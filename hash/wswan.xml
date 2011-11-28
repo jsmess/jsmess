@@ -3,7 +3,7 @@
 
 <softwarelist name="wswan" description="Bandai Wonderswan cartridges">
 	<software name="anchorz">
-        <!-- Alt title: アンカーズ・フィールド -->
+		<!-- Alt title: アンカーズ・フィールド -->
 		<description>Anchorz Field</description>
 		<!--<release_date>1999-06-24</release_date>-->
 		<year>1999</year>
@@ -18,7 +18,7 @@
 	</software>
 
 	<software name="armrunit">
-        <!-- Alt title: アーマードユニット -->
+		<!-- Alt title: アーマードユニット -->
 		<description>Armored Unit</description>
 		<!--<release_date>1999-11-18</release_date>-->
 		<year>1999</year>
@@ -33,7 +33,7 @@
 	</software>
 
 	<software name="bakusoud">
-        <!-- Alt title: 爆走デコトラ伝説 フォー ワンダースワン -->
+		<!-- Alt title: 爆走デコトラ伝説 フォー ワンダースワン -->
 		<description>Bakusou Dekotora Densetsu for WonderSwan</description>
 		<!--<release_date>1999-12-29</release_date>-->
 		<year>1999</year>
@@ -48,7 +48,7 @@
 	</software>
 
 	<software name="bemaniws">
-        <!-- Alt title: ビートマニア for ワンダースワン -->
+		<!-- Alt title: ビートマニア for ワンダースワン -->
 		<description>Beatmania for WonderSwan</description>
 		<!--<release_date>1999-04-28</release_date>-->
 		<year>1999</year>
@@ -63,7 +63,7 @@
 	</software>
 
 	<software name="buffers">
-        <!-- Alt title: バッファーズエボリューション -->
+		<!-- Alt title: バッファーズエボリューション -->
 		<description>Buffers Evolution</description>
 		<!--<release_date>1999-12-09</release_date>-->
 		<year>1999</year>
@@ -78,7 +78,7 @@
 	</software>
 
 	<software name="cclimber">
-        <!-- Alt title: クレイジー・クライマー -->
+		<!-- Alt title: クレイジー・クライマー -->
 		<description>Crazy Climber</description>
 		<!--<release_date>1999-07-29</release_date>-->
 		<year>1999</year>
@@ -92,7 +92,7 @@
 	</software>
 
 	<software name="ccsakura" supported="no"> <!-- freezes -->
-        <!-- Alt title: カードキャプターさくら ～さくらとふしぎなクロウカード～ -->
+		<!-- Alt title: カードキャプターさくら ～さくらとふしぎなクロウカード～ -->
 		<description>Cardcaptor Sakura - Sakura to Fushigi na Clow Card</description>
 		<!--<release_date>1999-12-02</release_date>-->
 		<year>1999</year>
@@ -107,7 +107,7 @@
 	</software>
 
 	<software name="chaosgea">
-        <!-- Alt title: カオスギア 導かれし者 -->
+		<!-- Alt title: カオスギア 導かれし者 -->
 		<description>Chaos Gear - Michibikareshi Mono</description>
 		<!--<release_date>1999-06-10</release_date>-->
 		<year>1999</year>
@@ -122,7 +122,7 @@
 	</software>
 
 	<software name="chocodun">
-        <!-- Alt title: チョコボの不思議なダンジョン for ワンダースワン -->
+		<!-- Alt title: チョコボの不思議なダンジョン for ワンダースワン -->
 		<description>Chocobo no Fushigi na Dungeon for WonderSwan</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
@@ -137,7 +137,7 @@
 	</software>
 
 	<software name="chouanik">
-        <!-- Alt title: 超兄貴 男の魂札 -->
+		<!-- Alt title: 超兄貴 男の魂札 -->
 		<description>Chou Aniki - Otoko no Tamafuda</description>
 		<!--<release_date>2000-02-10</release_date>-->
 		<year>2000</year>
@@ -152,7 +152,7 @@
 	</software>
 
 	<software name="youfumak" supported="no"> <!-- freezes -->
-        <!-- Alt title: 超伝奇カードバトル 妖符魔界 菊地秀行 -->
+		<!-- Alt title: 超伝奇カードバトル 妖符魔界 菊地秀行 -->
 		<description>Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou</description>
 		<!--<release_date>1999-12-16</release_date>-->
 		<year>1999</year>
@@ -166,7 +166,7 @@
 	</software>
 
 	<software name="clocktow" supported="no"> <!-- freezes -->
-        <!-- Alt title: クロックタワー フォー ワンダースワン -->
+		<!-- Alt title: クロックタワー フォー ワンダースワン -->
 		<description>Clock Tower for WonderSwan</description>
 		<!--<release_date>1999-12-09</release_date>-->
 		<year>1999</year>
@@ -181,7 +181,7 @@
 	</software>
 
 	<software name="denshad2">
-        <!-- Alt title: 電車でGO ! 2 -->
+		<!-- Alt title: 電車でGO ! 2 -->
 		<description>Densha de Go! 2</description>
 		<!--<release_date>1999-10-07</release_date>-->
 		<year>1999</year>
@@ -195,7 +195,7 @@
 	</software>
 
 	<software name="denshadg">
-        <!-- Alt title: 電車でGO！ -->
+		<!-- Alt title: 電車でGO！ -->
 		<description>Densha de Go!</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
@@ -209,7 +209,7 @@
 	</software>
 
 	<software name="digi2tag">
-        <!-- Alt title: デジモンアドベンチャー02 タッグテイマーズ -->
+		<!-- Alt title: デジモンアドベンチャー02 タッグテイマーズ -->
 		<description>Digimon Adventure 02 - Tag Tamers</description>
 		<!--<release_date>2000-08-03</release_date>-->
 		<year>2000</year>
@@ -224,7 +224,7 @@
 	</software>
 
 	<software name="digianod">
-        <!-- Alt title: デジモンアドベンチャー アノードテイマー -->
+		<!-- Alt title: デジモンアドベンチャー アノードテイマー -->
 		<description>Digimon Adventure - Anode Tamer</description>
 		<!--<release_date>1999-12-16</release_date>-->
 		<year>1999</year>
@@ -239,7 +239,7 @@
 	</software>
 
 	<software name="digicatd">
-        <!-- Alt title: デジモンアドベンチャー カソードテイマー -->
+		<!-- Alt title: デジモンアドベンチャー カソードテイマー -->
 		<description>Digimon Adventure - Cathode Tamer</description>
 		<!--<release_date>2000-01-20</release_date>-->
 		<year>2000</year>
@@ -254,7 +254,7 @@
 	</software>
 
 	<software name="digimon">
-        <!-- Alt title: デジタルモンスター バージョン ワンダースワン -->
+		<!-- Alt title: デジタルモンスター バージョン ワンダースワン -->
 		<description>Digital Monster - Ver. WonderSwan</description>
 		<!--<release_date>1999-03-25</release_date>-->
 		<year>1999</year>
@@ -268,7 +268,7 @@
 	</software>
 
 	<software name="digimon1" cloneof="digimon">
-         <!-- Alt title: -->
+ 		<!-- Alt title: -->
 		<description>Digimon - Ver. WonderSwan (Asia)</description>
 		<year>19??</year>
 		<publisher>Bandai</publisher>
@@ -282,7 +282,7 @@
 	</software>
 
 	<software name="digipart">
-        <!-- Alt title: デジモンアドベンチャー02 デジタルパートナー -->
+		<!-- Alt title: デジモンアドベンチャー02 デジタルパートナー -->
 		<description>Digital Partner</description>
 		<!--<release_date>2000-05-25</release_date>-->
 		<year>2000</year>
@@ -296,7 +296,7 @@
 	</software>
 
 	<software name="dokodemo">
-        <!-- Alt title: どこでもハムスター -->
+		<!-- Alt title: どこでもハムスター -->
 		<description>Dokodemo Hamster</description>
 		<!--<release_date>2000-01-06</release_date>-->
 		<year>2000</year>
@@ -310,7 +310,7 @@
 	</software>
 
 	<software name="tmtori">
-        <!-- Alt title: たねをまく鳥 / boxart: D'sGarage21公募ゲーム たねをまく鳥 (D's Garage 21 Koubo Game - Tane o Maku Tori) -->
+		<!-- Alt title: たねをまく鳥 / boxart: D'sGarage21公募ゲーム たねをまく鳥 (D's Garage 21 Koubo Game - Tane o Maku Tori) -->
 		<description>Tane o Maku Tori</description>
 		<!--<release_date>1999-12-22</release_date>-->
 		<year>1999</year>
@@ -325,7 +325,7 @@
 	</software>
 
 	<software name="engacho">
-        <!-- Alt title: えんがちょ！for ワンダースワン -->
+		<!-- Alt title: えんがちょ！for ワンダースワン -->
 		<description>Engacho! for WonderSwan</description>
 		<!--<release_date>1999-10-28</release_date>-->
 		<year>1999</year>
@@ -340,7 +340,7 @@
 	</software>
 
 	<software name="evangeln">
-        <!-- Alt title: 新世紀エヴァンゲリオン シト育成 -->
+		<!-- Alt title: 新世紀エヴァンゲリオン シト育成 -->
 		<description>Neon Genesis Evangelion - Shito Ikusei</description>
 		<!--<release_date>1999-07-22</release_date>-->
 		<year>1999</year>
@@ -355,7 +355,7 @@
 	</software>
 
 	<software name="feversan">
-        <!-- Alt title: フィーバー サンキョー 公式パチンコシミュレーション フォー ワンダースワン -->
+		<!-- Alt title: フィーバー サンキョー 公式パチンコシミュレーション フォー ワンダースワン -->
 		<description>Fever - Sankyo Koushiki Pachinko Simulation for WonderSwan</description>
 		<!--<release_date>1999-12-09</release_date>-->
 		<year>1999</year>
@@ -370,7 +370,7 @@
 	</software>
 
 	<software name="fishingf">
-        <!-- Alt title: フィッシングフリークス バスライズ フォー ワンダースワン -->
+		<!-- Alt title: フィッシングフリークス バスライズ フォー ワンダースワン -->
 		<description>Fishing Freaks - Bass Rise for WonderSwan</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
@@ -385,7 +385,7 @@
 	</software>
 
 	<software name="flap2000">
-        <!-- Alt title: ファイナルラップ2000 -->
+		<!-- Alt title: ファイナルラップ2000 -->
 		<description>Final Lap 2000</description>
 		<!--<release_date>2000-03-23</release_date>-->
 		<year>2000</year>
@@ -400,7 +400,7 @@
 	</software>
 
 	<software name="fprowres">
-        <!-- Alt title: ファイヤープロレスリング フォー ワンダースワン -->
+		<!-- Alt title: ファイヤープロレスリング フォー ワンダースワン -->
 		<description>Fire Pro Wrestling for WonderSwan</description>
 		<!--<release_date>2000-08-31</release_date>-->
 		<year>2000</year>
@@ -415,7 +415,7 @@
 	</software>
 
 	<software name="gjajamar">
-        <!-- Alt title: 元祖じゃじゃ丸くん -->
+		<!-- Alt title: 元祖じゃじゃ丸くん -->
 		<description>Ganso Jajamaru-kun</description>
 		<!--<release_date>1999-04-15</release_date>-->
 		<year>1999</year>
@@ -429,7 +429,7 @@
 	</software>
 
 	<software name="glochex">
-        <!-- Alt title: グローカルヘキサイト -->
+		<!-- Alt title: グローカルヘキサイト -->
 		<description>Glocal Hexcite</description>
 		<!--<release_date>2000-06-29</release_date>-->
 		<year>2000</year>
@@ -443,7 +443,7 @@
 	</software>
 
 	<software name="gomokuna">
-        <!-- Alt title: 五目並べ＆リバーシ 登龍門 -->
+		<!-- Alt title: 五目並べ＆リバーシ 登龍門 -->
 		<description>Gomoku Narabe &amp; Reversi - Touryuumon</description>
 		<!--<release_date>2000-01-13</release_date>-->
 		<year>2000</year>
@@ -458,7 +458,7 @@
 	</software>
 
 	<software name="gorakuta">
-        <!-- Alt title: 語楽王 タンゴ ! -->
+		<!-- Alt title: 語楽王 タンゴ ! -->
 		<description>Goraku Ou Tango!</description>
 		<!--<release_date>1999-04-01</release_date>-->
 		<year>1999</year>
@@ -472,7 +472,7 @@
 	</software>
 
 	<software name="gundmsvs">
-        <!-- Alt title: 機動戦士ガンダム エムエスバーサス -->
+		<!-- Alt title: 機動戦士ガンダム エムエスバーサス -->
 		<description>Kidou Senshi Gundam MSVS</description>
 		<!--<release_date>1999-08-26</release_date>-->
 		<year>1999</year>
@@ -487,7 +487,7 @@
 	</software>
 
 	<software name="gunpey">
-        <!-- Alt title: グンペイ -->
+		<!-- Alt title: グンペイ -->
 		<description>GunPey</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
@@ -502,7 +502,7 @@
 	</software>
 
 	<software name="hanafuda">
-        <!-- Alt title: 花札しようよ -->
+		<!-- Alt title: 花札しようよ -->
 		<description>Hanafuda Shiyouyo</description>
 		<!--<release_date>2000-02-17</release_date>-->
 		<year>2000</year>
@@ -517,7 +517,7 @@
 	</software>
 
 	<software name="handsonr">
-        <!-- Alt title: 携帯魚群探知機 ワンダースワン ハンディーソナー -->
+		<!-- Alt title: 携帯魚群探知機 ワンダースワン ハンディーソナー -->
 		<description>Keitai Gyogun Tanchiki - WonderSwan Handy Sonar</description>
 		<!--<release_date>1999-05-13</release_date>-->
 		<year>1999</year>
@@ -531,7 +531,7 @@
 	</software>
 
 	<software name="harobots">
-        <!-- Alt title: ハロボッツ -->
+		<!-- Alt title: ハロボッツ -->
 		<description>Harobots</description>
 		<!--<release_date>1999-10-07</release_date>-->
 		<year>1999</year>
@@ -546,7 +546,7 @@
 	</software>
 
 	<software name="hxhishi">
-        <!-- Alt title: ハンター×ハンター 意志を継ぐ者 -->
+		<!-- Alt title: ハンター×ハンター 意志を継ぐ者 -->
 		<description>Hunter X Hunter - Ishi o Tsugu Mono</description>
 		<!--<release_date>2000-06-01</release_date>-->
 		<year>2000</year>
@@ -560,7 +560,7 @@
 	</software>
 
 	<software name="itoujunj">
-        <!-- Alt title: うずまき 呪いシミュレーション -->
+		<!-- Alt title: うずまき 呪いシミュレーション -->
 		<description>Itou Junji Uzumaki - Noroi Simulation</description>
 		<!--<release_date>2000-03-04</release_date>-->
 		<year>2000</year>
@@ -574,7 +574,7 @@
 	</software>
 
 	<software name="kakutobr">
-        <!-- Alt title: 格闘料理伝説 ビストロレシピ ワンダーバトル編 -->
+		<!-- Alt title: 格闘料理伝説 ビストロレシピ ワンダーバトル編 -->
 		<description>Kakutou Ryouri Densetsu Bistro Recipe - Wonder Battle Hen</description>
 		<!--<release_date>1999-09-30</release_date>-->
 		<year>1999</year>
@@ -588,7 +588,7 @@
 	</software>
 
 	<software name="keibayos">
-        <!-- Alt title: 競馬予想支援ソフト 予想進化論 -->
+		<!-- Alt title: 競馬予想支援ソフト 予想進化論 -->
 		<description>Keiba Yosou Shien Soft - Yosou Shinkaron</description>
 		<!--<release_date>1999-09-14</release_date>-->
 		<year>1999</year>
@@ -602,7 +602,7 @@
 	</software>
 
 	<software name="kissyori">
-        <!-- Alt title: キスより… ～シーサイドセレナーデ～ -->
+		<!-- Alt title: キスより… ～シーサイドセレナーデ～ -->
 		<description>Kiss Yori... - Seaside Serenade</description>
 		<!--<release_date>1999-12-02</release_date>-->
 		<year>1999</year>
@@ -617,7 +617,7 @@
 	</software>
 
 	<software name="klonoa">
-        <!-- Alt title: 風のクロノアムーンライトミュージアム -->
+		<!-- Alt title: 風のクロノアムーンライトミュージアム -->
 		<description>Kaze no Klonoa - Moonlight Museum</description>
 		<!--<release_date>1999-05-20</release_date>-->
 		<year>1999</year>
@@ -632,7 +632,7 @@
 	</software>
 
 	<software name="kosodate">
-        <!-- Alt title: 子育てクイズ どこでもマイエンジェル -->
+		<!-- Alt title: 子育てクイズ どこでもマイエンジェル -->
 		<description>Kosodate Quiz Dokodemo - My Angel</description>
 		<!--<release_date>1999-04-15</release_date>-->
 		<year>1999</year>
@@ -646,7 +646,7 @@
 	</software>
 
 	<software name="kyousoub">
-        <!-- Alt title: 競走馬育成シミュレーション ケイバ -->
+		<!-- Alt title: 競走馬育成シミュレーション ケイバ -->
 		<description>Kyousouba Ikusei Simulation - Keiba</description>
 		<!--<release_date>1999-11-18</release_date>-->
 		<year>1999</year>
@@ -660,7 +660,7 @@
 	</software>
 
 	<software name="langriss">
-        <!-- Alt title: ラングリッサーミレニアム WS ～The LastCentury～ -->
+		<!-- Alt title: ラングリッサーミレニアム WS ～The LastCentury～ -->
 		<description>Langrisser Millennium WS - The Last Century</description>
 		<!--<release_date>2000-03-09</release_date>-->
 		<year>2000</year>
@@ -675,7 +675,7 @@
 	</software>
 
 	<software name="laststnd">
-        <!-- Alt title: ラストスタンド -->
+		<!-- Alt title: ラストスタンド -->
 		<description>Last Stand</description>
 		<!--<release_date>1999-05-27</release_date>-->
 		<year>1999</year>
@@ -689,7 +689,7 @@
 	</software>
 
 	<software name="loderun">
-        <!-- Alt title: ロードランナー フォー ワンダースワン -->
+		<!-- Alt title: ロードランナー フォー ワンダースワン -->
 		<description>Lode Runner for WonderSwan</description>
 		<!--<release_date>2000-04-20</release_date>-->
 		<year>2000</year>
@@ -703,7 +703,7 @@
 	</software>
 
 	<software name="macross">
-        <!-- Alt title: 超時空要塞マクロス トゥルーラブソング -->
+		<!-- Alt title: 超時空要塞マクロス トゥルーラブソング -->
 		<description>Macross - True Love Song</description>
 		<!--<release_date>2000-03-23</release_date>-->
 		<year>2000</year>
@@ -717,7 +717,7 @@
 	</software>
 
 	<software name="magdrop">
-        <!-- Alt title: マジカルドロップ for ワンダースワン -->
+		<!-- Alt title: マジカルドロップ for ワンダースワン -->
 		<description>Magical Drop for WonderSwan</description>
 		<!--<release_date>1999-10-14</release_date>-->
 		<year>1999</year>
@@ -731,7 +731,7 @@
 	</software>
 
 	<software name="mahjongt">
-        <!-- Alt title: 麻雀 登龍門 -->
+		<!-- Alt title: 麻雀 登龍門 -->
 		<description>Mahjong Touryuumon</description>
 		<!--<release_date>1999-03-11</release_date>-->
 		<year>1999</year>
@@ -745,7 +745,7 @@
 	</software>
 
 	<software name="makai">
-        <!-- Alt title: 魔界村 for ワンダースワン -->
+		<!-- Alt title: 魔界村 for ワンダースワン -->
 		<description>Makaimura for WonderSwan</description>
 		<!--<release_date>1999-07-22</release_date>-->
 		<year>1999</year>
@@ -760,7 +760,7 @@
 	</software>
 
 	<software name="mconanmc">
-        <!-- Alt title: 名探偵コナン 魔術師の挑戦状！ -->
+		<!-- Alt title: 名探偵コナン 魔術師の挑戦状！ -->
 		<description>Meitantei Conan - Majutsushi no Chousenjou!</description>
 		<!--<release_date>1999-08-05</release_date>-->
 		<year>1999</year>
@@ -775,7 +775,7 @@
 	</software>
 
 	<software name="mconannm" supported="no"> <!-- freezes -->
-        <!-- Alt title: 名探偵コナン 西の名探偵 最大の危機！？ -->
+		<!-- Alt title: 名探偵コナン 西の名探偵 最大の危機！？ -->
 		<description>Meitantei Conan - Nishi no Meitantei Saidai no Kiki!</description>
 		<!--<release_date>2000-07-27</release_date>-->
 		<year>2000</year>
@@ -789,7 +789,7 @@
 	</software>
 
 	<software name="medpkabu">
-        <!-- Alt title: メダロット パーフェクトエディション - カブトバージョン -->
+		<!-- Alt title: メダロット パーフェクトエディション - カブトバージョン -->
 		<description>Medarot Perfect Edition - Kabuto Version</description>
 		<!--<release_date>1999-05-04</release_date>-->
 		<year>1999</year>
@@ -803,7 +803,7 @@
 	</software>
 
 	<software name="medpkuwa">
-        <!-- Alt title: メダロット パーフェクトエディション - クワガタバージョン -->
+		<!-- Alt title: メダロット パーフェクトエディション - クワガタバージョン -->
 		<description>Medarot Perfect Edition - Kuwagata Version</description>
 		<!--<release_date>1999-05-04</release_date>-->
 		<year>1999</year>
@@ -817,7 +817,7 @@
 	</software>
 
 	<software name="mingmagn">
-        <!-- Alt title: ミングルマグネット -->
+		<!-- Alt title: ミングルマグネット -->
 		<description>Mingle Magnet</description>
 		<!--<release_date>1999-11-02</release_date>-->
 		<year>1999</year>
@@ -831,7 +831,7 @@
 	</software>
 
 	<software name="mjkiwame">
-        <!-- Alt title: プロ麻雀 極 フォー ワンダースワン -->
+		<!-- Alt title: プロ麻雀 極 フォー ワンダースワン -->
 		<description>Pro Mahjong Kiwame for WonderSwan</description>
 		<!--<release_date>1999-10-07</release_date>-->
 		<year>1999</year>
@@ -845,7 +845,7 @@
 	</software>
 
 	<software name="mjtetsu">
-        <!-- Alt title: 日本プロ麻雀連盟公認 徹萬 -->
+		<!-- Alt title: 日本プロ麻雀連盟公認 徹萬 -->
 		<description>Nihon Pro Mahjong Renmei Kounin Tetsuman</description>
 		<!--<release_date>1999-07-15</release_date>-->
 		<year>1999</year>
@@ -859,7 +859,7 @@
 	</software>
 
 	<software name="mobilewg">
-         <!-- Alt title: -->
+ 		<!-- Alt title: -->
 		<description>MobileWonderGate</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -871,7 +871,7 @@
 	</software>
 
 	<software name="proyakyu">
-        <!-- Alt title: 燃えろ！！プロ野球 ルーキーズ -->
+		<!-- Alt title: 燃えろ！！プロ野球 ルーキーズ -->
 		<description>Moero!! Pro Yakyuu Rookies</description>
 		<!--<release_date>2000-03-30</release_date>-->
 		<year>2000</year>
@@ -885,7 +885,7 @@
 	</software>
 
 	<software name="moritash">
-        <!-- Alt title: 森田将棋 フォー ワンダースワン -->
+		<!-- Alt title: 森田将棋 フォー ワンダースワン -->
 		<description>Morita Shougi for WonderSwan</description>
 		<!--<release_date>1999-11-02</release_date>-->
 		<year>1999</year>
@@ -899,7 +899,7 @@
 	</software>
 
 	<software name="mtherapy">
-        <!-- Alt title: メタコミセラピー ねぇ聞いて！ -->
+		<!-- Alt title: メタコミセラピー ねぇ聞いて！ -->
 		<description>Metakomi Theraphy - Nee Kiite!</description>
 		<!--<release_date>2000-03-23</release_date>-->
 		<year>2000</year>
@@ -913,7 +913,7 @@
 	</software>
 
 	<software name="nazoou">
-        <!-- Alt title: 謎王 Pocket -->
+		<!-- Alt title: 謎王 Pocket -->
 		<description>Nazo Ou Pocket</description>
 		<!--<release_date>1999-11-18</release_date>-->
 		<year>1999</year>
@@ -928,7 +928,7 @@
 	</software>
 
 	<software name="niceon">
-        <!-- Alt title: ナイスオン -->
+		<!-- Alt title: ナイスオン -->
 		<description>Nice On</description>
 		<!--<release_date>1999-04-08</release_date>-->
 		<year>1999</year>
@@ -943,7 +943,7 @@
 	</software>
 
 	<software name="nobunaga">
-        <!-- Alt title: 信長の野望 for ワンダースワン -->
+		<!-- Alt title: 信長の野望 for ワンダースワン -->
 		<description>Nobunaga no Yabou for WonderSwan</description>
 		<!--<release_date>1999-03-11</release_date>-->
 		<year>1999</year>
@@ -958,7 +958,7 @@
 	</software>
 
 	<software name="oekakil">
-        <!-- Alt title: おーちゃんのお絵かきロジック -->
+		<!-- Alt title: おーちゃんのお絵かきロジック -->
 		<description>Ou-chan no Oekaki Logic</description>
 		<!--<release_date>2000-01-06</release_date>-->
 		<year>2000</year>
@@ -973,7 +973,7 @@
 	</software>
 
 	<software name="onepmeza">
-        <!-- Alt title: フロムテレビアニメーション ワンピース めざせ海賊王！ -->
+		<!-- Alt title: フロムテレビアニメーション ワンピース めざせ海賊王！ -->
 		<description>From TV Animation One Piece - Mezase Kaizoku Ou!</description>
 		<!--<release_date>2000-07-19</release_date>-->
 		<year>2000</year>
@@ -1003,7 +1003,7 @@
 	</software>
 
 	<software name="pocketfi">
-        <!-- Alt title: ポケットファイター -->
+		<!-- Alt title: ポケットファイター -->
 		<description>Pocket Fighter</description>
 		<!--<release_date>2000-04-06</release_date>-->
 		<year>2000</year>
@@ -1018,7 +1018,7 @@
 	</software>
 
 	<software name="puyopuyo">
-        <!-- Alt title: ぷよぷよ通 -->
+		<!-- Alt title: ぷよぷよ通 -->
 		<description>Puyo Puyo Tsuu</description>
 		<!--<release_date>1999-03-11</release_date>-->
 		<year>1999</year>
@@ -1032,7 +1032,7 @@
 	</software>
 
 	<software name="rainbow">
-        <!-- Alt title: レインボーアイランド パティーズ☆パーティ！ -->
+		<!-- Alt title: レインボーアイランド パティーズ☆パーティ！ -->
 		<description>Rainbow Islands - Putty's Party</description>
 		<!--<release_date>2000-06-29</release_date>-->
 		<year>2000</year>
@@ -1047,7 +1047,7 @@
 	</software>
 
 	<software name="ring">
-        <!-- Alt title: リング インフィニティ -->
+		<!-- Alt title: リング インフィニティ -->
 		<description>Ring Infinity</description>
 		<!--<release_date>2000-08-10</release_date>-->
 		<year>2000</year>
@@ -1062,7 +1062,7 @@
 	</software>
 
 	<software name="srobot2a" supported="no"> <!-- freezes -->
-        <!-- Alt title: スーパーロボット大戦 コンパクト2 第1部：地上激闘篇 -->
+		<!-- Alt title: スーパーロボット大戦 コンパクト2 第1部：地上激闘篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-1-bu - Chijou Gekidou Hen</description>
 		<!--<release_date>2000-03-30</release_date>-->
 		<year>2000</year>
@@ -1076,7 +1076,7 @@
 	</software>
 
 	<software name="srobot2b" supported="no"> <!-- freezes -->
-         <!-- Alt title: スーパーロボット大戦 コンパクト2 第2部：宇宙激震篇 -->
+ 		<!-- Alt title: スーパーロボット大戦 コンパクト2 第2部：宇宙激震篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen</description>
 		<!--<release_date>2000-09-14</release_date>-->
 		<year>2000</year>
@@ -1091,7 +1091,7 @@
 	</software>
 
 	<software name="srobot2c" supported="no"> <!-- freezes -->
-         <!-- Alt title: スーパーロボット大戦 コンパクト2 第3部：銀河決戦篇 -->
+ 		<!-- Alt title: スーパーロボット大戦 コンパクト2 第3部：銀河決戦篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen</description>
 		<!--<release_date>2001-01-18</release_date>-->
 		<year>2001</year>
@@ -1106,7 +1106,7 @@
 	</software>
 
 	<software name="srobotws" supported="no"> <!-- freezes -->
-        <!-- Alt title: スーパーロボット大戦 コンパクト -->
+		<!-- Alt title: スーパーロボット大戦 コンパクト -->
 		<description>Super Robot Taisen Compact</description>
 		<!--<release_date>1999-04-28</release_date>-->
 		<year>1999</year>
@@ -1121,7 +1121,7 @@
 	</software>
 
 	<software name="robworks">
-        <!-- Alt title: ワンダーボーグ 完 -->
+		<!-- Alt title: ワンダーボーグ 完 -->
 		<description>Wonder Borg Robot Works</description>
 		<!--<release_date>2000-08-04</release_date>-->
 		<year>2000</year>
@@ -1135,7 +1135,7 @@
 	</software>
 
 	<software name="robworks1" cloneof="robworks">
-        <!-- Alt title: ワンダーボーグ 完 -->
+		<!-- Alt title: ワンダーボーグ 完 -->
 		<description>Robot Works (Asia)</description>
 		<!--<release_date>2000-08-04</release_date>-->
 		<year>2000</year>
@@ -1149,7 +1149,7 @@
 	</software>
 
 	<software name="rockmanf">
-        <!-- Alt title: ロックマン＆フォルテ 未来からの挑戦者 -->
+		<!-- Alt title: ロックマン＆フォルテ 未来からの挑戦者 -->
 		<description>Rockman &amp; Forte - Mirai Kara no Chousensha</description>
 		<!--<release_date>1999-10-28</release_date>-->
 		<year>1999</year>
@@ -1164,7 +1164,7 @@
 	</software>
 
 	<software name="sangoku">
-        <!-- Alt title: 三国志 for ワンダースワン -->
+		<!-- Alt title: 三国志 for ワンダースワン -->
 		<description>San Goku Shi for WonderSwan</description>
 		<!--<release_date>1999-04-01</release_date>-->
 		<year>1999</year>
@@ -1179,7 +1179,7 @@
 	</software>
 
 	<software name="sangoku2">
-        <!-- Alt title: 三国志II フォー ワンダースワン -->
+		<!-- Alt title: 三国志II フォー ワンダースワン -->
 		<description>San Goku Shi II for WonderSwan</description>
 		<!--<release_date>2000-04-06</release_date>-->
 		<year>2000</year>
@@ -1193,7 +1193,7 @@
 	</software>
 
 	<software name="sdgundem">
-        <!-- Alt title: SDガンダム エモーショナルジャム -->
+		<!-- Alt title: SDガンダム エモーショナルジャム -->
 		<description>SD Gundam - Emotional Jam</description>
 		<!--<release_date>1999-05-27</release_date>-->
 		<year>1999</year>
@@ -1208,7 +1208,7 @@
 	</software>
 
 	<software name="sdgundga">
-        <!-- Alt title: SD ガンダム ガシャポン戦記 -エピソード1- -->
+		<!-- Alt title: SD ガンダム ガシャポン戦記 -エピソード1- -->
 		<description>SD Gundam Gashapon Senki - Episode 1</description>
 		<!--<release_date>1999-12-29</release_date>-->
 		<year>1999</year>
@@ -1222,7 +1222,7 @@
 	</software>
 
 	<software name="sdgundgg">
-        <!-- Alt title: SDガンダム Gジェネレーション ギャザービート -->
+		<!-- Alt title: SDガンダム Gジェネレーション ギャザービート -->
 		<description>SD Gundam G-Generation - Gather Beat</description>
 		<!--<release_date>2000-07-13</release_date>-->
 		<year>2000</year>
@@ -1237,7 +1237,7 @@
 	</software>
 
 	<software name="senkai">
-        <!-- Alt title: 仙界伝 ～TVアニメーション仙界伝封神演義より～ -->
+		<!-- Alt title: 仙界伝 ～TVアニメーション仙界伝封神演義より～ -->
 		<description>Senkaiden - TV Animation Senkaiden Houshin Engi Yori</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
@@ -1252,7 +1252,7 @@
 	</software>
 
 	<software name="sennoumi">
-        <!-- Alt title: 線脳 ミレニアム -->
+		<!-- Alt title: 線脳 ミレニアム -->
 		<description>Sennou Millennium</description>
 		<!--<release_date>2000-03-16</release_date>-->
 		<year>2000</year>
@@ -1267,7 +1267,7 @@
 	</software>
 
 	<software name="shanghai">
-        <!-- Alt title: 上海 ポケット -->
+		<!-- Alt title: 上海 ポケット -->
 		<description>Shanghai Pocket</description>
 		<!--<release_date>1999-04-01</release_date>-->
 		<year>1999</year>
@@ -1281,7 +1281,7 @@
 	</software>
 
 	<software name="sprowres">
-        <!-- Alt title: 新日本プロレスリング 闘魂烈伝 -->
+		<!-- Alt title: 新日本プロレスリング 闘魂烈伝 -->
 		<description>Shin Nihon Pro Wrestling Toukon Retsuden</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
@@ -1295,7 +1295,7 @@
 	</software>
 
 	<software name="shougito">
-        <!-- Alt title: 将棋 登龍門 -->
+		<!-- Alt title: 将棋 登龍門 -->
 		<description>Shougi Touryuumon</description>
 		<!--<release_date>1999-10-28</release_date>-->
 		<year>1999</year>
@@ -1309,7 +1309,7 @@
 	</software>
 
 	<software name="sidepock">
-        <!-- Alt title: サイドポケット for ワンダースワン -->
+		<!-- Alt title: サイドポケット for ワンダースワン -->
 		<description>Side Pocket for WonderSwan</description>
 		<!--<release_date>1999-11-25</release_date>-->
 		<year>1999</year>
@@ -1323,7 +1323,7 @@
 	</software>
 
 	<software name="slither">
-        <!-- Alt title: スリザーリンク -->
+		<!-- Alt title: スリザーリンク -->
 		<description>Slither Link</description>
 		<!--<release_date>2000-04-20</release_date>-->
 		<year>2000</year>
@@ -1338,7 +1338,7 @@
 	</software>
 
 	<software name="soccerya">
-        <!-- Alt title: サッカーやろう！ チャレンジ・ザ・ワールド -->
+		<!-- Alt title: サッカーやろう！ チャレンジ・ザ・ワールド -->
 		<description>Soccer Yarou! - Challenge the World</description>
 		<!--<release_date>1999-08-12</release_date>-->
 		<year>1999</year>
@@ -1352,7 +1352,7 @@
 	</software>
 
 	<software name="sotsugyo">
-        <!-- Alt title: 卒業 フォー ワンダースワン -->
+		<!-- Alt title: 卒業 フォー ワンダースワン -->
 		<description>Sotsugyou for WonderSwan</description>
 		<!--<release_date>1999-12-16</release_date>-->
 		<year>1999</year>
@@ -1367,7 +1367,7 @@
 	</software>
 
 	<software name="spaceinv">
-        <!-- Alt title: スペースインベーダー -->
+		<!-- Alt title: スペースインベーダー -->
 		<description>Space Invaders</description>
 		<!--<release_date>1999-05-13</release_date>-->
 		<year>1999</year>
@@ -1381,7 +1381,7 @@
 	</software>
 
 	<software name="streetdn">
-        <!-- Alt title: ワサビ プロデュース ストリートダンサー -->
+		<!-- Alt title: ワサビ プロデュース ストリートダンサー -->
 		<description>Wasabi Produce - Street Dancer</description>
 		<!--<release_date>2000-04-27</release_date>-->
 		<year>2000</year>
@@ -1395,7 +1395,7 @@
 	</software>
 
 	<software name="taikyigo">
-        <!-- Alt title: 対局囲碁 平成棋院 -->
+		<!-- Alt title: 対局囲碁 平成棋院 -->
 		<description>Taikyoku Igo - Heisei Kiin</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
@@ -1421,7 +1421,7 @@
 	</software-->
 
 	<software name="tanjoude">
-        <!-- Alt title: 誕生 デビュー フォー ワンダースワン -->
+		<!-- Alt title: 誕生 デビュー フォー ワンダースワン -->
 		<description>Tanjou Debut for WonderSwan</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
@@ -1436,7 +1436,7 @@
 	</software>
 
 	<software name="tekkncrd">
-        <!-- Alt title: 鉄拳カードチャレンジ -->
+		<!-- Alt title: 鉄拳カードチャレンジ -->
 		<description>Tekken Card Challenge</description>
 		<!--<release_date>1999-06-17</release_date>-->
 		<year>1999</year>
@@ -1451,7 +1451,7 @@
 	</software>
 
 	<software name="terrors">
-        <!-- Alt title: テラーズ -->
+		<!-- Alt title: テラーズ -->
 		<description>Terrors</description>
 		<!--<release_date>1999-05-08</release_date>-->
 		<year>1999</year>
@@ -1466,7 +1466,7 @@
 	</software>
 
 	<software name="tetsu28g">
-        <!-- Alt title: 鉄人28号 -->
+		<!-- Alt title: 鉄人28号 -->
 		<description>Tetsujin 28 Gou</description>
 		<!--<release_date>1999-12-22</release_date>-->
 		<year>1999</year>
@@ -1481,7 +1481,7 @@
 	</software>
 
 	<software name="timeboka">
-        <!-- Alt title: タイム ボカン シリーズ ボカン伝説 ブタもおだてりゃドロンボー -->
+		<!-- Alt title: タイム ボカン シリーズ ボカン伝説 ブタもおだてりゃドロンボー -->
 		<description>Time Bokan Series - Bokan Densetsu - Butamo Odaterya Doronbou</description>
 		<!--<release_date>2000-04-27</release_date>-->
 		<year>2000</year>
@@ -1496,7 +1496,7 @@
 	</software>
 
 	<software name="tokyomg">
-        <!-- Alt title: 東京魔人学園 符咒封録 -->
+		<!-- Alt title: 東京魔人学園 符咒封録 -->
 		<description>Tokyo Majin Gakuen - Fuju Houroku</description>
 		<!--<release_date>2000-10-12</release_date>-->
 		<year>2000</year>
@@ -1511,7 +1511,7 @@
 	</software>
 
 	<software name="tpgunpey">
-        <!-- Alt title: たれぱんだのぐんぺい -->
+		<!-- Alt title: たれぱんだのぐんぺい -->
 		<description>Tare Panda no GunPey</description>
 		<!--<release_date>1999-12-09</release_date>-->
 		<year>1999</year>
@@ -1525,7 +1525,7 @@
 	</software>
 
 	<software name="trumpcl2">
-        <!-- Alt title: トランプコレクション ボトムアップ的トランプ生活 -->
+		<!-- Alt title: トランプコレクション ボトムアップ的トランプ生活 -->
 		<description>Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi</description>
 		<!--<release_date>2000-09-28</release_date>-->
 		<year>2000</year>
@@ -1551,7 +1551,7 @@
 	</software-->
 
 	<software name="trumpcol">
-        <!-- Alt title: トランプコレクション2 ボトムアップ的世界一周の旅 -->
+		<!-- Alt title: トランプコレクション2 ボトムアップ的世界一周の旅 -->
 		<description>Trump Collection - Bottom-Up Teki Trump Seikatsu</description>
 		<!--<release_date>1999-07-01</release_date>-->
 		<year>1999</year>
@@ -1565,7 +1565,7 @@
 	</software>
 
 	<software name="turntabl">
-        <!-- Alt title: タ→ンテ→ブリスト DJバトル -->
+		<!-- Alt title: タ→ンテ→ブリスト DJバトル -->
 		<description>Turntablist - DJ Battle</description>
 		<!--<release_date>1999-11-25</release_date>-->
 		<year>1999</year>
@@ -1580,7 +1580,7 @@
 	</software>
 
 	<software name="umizuri">
-        <!-- Alt title: 海釣りに行こう！ -->
+		<!-- Alt title: 海釣りに行こう！ -->
 		<description>Umizuri ni Ikou!</description>
 		<!--<release_date>1999-04-01</release_date>-->
 		<year>1999</year>
@@ -1594,7 +1594,7 @@
 	</software>
 
 	<software name="uzumaki">
-        <!-- Alt title: うずまき ～電視怪奇篇～ -->
+		<!-- Alt title: うずまき ～電視怪奇篇～ -->
 		<description>Uzumaki - Denshi Kaiki Hen</description>
 		<!--<release_date>2000-02-03</release_date>-->
 		<year>2000</year>
@@ -1608,7 +1608,7 @@
 	</software>
 
 	<software name="vaitzbla">
-        <!-- Alt title: ヴァイツブレイド -->
+		<!-- Alt title: ヴァイツブレイド -->
 		<description>Vaitz Blade</description>
 		<!--<release_date>1999-06-24</release_date>-->
 		<year>1999</year>
@@ -1623,7 +1623,7 @@
 	</software>
 
 	<software name="wstad99">
-        <!-- Alt title: ワンダースタジアム'99 -->
+		<!-- Alt title: ワンダースタジアム'99 -->
 		<description>Wonder Stadium '99</description>
 		<!--<release_date>1999-09</release_date>-->
 		<year>1999</year>
@@ -1638,7 +1638,7 @@
 	</software>
 
 	<software name="wstadium">
-        <!-- Alt title: ワンダースタジアム -->
+		<!-- Alt title: ワンダースタジアム -->
 		<description>Wonder Stadium</description>
 		<!--<release_date>1999-03</release_date>-->
 		<year>1999</year>
