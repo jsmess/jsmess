@@ -37916,7 +37916,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="crackoutup" cloneof="crackout">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Crackout (USA, Prototype)</description>
+		<description>CrackOut (USA, Prototype)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
@@ -43814,7 +43814,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- ORIGINAL & HACK PIRATE CARTS -->
 
-	<software name="crimebst" supported="partial">
+	<software name="crimebst" supported="no">
 		<!-- Serial: UNL-GRA-CB - Release Date: 1989 - Alternative Title:  -->
 		<description>Crime Busters</description>
 		<year>1989</year>
