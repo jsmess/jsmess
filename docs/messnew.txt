@@ -1,4 +1,77 @@
-﻿0.144
+﻿0.144u1
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- IBM PS/2 8530-H31 (Model 30/286) [Supervinx]
+- IBM PS/2 8535-043 (Model 35) [Supervinx]
+- IBM PS/2 8550-021 (Model 50) [Supervinx]
+- IBM PS/2 8550-061 (Model 50Z) [Supervinx]
+- IBM PS/2 8580-071 (Model 80) [Supervinx]
+- IBM PS/2 8580-111 (Model 80) [Supervinx]
+- 3DO M2 [Brian Hargrove]
+- Olivetti M15 [F.J. Kraan]
+
+System Driver Changes:
+----------------------
+-abc80: Added skeleton for ABC SIO card. [robcfg, Curt Coder]
+-abc80: Added skeleton for ABC FD2 card (ROMs not dumped yet). 	
+ [robcfg, Curt Coder]
+-snes: fixed another SRAM issue (Secret of Mana was affected, 
+ but probably other games too) [Fabio Priuli]
+-exelv: refactored  to define ADDRESS_MAP_MODERN [Fabio Priuli]
+-tms3556: converted to be a C++ device [Fabio Priuli]
+-cbmb: Added Commodore 8250LP drive (not working). [Curt Coder]
+-hector: Hector HRX minidisc support [JJ Stacino]
+-comx35: Fixed quickload. [Curt Coder]
+-abc80: Refactored memory mapping to use the MMU PROM. [Curt Coder]
+-at: Confirmed dump for 8555-081 (Model 55SX) and 8555-X61 (Model 55SX) [Supervinx]
+-mm1m6: Refactored to use the address decoder PROM. [Curt Coder]
+-kc: Added support for kcc, tap, tp2 and sss cassette images. [Sandro Ronco]
+-ep804/digel804: Add a bunch of information from the recently 
+ discovered schematics [Lord Nightmare]
+-victor9k: Added keyboard MCU ROM. [kevtris, Lord Nightmare]
+-lynx: Fixed end of sprite data detection bug,fixed sprite stretch / tilt handling 
+ improved handling of signed variables. Replaced magic numbers with constants. [Huygens]
+-coco: Multiple VHD support [Nathan Woods]
+-sms: added v1.0 proto bios [SMSPower]
+
+Software Lists:
+----------------
+-vidbrain.xml: Added new dumps to softlist. [Sean Riddle]
+-abc80.xml: Added some FD2 dumps to the softlist. [robcfg]
+-nes.xml: started to add more documentation to the confirmed dumps [Fabio Priuli]
+-lynx.xml: Small rotation info change [Huygens]
+-cpc: added preliminary cassette and floppy software lists [David Haywood]
+-mac: reworked HDD softlist using compressed CHDs, added softlist support to more models [R. Belmont]
+-softlist: fixed a bunch of small inconsistency [souxx, Fabio Priuli]
+
+Source Changes:
+----------------
+-coco: New CoCo driver: [Nathan Woods]
+ * Modernized codebase (fully C++/device based)
+ * Better MC6847/MC6883 emulation, particularly with respect to the interactions
+   between those two chips.
+ * Better separation between CoCo 1/2, CoCo 3, Dragon and Dragon Alpha emulations
+ * Updated all drivers to use new MC6847 emulation (VTech, MC10 etc)
+ * Converted RAM and Bitbanger devices to C++
+-ipf: avoid writing out-of-bounds [O. Galibert]
+-amigafdc: fixes, fixes [O. Galibert]
+-hd66421: converted to be a C++ device [Fabio Priuli]
+-Fixed HLSL memory leak and 32-bit HLSL crash-on-exit. [Ryan Holtz, Bat Country Entertainment]
+-amigafdc: Make the dsksync/DMA interaction more correct... probably [O. Galibert]
+-wd1772: generalize to all wd177x [O. Galibert]
+-upd765: Fixed sector increment during read/write. [Curt Coder]
+-Fixed image loading for apple2 in cases with tolerated extra bytes [Chad]
+
+0.144
 
 New System Drivers Supported:
 -----------------------------
