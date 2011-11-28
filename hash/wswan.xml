@@ -91,7 +91,7 @@
 		</part>
 	</software>
 
-	<software name="ccsakura">
+	<software name="ccsakura" supported="no"> <!-- freezes -->
         <!-- Alt title: カードキャプターさくら ～さくらとふしぎなクロウカード～ -->
 		<description>Cardcaptor Sakura - Sakura to Fushigi na Clow Card</description>
 		<!--<release_date>1999-12-02</release_date>-->
@@ -151,7 +151,7 @@
 		</part>
 	</software>
 
-	<software name="youfumak">
+	<software name="youfumak" supported="no"> <!-- freezes -->
         <!-- Alt title: 超伝奇カードバトル 妖符魔界 菊地秀行 -->
 		<description>Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou</description>
 		<!--<release_date>1999-12-16</release_date>-->
@@ -165,7 +165,7 @@
 		</part>
 	</software>
 
-	<software name="clocktow">
+	<software name="clocktow" supported="no"> <!-- freezes -->
         <!-- Alt title: クロックタワー フォー ワンダースワン -->
 		<description>Clock Tower for WonderSwan</description>
 		<!--<release_date>1999-12-09</release_date>-->
@@ -309,9 +309,9 @@
 		</part>
 	</software>
 
-	<software name="dsgarage">
-        <!-- Alt title: D's Garage21公募ゲーム たねをまく鳥 -->
-		<description>D's Garage 21 Koubo Game - Tane o Maku Tori</description>
+	<software name="tmtori">
+        <!-- Alt title: たねをまく鳥 / boxart: D'sGarage21公募ゲーム たねをまく鳥 (D's Garage 21 Koubo Game - Tane o Maku Tori) -->
+		<description>Tane o Maku Tori</description>
 		<!--<release_date>1999-12-22</release_date>-->
 		<year>1999</year>
 		<publisher>Bandai</publisher>
@@ -774,7 +774,7 @@
 		</part>
 	</software>
 
-	<software name="mconannm">
+	<software name="mconannm" supported="no"> <!-- freezes -->
         <!-- Alt title: 名探偵コナン 西の名探偵 最大の危機！？ -->
 		<description>Meitantei Conan - Nishi no Meitantei Saidai no Kiki!</description>
 		<!--<release_date>2000-07-27</release_date>-->
@@ -987,8 +987,8 @@
 		</part>
 	</software>
 
-	<software name="pbobble">
-        <!-- Alt title: パズルボブル -->
+	<software name="pbobble" supported="partial">
+		<!-- Alt title: パズルボブル -->
 		<description>Puzzle Bobble</description>
 		<!--<release_date>1999-07-01</release_date>-->
 		<year>1999</year>
@@ -1061,7 +1061,7 @@
 		</part>
 	</software>
 
-	<software name="srobot2a">
+	<software name="srobot2a" supported="no"> <!-- freezes -->
         <!-- Alt title: スーパーロボット大戦 コンパクト2 第1部：地上激闘篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-1-bu - Chijou Gekidou Hen</description>
 		<!--<release_date>2000-03-30</release_date>-->
@@ -1075,7 +1075,7 @@
 		</part>
 	</software>
 
-	<software name="srobot2b">
+	<software name="srobot2b" supported="no"> <!-- freezes -->
          <!-- Alt title: スーパーロボット大戦 コンパクト2 第2部：宇宙激震篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen</description>
 		<!--<release_date>2000-09-14</release_date>-->
@@ -1090,7 +1090,7 @@
 		</part>
 	</software>
 
-	<software name="srobot2c">
+	<software name="srobot2c" supported="no"> <!-- freezes -->
          <!-- Alt title: スーパーロボット大戦 コンパクト2 第3部：銀河決戦篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen</description>
 		<!--<release_date>2001-01-18</release_date>-->
@@ -1105,7 +1105,7 @@
 		</part>
 	</software>
 
-	<software name="srobotws">
+	<software name="srobotws" supported="no"> <!-- freezes -->
         <!-- Alt title: スーパーロボット大戦 コンパクト -->
 		<description>Super Robot Taisen Compact</description>
 		<!--<release_date>1999-04-28</release_date>-->
@@ -1280,7 +1280,7 @@
 		</part>
 	</software>
 
-	<software name="shinpwre">
+	<software name="sprowres">
         <!-- Alt title: 新日本プロレスリング 闘魂烈伝 -->
 		<description>Shin Nihon Pro Wrestling Toukon Retsuden</description>
 		<!--<release_date>1999-03-04</release_date>-->
@@ -1322,7 +1322,7 @@
 		</part>
 	</software>
 
-	<software name="slitherl">
+	<software name="slither">
         <!-- Alt title: スリザーリンク -->
 		<description>Slither Link</description>
 		<!--<release_date>2000-04-20</release_date>-->
