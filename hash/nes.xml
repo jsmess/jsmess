@@ -44249,7 +44249,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="mastrchub" cloneof="mastrchu">
 		<!-- Serial: TC-007 - Release Date:  - Alternative Title:  -->
-		<description>Master Chu &amp; Drunkard Hu (Asia, Pal)</description>
+		<description>Master Chu &amp; Drunkard Hu (Tw, Pal)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44370,7 +44370,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="bokuksk">
 		<!-- Serial: TC-012 - Release Date:  - Alternative Title: The World Of Card Game -->
-		<description>Boku Koku Shuu Kin (Asia)</description>
+		<description>Boku Koku Shuu Kin (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44388,7 +44388,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="bokukska" cloneof="bokuksk">
 		<!-- Serial: TC-012 - Release Date:  - Alternative Title: The World Of Card Game -->
-		<description>Boku Koku Shuu Kin (Asia, Alt)</description>
+		<description>Boku Koku Shuu Kin (Tw, Alt)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44405,7 +44405,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="bokukskb" cloneof="bokuksk">
 		<!-- Serial:  - Release Date:  - Alternative Title: The World Of Card Game -->
-		<description>Boku Koku Shuu Kin (Asia, Pirate?)</description>
+		<description>Boku Koku Shuu Kin (Tw, Pirate?)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44423,9 +44423,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="poker2">
 		<!-- Serial: TC-013 - Release Date:  - Alternative Title:  -->
-		<description>Poker II (Asia)</description>
+		<description>Poker II (Tw)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SACHEN-74LS374N" />
 			<feature name="mirroring" value="horizontal" />
@@ -44440,9 +44440,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="strateg">
 		<!-- Serial: TC-014 - Release Date:  - Alternative Title:  -->
-		<description>Strategist (Asia, Ntsc)</description>
+		<description>Strategist (Tw, Ntsc)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SACHEN-74LS374N" />
 			<feature name="mirroring" value="horizontal" />
@@ -44457,9 +44457,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="stratega" cloneof="strateg">
 		<!-- Serial: TC-014 - Release Date:  - Alternative Title:  -->
-		<description>Strategist (Asia, Pal, w/Intro)</description>
+		<description>Strategist (Tw, Pal, w/Intro)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SACHEN-74LS374N" />
 			<feature name="mirroring" value="horizontal" />
@@ -44576,11 +44576,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="poker3">
 		<!-- Serial: TC-020 - Release Date:  - Alternative Title:  -->
-		<description>Poker III 5 in 1 (Asia)</description>
+		<description>Poker III 5 in 1 (Tw)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-SACHEN-74LS374N-A" /> <!-- Mapper 243 variant -->
+			<feature name="pcb" value="UNL-SACHEN-74LS374N" /> <!-- Mapper 243 variant -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
 				<rom name="poker iii 5 in 1 (asia) (unl).chr" size="65536" crc="d74e9ff2" sha1="5066c2d12ff2ac45ef395d3a4353e897fce19f78" offset="00000" status="baddump" />
@@ -44593,9 +44593,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="poker3a" cloneof="poker3">
 		<!-- Serial: TC-020 - Release Date:  - Alternative Title:  -->
-		<description>Poker III 5 in 1 (Asia, Alt)</description>
+		<description>Poker III 5 in 1 (Tw, Alt)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SACHEN-74LS374N-A" /> <!-- Mapper 243 variant -->
 			<feature name="mirroring" value="horizontal" />
@@ -44610,9 +44610,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="poker3b" cloneof="poker3">
 		<!-- Serial: TC-020 - Release Date:  - Alternative Title:  -->
-		<description>Poker III 5 in 1 (Asia, Alt 2)</description>
+		<description>Poker III 5 in 1 (Tw, Alt 2)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SACHEN-74LS374N-A" /> <!-- Mapper 243 variant -->
 			<feature name="mirroring" value="horizontal" />
@@ -44659,9 +44659,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="popoteam">
 		<!-- Serial: TC-023 - Release Date:  - Alternative Title:  -->
-		<description>Po Po Team (Asia)</description>
+		<description>Po Po Team (Tw)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SACHEN-8259A" />
 			<dataarea name="chr" size="65536">
@@ -44723,7 +44723,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="shero" supported="no">
 		<!-- Serial: TC-027 - Release Date:  - Alternative Title:  -->
-		<description>Street Heroes (Asia)</description>
+		<description>Street Heroes (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44743,9 +44743,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="jboy2">
 		<!-- Serial: TC-028 - Release Date:  - Alternative Title: Jurassic Boy (on the cart label) -->
-		<description>Jurassic Boy 2 (Asia)</description>
+		<description>Jurassic Boy 2 (Tw)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -44809,7 +44809,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="chuugokt" supported="no">
 		<!-- Serial: TC-032 - Release Date:  - Alternative Title: 中國大亨 -->
-		<description>Chuugoku Taitei (Asia)</description>
+		<description>Chuugoku Taitei (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44969,7 +44969,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="tai16mj">
 		<!-- Serial: SA-001 - Release Date:  - Alternative Title: 台灣麻將 -->
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Asia)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44985,7 +44985,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="tai16mjb" cloneof="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Asia, Alt 2)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Alt 2)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45001,7 +45001,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="tai16mja" cloneof="tai16mj">
-		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Asia, Alt)</description>
+		<description>Taiwan Mahjong - Tai Wan Ma Que 16 (Tw, Alt)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45019,7 +45019,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	<!-- SA-002 is Penguin and Seal, and its dump coincide with the HES version -->
 	<software name="pengseal">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>The Penguin &amp; Seal (Asia, Aus)</description>
+		<description>The Penguin &amp; Seal (Tw, Aus)</description>
 		<year>19??</year>
 		<publisher>Sachen ~ HES</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45036,7 +45036,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="dongdng2">
 		<!-- Serial: SA-003 - Release Date:  - Alternative Title:  -->
-		<description>Middle School English - Dong Dong Nao II (Asia)</description>
+		<description>Middle School English - Dong Dong Nao II (Tw)</description>
 		<!-- check title: Dong Dong Nao Ii - Guo Zhong Ying Wen in GoodNES, Middle School English - Dong Dong Nao - Guo Zhong Ying Wen in TOSEC -->
 		<year>1989</year>
 		<publisher>Sachen</publisher>
@@ -45089,7 +45089,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="mnq">
 		<!-- Serial: SA-006 - Release Date:  - Alternative Title: Honey Peach -->
-		<description>Mei Nu Quan (Asia)</description>
+		<description>Mei Nu Quan (Tw)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45107,7 +45107,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- These have wrong CHR order, probably. Bad dump or different board? I have to investigate....  -->
 	<software name="mnq1" cloneof="mnq">
 		<!-- Serial: SA-006 - Release Date:  - Alternative Title: Honey Peach -->
-		<description>Mei Nu Quan (Asia, Alt)</description>
+		<description>Mei Nu Quan (Tw, Alt)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45124,7 +45124,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="mnq2" cloneof="mnq">
 		<!-- Serial: SA-006 - Release Date:  - Alternative Title: Honey Peach -->
-		<description>Mei Nu Quan (Asia, Alt 2)</description>
+		<description>Mei Nu Quan (Tw, Alt 2)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45141,7 +45141,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="mnq3" cloneof="mnq">
 		<!-- Serial: SA-006 - Release Date:  - Alternative Title: Honey Peach -->
-		<description>Mei Nu Quan (Asia, Alt 3)</description>
+		<description>Mei Nu Quan (Tw, Alt 3)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45247,9 +45247,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="pyramid2">
 		<!-- Serial: SA-010 - Release Date:  - Alternative Title:  -->
-		<description>Pyramid II (Asia, NES cart)</description>
+		<description>Pyramid II (Tw, NES cart)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SA-016-1M" />
 			<feature name="mirroring" value="vertical" />
@@ -45264,9 +45264,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="pipe5">
 		<!-- Serial: SA-011 - Release Date:  - Alternative Title:  -->
-		<description>Pipe 5 (Asia)</description>
+		<description>Pipe 5 (Tw)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SA-009" />
 			<feature name="mirroring" value="vertical" />
@@ -45403,7 +45403,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="pokermj">
 		<!-- Serial: SA-018 - Release Date:  - Alternative Title: 撲克麻雀 -->
-		<description>Poker Mahjong - Pu Ke Mao Que (Asia)</description>
+		<description>Poker Mahjong - Pu Ke Mao Que (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45467,7 +45467,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="tasac">
 		<!-- Serial: SA-021 - Release Date:  - Alternative Title:  -->
-		<description>Tasac (Asia)</description>
+		<description>Tasac (Tw)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45535,7 +45535,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="tai16mj2">
 		<!-- Serial: SA-025 - Release Date:  - Alternative Title: 台湾麻将二代 -->
-		<description>Taiwan Mahjong 2 (Asia)</description>
+		<description>Taiwan Mahjong 2 (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45552,9 +45552,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="mjacad">
 		<!-- Serial: SA-026 - Release Date:  - Alternative Title:  -->
-		<description>Mahjong Academy (Asia)</description>
+		<description>Mahjong Academy (Tw)</description>
 		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SACHEN-74LS374N" />
 			<feature name="mirroring" value="horizontal" />
@@ -45569,9 +45569,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="mjcompana" cloneof="mjcompan">
 		<!-- Serial: SA-027 - Release Date:  - Alternative Title:  -->
-		<description>Mahjang Companion (Asia, Sachen)</description>
+		<description>Mahjang Companion (Tw, Sachen)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SACHEN-8259C" />
 			<dataarea name="chr" size="65536">
@@ -45585,7 +45585,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="chinkngf">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Chinese KungFu (Asia)</description>
+		<description>Chinese KungFu (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45603,9 +45603,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- nointro -->
 	<software name="dongdong">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Dong Dong Nao 1 (Asia)</description>
+		<description>Dong Dong Nao 1 (Tw)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -46245,7 +46245,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="sanshilj">
 		<!-- Serial: ES-1008 - Release Date:  - Alternative Title: 三十六计 -->
-		<description>San Shi Liu Ji (Asia, Decrypted SmyNES)</description>
+		<description>San Shi Liu Ji (Chi, Decrypted SmyNES)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46429,7 +46429,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="duobaoxy" supported="partial">
 		<!-- Serial: ES-1021 - Release Date:  - Alternative Title: 夺宝小英豪 -->
-		<description>Duo Bao Xiao Ying Hao - Guang Ming Yu An Hei Chuan Shuo (Asia, Decrypted SmyNES)</description>
+		<description>Duo Bao Xiao Ying Hao - Guang Ming Yu An Hei Chuan Shuo (Chi, Decrypted SmyNES)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46445,7 +46445,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="duobaoxya" cloneof="duobaoxy" supported="partial">
 		<!-- Serial: ES-1021 - Release Date:  - Alternative Title:  -->
-		<description>Duo Bao Xiao Ying Hao - Guang Ming Yu An Hei Chuan Shuo (Asia)</description>
+		<description>Duo Bao Xiao Ying Hao - Guang Ming Yu An Hei Chuan Shuo (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46509,7 +46509,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="shuihuzh">
 		<!-- Serial: ES-1030 - Release Date:  - Alternative Title: 水浒传 -->
-		<description>Shui Hu Zhuan (Asia, Decrypted SmyNES)</description>
+		<description>Shui Hu Zhuan (Chi, Decrypted SmyNES)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46711,7 +46711,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="yangjiaj" supported="no">
 		<!-- Serial: ES-1052 - Release Date:  - Alternative Title: 杨家将 -->
-		<description>Yang Jia Jiang - Yang's Troops (Asia, Decrypted SmyNES)</description>
+		<description>Yang Jia Jiang - Yang's Troops (Chi, Decrypted SmyNES)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46778,7 +46778,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="napolwar" supported="no">
 		<!-- Serial: ES-1060 - Release Date:  - Alternative Title: 帝国风暴 -->
-		<description>Di Guo Feng Bao - Napoleon's War (Asia)</description>
+		<description>Di Guo Feng Bao - Napoleon's War (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -47060,7 +47060,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="pokeszs">
 		<!-- Serial: ES-1090 - Release Date:  - Alternative Title: 口袋妖怪钻石 (Pokemon Diamond) -->
-		<description>KouDai YaoGuai - ZuanShi Ban (Asia)</description>
+		<description>KouDai YaoGuai - ZuanShi Ban (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -47124,7 +47124,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="chongwu">
 		<!-- Serial: ES-1093 - Release Date:  - Alternative Title: 宠物·翡翠 (title screen), 口袋精灵·翡翠 ~ Kou Dai Jing Ling - Fei Cui (cart label?) -->
-		<description>Chong Wu - Fei Cui Ban (Asia)</description>
+		<description>Chong Wu - Fei Cui Ban (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -48636,7 +48636,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	<!-- Same as Galactic Crusader -->
 	<software name="chouhen">
 		<!-- Serial:  - Release Date:  - Alternative Title: Incantation -->
-		<description>Chou Hen (Asia)</description>
+		<description>Chou Hen (Tw)</description>
 		<year>1989</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51496,7 +51496,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- Does it come from an original cart or has it been ripped from sunday (Sunday Funday)?? -->
 	<software name="fishfall">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Fish Fall (Asia)</description>
+		<description>Fish Fall (USA?)</description>
 		<year>19??</year>
 		<publisher>Color Dreams</publisher>
 		<part name="cart" interface="nes_cart">
@@ -53029,7 +53029,7 @@ from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="biohazrd">
 		<!-- Serial:  - Release Date:  - Alternative Title: 生化危机 -->
-		<description>Bio Hazard (Asia)</description>
+		<description>Bio Hazard (Chi)</description>
 		<year>2003?</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54033,7 +54033,7 @@ from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="dafuwen2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title: 大富翁2-上海大亨 (Shanghai Tycoon) -->
-		<description>Da Fu Weng 2 - Shanghai Da Heng (Asia)</description>
+		<description>Da Fu Weng 2 - Shanghai Da Heng (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
@@ -61539,6 +61539,9 @@ We include them here as reference if they should coincide with later revisions o
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="castlevania iii - dracula's curse (2002)(konami)(us)[h buddha][ripped from konami classics for pc].prg" size="262144" crc="40dbc815" sha1="97ead1a57f822196d809ffc72fd1a1c571fcfd5b" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
+			<dataarea name="mapper_ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
