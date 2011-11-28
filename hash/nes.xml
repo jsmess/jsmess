@@ -37689,7 +37689,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="chestfldp" cloneof="chestfld">
-		<description>Chester Field - Ankoku Shin E no Chousen (Jpn, Prototype)</description>
+		<description>Chester Field: Ankoku Shin e no Chousen (Jpn, Prototype)</description>
 		<year>1987</year>
 		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45779,7 +45779,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<!-- Serial: CN-09 - Release Date:  - Alternative Title:  -->
 		<description>Cosmos Cop (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Mega Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -58132,7 +58132,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 	<software name="connorsr" cloneof="connors">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Jimmy Connor's Tennis (Rus)</description>
+		<description>Jimmy Connors Tennis (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -59325,7 +59325,7 @@ resulting in tons of glitches? -->
 
 	<software name="connorsh" cloneof="connors">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Jimmy Connor's Tennis (Pirate)</description>
+		<description>Jimmy Connors Tennis (Pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
