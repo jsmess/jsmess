@@ -5884,7 +5884,7 @@
   </software>
 
   <!-- Identifying Bridge-It.zip... -->
-  <software name="bridgeita" cloneof="bridgeit" " supported="no">
+  <software name="bridgeita" cloneof="bridgeit" supported="no">
       <description>Bridge-It</description>
       <year>19??</year>
       <publisher>&lt;unknown&gt;</publisher>
