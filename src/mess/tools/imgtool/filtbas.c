@@ -110,7 +110,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		}
 		else
 		{
-			//address = (UINT16) 
+			//address = (UINT16)
             pick_integer_le(line_header, 0, 2);
 			line_number = (UINT16) pick_integer_le(line_header, 2, 2);
 		}

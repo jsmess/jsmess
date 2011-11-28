@@ -1215,8 +1215,8 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
-		
+
+
 	<software name="bckgmmn">
 		<description>Backgammon</description>
 		<year>1979</year>
@@ -1242,7 +1242,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bankheis">
 		<description>Bank Heist</description>
 		<year>1983</year>
@@ -1255,7 +1255,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bankheisp" cloneof="bankheis">
 	<!-- Not 100% sure about this one's Official name Good2600 say it's the Alttitle, Atariage say it's not dumped and Atarimania Say it's Bank Heist. Both Atariage and Atarimania say there is no game named Skull Island-->
 		<description>Bank Heist (PAL)</description>
@@ -1282,7 +1282,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="barnstrm">
 		<description>Barnstorming (Activision)</description>
 		<year>1982</year>
@@ -1295,7 +1295,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="barnstrmc" cloneof="barnstrm">
 		<description>Barnstorming (CCE)</description>
 		<year>1982</year>
@@ -1307,7 +1307,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="baseatak">
 		<description>Base Attack (PAL)</description>
 		<year>1983</year>
@@ -1319,7 +1319,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="baseball">
 		<description>Baseball (Atari)</description>
 		<year>1978</year>
@@ -1333,7 +1333,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="baseballp"  cloneof="baseball">
 		<description>Baseball (PAL)</description>
 		<year>1978</year>
@@ -1347,7 +1347,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="scbasbal"><!-- cloneof="baseball" not so sure about it-->
 		<description>Super Challenge Baseball (Mattel)</description>
 		<year>1978</year>
@@ -1359,7 +1359,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="scbasball" cloneof="scbasbal"><!-- cloneof="baseball" not so sure about it-->
 		<description>Super Challenge Baseball (JYTEC)</description>
 		<year>1978</year>
@@ -1371,7 +1371,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basmath">
 		<description>Basic Math</description>
 		<year>1977</year>
@@ -1385,7 +1385,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basmathp"  cloneof="basmath">
 		<description>Basic Math (PAL)</description>
 		<year>1978</year>
@@ -1399,7 +1399,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basprog">
 		<description>BASIC Programming</description>
 		<year>1978</year>
@@ -1413,7 +1413,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basprogr"  cloneof="basprog">
 		<description>BASIC Programming (PAL)</description>
 		<year>1978</year>
@@ -1427,7 +1427,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="baskball">
 		<description>Basketball</description>
 		<year>1978</year>
@@ -1441,7 +1441,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="baskballp"  cloneof="baskball">
 		<description>Basketball (PAL)</description>
 		<year>1978</year>
@@ -1455,7 +1455,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="batlzone">
 		<description>Battlezone</description>
 		<year>1983</year>
@@ -1468,7 +1468,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="batlzonep" cloneof="batlzone">
 		<description>Battlezone (PAL)</description>
 		<year>1983</year>
@@ -1481,7 +1481,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="batlzonp1" cloneof="batlzone">
 		<description>Battlezone (Prototype, 19830502)</description>
 		<year>1983</year>
@@ -1494,7 +1494,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="batlzonp2"  cloneof="batlzone">
 		<description>Battlezone (Prototype, 19830512)</description>
 		<year>1983</year>
@@ -1507,7 +1507,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beamridr">
 		<description>Beamrider</description>
 		<year>1984</year>
@@ -1520,7 +1520,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beamridrp" cloneof="beamridr">
 		<description>Beamrider (PAL)</description>
 		<year>1984</year>
@@ -1533,7 +1533,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beanbopp">
 		<description>Beany Bopper (20th Century Fox)</description>
 		<year>1983</year>
@@ -1546,7 +1546,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beanboppr" cloneof="beanbopp">
 		<description>Beany Bopper (CCE)</description>
 		<year>1983</year>
@@ -1559,7 +1559,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beatem">
 		<description>Beat'Em and Eat'Em (Mystique)</description>
 		<year>1982</year>
@@ -1573,7 +1573,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beatemd" cloneof="beatem">
 		<description>Beat'Em and Eat'Em (Dynacom)</description>
 		<year>1982</year>
@@ -1586,7 +1586,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beatemp" cloneof="beatem">
 		<description>Beat'Em and Eat'Em (Mystique)(PAL)</description>
 		<year>1982</year>
@@ -1599,7 +1599,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beatems" cloneof="beatem">
 		<description>Beat'Em and Eat'Em (Mystique, SuperCharger)</description>
 		<year>1982</year>
@@ -1613,7 +1613,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beatemsp" cloneof="beatem">
 		<description>Beat'Em and Eat'Em (Mystique, SuperCharger)(PAL)</description>
 		<year>1982</year>
@@ -1627,7 +1627,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bernstin">
 		<description>Berenstain Bears</description>
 		<year>1984</year>
@@ -1639,7 +1639,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bermuda">
 		<description>Bermuda (Rainbow Vision)</description>
 		<year>1983</year>
@@ -1651,7 +1651,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bermudst" cloneof="bermuda">
 		<description>Bermuda (Starsoft)</description>
 		<year>1983</year>
@@ -1729,21 +1729,21 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>Starsoft</publisher>
 		<info name="serial" value="SS-013" />
-		<info name="alttitle" value="Ungeheuer der Tiefe" /> 
+		<info name="alttitle" value="Ungeheuer der Tiefe" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bezerk (cce).a26" size="4096" crc="9c3a516b" sha1="d2bcc767b170b0fc0a2a0903f4337a821623abb4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bbecatch">
 		<description>Big Bird's Egg Catch</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26104" />
 		<info name="programmer" value="Christopher H. Omarzu"/>
-		<part name="cart" interface="a2600_cart"> 
+		<part name="cart" interface="a2600_cart">
 			<feature name="peripheral" value="Kid's Controller" />
 			<dataarea name="rom" size="8192">
 				<rom name="big bird's egg catch.a26" size="8192" crc="96dc9a9c" sha1="5e4517db83c061926130ab65975e3b83d9401cc9" offset="0"/>

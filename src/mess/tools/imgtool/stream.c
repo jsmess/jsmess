@@ -40,7 +40,7 @@ struct _imgtool_stream
 static imgtool_stream *stream_open_zip(const char *zipname, const char *subname, int read_or_write)
 {
 	imgtool_stream *imgfile = NULL;
-//	zip_error ziperr;
+//  zip_error ziperr;
 	zip_file *z = NULL;
 	const zip_file_header *zipent;
 	FILE *f;
@@ -63,7 +63,7 @@ static imgtool_stream *stream_open_zip(const char *zipname, const char *subname,
 	imgfile->write_protect = 1;
 	imgfile->position = 0;
 
-//	ziperr = 
+//  ziperr =
     zip_file_open(zipname, &z);
 	if (!z)
 		goto error;

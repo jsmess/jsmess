@@ -171,9 +171,9 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Money Management Series -->
-  
+
   <software name="moneyman">
     <description>Money Manager</description>
     <year>1978</year>
@@ -185,9 +185,9 @@
       </dataarea>
     </part>
   </software>
-  
+
   <!-- Expanders -->
-  
+
   <software name="exp1">
     <description>Expander 1</description>
     <year>1978</year>

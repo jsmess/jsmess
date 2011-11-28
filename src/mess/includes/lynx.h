@@ -35,7 +35,7 @@ typedef struct
 	UINT8 color[16]; // or stored
 	void (*line_function)(lynx_state *state, const int y, const int xdir);
 	UINT16 bitmap;
-	
+
 	UINT8 spr_ctl0;
 	UINT8 spr_ctl1;
 	UINT16 scb;
@@ -145,19 +145,19 @@ void lynx_audio_count_down(device_t *device, int nr);
 #define TILTACUMH	0x03
 #define HOFFL		0x04	// X offset to edge of visible window
 #define HOFFH		0x05
-#define VOFFL 		0x06	// Y offset to edge of visible window
+#define VOFFL		0x06	// Y offset to edge of visible window
 #define VOFFH		0x07
 #define VIDBASL 	0x08	// Video buffer address
 #define VIDBASH 	0x09
-#define COLLBASL 	0x0A	// Collision buffer address
-#define COLLBASH 	0x0B
+#define COLLBASL	0x0A	// Collision buffer address
+#define COLLBASH	0x0B
 #define VIDADRL 	0x0C	// Current Video Build Address
 #define VIDADRH 	0x0D
-#define COLLADRL 	0x0E	// Current Collision Build Address
-#define COLLADRH 	0x0F
-#define SCBNEXTL 	0x10	// Address of next SCB
-#define SCBNEXTH 	0x11
-#define SPRDLINEL 0x12 	// Sprite data start address
+#define COLLADRL	0x0E	// Current Collision Build Address
+#define COLLADRH	0x0F
+#define SCBNEXTL	0x10	// Address of next SCB
+#define SCBNEXTH	0x11
+#define SPRDLINEL 0x12	// Sprite data start address
 #define SPRDLINEH 0x13
 #define HPOSSTRTL	0x14	// Starting Hpos
 #define HPOSSTRTH	0x15
@@ -181,7 +181,7 @@ void lynx_audio_count_down(device_t *device, int nr);
 #define VSIZACUMH	0x27
 #define HSIZOFFL	0x28	// Horizontal Size Offset
 #define HSIZOFFH	0x29
-#define VSIZOFFL	0x2A 	// Vertical Size Offset
+#define VSIZOFFL	0x2A	// Vertical Size Offset
 #define VSIZOFFH	0x2B
 #define SCBADRL	0x2C	// Address of Current SCB
 #define SCBADRH	0x2D
@@ -232,12 +232,12 @@ void lynx_audio_count_down(device_t *device, int nr);
 
 //16-bit
 #define SCB_SCBNEXT 	0x03	// L,H Address of Next SCB
-#define SCB_SPRDLINE	0x05 	// L,H Start of Sprite Data Line Address
+#define SCB_SPRDLINE	0x05	// L,H Start of Sprite Data Line Address
 #define SCB_HPOSSTRT	0x07	// L,H Starting Hpos
-#define SCB_VPOSSTRT	0x09	//	L,H Starting Vpos
+#define SCB_VPOSSTRT	0x09	//  L,H Starting Vpos
 #define SCB_SPRHSIZ 	0x0B	// L,H H Size
 #define SCB_SPRVSIZ	0x0D	// L,H V Size
-#define SCB_STRETCH	0x0F	//	L H H/V Size Adder
-#define SCB_TILT		0x11	//	L,H H Position Adder
+#define SCB_STRETCH	0x0F	//  L H H/V Size Adder
+#define SCB_TILT		0x11	//  L,H H Position Adder
 
 #endif /* LYNX_H_ */

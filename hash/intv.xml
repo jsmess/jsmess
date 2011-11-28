@@ -4,7 +4,7 @@
 <!--
 
   Missing Cartridges
-  
+
   * World Championsip Baseball (Mattel, 1983)
   * BASIC (Mattel, 1980)
 
@@ -24,7 +24,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="addc">
 		<description>Advanced Dungeons &amp; Dragons Cartridge</description>
 		<year>1982</year>
@@ -36,7 +36,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="addtot">
 		<description>Advanced Dungeons &amp; Dragons: Treasure of Tarmin</description>
 		<year>1982</year>
@@ -48,7 +48,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="armorbtl">
 		<description>Armor Battle</description>
 		<year>1978</year>
@@ -60,7 +60,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="astrosm">
 		<description>Astro Smash</description>
 		<year>1981</year>
@@ -84,7 +84,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="autorace">
 		<description>Auto Racing</description>
 		<year>1979</year>
@@ -112,7 +112,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="baseball">
 		<description>Major League Baseball</description>
 		<year>1978</year>
@@ -124,7 +124,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basketbl">
 		<description>NBA Basketball</description>
 		<year>1978</year>
@@ -136,7 +136,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beamridr">
 		<description>Beamrider</description>
 		<year>1983</year>
@@ -148,7 +148,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="beutyatb">
 		<description>Beauty &amp; the Beast</description>
 		<year>1978</year>
@@ -160,7 +160,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blockrun">
 		<description>Blockade Runner</description>
 		<year>1983</year>
@@ -172,7 +172,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wrestlng">
 		<description>Body Slam Super Pro Wrestling</description>
 		<year>1988</year>
@@ -187,7 +187,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bombsqd">
 		<description>Bomb Squad</description>
 		<year>1982</year>
@@ -203,7 +203,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bowling">
 		<description>PBA Bowling</description>
 		<year>1980</year>
@@ -227,7 +227,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bnj">
 		<description>Bump &apos;n&apos; Jump</description>
 		<year>1983</year>
@@ -245,7 +245,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="btime">
 		<description>BurgerTime!</description>
 		<year>1982</year>
@@ -257,7 +257,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="buzbombr">
 		<description>Buzz Bombers</description>
 		<year>1982</year>
@@ -282,7 +282,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="centiped">
 		<description>Centipede</description>
 		<year>1983</year>
@@ -294,7 +294,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ctennis">
 		<description>Championship Tennis</description>
 		<year>1985</year>
@@ -309,7 +309,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="checkers">
 		<description>Checkers</description>
 		<year>1979</year>
@@ -321,7 +321,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="chess">
 		<description>USCF Chess</description>
 		<year>1981</year>
@@ -336,7 +336,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="csspgolf">
 		<description>Chip Shot: Super Pro Golf</description>
 		<year>1987</year>
@@ -366,7 +366,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="congo">
 		<description>Congo Bongo</description>
 		<year>1983</year>
@@ -378,7 +378,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="defender">
 		<description>Defender</description>
 		<year>1983</year>
@@ -390,7 +390,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="demonatk">
 		<description>Demon Attack</description>
 		<year>1982</year>
@@ -402,7 +402,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="demoblue">
 		<description>Demonstration Cartridge (blue)</description>
 		<year>1978</year>
@@ -414,7 +414,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="demored">
 		<description>Demonstration Cartridge (red)</description>
 		<year>1978</year>
@@ -426,7 +426,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="demogrn">
 		<description>Demonstration Cartridge (green)</description>
 		<year>1982</year>
@@ -441,7 +441,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="demoint">
 		<description>International Demonstration Cartridge</description>
 		<year>1982</year>
@@ -455,7 +455,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="digdug">
 		<description>Dig Dug</description>
 		<year>1987</year>
@@ -473,7 +473,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="diner">
 		<description>Diner</description>
 		<year>1987</year>
@@ -488,7 +488,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dkong">
 		<description>Donkey Kong</description>
 		<year>1982</year>
@@ -549,7 +549,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mathfun">
 		<description>Electric Company: Math Fun</description>
 		<year>1978</year>
@@ -561,7 +561,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wordfun">
 		<description>Electric Company: Word Fun</description>
 		<year>1980</year>
@@ -598,7 +598,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="frogbog">
 		<description>Frog Bog</description>
 		<year>1982</year>
@@ -610,7 +610,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="frogger">
 		<description>Frogger</description>
 		<year>1983</year>
@@ -634,7 +634,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="htrails">
 		<description>Happy Trails</description>
 		<year>1983</year>
@@ -646,7 +646,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hockey">
 		<description>NHL Hockey</description>
 		<year>1979</year>
@@ -658,7 +658,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hracing">
 		<description>Horse Racing</description>
 		<year>1981</year>
@@ -688,7 +688,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="icetrek">
 		<description>Ice Trek</description>
 		<year>1983</year>
@@ -700,7 +700,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="koolaid">
 		<description>Kool-Aid Man</description>
 		<year>1983</year>
@@ -712,7 +712,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ladybug">
 		<description>Lady Bug</description>
 		<year>1983</year>
@@ -724,7 +724,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lfun1">
 		<description>Learning Fun I: Math Master Factor Fun</description>
 		<year>1987</year>
@@ -736,7 +736,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lfun2">
 		<description>Learning Fun II: Word Wizard Memory Fun</description>
 		<year>1987</year>
@@ -748,7 +748,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lnc">
 		<description>Lock &apos;n&apos; Chase</description>
 		<year>1982</year>
@@ -760,7 +760,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lnc2" cloneof="lnc">
 		<description>Lock &apos;n&apos; Chase (later version)</description>
 		<year>1982</year>
@@ -772,7 +772,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="locomotn">
 		<description>Loco-Motion</description>
 		<year>1982</year>
@@ -784,7 +784,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="he-man">
 		<description>Masters of the Universe: The Power of He-Man</description>
 		<year>1983</year>
@@ -802,7 +802,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="missionx">
 		<description>Mission X</description>
 		<year>1982</year>
@@ -814,7 +814,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="msurgeon">
 		<description>Microsurgeon</description>
 		<year>1982</year>
@@ -827,7 +827,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="motocros">
 		<description>Motocross</description>
 		<year>1982</year>
@@ -839,7 +839,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mmskiing">
 		<description>Mountain Madness Super Pro Skiing</description>
 		<year>1987</year>
@@ -851,7 +851,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mousetrp">
 		<description>Mouse Trap</description>
 		<year>1982</year>
@@ -864,7 +864,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="nstalker">
 		<description>Night Stalker</description>
 		<year>1982</year>
@@ -887,7 +887,7 @@
 					<rom name="nova blast.50" size="0x4000" crc="5ee2cc2a" sha1="ca18f2938168ec681ee34cb25a08c87b752a5024" offset="0000"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="pacman">
 		<description>Pac-Man</description>
@@ -938,8 +938,8 @@
 					<rom name="pitfall.50" size="0x2000" crc="9c75efcc" sha1="1f4087be2c0a51ed08e49e6498794a9d26dc0d65" offset="0000"/>
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="poker">
 		<description>Las Vegas Poker &amp; Blackjack</description>
 		<year>1979</year>
@@ -966,7 +966,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="popeye">
 		<description>Popeye</description>
 		<year>1983</year>
@@ -978,7 +978,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="qbert">
 		<description>Q*bert</description>
 		<year>1983</year>
@@ -990,7 +990,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="reversi">
 		<description>Reversi</description>
 		<year>1981</year>
@@ -1002,7 +1002,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="riveraid">
 		<description>River Raid</description>
 		<year>1983</year>
@@ -1026,7 +1026,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rdealer">
 		<description>Royal Dealer</description>
 		<year>1981</year>
@@ -1038,7 +1038,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="safecrkr">
 		<description>Safecracker</description>
 		<year>1983</year>
@@ -1050,7 +1050,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="seabattl">
 		<description>Sea Battle</description>
 		<year>1980</year>
@@ -1062,7 +1062,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sewersam">
 		<description>Sewer Sam</description>
 		<year>1983</year>
@@ -1074,7 +1074,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="shark">
 		<description>Shark! Shark!</description>
 		<year>1982</year>
@@ -1086,7 +1086,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="shrpshot">
 		<description>Sharp Shot</description>
 		<year>1982</year>
@@ -1098,7 +1098,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="skiing">
 		<description>U.S. Ski Team Skiing</description>
 		<year>1980</year>
@@ -1110,7 +1110,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sdspbb">
 		<description>Slam Dunk Super Pro Basketball</description>
 		<year>1987</year>
@@ -1125,7 +1125,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sphockey">
 		<description>Slap Shot Super Pro Hockey</description>
 		<year>1987</year>
@@ -1137,7 +1137,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="snafu">
 		<description>Snafu</description>
 		<year>1981</year>
@@ -1149,7 +1149,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="soccer">
 		<description>NASL Soccer</description>
 		<year>1979</year>
@@ -1161,7 +1161,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spacearm">
 		<description>Space Armada</description>
 		<year>1981</year>
@@ -1173,7 +1173,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spacebtl">
 		<description>Space Battle</description>
 		<year>1979</year>
@@ -1185,7 +1185,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spacehwk">
 		<description>Space Hawk</description>
 		<year>1981</year>
@@ -1197,7 +1197,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sspartan">
 		<description>Space Spartans</description>
 		<year>1981</year>
@@ -1210,7 +1210,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="vball">
 		<description>Spiker! Super Pro Volleyball</description>
 		<year>1988</year>
@@ -1225,7 +1225,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mbuggies">
 		<description>Stadium Mud Buggies</description>
 		<year>1988</year>
@@ -1240,7 +1240,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="stampede">
 		<description>Stampede</description>
 		<year>1982</year>
@@ -1252,7 +1252,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="starstrk">
 		<description>Star Strike</description>
 		<year>1981</year>
@@ -1264,7 +1264,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="swtesb">
 		<description>Star Wars: The Empire Strikes Back</description>
 		<year>1983</year>
@@ -1276,7 +1276,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="subhunt">
 		<description>Sub Hunt</description>
 		<year>1981</year>
@@ -1288,7 +1288,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="scobra">
 		<description>Super Cobra</description>
 		<year>1983</year>
@@ -1300,7 +1300,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dcathlon">
 		<description>Super Pro Decathlon</description>
 		<year>1988</year>
@@ -1315,7 +1315,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spftball">
 		<description>Super Pro Football</description>
 		<year>1986</year>
@@ -1330,7 +1330,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="swordsas">
 		<description>Swords &amp; Serpents</description>
 		<year>1982</year>
@@ -1343,7 +1343,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tennis">
 		<description>Tennis</description>
 		<year>1980</year>
@@ -1373,7 +1373,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="thcastle">
 		<description>Thunder Castle</description>
 		<year>1986</year>
@@ -1391,7 +1391,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="towerofd">
 		<description>Tower of Doom</description>
 		<year>1987</year>
@@ -1412,7 +1412,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="traction">
 		<description>Triple Action</description>
 		<year>1981</year>
@@ -1424,7 +1424,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="trchalng">
 		<description>Triple Challenge</description>
 		<year>1986</year>
@@ -1441,7 +1441,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="trondd">
 		<description>TRON Deadly Discs</description>
 		<year>1981</year>
@@ -1481,7 +1481,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tropical">
 		<description>Tropical Trouble</description>
 		<year>1982</year>
@@ -1493,7 +1493,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="truckin">
 		<description>Truckin&apos;</description>
 		<year>1983</year>
@@ -1505,7 +1505,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="turbo">
 		<description>Turbo</description>
 		<year>1983</year>
@@ -1517,7 +1517,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tutankhm">
 		<description>Tutankham</description>
 		<year>1983</year>
@@ -1529,7 +1529,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="utopia">
 		<description>Utopia</description>
 		<year>1981</year>
@@ -1556,7 +1556,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="venture">
 		<description>Venture</description>
 		<year>1982</year>
@@ -1569,7 +1569,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wwater">
 		<description>White Water!</description>
 		<year>1982</year>
@@ -1581,7 +1581,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="worldcup">
 		<description>World Cup Football</description>
 		<year>1985</year>
@@ -1599,7 +1599,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="wwhomper">
 		<description>Worm Whomper</description>
 		<year>1983</year>
@@ -1611,7 +1611,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="zaxxon">
 		<description>Zaxxon</description>
 		<year>1983</year>
@@ -1640,7 +1640,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="airstrk">
 		<description>Air Strike (prototype)</description>
 		<year>1982</year>
@@ -1662,7 +1662,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="choplift">
 		<description>Choplifter! (prototype)</description>
 		<year>1983</year>
@@ -1676,7 +1676,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pool">
 		<description>Deep Pockets: Super Pro Pool and Billiards (unreleased)</description>
 		<year>1990</year>
@@ -1690,7 +1690,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gftgold">
 		<description>Go for the Gold! (incomplete prototype)</description>
 		<year>1983</year>
@@ -1780,10 +1780,10 @@
 					<rom name="land battle.50" size="0x4000" crc="3825c25b" sha1="97073f31a8c9b5b04e773fcb145c4235a4712ff7" offset="0000"/>
 			</dataarea>
 			<dataarea name="D000_RAM8" size="0x800">
-			</dataarea>			
+			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="league">
 		<description>League of Light (prototype)</description>
 		<year>1983</year>
@@ -1794,7 +1794,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="magic">
 		<description>Magic Carousel (prototype)</description>
 		<year>1983</year>
@@ -1809,7 +1809,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="motuii">
 		<description>Masters of the Universe II (prototype)</description>
 		<year>1982</year>
@@ -1845,7 +1845,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="rrubble">
 		<description>Robot Rubble (prototype)</description>
 		<year>1983</year>
@@ -1856,7 +1856,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spacecad">
 		<description>Party Line: Space Cadet (unreleased)</description>
 		<year>1983</year>
@@ -1867,7 +1867,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sshuttle">
 		<description>Space Shuttel (prototype)</description>
 		<year>1981</year>
@@ -1881,7 +1881,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ssoccer">
 		<description>Super Soccer (unreleased)</description>
 		<year>1983</year>
@@ -1898,7 +1898,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="takeover">
 		<description>Takeover (unreleased)</description>
 		<year>1982</year>
@@ -1909,7 +1909,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="imitc">
 		<description>IMI Test Cartridge</description>
 		<year>1978</year>
@@ -1920,7 +1920,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mte201">
 		<description>MTE-201 Test Cartridge</description>
 		<year>1978</year>
@@ -1934,7 +1934,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="4-tris">
 		<description>4-Tris (download version)</description>
 		<year>2000</year>
@@ -1946,7 +1946,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="minehntr">
 		<description>Minehunter (download version)</description>
 		<year>2004</year>
@@ -1958,7 +1958,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sgr">
 		<description>SameGame &amp; Robots (download version)</description>
 		<year>2005</year>
@@ -1976,7 +1976,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="stonix">
 		<description>Stonix (download version)</description>
 		<year>2005</year>

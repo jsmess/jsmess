@@ -2,18 +2,18 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- The list contains both MVS and AES cartridges.
-     
+
      For the majority of official titles the actual ROM data contained in the cartridges is compatible across systems, the actual codepath taken
      depends upon the bios used.
-     
+
      The only real difference with the cartridges is the physical form of the cartridges which allowed a delayed release of the game for AES
      systems at a higher cost.  Due to this many adapters are available which plug into an AES unit allowing you to plug any standard MVS cart
      into the system.  Reverse adapters exist, although were less common because there was no reason to use them.  All MVS carts can be used
      with AES systems so there is no reason to have separate lists especially when in the majority of cases the data is identical.
-     
+
      The primary MVS / AES releases are marked in the list for documentation purposes, typically the first AES release is just a later revision
      of the game code with additional bugfixes etc. when compared to the primary MVS release.
-     
+
      Todo: games which are actually incompatible between systems (the first release of kof2001, and many of the bootlegs / hacks) should be
            tagged with compatibility tags.
 
@@ -28,7 +28,7 @@
    . NGH-001
    NEO-AEG PROG-NAM / NEO-AEG CHA-32
   ***************************************-->
-  
+
   <software name="nam1975">
     <!-- MVS AND AES VERSION -->
     <description>NAM-1975 (NGM-001)(NGH-001)</description>
@@ -7371,7 +7371,7 @@
       <dataarea name="fixed" size="0x80000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
         <rom value="0" length="0x80000" offset="0x000000" loadflag="fill" />
-      </dataarea>      
+      </dataarea>
       <dataarea name="audiocpu" size="0x040000">
         <rom offset="0x000000" size="0x040000" name="253-m1.m1" crc="36a806be" sha1="90fb44dc0c3fb57946a0f35716056abb84a0f191" />        <!-- TC532000 -->
       </dataarea>
@@ -10129,7 +10129,7 @@
   </software>
 
   <!-- Unlicensed Prototype -->
-  
+
   <software name="diggerma">
     <description>Digger Man (prototype)</description>
     <year>2000</year>

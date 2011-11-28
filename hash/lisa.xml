@@ -935,7 +935,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="burndiag">
 		<description>Lisa Burn-in Diagnostics</description>
 		<year>198?</year>
@@ -947,7 +947,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cputest2">
 		<description>Lisa Cpu Test V2.2</description>
 		<year>198?</year>
@@ -959,7 +959,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="macnosy">
 		<description>Lisa Mac Nosy V2.55</description>
 		<year>198?</year>
@@ -971,7 +971,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pertest">
 		<description>Lisa Peripherals Test</description>
 		<year>198?</year>
@@ -983,7 +983,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="calender">
 		<description>Lisa Calendar For Lisa Office System 7/7</description>
 		<year>198?</year>
@@ -995,7 +995,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="labellst">
 		<description>Label List For Lisa Office System 7/7</description>
 		<year>198?</year>
@@ -1007,7 +1007,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="phonbook">
 		<description>Lisa Phone Book For Lisa Office System 7/7</description>
 		<year>198?</year>

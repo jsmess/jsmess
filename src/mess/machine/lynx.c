@@ -117,7 +117,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const int x, cons
 				{
 					back = *colbuf;
 					*colbuf = (back & ~0x0f) | (state->m_blitter.spritenr);
-					if ((back & 0x0f) > state->m_blitter.mem[state->m_blitter.colpos]) 
+					if ((back & 0x0f) > state->m_blitter.mem[state->m_blitter.colpos])
 						state->m_blitter.mem[state->m_blitter.colpos] = back & 0x0f;
 					state->m_blitter.memory_accesses += 2;
 				}
@@ -337,7 +337,7 @@ static void lynx_blit_do_work( lynx_state *state, const int y, const int xdir, c
 	{
 		if (p < bits) // less than one pixels worth of data left in buffer
 		{
-			b = (b << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j]; // shift next byte into buffer 
+			b = (b << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j]; // shift next byte into buffer
 			j++; // increment byte accumulator
 			p += 8; // current bits in buffer
 			state->m_blitter.memory_accesses++;
@@ -524,8 +524,8 @@ static void lynx_blit_lines(lynx_state *state)
 	int i, hi, y;
 	int ydir = 0, xdir = 0;
 	int flip = 0;
-	int x_temp; 
-	
+	int x_temp;
+
 	state->m_blitter.everon = FALSE;
 
 	// flipping sprdemo3
@@ -536,7 +536,7 @@ static void lynx_blit_lines(lynx_state *state)
 	if (state->m_blitter.spr_ctl0 & 0x20)	/* Horizontal Flip */
 	{
 		xdir = -1;
-		//state->m_blitter.x--;	// causes blank lines in todds adventures, klax, etc
+		//state->m_blitter.x--; // causes blank lines in todds adventures, klax, etc
 	}
 
 	ydir = 1;
@@ -544,7 +544,7 @@ static void lynx_blit_lines(lynx_state *state)
 	if (state->m_blitter.spr_ctl0 & 0x10)	/* Vertical Flip */
 	{
 		ydir = -1;
-		//state->m_blitter.y--;	// causes blank lines in todds adventures, klax, etc
+		//state->m_blitter.y--; // causes blank lines in todds adventures, klax, etc
 	}
 
 	switch (state->m_blitter.spr_ctl1 & 0x03)	/* Initial drawing direction */
@@ -571,7 +571,7 @@ static void lynx_blit_lines(lynx_state *state)
 	for (y = state->m_blitter.y, hi = 0; (i = state->m_blitter.mem[state->m_blitter.bitmap]); state->m_blitter.bitmap += i)
 	{
 		state->m_blitter.memory_accesses++;
-		
+
 		if (i == 1) // draw next quadrant
 		{
 			// centered sprites sprdemo3, fat bobby, blockout
@@ -596,7 +596,7 @@ static void lynx_blit_lines(lynx_state *state)
 			flip++;
 			continue;
 		}
-		
+
 		for ( ; hi < (state->m_blitter.height); hi += 0x100, y += ydir)
 		{
 			if (y >= 0 && y < 102)
@@ -744,44 +744,44 @@ static void lynx_blitter(running_machine &machine)
 		state->m_blitter.stretch = 0;
 		state->m_blitter.tilt    = 0;
 		state->m_blitter.tilt_accumulator = 0;
-		
+
 		state->m_blitter.memory_accesses += 1;
-		
+
 		// move to load_scb() function
 		state->m_blitter.scb = state->m_blitter.scb_next; // current scb
 		state->m_blitter.scb_next = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SCBNEXT); // next scb
-		
+
 		state->m_blitter.spr_ctl0 = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCTL0];
 		state->m_blitter.spr_ctl1 = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCTL1];
 		state->m_suzy.data[SPRCOLL] = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCOLL];
-		 
+
 		if(!(state->m_blitter.spr_ctl1 & 0x04)) // sprite will be processed (if sprite is skipped first 5 bytes are still copied to suzy)
 		{
-		 	state->m_blitter.bitmap = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRDLINE);
-		 	state->m_suzy.data[HPOSSTRTL] = state->m_blitter.mem[state->m_blitter.scb + SCB_HPOSSTRT];
-		 	state->m_suzy.data[HPOSSTRTH] = state->m_blitter.mem[state->m_blitter.scb + SCB_HPOSSTRT+1];
-		 	state->m_suzy.data[VPOSSTRTL] = state->m_blitter.mem[state->m_blitter.scb + SCB_VPOSSTRT];
-		 	state->m_suzy.data[VPOSSTRTH] = state->m_blitter.mem[state->m_blitter.scb + SCB_VPOSSTRT+1];
-		 	
-		 	switch(state->m_blitter.spr_ctl1 & 0x30) // reload sprite scaling
-		 	{
-		 		case 0x30: // width, height, tilt, stretch
+			state->m_blitter.bitmap = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRDLINE);
+			state->m_suzy.data[HPOSSTRTL] = state->m_blitter.mem[state->m_blitter.scb + SCB_HPOSSTRT];
+			state->m_suzy.data[HPOSSTRTH] = state->m_blitter.mem[state->m_blitter.scb + SCB_HPOSSTRT+1];
+			state->m_suzy.data[VPOSSTRTL] = state->m_blitter.mem[state->m_blitter.scb + SCB_VPOSSTRT];
+			state->m_suzy.data[VPOSSTRTH] = state->m_blitter.mem[state->m_blitter.scb + SCB_VPOSSTRT+1];
+
+			switch(state->m_blitter.spr_ctl1 & 0x30) // reload sprite scaling
+			{
+				case 0x30: // width, height, tilt, stretch
 					state->m_blitter.tilt = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_TILT);
 				case 0x20: // width, height, stretch
-		 			state->m_blitter.stretch = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_STRETCH);
-		 		case 0x10: // width, height
-		 			state->m_blitter.width = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRHSIZ);
-		 			state->m_blitter.height = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRVSIZ);
-		 	}
-		 
-		 	if(!(state->m_blitter.spr_ctl1 & 0x08)) // reload palette
-		 	{
-		 		if (state->m_blitter.spr_ctl1 & 0x30)
-		 			palette_offset = 0x0b + 2*(((state->m_blitter.spr_ctl1 & 0x30)>>4) + 1); // palette data offset depends on width, height, etc. reloading
-		 		else
-		 			palette_offset = 0x0b;
-		 			
-		 		colors = lynx_colors[state->m_blitter.mem[state->m_blitter.scb] >> 6];
+					state->m_blitter.stretch = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_STRETCH);
+				case 0x10: // width, height
+					state->m_blitter.width = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRHSIZ);
+					state->m_blitter.height = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRVSIZ);
+			}
+
+			if(!(state->m_blitter.spr_ctl1 & 0x08)) // reload palette
+			{
+				if (state->m_blitter.spr_ctl1 & 0x30)
+					palette_offset = 0x0b + 2*(((state->m_blitter.spr_ctl1 & 0x30)>>4) + 1); // palette data offset depends on width, height, etc. reloading
+				else
+					palette_offset = 0x0b;
+
+				colors = lynx_colors[state->m_blitter.mem[state->m_blitter.scb] >> 6];
 
 				for (i = 0; i < colors / 2; i++)
 				{
@@ -790,12 +790,12 @@ static void lynx_blitter(running_machine &machine)
 					state->m_blitter.memory_accesses++;
 				}
 			}
-		 }	
-		 		
+		 }
 
-		
-		
-		
+
+
+
+
 		if (!(state->m_blitter.spr_ctl1 & 0x04))		// if 0, we skip this sprite
 		{
 			state->m_blitter.colpos = GET_WORD(state->m_suzy.data, COLLOFFL) + state->m_blitter.scb;  //????
@@ -964,7 +964,7 @@ static READ8_HANDLER( suzy_read )
 		case VIDBASH:
 			return state->m_blitter.screen>>8;
 		case COLLBASL:
-			return state->m_blitter.colbuf & 0xff;		
+			return state->m_blitter.colbuf & 0xff;
 		case COLLBASH:
 			return state->m_blitter.colbuf>>8;
 		case SCBNEXTL:
@@ -1086,7 +1086,7 @@ static WRITE8_HANDLER( suzy_write )
     F (0x62), H (0x60), K (0x6e) or M (0x6c) will force a '0' to be written to A (0x55),
     C (0x53), E (0x63), G (0x61), J (0x6f) or L (0x6d) respectively */
    if ((offset < 0x80) && !(offset & 0x01))
-   	state->m_suzy.data[offset + 1] = 0;
+	state->m_suzy.data[offset + 1] = 0;
 
 	switch(offset)
 	{
@@ -1118,7 +1118,7 @@ static WRITE8_HANDLER( suzy_write )
 			break;
 		case COLLBASL:
 			state->m_blitter.colbuf = data;
-			break;		
+			break;
 		case COLLBASH:
 			state->m_blitter.colbuf |= data<<8;
 			break;
@@ -1189,7 +1189,7 @@ static WRITE8_HANDLER( suzy_write )
 			break;
 		case MATH_C:
 			/* If we are going to perform a signed multiplication, we store the sign and convert the number
-    		to an unsigned one */
+            to an unsigned one */
 			if (state->m_suzy.data[SPRSYS] & 0x80)		/* signed math */
 			{
 				UINT16 factor, temp;
@@ -1207,7 +1207,7 @@ static WRITE8_HANDLER( suzy_write )
 			break;
 		/* Writing to A will start a 16 bit multiply */
 		/* If we are going to perform a signed multiplication, we also store the sign and convert the
-    	number to an unsigned one */
+        number to an unsigned one */
 		case MATH_A:
 			if (state->m_suzy.data[SPRSYS] & 0x80)		/* signed math */
 			{
@@ -1315,7 +1315,7 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 		return;
 	}
 
- 	// Documentation states lower two bits of buffer address are ignored (thus 0xfc mask)
+	// Documentation states lower two bits of buffer address are ignored (thus 0xfc mask)
 	j = ((state->m_mikey.data[0x94] & 0xfc)  | (state->m_mikey.data[0x95]<<8)) + state->m_line_y * 160 / 2;
 	if (state->m_mikey.data[0x92] & 0x02)
 		j -= 160 * 102 / 2 - 1;
@@ -1974,8 +1974,8 @@ int lynx_verify_cart (char *header, int kind)
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
-	11 bits are used to address data within the selected bank. Valid bank sizes are 256,
-	512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
+    11 bits are used to address data within the selected bank. Valid bank sizes are 256,
+    512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
 
 	lynx_state *state = image.device().machine().driver_data<lynx_state>();
 	UINT8 *rom = image.device().machine().region("user1")->base();
@@ -2035,9 +2035,9 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	{
 		size = image.get_software_region_length("rom");
       if (size > 0xffff) // 64,128,256,512k cartridges
-      	state->m_granularity = size >> 8;
+    	state->m_granularity = size >> 8;
       else
-      	state->m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
+    	state->m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
 
 		memcpy(rom, image.get_software_region("rom"), size);
 
