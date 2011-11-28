@@ -1029,6 +1029,9 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,3M,5M,7M,9M")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macii, mac_state )
@@ -1075,6 +1078,9 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciihmu, macii )
@@ -1123,6 +1129,9 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,64M,96M,128M")
+
+    // software list
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc, macii )
