@@ -643,7 +643,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool_image *image, imgtool_stream *str
 	info->cluster_size				= pick_integer_be(header,   6, 2);
 	info->root_dir_lsn				= pick_integer_be(header,   8, 3);
 	info->owner_id					= pick_integer_be(header,  11, 2);
-//	attributes						= 
+//  attributes                      =
     pick_integer_be(header,  13, 1);
 	info->disk_id					= pick_integer_be(header,  14, 2);
 	info->format_flags				= pick_integer_be(header,  16, 1);

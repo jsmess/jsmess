@@ -9,8 +9,8 @@
 	0.prg and 0.chr (alternatively, 1.prg and 1.chr for later revisions of a game). If you own one of these carts and they have a label
 	we don't have, please let us know (or contact Bootgod: he's always interested in new verifications) -->
 
-<!-- Note on the pcb values: for dumps which hasn't been documented from a cart (e.g. the ones obtained by splitting PRG and CHR 
-	banks from a iNES or UNIF files), we have chosen the pcb name as follows. For UNIF files we have used the one used by the dumper 
+<!-- Note on the pcb values: for dumps which hasn't been documented from a cart (e.g. the ones obtained by splitting PRG and CHR
+	banks from a iNES or UNIF files), we have chosen the pcb name as follows. For UNIF files we have used the one used by the dumper
 	in the header, in the hope it is accurate. For iNES files we have tried to use a unique pcb for each mapper, namely:
 	- mapper 0 with 16k PRG: NES-NROM-128
 	- mapper 0 with 32k PRG: NES-NROM-256
@@ -21,7 +21,7 @@
 	- mapper 5: NES-EKROM
 	etc. Proper PCB should be used when the cart is documented. -->
 
-<!-- Note on Waixing dumps: many roms are assigned to the wrong mapper. Common mistakes: 
+<!-- Note on Waixing dumps: many roms are assigned to the wrong mapper. Common mistakes:
 	- HENGGEDIANZI-XJZB carts use mapper 176
 	- a few WAIXING-A carts use mapper 4
 	Also, a few images are not proper dumps:
@@ -46405,7 +46405,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<dataarea name="prg" size="131072">
 				<rom name="[es-1018] shen mi jin san jiao (c).prg" size="131072" crc="2c3ad058" sha1="ff1f47a1c8565c834475f584b872c7faaff3634d" offset="00000" status="baddump" />
 			</dataarea>
- 			<!-- 8k VRAM on cartridge -->
+			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -46421,7 +46421,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<dataarea name="prg" size="131072">
 				<rom name="[es-1018] shen mi jin san jiao (c)_fix.prg" size="131072" crc="f07c21e3" sha1="5df0c221d5e5e1cac2ef41097b930d16050333fe" offset="00000" status="baddump" />
 			</dataarea>
- 			<!-- 8k VRAM on cartridge -->
+			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -46896,7 +46896,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="sanxiawya" cloneof="sanxiawy" 	supported="no">
+	<software name="sanxiawya" cloneof="sanxiawy"	supported="no">
 		<!-- Serial: ES-1071 - Release Date:  - Alternative Title: 三侠五义 -->
 		<description>San Xia Wu Yi (Chi, Alt?)</description>
 		<year>19??</year>
@@ -59060,8 +59060,8 @@ Other
 		</part>
 	</software>
 
-<!-- This needs more investigations: is it ripped from a multicart? was it from a standalone cart?  does it really use mapper 0 
-(and if so why the invalid code)?  is it the same fancy bros of a lot of multicarts (where the game have the wrong mirroring, 
+<!-- This needs more investigations: is it ripped from a multicart? was it from a standalone cart?  does it really use mapper 0
+(and if so why the invalid code)?  is it the same fancy bros of a lot of multicarts (where the game have the wrong mirroring,
 resulting in tons of glitches? -->
 	<software name="fancybro" cloneof="smb" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->

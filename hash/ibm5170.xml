@@ -285,6 +285,6 @@
 				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

@@ -880,12 +880,12 @@ static imgtoolerr_t fat_readwrite_file(imgtool_partition *partition, fat_file *f
 	void *buffer, size_t buffer_len, size_t *bytes_read, int read_or_write)
 {
 	imgtoolerr_t err;
-//	const fat_partition_info *disk_info;
+//  const fat_partition_info *disk_info;
 	UINT32 sector_index;
 	int offset;
 	size_t len;
 
-//	disk_info = 
+//  disk_info =
         fat_get_partition_info(partition);
 	if (bytes_read)
 		*bytes_read = 0;
