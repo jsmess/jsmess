@@ -32190,7 +32190,7 @@
 	</software>
 
 	<software name="whowant">
-		<description>Who Wants to Be a Millionaire? (Euro)</description>
+		<description>Who Wants to Be a Millionaire (UK)</description>
 		<year>2002</year>
 		<publisher>Zoo Digital Publishing</publisher>
 		<part name="cart" interface="gba_cart">
@@ -32201,7 +32201,7 @@
 	</software>
 
 	<software name="whowanta" cloneof="whowant">
-		<description>Who Wants to Be a Millionaire? (Aus)</description>
+		<description>Who Wants to Be a Millionaire (Aus)</description>
 		<year>2002</year>
 		<publisher>Zoo Digital Publishing</publisher>
 		<part name="cart" interface="gba_cart">
@@ -32267,7 +32267,7 @@
 	</software>
 
 	<software name="whowant2">
-		<description>Who Wants to Be a Millionaire - 2nd Edition (Euro)</description>
+		<description>Who Wants to Be a Millionaire - 2nd Edition (UK)</description>
 		<year>2004</year>
 		<publisher>Zoo Digital Publishing</publisher>
 		<part name="cart" interface="gba_cart">
@@ -32278,7 +32278,7 @@
 	</software>
 
 	<software name="whowanjr">
-		<description>Who Wants to Be a Millionaire? Junior (Euro)</description>
+		<description>Who Wants to Be a Millionaire - Junior (UK)</description>
 		<year>2005</year>
 		<publisher>Zoo Digital Publishing</publisher>
 		<part name="cart" interface="gba_cart">
