@@ -22,7 +22,18 @@ class bbc_state : public driver_device
 {
 public:
 	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_ACCCON_IRR(CLEAR_LINE),
+		  m_via_system_irq(CLEAR_LINE),
+		  m_via_user_irq(CLEAR_LINE),
+		  m_acia_irq(CLEAR_LINE)
+	{ }
+	
+	required_device<cpu_device> m_maincpu;
+
+	void check_interrupts();
+	
 	int m_RAMSize;			// BBC Memory Size
 	int m_DFSType;			// this stores the DIP switch setting for the DFS type being used
 	int m_SWRAMtype;		// this stores the DIP switch setting for the SWRAM type being used
@@ -108,6 +119,9 @@ public:
 	int m_MC146818_CE;		// 6522 port b bit 6
 
 	int m_via_system_porta;
+	int m_via_system_irq;
+	int m_via_user_irq;
+	int m_acia_irq;
 
 	int m_column;			// this is a counter in the keyboard circuit
 

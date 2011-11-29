@@ -726,6 +726,14 @@ static const centronics_interface bbcb_centronics_config =
 	DEVCB_NULL
 };
 
+static WRITE_LINE_DEVICE_HANDLER( bbcb_acia6850_irq_w )
+{
+	bbc_state *driver_state = device->machine().driver_data<bbc_state>();
+	driver_state->m_acia_irq = state;
+
+	driver_state->check_interrupts();
+}
+
 static ACIA6850_INTERFACE( bbc_acia6850_interface )
 {
 	0,
@@ -735,7 +743,7 @@ static ACIA6850_INTERFACE( bbc_acia6850_interface )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
+	DEVCB_LINE(bbcb_acia6850_irq_w)
 };
 
 static LEGACY_FLOPPY_OPTIONS_START(bbc)
