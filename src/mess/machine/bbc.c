@@ -24,6 +24,11 @@
 #include "imagedev/cassette.h"
 
 
+void bbc_state::check_interrupts()
+{
+	m_maincpu->set_input_line(M6502_IRQ_LINE, m_via_system_irq | m_via_user_irq | !m_acia_irq | m_ACCCON_IRR);
+}
+
 /*************************
 Model A memory handling functions
 *************************/
@@ -360,7 +365,7 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 
 	if (tempIRR!=state->m_ACCCON_IRR)
 	{
-		cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, state->m_ACCCON_IRR);
+		state->check_interrupts();
 	}
 
 	if (state->m_ACCCON_Y)
@@ -1205,6 +1210,14 @@ static READ8_DEVICE_HANDLER( bbcb_via_system_read_cb2 )
 }
 
 
+static WRITE_LINE_DEVICE_HANDLER( bbcb_via_system_irq_w )
+{
+	bbc_state *driver_state = device->machine().driver_data<bbc_state>();
+	driver_state->m_via_system_irq = state;
+
+	driver_state->check_interrupts();
+}
+
 const via6522_interface bbcb_system_via =
 {
 	DEVCB_HANDLER(bbcb_via_system_read_porta),
@@ -1219,7 +1232,7 @@ const via6522_interface bbcb_system_via =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
+	DEVCB_LINE(bbcb_via_system_irq_w)
 };
 
 
@@ -1244,6 +1257,14 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_user_write_portb )
 	state->m_userport = data;
 }
 
+static WRITE_LINE_DEVICE_HANDLER( bbcb_via_user_irq_w )
+{
+	bbc_state *driver_state = device->machine().driver_data<bbc_state>();
+	driver_state->m_via_user_irq = state;
+
+	driver_state->check_interrupts();
+}
+
 const via6522_interface bbcb_user_via =
 {
 	DEVCB_NULL,	//via_user_read_porta,
@@ -1258,7 +1279,7 @@ const via6522_interface bbcb_user_via =
 	DEVCB_NULL, //via_user_write_cb1
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),
 	DEVCB_NULL,	//via_user_write_cb2,
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
+	DEVCB_LINE(bbcb_via_user_irq_w)
 };
 
 
