@@ -23114,6 +23114,18 @@
 		</part>
 	</software>
 
+	<software name="pokerubygp" cloneof="pokeruby">
+		<description>Pokémon - Rubin-Edition (Ger, Prototype)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-FLASH-1M" />
+			<dataarea name="rom" size="16777216">
+				<rom name="pokemon_ruby_german_final_d.bin" size="16777216" crc="40686c47" sha1="ca5e3d415c4b47353a73a616878ba833f3648b7a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokerubys" cloneof="pokeruby">
 		<description>Pokémon - Edición Rubí (Spa, Rev. 1)</description>
 		<year>2003</year>
