@@ -3,7 +3,7 @@
 
 <softwarelist name="wscolor" description="Bandai Wonderswan Color cartridges">
 	<software name="anotherh">
-        <!-- Alt title: アナザヘヴン ～memory of those days～ -->
+		<!-- Alt title: アナザヘヴン ～memory of those days～ -->
 		<!-- WSC -->
 		<description>Another Heaven - Memory of those Days</description>
 		<!--<release_date>2000-12-21</release_date>-->
@@ -19,7 +19,7 @@
 	</software>
 
 	<software name="arclad">
-        <!-- Alt title: アークザラッド 機神復活 -->
+		<!-- Alt title: アークザラッド 機神復活 -->
 		<!-- WSC only -->
 		<description>Arc the Lad - Kishin Fukkatsu</description>
 		<!--<release_date>2002-07-04</release_date>-->
@@ -34,7 +34,7 @@
 	</software>
 
 	<software name="alchemst">
-        <!-- Alt title: マリー＆エリー ～ふたりのアトリエ～ -->
+		<!-- Alt title: マリー＆エリー ～ふたりのアトリエ～ -->
 		<!-- WSC only -->
 		<description>Alchemist Marie &amp; Elie - Futari no Atelier</description>
 		<!--<release_date>2001-10-25</release_date>-->
@@ -49,7 +49,7 @@
 	</software>
 
 	<software name="battlesp">
-        <!-- Alt title: バトルスピリット デジモンフロンティア -->
+		<!-- Alt title: バトルスピリット デジモンフロンティア -->
 		<!-- WSC only -->
 		<description>Battle Spirit - Digimon Frontier</description>
 		<!--<release_date>2002-12-07</release_date>-->
@@ -64,7 +64,7 @@
 	</software>
 
 	<software name="bluewing">
-        <!-- Alt title: ブルー ウイング ブリッツ -->
+		<!-- Alt title: ブルー ウイング ブリッツ -->
 		<!-- WSC -->
 		<description>Blue Wing Blitz</description>
 		<!--<release_date>2001-07-05</release_date>-->
@@ -79,7 +79,7 @@
 	</software>
 
 	<software name="crshgear">
-        <!-- Alt title: 激闘！ クラッシュギア ターボギアチャンピオンリーグ -->
+		<!-- Alt title: 激闘！ クラッシュギア ターボギアチャンピオンリーグ -->
 		<!-- WSC only -->
 		<description>Gekitou! Crash Gear Turbo - Gear Champion League</description>
 		<!--<release_date>2002-08-10</release_date>-->
@@ -94,7 +94,7 @@
 	</software>
 
 	<software name="darkeyes">
-        <!-- Alt title: バトルゲート ダークアイズ -->
+		<!-- Alt title: バトルゲート ダークアイズ -->
 		<!-- WSC -->
 		<description>Dark Eyes - Battle Gate</description>
 		<!--<release_date>2001-03-15</release_date>-->
@@ -109,7 +109,7 @@
 	</software>
 
 	<software name="dicing">
-        <!-- Alt title: だいしんぐないと・ピリオド -->
+		<!-- Alt title: だいしんぐないと・ピリオド -->
 		<!-- WSC only -->
 		<description>Dicing Knight.</description>
 		<!--<release_date>2004-05-31</release_date>-->
@@ -123,7 +123,7 @@
 	</software>
 
 	<software name="digi2d1">
-        <!-- Alt title: デジモンアドベンチャー02 ディーワンテイマーズ -->
+		<!-- Alt title: デジモンアドベンチャー02 ディーワンテイマーズ -->
 		<!-- WSC -->
 		<description>Digimon Adventure 02 - D1 Tamers</description>
 		<!--<release_date>2000-12-09</release_date>-->
@@ -139,7 +139,7 @@
 	</software>
 
 	<software name="digianca">
-        <!-- Alt title:  -->
+		<!-- Alt title:  -->
 		<!-- WSC only -->
 		<description>Digimon - Anode Tamer &amp; Cathode Tamer (Asia?)</description>
 		<year>19??</year>
@@ -153,7 +153,7 @@
 	</software>
 
 	<software name="digicard">
-        <!-- Alt title: デジタルモンスター カードゲーム バージョン ワンダースワンカラー -->
+		<!-- Alt title: デジタルモンスター カードゲーム バージョン ワンダースワンカラー -->
 		<!-- WSC only -->
 		<description>Digital Monster Card Game - Ver. WonderSwan Color</description>
 		<!--<release_date>2002-03-16</release_date>-->
@@ -168,7 +168,7 @@
 	</software>
 
 	<software name="digimdp">
-        <!-- Alt title: デジタルモンスター ディープロジェクト -->
+		<!-- Alt title: デジタルモンスター ディープロジェクト -->
 		<!-- WSC only -->
 		<description>Digital Monster - D-Project</description>
 		<!--<release_date>2002-08-03</release_date>-->
@@ -183,7 +183,7 @@
 	</software>
 
 	<software name="digitbs">
-        <!-- Alt title: デジモンテイマーズ バトルスピリット Ver.1.5 -->
+		<!-- Alt title: デジモンテイマーズ バトルスピリット Ver.1.5 -->
 		<!-- WSC only -->
 		<description>Digimon Tamers - Battle Spirit Ver. 1.5</description>
 		<!--<release_date>2002-04-27</release_date>-->
@@ -198,7 +198,7 @@
 	</software>
 
 	<software name="digitbs1">
-        <!-- Alt title: デジモンテイマーズ バトルスピリット -->
+		<!-- Alt title: デジモンテイマーズ バトルスピリット -->
 		<!-- WSC only -->
 		<description>Digimon Tamers - Battle Spirit</description>
 		<!--<release_date>2001-10-06</release_date>-->
@@ -213,7 +213,7 @@
 	</software>
 
 	<software name="digitbt">
-        <!-- Alt title: デジモンテイマーズ ブレイブテイマー -->
+		<!-- Alt title: デジモンテイマーズ ブレイブテイマー -->
 		<!-- WSC only -->
 		<description>Digimon Tamers - Brave Tamer</description>
 		<!--<release_date>2001-12-29</release_date>-->
@@ -228,7 +228,7 @@
 	</software>
 
 	<software name="digitmed">
-        <!-- Alt title: デジモンテイマーズ デジモンメドレー -->
+		<!-- Alt title: デジモンテイマーズ デジモンメドレー -->
 		<!-- WSC -->
 		<description>Digimon Tamers - Digimon Medley</description>
 		<!--<release_date>2001-07-12</release_date>-->
@@ -243,7 +243,7 @@
 	</software>
 
 	<software name="dokodem3">
-        <!-- Alt title: どこでもハムスター3 おでかけサフラン -->
+		<!-- Alt title: どこでもハムスター3 おでかけサフラン -->
 		<!-- WSC -->
 		<description>Dokodemo Hamster 3 - Odekake Saffron</description>
 		<!--<release_date>2000-12-14</release_date>-->
@@ -259,7 +259,7 @@
 	</software>
 
 	<software name="doraemon">
-        <!-- Alt title: ポケットの中の ドラえもん -->
+		<!-- Alt title: ポケットの中の ドラえもん -->
 		<!-- WSC -->
 		<description>Pocket no Naka no Doraemon</description>
 		<!--<release_date>2001-05-24</release_date>-->
@@ -275,7 +275,7 @@
 	</software>
 
 	<software name="dball">
-        <!-- Alt title: ドラゴンボール -->
+		<!-- Alt title: ドラゴンボール -->
 		<!-- WSC only - Rated "Everyone" -->
 		<description>Dragon Ball</description>
 		<!--<release_date>2003-11-20</release_date>-->
@@ -290,7 +290,7 @@
 	</software>
 
 	<software name="ffant">
-        <!-- Alt title: ファイナルファンタジー -->
+		<!-- Alt title: ファイナルファンタジー -->
 		<!-- WSC only -->
 		<description>Final Fantasy</description>
 		<!--<release_date>2000-12-09</release_date>-->
@@ -306,7 +306,7 @@
 	</software>
 
 	<software name="ffant2">
-        <!-- Alt title: ファイナルファンタジーII -->
+		<!-- Alt title: ファイナルファンタジーII -->
 		<!-- WSC only -->
 		<description>Final Fantasy II</description>
 		<!--<release_date>2001-05-02</release_date>-->
@@ -322,7 +322,7 @@
 	</software>
 
 	<software name="ffant4">
-        <!-- Alt title: ファイナルファンタジーIV -->
+		<!-- Alt title: ファイナルファンタジーIV -->
 		<!-- WSC only -->
 		<description>Final Fantasy IV</description>
 		<!--<release_date>2002-03-28</release_date>-->
@@ -337,7 +337,7 @@
 	</software>
 
 	<software name="flapspec">
-        <!-- Alt title: ファイナルラップスペシャル -->
+		<!-- Alt title: ファイナルラップスペシャル -->
 		<!-- WSC only -->
 		<description>Final Lap Special - GT &amp; Formula Machine</description>
 		<!--<release_date>2001-11-15</release_date>-->
@@ -353,7 +353,7 @@
 	</software>
 
 	<software name="flashkk">
-        <!-- Alt title: フラッシュ 恋人クン -->
+		<!-- Alt title: フラッシュ 恋人クン -->
 		<!-- WSC -->
 		<description>Flash Koibito-kun </description>
 		<!--<release_date>2000-12-28</release_date>-->
@@ -369,7 +369,7 @@
 	</software>
 
 	<software name="frontmis">
-        <!-- Alt title: フロントミッション -->
+		<!-- Alt title: フロントミッション -->
 		<!-- WSC only -->
 		<description>Front Mission</description>
 		<!--<release_date>2002-07-12</release_date>-->
@@ -384,7 +384,7 @@
 	</software>
 
 	<software name="gaxe">
-        <!-- Alt title: ゴールデンアックス -->
+		<!-- Alt title: ゴールデンアックス -->
 		<!-- WSC only -->
 		<description>Golden Axe</description>
 		<!--<release_date>2002-02-28</release_date>-->
@@ -399,7 +399,7 @@
 	</software>
 
 	<software name="gensouma">
-        <!-- Alt title 幻想魔伝最遊記 Retribution ～陽のあたる場所で～: -->
+		<!-- Alt title 幻想魔伝最遊記 Retribution ～陽のあたる場所で～: -->
 		<!-- WSC only -->
 		<description>Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de</description>
 		<!--<release_date>2001-06-07</release_date>-->
@@ -414,7 +414,7 @@
 	</software>
 
 	<software name="ggpetit">
-        <!-- Alt title: ギルティギア プチ -->
+		<!-- Alt title: ギルティギア プチ -->
 		<!-- WSC only -->
 		<description>Guilty Gear Petit</description>
 		<!--<release_date>2001-01-25</release_date>-->
@@ -430,7 +430,7 @@
 	</software>
 
 	<software name="ggpetit2">
-        <!-- Alt title: ギルティギア プチ2 -->
+		<!-- Alt title: ギルティギア プチ2 -->
 		<!-- WSC only -->
 		<description>Guilty Gear Petit 2</description>
 		<!--<release_date>2001-09-27</release_date>-->
@@ -445,7 +445,7 @@
 	</software>
 
 	<software name="gransta">
-        <!-- Alt title: グランスタ クロニクル -->
+		<!-- Alt title: グランスタ クロニクル -->
 		<!-- WSC only -->
 		<description>Gransta Chronicle</description>
 		<!--<release_date>2002-06-13</release_date>-->
@@ -460,7 +460,7 @@
 	</software>
 
 	<software name="gundseed">
-        <!-- Alt title: 機動戦士ガンダム シード -->
+		<!-- Alt title: 機動戦士ガンダム シード -->
 		<!-- WSC only -->
 		<description>Kidou Senshi Gundam Seed</description>
 		<!--<release_date>2003-03-15</release_date>-->
@@ -475,7 +475,7 @@
 	</software>
 
 	<software name="gundtoku">
-        <!-- Alt title: 機動戦士ガンダム ギレンの野望 特別編 蒼き星の覇者 -->
+		<!-- Alt title: 機動戦士ガンダム ギレンの野望 特別編 蒼き星の覇者 -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>Kidou Senshi Gundam - Giren no Yabou - Tokubetsu Hen - Aoki Hoshi no Hasha</description>
 		<!--<release_date>2003-05-02</release_date>-->
@@ -490,7 +490,7 @@
 	</software>
 
 	<software name="gundvol1">
-        <!-- Alt title: 機動戦士ガンダム Vol.1 サイドセブン -->
+		<!-- Alt title: 機動戦士ガンダム Vol.1 サイドセブン -->
 		<!-- WSC only -->
 		<description>Kidou Senshi Gundam Vol. 1 - Side 7</description>
 		<!--<release_date>2001-02-01</release_date>-->
@@ -506,7 +506,7 @@
 	</software>
 
 	<software name="gundvol2">
-        <!-- Alt title: 機動戦士ガンダム Vol.2 ジャブロー -->
+		<!-- Alt title: 機動戦士ガンダム Vol.2 ジャブロー -->
 		<!-- WSC only -->
 		<description>Kidou Senshi Gundam Vol. 2 - Jaburo</description>
 		<!--<release_date>2001-08-16</release_date>-->
@@ -521,7 +521,7 @@
 	</software>
 
 	<software name="gundvol3">
-        <!-- Alt title: 機動戦士ガンダム Vol.3 ア・バオア・クー -->
+		<!-- Alt title: 機動戦士ガンダム Vol.3 ア・バオア・クー -->
 		<!-- WSC only -->
 		<description>Kidou Senshi Gundam Vol. 3 - A Baoa Qu</description>
 		<!--<release_date>2002-05-25</release_date>-->
@@ -536,7 +536,7 @@
 	</software>
 
 	<software name="gunpeyex">
-        <!-- Alt title: グンペイEX -->
+		<!-- Alt title: グンペイEX -->
 		<!-- WSC only -->
 		<description>GunPey EX</description>
 		<!--<release_date>2000-12-09</release_date>-->
@@ -551,8 +551,8 @@
 		</part>
 	</software>
 
-	<software name="hanjuher">
-        <!-- Alt title: はんじゅくヒーロー半熟英雄 ああ、世界よ半熟なれ…！！ -->
+	<software name="hanjuher" supported="no">   <!-- it freezes -->
+		<!-- Alt title: はんじゅくヒーロー半熟英雄 ああ、世界よ半熟なれ…！！ -->
 		<!-- WSC only -->
 		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!!</description>
 		<!--<release_date>2002-02-14</release_date>-->
@@ -567,7 +567,7 @@
 	</software>
 
 	<software name="hatachoc">
-        <!-- Alt title: はたらくチョコボ -->
+		<!-- Alt title: はたらくチョコボ -->
 		<!-- WSC -->
 		<description>Hataraku Chocobo</description>
 		<!--<release_date>2000-09-21</release_date>-->
@@ -582,7 +582,7 @@
 	</software>
 
 	<software name="hxhgrisl">
-        <!-- Alt title: ハンター×ハンター グリードアイランド -->
+		<!-- Alt title: ハンター×ハンター グリードアイランド -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>Hunter X Hunter - Greed Island</description>
 		<!--<release_date>2003-04-24</release_date>-->
@@ -597,7 +597,7 @@
 	</software>
 
 	<software name="hxhmichi">
-        <!-- Alt title: ハンター×ハンター 導かれし者 -->
+		<!-- Alt title: ハンター×ハンター 導かれし者 -->
 		<!-- WSC only -->
 		<description>Hunter X Hunter - Michibikareshi Mono</description>
 		<!--<release_date>2001-08-23</release_date>-->
@@ -612,7 +612,7 @@
 	</software>
 
 	<software name="hxhsorez">
-        <!-- Alt title: ハンター×ハンター ～それぞれの決意～ -->
+		<!-- Alt title: ハンター×ハンター ～それぞれの決意～ -->
 		<!-- WSC only -->
 		<description>Hunter X Hunter - Sorezore no Ketsui</description>
 		<!--<release_date>2001-04-26</release_date>-->
@@ -628,7 +628,7 @@
 	</software>
 
 	<software name="inuyfema">
-        <!-- Alt title: 犬夜叉 風雲絵巻 -->
+		<!-- Alt title: 犬夜叉 風雲絵巻 -->
 		<!-- WSC only -->
 		<description>Inuyasha - Fuuun Emaki</description>
 		<!--<release_date>2002-07-27</release_date>-->
@@ -643,7 +643,7 @@
 	</software>
 
 	<software name="inuyksen">
-        <!-- Alt title: 犬夜叉 かごめの戦国日記 -->
+		<!-- Alt title: 犬夜叉 かごめの戦国日記 -->
 		<!-- WSC only -->
 		<description>Inuyasha - Kagome no Sengoku Nikki</description>
 		<!--<release_date>2001-11-02</release_date>-->
@@ -658,7 +658,7 @@
 	</software>
 
 	<software name="inuykyum">
-        <!-- Alt title: 犬夜叉 かごめの夢日記 -->
+		<!-- Alt title: 犬夜叉 かごめの夢日記 -->
 		<!-- WSC only -->
 		<description>Inuyasha - Kagome no Yume Nikki</description>
 		<!--<release_date>2002-11-16</release_date>-->
@@ -673,7 +673,7 @@
 	</software>
 
 	<software name="jsilver">
-         <!-- Alt title: -->
+ 		<!-- Alt title: -->
 		<!-- WSC only -->
 		<description>Judgement Silversword - Rebirth Edition (Rev. 4321)</description>
 		<!--<release_date>2004-02-05</release_date>-->
@@ -687,7 +687,7 @@
 	</software>
 
 	<software name="jsilver1" cloneof="jsilver">
-         <!-- Alt title: -->
+ 		<!-- Alt title: -->
 		<!-- WSC only -->
 		<description>Judgement Silversword - Rebirth Edition (Rev. SC21)</description>
 		<!--<release_date>2004-02-05</release_date>-->
@@ -701,7 +701,7 @@
 	</software>
 
 	<software name="kikuchou">
-        <!-- Alt title: キン肉マンII世 超人聖戦史 -->
+		<!-- Alt title: キン肉マンII世 超人聖戦史 -->
 		<!-- WSC only -->
 		<description>Kinnikuman IIsei - Choujin Seisenshi</description>
 		<!--<release_date>2003-01-30</release_date>-->
@@ -716,7 +716,7 @@
 	</software>
 
 	<software name="kikudrmt">
-        <!-- Alt title: キン肉マンII世 ドリームタッグマッチ -->
+		<!-- Alt title: キン肉マンII世 ドリームタッグマッチ -->
 		<!-- WSC only -->
 		<description>Kinnikuman IIsei - Dream Tag Match</description>
 		<!--<release_date>2002-03-02</release_date>-->
@@ -731,7 +731,7 @@
 	</software>
 
 	<software name="kurupara">
-        <!-- Alt title: くるパラ！ -->
+		<!-- Alt title: くるパラ！ -->
 		<!-- WSC only -->
 		<description>Kurupara!</description>
 		<!--<release_date>2001-06-14</release_date>-->
@@ -746,7 +746,7 @@
 	</software>
 
 	<software name="lastaliv">
-        <!-- Alt title: ラストアライブ -->
+		<!-- Alt title: ラストアライブ -->
 		<!-- WSC only -->
 		<description>Last Alive</description>
 		<!--<release_date>2001-07-26</release_date>-->
@@ -761,7 +761,7 @@
 	</software>
 
 	<software name="makaitou">
-        <!-- Alt title: 魔界塔士 サ・ガ -->
+		<!-- Alt title: 魔界塔士 サ・ガ -->
 		<!-- WSC only -->
 		<description>Makai Toushi Sa-Ga</description>
 		<!--<release_date>2002-03-20</release_date>-->
@@ -776,7 +776,7 @@
 	</software>
 
 	<software name="mconanyk">
-        <!-- Alt title: 名探偵コナン ～夕暮れの皇女～ -->
+		<!-- Alt title: 名探偵コナン ～夕暮れの皇女～ -->
 		<!-- WSC -->
 		<description>Meitantei Conan - Yuugure no Koujo</description>
 		<!--<release_date>2001-04-05</release_date>-->
@@ -791,7 +791,7 @@
 	</software>
 
 	<software name="memories">
-        <!-- Alt title: メモリーズオフ フェスタ -->
+		<!-- Alt title: メモリーズオフ フェスタ -->
 		<!-- WSC only -->
 		<description>Memories Off - Festa</description>
 		<!--<release_date>2001-03-08</release_date>-->
@@ -807,7 +807,7 @@
 	</software>
 
 	<software name="mikeneko">
-        <!-- Alt title: サウンドコミック - 三毛猫ホームズ ゴーストパニック -->
+		<!-- Alt title: サウンドコミック - 三毛猫ホームズ ゴーストパニック -->
 		<!-- WSC only -->
 		<description>Mikeneko Holmes - Ghost Panic</description>
 		<!--<release_date>2001-04-26</release_date>-->
@@ -823,7 +823,7 @@
 	</software>
 
 	<software name="mrdrillr">
-        <!-- Alt title: ミスタードリラー -->
+		<!-- Alt title: ミスタードリラー -->
 		<!-- WSC only -->
 		<description>Mr. Driller</description>
 		<!--<release_date>2001-04-05</release_date>-->
@@ -839,7 +839,7 @@
 	</software>
 
 	<software name="naruto">
-        <!-- Alt title: Naruto ナルト- 木ノ葉忍法帖 -->
+		<!-- Alt title: Naruto ナルト- 木ノ葉忍法帖 -->
 		<!-- WSC only -->
 		<description>Naruto - Konoha Ninpouchou</description>
 		<!--<release_date>2003-03-27</release_date>-->
@@ -854,7 +854,7 @@
 	</software>
 
 	<software name="onepbatl">
-        <!-- Alt title: フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム -->
+		<!-- Alt title: フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム -->
 		<!-- WSC only -->
 		<description>From TV Animation One Piece - Grand Battle Swan Colosseum</description>
 		<!--<release_date>2002-07-12</release_date>-->
@@ -869,7 +869,7 @@
 	</software>
 
 	<software name="onepchop">
-        <!-- Alt title: フロムテレビアニメーション ワンピース チョッパーの大冒険 -->
+		<!-- Alt title: フロムテレビアニメーション ワンピース チョッパーの大冒険 -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>From TV Animation One Piece - Chopper no Daibouken</description>
 		<!--<release_date>2003-10-16</release_date>-->
@@ -884,7 +884,7 @@
 	</software>
 
 	<software name="onepniji">
-        <!-- Alt title: フロムテレビアニメーション ワンピース 虹の島伝説 -->
+		<!-- Alt title: フロムテレビアニメーション ワンピース 虹の島伝説 -->
 		<!-- WSC only -->
 		<description>From TV Animation One Piece - Niji no Shima Densetsu</description>
 		<!--<release_date>2001-09-13</release_date>-->
@@ -899,7 +899,7 @@
 	</software>
 
 	<software name="oneptwar">
-        <!-- Alt title: フロムテレビアニメーション ワンピース トレジャーウォーズ -->
+		<!-- Alt title: フロムテレビアニメーション ワンピース トレジャーウォーズ -->
 		<!-- WSC only -->
 		<description>From TV Animation One Piece - Treasure Wars</description>
 		<!--<release_date>2002-01-03</release_date>-->
@@ -914,7 +914,7 @@
 	</software>
 
 	<software name="oneptwr2">
-        <!-- Alt title: フロムテレビアニメーション ワンピース トレジャーウォーズ2 バギーランドへようこそ -->
+		<!-- Alt title: フロムテレビアニメーション ワンピース トレジャーウォーズ2 バギーランドへようこそ -->
 		<!-- WSC only -->
 		<description>From TV Animation One Piece - Treasure Wars 2 - Buggy Land e Youkoso</description>
 		<!--<release_date>2002-12-20</release_date>-->
@@ -929,7 +929,7 @@
 	</software>
 
 	<software name="rakujong">
-        <!-- Alt title: 落雀 -->
+		<!-- Alt title: 落雀 -->
 		<!-- WSC only -->
 		<description>Raku Jongg</description>
 		<!--<release_date>2001-05-31</release_date>-->
@@ -944,7 +944,7 @@
 	</software>
 
 	<software name="rhymridr">
-        <!-- Alt title: ライムライダー ケロリカン -->
+		<!-- Alt title: ライムライダー ケロリカン -->
 		<!-- WSC only -->
 		<description>Rhyme Rider Kerorican</description>
 		<!--<release_date>2000-12-09</release_date>-->
@@ -960,7 +960,7 @@
 	</software>
 
 	<software name="riviera">
-        <!-- Alt title: Riviera ～約束の地 リヴィエラ～ -->
+		<!-- Alt title: Riviera ～約束の地 リヴィエラ～ -->
 		<!-- WSC only -->
 		<description>Riviera - Yakusoku no Chi Riviera</description>
 		<!--<release_date>2002-07-12</release_date>-->
@@ -975,7 +975,7 @@
 	</software>
 
 	<software name="srobotc3a" cloneof="srobotc3">
-         <!-- Alt title: スーパーロボット大戦 コンパクト3 -->
+ 		<!-- Alt title: スーパーロボット大戦 コンパクト3 -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>Super Robot Taisen Compact 3 (v1.5)</description>
 		<!--<release_date>2003-07-17</release_date>-->
@@ -990,7 +990,7 @@
 	</software>
 
 	<software name="srobotc3">
-        <!-- Alt title: スーパーロボット大戦 コンパクト3 -->
+		<!-- Alt title: スーパーロボット大戦 コンパクト3 -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>Super Robot Taisen Compact 3 (v1.6)</description>
 		<!--<release_date>2003-07-17</release_date>-->
@@ -1004,8 +1004,8 @@
 		</part>
 	</software>
 
-	<software name="srobotwc">
-        <!-- Alt title: フォー ワンダースワンカラーコンパクト スーパーロボット大戦 -->
+	<software name="srobotwc" supported="no">   <!-- it freezes -->
+		<!-- Alt title: フォー ワンダースワンカラーコンパクト スーパーロボット大戦 -->
 		<!-- WSC only -->
 		<description>Super Robot Taisen Compact for WonderSwan Color</description>
 		<!--<release_date>2001-12-13</release_date>-->
@@ -1020,7 +1020,7 @@
 	</software>
 
 	<software name="rockmnex">
-        <!-- Alt title: ロックマンエグゼ ワンダースワン -->
+		<!-- Alt title: ロックマンエグゼ ワンダースワン -->
 		<!-- WSC only -->
 		<description>Rockman EXE WS</description>
 		<!--<release_date>2003-02-08</release_date>-->
@@ -1035,7 +1035,7 @@
 	</software>
 
 	<software name="rockmnxn">
-        <!-- Alt title: ロックマンエグゼ N1バトル -->
+		<!-- Alt title: ロックマンエグゼ N1バトル -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>Rockman EXE - N1 Battle</description>
 		<!--<release_date>2003-08-08</release_date>-->
@@ -1050,7 +1050,7 @@
 	</software>
 
 	<software name="romnsaga">
-        <!-- Alt title: ロマンシング　サ・ガ -->
+		<!-- Alt title: ロマンシング　サ・ガ -->
 		<!-- WSC only -->
 		<description>Romancing Sa-Ga</description>
 		<!--<release_date>2001-12-20</release_date>-->
@@ -1065,7 +1065,7 @@
 	</software>
 
 	<software name="rundim">
-        <!-- Alt title: ランディム Return To Earth -->
+		<!-- Alt title: ランディム Return To Earth -->
 		<!-- WSC only -->
 		<description>RUN=DIM - Return to Earth</description>
 		<!--<release_date>2002-02-07</release_date>-->
@@ -1080,7 +1080,7 @@
 	</software>
 
 	<software name="sdgunde1">
-        <!-- Alt title: SDガンダム英雄伝 ～騎士伝説～ -->
+		<!-- Alt title: SDガンダム英雄伝 ～騎士伝説～ -->
 		<!-- WSC -->
 		<description>SD Gundam Eiyuu Den - Kishi Densetsu</description>
 		<!--<release_date>2001-03-15</release_date>-->
@@ -1096,7 +1096,7 @@
 	</software>
 
 	<software name="sdgunde2">
-        <!-- Alt title: SDガンダム英雄伝 ～武者伝説～ -->
+		<!-- Alt title: SDガンダム英雄伝 ～武者伝説～ -->
 		<!-- WSC -->
 		<description>SD Gundam Eiyuu Den - Musha Densetsu</description>
 		<!--<release_date>2001-03-15</release_date>-->
@@ -1112,7 +1112,7 @@
 	</software>
 
 	<software name="sdgundg1">
-        <!-- Alt title: SDガンダム Gジェネレーション ギャザービート2 -->
+		<!-- Alt title: SDガンダム Gジェネレーション ギャザービート2 -->
 		<!-- WSC only -->
 		<description>SD Gundam G-Generation - Gather Beat 2</description>
 		<!--<release_date>2001-06-14</release_date>-->
@@ -1127,7 +1127,7 @@
 	</software>
 
 	<software name="sdgundg2">
-        <!-- Alt title: SDガンダム ジージェネレーション モノアイガンダムズ -->
+		<!-- Alt title: SDガンダム ジージェネレーション モノアイガンダムズ -->
 		<!-- WSC only -->
 		<description>SD Gundam G-Generation - Mono-Eye Gundams</description>
 		<!--<release_date>2002-09-26</release_date>-->
@@ -1142,7 +1142,7 @@
 	</software>
 
 	<software name="sdgunduc">
-        <!-- Alt title: SDガンダム オペレーション U.C. -->
+		<!-- Alt title: SDガンダム オペレーション U.C. -->
 		<!-- WSC only -->
 		<description>SD Gundam - Operation U.C.</description>
 		<!--<release_date>2002-02-16</release_date>-->
@@ -1157,7 +1157,7 @@
 	</software>
 
 	<software name="senkaini">
-        <!-- Alt title: 仙界伝 弐～TVアニメーション仙界伝封神演義より～ -->
+		<!-- Alt title: 仙界伝 弐～TVアニメーション仙界伝封神演義より～ -->
 		<!-- WSC -->
 		<description>Senkaiden Ni - TV Animation Senkaiden Houshin Engi Yori</description>
 		<!--<release_date>2000-12-21</release_date>-->
@@ -1173,7 +1173,7 @@
 	</software>
 
 	<software name="shamking">
-        <!-- Alt title: シャーマンキング 未来への意志 -->
+		<!-- Alt title: シャーマンキング 未来への意志 -->
 		<!-- WSC only -->
 		<description>Shaman King - Asu e no Ishi (v1.1)</description>
 		<!--<release_date>2002-08-29</release_date>-->
@@ -1188,7 +1188,7 @@
 	</software>
 
 	<software name="shamking1" cloneof="shamking">
-        <!-- Alt title: シャーマンキング 未来への意志 -->
+		<!-- Alt title: シャーマンキング 未来への意志 -->
 		<!-- WSC only -->
 		<description>Shaman King - Asu e no Ishi</description>
 		<!--<release_date>2002-08-29</release_date>-->
@@ -1202,8 +1202,8 @@
 		</part>
 	</software>
 
-	<software name="sorobang">
-        <!-- Alt title: そろばんぐ -->
+	<software name="sorobang" supported="partial">
+		<!-- Alt title: そろばんぐ -->
         <!-- WSC -->
 		<description>Sorobang</description>
 		<!--<release_date>2000-12-09</release_date>-->
@@ -1219,7 +1219,7 @@
 	</software>
 
 	<software name="sseiya">
-        <!-- Alt title: 聖闘士星矢 黄金伝説編 パーフェクトエディション -->
+		<!-- Alt title: 聖闘士星矢 黄金伝説編 パーフェクトエディション -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>Saint Seiya - Ougon Densetsu Hen - Perfect Edition</description>
 		<!--<release_date>2003-07-31</release_date>-->
@@ -1234,7 +1234,7 @@
 	</software>
 
 	<software name="starhear">
-        <!-- Alt title: スターハーツ ～星と大地の使者～ -->
+		<!-- Alt title: スターハーツ ～星と大地の使者～ -->
 		<!-- WSC only -->
 		<description>Star Hearts - Hoshi to Daichi no Shisha</description>
 		<!--<release_date>2001-08-27</release_date>-->
@@ -1249,7 +1249,7 @@
 	</software>
 
 	<software name="starheartai" cloneof="starhear">
-        <!-- Alt title:  -->
+		<!-- Alt title:  -->
 		<!-- WSC only -->
 		<description>Star Hearts - Hoshi to Daichi no Shisha - Taikenban</description>
 		<year>2001</year>
@@ -1262,7 +1262,7 @@
 	</software>
 
 	<software name="suprwars">
-        <!-- Alt title: ナムコスーパーウォーズ -->
+		<!-- Alt title: ナムコスーパーウォーズ -->
 		<!-- WSC only -->
 		<description>Namco Super Wars</description>
 		<!--<release_date>2002-10-31</release_date>-->
@@ -1277,7 +1277,7 @@
 	</software>
 
 	<software name="terrors2">
-        <!-- Alt title: テラーズ2 -->
+		<!-- Alt title: テラーズ2 -->
         <!-- WSC -->
 		<description>Terrors 2</description>
 		<!--<release_date>2000-12-21</release_date>-->
@@ -1292,7 +1292,7 @@
 	</software>
 
 	<software name="tetris">
-        <!-- Alt title: テトリス -->
+		<!-- Alt title: テトリス -->
         <!-- WSC -->
 		<description>Tetris</description>
 		<!--<release_date>2002-04-18</release_date>-->
@@ -1306,8 +1306,8 @@
 		</part>
 	</software>
 
-	<software name="tonpuuso">
-        <!-- Alt title: 東風荘 -->
+	<software name="tonpuuso" supported="no">   <!-- it freezes -->
+		<!-- Alt title: 東風荘 -->
         <!-- WSC -->
 		<description>Tonpuusou</description>
 		<!--<release_date>2001-06-28</release_date>-->
@@ -1321,8 +1321,8 @@
 		</part>
 	</software>
 
-	<software name="uchuusen">
-        <!-- Alt title: 宇宙戦艦ヤマト -->
+	<software name="yamato">
+		<!-- Alt title: 宇宙戦艦ヤマト -->
         <!-- WSC -->
 		<description>Uchuu Senkan Yamato</description>
 		<!--<release_date>2001-02-08</release_date>-->
@@ -1337,7 +1337,7 @@
 	</software>
 
 	<software name="ultraman">
-        <!-- Alt title: ウルトラマン 光の国の使者 -->
+		<!-- Alt title: ウルトラマン 光の国の使者 -->
         <!-- WSC only -->
 		<description>Ultraman - Hikari no Kuni no Shisha</description>
 		<!--<release_date>2001-06-21</release_date>-->
@@ -1352,7 +1352,7 @@
 	</software>
 
 	<software name="wclassic">
-        <!-- Alt title: ナムコワンダークラシック -->
+		<!-- Alt title: ナムコワンダークラシック -->
         <!-- WSC -->
 		<description>Wonder Classic</description>
 		<!--<release_date>2001-01-18</release_date>-->
@@ -1368,7 +1368,7 @@
 	</software>
 
 	<software name="wildcard">
-        <!-- Alt title: ワイルドカード -->
+		<!-- Alt title: ワイルドカード -->
         <!-- WSC only -->
 		<description>Wild Card</description>
 		<!--<release_date>2001-03-29</release_date>-->
@@ -1384,7 +1384,7 @@
 	</software>
 
 	<software name="withyou">
-        <!-- Alt title: ウィズ・ユー ～みつめていたい～ -->
+		<!-- Alt title: ウィズ・ユー ～みつめていたい～ -->
         <!-- WSC only -->
 		<description>With You - Mitsumete Itai</description>
 		<!--<release_date>2001-01-25</release_date>-->
@@ -1399,7 +1399,7 @@
 	</software>
 
 	<software name="wizardry">
-        <!-- Alt title: ウィザードリィ シナリオ1 狂王の試練場 -->
+		<!-- Alt title: ウィザードリィ シナリオ1 狂王の試練場 -->
         <!-- WSC -->
 		<description>Wizardry Scenario 1 - Proving Grounds of the Mad Overlord</description>
 		<!--<release_date>2001-03-01</release_date>-->
@@ -1415,7 +1415,7 @@
 	</software>
 
 	<software name="xcard">
-        <!-- Alt title: エックス カード オブ フェイト -->
+		<!-- Alt title: エックス カード オブ フェイト -->
         <!-- WSC only -->
 		<description>X - Card of Fate</description>
 		<!--<release_date>2002-06-??</release_date>-->
@@ -1430,7 +1430,7 @@
 	</software>
 
 	<software name="xilittle">
-        <!-- Alt title: サイ リトル -->
+		<!-- Alt title: サイ リトル -->
         <!-- WSC only -->
 		<description>XI[sai] Little</description>
 		<!--<release_date>2001-12-20</release_date>-->
