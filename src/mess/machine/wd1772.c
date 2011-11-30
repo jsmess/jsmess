@@ -403,7 +403,6 @@ void wd177x_t::read_track_continue()
 		case WAIT_INDEX_DONE:
 			sub_state = TRACK_DONE;
 			live_start(READ_TRACK_DATA);
-			cur_live.pll.start_writing(machine().time());
 			return;
 
 		case TRACK_DONE:
@@ -539,6 +538,7 @@ void wd177x_t::write_track_continue()
 		case WAIT_INDEX_DONE:
 			sub_state = TRACK_DONE;
 			live_start(WRITE_TRACK_DATA);
+			cur_live.pll.start_writing(machine().time());
 			return;
 
 		case TRACK_DONE:
