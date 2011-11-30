@@ -4320,7 +4320,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="delta drawing v3.23 (1983)(spinnaker software).80" size="0x4000" crc="2b3224a8" sha1="b8e1186d1b01e98836adb458cca929079db07c98" />
+				<rom name="delta drawing v3.23 (1983)(spinnaker software).80" size="0x4000" crc="2b3224a8" sha1="b8e1186d1b01e98836adb458cca929079db07c98" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

@@ -652,7 +652,7 @@
 		<info name="serial" value="16??" />
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="a000" size="4096">
-				<rom name="buti - basic utility (umi)198-)(16--)(jue).a0" size="4096" crc="cb38dae6" sha1="377cd5d4059c272fd6395419cfc48e0dbfabe094" />
+				<rom name="buti - basic utility (umi)198-)(16--)(jue).a0" size="4096" crc="cb38dae6" sha1="377cd5d4059c272fd6395419cfc48e0dbfabe094" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
