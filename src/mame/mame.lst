@@ -2146,6 +2146,8 @@ aquajack		// B77 (c) 1990 Taito Corporation Japan (World)
 aquajacku		// B77 (c) 1990 Taito America Corporation (US)
 aquajackj		// B77 (c) 1990 Taito Corporation (Japan)
 spacegun		// C57 (c) 1990 Taito Corporation Japan (World)
+spacegunu		// C57 (c) 1990 Taito America Corporation (US)
+spacegunj		// C57 (c) 1990 Taito Corporation (Japan)
 dblaxle			// C78 (c) 1991 Taito America Corporation (US)
 pwheelsj		// C78 (c) 1991 Taito Corporation (Japan)
 racingb			// C84 (c) 1991 Taito Coropration ..
@@ -2851,7 +2853,6 @@ sf2ceea			// 13/03/1992 (c) 1992 (World)
 sf2ceua			// 13/03/1992 (c) 1992 (USA)
 sf2ceub			// 13/05/1992 (c) 1992 (USA)
 sf2ceuc			// 03/08/1992 (c) 1992 (USA)
-sf2ceud			// 03/08/1992 (c) 1992 (USA)
 sf2cej			// 13/05/1992 (c) 1992 (Japan)
 sf2rb			// hack
 sf2rb2			// hack
@@ -9827,7 +9828,6 @@ j7wldwkd		// Wild 'N' Wicked (Jpm)
 j7bullio		// Bullionaire (Ace)
 
 // Other Games
-pucky			// (c) 19?? ???
 vega			// (c) 19?? Olympia?
 astinvad		// (c) 1980 Stern
 kosmokil		// bootleg
@@ -9969,6 +9969,7 @@ nost			// (c) 1993 Face
 nostj			// (c) 1993 Face
 nostk			// (c) 1993 Face
 4enraya			// (c) 1990 IDSA
+unkpacg			// (c) 19?? ???
 oneshot			// no copyright notice
 maddonna		// (c) 1995 Tuning
 maddonnb		// (c) 1995 Tuning
