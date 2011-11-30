@@ -10,11 +10,12 @@
 -->
 
 <softwarelist name="studio2" description="RCA Studio II cartridges">
-  <software name="spacewar">
-    <!-- 18V400 -->
-    <description>TV Arcade I: Spacewar</description>
+	<software name="spacewar">
+	<!-- 18V400 -->
+		<description>TV Arcade I: Spacewar</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="0x200">
@@ -24,10 +25,11 @@
 	</software>
 
 	<software name="tennis">
-    <!-- 18V402 -->
-    <description>TV Arcade III: Tennis/Squash</description>
+	<!-- 18V402 -->
+		<description>TV Arcade III: Tennis/Squash</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear', '1' on Keypad A, '4' on Keypad B and then '7' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="0x200">
@@ -37,10 +39,11 @@
 	</software>
 
 	<software name="baseball">
-    <!-- 18V403 -->
-    <description>TV Arcade IV: Baseball </description>
+	<!-- 18V403 -->
+		<description>TV Arcade IV: Baseball </description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="0x400">
@@ -50,10 +53,11 @@
 	</software>
 
 	<software name="speedway">
-    <!-- 18V404 -->
-    <description>TV Arcade Series V: Speedway/Tag</description>
+	<!-- 18V404 -->
+		<description>TV Arcade Series V: Speedway/Tag</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="0x200">
@@ -62,50 +66,54 @@
 		</part>
 	</software>
 
-  <software name="gunfight">
-    <!-- 18V405 -->
-    <description>TV Arcade Series: Gunfighter/Moonship Battle</description>
-    <year>1977</year>
-    <publisher>RCA</publisher>
-
-    <part name="cart" interface="studio2_cart">
-      <dataarea name="rom" size="0x400">
-        <rom name="gunfighter-moonship battle.bin" size="0x400" crc="989d2c67" sha1="82f37ec5b7599e9169873da6c269c0c092395458" offset="0x0000" />
-      </dataarea>
-    </part>
-  </software>
-
-  <software name="compquiz">
-    <!-- 18V500 -->
-    <description>TV School House: Computer Quiz</description>
-    <year>1977</year>
-    <publisher>RCA</publisher>
-
-    <part name="cart" interface="studio2_cart">
-      <dataarea name="rom" size="0x200">
-        <rom name="computer quiz.bin" size="0x200" crc="cf08aa66" sha1="1d709a7f6b0a3d67d184ae0d94b1cb198f9c8a6a" offset="0x0000" />
-      </dataarea>
-    </part>
-  </software>
-
-  <software name="mathfun">
-    <!-- MG-209 -->
-    <description>TV School House II: Math Fun</description>
-    <year>1977</year>
-    <publisher>RCA</publisher>
-
-    <part name="cart" interface="studio2_cart">
-      <dataarea name="rom" size="0x400">
-        <rom name="math fun.bin" size="0x400" crc="9ab5af96" sha1="12a013e483af253d75845adf0d9e86672b161f94" offset="0x0000" />
-      </dataarea>
-    </part>
-  </software>
-
-  <software name="bjack">
-    <!-- 18V600 -->
-    <description>TV Casino I: Blackjack </description>
+	<software name="gunfight">
+	<!-- 18V405 -->
+		<description>TV Arcade Series: Gunfighter/Moonship Battle</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x400">
+				<rom name="gunfighter-moonship battle.bin" size="0x400" crc="989d2c67" sha1="82f37ec5b7599e9169873da6c269c0c092395458" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compquiz">
+	<!-- 18V500 -->
+		<description>TV School House: Computer Quiz</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A twice" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x200">
+				<rom name="computer quiz.bin" size="0x200" crc="cf08aa66" sha1="1d709a7f6b0a3d67d184ae0d94b1cb198f9c8a6a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathfun">
+	<!-- MG-209 -->
+		<description>TV School House II: Math Fun</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A three times" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x400">
+				<rom name="math fun.bin" size="0x400" crc="9ab5af96" sha1="12a013e483af253d75845adf0d9e86672b161f94" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjack">
+	<!-- 18V600 -->
+		<description>TV Casino I: Blackjack </description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom" size="0x400">
@@ -114,16 +122,17 @@
 		</part>
 	</software>
 
-  <software name="biorhyth">
-    <!-- 18V700 -->
-    <description>TV Mystic Series: Biorhythm</description>
-    <year>1977</year>
-    <publisher>RCA</publisher>
+	<software name="biorhyth">
+	<!-- 18V700 -->
+		<description>TV Mystic Series: Biorhythm</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
 
-    <part name="cart" interface="studio2_cart">
-      <dataarea name="rom" size="0x400">
-        <rom name="biorhythm.bin" size="0x400" crc="6dcbc525" sha1="9fdab1be5d83aa0ccacf7e9ae2837b2b9e10be1c" offset="0x0000" />
-      </dataarea>
-    </part>
-  </software>
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x400">
+				<rom name="biorhythm.bin" size="0x400" crc="6dcbc525" sha1="9fdab1be5d83aa0ccacf7e9ae2837b2b9e10be1c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

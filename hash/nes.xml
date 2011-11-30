@@ -7260,6 +7260,7 @@
 		</part>
 	</software>
 
+<!-- glitches on NTSC -->
 	<software name="diggertr">
 		<!-- Serial: NES-8D (NOE/ESP - Release Date: 1991 -->
 		<description>Digger T. Rock: The Legend of the Lost City (Euro)</description>
@@ -8713,7 +8714,7 @@
 
 	<software name="ducktal2u" cloneof="ducktal2">
 		<!-- Serial: NES-DL-USA - Release Date: 1993-06 -->
-		<description>Disney's Duck Tales 2 (USA)</description>
+		<description>Disney's DuckTales 2 (USA)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -8730,7 +8731,7 @@
 
 	<software name="ducktal2g" cloneof="ducktal2">
 		<!-- Serial: NES-DL-NOE - Release Date: 1994-06-06 -->
-		<description>Disney's Duck Tales 2 (Ger)</description>
+		<description>Disney's DuckTales 2 (Ger)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -8747,7 +8748,7 @@
 
 	<software name="ducktal2">
 		<!-- Serial: NES-DL-SCN - Release Date: 1993-11-18 -->
-		<description>Disney's Duck Tales 2 (Euro)</description>
+		<description>Disney's DuckTales 2 (Euro)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -8764,7 +8765,7 @@
 
 	<software name="ducktal2f" cloneof="ducktal2">
 		<!-- Serial: NES-DL-FRA - Release Date: 1993 -->
-		<description>Disney's Duck Tales 2: la Bande a Picsou (Fra)</description>
+		<description>Disney's DuckTales 2: la Bande a Picsou (Fra)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -43442,6 +43443,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="wanpaku duck yume bouken (japan) (beta).prg" size="131072" crc="98c7b4da" sha1="664d49af3e0c7148b23fd3814c25c79864a2c622" offset="00000" status="baddump" />
 			</dataarea>
@@ -45601,14 +45603,14 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- nointro -->
-	<software name="dongdong">
+	<software name="dongdong" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dong Dong Nao 1 (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="8192">
 				<rom name="dong dong no 1 (asia) (unl).chr" size="8192" crc="6bd749f5" sha1="25c2c8ed044c0b282ef3a6555baab76e380f0fac" offset="00000" status="baddump" />
 			</dataarea>
@@ -46111,7 +46113,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="3suprgun">
 		<!-- Serial: MGC-024 - Release Date:  - Alternative Title:  -->
-		<description>3 in 1 Supergun (Asia)</description>
+		<description>3 in 1 Supergun (Tw)</description>
 		<year>1993</year>
 		<publisher>Micro Genius</publisher>
 		<part name="cart" interface="nes_cart">
@@ -48963,18 +48965,21 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="dongfang" cloneof="zelda" supported="no">
+	<software name="dongfang" cloneof="zelda">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dong Fang De Chuan Shuo - The Hyrule Fantasy (Chi, Decrypted)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="pcb" value="WAIXING-G" />
 			<dataarea name="prg" size="131072">
 				<rom name="dong fang de chuan shuo - the hyrule fantasy (as) [decrypted].prg" size="131072" crc="b5766659" sha1="f1d4b6f60ea92d86d6f15944148dff0d1dd60c07" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -53098,7 +53103,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Crayon Shin-Chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-4" />
 			<feature name="vrc4-pin3" value="PRG A0" />
@@ -53228,7 +53233,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dragon Ball Z - Chao Ji Lun Tan 5 (Chi)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Rex Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-REXSOFT-DBZ5" />
 			<dataarea name="chr" size="524288">
@@ -53240,7 +53245,23 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="dbzsb2">
+	<software name="dbz5a" cloneof="dbz5">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Dragon Ball Z - Chao Ji Lun Tan 5 (Chi, Alt)</description>
+		<year>19??</year>
+		<publisher>Rex Soft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-REXSOFT-DBZ5" />
+			<dataarea name="chr" size="524288">
+				<rom name="dragon ball z super (ch) [f1].chr" size="524288" crc="0fd9fa91" sha1="48414e925b7d1dd2770b172a831dfd212c8dc5c1" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="dragon ball z super (ch) [f1].prg" size="262144" crc="784c9bdf" sha1="132a72717bea3ad8fd3ab552e73a0231b1994b26" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbzsb2" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Dragon Ball Z - Super Butoden 2 (Asia)</description>
 		<year>19??</year>
@@ -53252,22 +53273,6 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="dragon ball z - super butoden 2 (199x)(-)(as)[p][a mapper 91].prg" size="131072" crc="26d2f648" sha1="68704dc5b810b75fd99f363a04b829cf14387427" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dbzsuper">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Dragon Ball Z Super (Chi, Fixed)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-REXSOFT-DBZ5" />
-			<dataarea name="chr" size="524288">
-				<rom name="dragon ball z super (ch) [f1].chr" size="524288" crc="0fd9fa91" sha1="48414e925b7d1dd2770b172a831dfd212c8dc5c1" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="dragon ball z super (ch) [f1].prg" size="262144" crc="784c9bdf" sha1="132a72717bea3ad8fd3ab552e73a0231b1994b26" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -54105,7 +54110,7 @@ from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="shuiguli2" cloneof="jackpot">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Shui Guo Li (Chi, Alt 2)</description>
+		<description>Shui Guo Li (Tw, Alt 2)</description>
 		<year>19??</year>
 		<publisher>Bit Corp.</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54972,7 +54977,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Volleyball (Asia, FDS conversion, Alt 2)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNKNOWN" /> <!-- mapper 253?!? -->
 			<dataarea name="prg" size="81920">
@@ -54991,7 +54996,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Volleyball (Asia, FDS conversion, Alt)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SMB2J" />
 			<dataarea name="chr" size="8192">
@@ -55371,7 +55376,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="bombrmanh" cloneof="bombrman">
 		<description>Bomberman (FMG pirate)</description>
 		<year>1987</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -58886,7 +58891,7 @@ Other
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Brave Boy - Kung Fu Pikachu (Jackie Chan pirate)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -58902,7 +58907,7 @@ Other
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Bruce &amp; Leo (Tom &amp; Jerry pirate)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -58934,7 +58939,7 @@ Other
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Conqueror (Circus Charlie pirate)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<dataarea name="chr" size="8192">
@@ -60070,7 +60075,7 @@ resulting in tons of glitches? -->
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Super Fighter (Contra 2 pirate)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
@@ -61669,7 +61674,7 @@ be better to redump them properly. -->
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Pikachu Y2k (Felix the Cat pirate, Decrypted SmyNES)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BTL-PIKACHUY2K" />
 			<dataarea name="chr" size="131072">
