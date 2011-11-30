@@ -34,10 +34,10 @@ DRCOBJ = \
 	$(CPUOBJ)/drcfe.o \
 	$(CPUOBJ)/drcuml.o \
 	$(CPUOBJ)/uml.o \
-	$(CPUOBJ)/i386/i386dasm.o \
 	$(CPUOBJ)/x86log.o \
 	$(CPUOBJ)/drcbex86.o \
 	$(CPUOBJ)/drcbex64.o \
+#	$(CPUOBJ)/i386/i386dasm.o \
 
 DRCDEPS = \
 	$(CPUSRC)/drcbec.h \
