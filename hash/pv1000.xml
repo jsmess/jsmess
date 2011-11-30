@@ -100,7 +100,7 @@ Undumped carts:
 	</software>
 
 	<!-- Serial: GPA-114 - Alt Title: ダーティー カメレオン -->
-	<software name="dirtychm">
+	<software name="dirtychm" supported="no">
 		<description>Dirty Chameleon</description>
 		<year>198?</year>
 		<publisher>Casio</publisher>
