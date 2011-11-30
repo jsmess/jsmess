@@ -518,17 +518,17 @@
 		<publisher>Morrow Designs</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="329049">
-				<rom name="ux141_sa.imd" size="329049" crc="a32ed5d8" sha1="41d7d307d79ea840a0bde948f7bfb0e4f19239fc"/>
+				<rom name="ux141_sa.imd" size="329049" crc="a32ed5d8" sha1="41d7d307d79ea840a0bde948f7bfb0e4f19239fc" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_8">
 			<dataarea name="flop" size="543045">
-				<rom name="ux14_d1.imd" size="543045" crc="6f55e165" sha1="53e9d6f363f4a0415203780f35d1a6f05b506604"/>
+				<rom name="ux14_d1.imd" size="543045" crc="6f55e165" sha1="53e9d6f363f4a0415203780f35d1a6f05b506604" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_8">
 			<dataarea name="flop" size="530781">
-				<rom name="ux14_d2.imd" size="530781" crc="9e35739f" sha1="5f35b977e20535ae62108e8bd1f08776d52cff87"/>
+				<rom name="ux14_d2.imd" size="530781" crc="9e35739f" sha1="5f35b977e20535ae62108e8bd1f08776d52cff87" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
