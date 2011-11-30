@@ -154,7 +154,7 @@ void wd177x_t::seek_continue()
 			if(main_state == RESTORE && floppy && !floppy->trk00_r())
 				sub_state = SEEK_DONE;
 
-			if(main_state == SEEK && floppy && track == data)
+			if(main_state == SEEK && track == data)
 				sub_state = SEEK_DONE;
 
 			if(sub_state == SPINUP_DONE) {
