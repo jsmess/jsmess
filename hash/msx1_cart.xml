@@ -71,7 +71,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 		<!-- ウイングマン2 キータクラーの復活 -->
 		<description>Wing Man 2 - Kitakura no Fukkatsu</description>
 		<year>1987</year>
-		<publisher>ENIX</publisher>
+		<publisher>Enix</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -435,7 +435,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 		<!-- ドラゴンクエスト -->
 		<description>Dragon Quest</description>
 		<year>1986</year>
-		<publisher>enix</publisher>
+		<publisher>Enix</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />

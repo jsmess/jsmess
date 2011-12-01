@@ -5265,7 +5265,7 @@
 	<software name="karatedo">
 		<description>Karatedo</description>
 		<year>199?</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="karatedo (y) [xdf].xdf" size="1261568" crc="49d1502e" sha1="3d3a186168b2c740a3f1e11f587fc3e5d3b93b91" offset="0" />

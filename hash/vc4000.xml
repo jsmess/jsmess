@@ -335,7 +335,7 @@
 	<software name="cockpit">
 		<description>Cockpit</description>
 		<year>19??</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="vc4000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="cockpit.bin" size="4096" crc="11dd7f0d" sha1="456e9c5d1d48877e8c5eb5e5499c911a73e30584" offset="0" />
