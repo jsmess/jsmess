@@ -254,7 +254,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="tr2p">
+	<software name="traid2p">
 		<!-- Original images (unknown source)
 		<rom name="tomb raider 2 [beta] [ntsc] [psx].ccd" size="13748" crc="8158505c"/>
 		<rom name="tomb raider 2 [beta] [ntsc] [psx].cue" size="3624" crc="030aec00"/>
