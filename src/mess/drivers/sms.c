@@ -63,9 +63,9 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/2413intf.h"
-#include "includes/sms.h"
 #include "video/smsvdp.h"
 #include "imagedev/cartslot.h"
+#include "includes/sms.h"
 
 #include "sms1.lh"
 
@@ -114,8 +114,8 @@ static ADDRESS_MAP_START( sms_io, AS_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", sn76496_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sms_vdp_data_r, sms_vdp_data_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sms_vdp_ctrl_r, sms_vdp_ctrl_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE_MODERN("sms_vdp", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE_MODERN("sms_vdp", sega315_5124_device, register_read, register_write)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_0_r)
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_1_r)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_0_r)
@@ -145,8 +145,8 @@ static ADDRESS_MAP_START( gg_io, AS_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0x1e) AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("gamegear", sn76496_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sms_vdp_data_r, sms_vdp_data_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sms_vdp_ctrl_r, sms_vdp_ctrl_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE_MODERN("sms_vdp", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE_MODERN("sms_vdp", sega315_5124_device, register_read, register_write)
 	AM_RANGE(0xc0, 0xc0)                 AM_READ_PORT("PORT_DC")
 	AM_RANGE(0xc1, 0xc1)                 AM_READ_PORT("PORT_DD")
 	AM_RANGE(0xdc, 0xdc)                 AM_READ_PORT("PORT_DC")
@@ -302,73 +302,23 @@ static INPUT_PORTS_START( gg )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start") /* Game Gear START */
 INPUT_PORTS_END
 
-static PALETTE_INIT( sms )
-{
-	int i;
-	for (i = 0; i < 64; i++)
-	{
-		int r = i & 0x03;
-		int g = (i & 0x0c) >> 2;
-		int b = (i & 0x30) >> 4;
-		palette_set_color_rgb(machine, i, r << 6, g << 6, b << 6);
-	}
-	/* TMS9918 palette */
-	palette_set_color_rgb(machine, 64+ 0,   0,   0,   0);
-	palette_set_color_rgb(machine, 64+ 1,   0,   0,   0);
-	palette_set_color_rgb(machine, 64+ 2,  33, 200,  66);
-	palette_set_color_rgb(machine, 64+ 3,  94, 220, 120);
-	palette_set_color_rgb(machine, 64+ 4,  84,  85, 237);
-	palette_set_color_rgb(machine, 64+ 5, 125, 118, 252);
-	palette_set_color_rgb(machine, 64+ 6, 212,  82,  77);
-	palette_set_color_rgb(machine, 64+ 7,  66, 235, 245);
-	palette_set_color_rgb(machine, 64+ 8, 252,  85,  84);
-	palette_set_color_rgb(machine, 64+ 9, 255, 121, 120);
-	palette_set_color_rgb(machine, 64+10, 212, 193,  84);
-	palette_set_color_rgb(machine, 64+11, 230, 206, 128);
-	palette_set_color_rgb(machine, 64+12,  33, 176,  59);
-	palette_set_color_rgb(machine, 64+13, 201,  91, 186);
-	palette_set_color_rgb(machine, 64+14, 204, 204, 204);
-	palette_set_color_rgb(machine, 64+15, 255, 255, 255);
-}
-
-static PALETTE_INIT( gamegear )
-{
-	int i;
-	for (i = 0; i < 4096; i++)
-	{
-		int r = i & 0x000f;
-		int g = (i & 0x00f0) >> 4;
-		int b = (i & 0x0f00) >> 8;
-		palette_set_color_rgb(machine, i, r << 4, g << 4, b << 4);
-	}
-}
-
-
 
 static WRITE_LINE_DEVICE_HANDLER( sms_int_callback )
 {
 	cputag_set_input_line(device->machine(), "maincpu", 0, state);
 }
 
-static const smsvdp_interface _315_5124_intf =
+static const smsvdp_interface _315_5124_ntsc_intf =
 {
-	MODEL_315_5124,
+	false,
 	"screen",
 	DEVCB_LINE(sms_int_callback),
 	DEVCB_LINE(sms_pause_callback)
 };
 
-static const smsvdp_interface _315_5246_intf =
+static const smsvdp_interface _315_5124_pal_intf =
 {
-	MODEL_315_5246,
-	"screen",
-	DEVCB_LINE(sms_int_callback),
-	DEVCB_LINE(sms_pause_callback)
-};
-
-static const smsvdp_interface _315_5378_intf =
-{
-	MODEL_315_5378,
+	true,
 	"screen",
 	DEVCB_LINE(sms_int_callback),
 	DEVCB_LINE(sms_pause_callback)
@@ -376,7 +326,7 @@ static const smsvdp_interface _315_5378_intf =
 
 static const smsvdp_interface sms_store_intf =
 {
-	MODEL_315_5124,
+	false,
 	"screen",
 	DEVCB_LINE(sms_store_int_callback),
 	DEVCB_LINE(sms_pause_callback)
@@ -430,10 +380,10 @@ static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_53_693175MHz/10, SMS_X_PIXELS, SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 2, SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256 + 10, SMS_NTSC_Y_PIXELS, SMS_TBORDER_START + SMS_NTSC_224_TBORDER_Y_PIXELS, SMS_TBORDER_START + SMS_NTSC_224_TBORDER_Y_PIXELS + 224)
 	MCFG_SCREEN_UPDATE(sms)
 
-	MCFG_PALETTE_LENGTH(64+16)
-	MCFG_PALETTE_INIT(sms)
+	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(sega315_5124)
 
-	MCFG_SMSVDP_ADD("sms_vdp", _315_5246_intf)
+	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_ntsc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
@@ -460,12 +410,12 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	MCFG_PALETTE_LENGTH(64+16)
-	MCFG_PALETTE_INIT(sms)
+	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(sega315_5124)
 
 	MCFG_VIDEO_START(sms1)
 
-	MCFG_SMSVDP_ADD("sms_vdp", _315_5124_intf)
+	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
 MACHINE_CONFIG_END
 
 #define MCFG_SMSSDISP_CARTSLOT_ADD(_tag) \
@@ -479,7 +429,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sms_sdisp, sms2_ntsc )
 
 	MCFG_DEVICE_REMOVE("sms_vdp")
-	MCFG_SMSVDP_ADD("sms_vdp", sms_store_intf)
+	MCFG_SEGA315_5246_ADD("sms_vdp", sms_store_intf)
 
 	MCFG_CPU_ADD("control", Z80, XTAL_53_693175MHz/15)
 	MCFG_CPU_PROGRAM_MAP(sms_store_mem)
@@ -516,7 +466,7 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 	MCFG_CPU_PROGRAM_MAP(sms_mem)
 	MCFG_CPU_IO_MAP(sms_io)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	MCFG_MACHINE_START(sms)
 	MCFG_MACHINE_RESET(sms)
@@ -537,10 +487,10 @@ static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_PAL/10, SMS_X_PIXELS, SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 2, SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256 + 10, SMS_PAL_Y_PIXELS, SMS_TBORDER_START + SMS_PAL_240_TBORDER_Y_PIXELS, SMS_TBORDER_START + SMS_PAL_240_TBORDER_Y_PIXELS + 240)
 	MCFG_SCREEN_UPDATE(sms)
 
-	MCFG_PALETTE_LENGTH(64+16)
-	MCFG_PALETTE_INIT(sms)
+	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(sega315_5124)
 
-	MCFG_SMSVDP_ADD("sms_vdp", _315_5246_intf)
+	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_pal_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
@@ -565,12 +515,12 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_PAL/10, SMS_X_PIXELS, SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 2, SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256 + 10, SMS_PAL_Y_PIXELS, SMS_TBORDER_START + SMS_PAL_240_TBORDER_Y_PIXELS, SMS_TBORDER_START + SMS_PAL_240_TBORDER_Y_PIXELS + 240)
 	MCFG_SCREEN_UPDATE(sms1)
 
-	MCFG_PALETTE_LENGTH(64+16)
-	MCFG_PALETTE_INIT(sms)
+	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(sega315_5124)
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	MCFG_SMSVDP_ADD("sms_vdp", _315_5124_intf)
+	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )
@@ -611,12 +561,12 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_53_693175MHz/10, SMS_X_PIXELS, SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 6*8, SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 26*8, SMS_NTSC_Y_PIXELS, SMS_TBORDER_START + SMS_NTSC_192_TBORDER_Y_PIXELS + 3*8, SMS_TBORDER_START + SMS_NTSC_192_TBORDER_Y_PIXELS + 21*8 )
 	MCFG_SCREEN_UPDATE(gamegear)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT(gamegear)
+	MCFG_PALETTE_LENGTH(SEGA315_5378_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(sega315_5378)
 
 	MCFG_VIDEO_START(gamegear)
 
-	MCFG_SMSVDP_ADD("sms_vdp", _315_5378_intf)
+	MCFG_SEGA315_5378_ADD("sms_vdp", _315_5124_ntsc_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
