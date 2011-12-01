@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="sat_eu" description="Sega Saturn (Europe) CD-ROM list">
+
+	<software name="kof95" supported="no">
+		<description>The King of Fighters '95 (Euro)</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<!-- This set depends on -cart kof95 as well! -->
+		<!-- The softlists could do with some way to specify this dependency -->
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the king of fighters 95 (euro)" sha1="cdc783b083ab52c104be71259b6e654cbdd7ccca"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="temp2000" supported="no">
+		<description>Tempest 2000 (Euro)</description>
+		<year>1996</year>
+		<publisher>Interplay / Atari</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tempest 2000 (euro)" sha1="8817003309a383e729b8d708ccfdfcbf32bb7222"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="keio2" supported="no">
+		<description>Keio Flying Squadron 2 (Euro)</description>
+		<year>1996</year>
+		<publisher>Victor / JVC</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="keio flying squadron 2 (euro)" sha1="32a5b75dc342110d3b26c2fb03a92b2069ea2c2e"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
