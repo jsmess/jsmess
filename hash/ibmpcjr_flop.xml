@@ -19,6 +19,7 @@
 		<description>Wordstar for PCjr (Release 1.00)</description>
 		<year>1987</year>
 		<publisher>Micropro International</publisher>
+		<info name="usage" value="boot from DOS 2 and then load wordstar" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="disk 1.ima" size="368640" crc="81b95671" sha1="a5f33403b1e3762e6b1c2c84b279e093eec9501f" offset="0x00000" />
@@ -53,7 +54,7 @@
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="ibm pcjr sampler.ima" size="368640" crc="d0fb7d31" sha1="cbee7f6109fb0ed8a94de1893fc47ab066de36d3" offset="0x00000" />
+				<rom name="ibm pcjr sampler.ima" size="368640" crc="c36607b3" sha1="a1d99d975aaed9746056fa1c06563cf08d1a8bc5" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
