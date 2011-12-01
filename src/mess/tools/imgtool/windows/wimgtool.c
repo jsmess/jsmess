@@ -136,7 +136,7 @@ static imgtoolerr_t foreach_selected_item(HWND window,
 				{
 					item.mask = LVIF_PARAM;
 					item.iItem = selected_index;
-					res = ListView_GetItem(info->listview, &item);
+					res = ListView_GetItem(info->listview, &item); res++;
 					selected_item = item.lParam;
 				}
 			}
@@ -545,7 +545,7 @@ static imgtoolerr_t refresh_image(HWND window)
 	info = get_wimgtool_info(window);
 	size_buf[0] = '\0';
 
-	res = ListView_DeleteAllItems(info->listview);
+	res = ListView_DeleteAllItems(info->listview); res++;
 
 	if (info->image)
 	{
@@ -1787,7 +1787,7 @@ static imgtoolerr_t double_click(HWND window)
 	GetWindowRect(info->listview, &r);
 	htinfo.pt.x = pt.x - r.left;
 	htinfo.pt.y = pt.y - r.top;
-	res = ListView_HitTest(info->listview, &htinfo);
+	res = ListView_HitTest(info->listview, &htinfo); res++;
 
 	if (htinfo.flags & LVHT_ONITEM)
 	{
@@ -1837,7 +1837,7 @@ static BOOL context_menu(HWND window, LONG x, LONG y)
 	hittest.pt.x = x;
 	hittest.pt.y = y;
 	ScreenToClient(info->listview, &hittest.pt);
-	res = ListView_HitTest(info->listview, &hittest);
+	res = ListView_HitTest(info->listview, &hittest); res++;
 
 	if (hittest.flags & LVHT_ONITEM)
 	{
