@@ -95,7 +95,7 @@ static void size_dialog(HWND dialog, const struct anchor_entry *anchor_entries,
 	RECT dialog_rect, adjusted_dialog_rect, dlgitem_rect;
 	LONG dialog_left, dialog_top;
 	LONG left, top;
-	UINT32 width, height;
+	UINT64 width, height;
 	UINT8 anchor;
 	HANDLE width_prop, height_prop;
 	static const TCHAR winprop_negwidth[] = TEXT("winprop_negwidth");
@@ -245,7 +245,7 @@ static void set_sector_text(HWND dialog)
 static void change_sector(HWND dialog)
 {
 	struct sectorview_info *info;
-	imgtoolerr_t err;
+	//imgtoolerr_t err;
 	TCHAR buf[32];
 	UINT32 new_track, new_head, new_sector;
 
@@ -260,7 +260,8 @@ static void change_sector(HWND dialog)
 
 	if ((info->track != new_track) || (info->head != new_head) || (info->sector != new_sector))
 	{
-		err = read_sector_data(dialog, new_track, new_head, new_sector);
+		//err = 
+		read_sector_data(dialog, new_track, new_head, new_sector);
 		// TODO: this causes a stack overflow
 		//if (err)
 		//  set_sector_text(dialog);
