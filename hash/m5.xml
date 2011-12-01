@@ -102,6 +102,7 @@ and why some of the dumps below have weird size?
 		<description>Tank Battalion</description>
 		<year>1980</year>
 		<publisher>Namco</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="tank battlaion (1980)(namco)(jp).bin" size="8192" crc="daa0d610" sha1="5867090fbe2584654dd2c2aaa215e69243f2f599" offset="00000" status="baddump" />
@@ -126,6 +127,7 @@ and why some of the dumps below have weird size?
 		<description>Guttang Gottong</description>
 		<year>1981</year>
 		<publisher>Konami</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8448">
 				<rom name="guttang gottong (1981)(konami)(jp).bin" size="8448" crc="0f70fa69" sha1="4e4900f42cbc76e4e795ed32ee18b2e27246e90f" offset="00000" status="baddump" />
@@ -198,6 +200,7 @@ and why some of the dumps below have weird size?
 		<description>Wonder Hole</description>
 		<year>1982</year>
 		<publisher>Irem</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8320">
 				<rom name="wonder hole (1982)(irem)(jp).bin" size="8320" crc="aba2cece" sha1="bcb7442c6d320eb166e224c3ac0f50514906ad4c" offset="00000" status="baddump" />
@@ -231,9 +234,9 @@ and why some of the dumps below have weird size?
 
 	<software name="funnym">
 		<!-- Serial: 23 - Release Date:  - Alternative Title:  -->
-		<description>Funny Mouse (1983)(Takara)(Jp</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Funny Mouse</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="funny mouse (1983)(takara)(jp).bin" size="8192" crc="94145074" sha1="43c2a1a5959ab8057c7d149472512a0c7996c798" offset="00000" status="baddump" />
@@ -283,6 +286,7 @@ and why some of the dumps below have weird size?
 		<description>FALC</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="falc (198x)(sord)(jp).bin" size="16384" crc="78037f97" sha1="4cd917388a626d38dd8b16834c2e610d0ba6d505" offset="00000" status="baddump" />
@@ -305,7 +309,7 @@ and why some of the dumps below have weird size?
 <!-- Unidentified items -->
 	<software name="basicw">
         <!-- is this legit?!? might it be Disk BASIC? -->
-		<description>BASIC-W (198x)(Sord)(Jp</description>
+		<description>BASIC-W</description>
 		<year>198?</year>
 		<publisher>Sord?</publisher>
 		<part name="cart" interface="m5_cart">
@@ -344,6 +348,7 @@ and why some of the dumps below have weird size?
 		<description>Baseball</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="10904">
 				<rom name="baseball (19xx)(-).bin" size="10904" crc="46e94dae" sha1="56d11bb9e4e8431ff4f6dfa592b096dd613084c3" offset="00000" status="baddump" />
@@ -356,6 +361,7 @@ and why some of the dumps below have weird size?
 		<description>Drops</description>
 		<year>1986</year>
 		<publisher>SPC</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="6176">
 				<rom name="drops (1986)(spc)(jp).bin" size="6176" crc="fa321348" sha1="e9a44e12eed9d51cdb40ce4b6f1cb19a1ebed35d" offset="00000" status="baddump" />
@@ -368,6 +374,7 @@ and why some of the dumps below have weird size?
 		<description>Jumping Jack</description>
 		<year>1986</year>
 		<publisher>SPC</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="5920">
 				<rom name="jumping jack (1986)(spc)(jp).bin" size="5920" crc="49030973" sha1="c8716276fe6c4b0808078086f505efce1137afc9" offset="00000" status="baddump" />
@@ -380,6 +387,7 @@ and why some of the dumps below have weird size?
 		<description>Masterchess</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="12288">
 				<rom name="masterchess (19xx)(-).bin" size="12288" crc="c10a6e96" sha1="5dd24aae17c3a293ae91ef5086c1c4f3e59263ed" offset="00000" status="baddump" />
@@ -392,6 +400,7 @@ and why some of the dumps below have weird size?
 		<description>Reversi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="6392">
 				<rom name="reversi (19xx)(games of skill).bin" size="6392" crc="ca2cd257" sha1="a048a1055d175ace09155e50da0387986e150f92" offset="00000" status="baddump" />
@@ -415,10 +424,12 @@ but we need more info -->
 		</part>
 	</software>
 
+<!-- This displays garbage charset when launched with ramsize 36k or 68k -->
 	<software name="unk_intr" supported="no">
 		<description>Unknown Intruder</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 36k or more RAM?" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="5376">
 				<rom name="zzz-unk-intruder.bin" size="5376" crc="12859c5d" sha1="fd8fc752be6afcbf016f8a33e21ad9e1b7c50c48" offset="00000" status="baddump" />

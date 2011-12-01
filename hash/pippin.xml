@@ -103,7 +103,7 @@
 		<description>1995.1.17 Hanshin Daishinsai (Jpn)</description>
 		<!-- Serial: BDS-20005 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="hanshind" sha1="d83d9883ad6a64d30a92d966efe24db26a1d4cb6"/>
@@ -151,7 +151,7 @@
 		<description>Anpanman no AIUEO-N! (Jpn)</description>
 		<!-- Serial: BDE-10015 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="anaiueon" sha1="208a6f3fc77fab7cd81733e3cf68c9847b6080e3"/>
@@ -163,7 +163,7 @@
 		<description>Anpanman to asobou! 1 (Jpn)</description>
 		<!-- Serial: BDE-10009 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="asobou1" sha1="0ee04adbe9279fa1703f7e0d7f1e35635a118805"/>
@@ -175,7 +175,7 @@
 		<description>Anpanman to asobou! 2 (Jpn)</description>
 		<!-- Serial: BDE-70016 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="asobou2" sha1="e2a0694f0c46628fc17d95b487eaf2da7231fba0"/>
@@ -223,7 +223,7 @@
 		<description>Chisato Moritaka CD-Rom Watarase Bashi (Jpn)</description>
 		<!-- Serial: BDE-10007 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="chisatom" sha1="0c1a34b194179a2c993ab211f4b3f420eebe5563"/>
@@ -235,7 +235,7 @@
 		<description>Circus! (Jpn)</description>
 		<!-- Serial: BDS-20031 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="circus" sha1="826b2ad9c271126e13e898dddf29d40d60ba1754"/>
@@ -247,7 +247,7 @@
 		<description>Compton's Interactive Encyclopedia (USA)</description>
 		<!-- Serial: 71278C -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="compton" sha1="d30c34a1f32761e8dc0a8b8e01051099e1255d02"/>
@@ -259,7 +259,7 @@
 		<description>Dazzeloids (Jpn)</description>
 		<!-- Serial: BDS-20030 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dazzloid" sha1="d5b68846455e3dbe33d33c932c4fe02778c16a12"/>
@@ -271,7 +271,7 @@
 		<description>EGWord Pure (Jpn, Ver. 1.0)</description>
 		<!-- Serial: BDE-10021 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="egworldp" sha1="1db32f1fc16d3c639ddecd2e39a070b8e5783383"/>
@@ -331,7 +331,7 @@
 		<description>Gadget (Jpn)</description>
 		<!-- Serial: BDS-20033 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="gadget" sha1="e9e7996b6f767c887e1ac9cd053bf28084a59ccf"/>
@@ -463,7 +463,7 @@
 		<description>Mac Bin 38 (Jpn)</description>
 		<!-- Serial: MUJ-9701 -->
 		<year>1997</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="macbin38" sha1="f5fee76b5586064da06eb396ccfd931534133b46"/>
@@ -475,7 +475,7 @@
 		<description>Mac Bin 40 A (Jpn)</description>
 		<!-- Serial: MUJ-9703-1 -->
 		<year>1997</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="macbin40" sha1="36255caf7922598a193bfaa2a8264bbcdc103890"/>
@@ -487,7 +487,7 @@
 		<description>Mac Bin 40 B (Jpn)</description>
 		<!-- Serial: MUJ-9703-2 -->
 		<year>1997</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="macbin4b" sha1="bdbd0aa161dd38bd141da7ece319df94ef1f1ca6"/>
@@ -500,7 +500,7 @@
 		<!-- Serial: ? -->
 		<!-- Also known as Tuscon -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="maconpip" sha1="278be8ad232a83d9fa6a7c4fb0f28337b37d3b0f"/>
@@ -584,7 +584,7 @@
 		<description>Nemurenu Yoru no Chiisana Ohanashi (Jpn)</description>
 		<!-- Serial: BDS-20015 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="nemurenu" sha1="e27663ada1a6b982ac1283220cd6f8a8eaedf203"/>
@@ -776,7 +776,7 @@
 		<description>SeesawC 1 - My favorite things - Sukinamonodake Eitango 120 (Jpn)</description>
 		<!-- Serial: BDE-10006 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="seesawc1" sha1="fa3e0fb2bd5a1c75f4c50d9e67c6cab5ad02b892"/>
@@ -788,7 +788,7 @@
 		<description>SeesawC 2 - My favorite places - Sukinatokorode Eitango 400 (Jpn)</description>
 		<!-- Serial: BDE-10023 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="seesawc2" sha1="59189f06f8e82eab1f7c01705bb0c3c780483e00"/>
@@ -800,7 +800,7 @@
 		<description>Shichisokusen (Jpn)</description>
 		<!-- Serial: BDS-20019 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="shichiso" sha1="0f9229cfc7db40339c949ff264be80f10cfe7545"/>
@@ -823,7 +823,7 @@
 	<software name="supermar">
 		<description>Super Marathon (USA)</description>
 		<!-- Serial: 41028C -->
-		<year>?</year>
+		<year>&lt;unknown&gt;</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -835,7 +835,7 @@
 	<software name="supermara" cloneof="supermar">
 		<description>Super Marathon (USA, Alt)</description>
 		<!-- Serial: 41028C -->
-		<year>?</year>
+		<year>&lt;unknown&gt;</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -847,7 +847,7 @@
 	<software name="tbreak">
 		<description>T-Break (Jpn)</description>
 		<!-- Serial: BDS-20026 -->
-		<year>?</year>
+		<year>&lt;unknown&gt;</year>
 		<publisher>Infocity</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -859,7 +859,7 @@
 	<software name="tamagotc">
 		<description>Tamagotchi CD-ROM (Jpn)</description>
 		<!-- Serial: BDE-10033 -->
-		<year>?</year>
+		<year>&lt;unknown&gt;</year>
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
@@ -871,8 +871,8 @@
 	<software name="tropicis">
 		<description>Tropic Island (Jpn)</description>
 		<!-- Serial: BDS-20011 -->
-		<year>?</year>
-		<publisher>?</publisher>
+		<year>&lt;unknown&gt;</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tropicis" sha1="9c929f38229a17d6bd65ed68d4d396dc06239d39"/>
@@ -992,7 +992,7 @@
 		<description>Victorian Park (Jpn)</description>
 		<!-- Serial: BDE-10004-1 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
@@ -1012,7 +1012,7 @@
 		<description>WebViewer With Microsoft Internet Explorer 3.0 for Macintosh (Jpn)</description>
 		<!-- Serial: BDB-026 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="webview" sha1="e4164d3e13ad93f2a604fb97dc2061b077fa256f"/>
@@ -1024,7 +1024,7 @@
 		<description>Yellow Brick Road I (Jpn)</description>
 		<!-- Serial: BDS-20022 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="yellow1" sha1="ac9f59cca09608e034c695a560aa7948d8e649b5"/>
@@ -1036,7 +1036,7 @@
 		<description>Yellow Brick Road II CD1 (Jpn)</description>
 		<!-- Serial: BDS-20023 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
@@ -1055,7 +1055,7 @@
 		<description>Yellows - Akira Gomi Photographs (Jpn)</description>
 		<!-- Serial: BDS-20001 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="yellows" sha1="0a88a47018b6d7e5750b916e74e22bd35ac007a6"/>
@@ -1067,7 +1067,7 @@
 		<description>Yellows 2.0 - Tokyo 1993 Akira Gomi Photographs (Jpn)</description>
 		<!-- Serial: BDS-20002 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="yellws2" sha1="bdeacbbadfc8acba80e3778ed33a757416dd1767"/>
@@ -1079,7 +1079,7 @@
 		<description>Yoku Mite Goran (Jpn)</description>
 		<!-- Serial: BDS-20018 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="yokumite" sha1="9edbbb48a197ddaf386db7cf5902adc766f65b27"/>
@@ -1091,7 +1091,7 @@
 		<description>Zukkoke Sanningumi: Drama Satsujinjiken (Jpn</description>
 		<!-- Serial: BDE-10032 -->
 		<year>1996</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="pippin_cdrom">
 			<diskarea name="cdrom">
 				<disk name="zukkoke" sha1="2a541850909403f4ce30a798079e66b2a68364c0"/>

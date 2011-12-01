@@ -1,11 +1,26 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Undumped?
+    - SV10012 MahJongg
+    - hash block, jacky lucky, challenger tank, brain power
+    - b52 battle
+    - Box Carrier
+    - Devil Paradise
+    - money bee
+    - jade legend
+    - Jouney to the West
+    - Lucky Jack (Jacky Lucky clone or a name mistake?)
+    - usa sea battle
+-->
+
 <softwarelist name="svision" description="Watara Supervision cartridges">
 	<software name="2in1">
 		<description>2 in 1 - Block Buster + Cross High (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
-		<!-- <serial>SV10033</serial> -->
+		<info name="serial" value="SV10033" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10033.bin" size="65536" crc="7e05d84f" sha1="f2b7902b8c522f63858c99caa81d63f4cdcb60cb" offset="000000" />
@@ -17,7 +32,8 @@
 		<description>2 in 1 - Hash Blocks + Eagle Plan (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>GTC Inc</publisher>
-		<!-- <serial>SV10024</serial> -->
+		<info name="serial" value="SV10024" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10024.bin" size="65536" crc="c1354952" sha1="bca1c05ebac50a1acd4a8d3b440a29867edc9826" offset="000000" />
@@ -29,7 +45,8 @@
 		<description>Alien (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
-		<!-- <serial>SV10010</serial> -->
+		<info name="serial" value="SV10010" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10010.bin" size="65536" crc="8dbb2c53" sha1="e20ae19d0555dc8d34da8f16d2d7bcce8c9856da" offset="000000" />
@@ -52,7 +69,8 @@
 		<description>Block Buster (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
-		<!-- <serial>SV10001</serial> -->
+		<info name="serial" value="SV10001" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10001.bin" size="65536" crc="0a3db285" sha1="639c69afa4a68236dfea263b51e9c032c1aa71be" offset="000000" />
@@ -64,7 +82,8 @@
 		<description>Brain Power (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
-		<!-- <serial>SV10023</serial> -->
+		<info name="serial" value="SV10023" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10023.bin" size="65536" crc="5e6706b9" sha1="8a97572caa6cd91950bd333bcab5c61d60cf28d2" offset="000000" />
@@ -87,7 +106,8 @@
 		<description>Carrier (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Travellmate</publisher>
-		<!-- <serial>SV10004</serial> -->
+		<info name="serial" value="SV10004" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="sv10004.bin" size="32768" crc="5ecfb674" sha1="13061b97c7b6d74990b766670f59dbf1e7598120" offset="000000" />
@@ -110,7 +130,8 @@
 		<description>Challenger Tank (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10017</serial> -->
+		<info name="serial" value="SV10017" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10017.bin" size="65536" crc="c92382ce" sha1="70f7589fdf40c851cc34c0a5f644216f3765eb8c" offset="000000" />
@@ -122,7 +143,8 @@
 		<description>Chimera (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Supervision</publisher>
-		<!-- <serial>SV10016</serial> -->
+		<info name="serial" value="SV10016" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10016.bin" size="65536" crc="4a458aa8" sha1="c384062ce1284a4c80e8fbb1ad0e8fa924c6881b" offset="000000" />
@@ -134,7 +156,8 @@
 		<description>Chinese Checkers</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
-		<!-- <serial>SV10038</serial> -->
+		<info name="serial" value="SV10038" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10038.bin" size="65536" crc="eded8aec" sha1="eb69fa9df9186a3bf3fd4f8afebdd7a6d022ab38" offset="000000" />
@@ -179,7 +202,8 @@
 		<description>Dancing Block</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
-		<!-- <serial>SV10030</serial> -->
+		<info name="serial" value="SV10030" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="sv10030.bin" size="32768" crc="345ca42a" sha1="a5a421bfaad2837a7cee9522a59411c96dcc0827" offset="000000" />
@@ -191,7 +215,8 @@
 		<description>Delta Hero (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
-		<!-- <serial>SV10040</serial> -->
+		<info name="serial" value="SV10040" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10040.bin" size="65536" crc="32ccdf89" sha1="ee68c188c41cf8f12f74458d6dd614afc7b8edbb" offset="000000" />
@@ -214,7 +239,8 @@
 		<description>Eagle Plan (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>GTC Inc.</publisher>
-		<!-- <serial>SV10005</serial> -->
+		<info name="serial" value="SV10005" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10005.bin" size="65536" crc="01cb8364" sha1="226e8f14498be513b73f97b5e618a524209c4595" offset="000000" />
@@ -255,14 +281,15 @@
 		</part>
 	</software>
 
-	<software name="fcombta">
+	<software name="fcombata" cloneof="fcombat">
 		<description>Final Combat (Alt)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
-		<!-- <serial>SV10031</serial> -->
+		<info name="serial" value="SV10031" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="fcombta.bin" size="32768" crc="2861de5e" sha1="23efa16603c540e60dc85c7442188a8b76383098" offset="000000" />
+				<rom name="fcombata.bin" size="32768" crc="2861de5e" sha1="23efa16603c540e60dc85c7442188a8b76383098" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -271,7 +298,8 @@
 		<description>Galactic Crusader (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10029</serial> -->
+		<info name="serial" value="SV10029" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10029.bin" size="65536" crc="b494bc5c" sha1="7739826471d4ac2a69d34bdbd154bb6d748e90cc" offset="000000" />
@@ -294,7 +322,8 @@
 		<description>Grand Prix (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
-		<!-- <serial>SV10021</serial> -->
+		<info name="serial" value="SV10021" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10021.bin" size="65536" crc="cef3f295" sha1="a6b93e0bbb0d037a0fe4b0d8056b6808aea7ae6c" offset="000000" />
@@ -306,6 +335,8 @@
 		<description>Happy Pairs (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
+		<info name="serial" value="SV10035" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="happy pairs (usa, europe).bin" size="65536" crc="112f5eed" sha1="d8a78bb3cb492a90464f7a16bb2486566f7d4baa" offset="000000" />
@@ -317,7 +348,8 @@
 		<description>Happy Race</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
-		<!-- <serial>SV10027</serial> -->
+		<info name="serial" value="SV10027" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10027.bin" size="65536" crc="552afa89" sha1="08dc1bd109986d8745cfa6f1eb3c9731d736255f" offset="000000" />
@@ -329,7 +361,8 @@
 		<description>Hash Blocks (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>GTC Inc</publisher>
-		<!-- <serial>SV10002</serial> -->
+		<info name="serial" value="SV10002" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10002.bin" size="65536" crc="6bd7c885" sha1="d9836dfe4f113dca030b0472deb7a8d8bb9065dc" offset="000000" />
@@ -352,7 +385,8 @@
 		<description>Hero Kid (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Hartung</publisher>
-		<!-- <serial>SV10011</serial> -->
+		<info name="serial" value="SV10011" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10011.bin" size="65536" crc="25ddd6e1" sha1="3e5de3350e3bcf75e057b970d7e1c56634699bb1" offset="000000" />
@@ -364,7 +398,8 @@
 		<description>Honey Bee (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10018</serial> -->
+		<info name="serial" value="SV10018" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10018.bin" size="65536" crc="e856875a" sha1="3412cb0d657c6c79eef71d29c6af06ac3082cb2f" offset="000000" />
@@ -387,7 +422,8 @@
 		<description>Jaguar Bomber (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
-		<!-- <serial>SV10025</serial> -->
+		<info name="serial" value="SV10025" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10025.bin" size="65536" crc="aa4372d4" sha1="212f577b0d1df539aadfecdec4e85404e4d57201" offset="000000" />
@@ -399,7 +435,8 @@
 		<description>John Adventure (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10036</serial> -->
+		<info name="serial" value="SV10036" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10036.bin" size="65536" crc="e9ea3ae0" sha1="b422814b073544b66f2ad86c76bae6403f7a4530" offset="000000" />
@@ -411,7 +448,8 @@
 		<description>Juggler (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
-		<!-- <serial>SV10043</serial> -->
+		<info name="serial" value="SV10043" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10043.bin" size="65536" crc="32e68d6f" sha1="a5c8beecff5444183dfed9e46dd67150c12c8bfd" offset="000000" />
@@ -456,7 +494,8 @@
 		<description>Linear Racing (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10007</serial> -->
+		<info name="serial" value="SV10007" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10007.bin" size="65536" crc="6f8abaf9" sha1="9f80a72d967d2a35168250ca3da3941164164bfc" offset="000000" />
@@ -468,7 +507,8 @@
 		<description>Magincross (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
-		<!-- <serial>SV10039</serial> -->
+		<info name="serial" value="SV10039" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10039.bin" size="65536" crc="e406a91c" sha1="b7aec7d24175bdea1cfccc1359b5ab353e023d44" offset="000000" />
@@ -480,7 +520,8 @@
 		<description>Matta Blatta (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10020</serial> -->
+		<info name="serial" value="SV10020" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10020.bin" size="65536" crc="21864295" sha1="fb6af626a6496907d02a26b9bb5132f4be88bda9" offset="000000" />
@@ -492,7 +533,8 @@
 		<description>Olympic Trials (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10019</serial> -->
+		<info name="serial" value="SV10019" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10019.bin" size="65536" crc="85dc8111" sha1="4b863616bb9b821adf397f20e0ea043a3daa026a" offset="000000" />
@@ -504,7 +546,8 @@
 		<description>P-52 Sea Battle (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10006</serial> -->
+		<info name="serial" value="SV10006" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10006.bin" size="65536" crc="748f9dae" sha1="794ce6fb7084274c680b277a41f269840402e61b" offset="000000" />
@@ -516,7 +559,8 @@
 		<description>PacBoy &amp; Mouse (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10008</serial> -->
+		<info name="serial" value="SV10008" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10008.bin" size="65536" crc="1a89ac88" sha1="afa267bcced763cb51599cd5605062530ede1af3" offset="000000" />
@@ -539,7 +583,8 @@
 		<description>Penguin Hideout (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
-		<!-- <serial>SV10032</serial> -->
+		<info name="serial" value="SV10032" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="sv10032.bin" size="32768" crc="fe5f9774" sha1="9520221d8cfd3bdfb0fb6b7fb9fed66ba027a756" offset="000000" />
@@ -551,7 +596,8 @@
 		<description>Police Bust (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Bon Treasure</publisher>
-		<!-- <serial>SV10014</serial> -->
+		<info name="serial" value="SV10014" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10014.bin" size="65536" crc="531f0b51" sha1="9fa06b4d171d9ade2f9e4a639e80feba15c963f9" offset="000000" />
@@ -563,7 +609,8 @@
 		<description>Popo Team</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
-		<!-- <serial>SV10037</serial> -->
+		<info name="serial" value="SV10037" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10037.bin" size="65536" crc="e11a756c" sha1="7d9672fd2500f2d645d0ca28417fbf9e9bac3045" offset="000000" />
@@ -585,8 +632,9 @@
 	<software name="recycled">
 		<description>Recycle Design</description>
 		<year>199?</year>
-		<publisher>?</publisher>
-		<!-- <serial>SV10041</serial> -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="SV10041" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10041.bin" size="65536" crc="c36bd216" sha1="fc64336d963b88fc29dd2ea1b987f98a99e725e9" offset="000000" />
@@ -609,7 +657,8 @@
 		<description>Soccer Champion (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Hartung</publisher>
-		<!-- <serial>SV10034</serial> -->
+		<info name="serial" value="SV10034" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10034.bin" size="65536" crc="45204dc4" sha1="2b794e22f7d595902c515b3fd617980655a9d994" offset="000000" />
@@ -620,7 +669,7 @@
 	<software name="sonnyxpr">
 		<description>Sonny Xpress!</description>
 		<year>199?</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sonnyxpr.bin" size="65536" crc="c99b985a" sha1="00724d0275bd4ef77514468d6d04669c93125e32" offset="000000" />
@@ -632,7 +681,8 @@
 		<description>Space Fighter</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
-		<!-- <serial>SV10017</serial> -->
+		<info name="serial" value="SV10017" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10017.bin" size="65536" crc="7cd650c8" sha1="a2fa39c871956a27dc3afa74fe368e93ef8ee99a" offset="000000" />
@@ -644,7 +694,8 @@
 		<description>SSSnake (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
-		<!-- <serial>SV10009</serial> -->
+		<info name="serial" value="SV10009" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10009.bin" size="65536" crc="be9b6f10" sha1="da02d8e119fbd38048f16c78ce9714abf93bbfd6" offset="000000" />
@@ -656,7 +707,8 @@
 		<description>Super Block (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Bon Treasure</publisher>
-		<!-- <serial>SV10022</serial> -->
+		<info name="serial" value="SV10022" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="sv10022.bin" size="32768" crc="02e2c7ad" sha1="1fa3236ad83984d922893c294ed0d9e432201fb0" offset="000000" />
@@ -668,7 +720,8 @@
 		<description>Super Kong (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
-		<!-- <serial>SV10042</serial> -->
+		<info name="serial" value="SV10042" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10042.bin" size="65536" crc="59c7ff64" sha1="6c59bc0d14a05b404292de8aba3a7da12d72f355" offset="000000" />
@@ -680,7 +733,8 @@
 		<description>Super Pang</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
-		<!-- <serial>SV10028</serial> -->
+		<info name="serial" value="SV10028" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10028.bin" size="65536" crc="181d12dd" sha1="c4d61fcab3e8eb2aedb48b41bac24bf7197a7e21" offset="000000" />
@@ -692,7 +746,8 @@
 		<description>Tasac 2010 (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
-		<!-- <serial>SV10026</serial> -->
+		<info name="serial" value="SV10026" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10026.bin" size="65536" crc="3d5f3964" sha1="da884d97fbe7e7aca40dc1b5b0db6d7ff69377e3" offset="000000" />
@@ -704,7 +759,8 @@
 		<description>Tennis Pro '92 (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>B.I.T.S.</publisher>
-		<!-- <serial>SV10015</serial> -->
+		<info name="serial" value="SV10015" />
+
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="sv10015.bin" size="65536" crc="bd004cb7" sha1="386f555fcedaaf9fc4d81ddf59ec0320f42af988" offset="000000" />
@@ -737,7 +793,7 @@
 	<software name="tvlink">
 		<description>TV-Link</description>
 		<year>199?</year>
-		<publisher>?</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="tvlink.bin" size="32768" crc="af3ea0dd" sha1="08ea89ec012034cde36919ff94af95b9d8af8aa6" offset="000000" />
@@ -766,18 +822,5 @@
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- SV10012 MahJongg -->
-	<!-- SV10035 Happy Pair -->
-	<!-- hash block, jacky lucky, challenger tank, brain power -->
-	<!-- b52 battle -->
-	<!-- Box Carrier -->
-	<!-- Devil Paradise -->
-	<!-- money bee -->
-	<!-- jade legend -->
-	<!-- Jouney to the West -->
-	<!-- Lucky Jack (Jacky Lucky clone or a name mistake?) -->
-	<!-- pyramid -->
-	<!-- usa sea battle -->
 
 </softwarelist>
