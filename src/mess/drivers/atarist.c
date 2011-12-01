@@ -351,12 +351,12 @@ WRITE8_MEMBER( st_state::dma_base_w )
 		break;
 
 	case 1:
-		m_dma_base = (m_dma_base & 0x0000ff) | (data << 8);
+		m_dma_base = (m_dma_base & 0xff00ff) | (data << 8);
 		if (LOG) logerror("DMA Address Mid %02x (%06x)\n", data & 0xff, m_dma_base);
 		break;
 
 	case 2:
-		m_dma_base = data & 0xff;
+		m_dma_base = (m_dma_base & 0xffff00) | data;
 		if (LOG) logerror("DMA Address Low %02x (%06x)\n", data & 0xff, m_dma_base);
 		break;
 	}
