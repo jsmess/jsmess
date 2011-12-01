@@ -808,8 +808,8 @@ void kc_state::machine_start()
 
 	m_ram_base = m_ram->pointer();
 
-	m_expansions[0] = machine().device<kcexp_slot_device>("m1");
-	m_expansions[1] = machine().device<kcexp_slot_device>("m2");
+	m_expansions[0] = machine().device<kcexp_slot_device>("m8");
+	m_expansions[1] = machine().device<kcexp_slot_device>("mc");
 	m_expansions[2] = machine().device<kcexp_slot_device>("exp");
 }
 

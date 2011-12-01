@@ -38,22 +38,9 @@ static INPUT_PORTS_START( kc_d002 )
 	PORT_DIPSETTING( 0xF0, "0xF0" )		// reserved for FDC D004
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(kc_d002_cart)
-	SLOT_INTERFACE("standard", KC_STANDARD)	// standard 8KB ROM module
-	SLOT_INTERFACE("m006", KC_M006)			// BASIC
-	SLOT_INTERFACE("m011", KC_M011)			// 64KB RAM
-	SLOT_INTERFACE("m022", KC_M022)			// 16KB RAM
-	SLOT_INTERFACE("m032", KC_M032)			// 256KB segmented RAM
-	SLOT_INTERFACE("m033", KC_M033)			// TypeStar
-	SLOT_INTERFACE("m034", KC_M034)			// 512KB segmented RAM
-	SLOT_INTERFACE("m035", KC_M035)			// 1MB segmented RAM
-	SLOT_INTERFACE("m036", KC_M036)			// 128KB segmented RAM
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(kc_d002_exp)
-	SLOT_INTERFACE("d002", KC_D002)			// D002 Bus Driver
-	SLOT_INTERFACE("d004", KC_D004)			// D004 Floppy Disk Interface
-SLOT_INTERFACE_END
+// defined in drivers/kc.c
+SLOT_INTERFACE_EXTERN(kc85_cart);
+SLOT_INTERFACE_EXTERN(kc85_exp);
 
 WRITE_LINE_MEMBER(kc_d002_device::out_irq_w)
 {
@@ -78,13 +65,13 @@ static const kcexp_interface kc_d002_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( kc_d002 )
-	MCFG_KC85_CARTRIDGE_ADD("m1", "m2", kc_d002_interface, kc_d002_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m2", "m3", kc_d002_interface, kc_d002_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m3", "m4", kc_d002_interface, kc_d002_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m4", "exp", kc_d002_interface, kc_d002_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m0", "m4", kc_d002_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m4", "m8", kc_d002_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc_d002_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc_d002_interface, kc85_cart, NULL, NULL)
 
 	// expansion interface
-	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc_d002_interface, kc_d002_exp , NULL, NULL)
+	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc_d002_interface, kc85_exp , NULL, NULL)
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -102,7 +89,7 @@ const device_type KC_D002 = &device_creator<kc_d002_device>;
 //-------------------------------------------------
 
 kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, KC_D002, "D002", tag, owner, clock),
+      : device_t(mconfig, KC_D002, "D002 Bus Driver", tag, owner, clock),
 		device_kcexp_interface( mconfig, *this )
 {
 }
@@ -115,10 +102,10 @@ void kc_d002_device::device_start()
 {
 	m_slot = dynamic_cast<kcexp_slot_device *>(owner());
 
-	m_expansions[0] = downcast<kcexp_slot_device *>(subdevice("m1"));
-	m_expansions[1] = downcast<kcexp_slot_device *>(subdevice("m2"));
-	m_expansions[2] = downcast<kcexp_slot_device *>(subdevice("m3"));
-	m_expansions[3] = downcast<kcexp_slot_device *>(subdevice("m4"));
+	m_expansions[0] = downcast<kcexp_slot_device *>(subdevice("m0"));
+	m_expansions[1] = downcast<kcexp_slot_device *>(subdevice("m4"));
+	m_expansions[2] = downcast<kcexp_slot_device *>(subdevice("m8"));
+	m_expansions[3] = downcast<kcexp_slot_device *>(subdevice("mc"));
 	m_expansions[4] = downcast<kcexp_slot_device *>(subdevice("exp"));
 }
 
@@ -178,7 +165,7 @@ void kc_d002_device::io_read(offs_t offset, UINT8 &data)
 	{
 		UINT8 slot_id = (offset>>8) & 0xff;
 
-		if ((slot_id & 0xf0) == input_port_read(this, "ID"))
+		if ((slot_id & 0xf0) == input_port_read(this, "ID") && !(slot_id & 0x03))
 			data = m_expansions[(slot_id>>2) & 3]->module_id_r();
 		else
 			m_expansions[4]->io_read(offset, data);
@@ -200,7 +187,7 @@ void kc_d002_device::io_write(offs_t offset, UINT8 data)
 	{
 		UINT8 slot_id = (offset>>8) & 0xff;
 
-		if ((slot_id & 0xf0) == input_port_read(this, "ID"))
+		if ((slot_id & 0xf0) == input_port_read(this, "ID") && !(slot_id & 0x03))
 			m_expansions[(slot_id>>2) & 3]->control_w(data);
 		else
 			m_expansions[4]->io_write(offset, data);

@@ -74,7 +74,7 @@ static const kcexp_interface kc85_exp_interface =
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT)
 };
 
-static SLOT_INTERFACE_START(kc85_cart)
+extern SLOT_INTERFACE_START(kc85_cart)
 	SLOT_INTERFACE("standard", KC_STANDARD)	// standard 8KB ROM module
 	SLOT_INTERFACE("m006", KC_M006)			// BASIC
 	SLOT_INTERFACE("m011", KC_M011)			// 64KB RAM
@@ -86,7 +86,7 @@ static SLOT_INTERFACE_START(kc85_cart)
 	SLOT_INTERFACE("m036", KC_M036)			// 128KB segmented RAM
 SLOT_INTERFACE_END
 
-static SLOT_INTERFACE_START(kc85_exp)
+extern SLOT_INTERFACE_START(kc85_exp)
 	SLOT_INTERFACE("d002", KC_D002)			// D002 Bus Driver
 	SLOT_INTERFACE("d004", KC_D004)			// D004 Floppy Disk Interface
 SLOT_INTERFACE_END
@@ -164,8 +164,8 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, kc_cassette_interface )
 
 	/* cartridge slot */
-	MCFG_KC85_CARTRIDGE_ADD("m1", "m2", kc85_exp_interface, kc85_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m2", "exp", kc85_exp_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL, NULL)
 
 	/* expansion interface */
 	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc85_exp_interface, kc85_exp , NULL, NULL)
@@ -217,8 +217,8 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, kc_cassette_interface )
 
 	/* cartridge slot */
-	MCFG_KC85_CARTRIDGE_ADD("m1", "m2", kc85_exp_interface, kc85_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m2", "exp", kc85_exp_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL, NULL)
 
 	/* expansion interface */
 	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc85_exp_interface, kc85_exp , NULL, NULL)
