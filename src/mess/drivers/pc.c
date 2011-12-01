@@ -753,7 +753,7 @@ static const floppy_interface ibmpc_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -1201,6 +1201,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
+	MCFG_SOFTWARE_LIST_ADD("flop_list","ibmpcjr_flop")
 MACHINE_CONFIG_END
 
 static GFXDECODE_START( ibmpcjx )
