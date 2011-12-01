@@ -40,6 +40,66 @@
     decode the address on bus, clear the MEO line for disable other modules
     with less priority.
 
+************************************************************************
+
+    Known KC85 modules
+
+    Name    ID     Control     Emulated   Description
+
+    M001    EF    ---- ---M       no      Digital IN/OUT
+    M002    DA    ---- ---M       no      PIO 3
+    M003    EE    ---- ---M       no      V.24
+    M005          ---- ----       no      User
+    M006    FC    AA-- ---M       yes     BASIC for KC85/2 (16KB ROM)
+    M007          ---- ----       no      Adapter
+    M008          ---- ----       no      Joystick
+    M009    ED    ---- ---M       no      TLCM Spracheingabe/Datenkompr
+    M010    E7    ---- ---M       no      ADU 1 (4 analog inputs)
+    M011    F6    AA-- --WM       yes     64KB RAM
+    M012    FB    AAA- ---M       yes     Texor (8KB ROM)
+    M021          ---- ----       no      Joystick + Centronics
+    M022    F4    AA-- --WM       yes     16KB RAM
+    M024    F5    AA-- --WM       no      32KB RAM
+    M025    F7    AAA- ---M       no      User PROM 8KB
+    M026    FB    AAA- ---M       yes     FORTH (8KB ROM)
+    M027    FB    AAA- ---M       yes     Development (8KB ROM)
+    M028    FB    AA-- ---M       no      16KB EPROM(2x U2764)
+    M029    E3    ---- ---M       no      DAU 1 (2 analog outputs)
+    M030    DB    AAA- ---M       no      EPROMER 8KB EPROM
+    M032    79    A-SS SSWM       yes     256KB segmented RAM (16 segments of 16KB)
+    M033    01    AA0S ---M       yes     Typestar (8KB x 2 ROM)
+    M034    7A    ASSS SSWM       yes     512KB segmented RAM (32 segments of 16KB)
+    M035    7B    SSSS SSWM       yes     1MB segmented RAM (64 segments of 16KB)
+    M036    78    A--S SSWM       yes     128KB segmented RAM (8 segments of 16KB)
+    M040    F8    AA-- ---M       no      User PROM 8/16KB
+    M045    70    AASS ---M       no      User 32KB segmented ROM (4 segments of 8KB)
+    M046    71    AASS -S-M       no      User 64KB segmented ROM (8 segments of 8KB)
+    M047    72    AASS SS-M       no      User 128KB segmented ROM (16 segments of 8KB)
+    M048    73    SSSS SS-M       no      User 256KB segmented ROM (16 segments of 16KB)
+    M051    EC    ---- ----       no      Scanner Module
+    M052    FD    ---- ----       no      USB + NET (TCP/IP)
+    M053    EE    ---- ---M       no      RS-232
+    M061          ---- ----       no      3x E/A-Modul
+    M120    F0    AAA- --WM       no      8KB CMOS-RAM
+    M122    F1    AA-- --WM       no      16KB CMOS-RAM
+    M124    F2    AA-- --WM       no      32KB CMOS-RAM
+
+    D001          ---- ----       yes     Basis Device
+    D002          ---- ----       yes     Bus driver expansion
+    D003          ---- ----       no      PROM programmer for KC-PROM Module
+    D004    A7    --A- -K-M       yes     Floppy Disk Interface
+    D005          ---- ----       no      Komfort-Tastatur for KC85/4
+
+
+    Control byte                  ID byte
+    A - Base Address              01    - Autostart modules
+    K - Power on/off              7x    - Segmented memory
+    S - Active segment            Dx/Ex - IN/OUT modules
+    W - Write enabled             Fx    - memory modules
+    M - Module enabled
+
+    Info taken from: http://www.mpm-kc85.de/html/ModulListe.htm
+
 *********************************************************************/
 
 #include "emu.h"
