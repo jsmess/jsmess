@@ -25,11 +25,12 @@ public:
 	// device_ts
 	device_t *m_main_cpu;
 	device_t *m_control_cpu;
-	device_t *m_vdp;
+	sega315_5124_device *m_vdp;
 	device_t *m_ym;
 	device_t *m_main_scr;
 	device_t *m_left_lcd;
 	device_t *m_right_lcd;
+	address_space *m_space;
 
 	UINT8 m_bios_page_count;
 	UINT8 m_fm_detect;
