@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="sat_jp" description="Sega Saturn (Jpn) CD-ROM list">
+
+	<software name="capgen2" supported="no">
+		<description>Capcom Generation 2 (Jpn)</description>
+		<year>1998</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="capcom generation 2 (japan)" sha1="838bbddb3d2363ee6e33c4c7d7c707a0aadff104"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="clockwks" supported="no">
+		<description>Clockworks (Jpn)</description>
+		<year>199?</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="clockworks (japan)" sha1="9b76baa5a0b24c5e076c34416af49d893faf21e8"/>
+			</diskarea>
+		</part>
+	</software>
+
+
+	<software name="deroon" supported="no">
+		<description>Deroon Dero Dero (Jpn)</description>
+		<year>1996</year>
+		<publisher>Tecmo</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="deroon dero dero (japan)" sha1="83e6a4fe1c00a4fd4972d8b6203ae144667dcab4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="draculax" supported="no">
+		<description>Akumajo Dracula X - Gekka no Yasoukyoku (Jpn)</description>
+		<year>1995</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="akumajo dracula x - gekka no yasoukyoku (japan)" sha1="0d6504f8eed643d73a236749cf0728cd71df5871"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kof95" supported="no">
+		<description>The King of Fighters '95 (Jpn)</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<!-- This set depends on -cart kof95 as well! -->
+		<!-- The softlists could do with some way to specify this dependency -->
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the king of fighters 95 (japan)" sha1="502c80946144135fb83799b329340a8ed3de935a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kof96" supported="no">
+		<description>The King of Fighters '96 (Jpn)</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the king of fighters 96 (japan)" sha1="75b0ec646ea1731940fddb2b03c503f1672ee927"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kof97" supported="no">
+		<description>The King of Fighters '97 (Jpn)</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="the king of fighters 97 (japan)" sha1="12aa5c5da5b4d7138bc0919c90e099024e6fbeb3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ninpen" supported="no">
+		<description>Ninpen Manmaru (Jpn)</description>
+		<year>1997</year>
+		<publisher>Enix</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ninpen manmaru (japan)" sha1="143cd62b6aa2a6fccf02a434c68362405891e82b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pappara" supported="no">
+		<description>Pappara Paoon (Jpn)</description>
+		<year>1995</year>
+		<publisher>Ecole</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pappara paoon (japan)" sha1="9f081ac7db896ef4b0b4c00226f7cdaaa2446426"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pdumlink" supported="no">
+		<description>PD Ultraman Link (Jpn)</description>
+		<year>1996</year>
+		<publisher>Bandai / Sims</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pd ultraman link (japan)" sha1="eab3805b2b5464468589a315a241e85a6ebc7f08"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pukunpa" supported="no">
+		<description>Pukunpa - Joshikousei no Houkago... (Jpn)</description>
+		<year>1996</year>
+		<publisher>Athena</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="pukunpa - joshikousei no houkago... (japan)" sha1="e51c9363f273e1e1c89b92812c20a7fc1ffb7083"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="roxsix" supported="no">
+		<description>RoX 6 = Six (Jpn)</description>
+		<year>1998</year>
+		<publisher>Altron</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rox 6 = six (japan)" sha1="2200721a51b1784c14dff9e164629c09650b142d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="skurupa" supported="no">
+		<description>Shingata Kururin Pa! (Jpn)</description>
+		<year>1996</year>
+		<publisher>Sky Think</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shingata kururin pa! (japan)" sha1="907e88ecb84a0084b2f69cc80f3bd8dcf07b223e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- inputs no longer work! -->
+	<software name="tama" supported="no">
+		<description>Tama - Adventurous Ball in Giddy Labyrinth (Jpn)</description>
+		<year>199?</year>
+		<publisher>Time Warner Interactive</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tama - adventurous ball in giddy labyrinth (japan)" sha1="4a5cc9bb389279d85cdcdc6a3e6b1c7edd60a301"/>
+			</diskarea>
+		</part>
+	</software>
+
+
+	<software name="tmrenhit" supported="no">
+		<description>Tenchi Muyou! Rensa Hitsuyou (Jpn)</description>
+		<year>199?</year>
+		<publisher>Pioneer</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tenchi muyou! rensa hitsuyou (japan)" sha1="f0b178c20977a4145ede5646aa40bd615ece14aa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultraman" supported="no">
+		<description>Ultraman (Jpn)</description> <!-- (T-13308G) -->
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<!-- This set depends on -cart ultraman as well! -->
+		<!-- The softlists could do with some way to specify this dependency -->
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman (japan)" sha1="1232eee5dc6c2c031a4b3ce34862086f24684dff"/>
+			</diskarea>
+		</part>
+	</software>
+
+	 <!-- Ultraman Zukan --> <!-- (T-25501G) -->
+
+	<software name="ultraz2" supported="no">
+		<description>Ultraman Zukan 2 (Jpn)</description> <!-- (T-25502G) -->
+		<year>1997</year>
+		<publisher>Kodansha</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman zukan 2 (japan)" sha1="ade45a36ea1275eeca326d432a3dd87d1aa86f6c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ultraz3" supported="no">
+		<description>Ultraman Zukan 3 (Jpn)</description> <!-- (T-25505G) -->
+		<year>1998</year>
+		<publisher>Kodansha</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultraman zukan 3 (japan)" sha1="9a30908c84f47f402414eb497ec4b81a80f1d708"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wakumon" supported="no">
+		<description>Waku Waku Monster (Jpn)</description>
+		<year>1998</year>
+		<publisher>Altron</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="waku waku monster (japan)" sha1="1a5db979d3b006a417fa8c8bf6c41e1199c9a7bf"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="zokogus" supported="no">
+		<description>Zoku Gussun Oyoyo (Jpn)</description>
+		<year>1997</year>
+		<publisher>Banpresto / Irem</publisher>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="zoku gussun oyoyo (japan)" sha1="0438a3fd31915656ba70a27fc9fb713a5ae21bfc"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
