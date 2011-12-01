@@ -86,29 +86,6 @@ QUICKLOAD_LOAD(kc)
 
 // The KC85/4 and KC85/3 are "modular systems". These computers can be expanded with modules.
 
-/*
-    Module ID       Module Name         Module Description
-
-
-                    D001                Basis Device
-                    D002                Bus Driver device
-    a7              D004                Floppy Disk Interface Device
-
-
-    ef              M001                Digital IN/OUT
-    ee              M003                V24
-                    M005                User (empty)
-                    M007                Adapter (empty)
-    e7              M010                ADU1
-    f6              M011                64k RAM
-    fb              M012                Texor
-    f4              M022                Expander RAM (16k)
-    f7              M025                User PROM (8k)
-    fb              M026                Forth
-    fb              M027                Development
-    e3              M029                DAU1
-*/
-
 READ8_MEMBER( kc_state::expansion_read )
 {
 	UINT8 result = 0xff;
