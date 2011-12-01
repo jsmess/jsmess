@@ -1,0 +1,337 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="psx" description="Sony Playstation CD-ROM list">
+
+<!--
+***********************
+NON-REDUMP Rips
+***********************
+A few comments on these:
+1. since not a few ripping formats are not properly handled by CHDMAN (see 4. below) I currently also list checksums of the 
+   original files. don't throw them away if they are in ccd/img/sub format!
+2. pay attention to the bin/img/iso crc, not to the cue one: many of the cues I have found in the 'releases' had the wrong bin 
+   name/location, so I had to manually edit them (changing crc)
+3. bin/cue, nrg, iso/cue and ccd/img/sub/cue sets got directly converted with CHDMAN
+4. ccd/img/sub (with no cue) got converted by using a generic cue file as the following one
+   FILE "XXXX.img" BINARY
+      TRACK 1 MODE2/2352
+      INDEX 1 00:00:00
+   This might have introduced errors in the procedure, so it would be good to keep around the original files for later checks
+5. releases in mdf/mds format or cdi format (none included atm) have been mounted in ISOBuster and raw ripped to bin/cue, so 
+   there is the possibility that subtle errors are introduced either in this procedure, or in the original creation of the 
+   mdf/mds/cdi image.
+-->
+
+<!-- Prototype disks -->
+
+	<software name="baldgate">
+		<!-- Original images (from drx)
+		<rom name="baldur's gate - disc 1.bin" size="657475728" crc="96e9befa" sha1="f2c35e0c738fed7c4c881d261ce8d51f5143bca7"/>
+		<rom name="baldur's gate - disc 1.cue" size="88"        crc="2c5b8e8f" sha1="d96d6af5cfe0a6dff3959d6d59ebf25066dd0681"/>
+		<rom name="baldur's gate - disc 2.bin" size="627572400" crc="9633d7a3" sha1="b68e74fc0540a41dc9f2a12d38851e6dbaeb061f"/>
+		<rom name="baldur's gate - disc 2.cue" size="88"        crc="aa0c59ce" sha1="11eaa559e7ec4009f9796ab9f51c7c77bf28b43c"/>
+		<rom name="baldur's gate - disc 3.bin" size="772415616" crc="18558807" sha1="133829649e2311e1656e77b4610129c3ebbbe90d"/>
+		<rom name="baldur's gate - disc 3.cue" size="88"        crc="d7c114f1" sha1="f6f14f0239789b62cfe5499899b20fde5e273673"/>
+		SLUS-01037 -->
+		<description>Baldur's Gate (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>Interplay</publisher>
+		<part name="cdrom1" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="baldur's gate - disc 1" sha1="abe5d1c7f466150937c44802e559020ba479d941" />
+			</diskarea>
+		</part>
+
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="baldur's gate - disc 2" sha1="42db8585e1c0b68fbfb9274adaf0db8717427b28" />
+			</diskarea>
+		</part>
+
+		<part name="cdrom3" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="baldur's gate - disc 3" sha1="a59f863f0304bb457ed6aaa4f7e9797f233ee91b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="biohaza" cloneof="biohaz">
+		<!-- Original images (from drx)
+		<rom name="biohazard - 1995 - 08 - 04 - sample.bin" size="20057856" crc="a64e5922" sha1="c1a293f0183c3fb912794dc4cbbca3ca71d7ef31"/>
+		<rom name="biohazard - 1995 - 08 - 04 - sample.cue" size="101" crc="389803a9" sha1="be53c93c21aefa9e2fcdedc6eec7be381b2032b6"/>
+		-->
+		<description>BioHazard (Jpn, Prototype 19950804)</description>
+		<year>1995</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="biohazard - 1995 - 08 - 04 - sample" sha1="de2b4d723709dd262553065849c9000807d1e4cc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="biohaz">
+		<!-- Original images (from drx)
+		<rom name="biohazard - 1995 - 10 - 04 - sample.bin" size="100420992" crc="e417d9a6" sha1="f9f8afac9b08fd1a79d9ecfd93027defaac7fc7e"/>
+		<rom name="biohazard - 1995 - 10 - 04 - sample.cue" size="101" crc="39e8977b" sha1="24a10fe354a45a87b6cf08b49a8741e4c3f3de95"/>
+		-->
+		<description>BioHazard (Jpn, Prototype 19951004)</description>
+		<year>1995</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="biohazard - 1995 - 10 - 04 - sample" sha1="7c1e9f60c045fcf984c91dbaad7421d73a8aec73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crashp">
+		<!-- Original images (from drx) 
+		<rom name="crash.ccd" size="772" crc="34265432" sha1="d318d178bd37afe4cbd52771414649a094694197"/>
+		<rom name="crash.img" size="167431824" crc="79827883" sha1="837c7a9c1af9262fbe1842e798cd341ed221bc83"/>
+		<rom name="crash.sub" size="6833952" crc="86466038" sha1="3b57d344c4c813f8436c4c7acf3369591293ecaa"/>
+		-->
+		<description>Crash Bandicoot (Prototype, 19960408)</description>
+		<year>1996</year>
+		<publisher>SCEA</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="crash" sha1="8272aa46a2a959d2ffd54f281301a38bd1b2fbad" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="deuce">
+		<!-- Original images (unknown source)
+		<rom name="deuce.bin" size="28336896" crc="db149c5e"/>
+		<rom name="deuce.cue" size="337" crc="1ae16327"/>
+		-->
+		<description>Deuce (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="deuce (usa, prototype)" sha1="76911bb495fd3ff66e0e764eba1f1f7aa9aca8d2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kain2p1">
+		<!-- Original images (unknown source)
+		<rom name="legacy of kain - soul reaver [beta 6-28-99][ntsc-u] [slus-00708].iso" size="687872976" 
+		-->
+		<description>Legacy of Kain - Soul Reaver (USA, Prototype 19990628)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="legacy of kain - soul reaver (usa, prototype 19990628)" sha1="d0df73cdbfc9ef35076f13f9996593f2e8f50130" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="kain2p2">
+		<!-- Original images (unknown source)
+		<rom name="sr1-psx-beta.ccd" size="772" crc="250f9eb1"/>
+		<rom name="sr1-psx-beta.img" size="635820864" crc="22f06bfd"/>
+		<rom name="sr1-psx-beta.sub" size="25951872" crc="4183f8c3"/>
+		-->
+		<description>Legacy of Kain - Soul Reaver (USA, Prototype 19990512)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="legacy of kain - soul reaver (usa, prototype 19990512)" sha1="0255d212fba97680a57c7235d172940978d6c8d2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="madden96">
+		<!-- Original images (unknown source)
+		<rom name="madden96.bin" size="189646464" crc="4d9f6048" sha1="d8d9ea110e26138eaf9a14ce02e635cd8af836a1"/>
+		<rom name="madden96.cue" size="78" crc="243f16c7" sha1="f1f6613572bf62cf62c4eb0e8d5dbdd9e8190685"/>
+		-->
+		<description>Madden NFL 96 (USA, Prototype)</description>
+		<year>1995</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="madden96" sha1="74c6c4e4cc13a8f4a12e26d5444ad6f829e50342" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rockman8">
+		<!-- Original images released on early March 2011 (March the 3rd??) by Henger83 and Junker
+		<rom name="rockman 8 beta v1.bin" size="53352768" crc="bb8df0ca" sha1="69ed6c03831f9dae6bcf8c2e54a92935261a9cd3"/>
+		<rom name="rockman 8 beta v1.cue" size="80" crc="5ff4ae72" sha1="34e8a485039859d2d54e1fb75097da4651a08f31"/>
+		-->
+		<description>Rockman 8 (Jpn, Prototype v1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rockman 8 beta v1" sha1="ef22ee21d0ab15b69c64d951e69099c5e46e189a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rockman8a" cloneof="rockman8">
+		<!-- Original images (coming from I don't know where, possibly released by Tsunami?)
+		<rom name="rockman 8 beta 1.bin" size="53352768" crc="67c78d88" sha1="ee9fbb2157a983d11ac4aa71684292294678f1a7"/>
+		<rom name="rockman 8 beta 1.cue" size="79" crc="bae58743" sha1="9b3e6a0bb19b89e2079f12b157381ccc678a4dce"/>
+		-->
+		<description>Rockman 8 (Jpn, Prototype 1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rockman 8 beta 1" sha1="fa1b3e5cac9463866f51e5f67e5321bc532b5a2b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rockman8b" cloneof="rockman8">
+		<!-- Original images (coming from I don't know where, possibly released by Tsunami?)
+		<rom name="rockman 8 beta 2.bin" size="58710624" crc="1c8b620a" sha1="b9ca669a9d45359d10e2e419a278b84413041919"/>
+		<rom name="rockman 8 beta 2.cue" size="79" crc="65ac97f6" sha1="3d7f8fd05f0e5f5f38877a786df676c6c2c9a810"/>
+		-->
+		<description>Rockman 8 (Jpn, Prototype 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rockman 8 beta 2" sha1="ee3149d9579cdf1ad7b32d2ab9103e9f9353e732" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="starcon">
+		<!-- Original images (unknown source)
+		<rom name="starcon_t01.bin" size="138532800" crc="78ccec24" sha1="d9a8b5b968b5fda1d1bd59915872705f2d124dbc"/>
+		<rom name="starcon_t02.wav" size="44763308"  crc="14cd232a" sha1="c5095ba5eb1eb3b4757f6d86764a6d1ccd4971b4"/>
+		<rom name="starcon.cue" size="168"           crc="cedd64ed" sha1="bcef7f0f691f3a266c8aa040d32e9ffcde28a7c8"/>
+		-->
+		<description>StarCon (Prototype)</description>
+		<year>1998</year>
+		<publisher>Accolade</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="starcon"  sha1="cae7074b0498bc489d668a30a7bc94b541d10036" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="thkill">
+		<!-- Original images (unknown source)
+		<rom name="thrill kill.bin" size="625629648" crc="ab7aa9a2" sha1="8a0a68c4fa1d5d6e68acd878ea4e22c1cbcf5d24"/>
+		<rom name="thrill kill.cue" size="601" crc="b10890b1" sha1="1cb46ab6e2172d10ec4d267e57e2f307ad633287"/>
+		-->
+		<description>Thrill Kill (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="thrill kill"  sha1="09721bf343ee69f13b7ed86cc92beb0be94db04a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="thkilla" cloneof="thkill">
+		<!-- Original images (unknown source)
+		<rom name="thrill_kill_slus12345_frederico_psx_ud.ccd" size="164428320" crc="755a6f9a" sha1="4d7e1c0f8cc0539647a95fcbe1611ed2d4a82c98"/>
+		<rom name="thrill_kill_slus12345_frederico_psx_ud.sub" size="6711360"   crc="04f2d980" sha1="6255fd6057690f0cd42d51ef696c7d31acf562f0"/>
+		<rom name="thrill_kill_slus12345_frederico_psx_ud.ccd" size="1821"      crc="e65f76a3" sha1="4f54b8ba51f4f511e8f669d419da324ac15ac1e7"/>
+		<rom name="thrill_kill_slus12345_frederico_psx_ud.cue" size="402"       crc="1676ac31" sha1="2c41f798985fff38838b58c5168beb068aa50f24"/>
+		-->
+		<description>Thrill Kill (USA, Prototype Earlier?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="thrill_kill_slus12345_frederico_psx_ud"  sha1="5ee0e947808176e37a946c69ee6234927a0b96cc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tr2p">
+		<!-- Original images (unknown source)
+		<rom name="tomb raider 2 [beta] [ntsc] [psx].ccd" size="13748" crc="8158505c"/>
+		<rom name="tomb raider 2 [beta] [ntsc] [psx].cue" size="3624" crc="030aec00"/>
+		<rom name="tomb raider 2 [beta] [ntsc] [psx].img" size="755624688" crc="c3330f3c"/>
+		<rom name="tomb raider 2 [beta] [ntsc] [psx].sub" size="30841824" crc="19143fb6"/>
+		-->
+		<description>Tomb Raider II (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tomb raider ii (usa, prototype)" sha1="cc844146249ec76bdebf777efdbcf7d7bec07694" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="torc">
+		<!-- Original images (unknown source)
+		<rom name="killwheel.nrg" size="379698268" crc="4bb001c3"/>
+		-->
+		<description>Torc - Legend of the Ogre Crown (Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="torc - legend of the ogre crown (prototype)" sha1="0c27726e8957a2054c9c4fe38b8859ef4c4929c9" />
+			</diskarea>
+		</part>
+	</software>
+
+
+<!-- Demo disks -->
+
+	<software name="re2d">
+		<!-- Original images (unknown source)
+		<rom name="revil2prevpaling by spectro.bin" size="170583504" crc="3f66f858" sha1="aec467677f4f1085d881eae9aa7da9382dc36bd3"/>
+		<rom name="revil2prevpaling by spectro.cue" size="93" crc="7f31a5a5" sha1="601b8f056e656389744dbbdb10b18b75e6476be9"/>
+		-->
+		<description>Resident Evil 2 Preview (Euro, CD Consoles No.38)</description>
+		<year>1997</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sled-00977" sha1="2e05c694daa7dc069b93bbaca465ab047ef3eef8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bountyar">
+		<!-- Original images (from kidfenis and carnivol)
+		<rom name="bountyarms.bin" size="4111296" crc="250e1845" sha1="602bcbb72c47667a95eebe9b1ff6fb2b88dd0d36"/>
+		<rom name="bountyarms.cue" size="76"      crc="78100862" sha1="0dc0f092b2bc15faf210ffcb9f51b42a23e26ceb"/>
+		-->
+		<description>Bounty Arms Demo (Jpn, Demo Demo No.5?, 199504)</description>
+		<year>1995</year>
+		<publisher>Data West</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bountyarms" sha1="5543cc67b3e56de44ed2edf5faea7b8c002e9269" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="traidd">
+		<!-- Original images (from drx) 
+		<rom name="tr1.ccd" size="768" crc="66258656" sha1="e22fac1714d6bf6582dc721bde5999c5920ef53a"/>
+		<rom name="tr1.img" size="2293200" crc="9905010d" sha1="6a43d5840e1cb49c0522d8546219f1cc2c467438"/>
+		<rom name="tr1.sub" size="93600" crc="97ae0bfa" sha1="72016fcb74997ae12c8cca271d2c14622b3a8599"/>
+		-->
+		<description>Tomb Raider (E3 Demo, 19960520)</description>
+		<year>1996</year>
+		<publisher>SCEI</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tr1" sha1="a42bca9a943f660a6c080a38a2c8082109c78e79" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
