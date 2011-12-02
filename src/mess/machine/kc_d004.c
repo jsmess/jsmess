@@ -64,7 +64,7 @@ static const floppy_interface kc_d004_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(kc_d004),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
