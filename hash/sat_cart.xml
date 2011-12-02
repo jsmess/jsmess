@@ -29,4 +29,15 @@
 		</part>
 	</software>
 
+	<software name="test1f">
+		<description>Test Menu v1.0f</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sat_cart">
+			<dataarea name="cart" size="0x80000">
+				<rom name="sega saturn test menu v1.0f.bin" size="0x80000" crc="17031c7a" sha1="433cb101bb6e61873778dfcd61a65c72ec552dd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
