@@ -40,4 +40,16 @@
 		</part>
 	</software>
 
+ 	<!-- weird size... is it a bad dump? -->
+ 	<software name="ar">
+		<description>Action Replay</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sat_cart">
+			<dataarea name="cart" size="84069">
+				<rom name="action replay rom.bin" size="84069" crc="cc518d69" sha1="8c091285a2fc863c8b3e6e9e5849a8a3469e02ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
