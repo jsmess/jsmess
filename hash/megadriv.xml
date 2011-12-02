@@ -26647,7 +26647,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<!-- Serial: MT-601 -->
 		<description>Tiny Toon Adventures 3 (Tw)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Gamtec?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tiny toon adventures 3 (unl).bin" size="1048576" crc="d65d83d4" sha1="47b1ad463389d709fb49c7cef8fd033a6f95a301" offset="000000" loadflag="load16_word_swap" />
