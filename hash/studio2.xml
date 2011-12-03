@@ -3,7 +3,7 @@
 <!--
     Undumped:
 
-    18V402  Fun With Numbers            TV Arcade II
+    18V401  Fun With Numbers            TV Arcade II
             Bingo                       TV Casino
             Math and Social Studies     TV School House I
 
@@ -11,10 +11,10 @@
 
 <softwarelist name="studio2" description="RCA Studio II cartridges">
 	<software name="spacewar">
-	<!-- 18V400 -->
 		<description>TV Arcade I: Spacewar</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="18V400" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
@@ -25,10 +25,10 @@
 	</software>
 
 	<software name="tennis">
-	<!-- 18V402 -->
 		<description>TV Arcade III: Tennis/Squash</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="18V402" />
 		<info name="usage" value="Press 'Clear', '1' on Keypad A, '4' on Keypad B and then '7' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
@@ -39,10 +39,10 @@
 	</software>
 
 	<software name="baseball">
-	<!-- 18V403 -->
 		<description>TV Arcade IV: Baseball </description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="18V403" />
 		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
@@ -53,10 +53,10 @@
 	</software>
 
 	<software name="speedway">
-	<!-- 18V404 -->
 		<description>TV Arcade Series V: Speedway/Tag</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="18V404" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
@@ -67,10 +67,10 @@
 	</software>
 
 	<software name="gunfight">
-	<!-- 18V405 -->
 		<description>TV Arcade Series: Gunfighter/Moonship Battle</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="18V405" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
@@ -81,10 +81,10 @@
 	</software>
 
 	<software name="compquiz">
-	<!-- 18V500 -->
 		<description>TV School House: Computer Quiz</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="18V500" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A twice" />
 
 		<part name="cart" interface="studio2_cart">
@@ -95,10 +95,10 @@
 	</software>
 
 	<software name="mathfun">
-	<!-- MG-209 -->
 		<description>TV School House II: Math Fun</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="MG-209" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A three times" />
 
 		<part name="cart" interface="studio2_cart">
@@ -109,10 +109,10 @@
 	</software>
 
 	<software name="bjack">
-	<!-- 18V600 -->
 		<description>TV Casino I: Blackjack </description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="18V600" />
 		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
@@ -123,10 +123,10 @@
 	</software>
 
 	<software name="biorhyth">
-	<!-- 18V700 -->
 		<description>TV Mystic Series: Biorhythm</description>
 		<year>1977</year>
 		<publisher>RCA</publisher>
+		<info name="serial" value="18V700" />
 		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
