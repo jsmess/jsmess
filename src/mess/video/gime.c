@@ -559,7 +559,7 @@ void gime_base_device::update_memory(int bank)
 		/* perform the MMU lookup */
 		block = m_mmu[bank];
 
-		/* also check $FF9B - relevant for the 2 MB upgrade */
+		/* also check $FF9B - relevant for the 2-8 MB upgrade */
 		block |= ((UINT32) ((m_gime_registers[11] >> 4) & 0x03)) << 8;
 	}
 	else
@@ -917,15 +917,23 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 			break;
 
 		case 0x0B:
+			//	$FF9B Two/Eight Megabyte Upgrade register
+			//
+			// This variable is weird; it affects both the video position, but
+			// it also affects normal memory mapping.  However, changing $FF9B
+			// alone won't affect the MMU; writes to $FFAx are required to "latch"
+			// in the $FF9B value.
+			//
+            // The reason that $FF9B is not mentioned in offical documentation
+            // is because it is only meaningful in CoCo 3's with the 2MB upgrade
+			break;
+
 		case 0x0D:
 		case 0x0E:
 			//  $FF9B,$FF9D,$FF9E Vertical Offset Registers
 			//
             //  According to JK, if an odd value is placed in $FF9E on the 1986
             //  GIME, the GIME crashes
-            //
-            // The reason that $FF9B is not mentioned in offical documentation
-            // is because it is only meaninful in CoCo 3's with the 2MB upgrade
             break;
 
 		case 0x0F:
@@ -951,7 +959,11 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 ATTR_FORCE_INLINE void gime_base_device::write_mmu_register(offs_t offset, UINT8 data)
 {
 	offset &= 0x0F;
-	if (m_mmu[offset] != data)
+
+	// Check to see if the MMU register has changed.  If we have more than 512k of RAM
+	// then we have to always update because this is the point at which the MMU makes
+	// decisions based off of $FF9B
+	if ((m_mmu[offset] != data) || (m_ram->size() > 512*1024))
 	{
 		m_mmu[offset] = data;
 		update_memory(offset & 0x07);
