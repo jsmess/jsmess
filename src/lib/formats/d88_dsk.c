@@ -275,14 +275,15 @@ static void d88_get_header(floppy_image_legacy* floppy,UINT32* size, UINT8* prot
 
 	floppy_image_read(floppy,header,0,D88_HEADER_LEN);
 
-#ifdef SPOT_DUPLICATES
+	if (1)
+	{
 		// there exist many .d88 files with same data and different headers and
 		// this allows to spot duplicates, making easier to debug softlists.
 		UINT32 temp_size = floppy_image_size(floppy);
 		UINT8 tmp_copy[temp_size - D88_HEADER_LEN];
 		floppy_image_read(floppy,tmp_copy,D88_HEADER_LEN,temp_size - D88_HEADER_LEN);
 		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy, temp_size - D88_HEADER_LEN));
-#endif
+	}
 
 	if(prot)
 		*prot = header[0x1a];

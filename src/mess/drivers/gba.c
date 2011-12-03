@@ -2097,7 +2097,7 @@ static TIMER_CALLBACK( perform_scan )
 		// * Sabrina Teenage Witch does not even reach the Ubi Soft logo if we use the VBL exit value
 		//   227; it does not display title screen graphics when using 225-226; the intro is broken
 		//   with anything between 207-224.
-		// * Anstoss Action has broken field graphics for values > 223.
+		// * Anstoss Action and Ueki no Housoku have broken graphics for values > 223.
 		// However, taking smaller values breaks raster effects in a LOT of games (e.g. Castlevania
 		// series, Final Fantasy series, Tales of Phantasia, Banjo Pilot, NES 'collections' by Hudson,
 		// Jaleco and Technos, plus tons of racing games, which show garbage in the lower half of the
