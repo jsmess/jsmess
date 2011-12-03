@@ -32,9 +32,26 @@ static const int coeff[32] = {
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 };
 
+#define GBA_OLD_ROZ 1
+#define GBA_OLD_ROZA 1
+
 /* Drawing functions */
-static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
+#if GBA_OLD_ROZ
 static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed);
+#else
+// RotScreen
+static void draw_roz_scanline1(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed);
+#endif
+#if GBA_OLD_ROZA
+static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
+#else
+// RotScreen16Bit (mode 3)
+static void draw_roz_bitmap_scanline2(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
+// RotScreen256 (mode 4)
+static void draw_roz_bitmap_scanline3(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
+// RotScreen16Bit160 (mode 5)
+static void draw_roz_bitmap_scanline4(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth);
+#endif
 static void draw_bg_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs);
 static void draw_gba_oam_window(gba_state *state, running_machine &machine, UINT32 *scanline, int y);
 static void draw_gba_oam(gba_state *state, running_machine &machine, UINT32 *scanline, int y);
@@ -98,115 +115,10 @@ static void (*const gba_draw_scanline_modes[8][3])(running_machine &machine, gba
 
 static void invalid_gba_draw_function(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int aux)
 {
-	fatalerror( "Invalid screen mode (6 or 7)!" );
+	printf( "Invalid screen mode (6 or 7)!\n" );
 }
 
-static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
-{
-	UINT8 *src8 = (UINT8 *)state->m_gba_vram;
-	UINT16 *src16 = (UINT16 *)state->m_gba_vram;
-	UINT16 *palette = (UINT16 *)state->m_gba_pram;
-	INT32 sx = (depth == 4) ? 160 : 240;
-	INT32 sy = (depth == 4) ? 128 : 160;
-	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
-	INT32 dx, dmx, dy, dmy, startx, starty;
-	INT32 rx, ry, pixx, pixy, x;
-
-	if ((depth == 8) && (state->m_DISPCNT & DISPCNT_FRAMESEL))
-		src8 += 0xa000;
-
-	if ((depth == 4) && (state->m_DISPCNT & DISPCNT_FRAMESEL))
-		src16 += 0xa000/2;
-
-	// sign extend roz parameters
-	if (X & 0x08000000) X |= 0xf0000000;
-	if (Y & 0x08000000) Y |= 0xf0000000;
-	if (PA & 0x8000) PA |= 0xffff0000;
-	if (PB & 0x8000) PB |= 0xffff0000;
-	if (PC & 0x8000) PC |= 0xffff0000;
-	if (PD & 0x8000) PD |= 0xffff0000;
-
-	// re-assign parameters for convenience's sake
-	dx = PA;
-	dmx = PB;
-	dy = PC;
-	dmy = PD;
-	startx = X;
-	starty = Y;
-
-	if(ypos == 0)
-		changed = 3;
-
-	if(changed & 1)
-		*currentx = startx;
-	else
-		*currentx += dmx;
-
-	if(changed & 2)
-		*currenty = starty;
-	else
-		*currenty += dmy;
-
-	rx = *currentx;
-	ry = *currenty;
-
-	if(ctrl & BGCNT_MOSAIC)
-	{
-		INT32 mosaic_line = ((state->m_MOSAIC & 0x00f0) >> 4) + 1;
-		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
-		rx = startx + tempy*dmx;
-		ry = starty + tempy*dmy;
-	}
-
-	pixx = rx >> 8;
-	pixy = ry >> 8;
-
-	for(x = 0; x < 240; x++)
-	{
-		if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
-		{
-			scanline[x] = 0x80000000;
-		}
-		else
-		{
-			if (depth == 8)
-			{
-				UINT8 color = src8[pixy*sx + pixx];
-				scanline[x] = color ? (palette[color] | prio) : 0x80000000;
-			}
-			else
-			{
-				scanline[x] = src16[pixy*sx + pixx] | prio;
-			}
-		}
-
-		rx += dx;
-		ry += dy;
-
-		pixx = rx >> 8;
-		pixy = ry >> 8;
-	}
-
-	if(ctrl & BGCNT_MOSAIC)
-	{
-		INT32 mosaicx = (state->m_MOSAIC & 0x0f) + 1;
-		if(mosaicx > 1)
-		{
-			INT32 m = 1;
-			for(x = 0; x < 239; x++)
-			{
-				scanline[x+1] = scanline[x];
-				m++;
-				if(m == mosaicx)
-				{
-					m = 1;
-					x++;
-				}
-			}
-		}
-	}
-}
-
+#if GBA_OLD_ROZ
 static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed)
 {
 	UINT32 base, mapbase, size;
@@ -222,7 +134,11 @@ static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT
 	{
 		scanline[x] = 0x80000000;
 	}
-
+	
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if ((state->m_debug_input >> 1) & enablemask)
+		return;
+	
 	if (state->m_DISPCNT & enablemask)
 	{
 		base = ((ctrl & BGCNT_CHARBASE) >> BGCNT_CHARBASE_SHIFT) * 0x4000;			// VRAM base of tiles
@@ -391,6 +307,528 @@ static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT
 		}
 	}
 }
+#else
+// RotScreen
+static void draw_roz_scanline1(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed)
+{
+	UINT32 base, mapbase, size;
+	static const INT32 sizes[4] = { 128, 256, 512, 1024 };
+	INT32 cx, cy, x, pixx, pixy;
+	UINT8 *mgba_vram = (UINT8 *)state->m_gba_vram;
+	UINT32 tile;
+	UINT16 *pgba_pram = (UINT16 *)state->m_gba_pram;
+	UINT16 pixel;
+	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
+	
+	for(x = 0; x < 240; x++)
+		scanline[x] = 0x80000000;
+	
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if ((state->m_debug_input >> 1) & enablemask)
+		return;
+	
+	if (state->m_DISPCNT & enablemask)
+	{
+		base = ((ctrl & BGCNT_CHARBASE) >> BGCNT_CHARBASE_SHIFT) * 0x4000;			// VRAM base of tiles
+		mapbase = ((ctrl & BGCNT_SCREENBASE) >> BGCNT_SCREENBASE_SHIFT) * 0x800;	// VRAM base of map
+		size = (ctrl & BGCNT_SCREENSIZE) >> BGCNT_SCREENSIZE_SHIFT;					// size of map in submaps
+		
+		// sign extend roz parameters
+		if (X & 0x08000000) X |= 0xf0000000;
+		if (Y & 0x08000000) Y |= 0xf0000000;
+		if (PA & 0x8000) PA |= 0xffff0000;
+		if (PB & 0x8000) PB |= 0xffff0000;
+		if (PC & 0x8000) PC |= 0xffff0000;
+		if (PD & 0x8000) PD |= 0xffff0000;
+		
+		if(ypos == 0)
+			changed = 3;
+		
+		if(changed & 1)
+			*currentx = X;
+		else
+			*currentx += PB;
+		
+		if(changed & 2)
+			*currenty = Y;
+		else
+			*currenty += PD;
+		
+		cx = *currentx;
+		cy = *currenty;
+		
+		if(ctrl & BGCNT_MOSAIC)
+		{
+			int mosaicy = ((state->m_MOSAIC & 0xf0) >> 4) + 1;
+			int y = ypos % mosaicy;
+			cx -= y*PB;
+			cy -= y*PD;
+		}
+		
+		pixx = cx >> 8;
+		pixy = cy >> 8;
+		
+		if(ctrl & BGCNT_PALETTESET_WRAP)
+		{
+			pixx &= (sizes[size] - 1);
+			pixy &= (sizes[size] - 1);
+		}
+		
+		for(x = 0; x < 240; x++)
+		{
+			if(pixx < 0 || pixy < 0 || pixx >= sizes[size] || pixy >= sizes[size])
+				scanline[x] = 0x80000000;
+			else
+			{
+				int tilex = pixx & 7;
+				int tiley = pixy & 7;
+				
+				tile = mgba_vram[mapbase + (pixx >> 3) + (pixy >> 3) * (sizes[size] >> 3)];
+				pixel = mgba_vram[base + (tile << 6) + (tiley << 3) + tilex];
+				
+				// plot it
+				scanline[x] = pixel ? (pgba_pram[pixel] | prio) : 0x80000000;
+			}
+			
+			cx += PA;
+			cy += PC;
+			
+			pixx = cx >> 8;
+			pixy = cy >> 8;
+			
+			if(ctrl & BGCNT_PALETTESET_WRAP)
+			{
+				pixx &= (sizes[size] - 1);
+				pixy &= (sizes[size] - 1);
+			}
+		}
+		
+		if(ctrl & BGCNT_MOSAIC)
+		{
+			int mosaicx = (state->m_MOSAIC & 0x0f) + 1;
+			if(mosaicx > 1)
+			{
+				int m = 1;
+				for(x = 0; x < 239; x++)
+				{
+					scanline[x+1] = scanline[x];
+					m++;
+					if(m == mosaicx)
+					{
+						m = 1;
+						x++;
+					}
+				}
+			}
+		}
+	}
+}
+#endif
+
+#if GBA_OLD_ROZA
+static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
+{
+	UINT8 *src8 = (UINT8 *)state->m_gba_vram;
+	UINT16 *src16 = (UINT16 *)state->m_gba_vram;
+	UINT16 *palette = (UINT16 *)state->m_gba_pram;
+	INT32 sx = (depth == 4) ? 160 : 240;
+	INT32 sy = (depth == 4) ? 128 : 160;
+	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
+	INT32 dx, dmx, dy, dmy, startx, starty;
+	INT32 rx, ry, pixx, pixy, x;
+	
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if ((state->m_debug_input >> 1) & enablemask)
+		return;
+	
+	if ((depth == 8) && (state->m_DISPCNT & DISPCNT_FRAMESEL))
+		src8 += 0xa000;
+	
+	if ((depth == 4) && (state->m_DISPCNT & DISPCNT_FRAMESEL))
+		src16 += 0xa000/2;
+	
+	// sign extend roz parameters
+	if (X & 0x08000000) X |= 0xf0000000;
+	if (Y & 0x08000000) Y |= 0xf0000000;
+	if (PA & 0x8000) PA |= 0xffff0000;
+	if (PB & 0x8000) PB |= 0xffff0000;
+	if (PC & 0x8000) PC |= 0xffff0000;
+	if (PD & 0x8000) PD |= 0xffff0000;
+	
+	// re-assign parameters for convenience's sake
+	dx = PA;
+	dmx = PB;
+	dy = PC;
+	dmy = PD;
+	startx = X;
+	starty = Y;
+	
+	if(ypos == 0)
+		changed = 3;
+	
+	if(changed & 1)
+		*currentx = startx;
+	else
+		*currentx += dmx;
+	
+	if(changed & 2)
+		*currenty = starty;
+	else
+		*currenty += dmy;
+	
+	rx = *currentx;
+	ry = *currenty;
+	
+	if(ctrl & BGCNT_MOSAIC)
+	{
+		INT32 mosaic_line = ((state->m_MOSAIC & 0x00f0) >> 4) + 1;
+		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
+		rx = startx + tempy*dmx;
+		ry = starty + tempy*dmy;
+	}
+	
+	pixx = rx >> 8;
+	pixy = ry >> 8;
+	
+	for(x = 0; x < 240; x++)
+	{
+		if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
+		{
+			scanline[x] = 0x80000000;
+		}
+		else
+		{
+			if (depth == 8)
+			{
+				UINT8 color = src8[pixy*sx + pixx];
+				scanline[x] = color ? (palette[color] | prio) : 0x80000000;
+			}
+			else
+			{
+				scanline[x] = src16[pixy*sx + pixx] | prio;
+			}
+		}
+		
+		rx += dx;
+		ry += dy;
+		
+		pixx = rx >> 8;
+		pixy = ry >> 8;
+	}
+	
+	if(ctrl & BGCNT_MOSAIC)
+	{
+		INT32 mosaicx = (state->m_MOSAIC & 0x0f) + 1;
+		if(mosaicx > 1)
+		{
+			INT32 m = 1;
+			for(x = 0; x < 239; x++)
+			{
+				scanline[x+1] = scanline[x];
+				m++;
+				if(m == mosaicx)
+				{
+					m = 1;
+					x++;
+				}
+			}
+		}
+	}
+}
+#else
+// RotScreen16Bit (mode 3)
+static void draw_roz_bitmap_scanline2(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
+{
+	UINT16 *src16 = (UINT16 *)state->m_gba_vram;
+	INT32 sx = 240;
+	INT32 sy = 160;
+	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
+	INT32 dx, dmx, dy, dmy, startx, starty;
+	INT32 rx, ry, pixx, pixy, x;
+	
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if ((state->m_debug_input >> 1) & enablemask)
+		return;
+	
+	// sign extend roz parameters
+	if (X & 0x08000000) X |= 0xf0000000;
+	if (Y & 0x08000000) Y |= 0xf0000000;
+	if (PA & 0x8000) PA |= 0xffff0000;
+	if (PB & 0x8000) PB |= 0xffff0000;
+	if (PC & 0x8000) PC |= 0xffff0000;
+	if (PD & 0x8000) PD |= 0xffff0000;
+	
+	// re-assign parameters for convenience's sake
+	dx = PA;
+	dmx = PB;
+	dy = PC;
+	dmy = PD;
+	startx = X;
+	starty = Y;
+	
+	if(ypos == 0)
+		changed = 3;
+	
+	if(changed & 1)
+		*currentx = startx;
+	else
+		*currentx += dmx;
+	
+	if(changed & 2)
+		*currenty = starty;
+	else
+		*currenty += dmy;
+	
+	rx = *currentx;
+	ry = *currenty;
+	
+	if(ctrl & BGCNT_MOSAIC)
+	{
+		INT32 mosaic_line = ((state->m_MOSAIC & 0x00f0) >> 4) + 1;
+		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
+		rx -= tempy*dmx;
+		ry -= tempy*dmy;
+//		rx = startx + tempy*dmx;
+//		ry = starty + tempy*dmy;
+
+	}
+	
+	pixx = rx >> 8;
+	pixy = ry >> 8;
+	
+	for(x = 0; x < 240; x++)
+	{
+		if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
+			scanline[x] = 0x80000000;
+		else
+			scanline[x] = src16[pixy*sx + pixx] | prio;
+		
+		rx += dx;
+		ry += dy;
+		
+		pixx = rx >> 8;
+		pixy = ry >> 8;
+	}
+	
+	if(ctrl & BGCNT_MOSAIC)
+	{
+		INT32 mosaicx = (state->m_MOSAIC & 0x0f) + 1;
+		if(mosaicx > 1)
+		{
+			INT32 m = 1;
+			for(x = 0; x < 239; x++)
+			{
+				scanline[x+1] = scanline[x];
+				m++;
+				if(m == mosaicx)
+				{
+					m = 1;
+					x++;
+				}
+			}
+		}
+	}
+}
+
+// RotScreen256 (mode 4)
+static void draw_roz_bitmap_scanline3(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
+{
+	UINT8 *src8 = (UINT8 *)state->m_gba_vram;
+	UINT16 *palette = (UINT16 *)state->m_gba_pram;
+	INT32 sx = 240;
+	INT32 sy = 160;
+	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
+	INT32 dx, dmx, dy, dmy, startx, starty;
+	INT32 rx, ry, pixx, pixy, x;
+	
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if ((state->m_debug_input >> 1) & enablemask)
+		return;
+	
+	if(state->m_DISPCNT & DISPCNT_FRAMESEL)
+		src8 += 0xa000;
+	
+	// sign extend roz parameters
+	if (X & 0x08000000) X |= 0xf0000000;
+	if (Y & 0x08000000) Y |= 0xf0000000;
+	if (PA & 0x8000) PA |= 0xffff0000;
+	if (PB & 0x8000) PB |= 0xffff0000;
+	if (PC & 0x8000) PC |= 0xffff0000;
+	if (PD & 0x8000) PD |= 0xffff0000;
+	
+	// re-assign parameters for convenience's sake
+	dx = PA;
+	dmx = PB;
+	dy = PC;
+	dmy = PD;
+	startx = X;
+	starty = Y;
+	
+	if(ypos == 0)
+		changed = 3;
+	
+	if(changed & 1)
+		*currentx = startx;
+	else
+		*currentx += dmx;
+	
+	if(changed & 2)
+		*currenty = starty;
+	else
+		*currenty += dmy;
+	
+	rx = *currentx;
+	ry = *currenty;
+	
+	if(ctrl & BGCNT_MOSAIC)
+	{
+		INT32 mosaic_line = ((state->m_MOSAIC & 0x00f0) >> 4) + 1;
+		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
+		rx = startx + tempy*dmx;
+		ry = starty + tempy*dmy;
+	}
+	
+	pixx = rx >> 8;
+	pixy = ry >> 8;
+	
+	for(x = 0; x < 240; x++)
+	{
+		if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
+			scanline[x] = 0x80000000;
+		else
+		{
+			UINT8 color = src8[pixy * sx + pixx];
+
+			if(color)
+				scanline[x] = palette[color] | prio;
+			else
+				scanline[x] = 0x80000000;
+		}
+		
+		rx += dx;
+		ry += dy;
+		
+		pixx = rx >> 8;
+		pixy = ry >> 8;
+	}
+	
+	if(ctrl & BGCNT_MOSAIC)
+	{
+		INT32 mosaicx = (state->m_MOSAIC & 0x0f) + 1;
+		if(mosaicx > 1)
+		{
+			INT32 m = 1;
+			for(x = 0; x < 239; x++)
+			{
+				scanline[x+1] = scanline[x];
+				m++;
+				if(m == mosaicx)
+				{
+					m = 1;
+					x++;
+				}
+			}
+		}
+	}
+}
+
+// RotScreen16Bit160 (mode 5)
+static void draw_roz_bitmap_scanline4(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
+{
+	UINT16 *src16 = (UINT16 *)state->m_gba_vram;
+	INT32 sx = 160;
+	INT32 sy = 128;
+	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
+	INT32 dx, dmx, dy, dmy, startx, starty;
+	INT32 rx, ry, pixx, pixy, x;
+	
+	
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if ((state->m_debug_input >> 1) & enablemask)
+		return;
+	
+	if(state->m_DISPCNT & DISPCNT_FRAMESEL)
+		src16 += 0xa000/2;
+
+	// sign extend roz parameters
+	if (X & 0x08000000) X |= 0xf0000000;
+	if (Y & 0x08000000) Y |= 0xf0000000;
+	if (PA & 0x8000) PA |= 0xffff0000;
+	if (PB & 0x8000) PB |= 0xffff0000;
+	if (PC & 0x8000) PC |= 0xffff0000;
+	if (PD & 0x8000) PD |= 0xffff0000;
+	
+	// re-assign parameters for convenience's sake
+	dx = PA;
+	dmx = PB;
+	dy = PC;
+	dmy = PD;
+	startx = X;
+	starty = Y;
+	
+	if(ypos == 0)
+		changed = 3;
+	
+	if(changed & 1)
+		*currentx = startx;
+	else
+		*currentx += dmx;
+	
+	if(changed & 2)
+		*currenty = starty;
+	else
+		*currenty += dmy;
+	
+	rx = *currentx;
+	ry = *currenty;
+	
+	if(ctrl & BGCNT_MOSAIC)
+	{
+		INT32 mosaic_line = ((state->m_MOSAIC & 0x00f0) >> 4) + 1;
+		INT32 tempy = (ypos / mosaic_line) * mosaic_line;
+		rx = startx + tempy*dmx;
+		ry = starty + tempy*dmy;
+	}
+	
+	pixx = rx >> 8;
+	pixy = ry >> 8;
+	
+	for(x = 0; x < 240; x++)
+	{
+		if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
+			scanline[x] = 0x80000000;
+		else
+		{
+			scanline[x] = src16[pixy*sx + pixx] | prio;
+		}
+		
+		rx += dx;
+		ry += dy;
+		
+		pixx = rx >> 8;
+		pixy = ry >> 8;
+	}
+	
+	if(ctrl & BGCNT_MOSAIC)
+	{
+		INT32 mosaicx = (state->m_MOSAIC & 0x0f) + 1;
+		if(mosaicx > 1)
+		{
+			INT32 m = 1;
+			for(x = 0; x < 239; x++)
+			{
+				scanline[x+1] = scanline[x];
+				m++;
+				if(m == mosaicx)
+				{
+					m = 1;
+					x++;
+				}
+			}
+		}
+	}
+}
+#endif
 
 static void draw_bg_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs)
 {
@@ -417,6 +855,10 @@ static void draw_bg_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT3
 
 		return;
 	}
+	
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if ((state->m_debug_input >> 1) & enablemask)
+		return;	
 
 	switch((ctrl & BGCNT_SCREENSIZE) >> BGCNT_SCREENSIZE_SHIFT)
 	{
@@ -630,6 +1072,10 @@ static void draw_gba_oam_window(gba_state *state, running_machine &machine, UINT
 		scanline[x] = 0x80000000;
 	}
 
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if (BIT(state->m_debug_input, 14))
+		return;
+	
 	if( state->m_DISPCNT & DISPCNT_OBJWIN_EN )
 	{
 		for( gba_oamindex = 127; gba_oamindex >= 0; gba_oamindex-- )
@@ -1079,6 +1525,10 @@ static void draw_gba_oam(gba_state *state, running_machine &machine, UINT32 *sca
 	{
 		scanline[x] = 0x80000000;
 	}
+
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if (BIT(state->m_debug_input, 13))
+		return;
 
 	if( state->m_DISPCNT & DISPCNT_OBJ_EN )
 	{
@@ -1789,9 +2239,11 @@ void gba_draw_scanline(running_machine &machine, int y)
 			break;
 	}
 
-	gba_draw_scanline_modes[state->m_DISPCNT & 7][submode](machine, state, y, &state->m_xferscan[0][1024], &state->m_xferscan[1][1024], &state->m_xferscan[2][1024], &state->m_xferscan[3][1024], &state->m_xferscan[4][1024], &state->m_xferscan[5][1024], &state->m_xferscan[6][1024], bpp);
+	// state->m_debug_input != 0 only if some layer/mode has been disabled
+	if (!BIT(state->m_debug_input, state->m_DISPCNT & 7) && !BIT(state->m_debug_input, submode + 8))
+		gba_draw_scanline_modes[state->m_DISPCNT & 7][submode](machine, state, y, &state->m_xferscan[0][1024], &state->m_xferscan[1][1024], &state->m_xferscan[2][1024], &state->m_xferscan[3][1024], &state->m_xferscan[4][1024], &state->m_xferscan[5][1024], &state->m_xferscan[6][1024], bpp);
 
-	for(x = 0; x < 240; x++)
+	for (x = 0; x < 240; x++)
 	{
 		scanline[x] = state->m_xferscan[6][1024 + x] & 0x7fff;
 	}

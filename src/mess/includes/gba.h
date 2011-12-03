@@ -120,6 +120,8 @@
 #define TILEOBJ_VFLIP			0x0800
 #define TILEOBJ_PALETTE			0xf000
 
+#define GBA_LAYER_DEBUG         1
+
 enum
 {
 	EEP_IDLE,
@@ -210,6 +212,8 @@ public:
 	int m_bios_protected;
 
 	int m_flash_battery_load;
+
+	UINT32 m_debug_input;	// for debugging video layers. always zero if debug inputs are disabled.
 };
 
 /*----------- defined in video/gba.c -----------*/

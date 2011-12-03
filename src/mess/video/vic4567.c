@@ -9,7 +9,7 @@
     TODO:
       - plenty of cleanups
       - emulate variants of the vic chip
-      - update vic III to use the new vic6567.c code for the vic II comaptibility
+      - update vic III to use the new vic6567.c code for the vic II compatibility
 
 ***************************************************************************/
 
