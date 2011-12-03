@@ -1492,121 +1492,6 @@ void media_identifier::identify(const char *filename)
 //  identify_file - identify a file
 //-------------------------------------------------
 
-char shortname[12];
-const char *fullname;
-
-#define LENXX (12)
-
-char namelist[16384][LENXX];
-static int listpos = 0;
-static char namex[LENXX];
-static char lastname[LENXX] = {0};
-
-static char *copy_chars(const char *name)
-{
-	int pos = 0;
-	int len;
-	int x;
-	int y;
-	int validname;
-	int validcount;
-	int wasinvalid;
-	
-	len = strlen(name);
-	
-	for (x=0;x<LENXX;x++)
-	{
-		namex[x] = '\0';
-	}
-	
-	for (x=0;x<len;x++)
-	{
-		if ((name[x]>='A' && name[x]<='Z') ||
-			(name[x]>='a' && name[x]<='z') ||
-			(name[x]>='0' && name[x]<='9' && pos < LENXX-4))
-			
-		{
-			if (name[x]>='A' && name[x]<='Z')
-			{
-				namex[pos] = name[x] + 0x20;
-			}
-			else
-			{
-				namex[pos] = name[x];
-			}
-			
-			pos++;
-		}
-		
-		
-		if (pos==LENXX-4)
-		{
-			namex[pos]= '\0';
-			break;
-		}
-	}
-	
-	
-	validcount = 1;
-	wasinvalid = 0;
-	
-	do
-	{
-		validname=1;
-		
-		for (x=0;x<listpos;x++)
-		{
-			if (!strcmp(namex,namelist[x]))
-			{
-				char tmp[64];
-				sprintf(tmp,"%d", validcount);
-				
-				//printf("%s reused\n", namex);
-				validname = 0;
-				
-				if (!wasinvalid)
-				{
-					int xx;
-					for (xx=0;xx<LENXX;xx++)
-					{
-						lastname[xx] = namex[xx];
-					}
-				}
-				wasinvalid = 1;
-				
-				if (validcount<10)
-				{
-					namex[pos-1] = tmp[0];
-				}
-				else if (validcount<100)
-				{
-					namex[pos-2] = tmp[0];
-					namex[pos-1] = tmp[1];
-					
-					//printf("%s\n",namex);
-					//fatalerror("dd\n");
-				}
-				
-				validcount++;
-				
-				if (validcount==100)
-					fatalerror("too many duplicates!\n");
-			}
-		}
-		
-	} while (!validname);
-	
-	for (y=0;y<LENXX;y++)
-	{
-		namelist[listpos][y] = namex[y];
-	}
-	
-	logerror("name %s\n",namex);
-	listpos++;
-	
-	return namex;
-}
-
 void media_identifier::identify_file(const char *name)
 {
 	// CHD files need to be parsed and their hashes extracted from the header
@@ -1626,93 +1511,33 @@ void media_identifier::identify_file(const char *name)
 			m_nonroms++;
 			return;
 		}
-		else
-		{
-			// fetch the header and close the file
-			chd_header header = *chd_get_header(chd);
 
-			static const UINT8 nullhash[20] = { 0 };
-			hash_collection hashes;
-			
-			if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
-				hashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
-			
-			// determine whether this file exists
-			int found = find_by_hash(hashes, header.logicalbytes);
-			if (found == 0)
-			{
-				mame_printf_info("NO MATCH\n");
-				fullname = basename.cstr();
-				const char *tmpshort;
-
-				if (1) 
-				{
-					tmpshort = copy_chars(fullname);
-				}
-				else
-				{
-					int count = 0;
-					for (int i=0;i<9;i++)
-						shortname[i] = '\0';
-					
-					for (int i=0;i<astring_len(&basename);i++)
-					{
-						if (count==8 || fullname[i]==0x2e)
-							continue;
-						
-						if (  (fullname[i]>=0x30 && fullname[i]<=0x39)
-							||(fullname[i]>=0x41 && fullname[i]<=0x5a)
-							||(fullname[i]>=0x61 && fullname[i]<=0x7a))
-						{
-							if (fullname[i]>=0x41 && fullname[i]<=0x5a)
-							{
-								shortname[count] = fullname[i]+0x20;
-							}
-							else
-							{
-								shortname[count] = fullname[i];
-							}
-							count++;
-						}
-					}
-					shortname[count] = '\0';
-				}
-				
-				astring stringx(basename.cstr());
-				stringx.tolower();
-				stringx.del(stringx.len() - 4, 4);
-				basename.del(basename.len() - 4, 4);
-
-				FILE *f = fopen("output.txt", "a");
-				if (!f)
-					return;
-				else
-				{
-					fprintf(f, "	<software name=\"%s\">\n", tmpshort /*shortname*/);
-					fprintf(f, "		<description>%s</description>\n", xml_normalize_string(basename.cstr()));
-					fprintf(f, "		<year>19\?\?</year>\n");
-					fprintf(f, "		<publisher>&lt;unknown&gt;</publisher>\n");
-					fprintf(f, "		<part name=\"cdrom\" interface=\"psx_cdrom\">\n");
-					fprintf(f, "			<diskarea name=\"cdrom\">\n");
-					fprintf(f, "				<disk name=\"%s\" ", xml_normalize_string(stringx.cstr()));
-					astring tempstr;
-					for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
-						fprintf(f, "%s=\"%s\" ", hash->name(), hash->string(tempstr));
-					fprintf(f, "/>\n");
-					fprintf(f, "			</diskarea>\n");
-					fprintf(f, "		</part>\n");
-					fprintf(f, "	</software>\n");
-					fprintf(f, "\n");
-				}
-				fclose(f);
-			}
-			
-			/* if we did find it, count it as a match */
-			else
-				m_matches++;
-		}
+		// fetch the header and close the file
+		chd_header header = *chd_get_header(chd);
 		chd_close(chd);
+
+		// error on writable CHDs
+		if (header.flags & CHDFLAGS_IS_WRITEABLE)
+		{
+			mame_printf_info("is a writeable CHD\n");
+			return;
+		}
+
+		// otherwise, get the hash collection for this CHD
+		static const UINT8 nullhash[20] = { 0 };
+		hash_collection hashes;
+
+		if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
+			hashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
+
+		// determine whether this file exists
+		int found = find_by_hash(hashes, header.logicalbytes);
+		if (found == 0)
+			mame_printf_info("NO MATCH\n");
+		else
+			m_matches++;
 	}
+
 	// all other files have their hashes computed directly
 	else
 	{
@@ -1737,23 +1562,22 @@ void media_identifier::identify_file(const char *name)
 
 void media_identifier::identify_data(const char *name, const UINT8 *data, int length)
 {
+	// if this is a '.jed' file, process it into raw bits first
 	UINT8 *tempjed = NULL;
 	jed_data jed;
-
 	if (core_filename_ends_with(name, ".jed") && jed_parse(data, length, &jed) == JEDERR_NONE)
 	{
 		// now determine the new data length and allocate temporary memory for it
 		length = jedbin_output(&jed, NULL, 0);
 		tempjed = global_alloc_array(UINT8, length);
-
 		jedbin_output(&jed, tempjed, length);
 		data = tempjed;
 	}
-	
+
 	// compute the hash of the data
 	hash_collection hashes;
 	hashes.compute(data, length, hash_collection::HASH_TYPES_CRC_SHA1);
-	
+
 	// output the name
 	m_total++;
 	astring basename;
@@ -1761,84 +1585,28 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 
 	// see if we can find a match in the ROMs
 	int found = find_by_hash(hashes, length);
-	
+
 	// if we didn't find it, try to guess what it might be
 	if (found == 0)
 	{
-		mame_printf_info("NO MATCH\n");
-		fullname = basename.cstr();
-		const char *tmpshort;
+		// if not a power of 2, assume it is a non-ROM file
+		if ((length & (length - 1)) != 0)
+		{
+			mame_printf_info("NOT A ROM\n");
+			m_nonroms++;
+		}
 
-		if (1) 
-		{
-			tmpshort = copy_chars(fullname);
-		}
-		else
-		{
-			int count = 0;
-			for (int i=0;i<9;i++)
-				shortname[i] = '\0';
-			
-			for (int i=0;i<astring_len(&basename);i++)
-			{
-				if (count==8 || fullname[i]==0x2e)
-					continue;
-				
-				if (  (fullname[i]>=0x30 && fullname[i]<=0x39)
-					||(fullname[i]>=0x41 && fullname[i]<=0x5a)
-					||(fullname[i]>=0x61 && fullname[i]<=0x7a))
-				{
-					if (fullname[i]>=0x41 && fullname[i]<=0x5a)
-					{
-						shortname[count] = fullname[i]+0x20;
-					}
-					else
-					{
-						shortname[count] = fullname[i];
-					}
-					count++;
-				}
-			}
-			shortname[count] = '\0';
-		}
-		
-		astring stringx(basename.cstr());
-		stringx.tolower();
-		basename.del(basename.len() - 4, 4);
-		
-		FILE *f = fopen("output.txt", "a");
-		if (!f)
-			return;
 		// otherwise, it's just not a match
 		else
-		{
-			fprintf(f, "	<software name=\"%s\">\n", tmpshort /*shortname*/);
-			fprintf(f, "		<description>%s</description>\n", xml_normalize_string(basename.cstr()));
-			fprintf(f, "		<year>19\?\?</year>\n");
-			fprintf(f, "		<publisher>&lt;unknown&gt;</publisher>\n");
-			fprintf(f, "		<part name=\"disk\" interface=\"floppy_5_25\">\n");
-//			fprintf(f, "			<feature name=\"part_id\" value=\"Disk 1\" />\n");
-			fprintf(f, "			<dataarea name=\"flop\" size=\"%d\">\n", length);
-			fprintf(f, "				<rom name=\"%s\" size=\"%d\"", xml_normalize_string(stringx.cstr()), length);
-			astring tempstr;
-			for (hash_base *hash = hashes.first(); hash != NULL; hash = hash->next())
-				fprintf(f, " %s=\"%s\"", hash->name(), hash->string(tempstr));
-			fprintf(f, " offset=\"0\" />\n");
-			fprintf(f, "			</dataarea>\n");
-			fprintf(f, "		</part>\n");
-			fprintf(f, "	</software>\n");
-			fprintf(f, "\n");
-		}
-		fclose(f);
+			mame_printf_info("NO MATCH\n");
 	}
-	
+
 	// if we did find it, count it as a match
 	else
 		m_matches++;
-	
+
 	// free any temporary JED data
-	if (tempjed != NULL)
-		global_free(tempjed);
+	global_free(tempjed);
 }
 
 
