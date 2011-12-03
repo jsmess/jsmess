@@ -711,7 +711,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_mmu_register(offs_t offset)
 
 ATTR_FORCE_INLINE UINT8 gime_base_device::read_palette_register(offs_t offset)
 {
-	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F] | 0x40;
+	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F];
 }
 
 
