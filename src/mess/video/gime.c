@@ -711,7 +711,11 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_mmu_register(offs_t offset)
 
 ATTR_FORCE_INLINE UINT8 gime_base_device::read_palette_register(offs_t offset)
 {
-	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F];
+	// Bits 7/6 are set and cleared respectively.  On a real CoCo 3
+	//
+	//	POKE&HFFB1,255:PRINTPEEK(&HFFB1)	returns 127.
+	//	POKE&HFFB1,0:PRINTPEEK(&HFFB1)		returns 64
+	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F] | 0x40;
 }
 
 
