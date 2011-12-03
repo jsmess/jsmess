@@ -700,7 +700,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 
 ATTR_FORCE_INLINE UINT8 gime_base_device::read_mmu_register(offs_t offset)
 {
-	return m_mmu[offset & 0x0F];
+	return (m_mmu[offset & 0x0F] & 0x3F);
 }
 
 
@@ -729,7 +729,7 @@ void gime_base_device::write(offs_t offset, UINT8 data)
 			break;
 
 		case 0x10:
-			write_mmu_register(offset & 0x0F, data & 0x3F);
+			write_mmu_register(offset & 0x0F, data);
 			break;
 
 		case 0x20:
