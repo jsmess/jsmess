@@ -15,11 +15,7 @@ static void draw_mode1_scanline(running_machine &machine, gba_state *state, int 
 
 	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
 	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
-#if GBA_OLD_ROZ
 	draw_roz_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-#else
-	draw_roz_scanline1(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-#endif
 	draw_gba_oam(state, machine, lineOBJ, y);
 
 	for(x = 0; x < 240; x++)
@@ -111,11 +107,7 @@ static void draw_mode1_scanline_nowindow(running_machine &machine, gba_state *st
 
 	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
 	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
-#if GBA_OLD_ROZ
 	draw_roz_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-#else
-	draw_roz_scanline1(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-#endif
 	draw_gba_oam(state, machine, lineOBJ, y);
 
 	for(x = 0; x < 240; x++)
@@ -308,11 +300,7 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 
 	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
 	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
-#if GBA_OLD_ROZ
 	draw_roz_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-#else
-	draw_roz_scanline1(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-#endif
 	draw_gba_oam(state, machine, lineOBJ, y);
 	draw_gba_oam_window(state, machine, lineOBJWin, y);
 
