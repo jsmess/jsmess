@@ -30,7 +30,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "machine/ataridev.h"
@@ -1114,7 +1113,7 @@ static MACHINE_CONFIG_DERIVED( a400, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
-	MCFG_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_60HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a400_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START( a400 )
 
@@ -1133,7 +1132,7 @@ static MACHINE_CONFIG_DERIVED( a400pal, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
-	MCFG_CPU_VBLANK_INT_HACK(a400_interrupt, TOTAL_LINES_50HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a400_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START( a400 )
 
@@ -1152,7 +1151,7 @@ static MACHINE_CONFIG_DERIVED( a800, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800_mem)
-	MCFG_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_60HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a800_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START( a800 )
 
@@ -1171,7 +1170,7 @@ static MACHINE_CONFIG_DERIVED( a800pal, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800_mem)
-	MCFG_CPU_VBLANK_INT_HACK(a800_interrupt, TOTAL_LINES_50HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a800_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START( a800 )
 
@@ -1190,7 +1189,7 @@ static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)	// FIXME?
-	MCFG_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_PIA6821_MODIFY( "pia", a600xl_pia_interface )
 
@@ -1215,7 +1214,7 @@ static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800xl_mem)
-	MCFG_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_60HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_PIA6821_MODIFY( "pia", a800xl_pia_interface )
 
@@ -1235,7 +1234,8 @@ static MACHINE_CONFIG_DERIVED( a800xlpal, a800xl )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 1773000 )
-	MCFG_CPU_VBLANK_INT_HACK(a800xl_interrupt, TOTAL_LINES_50HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
@@ -1277,7 +1277,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
-	MCFG_CPU_VBLANK_INT_HACK(a5200_interrupt, TOTAL_LINES_60HZ)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a5200_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_REMOVE("pokey")
 	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
