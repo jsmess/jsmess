@@ -4746,7 +4746,7 @@
 	</software>
 
 	<software name="dragonss">
-		<description>Dragon Slayer (SPS)</description>
+		<description>Dragon Slayer - Legend of Heroes</description>
 		<year>1992</year>
 		<publisher>SPS</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -4788,14 +4788,6 @@
 			</dataarea>
 		</part>
 	</software>
-
-<!--
-	<software name="shortname">
-		<description>desc</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-	</software>
--->
 
 	<software name="drgncity">
 		<description>Dragon City</description>
@@ -5245,6 +5237,270 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="eeledit">
+		<description>EEL Edit Elements (v2.00a)</description>
+		<year>1995</year>
+		<publisher>Cat Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="eel edit elements v2.00a (1995)(cat soft)(disk 1 of 2).dim" size="1261824" crc="35bbe29b" sha1="504bfe0ff302b677c0fe2604b9e62e359c526061" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="eel edit elements v2.00a (1995)(cat soft)(disk 2 of 2).dim" size="1261824" crc="4ae4d96d" sha1="913462e248249ca1d483a4e210674082443407d0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eff">
+		<description>EFF Erotic Fantasy Fable</description>
+		<year>1994</year>
+		<publisher>T&amp;H Projects</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="eff erotic fantasy fable (1994)(t&amp;h projects).dim" size="1261824" crc="00845d4b" sha1="f0377d4819f2b7bd205cbf17e82f142f720745e3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eikan">
+		<description>Eikan ha Kimi ni Koukou Yakyuu Zenkokutaikai</description>
+		<year>1990</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="eikan ha kimi ni koukou yakyuu zenkokutaikai (1990)(artdink)(disk 1 of 3)(system).dim" size="1261824" crc="3f7469db" sha1="c2604e1f0db247ecb379b6d3cab30542850ade23" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="eikan ha kimi ni koukou yakyuu zenkokutaikai (1990)(artdink)(disk 2 of 3)(game).dim" size="1261824" crc="f4506ed7" sha1="9e5d2cbbc07bfb4046415703680447ef3d5f5797" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="eikan ha kimi ni koukou yakyuu zenkokutaikai (1990)(artdink)(disk 3 of 3)(utility).dim" size="1261824" crc="955a5e42" sha1="2e37562ebd9df8d5384baf3228c61364de03d53b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elfcg">
+		<description>Elf no Shoujou CG Puzzle</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="elf no shoujou cg puzzle (19xx)(-).dim" size="1261824" crc="b9f6f763" sha1="1b94bb3eec242ad5f3e70bc94448a41e8625c702" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elle">
+		<description>Elle</description>
+		<year>1991</year>
+		<publisher>Elf</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="elle (1991)(elf)(disk 1 of 4)(disk a).dim" size="1261824" crc="4f057b12" sha1="cabb4c060f4cce1fd8385d22c89757f3d3ed4d85" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="elle (1991)(elf)(disk 2 of 4)(disk b).dim" size="1261824" crc="9c92d3f4" sha1="8de431cc873c7a780896a4773bca74887b7b5ead" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="elle (1991)(elf)(disk 3 of 4)(disk c).dim" size="1261824" crc="cbb9f4c0" sha1="2f9bfadfab45c4d8dda1c524bb2af354ef6dcf22" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="elle (1991)(elf)(disk 4 of 4)(disk d).dim" size="1261824" crc="a99406a7" sha1="2caa0bf78e64eeeec90de674d5f0c02de728d48b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elrinda2">
+		<description>Elrin Da! Magazine vol. 2 Quiz Uchuu Tai Sakusen</description>
+		<year>1993</year>
+		<publisher>Elrin Da!</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="elrin da! magazine vol. 2 quiz uchuu tai sakusen (1993)(elrin da!).dim" size="1261824" crc="95cad303" sha1="4ba703175767ee404dd7571926c5bf0b51aca6bb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emerdrgn">
+		<description>Emerald Dragon</description>
+		<year>1990</year>
+		<publisher>Glodia</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="emerald dragon (1990)(glodia)(disk 1 of 6)(system).dim" size="1261824" crc="b2099996" sha1="cd6063c14108dcbec2b15e5736736c8c3075a626" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="emerald dragon (1990)(glodia)(disk 2 of 6)(data).dim" size="1261824" crc="ced945e0" sha1="6a5a2cbe627e7504dd393bb7e0b95e706d9853a5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="emerald dragon (1990)(glodia)(disk 3 of 6)(opening).dim" size="1261824" crc="c30a6b77" sha1="8700f92ecb1adaabcfecf98b6a5ad6aeea2fdea1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="emerald dragon (1990)(glodia)(disk 4 of 6)(visual 1).dim" size="1261824" crc="25329020" sha1="46c2787fc6e0d99267544d13e43178c245cbeed0" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="emerald dragon (1990)(glodia)(disk 5 of 6)(visual 2).dim" size="1261824" crc="3b137fd3" sha1="c73616238b2a9049dd67e2feaaf7888ccd56c900" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="emerald dragon (1990)(glodia)(disk 6 of 6)(ending).dim" size="1261824" crc="8bc73ce0" sha1="477130d4a455433089f7b813d4ff7fe953658a59" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="entfuhr">
+		<description>Entfuhrer</description>
+		<year>19??</year>
+		<publisher>Zenryuutsuu</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="entfuhrer (19xx)(zenryuutsuu).dim" size="1261824" crc="60815790" sha1="eb43e29859821c284250695df8d44c24d58a679a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erionqst">
+		<description>Erion Quest</description>
+		<year>1991</year>
+		<publisher>Ankoku Baitai Software House</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="erion quest (1991)(ankoku baitai software house).dim" size="1261824" crc="19c76824" sha1="048dd44f526e0510a0b24d62e1f7e35ad305ed2f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etoile">
+		<description>Etoile Princess</description>
+		<year>1993</year>
+		<publisher>Exact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="etoile princess (1993)(exact)(disk 1 of 3)(system).dim" size="1261824" crc="98012aa4" sha1="1ffa90878ebcd530444e205641b5742d0b5142fc" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="etoile princess (1993)(exact)(disk 2 of 3)(data 1).dim" size="1261824" crc="b991ad11" sha1="c53b38a16400c079ec4f8b781b52a930e2b04452" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="etoile princess (1993)(exact)(disk 3 of 3)(data 2).dim" size="1261824" crc="c488d6d5" sha1="43ebb0dda32a6972a895e67a4b32f59328738b42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="europe">
+		<description>Europe Sensen</description>
+		<year>1992</year>
+		<publisher>Koei</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="europe sensen (1992)(koei)(disk 1 of 3)(disk a).dim" size="1261824" crc="06fdc909" sha1="e89b2a48c2f8240eebcb52fde2b596a1bab83e7d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="europe sensen (1992)(koei)(disk 2 of 3)(disk b).dim" size="1261824" crc="6a79e977" sha1="4433a8cee6970de9c618efb77f664ec4690710c0" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="europe sensen (1992)(koei)(disk 3 of 3)(disk c).dim" size="1261824" crc="356351c2" sha1="c1c6a9a4a72bf8b30845ff742008d2883a7f6fa9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Video Game Anthology Vol. 8 -->
+	<software name="excthour">
+		<description>Exciting Hour / Syusse Oozumou</description>
+		<year>1994</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="exciting hour jusse oozumou (1994)(dempa).dim" size="1261824" crc="eed6df13" sha1="3ce201f2f25cdce96e30fc5169b432c2951913be" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exon">
+		<description>eXOn</description>
+		<year>1991</year>
+		<publisher>Softec</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="exon (1991)(softec)(disk 1 of 2)(disk a).dim" size="1261824" crc="73177c77" sha1="2bc47c9a7900f4c03f72ae479d90d3c20e45ec4d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="exon (1991)(softec)(disk 2 of 2)(disk b).dim" size="1261824" crc="e2c96b7c" sha1="4e19fa2b690885bd90ac576350c95db4f6b0040f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exterlin">
+		<description>Exterlien</description>
+		<year>1990</year>
+		<publisher>D.O.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="exterlian (1990)(do)(disk 1 of 3)(disk a).dim" size="1261824" crc="2a6fce93" sha1="2f183c7ac32e04588de0d09a2d9ea00879e9849a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="exterlian (1990)(do)(disk 2 of 3)(disk b).dim" size="1261824" crc="31d099d3" sha1="df77c449e0b40d0353840e9a6976e37fb11efb16" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="exterlian (1990)(do)(disk 3 of 3)(disk c).dim" size="1261824" crc="673fd4cc" sha1="7e3dcf4d213ba0479948bf326e218c5ebbd5919d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ezoris">
+		<description>Ezoris</description>
+		<year>1989</year>
+		<publisher>K.W.P.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ezoris (1989)(k.w.p).dim" size="1261824" crc="8d6f1358" sha1="4b3e3b0792276eccc61811107bf600ca596e181f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="shortname">
+		<description>desc</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+	</software>
+-->
 
 	<software name="human68k">
 		<description>Human 68k OS (v2.0)</description>
