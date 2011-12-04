@@ -1339,6 +1339,13 @@ void wd177x_t::live_run(attotime limit)
 
 			// Incorrect, hmmm
 			// Probably >2 + not just after a sync if <16
+
+			// Transitions 00..00 -> 4489.4489.4489 at varied syncs:
+			//  0: 00.00.14.a1   1: ff.fe.c2.a1   2: 00.01.14.a1   3: ff.fc.c2.a1
+			//  4: 00.02.14.a1   5: ff.f8.c2.a1   6: 00.05.14.a1   7: ff.f0.c2.a1
+			//  8: 00.00.0a.a1   9: ff.ff.e1.a1  10: 00.00.14.a1  11: ff.ff.ce.a1
+			// 12: 00.00.14.a1  13: ff.ff.c2.a1  14: 00.00.14.a1  15: ff.ff.c2.a1
+
 			bool output_byte = cur_live.bit_counter > 5;
 
 			cur_live.data_separator_phase = false;
