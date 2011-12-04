@@ -131,6 +131,21 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="diablop" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="diablo.bin" size="783745200" crc="3a0268cd" sha1="c29775b8eadca5be2ba35ec2a76f956d18416edc"/>
+		<rom name="diablo.cue" size="327"       crc="4ba55415" sha1="af32c37875d28eb30e6e841fe3ba35d943576e5f"/>
+		-->
+		<description>Diablo (Prototype)</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="diablo" sha1="00fe192c6ac3496c76e7f4f8af157b949073dda8" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dukettkp">
 		<!-- Original images (unknown source)
 		<rom name="ttk.mdf" size="287174880" crc="66ce93d8" sha1="17dc62d346b705fbf1fa657f6075075f11e7929e"/>
@@ -267,6 +282,21 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="rockmnx6" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="rockman_x6.bin" size="396577776" crc="b1442c95" sha1="51ec61dbb32c8144a48649309e9464a44672d654"/>
+		<rom name="rockman_x6.cue" size="73"        crc="5c05610d" sha1="3968ac1969c9bbcc9b2d3fa04682cc5efb98e23f"/>
+		-->
+		<description>Rockman X6 (Jpn, Prototype 20010928)</description>
+		<year>19??</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rockman_x6" sha1="0ff73049e29de65b67f7bc682a9354ecbe5c8ede" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="silenthp">
 		<!-- Original images (unknown source)
 		<rom name="silent1.bin" size="616518000" crc="8326dd8f" sha1="97c7d476c9e821b3d932139a0644c0c7593e1955"/>
@@ -341,6 +371,21 @@ A few comments on these:
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="thrill_kill_slus12345_frederico_psx_ud"  sha1="5ee0e947808176e37a946c69ee6234927a0b96cc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="traidp" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="tombraider.bin" size="615734784" crc="63999513" sha1="672efcd03a8342b0e54904adc606c5d140610c9b"/>
+		<rom name="tombraider.cue" size="2238"      crc="a1d37c30" sha1="fa46b66a3346a226817a6f1b5c5b843994854d64"/>
+		-->
+		<description>Tomb Raider (Prototype, 19960722)</description>
+		<year>1996</year>
+		<publisher>Core Design</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tomb raider (beta)(07-22-1996)" sha1="8efa97244b2b7744dde94c68497d370f9bf7c999" />
 			</diskarea>
 		</part>
 	</software>
@@ -472,4 +517,3 @@ A few comments on these:
 	</software>
 
 </softwarelist>
-
