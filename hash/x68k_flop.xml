@@ -575,7 +575,7 @@
 		<publisher>Sega-Dempa</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="disk 1.xdf" size="1261568" crc="d93369da" sha1="83166698f3abbbd8141f2c2d9360fb67188c3720" offset="0" />
+				<rom name="disk 1b.xdf" size="1261568" crc="d93369da" sha1="83166698f3abbbd8141f2c2d9360fb67188c3720" offset="0" />
 			</dataarea>
 		</part>
 	</software>
