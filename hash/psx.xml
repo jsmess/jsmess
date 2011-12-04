@@ -136,7 +136,7 @@ A few comments on these:
 		<rom name="ttk.mdf" size="287174880" crc="66ce93d8" sha1="17dc62d346b705fbf1fa657f6075075f11e7929e"/>
 		<rom name="ttk.mds" size="494"       crc="a068816f" sha1="66a69f81ed0d7d7b6967ce855364714f85f34792"/>
 		-->
-		<description>Duke Nukem Time to Kill (USA, Prototype?)</description>
+		<description>Duke Nukem Time to Kill (USA, Prototype)</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
 		<part name="cdrom" interface="psx_cdrom">
