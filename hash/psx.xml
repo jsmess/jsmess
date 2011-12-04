@@ -17,9 +17,9 @@ A few comments on these:
       TRACK 1 MODE2/2352
       INDEX 1 00:00:00
    This might have introduced errors in the procedure, so it would be good to keep around the original files for later checks
-5. releases in mdf/mds format or cdi format (none included atm) have been mounted in ISOBuster and raw ripped to bin/cue, so
-   there is the possibility that subtle errors are introduced either in this procedure, or in the original creation of the
-   mdf/mds/cdi image.
+5. releases in mdf/mds format or cdi format have been mounted in ISOBuster and raw ripped to bin/cue, so there is the possibility 
+   that subtle errors are introduced either in this procedure, or in the original creation of the mdf/mds/cdi image. These should
+   be verified with the original media, and are marked as bad dumps.
 -->
 
 <!-- Prototype disks -->
@@ -55,7 +55,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="biohaza" cloneof="biohaz">
+	<software name="biohazpb" cloneof="biohazp">
 		<!-- Original images (from drx)
 		<rom name="biohazard - 1995 - 08 - 04 - sample.bin" size="20057856" crc="a64e5922" sha1="c1a293f0183c3fb912794dc4cbbca3ca71d7ef31"/>
 		<rom name="biohazard - 1995 - 08 - 04 - sample.cue" size="101" crc="389803a9" sha1="be53c93c21aefa9e2fcdedc6eec7be381b2032b6"/>
@@ -70,7 +70,7 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="biohaz">
+	<software name="biohazpa" cloneof="biohazp">
 		<!-- Original images (from drx)
 		<rom name="biohazard - 1995 - 10 - 04 - sample.bin" size="100420992" crc="e417d9a6" sha1="f9f8afac9b08fd1a79d9ecfd93027defaac7fc7e"/>
 		<rom name="biohazard - 1995 - 10 - 04 - sample.cue" size="101" crc="39e8977b" sha1="24a10fe354a45a87b6cf08b49a8741e4c3f3de95"/>
@@ -81,6 +81,21 @@ A few comments on these:
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="biohazard - 1995 - 10 - 04 - sample" sha1="7c1e9f60c045fcf984c91dbaad7421d73a8aec73" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="biohazp">
+		<!-- Original images (unknown source)
+		<rom name="bio hazard (j) (sample 1996.01.31) [slps-00222].bin" size="735818496" crc="af067e3c" sha1="35a718d090bbedcb40974f2f07d33e255dc57529"/>
+		<rom name="bio hazard (j) (sample 1996.01.31) [slps-00222].cue" size="115"       crc="bf382b9a" sha1="6d918de5f48d78546c569e374c2aa45f340e80c9"/>
+		-->
+		<description>BioHazard (Jpn, Prototype 19960131)</description>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bio hazard (j) (sample 1996.01.31) [slps-00222]" sha1="e73192b6a3f573b4b04e9dd4ba90275d9d978b7a" />
 			</diskarea>
 		</part>
 	</software>
@@ -116,13 +131,43 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="dukettkp">
+		<!-- Original images (unknown source)
+		<rom name="ttk.mdf" size="287174880" crc="66ce93d8" sha1="17dc62d346b705fbf1fa657f6075075f11e7929e"/>
+		<rom name="ttk.mds" size="494"       crc="a068816f" sha1="66a69f81ed0d7d7b6967ce855364714f85f34792"/>
+		-->
+		<description>Duke Nukem Time to Kill (USA, Prototype?)</description>
+		<year>1998</year>
+		<publisher>GT Interactive</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ttk" sha1="4531bb227e2444fbc10ee53807c71a309637c55e" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="globldom" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="global domination [ntsc-u][slus-01419].bin" size="611564688" crc="f5e70299" sha1="35b457af1241c333d82a5f606f68818f28ea4403"/>
+		<rom name="global domination [ntsc-u][slus-01419].cue" size="105"       crc="8a9e7192" sha1="3eef0d1ebe2ffc2b54e07d68dcf059a2093517cd"/>
+		-->
+		<description>Global Domination (USA, Prototype)</description>
+		<year>1998?</year>
+		<publisher>Psygnosis</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="slus-01419" sha1="b8df7f15e32150e703780951fd7ccb6914c75c06" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="kain2p1" supported="no">
 		<!-- Original images (unknown source)
 		<rom name="legacy of kain - soul reaver [beta 6-28-99][ntsc-u] [slus-00708].iso" size="687872976"
 		-->
 		<description>Legacy of Kain - Soul Reaver (USA, Prototype 19990628)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Eidos</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="legacy of kain - soul reaver (usa, prototype 19990628)" sha1="d0df73cdbfc9ef35076f13f9996593f2e8f50130" />
@@ -130,15 +175,15 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="kain2p2" supported="no">
+	<software name="kain2p2" cloneof="kain2p1" supported="no">
 		<!-- Original images (unknown source)
 		<rom name="sr1-psx-beta.ccd" size="772" crc="250f9eb1"/>
 		<rom name="sr1-psx-beta.img" size="635820864" crc="22f06bfd"/>
 		<rom name="sr1-psx-beta.sub" size="25951872" crc="4183f8c3"/>
 		-->
 		<description>Legacy of Kain - Soul Reaver (USA, Prototype 19990512)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Eidos</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="legacy of kain - soul reaver (usa, prototype 19990512)" sha1="0255d212fba97680a57c7235d172940978d6c8d2" />
@@ -161,6 +206,22 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="person2p" supported="no">
+		<!-- L1+R1+START+SELECT brings up the debug menu -->
+		<!-- Original images (unknown source)
+		<rom name="persona2xus.bin" size="724992240" crc="9eb5619d" sha1="8dfb6d2e08257525566c80d8e17c141928290d47"/>
+		<rom name="persona2xus.cue" size="77"        crc="9d8dc4db" sha1="8977b08c99e52e3b1acf8c40b131faba2f9acb5a"/>
+		-->
+		<description>Persona 2 - Eternal Punishment (Prototype? Debug)</description>
+		<year>2000</year>
+		<publisher>Atlus</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="persona2xus" sha1="63910ca0f84d97496c5f4498e7a8d70299b14d64" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="rockman8" supported="no">
 		<!-- Original images released on early March 2011 (March the 3rd??) by Henger83 and Junker
 		<rom name="rockman 8 beta v1.bin" size="53352768" crc="bb8df0ca" sha1="69ed6c03831f9dae6bcf8c2e54a92935261a9cd3"/>
@@ -168,7 +229,7 @@ A few comments on these:
 		-->
 		<description>Rockman 8 (Jpn, Prototype v1)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="rockman 8 beta v1" sha1="ef22ee21d0ab15b69c64d951e69099c5e46e189a" />
@@ -183,7 +244,7 @@ A few comments on these:
 		-->
 		<description>Rockman 8 (Jpn, Prototype 1)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="rockman 8 beta 1" sha1="fa1b3e5cac9463866f51e5f67e5321bc532b5a2b" />
@@ -198,10 +259,40 @@ A few comments on these:
 		-->
 		<description>Rockman 8 (Jpn, Prototype 2)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Capcom</publisher>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="rockman 8 beta 2" sha1="ee3149d9579cdf1ad7b32d2ab9103e9f9353e732" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="silenthp">
+		<!-- Original images (unknown source)
+		<rom name="silent1.bin" size="616518000" crc="8326dd8f" sha1="97c7d476c9e821b3d932139a0644c0c7593e1955"/>
+		<rom name="silent1.cue" size="68"        crc="670aa37f" sha1="14fc981dd80051cbec08aec18afa8e5679be959f"/>
+		-->
+		<description>Silent Hill (USA, Prototype)</description>
+		<year>1999</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="silent1" sha1="95a9401a0f0aaa1b6a1e27324651ed8f67690eb7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="spiritm" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="spirit master (u) (prototype).bin" size="13547520" crc="92bf9773" sha1="98d5b62fed0ec04ba09577654f4366529bc0cab4"/>
+		<rom name="spirit master (u) (prototype).cue" size="95"       crc="9fdd687b" sha1="4184f28f49f29bb14387f9a364ce21b448da8147"/>
+		-->
+		<description>Spirit Master (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>Acclaim</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="spirit master (u) (prototype)" sha1="891a5584995be8c319c7422fa5cca1da60afebc8" />
 			</diskarea>
 		</part>
 	</software>
@@ -271,6 +362,21 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="thpsp" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="tony hawk's pro skater (usa) [beta].bin" size="36764112" crc="4dc94772" sha1="662f7aa67e1b9ac67cb479f80b55c0cf44305a34"/>
+		<rom name="tony hawk's pro skater (usa) [beta].cue" size="110"      crc="d4a2b89d" sha1="05c43fcd61f10a50e6594e4c2a92eadf3d76bb44"/>
+		-->
+		<description>Tony Hawk's Pro Skater (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tony hawk's pro skater (usa) [beta]" sha1="f326e476b44f3d011efd65197df633b446f77101" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="torc" supported="no">
 		<!-- Original images (unknown source)
 		<rom name="killwheel.nrg" size="379698268" crc="4bb001c3"/>
@@ -318,6 +424,37 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="sotne3">
+		<!-- Original images (unknown source)
+		<rom name="castlevania - symphony of the night e3 demo.img" size="587811840" crc="22b981c9" sha1="c94c1fb5548c21721835928f294d0301452eb90d"/>
+		<rom name="castlevania - symphony of the night e3 demo.ccd" size="964"       crc="d6a03944" sha1="b1a1e08e3837d3d39949097fb1c5f12b648aa5ce"/>
+		<rom name="castlevania - symphony of the night e3 demo.cue" size="163"       crc="919c7241" sha1="09413093892a1cb79b5bf99e0424000ace0eeae8"/>
+		-->
+		<description>Castlevania - Symphony of the Night (E3 Demo, 1997)</description>
+		<year>1997</year>
+		<publisher>Konami</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sotn e3 demo" sha1="c3f5a41ee4722660ce9a708c22990bf9656d5949" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dukettkd">
+		<!-- Original images (unknown source)
+		<rom name="duke nukem - time to kill (usa) (demo).bin" size="139252512" crc="be052dcf" sha1="7be0248928539529667b99691917b95ea918ef38"/>
+		<rom name="duke nukem - time to kill (usa) (demo).cue" size="104"       crc="aa45b70c" sha1="4a2d18dcd9e989e7aa993562eb25058e19fb5f5a"/>
+		-->
+		<description>Duke Nukem Time to Kill (USA, Demo)</description>
+		<year>1998</year>
+		<publisher>GT Interactive</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="slus-90036" sha1="28db4fb51b226d63cb5d2f1216c243c95a43e8a4" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="traidd">
 		<!-- Original images (from drx)
 		<rom name="tr1.ccd" size="768" crc="66258656" sha1="e22fac1714d6bf6582dc721bde5999c5920ef53a"/>
@@ -335,3 +472,4 @@ A few comments on these:
 	</software>
 
 </softwarelist>
+
