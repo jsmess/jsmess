@@ -225,7 +225,7 @@ void wd177x_t::seek_continue()
 			if(command & 0x04) {
 				sub_state = SCAN_ID;
 				counter = 0;
-				live_start(SEARCH_ADDRESS_MARK);
+				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			command_end();
@@ -233,12 +233,12 @@ void wd177x_t::seek_continue()
 
 		case SCAN_ID:
 			if(cur_live.idbuf[0] != track) {
-				live_start(SEARCH_ADDRESS_MARK);
+				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			if(cur_live.crc) {
 				status |= S_CRC;
-				live_start(SEARCH_ADDRESS_MARK);
+				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			command_end();
@@ -311,22 +311,22 @@ void wd177x_t::read_sector_continue()
 		case SETTLE_DONE:
 			sub_state = SCAN_ID;
 			counter = 0;
-			live_start(SEARCH_ADDRESS_MARK);
+			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
 			if(!sector_matches()) {
-				live_start(SEARCH_ADDRESS_MARK);
+				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			if(cur_live.crc) {
 				status |= S_CRC;
-				live_start(SEARCH_ADDRESS_MARK);
+				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			sector_size = size_codes[cur_live.idbuf[3] & 3];
 			sub_state = SECTOR_READ;
-			live_start(SEARCH_ADDRESS_MARK);
+			live_start(SEARCH_ADDRESS_MARK_DATA);
 			return;
 
 		case SCAN_ID_FAILED:
@@ -338,9 +338,9 @@ void wd177x_t::read_sector_continue()
 			if(cur_live.crc)
 				status |= S_CRC;
 
-			if(command & 0x10) {
+			if(command & 0x10 && !(status & S_RNF)) {
 				sector++;
-				sub_state = SPINUP_DONE;
+				sub_state = SETTLE_DONE;
 			} else {
 				command_end();
 				return;
@@ -457,7 +457,7 @@ void wd177x_t::read_id_continue()
 		case SETTLE_DONE:
 			sub_state = SCAN_ID;
 			counter = 0;
-			live_start(SEARCH_ADDRESS_MARK);
+			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
@@ -596,17 +596,17 @@ void wd177x_t::write_sector_continue()
 		case SETTLE_DONE:
 			sub_state = SCAN_ID;
 			counter = 0;
-			live_start(SEARCH_ADDRESS_MARK);
+			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
 			if(!sector_matches()) {
-				live_start(SEARCH_ADDRESS_MARK);
+				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			if(cur_live.crc) {
 				status |= S_CRC;
-				live_start(SEARCH_ADDRESS_MARK);
+				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			sector_size = size_codes[cur_live.idbuf[3] & 3];
@@ -940,8 +940,10 @@ void wd177x_t::index_callback(floppy_image_device *floppy, int state)
 
 	case SCAN_ID:
 		counter++;
-		if(counter == 5)
+		if(counter == 5) {
 			sub_state = SCAN_ID_FAILED;
+			live_abort();
+		}
 		break;
 
 	case WAIT_INDEX:
@@ -1125,7 +1127,7 @@ void wd177x_t::live_run(attotime limit)
 
 	for(;;) {
 		switch(cur_live.state) {
-		case SEARCH_ADDRESS_MARK:
+		case SEARCH_ADDRESS_MARK_HEADER:
 			if(read_one_bit(limit))
 				return;
 #if 0
@@ -1141,16 +1143,15 @@ void wd177x_t::live_run(attotime limit)
 					cur_live.bit_counter);
 #endif
 
-			if(cur_live.shift_reg == 0x4489 || cur_live.shift_reg == 0x5224) {
-				if(cur_live.shift_reg == 0x4489)
-					cur_live.crc = 0x443b;
+			if(cur_live.shift_reg == 0x4489) {
+				cur_live.crc = 0x443b;
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
-				cur_live.state = READ_BLOCK_HEADER;
+				cur_live.state = READ_HEADER_BLOCK_HEADER;
 			}
 			break;
 
-		case READ_BLOCK_HEADER:
+		case READ_HEADER_BLOCK_HEADER: {
 			if(read_one_bit(limit))
 				return;
 #if 0
@@ -1165,46 +1166,30 @@ void wd177x_t::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter);
 #endif
-			if(cur_live.bit_counter != 16) {
-				if(cur_live.shift_reg == 0x4489 || cur_live.shift_reg == 0x5224) {
-					if(cur_live.shift_reg == 0x4489)
-						cur_live.crc = 0x443b;
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
-				}
+			if(cur_live.bit_counter & 15)
+				break;
+
+			int slot = cur_live.bit_counter >> 4;
+
+			if(slot < 3) {
+				if(cur_live.shift_reg != 0x4489)
+					cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
+				break;
+			}
+			if(cur_live.data_reg != 0xfe && cur_live.data_reg != 0xff) {
+				cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
 				break;
 			}
 
 			cur_live.bit_counter = 0;
 
-			if(cur_live.shift_reg == 0x4489 || cur_live.shift_reg == 0x5224)
-				break;
-
-			switch(cur_live.data_reg & 0xfe) {
-			case 0xfa: // Sector data
-				if(sub_state == SECTOR_READ) {
-					cur_live.state = READ_SECTOR_DATA;
-					break;
-				}
-				cur_live.state = SEARCH_ADDRESS_MARK;
-				break;
-
-			case 0xfe: // ID
-				if(main_state == READ_ID) {
-					cur_live.state = READ_ID_BLOCK_TO_DMA;
-					break;
-				}
-				if(sub_state == SCAN_ID) {
-					cur_live.state = READ_ID_BLOCK_TO_LOCAL;
-					break;
-				}
-
-			default:
-				cur_live.state = SEARCH_ADDRESS_MARK;
-				break;
-			}
+			if(main_state == READ_ID)
+				cur_live.state = READ_ID_BLOCK_TO_DMA;
+			else
+				cur_live.state = READ_ID_BLOCK_TO_LOCAL;
 
 			break;
+		}
 
 		case READ_ID_BLOCK_TO_LOCAL: {
 			if(read_one_bit(limit))
@@ -1245,6 +1230,76 @@ void wd177x_t::live_run(attotime limit)
 			checkpoint();
 			break;
 
+		case SEARCH_ADDRESS_MARK_DATA:
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
+#endif
+			if(cur_live.bit_counter > 43*16) {
+				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+				return;
+			}
+
+			if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg == 0x4489) {
+				cur_live.crc = 0x443b;
+				cur_live.data_separator_phase = false;
+				cur_live.bit_counter = 0;
+				cur_live.state = READ_DATA_BLOCK_HEADER;
+			}
+			break;
+
+		case READ_DATA_BLOCK_HEADER: {
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter);
+#endif
+			if(cur_live.bit_counter & 15)
+				break;
+
+			int slot = cur_live.bit_counter >> 4;
+
+			if(slot < 3) {
+				if(cur_live.shift_reg != 0x4489) {
+					live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+					return;
+				}
+				break;
+			}
+			if((cur_live.data_reg & 0xfe) != 0xfa && (cur_live.data_reg & 0xfe) != 0xfc) {
+				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+				return;
+			}
+
+			cur_live.bit_counter = 0;
+			cur_live.state = READ_SECTOR_DATA;
+			break;
+		}
+
+		case SEARCH_ADDRESS_MARK_DATA_FAILED:
+			status |= S_RNF;
+			cur_live.state = IDLE;
+			return;
+				
 		case READ_SECTOR_DATA: {
 			if(read_one_bit(limit))
 				return;
@@ -1312,10 +1367,9 @@ void wd177x_t::live_run(attotime limit)
 
 			switch(data) {
 			case 0xf5:
-				if(cur_live.previous_type != live_info::PT_SYNC)
-					cur_live.crc = 0xffff;
 				live_write_raw(0x4489);
-				cur_live.previous_type = live_info::PT_SYNC;
+				cur_live.crc = 0x968b; // Ensures that the crc is cdb4 after writing the byte
+				cur_live.previous_type = live_info::PT_NONE;
 				break;
 			case 0xf6:
 				cur_live.previous_type = live_info::PT_NONE;
@@ -1335,6 +1389,7 @@ void wd177x_t::live_run(attotime limit)
 				live_write_mfm(data);
 				break;
 			}
+			fprintf(stderr, "- %02x %04x\n", data, cur_live.crc);
 			set_drq();
 			cur_live.state = WRITE_BYTE;
 			cur_live.bit_counter = 16;
