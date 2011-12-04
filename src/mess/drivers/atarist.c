@@ -23,6 +23,7 @@
 */
 
 #include "formats/st_dsk.h"
+#include "formats/pasti_dsk.h"
 #include "formats/mfi_dsk.h"
 #include "formats/ipf_dsk.h"
 
@@ -71,7 +72,8 @@ void st_state::flush_dma_fifo()
 
 			if (LOG) logerror("Flushing DMA FIFO %u data %04x to address %06x\n", m_fdc_fifo_sel, data, m_dma_base);
 
-			program->write_word(m_dma_base, data);
+			if(m_dma_base >= 8)
+				program->write_word(m_dma_base, data);
 			m_dma_base += 2;
 		}
 		m_fdc_dmabytes -= 16;
@@ -2334,7 +2336,7 @@ void stbook_state::machine_start()
 }
 
 const floppy_format_type st_state::floppy_formats[] = {
-	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_IPF_FORMAT, FLOPPY_MFI_FORMAT,
+	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_PASTI_FORMAT, FLOPPY_IPF_FORMAT, FLOPPY_MFI_FORMAT,
 	NULL
 };
 

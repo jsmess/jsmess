@@ -22,7 +22,10 @@
 
 #include "formats/hxcmfm_dsk.h"
 #include "formats/ami_dsk.h"
+
 #include "formats/st_dsk.h"
+#include "formats/pasti_dsk.h"
+
 #include "formats/dsk_dsk.h"
 
 static floppy_format_type floppy_formats[] = {
@@ -34,6 +37,7 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_ST_FORMAT,
 	FLOPPY_MSA_FORMAT,
+	FLOPPY_PASTI_FORMAT,
 
 	FLOPPY_DSK_FORMAT
 };
