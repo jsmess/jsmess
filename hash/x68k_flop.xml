@@ -5494,6 +5494,675 @@
 		</part>
 	</software>
 
+	<software name="f1fstlap">
+		<description>F-1 Fastest Lap</description>
+		<year>1991</year>
+		<publisher>Michael Company</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="f-1 fastest lap (1991)(michael company).dim" size="1261824" crc="f37c2409" sha1="b904cb21eac82077e814871a49c9ec52b62079f1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15eagle">
+		<description>F-15 Strike Eagle II</description>
+		<year>1991</year>
+		<publisher>Microprose</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="f-15 strike eagle ii (1991)(microprose)(disk 1 of 2)(disk a).dim" size="1261824" crc="a36b92ae" sha1="856c597c8ed8737140e18d548cc9f1a2f807c97b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="f-15 strike eagle ii (1991)(microprose)(disk 2 of 2)(disk b).dim" size="1261824" crc="14c70e6d" sha1="93f9b5df7d4027f9bb7030bede13955cc3e2d324" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flstory">
+		<description>The Fairyland Story</description>
+		<year>1991</year>
+		<publisher>SPS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fairyland story, the (1991)(sps)(disk 1 of 2)(disk a).dim" size="1261824" crc="48e47882" sha1="6bf80d71e4ad50475fbbff488042641ff4222091" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fairyland story, the (1991)(sps)(disk 2 of 2)(disk b).dim" size="1261824" crc="02a7de1d" sha1="2f355a7bf0c209fa48fbcb59af2a958b813b7fae" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fairytal">
+		<description>Fairytale Kaizoku Han</description>
+		<year>199?</year>
+		<publisher>Takeru</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fairytale kaizoku han (199x)(takeru)(disk 1 of 2)(disk a).dim" size="1261824" crc="855e1c9f" sha1="67d75d621ff046a4d9d2ffbdd092b8aabbf743d8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fairytale kaizoku han (199x)(takeru)(disk 2 of 2)(disk b).dim" size="1261824" crc="2c744608" sha1="03861ec1b8043325359ea6962a8e4af9126684d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famass">
+		<description>Fa-Mass</description>
+		<year>1990</year>
+		<publisher>VHS / Demon's</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="famass (1990)(vhs - demon's).dim" size="1261824" crc="fffbf708" sha1="2228561a5d6f8d0d15d2b1f517fdca60d2d7c228" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fancyqix">
+		<description>Fancy Qix</description>
+		<year>1990</year>
+		<publisher>A.H.S.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fancy qix (1990)(a.h.s.).dim" size="1261824" crc="0f76b0ae" sha1="3025a195e3d3fed36635d81cbd6f5e274957732b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantsht">
+		<description>Fantasy Shooting</description>
+		<year>1989</year>
+		<publisher>Michael Company</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fantasy shooting (1989)(michael company).dim" size="1261824" crc="90f93986" sha1="175dd9a5332a180c24f765709ec271c8caa61a3c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantzone">
+		<description>Fantasy Zone</description>
+		<year>1989</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fantasy zone (1989)(dempa).dim" size="1261824" crc="60c84822" sha1="db94c8e7ce2f5058627134658102918d6d82f986" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farewell">
+		<description>Farewell Disk</description>
+		<year>1994</year>
+		<publisher>Hayabusa Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="farewell disk (1994)(hayabusa soft).dim" size="1261824" crc="98182bfd" sha1="43194b99d3a25596d33b0654a31a39e7d11d2945" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farside">
+		<description>Far Side Moon - Chikyuu Boueidan 2</description>
+		<year>1990</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="far side moon chikyuu boueidan 2 (1990)(artdink)(disk 1 of 3)(system).dim" size="1261824" crc="f6556772" sha1="7b788d916921d2bacc695e7c27d4ead6499d764a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="far side moon chikyuu boueidan 2 (1990)(artdink)(disk 2 of 3)(game).dim" size="1261824" crc="ee33aca9" sha1="7e97f22f0e7ed51d430d926054e587ca39e20eed" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="far side moon chikyuu boueidan 2 (1990)(artdink)(disk 3 of 3)(data).dim" size="1261824" crc="8a404aaf" sha1="f34123596df88876dc074545ec61948071844df5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fevrie">
+		<description>Fevrie</description>
+		<year>19??</year>
+		<publisher>Jeudi</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fevrie (19xx)(jeudi).dim" size="1261824" crc="274fd143" sha1="fec22f39849da5eddc94d1fc65714464f0ec1bb1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffight">
+		<description>Final Fight</description>
+		<year>1992</year>
+		<publisher>Capcom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="final fight (1992)(capcom)(disk 1 of 2).dim" size="1261824" crc="d5f1b939" sha1="a9da4a98967134dc2145e10d4d1c47e0091c4831" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="final fight (1992)(capcom)(disk 2 of 2).dim" size="1261824" crc="2c3547c3" sha1="31d1438d78c6a5fa0ab0347a4d2456662f3aba6f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fire">
+		<description>Fire</description>
+		<year>19??</year>
+		<publisher>Takahashi Tokiyuki</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fire (19xx)(takahashi tokiyuki).dim" size="1261824" crc="a0bb3b27" sha1="0c7c37fcd7b4ea347217a7a9d4ec8f3f0631718c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firia">
+		<description>Firia</description>
+		<year>1991</year>
+		<publisher>Scuderia Phantom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="firia (1991)(scuderia phantom).dim" size="1261824" crc="ad5c40ce" sha1="e94dc201cf6f57016e0c60b80f2d8876fd06635f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fstblow">
+		<description>First Blow</description>
+		<year>199?</year>
+		<publisher>Project G</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first blow (199x)(project g).dim" size="1261824" crc="dd517b19" sha1="54e1bac4157dfd6acac81b2731f24e747a7f805f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fcrisis">
+		<description>First Crisis ma Jin no Toubou</description>
+		<year>1992</year>
+		<publisher>Minkey Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first crisis ma jin no toubou (1992)(minkey soft).dim" size="1261824" crc="6826a023" sha1="2c6ea2f3e6f279cf2bb28068c3965d88691a9fe9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fmaindsh">
+		<description>First Main Disk Pasta</description>
+		<year>1993</year>
+		<publisher>Toukyou Kogei Daigaku Programming Kenkyuukai</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first main dish pasta (1993)(toukyou kogei daigaku programming kenkyuukai).dim" size="1261824" crc="490a2790" sha1="9fd2d3037c87f57e531b73a9f6b291b0183d1cc4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fmission">
+		<description>First Mission</description>
+		<year>1989</year>
+		<publisher>YOH</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first mission (1989)(yoh).dim" size="1261824" crc="434c7cea" sha1="07905009ae8547ccdb6a80ea9c9b13dcd44fbcfd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fmissio2">
+		<description>First Mission II - Final Mission</description>
+		<year>1990</year>
+		<publisher>YOH</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first mission ii final mission (1990)(yoh)(disk 1 of 2)(disk a).dim" size="1261824" crc="402433d9" sha1="dc5842643230ff35aaa739a4ffcb7206f9da3ac9" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first mission ii final mission (1990)(yoh)(disk 2 of 2)(disk b).dim" size="1261824" crc="48f0a79b" sha1="9739b9e12d36aa50ec978b1ea7df1d546fdfb8bd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fqueen2">
+		<description>First Queen II</description>
+		<year>19??</year>
+		<publisher>KSK</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first queen ii (19xx)(ksk)(disk 1 of 3).dim" size="1261824" crc="493b07cc" sha1="895729119fef614d11e07ca9faed5152a6612b75" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first queen ii (19xx)(ksk)(disk 2 of 3).dim" size="1261824" crc="a3aa5435" sha1="0b517738674070a7e0171195eaa54d0ce34e4eac" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="first queen ii (19xx)(ksk)(disk 3 of 3)(opening).dim" size="1261824" crc="3f6a7e20" sha1="e3d7b6cdec3847c7fec65ebff0431f318b1ce41d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flmwing">
+		<description>Flame Wing (v1.02)</description>
+		<year>1994</year>
+		<publisher>Itasenpara</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="flame wing v1.02 (1994)(itasenpara).dim" size="1261824" crc="2711eff3" sha1="63e573eddd04e17f7b39aa4a79ec0b96c3222a27" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flmdart">
+		<description>Flaming Dart</description>
+		<year>1992</year>
+		<publisher>Kei-H</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="flaming dart (1992)(kei-h).dim" size="1261824" crc="eba1e59f" sha1="765ee1d8f2be86f3cee6db0c0a6c00787bcbc5ef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappy2">
+		<description>Flappy 2 - Blue Star Fukkatsu no Hi</description>
+		<year>1989</year>
+		<publisher>db-Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="flappy 2 blue star fukkatsu no hi (1989)(db-soft).dim" size="1261824" crc="3bf33e12" sha1="2bef34dccf881abc94bb9fb1f9fad3a7ac2b62d2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipflop">
+		<description>Flip Flop</description>
+		<year>1990</year>
+		<publisher>Maitake</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="flip flop (1990)(maitake).dim" size="1261824" crc="ae3ce771" sha1="5a9b5a190c542c9170b80e44e143584bd07d9d72" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipull">
+		<description>Flipull</description>
+		<year>1993</year>
+		<publisher>Mro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="flipull (1993)(mro).dim" size="1261824" crc="ea244add" sha1="bf19494fd3d8834f89bf4cd5e67debd177198f8d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fly">
+		<description>Fly</description>
+		<year>1990</year>
+		<publisher>Login</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fly (1990)(login).dim" size="1261824" crc="7c155cfc" sha1="d22f115b0994cb3cbb311f61d230153b9edb1428" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flyshoot">
+		<description>Fly Shooters</description>
+		<year>1991</year>
+		<publisher>Pineapple</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fly shooters (1991)(pineapple).dim" size="1261824" crc="35465b71" sha1="43a1ce34e92fec61e3757526671ab160c4164588" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formulax">
+		<description>Formula X</description>
+		<year>1992</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="formula x (1992)(-).dim" size="1261824" crc="6ddf2fd0" sha1="d56c0707d3af6f5ef1b9a70298e373737ee509a1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formxt">
+		<description>Formula X Tokubetsu Han</description>
+		<year>1991</year>
+		<publisher>Hayabusa Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="formula x tokubetsu han (1991)(hayabusa soft).dim" size="1261824" crc="9bcf6be3" sha1="7ca4405fb0212ea4473d782cccf01bb9293f0c2c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formxy">
+		<description>Formula X Yosen Han</description>
+		<year>1991</year>
+		<publisher>Hayabusa Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="formula x yosen han (1991)(hayabusa soft).dim" size="1261824" crc="91622ff9" sha1="389d8ec15a3362d2f44d2bdb19ac66057d2133fd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortatk">
+		<description>Fortress Attack</description>
+		<year>1993</year>
+		<publisher>Shibahara A.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fortress attack (1993)(shibahara a.)(disk 1 of 2).dim" size="1261824" crc="a919b870" sha1="ad7a2a1400c2bc9106021370f9d959f11e96d56e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fortress attack (1993)(shibahara a.)(disk 2 of 2).dim" size="1261824" crc="ebbf3a16" sha1="28db90ef8a65d405243bf7a43a235ad1a0c5938b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortyone">
+		<description>Forty-One</description>
+		<year>1993</year>
+		<publisher>Shin</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="forty-one (1993)(shin).dim" size="1261824" crc="53ed5c66" sha1="dad39b693dc4bb78d9b308dd4c87c538a2178c6e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourfall">
+		<description>Four'll Fall</description>
+		<year>19??</year>
+		<publisher>Magical Knights' Connection</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="four'll fall (19xx)(magical knights' connection).dim" size="1261824" crc="1816cdda" sha1="c858a13c849cc087ff189b0732f4c9664d59baab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourfallu" cloneof="fourfall">
+		<description>Four'll Fall (update)</description>
+		<year>19??</year>
+		<publisher>Magical Knights' Connection</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="four'll fall (19xx)(magical knights' connection)[update].dim" size="1261824" crc="38a73d84" sha1="8dea8e17fa5a3da50efd4e448d2d839001c2341b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foxy2">
+		<description>Foxy 2</description>
+		<year>1991</year>
+		<publisher>Elf</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="foxy 2 (1991)(elf)(disk 1 of 4).dim" size="1261824" crc="d6fcc249" sha1="9b1df51425cf18233470f4d66d9b13b1814f6806" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="foxy 2 (1991)(elf)(disk 2 of 4).dim" size="1261824" crc="e8cac94f" sha1="f6d7d383a072da2579a4df3394c05e155b29ad9f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="foxy 2 (1991)(elf)(disk 3 of 4).dim" size="1261824" crc="9b512368" sha1="5b24fe203d284a02f53dc79ddab466c831fc902a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="foxy 2 (1991)(elf)(disk 4 of 4).dim" size="1261824" crc="117fe4f3" sha1="1984a10666bae88ad7fdea52f373174d6f5e0ecf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frapull">
+		<description>Frapull</description>
+		<year>19??</year>
+		<publisher>D Bou / Wing K.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="frapull (19xx)(d bou - wing k.).dim" size="1261824" crc="0a98af96" sha1="108dc4291a07f0da16e61f886eec7fe91dfb8074" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frayd">
+		<description>Fray (demo)</description>
+		<year>199?</year>
+		<publisher>Gold Cats Project</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fray (demo) (199x)(gold cats project).dim" size="1261824" crc="785ff64a" sha1="9edf2b5b62032cc34e6d29a895c546338d66f7ee" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="friskytm">
+		<description>Frisky Tom</description>
+		<year>1995</year>
+		<publisher>XYZ</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="frisky tom (1995)(xyz).dim" size="1261824" crc="f7603f3c" sha1="c62c917ba3d9c2bc75f58b598418e064c2610815" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frog">
+		<description>Frog</description>
+		<year>19??</year>
+		<publisher>Takahashi T.</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="frog (19xx)(takahashi t.).dim" size="1261824" crc="eb107194" sha1="80f9f6ad19621e04320386eaef47787ddfa5e741" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+		<description>Frogger</description>
+		<year>1995</year>
+		<publisher>Tiny-Tomo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="frogger (1995)(tiny-tomo).dim" size="1261824" crc="44a8b164" sha1="859435f619a10669525d28895d5fe378b9baeba8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froggero">
+		<description>Frogger (1991)</description>
+		<year>1991</year>
+		<publisher>Tiny-Tomo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="frogger (1991)(tiny-tomo).dim" size="1261824" crc="272fe6a8" sha1="540bdfa3e331dc826034bd149f76c6ee0289b8d0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffields">
+		<description>Fruits Fields</description>
+		<year>1988</year>
+		<publisher>Compac</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fruits fields (1988)(compac).dim" size="1261824" crc="f4219982" sha1="ff3f71101d1173da03eaa5cdcff7e2a9c0d0ff7e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fss">
+		<description>FSS Fantasy Saga System</description>
+		<year>1990</year>
+		<publisher>MNM Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fss fantasy saga system (1990)(mnm software)(disk 1 of 2)(system).dim" size="1261824" crc="fc92fb2b" sha1="a72c1f2a9f913f544453e6bdb6bd3b5c0c69c18e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fss fantasy saga system (1990)(mnm software)(disk 2 of 2)(data).dim" size="1261824" crc="9a7d9f8a" sha1="1214e43d98b9d9b7afc161f620dc8af0676ba028" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fthrottl">
+		<description>Full Throttle</description>
+		<year>1988</year>
+		<publisher>Sharp / SPS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="full throttle (1988)(sharp - sps)(disk 1 of 2)(disk a).dim" size="1261824" crc="a80efab1" sha1="34370d43dd897f7cb52535e9a6650b03970a3dea" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="full throttle (1988)(sharp - sps)(disk 2 of 2)(disk b).dim" size="1261824" crc="f580aed1" sha1="cfe7c4d6bb10074983a072da0baad1feac72cd73" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fushigid">
+		<description>Fushigi Densetsu</description>
+		<year>199?</year>
+		<publisher>Proceed</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi densetsu (199x)(proceed).dim" size="1261824" crc="96d978d4" sha1="0abede5c95deb44f94faf1237b994df017009276" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fushigik">
+		<description>Fushigi no Kabe</description>
+		<year>1988</year>
+		<publisher>System House Oh!</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no kabe (1988)(system house oh!)(disk 1 of 2).dim" size="1261824" crc="6c6073f5" sha1="6b1982c0d51fe2097370d47888907264cd9982e5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no kabe (1988)(system house oh!)(disk 2 of 2).dim" size="1261824" crc="8cdf8d9b" sha1="9f2472f9832554c3d347e9405d3cdf61e1e8ea20" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fuminadi">
+		<description>Fushigi no Umi no Nadia</description>
+		<year>1992</year>
+		<publisher>Gainax</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 1 of 9)(disk a).dim" size="1261824" crc="224c4d2c" sha1="8a8d6dd4c739c6690d2ef27084e0f99079d973c1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 2 of 9)(disk b).dim" size="1261824" crc="0e9c67ee" sha1="2dc7003f4f96bd8d0e0e9dfda23618eb405db543" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 3 of 9)(disk c).dim" size="1261824" crc="fb2a2b57" sha1="975363019a1c090ea0ea518c67c65ca2e70ec8f2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 4 of 9)(disk d).dim" size="1261824" crc="f8d51acd" sha1="6e17b57bc883e87a2d449b896e93c1621511207a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 5 of 9)(disk e).dim" size="1261824" crc="17837803" sha1="4324cfe863a5e2ec604c349a5e42960bb8a3b04e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 6 of 9)(disk f).dim" size="1261824" crc="c970c7fb" sha1="1756ff602c5be1bc56e57ae9e84a18eea25aa2b1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 7 of 9)(disk g).dim" size="1261824" crc="bb768375" sha1="4f2a7942fcb94eceec03ed351092bd81ce46a524" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 8 of 9)(disk h).dim" size="1261824" crc="00620339" sha1="ce733aaf84b6135328ada5a1850e871b8cea0c15" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fushigi no umi no nadia (1992)(gainax)(disk 9 of 9)(disk i).dim" size="1261824" crc="89d8e3a9" sha1="e8d5b543594d04396f18f2bb340cb482560b0992" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futwars">
+		<description>Future Wars</description>
+		<year>19??</year>
+		<publisher>Starcraft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="future wars (19xx)(starcraft).dim" size="1261824" crc="cbbc198b" sha1="faca37cfa30ed5b9beec5dc1790239dd708e78e2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fzsenki">
+		<description>FZ Senki Axis</description>
+		<year>1990</year>
+		<publisher>Wolf Team</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fz senki axis (1990)(wolf team)(disk 1 of 3).dim" size="1261824" crc="6caffda3" sha1="c18ec69db33ebc6a67740e65780966558a2faf1f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fz senki axis (1990)(wolf team)(disk 2 of 3).dim" size="1261824" crc="3b476e24" sha1="c80165fdca2e50d4b640a32334c51dc90e49fa85" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="fz senki axis (1990)(wolf team)(disk 3 of 3).dim" size="1261824" crc="c5396629" sha1="d4eab40a9804d3358b0b6c374dbbd82cf7dfa957" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="shortname">
 		<description>desc</description>
