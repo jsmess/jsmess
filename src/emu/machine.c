@@ -111,6 +111,7 @@
 #include "cheat.h"
 #include "ui.h"
 #include "uimenu.h"
+#include "uimain.h"
 #include "uiinput.h"
 #include "crsshair.h"
 #include "validity.h"

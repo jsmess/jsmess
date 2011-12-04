@@ -75,7 +75,7 @@ static void ui_mess_menu_populate_software_parts(running_machine &machine, ui_me
 			{
 				if (strcmp(interface, swpart->interface_) == 0)
 				{
-					software_part_state *entry = (software_part_state *) ui_menu_pool_alloc(menu, sizeof(*entry));
+					software_part_state *entry = (software_part_state *) menu->m_pool_alloc(sizeof(*entry));
 					// check if the available parts have specific part_id to be displayed (e.g. "Map Disc", "Bonus Disc", etc.)
 					// if not, we simply display "part_name"; if yes we display "part_name (part_id)"
 					astring menu_part_name(swpart->name);
@@ -85,9 +85,9 @@ static void ui_mess_menu_populate_software_parts(running_machine &machine, ui_me
 						menu_part_name.cat(software_part_get_feature(swpart, "part_id"));
 						menu_part_name.cat(")");
 					}
-					entry->part_name = ui_menu_pool_strdup(menu, swpart->name);	// part_name is later used to build up the filename to load, so we use swpart->name!
-					entry->interface = ui_menu_pool_strdup(menu, swpart->interface_);
-					ui_menu_item_append(menu, info->shortname, menu_part_name.cstr(), 0, entry);
+					entry->part_name = menu->pool_strdup(swpart->name);	// part_name is later used to build up the filename to load, so we use swpart->name!
+					entry->interface = menu->pool_strdup(swpart->interface_);
+					menu->item_append(info->shortname, menu_part_name.cstr(), 0, entry);
 				}
 			}
 		}
@@ -105,7 +105,7 @@ void ui_mess_menu_software_parts(running_machine &machine, ui_menu *menu, void *
 	const char *interface = sw_state->interface;
 
 	// generate list of available parts
-	if (!ui_menu_populated(menu))
+	if (!menu->populated())
 	{
 		if (sw_state->list_name)
 		{
@@ -114,7 +114,7 @@ void ui_mess_menu_software_parts(running_machine &machine, ui_menu *menu, void *
 	}
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	event = menu->process(0);
 
 	if (event != NULL && event->iptkey == IPT_UI_SELECT && event->itemref != NULL)
 	{
@@ -178,14 +178,14 @@ static software_entry_state *append_software_entry(ui_menu *menu, software_menu_
 		if (strcmp(interface, swpart->interface_) == 0)
 		{
 			// allocate a new entry
-			entry = (software_entry_state *) ui_menu_pool_alloc(menu, sizeof(*entry));
+			entry = (software_entry_state *) menu->m_pool_alloc(sizeof(*entry));
 			memset(entry, 0, sizeof(*entry));
 
-			entry->short_name = ui_menu_pool_strdup(menu, swinfo->shortname);
-			entry->long_name = ui_menu_pool_strdup(menu, swinfo->longname);
+			entry->short_name = menu->pool_strdup(swinfo->shortname);
+			entry->long_name = menu->pool_strdup(swinfo->longname);
 			entry->list_name = list_name;
 			entry->image = image;
-			entry->interface = ui_menu_pool_strdup(menu, swpart->interface_);
+			entry->interface = menu->pool_strdup(swpart->interface_);
 			break;
 		}
 	}
@@ -217,11 +217,11 @@ static void ui_mess_menu_populate_software_entries(running_machine &machine, ui_
 	}
 
 	// add an entry to change ordering
-	ui_menu_item_append(menu, "Switch Item Ordering", NULL, 0, (void *)1);
+	menu->item_append("Switch Item Ordering", NULL, 0, (void *)1);
 
 	// append all of the menu entries
 	for (software_entry_state *entry = menustate->entrylist; entry != NULL; entry = entry->next)
-		ui_menu_item_append(menu, entry->short_name, entry->long_name, 0, entry);
+		menu->item_append(entry->short_name, entry->long_name, 0, entry);
 }
 
 bool swinfo_has_multiple_parts(software_info *swinfo, const char *interface)
@@ -244,7 +244,7 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 	const software_entry_state *selected_entry = NULL;
 	int bestmatch = 0;
 
-	if (!ui_menu_populated(menu) || sw_state->reorder)
+	if (!menu->populated() || sw_state->reorder)
 	{
 		sw_state->reorder = 0;
 
@@ -255,7 +255,7 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 	}
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	event = menu->process(0);
 
 	if (event != NULL && event->itemref != NULL)
 	{
@@ -268,7 +268,7 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 			memset(sw_state->filename_buffer, '\0', ARRAY_LENGTH(sw_state->filename_buffer));
 
 			// reload the menu with the new order
-			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
+			menu->reset(UI_MENU_RESET_REMEMBER_REF);
 			popmessage("Switched Order: entries now ordered by %s", sw_state->ordered_by_shortname ? "shortname" : "description");
 		}
 		/* handle selections */
@@ -283,12 +283,12 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 			if (swinfo_has_multiple_parts(tmp_info, image->image_interface()))
 			{
 				ui_menu *child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), ui_mess_menu_software_parts, entry);
-				software_entry_state *child_menustate = (software_entry_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+				software_entry_state *child_menustate = (software_entry_state *)child_menu->alloc_state(sizeof(*child_menustate), NULL);
 				child_menustate->short_name = entry->short_name;
 				child_menustate->interface = image->image_interface();
 				child_menustate->list_name = sw_state->list_name;
 				child_menustate->image = image;
-				ui_menu_stack_push(child_menu);
+				ui_menu::stack_push(child_menu);
 			}
 			else
 			{
@@ -332,7 +332,7 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 
 				// if the current selection is a software entry, start search from here
 				if ((FPTR)event->itemref != 1)
-					cur_selected= (const software_entry_state *)ui_menu_get_selection(menu);
+					cur_selected= (const software_entry_state *)menu->get_selection();
 				// else (if we are on the 'Switch Order' entry) start from the beginning
 				else
 					cur_selected= sw_state->entrylist;
@@ -382,7 +382,7 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 				}
 
 				if (selected_entry != NULL && selected_entry != cur_selected)
-					ui_menu_set_selection(menu, (void *) selected_entry);
+					menu->set_selection((void *) selected_entry);
 			}
 		}
 		else if (event->iptkey == IPT_UI_CANCEL)
@@ -422,7 +422,7 @@ static void ui_mess_menu_populate_software_list(running_machine &machine, ui_men
 						}
 					}
 					if (found) {
-						ui_menu_item_append(menu, list->description, NULL, 0, swlist->list_name[i]);
+						menu->item_append(list->description, NULL, 0, swlist->list_name[i]);
 					}
 
 					software_list_close(list);
@@ -454,9 +454,9 @@ static void ui_mess_menu_populate_software_list(running_machine &machine, ui_men
 					}
 					if (found) {
 						if (!haveCompatible) {
-							ui_menu_item_append(menu, "[compatible lists]", NULL, MENU_FLAG_DISABLE, NULL);
+							menu->item_append("[compatible lists]", NULL, MENU_FLAG_DISABLE, NULL);
 						}
-						ui_menu_item_append(menu, list->description, NULL, 0, swlist->list_name[i]);
+						menu->item_append(list->description, NULL, 0, swlist->list_name[i]);
 					}
 
 					haveCompatible = TRUE;
@@ -472,20 +472,20 @@ void ui_image_menu_software(running_machine &machine, ui_menu *menu, void *param
 {
 	const ui_menu_event *event;
 	device_image_interface* image = (device_image_interface*)parameter;
-	if (!ui_menu_populated(menu))
+	if (!menu->populated())
 		ui_mess_menu_populate_software_list(machine, menu, image);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	event = menu->process(0);
 
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 	{
 		ui_menu *child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), ui_mess_menu_software_list, NULL);
-		software_menu_state *child_menustate = (software_menu_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+		software_menu_state *child_menustate = (software_menu_state *)child_menu->alloc_state(sizeof(*child_menustate), NULL);
 		child_menustate->list_name = (char *)event->itemref;
 		child_menustate->image = image;
 		child_menustate->entrylist = NULL;
 		child_menustate->ordered_by_shortname = 1;
-		ui_menu_stack_push(child_menu);
+		ui_menu::stack_push(child_menu);
 	}
 }

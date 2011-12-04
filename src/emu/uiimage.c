@@ -223,10 +223,10 @@ static void extra_text_render(running_machine &machine, ui_menu *menu, void *sta
 
 static void menu_confirm_save_as_populate(running_machine &machine, ui_menu *menu, void *state)
 {
-	ui_menu_item_append(menu, "File Already Exists - Overide?", NULL, MENU_FLAG_DISABLE, NULL);
-	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, MENU_FLAG_DISABLE, NULL);
-	ui_menu_item_append(menu, "No", NULL, 0, ITEMREF_NO);
-	ui_menu_item_append(menu, "Yes", NULL, 0, ITEMREF_YES);
+	menu->item_append("File Already Exists - Overide?", NULL, MENU_FLAG_DISABLE, NULL);
+	menu->item_append(MENU_SEPARATOR_ITEM, NULL, MENU_FLAG_DISABLE, NULL);
+	menu->item_append("No", NULL, 0, ITEMREF_NO);
+	menu->item_append("Yes", NULL, 0, ITEMREF_YES);
 }
 
 
@@ -241,11 +241,11 @@ static void menu_confirm_save_as(running_machine &machine, ui_menu *menu, void *
 	confirm_save_as_menu_state *menustate = (confirm_save_as_menu_state *) state;
 
 	/* if the menu isn't built, populate now */
-	if (!ui_menu_populated(menu))
+	if (!menu->populated())
 		menu_confirm_save_as_populate(machine, menu, state);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	event = menu->process(0);
 
 	/* process the event */
 	if ((event != NULL) && (event->iptkey == IPT_UI_SELECT))
@@ -254,7 +254,7 @@ static void menu_confirm_save_as(running_machine &machine, ui_menu *menu, void *
 			*menustate->yes = TRUE;
 
 		/* no matter what, pop out */
-		ui_menu_stack_pop(machine);
+		ui_menu::stack_pop(machine);
 	}
 }
 
@@ -327,22 +327,22 @@ static void menu_file_create_populate(running_machine &machine, ui_menu *menu, v
 	{
 		new_image_name = menustate->filename_buffer;
 	}
-	ui_menu_item_append(menu, "New Image Name:", new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
+	menu->item_append("New Image Name:", new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	/* do we support multiple formats? */
 	format = device->device_get_creatable_formats();
 	if (ENABLE_FORMATS && (format != NULL))
 	{
-		ui_menu_item_append(menu, "Image Format:", menustate->current_format->m_description, 0, ITEMREF_FORMAT);
+		menu->item_append("Image Format:", menustate->current_format->m_description, 0, ITEMREF_FORMAT);
 		menustate->current_format = format;
 	}
 
 	/* finish up the menu */
-	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	ui_menu_item_append(menu, "Create", NULL, 0, ITEMREF_CREATE);
+	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	menu->item_append("Create", NULL, 0, ITEMREF_CREATE);
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_create_render_extra, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER, 0);
+	menu->set_custom_render(file_create_render_extra, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER, 0);
 }
 
 
@@ -384,9 +384,9 @@ static int create_new_image(device_image_interface *image, const char *directory
 		case ENTTYPE_FILE:
 			/* a file exists here - ask for permission from the user */
 			child_menu = ui_menu_alloc(image->device().machine(), &image->device().machine().render().ui_container(), menu_confirm_save_as, NULL);
-			child_menustate = (confirm_save_as_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+			child_menustate = (confirm_save_as_menu_state*)child_menu->alloc_state(sizeof(*child_menustate), NULL);
 			child_menustate->yes = yes;
-			ui_menu_stack_push(child_menu);
+			ui_menu::stack_push(child_menu);
 			do_create = FALSE;
 			break;
 
@@ -432,10 +432,10 @@ static void menu_file_create(running_machine &machine, ui_menu *menu, void *para
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
 
 	/* identify the selection */
-	selection = ui_menu_get_selection(menu);
+	selection = menu->get_selection();
 
 	/* rebuild the menu */
-	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
+	menu->reset(UI_MENU_RESET_REMEMBER_POSITION);
 	menu_file_create_populate(machine, menu, state, selection);
 
 	if (menustate->confirm_save_as_yes)
@@ -449,7 +449,7 @@ static void menu_file_create(running_machine &machine, ui_menu *menu, void *para
 	else
 	{
 		/* process the menu */
-		event = ui_menu_process(machine, menu, 0);
+		event = menu->process(0);
 	}
 
 	/* process the event */
@@ -468,14 +468,14 @@ static void menu_file_create(running_machine &machine, ui_menu *menu, void *para
 						&menustate->confirm_save_as_yes))
 					{
 						/* success - pop out twice to device view */
-						ui_menu_stack_pop(machine);
-						ui_menu_stack_pop(machine);
+						ui_menu::stack_pop(machine);
+						ui_menu::stack_pop(machine);
 					}
 				}
 				break;
 
 			case IPT_SPECIAL:
-				if (ui_menu_get_selection(menu) == ITEMREF_NEW_IMAGE_NAME)
+				if (menu->get_selection() == ITEMREF_NEW_IMAGE_NAME)
 				{
 					input_character(
 						menustate->filename_buffer,
@@ -563,11 +563,11 @@ static file_selector_entry *append_file_selector_entry(ui_menu *menu, file_selec
 	file_selector_entry **entryptr;
 
 	/* allocate a new entry */
-	entry = (file_selector_entry *) ui_menu_pool_alloc(menu, sizeof(*entry));
+	entry = (file_selector_entry *) menu->m_pool_alloc(sizeof(*entry));
 	memset(entry, 0, sizeof(*entry));
 	entry->type = entry_type;
-	entry->basename = (entry_basename != NULL) ? ui_menu_pool_strdup(menu, entry_basename) : entry_basename;
-	entry->fullpath = (entry_fullpath != NULL) ? ui_menu_pool_strdup(menu, entry_fullpath) : entry_fullpath;
+	entry->basename = (entry_basename != NULL) ? menu->pool_strdup(entry_basename) : entry_basename;
+	entry->fullpath = (entry_fullpath != NULL) ? menu->pool_strdup(entry_fullpath) : entry_fullpath;
 
 	/* find the end of the list */
 	entryptr = &menustate->entrylist;
@@ -668,7 +668,7 @@ static void append_file_selector_entry_menu_item(ui_menu *menu, const file_selec
 			subtext = "[FILE]";
 			break;
 	}
-	ui_menu_item_append(menu, text, subtext, 0, (void *) entry);
+	menu->item_append(text, subtext, 0, (void *) entry);
 }
 
 
@@ -742,10 +742,10 @@ static file_error menu_file_selector_populate(running_machine &machine, ui_menu 
 
 	/* set the selection (if we have one) */
 	if (selected_entry != NULL)
-		ui_menu_set_selection(menu, (void *) selected_entry);
+		menu->set_selection((void *) selected_entry);
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_selector_render_extra, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER, 0);
+	menu->set_custom_render(file_selector_render_extra, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER, 0);
 
 done:
 	if (directory != NULL)
@@ -786,20 +786,20 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 	menustate = (file_selector_menu_state *) state;
 
 	/* if the menu isn't built, populate now */
-	if (!ui_menu_populated(menu))
+	if (!menu->populated())
 	{
 		err = menu_file_selector_populate(machine, menu, menustate);
 
 		/* pop out if there was an error */
 		if (err != FILERR_NONE)
 		{
-			ui_menu_stack_pop(machine);
+			ui_menu::stack_pop(machine);
 			return;
 		}
 	}
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	event = menu->process(0);
 	if (event != NULL && event->itemref != NULL)
 	{
 		/* handle selections */
@@ -811,19 +811,19 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 				case SELECTOR_ENTRY_TYPE_EMPTY:
 					/* empty slot - unload */
 					menustate->manager_menustate->selected_device->unload();
-					ui_menu_stack_pop(machine);
+					ui_menu::stack_pop(machine);
 					break;
 
 				case SELECTOR_ENTRY_TYPE_CREATE:
 					/* create */
 					child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), menu_file_create, NULL);
-					child_menustate = (file_create_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+					child_menustate = (file_create_menu_state*)child_menu->alloc_state(sizeof(*child_menustate), NULL);
 					child_menustate->manager_menustate = menustate->manager_menustate;
-					ui_menu_stack_push(child_menu);
+					ui_menu::stack_push(child_menu);
 					break;
 				case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
 					child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), ui_image_menu_software, menustate->manager_menustate->selected_device);
-					ui_menu_stack_push(child_menu);
+					ui_menu::stack_push(child_menu);
 					break;
 				case SELECTOR_ENTRY_TYPE_DRIVE:
 				case SELECTOR_ENTRY_TYPE_DIRECTORY:
@@ -836,13 +836,13 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 						break;
 					}
 					astring_cpyc(menustate->manager_menustate->current_directory, entry->fullpath);
-					ui_menu_reset(menu, (ui_menu_reset_options)0);
+					menu->reset((ui_menu_reset_options)0);
 					break;
 
 				case SELECTOR_ENTRY_TYPE_FILE:
 					/* file */
 					menustate->manager_menustate->selected_device->load(entry->fullpath);
-					ui_menu_stack_pop(machine);
+					ui_menu::stack_pop(machine);
 					break;
 			}
 
@@ -877,7 +877,7 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 
 			if (update_selected)
 			{
-				const file_selector_entry *cur_selected = (const file_selector_entry *)ui_menu_get_selection(menu);
+				const file_selector_entry *cur_selected = (const file_selector_entry *)menu->get_selection();
 
 				// check for entries which matches our filename_buffer:
 				// from current entry to the end
@@ -920,7 +920,7 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 				}
 
 				if (selected_entry != NULL && selected_entry != cur_selected)
-					ui_menu_set_selection(menu, (void *) selected_entry);
+					menu->set_selection((void *) selected_entry);
 			}
 		}
 		else if (event->iptkey == IPT_UI_CANCEL)
@@ -1026,11 +1026,11 @@ static void menu_file_manager_populate(running_machine &machine, ui_menu *menu, 
 			tmp_name.cpy("---");
 
 		/* record the menu item */
-		ui_menu_item_append(menu, buffer, tmp_name.cstr(), 0, (void *) image);
+		menu->item_append(buffer, tmp_name.cstr(), 0, (void *) image);
 	}
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_manager_render_extra, 0, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER);
+	menu->set_custom_render(file_manager_render_extra, 0, ui_get_line_height(machine) + 3.0f * UI_BOX_TB_BORDER);
 }
 
 
@@ -1066,7 +1066,7 @@ void ui_image_menu_file_manager(running_machine &machine, ui_menu *menu, void *p
 	/* if no state, allocate now */
 	if (state == NULL)
 	{
-		state = ui_menu_alloc_state(menu, sizeof(*menustate), file_manager_destroy_state);
+		state = menu->alloc_state(sizeof(*menustate), file_manager_destroy_state);
 		menustate = (file_manager_menu_state *) state;
 
 		menustate->current_directory = astring_alloc();
@@ -1075,14 +1075,14 @@ void ui_image_menu_file_manager(running_machine &machine, ui_menu *menu, void *p
 	menustate = (file_manager_menu_state *) state;
 
 	/* if the menu isn't built, populate now */
-	if (!ui_menu_populated(menu))
+	if (!menu->populated())
 		menu_file_manager_populate(machine, menu, state);
 
 	/* update the selected device */
-	menustate->selected_device = (device_image_interface *) ui_menu_get_selection(menu);
+	menustate->selected_device = (device_image_interface *) menu->get_selection();
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	event = menu->process(0);
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 	{
 		menustate->selected_device = (device_image_interface *) event->itemref;
@@ -1096,13 +1096,13 @@ void ui_image_menu_file_manager(running_machine &machine, ui_menu *menu, void *p
 			astring_cpyc(menustate->current_file, menustate->selected_device->exists() ? menustate->selected_device->basename() : "");
 
 			/* reset the existing menu */
-			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
+			menu->reset(UI_MENU_RESET_REMEMBER_POSITION);
 
 			/* push the menu */
 			child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), menu_file_selector, NULL);
-			child_menustate = (file_selector_menu_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+			child_menustate = (file_selector_menu_state *)child_menu->alloc_state(sizeof(*child_menustate), NULL);
 			child_menustate->manager_menustate = menustate;
-			ui_menu_stack_push(child_menu);
+			ui_menu::stack_push(child_menu);
 		}
 	}
 }
@@ -1115,15 +1115,15 @@ void ui_image_menu_file_manager(running_machine &machine, ui_menu *menu, void *p
 void ui_image_menu_image_info(running_machine &machine, ui_menu *menu, void *parameter, void *state)
 {
 	/* if the menu isn't built, populate now */
-	if (!ui_menu_populated(menu))
+	if (!menu->populated())
 	{
 		astring *tempstring = image_info_astring(machine, astring_alloc());
-		ui_menu_item_append(menu, astring_c(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
+		menu->item_append(astring_c(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
 		astring_free(tempstring);
 	}
 
 	/* process the menu */
-	ui_menu_process(machine, menu, 0);
+	menu->process(0);
 }
 
 /***************************************************************************
@@ -1267,13 +1267,12 @@ static void menu_tape_control_populate(running_machine &machine, ui_menu *menu, 
 		}
 
 		/* name of tape */
-		ui_menu_item_append(menu, menustate->device->device().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
+		menu->item_append(menustate->device->device().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
 
 		/* state */
 		tapecontrol_gettime(&timepos, cassette, NULL, NULL);
 		state = cassette->get_state();
-		ui_menu_item_append(
-			menu,
+		menu->item_append(
 			(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
 				?	"stopped"
 				:	((state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY
@@ -1285,24 +1284,24 @@ static void menu_tape_control_populate(running_machine &machine, ui_menu *menu, 
 			TAPECMD_SLIDER);
 
 		/* pause or stop */
-		ui_menu_item_append(menu, "Pause/Stop", NULL, 0, TAPECMD_STOP);
+		menu->item_append("Pause/Stop", NULL, 0, TAPECMD_STOP);
 
 		/* play */
-		ui_menu_item_append(menu, "Play", NULL, 0, TAPECMD_PLAY);
+		menu->item_append("Play", NULL, 0, TAPECMD_PLAY);
 
 		/* record */
-		ui_menu_item_append(menu, "Record", NULL, 0, TAPECMD_RECORD);
+		menu->item_append("Record", NULL, 0, TAPECMD_RECORD);
 
 		/* rewind */
-		ui_menu_item_append(menu, "Rewind", NULL, 0, TAPECMD_REWIND);
+		menu->item_append("Rewind", NULL, 0, TAPECMD_REWIND);
 
 		/* fast forward */
-		ui_menu_item_append(menu, "Fast Forward", NULL, 0, TAPECMD_FAST_FORWARD);
+		menu->item_append("Fast Forward", NULL, 0, TAPECMD_FAST_FORWARD);
 	}
 	else
 	{
 		/* no tape loaded */
-		ui_menu_item_append(menu, "No Tape Image loaded", NULL, flags, NULL);
+		menu->item_append("No Tape Image loaded", NULL, flags, NULL);
 	}
 }
 
@@ -1348,16 +1347,16 @@ static void menu_bitbanger_control_populate(running_machine &machine, ui_menu *m
 	if (menustate->device->exists())
 	{
 		/* name of bitbanger file */
-		ui_menu_item_append(menu, menustate->device->device().name(), menustate->device->filename(), flags, BITBANGERCMD_SELECT);
-		ui_menu_item_append(menu, "Device Mode:", bitbanger->mode_string(), mode_flags, BITBANGERCMD_MODE);
-		ui_menu_item_append(menu, "Baud:", bitbanger->baud_string(), baud_flags, BITBANGERCMD_BAUD);
-		ui_menu_item_append(menu, "Baud Tune:", bitbanger->tune_string(), tune_flags, BITBANGERCMD_TUNE);
-		ui_menu_item_append(menu, "Protocol:", "8-1-N", 0, NULL);
+		menu->item_append(menustate->device->device().name(), menustate->device->filename(), flags, BITBANGERCMD_SELECT);
+		menu->item_append("Device Mode:", bitbanger->mode_string(), mode_flags, BITBANGERCMD_MODE);
+		menu->item_append("Baud:", bitbanger->baud_string(), baud_flags, BITBANGERCMD_BAUD);
+		menu->item_append("Baud Tune:", bitbanger->tune_string(), tune_flags, BITBANGERCMD_TUNE);
+		menu->item_append("Protocol:", "8-1-N", 0, NULL);
 	}
 	else
 	{
 		/* no tape loaded */
-		ui_menu_item_append(menu, "No Bitbanger Image loaded", NULL, flags, NULL);
+		menu->item_append("No Bitbanger Image loaded", NULL, flags, NULL);
 	}
 }
 
@@ -1373,7 +1372,7 @@ void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *pa
 
 	/* if no state, allocate some */
 	if (state == NULL)
-		state = ui_menu_alloc_state(menu, sizeof(*menustate), NULL);
+		state = menu->alloc_state(sizeof(*menustate), NULL);
 	menustate = (tape_control_menu_state *) state;
 
 	/* do we have to load the device? */
@@ -1389,17 +1388,17 @@ void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *pa
 			}
 		}
 		menustate->device = device;
-		ui_menu_reset(menu, (ui_menu_reset_options)0);
+		menu->reset((ui_menu_reset_options)0);
 	}
 
 	/* rebuild the menu - we have to do this so that the counter updates */
-	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
+	menu->reset(UI_MENU_RESET_REMEMBER_POSITION);
 	menu_tape_control_populate(machine, menu, (tape_control_menu_state*)state);
 
 	cassette_image_device* cassette = dynamic_cast<cassette_image_device*>(&menustate->device->device());
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
+	event = menu->process(UI_MENU_PROCESS_LR_REPEAT);
 	if (event != NULL)
 	{
 		switch(event->iptkey)
@@ -1472,7 +1471,7 @@ void ui_mess_menu_bitbanger_control(running_machine &machine, ui_menu *menu, voi
 
 	/* if no state, allocate some */
 	if (state == NULL)
-		state = ui_menu_alloc_state(menu, sizeof(*menustate), NULL);
+		state = menu->alloc_state(sizeof(*menustate), NULL);
 	menustate = (bitbanger_control_menu_state *) state;
 
 	/* do we have to load the device? */
@@ -1488,18 +1487,18 @@ void ui_mess_menu_bitbanger_control(running_machine &machine, ui_menu *menu, voi
 			}
 		}
 		menustate->device = device;
-		ui_menu_reset(menu, (ui_menu_reset_options)0);
+		menu->reset((ui_menu_reset_options)0);
 	}
 
 	/* get the bitbanger */
 	bitbanger_device *bitbanger = downcast<bitbanger_device *>(menustate->device);
 
 	/* rebuild the menu */
-	ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
+	menu->reset(UI_MENU_RESET_REMEMBER_POSITION);
 	menu_bitbanger_control_populate(machine, menu, (bitbanger_control_menu_state*)state);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
+	event = menu->process(UI_MENU_PROCESS_LR_REPEAT);
 	if (event != NULL)
 	{
 		switch(event->iptkey)
