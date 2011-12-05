@@ -55,7 +55,6 @@ Super System Card:
 **********************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
@@ -349,8 +348,9 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
 	MCFG_CPU_IO_MAP(pce_io)
-	MCFG_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "screen", 0, 1)
+
+//	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( pce )
 	MCFG_MACHINE_RESET( mess_pce )
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)
 	MCFG_CPU_IO_MAP(sgx_io)
-	MCFG_CPU_VBLANK_INT_HACK(sgx_interrupt, VDC_LPF)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", sgx_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( pce )
