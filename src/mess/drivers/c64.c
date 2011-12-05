@@ -340,14 +340,7 @@ C64DTV TODO:
 #include "includes/cbm.h"
 #include "formats/cbm_snqk.h"
 #include "machine/cbmiec.h"
-#include "machine/c1541.h"
-#include "machine/c1571.h"
-#include "machine/c1581.h"
-#include "machine/c2040.h"
-#include "machine/interpod.h"
 #include "machine/c64exp.h"
-#include "machine/c64_std.h"
-#include "machine/c64_xl80.h"
 
 #include "includes/c64.h"
 
@@ -563,17 +556,6 @@ static SLOT_INTERFACE_START( sx1541_iec_devices )
 	SLOT_INTERFACE("sx1541", SX1541)
 SLOT_INTERFACE_END
 
-static SLOT_INTERFACE_START( cbm_iec_devices )
-	SLOT_INTERFACE("c1540", C1540)
-	SLOT_INTERFACE("c1541", C1541)
-	SLOT_INTERFACE("c1541c", C1541C)
-	SLOT_INTERFACE("c1541ii", C1541II)
-	SLOT_INTERFACE("oc118", OC118)
-	SLOT_INTERFACE("c1570", C1570)
-	SLOT_INTERFACE("c1571", C1571)
-	SLOT_INTERFACE("c1581", C1581)
-SLOT_INTERFACE_END
-
 static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
 	DEVCB_NULL,
@@ -698,11 +680,6 @@ static C64_EXPANSION_INTERFACE( c64_expansion_intf )
 	DEVCB_NULL, // GAME
 	DEVCB_NULL  // EXROM
 };
-
-static SLOT_INTERFACE_START( c64_expansion_cards )
-	SLOT_INTERFACE("standard", C64_STD)
-	SLOT_INTERFACE("xl80", C64_XL80)
-SLOT_INTERFACE_END
 
 
 /*************************************
