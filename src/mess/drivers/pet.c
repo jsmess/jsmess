@@ -388,10 +388,6 @@ normal keyboards?
 #include "machine/cbmipt.h"
 #include "video/mc6845.h"
 #include "machine/ram.h"
-#include "machine/c2031.h"
-#include "machine/c2040.h"
-#include "machine/c8280.h"
-#include "machine/d9060.h"
 
 /* devices config */
 #include "includes/cbm.h"
@@ -646,20 +642,6 @@ static SCREEN_UPDATE( pet_crtc )
 	mc6845->update( bitmap, cliprect);
 	return 0;
 }
-
-static SLOT_INTERFACE_START( cbm_ieee488_devices )
-	SLOT_INTERFACE("c2040", C2040)
-	SLOT_INTERFACE("c3040", C3040)
-	SLOT_INTERFACE("c4040", C4040)
-	SLOT_INTERFACE("c8050", C8050)
-	SLOT_INTERFACE("c8250", C8250)
-	SLOT_INTERFACE("c8250lp", C8250LP)
-	SLOT_INTERFACE("sfd1001", SFD1001)
-	SLOT_INTERFACE("c2031", C2031)
-	SLOT_INTERFACE("c8280", C8280)
-	SLOT_INTERFACE("d9060", D9060)
-	SLOT_INTERFACE("d9090", D9090)
-SLOT_INTERFACE_END
 
 static IEEE488_INTERFACE( ieee488_intf )
 {

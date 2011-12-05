@@ -1,6 +1,17 @@
 #ifndef CBMIPT_H_
 #define CBMIPT_H_
 
+#include "machine/c64_std.h"
+#include "machine/c64_xl80.h"
+#include "machine/c1541.h"
+#include "machine/c1571.h"
+#include "machine/c1581.h"
+#include "machine/c2031.h"
+#include "machine/c2040.h"
+#include "machine/c8280.h"
+#include "machine/d9060.h"
+#include "machine/interpod.h"
+
 
 /* Commodore 64 */
 
@@ -46,4 +57,11 @@ INPUT_PORTS_EXTERN( vic_special );
 INPUT_PORTS_EXTERN( vic_controls );
 
 
+
+extern const slot_interface slot_interface_cbm_iec_devices[];
+extern const slot_interface slot_interface_cbm_ieee488_devices[];
+extern const slot_interface slot_interface_c64_expansion_cards[];
+
+
+	
 #endif /* CBMIPT_H_ */

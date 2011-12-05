@@ -120,10 +120,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
 #include "includes/c16.h"
-#include "machine/c1541.h"
 #include "machine/c1551.h"
-#include "machine/c1571.h"
-#include "machine/c1581.h"
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
 #include "sound/sid6581.h"
@@ -418,17 +415,6 @@ static const m6502_interface c16_m7501_interface =
 	DEVCB_HANDLER(c16_m7501_port_read),	/* port_read_func */
 	DEVCB_HANDLER(c16_m7501_port_write)	/* port_write_func */
 };
-
-static SLOT_INTERFACE_START( cbm_iec_devices )
-	SLOT_INTERFACE("c1540", C1540)
-	SLOT_INTERFACE("c1541", C1541)
-	SLOT_INTERFACE("c1541c", C1541C)
-	SLOT_INTERFACE("c1541ii", C1541II)
-	SLOT_INTERFACE("oc118", OC118)
-	SLOT_INTERFACE("c1570", C1570)
-	SLOT_INTERFACE("c1571", C1571)
-	SLOT_INTERFACE("c1581", C1581)
-SLOT_INTERFACE_END
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )
 {

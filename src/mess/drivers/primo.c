@@ -114,6 +114,7 @@ Interrupts:
 #include "imagedev/cartslot.h"
 #include "formats/primoptp.h"
 #include "machine/cbmiec.h"
+#include "machine/cbmipt.h"
 
 static ADDRESS_MAP_START( primoa_port, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -246,9 +247,6 @@ static const cassette_interface primo_cassette_interface =
 	NULL,
 	NULL
 };
-
-static SLOT_INTERFACE_START( cbm_iec_devices )
-SLOT_INTERFACE_END
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )
 {

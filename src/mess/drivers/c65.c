@@ -54,9 +54,6 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "cpu/m6502/m4510.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
-#include "machine/c1541.h"
-#include "machine/c1571.h"
-#include "machine/c1581.h"
 #include "machine/cbmipt.h"
 #include "video/vic4567.h"
 #include "includes/cbm.h"
@@ -197,17 +194,6 @@ static const sid6581_interface c65_sound_interface =
 	c64_paddle_read
 };
 
-
-static SLOT_INTERFACE_START( cbm_iec_devices )
-	SLOT_INTERFACE("c1540", C1540)
-	SLOT_INTERFACE("c1541", C1541)
-	SLOT_INTERFACE("c1541c", C1541C)
-	SLOT_INTERFACE("c1541ii", C1541II)
-	SLOT_INTERFACE("oc118", OC118)
-	SLOT_INTERFACE("c1570", C1570)
-	SLOT_INTERFACE("c1571", C1571)
-	SLOT_INTERFACE("c1581", C1581)
-SLOT_INTERFACE_END
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
