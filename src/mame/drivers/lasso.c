@@ -4,20 +4,20 @@
 
         driver by Phil Stroffolino, Nicola Salmoria, Luca Elia
 
----------------------------------------------------------------------------
-Year + Game                 By              CPUs        Sound Chips
----------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+Year + Game                 By              CPUs        Sound Chips         Misc Info
+--------------------------------------------------------------------------------------
 82  Lasso                   SNK             3 x 6502    2 x SN76489
 83  Chameleon               Jaleco          2 x 6502    2 x SN76489
 84  Wai Wai Jockey Gate-In! Jaleco/Casio    2 x 6502    2 x SN76489 + DAC
-84  Pinbo                   Jaleco          6502 + Z80  2 x AY-8910
----------------------------------------------------------------------------
+84  Pinbo                   Jaleco          6502 + Z80  2 x AY-8910         6502 @ 18MHz/24, Z80 @ 18MHz/6, AY @ 18MHz/12
+--------------------------------------------------------------------------------------
 
 Notes:
 
-- unknown CPU speeds (affect game timing), currently using same as the
-  Rock-Ola games of the same area.  Lot of similarities between these
-  hardware.  The music ends at the perfect time with this clock speed
+- unknown CPU speeds unless noted above (affect game timing), currently using
+  same as the Rock-Ola games of the same area.  Lot of similarities between
+  these hardware.  The music ends at the perfect time with this clock speed
 - Lasso: fire button auto-repeats on high score entry screen (real behavior?)
 
 ***************************************************************************
@@ -181,6 +181,7 @@ static ADDRESS_MAP_START( pinbo_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE_MEMBER(lasso_state, m_colorram)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE_MEMBER(lasso_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
+	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, m_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
@@ -591,30 +592,30 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pinbo, base )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", M6502, XTAL_18MHz/24)
 	MCFG_CPU_PROGRAM_MAP(pinbo_main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_REPLACE("audiocpu", Z80, 3000000)
+	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_18MHz/6)
 	MCFG_CPU_PROGRAM_MAP(pinbo_audio_map)
 	MCFG_CPU_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE(pinbo)
 	MCFG_PALETTE_LENGTH(256)
-
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(pinbo)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(pinbo)
+	MCFG_SCREEN_UPDATE(chameleo)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("sn76489.1")
 	MCFG_DEVICE_REMOVE("sn76489.2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1250000)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1250000)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_CONFIG_END
 

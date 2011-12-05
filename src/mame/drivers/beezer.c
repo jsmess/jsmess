@@ -4,10 +4,12 @@
 
   Written by Mathis Rosenhauer
 
+  TODO:
+  - what's really wrong with the sound? Any reference available?
+
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
@@ -23,9 +25,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM // RAM at 0D
 	AM_RANGE(0x0800, 0x0fff) AM_RAM // optional RAM at 2D (can be rom here instead)
-	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0x07F8) AM_DEVREADWRITE("custom", beezer_sh6840_r, beezer_sh6840_w)
-	AM_RANGE(0x1800, 0x180F) AM_MIRROR(0x07F0) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1FFC) AM_DEVWRITE("custom", beezer_sfxctrl_w)
+	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0x07f8) AM_DEVREADWRITE("custom", beezer_sh6840_r, beezer_sh6840_w)
+	AM_RANGE(0x1800, 0x180F) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)
+	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_DEVWRITE("custom", beezer_sfxctrl_w)
 	//AM_RANGE(0xa000, 0xbfff) AM_ROM // ROM at 2D (can be ram here instead), unpopulated
 	//AM_RANGE(0xc000, 0xdfff) AM_ROM // ROM at 4D, unpopulated
 	AM_RANGE(0xe000, 0xffff) AM_ROM // ROM at 6D
@@ -75,12 +77,19 @@ static INPUT_PORTS_START( beezer )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
+static MACHINE_START(beezer)
+{
+	beezer_state *state = machine.driver_data<beezer_state>();
+
+	state->m_maincpu = machine.device("maincpu");
+}
+
 static MACHINE_CONFIG_START( beezer, beezer_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1000000)        /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", beezer_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M6809, 1000000)        /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -90,11 +99,13 @@ static MACHINE_CONFIG_START( beezer, beezer_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(256, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 303)
+	MCFG_SCREEN_SIZE(384, 256)
+	MCFG_SCREEN_VISIBLE_AREA(16, 304-1, 0, 240-1) // 288 x 240, correct?
 	MCFG_SCREEN_UPDATE(beezer)
 
 	MCFG_PALETTE_LENGTH(16)
+
+	MCFG_MACHINE_START(beezer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -159,5 +170,5 @@ ROM_START( beezer1 )
 	ROM_LOAD( "e1.cpu", 0x100, 0x0100, CRC(3c775c5e) SHA1(ac86f45938c0c9d5fec1245bf86718442baf445b) )
 ROM_END
 
-GAME( 1982, beezer,  0,      beezer, beezer, beezer, ORIENTATION_FLIP_X, "Tong Electronic", "Beezer (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1982, beezer1, beezer, beezer, beezer, beezer, ORIENTATION_FLIP_X, "Tong Electronic", "Beezer (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1982, beezer,  0,      beezer, beezer, beezer, ROT90, "Tong Electronic", "Beezer (set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1982, beezer1, beezer, beezer, beezer, beezer, ROT90, "Tong Electronic", "Beezer (set 2)", GAME_IMPERFECT_SOUND )
