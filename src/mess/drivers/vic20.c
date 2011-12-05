@@ -577,35 +577,35 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 	}
 	else
 	{
-		size = image.get_software_region_length("2000");
+		size = image.get_software_region_length("blk1");
 		if (size)
 		{
 			address = 0x2000;
-			memcpy(ptr + address, image.get_software_region("2000"), size);
+			memcpy(ptr + address, image.get_software_region("blk1"), size);
 			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 
-		size = image.get_software_region_length("4000");
+		size = image.get_software_region_length("blk2");
 		if (size)
 		{
 			address = 0x4000;
-			memcpy(ptr + address, image.get_software_region("4000"), size);
+			memcpy(ptr + address, image.get_software_region("blk2"), size);
 			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 
-		size = image.get_software_region_length("6000");
+		size = image.get_software_region_length("blk3");
 		if (size)
 		{
 			address = 0x6000;
-			memcpy(ptr + address, image.get_software_region("6000"), size);
+			memcpy(ptr + address, image.get_software_region("blk3"), size);
 			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 
-		size = image.get_software_region_length("a000");
+		size = image.get_software_region_length("blk5");
 		if (size)
 		{
 			address = 0xa000;
-			memcpy(ptr + address, image.get_software_region("a000"), size);
+			memcpy(ptr + address, image.get_software_region("blk5"), size);
 			program->install_rom(address, (address + size) - 1, ptr + address);
 		}
 
