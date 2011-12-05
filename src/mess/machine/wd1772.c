@@ -1299,7 +1299,7 @@ void wd177x_t::live_run(attotime limit)
 			status |= S_RNF;
 			cur_live.state = IDLE;
 			return;
-				
+
 		case READ_SECTOR_DATA: {
 			if(read_one_bit(limit))
 				return;

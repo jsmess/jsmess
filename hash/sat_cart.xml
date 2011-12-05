@@ -40,8 +40,8 @@
 		</part>
 	</software>
 
- 	<!-- weird size... is it a bad dump? -->
- 	<software name="ar">
+	<!-- weird size... is it a bad dump? -->
+	<software name="ar">
 		<description>Action Replay</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -31,9 +31,9 @@
         "yes, the spurious interrupt occurs when i mask a timer. i did not notice an occurance of the SPI when changing data and control registers.
         if i kill interrupts with the status reg before masking the timer interrupt, then the SPI occurs as soon as the status register is set to re-enable interrupts."
 
-		Well, more experiments show that it's somewhat incorrect, and
-		the GLUE is essentially invisible w.r.t IPL.  The CPU and the
-		MFP manage to add the delays all by themselves.
+        Well, more experiments show that it's somewhat incorrect, and
+        the GLUE is essentially invisible w.r.t IPL.  The CPU and the
+        MFP manage to add the delays all by themselves.
 
     - divide serial clock by 16
     - synchronous mode

@@ -17,7 +17,7 @@ A few comments on these:
       TRACK 1 MODE2/2352
       INDEX 1 00:00:00
    This might have introduced errors in the procedure, so it would be good to keep around the original files for later checks
-5. releases in mdf/mds format or cdi format have been mounted in ISOBuster and raw ripped to bin/cue, so there is the possibility 
+5. releases in mdf/mds format or cdi format have been mounted in ISOBuster and raw ripped to bin/cue, so there is the possibility
    that subtle errors are introduced either in this procedure, or in the original creation of the mdf/mds/cdi image. These should
    be verified with the original media, and are marked as bad dumps.
 -->

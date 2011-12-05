@@ -29,7 +29,7 @@
 	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL) \
 	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
 
-	
+
 /* Commodore 64 */
 
 INPUT_PORTS_EXTERN( common_cbm_keyboard );	/* shared with c16, c65, c128 */
@@ -80,5 +80,5 @@ extern const slot_interface slot_interface_cbm_ieee488_devices[];
 extern const slot_interface slot_interface_c64_expansion_cards[];
 
 
-	
+
 #endif /* CBMIPT_H_ */

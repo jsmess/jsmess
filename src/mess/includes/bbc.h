@@ -29,11 +29,11 @@ public:
 		  m_via_user_irq(CLEAR_LINE),
 		  m_acia_irq(CLEAR_LINE)
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 
 	void check_interrupts();
-	
+
 	int m_RAMSize;			// BBC Memory Size
 	int m_DFSType;			// this stores the DIP switch setting for the DFS type being used
 	int m_SWRAMtype;		// this stores the DIP switch setting for the SWRAM type being used

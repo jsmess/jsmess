@@ -40,7 +40,7 @@ private:
 		int hstart, hend;
 		int dstart, dend;
 		bool hsynced, dsynced;
-	};		
+	};
 
 	void map_sectors_in_track(wd_obs &obs, wd_sect_info *sect_infos);
 	void match_mfm_data(wd_obs &obs, int tpos, const UINT8 *data, int size, UINT8 context, int &bcount, int &ccount, bool &synced);

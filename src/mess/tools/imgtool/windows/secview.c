@@ -260,7 +260,7 @@ static void change_sector(HWND dialog)
 
 	if ((info->track != new_track) || (info->head != new_head) || (info->sector != new_sector))
 	{
-		//err = 
+		//err =
 		read_sector_data(dialog, new_track, new_head, new_sector);
 		// TODO: this causes a stack overflow
 		//if (err)
