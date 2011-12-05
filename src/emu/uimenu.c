@@ -214,7 +214,7 @@ void ui_menu::reset(ui_menu_reset_options options)
 
 /*-------------------------------------------------
     is_special_main_menu - returns whether the
-	menu has special needs
+    menu has special needs
 -------------------------------------------------*/
 bool ui_menu::is_special_main_menu() const
 {
@@ -224,7 +224,7 @@ bool ui_menu::is_special_main_menu() const
 
 /*-------------------------------------------------
     set_special_main_menu - set whether the
-	menu has special needs
+    menu has special needs
 -------------------------------------------------*/
 void ui_menu::set_special_main_menu(bool special)
 {

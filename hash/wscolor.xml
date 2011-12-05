@@ -673,7 +673,7 @@
 	</software>
 
 	<software name="jsilver">
- 		<!-- Alt title: -->
+		<!-- Alt title: -->
 		<!-- WSC only -->
 		<description>Judgement Silversword - Rebirth Edition (Rev. 4321)</description>
 		<!--<release_date>2004-02-05</release_date>-->
@@ -687,7 +687,7 @@
 	</software>
 
 	<software name="jsilver1" cloneof="jsilver">
- 		<!-- Alt title: -->
+		<!-- Alt title: -->
 		<!-- WSC only -->
 		<description>Judgement Silversword - Rebirth Edition (Rev. SC21)</description>
 		<!--<release_date>2004-02-05</release_date>-->
@@ -975,7 +975,7 @@
 	</software>
 
 	<software name="srobotc3a" cloneof="srobotc3">
- 		<!-- Alt title: スーパーロボット大戦 コンパクト3 -->
+		<!-- Alt title: スーパーロボット大戦 コンパクト3 -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>Super Robot Taisen Compact 3 (v1.5)</description>
 		<!--<release_date>2003-07-17</release_date>-->

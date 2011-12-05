@@ -4026,7 +4026,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="desperad011" cloneof="desperad">
 		<description>Desperado (v0.11)</description>
 		<year>199?</year>
@@ -4037,7 +4037,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="desperad">
 		<description>Desperado (v0.29d)</description>
 		<year>1995</year>
@@ -4097,7 +4097,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="diamexp2">
 		<description>Diamond Explorer II</description>
 		<year>1991</year>
@@ -4144,7 +4144,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<!-- Video Game Anthology vol. 12 -->
 	<software name="digdug">
 		<description>Dig Dug I &amp; II</description>
@@ -4220,7 +4220,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="diveon2d">
 		<description>Dive On 2 (demo)</description>
 		<year>1995</year>
@@ -4276,7 +4276,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dogfight">
 		<description>Dog Fight!</description>
 		<year>1992</year>
@@ -4298,7 +4298,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dokicard">
 		<description>Doki Doki Card League</description>
 		<year>1990</year>
@@ -4314,7 +4314,7 @@
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="dome">
 		<description>Dome</description>
 		<year>1988</year>

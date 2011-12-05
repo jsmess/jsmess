@@ -56,7 +56,7 @@ static void hexdump(const UINT8 *d, int s)
 		printf("\n");
 	}
 }
-	
+
 bool pasti_format::load(io_generic *io, floppy_image *image)
 {
 	UINT8 fh[16];
@@ -341,7 +341,7 @@ void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head,
 			}
 			cell_size = ncell_size;
 		}
-			
+
 	} else
 		wd_generate_gap(trackbuf, pos, obs, 0, obs.track_size, false, 1000, 1000);
 
@@ -451,7 +451,7 @@ void pasti_format::match_mfm_data(wd_obs &obs, int tpos, const UINT8 *data, int 
 		shift = (shift << 1) | bit;
 		if(ds_phase)
 			dbyte = (dbyte << 1) | bit;
-		//		printf("  %04x %02x (%04x %02x)\n", shift, dbyte, inshift, data[bi-1]);
+		//      printf("  %04x %02x (%04x %02x)\n", shift, dbyte, inshift, data[bi-1]);
 		ds_phase = !ds_phase;
 		bc++;
 		if(shift == 0x4489 || shift == 0x5224) {
@@ -459,7 +459,7 @@ void pasti_format::match_mfm_data(wd_obs &obs, int tpos, const UINT8 *data, int 
 			ds_phase = false;
 		}
 		if(!((bc_phase + bc) & 15)) {
-			//			printf("dbyte=%02x data=%02x in=%02x bc=%d bc_shift=%d ds_phase=%s\n", dbyte, obs.track_data[tpos], data[bi-1], bc, bc_phase, ds_phase ? "on" : "off");
+			//          printf("dbyte=%02x data=%02x in=%02x bc=%d bc_shift=%d ds_phase=%s\n", dbyte, obs.track_data[tpos], data[bi-1], bc, bc_phase, ds_phase ? "on" : "off");
 			if(dbyte != obs.track_data[tpos++]) {
 				bcount = bi-1;
 				tend = tpos-1;
@@ -537,7 +537,7 @@ void pasti_format::map_sectors_in_track(wd_obs &obs, wd_sect_info *sect_infos)
 			int bcount, tend;
 			int best_bcount=0, best_j=0;
 			for(j=0; j != obs.sector_count; j++) {
-				match_mfm_data(obs, hpos, obs.sectors[j].id, 6, hbyte, bcount, tend, synced);	
+				match_mfm_data(obs, hpos, obs.sectors[j].id, 6, hbyte, bcount, tend, synced);
 				if(bcount > best_bcount) {
 					best_bcount = bcount;
 					best_j = j;
@@ -611,5 +611,5 @@ void pasti_format::map_sectors_in_track(wd_obs &obs, wd_sect_info *sect_infos)
 				}
 			}
 		}
-	
+
 }

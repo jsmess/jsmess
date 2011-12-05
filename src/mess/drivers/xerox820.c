@@ -22,9 +22,9 @@
     http://www.classiccmp.org/dunfield/img41867/system.htm
     http://www.microcodeconsulting.com/z80/plus2.htm
 
-	Note:
-	- MK-82 have same roms as original Big Board
-	- MK-83 have 256K of RAM
+    Note:
+    - MK-82 have same roms as original Big Board
+    - MK-83 have 256K of RAM
 */
 
 #define ADDRESS_MAP_MODERN
@@ -958,4 +958,4 @@ COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		"Xerox",						"Xerox 820"
 COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, mk83,   	0,          0,      xerox820,   xerox820,   0,      "<unknown>",   					"MK-83",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, mk83,   	0,          0,      xerox820,   xerox820,   0,      "<unknown>",					"MK-83",    GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -713,8 +713,8 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_palette_register(offs_t offset)
 {
 	// Bits 7/6 are set and cleared respectively.  On a real CoCo 3
 	//
-	//	POKE&HFFB1,255:PRINTPEEK(&HFFB1)	returns 127.
-	//	POKE&HFFB1,0:PRINTPEEK(&HFFB1)		returns 64
+	//  POKE&HFFB1,255:PRINTPEEK(&HFFB1)    returns 127.
+	//  POKE&HFFB1,0:PRINTPEEK(&HFFB1)      returns 64
 	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F] | 0x40;
 }
 
@@ -917,7 +917,7 @@ ATTR_FORCE_INLINE void gime_base_device::write_gime_register(offs_t offset, UINT
 			break;
 
 		case 0x0B:
-			//	$FF9B Two/Eight Megabyte Upgrade register
+			//  $FF9B Two/Eight Megabyte Upgrade register
 			//
 			// This variable is weird; it affects both the video position, but
 			// it also affects normal memory mapping.  However, changing $FF9B

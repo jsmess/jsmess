@@ -268,7 +268,7 @@
 	</software>
 
 	<software name="digimon1" cloneof="digimon">
- 		<!-- Alt title: -->
+		<!-- Alt title: -->
 		<description>Digimon - Ver. WonderSwan (Asia)</description>
 		<year>19??</year>
 		<publisher>Bandai</publisher>
@@ -859,7 +859,7 @@
 	</software>
 
 	<software name="mobilewg">
- 		<!-- Alt title: -->
+		<!-- Alt title: -->
 		<description>MobileWonderGate</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1076,7 +1076,7 @@
 	</software>
 
 	<software name="srobot2b" supported="no"> <!-- freezes -->
- 		<!-- Alt title: スーパーロボット大戦 コンパクト2 第2部：宇宙激震篇 -->
+		<!-- Alt title: スーパーロボット大戦 コンパクト2 第2部：宇宙激震篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen</description>
 		<!--<release_date>2000-09-14</release_date>-->
 		<year>2000</year>
@@ -1091,7 +1091,7 @@
 	</software>
 
 	<software name="srobot2c" supported="no"> <!-- freezes -->
- 		<!-- Alt title: スーパーロボット大戦 コンパクト2 第3部：銀河決戦篇 -->
+		<!-- Alt title: スーパーロボット大戦 コンパクト2 第3部：銀河決戦篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen</description>
 		<!--<release_date>2001-01-18</release_date>-->
 		<year>2001</year>
