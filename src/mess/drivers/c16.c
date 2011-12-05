@@ -497,12 +497,7 @@ static MACHINE_CONFIG_START( c16, c16_state )
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "plus4_flop")
 
 	/* IEC serial bus */
-	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_ADD(cbm_iec_intf, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

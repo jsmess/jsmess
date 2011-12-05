@@ -706,11 +706,7 @@ static MACHINE_CONFIG_DERIVED( pet, pet_general )
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
 
 	/* IEEE bus */
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c4040", NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c4040")
 MACHINE_CONFIG_END
 
 
@@ -728,11 +724,7 @@ static MACHINE_CONFIG_DERIVED( pet2001, pet_general )
 	MCFG_RAM_EXTRA_OPTIONS("4K")
 
 	/* IEEE bus */
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c4040", NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c4040")
 MACHINE_CONFIG_END
 
 
@@ -785,11 +777,7 @@ static MACHINE_CONFIG_DERIVED( pet80, pet_general )
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	/* IEEE bus */
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c8050", NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
 MACHINE_CONFIG_END
 
 

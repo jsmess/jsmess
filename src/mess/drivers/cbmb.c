@@ -462,11 +462,7 @@ static MACHINE_CONFIG_START( cbm600, cbmb_state )
 	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c8250", NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8250")
 
 	MCFG_FRAGMENT_ADD(cbmb_cartslot)
 MACHINE_CONFIG_END
@@ -541,11 +537,7 @@ static MACHINE_CONFIG_START( p500, cbmb_state )
 	MCFG_TPI6525_ADD("tpi6525_1", cbmb_tpi_1_intf)
 
 	/* IEEE bus */
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c8250", NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL)
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL)
+	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8250")
 
 	MCFG_FRAGMENT_ADD(cbmb_cartslot)
 MACHINE_CONFIG_END

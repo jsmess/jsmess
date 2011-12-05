@@ -794,21 +794,11 @@ static MACHINE_CONFIG_START( common, c128_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c128, common )
-	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, "c1571", NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c128d, common )
-	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, "c1571", NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1571")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c128dcr, common )

@@ -292,9 +292,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, primo_cassette_interface )
 
 	/* floppy from serial bus */
-	/* for some reason machine/primo.c sets up the serial bus
-    but no floppy drive has been apparently added... incomplete driver? */
-	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	MCFG_CBM_IEC_ADD(cbm_iec_intf, NULL)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart1")
