@@ -40,6 +40,9 @@ struct _gime_interface
 
 	/* if specified, this gets called for every change of the FIRQ pin */
 	devcb_write_line			m_out_firq_func;
+
+	/* if specified, this reads from the floating bugs */
+	devcb_read8					m_in_floating_bus_func;
 };
 
 
@@ -149,6 +152,7 @@ private:
 	// callbacks
 	devcb_resolved_write_line m_res_out_irq_func;
 	devcb_resolved_write_line m_res_out_firq_func;
+	devcb_resolved_read8 m_res_in_floating_bus_func;
 
 	// device state
 	UINT8 m_gime_registers[16];
@@ -194,6 +198,7 @@ private:
 	UINT8 read_gime_register(offs_t offset);
 	UINT8 read_mmu_register(offs_t offset);
 	UINT8 read_palette_register(offs_t offset);
+	UINT8 read_floating_bus(void);
 	void write(offs_t offset, UINT8 data);
 	void write_gime_register(offs_t offset, UINT8 data);
 	void write_mmu_register(offs_t offset, UINT8 data);

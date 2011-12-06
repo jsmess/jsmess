@@ -246,7 +246,8 @@ static const gime_interface coco_gime_config =
 	DEVCB_DEVICE_LINE_MEMBER(PIA0_TAG, pia6821_device, ca1_w),	/* horizontal sync */
 	DEVCB_DEVICE_LINE_MEMBER(PIA0_TAG, pia6821_device, cb1_w),	/* field sync */
 	DEVCB_DRIVER_LINE_MEMBER(coco3_state, gime_irq_w),
-	DEVCB_DRIVER_LINE_MEMBER(coco3_state, gime_firq_w)
+	DEVCB_DRIVER_LINE_MEMBER(coco3_state, gime_firq_w),
+	DEVCB_DRIVER_MEMBER(coco_state, floating_bus_read)
 };
 
 static MACHINE_CONFIG_START( coco3, coco3_state )

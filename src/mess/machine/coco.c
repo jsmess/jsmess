@@ -204,6 +204,79 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 
 
+//-------------------------------------------------
+//  floating_bus_read
+//-------------------------------------------------
+//
+// From Darren A on the CoCo list:
+//
+// Whenever you read from an un-mapped hardware address or from an
+// address where some of the bits are undefined (like the GIME's palette
+// and MMU registers), the value obtained for those undefined bits is
+// predictable on the CoCo.
+// 
+// There are two possibilites which depend on the addressing mode you use
+// to read from such an address.  If you use the "no-offset" indexed mode
+// (as in LDA ,X) the undefined bits will come from the first byte of the
+// next instruction.  For any other addressing mode, the undefined bits
+// will come from the byte at $FFFF (LSB of the Reset vector).
+// 
+// When you use BASIC's PEEK command to read from an un-mapped address
+// (such as $FF70), you get a value of 126.  This is because PEEK reads
+// the address with a LDA ,X instruction, so the value returned is the
+// opcode of the next instruction (JMP Extended = $7E = 126).  If you
+// patch the PEEK command to use a 5-bit offset (LDA 0,X), the value
+// returned for an un-mapped address will instead come from $FFFF (27 on
+// a CoCo 3 or 39 on a CoCo 1/2).
+// 
+// The reason for this behavior is that the 6809 normally does a VMA
+// cycle just before reading the instruction's effective address. The
+// exception is the "no-offset" indexed mode in which case the next
+// instruction byte is read just prior to the effective address.  During
+// a VMA cycle the address bus goes to Hi Impedance and the R/W line is
+// HI.  This has the effect of loading the value from $FFFF onto the data
+// bus.  This stale data from the previous cycle supplies the value for
+// the undefined bits.
+// 
+// Here is a small routine which will demonstrate this behavior:
+// 
+//   ldx   #$FF70
+//   lda   ,x
+//   ldb   $FF70
+//   std   $400
+//   rts
+// 
+// On a CoCo 3, you should end up with the value $F61B at $400-401.  On a
+// CoCo 1/2 you should get $F627 instead.
+//-------------------------------------------------
+
+UINT8 coco_state::floating_bus_read(void)
+{
+	UINT8 byte;
+
+	// set up the ability to read address spaces
+	address_space *program = m_maincpu->space(AS_PROGRAM);
+
+	// get the previous and current PC
+	UINT16 prev_pc = cpu_get_previouspc(m_maincpu);
+	UINT16 pc = cpu_get_pc(m_maincpu);
+
+	// get the byte; and skip over header bytes
+	byte = program->read_byte(prev_pc);
+	if ((byte == 0x10) || (byte == 0x11))
+		byte = program->read_byte(++prev_pc);
+
+	// check to see if the opcode specifies the indexed addressing mode, and the secondary byte
+	// specifies no-offset
+	bool is_nooffset_indexed = (((byte & 0xF0) == 0x60) || ((byte & 0xF0) == 0xA0) || ((byte & 0xF0) == 0xE0))
+		&& ((program->read_byte(prev_pc + 1) & 0xBF) == 0x84);
+
+	// finally read the byte
+	return program->read_byte(is_nooffset_indexed ? pc : 0xFFFF);
+}
+
+
+
 /***************************************************************************
   PIA0 ($FF00-$FF1F) (Chip U8)
 
@@ -1090,11 +1163,15 @@ coco_vhd_image_device *coco_state::current_vhd(void)
 
 READ8_MEMBER( coco_state::ff60_read )
 {
-	UINT8 result = 0x00;
+	UINT8 result;
 
 	if ((current_vhd() != NULL) && (offset >= 32) && (offset <= 37))
 	{
 		result = current_vhd()->read(offset - 32);
+	}
+	else
+	{
+		result = floating_bus_read();
 	}
 
 	return result;
