@@ -157,6 +157,7 @@ void gime_base_device::device_start(void)
 	m_res_out_fsync_func.resolve(config->m_out_fsync_func, *this);
 	m_res_out_irq_func.resolve(config->m_out_irq_func, *this);
 	m_res_out_firq_func.resolve(config->m_out_firq_func, *this);
+	m_res_in_floating_bus_func.resolve(config->m_in_floating_bus_func, *this);
 
 	/* set up ROM/RAM pointers */
 	m_rom = machine().region(config->m_maincpu_tag)->base();
@@ -711,11 +712,27 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_mmu_register(offs_t offset)
 
 ATTR_FORCE_INLINE UINT8 gime_base_device::read_palette_register(offs_t offset)
 {
-	// Bits 7/6 are set and cleared respectively.  On a real CoCo 3
+	// Bits 7/6 are floating, and behave oddly.  On a real CoCo 3
 	//
 	//  POKE&HFFB1,255:PRINTPEEK(&HFFB1)    returns 127.
 	//  POKE&HFFB1,0:PRINTPEEK(&HFFB1)      returns 64
-	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F] | 0x40;
+	//
+	// This is because of the floating bus
+	return m_palette_rotated[m_palette_rotated_position][offset & 0x0F]
+		| (read_floating_bus() & 0xC0);
+}
+
+
+
+//-------------------------------------------------
+//  read_floating_bus
+//-------------------------------------------------
+
+ATTR_FORCE_INLINE UINT8 gime_base_device::read_floating_bus(void)
+{
+	return m_res_in_floating_bus_func.isnull()
+		? 0
+		: m_res_in_floating_bus_func(0);
 }
 
 

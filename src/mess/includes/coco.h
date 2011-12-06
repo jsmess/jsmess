@@ -117,6 +117,9 @@ public:
 	DECLARE_READ8_MEMBER( ff60_read );
 	DECLARE_WRITE8_MEMBER( ff60_write );
 
+	/* floating bus */
+	DECLARE_READ8_MEMBER( floating_bus_read )	{ return floating_bus_read(); }
+
 protected:
 	/* device-level overrides */
 	virtual void device_start();
@@ -222,6 +225,9 @@ private:
 
 	/* VHD selection */
 	coco_vhd_image_device *current_vhd(void);
+
+	/* floating bus */
+	UINT8 floating_bus_read(void);
 
 	/* disassembly override */
 	static offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
