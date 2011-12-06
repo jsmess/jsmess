@@ -23550,7 +23550,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-<!-- The Prototype build "World Championship Soccer II (Prototype, 19940523)" released together with the other protos coincides 
+<!-- The Prototype build "World Championship Soccer II (Prototype, 19940523)" released together with the other protos coincides
 with the final release (CRC32: 6065774d), which has been dumped short ago -->
 
 	<software name="wcs2p19" cloneof="wcs2">

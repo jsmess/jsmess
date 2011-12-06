@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 	MCFG_CPU_IO_MAP(pce_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "screen", 0, 1)
 
-//	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( pce )
 	MCFG_MACHINE_RESET( mess_pce )
