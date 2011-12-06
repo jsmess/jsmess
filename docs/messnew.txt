@@ -1,4 +1,44 @@
-﻿0.144u1
+﻿0.144u2
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- MK-83 [Enrico Lazzerini]
+
+System Driver Changes:
+----------------------
+-wswan: fixed bug 2045. this fixes crash in several wswan games 
+  Morita Shougi, Chocobo Dungeon, World Stadium, World Stadium '99 
+  and the two Medarot games) and possibly in some wscolor games too. [Fabio Priuli]
+-bbc: Fixed interrupt handling. [Curt Coder]
+-atarist: DMA address bytes are individually adressable [O. Galibert]
+-atarist: Add Pasti format support [O. Galibert]
+
+Software Lists:
+----------------
+-ibmpcjr_flop.xml : added software list for PC Jr floppies [Kaylee]
+-sat_*.xml: added placeholder software lists for CD and (support) carts, 
+ and hooked them up in the driver [David Haywood] 
+-ibm5170.xml: New dumps from original media [Kaylee]
+
+Source Changes:
+----------------
+-mc68901: Correct the spurious irq information a little [ijor]
+-wd1772: Whether a drive is connected or not has no impact on the 
+ seek track==requested track test [O. Galibert]
+-wd1772: Funnily enough, it's write track that writes, not read track [O. Galibert]
+-floppy: Fix allocation issues on write [O. Galibert]
+-wd1772: Simpily and make it more correct at the same time [O. Galibert, ijor]
+-ui_menu: First part of the C++-ification [O. Galibert]
+
+0.144u1
 
 New System Drivers Supported:
 -----------------------------
