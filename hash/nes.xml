@@ -47012,6 +47012,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="cwdjz" supported="partial">
+		<!-- Serial: ES-1081 - Release Date:  - Alternative Title:  -->
+		<description>Chong Wu Da Jia Zu - Bu Luo Fen Zheng (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-SGZLZ" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[es-1081] chong wu da jia zu bu luo fen zheng (c).prg" size="1048576" crc="ec08cc36" sha1="1075e1216e484b1d17c59a6b5f9de3b93588a63a" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sanguo2" cloneof="sangok2h" supported="no">
 		<!-- Serial: ES-1084 - Release Date:  - Alternative Title: 三国志Ⅱ中文 -->
 		<description>San Guo Zhi II - Zhong Wen (Chi, Hacked)</description>
@@ -47021,6 +47037,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="WAIXING-FFV" />
 			<dataarea name="prg" size="1048576">
 				<rom name="san guo zhi ii (199x)(waixing)(cn)[p].prg" size="1048576" crc="0b1e9726" sha1="130422bc8a79c306396e54eb770d1ec6918ebaaf" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cwjhs" supported="no">
+		<!-- Serial: ES-1085 - Release Date:  - Alternative Title:  -->
+		<description>Chong Wu Jin Hua Shi (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" />	<!-- header says mapper 162! -->
+			<dataarea name="prg" size="1048576">
+				<rom name="[es-1085] chong wu jin hua shi (c).prg" size="1048576" crc="8b41d49c" sha1="db969702b2adeb77fa07e99bc1f14838c03f48aa" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -47282,6 +47314,25 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<feature name="pcb" value="WAIXING-A" />
 			<dataarea name="prg" size="524288">
 				<rom name="ji dou sheng zhan shi (es-1117) (c).prg" size="524288" crc="bff7c60c" sha1="6b2df23fb3c21742993a9d0fd1e6584d26657e7f" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guimeizj" supported="no">
+		<!-- Serial: ES-1125 - Release Date:  - Alternative Title:  -->
+		<description>Gui Mei Zhan Ji (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" /> <!-- header says mapper 176, but it's wrong -->
+			<dataarea name="chr" size="262144">
+				<rom name="[es-1125] gui mei zhan ji (c).chr" size="262144" crc="5a86b58f" sha1="e52f06ed0c253b8d3cba9aa020e25fd8b680947d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="[es-1125] gui mei zhan ji (c).prg" size="524288" crc="eb08bfe9" sha1="5439f65b1bdb0ee9f2d0f74843ac9b4a35302a50" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -53048,6 +53099,22 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+	<software name="biohazrda" cloneof="biohazrd" supported="partial">
+		<!-- Serial:  - Release Date:  - Alternative Title: 生化危机 -->
+		<description>Bio Hazard (Chi, Fixed?)</description>
+		<year>2003?</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-1200IN1" /> <!-- header says mapper 227, probably variant -->
+			<dataarea name="prg" size="1048576">
+				<rom name="bio hazard (no-bug) (unl).prg" size="1048576" crc="2e27e0af" sha1="3703c3f28174d5544f10b8d5ab8aa6660f1c1b7d" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chaojidz" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title: 超级大战略 / Super Daisenryaku? -->
 		<description>Chaoji Da Zhan Lue (Chi, Decrypted WXN)</description>
@@ -53542,6 +53609,23 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+<!-- Comment from Cah4e3: other dumps are patched lately with come portions of code to seems handle another PAL modes, which original game doesn't... so this might be the original version of the game -->
+	<software name="jkxz2" cloneof="jkxz">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Jing Ke Xin Zhuan (Chi, Alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="CNE-SHLZ" />
+			<dataarea name="chr" size="131072">
+				<rom name="jing ke xin zhuan (ch) [a2][!].chr" size="131072" crc="53d12c09" sha1="d53c54fd711bd9b6eb46ec032ec7f14a366782b8" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="jing ke xin zhuan (ch) [a2][!].prg" size="131072" crc="9d1e49e8" sha1="c4ee8ce635d7ce02b9037f7448496cbbbf424918" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jkxz">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Jing Ke Xin Zhuan (Chi)</description>
@@ -54016,6 +54100,22 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="qi wang - chinese chess (ch) [p1].prg" size="65536" crc="50892197" sha1="a1b1064226915652d7a02fe3b1a73a06cbb83f24" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_rockm" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Rockman 6 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23CA" />
+			<dataarea name="prg" size="2097152">
+				<rom name="6-in-1 rockman (unl)[u][!].prg" size="2097152" crc="e6d869ed" sha1="1e90811e0fa94afacaa2b06ac101d9c34e067515" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -66435,13 +66535,29 @@ that the real dumps might surface -->
 
 	<software name="mc_105te" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>2011 Super HiK 105-in-1 Turbo Edition</description>
+		<description>2011 Super HiK 105 in 1 Turbo Edition</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="8388608">
 				<rom name="2011 super hik 105-in-1 turbo edition.prg" size="8388608" crc="c0f85771" sha1="8c4182b1de3be10dd895089823cc67a9d12589ef" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_sp69" supported="no">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Sports Game 69 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="prg" size="4194304">
+				<rom name="sports game 69-in-1 (unl)[u][!].prg" size="4194304" crc="1242da7f" sha1="bb8f99b1f4a4783b3f7e54d74f1f2a6a628da154" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
