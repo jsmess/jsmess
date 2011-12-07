@@ -13993,6 +13993,18 @@
 		</part>
 	</software>
 
+	<software name="kirbyamjd" cloneof="kirbyam">
+		<description>Hoshi no Kirby - Kagami no Daimeikyuu (Jpn, Demo?)</description>
+		<year>2004</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-SRAM" />
+			<dataarea name="rom" size="16777216">
+				<rom name="hoshi no kirby - kagami no daimeikyuu (japan) (beta).bin" size="16777216" crc="bf80f1a1" sha1="d84dd2ad9caf2754dd76bc1f8f534b6a80a13b04" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kirbyndlj" cloneof="kirbyndl">
 		<description>Hoshi no Kirby - Yume no Izumi Deluxe (Jpn)</description>
 		<year>2002</year>

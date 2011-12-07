@@ -51948,7 +51948,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="bssdgn" supported="no">
+	<software name="bssdgn2" cloneof="bssdgn1" supported="no">
 		<!-- Serial:  - Release Date:  -->
 		<description>BS SD Gundam G-Next (Jpn, Data?)</description>
 		<!-- BS -->
@@ -51956,7 +51956,85 @@ Alternate board (XL-1)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sd gundam g-next (japan) (data) (?).bs" size="1048576" crc="a94854ad" sha1="f2ec8f76782656134804b1e97c9f186d26da5d08" offset="0x000000" />
+				<rom name="sd gundam g-next (japan) (data).bs" size="1048576" crc="a94854ad" sha1="f2ec8f76782656134804b1e97c9f186d26da5d08" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssdgn1" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS SD Gundam G-Next (Jpn, Data 0316)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sd gundam g-next data (3-16) (dumped august 2010).bs" size="1048576" crc="2e2ef6c4" sha1="81d2dff2d9e248e00bc7a051e603290f56f20f91" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsrpgt1" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS RPG Tsukuru 2 Data</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="[ikari] rpg tsukuru 2 data (2011-11-17).bs" size="1048576" crc="5561afd6" sha1="f312ff25789507ebbbb6bdc1c74131f91c20145b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsrpgt2" cloneof="bsrpgt1" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS RPG Tsukuru 2 Data (Overwritten Bokujo Data)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="rpg tsukuru 2 data (overwritten bokujo data).bs" size="1048576" crc="80ec9cc0" sha1="7ba6b26f0ec5309ed5ee14e1188891b554ca145e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsascii1" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS ASCII Data 1</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ascii data 1.bs" size="1048576" crc="148955f9" sha1="01fbab2a57d5e9ef9abc85202c3ef75031bd17ad" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsascii2" cloneof="bsascii1" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS ASCII Data 2</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ascii data 2.bs" size="1048576" crc="bf7d57b0" sha1="f4064a38723bcd4999ff92c8202b3cc9ce3d8d03" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsascii3" cloneof="bsascii1" supported="no">
+		<!-- Serial:  - Release Date:  -->
+		<description>BS ASCII Data 3</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ascii data 3.bs" size="1048576" crc="2ab43134" sha1="885c80f0e8582e6ae62bcc42ec6249f50c5b56da" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
