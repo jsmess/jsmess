@@ -47013,7 +47013,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="cwdjz" supported="partial">
-		<!-- Serial: ES-1081 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1081 - Release Date:  - Alternative Title: 宠物大家族-部落纷争 -->
 		<description>Chong Wu Da Jia Zu - Bu Luo Fen Zheng (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -47045,7 +47045,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="cwjhs" supported="no">
-		<!-- Serial: ES-1085 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1085 - Release Date:  - Alternative Title: 宠物进化史 -->
 		<description>Chong Wu Jin Hua Shi (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -47322,7 +47322,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="guimeizj" supported="no">
-		<!-- Serial: ES-1125 - Release Date:  - Alternative Title:  -->
+		<!-- Serial: ES-1125 - Release Date:  - Alternative Title: 鬼魅战记 -->
 		<description>Gui Mei Zhan Ji (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
