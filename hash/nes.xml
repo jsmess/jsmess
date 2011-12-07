@@ -46165,6 +46165,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="dafuweng1" cloneof="dafuweng" supported="no">
+		<!-- Serial: ES-1004 - Release Date:  - Alternative Title: 超级大富翁 -->
+		<description>Chao Ji Da Fu Weng - Super Rich (Chi, Decrypted WXN)</description>
+		<year>199?</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HENGGEDIANZI-XJZB" /> <!-- header says mapper 4, but it's wrong. this at least executes the correct program -->
+			<dataarea name="prg" size="1048576">
+				<rom name="chaoji da fu weng (wxn decrypted).prg" size="1048576" crc="49f22159" sha1="6ed9db38cb2633728b93d00ce00caa2a22675f6e" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bxtg">
 		<!-- Serial: ES-1005 - Release Date:  - Alternative Title: 爆笑三国 -->
 		<description>Bao Xiao Tien Guo (Chi)</description>
@@ -46315,7 +46331,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="firembgcc" cloneof="firembg" supported="no">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 圣火徽章外传 -->
 		<description>Sheng Huo Hui Zhang - Suo Fei Ya De Fu Su (Chi, Alt)</description>
 		<year>199?</year>
 		<publisher>CoolBoy</publisher>
@@ -46493,8 +46509,24 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="zjshiji1" cloneof="zjshiji" supported="partial">
+		<!-- Serial: ES-1025 - Release Date:  - Alternative Title: 拯救世纪 -->
+		<description>Zheng Jiu Shi Ji (Chi, Decrypted WXN)</description>
+		<year>199?</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="zheng jiu shi ji (wxn decrypted).chr" size="262144" crc="551a001e" sha1="dcbd95cfa1bab57d75ea8b6bb397cb9957df4589" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="zheng jiu shi ji (wxn decrypted).prg" size="262144" crc="b8109090" sha1="58af1ad1c33925537463cbdb37a42d62c25b6ba0" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gmzs" cloneof="zjshiji" supported="partial">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial:  - Release Date:  - Alternative Title: 光明之神 -->
 		<description>Guang Ming Zhi Shen (Chi)</description>
 		<year>199?</year>
 		<publisher>CoolBoy</publisher>
@@ -46621,6 +46653,25 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="[es-1046] fengyun (c) (wxn decrypted).prg" size="524288" crc="370808c3" sha1="d2d4c37715c7a066f53f7e38577f6ae4850b3560" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fengyun1" cloneof="fengyun">
+		<!-- Serial: ES-1046 - Release Date:  - Alternative Title: 风云 -->
+		<description>FengYun - Traitor Legend (Chi, Decrypted WXN, Alt)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-A" />
+			<dataarea name="chr" size="262144">
+				<rom name="fengyun (c) (wxn decrypted).chr" size="262144" crc="e86c090c" sha1="10c0381980766d06b78b75ff5c19d02a17404e92" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="fengyun (c) (wxn decrypted).prg" size="524288" crc="9a6ed0b2" sha1="7aa619ddfb518b1fa08b8bc76329242f652a6f5b" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
