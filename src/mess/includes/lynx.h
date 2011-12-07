@@ -74,7 +74,7 @@ typedef struct
 	UINT8	bakup;
 	UINT8	cntrl1;
 	UINT8	cntrl2;
-	int		counter;
+	UINT8	counter;
 	emu_timer	*timer;
 	int		timer_active;
 } LYNX_TIMER;
