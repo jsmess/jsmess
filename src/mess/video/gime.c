@@ -1391,7 +1391,7 @@ UINT32 gime_base_device::get_data_with_attributes(UINT32 video_position, UINT8 *
 	*mode = *memory_pointer(video_position + 1);
 
 	/* is the blink attribute specified? */
-	if (UNEXPECTED(*mode) & 0x80)
+	if (UNEXPECTED(*mode & 0x80))
 	{
 		/* if so - and we're blinking - then clear the character */
 		if (m_is_blinking)
