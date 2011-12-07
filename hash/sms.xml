@@ -87,11 +87,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1305, 5055, 41008 - Releases: 1986-08-17 (JPN) - Alt Title: アクションファイター -->
+	<!-- Serial: G-1305, 5055, 41008 - Releases: 1986-08-17 (JPN) -->
 	<software name="actionfg1" cloneof="actionfg">
 		<description>Action Fighter (Euro, Jpn, v1)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アクションファイター" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="action fighter (japan, europe) (v1.1).bin" size="131072" crc="d91b340d" sha1="5dbcfb75958f4cfa1b61d9ea114bab67787b113e" offset="000000" />
@@ -135,11 +136,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1340, 9001 - Releases: 1987-12-12 (JPN) - Alt Title: アフターバーナー - Notes: FM support -->
+	<!-- Serial: G-1340, 9001 - Releases: 1987-12-12 (JPN) - Notes: FM support -->
 	<software name="afterb">
 		<description>After Burner (World)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アフターバーナー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="after burner (world).bin" size="524288" crc="1c951f8e" sha1="51531df038783c84640a0cab93122e0b59e3b69a" offset="000000" />
@@ -183,11 +185,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1352 - Releases: 1988-02-29 (JPN) - Alt Title: アレスタ - Notes: FM support -->
+	<!-- Serial: G-1352 - Releases: 1988-02-29 (JPN) - Notes: FM support -->
 	<software name="aleste" cloneof="powstrik">
 		<description>Aleste (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アレスタ" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="aleste (japan).bin" size="131072" crc="d8c4165b" sha1="cba75b0d54df3c9a8e399851a05c194c7a05fbfe" offset="000000" />
@@ -195,11 +198,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1330 - Releases: 1987-11-15 (JPN) - Alt Title: アレックスキッド BMXトライアル - Notes: FM support -->
+	<!-- Serial: G-1330 - Releases: 1987-11-15 (JPN) - Notes: FM support -->
 	<software name="alexbmx">
 		<description>Alex Kidd BMX Trial (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アレックスキッド BMXトライアル" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="alex kidd bmx trial (japan).bin" size="131072" crc="f9dbb533" sha1="77cc767bfae01e9cc81612c780c939ed954a6312" offset="000000" />
@@ -253,11 +257,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1306 - Releases: 1986-11-01 (JPN) - Alt Title: アレックスキッドのミラクルワールド -->
+	<!-- Serial: G-1306 - Releases: 1986-11-01 (JPN) -->
 	<software name="alexkiddj" cloneof="alexkidd">
 		<description>Alex Kidd no Miracle World (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アレックスキッドのミラクルワールド" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="alex kidd no miracle world (japan).bin" size="131072" crc="08c9ec91" sha1="62fdc25501e17b87c355378562c3b1966e5f9008" offset="000000" />
@@ -265,11 +270,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1347, 7005, GB-2347 - Releases: 1988-03-10 (JPN) - Alt Title: アレックスキッド ザ・ロストスターズ - Notes: FM support -->
+	<!-- Serial: G-1347, 7005, GB-2347 - Releases: 1988-03-10 (JPN) - Notes: FM support -->
 	<software name="alexlost">
 		<description>Alex Kidd - The Lost Stars (World)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アレックスキッド ザ・ロストスターズ" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="alex kidd - the lost stars (world).bin" size="262144" crc="c13896d5" sha1="6dbf2684c3dfea7442d0b40a9ff7c8b8fc9b1b98" offset="000000" />
@@ -361,11 +367,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1328 - Releases: 1987-07-19 (JPN) - Alt Title: あんみつ姫 - Note: the Western release, "Alex Kidd Hiigh-Tech World" is quite different -->
+	<!-- Serial: G-1328 - Releases: 1987-07-19 (JPN) - Note: the Western release, "Alex Kidd High-Tech World" is quite different -->
 	<software name="anmitsu" cloneof="alexhitw">
 		<description>Anmitsu Hime (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="あんみつ姫" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="anmitsu hime (japan).bin" size="131072" crc="fff63b0b" sha1="74057d3b7f384c91871a2db2fbc86d3e700c45e5" offset="000000" />
@@ -385,11 +392,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: S-001 - Releases: 1988-03-25 (JPN) - Alt Title: アルゴスの十字剣 -->
+	<!-- Serial: S-001 - Releases: 1988-03-25 (JPN) -->
 	<software name="argosnj">
 		<description>Argos no Juujiken (Jpn)</description>
 		<year>1988</year>
 		<publisher>Tecmo</publisher>
+		<info name="alt_title" value="アルゴスの十字剣" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="argos no juujiken (japan).bin" size="131072" crc="bae75805" sha1="a4b63ed417380f8170091e66c0417123799a731f" offset="000000" />
@@ -420,11 +428,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1307 - Releases: 1986-11-16 - Alt Title: アシュラ - 阿修羅 -->
+	<!-- Serial: G-1307 - Releases: 1986-11-16 -->
 	<software name="ashura" cloneof="secret">
 		<description>Ashura (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アシュラ - 阿修羅" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="ashura (japan).bin" size="131072" crc="ae705699" sha1="e9f90d63320295e4bd9a87e6078186c5efb7e84e" offset="000000" />
@@ -552,11 +561,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1312, 5069 - Releases: 1986-11-16 (JPN) - Alt Title: アストロ ウォリアー -->
+	<!-- Serial: G-1312, 5069 - Releases: 1986-11-16 (JPN) -->
 	<software name="astrowj" cloneof="astrow">
 		<description>Astro Warrior (Jpn, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アストロ ウォリアー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="astro warrior (japan, usa).bin" size="131072" crc="299cbb74" sha1="901697a3535ad70190647f34ad5b30b695d54542" offset="000000" />
@@ -576,11 +586,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1339 - Releases: 1987-10-18 (JPN) - Alt Title: エイリアン シンドローム - Notes: FM support -->
+	<!-- Serial: G-1339 - Releases: 1987-10-18 (JPN) - Notes: FM support -->
 	<software name="asyndromj" cloneof="asyndrom">
 		<description>Alien Syndrome (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="エイリアン シンドローム" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="alien syndrome (japan).bin" size="262144" crc="4cc11df9" sha1="5d786476b275de34efb95f576dd556cf4b335a83" offset="000000" />
@@ -611,11 +622,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1335, 5100 - Releases: 1987-09-20 (JPN) - Alt Title: ナスカ'88 -THE GOLDEN ROAD TO PARADISE- - Notes: FM support -->
+	<!-- Serial: G-1335, 5100 - Releases: 1987-09-20 (JPN) - Notes: FM support -->
 	<software name="aztecadv">
 		<description>Aztec Adventure - The Golden Road to Paradise (Euro, USA) ~ Nazca '88 - The Golden Road to Paradise (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ナスカ'88 -THE GOLDEN ROAD TO PARADISE-" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="aztec adventure - the golden road to paradise (world).bin" size="131072" crc="ff614eb3" sha1="317775a17867530a8fe3a5b17b681d5ada351432" offset="000000" />
@@ -767,11 +779,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1351, 8005 - Releases: 1988-03-26 (JPN) - Alt Title: ブレード イーグル - Notes: FM support, 3D glasses support -->
+	<!-- Serial: G-1351, 8005 - Releases: 1988-03-26 (JPN) - Notes: FM support, 3D glasses support) -->
 	<software name="bladeag">
 		<description>Blade Eagle (World)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ブレード イーグル" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="blade eagle (world).bin" size="262144" crc="8ecd201c" sha1="b786d15b26b914c24cd1c36a8fca41b215c0a4e7" offset="000000" />
@@ -790,11 +803,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1373, QC-003, 27006 - Releases: 1989-02-04 (JPN) - Alt Title: ボンバーレイド - Notes: FM support -->
+	<!-- Serial: G-1373, QC-003, 27006 - Releases: 1989-02-04 (JPN) - Notes: FM support -->
 	<software name="bomber">
 		<description>Bomber Raid (World)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ボンバーレイド" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="bomber raid (world).bin" size="262144" crc="3084cf11" sha1="d754ef2b6e05c76502c02c71dbfcf6150ee12f6f" offset="000000" />
@@ -826,11 +840,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1371 - Releases: 1988-12-01 (JPN) - Alt Title: 超音戦士ボーグマン - Notes: FM support -->
+	<!-- Serial: G-1371 - Releases: 1988-12-01 (JPN) - Notes: FM support -->
 	<software name="borgman" cloneof="cyborgh">
 		<description>Chouon Senshi Borgman (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="超音戦士ボーグマン" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="chouon senshi borgman (japan).bin" size="131072" crc="e421e466" sha1="9f987e022090a40506b78d89523e9f88b3bb0c0b" offset="000000" />
@@ -921,11 +936,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1356, 7008 - Releases: 1988-07-02 (JPN) - Alt Title: キャプテン シルバー - Notes: FM support -->
+	<!-- Serial: G-1356, 7008 - Releases: 1988-07-02 (JPN) - Notes: FM support -->
 	<software name="captsilv">
 		<description>Captain Silver (Euro, Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="キャプテン シルバー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="captain silver (japan, europe).bin" size="262144" crc="a4852757" sha1="88402392e93b220632a61e0c07731a7ed087cbef" offset="000000" />
@@ -1134,11 +1150,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1304 - Releases: 1986-09-21 (JPN) - Alt Title: ザ・サーキット -->
+	<!-- Serial: G-1304 - Releases: 1986-09-21 (JPN) -->
 	<software name="circuit" cloneof="worldgp">
 		<description>The Circuit (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ザ・サーキット" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="circuit, the (japan).bin" size="131072" crc="8fb75994" sha1="34307a745d3d52a4b814e9831b7041f25e8052d1" offset="000000" />
@@ -1324,11 +1341,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1369, 7012 - Releases: 1988-10-01 (JPN) - Alt Title: 双截龍（ダブルドラゴン） - Notes: FM support -->
+	<!-- Serial: G-1369, 7012 - Releases: 1988-10-01 (JPN) - Notes: FM support -->
 	<software name="ddragon">
 		<description>Double Dragon (World)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="双截龍（ダブルドラゴン）" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="double dragon (world).bin" size="262144" crc="a55d89f3" sha1="cad5532af94ed75c0ada8820a83fa04d22f7bef5" offset="000000" />
@@ -1336,11 +1354,12 @@
 		</part>
 	</software>
 
-	<!-- Serial:  - Alt Title: 더블드래곤 -->
+	<!-- Serial:  -->
 	<software name="ddragonk" cloneof="ddragon">
 		<description>Double Dragon (Kor)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
+		<info name="alt_title" value="더블드래곤" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="double dragon (kr).bin" size="262144" crc="aeacfca7" sha1="20f209bef33d7c864710736131608213d25559ac" offset="000000" />
@@ -1418,11 +1437,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1334 - Releases: 1987-08-18 (JPN) - Alt Title: どきどきペンギンランド 宇宙大冒険 - Notes: FM support -->
+	<!-- Serial: G-1334 - Releases: 1987-08-18 (JPN) - Notes: FM support -->
 	<software name="dokidoki" cloneof="penguin">
 		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="どきどきペンギンランド 宇宙大冒険" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="doki doki penguin land - uchuu daibouken (japan).bin" size="131072" crc="2bcdb8fa" sha1="c01cf44eee335d509dc20a165add8514e7fbb7c4" offset="000000" />
@@ -1464,11 +1484,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1314 - Releases: 1987-01-18 (JPN) - Alt Title: ダブルターゲット シンシアの眠り -->
+	<!-- Serial: G-1314 - Releases: 1987-01-18 (JPN) -->
 	<software name="doubltgt" cloneof="quartet">
 		<description>Double Target - Cynthia no Nemuri (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ダブルターゲット シンシアの眠り" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="double target - cynthia no nemuri (japan).bin" size="131072" crc="52b83072" sha1="51f9ce05e383983ce1fe930ec178406b277db69c" offset="000000" />
@@ -1535,11 +1556,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1302 - Releases: 1986-07-20 (JPN) - Alt Title: 極悪同盟 ダンプ松本 -->
+	<!-- Serial: G-1302 - Releases: 1986-07-20 (JPN) -->
 	<software name="dumpmats" cloneof="prowrest">
 		<description>Gokuaku Doumei Dump Matsumoto (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="極悪同盟 ダンプ松本" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="gokuaku doumei dump matsumoto (japan).bin" size="131072" crc="a249fa9d" sha1="77f1e788f43fb59456f982472f02f109f53c7918" offset="000000" />
@@ -1643,11 +1665,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1322 - Releases: 1987-05-18 (JPN) - Alt Title: エンデューロレーサー -->
+	<!-- Serial: G-1322 - Releases: 1987-05-18 (JPN) -->
 	<software name="enduroj" cloneof="enduro">
 		<description>Enduro Racer (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="エンデューロレーサー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="enduro racer (japan).bin" size="262144" crc="5d5c50b3" sha1="7a0216af8d4a5aeda1d42e2703f140d08b3f92f6" offset="000000" />
@@ -1772,11 +1795,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1342 - Releases: 1987-12-27 (JPN) - Alt Title: ファミリーゲームズ - Notes: FM support -->
+	<!-- Serial: G-1342 - Releases: 1987-12-27 (JPN) - Notes: FM support -->
 	<software name="family" cloneof="parlour">
 		<description>Family Games (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ファミリーゲームズ" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="family games (japan).bin" size="131072" crc="7abc70e9" sha1="dfbf0186d497cf53d1f21a9430991ed4124cc4c2" offset="000000" />
@@ -1808,11 +1832,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1329 - Releases: 1987-10-17 (JPN) - Alt Title: ファンタジーゾーンII オパオパの涙 - Notes: FM support -->
+	<!-- Serial: G-1329 - Releases: 1987-10-17 (JPN) - Notes: FM support -->
 	<software name="fantzon2j" cloneof="fantzon2">
 		<description>Fantasy Zone II - Opa Opa no Namida (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ファンタジーゾーンII オパオパの涙" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="fantasy zone ii - opa-opa no namida (japan).bin" size="262144" crc="c722fb42" sha1="60d8135e8f15fe48f504d0ec69010a4b886dcda8" offset="000000" />
@@ -1820,11 +1845,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1301, 5108, 41002 - Releases: 1986-06-15 (JPN) - Alt Title: ファンタジーゾーン -->
+	<!-- Serial: G-1301, 5108, 41002 - Releases: 1986-06-15 (JPN) -->
 	<software name="fantzone">
 		<description>Fantasy Zone (World, v2)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ファンタジーゾーン" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="fantasy zone (world) (v1.2).bin" size="131072" crc="65d7e4e0" sha1="0278cd120dc3a7707eda9314c46c7f27f9e8fdda" offset="000000" />
@@ -1879,11 +1905,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1362 - Releases: 1988-07-02 (JPN) - Alt Title: ファイナル バブル ボブル -->
+	<!-- Serial: G-1362 - Releases: 1988-07-02 (JPN) -->
 	<software name="fbubbobl" cloneof="bublbobl">
 		<description>Final Bubble Bobble (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega </publisher>
+		<info name="alt_title" value="ファイナル バブル ボブル" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="final bubble bobble (japan).bin" size="262144" crc="3ebb7457" sha1="ab585612fddb90b5285e2804f63fd7fb7ba02900" offset="000000" />
@@ -2069,11 +2096,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1348 - Releases: 1988-02-21 (JPN) - Alt Title: ギャラクティック プロテクター - Notes: FM support -->
+	<!-- Serial: G-1348 - Releases: 1988-02-21 (JPN) - Notes: FM support -->
 	<software name="galactpr">
 		<description>Galactic Protector (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ギャラクティック プロテクター" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="galactic protector (japan).bin" size="131072" crc="a6fa42d0" sha1="e8bcc3621e30ee445a74e6ddbe0842d0a6753f36" offset="000000" />
@@ -2399,11 +2427,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1320, 5071 - Releases: 1987-03-29 (JPN) - Alt Title: グレート バスケットボール -->
+	<!-- Serial: G-1320, 5071 - Releases: 1987-03-29 (JPN) -->
 	<software name="greatbsk">
 		<description>Great Basketball (World)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="グレート バスケットボール" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="great basketball (world).bin" size="131072" crc="2ac001eb" sha1="2fdb7ebce61e316ded27b575535d4f475c9dd822" offset="000000" />
@@ -2411,11 +2440,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1321, 5058 - Releases: 1987-04-29 (JPN) - Alt Title: グレート フットボール -->
+	<!-- Serial: G-1321, 5058 - Releases: 1987-04-29 (JPN) -->
 	<software name="greatftb">
 		<description>Great Football (World)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="グレート フットボール" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="great football (world).bin" size="131072" crc="2055825f" sha1="a768f44ce7e50083ffe8c4b5e3ac93ceb7bd3266" offset="000000" />
@@ -2423,11 +2453,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1332, 5057 - Releases: 1987-10-10 (JPN) - Alt Title: マスターズ ゴルフ - Notes: FM support -->
+	<!-- Serial: G-1332, 5057 - Releases: 1987-10-10 (JPN) - Notes: FM support -->
 	<software name="greatglf">
 		<description>Great Golf (Euro, USA) ~ Masters Golf (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="マスターズ ゴルフ" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="great golf (world).bin" size="131072" crc="98e4ae4a" sha1="3c0b12cfb70f2515429b6e88e0753d69dbb907ab" offset="000000" />
@@ -2457,11 +2488,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1313 - Releases: 1986-12-20 (JPN) - Alt Title: グレートゴルフ -->
+	<!-- Serial: G-1313 - Releases: 1986-12-20 (JPN) -->
 	<software name="greatglj">
 		<description>Great Golf (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="グレートゴルフ" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="great golf (japan).bin" size="131072" crc="6586bd1f" sha1="417739aa248032f5aebe05750a5de85346e36712" offset="000000" />
@@ -2505,11 +2537,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: K-307 - Alt Title: Shìjiè bēi zúqiú sài ~ 世界杯足球賽 -->
+	<!-- Serial: K-307 -->
 	<software name="greatscrtw" cloneof="greatscr">
 		<description>Great Soccer (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
+		<info name="alt_title" value="Shìjiè bēi zúqiú sài ~ 世界杯足球賽" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="great soccer (tw).bin" size="32768" crc="84665648" sha1="88611c50fcaa307bfd70b2bd5effeb39c2c4f3ae" offset="000000" />
@@ -2541,11 +2574,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1317 - Releases: 1987-03-29 (JPN) - Alt Title: グレート バレーボール -->
+	<!-- Serial: G-1317 - Releases: 1987-03-29 (JPN) -->
 	<software name="greatvolj" cloneof="greatvol">
 		<description>Great Volleyball (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="グレート バレーボール" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="great volleyball (japan).bin" size="131072" crc="6819b0c0" sha1="b9e3284c7b557eed84661c98bc733d32b46c7a07" offset="000000" />
@@ -2553,11 +2587,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1331 - Releases: 1987-10-18 (JPN) - Alt Title: 覇邪の封印 - Notes: FM support -->
+	<!-- Serial: G-1331 - Releases: 1987-10-18 (JPN) - Notes: FM support -->
 	<software name="hajafuin" cloneof="miracle">
 		<description>Haja no Fuuin (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="覇邪の封印" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="haja no fuuin (japan).bin" size="262144" crc="b9fdf6d9" sha1="46a032004d49fec58099aa6bf0dd796997e95142" offset="000000" />
@@ -2648,11 +2683,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1309 - Releases: 1986-12-15 (JPN) - Alt Title: ハイスクール！奇面組 -->
+	<!-- Serial: G-1309 - Releases: 1986-12-15 (JPN) -->
 	<software name="highsc">
 		<description>High School! Kimengumi (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ハイスクール！奇面組" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="high school! kimengumi (japan).bin" size="131072" crc="9eb1aa4f" sha1="d3c0aeeacccef77c45ab4219c7d6d8ed04d467cb" offset="000000" />
@@ -2660,11 +2696,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1303 - Releases: 1986-07-20 (JPN) - Alt Title: 北斗の拳 - Notes: The Western version "Black Belt" is quite different -->
+	<!-- Serial: G-1303 - Releases: 1986-07-20 (JPN) - Notes: The Western version "Black Belt" is quite different -->
 	<software name="hokuto" cloneof="blackblt">
 		<description>Hokuto no Ken (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="北斗の拳" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="hokuto no ken (japan).bin" size="131072" crc="24f5fe8c" sha1="26c5da3ee48bc0f8fd3d20f9408e584242edcd9d" offset="000000" />
@@ -2707,11 +2744,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1354 - Releases: 1988-04-02 (JPN) - Alt Title: 星をさがして… - Notes: FM support -->
+	<!-- Serial: G-1354 - Releases: 1988-04-02 (JPN) - Notes: FM support -->
 	<software name="hoshiw">
 		<description>Hoshi wo Sagashite... (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="星をさがして…" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="hoshi wo sagasite... (japan).bin" size="262144" crc="955a009e" sha1="f9ce8b80d8671db6ab38ba5b7ce46324a65ebc3d" offset="000000" />
@@ -2907,11 +2945,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1358 - Releases: 1988-06-02 (JPN) - Alt Title: 剣聖伝 - Notes: FM support -->
+	<!-- Serial: G-1358 - Releases: 1988-06-02 (JPN) - Notes: FM support -->
 	<software name="kenseidj" cloneof="kenseid">
 		<description>Kenseiden (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="剣聖伝" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="kenseiden (japan).bin" size="262144" crc="05ea5353" sha1="cd349833ff41821635c6242a0b8cef7e071103d5" offset="000000" />
@@ -2978,11 +3017,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1366 - Releases: 1988-09-23 (JPN) - Alt Title: 孔雀王 - Notes: FM support -->
+	<!-- Serial: G-1366 - Releases: 1988-09-23 (JPN) - Notes: FM support -->
 	<software name="kujaku" cloneof="spellcst">
 		<description>Kujaku Ou (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="孔雀王" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="kujaku ou (japan).bin" size="524288" crc="d11d32e4" sha1="6974d27bc31c2634bec54c4e9935a28461fb60f7" offset="000000" />
@@ -3097,11 +3137,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1361 - Releases: 1988-06-02 (JPN) - Alt Title: ロード オブ ソード - Notes: FM support -->
+	<!-- Serial: G-1361 - Releases: 1988-06-02 (JPN) - Notes: FM support -->
 	<software name="lordswrdj" cloneof="lordswrd">
 		<description>Lord of Sword (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ロード オブ ソード" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="lord of sword (japan).bin" size="262144" crc="aa7d6f45" sha1="6a08d913fd92a213b1ecf5aa7c5630362cccc6b4" offset="000000" />
@@ -3109,11 +3150,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1315 - Releases: 1987-02-18 (JPN) - Alt Title: シャーロック・ホームズ - ロレッタの肖像 - Notes: This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
+	<!-- Serial: G-1315 - Releases: 1987-02-18 (JPN) - Notes: This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
 	<software name="loretta">
 		<description>Loretta no Shouzou (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="シャーロック・ホームズ - ロレッタの肖像" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="loretta no shouzou (japan).bin" size="131072" crc="323f357f" sha1="0ddd7448f5bd437d0d33b85a44f2bcc2bf2ea05e" offset="000000" />
@@ -3144,11 +3186,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1337 - Releases: 1987-10-18 (JPN) - Alt Title: 麻雀戦国時代 -->
+	<!-- Serial: G-1337 - Releases: 1987-10-18 (JPN) -->
 	<software name="mahjong">
 		<description>Mahjong Sengoku Jidai (Jpn, HK)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="麻雀戦国時代" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="mahjong sengoku jidai (japan).bin" size="131072" crc="bcfbfc67" sha1="9b7cd3a25b2a1fc880683dcdca81457c93d46de5" offset="000000" />
@@ -3167,11 +3210,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1324 - Releases: 1987-05-17 (JPN) - Alt Title: 魔界列伝 -->
+	<!-- Serial: G-1324 - Releases: 1987-05-17 (JPN) -->
 	<software name="makairet" cloneof="kungfuk">
 		<description>Makai Retsuden (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="魔界列伝" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="makai retsuden (japan).bin" size="131072" crc="ca860451" sha1="59d520fdb2b6cbd5736b2bd6045ad3ee3ad2e3a6" offset="000000" />
@@ -3179,11 +3223,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1363 - Releases: 1988-08-14 (JPN) - Alt Title: 魔王ゴルベリアス - Notes: FM support -->
+	<!-- Serial: G-1363 - Releases: 1988-08-14 (JPN) - Notes: FM support -->
 	<software name="maougolv" cloneof="golvell">
 		<description>Maou Golvellius (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="魔王ゴルベリアス" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="maou golvellius (japan).bin" size="262144" crc="bf0411ad" sha1="f62c5c9dea4368e6475517c4220a62e40fedd35d" offset="000000" />
@@ -3274,11 +3319,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1345 - Releases: 1988-01-31 (JPN) - Alt Title: メイズ ウォーカー - Notes: FM support, 3D glasses support -->
+	<!-- Serial: G-1345 - Releases: 1988-01-31 (JPN) - Notes: FM support, 3D glasses support -->
 	<software name="mazewalk" cloneof="mazehunt">
 		<description>Maze Walker (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="メイズ ウォーカー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="maze walker (japan).bin" size="131072" crc="871562b0" sha1="ade756eccaf94c79e8b3636921b6f8669a163265" offset="000000" />
@@ -3286,11 +3332,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1359 - Releases: 1988-07-30 (JPN) - Alt Title: (め)組レスキュー - Notes: FM support -->
+	<!-- Serial: G-1359 - Releases: 1988-07-30 (JPN) - Notes: FM support -->
 	<software name="megumi">
 		<description>Megumi Rescue (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="(め)組レスキュー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="megumi rescue (japan).bin" size="131072" crc="29bc7fad" sha1="7bd156cf8dc2ad07c666ac58ccb3c0ff6671b93f" offset="000000" />
@@ -3554,11 +3601,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1367 - Releases: 1988-09-09 (JPN) - Alt Title: 熱球甲子園 - Notes: FM support -->
+	<!-- Serial: G-1367 - Releases: 1988-09-09 (JPN) - Notes: FM support -->
 	<software name="nekkyu">
 		<description>Nekkyuu Koushien (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="熱球甲子園" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="nekkyuu koushien (japan).bin" size="262144" crc="5b5f9106" sha1="35e882723189178c1dc811a04125daec4487e693" offset="000000" />
@@ -3601,11 +3649,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1308 - Releases: 1986-11-08 (JPN) - Alt Title: 忍者 忍者プリンセス1メガ版 -->
+	<!-- Serial: G-1308 - Releases: 1986-11-08 (JPN) -->
 	<software name="ninjaj" cloneof="ninja">
 		<description>The Ninja (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="忍者 忍者プリンセス1メガ版" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="ninja (japan).bin" size="131072" crc="320313ec" sha1="e9acdae112a898f7db090fc0b8f1ce9b86637234" offset="000000" />
@@ -3637,11 +3686,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1343 - Releases: 1987-12-20 (JPN) - Alt Title: オパオパ - Notes: FM support -->
+	<!-- Serial: G-1343 - Releases: 1987-12-20 (JPN) - Notes: FM support -->
 	<software name="opaopa" cloneof="fantzonm">
 		<description>Opa Opa (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="オパオパ" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="opa opa (japan).bin" size="131072" crc="bea27d5c" sha1="38bd50181b98216c9ccf1d7dd6bc2c0a21e9a283" offset="000000" />
@@ -3673,11 +3723,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1326, 7003, 024.240 - Releases: 1987-06-30 (JPN) - Alt Title: アウト ラン - Notes: FM support -->
+	<!-- Serial: G-1326, 7003, 024.240 - Releases: 1987-06-30 (JPN) - Notes: FM support -->
 	<software name="outrun">
 		<description>Out Run (World)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アウト ラン" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="out run (world).bin" size="262144" crc="5589d8d2" sha1="4f9b61b24f0d9fee0448cdbbe8fc05411dbb1102" offset="000000" />
@@ -3923,11 +3974,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1323 - Releases: 1987-08-17 (JPN) - Alt Title: ザ・プロ野球 ペナントレース -->
+	<!-- Serial: G-1323 - Releases: 1987-08-17 (JPN) -->
 	<software name="proyakyu">
 		<description>The Pro Yakyuu Pennant Race (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ザ・プロ野球 ペナントレース" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="pro yakyuu pennant race, the (japan).bin" size="131072" crc="da9be8f0" sha1="1ee602f8711d82d13b006984cef95512a93c7783" offset="000000" />
@@ -3970,11 +4022,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1341 - Releases: 1987-12-20 (JPN) - Alt Title: ファンタシースター - Notes: FM support -->
+	<!-- Serial: G-1341 - Releases: 1987-12-20 (JPN) - Notes: FM support -->
 	<software name="pstarj" cloneof="pstar">
 		<description>Phantasy Star (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ファンタシースター" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="phantasy star (japan).bin" size="524288" crc="6605d36a" sha1="c9a40ddd217c58dddcd6b5c0fe66c3a50d3e68e4" offset="000000" />
@@ -4269,11 +4322,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1319, 7002 - Releases: 1987-04-19 (JPN) - Alt Title: ロッキー -->
+	<!-- Serial: G-1319, 7002 - Releases: 1987-04-19 (JPN) -->
 	<software name="rocky">
 		<description>Rocky (World)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ロッキー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="rocky (world).bin" size="262144" crc="1bcc7be3" sha1="8601927ca17419f5d61f757e9371ce533228f7bb" offset="000000" />
@@ -4281,11 +4335,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1364, 9002 - Releases: 1988-10-01 (JPN) - Alt Title: アールタイプ - Notes: FM support -->
+	<!-- Serial: G-1364, 9002 - Releases: 1988-10-01 (JPN) - Notes: FM support -->
 	<software name="rtype">
 		<description>R-Type (World)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="アールタイプ" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="r-type (world).bin" size="524288" crc="bb54b6b0" sha1="08ec70a2cd98fcb2645f59857f845d41b0045115" offset="000000" />
@@ -4611,11 +4666,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1349 - Releases: 1988-02-29 (JPN) - Alt Title: スペースハリアー3D - Notes: FM support, 3D glasses support -->
+	<!-- Serial: G-1349 - Releases: 1988-02-29 (JPN) - Notes: FM support, 3D glasses support -->
 	<software name="sharr3dj" cloneof="sharr3d">
 		<description>Space Harrier 3D (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="スペースハリアー3D" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="space harrier 3d (japan).bin" size="262144" crc="156948f9" sha1="7caf44ecc3de6daffedf7a494d449202888a6156" offset="000000" />
@@ -4623,11 +4679,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1310, 7001, 7080 - Releases: 1986-12-21 (JPN) - Alt Title: スペースハリアー -->
+	<!-- Serial: G-1310, 7001, 7080 - Releases: 1986-12-21 (JPN) -->
 	<software name="sharrj" cloneof="sharr">
 		<description>Space Harrier (Jpn, USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="スペースハリアー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="space harrier (japan).bin" size="262144" crc="beddf80e" sha1="51ba2185a2b93957c1c51b0a2e2b80394463bed8" offset="000000" />
@@ -4647,11 +4704,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1353, 028.380 - Releases: 1988-06-19 (JPN) - Alt Title: シノビ - SHINOBI 忍 - Notes: FM support -->
+	<!-- Serial: G-1353, 028.380 - Releases: 1988-06-19 (JPN) - Notes: FM support -->
 	<software name="shinobij">
 		<description>Shinobi (Jpn, Bra, v0)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="シノビ - SHINOBI 忍" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="shinobi (japan).bin" size="262144" crc="e1fff1bb" sha1="26070deaa2d3c170d31ac395a50231204250bdf3" offset="000000" />
@@ -4785,11 +4843,12 @@
 		</part>
 	</software>
 
-	<!-- 002 - Releases: 1988-04-17 (JPN) - Alt Title: ソロモンの鍵 －王女リヒタの涙－ - Notes: FM support -->
+	<!-- 002 - Releases: 1988-04-17 (JPN) - Notes: FM support -->
 	<software name="solomon">
 		<description>Solomon no Kagi - Oujo Rihita no Namida (Jpn)</description>
 		<year>1988</year>
 		<publisher>Salio</publisher>
+		<info name="alt_title" value="ソロモンの鍵 －王女リヒタの涙－" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="solomon no kagi - oujo rihita no namida (japan).bin" size="131072" crc="11645549" sha1="875f35d0775609776ec75ea2a8fa2297643e906c" offset="000000" />
@@ -5000,11 +5059,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1365 - Releases: 1988-10-29 (JPN) - Alt Title: スポーツパッドサッカー - Notes: Sports Pad support -->
+	<!-- Serial: G-1365 - Releases: 1988-10-29 (JPN) - Notes: Sports Pad support -->
 	<software name="sportssc" cloneof="worldscr">
 		<description>Sports Pad Soccer (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="スポーツパッドサッカー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad soccer (japan).bin" size="131072" crc="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f" offset="000000" />
@@ -5047,11 +5107,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: K-321 - Alt Title: Dié duì dié ~ 諜對諜 -->
+	<!-- Serial: K-321 -->
 	<software name="spyvsspytw" cloneof="spyvsspy">
 		<description>Spy vs Spy (Tw)</description>
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
+		<info name="alt_title" value="Dié duì dié ~ 諜對諜" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="spy vs spy (tw).bin" size="32768" crc="689f58a2" sha1="9f715b67ffddc432299c9bbae6b7e088ddbd4679" offset="000000" />
@@ -5165,11 +5226,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1318 - Releases: 1987-04-19 (JPN) - Alt Title: デカ - スケバン刑事II 少女鉄仮面伝説 -->
+	<!-- Serial: G-1318 - Releases: 1987-04-19 (JPN) -->
 	<software name="sukeban">
 		<description>Sukeban Deka II - Shoujo Tekkamen Densetsu (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="デカ - スケバン刑事II 少女鉄仮面伝説" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sukeban deka ii - shoujo tekkamen densetsu (japan).bin" size="131072" crc="b13df647" sha1="5cd041990c7418ba63cde54f83d3e0e323b42c3b" offset="000000" />
@@ -5318,11 +5380,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1357 - Releases: 1988-07-02 (JPN) - Alt Title: スーパーレーシング - Notes: FM support -->
+	<!-- Serial: G-1357 - Releases: 1988-07-02 (JPN) - Notes: FM support -->
 	<software name="superrac">
 		<description>Super Racing (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="スーパーレーシング" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="super racing (japan).bin" size="262144" crc="7e0ef8cb" sha1="442f3ba8a66a0d9c49a46091df83fcdba4b63c3a" offset="000000" />
@@ -5470,11 +5533,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1355 - Releases: 1988-06-02 (JPN) - Alt Title: 天才バカボン - Notes: FM support -->
+	<!-- Serial: G-1355 - Releases: 1988-06-02 (JPN) - Notes: FM support -->
 	<software name="tensai">
 		<description>Tensai Bakabon (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="天才バカボン" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="tensai bakabon (japan).bin" size="262144" crc="8132ab2c" sha1="ca802b7bdbc0b458d02fda2da32c2e27e50eef19" offset="000000" />
@@ -5530,11 +5594,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1360 - Releases: 1988-07-30 (JPN) - Alt Title: サンダーブレード - Notes: FM support -->
+	<!-- Serial: G-1360 - Releases: 1988-07-30 (JPN) - Notes: FM support -->
 	<software name="thunderbj" cloneof="thunderb">
 		<description>Thunder Blade (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="サンダーブレード" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="thunder blade (japan).bin" size="262144" crc="c0ce19b1" sha1="535dbd339f4b5c5efd502cffbbe719d7b3e7f1c3" offset="000000" />
@@ -5789,11 +5854,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1316, 5068, GB-1003 - Releases: 1987-03-22 (JPN) - Alt Title: スーパーワンダーボーイ -->
+	<!-- Serial: G-1316, 5068, GB-1003 - Releases: 1987-03-22 (JPN) -->
 	<software name="wboya" cloneof="wboy">
 		<description>Wonder Boy (Euro, Kor, v0) ~ Super Wonder Boy (Jpn, v0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="スーパーワンダーボーイ" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super wonder boy (japan).bin" size="131072" crc="e2fcb6f3" sha1="14210196f454b6d938f15cf7b52076796c5d0f7d" offset="000000" />
@@ -5836,11 +5902,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1346 - Releases: 1988-01-31 (JPN) - Alt Title: スーパーワンダーボーイ モンスターワールド - Notes: FM support -->
+	<!-- Serial: G-1346 - Releases: 1988-01-31 (JPN) - Notes: FM support -->
 	<software name="wboymlndj" cloneof="wboymlnd">
 		<description>Super Wonder Boy - Monster World (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="スーパーワンダーボーイ モンスターワールド" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="super wonder boy - monster world (japan).bin" size="262144" crc="b1da6a30" sha1="f4cd1ee6f98bc77fb36e232bf755d61d88e219d7" offset="000000" />
@@ -6072,11 +6139,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1327, 5059 - Releases: 1987-07-19 (JPN) - Alt Title: ワールド サッカー -->
+	<!-- Serial: G-1327, 5059 - Releases: 1987-07-19 (JPN) -->
 	<software name="worldscr">
 		<description>World Soccer (Euro, Jpn, Kor) ~ Great Soccer (USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ワールド サッカー" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="world soccer (world).bin" size="131072" crc="72112b75" sha1="bd385b69805c623ab9934174a19a30371584c4b0" offset="000000" />
@@ -6156,11 +6224,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1370 - Releases: 1988-10-15 (JPN) - Alt Title: イース - Notes: FM support -->
+	<!-- Serial: G-1370 - Releases: 1988-10-15 (JPN) - Notes: FM support -->
 	<software name="ys" cloneof="ysomens">
 		<description>Ys (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="イース" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ys (japan).bin" size="262144" crc="32759751" sha1="614b589080b732e17cc0d253e17216a72a268955" offset="000000" />
@@ -6180,11 +6249,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1336, 8002 - Releases: 1987-11-07 (JPN) - Alt Title: ザクソン3D - Notes: FM support, 3D glasses support -->
+	<!-- Serial: G-1336, 8002 - Releases: 1987-11-07 (JPN) - Notes: FM support, 3D glasses support -->
 	<software name="zaxxon3d">
 		<description>Zaxxon 3-D (World)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ザクソン3D" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="zaxxon 3-d (world).bin" size="262144" crc="a3ef13cb" sha1="257946fe8a230ac1308fc60a8ed43851cfe6b915" offset="000000" />
@@ -6215,11 +6285,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1325, 5075 - Releases: 1987-05-24 (JPN) - Alt Title: 赤い光弾 ジリオン -->
+	<!-- Serial: G-1325, 5075 - Releases: 1987-05-24 (JPN) -->
 	<software name="zillionb" cloneof="zillion">
 		<description>Zillion (Euro, v0) ~ Akai Koudan Zillion (Jpn, v0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="赤い光弾 ジリオン" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="zillion (japan, europe) (en,ja).bin" size="131072" crc="60c19645" sha1="6a0a21426cadadb5567907d9cc4cdaf63195d5c3" offset="000000" />
@@ -6239,11 +6310,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: G-1344, 5105 - Releases: 1987-12-13 (JPN) - Alt Title: トライフォーメーション - Notes: FM support -->
+	<!-- Serial: G-1344, 5105 - Releases: 1987-12-13 (JPN) - Notes: FM support -->
 	<software name="zillion2">
 		<description>Zillion II - The Tri Formation (Euro, USA) ~ Tri Formation (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="トライフォーメーション" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="zillion ii - the tri formation (world).bin" size="131072" crc="2f2e3bc9" sha1="1e08be828ecf4cf5db787704ab8779f4b5a444b5" offset="000000" />
