@@ -1161,19 +1161,15 @@ static WRITE8_HANDLER( suzy_write )
 		//case VSIZACUML:
 		case HSIZOFFL:
 			state->m_blitter.width_offset = data;
-			logerror("HSIZOFFL = %x \n", data);
 			break;
 		case HSIZOFFH:
 			state->m_blitter.width_offset |= data<<8;
-			logerror("HSIZOFFH = %x \n", data);
 			break;
 		case VSIZOFFL:
 			state->m_blitter.height_offset = data;
-			logerror("VSIZOFFL = %x \n", data);
 			break;
 		case VSIZOFFH:
 			state->m_blitter.height_offset |= data<<8;
-			logerror("VSIZOFFH = %x \n", data);
 			break;
 		case SCBADRL:
 			state->m_blitter.scb = data;
@@ -1405,12 +1401,11 @@ static void lynx_timer_signal_irq(running_machine &machine, int which)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
 	if ( ( state->m_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) // if interrupts are enabled and timer != 4
-	{ // irq flag handling later (what needs doing?)
-		//state->m_mikey.data[0x80] |= ( 1 << which ); // Should we set this one as well?
+	{ // irq flag handling later [what needs to be done?]
 		state->m_mikey.data[0x81] |= ( 1 << which ); // set interupt poll register
 		cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
-	switch ( which )
+	switch ( which ) // count down linked timers
 	{
 	case 0:
 		lynx_timer_count_down( machine, 2 );
@@ -1439,7 +1434,7 @@ static void lynx_timer_signal_irq(running_machine &machine, int which)
 void lynx_timer_count_down(running_machine &machine, int which)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
-	if ( ( state->m_timer[which].cntrl1 & 0x0f ) == 0x0f )
+	if ( ( state->m_timer[which].cntrl1 & 0x0f ) == 0x0f ) // count and linking enabled
 	{
 		if ( state->m_timer[which].counter > 0 )
 		{
@@ -1448,28 +1443,20 @@ void lynx_timer_count_down(running_machine &machine, int which)
 		}
 		if ( state->m_timer[which].counter == 0 )
 		{
-			state->m_timer[which].cntrl2 |= 8;
+			state->m_timer[which].cntrl2 |= 8; // set timer done
 			lynx_timer_signal_irq(machine, which);
-			if ( state->m_timer[which].cntrl1 & 0x10 )
+			if ( state->m_timer[which].cntrl1 & 0x10 ) // if reload enabled
 			{
 				state->m_timer[which].counter = state->m_timer[which].bakup;
+				// should we unset timer done?
 			}
 			else
 			{
-				state->m_timer[which].counter--;
+				state->m_timer[which].counter--; // Is this correct or should it stop at zero? 
 			}
 			return;
 		}
 	}
-}
-
-static TIMER_CALLBACK(lynx_timer_shot)
-{
-	lynx_state *state = machine.driver_data<lynx_state>();
-	state->m_timer[param].cntrl2 |= 8; // set timer done
-	lynx_timer_signal_irq( machine, param );
-	if ( ! ( state->m_timer[param].cntrl1 & 0x10 ) ) // if reload not enabled
-		state->m_timer[param].timer_active = 0;
 }
 
 static UINT32 lynx_time_factor(int val)
@@ -1487,6 +1474,20 @@ static UINT32 lynx_time_factor(int val)
 	}
 }
 
+static TIMER_CALLBACK(lynx_timer_shot)
+{
+	lynx_state *state = machine.driver_data<lynx_state>();
+	state->m_timer[param].cntrl2 |= 8; // set timer done
+	lynx_timer_signal_irq( machine, param );
+	if ( ! ( state->m_timer[param].cntrl1 & 0x10 ) ) // if reload not enabled
+		state->m_timer[param].timer_active = 0;
+	else
+	{
+		attotime t = (attotime::from_hz(lynx_time_factor(state->m_timer[param].cntrl1 & 0x07)) * (state->m_timer[param].bakup + 1));
+		state->m_timer[param].timer->adjust(t, param);
+	}	
+}
+
 static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)
 {
 	UINT8 value = 0;
@@ -1500,7 +1501,7 @@ static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)
 			value = state->m_timer[which].cntrl1;
 			break;
 		case 2:
-			if ((state->m_timer[which].cntrl1 & 0x07) == 0x07)
+			if ((state->m_timer[which].cntrl1 & 0x07) == 0x07) // linked timer
 			{
 				value = state->m_timer[which].counter;
 			}
@@ -1523,7 +1524,7 @@ static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)
 static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 data)
 {
 	// logerror("timer %d write %x %.2x\n", which, offset, data);
-
+	attotime t;
 	switch (offset)
 	{
 		case 0:
@@ -1531,13 +1532,14 @@ static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 dat
 			break;
 		case 1:
 			state->m_timer[which].cntrl1 = data;
-			if (data & 0x40)
+			if (data & 0x40) // reset timer done
 				state->m_timer[which].cntrl2 &= ~0x08;
 			break;
 		case 2:
-//          state->m_timer[which].counter = data;   // why commented out?
+			state->m_timer[which].counter = data;
 			break;
 		case 3:
+			// Should we be ignoring writes to the timer done bit?
 			state->m_timer[which].cntrl2 = (state->m_timer[which].cntrl2 & 0x08) | (data & ~0x08);
 			break;
 	}
@@ -1547,15 +1549,15 @@ static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 dat
 	{
 		state->m_timer[which].timer->reset();
 		state->m_timer[which].timer_active = 0;
-		if ((state->m_timer[which].cntrl1 & 0x08))		// 0x48?
+		if ((state->m_timer[which].cntrl1 & 0x08))		// if enable count
 		{
-			if ((state->m_timer[which].cntrl1 & 0x07) != 0x07)
+			if ((state->m_timer[which].cntrl1 & 0x07) != 0x07) // if not set to link mode
 			{
-				attotime t = (attotime::from_hz(lynx_time_factor(state->m_timer[which].cntrl1 & 0x07)) * (state->m_timer[which].bakup + 1));
-				if (state->m_timer[which].cntrl1 & 0x10)
-					state->m_timer[which].timer->adjust(attotime::zero, which, t);
+				if (state->m_timer[which].cntrl1 & 0x10) // reload enabled
+					t = (attotime::from_hz(lynx_time_factor(state->m_timer[which].cntrl1 & 0x07)) * (state->m_timer[which].bakup + 1));
 				else
-					state->m_timer[which].timer->adjust(t, which);
+					t = (attotime::from_hz(lynx_time_factor(state->m_timer[which].cntrl1 & 0x07)) * (state->m_timer[which].counter + 1));
+				state->m_timer[which].timer->adjust(t, which);
 				state->m_timer[which].timer_active = 1;
 			}
 		}
@@ -1680,7 +1682,7 @@ static READ8_HANDLER( mikey_read )
 
 	case 0x80:
 	case 0x81:
-		value = state->m_mikey.data[offset];
+		value = state->m_mikey.data[0x81]; // both registers access the same interupt status byte
 		// logerror( "mikey read %.2x %.2x\n", offset, value );
 		break;
 
@@ -1702,7 +1704,7 @@ static READ8_HANDLER( mikey_read )
 		value |= (direction & 0x01) ? (state->m_mikey.data[offset] & 0x01) : 0x01;	// External Power input
 		value |= (direction & 0x02) ? (state->m_mikey.data[offset] & 0x02) : 0x00;	// Cart Address Data output (0 turns cart power on)
 		value |= (direction & 0x04) ? (state->m_mikey.data[offset] & 0x04) : 0x04;	// noexp input
-		// REST still to implement
+		// REST read returns actual rest state anded with rest output bit (to be implemented)
 		value |= (direction & 0x08) ? (state->m_mikey.data[offset] & 0x08) : 0x00;	// rest output
 		value |= (direction & 0x10) ? (state->m_mikey.data[offset] & 0x10) : 0x10;	// audin input
 		/* Hack: we disable COMLynx  */
@@ -1717,7 +1719,7 @@ static READ8_HANDLER( mikey_read )
 
 	default:
 		value = state->m_mikey.data[offset];
-		// logerror( "mikey read %.2x %.2x\n", offset, value );
+		//logerror( "mikey read %.2x %.2x\n", offset, value );
 	}
 
 	return value;
@@ -1756,7 +1758,7 @@ static WRITE8_HANDLER( mikey_write )
 
 	/* Is this correct? */ // Notes say writing to register will result in interupt being triggered.
 	case 0x81:
-		state->m_mikey.data[offset] |= data;
+		state->m_mikey.data[0x81] |= data;
 		if (data)
 			cputag_set_input_line(space->machine(), "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
 		break;
@@ -1818,7 +1820,7 @@ static WRITE8_HANDLER( mikey_write )
 
 	default:
 		state->m_mikey.data[offset]=data;
-		// logerror("mikey write %.2x %.2x\n",offset,data);
+		//logerror("mikey write %.2x %.2x\n",offset,data);
 		break;
 	}
 }
