@@ -33844,7 +33844,7 @@
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-SRAM" />
 			<dataarea name="rom" size="33554432">
-				<rom name="digimon sapphire (unl).bin" size="33554432" crc="cd0a9fdb" sha1="7abdc00372c2be99c8fa09c5b5ee990febb71a28" offset="000000" />
+				<rom name="digimon ruby (unl).bin" size="33554432" crc="cd0a9fdb" sha1="7abdc00372c2be99c8fa09c5b5ee990febb71a28" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
