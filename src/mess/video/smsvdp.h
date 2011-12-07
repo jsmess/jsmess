@@ -121,6 +121,7 @@ protected:
 	memory_region    *m_CRAM;                    /* Pointer to CRAM */
 	const UINT8      *m_frame_timing;
 	bitmap_t         *m_tmpbitmap;
+	bitmap_t         *m_y1_bitmap;
 	UINT8            *m_collision_buffer;
 	UINT8            m_palette_offset;
 

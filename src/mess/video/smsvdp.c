@@ -502,11 +502,13 @@ void sega315_5124_device::process_line_timer()
 		rec.min_x = SMS_LBORDER_START;
 		rec.max_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw right border */
 		rec.min_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + SMS_RBORDER_X_PIXELS - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
@@ -533,11 +535,13 @@ void sega315_5124_device::process_line_timer()
 		rec.min_x = SMS_LBORDER_START;
 		rec.max_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw right border */
 		rec.min_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + SMS_RBORDER_X_PIXELS - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		refresh_line( SMS_LBORDER_START + SMS_LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
 
@@ -556,11 +560,13 @@ void sega315_5124_device::process_line_timer()
 		rec.min_x = SMS_LBORDER_START;
 		rec.max_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw right border */
 		rec.min_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + SMS_RBORDER_X_PIXELS - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
+		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
@@ -1386,6 +1392,7 @@ void sega315_5124_device::refresh_line( int pixel_offset_x, int pixel_plot_y, in
 	switch( m_vdp_mode )
 	{
 	case 0:
+		memset(priority_selected, 1, sizeof(priority_selected));
 		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
 		{
 			refresh_line_mode0( blitline_buffer, line );
@@ -1394,6 +1401,7 @@ void sega315_5124_device::refresh_line( int pixel_offset_x, int pixel_plot_y, in
 		break;
 
 	case 2:
+		memset(priority_selected, 1, sizeof(priority_selected));
 		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
 		{
 			refresh_line_mode2( blitline_buffer, line );
@@ -1412,18 +1420,25 @@ void sega315_5124_device::refresh_line( int pixel_offset_x, int pixel_plot_y, in
 		break;
 	}
 
+	UINT32 *p_bitmap = BITMAP_ADDR32(m_tmpbitmap, pixel_plot_y + line, pixel_offset_x);
+	UINT8  *p_y1 = BITMAP_ADDR8(m_y1_bitmap, pixel_plot_y + line, pixel_offset_x);
+
 	/* Check if display is disabled or we're below/above active area */
 	if (!(m_reg[0x01] & 0x40) || line < 0 || line >= m_frame_timing[ACTIVE_DISPLAY_V])
 	{
 		for (x = 0; x < 256; x++)
 		{
-			blitline_buffer[x] = m_current_palette[BACKDROP_COLOR];
+			p_bitmap[x] = machine().pens[m_current_palette[BACKDROP_COLOR]];
+			p_y1[x] = 1;
 		}
 	}
-
-	for (x = 0; x < 256; x++)
+	else
 	{
-		*BITMAP_ADDR32(m_tmpbitmap, pixel_plot_y + line, pixel_offset_x + x) = machine().pens[blitline_buffer[x]];
+		for (x = 0; x < 256; x++)
+		{
+			p_bitmap[x] = machine().pens[blitline_buffer[x]];
+			p_y1[x] = ( priority_selected[x] & 0x0f ) ? 0 : 1;
+		}
 	}
 }
 
@@ -1678,6 +1693,7 @@ void sega315_5124_device::device_start()
 
 	/* Make temp bitmap for rendering */
 	m_tmpbitmap = auto_bitmap_alloc(machine(), width, height, BITMAP_FORMAT_INDEXED32);
+	m_y1_bitmap = auto_bitmap_alloc(machine(), width, height, BITMAP_FORMAT_INDEXED8);
 
 	m_smsvdp_display_timer = timer_alloc(TIMER_LINE);
 	m_smsvdp_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
@@ -1705,6 +1721,7 @@ void sega315_5124_device::device_start()
 	save_pointer(NAME(m_line_buffer), 256 * 5);
 	save_pointer(NAME(m_collision_buffer), SMS_X_PIXELS);
 	save_item(NAME(*m_tmpbitmap));
+	save_item(NAME(*m_y1_bitmap));
 }
 
 
