@@ -53152,7 +53152,7 @@ from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="biohazrda" cloneof="biohazrd" supported="partial">
 		<!-- Serial:  - Release Date:  - Alternative Title: 生化危机 -->
-		<description>Bio Hazard (Chi, Fixed?)</description>
+		<description>Bio Hazard (Chi, Decrypted WXN)</description>
 		<year>2003?</year>
 		<publisher>Waixing</publisher>
 		<part name="cart" interface="nes_cart">
