@@ -16,11 +16,6 @@
     CONSTANTS
 ***************************************************************************/
 
-
-#define MODEL_315_5124			0x0001
-#define MODEL_315_5246			0x0002
-#define MODEL_315_5378			0x0004
-
 #define SMS_X_PIXELS			342		/* 342 pixels */
 #define SMS_NTSC_Y_PIXELS			262		/* 262 lines */
 #define SMS_PAL_Y_PIXELS			313		/* 313 lines */
