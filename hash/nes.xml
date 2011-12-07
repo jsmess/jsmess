@@ -54111,6 +54111,9 @@ from the NEStopia source, hence they would require confirmation. -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BMC-FK23CA" />
+			<dataarea name="chr" size="524288">
+				<rom name="6-in-1 rockman (unl)[u][!].chr" size="524288" crc="775b088c" sha1="6b4ed379be4d7948a20f171251629338f243bd8e" offset="00000" status="baddump" />
+			</dataarea>
 			<dataarea name="prg" size="2097152">
 				<rom name="6-in-1 rockman (unl)[u][!].prg" size="2097152" crc="e6d869ed" sha1="1e90811e0fa94afacaa2b06ac101d9c34e067515" offset="00000" status="baddump" />
 			</dataarea>
@@ -65396,6 +65399,27 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- The following iNES roms are ripped from mc_fcy54, so we don't include them (crc is from headerless file):
+	* Awful Rushing	[c499f79c]
+	* Bitha	[10522c7b] (also 15c51515, with a spurious byte 0x00 at the end of the dump, i.e. at 0x6000)
+	* Bubble	[c249142a]
+	* Diamond	[a207bd12]
+	* Dinosaur	[72b34e0c]
+	* Garden War	[98d8d3fd]
+	* Hassle	[c44d4faa]
+	* Moto Boat	[c499f79c]
+	* Porter	[194cc9e3] - 64k dump!, different from the 40k dump which is believed to be dumped from a real cart
+	* Space War	[22c50f32]
+	* Resistant	[98d8d3fd]
+	* Russia	[18922271]
+	* Space War	[227b52fa]
+	* Strafe	[c249142a]
+	* Tnt		[f80b49c7]  (also d7fab3d7, with a spurious byte 0x00 at the end of the dump, i.e. at 0x6000)
+	* Twin Cards	[f5f9ac3c]
+	* Twin Fish	[fe25d825] - 64k dump
+	* Van-1	[5cbfdbdb] - 64k dump
+ -->
+
 	<software name="mc_fcy54">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Famicom Yarou 54</description>
@@ -66528,7 +66552,7 @@ that the real dumps might surface -->
 	* Racing	[72e229fe]
 	* Sea War 2000	[d49342cc]
 	* Space War	[22c50f32]
-	* Tnt	[d7fab3d7]
+	* Tnt	[f80b49c7]
 	* Van-1	[a4928409]
 	* X-Plan	[77da46e1]
  -->
