@@ -1,0 +1,727 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="kc_cass" description="VEB Mikroelektronik KC 85 cassette images">
+	<software name="vorstell">
+		<!-- C0184 Demo 85/4 -->
+		<description>Vorstell/4</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="10981">
+				<rom name="vorstell4.tap" size="10981" crc="e1319cf5" sha1="edcfb2e3f1556f3a8ebbc133007ce0564eebdf20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lekt1">
+		<!-- C0184 Demo 85/4 -->
+		<description>Lektion 1 Demo</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="11755">
+				<rom name="lekt1.tap" size="11755" crc="0aa1f504" sha1="b6b7e66c636d487b56d15084a9650718f227f81c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othello">
+		<!-- C0184 Demo 85/4 -->
+		<description>Othello</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="4789">
+				<rom name="othello.tap" size="4789" crc="c259c2db" sha1="c3a8be5566017beaf43ee623d2a84a7d19091481" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inter">
+		<!-- C0184 Demo 85/4 -->
+		<description>Interaktives Demonstrations</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="9707">
+				<rom name="inter.tap" size="9707" crc="b38a281e" sha1="baa2a05985c5d7b307527e4023340e065c596fac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatecr" supported="no">		<!-- keyboard doesn't works -->
+		<!-- C0161 Spiele 8 -->
+		<description>Gatecrasher</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="7901">
+				<rom name="gatecr.tap" size="7901" crc="55f8c5e5" sha1="a34d91d8e68b20165600643005faed606ea2dc63" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="house4">
+		<!-- C0161 Spiele 8 -->
+		<description>House/4</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="13577">
+				<rom name="house4.tap" size="13577" crc="603d2a73" sha1="b46f7d3beec299c2b083497c6c6f5b982c5e8bd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pilze">
+		<!-- C0162 Spiele 1 -->
+		<description>Pilzsucher</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="5692">
+				<rom name="pilze.tap" size="5692" crc="d62f565c" sha1="10096d81d92e08ace4cf294022979d3af80370fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stadt">
+		<!-- C0162 Spiele 1 -->
+		<description>Hauptstädteraten</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="7111">
+				<rom name="stadt.tap" size="7111" crc="b7839b5e" sha1="e517ca73129aa133cc7083bfb0176be6231da6d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laby">
+		<!-- C0162 Spiele 1 -->
+		<description>Labyrinth</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6595">
+				<rom name="laby.tap" size="6595" crc="2cb7bc20" sha1="124bc8f605a08bb0cc503b6e423d464778cf6a7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arennen">
+		<!-- C0162 Spiele 1 -->
+		<description>Autorennen</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="5305">
+				<rom name="rennen.tap" size="5305" crc="7078ff5e" sha1="286e95614f616704f7c1c8b5d40ec9f88de693f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schwloch">
+		<!-- C0162 Spiele 1 -->
+		<description>Schwarzes Loch</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="4918">
+				<rom name="schwloch.tap" size="4918" crc="0bee8622" sha1="284898fe4b82267ae4a37725d5085669282c87c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perlen">
+		<!-- C0162 Spiele 1 -->
+		<description>Perlentaucher</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6724">
+				<rom name="perlen.tap" size="6724" crc="019307ae" sha1="c917d28ea8cd23a7dc1d5a34e43f9fa00d9cd91e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinguin">
+		<!-- C0162 Spiele 1 -->
+		<description>Pinguin</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6079">
+				<rom name="pinguin.tap" size="6079" crc="ac38d62b" sha1="584c8b7c61f285939e4b51eb05d0e16db5d26c2c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schiffsu">
+		<!-- C0163 Spiele 2 -->
+		<description>Schiffesuchen</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6595">
+				<rom name="schiffsu.tap" size="6595" crc="3deb9f16" sha1="925dfe40cdc8c496a635d96d5c4cfff1da4ab964" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sandburg">
+		<!-- C0163 Spiele 2 -->
+		<description>Sandburg</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="5305">
+				<rom name="sandburg.tap" size="5305" crc="5b8f8f81" sha1="c3f4a87f586b769ef7ba331ce8a97155bf3a2603" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ali">
+		<!-- C0163 Spiele 2 -->
+		<description>Ali</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="7240">
+				<rom name="ali.tap" size="7240" crc="ab361df4" sha1="b6a87e775acf579b9fa9971f34cbc4411c205f35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frosch">
+		<!-- C0163 Spiele 2 -->
+		<description>Frosch</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6466">
+				<rom name="frosch.tap" size="6466" crc="a678eb1c" sha1="8f321aa8d5fe7a84be0bfacef883a9e3ce69f008" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angeln">
+	<!-- C0163 Spiele 2 -->
+		<description>Angeln</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6208">
+				<rom name="angeln.tap" size="6208" crc="2ccc97ab" sha1="8698002635e20c5663877e79b37c0efdf96f9803" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ski">
+		<!-- C0163 Spiele 2 -->
+		<description>Ski</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="7369">
+				<rom name="ski.tap" size="7369" crc="2c71e8f5" sha1="766b90f8773ef028fdf3def51bbcfb503fcc49ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gowa">
+		<!-- C0164 Spiele 3 -->
+		<!-- required 18KB of free RAM -->
+		<description>Gowa</description>
+		<year>1987</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="15496">
+				<rom name="gowa.tap" size="15496" crc="34dfd445" sha1="5e3c2bf9f256f065b9f8f5a818cac046bd25d5a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cockpit">
+		<!-- C0164 Spiele 3 -->
+		<description>Cockpit</description>
+		<year>1987</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="14851">
+				<rom name="cockpit.tap" size="14851" crc="fdf93efb" sha1="a1c73de3822eb875c5a0370e434e2dee4e6eb714" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orbit">
+		<!-- C0164 Spiele 3 -->
+		<description>Orbit</description>
+		<year>1987</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="8014">
+				<rom name="orbit.tap" size="8014" crc="4f3cfa45" sha1="8f68ac50ed3ba35224b16be600e656d0a8992ec0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enten">
+		<!-- C0164 Spiele 3 -->
+		<description>Entenjagd</description>
+		<year>1987</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="8014">
+				<rom name="enten.tap" size="8014" crc="608c4d73" sha1="855a75d0cc7b7bdfc2747a1f0220c66a132208c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schach">
+		<!-- C0165 Spieleprogramme II -->
+		<description>Schach (Video Chess Master)</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="13448">
+				<rom name="schach.tap" size="13448" crc="a61f06a0" sha1="634272bd886ec68b6457c4e2c1ace2617de02882" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clubx">
+		<!-- C0166 Spiele 4 -->
+		<!-- required 31KB of free RAM -->
+		<description>Club-X</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="29686">
+				<rom name="club-xm.tap" size="29686" crc="16d48f0d" sha1="9295df3012eb4b774e167082f62ab7668473c5d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pursuit4">
+		<!-- C0167 Spiele 5 -->
+		<description>Pursuit/4</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="13319">
+				<rom name="pursuit4.tap" size="13319" crc="8da4f914" sha1="5e584c142c8d9ac62f55b6f06b8a4cba8d567ef0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cave4">
+		<!-- C0167 Spiele 5 -->
+		<description>Cave/4</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6998">
+				<rom name="cave.tap" size="6998" crc="9e449df1" sha1="b354bd6b73bce2d2e4d147f2dca21edc27a9a2ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deliro">
+		<!-- C0168 Spiele 6 -->
+		<description>Deliro</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="16673">
+				<rom name="deliro4.tap" size="16673" crc="ef52314d" sha1="96925dc7eb32aa2b7da50510809f432f68d2e18a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengo4">
+		<!-- C0168 Spiele 6 -->
+		<description>Pengo/4</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="14222">
+				<rom name="pengo4.tap" size="14222" crc="bff08c58" sha1="50a13f2bdb0bad168c87e035bf093f0244c96086" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digger4">	<!-- require mid-frame changes emulation -->
+		<!-- C0169 Spiele 7 -->
+		<description>Digger/4</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="21317">
+				<rom name="digger4.tap" size="21317" crc="af590459" sha1="937c4f00b20c2330be76af8d9173f240da9a607e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vgewinnt">
+		<!-- C0169 Spiele 7 -->
+		<description>Vier Gewinnt</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6611">
+				<rom name="4gewinnt.tap" size="6611" crc="91c9a4ac" sha1="fc142725aa4ca47f6cdac6d750305ff9ad30daf7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion1">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 1</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="11900">
+				<rom name="lektion1.tap" size="11900" crc="8ca8f79f" sha1="b00dd5ec7bbd48cfd5e4204ee3d986a63cb0fdd8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion2">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 2</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="11771">
+				<rom name="lektion2.tap" size="11771" crc="9877089c" sha1="055dca67c33f9478645b37e13edc2c286c624839" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion3">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 3</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="10094">
+				<rom name="lektion3.tap" size="10094" crc="691e2532" sha1="0196a792fd46433cec1067d08521b528137853df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion4">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 4</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="8417">
+				<rom name="lektion4.tap" size="8417" crc="0b60b8a7" sha1="288c9548077b87f1ea8740ac2ae9547f147c48d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion5">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 5</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="8546">
+				<rom name="lektion5.tap" size="8546" crc="9e58e690" sha1="2be698a4cb81d7665a8d200c9737cb70515ca5be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion6">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 6</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="9836">
+				<rom name="lektion6.tap" size="9836" crc="146a52c6" sha1="4cb6e2f11acd87937661ed44b6e2461a6dc5afc9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion7">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 7</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="11771">
+				<rom name="lektion7.tap" size="11771" crc="1e88e985" sha1="75251d20b0c828e2b8ac0c2f45803a980a898866" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion8">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 8</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="10223">
+				<rom name="lektion8.tap" size="10223" crc="80710860" sha1="33cdbf6ded26d5a171d0dec30c490b7820e0ea3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektion9">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 9</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="11642">
+				<rom name="lektion9.tap" size="11642" crc="dedfbd0f" sha1="eed099bcbd3821aa96673e19d8859bc4fd44ca00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektiona">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 10</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="10481">
+				<rom name="lektiona.tap" size="10481" crc="9068c9a2" sha1="1f7c6cc1338913d6ad9fb19d805ff1d7bf6ee316" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektionb">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 11</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="10868">
+				<rom name="lektionb.tap" size="10868" crc="bf193708" sha1="60e3f6f537df146fc717997f5cefe40849102c5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lektionc">
+		<!-- C0142 BASIC-Lernen -->
+		<description>BASIC-Lernen Lektion 12</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="15512">
+				<rom name="lektionc.tap" size="15512" crc="a2e5610b" sha1="c6bebd0ce40e500feb506926e7ed65b239295ce2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourpu">
+		<!-- C0153 Fourier-Transformation -->
+		<description>Fourieranalyse bis zu 40 Punkten</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="5176">
+				<rom name="fourpu.tap" size="5176" crc="fe175330" sha1="50c682bfa2adc5497cf807d965ed45f7fed0a20e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourfu">
+		<!-- C0153 Fourier-Transformation -->
+		<description>Fourieranalyse bis zu 5 Funktionen</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="5047">
+				<rom name="fourfu.tap" size="5047" crc="afe00e43" sha1="3562d7c7e6bdb618dd70d6fd85c856c664d2a96b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fourko">
+		<!-- C0153 Fourier-Transformation -->
+		<description>Fourierkoeffizienten bis zu 5 Funktionen</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="5434">
+				<rom name="fourko.tap" size="5434" crc="13caeca4" sha1="727b345c587ddc2243b6002097db4408b8e41baa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fft">
+		<!-- C0153 Fourier-Transformation -->
+		<description>Fast Fourier Transformation</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="4144">
+				<rom name="fft.tap" size="4144" crc="515f9452" sha1="5924dcd5886434636d6a7feb218ca68d340dd610" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hallo">
+		<description>Hallo</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="15109">
+				<rom name="hallo.tap" size="15109" crc="06f645e4" sha1="ae7960a7d12d4c7806b6ec75e9311abb3aca4259" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lexikon">
+		<description>Lexikon</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="15496">
+				<rom name="lexikon.tap" size="15496" crc="e745a717" sha1="5e9fef67c6494d56525b6aa47b321d002e1dd29a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spiele1">
+	<!--
+		Spiele 1 includes: Pilze, Stadt, Laby, Rennen, Loch, Perlen, Pinguin.
+		Same games are also available into splitted images.
+		Loading instructions:
+		- go into BASIC
+		- CLOAD "SPIELE1"
+		- RUN
+	-->
+		<description>Spiele 1</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="39103">
+				<rom name="spiele1m.tap" size="39103" crc="2c46887f" sha1="156720693c0b94b960e3a9113c4a45fca2d45299" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spiele2">
+	<!--
+		Spiele 2 includes: Schiffe, Sandburg, Ali, Frosch, Angeln, Lander, Ski.
+		Same games are also available into splitted images.
+		Loading instructions:
+		- go into BASIC
+		- CLOAD "SPIELE2"
+		- RUN
+	-->
+		<description>Spiele 2</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="42328">
+				<rom name="spiele2m.tap" size="42328" crc="5b87055a" sha1="7f6a13950bd9c201f4c86319d67987c75ba487e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spiele3">
+	<!--
+		Spiele 3 includes: Gowa, Cockpit, Orbit, Enten.
+		Same games are also available into splitted images.
+		Loading instructions:
+		- go into BASIC
+		- CLOAD "SPIELE3"
+		- RUN
+	-->
+		<description>Spiele 3</description>
+		<year>1986</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="44650">
+				<rom name="spiele3m.tap" size="44650" crc="07c91677" sha1="e4bed077974604fe50867ba98490815b1a3e42af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wp89">
+		<description>WordPro '89</description>
+		<year>1989</year>
+		<publisher>Cube-Ware</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="10094">
+				<rom name="wp1989.tap" size="10094" crc="acf1e9f8" sha1="d4dfa399800896d28aaf39b697d18625bc3504fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wp86v1">
+		<description>WordPro '86 v1</description>
+		<year>1986</year>
+		<publisher>Cube-Ware</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="9965">
+				<rom name="wp1986v1.tap" size="9965" crc="80a83f4f" sha1="b253f9e13d160c40536d7dcb2862b184a68c4781" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wp86v2">
+		<description>WordPro '86 v2</description>
+		<year>1986</year>
+		<publisher>Robotron</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="9191">
+				<rom name="wp1986v2.tap" size="9191" crc="793f53a3" sha1="e6e3a1328042bf4a78c429395b9c87b5244b6154" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcplus">
+		<description>KCPlus</description>
+		<year>1991</year>
+		<publisher>TB-Soft</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="13561">
+				<rom name="kcplus.tap" size="13561" crc="5af3b84d" sha1="d71a8e20087f543055fbfd11004eca676352fe84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungle14">
+		<description>Jungle v1.4</description>
+		<year>1989</year>
+		<publisher>SOWACO</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="32653">
+				<rom name="jungle4.tap" size="32653" crc="23fdca3d" sha1="b5a503272a492411abe29732edeab318c25aa7f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungle2">
+		<description>Jungle v2</description>
+		<year>1997</year>
+		<publisher>SOWACO</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="28267">
+				<rom name="jungle20.tap" size="28267" crc="68718148" sha1="c71878a91e5cbc2037aa250b71fc0b7d9d4733fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vollgas">
+		<description>Vollgas</description>
+		<year>1991</year>
+		<publisher>STS</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="85720">
+				<rom name="vollgas.tap" size="85720" crc="2d631948" sha1="bb9b6e151ce52c21dbdcd4b01f734924e5479b4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
