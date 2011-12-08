@@ -2152,6 +2152,7 @@ static void pmu_exec(mac_state *mac)
 				   mac->m_pm_cmd[5]);
 			#endif
 
+			#if 0
 			mac->m_pm_state = 10;
 			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 			if (ADB_IS_PM_VIA1)
@@ -2177,6 +2178,36 @@ static void pmu_exec(mac_state *mac)
 				mac->m_adb_command = mac->m_pm_cmd[5];
 				mac->adb_talk();
 			}
+			#else
+			if (((mac->m_pm_cmd[2] == 0xfc) || (mac->m_pm_cmd[2] == 0x2c)) && (mac->m_pm_cmd[3] == 4))
+			{
+//              printf("PMU: request to poll ADB, returning nothing\n");
+				mac->m_pm_slen = 0;
+				mac->m_pmu_int_status = 0;
+			}
+			else
+			{
+				mac->m_pm_state = 10;
+				mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+				if (ADB_IS_PM_VIA1)
+				{
+					mac->m_pmu_int_status = 0x1;
+				}
+				else if (ADB_IS_PM_VIA2)
+				{
+					mac->m_pmu_int_status = 0x10;
+				}
+				else
+				{
+					fatalerror("mac: unknown ADB PMU type\n");
+				}
+				mac->m_pmu_last_adb_command = mac->m_pm_cmd[2];
+			}
+
+			mac->m_adb_command = mac->m_pm_cmd[2];
+			mac->m_adb_waiting_cmd = 1;
+			mac->adb_talk();
+			#endif
 			break;
 
 		case 0x21:	// turn ADB auto-poll off (does this need a reply?)
@@ -2185,13 +2216,16 @@ static void pmu_exec(mac_state *mac)
 		case 0x28:	// read ADB
 			if (mac->m_adb_datasize > 0)
 			{
+				mac->m_adb_datasize = 1; // hack
+
 				mac->m_pm_out[0] = mac->m_pm_out[1] = 3 + mac->m_adb_datasize;
 				mac->m_pm_out[2] = 0;
-				mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
+//				mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
+				mac->m_pm_out[3] = 0;
 				mac->m_pm_out[4] = mac->m_adb_datasize;
 				for (int i = 0; i < mac->m_adb_datasize; i++)
 				{
-					mac->m_pm_out[5+i] = mac->m_adb_buffer[i];
+					mac->m_pm_out[5+i] = 0; //mac->m_adb_buffer[i];
 				}
 				mac->m_pm_slen = 5 + mac->m_adb_datasize;
 			}
@@ -2199,7 +2233,8 @@ static void pmu_exec(mac_state *mac)
 			{
 				mac->m_pm_out[0] = mac->m_pm_out[1] = 4;
 				mac->m_pm_out[2] = 0;
-				mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
+				mac->m_pm_out[3] = 0;
+//				mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
 				mac->m_pm_out[4] = 1;	// length of following data
 				mac->m_pm_out[5] = 0;
 				mac->m_pm_slen = 6;
@@ -2310,19 +2345,25 @@ static void pmu_exec(mac_state *mac)
 			mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 			break;
 
+		case 0x6c:	// read battery ID
+			pmu_one_byte_reply(mac, 1);
+			break;
+
 		case 0x78:	// read interrupt flag
 			if (ADB_IS_PM_VIA2)	// PB 140/170 use a "leaner" PMU protocol where you get the data for a PMU interrupt here
 			{
+				#if 0
 				if ((mac->m_pmu_int_status&0xf0) == 0x10)
 				{
 					if (mac->m_adb_datasize > 0)
 					{
+						mac->m_adb_datasize = 1; // hack
 						mac->m_pm_out[0] = mac->m_pm_out[1] = 2 + mac->m_adb_datasize;
 						mac->m_pm_out[2] = mac->m_pmu_int_status; // ADB status in low nibble
 						mac->m_pm_out[3] = mac->m_pmu_last_adb_command;		  // ADB command that was sent
 						for (int i = 0; i < mac->m_adb_datasize; i++)
 						{
-							mac->m_pm_out[4+i] = mac->m_adb_buffer[i];
+							mac->m_pm_out[4+i] = 0; //mac->m_adb_buffer[i];
 						}
 						mac->m_pm_slen = 4 + mac->m_adb_datasize;
 						mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
@@ -2348,6 +2389,21 @@ static void pmu_exec(mac_state *mac)
 				{
 					pmu_one_byte_reply(mac, mac->m_pmu_int_status);
 				}
+				#else
+				if ((mac->m_pmu_int_status&0xf0) == 0x10)
+				{
+					mac->m_pm_out[0] = mac->m_pm_out[1] = 2;
+					mac->m_pm_out[2] = mac->m_pmu_int_status; // ADB status in low nibble
+					mac->m_pm_out[3] = mac->m_pmu_last_adb_command;		  // ADB command that was sent OR 0x80 for extra error-ness
+					mac->m_pm_out[4] = 0;							  // return data
+					mac->m_pm_slen = 4;
+					mac->m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(1500)));
+				}
+				else
+				{
+					pmu_one_byte_reply(mac, mac->m_pmu_int_status);
+				}
+				#endif
 			}
 			else
 			{
@@ -2379,7 +2435,7 @@ static void pmu_exec(mac_state *mac)
 //              printf("PMU read at %x\n", mac->m_pm_cmd[2] | (mac->m_pm_cmd[3]<<8));
 
 				// note: read at 0xEE00 0 = target disk mode, 0xff = normal bootup
-				// (actually 0x00EE, the 50753 IN register?  would make more sense)
+				// (actually 0x00EE, the 50753 port 6)
 
 				for (i = 0; i < mac->m_pm_cmd[4]; i++)
 				{
@@ -2422,6 +2478,7 @@ void mac_state::adb_vblank()
 				m_adb_timer_ticks = 8;
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
+			#if 0
 			else if (ADB_IS_PM_CLASS)
 			{
 				m_adb_waiting_cmd = 1;
@@ -2437,6 +2494,7 @@ void mac_state::adb_vblank()
 					m_pmu_int_status = 0x10;
 				}
 			}
+			#endif
 			else
 			{
 				m_adb_irq_pending = 1;
@@ -2457,6 +2515,7 @@ void mac_state::adb_vblank()
 				m_adb_timer_ticks = 8;
 				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 			}
+			#if 0
 			else if (ADB_IS_PM_CLASS)
 			{
 				m_adb_waiting_cmd = 1;
@@ -2465,6 +2524,7 @@ void mac_state::adb_vblank()
 				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 				m_pmu_int_status = 0x1;
 			}
+			#endif
 			else
 			{
 				m_adb_irq_pending = 1;

@@ -176,6 +176,7 @@ SCREEN_UPDATE( macpb160 );
 SCREEN_UPDATE( macrbv );
 SCREEN_UPDATE( macrbvvram );
 SCREEN_UPDATE( macdafb );
+SCREEN_UPDATE( macpbwd );
 
 PALETTE_INIT( mac );
 PALETTE_INIT( macgsc );
@@ -395,6 +396,9 @@ public:
     DECLARE_WRITE32_MEMBER(dafb_w);
     DECLARE_READ32_MEMBER(dafb_dac_r);
     DECLARE_WRITE32_MEMBER(dafb_dac_w);
+
+    DECLARE_READ32_MEMBER(macwd_r);
+    DECLARE_WRITE32_MEMBER(macwd_w);
 
     DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
     DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
