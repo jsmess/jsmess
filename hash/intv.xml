@@ -229,7 +229,7 @@
 	</software>
 
 	<software name="bnj">
-		<description>Bump &apos;n&apos; Jump</description>
+		<description>Bump 'n' Jump</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4688"/>
@@ -750,7 +750,7 @@
 	</software>
 
 	<software name="lnc">
-		<description>Lock &apos;n&apos; Chase</description>
+		<description>Lock 'n' Chase</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="5637"/>
@@ -762,7 +762,7 @@
 	</software>
 
 	<software name="lnc2" cloneof="lnc">
-		<description>Lock &apos;n&apos; Chase (later version)</description>
+		<description>Lock 'n' Chase (later version)</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="5637"/>
@@ -1495,7 +1495,7 @@
 	</software>
 
 	<software name="truckin">
-		<description>Truckin&apos;</description>
+		<description>Truckin'</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720023"/>
@@ -1725,7 +1725,7 @@
 	</software>
 
 	<software name="hhsanta">
-		<description>Happy Holidays: Santa&apos;s Helper (prototype)</description>
+		<description>Happy Holidays: Santa's Helper (prototype)</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<part name="cart" interface="intv_cart">
