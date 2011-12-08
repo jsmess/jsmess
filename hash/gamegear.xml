@@ -36,12 +36,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega - Releases: 1993-07-02 (Jpn) -->
+	<!-- Developers: Sega -->
 	<software name="aaharima">
 		<description>Aa Harimanada (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3327"/>
+		<info name="release" value="19930702"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="aa harimanada (japan).bin" size="524288" crc="1d17d2a0" sha1="0fa7111fcd98670d4bef725d11e670e14eaaa7eb" offset="000000" />
@@ -161,11 +162,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Releases: 1992-06-05 (Jpn) - Developers: Sega -->
+	<!-- Developers: Sega -->
 	<software name="aerialasj" cloneof="aerialas">
 		<description>Aerial Assault (Jpn, v1)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<info name="release" value="19920605"/>
 		<info name="serial" value="G-3219"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
@@ -186,12 +188,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: SIMS - Releases: 1994-03-25 (Jpn) -->
+	<!-- Developers: SIMS -->
 	<software name="aladdinj" cloneof="aladdin">
 		<description>Disney's Aladdin (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3336"/>
+		<info name="release" value="19940325"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="aladdin (japan).bin" size="524288" crc="770e95e1" sha1="7ddfd53e91d8220e4238d3994921bf18fe383717" offset="000000" />
@@ -256,11 +259,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software-->
 
+	<!--  Alt. Title: Alex Kido (on the boxart) -->
 	<software name="alexkidd">
 		<description>Alex Kidd in Miracle World (Tw, SMS Mode)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="HG 101-10 Alt. Title: Alex Kido (on the boxart)"/>
+		<info name="serial" value="HG 101-10"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="alex kidd in miracle world [sms-gg] (tw).bin" size="131072" crc="6f8e46cf" sha1="da0bf41dc5fd68a191d0f02fb1213ffdb006d7b8" offset="000000" />
@@ -292,12 +296,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega / SIMS - Releases: 1992-03-19 (Jpn) -->
+	<!-- Developers: Sega / SIMS -->
 	<software name="asyndromj" cloneof="asyndrom">
 		<description>Alien Syndrome (Jpn)</description>
 		<year>1992</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44037"/>
+		<info name="release" value="19920319"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="alien syndrome (japan).bin" size="131072" crc="ffe4ed47" sha1="b72e54493bfa7f13883a608bcf8c9f315dd490ca" offset="000000" />
@@ -377,12 +382,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega - Releases: 1991-12-13 (Jpn) -->
+	<!-- Developers: Sega -->
 	<software name="arliel" cloneof="crystalw">
 		<description>Arliel - Crystal Densetsu (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3403"/>
+		<info name="release" value="19911213"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="arliel - crystal densetsu (japan).bin" size="262144" crc="35fa3f68" sha1="75a04fa483fccd12a52aa18e494d542f4486577f" offset="000000" />
@@ -504,12 +510,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Aspect - Releases: 1991-11-01 (Jpn) -->
+	<!-- Developers: Aspect -->
 	<software name="axbattlrj" cloneof="axbattlr">
 		<description>Ax Battler - Golden Axe Densetsu (Jpn, v1.5)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3306"/>
+		<info name="release" value="19911101"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ax battler - golden axe densetsu (japan) (v1.5).bin" size="262144" crc="dfcf555f" sha1="ff7931d3461c69ffc3a82d892ae3bb3bb00788b3" offset="000000" />
@@ -517,12 +524,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega - Releases: 1992-08-28 (Jpn) -->
+	<!-- Developers: Sega -->
 	<software name="ayrtonj" cloneof="ayrton">
 		<description>Ayrton Senna's Super Monaco GP II (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3312, G-3337"/>
+		<info name="release" value="19920828"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ayrton senna's super monaco gp ii (japan).bin" size="262144" crc="661faeff" sha1="44f2c2bfa6ab57c1fd533996a5e404ebaa07264b" offset="000000" />
@@ -579,12 +587,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega AM3 / SIMS / Minato Giken - Releases: 1996-01-26 (Jpn) -->
+	<!-- Developers: Sega AM3 / SIMS / Minato Giken -->
 	<software name="bakubakuj" cloneof="bakubaku">
 		<description>Baku Baku Animal - Sekai Shiikugakari Senshu-ken (Jpn)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3378"/>
+		<info name="release" value="19960126"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="baku baku animal - sekai shiikugakari senshu-ken (japan).bin" size="262144" crc="7174b802" sha1="270e071342adb41406568e171df4959656ed02bf" offset="000000" />
@@ -614,12 +623,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Probe - Releases: 1995-10-27 (Jpn) -->
+	<!-- Developers: Probe -->
 	<software name="batmanfv">
 		<description>Batman Forever (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81268, T-81268-50, T-81187"/>
+		<info name="release" value="19951027 (JPN)"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="batman forever (world).bin" size="524288" crc="618b19e2" sha1="775ecf7ba87345c2f89f0e9d6e55544db8878786" offset="000000" />
@@ -627,12 +637,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega - Releases: 1992-10-23 (Jpn) -->
+	<!-- Developers: Sega -->
 	<software name="batmanrn">
 		<description>Batman Returns (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3314, 2416, 2416-50"/>
+		<info name="release" value="19921023 (JPN)"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="batman returns (world).bin" size="262144" crc="7ac4a3ca" sha1="85994b2f506c7bded0b02a59d96b1d949e48d518" offset="000000" />
@@ -662,12 +673,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Rare - Releases: 1994-01-14 (Jpn) -->
+	<!-- Developers: Rare -->
 	<software name="btoads">
 		<description>Battletoads (Euro, Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3311, T-97018, 2436"/>
+		<info name="release" value="19940114"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="battletoads (japan, europe).bin" size="262144" crc="cb3cd075" sha1="77a284b993c6f60652d88468b836d7a2ee7b4600" offset="000000" />
@@ -909,12 +921,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Kaneko / Inter State - Releases: 1991-11-29 (Jpn) -->
+	<!-- Developers: Kaneko / Inter State -->
 	<software name="berlin">
 		<description>Berlin no Kabe - The Berlin Wall (Jpn)</description>
 		<year>1991</year>
 		<publisher>Kaneko</publisher>
 		<info name="serial" value="T-33017"/>
+		<info name="release" value="19911129"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="berlin no kabe (japan).bin" size="262144" crc="325b1797" sha1="1d58d3d8b957d33bab8b50ae60dc0c31eafc08af" offset="000000" />
@@ -922,7 +935,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="bishou">
 		<description>Bishoujo Senshi Sailor Moon S (Jpn)</description>
 		<year>1995</year>
@@ -1160,12 +1172,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: ??? - Releases: 1992-03-20 (Jpn) -->
+	<!-- Developers: ??? -->
 	<software name="busterb">
 		<description>Buster Ball (Jpn)</description>
 		<year>1992</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-53027"/>
+		<info name="release" value="19920320"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="buster ball (japan).bin" size="131072" crc="7cb079d0" sha1="5d67f38ec0c2e577a7ad88915849da696ad162aa" offset="000000" />
@@ -1173,12 +1186,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: SIMS - Releases: 1994-02-11 (Jpn) -->
+	<!-- Developers: SIMS -->
 	<software name="busterf">
 		<description>Buster Fight (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3341"/>
+		<info name="release" value="19940211"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="buster fight (japan).bin" size="262144" crc="a72a1753" sha1="5c87048082a95acd6bc27b98f85bda731617c739" offset="000000" />
@@ -1209,7 +1223,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="carlicen">
 		<description>Car Licence (Jpn)</description>
 		<year>199?</year>
@@ -1567,12 +1580,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Core Design - Releases: 1992-10-30 (Jpn) -->
+	<!-- Developers: Core Design -->
 	<software name="chuckrck">
 		<description>Chuck Rock (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-2430, G-3320, 016.740"/>
+		<info name="release" value="19921030 (JPN)"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="chuck rock (world).bin" size="262144" crc="191b1ed8" sha1="2b08a3231c0504d86caca74c8508d85c8ef6a86a" offset="000000" />
@@ -1636,7 +1650,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="cocakid">
 		<description>Coca Cola Kid (Jpn)</description>
 		<year>1994</year>
@@ -1649,12 +1662,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega - Releases: 1990-10-06 (Jpn) -->
+	<!-- Developers: Sega -->
 	<software name="columnsj" cloneof="columns">
 		<description>Columns (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3101, G-3104"/>
+		<info name="release" value="19901006"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="columns (japan).bin" size="32768" crc="f3ca6676" sha1="8b39ba23132af102b8dc313c5c1c211f4a4f27e1" offset="000000" />
@@ -1710,12 +1724,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Minato Giken - Releases: 1995-02-24 (Jpn) -->
+	<!-- Developers: Minato Giken -->
 	<software name="crayon">
 		<description>Crayon Shin-chan - Taiketsu! Kantamu Panic!! (Jpn)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133047"/>
+		<info name="release" value="19950224"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="crayon shin-chan - taiketsu! kantam panic!! (japan).bin" size="524288" crc="03d28eab" sha1="65bcbd89637b8e6837cf36c7f1241eacf85abaa9" offset="000000" />
@@ -1840,12 +1855,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Opera House - Releases: 1991-03-29 (Jpn) -->
+	<!-- Developers: Opera House -->
 	<software name="devilishj" cloneof="devilish">
 		<description>Devilish (Jpn)</description>
 		<year>1991</year>
 		<publisher>Genki</publisher>
 		<info name="serial" value="T-28017"/>
+		<info name="release" value="19910329"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="devilish (japan).bin" size="131072" crc="25db174f" sha1="5b1d4295920ebe4d6d9b9610764939b2aaa6c598" offset="000000" />
@@ -1864,12 +1880,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Aspect - Releases: 1993-12-17 (Jpn) -->
+	<!-- Developers: Aspect -->
 	<software name="donald42" cloneof="deepduck">
 		<description>Donald Duck no 4-Tsu no Hihou (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3332"/>
+		<info name="release" value="19931217"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="donald duck no 4-tsu no hihou (japan).bin" size="524288" crc="4457e7c0" sha1="d5e278b5c68864da7ddfd1f9cfa5b25e462496b0" offset="000000" />
@@ -1877,12 +1894,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega - Releases: 1991-12-20 (Jpn) -->
+	<!-- Developers: Sega -->
 	<software name="donaldld" cloneof="luckydim">
 		<description>Donald Duck no Lucky Dime (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3309"/>
+		<info name="release" value="19911220"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="donald duck no lucky dime (japan).bin" size="262144" crc="2d98bd87" sha1="ee70ac64973775adc2063a8cdff203965f2e7e1d" offset="000000" />
@@ -1890,7 +1908,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="donaldmw">
 		<description>Donald no Magical World (Jpn)</description>
 		<year>1994</year>
@@ -1903,7 +1920,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="doraemon">
 		<description>Doraemon - Waku Waku Pocket Paradise (Jpn)</description>
 		<year>1996</year>
@@ -1998,7 +2014,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="dragoncrj" cloneof="dragoncr">
 		<description>Dragon Crystal - Tsurani no Meikyuu (Jpn)</description>
 		<year>1990</year>
@@ -2023,7 +2038,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="dunkkids">
 		<description>Dunk Kids (Jpn)</description>
 		<year>1994</year>
@@ -2036,7 +2050,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="dynaheadj" cloneof="dynahead">
 		<description>Dynamite Headdy (Jpn)</description>
 		<year>1994</year>
@@ -2118,7 +2131,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="eccoj" cloneof="ecco">
 		<description>Ecco the Dolphin (Jpn)</description>
 		<year>1994</year>
@@ -2143,7 +2155,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ecco2j" cloneof="ecco2">
 		<description>Ecco the Dolphin II (Jpn)</description>
 		<year>1995</year>
@@ -2180,7 +2191,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="eternleg">
 		<description>Eternal Legend - Eien no Densetsu (Jpn)</description>
 		<year>1991</year>
@@ -2262,7 +2272,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="faceball">
 		<description>Faceball 2000 (Jpn)</description>
 		<year>1993</year>
@@ -2298,7 +2307,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="fantzone">
 		<description>Fantasy Zone Gear (Euro, Jpn)</description>
 		<year>1991</year>
@@ -2347,7 +2355,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="fifaj" cloneof="fifa">
 		<description>FIFA International Soccer (Jpn)</description>
 		<year>1995</year>
@@ -2384,7 +2391,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="foreman">
 		<description>Foreman for Real (World)</description>
 		<year>1995</year>
@@ -2409,7 +2415,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="fray">
 		<description>Fray - Shugyou Hen (Jpn)</description>
 		<year>1991</year>
@@ -2422,7 +2427,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="fredcoupj" cloneof="fredcoup">
 		<description>Fred Couples' Golf (Jpn)</description>
 		<year>1994</year>
@@ -2458,7 +2462,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="slamdunk">
 		<description>From TV Animation - Slam Dunk - Shouri e no Starting 5 (Jpn)</description>
 		<year>1994</year>
@@ -2471,7 +2474,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="glocairj" cloneof="glocair">
 		<description>G-LOC Air Battle (Jpn, v1)</description>
 		<year>1990</year>
@@ -2507,7 +2509,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="galaga91" cloneof="galaga2">
 		<description>Galaga '91 (Jpn)</description>
 		<year>1991</year>
@@ -2532,7 +2533,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="gamble">
 		<description>Gamble Panic (Jpn)</description>
 		<year>1995</year>
@@ -2545,7 +2545,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="gambler">
 		<description>Gambler Jikochuushinha (Jpn)</description>
 		<year>1992</year>
@@ -2558,7 +2557,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ganbare" cloneof="factoryp">
 		<description>Ganbare Gorby! (Jpn)</description>
 		<year>1991</year>
@@ -2583,7 +2581,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="garou" cloneof="fatfursp">
 		<description>Garou Densetsu Special (Jpn)</description>
 		<year>1994</year>
@@ -2596,7 +2593,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="gearstad" cloneof="batterup">
 		<description>Gear Stadium (Jpn)</description>
 		<year>1991</year>
@@ -2609,7 +2605,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="gearstah">
 		<description>Gear Stadium Heiseiban (Jpn)</description>
 		<year>1995</year>
@@ -2646,7 +2641,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ggaleste">
 		<description>GG Aleste (Jpn)</description>
 		<year>1991</year>
@@ -2659,7 +2653,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ggdora">
 		<description>GG Doraemon - Noranosuke no Yabou (Jpn)</description>
 		<year>1993</year>
@@ -2672,7 +2665,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ggport">
 		<description>GG Portrait - Pai Chen (Jpn)</description>
 		<year>1996</year>
@@ -2685,7 +2677,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ggport1">
 		<description>GG Portrait - Yuuki Akira (Jpn)</description>
 		<year>1996</year>
@@ -2698,7 +2689,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="shinobij" cloneof="shinobi">
 		<description>The GG Shinobi (Jpn)</description>
 		<year>1991</year>
@@ -2724,7 +2714,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="godzilla">
 		<description>Godzilla - Kaijuu Daishingeki (Jpn)</description>
 		<year>1995</year>
@@ -2737,7 +2726,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="gpriderj" cloneof="gprider">
 		<description>GP Rider (Jpn)</description>
 		<year>1994</year>
@@ -2784,7 +2772,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="griffin">
 		<description>Griffin (Jpn)</description>
 		<year>1991</year>
@@ -2797,7 +2784,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="gunstar">
 		<description>Gunstar Heroes (Jpn)</description>
 		<year>1995</year>
@@ -2810,7 +2796,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="halleywj" cloneof="halleyw">
 		<description>Halley Wars (Jpn)</description>
 		<year>1991</year>
@@ -2835,7 +2820,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="headbust">
 		<description>Head Buster (Jpn)</description>
 		<year>1991</year>
@@ -2848,7 +2832,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="heavywc">
 		<description>Heavy Weight Champ (Jpn)</description>
 		<year>1991</year>
@@ -2873,7 +2856,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="honoo">
 		<description>Honoo no Toukyuuji - Dodge Danpei (Jpn)</description>
 		<year>1992</year>
@@ -2909,7 +2891,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="hyokkori">
 		<description>Hyokkori Hyoutan Jima - Hyoutan Jima no Daikoukai (Jpn)</description>
 		<year>1992</year>
@@ -2922,7 +2903,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="hypery92">
 		<description>Hyper Pro Yakyuu '92 (Jpn)</description>
 		<year>1992</year>
@@ -2935,8 +2915,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) - Note: Yes! The title screen is grammatically incorrect! Engrish Masterpiece! -->
 	<software name="ichirgg">
+		<!-- Note: Yes! The title screen is grammatically incorrect! Engrish Masterpiece! -->
 		<description>Puzzlle &amp; Action Ichidant~R GG (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2948,7 +2928,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="wakevamp" cloneof="mstrdark">
 		<description>In the Wake of Vampire (Jpn)</description>
 		<year>1992</year>
@@ -3032,7 +3011,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="jleagu94">
 		<description>J.League GG Pro Striker '94 (Jpn)</description>
 		<year>1994</year>
@@ -3045,7 +3023,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="jleague">
 		<description>J.League Soccer - Dream Eleven (Jpn)</description>
 		<year>1995</year>
@@ -3141,7 +3118,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="joemontj" cloneof="joemont">
 		<description>Joe Montana's Football (Jpn)</description>
 		<year>1992</year>
@@ -3237,7 +3213,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="jparkj" cloneof="jpark">
 		<description>Jurassic Park (Jpn)</description>
 		<year>1993</year>
@@ -3262,7 +3237,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sainttal">
 		<description>Kaitou Saint Tale (Jpn)</description>
 		<year>1996</year>
@@ -3287,7 +3261,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="kenyuu">
 		<description>Kenyuu Densetsu Yaiba (Jpn)</description>
 		<year>1994</year>
@@ -3300,7 +3273,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="kickrush" cloneof="tengenwc">
 		<description>Kick &amp; Rush (Jpn)</description>
 		<year>1993</year>
@@ -3313,7 +3285,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="kineticc">
 		<description>Kinetic Connection (Jpn)</description>
 		<year>1991</year>
@@ -3326,7 +3297,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="kishin">
 		<description>Kishin Douji Zenki (Jpn)</description>
 		<year>1995</year>
@@ -3363,7 +3333,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="kunichan">
 		<description>Kuni-chan no Game Tengoku (Jpn)</description>
 		<year>1991</year>
@@ -3376,7 +3345,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="kunichn2">
 		<description>Kuni-chan no Game Tengoku Part 2 (Jpn)</description>
 		<year>1992</year>
@@ -3502,7 +3470,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="lemmings">
 		<description>Lemmings (World)</description>
 		<year>1992</year>
@@ -3527,12 +3494,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Syrox Developments - Releases: 1995-01-13 (Jpn) -->
+	<!-- Developers: Syrox Developments -->
 	<software name="lionkingj" cloneof="lionking">
 		<description>The Lion King (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3363"/>
+		<info name="release" value="19950113"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="lion king, the (disney's) (jp).bin" size="524288" crc="c78b8637" sha1="20e01958c3e3de905622c90838cd485a3338d7a4" offset="000000" />
@@ -3687,7 +3655,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="lunar">
 		<description>Lunar - Sanposuru Gakuen (Jpn)</description>
 		<year>1996</year>
@@ -3724,7 +3691,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="madoumna">
 		<description>Madou Monogatari A - Dokidoki Vacation (Jpn)</description>
 		<year>1995</year>
@@ -3737,7 +3703,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="madoumon">
 		<description>Madou Monogatari I - 3-Tsu no Madoukyuu (Jpn)</description>
 		<year>1993</year>
@@ -3750,7 +3715,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="madoumn2">
 		<description>Madou Monogatari II - Arle 16-Sai (Jpn)</description>
 		<year>1994</year>
@@ -3763,7 +3727,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="madoumn3">
 		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Jpn, v1)</description>
 		<year>1994</year>
@@ -3787,7 +3750,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="magicray">
 		<description>Magic Knight Rayearth (Jpn)</description>
 		<year>1994</year>
@@ -3800,7 +3762,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="magicry2">
 		<description>Magic Knight Rayearth 2 - Making of Magic Knight (Jpn)</description>
 		<year>1995</year>
@@ -3813,7 +3774,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="magiclpp">
 		<description>Magical Puzzle Popils (World)</description>
 		<year>1991</year>
@@ -3825,7 +3785,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="magical">
 		<description>Magical Taruruuto-kun (Jpn)</description>
 		<year>1991</year>
@@ -3850,7 +3809,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="mappy">
 		<description>Mappy (Jpn)</description>
 		<year>1991</year>
@@ -3910,7 +3868,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="lastbibl">
 		<description>Megami Tensei Gaiden - Last Bible (Jpn)</description>
 		<year>1994</year>
@@ -3923,7 +3880,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="lastbibs">
 		<description>Megami Tensei Gaiden - Last Bible S (Jpn)</description>
 		<year>1995</year>
@@ -3948,7 +3904,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="legndillj" cloneof="legndill">
 		<description>Mickey Mouse Densetsu no Oukoku - Legend of Illusion (Jpn)</description>
 		<year>1995</year>
@@ -3961,7 +3916,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="castlillj" cloneof="castlill">
 		<description>Mickey Mouse no Castle Illusion (Jpn, SMS Mode)</description>
 		<year>1991</year>
@@ -3974,7 +3928,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="landillj" cloneof="landill">
 		<description>Mickey Mouse no Mahou no Crystal (Jpn)</description>
 		<year>1993</year>
@@ -4079,7 +4032,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="moldoran">
 		<description>Moldorian - Hikari to Yami no Sister (Jpn)</description>
 		<year>1994</year>
@@ -4104,7 +4056,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="mnstwld2" cloneof="wboydtrp">
 		<description>Monster World II - Dragon no Wana (Jpn)</description>
 		<year>1992</year>
@@ -4117,7 +4068,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="mkj" cloneof="mk">
 		<description>Mortal Kombat (Jpn, v3.3)</description>
 		<year>1993</year>
@@ -4177,7 +4127,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="nazpuyo">
 		<description>Nazo Puyo (Jpn, v1)</description>
 		<year>1993</year>
@@ -4201,7 +4150,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="nazpuyo2">
 		<description>Nazo Puyo 2 (Jpn)</description>
 		<year>1993</year>
@@ -4225,7 +4173,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="nazpyoar">
 		<description>Nazo Puyo Arle no Roux (Jpn)</description>
 		<year>1994</year>
@@ -4580,7 +4527,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="nbajamj" cloneof="nbajam">
 		<description>NBA Jam (Jpn)</description>
 		<year>1994</year>
@@ -4628,7 +4574,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="nekodais">
 		<description>Pet Club Neko Daisuki! (Jpn)</description>
 		<year>1996</year>
@@ -4819,7 +4764,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="nflquart">
 		<description>NFL Quarterback Club (World)</description>
 		<year>1994</year>
@@ -5043,7 +4987,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ninjagj" cloneof="ninjag">
 		<description>Ninja Gaiden (Jpn)</description>
 		<year>1991</year>
@@ -5068,7 +5011,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ninku">
 		<description>Ninku (Jpn)</description>
 		<year>1995</year>
@@ -5081,7 +5023,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ninku2">
 		<description>Ninku 2 - Tenkuuryuu e no Michi (Jpn)</description>
 		<year>1995</year>
@@ -5094,7 +5035,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ninkug">
 		<description>Ninku Gaiden - Hiroyuki Daikatsugeki (Jpn)</description>
 		<year>1995</year>
@@ -5107,7 +5047,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) - Alt. Title: Nomo Hideo no World Series Baseball (Box?) -->
+	<!-- Alt. Title: Nomo Hideo no World Series Baseball (Box?) -->
 	<software name="nomowsb" cloneof="worlds95">
 		<description>Nomo's World Series Baseball (Jpn)</description>
 		<year>1995</year>
@@ -5132,7 +5072,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="olympglda" cloneof="olympgld">
 		<description>Olympic Gold (Jpn, USA, v0, SMS Mode)</description>
 		<year>1992</year>
@@ -5157,7 +5096,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="outrunj" cloneof="outrun">
 		<description>Out Run (Jpn)</description>
 		<year>1991</year>
@@ -5228,7 +5166,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="pacmanj" cloneof="pacman">
 		<description>Pac-Man (Jpn)</description>
 		<year>1991</year>
@@ -5253,7 +5190,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="panzer">
 		<description>Panzer Dragoon Mini (Jpn)</description>
 		<year>1996</year>
@@ -5289,7 +5225,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="pengoj" cloneof="pengo">
 		<description>Pengo (Jpn)</description>
 		<year>1990</year>
@@ -5313,7 +5248,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="inudais">
 		<description>Pet Club Inu Daisuki! (Jpn)</description>
 		<year>1996</year>
@@ -5383,7 +5317,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="pstaradv">
 		<description>Phantasy Star Adventure (Jpn)</description>
 		<year>1992</year>
@@ -5396,7 +5329,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="pstargdn">
 		<description>Phantasy Star Gaiden (Jpn)</description>
 		<year>1992</year>
@@ -5433,7 +5365,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="pocketj">
 		<description>Pocket Jansou (Jpn)</description>
 		<year>1992</year>
@@ -5494,7 +5425,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="popbreak">
 		<description>Pop Breaker (Jpn)</description>
 		<year>1991</year>
@@ -5507,7 +5437,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="popeye">
 		<description>Popeye no Beach Volleyball (Jpn)</description>
 		<year>1994</year>
@@ -5531,7 +5460,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="pstrike2">
 		<description>Power Strike II (Euro) ~ GG Aletste II (Jpn)</description>
 		<year>1993</year>
@@ -5592,7 +5520,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="proyak91">
 		<description>The Pro Yakyuu '91 (Jpn)</description>
 		<year>1991</year>
@@ -5605,7 +5532,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="proyak94">
 		<description>Pro Yakyuu GG League '94 (Jpn)</description>
 		<year>1994</year>
@@ -5618,7 +5544,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="proyakgg">
 		<description>Pro Yakyuu GG League (Jpn)</description>
 		<year>1993</year>
@@ -5631,7 +5556,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="psychicwj" cloneof="psychicw">
 		<description>Psychic World (Jpn)</description>
 		<year>1991</year>
@@ -5656,7 +5580,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="puttputtj" cloneof="puttputt">
 		<description>Putt &amp; Putter (Jpn)</description>
 		<year>1991</year>
@@ -5681,7 +5604,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="puyopuyo">
 		<description>Puyo Puyo (Jpn)</description>
 		<year>1991</year>
@@ -5694,7 +5616,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="puyopyo2">
 		<description>Puyo Puyo 2 (Jpn)</description>
 		<year>1994</year>
@@ -5707,7 +5628,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="tantr">
 		<description>Puzzle &amp; Action Tant~R (Jpn)</description>
 		<year>1994</year>
@@ -5719,7 +5639,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="pbobble" cloneof="bustamov">
 		<description>Puzzle Bobble (Jpn)</description>
 		<year>1996</year>
@@ -5744,7 +5663,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="quizgear">
 		<description>The Quiz Gear Fight!! (Jpn)</description>
 		<year>1995</year>
@@ -5780,7 +5698,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="rastansg">
 		<description>Rastan Saga (Jpn, SMS Mode)</description>
 		<year>1991</year>
@@ -5806,7 +5723,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="riddickj" cloneof="riddick">
 		<description>Riddick Bowe Boxing (Jpn, USA)</description>
 		<year>1994</year>
@@ -5842,7 +5758,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) - Alt. Title: Ristar The Shooting Star (Jpn Box?) -->
+	<!-- Alt. Title: Ristar The Shooting Star (Jpn Box?) -->
 	<software name="ristar">
 		<description>Ristar (World)</description>
 		<year>1995</year>
@@ -5958,7 +5874,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="royalstn">
 		<description>Royal Stone - Hirakareshi Toki no Tobira (Jpn)</description>
 		<year>1995</year>
@@ -5971,7 +5886,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ryukyu" cloneof="solitarp">
 		<description>Ryuukyuu (Jpn)</description>
 		<year>1991</year>
@@ -6007,7 +5921,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="samspi" cloneof="samsho">
 		<description>Samurai Spirits (Jpn)</description>
 		<year>1994</year>
@@ -6020,7 +5933,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="scratchg">
 		<description>Scratch Golf (Jpn)</description>
 		<year>1994</year>
@@ -6033,7 +5945,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sdgundam">
 		<description>SD Gundam - Winner's History (Jpn)</description>
 		<year>1995</year>
@@ -6080,7 +5991,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="shadam" cloneof="defoasis">
 		<description>Shadam Crusader - Harukanaru Oukoku (Jpn)</description>
 		<year>1992</year>
@@ -6105,7 +6015,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="shangh2">
 		<description>Shanghai II (Jpn, v1)</description>
 		<year>1990</year>
@@ -6129,7 +6038,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="shikinjo">
 		<description>Shikinjou (Jpn)</description>
 		<year>1991</year>
@@ -6142,7 +6050,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="shinfrcg">
 		<description>Shining Force Gaiden - Ensei, Jashin no Kuni e (Jpn)</description>
 		<year>1992</year>
@@ -6155,7 +6062,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="shinfrgf">
 		<description>Shining Force Gaiden - Final Conflict (Jpn)</description>
 		<year>1995</year>
@@ -6180,7 +6086,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="shinfrg2" cloneof="shinfrc2">
 		<description>Shining Force Gaiden II - Jashin no Kakusei (Jpn)</description>
 		<year>1993</year>
@@ -6286,12 +6191,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Loriciel - Releases: 1991-04-26 (Jpn) -->
+	<!-- Developers: Loriciel -->
 	<software name="skweek" cloneof="slider">
 		<description>Skweek (Jpn)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
 		<info name="serial" value="T-60017"/>
+		<info name="release" value="19910426"/>
 		<info name="alt_title" value="スクウィーク"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
@@ -6361,7 +6267,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sonictls" cloneof="sonicc">
 		<description>Sonic &amp; Tails (Jpn)</description>
 		<year>1993</year>
@@ -6374,11 +6279,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Alt. Title: ソニック＆テイルス 実演用 サンプル -->
 	<software name="sonictlss" cloneof="sonicc">
 		<description>Sonic &amp; Tails (Jpn, Jitsuenyou Sample)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="ソニック＆テイルス 実演用 サンプル"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sonic &amp; tails [demo] (jp).bin" size="524288" crc="e0e3fb6a" sha1="cb09f304f3da4bb23fe70abec4b94b4826c41111" offset="000000" />
@@ -6386,7 +6291,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sonictl2" cloneof="sonictri">
 		<description>Sonic &amp; Tails 2 (Jpn)</description>
 		<year>1994</year>
@@ -6399,7 +6303,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sonicbls">
 		<description>Sonic Blast (Euro, USA) ~ G Sonic (Jpn)</description>
 		<year>1996</year>
@@ -6501,7 +6404,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sonicdr">
 		<description>Sonic Drift (Jpn)</description>
 		<year>1994</year>
@@ -6514,7 +6416,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sonicdr2">
 		<description>Sonic Drift 2 (Jpn, USA)</description>
 		<year>1995</year>
@@ -6527,7 +6428,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="soniclab">
 		<description>Sonic Labyrinth (World)</description>
 		<year>1995</year>
@@ -6772,7 +6672,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sonicj" cloneof="sonic">
 		<description>Sonic The Hedgehog (Jpn, USA, v0)</description>
 		<year>1991</year>
@@ -6785,7 +6684,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sonic">
 		<description>Sonic The Hedgehog (Euro, Jpn, v1)</description>
 		<year>1991</year>
@@ -6809,7 +6707,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sonic2">
 		<description>Sonic The Hedgehog 2 (World)</description>
 		<year>1992</year>
@@ -6845,7 +6742,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="soukoban">
 		<description>Soukoban (Jpn)</description>
 		<year>1990</year>
@@ -6858,7 +6754,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sharr">
 		<description>Space Harrier (World)</description>
 		<year>1991</year>
@@ -7408,7 +7303,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="stargate">
 		<description>Stargate (World)</description>
 		<year>1994</year>
@@ -7421,12 +7315,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Sega AM7 (CS2) / JSH - Releases: 1992-11-27 (Jpn) -->
+	<!-- Developers: Sega AM7 (CS2) / JSH -->
 	<software name="sor">
 		<description>Streets of Rage (World) ~ Bare Knuckle (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3313, 2417"/>
+		<info name="release" value="19921127"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="streets of rage (world).bin" size="262144" crc="3d8bcf1d" sha1="ca8c8a00ee838e994b2fa17e595ddd40d898cf42" offset="000000" />
@@ -7434,12 +7329,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: Ancient / H.I.C. / Shout! Designworks / JSH - Releases: 1993-07-23 (Jpn) -->
+	<!-- Developers: Ancient / H.I.C. / Shout! Designworks / JSH -->
 	<software name="sor2">
 		<description>Streets of Rage II (World) ~ Bare Knuckle II - Shitou e no Chingonka (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3328, 2517"/>
+		<info name="release" value="19930723"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="streets of rage ii (world).bin" size="524288" crc="0b618409" sha1="2804b355347bda6e2903078ba30ed6b3a289ebba" offset="000000" />
@@ -7471,7 +7367,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="supercolj" cloneof="supercol">
 		<description>Super Columns (Jpn)</description>
 		<year>1995</year>
@@ -7573,7 +7468,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="superglf">
 		<description>Super Golf (Jpn)</description>
 		<year>1991</year>
@@ -7598,7 +7492,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="supermd3">
 		<description>Super Momotarou Dentetsu III (Jpn)</description>
 		<year>1995</year>
@@ -7611,7 +7504,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="smgpj">
 		<description>Super Monaco GP (Jpn)</description>
 		<year>1990</year>
@@ -7731,7 +7623,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="sylvan">
 		<description>Sylvan Tale (Jpn)</description>
 		<year>1995</year>
@@ -7768,7 +7659,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="tailsadv">
 		<description>Tails Adventures (World)</description>
 		<year>1995</year>
@@ -7781,7 +7671,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="tailskyp">
 		<description>Tails no Skypatrol (Jpn)</description>
 		<year>1995</year>
@@ -7794,7 +7683,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="taisnmj">
 		<description>Taisen Mahjong HaoPai (Jpn)</description>
 		<year>1990</year>
@@ -7807,7 +7695,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="taisnmj2">
 		<description>Taisen Mahjong HaoPai 2 (Jpn)</description>
 		<year>1993</year>
@@ -7820,7 +7707,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="taisendg">
 		<description>Taisen-gata Daisenryaku G (Jpn)</description>
 		<year>1991</year>
@@ -7833,7 +7719,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="chasehqj" cloneof="chasehq">
 		<description>Taito Chase H.Q. (Jpn, SMS Mode)</description>
 		<year>1991</year>
@@ -7870,7 +7755,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="tamalymp">
 		<description>Tama &amp; Friends Sanchoume Kouen - Tamalympic (Jpn)</description>
 		<year>1995</year>
@@ -7883,7 +7767,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="tarot">
 		<description>Tarot no Yakata (Jpn)</description>
 		<year>1991</year>
@@ -7908,7 +7791,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="tatakae">
 		<description>Tatakae! Pro Yakyuu Twin League (Jpn)</description>
 		<year>1995</year>
@@ -8111,7 +7993,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="tempojr">
 		<description>Tempo Jr. (World)</description>
 		<year>1995</year>
@@ -8282,12 +8163,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers: SIMS - Releases: 1993-06-25 (Jpn) -->
+	<!-- Developers: SIMS -->
 	<software name="tomjermvj" cloneof="tomjermv">
 		<description>Tom and Jerry - The Movie (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3319"/>
+		<info name="release" value="19930625"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="tom and jerry - the movie (jp).bin" size="262144" crc="a1453efa" sha1="25f7e0d4b4416e4f879d289eed638d4018bedb51" offset="000000" />
@@ -8307,7 +8189,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="torarete">
 		<description>Torarete Tamaruka (Jpn)</description>
 		<year>1994</year>
@@ -8320,7 +8201,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="truelies">
 		<description>True Lies (World)</description>
 		<year>1995</year>
@@ -8333,7 +8213,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="ultimate">
 		<description>Ultimate Soccer (Euro, Jpn, Bra)</description>
 		<year>1993</year>
@@ -8381,7 +8260,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="vfmini" cloneof="vfa">
 		<description>Virtua Fighter Mini (Jpn)</description>
 		<year>1996</year>
@@ -8406,7 +8284,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="waganlnd">
 		<description>Wagan Land (Jpn)</description>
 		<year>1991</year>
@@ -8441,7 +8318,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="wimbledn">
 		<description>Wimbledon (World)</description>
 		<year>1992</year>
@@ -8454,7 +8330,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="winterolj" cloneof="winterol">
 		<description>Winter Olympics - Lillehammer '94 (Jpn)</description>
 		<year>1994</year>
@@ -8513,7 +8388,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="wboyj" cloneof="wboy">
 		<description>Wonder Boy (Jpn)</description>
 		<year>1990</year>
@@ -8593,7 +8467,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="wderby">
 		<description>World Derby (Jpn)</description>
 		<year>1994</year>
@@ -8896,7 +8769,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="yuyuhaku">
 		<description>Yu Yu Hakusho - Horobishimono no Gyakushuu (Jpn)</description>
 		<year>1994</year>
@@ -8909,7 +8781,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="yuyuhak2">
 		<description>Yu Yu Hakusho 2 - Gekitou! Nanakyou no Tatakai (Jpn)</description>
 		<year>1994</year>
@@ -8922,7 +8793,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="zangear">
 		<description>Zan Gear (Jpn)</description>
 		<year>1990</year>
@@ -8946,7 +8816,6 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Developers:  - Releases:  (Jpn) -->
 	<software name="zoolj" cloneof="zool">
 		<description>Zool no Yume Bouken (Jpn)</description>
 		<year>1994</year>
