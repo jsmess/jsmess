@@ -84,7 +84,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bomberman &apos;93 (usa).pce" size="524288" crc="56171c1c" sha1="709b47de6e0ebc18fb80c951d5cfaa6ce82d6ce0" offset="000000" />
+				<rom name="bomberman '93 (usa).pce" size="524288" crc="56171c1c" sha1="709b47de6e0ebc18fb80c951d5cfaa6ce82d6ce0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 		<publisher>TTI</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bonk iii - bonk&apos;s big adventure (usa).pce" size="1048576" crc="5a3f76d8" sha1="b966df0281f7fab4536afc166278e1bec0d926c4" offset="000000" />
+				<rom name="bonk iii - bonk's big adventure (usa).pce" size="1048576" crc="5a3f76d8" sha1="b966df0281f7fab4536afc166278e1bec0d926c4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 		<publisher>NEC</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="bonk&apos;s adventure (usa).pce" size="393216" crc="599ead9b" sha1="403c4fbdb617cea5b8cd0c8d06ae988f6aef93bd" offset="000000" />
+				<rom name="bonk's adventure (usa).pce" size="393216" crc="599ead9b" sha1="403c4fbdb617cea5b8cd0c8d06ae988f6aef93bd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -128,7 +128,7 @@
 		<publisher>NEC</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bonk&apos;s revenge (usa).pce" size="524288" crc="14250f9a" sha1="1f6c2766507d72fb55fbf84d2a8b45cf86709c0b" offset="000000" />
+				<rom name="bonk's revenge (usa).pce" size="524288" crc="14250f9a" sha1="1f6c2766507d72fb55fbf84d2a8b45cf86709c0b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -271,7 +271,7 @@
 		<publisher>NEC</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="devil&apos;s crush - naxat pinball (usa).pce" size="393216" crc="157b4492" sha1="1c54fb80e5acf82d7346dd7f2e8db8c74c58f4ba" offset="000000" />
+				<rom name="devil's crush - naxat pinball (usa).pce" size="393216" crc="157b4492" sha1="1c54fb80e5acf82d7346dd7f2e8db8c74c58f4ba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -304,7 +304,7 @@
 		<publisher>NEC</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="dragon&apos;s curse (usa).pce" size="262144" crc="7d2c4b09" sha1="39b382725e38d6303ae2b19f1cabbd96ca661b07" offset="000000" />
+				<rom name="dragon's curse (usa).pce" size="262144" crc="7d2c4b09" sha1="39b382725e38d6303ae2b19f1cabbd96ca661b07" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -370,7 +370,7 @@
 		<publisher>NEC</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="galaga &apos;90 (usa).pce" size="262144" crc="2909dec6" sha1="ff73a144eb2da537d0e1a3c8c56ef197fd6ce1ce" offset="000000" />
+				<rom name="galaga '90 (usa).pce" size="262144" crc="2909dec6" sha1="ff73a144eb2da537d0e1a3c8c56ef197fd6ce1ce" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -436,7 +436,7 @@
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="jack nicklaus&apos; turbo golf (usa).pce" size="262144" crc="83384572" sha1="49d240ec70e4f7cc98a14e4e4e5a0857bc1ee737" offset="000000" />
+				<rom name="jack nicklaus' turbo golf (usa).pce" size="262144" crc="83384572" sha1="49d240ec70e4f7cc98a14e4e4e5a0857bc1ee737" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -447,7 +447,7 @@
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="jackie chan&apos;s action kung fu (usa).pce" size="524288" crc="9d2f6193" sha1="33ee18e3cd6ba59ffca70fa7a1322d6e44a08682" offset="000000" />
+				<rom name="jackie chan's action kung fu (usa).pce" size="524288" crc="9d2f6193" sha1="33ee18e3cd6ba59ffca70fa7a1322d6e44a08682" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -854,7 +854,7 @@
 		<publisher>NEC</publisher>
 		<part name="cart" interface="tg16_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="takin&apos; it to the hoop (usa).pce" size="262144" crc="e9d51797" sha1="1f36230efde7025730c1a0dbf3aa47b887440ecd" offset="000000" />
+				<rom name="takin' it to the hoop (usa).pce" size="262144" crc="e9d51797" sha1="1f36230efde7025730c1a0dbf3aa47b887440ecd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

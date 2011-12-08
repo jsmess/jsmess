@@ -1173,7 +1173,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="bc&apos;s quest for tires (1983)(sierra online).80" size="0x4000" crc="1800fa34" sha1="976b5090b500b3dd951640eaa107aff8cef3f7e0" offset="0x0000" />
+				<rom name="bc's quest for tires (1983)(sierra online).80" size="0x4000" crc="1800fa34" sha1="976b5090b500b3dd951640eaa107aff8cef3f7e0" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1201,7 +1201,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="big bird&apos;s funhouse (1984)(cbs software).80" size="0x4000" crc="31eb66d6" sha1="6bd7e5d52ecab833065a86d492f6c399699d68f4" offset="0x0000" />
+				<rom name="big bird's funhouse (1984)(cbs software).80" size="0x4000" crc="31eb66d6" sha1="6bd7e5d52ecab833065a86d492f6c399699d68f4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1215,7 +1215,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="big bird&apos;s special delivery (1984)(cbs software).80" size="0x4000" crc="d2fcb282" sha1="5ba4be39f46004beec0b65a2f2128b5bc0d4ecf2" offset="0x0000" />
+				<rom name="big bird's special delivery (1984)(cbs software).80" size="0x4000" crc="d2fcb282" sha1="5ba4be39f46004beec0b65a2f2128b5bc0d4ecf2" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1593,7 +1593,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dragon&apos;s den (1983)(commodore).80" size="0x4000" crc="447e9930" sha1="432a1fe70a975b5ad1bee1c0138b3672df7b1899" offset="0x0000" />
+				<rom name="dragon's den (1983)(commodore).80" size="0x4000" crc="447e9930" sha1="432a1fe70a975b5ad1bee1c0138b3672df7b1899" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1622,7 +1622,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="ernie&apos;s magic shapes (1984)(cbs software).80" size="0x4000" crc="36242abc" sha1="56a17956c73bb42f41cbe5e9021bbbc242b55248" offset="0x0000" />
+				<rom name="ernie's magic shapes (1984)(cbs software).80" size="0x4000" crc="36242abc" sha1="56a17956c73bb42f41cbe5e9021bbbc242b55248" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1840,7 +1840,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="halftime battlin&apos; bands (1984)(cbs software).80" size="0x4000" crc="2c142cc9" sha1="834a9acde6b44082c917084f3d9a7c72f9842762" offset="0x0000" />
+				<rom name="halftime battlin' bands (1984)(cbs software).80" size="0x4000" crc="2c142cc9" sha1="834a9acde6b44082c917084f3d9a7c72f9842762" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2159,7 +2159,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="mario&apos;s brewery (1983)(mr. computer).80" size="0x2000" crc="250942d0" sha1="3d2773247aa9b82a634cbf0cfa7dca5f127522a7" offset="0x0000" />
+				<rom name="mario's brewery (1983)(mr. computer).80" size="0x2000" crc="250942d0" sha1="3d2773247aa9b82a634cbf0cfa7dca5f127522a7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2252,7 +2252,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="minnesota fat&apos;s pool challenger (1983)(hesware).80" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4" offset="0x0000" />
+				<rom name="minnesota fat's pool challenger (1983)(hesware).80" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2723,7 +2723,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rack &apos;em up (1983)(roklan).80" size="0x4000" crc="4167bb7d" sha1="50da7890674ad80deea2a5b5a55120cd9e7d8ef5" offset="0x0000" />
+				<rom name="rack 'em up (1983)(roklan).80" size="0x4000" crc="4167bb7d" sha1="50da7890674ad80deea2a5b5a55120cd9e7d8ef5" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2903,7 +2903,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="rootin&apos; tootin&apos; (1983)(hesware).80" size="0x4000" crc="2d0b53d9" sha1="bc0dcf610a7aaf810c678b8eaa6d18c22d5e39dd" offset="0x0000" />
+				<rom name="rootin' tootin' (1983)(hesware).80" size="0x4000" crc="2d0b53d9" sha1="bc0dcf610a7aaf810c678b8eaa6d18c22d5e39dd" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2985,7 +2985,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="seahorse hide&apos;n seek (1984)(cbs software).80" size="0x4000" crc="89f7fc07" sha1="06e257129b3310dad8cd0b72870682d1be7e0e46" offset="0x0000" />
+				<rom name="seahorse hide'n seek (1984)(cbs software).80" size="0x4000" crc="89f7fc07" sha1="06e257129b3310dad8cd0b72870682d1be7e0e46" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3359,7 +3359,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="tyler&apos;s dungeon (1984)(turbo software).80" size="0x2000" crc="002d1ff6" sha1="1f005dca57a8004a45eb797e49dde0740ef8ed16" offset="0x0000" />
+				<rom name="tyler's dungeon (1984)(turbo software).80" size="0x2000" crc="002d1ff6" sha1="1f005dca57a8004a45eb797e49dde0740ef8ed16" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3387,7 +3387,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="up &apos;n add &apos;em (1984)(fisher price).80" size="0x2000" crc="b302c395" sha1="6ae46da8e59c2be2289175f0e453b2ad8c0425c7" offset="0x0000" />
+				<rom name="up 'n add 'em (1984)(fisher price).80" size="0x2000" crc="b302c395" sha1="6ae46da8e59c2be2289175f0e453b2ad8c0425c7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3401,7 +3401,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="up &apos;n down (1984)(sega).80" size="0x4000" crc="4a15edd9" sha1="2e594571cd4535bbd99235d2f885c305ad2c7b79" offset="0x0000" />
+				<rom name="up 'n down (1984)(sega).80" size="0x4000" crc="4a15edd9" sha1="2e594571cd4535bbd99235d2f885c305ad2c7b79" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3470,7 +3470,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="wizard of id&apos;s wiztype, the (1984)(sierra online).80" size="0x4000" crc="62ae5d16" sha1="34d6b54dc4811beb713e2d79afcda81b734d5f04" offset="0x0000" />
+				<rom name="wizard of id's wiztype, the (1984)(sierra online).80" size="0x4000" crc="62ae5d16" sha1="34d6b54dc4811beb713e2d79afcda81b734d5f04" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4333,7 +4333,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="designer&apos;s pencil, the (1984)(activision).80" size="0x4000" crc="0814b3ca" sha1="aefc9809610d9eda9827a05f9a5c5882d2000e03" offset="0x0000" />
+				<rom name="designer's pencil, the (1984)(activision).80" size="0x4000" crc="0814b3ca" sha1="aefc9809610d9eda9827a05f9a5c5882d2000e03" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4346,7 +4346,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="doc &apos;64 v2.2 (19xx)(n. heusler).80" size="0x2000" crc="d58a6007" sha1="04bbb9deefdf77fa938545c04f2dd3f00dad38bf" offset="0x0000" />
+				<rom name="doc '64 v2.2 (19xx)(n. heusler).80" size="0x2000" crc="d58a6007" sha1="04bbb9deefdf77fa938545c04f2dd3f00dad38bf" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4616,10 +4616,10 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="simons&apos; basic (198x)(commodore).80" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d" offset="0x0000" />
+				<rom name="simons' basic (198x)(commodore).80" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d" offset="0x0000" />
 			</dataarea>
 			<dataarea name="romh" size="0x2000">
-				<rom name="simons&apos; basic (198x)(commodore).a0" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9" offset="0x0000" />
+				<rom name="simons' basic (198x)(commodore).a0" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
