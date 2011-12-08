@@ -51,11 +51,12 @@
 		</part>
 	</software>
 
+	<!-- Serial: DS-G403 -->
 	<software name="94swc">
-        <!-- Serial: DS-G403 - Alt. Title: 94 슈퍼 월드컵 축구 -->
 		<description>94 Super World Cup Soccer (Kor)</description>
 		<year>1994</year>
 		<publisher>Daou Infosys</publisher>
+		<info name="alt_title" value="94 슈퍼 월드컵 축구" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="94 super world cup soccer (kr).bin" size="262144" crc="060d6a7c" sha1="bc9b5c41114a7c3a5481ee67fc86292b9ba861da" offset="000000" />
@@ -1221,11 +1222,12 @@
 		</part>
 	</software>
 
-	<!-- Serial: K-317 - Alt. Title: Dàzhàn hēishǒu dǎng ~ 大戰黑手黨 -->
+	<!-- Serial: K-317 -->
 	<software name="comicaltw" cloneof="comical">
 		<description>Comical Machine Gun Joe (Tw)</description>
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
+		<info name="alt_title" value="Dàzhàn hēishǒu dǎng ~ 大戰黑手黨" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="comical machine gun joe (tw).bin" size="32768" crc="84ad5ae4" sha1="b39b09f86b275612f6444247ff253f2620a36ef3" offset="000000" />
@@ -1606,10 +1608,10 @@
 	</software>
 
 	<software name="eagles5" supported="no">
-        <!-- Alt. Title: 독수리5형제 ~ Doksuri 5 Hyeongjae -->
 		<description>Eagles 5 (Kor)</description>
 		<year>1990</year>
 		<publisher>Zemina</publisher>
+		<info name="alt_title" value="독수리5형제 ~ Doksuri 5 Hyeongjae" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="eagles 5 (kr).bin" size="32768" crc="f06f2ccb" sha1="f0f128b25e5557e660d936995e6bf25c8ebd17e5" offset="000000" />
@@ -2109,11 +2111,11 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: 갤럭시안 -->
 	<software name="galaxian">
 		<description>Galaxian (Kor)</description>
 		<year>199?</year>
 		<publisher>HiCom</publisher>
+		<info name="alt_title" value="갤럭시안" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="galaxian [kr].bin" size="32768" crc="577ec227" sha1="eed656762c78b13f715a2b3c7fd4e8d2565a6684" offset="000000"/>
@@ -5297,11 +5299,11 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: 슈퍼바이오맨 I -->
 	<software name="sbioman1">
 		<description>Super Bioman 1 (Kor)</description>
 		<year>1992</year>
 		<publisher>HiCom</publisher>
+		<info name="alt_title" value="슈퍼바이오맨 I" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="super bioman 1.bin" size="65536" crc="a66d26cf" sha1="31605352efae3432a7fbea245ae00c53ab30ec18" offset="000000"/>
@@ -5309,11 +5311,11 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: 수퍼보이 I -->
 	<software name="sboy1">
 		<description>Super Boy I (Kor)</description>
 		<year>1989</year>
 		<publisher>Zemina</publisher>
+		<info name="alt_title" value="수퍼보이 I" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="49152">
 				<rom name="super boy 1.bin" size="49152" crc="bf5a994a" sha1="f0e6a20c72f0fb0feb1681217eeec3b69950e897" offset="000000"/>
@@ -5321,11 +5323,11 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: 수퍼보이 II -->
 	<software name="sboy2">
 		<description>Super Boy II (Kor)</description>
 		<year>1989</year>
 		<publisher>Zemina</publisher>
+		<info name="alt_title" value="수퍼보이 II" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="super boy ii (kor).bin" size="49152" crc="67c2f0ff" sha1="f0c239e4cf90cd4c699889792f811717670ac85c" offset="000000" />
@@ -5344,11 +5346,11 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: 수퍼보이 IV -->
 	<software name="sboy4">
 		<description>Super Boy 4 (Kor)</description>
 		<year>1992</year>
 		<publisher>Zemina</publisher>
+		<info name="alt_title" value="수퍼보이 IV" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="super boy 4 (kor).bin" size="262144" crc="b995b4f0" sha1="9b4be448b81f96391ef9667b1923abc53a9c59d9" offset="000000" />

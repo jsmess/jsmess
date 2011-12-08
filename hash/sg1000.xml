@@ -194,10 +194,10 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bombjackk1" cloneof="bombjack">
-		<!-- Alt Title: 범짹 ~ Beom Jjaek -->
 		<description>Bomb Jack (Kor)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="범짹 ~ Beom Jjaek"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="bomb jack [english logo] (kr).bin" size="32768" crc="0c69d837" sha1="835d0ea1c0cf1723ae95ba60ea0a929780ebaf71" offset="000000" />
@@ -206,10 +206,10 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bombjackk2" cloneof="bombjack">
-		<!-- Alt Title: 범짹 ~ Beom Jjaek -->
 		<description>Beom Jjaek (Kor)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="범짹 ~ Beom Jjaek"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="bomb jack [korean logo] (kr).bin" size="32768" crc="b0c7b310" sha1="b6b36a0280344214bdb8d9184244e21e9fb7371f" offset="000000" />
@@ -1155,10 +1155,10 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hangon2t1" cloneof="hangon2">
-		<!-- Alt Title: 摩托飛車 ~ Mótuō Fēichē -->
 		<description>Hang-On II (Tw)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="摩托飛車 ~ Mótuō Fēichē"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="hang-on ii [english logo] (tw).bin" size="32768" crc="cabd451b" sha1="1e25fc699baa715710f3f6375dbcb107bfc044f5" offset="000000" />
@@ -1167,10 +1167,10 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hangon2t2" cloneof="hangon2">
-		<!-- Alt Title: 摩托飛車 ~ Mótuō Fēichē -->
 		<description>Motuo Feiche (Tw)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="摩托飛車 ~ Mótuō Fēichē"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="hang-on ii [chinese logo] (tw).bin" size="32768" crc="e98a111e" sha1="154669944d899faa1db1cea3fecce9eb162eb3fd" offset="000000" />
