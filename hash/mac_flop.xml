@@ -57,11 +57,6 @@
 		</part>
 	</software>
 
-        ROM_LOAD( "system tools.img", 0x000000, 0x0c8000,   CRC(febb735f) SHA1(fb89deb29ff341e92fd30307934f7c7616c2c8e2) ) 
-        ROM_LOAD( "utilities 1.img", 0x000000, 0x0c8000,    CRC(936e35d8) SHA1(85e1667b236451149e06db76a60b8852432622a3) ) 
-        ROM_LOAD( "utilities 2.img", 0x000000, 0x0c8000,    CRC(4d00c41a) SHA1(3d5261d6ec11b11c16e745cd957aa77c4bebdf08) ) 
-        ROM_LOAD( "printing tools.img", 0x000000, 0x0c8000, CRC(e7ba71b1) SHA1(bd7194407769a2f2f4ebde8b94f8d85e92419d32) ) 
-
 	<software name="sys608">
 		<!-- This version of the System Software was an update to System Software 6.0.7 with added System 7 printer compatibility -->
 		<description>System Software 6.0.8</description>
