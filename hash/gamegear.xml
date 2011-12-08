@@ -7550,11 +7550,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<!-- Serial: 2304, 012.140-->
 	<software name="smgp">
 		<description>Super Monaco GP (Euro, USA, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="2304, 012.140"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super monaco gp (usa, europe).bin" size="131072" crc="fcf12547" sha1="d834e43d7ec6dbadf2e367afd45b7e1e4362035b" offset="000000" />

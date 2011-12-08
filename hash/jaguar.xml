@@ -13,7 +13,6 @@ Are the following undumped?
 		<description>Air Cars</description>
 		<year>1997</year>
 		<publisher>ICD</publisher>
-		<info name="serial" value="N/A"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152">
 				<!-- The original dump, released in a custom .j01 format, was the following one
@@ -496,7 +495,6 @@ Are the following undumped?
 		<description>Space War 2000</description>
 		<year>2001</year>
 		<publisher>B&amp;C Computervisions</publisher>
-		<info name="serial" value="N/A"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="space war 2000 (world).j64" size="4194304" crc="53df6440" sha1="b5da0b1231a6e6532268c4e04f74e56f047dd5a5" offset="000000" />

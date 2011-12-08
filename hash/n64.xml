@@ -3970,9 +3970,9 @@ There appear to exist some undumped N64 protos
 		<description>Jikkyou J.League 1999 - Perfect Striker 2 (Jpn, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value=""/>
-		<info name="release" value=""/>
-		<info name="alt_title" value=""/>
+		<info name="serial" value="NUS-NPSJ (RZ029-J1)"/>
+		<info name="release" value="19990729"/>
+		<info name="alt_title" value="実況J.LEAGUE1999 パーフェクトストライカー2"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou j.league 1999 - perfect striker 2 (japan) (rev a).bin" size="16777216" crc="b4131606" sha1="5a3734b75495372b0c6d45f9dd4dfcf57bc75be8" offset="000000" />
@@ -6426,8 +6426,8 @@ There appear to exist some undumped N64 protos
 		<description>Olympic Hockey Nagano '98 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="1998-07-16"/>
-		<info name="release" value=""/>
+		<info name="serial" value="NUS-P-NHNJ (RZ024-J1)"/>
+		<info name="release" value="19980716"/>
 		<info name="alt_title" value="オリンピックホッケーナガノ"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
@@ -8653,8 +8653,8 @@ There appear to exist some undumped N64 protos
 		<description>Super Mario 64 (Jpn, Rev. A, Shindou Edition)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="1997-07-18"/>
-		<info name="release" value=""/>
+		<info name="serial" value="NUS-P-NSMJ"/>
+		<info name="release" value="19970718"/>
 		<info name="alt_title" value="スーパーマリオ64 (振動パック対応バージョン)"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">

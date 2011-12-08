@@ -159,7 +159,6 @@
 
 	<software name="angels2">
 		<description>Angels II - Holy Night [Prototype][Backup] (SCD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -899,9 +898,10 @@
 
 	<software name="dedenden">
 		<description>Deden no Den (SCD)(Jpn)</description>
-		<!-- Serial: HCD4064 - Note: Promotional item -->
+		<!-- Notes: Promotional item -->
 		<year>199?</year>
 		<publisher>Hudson</publisher>
+		<info name="serial" value="HCD4064"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -1234,9 +1234,9 @@
 
 	<software name="emerdrgnt" cloneof="emerdrgn">
 		<description>Emerald Dragon Taikenban (SCD)(Jpn)</description>
-		<!-- Serial: HMD-001 -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
+		<info name="serial" value="HMD-001"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -1317,9 +1317,9 @@
 
 	<software name="faceballt" cloneof="faceball">
 		<description>Faceball Taikenban (SCD)(Jpn)</description>
-		<!-- Serial: RH3001 -->
 		<year>1993</year>
 		<publisher>Riverhill Software</publisher>
+		<info name="serial" value="RH3001"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -1442,7 +1442,6 @@
 
 	<software name="flashhidt" cloneof="flashhid">
 		<description>Flash Hiders Taikenban (SCD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>1993</year>
 		<publisher>Right Stuff</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -1567,9 +1566,9 @@
 
 	<software name="galaxyfyhv" cloneof="galaxyfy">
 		<description>Galaxy Fraulien Yuna HuVideo CD (SCD)(Jpn)</description>
-		<!-- Serial: HCD5078 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
+		<info name="serial" value="HCD5078"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -2068,7 +2067,6 @@
 
 	<software name="jthunder">
 		<description>J Thunder (SCD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -2303,13 +2301,13 @@
 		</part>
 	</software>
 
-  <!-- This is exactly the same as xanadu ?!-->
-  <!-- Serial: HE4002 -->
-  <!--
-  <software name="xanadus" cloneof="xanadu">
+	<!-- This is exactly the same as xanadu ?!-->
+	<!--
+	<software name="xanadus" cloneof="xanadu">
 		<description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
+		<info name="serial" value="HE4002"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -2317,7 +2315,7 @@
 			</diskarea>
 		</part>
 	</software>
-  -->
+	-->
 
 	<software name="xanadu2">
 		<description>Kaze no Densetsu Xanadu II (SCD)(Jpn)</description>
@@ -2475,9 +2473,9 @@
 
 	<software name="laplacep" cloneof="laplace">
 		<description>Laplace no Ma - Preview Disk (SCD)(Jpn)</description>
-		<!-- Serial: HMCD2007 -->
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
+		<info name="serial" value="HMCD2007"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -2528,13 +2526,14 @@
 		</part>
 	</software>
 
-  <!-- This is exactly the same as lastarma ?!-->
-  <!-- Serial: BRCD0001 - Release Date: 1990-08-31 -->
-  <!--
-  <software name="lastarma1" cloneof="lastarma">
+	<!-- This is exactly the same as lastarma ?!-->
+	<!--
+	<software name="lastarma1" cloneof="lastarma">
 		<description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Brain Gray</publisher>
+		<info name="serial" value="BRCD0001"/>
+		<info name="release" value="19900831"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -2542,7 +2541,7 @@
 			</diskarea>
 		</part>
 	</software>
-  -->
+	-->
 
 	<software name="lastarm2" cloneof="lastarma">
 		<description>Last Armageddon {BRCD0001-7-0904-R1D} (CD)(Jpn)</description>
@@ -2614,12 +2613,11 @@
 		</part>
 	</software>
 
-  <!-- This is exactly the same as lodoss ?!-->
-	<!-- Serial:  -->
-  <!--
-  <software name="lodosst" cloneof="lodoss">
-    <description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(Jpn)</description>
-    <year>1992</year>
+	<!-- This is exactly the same as lodoss ?!-->
+	<!--
+	<software name="lodosst" cloneof="lodoss">
+  	<description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(Jpn)</description>
+  	<year>1992</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
@@ -2628,7 +2626,7 @@
 			</diskarea>
 		</part>
 	</software>
-  -->
+	-->
 
 	<software name="lodoss2">
 		<description>Lodoss Tousenki II - Record of Lodoss War II (SCD)(Jpn)</description>
@@ -2716,7 +2714,6 @@
 
 	<software name="madstlkrs" cloneof="madstlkr">
 		<description>Mad Stalker - Full Metal Force - Sample Disc (ACD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -3411,9 +3408,9 @@
 
 	<software name="hyprcata">
 		<description>PCEngine Hyper Catalog Duo-RX - Disc A (SCD)(Jpn)</description>
-		<!-- Serial: SHCD-4008 -->
 		<year>19??</year>
 		<publisher>Shogakukan</publisher>
+		<info name="serial" value="SHCD-4008"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -3424,9 +3421,9 @@
 
 	<software name="hyprcatb">
 		<description>PCEngine Hyper Catalog Duo-RX - Disc B (SCD)(Jpn)</description>
-		<!-- Serial: SHCD-4009 -->
 		<year>19??</year>
 		<publisher>Shogakukan</publisher>
+		<info name="serial" value="SHCD-4009"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -3669,7 +3666,6 @@
 
 	<software name="psycdet3d" cloneof="psycdet3">
 		<description>Psychic Detective Series Vol. III - Aya - Auto Demo (SCD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>1992</year>
 		<publisher>DataWest</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -4018,9 +4014,9 @@
 
 	<software name="karaoke1">
 		<description>Rom² Karaoke - Volume I (CD)(Jpn)</description>
-		<!-- Serial: HRCD-9101 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
+		<info name="serial" value="HRCD-9101"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4031,9 +4027,9 @@
 
 	<software name="karao1ss">
 		<description>Rom² Karaoke - Volume I - Suteki ni Standard (CD)(Jpn)</description>
-		<!-- Serial: JCCD9501 -->
 		<year>1989</year>
 		<publisher>Victor Musical Industries</publisher>
+		<info name="serial" value="JCCD9501"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4044,9 +4040,9 @@
 
 	<software name="karaoke2">
 		<description>Rom² Karaoke - Volume II (CD)(Jpn)</description>
-		<!-- Serial: HRCD-9102 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
+		<info name="serial" value="HRCD-9102"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4057,9 +4053,9 @@
 
 	<software name="karao2ni">
 		<description>Rom² Karaoke - Volume II - Nattoku Idol (CD)(Jpn)</description>
-		<!-- Serial: JCCD9502 -->
 		<year>1989</year>
 		<publisher>Victor Musical Industries</publisher>
+		<info name="serial" value="JCCD9502"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4070,9 +4066,9 @@
 
 	<software name="karaoke3">
 		<description>Rom² Karaoke - Volume III (CD)(Jpn)</description>
-		<!-- Serial: HRCD-9103 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
+		<info name="serial" value="HRCD-9103"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4083,9 +4079,9 @@
 
 	<software name="karao3yb">
 		<description>Rom² Karaoke - Volume III - Yappashi Band (CD)(Jpn)</description>
-		<!-- Serial: JCCD9503 -->
 		<year>1990</year>
 		<publisher>Victor Musical Industries</publisher>
+		<info name="serial" value="JCCD9503"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4096,9 +4092,9 @@
 
 	<software name="karaoke4">
 		<description>Rom² Karaoke - Volume IV (CD)(Jpn)</description>
-		<!-- Serial: HRCD-9104 -->
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
+		<info name="serial" value="HRCD-9104"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4109,9 +4105,9 @@
 
 	<software name="karao4co">
 		<description>Rom² Karaoke - Volume IV - Choito Otona! (CD)(Jpn)</description>
-		<!-- Serial: JCCD9504 -->
 		<year>1990</year>
 		<publisher>Victor Musical Industries</publisher>
+		<info name="serial" value="JCCD9504"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4122,9 +4118,9 @@
 
 	<software name="karaoke5">
 		<description>Rom² Karaoke - Volume V (CD)(Jpn)</description>
-		<!-- Serial: HRCD-9105 -->
 		<year>1990</year>
 		<publisher>NEC Avenue</publisher>
+		<info name="serial" value="HRCD-9105"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4135,9 +4131,9 @@
 
 	<software name="karao5mu">
 		<description>Rom² Karaoke - Volume V - Maku no Uchi (CD)(Jpn)</description>
-		<!-- Serial: JCCD9505 -->
 		<year>1990</year>
 		<publisher>Victor Musical Industries</publisher>
+		<info name="serial" value="JCCD9505"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4190,7 +4186,6 @@
 
 	<software name="ryukokens" cloneof="ryukoken">
 		<description>Ryuuko no Ken - Sample Disc (ACD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -4287,9 +4282,9 @@
 
 	<software name="seiyamont" cloneof="seiyamon">
 		<description>Seiya Monogatari - Anearth Fantasy Stories Taikenban (SCD)(Jpn)</description>
-		<!-- Serial: HMD-004 -->
 		<year>1995</year>
 		<publisher>Hudson</publisher>
+		<info name="serial" value="HMD-004"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4300,7 +4295,6 @@
 
 	<software name="seiyamonp" cloneof="seiyamon">
 		<description>Seiya Monogatari - Anearth Fantasy Stories [Debug Version Prototype] (SCD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -4453,7 +4447,6 @@
 
 	<software name="shiawase">
 		<description>Shiawase Usagi - Nureta Bishoujo Ichi Hajimete na no ni [Imperfect] (SCD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -4466,7 +4459,6 @@
 
 	<software name="shiawas2">
 		<description>Shiawase Usagi II - Toraware Usagi Sailor Z (SCD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -4521,7 +4513,7 @@
 
 	<software name="shinsets">
 		<description>Shinsetsu Shiawase Usagi (SCD)(Jpn)</description>
-		<!-- Release Date: 1995-09-30  -->
+		<!-- Release Date: 1995-09-30	-->
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -4534,7 +4526,7 @@
 
 	<software name="shinsetf">
 		<description>Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(Jpn)</description>
-		<!-- Release Date: 1997-09-10  -->
+		<!-- Release Date: 1997-09-10	-->
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -4547,7 +4539,7 @@
 
 	<software name="shinset2">
 		<description>Shinsetsu Shiawase Usagi II (SCD)(Jpn)</description>
-		<!-- Release Date: 1996-02-25  -->
+		<!-- Release Date: 1996-02-25	-->
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -5298,9 +5290,10 @@
 
 	<software name="tengaimzh" cloneof="tengaimz">
 		<description>Tengai Makyou - Ziria [Hibaihin] (SCD)(Jpn)</description>
-		<!-- Serial: HDC2037 - Notes: Promotional item in SCD format -->
+		<!-- Notes: Promotional item in SCD format -->
 		<year>1992</year>
 		<publisher>Hudson</publisher>
+		<info name="serial" value="HDC2037"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -5491,13 +5484,14 @@
 		</part>
 	</software>
 
-  <!-- This is exactly the same as tokimeki ?!-->
-  <!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
-  <!--
-  <software name="tokimekia" cloneof="tokimeki">
+	<!-- This is exactly the same as tokimeki ?!-->
+	<!--
+	<software name="tokimekia" cloneof="tokimeki">
 		<description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="KMCD4007"/>
+		<info name="release" value="19940527"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -5505,7 +5499,7 @@
 			</diskarea>
 		</part>
 	</software>
-  -->
+	-->
 
 	<software name="tokimekib" cloneof="tokimeki">
 		<description>Tokimeki Memorial {HRKM70701-2FAAT} (SCD)(Jpn)</description>
@@ -5535,13 +5529,14 @@
 		</part>
 	</software>
 
-  <!-- This is exactly the same as tokimekic ?!-->
-  <!-- Serial: KMCD4007 - Release Date: 1994-05-27 -->
-  <!--
-  <software name="tokimekid" cloneof="tokimeki">
+	<!-- This is exactly the same as tokimekic ?!-->
+	<!--
+	<software name="tokimekid" cloneof="tokimeki">
 		<description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="KMCD4007"/>
+		<info name="release" value="19940527"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -5549,7 +5544,7 @@
 			</diskarea>
 		</part>
 	</software>
-  -->
+	-->
 
 	<software name="gunbust1">
 		<description>Top o Nerae! GunBuster Volume I (SCD)(Jpn)</description>
@@ -5897,7 +5892,6 @@
 
 	<software name="wh2s" cloneof="wh2">
 		<description>World Heroes II - Sample Disc (ACD)(Jpn)</description>
-		<!-- Serial:  -->
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
@@ -6122,9 +6116,9 @@
 	<!-- USA releases -->
 	<software name="3in1">
 		<description>3 in 1 DUO Demo CD (SCD)(USA)</description>
-		<!-- Serial: DUO DEMO 01 -->
 		<year>199?</year>
 		<publisher>Hudson Soft / Red</publisher>
+		<info name="serial" value="DUO DEMO 01"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6135,10 +6129,10 @@
 
 	<software name="4in1">
 		<description>4 in 1 Super CD (SCD)(USA)</description>
-		<!-- Serial: TGXCD1026 -->
 		<!-- Press U R D L II at menu to access Bomberman -->
 		<year>1992</year>
 		<publisher>Hudson Soft / Red</publisher>
+		<info name="serial" value="TGXCD1026"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6149,9 +6143,9 @@
 
 	<software name="addfam">
 		<description>The Addams Family (CD)(USA)</description>
-		<!-- Serial: TGXCD1019 -->
 		<year>1991</year>
 		<publisher>ICOM Simulations</publisher>
+		<info name="serial" value="TGXCD1019"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6162,9 +6156,9 @@
 
 	<software name="beyondsg">
 		<description>Beyond Shadowgate (SCD)(USA)</description>
-		<!-- Serial: TGXCD1048 -->
 		<year>1993</year>
 		<publisher>ICOM Simulations</publisher>
+		<info name="serial" value="TGXCD1048"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6175,9 +6169,9 @@
 
 	<software name="bonk3">
 		<description>Bonk III - Bonk's Big Adventure (SCD)(USA)</description>
-		<!-- Serial: TGXCD1052 -->
 		<year>1993</year>
 		<publisher>Hudson Soft / Red</publisher>
+		<info name="serial" value="TGXCD1052"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6188,9 +6182,9 @@
 
 	<software name="bbros">
 		<description>Buster Bros. (CD)(USA)</description>
-		<!-- Serial: TGXCD1031 -->
 		<year>1993</year>
 		<publisher>Capcom</publisher>
+		<info name="serial" value="TGXCD1031"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6201,9 +6195,9 @@
 
 	<software name="campcali">
 		<description>Camp California (SCD)(USA)</description>
-		<!-- Serial: TGXCD1013 -->
 		<year>1993</year>
 		<publisher>ICOM Simulations</publisher>
+		<info name="serial" value="TGXCD1013"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6214,9 +6208,9 @@
 
 	<software name="cosmfnt2">
 		<description>Cosmic Fantasy II (CD)(USA)</description>
-		<!-- Serial: WTG990301 -->
 		<year>1992</year>
 		<publisher>Telenet Japan</publisher>
+		<info name="serial" value="WTG990301"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6227,9 +6221,9 @@
 
 	<software name="cotton">
 		<description>Cotton - Fantastic Night Dreams (SCD)(USA)</description>
-		<!-- Serial: TGXCD1038 -->
 		<year>1993</year>
 		<publisher>Success</publisher>
+		<info name="serial" value="TGXCD1038"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6240,9 +6234,9 @@
 
 	<software name="dslayer">
 		<description>Dragon Slayer - The Legend of Heroes (SCD)(USA)</description>
-		<!-- Serial: TGXCD1029 -->
 		<year>1992</year>
 		<publisher>Falcom</publisher>
+		<info name="serial" value="TGXCD1029"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6253,9 +6247,9 @@
 
 	<software name="dungexp2">
 		<description>Dungeon Explorer II (SCD)(USA)</description>
-		<!-- Serial: TGXCD1034 -->
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="TGXCD1034"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6266,9 +6260,9 @@
 
 	<software name="dungmstr">
 		<description>Dungeon Master - Theron's Quest (SCD)(USA)</description>
-		<!-- Serial: TGXCD1041 -->
 		<year>1993</year>
 		<publisher>FTL Games</publisher>
+		<info name="serial" value="TGXCD1041"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6279,9 +6273,9 @@
 
 	<software name="exile">
 		<description>Exile (CD)(USA)</description>
-		<!-- Serial: WTG990101 -->
 		<year>1992</year>
 		<publisher>Telnet Japan</publisher>
+		<info name="serial" value="WTG990101"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6292,9 +6286,9 @@
 
 	<software name="exile2">
 		<description>Exile II - Wicked Phenomenon (SCD)(USA)</description>
-		<!-- Serial: WTG990102 -->
 		<year>1993</year>
 		<publisher>Telnet Japan</publisher>
+		<info name="serial" value="WTG990102"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6305,9 +6299,9 @@
 
 	<software name="fssoldr">
 		<description>Fantasy Star Soldier [Prototype] (SCD)(USA)</description>
-		<!-- Serial: N/A -->
 		<year>199?</year>
 		<publisher>Inter State</publisher>
+		<info name="serial" value="N/A"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6318,9 +6312,9 @@
 
 	<software name="fstreet">
 		<description>Fighting Street (CD)(USA)</description>
-		<!-- Serial: TGXCD1001 -->
 		<year>1989</year>
 		<publisher>Capcom</publisher>
+		<info name="serial" value="TGXCD1001"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6331,9 +6325,9 @@
 
 	<software name="fzone2">
 		<description>Final Zone II (CD)(USA)</description>
-		<!-- Serial: TGXCD1008 -->
 		<year>1990</year>
 		<publisher>Telnet Japan</publisher>
+		<info name="serial" value="TGXCD1008"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6344,9 +6338,9 @@
 
 	<software name="forgottn">
 		<description>Forgotten Worlds (SCD)(USA)</description>
-		<!-- Serial: TGXCD1030 -->
 		<year>1992</year>
 		<publisher>Capcom</publisher>
+		<info name="serial" value="TGXCD1030"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6357,9 +6351,9 @@
 
 	<software name="godzilla">
 		<description>Godzilla (SCD)(USA)</description>
-		<!-- Serial: TGXCD1051 -->
 		<year>1993</year>
 		<publisher>Toho</publisher>
+		<info name="serial" value="TGXCD1051"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6370,9 +6364,9 @@
 
 	<software name="jbharold">
 		<description>J. B. Harold Murder Club (CD)(USA)</description>
-		<!-- Serial: TGXCD1012 -->
 		<year>1991</year>
 		<publisher>Riverhill Soft</publisher>
+		<info name="serial" value="TGXCD1012"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6383,9 +6377,9 @@
 
 	<software name="implode">
 		<description>Implode (SCD)(USA)[bad toc]</description>
-		<!-- Serial: BTCD0201 -->
 		<!-- This disc has a copy protection scheme -->
 		<year>2002</year>
+		<info name="serial" value="BTCD0201"/>
 		<publisher>MindRec</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
@@ -6397,9 +6391,9 @@
 
 	<software name="itcame">
 		<description>It Came from the Desert (CD)(USA)</description>
-		<!-- Serial: TGXCD1010 -->
 		<year>1992</year>
 		<publisher>Cinemaware</publisher>
+		<info name="serial" value="TGXCD1010"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6410,9 +6404,9 @@
 
 	<software name="jacknick">
 		<description>Jack Nicklaus Turbo Golf (CD)(USA)</description>
-		<!-- Serial: ATGXCDJTTC -->
 		<year>1990</year>
 		<publisher>Accolade</publisher>
+		<info name="serial" value="ATGXCDJTTC"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6423,9 +6417,9 @@
 
 	<software name="madden">
 		<description>John Madden Duo CD Football (SCD)(USA)</description>
-		<!-- Serial: TGXCD1045 -->
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="TGXCD1045"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6436,9 +6430,9 @@
 
 	<software name="lstalert">
 		<description>Last Alert (CD)(USA)</description>
-		<!-- Serial: TGXCD1007 -->
 		<year>1990</year>
 		<publisher>Telnet Japan</publisher>
+		<info name="serial" value="TGXCD1007"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6449,9 +6443,9 @@
 
 	<software name="loom">
 		<description>Loom (SCD)(USA)</description>
-		<!-- Serial: TGXCD1017 -->
 		<year>1992</year>
 		<publisher>Lucas Arts</publisher>
+		<info name="serial" value="TGXCD1017"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6462,9 +6456,9 @@
 
 	<software name="lordrsun">
 		<description>Lords of the Rising Sun (CD)(USA)</description>
-		<!-- Serial: TGXCD1014 -->
 		<year>1992</year>
 		<publisher>Cinemaware</publisher>
+		<info name="serial" value="TGXCD1014"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6475,9 +6469,9 @@
 
 	<software name="lordthun">
 		<description>Lords of Thunder (SCD)(USA)</description>
-		<!-- Serial: TGXCD1033 -->
 		<year>1993</year>
 		<publisher>Hudson Soft / Red</publisher>
+		<info name="serial" value="TGXCD1033"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6488,9 +6482,9 @@
 
 	<software name="magdino">
 		<description>Magical Dinosaur Tour (CD)(USA)</description>
-		<!-- Serial: TGXCD1005 -->
 		<year>1990</year>
 		<publisher>Yazawa Science Office</publisher>
+		<info name="serial" value="TGXCD1005"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6501,9 +6495,9 @@
 
 	<software name="mmagic3">
 		<description>Might and Magic III - Isles of Terra (SCD)(USA)</description>
-		<!-- Serial: TGXCD1047 -->
 		<year>1993</year>
 		<publisher>New World Computing</publisher>
+		<info name="serial" value="TGXCD1047"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6514,9 +6508,9 @@
 
 	<software name="mlair">
 		<description>Monster Lair (CD)(USA)</description>
-		<!-- Serial: TGXCD1003 -->
 		<year>1989</year>
 		<publisher>Westone</publisher>
+		<info name="serial" value="TGXCD1003"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6527,9 +6521,9 @@
 
 	<software name="ppersia">
 		<description>Prince of Persia (SCD)(USA)</description>
-		<!-- Serial: TGXCD1027 -->
 		<year>1992</year>
 		<publisher>Brøderbund</publisher>
+		<info name="serial" value="TGXCD1027"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6540,9 +6534,9 @@
 
 	<software name="riotzone">
 		<description>Riot Zone (SCD)(USA)</description>
-		<!-- Serial: TGXCD1035 -->
 		<year>1993</year>
 		<publisher>Westone</publisher>
+		<info name="serial" value="TGXCD1035"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6553,9 +6547,9 @@
 
 	<software name="beast">
 		<description>Shadow of the Beast (SCD)(USA)</description>
-		<!-- Serial: TGXCD1018 -->
 		<year>1992</year>
 		<publisher>Psygnosis</publisher>
+		<info name="serial" value="TGXCD1018"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6566,9 +6560,9 @@
 
 	<software name="shapesh">
 		<description>Shape Shifter (SCD)(USA)</description>
-		<!-- Serial: TGXCD1021 -->
 		<year>1992</year>
 		<publisher>ICOM Simulations</publisher>
+		<info name="serial" value="TGXCD1021"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6579,9 +6573,9 @@
 
 	<software name="holmes">
 		<description>Sherlock Holmes Consulting Detective (CD)(USA)</description>
-		<!-- Serial: TGXCD1011 -->
 		<year>1991</year>
 		<publisher>Sleuth Publications</publisher>
+		<info name="serial" value="TGXCD1011"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6592,9 +6586,9 @@
 
 	<software name="holmes2">
 		<description>Sherlock Holmes Consulting Detective Volume II (CD, SCD)(USA)</description>
-		<!-- Serial: TGXCD1039 -->
 		<year>1993</year>
 		<publisher>Sleuth Publications</publisher>
+		<info name="serial" value="TGXCD1039"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6605,9 +6599,9 @@
 
 	<software name="simearth">
 		<description>Sim Earth - The Living Planet (SCD)(USA)</description>
-		<!-- Serial: TGXCD1036 -->
 		<year>1993</year>
 		<publisher>Maxis</publisher>
+		<info name="serial" value="TGXCD1036"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6618,9 +6612,9 @@
 
 	<software name="splashl">
 		<description>Splash Lake (CD)(USA)</description>
-		<!-- Serial: TGXCD1025 -->
 		<year>1992</year>
 		<publisher>NEC Avenue</publisher>
+		<info name="serial" value="TGXCD1025"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6631,9 +6625,9 @@
 
 	<software name="superair">
 		<description>Super Air Zonk (SCD)(USA)</description>
-		<!-- Serial: TGXCD1042 -->
 		<year>1993</year>
 		<publisher>Hudson Soft / Red</publisher>
+		<info name="serial" value="TGXCD1042"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6644,9 +6638,9 @@
 
 	<software name="terrafor">
 		<description>Syd Mead's Terra Forming (CD, SCD)(USA)</description>
-		<!-- Serial: TGXCD1040 -->
 		<year>1993</year>
 		<publisher>Syd Mead</publisher>
+		<info name="serial" value="TGXCD1040"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6657,9 +6651,9 @@
 
 	<software name="dynhero">
 		<description>The Dynastic Hero (SCD)(USA)</description>
-		<!-- Serial: TGXCD1053 -->
 		<year>1993</year>
 		<publisher>Westone</publisher>
+		<info name="serial" value="TGXCD1053"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6670,9 +6664,9 @@
 
 	<software name="valis2">
 		<description>Valis II (CD)(USA)</description>
-		<!-- Serial: TGXCD1006 -->
 		<year>1990</year>
 		<publisher>Telnet Japan</publisher>
+		<info name="serial" value="TGXCD1006"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6683,9 +6677,9 @@
 
 	<software name="valis3">
 		<description>Valis III (CD)(USA)</description>
-		<!-- Serial: TGXCD1024 -->
 		<year>1992</year>
 		<publisher>Telnet Japan</publisher>
+		<info name="serial" value="TGXCD1024"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6696,9 +6690,9 @@
 
 	<software name="vasteel">
 		<description>Vasteel (CD)(USA)</description>
-		<!-- Serial: WTG990801 -->
 		<year>1993</year>
 		<publisher>Human</publisher>
+		<info name="serial" value="WTG990801"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6709,9 +6703,9 @@
 
 	<software name="ys12">
 		<description>Ys Book I II (CD)(USA)</description>
-		<!-- Serial: TGXCD1002 -->
 		<year>1990</year>
 		<publisher>Falcom</publisher>
+		<info name="serial" value="TGXCD1002"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6722,9 +6716,9 @@
 
 	<software name="ys3">
 		<description>Ys III - Wanderers from Ys (CD)(USA)</description>
-		<!-- Serial: TGXCD1015 -->
 		<year>1991</year>
 		<publisher>Falcom</publisher>
+		<info name="serial" value="TGXCD1015"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6739,9 +6733,9 @@
 
 	<software name="meteorbl">
 		<description>Meteor Blaster DX (SCD)(USA)[bad toc]</description>
-		<!-- Serial: BTCD0402 -->
 		<!-- This disc has a copy protection scheme -->
 		<year>2004</year>
+		<info name="serial" value="BTCD0402"/>
 		<publisher>MindRec</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
@@ -6753,9 +6747,9 @@
 
 	<software name="bikini">
 		<description>Bikini Girls (CD)(USA)</description>
-		<!-- Serial: AK BIKINI SRCR 01 -->
 		<year>199?</year>
 		<publisher>Excite Software</publisher>
+		<info name="serial" value="AK BIKINI SRCR 01"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6766,9 +6760,9 @@
 
 	<software name="hawaiiu">
 		<description>The Local Girls of Hawaii (CD)(USA)</description>
-		<!-- Serial: AK LOCAL SRCR 01 -->
 		<year>199?</year>
 		<publisher>Excite Software</publisher>
+		<info name="serial" value="AK LOCAL SRCR 01"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6779,9 +6773,9 @@
 
 	<software name="hawiian">
 		<description>Hawiian Island Girls (CD)(USA)</description>
-		<!-- Serial: AK ISLAND SRCR 02 -->
 		<year>199?</year>
 		<publisher>Excite Software</publisher>
+		<info name="serial" value="AK ISLAND SRCR 02"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6808,9 +6802,9 @@
 
 	<software name="avtanjo" supported="no">
 		<description>AV Tanjou (GECD)(Jpn)</description>
-		<!-- Serial: GED-1015 -->
 		<year>1995</year>
 		<publisher>Game Express</publisher>
+		<info name="serial" value="GED-1015"/>
 		<info name="usage" value="Game Express CD Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">

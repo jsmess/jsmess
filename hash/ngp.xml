@@ -6,13 +6,13 @@
 NEOP00060 Dokodemo Mahjong
 -->
 
-	<!-- Id: NeoP00070 - Developer: SNK - Releases: 1998-11-26 (JPN) - Alt Title: ポケットスポーツシリーズ ベースボール スターズ -->
+	<!-- Developer: SNK -->
 	<software name="bstars">
 		<description>Pocket Sports Series - Baseball Stars (Euro, Jpn)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00070" />
-		<info name="release" value="19981126" />
+		<info name="release" value="19981126 (JPN)" />
 		<info name="alt_title" value="ポケットスポーツシリーズ ベースボール スターズ" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
@@ -33,13 +33,13 @@ NEOP00060 Dokodemo Mahjong
 		</part>
 	</software>
 
-	<!-- Id: NeoP00010 - Developer: SNK - Releases: 1998-10-28 (JPN) - Alt Title: ポケット格闘シリーズ キング・オブ・ファイターズ R-1 -->
+	<!-- Developer: SNK -->
 	<software name="kofr1">
 		<description>Pocket Fighting Series - King of Fighters R-1 (Euro, Jpn)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00010" />
-		<info name="release" value="19981028" />
+		<info name="release" value="19981028 (JPN)" />
 		<info name="alt_title" value="ポケット格闘シリーズ キング・オブ・ファイターズ R-1" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
@@ -48,7 +48,7 @@ NEOP00060 Dokodemo Mahjong
 		</part>
 	</software>
 
-	<!-- Id: NeoP00040 - Developer: ADK - Releases: 1998-10-28 (JPN) - Alt Title: めろんちゃんの成長日記 -->
+	<!-- Developer: ADK -->
 	<software name="melonchn">
 		<description>Melon-chan no Seichou Nikki (Jpn)</description>
 		<year>1998</year>
@@ -63,14 +63,14 @@ NEOP00060 Dokodemo Mahjong
 		</part>
 	</software>
 
-	<!-- Id: NeoP00140 - Developer: Dyna - Releases: 1998-12-25 (JPN) - Alt Title: ポケットカジノシリーズ ネオ・チェリーマスター -->
+	<!-- Developer: Dyna -->
 	<software name="neocher">
 	<!-- NGPC, rated "Over 18" -->
 		<description>Pocket Casino Series - Neo Cherry Master (Euro, Jpn)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00140" />
-		<info name="release" value="19981225" />
+		<info name="release" value="19981225 (JPN)" />
 		<info name="alt_title" value="ポケットカジノシリーズ ネオ・チェリーマスター" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
@@ -79,13 +79,13 @@ NEOP00060 Dokodemo Mahjong
 		</part>
 	</software>
 
-	<!-- Id: NeoP00020 - Developer: SNK - Releases: 1998-10-28 (JPN) - Alt Title: ポケットスポーツシリーズ ネオジオカップ'98 -->
+	<!-- Developer: SNK -->
 	<software name="neocup98">
 		<description>Pocket Sports Series - Neo Geo Cup '98 (Euro, Jpn)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00020" />
-		<info name="release" value="19981028" />
+		<info name="release" value="19981028 (JPN)" />
 		<info name="alt_title" value="ポケットスポーツシリーズ ネオジオカップ'98" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
@@ -94,13 +94,13 @@ NEOP00060 Dokodemo Mahjong
 		</part>
 	</software>
 
-	<!-- Id: NeoP00090 - Developer: Yumekobo - Releases: 1998-10-28 (JPN) - Alt Title: ポケットスポーツシリーズ ポケットテニス -->
+	<!-- Developer: Yumekobo -->
 	<software name="ptennis" supported="partial">   <!-- glitched sprites -->
 		<description>Pocket Sports Series - Pocket Tennis (Euro, Jpn)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00090" />
-		<info name="release" value="19981028" />
+		<info name="release" value="19981028 (JPN)" />
 		<info name="alt_title" value="ポケットスポーツシリーズ ポケットテニス" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="524288">
@@ -109,14 +109,14 @@ NEOP00060 Dokodemo Mahjong
 		</part>
 	</software>
 
-	<!-- Id: NeoP00080 - Developer: SNK - Releases: 1998-12-25 (JPN) - Alt Title: ポケット格闘シリーズ サムライスピリッツ！ -->
+	<!-- Developer: SNK -->
 	<software name="samsho">
 	<!-- NGPC -->
 		<description>Pocket Fighting Series - Samurai Spirit! (Jpn) ~ Samurai Shodown! (Euro)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00080" />
-		<info name="release" value="19981225" />
+		<info name="release" value="19981225 (JPN)" />
 		<info name="alt_title" value="ポケット格闘シリーズ サムライスピリッツ！" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
@@ -125,7 +125,7 @@ NEOP00060 Dokodemo Mahjong
 		</part>
 	</software>
 
-	<!-- Id: NeoP00050 - Developer: ADK - Releases: 1998-11-20 (JPN) - Alt Title: 将棋の達人 -->
+	<!-- Developer: ADK -->
 	<software name="shougi">
 		<description>Shougi no Tatsujin (Jpn)</description>
 		<year>1998</year>
@@ -140,7 +140,7 @@ NEOP00060 Dokodemo Mahjong
 		</part>
 	</software>
 
-	<!-- Id: NeoP00120 - Developer: Yumekobo - Releases: 1998-10-28 (JPN) - Alt Title: 連結パズル つなげてポンッ！ -->
+	<!-- Developer: Yumekobo -->
 	<software name="tsunapn">
 		<description>Renketsu Puzzle Tsunagete Pon! (Jpn)</description>
 		<year>1998</year>

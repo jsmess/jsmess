@@ -509,7 +509,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Champion Ice Hockey (Kor)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
-		<info name="serial" value=""/>
 		<info name="alt_title" value="아이스 하키"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
@@ -718,8 +717,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Circus Charlie (Kor)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value=""/>
-		<info name="alt_title" value=""/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="circus charlie (kr).bin" size="32768" crc="7f7f009d" sha1="34899ad454a56826d53028bef8fed7f5d2c6a78a" offset="000000" />
@@ -911,7 +908,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Drol (Kor)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
-		<info name="serial" value=""/>
 		<info name="alt_title" value="드롤"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
@@ -976,7 +972,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Exerion (Kor)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
-		<info name="serial" value=""/>
 		<info name="alt_title" value="엑스리온"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
@@ -1119,8 +1114,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Gulkave (Kor)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value=""/>
-		<info name="alt_title" value=""/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="gulkave (kr).bin" size="32768" crc="ddcb708b" sha1="deabfe970bb450e51909c181430e7de2bd1b1a9e" offset="000000" />
@@ -1298,7 +1291,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Hyper Sports (Kor)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
-		<info name="serial" value=""/>
 		<info name="alt_title" value="하이퍼스포츠"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
@@ -2293,8 +2285,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Super Tank (Kor)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value=""/>
-		<info name="alt_title" value=""/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="super tank (kr).bin" size="32768" crc="4c48b7ac" sha1="0a49de909b07b69a24b5c02ad08446e2cd1787d2" offset="000000" />
