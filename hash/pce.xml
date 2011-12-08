@@ -149,7 +149,6 @@
 		<description>AV Poker</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="av poker (japan).pce" size="524288" crc="b866d282" sha1="9d71b3dca401ea02595917ce5a3dbe8fb6edb7bb" offset="000000" />
@@ -293,7 +292,6 @@
 		<description>Body Conquest II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="body conquest ii (japan).pce" size="524288" crc="ffd92458" sha1="72edaf529c41f7c81d1e1fc7dc27bae8e598da9b" offset="000000" />
@@ -773,7 +771,6 @@
 		<description>Double Dungeons - W</description>
 		<year>1989</year>
 		<publisher>NCS</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="double dungeons - w (japan).pce" size="262144" crc="86087b39" sha1="a5a032283f24a4e487715ffb36b3fc4615656b37" offset="000000" />
@@ -1395,7 +1392,6 @@
 		<description>Idol Hanafuda Fan Club</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="idol hanafuda fan club (japan).pce" size="524288" crc="9ec6fc6c" sha1="55ccdf9f02339f02a2f62c61a10180ea8a24817d" offset="000000" />
@@ -1659,7 +1655,6 @@
 		<description>Kyuukyoku Mahjong - Idol Graphics</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="kyuukyoku mahjong - idol graphics (japan).pce" size="524288" crc="02dde03e" sha1="7fd4d9e028bd589b9315f81b1d27049b7541212b" offset="000000" />
@@ -1671,7 +1666,6 @@
 		<description>Kyuukyoku Mahjong II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="kyuukyoku mahjong ii (japan).pce" size="524288" crc="e5b6b3e5" sha1="1c3dfe795b84969e5c5acdece652f228fad6b163" offset="000000" />
@@ -1885,7 +1879,6 @@
 		<description>Makyou Densetsu</description>
 		<year>1988</year>
 		<publisher>Victor Interactive Software</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="makyou densetsu (japan).pce" size="262144" crc="d4c5af46" sha1="7e1b1f52222663e9e98973fdb3cf67879122b617" offset="000000" />
@@ -2771,7 +2764,6 @@
 		<description>Quiz Toukou Shashin</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="quiz toukou shashin (japan).pce" size="1048576" crc="f2e6856d" sha1="6b5d8e4b007de8a9b59d6a87802874f515cd1ae0" offset="000000" />
@@ -3190,7 +3182,6 @@
 		<description>Strip Fighter II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="strip fighter ii (japan).pce" size="1048576" crc="d6fc51ce" sha1="8dd63c3c499261af9ea43fcdd23066b0140e3ea1" offset="000000" />
@@ -3465,7 +3456,6 @@
 		<description>The Tower of Druaga</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="release" value=""/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tower of druaga, the (japan).pce" size="524288" crc="72e00bc4" sha1="1d34d947d9dfd4d7a3e1a0dda789645cd8c4ac29" offset="000000" />

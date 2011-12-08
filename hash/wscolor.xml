@@ -144,7 +144,6 @@
 		<year>19??</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BAN001"/>
-		<info name="alt_title" value=""/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-ban001digiasia.bin" size="4194304" crc="77689273" sha1="7a6411cf8a4d91e8a4e0532779f11bdd25b92363" offset="000000" />
@@ -1251,7 +1250,6 @@
 		<description>Star Hearts - Hoshi to Daichi no Shisha - Taikenban</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
-		<info name="alt_title" value=""/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="star hearts - hoshi to daichi no shisha - taikenban (japan).bin" size="4194304" crc="9874e9a2" sha1="44940ae0140df1bd91d742a166c459df1b6c2339" offset="000000" />

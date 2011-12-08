@@ -1716,8 +1716,6 @@ Undumped Pirates:
 		<description>Bomberman Max - Ain Version (Jpn)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="serial" value=""/>
-		<info name="release" value=""/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="bomberman max - ain version (japan).bin" size="2097152" crc="545e0da2" sha1="7416d9430a8163cd2f953c990ef8ad325725e53a" offset="000000" />
@@ -5185,8 +5183,6 @@ Undumped Pirates:
 		<description>GB Memory Multi Menu (Jpn, NP)</description>
 		<year>20??</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value=""/>
-		<info name="release" value=""/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="gb memory multi menu (japan) (np).bin" size="131072" crc="ec823cc1" sha1="0781eaecb7fd25c068e396b5eb02c6231baf6ea3" offset="000000" />
@@ -9926,8 +9922,6 @@ Undumped Pirates:
 		<description>Mobile Trainer (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value=""/>
-		<info name="release" value=""/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mobile trainer (japan).bin" size="2097152" crc="7226ead0" sha1="ecc0579edeaf9eccd722d605cc288cd023c8576a" offset="000000" />
@@ -11839,8 +11833,6 @@ Undumped Pirates:
 		<description>Pocket no Naka no Oukoku (Jpn, Prototype)</description>
 		<year>2000</year>
 		<publisher>Hector</publisher>
-		<info name="serial" value=""/>
-		<info name="release" value=""/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pocket no naka no oukoku (japan) (proto).bin" size="2097152" crc="1eed33c6" sha1="b91750cc805beb753e3c61a99c256d9cc006d3b8" offset="000000" />
@@ -13143,7 +13135,6 @@ Undumped Pirates:
 		<year>2000</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="CGB-BELJ-JPN"/>
-		<info name="release" value=""/>
 		<info name="alt_title" value="らくらくカットしゅう"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
@@ -13158,7 +13149,6 @@ Undumped Pirates:
 		<year>2000</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="DMG-BRAJ-JPN"/>
-		<info name="release" value=""/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="raku x raku - mishin (japan).bin" size="1048576" crc="0ba0711b" sha1="58bf5df55d2bab8877f7ec43110339ebe1a5d4c5" offset="000000" />
@@ -13172,7 +13162,6 @@ Undumped Pirates:
 		<year>2000</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="CGB-BEMJ-JPN"/>
-		<info name="release" value=""/>
 		<info name="alt_title" value="らくらく文字"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
@@ -13566,8 +13555,6 @@ Undumped Pirates:
 		<description>Robot Poncots - Comic Bom Bom Special Version (Jpn)</description>
 		<year>1999?</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="serial" value=""/>
-		<info name="release" value=""/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="robot poncots - comic bom bom special version (japan).bin" size="1048576" crc="4aa209cd" sha1="79d1eda07e792497506ff1494e5222db2a52702f" offset="000000" />
