@@ -1319,11 +1319,11 @@ Compiled by K1W1
 		<description>Typing Tutor</description>
 		<year>1980</year>
 		<publisher>Tandy</publisher>
-		<info name="author" value="Leah R. O&apos;Connor" />
+		<info name="author" value="Leah R. O'Connor" />
 		<info name="serial" value="26-3152" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="typing tutor (1980)(26-3152)(leah r. o&apos;connor)[!].rom" size="4096" crc="cebd3196" sha1="d5d8e2c1df18120f0c72fd70bf3ca077e74aed5c" offset="0" />
+				<rom name="typing tutor (1980)(26-3152)(leah r. o'connor)[!].rom" size="4096" crc="cebd3196" sha1="d5d8e2c1df18120f0c72fd70bf3ca077e74aed5c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
