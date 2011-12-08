@@ -92,7 +92,6 @@ public:
 	int m_start_vpos;
 	int m_start_vblank;
 	UINT8 m_lum;
-	UINT16 m_lfsr;
 	sound_stream *m_sh_channel;
 	UINT16 m_sh_count;
 	//ef9341_t ef9341;

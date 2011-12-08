@@ -580,7 +580,6 @@ VIDEO_START( odyssey2 )
 	state->m_start_vpos = 0;
 	state->m_start_vblank = 0;
 	state->m_lum = 0;
-	state->m_lfsr = 0;
 
 	state->m_o2_snd_shift[0] = machine.sample_rate() / 983;
 	state->m_o2_snd_shift[1] = machine.sample_rate() / 3933;
@@ -636,13 +635,13 @@ DEVICE_GET_INFO( odyssey2_sound )
 STREAM_UPDATE( odyssey2_sh_update )
 {
 	odyssey2_state *state = device->machine().driver_data<odyssey2_state>();
-	UINT32 signal;
+	UINT32 old_signal, signal;
 	int ii;
 	int period;
 	stream_sample_t *buffer = outputs[0];
 
 	/* Generate the signal */
-	signal = state->m_o2_vdc.s.shift3 | (state->m_o2_vdc.s.shift2 << 8) | (state->m_o2_vdc.s.shift1 << 16);
+	old_signal = signal = state->m_o2_vdc.s.shift3 | (state->m_o2_vdc.s.shift2 << 8) | (state->m_o2_vdc.s.shift1 << 16);
 
 	if( state->m_o2_vdc.s.sound & 0x80 )	/* Sound is enabled */
 	{
@@ -660,16 +659,12 @@ STREAM_UPDATE( odyssey2_sh_update )
 				{
 					signal |= *buffer << 23;
 				}
-				/* Noise poly is : L=16 W=2 10000000000100001 */
-				state->m_lfsr = ( state->m_lfsr >> 1 ) | ( ( ( state->m_lfsr & 0x01 ) ^ ( ( state->m_lfsr & 0x800 ) >> 11 ) ) << 15 );
-				if ( ! state->m_lfsr )
-				{
-					state->m_lfsr = 0xFFFF;
-				}
 				/* Check if noise should be applied */
 				if ( state->m_o2_vdc.s.sound & 0x10 )
 				{
-					*buffer |= ( state->m_lfsr & 0x01 );
+					/* Noise tap is on bits 0 and 5 and fed back to bits 15 (and 23!) */
+					UINT32 new_bit = ( ( old_signal ) ^ ( old_signal >> 5 ) ) & 0x01;
+					signal = ( old_signal & 0xFF0000 ) | ( ( old_signal & 0xFFFF ) >> 1 ) | ( new_bit << 15 ) | ( new_bit << 23 );
 				}
 				state->m_o2_vdc.s.shift3 = signal & 0xFF;
 				state->m_o2_vdc.s.shift2 = ( signal >> 8 ) & 0xFF;
