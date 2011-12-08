@@ -16,8 +16,12 @@ A few comments on these:
    FILE "XXXX.img" BINARY
       TRACK 1 MODE2/2352
       INDEX 1 00:00:00
-   This might have introduced errors in the procedure, so it would be good to keep around the original files for later checks
-5. releases in mdf/mds format or cdi format have been mounted in ISOBuster and raw ripped to bin/cue, so there is the possibility
+   (or TRACK 01, INDEX 01 when necessary). This might have introduced errors in the procedure, so it would be good to keep around 
+   the original files for later checks
+5. some 'release' were found both as iso only and as iso + cue; if by using the generic cuesheet above with the iso only release you 
+   end up with the wrong CHD try again by using MODE1 instead of MODE2 (raw data will remain untouched so in this case we can do 
+   further changes with no loss)
+6. releases in mdf/mds format or cdi format have been mounted in ISOBuster and raw ripped to bin/cue, so there is the possibility
    that subtle errors are introduced either in this procedure, or in the original creation of the mdf/mds/cdi image. These should
    be verified with the original media, and are marked as bad dumps.
 -->
@@ -26,16 +30,17 @@ A few comments on these:
 
 	<software name="baldgate" supported="no">
 		<!-- Original images (from drx)
-		<rom name="baldur's gate - disc 1.bin" size="657475728" crc="96e9befa" sha1="f2c35e0c738fed7c4c881d261ce8d51f5143bca7"/>
-		<rom name="baldur's gate - disc 1.cue" size="88"        crc="2c5b8e8f" sha1="d96d6af5cfe0a6dff3959d6d59ebf25066dd0681"/>
-		<rom name="baldur's gate - disc 2.bin" size="627572400" crc="9633d7a3" sha1="b68e74fc0540a41dc9f2a12d38851e6dbaeb061f"/>
-		<rom name="baldur's gate - disc 2.cue" size="88"        crc="aa0c59ce" sha1="11eaa559e7ec4009f9796ab9f51c7c77bf28b43c"/>
-		<rom name="baldur's gate - disc 3.bin" size="772415616" crc="18558807" sha1="133829649e2311e1656e77b4610129c3ebbbe90d"/>
-		<rom name="baldur's gate - disc 3.cue" size="88"        crc="d7c114f1" sha1="f6f14f0239789b62cfe5499899b20fde5e273673"/>
-		SLUS-01037 -->
+		<rom name="baldur's gate - disc 1.bin" size="657475728" crc="96e9befa"/>
+		<rom name="baldur's gate - disc 1.cue" size="88"        crc="2c5b8e8f"/>
+		<rom name="baldur's gate - disc 2.bin" size="627572400" crc="9633d7a3"/>
+		<rom name="baldur's gate - disc 2.cue" size="88"        crc="aa0c59ce"/>
+		<rom name="baldur's gate - disc 3.bin" size="772415616" crc="18558807"/>
+		<rom name="baldur's gate - disc 3.cue" size="88"        crc="d7c114f1"/>
+        -->
 		<description>Baldur's Gate (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>Interplay</publisher>
+		<info name="serial" value="SLUS-01037" />
 		<part name="cdrom1" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="baldur's gate - disc 1" sha1="abe5d1c7f466150937c44802e559020ba479d941" />
@@ -57,8 +62,8 @@ A few comments on these:
 
 	<software name="biohazpb" cloneof="biohazp">
 		<!-- Original images (from drx)
-		<rom name="biohazard - 1995 - 08 - 04 - sample.bin" size="20057856" crc="a64e5922" sha1="c1a293f0183c3fb912794dc4cbbca3ca71d7ef31"/>
-		<rom name="biohazard - 1995 - 08 - 04 - sample.cue" size="101" crc="389803a9" sha1="be53c93c21aefa9e2fcdedc6eec7be381b2032b6"/>
+		<rom name="biohazard - 1995 - 08 - 04 - sample.bin" size="20057856" crc="a64e5922"/>
+		<rom name="biohazard - 1995 - 08 - 04 - sample.cue" size="101"      crc="389803a9"/>
 		-->
 		<description>BioHazard (Jpn, Prototype 19950804)</description>
 		<year>1995</year>
@@ -72,8 +77,8 @@ A few comments on these:
 
 	<software name="biohazpa" cloneof="biohazp">
 		<!-- Original images (from drx)
-		<rom name="biohazard - 1995 - 10 - 04 - sample.bin" size="100420992" crc="e417d9a6" sha1="f9f8afac9b08fd1a79d9ecfd93027defaac7fc7e"/>
-		<rom name="biohazard - 1995 - 10 - 04 - sample.cue" size="101" crc="39e8977b" sha1="24a10fe354a45a87b6cf08b49a8741e4c3f3de95"/>
+		<rom name="biohazard - 1995 - 10 - 04 - sample.bin" size="100420992" crc="e417d9a6"/>
+		<rom name="biohazard - 1995 - 10 - 04 - sample.cue" size="101"       crc="39e8977b"/>
 		-->
 		<description>BioHazard (Jpn, Prototype 19951004)</description>
 		<year>1995</year>
@@ -87,8 +92,8 @@ A few comments on these:
 
 	<software name="biohazp">
 		<!-- Original images (unknown source)
-		<rom name="bio hazard (j) (sample 1996.01.31) [slps-00222].bin" size="735818496" crc="af067e3c" sha1="35a718d090bbedcb40974f2f07d33e255dc57529"/>
-		<rom name="bio hazard (j) (sample 1996.01.31) [slps-00222].cue" size="115"       crc="bf382b9a" sha1="6d918de5f48d78546c569e374c2aa45f340e80c9"/>
+		<rom name="bio hazard (j) (sample 1996.01.31) [slps-00222].bin" size="735818496" crc="af067e3c"/>
+		<rom name="bio hazard (j) (sample 1996.01.31) [slps-00222].cue" size="115"       crc="bf382b9a"/>
 		-->
 		<description>BioHazard (Jpn, Prototype 19960131)</description>
 		<year>1996</year>
@@ -100,11 +105,60 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="biohaz2p">
+		<!-- Original images (unknown source)
+		<rom name="biohazard-2-beta.img" size="690020352" crc="107751a0"/>
+		<rom name="biohazard-2-beta.ccd" size="743"       crc="7c549fd8"/>
+		<rom name="biohazard-2-beta.cue" size="77"        crc="afc461e8"/>
+		<rom name="biohazard-2-beta.sub" size="28164096"  crc="9af638a3"/>
+		-->
+		<description>BioHazard 2 (Prototype)</description>
+		<year>1998</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="biohazard-2-beta" sha1="2b7148b98f05498329e7bf2ced2a9ce44f3d4e9a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="biohaz2pa" cloneof="biohaz2p">
+		<!-- Original images (unknown source)
+		<rom name="biohazard 2 (beta 2).bin" size="780788736" crc="b7e5b1b9"/>
+		<rom name="biohazard 2 (beta 2).cue" size="86"        crc="1fd0def1"/>
+		-->
+		<description>BioHazard 2 (Prototype, Alt)</description>
+		<year>1998</year>
+		<publisher>Capcom</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="biohazard 2 (beta 2)" sha1="6297f31f083406884e03a1f52fd9db577e017fd8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="breaknek" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="breakneck.img" size="141343440" crc="227f6f58"/>
+		<rom name="breakneck.ccd" size="788"       crc="2662a57c"/>
+		<rom name="breakneck.cue" size="70"        crc="a4a9b658"/>
+		<rom name="breakneck.sub" size="5769120"   crc="d7034ad8"/>
+		-->
+		<description>Breakneck (Prototype)</description>
+		<year>19??</year>
+		<publisher>Radical Entertainment?</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="breakneck" sha1="bc1e3088bb29c95681b59489d16e6cbb15171279" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="crashp">
 		<!-- Original images (from drx)
-		<rom name="crash.ccd" size="772" crc="34265432" sha1="d318d178bd37afe4cbd52771414649a094694197"/>
-		<rom name="crash.img" size="167431824" crc="79827883" sha1="837c7a9c1af9262fbe1842e798cd341ed221bc83"/>
-		<rom name="crash.sub" size="6833952" crc="86466038" sha1="3b57d344c4c813f8436c4c7acf3369591293ecaa"/>
+		<rom name="crash.ccd" size="772"       crc="34265432"/>
+		<rom name="crash.img" size="167431824" crc="79827883"/>
+		<rom name="crash.sub" size="6833952"   crc="86466038"/>
 		-->
 		<description>Crash Bandicoot (Prototype, 19960408)</description>
 		<year>1996</year>
@@ -119,7 +173,7 @@ A few comments on these:
 	<software name="deuce" supported="no">
 		<!-- Original images (unknown source)
 		<rom name="deuce.bin" size="28336896" crc="db149c5e"/>
-		<rom name="deuce.cue" size="337" crc="1ae16327"/>
+		<rom name="deuce.cue" size="337"      crc="1ae16327"/>
 		-->
 		<description>Deuce (USA, Prototype)</description>
 		<year>19??</year>
@@ -133,8 +187,8 @@ A few comments on these:
 
 	<software name="diablop" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="diablo.bin" size="783745200" crc="3a0268cd" sha1="c29775b8eadca5be2ba35ec2a76f956d18416edc"/>
-		<rom name="diablo.cue" size="327"       crc="4ba55415" sha1="af32c37875d28eb30e6e841fe3ba35d943576e5f"/>
+		<rom name="diablo.bin" size="783745200" crc="3a0268cd"/>
+		<rom name="diablo.cue" size="327"       crc="4ba55415"/>
 		-->
 		<description>Diablo (Prototype)</description>
 		<year>1997</year>
@@ -146,10 +200,24 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="driverp" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="driver_you_are_the_wheelman_demo.iso" size="47482176" crc="8c11918d"/>
+		-->
+		<description>Driver (Prototype Demo)</description>
+		<year>19??</year>
+		<publisher>GT Interactive</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="driver (beta demo 3)" sha1="527e4c1ca4c2ec0a27a005290b4a1eac596b3fa9" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dukettkp">
 		<!-- Original images (unknown source)
-		<rom name="ttk.mdf" size="287174880" crc="66ce93d8" sha1="17dc62d346b705fbf1fa657f6075075f11e7929e"/>
-		<rom name="ttk.mds" size="494"       crc="a068816f" sha1="66a69f81ed0d7d7b6967ce855364714f85f34792"/>
+		<rom name="ttk.mdf" size="287174880" crc="66ce93d8"/>
+		<rom name="ttk.mds" size="494"       crc="a068816f"/>
 		-->
 		<description>Duke Nukem Time to Kill (USA, Prototype)</description>
 		<year>1998</year>
@@ -163,12 +231,13 @@ A few comments on these:
 
 	<software name="globldom" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="global domination [ntsc-u][slus-01419].bin" size="611564688" crc="f5e70299" sha1="35b457af1241c333d82a5f606f68818f28ea4403"/>
-		<rom name="global domination [ntsc-u][slus-01419].cue" size="105"       crc="8a9e7192" sha1="3eef0d1ebe2ffc2b54e07d68dcf059a2093517cd"/>
+		<rom name="global domination [ntsc-u][slus-01419].bin" size="611564688" crc="f5e70299"/>
+		<rom name="global domination [ntsc-u][slus-01419].cue" size="105"       crc="8a9e7192"/>
 		-->
 		<description>Global Domination (USA, Prototype)</description>
 		<year>1998?</year>
 		<publisher>Psygnosis</publisher>
+		<info name="serial" value="SLUS-01419" />
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="slus-01419" sha1="b8df7f15e32150e703780951fd7ccb6914c75c06" />
@@ -178,7 +247,7 @@ A few comments on these:
 
 	<software name="kain2p1" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="legacy of kain - soul reaver [beta 6-28-99][ntsc-u] [slus-00708].iso" size="687872976"
+		<rom name="legacy of kain - soul reaver [beta 6-28-99][ntsc-u] [slus-00708].iso" size="687872976" crc="6df2681d"/>
 		-->
 		<description>Legacy of Kain - Soul Reaver (USA, Prototype 19990628)</description>
 		<year>1999</year>
@@ -192,9 +261,9 @@ A few comments on these:
 
 	<software name="kain2p2" cloneof="kain2p1" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="sr1-psx-beta.ccd" size="772" crc="250f9eb1"/>
+		<rom name="sr1-psx-beta.ccd" size="772"       crc="250f9eb1"/>
 		<rom name="sr1-psx-beta.img" size="635820864" crc="22f06bfd"/>
-		<rom name="sr1-psx-beta.sub" size="25951872" crc="4183f8c3"/>
+		<rom name="sr1-psx-beta.sub" size="25951872"  crc="4183f8c3"/>
 		-->
 		<description>Legacy of Kain - Soul Reaver (USA, Prototype 19990512)</description>
 		<year>1999</year>
@@ -208,8 +277,8 @@ A few comments on these:
 
 	<software name="madden96" supported="partial">
 		<!-- Original images (unknown source)
-		<rom name="madden96.bin" size="189646464" crc="4d9f6048" sha1="d8d9ea110e26138eaf9a14ce02e635cd8af836a1"/>
-		<rom name="madden96.cue" size="78" crc="243f16c7" sha1="f1f6613572bf62cf62c4eb0e8d5dbdd9e8190685"/>
+		<rom name="madden96.bin" size="189646464" crc="4d9f6048"/>
+		<rom name="madden96.cue" size="78"        crc="243f16c7"/>
 		-->
 		<description>Madden NFL 96 (USA, Prototype)</description>
 		<year>1995</year>
@@ -221,11 +290,27 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="mgspilot" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="slpm.mdf" size="79669296" crc="f32426af"/>
+		<rom name="slpm.mds" size="486"      crc="d5ae5351"/>
+		-->
+		<description>Metal Gear Solid (Pilot Disk)</description>
+		<year>1998</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="SLPM-80254" />
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="slpm-80254" sha1="304e7e9b7182d8f30315cd589abe41d18a19c55c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="person2p" supported="no">
 		<!-- L1+R1+START+SELECT brings up the debug menu -->
 		<!-- Original images (unknown source)
-		<rom name="persona2xus.bin" size="724992240" crc="9eb5619d" sha1="8dfb6d2e08257525566c80d8e17c141928290d47"/>
-		<rom name="persona2xus.cue" size="77"        crc="9d8dc4db" sha1="8977b08c99e52e3b1acf8c40b131faba2f9acb5a"/>
+		<rom name="persona2xus.bin" size="724992240" crc="9eb5619d"/>
+		<rom name="persona2xus.cue" size="77"        crc="9d8dc4db"/>
 		-->
 		<description>Persona 2 - Eternal Punishment (Prototype? Debug)</description>
 		<year>2000</year>
@@ -239,8 +324,8 @@ A few comments on these:
 
 	<software name="rockman8" supported="no">
 		<!-- Original images released on early March 2011 (March the 3rd??) by Henger83 and Junker
-		<rom name="rockman 8 beta v1.bin" size="53352768" crc="bb8df0ca" sha1="69ed6c03831f9dae6bcf8c2e54a92935261a9cd3"/>
-		<rom name="rockman 8 beta v1.cue" size="80" crc="5ff4ae72" sha1="34e8a485039859d2d54e1fb75097da4651a08f31"/>
+		<rom name="rockman 8 beta v1.bin" size="53352768" crc="bb8df0ca"/>
+		<rom name="rockman 8 beta v1.cue" size="80"       crc="5ff4ae72"/>
 		-->
 		<description>Rockman 8 (Jpn, Prototype v1)</description>
 		<year>19??</year>
@@ -254,8 +339,8 @@ A few comments on these:
 
 	<software name="rockman8a" cloneof="rockman8" supported="no">
 		<!-- Original images (coming from I don't know where, possibly released by Tsunami?)
-		<rom name="rockman 8 beta 1.bin" size="53352768" crc="67c78d88" sha1="ee9fbb2157a983d11ac4aa71684292294678f1a7"/>
-		<rom name="rockman 8 beta 1.cue" size="79" crc="bae58743" sha1="9b3e6a0bb19b89e2079f12b157381ccc678a4dce"/>
+		<rom name="rockman 8 beta 1.bin" size="53352768" crc="67c78d88"/>
+		<rom name="rockman 8 beta 1.cue" size="79"       crc="bae58743"/>
 		-->
 		<description>Rockman 8 (Jpn, Prototype 1)</description>
 		<year>19??</year>
@@ -269,8 +354,8 @@ A few comments on these:
 
 	<software name="rockman8b" cloneof="rockman8" supported="no">
 		<!-- Original images (coming from I don't know where, possibly released by Tsunami?)
-		<rom name="rockman 8 beta 2.bin" size="58710624" crc="1c8b620a" sha1="b9ca669a9d45359d10e2e419a278b84413041919"/>
-		<rom name="rockman 8 beta 2.cue" size="79" crc="65ac97f6" sha1="3d7f8fd05f0e5f5f38877a786df676c6c2c9a810"/>
+		<rom name="rockman 8 beta 2.bin" size="58710624" crc="1c8b620a"/>
+		<rom name="rockman 8 beta 2.cue" size="79"       crc="65ac97f6"/>
 		-->
 		<description>Rockman 8 (Jpn, Prototype 2)</description>
 		<year>19??</year>
@@ -282,10 +367,25 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="rockmndp">
+		<!-- Original images (unknown source)
+		<rom name="[rpm] rockman dash beta 'capcom friendly club' (j).iso" size="155017968" crc="b18f4d41"/>
+		-->
+		<description>Rockman Dash (Capcom Friendly Club Demo)</description>
+		<year>1997</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SLPM-80158" />
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="slpm-80158" sha1="0156cc68c320849821b780207ed58cb8bc5b4a73" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="rockmnx6" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="rockman_x6.bin" size="396577776" crc="b1442c95" sha1="51ec61dbb32c8144a48649309e9464a44672d654"/>
-		<rom name="rockman_x6.cue" size="73"        crc="5c05610d" sha1="3968ac1969c9bbcc9b2d3fa04682cc5efb98e23f"/>
+		<rom name="rockman_x6.bin" size="396577776" crc="b1442c95"/>
+		<rom name="rockman_x6.cue" size="73"        crc="5c05610d"/>
 		-->
 		<description>Rockman X6 (Jpn, Prototype 20010928)</description>
 		<year>19??</year>
@@ -299,8 +399,8 @@ A few comments on these:
 
 	<software name="silenthp">
 		<!-- Original images (unknown source)
-		<rom name="silent1.bin" size="616518000" crc="8326dd8f" sha1="97c7d476c9e821b3d932139a0644c0c7593e1955"/>
-		<rom name="silent1.cue" size="68"        crc="670aa37f" sha1="14fc981dd80051cbec08aec18afa8e5679be959f"/>
+		<rom name="silent1.bin" size="616518000" crc="8326dd8f"/>
+		<rom name="silent1.cue" size="68"        crc="670aa37f"/>
 		-->
 		<description>Silent Hill (USA, Prototype)</description>
 		<year>1999</year>
@@ -314,8 +414,8 @@ A few comments on these:
 
 	<software name="spiritm" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="spirit master (u) (prototype).bin" size="13547520" crc="92bf9773" sha1="98d5b62fed0ec04ba09577654f4366529bc0cab4"/>
-		<rom name="spirit master (u) (prototype).cue" size="95"       crc="9fdd687b" sha1="4184f28f49f29bb14387f9a364ce21b448da8147"/>
+		<rom name="spirit master (u) (prototype).bin" size="13547520" crc="92bf9773"/>
+		<rom name="spirit master (u) (prototype).cue" size="95"       crc="9fdd687b"/>
 		-->
 		<description>Spirit Master (USA, Prototype)</description>
 		<year>19??</year>
@@ -329,9 +429,9 @@ A few comments on these:
 
 	<software name="starcon">
 		<!-- Original images (unknown source)
-		<rom name="starcon_t01.bin" size="138532800" crc="78ccec24" sha1="d9a8b5b968b5fda1d1bd59915872705f2d124dbc"/>
-		<rom name="starcon_t02.wav" size="44763308"  crc="14cd232a" sha1="c5095ba5eb1eb3b4757f6d86764a6d1ccd4971b4"/>
-		<rom name="starcon.cue" size="168"           crc="cedd64ed" sha1="bcef7f0f691f3a266c8aa040d32e9ffcde28a7c8"/>
+		<rom name="starcon_t01.bin" size="138532800" crc="78ccec24"/>
+		<rom name="starcon_t02.wav" size="44763308"  crc="14cd232a"/>
+		<rom name="starcon.cue" size="168"           crc="cedd64ed"/>
 		-->
 		<description>StarCon (Prototype)</description>
 		<year>1998</year>
@@ -345,8 +445,8 @@ A few comments on these:
 
 	<software name="thkill" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="thrill kill.bin" size="625629648" crc="ab7aa9a2" sha1="8a0a68c4fa1d5d6e68acd878ea4e22c1cbcf5d24"/>
-		<rom name="thrill kill.cue" size="601" crc="b10890b1" sha1="1cb46ab6e2172d10ec4d267e57e2f307ad633287"/>
+		<rom name="thrill kill.bin" size="625629648" crc="ab7aa9a2"/>
+		<rom name="thrill kill.cue" size="601"       crc="b10890b1"/>
 		-->
 		<description>Thrill Kill (USA, Prototype)</description>
 		<year>19??</year>
@@ -360,10 +460,10 @@ A few comments on these:
 
 	<software name="thkilla" cloneof="thkill" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="thrill_kill_slus12345_frederico_psx_ud.ccd" size="164428320" crc="755a6f9a" sha1="4d7e1c0f8cc0539647a95fcbe1611ed2d4a82c98"/>
-		<rom name="thrill_kill_slus12345_frederico_psx_ud.sub" size="6711360"   crc="04f2d980" sha1="6255fd6057690f0cd42d51ef696c7d31acf562f0"/>
-		<rom name="thrill_kill_slus12345_frederico_psx_ud.ccd" size="1821"      crc="e65f76a3" sha1="4f54b8ba51f4f511e8f669d419da324ac15ac1e7"/>
-		<rom name="thrill_kill_slus12345_frederico_psx_ud.cue" size="402"       crc="1676ac31" sha1="2c41f798985fff38838b58c5168beb068aa50f24"/>
+		<rom name="thrill_kill_slus12345_frederico_psx_ud.img" size="164428320" crc="755a6f9a"/>
+		<rom name="thrill_kill_slus12345_frederico_psx_ud.sub" size="6711360"   crc="04f2d980"/>
+		<rom name="thrill_kill_slus12345_frederico_psx_ud.ccd" size="1821"      crc="e65f76a3"/>
+		<rom name="thrill_kill_slus12345_frederico_psx_ud.cue" size="402"       crc="1676ac31"/>
 		-->
 		<description>Thrill Kill (USA, Prototype Earlier?)</description>
 		<year>19??</year>
@@ -377,8 +477,8 @@ A few comments on these:
 
 	<software name="traidp" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="tombraider.bin" size="615734784" crc="63999513" sha1="672efcd03a8342b0e54904adc606c5d140610c9b"/>
-		<rom name="tombraider.cue" size="2238"      crc="a1d37c30" sha1="fa46b66a3346a226817a6f1b5c5b843994854d64"/>
+		<rom name="tombraider.bin" size="615734784" crc="63999513"/>
+		<rom name="tombraider.cue" size="2238"      crc="a1d37c30"/>
 		-->
 		<description>Tomb Raider (Prototype, 19960722)</description>
 		<year>1996</year>
@@ -392,10 +492,10 @@ A few comments on these:
 
 	<software name="traid2p" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="tomb raider 2 [beta] [ntsc] [psx].ccd" size="13748" crc="8158505c"/>
-		<rom name="tomb raider 2 [beta] [ntsc] [psx].cue" size="3624" crc="030aec00"/>
+		<rom name="tomb raider 2 [beta] [ntsc] [psx].ccd" size="13748"     crc="8158505c"/>
+		<rom name="tomb raider 2 [beta] [ntsc] [psx].cue" size="3624"      crc="030aec00"/>
 		<rom name="tomb raider 2 [beta] [ntsc] [psx].img" size="755624688" crc="c3330f3c"/>
-		<rom name="tomb raider 2 [beta] [ntsc] [psx].sub" size="30841824" crc="19143fb6"/>
+		<rom name="tomb raider 2 [beta] [ntsc] [psx].sub" size="30841824"  crc="19143fb6"/>
 		-->
 		<description>Tomb Raider II (USA, Prototype)</description>
 		<year>19??</year>
@@ -409,8 +509,8 @@ A few comments on these:
 
 	<software name="thpsp" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="tony hawk's pro skater (usa) [beta].bin" size="36764112" crc="4dc94772" sha1="662f7aa67e1b9ac67cb479f80b55c0cf44305a34"/>
-		<rom name="tony hawk's pro skater (usa) [beta].cue" size="110"      crc="d4a2b89d" sha1="05c43fcd61f10a50e6594e4c2a92eadf3d76bb44"/>
+		<rom name="tony hawk's pro skater (usa) [beta].bin" size="36764112" crc="4dc94772"/>
+		<rom name="tony hawk's pro skater (usa) [beta].cue" size="110"      crc="d4a2b89d"/>
 		-->
 		<description>Tony Hawk's Pro Skater (USA, Prototype)</description>
 		<year>19??</year>
@@ -436,17 +536,50 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="virtuoso">
+		<!-- Original images (unknown source)
+		<rom name="virtuoso (prototype 1996-05-14).ccd" size="1178"     crc="4a4d26ac"/>
+		<rom name="virtuoso (prototype 1996-05-14).cue" size="228"      crc="20483bb0"/>
+		<rom name="virtuoso (prototype 1996-05-14).img" size="75607392" crc="3ffa24c3"/>
+		<rom name="virtuoso (prototype 1996-05-14).sub" size="3086016"  crc="d6099623"/>
+		-->
+		<description>Virtuoso (Prototype, 19960514)</description>
+		<year>1996</year>
+		<publisher>Data East?</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtuoso" sha1="17b12ec274b92acb586f4660303bbb21309c0702" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wwfsmack" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="wwf smackdown! (usa) [beta].bin" size="588961968" crc="4ac3a9b7"/>
+		<rom name="wwf smackdown! (usa) [beta].cue" size="105"       crc="21a5c146"/>
+		-->
+		<description>WWF Smackdown! (USA, Prototype 20000106)</description>
+		<year>2000</year>
+		<publisher>THQ</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="wwf smackdown (beta)" sha1="7aa0bc14fc4d33f785d0a9c911e8f177e737ad78" />
+			</diskarea>
+		</part>
+	</software>
+
 
 <!-- Demo disks -->
 
 	<software name="re2d" supported="no">
 		<!-- Original images (unknown source)
-		<rom name="revil2prevpaling by spectro.bin" size="170583504" crc="3f66f858" sha1="aec467677f4f1085d881eae9aa7da9382dc36bd3"/>
-		<rom name="revil2prevpaling by spectro.cue" size="93" crc="7f31a5a5" sha1="601b8f056e656389744dbbdb10b18b75e6476be9"/>
+		<rom name="revil2prevpaling by spectro.bin" size="170583504" crc="3f66f858"/>
+		<rom name="revil2prevpaling by spectro.cue" size="93"        crc="7f31a5a5"/>
 		-->
 		<description>Resident Evil 2 Preview (Euro, CD Consoles No.38)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
+		<info name="serial" value="SLED-00977" />
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sled-00977" sha1="2e05c694daa7dc069b93bbaca465ab047ef3eef8" />
@@ -454,10 +587,26 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="re3d" supported="no">
+		<!-- Original images (unknown source)
+		<rom name="sled_02541.bin" size="239762880" crc="fb7fb080"/>
+		<rom name="sled_02541.cue" size="76"        crc="b18c113c"/>
+		-->
+		<description>Resident Evil 3 (Euro, Demo?)</description>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SLED-02541" />
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sled-02541" sha1="6bad1e2c7c6541ba21333ef9e7076d910088ce87" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="bountyar">
 		<!-- Original images (from kidfenis and carnivol)
-		<rom name="bountyarms.bin" size="4111296" crc="250e1845" sha1="602bcbb72c47667a95eebe9b1ff6fb2b88dd0d36"/>
-		<rom name="bountyarms.cue" size="76"      crc="78100862" sha1="0dc0f092b2bc15faf210ffcb9f51b42a23e26ceb"/>
+		<rom name="bountyarms.bin" size="4111296" crc="250e1845"/>
+		<rom name="bountyarms.cue" size="76"      crc="78100862"/>
 		-->
 		<description>Bounty Arms Demo (Jpn, Demo Demo No.5?, 199504)</description>
 		<year>1995</year>
@@ -471,9 +620,9 @@ A few comments on these:
 
 	<software name="sotne3">
 		<!-- Original images (unknown source)
-		<rom name="castlevania - symphony of the night e3 demo.img" size="587811840" crc="22b981c9" sha1="c94c1fb5548c21721835928f294d0301452eb90d"/>
-		<rom name="castlevania - symphony of the night e3 demo.ccd" size="964"       crc="d6a03944" sha1="b1a1e08e3837d3d39949097fb1c5f12b648aa5ce"/>
-		<rom name="castlevania - symphony of the night e3 demo.cue" size="163"       crc="919c7241" sha1="09413093892a1cb79b5bf99e0424000ace0eeae8"/>
+		<rom name="castlevania - symphony of the night e3 demo.img" size="587811840" crc="22b981c9"/>
+		<rom name="castlevania - symphony of the night e3 demo.ccd" size="964"       crc="d6a03944"/>
+		<rom name="castlevania - symphony of the night e3 demo.cue" size="163"       crc="919c7241"/>
 		-->
 		<description>Castlevania - Symphony of the Night (E3 Demo, 1997)</description>
 		<year>1997</year>
@@ -487,12 +636,13 @@ A few comments on these:
 
 	<software name="dukettkd">
 		<!-- Original images (unknown source)
-		<rom name="duke nukem - time to kill (usa) (demo).bin" size="139252512" crc="be052dcf" sha1="7be0248928539529667b99691917b95ea918ef38"/>
-		<rom name="duke nukem - time to kill (usa) (demo).cue" size="104"       crc="aa45b70c" sha1="4a2d18dcd9e989e7aa993562eb25058e19fb5f5a"/>
+		<rom name="duke nukem - time to kill (usa) (demo).bin" size="139252512" crc="be052dcf"/>
+		<rom name="duke nukem - time to kill (usa) (demo).cue" size="104"       crc="aa45b70c"/>
 		-->
 		<description>Duke Nukem Time to Kill (USA, Demo)</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
+		<info name="serial" value="SLUS-90036" />
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
 				<disk name="slus-90036" sha1="28db4fb51b226d63cb5d2f1216c243c95a43e8a4" />
@@ -502,9 +652,9 @@ A few comments on these:
 
 	<software name="traidd">
 		<!-- Original images (from drx)
-		<rom name="tr1.ccd" size="768" crc="66258656" sha1="e22fac1714d6bf6582dc721bde5999c5920ef53a"/>
-		<rom name="tr1.img" size="2293200" crc="9905010d" sha1="6a43d5840e1cb49c0522d8546219f1cc2c467438"/>
-		<rom name="tr1.sub" size="93600" crc="97ae0bfa" sha1="72016fcb74997ae12c8cca271d2c14622b3a8599"/>
+		<rom name="tr1.ccd" size="768"     crc="66258656"/>
+		<rom name="tr1.img" size="2293200" crc="9905010d"/>
+		<rom name="tr1.sub" size="93600"   crc="97ae0bfa"/>
 		-->
 		<description>Tomb Raider (E3 Demo, 19960520)</description>
 		<year>1996</year>
@@ -515,5 +665,6 @@ A few comments on these:
 			</diskarea>
 		</part>
 	</software>
+
 
 </softwarelist>
