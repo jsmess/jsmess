@@ -3569,6 +3569,18 @@
 		</part>
 	</software>
 
+	<software name="xevious">
+		<description>The Micro Xevious (Kor)</description>
+		<year>1990</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="마이크로 제비우스"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="micro xevious, the (kr).bin" size="32768" crc="41cc2ade" sha1="021c05f23e7dc24a2d80787d99969ce07779b15c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Serial: 4001 (card), 4501 (cart), 021.030, 41004 -->
 	<software name="myhero">
 		<description>My Hero (Euro, USA, Bra)</description>

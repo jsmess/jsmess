@@ -321,17 +321,30 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-<!-- This has been hacked to work in emus, by mirroring the first 8K up to 32K and then adding the second 8K. This can be removed when the emulation
-  of this kind of carts have been fixed (running the 16K image results in missing graphics, among other things, see the title screen) -->
 	<software name="chaldrbya" cloneof="chaldrby">
-		<description>Challenge Derby (Jpn, Hacked, OMV)</description>
+		<description>Challenge Derby (Jpn, OMV, Alt)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G005"/>
 		<info name="alt_title" value="チャレンジダービー"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="40960">
-				<rom name="challenge derby [40k].bin" size="40960" crc="c5f014dc" sha1="8a5e6c9b10c9a99c1eaaee48374d1fede5966340" offset="000000" />
+				<rom name="challenge derby [40k].bin" size="40960" crc="02bc891f" sha1="6c0ffd66695e8bd4bc503c40ee49834c3f95082b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This has been hacked to work in emus, by mirroring the first 8K up to 32K and then adding the second 8K. This can be removed when the emulation
+  of this kind of carts have been fixed (running the 16K image results in missing graphics, among other things, see the title screen) -->
+	<software name="chaldrbyb" cloneof="chaldrby">
+		<description>Challenge Derby (Jpn, OMV, Hacked)</description>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
+		<info name="serial" value="OM-G005"/>
+		<info name="alt_title" value="チャレンジダービー"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="challenge derby [ver.b] [40k].bin" size="40960" crc="c5f014dc" sha1="8a5e6c9b10c9a99c1eaaee48374d1fede5966340" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1586,7 +1599,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="matchpga" cloneof="matchpg">
-		<description>Okamoto Ayako no Match Play Golf (Jpn, Alt, OMV)</description>
+		<description>Okamoto Ayako no Match Play Golf (Jpn, OMV, Alt)</description>
 		<year>1984?</year>
 		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2062,6 +2075,31 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="soukobank" cloneof="soukoban">
+		<description>Soukoban (Kor)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="창고지기 ~ Changgo Jigi"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="soukoban (kr).bin" size="32768" crc="148ea752" sha1="a9d77c6dee31956bb382abd14245ff581369578d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soukobank" cloneof="soukoban">
+		<description>I.Q. (Kor)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="G-36"/>
+		<info name="alt_title" value="아이-큐"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="soukoban [iq logo] (kr).bin" size="32768" crc="89bafec5" sha1="3a8505aabd165bd9de51369f588ae8c867b7671f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spacearm">
 		<description>Space Armor (Jpn, v20, OMV)</description>
 		<year>1984</year>
@@ -2076,7 +2114,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spacearma" cloneof="spacearm">
-		<description>Space Armor (Jpn, v20 Alt, OMV)</description>
+		<description>Space Armor (Jpn, v20, OMV, Alt)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G007, also W-016 (Tw, by Aaronix)"/>
