@@ -1833,12 +1833,23 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="dstrike">
-		<description>Desert Strike - Return to the Gulf (Euro, USA)</description>
+		<description>Desert Strike (Euro)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="desert strike - return to the gulf (usa, europe).bin" size="524288" crc="f6c400da" sha1="80b91bdf20605d940401738202c473df632d0765" offset="000000" />
+				<rom name="desert strike (eu).bin" size="524288" crc="3e44eca3" sha1="3bb092b14c650c5ffd0370e6870878282b3d04f4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dstrikeu" cloneof="dstrike">
+		<description>Desert Strike - Return to the Gulf (USA)</description>
+		<year>1992</year>
+		<publisher>Domark</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="desert strike - return to the gulf (usa).bin" size="524288" crc="f6c400da" sha1="80b91bdf20605d940401738202c473df632d0765" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2869,12 +2880,23 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="hook">
-		<description>Hook (Euro, USA)</description>
+		<description>Hook (Euro)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="hook (usa, europe).bin" size="262144" crc="f53ced2e" sha1="b9bd292fa4f3ef7dd86ebae9e1b5364ce6653c45" offset="000000" />
+				<rom name="hook (eu).bin" size="262144" crc="a5aa5ba1" sha1="404fe95907d816b524acd34c9223c30afcd82fa4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hooku" cloneof="hook">
+		<description>Hook (USA)</description>
+		<year>1992</year>
+		<publisher>Sony Imagesoft</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="hook (usa).bin" size="262144" crc="f53ced2e" sha1="b9bd292fa4f3ef7dd86ebae9e1b5364ce6653c45" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3166,13 +3188,24 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="junction">
-		<description>Junction (Euro, USA)</description>
+	<software name="junctionj" cloneof="junction">
+		<description>Junction (Jpn)</description>
 		<year>1991</year>
 		<publisher>Micronet</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="junction (usa, europe).bin" size="131072" crc="a8ef36a7" sha1="70cac7959d29903ad22316e9f5edf60834381d27" offset="000000" />
+				<rom name="junction (japan).bin" size="131072" crc="a8ef36a7" sha1="70cac7959d29903ad22316e9f5edf60834381d27" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="junction">
+		<description>Junction (USA)</description>
+		<year>1991</year>
+		<publisher>Micronet</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="junction (us).bin" size="131072" crc="32abaa02" sha1="d2b536dd1cdd72c66faf179d6ab2f6cf420a5682" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5724,10 +5757,10 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="riddickj" cloneof="riddick">
-		<description>Riddick Bowe Boxing (Jpn, USA)</description>
+		<description>Riddick Bowe Boxing (Jpn)</description>
 		<year>1994</year>
 		<publisher>Micronet</publisher>
-		<info name="serial" value="T-22027, T-22028"/>
+		<info name="serial" value="T-22027"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="riddick bowe boxing (japan).bin" size="262144" crc="a45fffb7" sha1="af32ad098a1bf872d5a2cef38105704d3507ed75" offset="000000" />
@@ -5739,6 +5772,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Riddick Bowe Boxing (USA)</description>
 		<year>1993</year>
 		<publisher>Extreme Entertainment Group</publisher>
+		<info name="serial" value="T-22028"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="riddick bowe boxing (usa).bin" size="262144" crc="38d8ec56" sha1="b8487bdb0a6167753fc6de82714793181d7718db" offset="000000" />
