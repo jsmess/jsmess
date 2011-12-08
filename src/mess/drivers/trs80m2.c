@@ -12,6 +12,9 @@
 
     - keyboard CPU ROM
     - graphics board
+	- Tandy 6000 HD
+	
+		chdman -createblankhd tandy6000hd.chd 306 6 34 256
 
 */
 
