@@ -58804,11 +58804,11 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="hogan&apos;s alley (1987)(fmg)(jp)[p].prg" size="16384" crc="27c51ce8" sha1="13743a35b1617c6a191fc3939e81be0388d36cdb" offset="00000" status="baddump" />
+				<rom name="hogan's alley (1987)(fmg)(jp)[p].prg" size="16384" crc="27c51ce8" sha1="13743a35b1617c6a191fc3939e81be0388d36cdb" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="hogan&apos;s alley (1987)(fmg)(jp)[p].chr" size="8192" crc="5df42fc4" sha1="4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8" offset="00000" status="baddump" />
+				<rom name="hogan's alley (1987)(fmg)(jp)[p].chr" size="8192" crc="5df42fc4" sha1="4fcf23151d9f11c1ef1b1007dd8058f5d5fe9ab8" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -59001,10 +59001,10 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
-				<rom name="king&apos;s knight (1987)(fmg)(jp)[p].prg" size="32768" crc="cdf5751e" sha1="634900267d83fea20d0d335845c625a82602a61f" offset="00000" status="baddump" />
+				<rom name="king's knight (1987)(fmg)(jp)[p].prg" size="32768" crc="cdf5751e" sha1="634900267d83fea20d0d335845c625a82602a61f" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="king&apos;s knight (1987)(fmg)(jp)[p].chr" size="32768" crc="1e1a11c1" sha1="39361fe572f55e9064dd5923813a2006fbf66013" offset="00000" status="baddump" />
+				<rom name="king's knight (1987)(fmg)(jp)[p].chr" size="32768" crc="1e1a11c1" sha1="39361fe572f55e9064dd5923813a2006fbf66013" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

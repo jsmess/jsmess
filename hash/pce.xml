@@ -308,7 +308,7 @@
 		<info name="release" value="19921211"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bomberman &apos;93 (japan).pce" size="524288" crc="b300c5d0" sha1="64131aeb6753bffde2910d641c73b56108874320" offset="000000" />
+				<rom name="bomberman '93 (japan).pce" size="524288" crc="b300c5d0" sha1="64131aeb6753bffde2910d641c73b56108874320" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -319,7 +319,7 @@
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bomberman &apos;93 (special version) (japan).pce" size="524288" crc="02309aa0" sha1="79af6d5987267238cf8f729af79e25349cb0bf03" offset="000000" />
+				<rom name="bomberman '93 (special version) (japan).pce" size="524288" crc="02309aa0" sha1="79af6d5987267238cf8f729af79e25349cb0bf03" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -331,7 +331,7 @@
 		<info name="release" value="19931210"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bomberman &apos;94 (japan).pce" size="1048576" crc="05362516" sha1="9085b474199531259b4ebbc05a279ae96cb7c5bd" offset="000000" />
+				<rom name="bomberman '94 (japan).pce" size="1048576" crc="05362516" sha1="9085b474199531259b4ebbc05a279ae96cb7c5bd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -920,7 +920,7 @@
 		<info name="release" value="19890323"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="f-1 pilot - you&apos;re king of kings (japan).pce" size="393216" crc="09048174" sha1="ba89f45d9b2ebd331da570f9e03ab0c8ae2cc835" offset="000000" />
+				<rom name="f-1 pilot - you're king of kings (japan).pce" size="393216" crc="09048174" sha1="ba89f45d9b2ebd331da570f9e03ab0c8ae2cc835" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -932,7 +932,7 @@
 		<info name="release" value="19910712"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="f1 circus &apos;91 - world championship (japan).pce" size="524288" crc="d7cfd70f" sha1="e424bb52a3739c7c4723a81d16a091ae2dba49eb" offset="000000" />
+				<rom name="f1 circus '91 - world championship (japan).pce" size="524288" crc="d7cfd70f" sha1="e424bb52a3739c7c4723a81d16a091ae2dba49eb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -944,7 +944,7 @@
 		<info name="release" value="19921218"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="f1 circus &apos;92 - the speed of sound (japan).pce" size="786432" crc="b268f2a2" sha1="c2ccd2110ae6a9d6cd64cce26b0264868d684933" offset="000000" />
+				<rom name="f1 circus '92 - the speed of sound (japan).pce" size="786432" crc="b268f2a2" sha1="c2ccd2110ae6a9d6cd64cce26b0264868d684933" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1111,7 +1111,7 @@
 		<info name="release" value="19900427"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="formation soccer - human cup &apos;90 (japan).pce" size="262144" crc="85a1e7b6" sha1="d53db608475ca26ff81837dc43b40726bd0440a5" offset="000000" />
+				<rom name="formation soccer - human cup '90 (japan).pce" size="262144" crc="85a1e7b6" sha1="d53db608475ca26ff81837dc43b40726bd0440a5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1171,7 +1171,7 @@
 		<info name="release" value="19880715"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="galaga &apos;88 (japan).pce" size="262144" crc="1a8393c6" sha1="246079bbf7c8aca0ca66a381986785a39f39ed06" offset="000000" />
+				<rom name="galaga '88 (japan).pce" size="262144" crc="1a8393c6" sha1="246079bbf7c8aca0ca66a381986785a39f39ed06" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1434,7 +1434,7 @@
 		<info name="release" value="19891124"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="jack nicklaus&apos; greatest 18 holes of major championship golf (japan).pce" size="262144" crc="ea751e82" sha1="3806f0509288f76393a35f395c34a4e9e979e51f" offset="000000" />
+				<rom name="jack nicklaus' greatest 18 holes of major championship golf (japan).pce" size="262144" crc="ea751e82" sha1="3806f0509288f76393a35f395c34a4e9e979e51f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1626,7 +1626,7 @@
 		<info name="release" value="19891215"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kore ga pro yakyuu &apos;89 (japan).pce" size="262144" crc="44f60137" sha1="4f506b4aac531bfdec9a7b7736efa2656be06f62" offset="000000" />
+				<rom name="kore ga pro yakyuu '89 (japan).pce" size="262144" crc="44f60137" sha1="4f506b4aac531bfdec9a7b7736efa2656be06f62" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1638,7 +1638,7 @@
 		<info name="release" value="19900629"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kore ga pro yakyuu &apos;90 (japan).pce" size="262144" crc="1772b229" sha1="a55d38119e533c035077e49947fce7c0b9f10882" offset="000000" />
+				<rom name="kore ga pro yakyuu '90 (japan).pce" size="262144" crc="1772b229" sha1="a55d38119e533c035077e49947fce7c0b9f10882" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1816,7 +1816,7 @@
 		<info name="release" value="19920228"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mahjong haou den - kaiser&apos;s quest (japan).pce" size="524288" crc="df10c895" sha1="e539de46a672e7ec3eecca58adb924d622a78c98" offset="000000" />
+				<rom name="mahjong haou den - kaiser's quest (japan).pce" size="524288" crc="df10c895" sha1="e539de46a672e7ec3eecca58adb924d622a78c98" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2595,7 +2595,7 @@
 		<info name="release" value="19931015"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="power league &apos;93 (japan).pce" size="786432" crc="7d3e6f33" sha1="0e710ee789206baceec43df7f24a8e80bdbc7154" offset="000000" />
+				<rom name="power league '93 (japan).pce" size="786432" crc="7d3e6f33" sha1="0e710ee789206baceec43df7f24a8e80bdbc7154" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2714,7 +2714,7 @@
 		<info name="release" value="19910321"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="pro yakyuu world stadium &apos;91 (japan).pce" size="262144" crc="66b167a9" sha1="6b76e9cc10a812c15631450b617ea3719fdcdc16" offset="000000" />
+				<rom name="pro yakyuu world stadium '91 (japan).pce" size="262144" crc="66b167a9" sha1="6b76e9cc10a812c15631450b617ea3719fdcdc16" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3181,7 +3181,7 @@
 		<info name="release" value="19930612"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="2621440">
-				<rom name="street fighter ii&apos; - champion edition (japan).pce" size="2621440" crc="d15cb6bb" sha1="e757ecdf857803cb46cdf37ecf4596f6eaccdd76" offset="000000" />
+				<rom name="street fighter ii' - champion edition (japan).pce" size="2621440" crc="d15cb6bb" sha1="e757ecdf857803cb46cdf37ecf4596f6eaccdd76" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

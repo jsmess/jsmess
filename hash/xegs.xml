@@ -204,7 +204,7 @@ Compiled by K1W1
 		<info name="serial" value="RX8083" />
 		<part name="cart" interface="xegs_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="david&apos;s midnight magic (atari)(1987)(rx8083).rom" size="65536" crc="b7ca61a2" sha1="cf7b224a4477597c872da00aebb3dcf11955b569" offset="0" /> <!-- Verified -->
+				<rom name="david's midnight magic (atari)(1987)(rx8083).rom" size="65536" crc="b7ca61a2" sha1="cf7b224a4477597c872da00aebb3dcf11955b569" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -311,7 +311,7 @@ Compiled by K1W1
 		<info name="serial" value="RX8114" />
 		<part name="cart" interface="xegs_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="into the eagle&apos;s nest (atari)(1988)(rx8114).rom" size="32768" crc="f31321c2" sha1="61d6f9264947481bc49cd47441e8fa5c8ed5fc55" offset="0" /> <!-- Verified -->
+				<rom name="into the eagle's nest (atari)(1988)(rx8114).rom" size="32768" crc="f31321c2" sha1="61d6f9264947481bc49cd47441e8fa5c8ed5fc55" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>

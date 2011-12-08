@@ -138,7 +138,7 @@
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="montezuma&apos;s revenge.rom" size="16384" crc="ff8d7dc3" sha1="b700e37f7e24adea6ba12cf0e935307bd006b9c9" offset="000000" />
+				<rom name="montezuma's revenge.rom" size="16384" crc="ff8d7dc3" sha1="b700e37f7e24adea6ba12cf0e935307bd006b9c9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="montezuma&apos;s revenge (prot).rom" size="16384" crc="5d73082e" sha1="e8f1b6e6b8c8eb6de6a0c6d271351ca7056a39af" offset="000000" />
+				<rom name="montezuma's revenge (prot).rom" size="16384" crc="5d73082e" sha1="e8f1b6e6b8c8eb6de6a0c6d271351ca7056a39af" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
