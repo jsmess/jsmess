@@ -2087,7 +2087,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="soukobank" cloneof="soukoban">
+	<software name="iq" cloneof="soukoban">
 		<description>I.Q. (Kor)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
