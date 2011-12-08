@@ -374,22 +374,22 @@
 		<publisher>MicroProse Ltd.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="diska.img" size="1474560" crc="d8e7a342" sha1="026af5576bf2b75ef609af0774958485c50c773b" offset="0" />
+				<rom name="diska.img" size="1474560" crc="d8e7a342" sha1="026af5576bf2b75ef609af0774958485c50c773b" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="diskb.img" size="1474560" crc="56e219e0" sha1="41afccc7f5ece6e090246e334ca1add3581f2350" offset="0" />
+				<rom name="diskb.img" size="1474560" crc="56e219e0" sha1="41afccc7f5ece6e090246e334ca1add3581f2350" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="diskc.img" size="1474560" crc="2e3fc2c2" sha1="7470d282463fe6fc40b4ed3833ee3e52b16c7805" offset="0" />
+				<rom name="diskc.img" size="1474560" crc="2e3fc2c2" sha1="7470d282463fe6fc40b4ed3833ee3e52b16c7805" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="diskd.img" size="1474560" crc="5d84110d" sha1="0140425ccb5aea27ccbff00a320941cccd86ac7a" offset="0" />
+				<rom name="diskd.img" size="1474560" crc="5d84110d" sha1="0140425ccb5aea27ccbff00a320941cccd86ac7a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -417,32 +417,32 @@
 		<info name="Alt Title" value="GEM Application Environment Services Version 3.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c" offset="0" />
+				<rom name="master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screend1.img" size="368640" crc="f4d618b0" sha1="02fedd94df50f57c281b9a931ef72fc8dbeacc5c" offset="0" />
+				<rom name="screend1.img" size="368640" crc="f4d618b0" sha1="02fedd94df50f57c281b9a931ef72fc8dbeacc5c" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="screend2.img" size="368640" crc="031bd65f" sha1="87fcc18b8e99d727b71854a6f27cfcc7f4d6e569" offset="0" />
+				<rom name="screend2.img" size="368640" crc="031bd65f" sha1="87fcc18b8e99d727b71854a6f27cfcc7f4d6e569" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printerd1.img" size="368640" crc="7f6a1247" sha1="200cd4002d6f2285a2762566bfd2f69a3ca70550" offset="0" />
+				<rom name="printerd1.img" size="368640" crc="7f6a1247" sha1="200cd4002d6f2285a2762566bfd2f69a3ca70550" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printerd2.img" size="368640" crc="1afc7a36" sha1="967103595523c7cdae923d5ff7bd1da802f6da9c" offset="0" />
+				<rom name="printerd2.img" size="368640" crc="1afc7a36" sha1="967103595523c7cdae923d5ff7bd1da802f6da9c" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="printerd3.img" size="368640" crc="c704dcbd" sha1="f6a8fdd8cd2de0b30a0b96481daf4125a4ce0528" offset="0" />
+				<rom name="printerd3.img" size="368640" crc="c704dcbd" sha1="f6a8fdd8cd2de0b30a0b96481daf4125a4ce0528" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -563,7 +563,7 @@
 		<publisher>LucasArts Entertainment Company LLC</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="xwing.img" size="1474560" crc="34eebdb6" sha1="fcee862c9b2460aed9cbf3b46657ad4e4eff5dcd" offset="0" />
+				<rom name="xwing.img" size="1474560" crc="34eebdb6" sha1="fcee862c9b2460aed9cbf3b46657ad4e4eff5dcd" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -575,7 +575,31 @@
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
-				<rom name="disk1.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e" offset="0" />
+				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2400ad">
+		<description>2400 A.D.</description>
+		<year>1987</year>
+		<publisher>Origin</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="2400ad.img" size="368640" crc="bf246734" sha1="a9f0be5fa2a5077375dae572622926bb8aa9e28a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibmdos2">
+		<description>IBM Personal Computer DOS Version 2.0</description>
+		<year>1983</year>
+		<publisher>IBM Corp.</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="ibmdos 2.img" size="368640" crc="d0fb7d31" sha1="cbee7f6109fb0ed8a94de1893fc47ab066de36d3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
