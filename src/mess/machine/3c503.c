@@ -30,18 +30,18 @@ el2_3c503_device::el2_3c503_device(const machine_config &mconfig, const char *ta
 void el2_3c503_device::device_start() {
 	char mac[7];
 	UINT32 num = rand();
-	m_dp8390->set_interface(0); // XXX make user configurable
 	memset(m_prom, 0x57, 16);
 	sprintf(mac, "\x02\x60\x8c%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	memcpy(m_prom, mac, 6);
 	memset(m_rom, 0, 8*1024); // empty
-
+	m_dp8390->set_mac(mac);
 	set_isa_device();
 	m_isa->install_device(0x0300, 0x030f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
 	m_isa->install_device(0x0700, 0x070f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
 }
 
 void el2_3c503_device::device_reset() {
+	memcpy(m_prom, m_dp8390->get_mac(), 6);
 	memset(&m_regs, 0, sizeof(m_regs));
 	m_regs.bcfr = 0x80; // port 0x300
 	m_regs.pcfr = 0x20; // address 0xcc000

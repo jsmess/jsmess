@@ -28,16 +28,17 @@ ne2000_device::ne2000_device(const machine_config &mconfig, const char *tag, dev
 void ne2000_device::device_start() {
 	char mac[7];
 	UINT32 num = rand();
-	m_dp8390->set_interface(0); // XXX make user configurable
 	memset(m_prom, 0x57, 16);
 	sprintf(mac+2, "\x1b%c%c%c", (num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff);
 	mac[0] = 0; mac[1] = 0;  // avoid gcc warning
 	memcpy(m_prom, mac, 6);
+	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install16_device(0x0300, 0x031f, 0, 0, read16_delegate(FUNC(ne2000_device::ne2000_port_r), this), write16_delegate(FUNC(ne2000_device::ne2000_port_w), this));
+	m_isa->install16_device(0x0300, 0x031f, 0, 0, read16_delegate(FUNC(ne2000_device::ne2000_port_r), this), write16_delegate(FUNC(ne2000_device::ne2000_port_w), this));	
 }
 
 void ne2000_device::device_reset() {
+	memcpy(m_prom, m_dp8390->get_mac(), 6);
 }
 
 READ16_MEMBER(ne2000_device::ne2000_port_r) {

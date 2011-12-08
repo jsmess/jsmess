@@ -10,6 +10,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "osdnet.h"
 #include "emuopts.h"
 #include "ui.h"
 #include "rendutil.h"
@@ -489,6 +490,63 @@ static void ui_menu_slot_devices(running_machine &machine, ui_menu *menu, void *
 
 
 /*-------------------------------------------------
+    menu_network_devices_populate - populates the main
+    network device menu
+-------------------------------------------------*/
+
+static void menu_network_devices_populate(running_machine &machine, ui_menu *menu, void *state)
+{
+	device_network_interface *network = NULL;
+
+	/* cycle through all devices for this system */
+	for (bool gotone = machine.devicelist().first(network); gotone; gotone = network->next(network))
+	{
+		int curr = network->get_interface();
+		const char *title = NULL;
+		const netdev_entry_t *entry = netdev_first();
+		while(entry) {
+			if(entry->id==curr) {
+				title = entry->description;
+				break;
+			}			
+			entry = entry->m_next;
+		}
+		
+		menu->item_append(network->device().tag(),  (title) ? title : "------", MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)network);		
+	}
+}
+
+/*-------------------------------------------------
+    ui_menu_network_devices - menu that
+-------------------------------------------------*/
+
+static void ui_menu_network_devices(running_machine &machine, ui_menu *menu, void *parameter, void *state)
+{
+	const ui_menu_event *menu_event;
+
+	/* if the menu isn't built, populate now */
+	if (!menu->populated())
+	{
+		menu_network_devices_populate(machine, menu, state);
+	}
+
+	/* process the menu */
+	menu_event = menu->process(0);
+
+	if (menu_event != NULL && menu_event->itemref != NULL)
+	{
+		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
+			device_network_interface *network = (device_network_interface *)menu_event->itemref;
+			int curr = network->get_interface();
+			if (menu_event->iptkey == IPT_UI_LEFT) curr--; else curr++;
+			if (curr==-2) curr = netdev_count() - 1;
+			network->set_interface(curr);
+			menu->reset(UI_MENU_RESET_REMEMBER_REF);
+		}
+	}
+}
+
+/*-------------------------------------------------
     menu_main_populate - populate the main menu
 -------------------------------------------------*/
 
@@ -556,6 +614,13 @@ static void menu_main_populate(running_machine &machine, ui_menu *menu, void *st
 	{
 		/* add image info menu */
 		menu->item_append("Slot Devices", NULL, 0, (void*)ui_menu_slot_devices);
+	}
+
+	device_network_interface *network = NULL;
+	if (machine.devicelist().first(network))
+	{
+		/* add image info menu */
+		menu->item_append("Network Devices", NULL, 0, (void*)ui_menu_network_devices);
 	}
 
 	/* add keyboard mode menu */
