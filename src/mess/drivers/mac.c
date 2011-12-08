@@ -746,7 +746,7 @@ static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM	AM_BASE(m_vram) AM_MIRROR(0x0ffe0000)
 ADDRESS_MAP_END
-/*
+
 static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
     AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
@@ -761,10 +761,13 @@ static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
     AM_RANGE(0x50f20000, 0x50f21fff) AM_READ(buserror_r)    // bus error here to detect we're not the grayscale 160/165/180
     AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
 
-    AM_RANGE(0xfc040000, 0xfc07ffff) AM_RAM AM_BASE(m_vram)
-    AM_RANGE(0xfcff0000, 0xfcffffff) AM_ROM AM_REGION("bootrom", 0xf0000)
+    // on-board color video on 165c/180c
+    AM_RANGE(0xfc000000, 0xfc07ffff) AM_RAM AM_BASE(m_vram) AM_MIRROR(0x00380000) // 512k of VRAM
+    AM_RANGE(0xfc400000, 0xfcefffff) AM_READWRITE(macwd_r, macwd_w)
+// fc4003c8 = DAC control, fc4003c9 = DAC data
+// fc4003da bit 3 is VBL
+    AM_RANGE(0xfcff8000, 0xfcffffff) AM_ROM AM_REGION("vrom", 0x0000)
 ADDRESS_MAP_END
-*/
 
 static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
@@ -887,7 +890,7 @@ static const floppy_interface mac_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	NULL,
+	"floppy_3_5",
 	NULL
 };
 
@@ -967,6 +970,7 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,2560K,4M")
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
@@ -1080,6 +1084,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
@@ -1131,6 +1136,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,64M,96M,128M")
 
     // software list
+	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
@@ -1312,6 +1318,9 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,48M,64M,96M,128M")
+
+	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macpb140, mac_state )
@@ -1362,6 +1371,9 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M")
+
+	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
 // PowerBook 145 = 140 @ 25 MHz (still 2MB RAM - the 145B upped that to 4MB)
@@ -1432,6 +1444,9 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
+
+	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( macpb180, macpb160 )
@@ -1442,16 +1457,22 @@ static MACHINE_CONFIG_DERIVED( macpb180, macpb160 )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
-/*
+
 static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
     MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
     MCFG_CPU_PROGRAM_MAP(macpb165c_map)
+
+	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(800, 525)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE(macpbwd)
 
     MCFG_RAM_MODIFY(RAM_TAG)
     MCFG_RAM_DEFAULT_SIZE("4M")
     MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
-*/
+
 static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
@@ -1639,6 +1660,10 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M,32M,64M,68M,72M,80M,96M,128M")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( macplus )
@@ -2085,6 +2110,14 @@ ROM_START( macpb180 )
 	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) )
 ROM_END
 
+ROM_START( macpb180c )
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD( "e33b2724.rom", 0x000000, 0x100000, CRC(536c60f4) SHA1(c0510682ae6d973652d7e17f3c3b27629c47afac) )
+
+    ROM_REGION32_BE(0x8000, "vrom", 0)
+    ROM_LOAD( "pb180cvrom.bin", 0x0000, 0x8000, CRC(810c75ad) SHA1(3a936e97dee5ceeb25e50197ef504e514ae689a4))
+ROM_END
+
 ROM_START( maccclas )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
@@ -2118,7 +2151,7 @@ COMP( 1991, maclc2,   0,		0,	maclc2,   maciici,  maclc2,	      "Apple Computer",
 COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145", GAME_NOT_WORKING )
 COMP( 1992, macpb160, 0,        0,  macpb160, macadb,   macpb160,	  "Apple Computer", "Macintosh PowerBook 160", GAME_NOT_WORKING )
 COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb,   macpb160,	  "Apple Computer", "Macintosh PowerBook 180", GAME_NOT_WORKING )
-//COMP( 1992, macp180c, macpb160, 0,  macpb180c,macadb,   macpb160,       "Apple Computer", "Macintosh PowerBook 180c", GAME_NOT_WORKING )
+COMP( 1992, macpb180c,macpb160, 0,  macpb180c,macadb,   macpb160,     "Apple Computer", "Macintosh PowerBook 180c", GAME_NOT_WORKING )
 COMP( 1993, maccclas, 0,        0,  maclc2,   macadb,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
 COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145B", GAME_NOT_WORKING )
 COMP( 1993, maclc3,   0,		0,	maclc3,   maciici,  maclc3,	      "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )

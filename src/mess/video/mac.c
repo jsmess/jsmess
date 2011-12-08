@@ -63,15 +63,13 @@ PALETTE_INIT( mac )
 	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
 }
 
-// 16-level grayscale
+// 4-level grayscale
 PALETTE_INIT( macgsc )
 {
-	for (int i = 15; i >= 0; i--)
-	{
-		UINT8 component = i | (i<<4);
-
-		palette_set_color_rgb(machine, 15-i, component, component, component);
-	}
+	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
+	palette_set_color_rgb(machine, 1, 0x7f, 0x7f, 0x7f);
+	palette_set_color_rgb(machine, 2, 0x3f, 0x3f, 0x3f);
+	palette_set_color_rgb(machine, 3, 0x00, 0x00, 0x00);
 }
 
 VIDEO_START( mac )
@@ -201,12 +199,17 @@ SCREEN_UPDATE( macpb160 )
 	{
 		line = BITMAP_ADDR16(bitmap, y, 0);
 
-		for (x = 0; x < 640/2; x++)
+		for (x = 0; x < 640/4; x++)
 		{
-			pixels = vram8[(y * 320) + (BYTE4_XOR_BE(x))];
+			pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
 
-			*line++ = (pixels>>4)&0xf;
-			*line++ = pixels&0xf;
+//			*line++ = (pixels>>4)&0xf;
+//			*line++ = pixels&0xf;
+            *line++ = ((pixels>>6)&3);
+            *line++ = ((pixels>>4)&3);
+            *line++ = ((pixels>>2)&3);
+            *line++ = (pixels&3);
+
 		}
 	}
 	return 0;
@@ -979,5 +982,83 @@ SCREEN_UPDATE( macdafb )
 	}
 
 	return 0;
+}
+
+SCREEN_UPDATE( macpbwd )    /* Color PowerBooks using an off-the-shelf WD video chipset */
+{
+	UINT32 *scanline;
+	int x, y;
+	mac_state *mac = screen->machine().driver_data<mac_state>();
+    UINT8 *vram8 = (UINT8 *)mac->m_vram;
+    UINT8 pixels;
+
+//    vram8 += 0x40000;
+
+    for (y = 0; y < 480; y++)
+    {
+        scanline = BITMAP_ADDR32(bitmap, y, 0);
+        for (x = 0; x < 640; x++)
+        {
+            pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];
+            *scanline++ = mac->m_rbv_palette[pixels];
+        }
+    }
+
+    return 0;
+}
+
+READ32_MEMBER(mac_state::macwd_r)
+{
+    switch (offset)
+    {
+        case 0xf6:
+            if (m_screen->vblank())
+            {
+                return 0xffffffff;
+            }
+            else
+            {
+                return 0;
+            }
+            break;
+
+        default:
+//            printf("macwd_r: @ %x, mask %08x (PC=%x)\n", offset, mem_mask, cpu_get_pc(m_maincpu));
+            break;
+    }
+    return 0;
+}
+
+WRITE32_MEMBER(mac_state::macwd_w)
+{
+    switch (offset)
+    {
+        case 0xf2:
+            if (mem_mask == 0xff000000) // DAC control
+            {
+                m_rbv_clutoffs = data>>24;
+                m_rbv_count = 0;
+            }
+            else if (mem_mask == 0x00ff0000)    // DAC data
+            {
+                m_rbv_colors[m_rbv_count++] = (data>>16)&0xff;
+                if (m_rbv_count == 3)
+                {
+//                    printf("RAMDAC: color %d = %02x %02x %02x\n", m_rbv_clutoffs, m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
+                    m_rbv_palette[m_rbv_clutoffs] = MAKE_RGB(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
+                    m_rbv_clutoffs++;
+                    m_rbv_count = 0;
+                }
+            }
+            else
+            {
+                printf("macwd: Unknown DAC write, data %08x, mask %08x\n", data, mem_mask);
+            }
+            break;
+
+        default:
+            printf("macwd_w: %x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(m_maincpu));
+            break;
+    }
 }
 
