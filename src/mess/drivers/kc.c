@@ -173,7 +173,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "kc_flop")
-//  MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -228,7 +228,7 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "kc_flop")
-//  MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "kc_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
