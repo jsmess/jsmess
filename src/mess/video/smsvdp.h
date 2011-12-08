@@ -62,7 +62,8 @@ extern const device_type SEGA315_5378;		/* Gamegear vdp */
 
 
 class sega315_5124_device : public device_t,
-                            public smsvdp_interface
+                            public smsvdp_interface,
+                            public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -101,6 +102,8 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
+
 	UINT8            m_reg[16];                  /* All the registers */
 	UINT8            m_status;                   /* Status register */
 	UINT8            m_reg9copy;                 /* Internal copy of register 9 */
@@ -117,7 +120,6 @@ protected:
 	int              m_y_pixels;                 /* 192, 224, 240 */
 	UINT8            m_line_counter;
 	UINT8            m_hcounter;
-	memory_region    *m_VRAM;                    /* Pointer to VRAM */
 	memory_region    *m_CRAM;                    /* Pointer to CRAM */
 	const UINT8      *m_frame_timing;
 	bitmap_t         *m_tmpbitmap;
@@ -138,6 +140,8 @@ protected:
 	emu_timer        *m_check_hint_timer;
 	emu_timer        *m_check_vint_timer;
 	screen_device    *m_screen;
+
+	const address_space_config  m_space_config;
 
 	/* Timers */
 	static const device_timer_id TIMER_LINE = 0;
