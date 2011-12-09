@@ -164,7 +164,8 @@ static const struct pc_vga_interface bebox_vga_interface =
 	bebox_map_vga_memory,
 
 	NULL,
-
+	AS_PROGRAM,
+	0xC00A0000,
 	AS_PROGRAM,
 	0x80000000
 };
