@@ -142,6 +142,24 @@ enum
 };
 
 
+// external I/O
+enum
+{
+	INP = 0,
+	STAT,
+	OPS
+};
+
+enum
+{
+	OUT = 0,
+	C1 = 2,
+	C2,
+	C3,
+	C4
+};
+
+
 
 //**************************************************************************
 //  MEMORY ACCESS CONTROLLER
@@ -207,194 +225,218 @@ void abc1600_state::write_ram(offs_t offset, UINT8 data)
 
 UINT8 abc1600_state::read_io(offs_t offset)
 {
+	if (X12)
+	{
+		return read_internal_io(offset);
+	}
+	else
+	{
+		return read_external_io(offset);
+	}
+}
+
+
+//-------------------------------------------------
+//  read_internal_io -
+//-------------------------------------------------
+
+UINT8 abc1600_state::read_internal_io(offs_t offset)
+{
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 data = 0;
 
-	if (X12)
+	if (X11)
 	{
-		if (X11)
+		switch (A10_A9_A8)
 		{
-			switch (A10_A9_A8)
-			{
-			case IORD0:
-				data = iord0_r(*program, offset);
-				break;
+		case IORD0:
+			data = iord0_r(*program, offset);
+			break;
 
-			default:
-				logerror("%s Unmapped read from virtual I/O %06x\n", machine().describe_context(), offset);
-			}
-		}
-		else
-		{
-			switch (A10_A9_A8)
-			{
-			case FLP:
-				data = wd17xx_r(m_fdc, A2_A1);
-				break;
-
-			case CRT:
-				if (A0)
-					data = m_crtc->register_r(*program, offset);
-				else
-					data = m_crtc->status_r(*program, offset);
-				break;
-
-			case DRT:
-				data = z80dart_ba_cd_r(m_dart, A2_A1 ^ 0x03);
-				break;
-
-			case DMA0:
-				data = m_dma0->read();
-				break;
-
-			case DMA1:
-				data = m_dma1->read();
-				break;
-
-			case DMA2:
-				data = m_dma2->read();
-				break;
-
-			case SCC:
-				data = scc8530_r(m_scc, A1_A2);
-				break;
-
-			case CIO:
-				data = m_cio->read(*program, A2_A1);
-				break;
-			}
+		default:
+			logerror("%s Unmapped read from virtual I/O %06x\n", machine().describe_context(), offset);
 		}
 	}
 	else
 	{
-		// card select pulse
-		UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
-
-		m_bus0i->cs_w(cs);
-		m_bus0x->cs_w(cs);
-		m_bus1->cs_w(cs);
-		m_bus2->cs_w(cs);
-
-		// card select b?
-		m_csb = m_bus2->csb_r();
-		m_csb |= m_bus1->csb_r() << 1;
-		m_csb |= m_bus0x->xcsb2_r() << 2;
-		m_csb |= m_bus0x->xcsb3_r() << 3;
-		m_csb |= m_bus0x->xcsb4_r() << 4;
-		m_csb |= m_bus0x->xcsb5_r() << 5;
-		m_csb |= m_bus0x->csb_r() << 6;
-		m_csb |= m_bus0i->csb_r() << 7;
-
-		m_bus0 = !((m_csb & 0xfc) == 0xfc);
-
-		if (X11)
+		switch (A10_A9_A8)
 		{
-			if (A4)
-			{
-				// EXP
-				data = m_bus0x->exp_r();
+		case FLP:
+			data = wd17xx_r(m_fdc, A2_A1);
+			break;
 
-				logerror("%s EXP %02x: %02x\n", machine().describe_context(), cs, data);
-			}
+		case CRT:
+			if (A0)
+				data = m_crtc->register_r(*program, offset);
 			else
-			{
-				// RCSB
-				if (m_bus0)
-				{
-					/*
+				data = m_crtc->status_r(*program, offset);
+			break;
 
-                        bit     description
+		case DRT:
+			data = z80dart_ba_cd_r(m_dart, A2_A1 ^ 0x03);
+			break;
 
-                        0       1
-                        1       1
-                        2       LXCSB2*
-                        3       LXCSB3*
-                        4       LXCSB4*
-                        5       LXCSB5*
-                        6       LCSB*-0
-                        7       LCSB*-0I
+		case DMA0:
+			data = m_dma0->read();
+			break;
 
-                    */
+		case DMA1:
+			data = m_dma1->read();
+			break;
 
-					data = (m_csb & 0xfc) | 0x03;
-				}
-				else
-				{
-					/*
+		case DMA2:
+			data = m_dma2->read();
+			break;
 
-                        bit     description
+		case SCC:
+			data = scc8530_r(m_scc, A1_A2);
+			break;
 
-                        0       LCSB*-2
-                        1       LCSB*-1
-                        2       1
-                        3       1
-                        4       1
-                        5       1
-                        6       1
-                        7       1
+		case CIO:
+			data = m_cio->read(*program, A2_A1);
+			break;
+		}
+	}
 
-                    */
+	return data;
+}
 
-					data = 0xfc | (m_csb & 0x03);
-				}
 
-				logerror("%s RCSB %02x\n", machine().describe_context(), data);
-			}
+//-------------------------------------------------
+//  read_external_io -
+//-------------------------------------------------
+
+UINT8 abc1600_state::read_external_io(offs_t offset)
+{
+	UINT8 data = 0;
+
+	// card select pulse
+	UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
+
+	m_bus0i->cs_w(cs);
+	m_bus0x->cs_w(cs);
+	m_bus1->cs_w(cs);
+	m_bus2->cs_w(cs);
+
+	// card select b?
+	m_csb = m_bus2->csb_r();
+	m_csb |= m_bus1->csb_r() << 1;
+	m_csb |= m_bus0x->xcsb2_r() << 2;
+	m_csb |= m_bus0x->xcsb3_r() << 3;
+	m_csb |= m_bus0x->xcsb4_r() << 4;
+	m_csb |= m_bus0x->xcsb5_r() << 5;
+	m_csb |= m_bus0x->csb_r() << 6;
+	m_csb |= m_bus0i->csb_r() << 7;
+
+	m_bus0 = !((m_csb & 0xfc) == 0xfc);
+
+	if (X11)
+	{
+		if (A4)
+		{
+			// EXP
+			data = m_bus0x->exp_r();
+
+			logerror("%s EXP %02x: %02x\n", machine().describe_context(), cs, data);
 		}
 		else
 		{
-			data = 0xff;
-
-			switch ((offset >> 1) & 0x07)
+			// RCSB
+			if (m_bus0)
 			{
-			case 0: // INP
-				if (m_bus0)
-				{
-					data &= m_bus0i->inp_r();
-					data &= m_bus0x->inp_r();
-				}
-				else
-				{
-					data &= m_bus1->inp_r();
-					data &= m_bus2->inp_r();
-				}
+				/*
 
-				logerror("%s INP %02x: %02x\n", machine().describe_context(), cs, data);
-				break;
+					bit     description
 
-			case 1: // STAT
-				if (m_bus0)
-				{
-					data &= m_bus0i->stat_r();
-					data &= m_bus0x->stat_r();
-				}
-				else
-				{
-					data &= m_bus1->stat_r();
-					data &= m_bus2->stat_r();
-				}
+					0       1
+					1       1
+					2       LXCSB2*
+					3       LXCSB3*
+					4       LXCSB4*
+					5       LXCSB5*
+					6       LCSB*-0
+					7       LCSB*-0I
 
-				logerror("%s STAT %02x: %02x\n", machine().describe_context(), cs, data);
-				break;
+				*/
 
-			case 2: // OPS
-				if (m_bus0)
-				{
-					data &= m_bus0i->ops_r();
-					data &= m_bus0x->ops_r();
-				}
-				else
-				{
-					data &= m_bus1->ops_r();
-					data &= m_bus2->ops_r();
-				}
-
-				logerror("%s OPS %02x: %02x\n", machine().describe_context(), cs, data);
-				break;
-
-			default:
-				logerror("%s Unmapped read from virtual I/O %06x\n", machine().describe_context(), offset);
+				data = (m_csb & 0xfc) | 0x03;
 			}
+			else
+			{
+				/*
+
+					bit     description
+
+					0       LCSB*-2
+					1       LCSB*-1
+					2       1
+					3       1
+					4       1
+					5       1
+					6       1
+					7       1
+
+				*/
+
+				data = 0xfc | (m_csb & 0x03);
+			}
+
+			logerror("%s RCSB %02x\n", machine().describe_context(), data);
+		}
+	}
+	else
+	{
+		data = 0xff;
+
+		switch ((offset >> 1) & 0x07)
+		{
+		case INP:
+			if (m_bus0)
+			{
+				data &= m_bus0i->inp_r();
+				data &= m_bus0x->inp_r();
+			}
+			else
+			{
+				data &= m_bus1->inp_r();
+				data &= m_bus2->inp_r();
+			}
+
+			logerror("%s INP %02x: %02x\n", machine().describe_context(), cs, data);
+			break;
+
+		case STAT:
+			if (m_bus0)
+			{
+				data &= m_bus0i->stat_r();
+				data &= m_bus0x->stat_r();
+			}
+			else
+			{
+				data &= m_bus1->stat_r();
+				data &= m_bus2->stat_r();
+			}
+
+			logerror("%s STAT %02x: %02x\n", machine().describe_context(), cs, data);
+			break;
+
+		case OPS:
+			if (m_bus0)
+			{
+				data &= m_bus0i->ops_r();
+				data &= m_bus0x->ops_r();
+			}
+			else
+			{
+				data &= m_bus1->ops_r();
+				data &= m_bus2->ops_r();
+			}
+
+			logerror("%s OPS %02x: %02x\n", machine().describe_context(), cs, data);
+			break;
+
+		default:
+			logerror("%s Unmapped read from virtual I/O %06x\n", machine().describe_context(), offset);
 		}
 	}
 
@@ -408,182 +450,202 @@ UINT8 abc1600_state::read_io(offs_t offset)
 
 void abc1600_state::write_io(offs_t offset, UINT8 data)
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-
 	if (X12)
 	{
-		if (X11)
+		write_internal_io(offset, data);
+	}
+	else
+	{
+		write_external_io(offset, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  write_internal_io -
+//-------------------------------------------------
+
+void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
+{
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+
+	if (X11)
+	{
+		switch (A10_A9_A8)
 		{
-			switch (A10_A9_A8)
+		case IOWR0:
+			iowr0_w(*program, offset, data);
+			break;
+
+		case IOWR1:
+			iowr1_w(*program, offset, data);
+			break;
+
+		case IOWR2:
+			iowr2_w(*program, offset, data);
+			break;
+
+		case FW:
+			if (!A7)
 			{
-			case IOWR0:
-				iowr0_w(*program, offset, data);
-				break;
-
-			case IOWR1:
-				iowr1_w(*program, offset, data);
-				break;
-
-			case IOWR2:
-				iowr2_w(*program, offset, data);
-				break;
-
-			case FW:
-				if (!A7)
-				{
-					if (A0)
-						fw1_w(*program, offset, data);
-					else
-						fw0_w(*program, offset, data);
-				}
+				if (A0)
+					fw1_w(*program, offset, data);
 				else
-				{
-					logerror("%s Unmapped write to virtual I/O %06x : %02x\n", machine().describe_context(), offset, data);
-				}
-				break;
-
-			case DMAMAP:
-				dmamap_w(*program, offset, data);
-				break;
-
-			case SPEC_CONTR_REG:
-				spec_contr_reg_w(*program, offset, data);
-				break;
-
-			default:
+					fw0_w(*program, offset, data);
+			}
+			else
+			{
 				logerror("%s Unmapped write to virtual I/O %06x : %02x\n", machine().describe_context(), offset, data);
 			}
-		}
-		else
-		{
-			switch (A10_A9_A8)
-			{
-			case FLP:
-				wd17xx_w(m_fdc, A2_A1, data);
-				break;
+			break;
 
-			case CRT:
-				if (A0)
-					m_crtc->register_w(*program, offset, data);
-				else
-					m_crtc->address_w(*program, offset, data);
-				break;
+		case DMAMAP:
+			dmamap_w(*program, offset, data);
+			break;
 
-			case DRT:
-				z80dart_ba_cd_w(m_dart, A2_A1 ^ 0x03, data);
-				break;
+		case SPEC_CONTR_REG:
+			spec_contr_reg_w(*program, offset, data);
+			break;
 
-			case DMA0:
-				m_dma0->write(data);
-				break;
-
-			case DMA1:
-				m_dma1->write(data);
-				break;
-
-			case DMA2:
-				m_dma2->write(data);
-				break;
-
-			case SCC:
-				scc8530_w(m_scc, A1_A2, data);
-				break;
-
-			case CIO:
-				m_cio->write(*program, A2_A1, data);
-				break;
-			}
+		default:
+			logerror("%s Unmapped write to virtual I/O %06x : %02x\n", machine().describe_context(), offset, data);
 		}
 	}
 	else
 	{
-		UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
-
-		m_bus0i->cs_w(cs);
-		m_bus0x->cs_w(cs);
-		m_bus1->cs_w(cs);
-		m_bus2->cs_w(cs);
-
-		switch ((offset >> 1) & 0x07)
+		switch (A10_A9_A8)
 		{
-		case 0: // OUT
-			logerror("%s OUT %02x: %02x\n", machine().describe_context(), cs, data);
-
-			if (m_bus0)
-			{
-				m_bus0i->out_w(data);
-				m_bus0x->out_w(data);
-			}
-			else
-			{
-				m_bus1->out_w(data);
-				m_bus2->out_w(data);
-			}
+		case FLP:
+			wd17xx_w(m_fdc, A2_A1, data);
 			break;
 
-		case 2: // C1
-			logerror("%s C1 %02x: %02x\n", machine().describe_context(), cs, data);
-
-			if (m_bus0)
-			{
-				m_bus0i->c1_w(data);
-				m_bus0x->c1_w(data);
-			}
+		case CRT:
+			if (A0)
+				m_crtc->register_w(*program, offset, data);
 			else
-			{
-				m_bus1->c1_w(data);
-				m_bus2->c1_w(data);
-			}
+				m_crtc->address_w(*program, offset, data);
 			break;
 
-		case 3: // C2
-			logerror("%s C2 %02x: %02x\n", machine().describe_context(), cs, data);
-
-			if (m_bus0)
-			{
-				m_bus0i->c2_w(data);
-				m_bus0x->c2_w(data);
-			}
-			else
-			{
-				m_bus1->c2_w(data);
-				m_bus2->c2_w(data);
-			}
+		case DRT:
+			z80dart_ba_cd_w(m_dart, A2_A1 ^ 0x03, data);
 			break;
 
-		case 4: // C3
-			logerror("%s C3 %02x: %02x\n", machine().describe_context(), cs, data);
-
-			if (m_bus0)
-			{
-				m_bus0i->c3_w(data);
-				m_bus0x->c3_w(data);
-			}
-			else
-			{
-				m_bus1->c3_w(data);
-				m_bus2->c3_w(data);
-			}
+		case DMA0:
+			m_dma0->write(data);
 			break;
 
-		case 5: // C4
-			logerror("%s C4 %02x: %02x\n", machine().describe_context(), cs, data);
-
-			if (m_bus0)
-			{
-				m_bus0i->c4_w(data);
-				m_bus0x->c4_w(data);
-			}
-			else
-			{
-				m_bus1->c4_w(data);
-				m_bus2->c4_w(data);
-			}
+		case DMA1:
+			m_dma1->write(data);
 			break;
 
-		default:
-			logerror("%s Unmapped write %02x to virtual I/O %06x\n", machine().describe_context(), data, offset);
+		case DMA2:
+			m_dma2->write(data);
+			break;
+
+		case SCC:
+			scc8530_w(m_scc, A1_A2, data);
+			break;
+
+		case CIO:
+			m_cio->write(*program, A2_A1, data);
+			break;
 		}
+	}
+}
+
+
+//-------------------------------------------------
+//  write_external_io -
+//-------------------------------------------------
+
+void abc1600_state::write_external_io(offs_t offset, UINT8 data)
+{
+	UINT8 cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
+
+	m_bus0i->cs_w(cs);
+	m_bus0x->cs_w(cs);
+	m_bus1->cs_w(cs);
+	m_bus2->cs_w(cs);
+
+	switch ((offset >> 1) & 0x07)
+	{
+	case OUT:
+		logerror("%s OUT %02x: %02x\n", machine().describe_context(), cs, data);
+
+		if (m_bus0)
+		{
+			m_bus0i->out_w(data);
+			m_bus0x->out_w(data);
+		}
+		else
+		{
+			m_bus1->out_w(data);
+			m_bus2->out_w(data);
+		}
+		break;
+
+	case C1:
+		logerror("%s C1 %02x: %02x\n", machine().describe_context(), cs, data);
+
+		if (m_bus0)
+		{
+			m_bus0i->c1_w(data);
+			m_bus0x->c1_w(data);
+		}
+		else
+		{
+			m_bus1->c1_w(data);
+			m_bus2->c1_w(data);
+		}
+		break;
+
+	case C2:
+		logerror("%s C2 %02x: %02x\n", machine().describe_context(), cs, data);
+
+		if (m_bus0)
+		{
+			m_bus0i->c2_w(data);
+			m_bus0x->c2_w(data);
+		}
+		else
+		{
+			m_bus1->c2_w(data);
+			m_bus2->c2_w(data);
+		}
+		break;
+
+	case C3:
+		logerror("%s C3 %02x: %02x\n", machine().describe_context(), cs, data);
+
+		if (m_bus0)
+		{
+			m_bus0i->c3_w(data);
+			m_bus0x->c3_w(data);
+		}
+		else
+		{
+			m_bus1->c3_w(data);
+			m_bus2->c3_w(data);
+		}
+		break;
+
+	case C4:
+		logerror("%s C4 %02x: %02x\n", machine().describe_context(), cs, data);
+
+		if (m_bus0)
+		{
+			m_bus0i->c4_w(data);
+			m_bus0x->c4_w(data);
+		}
+		else
+		{
+			m_bus1->c4_w(data);
+			m_bus2->c4_w(data);
+		}
+		break;
+
+	default:
+		logerror("%s Unmapped write %02x to virtual I/O %06x\n", machine().describe_context(), data, offset);
 	}
 }
 
@@ -689,7 +751,7 @@ void abc1600_state::write_user_memory(offs_t offset, UINT8 data)
 	int nonx = 0, wp = 0;
 	offs_t virtual_offset = translate_address(offset, &nonx, &wp);
 
-	if (nonx || !wp) return;
+	//if (nonx || !wp) return;
 
 	if (virtual_offset < 0x1fe000)
 	{

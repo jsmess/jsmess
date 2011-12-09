@@ -154,6 +154,10 @@ public:
 	void write_ram(offs_t offset, UINT8 data);
 	UINT8 read_io(offs_t offset);
 	void write_io(offs_t offset, UINT8 data);
+	UINT8 read_internal_io(offs_t offset);
+	void write_internal_io(offs_t offset, UINT8 data);
+	UINT8 read_external_io(offs_t offset);
+	void write_external_io(offs_t offset, UINT8 data);
 	UINT8 read_user_memory(offs_t offset);
 	void write_user_memory(offs_t offset, UINT8 data);
 	int get_fc();
