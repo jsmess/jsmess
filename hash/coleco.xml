@@ -2815,7 +2815,7 @@
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="colecoVision final test (1982) (coleco).rom" size="8192" crc="3ae4b58c" sha1="cef53b9eae8dfbd877e18277980975f862f95f9d" offset="0x0000" />
+				<rom name="colecovision final test (1982) (coleco).rom" size="8192" crc="3ae4b58c" sha1="cef53b9eae8dfbd877e18277980975f862f95f9d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
