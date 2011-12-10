@@ -51387,7 +51387,7 @@ ExtractDisk  [02]"xanadu80_b	  " -> "xanadu_v80_02.d88"
 	</software>
 
 	<software name="shanghva">
-		<description>Shanghai</description>
+		<description>Shanghai (VA)</description>
 		<year>1986</year>
 		<publisher>システムソフト (System Software)</publisher>
        <info name="alt_title" value="上海" />
