@@ -759,7 +759,7 @@ static void spu_irq(device_t *device, UINT32 data)
 
 struct cdrom_interface psx_cdrom =
 {
-	NULL,
+	"psx_cdrom",
 	NULL
 };
 
