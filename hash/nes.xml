@@ -381,11 +381,31 @@
 			<dataarea name="prg" size="2097152">
 				<rom name="action52 pgm-a" size="524288" crc="a51212fd" sha1="746b226ffc8aa717e2f95a8bbcbdb92188a96cd2" offset="000000" />
 				<rom name="action52 pgm-b" size="524288" crc="476d0b72" sha1="cf481deb81a03210e615f6bd942fe9560c102d39" offset="0x080000" />
-                <rom value="0xff" size="524288" offset="0x100000" loadflag="fill" />
+				<rom value="0xff" size="524288" offset="0x100000" loadflag="fill" />
 				<rom name="action52 pgm-c" size="524288" crc="2568dba6" sha1="da29c98c4048a9ad2ac0d5017d4368c931ebbf8e" offset="0x180000" />
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="action52 chr-a" size="524288" crc="596442ec" sha1="dc31dc0870e393fc46494b5e386ab08e769ac514" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This alt dump comes from furrtek -->
+	<software name="action52b" cloneof="action52">
+		<description>Action 52 (USA, Rev. A, Alt?)</description>
+		<year>1991</year>
+		<publisher>Active Enterprises</publisher>
+		<info name="serial" value="ACT-52"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="MLT-ACTION52" />
+			<dataarea name="prg" size="2097152">
+				<rom name="action52 pgm a" size="524288" crc="a51212fd" sha1="746b226ffc8aa717e2f95a8bbcbdb92188a96cd2" offset="000000" />
+				<rom name="action52 pgm b" size="524288" crc="91cbf3b1" sha1="5eeda68e6bf04d89d0c2ed58ddd1ca4cb45fa123" offset="0x080000" />
+				<rom value="0xff" size="524288" offset="0x100000" loadflag="fill" />
+				<rom name="action52 pgm c" size="524288" crc="2568dba6" sha1="da29c98c4048a9ad2ac0d5017d4368c931ebbf8e" offset="0x180000" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="action52 chr a" size="524288" crc="596442ec" sha1="dc31dc0870e393fc46494b5e386ab08e769ac514" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2744,7 +2764,7 @@
 		<description>Baseball (Euro, USA)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-BA-USA, NES-BA-ESP"/>
+		<info name="serial" value="NES-BA-USA, NES-BA-(ESP/GBR)"/>
 		<info name="release" value="198510xx (USA), 1985xxxx (Euro)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
@@ -3367,7 +3387,7 @@
 		<description>Battletoads (Euro)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
-		<info name="serial" value="NES-8T (SCN/ESP)"/>
+		<info name="serial" value="NES-8T-(SCN/ESP/FRG)"/>
 		<info name="release" value="19930218"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-AOROM" />
@@ -4569,7 +4589,7 @@
 		<description>Bram Stoker's Dracula (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
-		<info name="serial" value="NES-DR-NOE"/>
+		<info name="serial" value="NES-DR-(NOE/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TSROM" />
 			<dataarea name="prg" size="131072">
@@ -4697,7 +4717,7 @@
 		<description>Bucky O'Hare (Euro)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
-		<info name="serial" value="NES-56 (NOE/SCN)"/>
+		<info name="serial" value="NES-56 (NOE/SCN/UKV)"/>
 		<info name="release" value="19920703"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -5118,7 +5138,7 @@
 		<description>Captain Planet and the Planeteers (Euro)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
-		<info name="serial" value="NES-5C (NOE/SCN)"/>
+		<info name="serial" value="NES-5C (NOE/SCN/UKV)"/>
 		<info name="release" value="19920820"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -6666,7 +6686,7 @@
 		<description>CrackOut (Euro)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
-		<info name="serial" value="NES-37-NOE"/>
+		<info name="serial" value="NES-37-(NOE/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -7988,11 +8008,11 @@
 	</software>
 
 	<software name="dkong3">
-		<description>Donkey Kong 3 (Jpn, USA)</description>
+		<description>Donkey Kong 3 (World)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="HVC-DT, NES-DT-USA"/>
-		<info name="release" value="19840704 (JPN), 198606xx (USA)"/>
+		<info name="serial" value="HVC-DT, NES-DT-USA, NES-DT-GBR"/>
+		<info name="release" value="19840704 (JPN), 198606xx (USA), 1987? (EUR)"/>
 		<info name="alt_title" value="ドンキーコング３"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HVC-SROM" /> <!-- also found with HVC-NROM-128, NES-NROM-128 pcb -->
@@ -9797,7 +9817,7 @@
 		<description>Elite (Euro)</description>
 		<year>1992</year>
 		<publisher>Imagineering</publisher>
-		<info name="serial" value="NES-EL (NOE/ESP)"/>
+		<info name="serial" value="NES-EL (NOE/ESP/UKV)"/>
 		<info name="release" value="19920703"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SNROM" />
@@ -13188,7 +13208,7 @@
 		<description>Godzilla - Monster of Monsters! (Euro)</description>
 		<year>1990</year>
 		<publisher>Toho</publisher>
-		<info name="serial" value="NES-GZ-FRA"/>
+		<info name="serial" value="NES-GZ-(FRA/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -13794,7 +13814,7 @@
 		<description>Gremlins 2: The New Batch (Euro)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="NES-2Z (EEC/FRG)"/>
+		<info name="serial" value="NES-2Z (EEC/FRG/ITA))"/>
 		<info name="release" value="19910221"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -14075,7 +14095,7 @@
 		<description>Gyromite (Euro, USA) ~ Gyro (Jpn)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="HVC-GY, NES-GY-USA, NES-GY-FRA"/>
+		<info name="serial" value="HVC-GY, NES-GY-USA, NES-GY-(FRA/GBR)"/>
 		<info name="release" value="19850813 (JPN), 198510xx (USA), 1985xxxx (Euro)"/>
 		<info name="alt_title" value="ジャイロ"/>
 		<part name="cart" interface="nes_cart">
@@ -15131,7 +15151,7 @@
 		<description>Hook (Euro)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="NES-7Q-NOE"/>
+		<info name="serial" value="NES-7Q-(NOE/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -16555,7 +16575,7 @@
 		<description>James Bond Jr (Euro)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
-		<info name="serial" value="NES-JB-NOE"/>
+		<info name="serial" value="NES-JB-(NOE/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -16851,7 +16871,7 @@
 		<description>Joe &amp; Mac: Caveman Ninja (Euro)</description>
 		<year>1992</year>
 		<publisher>Data East</publisher>
-		<info name="serial" value="NES-CJ (FRG/ESP/SCN)"/>
+		<info name="serial" value="NES-CJ (FRG/ESP/SCN/UKV))"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -17737,7 +17757,7 @@
 		<description>Kickle Cubicle (Euro)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-QC-NOE"/>
+		<info name="serial" value="NES-QC-(NOE/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -18602,7 +18622,7 @@
 		<description>Kung Fu (Euro)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-SX (EEC/ESP/NOE)"/>
+		<info name="serial" value="NES-SX (EEC/ESP/NOE/GBR/UKV)"/>
 		<info name="release" value="19870415"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
@@ -19009,7 +19029,7 @@
 		<info name="release" value="199102xx"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
-			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-j7-0 prg" size="131072" crc="91209041" sha1="d936c69f543db8bcaa2a3c6bb88a1816a5331f5c" offset="00000" />
 			</dataarea>
@@ -19797,7 +19817,7 @@
 		<description>Lunar Pool (Euro)</description>
 		<year>1991</year>
 		<publisher>FCI</publisher>
-		<info name="serial" value="NES-LP-FRA"/>
+		<info name="serial" value="NES-LP-(FRA/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="vertical" />
@@ -22121,7 +22141,7 @@
 		<description>Mike Tyson's Punch-Out!! (Euro, Rev. A)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-PT-EEC"/>
+		<info name="serial" value="NES-PT-(EEC/FRA)"/>
 		<info name="release" value="19871215"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-PNROM" />
@@ -22798,7 +22818,7 @@
 		<description>Monster In My Pocket (Euro)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
-		<info name="serial" value="NES-1Y-NOE"/>
+		<info name="serial" value="NES-1Y-(NOE/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3B" />
@@ -26316,7 +26336,7 @@
 		<description>Punch-Out!! (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-QP (EEC/ESP)"/>
+		<info name="serial" value="NES-QP-(EEC/ESP/UKV)"/>
 		<info name="release" value="19910301"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-PNROM" />
@@ -27096,9 +27116,10 @@
 		<description>Rainbow Islands: The Story of Bubble Bobble 2 (Euro)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="NES-64-ESP"/>
+		<info name="serial" value="NES-64-(ESP/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
 				<rom name="pal-64-0 prg" size="131072" crc="ae71768e" sha1="dc0ea1f07b8b5c70a7567be545618b3d4a3ba4d8" offset="00000" />
 			</dataarea>
@@ -33413,7 +33434,7 @@
 		<description>T2: Terminator 2: Judgment Day (Euro)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
-		<info name="serial" value="NES-62 (NOE/SCN/ESP)"/>
+		<info name="serial" value="NES-62 (NOE/SCN/ESP/UKV)"/>
 		<info name="release" value="19920509"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -35082,7 +35103,7 @@
 		<description>Time Lord (Euro)</description>
 		<year>1991</year>
 		<publisher>Milton Bradley</publisher>
-		<info name="serial" value="NES-LZ (NOE/ESP)"/>
+		<info name="serial" value="NES-LZ-(NOE/ESP/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-AMROM" />
 			<dataarea name="prg" size="131072">
@@ -37102,7 +37123,7 @@
 		<description>WWF WrestleMania Challenge (Euro)</description>
 		<year>1991</year>
 		<publisher>LJN</publisher>
-		<info name="serial" value="NES-W9 (UKV/NOE)"/>
+		<info name="serial" value="NES-W9-(UKV/NOE)"/>
 		<info name="release" value="19911220"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
@@ -37120,7 +37141,7 @@
 		<description>WWF Wrestlemania: Steel Cage Challenge (Euro)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
-		<info name="serial" value="NES-WS-NOE"/>
+		<info name="serial" value="NES-WS-(NOE/UKV)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3C" />
@@ -37600,7 +37621,7 @@
 		<info name="release" value="199109xx"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TSROM" />
-			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
 				<rom name="nes-6w-0 prg" size="131072" crc="2735af2e" sha1="3b51231c7fbf6a9bf91c1551a26cc58b0659c283" offset="00000" />
 			</dataarea>
@@ -39355,21 +39376,6 @@ If you can help us with any of these, please contact us (at the MESS boards) or 
 
 Also notice that VRAM, WRAM & mirror are probably incorrect for some of these sets, at the moment... -->
 
-	<software name="bioforce">
-		<description>Bio Force Ape (Jpn, Prototype)</description>
-		<year>1991</year>
-		<publisher>Seta</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="prg" size="131072">
-				<rom name="bio force ape (j)(prototype).prg" size="131072" crc="7a46c984" sha1="97418d2b6ef39efea9758d5b1a410536fefaf801" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="bio force ape (j)(prototype).chr" size="131072" crc="bab49652" sha1="9b81991c0c16e6b122f55c9da0b9a1b090ba6afa" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="100mandk" cloneof="casinok">
 		<description>100 Man Dollar Kid - Maboroshi no Teiou Hen (Jpn)</description>
 		<year>1989</year>
@@ -39487,11 +39493,12 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher> Infogrames </publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="chr" size="131072">
-				<rom name="action in new york (europe).chr" size="131072" crc="87b9342b" sha1="8f8dec53071a612804aaf514ea5553a66f03673f" offset="00000" status="baddump" />
+				<rom name="pal-fv-0 chr" size="131072" crc="87b9342b" sha1="8f8dec53071a612804aaf514ea5553a66f03673f" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="action in new york (europe).prg" size="131072" crc="2e1790a4" sha1="c0983f1bddbc6aefe32f4e616589932c2e609427" offset="00000" status="baddump" />
+				<rom name="pal-fv-0 prg" size="131072" crc="2e1790a4" sha1="c0983f1bddbc6aefe32f4e616589932c2e609427" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -39989,9 +39996,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-ANROM" />
+			<feature name="pcb" value="NES-AOROM" />
 			<dataarea name="prg" size="262144">
-				<rom name="battletoads &amp; double dragon - the ultimate team (europe).prg" size="262144" crc="23d7d48f" sha1="6a6579963319cc14da457c963fa43741bfbf645c" offset="00000" status="baddump" />
+				<rom name="pal-u8-0 prg" size="262144" crc="23d7d48f" sha1="6a6579963319cc14da457c963fa43741bfbf645c" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -40066,6 +40073,21 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bioforce">
+		<description>Bio Force Ape (Jpn, Prototype)</description>
+		<year>1991</year>
+		<publisher>Seta</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="bio force ape (j)(prototype).prg" size="131072" crc="7a46c984" sha1="97418d2b6ef39efea9758d5b1a410536fefaf801" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="bio force ape (j)(prototype).chr" size="131072" crc="bab49652" sha1="9b81991c0c16e6b122f55c9da0b9a1b090ba6afa" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45557,11 +45579,12 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="chr" size="131072">
-				<rom name="teenage mutant ninja turtles (italy).chr" size="131072" crc="d7b8af02" sha1="1a193282fd4d7063625ab43b79c810f13332683b" offset="00000" status="baddump" />
+				<rom name="pal-u2-0 chr" size="131072" crc="d7b8af02" sha1="1a193282fd4d7063625ab43b79c810f13332683b" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="teenage mutant ninja turtles (italy).prg" size="131072" crc="f1db1ca5" sha1="91bfef1695ac06783332f2530082ec12f718b184" offset="00000" status="baddump" />
+				<rom name="pal-u2-0 prg" size="131072" crc="f1db1ca5" sha1="91bfef1695ac06783332f2530082ec12f718b184" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
