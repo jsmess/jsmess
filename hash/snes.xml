@@ -55418,6 +55418,42 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="bslemmin" supported="no">
+		<description>Lemmings (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lemmings (bs).bs" size="1048576" crc="25e19b04" sha1="16d31b379d3aa212b9b0d2235b41e85c35aad7bc" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdokap4" supported="no">
+		<description>Kessen! Dokapon Oukoku IV - Densetsu no Yuusha-tachi (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="kessen! dokapon oukoku iv - densetsu no yuusha-tachi (bs).bs" size="1048576" crc="e6a2e0d8" sha1="a40d9dedeff858fca2a549fadb2cbe7f0a84fc44" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmaria" supported="no">
+		<description>Maria - Part 1 (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="maria - part 1 (bs).bs" size="1048576" crc="c406562f" sha1="52eadd827bdba497bc2b0dc10ccfec4abebc8c0f" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 
     <!-- BS Unknow packs, to be sorted out once we emulate this properly! -->
 
