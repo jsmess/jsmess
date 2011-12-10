@@ -723,7 +723,7 @@
 	<software name="carmnusa">
 		<description>Where in the USA is Carmen Sandiego?</description>
 		<year>1990</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -740,7 +740,7 @@
 	<software name="carmnwld">
 		<description>Where in the World is Carmen Sandiego?</description>
 		<year>1989</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -1136,7 +1136,7 @@
 	<software name="dhilchl">
 		<description>Downhill Challenge</description>
 		<year>1989</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819279">
@@ -1570,7 +1570,7 @@
 	<software name="fantavsn">
 		<description>Fantavision</description>
 		<year>1987</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -1789,7 +1789,7 @@
 	<software name="geometry">
 		<description>Geometry</description>
 		<year>1988</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -2544,7 +2544,7 @@
 	<software name="jamsessn">
 		<description>Jam Session</description>
 		<year>1989</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4197,7 +4197,7 @@
 	<software name="printshp">
 		<description>The Print Shop</description>
 		<year>1987</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4221,7 +4221,7 @@
 	<software name="prntshcm">
 		<description>The Print Shop Companion</description>
 		<year>1990</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4281,7 +4281,7 @@
 	<software name="psglbrdr">
 		<description>Print Shop Graphics Library - Border</description>
 		<year>1987</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4293,7 +4293,7 @@
 	<software name="psglprty">
 		<description>Print Shop Graphics Library - Party Library</description>
 		<year>1987</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4305,7 +4305,7 @@
 	<software name="psglsamp">
 		<description>Print Shop Graphics Library - Sampler Edition</description>
 		<year>1987</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4317,7 +4317,7 @@
 	<software name="psglse">
 		<description>Print Shop Graphics Library - Special Edition</description>
 		<year>1987</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4329,7 +4329,7 @@
 	<software name="psincidr">
 		<description>Print Shop InCider Data</description>
 		<year>1987</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -4827,7 +4827,7 @@
 	<software name="shflpuck">
 		<description>Shufflepuck Cafe (unreleased)</description>
 		<year>1990</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819271">
@@ -4883,7 +4883,7 @@
 	<software name="showoff">
 		<description>Show Off</description>
 		<year>1987</year>
-		<publisher>Broderbund</publisher>
+		<publisher>Brøderbund</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">

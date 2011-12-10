@@ -115,7 +115,7 @@ Possible Undumped protos: -
 		<description>A.E. (Prototype)</description>
 		<!-- Serial: N/A -->
 		<year>1982</year>
-		<publisher>Broderbund Software Inc</publisher>
+		<publisher>Brøderbund Software Inc</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="aep.bin" size="16384" crc="35484751" sha1="e18a603b18b85e24f9c938b33b6077a767c1fa9c" offset="0" />

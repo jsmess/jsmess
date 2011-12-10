@@ -254,7 +254,7 @@ Unlicensed Undumped Releases
 		<description>Choplifter! (NTSC)</description>
 		<!-- Serial: CX7821 -->
 		<year>1987</year>
-		<publisher>Atari / Broderbund</publisher>
+		<publisher>Atari / Brøderbund</publisher>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-0" />
 			<dataarea name="rom" size="32768">
@@ -267,7 +267,7 @@ Unlicensed Undumped Releases
 		<description>Choplifter! (PAL)</description>
 		<!-- Serial: CX7821 -->
 		<year>1987</year>
-		<publisher>Atari / Broderbund</publisher>
+		<publisher>Atari / Brøderbund</publisher>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-0" />
 			<dataarea name="rom" size="49152">
@@ -930,7 +930,7 @@ Unlicensed Undumped Releases
 		<description>Karateka (NTSC, Prototype)</description>
 		<!-- Serial: CX7822 -->
 		<year>1987</year>
-		<publisher>Atari / Broderbund</publisher>
+		<publisher>Atari / Brøderbund</publisher>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-0" />
 			<dataarea name="rom" size="49152">
@@ -943,7 +943,7 @@ Unlicensed Undumped Releases
 		<description>Karateka (PAL, Prototype)</description>
 		<!-- Serial: CX7822 -->
 		<year>1987</year>
-		<publisher>Atari / Broderbund</publisher>
+		<publisher>Atari / Brøderbund</publisher>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
 			<dataarea name="rom" size="65536">
