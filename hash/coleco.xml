@@ -2815,7 +2815,7 @@
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="finaltst.bin" size="8192" crc="48ff87cf" sha1="d28f866a931fb8b8c82509f3a563c4452302857a" offset="0x0000" />
+				<rom name="colecoVision final test (1982) (coleco).rom" size="8192" crc="3ae4b58c" sha1="cef53b9eae8dfbd877e18277980975f862f95f9d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2826,9 +2826,8 @@
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="suprtest.1" size="8192" crc="4a263a4a" sha1="9ea2e97baa9ba01ad8db74d454318cdc2b0c9f56" offset="0x0000" />
-				<rom name="suprtest.2" size="8192" crc="b4293435" sha1="5e2b96c19c4f5c63a5afa2de504d29fe64a4c908" offset="0x2000" />
+			<dataarea name="rom" size="8192">
+				<rom name="super action controller tester (1982) (nuvatec).rom" size="8192" crc="d206fe58" sha1="b96fe60d2a1ee107a3b5a9cc91d5c811e93768af" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2840,9 +2839,9 @@
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
-				<rom name="musicbox.1" size="8192" crc="79e97cb3" sha1="e77ad34e2099416bfe13a703ba42b793250e7763" offset="0x0000" />
+				<rom name="musicbox.1" size="8192" crc="4557ed22" sha1="4378dee48c482fc5dc8f0b15b505ef210ea97ea0" offset="0x0000" />
 				<rom name="musicbox.2" size="8192" crc="5f40d58b" sha1="e22bc0e4e9a141af65d33089c53be1d01ca14b64" offset="0x2000" />
-				<rom name="musicbox.3" size="8192" crc="dad27c5d" sha1="6df8179effb7093e9f890bd7ab9157188d9e330a" offset="0x4000" />
+				<rom name="musicbox.3" size="8192" crc="0ab26aaa" sha1="0b6d75ad61139b28b97ece36d458a502386decd8" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
