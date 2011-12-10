@@ -201,7 +201,12 @@ void kc_state::update_cassette(int state)
 	if (m_astb ^ astb)
 	{
 		z80pio_astb_w(m_z80pio, astb);
+
 		m_astb = astb;
+
+		// FIXME: temporary for allow kc85_2-3 to load cassette
+		if ((m_cassette->get_state() & 0x03) == CASSETTE_PLAY)
+			z80pio_d_w(m_z80pio, 0, m_pio_data[0]);
 	}
 }
 
