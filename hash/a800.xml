@@ -1383,7 +1383,7 @@ Compiled by K1W1
 	<software name="choplift">
 		<description>Choplifter!</description>
 		<year>1982</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<info name="serial" value="ATCART191" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
@@ -3835,7 +3835,7 @@ Compiled by K1W1
 	<software name="seafox">
 		<description>Sea Fox</description>
 		<year>1982</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<info name="serial" value="ATCART193" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
@@ -3861,7 +3861,7 @@ Compiled by K1W1
 	<software name="serptine">
 		<description>Serpentine</description>
 		<year>1982</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<info name="serial" value="ATCART190" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />

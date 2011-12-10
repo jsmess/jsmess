@@ -677,7 +677,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="cloderun">
 		<description>Championship Lode Runner (Jpn)</description>
 		<year>1985</year>
-		<publisher>Sega / Broderbund Software</publisher>
+		<publisher>Sega / Brøderbund Software</publisher>
 		<info name="serial" value="C-57"/>
 		<info name="alt_title" value="チャンピオンシップ ロードランナー"/>
 		<part name="cart" interface="sg1000_cart">
@@ -881,7 +881,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="drol">
 		<description>Drol (Jpn)</description>
 		<year>1985</year>
-		<publisher>Sega / Aik Beng / Broderbund Software</publisher>
+		<publisher>Sega / Aik Beng / Brøderbund Software</publisher>
 		<info name="serial" value="C-51"/>
 		<info name="alt_title" value="ドロール"/>
 		<part name="cart" interface="sg1000_cart">
@@ -1352,7 +1352,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	<software name="loderun">
 		<description>Lode Runner (Euro, Jpn)</description>
 		<year>1984</year>
-		<publisher>Sega / Broderbund Software</publisher>
+		<publisher>Sega / Brøderbund Software</publisher>
 		<info name="serial" value="G-1031"/>
 		<info name="alt_title" value="ロードランナー"/>
 		<part name="cart" interface="sg1000_cart">

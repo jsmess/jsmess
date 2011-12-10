@@ -1345,7 +1345,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<software name="choplift">
 		<description>Choplifter!</description>
 		<year>1982</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<info name="serial" value="231" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -2113,7 +2113,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<software name="loderunr">
 		<description>Lode Runner</description>
 		<year>1983</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<info name="serial" value="234" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -2964,7 +2964,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<software name="seafox">
 		<description>Seafox</description>
 		<year>1982</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<info name="serial" value="233" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -2993,7 +2993,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	<software name="serptine" supported="no">
 		<description>Serpentine</description>
 		<year>1982</year>
-		<publisher>Br0derbund</publisher>
+		<publisher>Brøderbund</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
