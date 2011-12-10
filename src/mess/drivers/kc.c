@@ -164,7 +164,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, kc_cassette_interface )
 
 	/* cartridge slot */
-	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, "m011", NULL)
 	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL, NULL)
 
 	/* expansion interface */

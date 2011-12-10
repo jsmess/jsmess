@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!--
+    Loading instructions:
+    - execute the LOAD command.
+
+	Notes:
+    - for KC 85/3-2 most games require a memory expansion, the M011 is installed by default, but
+      must be enabled executing SWITCH 8 3 before the LOAD command.
+    - KC85/2 doesn't have BASIC ROM and requires the M006 module for run BASIC games.
+-->
+
 <softwarelist name="kc_cass" description="VEB Mikroelektronik KC 85 cassette images">
 	<software name="vorstell">
 		<!-- C0184 Demo 85/4 -->
@@ -67,9 +77,23 @@
 		<description>House/4</description>
 		<year>1988</year>
 		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="4"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13577">
 				<rom name="house4.tap" size="13577" crc="603d2a73" sha1="b46f7d3beec299c2b083497c6c6f5b982c5e8bd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="house3">
+		<!-- C0161 Spiele 8 -->
+		<description>House/3</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="13577">
+				<rom name="house3.853" size="13577" crc="9f4f27ef" sha1="d4f8a5f0dafab3c0f7c656b35f6bd3979faf9ff8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -309,9 +333,23 @@
 		<description>Pursuit/4</description>
 		<year>1988</year>
 		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13319">
 				<rom name="pursuit4.tap" size="13319" crc="8da4f914" sha1="5e584c142c8d9ac62f55b6f06b8a4cba8d567ef0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pursuit3">
+		<!-- C0167 Spiele 5 -->
+		<description>Pursuit/3</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="13319">
+				<rom name="pursuit3.853" size="13319" crc="c0aa039a" sha1="f26b02b4b0997863132dd137c43dfddad52417ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -321,9 +359,23 @@
 		<description>Cave/4</description>
 		<year>1988</year>
 		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="6998">
 				<rom name="cave.tap" size="6998" crc="9e449df1" sha1="b354bd6b73bce2d2e4d147f2dca21edc27a9a2ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cave3">
+		<!-- C0167 Spiele 5 -->
+		<description>Cave/3</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6998">
+				<rom name="cave3mh.853" size="6998" crc="eadc6f35" sha1="0d7c34a18c1dbdf1d49684cb552637547ff04675" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -345,9 +397,23 @@
 		<description>Pengo/4</description>
 		<year>1988</year>
 		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="14222">
 				<rom name="pengo4.tap" size="14222" crc="bff08c58" sha1="50a13f2bdb0bad168c87e035bf093f0244c96086" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengo3">
+		<!-- C0168 Spiele 6 -->
+		<description>Pengo/3</description>
+		<year>1988</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="14222">
+				<rom name="pengo3m.853" size="14222" crc="e1d607df" sha1="7f1d82efd172c6a720c3737bee7a86a5554a76ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -357,9 +423,23 @@
 		<description>Digger/4</description>
 		<year>198?</year>
 		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="21317">
 				<rom name="digger4.tap" size="21317" crc="af590459" sha1="937c4f00b20c2330be76af8d9173f240da9a607e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digger3">	<!-- require mid-frame changes emulation -->
+		<!-- C0169 Spiele 7 -->
+		<description>Digger/3</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="21317">
+				<rom name="digger3m.853" size="21317" crc="1ba98635" sha1="e84ef5b4b7b6c3bbba0f20b3622e33a902a7b07a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -571,7 +651,7 @@
 	<software name="hallo">
 		<description>Hallo</description>
 		<year>198?</year>
-		<publisher>VEB Mikroelektronik</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="15109">
 				<rom name="hallo.tap" size="15109" crc="06f645e4" sha1="ae7960a7d12d4c7806b6ec75e9311abb3aca4259" offset="0" />
@@ -651,6 +731,7 @@
 		<description>WordPro '89</description>
 		<year>1989</year>
 		<publisher>Cube-Ware</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="10094">
 				<rom name="wp1989.tap" size="10094" crc="acf1e9f8" sha1="d4dfa399800896d28aaf39b697d18625bc3504fe" offset="0" />
@@ -662,6 +743,7 @@
 		<description>WordPro '86 v1</description>
 		<year>1986</year>
 		<publisher>Cube-Ware</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9965">
 				<rom name="wp1986v1.tap" size="9965" crc="80a83f4f" sha1="b253f9e13d160c40536d7dcb2862b184a68c4781" offset="0" />
@@ -673,6 +755,7 @@
 		<description>WordPro '86 v2</description>
 		<year>1986</year>
 		<publisher>Robotron</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="9191">
 				<rom name="wp1986v2.tap" size="9191" crc="793f53a3" sha1="e6e3a1328042bf4a78c429395b9c87b5244b6154" offset="0" />
@@ -684,6 +767,7 @@
 		<description>KCPlus</description>
 		<year>1991</year>
 		<publisher>TB-Soft</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="13561">
 				<rom name="kcplus.tap" size="13561" crc="5af3b84d" sha1="d71a8e20087f543055fbfd11004eca676352fe84" offset="0" />
@@ -695,9 +779,22 @@
 		<description>Jungle v1.4</description>
 		<year>1989</year>
 		<publisher>SOWACO</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="32653">
 				<rom name="jungle4.tap" size="32653" crc="23fdca3d" sha1="b5a503272a492411abe29732edeab318c25aa7f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungle13">
+		<description>Jungle v1.3</description>
+		<year>1989</year>
+		<publisher>SOWACO</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="31105">
+				<rom name="jungle.853" size="31105" crc="6cc0bb32" sha1="1e7e8395fbd4605a71e79c0efca92f3ff9462a03" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -706,6 +803,7 @@
 		<description>Jungle v2</description>
 		<year>1997</year>
 		<publisher>SOWACO</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="28267">
 				<rom name="jungle20.tap" size="28267" crc="68718148" sha1="c71878a91e5cbc2037aa250b71fc0b7d9d4733fc" offset="0" />
@@ -717,9 +815,405 @@
 		<description>Vollgas</description>
 		<year>1991</year>
 		<publisher>STS</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
 		<part name="cass" interface="kc_cass">
 			<dataarea name="cass" size="85720">
 				<rom name="vollgas.tap" size="85720" crc="2d631948" sha1="bb9b6e151ce52c21dbdcd4b01f734924e5479b4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombjack">
+		<description>Bomb-Jack</description>
+		<year>1991</year>
+		<publisher>STS</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="9820">
+				<rom name="bombjack.tap" size="9820" crc="46dd5023" sha1="dda548f45d4726a0e041082d33b2e566a4a842c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunship">
+		<description>Gunship 3000</description>
+		<year>1991</year>
+		<publisher>STS</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="7627">
+				<rom name="gunship.tap" size="7627" crc="e556bd57" sha1="2f701363e7a991db8a495b1728d59cdfe0397a90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karate">
+		<description>Karate</description>
+		<year>1991</year>
+		<publisher>STS</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="19624">
+				<rom name="karate.tap" size="19624" crc="fb7c7879" sha1="d118634a4a0a80cece78fba40092b0356390f185" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldrush">
+		<description>Goldrush</description>
+		<year>1990</year>
+		<publisher>DM-Software</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="14980">
+				<rom name="gold90.tap" size="14980" crc="40f5c243" sha1="6561fbf25965bfde4015f48d2660f6a4b9f139ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earth">
+		<description>Earth</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="16528">
+				<rom name="earth.tap" size="16528" crc="dfb0f136" sha1="482837a55da59348f28ceb84b000243752f3c9f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boulder4">
+		<description>Boulderdash 4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="16141">
+				<rom name="boulder4.tap" size="16141" crc="fd9dae9f" sha1="144304776ac9e8a393982a5e5bea37e7851b21bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bennion" supported="no">		<!-- keyboard doesn't works -->
+		<description>Bennion Geppy/4</description>
+		<year>1988</year>
+		<publisher>R.B. Software</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="22462">
+				<rom name="bennion.tap" size="22462" crc="469fc372" sha1="094fd67cf045650736817ff7d8d6a4c2a2a42012" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bennion3">
+		<description>Bennion Geppy/3</description>
+		<year>1988</year>
+		<publisher>R.B. Software</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="22075">
+				<rom name="bennion.853" size="22075" crc="7def3fc7" sha1="ae839c629ac65e2e5152cfca949eb10b457a0bea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gourmand">
+		<description>Gourmand</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="20785">
+				<rom name="gourmand.tap" size="20785" crc="c78ff932" sha1="3f3497cdccf2dc8bb623f8557538a2de313f87c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladder4">
+		<description>Ladder/4</description>
+		<year>198?</year>
+		<publisher>EJ SOFT</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6595">
+				<rom name="ladder.tap" size="6595" crc="787a611c" sha1="db35c3a7efbdad35d3236e64ab3e90de6a241620" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladder3">
+		<description>Ladder/3</description>
+		<year>198?</year>
+		<publisher>EJ SOFT</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6595">
+				<rom name="ladder.853" size="6595" crc="c5e24a51" sha1="09b04e5671743ffd9b7fb5711f56c20938f3bb91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladder13">
+		<description>Ladder v1.3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="21430">
+				<rom name="kcladder.tap" size="21430" crc="582ea44e" sha1="743b85e56929fa178003e94ae8be31daf5718c5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladder10" cloneof="ladder13">
+		<description>Ladder v1.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="19624">
+				<rom name="kcladdv1.tap" size="19624" crc="ef22742b" sha1="244beb6cb624eddbd6d42dca7058d11f4e9ce27f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladder20" cloneof="ladder13">
+		<description>Ladder v2.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="19882">
+				<rom name="kcladdv2.tap" size="19882" crc="3a5456c6" sha1="352c287d6466618ff86623eae077400e2af4cb0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mine2">
+		<description>Mine II</description>
+		<year>1990</year>
+		<publisher>STS</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="28525">
+				<rom name="mine-ii.tap" size="28525" crc="a562cf16" sha1="32d88949866f3b22781ed1d6f109d1dc8e448d1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perestro">
+		<description>Perestroika</description>
+		<year>1991</year>
+		<publisher>STS</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="12400">
+				<rom name="perestro.tap" size="12400" crc="b2b8742c" sha1="8b436c729bb51a54270cabc5e0aa95469f7d51b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bgarden">
+		<description>Big Garden</description>
+		<year>198?</year>
+		<publisher>wega-soft</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="29815">
+				<rom name="bigturn.tap" size="29815" crc="d6f9d416" sha1="3a17ec451a5db20a9d34d07ae891fd184adb73c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombswee">
+		<description>Bombsweeper</description>
+		<year>198?</year>
+		<publisher>Star Soft</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="7885">
+				<rom name="bombswee.853" size="7885" crc="53dae558" sha1="a2a1c6d991bd257996f8c2235d43f72854df561d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pharao4" supported="no">		<!-- video problems -->
+		<description>Pharao/4</description>
+		<year>1989</year>
+		<publisher>HIGHSOFT</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="20269">
+				<rom name="pharao.tap" size="20269" crc="393dc1a7" sha1="cef1a6009ebd8867aacfbd58124c530e37cdb652" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pharao3" supported="no">		<!-- keyboard doesn't works -->
+		<description>Pharao/3</description>
+		<year>1989</year>
+		<publisher>HIGHSOFT</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="27235">
+				<rom name="pharao3.853" size="27235" crc="839c71ee" sha1="a96d9a58d309199656c849e41925ce45aedfe285" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castle">
+		<description>The Castle</description>
+		<year>1989</year>
+		<publisher>KINGSOFT</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="11497">
+				<rom name="thecastl.853" size="11497" crc="f1ac7017" sha1="4d317f82356e47a351e39ac496f857cac83d0e96" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pyram25">
+		<description>Pyramide v2.5</description>
+		<year>1987</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="8659">
+				<rom name="pyramide.tap" size="8659" crc="cd321943" sha1="3511397028faa659bf107d4b7823d9d91ad642f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pyram15">
+		<description>Pyramide v1.5</description>
+		<year>1987</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="8917">
+				<rom name="pyramide.853" size="8917" crc="104277cd" sha1="c479f02ced3ca7cc9ac64385bf8c353e72a60e22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anaconda">
+		<description>Anaconda</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="5821">
+				<rom name="anaconda.tap" size="5821" crc="e058cac1" sha1="91de70a4ce3683f56d9cb20c325a66d4047ee16c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bellum">
+		<description>Bellum</description>
+		<year>198?</year>
+		<publisher>PAULIN</publisher>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="9175">
+				<rom name="bellum.tap" size="9175" crc="f23fe8ab" sha1="df3747074b57a986ec5c07d329a4dcd3ee726958" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakou4">
+		<description>Breakout/4</description>
+		<year>198?</year>
+		<publisher>SOWACO</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="12013">
+				<rom name="breakout.854" size="12013" crc="ce3f515c" sha1="b99e3556357ed48e82a0fb2f0a2a609e4fe9d662" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakou3">
+		<description>Breakout/3</description>
+		<year>198?</year>
+		<publisher>SOWACO</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="12013">
+				<rom name="breakout.853" size="12013" crc="f43588a7" sha1="96f64f5240bfe1fee314177e5b276312ebaa0f9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pacman</description>
+		<year>198?</year>
+		<publisher>SOWACO</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="12013">
+				<rom name="pacman.853" size="12013" crc="40a98acc" sha1="c0275602cadb85423b27d16604df0a3bd5f89a2a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labyrint">
+		<description>Labyrint</description>
+		<year>1988</year>
+		<publisher>SOWACO</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="9949">
+				<rom name="labyrint(1).853" size="9949" crc="1075a152" sha1="6602bdfff15f67eccb21614ef5bf657e2f7c0f71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heli4">
+		<description>Helicopter/4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6466">
+				<rom name="heli4.tap" size="6466" crc="da4350cb" sha1="56a2676a0155165a453a19ad496fdf94144226ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heli3">
+		<description>Helicopter/3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="6337">
+				<rom name="helicopt.853" size="6337" crc="bd9c1553" sha1="2b54233340a2288ebff78e5d33c8db6ba1b43063" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazes4">
+		<description>Mazes/4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="4-5"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="11368">
+				<rom name="mazes.tap" size="11368" crc="639f3e81" sha1="a5a805770e50ffcb1c5d6c5eec09609163c8ff56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazes3">
+		<description>Mazes/3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="11239">
+				<rom name="mazes.853" size="11239" crc="9d11ff77" sha1="49e1d3c99849c5033aa6af2557d2f7c9f9838257" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superski">
+		<description>Superski</description>
+		<year>1988</year>
+		<publisher>ALIWE-Software</publisher>
+		<sharedfeat name="compatibility" value="2-3"/>
+		<part name="cass" interface="kc_cass">
+			<dataarea name="cass" size="9562">
+				<rom name="superski.853" size="9562" crc="7db8b38e" sha1="6fe09c9ac8e66f3cf16ca0771b5e6b787d13f95a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
