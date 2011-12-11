@@ -1155,6 +1155,30 @@ WRITE8_MEMBER( adam_state::fdc6801_p4_w )
 //**************************************************************************
 
 //-------------------------------------------------
+//  TIMER_CALLBACK( paddle_d7reset_callback )
+//-------------------------------------------------
+
+static TIMER_CALLBACK( paddle_d7reset_callback )
+{
+	adam_state *state = machine.driver_data<adam_state>();
+
+	state->m_joy_status0 &= 0x7f;
+	state->m_joy_status1 &= 0x7f;
+}
+
+//-------------------------------------------------
+//  TIMER_CALLBACK( paddle_irqreset_callback )
+//-------------------------------------------------
+
+static TIMER_CALLBACK( paddle_irqreset_callback )
+{
+	adam_state *state = machine.driver_data<adam_state>();
+
+	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
 //  TIMER_DEVICE_CALLBACK( paddle_tick )
 //-------------------------------------------------
 
@@ -1164,9 +1188,14 @@ static TIMER_DEVICE_CALLBACK( paddle_tick )
 
 	coleco_scan_paddles(timer.machine(), &state->m_joy_status0, &state->m_joy_status1);
 
+	// on change, controller port d7 is set for a short period and an irq is fired on d7 rising edge
     if (state->m_joy_status0 || state->m_joy_status1)
 	{
-		device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
+		state->m_joy_d7_timer->adjust(attotime::from_usec(500)); // TODO: measure duration
+		// irq on rising edge, PULSE_LINE is not supported in this case, so clear it manually
+
+		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		state->m_joy_irq_timer->adjust(attotime::from_usec(11)); // TODO: measure duration
 	}
 }
 
@@ -1197,7 +1226,7 @@ WRITE8_MEMBER( adam_state::joystick_w )
 
 READ8_MEMBER( adam_state::input1_r )
 {
-	return coleco_paddle1_read(machine(), m_joy_mode, m_joy_status0);
+	return coleco_paddle_read(machine(), 0, m_joy_mode, m_joy_status0);
 }
 
 
@@ -1207,7 +1236,7 @@ READ8_MEMBER( adam_state::input1_r )
 
 READ8_MEMBER( adam_state::input2_r )
 {
-	return coleco_paddle1_read(machine(), m_joy_mode, m_joy_status1);
+	return coleco_paddle_read(machine(), 1, m_joy_mode, m_joy_status1);
 }
 
 
@@ -1617,6 +1646,9 @@ static M6801_INTERFACE( master6801_intf )
 
 void adam_state::machine_start()
 {
+	m_joy_d7_timer = machine().scheduler().timer_alloc(FUNC(paddle_d7reset_callback));
+	m_joy_irq_timer = machine().scheduler().timer_alloc(FUNC(paddle_irqreset_callback));
+
 	// register for state saving
 	save_item(NAME(m_mioc));
 	save_item(NAME(m_game));
@@ -1662,6 +1694,13 @@ void adam_state::machine_reset()
 	}
 
 	m_adamnet = 0;
+
+	m_joy_d7_timer->reset();
+	m_joy_status0 &= 0x7f;
+	m_joy_status1 &= 0x7f;
+
+	m_joy_irq_timer->reset();
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	bankswitch();
 }

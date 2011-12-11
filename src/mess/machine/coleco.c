@@ -8,172 +8,99 @@ void coleco_scan_paddles(running_machine &machine, int *joy_status0, int *joy_st
 	UINT8 ctrl_sel = input_port_read_safe(machine, "CTRLSEL", 0);
 
 	/* which controller shall we read? */
-	if ((ctrl_sel & 0x07) == 0x03)	// Driving controller
-		analog1 = input_port_read_safe(machine, "DRIV", 0);
+	if ((ctrl_sel & 0x07) == 0x02)	// Super Action Controller P1
+		analog1 = input_port_read_safe(machine, "SAC_SLIDE1", 0);
 
-	else
+	if ((ctrl_sel & 0x70) == 0x20)	// Super Action Controller P2
+		analog2 = input_port_read_safe(machine, "SAC_SLIDE2", 0);
+
+	/* In principle, even if not supported by any game, I guess we could have two Super
+       Action Controllers plugged into the Roller controller ports. Since I found no info
+       about the behavior of sliders in such a configuration, we overwrite SAC sliders with
+       the Roller trackball inputs and actually use the latter ones, when both are selected. */
+	if (ctrl_sel & 0x80)			// Roller controller
 	{
-		if ((ctrl_sel & 0x07) == 0x02)	// Super Action Controller P1
-			analog1 = input_port_read_safe(machine, "SAC_SLIDE1", 0);
-
-		if ((ctrl_sel & 0x70) == 0x20)	// Super Action Controller P2
-			analog2 = input_port_read_safe(machine, "SAC_SLIDE2", 0);
-
-		/* In principle, even if not supported by any game, I guess we could have two Super
-        Action Controllers plugged into the Roller controller ports. Since I found no info
-        about the behavior of sliders in such a configuration, we overwrite SAC sliders with
-        the Roller trackball inputs and actually use the latter ones, when both are selected. */
-		if (ctrl_sel & 0x80)				// Roller controller
-		{
-			analog1 = input_port_read_safe(machine, "ROLLER_X", 0);
-			analog2 = input_port_read_safe(machine, "ROLLER_Y", 0);
-		}
+		analog1 = input_port_read_safe(machine, "ROLLER_X", 0);
+		analog2 = input_port_read_safe(machine, "ROLLER_Y", 0);
 	}
 
     if (analog1 == 0)
 		*joy_status0 = 0;
-    else if (analog1 & 0x08)
-		*joy_status0 = -1;
+    else if (analog1 & 8)
+		*joy_status0 = 0x8f;
     else
-		*joy_status0 = 1;
+		*joy_status0 = 0x81;
 
     if (analog2 == 0)
 		*joy_status1 = 0;
-    else if (analog2 & 0x08)
-		*joy_status1 = -1;
+    else if (analog2 & 8)
+		*joy_status1 = 0x8f;
     else
-		*joy_status1 = 1;
+		*joy_status1 = 0x81;
 }
 
 
-UINT8 coleco_paddle1_read(running_machine &machine, int joy_mode, int joy_status)
+UINT8 coleco_paddle_read(running_machine &machine, int port, int joy_mode, int joy_status)
 {
 	UINT8 ctrl_sel = input_port_read_safe(machine, "CTRLSEL", 0);
+	UINT8 ctrl_extra = ctrl_sel & 0x80;
+	ctrl_sel = ctrl_sel >> (port*4) & 7;
 
-	/* is there a controller connected to port1? */
-	if ((ctrl_sel & 0x07) != 0x01 )
+	/* Keypad and fire 1 (SAC Yellow Button) */
+	if (joy_mode == 0)
 	{
-		/* Keypad and fire 1 (SAC Yellow Button) */
-		if (joy_mode == 0)
-		{
-			UINT8 data = 0x0f;	/* No key pressed by default */
-			UINT16 ipt1 = 0x00;
+		/* No key pressed by default */
+		UINT8 data = 0x0f;
+		UINT16 ipt = 0;
 
-			if ((ctrl_sel & 0x07) == 0x00)			// colecovision controller
-				ipt1 = input_port_read(machine, "KEYPAD1");
-			else if ((ctrl_sel & 0x07) == 0x02)		// super action controller controller
-				ipt1 = input_port_read(machine, "SAC_KPD1");
+		if (ctrl_sel == 0)			// colecovision controller
+			ipt = input_port_read(machine, port ? "KEYPAD2" : "KEYPAD1");
+		else if (ctrl_sel == 2)		// super action controller
+			ipt = input_port_read(machine, port ? "SAC_KPD2" : "SAC_KPD1");
+		else						// unconnected
+			ipt = 0xffff;
 
-			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
-            than one, a real ColecoVision think that it is a third button, so we are going to emulate
-            the right behaviour */
-			/* Super Action Controller additional buttons are read in the same way */
-			if ((ctrl_sel & 0x07) != 0x03) /* If Driving Controller enabled -> no keypad 1*/
-			{
-				if (!(ipt1 & 0x0001)) data &= 0x0a; /* 0 */
-				if (!(ipt1 & 0x0002)) data &= 0x0d; /* 1 */
-				if (!(ipt1 & 0x0004)) data &= 0x07; /* 2 */
-				if (!(ipt1 & 0x0008)) data &= 0x0c; /* 3 */
-				if (!(ipt1 & 0x0010)) data &= 0x02; /* 4 */
-				if (!(ipt1 & 0x0020)) data &= 0x03; /* 5 */
-				if (!(ipt1 & 0x0040)) data &= 0x0e; /* 6 */
-				if (!(ipt1 & 0x0080)) data &= 0x05; /* 7 */
-				if (!(ipt1 & 0x0100)) data &= 0x01; /* 8 */
-				if (!(ipt1 & 0x0200)) data &= 0x0b; /* 9 */
-				if (!(ipt1 & 0x0400)) data &= 0x06; /* # */
-				if (!(ipt1 & 0x0800)) data &= 0x09; /* . */
-				if (!(ipt1 & 0x1000)) data &= 0x04; /* Blue Action Button */
-				if (!(ipt1 & 0x2000)) data &= 0x08; /* Purple Action Button */
-			}
+		/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
+           than one, a real ColecoVision think that it is a third button, so we are going to emulate
+           the right behaviour */
+		/* Super Action Controller additional buttons are read in the same way */
+		if (!(ipt & 0x0001)) data &= 0x0a; /* 0 */
+		if (!(ipt & 0x0002)) data &= 0x0d; /* 1 */
+		if (!(ipt & 0x0004)) data &= 0x07; /* 2 */
+		if (!(ipt & 0x0008)) data &= 0x0c; /* 3 */
+		if (!(ipt & 0x0010)) data &= 0x02; /* 4 */
+		if (!(ipt & 0x0020)) data &= 0x03; /* 5 */
+		if (!(ipt & 0x0040)) data &= 0x0e; /* 6 */
+		if (!(ipt & 0x0080)) data &= 0x05; /* 7 */
+		if (!(ipt & 0x0100)) data &= 0x01; /* 8 */
+		if (!(ipt & 0x0200)) data &= 0x0b; /* 9 */
+		if (!(ipt & 0x0400)) data &= 0x06; /* # */
+		if (!(ipt & 0x0800)) data &= 0x09; /* . */
+		if (!(ipt & 0x1000)) data &= 0x04; /* Blue Action Button */
+		if (!(ipt & 0x2000)) data &= 0x08; /* Purple Action Button */
 
-			return ((ipt1 & 0x4000) >> 8) | 0x30 | (data);
-		}
-		/* Joystick and fire 2 (SAC Red Button) */
-		else
-		{
-			UINT8 data = 0x0f;
-
-			if ((ctrl_sel & 0x07) == 0x00)			// colecovision controller
-				data = input_port_read(machine, "JOY1") & 0xcf;
-			else if ((ctrl_sel & 0x07) == 0x02)		// super action controller controller
-				data = input_port_read(machine, "SAC_JOY1") & 0xcf;
-
-			 /* If any extra contoller enabled */
-			if ((ctrl_sel & 0x80) || ((ctrl_sel & 0x07) == 0x02) || ((ctrl_sel & 0x07) == 0x03))
-			{
-				if (joy_status == 0) data |= 0x30; /* Spinner Move Left*/
-				else if (joy_status == 1) data |= 0x20; /* Spinner Move Right */
-			}
-
-			return data | 0x80;
-		}
+		return (joy_status & 0x80) | ((ipt & 0x4000) >> 8) | 0x30 | data;
 	}
-
-	return 0x0f;
-}
-
-
-UINT8 coleco_paddle2_read(running_machine &machine, int joy_mode, int joy_status)
-{
-	UINT8 ctrl_sel = input_port_read_safe(machine, "CTRLSEL", 0);
-
-	/* is there a controller connected to port2? */
-	if ((ctrl_sel & 0x70) != 0x10 )
+	/* Joystick and fire 2 (SAC Red Button) */
+	else
 	{
-		/* Keypad and fire 1 */
-		if (joy_mode == 0)
+		UINT8 data = 0x7f;
+
+		if (ctrl_sel == 0)			// colecovision controller
+			data = input_port_read(machine, port ? "JOY2" : "JOY1");
+		else if (ctrl_sel == 2)		// super action controller
+			data = input_port_read(machine, port ? "SAC_JOY2" : "SAC_JOY1");
+
+		/* If any extra contoller enabled */
+		if (ctrl_extra || ctrl_sel == 2 || ctrl_sel == 3)
 		{
-			UINT8 data = 0x0f;	/* No key pressed by default */
-			UINT16 ipt2 = 0x00;
-
-			if ((ctrl_sel & 0x70) == 0x00)			// colecovision controller
-				ipt2 = input_port_read(machine, "KEYPAD2");
-			else if ((ctrl_sel & 0x70) == 0x20)		// super action controller controller
-				ipt2 = input_port_read(machine, "SAC_KPD2");
-
-			/* Numeric pad buttons are not independent on a real ColecoVision, if you push more
-            than one, a real ColecoVision think that it is a third button, so we are going to emulate
-            the right behaviour */
-			/* Super Action Controller additional buttons are read in the same way */
-			if (!(ipt2 & 0x0001)) data &= 0x0a; /* 0 */
-			if (!(ipt2 & 0x0002)) data &= 0x0d; /* 1 */
-			if (!(ipt2 & 0x0004)) data &= 0x07; /* 2 */
-			if (!(ipt2 & 0x0008)) data &= 0x0c; /* 3 */
-			if (!(ipt2 & 0x0010)) data &= 0x02; /* 4 */
-			if (!(ipt2 & 0x0020)) data &= 0x03; /* 5 */
-			if (!(ipt2 & 0x0040)) data &= 0x0e; /* 6 */
-			if (!(ipt2 & 0x0080)) data &= 0x05; /* 7 */
-			if (!(ipt2 & 0x0100)) data &= 0x01; /* 8 */
-			if (!(ipt2 & 0x0200)) data &= 0x0b; /* 9 */
-			if (!(ipt2 & 0x0400)) data &= 0x06; /* # */
-			if (!(ipt2 & 0x0800)) data &= 0x09; /* . */
-			if (!(ipt2 & 0x1000)) data &= 0x04; /* Blue Action Button */
-			if (!(ipt2 & 0x2000)) data &= 0x08; /* Purple Action Button */
-
-			return ((ipt2 & 0x4000) >> 8) | 0x30 | (data);
+			data &= 0xcf;
+			if (joy_status == 0) data |= 0x30; /* Spinner Move Left */
+			else if (joy_status == 0x81) data |= 0x20; /* Spinner Move Right */
 		}
-		/* Joystick and fire 2*/
-		else
-		{
-			UINT8 data = 0x0f;
 
-			if ((ctrl_sel & 0x70) == 0x00)			// colecovision controller
-				data = input_port_read(machine, "JOY2") & 0xcf;
-			else if ((ctrl_sel & 0x70) == 0x20)		// super action controller controller
-				data = input_port_read(machine, "SAC_JOY2") & 0xcf;
-
-			/* If Roller Controller or P2 Super Action Controller enabled */
-			if ((ctrl_sel & 0x80) || ((ctrl_sel & 0x70) == 0x20))
-			{
-				if (joy_status == 0) data |= 0x30;
-				else if (joy_status == 1) data |= 0x20;
-			}
-
-			return data | 0x80;
-		}
+		return (joy_status & 0x80) | (data & 0x7f);
 	}
-
-	return 0x0f;
 }
 
 
@@ -296,18 +223,9 @@ static INPUT_PORTS_START( sac2 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( driving )
-	PORT_START("DRIV")	// Driving Controller
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_L) PORT_CODE_INC(KEYCODE_J) PORT_RESET PORT_CONDITION("CTRLSEL", 0x07, PORTCOND_EQUALS, 0x03)
-
-//  PORT_START("IN8")   //
-//  PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_PLAYER(2)
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( roller )
 	PORT_START("ROLLER_X")	// Roller Controller X Axis
-	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_L) PORT_CODE_INC(KEYCODE_J) PORT_RESET PORT_CONDITION("CTRLSEL", 0x80, PORTCOND_EQUALS, 0x80)
+	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_L) PORT_CODE_INC(KEYCODE_J) PORT_REVERSE PORT_RESET PORT_CONDITION("CTRLSEL", 0x80, PORTCOND_EQUALS, 0x80)
 
 	PORT_START("ROLLER_Y")	// Roller Controller Y Axis
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_RESET PORT_CONDITION("CTRLSEL", 0x80, PORTCOND_EQUALS, 0x80)
@@ -319,8 +237,7 @@ INPUT_PORTS_START( coleco )
 	PORT_CONFNAME( 0x07, 0x00, "Port 1 Controller" )
 	PORT_CONFSETTING(  0x01, DEF_STR( None ) )
 	PORT_CONFSETTING(  0x00, "ColecoVision Controller" )
-	PORT_CONFSETTING(  0x02, "Super Action Controller" )
-	PORT_CONFSETTING(  0x03, "Driving Controller" )
+	PORT_CONFSETTING(  0x02, "Super Action/Driving Controller" )
 	PORT_CONFNAME( 0x70, 0x00, "Port 2 Controller" )
 	PORT_CONFSETTING(  0x10, DEF_STR( None ) )
 	PORT_CONFSETTING(  0x00, "ColecoVision Controller" )
@@ -333,6 +250,5 @@ INPUT_PORTS_START( coleco )
 	PORT_INCLUDE( ctrl2 )
 	PORT_INCLUDE( sac1 )
 	PORT_INCLUDE( sac2 )
-	PORT_INCLUDE( driving )
 	PORT_INCLUDE( roller )
 INPUT_PORTS_END
