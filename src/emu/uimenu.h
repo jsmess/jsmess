@@ -57,9 +57,7 @@ class ui_menu;
 
 
 /* menu-related callback functions */
-typedef void (*ui_menu_handler_func)(running_machine &machine, ui_menu *menu, void *parameter, void *state);
 typedef void (*ui_menu_custom_func)(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-typedef void (*ui_menu_destroy_state_func)(ui_menu *menu, void *state);
 
 
 /* menu-related events */
@@ -92,18 +90,14 @@ public:
 class ui_menu
 {
 public:
-	ui_menu(running_machine &machine, render_container *container, ui_menu_handler_func handler, void *parameter);
-	~ui_menu();
+	ui_menu(running_machine &machine, render_container *container);
+	virtual ~ui_menu();
 
 	running_machine &machine() const { return m_machine; }
 
 	render_container *	container;			/* render_container we render to */
-	ui_menu_handler_func handler;			/* handler callback */
-	void *				parameter;			/* parameter */
 	ui_menu_event		menu_event;			/* the UI menu_event that occurred */
 	ui_menu *			parent;				/* pointer to parent menu */
-	void *				state;				/* menu-specific state */
-	ui_menu_destroy_state_func destroy_state; /* destroy state callback */
 	int					resetpos;			/* reset position */
 	void *				resetref;			/* reset reference */
 	int					selected;			/* which item is selected */
@@ -112,7 +106,6 @@ public:
 	int					numitems;			/* number of items in the menu */
 	int					allocitems;			/* allocated size of array */
 	ui_menu_item *		item;				/* pointer to array of items */
-	ui_menu_custom_func custom;				/* callback for custom rendering */
 	float				customtop;			/* amount of extra height to add at the top */
 	float				custombottom;		/* amount of extra height to add at the bottom */
 	ui_menu_pool *		pool;				/* list of memory pools */
@@ -130,10 +123,7 @@ public:
 	const ui_menu_event *process(UINT32 flags);
 
 	/* configure the menu for custom rendering */
-	void set_custom_render(ui_menu_custom_func custom, float top, float bottom);
-
-	/* allocate permanent memory to represent the menu's state */
-	void *alloc_state(size_t size, ui_menu_destroy_state_func destroy_state);
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 	/* allocate temporary memory from the menu's memory pool */
 	void *m_pool_alloc(size_t size);
@@ -174,6 +164,14 @@ public:
 	void validate_selection(int scandir);
 	static ui_menu *menu_stack;
 
+	void do_handle();
+
+	/* To be reimplemented in the menu subclass */
+	virtual void populate() = 0;
+
+	/* To be reimplemented in the menu subclass */
+	virtual void handle() = 0;
+
 private:
 	static ui_menu *menu_free;
 	static bitmap_t *hilight_bitmap;
@@ -193,18 +191,5 @@ private:
 	static void clear_free_list(running_machine &machine);
 	static void render_triangle(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param);
 };
-
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-/* ----- core menu management ----- */
-
-/* allocate a new menu */
-ui_menu *ui_menu_alloc(running_machine &machine, render_container *container, ui_menu_handler_func handler, void *parameter);
 
 #endif	/* __UIMENU_H__ */
