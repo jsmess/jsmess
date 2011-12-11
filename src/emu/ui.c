@@ -1385,7 +1385,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 
 	/* if the on-screen display isn't up and the user has toggled it, turn it on */
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
-		return ui_set_handler(ui_slider_ui_handler, 1);
+		return ui_set_handler(ui_menu_sliders::ui_handler, 1);
 
 	/* handle a reset request */
 	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))

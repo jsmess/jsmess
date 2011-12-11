@@ -127,24 +127,12 @@ void ui_menu::exit(running_machine &machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ui_menu_alloc - allocate a new menu
--------------------------------------------------*/
-
-ui_menu *ui_menu_alloc(running_machine &machine, render_container *container, ui_menu_handler_func handler, void *parameter)
-{
-	return auto_alloc_clear(machine, ui_menu(machine, container, handler, parameter));
-}
-
-
-/*-------------------------------------------------
     ui_menu - menu constructor
 -------------------------------------------------*/
-ui_menu::ui_menu(running_machine &machine, render_container *_container, ui_menu_handler_func _handler, void *_parameter) : m_machine(machine)
+ui_menu::ui_menu(running_machine &machine, render_container *_container) : m_machine(machine)
 {
 	special_main_menu = false;
 	container = _container;
-	handler = _handler;
-	parameter = _parameter;
 
 	reset(UI_MENU_RESET_SELECT_FIRST);
 }
@@ -167,14 +155,6 @@ ui_menu::~ui_menu()
 	/* free the item array */
 	if (item)
 		auto_free(machine(), item);
-
-	/* free the state */
-	if (state != NULL)
-	{
-		if (destroy_state)
-			destroy_state(this, state);
-		auto_free(machine(), state);
-	}
 }
 
 
@@ -333,39 +313,6 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 		return &menu_event;
 	}
 	return NULL;
-}
-
-
-/*-------------------------------------------------
-    set_custom_render - configure the menu
-    for custom rendering
--------------------------------------------------*/
-
-void ui_menu::set_custom_render(ui_menu_custom_func customfn, float top, float bottom)
-{
-	custom = customfn;
-	customtop = top;
-	custombottom = bottom;
-}
-
-
-/*-------------------------------------------------
-    alloc_state - allocate permanent
-    memory to represent the menu's state
--------------------------------------------------*/
-
-void *ui_menu::alloc_state(size_t size, ui_menu_destroy_state_func destroy_state_fn)
-{
-	if (state != NULL)
-	{
-		if (destroy_state != NULL)
-			destroy_state(this, state);
-		auto_free(machine(), state);
-	}
-	state = auto_alloc_array_clear(machine(), UINT8, size);
-	destroy_state = destroy_state_fn;
-
-	return state;
 }
 
 
@@ -715,17 +662,16 @@ void ui_menu::draw(bool customonly)
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 	}
 
-	/* if there is something special to add, do it by calling the passed routine */
-	if (custom != NULL)
-	{
-		void *selectedref = (selected >= 0 && selected < numitems) ? item[selected].ref : NULL;
-		custom(machine(), this, state, selectedref, customtop, custombottom, x1, y1, x2, y2);
-	}
+	/* if there is something special to add, do it by calling the virtual method */
+	custom_render((selected >= 0 && selected < numitems) ? item[selected].ref : NULL, customtop, custombottom, x1, y1, x2, y2);
 
 	/* return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow */
 	visitems = visible_lines - (top_line != 0) - (top_line + visible_lines != numitems);
 }
 
+void ui_menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+{
+}
 
 /*-------------------------------------------------
     draw_text_box - draw a multiline
@@ -1033,7 +979,6 @@ void ui_menu::stack_push(ui_menu *menu)
 {
 	menu->parent = menu_stack;
 	menu_stack = menu;
-	menu->reset(UI_MENU_RESET_SELECT_FIRST);
 	ui_input_reset(menu->machine());
 }
 
@@ -1071,6 +1016,12 @@ bool ui_menu::stack_has_special_main_menu()
 	return false;
 }
 
+void ui_menu::do_handle()
+{
+	if(!populated())
+		populate();
+	handle();
+}
 
 
 /***************************************************************************
@@ -1086,14 +1037,11 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 {
 	/* if we have no menus stacked up, start with the main menu */
 	if (menu_stack == NULL)
-		stack_push(ui_menu_alloc(machine, container, menu_main, NULL));
+		stack_push(auto_alloc_clear(machine, ui_menu_main(machine, container)));
 
 	/* update the menu state */
 	if (menu_stack != NULL)
-	{
-		ui_menu *menu = menu_stack;
-		(*menu->handler)(machine, menu, menu->parameter, menu->state);
-	}
+		menu_stack->do_handle();
 
 	/* clear up anything pending to be released */
 	clear_free_list(machine);

@@ -1159,6 +1159,14 @@ static void render_editor(DView_edit *editor)
     menu_main_populate - populate the main menu
   -------------------------------------------------*/
 
+class ui_menu_what_the_hell : public ui_menu {
+public:
+	ui_menu_what_the_hell(running_machine &machine, render_container *container) : ui_menu(machine, container) {}
+	virtual ~ui_menu_what_the_hell() {}
+	virtual void populate() {}
+	virtual void handle() {}
+};
+
 static void CreateMainMenu(running_machine &machine)
 {
 	const char *subtext = "";
@@ -1167,7 +1175,7 @@ static void CreateMainMenu(running_machine &machine)
 
 	if (menu)
 		auto_free(machine, menu);
-	menu = ui_menu_alloc(machine, &machine.render().ui_container(),NULL,NULL);
+	menu = auto_alloc_clear(machine, ui_menu_what_the_hell(machine, &machine.render().ui_container()));
 
 	switch (focus_view->type)
 	{
