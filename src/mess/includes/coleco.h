@@ -32,11 +32,18 @@ public:
 	DECLARE_WRITE8_MEMBER( paddle_off_w );
 	DECLARE_WRITE8_MEMBER( paddle_on_w );
 
-	emu_timer *m_joy_irq_timer;
-	emu_timer *m_joy_d7_timer;
 	int m_joy_mode;
-	int m_joy_status[2];
-	int m_last_state;
+	int m_last_nmi_state;
+
+	// analog controls
+	attotime m_joy_pulse_reload[2];
+	emu_timer *m_joy_pulse_timer[2];
+	emu_timer *m_joy_irq_timer[2];
+	emu_timer *m_joy_d7_timer[2];
+	int m_joy_irq_state[2];
+	int m_joy_d7_state[2];
+	UINT8 m_joy_analog_state[2];
+	UINT8 m_joy_analog_reload[2];
 };
 
 #endif
