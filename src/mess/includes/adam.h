@@ -115,11 +115,9 @@ public:
 	UINT16 m_key_y;
 
 	// paddle state
-	emu_timer *m_joy_irq_timer;
-	emu_timer *m_joy_d7_timer;
 	int m_joy_mode;
-	int m_joy_status0;
-	int m_joy_status1;
+	UINT8 m_joy_status0;
+	UINT8 m_joy_status1;
 
 	// video state
 	int m_vdp_nmi;

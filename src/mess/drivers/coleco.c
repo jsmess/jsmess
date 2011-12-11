@@ -67,12 +67,12 @@
 
 READ8_MEMBER( coleco_state::paddle_1_r )
 {
-	return coleco_paddle_read(machine(), 0, m_joy_mode, m_joy_status[0]);
+	return m_joy_d7_state[0] | coleco_paddle_read(machine(), 0, m_joy_mode, m_joy_analog_state[0]);
 }
 
 READ8_MEMBER( coleco_state::paddle_2_r )
 {
-	return coleco_paddle_read(machine(), 1, m_joy_mode, m_joy_status[1]);
+	return m_joy_d7_state[1] | coleco_paddle_read(machine(), 1, m_joy_mode, m_joy_analog_state[1]);
 }
 
 WRITE8_MEMBER( coleco_state::paddle_off_w )
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( czz50 )
-	PORT_START("KEYPAD1")
+	PORT_START("STD_KEYPAD1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
@@ -140,7 +140,7 @@ static INPUT_PORTS_START( czz50 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xb000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("JOY1")
+	PORT_START("STD_JOY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -148,13 +148,13 @@ static INPUT_PORTS_START( czz50 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xb0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEYPAD2")
+	PORT_START("STD_KEYPAD2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xb000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("JOY2")
+	PORT_START("STD_JOY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -163,62 +163,76 @@ static INPUT_PORTS_START( czz50 )
 	PORT_BIT( 0xb0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-/***************************************************************************
-
-  The interrupts come from the vdp. The vdp (tms9928a) interrupt can go up
-  and down; the Coleco only uses nmi interrupts (which is just a pulse). They
-  are edge-triggered: as soon as the vdp interrupt line goes up, an interrupt
-  is generated. Nothing happens when the line stays up or goes down.
-
-  To emulate this correctly, we set a callback in the tms9928a (they
-  can occur mid-frame). At every frame we call the TMS9928A_interrupt
-  because the vdp needs to know when the end-of-frame occurs, but we don't
-  return an interrupt.
-
-***************************************************************************/
+/* Interrupts */
 
 static WRITE_LINE_DEVICE_HANDLER(coleco_vdp_interrupt)
 {
 	coleco_state *drvstate = device->machine().driver_data<coleco_state>();
 
-    // only if it goes up
-	if (state && !drvstate->m_last_state)
-	{
+    // NMI on rising edge
+	if (state && !drvstate->m_last_nmi_state)
 		drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
 
-	drvstate->m_last_state = state;
+	drvstate->m_last_nmi_state = state;
 }
 
 static TIMER_CALLBACK( paddle_d7reset_callback )
 {
 	coleco_state *state = machine.driver_data<coleco_state>();
 
-	state->m_joy_status[0] &= 0x7f;
-	state->m_joy_status[1] &= 0x7f;
+	state->m_joy_d7_state[param] = 0;
+	state->m_joy_analog_state[param] = 0;
 }
 
 static TIMER_CALLBACK( paddle_irqreset_callback )
 {
 	coleco_state *state = machine.driver_data<coleco_state>();
 
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	state->m_joy_irq_state[param] = 0;
+
+	if (!state->m_joy_irq_state[param ^ 1])
+		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-static TIMER_DEVICE_CALLBACK( paddle_callback )
+static TIMER_CALLBACK( paddle_pulse_callback )
 {
+	coleco_state *state = machine.driver_data<coleco_state>();
+
+	// on movement, controller port d7 is set for a short period and an irq is fired on d7 rising edge
+	state->m_joy_d7_state[param] = 0x80;
+	state->m_joy_d7_timer[param]->adjust(attotime::from_usec(500), param); // TODO: measure duration
+
+	// irq on rising edge, PULSE_LINE is not supported in this case, so clear it manually
+	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	state->m_joy_irq_timer[param]->adjust(attotime::from_usec(11), param); // TODO: measure duration
+	state->m_joy_irq_state[param] = 1;
+
+	// reload timer
+	state->m_joy_analog_state[param] = state->m_joy_analog_reload[param];
+	if (state->m_joy_analog_state[param])
+		state->m_joy_pulse_timer[param]->adjust(state->m_joy_pulse_reload[param], param);
+}
+
+static TIMER_DEVICE_CALLBACK( paddle_update_callback )
+{
+	// arbitrary timer for reading analog controls
 	coleco_state *state = timer.machine().driver_data<coleco_state>();
 
-	coleco_scan_paddles(timer.machine(), &state->m_joy_status[0], &state->m_joy_status[1]);
+	coleco_scan_paddles(timer.machine(), &state->m_joy_analog_reload[0], &state->m_joy_analog_reload[1]);
 
-	// on change, controller port d7 is set for a short period and an irq is fired on d7 rising edge
-    if (state->m_joy_status[0] || state->m_joy_status[1])
-    {
-    	state->m_joy_d7_timer->adjust(attotime::from_usec(500)); // TODO: measure duration
+	for (int port = 0; port < 2; port++)
+	{
+		if (state->m_joy_analog_reload[port])
+		{
+			const int sensitivity = 500;
+			int ipt = state->m_joy_analog_reload[port];
+			if (ipt & 0x80) ipt = 0x100 - ipt;
+			attotime freq = attotime::from_msec(sensitivity / ipt);
 
-		// irq on rising edge, PULSE_LINE is not supported in this case, so clear it manually
-		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		state->m_joy_irq_timer->adjust(attotime::from_usec(11)); // TODO: measure duration
+			// change pulse intervals relative to spinner/trackball speed
+			state->m_joy_pulse_reload[port] = freq;
+			state->m_joy_pulse_timer[port]->adjust(min(freq, state->m_joy_pulse_timer[port]->remaining()), port);
+		}
 	}
 }
 
@@ -233,20 +247,23 @@ static TMS9928A_INTERFACE(coleco_tms9928a_interface)
 
 void coleco_state::machine_start()
 {
-	m_joy_d7_timer = machine().scheduler().timer_alloc(FUNC(paddle_d7reset_callback));
-	m_joy_irq_timer = machine().scheduler().timer_alloc(FUNC(paddle_irqreset_callback));
+	// init paddles
+	for (int port = 0; port < 2; port++)
+	{
+		m_joy_pulse_timer[port] = machine().scheduler().timer_alloc(FUNC(paddle_pulse_callback));
+		m_joy_d7_timer[port] = machine().scheduler().timer_alloc(FUNC(paddle_d7reset_callback));
+		m_joy_irq_timer[port] = machine().scheduler().timer_alloc(FUNC(paddle_irqreset_callback));
+
+		m_joy_irq_state[port] = 0;
+		m_joy_d7_state[port] = 0;
+		m_joy_analog_state[port] = 0;
+	}
 }
 
 void coleco_state::machine_reset()
 {
-	m_last_state = 0;
+	m_last_nmi_state = 0;
 
-	m_joy_d7_timer->reset();
-	m_joy_status[0] &= 0x7f;
-	m_joy_status[1] &= 0x7f;
-
-	m_joy_irq_timer->reset();
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
 
 	memset(&machine().region(Z80_TAG)->base()[0x6000], 0xff, 0x400);	// initialize RAM
@@ -319,7 +336,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
 
-	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_callback, attotime::from_msec(20))
+	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( czz50, coleco_state )
@@ -348,7 +365,7 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
 
-	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_callback, attotime::from_msec(20))
+	MCFG_TIMER_ADD_PERIODIC("paddle_timer", paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dina, czz50 )
