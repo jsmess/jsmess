@@ -3104,6 +3104,23 @@
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="cotton [disk 1] (1993) (electronic arts-success) [xdf] [a].xdf" size="1261568" crc="2813eb62" sha1="7c3adb1da216397b7d4fddae152885c192c76657" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="cotton [disk 2] (1993) (electronic arts-success) [xdf] [a].xdf" size="1261568" crc="dad68a90" sha1="9baa58e12d840b30f6465b5b4c5ce15a2ff0fc4d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- MESS won't load this version for some reason, the XDF version does load and is playable -->
+	<software name="cottonb" cloneof="cotton">
+		<description>Cotton - Fantastic Night Dreams (DIM)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="cotton fantastic night dreams (1993)(victor)(disk 1 of 2).dim" size="1261824" crc="49392404" sha1="280c3f8a5e7d45d9c0cdb225d654f51c74971261" offset="000000" />
 			</dataarea>
