@@ -32,6 +32,8 @@ public:
 	DECLARE_WRITE8_MEMBER( paddle_off_w );
 	DECLARE_WRITE8_MEMBER( paddle_on_w );
 
+	emu_timer *m_joy_irq_timer;
+	emu_timer *m_joy_d7_timer;
 	int m_joy_mode;
 	int m_joy_status[2];
 	int m_last_state;

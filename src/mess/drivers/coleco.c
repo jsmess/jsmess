@@ -27,7 +27,6 @@
             E0-FF (R) = Read Controller data, A1=0 -> read controller 1, A1=1 -> read controller 2
 
     - Modified paddle handler, now it is handled as on a real ColecoVision
-    - Added support for a Driving Controller (Expansion Module #2), enabled via category
     - Added support for a Roller Controller (Trackball), enabled via category
     - Added support for two Super Action Controller, enabled via category
 
@@ -68,12 +67,12 @@
 
 READ8_MEMBER( coleco_state::paddle_1_r )
 {
-	return coleco_paddle1_read(machine(), m_joy_mode, m_joy_status[0]);
+	return coleco_paddle_read(machine(), 0, m_joy_mode, m_joy_status[0]);
 }
 
 READ8_MEMBER( coleco_state::paddle_2_r )
 {
-	return coleco_paddle2_read(machine(), m_joy_mode, m_joy_status[1]);
+	return coleco_paddle_read(machine(), 1, m_joy_mode, m_joy_status[1]);
 }
 
 WRITE8_MEMBER( coleco_state::paddle_off_w )
@@ -191,14 +190,36 @@ static WRITE_LINE_DEVICE_HANDLER(coleco_vdp_interrupt)
 	drvstate->m_last_state = state;
 }
 
+static TIMER_CALLBACK( paddle_d7reset_callback )
+{
+	coleco_state *state = machine.driver_data<coleco_state>();
+
+	state->m_joy_status[0] &= 0x7f;
+	state->m_joy_status[1] &= 0x7f;
+}
+
+static TIMER_CALLBACK( paddle_irqreset_callback )
+{
+	coleco_state *state = machine.driver_data<coleco_state>();
+
+	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
 static TIMER_DEVICE_CALLBACK( paddle_callback )
 {
 	coleco_state *state = timer.machine().driver_data<coleco_state>();
 
 	coleco_scan_paddles(timer.machine(), &state->m_joy_status[0], &state->m_joy_status[1]);
 
+	// on change, controller port d7 is set for a short period and an irq is fired on d7 rising edge
     if (state->m_joy_status[0] || state->m_joy_status[1])
-		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+    {
+    	state->m_joy_d7_timer->adjust(attotime::from_usec(500)); // TODO: measure duration
+
+		// irq on rising edge, PULSE_LINE is not supported in this case, so clear it manually
+		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		state->m_joy_irq_timer->adjust(attotime::from_usec(11)); // TODO: measure duration
+	}
 }
 
 /* Machine Initialization */
@@ -212,12 +233,20 @@ static TMS9928A_INTERFACE(coleco_tms9928a_interface)
 
 void coleco_state::machine_start()
 {
+	m_joy_d7_timer = machine().scheduler().timer_alloc(FUNC(paddle_d7reset_callback));
+	m_joy_irq_timer = machine().scheduler().timer_alloc(FUNC(paddle_irqreset_callback));
 }
 
 void coleco_state::machine_reset()
 {
 	m_last_state = 0;
 
+	m_joy_d7_timer->reset();
+	m_joy_status[0] &= 0x7f;
+	m_joy_status[1] &= 0x7f;
+
+	m_joy_irq_timer->reset();
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
 
 	memset(&machine().region(Z80_TAG)->base()[0x6000], 0xff, 0x400);	// initialize RAM
