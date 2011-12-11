@@ -58,4 +58,15 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="kngquest">
+		<description>King's Quest</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line Inc</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="king's quest.ima" size="368640" crc="524c1991" sha1="f6159d955959bf421774ed85df09b50026fa5a81" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
