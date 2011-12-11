@@ -48,7 +48,10 @@ DRIVER_INIT( odyssey2 )
 {
 	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	int i;
+	int size = 0;
 	UINT8 *gfx = machine.region("gfx1")->base();
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
+
 	state->m_ram        = auto_alloc_array(machine, UINT8, 256);
 
 	for (i = 0; i < 256; i++)
@@ -56,6 +59,19 @@ DRIVER_INIT( odyssey2 )
 		gfx[i] = i;     /* TODO: Why i and not 0? */
 		state->m_ram[i] = 0;
     }
+
+	if (image->exists())
+	{
+		if (image->software_entry() == NULL)
+		{
+			size = image->length();
+		}
+		else
+		{
+			size = image->get_software_region_length("rom");
+		}
+	}
+	state->m_cart_size = size;
 }
 
 MACHINE_RESET( odyssey2 )
