@@ -671,11 +671,15 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 MACHINE_CONFIG_END
 
+static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
+
 static const struct pc_vga_interface vga_interface =
 {
 	NULL,
 	NULL,
-	NULL,
+	vga_setting,
+	AS_PROGRAM,
+	0xa0000,
 	AS_IO,
 	0x0000
 };
