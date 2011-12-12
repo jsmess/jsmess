@@ -7763,10 +7763,10 @@ The revision A of the cartridge has the same ROM as the initial release.
 	<software name="kengrwin">
 		<!-- The demo ROM matches the retail cart, but has serial "M/DIS-SNS-A9GE-USA (not for resale, demo game only)" -->
 		<description>Ken Griffey Jr.'s Winning Run (USA)</description>
-		<info name="serial" value="SNS-A9GE-USA"/>
-		<info name="release" value="199606xx"/>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="SNS-A9GE-USA"/>
+		<info name="release" value="199606xx"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1J3M-20" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
