@@ -281,15 +281,17 @@ static TIMER_CALLBACK(video_wait_callback)
 /*
     scanline interrupt
 */
-INTERRUPT_GEN( geneve_hblank_interrupt )
+TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt )
 {
-	device_t *dev = device->machine().device("geneve_board");
-	genboard_state *board = get_safe_token(dev);
-	v9938_interrupt(device->machine(), 0);
-	board->line_count++;
-	if (board->line_count == 262)
+	device_t *dev = timer.machine().device("geneve_board");
+	int scanline = param;
+	//genboard_state *board = get_safe_token(dev);
+
+	v9938_interrupt(timer.machine(), 0);
+	//board->line_count++;
+	if (scanline == 0) // was 262
 	{
-		board->line_count = 0;
+		//board->line_count = 0;
 		poll_keyboard(dev);
 		poll_mouse(dev);
 	}

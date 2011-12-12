@@ -62,7 +62,6 @@ video HW too.
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "sound/speaker.h"
-#include "deprecat.h"
 
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
@@ -768,7 +767,7 @@ static const kb_keytronic_interface pc_keytronic_intf =
 	MCFG_CPU_ADD("maincpu", type, clock)				\
 	MCFG_CPU_PROGRAM_MAP(mem##_map)	\
 	MCFG_CPU_IO_MAP(port##_io)	\
-	MCFG_CPU_VBLANK_INT_HACK(vblankfunc, 4)					\
+	MCFG_TIMER_ADD_SCANLINE("scantimer", vblankfunc, "screen", 0, 1) \
 	MCFG_CPU_CONFIG(i86_address_mask)
 
 

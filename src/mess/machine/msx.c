@@ -549,11 +549,11 @@ DRIVER_INIT( msx )
 	z80_set_cycle_tables( machine.device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 }
 
-INTERRUPT_GEN( msx2_interrupt )
+TIMER_DEVICE_CALLBACK( msx2_interrupt )
 {
-	v9938_set_sprite_limit(0, input_port_read(device->machine(), "DSW") & 0x20);
-	v9938_set_resolution(0, input_port_read(device->machine(), "DSW") & 0x03);
-	v9938_interrupt(device->machine(), 0);
+	v9938_set_sprite_limit(0, input_port_read(timer.machine(), "DSW") & 0x20);
+	v9938_set_resolution(0, input_port_read(timer.machine(), "DSW") & 0x03);
+	v9938_interrupt(timer.machine(), 0);
 }
 
 INTERRUPT_GEN( msx_interrupt )

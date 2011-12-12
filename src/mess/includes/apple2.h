@@ -164,7 +164,7 @@ UINT8 apple2_getfloatingbusvalue(running_machine &machine);
 READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );
 
-INTERRUPT_GEN( apple2_interrupt );
+TIMER_DEVICE_CALLBACK( apple2_interrupt );
 
 INT8 apple2_slotram_r(running_machine &machine, int slotnum, int offset);
 

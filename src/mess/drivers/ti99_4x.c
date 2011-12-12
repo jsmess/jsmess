@@ -19,7 +19,6 @@
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/sn76496.h"
 
@@ -1017,13 +1016,7 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x_state )
 	MCFG_MECMOUSE_ADD( "mecmouse" )
 MACHINE_CONFIG_END
 
-INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
-{
-	v9938_interrupt(device->machine(), 0);
-}
-
-// Unused
-TIMER_DEVICE_CALLBACK( ti99_4ev_scanline_interrupt )
+TIMER_DEVICE_CALLBACK( ti99_4ev_hblank_interrupt )
 {
 	v9938_interrupt(timer.machine(), 0);
 }
@@ -1034,7 +1027,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
 	MCFG_CPU_PROGRAM_MAP(memmap_4ev)
 	MCFG_CPU_IO_MAP(cru_map)
-	MCFG_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ti99_4ev_hblank_interrupt, "screen", 0, 1)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MCFG_MACHINE_RESET( ti99_4a )
 

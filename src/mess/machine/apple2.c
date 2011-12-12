@@ -1083,9 +1083,12 @@ static void apple2_reset(running_machine &machine)
  * Apple II interrupt; used to force partial updates
  * ----------------------------------------------------------------------- */
 
-INTERRUPT_GEN( apple2_interrupt )
+TIMER_DEVICE_CALLBACK( apple2_interrupt )
 {
-	device->machine().primary_screen->update_partial(device->machine().primary_screen->vpos());
+	int scanline = param;
+
+	if((scanline % 8) == 0)
+		timer.machine().primary_screen->update_partial(timer.machine().primary_screen->vpos());
 }
 
 

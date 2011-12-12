@@ -1257,23 +1257,31 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
  *
  **************************************************************************/
 
-INTERRUPT_GEN( pc_frame_interrupt )
+TIMER_DEVICE_CALLBACK( pc_frame_interrupt )
 {
-	pc_keyboard();
+	int scanline = param;
+
+	if((scanline % 64) == 0)
+		pc_keyboard();
 }
 
-INTERRUPT_GEN( pc_vga_frame_interrupt )
+TIMER_DEVICE_CALLBACK( pc_vga_frame_interrupt )
 {
-	//vga_timer();
-	pc_keyboard();
-}
+	int scanline = param;
 
-INTERRUPT_GEN( pcjr_frame_interrupt )
-{
-	if ( pcjr_keyb.transferring == 0 )
+	if((scanline % 64) == 0)
 	{
+		//vga_timer();
 		pc_keyboard();
 	}
+}
+
+TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt )
+{
+	int scanline = param;
+
+	if((scanline % 64) == 0 &&  pcjr_keyb.transferring == 0 )
+		pc_keyboard();
 }
 
 

@@ -26,7 +26,7 @@ extern const tms9901_interface tms9901_wiring_geneve;
 void tms9901_gen_set_int2(running_machine &machine, int state);
 void set_gm_switches(device_t *board, int number, int value);
 
-INTERRUPT_GEN( geneve_hblank_interrupt );
+TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt );
 
 /* device interface */
 DECLARE_LEGACY_DEVICE( GENBOARD, genboard );

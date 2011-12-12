@@ -199,7 +199,6 @@
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
-#include "deprecat.h"
 #include "machine/ti99/genboard.h"
 #include "machine/tms9901.h"
 #include "machine/ti99/videowrp.h"
@@ -565,7 +564,7 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_CPU_CONFIG(geneve_processor_config)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(cru_map)
-	MCFG_CPU_VBLANK_INT_HACK(geneve_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", geneve_hblank_interrupt, "screen", 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MCFG_MACHINE_START( geneve )
 	MCFG_MACHINE_RESET( geneve )

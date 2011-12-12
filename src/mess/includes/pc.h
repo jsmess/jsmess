@@ -89,9 +89,9 @@ MACHINE_RESET( pcjr );
 
 DEVICE_IMAGE_LOAD( pcjr_cartridge );
 
-INTERRUPT_GEN( pc_frame_interrupt );
-INTERRUPT_GEN( pc_vga_frame_interrupt );
-INTERRUPT_GEN( pcjr_frame_interrupt );
+TIMER_DEVICE_CALLBACK( pc_frame_interrupt );
+TIMER_DEVICE_CALLBACK( pc_vga_frame_interrupt );
+TIMER_DEVICE_CALLBACK( pcjr_frame_interrupt );
 
 
 READ8_HANDLER( pc_rtc_r );

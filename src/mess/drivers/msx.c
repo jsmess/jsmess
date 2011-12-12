@@ -324,7 +324,6 @@ PCB Layouts missing
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "machine/i8255.h"
 #include "machine/rp5c01.h"
 #include "machine/wd17xx.h"
@@ -1191,7 +1190,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(msx_memory_map)
 	MCFG_CPU_IO_MAP(msx2_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(msx2_interrupt, 262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", msx2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( msx2 )
