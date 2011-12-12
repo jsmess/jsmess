@@ -93,10 +93,13 @@ Are the following undumped or mistransalted?
  - Traditional Triangle (198801xx) by Ving
  - エミちゃんの燃えろ野球拳 (198801xx) by New System House Oh!
  - ビデオギャルズ'87 (1987xxxx)
+ - Peep Show (198610xx) by Tracers Soft
  - Peep Show 番外編 (1987xxxx) by Tracers Soft
+ - 裏ソフト No.9 (1986xxxx) by アダム＆イブ
  - 裏ソフト No.12 (1987xxxx) by アダム＆イブ 
  - 裏ソフト No.17 (1987xxxx) by アダム＆イブ 
  - 裏ソフト No.19 (1987xxxx) by アダム＆イブ
+ - 裏ソフト No.25 (1986xxxx) by アダム＆イブ
  - 裏ソフト No.28 (1987xxxx) by アダム＆イブ
  - レモネード２ (1987xxxx) by Champion Soft
  - Hello!麻衣子 (1987xxxx) by Champion Soft
@@ -123,6 +126,25 @@ Are the following undumped or mistransalted?
  - プレイメイト フラワーナイト (198707xx) by Champion Soft
  - パズルでデート (198707xx) by Tracers Soft
  - 振飛車 (198707xx) by Victor Music Industry
+ - 孫子 (198706xx) by SoftPlan
+ - ストロベリーソフト#1 いけない関係 (198706xx) by Strawberry Soft
+ - ７人のサムライ (198705xx) by IA System
+ - The Maze (198704xx) by Tracers Soft
+ - 幻夢の城 (198704xx) by Champion Soft
+ - 水道管ゲーム (198704xx) by Digital Station
+ - アマゾネス (198702xx) by Starcraft
+ - 戦国大名 (198702xx) by SoftPlan
+ - デウリング -魔王の館- (198702xx) by Victor Music Industry
+ - さゆり (198701xx) by Palcom
+ - 将棋大将88 (198701xx) by Showa Sangyo Kabushikigaisha
+ - 森田和郎のオセロ (1986xxxx) by Toshiba EMI
+ - パルコム (198612xx) by Palcom
+ - パットン第３軍 (198612xx) by Pony Canyon
+ - 名探偵ホームズ (198611xx) by Tokuma Communications
+ - 将棋塾 (198610xx) by Victor Music Industry
+ - ハイランダー (198610xx) by Login
+ - 倉庫番３ (198609xx) by Takeru
+ - ウォーズ１ (198609xx) by SoftPlan
 
 Not included:
  - ミラーズ (19901210) by Studio Wing, uses CDROM (>PC8801MC)
@@ -168,6 +190,14 @@ To investigate:
  - split 殺意の接吻 kiss of murder (198712xx) by Riverhill Software
  - is アンジェラ (198711xx) by Victor Music Industry the same as angelus below?
  - is 大戦略・マップコレクション (198707xx) by System Software in a Daisenryaku set below?
+ - is その後の慶子ちゃん 新妻編 (1986xxxx) by Champion Soft the same as sonogon2?
+ - which tenshitachi set is 天使たちの午後 バージョンアップ版 (198612xx) by Jast?
+ - is 冒険浪漫 the same as meikyu roman?
+ 
+TO FIX
+ - Identify games by Sein Soft & Xain Soft among the ones by Zain Soft (older company name)
+ - Identify games by Bond Soft among the ones by Pascal2 (older company name)
+ - Identify games by Cross Media Soft among the ones by Victor Music Industry (older company name)
  -->
 
 <!-- BASIC Disks &amp; System Disks -->
@@ -442,6 +472,9 @@ To investigate:
 		<description>1000-nen Oukoku</description>
 		<year>1986</year>
 		<publisher>ログ (Log)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="1000年王国"/>
 		<!--combined image-->
 		<!--rom name="1000-nen okoku.d88" size="697696" crc="03659473" sha1="6758c2cd99d0c62c44b6cd8de31263cfc338635e" offset="0" /-->
 
@@ -516,6 +549,8 @@ To investigate:
 		<description>177</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">	<!-- Data CRC16: 59295 -->
 				<rom name="177 (1986)(macadamia).d88" size="348848" crc="8b578336" sha1="b5474986284006a143e7c5229e54107f859c2b62" offset="0" />
@@ -527,6 +562,8 @@ To investigate:
 		<description>177 (Alt)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">	<!-- Data CRC16: 53099 -->
 				<rom name="177.d88" size="348848" crc="686fc661" sha1="1afd138c97e4d3deb12a432e5173ce50eacf5243" offset="0" />
@@ -538,6 +575,8 @@ To investigate:
 		<description>177 (Alt 2)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">	<!-- Data CRC16: 5086 -->
 				<rom name="177 (1986)(macadamia)[a].d88" size="348848" crc="ce455352" sha1="38ab32c19f82336acb120a05ac58f7c6a69a43a5" offset="0" />
@@ -549,6 +588,8 @@ To investigate:
 		<description>177 (Alt 3)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">	<!-- Data CRC16: 7942 -->
 				<rom name="177 (1986)(macadamia)[a2].d88" size="348848" crc="a2c594b6" sha1="88153673860cc61414be9e7ec8ee5e330b6e721a" offset="0" />
@@ -560,6 +601,8 @@ To investigate:
 		<description>177 (Alt 4)</description>
 		<year>1986</year>
 		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">	<!-- Data CRC16: 1806 -->
 				<rom name="177 (1986)(macadamia)[a3].d88" size="348848" crc="d4f71712" sha1="c03e02815df90de9b8ecfc328e4d45b44fa4f68e" offset="0" />
@@ -571,6 +614,8 @@ To investigate:
 		<description>1942</description>
 		<year>1987</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198702xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">	<!-- Data CRC16: 41863 -->
 				<rom name="1942.d88" size="348832" crc="02901f25" sha1="69055b5c217283c12a811ee36eb3f9b7870672e8" offset="0" />
@@ -582,6 +627,8 @@ To investigate:
 		<description>1942 (Alt)</description>
 		<year>1987</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198702xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">	<!-- Data CRC16: 34581 -->
 				<rom name="1942 (1987)(ascii).d88" size="348848" crc="cb204288" sha1="08b96cc36261dc563b1e41920d780750f94f5b87" offset="0" />
@@ -694,6 +741,8 @@ To investigate:
 	<description>A.I.R. - Anti Intruder Rangers</description>
 		<year>1987</year>
 		<publisher>クエイザーソフト (Quasar Soft)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="エー・アイ・アール"/>
 		<!--combined image-->
 		<!--rom name="a.i.r.d88" size="820880" crc="87732111" sha1="bcf77b32972e41fac0f22ae2e3c9904027744d71" offset="0" /-->
@@ -858,7 +907,9 @@ To investigate:
 		<description>Abunai Josei Shinrigaku Nyuumon</description>
 		<year>1987</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
-		<info name="alt_title" value="危ない女性心理学入門"/>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="あぶない女性心理学入門"/>
 		<info name="usage" value="Mount both disk A and B to start"/>
 		<!--combined image-->
 		<!--rom name="abunaijosei.d88" size="689520" crc="fa4fdc42" sha1="b5267d87fd99d17d5e3eeaae224a1a1a93314881" offset="0" /-->
@@ -1523,6 +1574,8 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<description>Albatross Kakuchou Course - Expert Course</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="アルバトロス 拡張コース -エキスパートコース-"/>
 		<!--combined image-->
 		<!--rom name="albatross expert course.d88" size="829952" crc="ba5238d3" sha1="63ab2ee90aec1b93db82a2003be462cef14ad0d0" offset="0" /-->
@@ -1546,6 +1599,8 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<description>Albatross Kakuchou Course - Expert Course (Alt)</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="アルバトロス 拡張コース -エキスパートコース-"/>
 		<!--combined image-->
 		<!--rom name="albatross expert course.d88" size="829984" crc="25734c0d" sha1="ec3ba231d2dcbf09037dcf3e2480ec941668e84b" offset="0" /-->
@@ -1566,10 +1621,12 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 	</software>
 
 	<software name="albatrosv" cloneof="albatros">
-		<!-- アルバトロス 拡張コース -ビジュアルコース- -->
 		<description>Albatross Kakuchou Course - Visual Course</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="アルバトロス 拡張コース -ビジュアルコース-"/>
 		<!--combined image-->
 		<!--rom name="albatross visual course.d88" size="829984" crc="b829d1b6" sha1="7fa7cffd84e487c8d8702fb934956dccbcf7edb6" offset="0" /-->
 
@@ -1589,10 +1646,12 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 	</software>
 
 	<software name="albatrosw" cloneof="albatros">
-		<!-- アルバトロス 拡張コース -ワールドコース- -->
 		<description>Albatross Kakuchou Course - World Course</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="アルバトロス 拡張コース -ワールドコース-"/>
 		<!--combined image-->
 		<!--rom name="albatross world course.d88" size="829952" crc="6c5b714e" sha1="7de4c78a667e1087f1967b9c8be9f501c0f767d9" offset="0" /-->
 
@@ -1612,10 +1671,12 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 	</software>
 
 	<software name="albatroswa" cloneof="albatros">
-		<!-- アルバトロス 拡張コース -ワールドコース- -->
 		<description>Albatross Kakuchou Course - World Course (Alt)</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="アルバトロス 拡張コース -ワールドコース-"/>
 		<!--combined image-->
 		<!--rom name="albatross world course.d88" size="829984" crc="a6b5ed73" sha1="2c43deec43a53da94b884e0088b2ddeb21b2315f" offset="0" /-->
 
@@ -1942,9 +2003,11 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 	</software>
 
 	<software name="alpha">
-	<description>Alpha</description>
+		<description>Alpha</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="アルファ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">	<!-- Data CRC16: 12806 -->
@@ -1954,9 +2017,11 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 	</software>
 
 	<software name="alphaa" cloneof="alpha">
-	<description>Alpha (Alt)</description>
+		<description>Alpha (Alt)</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="アルファ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">	<!-- Data CRC16: 3138 -->
@@ -2065,6 +2130,8 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<description>Amazones no Hihou - Romancing Grey-I</description>
 		<year>1987</year>
 		<publisher>スタジオライム (Studio Lime)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198703xx"/>
 		<info name="alt_title" value="アマゾネスの秘宝"/>
 		<!--combined image-->
 		<!--rom name="amazones no hiho.d88" size="876896" crc="84fa0231" sha1="e573cf4b41454cccc4e017ef3ad33b2484c44561" offset="0" /-->
@@ -3106,8 +3173,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 
 	<software name="argo">
 		<description>Argo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="アルゴー"/>
 		<!--combined image-->
 		<!--rom name="argo.d88" size="697680" crc="61a3db5b" sha1="a3b49703f056db0ed5271191aa407ca5027c56f4" offset="0" /-->
 
@@ -3128,8 +3198,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 
 	<software name="argoa" cloneof="argo">
 		<description>Argo (Alt Disk 2)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="アルゴー"/>
 		<!--combined image-->
 		<!--rom name="argo.d88" size="697664" crc="1a1f1523" sha1="e74478b79855bc9d2fa303198bbb692678f5c2d1" offset="0" /-->
 
@@ -3172,8 +3245,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 
 	<software name="arkanoid">
 		<description>Arkanoid</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ニデコム (Nidecom) / タイトー (Taito)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="アルカノイド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="arkanoid.d88" size="348848" crc="dbf83303" sha1="9eef143da2a49a0e9c7f2c12b56863e06b212baa" offset="0" />
@@ -3213,11 +3289,13 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 		</part>
 	</software>
 
-	<!-- Doujin?!? -->
 	<software name="artofwar">
 		<description>The Ancient Art of War</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ブローダーバンドジャパン (Brøderbund Japan)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="アートオブウォー"/>
 		<!--combined image-->
 		<!--rom name="the ancient art of war.d88" size="698464" crc="7d421046" sha1="234fe8adb7fdf4a856812bbef9479825d36546b2" offset="0" /-->
 
@@ -3563,8 +3641,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 
 	<software name="babylon">
 		<description>Babylon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="バビロン"/>
 		<!--combined image-->
 		<!--rom name="babylon.d88" size="1067728" crc="117d7783" sha1="31bf30823e223c63f9b71c92c024904416da9294" offset="0" /-->
 
@@ -3592,8 +3673,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 
 	<software name="babylona" cloneof="babylon">
 		<description>Babylon (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="バビロン"/>
 		<!--combined image-->
 		<!--rom name="babylon.d88" size="1053856" crc="d7b18f7d" sha1="56ae40707ebe70e0fc109c3189276ba66a4ee059" offset="0" /-->
 
@@ -3621,9 +3705,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 
 	<software name="backtoth">
 		<description>Back to the Future</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="バックトゥザフューチャー AVG"/>
+		<year>1986</year>
+		<publisher>ポニー (Pony)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="バックトゥザフューチャー"/>
 		<!--combined image-->
 		<!--rom name="back to the future.d88" size="697696" crc="e846ba80" sha1="0528301783101092297f54e0aa021e293d0ccdba" offset="0" /-->
 
@@ -3644,8 +3730,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 
 	<software name="backgamm">
 		<description>Backgammon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="バックギャモン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="backgammon.d88" size="348848" crc="6f674e12" sha1="c6322133640648156892738bdf847cfa0a84584d" offset="0" />
@@ -3813,9 +3902,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 	</software>
 
 	<software name="batten">
-	<description>Batten Tanuki no Daibouken</description>
+		<description>Batten Tanuki no Daibouken</description>
 		<year>1986</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ばってんタヌキの大冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -3825,9 +3916,11 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 	</software>
 
 	<software name="battena" cloneof="batten">
-	<description>Batten Tanuki no Daiboken (Alt?)</description>
+		<description>Batten Tanuki no Daiboken (Alt?)</description>
 		<year>1986</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ばってんタヌキの大冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -3840,6 +3933,8 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88"
 		<description>Batten Tanuki no Daiboken (Alt 2?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ばってんタヌキの大冒険"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4071,9 +4166,11 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bishojos">
-		<description>Bishojo Shashinkan 2 Moving School</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Bishojo Shashinkan - Moving School</description>
+		<year>1987</year>
+		<publisher>ハード (Hard)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="美少女写真館 -ムービング・スクール-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -4172,8 +4269,11 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 
 	<software name="bishojo3">
 		<description>Bishojo Shashinkan Studio Cut</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ハード (Hard)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="美少女写真館スタジオ・カット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348576">
 				<rom name="bishojo shashinkan studio cut.d88" size="348576" crc="1403e4a0" sha1="42c994a2faad0a783c131ea45678b7ea8853841a" offset="0" />
@@ -4386,8 +4486,11 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 
 	<software name="bokensha">
 		<description>Bokensha-tachi Kenja no Yuigon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="冒険者達・賢者の遺言"/>
 		<!--combined image-->
 		<!--rom name="bokensha-tachi kenja no yuigon.d88" size="907152" crc="eea1d25c" sha1="abce526bbd0a42e18a8416ef3e955e97747a817d" offset="0" /-->
 
@@ -4896,8 +4999,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="buuma">
 		<description>Buuma</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>パックスエレクトロニカ (Pax Electronica)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="舞臓魔"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="buuma.d88" size="348832" crc="e1d4b2c5" sha1="e3ce12cd7f7affd6d2f7eb3482d003aaaf2090e1" offset="0" />
@@ -4907,8 +5013,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="buumaa" cloneof="buuma">
 		<description>Buuma (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>パックスエレクトロニカ (Pax Electronica)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="舞臓魔"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="buuma (a).d88" size="348848" crc="434fa363" sha1="7606843288047e6c7113e5ddab555f11545d1a67" offset="0" />
@@ -5221,8 +5330,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="carbo">
 		<description>Carbo</description>
-		<year>19??</year>
-		<publisher>Compac</publisher>
+		<year>1987</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="コムパック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="carbo.d88" size="348848" crc="cd4a98a5" sha1="4e8821c6f39d6eb66089bb563432b9f3f17e61ab" offset="0" />
@@ -5283,8 +5395,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="carmine">
 		<description>Carmine</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="カーマイン"/>
 		<!--combined image-->
 		<!--rom name="carmine.d88" size="770496" crc="ade94761" sha1="220ee916091ece8176e56867e3923529a8c49591" offset="0" /-->
 
@@ -5305,8 +5420,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="carminea" cloneof="carmine">
 		<description>Carmine (Alt?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="カーマイン"/>
 		<!--combined image-->
 		<!--rom name="carmine.d88" size="1140944" crc="62aeef7e" sha1="18a952b782b71177fa0000652422d0ed23d7d6a5" offset="0" /-->
 
@@ -5345,8 +5463,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="casablan">
 		<description>Casablanca</description>
-		<year>19??</year>
-		<publisher>Soft Office ~ Thinking Rabbit</publisher>
+		<year>1986</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
+		<info name="alt_title" value="カサブランカに愛を"/>
 		<!--combined image-->
 		<!--rom name="casablanca.d88" size="829984" crc="bcd6fc94" sha1="0956b88fe96787c738cca3777271ed654b601ad8" offset="0" /-->
 
@@ -5495,7 +5616,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	<software name="chackn">
 		<description>Chack'n Pop</description>
 		<year>19??</year>
-		<publisher>Nidecom ~ Carry Soft</publisher>
+		<publisher>ニデコム (Nidecom) / Carry Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="70320">
 				<rom name="chack n pop.d88" size="70320" crc="242e0717" sha1="e1e064aa5bfa5f701be4c5af56d5a3b85dd96e31" offset="0" />
@@ -5698,8 +5819,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="chess4">
 		<description>Chess IV</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="チェスⅣ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="chess iv.d88" size="348848" crc="ef8744f6" sha1="f968c665cfc584232809dda450def1b887e6e91e" offset="0" />
@@ -5709,8 +5833,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="chikyubo">
 		<description>Chikyu Boeigun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>アートディンク (Artdink)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="地球防衛軍"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="chikyu boeigun.d88" size="348848" crc="7e2d5e42" sha1="7d305d59d92c10f6642a75e70a4364adc388507c" offset="0" />
@@ -5812,9 +5939,12 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	</software>
 
 	<software name="chosensh">
-		<description>Chosenshi Zaider</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Chou Senshi Zaider</description>
+		<year>1987</year>
+		<publisher>ザインソフト (Zain Soft)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="超戦士ザイダー"/>
 		<!--combined image-->
 		<!--rom name="chosenshi zaider.d88" size="697664" crc="c2a4113e" sha1="41f849b3dba21255a31c2d11f885728d154a5b22" offset="0" /-->
 
@@ -5849,6 +5979,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<description>Christine</description>
 		<year>1986</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="199612xx"/>
 		<info name="alt_title" value="クリスチーヌ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -5861,6 +5993,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<description>Cinderella Perudue</description>
 		<year>1986</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="シンデレラペルデュー"/>
 		<!--combined image-->
 		<!--rom name="cinderella perudue.d88" size="697696" crc="a43e2ffd" sha1="d07b8760652958a3b2a6a2527e89b79dcc57c480" offset="0" /-->
@@ -5882,8 +6016,10 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="cityfigh">
 		<description>City Fight</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ポニカ (Pony Canyon)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="シティファイト"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -6140,9 +6276,12 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	</software>
 
 	<software name="cosmics1">
-		<description>Cosmic Soldier 2 Psychic War</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Cosmic Soldier 2 - Psychic War</description>
+		<year>1987</year>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="サイキックウォー"/>
 		<!--combined image-->
 		<!--rom name="cosmic soldier 2 psychic war.d88" size="708096" crc="8eb95e37" sha1="3b0d455efc2fbb5f3b27c0ec4a99866006b359a6" offset="0" /-->
 
@@ -6164,6 +6303,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<description>Cosmo Angel</description>
 		<year>1986</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="コスモエンジェル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -6686,8 +6827,10 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="crux">
 		<description>Crux</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198703xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="crux.d88" size="348848" crc="074c739f" sha1="18454162a5848502e497ef88cf2730b607ab3434" offset="0" />
@@ -7262,9 +7405,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="daisenry">
 		<description>Daisenryaku 88</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="大戦略88"/>
+		<year>1986</year>
+		<publisher>システムソフト (System Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="大戦略８８"/>
 		<!--combined image-->
 		<!--rom name="daisenryaku 88.d88" size="1046496" crc="3399758a" sha1="c257dab6f7316c64b5fcfa77054d021c79eb2800" offset="0" /-->
 
@@ -7291,8 +7436,11 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="daiva">
 		<description>Daiva</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>T&amp;E Soft</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ディーヴァ ヴリトラの炎"/>
 		<!--combined image-->
 		<!--rom name="daiva.d88" size="697664" crc="a7c25f4c" sha1="6ffe94b083fee7424e671e79b081ddacfba01f26" offset="0" /-->
 
@@ -7311,10 +7459,39 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
+<!--
+ExtractDisk  [01]"DAIVA_A		 " -> "daiva_01.d88"
+ExtractDisk  [02]"DAIVA_B		 " -> "daiva_02.d88"
+-->
+	<software name="daivaa" cloneof="daiva">
+		<description>Daiva (alt)</description>
+		<year>1986</year>
+		<publisher>T&amp;E Soft</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ディーヴァ ヴリトラの炎"/>
+		<!--combined image-->
+		<!--rom name="daiva.d88" size="697664" crc="03cf68b5" sha1="26262e1c836c0d10437e9df33c84a8a87715926d" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="daiva_01.d88" size="348832" crc="6aff276f" sha1="f983961dfd25e789123fdc478b10bddb0c59aaf9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="daiva_02.d88" size="348832" crc="6dcf028f" sha1="8fe101e4e0fd7d94bda69011930f892b0cd18ba6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="daivab" cloneof="daiva">
 		<description>Daiva (alt 2)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>T&amp;E Soft</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ディーヴァ ヴリトラの炎"/>
 		<!--combined image-->
 		<!--rom name="daiva.d88" size="1046544" crc="9765177c" sha1="8200fb3840d37ec11376353cdc4fbda22709f4e3" offset="0" /-->
@@ -7505,8 +7682,10 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 
 	<software name="daydream">
 		<description>Day Dream</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="デイ・ドリーム"/>
 		<!--combined image-->
 		<!--rom name="day dream.d88" size="766240" crc="8c974c97" sha1="d23f69e7d721063f5a640c910e557ae6b609d264" offset="0" /-->
@@ -10647,7 +10826,7 @@ ExtractDisk  [08]"START DISK	  " -> "eiyu densetsu ii_08.d88"
 	<software name="elevator">
 		<description>Elevator Action</description>
 		<year>19??</year>
-		<publisher>Nidecom ~ Carry Soft</publisher>
+		<publisher>ニデコム (Nidecom) / Carry Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349376">
 				<rom name="elevator action.d88" size="349376" crc="d544fe47" sha1="49c9b0203fc76d5bacffac8d3f8ef5dc974638f6" offset="0" />
@@ -10657,8 +10836,11 @@ ExtractDisk  [08]"START DISK	  " -> "eiyu densetsu ii_08.d88"
 
 	<software name="elthlead">
 		<description>Elthlead</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>NCS</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="エルスリード"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="elthlead.d88" size="348848" crc="2d784780" sha1="0e1de3b8c37853dadc7e0bfe1fbb18225dd3835a" offset="0" />
@@ -10949,6 +11131,8 @@ ExtractDisk  [08]"START DISK	  " -> "eiyu densetsu ii_08.d88"
 		<description>Erika</description>
 		<year>1986</year>
 		<publisher>ジャスト (Jast)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="エリカ"/>
 		<!--combined image-->
 		<!--rom name="erika.d88" size="697696" crc="788ddc0c" sha1="f8712b7e58918ca470b7eb42125acf0da3344151" offset="0" /-->
@@ -11433,6 +11617,7 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 		<description>Fairies Residence Special - Club Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
 		<info name="alt_title" value="フェアリーズレジデンス・スペシャル -クラブ編-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -11445,6 +11630,7 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 		<description>Fairies Residence Special - SF Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
 		<info name="alt_title" value="フェアリーズレジデンス・スペシャル　-ＳＦ編-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -11454,9 +11640,11 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 	</software>
 
 	<software name="faeriesr">
-		<description>Faeries Residence SF Hen (Alt?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Fairies Residence Special - SF Hen (Alt)</description>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="フェアリーズレジデンス・スペシャル　-ＳＦ編-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="347488">
 				<rom name="faeries residence sf hen.d88" size="347488" crc="638ff3a0" sha1="3101467d43d45cb348ce6dd24590b59a0c1179ee" offset="0" />
@@ -11468,6 +11656,7 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 		<description>Fairies Residence Special - Gakuen Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
 		<info name="alt_title" value="フェアリーズレジデンス・スペシャル　-学園編-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -11480,6 +11669,7 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 		<description>Fairies Residence Special 4 - Geinou-kai Hen - Super Mariko Sister</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
 		<info name="alt_title" value="フェアリーズレジデンス・スペシャル　-芸能界編- スーパーマリコシスター"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -11492,6 +11682,8 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 		<description>Fairytale</description>
 		<year>1987</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
 		<info name="alt_title" value="ふぇありぃてぃる"/>
 		<!--combined image-->
 		<!--rom name="fairytale.d88" size="697696" crc="0708d9e2" sha1="642915b7324a4c7c18168f7f1cf472ce74b6a635" offset="0" /-->
@@ -11861,9 +12053,12 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 	</software>
 
 	<software name="murdclub">
-		<description>Final Mystery Murder Club</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Final Mystery Murder Club - Satsujin Club</description>
+		<year>1986</year>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="殺人倶楽部"/>
 		<!--combined image-->
 		<!--rom name="final mystery murder club.d88" size="832528" crc="2c38ce7c" sha1="d7e88818e902d0d1c838653c85c6608d709add80" offset="0" /-->
 
@@ -11878,6 +12073,58 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="416688">
 				<rom name="final mystery murder club (disk 2).d88" size="416688" crc="def33d9a" sha1="f3420b8d306382240998668c3a774012f71a8624" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+ExtractDisk  [01]"Mader Club DISK " -> "murder club_01.d88"
+ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
+-->
+	<software name="murdcluba" cloneof="murdclub">
+		<description>Final Mystery Murder Club - Satsujin Club (Alt)</description>
+		<year>1986</year>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="殺人倶楽部"/>
+		<!--combined image-->
+		<!--rom name="murder club.d88" size="832784" crc="cd71ac13" sha1="2f25920eb13f410d6aa10c03f3ef398e538d3e05" offset="0" /-->
+		<!-- Disk (-,-) -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="416112">
+				<rom name="murder club_01.d88" size="416112" crc="76eda8ee" sha1="bc4f085b7e976df5c696cd3802f5ae594757bfec" offset="0" />
+			</dataarea>
+		</part>
+		<!-- Disk 2 is the same as Satsujin Kurabu -->
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="416672">
+				<rom name="satsujin kurabu (disk 2).d88" size="416672" crc="778cc503" sha1="6f5d67a1ddbb5444977aeacf017a8bd8b34e9068" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murdclubb" cloneof="murdclub">
+		<description>Final Mystery Murder Club - Satsujin Club (Alt 2)</description>
+		<year>1986</year>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="殺人倶楽部"/>
+		<!--combined image-->
+		<!--rom name="satsujin kurabu.d88" size="832768" crc="0056ddaf" sha1="b6c0a65e336ae7b38a02a1a171288000fdc9cbc0" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="416096">
+				<rom name="satsujin kurabu (disk 1).d88" size="416096" crc="f13e49f9" sha1="0da48b40d781f25cb47235354658c22f0c31422d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="416672">
+				<rom name="satsujin kurabu (disk 2).d88" size="416672" crc="778cc503" sha1="6f5d67a1ddbb5444977aeacf017a8bd8b34e9068" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12140,8 +12387,11 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 
 	<software name="fiveswee">
 		<description>Five Sweet Dream</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>グレイト (Great)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="ファイブスイートドリーム"/>
 		<!--combined image-->
 		<!--rom name="five sweet dream.d88" size="697696" crc="5a7aea35" sha1="76937db1d085eb0ccdaeb12e6f2a1af97fd49fd8" offset="0" /-->
 
@@ -12322,8 +12572,11 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 
 	<software name="fruitsf1">
 		<description>Fruits Fields</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="フルーツフィールド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="fruits fields.d88" size="348848" crc="cf090ad2" sha1="dcbce1ddaa6bf4cca23e97f4b5a3e9c771fa68d2" offset="0" />
@@ -12578,8 +12831,11 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 
 	<software name="gaianomo">
 		<description>Gaia no Monsho</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>NCS</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="ガイアの紋章"/>
 		<!--combined image-->
 		<!--rom name="gaia no monsho.d88" size="697696" crc="4aa7fd9f" sha1="37c30c9a1db7f8798397dcc14b09cc20a32efd28" offset="0" /-->
 
@@ -12858,8 +13114,11 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 
 	<software name="gamblerj">
 		<description>Gambler Jikochuushinha</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="ぎゅわんぶらあ自己中心派"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gambler jikochushin-ha.d88" size="348848" crc="ce8b9980" sha1="a7c8ee484a4e3ba731461e0bbded4512319b440e" offset="0" />
@@ -12957,8 +13216,11 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 
 	<software name="gamma5">
 		<description>Gamma5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="ガンマ５ 88対応版"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gamma5.d88" size="348848" crc="b3a6736f" sha1="3cdbdbb0056aa89e0ce5656c8e3a4bc4a26d4b73" offset="0" />
@@ -12968,8 +13230,10 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 
 	<software name="ganbarem">
 		<description>Ganbare! Miki-chan</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="がんばれ美樹ちゃん"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ganbare! miki-chan.d88" size="348848" crc="b71a357a" sha1="b02f2f06ffb71a7c16b56d525b054df37289a018" offset="0" />
@@ -12979,8 +13243,11 @@ ExtractDisk  [03]"EXTRA Disk B	" -> "extra_03.d88"
 
 	<software name="gandhara">
 		<description>Gandhara</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="ガンダーラ"/>
 		<!--combined image-->
 		<!--rom name="gandhara.d88" size="697664" crc="52d7094d" sha1="011f6959a0b20117ac6e567c560d102ff0ac4c40" offset="0" /-->
 
@@ -13739,8 +14006,11 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 
 	<software name="golques">
 		<description>Golques</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>データウエスト (Data West)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="ゴルコス"/>
 		<!--combined image-->
 		<!--rom name="golques.d88" size="697696" crc="af84fa99" sha1="934e7e550678c2059cc8fbbf2921f46f43d013ac" offset="0" /-->
 
@@ -13761,8 +14031,11 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 
 	<software name="golquesa" cloneof="golques">
 		<description>Golques (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="ゴルコス"/>
 		<!--combined image-->
 		<!--rom name="golques.d88" size="697696" crc="b13d293b" sha1="7b27ae81484c92831068c32cb894d8d652c3a4f1" offset="0" /-->
 
@@ -13783,8 +14056,11 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 
 	<software name="goonies">
 		<description>The Goonies</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>コナミ (Konami)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="グーニーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="the goonies.d88" size="348832" crc="dd823a13" sha1="b749fd16f2f8d1af877d2a3c72df2fceaf9904dc" offset="0" />
@@ -13793,9 +14069,12 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 	</software>
 
 	<software name="gooniesa" cloneof="goonies">
-		<description>Goonies (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>The Goonies (Alt)</description>
+		<year>1986</year>
+		<publisher>コナミ (Konami)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="グーニーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="goonies.d88" size="348848" crc="3c79f38b" sha1="a9f3dbadada2800bfb1eb4a316880d70b7c8630c" offset="0" />
@@ -13842,8 +14121,11 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 
 	<software name="goyugi">
 		<description>Goyugi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="碁遊戯"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="goyugi.d88" size="348848" crc="112bb174" sha1="5de47817dac3ba898a381bd3d0af1210274d52ef" offset="0" />
@@ -13853,8 +14135,11 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 
 	<software name="gradius">
 		<description>Gradius</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>コナミ (Konami)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="グラディウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="gradius.d88" size="348832" crc="f9c489ce" sha1="bbc2064d8d245b134a8928396a2fe1b5f4e87082" offset="0" />
@@ -13864,8 +14149,11 @@ ExtractDisk  [02]"ｼﾅﾘｵ ｷﾞﾙｶﾞﾒｯｼｭ 2" -> "gilgamesh sorc
 
 	<software name="gradiusa" cloneof="gradius">
 		<description>Gradius (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>コナミ (Konami)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="グラディウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gradius (a).d88" size="348848" crc="de2c9bac" sha1="b59393f7c7cd23129e777c259cac391ee265e224" offset="0" />
@@ -13977,6 +14265,7 @@ ExtractDisk  [02]"Gradius改	   " -> "gradius kai_02.d88"
 		<description>Grodba</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<!-- PC8801 -->
 		<info name="alt_title" value="グロブダー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -13987,8 +14276,9 @@ ExtractDisk  [02]"Gradius改	   " -> "gradius kai_02.d88"
 
 	<software name="grodbaa" cloneof="grodba">
 		<description>Grobda (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<!-- PC8801 -->
 		<info name="alt_title" value="グロブダー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348560">
@@ -14009,9 +14299,12 @@ ExtractDisk  [02]"Gradius改	   " -> "gradius kai_02.d88"
 	</software>
 
 	<software name="guinsaga">
-		<description>Guin Saga</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Guin Saga - Hyoto no Kamen</description>
+		<year>1987</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="グインサーガ〜豹頭の仮面〜"/>
 		<!--combined image-->
 		<!--rom name="guin saga.d88" size="828256" crc="8c477370" sha1="72ab37098579b0bacfecaf7d98948d5d7b689414" offset="0" /-->
 
@@ -14032,8 +14325,11 @@ ExtractDisk  [02]"Gradius改	   " -> "gradius kai_02.d88"
 
 	<software name="guinsagaa" cloneof="guinsaga">
 		<description>Guin Saga (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="グインサーガ〜豹頭の仮面〜"/>
 		<!--combined image-->
 		<!--rom name="guin saga.d88" size="828256" crc="8d5e833e" sha1="b11c2e0395c25212aa3577a814d2d36bbce9de9b" offset="0" /-->
 
@@ -14088,8 +14384,11 @@ ExtractDisk  [02]"Gradius改	   " -> "gradius kai_02.d88"
 
 	<software name="gunyusoh">
 		<description>Gun'yu Soha</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ソフトプラン (SoftPlan)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="群雄争覇"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gun'yu soha.d88" size="348848" crc="ef8505c8" sha1="c797d41522c5fd1be2cb434ea8497ad568107886" offset="0" />
@@ -14439,8 +14738,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="hajanofu">
 		<description>Haja no Fuin</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="覇邪の封印"/>
 		<!--combined image-->
 		<!--rom name="haja no fuin.d88" size="697664" crc="11b02b14" sha1="52be114e3a015bf51b60cf82d68c22aa128a6e61" offset="0" /-->
 
@@ -14461,8 +14763,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="hajanofua" cloneof="hajanofu">
 		<description>Haja no Fuin (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="覇邪の封印"/>
 		<!--combined image-->
 		<!--rom name="haja no fuin.d88" size="697664" crc="9ab30489" sha1="2c037e2d80ed68aa1224aaf485ed10b9a53d0b46" offset="0" /-->
 
@@ -14597,8 +14902,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="hangon">
 		<description>Hang On</description>
-		<year>19??</year>
-		<publisher>Disk</publisher>
+		<year>1986</year>
+		<publisher>パックスエレクトロニカ (Pax Electronica)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="ハングオン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hang on.d88" size="348848" crc="111dfb6d" sha1="38611594391ebfa2524c0852a7660e36d98b8efe" offset="0" />
@@ -14608,8 +14916,10 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="hangona" cloneof="hangon">
 		<description>Hang On (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>パックスエレクトロニカ (Pax Electronica)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ハングオン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -15655,9 +15965,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="hotmilkd">
 		<description>Hot Milk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ホットミルク"/>
+		<year>1987</year>
+		<publisher>フェアリーテール (Fairytale)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="ほっとミルク"/>
 		<!--combined image-->
 		<!--rom name="hot milk.d88" size="697696" crc="6b7af589" sha1="f9db8c0ebf748129e7bc588688cae2b48740ba60" offset="0" /-->
 
@@ -15690,8 +16002,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="hotelwar">
 		<description>Hotel Wars</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ボーステック (Bothtec)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="ホテルウォーズ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hotel wars.d88" size="348848" crc="fc30ffbb" sha1="d104742179cc07ceaa75769cc51333291fac0861" offset="0" />
@@ -16245,8 +16560,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="imitcity">
 		<description>Imitation City</description>
-		<year>19??</year>
+		<year>1987</year>
 		<publisher>データウエスト (Data West)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="イミテーションシティ"/>
 		<!--combined image-->
 		<!--rom name="imitation city.d88" size="697696" crc="60db1183" sha1="5bcfe89fe450b2dbd6eb49091670cb7a8410d581" offset="0" /-->
 
@@ -16750,8 +17068,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="jangball">
 		<description>Jang Ball</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="雀ボール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="jang ball.d88" size="348848" crc="7699492c" sha1="a4baa5f98167c9f50d385e2beabef179eaf5a385" offset="0" />
@@ -16827,6 +17148,8 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		<description>Jesus</description>
 		<year>1987</year>
 		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198704xx"/>
 		<info name="alt_title" value="ジーザス"/>
 		<!--combined image-->
 		<!--rom name="jesus.d88" size="1046512" crc="658f7db0" sha1="96e8438444312c5d519fb90a7ef21a454bac777d" offset="0" /-->
@@ -16866,8 +17189,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="jesusa" cloneof="jesus">
 		<description>Jesus (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="ジーザス"/>
 		<!--combined image-->
 		<!--rom name="jesus.d88" size="1046496" crc="b1faf10c" sha1="4612932c602d5a362e38b5eef153c22cd2b8fe96" offset="0" /-->
 
@@ -17264,8 +17590,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="kabbalan">
 		<description>Kabbala no Himitsu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>全流通 (Zenryutsu)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="カバラの秘密"/>
 		<!--combined image-->
 		<!--rom name="kabbala no himitsu.d88" size="697696" crc="70a3b140" sha1="91d37423a6021d67c68f2e329d880706c23497b1" offset="0" /-->
 
@@ -17425,9 +17754,12 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="kaleido1">
-		<description>Kaleidoscope II - Hakkan Wakusei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Kaleidoscope - Hakkan Wakusei</description>
+		<year>1986</year>
+		<publisher>HOT・B</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="カレイドスコープ発汗惑星"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="kaleidoscope ii - hakkan wakusei.d88" size="392368" crc="075479a1" sha1="6ef70e855b3d1b81269e9e96879270a749f904dc" offset="0" />
@@ -18186,8 +18518,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="thekings">
 		<description>The King Salmon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>HOT・B</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="ザ・キングサーモン"/>
 		<!--combined image-->
 		<!--rom name="the king salmon.d88" size="1171472" crc="0d00713f" sha1="99d5f54df9d4ea41b252751d0ffb8773d458f334" offset="0" /-->
 
@@ -18237,8 +18572,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="kingsnig">
 		<description>King's Night Special</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>スクウェア (Square)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="キングスナイトスペシャル"/>
 		<!--combined image-->
 		<!--rom name="king's night special.d88" size="697664" crc="72c57b64" sha1="f5b8741738debde59c7cec7c6aefd57bb213171d" offset="0" /-->
 
@@ -18270,8 +18608,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 	<software name="kisei">
 		<description>Kisei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="棋聖"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="kisei.d88" size="348848" crc="4b0bf9fd" sha1="6f28ffcf0003fee1bc1cfc439c58c45385eb5d62" offset="0" />
@@ -18316,9 +18657,12 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="knither">
-		<description>Knither - Demon Crystal 2</description>
-		<year>19??</year>
+		<description>Knither - Demon Crystal II</description>
+		<year>1987</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="ナイザー -デーモンクリスタルⅡ-"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="demon crystal 2 knither.d88" size="348848" crc="51fc6b9d" sha1="8294d54f6ee340ed55af5d3c593463e0b203377c" offset="0" />
@@ -18706,8 +19050,11 @@ ExtractDisk  [04]"四			  " -> "Kohakuiro no Yuigon 04.d88"
 
 	<software name="kudokika">
 		<description>Kudokikata Oshiemasu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>ハード (Hard)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="口説きかた教えます"/>
 		<!--combined image-->
 		<!--rom name="kudokikata oshiemasu.d88" size="697696" crc="0775ddc7" sha1="fc06e542454953418c87013f255a2ec1b395af4f" offset="0" /-->
 
@@ -18760,8 +19107,11 @@ ExtractDisk  [04]"四			  " -> "Kohakuiro no Yuigon 04.d88"
 
 	<software name="kugyokud">
 		<description>Kugyokuden</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="九玉伝"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk 1" />
 			<dataarea name="flop" size="348832">
@@ -18779,8 +19129,11 @@ ExtractDisk  [04]"四			  " -> "Kohakuiro no Yuigon 04.d88"
 
 	<software name="kugyokuda" cloneof="kugyokud">
 		<description>Kugyokuden (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="九玉伝"/>
 		<!--combined image-->
 		<!--rom name="kugyokuden.d88" size="697696" crc="1a23f4f1" sha1="053875800c44346c0fbd087e5436fb79c3871cb3" offset="0" /-->
 
@@ -18964,9 +19317,11 @@ ExtractDisk  [04]"四			  " -> "Kohakuiro no Yuigon 04.d88"
 
 	<software name="labyrint">
 		<description>Labyrinth</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ラピリンス"/>
+		<year>1987</year>
+		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198707xx"/>
+		<info name="alt_title" value="ラビリンス"/>
 		<!--combined image-->
 		<!--rom name="labyrinth.d88" size="697696" crc="fc0784b5" sha1="060ea9ce80770b2e8ff034c0fc6b92eaae44d4a9" offset="0" /-->
 
@@ -19046,8 +19401,11 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lamia199">
 		<description>Lamia 1999</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="ラミア１９９９"/>
 		<!--combined image-->
 		<!--rom name="lamia 1999.d88" size="1171472" crc="a1a0a96f" sha1="5cd4e17d89439988e20cc63f97e4a326e206cc7f" offset="0" /-->
 
@@ -19106,8 +19464,10 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lasvegas">
 		<description>Las Vegas</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="ラスベガス"/>
 		<!--combined image-->
 		<!--rom name="las vegas.d88" size="1046544" crc="8c66e260" sha1="7db12171227ae2431e72f990a419467e39d16fa9" offset="0" /-->
@@ -19364,8 +19724,11 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lawwest">
 		<description>Law of the West</description>
-		<year>19??</year>
-		<publisher>PonyCa</publisher>
+		<year>1987</year>
+		<publisher>ポニカ (Pony Canyon)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="ローオブザ・ウエスト"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="law of the west.d88" size="348848" crc="c2c79c0d" sha1="288d8881bfb2a96571c79364418ef4cab875b1d9" offset="0" />
@@ -19425,8 +19788,11 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="leftymou">
 		<description>Lefty Mouse</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="レフティマウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="346080">
 				<rom name="lefty mouse.d88" size="346080" crc="d006b425" sha1="cf8064c221455a511f99b6609055c017a27224d9" offset="0" />
@@ -19874,8 +20240,11 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lolitahi">
 		<description>Lolita-hime no Densetsu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>パスカル２ (Pascal2)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ロリータ姫の伝説"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="lolita-hime no densetsu.d88" size="348848" crc="576fd53c" sha1="89b90dca84fa6989e98f53cf962d3002ad8515a0" offset="0" />
@@ -19885,8 +20254,10 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lolitahia" cloneof="lolitahi">
 		<description>Lolita-hime no Densetsu (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>パスカル２ (Pascal2)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ロリータ姫の伝説"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -19897,8 +20268,10 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lolitah1">
 		<description>Lolita-hime no Enikki - Ikenai Pose Shu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>パスカル２ (Pascal2)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="ロリータ姫の絵日記"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -20025,9 +20398,11 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lotlot">
 		<description>Lot Lot</description>
-		<year>19??</year>
-		<publisher>テクノポリスソフト (Technopolis Soft)</publisher>
-		<info name="alt_title" value="ロットロット lotlot"/>
+		<year>1986</year>
+		<publisher>徳間コミュニケーションズ (Tokuma Communications)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ロットロット"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="lot lot.d88" size="348832" crc="d4c9ede4" sha1="687c16c9220d6c4dfb430c0316ac4bfbaea5863f" offset="0" />
@@ -20124,8 +20499,10 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lunacity">
 		<description>Luna City Satsujin Jiken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>パスカル２ (Pascal2)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ルナシティ殺人事件"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -20258,8 +20635,11 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lyrane">
 		<description>Lyrane</description>
-		<year>19??</year>
+		<year>1987</year>
 		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="ライレーン"/>
 		<!--combined image-->
 		<!--rom name="lyrane.d88" size="697696" crc="7dc1a432" sha1="0b05df04e058d7d0104028d6a90151cd09cc672b" offset="0" /-->
 
@@ -20280,8 +20660,10 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="lyranea" cloneof="lyrane">
 		<description>Lyrane (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="ライレーン"/>
 		<!--combined image-->
 		<!--rom name="lyrane.d88" size="697696" crc="7edfb77f" sha1="5671c008868fedb8f7578552eb41a5e7f790a3be" offset="0" /-->
@@ -20364,8 +20746,11 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 
 	<software name="madelein">
 		<description>Madeleine</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="マデリーン"/>
 		<!--combined image-->
 		<!--rom name="madeleine.d88" size="804704" crc="896606dc" sha1="958f1b9718e4d4b4950ec4b4c10ea4675dbbb892" offset="0" /-->
 
@@ -20533,8 +20918,10 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 -->
 	<software name="mahakala">
 		<description>Maha-kala</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>マジカルズゥ (MagicalZoo)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="摩訶迦羅"/>
 		<!--combined image-->
 		<!--rom name="maha-kala.d88" size="1306304" crc="4d2c0ccd" sha1="6f36eeda7853704e411d8ab7b507c7a4e0d45d61" offset="0" /-->
@@ -20803,8 +21190,11 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="maidum">
 		<description>Maidum</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>NCS</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
+		<info name="alt_title" value="メイドゥム"/>
 		<!--combined image-->
 		<!--rom name="maidum.d88" size="697696" crc="c1f535d4" sha1="80741b60727f776c62ee2ee6ba65f1e25feb656f" offset="0" /-->
 
@@ -20825,8 +21215,10 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="maiduma" cloneof="maidum">
 		<description>Maidum (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>NCS</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
 		<info name="alt_title" value="メイドゥム"/>
 		<!--combined image-->
 		<!--rom name="maidum (a).d88" size="697696" crc="08940f7e" sha1="1003571aa521e12f71da96d321da7b9396447add" offset="0" /-->
@@ -20859,8 +21251,10 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="mikkoku">
 		<description>Maison Ikkoku</description>
-		<year>19??</year>
+		<year>1986</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<!--PC8801-->
+		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="めぞん一刻"/>
 		<!--combined image-->
 		<!--rom name="maison ikkoku.d88" size="761296" crc="b484dee2" sha1="8f3356d54ea92280572e49c69a90a1615b687dc4" offset="0" /-->
@@ -21015,8 +21409,11 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="majavent">
 		<description>Majaventure - Negi Mahjong</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>徳間コミュニケーションズ (Tokuma Communications)</publisher>
+		<!--PC8801-->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="まじゃべんちゃー ねぎ麻雀"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="majaventure - negi mahjong.d88" size="348848" crc="a85cd6d4" sha1="e87f2f6aa5912f346c3501b79d81382a6199b5af" offset="0" />
@@ -21025,9 +21422,11 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="majaventa" cloneof="majavent">
-		<description>Majaventure Negi Mahjong (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Majaventure - Negi Mahjong (Alt)</description>
+		<year>1986</year>
+		<publisher>徳間コミュニケーションズ (Tokuma Communications)</publisher>
+		<!--PC8801-->
+		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="まじゃべんちゃー ねぎ麻雀"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -21162,8 +21561,10 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="makaifuk">
 		<description>Makai Fukkatsu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ソフトスタジオＷＩＮＧ (Soft Studio Wing)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198704xx"/>
 		<info name="alt_title" value="魔界復活"/>
 		<!--combined image-->
 		<!--rom name="makai fukkatsu.d88" size="693312" crc="d7f65654" sha1="c0865d914b62e3b557255b54b811d81f93603bd5" offset="0" /-->
@@ -21312,8 +21713,11 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="themanil">
 		<description>The Man I Love</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<!--PC8801-->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="マスターオブモンスターズ"/>
 		<!--combined image-->
 		<!--rom name="the man i love.d88" size="794432" crc="0e99fba4" sha1="78e6b3396cd1040dfd84840f58d7989a0904d1eb" offset="0" /-->
 
@@ -21368,10 +21772,12 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="marikono">
+	<software name="marikohs">
 		<description>Mariko no Heya Sorekara</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>パルコム (Palcom)</publisher>
+		<!--PC8801-->
+		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="マリコの部屋 それから"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349744">
@@ -21380,10 +21786,12 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="marikonoa" cloneof="marikono">
+	<software name="marikohe">
 		<description>Mariko no Heya (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>パルコム (Palcom)</publisher>
+		<!--PC8801-->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="マリコの部屋"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -21441,9 +21849,12 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="kagai">
-		<description>Maruhi Kagai Jugyou Hen??</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Maruhi Kagai Jugyou-Hen</description>
+		<year>1986</year>
+		<publisher>グレイト (Great)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="マル秘 課外授業編"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="kagai.d88" size="348832" crc="5f4d123d" sha1="03e4568928c729d797d8fcdc881e22c361ab5877" offset="0" />
@@ -21845,7 +22256,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="melonsod">
 		<description>Melon Soda</description>
 		<year>1987</year>
-		<publisher>パスカル2 (Pascal2)</publisher>
+		<publisher>パスカル２ (Pascal2)</publisher>
 		<!-- PC8801 -->
 		<info name="alt_title" value="メロンソーダ"/>
 		<!--combined image-->
@@ -21869,7 +22280,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="melonsoda" cloneof="melonsod">
 		<description>Melon Soda (Alt)</description>
 		<year>1987</year>
-		<publisher>パスカル2 (Pascal2)</publisher>
+		<publisher>パスカル２ (Pascal2)</publisher>
 		<!-- PC8801 -->
 		<info name="alt_title" value="メロンソーダ"/>
 		<!--combined image-->
@@ -22980,9 +23391,11 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="moonchil">
 		<description>Moon Child</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ムーンチャイルド"/>
+		<year>1987</year>
+		<publisher>HOT・B</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="ムーンチャイルド"/>        
 		<!--combined image-->
 		<!--rom name="moon child.d88" size="697696" crc="cf86aa5e" sha1="8f541854a18b689841bdbf8a4b23ecdab3cdd32b" offset="0" /-->
 
@@ -23094,8 +23507,10 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="motokohi">
 		<description>Motoko-hime Adventure</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>辰巳出版 (Tatsumi Publishing)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
 		<info name="alt_title" value="素子姫アドベンチャー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -23345,9 +23760,12 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="mugensen">
-		<description>Mugensenshi Valis</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Mugen Senshi Valis</description>
+		<year>1986</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="夢幻戦士ヴァリス"/>
 		<!--combined image-->
 		<!--rom name="mugensenshi valis.d88" size="829984" crc="316be3e3" sha1="7b9d01c671d3b3f5e5f7cb9491766ab8107c4cfc" offset="0" /-->
 
@@ -23368,8 +23786,8 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 	<software name="mugensed">
 		<description>Mugensenshi Valis II Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<!--combined image-->
 		<!--rom name="mugensenshi valis 2 demo.d88" size="831936" crc="41fff51a" sha1="5a950b2dce5301f1ffaea9a85f545a5ff7754a7a" offset="0" /-->
 
@@ -23446,26 +23864,6 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 				<rom name="mugensenshi valis ii (disk g).d88" size="415824" crc="9d1aacb7" sha1="13dca06fed32ed06c59ab56036ccadf9e788ecbd" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-<!--
-ExtractDisk  [01]"Mader Club DISK " -> "murder club_01.d88"
-ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
--->
-	<software name="murdercl">
-		<description>Murder Club</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="murder club.d88" size="832784" crc="cd71ac13" sha1="2f25920eb13f410d6aa10c03f3ef398e538d3e05" offset="0" /-->
-		<!-- Disk (-,-) -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="416112">
-				<rom name="murder club_01.d88" size="416112" crc="76eda8ee" sha1="bc4f085b7e976df5c696cd3802f5ae594757bfec" offset="0" />
-			</dataarea>
-		</part>
-		<!-- Disk 2 is the same as Satsujin Kurabu -->
 	</software>
 
 	<software name="murdrtop">
@@ -23926,7 +24324,9 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 	<software name="nilenami">
 		<description>Nile no Namida</description>
 		<year>1986</year>
-		<publisher>Cross Media Soft</publisher>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="ナイルの涙"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349664">
@@ -24217,10 +24617,12 @@ ExtractDisk  [04]"DATAディスク	" -> "Nobunaga no Yabo Sengokugun'yuden 04.d8
 	</software>
 
 	<software name="nobunag3">
-		<description>Nobunaga no Yabo Zenkokuban</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="信長の野望・全国版SR"/>
+		<description>Nobunaga no Yabou - Zenkokuban</description>
+		<year>1986</year>
+		<publisher>光栄 (Koei)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="信長の野望・全国版"/>
 		<!--combined image-->
 		<!--rom name="nobunaga no yabo zenkokuban.d88" size="697664" crc="9ff59f02" sha1="93187048347136f1bf0b02a756270d8e0b3bf990" offset="0" /-->
 
@@ -24461,8 +24863,11 @@ ExtractDisk  [05]"ｺｹﾞﾝﾀ		   " -> "Nukenin Densetsu 05.d88"
 
 	<software name="ogre">
 		<description>Ogre</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>システムソフト (System Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="オーガ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ogre.d88" size="348848" crc="e407bbe1" sha1="444c8fff2695c0aaa7ac2affd8c38912f97180c5" offset="0" />
@@ -24581,8 +24986,11 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 
 	<software name="ojosamac">
 		<description>Ojosama Club</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>テクノポリスソフト (Technopolis Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="お嬢様くらぶ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ojosama club.d88" size="348848" crc="7a318368" sha1="3f53ea480f3a2462703a82df3abbaf43a87e6270" offset="0" />
@@ -24592,8 +25000,11 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 
 	<software name="ojosamaca" cloneof="ojosamac">
 		<description>Ojosama Club (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>テクノポリスソフト (Technopolis Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="お嬢様くらぶ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ojosama club (a).d88" size="348848" crc="27e0b78b" sha1="e6d2544f750dadda27b9e0b42f6e1560d2b3c7bc" offset="0" />
@@ -25219,8 +25630,11 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 
 	<software name="pachicom">
 		<description>Pachi Com</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>東芝ＥＭＩ (Toshiba EMI)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="パチコン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="pachi com.d88" size="348848" crc="94d142a1" sha1="bc3096000c81a2bdb743dfe5fa16a35620e75308" offset="0" />
@@ -25425,9 +25839,12 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="peepinga">
-		<description>Peeping(a)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>The Peeping (Alt)</description>
+		<year>1986</year>
+		<publisher>全流通 (Zenryutsu)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ザ・ピーピング"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="peeping(a).d88" size="348848" crc="599a6d15" sha1="4cb8f6eeaa3be01e72758caf2db15ae754e6056b" offset="0" />
@@ -25436,9 +25853,12 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="peeping">
-		<description>Peeping</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>The Peeping</description>
+		<year>1986</year>
+		<publisher>全流通 (Zenryutsu)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ザ・ピーピング"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="peeping.d88" size="348848" crc="4ad42b3b" sha1="a566a947d1142c69a59ae429ced301b16fd875c5" offset="0" />
@@ -25576,9 +25996,12 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="phantasi">
-		<description>Phantasie I</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Phantasie</description>
+		<year>1986</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="ファンタジー"/>
 		<!--combined image-->
 		<!--rom name="phantasie i.d88" size="694928" crc="6d12b3bd" sha1="19910a9459a0f753184dc76e5de02c17c17d5085" offset="0" /-->
 
@@ -25598,9 +26021,12 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="phantas1">
-		<description>Phantasie II Story of Ferronrah</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Phantasie II - Story of Ferronrah</description>
+		<year>1987</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="ファンタジー２"/>
 		<!--combined image-->
 		<!--rom name="phantasie ii story of ferronrah.d88" size="1046544" crc="0161e97b" sha1="204a81b035ab78a92fb86875a3d7d53efe22467c" offset="0" /-->
 
@@ -26181,8 +26607,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ2		   " -> "phantasie iv the birth of heroes_03.d8
 
 	<software name="poplemon">
 		<description>Pop Lemon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ポップレモン"/>
 		<!--combined image-->
 		<!--rom name="pop lemon.d88" size="697696" crc="b8b2be06" sha1="a3f59bb002801eae76c5ed4ab8327f9fd092bc28" offset="0" /-->
 
@@ -26203,9 +26632,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ2		   " -> "phantasie iv the birth of heroes_03.d8
 
 	<software name="poplemona" cloneof="poplemon">
 		<description>Pop Lemon (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ポップレモン"/>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ポップレモン"/>
 		<!--combined image-->
 		<!--rom name="pop lemon.d88" size="697696" crc="9acd9ee4" sha1="093208b48173e3203a5e23663fff6273de227dd3" offset="0" /-->
 
@@ -26794,8 +27225,11 @@ ExtractDisk  [02]"DRIVE_2		 " -> "pro yakyu fan & yosei gips_02.d88"		fde0b7fe
 
 	<software name="projecta">
 		<description>Project A-ko</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>辰巳出版 (Tatsumi Publishing)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="プロジェクトＡ子"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348592">
 				<rom name="project a-ko.d88" size="348592" crc="3788b090" sha1="e60ef410c39374fab005e307df72c26445e409ef" offset="0" />
@@ -27589,8 +28023,11 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 
 	<software name="rebirth">
 		<description>Re-Birth</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>SPS</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="リバース"/>
 		<!--combined image-->
 		<!--rom name="re-birth.d88" size="1666928" crc="b1b5f1fc" sha1="f1e9686c81744cfbcf1b799ddae2e2aad873a739" offset="0" /-->
 
@@ -27693,8 +28130,11 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 
 	<software name="redwing">
 		<description>Red Wing</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="レッドウィング"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="red wing.d88" size="348848" crc="9bb2d724" sha1="187d2921a6a08d040c0c5fbbd69ef6fb72fe4c4e" offset="0" />
@@ -27714,9 +28154,11 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 	</software>
 
 	<software name="reina">
-		<description>Reina - An Angel of a Girl</description>
+		<description>Reina - An Angel of a Girl.</description>
 		<year>1987</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
 		<info name="alt_title" value="麗奈 -AN ANGEL OF A GIRL.-"/>
 		<!--combined image-->
 		<!--rom name="angel girl.d88" size="697696" crc="2439157a" sha1="d12b0e0c5347b7b337b9916eba7de857c928b4b2" offset="0" /-->
@@ -28241,8 +28683,11 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 
 	<software name="robowres">
 		<description>RoboWres2001</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>マイクロネット (Micronet)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="ロボレス２００１"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="robowres2001.d88" size="348848" crc="68d16658" sha1="c4026565cab17c593121b26872fed30eb41701eb" offset="0" />
@@ -28371,8 +28816,11 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 
 	<software name="romancia">
 		<description>Romancia</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="ロマンシア"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415824">
 				<rom name="romancia.d88" size="415824" crc="b4682009" sha1="63d0d53bf2fb78d67391bbfe544c6bf39d589b7e" offset="0" />
@@ -28382,8 +28830,10 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 
 	<software name="romanciaa" cloneof="romancia">
 		<description>Romancia (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="ロマンシア"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
@@ -28477,8 +28927,11 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 
 	<software name="ruin">
 		<description>Ruin</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ウィンキーソフト (Winky Soft)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="ルーイン"/>
 		<!--combined image-->
 		<!--rom name="ruin.d88" size="1171472" crc="521d0bd4" sha1="7c0bf1f6b489dfc9e8c85d446fa6081671ad0523" offset="0" /-->
 
@@ -28699,8 +29152,11 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 
 	<software name="sf3dorig">
 		<description>S.F.3.D. - Original Operation Thanksgiving</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!--PC8801-->
+		<info name="release" value="198609xx"/>
+		<info name="alt_title" value="ポイントＸ占領作戦 (Box)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="365168">
 				<rom name="s.f.3.d. - original operation thanksgiving.d88" size="365168" crc="4985b37a" sha1="d13efd4b247b0e6ec702e769e51a5963fa007411" offset="0" />
@@ -29052,9 +29508,12 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B		" -> "Sangokushi 02.d88"
     </software>
 
 	<software name="sangoku1b" cloneof="sangoku1">
-		<description>Sangokushi SR (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sangokushi SR Ban (Alt)</description>
+		<year>1987</year>
+		<publisher>光栄 (Koei)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="三国志SR版"/>
 		<!--combined image-->
 		<!--rom name="sangokushi sr.d88" size="1142832" crc="adb97e00" sha1="60c074525d555efabc480ccafb19aa454a4b2178" offset="0" /-->
 
@@ -29333,27 +29792,6 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B		" -> "Sangokushi 02.d88"
 			<feature name="part id" value="M.Requiem Disk B" />
 			<dataarea name="flop" size="416672">
 				<rom name="satsui no seppun (m. requiem - disk b).d88" size="416672" crc="b4b1890a" sha1="9ae867d638c97d9dab866886d9fdf556e4fe1e88" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Murder Club?? -->
-	<software name="satsujik">
-		<description>Satsujin Kurabu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="satsujin kurabu.d88" size="832768" crc="0056ddaf" sha1="b6c0a65e336ae7b38a02a1a171288000fdc9cbc0" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="416096">
-				<rom name="satsujin kurabu (disk 1).d88" size="416096" crc="f13e49f9" sha1="0da48b40d781f25cb47235354658c22f0c31422d" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="416672">
-				<rom name="satsujin kurabu (disk 2).d88" size="416672" crc="778cc503" sha1="6f5d67a1ddbb5444977aeacf017a8bd8b34e9068" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -29752,10 +30190,27 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B		" -> "Sangokushi 02.d88"
 		</part>
 	</software>
 
+	<software name="seijopan">
+		<description>Seijo Panic</description>
+		<year>1986</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="聖女ぱにっく"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="seijo panic.d88" size="348848" crc="fcdbb331" sha1="25f8185fb6d349edaa29d1b16150a59045f3ea3c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="seijopana" cloneof="seijopan">
 		<description>Seijo Panic (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="聖女ぱにっく"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="seijo panic (a).d88" size="348832" crc="ca651f14" sha1="d10fdb251a9143d083d6db1f04983aa9498d1ba1" offset="0" />
@@ -29926,8 +30381,11 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B		" -> "Sangokushi 02.d88"
 
 	<software name="sekaiyar">
 		<description>Sekai Yaruhodo So Much</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ピーコック (Peacock)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="世界やるほどＳＯ ＭＵＣＨ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="sekai yaruhodo so much.d88" size="348848" crc="fc31ab70" sha1="1aa1eb99eb12568bdabde3e65ace5cbd8b37e233" offset="0" />
@@ -30045,8 +30503,11 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B		" -> "Sangokushi 02.d88"
 
 	<software name="senjonoo">
 		<description>Senjo no Ookami</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="戦場の狼"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="senjo no ookami.d88" size="348832" crc="8591df6d" sha1="864f1938e58fd28f109a60e415b3d4ab41de6c08" offset="0" />
@@ -30056,8 +30517,10 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B		" -> "Sangokushi 02.d88"
 
 	<software name="senjonooa" cloneof="senjonoo">
 		<description>Senjo no Ookami (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198703xx"/>
 		<info name="alt_title" value="戦場の狼"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -30187,6 +30650,8 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B		" -> "Sangokushi 02.d88"
 		<description>Shanghai</description>
 		<year>1987</year>
 		<publisher>システムソフト (System Soft)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198704xx"/>
 		<info name="alt_title" value="上海"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -30360,9 +30825,12 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B		" -> "Sangokushi 02.d88"
 	</software>
 
 	<software name="shikenni">
-		<description>Shiken ni Deru Uru-sei Yatsura</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shiken ni Deru Urusei Yatsura</description>
+		<year>1986</year>
+		<publisher>キティエンタープライズ (Kitty Enterprise)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="試験に出るうる星やつら"/>
 		<!--combined image-->
 		<!--rom name="shiken ni deru uru-sei yatsura.d88" size="719456" crc="c2967757" sha1="5fe32ac0df1ac7cc4c9dad998c1d1434ee7a6bcc" offset="0" /-->
 
@@ -31034,8 +31502,10 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 
 	<software name="shogi88">
 		<description>Shogi88</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>システムソフト (System Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
 		<!--combined image-->
 		<!--rom name="shogi88.d88" size="697696" crc="e6f2b3a8" sha1="d7f3c089260939fa8dbb71c9c860e18796689151" offset="0" /-->
 
@@ -31056,8 +31526,11 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 
 	<software name="shomakyo">
 		<description>Shomakyo no Densetsu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="照魔鏡の伝説"/>
 		<!--combined image-->
 		<!--rom name="shomakyo no densetsu.d88" size="1046544" crc="53373ee4" sha1="7dd2e9bb7cff03192c11b624812229ad3b2d59f6" offset="0" /-->
 
@@ -31163,8 +31636,8 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 
 	<software name="silphedd">
 		<description>Silpheed Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<!--combined image-->
 		<!--rom name="silpheed demo.d88" size="784736" crc="80dbf259" sha1="27e0d72ea4b2160bbdcbbc71f364778cd50c3215" offset="0" /-->
 
@@ -31196,8 +31669,11 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 
 	<software name="silphee1">
 		<description>Silpheed(invincible cheat)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="シルフィード"/>
 		<!--combined image-->
 		<!--rom name="silpheed(invincible cheat).d88" size="1245792" crc="ea595cfb" sha1="9e64ed0aa44c90322bd85f20c1fde2b0e3c2a98a" offset="0" /-->
 
@@ -31225,8 +31701,11 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 
 	<software name="silphee2">
 		<description>Silpheed</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="シルフィード"/>
 		<!--combined image-->
 		<!--rom name="silpheed.d88" size="830528" crc="34b1ea11" sha1="3e60ff944963d8eac8d983eb749e4f1b7e74bd60" offset="0" /-->
 
@@ -31584,9 +32063,11 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 
 	<software name="soapland">
 		<description>Soapland Story</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ソーブランドストーリー"/>
+		<year>1986</year>
+		<publisher>ハード (Hard)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ソープランドストーリー"/>
 		<!--combined image-->
 		<!--rom name="soapland story.d88" size="697696" crc="2b8d5fce" sha1="2f489a0393657f252606b47acfd5bc8d4e131ce0" offset="0" /-->
 
@@ -31770,8 +32251,10 @@ ExtractDisk  [03]"SONOGONOKEIKO_P3" -> "sonogo no keiko-chan full pack_03.d88"
 
 	<software name="sonogono">
 		<description>Sonogo no Keiko-chan Kangofu-hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="その後の慶子ちゃん 看護婦編"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
 				<rom name="sonogo no keiko-chan kangofu-hen.d88" size="344496" crc="c169856f" sha1="4b8eb2a5eb41ceff9f72fb2d3830038fb7571ce0" offset="0" />
@@ -31781,8 +32264,10 @@ ExtractDisk  [03]"SONOGONOKEIKO_P3" -> "sonogo no keiko-chan full pack_03.d88"
 
 	<software name="sonogon1">
 		<description>Sonogo no Keiko-chan OL Hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="その後の慶子ちゃん ＯＬ編"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
 				<rom name="sonogo no keiko-chan ol hen.d88" size="344496" crc="f744ba9f" sha1="ff2f78f09da002263582c3b20a047b90c043681f" offset="0" />
@@ -32357,8 +32842,11 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 
 	<software name="spyvsspy">
 		<description>Spy vs Spy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>HOT・B</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="スパイＶＳスパイ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="spy vs spy.d88" size="348848" crc="e062d092" sha1="ab4d21163818b39f2ad6b606bb19bc97d25553c4" offset="0" />
@@ -32498,8 +32986,11 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 
 	<software name="starsymp">
 		<description>Star Symphony</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
+		<info name="alt_title" value="スターシンフォニー"/>
 		<!--combined image-->
 		<!--rom name="star symphony.d88" size="698512" crc="d79e7454" sha1="515f5acfb2f8c8939fdc42b031f4027785c25206" offset="0" /-->
 
@@ -32521,8 +33012,11 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 
 	<software name="starsympa" cloneof="starsymp">
 		<description>Star Symphony (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198609xx"/>
+		<info name="alt_title" value="スターシンフォニー"/>
 		<!--combined image-->
 		<!--rom name="star symphony.d88" size="698480" crc="6f4ca179" sha1="f22fa8c5e2d1e26e68c9df06cde49885a46815af" offset="0" /-->
 
@@ -32753,9 +33247,12 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 	</software>
 
 	<software name="strawber">
-		<description>Strawberry Soft #2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Strawberry Soft #2 - SM Sailor-fuku</description>
+		<year>1987</year>
+		<publisher>ストロベリーソフト (Strawberry Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="ストロベリーソフト#2 ＳＭセーラー服"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348064">
 				<rom name="strawberry soft #2.d88" size="348064" crc="abc060f3" sha1="dd89ff5241bfb3d409944e61a498b0b07ac28a6d" offset="0" />
@@ -33058,8 +33555,11 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 
 	<software name="summerga">
 		<description>Summer Games</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ポニカ (Pony Canyon)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="サマーゲームス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="summer games.d88" size="348848" crc="e852fc23" sha1="abc0ceef39b2369916e1c91be933340113e8b75a" offset="0" />
@@ -33234,8 +33734,8 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 
 	<software name="superpit">
 		<description>Super Pitfall(invincible cheat)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ポニカ (Pony Canyon)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="super pitfall(invincible cheat).d88" size="348848" crc="825faab2" sha1="604cd4262f8e17b2575526808291225296f748cd" offset="0" />
@@ -33245,8 +33745,11 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 
 	<software name="superpi1">
 		<description>Super Pitfall</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ポニカ (Pony Canyon)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="スーパーピットフォール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="super pitfall.d88" size="348848" crc="04a823e0" sha1="83f927acfbd1f9de6d85ac4f4c827073593a9178" offset="0" />
@@ -33441,8 +33944,10 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 
 	<software name="asteka2">
 		<description>Taiyou no Shinden - Asteka II</description>
-		<year>19??</year>
+		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="太陽の神殿 アステカ２"/>
 		<!--combined image-->
 		<!--rom name="asteka ii.d88" size="1180480" crc="2423d1c2" sha1="2c8d188aea56c64e65767531c390a1f0869430f0" offset="0" /-->
@@ -33829,8 +34334,11 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 
 	<software name="tekiwaka">
 		<description>Teki wa Kaizoku - Kaizokuban</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="敵は海賊・海賊版"/>
 		<!--combined image-->
 		<!--rom name="teki wa kaizoku - kaizokuban.d88" size="697696" crc="8d124d4d" sha1="8a42841d46fa878154764d8b94d62ba09f2ea1ec" offset="0" /-->
 
@@ -33850,9 +34358,12 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"
 	</software>
 
 	<software name="tekiwakaa" cloneof="tekiwaka">
-		<description>Teki wa Kaizoku - Kaizoku-ban (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Teki wa Kaizoku - Kaizokuban (Alt)</description>
+		<year>1987</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="敵は海賊・海賊版"/>
 		<!--combined image-->
 		<!--rom name="teki wa kaizoku - kaizoku-ban.d88" size="697696" crc="350d8b20" sha1="06c83c40afbbdf7b227440c0cbfa899d23ce3220" offset="0" /-->
 
@@ -34927,8 +35438,11 @@ ExtractDisk  [02]"DISK B		  " -> "telenet music box (b)_02.d88"
 
 	<software name="tobirawo">
 		<description>Tobira wo Hirakete</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>キティエンタープライズ (Kitty Enterprise)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="扉を開けて"/>
 		<!--combined image-->
 		<!--rom name="tobira wo hirakete.d88" size="832528" crc="60a863ed" sha1="e24a2f9dd3b7a2ef4b309355d5e5524fa7e07d22" offset="0" /-->
 
@@ -35391,8 +35905,11 @@ ExtractDisk  [02]"DISK B		  " -> "telenet music box (b)_02.d88"
 
 	<software name="topplezi">
 		<description>Topple Zip</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ボーステック (Bothtec)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="トップルジップ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="topple zip.d88" size="348848" crc="62409179" sha1="432fdcd91e247a69f24136bc68654e9d63df8474" offset="0" />
@@ -35402,8 +35919,8 @@ ExtractDisk  [02]"DISK B		  " -> "telenet music box (b)_02.d88"
 
 	<software name="topplezd">
 		<description>Topple Zip Demo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ボーステック (Bothtec)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="topple zip demo.d88" size="348848" crc="a0b92f64" sha1="a2535b8fabfcacc65c4e2ce84bb34fa59daf93a7" offset="0" />
@@ -35450,8 +35967,11 @@ ExtractDisk  [02]"DISK B		  " -> "telenet music box (b)_02.d88"
 
 	<software name="touch">
 		<description>Touch</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>東宝 (Toho)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="タッチ"/>
 		<!--combined image-->
 		<!--rom name="touch.d88" size="697696" crc="7fcb8848" sha1="7e29ef15fd2572fa7eefeff72b4a85f8a7fd4b56" offset="0" /-->
 
@@ -35472,8 +35992,10 @@ ExtractDisk  [02]"DISK B		  " -> "telenet music box (b)_02.d88"
 
 	<software name="toucha" cloneof="touch">
 		<description>Touch (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>東宝 (Toho)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="タッチ"/>
 		<!--combined image-->
 		<!--rom name="touch.d88" size="697696" crc="432e191d" sha1="61cbea253eab55cd0ad38d6f0b91cb9e24c8f2af" offset="0" /-->
@@ -35711,8 +36233,11 @@ ExtractDisk  [02]"PROGRAM		 " -> "transylvania_02.d88"
 
 	<software name="trumpaid">
 		<description>Trump Aid</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>東芝ＥＭＩ (Toshiba EMI)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="トランプエイド"/>
 		<!--combined image-->
 		<!--rom name="trump aid.d88" size="697696" crc="96e0d324" sha1="31569c3d3d7a3af2f5b57929519cbb39f8f47e42" offset="0" /-->
 
@@ -36013,8 +36538,11 @@ ExtractDisk  [02]"PROGRAM		 " -> "transylvania_02.d88"
 
 	<software name="twilight">
 		<description>Twilight Zone</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>グレイト (Great)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="トワイライトゾーン"/>
 		<!--combined image-->
 		<!--rom name="twilight zone.d88" size="697664" crc="3158da19" sha1="df27b9644f8a6d2638250ee7103da244887f89fc" offset="0" /-->
 
@@ -36803,8 +37331,11 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 	<software name="uruseiya">
 		<description>Urusei Yatsura</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="うる星やつら"/>
 		<!--combined image-->
 		<!--rom name="uru-sei yatsura.d88" size="1557456" crc="951e54e1" sha1="9c1ab829d32a249e39aeac8488b16b3d419240fd" offset="0" /-->
 
@@ -36881,6 +37412,8 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 		<description>Utsukushiki Emono-Tachi 1</description>
 		<year>1987</year>
 		<publisher>グレイト (Great)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="美しき獲物たち"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -37236,8 +37769,11 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 	<software name="vaxol">
 		<description>Vaxol</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ハート電子 (Heart Denshi)</publisher>
+		<!--PC8801mk2SR-->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="ヴァクソル"/>
 		<!--combined image-->
 		<!--rom name="vaxol.d88" size="935264" crc="47cda3a5" sha1="e9bd5fee60d61849c2b978f7f6db591a09e7d8e5" offset="0" /-->
 
@@ -37306,8 +37842,11 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 	<software name="venusfir">
 		<description>Venus Fire</description>
-		<year>19??</year>
-		<publisher>Cross Media Soft</publisher>
+		<year>1986</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ヴィーナスの火 (or ヴィーナスファイアー)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="352112">
 				<rom name="venus fire.d88" size="352112" crc="d0d22881" sha1="52430e1c97b5478f4428c8a4967d5b53ec3c36a5" offset="0" />
@@ -37834,8 +38373,11 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 	<software name="wibarm">
 		<description>Wibarm</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>アルシスソフト (Arsys Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="ウィバーン"/>
 		<!--combined image-->
 		<!--rom name="wibarm.d88" size="830256" crc="cb2ca12f" sha1="3e33dbe71cd68a50059bc5a83a7b8a8d30be6f55" offset="0" /-->
 
@@ -37856,8 +38398,11 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 	<software name="wibarma" cloneof="wibarm">
 		<description>Wibarm (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>アルシスソフト (Arsys Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198608xx"/>
+		<info name="alt_title" value="ウィバーン"/>
 		<!--combined image-->
 		<!--rom name="wibarm.d88" size="830256" crc="b1420c63" sha1="10e89acc80397ff005d2ec26e1b021e163cb6f95" offset="0" /-->
 
@@ -38050,8 +38595,11 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 	<software name="winterga">
 		<description>Winter Games</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>ポニカ (Pony Canyon)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="ウィンターゲームス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348576">
 				<rom name="winter games.d88" size="348576" crc="6d177d6b" sha1="c51e92d4b3adba145f45708ad384854642b9bf89" offset="0" />
@@ -38123,9 +38671,12 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 	</software>
 
 	<software name="wizardr2">
-		<description>Wizardry 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Wizardry 2 - The Knight of Diamonds</description>
+		<year>1987</year>
+		<publisher>アスキー (ASCII) / SIRTEC</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="ウィザードリィ２"/>
 		<!--combined image-->
 		<!--rom name="wiz2a.d88" size="697696" crc="abd0303a" sha1="85a7452abf914d88c8b83204b18fcd55ea076274" offset="0" /-->
 
@@ -38423,8 +38974,11 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 
 	<software name="woodypo1">
 		<description>Woody Poco</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="うっでぃぽこ"/>
 		<!--combined image-->
 		<!--rom name="woody poco.d88" size="697664" crc="65bb8bd0" sha1="240ebf754a046336f6480c801a6ecdcdaa7505a2" offset="0" /-->
 
@@ -39107,9 +39661,12 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 	</software>
 
 	<software name="xanadusc">
-		<description>Xanadu Scenario 2</description>
-		<year>19??</year>
+		<description>Xanadu Scenario II - The Resurrection of Dragon</description>
+		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="ザナドゥ シナリオ２"/>
 		<!--combined image-->
 		<!--rom name="xanadu scenario 2.d88" size="1305408" crc="64263b22" sha1="47436a60de048d8ed08d24765631d33f731f7484" offset="0" /-->
 
@@ -40014,9 +40571,11 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yokiden">
-		<description>Yokiden</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Youkiden</description>
+		<year>1987</year>
+		<publisher>HOT・B</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="妖姫伝"/>
 		<!--combined image-->
 		<!--rom name="yokiden.d88" size="697664" crc="be868770" sha1="d303b96bee138bcdf48b2d442b97e58fd302a44c" offset="0" /-->
@@ -40611,7 +41170,7 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 	<software name="yumesho1">
 		<description>Yumeshojo Sayaka</description>
 		<year>1988</year>
-		<publisher>パスカル2 (Pascal2)</publisher>
+		<publisher>パスカル２ (Pascal2)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="夢少女さやか"/>
@@ -40635,8 +41194,10 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 
 	<software name="yunagino">
 		<description>Yunagi no Horizon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="夕なぎのホライゾン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="352112">
@@ -40974,9 +41535,12 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="zeta1">
-		<description>Zeta 1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zeta Soukan Go</description>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="ゼータ 創刊号"/>
 		<!--combined image-->
 		<!--rom name="zeta 1.d88" size="697696" crc="88411ab4" sha1="66a1015e928b7f9471d23431fb4c03017eefce8b" offset="0" /-->
 
@@ -40996,9 +41560,11 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="zeta2">
-		<description>Zeta 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zeta Soukan 2 Go</description>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="ゼータ 創刊２号"/>
 		<!--combined image-->
 		<!--rom name="zeta 2.d88" size="697696" crc="2b425484" sha1="cdc7d8d347eb184d84226418ddc05a07f2d1709e" offset="0" /-->
 
@@ -41018,9 +41584,12 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="zeta3">
-		<description>Zeta 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zeta Dai 3 Go</description>
+		<year>1987</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ゼータ 第３号"/>
 		<!--combined image-->
 		<!--rom name="zeta 3.d88" size="688992" crc="4c828cbc" sha1="0ea9016a29a2a790d9fe56f430b2ffb7e5e4521d" offset="0" /-->
 
@@ -41040,9 +41609,12 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="zeta4">
-		<description>Zeta 4</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zeta Dai 4 Go</description>
+		<year>1987</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="ゼータ 第４号"/>
 		<!--combined image-->
 		<!--rom name="zeta 4.d88" size="741216" crc="956a53b9" sha1="deccb723c0560338514e19277860dbfdb547f1e0" offset="0" /-->
 
@@ -42324,7 +42896,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Doujin?!? -->
 	<software name="chikyuba">
 		<description>Chikyu Boeigun Arbeit Butai</description>
 		<year>19??</year>
@@ -42585,31 +43156,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="dai hussle! sf harehare sanjushi.d88" size="348848" crc="ba6af099" sha1="014f0dbc723f0c1fd41576d23a651dd5f59e9deb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Doujin?!? -->
-	<!--
-ExtractDisk  [01]"DAIVA_A		 " -> "daiva_01.d88"
-ExtractDisk  [02]"DAIVA_B		 " -> "daiva_02.d88"
-	-->
-	<software name="daivaa" cloneof="daiva">
-		<description>Daiva (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="daiva.d88" size="697664" crc="03cf68b5" sha1="26262e1c836c0d10437e9df33c84a8a87715926d" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">
-				<rom name="daiva_01.d88" size="348832" crc="6aff276f" sha1="f983961dfd25e789123fdc478b10bddb0c59aaf9" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">
-				<rom name="daiva_02.d88" size="348832" crc="6dcf028f" sha1="8fe101e4e0fd7d94bda69011930f892b0cd18ba6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -44890,11 +45436,13 @@ ExtractDisk  [02]"Disk_B		  " -> "pakapaka shoboken dp_02.d88"
 		</part>
 	</software>
 
-	<!-- Doujin?!? -->
 	<software name="platonic">
 		<description>Platonic Love</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>パルコム (Palcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="プラトニックラブ"/>
 		<!--combined image-->
 		<!--rom name="platonic love.d88" size="695184" crc="36ee7723" sha1="e84e4c5ae42db16522ee0125977e11f58d77e533" offset="0" /-->
 
@@ -45660,26 +46208,16 @@ ExtractDisk  [02]"sos sword	   " -> "s-os sword_02.d88"
 		</part>
 	</software>
 
-	<!-- Doujin?!? -->
 	<software name="seijoden">
 		<description>Seijo Densetsu</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="聖女伝説"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="seijo densetsu.d88" size="348848" crc="784876fd" sha1="3bd7b035cbe773589ba719eccfb38ebfd7b82482" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Doujin?!? -->
-	<software name="seijopan">
-		<description>Seijo Panic</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="seijo panic.d88" size="348848" crc="fcdbb331" sha1="25f8185fb6d349edaa29d1b16150a59045f3ea3c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46325,7 +46863,6 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 		</part>
 	</software>
 
-	<!-- Doujin?!? -->
 	<software name="tenshit2a" cloneof="tenshit2">
 		<description>Tenshi-tachi no Gogo 2 (Alt?)</description>
 		<year>19??</year>
@@ -48828,7 +49365,7 @@ ExtractDisk  [14]"TFM_NEW		 " -> "the file master (ver1.1) & hot file express_14
 		<description>Vogue(Pascal)</description>
 		<!-- Or only Pascal? -->
 		<year>19??</year>
-		<publisher>パスカル2 (Pascal2)</publisher>
+		<publisher>パスカル２ (Pascal2)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="vogue(pascal).d88" size="348848" crc="4f237d34" sha1="d64446186204b0912d8c687937ef01b1a85dacdf" offset="0" />
@@ -52755,7 +53292,7 @@ ExtractDisk  [02]"xanadu80_b	  " -> "xanadu_v80_02.d88"
 	<software name="bishoco">
 		<description>Bishojo wa Check ga Osuki</description>
 		<year>1988</year>
-		<publisher>パスカル2 (Pascal2)</publisher>
+		<publisher>パスカル２ (Pascal2)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="美少女はチェックがお好き"/>
