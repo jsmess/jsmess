@@ -47330,7 +47330,6 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 			</dataarea>
 		</part>
 
-		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="yosei no yakata (disk 2).d88" size="348848" crc="b4800f33" sha1="8a8a2b80cdd5d8a73025028987f0d2fee295e42f" offset="0" />
