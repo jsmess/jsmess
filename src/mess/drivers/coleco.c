@@ -198,19 +198,22 @@ static TIMER_CALLBACK( paddle_pulse_callback )
 {
 	coleco_state *state = machine.driver_data<coleco_state>();
 
-	// on movement, controller port d7 is set for a short period and an irq is fired on d7 rising edge
-	state->m_joy_d7_state[param] = 0x80;
-	state->m_joy_d7_timer[param]->adjust(attotime::from_usec(500), param); // TODO: measure duration
+	if (state->m_joy_analog_reload[param])
+	{
+		state->m_joy_analog_state[param] = state->m_joy_analog_reload[param];
 
-	// irq on rising edge, PULSE_LINE is not supported in this case, so clear it manually
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	state->m_joy_irq_timer[param]->adjust(attotime::from_usec(11), param); // TODO: measure duration
-	state->m_joy_irq_state[param] = 1;
+		// on movement, controller port d7 is set for a short period and an irq is fired on d7 rising edge
+		state->m_joy_d7_state[param] = 0x80;
+		state->m_joy_d7_timer[param]->adjust(attotime::from_usec(500), param); // TODO: measure duration
 
-	// reload timer
-	state->m_joy_analog_state[param] = state->m_joy_analog_reload[param];
-	if (state->m_joy_analog_state[param])
+		// irq on rising edge, PULSE_LINE is not supported in this case, so clear it manually
+		state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		state->m_joy_irq_timer[param]->adjust(attotime::from_usec(11), param); // TODO: measure duration
+		state->m_joy_irq_state[param] = 1;
+
+		// reload timer
 		state->m_joy_pulse_timer[param]->adjust(state->m_joy_pulse_reload[param], param);
+	}
 }
 
 static TIMER_DEVICE_CALLBACK( paddle_update_callback )
