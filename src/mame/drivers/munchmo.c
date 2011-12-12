@@ -9,7 +9,6 @@
   Known Issues:
     - it's unclear if mirroring the videoram chunks is correct behavior
     - several unmapped registers
-    - sustained sounds (when there should be silence)
 
 Stephh's notes (based on the game Z80 code and some tests) :
 
@@ -25,7 +24,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/munchmo.h"
@@ -43,37 +41,30 @@ static WRITE8_HANDLER( mnchmobl_nmi_enable_w )
 	state->m_nmi_enable = data;
 }
 
-static INTERRUPT_GEN( mnchmobl_interrupt )
+/* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
+static INTERRUPT_GEN( mnchmobl_vblank_irq )
 {
 	munchmo_state *state = device->machine().driver_data<munchmo_state>();
-	state->m_which = !state->m_which;
 
-	if (state->m_which)
-		device_set_input_line(device, 0, HOLD_LINE);
-	else if (state->m_nmi_enable)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_nmi_enable)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+
+	device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( mnchmobl_sound_irq )
 {
-	munchmo_state *state = device->machine().driver_data<munchmo_state>();
+	//munchmo_state *state = device->machine().driver_data<munchmo_state>();
 
-	if (!(state->m_sound_nmi_enable))
-		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
 	munchmo_state *state = space->machine().driver_data<munchmo_state>();
 
-	soundlatch_w(space, offset, data);
+	soundlatch_w(space, 0, data);
 	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE );
-}
-
-static WRITE8_HANDLER( sound_nmi_enable_w )
-{
-	munchmo_state *state = space->machine().driver_data<munchmo_state>();
-	state->m_sound_nmi_enable = data & 1;
 }
 
 
@@ -83,6 +74,11 @@ static WRITE8_HANDLER( sound_nmi_ack_w )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
+static READ8_DEVICE_HANDLER( munchmo_ayreset_r )
+{
+	ay8910_reset_w(device,0,0);
+	return 0;
+}
 
 /*************************************
  *
@@ -114,17 +110,18 @@ static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xbf03, 0xbf03) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
+/* memory map provided thru schematics */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2000) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITENOP /* ? */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_enable_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_nmi_ack_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_data_w)
+	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ay1", munchmo_ayreset_r, ay8910_reset_w)
+	AM_RANGE(0xa000, 0xbfff) AM_DEVREADWRITE("ay2", munchmo_ayreset_r, ay8910_reset_w)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(sound_nmi_ack_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM // is mirror ok?
 ADDRESS_MAP_END
 
 
@@ -315,7 +312,6 @@ static MACHINE_START( munchmo )
 	state->save_item(NAME(state->m_palette_bank));
 	state->save_item(NAME(state->m_flipscreen));
 	state->save_item(NAME(state->m_nmi_enable));
-	state->save_item(NAME(state->m_which));
 }
 
 static MACHINE_RESET( munchmo )
@@ -325,7 +321,6 @@ static MACHINE_RESET( munchmo )
 	state->m_palette_bank = 0;
 	state->m_flipscreen = 0;
 	state->m_nmi_enable = 0;
-	state->m_which = 0;
 }
 
 static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
@@ -333,7 +328,7 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(mnchmobl_map)
-	MCFG_CPU_VBLANK_INT_HACK(mnchmobl_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen", mnchmobl_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -438,5 +433,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, 0, ROT270, "SNK", "Joyful Road (Japan)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, 0, ROT270, "SNK", "Joyful Road (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
