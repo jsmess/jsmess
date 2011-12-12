@@ -13,7 +13,9 @@ class a7800_state : public driver_device
 {
 public:
 	a7800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu")
+		{ }
 
 	int m_lines;
 	int m_ispal;
@@ -46,6 +48,8 @@ public:
 	int m_maria_kangaroo;
 	int m_maria_rm;
 	unsigned int m_maria_charbase;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -53,7 +57,7 @@ public:
 
 VIDEO_START( a7800 );
 SCREEN_UPDATE( a7800 );
-INTERRUPT_GEN( a7800_interrupt );
+TIMER_DEVICE_CALLBACK( a7800_interrupt );
  READ8_HANDLER( a7800_MARIA_r );
 WRITE8_HANDLER( a7800_MARIA_w );
 

@@ -810,7 +810,11 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 
 		/* call Apple II interrupt handler */
 		if ((machine.primary_screen->vpos() % 8) == 7)
-			apple2_interrupt(machine.device("maincpu"));
+		{
+			//apple2_interrupt(machine.device("maincpu"));
+			/* TODO: check me! */
+			machine.primary_screen->update_partial(machine.primary_screen->vpos());
+		}
 	}
 
 	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos((scanline+1)%262, 0));

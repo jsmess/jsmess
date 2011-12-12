@@ -45,7 +45,6 @@
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/wave.h"
 #include "sound/dac.h"
@@ -294,9 +293,9 @@ MACHINE_RESET( ti99_4p )
 	tms9901_set_single_int(machine.device("tms9901"), 12, 0);
 }
 
-INTERRUPT_GEN( ti99_4p_hblank_interrupt )
+TIMER_DEVICE_CALLBACK( ti99_4p_hblank_interrupt )
 {
-	v9938_interrupt(device->machine(), 0);
+	v9938_interrupt(timer.machine(), 0);
 }
 
 /*
@@ -308,16 +307,13 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(cru_map)
-	MCFG_CPU_VBLANK_INT_HACK(ti99_4p_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ti99_4p_hblank_interrupt, "screen", 0, 1)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	/* video hardware */
 	MCFG_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_sg_set_int2)
 
 	MCFG_MACHINE_START( ti99_4p )
 	MCFG_MACHINE_RESET( ti99_4p )
-
-// Didn't work, probably just done wrong by me:
-//  MCFG_TIMER_ADD_SCANLINE("v9938_scanline", ti99_4ev_scanline_interrupt , "screen", 0, 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

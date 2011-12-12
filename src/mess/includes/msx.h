@@ -64,7 +64,7 @@ extern MACHINE_START( msx2 );
 extern MACHINE_RESET( msx );
 extern MACHINE_RESET( msx2 );
 extern INTERRUPT_GEN( msx_interrupt );
-extern INTERRUPT_GEN( msx2_interrupt );
+extern TIMER_DEVICE_CALLBACK( msx2_interrupt );
 
 DEVICE_IMAGE_LOAD( msx_cart );
 DEVICE_IMAGE_UNLOAD( msx_cart );

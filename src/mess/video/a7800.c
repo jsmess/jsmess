@@ -317,12 +317,12 @@ static void maria_draw_scanline(running_machine &machine)
 }
 
 
-INTERRUPT_GEN( a7800_interrupt )
+TIMER_DEVICE_CALLBACK( a7800_interrupt )
 {
-	a7800_state *state = device->machine().driver_data<a7800_state>();
+	a7800_state *state = timer.machine().driver_data<a7800_state>();
 	int frame_scanline;
-	UINT8 *ROM = device->machine().region("maincpu")->base();
-	address_space* space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ROM = timer.machine().region("maincpu")->base();
+	address_space* space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_maria_scanline++;
 
@@ -336,7 +336,7 @@ INTERRUPT_GEN( a7800_interrupt )
 
 	if( state->m_maria_wsync )
 	{
-		device->machine().scheduler().trigger( TRIGGER_HSYNC );
+		timer.machine().scheduler().trigger( TRIGGER_HSYNC );
 		state->m_maria_wsync = 0;
 	}
 
@@ -394,7 +394,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	if( ( frame_scanline > 15 ) && state->m_maria_dodma )
 	{
 		if (state->m_maria_scanline < ( state->m_lines - 4 ) )
-			maria_draw_scanline(device->machine());
+			maria_draw_scanline(timer.machine());
 
 		if( state->m_maria_offset == 0 )
 		{
@@ -418,7 +418,7 @@ INTERRUPT_GEN( a7800_interrupt )
 	if( state->m_maria_dli )
 	{
 		state->m_maria_dli = 0;
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 }

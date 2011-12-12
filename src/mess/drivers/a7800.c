@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
 #include "sound/tiaintf.h"
@@ -254,7 +253,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8)	/* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
-	MCFG_CPU_VBLANK_INT_HACK(a7800_interrupt, 262)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET(a7800)
 
@@ -300,7 +299,7 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CLK_PAL)
-	MCFG_CPU_VBLANK_INT_HACK(a7800_interrupt, 312)
+//	MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_REFRESH_RATE(50)

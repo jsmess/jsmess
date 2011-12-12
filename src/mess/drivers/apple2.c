@@ -185,7 +185,6 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "devices/appldriv.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
@@ -591,7 +590,7 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
-	MCFG_CPU_VBLANK_INT_HACK(apple2_interrupt, 192/8)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START( apple2 )
