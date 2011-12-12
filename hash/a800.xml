@@ -110,7 +110,7 @@ Compiled by K1W1
    - Hacked/Pirate/Homemeade        	      Jet Boot Jack
    - Hacked/Pirate/Homemeade        	      Mr.Robot
    - Hacked/Pirate/Homemeade        	      Neptune's Daughter
-   - Hacked/Pirate/Homemeade	       1984   Parrot Phone Test 1.1
+   - Hacked/Pirate/Homemeade	        1984  Parrot Phone Test 1.1
    - Hacked/Pirate/Homemeade        	      Shadow World
    - Hacked/Pirate/Homemeade        	      Tapper
    - Hacked/Pirate/Homemeade        	      Tank Commander
@@ -171,8 +171,6 @@ Compiled by K1W1
    - Beaumont                        ER       PUP (Primary Utility Pack)
 
    - Chalkboard Inc.                 ER       Leo's Links
-
-   - Citibank                        ER 1984  Direct Access
 
    - Convologic                               WAM
 
@@ -449,7 +447,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="oss m091" />
 			<dataarea name="rom" size="16384">
-				<rom name="action! programming language v3.6.rom" size="16384" crc="a1f90dfd" sha1="03b31582133c4883f470ef08c7b9eaad71fc8710" offset="0" />
+				<rom name="action! programming language v3.6.rom" size="16384" crc="a1f90dfd" sha1="03b31582133c4883f470ef08c7b9eaad71fc8710" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -539,7 +537,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="alien ambush.rom" size="8192" crc="ad7bc30b" sha1="aba31902c7cda455c228bb3af6b7bb55422ea02d" offset="0" />
+				<rom name="alien ambush.rom" size="8192" crc="ad7bc30b" sha1="aba31902c7cda455c228bb3af6b7bb55422ea02d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -818,7 +816,7 @@ Compiled by K1W1
 				<rom name="microsoft basic ii programming language.rom" size="16384" crc="24391ffb" sha1="9f0ee797e07bbc74d5d7b664157a80019634172d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop" interface="floppy_5_25">
 		<!-- Adds 10 more BASIC commands that could not fit on the cartridge. -->
 			<dataarea name="flop" size="92176">
 				<rom name="microsoft basic ii extension disk.atr" size="92176" crc="9d6c44ea" sha1="8f305bf916fc6df9cf469a413686de8933ac36e8" offset="0" />
@@ -1796,6 +1794,18 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="daccess">
+		<description>Direct Access</description>
+		<year>1984</year>
+		<publisher>Citibank</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="direct access.rom" size="16384" crc="0b5c7bd3" sha1="0030ed9f16ab9b5a8e547b914c8dc28960dc1eaa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="droids">
 		<description>Droids</description>
 		<year>1983</year>
@@ -2069,7 +2079,7 @@ Compiled by K1W1
 
 	<software name="legacy" cloneof="flegacy">
 		<description>The Legacy (Prototype)</description>
-		<!-- Name changed to "Final Legacy" on release. -->
+		<!-- Name changed to 'Final Legacy' on release. -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
@@ -2374,19 +2384,19 @@ Compiled by K1W1
 	</software>
 
 	<software name="is3000">
-		<description>INFO/soft 3000 Text Generator</description>
+		<description>INFO/soft 3000 Text Generator v3.3</description>
 		<year>1986</year>
 		<publisher>INFO/soft</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="info-soft 3000.rom" size="16384" crc="910f39db" sha1="3c67e1f18674968fc256baf657918a013e82dfbb" offset="0" />
+				<rom name="info-soft 3000.rom" size="16384" crc="6c104750" sha1="29d477e56910c79c06dde1718b0ff31bc7b8e5e2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="is5000">
-		<description>INFO/soft 5000 Graphics Genlock v5.3</description>
+		<description>INFO/soft 5000 Graphic Generator v5.3</description>
 		<year>1986</year>
 		<publisher>INFO/soft</publisher>
 		<part name="cart" interface="a800_cart">
@@ -2432,7 +2442,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="jawbreaker 2.rom" size="8192" crc="e2a63a2d" sha1="ef7b7693c313b4ca287e09bd7392c9d533179dd2" offset="0" />
+				<rom name="jawbreaker 2.rom" size="8192" crc="e2a63a2d" sha1="ef7b7693c313b4ca287e09bd7392c9d533179dd2" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3827,7 +3837,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="sea chase.rom" size="8192" crc="99b5a1dd" sha1="4e511d2d935039d514889583a7584f718e02f09c" offset="0" />
+				<rom name="sea chase.rom" size="8192" crc="99b5a1dd" sha1="4e511d2d935039d514889583a7584f718e02f09c" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
