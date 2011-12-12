@@ -46735,8 +46735,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<!--  Um Chi (Glommy Chess, Joy Van) in GoodNES, check title -->
 		<description>An Qi ~ Hidden Chinese Chess (Tw)</description>
 		<year>1989</year>
-		<info name="serial" value="TC-002"/>
 		<publisher>Sachen</publisher>
+		<info name="serial" value="TC-002"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="SACHEN-NROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -46975,8 +46975,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<description>Mahjong Trap - Si Cuan Ma Que (Asia)</description>
 		<!-- Shisen Mahjong (Joy Van) in GoodNES & Shisen Mahjong (1990)(Hacker International)(As)[P] in TOSEC, check title -->
 		<year>19??</year>
-		<info name="serial" value="TC-010"/>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="TC-010"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
@@ -46993,9 +46993,9 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<description>Mahjong Trap - Si Cuan Ma Que - Zhi Fu Pian (Tw)</description>
 		<!-- Shisen Mahjong - Seifuku Hen (Sachen) in GoodNES, check title -->
 		<year>1990</year>
+		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-010?"/>
 		<info name="alt_title" value="四川麻將 制服篇"/>
-		<publisher>Sachen</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SA-0037" />
 			<feature name="mirroring" value="horizontal" />
@@ -47691,8 +47691,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<description>Middle School English - Dong Dong Nao II (Tw)</description>
 		<!-- check title: Dong Dong Nao Ii - Guo Zhong Ying Wen in GoodNES, Middle School English - Dong Dong Nao - Guo Zhong Ying Wen in TOSEC -->
 		<year>1989</year>
-		<info name="serial" value="SA-003"/>
 		<publisher>Sachen</publisher>
+		<info name="serial" value="SA-003"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -54271,8 +54271,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<description>Feng Shen Bang (Asia)</description>
 		<!-- TOSEC & GoodNES: Fong Shen Bang - Zhu Lu Zhi Zhan check -->
 		<year>1995</year>
-		<info name="serial" value="G-0151"/>
 		<publisher>Computer &amp; Entertainment</publisher>
+		<info name="serial" value="G-0151"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="CNE-PSB" />
 			<dataarea name="chr" size="524288">
@@ -62429,8 +62429,8 @@ resulting in tons of glitches? -->
 		<description>Pokemon - Silver Version (Little Nemo pirate, Hacked)</description>
 		<!-- TOSEC: Pokemon - Silver Version (19xx)(-)(As)[H Dr. Titus][P][!][Ines Title][K1914]  check -->
 		<year>19??</year>
-		<info name="serial" value="K1914"/>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="serial" value="K1914"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">

@@ -353,9 +353,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Champion Baseball (Jpn)</description>
 		<!-- according to Bock this comes from Small Boxed cart -->
 		<year>1983</year>
+		<publisher>Sega / Alpha Denshi</publisher>
 		<info name="serial" value="G-1011"/>
 		<info name="alt_title" value="チャンピオンベースボール"/>
-		<publisher>Sega / Alpha Denshi</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="champion baseball [16k].bin" size="16384" crc="5970a12b" sha1="737b9478c4ce6df2afcd36f78011019f5d669226" offset="000000" />
@@ -636,9 +636,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Fei Lang (Tw)</description>
 		<!-- This version has the Chinese title screen after the Chinese title -->
 		<year>1985?</year>
+		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-048"/>
 		<info name="alt_title" value="Fēi láng ~ 飛狼"/>
-		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="choplifter [chinese logo] (tw).bin" size="32768" crc="746a8d86" sha1="af6c40febe02fe2b424ea99e666cf3f451eb5a1f" offset="000000" />
@@ -650,9 +650,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Fei Lang ~ Choplifter (Tw, Alt)</description>
 		<!-- This version has the English title screen after the Chinese title -->
 		<year>1985?</year>
+		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-048"/>
 		<info name="alt_title" value="Fēi láng ~ 飛狼"/>
-		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="choplifter [english logo] (tw).bin" size="32768" crc="7c603987" sha1="61d1afe62b2be0da26d8a185828387063dd4b06e" offset="000000" />
@@ -664,9 +664,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Choplifter (Tw)</description>
 		<!-- This version has the no Chinese title -->
 		<year>1985?</year>
+		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-048"/>
 		<info name="alt_title" value="Fēi láng ~ 飛狼 (cart)"/>
-		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="choplifter [no logo] (tw).bin" size="32768" crc="825e1aae" sha1="daf36c050b0e507d2f2470050299a648716c9158" offset="000000" />
@@ -843,9 +843,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Jing Wu Men (Tw)</description>
 		<!-- This version has Chinese title screen after the Chinese title -->
 		<year>1985?</year>
+		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-046"/>
 		<info name="alt_title" value="精武門"/>
-		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="dragon wang (tw).bin" size="32768" crc="7c7d4397" sha1="57ade81eaa044d69621741d8c5f5c5e8650f6c2b" offset="000000" />
@@ -857,9 +857,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Jing Wu Men (Tw, Alt)</description>
 		<!-- This version has English title screen after the Chinese title -->
 		<year>1985?</year>
+		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-046"/>
 		<info name="alt_title" value="精武門"/>
-		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="dragon wang [v0] [english logo] (tw).bin" size="32768" crc="6f94e5c0" sha1="b2a3c886677ba3926cb56a1a781e7926852499c7" offset="000000" />
@@ -1416,9 +1416,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Mahjong (Jpn)</description>
 		<!-- This version has smaller 1983 and Japanese instructions in the title screen -->
 		<year>1983</year>
+		<publisher>Sega</publisher>
 		<info name="serial" value="G-1004"/>
 		<info name="alt_title" value="麻雀"/>
-		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="24576">
 				<rom name="mahjong (japan).bin" size="24576" crc="6d909857" sha1="2e6810c0c0c02c0fdda6fcaeae835cf94ab9bcba" offset="000000" />
@@ -1759,9 +1759,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Fa Gui Qibing (Tw)</description>
 		<!-- This version has the Chinese title screen -->
 		<year>1985?</year>
+		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-049"/>
 		<info name="alt_title" value="Fǎ guì qíbīng ~ 法櫃奇兵"/>
-		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="pitfall ii [v0] [chinese logo] (tw).bin" size="32768" crc="476a079b" sha1="38c25d7730863877fdae5491724a3aed9c6b04d5" offset="000000" />
@@ -1773,9 +1773,9 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>Fa Gui Qibing (Tw, Alt)</description>
 		<!-- This version has the English title screen -->
 		<year>1985?</year>
+		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-049"/>
 		<info name="alt_title" value="Fǎ guì qíbīng ~ 法櫃奇兵"/>
-		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="pitfall ii [v0] [english logo] (tw).bin" size="32768" crc="4e93bc8e" sha1="c98a5bdb2f97e2e85d0a131d58e311544adb416e" offset="000000" />

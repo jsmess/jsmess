@@ -6804,8 +6804,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<!-- The same dump has also been released as proto build 19950217 and 19950224 (which means that the code has not changed at all in the last weeks of development) -->
 		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Euro)</description>
 		<year>1995</year>
-		<info name="serial" value="2523, 2523-50"/>
 		<publisher>Sega</publisher>
+		<info name="serial" value="2523, 2523-50"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="cheese catastrophe (euro).bin" size="524288" crc="4e78fd36" sha1="8897ba5aa76d0e17251b2765fafbdb0df41030a6" offset="000000" />
