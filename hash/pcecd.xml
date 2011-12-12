@@ -6379,8 +6379,8 @@
 		<description>Implode (SCD)(USA)[bad toc]</description>
 		<!-- This disc has a copy protection scheme -->
 		<year>2002</year>
-		<info name="serial" value="BTCD0201"/>
 		<publisher>MindRec</publisher>
+		<info name="serial" value="BTCD0201"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -6735,8 +6735,8 @@
 		<description>Meteor Blaster DX (SCD)(USA)[bad toc]</description>
 		<!-- This disc has a copy protection scheme -->
 		<year>2004</year>
-		<info name="serial" value="BTCD0402"/>
 		<publisher>MindRec</publisher>
+		<info name="serial" value="BTCD0402"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">

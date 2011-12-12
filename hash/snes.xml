@@ -3521,9 +3521,9 @@ The software list will be divided in four categories:
 	<software name="dkongc2ua" cloneof="dkongc2">
 		<description>Donkey Kong Country 2 - Diddy's Kong Quest (USA)</description>
 		<year>1995</year>
+		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-ADNE-USA, M/SNS-ADNE-USA (Made in Mexico)"/>
 		<info name="release" value="199512xx"/>
-		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1J1M-20" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -14719,10 +14719,10 @@ Japanese cart
 	<software name="dkongc2j" cloneof="dkongc2">
 		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Jpn, Rev. A)</description>
 		<year>1995</year>
+		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-ADNJ-JPN / G740814, SHVC-ADNJ-JPN-1 / G743669"/>
 		<info name="release" value="19951121"/>
 		<info name="alt_title" value="スーパードンキーコング2 ディクシー&amp;ディディー"/>
-		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1J1M-20" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -24083,10 +24083,10 @@ Alternate board (XL-1)
 		<description>Bishoujo Senshi Sailormoon Sailorstars - Fuwafuwa Panic 2 (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0112"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="美少女戦士セーラームーン セー ラースターズ ~ふわふわパニック2"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="bishoujo senshi sailormoon sailorstars - fuwafuwa panic 2 (japan).st" size="1048576" crc="bb5c4238" sha1="f72ea67468cf34360042bdd7974fd588a2407566" offset="0x000000" />
@@ -26061,10 +26061,10 @@ Alternate board (XL-1)
 		<description>Crayon Shin-chan - Nagagutsu Dobon!! (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0113"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="クレヨンしんちゃん 長ぐつどぼ ん!!"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="crayon shin-chan - nagagutsu dobon!! (japan).st" size="524288" crc="8eb753f3" sha1="98a99807a958c1175a2b257166d7b08b2be6d442" offset="0x000000" />
@@ -29720,10 +29720,10 @@ Alternate board (XL-1)
 		<description>Gegege no Kitarou - Youkai Donjara (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0106"/>
 		<info name="release" value="19960719"/>
 		<info name="alt_title" value="ゲゲゲの鬼太郎 妖怪ドンジャラ"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gegege no kitarou - youkai donjara (japan).st" size="524288" crc="4296500d" sha1="965b2582b13ee361eca93937b1b093049bc8d958" offset="0x000000" />
@@ -29735,10 +29735,10 @@ Alternate board (XL-1)
 		<description>Gekisou Sentai Carranger - Zenkai! Racer Senshi (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0109"/>
 		<info name="release" value="19960823"/>
 		<info name="alt_title" value="激走戦隊カーレンジャー 全開!レー サー戦士"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gekisou sentai carranger - zenkai! racer senshi (japan).st" size="524288" crc="14c66fca" sha1="50b9d6ebf0e3f4b9dad5d0660d6c834820cbe391" offset="0x000000" />
@@ -40329,10 +40329,10 @@ Alternate board (XL-1)
 		<description>Poi Poi Ninja World (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0103"/>
 		<info name="release" value="19960628"/>
 		<info name="alt_title" value="ぽいぽい忍者ワールト"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="poi poi ninja world (japan).st" size="524288" crc="32b2b3dd" sha1="ae7421b87a9f4cc7c189680dfbb39453905aa5e6" offset="0x000000" />
@@ -42451,10 +42451,10 @@ Alternate board (XL-1)
 		<description>SD Gundam Generation - Axis Senki (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0107"/>
 		<info name="release" value="19960823"/>
 		<info name="alt_title" value="SDガンダムジェネレーション アクシズ戦記"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd gundam generation - axis senki (japan).st" size="524288" crc="72b4235f" sha1="6f5be110a606f34bb797a30c1f07b84b2ff38425" offset="0x000000" />
@@ -42466,10 +42466,10 @@ Alternate board (XL-1)
 		<description>SD Gundam Generation - Babylonia Kenkoku Senki (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0108"/>
 		<info name="release" value="19960823"/>
 		<info name="alt_title" value="SDガンダムジェネレーション バヒロニア建国戦記"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd gundam generation - babylonia kenkoku senki (japan).st" size="524288" crc="792d884c" sha1="f18f680b981077cfa025161cfe6c9594b6d18078" offset="0x000000" />
@@ -42481,10 +42481,10 @@ Alternate board (XL-1)
 		<description>SD Gundam Generation - Colony Kakutouki (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0111"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="SDガンダムジェネレーション コロ ニー格闘記"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd gundam generation - colony kakutouki (japan).st" size="524288" crc="c5dfa8fd" sha1="0a335ef645d058c2da5389ad622c62d0bffce944" offset="0x000000" />
@@ -42496,10 +42496,10 @@ Alternate board (XL-1)
 		<description>SD Gundam Generation - Gryps Senki (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0105"/>
 		<info name="release" value="19960726"/>
 		<info name="alt_title" value="SDガンダムジェネレーション グリプス戦記"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd gundam generation - gryps senki (japan).st" size="524288" crc="48ecae44" sha1="f280004dd92b70b1bf4518e054b4181a9bbba245" offset="0x000000" />
@@ -42511,10 +42511,10 @@ Alternate board (XL-1)
 		<description>SD Gundam Generation - Ichinen Sensouki (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0104"/>
 		<info name="release" value="19960726"/>
 		<info name="alt_title" value="SDガンダムジェネレーション一年戦争記"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd gundam generation - ichinen sensouki (japan).st" size="524288" crc="afd74dcb" sha1="adc7716a4b081aba5cde3525881c51ee6d600396" offset="0x000000" />
@@ -42526,10 +42526,10 @@ Alternate board (XL-1)
 		<description>SD Gundam Generation - Zanscare Senki (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0110"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="SDガンダムジェネレーション ザン スカール戦記"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd gundam generation - zanscare senki (japan).st" size="524288" crc="efd3a865" sha1="d0ebe3cfcc76ec275151c3b9392fc2ff5d3b50da" offset="0x000000" />
@@ -42555,10 +42555,10 @@ Alternate board (XL-1)
 		<description>SD Ultra Battle - Seven Densetsu (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0102"/>
 		<info name="release" value="19960628"/>
 		<info name="alt_title" value="SDウルトラバトル セブン伝説"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd ultra battle - seven densetsu (japan).st" size="524288" crc="43ad5a45" sha1="bfe85a6e6e8c24584ed5983dbf56048c4c8f2287" offset="0x000000" />
@@ -42570,10 +42570,10 @@ Alternate board (XL-1)
 		<description>SD Ultra Battle - Ultraman Densetsu (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
+		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0101"/>
 		<info name="release" value="19960628"/>
 		<info name="alt_title" value="SDウルトラバトル ウルトラマン伝 説"/>
-		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd ultra battle - ultraman densetsu (japan).st" size="524288" crc="04939d14" sha1="5527fcc136ff0c0ef53a1c9c2756d4a27afa1526" offset="0x000000" />

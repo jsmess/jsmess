@@ -637,8 +637,8 @@
 		<!-- Enhanced by SGX -->
 		<description>Darius Alpha</description>
 		<year>1990</year>
-		<info name="release" value="19900921"/>
 		<publisher>NEC Avenue</publisher>
+		<info name="release" value="19900921"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
 				<rom name="darius alpha (japan).pce" size="393216" crc="b0ba689f" sha1="f59c538fa632f687c356af70659fb07b37933f78" offset="000000" />
@@ -650,8 +650,8 @@
 		<!-- Enhanced by SGX -->
 		<description>Darius Plus</description>
 		<year>1990</year>
-		<info name="release" value="19900921"/>
 		<publisher>NEC Avenue</publisher>
+		<info name="release" value="19900921"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
 				<rom name="darius plus (japan).pce" size="786432" crc="bebfe042" sha1="a362c06e4466b2b3dc7a682f892988189117ef62" offset="000000" />
