@@ -424,6 +424,10 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		m_status |= STATUS_SPROVR;
 		break;
 
+	case TIMER_SET_STATUS_SPRCOL:
+		m_status |= STATUS_SPRCOL;
+		break;
+
 	case TIMER_CHECK_HINT:
 		if (m_line_counter == 0x00)
 		{
@@ -1035,7 +1039,7 @@ void sega315_5124_device::refresh_mode4_sprites( int *line_buffer, int *priority
 		}
 		if (sprite_col_occurred)
 		{
-			m_set_status_sprovr_timer->adjust( m_screen->time_until_pos( pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x ) );
+			m_set_status_sprcol_timer->adjust( m_screen->time_until_pos( pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x ) );
 		}
 	}
 
@@ -1300,7 +1304,7 @@ void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_p
 		}
 		if (sprite_col_occurred)
 		{
-			m_set_status_sprovr_timer->adjust( m_screen->time_until_pos( pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x ) );
+			m_set_status_sprcol_timer->adjust( m_screen->time_until_pos( pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x ) );
 		}
 	}
 }
@@ -1698,7 +1702,6 @@ void sega315_5124_device::device_start()
 	m_CRAM = machine().region_alloc(subtag(tempstring,"vdp_cram"), SEGA315_5378_CRAM_SIZE, 1, ENDIANNESS_LITTLE);
 	m_line_buffer = auto_alloc_array(machine(), int, 256 * 5);
 
-	m_collision_buffer = auto_alloc_array(machine(), UINT8, SMS_X_PIXELS);
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
 
 	/* Make temp bitmap for rendering */
@@ -1709,6 +1712,7 @@ void sega315_5124_device::device_start()
 	m_smsvdp_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
 	m_set_status_vint_timer = timer_alloc( TIMER_SET_STATUS_VINT );
 	m_set_status_sprovr_timer = timer_alloc( TIMER_SET_STATUS_SPROVR );
+	m_set_status_sprcol_timer = timer_alloc( TIMER_SET_STATUS_SPRCOL );
 	m_check_hint_timer = timer_alloc( TIMER_CHECK_HINT );
 	m_check_vint_timer = timer_alloc( TIMER_CHECK_VINT );
 
@@ -1729,7 +1733,7 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_reg));
 	save_item(NAME(m_current_palette));
 	save_pointer(NAME(m_line_buffer), 256 * 5);
-	save_pointer(NAME(m_collision_buffer), SMS_X_PIXELS);
+	save_item(NAME(m_collision_buffer));
 	save_item(NAME(*m_tmpbitmap));
 	save_item(NAME(*m_y1_bitmap));
 }

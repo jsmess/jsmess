@@ -124,7 +124,7 @@ protected:
 	const UINT8      *m_frame_timing;
 	bitmap_t         *m_tmpbitmap;
 	bitmap_t         *m_y1_bitmap;
-	UINT8            *m_collision_buffer;
+	UINT8            m_collision_buffer[SMS_X_PIXELS];
 	UINT8            m_palette_offset;
 
 	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
@@ -137,6 +137,7 @@ protected:
 	emu_timer        *m_smsvdp_display_timer;
 	emu_timer        *m_set_status_vint_timer;
 	emu_timer        *m_set_status_sprovr_timer;
+	emu_timer        *m_set_status_sprcol_timer;
 	emu_timer        *m_check_hint_timer;
 	emu_timer        *m_check_vint_timer;
 	screen_device    *m_screen;
@@ -149,6 +150,7 @@ protected:
 	static const device_timer_id TIMER_SET_STATUS_SPROVR = 2;
 	static const device_timer_id TIMER_CHECK_HINT = 3;
 	static const device_timer_id TIMER_CHECK_VINT = 4;
+	static const device_timer_id TIMER_SET_STATUS_SPRCOL = 5;
 };
 
 
