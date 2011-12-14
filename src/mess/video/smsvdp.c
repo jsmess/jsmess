@@ -854,7 +854,8 @@ void sega315_5124_device::refresh_mode4_sprites( int *line_buffer, int *priority
 	int sprite_index;
 	int pixel_x, pixel_plot_x;
 	int sprite_x, sprite_y, sprite_line, sprite_tile_selected, sprite_height, sprite_zoom;
-	int sprite_col_occurred, sprite_col_x;
+	bool sprite_col_occurred = false;
+	int sprite_col_x = 1000;
 	int sprite_buffer[8], sprite_buffer_count, sprite_buffer_index;
 	int bit_plane_0, bit_plane_1, bit_plane_2, bit_plane_3;
 	UINT16 sprite_base = ((m_reg[0x05] << 7) & 0x3f00);
@@ -930,9 +931,6 @@ void sega315_5124_device::refresh_mode4_sprites( int *line_buffer, int *priority
 		bit_plane_2 = space()->read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x02);
 		bit_plane_3 = space()->read_byte(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x03);
 
-		sprite_col_occurred = 0;
-		sprite_col_x = 0;
-
 		for (pixel_x = 0; pixel_x < 8 ; pixel_x++)
 		{
 			UINT8 pen_bit_0, pen_bit_1, pen_bit_2, pen_bit_3;
@@ -983,11 +981,8 @@ void sega315_5124_device::refresh_mode4_sprites( int *line_buffer, int *priority
 				}
 				else
 				{
-					if (!sprite_col_occurred)
-					{
-						sprite_col_occurred = 1;
-						sprite_col_x = pixel_plot_x;
-					}
+					sprite_col_occurred = true;
+					sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 				}
 				if (m_collision_buffer[pixel_plot_x + 1] != 1)
 				{
@@ -995,11 +990,8 @@ void sega315_5124_device::refresh_mode4_sprites( int *line_buffer, int *priority
 				}
 				else
 				{
-					if (!sprite_col_occurred)
-					{
-						sprite_col_occurred = 1;
-						sprite_col_x = pixel_plot_x;
-					}
+					sprite_col_occurred = true;
+					sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 				}
 			}
 			else
@@ -1029,11 +1021,8 @@ void sega315_5124_device::refresh_mode4_sprites( int *line_buffer, int *priority
 				}
 				else
 				{
-					if (!sprite_col_occurred)
-					{
-						sprite_col_occurred = 1;
-						sprite_col_x = pixel_plot_x;
-					}
+					sprite_col_occurred = true;
+					sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 				}
 			}
 		}
@@ -1061,7 +1050,8 @@ void sega315_5124_device::refresh_mode4_sprites( int *line_buffer, int *priority
 void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_plot_y, int line )
 {
 	int pixel_plot_x;
-	int sprite_col_occurred, sprite_col_x;
+	bool sprite_col_occurred = false;
+	int sprite_col_x = 1000;
 	int sprite_height, sprite_buffer_count, sprite_index, sprite_buffer[5], sprite_buffer_index;
 	UINT16 sprite_base, sprite_pattern_base;
 
@@ -1148,9 +1138,6 @@ void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_p
 
 		pattern = space()->read_byte( sprite_pattern_base + sprite_tile_selected * 8 + sprite_line );
 
-		sprite_col_occurred = 0;
-		sprite_col_x = 0;
-
 		for (pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
 			if (m_reg[0x01] & 0x01)
@@ -1171,11 +1158,8 @@ void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_p
 					}
 					else
 					{
-						if (!sprite_col_occurred)
-						{
-							sprite_col_occurred = 1;
-							sprite_col_x = pixel_plot_x;
-						}
+						sprite_col_occurred = true;
+						sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 					}
 
 					line_buffer[pixel_plot_x+1] = m_current_palette[pen_selected];
@@ -1186,11 +1170,8 @@ void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_p
 					}
 					else
 					{
-						if (!sprite_col_occurred)
-						{
-							sprite_col_occurred = 1;
-							sprite_col_x = pixel_plot_x;
-						}
+						sprite_col_occurred = true;
+						sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 					}
 				}
 			}
@@ -1213,11 +1194,8 @@ void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_p
 					}
 					else
 					{
-						if (!sprite_col_occurred)
-						{
-							sprite_col_occurred = 1;
-							sprite_col_x = pixel_plot_x;
-						}
+						sprite_col_occurred = true;
+						sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 					}
 				}
 			}
@@ -1250,11 +1228,8 @@ void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_p
 						}
 						else
 						{
-							if (!sprite_col_occurred)
-							{
-								sprite_col_occurred = 1;
-								sprite_col_x = pixel_plot_x;
-							}
+							sprite_col_occurred = true;
+							sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 						}
 
 						line_buffer[pixel_plot_x+1] = m_current_palette[pen_selected];
@@ -1265,11 +1240,8 @@ void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_p
 						}
 						else
 						{
-							if (!sprite_col_occurred)
-							{
-								sprite_col_occurred = 1;
-								sprite_col_x = pixel_plot_x;
-							}
+							sprite_col_occurred = true;
+							sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 						}
 					}
 				}
@@ -1292,11 +1264,8 @@ void sega315_5124_device::refresh_tms9918_sprites( int *line_buffer, int pixel_p
 						}
 						else
 						{
-							if (!sprite_col_occurred)
-							{
-								sprite_col_occurred = 1;
-								sprite_col_x = pixel_plot_x;
-							}
+							sprite_col_occurred = true;
+							sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
 						}
 					}
 				}
@@ -1404,35 +1373,47 @@ void sega315_5124_device::refresh_line( int pixel_offset_x, int pixel_plot_y, in
 	int *blitline_buffer = m_line_buffer;
 	int priority_selected[256];
 
-	switch( m_vdp_mode )
+	if ( line < m_frame_timing[ACTIVE_DISPLAY_V] )
 	{
-	case 0:
-		memset(priority_selected, 1, sizeof(priority_selected));
-		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
+		switch( m_vdp_mode )
 		{
-			refresh_line_mode0( blitline_buffer, line );
-		}
-		refresh_tms9918_sprites( blitline_buffer, pixel_plot_y, line );
-		break;
+		case 0:
+			memset(priority_selected, 1, sizeof(priority_selected));
+			if ( line >= 0 )
+			{
+				refresh_line_mode0( blitline_buffer, line );
+			}
+			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
+			{
+				refresh_tms9918_sprites( blitline_buffer, pixel_plot_y, line );
+			}
+			break;
 
-	case 2:
-		memset(priority_selected, 1, sizeof(priority_selected));
-		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
-		{
-			refresh_line_mode2( blitline_buffer, line );
-		}
-		refresh_tms9918_sprites( blitline_buffer, pixel_plot_y, line );
-		break;
+		case 2:
+			memset(priority_selected, 1, sizeof(priority_selected));
+			if ( line >= 0 )
+			{
+				refresh_line_mode2( blitline_buffer, line );
+			}
+			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
+			{
+				refresh_tms9918_sprites( blitline_buffer, pixel_plot_y, line );
+			}
+			break;
 
-	case 4:
-	default:
-		memset(priority_selected, 0, sizeof(priority_selected));
-		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
-		{
-			refresh_line_mode4( blitline_buffer, priority_selected, line );
+		case 4:
+		default:
+			memset(priority_selected, 0, sizeof(priority_selected));
+			if ( line >= 0 )
+			{
+				refresh_line_mode4( blitline_buffer, priority_selected, line );
+			}
+			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
+			{
+				refresh_mode4_sprites( blitline_buffer, priority_selected, pixel_plot_y, line );
+			}
+			break;
 		}
-		refresh_mode4_sprites( blitline_buffer, priority_selected, pixel_plot_y, line );
-		break;
 	}
 
 	UINT32 *p_bitmap = BITMAP_ADDR32(m_tmpbitmap, pixel_plot_y + line, pixel_offset_x);
@@ -1464,33 +1445,45 @@ void sega315_5378_device::refresh_line( int pixel_offset_x, int pixel_plot_y, in
 	int *blitline_buffer = m_line_buffer;
 	int priority_selected[256];
 
-	switch( m_vdp_mode )
+	if ( line < m_frame_timing[ACTIVE_DISPLAY_V] )
 	{
-	case 0:
-		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
+		switch( m_vdp_mode )
 		{
-			refresh_line_mode0( blitline_buffer, line );
-		}
-		refresh_tms9918_sprites( blitline_buffer, pixel_plot_y, line );
-		break;
+		case 0:
+			if ( line >= 0 )
+			{
+				refresh_line_mode0( blitline_buffer, line );
+			}
+			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
+			{
+				refresh_tms9918_sprites( blitline_buffer, pixel_plot_y, line );
+			}
+			break;
 
-	case 2:
-		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
-		{
-			refresh_line_mode2( blitline_buffer, line );
-		}
-		refresh_tms9918_sprites( blitline_buffer, pixel_plot_y, line );
-		break;
+		case 2:
+			if ( line >= 0 )
+			{
+				refresh_line_mode2( blitline_buffer, line );
+			}
+			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
+			{
+				refresh_tms9918_sprites( blitline_buffer, pixel_plot_y, line );
+			}
+			break;
 
-	case 4:
-	default:
-		memset(priority_selected, 0, sizeof(priority_selected));
-		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
-		{
-			refresh_line_mode4( blitline_buffer, priority_selected, line );
+		case 4:
+		default:
+			memset(priority_selected, 0, sizeof(priority_selected));
+			if ( line >= 0 )
+			{
+				refresh_line_mode4( blitline_buffer, priority_selected, line );
+			}
+			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
+			{
+				refresh_mode4_sprites( blitline_buffer, priority_selected, pixel_plot_y, line );
+			}
+			break;
 		}
-		refresh_mode4_sprites( blitline_buffer, priority_selected, pixel_plot_y, line );
-		break;
 	}
 
 	/* Check if display is disabled or we're below/above active area */
