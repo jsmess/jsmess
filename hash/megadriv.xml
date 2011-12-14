@@ -7861,6 +7861,20 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="fengsha" cloneof="fengsh">
+		<description>Feng Shen Ying Jie Zhuan (Chi, Alt?)</description>
+		<year>1996</year>
+		<publisher>Chuanpu Technologies</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<dataarea name="rom" size="2097152">
+				<rom name="unknown chinese game 1 (chi).bin" size="2097152" crc="dfacb9ff" sha1="4283bb9aec05098b9f6b1739e1b02c1bb1f8242f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ferias">
 		<description>Férias Frustradas do Pica-Pau (Bra)</description>
 		<year>1995</year>
@@ -10828,7 +10842,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="langriss">
+	<software name="langriss" cloneof="warsong">
 		<!-- Serial: T-25103 - Release Date: 1991-04-26 -->
 		<description>Langrisser (Jpn)</description>
 		<year>1991</year>
@@ -25809,20 +25823,6 @@ with the final release (CRC32: 6065774d), which has been dumped short ago -->
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tc2000.bin" size="1048576" crc="cef91bdb" sha1="80a2f21304cea6876bc07a48dcd1f5e53a5b3adb" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="unknown">
-		<description>Unknown Chinese Game 1 (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb_type" value="SEGA-SRAM" />
-			<dataarea name="rom" size="2097152">
-				<rom name="unknown chinese game 1 (chi).bin" size="2097152" crc="dfacb9ff" sha1="4283bb9aec05098b9f6b1739e1b02c1bb1f8242f" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
