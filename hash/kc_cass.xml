@@ -60,7 +60,7 @@
 		</part>
 	</software>
 
-	<software name="gatecr" supported="no">		<!-- keyboard doesn't works -->
+	<software name="gatecr" supported="no">		<!-- keyboard doesn't works in KC85/4-5 -->
 		<!-- C0161 Spiele 8 -->
 		<description>Gatecrasher</description>
 		<year>1988</year>
@@ -890,7 +890,7 @@
 		</part>
 	</software>
 
-	<software name="bennion" supported="no">		<!-- keyboard doesn't works -->
+	<software name="bennion">
 		<description>Bennion Geppy/4</description>
 		<year>1988</year>
 		<publisher>R.B. Software</publisher>
@@ -1659,7 +1659,7 @@
 		</part>
 	</software>
 
-	<software name="kdp" supported="no">
+	<software name="kdp">
 		<description>Kampf der Piraten</description>
 		<year>198?</year>
 		<publisher>Gauß-Service</publisher>
@@ -1784,7 +1784,7 @@
 		</part>
 	</software>
 
-	<software name="nuclear" supported="no">
+	<software name="nuclear">
 		<description>Nuclear</description>
 		<year>198?</year>
 		<publisher>Gauß-Service</publisher>
