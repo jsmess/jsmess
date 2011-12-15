@@ -214,13 +214,13 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // address where some of the bits are undefined (like the GIME's palette
 // and MMU registers), the value obtained for those undefined bits is
 // predictable on the CoCo.
-// 
+//
 // There are two possibilites which depend on the addressing mode you use
 // to read from such an address.  If you use the "no-offset" indexed mode
 // (as in LDA ,X) the undefined bits will come from the first byte of the
 // next instruction.  For any other addressing mode, the undefined bits
 // will come from the byte at $FFFF (LSB of the Reset vector).
-// 
+//
 // When you use BASIC's PEEK command to read from an un-mapped address
 // (such as $FF70), you get a value of 126.  This is because PEEK reads
 // the address with a LDA ,X instruction, so the value returned is the
@@ -228,7 +228,7 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // patch the PEEK command to use a 5-bit offset (LDA 0,X), the value
 // returned for an un-mapped address will instead come from $FFFF (27 on
 // a CoCo 3 or 39 on a CoCo 1/2).
-// 
+//
 // The reason for this behavior is that the 6809 normally does a VMA
 // cycle just before reading the instruction's effective address. The
 // exception is the "no-offset" indexed mode in which case the next
@@ -237,15 +237,15 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 // HI.  This has the effect of loading the value from $FFFF onto the data
 // bus.  This stale data from the previous cycle supplies the value for
 // the undefined bits.
-// 
+//
 // Here is a small routine which will demonstrate this behavior:
-// 
+//
 //   ldx   #$FF70
 //   lda   ,x
 //   ldb   $FF70
 //   std   $400
 //   rts
-// 
+//
 // On a CoCo 3, you should end up with the value $F61B at $400-401.  On a
 // CoCo 1/2 you should get $F627 instead.
 //-------------------------------------------------

@@ -2220,7 +2220,7 @@ static void pmu_exec(mac_state *mac)
 
 				mac->m_pm_out[0] = mac->m_pm_out[1] = 3 + mac->m_adb_datasize;
 				mac->m_pm_out[2] = 0;
-//				mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
+//              mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
 				mac->m_pm_out[3] = 0;
 				mac->m_pm_out[4] = mac->m_adb_datasize;
 				for (int i = 0; i < mac->m_adb_datasize; i++)
@@ -2234,7 +2234,7 @@ static void pmu_exec(mac_state *mac)
 				mac->m_pm_out[0] = mac->m_pm_out[1] = 4;
 				mac->m_pm_out[2] = 0;
 				mac->m_pm_out[3] = 0;
-//				mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
+//              mac->m_pm_out[3] = mac->m_pmu_last_adb_command;
 				mac->m_pm_out[4] = 1;	// length of following data
 				mac->m_pm_out[5] = 0;
 				mac->m_pm_slen = 6;

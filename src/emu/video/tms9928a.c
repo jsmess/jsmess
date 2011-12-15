@@ -133,18 +133,29 @@ READ8_MEMBER( tms9928a_device::register_read )
 	UINT8 data = m_StatusReg;
 
 	m_StatusReg = m_FifthSprite;
-	if (m_INT) {
-		m_INT = 0;
-		if ( !m_irq_changed.isnull() )
-			m_irq_changed( m_INT );
-	}
+	check_interrupt();
 	m_latch = 0;
 
 	return data;
 }
 
 
-void tms9928a_device::change_register(UINT8 reg, UINT8 val) {
+void tms9928a_device::check_interrupt()
+{
+	// trigger if vblank and interrupt-enable bits are set
+	UINT8 b = (m_StatusReg & 0x80 && m_Regs[1] & 0x20) ? 1 : 0;
+
+	if (b != m_INT)
+	{
+		m_INT = b;
+		if ( !m_irq_changed.isnull() )
+			m_irq_changed( m_INT );
+	}
+}
+
+
+void tms9928a_device::change_register(UINT8 reg, UINT8 val)
+{
 	static const UINT8 Mask[8] =
 		{ 0x03, 0xfb, 0x0f, 0xff, 0x07, 0x7f, 0x07, 0xff };
 	static const char *const modes[] =
@@ -154,7 +165,6 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val) {
 		"Mode 1+3 (BOGUS)", "Mode 2+3 (MULTICOLOR variation)",
 		"Mode 1+2+3 (BOGUS)"
 	};
-	UINT8 b;
 
 	val &= Mask[reg];
 	m_Regs[reg] = val;
@@ -181,14 +191,7 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val) {
 		logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
 		break;
 	case 1:
-		/* check for changes in the INT line */
-		b = (val & 0x20) && (m_StatusReg & 0x80) ;
-		if (b != m_INT)
-		{
-			m_INT = b;
-			if ( !m_irq_changed.isnull() )
-				m_irq_changed( m_INT );
-		}
+		check_interrupt();
 		m_mode = ( (m_reva ? (m_Regs[0] & 2) : 0) | ((m_Regs[1] & 0x10)>>4) | ((m_Regs[1] & 8)>>1));
 		logerror("TMS9928A('%s'): %s\n", tag(), modes[m_mode]);
 		break;
@@ -281,18 +284,11 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		for ( int i = 0; i < TMS9928A_TOTAL_HORZ; i++ )
 			p[i] = BackColour;
 
-		/* Check for end of active display */
-		if ( y == 192 )
+		/* vblank is set 1 line after end of active display */
+		if ( y == 193 )
 		{
-			UINT8 b;
-
 			m_StatusReg |= 0x80;
-			b = (m_Regs[1] & 0x20) != 0;
-			if (b != m_INT) {
-				m_INT = b;
-				if ( !m_irq_changed.isnull() )
-					m_irq_changed( m_INT );
-			}
+			check_interrupt();
 		}
 	}
 	else
@@ -333,11 +329,11 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				UINT16 fg = m_Regs[7] >> 4;
 				UINT16 bg = m_Regs[7] & 15;
 
-				/* Extra 8 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+				/* Extra 6 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6, addr++ )
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6, addr++ )
 				{
 					UINT16 charcode = m_vMem[ addr ];
 					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
@@ -346,8 +342,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
 				}
 
-				/* Extra 8 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				/* Extra 10 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
@@ -378,11 +374,11 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				UINT16 fg = m_Regs[7] >> 4;
 				UINT16 bg = m_Regs[7] & 15;
 
-				/* Extra 8 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+				/* Extra 6 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6, addr++ )
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6, addr++ )
 				{
 					UINT16 charcode = ( m_vMem[ addr ] + ( ( y >> 6 ) << 8 ) ) & m_patternmask;
 					UINT8 pattern = m_vMem[ m_pattern + ( charcode << 3 ) + ( y & 7 ) ];
@@ -391,8 +387,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 						p[x+i] = ( pattern & 0x80 ) ? fg : bg;
 				}
 
-				/* Extra 8 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				/* Extra 10 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
@@ -421,18 +417,18 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				UINT16 fg = m_Regs[7] >> 4;
 				UINT16 bg = m_Regs[7] & 15;
 
-				/* Extra 8 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 8; x++ )
+				/* Extra 6 pixels left border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 8; x < TMS9928A_HORZ_DISPLAY_START + 248; x+= 6 )
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6 )
 				{
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = bg;
 				}
 
-				/* Extra 8 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 248; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				/* Extra 10 pixels right border */
+				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
@@ -475,8 +471,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			{
 				int spr_y = m_vMem[ m_spriteattribute + sprattr + 0 ];
 
-				if (!fifth_encountered)
-					m_FifthSprite = sprattr / 4;
+				m_FifthSprite = sprattr / 4;
 
 				/* Stop processing sprites */
 				if ( spr_y == 208 )
@@ -499,8 +494,11 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					num_sprites++;
 
 					/* Fifth sprite encountered? */
-					if( num_sprites == 5 )
+					if ( num_sprites == 5 )
+					{
 						fifth_encountered = true;
+						break;
+					}
 
 					if ( sprite_mag )
 						pataddr += ( ( ( y - spr_y ) & 0x1F ) >> 1 );
@@ -555,7 +553,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			/* Update sprite overflow bits */
 			if (~m_StatusReg & 0x40)
 			{
-				m_StatusReg |= m_FifthSprite;
+				m_StatusReg = (m_StatusReg & 0xe0) | m_FifthSprite;
 				if (fifth_encountered && ~m_StatusReg & 0x80)
 					m_StatusReg |= 0x40;
 			}
@@ -611,8 +609,6 @@ void tms9928a_device::device_start()
 	m_tmpbmp = auto_bitmap_alloc(machine(), TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL, m_screen->format());
 
 	m_line_timer = timer_alloc(TIMER_LINE);
-
-	m_LimitSprites = 1;
 
 	save_item(NAME(m_Regs[0]));
 	save_item(NAME(m_Regs[1]));

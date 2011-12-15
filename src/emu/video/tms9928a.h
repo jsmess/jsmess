@@ -118,6 +118,7 @@ protected:
 
 private:
 	void change_register(UINT8 reg, UINT8 val);
+	void check_interrupt();
 
 	static const device_timer_id TIMER_LINE = 0;
 
@@ -151,7 +152,6 @@ private:
 	UINT8		m_mode;
 
 	/* emulation settings */
-	int			m_LimitSprites; /* max 4 sprites on a row, like original TMS9918A */
 	int			m_top_border;
 };
 

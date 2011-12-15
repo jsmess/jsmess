@@ -2616,8 +2616,8 @@
 	<!-- This is exactly the same as lodoss ?!-->
 	<!--
 	<software name="lodosst" cloneof="lodoss">
-  	<description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(Jpn)</description>
-  	<year>1992</year>
+	<description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(Jpn)</description>
+	<year>1992</year>
 		<publisher>Hudson</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
 		<part name="cdrom" interface="pce_cdrom">

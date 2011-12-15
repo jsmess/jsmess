@@ -203,8 +203,8 @@ SCREEN_UPDATE( macpb160 )
 		{
 			pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
 
-//			*line++ = (pixels>>4)&0xf;
-//			*line++ = pixels&0xf;
+//          *line++ = (pixels>>4)&0xf;
+//          *line++ = pixels&0xf;
             *line++ = ((pixels>>6)&3);
             *line++ = ((pixels>>4)&3);
             *line++ = ((pixels>>2)&3);

@@ -149,19 +149,19 @@ static void lynx_audio_shift(device_t *device, LYNX_AUDIO *channel)
     lynx_sound_state *state = get_safe_token(device);
 	INT16 out_temp;
     UINT8 channel_number = (UINT8)(channel - state->audio);
-	
+
 	channel->shifter = ((channel->shifter<<1)&0xffe) | (state->shift_xor[ channel->shifter & channel->mask ]&1);
-	
+
 	/* // alternative method (functionally the same as above)
-	UINT8 xor_out=0;
-	for(int bit=0;bit<12;bit++)
-	{
-		if((channel->mask>>bit)&1) xor_out ^= (channel->shifter>>bit)&1;
-	}
-	channel->shifter = ((channel->shifter<<1)&0xffe) | (xor_out ^ 1); // output of xor is inverted
-	*/
-	
-	
+    UINT8 xor_out=0;
+    for(int bit=0;bit<12;bit++)
+    {
+        if((channel->mask>>bit)&1) xor_out ^= (channel->shifter>>bit)&1;
+    }
+    channel->shifter = ((channel->shifter<<1)&0xffe) | (xor_out ^ 1); // output of xor is inverted
+    */
+
+
     if (channel->reg.control1&0x20) // integrate mode enabled
 	{
 		if (channel->shifter&1)
@@ -172,7 +172,7 @@ static void lynx_audio_shift(device_t *device, LYNX_AUDIO *channel)
 		{
 			out_temp = channel->reg.output - channel->reg.volume;
 		}
-		
+
 		// clipping
 		if(out_temp > 127) out_temp = 127;
 		if(out_temp < -128) out_temp = -128;
@@ -204,13 +204,13 @@ static void lynx_audio_execute(device_t *device, LYNX_AUDIO *channel)
 					channel->count = channel->reg.bakup;
 				lynx_audio_shift(device, channel);
 			}
-		} 
-		else 
+		}
+		else
 		{
 			int t=1<<(channel->reg.control1&7); // microseconds per count
-			for (;;) 
+			for (;;)
 			{
-				for (;(channel->ticks >= t) && (channel->count >= 0); channel->ticks-=t) // at least one sampled worth of time left, timer not expired 
+				for (;(channel->ticks >= t) && (channel->count >= 0); channel->ticks-=t) // at least one sampled worth of time left, timer not expired
 				{
 					channel->count--;
 				}
@@ -227,8 +227,8 @@ static void lynx_audio_execute(device_t *device, LYNX_AUDIO *channel)
 		{
 			channel->reg.output = (channel->shifter & 1) ? channel->reg.volume : -channel->reg.volume;
 		}
-    } 
-	else 
+    }
+	else
 	{
 		channel->ticks=0;
 		channel->count=0;
@@ -289,7 +289,7 @@ UINT8 lynx_audio_read(device_t *device, int offset)
 				value = state->master_enable;
 				break;
 		}
-		
+
 	}
     return value;
 }

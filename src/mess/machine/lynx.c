@@ -1452,7 +1452,7 @@ void lynx_timer_count_down(running_machine &machine, int which)
 			}
 			else
 			{
-				state->m_timer[which].counter--; // Is this correct or should it stop at zero? 
+				state->m_timer[which].counter--; // Is this correct or should it stop at zero?
 			}
 			return;
 		}
@@ -1485,7 +1485,7 @@ static TIMER_CALLBACK(lynx_timer_shot)
 	{
 		attotime t = (attotime::from_hz(lynx_time_factor(state->m_timer[param].cntrl1 & 0x07)) * (state->m_timer[param].bakup + 1));
 		state->m_timer[param].timer->adjust(t, param);
-	}	
+	}
 }
 
 static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)

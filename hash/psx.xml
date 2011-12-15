@@ -16,10 +16,10 @@ A few comments on these:
    FILE "XXXX.img" BINARY
       TRACK 1 MODE2/2352
       INDEX 1 00:00:00
-   (or TRACK 01, INDEX 01 when necessary). This might have introduced errors in the procedure, so it would be good to keep around 
+   (or TRACK 01, INDEX 01 when necessary). This might have introduced errors in the procedure, so it would be good to keep around
    the original files for later checks
-5. some 'release' were found both as iso only and as iso + cue; if by using the generic cuesheet above with the iso only release you 
-   end up with the wrong CHD try again by using MODE1 instead of MODE2 (raw data will remain untouched so in this case we can do 
+5. some 'release' were found both as iso only and as iso + cue; if by using the generic cuesheet above with the iso only release you
+   end up with the wrong CHD try again by using MODE1 instead of MODE2 (raw data will remain untouched so in this case we can do
    further changes with no loss)
 6. releases in mdf/mds format or cdi format have been mounted in ISOBuster and raw ripped to bin/cue, so there is the possibility
    that subtle errors are introduced either in this procedure, or in the original creation of the mdf/mds/cdi image. These should

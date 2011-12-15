@@ -346,18 +346,18 @@ UINT8 abc1600_state::read_external_io(offs_t offset)
 			{
 				/*
 
-					bit     description
+                    bit     description
 
-					0       1
-					1       1
-					2       LXCSB2*
-					3       LXCSB3*
-					4       LXCSB4*
-					5       LXCSB5*
-					6       LCSB*-0
-					7       LCSB*-0I
+                    0       1
+                    1       1
+                    2       LXCSB2*
+                    3       LXCSB3*
+                    4       LXCSB4*
+                    5       LXCSB5*
+                    6       LCSB*-0
+                    7       LCSB*-0I
 
-				*/
+                */
 
 				data = (m_csb & 0xfc) | 0x03;
 			}
@@ -365,18 +365,18 @@ UINT8 abc1600_state::read_external_io(offs_t offset)
 			{
 				/*
 
-					bit     description
+                    bit     description
 
-					0       LCSB*-2
-					1       LCSB*-1
-					2       1
-					3       1
-					4       1
-					5       1
-					6       1
-					7       1
+                    0       LCSB*-2
+                    1       LCSB*-1
+                    2       1
+                    3       1
+                    4       1
+                    5       1
+                    6       1
+                    7       1
 
-				*/
+                */
 
 				data = 0xfc | (m_csb & 0x03);
 			}
