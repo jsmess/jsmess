@@ -72,7 +72,6 @@ public:
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
@@ -105,7 +104,6 @@ public:
 
 	/* video state */
 	UINT8 *m_video_ram;
-	int m_vert;
 	int m_brt;
 	int m_cont;
 
