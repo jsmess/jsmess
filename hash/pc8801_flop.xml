@@ -10,8 +10,6 @@ Missing games to investigate:
 
 Are the following undumped or mistransalted (check also if available in TOSEC)?
 
- - ぽっぷるめいる (19911220) by Nihon Falcom
- - 伊忍道 (19910719) by Koei
  - DEFLEKTOR (199107xx) by BPS
  - カクテルソフトディスク増刊号 (19910625) by Cocktail Soft / Takeru
  - 野球道Ⅱデータブック'91 (199104xx) by Takeru
@@ -29,8 +27,6 @@ Are the following undumped or mistransalted (check also if available in TOSEC)?
  - Caroll (199010xx) by System House Oh!
  - サイバーファイト (199010xx) by NASC / Takeru
  - キサナ (19900921) by Fairytale
- - 斬・夜叉円舞曲 (19900904) by WolfTeam
- - ティルナノーグ 禁断の塔 (19900824) by System Software
  - ルージュ 真紅の口紅 (19900613) by BirdieSoft
  - 陽炎迷宮 (19900614) by Heart Denshi
  - 鳴門巻秘帖 (199004xx) by Zenryutsu
@@ -46,13 +42,11 @@ Are the following undumped or mistransalted (check also if available in TOSEC)?
  - 天九牌スペシャル (198912xx) by Takeru
  - ヒーロー・シンドローム (19891229) by Takeru / Swing Soft
  - 早乙女学園　ブルーウィンド (19891121) by Zenryutsu
- - メルルーン (19891130) by dB-Soft
- - ヒーローオブランス (198910xx) by Pony Canyon
+ - AD&D ヒーローオブランス (198910xx) by Pony Canyon
  - オレンジ色の媚薬 (198801xx) by New System House Oh!
  - オレンジ色の媚薬PART2 (19890929) by System House Oh!
  - 少女伝説 (198802xx) by New System House Oh!
  - 少女伝説PART2 (19890929) by System House Oh!
- - パワフルまぁじゃん２データ集 邪子ちゃん組 (198906xx) by Takeru
  - イーヴルストーン (198906xx) by Zenryutsu
  - タウヒード (198906xx) by Champion Soft
  - ビデオクィーンをさがせ (19890609) by IST
@@ -66,7 +60,6 @@ Are the following undumped or mistransalted (check also if available in TOSEC)?
  - 牧本千幸のメランコリー (198902xx) by Uchuu Kikaku
  - ５ギャルズコネクション (1988xxxx) by Aisel
  - 天女伝説 (1988xxxx) by Champion Soft
- - フライトシミュレータWith魚雷攻撃 (1988xxxx) by Sublogic
  - サルベーション (198812xx) by Zenryutsu
  - システィライア サリアの大冒険 (198812xx) by Pasoket
  - 続々坂田血風録 (198812xx) by Victor Music Industry
@@ -329,6 +322,7 @@ To investigate:
  - is ロードランナー オリジナル追加面 (198504xx) among the add-on disks for Lode Runner below?
  - is Lode Data (198502xx) among the add-on disks for Lode Runner below?
  - is ザ・コックピット (198411xx) the SR version of cockpit or the older one?
+ - is パワフルまぁじゃん２データ集 邪子ちゃん組 (198906xx) by Takeru in one of the Powerful mahjong 2 sets below?
 
 TO FIX
  - Identify games by Bond Soft among the ones by Pascal2 (older company name)
@@ -2172,7 +2166,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 	</software>
 
 	<software name="alicetac" supported="no">
-		<description>Alice Tachi no Gogo vol. 1</description>
+		<description>Alice Tachi no Gogo Vol. 1</description>
 		<year>1989</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
 		<!-- PC8801mk2SR -->
@@ -2204,7 +2198,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 	</software>
 
 	<software name="alicetaca" cloneof="alicetac" supported="no">
-		<description>Alice Tachi no Gogo vol. 1 (Alt)</description>
+		<description>Alice Tachi no Gogo Vol. 1 (Alt)</description>
 		<year>1989</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
 		<!-- PC8801mk2SR -->
@@ -12055,6 +12049,20 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 		</part>
 	</software>
 
+	<software name="flighsim">
+		<!-- Alt. Title: Flight Simulator with Torpedo Attack (Box) -->
+		<description>Flight Simulator with Gyorai Kogeki</description>
+		<year>1988</year>
+		<publisher>サブロジック (subLOGIC) </publisher>
+		<!-- PC8801mk2SR -->
+		<info name="alt_title" value="フライトシミュレータWith魚雷攻撃"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gyorai kogeki.d88" size="348848" crc="2642a6ab" sha1="4ca6cb3459f29ad5e1b7a9d27d16907cd004457a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="formatz">
 		<description>Formation Z</description>
 		<year>1986</year>
@@ -15988,6 +15996,98 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
 				<rom name="mission impossible (disk 2).d88" size="344496" crc="06fb10e2" sha1="2b775f4603cfa35f634fead98d3afef5e0a3a374" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inindo">
+		<description>Inindo</description>
+		<year>1991</year>
+		<publisher>光栄 (Koei)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19910719"/>
+		<info name="alt_title" value="伊忍道"/>
+		<!--combined image-->
+		<!--rom name="inindo.d88" size="1978192" crc="bfebfab5" sha1="c947f2e7bb82e0b0b421af4a409a26fc351d36b8" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part id" value="Disk A" />
+			<dataarea name="flop" size="380864">
+				<rom name="inindo (disk a).d88" size="380864" crc="698a4604" sha1="047baad87302f1aeb12dbc9089732d6930aa2edc" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part id" value="Disk B" />
+			<dataarea name="flop" size="401984">
+				<rom name="inindo (disk b).d88" size="401984" crc="8d9345d6" sha1="a228a28ea9786d05d38d233b6ff6ff7d1718ac45" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part id" value="Disk C" />
+			<dataarea name="flop" size="401968">
+				<rom name="inindo (disk c).d88" size="401968" crc="78d7954b" sha1="c5f8113a690e79f29c5dab0053bc0d4ee614c455" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part id" value="Disk D" />
+			<dataarea name="flop" size="401968">
+				<rom name="inindo (disk d).d88" size="401968" crc="037379ce" sha1="9ca9404689c8edd03666d290f7083103a8429b59" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part id" value="User" />
+			<dataarea name="flop" size="391408">
+				<rom name="inindo (user).d88" size="391408" crc="aa113088" sha1="147ba8c9b61f5e67d47aca4e97697355c1b278c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inindoa" cloneof="inindo">
+		<description>Inindo (Alt?)</description>
+		<year>1991</year>
+		<publisher>光栄 (Koei)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19910719"/>
+		<info name="alt_title" value="伊忍道"/>
+		<!--combined image-->
+		<!--rom name="inindo.d88" size="1930272" crc="2237c01b" sha1="02f13c7d481ece86919944e9a91b11c551a91c36" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part id" value="Disk A" />
+			<dataarea name="flop" size="391264">
+				<rom name="inindo (a) (disk a).d88" size="391264" crc="ebef21b2" sha1="2dd59a9429c8454a8f77f9e29bc6e1f199ce1799" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part id" value="Disk B" />
+			<dataarea name="flop" size="391264">
+				<rom name="inindo (a) (disk b).d88" size="391264" crc="a15f8562" sha1="b32af2a37bef3351f534d5a9177a31146a5d4358" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part id" value="Disk C" />
+			<dataarea name="flop" size="386048">
+				<rom name="inindo (a) (disk c).d88" size="386048" crc="48e40d31" sha1="a19ad4a0441727c241cd70eb0363eaf552772122" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part id" value="Disk D" />
+			<dataarea name="flop" size="380848">
+				<rom name="inindo (a) (disk d).d88" size="380848" crc="8b7c0aa0" sha1="6a0eceaf5d03b88367ee9cc4437d7291fdba6621" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part id" value="User" />
+			<dataarea name="flop" size="380848">
+				<rom name="inindo (a) (user).d88" size="380848" crc="e627e635" sha1="35903a68c285ec7b68c60ab926db307b312416cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21522,6 +21622,47 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
+	<software name="melroon">
+		<description>Melroon</description>
+		<year>1989</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19891130"/>
+		<info name="alt_title" value="メルルーン"/>
+		<!--combined image-->
+		<!--rom name="melroon.d88" size="1395392" crc="8ef8e7b4" sha1="7bb5fb9000a10e27882c059242b89346771f8459" offset="0" /-->
+		<!-- Disk A,B,C(error), User -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part id" value="Disk A" />
+			<dataarea name="flop" size="348848">
+				<rom name="melroon (disk a).d88" size="348848" crc="29b65e59" sha1="38738a92f984a306d8f6d09097e7d9bb246c0e90" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part id" value="Disk B" />
+			<dataarea name="flop" size="348848">
+				<rom name="melroon (disk b).d88" size="348848" crc="79a61833" sha1="55a173c08fa6ee04b43b6cf290b7ee438de77e59" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+		<!-- Is this disk bad? The header says: "Disk C (error)" -->
+			<feature name="part id" value="Disk C" />
+			<dataarea name="flop" size="348848">
+				<rom name="melroon (disk c - error).d88" size="348848" crc="3bd3ee91" sha1="eb535d2c7b5e93912c68892b1035c9fb27c92472" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part id" value="User" />
+			<dataarea name="flop" size="348848">
+				<rom name="melroon (user).d88" size="348848" crc="ef488bb9" sha1="5fa463546788da7a89b59b5ca1c4f9c70cee8751" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="meosmyst">
 		<description>Meo's Mystery Adventure</description>
 		<year>1983</year>
@@ -23696,7 +23837,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk 2" />
 			<dataarea name="flop" size="348832">
-				<rom name="oji binbin monogatari (disk 2).d88" size="348832" crc="78f12d5a" sha1="6bcf553628da67d855c7eaa9299a3ba598a13c02" offset="0" />
+				<rom name="oji binbin monogatari (a) (disk 2).d88" size="348832" crc="78f12d5a" sha1="6bcf553628da67d855c7eaa9299a3ba598a13c02" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -23714,14 +23855,14 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk 1" />
 			<dataarea name="flop" size="348832">
-				<rom name="oji binbin monogatari (disk 1).d88" size="348832" crc="2674a504" sha1="e05bfa34ba1472a1f1b8652c7a5869685538bdc9" offset="0" />
+				<rom name="oji binbin monogatari (b) (disk 1).d88" size="348832" crc="2674a504" sha1="e05bfa34ba1472a1f1b8652c7a5869685538bdc9" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk 2" />
 			<dataarea name="flop" size="348832">
-				<rom name="oji binbin monogatari (disk 2).d88" size="348832" crc="78f12d5a" sha1="6bcf553628da67d855c7eaa9299a3ba598a13c02" offset="0" />
+				<rom name="oji binbin monogatari (b) (disk 2).d88" size="348832" crc="78f12d5a" sha1="6bcf553628da67d855c7eaa9299a3ba598a13c02" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -23739,14 +23880,14 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk 1" />
 			<dataarea name="flop" size="348832">
-				<rom name="oji binbin monogatari (disk 1).d88" size="348832" crc="2674a504" sha1="e05bfa34ba1472a1f1b8652c7a5869685538bdc9" offset="0" />
+				<rom name="oji binbin monogatari (c) (disk 1).d88" size="348832" crc="2674a504" sha1="e05bfa34ba1472a1f1b8652c7a5869685538bdc9" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk 2" />
 			<dataarea name="flop" size="348848">
-				<rom name="oji binbin monogatari (disk 2).d88" size="348848" crc="3ef1fe8d" sha1="18e2398d119ab1a871160079fc1939bc9dba9ed9" offset="0" />
+				<rom name="oji binbin monogatari (c) (disk 2).d88" size="348848" crc="3ef1fe8d" sha1="18e2398d119ab1a871160079fc1939bc9dba9ed9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25158,8 +25299,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ2		   " -> "phantasie iv the birth of heroes_03.d8
 
 	<software name="popful">
 		<description>Popful Mail</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19911220"/>
+		<info name="alt_title" value="ぽっぷるめいる"/>
 		<!--combined image-->
 		<!--rom name="popful mail.d88" size="2496656" crc="acbb1bc0" sha1="3ef2dea25b96c478469e60fefaad9c083255e6d6" offset="0" /-->
 
@@ -25243,7 +25387,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2		   " -> "phantasie iv the birth of heroes_03.d8
 		<info name="alt_title" value="ポートピア連続殺人事件"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="portopia renzokusatsujin jiken.d88" size="348848" crc="b0753338" sha1="ec16e1894c9d559f894bcea4cd94a9c7c5921bd0" offset="0" />
+				<rom name="portopia renzokusatsujin jiken (a).d88" size="348848" crc="b0753338" sha1="ec16e1894c9d559f894bcea4cd94a9c7c5921bd0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -27230,7 +27374,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 		<info name="alt_title" value="セーラー服美少女図鑑５"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="sailor-fuku bishojo zukan 5.d88" size="348848" crc="d0d47dd4" sha1="fdb3f9448c86ade18332c958abc0450cf989be62" offset="0" />
+				<rom name="sailor-fuku bishojo zukan 5 (a).d88" size="348848" crc="d0d47dd4" sha1="fdb3f9448c86ade18332c958abc0450cf989be62" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -29733,14 +29877,14 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk 0" />
 			<dataarea name="flop" size="436640">
-				<rom name="snatcher demo (disk 0).d88" size="436640" crc="a8a5a4d9" sha1="bdb0b710eba05850a4202825854adab706829db5" offset="0" />
+				<rom name="snatcher demo (a) (disk 0).d88" size="436640" crc="a8a5a4d9" sha1="bdb0b710eba05850a4202825854adab706829db5" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk 1" />
 			<dataarea name="flop" size="436640">
-				<rom name="snatcher demo (disk 1).d88" size="436640" crc="5c40a4ee" sha1="15a915c2a043d8416530f39166b2ad94183c7edc" offset="0" />
+				<rom name="snatcher demo (a) (disk 1).d88" size="436640" crc="5c40a4ee" sha1="15a915c2a043d8416530f39166b2ad94183c7edc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -30913,21 +31057,21 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
 			<dataarea name="flop" size="348832">
-				<rom name="still sword for adult (disk a).d88" size="348832" crc="8c362d63" sha1="81f827e7d5469941a8f59e719a139dbcf576a99a" offset="0" />
+				<rom name="still sword for adult (a) (disk a).d88" size="348832" crc="8c362d63" sha1="81f827e7d5469941a8f59e719a139dbcf576a99a" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk B" />
 			<dataarea name="flop" size="348832">
-				<rom name="still sword for adult (disk b).d88" size="348832" crc="074caaad" sha1="5a16b3c252e0181dce1d302ea4aa2f81be16334d" offset="0" />
+				<rom name="still sword for adult (a) (disk b).d88" size="348832" crc="074caaad" sha1="5a16b3c252e0181dce1d302ea4aa2f81be16334d" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part id" value="Disk C" />
 			<dataarea name="flop" size="348832">
-				<rom name="still sword for adult (disk c).d88" size="348832" crc="d0cd2b4a" sha1="89dc749652772d190391374b35ab14a885150b2d" offset="0" />
+				<rom name="still sword for adult (a) (disk c).d88" size="348832" crc="d0cd2b4a" sha1="89dc749652772d190391374b35ab14a885150b2d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -32419,21 +32563,21 @@ ExtractDisk  [02]"DISK B		  " -> "telenet music box (b)_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
 			<dataarea name="flop" size="415840">
-				<rom name="testament (disk a).d88" size="415840" crc="24b9fe31" sha1="3009ed38b11a43470f4d48d8b0ae56479c0a3b16" offset="0" />
+				<rom name="testament (b) (disk a).d88" size="415840" crc="24b9fe31" sha1="3009ed38b11a43470f4d48d8b0ae56479c0a3b16" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk B" />
 			<dataarea name="flop" size="416688">
-				<rom name="testament (disk b).d88" size="416688" crc="b65e0f30" sha1="70cf760352b36aff166deca9684f124ce3265190" offset="0" />
+				<rom name="testament (b) (disk b).d88" size="416688" crc="b65e0f30" sha1="70cf760352b36aff166deca9684f124ce3265190" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part id" value="Expansion Map" /> <!-- 拡張MAP -->
 			<dataarea name="flop" size="416688">
-				<rom name="testament (expansion map).d88" size="416688" crc="c594d308" sha1="3a6f15e8550d3b1e31a0e68d624e9f1bb9bb576d" offset="0" />
+				<rom name="testament (b) (expansion map).d88" size="416688" crc="c594d308" sha1="3a6f15e8550d3b1e31a0e68d624e9f1bb9bb576d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -32751,6 +32895,39 @@ ExtractDisk  [02]"DISK B		  " -> "telenet music box (b)_02.d88"
 			<feature name="part id" value="Disk 2G" />
 			<dataarea name="flop" size="348848">
 				<rom name="time zone (disk 2g).d88" size="348848" crc="902a7d3d" sha1="681c06fc1e973f3bc7078e6b250d57d0da9a91b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tirnanog">
+		<description>Tir-Nan-Og - Kindan no Tou</description>
+		<year>1990</year>
+		<publisher>システムソフト (System Software)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19900824"/>
+		<info name="alt_title" value="ティルナノーグ 禁断の塔"/>
+		<!--combined image-->
+		<!--rom name="tir-nan-og.d88" size="1171472" crc="36d40ed1" sha1="0fecd94f2ad6e740cabf39c8be9225ff59b0fd39" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25" >
+			<feature name="part id" value="Disk 1" />
+			<dataarea name="flop" size="348848">
+				<rom name="tir-nan-og (disk 1).d88" size="348848" crc="922c34cc" sha1="1ab9ae0425e497cd06a627cdeb718bab533bee57" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25" >
+			<feature name="part id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="tir-nan-og (disk 2).d88" size="348848" crc="afb04c8b" sha1="e7eb711886d9032d51316dad3c81fee89afdb041" offset="0" />
+			</dataarea>
+		</part>
+
+		<!-- Common User Disk... is it blank?!? -->
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="473776">
+				<rom name="tir-nan-og (user).d88" size="473776" crc="df1c43ca" sha1="2643a30e50ccd65fcc2ce35938ee8aa0610f43ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -35923,7 +36100,7 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
 			<dataarea name="flop" size="348832">
-				<rom name="woody poco.d88" size="348832" crc="52f2a967" sha1="f3da1e2bddbc794bae748fd6396473b43ed7ae42" offset="0" />
+				<rom name="woody poco (a2).d88" size="348832" crc="52f2a967" sha1="f3da1e2bddbc794bae748fd6396473b43ed7ae42" offset="0" />
 			</dataarea>
 		</part>
 
@@ -37913,6 +38090,38 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="z gundam.d88" size="348832" crc="639f36d5" sha1="1cf2102518aeb301b0473c1a624fd634cc479083" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zan">
+		<description>Zan - Yaksa Enbukyoku</description>
+		<year>1990</year>
+		<publisher>ウルフチーム (WolfTeam)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="19900904"/>
+		<info name="alt_title" value="斬・夜叉円舞曲"/>
+		<!--combined image-->
+		<!--rom name="zan.d88" size="1247472" crc="ab694b6b" sha1="da5bedb8680b897fc3eb4d174f6f9a6b699afb86" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25" >
+			<feature name="part id" value="Disk 1" />
+			<dataarea name="flop" size="415824">
+				<rom name="zan (disk 1).d88" size="415824" crc="82d58d29" sha1="0a91137e9cd1cf9550c68fd0405a3a527b60cff9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25" >
+			<feature name="part id" value="Disk 2" />
+			<dataarea name="flop" size="415824">
+				<rom name="zan (disk 2).d88" size="415824" crc="0074a4fa" sha1="980f8c0e439d1ca8501dad7a9c1b90cb0704b31f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25" >
+			<feature name="part id" value="Disk 3" />
+			<dataarea name="flop" size="415824">
+				<rom name="zan (disk 3).d88" size="415824" crc="4d4cf677" sha1="45506051b4bf74767a39e37c05429d34c49f1cf6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -44179,18 +44388,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="gyoraiko">
-		<description>Gyorai Kogeki</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="フライトシミュレーター"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="gyorai kogeki.d88" size="348848" crc="2642a6ab" sha1="4ca6cb3459f29ad5e1b7a9d27d16907cd004457a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hansensi">
 		<description>Hansen Simulator (Thousantis-go no Boken)</description>
 		<year>19??</year>
@@ -44327,92 +44524,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 			<feature name="part id" value="Disk B" />
 			<dataarea name="flop" size="422160">
 				<rom name="infinitia (disk b).d88" size="422160" crc="1c847189" sha1="158987a35585d4378fbb32c2be7bec33459e42f0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="inindo">
-		<description>Inindo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="inindo.d88" size="1978192" crc="bfebfab5" sha1="c947f2e7bb82e0b0b421af4a409a26fc351d36b8" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="380864">
-				<rom name="inindo (disk a).d88" size="380864" crc="698a4604" sha1="047baad87302f1aeb12dbc9089732d6930aa2edc" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="401984">
-				<rom name="inindo (disk b).d88" size="401984" crc="8d9345d6" sha1="a228a28ea9786d05d38d233b6ff6ff7d1718ac45" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="401968">
-				<rom name="inindo (disk c).d88" size="401968" crc="78d7954b" sha1="c5f8113a690e79f29c5dab0053bc0d4ee614c455" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="401968">
-				<rom name="inindo (disk d).d88" size="401968" crc="037379ce" sha1="9ca9404689c8edd03666d290f7083103a8429b59" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part id" value="User" />
-			<dataarea name="flop" size="391408">
-				<rom name="inindo (user).d88" size="391408" crc="aa113088" sha1="147ba8c9b61f5e67d47aca4e97697355c1b278c9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="inindoa" cloneof="inindo">
-		<description>Inindo (Alt?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="inindo.d88" size="1930272" crc="2237c01b" sha1="02f13c7d481ece86919944e9a91b11c551a91c36" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="391264">
-				<rom name="inindo (a) (disk a).d88" size="391264" crc="ebef21b2" sha1="2dd59a9429c8454a8f77f9e29bc6e1f199ce1799" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="391264">
-				<rom name="inindo (a) (disk b).d88" size="391264" crc="a15f8562" sha1="b32af2a37bef3351f534d5a9177a31146a5d4358" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="386048">
-				<rom name="inindo (a) (disk c).d88" size="386048" crc="48e40d31" sha1="a19ad4a0441727c241cd70eb0363eaf552772122" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="380848">
-				<rom name="inindo (a) (disk d).d88" size="380848" crc="8b7c0aa0" sha1="6a0eceaf5d03b88367ee9cc4437d7291fdba6621" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part id" value="User" />
-			<dataarea name="flop" size="380848">
-				<rom name="inindo (a) (user).d88" size="380848" crc="e627e635" sha1="35903a68c285ec7b68c60ab926db307b312416cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -44991,44 +45102,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="meitantei tojo.d88" size="348848" crc="7a0b7ec9" sha1="0acd429282bd67812d9843db5a817755eedb4121" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="melroon">
-		<description>Melroon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="melroon.d88" size="1395392" crc="8ef8e7b4" sha1="7bb5fb9000a10e27882c059242b89346771f8459" offset="0" /-->
-		<!-- Disk A,B,C(error), User -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="348848">
-				<rom name="melroon (disk a).d88" size="348848" crc="29b65e59" sha1="38738a92f984a306d8f6d09097e7d9bb246c0e90" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="348848">
-				<rom name="melroon (disk b).d88" size="348848" crc="79a61833" sha1="55a173c08fa6ee04b43b6cf290b7ee438de77e59" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-		<!-- Is this disk bad? The header says: "Disk C (error)" -->
-			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="348848">
-				<rom name="melroon (disk c - error).d88" size="348848" crc="3bd3ee91" sha1="eb535d2c7b5e93912c68892b1035c9fb27c92472" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part id" value="User" />
-			<dataarea name="flop" size="348848">
-				<rom name="melroon (user).d88" size="348848" crc="ef488bb9" sha1="5fa463546788da7a89b59b5ca1c4f9c70cee8751" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46790,36 +46863,6 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 		</part>
 	</software>
 
-	<software name="tirnanog">
-		<description>Tir-Nan-Og</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="tir-nan-og.d88" size="1171472" crc="36d40ed1" sha1="0fecd94f2ad6e740cabf39c8be9225ff59b0fd39" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25" >
-			<feature name="part id" value="Disk 1" />
-			<dataarea name="flop" size="348848">
-				<rom name="tir-nan-og (disk 1).d88" size="348848" crc="922c34cc" sha1="1ab9ae0425e497cd06a627cdeb718bab533bee57" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25" >
-			<feature name="part id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
-				<rom name="tir-nan-og (disk 2).d88" size="348848" crc="afb04c8b" sha1="e7eb711886d9032d51316dad3c81fee89afdb041" offset="0" />
-			</dataarea>
-		</part>
-
-		<!-- Common User Disk... is it blank?!? -->
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="User" />
-			<dataarea name="flop" size="473776">
-				<rom name="tir-nan-og (user).d88" size="473776" crc="df1c43ca" sha1="2643a30e50ccd65fcc2ce35938ee8aa0610f43ae" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tokimek1">
 		<description>Tokimeki Sports Gal</description>
 		<year>19??</year>
@@ -47409,35 +47452,6 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="yukar k2 demo.d88" size="348848" crc="9295851a" sha1="765553ae6d5eb462438e0ccb8e8897fde2b2c3b8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zan">
-		<description>Zan</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="zan.d88" size="1247472" crc="ab694b6b" sha1="da5bedb8680b897fc3eb4d174f6f9a6b699afb86" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25" >
-			<feature name="part id" value="Disk 1" />
-			<dataarea name="flop" size="415824">
-				<rom name="zan (disk 1).d88" size="415824" crc="82d58d29" sha1="0a91137e9cd1cf9550c68fd0405a3a527b60cff9" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25" >
-			<feature name="part id" value="Disk 2" />
-			<dataarea name="flop" size="415824">
-				<rom name="zan (disk 2).d88" size="415824" crc="0074a4fa" sha1="980f8c0e439d1ca8501dad7a9c1b90cb0704b31f" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25" >
-			<feature name="part id" value="Disk 3" />
-			<dataarea name="flop" size="415824">
-				<rom name="zan (disk 3).d88" size="415824" crc="4d4cf677" sha1="45506051b4bf74767a39e37c05429d34c49f1cf6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
