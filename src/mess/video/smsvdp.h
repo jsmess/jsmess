@@ -87,14 +87,14 @@ public:
 protected:
 	virtual void set_display_settings();
 	virtual void update_palette();
-	virtual void refresh_line( int pixel_offset_x, int pixel_plot_y, int line );
+	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_address();
 	void process_line_timer();
-	void refresh_line_mode4( int *line_buffer, int *priority_selected, int line );
-	void refresh_mode4_sprites( int *line_buffer, int *priority_selected, int pixel_plot_y, int line );
-	void refresh_tms9918_sprites( int *line_buffer, int pixel_plot_y, int line );
-	void refresh_line_mode2( int *line_buffer, int line );
-	void refresh_line_mode0( int *line_buffer, int line );
+	void draw_scanline_mode4( int *line_buffer, int *priority_selected, int line );
+	void draw_sprites_mode4( int *line_buffer, int *priority_selected, int pixel_plot_y, int line );
+	void draw_sprites_tms9918_mode( int *line_buffer, int pixel_plot_y, int line );
+	void draw_scanline_mode2( int *line_buffer, int line );
+	void draw_scanline_mode0( int *line_buffer, int line );
 
 	// device-level overrides
 	virtual void device_config_complete();
@@ -175,7 +175,7 @@ public:
 protected:
 	virtual void set_display_settings();
 	virtual void update_palette();
-	virtual void refresh_line( int pixel_offset_x, int pixel_plot_y, int line );
+	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_address();
 };
 
