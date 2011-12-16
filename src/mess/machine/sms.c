@@ -1520,13 +1520,20 @@ DEVICE_IMAGE_LOAD( sms_cart )
 			state->m_cartridge[index].features |= CF_KOREAN_NOBANK_MAPPER;
 		}
 
-		if ( mapper && !strcmp( mapper, "codemasters" ) )
+		if ( mapper )
 		{
-			state->m_cartridge[index].features |= CF_CODEMASTERS_MAPPER;
+			if ( ! strcmp( mapper, "codemasters" ) )
+			{
+				state->m_cartridge[index].features |= CF_CODEMASTERS_MAPPER;
+			}
+			if ( ! strcmp( mapper, "korean" ) )
+			{
+				state->m_cartridge[index].features |= CF_KOREAN_MAPPER;
+			}
 		}
 
 		// Check for gamegear cartridges with PIN 42 set to SMS mode
-		if ( pin_42 != NULL && ! strcmp(pin_42, "sms_mode"))
+		if ( pin_42 && ! strcmp(pin_42, "sms_mode"))
 		{
 			state->m_cartridge[index].features |= CF_GG_SMS_MODE;
 		}
