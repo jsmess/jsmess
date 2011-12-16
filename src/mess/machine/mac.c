@@ -77,7 +77,15 @@
 
      Caboose version spotting:
      341S0853 - 0x0100 (1.00) - Quadra 950
-
+ 
+     PG&E (68HC05 PMU) version spotting:
+     (find the text "BORG" in the system ROM, the next 32768 bytes are the PG&E image.
+      offset +4 in the image is the version byte).
+     01 - PowerBook Duo 210/230/250
+     02 - PowerBook 540c, PBDuo 270C, PBDuo 280/280C
+     03 - PowerBook 150
+     08 - PB190cs, PowerBook 540c PPC update, all PowerPC PowerBooks through WallStreet G3s
+ 
 ****************************************************************************/
 
 #define ADDRESS_MAP_MODERN
@@ -1586,7 +1594,7 @@ int mac_state::adb_pollkbd(int update)
 	int i, j, keybuf, report, codes[2], result;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
-	codes[0] = codes[1] = 0x80;	// key up
+	codes[0] = codes[1] = 0xff;	// key up
 	report = result = 0;
 
 	for (i = 0; i < 6; i++)
@@ -2567,7 +2575,7 @@ void mac_state::adb_reset()
 	// keyboard
 	m_adb_keybaddr = 2;
 	m_adb_keybinitialized = 0;
-	m_adb_currentkeys[0] = m_adb_currentkeys[1] = 0x80;
+	m_adb_currentkeys[0] = m_adb_currentkeys[1] = 0xff;
 	m_adb_modifiers = 0;
 	for (i=0; i<7; i++)
 	{
@@ -3413,7 +3421,7 @@ MAC_DRIVER_INIT(macpb140, MODEL_MAC_PB140)
 MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
 MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
-MAC_DRIVER_INIT(macpbduo210, MODEL_MAC_PBDUO_210)
+MAC_DRIVER_INIT(macpd210, MODEL_MAC_PBDUO_210)
 MAC_DRIVER_INIT(macquadra700, MODEL_MAC_QUADRA_700)
 MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
 MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
