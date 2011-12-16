@@ -1359,6 +1359,7 @@
 		<publisher>Game Line</publisher>
 		<info name="serial" value="G9511-RP4"/>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="korean" />
 			<dataarea name="rom" size="442368">
 				<rom name="dallyeora pigu-wang (korea) (unl).bin" size="442368" crc="89b79e77" sha1="9ebd5a7b025e980795eaac206f3f6f5dc297084f" offset="000000" />
 			</dataarea>
@@ -2964,6 +2965,7 @@
 		<year>1994</year>
 		<publisher>Sanghun</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="korean" />
 			<dataarea name="rom" size="1048576">
 				<rom name="jang pung 3 (kr).bin" size="1048576" crc="18fb98a3" sha1="1b2b525ef2ab2d7ea3f934f0c229dab33af56d90" offset="000000" />
 			</dataarea>
@@ -4505,6 +4507,7 @@
 		<year>1994</year>
 		<publisher>Game Line</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="korean" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sangokushi 3 (korea) (unl).bin" size="1048576" crc="97d03541" sha1="c0256188b15271bb814bb8356b3311340e53ea3e" offset="000000" />
 			</dataarea>
