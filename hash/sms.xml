@@ -1299,6 +1299,7 @@
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="MK-27074-50"/>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="cosmic spacehead (europe) (en,fr,de,es).bin" size="262144" crc="29822980" sha1="f46f716dd34a1a5013a2d8a59769f6ef7536a567" offset="000000" />
 			</dataarea>
@@ -1458,6 +1459,7 @@
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="dinobasher starring bignose the caveman (europe) (proto).bin" size="262144" crc="ea5c3a6f" sha1="05b4f23e33ada08e0a8b1fc6feccd8a97c690a21" offset="000000" />
 			</dataarea>
@@ -1750,6 +1752,7 @@
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="excellent dizzy collection, the (usa, europe) (en,fr,de,es,it) (proto).bin" size="262144" crc="8813514b" sha1="09a2acf3ed90101be2629384c5c702f6a5408035" offset="000000" />
 			</dataarea>
@@ -1862,6 +1865,7 @@
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="MK-27074-50"/>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="fantastic dizzy (europe) (en,fr,de,es,it).bin" size="262144" crc="b9664ae1" sha1="4202ce26832046c7ca8209240f097a8a0a84d981" offset="000000" />
 			</dataarea>
@@ -3480,6 +3484,7 @@
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="19001"/>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="micro machines (europe).bin" size="262144" crc="a577ce46" sha1="425621f350d011fd021850238c6de9999625fd69" offset="000000" />
 			</dataarea>
