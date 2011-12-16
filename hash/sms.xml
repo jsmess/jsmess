@@ -3943,6 +3943,7 @@
 		<year>199?</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="penguin adventure (kr).bin" size="131072" crc="445525e2" sha1="9d0c8fb5f1ff6f596aa156264db8d7c1c778b1bf" offset="000000" />
 			</dataarea>
@@ -5313,6 +5314,7 @@
 		<year>1992</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="street master (kr).bin" size="131072" crc="83f0eede" sha1="49f9d62f121d3b7e35d38436c920a53b7070ecd4" offset="000000" />
 			</dataarea>
@@ -6109,6 +6111,7 @@
 		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="wonsiin (kr).bin" size="131072" crc="a05258f5" sha1="f98f9c0fd32b2392b57b14105a9b730c8957d9b9" offset="000000" />
 			</dataarea>

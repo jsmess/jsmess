@@ -1526,9 +1526,13 @@ DEVICE_IMAGE_LOAD( sms_cart )
 			{
 				state->m_cartridge[index].features |= CF_CODEMASTERS_MAPPER;
 			}
-			if ( ! strcmp( mapper, "korean" ) )
+			else if ( ! strcmp( mapper, "korean" ) )
 			{
 				state->m_cartridge[index].features |= CF_KOREAN_MAPPER;
+			}
+			else if ( ! strcmp( mapper, "zemina" ) )
+			{
+				state->m_cartridge[index].features |= CF_KOREAN_ZEMINA_MAPPER;
 			}
 		}
 
