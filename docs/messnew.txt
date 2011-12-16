@@ -1,4 +1,44 @@
-﻿0.144u2
+﻿0.144u3
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+-lynx: Updated timer handling,most of the games that froze at the intro screen go in-game now [huygens]
+-mac: fixed video emulation for PowerBook 160/180, dumped and added video ROM and color video 
+  emulation for PowerBook 180c. Added floppy softlist + softlist support on more models. [R. Belmont, Paul Pratt]
+-lynx: Fixed timer counter reloading and added output clipping (fixes bugzilla Bug 1822) [huygens]
+-kc: Started creating a software list for cassettes. [Sandro Ronco]
+-coleco:  Replaced some utility/in-house cartridges dumps with confirmed good dumps 
+ (fixes behavior in Super Action Controller Test.)
+ Changed Super Action Controller mapping to match that of actual buttons and suprtest 
+ recognition (button 3 and 4 were inverted).  [Tafoid]
+-odyssey2: Fixed banking regression affecting Kill the Attacking Aliens. [Justin Kerk]
+-coleco,adam: Cleaned up inputs, fixing issue with Super Cobra (Bugzilla #2101) 
+  and made spinner irq behaviour more accurate.  [hap, Kevtris, Tafoid]
+
+Software Lists:
+----------------
+-mac_flop.xml: initial add with 6.0.3, 6.0.5, and 6.0.8 [Fabio Priuli, R. Belmont]
+-pc8801: added preliminary softlists for tapes and disks. [Fabio Priuli]
+
+Source Changes:
+----------------
+- handling error where filenames are too long [Chad]
+- added MC68008 PLCC variant. [Curt Coder]
+- uimenu: C++-ification [O. Galibert]
+
+0.144u2
 
 New System Drivers Supported:
 -----------------------------
