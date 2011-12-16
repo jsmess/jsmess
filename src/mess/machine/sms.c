@@ -1510,20 +1510,22 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	{
 		memcpy(state->m_cartridge[index].ROM, image.get_software_region("rom") + offset, size);
 
+		const char *pcb = image.get_feature("pcb");
 		const char *mapper = image.get_feature("mapper");
+		const char *pin_42 = image.get_feature("pin_42");
 
-		// check for mapper feature (currently only KOREAN_NOBANK, but eventually we will add the other mappers as well)
-		if (mapper != NULL)
+		// Check for special mappers (or lack of mappers)
+		if ( pcb && !strcmp(pcb, "korean_nobank"))
 		{
-			if (!strcmp(mapper, "korean_nobank"))
-			{
-				state->m_cartridge[index].features |= CF_KOREAN_NOBANK_MAPPER;
-			}
+			state->m_cartridge[index].features |= CF_KOREAN_NOBANK_MAPPER;
+		}
+
+		if ( mapper && !strcmp( mapper, "codemasters" ) )
+		{
+			state->m_cartridge[index].features |= CF_CODEMASTERS_MAPPER;
 		}
 
 		// Check for gamegear cartridges with PIN 42 set to SMS mode
-		const char *pin_42 = image.get_feature("pin_42");
-
 		if ( pin_42 != NULL && ! strcmp(pin_42, "sms_mode"))
 		{
 			state->m_cartridge[index].features |= CF_GG_SMS_MODE;
@@ -1599,14 +1601,6 @@ DEVICE_IMAGE_LOAD( sms_cart )
 			else if (cA000 > cFFFF + 2 || (cA000 > 0 && cFFFF == 0))
 				state->m_cartridge[index].features |= CF_KOREAN_MAPPER;
 
-		}
-
-		/* Check for special SMS Compatibility mode gamegear cartridges */
-		if (state->m_is_gamegear && image.software_entry() == NULL)	// not sure about how to handle this with softlists
-		{
-			/* Just in case someone passes us an sms file */
-			if (!mame_stricmp (image.filetype(), "sms"))
-				state->m_cartridge[index].features |= CF_GG_SMS_MODE;
 		}
 	}
 

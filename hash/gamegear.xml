@@ -2233,6 +2233,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="mapper" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="524288">
 				<rom name="excellent dizzy collection, the (europe).bin" size="524288" crc="aa140c9c" sha1="db3c0686715373242911f8471a1e91673811d62a" offset="000000" />
@@ -2245,6 +2246,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="mapper" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="excellent dizzy collection, the (prototype) [s][!].bin" size="262144" crc="8813514b" sha1="09a2acf3ed90101be2629384c5c702f6a5408035" offset="000000" />
@@ -2316,6 +2318,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="mapper" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="fantastic dizzy (europe) (en,fr,de,es,it).bin" size="262144" crc="c888222b" sha1="b6a13d51c72b576738f0d7e8e328db2ffeb0b38c" offset="000000" />
@@ -3116,6 +3119,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="mapper" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="jang pung ii (k) [s].bin" size="262144" crc="76c5bdfb" sha1="2b3bb8fd76fe706d7e564b372d2d71dfce53cb1b" offset="000000" />
