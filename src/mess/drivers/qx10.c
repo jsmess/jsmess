@@ -54,15 +54,31 @@ class qx10_state : public driver_device
 public:
 	qx10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-    	  m_dmac1(*this, "8237dma_1"),
-    	  m_rtc(*this, "rtc"),
-    	  m_hgdc(*this, "upd7220"),
-		  m_vram_bank(0)
-		{ }
+	m_pit_1(*this, "pit8253_1"),
+	m_pit_2(*this, "pit8253_2"),
+	m_pic_m(*this, "pic8259_master"),
+	m_pic_s(*this, "pic8259_slave"),
+	m_scc(*this, "upd7201"),
+	m_ppi(*this, "i8255"),
+	m_dma_1(*this, "8237dma_1"),
+	m_dma_2(*this, "8237dma_2"),
+	m_fdc(*this, "upd765"),
+	m_hgdc(*this, "upd7220"),
+	m_rtc(*this, "rtc"),
+	m_vram_bank(0)
+	{ }
 
-	required_device<i8237_device> m_dmac1;
-	required_device<mc146818_device> m_rtc;
+	required_device<device_t> m_pit_1;
+	required_device<device_t> m_pit_2;
+	required_device<device_t> m_pic_m;
+	required_device<device_t> m_pic_s;
+	required_device<upd7201_device> m_scc;
+	required_device<i8255_device> m_ppi;
+	required_device<i8237_device> m_dma_1;
+	required_device<i8237_device> m_dma_2;
+	required_device<device_t> m_fdc;
 	required_device<upd7220_device> m_hgdc;
+	required_device<mc146818_device> m_rtc;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -109,12 +125,6 @@ public:
 	int		m_memprom;
 	int		m_memcmos;
 	UINT8	m_cmosram[0x800];
-
-	/* devices */
-	device_t *m_pic8259_master;
-	device_t *m_pic8259_slave;
-	device_t *m_dma8237_1;
-	device_t *m_upd765;
 
 	UINT8 m_color_mode;
 
@@ -297,12 +307,12 @@ WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 
 	//logerror("Interrupt from upd765: %d\n", state);
 	// signal interrupt
-	pic8259_ir6_w(m_pic8259_master, state);
+	pic8259_ir6_w(m_pic_m, state);
 };
 
 WRITE_LINE_MEMBER( qx10_state::drq_w )
 {
-	i8237_dreq0_w(m_dmac1, !state);
+	i8237_dreq0_w(m_dma_1, !state);
 }
 
 static const struct upd765_interface qx10_upd765_interface =
@@ -359,7 +369,7 @@ WRITE8_MEMBER( qx10_state::gdc_dack_w )
 WRITE_LINE_MEMBER( qx10_state::tc_w )
 {
 	/* floppy terminal count */
-	upd765_tc_w(m_upd765, !state);
+	upd765_tc_w(m_fdc, !state);
 }
 
 /*
@@ -524,7 +534,7 @@ WRITE_LINE_MEMBER( qx10_state::qx10_pic8259_master_set_int_line )
 READ8_MEMBER( qx10_state::get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(m_pic8259_slave);
+		return pic8259_acknowledge(m_pic_s);
 	}
 	return 0x00;
 }
@@ -558,7 +568,7 @@ static const struct pic8259_interface qx10_pic8259_slave_config =
 
 static IRQ_CALLBACK( irq_callback )
 {
-	return pic8259_acknowledge(device->machine().driver_data<qx10_state>()->m_pic8259_master );
+	return pic8259_acknowledge(device->machine().driver_data<qx10_state>()->m_pic_m );
 }
 
 READ8_MEMBER( qx10_state::upd7201_r )
@@ -892,18 +902,11 @@ INPUT_PORTS_END
 void qx10_state::machine_start()
 {
 	device_set_irq_callback(machine().device("maincpu"), irq_callback);
-
-	// find devices
-	m_pic8259_master = machine().device("pic8259_master");
-	m_pic8259_slave = machine().device("pic8259_slave");
-	m_dma8237_1 = machine().device("8237dma_1");
-	m_upd765 = machine().device("upd765");
-
 }
 
 void qx10_state::machine_reset()
 {
-	i8237_dreq0_w(m_dma8237_1, 1);
+	i8237_dreq0_w(m_dma_1, 1);
 
 	m_memprom = 0;
 	m_memcmos = 0;
@@ -948,7 +951,7 @@ static const gfx_layout qx10_charlayout =
 };
 
 static GFXDECODE_START( qx10 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, qx10_charlayout, 1, 7 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, qx10_charlayout, 1, 1 )
 GFXDECODE_END
 
 void qx10_state::video_start()
@@ -1021,17 +1024,6 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_CPU_PROGRAM_MAP(qx10_mem)
 	MCFG_CPU_IO_MAP(qx10_io)
 
-	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
-	MCFG_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
-	MCFG_PIC8259_ADD("pic8259_master", qx10_pic8259_master_config)
-	MCFG_PIC8259_ADD("pic8259_slave", qx10_pic8259_slave_config)
-	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
-	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
-	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
-	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
-	MCFG_UPD765A_ADD("upd765", qx10_upd765_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(qx10_floppy_interface)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1043,9 +1035,19 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(gdc)
 
+	/* Devices */
+	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
+	MCFG_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
+	MCFG_PIC8259_ADD("pic8259_master", qx10_pic8259_master_config)
+	MCFG_PIC8259_ADD("pic8259_slave", qx10_pic8259_slave_config)
+	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
+	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
+	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
+	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, upd7220_map)
-
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_UPD765A_ADD("upd765", qx10_upd765_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(qx10_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1056,13 +1058,14 @@ MACHINE_CONFIG_END
 ROM_START( qx10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v006", "v0.06")
-    ROMX_LOAD( "ipl006.bin", 0x0000, 0x0800, CRC(3155056a) SHA1(67cc0ae5055d472aa42eb40cddff6da69ffc6553), ROM_BIOS(1))
+	ROMX_LOAD( "ipl006.bin", 0x0000, 0x0800, CRC(3155056a) SHA1(67cc0ae5055d472aa42eb40cddff6da69ffc6553), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v003", "v0.03")
-    ROMX_LOAD( "ipl003.bin", 0x0000, 0x0800, CRC(3cbc4008) SHA1(cc8c7d1aa0cca8f9753d40698b2dc6802fd5f890), ROM_BIOS(2))
+	ROMX_LOAD( "ipl003.bin", 0x0000, 0x0800, CRC(3cbc4008) SHA1(cc8c7d1aa0cca8f9753d40698b2dc6802fd5f890), ROM_BIOS(2))
+
 	/* This is probably the i8039 program ROM for the Q10MF Multifont card, and the actual font ROMs are missing (6 * HM43128) */
 	/* The first part of this rom looks like code for an embedded controller?
-        From 8300 on, looks like a characters generator */
-	ROM_REGION( 0x800, "i8039", 0 )
+        From 0300 on, is a keyboard lookup table */
+	ROM_REGION( 0x0800, "i8039", 0 )
 	ROM_LOAD( "m12020a.3e", 0x0000, 0x0800, CRC(fa27f333) SHA1(73d27084ca7b002d5f370220d8da6623a6e82132))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
