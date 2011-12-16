@@ -266,6 +266,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="HG 101-10"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
 				<rom name="alex kidd in miracle world [sms-gg] (tw).bin" size="131072" crc="6f8e46cf" sha1="da0bf41dc5fd68a191d0f02fb1213ffdb006d7b8" offset="000000" />
 			</dataarea>
@@ -1252,6 +1253,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2401"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="castle of illusion starring mickey mouse (usa, europe).bin" size="262144" crc="59840fd6" sha1="06bbeb784f913b37f58c2581c66d4ecb099deace" offset="000000" />
 			</dataarea>
@@ -2231,6 +2233,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="524288">
 				<rom name="excellent dizzy collection, the (europe).bin" size="524288" crc="aa140c9c" sha1="db3c0686715373242911f8471a1e91673811d62a" offset="000000" />
 			</dataarea>
@@ -2242,6 +2245,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="excellent dizzy collection, the (prototype) [s][!].bin" size="262144" crc="8813514b" sha1="09a2acf3ed90101be2629384c5c702f6a5408035" offset="000000" />
 			</dataarea>
@@ -2312,6 +2316,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="fantastic dizzy (europe) (en,fr,de,es,it).bin" size="262144" crc="c888222b" sha1="b6a13d51c72b576738f0d7e8e328db2ffeb0b38c" offset="000000" />
 			</dataarea>
@@ -3111,6 +3116,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="jang pung ii (k) [s].bin" size="262144" crc="76c5bdfb" sha1="2b3bb8fd76fe706d7e564b372d2d71dfce53cb1b" offset="000000" />
 			</dataarea>
@@ -3955,6 +3961,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3301"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="mickey mouse no castle illusion (japan).bin" size="262144" crc="9942b69b" sha1="d2580137c641192d7faa98dbf8c715623e7d0bed" offset="000000" />
 			</dataarea>
@@ -5099,6 +5106,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="79018-50, 79018-05, 79018-18"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="olympic gold (europe) (en,fr,de,es,it,nl,pt,sv) (v1.1).bin" size="262144" crc="1d93246e" sha1="53fd026008be77cd0cda7080e67a87a7bad33a6a" offset="000000" />
 			</dataarea>
@@ -5111,6 +5119,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="G-3316, T-79018"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="olympic gold (japan, usa) (en,fr,de,es,it,nl,pt,sv).bin" size="262144" crc="a2f9c7af" sha1="b7e5ae436ccaa9984297b0c14969922d189cb10c" offset="000000" />
 			</dataarea>
@@ -5159,6 +5168,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79038-50, 016.870"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="out run europa (euro).bin" size="262144" crc="01eab89d" sha1="0fb4200fa291fe57cd7be2ee73ac2d71ae3c005e" offset="000000" />
 			</dataarea>
@@ -5171,6 +5181,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79038"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="out run europa (usa).bin" size="262144" crc="f037ec00" sha1="dd842a7294eee7badf4353fbe3e5d87dd570c671" offset="000000" />
 			</dataarea>
@@ -5511,6 +5522,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81068, T-81068-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="predator 2 (usa, europe).bin" size="262144" crc="e5f789b9" sha1="76464809826a0ceed7cfd68a8fe5e06c06bd96fc" offset="000000" />
 			</dataarea>
@@ -5535,6 +5547,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88018-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="prince of persia (usa, europe) (beta).bin" size="262144" crc="45f058d6" sha1="0672814b9fb20dd217141f7853db300343f2c1ea" offset="000000" />
 			</dataarea>
@@ -5547,6 +5560,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-48098 301053-0161"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="prince of persia (usa, europe).bin" size="262144" crc="311d2863" sha1="7820699ee6b214f3f02f724f4d7891184caf93f8" offset="000000" />
 			</dataarea>
@@ -5725,6 +5739,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Absolute Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="r.c. grand prix (usa, europe).bin" size="262144" crc="56201996" sha1="c789e7f9450c8eaa08be1bf6c39e877973216431" offset="000000" />
 			</dataarea>
@@ -5737,6 +5752,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11037"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="rastan saga (japan).bin" size="262144" crc="9c76fb3a" sha1="96bf8a67919218aac91fb74cde80a16f90df77d5" offset="000000" />
 			</dataarea>
@@ -7520,6 +7536,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2415"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="super kick off (euro).bin" size="262144" crc="10dbbef4" sha1="cb4a08b89cc24154328309cab54bfd9d83e4754f" offset="000000" />
 			</dataarea>
@@ -7616,6 +7633,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="65536">
 				<rom name="super tetris (k) [s][!].bin" size="65536" crc="bd1cc7df" sha1="3772e9dc07b15de62326ee78981ec0b6f4387590" offset="000000" />
 			</dataarea>
@@ -7759,6 +7777,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11017"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
 				<rom name="taito chase h.q. (japan).bin" size="131072" crc="7bb81e3d" sha1="b757b45a07ae6530443862e0eca547e16c23b4a3" offset="000000" />
 			</dataarea>
@@ -7771,6 +7790,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11018"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
 				<rom name="chase h.q. [sms-gg].bin" size="131072" crc="c8381def" sha1="6d6209c642b854eaa43da81b311c04a7579d9a17" offset="000000" />
 			</dataarea>
@@ -8629,6 +8649,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="wwf wrestlemania steel cage challenge (europe).bin" size="262144" crc="da8e95a9" sha1="59e2fab18a0244efcc9cb9ad1e4ed3a1c777948d" offset="000000" />
 			</dataarea>

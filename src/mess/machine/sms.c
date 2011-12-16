@@ -1510,12 +1510,23 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	{
 		memcpy(state->m_cartridge[index].ROM, image.get_software_region("rom") + offset, size);
 
+		const char *mapper = image.get_feature("mapper");
+
 		// check for mapper feature (currently only KOREAN_NOBANK, but eventually we will add the other mappers as well)
-		if (image.get_feature("pcb") != NULL)
+		if (mapper != NULL)
 		{
-			const char *mapper = image.get_feature("pcb");
 			if (!strcmp(mapper, "korean_nobank"))
+			{
 				state->m_cartridge[index].features |= CF_KOREAN_NOBANK_MAPPER;
+			}
+		}
+
+		// Check for gamegear cartridges with PIN 42 set to SMS mode
+		const char *pin_42 = image.get_feature("pin_42");
+
+		if ( pin_42 != NULL && ! strcmp(pin_42, "sms_mode"))
+		{
+			state->m_cartridge[index].features |= CF_GG_SMS_MODE;
 		}
 	}
 
