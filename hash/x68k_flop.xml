@@ -6180,6 +6180,989 @@
 		</part>
 	</software>
 
+	<software name="gr">
+		<description>G.R. Gravity Response</description>
+		<year>1992</year>
+		<publisher>Tenshindou</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="g.r. gravity responce (1992)(tenshindou)(disk 1 of 3)(momotarou).dim" size="1261824" crc="6e763507" sha1="a985ef7f0a6cad1b115ec293c8288b34f111ca56" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="g.r. gravity responce (1992)(tenshindou)(disk 2 of 3)(saru).dim" size="1261824" crc="889de665" sha1="5b210a0ab736132eff6be81bb2e39808dd636d0f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="g.r. gravity responce (1992)(tenshindou)(disk 3 of 3)(inu).dim" size="1261824" crc="bbb0b6b1" sha1="b844cb015942fe23e8a91b2a7acd4a94de280ab2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaiafght">
+		<description>Gaia Fighter (v2.5)</description>
+		<year>1991</year>
+		<publisher>Hong Kong Project</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gaia fighter v2.5 (1991)(hong kong project).dim" size="1261824" crc="24cbb3a6" sha1="33f4c84370c69115d7a6fd47df233fa58c962792" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaiarm">
+		<description>Gaiarm</description>
+		<year>1991</year>
+		<publisher>Violet Heart Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gaiarm (1991)(violet heart software).dim" size="1261824" crc="e69fef13" sha1="ce28ab3f1f7746d4c70634398302d67b336edeb0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakubomb">
+		<description>Gakuen Bomber</description>
+		<year>1994</year>
+		<publisher>Active</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gakuen bomber (1994)(active)(disk 1 of 3)(disk a).dim" size="1261824" crc="28268853" sha1="2eef255e1588c32e6f6149661ec323f7837d8cf6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gakuen bomber (1994)(active)(disk 2 of 3)(disk b).dim" size="1261824" crc="e1107a04" sha1="20650ffa6b0a8c68c37c858515098cd263105a15" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gakuen bomber (1994)(active)(disk 3 of 3)(disk c).dim" size="1261824" crc="38122da7" sha1="cfeecb0f96676127fdee0903ae84b04e0d0c6ea1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakutosh">
+		<description>Gakuen Toshi Z</description>
+		<year>199?</year>
+		<publisher>Striker</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gakuen toshi z (199x)(striker)(disk 1 of 3)(disk a).dim" size="1261824" crc="90b8cbbe" sha1="31433b2491d26837633f3a50aaa6157f0eea1f01" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gakuen toshi z (199x)(striker)(disk 2 of 3)(disk b).dim" size="1261824" crc="620d079b" sha1="f7aa468d1f5119f25420added2f89e7dfc8d4b95" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gakuen toshi z (199x)(striker)(disk 3 of 3)(disk c).dim" size="1261824" crc="a1f36194" sha1="99007c5a3f1c9c71b7a3afa8fb9d02934ab74f6c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaga88">
+		<description>Galaga '88</description>
+		<year>1990</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="galaga '88 (1990)(dempa)(disk 1 of 2)(disk a).dim" size="1261824" crc="f3e0f96b" sha1="552bf11c609d0df73592c8636826e3f2e962efd6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="galaga '88 (1990)(dempa)(disk 2 of 2)(disk b).dim" size="1261824" crc="26b19842" sha1="8889860d4567bb0a5525a0fefb1353e1e6cb6a48" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxian">
+		<description>Galaxian</description>
+		<year>1996</year>
+		<publisher>XYZ</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="galaxian (1996)(xyz).dim" size="1261824" crc="5fd93499" sha1="b1e81867bd03b8da3fa356d4af92e7eaa9e457ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxia2">
+		<description>Galaxian 2</description>
+		<year>1996</year>
+		<publisher>68 Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="galaxian 2 (1996)(68 bank).dim" size="1261824" crc="596a1787" sha1="7f2433cb91d2459cc02c29988875c238cf1e492b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galax68k">
+		<description>Galaxian X68K</description>
+		<year>19??</year>
+		<publisher>Gyo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="galaxian x68k (19xx)(gyo).dim" size="1261824" crc="4e94f4a8" sha1="56f029c2bfba544a49d27b67a913dca18453f224" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galxwars">
+		<description>Galaxy Wars</description>
+		<year>1987</year>
+		<publisher>Tiny-Tomo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="galaxy wars (1987)(tiny-tomo).dim" size="1261824" crc="6f3c1ccf" sha1="54248505566c7974acbef97c93af8ad440437861" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galmind2">
+		<description>Gal Mind 2</description>
+		<year>1992</year>
+		<publisher>Coto Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gal mind 2 (1992)(coto software)(disk 1 of 2)(system).dim" size="1261824" crc="8250d249" sha1="f7552037174b6ba8bde3c9a7d424b0088193fbf6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gal mind 2 (1992)(coto software)(disk 2 of 2)(data).dim" size="1261824" crc="d0db9afb" sha1="184a5e6e670b2bec227c3584c458f81d2e89cb60" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galseed">
+		<description>Galseed</description>
+		<year>1991</year>
+		<publisher>Login</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="galseed (1991)(login)(disk 1 of 2)(disk a).dim" size="1261824" crc="3f8172f5" sha1="59085ef58261b1e129863e267deb1d8744c1ebfc" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="galseed (1991)(login)(disk 2 of 2)(disk b).dim" size="1261824" crc="1caf5275" sha1="c85ae598d44a3517b6f935f0c858f676c9ac179a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamex">
+		<description>Game.X</description>
+		<year>1990</year>
+		<publisher>Kugenuma Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="game.x (1990)(kugenuma soft).dim" size="1261824" crc="5b205492" sha1="387943a01c751480418044b8b603ce09ec22edc5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gammapl">
+		<description>Gamma Planet</description>
+		<year>1989</year>
+		<publisher>Compac</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gamma planet (1989)(compac).dim" size="1261824" crc="c0023ead" sha1="79fa77599fe2550194c2b81cc5310bc6c98c7401" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ganpaich">
+		<description>Ganbare! Paichan</description>
+		<year>1994</year>
+		<publisher>Daba</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ganbare! paichan (1994)(daba).dim" size="1261824" crc="8cfbcf3a" sha1="096506173c25332b722357c70b7e7b30aa69e386" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gardisli">
+		<description>Gardis Light (v2.10)</description>
+		<year>1994</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gardis light v2.10 (1994)(sprite).dim" size="1261824" crc="a828b62f" sha1="72a7872d2c4601942cc40e7b1d9743f611743154" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gardisli202" cloneof="gardisli">
+		<description>Gardis Light (v2.02)</description>
+		<year>1994</year>
+		<publisher>Sprite</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gardis light v2.02 (1994)(sprite).dim" size="1261824" crc="71f29337" sha1="34a45ee8851ea274dab6cf8df9c66c93a8855392" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garou">
+		<description>Garou Densetsu</description>
+		<year>1993</year>
+		<publisher>Magical Company</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu (1993)(magical company)(disk 1 of 4)(disk a).dim" size="1261824" crc="5180493f" sha1="98865070b3a4a42166cff8b8df19d6ebdd4aa87c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu (1993)(magical company)(disk 2 of 4)(disk b).dim" size="1261824" crc="0d2bd661" sha1="50a458df4045fd38f04a02ceb56d9fb6da47cd09" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu (1993)(magical company)(disk 3 of 4)(disk c).dim" size="1261824" crc="722458bc" sha1="cf890d301cb9069d96d89a4104143637c6968768" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu (1993)(magical company)(disk 4 of 4)(disk d).dim" size="1261824" crc="85e2015e" sha1="86bd2856873581e7a5db5d997aef902127b86379" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garou2">
+		<description>Garou Densetsu 2</description>
+		<year>1993</year>
+		<publisher>Magical Company</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu 2 (1993)(magical company)(disk 1 of 6)(disk a).dim" size="1261824" crc="5b50b94d" sha1="6e44b30bfb4eb8f3a7e339b72d04d644e4d193f6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu 2 (1993)(magical company)(disk 2 of 6)(disk b).dim" size="1261824" crc="df609964" sha1="6dc541bc6218c0cf227c6c48a9a666e06a333db0" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu 2 (1993)(magical company)(disk 3 of 6)(disk c).dim" size="1261824" crc="809d581d" sha1="43705ade377f4be5100bd248fc9439c4b86a0b46" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu 2 (1993)(magical company)(disk 4 of 6)(disk d).dim" size="1261824" crc="62ae090c" sha1="bb890441f11e65b6f099f14089d1411c1bd369c4" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu 2 (1993)(magical company)(disk 5 of 6)(disk e).dim" size="1261824" crc="12ada921" sha1="810613e55807a31ae01ff65c2a15a91f7ecac70e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu 2 (1993)(magical company)(disk 6 of 6)(disk f).dim" size="1261824" crc="91c8630b" sha1="b970b51c0378cb2c8915768d47215ab00ad56fc4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garousp">
+		<description>Garou Densetsu Special</description>
+		<year>1994</year>
+		<publisher>Magical Company</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="garou densetsu special (1994)(magical company)(disk 1 of 9)(disk a).dim" size="1261824" crc="7aafbab1" sha1="773e8173385d4ec98ec7558a88e595017006f243" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="garou densetsu special (1994)(magical company)(disk 2 of 9)(disk b).dim" size="1474816" crc="21280b08" sha1="b312a7d6fd811edf88b4ce10140199aa3c7b314b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="garou densetsu special (1994)(magical company)(disk 3 of 9)(disk c).dim" size="1474816" crc="0b9a984f" sha1="c912d4279492589137edfd42bd437a8741844235" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="garou densetsu special (1994)(magical company)(disk 4 of 9)(disk d).dim" size="1474816" crc="d7c3d931" sha1="499d496e420bca7589ff565dffae8381aff1079b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="garou densetsu special (1994)(magical company)(disk 5 of 9)(disk e).dim" size="1474816" crc="915cbb71" sha1="95fd831d2106658c51e6272d588d7b4237b22891" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="garou densetsu special (1994)(magical company)(disk 6 of 9)(disk f).dim" size="1474816" crc="a9ad25ce" sha1="c4f6c0df536e4656b555a4dd50db32820e96e347" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="garou densetsu special (1994)(magical company)(disk 7 of 9)(disk g).dim" size="1474816" crc="1cdbc145" sha1="ce2a9d56b2090ee52aa6f9464c3d41906709e9f0" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="garou densetsu special (1994)(magical company)(disk 8 of 9)(disk h).dim" size="1474816" crc="14ae132a" sha1="d78c24d368eaa65002b102324ca89096528917d2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="garou densetsu special (1994)(magical company)(disk 9 of 9)(disk i).dim" size="1474816" crc="c50217c5" sha1="3d564daad9cc5d8bb108916b20004214a4100fb9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaudibar">
+		<description>Gaudi Barcelona no Kaze</description>
+		<year>19??</year>
+		<publisher>Wolf Team</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 1 of 3).dim" size="1261824" crc="4189f78b" sha1="15c54cc35f2d1d0939ca43980a40b260988a4a74" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 2 of 3).dim" size="1261824" crc="2f345803" sha1="bf548444c9015b553aa5a26b91749f8811c42784" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gaudi barcelona no kaze (19xx)(wolf team)(disk 3 of 3).dim" size="1261824" crc="963650da" sha1="bb929c0edf275e60f5e6ed7aa3116fd6c7df0367" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gawar">
+		<description>Ga-War Games</description>
+		<year>19??</year>
+		<publisher>To$hi</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ga-war games (19xx)(to$hi).dim" size="1261824" crc="e98d5245" sha1="f7bce4cc75d49f9e1ce552b7cf3520334396223f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gedou">
+		<description>Gedou Densetsu</description>
+		<year>1993</year>
+		<publisher>Mix</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gedou densetsu (1993)(mix)(disk 1 of 2)(disk a).dim" size="1261824" crc="f8369d6c" sha1="76c2b5795f346d7c628c4bb111d586380e4bcb14" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gedou densetsu (1993)(mix)(disk 2 of 2)(disk b).dim" size="1261824" crc="3f55955d" sha1="c1d31c168276ae18ef3baee9bbc958bff5a4990d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gedouret">
+		<description>Gedou Retsuden</description>
+		<year>1993</year>
+		<publisher>Mix</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gedou retsuden (1993)(mix)(disk 1 of 2)(disk a).dim" size="1261824" crc="c3afb1d1" sha1="aad5714cbc0671414b2f7b3147aa512c63a24787" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gedou retsuden (1993)(mix)(disk 2 of 2)(disk b).dim" size="1261824" crc="2a585c45" sha1="7020ee467549980d46a7185ea9c888cf972e5e03" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gekkan5">
+		<description>Gekkan 5 Gou</description>
+		<year>19??</year>
+		<publisher>68 Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gekkan 5 gou (19xx)(68 bank).dim" size="1261824" crc="571e2cad" sha1="d5f6b7e0758fdc58b905965f9e289494527a3b6d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemdrop">
+		<description>Gemdrop</description>
+		<year>1990</year>
+		<publisher>SSL / Au</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gemdrop (1990)(ssl - au).dim" size="1261824" crc="e2e73f80" sha1="3c09d1636e55e5b5448912664a22efed847f5bf7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gemini">
+		<description>Gemini Wing</description>
+		<year>1990</year>
+		<publisher>System Sacom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gemini wing (1990)(system sacom)(disk 1 of 2)(disk a).dim" size="1261824" crc="6464e4fd" sha1="972ce75b1f1b2d37ab65e40740c3a912edea78af" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gemini wing (1990)(system sacom)(disk 2 of 2)(disk b).dim" size="1261824" crc="d935bd02" sha1="cdce30b9af270b541d7c851a5523cc00399162df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genocide">
+		<description>Genocide</description>
+		<year>1989</year>
+		<publisher>Zoom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide (1989)(zoom)(disk 1 of 4)(system).dim" size="1261824" crc="93444d19" sha1="207e321249a8f32b92d061c30729278e53440ff4" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide (1989)(zoom)(disk 2 of 4)(disk a).dim" size="1261824" crc="e461a2eb" sha1="8ac9967566bf476644a712eb01a7e3f2c0673cc7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide (1989)(zoom)(disk 3 of 4)(disk b).dim" size="1261824" crc="5b070855" sha1="d770c03f09a7b7e967daeed672b3f4c8b642291d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide (1989)(zoom)(disk 4 of 4)(disk c).dim" size="1261824" crc="645cbf5f" sha1="f250d17c18343fa25e7966e413cc6eb92179eef6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genocid2">
+		<description>Genocide 2</description>
+		<year>1991</year>
+		<publisher>Zoom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide 2 (1991)(zoom)(disk 1 of 4)(system).dim" size="1261824" crc="deb09e65" sha1="6ae4414333815e44d5a02905f429944dbaa3fc4d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide 2 (1991)(zoom)(disk 2 of 4)(data 1).dim" size="1261824" crc="5cc18a79" sha1="f7426cf6598554f54f0731dcdfd31163cc05cdd1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide 2 (1991)(zoom)(disk 3 of 4)(data 2).dim" size="1261824" crc="157e6464" sha1="e68d2464d2764ec842d02ba9d2c5c57f5668200b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide 2 (1991)(zoom)(disk 4 of 4)(data 3).dim" size="1261824" crc="c06136a0" sha1="9cb3670dcd0080eb42397f0c4d1e282be33905e7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genocd2d">
+		<description>Genocide 2 (demo)</description>
+		<year>1991</year>
+		<publisher>Zoom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genocide 2 (demo) (1991)(zoom).dim" size="1261824" crc="c23bb988" sha1="c43aad580ba124030e84c6dc4011f65d3372d3c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genpeitd">
+		<description>Genpei Toumaden</description>
+		<year>1988</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="genpei toumaden (1988)(dempa).dim" size="1261824" crc="d74e7963" sha1="7251a16288092a66ba8369009551f2451837cb8a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geoseal">
+		<description>Geograph Seal</description>
+		<year>1994</year>
+		<publisher>Exact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="geograph seal (1994)(exact)(disk 1 of 2)(system).dim" size="1261824" crc="4becbab5" sha1="8fc75493120ef4b3a1dc00b459c63cd050b86eb2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="geograph seal (1994)(exact)(disk 2 of 2)(data).dim" size="1261824" crc="bcb505d5" sha1="7cca4c1c90a42db83bc090a5b3c03e32595d86bd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geoseald">
+		<description>Geograph Seal (demo)</description>
+		<year>199?</year>
+		<publisher>Exact</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="geograph seal (demo) (199x)(exact).dim" size="1261824" crc="5ac3b09f" sha1="1350a444623d61cf0ccf514f9f881ecf24ecfd26" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="getready">
+		<description>Get Ready</description>
+		<year>19??</year>
+		<publisher>Santasan Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="get ready (19xx)(santasan soft).dim" size="1261824" crc="9b4b9284" sha1="39e7060c4157e5c392925c9adb56d4c07a161068" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="getsumen">
+		<description>Getsumen Nanchakuriku Game</description>
+		<year>19??</year>
+		<publisher>Kurimoto Kenya</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="getsumen nanchakuriku game (19xx)(kurimoto kenya).dim" size="1261824" crc="bee7fd81" sha1="65c0c0d12131eda5c7425eed8483e84adad1d878" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gigafght">
+		<description>Giga Fight 68k</description>
+		<year>1992</year>
+		<publisher>Gainen Shuppon</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="giga fight 68k (1992)(gainen shuppon).dim" size="1261824" crc="4ea5dbe9" sha1="d54b4fe306c57bbbe433a8f1cc3107e3e898c825" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gingeiyu">
+		<description>Ginga Eiyuu Densetsu</description>
+		<year>1990</year>
+		<publisher>Bothtec</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu (1990)(bothtec)(disk 1 of 3)(disk a).dim" size="1261824" crc="d7f55a1d" sha1="51bb5e5c845611f8f5c4e35438b011784c47b8cf" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu (1990)(bothtec)(disk 2 of 3)(disk b).dim" size="1261824" crc="9dea7b4d" sha1="b24570c0e2804adeba0641fc0494aa85ff9c3f90" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu (1990)(bothtec)(disk 3 of 3)(disk c).dim" size="1261824" crc="17dc78af" sha1="ed4a61da8b119d20efce33871b2779da65b03fc9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gingeyu2">
+		<description>Ginga Eiyuu Densetsu II</description>
+		<year>1990</year>
+		<publisher>Bothtec</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu ii (1990)(bothtec)(disk 1 of 4)(disk a).dim" size="1261824" crc="776a830a" sha1="54e3bde9c81098148dbf152deff831f801d4cede" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu ii (1990)(bothtec)(disk 2 of 4)(disk b).dim" size="1261824" crc="23204b5a" sha1="261ca75acd6cdad323abb4ef457b88d9f87da430" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu ii (1990)(bothtec)(disk 3 of 4)(disk c).dim" size="1261824" crc="29c0618a" sha1="3e3553b0d7e5410a442eef7b1549b7cfce0d58d8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu ii (1990)(bothtec)(disk 4 of 4)(disk d).dim" size="1261824" crc="c65373f2" sha1="54a0ac88bf7122fa7370117e36507d43c661bc39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ginge2dx">
+		<description>Ginga Eiyuu Densetsu II DX+</description>
+		<year>1991</year>
+		<publisher>Bothtec</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu ii dx+ (1991)(bothtec)(disk 1 of 4).dim" size="1261824" crc="c59e9063" sha1="acc241887120f6ca1ddccd2f38daad65a28c270f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu ii dx+ (1991)(bothtec)(disk 2 of 4).dim" size="1261824" crc="050af071" sha1="8d11683dd44630d2887b860de5a3a3f8da30d2dc" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu ii dx+ (1991)(bothtec)(disk 3 of 4).dim" size="1261824" crc="6df96430" sha1="a52a594fc806a548c951e062f3100cfcf9b0056d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu ii dx+ (1991)(bothtec)(disk 4 of 4)(scenario).dim" size="1261824" crc="0dfe5b0e" sha1="a8dc94612f5b32821d6ef8fe9fb0de6e405fd9c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gingpow">
+		<description>Ginga Eiyuu Densetsu Power Up &smp; Scenario Shuu</description>
+		<year>1990</year>
+		<publisher>Bothtec</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ginga eiyuu densetsu power up &amp; scenario shuu (1990)(bothtec).dim" size="1261824" crc="7b23fdbb" sha1="dc814b5b315a258df54007ee38cfb4884c111e01" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="girlpara">
+		<description>Girls Paradise</description>
+		<year>1989</year>
+		<publisher>Great</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="girls paradise (1989)(great)(disk 1 of 3)(disk a).dim" size="1261824" crc="e1a91e35" sha1="d9a6e827958bb0a3526c330c2358bb8444060c61" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="girls paradise (1989)(great)(disk 2 of 3)(disk b).dim" size="1261824" crc="b636900a" sha1="44861b3886f6e9adc53bb9669116278e9a2741d2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="girls paradise (1989)(great)(disk 3 of 3)(disk c).dim" size="1261824" crc="1d3ed7a8" sha1="2503aa58584f735629eca615afd0de5023b03315" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gizaxix">
+		<description>Giza! XIX</description>
+		<year>1991</year>
+		<publisher>Fairytale</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="giza! xix (1991)(fairytale)(disk 1 of 2)(disk a).dim" size="1261824" crc="d86f814c" sha1="0f42850e0a1d41695bbdc79ec688696cda1583bf" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="giza! xix (1991)(fairytale)(disk 2 of 2)(disk b).dim" size="1261824" crc="23902ddd" sha1="930c9deb8596261ea6be5c9c636c19463f6f2556" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glacierd">
+		<description>Glacier (Otameshi Version)</description>
+		<year>199?</year>
+		<publisher>DSN-9</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="glacier (199x)(dsn-9)[otameshi version].dim" size="1261824" crc="cbe85606" sha1="da96b7bbfe969dc9e6e1c77bbf0cbf7ce3ad6d31" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glacier">
+		<description>Glacier</description>
+		<year>1993</year>
+		<publisher>DSN-9</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="glacier (1993)(dsn-9)(disk 1 of 2).dim" size="1261824" crc="99bddca7" sha1="30e0e4627f5abaa74b2a72c34c6e6c12f3a780e6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="glacier (1993)(dsn-9)(disk 2 of 2).dim" size="1261824" crc="5f08cb3a" sha1="304d32e5715b4aa236a51f62e6d46c2301b7c3d2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="godblazn">
+		<description>Goddess' Blazon</description>
+		<year>1995</year>
+		<publisher>DCS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="goddess' blazon (1995)(dcs)(disk 1 of 2)(disk a).dim" size="1261824" crc="bfbd0bc7" sha1="f3781c9953eda297d0ba9c7a495865dd851d32c1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="goddess' blazon (1995)(dcs)(disk 2 of 2)(disk b).dim" size="1261824" crc="e35fa786" sha1="9362b38b6d46b0ffaf4301345800748709223a91" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gokiburi">
+		<description>Gokiburi Game</description>
+		<year>1989</year>
+		<publisher>NST / Onion Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gokiburi game (1989)(nst - onion soft).dim" size="1261824" crc="b41f1f06" sha1="bf58ca1aede6b5313010add638675ba0d70254a9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gokichi">
+		<description>Go Kichikun</description>
+		<year>1988</year>
+		<publisher>Gam</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="go kichikun (1988)(gam).dim" size="1261824" crc="d70aff80" sha1="f48c3b368a267b59d4ce6750f7c92206eb634dfd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gorakuin">
+		<description>Gorakuin</description>
+		<year>19??</year>
+		<publisher>Zenryuutsuu</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gorakuin (19xx)(zenryuutsuu).dim" size="1261824" crc="3d17f83f" sha1="9ae82a03b8d4f02175043a29bb59008b2eae7e62" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This disk was included with the system -->
+	<software name="gradius">
+		<description>Gradius</description>
+		<year>1987</year>
+		<publisher>Sharp / SPS</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gradius (1987)(sharp - sps).dim" size="1261824" crc="6d17de2a" sha1="1de2477afd04ddc91be059b3518d0a55f86be4ca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gradius2">
+		<description>Gradius II - Gofer no Yabou</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gradius ii gofer no yabou (1992)(konami)(disk 1 of 2)(disk a).dim" size="1261824" crc="45b4098e" sha1="56711f028b8b3a8387635f86feadc906b5e05152" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gradius ii gofer no yabou (1992)(konami)(disk 2 of 2)(disk b).dim" size="1261824" crc="c195b747" sha1="10125ddef46517c55fe9c8ac55c522c137a555e4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gramcat2">
+		<description>Gram Cats 2</description>
+		<year>1993</year>
+		<publisher>Dot Kikaku</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gram cats 2 (1993)(dot kikaku)(disk 1 of 4)(disk a).dim" size="1261824" crc="d7ca5d54" sha1="b1aedd80129f417bb481d70ac6e1d4b9d3f5fb6d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gram cats 2 (1993)(dot kikaku)(disk 2 of 4)(disk b).dim" size="1261824" crc="7cc04a1d" sha1="7d0bb841861df2907c446f264fed4474d6e46797" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gram cats 2 (1993)(dot kikaku)(disk 3 of 4)(disk c).dim" size="1261824" crc="4896dbd5" sha1="c37633d50aa3ff512eba7782eb40b59808cf146d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gram cats 2 (1993)(dot kikaku)(disk 4 of 4)(disk d).dim" size="1261824" crc="bbe9ab82" sha1="38f3cd9e5307b5fe7d7d468be91be1b1d84e3ab4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="granada">
+		<description>Granada</description>
+		<year>1990</year>
+		<publisher>Wolf Team</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="granada (1990)(wolf team)(disk 1 of 3).dim" size="1261824" crc="d2cc7dc0" sha1="69f8b6bbe0f2dc4d210abb808d8b4b9e1868ac34" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="granada (1990)(wolf team)(disk 2 of 3).dim" size="1261824" crc="d8f3cd58" sha1="cfa0341337b3d30484c058bc2d569e136d26396f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="granada (1990)(wolf team)(disk 3 of 3).dim" size="1261824" crc="c4fdbdcf" sha1="786be9ba2a8e6535b715e6dec5a765599f284d21" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grandfl">
+		<description>Grandi Florum Mischief of Iveris</description>
+		<year>1990</year>
+		<publisher>Compac</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="grandi florum mischeif of iveris (1990)(compac)(disk 1 of 2)(disk a).dim" size="1261824" crc="035e7232" sha1="89121fcf8e4815f3c4cf2c78579092ed1e0d70af" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="grandi florum mischeif of iveris (1990)(compac)(disk 2 of 2)(disk b).dim" size="1261824" crc="40e6bfa5" sha1="49cf90b67975a46dee4b044a72217a61014b4c6b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grobda">
+		<description>Grobda</description>
+		<year>199?</year>
+		<publisher>L.Sound</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="grobda (199x)(l. sound).dim" size="1261824" crc="a4b575d9" sha1="63f5d072d4759ef45d6a35b5fd60003769b485b8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grobdam">
+		<description>Grobda modoki</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="grobda modoki (199x)(-).dim" size="1261824" crc="ec18192c" sha1="bdd48d338db0f655f3d97842bcc9036f66155eef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grmaster">
+		<description>Ground Master</description>
+		<year>19??</year>
+		<publisher>Zain Soft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ground master (19xx)(zain soft)(disk 1 of 2)(disk a).dim" size="1261824" crc="871ad7ed" sha1="9bcdc3eb3804854a4b43dcff940a73a7420cd4b5" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="ground master (19xx)(zain soft)(disk 2 of 2)(disk b).dim" size="1261824" crc="a7f38c8d" sha1="bb552930973c3c38ecaca454721a19cc934a77fa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="groupx">
+		<description>Group X</description>
+		<year>1991</year>
+		<publisher>Compac</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="group x (1991)(compac)(disk 1 of 2).dim" size="1261824" crc="6f3b5fe2" sha1="1824627a553c86a6b567ffc0404e6f152f3f084f" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="group x (1991)(compac)(disk 2 of 2).dim" size="1261824" crc="406cc4a1" sha1="2c47397aeaa0368fd37b128a6550eaac8d6360dd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guardian">
+		<description>Guardian</description>
+		<year>1993</year>
+		<publisher>Trap Zero</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="guardian (1993)(trap zero).dim" size="1261824" crc="b2ebc3af" sha1="582573eff70fd437be1737c50201c7a44409af72" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guardans">
+		<description>Guardians</description>
+		<year>1993</year>
+		<publisher>Moai</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="guardians (1993)(moai).dim" size="1261824" crc="3ec4e7c7" sha1="19ea676318f11b21ac24328db8f7ca0a1875042c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glyeward">
+		<description>Guerriere Lyeward</description>
+		<year>1990</year>
+		<publisher>Technopolis</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="guerriere lyeward (1990)(technopolis)(disk 1 of 2)(disk a).dim" size="1261824" crc="59001d1a" sha1="a25ffbd50a41440201aacdf3133c11ef22965339" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="guerriere lyeward (1990)(technopolis)(disk 2 of 2)(disk b).dim" size="1261824" crc="3491b229" sha1="af6793af8836c19b34fc28030aed6cae5aca8975" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunship">
+		<description>Gunship</description>
+		<year>1990</year>
+		<publisher>Microprose</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gunship (1990)(microprose).dim" size="1261824" crc="10c81fff" sha1="f4ea0e0fadf5f840ecf94b841159b49de158e4ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gyaos">
+		<description>Gyaos</description>
+		<year>1990</year>
+		<publisher>Project Makkusu</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="gyaos (1990)(project makkusu).dim" size="1261824" crc="0c5a81a2" sha1="ed4020bb1d4dc92827f5d9db0894d57ad474ae45" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 	<software name="shortname">
 		<description>desc</description>
