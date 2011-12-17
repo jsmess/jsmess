@@ -118,6 +118,8 @@ public:
 
 bool pce220_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
+	UINT8 lcd_symbols[4];
+
 	if (m_lcd_on)
 	{
 		for (int y = 0; y < 4; y++)
@@ -143,23 +145,43 @@ bool pce220_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 				}
 			}
 		}
+
+		lcd_symbols[0] = m_vram[((m_lcd_start_line>>3)*0x40 + 0x03c) & 0x1ff];
+		lcd_symbols[1] = m_vram[((m_lcd_start_line>>3)*0x40 + 0x0fc) & 0x1ff];
+		lcd_symbols[2] = m_vram[((m_lcd_start_line>>3)*0x40 + 0x13c) & 0x1ff];
+		lcd_symbols[3] = m_vram[((m_lcd_start_line>>3)*0x40 + 0x1fc) & 0x1ff];
 	}
 	else
 	{
 		bitmap_fill(&bitmap, &cliprect, 0);
+		memset(lcd_symbols, 0, sizeof(lcd_symbols));
 	}
-/*
-    // TODO: LCD Symbols
-    popmessage("%x %x %x %x",   m_vram[((m_lcd_start_line>>3)*0x40 + 0x03c) & 0x1ff],
-                                m_vram[((m_lcd_start_line>>3)*0x40 + 0x0fc) & 0x1ff],
-                                m_vram[((m_lcd_start_line>>3)*0x40 + 0x13c) & 0x1ff],
-                                m_vram[((m_lcd_start_line>>3)*0x40 + 0x1fc) & 0x1ff]);
-*/
+
+	output_set_value("BUSY" , (lcd_symbols[0] & 0x01) ? 1 : 0);
+	output_set_value("CAPS" , (lcd_symbols[0] & 0x02) ? 1 : 0);
+	output_set_value("KANA" , (lcd_symbols[0] & 0x04) ? 1 : 0);
+	output_set_value("SYO"  , (lcd_symbols[0] & 0x08) ? 1 : 0);
+	output_set_value("2ndF" , (lcd_symbols[0] & 0x10) ? 1 : 0);
+	output_set_value("TEXT" , (lcd_symbols[1] & 0x08) ? 1 : 0);
+	output_set_value("CASL" , (lcd_symbols[1] & 0x10) ? 1 : 0);
+	output_set_value("PRO"  , (lcd_symbols[1] & 0x20) ? 1 : 0);
+	output_set_value("RUN"  , (lcd_symbols[1] & 0x40) ? 1 : 0);
+	output_set_value("BATT" , (lcd_symbols[2] & 0x01) ? 1 : 0);
+	output_set_value("E"    , (lcd_symbols[2] & 0x02) ? 1 : 0);
+	output_set_value("M"    , (lcd_symbols[2] & 0x04) ? 1 : 0);
+	output_set_value("CONST", (lcd_symbols[2] & 0x08) ? 1 : 0);
+	output_set_value("RAD"  , (lcd_symbols[2] & 0x10) ? 1 : 0);
+	output_set_value("G"    , (lcd_symbols[2] & 0x20) ? 1 : 0);
+	output_set_value("DE"   , (lcd_symbols[2] & 0x40) ? 1 : 0);
+	output_set_value("STAT" , (lcd_symbols[3] & 0x20) ? 1 : 0);
+	output_set_value("PRINT", (lcd_symbols[3] & 0x40) ? 1 : 0);
+
     return 0;
 }
 
 bool pcg850v_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
+	UINT8 lcd_symbols[6];
 	int color0 = 0;
 	int color1 = 1;
 
@@ -203,11 +225,37 @@ bool pcg850v_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 				}
 			}
 		}
+
+		lcd_symbols[0] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x090) & 0x7ff];
+		lcd_symbols[1] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x190) & 0x7ff];
+		lcd_symbols[2] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x290) & 0x7ff];
+		lcd_symbols[3] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x390) & 0x7ff];
+		lcd_symbols[4] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x490) & 0x7ff];
+		lcd_symbols[5] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x590) & 0x7ff];
 	}
 	else
 	{
 		bitmap_fill(&bitmap, &cliprect, 0);
+		memset(lcd_symbols, 0, sizeof(lcd_symbols));
 	}
+
+	output_set_value("RUN"  , (lcd_symbols[0] & 0x02) ? 1 : 0);
+	output_set_value("PRO"  , (lcd_symbols[0] & 0x08) ? 1 : 0);
+	output_set_value("TEXT" , (lcd_symbols[0] & 0x40) ? 1 : 0);
+	output_set_value("CASL" , (lcd_symbols[1] & 0x08) ? 1 : 0);
+	output_set_value("STAT" , (lcd_symbols[2] & 0x01) ? 1 : 0);
+	output_set_value("2ndF" , (lcd_symbols[2] & 0x20) ? 1 : 0);
+	output_set_value("M"    , (lcd_symbols[2] & 0x80) ? 1 : 0);
+	output_set_value("CAPS" , (lcd_symbols[3] & 0x04) ? 1 : 0);
+	output_set_value("KANA" , (lcd_symbols[3] & 0x80) ? 1 : 0);
+	output_set_value("SYO"  , (lcd_symbols[4] & 0x02) ? 1 : 0);
+	output_set_value("DE"   , (lcd_symbols[4] & 0x10) ? 1 : 0);
+	output_set_value("G"    , (lcd_symbols[4] & 0x40) ? 1 : 0);
+	output_set_value("RAD"  , (lcd_symbols[5] & 0x01) ? 1 : 0);
+	output_set_value("CONST", (lcd_symbols[5] & 0x04) ? 1 : 0);
+	output_set_value("PRINT", (lcd_symbols[5] & 0x10) ? 1 : 0);
+	output_set_value("BUSY" , (lcd_symbols[5] & 0x40) ? 1 : 0);
+	output_set_value("BATT" , (lcd_symbols[5] & 0x80) ? 1 : 0);
 
     return 0;
 }
