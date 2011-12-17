@@ -1513,6 +1513,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		const char *pcb = image.get_feature("pcb");
 		const char *mapper = image.get_feature("mapper");
 		const char *pin_42 = image.get_feature("pin_42");
+		const char *eeprom = image.get_feature("eeprom");
 
 		// Check for special mappers (or lack of mappers)
 		if ( pcb && !strcmp(pcb, "korean_nobank"))
@@ -1540,6 +1541,12 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		if ( pin_42 && ! strcmp(pin_42, "sms_mode"))
 		{
 			state->m_cartridge[index].features |= CF_GG_SMS_MODE;
+		}
+
+		// Check for presence of 93c46 eeprom
+		if ( eeprom && ! strcmp( eeprom, "93c46" ) )
+		{
+			state->m_cartridge[index].features |= CF_93C46_EEPROM;
 		}
 	}
 
