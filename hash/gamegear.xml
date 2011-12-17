@@ -3846,6 +3846,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2418"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="262144">
 				<rom name="majors pro baseball, the (usa).bin" size="262144" crc="36ebcd6d" sha1="76f3c504d717067134a88f7f1d0ef38bd6698e50" offset="000000" />
 			</dataarea>
@@ -5098,6 +5099,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3442"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="524288">
 				<rom name="nomo hideo no world series baseball (japan).bin" size="524288" crc="4ed45bda" sha1="127a7e6706f6d9b129d5cf0dd2bb417e9b108748" offset="000000" />
 			</dataarea>
@@ -5589,6 +5591,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3353"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="524288">
 				<rom name="pro yakyuu gg league '94 (japan).bin" size="524288" crc="a1a19135" sha1="faac2b420cb895aec4216d4c5ce21e5f2a4c4338" offset="000000" />
 			</dataarea>
@@ -5601,6 +5604,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3407"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="262144">
 				<rom name="pro yakyuu gg league (japan).bin" size="262144" crc="2da8e943" sha1="bf78122a549ad9b016e3704690c7eea1574af140" offset="000000" />
 			</dataarea>
@@ -8542,6 +8546,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="524288">
 				<rom name="world series baseball '95 (usa).bin" size="524288" crc="578a8a38" sha1="66d31ed6bb6dfedd769bf5e6c5dcbf899f2f2c8c" offset="000000" />
 			</dataarea>
@@ -8619,6 +8624,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="262144">
 				<rom name="world series baseball (usa) (v1.1).bin" size="262144" crc="bb38cfd7" sha1="333dd99f11781d6de5720043530a460a409d652b" offset="000000" />
 			</dataarea>
@@ -8630,6 +8636,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="262144">
 				<rom name="world series baseball (usa).bin" size="262144" crc="3d8d0dd6" sha1="ccfd03edf130f28e6bb4c2764df7ace7bbe9e159" offset="000000" />
 			</dataarea>
