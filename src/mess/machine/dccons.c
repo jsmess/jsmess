@@ -66,18 +66,18 @@ static UINT8 xfer_mode = ATAPI_XFER_PIO;
 
 #define MAX_TRANSFER_SIZE ( 63488 )
 
-extern UINT32 dc_sysctrl_regs[0x200/4];
-
-extern UINT32 g1bus_regs[0x100/4];
-
 static void gdrom_raise_irq(running_machine &machine)
 {
-	dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( atapi_xfer_end )
 {
+	dc_state *state = machine.driver_data<dc_state>();
+
 	UINT8 sector_buffer[ 4096 ];
 
 	atapi_timer->adjust(attotime::never);
@@ -135,8 +135,8 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		gdrom_alt_status = ATAPI_STAT_DRDY;
 		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 
-		g1bus_regs[SB_GDST]=0;
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+		state->g1bus_regs[SB_GDST]=0;
+		state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 		dc_update_interrupt_status(machine);
 	}
 
@@ -684,38 +684,40 @@ INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_m
 
 READ64_HANDLER( dc_mess_g1_ctrl_r )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
 	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	mame_printf_verbose("G1CTRL:  Unmapped read %08x\n", 0x5f7400+reg*4);
-	return (UINT64)g1bus_regs[reg] << shift;
+	return (UINT64)state->g1bus_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat; //, old
 
 	reg = decode_reg32_64(space->machine(), offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-//  old = g1bus_regs[reg];
+//  old = state->g1bus_regs[reg];
 
-	g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
+	state->g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
 	mame_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
 	switch (reg)
 	{
 	case SB_GDST:
-		if (dat & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
+		if (dat & 1 && state->g1bus_regs[SB_GDEN] == 1) // 0 -> 1
 		{
-			if (g1bus_regs[SB_GDDIR] == 0)
+			if (state->g1bus_regs[SB_GDDIR] == 0)
 			{
 				printf("G1CTRL: unsupported transfer\n");
 				return;
 			}
 
-			atapi_xferbase = g1bus_regs[SB_GDSTAR];
+			atapi_xferbase = state->g1bus_regs[SB_GDSTAR];
 			atapi_timer->adjust(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
 		}
 		break;

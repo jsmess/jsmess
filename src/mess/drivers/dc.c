@@ -37,7 +37,6 @@ extern WRITE64_HANDLER( dc_mess_gdrom_w );
 extern READ64_HANDLER( dc_mess_g1_ctrl_r );
 extern WRITE64_HANDLER( dc_mess_g1_ctrl_w );
 
-static UINT32 *dc_sound_ram;
 static UINT64 *dc_ram;
 
 static READ64_HANDLER( dcus_idle_skip_r )
@@ -110,41 +109,50 @@ static WRITE64_HANDLER( dc_pdtra_w )
 
 static READ64_HANDLER( dc_arm_r )
 {
-	return *((UINT64 *)dc_sound_ram+offset);
+	dc_state *state = space->machine().driver_data<dc_state>();
+
+	return *((UINT64 *)state->dc_sound_ram+offset);
 }
 
 static WRITE64_HANDLER( dc_arm_w )
 {
-	COMBINE_DATA((UINT64 *)dc_sound_ram + offset);
+	dc_state *state = space->machine().driver_data<dc_state>();
+
+	COMBINE_DATA((UINT64 *)state->dc_sound_ram + offset);
 }
+
 
  // SB_LMMODE0
  static WRITE64_HANDLER( ta_texture_directpath0_w )
  {
-	int mode = pvrctrl_regs[SB_LMMODE0]&1;
+	dc_state *state = space->machine().driver_data<dc_state>();
+
+	int mode = state->pvrctrl_regs[SB_LMMODE0]&1;
 	if (mode&1)
 	{
 		printf("ta_texture_directpath0_w 32-bit access!\n");
-		COMBINE_DATA(&dc_framebuffer_ram[offset]);
+		COMBINE_DATA(&state->dc_framebuffer_ram[offset]);
 	}
 	else
 	{
-		COMBINE_DATA(&dc_texture_ram[offset]);
+		COMBINE_DATA(&state->dc_texture_ram[offset]);
 	}
  }
 
  // SB_LMMODE1
  static WRITE64_HANDLER( ta_texture_directpath1_w )
  {
-	int mode = pvrctrl_regs[SB_LMMODE1]&1;
+	dc_state *state = space->machine().driver_data<dc_state>();
+
+	int mode = state->pvrctrl_regs[SB_LMMODE1]&1;
 	if (mode&1)
 	{
-		printf("ta_texture_directpath0_w 32-bit access!\n");
-		COMBINE_DATA(&dc_framebuffer_ram[offset]);
+		printf("ta_texture_directpath1_w 32-bit access!\n");
+		COMBINE_DATA(&state->dc_framebuffer_ram[offset]);
 	}
 	else
 	{
-		COMBINE_DATA(&dc_texture_ram[offset]);
+		COMBINE_DATA(&state->dc_texture_ram[offset]);
 	}
  }
 
@@ -164,8 +172,8 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE( dc_arm_r, dc_arm_w )
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE( &dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_BASE_MEMBER( dc_state, dc_texture_ram )      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE_MEMBER( dc_state, dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 3 */
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("share4") AM_BASE(&dc_ram)
@@ -192,15 +200,17 @@ static ADDRESS_MAP_START( dc_port, AS_IO, 64 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&dc_sound_ram)		/* shared with SH-4 */
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(dc_state, dc_sound_ram)		/* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE("aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( dc_console )
 {
+	dc_state *state = machine.driver_data<dc_state>();
+
 	device_t *aica = machine.device("aica");
 	MACHINE_RESET_CALL(dc);
-	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
+	aica_set_ram_base(aica, state->dc_sound_ram, 2*1024*1024);
 	dreamcast_atapi_reset(machine);
 }
 
@@ -224,7 +234,7 @@ struct cdrom_interface dc_cdrom =
 	NULL
 };
 
-static MACHINE_CONFIG_START( dc, driver_device )
+static MACHINE_CONFIG_START( dc, dc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
