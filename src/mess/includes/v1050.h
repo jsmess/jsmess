@@ -10,13 +10,15 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/flopdrv.h"
-#include "machine/ram.h"
+#include "imagedev/harddriv.h"
 #include "formats/basicdsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8214.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
-#include "machine/i8251.h"
+#include "machine/ram.h"
+#include "machine/scsibus.h"
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
 #include "sound/discrete.h"
@@ -41,6 +43,7 @@
 #define TIMER_KB_TAG			"timer_kb"
 #define TIMER_SIO_TAG			"timer_sio"
 #define DISCRETE_TAG			"ls1"
+#define SASIBUS_TAG				"sasi"
 
 #define V1050_VIDEORAM_SIZE		0x8000
 #define V1050_VIDEORAM_MASK		0x7fff
@@ -72,7 +75,8 @@ public:
 		  m_discrete(*this, DISCRETE_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
-		  m_timer_sio(*this, TIMER_SIO_TAG)
+		  m_timer_sio(*this, TIMER_SIO_TAG),
+		  m_sasibus(*this, SASIBUS_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -89,6 +93,7 @@ public:
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 	required_device<timer_device> m_timer_sio;
+	required_device<device_t> m_sasibus;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -124,6 +129,8 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
+	DECLARE_READ8_MEMBER( sasi_r );
+	DECLARE_WRITE8_MEMBER( sasi_w );
 
 	void bankswitch();
 	void set_interrupt(UINT8 mask, int state);

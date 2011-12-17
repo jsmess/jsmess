@@ -99,6 +99,8 @@ Notes:
     - real keyboard w/i8049
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
     - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
+	
+		chdman -createblankhd cm5412.chd 306 4 17 512
 
 */
 
@@ -381,6 +383,56 @@ WRITE8_MEMBER( v1050_state::p2_w )
 	m_kb_so = BIT(data, 7);
 }
 
+READ8_MEMBER( v1050_state::sasi_r )
+{
+	/*
+
+        bit     description
+
+        0		REQ-
+        1		BUSY
+        2		MESSAGE
+        3		C/D-
+        4		I-/O
+        5
+        6
+        7
+
+    */
+	
+	UINT8 data = 0;
+	
+	data |= scsi_req_r(m_sasibus);
+	data |= !scsi_bsy_r(m_sasibus) << 1;
+	data |= !scsi_msg_r(m_sasibus) << 2;
+	data |= !scsi_cd_r(m_sasibus) << 3;
+	data |= scsi_io_r(m_sasibus) << 4;
+	
+	return data;
+}
+
+WRITE8_MEMBER( v1050_state::sasi_w )
+{
+	/*
+
+        bit     description
+
+        0		SEL
+        1		ACK
+        2
+        3
+        4
+        5
+        6
+        7		RST
+
+    */
+	
+	scsi_sel_w(m_sasibus, !BIT(data, 0));
+	scsi_ack_w(m_sasibus, !BIT(data, 1));
+	scsi_rst_w(m_sasibus, !BIT(data, 7));
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( v1050_mem, AS_PROGRAM, 8, v1050_state )
@@ -409,7 +461,8 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-//  AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(S1410_TAG, s1410_r, s1410_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(sasi_w)
+	AM_RANGE(0xe1, 0xe1) AM_READ(sasi_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_crt_mem, AS_PROGRAM, 8, v1050_state )
@@ -1083,6 +1136,32 @@ static const floppy_interface v1050_floppy_interface =
 	NULL
 };
 
+
+//-------------------------------------------------
+//  SCSIBus_interface sasi_intf
+//-------------------------------------------------
+
+static const SCSIConfigTable sasi_dev_table =
+{
+	1,
+	{
+		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK }
+	}
+};
+
+static const SCSIBus_interface sasi_intf =
+{
+    &sasi_dev_table,
+    NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 /* Machine Initialization */
 
 static IRQ_CALLBACK( v1050_int_ack )
@@ -1199,6 +1278,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(v1050_floppy_interface)
 	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
 	MCFG_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
+    MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
+	MCFG_HARDDISK_ADD("harddisk0")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","v1050")
