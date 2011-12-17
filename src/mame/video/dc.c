@@ -26,17 +26,17 @@ SPG_HBLANK_INT
 ---- ---- ---- ---- --xx ---- ---- ---- hblank_int_mode
 ---- ---- ---- ---- ---- --xx xxxx xxxx line_comp_val
 */
-#define spg_hblank_in_irq   ((pvrta_regs[SPG_HBLANK_INT] & 0x03ff0000) >> 16)
-#define spg_hblank_int_mode ((pvrta_regs[SPG_HBLANK_INT] & 0x00003000) >> 12)
-#define spg_line_comp_val   ((pvrta_regs[SPG_HBLANK_INT] & 0x000003ff) >> 0)
+#define spg_hblank_in_irq   ((state->pvrta_regs[SPG_HBLANK_INT] & 0x03ff0000) >> 16)
+#define spg_hblank_int_mode ((state->pvrta_regs[SPG_HBLANK_INT] & 0x00003000) >> 12)
+#define spg_line_comp_val   ((state->pvrta_regs[SPG_HBLANK_INT] & 0x000003ff) >> 0)
 
 /*
 SPG_VBLANK_INT
 ---- --xx xxxx xxxx ---- ---- ---- ---- vblank_out_interrupt_line_number
 ---- ---- ---- ---- ---- --xx xxxx xxxx vblank_in_interrupt_line_number
 */
-#define spg_vblank_out_irq_line_num ((pvrta_regs[SPG_VBLANK_INT] & 0x03ff0000) >> 16)
-#define spg_vblank_in_irq_line_num  ((pvrta_regs[SPG_VBLANK_INT] & 0x000003ff) >> 0)
+#define spg_vblank_out_irq_line_num ((state->pvrta_regs[SPG_VBLANK_INT] & 0x03ff0000) >> 16)
+#define spg_vblank_in_irq_line_num  ((state->pvrta_regs[SPG_VBLANK_INT] & 0x000003ff) >> 0)
 
 
 /*
@@ -46,18 +46,18 @@ VO_BORDER_COL
 ---- ---- ---- ---- xxxx xxxx ---- ---- Green
 ---- ---- ---- ---- ---- ---- xxxx xxxx Blue
 */
-#define vo_border_K ((pvrta_regs[VO_BORDER_COL] & 0x01000000) >> 24)
-#define vo_border_R ((pvrta_regs[VO_BORDER_COL] & 0x00ff0000) >> 16)
-#define vo_border_G ((pvrta_regs[VO_BORDER_COL] & 0x0000ff00) >> 8)
-#define vo_border_B ((pvrta_regs[VO_BORDER_COL] & 0x000000ff) >> 0)
+#define vo_border_K ((state->pvrta_regs[VO_BORDER_COL] & 0x01000000) >> 24)
+#define vo_border_R ((state->pvrta_regs[VO_BORDER_COL] & 0x00ff0000) >> 16)
+#define vo_border_G ((state->pvrta_regs[VO_BORDER_COL] & 0x0000ff00) >> 8)
+#define vo_border_B ((state->pvrta_regs[VO_BORDER_COL] & 0x000000ff) >> 0)
 
 /*
 SPG_HBLANK
 ---- ---- --xx xxxx xxxx ---- ---- ---- hbend
 ---- ---- ---- ---- ---- --xx xxxx xxxx hbstart
 */
-#define spg_hbend    ((pvrta_regs[SPG_HBLANK] & 0x03ff0000) >> 16)
-#define spg_hbstart  ((pvrta_regs[SPG_HBLANK] & 0x000003ff) >> 0)
+#define spg_hbend    ((state->pvrta_regs[SPG_HBLANK] & 0x03ff0000) >> 16)
+#define spg_hbstart  ((state->pvrta_regs[SPG_HBLANK] & 0x000003ff) >> 0)
 
 
 /*
@@ -65,16 +65,16 @@ SPG_LOAD
 ---- ---- --xx xxxx xxxx ---- ---- ---- vcount
 ---- ---- ---- ---- ---- --xx xxxx xxxx hcount
 */
-#define spg_vcount   ((pvrta_regs[SPG_LOAD] & 0x03ff0000) >> 16)
-#define spg_hcount   ((pvrta_regs[SPG_LOAD] & 0x000003ff) >> 0)
+#define spg_vcount   ((state->pvrta_regs[SPG_LOAD] & 0x03ff0000) >> 16)
+#define spg_hcount   ((state->pvrta_regs[SPG_LOAD] & 0x000003ff) >> 0)
 
 /*
 SPG_VBLANK
 ---- ---- --xx xxxx xxxx ---- ---- ---- vbend
 ---- ---- ---- ---- ---- --xx xxxx xxxx vbstart
 */
-#define spg_vbend    ((pvrta_regs[SPG_VBLANK] & 0x03ff0000) >> 16)
-#define spg_vbstart  ((pvrta_regs[SPG_VBLANK] & 0x000003ff) >> 0)
+#define spg_vbend    ((state->pvrta_regs[SPG_VBLANK] & 0x03ff0000) >> 16)
+#define spg_vbstart  ((state->pvrta_regs[SPG_VBLANK] & 0x000003ff) >> 0)
 
 
 /*
@@ -87,19 +87,19 @@ VO_CONTROL
 ---- ---- ---- ---- ---- ---- ---- --x- vsync_pol
 ---- ---- ---- ---- ---- ---- ---- ---x hsync_pol
 */
-#define spg_pclk_delay   ((pvrta_regs[VO_CONTROL] & 0x003f0000) >> 16)
-#define spg_pixel_double ((pvrta_regs[VO_CONTROL] & 0x00000100) >> 8)
-#define spg_field_mode   ((pvrta_regs[VO_CONTROL] & 0x000000f0) >> 4)
-#define spg_blank_video  ((pvrta_regs[VO_CONTROL] & 0x00000008) >> 3)
-#define spg_blank_pol    ((pvrta_regs[VO_CONTROL] & 0x00000004) >> 2)
-#define spg_vsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000002) >> 1)
-#define spg_hsync_pol    ((pvrta_regs[VO_CONTROL] & 0x00000001) >> 0)
+#define spg_pclk_delay   ((state->pvrta_regs[VO_CONTROL] & 0x003f0000) >> 16)
+#define spg_pixel_double ((state->pvrta_regs[VO_CONTROL] & 0x00000100) >> 8)
+#define spg_field_mode   ((state->pvrta_regs[VO_CONTROL] & 0x000000f0) >> 4)
+#define spg_blank_video  ((state->pvrta_regs[VO_CONTROL] & 0x00000008) >> 3)
+#define spg_blank_pol    ((state->pvrta_regs[VO_CONTROL] & 0x00000004) >> 2)
+#define spg_vsync_pol    ((state->pvrta_regs[VO_CONTROL] & 0x00000002) >> 1)
+#define spg_hsync_pol    ((state->pvrta_regs[VO_CONTROL] & 0x00000001) >> 0)
 
 /*
 VO_STARTX
 ---- ---- ---- ---- ---- ---x xxxx xxxx horzontal start position
 */
-#define vo_horz_start_pos ((pvrta_regs[VO_STARTX] & 0x000003ff) >> 0)
+#define vo_horz_start_pos ((state->pvrta_regs[VO_STARTX] & 0x000003ff) >> 0)
 
 /*
 VO_STARTY
@@ -107,8 +107,8 @@ VO_STARTY
 ---- ---- ---- ---- ---- ---x xxxx xxxx vertical start position on field 1
 */
 
-#define vo_vert_start_pos_f2 ((pvrta_regs[VO_STARTY] & 0x03ff0000) >> 16)
-#define vo_vert_start_pos_f1 ((pvrta_regs[VO_STARTY] & 0x000003ff) >> 0)
+#define vo_vert_start_pos_f2 ((state->pvrta_regs[VO_STARTY] & 0x03ff0000) >> 16)
+#define vo_vert_start_pos_f1 ((state->pvrta_regs[VO_STARTY] & 0x000003ff) >> 0)
 
 /*
 SPG_STATUS
@@ -116,11 +116,9 @@ SPG_STATUS
 ---- ---- ---- ---- ---x ---- ---- ---- hsync
 ---- ---- ---- ---- ---- x--- ---- ---- blank
 ---- ---- ---- ---- ---- -x-- ---- ---- field number
----- ---- ---- ---- ---- --xx xxxx xxxx scanline
+---- ---- ---- ---- ---- --xx xxxx xxxx state->scanline
 */
 
-UINT32 pvrctrl_regs[0x100/4];
-static UINT32 pvrta_regs[0x2000/4];
 static const int pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
 static const int pvr_wordsvertex[24]  = {8,8,8,8,8,16,16,8,8,8, 8, 8,8,8,8,8,16,16, 8,16,16,8,16,16};
 static const int pvr_wordspolygon[24] = {8,8,8,8,8, 8, 8,8,8,8,16,16,8,8,8,8, 8, 8,16,16,16,8, 8, 8};
@@ -129,26 +127,7 @@ static UINT32 dilated0[15][1024];
 static UINT32 dilated1[15][1024];
 static int dilatechose[64];
 static float wbuffer[480][640];
-static UINT32 debug_dip_status;
 static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,int y);
-
-UINT64 *dc_framebuffer_ram; // '32-bit access area'
-UINT64 *dc_texture_ram; // '64-bit access area'
-UINT64 *pvr2_texture_ram;
-UINT64 *pvr2_framebuffer_ram;
-
-UINT64 *elan_ram;
-
-static UINT32 tafifo_buff[32];
-
-static emu_timer *vbout_timer;
-static emu_timer *vbin_timer;
-static emu_timer *hbin_timer;
-static emu_timer *endofrender_timer_isp;
-static emu_timer *endofrender_timer_tsp;
-static emu_timer *endofrender_timer_video;
-
-static int scanline,next_y;
 
 // the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
 //  our implementation is not currently tile based, and thus the accumulation buffer is screen sized
@@ -159,7 +138,7 @@ typedef struct texinfo {
 	UINT32 address, vqbase;
 	int textured, sizex, sizey, stride, sizes, pf, palette, mode, mipmapped, blend_mode, filter_mode, flip_u, flip_v;
 
-	UINT32 (*r)(struct texinfo *t, float x, float y);
+	UINT32 (*r)(running_machine &machine, struct texinfo *t, float x, float y);
 	UINT32 (*blend)(UINT32 s, UINT32 d);
 	int palbase, cd;
 } texinfo;
@@ -436,255 +415,282 @@ INLINE UINT32 cv_yuv(UINT16 c1, UINT16 c2, int x)
 }
 
 
-INLINE UINT32 tex_r_yuv_n(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_yuv_n(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (t->stride*yt + (xt & ~1))*2;
-	UINT16 c1 = *(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp));
-	UINT16 c2 = *(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp+2));
+	UINT16 c1 = *(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp));
+	UINT16 c2 = *(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp+2));
 	return cv_yuv(c1, c2, xt);
 }
 
-INLINE UINT32 tex_r_1555_n(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_1555_n(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (t->stride*yt + xt)*2;
-	return cv_1555z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_1555z(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_1555_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_1555_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (dilated1[t->cd][xt] + dilated0[t->cd][yt])*2;
-	return cv_1555(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_1555(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_1555_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_1555_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
-	return cv_1555(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_1555(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_565_n(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_565_n(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (t->stride*yt + xt)*2;
-	return cv_565z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_565z(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_565_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_565_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (dilated1[t->cd][xt] + dilated0[t->cd][yt])*2;
-	return cv_565(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_565(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_565_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_565_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
-	return cv_565(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_565(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_4444_n(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_4444_n(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (t->stride*yt + xt)*2;
-	return cv_4444z(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_4444z(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_4444_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_4444_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + (dilated1[t->cd][xt] + dilated0[t->cd][yt])*2;
-	return cv_4444(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_4444(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_4444_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_4444_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
-	return cv_4444(*(UINT16 *)(((UINT8 *)dc_texture_ram) + WORD_XOR_LE(addrp)));
+	return cv_4444(*(UINT16 *)(((UINT8 *)state->dc_texture_ram) + WORD_XOR_LE(addrp)));
 }
 
-INLINE UINT32 tex_r_p4_1555_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_1555_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
-	return cv_1555(pvrta_regs[t->palbase + c]);
+	int c = (((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
+	return cv_1555(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p4_1555_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_1555_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
-	return cv_1555(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
+	return cv_1555(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p4_565_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_565_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
-	return cv_565(pvrta_regs[t->palbase + c]);
+	int c = (((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
+	return cv_565(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p4_565_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_565_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
-	return cv_565(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
+	return cv_565(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p4_4444_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_4444_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
-	return cv_4444(pvrta_regs[t->palbase + c]);
+	int c = (((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
+	return cv_4444(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p4_4444_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_4444_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
-	return cv_4444(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
+	return cv_4444(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p4_8888_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_8888_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = (((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
-	return pvrta_regs[t->palbase + c];
+	int c = (((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
+	return state->pvrta_regs[t->palbase + c];
 }
 
-INLINE UINT32 tex_r_p4_8888_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p4_8888_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
-	return pvrta_regs[t->palbase + c];
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)] & 0xf;
+	return state->pvrta_regs[t->palbase + c];
 }
 
-INLINE UINT32 tex_r_p8_1555_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_1555_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + dilated1[t->cd][xt] + dilated0[t->cd][yt];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
-	return cv_1555(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)];
+	return cv_1555(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p8_1555_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_1555_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
-	return cv_1555(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)];
+	return cv_1555(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p8_565_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_565_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + dilated1[t->cd][xt] + dilated0[t->cd][yt];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
-	return cv_565(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)];
+	return cv_565(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p8_565_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_565_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
-	return cv_565(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)];
+	return cv_565(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p8_4444_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_4444_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + dilated1[t->cd][xt] + dilated0[t->cd][yt];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
-	return cv_4444(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)];
+	return cv_4444(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p8_4444_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_4444_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
-	return cv_4444(pvrta_regs[t->palbase + c]);
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)];
+	return cv_4444(state->pvrta_regs[t->palbase + c]);
 }
 
-INLINE UINT32 tex_r_p8_8888_tw(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_8888_tw(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
 	int addrp = t->address + dilated1[t->cd][xt] + dilated0[t->cd][yt];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
-	return pvrta_regs[t->palbase + c];
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)];
+	return state->pvrta_regs[t->palbase + c];
 }
 
-INLINE UINT32 tex_r_p8_8888_vq(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_p8_8888_vq(running_machine &machine, texinfo *t, float x, float y)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xt = ((int)x) & (t->sizex-1);
 	int yt = ((int)y) & (t->sizey-1);
-	int idx = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = ((UINT8 *)dc_texture_ram)[BYTE_XOR_LE(addrp)];
-	return pvrta_regs[t->palbase + c];
+	int c = ((UINT8 *)state->dc_texture_ram)[BYTE_XOR_LE(addrp)];
+	return state->pvrta_regs[t->palbase + c];
 }
 
 
-INLINE UINT32 tex_r_default(texinfo *t, float x, float y)
+INLINE UINT32 tex_r_default(running_machine &machine, texinfo *t, float x, float y)
 {
 	return ((int)x ^ (int)y) & 4 ? 0xffffff00 : 0xff0000ff;
 }
 
-static void tex_get_info(texinfo *t, pvrta_state *sa)
+static void tex_get_info(running_machine &machine,texinfo *t, pvrta_state *sa)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int miptype = 0;
 
 	t->textured    = sa->texture;
@@ -727,7 +733,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 
 
 	/* Stride select is used only in the non-twiddled case */
-	t->stride = (t->mode & 1) && sa->strideselect ? (pvrta_regs[TEXT_CONTROL] & 0x1f) << 5 : t->sizex;
+	t->stride = (t->mode & 1) && sa->strideselect ? (state->pvrta_regs[TEXT_CONTROL] & 0x1f) << 5 : t->sizex;
 
 	t->blend_mode  = sa->blend_mode;
 	t->filter_mode = sa->filtermode;
@@ -740,7 +746,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 	t->vqbase = t->address;
 	t->blend = sa->use_alpha ? blend_functions[t->blend_mode] : bl10;
 
-	//  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, pvrta_regs[PAL_RAM_CTRL], t->mipmapped);
+	//  fprintf(stderr, "tex %d %d %d %d\n", t->pf, t->mode, state->pvrta_regs[PAL_RAM_CTRL], t->mipmapped);
 
 	switch(t->pf) {
 	case 0: // 1555
@@ -799,7 +805,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		case 0: case 1:
 			miptype = 0;
 
-			switch(pvrta_regs[PAL_RAM_CTRL]) {
+			switch(state->pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p4_1555_tw; break;
 			case 1: t->r = tex_r_p4_565_tw;  break;
 			case 2: t->r = tex_r_p4_4444_tw; break;
@@ -808,7 +814,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			break;
 		case 2: case 3:
 			miptype = 3; // ?
-			switch(pvrta_regs[PAL_RAM_CTRL]) {
+			switch(state->pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p4_1555_vq; t->address += 0x800; break;
 			case 1: t->r = tex_r_p4_565_vq;  t->address += 0x800; break;
 			case 2: t->r = tex_r_p4_4444_vq; t->address += 0x800; break;
@@ -828,7 +834,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 		case 0: case 1:
 			miptype = 1;
 
-			switch(pvrta_regs[PAL_RAM_CTRL]) {
+			switch(state->pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p8_1555_tw; break;
 			case 1: t->r = tex_r_p8_565_tw; break;
 			case 2: t->r = tex_r_p8_4444_tw; break;
@@ -837,7 +843,7 @@ static void tex_get_info(texinfo *t, pvrta_state *sa)
 			break;
 		case 2: case 3:
 			miptype = 3; // ?
-			switch(pvrta_regs[PAL_RAM_CTRL]) {
+			switch(state->pvrta_regs[PAL_RAM_CTRL]) {
 			case 0: t->r = tex_r_p8_1555_vq; t->address += 0x800; break;
 			case 1: t->r = tex_r_p8_565_vq;  t->address += 0x800; break;
 			case 2: t->r = tex_r_p8_4444_vq; t->address += 0x800; break;
@@ -973,6 +979,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 
 READ64_HANDLER( pvr_ta_r )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
@@ -996,7 +1003,7 @@ READ64_HANDLER( pvr_ta_r )
 			blank = (space->machine().primary_screen->vblank() | space->machine().primary_screen->hblank()) ? 0 : 1;
 			if(spg_blank_pol) { blank^=1; }
 
-			pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (space->machine().primary_screen->vpos() & 0x3ff);
+			state->pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (space->machine().primary_screen->vpos() & 0x3ff);
 			break;
 		}
 	case SPG_TRIGGER_POS:
@@ -1008,13 +1015,14 @@ READ64_HANDLER( pvr_ta_r )
 
 	#if DEBUG_PVRTA_REGS
 	if (reg != 0x43)
-		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(&space->device()));
+		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, state->pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(&space->device()));
 	#endif
-	return (UINT64)pvrta_regs[reg] << shift;
+	return (UINT64)state->pvrta_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( pvr_ta_w )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
@@ -1024,13 +1032,13 @@ WRITE64_HANDLER( pvr_ta_w )
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	//old = pvrta_regs[reg];
+	//old = state->pvrta_regs[reg];
 
 	// Dreamcast BIOS attempts to set PVRID to zero and then dies
 	// if it succeeds.  Don't allow.
 	if ((reg != PVRID) && (reg != REVISION))
 	{
-		pvrta_regs[reg] = dat; // 5f8000+reg*4=dat
+		state->pvrta_regs[reg] = dat; // 5f8000+reg*4=dat
 	}
 
 	switch (reg)
@@ -1068,14 +1076,14 @@ WRITE64_HANDLER( pvr_ta_w )
 		g_profiler.start(PROFILER_USER1);
 		#if DEBUG_PVRTA
 		mame_printf_verbose("Start Render Received:\n");
-		mame_printf_verbose("  Region Array at %08x\n",pvrta_regs[REGION_BASE]);
-		mame_printf_verbose("  ISP/TSP Parameters at %08x\n",pvrta_regs[PARAM_BASE]);
+		mame_printf_verbose("  Region Array at %08x\n",state->pvrta_regs[REGION_BASE]);
+		mame_printf_verbose("  ISP/TSP Parameters at %08x\n",state->pvrta_regs[PARAM_BASE]);
 
 		#endif
 		// select buffer to draw using PARAM_BASE
 		for (a=0;a < NUM_BUFFERS;a++)
 		{
-			if ((state_ta.grab[a].ispbase == pvrta_regs[PARAM_BASE]) && (state_ta.grab[a].valid == 1) && (state_ta.grab[a].busy == 0))
+			if ((state_ta.grab[a].ispbase == state->pvrta_regs[PARAM_BASE]) && (state_ta.grab[a].valid == 1) && (state_ta.grab[a].busy == 0))
 			{
 				rectangle clip;
 
@@ -1084,8 +1092,8 @@ WRITE64_HANDLER( pvr_ta_w )
 				state_ta.start_render_received=1;
 
 
-				state_ta.grab[a].fbwsof1=pvrta_regs[FB_W_SOF1];
-				state_ta.grab[a].fbwsof2=pvrta_regs[FB_W_SOF2];
+				state_ta.grab[a].fbwsof1=state->pvrta_regs[FB_W_SOF1];
+				state_ta.grab[a].fbwsof2=state->pvrta_regs[FB_W_SOF2];
 
 				clip.min_x = 0;
 				clip.max_x = 1023;
@@ -1096,14 +1104,14 @@ WRITE64_HANDLER( pvr_ta_w )
 				// this should really be done for each tile!
 				render_to_accumulation_buffer(space->machine(),fake_accumulationbuffer_bitmap,&clip);
 
-				endofrender_timer_isp->adjust(attotime::from_usec(4000) ); // hack, make sure render takes some amount of time
+				state->endofrender_timer_isp->adjust(attotime::from_usec(4000) ); // hack, make sure render takes some amount of time
 
 				/* copy the tiles to the framebuffer (really the rendering should be in this loop too) */
-				if (pvrta_regs[FPU_PARAM_CFG] & 0x200000)
+				if (state->pvrta_regs[FPU_PARAM_CFG] & 0x200000)
 					sizera=6;
 				else
 					sizera=5;
-				offsetra=pvrta_regs[REGION_BASE];
+				offsetra=state->pvrta_regs[REGION_BASE];
 
 				//printf("base is %08x\n", offsetra);
 
@@ -1169,26 +1177,26 @@ WRITE64_HANDLER( pvr_ta_w )
 			state_ta.tafifo_vertexwords=8;
 			state_ta.tafifo_listtype= -1;
 	#if DEBUG_PVRTA
-			mame_printf_verbose("TA_OL_BASE       %08x TA_OL_LIMIT  %08x\n", pvrta_regs[TA_OL_BASE], pvrta_regs[TA_OL_LIMIT]);
-			mame_printf_verbose("TA_ISP_BASE      %08x TA_ISP_LIMIT %08x\n", pvrta_regs[TA_ISP_BASE], pvrta_regs[TA_ISP_LIMIT]);
-			mame_printf_verbose("TA_ALLOC_CTRL    %08x\n", pvrta_regs[TA_ALLOC_CTRL]);
-			mame_printf_verbose("TA_NEXT_OPB_INIT %08x\n", pvrta_regs[TA_NEXT_OPB_INIT]);
+			mame_printf_verbose("TA_OL_BASE       %08x TA_OL_LIMIT  %08x\n", state->pvrta_regs[TA_OL_BASE], state->pvrta_regs[TA_OL_LIMIT]);
+			mame_printf_verbose("TA_ISP_BASE      %08x TA_ISP_LIMIT %08x\n", state->pvrta_regs[TA_ISP_BASE], state->pvrta_regs[TA_ISP_LIMIT]);
+			mame_printf_verbose("TA_ALLOC_CTRL    %08x\n", state->pvrta_regs[TA_ALLOC_CTRL]);
+			mame_printf_verbose("TA_NEXT_OPB_INIT %08x\n", state->pvrta_regs[TA_NEXT_OPB_INIT]);
 	#endif
-			pvrta_regs[TA_NEXT_OPB] = pvrta_regs[TA_NEXT_OPB_INIT];
-			pvrta_regs[TA_ITP_CURRENT] = pvrta_regs[TA_ISP_BASE];
-			state_ta.alloc_ctrl_OPB_Mode = pvrta_regs[TA_ALLOC_CTRL] & 0x100000; // 0 up 1 down
-			state_ta.alloc_ctrl_PT_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 16) & 3)) & 0x38; // number of 32 bit words (0,8,16,32)
-			state_ta.alloc_ctrl_TM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 12) & 3)) & 0x38;
-			state_ta.alloc_ctrl_T_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 8) & 3)) & 0x38;
-			state_ta.alloc_ctrl_OM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 4) & 3)) & 0x38;
-			state_ta.alloc_ctrl_O_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 0) & 3)) & 0x38;
+			state->pvrta_regs[TA_NEXT_OPB] = state->pvrta_regs[TA_NEXT_OPB_INIT];
+			state->pvrta_regs[TA_ITP_CURRENT] = state->pvrta_regs[TA_ISP_BASE];
+			state_ta.alloc_ctrl_OPB_Mode = state->pvrta_regs[TA_ALLOC_CTRL] & 0x100000; // 0 up 1 down
+			state_ta.alloc_ctrl_PT_OPB = (4 << ((state->pvrta_regs[TA_ALLOC_CTRL] >> 16) & 3)) & 0x38; // number of 32 bit words (0,8,16,32)
+			state_ta.alloc_ctrl_TM_OPB = (4 << ((state->pvrta_regs[TA_ALLOC_CTRL] >> 12) & 3)) & 0x38;
+			state_ta.alloc_ctrl_T_OPB = (4 << ((state->pvrta_regs[TA_ALLOC_CTRL] >> 8) & 3)) & 0x38;
+			state_ta.alloc_ctrl_OM_OPB = (4 << ((state->pvrta_regs[TA_ALLOC_CTRL] >> 4) & 3)) & 0x38;
+			state_ta.alloc_ctrl_O_OPB = (4 << ((state->pvrta_regs[TA_ALLOC_CTRL] >> 0) & 3)) & 0x38;
 			state_ta.listtype_used |= (1+4);
 			// use TA_ISP_BASE and select buffer for grab data
 			state_ta.grabsel = -1;
 			// try to find already used buffer but not busy
 			for (a=0;a < NUM_BUFFERS;a++)
 			{
-				if ((state_ta.grab[a].ispbase == pvrta_regs[TA_ISP_BASE]) && (state_ta.grab[a].busy == 0) && (state_ta.grab[a].valid == 1))
+				if ((state_ta.grab[a].ispbase == state->pvrta_regs[TA_ISP_BASE]) && (state_ta.grab[a].busy == 0) && (state_ta.grab[a].valid == 1))
 				{
 					state_ta.grabsel=a;
 					break;
@@ -1221,7 +1229,7 @@ WRITE64_HANDLER( pvr_ta_w )
 			if (state_ta.grabsel < 0)
 				assert_always(0, "TA grabber error B!\n");
 			state_ta.grabsellast=state_ta.grabsel;
-			state_ta.grab[state_ta.grabsel].ispbase=pvrta_regs[TA_ISP_BASE];
+			state_ta.grab[state_ta.grabsel].ispbase=state->pvrta_regs[TA_ISP_BASE];
 			state_ta.grab[state_ta.grabsel].busy=0;
 			state_ta.grab[state_ta.grabsel].valid=1;
 			state_ta.grab[state_ta.grabsel].verts_size=0;
@@ -1235,7 +1243,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		printf("TA_YUV_TEX_BASE initialized to %08x\n", dat);
 
 		// hack, this interrupt is generated after transfering a set amount of data
-		//dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
+		//state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
 		//dc_update_interrupt_status(space->machine());
 
 		break;
@@ -1245,11 +1253,11 @@ WRITE64_HANDLER( pvr_ta_w )
 
 	case SPG_VBLANK_INT:
 		/* clear pending irqs and modify them with the updated ones */
-		vbin_timer->adjust(attotime::never);
-		vbout_timer->adjust(attotime::never);
+		state->vbin_timer->adjust(attotime::never);
+		state->vbout_timer->adjust(attotime::never);
 
-		vbin_timer->adjust(space->machine().primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
-		vbout_timer->adjust(space->machine().primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
+		state->vbin_timer->adjust(space->machine().primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
+		state->vbout_timer->adjust(space->machine().primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 		break;
 	/* TODO: timer adjust for SPG_HBLANK_INT too */
 	case TA_LIST_CONT:
@@ -1289,36 +1297,48 @@ WRITE64_HANDLER( pvr_ta_w )
 
 static TIMER_CALLBACK( transfer_opaque_list_irq )
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( transfer_opaque_modifier_volume_list_irq )
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( transfer_translucent_list_irq )
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( transfer_translucent_modifier_volume_list_irq )
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
 	dc_update_interrupt_status(machine);
 }
 
 static TIMER_CALLBACK( transfer_punch_through_list_irq )
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= (1 << 21);
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= (1 << 21);
 	dc_update_interrupt_status(machine);
 }
 
 static void process_ta_fifo(running_machine& machine)
 {
+	dc_state *state = machine.driver_data<dc_state>();
+
 	/* first byte in the buffer is the Parameter Control Word
 
      pppp pppp gggg gggg oooo oooo oooo oooo
@@ -1332,7 +1352,7 @@ static void process_ta_fifo(running_machine& machine)
 	receiveddata *rd = &state_ta.grab[state_ta.grabsel];
 
 	// Para Control
-	state_ta.paracontrol=(tafifo_buff[0] >> 24) & 0xff;
+	state_ta.paracontrol=(state->tafifo_buff[0] >> 24) & 0xff;
 	// 0 end of list
 	// 1 user tile clip
 	// 2 object list set
@@ -1348,12 +1368,12 @@ static void process_ta_fifo(running_machine& machine)
 	{
 		state_ta.global_paratype = state_ta.paratype;
 		// Group Control
-		state_ta.groupcontrol=(tafifo_buff[0] >> 16) & 0xff;
+		state_ta.groupcontrol=(state->tafifo_buff[0] >> 16) & 0xff;
 		state_ta.groupen=(state_ta.groupcontrol >> 7) & 1;
 		state_ta.striplen=(state_ta.groupcontrol >> 2) & 3;
 		state_ta.userclip=(state_ta.groupcontrol >> 0) & 3;
 		// Obj Control
-		state_ta.objcontrol=(tafifo_buff[0] >> 0) & 0xffff;
+		state_ta.objcontrol=(state->tafifo_buff[0] >> 0) & 0xffff;
 		state_ta.shadow=(state_ta.objcontrol >> 7) & 1;
 		state_ta.volume=(state_ta.objcontrol >> 6) & 1;
 		state_ta.coltype=(state_ta.objcontrol >> 4) & 3;
@@ -1416,20 +1436,20 @@ static void process_ta_fifo(running_machine& machine)
 	{ // user tile clip
 		#if DEBUG_PVRDLIST
 		mame_printf_verbose("Para Type 1 User Tile Clip\n");
-		mame_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
+		mame_printf_verbose(" (%d , %d)-(%d , %d)\n", state->tafifo_buff[4], state->tafifo_buff[5], state->tafifo_buff[6], state->tafifo_buff[7]);
 		#endif
 	}
 	else if (state_ta.paratype == 2)
 	{ // object list set
 		#if DEBUG_PVRDLIST
-		mame_printf_verbose("Para Type 2 Object List Set at %08x\n", tafifo_buff[1]);
-		mame_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
+		mame_printf_verbose("Para Type 2 Object List Set at %08x\n", state->tafifo_buff[1]);
+		mame_printf_verbose(" (%d , %d)-(%d , %d)\n", state->tafifo_buff[4], state->tafifo_buff[5], state->tafifo_buff[6], state->tafifo_buff[7]);
 		#endif
 	}
 	else if (state_ta.paratype == 3)
 	{
 		#if DEBUG_PVRDLIST
-		mame_printf_verbose("Para Type %x Unknown!\n", tafifo_buff[0]);
+		mame_printf_verbose("Para Type %x Unknown!\n", state->tafifo_buff[0]);
 		#endif
 	}
 	else
@@ -1455,40 +1475,40 @@ static void process_ta_fifo(running_machine& machine)
 
 		if ((state_ta.paratype == 4) || (state_ta.paratype == 5))
 		{ // quad or polygon
-			state_ta.depthcomparemode=(tafifo_buff[1] >> 29) & 7;
-			state_ta.cullingmode=(tafifo_buff[1] >> 27) & 3;
-			state_ta.zwritedisable=(tafifo_buff[1] >> 26) & 1;
-			state_ta.cachebypass=(tafifo_buff[1] >> 21) & 1;
-			state_ta.dcalcctrl=(tafifo_buff[1] >> 20) & 1;
-			state_ta.volumeinstruction=(tafifo_buff[1] >> 29) & 7;
+			state_ta.depthcomparemode=(state->tafifo_buff[1] >> 29) & 7;
+			state_ta.cullingmode=(state->tafifo_buff[1] >> 27) & 3;
+			state_ta.zwritedisable=(state->tafifo_buff[1] >> 26) & 1;
+			state_ta.cachebypass=(state->tafifo_buff[1] >> 21) & 1;
+			state_ta.dcalcctrl=(state->tafifo_buff[1] >> 20) & 1;
+			state_ta.volumeinstruction=(state->tafifo_buff[1] >> 29) & 7;
 
-			//state_ta.textureusize=1 << (3+((tafifo_buff[2] >> 3) & 7));
-			//state_ta.texturevsize=1 << (3+(tafifo_buff[2] & 7));
-			state_ta.texturesizes=tafifo_buff[2] & 0x3f;
-			state_ta.blend_mode = tafifo_buff[2] >> 26;
-			state_ta.srcselect=(tafifo_buff[2] >> 25) & 1;
-			state_ta.dstselect=(tafifo_buff[2] >> 24) & 1;
-			state_ta.fogcontrol=(tafifo_buff[2] >> 22) & 3;
-			state_ta.colorclamp=(tafifo_buff[2] >> 21) & 1;
-			state_ta.use_alpha = (tafifo_buff[2] >> 20) & 1;
-			state_ta.ignoretexalpha=(tafifo_buff[2] >> 19) & 1;
-			state_ta.flipuv=(tafifo_buff[2] >> 17) & 3;
-			state_ta.clampuv=(tafifo_buff[2] >> 15) & 3;
-			state_ta.filtermode=(tafifo_buff[2] >> 13) & 3;
-			state_ta.sstexture=(tafifo_buff[2] >> 12) & 1;
-			state_ta.mmdadjust=(tafifo_buff[2] >> 8) & 1;
-			state_ta.tsinstruction=(tafifo_buff[2] >> 6) & 3;
+			//state_ta.textureusize=1 << (3+((state->tafifo_buff[2] >> 3) & 7));
+			//state_ta.texturevsize=1 << (3+(state->tafifo_buff[2] & 7));
+			state_ta.texturesizes=state->tafifo_buff[2] & 0x3f;
+			state_ta.blend_mode = state->tafifo_buff[2] >> 26;
+			state_ta.srcselect=(state->tafifo_buff[2] >> 25) & 1;
+			state_ta.dstselect=(state->tafifo_buff[2] >> 24) & 1;
+			state_ta.fogcontrol=(state->tafifo_buff[2] >> 22) & 3;
+			state_ta.colorclamp=(state->tafifo_buff[2] >> 21) & 1;
+			state_ta.use_alpha = (state->tafifo_buff[2] >> 20) & 1;
+			state_ta.ignoretexalpha=(state->tafifo_buff[2] >> 19) & 1;
+			state_ta.flipuv=(state->tafifo_buff[2] >> 17) & 3;
+			state_ta.clampuv=(state->tafifo_buff[2] >> 15) & 3;
+			state_ta.filtermode=(state->tafifo_buff[2] >> 13) & 3;
+			state_ta.sstexture=(state->tafifo_buff[2] >> 12) & 1;
+			state_ta.mmdadjust=(state->tafifo_buff[2] >> 8) & 1;
+			state_ta.tsinstruction=(state->tafifo_buff[2] >> 6) & 3;
 			if (state_ta.texture == 1)
 			{
-				state_ta.textureaddress=(tafifo_buff[3] & 0x1FFFFF) << 3;
-				state_ta.scanorder=(tafifo_buff[3] >> 26) & 1;
-				state_ta.pixelformat=(tafifo_buff[3] >> 27) & 7;
-				state_ta.mipmapped=(tafifo_buff[3] >> 31) & 1;
-				state_ta.vqcompressed=(tafifo_buff[3] >> 30) & 1;
-				state_ta.strideselect=(tafifo_buff[3] >> 25) & 1;
-				state_ta.paletteselector=(tafifo_buff[3] >> 21) & 0x3F;
+				state_ta.textureaddress=(state->tafifo_buff[3] & 0x1FFFFF) << 3;
+				state_ta.scanorder=(state->tafifo_buff[3] >> 26) & 1;
+				state_ta.pixelformat=(state->tafifo_buff[3] >> 27) & 7;
+				state_ta.mipmapped=(state->tafifo_buff[3] >> 31) & 1;
+				state_ta.vqcompressed=(state->tafifo_buff[3] >> 30) & 1;
+				state_ta.strideselect=(state->tafifo_buff[3] >> 25) & 1;
+				state_ta.paletteselector=(state->tafifo_buff[3] >> 21) & 0x3F;
 				#if DEBUG_PVRDLIST
-				mame_printf_verbose(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, state_ta.pixelformat);
+				mame_printf_verbose(" Texture at %08x format %d\n", (state->tafifo_buff[3] & 0x1FFFFF) << 3, state_ta.pixelformat);
 				#endif
 			}
 			if (state_ta.paratype == 4)
@@ -1520,9 +1540,9 @@ static void process_ta_fifo(running_machine& machine)
 			{
 				#if DEBUG_PVRDLIST
 				mame_printf_verbose(" Vertex modifier volume");
-				mame_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
-					u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]), u2f(tafifo_buff[7]),
-					u2f(tafifo_buff[8]), u2f(tafifo_buff[9]));
+				mame_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f)", u2f(state->tafifo_buff[1]), u2f(state->tafifo_buff[2]),
+					u2f(state->tafifo_buff[3]), u2f(state->tafifo_buff[4]), u2f(state->tafifo_buff[5]), u2f(state->tafifo_buff[6]), u2f(state->tafifo_buff[7]),
+					u2f(state->tafifo_buff[8]), u2f(state->tafifo_buff[9]));
 				mame_printf_verbose("\n");
 				#endif
 			}
@@ -1530,9 +1550,9 @@ static void process_ta_fifo(running_machine& machine)
 			{
 				#if DEBUG_PVRDLIST
 				mame_printf_verbose(" Vertex sprite");
-				mame_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f) D(%f,%f,)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
-					u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]), u2f(tafifo_buff[7]),
-					u2f(tafifo_buff[8]), u2f(tafifo_buff[9]), u2f(tafifo_buff[10]), u2f(tafifo_buff[11]));
+				mame_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f) D(%f,%f,)", u2f(state->tafifo_buff[1]), u2f(state->tafifo_buff[2]),
+					u2f(state->tafifo_buff[3]), u2f(state->tafifo_buff[4]), u2f(state->tafifo_buff[5]), u2f(state->tafifo_buff[6]), u2f(state->tafifo_buff[7]),
+					u2f(state->tafifo_buff[8]), u2f(state->tafifo_buff[9]), u2f(state->tafifo_buff[10]), u2f(state->tafifo_buff[11]));
 				mame_printf_verbose("\n");
 				#endif
 				if (state_ta.texture == 1)
@@ -1541,29 +1561,29 @@ static void process_ta_fifo(running_machine& machine)
 					{
 						strip *ts;
 						vert *tv = &rd->verts[rd->verts_size];
-						tv[0].x = u2f(tafifo_buff[0x1]);
-						tv[0].y = u2f(tafifo_buff[0x2]);
-						tv[0].w = u2f(tafifo_buff[0x3]);
-						tv[1].x = u2f(tafifo_buff[0x4]);
-						tv[1].y = u2f(tafifo_buff[0x5]);
-						tv[1].w = u2f(tafifo_buff[0x6]);
-						tv[3].x = u2f(tafifo_buff[0x7]);
-						tv[3].y = u2f(tafifo_buff[0x8]);
-						tv[3].w = u2f(tafifo_buff[0x9]);
-						tv[2].x = u2f(tafifo_buff[0xa]);
-						tv[2].y = u2f(tafifo_buff[0xb]);
+						tv[0].x = u2f(state->tafifo_buff[0x1]);
+						tv[0].y = u2f(state->tafifo_buff[0x2]);
+						tv[0].w = u2f(state->tafifo_buff[0x3]);
+						tv[1].x = u2f(state->tafifo_buff[0x4]);
+						tv[1].y = u2f(state->tafifo_buff[0x5]);
+						tv[1].w = u2f(state->tafifo_buff[0x6]);
+						tv[3].x = u2f(state->tafifo_buff[0x7]);
+						tv[3].y = u2f(state->tafifo_buff[0x8]);
+						tv[3].w = u2f(state->tafifo_buff[0x9]);
+						tv[2].x = u2f(state->tafifo_buff[0xa]);
+						tv[2].y = u2f(state->tafifo_buff[0xb]);
 						tv[2].w = tv[0].w+tv[3].w-tv[1].w;
-						tv[0].u = u2f(tafifo_buff[0xd] & 0xffff0000);
-						tv[0].v = u2f(tafifo_buff[0xd] << 16);
-						tv[1].u = u2f(tafifo_buff[0xe] & 0xffff0000);
-						tv[1].v = u2f(tafifo_buff[0xe] << 16);
-						tv[3].u = u2f(tafifo_buff[0xf] & 0xffff0000);
-						tv[3].v = u2f(tafifo_buff[0xf] << 16);
+						tv[0].u = u2f(state->tafifo_buff[0xd] & 0xffff0000);
+						tv[0].v = u2f(state->tafifo_buff[0xd] << 16);
+						tv[1].u = u2f(state->tafifo_buff[0xe] & 0xffff0000);
+						tv[1].v = u2f(state->tafifo_buff[0xe] << 16);
+						tv[3].u = u2f(state->tafifo_buff[0xf] & 0xffff0000);
+						tv[3].v = u2f(state->tafifo_buff[0xf] << 16);
 						tv[2].u = tv[0].u+tv[3].u-tv[1].u;
 						tv[2].v = tv[0].v+tv[3].v-tv[1].v;
 
 						ts = &rd->strips[rd->strips_size++];
-						tex_get_info(&ts->ti, &state_ta);
+						tex_get_info(machine, &ts->ti, &state_ta);
 						ts->svert = rd->verts_size;
 						ts->evert = rd->verts_size + 3;
 
@@ -1575,7 +1595,7 @@ static void process_ta_fifo(running_machine& machine)
 			{
 				#if DEBUG_PVRDLIST
 				mame_printf_verbose(" Vertex polygon");
-				mame_printf_verbose(" V(%f,%f,%f) T(%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]));
+				mame_printf_verbose(" V(%f,%f,%f) T(%f,%f)", u2f(state->tafifo_buff[1]), u2f(state->tafifo_buff[2]), u2f(state->tafifo_buff[3]), u2f(state->tafifo_buff[4]), u2f(state->tafifo_buff[5]));
 				mame_printf_verbose("\n");
 				#endif
 				if (rd->verts_size <= 65530)
@@ -1585,18 +1605,18 @@ static void process_ta_fifo(running_machine& machine)
 					/* -- this is also wildly inaccurate! */
 					vert *tv = &rd->verts[rd->verts_size];
 
-					tv->x=u2f(tafifo_buff[1]);
-					tv->y=u2f(tafifo_buff[2]);
-					tv->w=u2f(tafifo_buff[3]);
-					tv->u=u2f(tafifo_buff[4]);
-					tv->v=u2f(tafifo_buff[5]);
+					tv->x=u2f(state->tafifo_buff[1]);
+					tv->y=u2f(state->tafifo_buff[2]);
+					tv->w=u2f(state->tafifo_buff[3]);
+					tv->u=u2f(state->tafifo_buff[4]);
+					tv->v=u2f(state->tafifo_buff[5]);
 
 
 					if((!rd->strips_size) ||
 					   rd->strips[rd->strips_size-1].evert != -1)
 					{
 						strip *ts = &rd->strips[rd->strips_size++];
-						tex_get_info(&ts->ti, &state_ta);
+						tex_get_info(machine, &ts->ti, &state_ta);
 						ts->svert = rd->verts_size;
 						ts->evert = -1;
 					}
@@ -1611,13 +1631,14 @@ static void process_ta_fifo(running_machine& machine)
 
 WRITE64_HANDLER( ta_fifo_poly_w )
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
 
 	if (mem_mask == U64(0xffffffffffffffff))	// 64 bit
 	{
-		tafifo_buff[state_ta.tafifo_pos]=(UINT32)data;
-		tafifo_buff[state_ta.tafifo_pos+1]=(UINT32)(data >> 32);
+		state->tafifo_buff[state_ta.tafifo_pos]=(UINT32)data;
+		state->tafifo_buff[state_ta.tafifo_pos+1]=(UINT32)(data >> 32);
 		#if DEBUG_FIFO_POLY
-		mame_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %" I64FMT "x -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[state_ta.tafifo_pos], tafifo_buff[state_ta.tafifo_pos+1]);
+		mame_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %" I64FMT "x -> %08x %08x\n", 0x10000000+offset*8, data, state->tafifo_buff[state_ta.tafifo_pos], state->tafifo_buff[state_ta.tafifo_pos+1]);
 		#endif
 		state_ta.tafifo_pos += 2;
 	}
@@ -1636,6 +1657,8 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 
 WRITE64_HANDLER( ta_fifo_yuv_w )
 {
+	//dc_state *state = space->machine().driver_data<dc_state>();
+
 //  int reg;
 //  UINT64 shift;
 //  UINT32 dat;
@@ -1693,8 +1716,9 @@ static void computedilated(void)
 			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
 }
 
-static void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
+static void render_hline(running_machine &machine,bitmap_t *bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	int xxl, xxr;
 	float dx, ddx, dudx, dvdx, dwdx;
 	UINT32 *tdata;
@@ -1749,16 +1773,16 @@ static void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float x
                 v = ti->sizey - v;
             }*/
 
-			c = ti->r(ti, u, v);
+			c = ti->r(machine, ti, u, v);
 
 			// debug dip to turn on/off bilinear filtering, it's slooooow
-			if (debug_dip_status&0x1)
+			if (state->debug_dip_status&0x1)
 			{
 				if(ti->filter_mode >= TEX_FILTER_BILINEAR)
 				{
-					UINT32 c1 = ti->r(ti, u+1.0, v);
-					UINT32 c2 = ti->r(ti, u+1.0, v+1.0);
-					UINT32 c3 = ti->r(ti, u, v+1.0);
+					UINT32 c1 = ti->r(machine, ti, u+1.0, v);
+					UINT32 c2 = ti->r(machine, ti, u+1.0, v+1.0);
+					UINT32 c3 = ti->r(machine, ti, u, v+1.0);
 					c = bilinear_filter(c, c1, c2, c3, u, v);
 				}
 			}
@@ -1778,7 +1802,7 @@ static void render_hline(bitmap_t *bitmap, texinfo *ti, int y, float xl, float x
 	}
 }
 
-static void render_span(bitmap_t *bitmap, texinfo *ti,
+static void render_span(running_machine &machine, bitmap_t *bitmap, texinfo *ti,
                  float y0, float y1,
                  float xl, float xr,
                  float ul, float ur,
@@ -1832,7 +1856,7 @@ static void render_span(bitmap_t *bitmap, texinfo *ti,
 	wr += dy*dwrdy;
 
 	while(yy0 < yy1) {
-		render_hline(bitmap, ti, yy0, xl, xr, ul, ur, vl, vr, wl, wr);
+		render_hline(machine, bitmap, ti, yy0, xl, xr, ul, ur, vl, vr, wl, wr);
 
 		xl += dxldy;
 		xr += dxrdy;
@@ -1877,7 +1901,7 @@ static void sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 }
 
 
-static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
+static void render_tri_sorted(running_machine &machine, bitmap_t *bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	float dy01, dy02, dy12;
 //  float dy; // unused, compiler complains about this
@@ -1912,47 +1936,48 @@ static void render_tri_sorted(bitmap_t *bitmap, texinfo *ti, const vert *v0, con
 			return;
 
 		if(v1->x > v0->x)
-			render_span(bitmap, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy);
+			render_span(machine, bitmap, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy);
 		else
-			render_span(bitmap, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
+			render_span(machine, bitmap, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
 
 	} else if(!dy12) {
 
 		if(v2->x > v1->x)
-			render_span(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy);
+			render_span(machine, bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy);
 		else
-			render_span(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy);
+			render_span(machine, bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy);
 
 	} else {
 		if(dx01dy < dx02dy) {
-			render_span(bitmap, ti, v0->y, v1->y,
+			render_span(machine, bitmap, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w,
 						dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy);
-			render_span(bitmap, ti, v1->y, v2->y,
+			render_span(machine, bitmap, ti, v1->y, v2->y,
 						v1->x, v0->x + dx02dy*dy01, v1->u, v0->u + du02dy*dy01, v1->v, v0->v + dv02dy*dy01, v1->w, v0->w + dw02dy*dy01,
 						dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
 		} else {
 
-			render_span(bitmap, ti, v0->y, v1->y,
+			render_span(machine, bitmap, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w,
 						dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy);
-			render_span(bitmap, ti, v1->y, v2->y,
+			render_span(machine, bitmap, ti, v1->y, v2->y,
 						v0->x + dx02dy*dy01, v1->x, v0->u + du02dy*dy01, v1->u, v0->v + dv02dy*dy01, v1->v, v0->w + dw02dy*dy01, v1->w,
 						dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy);
 		}
 	}
 }
 
-static void render_tri(bitmap_t *bitmap, texinfo *ti, const vert *v)
+static void render_tri(running_machine &machine, bitmap_t *bitmap, texinfo *ti, const vert *v)
 {
 	int i0, i1, i2;
 
 	sort_vertices(v, &i0, &i1, &i2);
-	render_tri_sorted(bitmap, ti, v+i0, v+i1, v+i2);
+	render_tri_sorted(machine, bitmap, ti, v+i0, v+i1, v+i2);
 }
 
 static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
+	dc_state *state = machine.driver_data<dc_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int cs,rs,ns;
 	UINT32 c;
@@ -1969,7 +1994,7 @@ static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bit
 	//printf("drawtest!\n");
 
 	rs=state_ta.renderselect;
-	c=pvrta_regs[ISP_BACKGND_T];
+	c=state->pvrta_regs[ISP_BACKGND_T];
 	c=space->read_dword(0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
 	bitmap_fill(bitmap,cliprect,c);
 
@@ -1996,8 +2021,8 @@ static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bit
 
 		for(i=sv; i <= ev-2; i++)
 		{
-			if (!(debug_dip_status&0x2))
-				render_tri(bitmap, &ts->ti, state_ta.grab[rs].verts + i);
+			if (!(state->debug_dip_status&0x2))
+				render_tri(machine, bitmap, &ts->ti, state_ta.grab[rs].verts + i);
 
 		}
 	}
@@ -2025,14 +2050,16 @@ static void render_to_accumulation_buffer(running_machine &machine,bitmap_t *bit
 
 static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,int y)
 {
+	dc_state *state = space->machine().driver_data<dc_state>();
+
 	// the accumulation buffer is always 8888
 	//
 	// the standard format for the framebuffer appears to be 565
 	// yes, this means colour data is lost in the conversion
 
-	UINT32 wc = pvrta_regs[FB_W_CTRL];
-	UINT32 stride = pvrta_regs[FB_W_LINESTRIDE];
-	UINT32 writeoffs = pvrta_regs[FB_W_SOF1];
+	UINT32 wc = state->pvrta_regs[FB_W_CTRL];
+	UINT32 stride = state->pvrta_regs[FB_W_LINESTRIDE];
+	UINT32 writeoffs = state->pvrta_regs[FB_W_SOF1];
 
 	UINT32* src;
 
@@ -2177,15 +2204,17 @@ static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,in
 }
 
 
-static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
+static void pvr_drawframebuffer(running_machine &machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
+	dc_state *state = machine.driver_data<dc_state>();
+
 	int x,y,dy,xi;
 	UINT32 addrp;
 	UINT32 *fbaddr;
 	UINT32 c;
 	UINT32 r,g,b;
 
-	UINT32 wc = pvrta_regs[FB_R_CTRL];
+	UINT32 wc = state->pvrta_regs[FB_R_CTRL];
 	UINT8 unpackmode = (wc & 0x0000000c) >>2;  // aka fb_depth
 	UINT8 enable = (wc & 0x00000001);
 
@@ -2193,8 +2222,8 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 	if (!enable) return;
 
 	// only for rgb565 framebuffer
-	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
-	dy=((pvrta_regs[FB_R_SIZE] >> 10) & 0x3ff)+1;
+	xi=((state->pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
+	dy=((state->pvrta_regs[FB_R_SIZE] >> 10) & 0x3ff)+1;
 
 	dy++;
 	dy*=2; // probably depends on interlace mode, fields etc...
@@ -2205,13 +2234,13 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			// should upsample back to 8-bit output using fb_concat
 			for (y=0;y <= dy;y++)
 			{
-				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+				addrp=state->pvrta_regs[FB_R_SOF1]+y*xi*2;
 				if(spg_pixel_double)
 				{
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+0);
-						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+						c=*(((UINT16 *)state->dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
 						g = (c & 0x03e0) >> 2;
@@ -2231,7 +2260,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=BITMAP_ADDR32(bitmap,y,x);
-						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+						c=*(((UINT16 *)state->dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
 						g = (c & 0x03e0) >> 2;
@@ -2249,13 +2278,13 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 			// should upsample back to 8-bit output using fb_concat
 			for (y=0;y <= dy;y++)
 			{
-				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+				addrp=state->pvrta_regs[FB_R_SOF1]+y*xi*2;
 				if(spg_pixel_double)
 				{
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+0);
-						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+						c=*(((UINT16 *)state->dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
 						g = (c & 0x07e0) >> 3;
@@ -2277,7 +2306,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=BITMAP_ADDR32(bitmap,y,x);
-						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+						c=*(((UINT16 *)state->dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
 						g = (c & 0x07e0) >> 3;
@@ -2294,13 +2323,13 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 		case 0x02: ; // 888 RGB 24-bit - suchie3 - HACKED, see pvr_accumulationbuffer_to_framebuffer!
 			for (y=0;y <= dy;y++)
 			{
-				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+				addrp=state->pvrta_regs[FB_R_SOF1]+y*xi*2;
 				if(spg_pixel_double)
 				{
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+0);
-						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+						c=*(((UINT16 *)state->dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
 						g = (c & 0x07e0) >> 3;
@@ -2321,7 +2350,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=BITMAP_ADDR32(bitmap,y,x);
-						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+						c=*(((UINT16 *)state->dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
 						g = (c & 0x07e0) >> 3;
@@ -2338,13 +2367,13 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 		case 0x03:        // 0888 ARGB 32-bit - HACKED, see pvr_accumulationbuffer_to_framebuffer!
 			for (y=0;y <= dy;y++)
 			{
-				addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+				addrp=state->pvrta_regs[FB_R_SOF1]+y*xi*2;
 				if(spg_pixel_double)
 				{
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=BITMAP_ADDR32(bitmap,y,x*2+0);
-						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+						c=*(((UINT16 *)state->dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
 						g = (c & 0x07e0) >> 3;
@@ -2365,7 +2394,7 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 					for (x=0;x < xi;x++)
 					{
 						fbaddr=BITMAP_ADDR32(bitmap,y,x);
-						c=*(((UINT16 *)dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
+						c=*(((UINT16 *)state->dc_framebuffer_ram) + (WORD2_XOR_LE(addrp) >> 1));
 
 						b = (c & 0x001f) << 3;
 						g = (c & 0x07e0) >> 3;
@@ -2385,16 +2414,18 @@ static void pvr_drawframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 #if DEBUG_PALRAM
 static void debug_paletteram(running_machine &machine)
 {
+	dc_state *state = machine.driver_data<dc_state>();
+
 	UINT64 pal;
 	UINT32 r,g,b;
 	int i;
 
-	//popmessage("%02x",pvrta_regs[PAL_RAM_CTRL]);
+	//popmessage("%02x",state->pvrta_regs[PAL_RAM_CTRL]);
 
 	for(i=0;i<0x400;i++)
 	{
-		pal = pvrta_regs[((0x005F9000-0x005F8000)/4)+i];
-		switch(pvrta_regs[PAL_RAM_CTRL])
+		pal = state->pvrta_regs[((0x005F9000-0x005F8000)/4)+i];
+		switch(state->pvrta_regs[PAL_RAM_CTRL])
 		{
 			case 0: //argb1555 <- guilty gear uses this mode
 			{
@@ -2472,98 +2503,109 @@ static void pvr_build_parameterconfig(void)
 
 static TIMER_CALLBACK(vbin)
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	dc_update_interrupt_status(machine);
 
-	vbin_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
+	state->vbin_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
 }
 
 static TIMER_CALLBACK(vbout)
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
 	dc_update_interrupt_status(machine);
 
-	vbout_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
+	state->vbout_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 }
 
 static TIMER_CALLBACK(hbin)
 {
+	dc_state *state = machine.driver_data<dc_state>();
+
 	if(spg_hblank_int_mode & 1)
 	{
-		if(scanline == next_y)
+		if(state->scanline == state->next_y)
 		{
-			dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
+			state->dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
 			dc_update_interrupt_status(machine);
-			next_y+=spg_line_comp_val;
+			state->next_y+=spg_line_comp_val;
 		}
 	}
-	else if((scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2))
+	else if((state->scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2))
 	{
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
+		state->dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
 		dc_update_interrupt_status(machine);
 	}
 
-//  printf("hbin on scanline %d\n",scanline);
+//  printf("hbin on state->scanline %d\n",state->scanline);
 
-	scanline++;
+	state->scanline++;
 
-	if(scanline >= spg_vblank_in_irq_line_num)
+	if(state->scanline >= spg_vblank_in_irq_line_num)
 	{
-		scanline = 0;
-		next_y = spg_line_comp_val;
+		state->scanline = 0;
+		state->next_y = spg_line_comp_val;
 	}
 
-	hbin_timer->adjust(machine.primary_screen->time_until_pos(scanline, spg_hblank_in_irq-1));
+	state->hbin_timer->adjust(machine.primary_screen->time_until_pos(state->scanline, spg_hblank_in_irq-1));
 }
 
 
 
 static TIMER_CALLBACK(endofrender_video)
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
+	dc_state *state = machine.driver_data<dc_state>();
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
 	dc_update_interrupt_status(machine);
-	endofrender_timer_video->adjust(attotime::never);
+	state->endofrender_timer_video->adjust(attotime::never);
 }
 
 static TIMER_CALLBACK(endofrender_tsp)
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
+	dc_state *state = machine.driver_data<dc_state>();
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 	dc_update_interrupt_status(machine);
 
-	endofrender_timer_tsp->adjust(attotime::never);
-	endofrender_timer_video->adjust(attotime::from_usec(500) );
+	state->endofrender_timer_tsp->adjust(attotime::never);
+	state->endofrender_timer_video->adjust(attotime::from_usec(500) );
 }
 
 static TIMER_CALLBACK(endofrender_isp)
 {
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;	// ISP end of render
+	dc_state *state = machine.driver_data<dc_state>();
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;	// ISP end of render
 	dc_update_interrupt_status(machine);
 
-	endofrender_timer_isp->adjust(attotime::never);
-	endofrender_timer_tsp->adjust(attotime::from_usec(500) );
+	state->endofrender_timer_isp->adjust(attotime::never);
+	state->endofrender_timer_tsp->adjust(attotime::from_usec(500) );
 }
 
 
 VIDEO_START(dc)
 {
-	memset(pvrctrl_regs, 0, sizeof(pvrctrl_regs));
-	memset(pvrta_regs, 0, sizeof(pvrta_regs));
+	dc_state *state = machine.driver_data<dc_state>();
+
+	memset(state->pvrctrl_regs, 0, sizeof(state->pvrctrl_regs));
+	memset(state->pvrta_regs, 0, sizeof(state->pvrta_regs));
 	memset(state_ta.grab, 0, sizeof(state_ta.grab));
 	pvr_build_parameterconfig();
 
 	// if the next 2 registers do not have the correct values, the naomi bios will hang
-	pvrta_regs[PVRID]=0x17fd11db;
-	pvrta_regs[REVISION]=0x11;
+	state->pvrta_regs[PVRID]=0x17fd11db;
+	state->pvrta_regs[REVISION]=0x11;
 	/* FIXME: move the following regs inside MACHINE_RESET */
-	pvrta_regs[VO_CONTROL]=		0x00000108;
-	pvrta_regs[SOFTRESET]=		0x00000007;
-	pvrta_regs[VO_STARTX]=		0x0000009d;
-	pvrta_regs[VO_STARTY]=		0x00150015;
-	pvrta_regs[SPG_HBLANK]=		0x007e0345;
-	pvrta_regs[SPG_LOAD]=		0x01060359;
-	pvrta_regs[SPG_VBLANK]=		0x01500104;
-	pvrta_regs[SPG_HBLANK_INT]=	0x031d0000;
-	pvrta_regs[SPG_VBLANK_INT]=	0x01500104;
+	state->pvrta_regs[VO_CONTROL]=		0x00000108;
+	state->pvrta_regs[SOFTRESET]=		0x00000007;
+	state->pvrta_regs[VO_STARTX]=		0x0000009d;
+	state->pvrta_regs[VO_STARTY]=		0x00150015;
+	state->pvrta_regs[SPG_HBLANK]=		0x007e0345;
+	state->pvrta_regs[SPG_LOAD]=		0x01060359;
+	state->pvrta_regs[SPG_VBLANK]=		0x01500104;
+	state->pvrta_regs[SPG_HBLANK_INT]=	0x031d0000;
+	state->pvrta_regs[SPG_VBLANK_INT]=	0x01500104;
 
 	state_ta.tafifo_pos=0;
 	state_ta.tafifo_mask=7;
@@ -2575,25 +2617,25 @@ VIDEO_START(dc)
 
 	computedilated();
 
-	vbout_timer = machine.scheduler().timer_alloc(FUNC(vbout));
-	vbout_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
+	state->vbout_timer = machine.scheduler().timer_alloc(FUNC(vbout));
+	state->vbout_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 
-	vbin_timer = machine.scheduler().timer_alloc(FUNC(vbin));
-	vbin_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
+	state->vbin_timer = machine.scheduler().timer_alloc(FUNC(vbin));
+	state->vbin_timer->adjust(machine.primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
 
-	hbin_timer = machine.scheduler().timer_alloc(FUNC(hbin));
-	hbin_timer->adjust(machine.primary_screen->time_until_pos(0, spg_hblank_in_irq-1));
+	state->hbin_timer = machine.scheduler().timer_alloc(FUNC(hbin));
+	state->hbin_timer->adjust(machine.primary_screen->time_until_pos(0, spg_hblank_in_irq-1));
 
-	scanline = 0;
-	next_y = 0;
+	state->scanline = 0;
+	state->next_y = 0;
 
-	endofrender_timer_isp = machine.scheduler().timer_alloc(FUNC(endofrender_isp));
-	endofrender_timer_tsp = machine.scheduler().timer_alloc(FUNC(endofrender_tsp));
-	endofrender_timer_video = machine.scheduler().timer_alloc(FUNC(endofrender_video));
+	state->endofrender_timer_isp = machine.scheduler().timer_alloc(FUNC(endofrender_isp));
+	state->endofrender_timer_tsp = machine.scheduler().timer_alloc(FUNC(endofrender_tsp));
+	state->endofrender_timer_video = machine.scheduler().timer_alloc(FUNC(endofrender_video));
 
-	endofrender_timer_isp->adjust(attotime::never);
-	endofrender_timer_tsp->adjust(attotime::never);
-	endofrender_timer_video->adjust(attotime::never);
+	state->endofrender_timer_isp->adjust(attotime::never);
+	state->endofrender_timer_tsp->adjust(attotime::never);
+	state->endofrender_timer_video->adjust(attotime::never);
 
 	fake_accumulationbuffer_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_RGB32);
 
@@ -2601,6 +2643,8 @@ VIDEO_START(dc)
 
 SCREEN_UPDATE(dc)
 {
+	dc_state *state = screen->machine().driver_data<dc_state>();
+
 	/******************
       MAME note
     *******************
@@ -2617,7 +2661,6 @@ SCREEN_UPDATE(dc)
 //  static int useframebuffer=1;
 //  const rectangle &visarea = screen->visible_area();
 //  int y,x;
-	//printf("videoupdate\n");
 
 #if DEBUG_PALRAM
 	debug_paletteram(screen->machine());
@@ -2639,10 +2682,10 @@ SCREEN_UPDATE(dc)
 	bitmap_fill(bitmap,cliprect,MAKE_ARGB(0xff,vo_border_R,vo_border_G,vo_border_B)); //FIXME: Chroma bit?
 
 	if(!spg_blank_video)
-		pvr_drawframebuffer(bitmap,cliprect);
+		pvr_drawframebuffer(screen->machine(),bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
-	debug_dip_status = input_port_read(screen->machine(), "MAMEDEBUG");
+	state->debug_dip_status = input_port_read(screen->machine(), "MAMEDEBUG");
 
 	return 0;
 }
