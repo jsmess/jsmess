@@ -198,10 +198,7 @@ XR22-050-3B Pinout
 
     TODO:
 
-    - update Z80 DART/CTC/SIO references to C++ style
-    - rewrite abc806 bankswitch to use install_ram/rom
     - ABC800 keyboard: T1 clock frequency, caps lock led, keydown
-    - ABC802/806 ABC77 keyboard
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
 
 */
@@ -905,8 +902,6 @@ INPUT_PORTS_START( abc800 )
 	PORT_DIPSETTING(    0x2e, "Asynchronous, Split Speed" )
 	PORT_DIPSETTING(    0x50, "Synchronous" )
 	PORT_DIPSETTING(    0x8b, "ABC NET" )
-
-	//PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 
@@ -935,8 +930,6 @@ static INPUT_PORTS_START( abc802 )
 	PORT_DIPNAME( 0x08, 0x08, "Frame Frequency" )
 	PORT_DIPSETTING(    0x00, "60 Hz" )
 	PORT_DIPSETTING(    0x08, "50 Hz" )
-
-	//PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 
@@ -951,8 +944,6 @@ static INPUT_PORTS_START( abc806 )
 	PORT_DIPSETTING(    0x2e, "Asynchronous, Split Speed" )
 	PORT_DIPSETTING(    0x50, "Synchronous" )
 	PORT_DIPSETTING(    0x8b, "ABC NET" )
-
-	//PORT_INCLUDE(luxor_55_21046)
 INPUT_PORTS_END
 
 
