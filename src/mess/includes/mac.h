@@ -15,11 +15,22 @@
 #include "machine/egret.h"
 #include "machine/nubus.h"
 #include "machine/ncr539x.h"
+#include "sound/asc.h"
 #include "sound/awacs.h"
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
 #define MAC_539X_2_TAG "539x_2"
+
+// model helpers
+#define ADB_IS_BITBANG	((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_QUADRA_700))
+#define ADB_IS_BITBANG_CLASS	((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_QUADRA_700))
+#define ADB_IS_EGRET	(mac->m_model >= MODEL_MAC_LC && mac->m_model <= MODEL_MAC_CLASSIC_II) || ((mac->m_model >= MODEL_MAC_IISI) && (mac->m_model <= MODEL_MAC_IIVI))
+#define ADB_IS_PM_VIA1	(mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100)
+#define ADB_IS_PM_VIA2	(mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PBDUO_270c)
+#define ADB_IS_PM_VIA1_CLASS	(m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100)
+#define ADB_IS_PM_VIA2_CLASS	(m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c)
+#define ADB_IS_PM_CLASS	((m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100) || (m_model >= MODEL_MAC_PB140 && m_model <= MODEL_MAC_PBDUO_270c))
 
 /* for Egret and CUDA streaming MCU commands, command types */
 typedef enum
@@ -150,7 +161,7 @@ DRIVER_INIT(macpb140);
 DRIVER_INIT(macpb160);
 DRIVER_INIT(maciivx);
 DRIVER_INIT(maciifx);
-DRIVER_INIT(macpbduo210);
+DRIVER_INIT(macpd210);
 DRIVER_INIT(macquadra700);
 
 NVRAM_HANDLER( mac );
@@ -340,6 +351,8 @@ public:
 	void adb_talk();
 	void mouse_callback();
     void rbv_recalc_irqs();
+	void pmu_exec();
+	void mac_adb_newaction(int state);
 
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
@@ -419,6 +432,8 @@ private:
 	int adb_pollkbd(int update);
 	int adb_pollmouse();
 	void adb_accummouse( UINT8 *MouseX, UINT8 *MouseY );
+	void pmu_one_byte_reply(UINT8 result);
+	void pmu_three_byte_reply(UINT8 result1, UINT8 result2, UINT8 result3);
 
     // wait states for accessing the VIA
     int m_via_cycles;

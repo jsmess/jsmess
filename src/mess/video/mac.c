@@ -1057,7 +1057,7 @@ WRITE32_MEMBER(mac_state::macwd_w)
             break;
 
         default:
-            printf("macwd_w: %x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(m_maincpu));
+//            printf("macwd_w: %x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(m_maincpu));
             break;
     }
 }

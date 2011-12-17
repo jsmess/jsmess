@@ -392,41 +392,6 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 	}
 }
 
-READ32_MEMBER(mac_state::mac_read_id)
-{
-//  printf("Mac read ID reg @ PC=%x\n", cpu_get_pc(m_maincpu));
-
-	switch (m_model)
-	{
-		case MODEL_MAC_LC_III:
-			return 0xa55a0001;	// 25 MHz LC III
-
-		case MODEL_MAC_LC_III_PLUS:
-			return 0xa55a0003;	// 33 MHz LC III+
-
-		case MODEL_MAC_POWERMAC_6100:
-			return 0xa55a3011;
-
-		case MODEL_MAC_POWERMAC_7100:
-			return 0xa55a3012;
-
-		case MODEL_MAC_POWERMAC_8100:
-			return 0xa55a3013;
-
-		case MODEL_MAC_PBDUO_210:
-			return 0xa55a1004;
-
-		case MODEL_MAC_PBDUO_230:
-			return 0xa55a1005;
-
-		case MODEL_MAC_PBDUO_250:
-			return 0xa55a1006;
-
-		default:
-			return 0;
-	}
-}
-
 // Portable/PB100 video
 static VIDEO_START( macprtb )
 {
@@ -768,7 +733,26 @@ static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
 // fc4003da bit 3 is VBL
     AM_RANGE(0xfcff8000, 0xfcffffff) AM_ROM AM_REGION("vrom", 0x0000)
 ADDRESS_MAP_END
+#if 0
+static ADDRESS_MAP_START(macpd210_map, AS_PROGRAM, 32, mac_state )
+	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
+	AM_RANGE(0x50f00000, 0x50f01fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff)
+	AM_RANGE(0x50f02000, 0x50f03fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffff)
+	AM_RANGE(0x50f04000, 0x50f05fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffff)
+	AM_RANGE(0x50f06000, 0x50f07fff) AM_READWRITE(macii_scsi_drq_r, macii_scsi_drq_w)
+	AM_RANGE(0x50f10000, 0x50f11fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffff)
+	AM_RANGE(0x50f12060, 0x50f12063) AM_READ(macii_scsi_drq_r)
+	AM_RANGE(0x50f14000, 0x50f15fff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffffffff)
+	AM_RANGE(0x50f16000, 0x50f17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
+	AM_RANGE(0x50f20000, 0x50f21fff) AM_READWRITE8(mac_gsc_r, mac_gsc_w, 0xffffffff)
+	AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
+
+	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_read_id)
+
+	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM	AM_BASE(m_vram) AM_MIRROR(0x0ffe0000)
+ADDRESS_MAP_END
+#endif
 static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x40000000, 0x400fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0ff00000)
 
@@ -1472,7 +1456,16 @@ static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
     MCFG_RAM_DEFAULT_SIZE("4M")
     MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
+#if 0
+static MACHINE_CONFIG_DERIVED( macpd210, macpb160 )
+	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
+	MCFG_CPU_PROGRAM_MAP(macpd210_map)
 
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M")
+MACHINE_CONFIG_END
+#endif
 static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
@@ -2123,6 +2116,11 @@ ROM_START( maccclas )
 	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
 ROM_END
 
+/*ROM_START( macpd210 )
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+	ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) ) 
+ROM_END*/
+
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
 COMP( 1984, mac128k,  0,		0,	mac128k,  macplus,  mac128k512k,  "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k,  "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
@@ -2152,6 +2150,7 @@ COMP( 1992, macpb145, macpb140, 0,  macpb145, macadb,   macpb140,	  "Apple Compu
 COMP( 1992, macpb160, 0,        0,  macpb160, macadb,   macpb160,	  "Apple Computer", "Macintosh PowerBook 160", GAME_NOT_WORKING )
 COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb,   macpb160,	  "Apple Computer", "Macintosh PowerBook 180", GAME_NOT_WORKING )
 COMP( 1992, macpb180c,macpb160, 0,  macpb180c,macadb,   macpb160,     "Apple Computer", "Macintosh PowerBook 180c", GAME_NOT_WORKING )
+//COMP( 1992, macpd210, 0,        0,  macpd210, macadb,   macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", GAME_NOT_WORKING )
 COMP( 1993, maccclas, 0,        0,  maclc2,   macadb,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
 COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145B", GAME_NOT_WORKING )
 COMP( 1993, maclc3,   0,		0,	maclc3,   maciici,  maclc3,	      "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
