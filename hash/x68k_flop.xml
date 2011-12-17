@@ -6835,7 +6835,7 @@
 	</software>
 
 	<software name="gingpow">
-		<description>Ginga Eiyuu Densetsu Power Up &smp; Scenario Shuu</description>
+		<description>Ginga Eiyuu Densetsu Power Up &amp; Scenario Shuu</description>
 		<year>1990</year>
 		<publisher>Bothtec</publisher>
 		<part name="flop1" interface="floppy_5_25">
