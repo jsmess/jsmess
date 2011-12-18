@@ -75,8 +75,6 @@ void sms_state::map_cart_8k( UINT16 address, UINT16 bank )
 	{
 		UINT16 rom_bank_count = m_cartridge[m_current_cartridge].size / 0x2000;
 		bank_start = m_cartridge[m_current_cartridge].ROM + ((rom_bank_count > 0) ? bank % rom_bank_count : 0) * 0x2000;
-if ( bank >= rom_bank_count )
-printf("%s: swiching to bank %02x of %02x\n", machine().describe_context(), bank, rom_bank_count);
 	}
 
 	switch ( address )
@@ -1027,7 +1025,7 @@ WRITE8_HANDLER( sms_mapper_w )
 
 			if ( ! ( state->m_mapper[0] & 0x08 ) )		// Is RAM disabled
 			{
-				if ( ! state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_NOBANK_MAPPER )
+				if ( ! ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_NOBANK_MAPPER ) )
 				{
 					state->map_cart_16k( 0x8000, data );
 				}
