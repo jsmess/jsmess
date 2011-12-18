@@ -19,6 +19,12 @@
 class sms_state : public driver_device
 {
 public:
+	void map_cart_16k( UINT16 address, UINT16 bank );
+	void map_cart_8k( UINT16 address, UINT16 bank );
+	void map_bios_16k( UINT16 address, UINT16 bank );
+	void map_bios_8k( UINT16 address, UINT16 bank );
+
+public:
 	sms_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag) { }
 
@@ -43,9 +49,9 @@ public:
 	// we are going to use 1-6, same as bank numbers. Notice, though, that most mappers
 	// only work on 16K banks and, hence, banks 4-6 are not always directly set
 	// (they often use bank3 + 0x2000 and bank5 + 0x2000)
-	UINT8 *m_banking_bios[7];
-	UINT8 *m_banking_cart[7];
-	UINT8 *m_banking_none[7];
+	UINT8 *m_banking_bios[8];
+	UINT8 *m_banking_cart[8];
+	UINT8 *m_banking_none;
 	UINT8 m_gg_sio[5];
 	UINT8 m_store_control;
 	UINT8 m_input_port0;
@@ -99,21 +105,26 @@ public:
 	/* Data needed for SegaScope (3D glasses) */
 	UINT8 m_sscope_state;
 
-	/* Data needed for Terebi Oekaki (TV Draw) */
-	UINT8 m_tvdraw_data;
-
 	/* Cartridge slot info */
 	UINT8 m_current_cartridge;
 	struct
 	{
 		UINT8 *ROM;        /* Pointer to ROM image data */
 		UINT32 size;       /* Size of the ROM image */
-		UINT8 features;    /* on-cartridge special hardware */
+		UINT32 features;   /* on-cartridge special hardware */
 		UINT8 *cartSRAM;   /* on-cartridge SRAM */
 		UINT8 sram_save;   /* should be the contents of the on-cartridge SRAM be saved */
 		UINT8 *cartRAM;    /* additional on-cartridge RAM (64KB for Ernie Els Golf) */
 		UINT32 ram_size;   /* size of the on-cartridge RAM */
 		UINT8 ram_page;    /* currently swapped in cartridge RAM */
+
+		/* Data needed for Terebi Oekaki (TV Draw) */
+		UINT8 m_tvdraw_data;
+
+		/* Data needed for 4pak mapper */
+		UINT8 m_4pak_page0;
+		UINT8 m_4pak_page1;
+		UINT8 m_4pak_page2;
 	} m_cartridge[MAX_CARTRIDGES];
 };
 

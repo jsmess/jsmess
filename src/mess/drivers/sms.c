@@ -74,7 +74,8 @@ DC00      - Selection buttons #2, 9-16 (R)
 
 static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")					/* First 0x0400 part always points to first page */
-	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK("bank2")					/* switchable rom bank */
+	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")					/* switchable rom bank */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")					/* switchable rom bank */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")					/* switchable rom bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* switchable rom bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)	/* ROM bank / on-cart RAM */
@@ -87,7 +88,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")					/* First 0x0400 part always points to first page */
-	AM_RANGE(0x0400, 0x3fff) AM_ROMBANK("bank2")					/* switchable rom bank */
+	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")					/* switchable rom bank */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")					/* switchable rom bank */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")					/* switchable rom bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* switchable rom bank */
 	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)	/* ROM bank / on-cart RAM */
