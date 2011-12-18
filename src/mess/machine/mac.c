@@ -290,13 +290,13 @@ void mac_state::field_interrupts()
 		return;	// no interrupts for PowerPC yet
 	}
 
-	if (m_last_taken_interrupt != -1)
+	if (m_last_taken_interrupt > -1)
 	{
 		cputag_set_input_line(machine(), "maincpu", m_last_taken_interrupt, CLEAR_LINE);
 		m_last_taken_interrupt = -1;
 	}
 
-	if (take_interrupt != -1)
+	if (take_interrupt > -1)
 	{
 		cputag_set_input_line(machine(), "maincpu", take_interrupt, ASSERT_LINE);
 		m_last_taken_interrupt = take_interrupt;
@@ -1945,8 +1945,7 @@ void mac_state::machine_reset()
 	m_rtc_state = 0;
 	m_pm_data_send = m_pm_data_recv = m_pm_ack = m_pm_req = m_pm_dptr = 0;
 	m_pm_state = 0;
-
-	// "variable not exist" memset(m_egregs, 0xff, sizeof(m_egregs));
+	m_last_taken_interrupt = 0;
 }
 
 
