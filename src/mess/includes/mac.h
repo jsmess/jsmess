@@ -329,9 +329,6 @@ public:
     // this is shared among all video setups with vram
 	UINT32 *m_vram;
 
-	// Egret/Caboose/Cuda stuff
-	UINT8 m_egregs[0x20];
-
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_asc_interrupt, m_last_taken_interrupt;
 
