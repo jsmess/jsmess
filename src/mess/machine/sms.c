@@ -73,8 +73,10 @@ void sms_state::map_cart_8k( UINT16 address, UINT16 bank )
 
 	if ( m_cartridge[m_current_cartridge].ROM )
 	{
-		UINT8 rom_bank_count = m_cartridge[m_current_cartridge].size / 0x2000;
+		UINT16 rom_bank_count = m_cartridge[m_current_cartridge].size / 0x2000;
 		bank_start = m_cartridge[m_current_cartridge].ROM + ((rom_bank_count > 0) ? bank % rom_bank_count : 0) * 0x2000;
+if ( bank >= rom_bank_count )
+printf("%s: swiching to bank %02x of %02x\n", machine().describe_context(), bank, rom_bank_count);
 	}
 
 	switch ( address )
@@ -160,7 +162,7 @@ void sms_state::map_bios_8k( UINT16 address, UINT16 bank )
 
 	if ( m_BIOS )
 	{
-		bank_start = m_BIOS + ((m_bios_page_count > 0) ? bank % m_bios_page_count : 0) * 0x2000;
+		bank_start = m_BIOS + ((m_bios_page_count > 0) ? bank % ( m_bios_page_count << 1 ) : 0) * 0x2000;
 	}
 
 	switch ( address )
@@ -1795,6 +1797,31 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	if ((detect_tvdraw(state->m_cartridge[index].ROM)) && state->m_is_region_japan)
 	{
 		state->m_cartridge[index].features |= CF_TVDRAW;
+	}
+
+	if (state->m_cartridge[index].features & CF_JANGGUN_MAPPER)
+	{
+		// Reverse bytes when bit 6 in the mapper is set
+
+		if ( state->m_cartridge[index].size <= 0x40 * 0x4000 )
+		{
+			UINT8 *new_rom = auto_alloc_array(machine, UINT8, 0x80 * 0x4000);
+			UINT32 dest = 0;
+
+			while ( dest < 0x40 * 0x4000 )
+			{
+				memcpy( new_rom + dest, state->m_cartridge[index].ROM, state->m_cartridge[index].size );
+				dest += state->m_cartridge[index].size;
+			}
+
+			for ( dest = 0; dest < 0x40 * 0x4000; dest++ )
+			{
+				new_rom[ 0x40 * 0x4000 + dest ] = BITSWAP8( new_rom[ dest ], 0, 1, 2, 3, 4, 5, 6, 7);
+			}
+
+			state->m_cartridge[index].ROM = new_rom;
+			state->m_cartridge[index].size = 0x80 * 0x4000;
+		}
 	}
 
 	LOG(("Cart Features: %x\n", state->m_cartridge[index].features));
