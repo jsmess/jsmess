@@ -1946,7 +1946,7 @@ void mac_state::machine_reset()
 	m_pm_data_send = m_pm_data_recv = m_pm_ack = m_pm_req = m_pm_dptr = 0;
 	m_pm_state = 0;
 
-	memset(m_egregs, 0xff, sizeof(m_egregs));
+	// "variable not exist" memset(m_egregs, 0xff, sizeof(m_egregs));
 }
 
 
