@@ -20,6 +20,8 @@
 #define CF_4PAK_MAPPER             0x100
 #define CF_JANGGUN_MAPPER          0x200
 #define CF_TVDRAW                  0x400
+#define CF_MAPPER_BITS             ( CF_CODEMASTERS_MAPPER | CF_KOREAN_MAPPER | CF_KOREAN_ZEMINA_MAPPER | \
+                                     CF_KOREAN_NOBANK_MAPPER | CF_4PAK_MAPPER | CF_JANGGUN_MAPPER )
 
 #define LGUN_RADIUS           6
 #define LGUN_X_INTERVAL       4
@@ -1554,7 +1556,6 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	running_machine &machine = image.device().machine();
 	sms_state *state = machine.driver_data<sms_state>();
 	int size, index = 0, offset = 0;
-	const char *extrainfo = NULL;
 
 	if (strcmp(image.device().tag(), "cart1") == 0)
 		index = 0;
@@ -1691,34 +1692,8 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		}
 	}
 
-	/* Detect special features from the extrainfo field */
-	if (extrainfo)
-	{
-		/* Check for codemasters mapper */
-		if (strstr(extrainfo, "CODEMASTERS"))
-			state->m_cartridge[index].features |= CF_CODEMASTERS_MAPPER;
-
-		/* Check for korean mapper */
-		if (strstr(extrainfo, "KOREAN"))
-			state->m_cartridge[index].features |= CF_KOREAN_MAPPER;
-
-		/* Check for special SMS Compatibility mode gamegear cartridges */
-		if (state->m_is_gamegear && strstr(extrainfo, "GGSMS"))
-			state->m_cartridge[index].features |= CF_GG_SMS_MODE;
-
-		/* Check for 93C46 eeprom */
-		if (strstr(extrainfo, "93C46"))
-			state->m_cartridge[index].features |= CF_93C46_EEPROM;
-
-		/* Check for 8KB on-cart RAM */
-		if (strstr(extrainfo, "8KB_CART_RAM"))
-		{
-			state->m_cartridge[index].features |= CF_ONCART_RAM;
-			state->m_cartridge[index].ram_size = 0x2000;
-			state->m_cartridge[index].cartRAM = auto_alloc_array(machine, UINT8, state->m_cartridge[index].ram_size);
-		}
-	}
-	else
+	// If no mapper bits are set attempt to autodetect the mapper
+	if ( ! ( state->m_cartridge[index].features & CF_MAPPER_BITS ) )
 	{
 		/* If no extrainfo information is available try to find special information out on our own */
 		/* Check for special cartridge features (new routine, courtesy of Omar Cornut, from MEKA)  */
