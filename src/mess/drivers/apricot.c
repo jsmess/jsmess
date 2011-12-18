@@ -339,9 +339,9 @@ static const floppy_interface apricot_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD_40,
+	FLOPPY_STANDARD_3_5_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(apricot),
-	NULL,
+	"floppy_3_5",
 	NULL
 };
 
