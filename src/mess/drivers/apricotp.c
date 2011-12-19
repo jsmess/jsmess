@@ -16,14 +16,14 @@
 
 	TODO:
 	
-	- CTC/SIO interrupt acknowledge
-	- CTC clocks
+	- devices
+	- LCD
 	- sound
-	- portable has wrong devices
 
 */
 
 #include "includes/apricotp.h"
+#include "apricotp.lh"
 
 
 
@@ -31,9 +31,39 @@
 //  VIDEO
 //**************************************************************************
 
+//-------------------------------------------------
+//  mc6845_interface crtc_intf
+//-------------------------------------------------
+
+static MC6845_UPDATE_ROW( fp_update_row )
+{
+}
+
+static const mc6845_interface crtc_intf =
+{
+	SCREEN_CRT_TAG,
+	8,
+	NULL,
+	fp_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
+
+
 bool fp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update(&bitmap, &cliprect);
+	if (&screen == machine().first_screen())
+	{
+		// TODO
+	}
+	else
+	{
+		m_crtc->update(&bitmap, &cliprect);
+	}
 
 	return false;
 }
@@ -67,7 +97,7 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START( fp_mem, AS_PROGRAM, 16, fp_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xeffff) AM_RAM// AM_BASE(m_p_videoram)
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM// AM_BASE(m_p_videoram)
 	AM_RANGE(0xf0000, 0xf7fff) AM_RAM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
@@ -164,13 +194,37 @@ static const struct pic8259_interface pic_intf =
 
 
 //-------------------------------------------------
+//  pit8253_config pit_intf
+//-------------------------------------------------
+
+static const struct pit8253_config pit_intf =
+{
+	{
+		{
+			2000000,
+			DEVCB_LINE_VCC,
+			DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir0_w)
+		}, {
+			2000000,
+			DEVCB_LINE_VCC,
+			DEVCB_NULL
+		}, {
+			2000000,
+			DEVCB_LINE_VCC,
+			DEVCB_NULL
+		}
+	}
+};
+
+
+//-------------------------------------------------
 //  I8237_INTERFACE( dmac_intf )
 //-------------------------------------------------
 
 static I8237_INTERFACE( dmac_intf )
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir7_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	{ DEVCB_NULL, DEVCB_DEVICE_HANDLER(WD2797_TAG, wd17xx_data_r), DEVCB_NULL, DEVCB_NULL },
@@ -253,29 +307,6 @@ static const centronics_interface centronics_intf =
 };
 
 
-//-------------------------------------------------
-//  mc6845_interface crtc_intf
-//-------------------------------------------------
-
-static MC6845_UPDATE_ROW( fp_update_row )
-{
-}
-
-static const mc6845_interface crtc_intf =
-{
-	SCREEN_TAG,
-	8,
-	NULL,
-	fp_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -289,6 +320,13 @@ void fp_state::machine_start()
 {
 	// register CPU IRQ callback
 	device_set_irq_callback(m_maincpu, fp_irq_callback);
+	
+	// configure RAM
+	if (m_ram->size() == 256 * 1024)
+	{
+		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+		program->unmap_readwrite(0x40000, 0x7ffff);
+	}
 }
 
 
@@ -313,27 +351,40 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_DEFAULT_LAYOUT( layout_apricotp )
+
+	MCFG_SCREEN_ADD(SCREEN_LCD_TAG, LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	
+	MCFG_SCREEN_ADD(SCREEN_CRT_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+
+	MCFG_PALETTE_LENGTH(16)
 	MCFG_GFXDECODE(act_f1)
-	MCFG_DEFAULT_LAYOUT( layout_lcd )
-	
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, 4000000, crtc_intf)
 
 	/* Devices */
 	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
 	MCFG_I8237_ADD(I8237_TAG, 250000, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
+	MCFG_PIT8253_ADD(I8253A5_TAG, pit_intf)
 	MCFG_Z80DART_ADD(Z80SIO0_TAG, 2500000, sio_intf)
 	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(act_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("512K")
 MACHINE_CONFIG_END
 
 
@@ -353,6 +404,14 @@ ROM_START( fp )
 
 	ROM_REGION( 0x1000, HD63B01V1_TAG, 0 )
 	ROM_LOAD( "voice interface hd63b01v01.ic29", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "tbp24s10.ic73", 0x000, 0x100, NO_DUMP ) // address decoder 256x4
+
+	ROM_REGION( 0x100, "plds", 0 )
+	ROM_LOAD( "pal1 pal12l6.ic2", 0x000, 0x100, NO_DUMP ) // ?
+	ROM_LOAD( "pal2 pal10l8.ic35", 0x000, 0x100, NO_DUMP ) // address decoder
+	ROM_LOAD( "pal3 pal12l6.ic77", 0x000, 0x100, NO_DUMP ) // ?
 ROM_END
 
 

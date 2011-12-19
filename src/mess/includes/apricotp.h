@@ -14,6 +14,8 @@
 #include "machine/apricotkb.h"
 #include "machine/ctronics.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
 #include "machine/wd17xx.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
@@ -25,11 +27,11 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define SCREEN_TAG		"screen"
 #define I8086_TAG		"ic7"
 #define I8284_TAG		"ic30"
 #define I8237_TAG		"ic17"
 #define I8259A_TAG		"ic51"
+#define I8253A5_TAG		"ic20"
 #define TMS4500_TAG		"ic42"
 #define MC6845_TAG		"ic69"
 #define HD63B01V1_TAG	"ic29"
@@ -39,6 +41,8 @@
 #define WD2797_TAG		"ic5"
 #define UPD7507C_TAG	"ic2"
 #define CENTRONICS_TAG	"centronics"
+#define SCREEN_LCD_TAG	"screen0"
+#define SCREEN_CRT_TAG	"screen1"
 
 
 
@@ -57,9 +61,11 @@ public:
 		  m_soundcpu(*this, HD63B01V1_TAG),
 		  m_dmac(*this, I8237_TAG),
 		  m_pic(*this, I8259A_TAG),
+		  m_pit(*this, I8253A5_TAG),
 		  m_sio(*this, Z80SIO0_TAG),
 		  m_fdc(*this, WD2797_TAG),
 		  m_crtc(*this, MC6845_TAG),
+		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_centronics(*this, CENTRONICS_TAG)
 	{ }
@@ -68,9 +74,11 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<i8237_device> m_dmac;
 	required_device<device_t> m_pic;
+	required_device<device_t> m_pit;
 	required_device<z80dart_device> m_sio;
 	required_device<device_t> m_fdc;
 	required_device<mc6845_device> m_crtc;
+	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_centronics;
 
