@@ -28,6 +28,23 @@
 
 
 //**************************************************************************
+//  MACROS/CONSTANTS
+//**************************************************************************
+
+enum
+{
+	LED_STOP = 0,
+	LED_POWER,
+	LED_SHIFT_LOCK,
+	LED_DISK,
+	LED_VOICE,
+	LED_COLOUR_SELECT,
+	LED_CAPS_LOCK
+};
+
+
+
+//**************************************************************************
 //  VIDEO
 //**************************************************************************
 
@@ -54,11 +71,35 @@ static const mc6845_interface crtc_intf =
 };
 
 
+void fp_state::video_start()
+{
+	// allocate memory
+	m_video_ram = auto_alloc_array(machine(), UINT16, 0x20000);
+}
+
+
 bool fp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (&screen == machine().first_screen())
 	{
-		// TODO
+		offs_t addr = (!BIT(m_video, 4) << 15) | (BIT(m_video, 1) << 14);
+
+		for (int y = 0; y < 200; y++)
+		{
+			for (int sx = 0; sx < 40; sx++)
+			{
+				UINT16 data = m_video_ram[addr++];
+				
+				for (int x = 0; x < 16; x++)
+				{
+					int color = BIT(data, 15);
+					
+					*BITMAP_ADDR16(&bitmap, y, (sx * 16) + x) = color;
+					
+					data <<= 1;
+				}
+			}
+		}
 	}
 	else
 	{
@@ -86,6 +127,176 @@ static GFXDECODE_START( act_f1 )
 GFXDECODE_END
 
 
+READ8_MEMBER( fp_state::prtr_snd_r )
+{
+	/*
+	
+		bit		description
+		
+		0		BUSY
+		1		SE
+		2		_FAULT
+		3		PE
+		4		LP23
+		5		DCNG-L
+		6		J9 1-2
+		7		J9 3-4
+	
+	*/
+	
+	UINT8 data = 0;
+	
+	data |= centronics_busy_r(m_centronics);
+	data |= centronics_vcc_r(m_centronics) << 1;
+	data |= centronics_fault_r(m_centronics) << 2;
+	data |= centronics_pe_r(m_centronics) << 3;
+	
+	return data;
+}
+
+WRITE8_MEMBER( fp_state::pint_clr_w )
+{
+	pic8259_ir6_w(m_pic, CLEAR_LINE);
+}
+
+
+WRITE8_MEMBER( fp_state::ls_w )
+{
+	centronics_strobe_w(m_centronics, !BIT(data, 0));
+}
+
+
+WRITE8_MEMBER( fp_state::contrast_w )
+{
+	
+}
+
+
+WRITE8_MEMBER( fp_state::palette_w )
+{
+	/*
+	
+		bit		description
+		
+		0		B
+		1		G
+		2		R
+		3		I
+		4		index
+		5		index
+		6		index
+		7		index
+	
+	*/
+}
+
+
+WRITE16_MEMBER( fp_state::video_w )
+{
+	/*
+	
+		bit		description
+		
+		0		CRTRES-H
+		1		SEL1
+		2		DON-H
+		3		LCDON-H
+		4		SEL2
+		5		L3 even access
+		6		L2 odd access
+		7		L1 video RAM enable
+		8		
+		9		STOP LED
+		10		POWER LED
+		11		SHIFT LOCK LED
+		12		DISK LED
+		13		VOICE LED
+		14		COLOUR SELECT LED
+		15		CAPS LOCK LED
+	
+	*/
+
+	m_video = data & 0xff;
+}
+
+
+READ16_MEMBER( fp_state::mem_r )
+{
+	UINT16 data = 0xffff;
+	
+	if (offset >= 0xd0000/2 && offset < 0xf0000/2)
+	{
+		if (BIT(m_video, 7))
+		{
+			data = m_video_ram[offset - 0xd0000/2];
+		}
+		else
+		{
+			if (offset < m_ram->size()/2)
+			{
+				data = m_work_ram[offset];
+			}
+		}
+	}
+	else
+	{
+		if (offset < m_ram->size()/2)
+		{
+			data = m_work_ram[offset];
+		}
+	}
+
+	return data;
+}
+
+
+WRITE16_MEMBER( fp_state::mem_w )
+{
+	if (offset >= 0xd0000/2 && offset < 0xe0000/2)
+	{
+		if (BIT(m_video, 7))
+		{
+			m_video_ram[offset - 0xd0000/2] = data;
+		}
+		else
+		{
+			if (offset < m_ram->size()/2)
+			{
+				m_work_ram[offset] = data;
+			}
+		}
+	}
+	else if (offset >= 0xe0000/2 && offset < 0xf0000/2)
+	{
+		if (BIT(m_video, 7))
+		{
+			if (BIT(m_video, 5))
+			{
+				m_video_ram[offset - 0xd0000/2] = (data & 0xff00) | (m_video_ram[offset - 0xd0000/2] & 0x00ff);
+			}
+			
+			if (BIT(m_video, 6))
+			{
+				m_video_ram[offset - 0xd0000/2] = (data & 0x00ff) | (m_video_ram[offset - 0xd0000/2] & 0xff00);
+			}
+		}
+		else
+		{
+			if (offset < m_ram->size()/2)
+			{
+				m_work_ram[offset] = data;
+			}
+		}
+	}
+	else
+	{
+		if (offset < m_ram->size()/2)
+		{
+			m_work_ram[offset] = data;
+		}
+	}
+}
+
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -97,8 +308,7 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START( fp_mem, AS_PROGRAM, 16, fp_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM// AM_BASE(m_p_videoram)
-	AM_RANGE(0xf0000, 0xf7fff) AM_RAM
+	AM_RANGE(0x00000, 0xf7fff) AM_READWRITE(mem_r, mem_w)
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
@@ -108,6 +318,21 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w, 0x00ff)
+	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8_LEGACY(I8253A5_TAG, pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8_LEGACY(Z80SIO0_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w, 0x00ff)
+	AM_RANGE(0x020, 0x021) AM_DEVWRITE8_LEGACY(CENTRONICS_TAG, centronics_data_w, 0x00ff)
+	AM_RANGE(0x022, 0x023) AM_WRITE8(pint_clr_w, 0x00ff)
+	AM_RANGE(0x024, 0x025) AM_READ8(prtr_snd_r, 0x00ff)
+	AM_RANGE(0x026, 0x027) AM_DEVWRITE8_LEGACY(SN76489AN_TAG, sn76496_w, 0x00ff)
+	AM_RANGE(0x028, 0x029) AM_WRITE8(contrast_w, 0x00ff)
+	AM_RANGE(0x02a, 0x02b) AM_WRITE8(palette_w, 0x00ff)
+	AM_RANGE(0x02e, 0x02f) AM_WRITE(video_w)
+	AM_RANGE(0x040, 0x05f) AM_DEVREADWRITE8_LEGACY(I8237_TAG, i8237_r, i8237_w, 0x00ff)
+	AM_RANGE(0x068, 0x06b) AM_DEVREADWRITE8_LEGACY(I8259A_TAG, pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x06c, 0x06d) AM_DEVWRITE8(MC6845_TAG, mc6845_device, address_w, 0x00ff)
+	AM_RANGE(0x06e, 0x06f) AM_DEVREADWRITE8(MC6845_TAG, mc6845_device, register_r, register_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -298,11 +523,16 @@ static const wd17xx_interface fdc_intf =
 //  centronics_interface centronics_intf
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( fp_state::busy_w )
+{
+	if (!state)	pic8259_ir6_w(m_pic, ASSERT_LINE);
+}
+
 static const centronics_interface centronics_intf =
 {
 	0,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(fp_state, busy_w),
 	DEVCB_NULL
 };
 
@@ -313,20 +543,26 @@ static const centronics_interface centronics_intf =
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_START( pc1512 )
+//  MACHINE_START( fp )
 //-------------------------------------------------
 
 void fp_state::machine_start()
 {
 	// register CPU IRQ callback
 	device_set_irq_callback(m_maincpu, fp_irq_callback);
-	
-	// configure RAM
-	if (m_ram->size() == 256 * 1024)
-	{
-		address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-		program->unmap_readwrite(0x40000, 0x7ffff);
-	}
+
+	// allocate memory
+	m_work_ram = auto_alloc_array(machine(), UINT16, m_ram->size() / 2);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( fp )
+//-------------------------------------------------
+
+void fp_state::machine_reset()
+{
+	m_video = 0;
 }
 
 
@@ -370,6 +606,11 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_GFXDECODE(act_f1)
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, 4000000, crtc_intf)
+	
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
@@ -384,7 +625,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K")
+	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
 MACHINE_CONFIG_END
 
 
@@ -421,4 +662,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1984, fp,    0,      0,      fp,   fp,    0,     "ACT",   "Apricot Portable / FP", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1984, fp,    0,      0,      fp,   fp,    0,     "ACT",   "Apricot Portable / FP", GAME_NOT_WORKING )
