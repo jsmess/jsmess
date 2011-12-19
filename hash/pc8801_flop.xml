@@ -344,7 +344,7 @@ TO FIX
 	</software>
 
 	<software name="n80basic">
-		<description>N80-BASIC</description>
+		<description>N80 BASIC v1.8</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -354,24 +354,13 @@ TO FIX
 		</part>
 	</software>
 
-	<software name="n80basia">
+	<software name="n80basica" cloneof="n80basic">
 		<description>N80 BASIC (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="pc8001_flop">
-			<dataarea name="flop" size="348848">
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 34301 -->
 				<rom name="n80 basic (1983)(microsoft - nec).d88" size="348848" crc="ff9416a4" sha1="3321c6a723545ef7f413a372683a1e40ef7ea4ef" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="n80basica" cloneof="n80basic">
-		<description>N80 BASIC v1.8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="pc8001_flop">
-			<dataarea name="flop" size="348848">
-				<rom name="n80 basic v1.8 (1981)(microsoft).d88" size="348848" crc="00b2a439" sha1="ce234142ec31e8ec2e862042b2c6889650ed59d6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -617,13 +606,13 @@ TO FIX
 		<!--rom name="saito yuki demo.d88" size="697984" crc="e879576f" sha1="4f7344ce305d86c9492f0527c4120d5ac0ced37a" offset="0"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="31424">
+			<dataarea name="flop" size="31424">	<!-- Data CRC16: 2590 -->
 				<rom name="saito yuki demo (disk 1).d88" size="349136" crc="596501d6" sha1="b698d49dcdf16dbe97151d368a5f7f139a5b4dd6" offset="0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="31424">
+			<dataarea name="flop" size="31424">	<!-- Data CRC16: 15660 -->
 				<rom name="saito yuki demo (disk 2).d88" size="348848" crc="0b6f69cb" sha1="f90808d7368a2c3d09a67570754b8e27f3ec4b98" offset="0"/>
 			</dataarea>
 		</part>
@@ -835,7 +824,7 @@ TO FIX
 		<info name="release" value="198310xx"/>
 		<info name="alt_title" value="ファンタジックキュービック Part.Ⅳ -Twenty by Twelve-"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="66240">
+			<dataarea name="flop" size="66240">	<!-- Data CRC16: 58722 -->
 				<rom name="twenty by twelve.d88" size="66240" crc="44784a25" sha1="73e70047f323a65808cdcd4af425b5a6ba71ede5" offset="0" />
 			</dataarea>
 		</part>
@@ -865,7 +854,7 @@ TO FIX
 		<info name="release" value="198308xx"/>
 		<info name="alt_title" value="四次元の家"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 34880 -->
 				<rom name="4 dimension house.d88" size="348848" crc="90e85539" sha1="450867c78915238f9de40bb98cd9d03f63eb01b6" offset="0" />
 			</dataarea>
 		</part>
@@ -2299,7 +2288,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<publisher>Kotobuki Raison</publisher>
 		<!-- PC8801 -->
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="350112">
+			<dataarea name="flop" size="350112">	<!-- Data CRC16: 47519 -->
 				<rom name="alleycat.img" size="350112" crc="1a9083f3" sha1="5f9bbffb20d843ce53c7c2cc14cd10c517575f27" offset="0" />
 			</dataarea>
 		</part>
@@ -2552,7 +2541,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk " />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 16141 -->
 				<rom name="angel (system disk).d88" size="348848" crc="6854a327" sha1="1d79b55f0829430c59132c10996d423b8be4a18c" offset="0" />
 			</dataarea>
 		</part>
@@ -2560,7 +2549,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<!-- Common User Disk... is it blank?!? -->
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk " />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 42538 -->
 				<rom name="angel (user disk).d88" size="348848" crc="ff186ffb" sha1="a81214fa015bbe0e1e163678da34f072fc6672c7" offset="0" />
 			</dataarea>
 		</part>
@@ -2578,7 +2567,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 
 		<part name="flop1" interface="floppy_5_25" >
 			<feature name="part id" value="System" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 63152 -->
 				<rom name="the fightgirls angel (system).d88" size="348848" crc="2bb1dec5" sha1="cf2c349aee80395be22a17bae35261d4e85cb497" offset="0" />
 			</dataarea>
 		</part>
@@ -2586,7 +2575,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<!-- Common User Disk... is it blank?!? -->
 		<part name="flop2" interface="floppy_5_25" >
 			<feature name="part id" value="User" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 42538 -->
 				<rom name="the fightgirls angel (user).d88" size="348848" crc="ff186ffb" sha1="a81214fa015bbe0e1e163678da34f072fc6672c7" offset="0" />
 			</dataarea>
 		</part>
@@ -2604,21 +2593,21 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="436624">
+			<dataarea name="flop" size="436624">	<!-- Data CRC16: 48649 -->
 				<rom name="angel hearts (disk a).d88" size="436624" crc="9352bc27" sha1="60eca937f08ef9305f52b68b2bf1d514896038b3" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="437472">
+			<dataarea name="flop" size="437472">	<!-- Data CRC16: 24860 -->
 				<rom name="angel hearts (disk b).d88" size="437472" crc="a6527bcb" sha1="357d47d01760a0552c563f7bb5db2dbae31e3b45" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="437472">
+			<dataarea name="flop" size="437472">	<!-- Data CRC16: 8462 -->
 				<rom name="angel hearts (disk c).d88" size="437472" crc="bac5ecb3" sha1="f3c19858edf814d1f8cd8f8f868b35b350275582" offset="0" />
 			</dataarea>
 		</part>
@@ -2636,28 +2625,28 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="418368">
+			<dataarea name="flop" size="418368">	<!-- Data CRC16: 63647 -->
 				<rom name="angelous (disk a).d88" size="418368" crc="f83fa80c" sha1="4ea807a4b47be435aedd94b52937f370f62144e8" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="415824">
+			<dataarea name="flop" size="415824">	<!-- Data CRC16: 33429 -->
 				<rom name="angelous (disk b).d88" size="415824" crc="d95bc7d0" sha1="b3946013ab48be61c6be2b051f42902bf44e7d18" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="416864">
+			<dataarea name="flop" size="416864">	<!-- Data CRC16: 64233 -->
 				<rom name="angelous (disk c).d88" size="416864" crc="c9a21924" sha1="403d5cbddf5cc30014425117442e4f8484832ec6" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="415824">
+			<dataarea name="flop" size="415824">	<!-- Data CRC16: 28265 -->
 				<rom name="angelous (disk d).d88" size="415824" crc="12692c66" sha1="51dfc8dd04fb34699fb3c2acd7f226f8b5c679e5" offset="0" />
 			</dataarea>
 		</part>
@@ -2675,28 +2664,28 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk 1" />
-			<dataarea name="flop" size="414128">
+			<dataarea name="flop" size="414128">	<!-- Data CRC16: 61388 -->
 				<rom name="angelus (disk 1).d88" size="414128" crc="65f3776c" sha1="7af8d2d3c9416afa5b995080be82a660cf3e1a7b" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk 2" />
-			<dataarea name="flop" size="415824">
+			<dataarea name="flop" size="415824">	<!-- Data CRC16: 33429 -->
 				<rom name="angelus (disk 2).d88" size="415824" crc="9fd79d6a" sha1="98d77681e2797c83e20f767ff5db9f6caac7c8ae" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part id" value="Disk 3" />
-			<dataarea name="flop" size="415824">
+			<dataarea name="flop" size="415824">	<!-- Data CRC16: 33502 -->
 				<rom name="angelus (disk 3).d88" size="415824" crc="97f39e75" sha1="3ed1bc197d4cad204443515fa9d4a0320cb17107" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part id" value="Disk 4" />
-			<dataarea name="flop" size="415824">
+			<dataarea name="flop" size="415824">	<!-- Data CRC16: 28265 -->
 				<rom name="angelus (disk 4).d88" size="415824" crc="54e576dc" sha1="0cc184abc364d71fc2f231b7fa49f9b64fc253c7" offset="0" />
 			</dataarea>
 		</part>
@@ -2710,7 +2699,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="青い宇宙の冒険"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="350160">
+			<dataarea name="flop" size="350160">	<!-- Data CRC16: 42756 -->
 				<rom name="aoi.d88" size="350160" crc="53375267" sha1="ec077c1ef2780f1a9d7aff5fc411ef1349c70a42" offset="0" />
 			</dataarea>
 		</part>
@@ -2724,7 +2713,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<info name="release" value="198507xx"/>
 		<info name="alt_title" value="蒼き狼と白き牝鹿"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 4429 -->
 				<rom name="aoki ookami to shiroki mejika.d88" size="348848" crc="2b993b09" sha1="3453dacb8eb071d42838d65b213285b08fbf047a" offset="0" />
 			</dataarea>
 		</part>
@@ -2738,7 +2727,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		<info name="release" value="198507xx"/>
 		<info name="alt_title" value="蒼き狼と白き牝鹿"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 59896 -->
 				<rom name="aoki ookami to shiroki mejika (a).d88" size="348848" crc="ddc78a1e" sha1="715ca5054cfb99ebdee9e388812e50f05cfde7eb" offset="0" />
 			</dataarea>
 		</part>
@@ -2756,35 +2745,35 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 
 		<part name="flop1" interface="floppy_5_25" >
 			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="381392">
+			<dataarea name="flop" size="381392">	<!-- Data CRC16: 20298 -->
 				<rom name="aoki ookami to shiroki mejika - gencho hisshi (disk a).d88" size="381392" crc="73a2eafb" sha1="cfecff38564f9db89f1abfa7cc2383c4cebeadc6" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25" >
 			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="380832">
+			<dataarea name="flop" size="380832">	<!-- Data CRC16: 7831 -->
 				<rom name="aoki ookami to shiroki mejika - gencho hisshi (disk b).d88" size="380832" crc="63ac8e1f" sha1="f909d6d236dbf3460d6cd8aa0c5c2b4803e44fdf" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25" >
 			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="380832">
+			<dataarea name="flop" size="380832">	<!-- Data CRC16: 51623 -->
 				<rom name="aoki ookami to shiroki mejika - gencho hisshi (disk c).d88" size="380832" crc="1641b017" sha1="1891184047e9101778c7f409bf2d0864f273642d" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25" >
 			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="380832">
+			<dataarea name="flop" size="380832">	<!-- Data CRC16: 19416 -->
 				<rom name="aoki ookami to shiroki mejika - gencho hisshi (disk d).d88" size="380832" crc="27d7afbf" sha1="4e1585d66e4b5ced150d2c301a720d659fa6cfe1" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25" >
 			<feature name="part id" value="Save Disk" />
-			<dataarea name="flop" size="380832">
+			<dataarea name="flop" size="380832">	<!-- Data CRC16: 49167 -->
 				<rom name="aoki ookami to shiroki mejika - gencho hisshi (save disk).d88" size="380832" crc="73e47e31" sha1="a39b67ec2b096e46230897d46f4c8fe6c8e007d1" offset="0" />
 			</dataarea>
 		</part>
@@ -2802,28 +2791,28 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 
 		<part name="flop1" interface="floppy_5_25" >
 			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="381136">
+			<dataarea name="flop" size="381136">	<!-- Data CRC16: 49036 -->
 				<rom name="aoki ookami to shiroki mejika genghis khan (disk a).d88" size="381136" crc="336a0c57" sha1="f3beea85d6471a9b9386d3a98cd234e21118262f" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25" >
 			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="380848">
+			<dataarea name="flop" size="380848">	<!-- Data CRC16: 13159 -->
 				<rom name="aoki ookami to shiroki mejika genghis khan (disk b).d88" size="380848" crc="2d78dc6c" sha1="1a6e26f3bde3e1fcd51123f261a3b69796149206" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25" >
 			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="380848">
+			<dataarea name="flop" size="380848">	<!-- Data CRC16: 54486 -->
 				<rom name="aoki ookami to shiroki mejika genghis khan (disk c).d88" size="380848" crc="81b9f93e" sha1="a1f91f31db10133484e93bb28a7aaf6dd4fb6f40" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25" >
 			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="380848">
+			<dataarea name="flop" size="380848">	<!-- Data CRC16: 49865 -->
 				<rom name="aoki ookami to shiroki mejika genghis khan (disk d).d88" size="380848" crc="e2688e79" sha1="757caa631e33477e06f7e9a90f5ada7d284b550f" offset="0" />
 			</dataarea>
 		</part>
@@ -2838,28 +2827,28 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="380864">
+			<dataarea name="flop" size="380864">	<!-- Data CRC16: 49864 -->
 				<rom name="aoki ookami to shiroki mejika genghis khan(soundware maybe) (disk a).d88" size="380864" crc="6da2bebc" sha1="a1a7dc7db06dd1d1539eec52847c7a80fc739a27" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="380848">
+			<dataarea name="flop" size="380848">	<!-- Data CRC16: 24549 -->
 				<rom name="aoki ookami to shiroki mejika genghis khan(soundware maybe) (disk b).d88" size="380848" crc="7747d151" sha1="495916c6f3c9ac825df4aeda9636434dc7e61016" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="380848">
+			<dataarea name="flop" size="380848">	<!-- Data CRC16: 7093 -->
 				<rom name="aoki ookami to shiroki mejika genghis khan(soundware maybe) (disk c).d88" size="380848" crc="5afa673e" sha1="868fa726df0f13e0659e593d4dc760557bc7330a" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part id" value="User" />
-			<dataarea name="flop" size="380848">
+			<dataarea name="flop" size="380848">	<!-- Data CRC16: 2604 -->
 				<rom name="aoki ookami to shiroki mejika genghis khan(soundware maybe) (user).d88" size="380848" crc="1ed0dedd" sha1="3e58e9bac7093a7c1def3726ccff49d5c7f59c4b" offset="0" />
 			</dataarea>
 		</part>

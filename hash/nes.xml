@@ -12638,7 +12638,7 @@
 		</part>
 	</software>
 
-	<software name="gegege" cloneof="ninjakid">
+	<software name="gegege" cloneof="ninjakid" supported="no">
 		<description>GeGeGe no Kitarou: Youkai Daimakyou (Jpn)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -23880,7 +23880,7 @@
 		</part>
 	</software>
 
-	<software name="ninjakid">
+	<software name="ninjakid" supported="no">
 		<description>Ninja Kid (USA)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -41838,7 +41838,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="gegegep" cloneof="ninjakid">
+	<software name="gegegep" cloneof="ninjakid" supported="no">
 		<description>Gegege no Kitarou - Youkai Dai Makyou (Jpn, Prototype)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -48283,7 +48283,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- NTDEC / Gluk Video (the latter company being a Spanish importer?) -->
 
-	<software name="fighther">
+	<software name="fighther" supported="no">
 		<description>Fighting Hero (Asia)</description>
 		<year>1991</year>
 		<publisher>Mega Soft</publisher>
@@ -48531,7 +48531,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software-->
 
-	<software name="fighthr3">
+	<software name="fighthr3" supported="no">
 		<description>Fighting Hero III (Asia)</description>
 		<year>1993</year>
 		<publisher>NTDEC</publisher>
@@ -50959,14 +50959,14 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- [NJ070] 傲剑江湖 ~ Ao Jian Jiang Hu -->
 <!-- [NJ071] 新月剑痕 ~ Xin Yue Jian Hen -->
 
-	<software name="fengyind" supported="no">
+	<software name="fengyind">
 		<description>Feng Yin Dao (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ072"/>
 		<info name="alt_title" value="(塞尔达) 封印岛 ~ (Zelda) Link's Awakening"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" /> <!-- is this correct? -->
+			<feature name="pcb" value="WAIXING-G" />
 			<dataarea name="prg" size="524288">
 				<rom name="feng yin dao (nj072) (ch).prg" size="524288" crc="1fb4022d" sha1="b50c82a4018a7a361c471f8789c2d11fe1777a4b" offset="00000" status="baddump" />
 			</dataarea>
@@ -50976,14 +50976,14 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="wlwz" supported="no">
+	<software name="wlwz">
 		<description>Wu Lin Wai Zhuan (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ073"/>
 		<info name="alt_title" value="武林外传"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" /> <!-- is this correct? -->
+			<feature name="pcb" value="WAIXING-G" />
 			<dataarea name="prg" size="524288">
 				<rom name="wulin waizhuan (unl) (nanjing).prg" size="524288" crc="fc334c0c" sha1="46e283344b9e7ab4e2279031e30adf8774164be3" offset="00000" status="baddump" />
 			</dataarea>
@@ -50993,14 +50993,14 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="yixing" supported="no">
+	<software name="yixing">
 		<description>Yi Xing (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ074"/>
 		<info name="alt_title" value="异形 ~ Aliens vs. Predator"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" /> <!-- is this correct? -->
+			<feature name="pcb" value="WAIXING-G" />
 			<dataarea name="prg" size="524288">
 				<rom name="yixing zhi taikong tanxianzhe (unl) (nanjing).prg" size="524288" crc="17d3759e" sha1="891dee588262e366101dce3212c482998a08d1bc" offset="00000" status="baddump" />
 			</dataarea>
@@ -51293,7 +51293,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="ffant5" supported="partial">
+	<software name="ffant5" supported="no">
 		<description>Final Fantasy V (Asia)</description>
 		<year>19??</year>
 		<publisher>Union Bond?</publisher>
@@ -54268,7 +54268,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- nointro -->
 	<software name="fengshen">
-		<description>Feng Shen Bang (Asia)</description>
+		<description>Feng Shen Bang - Zhu Lu Zhi Zhan (Asia)</description>
 		<!-- TOSEC & GoodNES: Fong Shen Bang - Zhu Lu Zhi Zhan check -->
 		<year>1995</year>
 		<publisher>Computer &amp; Entertainment</publisher>
@@ -56089,9 +56089,9 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="eurosens">
-		<description>Europe Sensen (Asia)</description>
+		<description>Europe Sensen (Chi)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Waixing</publisher>
 		<info name="alt_title" value="欧陆之战"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -56137,8 +56137,9 @@ from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="fengshena" cloneof="fengshen">
 		<description>Fong Shen Bang - Zhu Lu Zhi Zhan (Chi, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Computer &amp; Entertainment</publisher>
+		<info name="serial" value="G-0151"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="CNE-PSB" />
 			<dataarea name="chr" size="524288">
@@ -56155,8 +56156,9 @@ from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="fengshenb" cloneof="fengshen">
 		<description>Fong Shen Bang - Zhu Lu Zhi Zhan (Chi, Alt 2)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Computer &amp; Entertainment</publisher>
+		<info name="serial" value="G-0151"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="CNE-PSB" />
 			<dataarea name="chr" size="524288">
@@ -58689,7 +58691,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="gegegeh" cloneof="ninjakid">
+	<software name="gegegeh" cloneof="ninjakid" supported="no">
 		<description>GeGeGe no Kitarou: Youkai Daimakyou (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -60390,7 +60392,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="ghgc">
+	<software name="ghgc" supported="no">
 		<description>Gaau Hok Gwong Cheung (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -60398,6 +60400,9 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="pcb" value="UNL-43272" />
 			<dataarea name="prg" size="262144">
 				<rom name="gaau hok gwong cheung (ch) [u][!].prg" size="262144" crc="3eee9ad8" sha1="662adb1d4714a0e2cf0a1da714b9c03e6086d2e8" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -61756,7 +61761,7 @@ resulting in tons of glitches? -->
 	</software>
 
 <!-- FIXME: which board should use this game?? -->
-	<software name="fifa96" cloneof="goal2">
+	<software name="fifa96" cloneof="goal2" supported="no">
 		<description>FIFA International 2' 96 (Goal!! pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64136,10 +64141,10 @@ We include them here as reference if they should coincide with later revisions o
 These have been ripped from SmyNES and decrypted (by CaH4e3?), but it would
 be better to redump them properly. -->
 
-	<software name="fengkuan">
+	<software name="fengkuan" supported="no">
 		<description>Feng Kuang Ji Dan Zi - Flighty Chicken (Asia, Decrypted SmyNES)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Waixing</publisher>
 		<info name="alt_title" value="疯狂鸡蛋仔"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -64327,7 +64332,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="garousp1" cloneof="garousp">
+	<software name="garousp1" cloneof="garousp" supported="no">
 		<description>Garou Densetsu Special (Asia, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -64378,8 +64383,8 @@ be better to redump them properly. -->
 
 	<software name="fatfur2a" cloneof="fatfur2" supported="partial">
 		<description>Fatal Fury 2' (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
