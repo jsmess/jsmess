@@ -567,6 +567,8 @@ $(MESSOBJ)/acorn.a:				\
 $(MESSOBJ)/act.a:				\
 	$(MESS_DRIVERS)/apricot.o	\
 	$(MESS_DRIVERS)/apricotf.o	\
+	$(MESS_DRIVERS)/apricotp.o	\
+	$(MESS_MACHINE)/apricotkb.o	\
 	$(MESS_DRIVERS)/victor9k.o	\
 
 $(MESSOBJ)/amiga.a:				\
