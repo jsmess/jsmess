@@ -75,10 +75,10 @@ bool f1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 	return false;
 }
 
-bool f1p_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return false;
-}
+//bool f1p_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+//{
+//	return false;
+//}
 
 READ16_MEMBER( f1_state::palette_r )
 {
