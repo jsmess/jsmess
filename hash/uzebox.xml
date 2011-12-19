@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="uzebox" description="Uzebox internal EPROM contents">
-	<software name="arkanoid">
+	<software name="arkanoid" supported="no">
 		<description>Arkanoid</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -11,7 +11,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="bitmapd">
+	<software name="bitmapd" supported="no">
 		<description>Bitmap Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -21,7 +21,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="drmario">
+	<software name="drmario" supported="no">
 		<description>Dr Mario</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -31,7 +31,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="maze">
+	<software name="maze" supported="no">
 		<description>Maze</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -41,7 +41,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="megatris">
+	<software name="megatris" supported="no">
 		<description>Megatris</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -51,7 +51,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="musicdmo">
+	<software name="musicdmo" supported="no">
 		<description>Music Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -61,7 +61,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="sdcardd">
+	<software name="sdcardd" supported="no">
 		<description>SD Card Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -71,7 +71,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="sprited">
+	<software name="sprited" supported="no">
 		<description>Sprite Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -81,7 +81,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="smariod">
+	<software name="smariod" supported="no">
 		<description>Super Mario Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -91,7 +91,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="tutorial">
+	<software name="tutorial" supported="no">
 		<description>Tutorial</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -101,7 +101,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="uzeamp">
+	<software name="uzeamp" supported="no">
 		<description>UzeAmp</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -111,7 +111,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="vectord">
+	<software name="vectord" supported="no">
 		<description>Vector Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -121,7 +121,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="videod">
+	<software name="videod" supported="no">
 		<description>Video Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -131,7 +131,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="wamole">
+	<software name="wamole" supported="no">
 		<description>Whack-a-Mole</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
