@@ -18,6 +18,7 @@
 #include "machine/ram.h"
 #include "machine/wd17xx.h"
 #include "machine/z80dart.h"
+#include "sound/sn76496.h"
 #include "video/mc6845.h"
 #include "rendlay.h"
 
@@ -39,7 +40,7 @@
 #define AD1408_TAG		"ic37"
 #define Z80SIO0_TAG		"ic6"
 #define WD2797_TAG		"ic5"
-#define UPD7507C_TAG	"ic2"
+#define SN76489AN_TAG	"ic13"
 #define CENTRONICS_TAG	"centronics"
 #define SCREEN_LCD_TAG	"screen0"
 #define SCREEN_CRT_TAG	"screen1"
@@ -83,8 +84,26 @@ public:
 	required_device<device_t> m_centronics;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 
+	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	
+	DECLARE_READ16_MEMBER( mem_r );
+	DECLARE_WRITE16_MEMBER( mem_w );
+	DECLARE_READ8_MEMBER( prtr_snd_r );
+	DECLARE_WRITE8_MEMBER( pint_clr_w );
+	DECLARE_WRITE8_MEMBER( ls_w );
+	DECLARE_WRITE8_MEMBER( contrast_w );
+	DECLARE_WRITE8_MEMBER( palette_w );
+	DECLARE_WRITE16_MEMBER( video_w );
+	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	
+	UINT16 *m_work_ram;
+	
+	// video state
+	UINT16 *m_video_ram;
+	UINT8 m_video;
 };
 
 
