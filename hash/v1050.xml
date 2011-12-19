@@ -20,7 +20,27 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="cpm3b14" cloneof="cpm3">
+		<description>CP/M Plus v3.0 (BIOS 1.4)</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="CP2768-1"/>
 
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358022">
+				<rom name="cpm_plus.imd" size="358022" crc="4bdb61ce" sha1="ef7ead3043135ea2d32795baa9ba0bc5f5695d87" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<!-- Additional Files -->
+			<dataarea name="flop" size="364682">
+				<rom name="cpm_add.imd" size="364682" crc="3b190357" sha1="c733db6d9592088f7b655a156edefbf5b6834555" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="multplan">
 		<description>Multiplan v1.06</description>
 		<year>1982</year>
