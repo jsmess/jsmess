@@ -7635,6 +7635,20 @@ ExtractDisk  [02]"Disk 2		  " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
+	<software name="daisekiy">
+		<description>Daisekiyuo</description>
+		<year>1983</year>
+		<publisher>ブレーンメディア (Brain Media)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="大石油王"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="66240">
+				<rom name="daisekiyuo.d88" size="66240" crc="c958bf03" sha1="b99874d82527ddb2d33e87d49c45b09ad8a71545" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="daisenry">
 		<description>Daisenryaku 88</description>
 		<year>1986</year>
@@ -9366,7 +9380,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 	</software>
 
 	<software name="dokuron">
-		<description>Dokuron no Kan</description>
+		<description>Dokuron no Yakata</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -11489,6 +11503,21 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
+	<!-- box says it's also for pc8001 (32k) and pc8001mkII -->
+	<software name="fanfun">
+		<description>Fan Fun</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8001 -->
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="ファンファン"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="31424">
+				<rom name="fanfun.d88" size="31424" crc="4d31b443" sha1="65c0e564c99f57eb4551dadb28b8a1ee387386cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fangs">
 		<description>Fangs</description>
 		<year>1991</year>
@@ -11628,6 +11657,19 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 			<feature name="part id" value="Disk C" />
 			<dataarea name="flop" size="348848">
 				<rom name="fantasy lope (disk c).d88" size="348848" crc="6cc02c78" sha1="4785f65bcaabd6e11b35fc61b07180e9efa9c599" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thefarwa">
+		<description>The Farway</description>
+		<year>1983</year>
+		<publisher>ブレーンメディア (Brain Media)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198310xx"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35776">
+				<rom name="the farway.d88" size="35776" crc="f376b81b" sha1="b96a37d6d3d429ac3ef8364c28f7641abd84d916" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -16969,6 +17011,20 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
+	<software name="joshiprv">
+		<description>Joshidaisei Private</description>
+		<year>1983</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198311xx"/>
+		<info name="alt_title" value="女子大生プライベート"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="66240">
+				<rom name="joshidaisei private.d88" size="66240" crc="bb03a520" sha1="7d57c996e8be87693281efc3e032163118be8f37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jotunn">
 		<description>Jotunn</description>
 		<year>1988</year>
@@ -18627,6 +18683,30 @@ ExtractDisk  [04]"D_USER		  " -> "kon'yamo asamade powerful mahjong 2_04.d88"
 			<feature name="part id" value="Disk D" />
 			<dataarea name="flop" size="348832">
 				<rom name="koroshi no dress 2 (disk d).d88" size="348832" crc="3470938a" sha1="74d17155d8257c48caa6194f5f319580df290f6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kosokido">
+		<description>Kosoku Kido Butai</description>
+		<year>1983</year>
+		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="高速機動部隊"/>
+		<!--combined image-->
+		<!--rom name="kubo kido butai(taskforce).d88" size="697680" crc="64c467b3" sha1="5d8f0c516e038e8a7246151de27d9bb9bc511b06" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25" >
+			<feature name="part id" value="BASIC" />
+			<dataarea name="flop" size="348848">
+				<rom name="kubo kido butai(taskforce) (basic).d88" size="348848" crc="70077beb" sha1="68846f9916595e2c37f2db272280e44a7a36a9ab" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25" >
+			<dataarea name="flop" size="348832">
+				<rom name="kubo kido butai(taskforce) (disk 2).d88" size="348832" crc="0de15ef0" sha1="4c8437063eaa9ccd855da783a15d14a53a862493" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21772,7 +21852,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="mtantojo">
 		<description>Meitantei Tojo!</description>
 		<year>1984</year>
-		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<publisher>クリスタルソフト (Crystal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="名探偵登場!"/>
@@ -24737,6 +24817,34 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 			<feature name="part id" value="Disk 2" />
 			<dataarea name="flop" size="348848">
 				<rom name="panga (1997)(soft plan)(disk 2 of 2).d88" size="348848" crc="a38c0500" sha1="d84c963f7fffcb4448ffe19932d5afa699ba528c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panorama">
+		<description>Panorama-to</description>
+		<year>1983</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ぱのらま島"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349648">
+				<rom name="panorama-to.d88" size="349648" crc="1fedc1bc" sha1="194982008ba2c33dde5f9bdcd29e17ce0b5b806a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panoramaa" cloneof="panorama">
+		<description>Panorama-to (Alt)</description>
+		<year>1983</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ぱのらま島"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349648">
+				<rom name="panorama-to (a).d88" size="349648" crc="fb462603" sha1="0ded6ada13f982ac7562c805f03758618c5927b0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -43211,7 +43319,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 <!-- PC88VA -->
 
 <!-- Possibly Undumped PC88VA games:
-    [some of these might have been discs compatible with both PC88VA and PC98, 
+    [some of these might have been discs compatible with both PC88VA and PC98,
     or compatible with both PC88VA and PC8801, so they could be in other collections]
     * Flight in Hawaii ~ フライトインハワイ, released 1986-09 by Carry Soft
     * Coach ~ 名監督, by JDS
@@ -44215,17 +44323,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="daisekiy">
-		<description>Daisekiyuo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="66240">
-				<rom name="daisekiyuo.d88" size="66240" crc="c958bf03" sha1="b99874d82527ddb2d33e87d49c45b09ad8a71545" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dennoero">
 		<description>Denno E-ro Hon Series Dai2Dan Purupuru</description>
 		<year>19??</year>
@@ -44460,18 +44557,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- box says it's also for pc8001 (32k) and pc8001mkII -->
-	<software name="fanfun">
-		<description>Fan Fun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="31424">
-				<rom name="fanfun.d88" size="31424" crc="4d31b443" sha1="65c0e564c99f57eb4551dadb28b8a1ee387386cd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fancypro">
 		<description>Fancy Promenade</description>
 		<year>1987</year>
@@ -44501,17 +44586,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="52912">
 				<rom name="fantastic eaters(a).d88" size="52912" crc="4d556b50" sha1="338f5e63319dcdbb2b9b41d65cbdb982bf9a224d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefarwa">
-		<description>The Farway</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="35776">
-				<rom name="the farway.d88" size="35776" crc="f376b81b" sha1="b96a37d6d3d429ac3ef8364c28f7641abd84d916" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -44977,18 +45051,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="joshidai">
-		<description>Joshidaisei Private</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="女子大生ブライベート"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="66240">
-				<rom name="joshidaisei private.d88" size="66240" crc="bb03a520" sha1="7d57c996e8be87693281efc3e032163118be8f37" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="joshiryo">
 		<description>Joshiryo Panic</description>
 		<year>19??</year>
@@ -45095,27 +45157,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="koshiro yuzo vol.2.d88" size="348848" crc="b3832012" sha1="d15d7f2cd0578325543ea4348b352443a8170340" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kubokido">
-		<description>Kubo Kido Butai(Taskforce)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="kubo kido butai(taskforce).d88" size="697680" crc="64c467b3" sha1="5d8f0c516e038e8a7246151de27d9bb9bc511b06" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25" >
-			<feature name="part id" value="BASIC" />
-			<dataarea name="flop" size="348848">
-				<rom name="kubo kido butai(taskforce) (basic).d88" size="348848" crc="70077beb" sha1="68846f9916595e2c37f2db272280e44a7a36a9ab" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25" >
-			<dataarea name="flop" size="348832">
-				<rom name="kubo kido butai(taskforce) (disk 2).d88" size="348832" crc="0de15ef0" sha1="4c8437063eaa9ccd855da783a15d14a53a862493" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -45898,29 +45939,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="pal teiki test taisashu horizon shu chu2ge.d88" size="348832" crc="f6457959" sha1="ff7e462b9dbe7347b9684492d7fde250f4609335" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="panorama">
-		<description>Panorama-to</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="349648">
-				<rom name="panorama-to.d88" size="349648" crc="1fedc1bc" sha1="194982008ba2c33dde5f9bdcd29e17ce0b5b806a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="panoramaa" cloneof="panorama">
-		<description>Panorama-to (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ばのらま島"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="349648">
-				<rom name="panorama-to (a).d88" size="349648" crc="fb462603" sha1="0ded6ada13f982ac7562c805f03758618c5927b0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
