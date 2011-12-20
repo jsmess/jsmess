@@ -79,6 +79,8 @@ AUD_A_RIGHT EQU %00000001
 
  */
 
+#define LYNX_AUDIO_CHANNELS 4
+
 typedef struct {
     struct {
 		INT8 volume;
@@ -140,7 +142,7 @@ void lynx_audio_count_down(device_t *device, int nr)
     LYNX_AUDIO *This=state->audio+nr;
     if (This->reg.control1&8 && (This->reg.control1&7)!=7) return;
     if (nr==0) state->mixer_channel->update();
-	if ((This->reg.control1&0x0f)==0x0f) //count down if linking enabled and count enabled
+	//if ((This->reg.control1&0x0f)==0x0f) //count down if linking enabled and count enabled
 		This->count--;
 }
 
@@ -150,18 +152,17 @@ static void lynx_audio_shift(device_t *device, LYNX_AUDIO *channel)
 	INT16 out_temp;
     UINT8 channel_number = (UINT8)(channel - state->audio);
 
-	channel->shifter = ((channel->shifter<<1)&0xffe) | (state->shift_xor[ channel->shifter & channel->mask ]&1);
+	//channel->shifter = ((channel->shifter<<1)&0xffe) | (state->shift_xor[ channel->shifter & channel->mask ]&1);
 
-	/* // alternative method (functionally the same as above)
-    UINT8 xor_out=0;
-    for(int bit=0;bit<12;bit++)
-    {
-        if((channel->mask>>bit)&1) xor_out ^= (channel->shifter>>bit)&1;
-    }
-    channel->shifter = ((channel->shifter<<1)&0xffe) | (xor_out ^ 1); // output of xor is inverted
-    */
-
-
+	 // alternative method (functionally the same as above)
+	UINT8 xor_out=0;
+	for(int bit=0;bit<12;bit++)
+	{
+		if((channel->mask>>bit)&1) xor_out ^= (channel->shifter>>bit)&1;
+	}
+	channel->shifter = ((channel->shifter<<1)&0xffe) | (xor_out ^ 1); // output of xor is inverted
+	
+	
     if (channel->reg.control1&0x20) // integrate mode enabled
 	{
 		if (channel->shifter&1)
@@ -217,9 +218,11 @@ static void lynx_audio_execute(device_t *device, LYNX_AUDIO *channel)
 				if (channel->ticks<t) break;
 				if (channel->count<0)
 				{
+					lynx_audio_shift(device, channel);
 					if (channel->reg.control1&0x10)
 						channel->count = channel->reg.bakup;
-					lynx_audio_shift(device, channel);
+					else
+						break;
 				}
 			}
 		}
@@ -266,7 +269,10 @@ UINT8 lynx_audio_read(device_t *device, int offset)
 				break;
 			case 6:
 				//current timer value
-				value = channel->count;
+				if (channel->count >=0)
+					value = channel->count;
+				else
+					value = 0;
 				break;
 			case 7:
 				// current shifter state (upper 4 bits), status bits
@@ -369,18 +375,18 @@ void lynx_audio_write(device_t *device, int offset, UINT8 data)
 static STREAM_UPDATE( lynx_update )
 {
 	lynx_sound_state *state = get_safe_token(device);
-	int i, j;
-	LYNX_AUDIO *channel;
+	int i, channel;
+	//LYNX_AUDIO *channel;
 	int v;
 	stream_sample_t *buffer = outputs[0];
 
 	for (i = 0; i < samples; i++, buffer++)
 	{
 		*buffer = 0;
-		for (channel=state->audio, j=0; j<ARRAY_LENGTH(state->audio); j++, channel++)
+		for (channel=0; channel<LYNX_AUDIO_CHANNELS; channel++)
 		{
-			lynx_audio_execute(device, channel);
-			v=channel->reg.output;
+			lynx_audio_execute(device, &state->audio[channel]);
+			v=state->audio[channel].reg.output;
 			*buffer+=v*15; // where does the *15 come from?
 		}
 	}

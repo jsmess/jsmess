@@ -22,14 +22,15 @@ typedef struct
 	UINT16 screen;
 	UINT16 colbuf;
 	UINT16 colpos; // byte where value of collision is written
-	UINT16 xoff, yoff;
+	INT16 xoff, yoff;
 	// in command
 	int mode;
+	UINT8 spr_coll;
 	UINT8 spritenr;
-	INT16 x,y;
+	INT16 x_pos,y_pos;
 	UINT16 width, height; // uint16 important for blue lightning
 	INT16 tilt_accumulator;
-	UINT16 vertical_size_accumulator;
+	UINT16 height_accumulator, width_accumulator;
 	UINT16 width_offset, height_offset;
 	INT16 stretch, tilt;
 	UINT8 color[16]; // or stored
@@ -67,6 +68,8 @@ typedef struct
 typedef struct
 {
 	UINT8 data[0x100];
+	UINT16 disp_addr;
+	UINT8 vb_rest;
 } MIKEY;
 
 typedef struct
