@@ -400,7 +400,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-0" />
 			<dataarea name="rom" size="49152">
-				<rom name="bonQ.bin" size="49152" crc="3124b41c" sha1="379ae22a8c8a1c518ba5eb29ad0826dd2daca954" offset="0" />
+				<rom name="bonq.bin" size="49152" crc="3124b41c" sha1="379ae22a8c8a1c518ba5eb29ad0826dd2daca954" offset="0" />
 			</dataarea>
 		</part>
 	</software>
