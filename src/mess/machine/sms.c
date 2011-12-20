@@ -4,6 +4,7 @@
 #include "video/smsvdp.h"
 #include "sound/2413intf.h"
 #include "imagedev/cartslot.h"
+#include "machine/eeprom.h"
 #include "includes/sms.h"
 
 #define VERBOSE 0
@@ -922,6 +923,37 @@ static READ8_HANDLER( sms_tvdraw_data_r )
 }
 
 
+static WRITE8_HANDLER( sms_93c46_w )
+{
+	sms_state *state = space->machine().driver_data<sms_state>();
+
+	if ( state->m_cartridge[state->m_current_cartridge].m_93c46_enabled )
+	{
+		state->m_cartridge[state->m_current_cartridge].m_93c46_lines = data;
+
+		logerror( "sms_93c46_w: setting eeprom lines: DI=%s CLK=%s CS=%s\n", data & 0x01 ? "1" : "0", data & 0x02 ? "1" : "0", data & 0x04 ? "1" : "0" );
+		state->m_eeprom->write_bit( ( data & 0x01 ) ? ASSERT_LINE : CLEAR_LINE );
+		state->m_eeprom->set_cs_line( !( data & 0x04 ) ? ASSERT_LINE : CLEAR_LINE );
+		state->m_eeprom->set_clock_line( ( data & 0x02 ) ? ASSERT_LINE : CLEAR_LINE );
+	}
+}
+
+
+static READ8_HANDLER( sms_93c46_r )
+{
+	sms_state *state = space->machine().driver_data<sms_state>();
+	UINT8 data = state->m_banking_cart[5][0];
+
+	if ( state->m_cartridge[state->m_current_cartridge].m_93c46_enabled )
+	{
+		data = ( state->m_cartridge[state->m_current_cartridge].m_93c46_lines & 0xFC ) | 0x02;
+		data |= state->m_eeprom->read_bit() ? 1 : 0;
+	}
+
+	return data;
+}
+
+
 WRITE8_HANDLER( sms_mapper_w )
 {
 	sms_state *state = space->machine().driver_data<sms_state>();
@@ -960,18 +992,32 @@ WRITE8_HANDLER( sms_mapper_w )
 		/* Is it ram or rom? */
 		if (data & 0x08) /* it's ram */
 		{
-			UINT8 *sram = NULL;
-			state->m_cartridge[state->m_current_cartridge].sram_save = 1;			/* SRAM should be saved on exit. */
-			if (data & 0x04)
+			if ( state->m_cartridge[state->m_current_cartridge].features & CF_93C46_EEPROM )
 			{
-				sram = state->m_cartridge[state->m_current_cartridge].cartSRAM + 0x4000;
+				if ( data & 0x80 )
+				{
+					state->m_eeprom->reset();
+					logerror("sms_mapper_w: eeprom CS=1\n");
+					state->m_eeprom->set_cs_line( ASSERT_LINE );
+				}
+				logerror("sms_mapper_w: eeprom enabled\n");
+				state->m_cartridge[state->m_current_cartridge].m_93c46_enabled = true;
 			}
 			else
 			{
-				sram = state->m_cartridge[state->m_current_cartridge].cartSRAM;
+				UINT8 *sram = NULL;
+				state->m_cartridge[state->m_current_cartridge].sram_save = 1;			/* SRAM should be saved on exit. */
+				if (data & 0x04)
+				{
+					sram = state->m_cartridge[state->m_current_cartridge].cartSRAM + 0x4000;
+				}
+				else
+				{
+					sram = state->m_cartridge[state->m_current_cartridge].cartSRAM;
+				}
+				memory_set_bankptr(space->machine(),  "bank5", sram);
+				memory_set_bankptr(space->machine(),  "bank6", sram + 0x2000);
 			}
-			memory_set_bankptr(space->machine(),  "bank5", sram);
-			memory_set_bankptr(space->machine(),  "bank6", sram + 0x2000);
 		}
 		else /* it's rom */
 		{
@@ -979,7 +1025,21 @@ WRITE8_HANDLER( sms_mapper_w )
 			{
 				if ( ! ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_NOBANK_MAPPER ) )
 				{
-					state->map_cart_16k( 0x8000, state->m_mapper[3] );
+					if ( state->m_cartridge[state->m_current_cartridge].features & CF_93C46_EEPROM )
+					{
+						if ( data & 0x80 )
+						{
+							state->m_eeprom->reset();
+							logerror("sms_mapper_w: eeprom CS=1\n");
+							state->m_eeprom->set_cs_line( ASSERT_LINE );
+						}
+						logerror("sms_mapper_w: eeprom disabled\n");
+						state->m_cartridge[state->m_current_cartridge].m_93c46_enabled = false;
+					}
+					else
+					{
+						state->map_cart_16k( 0x8000, state->m_mapper[3] );
+					}
 				}
 			}
 			else
@@ -1886,6 +1946,7 @@ MACHINE_START( sms )
 	state->m_main_cpu = machine.device("maincpu");
 	state->m_control_cpu = machine.device("control");
 	state->m_vdp = machine.device<sega315_5124_device>("sms_vdp");
+	state->m_eeprom = machine.device<eeprom_device>("eeprom");
 	state->m_ym = machine.device("ym2413");
 	state->m_main_scr = machine.device("screen");
 	state->m_left_lcd = machine.device("left_lcd");
@@ -1909,19 +1970,19 @@ MACHINE_RESET( sms )
 
 	state->m_bios_port = 0;
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER)
+	if ( state->m_cartridge[state->m_current_cartridge].features & CF_CODEMASTERS_MAPPER )
 	{
 		/* Install special memory handlers */
 		space->install_legacy_write_handler(0x0000, 0x0000, FUNC(sms_codemasters_page0_w));
 		space->install_legacy_write_handler(0x4000, 0x4000, FUNC(sms_codemasters_page1_w));
 	}
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER)
+	if ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_ZEMINA_MAPPER )
 	{
 		space->install_legacy_write_handler(0x0000, 0x0003, FUNC(sms_korean_zemina_banksw_w));
 	}
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_JANGGUN_MAPPER)
+	if ( state->m_cartridge[state->m_current_cartridge].features & CF_JANGGUN_MAPPER )
 	{
 		space->install_legacy_write_handler(0x4000, 0x4000, FUNC(sms_janggun_bank0_w));
 		space->install_legacy_write_handler(0x6000, 0x6000, FUNC(sms_janggun_bank1_w));
@@ -1929,20 +1990,26 @@ MACHINE_RESET( sms )
 		space->install_legacy_write_handler(0xA000, 0xA000, FUNC(sms_janggun_bank3_w));
 	}
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_4PAK_MAPPER)
+	if ( state->m_cartridge[state->m_current_cartridge].features & CF_4PAK_MAPPER )
 	{
 		space->install_legacy_write_handler(0x3ffe, 0x3ffe, FUNC(sms_4pak_page0_w));
 		space->install_legacy_write_handler(0x7fff, 0x7fff, FUNC(sms_4pak_page1_w));
 		space->install_legacy_write_handler(0xbfff, 0xbfff, FUNC(sms_4pak_page2_w));
 	}
 
-	if (state->m_cartridge[state->m_current_cartridge].features & CF_TVDRAW )
+	if ( state->m_cartridge[state->m_current_cartridge].features & CF_TVDRAW )
 	{
 		space->install_legacy_write_handler(0x6000, 0x6000, FUNC(sms_tvdraw_axis_w));
 		space->install_legacy_read_handler(0x8000, 0x8000, FUNC(sms_tvdraw_status_r));
 		space->install_legacy_read_handler(0xa000, 0xa000, FUNC(sms_tvdraw_data_r));
 		space->nop_write(0xa000, 0xa000);
 		state->m_cartridge[state->m_current_cartridge].m_tvdraw_data = 0;
+	}
+
+	if ( state->m_cartridge[state->m_current_cartridge].features & CF_93C46_EEPROM )
+	{
+		space->install_legacy_write_handler(0x8000,0x8000, FUNC(sms_93c46_w));
+		space->install_legacy_read_handler(0x8000,0x8000, FUNC(sms_93c46_r));
 	}
 
 	if (state->m_cartridge[state->m_current_cartridge].features & CF_GG_SMS_MODE)

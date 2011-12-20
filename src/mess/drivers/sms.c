@@ -65,6 +65,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "sound/2413intf.h"
 #include "video/smsvdp.h"
 #include "imagedev/cartslot.h"
+#include "machine/eeprom.h"
 #include "includes/sms.h"
 
 #include "sms1.lh"
@@ -578,6 +579,9 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 
 	/* cartridge */
 	MCFG_FRAGMENT_ADD( gg_cartslot )
+
+	/* Some gamegear games use a 93c46 eeprom to store information */
+	MCFG_EEPROM_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
 
