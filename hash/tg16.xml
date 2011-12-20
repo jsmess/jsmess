@@ -1035,7 +1035,7 @@
 		</part>
 	</software>
 
-	<software name="cdsys">
+	<software name="scdsys">
 		<description>Turbografx CD Super System Card (v3.0)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
@@ -1046,7 +1046,7 @@
 		</part>
 	</software>
 
-	<software name="cdsysa" cloneof="cdsys">
+	<software name="cdsys">
 		<description>Turbografx CD System Card (v2.0)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
