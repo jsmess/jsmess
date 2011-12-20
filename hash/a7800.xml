@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- Atari 7800 Software List
@@ -43,7 +43,7 @@ Impossible Mission                CX7832
 Lode Runner                       CX7833 (Not Released)
 RealSports Baseball - NTSC only   CX7834
                                   CX7835
-Crack'ed                          CX7836 
+Crack'ed                          CX7836
 Dark Chambers                     CX7837
 Commando                          CX7838
                                   CX7839
@@ -52,7 +52,7 @@ Commando                          CX7838
                                   CX7842
                                   CX7843
 Crossbow                          CX7844
-                                  CX7845 
+                                  CX7845
 Ace of Aces                       CX7846
 Mean 18 Golf                      CX7847
 Donkey Kong                       CX7848
@@ -61,14 +61,14 @@ Mario Bros.                       CX7850
 Fight Night                       CX7851
 Motor Psycho                      CX7852
                                   CX7853
-Fatal Run                         CX7854 
+Fatal Run                         CX7854
 Alien Brigade                     CX7855
 Tower Toppler                     CX7856
 Jinks                             CX7857
 Xenophobe                         CX7858
 Barnyard Blaster                  CX7859
                                   CX7860
-                                  CX7861 
+                                  CX7861
 Ikari Warriors                    CX7862
 Mat Mania Challenge               CX7863
 White Water Madness               CX7864 (Not Released)
@@ -98,7 +98,7 @@ Basketbrawl                       CX7880
 Klax                              CX7888 (Prototype)
 Midnight Mutants                  CX7889
 Missing in Action - NTSC only     CX7890 (Prototype)
-Pit Fighter - NTSC only           CX7891 (Prototype) 
+Pit Fighter - NTSC only           CX7891 (Prototype)
 Rampart                           CX7892 (Prototype)
 
 
@@ -122,7 +122,7 @@ Tank Command - NTSC only          FG 2003
 
 
 TYNESOFT
-Plutos                            Prototype 
+Plutos                            Prototype
 Sirius                            Prototype
 
 
@@ -158,7 +158,7 @@ Quest for Quintana Roo
 MODERN RELEASES
 (Homebrew sold on physical cartridges playable on a real hardware Atari 7800)
 
-Asteroids Deluxe (2007)     
+Asteroids Deluxe (2007)
 Beef Drop (2006)
 Beef Drop VE (2007)               Missing
 B*nQ (2007)
@@ -167,7 +167,7 @@ FailSafe (NTSC only?) (2010)      Missing
 Hangly-Man (2006)
 Jr Pac-Man (2009)
 Kessel Attack                     Missing
-Ms Pac-Attack (2006) 
+Ms Pac-Attack (2006)
 Pac-Man Collection (2006)
 Pac-Man (2006)
 Pac-Man Plus (2006)
@@ -1366,7 +1366,7 @@ the buttons not work in emulators.
 Prototype (named "Super Stunt Cycle")
 11/3/88 - This particular prototype is nothing more than a static screen demo showing what the game might look like.  The screen also
 shows some looping information about the prototype.  The idea behind the game must have changed dramatically as the final game looks
-almost nothing like the prototype.  
+almost nothing like the prototype.
 -->
 	<software name="mpsychou" cloneof="mpsycho">
 		<description>Motor Psycho (NTSC)</description>
