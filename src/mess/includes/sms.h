@@ -32,6 +32,7 @@ public:
 	device_t *m_main_cpu;
 	device_t *m_control_cpu;
 	sega315_5124_device *m_vdp;
+	eeprom_device *m_eeprom;
 	device_t *m_ym;
 	device_t *m_main_scr;
 	device_t *m_left_lcd;
@@ -125,6 +126,10 @@ public:
 		UINT8 m_4pak_page0;
 		UINT8 m_4pak_page1;
 		UINT8 m_4pak_page2;
+
+		/* Data needed for 93c46 */
+		bool m_93c46_enabled;
+		UINT8 m_93c46_lines;
 	} m_cartridge[MAX_CARTRIDGES];
 };
 
