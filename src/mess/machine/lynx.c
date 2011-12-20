@@ -79,7 +79,7 @@ The sprite types relate to specific hardware functions according to the followin
   0  0  0  0  0  0  0  1      exclusive-or the data
 */
 
-INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const int x, const int y, const int color)
+INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, const int y, const int color)
 {
 	int back;
 	UINT8 *screen;
@@ -89,7 +89,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const int x, cons
 	screen = state->m_blitter.mem + state->m_blitter.screen + y * 80 + x / 2;
 	colbuf = state->m_blitter.mem + state->m_blitter.colbuf + y * 80 + x / 2;
 
-	switch (mode)
+	switch (mode&0x7)
 	{
 		case NORMAL_SPRITE:
 		/* A sprite may be set to 'normal'. This means that pen number '0' will be transparent and
@@ -297,8 +297,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const int x, cons
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
 			{
-				*screen = (*screen & 0x0f)^(color<<4);
-
+				*screen = (*screen)^(color<<4);
 				if (color != 0x0e)
 				{
 					back = *colbuf;
@@ -310,8 +309,7 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const int x, cons
 			}
 			else					/* Lower nibble */
 			{
-				*screen = (*screen & 0xf0)^color;
-
+				*screen = (*screen)^color;
 				if (color != 0x0e)
 				{
 					back = *colbuf;
@@ -326,32 +324,35 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const int x, cons
 	}
 }
 
-static void lynx_blit_do_work( lynx_state *state, const int y, const int xdir, const int bits, const int mask )
+static void lynx_blit_do_work( lynx_state *state, const int y, const int xdir, const int bits_per_pixel, const int mask )
 {
-	int i,j;
-	int xi, wi, b, p, color;
+	int next_line_addr,i,j;
+	int xi, bits, color;
+	UINT16 width_accum, buffer;
 
-	i = state->m_blitter.mem[state->m_blitter.bitmap]; // offset to second sprite line
-	state->m_blitter.memory_accesses++;		// ?
-	for (xi = state->m_blitter.x, p = 0, b = 0, j = 1, wi = 0; j < i;)
+	next_line_addr = state->m_blitter.mem[state->m_blitter.bitmap]; // offset to second sprite line
+	width_accum = (xdir == 1) ? state->m_blitter.width_offset : 0;
+	state->m_blitter.memory_accesses++;
+	
+	for (xi = state->m_blitter.x_pos - state->m_blitter.xoff, bits = 0, buffer = 0, j = 1; j < next_line_addr;j++)
 	{
-		if (p < bits) // less than one pixels worth of data left in buffer
+		buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
+		bits += 8; // current bits in buffer
+		state->m_blitter.memory_accesses++;
+		
+		for ( ; bits >= bits_per_pixel; bits -= bits_per_pixel)
 		{
-			b = (b << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j]; // shift next byte into buffer
-			j++; // increment byte accumulator
-			p += 8; // current bits in buffer
-			state->m_blitter.memory_accesses++;
-		}
-		for ( ;(p >= bits); ) // as long as there is still one pixel of data remaining in buffer
-		{
-			color = state->m_blitter.color[(b >> (p - bits)) & mask];
-			p -= bits;
-			for ( ; wi < state->m_blitter.width; wi += 0x100, xi += xdir)
+			color = state->m_blitter.color[(buffer >> (bits - bits_per_pixel)) & mask];
+			//bits -= bits_per_pixel;
+			width_accum += state->m_blitter.width;
+			for (i = 0; i < (width_accum>>8); i++, xi += xdir)
 			{
 				if ((xi >= 0) && (xi < 160))
+				{
 					lynx_plot_pixel(state, state->m_blitter.mode, xi, y, color);
+				}
 			}
-			wi -= state->m_blitter.width;
+			width_accum &= 0xff;
 		}
 	}
 }
@@ -410,80 +411,85 @@ static void lynx_blit_16color_line(lynx_state *state, const int y, const int xdi
  1, 4 bit count of values-1, 4 bit color, ....
 */
 
-static void lynx_blit_rle_do_work( lynx_state *state, const int y, const int xdir, const int bits, const int mask )
+static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int xdir, const int bits_per_pixel, const int mask )
 {
-	int wi, xi;
-	int b, p, j;
-	int t, count, color;
-
-	for( p = 0, j = 0, b = 0, xi = state->m_blitter.x, wi = 0; ; )		/* through the rle entries */
+	int i;
+	int xi = state->m_blitter.x_pos - state->m_blitter.xoff;
+	int buffer, bits, j;
+	int literal_data, count, color;
+	UINT16 width_accum;
+	
+	width_accum = (xdir == 1) ? 0 : state->m_blitter.width_offset;
+	for( bits = 0, j = 0, buffer = 0, xi = state->m_blitter.x_pos - state->m_blitter.xoff; ; )		/* through the rle entries */
 	{
-		if (p < 5 + bits) /* under 7 bits no complete entry */
+		if (bits < 5 + bits_per_pixel) /* under 7 bits no complete entry */
 		{
 			j++;
 			if (j >= state->m_blitter.mem[state->m_blitter.bitmap])
 				return;
 
-			p += 8;
-			b = (b << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
+			bits += 8;
+			buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
 			state->m_blitter.memory_accesses++;
 		}
 
-		t = (b >> (p - 1)) & 0x01;
-		p--;
-		count = ((b >> (p - 4)) & 0x0f) + 1; // count value of zero means 1 pixel, thus the +1
-		p -= 4;
+		literal_data = (buffer >> (bits - 1)) & 0x01;
+		bits--;
+		count = (buffer >> (bits - 4)) & 0x0f; // repeat count (packed) or pixel count (literal)
+		bits -= 4;
 
-		if (t)		/* count of different pixels */
-		{
-			for ( ; count; count--)
+		if (literal_data)		/* count of different pixels */
+		{		
+			for ( ; count >= 0; count--)
 			{
-				if (p < bits)
+				if (bits < bits_per_pixel)
 				{
 					j++;
 					if (j >= state->m_blitter.mem[state->m_blitter.bitmap])
 						return;
-					p += 8;
-					b = (b << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
+					bits += 8;
+					buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
 					state->m_blitter.memory_accesses++;
 				}
 
-				color = state->m_blitter.color[(b >> (p - bits)) & mask];
-				p -= bits;
-				for ( ; wi < (state->m_blitter.width); wi += 0x100, xi += xdir)
+				color = state->m_blitter.color[(buffer >> (bits - bits_per_pixel)) & mask];
+				bits -= bits_per_pixel;
+				width_accum += state->m_blitter.width;
+				for (i = 0; i < (width_accum>>8); i++, xi += xdir)
 				{
 					if ((xi >= 0) && (xi < 160))
 						lynx_plot_pixel(state, state->m_blitter.mode, xi, y, color);
 				}
-				wi -= state->m_blitter.width;
+				width_accum &= 0xff;
 			}
 		}
 		else		/* count of same pixels */
 		{
-			if (count == 1) // 4 bit count value of zero indicates end-of-line in a packed sprite
+			if (count == 0) // 4 bit count value of zero indicates end-of-line in a packed sprite
 				return;
 
-			if (p < bits)
+			if (bits < bits_per_pixel)
 			{
 				j++;
 				if (j >= state->m_blitter.mem[state->m_blitter.bitmap])
 					return;
-				p += 8;
-				b = (b << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
+				bits += 8;
+				buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
 				state->m_blitter.memory_accesses++;
 			}
 
-			color = state->m_blitter.color[(b >> (p - bits)) & mask];
-			p -= bits;
+			color = state->m_blitter.color[(buffer >> (bits - bits_per_pixel)) & mask];
+			bits -= bits_per_pixel;
 
-			for ( ; count; count--)
+			for ( ; count>=0; count--)
 			{
-				for ( ; (wi < state->m_blitter.width); wi += 0x100, xi += xdir)
+				width_accum += state->m_blitter.width;
+				for (i = 0; i < (width_accum>>8); i++, xi += xdir)
 				{
 					if ((xi >= 0) && (xi < 160))
 						lynx_plot_pixel(state, state->m_blitter.mode, xi, y, color);
 				}
-				wi -= state->m_blitter.width;
+				width_accum &= 0xff;
 			}
 		}
 	}
@@ -521,83 +527,85 @@ static void lynx_blit_16color_rle_line(lynx_state *state, const int y, const int
 
 static void lynx_blit_lines(lynx_state *state)
 {
-	int i, hi, y;
+	int i;
+	INT16 y;
 	int ydir = 0, xdir = 0;
 	int flip = 0;
-	int x_temp;
 
 	state->m_blitter.everon = FALSE;
 
-	// flipping sprdemo3
-	// fat bobby 0x10
-	// mirror the sprite in gameplay?
-	xdir = 1;
-
-	if (state->m_blitter.spr_ctl0 & 0x20)	/* Horizontal Flip */
-	{
-		xdir = -1;
-		//state->m_blitter.x--; // causes blank lines in todds adventures, klax, etc
-	}
-
-	ydir = 1;
-
-	if (state->m_blitter.spr_ctl0 & 0x10)	/* Vertical Flip */
-	{
-		ydir = -1;
-		//state->m_blitter.y--; // causes blank lines in todds adventures, klax, etc
-	}
-
 	switch (state->m_blitter.spr_ctl1 & 0x03)	/* Initial drawing direction */
 	{
-		case 0: // Down/Right
+		case 0: // Down/Right (quadrant 0)
+			xdir = 1;
+			ydir = 1;
 			flip = 0;
 			break;
-		case 1: // Down/Left (blockout)
-			xdir *= -1;
+		case 1: // Down/Left (blockout) (quadrant 3)
+			xdir = -1;
+			ydir = 1;
 			flip = 3;
 			break;
-		case 2: // Up/Right (fat bobby)
-			ydir *= -1;
+		case 2: // Up/Right (fat bobby) (quadrant 1)
+			xdir = 1;
+			ydir = -1;
 			flip = 1;
 			break;
-		case 3: // Up/Left
-			xdir *= -1;
-			ydir *= -1;
+		case 3: // Up/Left (quadrant 2)
+			xdir = -1;
+			ydir = -1;
 			flip = 2;
 			break;
 	}
-
-	x_temp = state->m_blitter.x;
-	for (y = state->m_blitter.y, hi = 0; (i = state->m_blitter.mem[state->m_blitter.bitmap]); state->m_blitter.bitmap += i)
+	
+	if (state->m_blitter.spr_ctl0 & 0x20)	/* Horizontal Flip */
+	{
+		xdir *= -1;
+		//state->m_blitter.x_pos -= xdir; // causes blank lines in todds adventures, klax, etc
+	}
+	
+	if (state->m_blitter.spr_ctl0 & 0x10)	/* Vertical Flip */
+	{
+		ydir *= -1;
+		//state->m_blitter.y_pos -= ydir; // causes blank lines in todds adventures, klax, etc
+	}
+	
+	// Set height accumulator based on drawing direction
+	state->m_blitter.height_accumulator = (ydir == 1) ? state->m_blitter.height_offset : 0x00;
+	
+	for (y = state->m_blitter.y_pos - state->m_blitter.yoff; (i = state->m_blitter.mem[state->m_blitter.bitmap]); state->m_blitter.bitmap += i)
 	{
 		state->m_blitter.memory_accesses++;
-
+	
 		if (i == 1) // draw next quadrant
 		{
 			// centered sprites sprdemo3, fat bobby, blockout
-			hi = 0;
 			switch (flip & 0x03)
 			{
 				case 0:
 				case 2:
 					ydir *= -1;
-					state->m_blitter.y += ydir;
+					state->m_blitter.y_pos += ydir;
 					break;
-
 				case 1:
 				case 3:
 					xdir *= -1;
-					state->m_blitter.x += xdir;
-					x_temp += xdir;
+					state->m_blitter.x_pos += xdir;
 					break;
 			}
-
-			y = state->m_blitter.y;
 			flip++;
+			y = state->m_blitter.y_pos - state->m_blitter.yoff;
+			state->m_blitter.height_accumulator = (ydir == 1) ? state->m_blitter.height_offset : 0x00;
 			continue;
 		}
+		
+		INT16 x = state->m_blitter.x_pos - state->m_blitter.xoff;
+		// superclipping
+		if (((x > 159) && (xdir == 1)) || ((x < 0) && (xdir == -1)) || ((y > 101) && (ydir == 1)) || ((y < 0) && (ydir == -1)))
+			continue;
 
-		for ( ; hi < (state->m_blitter.height); hi += 0x100, y += ydir)
+		state->m_blitter.height_accumulator += state->m_blitter.height;
+		for (int i=0; i < (state->m_blitter.height_accumulator>>8); i++, y += ydir)
 		{
 			if (y >= 0 && y < 102)
 				state->m_blitter.line_function(state, y, xdir);
@@ -608,10 +616,10 @@ static void lynx_blit_lines(lynx_state *state)
 				logerror("vertical stretch enabled");
 			}
 			state->m_blitter.tilt_accumulator += state->m_blitter.tilt;
-			state->m_blitter.x = x_temp + (INT8)((state->m_blitter.tilt_accumulator)>>8);
+			state->m_blitter.x_pos += (state->m_blitter.tilt_accumulator>>8);
+			state->m_blitter.tilt_accumulator &= 0xff;
 		}
-
-		hi -= state->m_blitter.height;
+		state->m_blitter.height_accumulator &= 0xff;
 	}
 
 	if (state->m_suzy.data[SPRGO] & 0x04)
@@ -726,14 +734,7 @@ static void lynx_blitter(running_machine &machine)
 	state->m_blitter.memory_accesses = 0;
 	state->m_blitter.mem = (UINT8*)machine.device("maincpu")->memory().space(AS_PROGRAM)->get_read_ptr(0x0000);
 
-	state->m_blitter.xoff   = GET_WORD(state->m_suzy.data, HOFFL);
-	state->m_blitter.yoff   = GET_WORD(state->m_suzy.data, VOFFL);
-	state->m_blitter.screen = GET_WORD(state->m_suzy.data, VIDBASL);
-	state->m_blitter.colbuf = GET_WORD(state->m_suzy.data, COLLBASL);
-
 	// these might be never set by the state->m_blitter hardware
-	//state->m_blitter.width   = 0x100;
-	//state->m_blitter.height  = 0x100;
 	state->m_sprite_collide  = 0;
 
 	state->m_blitter.memory_accesses += 2;
@@ -753,15 +754,13 @@ static void lynx_blitter(running_machine &machine)
 
 		state->m_blitter.spr_ctl0 = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCTL0];
 		state->m_blitter.spr_ctl1 = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCTL1];
-		state->m_suzy.data[SPRCOLL] = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCOLL];
+		state->m_blitter.spr_coll = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCOLL];
 
 		if(!(state->m_blitter.spr_ctl1 & 0x04)) // sprite will be processed (if sprite is skipped first 5 bytes are still copied to suzy)
 		{
 			state->m_blitter.bitmap = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRDLINE);
-			state->m_suzy.data[HPOSSTRTL] = state->m_blitter.mem[state->m_blitter.scb + SCB_HPOSSTRT];
-			state->m_suzy.data[HPOSSTRTH] = state->m_blitter.mem[state->m_blitter.scb + SCB_HPOSSTRT+1];
-			state->m_suzy.data[VPOSSTRTL] = state->m_blitter.mem[state->m_blitter.scb + SCB_VPOSSTRT];
-			state->m_suzy.data[VPOSSTRTH] = state->m_blitter.mem[state->m_blitter.scb + SCB_VPOSSTRT+1];
+			state->m_blitter.x_pos = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_HPOSSTRT);
+			state->m_blitter.y_pos = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_VPOSSTRT);
 
 			switch(state->m_blitter.spr_ctl1 & 0x30) // reload sprite scaling
 			{
@@ -781,7 +780,7 @@ static void lynx_blitter(running_machine &machine)
 				else
 					palette_offset = 0x0b;
 
-				colors = lynx_colors[state->m_blitter.mem[state->m_blitter.scb] >> 6];
+				colors = lynx_colors[state->m_blitter.spr_ctl0 >> 6];
 
 				for (i = 0; i < colors / 2; i++)
 				{
@@ -792,15 +791,10 @@ static void lynx_blitter(running_machine &machine)
 			}
 		 }
 
-
-
-
-
+		 
 		if (!(state->m_blitter.spr_ctl1 & 0x04))		// if 0, we skip this sprite
 		{
 			state->m_blitter.colpos = GET_WORD(state->m_suzy.data, COLLOFFL) + state->m_blitter.scb;  //????
-			state->m_blitter.x = (INT16)GET_WORD(state->m_suzy.data, HPOSSTRTL) - state->m_blitter.xoff;
-			state->m_blitter.y = (INT16)GET_WORD(state->m_suzy.data, VPOSSTRTL) - state->m_blitter.yoff;
 			state->m_blitter.memory_accesses += 6;
 
 			state->m_blitter.mode = state->m_blitter.spr_ctl0 & 0x07;
@@ -810,7 +804,7 @@ static void lynx_blitter(running_machine &machine)
 			else
 				state->m_blitter.line_function = blit_rle_line[state->m_blitter.spr_ctl0 >> 6];
 
-			if (!(state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCOLL] & 0x20) && !(state->m_suzy.data[SPRSYS] & 0x20))
+			if (!(state->m_blitter.spr_coll & 0x20) && !(state->m_suzy.data[SPRSYS] & 0x20))
 			{
 				switch (state->m_blitter.mode)
 				{
@@ -822,7 +816,7 @@ static void lynx_blitter(running_machine &machine)
 					case SHADOW:
 						state->m_sprite_collide = 1;
 						state->m_blitter.mem[state->m_blitter.colpos] = 0;
-						state->m_blitter.spritenr = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCOLL] & 0x0f;
+						state->m_blitter.spritenr = state->m_blitter.spr_coll & 0x0f;
 				}
 			}
 
@@ -971,9 +965,18 @@ static READ8_HANDLER( suzy_read )
 			return state->m_blitter.scb_next & 0xff;
 		case SCBNEXTH:
 			return state->m_blitter.scb_next>>8;
-		// case SPRDLINEL:
-		// case HPOSSTRTL:
-		// case VPOSSTRTL:
+		case SPRDLINEL:
+			return state->m_blitter.bitmap & 0xff;
+		case SPRDLINEH:
+			return state->m_blitter.bitmap>>8;
+		case HPOSSTRTL:
+			return state->m_blitter.x_pos & 0xff;
+		case HPOSSTRTH:
+			return state->m_blitter.x_pos>>8;
+		case VPOSSTRTL:
+			return state->m_blitter.y_pos & 0xff;
+		case VPOSSTRTH:
+			return state->m_blitter.y_pos>>8;
 		case SPRHSIZL:
 			return state->m_blitter.width & 0xff;
 		case SPRHSIZH:
@@ -993,7 +996,10 @@ static READ8_HANDLER( suzy_read )
 		// case SPRDOFFL:
 		// case SPRVPOSL:
 		// case COLLOFFL:
-		//case VSIZACUML:
+		case VSIZACUML:
+			return state->m_blitter.height_accumulator & 0xff;
+		case VSIZACUMH:
+			return state->m_blitter.height_accumulator>>8;
 		case HSIZOFFL:
 			return state->m_blitter.width_offset & 0xff;
 		case HSIZOFFH:
@@ -1007,10 +1013,6 @@ static READ8_HANDLER( suzy_read )
 		case SCBADRH:
 			return state->m_blitter.scb>>8;
 		//case PROCADRL:
-		case SPRCTL0:
-			return state->m_blitter.spr_ctl0;
-		case SPRCTL1:
-			return state->m_blitter.spr_ctl1;
 		case SUZYHREV:
 			return 0x01; // must not be 0 for correct power up
 		case SPRSYS:	/* Better check this with docs! */
@@ -1067,11 +1069,20 @@ static READ8_HANDLER( suzy_read )
 			value = *(space->machine().region("user1")->base() + (state->m_suzy.high * state->m_granularity) + state->m_suzy.low);
 			state->m_suzy.low = (state->m_suzy.low + 1) & (state->m_granularity - 1);
 			break;
-		case RCART_BANK1: /* we need bank 1 emulation!!! */
+		//case RCART_BANK1: /* we need bank 1 emulation!!! */
+		case SPRCTL0:
+		case SPRCTL1:
+		case SPRCOLL:
+		case SPRINIT:
+		//case SUZYBUSEN:
+		case SPRGO:
+			logerror("read from write only register %x\n", offset);
+			value = 0;
+			break;
 		default:
 			value = state->m_suzy.data[offset];
 	}
-//  logerror("suzy read %.2x %.2x\n",offset,data);
+	//logerror("suzy read %.2x %.2x\n",offset,value);
 	return value;
 }
 
@@ -1096,85 +1107,118 @@ static WRITE8_HANDLER( suzy_write )
 			state->m_blitter.tilt_accumulator = data; // upper byte forced to zero see above.
 			break;
 		case TILTACUMH:
+			state->m_blitter.tilt_accumulator &= 0xff;
 			state->m_blitter.tilt_accumulator |= data<<8;
 			break;
 		case HOFFL:
 			state->m_blitter.xoff = data;
 			break;
 		case HOFFH:
+			state->m_blitter.xoff &= 0xff;
 			state->m_blitter.xoff |= data<<8;
 			break;
 		case VOFFL:
 			state->m_blitter.yoff = data;
 			break;
 		case VOFFH:
+			state->m_blitter.yoff &= 0xff;
 			state->m_blitter.yoff |= data<<8;
 			break;
 		case VIDBASL:
 			state->m_blitter.screen = data;
 			break;
 		case VIDBASH:
+			state->m_blitter.screen &= 0xff;
 			state->m_blitter.screen |= data<<8;
 			break;
 		case COLLBASL:
 			state->m_blitter.colbuf = data;
 			break;
 		case COLLBASH:
+			state->m_blitter.colbuf &= 0xff;
 			state->m_blitter.colbuf |= data<<8;
 			break;
 		case SCBNEXTL:
 			state->m_blitter.scb_next = data;
 			break;
 		case SCBNEXTH:
+			state->m_blitter.scb_next &= 0xff;
 			state->m_blitter.scb_next |= data<<8;
 			break;
-		// case SPRDLINEL:
-		// case HPOSSTRTL:
-		// case VPOSSTRTL:
+		case SPRDLINEL:
+			state->m_blitter.bitmap = data;
+			break;
+		case SPRDLINEH:
+			state->m_blitter.bitmap &= 0xff;
+			state->m_blitter.bitmap |= data<<8;
+			break;
+		case HPOSSTRTL:
+			state->m_blitter.x_pos = data;
+		case HPOSSTRTH:
+			state->m_blitter.x_pos &= 0xff;
+			state->m_blitter.x_pos |= data<<8;
+		case VPOSSTRTL:
+			state->m_blitter.y_pos = data;
+		case VPOSSTRTH:
+			state->m_blitter.y_pos &= 0xff;
+			state->m_blitter.y_pos |= data<<8;
 		case SPRHSIZL:
 			state->m_blitter.width = data;
 			break;
 		case SPRHSIZH:
+			state->m_blitter.width &= 0xff;
 			state->m_blitter.width |= data<<8;
 			break;
 		case SPRVSIZL:
 			state->m_blitter.height = data;
 			break;
 		case SPRVSIZH:
+			state->m_blitter.height &= 0xff;
 			state->m_blitter.height |= data<<8;
 			break;
 		case STRETCHL:
 			state->m_blitter.stretch = data;
 			break;
 		case STRETCHH:
+			state->m_blitter.stretch &= 0xff;
 			state->m_blitter.stretch |= data<<8;
 			break;
 		case TILTL:
 			state->m_blitter.stretch = data;
 			break;
 		case TILTH:
+			state->m_blitter.stretch &= 0xff;
 			state->m_blitter.stretch |= data<<8;
 			break;
 		// case SPRDOFFL:
 		// case SPRVPOSL:
 		// case COLLOFFL:
-		//case VSIZACUML:
+		case VSIZACUML:
+			state->m_blitter.height_accumulator = data;
+			break;
+		case VSIZACUMH:
+			state->m_blitter.height_accumulator &= 0xff;
+			state->m_blitter.height_accumulator |= data<<8;
+			break;
 		case HSIZOFFL:
 			state->m_blitter.width_offset = data;
 			break;
 		case HSIZOFFH:
+			state->m_blitter.width_offset &= 0xff;
 			state->m_blitter.width_offset |= data<<8;
 			break;
 		case VSIZOFFL:
 			state->m_blitter.height_offset = data;
 			break;
 		case VSIZOFFH:
+			state->m_blitter.height_offset &= 0xff;
 			state->m_blitter.height_offset |= data<<8;
 			break;
 		case SCBADRL:
 			state->m_blitter.scb = data;
 			break;
 		case SCBADRH:
+			state->m_blitter.scb &= 0xff;
 			state->m_blitter.scb |= data<<8;
 			break;
 		//case PROCADRL:
@@ -1231,12 +1275,19 @@ static WRITE8_HANDLER( suzy_write )
 		case SPRCTL1:
 			state->m_blitter.spr_ctl1 = data;
 			break;
+		case SPRCOLL:
+			state->m_blitter.spr_coll = data;
+			break;
 		case SPRGO:
 			if (data & 0x01)
 			{
 				state->m_blitter.time = space->machine().time();
 				lynx_blitter(space->machine());
 			}
+			break;
+		case JOYSTICK:
+		case SWITCHES:
+			logerror("warning: write to read-only button registers\n");
 			break;
 	}
 }
@@ -1311,13 +1362,12 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 		return;
 	}
 
-	// Documentation states lower two bits of buffer address are ignored (thus 0xfc mask)
-	j = ((state->m_mikey.data[0x94] & 0xfc)  | (state->m_mikey.data[0x95]<<8)) + state->m_line_y * 160 / 2;
-	if (state->m_mikey.data[0x92] & 0x02)
-		j -= 160 * 102 / 2 - 1;
-
+	// Documentation states lower two bits of buffer address are ignored (thus 0xfffc mask)
+	j = (state->m_mikey.disp_addr & 0xfffc) + state->m_line_y * 160 / 2;
+		
 	if (state->m_mikey.data[0x92] & 0x02)
 	{
+		j -= 160 * 102 / 2 - 1;
 		for ( ; state->m_line_y < yend; state->m_line_y++)
 		{
 			line = BITMAP_ADDR16(machine.generic.tmpbitmap, 102 - 1 - state->m_line_y, 0);
@@ -1408,6 +1458,17 @@ static void lynx_timer_signal_irq(running_machine &machine, int which)
 	switch ( which ) // count down linked timers
 	{
 	case 0:
+		if ((state->m_line == 2) || (state->m_line == 3) || (state->m_line == 4))
+		{
+			//state->m_mikey.vb_rest = 1;
+		}
+		else
+			state->m_mikey.vb_rest = 0;
+		if (state->m_line == 3)
+		{
+			state->m_mikey.disp_addr = state->m_mikey.data[0x94] | (state->m_mikey.data[0x95] << 8);
+			lynx_draw_lines( machine, -1 );
+		}
 		lynx_timer_count_down( machine, 2 );
 		state->m_line++;
 		break;
@@ -1444,16 +1505,16 @@ void lynx_timer_count_down(running_machine &machine, int which)
 		if ( state->m_timer[which].counter == 0 )
 		{
 			state->m_timer[which].cntrl2 |= 8; // set timer done
-			lynx_timer_signal_irq(machine, which);
-			if ( state->m_timer[which].cntrl1 & 0x10 ) // if reload enabled
-			{
-				state->m_timer[which].counter = state->m_timer[which].bakup;
+				lynx_timer_signal_irq(machine, which);
+				if ( state->m_timer[which].cntrl1 & 0x10 ) // if reload enabled
+				{
+					state->m_timer[which].counter = state->m_timer[which].bakup;
 				// should we unset timer done?
-			}
-			else
-			{
+				}
+				else
+				{
 				state->m_timer[which].counter--; // Is this correct or should it stop at zero?
-			}
+				}
 			return;
 		}
 	}
@@ -1539,8 +1600,7 @@ static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 dat
 			state->m_timer[which].counter = data;
 			break;
 		case 3:
-			// Should we be ignoring writes to the timer done bit?
-			state->m_timer[which].cntrl2 = (state->m_timer[which].cntrl2 & 0x08) | (data & ~0x08);
+			state->m_timer[which].cntrl2 = (state->m_timer[which].cntrl2 & ~0x08) | (data & 0x08);
 			break;
 	}
 
@@ -1704,8 +1764,8 @@ static READ8_HANDLER( mikey_read )
 		value |= (direction & 0x01) ? (state->m_mikey.data[offset] & 0x01) : 0x01;	// External Power input
 		value |= (direction & 0x02) ? (state->m_mikey.data[offset] & 0x02) : 0x00;	// Cart Address Data output (0 turns cart power on)
 		value |= (direction & 0x04) ? (state->m_mikey.data[offset] & 0x04) : 0x04;	// noexp input
-		// REST read returns actual rest state anded with rest output bit (to be implemented)
-		value |= (direction & 0x08) ? (state->m_mikey.data[offset] & 0x08) : 0x00;	// rest output
+		// REST read returns actual rest state anded with rest output bit
+		value |= (direction & 0x08) ? (state->m_mikey.data[offset] & 0x08) & (state->m_mikey.vb_rest<<3) : 0x00;	// rest output
 		value |= (direction & 0x10) ? (state->m_mikey.data[offset] & 0x10) : 0x10;	// audin input
 		/* Hack: we disable COMLynx  */
 		value |= 0x04;
@@ -1721,7 +1781,6 @@ static READ8_HANDLER( mikey_read )
 		value = state->m_mikey.data[offset];
 		//logerror( "mikey read %.2x %.2x\n", offset, value );
 	}
-
 	return value;
 }
 
@@ -1817,6 +1876,13 @@ static WRITE8_HANDLER( mikey_write )
 			//logerror("CPUSLEEP request \n");
 		}
 		break;
+	case 0x94: case 0x95:
+		state->m_mikey.data[offset]=data;
+		break;
+	case 0x9c: case 0x9d: case 0x9e:
+		state->m_mikey.data[offset]=data;
+		logerror("Mtest%d write: %x\n", offset&0x3, data);
+		break;
 
 	default:
 		state->m_mikey.data[offset]=data;
@@ -1883,6 +1949,24 @@ static void lynx_reset(running_machine &machine)
 	state->m_mikey.data[0x8c] = 0x00;
 	state->m_mikey.data[0x90] = 0x00;
 	state->m_mikey.data[0x92] = 0x00;
+
+/*
+	state->m_suzy.data[MATH_A] = 0xff;
+	state->m_suzy.data[MATH_B] = 0xff;
+	state->m_suzy.data[MATH_C] = 0xff;
+	state->m_suzy.data[MATH_D] = 0xff;
+	
+	state->m_suzy.data[MATH_E] = 0xff;
+	state->m_suzy.data[MATH_F] = 0xff;
+	state->m_suzy.data[MATH_G] = 0xff;
+	state->m_suzy.data[MATH_H] = 0xff;
+	
+	state->m_suzy.data[MATH_J] = 0xff;
+	state->m_suzy.data[MATH_K] = 0xff;
+	state->m_suzy.data[MATH_L] = 0xff;
+	state->m_suzy.data[MATH_M] = 0xff;
+	state->m_suzy.data[MATH_P] = 0xff;
+*/
 
 	lynx_uart_reset(state);
 
