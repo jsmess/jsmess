@@ -328,8 +328,11 @@
 
 	<software name="dungeon">
 		<description>Dungeon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>光栄 (Koei)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="ダンジョン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="54499">
 				<rom name="dungeon.t88" size="54499" crc="ffd71bd4" sha1="f43705e6f2cc5df89bfea1167b42617029ca2113" offset="0" />
@@ -363,9 +366,12 @@
 	</software>
 
 	<software name="fanfun">
-		<description>Fanfun</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Fan Fun</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8001 -->
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="ファンファン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="23168">
 				<rom name="fanfun.t88" size="23168" crc="7e087464" sha1="5a5ef975ecfc5f24556ffb6db77004e5f8d62ece" offset="0" />
@@ -374,10 +380,12 @@
 	</software>
 
 	<software name="fanfuna" cloneof="fanfun">
-		<description>Fanfun (alt maybe)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ファンファン FANFUN"/>
+		<description>Fan Fun (alt maybe)</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8001 -->
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="ファンファン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="523940">
 				<rom name="fanfun (alt maybe).t88" size="523940" crc="9aa09f20" sha1="1eced4485695044a72784485f7f2b0aa913f3941" offset="0" />
@@ -539,8 +547,10 @@
 
 	<software name="jeldacmt">
 		<description>Jelda</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198312xx"/>
 		<info name="alt_title" value="ジェルダ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="39326">
@@ -626,8 +636,11 @@
 
 	<software name="kyokiyak">
 		<description>Kyoki no Yakata</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="狂気の館"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="31965">
 				<rom name="kyoki no yakata.t88" size="31965" crc="a71301f0" sha1="9cce3f606c42f697838cefadbadc13c2413bed10" offset="0" />
@@ -730,8 +743,11 @@
 
 	<software name="minami">
 		<description>Minami Taihei-yo Adventure</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198311xx"/>
+		<info name="alt_title" value="南太平洋アドベンチャー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="43983">
 				<rom name="minami taihei-yo adventure.t88" size="43983" crc="802fe88f" sha1="8a9976d4bae7982a39e7e222c6aac128d7d36f74" offset="0" />
@@ -871,11 +887,13 @@
 		</part>
 	</software>
 
-	<software name="poibost8">
-		<description>Poibos</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ボイボス POIBOS"/>
+	<software name="poibos">
+		<description>Poibos Part-1 - Dasshutsu</description>
+		<year>1983</year>
+		<publisher>大名マイコン学院 (Daimyo Micom Gakuen)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198311xx"/>
+		<info name="alt_title" value="ポイボスＰａｒｔ１ -脱出-"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="32727">
 				<rom name="poibos.t88" size="32727" crc="e14bb4ce" sha1="93a33d391336b7e36db5a4a706ee18dec63eab69" offset="0" />
@@ -1049,8 +1067,10 @@
 
 	<software name="starligh">
 		<description>Starlight Adventure</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198310xx"/>
 		<info name="alt_title" value="スターライトアドベンチャー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="36281">
@@ -1138,8 +1158,11 @@
 
 	<software name="tropical">
 		<description>Tropical Boy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="トロピカルボーイ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25650">
 				<rom name="tropical boy.t88" size="25650" crc="1af889f3" sha1="c8136db4c0f12bd04c2d9efa153dfaae2580caf3" offset="0" />
