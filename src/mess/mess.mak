@@ -1733,6 +1733,7 @@ $(MESSOBJ)/test.a:				\
 
 $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/alesis.o	\
+	$(MESS_DRIVERS)/alphatro.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/applix.o	\
 	$(MESS_DRIVERS)/babbage.o	\
