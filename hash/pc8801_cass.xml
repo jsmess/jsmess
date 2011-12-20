@@ -55,8 +55,11 @@
 
 	<software name="3dgolf">
 		<description>3D Golf Simulation</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>T&amp;E Soft</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198307xx"/>
+		<info name="alt_title" value="３Ｄゴルフシミュレーション"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="64126">
 				<rom name="3d golf simulation.t88" size="64126" crc="1e2d085c" sha1="4070737ede0f4eda0c0102468127cd0abf3725d9" offset="0" />
@@ -107,9 +110,11 @@
 	</software>
 
 	<software name="ay1">
-		<description>AY-1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>AY-1 Fortress Solomon</description>
+		<year>1983</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="AY-1 フォートロレス・ソロモン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="30241">
 				<rom name="ay-1.t88" size="30241" crc="f5706072" sha1="be83344cff7fdaadbfb329d5357db7124a1bacd0" offset="0" />
@@ -130,8 +135,11 @@
 
 	<software name="bishohip">
 		<description>Bishojo Hippagashi Game</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>ツクモ (Tsukumo)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198303xx"/>
+		<info name="alt_title" value="美少女ひっぱがしゲーム"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="22194">
 				<rom name="bishojo hippagashi game.t88" size="22194" crc="d4b6a8d3" sha1="419c1cf949b9d20a4fc64cbe8074779796baecb4" offset="0" />
@@ -214,13 +222,22 @@
 		</part>
 	</software>
 
-	<software name="cyclops">
-		<description>Cyclops Crusher</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="pc8801_cass">
+	<software name="cyclwman">
+		<description>Cyclops Crusher + Waterman</description>
+		<year>1983</year>
+		<publisher>ポニカ (Pony Canyon)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198312xx"/>
+		<info name="alt_title" value="サイクロプスクラッシャー＆ウォーターマン"/>
+		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="7658">
 				<rom name="cyclops crusher.t88" size="7658" crc="1d8f5671" sha1="065682e65074e3ba35ec977a04112766b74c568e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="pc8801_cass">
+			<dataarea name="cass" size="30290">
+				<rom name="waterman.t88" size="30290" crc="b041f530" sha1="2faafae8cbe6502517e0cc845f32a1174bb64ddf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -237,6 +254,7 @@
 		</part>
 	</software>
 
+    <!-- or is it the PC8001 version? -->
 	<software name="digdug">
 		<description>Dig Dug</description>
 		<year>1983</year>
@@ -264,8 +282,10 @@
 
 	<software name="donkeygo">
 		<description>Donkey Gorilla</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>ツクモ (Tsukumo)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="ドンキーゴリラ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="6958">
 				<rom name="donkey gorilla.t88" size="6958" crc="8359a32a" sha1="255ca88bedb466e9313c025e3f4397733f000e96" offset="0" />
@@ -422,8 +442,10 @@
 
 	<software name="forsice">
 		<description>Forsice</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>ブレーンメディア (Brain Media)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="フォーサイス"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="28547">
 				<rom name="forsice.t88" size="28547" crc="bd01cd7a" sha1="ebc6fe69ec80bf9585283ee56e21400a9779fcf7" offset="0" />
@@ -474,9 +496,12 @@
 	</software>
 
 	<software name="hitsuyai">
-		<description>Hitsuji Yaai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Hitsuji-Ya</description>
+		<year>1983</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="ひつじやーい"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19259">
 				<rom name="hitsuji yaai.t88" size="19259" crc="c7027c11" sha1="0cf7a14fd778830e41c0364ba96446c12bc3b8d4" offset="0" />
@@ -511,8 +536,11 @@
 
 	<software name="horrorho">
 		<description>Horror House</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="ホラーハウス"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="50422">
 				<rom name="horror house.t88" size="50422" crc="8a6100a2" sha1="3ba80f042acb22b53da0d433c02d74e239879572" offset="0" />
@@ -520,7 +548,7 @@
 		</part>
 	</software>
 
-	<software name="hosit88">
+	<software name="hosi">
 		<description>Hosi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -531,7 +559,7 @@
 		</part>
 	</software>
 
-	<software name="jageyt88">
+	<software name="jagey">
 		<description>Jagey</description>
 		<year>1985</year>
 		<publisher>MIA</publisher>
@@ -545,7 +573,7 @@
 		</part>
 	</software>
 
-	<software name="jeldacmt">
+	<software name="jelda">
 		<description>Jelda</description>
 		<year>1983</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -652,6 +680,8 @@
 		<description>Love Adventure Playboy</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198307xx"/>
 		<info name="alt_title" value="ラブアドベンチャー プレイボーイ"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="39684">
@@ -928,8 +958,10 @@
 
 	<software name="puzzladv">
 		<description>Puzzle Adventure</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>マイコンシティー (Micom City)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198301xx"/>
 		<info name="alt_title" value="パズルアドベンチャー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="19939">
@@ -976,8 +1008,10 @@
 
 	<software name="shogimei">
 		<description>Shogi Meijin</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>ソフトプロ (Soft Pro) / アポロテクニカ (Apollo Technica)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="将棋名人"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25655">
@@ -1045,8 +1079,11 @@
 
 	<software name="starflet">
 		<description>Star Fleet</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198307xx"/>
+		<info name="alt_title" value="スターフリート"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="20553">
 				<rom name="star_fleet_v80.t88" size="20553" crc="47ac3ccb" sha1="2e3d459f12acccc13247f7dc2c42d6732ce7dcdd" offset="0" />
@@ -1102,11 +1139,13 @@
 		</part>
 	</software>
 
-	<software name="thespide">
+	<software name="spider">
 		<description>The Spider</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ザ・スパイダー"/>
+		<year>1983</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198307xx"/>
+		<info name="alt_title" value="ザ・スパイダー"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25318">
 				<rom name="the spider.cmt" size="25318" crc="b2d0f4f1" sha1="73eda7b80ca817bc49e5f432fcd348e5d3374eaf" offset="0" />
@@ -1172,8 +1211,11 @@
 
 	<software name="uchusens">
 		<description>Uchu no Senshi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198302xx"/>
+		<info name="alt_title" value="宇宙の戦士"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="27723">
 				<rom name="uchu no senshi.t88" size="27723" crc="613dae17" sha1="e488a209b43bb727f8036b115de2043d3d22f08e" offset="0" />
@@ -1204,22 +1246,12 @@
 		</part>
 	</software>
 
-	<software name="waterman">
-		<description>Waterman</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="pc8801_cass">
-			<dataarea name="cass" size="30290">
-				<rom name="waterman.t88" size="30290" crc="b041f530" sha1="2faafae8cbe6502517e0cc845f32a1174bb64ddf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xenon">
-		<description>Xenon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ゼノン XENON"/>
+	<software name="zenon">
+		<description>Zenon</description>
+		<year>1983</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<!-- PC8801 -->
+		<info name="alt_title" value="ゼノン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="37237">
 				<rom name="xenon.cmt" size="37237" crc="7ac5ab1c" sha1="4fdf68f89e0b4f6845592d34e405d1fa9764b877" offset="0" />
