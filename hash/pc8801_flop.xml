@@ -192,7 +192,6 @@ Are the following undumped or mistransalted (check also if available in TOSEC)?
  - 暴龍ゴジラ (198505xx) by Bandai
  - バックギャモン エクセレント (198505xx) by Techno Soft
  - ワンウェイトラップ (198504xx) by HOT-B
- - 将棋名人 (198504xx) by SoftPro / Apollo Technica
  - セラピスの神殿 (198504xx) by T.I.P.
  - 中国弁官図 (198503xx) by DataPop
  - ローリングペーパーズ (198503xx) by Koei
@@ -835,7 +834,7 @@ TO FIX
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198505xx"/>
-		<info name="alt_title" value="3Dゴルフシミュレーションスーパーバージョン"/>
+		<info name="alt_title" value="３Ｄゴルフシミュレーションスーパーバージョン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="370608">	<!-- Data CRC16: 29390 -->
 				<rom name="3d golf simulation (super version).d88" size="370608" crc="2734438e" sha1="67d2fc222d1b8f4ed6a24f1a671e93941fd15d76" offset="0" />
@@ -6105,6 +6104,20 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
+	<software name="mjhana">
+		<description>Chin-san Mahjong + Hanafuda Koi Koi</description>
+		<year>1984</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198407xx"/>
+		<info name="alt_title" value="珍さん麻雀/花札こいこい"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="296624">
+				<rom name="mahjong &amp; hanafuda.d88" size="296624" crc="6d8a23d1" sha1="3d3979f6bae33407611aa65ab21a3b621b70866a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chiteita">
 		<description>Chitei Tanken</description>
 		<year>1982</year>
@@ -8538,6 +8551,20 @@ ExtractDisk  [02]"DAIVA_B		 " -> "daiva_02.d88"
 		</part>
 	</software>
 
+	<software name="shinsen">
+		<description>Shinsenkumi</description>
+		<year>1983</year>
+		<publisher>CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198307xx"/>
+		<info name="alt_title" value="新撰組"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="shinsengumi.d88" size="348848" crc="1c0af779" sha1="c8124bec656009c4d080846b19bfecac74f1b7e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="destrujk">
 		<description>Shiro to Kuro no Densetsu Shirizu - Destruction Joukan</description>
 		<year>1989</year>
@@ -9637,6 +9664,20 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
+	<software name="drmasuik">
+		<description>Dr. Masuikai</description>
+		<year>1983</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="Ｄｒ．麻酔科医"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="66240">
+				<rom name="dr masuikai.d88" size="66240" crc="43e07ed2" sha1="f80949257610f31d1ed7b1e3719772b383c8b492" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dragon">
 		<description>Dragon</description>
 		<year>1989</year>
@@ -10324,8 +10365,11 @@ ExtractDisk  [08]"START DISK	  " -> "eiyu densetsu ii_08.d88"
 
 	<software name="dreamlnd">
 		<description>Dream Land</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="ドリームランド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
 				<rom name="dream land.d88" size="344496" crc="8061b05e" sha1="f1a6a3e3b70486eddb6f1dea7ae390935d6f0751" offset="0" />
@@ -13132,6 +13176,20 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="352240">
 				<rom name="gegege no kitaro.d88" size="352240" crc="420cc095" sha1="40486c67a0951b1a809a6763e1b9ed89db0ac0df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gekisenm">
+		<description>Gekisen! Minami Taihei-yo</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="激戦！南太平洋"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gekisen minami taihei-yo.d88" size="348848" crc="e84c77e2" sha1="49230a4bd91f05906df8250786eb69ce94c22638" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -17025,6 +17083,20 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
+	<software name="joshipan">
+		<description>Joshiryo Panic</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="女子寮パニック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="joshiryo panic.d88" size="348848" crc="90b1f72d" sha1="6d48954a36c125d6eeeb9ed014d75aaf7c0717a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jotunn">
 		<description>Jotunn</description>
 		<year>1988</year>
@@ -17685,6 +17757,20 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="331440">
 				<rom name="keiko-chan no himitsu.d88" size="331440" crc="63a904cb" sha1="ed0c7436744401e7a9eed5be69246ee03d13f766" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kenmaho">
+		<description>Ken to Maho</description>
+		<year>1983</year>
+		<publisher>光栄 (Koei)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="剣と魔法"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ken to maho.d88" size="348848" crc="836ad094" sha1="ea9bc7afcbacc0dcfff28089df3c09d2c7bdc327" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -18687,7 +18773,7 @@ ExtractDisk  [04]"D_USER		  " -> "kon'yamo asamade powerful mahjong 2_04.d88"
 		</part>
 	</software>
 
-	<software name="kosokido">
+	<software name="kubokido">
 		<description>Kosoku Kido Butai</description>
 		<year>1983</year>
 		<publisher>クリスタルソフト (Crystal Soft)</publisher>
@@ -18893,6 +18979,21 @@ ExtractDisk  [04]"D_USER		  " -> "kon'yamo asamade powerful mahjong 2_04.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="kyan kyan collection (disk 2).d88" size="348848" crc="97d87192" sha1="f9aa8eca34ae2bfb6f8db426b91debd34f93ee9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kyodaiji">
+		<description>Kyodai Jishin</description>
+		<year>1983</year>
+		<publisher>ユニオンプランニング (Union Planning)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="巨大地震"/>
+		<info name="usage" value="Needs BASIC V1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="kyodai jishin.d88" size="348848" crc="0964fcfd" sha1="448a0a64d459a43609d3bd6e5da4389d23527554" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -19542,6 +19643,8 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		<description>Light Flipper</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198306xx"/>
 		<info name="alt_title" value="ライト・フリッパー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -22644,6 +22747,20 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
+	<software name="missilep">
+		<description>Missile Panic</description>
+		<year>1983</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198302xx"/>
+		<info name="alt_title" value="ミサイルパニック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="missile panic.d88" size="348848" crc="38fac0f9" sha1="ae278059eeffd7872622d6f0b7cdcfcea5c5e222" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="missimp">
 		<description>Mission Impossible</description>
 		<year>1984</year>
@@ -22970,7 +23087,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="moritabfb" cloneof="moritabf">
-		<description>Morita no Battle Field (Alt s)</description>
+		<description>Morita no Battle Field (Alt 2)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -28691,6 +28808,20 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 		</part>
 	</software>
 
+	<software name="seikonoa">
+		<description>Seiko no Adventure</description>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198302xx"/>
+		<info name="alt_title" value="星子のアドベンチャー"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="seiko no adventure.d88" size="348848" crc="8ea7f125" sha1="41586fd5598eb1128473cf658f38d3a1102c2e07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="seilane">
 		<description>Seilane</description>
 		<year>1987</year>
@@ -31076,6 +31207,20 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349376">
 				<rom name="southern cross.d88" size="349376" crc="f9154157" sha1="5bfbd1b30d51af4dd1980fa77646d44cf0a717ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacecrs">
+		<description>Space Cruiser</description>
+		<year>1983</year>
+		<publisher>ニデコム (Nidecom)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198309xx"/>
+		<info name="alt_title" value="スペースクルーザー"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="space cruiser(n mode).d88" size="348848" crc="6ed341ec" sha1="8bf711abcb66e70af7c86ea9432c4c3e3a73806b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -36230,11 +36375,12 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<software name="wizardan">  <!-- is this really the new version? -->
-		<description>Wizard and The Princess - New Version</description>
-		<year>1984</year>
+	<software name="wizardan">  <!-- this was labeled as "new version", why? -->
+		<description>Wizard and The Princess</description>
+		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801 -->
+		<info name="release" value="198305xx"/>
 		<info name="alt_title" value="ウィザードアンドプリンセス ニューバージョン"/>
 		<!--combined image-->
 		<!--rom name="wizard and princess.d88" size="1046496" crc="d2e00241" sha1="08e1e6e7c17e0b5b32f3fa4b82cf771afae8ab71" offset="0" /-->
@@ -44390,17 +44536,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="drmasuik">
-		<description>Dr Masuikai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="66240">
-				<rom name="dr masuikai.d88" size="66240" crc="43e07ed2" sha1="f80949257610f31d1ed7b1e3719772b383c8b492" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="draghnt2">
 		<description>Dragon Hunt 2</description>
 		<year>19??</year>
@@ -44757,17 +44892,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="gekisenm">
-		<description>Gekisen Minami Taihei-yo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="gekisen minami taihei-yo.d88" size="348848" crc="e84c77e2" sha1="49230a4bd91f05906df8250786eb69ce94c22638" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="genmunos">
 		<description>Genmu no Shiro</description>
 		<year>19??</year>
@@ -45051,17 +45175,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="joshiryo">
-		<description>Joshiryo Panic</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="joshiryo panic.d88" size="348848" crc="90b1f72d" sha1="6d48954a36c125d6eeeb9ed014d75aaf7c0717a9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kanai">
 		<description>Kanai</description>
 		<year>19??</year>
@@ -45091,17 +45204,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 			<feature name="part id" value="Data" />
 			<dataarea name="flop" size="348848">
 				<rom name="kasangen (data).d88" size="348848" crc="2730cd41" sha1="e0a2b23901444535e01556ccbe4a9cad25c590d2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kentomah">
-		<description>Ken to Maho</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="ken to maho.d88" size="348848" crc="836ad094" sha1="ea9bc7afcbacc0dcfff28089df3c09d2c7bdc327" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -45291,17 +45393,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="love mate.d88" size="348848" crc="b6d18396" sha1="51f63e0222eafafffb194cd488ec690ac6633434" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mahjongh">
-		<description>Mahjong &amp; Hana</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="296624">
-				<rom name="mahjong &amp; hanafuda.d88" size="296624" crc="6d8a23d1" sha1="3d3979f6bae33407611aa65ab21a3b621b70866a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46535,17 +46626,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="seikonoa">
-		<description>Seiko no Adventure</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="seiko no adventure.d88" size="348848" crc="8ea7f125" sha1="41586fd5598eb1128473cf658f38d3a1102c2e07" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="semidoub">
 		<description>Semi Double II</description>
 		<year>19??</year>
@@ -46673,17 +46753,6 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 		</part>
 	</software>
 
-	<software name="shinseng">
-		<description>Shinsengumi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="shinsengumi.d88" size="348848" crc="1c0af779" sha1="c8124bec656009c4d080846b19bfecac74f1b7e8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sigma">
 		<description>Sigma</description>
 		<year>19??</year>
@@ -46702,17 +46771,6 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="space amoeba.d88" size="348848" crc="f91e0345" sha1="077f60c5b93e687a1e8d471fc8f78e36be7db34d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spacecru">
-		<description>Space Cruiser(N mode)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="space cruiser(n mode).d88" size="348848" crc="6ed341ec" sha1="8bf711abcb66e70af7c86ea9432c4c3e3a73806b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -49160,17 +49218,6 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 		</part>
 	</software>
 
-	<software name="kyodaiji">
-		<description>Kyodai Jishin</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="kyodai jishin.d88" size="348848" crc="0964fcfd" sha1="448a0a64d459a43609d3bd6e5da4389d23527554" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kyofuno2">
 		<description>Kyofu no 200 Yen Disk</description>
 		<year>19??</year>
@@ -49409,17 +49456,6 @@ ExtractDisk  [04]"game_2		  " -> "loginsoft game create system - mamirin_04.d88"
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="mind panics (disk 2).d88" size="348848" crc="6ed468db" sha1="b97686a76809f01936536831096fb679e9601bc7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="missilep">
-		<description>Missile Panic</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="missile panic.d88" size="348848" crc="38fac0f9" sha1="ae278059eeffd7872622d6f0b7cdcfcea5c5e222" offset="0" />
 			</dataarea>
 		</part>
 	</software>
