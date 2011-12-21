@@ -16452,7 +16452,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198707xx"/>
 		<info name="alt_title" value="マンハッタンレクイエム"/>
-		<!--combined image-->
+		<!--combined image (with kiss of murder [bc660ad3] too)-->
 		<!--rom name="manhattan requiem.d88" size="1248368" crc="3c109935" sha1="fedeb91f2f6d6488804a5eedbf70b15e4b9a8eb8" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -30669,7 +30669,6 @@ ExtractDisk  [03]"SONOGONOKEIKO_P3" -> "sonogo no keiko-chan full pack_03.d88"
 	</software>
 
 <!--
-first 9 disks are same as sorcer (the one with broken 10th disk)
 ExtractDisk  [01]"Program V1.1	" -> "sorcerian(full package)_01.d88"	[4f3c2875]
 ExtractDisk  [02]"User Disk 1	 " -> "sorcerian(full package)_02.d88"	[865cb1cb]
 ExtractDisk  [03]"User Disk 2	 " -> "sorcerian(full package)_03.d88"	[d5dc59c5]
@@ -30804,11 +30803,6 @@ ExtractDisk  [27]"Program V1.0	" -> "sorcerian(full package)_27.d88"	[15740427]
 		</part>
 	</software>
 
-<!--
-// Program v1.0 from sorcer
-
-// Program v1.1 from sorcerb
--->
 <!--
 ExtractDisk  [01]"Program Disk(V1." -> "Sorcerian - Full Set 01.d88"	[5deed07a]
 ExtractDisk  [02]"User Disk	   " -> "Sorcerian - Full Set 02.d88"	[ff893079]
@@ -31099,7 +31093,7 @@ ExtractDisk  [26]"Program Disk(V1." -> "Sorcerian - Full Set 26.d88"	[c85f188d]
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
-				<rom name="sorcerian (scenario uchuu 1).d88" size="348832" crc="1f6abcf8" sha1="2735bb732d73aef4f68b952c6ffca209a2ff2d07" offset="0" />
+				<rom name="sorcerian (scenario uchuu 2).d88" size="348832" crc="1f6abcf8" sha1="2735bb732d73aef4f68b952c6ffca209a2ff2d07" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -42834,10 +42828,22 @@ ExtractDisk  [02]"				" -> "sound on-ten vol.1(a)_02.d88"
 		<description>Street Yakyuken</description>
 		<year>1991?</year>
 		<publisher>NAMECO</publisher>
-		<info name="alt_title" value="STREET野球拳"/>
+		<info name="alt_title" value="ストリート野球拳"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="street yakyuken.d88" size="348848" crc="2ac6bd29" sha1="1a4cd4fefa593cb81e12edb018f8ddae00b4866f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="streetyaa" cloneof="streetya">
+		<description>Street Yakyuken (Alt)</description>
+		<year>1991?</year>
+		<publisher>NAMECO</publisher>
+		<info name="alt_title" value="ストリート野球拳"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">
+				<rom name="street yakyuken (a).d88" size="348832" crc="7080a55e" sha1="d37eb5992fdcd07ea55cd390fdd787e853767141" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -46661,7 +46667,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Doujin? -->
 	<software name="rexland2">
 		<description>Rex Land 2 - Dice</description>
 		<year>19??</year>
@@ -46673,7 +46678,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Doujin? -->
 	<software name="rexland3">
 		<description>Rex Land 3 - Bingo</description>
 		<year>19??</year>
@@ -46685,7 +46689,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Doujin? -->
 	<software name="rexland4">
 		<description>Rex Land 4 - Roulette</description>
 		<year>19??</year>
@@ -46719,7 +46722,6 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<!-- Doujin? -->
 	<software name="rollingr">
 		<description>Rollinger</description>
 		<year>19??</year>
@@ -50646,18 +50648,6 @@ ExtractDisk  [02]"sos sword	   " -> "s-os sword_02.d88"
 			<feature name="part id" value="Disk B" />
 			<dataarea name="flop" size="348848">
 				<rom name="street quiz 3 (disk b).d88" size="348848" crc="e1c60e06" sha1="cf74aee31b1e938d96487c8e8ff7a318ae31cebd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="streetyaa" cloneof="streetya">
-		<description>Street Yakyuken(a)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ストリート野球拳"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">
-				<rom name="street yakyuken(a).d88" size="348832" crc="7080a55e" sha1="d37eb5992fdcd07ea55cd390fdd787e853767141" offset="0" />
 			</dataarea>
 		</part>
 	</software>
