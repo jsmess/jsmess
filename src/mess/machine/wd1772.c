@@ -1396,7 +1396,6 @@ void wd177x_t::live_run(attotime limit)
 				live_write_mfm(data);
 				break;
 			}
-			fprintf(stderr, "- %02x %04x\n", data, cur_live.crc);
 			set_drq();
 			cur_live.state = WRITE_BYTE;
 			cur_live.bit_counter = 16;
