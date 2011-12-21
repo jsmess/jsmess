@@ -6,6 +6,16 @@
 
 	z80 + HD46505 as a CRTC
 
+        Note the boot rom (E000-FFFF) has various areas of zero bytes,
+        in these areas are connected the keyboard scan lines etc.
+
+        Looks like videoram is shadowed behind rom at F000-F7CF (filled
+        with 0x20), and F800-FDFF is filled with 0x30 (colour/attribute?).
+
+        BASIC should get copied from ROM into lower RAM when it is needed.
+
+        Appears to use an amber monitor.
+
 ***************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -29,15 +39,28 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
+	DECLARE_READ8_MEMBER(random_r);
+	DECLARE_WRITE8_MEMBER(video_w);
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_chargen;
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
+READ8_MEMBER( alphatro_state::random_r )
+{
+	return space.machine().rand();
+}
+
+WRITE8_MEMBER( alphatro_state::video_w )
+{
+	m_p_videoram[offset] = data;
+}
+
 VIDEO_START_MEMBER( alphatro_state )
 {
 	m_p_chargen = machine().region("chargen")->base();
+	m_p_videoram = machine().region("vram")->base();
 }
 
 SCREEN_UPDATE_MEMBER( alphatro_state )
@@ -49,7 +72,7 @@ SCREEN_UPDATE_MEMBER( alphatro_state )
 static MC6845_UPDATE_ROW( alphatro_update_row )
 {
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
-	UINT8 chr,gfx;
+	UINT8 chr,gfx,attr;
 	UINT16 mem,x;
 	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -58,9 +81,10 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 		UINT8 inv=0;
 		if (x == cursor_x) inv=0xff;
 		mem = (ma + x) & 0x7ff;
-		chr = 0x20;  //state->m_p_videoram[mem]; // need to find out where videoram is
+		chr = state->m_p_videoram[mem];
+		attr = state->m_p_videoram[mem | 0x800];
 
-		if (chr & 0x80)
+		if (BIT(attr, 7))
 		{
 			inv ^= 0xff;
 			chr &= 0x7f;
@@ -82,15 +106,20 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM // this would get banked out when cp/m is being used
+	AM_RANGE(0x0000, 0x5fff) AM_ROM // this is really ram, basic gets copied to here when it is needed
 	AM_RANGE(0x6000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xfdff) AM_ROM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM
+	AM_RANGE(0xe000, 0xe46f) AM_ROM
+	AM_RANGE(0xe470, 0xe4cf) AM_RAM // keyboard out?
+	AM_RANGE(0xe4d0, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xfdff) AM_ROM AM_WRITE(video_w)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM // for the stack
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x10, 0x10) AM_READ(random_r)
+	//AM_RANGE(0x20, 0x2f) AM_READ(random_r) // keyboard in?
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
@@ -124,9 +153,9 @@ static MACHINE_RESET( alphatro )
 	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0xe000);
 }
 
-static PALETTE_INIT( alphatro )
-{
-}
+//static PALETTE_INIT( alphatro )
+//{
+//}
 
 static const mc6845_interface h19_crtc6845_interface =
 {
@@ -160,8 +189,10 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_GFXDECODE(alphatro)
-	MCFG_PALETTE_INIT(alphatro)
-	MCFG_PALETTE_LENGTH(8)
+	//MCFG_PALETTE_INIT(alphatro)
+	//MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(monochrome_amber)
+	MCFG_PALETTE_LENGTH(2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -201,11 +232,13 @@ ROM_START( alphatro )
 	ROM_LOAD( "2764.ic-1038", 0xe000, 0x2000, BAD_DUMP CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) ) // ???
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
-	ROM_LOAD( "613256.ic-1058"	,     0x2000, 0x6000, BAD_DUMP CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
+	ROM_LOAD( "613256.ic-1058"	,     0x0000, 0x6000, BAD_DUMP CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
 	ROM_LOAD( "ipl.bin",     0x8000, 0x2000, NO_DUMP  )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "2732.ic-1067",      0x0000, 0x1000, BAD_DUMP CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8) ) // should be 1:1
+
+	ROM_REGION( 0x1000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 COMP( 1983, alphatro,   0,       0,    alphatro,   alphatro,  0,  "Triumph-Adler", "Alphatronic PC", GAME_NOT_WORKING | GAME_NO_SOUND)
