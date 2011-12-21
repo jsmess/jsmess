@@ -56,7 +56,9 @@ class x1_state : public driver_device
 {
 public:
 	x1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_x1_cpu(*this,"x1_cpu")
+		{ }
 
 	UINT8 *m_tvram;
 	UINT8 *m_avram;
@@ -107,9 +109,13 @@ public:
 	UINT8 m_is_turbo;
 	UINT8 m_ex_bank;
 	UINT8 m_ram_bank;
+
+	required_device<cpu_device> m_x1_cpu;
 };
 
+VIDEO_START( x1 );
 SCREEN_UPDATE( x1 );
+
 READ8_HANDLER( x1_sub_io_r );
 WRITE8_HANDLER( x1_sub_io_w );
 READ8_HANDLER( x1_rom_r );
@@ -163,11 +169,14 @@ WRITE8_DEVICE_HANDLER( x1_portc_w );
 
 TIMER_DEVICE_CALLBACK(x1_keyboard_callback);
 TIMER_CALLBACK(x1_rtc_increment);
+TIMER_DEVICE_CALLBACK( x1_cmt_wind_timer );
 
 MACHINE_RESET( x1 );
 MACHINE_RESET( x1turbo );
 MACHINE_START( x1 );
 PALETTE_INIT(x1);
+
+DRIVER_INIT( x1_kanji );
 
 
 /*----------- defined in machine/x1.c -----------*/

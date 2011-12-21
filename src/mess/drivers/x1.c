@@ -217,7 +217,6 @@
 #include "video/mc6845.h"
 #include "sound/2151intf.h"
 #include "sound/wave.h"
-
 #include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
@@ -242,7 +241,7 @@
  *
  *************************************/
 
-static VIDEO_START( x1 )
+VIDEO_START( x1 )
 {
 	x1_state *state = machine.driver_data<x1_state>();
 
@@ -827,7 +826,7 @@ static void cmt_command( running_machine &machine, UINT8 cmd )
 	logerror("CMT: Command 0xe9-0x%02x received.\n",cmd);
 }
 
-static TIMER_DEVICE_CALLBACK( x1_cmt_wind_timer )
+TIMER_DEVICE_CALLBACK( x1_cmt_wind_timer )
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
 	cassette_image_device* cmt = timer.machine().device<cassette_image_device>(CASSETTE_TAG);
@@ -1611,7 +1610,7 @@ READ8_HANDLER( x1turbo_bank_r )
 WRITE8_HANDLER( x1turbo_bank_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
-	//UINT8 *RAM = space->machine().region("maincpu")->base();
+	//UINT8 *RAM = space->machine().region("x1_cpu")->base();
 	/*
     --x- ---- BML5: latch bit (doesn't have any real function)
     ---x ---- BMCS: select bank RAM, active low
@@ -2007,13 +2006,13 @@ static void memory_write_byte(address_space *space, offs_t address, UINT8 data) 
 
 static Z80DMA_INTERFACE( x1_dma )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_HALT),
+	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_write_byte)
+	DEVCB_MEMORY_HANDLER("x1_cpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("x1_cpu", PROGRAM, memory_write_byte),
+	DEVCB_MEMORY_HANDLER("x1_cpu", IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("x1_cpu", IO, memory_write_byte)
 };
 
 /*************************************
@@ -2024,10 +2023,10 @@ static Z80DMA_INTERFACE( x1_dma )
 
 static INPUT_CHANGED( ipl_reset )
 {
-	//address_space *space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	//address_space *space = field.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 	x1_state *state = field.machine().driver_data<x1_state>();
 
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_x1_cpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	state->m_ram_bank = 0x00;
 	if(state->m_is_turbo) { state->m_ex_bank = 0x10; }
@@ -2037,7 +2036,9 @@ static INPUT_CHANGED( ipl_reset )
 /* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
 static INPUT_CHANGED( nmi_reset )
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	x1_state *state = field.machine().driver_data<x1_state>();
+
+	device_set_input_line(state->m_x1_cpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_PORTS_START( x1 )
@@ -2371,7 +2372,7 @@ GFXDECODE_END
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,					// timer disables
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
+	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),		// interrupt handler
 	DEVCB_LINE(z80ctc_trg3_w),		// ZC/TO0 callback
 	DEVCB_LINE(z80ctc_trg1_w),		// ZC/TO1 callback
 	DEVCB_LINE(z80ctc_trg2_w),		// ZC/TO2 callback
@@ -2408,7 +2409,7 @@ static Z80DART_INTERFACE( sio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
+	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0)
 };
 
 static const z80_daisy_config x1_daisy[] =
@@ -2492,7 +2493,7 @@ static IRQ_CALLBACK(x1_irq_callback)
 TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
-	address_space *space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = timer.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
 	UINT32 key1 = input_port_read(timer.machine(),"key1");
 	UINT32 key2 = input_port_read(timer.machine(),"key2");
 	UINT32 key3 = input_port_read(timer.machine(),"key3");
@@ -2510,7 +2511,7 @@ TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 			x1_sub_io_w(space,0,0xe6);
 			state->m_irq_vector = state->m_key_irq_vector;
 			state->m_key_irq_flag = 1;
-			cputag_set_input_line(timer.machine(),"maincpu",0,ASSERT_LINE);
+			cputag_set_input_line(timer.machine(),"x1_cpu",0,ASSERT_LINE);
 			state->m_old_key1 = key1;
 			state->m_old_key2 = key2;
 			state->m_old_key3 = key3;
@@ -2551,7 +2552,7 @@ TIMER_CALLBACK(x1_rtc_increment)
 MACHINE_RESET( x1 )
 {
 	x1_state *state = machine.driver_data<x1_state>();
-	//UINT8 *ROM = machine.region("maincpu")->base();
+	//UINT8 *ROM = machine.region("x1_cpu")->base();
 	UINT8 *PCG_RAM = machine.region("pcg")->base();
 	int i;
 
@@ -2567,7 +2568,7 @@ MACHINE_RESET( x1 )
 
 	state->m_io_bank_mode = 0;
 
-	//device_set_irq_callback(machine.device("maincpu"), x1_irq_callback);
+	//device_set_irq_callback(machine.device("x1_cpu"), x1_irq_callback);
 
 	state->m_cmt_current_cmd = 0;
 	state->m_cmt_test = 0;
@@ -2657,7 +2658,7 @@ static const floppy_interface x1_floppy_interface =
 
 static MACHINE_CONFIG_START( x1, x1_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
+	MCFG_CPU_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_CPU_CONFIG(x1_daisy)
@@ -2714,12 +2715,12 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", x1_keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_ADD_PERIODIC("x1_cmt_wind_timer", x1_cmt_wind_timer, attotime::from_hz(16))
+	MCFG_TIMER_ADD_PERIODIC("cmt_wind_timer", x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("x1_cpu")
 	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
 	MCFG_CPU_IO_MAP(x1turbo_io)
 	MCFG_CPU_CONFIG(x1turbo_daisy)
@@ -2746,7 +2747,7 @@ MACHINE_CONFIG_END
  *************************************/
 
  ROM_START( x1 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "x1_cpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d) )
@@ -2775,42 +2776,8 @@ MACHINE_CONFIG_END
 	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
-ROM_START( x1twin )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "ipl.rom", 0x0000, 0x1000, CRC(e70011d3) SHA1(d3395e9aeb5b8bbba7654dd471bcd8af228ee69a) )
-
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
-	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
-
-	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x1000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
-	ROM_LOAD( "ank16.rom", 0x0000, 0x1000, CRC(8f9fb213) SHA1(4f06d20c997a79ee6af954b69498147789bf1847) )
-
-	ROM_REGION(0x1800, "cgrom", 0)
-	ROM_LOAD("ank8.rom", 0x00000, 0x00800, CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) )
-	ROM_COPY("font",	 0x00000, 0x00800, 0x1000 )
-
-	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
-
-	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF) // these comes from x1 turbo
-	ROM_LOAD("kanji4.rom", 0x00000, 0x8000, BAD_DUMP CRC(3e39de89) SHA1(d3fd24892bb1948c4697dedf5ff065ff3eaf7562) )
-	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, BAD_DUMP CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
-	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, BAD_DUMP CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
-	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
-
-	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
-	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
-ROM_END
-
 ROM_START( x1turbo )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "x1_cpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1t", 0x0000, 0x8000, CRC(2e8b767c) SHA1(44620f57a25f0bcac2b57ca2b0f1ebad3bf305d3) )
@@ -2846,7 +2813,7 @@ ROM_START( x1turbo )
 ROM_END
 
 ROM_START( x1turbo40 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "x1_cpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.bin", 0x0000, 0x8000, CRC(112f80a2) SHA1(646cc3fb5d2d24ff4caa5167b0892a4196e9f843) )
@@ -2881,7 +2848,7 @@ ROM_END
 
 
 /* Convert the ROM interleaving into something usable by the write handlers */
-static DRIVER_INIT( kanji )
+DRIVER_INIT( x1_kanji )
 {
 	UINT32 i,j,k,l;
 	UINT8 *kanji = machine.region("kanji")->base();
@@ -2904,8 +2871,8 @@ static DRIVER_INIT( kanji )
 
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT       INIT   COMPANY   FULLNAME      FLAGS */
-COMP( 1982, x1,        0,      0,       x1,      x1,         0,    "Sharp",  "X1 (CZ-800C)",         0 )
-COMP( 1986, x1twin,    x1,     0,       x1, 	 x1,         kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING )
-COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING ) //model 10
-COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo,    kanji,"Sharp",  "X1 Turbo (CZ-862C)",   0 ) //model 40
+COMP( 1982, x1,        0,      0,       x1,      x1,         0,       "Sharp",  "X1 (CZ-800C)",         0 )
+// x1twin in x1twin.c
+COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo,    x1_kanji,"Sharp",  "X1 Turbo (CZ-850C)",   GAME_NOT_WORKING ) //model 10
+COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo,    x1_kanji,"Sharp",  "X1 Turbo (CZ-862C)",   0 ) //model 40
 // x1turboz  /* 1986 Sharp X1 TurboZ  */
