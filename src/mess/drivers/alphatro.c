@@ -4,38 +4,95 @@
 
 	skeleton driver
 
-	z80 + m6847 as a CRTC
+	z80 + HD46505 as a CRTC
 
 ***************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "video/mc6845.h"
 
 #define MAIN_CLOCK XTAL_4MHz
+
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class alphatro_state : public driver_device
 {
 public:
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_crtc(*this, "crtc")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_chargen;
+	virtual void video_start();
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
-static VIDEO_START( alphatro )
+VIDEO_START_MEMBER( alphatro_state )
 {
-
+	m_p_chargen = machine().region("chargen")->base();
 }
 
-static SCREEN_UPDATE( alphatro )
+SCREEN_UPDATE_MEMBER( alphatro_state )
 {
+	m_crtc->update( &bitmap, &cliprect);
 	return 0;
 }
 
-static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+static MC6845_UPDATE_ROW( alphatro_update_row )
+{
+	alphatro_state *state = device->machine().driver_data<alphatro_state>();
+	UINT8 chr,gfx;
+	UINT16 mem,x;
+	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+
+	for (x = 0; x < x_count; x++)
+	{
+		UINT8 inv=0;
+		if (x == cursor_x) inv=0xff;
+		mem = (ma + x) & 0x7ff;
+		chr = 0x20;  //state->m_p_videoram[mem]; // need to find out where videoram is
+
+		if (chr & 0x80)
+		{
+			inv ^= 0xff;
+			chr &= 0x7f;
+		}
+
+		/* get pattern of pixels for that character scanline */
+		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv;
+
+		/* Display a scanline of a character (8 pixels) */
+		*p++ = BIT(gfx, 7);
+		*p++ = BIT(gfx, 6);
+		*p++ = BIT(gfx, 5);
+		*p++ = BIT(gfx, 4);
+		*p++ = BIT(gfx, 3);
+		*p++ = BIT(gfx, 2);
+		*p++ = BIT(gfx, 1);
+		*p++ = BIT(gfx, 0);
+	}
+}
+
+static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM // this would get banked out when cp/m is being used
+	AM_RANGE(0x6000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xfdff) AM_ROM
+	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatro_io, AS_IO, 8 )
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( alphatro )
@@ -53,7 +110,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( alphatro )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
 static MACHINE_START( alphatro )
@@ -64,12 +121,26 @@ static MACHINE_START( alphatro )
 
 static MACHINE_RESET( alphatro )
 {
-
+	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0xe000);
 }
 
 static PALETTE_INIT( alphatro )
 {
 }
+
+static const mc6845_interface h19_crtc6845_interface =
+{
+	"screen",
+	8,
+	NULL,
+	alphatro_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
 
 static MACHINE_CONFIG_START( alphatro, alphatro_state )
 
@@ -88,19 +159,17 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(alphatro)
-
 	MCFG_GFXDECODE(alphatro)
-
 	MCFG_PALETTE_INIT(alphatro)
 	MCFG_PALETTE_LENGTH(8)
-
-	MCFG_VIDEO_START(alphatro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 //  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	/* Devices */
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk unknown
 MACHINE_CONFIG_END
 
 
@@ -126,16 +195,16 @@ in various places of the ROM ... most likely a bad dump.
 
 ROM_START( alphatro )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "2764.ic-1038"	,     0x0000, 0x2000, BAD_DUMP CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) ) // ???
-    ROM_LOAD( "rom1.bin",     0x2000, 0x2000, BAD_DUMP CRC(1509b15a) SHA1(225c36411de680eb8f4d6b58869460a58e60c0cf) )
-	ROM_LOAD( "rom2.bin",     0x4000, 0x2000, BAD_DUMP CRC(998a865d) SHA1(294fe64e839ae6c4032d5db1f431c35e0d80d367) )
-	ROM_LOAD( "rom3.bin",     0x6000, 0x2000, BAD_DUMP CRC(55cbafef) SHA1(e3376b92f80d5a698cdcb2afaa0f3ef4341dd624) )
+	ROM_LOAD( "rom1.bin",     0x0000, 0x2000, BAD_DUMP CRC(1509b15a) SHA1(225c36411de680eb8f4d6b58869460a58e60c0cf) )
+	ROM_LOAD( "rom2.bin",     0x2000, 0x2000, BAD_DUMP CRC(998a865d) SHA1(294fe64e839ae6c4032d5db1f431c35e0d80d367) )
+	ROM_LOAD( "rom3.bin",     0x4000, 0x2000, BAD_DUMP CRC(55cbafef) SHA1(e3376b92f80d5a698cdcb2afaa0f3ef4341dd624) )
+	ROM_LOAD( "2764.ic-1038", 0xe000, 0x2000, BAD_DUMP CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) ) // ???
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 	ROM_LOAD( "613256.ic-1058"	,     0x2000, 0x6000, BAD_DUMP CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
-    ROM_LOAD( "ipl.bin",     0x8000, 0x2000, NO_DUMP  )
+	ROM_LOAD( "ipl.bin",     0x8000, 0x2000, NO_DUMP  )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "2732.ic-1067",      0x0000, 0x1000, BAD_DUMP CRC(61f38814) SHA1(35ba31c58a10d5bd1bdb202717792ca021dbe1a8) ) // should be 1:1
 ROM_END
 
