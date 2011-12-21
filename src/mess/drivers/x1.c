@@ -244,12 +244,13 @@
 
 static VIDEO_START( x1 )
 {
-//  x1_state *state = machine.driver_data<x1_state>();
-//  state->m_avram = auto_alloc_array(machine, UINT8, 0x800);
-//  state->m_tvram = auto_alloc_array(machine, UINT8, 0x800);
-//  state->m_kvram = auto_alloc_array(machine, UINT8, 0x800);
-//  state->m_gfx_bitmap_ram = auto_alloc_array(machine, UINT8, 0xc000*2);
-//  state->m_pal_4096 = auto_alloc_array(machine, UINT8, 0x1000*3);
+	x1_state *state = machine.driver_data<x1_state>();
+
+	state->m_avram = auto_alloc_array_clear(machine, UINT8, 0x800);
+	state->m_tvram = auto_alloc_array_clear(machine, UINT8, 0x800);
+	state->m_kvram = auto_alloc_array_clear(machine, UINT8, 0x800);
+	state->m_gfx_bitmap_ram = auto_alloc_array_clear(machine, UINT8, 0xc000*2);
+	state->m_pal_4096 = auto_alloc_array_clear(machine, UINT8, 0x1000*3);
 }
 
 static void x1_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
@@ -563,7 +564,7 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static SCREEN_UPDATE( x1 )
+SCREEN_UPDATE( x1 )
 {
 	x1_state *state = screen->machine().driver_data<x1_state>();
 
@@ -576,12 +577,6 @@ static SCREEN_UPDATE( x1 )
 	return 0;
 }
 
-static SCREEN_EOF( x1 )
-{
-//  x1_state *state = screen->machine().driver_data<x1_state>();
-
-//  state->m_old_vpos = -1;
-}
 
 /*************************************
  *
@@ -731,7 +726,7 @@ static UINT8 get_game_key(running_machine &machine, int port)
 	return ret;
 }
 
-static READ8_HANDLER( sub_io_r )
+READ8_HANDLER( x1_sub_io_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 ret,bus_res;
@@ -832,7 +827,7 @@ static void cmt_command( running_machine &machine, UINT8 cmd )
 	logerror("CMT: Command 0xe9-0x%02x received.\n",cmd);
 }
 
-static TIMER_DEVICE_CALLBACK( cmt_wind_timer )
+static TIMER_DEVICE_CALLBACK( x1_cmt_wind_timer )
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
 	cassette_image_device* cmt = timer.machine().device<cassette_image_device>(CASSETTE_TAG);
@@ -857,7 +852,7 @@ static TIMER_DEVICE_CALLBACK( cmt_wind_timer )
 	}
 }
 
-static WRITE8_HANDLER( sub_io_w )
+WRITE8_HANDLER( x1_sub_io_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	/* sub-routine at $10e sends to these sub-routines when a keyboard input is triggered:
@@ -988,7 +983,7 @@ static WRITE8_HANDLER( sub_io_w )
  *************************************/
 
 
-static READ8_HANDLER( x1_rom_r )
+READ8_HANDLER( x1_rom_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 *rom = space->machine().region("cart_img")->base();
@@ -998,19 +993,19 @@ static READ8_HANDLER( x1_rom_r )
 	return rom[state->m_rom_index[0]<<16|state->m_rom_index[1]<<8|state->m_rom_index[2]<<0];
 }
 
-static WRITE8_HANDLER( x1_rom_w )
+WRITE8_HANDLER( x1_rom_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	state->m_rom_index[offset] = data;
 }
 
-static WRITE8_HANDLER( rom_bank_0_w )
+WRITE8_HANDLER( x1_rom_bank_0_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	state->m_ram_bank = 0x10;
 }
 
-static WRITE8_HANDLER( rom_bank_1_w )
+WRITE8_HANDLER( x1_rom_bank_1_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	state->m_ram_bank = 0x00;
@@ -1027,7 +1022,7 @@ static WRITE8_HANDLER( rom_bank_1_w )
 //static UINT8 fdc_side;
 //static UINT8 fdc_drive;
 
-static READ8_HANDLER( x1_fdc_r )
+READ8_HANDLER( x1_fdc_r )
 {
 	device_t* dev = space->machine().device("fdc");
 	//UINT8 ret = 0;
@@ -1059,7 +1054,7 @@ static READ8_HANDLER( x1_fdc_r )
 	return 0x00;
 }
 
-static WRITE8_HANDLER( x1_fdc_w )
+WRITE8_HANDLER( x1_fdc_w )
 {
 	device_t* dev = space->machine().device("fdc");
 
@@ -1152,7 +1147,7 @@ static UINT16 get_pcg_addr(running_machine &machine,UINT16 width,UINT8 y_char_si
 	return pcg_offset;
 }
 
-static READ8_HANDLER( x1_pcg_r )
+READ8_HANDLER( x1_pcg_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	int addr;
@@ -1189,7 +1184,7 @@ static READ8_HANDLER( x1_pcg_r )
 	return res;
 }
 
-static WRITE8_HANDLER( x1_pcg_w )
+WRITE8_HANDLER( x1_pcg_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	int addr,pcg_offset;
@@ -1257,7 +1252,7 @@ static void set_current_palette(running_machine &machine)
 	}
 }
 
-static WRITE8_HANDLER( x1turboz_4096_palette_w )
+WRITE8_HANDLER( x1turboz_4096_palette_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT32 pal_entry;
@@ -1276,7 +1271,7 @@ static WRITE8_HANDLER( x1turboz_4096_palette_w )
 
 /* Note: docs claims that reading the palette ports makes the value to change somehow in X1 mode ...
          In 4096 color mode, it's used for reading the value back. */
-static WRITE8_HANDLER( x1_pal_r_w )
+WRITE8_HANDLER( x1_pal_r_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
@@ -1297,7 +1292,7 @@ static WRITE8_HANDLER( x1_pal_r_w )
 	}
 }
 
-static WRITE8_HANDLER( x1_pal_g_w )
+WRITE8_HANDLER( x1_pal_g_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
@@ -1318,7 +1313,7 @@ static WRITE8_HANDLER( x1_pal_g_w )
 	}
 }
 
-static WRITE8_HANDLER( x1_pal_b_w )
+WRITE8_HANDLER( x1_pal_b_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
@@ -1339,7 +1334,7 @@ static WRITE8_HANDLER( x1_pal_b_w )
 	}
 }
 
-static WRITE8_HANDLER( x1_ex_gfxram_w )
+WRITE8_HANDLER( x1_ex_gfxram_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 ex_mask;
@@ -1366,7 +1361,7 @@ static WRITE8_HANDLER( x1_ex_gfxram_w )
     d6(40) = 0:8-raster graphics      1:16-raster graphics
     d7(80) = 0:don't display          1:display  <- underline (when 1, graphics are not displayed)
 */
-static WRITE8_HANDLER( x1_scrn_w )
+WRITE8_HANDLER( x1_scrn_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	state->m_scrn_reg.pcg_mode = (data & 0x20)>>5;
@@ -1381,14 +1376,14 @@ static WRITE8_HANDLER( x1_scrn_w )
 		printf("SCRN sets true 400 lines mode\n");
 }
 
-static WRITE8_HANDLER( x1_pri_w )
+WRITE8_HANDLER( x1_pri_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	state->m_scrn_reg.pri = data;
 //  printf("PRI = %02x\n",data);
 }
 
-static WRITE8_HANDLER( x1_6845_w )
+WRITE8_HANDLER( x1_6845_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	if(offset == 0)
@@ -1403,14 +1398,14 @@ static WRITE8_HANDLER( x1_6845_w )
 	}
 }
 
-static READ8_HANDLER( x1_blackclip_r )
+READ8_HANDLER( x1turboz_blackclip_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	/*  TODO: this returns only on x1turboz */
 	return state->m_scrn_reg.blackclip;
 }
 
-static WRITE8_HANDLER( x1_blackclip_w )
+WRITE8_HANDLER( x1turbo_blackclip_w )
 {
 	/*
     -x-- ---- replace blanking duration with black
@@ -1425,38 +1420,38 @@ static WRITE8_HANDLER( x1_blackclip_w )
 		printf("Blackclip data access %02x\n",data);
 }
 
-static READ8_HANDLER( x1turbo_pal_r )
+READ8_HANDLER( x1turbo_pal_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	return state->m_turbo_reg.pal;
 }
 
-static READ8_HANDLER( x1turbo_txpal_r )
+READ8_HANDLER( x1turbo_txpal_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	return state->m_turbo_reg.txt_pal[offset];
 }
 
-static READ8_HANDLER( x1turbo_txdisp_r )
+READ8_HANDLER( x1turbo_txdisp_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	return state->m_turbo_reg.txt_disp;
 }
 
-static READ8_HANDLER( x1turbo_gfxpal_r )
+READ8_HANDLER( x1turbo_gfxpal_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	return state->m_turbo_reg.gfx_pal;
 }
 
-static WRITE8_HANDLER( x1turbo_pal_w )
+WRITE8_HANDLER( x1turbo_pal_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	printf("TURBO PAL %02x\n",data);
 	state->m_turbo_reg.pal = data;
 }
 
-static WRITE8_HANDLER( x1turbo_txpal_w )
+WRITE8_HANDLER( x1turbo_txpal_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	int r,g,b;
@@ -1474,14 +1469,14 @@ static WRITE8_HANDLER( x1turbo_txpal_w )
 	}
 }
 
-static WRITE8_HANDLER( x1turbo_txdisp_w )
+WRITE8_HANDLER( x1turbo_txdisp_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	printf("TURBO TEXT DISPLAY %02x\n",data);
 	state->m_turbo_reg.txt_disp = data;
 }
 
-static WRITE8_HANDLER( x1turbo_gfxpal_w )
+WRITE8_HANDLER( x1turbo_gfxpal_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	printf("TURBO GFX PAL %02x\n",data);
@@ -1508,7 +1503,7 @@ static UINT16 jis_convert(int kanji_addr)
 	return 0x0000;
 }
 
-static READ8_HANDLER( x1_kanji_r )
+READ8_HANDLER( x1_kanji_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 *kanji_rom = space->machine().region("kanji")->base();
@@ -1522,7 +1517,7 @@ static READ8_HANDLER( x1_kanji_r )
 	return res;
 }
 
-static WRITE8_HANDLER( x1_kanji_w )
+WRITE8_HANDLER( x1_kanji_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 //  if(offset < 2)
@@ -1553,7 +1548,7 @@ static WRITE8_HANDLER( x1_kanji_w )
 	}
 }
 
-static READ8_HANDLER( x1_emm_r )
+READ8_HANDLER( x1_emm_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 *emm_ram = space->machine().region("emm")->base();
@@ -1579,7 +1574,7 @@ static READ8_HANDLER( x1_emm_r )
 	return res;
 }
 
-static WRITE8_HANDLER( x1_emm_w )
+WRITE8_HANDLER( x1_emm_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 *emm_ram = space->machine().region("emm")->base();
@@ -1605,7 +1600,7 @@ static WRITE8_HANDLER( x1_emm_w )
 /*
     CZ-141SF, CZ-127MF, X1turboZII, X1turboZ3 boards
 */
-static READ8_HANDLER( x1turbo_bank_r )
+READ8_HANDLER( x1turbo_bank_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
@@ -1613,7 +1608,7 @@ static READ8_HANDLER( x1turbo_bank_r )
 	return state->m_ex_bank & 0x3f;
 }
 
-static WRITE8_HANDLER( x1turbo_bank_w )
+WRITE8_HANDLER( x1turbo_bank_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	//UINT8 *RAM = space->machine().region("maincpu")->base();
@@ -1628,7 +1623,7 @@ static WRITE8_HANDLER( x1turbo_bank_w )
 }
 
 /* TODO: waitstate penalties */
-static READ8_HANDLER( x1_mem_r )
+READ8_HANDLER( x1_mem_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 *wram = space->machine().region("wram")->base();
@@ -1642,7 +1637,7 @@ static READ8_HANDLER( x1_mem_r )
 	return wram[offset]; //RAM
 }
 
-static WRITE8_HANDLER( x1_mem_w )
+WRITE8_HANDLER( x1_mem_w )
 {
 	//x1_state *state = space->machine().driver_data<x1_state>();
 	UINT8 *wram = space->machine().region("wram")->base();
@@ -1650,7 +1645,7 @@ static WRITE8_HANDLER( x1_mem_w )
 	wram[offset] = data; //RAM
 }
 
-static READ8_HANDLER( x1turbo_mem_r )
+READ8_HANDLER( x1turbo_mem_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
@@ -1664,7 +1659,7 @@ static READ8_HANDLER( x1turbo_mem_r )
 	return x1_mem_r(space,offset);
 }
 
-static WRITE8_HANDLER( x1turbo_mem_w )
+WRITE8_HANDLER( x1turbo_mem_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
@@ -1684,7 +1679,7 @@ static WRITE8_HANDLER( x1turbo_mem_w )
  *
  *************************************/
 
-static READ8_HANDLER( x1_io_r )
+READ8_HANDLER( x1_io_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	state->m_io_bank_mode = 0; //any read disables the extended mode.
@@ -1695,7 +1690,7 @@ static READ8_HANDLER( x1_io_r )
 	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(space->machine().device("ctc"), offset-0x0704); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return x1_sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return space->machine().device<i8255_device>("ppi8255_0")->read(*space, (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(space->machine().device("ay"), 0); }
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(space->machine().device("dma"), 0); }
@@ -1704,7 +1699,7 @@ static READ8_HANDLER( x1_io_r )
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(space->machine().device("ctc"), offset-0x1fa0); }
 	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(space->machine().device("ctc"), offset-0x1fa8); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
-//  else if(offset == 0x1fe0)                       { return x1_blackclip_r(space,0); }
+//  else if(offset == 0x1fe0)                       { return x1turboz_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->m_avram[offset & 0x7ff]; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ return state->m_tvram[offset & 0x7ff]; } // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ return state->m_gfx_bitmap_ram[offset-0x4000+(state->m_scrn_reg.gfx_bank*0xc000)]; }
@@ -1715,7 +1710,7 @@ static READ8_HANDLER( x1_io_r )
 	return 0xff;
 }
 
-static WRITE8_HANDLER( x1_io_w )
+WRITE8_HANDLER( x1_io_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
@@ -1733,12 +1728,12 @@ static WRITE8_HANDLER( x1_io_w )
 	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_pri_w(space, 0,data); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ x1_sub_io_w(space, 0,data); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ space->machine().device<i8255_device>("ppi8255_0")->write(*space, (offset-0x1a00) & 3,data); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(space->machine().device("ay"), 0,data); }
 	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(space->machine().device("ay"), 0,data); }
-	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
-	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
+	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ x1_rom_bank_1_w(space,0,data); }
+	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ x1_rom_bank_0_w(space,0,data); }
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(space->machine().device("dma"), 0,data); }
 //  else if(offset >= 0x1f90 && offset <= 0x1f91)   { z80sio_c_w(space->machine().device("sio"), (offset-0x1f90) & 1,data); }
 //  else if(offset >= 0x1f92 && offset <= 0x1f93)   { z80sio_d_w(space->machine().device("sio"), (offset-0x1f92) & 1,data); }
@@ -1749,7 +1744,7 @@ static WRITE8_HANDLER( x1_io_w )
 //  else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); }
 //  else if(offset == 0x1fc5)                       { x1turbo_gfxpal_w(space,0,data); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { x1_scrn_w(space,0,data); }
-//  else if(offset == 0x1fe0)                       { x1_blackclip_w(space,0,data); }
+//  else if(offset == 0x1fe0)                       { x1turbo_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->m_avram[offset & 0x7ff] = data; }
 	else if(offset >= 0x3000 && offset <= 0x3fff)	{ state->m_tvram[offset & 0x7ff] = data; }
 	else if(offset >= 0x4000 && offset <= 0xffff)	{ state->m_gfx_bitmap_ram[offset-0x4000+(state->m_scrn_reg.gfx_bank*0xc000)] = data; }
@@ -1760,7 +1755,7 @@ static WRITE8_HANDLER( x1_io_w )
 }
 
 /* TODO: I should actually simplify this, by just overwriting X1 Turbo specifics here, and call plain X1 functions otherwise */
-static READ8_HANDLER( x1turbo_io_r )
+READ8_HANDLER( x1turbo_io_r )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 	state->m_io_bank_mode = 0; //any read disables the extended mode.
@@ -1782,7 +1777,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset >= 0x0fe8 && offset <= 0x0fef)	{ printf("8-inch FD read %04x\n",offset); return 0xff; } // *
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return sub_io_r(space, 0); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return x1_sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ return space->machine().device<i8255_device>("ppi8255_0")->read(*space, (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ return ay8910_r(space->machine().device("ay"), 0); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(space->machine().device("dma"), 0); }
@@ -1795,7 +1790,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	else if(offset == 0x1fc0)						{ return x1turbo_txdisp_r(space,0); } // Z only!
 	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); } // Z only!
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); } //Z only
-	else if(offset == 0x1fe0)						{ return x1_blackclip_r(space,0); }
+	else if(offset == 0x1fe0)						{ return x1turboz_blackclip_r(space,0); }
 	else if(offset == 0x1ff0)						{ return input_port_read(space->machine(), "X1TURBO_DSW"); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return state->m_avram[offset & 0x7ff]; }
 	else if(offset >= 0x3000 && offset <= 0x37ff)	{ return state->m_tvram[offset & 0x7ff]; }
@@ -1808,7 +1803,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	return 0xff;
 }
 
-static WRITE8_HANDLER( x1turbo_io_w )
+WRITE8_HANDLER( x1turbo_io_w )
 {
 	x1_state *state = space->machine().driver_data<x1_state>();
 
@@ -1834,12 +1829,12 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset >= 0x1300 && offset <= 0x13ff)	{ x1_pri_w(space, 0,data); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ x1_pcg_w(space, offset-0x1400,data); }
 	else if(offset == 0x1800 || offset == 0x1801)	{ x1_6845_w(space, offset-0x1800, data); }
-	else if(offset >= 0x1900 && offset <= 0x19ff)	{ sub_io_w(space, 0,data); }
+	else if(offset >= 0x1900 && offset <= 0x19ff)	{ x1_sub_io_w(space, 0,data); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)	{ space->machine().device<i8255_device>("ppi8255_0")->write(*space, (offset-0x1a00) & 3,data); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)	{ ay8910_data_w(space->machine().device("ay"), 0,data); }
 	else if(offset >= 0x1c00 && offset <= 0x1cff)	{ ay8910_address_w(space->machine().device("ay"), 0,data); }
-	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ rom_bank_1_w(space,0,data); }
-	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ rom_bank_0_w(space,0,data); }
+	else if(offset >= 0x1d00 && offset <= 0x1dff)	{ x1_rom_bank_1_w(space,0,data); }
+	else if(offset >= 0x1e00 && offset <= 0x1eff)	{ x1_rom_bank_0_w(space,0,data); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(space->machine().device("dma"), 0,data); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ z80dart_ba_cd_w(space->machine().device("sio"), (offset-0x1f90) & 3,data); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC write %04x %02x\n",offset,data); }
@@ -1854,7 +1849,7 @@ static WRITE8_HANDLER( x1turbo_io_w )
 	else if(offset == 0x1fc4)						{ printf("Z Extra scroll config access %02x\n",data); } // Z only!
 	else if(offset == 0x1fc5)						{ x1turbo_gfxpal_w(space,0,data); } // Z only!
 	else if(offset >= 0x1fd0 && offset <= 0x1fdf)	{ x1_scrn_w(space,0,data); }
-	else if(offset == 0x1fe0)						{ x1_blackclip_w(space,0,data); }
+	else if(offset == 0x1fe0)						{ x1turbo_blackclip_w(space,0,data); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ state->m_avram[offset & 0x7ff] = data; }
 	else if(offset >= 0x3000 && offset <= 0x37ff)	{ state->m_tvram[offset & 0x7ff] = data; }
 	else if(offset >= 0x3800 && offset <= 0x3fff)	{ state->m_kvram[offset & 0x7ff] = data; }
@@ -1891,14 +1886,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( x1_porta_r )
+READ8_DEVICE_HANDLER( x1_porta_r )
 {
 	printf("PPI Port A read\n");
 	return 0xff;
 }
 
 /* this port is system related */
-static READ8_DEVICE_HANDLER( x1_portb_r )
+READ8_DEVICE_HANDLER( x1_portb_r )
 {
 	x1_state *state = device->machine().driver_data<x1_state>();
 	//printf("PPI Port B read\n");
@@ -1942,7 +1937,7 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
 }
 
 /* I/O system port */
-static READ8_DEVICE_HANDLER( x1_portc_r )
+READ8_DEVICE_HANDLER( x1_portc_r )
 {
 	x1_state *state = device->machine().driver_data<x1_state>();
 	//printf("PPI Port C read\n");
@@ -1956,17 +1951,17 @@ static READ8_DEVICE_HANDLER( x1_portc_r )
 	return (state->m_io_sys & 0x9f) | state->m_hres_320 | ~state->m_io_switch;
 }
 
-static WRITE8_DEVICE_HANDLER( x1_porta_w )
+WRITE8_DEVICE_HANDLER( x1_porta_w )
 {
 	//printf("PPI Port A write %02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER( x1_portb_w )
+WRITE8_DEVICE_HANDLER( x1_portb_w )
 {
 	//printf("PPI Port B write %02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER( x1_portc_w )
+WRITE8_DEVICE_HANDLER( x1_portc_w )
 {
 	x1_state *state = device->machine().driver_data<x1_state>();
 	state->m_hres_320 = data & 0x40;
@@ -2045,7 +2040,7 @@ static INPUT_CHANGED( nmi_reset )
 	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static INPUT_PORTS_START( x1 )
+INPUT_PORTS_START( x1 )
 	PORT_START("FP_SYS") //front panel buttons, hard-wired with the soft reset/NMI lines
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED(ipl_reset,0) PORT_NAME("IPL reset")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED(nmi_reset,0) PORT_NAME("NMI reset")
@@ -2494,7 +2489,7 @@ static IRQ_CALLBACK(x1_irq_callback)
 }
 #endif
 
-static TIMER_DEVICE_CALLBACK(keyboard_callback)
+TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
 	address_space *space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
@@ -2512,7 +2507,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 		if((key1 != state->m_old_key1) || (key2 != state->m_old_key2) || (key3 != state->m_old_key3) || (key4 != state->m_old_key4) || (f_key != state->m_old_fkey))
 		{
 			// generate keyboard IRQ
-			sub_io_w(space,0,0xe6);
+			x1_sub_io_w(space,0,0xe6);
 			state->m_irq_vector = state->m_key_irq_vector;
 			state->m_key_irq_flag = 1;
 			cputag_set_input_line(timer.machine(),"maincpu",0,ASSERT_LINE);
@@ -2525,7 +2520,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 	}
 }
 
-static TIMER_CALLBACK(x1_rtc_increment)
+TIMER_CALLBACK(x1_rtc_increment)
 {
 	x1_state *state = machine.driver_data<x1_state>();
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
@@ -2553,7 +2548,7 @@ static TIMER_CALLBACK(x1_rtc_increment)
 	if((state->m_rtc.year & 0xf0) >= 0xa0)				{ state->m_rtc.year = 0; } //roll over
 }
 
-static MACHINE_RESET( x1 )
+MACHINE_RESET( x1 )
 {
 	x1_state *state = machine.driver_data<x1_state>();
 	//UINT8 *ROM = machine.region("maincpu")->base();
@@ -2599,7 +2594,7 @@ static MACHINE_RESET( x1 )
 //  state->m_old_vpos = -1;
 }
 
-static MACHINE_RESET( x1turbo )
+MACHINE_RESET( x1turbo )
 {
 	x1_state *state = machine.driver_data<x1_state>();
 	MACHINE_RESET_CALL( x1 );
@@ -2609,7 +2604,7 @@ static MACHINE_RESET( x1turbo )
 	state->m_scrn_reg.blackclip = 0;
 }
 
-static MACHINE_START( x1 )
+MACHINE_START( x1 )
 {
 	x1_state *state = machine.driver_data<x1_state>();
 
@@ -2630,7 +2625,7 @@ static MACHINE_START( x1 )
 	}
 }
 
-static PALETTE_INIT(x1)
+PALETTE_INIT(x1)
 {
 	int i;
 
@@ -2684,7 +2679,6 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(x1)
-	MCFG_SCREEN_EOF(x1)
 
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
 	MCFG_PALETTE_LENGTH(0x10+0x1000)
@@ -2719,8 +2713,8 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x1_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x1_flop")
 
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_ADD_PERIODIC("cmt_wind_timer", cmt_wind_timer, attotime::from_hz(16))
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", x1_keyboard_callback, attotime::from_hz(250))
+	MCFG_TIMER_ADD_PERIODIC("x1_cmt_wind_timer", x1_cmt_wind_timer, attotime::from_hz(16))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
