@@ -296,6 +296,12 @@ ROM_START( dcdev )
         ROM_LOAD( "hkt-0120-flash.bin", 0x200000, 0x020000, CRC(7784C304) SHA1(31EF57F550D8CD13E40263CBC657253089E53034) )	// Flash
 ROM_END
 
+ROM_START( dcprt )
+    ROM_REGION(0x220000, "maincpu", 0)
+    ROM_LOAD( "katana-set5-v0.41-98-08-27.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) ) // BIOS
+    ROM_LOAD( "dcjp_ntsc.bin", 0x200000, 0x020000, CRC(5F92BF76) SHA1(BE78B834F512AB2CF3D67B96E377C9F3093FF82A) )  // Flash
+ROM_END
+
 static INPUT_PORTS_START( dc )
 	PORT_START("P1L")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -385,3 +391,5 @@ CONS( 1999, dc,     dcjp,   0,      dc,     dc,     dcus,   "Sega", "Dreamcast (
 CONS( 1998, dcjp,   0,      0,      dc,     dc,     dcjp,   "Sega", "Dreamcast (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1999, dceu,   dcjp,   0,      dc,     dc,     dcus,   "Sega", "Dreamcast (Europe, PAL)", GAME_NOT_WORKING )
 CONS( 1998, dcdev,  dcjp,   0,      dc,     dc,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
+CONS( 1998, dcprt,  dcjp,   0,      dc,     dc,     dcjp,   "Sega", "Katana Set 5 Prototype", GAME_NOT_WORKING )
+
