@@ -558,10 +558,12 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_MACHINE_START(x1)
 	MCFG_MACHINE_RESET(x1)
 
+	#if 0
 	MCFG_CPU_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
 	MCFG_CPU_IO_MAP(pce_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "pce_screen", 0, 1)
+	#endif
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	/* video hardware */
