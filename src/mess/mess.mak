@@ -1425,6 +1425,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_DRIVERS)/mz2000.o	\
 	$(MESS_DRIVERS)/x1.o		\
 	$(MESS_MACHINE)/x1.o		\
+	$(MESS_DRIVERS)/x1twin.o	\
 	$(MESS_DRIVERS)/mz2500.o	\
 	$(MESS_DRIVERS)/pce220.o	\
 	$(MESS_MACHINE)/pce220_ser.o	\
