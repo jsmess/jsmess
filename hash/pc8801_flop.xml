@@ -20838,7 +20838,6 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="魔法使いの妹子"/>
-		<publisher>Teikoku</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="mahoutsukai no denshi.d88" size="348848" crc="ac44fbef" sha1="36d2e91df8796a25fc483ddae39a5427c4b3321d" offset="0" />
