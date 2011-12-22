@@ -32,6 +32,9 @@
 #define MCFG_EGRET_TYPE(_type) \
     egret_device::static_set_type(*device, _type);
 
+#define MCFG_EGRET_REMOVE() \
+    MCFG_DEVICE_REMOVE(EGRET_TAG)
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
