@@ -2323,7 +2323,7 @@ static const floppy_interface pc9801_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -2491,6 +2491,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_UPD765A_ADD("upd765_2hd", upd765_2hd_intf)
 	MCFG_UPD765A_ADD("upd765_2dd", upd765_2dd_intf)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pc9801_floppy_interface)
+	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
 
 	#if 0
 	MCFG_RAM_ADD(RAM_TAG)
