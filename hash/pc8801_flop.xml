@@ -125,7 +125,6 @@ Are the following undumped or mistransalted (check also if available in TOSEC)?
  - 倉庫番３ (198609xx) by Takeru
  - ウォーズ１ (198609xx) by SoftPlan
  - 九龍島 (198606xx) by Starcraft
- - Help (198505xx) by Mame House
  - Tako Taco (198605xx) by Tokuma
  - 抄本三国志 (198605xx) by Koei
  - オペレーショングレネード (198605xx) by Pony Canyon
@@ -9689,121 +9688,62 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<software name="dragoney">
+	<software name="drageyes">
 		<description>Dragon Eyes</description>
 		<year>1991</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199102xx"/>
 		<info name="alt_title" value="ドラゴンアイズ"/>
+        <!-- multidisk image 2be6e126 had disks only differing in d88 headers -->
 		<!--combined image-->
 		<!--rom name="dragon eyes.d88" size="3102032" crc="6b9a6ada" sha1="d6928765c7f7926e97e3ce336edf5d49f456ebfd" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="442352">
+			<dataarea name="flop" size="442352">	<!-- Data CRC16: 45312 -->
 				<rom name="dragon eyes (disk a).d88" size="442352" crc="9ad7b381" sha1="8268799b912cc7116475655d2d8d5a2e77b098de" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="443280">
+			<dataarea name="flop" size="443280">	<!-- Data CRC16: 29421 -->
 				<rom name="dragon eyes (disk b).d88" size="443280" crc="751ccb3d" sha1="8a4da9862753ed4ca8782c212c296695c5950242" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="443280">
+			<dataarea name="flop" size="443280">	<!-- Data CRC16: 49410 -->
 				<rom name="dragon eyes (disk c).d88" size="443280" crc="17726256" sha1="bc57612c18ae8b1d86584a449952d56c66e34412" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="443280">
+			<dataarea name="flop" size="443280">	<!-- Data CRC16: 42479 -->
 				<rom name="dragon eyes (disk d).d88" size="443280" crc="8f029a67" sha1="fc5d66c8335f337baf40ad44a1ecd80d7954b88d" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part id" value="Disk E" />
-			<dataarea name="flop" size="443280">
+			<dataarea name="flop" size="443280">	<!-- Data CRC16: 65418 -->
 				<rom name="dragon eyes (disk e).d88" size="443280" crc="db7ef799" sha1="3357223a92801ac29824e0093a06ec3f0e993e68" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part id" value="Disk F" />
-			<dataarea name="flop" size="443280">
+			<dataarea name="flop" size="443280">	<!-- Data CRC16: 47217 -->
 				<rom name="dragon eyes (disk f).d88" size="443280" crc="9e03a7aa" sha1="44113af5bd681d8e9e004c4a4e3890eed74201de" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part id" value="Disk G" />
-			<dataarea name="flop" size="443280">
+			<dataarea name="flop" size="443280">	<!-- Data CRC16: 15427 -->
 				<rom name="dragon eyes (disk g).d88" size="443280" crc="3de152dd" sha1="391e1d59f6e155b5508b7ea6d74500f2ca20afae" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dragoneya" cloneof="dragoney">
-		<description>Dragon Eyes (Alt)</description>
-		<year>1991</year>
-		<publisher>フェアリーテール (Fairytale)</publisher>
-		<!-- PC8801mk2SR -->
-		<info name="release" value="199102xx"/>
-		<info name="alt_title" value="ドラゴンアイズ"/>
-		<!--combined image-->
-		<!--rom name="dragon eyes.d88" size="3102032" crc="2be6e126" sha1="750aef8d789c607dd56f9255a2f7e8be871214a0" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="442352">
-				<rom name="dragon eyes (a) (disk a).d88" size="442352" crc="511b26f7" sha1="ef000e311a8740a527b5582d5a718f45c2efd810" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="443280">
-				<rom name="dragon eyes (a) (disk b).d88" size="443280" crc="412fe5aa" sha1="3fcdfb77e723eb79212207cde0c9d3aae668b910" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="443280">
-				<rom name="dragon eyes (a) (disk c).d88" size="443280" crc="23414cc1" sha1="9e8fa316e246f8d9b66328578844c3bbabde4185" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="443280">
-				<rom name="dragon eyes (a) (disk d).d88" size="443280" crc="bb31b4f0" sha1="1b675fb7a8c27a86f989218c32c2c7d8470f31ea" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part id" value="Disk E" />
-			<dataarea name="flop" size="443280">
-				<rom name="dragon eyes (a) (disk e).d88" size="443280" crc="ef4dd90e" sha1="8361917cc3854b96c76f733a642ca6c95a7baf7a" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part id" value="Disk F" />
-			<dataarea name="flop" size="443280">
-				<rom name="dragon eyes (a) (disk f).d88" size="443280" crc="aa30893d" sha1="add1601088bc451698f70146f05350d926147536" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part id" value="Disk G" />
-			<dataarea name="flop" size="443280">
-				<rom name="dragon eyes (a) (disk g).d88" size="443280" crc="09d27c4a" sha1="b7b9d6562e3d67e7879c4c5ae51630e1c2c982f1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12468,43 +12408,18 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 		<info name="release" value="198809xx"/>
 		<info name="alt_title" value="不思議の壁"/>
 		<!--combined image-->
-		<!--rom name="fusik.d88" size="697696" crc="555752df" sha1="fb8498abcf34677c5f9ef62b39fda0b211067305" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="348848">
-				<rom name="fusik (disk 1).d88" size="348848" crc="8c2103a8" sha1="7f5522d2684c14bca695839659b32d274031b546" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
-				<rom name="fusik (disk 2).d88" size="348848" crc="78d72fb6" sha1="800384ee829ae893d87e1c21199f89e3a64ff172" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fushikaba" cloneof="fushikab">
-		<description>Fushigi no Kabe (Alt)</description>
-		<year>1988</year>
-		<publisher>ニューシステムハウスオウ (New System House Oh!)</publisher>
-		<!-- PC8801mk2SR -->
-		<info name="release" value="198809xx"/>
-		<info name="alt_title" value="不思議の壁"/>
-		<!--combined image-->
 		<!--rom name="fushigi no kabe.d88" size="697696" crc="b42201e1" sha1="5252bfeb00e8fb6378dcfba0f69a6d93cfe7b1c1" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk 1" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 6340 -->
 				<rom name="fushigi no kabe (disk 1).d88" size="348848" crc="ad7471a2" sha1="fc6996b110ef114ce05ce200f086bb34b2ad4e1a" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 24766 -->
 				<rom name="fushigi no kabe (disk 2).d88" size="348848" crc="59825dbc" sha1="baef86897e69651cb082955c36869fe9c8d4b232" offset="0" />
 			</dataarea>
 		</part>
@@ -14123,28 +14038,28 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 		<part name="flop1" interface="floppy_5_25" >
 			<feature name="part id" value="Disk 1" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 24653 -->
 				<rom name="ms field - kido senshi gundam (disk 1).d88" size="348848" crc="4f889a34" sha1="bd8855e79fe5318d5f9334d3c254e7791d681232" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25" >
 			<feature name="part id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 33495 -->
 				<rom name="ms field - kido senshi gundam (disk 2).d88" size="348848" crc="47113e9c" sha1="de2f0daf40106c5e21fbfec5246cf7d786be97dc" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25" >
 			<feature name="part id" value="Disk 3" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 28240 -->
 				<rom name="ms field - kido senshi gundam (disk 3).d88" size="348848" crc="546be1d6" sha1="88d0b4ab19380322b7bb536586395fb6178d9603" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="msfielda" cloneof="msfield">
-		<description>Kidou Senshi Gundam - MS Field (Alt)</description>
+		<description>Kidou Senshi Gundam - MS Field (Alt Disk 2)</description>
 		<year>1989</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<!-- PC8801 -->
@@ -14155,21 +14070,21 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk 1" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 24653 -->
 				<rom name="gundam ms field (disk 1).d88" size="348848" crc="7b92b053" sha1="43189f4d3c8f70bfee52763517fcc34c794e298b" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 46000 -->
 				<rom name="gundam ms field (disk 2).d88" size="348848" crc="9b989076" sha1="9cc3645be987413e259d5085362dac74e6c69729" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part id" value="Disk 3" />
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 28240 -->
 				<rom name="gundam ms field (disk 3).d88" size="348848" crc="6071cbb1" sha1="612710029bebe29d0950f8ea7859cd5315fcaa29" offset="0" />
 			</dataarea>
 		</part>
@@ -14412,45 +14327,21 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="覇邪の封印"/>
+		<!--combined image with crc 9ab30489 contained same disks with only diff headers -->
 		<!--combined image-->
 		<!--rom name="haja no fuin.d88" size="697664" crc="11b02b14" sha1="52be114e3a015bf51b60cf82d68c22aa128a6e61" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Program" />
-			<dataarea name="flop" size="348832">
+			<dataarea name="flop" size="348832">	<!-- Data CRC16: 32941 -->
 				<rom name="haja no fuin (program).d88" size="348832" crc="ee53b4b9" sha1="b07b0c65eca5871067ae76cd2d706abe717a23ac" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="User" />
-			<dataarea name="flop" size="348832">
+			<dataarea name="flop" size="348832">	<!-- Data CRC16: 31179 -->
 				<rom name="haja no fuin (user).d88" size="348832" crc="1ce2dda7" sha1="8020e9644290ade64f6881ef232f9be1171971ab" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hajanofua" cloneof="hajanofu">
-		<description>Haja no Fuin (Alt)</description>
-		<year>1986</year>
-		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198607xx"/>
-		<info name="alt_title" value="覇邪の封印"/>
-		<!--combined image-->
-		<!--rom name="haja no fuin.d88" size="697664" crc="9ab30489" sha1="2c037e2d80ed68aa1224aaf485ed10b9a53d0b46" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Program" />
-			<dataarea name="flop" size="348832">
-				<rom name="haja no fuin (a) (program).d88" size="348832" crc="7373c5a9" sha1="b8974814d95705f52fa903bad8b63488c2966448" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="User" />
-			<dataarea name="flop" size="348832">
-				<rom name="haja no fuin (a) (user).d88" size="348832" crc="4d2b3395" sha1="652d0b993e37ad49db7a6a97561bc29c1882a699" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15004,10 +14895,12 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="help1985">
+	<software name="help">
 		<description>Help</description>
-		<year>1985</year>
-		<publisher>Mame Soft</publisher>
+		<year>1986</year>
+		<publisher>Mame House</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198605xx"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="help (1985)(mame soft).d88" size="348848" crc="dce4d906" sha1="a2ca8c9aedd287682a168eb0568c28aa46ba484a" offset="0" />
@@ -15721,33 +15614,20 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="ホバーアタック"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="359632">
-				<rom name="hover attack.d88" size="359632" crc="7bf97f85" sha1="6815302c2f7cdf8f06768b7e471d8124ba12f81a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hoverata" cloneof="hoverat">
-		<description>Hover Attack (Alt)</description>
-		<year>1985</year>
-		<publisher>コムパック (Compaq)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198508xx"/>
-		<info name="alt_title" value="ホバーアタック"/>
+		<!--disk 1 contains same data as disk 7bf97f85 (only d88 header differs)-->
 		<!--combined image-->
 		<!--rom name="hover attack.d88" size="712832" crc="84f81146" sha1="d14cf8436482d206acd141838860ef179d5264a4" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Game Disk" />
-			<dataarea name="flop" size="359632">
+			<dataarea name="flop" size="359632">	<!-- Data CRC16: 44607 -->
 				<rom name="hover attack (game disk).d88" size="359632" crc="0287a031" sha1="5565f7011991169ba9ac688216c6f09a920469e7" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="User" />
-			<dataarea name="flop" size="353200">
+			<dataarea name="flop" size="353200">	<!-- Data CRC16: 11844 -->
 				<rom name="hover attack (user).d88" size="353200" crc="08254a92" sha1="1b38523ab2145afcd2e59137116fab27ae2821e2" offset="0" />
 			</dataarea>
 		</part>
@@ -18867,12 +18747,12 @@ ExtractDisk  [04]"D_USER		  " -> "kon'yamo asamade powerful mahjong 2_04.d88"
 	</software>
 
 	<software name="kubokido">
-		<description>Kosoku Kido Butai</description>
+		<description>Kubo Kido Butai</description>
 		<year>1983</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>木屋通商 (Kiya Tsusho)</publisher>
 		<!-- PC8801 -->
-		<info name="release" value="198310xx"/>
-		<info name="alt_title" value="高速機動部隊"/>
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="空母機動部隊"/>
 		<!--combined image-->
 		<!--rom name="kubo kido butai(taskforce).d88" size="697680" crc="64c467b3" sha1="5d8f0c516e038e8a7246151de27d9bb9bc511b06" offset="0" /-->
 
@@ -19464,7 +19344,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="ラストハルマゲドン"/>
-		<!--combined image-->
+		<!--combined image (including Alien Zukan disk, same as below, and N_Ver disk)-->
 		<!--rom name="last armageddon.d88" size="3828432" crc="63119cc5" sha1="03719b1eb4ede86e8dd2f831b739f5974318d0be" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25" >
@@ -19517,13 +19397,6 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 
 		<part name="flop8" interface="floppy_5_25" >
-			<feature name="part id" value="Disk H (Alien)" />
-			<dataarea name="flop" size="425392">
-				<rom name="last armageddon (a) (disk h - alien).d88" size="425392" crc="333437df" sha1="a3b9f216988f733f652c0d10eeaae75f9ef31c96" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop9" interface="floppy_5_25" >
 			<feature name="part id" value="Disk G (N_VER)" />
 			<dataarea name="flop" size="425392">
 				<rom name="last armageddon (a) (disk g - n_ver).d88" size="425392" crc="e60077d8" sha1="f2c3d8ee9b126f347f78ca3d27661dff011c071c" offset="0" />
@@ -19538,8 +19411,9 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="エイリアン図鑑"/>
+		<!-- disk h in the combined disk above (crc: 333437df) contains same data as this -->
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="425392">
+			<dataarea name="flop" size="425392">	<!-- Data CRC16: 30901 -->
 				<rom name="last armaggedon alien zukan.d88" size="425392" crc="0c867c43" sha1="7ad6bbcb947920a460c7b4a07c1c0e93c26ad3dd" offset="0" />
 			</dataarea>
 		</part>
@@ -19880,73 +19754,35 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="リップスティックアドベンチャー"/>
+		<!--combined disk with crc f2a9ff7b contained disks which only differ for d88 headers-->
 		<!--combined image-->
 		<!--rom name="lipstick adv.d88" size="1748192" crc="4d51e1fb" sha1="cfe76e0d61a37a8d08864d39e15ea471aa0ecd1a" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="435776">
+			<dataarea name="flop" size="435776">	<!-- Data CRC16: 52668 -->
 				<rom name="lipstick adv (disk a).d88" size="435776" crc="06a8e2c7" sha1="f236e15d8716a7eee5f64710b2ddf14dbee735b8" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="437472">
+			<dataarea name="flop" size="437472">	<!-- Data CRC16: 3124 -->
 				<rom name="lipstick adv (disk b).d88" size="437472" crc="cfbe802f" sha1="27fc35b2d9d6cecd79c5047f9ab04684c943d08e" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="437472">
+			<dataarea name="flop" size="437472">	<!-- Data CRC16: 15774 -->
 				<rom name="lipstick adv (disk c).d88" size="437472" crc="6c9cc1e5" sha1="d4fdc78cf96c13240cc188c48f937e2f7b35c7b0" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="437472">
+			<dataarea name="flop" size="437472">	<!-- Data CRC16: 31418 -->
 				<rom name="lipstick adv (disk d).d88" size="437472" crc="8fde4238" sha1="ef8531e37829d3845e5df2968105555526a4e05f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lipsadva" cloneof="lipsadv">
-		<description>Lipstick Adventure (Alt)</description>
-		<year>1988</year>
-		<publisher>フェアリーテール (Fairytale)</publisher>
-		<!-- PC8801mk2SR -->
-		<info name="release" value="198810xx"/>
-		<info name="alt_title" value="リップスティックアドベンチャー"/>
-		<!--combined image-->
-		<!--rom name="lipstick adventure.d88" size="1748192" crc="f2a9ff7b" sha1="eb51377150729691d65d5ef8ed2c199aadd304b8" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="435776">
-				<rom name="lipstick adventure (disk a).d88" size="435776" crc="fbe9dbe6" sha1="86959053d07439998a6008b25c9c2678178560f3" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="437472">
-				<rom name="lipstick adventure (disk b).d88" size="437472" crc="a48a559b" sha1="917497f3d2eb2a21af75678c6a276ce75c76ea2c" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="437472">
-				<rom name="lipstick adventure (disk c).d88" size="437472" crc="3185d90b" sha1="99016801635541c0d667a630d36e54f48418a251" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="437472">
-				<rom name="lipstick adventure (disk d).d88" size="437472" crc="e4ea978c" sha1="622b87b51ae207ad9c8aee8e1abaf8340eac80e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21462,65 +21298,41 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="344480">
+			<dataarea name="flop" size="344480">	<!-- Data CRC16: 8306 -->
 				<rom name="makai fukkatsu (disk a).d88" size="344480" crc="a34376f7" sha1="7bc2195a886c56a86ab40fa95162a9adb821755a" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="348832">
+			<dataarea name="flop" size="348832">	<!-- Data CRC16: 46359 -->
 				<rom name="makai fukkatsu (disk b).d88" size="348832" crc="b7021ecf" sha1="15817cd54c830be5f45a1b9da9835f8cd1d055aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="makaifuka" cloneof="makaifuk">
-		<description>Makai Fukkatsu (Alt)</description>
+		<description>Makai Fukkatsu (Alt Disk 1)</description>
 		<year>1987</year>
 		<publisher>ソフトスタジオＷＩＮＧ (Soft Studio Wing)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198704xx"/>
 		<info name="alt_title" value="魔界復活"/>
+		<!--combined image with crc a9174252 has disks which only differ in d88 headers-->
 		<!--combined image-->
 		<!--rom name="makai fukkatsu.d88" size="693328" crc="e849e977" sha1="7611d7f83303699fecdc27b9e6bb38317a6b4479" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="344496">
+			<dataarea name="flop" size="344496">	<!-- Data CRC16: 60300 -->
 				<rom name="makai fukkatsu (a) (disk a).d88" size="344496" crc="76914e70" sha1="b16d7182adf8964b39373f500ad2644f128c721f" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="348832">
+			<dataarea name="flop" size="348832">	<!-- Data CRC16: 46359 -->
 				<rom name="makai fukkatsu (a) (disk b).d88" size="348832" crc="27df999d" sha1="51a8f07b1c0f616a0ebbabee8f1aa125c0dc98d2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="makaifukb" cloneof="makaifuk">
-		<description>Makai Fukkatsu (Alt 2)</description>
-		<year>1987</year>
-		<publisher>ソフトスタジオＷＩＮＧ (Soft Studio Wing)</publisher>
-		<!-- PC8801 -->
-		<info name="release" value="198704xx"/>
-		<info name="alt_title" value="魔界復活"/>
-		<!--combined image-->
-		<!--rom name="makai fukkatsu.d88" size="693328" crc="a9174252" sha1="418edf8b7fdf6f97777842ac73ae93a8f810471f" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="344496">
-				<rom name="makai fukkatsu (a2) (disk a).d88" size="344496" crc="731fa2b1" sha1="5727c3292ad91d9d3f6a95d56db3f7360b0e1fd4" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="348832">
-				<rom name="makai fukkatsu (a2) (disk b).d88" size="348832" crc="b7021ecf" sha1="15817cd54c830be5f45a1b9da9835f8cd1d055aa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21532,23 +21344,10 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198707xx"/>
 		<info name="alt_title" value="魔界村"/>
+		<!-- disk with crc ab448ccf has only d88 header diff -->
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">	<!-- Data CRC16: 30501 -->
 				<rom name="makaimura.d88" size="348848" crc="824f3b55" sha1="745c8ee774bc7af711d3a37a078439ab6ac57ec3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="makaimura" cloneof="makaimur">
-		<description>Makaimura (Alt)</description>
-		<year>1987</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<!-- PC8801mk2SR -->
-		<info name="release" value="198707xx"/>
-		<info name="alt_title" value="魔界村"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="makaimura (a).d88" size="348848" crc="ab448ccf" sha1="5e77b7797ed7075db7e9b1bc2a9c8d2a1f693d7a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -24517,7 +24316,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part id" value="Disk 1" />
 			<dataarea name="flop" size="348848">
-				<rom name="okhotsk ni kiyu (disk 1).d88" size="348848" crc="4cbfaef5" sha1="b788cdefcbb626552e93f7a7309b9c5239773bf9" offset="0" />
+				<rom name="okhotsk ni kiyu (a)(disk 1).d88" size="348848" crc="4cbfaef5" sha1="b788cdefcbb626552e93f7a7309b9c5239773bf9" offset="0" />
 			</dataarea>
 		</part>
 
@@ -30136,7 +29935,7 @@ ExtractDisk  [03]"disk 3		  " -> "shiryo sensen 2_03.d88"
 ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 -->
 	<software name="shiryos2a" cloneof="shiryos2">
-		<description>Shiryou Sensen 2 - War of the Dead Part 2 (Alt)</description>
+		<description>Shiryou Sensen 2 - War of the Dead Part 2 (Alt Disk 1)</description>
 		<year>1989</year>
 		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
 		<!-- PC8801mk2SR -->
@@ -40822,71 +40621,6 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 
 	<software name="dragonksa" cloneof="dragonks">
 		<description>Dragon Knights ~Spirit 3~ (Alt)</description>
-		<year>1992</year>
-		<publisher>TSUKKAsoftware</publisher>
-		<info name="alt_title" value="ドラゴンナイツ D.K."/>
-		<!--combined image-->
-		<!--rom name="spirit #3 d.k. (dragon knights).d88" size="2790784" crc="2f8a35fe" sha1="97f322aa0ac5102876ffeaab7cc32f83d1ba2253" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Opening 1" />
-			<dataarea name="flop" size="348848">
-				<rom name="spirit #3 d.k. (dragon knights) (opening 1).d88" size="348848" crc="ffecef27" sha1="64fccf6da7387bf4e04285bf22126b546a75de7d" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Opening 2" />
-			<dataarea name="flop" size="348848">
-				<rom name="spirit #3 d.k. (dragon knights) (opening 2).d88" size="348848" crc="99a98466" sha1="746177f35f6635defa1c5656dd2301aeebb8c48b" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part id" value="System" />
-			<dataarea name="flop" size="348848">
-				<rom name="spirit #3 d.k. (dragon knights) (system).d88" size="348848" crc="033cbeda" sha1="3061c934cd5456cd8f216429b6f6b4f3d946af59" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part id" value="Data 1" />
-			<dataarea name="flop" size="348848">
-				<rom name="spirit #3 d.k. (dragon knights) (data 1).d88" size="348848" crc="ff6bc0e1" sha1="4e5564e8606abf39fa4340cb5be60fdbbe8d65b4" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part id" value="Data 2" />
-			<dataarea name="flop" size="348848">
-				<rom name="spirit #3 d.k. (dragon knights) (data 2).d88" size="348848" crc="a55449bd" sha1="93fd035e0fa8ebf83b6ca4ef081d2d9e10a59d25" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part id" value="Data 3" />
-			<dataarea name="flop" size="348848">
-				<rom name="spirit #3 d.k. (dragon knights) (data 3).d88" size="348848" crc="cc8e2993" sha1="1e54ded9dd86a5a919b2557b62db1057b37e90ed" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part id" value="Data 4" />
-			<dataarea name="flop" size="348848">
-				<rom name="spirit #3 d.k. (dragon knights) (data 4).d88" size="348848" crc="dd631af6" sha1="e06dab7b9cc3e20712fcf510efc2b913fccaf7c3" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part id" value="Data 5" />
-			<dataarea name="flop" size="348848">
-				<rom name="spirit #3 d.k. (dragon knights) (data 5).d88" size="348848" crc="ae2db3cb" sha1="9e0d833624c0b1df58e66e1a44656c4d52f12a89" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dragonksb" cloneof="dragonks">
-		<description>Dragon Knights ~Spirit 3~ (Alt 2)</description>
 		<year>1992</year>
 		<publisher>TSUKKAsoftware</publisher>
 		<info name="alt_title" value="ドラゴンナイツ D.K."/>
