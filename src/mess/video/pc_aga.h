@@ -18,7 +18,7 @@
 
 */
 
-#define AGA_SCREEN_NAME "aga_screen"
+#define AGA_SCREEN_NAME "screen"
 #define AGA_MC6845_NAME "mc6845_aga"
 
 MACHINE_CONFIG_EXTERN( pcvideo_aga );
