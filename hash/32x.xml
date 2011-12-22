@@ -124,6 +124,9 @@
 		<description>After Burner (USA) ~ After Burner Complete (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4006 (JPN)"/>
+		<info name="release" value="19950113 (JPN)"/>
+		<info name="alt_title" value="アフターバーナー・コンプリート"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="after burner complete ~ after burner (japan, usa).bin" size="2097152" crc="204044c4" sha1="9cf575feb036e2f26e78350154d5eb2fd3825325" offset="000000" />
@@ -190,6 +193,9 @@
 		<description>Cyber Brawl (Jpn) ~ Cosmic Carnage (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4004 (JPN)"/>
+		<info name="release" value="19950127 (JPN)"/>
+		<info name="alt_title" value="サイバーブロール"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="cyber brawl ~ cosmic carnage (japan, usa).bin" size="3145728" crc="7c7be6a2" sha1="9a563ed821b483148339561ebd2b876efa58847b" offset="000000" />
@@ -300,6 +306,9 @@
 		<description>Doom (Jpn, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4003 (JPN)"/>
+		<info name="release" value="19941203 (JPN)"/>
+		<info name="alt_title" value="ドゥーム"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (japan, usa).bin" size="3145728" crc="208332fd" sha1="b68e9c7af81853b8f05b8696033dfe4c80327e38" offset="000000" />
@@ -488,6 +497,9 @@
 		<description>36 Great Holes Starring Fred Couples (Jpn, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-5002 (JPN)"/>
+		<info name="release" value="19950224 (JPN)"/>
+		<info name="alt_title" value="ゴルフマガジンプレゼンツ 36グレイトホールズ スターリング フレッド コプルス"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="golf magazine 36 great holes starring fred couples (japan, usa).bin" size="3145728" crc="d3d0a2fe" sha1="dc77b1e5c888c2c4284766915a5020bb14ee681d" offset="000000" />
@@ -885,6 +897,9 @@
 		<description>Chaotix (Jpn) ~ Knuckles' Chaotix (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-5003 (JPN)"/>
+		<info name="release" value="19950421 (JPN)"/>
+		<info name="alt_title" value="カオティクス フィーチャリング ナックルズ ザ エキドゥナ"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="chaotix ~ knuckles' chaotix (japan, usa).bin" size="3145728" crc="d0b0b842" sha1="0c2fff7bc79ed26507c08ac47464c3af19f7ced7" offset="000000" />
@@ -1116,6 +1131,9 @@
 		<description>Metal Head (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4008 (JPN)"/>
+		<info name="release" value="19950224 (JPN)"/>
+		<info name="alt_title" value="メタルヘッド"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (japan, usa) (en,ja).bin" size="3145728" crc="ef5553ff" sha1="4e872fbb44ecb2bd730abd8cc8f32f96b10582c0" offset="000000" />
@@ -1237,6 +1255,9 @@
 		<description>Mortal Kombat II: Kyuukyoku Shinken (Jpn) ~ Mortal Kombat II (USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="T-8104A (JPN)"/>
+		<info name="release" value="19950519 (JPN)"/>
+		<info name="alt_title" value="モータルコンバットII 究極神拳"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mortal kombat ii (japan, usa).bin" size="4194304" crc="773c0a85" sha1="d55964bd935110ac2d9cbd3b085b7e8b71b11df2" offset="000000" />
@@ -1424,6 +1445,9 @@
 		<description>NBA Jam T.E. - Tournament Edition (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="T-8102A (JPN)"/>
+		<info name="release" value="19950901 (JPN)"/>
+		<info name="alt_title" value="NBAジャム トーナメントエディション"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="nba jam tournament edition (world).bin" size="4194304" crc="6b7994aa" sha1="c8af3e74c49514669ba6652ec0c81bccf77873b6" offset="000000" />
@@ -1435,6 +1459,9 @@
 		<description>NFL Quarterback Club ~ NFL Quarterback '95 (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="T-8103A (JPN)"/>
+		<info name="release" value="19950714 (JPN)"/>
+		<info name="alt_title" value="NFL クォーターバッククラブ'95"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="nfl quarterback club (world).bin" size="3145728" crc="0bc7018d" sha1="a0dc24f2f3a7fc5bfd12791cf25af7f7888843cf" offset="000000" />
@@ -1479,6 +1506,9 @@
 		<description>Sangokushi IV (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
+		<info name="serial" value="T-7601A (JPN)"/>
+		<info name="release" value="19950728 (JPN)"/>
+		<info name="alt_title" value="三国志IV"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="sangokushi iv (japan).bin" size="4194304" crc="e4de7625" sha1="74a3ba27c55cff12409bf6c9324ece6247abbad1" offset="000000" />
@@ -1501,6 +1531,9 @@
 		<description>Stellar Assault (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4010 (JPN)"/>
+		<info name="release" value="19950426 (JPN)"/>
+		<info name="alt_title" value="ステラアサルト"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="stellar assault (japan).bin" size="2097152" crc="fce4c8c7" sha1="ff4f1a2dded85f3ad43bf28a85c46ad8595d5614" offset="000000" />
@@ -1601,6 +1634,9 @@
 		<description>Space Harrier (Jpn, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4005 (JPN)"/>
+		<info name="release" value="19941203 (JPN)"/>
+		<info name="alt_title" value="スペースハリアー"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="space harrier (japan, usa).bin" size="2097152" crc="86e7f989" sha1="f32a52a7082761982024e40291dbd962a835b231" offset="000000" />
@@ -1634,6 +1670,9 @@
 		<description>Star Wars Arcade (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4002"/>
+		<info name="release" value="19941203"/>
+		<info name="alt_title" value="スターウォーズ・アーケード"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="star wars arcade (japan).bin" size="2621440" crc="f4e9b846" sha1="282767a07e453e868de52b46bf11def3d071bda6" offset="000000" />
@@ -1865,6 +1904,9 @@
 		<description>Tempo (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4009 (JPN)"/>
+		<info name="release" value="19950324 (JPN)"/>
+		<info name="alt_title" value="テンポ"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (japan, usa).bin" size="3145728" crc="14e5c575" sha1="6673ba83570b4f2c1b4a22415a56594c3cc6c6a9" offset="000000" />
@@ -1975,6 +2017,9 @@
 		<description>Virtua Fighter (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4013 (JPN)"/>
+		<info name="release" value="19951020 (JPN)"/>
+		<info name="alt_title" value="バーチャファイター"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (japan, usa).bin" size="4194304" crc="b5de9626" sha1="f35754f4bfe3a53722d7a799f88face0fd13c424" offset="000000" />
@@ -2074,6 +2119,9 @@
 		<description>Virtua Racing Deluxe (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-5001 (JPN)"/>
+		<info name="release" value="19941216 (JPN)"/>
+		<info name="alt_title" value="バーチャレーシング デラックス"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="mpr-17503+mpr-17504.bin" size="3145728" crc="0908e888" sha1="1c64e80eb164ca8d6c6587a55ad60385ba1daf27" offset="000000" />
@@ -2140,6 +2188,8 @@
 		<description>WWF Raw (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="T-8101A (JPN)"/>
+		<info name="release" value="19950901 (JPN)"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="wwf raw (world).bin" size="4194304" crc="8eb7cd2c" sha1="94b974f2f69f0c10bc18b349fa4ff95ca56fa47b" offset="000000" />
@@ -2173,6 +2223,9 @@
 		<description>Parasquad (Jpn) ~ Zaxxon's Motherbase 2000 (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="GM-4012 (JPN)"/>
+		<info name="release" value="19950714 (JPN)"/>
+		<info name="alt_title" value="パラスコード"/>
 		<part name="cart" interface="_32x_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="parasquad ~ zaxxon's motherbase 2000 (japan, usa).bin" size="2097152" crc="447d44be" sha1="60c390f76c394bdd221936c21aecbf98aec49a3d" offset="000000" />
