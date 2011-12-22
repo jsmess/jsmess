@@ -27,6 +27,7 @@
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
+#include "formats/basicdsk.h"
 
 typedef struct
 {
@@ -1553,7 +1554,16 @@ static INTERRUPT_GEN( pc88va_vrtc_irq )
 	pic8259_ir2_w(device->machine().device("pic8259_master"), 1);
 }
 
-/* TODO */
+/* Not sure if parameters are correct for pc88va (copied from x68k) */
+static LEGACY_FLOPPY_OPTIONS_START( pc88va )
+LEGACY_FLOPPY_OPTION( img2d, "xdf,hdm,2hd", "XDF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+					 HEADS([2])
+					 TRACKS([77])
+					 SECTORS([8])
+					 SECTOR_LENGTH([1024])
+					 FIRST_SECTOR_ID([1]))
+LEGACY_FLOPPY_OPTIONS_END
+
 static const floppy_interface pc88va_floppy_interface =
 {
 	DEVCB_NULL,
@@ -1562,8 +1572,8 @@ static const floppy_interface pc88va_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+	LEGACY_FLOPPY_OPTIONS_NAME(pc88va),
+	"floppy_5_25",
 	NULL
 };
 
@@ -1666,6 +1676,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_UPD765A_ADD("upd765", pc88va_upd765_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pc88va_floppy_interface)
+	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
     MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)
 
