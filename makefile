@@ -305,10 +305,10 @@ BUILD_EXE = $(EXE)
 endif
 
 # compiler, linker and utilities
-AR=/Users/devesine/Source/personal/jsmess/emscripten/tools/emmaken.py 
-CXX=/Users/devesine/Source/personal/jsmess/emscripten/tools/emmakenxx.py 
-LD=/Users/devesine/Source/personal/jsmess/emscripten/tools/emmakenxx.py 
-CC=/Users/devesine/Source/personal/jsmess/emscripten/tools/emmaken.py 
+AR=/Users/devesine/Source/personal/jsmess/emscripten/emar
+CXX=/Users/devesine/Source/personal/jsmess/emscripten/emc++
+LD=/Users/devesine/Source/personal/jsmess/emscripten/emld
+CC=/Users/devesine/Source/personal/jsmess/emscripten/emcc
 #AR = @ar
 #CC = @gcc
 #LD = @g++
