@@ -68,8 +68,8 @@
      344S0100 - 0x0100 (1.00) - Some (early production?) IIsi
 
      Cuda version spotting:
-     341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, Gossamer G3, others?
-                                    (verified found in PMac 5500-225)
+     341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, "Gossamer" G3, others?
+                                    (verified found in PMac 5500-225, G3-333)
      341S0262 - 0x???????? (?.??) - some PMac 6500
      341S0285 - 0x???????? (?.??) - PMac 4400 + Mac clones
      341S0417 - 0x???????? (?.??) - Color Classic
@@ -1209,6 +1209,13 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 		printf("68K: Read VIA_DATA %x\n", ret);
 		#endif
     }
+	else if (ADB_IS_CUDA)
+	{
+        ret = mac->m_cuda->get_via_data();
+		#if LOG_ADB
+		printf("68K: Read VIA_DATA %x\n", ret);
+		#endif
+	}
     else
     {
         ret = (mac->m_adb_send & 0x80)>>7;
@@ -1228,6 +1235,10 @@ static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
     if (ADB_IS_EGRET)
     {
         mac->m_egret->set_via_data(data & 1);
+    }
+    else if (ADB_IS_CUDA)
+    {
+        mac->m_cuda->set_via_data(data & 1);
     }
     else
     {
@@ -1299,7 +1310,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 		case MODEL_MAC_SE30:
 			return 0x81 | PA6;
 
-		case MODEL_MAC_LC:		// apollo board is 0x38, box 0x11 (17), vid hw 0x21
+		case MODEL_MAC_LC:
 		case MODEL_MAC_LC_II:
 		case MODEL_MAC_IIVX:
 			return 0x81 | PA6 | PA4 | PA2;
@@ -1368,6 +1379,10 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 		else if (ADB_IS_EGRET)
         {
             val |= mac->m_egret->get_xcvr_session()<<3;
+		}
+		else if (ADB_IS_CUDA)
+        {
+            val |= mac->m_cuda->get_treq()<<3;
 		}
 		else
 		{
@@ -1544,6 +1559,14 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 		#endif
         mac->m_egret->set_via_full((data&0x10) ? 1 : 0);
         mac->m_egret->set_sys_session((data&0x20) ? 1 : 0);
+	}
+	else if (ADB_IS_CUDA)
+	{
+		#if LOG_ADB
+		printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, cpu_get_pc(mac->m_maincpu));
+		#endif
+        mac->m_cuda->set_byteack((data&0x10) ? 1 : 0);
+        mac->m_cuda->set_tip((data&0x20) ? 1 : 0);
 	}
 }
 
