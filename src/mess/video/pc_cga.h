@@ -3,7 +3,7 @@
 #define CGA_PALETTE_SETS 83	/* one for colour, one for mono,
                  * 81 for colour composite */
 
-#define CGA_SCREEN_NAME	"cga_screen"
+#define CGA_SCREEN_NAME	"screen"
 #define CGA_MC6845_NAME	"mc6845_cga"
 
 MACHINE_CONFIG_EXTERN( pcvideo_cga );
