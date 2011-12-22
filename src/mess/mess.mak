@@ -633,6 +633,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/apple3.o	\
 	$(MESS_DRIVERS)/apple3.o	\
 	$(MESS_MACHINE)/egret.o     \
+	$(MESS_MACHINE)/cuda.o      \
 	$(MESS_VIDEO)/nubus_48gc.o	\
 	$(MESS_VIDEO)/nubus_cb264.o \
 	$(MESS_VIDEO)/nubus_vikbw.o \
@@ -1842,16 +1843,22 @@ $(MESS_MACHINE)/nes_mmc.o:	$(MESSSRC)/machine/nes_ines.c \
 				$(MESSSRC)/machine/nes_unif.c \
 
 $(MESS_AUDIO)/mac.o:		$(MESSSRC)/audio/mac.c \
-				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h $(MESSSRC)/machine/cuda.h
 
 $(MESS_VIDEO)/mac.o:		$(MESSSRC)/video/mac.c \
-				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h $(MESSSRC)/machine/cuda.h
 
 $(MESS_MACHINE)/mac.o:		$(MESSSRC)/machine/mac.c \
-				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h $(MESSSRC)/machine/cuda.h
+
+$(MESS_MACHINE)/macadb.o:	$(MESSSRC)/machine/macadb.c \
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h $(MESSSRC)/machine/cuda.h
+
+$(MESS_MACHINE)/macrtc.o:	$(MESSSRC)/machine/macrtc.c \
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h $(MESSSRC)/machine/cuda.h
 
 $(MESS_DRIVERS)/mac.o:		$(MESSSRC)/drivers/mac.c \
-				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h
+				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h $(MESSSRC)/machine/cuda.h
 
 $(MESS_MACHINE)/egret.o:	$(MESSSRC)/machine/egret.c\
                         	$(MESSSRC)/machine/egret.h

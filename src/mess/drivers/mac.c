@@ -219,12 +219,12 @@ void mac_state::rbv_recalc_irqs()
 		m_rbv_ifr = ifr | 0x80;
 
 //      printf("VIA2 raise\n");
-		this->set_via2_interrupt(1);
+		set_via2_interrupt(1);
 	}
 	else
 	{
 //      printf("VIA2 lower\n");
-		this->set_via2_interrupt(0);
+		set_via2_interrupt(0);
 	}
 }
 
@@ -1173,6 +1173,21 @@ static MACHINE_CONFIG_DERIVED( maclc2, maclc )
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( maccclas, maclc )
+
+	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
+	MCFG_CPU_PROGRAM_MAP(maclc_map)
+	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
+    
+    MCFG_EGRET_REMOVE()
+    MCFG_CUDA_ADD(CUDA_341S0788)    // should be 341s0417, but only the color classic used that rev and those are "collectable" ($$$$)
+    MCFG_QUANTUM_PERFECT_CPU("maincpu")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
@@ -1556,6 +1571,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
+
     MCFG_EGRET_ADD(EGRET_TYPE_100)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
@@ -2159,7 +2175,7 @@ COMP( 1992, macpb160, 0,        0,  macpb160, macadb,   macpb160,	  "Apple Compu
 COMP( 1992, macpb180, macpb160, 0,  macpb180, macadb,   macpb160,	  "Apple Computer", "Macintosh PowerBook 180", GAME_NOT_WORKING )
 COMP( 1992, macpb180c,macpb160, 0,  macpb180c,macadb,   macpb160,     "Apple Computer", "Macintosh PowerBook 180c", GAME_NOT_WORKING )
 //COMP( 1992, macpd210, 0,        0,  macpd210, macadb,   macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", GAME_NOT_WORKING )
-COMP( 1993, maccclas, 0,        0,  maclc2,   macadb,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
+COMP( 1993, maccclas, 0,        0,  maccclas, macadb,   maclrcclassic,"Apple Computer", "Macintosh Color Classic", GAME_NOT_WORKING )
 COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb,   macpb140,	  "Apple Computer", "Macintosh PowerBook 145B", GAME_NOT_WORKING )
 COMP( 1993, maclc3,   0,		0,	maclc3,   maciici,  maclc3,	      "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
 COMP( 1993, maciivx,  0,		0,	maciivx,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvx",  GAME_NOT_WORKING )
