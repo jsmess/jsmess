@@ -25,30 +25,67 @@
         Z8420APS PIO
 
         MB8877A Compatible FD1793
+
+        2011-12-22 connected to a terminal [Robbbert]
+
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/terminal.h"
 
 
 class systec_state : public driver_device
 {
 public:
 	systec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_terminal;
+	DECLARE_READ8_MEMBER(systec_c4_r);
+	DECLARE_READ8_MEMBER(systec_c6_r);
+	DECLARE_WRITE8_MEMBER( kbd_put );
+	UINT8 m_term_data;
+};
+
+READ8_MEMBER( systec_state::systec_c4_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+READ8_MEMBER( systec_state::systec_c6_r )
+{
+	return 0x04 | (m_term_data ? 1 : 0);
+}
+
+WRITE8_MEMBER( systec_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(systec_state, kbd_put)
 };
 
 
 static ADDRESS_MAP_START(systec_mem, AS_PROGRAM, 8, systec_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(systec_io, AS_IO, 8, systec_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xc4, 0xc4) AM_READ(systec_c4_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xc6, 0xc6) AM_READ(systec_c6_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -57,15 +94,9 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(systec)
 {
-}
-
-static VIDEO_START( systec )
-{
-}
-
-static SCREEN_UPDATE( systec )
-{
-	return 0;
+	UINT8 *m_p_maincpu = machine.region("maincpu")->base();
+	UINT8 *m_p_roms = machine.region("roms")->base();
+	memcpy(m_p_maincpu, m_p_roms, 0x2000);
 }
 
 static MACHINE_CONFIG_START( systec, systec_state )
@@ -77,22 +108,15 @@ static MACHINE_CONFIG_START( systec, systec_state )
 	MCFG_MACHINE_RESET(systec)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(256, 192) /* border size not accurate */
-	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
-	MCFG_VIDEO_START(systec)
-	MCFG_SCREEN_UPDATE(systec)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 
 /* ROM definition */
 ROM_START( systec )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "roms", 0 )
 	ROM_LOAD( "systec.bin",   0x0000, 0x2000, CRC(967108ab) SHA1(a414db032ca7db0f9fdbe22aa68a099a93efb593))
 ROM_END
 
