@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
+#include "machine/ram.h"
 
 #define MAIN_CLOCK XTAL_4MHz
 
@@ -41,11 +42,35 @@ public:
 	required_device<mc6845_device> m_crtc;
 	DECLARE_READ8_MEMBER(random_r);
 	DECLARE_WRITE8_MEMBER(video_w);
+	DECLARE_READ8_MEMBER(vblank_r);
+
+	emu_timer* m_sys_timer;
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_chargen;
 	virtual void video_start();
+	virtual void machine_start();
+	virtual void machine_reset();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+    virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+private:
+    static const device_timer_id SYSTEM_TIMER = 0;
+
 };
+
+void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case SYSTEM_TIMER:
+		device_set_input_line(m_maincpu,INPUT_LINE_IRQ0,HOLD_LINE);
+		break;
+	}
+}
+
+READ8_MEMBER( alphatro_state::vblank_r)
+{
+	return (space.machine().device<screen_device>("screen")->vblank() ? 0x80 : 0x00);
+}
 
 READ8_MEMBER( alphatro_state::random_r )
 {
@@ -106,11 +131,11 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM // this is really ram, basic gets copied to here when it is needed
-	AM_RANGE(0x6000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe46f) AM_ROM
-	AM_RANGE(0xe470, 0xe4cf) AM_RAM // keyboard out?
-	AM_RANGE(0xe4d0, 0xefff) AM_ROM
+	AM_RANGE(0x0000, 0xefff) AM_RAMBANK("bank1") // this is really ram, basic gets copied to here when it is needed
+//	AM_RANGE(0x6000, 0xdfff) AM_RAM
+//	AM_RANGE(0xe000, 0xe46f) AM_RAM
+//	AM_RANGE(0xe470, 0xe4cf) AM_RAM // keyboard out?
+//	AM_RANGE(0xe4d0, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xfdff) AM_ROM AM_WRITE(video_w)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM // for the stack
 ADDRESS_MAP_END
@@ -118,7 +143,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x10, 0x10) AM_READ(random_r)
+	AM_RANGE(0x10, 0x10) AM_READ(vblank_r)
 	//AM_RANGE(0x20, 0x2f) AM_READ(random_r) // keyboard in?
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -142,15 +167,19 @@ static GFXDECODE_START( alphatro )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-static MACHINE_START( alphatro )
+void alphatro_state::machine_start()
 {
-//  alphatro_state *state = machine.driver_data<alphatro_state>();
-
+	m_sys_timer = timer_alloc(SYSTEM_TIMER);
 }
 
-static MACHINE_RESET( alphatro )
+void alphatro_state::machine_reset()
 {
-	cpu_set_reg(machine.device("maincpu"), STATE_GENPC, 0xe000);
+	UINT8* RAM = machine().device<ram_device>("ram")->pointer();
+	UINT8* ROM = machine().region("maincpu")->base();
+	cpu_set_reg(machine().device("maincpu"), STATE_GENPC, 0xe000);
+	memcpy(RAM,ROM,0x10000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
+	memory_set_bankptr(machine(), "bank1",RAM);
+	// m_sys_timer->adjust(attotime::zero,0,attotime::from_msec(10));  // interrupts aren't enabled yet, so not much point in setting this
 }
 
 //static PALETTE_INIT( alphatro )
@@ -178,13 +207,13 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_CPU_PROGRAM_MAP(alphatro_map)
 	MCFG_CPU_IO_MAP(alphatro_io)
 
-	MCFG_MACHINE_START(alphatro)
-	MCFG_MACHINE_RESET(alphatro)
+//	MCFG_MACHINE_START(alphatro)
+//	MCFG_MACHINE_RESET(alphatro)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -201,6 +230,9 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk unknown
+
+	MCFG_RAM_ADD("ram")
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 
@@ -225,7 +257,7 @@ in various places of the ROM ... most likely a bad dump.
 */
 
 ROM_START( alphatro )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD( "rom1.bin",     0x0000, 0x2000, BAD_DUMP CRC(1509b15a) SHA1(225c36411de680eb8f4d6b58869460a58e60c0cf) )
 	ROM_LOAD( "rom2.bin",     0x2000, 0x2000, BAD_DUMP CRC(998a865d) SHA1(294fe64e839ae6c4032d5db1f431c35e0d80d367) )
 	ROM_LOAD( "rom3.bin",     0x4000, 0x2000, BAD_DUMP CRC(55cbafef) SHA1(e3376b92f80d5a698cdcb2afaa0f3ef4341dd624) )
