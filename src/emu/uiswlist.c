@@ -369,28 +369,25 @@ void ui_menu_software::populate()
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
-		for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
+		if (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
 		{
-			if (swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM))
+			software_list *list = software_list_open(machine().options(), swlist->list_name, false, NULL);
+
+			if (list)
 			{
-				software_list *list = software_list_open(machine().options(), swlist->list_name[i], false, NULL);
-
-				if (list)
+				bool found = false;
+				for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 				{
-					bool found = false;
-					for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
-					{
-						software_part *part = software_find_part(swinfo, NULL, NULL);
-						if (strcmp(interface,part->interface_)==0) {
-							found = true;
-						}
+					software_part *part = software_find_part(swinfo, NULL, NULL);
+					if (strcmp(interface,part->interface_)==0) {
+						found = true;
 					}
-					if (found) {
-						item_append(list->description, NULL, 0, swlist->list_name[i]);
-					}
-
-					software_list_close(list);
 				}
+				if (found) {
+					item_append(list->description, NULL, 0, swlist->list_name);
+				}
+
+				software_list_close(list);
 			}
 		}
 	}
@@ -400,32 +397,29 @@ void ui_menu_software::populate()
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
-		for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
+		if (swlist->list_type == SOFTWARE_LIST_COMPATIBLE_SYSTEM)
 		{
-			if (swlist->list_name[i] && (swlist->list_type == SOFTWARE_LIST_COMPATIBLE_SYSTEM))
+			software_list *list = software_list_open(machine().options(), swlist->list_name, false, NULL);
+
+			if (list)
 			{
-				software_list *list = software_list_open(machine().options(), swlist->list_name[i], false, NULL);
-
-				if (list)
+				bool found = false;
+				for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 				{
-					bool found = false;
-					for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
-					{
-						software_part *part = software_find_part(swinfo, NULL, NULL);
-						if (strcmp(interface,part->interface_)==0) {
-							found = true;
-						}
+					software_part *part = software_find_part(swinfo, NULL, NULL);
+					if (strcmp(interface,part->interface_)==0) {
+						found = true;
 					}
-					if (found) {
-						if (!haveCompatible) {
-							item_append("[compatible lists]", NULL, MENU_FLAG_DISABLE, NULL);
-						}
-						item_append(list->description, NULL, 0, swlist->list_name[i]);
-					}
-
-					haveCompatible = true;
-					software_list_close(list);
 				}
+				if (found) {
+					if (!haveCompatible) {
+						item_append("[compatible lists]", NULL, MENU_FLAG_DISABLE, NULL);
+					}
+					item_append(list->description, NULL, 0, swlist->list_name);
+				}
+
+				haveCompatible = true;
+				software_list_close(list);
 			}
 		}
 	}
