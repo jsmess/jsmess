@@ -40,7 +40,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	DECLARE_READ8_MEMBER(random_r);
+	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(video_w);
 	DECLARE_READ8_MEMBER(vblank_r);
 
@@ -72,9 +72,9 @@ READ8_MEMBER( alphatro_state::vblank_r)
 	return (space.machine().device<screen_device>("screen")->vblank() ? 0x80 : 0x00);
 }
 
-READ8_MEMBER( alphatro_state::random_r )
+READ8_MEMBER( alphatro_state::keyboard_r )
 {
-	return space.machine().rand();
+	return 0x00;
 }
 
 WRITE8_MEMBER( alphatro_state::video_w )
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_READ(vblank_r)
-	//AM_RANGE(0x20, 0x2f) AM_READ(random_r) // keyboard in?
+	AM_RANGE(0x20, 0x2f) AM_READ(keyboard_r) // keyboard in?
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
