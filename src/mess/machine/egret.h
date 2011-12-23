@@ -13,9 +13,9 @@
 
 #define EGRET_TAG	"egret"
 
-#define EGRET_TYPE_101		0x1100
-#define EGRET_TYPE_101_EARLY	0x2200
-#define EGRET_TYPE_100		0x3300
+#define EGRET_341S0851  0x1100
+#define EGRET_341S0850  0x2200
+#define EGRET_344S0100  0x3300
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
