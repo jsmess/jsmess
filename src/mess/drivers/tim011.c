@@ -16,7 +16,6 @@ class tim011_state : public driver_device
 public:
 	tim011_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-
 };
 
 
@@ -28,8 +27,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tim011_io, AS_IO, 8, tim011_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_NOP	/* Z180 internal registers */
+	AM_RANGE(0x0000, 0x007f) AM_RAM	/* Z180 internal registers */
+	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -55,6 +54,7 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	MCFG_CPU_ADD("maincpu",Z180, XTAL_12_288MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tim011_mem)
 	MCFG_CPU_IO_MAP(tim011_io)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 
 	MCFG_MACHINE_RESET(tim011)
 
