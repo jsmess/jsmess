@@ -30,6 +30,7 @@
     
                                                                                               Key
                                                                                               @@ - might be the same as above (not verified)
+                                                                                              ?? - probably different
                                                                                               ########MISSING######## - currently missing?
     
       Name                                                                                  | setname(s)
@@ -196,7 +197,7 @@
       Cross Romance: Koi to Mahjong to Hanafuda to (Japan) [T-7103G]                        |
       Cross Tantei Monogatari: Motsureta 7tsu no Labyrinth (Japan) [T-36401G]               |
       Crow, The: City of Angels (Japan) [T-8123G]                                           |
-      Crows: The Battle Action for Sega Saturn (Japan) [T-16806G]                           | ########MISSING########
+      Crows: The Battle Action for Sega Saturn (Japan) [T-16806G]                           | (crows)             Playable? 
       Cube Battler: Story of Anna (Japan) [T-21006G]                                        |
       Cube Battler: Story of Shou: Debugger Shou-hen (Japan) [T-21004G]                     |
       Cubic Gallery (Japan) [T-19401G]                                                      |
@@ -313,9 +314,9 @@
       Eisei Meijin II (Japan) [T-9516G]                                                     |
       Eiyuu Shigan: Gal Act Heroism (Japan) [T-5204G]                                       |
       Elevator Action Returns (Japan) [T-19903G]                                            |
-      Elf o Karu Mono-tachi (Japan) [T-16605G]                                              |
-      Elf o Karu Mono-tachi II (Japan) [T-16610G]                                           |
-      Elf o Karu Mono-tachi: Hanafuda-hen (Japan) [T-16606G]                                |
+      Elf o Karu Mono-tachi (Japan) [T-16605G]                                              | (elf)
+      Elf o Karu Mono-tachi II (Japan) [T-16610G]                                           | (elf2)
+      Elf o Karu Mono-tachi: Hanafuda-hen (Japan) [T-16606G]                                | (elfhana)
       EMIT Value Set (Japan) [T-7610G]                                                      |
       EMIT Vol. 1: Toki no Maigo (Japan) [T-7602G]                                          |
       EMIT Vol. 2: Meigake no Tabi (Japan) [T-7603G]                                        |
@@ -485,7 +486,7 @@
       Houma Hunter Lime: Perfect Collection (Japan) [T-2001G]                               |
       House of the Dead, The (Japan) [GS-9173]                                              |
       House of the Dead, The (Japan) (Satakore) [GS-9207]                                   |
-      Hyper 3D Pinball (Japan) [T-7007G]                                                    |
+      Hyper 3D Pinball (Japan) [T-7007G]                                                    | (h3dpin)
       Hyper 3D Taisen Battle: Gebockers (Japan) [T-5303G]                                   |
       Hyper 3D Taisen Battle: Gebockers (Japan) (Taisen Cable Tsuki Gentei Pack) [T-5304G]  |
       Hyper Duel (Japan) [T-1809G]                                                          |
@@ -838,22 +839,22 @@
       Princess Quest (Japan) [T-24603G]                                                     |
       Princess Quest (Japan) (Tokubetsu Genteiban) [T-24604G]                               |
       Prisoner of Ice: Jashin Kourin (Japan) [T-26112G]                                     |
-      Private Idol Disc Data-hen: Race Queen F (Japan) [T-30805G]                           |
-      Private Idol Disc Data-hen: Race Queen G (Japan) [T-30806G]                           |
-      Private Idol Disc Tokubetsu-hen: Campaign Girl '97 (Japan) [T-30808G]                 |
-      Private Idol Disc Tokubetsu-hen: CosPlayers (Japan) [T-30804G]                        |
-      Private Idol Disc Tokubetsu-hen: Kogal Daihyakka 100 (Japan) [T-30807G]               |
-      Private Idol Disc Vol. 1: Yuu Kinoshita (Japan) [T-30801G]                            |
-      Private Idol Disc Vol. 2: Miki Uchiyama (Japan) [T-30802G]                            |
-      Private Idol Disc Vol. 3: Akemi Oushima (Japan) [T-30803G]                            |
-      Private Idol Disc Vol. 4: Mirei Kuroda (Japan) [T-30809G]                             |
-      Private Idol Disc Vol. 5: Nanako Fujisaki (Japan) [T-30811G]                          |
+      Private Idol Disc Data-hen: Race Queen F (Japan) [T-30805G]                           | (pidolhrf)
+      Private Idol Disc Data-hen: Race Queen G (Japan) [T-30806G]                           | (pidolhrg)
+      Private Idol Disc Tokubetsu-hen: Campaign Girl '97 (Japan) [T-30808G]                 | (pidolc97)
+      Private Idol Disc Tokubetsu-hen: CosPlayers (Japan) [T-30804G]                        | (pidolcos)
+      Private Idol Disc Tokubetsu-hen: Kogal Daihyakka 100 (Japan) [T-30807G]               | (pidol100)
+      Private Idol Disc Vol. 1: Yuu Kinoshita (Japan) [T-30801G]                            | (pidolv1)
+      Private Idol Disc Vol. 2: Miki Uchiyama (Japan) [T-30802G]                            | (pidolv2)
+      Private Idol Disc Vol. 3: Akemi Oushima (Japan) [T-30803G]                            | (pidolv3)
+      Private Idol Disc Vol. 4: Mirei Kuroda (Japan) [T-30809G]                             | (pidolv4)
+      Private Idol Disc Vol. 5: Nanako Fujisaki (Japan) [T-30811G]                          | (pidolv5)
       Private Idol Disc Vol. 6: Satomi Yoshida (Japan) [T-30813G]                           |
-      Private Idol Disc Vol. 7: Kaori Asou (Japan) [T-30814G]                               |
+      Private Idol Disc Vol. 7: Kaori Asou (Japan) [T-30814G]                               | (pidolv7)
       Private Idol Disc Vol. 8: Emiko Furukawa (Japan) [T-30815G]                           |
-      Private Idol Disc Vol. 9: Keiko Nagamatsu (Japan) [T-30816G]                          |
-      Private Idol Disc Vol. 10: Mai Masaki (Japan) [T-30817G]                              |
-      Private Idol Disc Vol. 11: Mayumi Hirose (Japan) [T-30818G]                           |
+      Private Idol Disc Vol. 9: Keiko Nagamatsu (Japan) [T-30816G]                          | (pidolv9)
+      Private Idol Disc Vol. 10: Mai Masaki (Japan) [T-30817G]                              | (pidolv10)
+      Private Idol Disc Vol. 11: Mayumi Hirose (Japan) [T-30818G]                           | (pidolv11)
       Pro Mahjong Kiwame S (Japan) [T-16801G]                                               |
       Pro Mahjong Kiwame S (Japan) (Satakore) [T-16807G]                                    |
       Pro Shinan Mahjong Tsuwamono (Japan) [T-38501G]                                       |
@@ -867,11 +868,11 @@
       Pu-Li-Ru-La Arcade Gears (Japan) [T-26106G]                                           |
       Pup-Breeder (Japan) [T-29301G]                                                        |
       Purikura Daisakusen (Japan) [T-14409G]                                                |
-      Puyo Puyo Sun (Japan) [T-6603G]                                                       |
-      Puyo Puyo Sun (Japan) (Satakore) [T-6609G]                                            |
-      Puyo Puyo Sun for SegaNet (Japan) [GS-7111]                                           |
-      Puyo Puyo Tsuu (Japan) [T-6601G]                                                      |
-      Puyo Puyo Tsuu (Japan) (Satakore) [T-6604G]                                           |
+      Puyo Puyo Sun (Japan) [T-6603G]                                                       | (puyosun)
+      Puyo Puyo Sun (Japan) (Satakore) [T-6609G]                                            |  @@
+      Puyo Puyo Sun for SegaNet (Japan) [GS-7111]                                           |  ??
+      Puyo Puyo Tsuu (Japan) [T-6601G]                                                      | (puyopuy2)
+      Puyo Puyo Tsuu (Japan) (Satakore) [T-6604G]                                           |  @@
       Puzzle Bobble 2X (Japan) [T-1106G]                                                    | (pbobbl2x)
       Puzzle Bobble 2X (Japan) (Satakore) [T-1114G]                                         |
       Puzzle Bobble 2X + Space Invaders (Japan) [T-1111G]                                   |
@@ -1035,22 +1036,22 @@
       Shin Megami Tensei: Devil Summoner: Akuma Zensho (Japan) [T-14406G]                   |
       Shin Shinobi Den (Japan) [GS-9010]                                                    |
       Shin Theme Park (Japan) [T-10618G]                                                    |
-      Shingata Kururin Pa! (Japan) [T-24202G]                                               |
-      Shining Force III Scenario 1: Outo no Kyoshin (Japan) [GS-9175]                       |
-      Shining Force III Scenario 2: Nerawareta Miko (Japan) [GS-9188]                       |
-      Shining Force III Scenario 3: Hyouheki no Jashingu (Japan) [GS-9203]                  |
-      Shining the Holy Ark (Japan) [T-33101G]                                               |
-      Shining Wisdom (Japan) [GS-9057]                                                      |
+      Shingata Kururin Pa! (Japan) [T-24202G]                                               | (skurupa)           Playable?
+      Shining Force III Scenario 1: Outo no Kyoshin (Japan) [GS-9175]                       | (sforc3s1)
+      Shining Force III Scenario 2: Nerawareta Miko (Japan) [GS-9188]                       | (sforc3s2)
+      Shining Force III Scenario 3: Hyouheki no Jashingu (Japan) [GS-9203]                  | (sforc3s3)
+      Shining the Holy Ark (Japan) [T-33101G]                                               | (sholyark)
+      Shining Wisdom (Japan) [GS-9057]                                                      | (swisdom)
       Shinouken (Japan) [T-3113G]                                                           |
       Shinpi no Sekai: El Hazard (Japan) [T-22203G]                                         |
       Shinpi no Sekai: El Hazard (Japan) (Shokai Tokuten Genteiban) [T-22202G]              |
       Shinrei Jusatsushi Taroumaru (Japan) [T-4804G]                                        |
-      Shinseiki Evangelion (Japan) [GS-9051]                                                |
-      Shinseiki Evangelion (New Package) (Japan) [GS-9141]                                  |
-      Shinseiki Evangelion 2nd Impression (Japan) [GS-9129]                                 |
-      Shinseiki Evangelion: Digital Card Library (Japan) [GS-9159]                          |
-      Shinseiki Evangelion: Eva to Yukai na Nakama-tachi (Japan) [T-35103G]                 |
-      Shinseiki Evangelion: Koutetsu no Girlfriend (Japan) [GS-9194]                        |
+      Shinseiki Evangelion (Japan) [GS-9051]                                                | (shinev)
+      Shinseiki Evangelion (New Package) (Japan) [GS-9141]                                  |  @@
+      Shinseiki Evangelion 2nd Impression (Japan) [GS-9129]                                 | (shinev2i)
+      Shinseiki Evangelion: Digital Card Library (Japan) [GS-9159]                          | (shinevdc)
+      Shinseiki Evangelion: Eva to Yukai na Nakama-tachi (Japan) [T-35103G]                 | (shinevyu)
+      Shinseiki Evangelion: Koutetsu no Girlfriend (Japan) [GS-9194]                        | (shinevgf)
       Shinsetsu Samurai Spirits: Bushidouretsuden (Japan) [T-3112G]                         |
       Shinsetsu Yumemi Yakata: Tobira no Oku ni Darekaga… (Japan) [GS-9005]                 |
       Shippu Mahou Daisakusen (Japan) [T-18506G]                                            |
@@ -1062,11 +1063,11 @@
       Shunsai: Keiba Data Stable (Japan) [T-18703G]                                         |
       Shusse Mahjong Daisettai (Japan) [T-24902G]                                           |
       Shutokou Battle '97 (Japan) [T-15019G]                                                |
-      Shutsudou! Minisuka Police (Japan) [T-30811G]                                         |
+      Shutsudou! Minisuka Police (Japan) [T-30811G]                                         | (minipoli)
       Shutsudou! Minisuka Police (Japan) (Genteiban) [T-30812G]                             |
-      Side Pocket 2: Densetsu no Hustler (Japan) [T-1301G]                                  |
-      Side Pocket 3 (Japan) [T-1314G]                                                       |
-      Side Pocket 3 (Japan) (Satakore) [T-1319G]                                            |
+      Side Pocket 2: Densetsu no Hustler (Japan) [T-1301G]                                  | (sidepkt2)          Playable? Shadow issues
+      Side Pocket 3 (Japan) [T-1314G]                                                       | (sidepkt3)          Playable?
+      Side Pocket 3 (Japan) (Satakore) [T-1319G]                                            | (sidepkt3sam)       Playable?
       Silhouette Mirage (Japan) [T-32901G]                                                  |
       Silhouette Mirage (Japan) (Satakore) [T-32903G]                                       |
       Sim City 2000 (Japan) [GS-9027]                                                       |
@@ -1327,12 +1328,12 @@
       Whizz (Japan) [T-36102G]                                                              |
       Willy Wombat (Japan) [T-14306G]                                                       |
       Wing Arms: Kareinaru Gekitsui Ou (Japan) [GS-9038]                                    |
-      Winning Post 2 (Japan) [T-7612G]                                                      |
-      Winning Post 2 (Japan) (Koei the Best) [T-7666G]                                      |
-      Winning Post 2: Final '97 (Japan) [T-7647G]                                           |
-      Winning Post 2: Program '96 (Japan) [T-7620G]                                         |
-      Winning Post 3 (Japan) [T-7660G]                                                      |
-      Winning Post 3: Program '98 (Japan) [T-7671G]                                         |
+      Winning Post 2 (Japan) [T-7612G]                                                      | (wpost2)
+      Winning Post 2 (Japan) (Koei the Best) [T-7666G]                                      |  @@
+      Winning Post 2: Final '97 (Japan) [T-7647G]                                           | (wpost297)
+      Winning Post 2: Program '96 (Japan) [T-7620G]                                         | (wpost296)
+      Winning Post 3 (Japan) [T-7660G]                                                      | (wpost3)
+      Winning Post 3: Program '98 (Japan) [T-7671G]                                         | (wpost398)
       Winning Post EX (Japan) [T-7606G]                                                     |
       Winter Heat (Japan) [GS-9177]                                                         |
       WipEout (Japan) [T-18603G]                                                            |
@@ -1343,7 +1344,7 @@
       Wizardry Nemesis (Japan) [T-37001G]                                                   |
       Wizardry VI & VII Complete (Japan) [T-1306G]                                          |
       Wizardry: Llylgamyn Saga (Japan) [T-38601G]                                           |
-      Wolf Fang SS: Kuuga 2001 (Japan) [T-26105G]                                           |
+      Wolf Fang SS: Kuuga 2001 (Japan) [T-26105G]                                           | (wolffang)
       Wonder 3 Arcade Gears (Japan) [T-26107G]                                              |
       World Advanced Daisenryaku: Koutetsu no Ikusakaze (Japan) [GS-9025]                   |
       World Advanced Daisenryaku: Sakusen File (Japan) [GS-9082]                            |
@@ -1352,7 +1353,7 @@
       World Evolution Soccer (Japan) [T-2002G]                                              |
       World Heroes Perfect (Japan) [T-3103G]                                                |
       World Series Baseball II (Japan) [GS-9120]                                            |
-      Worms (Japan) [T-22405G]                                                              |
+      Worms (Japan) [T-22405G]                                                              | (worms)
       WWF In Your House (Japan) [T-8120G]                                                   |
       WWF WrestleMania: The Arcade Game (Japan) [T-8112]                                    |
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4591,8 +4592,9 @@
   </software>
 
   <!-- Identifying Neon Genesis - Evangelion - Koutetsu no Girlfriend (Japan) (Disc 1)... -->
-  <software name="neongene" supported="no">
-    <description>Neon Genesis - Evangelion - Koutetsu no Girlfriend (Japan) (Disc 1)</description>
+  <!-- Identifying Neon Genesis - Evangelion - Koutetsu no Girlfriend (Japan) (Disc 2)... -->
+  <software name="shinevgfa" cloneof="shinevgf" supported="no">
+    <description>Neon Genesis - Evangelion - Koutetsu no Girlfriend (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -4600,22 +4602,16 @@
         <disk name="neon genesis - evangelion - koutetsu no girlfriend (japan) (disc 1)" sha1="f2ea089059bc0d799788da680bfc5a835ef16575" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Neon Genesis - Evangelion - Koutetsu no Girlfriend (Japan) (Disc 2)... -->
-  <software name="neongene01" cloneof="neongene" supported="no">
-    <description>Neon Genesis - Evangelion - Koutetsu no Girlfriend (Japan) (Disc 2)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="neon genesis - evangelion - koutetsu no girlfriend (japan) (disc 2)" sha1="f1a4d701b50a6d3b111d06abb9236eb7cc2dd5b0" />
       </diskarea>
     </part>
   </software>
 
+
   <!-- Identifying Neon Genesis Evangelion - Digital Card Library (Japan)... -->
-  <software name="neongene02" cloneof="neongene" supported="no">
+  <software name="shinevdca" cloneof="shinevdc" supported="no">
     <description>Neon Genesis Evangelion - Digital Card Library (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5023,7 +5019,7 @@
   </software>
 
   <!-- Identifying Puyo Puyo Tsuu (Japan) (3M)... -->
-  <software name="puyopuyo" supported="no">
+  <software name="puyopuy2" supported="no">
     <description>Puyo Puyo Tsuu (Japan) (3M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5683,7 +5679,7 @@
   </software>
 
   <!-- Identifying Sega Ages - I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)... -->
-  <software name="segaages03" cloneof="segaages" supported="no">
+  <software name="samickey" supported="no">
     <description>Sega Ages - I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5971,7 +5967,7 @@
   </software>
 
   <!-- Identifying Shin Seiki Evangelion (Japan)... -->
-  <software name="shinseik" supported="no">
+  <software name="shinev" supported="no">
     <description>Shin Seiki Evangelion (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5983,7 +5979,7 @@
   </software>
 
   <!-- Identifying Shin Seiki Evangelion - 2nd Impression (Japan) (Made in Japan)... -->
-  <software name="shinseik01" cloneof="shinseik" supported="no">
+  <software name="shinev2i" supported="no">
     <description>Shin Seiki Evangelion - 2nd Impression (Japan) (Made in Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5995,7 +5991,7 @@
   </software>
 
   <!-- Identifying Shin Seiki Evangelion - 2nd Impression (Japan) (Made in USA)... -->
-  <software name="shinseik02" cloneof="shinseik" supported="no">
+  <software name="shinev2ia" cloneof="shinev2i" supported="no">
     <description>Shin Seiki Evangelion - 2nd Impression (Japan) (Made in USA)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -6019,7 +6015,7 @@
   </software>
 
   <!-- Identifying Shining Force III - Scenario 1 - Outo no Kyoshin (Japan) (Rev A)... -->
-  <software name="shiningf" supported="no">
+  <software name="sforc3s1" supported="no">
     <description>Shining Force III - Scenario 1 - Outo no Kyoshin (Japan) (Rev A)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -6031,7 +6027,7 @@
   </software>
 
   <!-- Identifying Shining Force III - Scenario 2 - Nerawareta Miko (Japan) (Rev A)... -->
-  <software name="shiningf01" cloneof="shiningf" supported="no">
+  <software name="sforc3s2" supported="no">
     <description>Shining Force III - Scenario 2 - Nerawareta Miko (Japan) (Rev A)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -6043,7 +6039,7 @@
   </software>
 
   <!-- Identifying Shining Force III - Scenario 3 - Hyouheki no Jashinguu (Japan)... -->
-  <software name="shiningf02" cloneof="shiningf" supported="no">
+  <software name="sforc3s3" supported="no">
     <description>Shining Force III - Scenario 3 - Hyouheki no Jashinguu (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -6055,7 +6051,7 @@
   </software>
 
   <!-- Identifying Shining Wisdom (Japan) (Rev A)... -->
-  <software name="shiningw" supported="no">
+  <software name="swisdom" supported="no">
     <description>Shining Wisdom (Japan) (Rev A)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -6139,7 +6135,7 @@
   </software>
 
   <!-- Identifying Side Pocket 2 - Densetsu no Hustler (Japan)... -->
-  <software name="sidepock" supported="no">
+  <software name="sidepkt2" supported="no">
     <description>Side Pocket 2 - Densetsu no Hustler (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -7263,7 +7259,7 @@
   </software>
 
   <!-- Identifying Winning Post 2 (Japan) (2M)... -->
-  <software name="winningp" supported="no">
+  <software name="wpost2" supported="no">
     <description>Winning Post 2 (Japan) (2M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -7275,7 +7271,7 @@
   </software>
 
   <!-- Identifying Winning Post 2 - Final '97 (Japan)... -->
-  <software name="winningp01" cloneof="winningp" supported="no">
+  <software name="wpost297" supported="no">
     <description>Winning Post 2 - Final '97 (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -7287,7 +7283,7 @@
   </software>
 
   <!-- Identifying Winning Post 2 - Program '96 (Japan)... -->
-  <software name="winningp02" cloneof="winningp" supported="no">
+  <software name="wpost296" supported="no">
     <description>Winning Post 2 - Program '96 (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -9940,8 +9936,8 @@
   </software>
 
   <!-- Identifying Puyo Puyo Sun (JAP) (v1.002) (DW0154)... -->
-  <software name="puyopuyoa" cloneof="puyopuyo" supported="no">
-    <description>Puyo Puyo Sun (JAP) (v1.002) (DW0154)</description>
+  <software name="puyosun" supported="no">
+    <description>Puyo Puyo Sun (JAP) (v1.002)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -9952,8 +9948,8 @@
   </software>
 
   <!-- Identifying Puyo Puyo Tsuu (JAP) (DW0478)... -->
-  <software name="puyopuyo01" cloneof="puyopuyo" supported="no">
-    <description>Puyo Puyo Tsuu (JAP) (DW0478)</description>
+  <software name="puyopuy2a" cloneof="puyopuy2" supported="no">
+    <description>Puyo Puyo Tsuu (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -10396,8 +10392,8 @@
   </software>
 
   <!-- Identifying Shining Force III - Scenario 3 (JAP) (DW0250)... -->
-  <software name="shiningfa" cloneof="shiningf" supported="no">
-    <description>Shining Force III - Scenario 3 (JAP) (DW0250)</description>
+  <software name="sforc3s3a" cloneof="sforc3s3" supported="no">
+    <description>Shining Force III - Scenario 3 (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -10408,7 +10404,7 @@
   </software>
 
   <!-- Identifying Shining the Holy Ark (JAP) (DW0537)... -->
-  <software name="shiningt" supported="no">
+  <software name="sholyark" supported="no">
     <description>Shining the Holy Ark (JAP) (DW0537)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -10420,8 +10416,8 @@
   </software>
 
   <!-- Identifying Shining Wisdom (JAP) (DW0368)... -->
-  <software name="shiningwa" cloneof="shiningw" supported="no">
-    <description>Shining Wisdom (JAP) (DW0368)</description>
+  <software name="swisdoma" cloneof="swisdom" supported="no">
+    <description>Shining Wisdom (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -10444,7 +10440,7 @@
   </software>
 
   <!-- Identifying Shinseiki Evangelion (JAP) (DW0542)... -->
-  <software name="shinseik03" cloneof="shinseik" supported="no">
+  <software name="shineva" cloneof="shinev" supported="no">
     <description>Shinseiki Evangelion (JAP) (DW0542)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -10456,8 +10452,8 @@
   </software>
 
   <!-- Identifying Shinseiki Evangelion 2nd Impression (JAP) (DW0545)... -->
-  <software name="shinseik04" cloneof="shinseik" supported="no">
-    <description>Shinseiki Evangelion 2nd Impression (JAP) (DW0545)</description>
+  <software name="shinev2ib" cloneof="shinev2i" supported="no">
+    <description>Shinseiki Evangelion 2nd Impression (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -10468,7 +10464,7 @@
   </software>
 
   <!-- Identifying Shinseiki Evangelion Digital Card Library (JAP) (DW0393)... -->
-  <software name="shinseik05" cloneof="shinseik" supported="no">
+  <software name="shinevdc" supported="no">
     <description>Shinseiki Evangelion Digital Card Library (JAP) (DW0393)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -10480,8 +10476,9 @@
   </software>
 
   <!-- Identifying Shinseiki Evangelion Koutetsu no Girlfriend (Disc 1 of 2) (JAP) (DW0448)... -->
-  <software name="shinseik06" cloneof="shinseik" supported="no">
-    <description>Shinseiki Evangelion Koutetsu no Girlfriend (Disc 1 of 2) (JAP) (DW0448)</description>
+  <!-- Identifying Shinseiki Evangelion Koutetsu no Girlfriend (Disc 2 of 2) (JAP) (DW0448)... -->
+  <software name="shinevgf" supported="no">
+    <description>Shinseiki Evangelion Koutetsu no Girlfriend (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -10489,19 +10486,13 @@
         <disk name="shinseiki evangelion koutetsu no girlfriend (disc 1 of 2) (jap) (dw0448)" sha1="c3e49deddde4aa616180eaf56a6c998ea52f4dbe" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Shinseiki Evangelion Koutetsu no Girlfriend (Disc 2 of 2) (JAP) (DW0448)... -->
-  <software name="shinseik07" cloneof="shinseik" supported="no">
-    <description>Shinseiki Evangelion Koutetsu no Girlfriend (Disc 2 of 2) (JAP) (DW0448)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="shinseiki evangelion koutetsu no girlfriend (disc 2 of 2) (jap) (dw0448)" sha1="a6afc245608d77b1fde5ccf084a9ed595f08a13e" />
       </diskarea>
     </part>
   </software>
+
 
   <!-- Identifying Shinsetsu Samurai Spirits Bushidou Retsuden (JAP) (DW0434)... -->
   <software name="shinsetsa" cloneof="shinsets" supported="no">
@@ -13486,7 +13477,7 @@
   </software>
 
   <!-- Identifying Elf wo Karu Monotachi ~Hanafuda Hen~ (T-16606G)... -->
-  <software name="elfwokar" supported="no">
+  <software name="elfhana" supported="no">
     <description>Elf wo Karu Monotachi ~Hanafuda Hen~ (T-16606G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -14552,7 +14543,7 @@
   </software>
 
   <!-- Identifying Hyper 3D Pinball (T-7007G)... -->
-  <software name="hyper3dp" supported="no">
+  <software name="h3dpin" supported="no">
     <description>Hyper 3D Pinball (T-7007G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15522,7 +15513,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Data Hen Race Queen F (T-30805G)... -->
-  <software name="privatei" supported="no">
+  <software name="pidolhrf" supported="no">
     <description>Private Idol Disc Data Hen Race Queen F (T-30805G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15534,7 +15525,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Data Hen Race Queen G (T-30806G)... -->
-  <software name="privatei01" cloneof="privatei" supported="no">
+  <software name="pidolhrg" supported="no">
     <description>Private Idol Disc Data Hen Race Queen G (T-30806G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15546,7 +15537,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Tokubetsu Hen Campaign Girl 97 (T-30808G)... -->
-  <software name="privatei02" cloneof="privatei" supported="no">
+  <software name="pidolc97" supported="no">
     <description>Private Idol Disc Tokubetsu Hen Campaign Girl 97 (T-30808G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15558,7 +15549,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Tokubetsu Hen CosPlayers (T-30804G)... -->
-  <software name="privatei03" cloneof="privatei" supported="no">
+  <software name="pidolcos" supported="no">
     <description>Private Idol Disc Tokubetsu Hen CosPlayers (T-30804G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15570,7 +15561,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Tokubetsu Hen Kogal Daihyakka 100 (T-30807G)... -->
-  <software name="privatei04" cloneof="privatei" supported="no">
+  <software name="pidol100" supported="no">
     <description>Private Idol Disc Tokubetsu Hen Kogal Daihyakka 100 (T-30807G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15582,7 +15573,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 1 - Kinoshita Yuu (T-30801G)... -->
-  <software name="privatei05" cloneof="privatei" supported="no">
+  <software name="pidolv1" supported="no">
     <description>Private Idol Disc Vol 1 - Kinoshita Yuu (T-30801G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15594,7 +15585,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 10 ~Masaki Mai~ (T-30817G)... -->
-  <software name="privatei06" cloneof="privatei" supported="no">
+  <software name="pidolv10" supported="no">
     <description>Private Idol Disc Vol 10 ~Masaki Mai~ (T-30817G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15606,7 +15597,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 11 - Hirose Mayumi (T-30818G)... -->
-  <software name="privatei07" cloneof="privatei" supported="no">
+  <software name="pidolv11" supported="no">
     <description>Private Idol Disc Vol 11 - Hirose Mayumi (T-30818G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15618,7 +15609,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 2 - Uchiyama Miki (T-30802G)... -->
-  <software name="privatei08" cloneof="privatei" supported="no">
+  <software name="pidolv2" supported="no">
     <description>Private Idol Disc Vol 2 - Uchiyama Miki (T-30802G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15630,7 +15621,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 3 - Oushima Akemi (T-30803G)... -->
-  <software name="privatei09" cloneof="privatei" supported="no">
+  <software name="pidolv3" supported="no">
     <description>Private Idol Disc Vol 3 - Oushima Akemi (T-30803G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15642,7 +15633,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 7 ~Asou Kaori~ (T-30814G)... -->
-  <software name="privatei0a" cloneof="privatei" supported="no">
+  <software name="pidolv7" supported="no">
     <description>Private Idol Disc Vol 7 ~Asou Kaori~ (T-30814G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15654,7 +15645,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 9 ~Nagamatsu Keiko~ (T-30816G)... -->
-  <software name="privatei0b" cloneof="privatei" supported="no">
+  <software name="pidolv9" supported="no">
     <description>Private Idol Disc Vol 9 ~Nagamatsu Keiko~ (T-30816G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15690,7 +15681,7 @@
   </software>
 
   <!-- Identifying Puyo Puyo Tsuu (Satakore) (T-6604G)... -->
-  <software name="puyopuyob" cloneof="puyopuyo" supported="no">
+  <software name="puyopuy2b" cloneof="puyopuy2" supported="no">
     <description>Puyo Puyo Tsuu (Satakore) (T-6604G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -16242,7 +16233,7 @@
   </software>
 
   <!-- Identifying Shining the Holy Arc (T-33101G)... -->
-  <software name="shiningtb" cloneof="shiningt" supported="no">
+  <software name="sholyarka" cloneof="sholyark" supported="no">
     <description>Shining the Holy Arc (T-33101G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -16277,21 +16268,10 @@
     </part>
   </software>
 
-  <!-- Identifying Shutsudou! Mini-skirt Police Audio Disc (T-30812G)... -->
-  <software name="shutsudo" supported="no">
-    <description>Shutsudou! Mini-skirt Police Audio Disc (T-30812G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
-      <diskarea name="cdrom">
-        <disk name="shutsudou! mini-skirt police audio disc (t-30812g)" sha1="a76bf8d86b3a4733efb728604cc75dd48fac8987" />
-      </diskarea>
-    </part>
-  </software>
-
   <!-- Identifying Shutsudou! Mini-skirt Police Disc 1 (T-30812G)... -->
-  <software name="shutsudo01" cloneof="shutsudo" supported="no">
-    <description>Shutsudou! Mini-skirt Police Disc 1 (T-30812G)</description>
+  <!-- Identifying Shutsudou! Mini-skirt Police Audio Disc (T-30812G)... -->
+  <software name="minipoli" supported="no">
+    <description>Shutsudou! Mini-skirt Police (T-30812G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -16299,34 +16279,28 @@
         <disk name="shutsudou! mini-skirt police disc 1 (t-30812g)" sha1="b4d4f9310884a1298ab4896c2dcc75ce291ba3b8" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Side Pocket 3 (Satakore) (T-1319G)... -->
-  <software name="sidepocka" cloneof="sidepock" supported="no">
-    <description>Side Pocket 3 (Satakore) (T-1319G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
-        <disk name="side pocket 3 (satakore) (t-1319g)" sha1="f52af81f9bb8fddab8b9c368ccd85fc0b2699f18" />
+        <disk name="shutsudou! mini-skirt police audio disc (t-30812g)" sha1="a76bf8d86b3a4733efb728604cc75dd48fac8987" />
       </diskarea>
     </part>
   </software>
 
+  <!-- Identifying Side Pocket 3 (Satakore) (T-1319G)... -->
   <!-- Identifying Side Pocket 3 (T-1314G)... -->
-  <!--<software name="sidepock01" cloneof="sidepock" supported="no">
-      <description>Side Pocket 3 (T-1314G)</description>
-      <year>199?</year>
-      <publisher>unknown</publisher>
-      <part name="cdrom" interface="sat_cdrom">
-        <diskarea name="cdrom">
-          <disk name="side pocket 3 (t-1314g)" sha1="f52af81f9bb8fddab8b9c368ccd85fc0b2699f18" />
-        </diskarea>
-      </part>
-    </software>-->
+  <software name="sidepkt3" supported="no">
+    <description>Side Pocket 3 (T-1314G) / Side Pocket 3 (Satakore) (T-1319G)</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="side pocket 3" sha1="f52af81f9bb8fddab8b9c368ccd85fc0b2699f18" />
+      </diskarea>
+    </part>
+  </software>
 
   <!-- Identifying Side Pocket 3 SAMPLE (610-6678)... -->
-  <software name="sidepock02" cloneof="sidepock" supported="no">
+  <software name="sidepkt3sam" cloneof="sidepkt3" supported="no">
     <description>Side Pocket 3 SAMPLE (610-6678)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -17729,7 +17703,7 @@
   </software>
 
   <!-- Identifying Winning Post 3 (T-7660G)... -->
-  <software name="winningpa" cloneof="winningp" supported="no">
+  <software name="wpost3" supported="no">
     <description>Winning Post 3 (T-7660G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -17885,7 +17859,7 @@
   </software>
 
   <!-- Identifying Worms (T-22405G)... -->
-  <software name="wormst22" supported="no">
+  <software name="worms" supported="no">
     <description>Worms (T-22405G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20006,7 +19980,7 @@
   </software>
 
   <!-- Identifying Neon Genesis Evangelion (J) (GS-9051)... -->
-  <software name="neongenez" cloneof="neongene" supported="no">
+  <software name="shinevb" cloneof="shinev" supported="no">
     <description>Neon Genesis Evangelion (J) (GS-9051)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20018,8 +19992,9 @@
   </software>
 
   <!-- Identifying Neon Genesis Evangelion Iron Maiden Disc 1 (J) (GS-9194)... -->
-  <software name="neongenez01" cloneof="neongene" supported="no">
-    <description>Neon Genesis Evangelion Iron Maiden Disc 1 (J) (GS-9194)</description>
+  <!-- Identifying Neon Genesis Evangelion Iron Maiden Disc 2 (J) (GS-9194)... -->
+  <software name="shinevgfb" cloneof="shinevgf" supported="no">
+    <description>Neon Genesis Evangelion Iron Maiden (J) (GS-9194)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -20027,19 +20002,13 @@
         <disk name="neon genesis evangelion iron maiden disc 1 (j) (gs-9194)" sha1="491c27115c83f5084d1b5ee5f4fa228cf004dee7" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Neon Genesis Evangelion Iron Maiden Disc 2 (J) (GS-9194)... -->
-  <software name="neongenez02" cloneof="neongene" supported="no">
-    <description>Neon Genesis Evangelion Iron Maiden Disc 2 (J) (GS-9194)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="neon genesis evangelion iron maiden disc 2 (j) (gs-9194)" sha1="3540783b892753638539fb35b7ff1af22f7db7a2" />
       </diskarea>
     </part>
   </software>
+
 
   <!-- Identifying Nightruth Explaination of the Paranormal - Maria (T-20206G)... -->
   <software name="nightrutz" cloneof="nightrut" supported="no">
@@ -20330,7 +20299,7 @@
   </software>
 
   <!-- Identifying Puyo Puyo Tsuu (T-6601G)... -->
-  <software name="puyopuyoz" cloneof="puyopuyo" supported="no">
+  <software name="puyopuy2c" cloneof="puyopuy2" supported="no">
     <description>Puyo Puyo Tsuu (T-6601G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20870,7 +20839,7 @@
   </software>
 
   <!-- Identifying Shining Wisdom (GS-9057)... -->
-  <software name="shiningwz" cloneof="shiningw" supported="no">
+  <software name="swisdomb" cloneof="swisdom" supported="no">
     <description>Shining Wisdom (GS-9057)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20882,7 +20851,7 @@
   </software>
 
   <!-- Identifying Shinseiki Evangelion - Eva to Yukai na Nakamatachi (T-35103G)... -->
-  <software name="shinseikz" cloneof="shinseik" supported="no">
+  <software name="shinevyu" supported="no">
     <description>Shinseiki Evangelion - Eva to Yukai na Nakamatachi (T-35103G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20893,21 +20862,10 @@
     </part>
   </software>
 
-  <!-- Identifying Shinseiki Evangelion 2nd Impression Audio Disc (GS-9129)... -->
-  <software name="shinseikz01" cloneof="shinseik" supported="no">
-    <description>Shinseiki Evangelion 2nd Impression Audio Disc (GS-9129)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
-      <diskarea name="cdrom">
-        <disk name="shinseiki evangelion 2nd impression audio disc (gs-9129)" sha1="a3d2a7cb78781fe5c96b6060de12503cc1444955" />
-      </diskarea>
-    </part>
-  </software>
-
   <!-- Identifying Shinseiki Evangelion 2nd Impression Disc 1 (GS-9129)... -->
-  <software name="shinseikz02" cloneof="shinseik" supported="no">
-    <description>Shinseiki Evangelion 2nd Impression Disc 1 (GS-9129)</description>
+  <!-- Identifying Shinseiki Evangelion 2nd Impression Audio Disc (GS-9129)... -->
+  <software name="shinev2ic" cloneof="shinev2i" supported="no">
+    <description>Shinseiki Evangelion 2nd Impression Audio Disc (GS-9129)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -20915,7 +20873,13 @@
         <disk name="shinseiki evangelion 2nd impression disc 1 (gs-9129)" sha1="9ac7e227e19dc4513c25f370184330696b8ff2c8" />
       </diskarea>
     </part>
+    <part name="cdrom2" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="shinseiki evangelion 2nd impression audio disc (gs-9129)" sha1="a3d2a7cb78781fe5c96b6060de12503cc1444955" />
+      </diskarea>
+    </part>
   </software>
+
 
   <!-- Identifying Shinsetsu Yumemiyakata (J) (GS-9005)... -->
   <software name="shinsetsz" cloneof="shinsets" supported="no">
@@ -20954,7 +20918,7 @@
   </software>
 
   <!-- Identifying Side Pocket 2 - Densetsu no Hustler (T-1301G)... -->
-  <software name="sidepockz" cloneof="sidepock" supported="no">
+  <software name="sidepkt2a" cloneof="sidepkt2" supported="no">
     <description>Side Pocket 2 - Densetsu no Hustler (T-1301G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -21629,7 +21593,7 @@
   </software>
 
   <!-- Identifying Winning Post 2 (J) (T-7612G)... -->
-  <software name="winningpz" cloneof="winningp" supported="no">
+  <software name="wpost2a" cloneof="wpost2" supported="no">
     <description>Winning Post 2 (J) (T-7612G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -21641,7 +21605,7 @@
   </software>
 
   <!-- Identifying Winning Post 2 Final 97 (J) (T-7647G)... -->
-  <software name="winningpz01" cloneof="winningp" supported="no">
+  <software name="wpost297a" cloneof="wpost297" supported="no">
     <description>Winning Post 2 Final 97 (J) (T-7647G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -21653,7 +21617,7 @@
   </software>
 
   <!-- Identifying Winning Post 2 Program 96 (J) (T-7620G)... -->
-  <software name="winningpz02" cloneof="winningp" supported="no">
+  <software name="wpost296a" cloneof="wpost296" supported="no">
     <description>Winning Post 2 Program 96 (J) (T-7620G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -21665,7 +21629,7 @@
   </software>
 
   <!-- Identifying Winning Post 3 Program 98 (J) (T-7671G)... -->
-  <software name="winningpz03" cloneof="winningp" supported="no">
+  <software name="wpost398" supported="no">
     <description>Winning Post 3 Program 98 (J) (T-7671G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -21677,6 +21641,7 @@
   </software>
 
   <!-- Identifying With You - Mitsumete Itai Disc 1 (T-20117G)... -->
+  <!-- Identifying With You - Mitsumete Itai Disc 2 (T-20117G)... -->
   <software name="withyoum" supported="no">
     <description>With You - Mitsumete Itai Disc 1 (T-20117G)</description>
     <year>199?</year>
@@ -21686,14 +21651,7 @@
         <disk name="with you - mitsumete itai disc 1 (t-20117g)" sha1="9f8b2dcb2dcd499362c5b81ea8a3ef462527591a" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying With You - Mitsumete Itai Disc 2 (T-20117G)... -->
-  <software name="withyoum01" cloneof="withyoum" supported="no">
-    <description>With You - Mitsumete Itai Disc 2 (T-20117G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="with you - mitsumete itai disc 2 (t-20117g)" sha1="cac8d7a6dc85b410afa3a353ca9cdc9db54da0ab" />
       </diskarea>
@@ -21797,7 +21755,7 @@
   </software>
 
   <!-- Identifying Zork 1 - The Great Underground Empire (T-21502G)... -->
-  <software name="zork1the" supported="no">
+  <software name="zork" supported="no">
     <description>Zork 1 - The Great Underground Empire (T-21502G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -22241,7 +22199,7 @@
   </software>
 
   <!-- Identifying Puyo Puyo Sun (T-6603G)... -->
-  <software name="puyopuyox" cloneof="puyopuyo" supported="no">
+  <software name="puyosuna" cloneof="puyosun" supported="no">
     <description>Puyo Puyo Sun (T-6603G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -22421,7 +22379,7 @@
   </software>
 
   <!-- Identifying Shining Force 3 Scenario 1 (GS-9175)... -->
-  <software name="shiningfz" cloneof="shiningf" supported="no">
+  <software name="sforc3s1a" cloneof="sforc3s1" supported="no">
     <description>Shining Force 3 Scenario 1 (GS-9175)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -22527,6 +22485,74 @@
       </diskarea>
     </part>
   </software>
+
+  <!-- *********************************************************************************************************-->
+  <!-- *********************************************************************************************************-->
+  <!-- *********************************************************************************************************-->
+  <!-- *********************************************************************************************************-->
+  <!-- TOSEC -->
+  <!-- *********************************************************************************************************-->
+  <!-- *********************************************************************************************************-->
+  <!-- *********************************************************************************************************-->
+  <!-- *********************************************************************************************************-->
+
+  <!-- Identifying Derby Stallion v1.001 (1999)(ASCII)(NTSC)(JP)[!]... -->
+  <software name="derbysta" supported="no">
+    <description>Derby Stallion v1.001 (Japan)</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="derby stallion v1.001 (1999)(ascii)(ntsc)(jp)[!]" sha1="f6e875e07147833c4631cbf728873e995d68f6e5" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Winning Post EX v1.000 (1995)(KOEI)(NTSC)(JP)[!]... -->
+  <software name="winningp" supported="no">
+    <description>Winning Post EX v1.000 (1995)(Japan)</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="winning post ex v1.000 (1995)(koei)(ntsc)(jp)[!]" sha1="ff7257e1ba92cb76bbcd3f25d63523138a9c657b" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Elf wo Karu Monotachi v1.001 (1997)(Altron)(NTSC)(JP)(Disc 1 of 2)[!]... -->
+  <!-- Identifying Elf wo Karu Monotachi v1.001 (1997)(Altron)(NTSC)(JP)(Disc 2 of 2)[!][Omake]... -->
+  <software name="elf" supported="no">
+    <description>Elf wo Karu Monotachi v1.001 (1997)(Altron)(Japan)</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="elf wo karu monotachi v1.001 (1997)(altron)(ntsc)(jp)(disc 1 of 2)[!]" sha1="233c4a4eefc7fae89d4fc559943e2b999ce5a0e1" />
+      </diskarea>
+    </part>
+    <part name="cdrom2" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="elf wo karu monotachi v1.001 (1997)(altron)(ntsc)(jp)(disc 2 of 2)[!][omake]" sha1="ecd7363ee5977c41f9333672ff059d8f384c2b4d" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying GT 24 v1.003 (1998)(Jaleco)(NTSC)(JP)[!]... -->
+  <software name="gt24" supported="no">
+    <description>GT 24 v1.003 (1998)(Jaleco)(Japan)</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="gt 24 v1.003 (1998)(jaleco)(ntsc)(jp)[!]" sha1="32535fa6987d4f578469a1ca3aede27297860f7e" />
+      </diskarea>
+    </part>
+  </software>
+
+
+
+
 
   <!-- *********************************************************************************************************-->
   <!-- *********************************************************************************************************-->
@@ -22729,7 +22755,7 @@
   </software>
 
   <!-- Identifying CanCanBunnyExtra... -->
-  <software name="cancanbuz" cloneof="cancanbu" supported="no">
+  <software name="cancanex" supported="no">
     <description>Can Can Bunny Extra</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -22741,8 +22767,8 @@
   </software>
 
   <!-- Identifying CastleOfIllusion... -->
-  <software name="castleof" supported="no">
-    <description>Castle Of Illusion</description>
+  <software name="samickeya" cloneof="samickey" supported="no">
+    <description>Sega Ages - I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan, set 2)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -23178,7 +23204,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 4 - Kuroda Mire (T-30809G)... -->
-  <software name="privatei4" cloneof="privatei" supported="no">
+  <software name="pidolv4" supported="no">
     <description>Private Idol Disc Vol 4 - Kuroda Mire (T-30809G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -23190,7 +23216,7 @@
   </software>
 
   <!-- Identifying Private Idol Disc Vol 5 - Fujisaki Nanako (T-30811G)... -->
-  <software name="privatei5" cloneof="privatei" supported="no">
+  <software name="pidolv5" supported="no">
     <description>Private Idol Disc Vol 5 - Fujisaki Nanako (T-30811G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -23485,7 +23511,7 @@
 		<publisher>unknown</publisher>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="psychic killer taromaru (iso-mp3 sourced)" sha1="45539fad2c557151e753bc7b421a27e682a8e5aa" status="bad" />
+				<disk name="psychic killer taromaru (iso-mp3 sourced)" sha1="45539fad2c557151e753bc7b421a27e682a8e5aa" status="baddump" />
 			</diskarea>
 		</part>
 	</software>-->
@@ -23497,7 +23523,7 @@
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
-        <disk name="skull fang - kuuga gaiden (japan) (iso-mp3 sourced)" sha1="9d8bcc45f2ddd1c1d1017d0aadc19eb045b30c2f" status="bad"/>
+        <disk name="skull fang - kuuga gaiden (japan) (iso-mp3 sourced)" sha1="9d8bcc45f2ddd1c1d1017d0aadc19eb045b30c2f" status="baddump"/>
       </diskarea>
     </part>
   </software>
@@ -23587,18 +23613,6 @@
     </part>
   </software>-->
 
-  <!-- Identifying Derby Stallion v1.001 (1999)(ASCII)(NTSC)(JP)[!]... -->
-  <software name="derbysta" supported="no">
-    <description>Derby Stallion v1.001 (Japan)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
-      <diskarea name="cdrom">
-        <disk name="derby stallion v1.001 (1999)(ascii)(ntsc)(jp)[!]" sha1="f6e875e07147833c4631cbf728873e995d68f6e5" />
-      </diskarea>
-    </part>
-  </software>
-
   <!-- Identifying G Vector (J)... -->
   <software name="gvectorj" supported="no">
     <description>G Vector (J)</description>
@@ -23666,7 +23680,7 @@
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
-        <disk name="planet joker (iso-mp3 sourced)" sha1="771da438e4d1418404d6872566eaaac668c357e7" status="bad"/>
+        <disk name="planet joker (iso-mp3 sourced)" sha1="771da438e4d1418404d6872566eaaac668c357e7" status="baddump"/>
       </diskarea>
     </part>
   </software>
@@ -23742,5 +23756,49 @@
       </diskarea>
     </part>
   </software>
+
+  <!-- Identifying Crows The Battle Action for Sega Saturn (J)(Saturn)... -->
+  <software name="crows" supported="no">
+    <description>Crows The Battle Action for Sega Saturn (J)(Saturn)</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="crows the battle action for sega saturn (j)(saturn) (iso-mp3 sourced)" sha1="0280bce062373d3f7c9cd67a7abbff7c6e1c45e9" status="baddump" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Elevator Action Returns (J)... -->
+  <software name="elevact2" supported="no">
+    <description>Elevator Action Returns (J)</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="elevator action returns (j)" sha1="939ed121fd4cfe4d7d85607806f07fb6512bf826" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying elves2-cd1... -->
+  <software name="elf2" supported="no">
+    <description>Elf o Karu Mono-tachi II (Japan) [T-16610G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="elves2-cd1" sha1="a87004f2b71839f140036abb2265989d05a25f49" />
+      </diskarea>
+    </part>
+    <part name="cdrom2" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="elves2-cd2" sha1="369df75c8800489c6719ebce6326dce9a6471566" />
+      </diskarea>
+    </part>
+  </software>
+
+
+
 
 </softwarelist>
