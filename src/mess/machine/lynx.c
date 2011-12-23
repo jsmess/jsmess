@@ -81,7 +81,7 @@ The sprite types relate to specific hardware functions according to the followin
 
 INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, const int y, const int color)
 {
-	int back;
+	UINT8 back;
 	UINT8 *screen;
 	UINT8 *colbuf;
 
@@ -340,10 +340,9 @@ static void lynx_blit_do_work( lynx_state *state, const int y, const int xdir, c
 		bits += 8; // current bits in buffer
 		state->m_blitter.memory_accesses++;
 		
-		for ( ; bits >= bits_per_pixel; bits -= bits_per_pixel)
+		for ( ; bits > bits_per_pixel; bits -= bits_per_pixel) // last data packet at end of scanline is not rendered (qix, blulght)
 		{
 			color = state->m_blitter.color[(buffer >> (bits - bits_per_pixel)) & mask];
-			//bits -= bits_per_pixel;
 			width_accum += state->m_blitter.width;
 			for (i = 0; i < (width_accum>>8); i++, xi += xdir)
 			{
@@ -622,9 +621,9 @@ static void lynx_blit_lines(lynx_state *state)
 		state->m_blitter.height_accumulator &= 0xff;
 	}
 
-	if (state->m_suzy.data[SPRGO] & 0x04)
+	if (state->m_suzy.data[SPRGO] & 0x04) // Everon enabled
 	{
-		if (state->m_sprite_collide & !state->m_blitter.everon)
+		if (!state->m_blitter.everon)
 			state->m_blitter.mem[state->m_blitter.colpos] |= 0x80;
 		else
 			state->m_blitter.mem[state->m_blitter.colpos] &= 0x7f;
@@ -794,7 +793,7 @@ static void lynx_blitter(running_machine &machine)
 		 
 		if (!(state->m_blitter.spr_ctl1 & 0x04))		// if 0, we skip this sprite
 		{
-			state->m_blitter.colpos = GET_WORD(state->m_suzy.data, COLLOFFL) + state->m_blitter.scb;  //????
+			state->m_blitter.colpos = state->m_blitter.scb + GET_WORD(state->m_suzy.data, COLLOFFL);
 			state->m_blitter.memory_accesses += 6;
 
 			state->m_blitter.mode = state->m_blitter.spr_ctl0 & 0x07;
@@ -808,7 +807,6 @@ static void lynx_blitter(running_machine &machine)
 			{
 				switch (state->m_blitter.mode)
 				{
-					case BACKGROUND:
 					case BOUNDARY_SHADOW:
 					case BOUNDARY:
 					case NORMAL_SPRITE:
@@ -816,6 +814,10 @@ static void lynx_blitter(running_machine &machine)
 					case SHADOW:
 						state->m_sprite_collide = 1;
 						state->m_blitter.mem[state->m_blitter.colpos] = 0;
+						state->m_blitter.spritenr = state->m_blitter.spr_coll & 0x0f;
+					break;
+					case BACKGROUND:
+						state->m_sprite_collide = 1;
 						state->m_blitter.spritenr = state->m_blitter.spr_coll & 0x0f;
 				}
 			}
@@ -885,8 +887,8 @@ static void lynx_divide( lynx_state *state )
 
 	state->m_suzy.data[MATH_M] = mod & 0xff;
 	state->m_suzy.data[MATH_L] = mod >> 8;
-	state->m_suzy.data[MATH_K] = mod >> 16;
-	state->m_suzy.data[MATH_J] = mod >> 24;
+	state->m_suzy.data[MATH_K] = 0; // documentation states the hardware sets these to zero on divides
+	state->m_suzy.data[MATH_J] = 0;
 }
 
 static void lynx_multiply( lynx_state *state )
