@@ -42,6 +42,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(video_w);
+	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_READ8_MEMBER(vblank_r);
 
 	emu_timer* m_sys_timer;
@@ -111,6 +112,11 @@ WRITE8_MEMBER( alphatro_state::video_w )
 	m_p_videoram[offset] = data;
 }
 
+READ8_MEMBER( alphatro_state::video_r )
+{
+	return m_p_videoram[offset];
+}
+
 VIDEO_START_MEMBER( alphatro_state )
 {
 	m_p_chargen = machine().region("chargen")->base();
@@ -165,7 +171,7 @@ static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
 //	AM_RANGE(0xe000, 0xe46f) AM_RAM
 //	AM_RANGE(0xe470, 0xe4cf) AM_RAM // keyboard out?
 //	AM_RANGE(0xe4d0, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xfdff) AM_ROM AM_WRITE(video_w)
+	AM_RANGE(0xf000, 0xfdff) AM_READWRITE(video_r,video_w)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM // for the stack
 ADDRESS_MAP_END
 
@@ -266,12 +272,13 @@ static INPUT_PORTS_START( alphatro )
     PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
 
 	PORT_START("key_row_k")
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("INS DEL") PORT_CODE(KEYCODE_BACKSPACE)
     PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
     PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB)
     PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
     PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_PGUP) // GRAPH
     PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Clear Home") PORT_CODE(KEYCODE_HOME)
-    PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Enter (?)") PORT_CODE(KEYCODE_ENTER_PAD)
+    PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad Enter (?)") PORT_CODE(KEYCODE_ENTER_PAD)
 
     PORT_START("key_row_l")
     PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)
