@@ -43,7 +43,8 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(video_w);
 	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_READ8_MEMBER(vblank_r);
+	DECLARE_READ8_MEMBER(port10_r);
+	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 
 	emu_timer* m_sys_timer;
 	UINT8 *m_p_videoram;
@@ -53,24 +54,31 @@ public:
 	virtual void machine_reset();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
     virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 private:
     static const device_timer_id SYSTEM_TIMER = 0;
-
+    UINT8 m_timer_bit;
 };
+
+READ8_MEMBER( alphatro_state::port10_r)
+{
+	//return (space.machine().device<screen_device>("screen")->vblank() ? 0x00 : 0x80);
+	return (m_timer_bit ? 0x80 : 0x00);
+}
 
 void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{
 	case SYSTEM_TIMER:
-		device_set_input_line(m_maincpu,INPUT_LINE_IRQ0,HOLD_LINE);
+		{
+			if(m_timer_bit == 0)
+				m_timer_bit = 1;
+			else
+				m_timer_bit = 0;
+		}
 		break;
 	}
-}
-
-READ8_MEMBER( alphatro_state::vblank_r)
-{
-	return (space.machine().device<screen_device>("screen")->vblank() ? 0x80 : 0x00);
 }
 
 READ8_MEMBER( alphatro_state::keyboard_r )
@@ -165,6 +173,11 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 	}
 }
 
+INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
+{
+	device_set_input_line(m_maincpu,INPUT_LINE_IRQ0,HOLD_LINE);
+}
+
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
 	AM_RANGE(0x0000, 0xefff) AM_RAMBANK("bank1") // this is really ram, basic gets copied to here when it is needed
 //	AM_RANGE(0x6000, 0xdfff) AM_RAM
@@ -178,7 +191,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x10, 0x10) AM_READ(vblank_r)
+	AM_RANGE(0x10, 0x10) AM_READ(port10_r)
 	AM_RANGE(0x20, 0x2f) AM_READ(keyboard_r) // keyboard in?
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -290,6 +303,8 @@ static INPUT_PORTS_START( alphatro )
     PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
     PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 
+    PORT_START("other")
+    PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF,alphatro_state,alphatro_break,0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -314,12 +329,15 @@ void alphatro_state::machine_start()
 
 void alphatro_state::machine_reset()
 {
+	// do what the IPL does
 	UINT8* RAM = machine().device<ram_device>("ram")->pointer();
 	UINT8* ROM = machine().region("maincpu")->base();
 	cpu_set_reg(machine().device("maincpu"), STATE_GENPC, 0xe000);
 	memcpy(RAM,ROM,0x10000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
 	memory_set_bankptr(machine(), "bank1",RAM);
-	// m_sys_timer->adjust(attotime::zero,0,attotime::from_msec(10));  // interrupts aren't enabled yet, so not much point in setting this
+
+	// probably not the correct, exact meaning of port is unknown, vblank/vsync is too slow.
+	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
 }
 
 //static PALETTE_INIT( alphatro )
