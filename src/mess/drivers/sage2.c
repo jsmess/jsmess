@@ -3,7 +3,7 @@
         Sage II
 
         For memory map look at :
-            htpp://www.thebattles.net/sage/img/SDT.pdf  (pages 14-)
+            http://www.thebattles.net/sage/img/SDT.pdf  (pages 14-)
 
 
         06/12/2009 Skeleton driver.
@@ -31,10 +31,24 @@ public:
 
 static ADDRESS_MAP_START(sage2_mem, AS_PROGRAM, 16, sage2_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_p_ram) // 512 KB RAM / ROM at boot
-	AM_RANGE(0x00fe0000, 0x00feffff) AM_ROM AM_REGION("user1",0)
-//  AM_RANGE(0x00ffc070, 0x00ffc071 ) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0xffff)
-//  AM_RANGE(0x00ffc072, 0x00ffc073 ) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0xffff)
+	AM_RANGE(0x000000, 0x07ffff ) AM_RAM AM_BASE(m_p_ram) // 512 KB RAM / ROM at boot
+//  Board #1
+//	AM_RANGE(0xffc000, 0xffc007 ) // 8253-S, RTC
+//	AM_RANGE(0xffc010, 0xffc01f ) // TMS9914, IEEE-488 Interface
+//	AM_RANGE(0xffc020, 0xffc027 ) // i8255, DIPs + Floppy ctrl port
+//	AM_RANGE(0xffc030, 0xffc033 ) // i8251, Serial Port 2
+//	AM_RANGE(0xffc040, 0xffc045 ) // i8259
+//	AM_RANGE(0xffc050, 0xffc051 ) // FDC 765, status
+//	AM_RANGE(0xffc052, 0xffc053 ) // FDC 765, control
+//	AM_RANGE(0xffc060, 0xffc067 ) // i8255, Printer
+	AM_RANGE(0xffc070, 0xffc071 ) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0x00ff) // terminal data
+	AM_RANGE(0xffc072, 0xffc073 ) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0x00ff) // terminal control/status
+//	AM_RANGE(0xffc080, 0xffc087 ) // RTC? i8253-S
+//  Board #2
+//	AM_RANGE(0xffc400, 0xffc4ff ) // AUX Serial Channels (2651)
+//	AM_RANGE(0xffc500, 0xffc7ff ) // Winchester drive ports
+
+	AM_RANGE(0xfe0000, 0xfeffff ) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 /* Input ports */
