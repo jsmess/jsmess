@@ -31,7 +31,7 @@
 	<software name="arion">
 		<description>アリオン</description>
 		<year>19??</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="arion_a.d77" size="348848" crc="7BC01A77" sha1="AE894BF2FD0DE60A43A0F80C458FC193FA32D4DC" offset="000000"/>
@@ -48,7 +48,7 @@
 	<software name="atrain">
 		<description>A列車で行こう</description>
 		<year>1986</year>
-		<publisher>Artdink</publisher>
+		<publisher>アートディンク (Artdink)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="a-train.d77" size="348848" crc="257C7052" sha1="0349A90A8F132F829DF8335A9E22003B879B93D2" offset="000000" />
@@ -73,7 +73,7 @@
 	<software name="cas_casx">
 		<description>The Castle &amp; The Castle Excellent</description>
 		<year>19??</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="castle.d77" size="348848" crc="E69D5A7A" sha1="8D24B38A3C823003EE3FCC4AB1ABCDC1879456FD" offset="000000" />
@@ -84,7 +84,7 @@
 	<software name="castleex">
 		<description>The Castle Excellent</description>
 		<year>19??</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="347168">
 				<rom name="castleex.d77" size="347168" crc="59298C31" sha1="810D5FEBD6EB39DF8E14E025EDEFE39E53BFE5D6" offset="000000" />
@@ -96,7 +96,7 @@
 	<software name="chojigen">
 		<description>超次元伝説ラル</description>
 		<year>1988</year>
-		<publisher>Pony Canyon</publisher>
+		<publisher>ポニカ (Pony Canyon)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349392">
 				<rom name="chojigen_a.d77" size="349392" crc="FDC244E4" sha1="EF40F54BA73411AD0A975DD13F476C6D2800A491" offset="000000" />
@@ -123,7 +123,7 @@
 	<software name="cristine">
 		<description>Christine</description>
 		<year>19??</year>
-		<publisher>PSK</publisher>
+		<publisher>パソコンショップ高知 (PSK)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="cristine.d77" size="348848" crc="71964D2A" sha1="B237E88631A96467A3B2087205D5FA73496C7C3A" offset="000000" />
@@ -190,7 +190,7 @@
 	<software name="dezeni">
 		<description>デゼニランド</description>
 		<year>19??</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="274864">
 				<rom name="dezenifm.d77" size="274864" crc="1AE3AB0B" sha1="CBF286B35B816ABB9CC39528D558D3F7DE195B2A" offset="000000" />
@@ -240,7 +240,7 @@
 	<software name="flolita">
 		<description>Final Lolita</description>
 		<year>19??</year>
-		<publisher>PSK</publisher>
+		<publisher>パソコンショップ高知 (PSK)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="flolita.d77" size="348848" crc="085E989D" sha1="87F9D94E944AE07896CE4F52434F99AE0C2DF7E5" offset="000000" />
@@ -282,7 +282,7 @@
 	<software name="hcc">
 		<description>Hudson Country Club</description>
 		<year>1983</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="96432">
 				<rom name="golfkyo.d77" size="96432" crc="836014EF" sha1="7A5D4EDE2B8A85AFCDCA134FAE932F34066B1E34" offset="000000" />
@@ -306,7 +306,7 @@
 	<software name="hokuto">
 		<description>北斗の拳</description>
 		<year>19??</year>
-		<publisher>Enix</publisher>
+		<publisher>エニックス (Enix)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380048">
 				<rom name="hokuto_1.d77" size="380048" crc="5AEE50A9" sha1="60C21DDCB9834E83716F117E703AE1F4D94BA7FA" offset="000000" />
@@ -370,7 +370,7 @@
 	<software name="kenja">
 		<description>賢者の遺言 - They, Adventurers Go On</description>
 		<year>1986</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="kenja0.d77" size="415840" crc="D64193F5" sha1="6CB18B2199109BB4FD70BD15FCF1AF550FB866BD" offset="000000" />
@@ -497,7 +497,7 @@
 	<software name="palms">
 		<description>The Palms</description>
 		<year>1983</year>
-		<publisher>Hummingbird Soft</publisher>
+		<publisher>ハミングバード (HummingBird)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
 				<rom name="palms.d77" size="344496" crc="9B9C67B6" sha1="545FAC7571F1264D440C7AB12C921D5B23DA55EC" offset="000000" />
@@ -543,7 +543,7 @@
 	<software name="reviver">
 		<description>リバイバー</description>
 		<year>19??</year>
-		<publisher>Arsys</publisher>
+		<publisher>アルシスソフト (Arsys Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
 				<rom name="reviver1.d77" size="414992" crc="C8B28869" sha1="17B24A60EA115714DDFF5E97E3B50A165CE48592" offset="000000" />
@@ -555,7 +555,7 @@
 	<software name="riglas">
 		<description>Riglas</description>
 		<year>1985</year>
-		<publisher>Random House</publisher>
+		<publisher>ランダムハウス (Random House)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="384608">
 				<rom name="riglas.d77" size="384608" crc="57828D4D" sha1="774966B21D06177B6A0AAC9C271E769B00FF6BE4" offset="000000" />
@@ -590,7 +590,7 @@
 	<software name="tforce">
 		<description>Thunder Force</description>
 		<year>1984</year>
-		<publisher>Tecno Soft</publisher>
+		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348560">
 				<rom name="thunderc.d77" size="348560" crc="D0202B6B" sha1="4F87D770033A29DFF2E41784A1CAA85EC49DFE94" offset="000000" />
@@ -671,7 +671,7 @@
 	<software name="weird2">
 		<description>Weird 2</description>
 		<year>19??</year>
-		<publisher>Policy</publisher>
+		<publisher>ポリシー (Policy)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="377520">
 				<rom name="weird2.d77" size="377520" crc="11C851F3" sha1="E644E5F4AA8623E0F5CA11034A6A4D3CCC4ADFD9" offset="000000" />
@@ -719,7 +719,7 @@
 	<software name="xevious">
 		<description>Xevious</description>
 		<year>19??</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="xevious.d77" size="348848" crc="ABD96CCC" sha1="1C6BB9FAD36730654FBFD11FA3E06D24FD63A1BC" offset="000000" />
@@ -743,7 +743,7 @@
 	<software name="ylemon">
 		<description>Yellow Lemon</description>
 		<year>19??</year>
-		<publisher>PSK</publisher>
+		<publisher>パソコンショップ高知 (PSK)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ylemon.d77" size="348848" crc="9EF4EB64" sha1="392F7597DFFFEC9344C0320BAE85E9E435B4218C" offset="000000" />
