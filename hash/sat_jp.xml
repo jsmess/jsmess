@@ -7,11 +7,11 @@
 
   <!-- The initial goal of this list is to aggregate the images from various sources to get the most complete picture
      of what material is available for testing.
-     
+
      There are likely to be initial overlaps where (for example) only audio differs.  At this stage I'm not making
      a call on which set of images is 'best'
-     
-     
+
+
      15 Dec 11 - First pass at adding many sets from Redump, linlhutz and DarkWater collections
                - setname / clone status have been automatically generated and will be sub-optimal / wrong in many cases.
                - more sets still to add!
@@ -24,15 +24,16 @@
   *********************************************************************************************************
   Below is what should be a mostly complete list of Asia/Japan region Saturn games lifted from the web
   todo: cross reference each of these with the set names where supported, identify what's missing!
-  
+
   In many cases the budget re-releases (Satakore) are the same as the regular discs, likewise other
   repackaged versions
-    
+
                                                                                               Key
                                                                                               @@ - might be the same as above (not verified)
                                                                                               ?? - probably different
+                                                                                              == - confirmed same as above
                                                                                               ########MISSING######## - currently missing?
-    
+
       Name                                                                                  | setname(s)
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
       #                                                                                     |
@@ -55,7 +56,7 @@
       Advanced World War: Sennen Teikoku no Metsubou (Japan) [GS-9087]                      | (aww)           missing gfx during FMVs?
       Advanced World War: Sennen Teikoku no Metsubou (Japan) (Satakore) [GS-9190]           |  @@
       After Burner II (Japan) (Sega Ages) [GS-9109]                                         | (aburner2)      gets stuck on loading screen
-      AI Igo (Japan) [T-17601G]                                                             | (aiigo)         playable 
+      AI Igo (Japan) [T-17601G]                                                             | (aiigo)         playable
       Ai Iijima: Good Island Cafe (Japan) [T-25201G]                                        | (aiiijima)      menu options missing after first video?
       AI Shougi (Japan) [T-18602G]                                                          | (aishougi)      hangs after making move
       AI Shougi 2 (Japan) [T-17602G]                                                        | ########MISSING########
@@ -187,8 +188,8 @@
       Conveni, The: Ano Machi o Dokusen Seyo (Japan) [T-4310G]                              |
       Conveni, The: Ano Machi o Dokusen Seyo (Japan) (Satakore) [T-4319G]                   |
       Conveni 2, The: Zenkoku Chain Tenkaida! (Japan) [T-4317G]                             |
-      Cotton 2 (Japan) [T-9904G]                                                            | (cotton2)           Playable? 
-      Cotton Boomerang (Japan) [T-9906G]                                                    | (cottonbm)          Playable? 
+      Cotton 2 (Japan) [T-9904G]                                                            | (cotton2)           Playable?
+      Cotton Boomerang (Japan) [T-9906G]                                                    | (cottonbm)          Playable?
       Courier Crisis (Japan) [T-18010G]                                                     |
       Creature Shock (Japan) [T-1303G]                                                      |
       CrimeWave (Japan) [T-7018G]                                                           |
@@ -197,7 +198,7 @@
       Cross Romance: Koi to Mahjong to Hanafuda to (Japan) [T-7103G]                        |
       Cross Tantei Monogatari: Motsureta 7tsu no Labyrinth (Japan) [T-36401G]               |
       Crow, The: City of Angels (Japan) [T-8123G]                                           |
-      Crows: The Battle Action for Sega Saturn (Japan) [T-16806G]                           | (crows)             Playable? 
+      Crows: The Battle Action for Sega Saturn (Japan) [T-16806G]                           | (crows)             Playable?
       Cube Battler: Story of Anna (Japan) [T-21006G]                                        |
       Cube Battler: Story of Shou: Debugger Shou-hen (Japan) [T-21004G]                     |
       Cubic Gallery (Japan) [T-19401G]                                                      |
@@ -214,87 +215,87 @@
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   D                                                                                         |
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      D no Shokutaku (Japan) [T-8101G]                                                      |
-      D no Shokutaku (Japan) (Satakore) [T-8124G]                                           |
-      D-Xhird (Japan) [T-10307G]                                                            |
-      Daibouken: Saint Elmos no Kiseki (Japan) [T-23101G]                                   |
-      Daikoukai Jidai Gaiden (Japan) [T-7657G]                                              |
-      Daikoukai Jidai II (Japan) [T-7628G]                                                  |
-      Daikoukai Jidai II (Japan) (Premium Pack) [T-7649G]                                   |
-      Daina Airan (Japan) [T-4503G]                                                         |
-      Daina Airan: Yokoku-hen (Japan) [T-4505G]                                             |
-      Daisenryaku Pack (Japan) [GS-9125]                                                    |
-      Daisenryaku: Strong Style (Japan) [T-21202G]                                          |
-      Daisuki (Japan) [T-18510G]                                                            |
-      Daitoride (Japan) [T-29201G]                                                          |
-      Darius Gaiden (Japan) [T-1102G]                                                       |
-      Darius II (Japan) [T-1104G]                                                           |
-      Dark Hunter: Ge Youma no Mori (Japan) [T-7632G]                                       |
-      Dark Hunter: Jou Ijigen Gakuen (Japan) [T-7631G]                                      |
-      Dark Savior (Japan) [T-22101G]                                                        |
-      Darkseed (Japan) [T-18501G]                                                           |
-      Darkseed II (Japan) [T-36101G]                                                        |
-      Daytona USA (Japan) [GS-9013]                                                         |
-      Daytona USA Circuit Edition (Japan) [GS-9100]                                         |
-      Dead or Alive (Japan) [T-3603G]                                                       |
-      Dead or Alive (Japan) (Gentei Seisan Ban) [T-3604G]                                   |
-      Deadalus (Japan) [GS-9008]                                                            |
-      Death Crimson (Japan) [T-23202G]                                                      |
+      D no Shokutaku (Japan) [T-8101G]                                                      | (dnosho)          playable?
+      D no Shokutaku (Japan) (Satakore) [T-8124G]                                           |  @@
+      D-Xhird (Japan) [T-10307G]                                                            | (dxhird)          playable?
+      Daibouken: Saint Elmos no Kiseki (Japan) [T-23101G]                                   | (daistelm)
+      Daikoukai Jidai Gaiden (Japan) [T-7657G]                                              | (daijidga)
+      Daikoukai Jidai II (Japan) [T-7628G]                                                  | (daijid2)
+      Daikoukai Jidai II (Japan) (Premium Pack) [T-7649G]                                   |  @@
+      Daina Airan (Japan) [T-4503G]                                                         | (dinoisl)
+      Daina Airan: Yokoku-hen (Japan) [T-4505G]                                             | (dinoislyoko)
+      Daisenryaku Pack (Japan) [GS-9125]                                                    | - contains World Advanced Daisenryaku ~Koutetsu no Senpuu~ and World Advanced Daisenryaku ~Sakusen File~
+      Daisenryaku: Strong Style (Japan) [T-21202G]                                          | (daisenss)
+      Daisuki (Japan) [T-18510G]                                                            | (daisuki)
+      Daitoride (Japan) [T-29201G]                                                          | (daitorid)
+      Darius Gaiden (Japan) [T-1102G]                                                       | (dariusg)
+      Darius II (Japan) [T-1104G]                                                           | (darius2)
+      Dark Hunter: Ge Youma no Mori (Japan) [T-7632G]                                       | (dhuntge)
+      Dark Hunter: Jou Ijigen Gakuen (Japan) [T-7631G]                                      | (dhuntjou)
+      Dark Savior (Japan) [T-22101G]                                                        | (darksavi)        hangs MAME after pressing start
+      Darkseed (Japan) [T-18501G]                                                           | (darkseed)
+      Darkseed II (Japan) [T-36101G]                                                        | (darksee2)
+      Daytona USA (Japan) [GS-9013]                                                         | (daytona)
+      Daytona USA Circuit Edition (Japan) [GS-9100]                                         | (daytonce)
+      Dead or Alive (Japan) [T-3603G]                                                       | (doa)
+      Dead or Alive (Japan) (Gentei Seisan Ban) [T-3604G]                                   |  @@
+      Deadalus (Japan) [GS-9008]                                                            | (deadalus)
+      Death Crimson (Japan) [T-23202G]                                                      | (deathcri)
       Death Throttle: Kakuzetsu Toshi Kara no Dasshutsu (Japan) [T-26403G]                  | (deaththr)        playable?
-      DeathMask (Japan) [T-22701G]                                                          |
-      DecAthlete (Japan) [GS-9096]                                                          |
-      DecAthlete (Japan) (Satakore) [GS-9150]                                               |
-      DecAthlete for SegaNet (Japan) [GS-7110]                                              |
-      Deep Fear (Japan) [GS-9189]                                                           |
-      Defcon 5 (Japan) [T-24101G]                                                           |
-      Dejig: AquaWorld (Japan) [T-30303G]                                                   |
-      Dejig: Lassen: Art Collection (Japan) [T-30304G]                                      |
-      Dejig: McKnight: Art Collection (Japan) [T-30305G]                                    |
-      Dejig: Tin Toy (Japan) [T-30302G]                                                     |
-      Deka Yonku: Tough the Truck (Japan) [T-4313G]                                         |
-      Denpa Shounen Teki Game (Japan) [T-14318G]                                            |
-      Densetsu no Ogre Battle (Japan) [T-5305G]                                             |
-      Densha de Go! EX (Japan) [T-10317G]                                                   |
-      Derby Analyst (Japan) [T-20505G]                                                      |
-      Derby Stallion (Japan) [T-2113G]                                                      |
-      Dero-N Dero Dero (Japan) [T-3601G]                                                    |
-      Desire (Japan) [T-15031G]                                                             |
-      Desire (Japan) (Premium Pack) [T-15036G]                                              |
-      Destruction Derby (Japan) [T-18604G]                                                  |
-      Detana TwinBee Yahhoo! Deluxe Pack (Japan) [T-9505G]                                  |
-      Devicereign (Japan) [T-27810G]                                                        |
-      Devil Summoner: Soul Hackers (Japan) [T-14420G]                                       |
-      Devil Summoner: Soul Hackers: Akuma Zenshou Dai-ni-shuu (Japan) [T-14421G]            |
-      Dezaemon 2 (Japan) [T-16804G]                                                         |
-      Die Hard Trilogy (Japan) [GS-9123]                                                    |
-      Digital Ange: Dennou Tenshi Spiral Story (Japan) [T-33003G]                           |
-      Digital Dance Mix: Namie Amuro (Japan) [GS-9133]                                      |
-      Digital Monster Ver. S: Digimon Trainers (Japan) [T-13331G]                           |
-      Digital Pinball: Last Gladiators (Japan) [T-18901G]                                   |
-      Digital Pinball: Last Gladiators Ver. 9.7 (Japan) [T-18903G]                          |
-      Digital Pinball: Necronomicon (Japan) [T-18902G]                                      |
-      Discworld (Japan) [T-20502G]                                                          |
-      DJ Wars (Japan) [T-18807G]                                                            |
-      Dodonpachi (Japan) [T-14419G]                                                         |
-      Dodonpachi (Japan) (Satakore) [T-14424G]                                              |
-      DonPachi (Japan) [T-14405G]                                                           |
-      Doom (Japan) [T-18610G]                                                               |
-      Doraemon: Nobita to Fukkatsu no Hoshi (Japan) [T-19801G]                              |
-      Doukoku Soshite… (Japan) [T-1315G]                                                    |
-      Doukoku Soshite… Final Edition (Japan) [T-1317G]                                      |
-      Doukyuusei: if (Japan) [T-20102G]                                                     |
-      Doukyuusei 2 (Japan) [T-20104G]                                                       |
-      Dragon Ball Z: Idainaru Dragon Ball Densetsu (Japan) [T-13305G]                       |
-      Dragon Ball Z: Idainaru Dragon Ball Densetsu (Japan) (Satakore) [T-13317G]            |
-      Dragon Ball Z: Shin Butouden (Japan) [T-13302G]                                       |
-      Dragon Force (Japan) [GS-9028]                                                        |
-      Dragon Force (Japan) (Satakore) [GS-9145]                                             |
-      Dragon Force II: Kamisarishi Daichi ni (Japan) [GS-9184]                              |
-      Dragon Master Silk (Japan) [T-19503G]                                                 |
-      Dream Generation: Koi ka? Shigoto ka!?... (Japan) [T-2511G]                           |
-      Dream Square: Hinagata Akiko (Japan) [T-3002G]                                        |
-      Druid: Yami e no Tsuisekisha (Japan) [T-7670G]                                        |
-      Dungeon Master Nexus (Japan) [T-9111G]                                                |
+      DeathMask (Japan) [T-22701G]                                                          | (deathmsk)
+      DecAthlete (Japan) [GS-9096]                                                          | (decathlt)
+      DecAthlete (Japan) (Satakore) [GS-9150]                                               | (decathltsa)
+      DecAthlete for SegaNet (Japan) [GS-7110]                                              | (decathltsn)
+      Deep Fear (Japan) [GS-9189]                                                           | (deepfear)
+      Defcon 5 (Japan) [T-24101G]                                                           | (defcon5)
+      Dejig: AquaWorld (Japan) [T-30303G]                                                   | (dejigaqw)
+      Dejig: Lassen: Art Collection (Japan) [T-30304G]                                      | ########MISSING########
+      Dejig: McKnight: Art Collection (Japan) [T-30305G]                                    | (dejigmck)
+      Dejig: Tin Toy (Japan) [T-30302G]                                                     | (dejigtin)
+      Deka Yonku: Tough the Truck (Japan) [T-4313G]                                         | (toughtrk)
+      Denpa Shounen Teki Game (Japan) [T-14318G]                                            | (denpasho)
+      Densetsu no Ogre Battle (Japan) [T-5305G]                                             | (ogrebatl)
+      Densha de Go! EX (Japan) [T-10317G]                                                   | (dendego)
+      Derby Analyst (Japan) [T-20505G]                                                      | (derbyana)
+      Derby Stallion (Japan) [T-2113G]                                                      | (derbysta)
+      Dero-N Dero Dero (Japan) [T-3601G]                                                    | (deroon)          playable?
+      Desire (Japan) [T-15031G]                                                             | (desire)
+      Desire (Japan) (Premium Pack) [T-15036G]                                              |  @@
+      Destruction Derby (Japan) [T-18604G]                                                  | (dderby)
+      Detana TwinBee Yahhoo! Deluxe Pack (Japan) [T-9505G]                                  | (tbyahhod)        playable?
+      Devicereign (Japan) [T-27810G]                                                        | (devicere)
+      Devil Summoner: Soul Hackers (Japan) [T-14420G]                                       | (dsumsoul)
+      Devil Summoner: Soul Hackers: Akuma Zenshou Dai-ni-shuu (Japan) [T-14421G]            | (dsumshaz)
+      Dezaemon 2 (Japan) [T-16804G]                                                         | (dezaemo2)
+      Die Hard Trilogy (Japan) [GS-9123]                                                    | (diehardt)        requires no ram/rom cart present, even then hangs at end of fmv
+      Digital Ange: Dennou Tenshi Spiral Story (Japan) [T-33003G]                           | (digiange)
+      Digital Dance Mix: Namie Amuro (Japan) [GS-9133]                                      | (digidanc)
+      Digital Monster Ver. S: Digimon Trainers (Japan) [T-13331G]                           | (digimons)
+      Digital Pinball: Last Gladiators (Japan) [T-18901G]                                   | (digpin)
+      Digital Pinball: Last Gladiators Ver. 9.7 (Japan) [T-18903G]                          | (digpin97)
+      Digital Pinball: Necronomicon (Japan) [T-18902G]                                      | (dpnecro)
+      Discworld (Japan) [T-20502G]                                                          | (discworl)
+      DJ Wars (Japan) [T-18807G]                                                            | (djwars)
+      Dodonpachi (Japan) [T-14419G]                                                         | (ddonpach)
+      Dodonpachi (Japan) (Satakore) [T-14424G]                                              |  @@
+      DonPachi (Japan) [T-14405G]                                                           | (donpachi)
+      Doom (Japan) [T-18610G]                                                               | (doom)
+      Doraemon: Nobita to Fukkatsu no Hoshi (Japan) [T-19801G]                              | (doraemon)
+      Doukoku Soshite… (Japan) [T-1315G]                                                    | (doukokus)
+      Doukoku Soshite… Final Edition (Japan) [T-1317G]                                      |  ??
+      Doukyuusei: if (Japan) [T-20102G]                                                     | (doukyif)
+      Doukyuusei 2 (Japan) [T-20104G]                                                       | (douky2)
+      Dragon Ball Z: Idainaru Dragon Ball Densetsu (Japan) [T-13305G]                       | (dbzidb)
+      Dragon Ball Z: Idainaru Dragon Ball Densetsu (Japan) (Satakore) [T-13317G]            |  @@
+      Dragon Ball Z: Shin Butouden (Japan) [T-13302G]                                       | (dbzshin)
+      Dragon Force (Japan) [GS-9028]                                                        | (dragfrc)
+      Dragon Force (Japan) (Satakore) [GS-9145]                                             | (dragfrcsa)
+      Dragon Force II: Kamisarishi Daichi ni (Japan) [GS-9184]                              | (dragfrc2)
+      Dragon Master Silk (Japan) [T-19503G]                                                 | (dmsilk)
+      Dream Generation: Koi ka? Shigoto ka!?... (Japan) [T-2511G]                           | (dreamgen)
+      Dream Square: Hinagata Akiko (Japan) [T-3002G]                                        | (dreamsq)
+      Druid: Yami e no Tsuisekisha (Japan) [T-7670G]                                        | (druid)
+      Dungeon Master Nexus (Japan) [T-9111G]                                                | (dungeonm)
       Dungeons & Dragons Collection (Japan) [T-1224G]                                       |
       Dungeons & Dragons Collection (Japan) (Doukonban) [T-1245G]                           |
       DX Jinsei Game (Japan) [T-10302G]                                                     |
@@ -335,12 +336,12 @@
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
   F                                                                                         |
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      F-1 Live Information (Japan) [GS-9035]                                                |
-      Falcom Classics (Japan) [T-31502G]                                                    |
+      F-1 Live Information (Japan) [GS-9035]                                                | (f1live)
+      Falcom Classics (Japan) [T-31502G]                                                    | (falcom1)
       Falcom Classics (Japan) (Genteiban) [T-31503G]                                        |
       Falcom Classics (Japan) (Satakore) [T-31506G]                                         |
       Falcom Classics Collection (Japan) [T-31507G]                                         |
-      Falcom Classics II (Japan) [T-31505G]                                                 |
+      Falcom Classics II (Japan) [T-31505G]                                                 | (falcom2)
       Falcom Classics II (Japan) (Genteiban) [T-31504G]                                     |
       Fang-Shui Master (Japan) [T-21701G]                                                   |
       Fantastep (Japan) [T-5710G]                                                           |
@@ -349,17 +350,17 @@
       Farland Saga: Toki no Michishirube (Japan) [T-32509G]                                 |
       Farland Saga: Toki no Michishirube (Japan) (Genteiban) [T-32511G]                     |
       Farland Story: Habou no Mai (Japan) [T-32505G]                                        |
-      Father Christmas (Japan) [T-18504G]                                                   |
+      Father Christmas (Japan) [T-18504G]                                                   | (fatherch)
       FEDA Remake!: The Emblem of Justice (Japan) [T-21001G]                                |
-      FIFA Soccer 96 (Japan) [T-10606G]                                                     |
+      FIFA Soccer 96 (Japan) [T-10606G]                                                     | (fifa97)
       Fighter's History Dynamite (Japan) [GS-9107]                                          |
       Fighter's History Dynamite (Japan (Doukonban) [GS-9153]                               |
-      Fighters Megamix (Japan) [GS-9126]                                                    |
-      Fighting Vipers (Japan) [GS-9101]                                                     |
+      Fighters Megamix (Japan) [GS-9126]                                                    | (fmegamix)
+      Fighting Vipers (Japan) [GS-9101]                                                     | (fvipers)
       Final Fight Revenge (Japan) [T-1249G]                                                 |
       Final Fight Revenge (Japan) (Doukonban) [T-1248G]                                     |
-      Find Love 2: Rhapsody (Japan) [T-34605G]                                              |
-      Find Love 2: The Prologue (Japan) [T-34604G]                                          |
+      Find Love 2: Rhapsody (Japan) [T-34605G]                                              | (flove2ra)
+      Find Love 2: The Prologue (Japan) [T-34604G]                                          | (flove2pr)
       Fire Pro Gaiden: Blazing Tornado (Japan) [T-4302G]                                    |
       Fire Pro Wrestling S: 6 Men Scramble (Japan) [T-4308G]                                |
       Fire Pro Wrestling S: 6 Men Scramble (Japan) (Satakore) [T-4316G]                     |
@@ -606,12 +607,12 @@
       Koutetsu Reiiki Steeldom (Japan) [T-1805G]                                            |
       Koutetsu Reiiki Steeldom (Japan) (Taisen Cable Doukonban) [T-1806G]                   |
       Krazy Ivan (Japan) [T-18605G]                                                         |
-      Kumitate Battle: Kuttu Ketto (Japan) [T-1813G]                                        |
+      Kumitate Battle: Kuttu Ketto (Japan) [T-1813G]                                        | (kuttuket)
       Kunoichi Torimonochou (Japan) [T-6803G]                                               |
       Kuro no Danshou: The Literary Fragment (Japan) [T-21204G]                             |
       Kuro no Danshou: The Literary Fragment (Japan) (Genteiban) [T-21203G]                 |
-      Kurubushi Kyoudai Gekijo Daiikkan: Mahjong-hen (Japan) [T-21803G]                     | 
-      Kururin Pa! (Japan) [T-24201G]                                                        |
+      Kurubushi Kyoudai Gekijo Daiikkan: Mahjong-hen (Japan) [T-21803G]                     |
+      Kururin Pa! (Japan) [T-24201G]                                                        | (kururinp)
       Kuusou Kagaku Sekai Gulliver Boy (Japan) [T-14303G]                                   |
       Kyuukyoku Tiger II Plus (Japan) [T-18715G]                                            |
       Kyuutenkai: Fantastic Pinball (Japan) [T-1801G]                                       |
@@ -710,7 +711,7 @@
       Message Navi (Japan) [T-4401G]                                                        |
       Message Navi Vol.2 (Japan) [T-4404G]                                                  |
       Metal Black (Japan) [T-19902G]                                                        |
-      Metal Black (Japan) (Satakore) [T-19909G]                                             | 
+      Metal Black (Japan) (Satakore) [T-19909G]                                             |
       Metal Fighter Miku (Japan) [T-6002G]                                                  | (mslug)
       Metal Slug (Japan) [T-3111G]                                                          | (mslugdouk)
       Metal Slug (Japan) (Doukonban) [T-3114G]                                              |
@@ -728,7 +729,7 @@
       Moon Cradle (Japan) [T-9109G]                                                         |
       Mortal Kombat II (Japan) [T-8107G]                                                    |
       Motteke Tamago with Ganbare! Kamonohashi (Japan) [T-18712G]                           |
-      Moujiya (Japan) [T-7010G]                                                             |
+      Moujiya (Japan) [T-7010G]                                                             | ########MISSING########
       Mouri Motonari: Chikai no Sanshi (Japan) [T-7646G]                                    |
       Mr. Bones (Japan) [GS-9127]                                                           |
       Mujintou Monogatari R: Futari no Love Love Island (Japan) [T-28901G]                  |
@@ -766,7 +767,7 @@
       Nihon Daihyou Team no Kantoku ni Naruu! Sekaihatsu Soccer RPG (Japan) [T-35504G]      |
       Nihon Pro Mahjong Renmei Kounin: Doujou Yaburi (Japan) [T-18714G]                     |
       Nile Gawa no Yoake (Japan) [T-9106G]                                                  |
-      Ninja Jajamaru-kun: Onigiri Ninpouchou Gold (Japan) [T-5709G]                         |
+      Ninja Jajamaru-kun: Onigiri Ninpouchou Gold (Japan) [T-5709G]                         | (ninjaja)     Doesn't boot
       Ninku: Tsuyokina Yatsura no Daigekitotsu! (Japan) [GS-9036]                           |
       Ninpen Manmaru (Japan) [T-35502G]                                                     |
       Nissan Collections Skyline (Japan) [GS-7005]                                          |
@@ -950,22 +951,22 @@
       Sakura Taisen: Teigeki Graph: Teigeki Graph In Sakura Wars (Japan) [T-32602G]         |
       Sakura Tsuushin (Japan) [T-38401G]                                                    |
       Salamander Deluxe Pack Plus (Japan) [T-9520G]                                         |
-      Samurai Spirits (Japan) (SNK Best Collection) [T-3123G]                               |
-      Samurai Spirits: Amakusa Kourin (Japan) [T-3116G]                                     |
-      Samurai Spirits: Amakusa Kourin (Japan) (Doukonban) [T-3118G]                         |
-      Samurai Spirits: Zankurou Musouken (Japan) [T-3106G]                                  |
-      Samurai Spirits: Zankurou Musouken (Japan) (Doukonban) [T-3104G]                      |
-      Sangokushi Eiketsuden (Japan) [T-7613G]                                               |
-      Sangokushi Eiketsuden (Japan) (Premium Pack) [T-7652G]                                |
-      Sangokushi IV (Japan) [T-7601G]                                                       |
-      Sangokushi IV (Japan) (Koei the Best) [T-7669G]                                       |
-      Sangokushi IV with Power Up Kit (Japan) [T-7644G]                                     |
-      Sangokushi Koumeiden (Japan) [T-7629G]                                                |
-      Sangokushi Koumeiden (Japan) (Premium Pack) [T-7651G]                                 |
-      Sangokushi Returns (Japan) [T-7617G]                                                  |
-      Sangokushi V (Japan) [T-7623G]                                                        |
-      Sangokushi V (Japan) (Premium Pack) [T-7648G]                                         |
-      Sangokushi Value Set (Japan) [T-7636G]                                                |
+      Samurai Spirits (Japan) (SNK Best Collection) [T-3123G]                               | just the 2 games below in 1 pack?
+      Samurai Spirits: Amakusa Kourin (Japan) [T-3116G]                                     | (samsho4)
+      Samurai Spirits: Amakusa Kourin (Japan) (Doukonban) [T-3118G]                         |  @@
+      Samurai Spirits: Zankurou Musouken (Japan) [T-3106G]                                  | (samsho3)
+      Samurai Spirits: Zankurou Musouken (Japan) (Doukonban) [T-3104G]                      |  ==
+      Sangokushi Eiketsuden (Japan) [T-7613G]                                               | (snageike)
+      Sangokushi Eiketsuden (Japan) (Premium Pack) [T-7652G]                                |  @@
+      Sangokushi IV (Japan) [T-7601G]                                                       | (sang4)
+      Sangokushi IV (Japan) (Koei the Best) [T-7669G]                                       |  @@
+      Sangokushi IV with Power Up Kit (Japan) [T-7644G]                                     | (sang4puk)
+      Sangokushi Koumeiden (Japan) [T-7629G]                                                | (sangkoum)
+      Sangokushi Koumeiden (Japan) (Premium Pack) [T-7651G]                                 |  @@
+      Sangokushi Returns (Japan) [T-7617G]                                                  | (sangret)
+      Sangokushi V (Japan) [T-7623G]                                                        | (sang5)
+      Sangokushi V (Japan) (Premium Pack) [T-7648G]                                         |  @@
+      Sangokushi Value Set (Japan) [T-7636G]                                                |  ??
       Sankyo Fever Jikki Simulation S (Japan) [T-32102G]                                    |
       Sankyo Fever Jikki Simulation S (Japan) (Satakore) [T-32104G]                         |
       Sankyo Fever Jikki Simulation S Vol. 2 (Japan) [T-32103G]                             |
@@ -1020,7 +1021,7 @@
       Sentimental Graffiti: First Window (Japan) [T-20111G]                                 |
       Sento Monogatari: Sono 1 (Japan) [T-6801G]                                            |
       Sexy Parodius (Japan) [T-9514G]                                                       |
-      Shadows of the Tusk (Japan) [T-14319G]                                                |
+      Shadows of the Tusk (Japan) [T-14319G]                                                | (shadtusk)      Hangs after Title Screen
       Shanghai Great Moments (Japan) [T-1512G]                                              |
       Shanghai: Banri no Choujou (Japan) [T-1505G]                                          |
       Shanghai: Banri no Choujou (Japan) (Satakore) [T-1527G]                               |
@@ -1030,10 +1031,10 @@
       Shichuu Suimei Pitagraph (Japan) [T-19501G]                                           |
       Shienryu (Japan) [T-29102G]                                                           |
       Shin Kaitei Gunkan: Koutetsu no Kodoku (Japan) [T-2105G]                              |
-      Shin Megami Tensei: Devil Summoner (Japan) [T-14403G]                                 |
-      Shin Megami Tensei: Devil Summoner (Japan) (Satakore) [T-14417G]                      |
-      Shin Megami Tensei: Devil Summoner Special Box (Japan) [T-14408G]                     |
-      Shin Megami Tensei: Devil Summoner: Akuma Zensho (Japan) [T-14406G]                   |
+      Shin Megami Tensei: Devil Summoner (Japan) [T-14403G]                                 | (sdvsum)
+      Shin Megami Tensei: Devil Summoner (Japan) (Satakore) [T-14417G]                      | (sdvsumsak)
+      Shin Megami Tensei: Devil Summoner Special Box (Japan) [T-14408G]                     | (sdvsumspec)
+      Shin Megami Tensei: Devil Summoner: Akuma Zensho (Japan) [T-14406G]                   | (sdvsumaz)
       Shin Shinobi Den (Japan) [GS-9010]                                                    |
       Shin Theme Park (Japan) [T-10618G]                                                    |
       Shingata Kururin Pa! (Japan) [T-24202G]                                               | (skurupa)           Playable?
@@ -1052,7 +1053,7 @@
       Shinseiki Evangelion: Digital Card Library (Japan) [GS-9159]                          | (shinevdc)
       Shinseiki Evangelion: Eva to Yukai na Nakama-tachi (Japan) [T-35103G]                 | (shinevyu)
       Shinseiki Evangelion: Koutetsu no Girlfriend (Japan) [GS-9194]                        | (shinevgf)
-      Shinsetsu Samurai Spirits: Bushidouretsuden (Japan) [T-3112G]                         |
+      Shinsetsu Samurai Spirits: Bushidouretsuden (Japan) [T-3112G]                         | (samshrpg)
       Shinsetsu Yumemi Yakata: Tobira no Oku ni Darekaga… (Japan) [GS-9005]                 |
       Shippu Mahou Daisakusen (Japan) [T-18506G]                                            |
       Shiroki Majo: Mouhitotsu no Eiyuu Densetsu (Japan) [T-14322G]                         |
@@ -1079,7 +1080,7 @@
       Slayers Royal (Japan) [T-27903G]                                                      |
       Slayers Royal 2 (Japan) [T-27907G]                                                    |
       Snatcher (Japan) [T-9508G]                                                            |
-      Sokkou Seitokai: Sonic Council (Japan) [T-20611G]                                     |
+      Sokkou Seitokai: Sonic Council (Japan) [T-20611G]                                     | (scouncil)          Playable?
       Sol Divide (Japan) [T-14423G]                                                         |
       Solo Crisis (Japan) [T-23501G]                                                        |
       Sonic 3D: Flickies' Island (Japan) [GS-9143]                                          |
@@ -1173,7 +1174,7 @@
       Taikou Risshiden II (Japan) (Koei the Best) [T-7667G]                                 |
       Taikou Risshiden II (Japan) (Premium Pack) [T-7653G]                                  |
       Taikyoku Shougi Kiwame II (Japan) [T-29001G]                                          |
-      Taito Chase H.Q. + S.C.I. (Japan) [T-1105G]                                           |
+      Taito Chase H.Q. + S.C.I. (Japan) [T-1105G]                                           | (chasehqs)      Playable?
       Takuramakan: Tonkoudenki (Japan) [T-25102G]                                           |
       Tama: Adventurous Ball in Giddy Labyrinth (Japan) [T-4801G]                           |
       Tanjou S: Debut (Japan) [T-20101G]                                                    |
@@ -1203,7 +1204,7 @@
       Tetris S (Japan) (Satakore) [T-20804G]                                                |
       Texthoth Ludo: Arcana Senki (Japan) [T-23102G]                                        |
       Texthoth Ludo: Arcana Senki (Japan) (Satakore) [T-23103G]                             |
-      Theme Park (Japan) [T-10605G]                                                         | 
+      Theme Park (Japan) [T-10605G]                                                         |
       Thor: Seireioukiden (Japan) [GS-9053]                                                 |
       Three Dirty Dwarves (Japan) [GS-9137]                                                 |
       Thunder Force Gold Pack 1 (Japan) [T-1807G]                                           |
@@ -1426,8 +1427,8 @@
       Devil Summoner Soul Hackers / Ronde Otamashi You Sample Ban (Japan) [610-6704]        |
       Devil Summoner Soul Hackers / Ronde Tokubetsu Gentei Taikenban Soft (Japan)           |
                                                                                  [610-6703] |
-      Digital Pinball Last Gladiators Taikenban (Japan) [ST-18901G]                         |
-      Digital Pinball Necronomicon Taikenban (Japan) [ST-18902G]                            |
+      Digital Pinball Last Gladiators Taikenban (Japan) [ST-18901G]                         | (digpintai)
+      Digital Pinball Necronomicon Taikenban (Japan) [ST-18902G]                            | (dpnecrotai)
       Disc Station Betsu Satsu i miss You. Tanaka Katsumi (Japan) [610-6732]                |
       DJ Wars Taikenban (Japan) [610-6762]                                                  |
       DoDonPachi Mihon Hin (Japan) [610-6702]                                               |
@@ -1483,7 +1484,7 @@
       Grandia: Prelude (Japan) [610-6600]                                                   |
       Gungriffon Hibaihin Auto Demo (Japan) [ST-4502G]                                      |
       Gungriffon II Taikenban (Japan) [610-6896]                                            |
-      Gunbird Sample (Japan) [ST-14402G]                                                    | 
+      Gunbird Sample (Japan) [ST-14402G]                                                    |
       Hang On GP '95 Hibaihin (Japan) [SGS-9032]                                            |
       Hansha de Spark! Hibaihin (Japan) [610-6731]                                          |
       Heim Waltz (Japan) [GS-9121]                                                          |
@@ -1492,75 +1493,76 @@
       Hiyake no Omoide + Himekuri ~Girls In Motion Puzzle Vol. 1~ Hibaihin Sample (Japan)   |
                                                                                 [ST-21002G] |
       Hudson Soft New Soft Line Up (Japan) [610-6540]                                       |
-      Hyper 3D Taisen Battle Gebockers Auto Demo CD (Japan) [ST-5303G]
-      Idol Maajan Final Romance R Kisekae Disc (Japan) [ST-16705G]
-      Jantei Battle Cos-Player Original Genga Shuu (Japan) [610-6553]
-      Jantei Battle Cos-Player Sample Ban (Japan) [610-6541]
-      Java Tea Original: Virtua Fighter Kids (Japan) [GS-9113]
-      K-1 Fighting Illusion Shou DEMO-CD Hibaihin (Japan) [ST-26102G]
-      Kanzen Chuukei Pro Yakyuu Greatest Nine Hibaihin (Japan) [SGS-9024]
-      Keiou Yuugekitai: Okiraku Tamatebako (Japan) [610-6321-01]
-      Keriotosse! Hibaihin (Japan) [ST-30306G]
-      Kidou Senshi Gundam Gaiden I ~Senritsu no Blue~ Taikenban disc (Japan) [ST-13306G]
-      Kidou Senshi Gundam Gaiden II ~Ao wo Uketsugu Mono~ Sample (Japan) [T-13309GSAMPLE]
-      Kin Ninja Jajamaru Kun ~Onigiri Ninpou Chou~ Taikenban (Japan) [610-6692]
-      Layer Section II Taikenban (Japan) [610-6727]
-      Lunar Silver Star Story Hibaihin Auto Demo (Japan) [ST-27901G]
-      Lunar 2 Eternal Blue Hibaihin Auto Demo (Japan) [ST-27906G]
-      Maajan Kaigan Monogatari ~Maajankyou Jidai Sexy Idol Hen~ Sample Ban CD (Japan) [ST-2201G]
-      Machi Sample (Japan) [610-6777]
-      Magical Drop III Toretate Zoukangou! Mogitate Taikenban! (Japan) [610-6569]
-      Magical Drop SAMPLE (Japan) [ST-1304G]
-      Maria ~Kimitachi Ga Umareta Wake~ Hibaihin (Japan) [610-6800]
-      Marvel Super Heroes Taikenban (Japan) [610-6664]
-      MeltyLancer Re-Inforce Taikenban (Japan) [610-6905]
-      Message Navi Hibaihin (Japan) [610-6728]
-      Mogitate SegaSaturn Vol.2 1998.2 (Japan) [610-6805-02]
-      Mogitate SegaSaturn Vol.3 1998.5 (Japan) [610-6805-03]
-      Mogitate SegaSaturn Vol.4 1998.8 (Japan) [610-6805-04]
-      Mogitate SegaSaturn Vol.5 1998.11 (Japan) [610-6805-05]
-      Mogitate SegaSaturn Vol.6 1999.2 (Japan) [610-6805-06]
-      Moon Cradle Taikenban (Japan) [ST-9109G]
-      Mr Bones Taiken Sample Ban (Japan) [610-6666]
-      Nanatsu no Hikan Hibaihin Demonstration You CD-ROM (Japan) [ST-7616G]
-      Nights Into Dreams... Special Sampler (Japan) [610-6300]
-      Nissan Presents Over Drivin' GT-R Demo (Japan) [610-6470]
-      Nobunaga no Yabou Tenshouki Hibaihin (Japan) [ST-7605G]
-      Noël 3 Taikenban (Japan) [610-7100]
-      Otanoshimi 3 Shiro! Disc (Japan) [3SHIRO]
-      Panzer Dragoon Demo You Hibaihin (Japan) [PDDEMO]
-      Panzer Dragoon Taikenban Hibaihin (Japan) [PD-002]
-      Pia Carrot e Youkoso!! ~We've Been Waiting For You~ Hibaihin (Japan) [610-6822]
-      PictFlash Don Don (Japan) [T-17811G]
-      Pocket Fighter Taikenban (Japan) [ST-1230G]
-      Prime Selection Vol.1 (Japan) [610-6033]
-      Purikura Daisakusen Mihon Hin (Japan) [ST-14409G]
-      QuoVadis 2 ~Wakusei Kyoushuu Ovan Rei~ Taikenban (Japan) [ST-17402G]
-      Rabbit Mihon Hin (Japan) [610-6613]
-      Radiant Silvergun Sample (Japan) [T-32902GSAMPLE]
-      Real Bout Garou Densetsu Special Sample (Japan) [610-6834]
-      Real Sound ~Kaze no Regret~ Taikenban (Japan) [610-6725]
-      Riglord Saga Hibaihin (Japan) [SGS-9021]
-      Sakura Taisen 2: Kimi, Shini Tamou Kotonakare: Tokubetsu Ban (Japan) [610-6864]
-      Sakura Taisen Teikoku Kagekidan Taiin Meibo (Japan) [SKR-00468]
-      Samurai Spirits Amakusa Kourin Hibaihin (Japan) [610-6730]
-      Samurai Spirits Zankourou Musouken Sample (Japan) [ST-3106G]
-      SatMag Sono CD (Japan) [610-6833]
-      SatMag Sono CD 2 (Japan) [SATMAGSONO2]
-      Saturn Bomberman Fight!! Taikenban (Japan) [SATURN-BOMBERMAN-DEMO]
-      Saturn Bomberman Sample Disc Hibaihin (Japan) [ST-14302G]
-      Saturn CG Selection Vol.1 (Japan) [610-6113]
-      Saturn Super Vol. 1 (Japan) [610-6020-01]
-      Saturn Super Vol. 2 (Japan) [610-6020-02]
-      Saturn Super Vol. 3 (Japan) [610-6020-03]
-      Saturn Super Vol. 4 (Japan) [610-6020-05]
-      Saturn Super Vol. 5 (Japan) [610-6020-006]
-      Saturn Super Vol. 6 (Japan) [610-6020-07]
-      Saturn Super Vol. 7 (Japan) [610-6020-08]
-      Saturn Super Vol. 8 (Japan) [610-6020-09]
-      Saturn Super Vol. 9 (Japan) [610-6020-10]
-      Saturn Super Vol. 10 (Japan) [610-6020-11]
-      Saturn Super Vol. 11 (Japan) [610-6020-12]
+      Hyper 3D Taisen Battle Gebockers Auto Demo CD (Japan) [ST-5303G]                      |
+      Idol Maajan Final Romance R Kisekae Disc (Japan) [ST-16705G]                          |
+      Jantei Battle Cos-Player Original Genga Shuu (Japan) [610-6553]                       |
+      Jantei Battle Cos-Player Sample Ban (Japan) [610-6541]                                |
+      Java Tea Original: Virtua Fighter Kids (Japan) [GS-9113]                              |
+      K-1 Fighting Illusion Shou DEMO-CD Hibaihin (Japan) [ST-26102G]                       |
+      Kanzen Chuukei Pro Yakyuu Greatest Nine Hibaihin (Japan) [SGS-9024]                   |
+      Keiou Yuugekitai: Okiraku Tamatebako (Japan) [610-6321-01]                            |
+      Keriotosse! Hibaihin (Japan) [ST-30306G]                                              |
+      Kidou Senshi Gundam Gaiden I ~Senritsu no Blue~ Taikenban disc (Japan) [ST-13306G]    |
+      Kidou Senshi Gundam Gaiden II ~Ao wo Uketsugu Mono~ Sample (Japan) [T-13309GSAMPLE]   |
+      Kin Ninja Jajamaru Kun ~Onigiri Ninpou Chou~ Taikenban (Japan) [610-6692]             |
+      Layer Section II Taikenban (Japan) [610-6727]                                         |
+      Lunar Silver Star Story Hibaihin Auto Demo (Japan) [ST-27901G]                        |
+      Lunar 2 Eternal Blue Hibaihin Auto Demo (Japan) [ST-27906G]                           |
+      Maajan Kaigan Monogatari ~Maajankyou Jidai Sexy Idol Hen~ Sample Ban CD (Japan)       |
+                                                                                 [ST-2201G] |
+      Machi Sample (Japan) [610-6777]                                                       |
+      Magical Drop III Toretate Zoukangou! Mogitate Taikenban! (Japan) [610-6569]           |
+      Magical Drop SAMPLE (Japan) [ST-1304G]                                                |
+      Maria ~Kimitachi Ga Umareta Wake~ Hibaihin (Japan) [610-6800]                         |
+      Marvel Super Heroes Taikenban (Japan) [610-6664]                                      |
+      MeltyLancer Re-Inforce Taikenban (Japan) [610-6905]                                   |
+      Message Navi Hibaihin (Japan) [610-6728]                                              |
+      Mogitate SegaSaturn Vol.2 1998.2 (Japan) [610-6805-02]                                |
+      Mogitate SegaSaturn Vol.3 1998.5 (Japan) [610-6805-03]                                |
+      Mogitate SegaSaturn Vol.4 1998.8 (Japan) [610-6805-04]                                |
+      Mogitate SegaSaturn Vol.5 1998.11 (Japan) [610-6805-05]                               |
+      Mogitate SegaSaturn Vol.6 1999.2 (Japan) [610-6805-06]                                |
+      Moon Cradle Taikenban (Japan) [ST-9109G]                                              |
+      Mr Bones Taiken Sample Ban (Japan) [610-6666]                                         |
+      Nanatsu no Hikan Hibaihin Demonstration You CD-ROM (Japan) [ST-7616G]                 |
+      Nights Into Dreams... Special Sampler (Japan) [610-6300]                              |
+      Nissan Presents Over Drivin' GT-R Demo (Japan) [610-6470]                             |
+      Nobunaga no Yabou Tenshouki Hibaihin (Japan) [ST-7605G]                               |
+      Noël 3 Taikenban (Japan) [610-7100]                                                   |
+      Otanoshimi 3 Shiro! Disc (Japan) [3SHIRO]                                             |
+      Panzer Dragoon Demo You Hibaihin (Japan) [PDDEMO]                                     |
+      Panzer Dragoon Taikenban Hibaihin (Japan) [PD-002]                                    |
+      Pia Carrot e Youkoso!! ~We've Been Waiting For You~ Hibaihin (Japan) [610-6822]       |
+      PictFlash Don Don (Japan) [T-17811G]                                                  |
+      Pocket Fighter Taikenban (Japan) [ST-1230G]                                           |
+      Prime Selection Vol.1 (Japan) [610-6033]                                              |
+      Purikura Daisakusen Mihon Hin (Japan) [ST-14409G]                                     |
+      QuoVadis 2 ~Wakusei Kyoushuu Ovan Rei~ Taikenban (Japan) [ST-17402G]                  |
+      Rabbit Mihon Hin (Japan) [610-6613]                                                   |
+      Radiant Silvergun Sample (Japan) [T-32902GSAMPLE]                                     |
+      Real Bout Garou Densetsu Special Sample (Japan) [610-6834]                            |
+      Real Sound ~Kaze no Regret~ Taikenban (Japan) [610-6725]                              |
+      Riglord Saga Hibaihin (Japan) [SGS-9021]                                              |
+      Sakura Taisen 2: Kimi, Shini Tamou Kotonakare: Tokubetsu Ban (Japan) [610-6864]       |
+      Sakura Taisen Teikoku Kagekidan Taiin Meibo (Japan) [SKR-00468]                       |
+      Samurai Spirits Amakusa Kourin Hibaihin (Japan) [610-6730]                            |
+      Samurai Spirits Zankourou Musouken Sample (Japan) [ST-3106G]                          |
+      SatMag Sono CD (Japan) [610-6833]                                                     |
+      SatMag Sono CD 2 (Japan) [SATMAGSONO2]                                                |
+      Saturn Bomberman Fight!! Taikenban (Japan) [SATURN-BOMBERMAN-DEMO]                    |
+      Saturn Bomberman Sample Disc Hibaihin (Japan) [ST-14302G]                             |
+      Saturn CG Selection Vol.1 (Japan) [610-6113]                                          |
+      Saturn Super Vol. 1 (Japan) [610-6020-01]                                             |
+      Saturn Super Vol. 2 (Japan) [610-6020-02]                                             |
+      Saturn Super Vol. 3 (Japan) [610-6020-03]                                             |
+      Saturn Super Vol. 4 (Japan) [610-6020-05]                                             |
+      Saturn Super Vol. 5 (Japan) [610-6020-006]                                            |
+      Saturn Super Vol. 6 (Japan) [610-6020-07]                                             |
+      Saturn Super Vol. 7 (Japan) [610-6020-08]                                             |
+      Saturn Super Vol. 8 (Japan) [610-6020-09]                                             |
+      Saturn Super Vol. 9 (Japan) [610-6020-10]                                             |
+      Saturn Super Vol. 10 (Japan) [610-6020-11]                                            |
+      Saturn Super Vol. 11 (Japan) [610-6020-12]                                            |
       Sega Rally Championship Hibaihin (Japan) [SGS-9047]
       Sega Touring Car Championship OST (Japan) [MJCA-00002]
       Sega Touring Car Championship Taikenban (Japan) [610-6747]
@@ -2252,8 +2254,9 @@
   </software>
 
   <!-- Identifying D no Shokutaku (Japan) (Disc 1)... -->
-  <software name="dnoshoku" supported="no">
-    <description>D no Shokutaku (Japan) (Disc 1)</description>
+  <!-- Identifying D no Shokutaku (Japan) (Disc 2)... -->
+  <software name="dnosho" supported="no">
+    <description>D no Shokutaku (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -2261,22 +2264,16 @@
         <disk name="d no shokutaku (japan) (disc 1)" sha1="5102191e0f2a2df11e903c7af5c4dfaa236566a0" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying D no Shokutaku (Japan) (Disc 2)... -->
-  <software name="dnoshoku01" cloneof="dnoshoku" supported="no">
-    <description>D no Shokutaku (Japan) (Disc 2)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="d no shokutaku (japan) (disc 2)" sha1="8956c7916477560815a75d525a22e328195eaafc" />
       </diskarea>
     </part>
   </software>
 
+
   <!-- Identifying Daikoukai Jidai II (Japan)... -->
-  <software name="daikouka" supported="no">
+  <software name="daijid2" supported="no">
     <description>Daikoukai Jidai II (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2288,8 +2285,9 @@
   </software>
 
   <!-- Identifying Daisuki (Japan) (Disc 1)... -->
-  <software name="daisukij" supported="no">
-    <description>Daisuki (Japan) (Disc 1)</description>
+  <!-- Identifying Daisuki (Japan) (Disc 2)... -->
+  <software name="daisuki" supported="no">
+    <description>Daisuki (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -2297,22 +2295,17 @@
         <disk name="daisuki (japan) (disc 1)" sha1="f854a884f03cdcf65535948a0a48275652768a49" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Daisuki (Japan) (Disc 2)... -->
-  <software name="daisukij01" cloneof="daisukij" supported="no">
-    <description>Daisuki (Japan) (Disc 2)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="daisuki (japan) (disc 2)" sha1="132526bf038cb719760e9e078e536bdc84e91d92" />
       </diskarea>
     </part>
   </software>
 
+
+
   <!-- Identifying Darius Gaiden (Japan) (3M)... -->
-  <software name="dariusga" supported="no">
+  <software name="dariusg" supported="no">
     <description>Darius Gaiden (Japan) (3M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2336,7 +2329,7 @@
   </software>
 
   <!-- Identifying Daytona USA (Japan)... -->
-  <software name="daytonau" supported="no">
+  <software name="daytona" supported="no">
     <description>Daytona USA (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2348,7 +2341,7 @@
   </software>
 
   <!-- Identifying Daytona USA - Circuit Edition (Japan)... -->
-  <software name="daytonau01" cloneof="daytonau" supported="no">
+  <software name="daytonce" supported="no">
     <description>Daytona USA - Circuit Edition (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2360,7 +2353,7 @@
   </software>
 
   <!-- Identifying Dead or Alive (Japan) (2M)... -->
-  <software name="deadoral" supported="no">
+  <software name="doa" supported="no">
     <description>Dead or Alive (Japan) (2M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2372,7 +2365,7 @@
   </software>
 
   <!-- Identifying DecAthlete (Japan) (1M)... -->
-  <software name="decathle" supported="no">
+  <software name="decathlt" supported="no">
     <description>DecAthlete (Japan) (1M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2384,7 +2377,7 @@
   </software>
 
   <!-- Identifying DecAthlete (Japan) (2M)... -->
-  <software name="decathle01" cloneof="decathle" supported="no">
+  <software name="decathlta" cloneof="decathlt" supported="no">
     <description>DecAthlete (Japan) (2M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2396,8 +2389,9 @@
   </software>
 
   <!-- Identifying Deep Fear (Japan) (Disc 1)... -->
+  <!-- Identifying Deep Fear (Japan) (Disc 2)... -->
   <software name="deepfear" supported="no">
-    <description>Deep Fear (Japan) (Disc 1)</description>
+    <description>Deep Fear (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -2405,19 +2399,13 @@
         <disk name="deep fear (japan) (disc 1)" sha1="cabfcc22a0e99c00f9a3321c482084e1fd8da61c" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Deep Fear (Japan) (Disc 2)... -->
-  <software name="deepfear01" cloneof="deepfear" supported="no">
-    <description>Deep Fear (Japan) (Disc 2)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="deep fear (japan) (disc 2)" sha1="9df9d04c5814b7c2772cf86e60afb61bd44e802a" />
       </diskarea>
     </part>
   </software>
+
 
   <!-- Identifying Dennou Senki Virtual-On (Japan)... -->
   <software name="dennouse" supported="no">
@@ -2432,7 +2420,7 @@
   </software>
 
   <!-- Identifying Densetsu no Ogre Battle (Japan)... -->
-  <software name="densetsu" supported="no">
+  <software name="ogrebatl" supported="no">
     <description>Densetsu no Ogre Battle (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2444,7 +2432,7 @@
   </software>
 
   <!-- Identifying Deron Dero Dero (Japan) (1M)... -->
-  <software name="deronder" supported="no">
+  <software name="deroon" supported="no">
     <description>Deron Dero Dero (Japan) (1M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2456,7 +2444,7 @@
   </software>
 
   <!-- Identifying Detana Twinbee Yahoo! Deluxe Pack (Japan) (3M)... -->
-  <software name="detanatw" supported="no">
+  <software name="tbyahhod" supported="no">
     <description>Detana Twinbee Yahoo! Deluxe Pack (Japan) (3M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2468,7 +2456,7 @@
   </software>
 
   <!-- Identifying Devil Summoner - Soul Hackers &amp; Ronde - Otamashi You Sample Ban (Japan) (Sample)... -->
-  <software name="devilsum" supported="no">
+  <software name="dsumsouldemo" cloneof="dsumsoul" supported="no">
     <description>Devil Summoner - Soul Hackers &amp; Ronde - Otamashi You Sample Ban (Japan) (Sample)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2480,8 +2468,9 @@
   </software>
 
   <!-- Identifying Devil Summoner - Soul Hackers (Japan) (Disc 1)... -->
-  <software name="devilsum01" cloneof="devilsum" supported="no">
-    <description>Devil Summoner - Soul Hackers (Japan) (Disc 1)</description>
+  <!-- Identifying Devil Summoner - Soul Hackers (Japan) (Disc 2)... -->
+  <software name="dsumsoul" supported="no">
+    <description>Devil Summoner - Soul Hackers (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -2489,22 +2478,16 @@
         <disk name="devil summoner - soul hackers (japan) (disc 1)" sha1="36beb7844c0a5de3e698e8f841e38e8b188093ea" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Devil Summoner - Soul Hackers (Japan) (Disc 2)... -->
-  <software name="devilsum02" cloneof="devilsum" supported="no">
-    <description>Devil Summoner - Soul Hackers (Japan) (Disc 2)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="devil summoner - soul hackers (japan) (disc 2)" sha1="84c4348fd0b2e40a6dcb50999860769baa871d65" />
       </diskarea>
     </part>
   </software>
 
+
   <!-- Identifying Dezaemon 2 (Japan)... -->
-  <software name="dezaemon" supported="no">
+  <software name="dezaemo2" supported="no">
     <description>Dezaemon 2 (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2528,7 +2511,7 @@
   </software>
 
   <!-- Identifying Digital Ange - Dennou Tenshi SS (Japan)... -->
-  <software name="digitala" supported="no">
+  <software name="digiange" supported="no">
     <description>Digital Ange - Dennou Tenshi SS (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2540,7 +2523,7 @@
   </software>
 
   <!-- Identifying Digital Dance Mix Vol.1 - Namie Amuro (Japan) (Rev A) (11M)... -->
-  <software name="digitald" supported="no">
+  <software name="digidanc" supported="no">
     <description>Digital Dance Mix Vol.1 - Namie Amuro (Japan) (Rev A) (11M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2552,7 +2535,7 @@
   </software>
 
   <!-- Identifying Digital Pinball - Last Gladiators (Japan)... -->
-  <software name="digitalp" supported="no">
+  <software name="digpin" supported="no">
     <description>Digital Pinball - Last Gladiators (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2564,7 +2547,7 @@
   </software>
 
   <!-- Identifying Digital Pinball - Necronomicon (Japan)... -->
-  <software name="digitalp01" cloneof="digitalp" supported="no">
+  <software name="dpnecro" supported="no">
     <description>Digital Pinball - Necronomicon (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2576,8 +2559,8 @@
   </software>
 
   <!-- Identifying Dino Island (Japan) (Yokoku Hen)... -->
-  <software name="dinoisla" supported="no">
-    <description>Dino Island (Japan) (Yokoku Hen)</description>
+  <software name="dinoislyoko" cloneof="dinoisl" supported="no">
+    <description>Daina Airan: Yokoku-hen (Japan) [T-4505G]</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -2588,7 +2571,7 @@
   </software>
 
   <!-- Identifying DoDonPachi (Japan)... -->
-  <software name="dodonpac" supported="no">
+  <software name="ddonpach" supported="no">
     <description>DoDonPachi (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2624,8 +2607,9 @@
   </software>
 
   <!-- Identifying Doukyuusei 2 (Japan) (Disc 1)... -->
-  <software name="doukyuus" supported="no">
-    <description>Doukyuusei 2 (Japan) (Disc 1)</description>
+  <!-- Identifying Doukyuusei 2 (Japan) (Disc 2)... -->
+  <software name="douky2" supported="no">
+    <description>Doukyuusei 2 (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -2633,22 +2617,16 @@
         <disk name="doukyuusei 2 (japan) (disc 1)" sha1="4de8aec510a34f17a41df49eebed11bd5340f21d" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Doukyuusei 2 (Japan) (Disc 2)... -->
-  <software name="doukyuus01" cloneof="doukyuus" supported="no">
-    <description>Doukyuusei 2 (Japan) (Disc 2)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="doukyuusei 2 (japan) (disc 2)" sha1="90f836a1d15a0e77525505123e6292e5f4ced50e" />
       </diskarea>
     </part>
   </software>
 
+
   <!-- Identifying Doukyuusei if (Japan) (1M, 2M)... -->
-  <software name="doukyuus02" cloneof="doukyuus" supported="no">
+  <software name="doukyif" supported="no">
     <description>Doukyuusei if (Japan) (1M, 2M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2660,7 +2638,7 @@
   </software>
 
   <!-- Identifying Dragon Ball Z - Shinbutouden (Japan)... -->
-  <software name="dragonba" supported="no">
+  <software name="dbzshin" supported="no">
     <description>Dragon Ball Z - Shinbutouden (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2672,7 +2650,7 @@
   </software>
 
   <!-- Identifying Dragon Force (Japan) (3M)... -->
-  <software name="dragonfo" supported="no">
+  <software name="dragfrc" supported="no">
     <description>Dragon Force (Japan) (3M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2684,7 +2662,7 @@
   </software>
 
   <!-- Identifying Dragon Force (Japan) (4M)... -->
-  <software name="dragonfo01" cloneof="dragonfo" supported="no">
+  <software name="dragfrca" cloneof="dragfrc" supported="no">
     <description>Dragon Force (Japan) (4M)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2696,7 +2674,7 @@
   </software>
 
   <!-- Identifying Dragon Force II - Kamisarishi Daichi ni (Japan)... -->
-  <software name="dragonfo02" cloneof="dragonfo" supported="no">
+  <software name="dragfrc2" supported="no">
     <description>Dragon Force II - Kamisarishi Daichi ni (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -2780,8 +2758,20 @@
   </software>
 
   <!-- Identifying Enemy Zero (Japan) (Disc 0) (Opening Disc) (2M)... -->
-  <software name="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 0) (Opening Disc) (2M)</description>
+  <!-- Identifying Enemy Zero (Japan) (Disc 0) (Opening Disc)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 1) (Game Disc) (1M)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 1) (Game Disc) (2M)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 1) (Game Disc)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 2) (Game Disc) (1M)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 2) (Game Disc) (2M)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 2) (Game Disc)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 3) (Game Disc) (3M)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 3) (Game Disc) (4M)... -->
+  <!-- Identifying Enemy Zero (Japan) (Disc 3) (Game Disc)... -->
+
+  <!-- Redump gives no indication of how these pair up.. -->
+  <software name="enemy0b" cloneof="enemy0" supported="no">
+    <description>Enemy Zero (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -2789,127 +2779,59 @@
         <disk name="enemy zero (japan) (disc 0) (opening disc) (2m)" sha1="874b92dcef85a9caecedd845b987e5725e5f4c63" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 0) (Opening Disc)... -->
-  <software name="enemyzer01" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 0) (Opening Disc)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 0) (opening disc)" sha1="220db325be33e52443cbb61fe809afee23b48ae0" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 1) (Game Disc) (1M)... -->
-  <software name="enemyzer02" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 1) (Game Disc) (1M)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 1) (game disc) (1m)" sha1="2c9aa8449bffd223d24c5296ab2686bcc3df4da5" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 1) (Game Disc) (2M)... -->
-  <software name="enemyzer03" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 1) (Game Disc) (2M)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom3" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 1) (game disc) (2m)" sha1="70584d4cc80ffe16bc12a01b1124ed58791c3eaa" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 1) (Game Disc)... -->
-  <software name="enemyzer04" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 1) (Game Disc)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom4" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 1) (game disc)" sha1="7358fa27b3fe79846a6cab11b3c31bcdbb55ede4" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 2) (Game Disc) (1M)... -->
-  <software name="enemyzer05" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 2) (Game Disc) (1M)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom5" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 2) (game disc) (1m)" sha1="abf835f6ebc1ebb0cb6a704a0c74d7fe025257b9" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 2) (Game Disc) (2M)... -->
-  <software name="enemyzer06" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 2) (Game Disc) (2M)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom6" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 2) (game disc) (2m)" sha1="07930e63469a754a8ea83020b0e9025e1dc16f79" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 2) (Game Disc)... -->
-  <software name="enemyzer07" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 2) (Game Disc)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom7" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 2) (game disc)" sha1="81856706d69b3cedd3e13da653b3cc9707b959ea" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 3) (Game Disc) (3M)... -->
-  <software name="enemyzer08" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 3) (Game Disc) (3M)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom8" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 3) (game disc) (3m)" sha1="9b5619236012dd370b5be7fb2665d5a4cf60b191" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 3) (Game Disc) (4M)... -->
-  <software name="enemyzer09" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 3) (Game Disc) (4M)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom9" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 3) (game disc) (4m)" sha1="853e6a3c944b90bdb5d924e37d2c9d7e244e9a1a" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Japan) (Disc 3) (Game Disc)... -->
-  <software name="enemyzer10" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Japan) (Disc 3) (Game Disc)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom10" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (japan) (disc 3) (game disc)" sha1="dae836f6ae0d90e76bf4c7a99dc3a79fb4309b22" />
       </diskarea>
     </part>
   </software>
+
+
 
   <!-- Identifying EVE - burst error (Japan) (Disc 1) (Kojiroh Disc)... -->
   <software name="eveburst" supported="no">
@@ -3008,7 +2930,7 @@
   </software>
 
   <!-- Identifying Falcom Classics (Japan)... -->
-  <software name="falcomcl" supported="no">
+  <software name="falcom1" supported="no">
     <description>Falcom Classics (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -3020,7 +2942,7 @@
   </software>
 
   <!-- Identifying Falcom Classics II (Japan)... -->
-  <software name="falcomcl01" cloneof="falcomcl" supported="no">
+  <software name="falcom2" supported="no">
     <description>Falcom Classics II (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -3044,7 +2966,7 @@
   </software>
 
   <!-- Identifying Fighter's History Dynamite (Japan)... -->
-  <software name="fighters" supported="no">
+  <software name="fhdyna" supported="no"> <!-- karnovr -->
     <description>Fighter's History Dynamite (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -3056,7 +2978,7 @@
   </software>
 
   <!-- Identifying Fighters Megamix (Japan)... -->
-  <software name="fighters01" cloneof="fighters" supported="no">
+  <software name="fmegamix" supported="no">
     <description>Fighters Megamix (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -3068,7 +2990,7 @@
   </software>
 
   <!-- Identifying Fighting Vipers (Japan) (Rev A)... -->
-  <software name="fighting" supported="no">
+  <software name="fvipers" supported="no">
     <description>Fighting Vipers (Japan) (Rev A)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -3080,7 +3002,7 @@
   </software>
 
   <!-- Identifying Fighting Vipers (Japan) (Rev C)... -->
-  <software name="fighting01" cloneof="fighting" supported="no">
+  <software name="fvipersa" cloneof="fvipers" supported="no">
     <description>Fighting Vipers (Japan) (Rev C)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -3092,7 +3014,7 @@
   </software>
 
   <!-- Identifying Fighting Vipers (Korea)... -->
-  <software name="fighting02" cloneof="fighting" supported="no">
+  <software name="fvipersb" cloneof="fvipers" supported="no">
     <description>Fighting Vipers (Korea)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -3104,7 +3026,7 @@
   </software>
 
   <!-- Identifying Find Love 2 - The Prologue (Japan)... -->
-  <software name="findlove" supported="no">
+  <software name="flove2pr" supported="no">
     <description>Find Love 2 - The Prologue (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5583,7 +5505,7 @@
   </software>
 
   <!-- Identifying Samurai Spirits - Amakusa Kourin (Japan) (En,Ja,Es,Pt)... -->
-  <software name="samurais" supported="no">
+  <software name="samsho4" supported="no">
     <description>Samurai Spirits - Amakusa Kourin (Japan) (En,Ja,Es,Pt)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5595,7 +5517,7 @@
   </software>
 
   <!-- Identifying Sangokushi Eiketsuden (Japan)... -->
-  <software name="sangokus" supported="no">
+  <software name="sangeike" supported="no">
     <description>Sangokushi Eiketsuden (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5607,7 +5529,7 @@
   </software>
 
   <!-- Identifying Sangokushi Koumeiden (Japan)... -->
-  <software name="sangokus01" cloneof="sangokus" supported="no">
+  <software name="sangkoum" supported="no">
     <description>Sangokushi Koumeiden (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5943,7 +5865,7 @@
   </software>
 
   <!-- Identifying Shin Megami Tensei - Devil Summoner (Japan) (Rev A)... -->
-  <software name="shinmega" supported="no">
+  <software name="sdvsum" supported="no">
     <description>Shin Megami Tensei - Devil Summoner (Japan) (Rev A)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -5955,7 +5877,7 @@
   </software>
 
   <!-- Identifying Shin Megami Tensei - Devil Summoner - Akuma Zensho (Japan)... -->
-  <software name="shinmega01" cloneof="shinmega" supported="no">
+  <software name="sdvsumaz" supported="no">
     <description>Shin Megami Tensei - Devil Summoner - Akuma Zensho (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -6075,7 +5997,7 @@
   </software>
 
   <!-- Identifying Shinsetsu Samurai Spirits Bushidou Retsuden (Japan)... -->
-  <software name="shinsets" supported="no">
+  <software name="samshrpg" supported="no">
     <description>Shinsetsu Samurai Spirits Bushidou Retsuden (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -6087,7 +6009,7 @@
   </software>
 
   <!-- Identifying Shinsetsu Yumemi Yakata - Tobira no Oku ni Darekaga... (Japan) (Rev A) (2A)... -->
-  <software name="shinsets01" cloneof="shinsets" supported="no">
+  <software name="shinsets" supported="no">
     <description>Shinsetsu Yumemi Yakata - Tobira no Oku ni Darekaga... (Japan) (Rev A) (2A)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -7884,8 +7806,9 @@
   </software>
 
   <!-- Identifying D no Shokutaku (Disc 1 of 2) (JAP) (DW0511)... -->
-  <software name="dnoshoku02" cloneof="dnoshoku" supported="no">
-    <description>D no Shokutaku (Disc 1 of 2) (JAP) (DW0511)</description>
+  <!-- Identifying D no Shokutaku (Disc 2 of 2) (JAP) (DW0511)... -->
+  <software name="dnoshoa" cloneof="dnosho" supported="no">
+    <description>D no Shokutaku (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -7893,13 +7816,6 @@
         <disk name="d no shokutaku (disc 1 of 2) (jap) (dw0511)" sha1="0d3f8d81f5d5de2164141ac8257044f18d7a3cba" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying D no Shokutaku (Disc 2 of 2) (JAP) (DW0511)... -->
-  <software name="dnoshoku03" cloneof="dnoshoku" supported="no">
-    <description>D no Shokutaku (Disc 2 of 2) (JAP) (DW0511)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="d no shokutaku (disc 2 of 2) (jap) (dw0511)" sha1="e203e82e005c771565c857276a35d17395a7aa7b" />
@@ -7907,8 +7823,9 @@
     </part>
   </software>
 
+
   <!-- Identifying Daina Airan - Dinosaur Island (JAP) (DW0633)... -->
-  <software name="dainaair" supported="no">
+  <software name="dinoisl" supported="no">
     <description>Daina Airan - Dinosaur Island (JAP) (DW0633)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -7920,8 +7837,8 @@
   </software>
 
   <!-- Identifying Darius Gaiden (JAP) (DW0125)... -->
-  <software name="dariusgaa" cloneof="dariusga" supported="no">
-    <description>Darius Gaiden (JAP) (DW0125)</description>
+  <software name="dariusga" cloneof="dariusg" supported="no">
+    <description>Darius Gaiden (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -7933,7 +7850,7 @@
 
   <!-- Identifying Dark Savior (JAP) (DW0579)... -->
   <software name="darksavia" cloneof="darksavi" supported="no">
-    <description>Dark Savior (JAP) (DW0579)</description>
+    <description>Dark Savior (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -7945,7 +7862,7 @@
 
   <!-- Identifying Dark Seed (JAP) (DW0616)... -->
   <software name="darkseed" supported="no">
-    <description>Dark Seed (JAP) (DW0616)</description>
+    <description>Dark Seed (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -7956,8 +7873,8 @@
   </software>
 
   <!-- Identifying Dark Seed II (JAP) (DW0617)... -->
-  <software name="darkseed01" cloneof="darkseed" supported="no">
-    <description>Dark Seed II (JAP) (DW0617)</description>
+  <software name="darksee2" supported="no">
+    <description>Dark Seed II (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -7968,7 +7885,7 @@
   </software>
 
   <!-- Identifying Daytona USA Hibaihin Mihonban (JAP) (DW0870)... -->
-  <software name="daytonaua" cloneof="daytonau" supported="no">
+  <software name="daytonahib" cloneof="daytona" supported="no">
     <description>Daytona USA Hibaihin Mihonban (JAP) (DW0870)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -7980,8 +7897,8 @@
   </software>
 
   <!-- Identifying Dead Or Alive (JAP) (v1.001) (DW0114)... -->
-  <software name="deadorala" cloneof="deadoral" supported="no">
-    <description>Dead Or Alive (JAP) (v1.001) (DW0114)</description>
+  <software name="doaa" cloneof="doa" supported="no">
+    <description>Dead Or Alive (JAP) (v1.001)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -7993,7 +7910,7 @@
 
   <!-- Identifying Deadalus (JAP) (DW0610)... -->
   <software name="deadalus" supported="no">
-    <description>Deadalus (JAP) (DW0610)</description>
+    <description>Deadalus (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8004,8 +7921,8 @@
   </software>
 
   <!-- Identifying Decathlete (JAP) (v1.001) (DW0863)... -->
-  <software name="decathlea" cloneof="decathle" supported="no">
-    <description>Decathlete (JAP) (v1.001) (DW0863)</description>
+  <software name="decathltb" cloneof="decathlt" supported="no">
+    <description>Decathlete (JAP) (v1.001)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8016,7 +7933,8 @@
   </software>
 
   <!-- Identifying Deep Fear (Disc 1 of 2) (JAP) (DW0638)... -->
-  <software name="deepfear02" cloneof="deepfear" supported="no">
+  <!-- Identifying Deep Fear (Disc 2 of 2) (JAP) (DW0638)... -->
+  <software name="deepfeara" cloneof="deepfear" supported="no">
     <description>Deep Fear (Disc 1 of 2) (JAP) (DW0638)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -8025,23 +7943,18 @@
         <disk name="deep fear (disc 1 of 2) (jap) (dw0638)" sha1="25f090e7ad42ac3327b42698f523361d919bc3a5" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Deep Fear (Disc 2 of 2) (JAP) (DW0638)... -->
-  <software name="deepfear03" cloneof="deepfear" supported="no">
-    <description>Deep Fear (Disc 2 of 2) (JAP) (DW0638)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="deep fear (disc 2 of 2) (jap) (dw0638)" sha1="60ec31e9239ab0fbd1427f478aedea95705898ba" />
       </diskarea>
     </part>
   </software>
 
+
+
   <!-- Identifying Densetsu no Ogre Battle (JAP) (DW0433)... -->
-  <software name="densetsua" cloneof="densetsu" supported="no">
-    <description>Densetsu no Ogre Battle (JAP) (DW0433)</description>
+  <software name="ogrebatla" cloneof="ogrebatl" supported="no">
+    <description>Densetsu no Ogre Battle (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8053,7 +7966,7 @@
 
   <!-- Identifying Derby Analyst (JAP) (DW0471)... -->
   <software name="derbyana" supported="no">
-    <description>Derby Analyst (JAP) (DW0471)</description>
+    <description>Derby Analyst (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8064,8 +7977,10 @@
   </software>
 
   <!-- Identifying Desire (Disc 1 of 2) (JAP) (DW0241)... -->
-  <software name="desiredi" supported="no">
-    <description>Desire (Disc 1 of 2) (JAP) (DW0241)</description>
+  <!-- Identifying Desire (Disc 2 of 2) (JAP) (DW0241)... -->
+
+  <software name="desire" supported="no">
+    <description>Desire (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8073,14 +7988,7 @@
         <disk name="desire (disc 1 of 2) (jap) (dw0241)" sha1="5eb61102f8516c1ba3fd8bccbb30a87063502d5e" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Desire (Disc 2 of 2) (JAP) (DW0241)... -->
-  <software name="desiredi01" cloneof="desiredi" supported="no">
-    <description>Desire (Disc 2 of 2) (JAP) (DW0241)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="desire (disc 2 of 2) (jap) (dw0241)" sha1="7eee4909a9000f77876d025a53c2fb0b24b61696" />
       </diskarea>
@@ -8088,8 +7996,9 @@
   </software>
 
   <!-- Identifying Devil Summoner Soul Hackers (Disc 1 of 2) (JAP) (DW0483)... -->
-  <software name="devilsum03" cloneof="devilsum" supported="no">
-    <description>Devil Summoner Soul Hackers (Disc 1 of 2) (JAP) (DW0483)</description>
+  <!-- Identifying Devil Summoner Soul Hackers (Disc 2 of 2) (JAP) (DW0483)... -->
+  <software name="dsumsoula" cloneof="dsumsoul" supported="no">
+    <description>Devil Summoner Soul Hackers (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8097,23 +8006,18 @@
         <disk name="devil summoner soul hackers (disc 1 of 2) (jap) (dw0483)" sha1="233d4f7d30ce104cd5a7b428f78308b705d292da" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Devil Summoner Soul Hackers (Disc 2 of 2) (JAP) (DW0483)... -->
-  <software name="devilsum04" cloneof="devilsum" supported="no">
-    <description>Devil Summoner Soul Hackers (Disc 2 of 2) (JAP) (DW0483)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="devil summoner soul hackers (disc 2 of 2) (jap) (dw0483)" sha1="fc69369c40ed7fae88e78b6d5337ca72ca167a55" />
       </diskarea>
     </part>
   </software>
 
+
+
   <!-- Identifying Digital Dance Mix Vol.1 - Namie Amuro (JAP) (DW0475)... -->
-  <software name="digitalda" cloneof="digitald" supported="no">
-    <description>Digital Dance Mix Vol.1 - Namie Amuro (JAP) (DW0475)</description>
+  <software name="digidanca" cloneof="digidanc" supported="no">
+    <description>Digital Dance Mix Vol.1 - Namie Amuro (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8124,8 +8028,8 @@
   </software>
 
   <!-- Identifying Digital Pinball Last Gladiators Taikenban (JAP) (DW0871)... -->
-  <software name="digitalp02" cloneof="digitalp" supported="no">
-    <description>Digital Pinball Last Gladiators Taikenban (JAP) (DW0871)</description>
+  <software name="digpintai" cloneof="digpin" supported="no">
+    <description>Digital Pinball Last Gladiators Taikenban (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8136,7 +8040,7 @@
   </software>
 
   <!-- Identifying Digital Pinball Necronomicon Taikenban (JAP) (DW0872)... -->
-  <software name="digitalp03" cloneof="digitalp" supported="no">
+  <software name="dpnecrotai" cloneof="dpnecro" supported="no">
     <description>Digital Pinball Necronomicon Taikenban (JAP) (DW0872)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -8148,8 +8052,8 @@
   </software>
 
   <!-- Identifying DJ Wars (JAP) (DW0937)... -->
-  <software name="djwarsja" supported="no">
-    <description>DJ Wars (JAP) (DW0937)</description>
+  <software name="djwars" supported="no">
+    <description>DJ Wars (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8160,7 +8064,7 @@
   </software>
 
   <!-- Identifying DJ Wars Taikenban (JAP) (DW0873)... -->
-  <software name="djwarsta" supported="no">
+  <software name="djwarstai" cloneof="djwars" supported="no">
     <description>DJ Wars Taikenban (JAP) (DW0873)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -8173,7 +8077,7 @@
 
   <!-- Identifying DonPachi (JAP) (DW0635)... -->
   <software name="donpachia" cloneof="donpachi" supported="no">
-    <description>DonPachi (JAP) (DW0635)</description>
+    <description>DonPachi (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8185,7 +8089,7 @@
 
   <!-- Identifying Doukoku Soshite... (JAP) (DW0313)... -->
   <software name="doukokus" supported="no">
-    <description>Doukoku Soshite... (JAP) (DW0313)</description>
+    <description>Doukoku Soshite... (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8208,8 +8112,9 @@
   </software>
 
   <!-- Identifying Doukyuusei 2 (Disc 1 of 2) (JAP) (DW0307)... -->
-  <software name="doukyuus03" cloneof="doukyuus" supported="no">
-    <description>Doukyuusei 2 (Disc 1 of 2) (JAP) (DW0307)</description>
+  <!-- Identifying Doukyuusei 2 (Disc 2 of 2) (JAP) (DW0307)... -->
+  <software name="douky2a" cloneof="douky2" supported="no">
+    <description>Doukyuusei 2 (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8217,22 +8122,16 @@
         <disk name="doukyuusei 2 (disc 1 of 2) (jap) (dw0307)" sha1="8b6fcf94f7dc5913cd2cc24ce16e2128a2d7d146" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Doukyuusei 2 (Disc 2 of 2) (JAP) (DW0307)... -->
-  <software name="doukyuus04" cloneof="doukyuus" supported="no">
-    <description>Doukyuusei 2 (Disc 2 of 2) (JAP) (DW0307)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="doukyuusei 2 (disc 2 of 2) (jap) (dw0307)" sha1="e44f2c277f2ed8cdec6f31576fb6696f0c7f33ea" />
       </diskarea>
     </part>
   </software>
 
+
   <!-- Identifying Dragon Ball Z - Shinbutohden (JAP) (DW0102)... -->
-  <software name="dragonbaa" cloneof="dragonba" supported="no">
+  <software name="dbzshina" cloneof="dbzshin" supported="no">
     <description>Dragon Ball Z - Shinbutohden (JAP) (DW0102)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -8244,8 +8143,8 @@
   </software>
 
   <!-- Identifying Dragon Force II (JAP) (v1.007) (DW0520)... -->
-  <software name="dragonfo03" cloneof="dragonfo" supported="no">
-    <description>Dragon Force II (JAP) (v1.007) (DW0520)</description>
+  <software name="dragfrc2a" cloneof="dragfrc2" supported="no">
+    <description>Dragon Force II (JAP) (v1.007)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8340,8 +8239,11 @@
   </software>
 
   <!-- Identifying Enemy Zero (Disc 0 of 4) (JAP) (DW0512)... -->
-  <software name="enemyzer11" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Disc 0 of 4) (JAP) (DW0512)</description>
+  <!-- Identifying Enemy Zero (Disc 1 of 4) (JAP) (DW0512)... -->
+  <!-- Identifying Enemy Zero (Disc 2 of 4) (JAP) (DW0512)... -->
+  <!-- Identifying Enemy Zero (Disc 3 of 4) (JAP) (DW0512)... -->
+  <software name="enemy0" supported="no">
+    <description>Enemy Zero (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -8349,43 +8251,23 @@
         <disk name="enemy zero (disc 0 of 4) (jap) (dw0512)" sha1="6379fb365e308ebcbf3f25daa9f9126fc692ceb3" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Disc 1 of 4) (JAP) (DW0512)... -->
-  <software name="enemyzer12" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Disc 1 of 4) (JAP) (DW0512)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (disc 1 of 4) (jap) (dw0512)" sha1="38b848d4ab8d30fc35e3f2ea4bd3318bb2f9b00e" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Disc 2 of 4) (JAP) (DW0512)... -->
-  <software name="enemyzer13" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Disc 2 of 4) (JAP) (DW0512)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom3" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (disc 2 of 4) (jap) (dw0512)" sha1="aafa52ab88d695acfe786e9dfe4f2c014a267a2b" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero (Disc 3 of 4) (JAP) (DW0512)... -->
-  <software name="enemyzer14" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero (Disc 3 of 4) (JAP) (DW0512)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom4" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero (disc 3 of 4) (jap) (dw0512)" sha1="764c9b7adb8cb2306bcda561ff8b223b1b3b736a" />
       </diskarea>
     </part>
   </software>
+
 
   <!-- Identifying Eternal Melody (JAP) (v1.002) (DW0603)... -->
   <software name="eternalm" supported="no">
@@ -8436,7 +8318,7 @@
   </software>
 
   <!-- Identifying Fighters Megamix (JAP) (DW0015)... -->
-  <software name="fightersa" cloneof="fighters" supported="no">
+  <software name="fmegamixa" cloneof="fmegamix" supported="no">
     <description>Fighters Megamix (JAP) (DW0015)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -8448,7 +8330,7 @@
   </software>
 
   <!-- Identifying Fighting Vipers (JAP) (DW0064)... -->
-  <software name="fighting03" cloneof="fighting" supported="no">
+  <software name="fvipersc" cloneof="fvipers" supported="no">
     <description>Fighting Vipers (JAP) (DW0064)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -8460,7 +8342,7 @@
   </software>
 
   <!-- Identifying Fighting Vipers Taikenban (JAP) (DW0877)... -->
-  <software name="fighting04" cloneof="fighting" supported="no">
+  <software name="fviperstai" cloneof="fvipers" supported="no">
     <description>Fighting Vipers Taikenban (JAP) (DW0877)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -10212,8 +10094,8 @@
   </software>
 
   <!-- Identifying Samurai Spirits Amakusa Kourin (JAP) (DW0141)... -->
-  <software name="samuraisa" cloneof="samurais" supported="no">
-    <description>Samurai Spirits Amakusa Kourin (JAP) (DW0141)</description>
+  <software name="samsho4a" cloneof="samsho4" supported="no">
+    <description>Samurai Spirits Amakusa Kourin (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -10380,8 +10262,8 @@
   </software>
 
   <!-- Identifying Shin Megami Tensei Devil Summoner (JAP) (v1.000) (DW0417)... -->
-  <software name="shinmegaa" cloneof="shinmega" supported="no">
-    <description>Shin Megami Tensei Devil Summoner (JAP) (v1.000) (DW0417)</description>
+  <software name="sdvsuma" cloneof="sdvsum" supported="no">
+    <description>Shin Megami Tensei Devil Summoner (JAP) (v1.000)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -10495,8 +10377,8 @@
 
 
   <!-- Identifying Shinsetsu Samurai Spirits Bushidou Retsuden (JAP) (DW0434)... -->
-  <software name="shinsetsa" cloneof="shinsets" supported="no">
-    <description>Shinsetsu Samurai Spirits Bushidou Retsuden (JAP) (DW0434)</description>
+  <software name="samshrpga" cloneof="samshrpg" supported="no">
+    <description>Shinsetsu Samurai Spirits Bushidou Retsuden (JAP)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -12785,7 +12667,7 @@
   </software>
 
   <!-- Identifying D-Xhird (T-10307G)... -->
-  <software name="dxhirdt1" supported="no">
+  <software name="dxhird" supported="no">
     <description>D-Xhird (T-10307G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -12797,7 +12679,7 @@
   </software>
 
   <!-- Identifying Daibouken - Saint Elmos no Kiseki (T-23101G)... -->
-  <software name="daibouke" supported="no">
+  <software name="daistelm" supported="no">
     <description>Daibouken - Saint Elmos no Kiseki (T-23101G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -12809,7 +12691,7 @@
   </software>
 
   <!-- Identifying Daikoukai Jidai Gaiden (T-7657G)... -->
-  <software name="daikoukaa" cloneof="daikouka" supported="no">
+  <software name="daijidga" supported="no">
     <description>Daikoukai Jidai Gaiden (T-7657G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -12821,7 +12703,7 @@
   </software>
 
   <!-- Identifying Daina Airan (T-4503G)... -->
-  <software name="dainaaira" cloneof="dainaair" supported="no">
+  <software name="dinoisla" cloneof="dinoisl" supported="no">
     <description>Daina Airan (T-4503G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -12833,7 +12715,7 @@
   </software>
 
   <!-- Identifying Daisenriyaku Strong Style (J) (T-21202G)... -->
-  <software name="daisenri" supported="no">
+  <software name="daisenss" supported="no">
     <description>Daisenriyaku Strong Style (J) (T-21202G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -12845,8 +12727,9 @@
   </software>
 
   <!-- Identifying Daisuki Disc 1 (T-18510G)... -->
-  <software name="daisukid" supported="no">
-    <description>Daisuki Disc 1 (T-18510G)</description>
+  <!-- Identifying Daisuki Disc 2 (T-18510G)... -->
+  <software name="daisukia" cloneof="daisuki" supported="no">
+    <description>Daisuki (T-18510G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -12854,19 +12737,14 @@
         <disk name="daisuki disc 1 (t-18510g)" sha1="b3cd93f744d43cd6116d4433c83b7b134eb081dd" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Daisuki Disc 2 (T-18510G)... -->
-  <software name="daisukid01" cloneof="daisukid" supported="no">
-    <description>Daisuki Disc 2 (T-18510G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="daisuki disc 2 (t-18510g)" sha1="8b28a6e78e8225f839f67f75a3a62267585617b0" />
       </diskarea>
     </part>
   </software>
+
+
 
   <!-- Identifying Daitoride (T-29201G)... -->
   <software name="daitorid" supported="no">
@@ -12881,8 +12759,8 @@
   </software>
 
   <!-- Identifying Dark Hunter Jou Ijigen Gakuen (T-7631G)... -->
-  <software name="darkhunt" supported="no">
-    <description>Dark Hunter Jou Ijigen Gakuen (T-7631G)</description>
+  <software name="dhuntjou" supported="no">
+    <description>Dark Hunter: Jou Ijigen Gakuen (Japan) [T-7631G]</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -12905,8 +12783,8 @@
   </software>
 
   <!-- Identifying Dark Seed 2 (J) (T-36101)... -->
-  <software name="darkseeda" cloneof="darkseed" supported="no">
-    <description>Dark Seed 2 (J) (T-36101)</description>
+  <software name="darksee2a" cloneof="darksee2" supported="no">
+    <description>Dark Seed II (J) (T-36101)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -12917,7 +12795,7 @@
   </software>
 
   <!-- Identifying Daytona USA Circuit Edition (GS-9100)... -->
-  <software name="daytonaub" cloneof="daytonau" supported="no">
+  <software name="daytoncea" cloneof="daytonce" supported="no">
     <description>Daytona USA Circuit Edition (GS-9100)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -12953,8 +12831,10 @@
   </software>
 
   <!-- Identifying Death Mask Disc 1 (J) (T-22701G)... -->
-  <software name="deathmas" supported="no">
-    <description>Death Mask Disc 1 (J) (T-22701G)</description>
+  <!-- Identifying Death Mask Disc 2 (J) (T-22701G)... -->
+  <!-- Identifying Death Mask Disc 3 (J) (T-22701G)... -->
+  <software name="deathmsk" supported="no">
+    <description>Death Mask (J) (T-22701G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -12962,31 +12842,20 @@
         <disk name="death mask disc 1 (j) (t-22701g)" sha1="390716ef86817e3fe286687d41b9c78286d12f01" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Death Mask Disc 2 (J) (T-22701G)... -->
-  <software name="deathmas01" cloneof="deathmas" supported="no">
-    <description>Death Mask Disc 2 (J) (T-22701G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="death mask disc 2 (j) (t-22701g)" sha1="1cb10347761955d241f08ec059bfdcce53439186" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Death Mask Disc 3 (J) (T-22701G)... -->
-  <software name="deathmas02" cloneof="deathmas" supported="no">
-    <description>Death Mask Disc 3 (J) (T-22701G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom3" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="death mask disc 3 (j) (t-22701g)" sha1="98d081daa28bd04500219aaed7c311fc5b41b2f9" />
       </diskarea>
     </part>
   </software>
+
+
+
 
   <!-- Identifying Death Throttle (T-26403G)... -->
   <software name="deaththr" supported="no">
@@ -13001,7 +12870,7 @@
   </software>
 
   <!-- Identifying DecAthlete (Satakore) (GS-9150)... -->
-  <software name="decathle02" cloneof="decathle" supported="no">
+  <software name="decathltsa" cloneof="decathlt" supported="no">
     <description>DecAthlete (Satakore) (GS-9150)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13013,7 +12882,7 @@
   </software>
 
   <!-- Identifying DecAthlete for SegaNet (GS-7110)... -->
-  <software name="decathle03" cloneof="decathle" supported="no">
+  <software name="decathltsn" cloneof="decathlt" supported="no">
     <description>DecAthlete for SegaNet (GS-7110)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13045,7 +12914,7 @@
     </software>-->
 
   <!-- Identifying Deka Yonku - Tough The Truck (T-4313G)... -->
-  <software name="dekayonk" supported="no">
+  <software name="toughtrk" supported="no">
     <description>Deka Yonku - Tough The Truck (T-4313G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13081,7 +12950,7 @@
   </software>
 
   <!-- Identifying Densetsu no Ogre Battle (T-5305G)... -->
-  <software name="densetsub" cloneof="densetsu" supported="no">
+  <software name="ogrebatlb" cloneof="ogrebatl" supported="no">
     <description>Densetsu no Ogre Battle (T-5305G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13093,7 +12962,7 @@
   </software>
 
   <!-- Identifying Densha de Go EX (T-10317G)... -->
-  <software name="denshade" supported="no">
+  <software name="dendego" supported="no">
     <description>Densha de Go EX (T-10317G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13117,7 +12986,7 @@
   </software>
 
   <!-- Identifying Destruction Derby (T-18604G)... -->
-  <software name="destruct" supported="no">
+  <software name="dderby" supported="no">
     <description>Destruction Derby (T-18604G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13129,7 +12998,7 @@
   </software>
 
   <!-- Identifying Detana Twinbee Yahho ! Deluxe Pack (T-9505G)... -->
-  <software name="detanatwa" cloneof="detanatw" supported="no">
+  <software name="tbyahhoda" cloneof="tbyahhod" supported="no">
     <description>Detana Twinbee Yahho ! Deluxe Pack (T-9505G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13153,7 +13022,7 @@
   </software>
 
   <!-- Identifying Devil Summoner Soul Hackers - Ronde Otamashi You Sample Ban (610-6704)... -->
-  <software name="devilsums" cloneof="devilsum" supported="no">
+  <software name="dsumsouldemoa" cloneof="dsumsoul" supported="no">
     <description>Devil Summoner Soul Hackers - Ronde Otamashi You Sample Ban (610-6704)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13165,7 +13034,7 @@
   </software>
 
   <!-- Identifying Digital Ange - Dennou Tenshi SS (T-33003G)... -->
-  <software name="digitalaa" cloneof="digitala" supported="no">
+  <software name="digiangea" cloneof="digiange" supported="no">
     <description>Digital Ange - Dennou Tenshi SS (T-33003G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13177,7 +13046,7 @@
   </software>
 
   <!-- Identifying Digital Dance Mix Vol 1 - Namie Amuro (GS-9133)... -->
-  <software name="digitaldb" cloneof="digitald" supported="no">
+  <software name="digidancb" cloneof="digidanc" supported="no">
     <description>Digital Dance Mix Vol 1 - Namie Amuro (GS-9133)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13189,7 +13058,7 @@
   </software>
 
   <!-- Identifying Digital Monster Ver S Digimontamers (J) (T-13331G)... -->
-  <software name="digitalm" supported="no">
+  <software name="digimons" supported="no">
     <description>Digital Monster Ver S Digimontamers (J) (T-13331G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13201,7 +13070,7 @@
   </software>
 
   <!-- Identifying Digital Pinball Last Gladiators (T-18901G)... -->
-  <software name="digitalp04" cloneof="digitalp" supported="no">
+  <software name="digpinb" cloneof="digpin" supported="no">
     <description>Digital Pinball Last Gladiators (T-18901G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13213,7 +13082,7 @@
   </software>
 
   <!-- Identifying Digital Pinball Last Gladiators Ver 9.7 (T-18903G)... -->
-  <software name="digitalp05" cloneof="digitalp" supported="no">
+  <software name="digpin97" supported="no">
     <description>Digital Pinball Last Gladiators Ver 9.7 (T-18903G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13225,7 +13094,7 @@
   </software>
 
   <!-- Identifying DJ Wars (T-18807G)... -->
-  <software name="djwarst1" supported="no">
+  <software name="djwarsa" cloneof="djwars" supported="no">
     <description>DJ Wars (T-18807G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13236,21 +13105,10 @@
     </part>
   </software>
 
+  <!-- Identifying Doukoku Soshite Disc 1 (T-1315G)... -->
   <!-- Identifying Doukoku Soshite Audio Disc (T-1315G)... -->
   <software name="doukokusa" cloneof="doukokus" supported="no">
-    <description>Doukoku Soshite Audio Disc (T-1315G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
-      <diskarea name="cdrom">
-        <disk name="doukoku soshite audio disc (t-1315g)" sha1="1ea8210ebe748f5d33bd103b3c9860b2984223b0" />
-      </diskarea>
-    </part>
-  </software>
-
-  <!-- Identifying Doukoku Soshite Disc 1 (T-1315G)... -->
-  <software name="doukokus01" cloneof="doukokus" supported="no">
-    <description>Doukoku Soshite Disc 1 (T-1315G)</description>
+    <description>Doukoku Soshite (T-1315G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -13258,10 +13116,15 @@
         <disk name="doukoku soshite disc 1 (t-1315g)" sha1="ac771689127cc3fd18e86efe60aec2e84ffd0f48" />
       </diskarea>
     </part>
+    <part name="cdrom2" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="doukoku soshite audio disc (t-1315g)" sha1="1ea8210ebe748f5d33bd103b3c9860b2984223b0" />
+      </diskarea>
+    </part>
   </software>
 
   <!-- Identifying Doukyuusei - If (T-20102G)... -->
-  <software name="doukyuus05" cloneof="doukyuus" supported="no">
+  <software name="doukyifa" cloneof="doukyif" supported="no">
     <description>Doukyuusei - If (T-20102G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13273,8 +13136,9 @@
   </software>
 
   <!-- Identifying Doukyuusei 2 Disc 1 (T-20104G)... -->
-  <software name="doukyuus06" cloneof="doukyuus" supported="no">
-    <description>Doukyuusei 2 Disc 1 (T-20104G)</description>
+  <!-- Identifying Doukyuusei 2 Disc 2 (T-20104G)... -->
+  <software name="douky2b" cloneof="douky2" supported="no">
+    <description>Doukyuusei 2 (T-20104G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -13282,22 +13146,17 @@
         <disk name="doukyuusei 2 disc 1 (t-20104g)" sha1="ff82775e47d3155c8643ef429fb103a12f08cbe2" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Doukyuusei 2 Disc 2 (T-20104G)... -->
-  <software name="doukyuus07" cloneof="doukyuus" supported="no">
-    <description>Doukyuusei 2 Disc 2 (T-20104G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="doukyuusei 2 disc 2 (t-20104g)" sha1="f524239a049eb64d70fb46510805edd68d5791d1" />
       </diskarea>
     </part>
   </software>
 
+
+
   <!-- Identifying Dragon Force (GS-9028)... -->
-  <software name="dragonfo04" cloneof="dragonfo" supported="no">
+  <software name="dragfrcb" cloneof="dragfrc" supported="no">
     <description>Dragon Force (GS-9028)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13309,7 +13168,7 @@
   </software>
 
   <!-- Identifying Dragon Force (Satakore) (GS-9145)... -->
-  <software name="dragonfo05" cloneof="dragonfo" supported="no">
+  <software name="dragfrcsa" cloneof="dragfrc" supported="no">
     <description>Dragon Force (Satakore) (GS-9145)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13333,7 +13192,7 @@
   </software>
 
   <!-- Identifying Dream Square Hinagata Akiko (T-3002G)... -->
-  <software name="dreamsqu" supported="no">
+  <software name="dreamsq" supported="no">
     <description>Dream Square Hinagata Akiko (T-3002G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13345,7 +13204,7 @@
   </software>
 
   <!-- Identifying Druid - Yami-He no Tsuiseki Sha (T-7670G)... -->
-  <software name="druidyam" supported="no">
+  <software name="druid" supported="no">
     <description>Druid - Yami-He no Tsuiseki Sha (T-7670G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13501,8 +13360,12 @@
   </software>
 
   <!-- Identifying Enemy Zero Disc 1 (T-30001G)... -->
-  <software name="enemyzer15" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero Disc 1 (T-30001G)</description>
+  <!-- Identifying Enemy Zero Disc 2 (T-30001G)... -->
+  <!-- Identifying Enemy Zero Disc 3 (T-30001G)... -->
+  <!-- Identifying Enemy Zero Disc 4 (T-30001G)... -->
+
+  <software name="enemy0a" cloneof="enemy0" supported="no">
+    <description>Enemy Zero (T-30001G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -13510,38 +13373,17 @@
         <disk name="enemy zero disc 1 (t-30001g)" sha1="0fb57e054bdda040abdaa51f79d38eaa823293db" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero Disc 2 (T-30001G)... -->
-  <software name="enemyzer16" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero Disc 2 (T-30001G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero disc 2 (t-30001g)" sha1="532cec04ca18ebe561d80ed2c503821e9b21735c" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero Disc 3 (T-30001G)... -->
-  <software name="enemyzer17" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero Disc 3 (T-30001G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom3" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero disc 3 (t-30001g)" sha1="287552dfab91a9f7b791cd70ee95debda7b6058d" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Enemy Zero Disc 4 (T-30001G)... -->
-  <software name="enemyzer18" cloneof="enemyzer" supported="no">
-    <description>Enemy Zero Disc 4 (T-30001G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom4" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="enemy zero disc 4 (t-30001g)" sha1="e1591c0400794d81eaca689a357afb4a522d1fa0" />
       </diskarea>
@@ -13561,7 +13403,7 @@
   </software>
 
   <!-- Identifying F-1 Live Information (GS-9035)... -->
-  <software name="f1livein" supported="no">
+  <software name="f1live" supported="no">
     <description>F-1 Live Information (GS-9035)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13585,7 +13427,7 @@
   </software>
 
   <!-- Identifying FIFA Soccer 96 (J) (T-10606G)... -->
-  <software name="fifasocc" supported="no">
+  <software name="fifa96" supported="no">
     <description>FIFA Soccer 96 (J) (T-10606G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13597,7 +13439,7 @@
   </software>
 
   <!-- Identifying Fighters Megamix (GS-9126)... -->
-  <software name="fightersb" cloneof="fighters" supported="no">
+  <software name="fmegamixb" cloneof="fmegamix" supported="no">
     <description>Fighters Megamix (GS-9126)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -13609,8 +13451,9 @@
   </software>
 
   <!-- Identifying Find Love 2 - Rhapsody Disc 1 (T-34605G)... -->
-  <software name="findlovea" cloneof="findlove" supported="no">
-    <description>Find Love 2 - Rhapsody Disc 1 (T-34605G)</description>
+  <!-- Identifying Find Love 2 - Rhapsody Disc 2 (T-34605G)... -->
+  <software name="flove2ra" supported="no">
+    <description>Find Love 2 - Rhapsody (T-34605G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -13618,22 +13461,17 @@
         <disk name="find love 2 - rhapsody disc 1 (t-34605g)" sha1="21ecdcf603906c7f9bf1f88ab1a35a69b621baca" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Find Love 2 - Rhapsody Disc 2 (T-34605G)... -->
-  <software name="findlove01" cloneof="findlove" supported="no">
-    <description>Find Love 2 - Rhapsody Disc 2 (T-34605G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="find love 2 - rhapsody disc 2 (t-34605g)" sha1="5a360797b165b6d43556df126823f45958e39e8d" />
       </diskarea>
     </part>
   </software>
 
+
+
   <!-- Identifying Find Love 2 - The Prologue (T-34604G)... -->
-  <software name="findlove02" cloneof="findlove" supported="no">
+  <software name="flove2pra" cloneof="flove2pr" supported="no">
     <description>Find Love 2 - The Prologue (T-34604G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -14925,7 +14763,7 @@
   </software>
 
   <!-- Identifying Kumitate Battle Kuttu Ketto (T-1813G)... -->
-  <software name="kumitate" supported="no">
+  <software name="kuttuket" supported="no">
     <description>Kumitate Battle Kuttu Ketto (T-1813G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -15909,8 +15747,9 @@
   </software>
 
   <!-- Identifying Samurai Spirits Zankourou Musouken (Doukonban) (T-3104G)... -->
-  <software name="samuraisb" cloneof="samurais" supported="no">
-    <description>Samurai Spirits Zankourou Musouken (Doukonban) (T-3104G)</description>
+  <!-- Identifying Samurai Spirits Zankourou Musouken (T-3106G)... -->
+  <software name="samsho3" supported="no">
+    <description>Samurai Spirits Zankourou Musouken (T-3106G) / Samurai Spirits Zankourou Musouken (Doukonban) (T-3104G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -15920,20 +15759,9 @@
     </part>
   </software>
 
-  <!-- Identifying Samurai Spirits Zankourou Musouken (T-3106G)... -->
-  <!--<software name="samurais01" cloneof="samurais" supported="no">
-      <description>Samurai Spirits Zankourou Musouken (T-3106G)</description>
-      <year>199?</year>
-      <publisher>unknown</publisher>
-      <part name="cdrom" interface="sat_cdrom">
-        <diskarea name="cdrom">
-          <disk name="samurai spirits zankourou musouken (t-3106g)" sha1="6d46595e99d9564dbd6eef0d180b689373181072" />
-        </diskarea>
-      </part>
-    </software>-->
 
   <!-- Identifying Sangokushi IV with Power Up Kit (T-7644G)... -->
-  <software name="sangokusa" cloneof="sangokus" supported="no">
+  <software name="sang4puk" cloneof="sang4" supported="no">
     <description>Sangokushi IV with Power Up Kit (T-7644G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -16173,7 +16001,7 @@
   </software>
 
   <!-- Identifying Shin Megami Tensai Devil Summoner - Azuma Zensho (T-14406G)... -->
-  <software name="shinmega02" cloneof="shinmega" supported="no">
+  <software name="sdvsumaza" cloneof="sdvsumaz" supported="no">
     <description>Shin Megami Tensai Devil Summoner - Azuma Zensho (T-14406G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -16184,20 +16012,12 @@
     </part>
   </software>
 
-  <!-- Identifying Shin Megami Tensei Devil Summoner Special Box Audio Disc (T-14408G)... -->
-  <software name="shinmega03" cloneof="shinmega" supported="no">
-    <description>Shin Megami Tensei Devil Summoner Special Box Audio Disc (T-14408G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
-      <diskarea name="cdrom">
-        <disk name="shin megami tensei devil summoner special box audio disc (t-14408g)" sha1="639c6abb1576124c978a9e33ef86af6d9906ab34" />
-      </diskarea>
-    </part>
-  </software>
+
 
   <!-- Identifying Shin Megami Tensei Devil Summoner Special Box Disc 1 (T-14408G)... -->
-  <software name="shinmega04" cloneof="shinmega" supported="no">
+  <!-- Identifying Shin Megami Tensei Devil Summoner Special Box Disc 2 (T-14408G)... -->
+  <!-- Identifying Shin Megami Tensei Devil Summoner Special Box Audio Disc (T-14408G)... -->
+  <software name="sdvsumspec" cloneof="sdvsum" supported="no">
     <description>Shin Megami Tensei Devil Summoner Special Box Disc 1 (T-14408G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -16206,19 +16026,19 @@
         <disk name="shin megami tensei devil summoner special box disc 1 (t-14408g)" sha1="c49a21f16458b1b1bfae2238583b9c8dba38ac75" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Shin Megami Tensei Devil Summoner Special Box Disc 2 (T-14408G)... -->
-  <software name="shinmega05" cloneof="shinmega" supported="no">
-    <description>Shin Megami Tensei Devil Summoner Special Box Disc 2 (T-14408G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="shin megami tensei devil summoner special box disc 2 (t-14408g)" sha1="5ea516ec63ac19a87f97762c2811d43a776d6abc" />
       </diskarea>
     </part>
+    <part name="cdrom3" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="shin megami tensei devil summoner special box audio disc (t-14408g)" sha1="639c6abb1576124c978a9e33ef86af6d9906ab34" />
+      </diskarea>
+    </part>
   </software>
+
+
 
   <!-- Identifying Shin Ou Ken (T-3113G)... -->
   <software name="shinouke" supported="no">
@@ -16257,7 +16077,7 @@
   </software>
 
   <!-- Identifying Shinsetsu Samurai Spirits Bushidou Retsuden (T-3112G)... -->
-  <software name="shinsetsb" cloneof="shinsets" supported="no">
+  <software name="samshrpgb" cloneof="samshrpg" supported="no">
     <description>Shinsetsu Samurai Spirits Bushidou Retsuden (T-3112G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -18167,8 +17987,9 @@
   </software>
 
   <!-- Identifying D no Shokutaku Disc 1 (T-8101G)... -->
-  <software name="dnoshoku04" cloneof="dnoshoku" supported="no">
-    <description>D no Shokutaku Disc 1 (T-8101G)</description>
+  <!-- Identifying D no Shokutaku Disc 2 (T-8101G)... -->
+  <software name="dnoshob" cloneof="dnosho" supported="no">
+    <description>D no Shokutaku (T-8101G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -18176,13 +17997,6 @@
         <disk name="d no shokutaku disc 1 (t-8101g)" sha1="d54f2589ccb8c66af6edeecab0c55f07c1afa657" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying D no Shokutaku Disc 2 (T-8101G)... -->
-  <software name="dnoshoku05" cloneof="dnoshoku" supported="no">
-    <description>D no Shokutaku Disc 2 (T-8101G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="d no shokutaku disc 2 (t-8101g)" sha1="6a5d7e4d9e1f82b40e3e8ea5804880550806888f" />
@@ -18190,8 +18004,9 @@
     </part>
   </software>
 
+
   <!-- Identifying Dead or Alive (T-3603G)... -->
-  <software name="deadoralz" cloneof="deadoral" supported="no">
+  <software name="doab" cloneof="doa" supported="no">
     <description>Dead or Alive (T-3603G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -18203,7 +18018,7 @@
   </software>
 
   <!-- Identifying Dejig Aqua World (T-30303G)... -->
-  <software name="dejigaqu" supported="no">
+  <software name="dejigaqw" supported="no">
     <description>Dejig Aqua World (T-30303G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -18239,8 +18054,9 @@
   </software>
 
   <!-- Identifying Desire Disc 1 (T-15031G)... -->
-  <software name="desirediz" cloneof="desiredi" supported="no">
-    <description>Desire Disc 1 (T-15031G)</description>
+  <!-- Identifying Desire Disc 2 (T-15031G)... -->
+  <software name="desirea" cloneof="desire" supported="no">
+    <description>Desire (T-15031G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -18248,22 +18064,16 @@
         <disk name="desire disc 1 (t-15031g)" sha1="9dc08ba54a9ba8d7df3c75c88a0476da64ec4814" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Desire Disc 2 (T-15031G)... -->
-  <software name="desirediz01" cloneof="desiredi" supported="no">
-    <description>Desire Disc 2 (T-15031G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="desire disc 2 (t-15031g)" sha1="5730ef844b8ac4df4526ebdf4eeeb1c658bc653a" />
       </diskarea>
     </part>
   </software>
 
+
   <!-- Identifying Devil Summoner Soul Hackers - Akuma Zensho Daini Syuu (T-14421G)... -->
-  <software name="devilsumz" cloneof="devilsum" supported="no">
+  <software name="dsumshaz" supported="no">
     <description>Devil Summoner Soul Hackers - Akuma Zensho Daini Syuu (T-14421G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -18275,8 +18085,8 @@
   </software>
 
   <!-- Identifying Devil Summoner Soul Hackers Disc 1 (T-14420G)... -->
-  <software name="devilsumz01" cloneof="devilsum" supported="no">
-    <description>Devil Summoner Soul Hackers Disc 1 (T-14420G)</description>
+  <software name="dsumsoulb" cloneof="dsumsoul" supported="no">
+    <description>Devil Summoner Soul Hackers (T-14420G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -18284,22 +18094,16 @@
         <disk name="devil summoner soul hackers disc 1 (t-14420g)" sha1="66d84a44ee8b518dd64536fba2623f415fe4b21d" />
       </diskarea>
     </part>
-  </software>
-
-  <!-- Identifying Devil Summoner Soul Hackers Disc 2 (T-14420G)... -->
-  <software name="devilsumz02" cloneof="devilsum" supported="no">
-    <description>Devil Summoner Soul Hackers Disc 2 (T-14420G)</description>
-    <year>199?</year>
-    <publisher>unknown</publisher>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="devil summoner soul hackers disc 2 (t-14420g)" sha1="d2e375fee5ff7b52b244dc5fd5197b813e5eca23" />
       </diskarea>
     </part>
   </software>
 
+
   <!-- Identifying Dragon Master Silk (T-19503G)... -->
-  <software name="dragonma" supported="no">
+  <software name="dmsilk" supported="no">
     <description>Dragon Master Silk (T-19503G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -18371,7 +18175,7 @@
   </software>
 
   <!-- Identifying Fighting Vipers (GS-9101)... -->
-  <software name="fightingz" cloneof="fighting" supported="no">
+  <software name="fvipersd" cloneof="fvipers" supported="no">
     <description>Fighting Vipers (GS-9101)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20659,7 +20463,7 @@
   </software>
 
   <!-- Identifying Sangokushi Eiketsuden (J) (T-7613G)... -->
-  <software name="sangokusz" cloneof="sangokus" supported="no">
+  <software name="sangeikea" cloneof="sangeike" supported="no">
     <description>Sangokushi Eiketsuden (J) (T-7613G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20671,7 +20475,7 @@
   </software>
 
   <!-- Identifying Sangokushi IV (J) (T-7601G)... -->
-  <software name="sangokusz01" cloneof="sangokus" supported="no">
+  <software name="sang4" supported="no">
     <description>Sangokushi IV (J) (T-7601G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20683,7 +20487,7 @@
   </software>
 
   <!-- Identifying Sangokushi Koumeiden (J) (T-7629G)... -->
-  <software name="sangokusz02" cloneof="sangokus" supported="no">
+  <software name="sangkouma" cloneof="sangkoum" supported="no">
     <description>Sangokushi Koumeiden (J) (T-7629G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20695,7 +20499,7 @@
   </software>
 
   <!-- Identifying Sangokushi Returns (T-7617G)... -->
-  <software name="sangokusz03" cloneof="sangokus" supported="no">
+  <software name="sangret" supported="no">
     <description>Sangokushi Returns (T-7617G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20707,7 +20511,7 @@
   </software>
 
   <!-- Identifying Sangokushi V (J) (T-7623G)... -->
-  <software name="sangokusz04" cloneof="sangokus" supported="no">
+  <software name="sang5" supported="no">
     <description>Sangokushi V (J) (T-7623G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -20827,7 +20631,7 @@
   </software>
 
   <!-- Identifying Shin Megami Tensei Devil Summoner (T-14403G)... -->
-  <software name="shinmegaz" cloneof="shinmega" supported="no">
+  <software name="sdvsumb" cloneof="sdvsum" supported="no">
     <description>Shin Megami Tensei Devil Summoner (T-14403G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -21815,7 +21619,7 @@
   </software>
 
   <!-- Identifying Dragonball Z Idainaru Dragon Ball Densetsu (T-13305G)... -->
-  <software name="dragonbaz" cloneof="dragonba" supported="no">
+  <software name="dbzidb" supported="no">
     <description>Dragonball Z Idainaru Dragon Ball Densetsu (T-13305G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -22355,7 +22159,7 @@
   </software>
 
   <!-- Identifying Shin Megami Tensei Devil Summoner (Satakore) (T-14417G)... -->
-  <software name="shinmegax" cloneof="shinmega" supported="no">
+  <software name="sdvsumsak" cloneof="sdvsum" supported="no">
     <description>Shin Megami Tensei Devil Summoner (Satakore) (T-14417G)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -22864,8 +22668,8 @@
   </software>
 
   <!-- Identifying DarkHunterGeYoumaNoMori... -->
-  <software name="darkhuntz" cloneof="darkhunt" supported="no">
-    <description>Dark Hunter Ge Youma No Mori</description>
+  <software name="dhuntge" supported="no">
+    <description>Dark Hunter: Ge Youma no Mori (Japan) [T-7632G]</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -22876,7 +22680,7 @@
   </software>
 
   <!-- Identifying DarkSavior... -->
-  <software name="darksaviz" cloneof="darksavi" supported="no">
+  <software name="darksavic" cloneof="darksavi" supported="no">
     <description>Dark Savior</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -22900,8 +22704,8 @@
   </software>
 
   <!-- Identifying DinosaurIslandYokokuHen... -->
-  <software name="dinosaur" supported="no">
-    <description>Dinosaur Island Yokoku Hen</description>
+  <software name="dinoislyokoa" cloneof="dinoisl" supported="no">
+    <description>Daina Airan: Yokoku-hen (Japan) [T-4505G] (set 2)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
@@ -22975,7 +22779,7 @@
   </software>
 
   <!-- Identifying FILN_LOVE... -->
-  <software name="filnlove" supported="no">
+  <software name="findlove" supported="no">
     <description>Zenkoku Seifuku Bishoujo Grand Prix Find Love (Japan)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
@@ -23798,6 +23602,125 @@
     </part>
   </software>
 
+  <!-- Identifying Cube Battler Story of Anna (Japan) [T-21006G]... -->
+  <software name="cubeanna" supported="no">
+    <description>Cube Battler Story of Anna (Japan) [T-21006G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="cube battler story of anna (japan) [t-21006g]" sha1="888c047659054d0f80440412871f59cf090988e8" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Hyper Reverthion (Japan) [T-1803G]... -->
+  <software name="hyperrev" supported="no">
+    <description>Hyper Reverthion (Japan) [T-1803G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="hyper reverthion (japan) [t-1803g]" sha1="4c56db1ea8ac230982511fbf4271b1ed89df11fc" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Minami no Shima ni Buta ga Ita Lucas no Daibouken (Japan) [T-27101G]... -->
+  <software name="minamino" supported="no">
+    <description>Minami no Shima ni Buta ga Ita Lucas no Daibouken (Japan) [T-27101G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="minami no shima ni buta ga ita lucas no daibouken (japan) [t-27101g]" sha1="e81b966362eb443cc16f842737f32639392c2fc9" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Ninja Jajamaru-kun Onigiri Ninpouchou Gold (Japan) [T-5709G]... -->
+  <software name="ninjaja" supported="no">
+    <description>Ninja Jajamaru-kun Onigiri Ninpouchou Gold (Japan) [T-5709G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="ninja jajamaru-kun onigiri ninpouchou gold (japan) [t-5709g]" sha1="e73519b1264a765cbf90b093722339b0c70560f3" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Shadows of the Tusk (Japan) [T-14319G]... -->
+  <software name="shadtusk" supported="no">
+    <description>Shadows of the Tusk (Japan) [T-14319G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="shadows of the tusk (japan) [t-14319g]" sha1="2457131b38f8218075237764c31a5bcc8eeb5b37" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Sokkou Seitokai Sonic Council (Japan) [T-20611G] (iso-mp3 sourced)... -->
+  <software name="scouncil" supported="no">
+    <description>Sokkou Seitokai Sonic Council (Japan) [T-20611G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="sokkou seitokai sonic council (japan) [t-20611g] (iso-mp3 sourced)" sha1="149fa9b129567bad580e01ce4a05f88a37c6491e" status="baddump" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Taito Chase H.Q. + S.C.I. (Japan) [T-1105G]... -->
+  <software name="chasehqs" supported="no">
+    <description>Taito Chase H.Q. + S.C.I. (Japan) [T-1105G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="taito chase h.q. + s.c.i. (japan) [t-1105g]" sha1="85be66626c4846d3ee98b2dd8c541ae84da025c9" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Darius II (Japan) [T-1104G] (iso-ogg sourced)... -->
+  <software name="darius2" supported="no">
+    <description>Darius II (Japan) [T-1104G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="darius ii (japan) [t-1104g] (iso-ogg sourced)" sha1="b37f69f2509cc678e9413fb632a140288198e8b1" status="baddump" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Defcon 5 (Japan) [T-24101G]... -->
+  <software name="defcon5" supported="no">
+    <description>Defcon 5 (Japan) [T-24101G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="defcon 5 (japan) [t-24101g]" sha1="f0d2760063163265648e6a3409760184002980a2" />
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- Identifying Dungeon Master Nexus (Japan) [T-9111G]... -->
+  <software name="dungeonm" supported="no">
+    <description>Dungeon Master Nexus (Japan) [T-9111G]</description>
+    <year>199?</year>
+    <publisher>unknown</publisher>
+    <part name="cdrom" interface="sat_cdrom">
+      <diskarea name="cdrom">
+        <disk name="dungeon master nexus (japan) [t-9111g]" sha1="2727610cdcf470e0146126f6224c6f1c2ac4d781" />
+      </diskarea>
+    </part>
+  </software>
 
 
 
