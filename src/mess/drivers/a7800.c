@@ -291,6 +291,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a7800")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC")
 MACHINE_CONFIG_END
 
 
@@ -314,6 +315,11 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 	/* devices */
 	MCFG_DEVICE_REMOVE("riot")
 	MCFG_RIOT6532_ADD("riot", 3546894/3, a7800_r6532_interface)
+
+	/* software lists */
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","a7800")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","PAL")
 MACHINE_CONFIG_END
 
 
