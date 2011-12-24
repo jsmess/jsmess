@@ -6,10 +6,10 @@
     <!-- Game disks -->
 
 	<software name="simulwar">
-        <!-- Alt. Title: 蒼き狼と白き牝鹿 -->
 		<description>Aoki Ookami to Shiroki Mejika - Simulation War Game</description>
 		<year>1985</year>
-		<publisher>Koei</publisher>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="蒼き狼と白き牝鹿"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -25,10 +25,10 @@
 	</software>
 
 	<software name="arion">
-        <!-- Alt. Title: ネオ・ヒロイック・ファンタジア・アリオン -->
 		<description>Neo Heroic Fantasia Arion</description>
 		<year>198?</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ネオ・ヒロイック・ファンタジア・アリオン"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692656">
@@ -52,7 +52,7 @@
 	<software name="blckonyx">
 		<description>The Black Onyx</description>
 		<year>1985</year>
-		<publisher>BPS</publisher>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692656">
@@ -62,10 +62,10 @@
 	</software>
 
 	<software name="eiyuuden">
-        <!-- Alt. Title: 英雄伝説サーガ -->
 		<description>Eiyuu Densetsu Saga</description>
 		<year>198?</year>
 		<publisher>Arrow Soft</publisher>
+		<info name="alt_title" value="英雄伝説サーガ"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -83,7 +83,7 @@
 	<software name="excitbik">
 		<description>Excite Bike</description>
 		<year>1985</year>
-		<publisher>Nintendo / Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="98624">
@@ -95,7 +95,7 @@
 	<software name="firecrys">
 		<description>The Fire Crystal</description>
 		<year>198?</year>
-		<publisher>BPS</publisher>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692656">
@@ -105,10 +105,10 @@
 	</software>
 
 	<software name="gomokuna">
-        <!-- Alt. Title: 五目並べ -->
 		<description>Gomoku Narabe</description>
 		<year>198?</year>
 		<publisher>Renju</publisher>
+		<info name="alt_title" value="五目並べ"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -140,7 +140,7 @@
 			</dataarea>
 		</part>
 
-        <!-- original disk 2 filename: ﾃｩ-ﾃｼ`ﾃｩﾃ榲ｩﾃｭﾃｩﾃ凝ｩﾂｺﾃｩ-ﾃｩﾂ｡ﾃｩﾃ.D88 -->
+		<!-- original disk 2 filename: ﾃｩ-ﾃｼ`ﾃｩﾃ榲ｩﾃｭﾃｩﾃ凝ｩﾂｺﾃｩ-ﾃｩﾂ｡ﾃｩﾃ.D88 -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="disk2.d88" size="697008" crc="23378860" sha1="885ec9eaf69fcae97e47587b4beb68ad46bbf719" offset="0" />
@@ -239,10 +239,10 @@
 	</software>
 
 	<software name="mugen">
-        <!-- Alt. Title: 夢幻の心臓 -->
 		<description>Mugen no Shinzou</description>
 		<year>198?</year>
-		<publisher>Xtal Soft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<info name="alt_title" value="夢幻の心臓"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="696736">
@@ -252,10 +252,10 @@
 	</software>
 
 	<software name="mugen2">
-        <!-- Alt. Title: 夢幻の心臓Ⅱ -->
 		<description>Mugen no Shinzou II</description>
 		<year>198?</year>
-		<publisher>Xtal Soft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<info name="alt_title" value="夢幻の心臓Ⅱ"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="370528">
@@ -285,7 +285,7 @@
 	<software name="nobunaga">
 		<description>Nobunaga no Yabou</description>
 		<year>198?</year>
-		<publisher>Koei</publisher>
+		<publisher>光栄 (Koei)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -297,7 +297,7 @@
 	<software name="pengkunw">
 		<description>Penguin Kun Wars</description>
 		<year>198?</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697424">
@@ -307,10 +307,10 @@
 	</software>
 
 	<software name="promj">
-        <!-- Alt. Title: プロフェッショナル麻雀 -->
 		<description>Professional Mahjong (v2.1)</description>
 		<year>198?</year>
-		<publisher>Chat Noir</publisher>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="65968">
@@ -320,10 +320,10 @@
 	</software>
 
 	<software name="promja" cloneof="promj">
-        <!-- Alt. Title: プロフェッショナル麻雀 -->
 		<description>Professional Mahjong (v2.1, Alt)</description>
 		<year>198?</year>
-		<publisher>Chat Noir</publisher>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="65968">
@@ -359,7 +359,7 @@
 	<software name="druaga">
 		<description>The Tower of Druaga</description>
 		<year>198?</year>
-		<publisher>Dempa Micon Soft</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="695648">
@@ -371,7 +371,7 @@
 	<software name="tritorn">
 		<description>Tritorn</description>
 		<year>198?</year>
-		<publisher>Sein Soft</publisher>
+		<publisher>ザインソフト (Sein Soft)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="545840">
@@ -395,7 +395,7 @@
 	<software name="ys3">
 		<description>Ys 3 - Wanderers from Ys</description>
 		<year>1989</year>
-		<publisher>Falcom</publisher>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="830144">
@@ -729,7 +729,7 @@
 	</software>
 
 	<software name="yukark2">
-        <!-- Original filanames: テ「テ・テシ[テ「Jテ「ティK2 xxxx, with xxx our current names -->
+		<!-- Original filanames: テ「テ・テシ[テ「Jテ「ティK2 xxxx, with xxx our current names -->
 		<description>Yukar K2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>

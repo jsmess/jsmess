@@ -274,7 +274,7 @@
 	</software>
 
 	<software name="chackna" cloneof="chackn">
-		<description>Chack'n Pop (alternate)</description>
+		<description>Chack'n Pop (Alt)</description>
 		<year>19??</year>
 		<publisher>Nidecom / Carry Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
@@ -470,7 +470,7 @@
 	<software name="earthbnd">
 		<description>Earthbound</description>
 		<year>1983</year>
-		<publisher>XTAL Soft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="4055314">
 				<rom name="earthbou.t77" size="4055314" crc="840C5F73" sha1="B225E8FD97EED419380E03E21DBD259A057C5DBF" offset="000000" />
@@ -775,7 +775,7 @@
 
 <!-- ハイドライド - use loadm"",r to load -->
 	<software name="hydlidea" cloneof="hydlide1">
-		<description>Hydlide 1 (alternate)</description>
+		<description>Hydlide 1 (Alt)</description>
 		<year>19??</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
@@ -808,7 +808,7 @@
 	</software>
 
 	<software name="hydlide2a" cloneof="hydlide2">
-		<description>Hydlide 2 (alternate)</description>
+		<description>Hydlide 2 (Alt)</description>
 		<year>19??</year>
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
@@ -981,7 +981,7 @@
 	<software name="lizard">
 		<description>Lizard</description>
 		<year>19??</year>
-		<publisher>Xtalsoft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2444224">
 				<rom name="liz.t77" size="2444224" crc="234F49DF" sha1="70C0B95EE43161B53841E79F89BEBC30F616E992" offset="000000" />
@@ -1091,7 +1091,7 @@
 	<software name="molemole">
 		<description>Mole Mole</description>
 		<year>1985</year>
-		<publisher>Cross Media Soft</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3875684">
 				<rom name="mole.t77" size="3875684" crc="5156B6EE" sha1="AE006F9047ABAC7B4D5FE732870BD4C5849E7D43" offset="000000" />
@@ -1115,7 +1115,7 @@
 	<software name="mu">
 		<description>ムー大陸の謎</description>
 		<year>19??</year>
-		<publisher>Magicalzoo</publisher>
+		<publisher>マジカルズゥ (MagicalZoo)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2637670">
 				<rom name="mu.t77" size="2637670" crc="FB9FEA6F" sha1="E0E0CD9061B970D46F275973DFEF38ECF9DB1F14" offset="000000" />
@@ -1197,7 +1197,7 @@
 	<software name="ougon">
 		<description>黄金の墓</description>
 		<year>1983</year>
-		<publisher>Magicalzoo</publisher>
+		<publisher>マジカルズゥ (MagicalZoo)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="7402016">
 				<rom name="ogon.t77" size="7402016" crc="12A27634" sha1="AB18DF8858E9D6EB121915DD7B1A4C51B24BDFA1" offset="000000" />
@@ -1351,7 +1351,7 @@
 
 <!-- パンチボールマリオ -->
 	<software name="punchbala" cloneof="punchbal">
-		<description>Punch Ball Mario Bros. (alternate)</description>
+		<description>Punch Ball Mario Bros. (Alt)</description>
 		<year>1984</year>
 		<publisher>Kiku / Hudson Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
@@ -1738,7 +1738,7 @@
 	</software>
 
 	<software name="tforcea" cloneof="tforce">
-		<description>Thunder Force (alternate)</description>
+		<description>Thunder Force (Alt)</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
