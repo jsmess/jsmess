@@ -1706,7 +1706,6 @@ almost nothing like the prototype.
 		<description>Plutos (Prototype)</description>
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
-		<info name="serial" value="N/A"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-6" />
 			<dataarea name="rom" size="131072">
@@ -1888,7 +1887,6 @@ almost nothing like the prototype.
 		<description>Sirius (Prototype)</description>
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
-		<info name="serial" value="N/A"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-6" />
 			<dataarea name="rom" size="131072">
