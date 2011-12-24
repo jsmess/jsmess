@@ -54779,7 +54779,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="bsnazo" supported="no">
-		<description>Super Nazo Puyo - Lulu no Luu (Jpn, BS)</description>
+		<description>Super Nazo Puyo - Rulue no Roux (Jpn, BS)</description>
 		<!-- BS -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -55450,6 +55450,18 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="maria - part 1 (bs).bs" size="1048576" crc="c406562f" sha1="52eadd827bdba497bc2b0dc10ccfec4abebc8c0f" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsssold" supported="no">
+		<description>Star Soldier - 2 Minute (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="star soldier 2mins (b).bs" size="1048576" crc="c79c1b8d" sha1="fd81383fbf4fee2cb528e2336c346112f44933c9" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
