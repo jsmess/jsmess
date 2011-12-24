@@ -19,7 +19,7 @@
 	<software name="alde">
 		<description>Aldebaran</description>
 		<year>19??</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="471592">
 				<rom name="alde.t77" size="471592" crc="16DA890C" sha1="BF3979254575EEBBF8E0DD4054B7CE6087402D57" offset="000000" />
@@ -55,7 +55,7 @@
 	<software name="american">
 		<description>American Truck</description>
 		<year>19??</year>
-		<publisher>Telenet Japan</publisher>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="6037920">
 				<rom name="ame.t77" size="6037920" crc="AE5C40F8" sha1="646ED1CEF2B3D57336A77146AADAD83DFF0AFF69" offset="000000" />
@@ -84,7 +84,7 @@
 	<software name="asc">
 		<description>Muscat Arrange</description>
 		<year>1984</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1236938">
 				<rom name="asc1.t77" size="1236938" crc="408B4006" sha1="BDEFAA50DA786E8C8C58DD4A1B697B99DCEEA31F" offset="000000" />
@@ -217,7 +217,7 @@
 	<software name="bokosuka">
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2218190">
 				<rom name="bokosuka.t77" size="2218190" crc="C6989ADE" sha1="72C0592D0A38FAEE036720B48218357BB1EAB1F1" offset="000000" />
@@ -241,7 +241,7 @@
 	<software name="capricrn">
 		<description>南の島のカプリコーン</description>
 		<year>1983</year>
-		<publisher>Tsukumo Denki</publisher>
+		<publisher>ツクモ (Tsukumo)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2693020">
 				<rom name="cap.t77" size="2693020" crc="634256E6" sha1="8AB55C19B72BE26F9A0AE5AB9A4D90A9991EA618" offset="000000" />
@@ -253,7 +253,7 @@
 	<software name="castle">
 		<description>The Castle</description>
 		<year>1985</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3810142">
 				<rom name="cas.t77" size="3810142" crc="33349E08" sha1="EB86133A232960BCB0C5426C2FBB6854B77C8AEF" offset="000000" />
@@ -288,7 +288,7 @@
 	<software name="chima">
 		<description>妖怪探偵ちまちま</description>
 		<year>19??</year>
-		<publisher>Bothtec</publisher>
+		<publisher>ボーステック (Bothtec)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3000980">
 				<rom name="chi.t77" size="3000980" crc="7275CC2C" sha1="7A996AA47A2A828F6FCAB7695C7485E9C8B673F3" offset="000000" />
@@ -324,7 +324,7 @@
 	<software name="coron">
 		<description>Coron</description>
 		<year>19??</year>
-		<publisher>ASCII</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1846176">
 				<rom name="cor.t77" size="1846176" crc="F1B3DBDC" sha1="183C10EB58BAA16F0124DF9EB253AD9FE8DD2B54" offset="000000" />
@@ -360,7 +360,7 @@
 	<software name="denzeni">
 		<description>デゼニランド</description>
 		<year>19??</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="55598">
 				<rom name="dezeni1.t77" size="55598" crc="63299423" sha1="EE0C36FFD66BA06A59108DBB840E185773ACA606" offset="000000" />
@@ -447,7 +447,7 @@
 	<software name="digdug">
 		<description>digdug</description>
 		<year>19??</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="4500408">
 				<rom name="dig.t77" size="4500408" crc="A1C6D6EC" sha1="660DDB5EC6DD60A76055A092D73AA79B79ADFD3F" offset="000000" />
@@ -459,7 +459,7 @@
 	<software name="dslayer">
 		<description>Dragon Slayer</description>
 		<year>19??</year>
-		<publisher>Falcom</publisher>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3586648">
 				<rom name="dragon.t77" size="3586648" crc="407FFCDF" sha1="A85453807A4CC7E11C2A6193CF53F31FC9465A71" offset="000000" />
@@ -535,7 +535,7 @@
 	<software name="flappy">
 		<description>Flappy</description>
 		<year>19??</year>
-		<publisher>db-Soft</publisher>
+		<publisher>デービーソフト (dB-Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5613848">
 				<rom name="flap.t77" size="5613848" crc="5E5F9A17" sha1="7F6E46A3F3C1932DD31B3AA31440E4EC26AFC039" offset="000000" />
@@ -618,7 +618,7 @@
 	<software name="galaga">
 		<description>Galaga</description>
 		<year>19??</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3843814">
 				<rom name="gal.t77" size="3843814" crc="0B446605" sha1="61944B8C94DD394ACCD6FA4CA8F52BDF2AB89ECB" offset="000000" />
@@ -707,7 +707,7 @@
 	<software name="gunman">
 		<description>Gunman</description>
 		<year>1983</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1256418">
 				<rom name="gunman.t77" size="1256418" crc="43A1C580" sha1="551F6D24C6AB4EF3E86C4056C3A266AE439B8E30" offset="000000" />
@@ -844,7 +844,7 @@
 	<software name="kaguya">
 		<description>おーいかぐや姫</description>
 		<year>19??</year>
-		<publisher>Pony Canyon</publisher>
+		<publisher>ポニカ (Pony Canyon)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2274254">
 				<rom name="ooikagu.t77" size="2274254" crc="9F0057FF" sha1="DA5947960734EF53CD3B5332E971AD14BE680F62" offset="000000" />
@@ -934,7 +934,7 @@
 	<software name="kokushi">
 		<description>国士無双</description>
 		<year>19??</year>
-		<publisher>Pony Canyon</publisher>
+		<publisher>ポニカ (Pony Canyon)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2162090">
 				<rom name="kok.t77" size="2162090" crc="072A8753" sha1="FCE7AD1A32E31398DF17F445F4FAA6B1B567E617" offset="000000" />
@@ -1044,7 +1044,7 @@
 	<software name="mappy">
 		<description>Mappy</description>
 		<year>19??</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2808984">
 				<rom name="mappy.t77" size="2808984" crc="A717EC9F" sha1="B4523AB657564925EC7F910CAFF8A574ED40C660" offset="000000" />
@@ -1055,7 +1055,7 @@
 	<software name="mariobrs">
 		<description>Mario Bros. Special</description>
 		<year>1984</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2453598">
 				<rom name="mariobrs.t77" size="2453598" crc="6DA2355E" sha1="E1AF54A873DCE91A4BCA2F75C1C628AF74891424" offset="000000" />
@@ -1067,7 +1067,7 @@
 	<software name="mazinger">
 		<description>マジンガーＺ</description>
 		<year>19??</year>
-		<publisher>Bandai Soft</publisher>
+		<publisher>バンダイ (Bandai)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3789260">
 				<rom name="majin.t77" size="3789260" crc="3AA0B3DA" sha1="F28E2D3C0EB564C55114E43CC8BD393D499C3454" offset="000000" />
@@ -1079,7 +1079,7 @@
 	<software name="midway">
 		<description>Midway</description>
 		<year>1983</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1361648">
 				<rom name="mid.t77" size="1361648" crc="C63C2F29" sha1="0889ADCC6D0AE183757381ACB94D3DAE03E0BE53" offset="000000" />
@@ -1233,7 +1233,7 @@
 	<software name="panic">
 		<description>女子寮パニック</description>
 		<year>19??</year>
-		<publisher>Enix</publisher>
+		<publisher>エニックス (Enix)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="11369494">
 				<rom name="panic.t77" size="11369494" crc="E42B289E" sha1="BF44E13D984FF5BEC00C3A5660B3B897ED0ACE7A" offset="000000" />
@@ -1392,7 +1392,7 @@
 	<software name="rallyx">
 		<description>Rally-X</description>
 		<year>19??</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="122012">
 				<rom name="rally-x.t77" size="122012" crc="06B08DB8" sha1="A6D96DFDF3C55F5325149B50F95E42347F00F664" offset="000000" />
@@ -1627,7 +1627,7 @@
 	<software name="sphinx">
 		<description>Sphinx</description>
 		<year>1984</year>
-		<publisher>Tsukumo</publisher>
+		<publisher>ツクモ (Tsukumo)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1723374">
 				<rom name="sphinx.t77" size="1723374" crc="E21D57C0" sha1="107C5CA0142C59CC23DD482D83E7FEDEF4C320B6" offset="000000" />
@@ -1681,7 +1681,7 @@
 	<software name="startrek">
 		<description>Star Trek v1.2</description>
 		<year>19??</year>
-		<publisher>Tsukumo</publisher>
+		<publisher>ツクモ (Tsukumo)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="470560">
 				<rom name="sup_star.t77" size="470560" crc="A6A45074" sha1="3086EF8E7EA9A07BE4440FB220DF6B5F697438EB" offset="000000" />
@@ -1729,7 +1729,7 @@
 	<software name="tforce">
 		<description>Thunder Force</description>
 		<year>1984</year>
-		<publisher>Tecno Soft</publisher>
+		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2329036">
 				<rom name="tforce.t77" size="2329036" crc="4297C768" sha1="7C534329D6550F0B00AD8F7D9CDB8EE861A16B60" offset="000000" />
@@ -1740,7 +1740,7 @@
 	<software name="tforcea" cloneof="tforce">
 		<description>Thunder Force (alternate)</description>
 		<year>1984</year>
-		<publisher>Tecno Soft</publisher>
+		<publisher>テクノソフト (Tecno Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2698972">
 				<rom name="thunder.t77" size="2698972" crc="6CD37C96" sha1="C68807BE6346BCE0BED787288CB10091D95A7947" offset="000000" />
@@ -1822,7 +1822,7 @@
 	<software name="volguard">
 		<description>Volguard</description>
 		<year>19??</year>
-		<publisher>db-Soft</publisher>
+		<publisher>デービーソフト (dB-Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3893070">
 				<rom name="vol.t77" size="3893070" crc="1CE19974" sha1="B4FBD549D81F92FAC2B83B395A9ABFF21C09A037" offset="000000" />
@@ -1834,7 +1834,7 @@
 	<software name="wedding">
 		<description>Wedding Race</description>
 		<year>19??</year>
-		<publisher>Champion Soft</publisher>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="899396">
 				<rom name="wed.t77" size="899396" crc="45958FC1" sha1="5916A44BC3B54EB33628ACCD1C5998DD9EE623B1" offset="000000" />
@@ -1846,7 +1846,7 @@
 	<software name="wife">
 		<description>オランダ妻は電気ウナギの夢を見るか?</description>
 		<year>1985</year>
-		<publisher>Koei</publisher>
+		<publisher>光栄 (Koei)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5823560">
 				<rom name="wife.t77" size="5823560" crc="063A1CF5" sha1="688F322A9B60799B8011AAE7EF07AA1878E30512" offset="000000" />
@@ -1892,7 +1892,7 @@
 	<software name="yakyu">
 		<description>野球狂</description>
 		<year>1984</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2945320">
 				<rom name="yakyu.t77" size="2945320" crc="02CF29FB" sha1="ADC85A3C81D524EA21ACA33AA15124484F8D642F" offset="000000" />

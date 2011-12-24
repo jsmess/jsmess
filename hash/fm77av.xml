@@ -11,7 +11,7 @@
 	<software name="9gyokudn">
 		<description>九玉伝</description>
 		<year>19??</year>
-		<publisher>Tecnosoft</publisher>
+		<publisher>テクノソフト (TecnoSoft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="9gyokuden_a.d77" size="416688" crc="c3757455" sha1="dcf9d2422daa7920d91c26171dd0334e65cf15f8" offset="000000" />
@@ -27,7 +27,7 @@
 	<software name="argo">
 		<description>Argo</description>
 		<year>19??</year>
-		<publisher>呉ソフトウェア</publisher>
+		<publisher>呉ソフトウェア工房 (Kure Software Koubou)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348576">
 				<rom name="argo_a.d77" size="348576" crc="a16e0351" sha1="38502279d0db666f8aa73fde34a7b1557141d3d6" offset="000000" />
@@ -87,7 +87,7 @@
 	<software name="drabus">
 		<description>Dragon Buster</description>
 		<year>1987</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="drabus.d77" size="348848" crc="6100e7f0" sha1="4671fadc689cb3e0c708119082f0db083d260232" offset="000000" />
@@ -98,7 +98,7 @@
 	<software name="druaga">
 		<description>The Tower of Druaga</description>
 		<year>19??</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="druaga.d77" size="348848" crc="2d5e1a08" sha1="c6cdcf38ca98514c96dab84eed22ed8cb277c54b" offset="000000" />
@@ -124,7 +124,7 @@
 　　　　　ESC(XM7:半角/全角):ポーズ・点数表示　HOME:捨て牌指導	-->
 		<description>ぎゅわんぶらぁ自己中心派</description>
 		<year>1986</year>
-		<publisher>Game Arts</publisher>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ganjiko.d77" size="348848" crc="2cc9b92b" sha1="2bbc4f984a24812720ae9c56a991e4085155f90b" offset="000000" />
@@ -167,7 +167,7 @@
 	<software name="luxsor">
 		<description>Luxsor</description>
 		<year>19??</year>
-		<publisher>TELENET</publisher>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="luxsor_1.d77" size="416688" crc="360d26f1" sha1="86fba737fc65fbcb5960c8e475108065c7791b34" offset="000000" />
@@ -241,7 +241,7 @@
 　　　　　操作の要領は基本的にファミスタ準拠 -->
 		<description>プロ野球ファン</description>
 		<year>1986</year>
-		<publisher>日本テレネット</publisher>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="probbfan_a.d77" size="416688" crc="be418ab5" sha1="10c250261fcd2e7a92d23338f3759f826da16f59" offset="000000" />
@@ -273,7 +273,7 @@
 	<software name="sharrier">
 		<description>Space Harrier</description>
 		<year>1985</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="sharriera.d77" size="348848" crc="2d6741dc" sha1="29e7a71293f3587a66fae9181480e32c06279498" offset="000000" />
@@ -289,7 +289,7 @@
 	<software name="silpheed">
 		<description>Silpheed</description>
 		<year>19??</year>
-		<publisher>Game Arts</publisher>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="sil_a.d77" size="348848" crc="3233658c" sha1="0594a90a0462a6324f929cc2ec9d5788f496b248" offset="000000" />
@@ -326,7 +326,7 @@
 	<software name="ys1_av">
 		<description>Ancient Ys Vanished Omen</description>
 		<year>19??</year>
-		<publisher>日本ファルコム</publisher>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="ys_ap.d77" size="415840" crc="d6f7544d" sha1="cc9686d21a765215130128bc94b544d73c4065dc" offset="000000" />

@@ -55,7 +55,7 @@
 	<software name="onyx">
 		<description>The Black Onyx</description>
 		<year>19??</year>
-		<publisher>Bullet-Proof Software</publisher>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="1194027">
 				<rom name="onyx.tap" size="1194027" crc="eb8bddee" sha1="3a19bd2f7e3f6c1deed6f9aa3fc165b27ac98001" offset="0" />
@@ -231,7 +231,7 @@
 	<software name="digdug">
 		<description>Dig Dug</description>
 		<year>1982?</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="dig dug.tap" size="240004" crc="c37c9bc0" sha1="d9752e3ca6bdc52114a569660289f13d46879c92" offset="0" />
@@ -287,7 +287,7 @@
 		<!-- aka The Black Onyx 2 -->
 		<description>The Fire Crystal (Alt)</description>
 		<year>19??</year>
-		<publisher>Bullet-Proof Software</publisher>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="1545939">
 				<rom name="onyx2t.tap" size="1545939" crc="e1f706b2" sha1="1a3e5f4c6087d96b03a5891391a3b0dcd57feff3" offset="0" />
@@ -342,7 +342,7 @@
 	<software name="galaxian">
 		<description>Galaxian</description>
 		<year>198?</year>
-		<publisher>Dempa</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="galaxian.tap" size="180004" crc="bc1896c5" sha1="3eb7db6b658ccdfdfcfa4deafe34e535b7d14fc2" offset="0" />
@@ -353,7 +353,7 @@
 	<software name="golf">
 		<description>Nintendo no Golf</description>
 		<year>19??</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="golf.tap" size="180004" crc="d71eebf1" sha1="bd61d8af9ef4beebe6cc21f56edadb1c3bace59b" offset="0" />
@@ -364,7 +364,7 @@
 	<software name="golfa" cloneof="golf">
 		<description>Nintendo no Golf (Alt)</description>
 		<year>19??</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="golfa.tap" size="180004" crc="d731667d" sha1="4e5dc0a29a04d5c1d494f472fbc50c1f72e6b526" offset="0" />
