@@ -23,6 +23,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
+#include "machine/i8251.h"
+#include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "machine/ram.h"
 
@@ -38,17 +40,23 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "crtc"),
+	m_usart(*this, "usart"),
 	m_beep(*this, BEEPER_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
+	required_device<i8251_device> m_usart;
 	required_device<device_t> m_beep;
+
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
+	DECLARE_READ_LINE_MEMBER(rxdata_callback);
+	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 
 	emu_timer* m_sys_timer;
+	emu_timer* m_serial_timer;  // for the usart
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 *m_p_ram;
@@ -60,19 +68,20 @@ public:
 
 private:
 	static const device_timer_id SYSTEM_TIMER = 0;
+	static const device_timer_id SERIAL_TIMER = 1;
 	UINT8 m_timer_bit;
 };
-
-READ8_MEMBER( alphatro_state::port10_r )
-{
-	//return (space.machine().device<screen_device>("screen")->vblank() ? 0x00 : 0x80);
-	return m_timer_bit;
-}
 
 static TIMER_CALLBACK( alphatro_beepoff )
 {
 	alphatro_state *state = machine.driver_data<alphatro_state>();
 	beep_set_state(state->m_beep, 0);
+}
+
+READ8_MEMBER( alphatro_state::port10_r )
+{
+	//return (space.machine().device<screen_device>("screen")->vblank() ? 0x00 : 0x80);
+	return m_timer_bit;
 }
 
 WRITE8_MEMBER( alphatro_state::port10_w )
@@ -104,7 +113,23 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case SYSTEM_TIMER:
 		m_timer_bit ^= 0x80;
 		break;
+	case SERIAL_TIMER:
+		m_usart->transmit_clock();
+		m_usart->receive_clock();
+		break;
 	}
+}
+
+READ_LINE_MEMBER( alphatro_state::rxdata_callback )
+{
+	popmessage("RX DATA");
+	return machine().device<cassette_image_device>("cass")->input();
+}
+
+WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
+{
+	popmessage("TX DATA: %i",state);
+	machine().device<cassette_image_device>("cass")->output(state);
 }
 
 VIDEO_START_MEMBER( alphatro_state )
@@ -182,7 +207,10 @@ static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
 	AM_RANGE(0x2a, 0x2a) AM_READ_PORT("XA")
 	AM_RANGE(0x2b, 0x2b) AM_READ_PORT("XB")
 	//AM_RANGE(0x30, 0x30) unknown
-	//AM_RANGE(0x40, 0x41) cassette UART
+	// USART for cassette reading and writing
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("usart", i8251_device, data_r, data_w)
+	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("usart", i8251_device, status_r, control_w)
+	// CRTC - HD46505 / HD6845SP
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
@@ -281,7 +309,7 @@ static INPUT_PORTS_START( alphatro )
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_PGUP) // GRAPH
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_PGUP)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Clear Home") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
 
@@ -320,6 +348,7 @@ GFXDECODE_END
 void alphatro_state::machine_start()
 {
 	m_sys_timer = timer_alloc(SYSTEM_TIMER);
+	m_serial_timer = timer_alloc(SERIAL_TIMER);
 }
 
 void alphatro_state::machine_reset()
@@ -334,6 +363,7 @@ void alphatro_state::machine_reset()
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
+	m_serial_timer->adjust(attotime::from_hz(2000),0,attotime::from_hz(2000));  // USART clock - this is a guesstimate
 	m_timer_bit = 0;
 	beep_set_state(m_beep, 0);
 	beep_set_frequency(m_beep, 950);	/* piezo-device needs to be measured */
@@ -357,6 +387,28 @@ static const mc6845_interface alphatro_crtc6845_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL
+};
+
+static const i8251_interface alphatro_usart_interface =
+{
+	DEVCB_LINE_MEMBER(alphatro_state,rxdata_callback), //rxd_cb
+	DEVCB_LINE_MEMBER(alphatro_state,txdata_callback), //txd_cb
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const cassette_interface alphatro_cassette_interface =
+{
+		cassette_default_formats,
+		NULL,
+		(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+		"alphatro_cass",
+		NULL
 };
 
 static MACHINE_CONFIG_START( alphatro, alphatro_state )
@@ -384,6 +436,10 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, alphatro_crtc6845_interface) // clk unknown
+
+	MCFG_I8251_ADD("usart", alphatro_usart_interface)
+
+	MCFG_CASSETTE_ADD("cass", alphatro_cassette_interface)
 
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64K")
