@@ -323,7 +323,7 @@
 	<software name="horizon">
 		<description>Horizon - 夕なぎのホライゾン</description>
 		<year>19??</year>
-		<publisher>Cross Media Soft</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350480">
 				<rom name="yunagi.d77" size="350480" crc="383B8095" sha1="5FD7F22BCBB50FA448B9311E847B2C31AA422DF6" offset="000000" />
@@ -618,7 +618,7 @@
 	<software name="tritorn">
 		<description>トリトーン</description>
 		<year>19??</year>
-		<publisher>Sein Soft</publisher>
+		<publisher>ザインソフト (Sein Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="tritorn.d77" size="348848" crc="5A04DEB9" sha1="D1A6AEC0D3E517F7C1E1F162E539969FE089FA27" offset="000000" />

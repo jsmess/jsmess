@@ -292,12 +292,17 @@ To investigate:
  - is ザ・コックピット (198411xx) the SR version of cockpit or the older one?
  - is パワフルまぁじゃん２データ集 邪子ちゃん組 (198906xx) by Takeru in one of the Powerful mahjong 2 sets below?
 
-TO FIX
- - Identify games by Bond Soft among the ones by Pascal2 (older company name)
- - Identify games by Cross Media Soft among the ones by Victor Music Industry (older company name)
- - Identify games by Xtal Soft among the ones by Crystal Soft (older company name)
- - Identify games by PonyCa and Pony among the ones by Pony Canyon (older company name)
- -->
+INVESTIGATE
+ - Find exactly when Bond Soft became Pascal2: Lolita-hime no Enikki - Ikenai Pose Shu (198701) was by BondSoft
+ - Find exactly when PonyCa became Pony Canyon: The Eidolon (198710) was by PonyCa, while Little Computer People (198712) was by Pony Canyon
+ - Was there any game released by Pony Canyon as ポニー (Pony)?
+ - Cross Media Soft folded back into Victor Music Industry in ~1991. did any pc8801 game got released under the Victor main brand?
+   (for now I have left Prontis and Yajiuma Pennant Race 2 under Victor, pending verification with original images)
+ - Check exactly the 'boundary games' for ザインソフト = Sein/Xain/Zain Soft, it should be Sein 1984~1986, Xain 1987~198905 (Galf Stream?), 
+   Zain 198909~... (Alfaim?)
+
+-->
+
 
 <!-- BASIC Disks &amp; System Disks -->
 
@@ -1288,7 +1293,7 @@ TO FIX
 	<software name="adrecon">
 		<description>Adrenalin Connection</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198709xx"/>
 		<info name="alt_title" value="アドレナリン・コネクション"/>
@@ -1321,7 +1326,7 @@ TO FIX
 	<software name="adrecona" cloneof="adrecon">
 		<description>Adrenalin Connection (Alt)</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198709xx"/>
 		<info name="alt_title" value="アドレナリン・コネクション"/>
@@ -1352,7 +1357,7 @@ TO FIX
 	<software name="adreconb" cloneof="adrecon">
 		<description>Adrenalin Connection (Alt 2)</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198709xx"/>
 		<info name="alt_title" value="アドレナリン・コネクション"/>
@@ -1383,7 +1388,7 @@ TO FIX
 	<software name="adreconc" cloneof="adrecon">
 		<description>Adrenalin Connection (Alt 3)</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198709xx"/>
 		<info name="alt_title" value="アドレナリン・コネクション"/>
@@ -1446,7 +1451,7 @@ TO FIX
 	<software name="advfant" supported="no">
 		<description>Advanced Fantasian - Quest for Lost Sanctuary</description>
 		<year>1988</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
@@ -1485,7 +1490,7 @@ TO FIX
 	<software name="advfanta" cloneof="advfant" supported="no">
 		<description>Advanced Fantasian - Quest for Lost Sanctuary (Alt User Disk)</description>
 		<year>1988</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
@@ -1524,7 +1529,7 @@ TO FIX
 	<software name="advfantb" cloneof="advfant" supported="no">
 		<description>Advanced Fantasian - Quest for Lost Sanctuary (Alt 2)</description>
 		<year>1988</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
@@ -3864,7 +3869,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 	<software name="babylon">
 		<description>Babylon</description>
 		<year>1986</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
@@ -3896,7 +3901,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 	<software name="babylona" cloneof="babylon">
 		<description>Babylon (Alt)</description>
 		<year>1986</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
@@ -3928,7 +3933,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 	<software name="backtof">
 		<description>Back to the Future</description>
 		<year>1986</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バックトゥザフューチャー"/>
@@ -3992,7 +3997,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 	<software name="ballpani">
 		<description>Ball Panicker</description>
 		<year>1984</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="ボールパニカー"/>
@@ -4166,7 +4171,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	<software name="bgorilla">
 		<description>Battle Gorilla</description>
 		<year>1988</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="バトルゴリラ"/>
@@ -4201,7 +4206,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	<software name="bgorillaa" cloneof="bgorilla">
 		<description>Battle Gorilla (Alt)</description>
 		<year>1988</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="バトルゴリラ"/>
@@ -4836,7 +4841,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	<software name="bublcris">
 		<description>Bubblegum Crisis</description>
 		<year>1989</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19890525"/>
 		<info name="alt_title" value="バブルガムクライシス"/>
@@ -4871,7 +4876,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	<software name="bublcrisa" cloneof="bublcris">
 		<description>Bubblegum Crisis (Alt?)</description>
 		<year>1989</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19890525"/>
 		<info name="alt_title" value="バブルガムクライシス"/>
@@ -5295,7 +5300,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	<software name="sayjuptr">
 		<description>Sayonara Jupiter</description>
 		<year>1984</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="さよならジュピター"/>
@@ -6131,7 +6136,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	<software name="locke">
 		<description>Choujin Locke</description>
 		<year>1984</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="超人ロック"/>
@@ -6184,7 +6189,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	<software name="cityfigh">
 		<description>City Fight</description>
 		<year>1986</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="シティファイト"/>
@@ -6717,7 +6722,7 @@ ExtractDisk  [02]"Disk 2		  " -> "cranston_manor_v80_02.d88"
 	<software name="crimson">
 		<description>Crimson</description>
 		<year>1987</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198711xx"/>
 		<info name="alt_title" value="クリムゾン"/>
@@ -6749,7 +6754,7 @@ ExtractDisk  [02]"Disk 2		  " -> "cranston_manor_v80_02.d88"
 	<software name="crimson2">
 		<description>Crimson II</description>
 		<year>1989</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198903xx"/>
 		<info name="alt_title" value="クリムゾン２"/>
@@ -6788,7 +6793,7 @@ ExtractDisk  [02]"Disk 2		  " -> "cranston_manor_v80_02.d88"
 	<software name="crimson2a" cloneof="crimson2">
 		<description>Crimson II (Alt)</description>
 		<year>1989</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198903xx"/>
 		<info name="alt_title" value="クリムゾン２"/>
@@ -6827,7 +6832,7 @@ ExtractDisk  [02]"Disk 2		  " -> "cranston_manor_v80_02.d88"
 	<software name="crimson3">
 		<description>Crimson 3</description>
 		<year>1990</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199005xx"/>
 		<info name="alt_title" value="クリムゾン３"/>
@@ -6873,7 +6878,7 @@ ExtractDisk  [02]"Disk 2		  " -> "cranston_manor_v80_02.d88"
 	<software name="crimson3a" cloneof="crimson3">
 		<description>Crimson 3 (Alt)</description>
 		<year>1990</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199005xx"/>
 		<info name="alt_title" value="クリムゾン３"/>
@@ -7829,7 +7834,7 @@ ExtractDisk  [02]"DAIVA_B		 " -> "daiva_02.d88"
 	<software name="daydream">
 		<description>Day Dream</description>
 		<year>1986</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="デイ・ドリーム"/>
@@ -9076,7 +9081,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 	<software name="director">
 		<description>Director Monogatari</description>
 		<year>1988</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="ディレクター物語"/>
@@ -10629,7 +10634,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 	<software name="eidolon">
 		<description>The Eidolon</description>
 		<year>1987</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198710xx"/>
 		<info name="alt_title" value="アイドロン"/>
@@ -11524,7 +11529,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 	<software name="fantasia">
 		<description>Fantasian</description>
 		<year>1985</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="ファンタジアン"/>
@@ -12224,7 +12229,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 	<software name="fortress">
 		<description>Fortress</description>
 		<year>1989</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198902xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -12283,7 +12288,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 	<software name="fruitpan">
 		<description>Fruit Panic</description>
 		<year>1984</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="フルーツパニック"/>
@@ -13882,7 +13887,7 @@ ExtractDisk  [02]"Gradius改	   " -> "gradius kai_02.d88"
 	<software name="guinsaga">
 		<description>Guin Saga - Hyoto no Kamen</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198704xx"/>
 		<info name="alt_title" value="グインサーガ〜豹頭の仮面〜"/>
@@ -13907,7 +13912,7 @@ ExtractDisk  [02]"Gradius改	   " -> "gradius kai_02.d88"
 	<software name="guinsagaa" cloneof="guinsaga">
 		<description>Guin Saga (Alt)</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198704xx"/>
 		<info name="alt_title" value="グインサーガ〜豹頭の仮面〜"/>
@@ -15098,7 +15103,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="hiranyan">
 		<description>Hiranya no Nazo</description>
 		<year>1986</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="ヤンパラアドベンチャー ヒランヤの謎"/>
@@ -15339,7 +15344,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="holyswrd">
 		<description>Holy Sword</description>
 		<year>1983</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198305xx"/>
 		<info name="alt_title" value="聖なる剣"/>
@@ -15924,7 +15929,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="igohyakk">
 		<description>Igo Hyakka - Go to Shodan</description>
 		<year>1985</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198509xx"/>
 		<info name="alt_title" value="囲碁百科 -初段をめざす人のために-"/>
@@ -15938,7 +15943,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="igohyak2">
 		<description>Igo Hyakka II - Sakata Keppuroku</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198707xx"/>
 		<info name="alt_title" value="囲碁百科２　坂田血風録"/>
@@ -16530,7 +16535,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="jacknick">
 		<description>Jack Nicklaus Championship Golf</description>
 		<year>1990</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900421"/>
 		<info name="alt_title" value="ジャックニクラウス チャンピオンシップ・ゴルフ"/>
@@ -16555,7 +16560,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="jangball">
 		<description>Jang Ball</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198706xx"/>
 		<info name="alt_title" value="雀ボール"/>
@@ -16569,7 +16574,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="jango1">
 		<description>Jangou 1</description>
 		<year>1988</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198808xx"/>
 		<info name="alt_title" value="雀豪１"/>
@@ -16583,7 +16588,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="jehard">
 		<description>Jehard</description>
 		<year>1987</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198710xx"/>
 		<info name="alt_title" value="ジハード"/>
@@ -16608,7 +16613,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="jeharda" cloneof="jehard">
 		<description>Jehard (Alt)</description>
 		<year>1987</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198710xx"/>
 		<info name="alt_title" value="ジハード"/>
@@ -16982,7 +16987,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	<software name="joshikos">
 		<description>Joshidaisei Kousai Zukan</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198708xx"/>
 		<info name="alt_title" value="女子大生交際図鑑"/>
@@ -19412,7 +19417,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lawwest">
 		<description>Law of the West</description>
 		<year>1987</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198705xx"/>
 		<info name="alt_title" value="ローオブザ・ウエスト"/>
@@ -19451,7 +19456,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="leningrd">
 		<description>Leningrad</description>
 		<year>1987</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198708xx"/>
 		<info name="alt_title" value="レニングラード"/>
@@ -19819,7 +19824,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lizard">
 		<description>Lizard</description>
 		<year>1984</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="リザード"/>
@@ -19833,7 +19838,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lizarda" cloneof="lizard">
 		<description>Lizard (Alt)</description>
 		<year>1984</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="リザード"/>
@@ -19931,7 +19936,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lolitahd">
 		<description>Lolita-hime no Densetsu</description>
 		<year>1986</year>
-		<publisher>パスカル２ (Pascal2)</publisher>
+		<publisher>ボンドソフト (Bond Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ロリータ姫の伝説"/>
@@ -19945,7 +19950,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lolitahda" cloneof="lolitahd">
 		<description>Lolita-hime no Densetsu (Alt)</description>
 		<year>1986</year>
-		<publisher>パスカル２ (Pascal2)</publisher>
+		<publisher>ボンドソフト (Bond Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ロリータ姫の伝説"/>
@@ -19959,7 +19964,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lolitah2">
 		<description>Lolita-hime no Enikki - Ikenai Pose Shu</description>
 		<year>1987</year>
-		<publisher>パスカル２ (Pascal2)</publisher>
+		<publisher>ボンドソフト (Bond Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="ロリータ姫の絵日記"/>
@@ -20151,7 +20156,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lunacity">
 		<description>Luna City Satsujin Jiken</description>
 		<year>1986</year>
-		<publisher>パスカル２ (Pascal2)</publisher>
+		<publisher>ボンドソフト (Bond Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ルナシティ殺人事件"/>
@@ -20165,7 +20170,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lunacitya" cloneof="lunacity">
 		<description>Luna City Satsujin Jiken (Alt)</description>
 		<year>1986</year>
-		<publisher>パスカル２ (Pascal2)</publisher>
+		<publisher>ボンドソフト (Bond Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ルナシティ殺人事件"/>
@@ -20179,7 +20184,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lunarbal">
 		<description>Lunar Ball</description>
 		<year>1985</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ルナーボール"/>
@@ -20193,7 +20198,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 	<software name="lunarbala" cloneof="lunarbal">
 		<description>Lunar Ball (Alt?)</description>
 		<year>1985</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ルナーボール"/>
@@ -21790,7 +21795,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="mtantojo">
 		<description>Meitantei Tojo!</description>
 		<year>1984</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="名探偵登場!"/>
@@ -22801,7 +22806,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="molemole">
 		<description>Mole Mole</description>
 		<year>1985</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198507xx"/>
 		<info name="alt_title" value="モールモール"/>
@@ -22815,7 +22820,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="molemol2">
 		<description>Mole Mole 2</description>
 		<year>1986</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="モールモール２"/>
@@ -22966,7 +22971,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="mrproyak">
 		<description>Mr. Pro Yakyu</description>
 		<year>1987</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198712xx"/>
 		<info name="alt_title" value="Ｍｒ．プロ野球"/>
@@ -22998,7 +23003,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="mrproyaka" cloneof="mrproyak">
 		<description>Mr. Pro Yakyu (Alt)</description>
 		<year>1987</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198712xx"/>
 		<info name="alt_title" value="Ｍｒ．プロ野球"/>
@@ -23044,7 +23049,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="mugensnz">
 		<description>Mugen no Shinzo</description>
 		<year>1984</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198403xx"/>
 		<info name="alt_title" value="夢幻の心臓"/>
@@ -23058,7 +23063,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="mugensn2">
 		<description>Mugen no Shinzo II</description>
 		<year>1985</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198511xx"/>
 		<info name="alt_title" value="夢幻の心臓２"/>
@@ -23090,7 +23095,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="mugensn3">
 		<description>Mugen no Shinzo III</description>
 		<year>1990</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900112"/>
 		<info name="alt_title" value="夢幻の心臓３"/>
@@ -23143,7 +23148,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="mugensn3a" cloneof="mugensn3">
 		<description>Mugen no Shinzo III (Alt)</description>
 		<year>1990</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900112"/>
 		<info name="alt_title" value="夢幻の心臓３"/>
@@ -23310,7 +23315,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="murdrtop">
 		<description>Tenbou-dai - Murder on the Top</description>
 		<year>1989</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198906xx"/>
 		<info name="alt_title" value="展望台"/>
@@ -23624,7 +23629,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	<software name="nilenami">
 		<description>Nile no Namida</description>
 		<year>1986</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="ナイルの涙"/>
@@ -24093,7 +24098,7 @@ ExtractDisk  [05]"ｺｹﾞﾝﾀ		   " -> "Nukenin Densetsu 05.d88"
 	<software name="kaguya">
 		<description>Ohi! Kaguya Hime - Koromo Koromo no Waka re</description>
 		<year>1983</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198312xx"/>
 		<info name="alt_title" value="おーい！かぐや姫　- 衣衣 のわかれ"/>
@@ -24695,7 +24700,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 	<software name="outlande">
 		<description>Outlanders</description>
 		<year>1988</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="アウトランダーズ"/>
@@ -24979,7 +24984,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 	<software name="pengvill">
 		<description>Penguin Village</description>
 		<year>1984</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198403xx"/>
 		<info name="alt_title" value="ぺんぎんビレッジ"/>
@@ -25235,7 +25240,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2		   " -> "phantasie iv the birth of heroes_03.d8
 	<software name="pinballl">
 		<description>Pinball Land</description>
 		<year>1986</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="ピンボールランド"/>
@@ -27697,7 +27702,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	<software name="sf3dopv">
 		<description>S.F.3.D Original Operation V</description>
 		<year>1985</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198512xx"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -27710,7 +27715,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	<software name="sf3dthxg">
 		<description>S.F.3.D. - Original Operation Thanksgiving</description>
 		<year>1986</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<info name="alt_title" value="ポイントＸ占領作戦 (Box)"/>
@@ -29055,7 +29060,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 	<software name="xabungle">
 		<description>Sento Mecha Xabungle - Blue Gale</description>
 		<year>1983</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198309xx"/>
 		<info name="alt_title" value="戦闘メカ ザブングル -ブルーゲール PART 1-"/>
@@ -29069,7 +29074,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 	<software name="xabunglea" cloneof="xabungle">
 		<description>Sento Mecha Xabungle - Blue Gale (Alt)</description>
 		<year>1983</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198309xx"/>
 		<info name="alt_title" value="戦闘メカ ザブングル -ブルーゲール PART 1-"/>
@@ -29520,7 +29525,7 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 	<software name="shintake">
 		<description>Shin Taketori Monogatari</description>
 		<year>1984</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198410xx"/>
 		<info name="alt_title" value="新竹取物語"/>
@@ -29552,7 +29557,7 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 	<software name="shintama">
 		<description>Shin Tamatori Monogatari</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198710xx"/>
 		<info name="alt_title" value="新玉取物語"/>
@@ -29695,7 +29700,7 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 	<software name="shiroden">
 		<description>Shiro Densetsu</description>
 		<year>1984</year>
-		<publisher>クリスタルソフト (Crystal Soft)</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198410xx"/>
 		<info name="alt_title" value="白伝説"/>
@@ -29723,7 +29728,7 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 	<software name="shiryose">
 		<description>Shiryou Sensen - War of the Dead</description>
 		<year>1989</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198901xx"/>
 		<info name="alt_title" value="死霊戦線"/>
@@ -29751,7 +29756,7 @@ ExtractDisk  [02]"DISK A		  " -> "shiryo sensen_02.d88"
 	<software name="shiryosea" cloneof="shiryose">
 		<description>Shiryou Sensen - War of the Dead (Alt)</description>
 		<year>1989</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198901xx"/>
 		<info name="alt_title" value="死霊戦線"/>
@@ -29777,7 +29782,7 @@ ExtractDisk  [02]"DISK A		  " -> "shiryo sensen_02.d88"
 	<software name="shiryos2">
 		<description>Shiryou Sensen 2 - War of the Dead Part 2</description>
 		<year>1989</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198906xx"/>
 		<info name="alt_title" value="死霊戦線2"/>
@@ -29822,7 +29827,7 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 	<software name="shiryos2a" cloneof="shiryos2">
 		<description>Shiryou Sensen 2 - War of the Dead Part 2 (Alt Disk 1)</description>
 		<year>1989</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198906xx"/>
 		<info name="alt_title" value="死霊戦線2"/>
@@ -31481,7 +31486,7 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 	<software name="starsymp">
 		<description>Star Symphony</description>
 		<year>1986</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<info name="alt_title" value="スターシンフォニー"/>
@@ -31507,7 +31512,7 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 	<software name="starsympa" cloneof="starsymp">
 		<description>Star Symphony (Alt)</description>
 		<year>1986</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198609xx"/>
 		<info name="alt_title" value="スターシンフォニー"/>
@@ -31969,7 +31974,7 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 	<software name="summerga">
 		<description>Summer Games</description>
 		<year>1986</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="サマーゲームス"/>
@@ -32163,7 +32168,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 	<software name="superpit">
 		<description>Super Pitfall</description>
 		<year>1986</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="スーパーピットフォール"/>
@@ -32177,7 +32182,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 	<software name="superpith" cloneof="superpit">
 		<description>Super Pitfall (invincible cheat)</description>
 		<year>1986</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="super pitfall(invincible cheat).d88" size="348848" crc="825faab2" sha1="604cd4262f8e17b2575526808291225296f748cd" offset="0" />
@@ -32572,7 +32577,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 	<software name="tekiwaka">
 		<description>Teki wa Kaizoku - Kaizokuban</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="敵は海賊・海賊版"/>
@@ -32597,7 +32602,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 	<software name="tekiwakaa" cloneof="tekiwaka">
 		<description>Teki wa Kaizoku - Kaizokuban (Alt)</description>
 		<year>1987</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="敵は海賊・海賊版"/>
@@ -34341,7 +34346,7 @@ ExtractDisk  [02]"PROGRAM		 " -> "transylvania_02.d88"
 	<software name="triviaq">
 		<description>Trivia Q</description>
 		<year>1985</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198511xx"/>
 		<info name="alt_title" value="トリビアＱ"/>
@@ -35057,7 +35062,7 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 	<software name="ultima4">
 		<description>Ultima IV - Quest of the Avatar</description>
 		<year>1987</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198707xx"/>
 		<info name="alt_title" value="ウルティマ４"/>
@@ -35766,7 +35771,7 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 	<software name="venusfir">
 		<description>Venus Fire</description>
 		<year>1986</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ヴィーナスの火 (or ヴィーナスファイアー)"/>
@@ -36548,7 +36553,7 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 	<software name="winterga">
 		<description>Winter Games</description>
 		<year>1987</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="ウィンターゲームス"/>
@@ -37871,7 +37876,7 @@ ExtractDisk  [02]"xanadu80_b	  " -> "xanadu_v80_02.d88"
 	<software name="yajiuma">
 		<description>Yajiuma Pennant Race</description>
 		<year>1988</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="やじうまペナントレース"/>
@@ -37907,7 +37912,7 @@ ExtractDisk  [02]"やじペナB	   " -> "Yajiuma Pennant Race 02.d88"
 	<software name="yajiumaa" cloneof="yajiuma">
 		<description>Yajiuma Pennant Race (Alt)</description>
 		<year>1988</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="やじうまペナントレース"/>
@@ -38953,7 +38958,7 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 	<software name="yunagino">
 		<description>Yunagi no Horizon</description>
 		<year>1986</year>
-		<publisher>ビクター音楽産業 (Victor Music Industry)</publisher>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="夕なぎのホライゾン"/>

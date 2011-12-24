@@ -91,7 +91,7 @@
 	<software name="crimson">
 		<description>Crimson</description>
 		<year>1988</year>
-		<publisher>Xtalsoft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="crimson (1988)(xtalsoft)(jp)(disk 1 of 3).d88" size="348848" crc="050b0fe6" sha1="05eb7831b328890291e79e9325009ea0415fb31d" offset="0" />
@@ -112,7 +112,7 @@
 	<software name="crimsona" cloneof="crimson">
 		<description>Crimson (Alt Disk 1)</description>
 		<year>1988</year>
-		<publisher>Xtalsoft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="crimsonb (disk 1).d88"  size="348848" crc="26125d32" sha1="274dc32c55b678635a4b7cbabc334a6cd78dfe5c" offset="0" />
@@ -408,7 +408,7 @@
 	<software name="screamer">
 		<description>The Screamer</description>
 		<year>19??</year>
-		<publisher>Magical Zoo</publisher>
+		<publisher>マジカルズゥ (MagicalZoo)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
 				<rom name="the screamer system.d88" size="415792" crc="ee7c9ddb" sha1="4f42b5ac6eaa60290841038029ea5b6a9db96e99" offset="0" />
@@ -1322,7 +1322,7 @@
 	<software name="slaydock">
 		<description>Super Laydock - Mission Striker</description>
 		<year>19??</year>
-		<publisher>T&amp;E soft</publisher>
+		<publisher>T&amp;E Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="super laydock - mission striker (19xx)(t&amp;e soft)(disk 1 of 2).d88" size="348848" crc="4ddca46f" sha1="0bf76ad1ace3ddd9aded427056414278437c161d" offset="0" />
@@ -1338,7 +1338,7 @@
 	<software name="slaydocka" cloneof="slaydock">
 		<description>Super Laydock - Mission Striker (Alt)</description>
 		<year>19??</year>
-		<publisher>T&amp;E soft</publisher>
+		<publisher>T&amp;E Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="super laydock 1.d88" size="348848" crc="4ddca46f" sha1="0bf76ad1ace3ddd9aded427056414278437c161d" offset="0" />
@@ -1354,7 +1354,7 @@
 	<software name="slaydocm">
 		<description>Super Laydock Muteki</description>
 		<year>19??</year>
-		<publisher>T&amp;E soft</publisher>
+		<publisher>T&amp;E Soft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="super laydock muteki 1.d88" size="348848" crc="4292964b" sha1="42807f4aec38fa2f792cf4bbcb327aaf038d73ef" offset="0" />
@@ -1581,7 +1581,7 @@
 	<software name="fantsian">
 		<description>Fantasian X1</description>
 		<year>1985</year>
-		<publisher>Xtalsoft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="347984">
 				<rom name="fantsia.d88" size="347984" crc="82f0febf" sha1="82876fc26ccc00430b02f527d0c642585c735dee" offset="0" />
@@ -2986,7 +2986,7 @@
 	<software name="proyak88">
 		<description>Mr. Pro Yakyu '88</description>
 		<year>1987</year>
-		<publisher>Xtalsoft</publisher>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="mr. pro yakyuu 88.d88" size="348848" crc="74c034a4" sha1="571c5cc7307c13821b7a3df337676b020e637fbf" offset="0" />

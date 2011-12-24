@@ -825,7 +825,7 @@
 	</software>
 
 	<software name="popbalona" cloneof="popbalon">
-		<description>Pop Balloon (Alt.)</description>
+		<description>Pop Balloon (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="x1_cass">
@@ -836,7 +836,7 @@
 	</software>
 
 	<software name="punchmba" cloneof="punchmb">
-		<description>Punch Ball Mario Bros. (Alt.)</description>
+		<description>Punch Ball Mario Bros. (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="x1_cass">
