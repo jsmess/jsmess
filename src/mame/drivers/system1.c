@@ -250,7 +250,7 @@ static const UINT8 cc_op[0x100] = {
  4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+1*2, 4*5+1*2,
  4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+1*2, 4*5+1*2,
  4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 4*5+1*2, 7*5+1*2, 4*5+1*2,
- 5*5+1*2,10*5+1*2,10*5+3*2,10*5+3*2,10*5+3*2,11*5+1*2, 7*5+2*2,11*5+1*2, 5*5+1*2,10*5+1*2,10*5+3*2, 0*5+1*2,10*5+3*2,17*5+3*2, 7*5+2*2,11*5+1*2,
+ 5*5+1*2,10*5+1*2,10*5+3*2,10*5+3*2,10*5+3*2,11*5+1*2, 7*5+2*2,11*5+1*2, 5*5+1*2,10*5+1*2,10*5+3*2, 0*5    ,10*5+3*2,17*5+3*2, 7*5+2*2,11*5+1*2,
  5*5+1*2,10*5+1*2,10*5+3*2,11*5+2*2,10*5+3*2,11*5+1*2, 7*5+2*2,11*5+1*2, 5*5+1*2, 4*5+1*2,10*5+3*2,11*5+2*2,10*5+3*2, 0*5    , 7*5+2*2,11*5+1*2,
  5*5+1*2,10*5+1*2,10*5+3*2,19*5+1*2,10*5+3*2,11*5+1*2, 7*5+2*2,11*5+1*2, 5*5+1*2, 4*5+1*2,10*5+3*2, 4*5+1*2,10*5+3*2, 0*5    , 7*5+2*2,11*5+1*2,
  5*5+1*2,10*5+1*2,10*5+3*2, 4*5+1*2,10*5+3*2,11*5+1*2, 7*5+2*2,11*5+1*2, 5*5+1*2, 6*5+1*2,10*5+3*2, 4*5+1*2,10*5+3*2, 0*5    , 7*5+2*2,11*5+1*2
@@ -297,7 +297,7 @@ static const UINT8 cc_ed[0x100] = {
 static const UINT8 cc_xy[0x100] = {
  4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2,15*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2,
  4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2,15*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2,
- 4*5+2*2,14*5+4*2,20*5+4*2,10*5+2*2, 9*5+2*2, 9*5+2*2, 9*5+3*2, 4*5+2*2, 4*5+2*2,15*5+2*2,20*5+4*2,10*5+2*2, 9*5+2*2, 9*5+2*2, 9*5+3*2, 4*5+2*2,
+ 4*5+2*2,14*5+4*2,20*5+4*2,10*5+2*2, 9*5+2*2, 9*5+2*2,11*5+3*2, 4*5+2*2, 4*5+2*2,15*5+2*2,20*5+4*2,10*5+2*2, 9*5+2*2, 9*5+2*2,11*5+3*2, 4*5+2*2,
  4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2,23*5+3*2,23*5+3*2,19*5+4*2, 4*5+2*2, 4*5+2*2,15*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2,
  4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 9*5+2*2, 9*5+2*2,19*5+3*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 9*5+2*2, 9*5+2*2,19*5+3*2, 4*5+2*2,
  4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 9*5+2*2, 9*5+2*2,19*5+3*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 4*5+2*2, 9*5+2*2, 9*5+2*2,19*5+3*2, 4*5+2*2,
@@ -615,9 +615,11 @@ static INTERRUPT_GEN( mcu_irq_assert )
 
 static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
 {
-	/* the T0 line is clocked by something; if it is not clocked fast
+	/* The T0 line is clocked by something; if it is not clocked fast
        enough, the MCU will fail; on shtngmst this happens after 3
-       VBLANKs without a tick */
+       VBLANKs without a tick.
+       choplift is even more picky about it, affecting scroll speed
+    */
 
 	device_t *mcu = timer.machine().device("mcu");
 	device_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
@@ -2153,6 +2155,8 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_TIMER_ADD_SCANLINE("soundirq", soundirq_gen, "screen", 32, 64)
 
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
 	MCFG_MACHINE_START(system1)
 	MCFG_MACHINE_RESET(system1)
 
@@ -2163,7 +2167,7 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 320, 0, 256, 260, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224)
 	MCFG_SCREEN_UPDATE(system1)
 
 	MCFG_GFXDECODE(system1)
@@ -2186,7 +2190,7 @@ static MACHINE_CONFIG_DERIVED( sys1ppis, sys1ppi )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8+8, 32*8-1-8, 0*8, 28*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1)
 MACHINE_CONFIG_END
 
 
@@ -2206,7 +2210,7 @@ static MACHINE_CONFIG_DERIVED( sys1pios, sys1pio )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8+8, 32*8-1-8, 0*8, 28*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1)
 MACHINE_CONFIG_END
 
 
@@ -2222,7 +2226,7 @@ static MACHINE_CONFIG_FRAGMENT( mcu )
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", mcu_irq_assert)
 
-	MCFG_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, attotime::from_msec(20))	/* ??? actual clock unknown */
+	MCFG_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, attotime::from_usec(2500))	/* ??? actual clock unknown */
 MACHINE_CONFIG_END
 
 

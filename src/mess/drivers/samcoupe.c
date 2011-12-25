@@ -527,6 +527,11 @@ static SLOT_INTERFACE_START( samcoupe_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
+static MSM6242_INTERFACE( samcoupe_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
@@ -551,7 +556,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	/* devices */
 	MCFG_CENTRONICS_ADD("lpt1", standard_centronics)
 	MCFG_CENTRONICS_ADD("lpt2", standard_centronics)
-	MCFG_MSM6242_ADD("sambus_clock")
+	MCFG_MSM6242_ADD("sambus_clock", samcoupe_rtc_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, samcoupe_cassette_interface)
 	MCFG_WD1772x_ADD("wd1772", SAMCOUPE_XTAL_X1/3)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", samcoupe_floppies, "35dd", 0, samcoupe_floppy_formats)

@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "machine/cococart.h"
+#include "machine/msm6242.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -62,7 +63,7 @@ protected:
 		device_t *m_ds1315;			/* DS1315 */
 
 		/* Disto RTC */
-		device_t *m_disto_msm6242;		/* 6242 RTC on Disto interface */
+		msm6242_device *m_disto_msm6242;		/* 6242 RTC on Disto interface */
 		offs_t m_msm6242_rtc_address;
 };
 

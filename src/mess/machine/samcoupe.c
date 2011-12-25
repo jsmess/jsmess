@@ -161,13 +161,17 @@ WRITE8_HANDLER( samcoupe_ext_mem_w )
 
 static READ8_DEVICE_HANDLER( samcoupe_rtc_r )
 {
-	return msm6242_r(device, offset >> 12);
+	address_space *spaceio = device->machine().device("maincpu")->memory().space(AS_IO);
+	msm6242_device *rtc = dynamic_cast<msm6242_device*>(device);
+	return rtc->read(*spaceio,offset >> 12);
 }
 
 
 static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
 {
-	msm6242_w(device, offset >> 12, data);
+	address_space *spaceio = device->machine().device("maincpu")->memory().space(AS_IO);
+	msm6242_device *rtc = dynamic_cast<msm6242_device*>(device);
+	rtc->write(*spaceio,offset >> 12, data);
 }
 
 

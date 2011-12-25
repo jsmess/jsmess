@@ -1552,7 +1552,7 @@ static DRIVER_INIT( ip225015 )
 	ip22_state *state = machine.driver_data<ip22_state>();
 	static const struct kbdc8042_interface at8042 =
 	{
-		KBDC8042_STANDARD, NULL, NULL, ip22_get_out2
+		KBDC8042_STANDARD, NULL, NULL, NULL, ip22_get_out2
 	};
 
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse

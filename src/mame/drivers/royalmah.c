@@ -819,7 +819,7 @@ static ADDRESS_MAP_START( janptr96_iomap, AS_IO, 8 )
 	AM_RANGE( 0x1c, 0x1c ) AM_READ( janptr96_dsw_r )
 	AM_RANGE( 0x20, 0x20 ) AM_READWRITE( janptr96_unknown_r, janptr96_rambank_w )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( mjderngr_palbank_w )
-	AM_RANGE( 0x60, 0x6f ) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)
+	AM_RANGE( 0x60, 0x6f ) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
 	AM_RANGE( 0x81, 0x81 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x82, 0x83 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
 	AM_RANGE( 0x93, 0x93 ) AM_WRITE( input_port_select_w )
@@ -1042,7 +1042,7 @@ static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x6fc2, 0x6fc3 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
 	AM_RANGE( 0x6fd0, 0x6fd0 ) AM_WRITE( janptr96_coin_counter_w )
 	AM_RANGE( 0x6fd1, 0x6fd1 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
-	AM_RANGE( 0x6fe0, 0x6fef ) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)
+	AM_RANGE( 0x6fe0, 0x6fef ) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
 	AM_RANGE( 0x6ff0, 0x6ff0 ) AM_READWRITE( janptr96_dsw_r, janptr96_dswsel_w )
 	AM_RANGE( 0x6ff1, 0x6ff1 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE( mjtensin_6ff3_w )
@@ -1121,7 +1121,7 @@ static ADDRESS_MAP_START( cafetime_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x7fe2, 0x7fe2 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x7fe3, 0x7fe3 ) AM_WRITE( cafetime_7fe3_w )
 	AM_RANGE( 0x7fe4, 0x7fe4 ) AM_READ( cafetime_7fe4_r )
-	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)
+	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, m_videoram)
 ADDRESS_MAP_END
@@ -1161,29 +1161,13 @@ static READ8_HANDLER( mjvegasa_rom_io_r )
 
 	offset += 0x8000;
 
-	switch(offset)
+	if((offset & 0xfff0) == 0x8000)
 	{
-		case 0x8000:
-		case 0x8001:
-		case 0x8002:
-		case 0x8003:
-		case 0x8004:
-		case 0x8005:
-		case 0x8006:
-		case 0x8007:
-		case 0x8008:
-		case 0x8009:
-		case 0x800a:
-		case 0x800b:
-		case 0x800c:
-		case 0x800d:
-		case 0x800e:
-		case 0x800f:
-		{
-			device_t *rtc = space->machine().device("rtc");
-			return msm6242_r(rtc, offset-0x8000);
-		}
+		msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
+
+		return rtc->read(*space, offset & 0xf);
 	}
+
 	logerror("%04X: unmapped IO read at %04X\n", cpu_get_pc(&space->device()), offset);
 	return 0xff;
 }
@@ -1200,30 +1184,14 @@ static WRITE8_HANDLER( mjvegasa_rom_io_w )
 
 	offset += 0x8000;
 
-	switch(offset)
+	if((offset & 0xfff0) == 0x8000)
 	{
-		case 0x8000:
-		case 0x8001:
-		case 0x8002:
-		case 0x8003:
-		case 0x8004:
-		case 0x8005:
-		case 0x8006:
-		case 0x8007:
-		case 0x8008:
-		case 0x8009:
-		case 0x800a:
-		case 0x800b:
-		case 0x800c:
-		case 0x800d:
-		case 0x800e:
-		case 0x800f:
-		{
-			device_t *rtc = space->machine().device("rtc");
-			msm6242_w(rtc, offset-0x8000, data);
-			return;
-		}
+		msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
+
+		rtc->write(*space, offset & 0xf,data);
+		return;
 	}
+
 	logerror("%04X: unmapped IO write at %04X = %02X\n", cpu_get_pc(&space->device()), offset,data);
 }
 
@@ -3307,12 +3275,21 @@ static TIMER_DEVICE_CALLBACK( janptr96_interrupt )
 	if(scanline == 248)
 		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x80);	// vblank
 
-	if(scanline == 128)
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x82);	// rtc
-
 	if(scanline == 0)
 		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0x84);	// demo
 }
+
+static WRITE_LINE_DEVICE_HANDLER(janptr96_rtc_irq)
+{
+	royalmah_state *drvstate = device->machine().driver_data<royalmah_state>();
+
+	device_set_input_line_and_vector(drvstate->m_maincpu, 0, HOLD_LINE, 0x82);	// rtc
+}
+
+static MSM6242_INTERFACE( janptr96_rtc_intf )
+{
+	DEVCB_LINE(janptr96_rtc_irq)
+};
 
 static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MCFG_DEVICE_REMOVE("maincpu")
@@ -3323,10 +3300,10 @@ static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", janptr96_interrupt, "screen", 0, 1)	/* IM 2 needs a vector on the data bus */
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", janptr96_rtc_intf)
 MACHINE_CONFIG_END
 
 
@@ -3352,56 +3329,64 @@ static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 MACHINE_CONFIG_END
 
 
-static TIMER_DEVICE_CALLBACK( mjtensin_interrupt )
+static INTERRUPT_GEN( mjtensin_interrupt )
 {
-	royalmah_state *state = timer.machine().driver_data<royalmah_state>();
-	int scanline = param;
+	royalmah_state *state = device->machine().driver_data<royalmah_state>();
 
-	if(scanline == 248)
-		device_set_input_line(state->m_maincpu, 0, INPUT_LINE_IRQ0);	// vblank
-
-	if(scanline == 128)
-		device_set_input_line(state->m_maincpu, 0, INPUT_LINE_IRQ1);	// rtc
+	device_set_input_line(state->m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);	// vblank
 }
+
+static WRITE_LINE_DEVICE_HANDLER(mjtensin_rtc_irq)
+{
+	royalmah_state *drvstate = device->machine().driver_data<royalmah_state>();
+
+	device_set_input_line(drvstate->m_maincpu, INPUT_LINE_IRQ1, HOLD_LINE);	// rtc
+}
+
+
+static MSM6242_INTERFACE( mjtensin_rtc_intf )
+{
+	DEVCB_LINE(mjtensin_rtc_irq)
+};
 
 
 static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
 	MCFG_CPU_IO_MAP(mjtensin_iomap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mjtensin_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", mjtensin_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(cafetime_map)
 	MCFG_CPU_IO_MAP(cafetime_iomap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mjtensin_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", mjtensin_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(mjvegasa_map)
 	MCFG_CPU_IO_MAP(mjvegasa_iomap)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", mjtensin_interrupt, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT("screen", mjtensin_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", mjtensin_rtc_intf)
 MACHINE_CONFIG_END
 
 

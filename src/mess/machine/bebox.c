@@ -871,6 +871,7 @@ static const struct kbdc8042_interface bebox_8042_interface =
 	KBDC8042_STANDARD,
 	NULL,
 	bebox_keyboard_interrupt,
+	NULL,
 	bebox_get_out2
 };
 

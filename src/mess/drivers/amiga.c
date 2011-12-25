@@ -49,15 +49,15 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
 
 static READ16_HANDLER( amiga_clock_r )
 {
-	device_t *rtc = space->machine().device("rtc");
-	return msm6242_r(rtc, offset / 2);
+	msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
+	return rtc->read(*space,offset / 2);
 }
 
 
 static WRITE16_HANDLER( amiga_clock_w )
 {
-	device_t *rtc = space->machine().device("rtc");
-	msm6242_w(rtc, offset / 2, data);
+	msm6242_device *rtc = space->machine().device<msm6242_device>("rtc");
+	rtc->write(*space,offset / 2, data);
 }
 
 
@@ -369,6 +369,11 @@ static MACHINE_CONFIG_FRAGMENT( amiga_cartslot )
 	MCFG_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
+static MSM6242_INTERFACE( amiga_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( ntsc, amiga_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
@@ -397,7 +402,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_VIDEO_START(amiga)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
 	MCFG_CENTRONICS_ADD("centronics", amiga_centronics_config)
 
 	/* sound hardware */
