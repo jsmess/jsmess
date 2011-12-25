@@ -135,7 +135,7 @@ protected:
 	int              m_current_palette[32];
 	devcb_resolved_write_line	m_cb_int;
 	devcb_resolved_write_line   m_cb_pause;
-	emu_timer        *m_smsvdp_display_timer;
+	emu_timer        *m_display_timer;
 	emu_timer        *m_set_status_vint_timer;
 	emu_timer        *m_set_status_sprovr_timer;
 	emu_timer        *m_set_status_sprcol_timer;

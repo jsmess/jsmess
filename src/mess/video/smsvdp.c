@@ -1717,8 +1717,8 @@ void sega315_5124_device::device_start()
 	m_tmpbitmap = auto_bitmap_alloc(machine(), width, height, BITMAP_FORMAT_INDEXED32);
 	m_y1_bitmap = auto_bitmap_alloc(machine(), width, height, BITMAP_FORMAT_INDEXED8);
 
-	m_smsvdp_display_timer = timer_alloc(TIMER_LINE);
-	m_smsvdp_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
+	m_display_timer = timer_alloc(TIMER_LINE);
+	m_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
 	m_draw_timer = timer_alloc(TIMER_DRAW);
 	m_set_status_vint_timer = timer_alloc( TIMER_SET_STATUS_VINT );
 	m_set_status_sprovr_timer = timer_alloc( TIMER_SET_STATUS_SPROVR );
