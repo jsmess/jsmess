@@ -311,7 +311,7 @@ static WRITE_LINE_DEVICE_HANDLER( sms_int_callback )
 	cputag_set_input_line(device->machine(), "maincpu", 0, state);
 }
 
-static const smsvdp_interface _315_5124_ntsc_intf =
+static const sega315_5124_interface _315_5124_ntsc_intf =
 {
 	false,
 	"screen",
@@ -319,7 +319,7 @@ static const smsvdp_interface _315_5124_ntsc_intf =
 	DEVCB_LINE(sms_pause_callback)
 };
 
-static const smsvdp_interface _315_5124_pal_intf =
+static const sega315_5124_interface _315_5124_pal_intf =
 {
 	true,
 	"screen",
@@ -327,7 +327,7 @@ static const smsvdp_interface _315_5124_pal_intf =
 	DEVCB_LINE(sms_pause_callback)
 };
 
-static const smsvdp_interface sms_store_intf =
+static const sega315_5124_interface sms_store_intf =
 {
 	false,
 	"screen",

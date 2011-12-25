@@ -46,8 +46,8 @@ PALETTE_INIT( sega315_5378 );
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _smsvdp_interface smsvdp_interface;
-struct _smsvdp_interface
+typedef struct _sega315_5124_interface sega315_5124_interface;
+struct _sega315_5124_interface
 {
 	bool               m_is_pal;             /* false = NTSC, true = PAL */
 	const char         *m_screen_tag;
@@ -62,7 +62,7 @@ extern const device_type SEGA315_5378;		/* Gamegear vdp */
 
 
 class sega315_5124_device : public device_t,
-                            public smsvdp_interface,
+                            public sega315_5124_interface,
                             public device_memory_interface
 {
 public:

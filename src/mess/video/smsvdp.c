@@ -1683,15 +1683,15 @@ void sega315_5124_device::update_video( bitmap_t *bitmap, const rectangle *clipr
 
 void sega315_5124_device::device_config_complete()
 {
-	const smsvdp_interface *intf = reinterpret_cast<const smsvdp_interface *>(static_config());
+	const sega315_5124_interface *intf = reinterpret_cast<const sega315_5124_interface *>(static_config());
 
 	if ( intf != NULL )
 	{
-		*static_cast<smsvdp_interface *>(this) = *intf;
+		*static_cast<sega315_5124_interface *>(this) = *intf;
 	}
 	else
 	{
-		fatalerror("No smsvdp_interface supplied\n");
+		fatalerror("No sega315_5124_interface supplied\n");
 	}
 }
 
