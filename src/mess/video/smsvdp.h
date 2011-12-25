@@ -82,7 +82,7 @@ public:
 	void update_video( bitmap_t *bitmap, const rectangle *cliprect );
 
 	int check_brightness( int x, int y );
-	virtual void set_gg_sms_mode( bool sms_mode ) { };
+	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) { };
 
 protected:
 	virtual void set_display_settings();
@@ -114,7 +114,7 @@ protected:
 	int              m_cram_dirty;               /* Have there been any changes to the CRAM area */
 	int              m_pending;
 	UINT8            m_buffer;
-	bool             m_gg_sms_mode;              /* Shrunk SMS screen on GG lcd mode flag */
+	bool             m_sega315_5124_compatibility_mode;    /* Shrunk SMS screen on GG lcd mode flag */
 	int              m_irq_state;                /* The status of the IRQ line of the VDP */
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
@@ -175,7 +175,7 @@ public:
 
 	virtual void device_reset();
 
-	virtual void set_gg_sms_mode( bool sms_mode );
+	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode );
 
 protected:
 	virtual void set_display_settings();
