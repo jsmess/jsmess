@@ -72,7 +72,6 @@
 #include "includes/coco.h"
 #include "machine/wd17xx.h"
 #include "machine/ds1315.h"
-#include "machine/msm6242.h"
 #include "imagedev/flopdrv.h"
 #include "formats/coco_dsk.h"
 
@@ -164,9 +163,14 @@ static const wd17xx_interface coco_wd17xx_interface =
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
+static MSM6242_INTERFACE( coco_fdc_rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_FRAGMENT(coco_fdc)
 	MCFG_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
-	MCFG_MSM6242_ADD(DISTO_TAG)
+	MCFG_MSM6242_ADD(DISTO_TAG, coco_fdc_rtc_intf)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
@@ -202,7 +206,7 @@ void coco_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 	m_drq           	= 1;
-	m_disto_msm6242		= subdevice(DISTO_TAG);
+	m_disto_msm6242		= subdevice<msm6242_device>(DISTO_TAG);
 	m_ds1315			= subdevice(CLOUD9_TAG);
 	m_wd17xx			= subdevice(WD_TAG);
 	m_dskreg			= 0x00;
@@ -360,7 +364,7 @@ READ8_MEMBER(coco_fdc_device::read)
 	{
 		case 0x10:	/* FF50 */
 			if (real_time_clock() == RTC_DISTO)
-				result = msm6242_r(m_disto_msm6242, m_msm6242_rtc_address);
+				result = m_disto_msm6242->read(space,m_msm6242_rtc_address);
 			break;
 
 		case 0x38:	/* FF78 */
@@ -414,7 +418,7 @@ WRITE8_MEMBER(coco_fdc_device::write)
 	{
 		case 0x10:	/* FF50 */
 			if (real_time_clock() == RTC_DISTO)
-				msm6242_w(m_disto_msm6242, m_msm6242_rtc_address, data);
+				m_disto_msm6242->write(space,m_msm6242_rtc_address, data);
 			break;
 
 		case 0x11:	/* FF51 */

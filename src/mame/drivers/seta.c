@@ -2900,7 +2900,7 @@ static ADDRESS_MAP_START( inttoote_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x700000, 0x700101) AM_RAM_READ(inttoote_700000_r) AM_BASE_MEMBER(seta_state, m_inttoote_700000)
 
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
+	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write, 0x00ff)
 
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w		)	// Sound
 
@@ -2966,7 +2966,7 @@ static ADDRESS_MAP_START( jockeyc_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500003) AM_READ(inttoote_dsw_r)	// DSW x 3
 	AM_RANGE(0x600000, 0x600003) AM_READ(unk_r)
 
-	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
+	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write, 0x00ff)
 
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w)	// Sound
 
@@ -8973,12 +8973,13 @@ MACHINE_CONFIG_END
                              International Toote
 ***************************************************************************/
 
-// Test mode shows a 16ms and 2ms counters
+// Test mode shows a 16ms and 2ms counters, then there's vblank and presumably ACIA irqs ...
 static TIMER_DEVICE_CALLBACK( inttoote_interrupt )
 {
 	seta_state *state = timer.machine().driver_data<seta_state>();
 	int scanline = param;
 
+	/* ACIA irq */
 	if(scanline == 15)
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 
@@ -9024,6 +9025,11 @@ static const pia6821_interface inttoote_pia1_intf =
 	DEVCB_NULL		/* IRQB */
 };
 
+static MSM6242_INTERFACE( rtc_intf )
+{
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( inttoote, seta_state )
 
 	/* basic machine hardware */
@@ -9060,7 +9066,7 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc", rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jockeyc, inttoote )
