@@ -405,11 +405,11 @@ WRITE8_MEMBER( sega315_5124_device::hcount_latch_write )
 }
 
 
-void sega315_5378_device::set_gg_sms_mode( bool sms_mode )
+void sega315_5378_device::set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode )
 {
-	m_gg_sms_mode = sms_mode;
-	m_cram_mask = (!m_gg_sms_mode) ? (SEGA315_5378_CRAM_SIZE - 1) : (SEGA315_5124_CRAM_SIZE - 1);
-	m_draw_time = m_gg_sms_mode ? DRAW_TIME_SMS : DRAW_TIME_GG;
+	m_sega315_5124_compatibility_mode = sega315_5124_compatibility_mode;
+	m_cram_mask = (!m_sega315_5124_compatibility_mode) ? (SEGA315_5378_CRAM_SIZE - 1) : (SEGA315_5124_CRAM_SIZE - 1);
+	m_draw_time = m_sega315_5124_compatibility_mode ? DRAW_TIME_SMS : DRAW_TIME_GG;
 }
 
 
@@ -1511,7 +1511,7 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 		}
 	}
 
-	if (m_gg_sms_mode)
+	if (m_sega315_5124_compatibility_mode)
 	{
 		int *combineline_buffer = m_line_buffer + ((line & 0x03) + 1) * 256;
 		int plot_x = 48;
@@ -1654,7 +1654,7 @@ void sega315_5378_device::update_palette()
 	}
 	m_cram_dirty = 0;
 
-	if (m_gg_sms_mode)
+	if (m_sega315_5124_compatibility_mode)
 	{
 		for (i = 0; i < 32; i++)
 		{
@@ -1734,7 +1734,7 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_cram_dirty));
 	save_item(NAME(m_pending));
 	save_item(NAME(m_buffer));
-	save_item(NAME(m_gg_sms_mode));
+	save_item(NAME(m_sega315_5124_compatibility_mode));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_vdp_mode));
 	save_item(NAME(m_y_pixels));
@@ -1765,7 +1765,7 @@ void sega315_5124_device::device_reset()
 	m_reg9copy = 0;
 	m_addrmode = 0;
 	m_addr = 0;
-	m_gg_sms_mode = false;
+	m_sega315_5124_compatibility_mode = false;
 	m_cram_mask = m_cram_size - 1;
 	m_cram_dirty = 1;
 	m_pending = 0;

@@ -2014,7 +2014,7 @@ MACHINE_RESET( sms )
 
 	if (state->m_cartridge[state->m_current_cartridge].features & CF_GG_SMS_MODE)
 	{
-		state->m_vdp->set_gg_sms_mode(true);
+		state->m_vdp->set_sega315_5124_compatibility_mode(true);
 	}
 
 	/* Initialize SIO stuff for GG */
