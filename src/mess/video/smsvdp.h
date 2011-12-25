@@ -16,23 +16,23 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SMS_X_PIXELS			342		/* 342 pixels */
-#define SMS_NTSC_Y_PIXELS			262		/* 262 lines */
-#define SMS_PAL_Y_PIXELS			313		/* 313 lines */
-#define SMS_LBORDER_START			(1 + 2 + 14 + 8)
-#define SMS_LBORDER_X_PIXELS		(0x0d)		/* 13 pixels */
-#define SMS_RBORDER_X_PIXELS		(0x0f)		/* 15 pixels */
-#define SMS_TBORDER_START			(3 + 13)
-#define SMS_NTSC_192_TBORDER_Y_PIXELS	(0x1b)		/* 27 lines */
-//#define NTSC_192_BBORDER_Y_PIXELS (0x18)      /* 24 lines */
-#define SMS_NTSC_224_TBORDER_Y_PIXELS	(0x0b)		/* 11 lines */
-//#define NTSC_224_BBORDER_Y_PIXELS (0x08)      /* 8 lines */
-//#define PAL_192_TBORDER_Y_PIXELS  (0x36)      /* 54 lines */
-//#define PAL_192_BBORDER_Y_PIXELS  (0x30)      /* 48 lines */
-//#define PAL_224_TBORDER_Y_PIXELS  (0x26)      /* 38 lines */
-//#define PAL_224_BBORDER_Y_PIXELS  (0x20)      /* 32 lines */
-#define SMS_PAL_240_TBORDER_Y_PIXELS	(0x1e)		/* 30 lines */
-//#define PAL_240_BBORDER_Y_PIXELS  (0x18)      /* 24 lines */
+#define SEGA315_5124_WIDTH                      342     /* 342 pixels */
+#define SEGA315_5124_HEIGHT_NTSC                262     /* 262 lines */
+#define SEGA315_5124_HEIGHT_PAL                 313     /* 313 lines */
+#define SEGA315_5124_LBORDER_START              (1 + 2 + 14 + 8)
+#define SEGA315_5124_LBORDER_WIDTH              13      /* 13 pixels */
+#define SEGA315_5124_RBORDER_WIDTH              15      /* 15 pixels */
+#define SEGA315_5124_TBORDER_START              (3 + 13)
+#define SEGA315_5124_NTSC_192_TBORDER_HEIGHT    (0x1b)  /* 27 lines */
+//#define SEGA315_5124_NTSC_192_BBORDER_HEIGHT  (0x18)  /* 24 lines */
+#define SEGA315_5124_NTSC_224_TBORDER_HEIGHT    (0x0b)  /* 11 lines */
+//#define SEGA315_5124_NTSC_224_BBORDER_HEIGHT  (0x08)  /* 8 lines */
+//#define SEGA315_5124_PAL_192_TBORDER_HEIGHT   (0x36)  /* 54 lines */
+//#define SEGA315_5124_PAL_192_BBORDER_HEIGHT   (0x30)  /* 48 lines */
+//#define SEGA315_5124_PAL_224_TBORDER_HEIGHT   (0x26)  /* 38 lines */
+//#define SEGA315_5124_PAL_224_BBORDER_HEIGHT   (0x20)  /* 32 lines */
+#define SEGA315_5124_PAL_240_TBORDER_HEIGHT     (0x1e)  /* 30 lines */
+//#define SEGA315_5124_PAL_240_BBORDER_HEIGHT   (0x18)  /* 24 lines */
 
 
 #define SEGA315_5124_PALETTE_SIZE	(64+16)
@@ -56,9 +56,9 @@ struct _sega315_5124_interface
 };
 
 
-extern const device_type SEGA315_5124;		/* SMS1 vdp */
-extern const device_type SEGA315_5246;		/* SMS2 vdp */
-extern const device_type SEGA315_5378;		/* Gamegear vdp */
+extern const device_type SEGA315_5124;		/* aka SMS1 vdp */
+extern const device_type SEGA315_5246;		/* aka SMS2 vdp */
+extern const device_type SEGA315_5378;		/* aka Gamegear vdp */
 
 
 class sega315_5124_device : public device_t,
@@ -125,7 +125,7 @@ protected:
 	const UINT8      *m_frame_timing;
 	bitmap_t         *m_tmpbitmap;
 	bitmap_t         *m_y1_bitmap;
-	UINT8            m_collision_buffer[SMS_X_PIXELS];
+	UINT8            m_collision_buffer[SEGA315_5124_WIDTH];
 	UINT8            m_palette_offset;
 
 	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.

@@ -422,7 +422,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		break;
 
 	case TIMER_DRAW:
-		draw_scanline( SMS_LBORDER_START + SMS_LBORDER_X_PIXELS, param, m_screen->vpos() - param );
+		draw_scanline( SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, param, m_screen->vpos() - param );
 		break;
 
 	case TIMER_SET_STATUS_VINT:
@@ -522,21 +522,21 @@ void sega315_5124_device::process_line_timer()
 		update_palette();
 
 		/* Draw left border */
-		rec.min_x = SMS_LBORDER_START;
-		rec.max_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 1;
+		rec.min_x = SEGA315_5124_LBORDER_START;
+		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
 		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw right border */
-		rec.min_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256;
-		rec.max_x = rec.min_x + SMS_RBORDER_X_PIXELS - 1;
+		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
+		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
 		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		draw_scanline( SMS_LBORDER_START + SMS_LBORDER_X_PIXELS, vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V], vpos - (vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V]) );
+		draw_scanline( SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V], vpos - (vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V]) );
 		return;
 	}
 
@@ -555,14 +555,14 @@ void sega315_5124_device::process_line_timer()
 		update_palette();
 
 		/* Draw left border */
-		rec.min_x = SMS_LBORDER_START;
-		rec.max_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 1;
+		rec.min_x = SEGA315_5124_LBORDER_START;
+		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
 		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw right border */
-		rec.min_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256;
-		rec.max_x = rec.min_x + SMS_RBORDER_X_PIXELS - 1;
+		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
+		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
 		bitmap_fill(m_y1_bitmap, &rec, 1);
 
@@ -572,7 +572,7 @@ void sega315_5124_device::process_line_timer()
 		}
 		else
 		{
-			draw_scanline( SMS_LBORDER_START + SMS_LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
+			draw_scanline( SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, vpos_limit, vpos - vpos_limit );
 		}
 		return;
 	}
@@ -586,21 +586,21 @@ void sega315_5124_device::process_line_timer()
 		update_palette();
 
 		/* Draw left border */
-		rec.min_x = SMS_LBORDER_START;
-		rec.max_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS - 1;
+		rec.min_x = SEGA315_5124_LBORDER_START;
+		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
 		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw right border */
-		rec.min_x = SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256;
-		rec.max_x = rec.min_x + SMS_RBORDER_X_PIXELS - 1;
+		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
+		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
 		bitmap_fill(m_y1_bitmap, &rec, 1);
 
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		draw_scanline( SMS_LBORDER_START + SMS_LBORDER_X_PIXELS, vpos_limit + m_frame_timing[TOP_BORDER], vpos - (vpos_limit + m_frame_timing[TOP_BORDER]) );
+		draw_scanline( SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, vpos_limit + m_frame_timing[TOP_BORDER], vpos - (vpos_limit + m_frame_timing[TOP_BORDER]) );
 		return;
 	}
 
@@ -913,7 +913,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 	if (sprite_buffer_count > 8)
 		sprite_buffer_count = 8;
 
-	memset(m_collision_buffer, 0, SMS_X_PIXELS);
+	memset(m_collision_buffer, 0, SEGA315_5124_WIDTH);
 	sprite_buffer_count--;
 
 	for (sprite_buffer_index = sprite_buffer_count; sprite_buffer_index >= 0; sprite_buffer_index--)
@@ -1111,7 +1111,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int pixel
 	if (sprite_buffer_count > 4)
 		sprite_buffer_count = 4;
 
-	memset(m_collision_buffer, 0, SMS_X_PIXELS);
+	memset(m_collision_buffer, 0, SEGA315_5124_WIDTH);
 	sprite_buffer_count--;
 
 	for (sprite_buffer_index = sprite_buffer_count; sprite_buffer_index >= 0; sprite_buffer_index--)
@@ -1546,7 +1546,7 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
         */
 		{
 			int gg_line;
-			int my_line = pixel_plot_y + line - (SMS_TBORDER_START + SMS_NTSC_224_TBORDER_Y_PIXELS);
+			int my_line = pixel_plot_y + line - (SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
 			int *line1, *line2, *line3, *line4;
 
 			/* First make sure there's enough data to draw anything */
@@ -1565,7 +1565,7 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 			}
 
 			/* Calculate the line we will be drawing on */
-			pixel_plot_y = SMS_TBORDER_START + SMS_NTSC_192_TBORDER_Y_PIXELS + 24 + gg_line;
+			pixel_plot_y = SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 24 + gg_line;
 
 			/* Setup our source lines */
 			line1 = m_line_buffer + (((my_line - 3) & 0x03) + 1) * 256;
@@ -1603,7 +1603,7 @@ int sega315_5124_device::check_brightness(int x, int y)
 
 	/* TODO: Check how Light Phaser behaves for border areas. For Gangster Town, should */
 	/* a shot at right border (HC~=0x90) really appear at active scr, near to left border? */
-	if (x < SMS_LBORDER_START + SMS_LBORDER_X_PIXELS || x >= SMS_LBORDER_START + SMS_LBORDER_X_PIXELS + 256)
+	if (x < SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH || x >= SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256)
 		return 0;
 
 	rgb_t color = *BITMAP_ADDR32(m_tmpbitmap, y, x);
