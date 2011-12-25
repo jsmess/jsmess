@@ -82,7 +82,7 @@ public:
 	void update_video( bitmap_t *bitmap, const rectangle *cliprect );
 
 	int check_brightness( int x, int y );
-	virtual void set_gg_sms_mode( int mode ) { };
+	virtual void set_gg_sms_mode( bool sms_mode ) { };
 
 protected:
 	virtual void set_display_settings();
@@ -114,10 +114,11 @@ protected:
 	int              m_cram_dirty;               /* Have there been any changes to the CRAM area */
 	int              m_pending;
 	UINT8            m_buffer;
-	int              m_gg_sms_mode;              /* Shrunk SMS screen on GG lcd mode flag */
+	bool             m_gg_sms_mode;              /* Shrunk SMS screen on GG lcd mode flag */
 	int              m_irq_state;                /* The status of the IRQ line of the VDP */
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
+	int              m_draw_time;
 	UINT8            m_line_counter;
 	UINT8            m_hcounter;
 	memory_region    *m_CRAM;                    /* Pointer to CRAM */
@@ -140,6 +141,7 @@ protected:
 	emu_timer        *m_set_status_sprcol_timer;
 	emu_timer        *m_check_hint_timer;
 	emu_timer        *m_check_vint_timer;
+	emu_timer        *m_draw_timer;
 	screen_device    *m_screen;
 
 	const address_space_config  m_space_config;
@@ -151,6 +153,7 @@ protected:
 	static const device_timer_id TIMER_CHECK_HINT = 3;
 	static const device_timer_id TIMER_CHECK_VINT = 4;
 	static const device_timer_id TIMER_SET_STATUS_SPRCOL = 5;
+	static const device_timer_id TIMER_DRAW = 6;
 };
 
 
@@ -170,7 +173,9 @@ class sega315_5378_device : public sega315_5124_device
 public:
 	sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual void set_gg_sms_mode( int mode );
+	virtual void device_reset();
+
+	virtual void set_gg_sms_mode( bool sms_mode );
 
 protected:
 	virtual void set_display_settings();

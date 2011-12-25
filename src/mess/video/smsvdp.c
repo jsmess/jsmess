@@ -47,6 +47,7 @@ PAL frame timing
 #include "emu.h"
 #include "video/smsvdp.h"
 #include "machine/devhelpr.h"
+#include "debugger.h"
 
 
 #define STATUS_VINT           0x80	/* Pending vertical interrupt flag */
@@ -61,6 +62,9 @@ PAL frame timing
 #define SPROVR_HPOS           6
 #define SPRCOL_BASEHPOS       42
 #define DISPLAY_CB_HPOS       5  /* fix X-Scroll latchtime (Flubba's VDPTest) */
+
+#define DRAW_TIME_GG		86		/* 1 + 2 + 14 +8 + 96/2 */
+#define DRAW_TIME_SMS		0
 
 #define SEGA315_5378_CRAM_SIZE    0x40	/* 32 colors x 2 bytes per color = 64 bytes */
 #define SEGA315_5124_CRAM_SIZE    0x20	/* 32 colors x 1 bytes per color = 32 bytes */
@@ -401,10 +405,11 @@ WRITE8_MEMBER( sega315_5124_device::hcount_latch_write )
 }
 
 
-void sega315_5378_device::set_gg_sms_mode( int mode )
+void sega315_5378_device::set_gg_sms_mode( bool sms_mode )
 {
-	m_gg_sms_mode = mode;
+	m_gg_sms_mode = sms_mode;
 	m_cram_mask = (!m_gg_sms_mode) ? (SEGA315_5378_CRAM_SIZE - 1) : (SEGA315_5124_CRAM_SIZE - 1);
+	m_draw_time = m_gg_sms_mode ? DRAW_TIME_SMS : DRAW_TIME_GG;
 }
 
 
@@ -414,6 +419,10 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 	{
 	case TIMER_LINE:
 		process_line_timer();
+		break;
+
+	case TIMER_DRAW:
+		draw_scanline( SMS_LBORDER_START + SMS_LBORDER_X_PIXELS, param, m_screen->vpos() - param );
 		break;
 
 	case TIMER_SET_STATUS_VINT:
@@ -557,8 +566,14 @@ void sega315_5124_device::process_line_timer()
 		bitmap_fill(m_tmpbitmap, &rec, machine().pens[m_current_palette[BACKDROP_COLOR]]);
 		bitmap_fill(m_y1_bitmap, &rec, 1);
 
-		draw_scanline( SMS_LBORDER_START + SMS_LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
-
+		if ( m_draw_time > 0 )
+		{
+			m_draw_timer->adjust( m_screen->time_until_pos( vpos, m_draw_time ), vpos_limit );
+		}
+		else
+		{
+			draw_scanline( SMS_LBORDER_START + SMS_LBORDER_X_PIXELS, vpos_limit, vpos - vpos_limit );
+		}
 		return;
 	}
 
@@ -700,6 +715,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 		case 2:		/* VDP register write */
 			reg_num = data & 0x0f;
 			m_reg[reg_num] = m_addr & 0xff;
+			logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xf );
 			if ( reg_num == 0 && ( m_addr & 0x02 ) )
 				logerror("overscan enabled.\n");
 
@@ -1703,6 +1719,7 @@ void sega315_5124_device::device_start()
 
 	m_smsvdp_display_timer = timer_alloc(TIMER_LINE);
 	m_smsvdp_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
+	m_draw_timer = timer_alloc(TIMER_DRAW);
 	m_set_status_vint_timer = timer_alloc( TIMER_SET_STATUS_VINT );
 	m_set_status_sprovr_timer = timer_alloc( TIMER_SET_STATUS_SPROVR );
 	m_set_status_sprcol_timer = timer_alloc( TIMER_SET_STATUS_SPRCOL );
@@ -1729,6 +1746,7 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_collision_buffer));
 	save_item(NAME(*m_tmpbitmap));
 	save_item(NAME(*m_y1_bitmap));
+	save_item(NAME(m_draw_time));
 }
 
 
@@ -1747,7 +1765,7 @@ void sega315_5124_device::device_reset()
 	m_reg9copy = 0;
 	m_addrmode = 0;
 	m_addr = 0;
-	m_gg_sms_mode = 0;
+	m_gg_sms_mode = false;
 	m_cram_mask = m_cram_size - 1;
 	m_cram_dirty = 1;
 	m_pending = 0;
@@ -1755,6 +1773,7 @@ void sega315_5124_device::device_reset()
 	m_irq_state = 0;
 	m_line_counter = 0;
 	m_hcounter = 0;
+	m_draw_time = DRAW_TIME_SMS;
 
 	for (i = 0; i < 0x20; i++)
 		m_current_palette[i] = 0;
@@ -1765,4 +1784,12 @@ void sega315_5124_device::device_reset()
 	memset(m_CRAM->base(), 0, SEGA315_5378_CRAM_SIZE);
 	memset(m_line_buffer, 0, 256 * 5 * sizeof(int));
 }
+
+
+void sega315_5378_device::device_reset()
+{
+	sega315_5124_device::device_reset();
+	m_draw_time = DRAW_TIME_GG;
+}
+
 
