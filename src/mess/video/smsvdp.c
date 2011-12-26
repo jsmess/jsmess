@@ -150,12 +150,13 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, device_memory_interface(mconfig, *this)
 	, m_cram_size( SEGA315_5124_CRAM_SIZE )
 	, m_palette_offset( 0 )
+	, m_supports_224_240( false )
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
 {
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240)
 	: device_t( mconfig, type, name, tag, owner, clock )
 	, device_memory_interface(mconfig, *this)
 	, m_cram_size( cram_size )
@@ -166,13 +167,13 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 
 
 sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0 )
+	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true )
 {
 }
 
 
 sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10 )
+	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true )
 {
 }
 
@@ -190,146 +191,18 @@ void sega315_5124_device::set_display_settings()
 	{
 		/* mode 4 */
 		m_vdp_mode = 4;
-	}
-	else
-	{
-		/* original TMS9918 mode */
-		if (!M1 && !M2 && !M3)
+		if ( m_supports_224_240 )
 		{
-			m_vdp_mode = 0;
-		}
-		else
-//      if (M1 && !M2 && !M3)
-//      {
-//          m_vdp_mode = 1;
-//      }
-//      else
-		if (!M1 && M2 && !M3)
-		{
-			m_vdp_mode = 2;
-//      }
-//      else
-//      if (!M1 && !M2 && M3)
-//      {
-//          m_vdp_mode = 3;
-		}
-		else
-		{
-			logerror("Unknown video mode detected (M1 = %c, M2 = %c, M3 = %c, M4 = %c)\n", M1 ? '1' : '0', M2 ? '1' : '0', M3 ? '1' : '0', M4 ? '1' : '0');
-		}
-	}
-
-	switch (m_y_pixels)
-	{
-	case 192:
-		m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
-		break;
-
-	case 224:
-		m_frame_timing = (m_is_pal) ? pal_224 : ntsc_224;
-		break;
-
-	case 240:
-		m_frame_timing = (m_is_pal) ? pal_240 : ntsc_240;
-		break;
-	}
-	m_cram_dirty = 1;
-}
-
-
-void sega315_5246_device::set_display_settings()
-{
-	bool M1 = m_reg[0x01] & 0x10;
-	bool M2 = m_reg[0x00] & 0x02;
-	bool M3 = m_reg[0x01] & 0x08;
-	bool M4 = m_reg[0x00] & 0x04;
-
-	m_y_pixels = 192;
-
-	if (M4)
-	{
-		/* mode 4 */
-		m_vdp_mode = 4;
-		if (M2)
-		{
-			if (M1 && !M3)
+			if (M2)
 			{
-				m_y_pixels = 224;	/* 224-line display */
-			}
-			else if (!M1 && M3)
-			{
-				m_y_pixels = 240;	/* 240-line display */
-			}
-		}
-	}
-	else
-	{
-		/* original TMS9918 mode */
-		if (!M1 && !M2 && !M3)
-		{
-			m_vdp_mode = 0;
-		}
-		else
-//      if (M1 && !M2 && !M3)
-//      {
-//          m_vdp_mode = 1;
-//      }
-//      else
-		if (!M1 && M2 && !M3)
-		{
-			m_vdp_mode = 2;
-//      }
-//      else
-//      if (!M1 && !M2 && M3)
-//      {
-//          m_vdp_mode = 3;
-		}
-		else
-		{
-			logerror("Unknown video mode detected (M1 = %c, M2 = %c, M3 = %c, M4 = %c)\n", M1 ? '1' : '0', M2 ? '1' : '0', M3 ? '1' : '0', M4 ? '1' : '0');
-		}
-	}
-
-	switch (m_y_pixels)
-	{
-	case 192:
-		m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
-		break;
-
-	case 224:
-		m_frame_timing = (m_is_pal) ? pal_224 : ntsc_224;
-		break;
-
-	case 240:
-		m_frame_timing = (m_is_pal) ? pal_240 : ntsc_240;
-		break;
-	}
-	m_cram_dirty = 1;
-}
-
-
-void sega315_5378_device::set_display_settings()
-{
-	bool M1 = m_reg[0x01] & 0x10;
-	bool M2 = m_reg[0x00] & 0x02;
-	bool M3 = m_reg[0x01] & 0x08;
-	bool M4 = m_reg[0x00] & 0x04;
-
-	m_y_pixels = 192;
-
-	if (M4)
-	{
-		/* mode 4 */
-		m_vdp_mode = 4;
-		if (M2)
-		{
-			if (M1 && !M3)
-			{
-				m_y_pixels = 224;	/* 224-line display */
-			}
-			else if (!M1 && M3)
-			{
-				m_y_pixels = 240;	/* 240-line display */
+				if (M1 && !M3)
+				{
+					m_y_pixels = 224;   /* 224-line display */
+				}
+				else if (!M1 && M3)
+				{
+					m_y_pixels = 240;   /* 240-line display */
+				}
 			}
 		}
 	}

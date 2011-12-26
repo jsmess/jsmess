@@ -68,7 +68,7 @@ class sega315_5124_device : public device_t,
 public:
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset);
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240);
 
 	DECLARE_READ8_MEMBER( vram_read );
 	DECLARE_WRITE8_MEMBER( vram_write );
@@ -87,7 +87,7 @@ public:
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) { };
 
 protected:
-	virtual void set_display_settings();
+	void set_display_settings();
 	virtual void update_palette();
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_address();
@@ -129,6 +129,7 @@ protected:
 	bitmap_t         *m_y1_bitmap;
 	UINT8            m_collision_buffer[SEGA315_5124_WIDTH];
 	UINT8            m_palette_offset;
+	bool             m_supports_224_240;
 
 	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
        Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
@@ -165,7 +166,6 @@ public:
 	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void set_display_settings();
 	virtual UINT16 get_name_table_address();
 };
 
@@ -180,7 +180,6 @@ public:
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode );
 
 protected:
-	virtual void set_display_settings();
 	virtual void update_palette();
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_address();
