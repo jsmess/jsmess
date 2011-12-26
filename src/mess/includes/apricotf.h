@@ -61,7 +61,7 @@ public:
 	required_device<device_t> m_centronics;
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_READ16_MEMBER( palette_r );
 	DECLARE_WRITE16_MEMBER( palette_w );
 	DECLARE_WRITE8_MEMBER( system_w );
@@ -69,10 +69,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	
+
 	int m_ctc_int;
 	int m_sio_int;
-	
+
 	UINT16 *m_p_paletteram;
 	UINT16 *m_p_scrollram;
 	int m_40_80;

@@ -99,8 +99,8 @@ Notes:
     - real keyboard w/i8049
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
     - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
-	
-		chdman -createblankhd cm5412.chd 306 4 17 512
+
+        chdman -createblankhd cm5412.chd 306 4 17 512
 
 */
 
@@ -389,25 +389,25 @@ READ8_MEMBER( v1050_state::sasi_r )
 
         bit     description
 
-        0		REQ-
-        1		BUSY
-        2		MESSAGE
-        3		C/D-
-        4		I-/O
+        0       REQ-
+        1       BUSY
+        2       MESSAGE
+        3       C/D-
+        4       I-/O
         5
         6
         7
 
     */
-	
+
 	UINT8 data = 0;
-	
+
 	data |= scsi_req_r(m_sasibus);
 	data |= !scsi_bsy_r(m_sasibus) << 1;
 	data |= !scsi_msg_r(m_sasibus) << 2;
 	data |= !scsi_cd_r(m_sasibus) << 3;
 	data |= scsi_io_r(m_sasibus) << 4;
-	
+
 	return data;
 }
 
@@ -417,17 +417,17 @@ WRITE8_MEMBER( v1050_state::sasi_w )
 
         bit     description
 
-        0		SEL
-        1		ACK
+        0       SEL
+        1       ACK
         2
         3
         4
         5
         6
-        7		RST
+        7       RST
 
     */
-	
+
 	scsi_sel_w(m_sasibus, !BIT(data, 0));
 	scsi_ack_w(m_sasibus, !BIT(data, 1));
 	scsi_rst_w(m_sasibus, !BIT(data, 7));

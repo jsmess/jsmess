@@ -1182,7 +1182,7 @@ static MACHINE_CONFIG_DERIVED( maccclas, maclc )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
-    
+
     MCFG_EGRET_REMOVE()
     MCFG_CUDA_ADD(CUDA_341S0788)    // should be 341s0417, but only the color classic used that rev and those are "collectable" ($$$$)
     MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -2141,8 +2141,8 @@ ROM_START( maccclas )
 ROM_END
 
 /*ROM_START( macpd210 )
-	ROM_REGION32_BE(0x100000, "bootrom", 0)
-	ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) ) 
+    ROM_REGION32_BE(0x100000, "bootrom", 0)
+    ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) )
 ROM_END*/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */

@@ -161,8 +161,8 @@ static void lynx_audio_shift(device_t *device, LYNX_AUDIO *channel)
 		if((channel->mask>>bit)&1) xor_out ^= (channel->shifter>>bit)&1;
 	}
 	channel->shifter = ((channel->shifter<<1)&0xffe) | (xor_out ^ 1); // output of xor is inverted
-	
-	
+
+
     if (channel->reg.control1&0x20) // integrate mode enabled
 	{
 		if (channel->shifter&1)

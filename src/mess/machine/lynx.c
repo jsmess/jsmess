@@ -333,13 +333,13 @@ static void lynx_blit_do_work( lynx_state *state, const int y, const int xdir, c
 	next_line_addr = state->m_blitter.mem[state->m_blitter.bitmap]; // offset to second sprite line
 	width_accum = (xdir == 1) ? state->m_blitter.width_offset : 0;
 	state->m_blitter.memory_accesses++;
-	
+
 	for (xi = state->m_blitter.x_pos - state->m_blitter.xoff, bits = 0, buffer = 0, j = 1; j < next_line_addr;j++)
 	{
 		buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
 		bits += 8; // current bits in buffer
 		state->m_blitter.memory_accesses++;
-		
+
 		for ( ; bits > bits_per_pixel; bits -= bits_per_pixel) // last data packet at end of scanline is not rendered (qix, blulght)
 		{
 			color = state->m_blitter.color[(buffer >> (bits - bits_per_pixel)) & mask];
@@ -417,7 +417,7 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 	int buffer, bits, j;
 	int literal_data, count, color;
 	UINT16 width_accum;
-	
+
 	width_accum = (xdir == 1) ? 0 : state->m_blitter.width_offset;
 	for( bits = 0, j = 0, buffer = 0, xi = state->m_blitter.x_pos - state->m_blitter.xoff; ; )		/* through the rle entries */
 	{
@@ -438,7 +438,7 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 		bits -= 4;
 
 		if (literal_data)		/* count of different pixels */
-		{		
+		{
 			for ( ; count >= 0; count--)
 			{
 				if (bits < bits_per_pixel)
@@ -556,26 +556,26 @@ static void lynx_blit_lines(lynx_state *state)
 			flip = 2;
 			break;
 	}
-	
+
 	if (state->m_blitter.spr_ctl0 & 0x20)	/* Horizontal Flip */
 	{
 		xdir *= -1;
 		//state->m_blitter.x_pos -= xdir; // causes blank lines in todds adventures, klax, etc
 	}
-	
+
 	if (state->m_blitter.spr_ctl0 & 0x10)	/* Vertical Flip */
 	{
 		ydir *= -1;
 		//state->m_blitter.y_pos -= ydir; // causes blank lines in todds adventures, klax, etc
 	}
-	
+
 	// Set height accumulator based on drawing direction
 	state->m_blitter.height_accumulator = (ydir == 1) ? state->m_blitter.height_offset : 0x00;
-	
+
 	for (y = state->m_blitter.y_pos - state->m_blitter.yoff; (i = state->m_blitter.mem[state->m_blitter.bitmap]); state->m_blitter.bitmap += i)
 	{
 		state->m_blitter.memory_accesses++;
-	
+
 		if (i == 1) // draw next quadrant
 		{
 			// centered sprites sprdemo3, fat bobby, blockout
@@ -597,7 +597,7 @@ static void lynx_blit_lines(lynx_state *state)
 			state->m_blitter.height_accumulator = (ydir == 1) ? state->m_blitter.height_offset : 0x00;
 			continue;
 		}
-		
+
 		INT16 x = state->m_blitter.x_pos - state->m_blitter.xoff;
 		// superclipping
 		if (((x > 159) && (xdir == 1)) || ((x < 0) && (xdir == -1)) || ((y > 101) && (ydir == 1)) || ((y < 0) && (ydir == -1)))
@@ -790,7 +790,7 @@ static void lynx_blitter(running_machine &machine)
 			}
 		 }
 
-		 
+
 		if (!(state->m_blitter.spr_ctl1 & 0x04))		// if 0, we skip this sprite
 		{
 			state->m_blitter.colpos = state->m_blitter.scb + GET_WORD(state->m_suzy.data, COLLOFFL);
@@ -1366,7 +1366,7 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 
 	// Documentation states lower two bits of buffer address are ignored (thus 0xfffc mask)
 	j = (state->m_mikey.disp_addr & 0xfffc) + state->m_line_y * 160 / 2;
-		
+
 	if (state->m_mikey.data[0x92] & 0x02)
 	{
 		j -= 160 * 102 / 2 - 1;
@@ -1953,21 +1953,21 @@ static void lynx_reset(running_machine &machine)
 	state->m_mikey.data[0x92] = 0x00;
 
 /*
-	state->m_suzy.data[MATH_A] = 0xff;
-	state->m_suzy.data[MATH_B] = 0xff;
-	state->m_suzy.data[MATH_C] = 0xff;
-	state->m_suzy.data[MATH_D] = 0xff;
-	
-	state->m_suzy.data[MATH_E] = 0xff;
-	state->m_suzy.data[MATH_F] = 0xff;
-	state->m_suzy.data[MATH_G] = 0xff;
-	state->m_suzy.data[MATH_H] = 0xff;
-	
-	state->m_suzy.data[MATH_J] = 0xff;
-	state->m_suzy.data[MATH_K] = 0xff;
-	state->m_suzy.data[MATH_L] = 0xff;
-	state->m_suzy.data[MATH_M] = 0xff;
-	state->m_suzy.data[MATH_P] = 0xff;
+    state->m_suzy.data[MATH_A] = 0xff;
+    state->m_suzy.data[MATH_B] = 0xff;
+    state->m_suzy.data[MATH_C] = 0xff;
+    state->m_suzy.data[MATH_D] = 0xff;
+
+    state->m_suzy.data[MATH_E] = 0xff;
+    state->m_suzy.data[MATH_F] = 0xff;
+    state->m_suzy.data[MATH_G] = 0xff;
+    state->m_suzy.data[MATH_H] = 0xff;
+
+    state->m_suzy.data[MATH_J] = 0xff;
+    state->m_suzy.data[MATH_K] = 0xff;
+    state->m_suzy.data[MATH_L] = 0xff;
+    state->m_suzy.data[MATH_M] = 0xff;
+    state->m_suzy.data[MATH_P] = 0xff;
 */
 
 	lynx_uart_reset(state);

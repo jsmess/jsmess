@@ -88,7 +88,7 @@ public:
 
 	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_READ16_MEMBER( mem_r );
 	DECLARE_WRITE16_MEMBER( mem_w );
 	DECLARE_READ8_MEMBER( prtr_snd_r );
@@ -98,9 +98,9 @@ public:
 	DECLARE_WRITE8_MEMBER( palette_w );
 	DECLARE_WRITE16_MEMBER( video_w );
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	
+
 	UINT16 *m_work_ram;
-	
+
 	// video state
 	UINT16 *m_video_ram;
 	UINT8 m_video;
