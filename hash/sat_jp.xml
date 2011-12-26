@@ -13183,7 +13183,7 @@
     </part>
   </software>
 
- 
+
 
   <!-- Identifying Eiseimeijin (J) (T-9506G)... -->
   <software name="eisei" supported="no">
@@ -14048,7 +14048,7 @@
       <diskarea name="cdrom">
         <disk name="harukaze sentai v-force disc 3 (t-19904g)" sha1="ef1acaa3e607c179b5edcfb88849613fefdaf403" />
       </diskarea>
-    </part>  
+    </part>
   </software>
 
   <!-- Identifying Hatsukoi Monogatari (T-33004G)... -->
