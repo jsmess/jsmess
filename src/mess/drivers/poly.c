@@ -6,6 +6,8 @@
 
     http://www.cs.otago.ac.nz/homepages/andrew/poly/Poly.htm
 
+    Andrew has supplied the roms for -bios 1
+
     It uses a 6809 for all main functions. There is a Z80 for CP/M, but all
     of the roms are 6809 code.
 
@@ -163,7 +165,7 @@ WRITE8_MEMBER( poly_state::kbd_put )
 	m_term_data = data;
 	//m_term_key = 1;
 	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
-	mem->write_byte(0xebec, data);
+	mem->write_byte(0xebec, data); // this has to be 0xecf1 for bios 1
 	mem->write_byte(0xebd0, 1); // any non-zero here
 }
 
@@ -204,13 +206,22 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( poly1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v3bas1.bin", 0xa000, 0x1000, CRC(2c5276cb) SHA1(897cb9c2456ddb0f316a8c3b8aa56706056cc1dd) )
-	// next 3 roms are at the wrong location
-	ROM_LOAD( "v3bas2.bin", 0xb000, 0x1000, CRC(30f99447) SHA1(a26170113a968ccd8df7db1b0f256a2198054037) )
-	ROM_LOAD( "v3bas3.bin", 0xc000, 0x1000, CRC(89ea5b27) SHA1(e37a61d3dd78fb40bc43c70af9714ce3f75fd895) )
-	ROM_LOAD( "v3bas4.bin", 0x9000, 0x1000, CRC(c16c1209) SHA1(42f3b0bce32aafab14bc0500fb13bd456730875c) )
+	ROM_SYSTEM_BIOS(0, "BIOS0", "Standalone")
+	ROMX_LOAD( "v3bas1.bin", 0xa000, 0x1000, CRC(2c5276cb) SHA1(897cb9c2456ddb0f316a8c3b8aa56706056cc1dd), ROM_BIOS(1) )
+	// next 3 roms could be at the wrong location
+	ROMX_LOAD( "v3bas2.bin", 0xb000, 0x1000, CRC(30f99447) SHA1(a26170113a968ccd8df7db1b0f256a2198054037), ROM_BIOS(1) )
+	ROMX_LOAD( "v3bas3.bin", 0xc000, 0x1000, CRC(89ea5b27) SHA1(e37a61d3dd78fb40bc43c70af9714ce3f75fd895), ROM_BIOS(1) )
+	ROMX_LOAD( "v3bas4.bin", 0x9000, 0x1000, CRC(c16c1209) SHA1(42f3b0bce32aafab14bc0500fb13bd456730875c), ROM_BIOS(1) )
 	// boot rom
-	ROM_LOAD( "plrt16v3e9.bin", 0xf000, 0x1000, CRC(453c10a0) SHA1(edfbc3d83710539c01093e89fe1b47dfe1e68acd) )
+	ROMX_LOAD( "plrt16v3e9.bin", 0xf000, 0x1000, CRC(453c10a0) SHA1(edfbc3d83710539c01093e89fe1b47dfe1e68acd), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(1, "BIOS1", "Terminal")
+	// supplied by Andrew Trotman, author of Poly1 emulator (PolyROM v3.4)
+	ROMX_LOAD( "v2bas1.bin", 0xa000, 0x1000, CRC(f8c5adc4) SHA1(b1a16d7d996909185495b15a52afa697324e1f8d), ROM_BIOS(2) )
+	ROMX_LOAD( "v2bas2.bin", 0xb000, 0x1000, CRC(a2b0fa4d) SHA1(05ab723eb2e2b09325380a1a72da5ade401847d1), ROM_BIOS(2) )
+	ROMX_LOAD( "v2bas3.bin", 0xc000, 0x1000, CRC(04a58be5) SHA1(729fa02c76783213e40bb179e60c09d4b439ab90), ROM_BIOS(2) )
+	ROMX_LOAD( "v2bas4.bin", 0x9000, 0x1000, CRC(328fe790) SHA1(43dca92092b27627603d3588f91cf9eca24ed29f), ROM_BIOS(2) )
+	ROMX_LOAD( "slrt14_00f9.bin", 0xf000, 0x1000, CRC(6559a2ce) SHA1(7c38f449ca122342732123b56992ed0c446406c2), ROM_BIOS(2) )
 
 	/* This is SAA5050 came with poly emulator, identical to p2000t */
 	ROM_REGION(0x01000, "gfx1",0)
