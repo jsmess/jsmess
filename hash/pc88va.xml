@@ -13,19 +13,13 @@
     * Tanoshī tsumego daiikkan ~ 楽しい詰碁第一巻, by GAM
     * Igo-mei-kyoku Shuu '87 ~ 囲碁名局集'87, by GAM
     * Desu buringā ~ デス・ブリンガー, by Telenet Japan
-    * Arantia VA Special ~ アランティアVAスペシャル, by Victor Music Industry
-    * Family Stadium ~ ファミリースタジアム, by Game Arts
+    * Arantia (Atlantia?) VA Special ~ アランティアVAスペシャル, by Victor Music Industry
     * Go Kichi-kun 2 ~ 碁キチくん2, by GAM
-    * Crescent Moon Aru ~ クレセントムーンがぁる, by Alicesoft
     * Ultima V ~ ウルティマⅤ, by Pony Canyon
     * Za bāzuteiru ~ ザ バーズテイル, by Pony Canyon
     * Za bāzuteiru 2 ~ ザ・バーズテイル２, by Pony Canyon
     * Battle ~ バトル, by GAM
-    * D.P.S. SG - Dream Program System SG, by Alicesoft
-    * D.P.S. SG Set 2 - Dream Program System SG Set 2, by Alicesoft
-    * D.P.S. SG Set 3 - Dream Program System SG Set 3, by Alicesoft
     * Advanced Dungeons & Dragons: Hillsfar ~ AD&D ヒルズファー, by Pony Canyon
-    * Gen'ei Toshi - Illusion City ~ 幻影都市, by MicroCabin
     * Balance of Power ~ バランスオブパワー, by ASCII
     * First Queen ~ ファーストクイーン, by Kure Software
     * Ishin no Arashi ~ 維新の嵐, by Koei
@@ -36,11 +30,6 @@
     * Fantasy III ~ ファンタジーⅢ, by Starcraft
     * Lodoss Shima Senki ~ ロードス島戦記, by Humming Bird Soft
     * Tetris ~ テトリス, by BPS
-    * Sorcerian ~ ソーサリアン, by Falcom
-    * Sorcerian Utility Vol.1 ~ ソーサリアン　ユーティリティVol.1, by Falcom
-    * Sorcerian Tsuika Scenario Vol.1 ~ ソーサリアン　追加シナリオVol.1, by Falcom
-    * Sorcerian Sengoke ~ 戦国ソーサリアン, by Falcom
-    * Sorcerian Pyramid ~ ピラミッドソーサリアン, by Falcom
     * Art of War ~ アートオブウォー, by Broderbund Japan
     * Eiyuu Napoleon ~ 英雄ナポレオン, by Pony Canyon
     * Ultima I-IV ~ ウルティマI～IV, by Pony Canyon
@@ -77,6 +66,17 @@
 		</part>
 	</software>
 
+	<software name="88va2d">
+		<description>88VA2 Demo</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1331888">
+				<rom name="nec pc-88va2 demo.d88" size="1331888" crc="ca33e185" sha1="7895ffebce522bacef50397b23414e09bce7e9d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="animefrm">
 		<description>AnimeFramer</description>
 		<year>19??</year>
@@ -93,6 +93,26 @@
 			<feature name="part id" value="Data Disk" />
 			<dataarea name="flop" size="1338960">
 				<rom name="animeframer - data disk.d88" size="1338960" crc="9b5cd907" sha1="80f1558a3d5c6d21d1c42d8325ae55e320674ef7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Is this an Alt version of the program above (mistranslated), or another program? -->
+	<software name="paint">
+		<description>Paint?</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part id" value="Program Disk" />
+			<dataarea name="flop" size="1338960">
+				<rom name="paint - prog disk.d88" size="1331888" crc="08107401" sha1="aab13d4437358f0fac7adec31cf83d1a22608616" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part id" value="Data Disk" />
+			<dataarea name="flop" size="1338960">
+				<rom name="paint - data disk.d88" size="1331888" crc="73739619" sha1="60f493e7ab24ad8fc57367224a994b0ecf0ad5e2" offset="0" />
 			</dataarea>
 		</part>
 
@@ -121,8 +141,46 @@
 		</part>
 	</software>
 
+	<software name="pce11">
+		<description>PC-Engine v1.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1331888">
+				<rom name="pc-engine 1.1 os.d88" size="1331888" crc="17d2e121" sha1="b88095cae4238a68833435ac0e3414081cb5a13b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Games -->
+
+	<software name="famista">
+		<description>Family Stadium</description>
+		<year>19??</year>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<info name="alt_title" value="ファミリースタジアム" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part id" value="Disk 1" />
+			<dataarea name="flop" size="1281968">
+				<rom name="famista_1.d88" size="1281968" crc="3c78e2e7" sha1="1040b1d79052df93e4a1b3a6ed019098c8c2ad46" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part id" value="Disk 2" />
+			<dataarea name="flop" size="1281968">
+				<rom name="famista_2.d88" size="1281968" crc="29cfa16a" sha1="2a343ef96852ae882730cfe340cb130d48f17bc5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part id" value="User Disk" />
+			<dataarea name="flop" size="1331888">
+				<rom name="famista_u.d88" size="1331888" crc="d2623a5e" sha1="b57bb896488e62c6d1c5bd20acf97d4f9f805a0c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="famist89">
 		<description>Family Stadium '89 - Pennant Race Hen</description>
@@ -147,8 +205,6 @@
 		</part>
 	</software>
 
-<!-- From info gathered on the web, only Famista'89 Pennant Race Hen seems to have been released for the PC88VA...
-Yet these two were labeled respectively, FAMISTA89 and FAMISTA -->
 	<software name="famist89a" cloneof="famist89">
 		<description>Family Stadium '89 (Alt?)</description>
 		<year>19??</year>
@@ -171,32 +227,6 @@ Yet these two were labeled respectively, FAMISTA89 and FAMISTA -->
 			<feature name="part id" value="User Disk" />
 			<dataarea name="flop" size="1331888">
 				<rom name="famista89_u.d88" size="1331888" crc="11ee32e8" sha1="959205c410d24db3cca3ceb147d57a8b94aa20bf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="famista" cloneof="famist89">
-		<description>Family Stadium (Alt 2)</description>
-		<year>19??</year>
-		<publisher>ゲームアーツ (Game Arts)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk 1" />
-			<dataarea name="flop" size="1281968">
-				<rom name="famista_1.d88" size="1281968" crc="3c78e2e7" sha1="1040b1d79052df93e4a1b3a6ed019098c8c2ad46" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk 2" />
-			<dataarea name="flop" size="1281968">
-				<rom name="famista_2.d88" size="1281968" crc="29cfa16a" sha1="2a343ef96852ae882730cfe340cb130d48f17bc5" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part id" value="User Disk" />
-			<dataarea name="flop" size="1331888">
-				<rom name="famista_u.d88" size="1331888" crc="d2623a5e" sha1="b57bb896488e62c6d1c5bd20acf97d4f9f805a0c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -344,54 +374,6 @@ Yet these two were labeled respectively, FAMISTA89 and FAMISTA -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
 				<rom name="r-type(disk2) (irem).d88" size="1296112" crc="041d6155" sha1="b72d4ed6a031bfa0e1900dd012effc811a8169c1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rance2">
-		<description>Rance 2 - Hangyaku no Shojo-tachi</description>
-		<year>1990</year>
-		<publisher>アリスソフト (Alicesoft)</publisher>
-		<info name="alt_title" value="ランス２"/>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part id" value="Disk A" />
-			<dataarea name="flop" size="1261568">
-				<rom name="adisk.xdf" size="1261568" crc="959d531e" sha1="8bfa67e8290f195f6325cc03ff667a7c935958ba" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part id" value="Disk B" />
-			<dataarea name="flop" size="1261568">
-				<rom name="bdisk.xdf" size="1261568" crc="c51e2d10" sha1="3e82f90249ec3545a67758970e018d297ffb8f23" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part id" value="Disk C" />
-			<dataarea name="flop" size="1261568">
-				<rom name="cdisk.xdf" size="1261568" crc="473aaf1c" sha1="e3bc65950531df8dda0e5392323cebb6cb92c44f" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part id" value="Disk D" />
-			<dataarea name="flop" size="1261568">
-				<rom name="ddisk.xdf" size="1261568" crc="b84fdce5" sha1="ba80bdd9d32cda0713abfc7259c841237463a512" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part id" value="Disk E" />
-			<dataarea name="flop" size="1261568">
-				<rom name="edisk.xdf" size="1261568" crc="df3de612" sha1="0cec33872aa32c1451a0741064a1db86f92ebfd7" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part id" value="Disk F" />
-			<dataarea name="flop" size="1261568">
-				<rom name="fdisk.xdf" size="1261568" crc="0d9a2891" sha1="834cd1495d36217fb0e7d19814abd3ea387d4fc0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -642,9 +624,343 @@ Yet these two were labeled respectively, FAMISTA89 and FAMISTA -->
 		</part>
 	</software>
 
+<!-- Dual floppies, should work both on the PC88VA and on the PC98 -->
+
+	<software name="illcity">
+		<description>Illusion City - Genei Toshi</description>
+		<year>1992</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="release" value="199201xx"/>
+		<info name="alt_title" value="幻影都市 ～イリュージョンシティ～"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 1.fdi" size="1265664" crc="6c28f456" sha1="b9595c3798b0faf5152df79f1ea1c74ce3a07672" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 2.fdi" size="1265664" crc="408aba76" sha1="5770ff0dc637776d6cb5e30cd4a128fb783befa3" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 3.fdi" size="1265664" crc="da57a623" sha1="3fbd4cdeccf99e531b34dfe5a3fe890966307fa8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 4.fdi" size="1265664" crc="cfb2c03b" sha1="b7397ef886811f71927d53c6d940167f01147b9d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 5.fdi" size="1265664" crc="1187eea4" sha1="7ad2a757460adaff37d73c59287b941241d1e160" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 6.fdi" size="1265664" crc="3256197f" sha1="26a46c2f6124c569b3586e6b9dd97e521460bc0e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 7.fdi" size="1265664" crc="2b71cca8" sha1="60b32fe6816be8a9b0b35d9b779ab5baa2fac8af" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="1265664">
+				<rom name="user disk.fdi" size="1265664" crc="c1c566df" sha1="0211d36ee53453122d6e2df604d5fdf6c9bfba3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Dual floppies, should work both on the PC88VA and on the X68000 -->
+
+	<software name="abunaten">
+		<description>Abunai Tengu Densetsu</description>
+		<year>1989</year>
+		<publisher>アリスソフト (Alicesoft)</publisher>
+		<info name="release" value="198910xx"/>
+		<info name="alt_title" value="あぶない天狗伝説 (or あぶないてんぐ伝説 )"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk a.xdf" size="1261568" crc="7614c8af" sha1="eeea190cf882eb91b55965553cf3bac64f09dee0" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk b.xdf" size="1261568" crc="9e83829f" sha1="e171236054d08b78b30657a3f7132e179de9a0cf" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk c.xdf" size="1261568" crc="9d536580" sha1="feb812332d2119196558cffde50a5ef1272a4c37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cresmoon">
+		<description>Crescent Moon Aru</description>
+		<year>1989</year>
+		<publisher>アリスソフト (Alicesoft)</publisher>
+		<info name="release" value="198908xx"/>
+		<info name="alt_title" value="クレセントムーンがぁる"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk a.xdf" size="1261568" crc="ccebcb01" sha1="fc6c8913c9e0fc70b0983d0d2dc8837e441ae567" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk b.xdf" size="1261568" crc="702de57e" sha1="1d7bfbcb3a2543abfadec1a5d999386994763384" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk c.xdf" size="1261568" crc="d1c56921" sha1="7a8d496fc94167b99cc8cc5b590e5dab8f453d05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dps">
+		<description>D.P.S - Dream Program System</description>
+		<year>1989</year>
+		<publisher>アリスソフト (Alicesoft)</publisher>
+		<info name="release" value="198912xx"/>
+		<info name="alt_title" value="ディー・ピー・エス - ドリームプログラムシステム"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk a.xdf" size="1261568" crc="f6078845" sha1="f1695e9b313daba8a93ee2d74aefe833262078f4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk b.xdf" size="1261568" crc="224d3faf" sha1="300cf05020e91069c0fd54d2d992e5b7acccd1c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpssg">
+		<description>D.P.S. SG - Dream Program System SG</description>
+		<year>1990</year>
+		<publisher>アリスソフト (Alicesoft)</publisher>
+		<info name="release" value="199008xx"/>
+		<info name="alt_title" value="ディー・ピー・エス SG"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System" />
+			<dataarea name="flop" size="1261568">
+				<rom name="system.xdf" size="1261568" crc="94af1a60" sha1="b662d9024b23aef819eaf95826cd56cc9a517e70" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 1.xdf" size="1261568" crc="a96f5768" sha1="3b84125f81d610ba218a2df9aab163d044ee84d4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 2.xdf" size="1261568" crc="030bbe44" sha1="7fe3bd38370c67fbd80c9b069299abcf914c45ab" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 3 ~ Fahnen Fliegen" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 3.xdf" size="1261568" crc="ee47af10" sha1="3db3f994df5701ec2811c4f628ca7552845a07ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpssg2">
+		<description>D.P.S. SG 2 - Dream Program System SG Set 2</description>
+		<year>1991</year>
+		<publisher>アリスソフト (Alicesoft)</publisher>
+		<info name="release" value="199104xx"/>
+		<info name="alt_title" value="ディー・ピー・エス SG2"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System" />
+			<dataarea name="flop" size="1261568">
+				<rom name="system.xdf" size="1261568" crc="509433e8" sha1="db9f073f6afb379c4b7d79f8b685048951421eb2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 1.xdf" size="1261568" crc="d1bdb2bf" sha1="ea58a504414d0824ddd9adc23ca504a974573f26" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 2.xdf" size="1261568" crc="10250dff" sha1="550696eb596e0c3ffbb670d2fd003faf664866d5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 3 ~ Antique House" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 3.xdf" size="1261568" crc="b8d09260" sha1="d4067d8c87e3fe6f66396145edeb64fdcbe22842" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpssg3">
+		<description>D.P.S. SG 3 - Dream Program System SG Set 3</description>
+		<year>1991</year>
+		<publisher>アリスソフト (Alicesoft)</publisher>
+		<info name="release" value="199112xx"/>
+		<info name="alt_title" value="ディー・ピー・エス SG3"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System" />
+			<dataarea name="flop" size="1261568">
+				<rom name="system.xdf" size="1261568" crc="509433e8" sha1="db9f073f6afb379c4b7d79f8b685048951421eb2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 1.xdf" size="1261568" crc="03631feb" sha1="f13f294c47993cff8d8a87baa481170a697c9cd5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 2.xdf" size="1261568" crc="0c58a147" sha1="2c009163532b104757e119a20d947b91469aaad6" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario 3 ~ Rabbit P4P" />
+			<dataarea name="flop" size="1261568">
+				<rom name="scenario 3.xdf" size="1261568" crc="4ebe2833" sha1="d29eaad46e44af04d140f4ee18262490e46f1b79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rance">
+		<description>Rance - Hikari wo Motomete</description>
+		<year>1989</year>
+		<publisher>アリスソフト (Alicesoft)</publisher>
+		<info name="release" value="198907xx"/>
+		<info name="alt_title" value="ランス 光を求めて"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk a.xdf" size="1261568" crc="7512d4ff" sha1="a442213bf7330548ef012f3e0623b1df5fb2142e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk b.xdf" size="1261568" crc="fa088a6f" sha1="7ddcace8d5e42a75b0ca30f262f71159844ee69d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk c.xdf" size="1261568" crc="5e571192" sha1="cc6ecbb63be4c201e0634c85d0883173f983e879" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="disk d.xdf" size="1261568" crc="80c44e64" sha1="497bff6513c4fba5d193f06df95009dc2c154370" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rance2">
+		<description>Rance 2 - Hangyaku no Shojo-tachi</description>
+		<year>1990</year>
+		<publisher>アリスソフト (Alicesoft)</publisher>
+		<info name="release" value="199005xx"/>
+		<info name="alt_title" value="ランス２-反逆の少女たち-"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="adisk.xdf" size="1261568" crc="959d531e" sha1="8bfa67e8290f195f6325cc03ff667a7c935958ba" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="bdisk.xdf" size="1261568" crc="c51e2d10" sha1="3e82f90249ec3545a67758970e018d297ffb8f23" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="cdisk.xdf" size="1261568" crc="473aaf1c" sha1="e3bc65950531df8dda0e5392323cebb6cb92c44f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ddisk.xdf" size="1261568" crc="b84fdce5" sha1="ba80bdd9d32cda0713abfc7259c841237463a512" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="edisk.xdf" size="1261568" crc="df3de612" sha1="0cec33872aa32c1451a0741064a1db86f92ebfd7" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part id" value="Disk F" />
+			<dataarea name="flop" size="1261568">
+				<rom name="fdisk.xdf" size="1261568" crc="0d9a2891" sha1="834cd1495d36217fb0e7d19814abd3ea387d4fc0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 
 
+<!-- PC88 Images which have been patched to work on the VA? -->
 	<!-- is this legit? -->
 	<software name="midgarts">
 		<description>Mid Garts (VA patched?)</description>
