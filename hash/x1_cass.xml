@@ -27,7 +27,7 @@ Titles, publishers and release dates taken from:
 -->
 <softwarelist name="x1_cass" description="Sharp X1 tape images">
 
-	<software name="onyx">
+	<software name="blckonyx">
 		<description>The Black Onyx</description>
 		<year>1985</year>
 		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
@@ -960,6 +960,17 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="mimitan.tap" size="120004" crc="261795ba" sha1="cd239e7301963288cdf1bc83da2f5d8f1fe91a44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="milkyway">
+		<description>Milkyway</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="656387">
+				<rom name="milkyway.tap" size="656387" crc="197ea309" sha1="00d1b80dfc19bafadfe5b9169c93bdfc71343ee0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
