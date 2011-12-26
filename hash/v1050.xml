@@ -20,7 +20,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cpm3b14" cloneof="cpm3">
 		<description>CP/M Plus v3.0 (BIOS 1.4)</description>
 		<year>1982</year>
@@ -40,7 +40,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="multplan">
 		<description>Multiplan v1.06</description>
 		<year>1982</year>
