@@ -50089,6 +50089,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="chengji" supported="no">
+		<description>Cheng Ji Si Han (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1110"/>
+		<info name="alt_title" value="成吉思汗"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-A" /> <!-- Wrong pcb, but header says mapper 198 which is wrong too -->
+			<dataarea name="prg" size="524288">
+				<rom name="[es-1110] cheng ji si han (c).prg" size="524288" crc="935f2119" sha1="ca7fe978a1926827c6d3eb670d8e1ff9903614b7" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tmlxj" cloneof="sqtomsaw" supported="no">
 		<description>Tang Mu Li Xian Ji (Chi)</description>
 		<year>19??</year>
