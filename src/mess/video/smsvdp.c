@@ -1,8 +1,9 @@
 /*********************************************************************
 
-    smsvdp.c
+    sega315_5124.c
 
-    Implementation of video hardware chip used by Sega Master System
+    Implementation of video hardware chips used by Sega System E,
+    Master System, and Game Gear.
 
 **********************************************************************/
 
@@ -1593,26 +1594,6 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 	{
 		*BITMAP_ADDR32(m_tmpbitmap, pixel_plot_y + line, pixel_offset_x + x) = machine().pens[blitline_buffer[x]];
 	}
-}
-
-// This is only used by Light Phaser. Should it be moved elsewhere?
-int sega315_5124_device::check_brightness(int x, int y)
-{
-	/* brightness of the lightgray color in the frame drawn by Light Phaser games */
-	const UINT8 sensor_min_brightness = 0x7f;
-
-	/* TODO: Check how Light Phaser behaves for border areas. For Gangster Town, should */
-	/* a shot at right border (HC~=0x90) really appear at active scr, near to left border? */
-	if (x < SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH || x >= SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256)
-		return 0;
-
-	rgb_t color = *BITMAP_ADDR32(m_tmpbitmap, y, x);
-
-	/* reference: http://www.w3.org/TR/AERT#color-contrast */
-	UINT8 brightness = (RGB_RED(color) * 0.299) + (RGB_GREEN(color) * 0.587) + (RGB_BLUE(color) * 0.114);
-	//printf ("color brightness: %2X for x %d y %d\n", brightness, x, y);
-
-	return (brightness >= sensor_min_brightness) ? 1 : 0;
 }
 
 
