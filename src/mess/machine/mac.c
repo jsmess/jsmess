@@ -78,7 +78,7 @@
 
      Caboose version spotting:
      341S0853 - 0x0100 (1.00) - Quadra 950
- 
+
      PG&E (68HC05 PMU) version spotting:
      (find the text "BORG" in the system ROM, the next 32768 bytes are the PG&E image.
       offset +4 in the image is the version byte).
@@ -86,7 +86,7 @@
      02 - PowerBook 540c, PBDuo 270C, PBDuo 280/280C
      03 - PowerBook 150
      08 - PB190cs, PowerBook 540c PPC update, all PowerPC PowerBooks through WallStreet G3s
- 
+
 ****************************************************************************/
 
 #define ADDRESS_MAP_MODERN

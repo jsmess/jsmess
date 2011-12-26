@@ -1,10 +1,10 @@
 /***************************************************************************
 
-	Triumph-Adler's Alphatronic PC
+    Triumph-Adler's Alphatronic PC
 
-	skeleton driver
+    skeleton driver
 
-	z80 + HD46505 as a CRTC
+    z80 + HD46505 as a CRTC
 
         Has a socket for monochrome (to the standard amber monitor),
         and another for RGB. We emulate this with a configuration switch.
@@ -93,7 +93,7 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 	data &= 0xfe;
 
 	//if (data == 0x02)
-	//	length = 4; // keyclick + when it scrolls?
+	//  length = 4; // keyclick + when it scrolls?
 	//else
 	if (data == 0x10)
 		length = 400; // BEEP command
@@ -354,12 +354,12 @@ void alphatro_state::machine_start()
 void alphatro_state::machine_reset()
 {
 	// do what the IPL does
-//	UINT8* RAM = machine().device<ram_device>("ram")->pointer();
+//  UINT8* RAM = machine().device<ram_device>("ram")->pointer();
 	UINT8* ROM = machine().region("maincpu")->base();
 	cpu_set_reg(m_maincpu, STATE_GENPC, 0xe000);
 	memcpy(m_p_ram, ROM, 0xf000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
 	memcpy(m_p_videoram, ROM+0x1000, 0x1000);
-//	memory_set_bankptr(machine(), "bank1", RAM);
+//  memory_set_bankptr(machine(), "bank1", RAM);
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));

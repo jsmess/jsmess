@@ -1,9 +1,9 @@
 /***************************************************************************
- 
+
   macrtc.c - the real-time clock & NVRAM chip used in Macs and the Apple IIgs.
- 
+
   TODO: convert to a device, share between Mac and IIgs
- 
+
 ***************************************************************************/
 
 #include "emu.h"

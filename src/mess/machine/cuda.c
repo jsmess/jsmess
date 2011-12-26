@@ -30,7 +30,7 @@
     x---      O  680x0 reset
     -x--      ?  680x0 IPL 2 (used in both directions)
     --x-      ?  IPL 1 for "passive" power, trickle sense for "soft" and "secure"
-    ---x	  ?  IPL 0 for "passive" power, pull-up for "soft" power, file server switch for "secure" power
+    ---x      ?  IPL 0 for "passive" power, pull-up for "soft" power, file server switch for "secure" power
 */
 
 #define ADDRESS_MAP_MODERN
@@ -58,8 +58,8 @@ const device_type CUDA = &device_creator<cuda_device>;
 
 ROM_START( cuda )
 	ROM_REGION(0x3300, CUDA_CPU_TAG, 0)
-    ROM_LOAD( "341s0060.bin", 0x1100, 0x1100, CRC(0f5e7b4a) SHA1(972b3778146d9787b18c3a9874d505cf606b3e15) ) 
-    ROM_LOAD( "341s0788.bin", 0x2200, 0x1100, CRC(df6e1b43) SHA1(ec23cc6214c472d61b98964928c40589517a3172) ) 
+    ROM_LOAD( "341s0060.bin", 0x1100, 0x1100, CRC(0f5e7b4a) SHA1(972b3778146d9787b18c3a9874d505cf606b3e15) )
+    ROM_LOAD( "341s0788.bin", 0x2200, 0x1100, CRC(df6e1b43) SHA1(ec23cc6214c472d61b98964928c40589517a3172) )
 ROM_END
 
 //-------------------------------------------------
@@ -390,7 +390,7 @@ void cuda_device::device_start()
 	astring tempstring;
 	UINT8 *rom = device().machine().region(device().subtag(tempstring, CUDA_CPU_TAG))->base();
 
-    if (rom)                
+    if (rom)
     {
         memcpy(rom, rom+rom_offset, 0x1100);
     }

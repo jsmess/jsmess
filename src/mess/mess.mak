@@ -623,8 +623,8 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_AUDIO)/mac.o			\
 	$(MESS_VIDEO)/mac.o			\
 	$(MESS_MACHINE)/mac.o		\
-	$(MESS_MACHINE)/macrtc.o   	\
-	$(MESS_MACHINE)/macadb.o   	\
+	$(MESS_MACHINE)/macrtc.o	\
+	$(MESS_MACHINE)/macadb.o	\
 	$(MESS_DRIVERS)/mac.o		\
 	$(MESS_VIDEO)/apple1.o		\
 	$(MESS_MACHINE)/apple1.o	\
@@ -1744,7 +1744,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/busicom.o	\
 	$(MESS_VIDEO)/busicom.o		\
 	$(MESS_DRIVERS)/chaos.o 	\
-	$(MESS_DRIVERS)/chesstrv.o 	\
+	$(MESS_DRIVERS)/chesstrv.o	\
 	$(MESS_DRIVERS)/cd2650.o	\
 	$(MESS_DRIVERS)/codata.o	\
 	$(MESS_DRIVERS)/cosmicos.o	\

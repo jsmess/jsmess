@@ -75,7 +75,7 @@ protected:
 
 private:
 	devcb_resolved_write_line	m_out_txd_func;
-	
+
 	UINT16 m_kb_y;
 };
 

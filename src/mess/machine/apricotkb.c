@@ -65,13 +65,13 @@ const rom_entry *apricot_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 /*
 static ADDRESS_MAP_START( apricot_keyboard_io, AS_IO, 8, apricot_keyboard_device )
-	AM_RANGE(0x00, 0x00) AM_READ(kb_lo_r)
-	AM_RANGE(0x01, 0x01) AM_READ(kb_hi_r)
-	AM_RANGE(0x03, 0x03) AM_WRITE(kb_p3_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(kb_y0_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(kb_y4_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(kb_p6_r, kb_yc_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(kb_y8_w)
+    AM_RANGE(0x00, 0x00) AM_READ(kb_lo_r)
+    AM_RANGE(0x01, 0x01) AM_READ(kb_hi_r)
+    AM_RANGE(0x03, 0x03) AM_WRITE(kb_p3_w)
+    AM_RANGE(0x04, 0x04) AM_WRITE(kb_y0_w)
+    AM_RANGE(0x05, 0x05) AM_WRITE(kb_y4_w)
+    AM_RANGE(0x06, 0x06) AM_READWRITE(kb_p6_r, kb_yc_w)
+    AM_RANGE(0x07, 0x07) AM_WRITE(kb_y8_w)
 ADDRESS_MAP_END
 */
 
@@ -82,8 +82,8 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( apricot_keyboard )
 /*
-	MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL_32_768kHz)
-	MCFG_CPU_IO_MAP(apricot_keyboard_io)
+    MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL_32_768kHz)
+    MCFG_CPU_IO_MAP(apricot_keyboard_io)
 */
 MACHINE_CONFIG_END
 
@@ -113,7 +113,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -123,7 +123,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -133,7 +133,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y3")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -143,7 +143,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y4")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -153,7 +153,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y5")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -163,7 +163,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -173,7 +173,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -183,7 +183,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y8")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -193,7 +193,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("Y9")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -203,7 +203,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("YA")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -213,7 +213,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("YB")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -223,7 +223,7 @@ INPUT_PORTS_START( apricot_keyboard )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	
+
 	PORT_START("YC")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -292,7 +292,7 @@ void apricot_keyboard_device::device_reset()
 UINT8 apricot_keyboard_device::read_keyboard()
 {
 	UINT8 data = 0xff;
-	
+
 	if (!BIT(m_kb_y, 0)) data &= input_port_read(machine(), "Y0");
 	if (!BIT(m_kb_y, 1)) data &= input_port_read(machine(), "Y1");
 	if (!BIT(m_kb_y, 2)) data &= input_port_read(machine(), "Y2");
@@ -306,7 +306,7 @@ UINT8 apricot_keyboard_device::read_keyboard()
 	if (!BIT(m_kb_y, 10)) data &= input_port_read(machine(), "YA");
 	if (!BIT(m_kb_y, 11)) data &= input_port_read(machine(), "YB");
 	if (!BIT(m_kb_y, 12)) data &= input_port_read(machine(), "YC");
-	
+
 	return data;
 }
 
@@ -338,17 +338,17 @@ READ8_MEMBER( apricot_keyboard_device::kb_hi_r )
 READ8_MEMBER( apricot_keyboard_device::kb_p6_r )
 {
 	/*
-	
-		bit		description
-		
-		P60		
-		P61		SHIFT
-		P62		CONTROL
-	
-	*/
+
+        bit     description
+
+        P60
+        P61     SHIFT
+        P62     CONTROL
+
+    */
 
 	UINT8 modifiers = input_port_read(machine(), "MODIFIERS");
-	
+
 	return modifiers << 1;
 }
 

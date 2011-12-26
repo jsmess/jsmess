@@ -1,14 +1,14 @@
 /************************************************************************************************
 
-	Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
+    Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
 
-	Both systems doesn't interact at all, according to info on the net they just shares the
-	same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
+    Both systems doesn't interact at all, according to info on the net they just shares the
+    same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
 
-	TODO:
-	- Find 100% trusted info about it.
-	- inherit pce_state into x1twin_state
-	- Needs video mods
+    TODO:
+    - Find 100% trusted info about it.
+    - inherit pce_state into x1twin_state
+    - Needs video mods
 
 ************************************************************************************************/
 
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SPEAKER_ADD("pce_l",-0.2, 0.0, 1.0)
 	MCFG_SPEAKER_ADD("pce_r",-0.2, 0.0, 1.0)
 
-//	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+//  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
 	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 	#if 0
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-//	MCFG_SOUND_CONFIG(c6280_config)
+//  MCFG_SOUND_CONFIG(c6280_config)
 	MCFG_SOUND_ROUTE(0, "pce_l", 0.5)
 	MCFG_SOUND_ROUTE(1, "pce_r", 0.5)
 	#endif

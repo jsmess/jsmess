@@ -11,7 +11,7 @@
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 	</view>
-	
+
 	<view name="Dual Side-by-Side">
 		<screen index="0">
 			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />

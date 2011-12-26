@@ -20,7 +20,7 @@
     - brightness/contrast
     - MC6852
     - codec sound
-	- hard disk (Tandon TM502, TM603SE)
+    - hard disk (Tandon TM502, TM603SE)
 
 */
 
@@ -261,7 +261,7 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
         PA6     DIO7
         PA7     DIO8
 
-	*/
+    */
 
 	m_ieee488->dio_w(data);
 }
@@ -281,7 +281,7 @@ READ8_MEMBER( victor9k_state::via1_pb_r )
         PB6     NRFD
         PB7     NDAC
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -327,7 +327,7 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
         PB6     NRFD
         PB7     NDAC
 
-	*/
+    */
 
 	// data valid
 	m_ieee488->dav_w(BIT(data, 0));
@@ -390,8 +390,8 @@ READ8_MEMBER( victor9k_state::via2_pa_r )
 
         bit     description
 
-        PA0     
-        PA1     
+        PA0
+        PA1
         PA2     RIA
         PA3     DSRA
         PA4     RIB
@@ -399,7 +399,7 @@ READ8_MEMBER( victor9k_state::via2_pa_r )
         PA6     KBDATA
         PA7     VERT
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -417,14 +417,14 @@ WRITE8_MEMBER( victor9k_state::via2_pa_w )
 
         PA0     _INT/EXTA
         PA1     _INT/EXTB
-        PA2     
-        PA3     
-        PA4     
-        PA5     
-        PA6     
-        PA7     
+        PA2
+        PA3
+        PA4
+        PA5
+        PA6
+        PA7
 
-	*/
+    */
 }
 
 WRITE8_MEMBER( victor9k_state::via2_pb_w )
@@ -442,7 +442,7 @@ WRITE8_MEMBER( victor9k_state::via2_pb_w )
         PB6     CONT1
         PB7     CONT2
 
-	*/
+    */
 
 	// brightness
 	m_brt = (data >> 2) & 0x07;
@@ -492,7 +492,7 @@ READ8_MEMBER( victor9k_state::via3_pa_r )
         PA6     J5-28
         PA7     J5-30
 
-	*/
+    */
 
 	return 0;
 }
@@ -512,7 +512,7 @@ WRITE8_MEMBER( victor9k_state::via3_pa_w )
         PA6     J5-28
         PA7     J5-30
 
-	*/
+    */
 }
 
 READ8_MEMBER( victor9k_state::via3_pb_r )
@@ -530,7 +530,7 @@ READ8_MEMBER( victor9k_state::via3_pb_r )
         PB6     J5-44
         PB7     J5-46
 
-	*/
+    */
 
 	return 0;
 }
@@ -550,7 +550,7 @@ WRITE8_MEMBER( victor9k_state::via3_pb_w )
         PB6     J5-44
         PB7     J5-46
 
-	*/
+    */
 
 	// codec clock output
 	m_ssda->rx_clk_w(BIT(data, 7));
@@ -598,7 +598,7 @@ WRITE8_MEMBER( victor9k_state::via4_pa_w )
         PA6     ST0C
         PA7     ST0D
 
-	*/
+    */
 
 	m_st[0] = data >> 4;
 }
@@ -618,7 +618,7 @@ WRITE8_MEMBER( victor9k_state::via4_pb_w )
         PB6     ST1C
         PB7     ST1D
 
-	*/
+    */
 
 	m_st[1] = data >> 4;
 }
@@ -668,7 +668,7 @@ READ8_MEMBER( victor9k_state::via5_pa_r )
         PA6     I7
         PA7     E6
 
-	*/
+    */
 
 	return 0;
 }
@@ -688,7 +688,7 @@ WRITE8_MEMBER( victor9k_state::via5_pb_w )
         PB6     WD6
         PB7     WD7
 
-	*/
+    */
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via5_irq_w )
@@ -723,16 +723,16 @@ READ8_MEMBER( victor9k_state::via6_pa_r )
 
         bit     description
 
-        PA0     
+        PA0
         PA1     TRK0D0
-        PA2     
+        PA2
         PA3     TRK0D1
-        PA4     
-        PA5     
+        PA4
+        PA5
         PA6     WPS
         PA7     SYNC
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -744,7 +744,7 @@ READ8_MEMBER( victor9k_state::via6_pa_r )
 
 	// write protect sense
 	data |= floppy_wpt_r(m_drive ? m_floppy1 : m_floppy0) << 6;
-	
+
 	// disk sync detect
 
 	return data;
@@ -757,19 +757,19 @@ WRITE8_MEMBER( victor9k_state::via6_pa_w )
         bit     description
 
         PA0     LED0A
-        PA1     
+        PA1
         PA2     LED1A
-        PA3     
+        PA3
         PA4     SIDE SELECT
         PA5     DRIVE SELECT
-        PA6     
-        PA7     
+        PA6
+        PA7
 
-	*/
+    */
 
 	// LED, drive A
 	output_set_led_value(LED_A, BIT(data, 0));
-	
+
 	// LED, drive B
 	output_set_led_value(LED_B, BIT(data, 2));
 
@@ -788,23 +788,23 @@ READ8_MEMBER( victor9k_state::via6_pb_r )
 
         PB0     RDY0
         PB1     RDY1
-        PB2     
+        PB2
         PB3     _DS1
         PB4     _DS0
         PB5     SINGLE/_DOUBLE SIDED
-        PB6     
-        PB7     
+        PB6
+        PB7
 
-	*/
+    */
 
 	UINT8 data = 0;
 
 	// motor speed status, drive A
 
 	// motor speed status, drive B
-	
+
 	// door B sense
-	
+
 	// door A sense
 
 	// single/double sided
@@ -819,16 +819,16 @@ WRITE8_MEMBER( victor9k_state::via6_pb_w )
 
         bit     description
 
-        PB0     
-        PB1     
+        PB0
+        PB1
         PB2     SCRESET
-        PB3     
-        PB4     
-        PB5     
+        PB3
+        PB4
+        PB5
         PB6     stepper enable A
         PB7     stepper enable B
 
-	*/
+    */
 
 	// motor speed controller reset
 	device_set_input_line(m_fdc_cpu, INPUT_LINE_RESET, BIT(data, 2));

@@ -58,8 +58,8 @@ const device_type EGRET = &device_creator<egret_device>;
 ROM_START( egret )
 	ROM_REGION(0x4400, EGRET_CPU_TAG, 0)
     ROM_LOAD( "341s0851.bin", 0x1100, 0x1100, CRC(ea9ea6e4) SHA1(8b0dae3ec66cdddbf71567365d2c462688aeb571) )
-    ROM_LOAD( "341s0850.bin", 0x2200, 0x1100, CRC(4906ecd0) SHA1(95e08ba0c5d4b242f115f104aba9905dbd3fd87c) ) 
-    ROM_LOAD( "344s0100.bin", 0x3300, 0x1100, CRC(59e2b6b6) SHA1(540e752b7da521f1bdb16e0ad7c5f46ddc92d4e9) ) 
+    ROM_LOAD( "341s0850.bin", 0x2200, 0x1100, CRC(4906ecd0) SHA1(95e08ba0c5d4b242f115f104aba9905dbd3fd87c) )
+    ROM_LOAD( "344s0100.bin", 0x3300, 0x1100, CRC(59e2b6b6) SHA1(540e752b7da521f1bdb16e0ad7c5f46ddc92d4e9) )
 ROM_END
 
 //-------------------------------------------------
@@ -383,7 +383,7 @@ void egret_device::device_start()
 	astring tempstring;
 	UINT8 *rom = device().machine().region(device().subtag(tempstring, EGRET_CPU_TAG))->base();
 
-    if (rom)                
+    if (rom)
     {
         memcpy(rom, rom+rom_offset, 0x1100);
     }

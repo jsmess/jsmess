@@ -14,11 +14,11 @@
 
 /*
 
-	TODO:
-	
-	- devices
-	- LCD
-	- sound
+    TODO:
+
+    - devices
+    - LCD
+    - sound
 
 */
 
@@ -89,13 +89,13 @@ bool fp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 			for (int sx = 0; sx < 40; sx++)
 			{
 				UINT16 data = m_video_ram[addr++];
-				
+
 				for (int x = 0; x < 16; x++)
 				{
 					int color = BIT(data, 15);
-					
+
 					*BITMAP_ADDR16(&bitmap, y, (sx * 16) + x) = color;
-					
+
 					data <<= 1;
 				}
 			}
@@ -130,27 +130,27 @@ GFXDECODE_END
 READ8_MEMBER( fp_state::prtr_snd_r )
 {
 	/*
-	
-		bit		description
-		
-		0		BUSY
-		1		SE
-		2		_FAULT
-		3		PE
-		4		LP23
-		5		DCNG-L
-		6		J9 1-2
-		7		J9 3-4
-	
-	*/
-	
+
+        bit     description
+
+        0       BUSY
+        1       SE
+        2       _FAULT
+        3       PE
+        4       LP23
+        5       DCNG-L
+        6       J9 1-2
+        7       J9 3-4
+
+    */
+
 	UINT8 data = 0;
-	
+
 	data |= centronics_busy_r(m_centronics);
 	data |= centronics_vcc_r(m_centronics) << 1;
 	data |= centronics_fault_r(m_centronics) << 2;
 	data |= centronics_pe_r(m_centronics) << 3;
-	
+
 	return data;
 }
 
@@ -168,53 +168,53 @@ WRITE8_MEMBER( fp_state::ls_w )
 
 WRITE8_MEMBER( fp_state::contrast_w )
 {
-	
+
 }
 
 
 WRITE8_MEMBER( fp_state::palette_w )
 {
 	/*
-	
-		bit		description
-		
-		0		B
-		1		G
-		2		R
-		3		I
-		4		index
-		5		index
-		6		index
-		7		index
-	
-	*/
+
+        bit     description
+
+        0       B
+        1       G
+        2       R
+        3       I
+        4       index
+        5       index
+        6       index
+        7       index
+
+    */
 }
 
 
 WRITE16_MEMBER( fp_state::video_w )
 {
 	/*
-	
-		bit		description
-		
-		0		CRTRES-H
-		1		SEL1
-		2		DON-H
-		3		LCDON-H
-		4		SEL2
-		5		L3 even access
-		6		L2 odd access
-		7		L1 video RAM enable
-		8		
-		9		STOP LED
-		10		POWER LED
-		11		SHIFT LOCK LED
-		12		DISK LED
-		13		VOICE LED
-		14		COLOUR SELECT LED
-		15		CAPS LOCK LED
-	
-	*/
+
+        bit     description
+
+        0       CRTRES-H
+        1       SEL1
+        2       DON-H
+        3       LCDON-H
+        4       SEL2
+        5       L3 even access
+        6       L2 odd access
+        7       L1 video RAM enable
+        8
+        9       STOP LED
+        10      POWER LED
+        11      SHIFT LOCK LED
+        12      DISK LED
+        13      VOICE LED
+        14      COLOUR SELECT LED
+        15      CAPS LOCK LED
+
+    */
 
 	m_video = data & 0xff;
 }
@@ -223,7 +223,7 @@ WRITE16_MEMBER( fp_state::video_w )
 READ16_MEMBER( fp_state::mem_r )
 {
 	UINT16 data = 0xffff;
-	
+
 	if (offset >= 0xd0000/2 && offset < 0xf0000/2)
 	{
 		if (BIT(m_video, 7))
@@ -274,7 +274,7 @@ WRITE16_MEMBER( fp_state::mem_w )
 			{
 				m_video_ram[offset - 0xd0000/2] = (data & 0xff00) | (m_video_ram[offset - 0xd0000/2] & 0x00ff);
 			}
-			
+
 			if (BIT(m_video, 6))
 			{
 				m_video_ram[offset - 0xd0000/2] = (data & 0x00ff) | (m_video_ram[offset - 0xd0000/2] & 0xff00);
@@ -399,14 +399,14 @@ static IRQ_CALLBACK( fp_irq_callback )
 
 /*
 
-	INT0	TIMER
-	INT1	FDC
-	INT2	6301
-	INT3	COMS
-	INT4	USART
-	INT5	COMS
-	INT6	PRINT
-	INT7	EOP
+    INT0    TIMER
+    INT1    FDC
+    INT2    6301
+    INT3    COMS
+    INT4    USART
+    INT5    COMS
+    INT6    PRINT
+    INT7    EOP
 
 */
 
@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	
+
 	MCFG_SCREEN_ADD(SCREEN_CRT_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -606,7 +606,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_GFXDECODE(act_f1)
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, 4000000, crtc_intf)
-	
+
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, 2000000)
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(act_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")

@@ -14,11 +14,11 @@
 
 /*
 
-	TODO:
-	
-	- CTC/SIO interrupt acknowledge
-	- CTC clocks
-	- sound
+    TODO:
+
+    - CTC/SIO interrupt acknowledge
+    - CTC clocks
+    - sound
 
 */
 
@@ -34,23 +34,23 @@ bool f1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	int lines = m_200_256 ? 200 : 256;
-	
+
 	for (int y = 0; y < lines; y++)
 	{
 		offs_t addr = m_p_scrollram[y] << 1;
-		
+
 		for (int sx = 0; sx < 80; sx++)
 		{
 			UINT16 data = program->read_word(addr);
-			
+
 			if (m_40_80)
 			{
 				for (int x = 0; x < 8; x++)
 				{
 					int color = (BIT(data, 15) << 1) | BIT(data, 7);
-					
+
 					*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = color;
-					
+
 					data <<= 1;
 				}
 			}
@@ -59,14 +59,14 @@ bool f1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 				for (int x = 0; x < 4; x++)
 				{
 					int color = (BIT(data, 15) << 3) | (BIT(data, 14) << 2) | (BIT(data, 7) << 1) | BIT(data, 6);
-					
+
 					*BITMAP_ADDR16(&bitmap, y, (sx * 8) + (x * 2)) = color;
 					*BITMAP_ADDR16(&bitmap, y, (sx * 8) + (x * 2) + 1) = color;
-					
+
 					data <<= 2;
 				}
 			}
-			
+
 			addr += 2;
 		}
 	}
@@ -120,32 +120,32 @@ WRITE8_MEMBER( f1_state::system_w )
 	case 0: // centronics data port
 		centronics_data_w(m_centronics, 0, data);
 		break;
-	
+
 	case 1: // drive select
 		wd17xx_set_drive(m_fdc, !BIT(data, 0));
 		break;
-	
+
 	case 3: // drive head load
 		break;
-	
+
 	case 5: // drive motor on
 		floppy_mon_w(m_floppy0, !BIT(data, 0));
 		break;
-	
+
 	case 7: // video lines (1=200, 0=256)
 		m_200_256 = BIT(data, 0);
 		break;
-	
+
 	case 9: // video columns (1=80, 0=40)
 		m_40_80 = BIT(data, 0);
 		break;
-	
+
 	case 0x0b: // LED 0 enable
 		break;
-	
+
 	case 0x0d: // LED 1 enable
 		break;
-	
+
 	case 0x0f: // centronics strobe output
 		centronics_strobe_w(m_centronics, !BIT(data, 0));
 		break;
@@ -222,7 +222,7 @@ static APRICOT_KEYBOARD_INTERFACE( kb_intf )
 WRITE_LINE_MEMBER( f1_state::sio_int_w )
 {
 	m_sio_int = state;
-	
+
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int | m_sio_int);
 }
 
@@ -255,7 +255,7 @@ static Z80DART_INTERFACE( sio_intf )
 WRITE_LINE_MEMBER( f1_state::ctc_int_w )
 {
 	m_ctc_int = state;
-	
+
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int | m_sio_int);
 }
 
