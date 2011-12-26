@@ -1,4 +1,49 @@
-﻿0.144u3
+﻿0.144u4
+
+New System Drivers Supported:
+-----------------------------
+- Fidelity Champion Chess Challenger (model CSC). [Lord Nightmare, Kevtris, Sandro Ronco]
+- Acetronic Chess Traveller. [Curt Coder]
+- Triumph-Adler's Alphatronic PC [Ian Gledhill,Barry Rodewald,Robbbert]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+-v1050: Added Winchester hard disk [Curt Coder]
+-mac: match dumped Egret ROM versions to known machines.  II/IIx/IIcx now 
+ default to Apple 4*8 video card instead of RasterOps board to better 
+ represent a common config and boot faster. [R. Belmont]
+-lynx: Fixes a bug in the audio emulation that was causing mess to hang. [huygens]
+  Changed button ordering 
+  Sprite scaling changes (Blue Lightning runway fixed)
+-dc: added Katana Set 5 prototype BIOS (The Dumping Union)
+-mac: Added preliminary Cuda skeleton.  Doesn't sync up properly 
+ with 68k yet. [R. Belmont, Paul Pratt]
+-lynx: removed clearing of collision depository for background sprites 
+ (Dirty Larry can now get to the second level, Scrapyard Dog goes in-game) [huygens]
+-lynx: removed drawing of pad byte on end of scanline in completely literal 
+ sprite data (fixes score display in Qix, Blue Lightning).[huygens]
+
+Software Lists:
+----------------
+-v1050.xml: Added CP/M 3.0 (BIOS 1.4) to softlist. [rbramante]
+-a7800.xml: Adding softlist information regarding known prototypes, verified 
+ descriptions, general set upkeep.. more work needed. [Tafoid]
+-ibmpcjr_cart.xml: adding required field for DOS disk in the carts which needs it. [Kaylee]
+
+Source Changes:
+----------------
+-ipf: Cope with a probable image error (Chase H.Q. ST in particular) [O. Galibert]
+
+
+0.144u3
 
 New System Drivers Supported:
 -----------------------------
