@@ -1,13 +1,13 @@
 /*************************************************************************
 
-    smsvdp.h
+    sega315_5124.h
 
-    Implementation of Sega VDP chip used in Master System and Game Gear
+    Implementation of Sega VDP chips used in System E, Master System and Game Gear
 
 **************************************************************************/
 
-#ifndef __SMSVDP_H__
-#define __SMSVDP_H__
+#ifndef __SEGA315_5124_H__
+#define __SEGA315_5124_H__
 
 #include "devcb.h"
 
@@ -78,10 +78,12 @@ public:
 	DECLARE_READ8_MEMBER( hcount_latch_read );
 	DECLARE_WRITE8_MEMBER( hcount_latch_write );
 
+	bitmap_t *get_bitmap() { return m_tmpbitmap; };
+	bitmap_t *get_y1_bitmap() { return m_y1_bitmap; };
+
 	/* update the screen */
 	void update_video( bitmap_t *bitmap, const rectangle *cliprect );
 
-	int check_brightness( int x, int y );
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) { };
 
 protected:
@@ -201,4 +203,4 @@ protected:
 	MCFG_DEVICE_ADD(_tag, SEGA315_5378, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
-#endif /* __SMSVDP_H__ */
+#endif /* __SEGA315_5124_H__ */

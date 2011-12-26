@@ -369,7 +369,24 @@ static int lgun_bright_aim_area( running_machine &machine, emu_timer *timer, int
 
 		if (!pos_changed)
 		{
-			result = state->m_vdp->check_brightness(beam_x, beam_y);
+			bitmap_t *bitmap = state->m_vdp->get_bitmap();
+
+			/* brightness of the lightgray color in the frame drawn by Light Phaser games */
+			const UINT8 sensor_min_brightness = 0x7f;
+
+			/* TODO: Check how Light Phaser behaves for border areas. For Gangster Town, should */
+			/* a shot at right border (HC~=0x90) really appear at active scr, near to left border? */
+			if (beam_x < SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH || beam_x >= SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256)
+				return 0;
+
+			rgb_t color = *BITMAP_ADDR32(bitmap, beam_y, beam_x);
+
+			/* reference: http://www.w3.org/TR/AERT#color-contrast */
+			UINT8 brightness = (RGB_RED(color) * 0.299) + (RGB_GREEN(color) * 0.587) + (RGB_BLUE(color) * 0.114);
+			//printf ("color brightness: %2X for x %d y %d\n", brightness, beam_x, beam_y);
+
+			result = (brightness >= sensor_min_brightness) ? 1 : 0;
+
 			/* next check at same line */
 			beam_x += LGUN_X_INTERVAL;
 			pos_changed = 1;
