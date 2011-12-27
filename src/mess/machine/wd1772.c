@@ -280,8 +280,6 @@ void wd177x_t::read_sector_start()
 
 void wd177x_t::read_sector_continue()
 {
-	static int size_codes[4] = { 128, 256, 512, 1024 };
-
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
@@ -324,7 +322,7 @@ void wd177x_t::read_sector_continue()
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
-			sector_size = size_codes[cur_live.idbuf[3] & 3];
+			sector_size = 128 << (cur_live.idbuf[3] & 3);
 			sub_state = SECTOR_READ;
 			live_start(SEARCH_ADDRESS_MARK_DATA);
 			return;
@@ -565,8 +563,6 @@ void wd177x_t::write_sector_start()
 
 void wd177x_t::write_sector_continue()
 {
-	static int size_codes[4] = { 128, 256, 512, 1024 };
-
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
@@ -609,7 +605,7 @@ void wd177x_t::write_sector_continue()
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
-			sector_size = size_codes[cur_live.idbuf[3] & 3];
+			sector_size = 128 << (cur_live.idbuf[3] & 3);
 			sub_state = SECTOR_WRITE;
 			live_start(WRITE_SECTOR_PRE);
 			return;
