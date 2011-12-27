@@ -266,7 +266,6 @@ private:
 	void general_continue();
 	void command_end();
 
-
 	void spinup();
 	void index_callback(floppy_image_device *floppy, int state);
 	bool sector_matches() const;
