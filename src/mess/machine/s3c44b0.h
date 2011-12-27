@@ -71,12 +71,6 @@ struct _s3c44b0_interface_i2s
 	write16_device_func data_w;
 };
 
-typedef struct _s3c44b0_interface_lcd s3c44b0_interface_lcd;
-struct _s3c44b0_interface_lcd
-{
-	int flags;
-};
-
 typedef struct _s3c44b0_interface s3c44b0_interface;
 struct _s3c44b0_interface
 {
@@ -84,7 +78,6 @@ struct _s3c44b0_interface
 	s3c44b0_interface_i2c i2c;
 	s3c44b0_interface_adc adc;
 	s3c44b0_interface_i2s i2s;
-	s3c44b0_interface_lcd lcd;
 };
 
 /*******************************************************************************
@@ -101,10 +94,6 @@ void s3c44b0_request_eint( device_t *device, UINT32 number);
 /*******************************************************************************
     MACROS & CONSTANTS
 *******************************************************************************/
-
-/* Interface */
-
-#define S3C44B0_INTERFACE_LCD_REVERSE 1
 
 /* Memory Controller */
 
