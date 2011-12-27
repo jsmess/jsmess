@@ -1325,8 +1325,10 @@ Titles, publishers and release dates taken from:
 
 	<software name="wingman">
 		<description>Wingman</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198511xx"/>
+		<info name="alt_title" value="ウイングマン"/>
 		<part name="cass1" interface="x1_cass">
 			<dataarea name="side1" size="3898573">
 				<rom name="wingman a.tap" size="3898573" crc="853f4ea8" sha1="1115ea0e46fb5ee2a65cae50c45e7e0eab7bbbe8" offset="0" />
