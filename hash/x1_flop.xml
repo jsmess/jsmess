@@ -82,6 +82,17 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="advfantd" cloneof="advfant">
+		<description>Advanced Fantasian - Quest for Lost Sanctuary (Demo)</description>
+		<year>1989</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="advfant_demo.d88" size="348848" crc="8493aed0" sha1="a4a7b7dc0b7f884d55ff05b581b587cc6a27e27d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alpha">
 		<description>Alpha</description>
 		<year>1986</year>
@@ -197,10 +208,23 @@ Titles, publishers and release dates taken from:
 		<year>1987</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<info name="release" value="198705xx"/>
-		<info name="alt_title" value="アスピック"/>
+		<info name="alt_title" value="アスピックスペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="aspic_np.2d" size="327680" crc="c56d230b" sha1="5d2e11e7e5234ee11076ab13f87a8f42684197d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aztec">
+		<description>Aztec</description>
+		<year>1985</year>
+		<publisher>コンプティーク (Comptiq)</publisher>
+		<info name="release" value="198507xx"/>
+		<info name="alt_title" value="アズテック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="392368">
+				<rom name="aztec.d88" size="392368" crc="be5c8f9e" sha1="55626d13c1a7211fe9e46da544d785563d590f0d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -438,6 +462,19 @@ Titles, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="daiva2.d88" size="348848" crc="487b2157" sha1="306a2538d37f7d8e18376219e26cc67304b23aec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dezeniwl">
+		<description>Dezeni World</description>
+		<year>1986</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="release" value="198602xx"/>
+		<info name="alt_title" value="デゼニワールド"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="271824">
+				<rom name="dezeni_w.d88" size="271824" crc="702797b3" sha1="240ba477420b6045eba36612cb20e7fb3d1e9e68" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1020,6 +1057,24 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="jesusd" cloneof="jesus">
+		<description>Jesus (Demo)</description>
+		<year>1987</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="ジーザス =店頭DEMO="/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="367888">
+				<rom name="jesus-1.d88" size="367888" crc="e3d420c0" sha1="8b38eb3a8240c31fcef0550307ab21d7540cf06a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="jesus-2.d88" size="348848" crc="5e125051" sha1="eac0c464d902a5507907f92a6d2cef28bd0c18ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lkage">
 		<description>Kage no Densetsu - The Legend of Kage</description>
 		<year>1987</year>
@@ -1029,6 +1084,19 @@ Titles, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="legend of kage.d88" size="348848" crc="1b4fd2e1" sha1="ba078d57c1d544dedecd5ebe358d346015724ac0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karuizaw">
+		<description>Karuizawa Yukai Annai</description>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198511xx"/>
+		<info name="alt_title" value="軽井沢誘拐案内"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="karuizawa yukai annai.2d" size="327680" crc="b246d81c" sha1="c9a0e24fb0ef333bcf3018f1578bee9b42b2efd2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1221,6 +1289,19 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="lunacity">
+		<description>Luna City Satsujin Jiken</description>
+		<year>1987</year>
+		<publisher>ボンドソフト (Bond Soft)</publisher>
+		<info name="release" value="198701xx"/>
+		<info name="alt_title" value="ルナシティ殺人事件"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="396336">
+				<rom name="luna city.d88" size="396336" crc="272d2792" sha1="2babbe0051d37b8fb35b3e14cc8b6f5ab6044278" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lupin">
 		<description>Lupin the Third - Cagliostro no Shiro</description>
 		<year>1986</year>
@@ -1280,6 +1361,26 @@ Titles, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348576">
 				<rom name="mulea.d88" size="348576" crc="5c2715cd" sha1="17b790e9e1c9a8e9171eacdd8f37d83ac7be10cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjongk">
+		<description>Mahjong Kyo Jidai Special</description>
+		<year>1988</year>
+		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="release" value="198801xx"/>
+		<info name="alt_title" value="麻雀狂時代スペシャル"/>
+
+		<part name="flop1" interface="floppy_5_25" >
+			<dataarea name="flop" size="414144">
+				<rom name="mahjong kyo jidai special (disk a).d88" size="414144" crc="9b311819" sha1="bebaa9bfcf36bedde90ef8cf51f19b9d66cc215b" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25" >
+			<dataarea name="flop" size="416688">
+				<rom name="mahjong kyo jidai special (disk b).d88" size="416688" crc="b76b529b" sha1="0fa69cce2672d984723b6a9f8d6c226a01319d5b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1404,6 +1505,51 @@ Titles, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="makai_b.d88" size="348848" crc="e54022b3" sha1="59105b04d45580324d0f257bf300a30fbdee5573" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manilove" supported="no">
+		<description>The Man I Love</description>
+		<year>1987</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<info name="release" value="198709xx"/>
+		<info name="alt_title" value="マスターオブモンスターズ"/>
+		<!--combined image-->
+		<!--rom name="the man i love.d88" size="2025568" crc="c2df00bb" sha1="a52355adfcd1ef200c18a8e2ab7d776fdc85a9f9" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System" />
+			<dataarea name="flop" size="359520">
+				<rom name="the man i love.d88" size="359520" crc="76f54932" sha1="41e4d82da2b482b496a6d56a7f715322d4591bc0" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Map" />
+			<dataarea name="flop" size="359248">
+				<rom name="the man i love.d88" size="359248" crc="79b9c679" sha1="278383e57bfd268474e597f758cf0ea455f9435b" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Campaign" />
+			<dataarea name="flop" size="359248">
+				<rom name="the man i love.d88" size="359248" crc="2daa8353" sha1="5eb5b011315f6ea01944afe29ab80ed712e5f9eb" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="User" />
+			<dataarea name="flop" size="473776">
+				<rom name="the man i love.d88" size="473776" crc="2232089a" sha1="db3310cdbf3a7f56e96cc81b47c26ae43a6ffb2f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="User Campaign" />
+			<dataarea name="flop" size="473776">
+				<rom name="the man i love.d88" size="473776" crc="211c2f0e" sha1="f5a30bfe9b0f6ba830a86e740ffa0d23493b9453" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1871,7 +2017,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="sangoku2a" cloneof="sangoku2">
-		<description>Sangokushi II (Alt)</description>
+		<description>Sangokushi II Turbo</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- Turbo only -->
@@ -2559,6 +2705,7 @@ Titles, publishers and release dates taken from:
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="サンダーボール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="thndrbal.2d" size="327680" crc="b59a446c" sha1="e71b1eba1125ebceb475b1884b56b18f3df91298" offset="0" />
@@ -2815,6 +2962,19 @@ Titles, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350432">
 				<rom name="will 2.d88" size="350432" crc="b5def050" sha1="00d52f469e2831a08ef7a56e1bfe7a2f01a9f60f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingman">
+		<description>Wingman</description>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198511xx"/>
+		<info name="alt_title" value="ウイングマン"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="wingman.d88" size="327680" crc="862579ae" sha1="79d625917e776bcf71afe8678f897942352fc0bf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3112,36 +3272,14 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-<!-- is this by Comptiq or by Nihon Falcom? -->
-	<software name="aztec">
-		<description>Aztec?</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="392368">
-				<rom name="aztec.d88" size="392368" crc="be5c8f9e" sha1="55626d13c1a7211fe9e46da544d785563d590f0d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bastard">
 		<description>Bastard!! Special</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="バスタードスペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="bastard sp.d88" size="348848" crc="63c7fe77" sha1="b3de0bfc6aa1079d5079907ebfbd44455f9a2df5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="brank">
-		<description>Brank</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
-				<rom name="brank.2d" size="327680" crc="166f974a" sha1="27c77f2d2eb6898e0c388b1f5a6b5c6a76575385" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3194,8 +3332,9 @@ Titles, publishers and release dates taken from:
 		<description>Dezeni Land</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="デゼニランド"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="284752">
 				<rom name="dezeni_l.d88" size="284752" crc="0d3a751e" sha1="8db16b328eca8eaffd631aa08a85212b198c6a4f" offset="0" />
 			</dataarea>
 		</part>
@@ -3221,6 +3360,7 @@ Titles, publishers and release dates taken from:
 		<description>Dione</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ディオーネ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="dione-1.d88" size="348848" crc="bb7a6bb2" sha1="02b561da7bb493b40e280c611f6775cb012785fa" offset="0" />
@@ -3266,6 +3406,7 @@ Titles, publishers and release dates taken from:
 		<description>Faeries Residence</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="フェアリーズレジデンス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="fairiesa.2d" size="327680" crc="573c4145" sha1="9663371e9b31710e322658bbfd05d6cb603ec46e" offset="0" />
@@ -3298,6 +3439,7 @@ Titles, publishers and release dates taken from:
 		<description>Front Line</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="フロントライン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="305872">
 				<rom name="frontline.d88" size="305872" crc="02089748" sha1="b86e5221c1199251f55d28c60a184850d8864e1a" offset="0" />
@@ -3316,11 +3458,11 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-
 	<software name="galaxian">
 		<description>Galaxian X-1</description>
 		<year>19??</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="ギャラクシアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="galaxian x-1 (19xx)(namco).2d" size="327680" crc="0d2f49dc" sha1="7529a5483f526ee9318d4eeb08850f8cd39f3c77" offset="0" />
@@ -3332,6 +3474,7 @@ Titles, publishers and release dates taken from:
 		<description>Gate of Labyrinth</description>
 		<year>1987</year>
 		<publisher>Ymcat</publisher>
+		<info name="alt_title" value="迷宮への扉"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="gate of labyrinth (1987)(ymcat).2d" size="327680" crc="4488121c" sha1="c9bddf91d51cbc124fd1a580a2c69b003d2bdd2a" offset="0" />
@@ -3343,6 +3486,7 @@ Titles, publishers and release dates taken from:
 		<description>Hyper Olympics '84</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ハイパーオリンピック '84"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="hyper olympic 84.2d" size="327680" crc="a4b2f2f5" sha1="064ed54ce40487f07d805ce04b7007e8cb4088b1" offset="0" />
@@ -3351,9 +3495,10 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="irohamio">
-		<description>Irohamioedo</description>
+		<description>Irohanihoheto</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="いろはにほへと"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="413296">
 				<rom name="irohamioedo (19xx)(-)(jp)(disk 1 of 2).d88" size="413296" crc="ded12e38" sha1="cfffdea2f2445d6996cc24014c9af81f866f59d9" offset="0" />
@@ -3386,6 +3531,7 @@ Titles, publishers and release dates taken from:
 		<description>Knither - Demon Crystal II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ナイザー　=デーモンクリスタルⅡ="/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="knither.2d" size="327680" crc="c64e3046" sha1="9a26bd5b299f6890a847a9d04ced8e686ab26a94" offset="0" />
@@ -3397,6 +3543,7 @@ Titles, publishers and release dates taken from:
 		<description>Labyrinth</description>
 		<year>1986</year>
 		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<info name="alt_title" value="ラビリンス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="labyrintha.d88" size="348848" crc="7e56f2d1" sha1="199a6a7fe3bf6689069a979cf111133f0c7dfb67" offset="0" />
@@ -3413,6 +3560,7 @@ Titles, publishers and release dates taken from:
 		<description>Lizard</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="リザード"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="346032">
 				<rom name="lizard.d88" size="346032" crc="e0df6f30" sha1="eb4875b56604ba1a6300576de606676cd382aaf1" offset="0" />
@@ -3424,6 +3572,7 @@ Titles, publishers and release dates taken from:
 		<description>Love Chaser</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ラブチェイサー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="lovec_1.d88" size="348848" crc="cafd770e" sha1="20cccd3a493a05fbc2966fa950239483d46e6149" offset="0" />
@@ -3456,6 +3605,7 @@ Titles, publishers and release dates taken from:
 		<description>Marvelous</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="marvelous.2d" size="327680" crc="af21a06c" sha1="db9f47962dc93b736c5f3b081becb6def989e14d" offset="0" />
@@ -3464,9 +3614,10 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="merver">
-		<description>Merveros</description>
+		<description>Marvelous (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="merveros.2d" size="327680" crc="3e5447af" sha1="b27f428183e59d22cc81256f794d5d9d2a782b3d" offset="0" />
@@ -3475,9 +3626,10 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="mervera" cloneof="merver">
-		<description>Merveros (Alt)</description>
+		<description>Marvelous (Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="merveros_alt.2d" size="327680" crc="c93d71ec" sha1="27a695d2a039d604aff3a2f37ac6c83be4ef6cd5" offset="0" />
@@ -3489,6 +3641,7 @@ Titles, publishers and release dates taken from:
 		<description>Mikichan</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="がんばれ美樹ちゃん！"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="mikichan.2d" size="327680" crc="06965b19" sha1="b33c79c4444f53419beb5db300ef536d1df9d432" offset="0" />
@@ -3522,6 +3675,7 @@ Titles, publishers and release dates taken from:
 		<description>Outroyd</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="アウトロイド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="outroyd.d88" size="348848" crc="34c7df8c" sha1="c54103e3e3df00ee6417b80fe1d8f3ae4dd64b82" offset="0" />
@@ -3533,6 +3687,7 @@ Titles, publishers and release dates taken from:
 		<description>Panch</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="パンチボールマリオ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="panch.d88" size="348848" crc="bf089114" sha1="330399d0c1f1caad98fc445b3768a217a7572559" offset="0" />
@@ -3544,6 +3699,7 @@ Titles, publishers and release dates taken from:
 		<description>Pop Lemon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ポップレモン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="poplem_a.2d" size="327680" crc="29b09279" sha1="1d12cfd7778bc1c52412947adc895006ca15a3b3" offset="0" />
@@ -3560,6 +3716,7 @@ Titles, publishers and release dates taken from:
 		<description>Portpia</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ポートピア連続殺人事件"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="zzz-unk-portpia.2d" size="327680" crc="6699bf3d" sha1="5be59558474e4f8709949821cdf8495dd66ed7b3" offset="0" />
@@ -3635,6 +3792,7 @@ Titles, publishers and release dates taken from:
 		<description>Studio Cut</description>
 		<year>19??</year>
 		<publisher>ハード (Hard)</publisher>
+		<info name="alt_title" value="美少女写真館 STUDIO CUT"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="studio cut (19xx)(hard)(jp).2d" size="327680" crc="b6f0148b" sha1="9c618d0eee0cb27d20316b75a195fedda8d10afe" offset="0" />
@@ -3729,11 +3887,11 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-
 	<software name="xevious">
 		<description>Xevious</description>
 		<year>19??</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="ゼビウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344768">
 				<rom name="xevious (19xx)(namco).d88" size="344768" crc="dc93900d" sha1="f81545b62068d8eb91f209caf5a57df252b930c2" offset="0" />
@@ -3777,6 +3935,7 @@ Titles, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="zeta5">
 		<description>Zeta 5</description>
 		<year>19??</year>
@@ -3793,8 +3952,116 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="pstar2">
+		<description>Polar Star 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="polar star 2.2d" size="327680" crc="e8b8bdb6" sha1="97b9099d2cfde575410d5c1db40a43833108d0f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-<!-- Utilities and Demos -->
+	<software name="dokkin">
+		<description>Dokkin Minako Sensei</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ドッキン美奈子先生！"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="minako (disk a).2d" size="327680" crc="847ffb04" sha1="56dc77544b700da9ad61c3b5259fbebde95d02a4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="minako (disk b).2d" size="327680" crc="cbb456eb" sha1="85dcab4b41a7305742c8266423bc23355dcc42b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triviaq">
+		<description>Trivia Q</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="トリビアＱ"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="396176">
+				<rom name="trivia q.d88" size="396176" crc="8d660b88" sha1="eee0ab2e898c6968b43da4fac6e9625b74053192" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videogam">
+		<description>Video Game Music vol.1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ナムコ　ビデオゲームミュージックライブラリ Vol.1"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="video game music disk a.2d" size="327680" crc="6017899c" sha1="e2bcfbf554d4be7f5e7c24ede1e596c243c1f78b" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="video game music disk b.2d" size="327680" crc="bce68298" sha1="d84a4e90cefff6f42ef9db50d799392781424fa9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kudokika">
+		<description>Kudokikata Oshiemasu</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="口説き方教えます"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="disk a.2d" size="327680" crc="d3eb3603" sha1="9b6a480fdd39a471ed602aa07f7323df345699dc" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="disk b.2d" size="327680" crc="81ac150e" sha1="89b9f95dc284e116f92b9f408b640b2e8c570705" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sayaka">
+		<description>Yumeshojo Sayaka</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="夢少女さやか"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="disk a.2d" size="327680" crc="87b217b7" sha1="984b83846d61cda4d9e1f9f5d2ec7a7c00c9c216" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="disk b.2d" size="327680" crc="37728ac4" sha1="71d54496baae18bf82016d361e88eac8069e4e22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbrenzsj">
+		<description>Shirobara Renzoku Satsujin Jiken</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="白薔薇連続殺人事件"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="351712">
+				<rom name="shirobara renzoku.d88" size="351712" crc="4c7aff07" sha1="3c19382c4610bbb6c35379a01440c304de9c7bd3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- Utilities and Tech Demos -->
 
 	<software name="x1demo">
 		<description>X1 Demo</description>
@@ -4105,6 +4372,18 @@ Titles, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
                 <rom name="unk_disk.d88" size="348848" crc="821d3e69" sha1="8de8f1855fa97a2381b9a3328c331c14d3d79300" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="blank">
+		<description>Blank Disk?</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="brank.2d" size="327680" crc="166f974a" sha1="27c77f2d2eb6898e0c388b1f5a6b5c6a76575385" offset="0" />
 			</dataarea>
 		</part>
 	</software>
