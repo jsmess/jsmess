@@ -8,7 +8,11 @@ To investigate:
 
 Undumped:
 - 10-Pin Bowling CGB-AXPP-UKV
+- 102 Dalmatas Cachorros Al Rescate CGB-B99S-ESP
+- Army Men 2 CGB-BA2P-EUU
 - Army Men - Air Combat  CGB-BATP-EUR
+- Bionic Command CGB-AV4P-AUS
+- Bugs Bunny et le chateau des catastrophes CGB-AO4F-FRA
 - Caterpillar Construction Zone DMG-AR4P-EUU? [unclear pic]
 - Championship Motocross 2001 featuring Ricky Carmichael CGB-BCMP-EUR
 - Daffy Duck - Fowl Play DMG-AD7P-UKV
@@ -41,9 +45,11 @@ Undumped:
 - Rugrats - Totally Angelica CGB-BAGP-EUR
 - San Francisco Rush 2049 (Euro, fr/de/nl) [small pic]
 - Sesame Street Sports (Euro) [small pic]
+- Shaun Palmer's Pro Snowboarder CGB-B3SP-AUS
 - Space Invaders DMG-AIVP-(EUR/NOE)
 - Spider-Man 2 - The Sinister Six CGB-B2SP-EUR
 - Las Super Nenas - Lucha Con Ese CGB-BBHS-ESP
+- Las Super Nenas - Panico en Townsville CGB-BPTS-ESP
 - TOCA Touring Car Championship CGB-BTCP-EUR
 - Tony Hawk's Pro Skater 2 CGB-BTGP-EUR
 - Tony Hawk's Pro Skater 3 CGB-B3TE-EUR
@@ -51,18 +57,13 @@ Undumped:
 - Yoda Stories DMG-AYDP-EUR
 - WWF Attitude CGB-AWTP-AUS
 
-nointro guys also lists the following
-- 102 Dalmatas Cachorros Al Rescate (Spain)
+nointro guys also list the following
 - 1942 (Euro)
-- Army Men 2 (Euro)
-- Bugs Bunny et le chateau des catastrophes (France)
 - Mega Man Xtreme (Euro)
 - Moon Patrol &amp; Spy Hunter (Euro)
 - The New Adventures of Mary-Kate &amp; Ashley (Euro)
 - Razor Freestyle Scooter (Euro)
-- Shaun Palmer's Pro Snowboarder (Australia)
 - Las Super Nenas - Malvado Mojo (Spain)
-- Las Super Nenas - Panico en Townsville (Spain)
 
 Undumped GBC protos:
   - Jet Force Gemini
@@ -19394,6 +19395,21 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="dragon quest 4 (unl).bin" size="4194304" crc="bd651350" sha1="120b18c4f53051db70b90e92c60b100cc13024c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+    <!-- This is usually referred to as 'Vietnamese bootleg' of pokecrys
+    (apparently it got sent to US by a Vietnamese guy back in the 2000)
+    it can be seen on youtube. -->
+	<software name="pokecrysb" cloneof="pokecrys">
+		<!-- Notes: GBC only -->
+		<description>Pocket Monsters - Crystal Version (Bootleg)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pokemon crystal vietnamese.bin" size="2097152" crc="a690ed9f" sha1="0b3041476100a450c20d8e672f49b59880b7d234" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
