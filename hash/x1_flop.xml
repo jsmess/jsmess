@@ -1521,35 +1521,35 @@ Titles, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="359520">
-				<rom name="the man i love.d88" size="359520" crc="76f54932" sha1="41e4d82da2b482b496a6d56a7f715322d4591bc0" offset="0" />
+				<rom name="the man i love (disk 1).d88" size="359520" crc="76f54932" sha1="41e4d82da2b482b496a6d56a7f715322d4591bc0" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Map" />
 			<dataarea name="flop" size="359248">
-				<rom name="the man i love.d88" size="359248" crc="79b9c679" sha1="278383e57bfd268474e597f758cf0ea455f9435b" offset="0" />
+				<rom name="the man i love (disk 2).d88" size="359248" crc="79b9c679" sha1="278383e57bfd268474e597f758cf0ea455f9435b" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Campaign" />
 			<dataarea name="flop" size="359248">
-				<rom name="the man i love.d88" size="359248" crc="2daa8353" sha1="5eb5b011315f6ea01944afe29ab80ed712e5f9eb" offset="0" />
+				<rom name="the man i love (disk 3).d88" size="359248" crc="2daa8353" sha1="5eb5b011315f6ea01944afe29ab80ed712e5f9eb" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="User" />
 			<dataarea name="flop" size="473776">
-				<rom name="the man i love.d88" size="473776" crc="2232089a" sha1="db3310cdbf3a7f56e96cc81b47c26ae43a6ffb2f" offset="0" />
+				<rom name="the man i love (disk 4).d88" size="473776" crc="2232089a" sha1="db3310cdbf3a7f56e96cc81b47c26ae43a6ffb2f" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="User Campaign" />
 			<dataarea name="flop" size="473776">
-				<rom name="the man i love.d88" size="473776" crc="211c2f0e" sha1="f5a30bfe9b0f6ba830a86e740ffa0d23493b9453" offset="0" />
+				<rom name="the man i love (disk 5).d88" size="473776" crc="211c2f0e" sha1="f5a30bfe9b0f6ba830a86e740ffa0d23493b9453" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4047,14 +4047,50 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="sbrenzsj">
-		<description>Shirobara Renzoku Satsujin Jiken</description>
+	<software name="moritash">
+		<description>Kazuo Morita no Shougi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="白薔薇連続殺人事件"/>
+		<info name="alt_title" value="森田和郎の将棋"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="351712">
-				<rom name="shirobara renzoku.d88" size="351712" crc="4c7aff07" sha1="3c19382c4610bbb6c35379a01440c304de9c7bd3" offset="0" />
+			<dataarea name="flop" size="327680">
+				<rom name="morita shogi.2d" size="327680" crc="9a0bf69c" sha1="6b2d15bdfd64cd069712b3b9df2f0dbba5a88143" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emono1">
+		<description>Utsukushiki Emono-Tachi 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="美しき獲物たち"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="emonotachi 1.2d" size="327680" crc="52d62c6b" sha1="0c2af1fb20943ddb872691b58c0951ab64d54f0c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenshit">
+		<description>Tenshi-tachi no Gogo</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="天使たちの午後"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="tenshi-tachi no gogo.2d" size="327680" crc="44c8af0c" sha1="b76c80b27607cb952ee3b71f5d8f581dcbd77ef6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profmj">
+		<description>Professional Mahjong</description>
+		<year>19??</year>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="professional mahjong.2d" size="327680" crc="bc91c664" sha1="c26f5492a4d4b65640d76c43235fc84afcb8654d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
