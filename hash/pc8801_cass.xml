@@ -1314,5 +1314,65 @@
 		</part>
 	</software>
 
+	<software name="cbdash">
+		<description>Champion Boulderdash</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="42884">
+				<rom name="champion boulderdash.t88" size="42884" crc="ded95084" sha1="e095f1406df311e8eef1eecf95531e29a69b301d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enterpr">
+		<description>Enterprise</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="31605">
+				<rom name="enterprise.t88" size="31605" crc="9ab8b63d" sha1="16c10eb3a6b42293b5ef4f25b6f05684fbb057f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intadv">
+		<description>Intern Adventure</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="19646">
+				<rom name="intern adventure.t88" size="19646" crc="2392d3f8" sha1="1c7dd07f678a8121da848072966f1a857736570b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jump">
+		<description>Jump!</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="pc8801_cass">
+			<dataarea name="cass" size="24466">
+				<rom name="jump!.t88" size="24466" crc="92d695f5" sha1="77bb7af0fa4c67db5f6655e68fd5028c052ddaee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gundam2">
+		<description>Kidou Senshi Gundam 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="pc8801_cass">
+			<dataarea name="cass" size="109907">
+				<rom name="kido senshi gundam 2 1.t88" size="109907" crc="43f9c027" sha1="aac45310ac2bf16303dbd57f23aea053811c0ae8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="pc8801_cass">
+			<dataarea name="cass" size="74824">
+				<rom name="kido senshi gundam 2 2.t88" size="74824" crc="668c55d9" sha1="640275f3cb50a2b7d7a2e156bf1215324cef548a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
