@@ -21804,7 +21804,7 @@
     <publisher>unknown</publisher>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
-        <disk name="blast wind (japan) (iso-mp3 sourced)" sha1="700a2e9385664f15892855e6414e3232ff5c7591" status="bad" />
+        <disk name="blast wind (japan) (iso-mp3 sourced)" sha1="700a2e9385664f15892855e6414e3232ff5c7591" status="baddump" />
       </diskarea>
     </part>
   </software>
