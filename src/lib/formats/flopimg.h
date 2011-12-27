@@ -502,8 +502,9 @@ public:
 
 	// Form factors
 	enum {
-		FF_35   = 0x20203533, // "35  "
-		FF_525  = 0x20353235, // "525 "
+		FF_UNKNOWN  = 0x00000000, // Unknown, useful when converting
+		FF_35       = 0x20203533, // "35  "
+		FF_525      = 0x20353235, // "525 "
 	};
 
 	// Variants

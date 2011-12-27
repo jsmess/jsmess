@@ -76,7 +76,7 @@ static floppy_image_format_t *find_format_by_identify(io_generic *image)
 
 	for(int i = 0; i != FORMAT_COUNT; i++) {
 		floppy_image_format_t *fif = formats[i];
-		int score = fif->identify(image);
+		int score = fif->identify(image, floppy_image::FF_UNKNOWN);
 		if(score > best) {
 			best = score;
 			best_fif = fif;
@@ -203,8 +203,8 @@ static int convert(int argc, char *argv[])
 	dest_io.procs = &stdio_ioprocs_noclose;
 	dest_io.filler = 0xff;
 
-	floppy_image image(84, 2);
-	if(!source_format->load(&source_io, &image)) {
+	floppy_image image(84, 2, floppy_image::FF_UNKNOWN);
+	if(!source_format->load(&source_io, floppy_image::FF_UNKNOWN, &image)) {
 		fprintf(stderr, "Error: parsing input file as '%s' failed\n", source_format->name());
 		return 1;
 	}
