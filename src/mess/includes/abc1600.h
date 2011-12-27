@@ -84,7 +84,7 @@ public:
 	required_device<z80dma_device> m_dma1;
 	required_device<z80dma_device> m_dma2;
 	required_device<z80dart_device> m_dart;
-	required_device<device_t> m_scc;
+	required_device<scc8530_t> m_scc;
 	required_device<z8536_device> m_cio;
 	required_device<device_t> m_fdc;
 	required_device<e0516_device> m_rtc;
@@ -193,6 +193,8 @@ public:
 	inline void write_videoram(UINT32 offset, UINT16 data, UINT16 mask);
 	inline UINT16 get_crtca(UINT16 ma, UINT8 ra, UINT8 column);
 	void crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+
+	void scc_irq(int status);
 
 	// memory access controller
 	int m_ifc2;

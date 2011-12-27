@@ -1359,7 +1359,7 @@ static ADDRESS_MAP_START( megaste_map, AS_PROGRAM, 16, megaste_state )
     AM_RANGE(0xff8e00, 0xff8e0f) AM_READWRITE(vme_r, vme_w)
     AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(cache_r, cache_w)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(fpu_r, fpu_w)*/
-	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8_LEGACY(Z8530_TAG, scc8530_r, scc8530_w, 0x00ff)
+	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8(Z8530_TAG, scc8530_t, reg_r, reg_w, 0x00ff)
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -2520,7 +2520,7 @@ static MACHINE_CONFIG_DERIVED( megaste, ste )
 	MCFG_CPU_MODIFY(M68000_TAG)
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
-	MCFG_SCC8530_ADD(Z8530_TAG, Y2/4)
+	MCFG_SCC8530_ADD(Z8530_TAG, Y2/4, scc8530_t::intrq_cb_t())
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
