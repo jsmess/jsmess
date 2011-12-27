@@ -1,23 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- list of games that requires basic disk/tape loaded first (use load cmd then run):
-	2001 An Adventure story (2001nen)
-	Extra Pinball
-	Hanafuda Koi Koi
-	Hohju
-	Hover Attack
-	Nobunaga no Yabou
-	Pac-Man
-	Perfect Mahjong
-	Poibos
-	Pyramid no Nazo
-	Rowdy Ball
-	Spartan X
-	Star Fleet
-	Super Golf
-	Zenon (zennon, made by Dempa)
--->
 
+<!-- There are a few images which are in a different TAP format (look for filesize%60000!=4)... -->
 <!--
 
 Titles, publishers and release dates taken from:
@@ -25,6 +9,7 @@ Titles, publishers and release dates taken from:
 [which is not really complete when it comes to older tapes, unfortunately...]
 
 -->
+
 <softwarelist name="x1_cass" description="Sharp X1 tape images">
 
 	<software name="blckonyx">
@@ -370,6 +355,8 @@ Titles, publishers and release dates taken from:
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="パックマン"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="pac-man (basic).tap" size="240004" crc="1b4a9af7" sha1="8bf5a7dc818669901fda4416a696ea3adb492291" offset="0" />
@@ -409,6 +396,8 @@ Titles, publishers and release dates taken from:
 		<publisher>応用電算技研</publisher>
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ポイボスＰａｒｔ１ -脱出-"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="poibos.tap" size="240004" crc="2449cd8c" sha1="e233c1b2cfc2ebd26cdc07426d1ee9b8ab43bf2e" offset="0" />
@@ -422,6 +411,8 @@ Titles, publishers and release dates taken from:
 		<publisher>応用電算技研</publisher>
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ポイボスＰａｒｔ１ -脱出-"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="poibosa.tap" size="240004" crc="c6bd98b5" sha1="a894e2388c3cbcc3452d6049ea5d1497e3e819e6" offset="0" />
@@ -534,10 +525,24 @@ Titles, publishers and release dates taken from:
 
 
 <!-- Look for info -->
+	<software name="2001nen">
+		<description>2001 - An Adventure Story?</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="120004">
+				<rom name="2001nen.tap" size="120004" crc="0c03768b" sha1="f0bbbd1c10a01875bf1774bede177cfb653e57ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3biki">
 		<description>3biki no Butachan</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="三匹のぶたちゃん"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="3biki no butachan.tap" size="240004" crc="afb90f84" sha1="c06cffd73ea97bb1a8395b3ad7e09d0b4a97718d" offset="0" />
@@ -549,9 +554,21 @@ Titles, publishers and release dates taken from:
 		<description>3D Bomberman</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="三次元ボンバーマン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="684380">
 				<rom name="3d bomberman.tap" size="684380" crc="1bf0e104" sha1="f5660c81d632babab3268dd4b2d97dbe53f0a0d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armsold">
+		<description>The Armored Soldier</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="240004">
+				<rom name="as.tap" size="240004" crc="95bc0439" sha1="a78b6cc2fbaa28e679717522af6d96d5288dc0d8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -560,6 +577,7 @@ Titles, publishers and release dates taken from:
 		<description>Bat</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="バット"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="300004">
 				<rom name="bat.tap" size="300004" crc="8c83d6ef" sha1="64912a85a34b0ae3fbdce152d394271748998b0a" offset="0" />
@@ -571,6 +589,7 @@ Titles, publishers and release dates taken from:
 		<description>Bomberman</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ボンバーマン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="bomber man.tap" size="180004" crc="c7d4af37" sha1="f4160c8e2234dcabe0d822eb1c011f6436c70140" offset="0" />
@@ -582,6 +601,7 @@ Titles, publishers and release dates taken from:
 		<description>Cannon Ball 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="キャノンボール2"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="cannon ball2.tap" size="180004" crc="4cffaba8" sha1="06531cb4939fb1e188bb182046bb60bc028edf67" offset="0" />
@@ -607,6 +627,18 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="cepton.tap" size="180004" crc="06a6eff2" sha1="c2ed3ed0dd8fa29dccc013da25a2f63746e2bac6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perseus">
+		<description>Corageous Perseus</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="カレイジアスペルセウス"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="180004">
+				<rom name="perseus.tap" size="180004" crc="aacc8aef" sha1="239d1d1df1a5f4e0c424616ee0d2faf7972e7f79" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -637,6 +669,7 @@ Titles, publishers and release dates taken from:
 		<description>Dig Dug</description>
 		<year>1982?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="ディグダグ"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="dig dug.tap" size="240004" crc="c37c9bc0" sha1="d9752e3ca6bdc52114a569660289f13d46879c92" offset="0" />
@@ -648,6 +681,8 @@ Titles, publishers and release dates taken from:
 		<description>Extra Pinball</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="300004">
 				<rom name="extra pinball (basic).tap" size="300004" crc="0bedc3de" sha1="0246b50cfcc4213aea4935f28ce3a01c4b57f821" offset="0" />
@@ -681,6 +716,7 @@ Titles, publishers and release dates taken from:
 		<description>Front Line</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="フロントライン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="360004">
 				<rom name="front line.tap" size="360004" crc="132e4ce3" sha1="0187198aa679fd66ed93fd2933bd36fcf13abf00" offset="0" />
@@ -692,9 +728,22 @@ Titles, publishers and release dates taken from:
 		<description>Galaxian</description>
 		<year>198?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="ギャラクシアン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="galaxian.tap" size="180004" crc="bc1896c5" sha1="3eb7db6b658ccdfdfcfa4deafe34e535b7d14fc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golfkyo">
+		<description>Golf Kyo</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ゴルフ狂"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="180004">
+				<rom name="golfkyo.tap" size="180004" crc="fae957c9" sha1="c9af71b2638840eb6c6da235f35dab82f99d1fb4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -710,21 +759,11 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="golfkyo">
-		<description>Golf Kyo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="x1_cass">
-			<dataarea name="side1" size="180004">
-				<rom name="golfkyo.tap" size="180004" crc="fae957c9" sha1="c9af71b2638840eb6c6da235f35dab82f99d1fb4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gunman">
 		<description>Gunman</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ガンマン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="gunman.tap" size="180004" crc="ead9572f" sha1="e6998219922a2dcbc27a7bda17be3001e962aa1f" offset="0" />
@@ -747,6 +786,9 @@ Titles, publishers and release dates taken from:
 		<description>Hanafuda Koikoi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="花札こいこい"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="hanafuda koikoi.tap" size="120004" crc="ae4c50b2" sha1="fa7bc46e9468c43eb29923844a03365ebc109fcd" offset="0" />
@@ -765,10 +807,26 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="hohju">
+		<description>Hohju?</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="宝珠"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="180004">
+				<rom name="hohju.tap" size="180004" crc="77aa3a0c" sha1="49d499b9397d00ceebeacf340ee99817f77e8f90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hovattck">
 		<description>Hover Attack</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="hover attack (basic).tap" size="240004" crc="e350d5a8" sha1="68bc644b2a3199da764d1c8f1466b84d605e2e26" offset="0" />
@@ -791,6 +849,7 @@ Titles, publishers and release dates taken from:
 		<description>Hyper Olympics '84</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ハイパーオリンピック '84"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="360004">
 				<rom name="hyper olympic '84.tap" size="360004" crc="796a3e54" sha1="9b71b7d4a0ae876043aeb44058e5f4a265bd821d" offset="0" />
@@ -813,6 +872,7 @@ Titles, publishers and release dates taken from:
 		<description>Ice Block</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="アイスブロック"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="ice block.tap" size="180004" crc="77a6f3be" sha1="fc65e13ce6a45f32181549b684ca737bfe91a95b" offset="0" />
@@ -824,6 +884,7 @@ Titles, publishers and release dates taken from:
 		<description>Jelda</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ジェルダ"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="jelda.tap" size="180004" crc="bbf4baf2" sha1="edf47fe19a733d3ca9d019058e3cfd8a829528f2" offset="0" />
@@ -846,6 +907,7 @@ Titles, publishers and release dates taken from:
 		<description>Jong Kyo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ジャン狂"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="jong kyo.tap" size="120004" crc="518129ba" sha1="38e4750867ae952b1f22923fc893a2f6f60222f9" offset="0" />
@@ -857,6 +919,7 @@ Titles, publishers and release dates taken from:
 		<description>Kagirinaki Tatakai</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="カギリナキ (or 限りなき戦い)"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="kagirinaki tatakai.tap" size="240004" crc="e039685b" sha1="b2137efd4239ea75ff449f79366808d4992b60ac" offset="0" />
@@ -879,6 +942,7 @@ Titles, publishers and release dates taken from:
 		<description>Kim Dan 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="キムキムダンダン2"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="kim dan 2.tap" size="240004" crc="a9161c58" sha1="8633363fdc91d91a84cdc2c44929cc5c26a78c95" offset="0" />
@@ -901,6 +965,7 @@ Titles, publishers and release dates taken from:
 		<description>Kitaro</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ゲゲゲの鬼太郎"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="kitaro.tap" size="240004" crc="e6285c24" sha1="50ee828da97603b2cb936c993006eb388b08cf6b" offset="0" />
@@ -912,6 +977,7 @@ Titles, publishers and release dates taken from:
 		<description>Macross</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="超時空要塞マクロス"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="540004">
 				<rom name="macross.tap" size="540004" crc="fc3eb348" sha1="5351061bc4d13d11726beb4f7e6e94aa5c429a00" offset="0" />
@@ -934,6 +1000,7 @@ Titles, publishers and release dates taken from:
 		<description>Maharito</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="マハリト"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="846723">
 				<rom name="maharito.tap" size="846723" crc="41723ab2" sha1="e0d7ed99b852de13c5d04c2952cabf620c88a9c7" offset="0" />
@@ -941,11 +1008,11 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-    <!-- Perfect Mahjong? -->
 	<software name="mahjong">
 		<description>Mahjong</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ウルトラ4人麻雀"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="mahjong.tap" size="120004" crc="14304522" sha1="fe4fd7b77de411784a9d1670df670331240aaf66" offset="0" />
@@ -957,6 +1024,7 @@ Titles, publishers and release dates taken from:
 		<description>Mimitan</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ミミタン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="mimitan.tap" size="120004" crc="261795ba" sha1="cd239e7301963288cdf1bc83da2f5d8f1fe91a44" offset="0" />
@@ -975,13 +1043,29 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="perseus">
-		<description>Corageous Perseus</description>
+	<software name="nobunaga">
+		<description>Nobunaga no Yabou</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="信長の野望"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="240004">
+				<rom name="nobunaga no yabou.tap" size="240004" crc="77705e07" sha1="4cfa64d9d2617f3300496976e25c41605e6ec292" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perfmj">
+		<description>Perfect Mahjong</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
-				<rom name="perseus.tap" size="180004" crc="aacc8aef" sha1="239d1d1df1a5f4e0c424616ee0d2faf7972e7f79" offset="0" />
+				<rom name="perfect mahjang.tap" size="180004" crc="3bbbcf9c" sha1="2e651b4761a83e2caf9f3a85d3f8b7dd3f81938a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1001,6 +1085,7 @@ Titles, publishers and release dates taken from:
 		<description>Pop Balloon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ポップバルーン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="360004">
 				<rom name="pop baloon.tap" size="360004" crc="713c7791" sha1="e8c7352be1c453361bcf9a18156d0856c1ea064e" offset="0" />
@@ -1023,6 +1108,9 @@ Titles, publishers and release dates taken from:
 		<description>Pyramid no Nazo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ピラミッドの謎"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="600004">
 				<rom name="pyramid no nazo.tap" size="600004" crc="878b407b" sha1="71ec7289836ce6f8c7ad5dcf5ee5f8aea7aa1c1c" offset="0" />
@@ -1034,6 +1122,7 @@ Titles, publishers and release dates taken from:
 		<description>Rally-X</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ラリーX"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="rally-x.tap" size="120004" crc="dc752c51" sha1="693b0d61ad01d5f8a2c431facb6b8edfcced02c5" offset="0" />
@@ -1045,6 +1134,8 @@ Titles, publishers and release dates taken from:
 		<description>Rowdy Ball</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="rowdy ball (basic).tap" size="120004" crc="e64d46c0" sha1="16d872e5841a9ac1a582ebf1037a69f718a3ed8c" offset="0" />
@@ -1056,6 +1147,21 @@ Titles, publishers and release dates taken from:
 		<description>Spartan X</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="スパルタンＸ"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="240004">
+				<rom name="spartanx.tap" size="240004" crc="582352fc" sha1="942d53cccb6a0046d37a0fd379fe770f63281fd4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spartanxa" cloneof="spartanx">
+		<description>Spartan X (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="スパルタンＸ"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="1094611">
 				<rom name="spartanx (basic).tap" size="1094611" crc="1c21cef0" sha1="8eeac00b7f60d6beb110509da6235f3673125349" offset="0" />
@@ -1067,6 +1173,7 @@ Titles, publishers and release dates taken from:
 		<description>Space Burger</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="スペースバーガー"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="60004">
 				<rom name="space burger.tap" size="60004" crc="395e2192" sha1="262faf4eddef5a525c27938ce58d5cd7824728f3" offset="0" />
@@ -1078,9 +1185,23 @@ Titles, publishers and release dates taken from:
 		<description>Star Arthur Densetsu - Wakusei Mephius</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="惑星メフィウス"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="1753088">
 				<rom name="star arthur densetsu - wakusei mephius.tap" size="1753088" crc="f0b5d24b" sha1="551b36eefa433b91eb228be8ebd1b1c4f1013d4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflet">
+		<description>Star Fleet</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="180004">
+				<rom name="star freet.tap" size="180004" crc="a5f3db38" sha1="a144ae03d38edd5bef868bd6dd2e7a457103b5e0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1107,10 +1228,24 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="sgolf2">
+		<description>Super Golf #2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="180004">
+				<rom name="super golf.tap" size="180004" crc="1193e51d" sha1="374a8d884766a9cac22fb257970459824b6b9d0e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tforce">
 		<description>Thunder Force</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="サンダーフォース"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="thunder force.tap" size="240004" crc="d8d1fc3f" sha1="30e69b6fac9fbf634b12be9b2d1b371081a2dd44" offset="0" />
@@ -1122,6 +1257,7 @@ Titles, publishers and release dates taken from:
 		<description>Time Secret</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="タイムシークレット"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="time secret.tap" size="240004" crc="5e9270ad" sha1="2103c49fc629f0a0b10b5b2d1aa3eea0e06bcb90" offset="0" />
@@ -1133,6 +1269,7 @@ Titles, publishers and release dates taken from:
 		<description>Touch Down</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="タッチダウン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="touch down.tap" size="180004" crc="f1c1d9f8" sha1="ad6c7d0c51df4185c700d49d7393ac6d0b9190d9" offset="0" />
@@ -1155,6 +1292,7 @@ Titles, publishers and release dates taken from:
 		<description>Salad no Kuni no Tomato Hime</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="サラダの国のトマト姫"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="3646247">
 				<rom name="tomathim.tap" size="3646247" crc="b29436cb" sha1="39c52dbe5985647d0b03411d4c2a97da3f1ab247" offset="0" />
@@ -1177,9 +1315,39 @@ Titles, publishers and release dates taken from:
 		<description>Volguard</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ヴォルガード"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="300004">
 				<rom name="volguard.tap" size="300004" crc="2b63a375" sha1="73f99c5bc9c10a05e18d5b8c5926cef6144334ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingman">
+		<description>Wingman</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass1" interface="x1_cass">
+			<dataarea name="side1" size="3898573">
+				<rom name="wingman a.tap" size="3898573" crc="853f4ea8" sha1="1115ea0e46fb5ee2a65cae50c45e7e0eab7bbbe8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="x1_cass">
+			<dataarea name="side1" size="2722329">
+				<rom name="wingman b.tap" size="2722329" crc="f7858164" sha1="dd79ace3722be14fef3f2b7c718f9c01f48140a2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="x1_cass">
+			<dataarea name="side1" size="1188801">
+				<rom name="wingman c.tap" size="1188801" crc="cce23432" sha1="a09ef29399e70ef67b52ebec1ff79dd7de2635cd" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="x1_cass">
+			<dataarea name="side1" size="1169733">
+				<rom name="wingman d.tap" size="1169733" crc="cab5a97a" sha1="afb2068e05eb0ca3ccdd7716bfbbe97a2120a2d6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1188,6 +1356,7 @@ Titles, publishers and release dates taken from:
 		<description>Wild Western</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ワイルドウェスタン"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="360004">
 				<rom name="wild western.tap" size="360004" crc="27d042dc" sha1="80c7f2adc7dc59eeee048edf864252e89f544a51" offset="0" />
@@ -1210,6 +1379,7 @@ Titles, publishers and release dates taken from:
 		<description>Xevious</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ゼビウス"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="4203836">
 				<rom name="xevious.tap" size="4203836" crc="9005609a" sha1="d69a3aa250801f5c662b1f2b3fc86ebfcd8d5c66" offset="0" />
@@ -1221,6 +1391,7 @@ Titles, publishers and release dates taken from:
 		<description>Yellow Cab</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="イエローキャブ"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="yellow cab.tap" size="240004" crc="3f660cc7" sha1="349e4f47156e7336ad300e77d77bb79cfc119fac" offset="0" />
@@ -1239,10 +1410,24 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="zenon">
+		<description>Zenon</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="180004">
+				<rom name="zennon.tap" size="180004" crc="2bd4eadf" sha1="2776365cd0b0f2372f00143b6cc9e66a7743abdc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zexas">
 		<description>Zexas</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ゼクサス"/>
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="zexas.tap" size="240004" crc="940e77b7" sha1="8abc037d37e93e834116513c8e04f3c2b759722f" offset="0" />
