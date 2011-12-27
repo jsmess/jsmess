@@ -286,9 +286,7 @@ static S3C44B0_INTERFACE( juicebox_s3c44b0_intf )
 	// ADC (data read)
 	{ NULL },
 	// I2S (data write)
-	{ s3c44b0_i2s_data_w },
-	// LCD (flags)
-	{ 0 }
+	{ s3c44b0_i2s_data_w }
 };
 
 static MACHINE_CONFIG_START( juicebox, juicebox_state )
