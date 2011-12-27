@@ -44,7 +44,7 @@ void st_format::find_size(io_generic *io, int &track_count, int &head_count, int
 	track_count = head_count = sector_count = 0;
 }
 
-int st_format::identify(io_generic *io)
+int st_format::identify(io_generic *io, UINT32 form_factor)
 {
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -54,7 +54,7 @@ int st_format::identify(io_generic *io)
 	return 0;
 }
 
-bool st_format::load(io_generic *io, floppy_image *image)
+bool st_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -75,6 +75,8 @@ bool st_format::load(io_generic *io, floppy_image *image)
 						   track, head, sectors, sector_count, 100000, image);
 		}
 	}
+
+	image->set_variant(floppy_image::DSDD);
 
 	return true;
 }
@@ -201,7 +203,7 @@ bool msa_format::compress(const UINT8 *buffer, int usize, UINT8 *dest, int &csiz
 	return dst < usize;
 }
 
-int msa_format::identify(io_generic *io)
+int msa_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT16 sign, sect, head, strack, etrack;
 	read_header(io, sign, sect, head, strack, etrack);
@@ -215,7 +217,7 @@ int msa_format::identify(io_generic *io)
 	return 0;
 }
 
-bool msa_format::load(io_generic *io, floppy_image *image)
+bool msa_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT16 sign, sect, heads, strack, etrack;
 	read_header(io, sign, sect, heads, strack, etrack);
@@ -248,6 +250,7 @@ bool msa_format::load(io_generic *io, floppy_image *image)
 		}
 	}
 
+	image->set_variant(floppy_image::DSDD);
 	return true;
 }
 
