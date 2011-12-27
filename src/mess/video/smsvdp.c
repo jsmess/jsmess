@@ -926,13 +926,21 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 	if (m_reg[0x00] & 0x20)
 	{
 		line_buffer[0] = m_current_palette[BACKDROP_COLOR];
+		priority_selected[0] = 1;
 		line_buffer[1] = m_current_palette[BACKDROP_COLOR];
+		priority_selected[1] = 1;
 		line_buffer[2] = m_current_palette[BACKDROP_COLOR];
+		priority_selected[2] = 1;
 		line_buffer[3] = m_current_palette[BACKDROP_COLOR];
+		priority_selected[3] = 1;
 		line_buffer[4] = m_current_palette[BACKDROP_COLOR];
+		priority_selected[4] = 1;
 		line_buffer[5] = m_current_palette[BACKDROP_COLOR];
+		priority_selected[5] = 1;
 		line_buffer[6] = m_current_palette[BACKDROP_COLOR];
+		priority_selected[6] = 1;
 		line_buffer[7] = m_current_palette[BACKDROP_COLOR];
+		priority_selected[7] = 1;
 	}
 }
 
