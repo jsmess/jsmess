@@ -158,7 +158,7 @@ static int lcd_spi_line_r( running_machine &machine, int line)
 
 // I/O PORT
 
-static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
+static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 {
 	hp49gp_state *hp49gp = device->machine().driver_data<hp49gp_state>();
 	UINT32 data = hp49gp->m_port[port];
@@ -209,7 +209,7 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 	return data;
 }
 
-static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
+static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32 data)
 {
 	hp49gp_state *hp49gp = device->machine().driver_data<hp49gp_state>();
 	hp49gp->m_port[port] = data;
@@ -273,6 +273,8 @@ static DRIVER_INIT( hp49gp )
 
 static S3C2410_INTERFACE( hp49gp_s3c2410_intf )
 {
+	// CORE (pin read / pin write)
+	{ NULL, NULL },
 	// GPIO (port read / port write)
 	{ s3c2410_gpio_port_r, s3c2410_gpio_port_w },
 	// I2C (scl write / sda read / sda write)
@@ -281,7 +283,7 @@ static S3C2410_INTERFACE( hp49gp_s3c2410_intf )
 	{ NULL },
 	// I2S (data write)
 	{ NULL },
-	// NAND (command write, address write, data read, data write)
+	// NAND (command write / address write / data read / data write)
 	{ NULL, NULL, NULL, NULL },
 	// LCD (flags)
 	{ S3C24XX_INTERFACE_LCD_REVERSE }

@@ -68,7 +68,7 @@ public:
 
 // I/O PORT
 
-static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
+static UINT32 s3c2440_gpio_port_r( device_t *device, int port, UINT32 mask)
 {
 	gizmondo_state *gizmondo = device->machine().driver_data<gizmondo_state>();
 	UINT32 data = gizmondo->m_port[port];
@@ -108,7 +108,7 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port)
 	return data;
 }
 
-static void s3c2440_gpio_port_w( device_t *device, int port, UINT32 data)
+static void s3c2440_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32 data)
 {
 	gizmondo_state *gizmondo = device->machine().driver_data<gizmondo_state>();
 	gizmondo->m_port[port] = data;
@@ -171,6 +171,8 @@ static DRIVER_INIT( gizmondo )
 
 static S3C2440_INTERFACE( gizmondo_s3c2440_intf )
 {
+	// CORE (pin read / pin write)
+	{ NULL, NULL },
 	// GPIO (port read / port write)
 	{ s3c2440_gpio_port_r, s3c2440_gpio_port_w },
 	// I2C (scl write / sda read / sda write)
@@ -179,7 +181,7 @@ static S3C2440_INTERFACE( gizmondo_s3c2440_intf )
 	{ NULL },
 	// I2S (data write)
 	{ NULL },
-	// NAND (command write, address write, data read, data write)
+	// NAND (command write / address write / data read / data write)
 	{ NULL, NULL, NULL, NULL },
 	// LCD (flags)
 	{ 0 }
