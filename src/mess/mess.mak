@@ -1737,6 +1737,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/alphatro.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/applix.o	\
+	$(MESS_DRIVERS)/ax20.o		\
 	$(MESS_DRIVERS)/babbage.o	\
 	$(MESS_DRIVERS)/beehive.o	\
 	$(MESS_DRIVERS)/bob85.o		\
