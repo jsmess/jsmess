@@ -538,11 +538,11 @@ void mfp_recv_data(int data)
 static int x68k_read_mouse(running_machine &machine)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	device_t *scc = machine.device("scc");
+	scc8530_t *scc = machine.device<scc8530_t>("scc");
 	char val = 0;
 	char ipt = 0;
 
-	if(!(scc8530_get_reg_b(scc,5) & 0x02))
+	if(!(scc->get_reg_b(5) & 0x02))
 		return 0xff;
 
 	switch(state->m_mouse.inputtype)
@@ -564,11 +564,11 @@ static int x68k_read_mouse(running_machine &machine)
 	state->m_mouse.inputtype++;
 	if(state->m_mouse.inputtype > 2)
 	{
-		int i_val = scc8530_get_reg_b(scc, 0);
+		int i_val = scc->get_reg_b(0);
 		state->m_mouse.inputtype = 0;
 		state->m_mouse.bufferempty = 1;
 		i_val &= ~0x01;
-		scc8530_set_reg_b(scc, 0, i_val);
+		scc->set_reg_b(0, i_val);
 		logerror("SCC: mouse buffer empty\n");
 	}
 
@@ -583,18 +583,18 @@ static int x68k_read_mouse(running_machine &machine)
 */
 static READ16_HANDLER( x68k_scc_r )
 {
-	device_t *scc = space->machine().device("scc");
+	scc8530_t *scc = space->machine().device<scc8530_t>("scc");
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
-		return scc8530_r(scc, 0);
+		return scc->reg_r(*space, 0);
 	case 1:
 		return x68k_read_mouse(space->machine());
 	case 2:
-		return scc8530_r(scc, 1);
+		return scc->reg_r(*space, 1);
 	case 3:
-		return scc8530_r(scc, 3);
+		return scc->reg_r(*space, 3);
 	default:
 		return 0xff;
 	}
@@ -603,41 +603,41 @@ static READ16_HANDLER( x68k_scc_r )
 static WRITE16_HANDLER( x68k_scc_w )
 {
 	x68k_state *state = space->machine().driver_data<x68k_state>();
-	device_t *scc = space->machine().device("scc");
+	scc8530_t *scc = space->machine().device<scc8530_t>("scc");
 	offset %= 4;
 
 	switch(offset)
 	{
 	case 0:
-		scc8530_w(scc, 0,(UINT8)data);
-		if((scc8530_get_reg_b(scc, 5) & 0x02) != state->m_scc_prev)
+		scc->reg_w(*space, 0,(UINT8)data);
+		if((scc->get_reg_b(5) & 0x02) != state->m_scc_prev)
 		{
-			if(scc8530_get_reg_b(scc, 5) & 0x02)  // Request to Send
+			if(scc->get_reg_b(5) & 0x02)  // Request to Send
 			{
-				int val = scc8530_get_reg_b(scc, 0);
+				int val = scc->get_reg_b(0);
 				state->m_mouse.bufferempty = 0;
 				val |= 0x01;
-				scc8530_set_reg_b(scc, 0,val);
+				scc->set_reg_b(0,val);
 			}
 		}
 		break;
 	case 1:
-		scc8530_w(scc, 2,(UINT8)data);
+		scc->reg_w(*space, 2,(UINT8)data);
 		break;
 	case 2:
-		scc8530_w(scc, 1,(UINT8)data);
+		scc->reg_w(*space, 1,(UINT8)data);
 		break;
 	case 3:
-		scc8530_w(scc, 3,(UINT8)data);
+		scc->reg_w(*space, 3,(UINT8)data);
 		break;
 	}
-	state->m_scc_prev = scc8530_get_reg_b(scc, 5) & 0x02;
+	state->m_scc_prev = scc->get_reg_b(5) & 0x02;
 }
 
 static TIMER_CALLBACK(x68k_scc_ack)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	device_t *scc = machine.device("scc");
+	scc8530_t *scc = machine.device<scc8530_t>("scc");
 	if(state->m_mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
@@ -645,11 +645,11 @@ static TIMER_CALLBACK(x68k_scc_ack)
 //      return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
-	if((scc8530_get_reg_a(scc, 9) & 0x08) || (scc8530_get_reg_b(scc, 9) & 0x08))  // SCC reg WR9 is the same for both channels
+	if((scc->get_reg_a(9) & 0x08) || (scc->get_reg_b(9) & 0x08))  // SCC reg WR9 is the same for both channels
 	{
-		if((scc8530_get_reg_b(scc, 1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
+		if((scc->get_reg_b(1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
 		{
-			if(scc8530_get_reg_b(scc, 5) & 0x02)  // RTS signal
+			if(scc->get_reg_b(5) & 0x02)  // RTS signal
 			{
 				state->m_mouse.irqactive = 1;
 				state->m_current_vector[5] = 0x54;
@@ -2773,7 +2773,7 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 
 	MCFG_HD63450_ADD( "hd63450", dmac_interface )
 
-	MCFG_SCC8530_ADD( "scc", 5000000 )
+	MCFG_SCC8530_ADD( "scc", 5000000, scc8530_t::intrq_cb_t() )
 
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 

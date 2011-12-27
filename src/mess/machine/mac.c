@@ -1101,33 +1101,24 @@ WRITE_LINE_MEMBER(mac_state::drq_539x_1_w)
  * Serial Communications Controller
  * *************************************************************************/
 
-void mac_scc_irq(device_t *device, int status)
-{
-	mac_state *mac = device->machine().driver_data<mac_state>();
-
-	mac->set_scc_interrupt(status);
-}
-
-
-
 void mac_state::scc_mouse_irq(int x, int y)
 {
-	device_t *scc = machine().device("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	if (x && y)
 	{
 		if (m_last_was_x)
-			scc8530_set_status(scc, 0x0a);
+			scc->set_status(0x0a);
 		else
-			scc8530_set_status(scc, 0x02);
+			scc->set_status(0x02);
 
 		m_last_was_x ^= 1;
 	}
 	else
 	{
 		if (x)
-			scc8530_set_status(scc, 0x0a);
+			scc->set_status(0x0a);
 		else
-			scc8530_set_status(scc, 0x02);
+			scc->set_status(0x02);
 	}
 
 	this->set_scc_interrupt(1);
@@ -1137,10 +1128,10 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 READ16_MEMBER ( mac_state::mac_scc_r )
 {
-	device_t *scc = space.machine().device("scc");
+	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	UINT16 result;
 
-	result = scc8530_r(scc, offset);
+	result = scc->reg_r(space, offset);
 	return (result << 8) | result;
 }
 
@@ -1148,15 +1139,14 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 WRITE16_MEMBER ( mac_state::mac_scc_w )
 {
-	device_t *scc = space.machine().device("scc");
-	scc8530_w(scc, offset, (UINT8) data);
+	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc->reg_w(space, offset, data);
 }
 
 WRITE16_MEMBER ( mac_state::mac_scc_2_w )
 {
-	device_t *scc = space.machine().device("scc");
-	UINT8 wdata = data>>8;
-	scc8530_w(scc, offset, wdata);
+	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc->reg_w(space, offset, data >> 8);
 }
 
 /* ********************************** *

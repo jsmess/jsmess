@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
 	/* SCC */
-	MCFG_SCC8530_ADD("scc", APPLE2GS_14M/2)
+	MCFG_SCC8530_ADD("scc", APPLE2GS_14M/2, scc8530_t::intrq_cb_t())
 
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_interface)

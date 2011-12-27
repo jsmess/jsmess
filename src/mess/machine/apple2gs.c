@@ -942,7 +942,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 {
 	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
 	UINT8 result;
-	device_t *scc;
+	scc8530_t *scc;
 
 	offset &= 0xFF;
 
@@ -1029,8 +1029,8 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc = space->machine().device("scc");
-			result = scc8530_r(scc, offset & 0x03);
+			scc = space->machine().device<scc8530_t>("scc");
+			result = scc->reg_r(*space, offset & 0x03);
 			break;
 
 		case 0x3C:	/* C03C - SOUNDCTL */
@@ -1085,7 +1085,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 static WRITE8_HANDLER( apple2gs_c0xx_w )
 {
 	apple2gs_state *state = space->machine().driver_data<apple2gs_state>();
-	device_t *scc;
+	scc8530_t *scc;
 
 	offset &= 0xFF;
 
@@ -1170,8 +1170,8 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 		case 0x39:	/* C039 - SCCAREG */
 		case 0x3A:	/* C03A - SCCBDATA */
 		case 0x3B:	/* C03B - SCCADATA */
-			scc = space->machine().device("scc");
-			scc8530_w(scc, offset & 0x03, data);
+			scc = space->machine().device<scc8530_t>("scc");
+			scc->reg_w(*space, offset & 0x03, data);
 			break;
 
 		case 0x3C:	/* C03C - SOUNDCTL */

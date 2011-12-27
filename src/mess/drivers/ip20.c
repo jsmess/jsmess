@@ -22,7 +22,6 @@
 #include "machine/8530scc.h"
 #include "machine/sgi.h"
 #include "machine/eeprom.h"
-#include "machine/8530scc.h"
 #include "machine/wd33c93.h"
 #include "imagedev/harddriv.h"
 #include "imagedev/chd_cd.h"
@@ -106,7 +105,7 @@ static const eeprom_interface eeprom_interface_93C56 =
 static READ32_HANDLER( hpc_r )
 {
 	ip20_state *state = space->machine().driver_data<ip20_state>();
-	device_t *scc;
+	scc8530_t *scc;
 	running_machine &machine = space->machine();
 
 	offset <<= 2;
@@ -165,21 +164,21 @@ static READ32_HANDLER( hpc_r )
 	case 0x0d00:
 		verboselog(machine, 2, "HPC DUART0 Channel B Control Read\n" );
 //      return 0x00000004;
-		return 0x7c; //scc8530_r(machine, 0);
+		return 0x7c; //scc->reg_r(*space, 0);
 	case 0x0d04:
 		verboselog(machine, 2, "HPC DUART0 Channel B Data Read\n" );
 //      return 0;
-		scc = space->machine().device("scc");
-		return scc8530_r(scc, 2);
+		scc = space->machine().device<scc8530_t>("scc");
+		return scc->reg_r(*space, 2);
 	case 0x0d08:
 		verboselog(machine, 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask	 );
 //      return 0x40;
-		return 0x7c; //scc8530_r(machine, 1);
+		return 0x7c; //scc->reg_r(*space, 1);
 	case 0x0d0c:
 		verboselog(machine, 2, "HPC DUART0 Channel A Data Read\n" );
 //      return 0;
-		scc = space->machine().device("scc");
-		return scc8530_r(scc, 3);
+		scc = space->machine().device<scc8530_t>("scc");
+		return scc->reg_r(*space, 3);
 	case 0x0d10:
 //      verboselog(machine, 2, "HPC DUART1 Channel B Control Read\n" );
 		return 0x00000004;
@@ -224,7 +223,7 @@ static READ32_HANDLER( hpc_r )
 static WRITE32_HANDLER( hpc_w )
 {
 	ip20_state *state = space->machine().driver_data<ip20_state>();
-	device_t *scc;
+	scc8530_t *scc;
 	eeprom_device *eeprom;
 	running_machine &machine = space->machine();
 
@@ -363,23 +362,23 @@ static WRITE32_HANDLER( hpc_w )
 		break;
 	case 0x0d00:
 		verboselog(machine, 2, "HPC DUART0 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
-		scc = space->machine().device("scc");
-		scc8530_w(scc, 0, data);
+		scc = space->machine().device<scc8530_t>("scc");
+		scc->reg_w(*space, 0, data);
 		break;
 	case 0x0d04:
 		verboselog(machine, 2, "HPC DUART0 Channel B Data Write: %08x (%08x)\n", data, mem_mask );
-		scc = space->machine().device("scc");
-		scc8530_w(scc, 2, data);
+		scc = space->machine().device<scc8530_t>("scc");
+		scc->reg_w(*space, 2, data);
 		break;
 	case 0x0d08:
 		verboselog(machine, 2, "HPC DUART0 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
-		scc = space->machine().device("scc");
-		scc8530_w(scc, 1, data);
+		scc = space->machine().device<scc8530_t>("scc");
+		scc->reg_w(*space, 1, data);
 		break;
 	case 0x0d0c:
 		verboselog(machine, 2, "HPC DUART0 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
-		scc = space->machine().device("scc");
-		scc8530_w(scc, 3, data);
+		scc = space->machine().device<scc8530_t>("scc");
+		scc->reg_w(*space, 3, data);
 		break;
 	case 0x0d10:
 		if( ( data & 0x000000ff ) >= 0x00000020 )
@@ -625,7 +624,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SCC8530_ADD("scc", 7000000)
+	MCFG_SCC8530_ADD("scc", 7000000, scc8530_t::intrq_cb_t())
 
 	MCFG_CDROM_ADD( "cdrom",ip20_cdrom )
 
