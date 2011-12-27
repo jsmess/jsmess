@@ -1834,6 +1834,23 @@
 		</part>
 	</software>
 
+	<software name="dkonga" cloneof="dkong">
+		<!-- Donkey Kong (Earlier Version) (1982)(Coleco).bin -->
+		<description>Donkey Kong (Earlier Version)</description>
+		<!-- This version contained a number of bugs which were fixed and the code size reduced to fit into 16k. -->
+		<year>1982</year>
+		<publisher>Coleco / CBS</publisher>
+		<info name="developer" value="Nintendo" />
+		<info name="serial" value="2411" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="dkonga.1" size="8192" crc="dcaf20d8" sha1="0e8c227b69453ed21850baffff882ed272966500" offset="0x0000" />
+				<rom name="dkonga.2" size="8192" crc="6045f75d" sha1="6e84f270549b0c239fbab325983b1dcb8d1f4752" offset="0x2000" />
+				<rom name="dkonga.3" size="8192" crc="00739499" sha1="283f7e56a283ce5d5c54fc6f5f7f9ff0ff543195" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frenzy">
 		<!-- Frenzy (1983)(Coleco).bin -->
 		<description>Frenzy</description>
