@@ -97,6 +97,7 @@ protected:
 	void draw_sprites_tms9918_mode( int *line_buffer, int pixel_plot_y, int line );
 	void draw_scanline_mode2( int *line_buffer, int line );
 	void draw_scanline_mode0( int *line_buffer, int line );
+	void select_sprites( int pixel_plot_y, int line );
 
 	// device-level overrides
 	virtual void device_config_complete();
@@ -130,6 +131,11 @@ protected:
 	UINT8            m_collision_buffer[SEGA315_5124_WIDTH];
 	UINT8            m_palette_offset;
 	bool             m_supports_224_240;
+	UINT16           m_sprite_base;
+	int              m_selected_sprite[8];
+	int              m_sprite_count;
+	int              m_sprite_height;
+	int              m_sprite_zoom;
 
 	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
        Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
