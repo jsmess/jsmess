@@ -26,6 +26,7 @@
 #include "machine/i8251.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
+#include "sound/wave.h"
 #include "machine/ram.h"
 
 #define MAIN_CLOCK XTAL_4MHz
@@ -122,14 +123,18 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ_LINE_MEMBER( alphatro_state::rxdata_callback )
 {
-	popmessage("RX DATA");
-	return machine().device<cassette_image_device>("cass")->input();
+	if(machine().device<cassette_image_device>(CASSETTE_TAG)->input() > -0.1)
+		return 1;
+	else
+		return 0;
 }
 
 WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 {
-	popmessage("TX DATA: %i",state);
-	machine().device<cassette_image_device>("cass")->output(state);
+	if(state)
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(0.8);
+	else
+		machine().device<cassette_image_device>(CASSETTE_TAG)->output(-0.8);
 }
 
 VIDEO_START_MEMBER( alphatro_state )
@@ -363,7 +368,7 @@ void alphatro_state::machine_reset()
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
-	m_serial_timer->adjust(attotime::from_hz(2000),0,attotime::from_hz(2000));  // USART clock - this is a guesstimate
+	m_serial_timer->adjust(attotime::from_hz(500),0,attotime::from_hz(500));  // USART clock - this is a guesstimate
 	m_timer_bit = 0;
 	beep_set_state(m_beep, 0);
 	beep_set_frequency(m_beep, 950);	/* piezo-device needs to be measured */
@@ -406,7 +411,7 @@ static const cassette_interface alphatro_cassette_interface =
 {
 		cassette_default_formats,
 		NULL,
-		(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+		(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 		"alphatro_cass",
 		NULL
 };
@@ -433,13 +438,16 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, alphatro_crtc6845_interface) // clk unknown
 
 	MCFG_I8251_ADD("usart", alphatro_usart_interface)
 
-	MCFG_CASSETTE_ADD("cass", alphatro_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, alphatro_cassette_interface)
 
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64K")
