@@ -2983,6 +2983,9 @@ static void s3c24xx_adc_start( device_t *device)
 	verboselog( device->machine(), 1, "ADC start\n");
 	s3c24xx->adc.regs.adccon &= ~(1 << 0); // A/D conversion is completed
 	s3c24xx->adc.regs.adccon |= (1 << 15); // End of A/D conversion
+	#if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
+	s3c24xx_request_subirq( device, S3C24XX_SUBINT_ADC);
+	#endif
 }
 
 static WRITE32_DEVICE_HANDLER( s3c24xx_adc_w )
