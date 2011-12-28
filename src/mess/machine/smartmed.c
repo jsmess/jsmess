@@ -81,7 +81,9 @@ enum sm_mode_t
 	SM_M_ERASE,		// erase block data
 	SM_M_READSTATUS,// read status
 	SM_M_READID,		// read ID
-	SM_M_30
+	SM_M_30,
+	SM_M_RANDOM_DATA_INPUT,
+	SM_M_RANDOM_DATA_OUTPUT
 };
 
 enum pointer_sm_mode_t
@@ -486,7 +488,7 @@ void smartmedia_command_w(device_t *device, UINT8 data)
 
 	switch (data)
 	{
-	case 0xff:
+	case 0xff: // Reset
 		sm->mode = SM_M_INIT;
 		sm->pointer_mode = SM_PM_A;
 		sm->status = (sm->status & 0x80) | 0x40;
@@ -495,7 +497,7 @@ void smartmedia_command_w(device_t *device, UINT8 data)
 		sm->devcb_write_line_rnb( 0);
 		sm->devcb_write_line_rnb( 1);
 		break;
-	case 0x00:
+	case 0x00: // Read (1st cycle)
 		sm->mode = SM_M_READ;
 		sm->pointer_mode = SM_PM_A;
 		sm->page_addr = 0;
@@ -529,16 +531,16 @@ void smartmedia_command_w(device_t *device, UINT8 data)
 		sm->addr_load_ptr = 0;
 		}
 		break;
-	case 0x80:
+	case 0x80: // Page Program (1st cycle)
 		sm->mode = SM_M_PROGRAM;
 		sm->page_addr = 0;
 		sm->addr_load_ptr = 0;
 		sm->program_byte_count = 0;
 		memset(sm->pagereg, 0xff, sm->page_total_size);
 		break;
-	case 0x10:
+	case 0x10: // Page Program (2nd cycle)
 	case 0x15:
-		if (sm->mode != SM_M_PROGRAM)
+		if ((sm->mode != SM_M_PROGRAM) && (sm->mode != SM_M_RANDOM_DATA_INPUT))
 		{
 			logerror("smartmedia: illegal page program confirm command\n");
 			sm->mode = SM_M_INIT;
@@ -562,12 +564,12 @@ void smartmedia_command_w(device_t *device, UINT8 data)
 		break;
 	/*case 0x11:
         break;*/
-	case 0x60:
+	case 0x60: // Block Erase (1st cycle)
 		sm->mode = SM_M_ERASE;
 		sm->page_addr = 0;
 		sm->addr_load_ptr = 0;
 		break;
-	case 0xd0:
+	case 0xd0: // Block Erase (2nd cycle)
 		if (sm->mode != SM_M_ERASE)
 		{
 			logerror("smartmedia: illegal block erase confirm command\n");
@@ -586,18 +588,18 @@ void smartmedia_command_w(device_t *device, UINT8 data)
 			sm->devcb_write_line_rnb( 1);
 		}
 		break;
-	case 0x70:
+	case 0x70: // Read Status
 		sm->mode = SM_M_READSTATUS;
 		break;
 	/*case 0x71:
         break;*/
-	case 0x90:
+	case 0x90: // Read ID
 		sm->mode = SM_M_READID;
 		sm->addr_load_ptr = 0;
 		break;
 	/*case 0x91:
         break;*/
-	case 0x30:
+	case 0x30: // Read (2nd cycle)
 		if (sm->col_address_cycles == 1)
 		{
 			sm->mode = SM_M_30;
@@ -630,6 +632,42 @@ void smartmedia_command_w(device_t *device, UINT8 data)
 		else
 		{
 			sm->mode_3065 = 1;
+		}
+		break;
+	case 0x05: // Random Data Output (1st cycle)
+		if ((sm->mode != SM_M_READ) && (sm->mode != SM_M_RANDOM_DATA_OUTPUT))
+		{
+			logerror("smartmedia: illegal random data output command\n");
+			sm->mode = SM_M_INIT;
+		}
+		else
+		{
+			sm->mode = SM_M_RANDOM_DATA_OUTPUT;
+			sm->addr_load_ptr = 0;
+		}
+		break;
+	case 0xE0: // Random Data Output (2nd cycle)
+		if (sm->mode != SM_M_RANDOM_DATA_OUTPUT)
+		{
+			logerror("smartmedia: illegal random data output confirm command\n");
+			sm->mode = SM_M_INIT;
+		}
+		else
+		{
+			// do nothing
+		}
+		break;
+	case 0x85: // Random Data Input
+		if ((sm->mode != SM_M_PROGRAM) && (sm->mode != SM_M_RANDOM_DATA_INPUT))
+		{
+			logerror("smartmedia: illegal random data input command\n");
+			sm->mode = SM_M_INIT;
+		}
+		else
+		{
+			sm->mode = SM_M_RANDOM_DATA_INPUT;
+			sm->addr_load_ptr = 0;
+			sm->program_byte_count = 0;
 		}
 		break;
 	default:
@@ -698,6 +736,15 @@ void smartmedia_address_w(device_t *device, UINT8 data)
 		}
 		sm->addr_load_ptr++;
 		break;
+	case SM_M_RANDOM_DATA_INPUT:
+	case SM_M_RANDOM_DATA_OUTPUT:
+		if (sm->addr_load_ptr < sm->col_address_cycles)
+		{
+			sm->byte_addr &= ~(0xFF << (sm->addr_load_ptr * 8));
+			sm->byte_addr |=  (data << (sm->addr_load_ptr * 8));
+		}
+		sm->addr_load_ptr++;
+		break;
 	case SM_M_READSTATUS:
 	case SM_M_30:
 		logerror("smartmedia: unexpected address port write\n");
@@ -728,6 +775,7 @@ UINT8 smartmedia_data_r(device_t *device)
 		logerror("smartmedia: unexpected data port read\n");
 		break;
 	case SM_M_READ:
+	case SM_M_RANDOM_DATA_OUTPUT:
 		if (!sm->mode_3065)
 		{
 			if (sm->byte_addr < sm->page_total_size)
@@ -753,8 +801,7 @@ UINT8 smartmedia_data_r(device_t *device)
 		}
 		break;
 	case SM_M_PROGRAM:
-		logerror("smartmedia: unexpected data port read\n");
-		break;
+	case SM_M_RANDOM_DATA_INPUT:
 	case SM_M_ERASE:
 		logerror("smartmedia: unexpected data port read\n");
 		break;
@@ -788,9 +835,11 @@ void smartmedia_data_w(device_t *device, UINT8 data)
 	case SM_M_INIT:
 	case SM_M_READ:
 	case SM_M_30:
+	case SM_M_RANDOM_DATA_OUTPUT:
 		logerror("smartmedia: unexpected data port write\n");
 		break;
 	case SM_M_PROGRAM:
+	case SM_M_RANDOM_DATA_INPUT:
 		if (sm->program_byte_count++ < sm->page_total_size)
 		{
 			sm->pagereg[sm->byte_addr] = data;
