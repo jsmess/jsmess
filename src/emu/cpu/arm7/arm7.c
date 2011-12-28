@@ -991,9 +991,18 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
 				}
 				else
 				{
-					data = 0x41 | (1 << 23) | (7 << 12);
-					//data = (0x41 << 24) | (1 << 20) | (2 << 16) | (0x920 << 4) | (0 << 0); // ARM920T (S3C24xx)
-					//data = (0x41 << 24) | (0 << 20) | (1 << 16) | (0x710 << 4) | (0 << 0); // ARM7500
+					if (device->type() == ARM920T)
+					{
+						data = (0x41 << 24) | (1 << 20) | (2 << 16) | (0x920 << 4) | (0 << 0); // ARM920T (S3C24xx)
+					}
+					else if (device->type() == ARM7500)
+					{
+						data = (0x41 << 24) | (0 << 20) | (1 << 16) | (0x710 << 4) | (0 << 0); // ARM7500
+					}
+					else
+					{
+						data = 0x41 | (1 << 23) | (7 << 12); // <-- where did this come from?
+					}
 				}
 				break;
 
