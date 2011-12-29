@@ -902,5 +902,5 @@ COMP( 1983, trs80m4p, trs80,  0,      model4p,    trs80m3, trs80m4p, "Tandy Radi
 COMP( 1983, ht1080z,  trs80,  0,      ht1080z,    trs80,   trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I", 0 )
 COMP( 1984, ht1080z2, trs80,  0,      ht1080z,    trs80,   trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II", 0 )
 COMP( 1985, ht108064, trs80,  0,      ht1080z,    trs80,   trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64", 0 )
-COMP( 1985, meritum,  trs80,  0,      meritum,    trs80,   trs80l2,  "Mera-Elzab ", "Meritum I (Model 2)", 0 )
-COMP( 1985, meritum_net, trs80,  0,   meritum,    trs80,   trs80l2,  "Mera-Elzab ", "Meritum I (Model 2) (network)", 0 )
+COMP( 1985, meritum,  trs80,  0,      meritum,    trs80,   trs80l2,  "Mera-Elzab", "Meritum I (Model 2)", 0 )
+COMP( 1985, meritum_net, trs80,  0,   meritum,    trs80,   trs80l2,  "Mera-Elzab", "Meritum I (Model 2) (network)", 0 )
