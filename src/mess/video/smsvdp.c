@@ -498,11 +498,14 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 	/* Return read buffer contents */
 	temp = m_buffer;
 
-	/* Load read buffer */
-	m_buffer = this->space()->read_byte(m_addr & 0x3fff);
+	if ( !space.debugger_access() )
+	{
+		/* Load read buffer */
+		m_buffer = this->space()->read_byte(m_addr & 0x3fff);
 
-	/* Bump internal addthis->ress register */
-	m_addr += 1;
+		/* Bump internal addthis->ress register */
+		m_addr += 1;
+	}
 	return temp;
 }
 
@@ -511,17 +514,20 @@ READ8_MEMBER( sega315_5124_device::register_read )
 {
 	UINT8 temp = m_status;
 
-	/* Clear pending write flag */
-	m_pending = 0;
-
-	m_status &= ~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL | STATUS_HINT);
-
-	if (m_irq_state == 1)
+	if ( !space.debugger_access() )
 	{
-		m_irq_state = 0;
+		/* Clear pending write flag */
+		m_pending = 0;
 
-		if ( !m_cb_int.isnull() )
-			m_cb_int(CLEAR_LINE);
+		m_status &= ~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL | STATUS_HINT);
+
+		if (m_irq_state == 1)
+		{
+			m_irq_state = 0;
+
+			if ( !m_cb_int.isnull() )
+				m_cb_int(CLEAR_LINE);
+		}
 	}
 
 	/* low 5 bits return non-zero data (it fixes PGA Tour Golf course map introduction) */
