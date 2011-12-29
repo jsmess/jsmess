@@ -1929,6 +1929,7 @@ $(MESS_DRIVERS)/pro80.o:	$(MESS_LAYOUT)/pro80.lh
 $(MESS_DRIVERS)/px4.o:		$(MESS_LAYOUT)/px4.lh
 $(MESS_DRIVERS)/px8.o:		$(MESS_LAYOUT)/px8.lh
 $(MESS_DRIVERS)/savia84.o:	$(MESS_LAYOUT)/savia84.lh
+$(MESS_DRIVERS)/sc1.o:		$(MESS_LAYOUT)/sc1.lh
 $(MESS_DRIVERS)/sc2.o:		$(MESS_LAYOUT)/sc2.lh
 $(MESS_DRIVERS)/sdk85.o:	$(MESS_LAYOUT)/sdk85.lh
 $(MESS_DRIVERS)/sdk86.o:	$(MESS_LAYOUT)/sdk86.lh

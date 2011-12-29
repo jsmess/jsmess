@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
+#include "sc1.lh"
 
 
 class sc1_state : public driver_device
@@ -25,7 +26,72 @@ public:
 	required_device<device_t> m_speaker;
 	DECLARE_WRITE8_MEMBER(sc1_fc_w);
 	DECLARE_WRITE8_MEMBER(sc1v2_07_w);
+	DECLARE_WRITE8_MEMBER(sc1v2_io_w);
+	DECLARE_READ8_MEMBER(sc1v2_io_r);
+private:
+	UINT8 m_digit;
 };
+
+/***************************************************************************
+
+    Display
+
+***************************************************************************/
+
+WRITE8_MEMBER( sc1_state::sc1v2_io_w )
+{
+	bool segonoff = BIT(data, 7);
+	//bool busyled = BIT(data, 4);
+	data &= 15;
+
+	if (data < 8)
+		m_digit = data;
+	else
+	if (data < 12)
+	{
+		speaker_level_w(m_speaker, BIT(data, 1) );
+		return;
+	}
+	else
+	if (offset == 0x2f07)
+		return;
+
+	UINT8 segdata = output_get_digit_value(m_digit);
+	UINT8 segnum  = offset & 7;
+	UINT8 segmask = 1 << segnum;
+
+	if (segonoff)
+		segdata |= segmask;
+	else
+		segdata &= ~segmask;
+
+	output_set_digit_value(m_digit, segdata);
+
+	//output_set_value("busyled", busyled);
+}
+
+
+/***************************************************************************
+
+    Keyboard
+
+***************************************************************************/
+
+READ8_MEMBER( sc1_state::sc1v2_io_r )
+{
+	UINT8 data = 0xff, upper = (offset >> 8) & 7;
+
+	if (upper == 3)
+		data &= input_port_read(machine(), "X0");
+	else
+	if (upper == 4)
+		data &= input_port_read(machine(), "X1");
+	else
+	if (upper == 5)
+		data &= input_port_read(machine(), "X2");
+
+	return data;
+}
 
 WRITE8_MEMBER( sc1_state::sc1_fc_w )
 {
@@ -54,26 +120,37 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sc1v2_io, AS_IO, 8, sc1_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x07, 0x07) AM_WRITE(sc1v2_07_w)
+	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x0000, 0xffff) AM_WRITE(sc1v2_io_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( sc1 )
+	PORT_START("X0")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D4 T") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C3 L") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B2 S") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A1 B") PORT_CODE(KEYCODE_1)
+
+	PORT_START("X1")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E5 D") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6 K") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G7")   PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H8")   PORT_CODE(KEYCODE_8)
+
+	PORT_START("X2")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")    PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")    PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("St")   PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")    PORT_CODE(KEYCODE_Z)
 INPUT_PORTS_END
 
 
 static MACHINE_RESET(sc1)
 {
-}
-
-static VIDEO_START( sc1 )
-{
-}
-
-static SCREEN_UPDATE( sc1 )
-{
-	return 0;
 }
 
 static MACHINE_CONFIG_START( sc1, sc1_state )
@@ -85,16 +162,7 @@ static MACHINE_CONFIG_START( sc1, sc1_state )
 	MCFG_MACHINE_RESET(sc1)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(sc1)
-	MCFG_SCREEN_UPDATE(sc1)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_DEFAULT_LAYOUT(layout_sc1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
