@@ -127,6 +127,7 @@ INTERRUPT_GEN( trs80_fdc_interrupt );
 VIDEO_START( trs80 );
 SCREEN_UPDATE( trs80 );
 SCREEN_UPDATE( ht1080z );
+SCREEN_UPDATE( meritum );
 SCREEN_UPDATE( lnw80 );
 SCREEN_UPDATE( radionic );
 SCREEN_UPDATE( trs80m4 );

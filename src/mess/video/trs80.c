@@ -494,7 +494,65 @@ SCREEN_UPDATE( radionic )
 	return 0;
 }
 
+SCREEN_UPDATE( meritum )
+{
+	trs80_state *state = screen->machine().driver_data<trs80_state>();
+	UINT8 y,ra,chr,gfx,gfxbit;
+	UINT16 sy=0,ma=0,x;
+	UINT8 cols = BIT(state->m_mode, 0) ? 32 : 64;
+	UINT8 skip = BIT(state->m_mode, 0) ? 2 : 1;
 
+	if (state->m_mode != state->m_size_store)
+	{
+		state->m_size_store = state->m_mode & 1;
+		screen->set_visible_area(0, cols*6-1, 0, 16*12-1);
+	}
+
+	for (y = 0; y < 16; y++)
+	{
+		for (ra = 0; ra < 12; ra++)
+		{
+			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+
+			for (x = ma; x < ma + 64; x+=skip)
+			{
+				chr = state->m_p_videoram[x];
+
+				if (chr & 0x80)
+				{
+					gfxbit = (ra & 0x0c)>>1;
+					/* Display one line of a lores character (6 pixels) */
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+					gfxbit++;
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+				}
+				else
+				{
+					if ((state->m_mode & 2) && (chr < 32)) chr+=64;
+
+					/* get pattern of pixels for that character scanline */
+					gfx = state->m_p_chargen[(chr<<4) | ra ] ^ 0xff;
+
+					/* Display a scanline of a character (6 pixels) */
+					*p++ = BIT(gfx, 7);
+					*p++ = BIT(gfx, 6);
+					*p++ = BIT(gfx, 5);
+					*p++ = BIT(gfx, 4);
+					*p++ = BIT(gfx, 3);
+					*p++ = BIT(gfx, 2);
+					*p++ = BIT(gfx, 1);
+					*p++ = BIT(gfx, 0);
+				}
+			}
+		}
+		ma+=64;
+	}
+	return 0;
+}
 /***************************************************************************
   Write to video ram
 ***************************************************************************/

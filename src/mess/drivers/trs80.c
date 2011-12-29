@@ -261,7 +261,23 @@ static ADDRESS_MAP_START( model4p_io, AS_IO, 8, trs80_state )
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( meritum_map, AS_PROGRAM, 8, trs80_state )
+	AM_RANGE(0x0000, 0x37ff) AM_ROM
+	AM_RANGE(0x3800, 0x38ff) AM_MIRROR(0x300) AM_READ(trs80_keyboard_r)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(trs80_videoram_r, trs80_videoram_w) AM_BASE(m_p_videoram)
+	AM_RANGE(0x4000, 0xffff) AM_RAM
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( meritum_io, AS_IO, 8, trs80_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE_LEGACY("wd179x", wd17xx_command_w)
+	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE_LEGACY("wd179x", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE_LEGACY("wd179x", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE_LEGACY("wd179x", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
+	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
+	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
+ADDRESS_MAP_END
 
 /**************************************************************************
    w/o SHIFT                             with SHIFT
@@ -645,6 +661,13 @@ static MACHINE_CONFIG_DERIVED( radionic, model1 )
 	MCFG_GFXDECODE(radionic)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( meritum, sys80 )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( meritum_map)
+	MCFG_CPU_IO_MAP( meritum_io)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE( meritum )
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -802,6 +825,32 @@ ROM_START(ht108064)
 	ROM_LOAD("ht108064.chr", 0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
 ROM_END
 
+ROM_START( meritum)
+	ROM_REGION(0x10000, "maincpu",0)
+	ROM_LOAD( "01.bin", 0x0000, 0x0800, CRC(ed705a47) SHA1(dae8b14eb2ddb2a8b4458215180ebc0fb781816a))
+	ROM_LOAD( "02.bin", 0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
+	ROM_LOAD( "03.bin", 0x1000, 0x0800, CRC(a21d0d62) SHA1(6dfdf3806ed2b6502e09a1b6922f21494134cc05))
+	ROM_LOAD( "04.bin", 0x1800, 0x0800, CRC(3610bdda) SHA1(602f0ba1e1267f24620f993acac019ac6342a594))
+	ROM_LOAD( "05.bin", 0x2000, 0x0800, CRC(461fbf0d) SHA1(bd19187dd992168af43bd68055343d515f152624))
+	ROM_LOAD( "06.bin", 0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
+	ROM_LOAD( "07.bin", 0x3000, 0x0800, CRC(044b1459) SHA1(faace7353ffbef6587b1b9e7f8b312e0892e3427))
+	ROM_REGION(0x1000, "chargen",0)
+	ROM_LOAD( "chargen.bin", 0x0000, 0x1000, CRC(3dfc6439) SHA1(6e45a27f68c3491c403b4eafe45a108f348dd2fd))
+ROM_END
+
+ROM_START( meritum_net )
+	ROM_REGION(0x10000, "maincpu",0)
+	ROM_LOAD( "01_447_m07_015m.bin", 0x0000, 0x0800, CRC(6d30cb49) SHA1(558241340a84eebcbbf8d92540e028e9164b6f8a))
+	ROM_LOAD( "02_440_m08_01.bin",   0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
+	ROM_LOAD( "03_440_m09_015m.bin", 0x1000, 0x0800, CRC(88e267da) SHA1(9cb8626801f8e969f35291de43c1b643c809a3c3))
+	ROM_LOAD( "04_447_m10_015m.bin", 0x1800, 0x0800, CRC(e51991e4) SHA1(a7d42436da1af405970f9f99ab34b6d9abd05adf))
+	ROM_LOAD( "05_440_m11_02.bin",   0x2000, 0x0800, CRC(461fbf0d) SHA1(bd19187dd992168af43bd68055343d515f152624))
+	ROM_LOAD( "06_440_m12_01.bin",   0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
+	ROM_LOAD( "07_447_m13_015m.bin", 0x3000, 0x0800, CRC(789f6964) SHA1(9b2231ca7ffd82bbca1f53988a7df833290ddbf2))
+	ROM_REGION(0x1000, "chargen",0)
+	ROM_LOAD( "char.bin", 0x0000, 0x1000, CRC(2c09a5a7) SHA1(146891b3ddfc2de95e6a5371536394a657880054))
+ROM_END
+
 static DRIVER_INIT( trs80 )
 {
 	trs80_state *state = machine.driver_data<trs80_state>();
@@ -853,3 +902,5 @@ COMP( 1983, trs80m4p, trs80,  0,      model4p,    trs80m3, trs80m4p, "Tandy Radi
 COMP( 1983, ht1080z,  trs80,  0,      ht1080z,    trs80,   trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I", 0 )
 COMP( 1984, ht1080z2, trs80,  0,      ht1080z,    trs80,   trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II", 0 )
 COMP( 1985, ht108064, trs80,  0,      ht1080z,    trs80,   trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64", 0 )
+COMP( 1985, meritum,  trs80,  0,      meritum,    trs80,   trs80l2,  "Mera-Elzab ", "Meritum I (Model 2)", 0 )
+COMP( 1985, meritum_net, trs80,  0,   meritum,    trs80,   trs80l2,  "Mera-Elzab ", "Meritum I (Model 2) (network)", 0 )
