@@ -944,6 +944,12 @@ ROM_START(didakm91)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+ROM_START(didakm92)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("didakm92.bin",0x0000,0x4000, CRC(57264d4f) SHA1(23644fe949cbf527747959d07b72db01de378c4c))
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+ROM_END
+  
 ROM_START(didaktk)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("didaktk.rom",0x0000,0x4000, CRC(8ec8a625) SHA1(cba35517d33a5c97e3d9110f12a417c6c5cdeca8))
@@ -1034,6 +1040,7 @@ COMP( 1988, dgama88,  spectrum, 0,		spectrum,		spectrum,	spectrum,	"Didaktik Ska
 COMP( 1989, dgama89,  spectrum, 0,		spectrum,		spectrum,	spectrum,	"Didaktik Skalica",	"Didaktik Gama 89" , 0)
 COMP( 1990, didakt90, spectrum, 0,		spectrum,		spectrum,	spectrum,	"Didaktik Skalica",	"Didaktik 90" , 0)
 COMP( 1991, didakm91, spectrum, 0,		spectrum,		spec_plus,	spectrum,	"Didaktik Skalica",	"Didaktik M 91" , 0)
+COMP( 1992, didakm92, spectrum, 0,		spectrum,		spec_plus,	spectrum,	"Didaktik Skalica",	"Didaktik M 92" , 0)
 COMP( 1992, didaktk,  spectrum, 0,		spectrum,		spec_plus,	spectrum,	"Didaktik Skalica",	"Didaktik Kompakt" , 0)
 COMP( 1993, didakm93, spectrum, 0,		spectrum,		spec_plus,	spectrum,	"Didaktik Skalica",	"Didaktik M 93" , 0)
 COMP( 1988, mistrum,  spectrum, 0,		spectrum,		spectrum,	spectrum,	"Amaterske RADIO",	"Mistrum" , 0)	// keyboard could be spectrum in some models (since it was a build-yourself design)
