@@ -510,6 +510,24 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="megamitb" cloneof="megamit">
+		<description>Digital Devil Story - Megami Tensei (Alt Disk 1)</description>
+		<year>1987</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="release" value="198705xx"/>
+		<info name="alt_title" value="デジタル・デビル・ストーリー 女神転生"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="414992">
+				<rom name="dds_a (alt).d88" size="414992" crc="3b4ede0e" sha1="1892e0f16afb13cc88ae5562d281f41f3d8f0a90" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="dds_b.d88" size="415840" crc="1cbe5ddb" sha1="bb6d516cda5e47c6d11f74106d1227f4d9e731af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="megamita" cloneof="megamit">
 		<description>Digital Devil Story - Megami Tensei (Alt)</description>
 		<year>1987</year>
@@ -607,7 +625,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="finalzon">
+	<software name="fzone">
 		<description>Final Zone</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -621,6 +639,24 @@ Titles, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="417216">
 				<rom name="final zone 2.d88" size="417216" crc="b74d794a" sha1="bf67e28ac5ba18358d9b6eb5179ec8131a047938" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fzonea" cloneof="fzone">
+		<description>Final Zone (Alt)</description>
+		<year>1986</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ファイナルゾーン"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="420192">
+				<rom name="f_zone_a.d88" size="420192" crc="fb52dcb2" sha1="c26133233c520535f1869c68317fc6cb347945e1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="436640">
+				<rom name="f_zone_b.d88" size="436640" crc="544c71ce" sha1="e84502e2c9344df02f8aef3617f7b88b3d051076" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -781,6 +817,19 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="gradiusb" cloneof="gradius">
+		<description>Gradius (Alt 2)</description>
+		<year>1987</year>
+		<publisher>コナミ (Konami)</publisher>
+		<info name="release" value="198702xx"/>
+		<info name="alt_title" value="グラディウス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="gradius.2d" size="327680" crc="79a4fe41" sha1="58049302219bd22f3d7c164ec1b94404ae01c04f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gradiusk" cloneof="gradius">
 		<description>Gradius Kai</description>
 		<year>19??</year>
@@ -849,7 +898,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="hurryfox">
+	<software name="hfox">
 		<description>Hurry Fox X1</description>
 		<year>1985</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -858,6 +907,19 @@ Titles, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="harry fox.d88" size="348848" crc="493c9699" sha1="0fa37d988d20dd698d096025b645994b874ca8cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfoxa" cloneof="hfox">
+		<description>Hurry Fox X1 (Alt)</description>
+		<year>1985</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="release" value="198507xx"/>
+		<info name="alt_title" value="はーりぃふぉっくす"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfox.d88" size="348848" crc="d4731ad9" sha1="00604fa48d3f45234b9d12d9f2df46baa8a3e2b3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3356,6 +3418,22 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="dialidea" cloneof="dialide">
+		<description>Dialide (Alt?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dialide.d88" size="348848" crc="ccf0c49c" sha1="1b55edcfe542663eff2587145b830810a4fc8e5e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dialide2.d88" size="348848" crc="c5c4041c" sha1="722289227a606e99cc26d210d0e904b46636cab3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dione">
 		<description>Dione</description>
 		<year>19??</year>
@@ -3494,11 +3572,11 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="irohamio">
+	<software name="iroha">
 		<description>Irohanihoheto</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="いろはにほへと"/>
+		<info name="alt_title" value="いろはにほへと (or イロハニホヘト)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="413296">
 				<rom name="irohamioedo (19xx)(-)(jp)(disk 1 of 2).d88" size="413296" crc="ded12e38" sha1="cfffdea2f2445d6996cc24014c9af81f866f59d9" offset="0" />
