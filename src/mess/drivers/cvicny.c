@@ -25,7 +25,7 @@
         Now press up-arrow to confirm the data has been entered.
 
     ToDo:
-    - When ADR is pressed, sometimes a segment stays alight. Bug?
+        - When ADR is pressed, sometimes a segment stays alight. Bug?
         - Blank the display if digits aren't being refreshed
 
 ****************************************************************************/

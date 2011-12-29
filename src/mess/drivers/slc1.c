@@ -1,20 +1,46 @@
 /***************************************************************************
 
-2011-07-16 SLC1 skeleton driver [Robbbert]
+2011-JUL-16 SLC1 skeleton driver [Robbbert]
+2011-DEC-29 Working [Robbbert]
 
 http://www.jens-mueller.org/jkcemu/slc1.html
 
 This computer is both a Z80 trainer, and a chess computer.
+        The keyboard is different between the two, so
+        we redefine it for your convenience.
+
+        There is no chess board attached. You supply your own
+        and you sync the pieces and the computer instructions.
+
+        When started, it is in Chess mode. Press 11111 to switch to
+        Trainer mode.
 
 Hardware
-    4 Kbytes ROM in the address range 0000-0FFF
-    1 Kbyte RAM in the address range 5000-53ff
-    6-digit 7-segment display
-    Busy LED
-    Keyboard with 12 keys
+        4 Kbytes ROM in the address range 0000-0FFF
+        1 Kbyte RAM in the address range 5000-53ff (user area starts at 5100)
+        6-digit 7-segment display
+        Busy LED
+        Keyboard with 12 keys
 
-ToDo:
-- Everything
+Keys:
+        0-7 : hexadecimal numbers
+        Shift then 0-7 : Hexadecimal 8-F (decimal points will appear)
+        ADR : enter an address to work with. After the 4 digits are entered,
+              the data at that address shows, and you can modify the data.
+        + (inc) : Enter the data into memory, and increment the address by 1.
+
+Pasting doesn't work, but if it did...
+
+    Pasting:
+        0-7 : as is
+        8-F : H, then 0-7
+        + : ^
+        - : H^
+        ADR : -
+
+    Test Paste:
+        [[[[[-510011^22^33^44^55^66^77^H8H8^H9H9^-5100
+        Now press up-arrow to confirm the data has been entered.
 
 
 
@@ -40,15 +66,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
-	emu_timer *m_kbd_timer;
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
-	UINT8 m_kbd;
-	UINT8 m_segment;
 	UINT8 m_digit;
-	UINT8 m_kbd_row;
-	UINT8 m_refresh[6];
-	UINT8 slc1_convert_col_to_bin( UINT8 col, UINT8 row );
+	bool m_kbd_type;
 	virtual void machine_reset();
 	virtual void machine_start();
 };
@@ -64,32 +85,38 @@ public:
 
 WRITE8_MEMBER( slc1_state::io_w )
 {
-	UINT8 upper = offset >> 8;
-//  if (upper == 0x2f) return;
+	bool segonoff = BIT(data, 7);
+	bool busyled = BIT(data, 4);
+	data &= 15;
 
-
-	speaker_level_w(m_speaker, (upper == 0x29));
-
-//  output_set_led_value(0, BIT(data, 4));
-
-	// This computer sets each segment, one at a time. */
-
-	if ((offset & 0xff) < 8)
+	if (data < 8)
+		m_digit = data;
+	else
+	if (data < 12)
 	{
-		static const UINT8 segments[8]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80};
-		UINT8 digit = data & 7;
-		UINT8 segment = segments[offset];
-		UINT8 segdata = output_get_digit_value(digit);
-
-		if (BIT(data, 7))
-			segdata |= segment;
-		else
-			segdata &= ~segment;
-
-		output_set_digit_value(digit, segdata);
+		speaker_level_w(m_speaker, BIT(data, 1) );
+		return;
 	}
-}
+	else
+	if (offset == 0x2f07)
+		return;
 
+	UINT8 segdata = output_get_digit_value(m_digit);
+	UINT8 segnum  = offset & 7;
+	UINT8 segmask = 1 << segnum;
+
+	if (segonoff)
+		segdata |= segmask;
+	else
+		segdata &= ~segmask;
+
+	output_set_digit_value(m_digit, segdata);
+
+	output_set_value("busyled", busyled);
+
+	if (m_digit == 3)
+		m_kbd_type = (segdata);
+}
 
 
 /***************************************************************************
@@ -102,9 +129,29 @@ READ8_MEMBER( slc1_state::io_r )
 {
 	UINT8 data = 0xff, upper = (offset >> 8) & 7;
 
-	if (upper == 5) data &= input_port_read(machine(), "X0");
-	if (upper == 6) data &= input_port_read(machine(), "X1");
-	if (upper == 7) data &= input_port_read(machine(), "X2");
+	if (m_kbd_type)
+	{ // Trainer
+		if (upper == 3)
+			data &= input_port_read(machine(), "Y0");
+		else
+		if (upper == 4)
+			data &= input_port_read(machine(), "Y1");
+		else
+		if (upper == 5)
+			data &= input_port_read(machine(), "Y2");
+	}
+	else
+	{ // Chess
+		if (upper == 3)
+			data &= input_port_read(machine(), "X0");
+		else
+		if (upper == 4)
+			data &= input_port_read(machine(), "X1");
+		else
+		if (upper == 5)
+			data &= input_port_read(machine(), "X2");
+	}
+
 	return data;
 }
 
@@ -152,26 +199,49 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( slc1 )
+// Chess Keyboard
 	PORT_START("X0")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 B D 4 T") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 A C 3 L") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 9 B 2 S") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 8 A 1 B") PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D4 T") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C3 L") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B2 S") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A1 B") PORT_CODE(KEYCODE_1) PORT_CHAR('[')
 
 	PORT_START("X1")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 F H 8 GO") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 E G 7 BL") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 D F 6 K DEL") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 C E 5 D INS") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E5 D") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6 K") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G7")   PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H8")   PORT_CODE(KEYCODE_8)
 
 	PORT_START("X2")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Seq C BG") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+-1 A SS") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Fu St DP") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ADR Z BP") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")    PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")    PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("St")   PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")    PORT_CODE(KEYCODE_Z)
+
+// Trainer Keyboard
+	PORT_START("Y0")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 B")  PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 A")  PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 9")  PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 8")  PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+
+	PORT_START("Y1")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 C INS") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 D DEL") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 E BL")  PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 F Go")  PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+
+	PORT_START("Y2")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Fu DP") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR('H')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+-1 SS") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Seq BG") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ADR BP") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 INPUT_PORTS_END
 
 
@@ -210,4 +280,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      COMPANY    FULLNAME */
-COMP( 1989, slc1,     0,      0,      slc1,       slc1,    0,      "Dr. Dieter Scheuschner",  "SLC-1" , GAME_NOT_WORKING )
+COMP( 1989, slc1,     0,      0,      slc1,       slc1,    0,      "Dr. Dieter Scheuschner",  "SLC-1" , 0 )
