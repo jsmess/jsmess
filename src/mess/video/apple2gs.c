@@ -27,7 +27,7 @@ VIDEO_START( apple2gs )
 
 SCREEN_UPDATE( apple2gs )
 {
-	apple2gs_state *state = screen->machine().driver_data<apple2gs_state>();
+	apple2gs_state *state = screen.machine().driver_data<apple2gs_state>();
 	const UINT8 *vram;
 	UINT16 *scanline;
 	UINT8 scb, b;
@@ -117,7 +117,7 @@ SCREEN_UPDATE( apple2gs )
 		if (beamy == 0)
 		{
 			rectangle new_cliprect;
-			apple2_state *a2state = screen->machine().driver_data<apple2_state>();
+			apple2_state *a2state = screen.machine().driver_data<apple2_state>();
 
 			// check if DHR should be monochrome 560x192
 			if (state->m_newvideo & 0x20)

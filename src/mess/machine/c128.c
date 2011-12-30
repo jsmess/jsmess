@@ -1302,8 +1302,8 @@ INTERRUPT_GEN( c128_frame_interrupt )
 
 SCREEN_UPDATE( c128 )
 {
-	device_t *vic2e = screen->machine().device("vic2e");
-	device_t *vdc8563 = screen->machine().device("vdc8563");
+	device_t *vic2e = screen.machine().device("vic2e");
+	device_t *vdc8563 = screen.machine().device("vdc8563");
 
 	vdc8563_video_update(vdc8563, bitmap, cliprect);
 	vic2_video_update(vic2e, bitmap, cliprect);

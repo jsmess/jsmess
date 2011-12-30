@@ -59,7 +59,7 @@ static VIDEO_START( bmjr )
 
 static SCREEN_UPDATE( bmjr )
 {
-	bmjr_state *state = screen->machine().driver_data<bmjr_state>();
+	bmjr_state *state = screen.machine().driver_data<bmjr_state>();
 	UINT8 y,ra,chr,gfx,fg=4;
 	UINT16 sy=0,ma=0x100,x;
 	UINT8 inv = (state->m_xor_display) ? 0xff : 0;

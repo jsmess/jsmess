@@ -373,7 +373,7 @@ static void draw_text(running_machine &machine, bitmap_t *bitmap, const rectangl
 
 static SCREEN_UPDATE( pc88va )
 {
-	pc88va_state *state = screen->machine().driver_data<pc88va_state>();
+	pc88va_state *state = screen.machine().driver_data<pc88va_state>();
 	UINT8 pri,cur_pri_lv;
 	UINT32 screen_pri;
 	bitmap_fill(bitmap, cliprect, 0);
@@ -416,8 +416,8 @@ static SCREEN_UPDATE( pc88va )
 			{
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
-					case 0: draw_text(screen->machine(),bitmap,cliprect); break;
-					case 1: if(state->m_tsp.spr_on) { draw_sprites(screen->machine(),bitmap,cliprect); } break;
+					case 0: draw_text(screen.machine(),bitmap,cliprect); break;
+					case 1: if(state->m_tsp.spr_on) { draw_sprites(screen.machine(),bitmap,cliprect); } break;
 					case 2: /* A = graphic 0 */ break;
 					case 3: /* B = graphic 1 */ break;
 				}

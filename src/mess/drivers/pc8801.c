@@ -590,15 +590,15 @@ static void draw_text_40(running_machine &machine, bitmap_t *bitmap, int y_size)
 
 static SCREEN_UPDATE( pc8801 )
 {
-	pc8801_state *state = screen->machine().driver_data<pc8801_state>();
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	pc8801_state *state = screen.machine().driver_data<pc8801_state>();
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
 	if(state->m_gfx_ctrl & 8)
 	{
 		if(state->m_gfx_ctrl & 0x10)
-			draw_bitmap_3bpp(screen->machine(),bitmap);
+			draw_bitmap_3bpp(screen.machine(),bitmap);
 		else
-			draw_bitmap_1bpp(screen->machine(),bitmap);
+			draw_bitmap_1bpp(screen.machine(),bitmap);
 	}
 
 	//popmessage("%02x %02x %02x %02x %02x",state->m_layer_mask,state->m_dmac_mode,state->m_crtc.status,state->m_crtc.irq_mask,state->m_gfx_ctrl);
@@ -615,9 +615,9 @@ static SCREEN_UPDATE( pc8801 )
 		if(y_size > 25) y_size = 25;
 
 		if(state->m_txt_width)
-			draw_text_80(screen->machine(),bitmap,y_size);
+			draw_text_80(screen.machine(),bitmap,y_size);
 		else
-			draw_text_40(screen->machine(),bitmap,y_size);
+			draw_text_40(screen.machine(),bitmap,y_size);
 	}
 
 	return 0;

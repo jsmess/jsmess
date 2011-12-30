@@ -831,7 +831,7 @@ VIDEO_START( lisa )
 */
 SCREEN_UPDATE( lisa )
 {
-	lisa_state *state = screen->machine().driver_data<lisa_state>();
+	lisa_state *state = screen.machine().driver_data<lisa_state>();
 	UINT16 *v;
 	int x, y;
 	/* resolution is 720*364 on lisa, vs 608*431 on mac XL */
@@ -847,7 +847,7 @@ SCREEN_UPDATE( lisa )
 		for (x = 0; x < resx; x++)
 //          line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> ((x+y*resx) & 0xf))) ? 0 : 1;
 			line_buffer[x] = (v[(x+y*resx)>>4] & (0x8000 >> (x & 0xf))) ? 0 : 1;
-		draw_scanline8(bitmap, 0, y, resx, line_buffer, screen->machine().pens);
+		draw_scanline8(bitmap, 0, y, resx, line_buffer, screen.machine().pens);
 	}
 	return 0;
 }

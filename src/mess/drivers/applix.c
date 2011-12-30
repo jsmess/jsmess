@@ -147,7 +147,7 @@ static VIDEO_START( applix )
 
 static SCREEN_UPDATE( applix )
 {
-	applix_state *state = screen->machine().driver_data<applix_state>();
+	applix_state *state = screen.machine().driver_data<applix_state>();
 	state->m_crtc->update( bitmap, cliprect);
 	return 0;
 }

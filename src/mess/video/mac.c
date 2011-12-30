@@ -86,10 +86,10 @@ SCREEN_UPDATE( mac )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *state = screen->machine().driver_data<mac_state>();
+	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_base = screen->machine().device<ram_device>(RAM_TAG)->size() - (state->m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const UINT16 *) (screen->machine().device<ram_device>(RAM_TAG)->pointer() + video_base);
+	video_base = screen.machine().device<ram_device>(RAM_TAG)->size() - (state->m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_ram = (const UINT16 *) (screen.machine().device<ram_device>(RAM_TAG)->pointer() + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
@@ -114,7 +114,7 @@ SCREEN_UPDATE( macse30 )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *state = screen->machine().driver_data<mac_state>();
+	mac_state *state = screen.machine().driver_data<mac_state>();
 
 	video_base = state->m_screen_buffer ? 0x8000 : 0;
 	video_ram = (const UINT16 *) &state->m_vram[video_base/4];
@@ -141,7 +141,7 @@ SCREEN_UPDATE( macprtb )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *state = screen->machine().driver_data<mac_state>();
+	mac_state *state = screen.machine().driver_data<mac_state>();
 
 	video_ram = (const UINT16 *) state->m_vram;
 
@@ -167,7 +167,7 @@ SCREEN_UPDATE( macpb140 )
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	mac_state *state = screen->machine().driver_data<mac_state>();
+	mac_state *state = screen.machine().driver_data<mac_state>();
 
 	video_ram = (const UINT16 *) state->m_vram;
 
@@ -192,7 +192,7 @@ SCREEN_UPDATE( macpb160 )
 	UINT16 *line;
 	int y, x;
 	UINT8 pixels;
-	mac_state *state = screen->machine().driver_data<mac_state>();
+	mac_state *state = screen.machine().driver_data<mac_state>();
 	UINT8 *vram8 = (UINT8 *)state->m_vram;
 
 	for (y = 0; y < 400; y++)
@@ -385,8 +385,8 @@ SCREEN_UPDATE( macrbv )
 {
 	UINT32 *scanline;
 	int x, y, hres, vres;
-	mac_state *mac = screen->machine().driver_data<mac_state>();
-	UINT8 *vram8 = (UINT8 *)screen->machine().device<ram_device>(RAM_TAG)->pointer();
+	mac_state *mac = screen.machine().driver_data<mac_state>();
+	UINT8 *vram8 = (UINT8 *)screen.machine().device<ram_device>(RAM_TAG)->pointer();
 
 	switch (mac->m_rbv_montype)
 	{
@@ -502,7 +502,7 @@ SCREEN_UPDATE( macrbvvram )
 {
 	UINT32 *scanline;
 	int x, y;
-	mac_state *mac = screen->machine().driver_data<mac_state>();
+	mac_state *mac = screen.machine().driver_data<mac_state>();
 	UINT8 mode = 0;
 
 	switch (mac->m_rbv_type)
@@ -874,7 +874,7 @@ SCREEN_UPDATE( macdafb )
 {
 	UINT32 *scanline;
 	int x, y;
-	mac_state *mac = screen->machine().driver_data<mac_state>();
+	mac_state *mac = screen.machine().driver_data<mac_state>();
 
 	switch (mac->m_dafb_mode)
 	{
@@ -988,7 +988,7 @@ SCREEN_UPDATE( macpbwd )    /* Color PowerBooks using an off-the-shelf WD video 
 {
 	UINT32 *scanline;
 	int x, y;
-	mac_state *mac = screen->machine().driver_data<mac_state>();
+	mac_state *mac = screen.machine().driver_data<mac_state>();
     UINT8 *vram8 = (UINT8 *)mac->m_vram;
     UINT8 pixels;
 

@@ -211,7 +211,7 @@ void isa8_mda_device::device_reset()
 
 static SCREEN_UPDATE( mc6845_mda )
 {
-	mc6845_device *mc6845 = downcast<mc6845_device *>(screen->owner()->subdevice(MDA_MC6845_NAME));
+	mc6845_device *mc6845 = downcast<mc6845_device *>(screen.owner()->subdevice(MDA_MC6845_NAME));
 	mc6845->update( bitmap, cliprect );
 	return 0;
 }
@@ -661,7 +661,7 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 
 static SCREEN_UPDATE( mc6845_hercules )
 {
-	mc6845_device *mc6845 = downcast<mc6845_device *>(screen->owner()->subdevice(HERCULES_MC6845_NAME));
+	mc6845_device *mc6845 = downcast<mc6845_device *>(screen.owner()->subdevice(HERCULES_MC6845_NAME));
 
 	mc6845->update( bitmap, cliprect );
 	return 0;

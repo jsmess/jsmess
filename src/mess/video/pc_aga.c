@@ -756,7 +756,7 @@ VIDEO_START( pc200 )
 
 static SCREEN_UPDATE( mc6845_aga )
 {
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(AGA_MC6845_NAME);
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(AGA_MC6845_NAME);
 	mc6845->update(bitmap, cliprect);
 
 	return 0;

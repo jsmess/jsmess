@@ -64,7 +64,7 @@ static VIDEO_START( myb3k )
 
 static SCREEN_UPDATE( myb3k )
 {
-	myb3k_state *state = screen->machine().driver_data<myb3k_state>();
+	myb3k_state *state = screen.machine().driver_data<myb3k_state>();
 	int x,y;
 	int xi,yi;
 	int dot;
@@ -88,7 +88,7 @@ static SCREEN_UPDATE( myb3k )
 						dot = 0;
 
 					if(y*mc6845_tile_height+yi < 200 && x*8+xi < 320) /* TODO: safety check */
-						*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[dot];
+						*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[dot];
 				}
 			}
 		}

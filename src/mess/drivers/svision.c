@@ -355,7 +355,7 @@ static PALETTE_INIT( svisionp )
 
 static SCREEN_UPDATE( svision )
 {
-	svision_state *state = screen->machine().driver_data<svision_state>();
+	svision_state *state = screen.machine().driver_data<svision_state>();
 	int x, y, i, j=XPOS/4+YPOS*0x30;
 	UINT8 *videoram = state->m_videoram;
 
@@ -387,7 +387,7 @@ static SCREEN_UPDATE( svision )
 
 static SCREEN_UPDATE( tvlink )
 {
-	svision_state *state = screen->machine().driver_data<svision_state>();
+	svision_state *state = screen.machine().driver_data<svision_state>();
 	int x, y, i, j = XPOS/4+YPOS*0x30;
 	UINT8 *videoram = state->m_videoram;
 
@@ -412,7 +412,7 @@ static SCREEN_UPDATE( tvlink )
 	}
 	else
 	{
-		plot_box(bitmap, 3, 0, 162, 159, screen->machine().pens[PALETTE_START]);
+		plot_box(bitmap, 3, 0, 162, 159, screen.machine().pens[PALETTE_START]);
 	}
 	return 0;
 }

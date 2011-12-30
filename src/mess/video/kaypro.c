@@ -18,7 +18,7 @@ PALETTE_INIT( kaypro )
 
 SCREEN_UPDATE( kayproii )
 {
-	kaypro_state *state = screen->machine().driver_data<kaypro_state>();
+	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
 /* The display consists of 80 columns and 24 rows. Each row is allocated 128 bytes of ram,
     but only the first 80 are used. The total video ram therefore is 0x0c00 bytes.
     There is one video attribute: bit 7 causes blinking. The first half of the
@@ -70,7 +70,7 @@ SCREEN_UPDATE( kayproii )
 
 SCREEN_UPDATE( omni2 )
 {
-	kaypro_state *state = screen->machine().driver_data<kaypro_state>();
+	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -115,7 +115,7 @@ SCREEN_UPDATE( omni2 )
 
 SCREEN_UPDATE( kaypro2x )
 {
-	kaypro_state *state = screen->machine().driver_data<kaypro_state>();
+	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
 	state->m_framecnt++;
 	state->m_speed = state->m_mc6845_reg[10]&0x20;
 	state->m_flash = state->m_mc6845_reg[10]&0x40;				// cursor modes

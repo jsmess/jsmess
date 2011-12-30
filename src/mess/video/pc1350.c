@@ -131,10 +131,10 @@ static const int pc1350_addr[4]={ 0, 0x40, 0x1e, 0x5e };
 
 SCREEN_UPDATE( pc1350 )
 {
-	pc1350_state *state = screen->machine().driver_data<pc1350_state>();	/* The contrast colours need some work done - select contrast level 7 for now */
+	pc1350_state *state = screen.machine().driver_data<pc1350_state>();	/* The contrast colours need some work done - select contrast level 7 for now */
 	int x, y=DOWN, i, j, k=0, b;
 	int color[4];
-	running_machine &machine = screen->machine();
+	running_machine &machine = screen.machine();
 
 	bitmap_fill(bitmap, cliprect, 11);
 

@@ -55,7 +55,7 @@ void nc200_video_set_backlight(running_machine &machine, int state)
 ***************************************************************************/
 SCREEN_UPDATE( nc )
 {
-	nc_state *state = screen->machine().driver_data<nc_state>();
+	nc_state *state = screen.machine().driver_data<nc_state>();
 	int y;
 	int b;
 	int x;
@@ -91,7 +91,7 @@ SCREEN_UPDATE( nc )
     {
 		int by;
 		/* 64 bytes per line */
-		char *line_ptr = ((char*)screen->machine().device<ram_device>(RAM_TAG)->pointer()) + state->m_display_memory_start + (y<<6);
+		char *line_ptr = ((char*)screen.machine().device<ram_device>(RAM_TAG)->pointer()) + state->m_display_memory_start + (y<<6);
 
 		x = 0;
 		for (by=0; by<width>>3; by++)

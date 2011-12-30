@@ -581,12 +581,12 @@ static void draw_cg_screen(running_machine &machine, bitmap_t *bitmap,const rect
 
 static SCREEN_UPDATE( mz2500 )
 {
-	//mz2500_state *state = screen->machine().driver_data<mz2500_state>();
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]); //TODO: correct?
+	//mz2500_state *state = screen.machine().driver_data<mz2500_state>();
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]); //TODO: correct?
 
-	draw_cg_screen(screen->machine(),bitmap,cliprect,0);
-	draw_tv_screen(screen->machine(),bitmap,cliprect);
-	draw_cg_screen(screen->machine(),bitmap,cliprect,1);
+	draw_cg_screen(screen.machine(),bitmap,cliprect,0);
+	draw_tv_screen(screen.machine(),bitmap,cliprect);
+	draw_cg_screen(screen.machine(),bitmap,cliprect,1);
 	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",state->m_cg_reg[0x0f],state->m_cg_reg[0x10],state->m_cg_reg[0x11],state->m_cg_reg[0x12],state->m_cg_reg[0x13],state->m_cg_reg[0x14],state->m_cg_reg[0x15],state->m_cg_reg[0x16],state->m_cg_reg[0x17]);
 	//  popmessage("%02x",state->m_text_reg[0x0f]);
 

@@ -39,7 +39,7 @@ VIDEO_START( mz80k )
 
 SCREEN_UPDATE( mz80k )
 {
-	mz80_state *state = screen->machine().driver_data<mz80_state>();
+	mz80_state *state = screen.machine().driver_data<mz80_state>();
 	state->m_mz80k_vertical ^= 1;
 	state->m_mz80k_cursor_cnt++;
 	UINT8 y,ra,chr,gfx;
@@ -75,7 +75,7 @@ SCREEN_UPDATE( mz80k )
 // same as above except bits are in reverse order
 SCREEN_UPDATE( mz80kj )
 {
-	mz80_state *state = screen->machine().driver_data<mz80_state>();
+	mz80_state *state = screen.machine().driver_data<mz80_state>();
 	state->m_mz80k_vertical ^= 1;
 	state->m_mz80k_cursor_cnt++;
 	UINT8 y,ra,chr,gfx;
@@ -111,7 +111,7 @@ SCREEN_UPDATE( mz80kj )
 // has twice as much video ram and uses a scroll register
 SCREEN_UPDATE( mz80a )
 {
-	mz80_state *state = screen->machine().driver_data<mz80_state>();
+	mz80_state *state = screen.machine().driver_data<mz80_state>();
 	state->m_mz80k_vertical ^= 1;
 	state->m_mz80k_cursor_cnt++;
 	UINT8 y,ra,chr,gfx;

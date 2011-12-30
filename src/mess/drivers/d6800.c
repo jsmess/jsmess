@@ -129,7 +129,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( d6800 )
 {
-	d6800_state *state = screen->machine().driver_data<d6800_state>();
+	d6800_state *state = screen.machine().driver_data<d6800_state>();
 	UINT8 x,y,gfx=0,i;
 
 	for (y = 0; y < 32; y++)

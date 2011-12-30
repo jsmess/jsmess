@@ -98,7 +98,7 @@ VIDEO_START( mc8020 )
 
 SCREEN_UPDATE( mc8020 )
 {
-	mc80_state *state = screen->machine().driver_data<mc80_state>();
+	mc80_state *state = screen.machine().driver_data<mc80_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -145,7 +145,7 @@ VIDEO_START( mc8030 )
 
 SCREEN_UPDATE( mc8030 )
 {
-	mc80_state *state = screen->machine().driver_data<mc80_state>();
+	mc80_state *state = screen.machine().driver_data<mc80_state>();
 	UINT8 gfx;
 	UINT16 y=0,ma=0,x;
 

@@ -1831,9 +1831,9 @@ bool towns_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 
 #if 0
 #ifdef SPR_DEBUG
-	if(screen->machine().input().code_pressed(KEYCODE_O))
+	if(screen.machine().input().code_pressed(KEYCODE_O))
 		pshift+=0x80;
-	if(screen->machine().input().code_pressed(KEYCODE_I))
+	if(screen.machine().input().code_pressed(KEYCODE_I))
 		pshift-=0x80;
 	popmessage("Pixel shift = %08x",pshift);
 #endif

@@ -201,7 +201,7 @@ SCREEN_EOF( mbc55x )
 
 SCREEN_UPDATE( mbc55x )
 {
-	mbc55x_state *state = screen->machine().driver_data<mbc55x_state>();
+	mbc55x_state *state = screen.machine().driver_data<mbc55x_state>();
 	state->m_crtc->update(bitmap, cliprect);
 	return 0;
 }

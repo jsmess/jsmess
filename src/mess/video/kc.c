@@ -659,7 +659,7 @@ static void kc85_4_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
 ***************************************************************************/
 SCREEN_UPDATE( kc85_4 )
 {
-	kc85_4_state *state = screen->machine().driver_data<kc85_4_state>();
+	kc85_4_state *state = screen.machine().driver_data<kc85_4_state>();
 #if 0
 	unsigned char *pixel_ram = state->m_display_video_ram;
 	unsigned char *colour_ram = pixel_ram + 0x04000;
@@ -688,7 +688,7 @@ SCREEN_UPDATE( kc85_4 )
 	grab_data.pixel_ram = state->m_display_video_ram;
 	grab_data.colour_ram = state->m_display_video_ram + 0x04000;
 
-	kc85_common_process_frame(screen->machine(), bitmap, kc85_4_pixel_grab_callback,&grab_data);
+	kc85_common_process_frame(screen.machine(), bitmap, kc85_4_pixel_grab_callback,&grab_data);
 
 	return 0;
 }
@@ -739,7 +739,7 @@ static void kc85_3_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
 ***************************************************************************/
 SCREEN_UPDATE( kc85_3 )
 {
-	kc_state *state = screen->machine().driver_data<kc_state>();
+	kc_state *state = screen.machine().driver_data<kc_state>();
 
 #if 0
 	/* colour ram takes up 0x02800 bytes */
@@ -787,7 +787,7 @@ SCREEN_UPDATE( kc85_3 )
 	grab_data.pixel_ram = state->m_ram_base + 0x04000;
 	grab_data.colour_ram = state->m_ram_base + 0x04000 + 0x02800;
 
-	kc85_common_process_frame(screen->machine(), bitmap, kc85_3_pixel_grab_callback,&grab_data);
+	kc85_common_process_frame(screen.machine(), bitmap, kc85_3_pixel_grab_callback,&grab_data);
 
 	return 0;
 }

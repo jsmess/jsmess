@@ -1142,7 +1142,7 @@ static WRITE_LINE_DEVICE_HANDLER(tms9928a_interrupt)
 
 static SCREEN_UPDATE( msx )
 {
-	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
 
 	tms9928a->update( bitmap, cliprect );
 	return 0;

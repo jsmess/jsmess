@@ -164,10 +164,10 @@ static VIDEO_START(calchase)
 /*GRULL-ADDVGA
 static SCREEN_UPDATE(calchase)
 {
-    calchase_state *state = screen->machine().driver_data<calchase_state>();
+    calchase_state *state = screen.machine().driver_data<calchase_state>();
     int x,y,count,i;
 
-    bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+    bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
     count = (0);
 
@@ -181,8 +181,8 @@ static SCREEN_UPDATE(calchase)
 
                 color = (state->m_vga_vram[count])>>(32-i) & 0x1;
 
-                if((x+i)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
-                    *BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine().pens[color];
+                if((x+i)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
+                    *BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen.machine().pens[color];
 
             }
 
@@ -835,10 +835,7 @@ ROM_START( calchase )
 	ROM_REGION( 0x40000, "bios", 0 )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
 
-	ROM_REGION(0x8000,"video_bios", 0)
-	ROM_LOAD("et4000.bin", 0x0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) ) // Not on the original board, to be changed
-
-	ROM_REGION( 0x8000, "ovbios", 0 ) // TODO: Make this to work on our VGA driver
+	ROM_REGION( 0x8000, "video_bios", 0 )
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 

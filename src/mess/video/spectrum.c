@@ -61,7 +61,7 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
    independent of frame skip etc. */
 SCREEN_EOF( spectrum )
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
+	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
 	EVENT_LIST_ITEM *pItem;
 	int NumItems;
 
@@ -74,13 +74,13 @@ SCREEN_EOF( spectrum )
 
 	/* Empty event buffer for undisplayed frames noting the last border
        colour (in case colours are not changed in the next frame). */
-	NumItems = spectrum_EventList_NumEvents(machine);
+	NumItems = spectrum_EventList_NumEvents(screen.machine());
 	if (NumItems)
 	{
-		pItem = spectrum_EventList_GetFirstItem(machine);
-		spectrum_border_set_last_color ( machine, pItem[NumItems-1].Event_Data );
-		spectrum_EventList_Reset(machine);
-		spectrum_EventList_SetOffsetStartTime ( machine, machine.firstcpu->attotime_to_cycles(machine.primary_screen->scan_period() * machine.primary_screen->vpos()) );
+		pItem = spectrum_EventList_GetFirstItem(screen.machine());
+		spectrum_border_set_last_color ( screen.machine(), pItem[NumItems-1].Event_Data );
+		spectrum_EventList_Reset(screen.machine());
+		spectrum_EventList_SetOffsetStartTime ( screen.machine(), screen.machine().firstcpu->attotime_to_cycles(screen.scan_period() * screen.vpos()) );
 		logerror ("Event log reset in callback fn.\n");
 	}
 }
@@ -118,7 +118,7 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 SCREEN_UPDATE( spectrum )
 {
 	/* for now do a full-refresh */
-	spectrum_state *state = screen->machine().driver_data<spectrum_state>();
+	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
 	int x, y, b, scrx, scry;
 	unsigned short ink, pap;
 	unsigned char *attr, *scr;
@@ -159,7 +159,7 @@ SCREEN_UPDATE( spectrum )
 		}
 	}
 
-	spectrum_border_draw(screen->machine(), bitmap, full_refresh,
+	spectrum_border_draw(screen.machine(), bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		SPEC_LEFT_BORDER, SPEC_DISPLAY_XSIZE, SPEC_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,

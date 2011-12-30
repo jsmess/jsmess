@@ -151,7 +151,7 @@ static VIDEO_START( mbc200 )
 
 static SCREEN_UPDATE( mbc200 )
 {
-	mbc200_state *state = screen->machine().driver_data<mbc200_state>();
+	mbc200_state *state = screen.machine().driver_data<mbc200_state>();
 	int x,y,xi,yi;
 	int count;
 
@@ -169,7 +169,7 @@ static SCREEN_UPDATE( mbc200 )
 					dot = (state->m_vram[count] >> (7-xi)) & 1;
 
 					if(y*4+yi < 400 && x*8+xi < 640) /* TODO: safety check */
-						*BITMAP_ADDR16(bitmap, y*4+yi, x*8+xi) = screen->machine().pens[dot];
+						*BITMAP_ADDR16(bitmap, y*4+yi, x*8+xi) = screen.machine().pens[dot];
 				}
 
 				count++;

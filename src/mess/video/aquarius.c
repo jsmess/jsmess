@@ -99,7 +99,7 @@ VIDEO_START( aquarius )
 
 SCREEN_UPDATE( aquarius )
 {
-	aquarius_state *state = screen->machine().driver_data<aquarius_state>();
+	aquarius_state *state = screen.machine().driver_data<aquarius_state>();
 	tilemap_draw(bitmap, NULL, state->m_tilemap, 0, 0);
 
 	return 0;

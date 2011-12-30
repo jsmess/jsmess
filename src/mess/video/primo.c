@@ -41,6 +41,6 @@ SCREEN_UPDATE( primo )
 	int primo_scanline;
 
 	for (primo_scanline=0; primo_scanline<192; primo_scanline++)
-		primo_draw_scanline(screen->machine(), bitmap, primo_scanline);
+		primo_draw_scanline(screen.machine(), bitmap, primo_scanline);
 	return 0;
 }

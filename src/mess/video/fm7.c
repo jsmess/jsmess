@@ -1556,7 +1556,7 @@ VIDEO_START( fm7 )
 
 SCREEN_UPDATE( fm7 )
 {
-	fm7_state *state = screen->machine().driver_data<fm7_state>();
+	fm7_state *state = screen.machine().driver_data<fm7_state>();
 	UINT8 code_r = 0,code_g = 0,code_b = 0;
 	UINT8 code_r2 = 0,code_g2 = 0,code_b2 = 0;
 	UINT8 code_r3 = 0,code_g3 = 0,code_b3 = 0;

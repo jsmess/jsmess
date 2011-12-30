@@ -111,7 +111,7 @@ const i8275_interface ipds_i8275_interface = {
 
 static SCREEN_UPDATE( ipds )
 {
-	device_t *devconf = screen->machine().device("i8275");
+	device_t *devconf = screen.machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;

@@ -574,7 +574,7 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 
 static SCREEN_UPDATE( c64 )
 {
-	device_t *vic2 = screen->machine().device("vic2");
+	device_t *vic2 = screen.machine().device("vic2");
 
 	vic2_video_update(vic2, bitmap, cliprect);
 	return 0;

@@ -61,7 +61,7 @@ static VIDEO_START( vta2000 )
 static SCREEN_UPDATE( vta2000 )
 /* Cursor is missing. */
 {
-	vta2000_state *state = screen->machine().driver_data<vta2000_state>();
+	vta2000_state *state = screen.machine().driver_data<vta2000_state>();
 	static UINT8 framecnt=0;
 	UINT8 y,ra,gfx,attr,fg,bg;
 	UINT16 sy=0,ma=0,x,xx=0,chr;

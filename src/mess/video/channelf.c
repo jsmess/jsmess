@@ -50,7 +50,7 @@ static int recalc_palette_offset(int reg1, int reg2)
 
 SCREEN_UPDATE( channelf )
 {
-	channelf_state *state = screen->machine().driver_data<channelf_state>();
+	channelf_state *state = screen.machine().driver_data<channelf_state>();
 	UINT8 y,col;
 	UINT16 ma=0,x;
 	int palette_offset;

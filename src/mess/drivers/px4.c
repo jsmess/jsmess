@@ -1028,7 +1028,7 @@ static NVRAM_HANDLER( px4_ramdisk )
 
 static SCREEN_UPDATE( px4 )
 {
-	px4_state *px4 = screen->machine().driver_data<px4_state>();
+	px4_state *px4 = screen.machine().driver_data<px4_state>();
 
 	/* display enabled? */
 	if (BIT(px4->m_yoff, 7))

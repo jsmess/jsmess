@@ -1116,7 +1116,7 @@ VIDEO_START( x68000 )
 
 SCREEN_UPDATE( x68000 )
 {
-	x68k_state *state = screen->machine().driver_data<x68k_state>();
+	x68k_state *state = screen.machine().driver_data<x68k_state>();
 	rectangle rect = {0,0,0,0};
 	int priority;
 	int xscr,yscr;
@@ -1155,17 +1155,17 @@ SCREEN_UPDATE( x68000 )
 		rect.max_y = cliprect->max_y;
 
 	// update tiles
-	//rom = screen->machine().region("user1")->base();
+	//rom = screen.machine().region("user1")->base();
 	for(x=0;x<256;x++)
 	{
 		if(state->m_video.tile16_dirty[x] != 0)
 		{
-			gfx_element_mark_dirty(screen->machine().gfx[1], x);
+			gfx_element_mark_dirty(screen.machine().gfx[1], x);
 			state->m_video.tile16_dirty[x] = 0;
 		}
 		if(state->m_video.tile8_dirty[x] != 0)
 		{
-			gfx_element_mark_dirty(screen->machine().gfx[0], x);
+			gfx_element_mark_dirty(screen.machine().gfx[0], x);
 			state->m_video.tile8_dirty[x] = 0;
 		}
 	}
@@ -1174,12 +1174,12 @@ SCREEN_UPDATE( x68000 )
 	{
 		// Graphics screen(s)
 		if(priority == state->m_video.gfx_pri)
-			x68k_draw_gfx(screen->machine(),bitmap,rect);
+			x68k_draw_gfx(screen.machine(),bitmap,rect);
 
 		// Sprite / BG Tiles
 		if(priority == state->m_video.sprite_pri /*&& (state->m_spritereg[0x404] & 0x0200)*/ && (state->m_video.reg[2] & 0x0040))
 		{
-			x68k_draw_sprites(screen->machine(), bitmap,1,rect);
+			x68k_draw_sprites(screen.machine(), bitmap,1,rect);
 			if((state->m_spritereg[0x404] & 0x0008))
 			{
 				if((state->m_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
@@ -1195,7 +1195,7 @@ SCREEN_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(screen->machine(),bitmap,2,rect);
+			x68k_draw_sprites(screen.machine(),bitmap,2,rect);
 			if((state->m_spritereg[0x404] & 0x0001))
 			{
 				if((state->m_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
@@ -1211,7 +1211,7 @@ SCREEN_UPDATE( x68000 )
 					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
 				}
 			}
-			x68k_draw_sprites(screen->machine(),bitmap,3,rect);
+			x68k_draw_sprites(screen.machine(),bitmap,3,rect);
 		}
 
 		// Text screen
@@ -1220,24 +1220,24 @@ SCREEN_UPDATE( x68000 )
 			xscr = (state->m_crtc.reg[10] & 0x3ff);
 			yscr = (state->m_crtc.reg[11] & 0x3ff);
 			if(!(state->m_crtc.reg[20] & 0x1000))  // if text layer is set to buffer, then it's not visible
-				x68k_draw_text(screen->machine(),bitmap,xscr,yscr,rect);
+				x68k_draw_text(screen.machine(),bitmap,xscr,yscr,rect);
 		}
 	}
 
 #ifdef MAME_DEBUG
-	if(screen->machine().input().code_pressed(KEYCODE_I))
+	if(screen.machine().input().code_pressed(KEYCODE_I))
 	{
 		state->m_mfp.isra = 0;
 		state->m_mfp.isrb = 0;
 //      mfp_trigger_irq(MFP_IRQ_GPIP6);
 //      cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x43);
 	}
-	if(screen->machine().input().code_pressed(KEYCODE_9))
+	if(screen.machine().input().code_pressed(KEYCODE_9))
 	{
 		state->m_sprite_shift--;
 		popmessage("Sprite shift = %i",state->m_sprite_shift);
 	}
-	if(screen->machine().input().code_pressed(KEYCODE_0))
+	if(screen.machine().input().code_pressed(KEYCODE_0))
 	{
 		state->m_sprite_shift++;
 		popmessage("Sprite shift = %i",state->m_sprite_shift);

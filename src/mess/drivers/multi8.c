@@ -112,7 +112,7 @@ static void multi8_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,i
 
 static SCREEN_UPDATE( multi8 )
 {
-	multi8_state *state = screen->machine().driver_data<multi8_state>();
+	multi8_state *state = screen.machine().driver_data<multi8_state>();
 	int x,y,count;
 	UINT8 x_width;
 	UINT8 xi,yi;
@@ -144,7 +144,7 @@ static SCREEN_UPDATE( multi8 )
 				else
 					color = (pen_b) | (pen_r << 1) | (pen_g << 2);
 
-				multi8_draw_pixel(screen->machine(),bitmap, y, x*8+xi,state->m_pen_clut[color], 0);
+				multi8_draw_pixel(screen.machine(),bitmap, y, x*8+xi,state->m_pen_clut[color], 0);
 			}
 			count++;
 		}
@@ -172,11 +172,11 @@ static SCREEN_UPDATE( multi8 )
 						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(pen)
-						multi8_draw_pixel(screen->machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (state->m_display_reg & 0x40) == 0x00);
+						multi8_draw_pixel(screen.machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (state->m_display_reg & 0x40) == 0x00);
 				}
 			}
 
-			//drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile,color >> 5, 0, 0, x*8, y*8);
+			//drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
 			if(mc6845_cursor_addr+0xc000 == count)
@@ -188,8 +188,8 @@ static SCREEN_UPDATE( multi8 )
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(screen->machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(screen->machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(screen.machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(screen.machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -197,7 +197,7 @@ static SCREEN_UPDATE( multi8 )
 					for (yc=0; yc<(mc6845_tile_height-(mc6845_cursor_y_start & 7)); yc++)
 					{
 						for (xc=0; xc<8; xc++)
-							multi8_draw_pixel(screen->machine(),bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(state->m_display_reg & 0x40) == 0x00);
+							multi8_draw_pixel(screen.machine(),bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(state->m_display_reg & 0x40) == 0x00);
 
 					}
 				}

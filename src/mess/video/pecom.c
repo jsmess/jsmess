@@ -110,7 +110,7 @@ static VIDEO_START( pecom )
 
 static SCREEN_UPDATE( pecom )
 {
-	pecom_state *state = screen->machine().driver_data<pecom_state>();
+	pecom_state *state = screen.machine().driver_data<pecom_state>();
 
 	state->m_cdp1869->update_screen(bitmap, cliprect);
 

@@ -430,7 +430,7 @@ static VIDEO_START( lynx48k )
 
 static SCREEN_UPDATE( lynx48k )
 {
-	camplynx_state *state = screen->machine().driver_data<camplynx_state>();
+	camplynx_state *state = screen.machine().driver_data<camplynx_state>();
 
 	state->m_crtc->update( bitmap, cliprect);
 	return 0;

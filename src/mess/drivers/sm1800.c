@@ -79,7 +79,7 @@ MACHINE_RESET_MEMBER(sm1800_state)
 
 static SCREEN_UPDATE( sm1800 )
 {
-	device_t *devconf = screen->machine().device("i8275");
+	device_t *devconf = screen.machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;

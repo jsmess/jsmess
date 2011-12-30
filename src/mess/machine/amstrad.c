@@ -1066,7 +1066,7 @@ VIDEO_START( amstrad )
 
 SCREEN_UPDATE( amstrad )
 {
-	amstrad_state *state = screen->machine().driver_data<amstrad_state>();
+	amstrad_state *state = screen.machine().driver_data<amstrad_state>();
 	copybitmap( bitmap, state->m_gate_array.bitmap, 0, 0, 0, 0, cliprect );
 	return 0;
 }
@@ -2390,7 +2390,7 @@ static void kccomp_reset_machine(running_machine &machine)
 
 SCREEN_EOF( amstrad )
 {
-	cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(screen->machine(),"multiface2"));
+	cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(screen.machine(),"multiface2"));
 
 	if(mface2 != NULL)
 	{

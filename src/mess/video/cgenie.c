@@ -416,10 +416,10 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t * bitmap, c
 ***************************************************************************/
 SCREEN_UPDATE( cgenie )
 {
-	cgenie_state *state = screen->machine().driver_data<cgenie_state>();
+	cgenie_state *state = screen.machine().driver_data<cgenie_state>();
     if( state->m_tv_mode )
-		cgenie_refresh_tv_set(screen->machine(), bitmap, cliprect);
+		cgenie_refresh_tv_set(screen.machine(), bitmap, cliprect);
 	else
-		cgenie_refresh_monitor(screen->machine(), bitmap, cliprect);
+		cgenie_refresh_monitor(screen.machine(), bitmap, cliprect);
 	return 0;
 }

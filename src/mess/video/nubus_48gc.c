@@ -144,7 +144,7 @@ void jmfb_device::device_reset()
 
 static SCREEN_UPDATE( mac_48gc )
 {
-	jmfb_device *card = downcast<jmfb_device *>(screen->owner());
+	jmfb_device *card = downcast<jmfb_device *>(screen.owner());
 	UINT32 *scanline, *base;
 	int x, y;
 	UINT8 *vram8 = (UINT8 *)card->m_vram;

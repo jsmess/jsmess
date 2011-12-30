@@ -78,17 +78,17 @@ static VIDEO_START( paso1600 )
 
 static SCREEN_UPDATE( paso1600 )
 {
-	paso1600_state *state = screen->machine().driver_data<paso1600_state>();
+	paso1600_state *state = screen.machine().driver_data<paso1600_state>();
 	int x,y;
 	int xi,yi;
 	#if 0
 	UINT32 count;
 	static int test_x;
 
-	if(screen->machine().input().code_pressed(KEYCODE_Z))
+	if(screen.machine().input().code_pressed(KEYCODE_Z))
 		test_x++;
 
-	if(screen->machine().input().code_pressed(KEYCODE_X))
+	if(screen.machine().input().code_pressed(KEYCODE_X))
 		test_x--;
 
 	popmessage("%d",test_x);
@@ -106,7 +106,7 @@ static SCREEN_UPDATE( paso1600 )
 				int pen = (state->m_p_gvram[count] >> xi) & 1;
 
 				if(y < 475 && x*16+xi < 640) /* TODO: safety check */
-					*BITMAP_ADDR16(bitmap, y, x*16+xi) = screen->machine().pens[pen];
+					*BITMAP_ADDR16(bitmap, y, x*16+xi) = screen.machine().pens[pen];
 			}
 
 			count++;
@@ -135,7 +135,7 @@ static SCREEN_UPDATE( paso1600 )
 
 					//if(pen != -1)
 						if(y*19 < 475 && x*8+xi < 640) /* TODO: safety check */
-							*BITMAP_ADDR16(bitmap, y*19+yi, x*8+xi) = screen->machine().pens[pen];
+							*BITMAP_ADDR16(bitmap, y*19+yi, x*8+xi) = screen.machine().pens[pen];
 				}
 			}
 		}
@@ -151,7 +151,7 @@ static SCREEN_UPDATE( paso1600 )
 			{
 				x = mc6845_cursor_addr % mc6845_h_display;
 				y = mc6845_cursor_addr / mc6845_h_display;
-				*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[7];
+				*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[7];
 			}
 		}
 	}

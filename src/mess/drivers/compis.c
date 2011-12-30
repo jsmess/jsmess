@@ -92,7 +92,7 @@ void compis_state::video_start()
 
 static SCREEN_UPDATE( compis )
 {
-	compis_state *state = screen->machine().driver_data<compis_state>();
+	compis_state *state = screen.machine().driver_data<compis_state>();
 	/* graphics */
 	state->m_crtc->update_screen(bitmap, cliprect);
 
@@ -101,9 +101,9 @@ static SCREEN_UPDATE( compis )
 
 static SCREEN_UPDATE( compis2 ) // temporary
 {
-	compis_state *state = screen->machine().driver_data<compis_state>();
+	compis_state *state = screen.machine().driver_data<compis_state>();
 	UINT8 *m_p_chargen;
-	m_p_chargen = screen->machine().region("maincpu")->base()+0xca70; //bios0
+	m_p_chargen = screen.machine().region("maincpu")->base()+0xca70; //bios0
 	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;

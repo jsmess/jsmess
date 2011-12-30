@@ -339,7 +339,7 @@ static TMS9928A_INTERFACE(mtx_tms9928a_interface)
 
 static SCREEN_UPDATE( mtx )
 {
-	tms9929a_device *tms9929a = screen->machine().device<tms9929a_device>( "tms9929a" );
+	tms9929a_device *tms9929a = screen.machine().device<tms9929a_device>( "tms9929a" );
 
 	tms9929a->update( bitmap, cliprect );
 	return 0;

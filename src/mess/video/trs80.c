@@ -54,7 +54,7 @@ VIDEO_START( trs80 )
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
 SCREEN_UPDATE( trs80 )
 {
-	trs80_state *state = screen->machine().driver_data<trs80_state>();
+	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 cols = BIT(state->m_mode, 0) ? 32 : 64;
@@ -63,7 +63,7 @@ SCREEN_UPDATE( trs80 )
 	if (state->m_mode != state->m_size_store)
 	{
 		state->m_size_store = state->m_mode & 1;
-		screen->set_visible_area(0, cols*6-1, 0, 16*12-1);
+		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
 	for (y = 0; y < 16; y++)
@@ -126,7 +126,7 @@ SCREEN_UPDATE( trs80 )
 /* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
 SCREEN_UPDATE( trs80m4 )
 {
-	trs80_state *state = screen->machine().driver_data<trs80_state>();
+	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 skip=1;
@@ -145,7 +145,7 @@ SCREEN_UPDATE( trs80m4 )
 	if ((state->m_mode & 0x7f) != state->m_size_store)
 	{
 		state->m_size_store = state->m_mode & 5;
-		screen->set_visible_area(0, s_cols*8-1, 0, rows*lines-1);
+		screen.set_visible_area(0, s_cols*8-1, 0, rows*lines-1);
 	}
 
 	for (y = 0; y < rows; y++)
@@ -221,7 +221,7 @@ SCREEN_UPDATE( trs80m4 )
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
 SCREEN_UPDATE( ht1080z )
 {
-	trs80_state *state = screen->machine().driver_data<trs80_state>();
+	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 cols = BIT(state->m_mode, 0) ? 32 : 64;
@@ -230,7 +230,7 @@ SCREEN_UPDATE( ht1080z )
 	if (state->m_mode != state->m_size_store)
 	{
 		state->m_size_store = state->m_mode & 1;
-		screen->set_visible_area(0, cols*6-1, 0, 16*12-1);
+		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
 	for (y = 0; y < 16; y++)
@@ -280,7 +280,7 @@ SCREEN_UPDATE( ht1080z )
 /* 8-bit video, 64/80 characters per line = lnw80 */
 SCREEN_UPDATE( lnw80 )
 {
-	trs80_state *state = screen->machine().driver_data<trs80_state>();
+	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	static const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
 	UINT8 chr,gfx,gfxbit,bg=7,fg=0;
 	UINT16 sy=0,ma=0,x,y,ra;
@@ -290,7 +290,7 @@ SCREEN_UPDATE( lnw80 )
 	if (state->m_mode != state->m_size_store)
 	{
 		state->m_size_store = state->m_mode & 0x10;
-		screen->set_visible_area(0, cols*6-1, 0, 16*12-1);
+		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
 	if (state->m_mode & 8)
@@ -453,7 +453,7 @@ SCREEN_UPDATE( lnw80 )
 /* lores characters are in the character generator. Each character is 8x16. */
 SCREEN_UPDATE( radionic )
 {
-	trs80_state *state = screen->machine().driver_data<trs80_state>();
+	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 	UINT8 cols = BIT(state->m_mode, 0) ? 32 : 64;
@@ -462,7 +462,7 @@ SCREEN_UPDATE( radionic )
 	if (state->m_mode != state->m_size_store)
 	{
 		state->m_size_store = state->m_mode & 1;
-		screen->set_visible_area(0, cols*8-1, 0, 16*16-1);
+		screen.set_visible_area(0, cols*8-1, 0, 16*16-1);
 	}
 
 	for (y = 0; y < 16; y++)
@@ -496,7 +496,7 @@ SCREEN_UPDATE( radionic )
 
 SCREEN_UPDATE( meritum )
 {
-	trs80_state *state = screen->machine().driver_data<trs80_state>();
+	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx,gfxbit;
 	UINT16 sy=0,ma=0,x;
 	UINT8 cols = BIT(state->m_mode, 0) ? 32 : 64;
@@ -505,7 +505,7 @@ SCREEN_UPDATE( meritum )
 	if (state->m_mode != state->m_size_store)
 	{
 		state->m_size_store = state->m_mode & 1;
-		screen->set_visible_area(0, cols*6-1, 0, 16*12-1);
+		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
 	for (y = 0; y < 16; y++)

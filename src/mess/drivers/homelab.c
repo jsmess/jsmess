@@ -182,7 +182,7 @@ VIDEO_START_MEMBER( homelab_state )
 
 static SCREEN_UPDATE( homelab )
 {
-	homelab_state *state = screen->machine().driver_data<homelab_state>();
+	homelab_state *state = screen.machine().driver_data<homelab_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 
@@ -215,7 +215,7 @@ static SCREEN_UPDATE( homelab )
 
 static SCREEN_UPDATE( homelab3 )
 {
-	homelab_state *state = screen->machine().driver_data<homelab_state>();
+	homelab_state *state = screen.machine().driver_data<homelab_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 

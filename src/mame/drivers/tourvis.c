@@ -8,6 +8,30 @@
     and the other as an integrated PCB.
 
     Todo: complete jamma interface emulation.
+
+	By now, three known BIOS versions, U4-52 (dumped from a board with-subboard PCB), 
+	U4-55 (dumped from an integrated PCB) and U4-60 (dumped from a board with-subboard PCB). 
+
+	Known games:
+
+    Special Criminal Investigation
+    Power League IV
+    Final Match Tennis
+    Formation Soccer
+    Super Volleay Ball
+    Rastan Saga II
+    Dungeon Explorer
+    Legendary Axe
+    Thunder Blade
+    USA Pro Basketball
+    Out Run
+    After Burner
+    Final Lap
+    Columns
+    Power Sports
+	Saigo no Nindou
+	Son Son II
+
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
 |                                           ____________               ____________               ____________               ____________       |
@@ -75,147 +99,7 @@ BT1   = 3.6 V battery
 XT2   = 21.32825 MHz UNI 90-H
 JP1-4 = Carts slots
 
-****************************************************************************/
-
-#include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "machine/pcecommn.h"
-#include "video/vdc.h"
-#include "cpu/h6280/h6280.h"
-#include "sound/c6280.h"
-#include "machine/i8155.h"
-
-
-class tourvision_state : public driver_device
-{
-public:
-	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-};
-
-
-static INPUT_PORTS_START( tourvision )
-    PORT_START( "JOY" )
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* select */
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-INPUT_PORTS_END
-
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
-	AM_RANGE( 0x000000, 0x07FFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( "c6280", c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pce_io , AS_IO, 8)
-	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
-ADDRESS_MAP_END
-
-static WRITE8_HANDLER( tourvision_8085_d000_w )
-{
-	//logerror( "D000 (8085) write %02x\n", data );
-}
-
-static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x80ff) AM_DEVREADWRITE_MODERN("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x8100, 0x8107) AM_DEVREADWRITE_MODERN("i8155", i8155_device, io_r, io_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE( tourvision_8085_d000_w )
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM
-ADDRESS_MAP_END
-
-static WRITE8_DEVICE_HANDLER(tourvision_i8155_a_w)
-{
-	//logerror("i8155 Port A: %02X\n", data);
-}
-
-static WRITE8_DEVICE_HANDLER(tourvision_i8155_b_w)
-{
-	//logerror("i8155 Port B: %02X\n", data);
-}
-
-static WRITE8_DEVICE_HANDLER(tourvision_i8155_c_w)
-{
-	//logerror("i8155 Port C: %02X\n", data);
-}
-
-static WRITE_LINE_DEVICE_HANDLER(tourvision_timer_out)
-{
-	cputag_set_input_line(device->machine(), "sub", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
-	//logerror("Timer out %d\n", state);
-}
-
-static I8155_INTERFACE(i8155_intf)
-{
-	DEVCB_NULL,
-	DEVCB_HANDLER(tourvision_i8155_a_w),
-	DEVCB_NULL,
-	DEVCB_HANDLER(tourvision_i8155_b_w),
-	DEVCB_NULL,
-	DEVCB_HANDLER(tourvision_i8155_c_w),
-	DEVCB_LINE(tourvision_timer_out)
-};
-
-static const c6280_interface c6280_config =
-{
-	"maincpu"
-};
-
-static MACHINE_CONFIG_START( tourvision, tourvision_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem)
-	MCFG_CPU_IO_MAP(pce_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "screen", 0, 1)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_CPU_ADD("sub", I8085A, 18000000/3 /*?*/)
-	MCFG_CPU_PROGRAM_MAP(tourvision_8085_map)
-
-    /* video hardware */
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
-	MCFG_SCREEN_UPDATE( pce )
-
-	/* MCFG_GFXDECODE( pce_gfxdecodeinfo ) */
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT( vce )
-
-	MCFG_VIDEO_START( pce )
-
-	MCFG_I8155_ADD("i8155", 1000000 /*?*/, i8155_intf)
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-	MCFG_SOUND_CONFIG(c6280_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-
-MACHINE_CONFIG_END
-
-/*
-Taito Scene Crime Investigation (SCI) Tourvision cart.
-
-Notes:
- -1st and 2nd halfs are identical, left unsplit for reference.
- -Cart's A19 line seems not connected to anything.
- -CRC of split ROM ("09a0bfcc") matches the common English language PC Engine Hu-Card ROM dump.
-
-Dumped directly from the cartridge edge connector using the following adapter:
+Games are dumped directly from the cartridge edge connector using the following adapter:
 
  ----------------------------------------------------------------------------
  Cartridge pinout
@@ -270,15 +154,237 @@ Dumped directly from the cartridge edge connector using the following adapter:
                      D2 |15     18| D4
                     GND |16     17| D3
                         +---------+
+
+****************************************************************************/
+
+#include "emu.h"
+#include "cpu/i8085/i8085.h"
+#include "machine/pcecommn.h"
+#include "video/vdc.h"
+#include "cpu/h6280/h6280.h"
+#include "sound/c6280.h"
+#include "machine/i8155.h"
+
+
+class tourvision_state : public driver_device
+{
+public:
+	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
+
+};
+
+
+static INPUT_PORTS_START( tourvision )
+    PORT_START( "JOY" )
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* select */
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
+	AM_RANGE( 0x000000, 0x0FFFFF) AM_ROM
+	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
+	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
+	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( "c6280", c6280_r, c6280_w )
+	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
+	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pce_io , AS_IO, 8)
+	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
+ADDRESS_MAP_END
+
+static WRITE8_HANDLER( tourvision_8085_d000_w )
+{
+	//logerror( "D000 (8085) write %02x\n", data );
+}
+
+static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x80ff) AM_DEVREADWRITE_MODERN("i8155", i8155_device, memory_r, memory_w)
+	AM_RANGE(0x8100, 0x8107) AM_DEVREADWRITE_MODERN("i8155", i8155_device, io_r, io_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE( tourvision_8085_d000_w )
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM
+ADDRESS_MAP_END
+
+static WRITE8_DEVICE_HANDLER(tourvision_i8155_a_w)
+{
+	//logerror("i8155 Port A: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(tourvision_i8155_b_w)
+{
+	//logerror("i8155 Port B: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(tourvision_i8155_c_w)
+{
+	//logerror("i8155 Port C: %02X\n", data);
+}
+
+static WRITE_LINE_DEVICE_HANDLER(tourvision_timer_out)
+{
+	cputag_set_input_line(device->machine(), "subcpu", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	//logerror("Timer out %d\n", state);
+}
+
+static I8155_INTERFACE(i8155_intf)
+{
+	DEVCB_NULL,
+	DEVCB_HANDLER(tourvision_i8155_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(tourvision_i8155_b_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(tourvision_i8155_c_w),
+	DEVCB_LINE(tourvision_timer_out)
+};
+
+static const c6280_interface c6280_config =
+{
+	"maincpu"
+};
+
+static MACHINE_CONFIG_START( tourvision, tourvision_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
+	MCFG_CPU_PROGRAM_MAP(pce_mem)
+	MCFG_CPU_IO_MAP(pce_io)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "screen", 0, 1)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_CPU_ADD("subcpu", I8085A, 18000000/3 /*?*/)
+	MCFG_CPU_PROGRAM_MAP(tourvision_8085_map)
+
+    /* video hardware */
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
+	MCFG_SCREEN_UPDATE( pce )
+
+	/* MCFG_GFXDECODE( pce_gfxdecodeinfo ) */
+	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_INIT( vce )
+
+	MCFG_VIDEO_START( pce )
+
+	MCFG_I8155_ADD("i8155", 1000000 /*?*/, i8155_intf)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
+	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+
+MACHINE_CONFIG_END
+
+#define TOURVISION_BIOS \
+	ROM_REGION( 0x8000, "subcpu", 0 ) \
+	ROM_SYSTEM_BIOS( 0, "60", "U4-60" ) \
+	ROMX_LOAD( "u4-60_am27c256.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(1) ) \
+	ROM_SYSTEM_BIOS( 1, "55", "U4-55" ) \
+	ROMX_LOAD( "u4-55_am27c256.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
+	ROM_SYSTEM_BIOS( 2, "52", "U4-52" ) \
+	ROMX_LOAD( "bios.29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) )
+	
+
+ROM_START(tourvis)
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+/*
+Aicom USA Pro Basketball Tourvision cart.
+
+Notes:
+ -4 identical 256KB parts, left unsplit for reference.
+ -Cart's A19 and A18 lines seems not connected to anything.
+ -CRC of split ROM ("1CAD4B7F") matches the common PC Engine Hu-Card ROM dump.
+*/
+
+
+ROM_START(tvusapb)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_usaprobasketball.bin", 0x00000, 0x100000, CRC(f9a86270) SHA1(45f33fd80a0fa16a9271d258d8e827c3d5e8c98d) )
+
+	TOURVISION_BIOS
+ROM_END
+
+/*
+Sega Thunder Blade Tourvision cart.
+
+Notes:
+ -1st and 2nd halfs are identical, left unsplit for reference.
+ -Cart's A19 line seems not connected to anything.
+ -CRC of split ROM ("DDC3E809") matches the common PC Engine Hu-Card ROM dump.
+*/
+
+ROM_START(tvthbld)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_thunderblade.bin", 0x00000, 0x100000, CRC(0b93b85b) SHA1(b7d9fc2f46f95d305aa24326eded13abbe93738c) )
+
+	TOURVISION_BIOS
+ROM_END
+
+/*
+Taito Rastan Saga II Tourvision cart.
+
+Notes:
+ -Cart's A18 line seems not connected to anything.
+
+*/
+
+ROM_START(tvrs2)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_rastansagaii.bin", 0x00000, 0x100000, CRC(cfe4c2f1) SHA1(1e39276b7d4bdb49421cc1102ad2fbba946127da) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+/*
+Hudson Power League IV Tourvision cart.
+
+Notes:
+ -1st and 2nd halfs are identical, left unsplit for reference.
+ -Cart's A19 line seems not connected to anything.
+ -CRC of split ROM ("30cc3563") matches the common PC Engine Hu-Card ROM dump.
+*/
+
+ROM_START(tvpwlg4)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_powerleague4.bin", 0x00000, 0x100000, CRC(0a6e65f8) SHA1(88adf3f5b9a6d139f216bdb73abf8606bb8e5b16) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+/*
+Taito Scene Crime Investigation (SCI) Tourvision cart.
+
+Notes:
+ -1st and 2nd halfs are identical, left unsplit for reference.
+ -Cart's A19 line seems not connected to anything.
+ -CRC of split ROM ("09a0bfcc") matches the common English language PC Engine Hu-Card ROM dump.
+
 */
 
 ROM_START(scitvpce)
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "tourv_sci.bin", 0x00000, 0x80000, CRC(4baac6d8) SHA1(4c2431d9553e2bd952cf816e78fc1e3387376ef4) )
-	ROM_CONTINUE(0x00000, 0x80000)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_sci.bin", 0x00000, 0x100000, CRC(4baac6d8) SHA1(4c2431d9553e2bd952cf816e78fc1e3387376ef4) )
 
-	ROM_REGION( 0x8000, "sub", 0 )
-	ROM_LOAD( "tourvision.bin", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f) )
+	TOURVISION_BIOS
 ROM_END
 
 static DRIVER_INIT(tourvision)
@@ -286,4 +392,9 @@ static DRIVER_INIT(tourvision)
 	DRIVER_INIT_CALL(pce);
 }
 
-GAME( 1991, scitvpce, 0, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
+GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Aicom", "USA Pro Basketball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Rastan Saga II (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, scitvpce, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

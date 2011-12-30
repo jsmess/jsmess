@@ -1039,9 +1039,9 @@ SCREEN_EOF ( thom )
 	int fnew, fold = FLOP_STATE;
 	int i;
 	UINT16 b = 0;
-	struct thom_vsignal l = thom_get_lightpen_vsignal( machine, 0, -1, 0 );
+	struct thom_vsignal l = thom_get_lightpen_vsignal( screen.machine(), 0, -1, 0 );
 
-	LOG (( "%f thom: video eof called\n", machine.time().as_double() ));
+	LOG (( "%f thom: video eof called\n", screen.machine().time().as_double() ));
 
 	/* floppy indicator count */
 	if ( thom_floppy_wcount )
@@ -1082,7 +1082,7 @@ SCREEN_EOF ( thom )
 	thom_video_timer->adjust(attotime::zero);
 
 	/* update screen size according to user options */
-	if ( thom_update_screen_size( machine ) )
+	if ( thom_update_screen_size( screen.machine() ) )
 		thom_vstate_dirty = 1;
 
 	/* hi-res automatic */

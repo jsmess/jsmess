@@ -923,7 +923,7 @@ static MACHINE_RESET( pockstat )
 
 static SCREEN_UPDATE( pockstat )
 {
-	pockstat_state *state = screen->machine().driver_data<pockstat_state>();
+	pockstat_state *state = screen.machine().driver_data<pockstat_state>();
 	int x = 0;
 	int y = 0;
 	for(y = 0; y < 32; y++)

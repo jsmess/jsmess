@@ -123,12 +123,12 @@ VIDEO_START( galaxy )
 
 SCREEN_UPDATE( galaxy )
 {
-	galaxy_state *state = screen->machine().driver_data<galaxy_state>();
+	galaxy_state *state = screen.machine().driver_data<galaxy_state>();
 	state->m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 	if (state->m_interrupts_enabled == FALSE)
 	{
 		static const rectangle black_area = {0, 384 - 1, 0, 208 - 1};
-		bitmap_fill(screen->machine().generic.tmpbitmap, &black_area, 0);
+		bitmap_fill(screen.machine().generic.tmpbitmap, &black_area, 0);
 	}
 	state->m_interrupts_enabled = FALSE;
 	return SCREEN_UPDATE_CALL ( generic_bitmapped );

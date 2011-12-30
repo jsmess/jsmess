@@ -595,7 +595,7 @@ MACHINE_RESET( ti99_8 )
 
 static SCREEN_UPDATE( ti99_8 )
 {
-	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( TMS9928A_TAG );
+	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( TMS9928A_TAG );
 
 	tms9928a->update( bitmap, cliprect );
 	return 0;

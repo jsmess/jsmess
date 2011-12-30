@@ -250,7 +250,7 @@ static VIDEO_START( unior )
 
 static SCREEN_UPDATE( unior )
 {
-	unior_state *state = screen->machine().driver_data<unior_state>();
+	unior_state *state = screen.machine().driver_data<unior_state>();
 	UINT8 y,ra,gfx;
 	UINT16 sy=0,ma=0,x,chr;
 	UINT8 *videoram;

@@ -121,7 +121,7 @@ static VIDEO_START( fp1100 )
 
 static SCREEN_UPDATE( fp1100 )
 {
-	fp1100_state *state = screen->machine().driver_data<fp1100_state>();
+	fp1100_state *state = screen.machine().driver_data<fp1100_state>();
 	state->m_crtc->update( bitmap, cliprect);
 	return 0;
 }

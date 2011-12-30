@@ -338,7 +338,7 @@ static PALETTE_INIT( p500 )
 
 static SCREEN_UPDATE( p500 )
 {
-	device_t *vic2 = screen->machine().device("vic6567");
+	device_t *vic2 = screen.machine().device("vic6567");
 
 	vic2_video_update(vic2, bitmap, cliprect);
 	return 0;

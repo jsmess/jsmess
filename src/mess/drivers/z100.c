@@ -229,7 +229,7 @@ static VIDEO_START( z100 )
 
 static SCREEN_UPDATE( z100 )
 {
-	z100_state *state = screen->machine().driver_data<z100_state>();
+	z100_state *state = screen.machine().driver_data<z100_state>();
 	int x,y,xi,yi;
 	int dot;
 	int i;
@@ -259,7 +259,7 @@ static SCREEN_UPDATE( z100 )
 						dot = state->m_display_mask;
 
 					if(y*mc6845_tile_height+yi < 216 && x*8+xi < 640) /* TODO: safety check */
-						*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[dot];
+						*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[dot];
 				}
 			}
 		}

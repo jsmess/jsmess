@@ -78,7 +78,7 @@ static VIDEO_START( pasopia )
 
 static SCREEN_UPDATE( pasopia )
 {
-	pasopia_state *state = screen->machine().driver_data<pasopia_state>();
+	pasopia_state *state = screen.machine().driver_data<pasopia_state>();
 	state->m_crtc->update(bitmap, cliprect);
 	return 0;
 }

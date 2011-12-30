@@ -171,7 +171,7 @@ static MACHINE_RESET( bbcbc )
 
 static SCREEN_UPDATE( bbcbc )
 {
-	tms9928a_device *tms9129 = screen->machine().device<tms9928a_device>( "tms9129" );
+	tms9928a_device *tms9129 = screen.machine().device<tms9928a_device>( "tms9129" );
 
 	tms9129->update( bitmap, cliprect );
 	return 0;

@@ -548,7 +548,7 @@ INLINE void draw_block_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 col )
 
 static SCREEN_UPDATE( scv )
 {
-	scv_state *state = screen->machine().driver_data<scv_state>();
+	scv_state *state = screen.machine().driver_data<scv_state>();
 	int x, y;
 	UINT8 fg = state->m_p_videoram[0x1403] >> 4;
 	UINT8 bg = state->m_p_videoram[0x1403] & 0x0f;
@@ -583,7 +583,7 @@ static SCREEN_UPDATE( scv )
 			if ( text_x && text_y )
 			{
 				/* Text mode */
-				UINT8 *char_data = screen->machine().region( "charrom" )->base() + ( d & 0x7f ) * 8;
+				UINT8 *char_data = screen.machine().region( "charrom" )->base() + ( d & 0x7f ) * 8;
 				draw_text( bitmap, x * 8, y * 16, char_data, fg, bg );
 			}
 			else

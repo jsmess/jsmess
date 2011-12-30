@@ -158,13 +158,13 @@ static SCREEN_UPDATE( specpdq )
 {
 	UINT32 *scanline;
 	int x, y;
-	nubus_specpdq_device *card = downcast<nubus_specpdq_device *>(screen->owner());
+	nubus_specpdq_device *card = downcast<nubus_specpdq_device *>(screen.owner());
 	UINT8 pixels, *vram;
 
 	// first time?  kick off the VBL timer
 	if (!card->m_screen)
 	{
-		card->m_screen = screen;
+		card->m_screen = &screen;
 		card->m_timer->adjust(card->m_screen->time_until_pos(843, 0), 0);
 	}
 	vram = card->m_vram + 0x9000;

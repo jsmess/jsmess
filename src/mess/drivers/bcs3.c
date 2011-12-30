@@ -221,7 +221,7 @@ VIDEO_START_MEMBER( bcs3_state )
 
 static SCREEN_UPDATE( bcs3 )
 {
-	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
+	bcs3_state *state = screen.machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0,x;
 
@@ -264,7 +264,7 @@ static SCREEN_UPDATE( bcs3 )
     with the cursor always in sight. */
 static SCREEN_UPDATE( bcs3a )
 {
-	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
+	bcs3_state *state = screen.machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
 	UINT16 cursor = (state->m_p_videoram[0x7a] | (state->m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
@@ -308,7 +308,7 @@ static SCREEN_UPDATE( bcs3a )
 
 static SCREEN_UPDATE( bcs3b )
 {
-	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
+	bcs3_state *state = screen.machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=128,x;
 	UINT16 cursor = (state->m_p_videoram[0x7a] | (state->m_p_videoram[0x7b] << 8)) - 0x3c80;	// get cursor relative position
@@ -352,7 +352,7 @@ static SCREEN_UPDATE( bcs3b )
 
 static SCREEN_UPDATE( bcs3c )
 {
-	bcs3_state *state = screen->machine().driver_data<bcs3_state>();
+	bcs3_state *state = screen.machine().driver_data<bcs3_state>();
 	UINT8 y,ra,chr,gfx,rat;
 	UINT16 sy=0,ma=0xb4,x;
 	UINT16 cursor = (state->m_p_videoram[0x08] | (state->m_p_videoram[0x09] << 8)) - 0x3c80;	// get cursor relative position

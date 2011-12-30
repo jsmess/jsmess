@@ -55,10 +55,10 @@ class x1twin_state : public x1_state
 
 static SCREEN_UPDATE( x1twin )
 {
-	device_t *left_screen  = screen->machine().device("x1_screen");
-	//device_t *right_screen = screen->machine().device("pce_screen");
+	device_t *left_screen  = screen.machine().device("x1_screen");
+	//device_t *right_screen = screen.machine().device("pce_screen");
 
-	if (screen==left_screen)
+	if (&screen==left_screen)
 		SCREEN_UPDATE_CALL( x1 );
 
 	return 0;

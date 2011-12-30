@@ -452,13 +452,13 @@ VIDEO_START( apple2e )
 
 SCREEN_UPDATE( apple2 )
 {
-	apple2_state *state = screen->machine().driver_data<apple2_state>();
+	apple2_state *state = screen.machine().driver_data<apple2_state>();
 	int page;
 	UINT32 new_a2;
-	running_machine &machine = screen->machine();
+	running_machine &machine = screen.machine();
 
 	/* calculate the state->m_flash value */
-	state->m_flash = ((screen->machine().time() * 4).seconds & 1) ? 1 : 0;
+	state->m_flash = ((screen.machine().time() * 4).seconds & 1) ? 1 : 0;
 
 	/* read out relevant softswitch variables; to see what has changed */
 	new_a2 = effective_a2(state);

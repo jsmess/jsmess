@@ -625,7 +625,7 @@ void ngp_state::machine_reset()
 
 static SCREEN_UPDATE( ngp )
 {
-	ngp_state *state = screen->machine().driver_data<ngp_state>();
+	ngp_state *state = screen.machine().driver_data<ngp_state>();
 
 	k1ge_update( state->m_k1ge, bitmap, cliprect );
 	return 0;

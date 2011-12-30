@@ -366,33 +366,33 @@ static void apple3_video_graphics_chires(running_machine &machine,bitmap_t *bitm
 
 SCREEN_UPDATE( apple3 )
 {
-	apple3_state *state = screen->machine().driver_data<apple3_state>();
+	apple3_state *state = screen.machine().driver_data<apple3_state>();
 	switch(state->m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{
 		case 0:
 		case VAR_VM0:
-			apple3_video_text40(screen->machine(),bitmap);
+			apple3_video_text40(screen.machine(),bitmap);
 			break;
 
 		case VAR_VM1:
 		case VAR_VM1|VAR_VM0:
-			apple3_video_text80(screen->machine(),bitmap);
+			apple3_video_text80(screen.machine(),bitmap);
 			break;
 
 		case VAR_VM3:
-			apple3_video_graphics_hgr(screen->machine(),bitmap);	/* hgr mode */
+			apple3_video_graphics_hgr(screen.machine(),bitmap);	/* hgr mode */
 			break;
 
 		case VAR_VM3|VAR_VM0:
-			apple3_video_graphics_chgr(screen->machine(),bitmap);
+			apple3_video_graphics_chgr(screen.machine(),bitmap);
 			break;
 
 		case VAR_VM3|VAR_VM1:
-			apple3_video_graphics_shgr(screen->machine(),bitmap);
+			apple3_video_graphics_shgr(screen.machine(),bitmap);
 			break;
 
 		case VAR_VM3|VAR_VM1|VAR_VM0:
-			apple3_video_graphics_chires(screen->machine(),bitmap);
+			apple3_video_graphics_chires(screen.machine(),bitmap);
 			break;
 	}
 	return 0;

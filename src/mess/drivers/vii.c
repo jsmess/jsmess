@@ -403,7 +403,7 @@ static void vii_blit_sprites(running_machine &machine, bitmap_t *bitmap, const r
 
 static SCREEN_UPDATE( vii )
 {
-	vii_state *state = screen->machine().driver_data<vii_state>();
+	vii_state *state = screen.machine().driver_data<vii_state>();
 	int i, x, y;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -412,9 +412,9 @@ static SCREEN_UPDATE( vii )
 
 	for(i = 0; i < 4; i++)
 	{
-		vii_blit_page(screen->machine(), bitmap, cliprect, i, 0x40 * state->m_video_regs[0x20], state->m_video_regs + 0x10);
-		vii_blit_page(screen->machine(), bitmap, cliprect, i, 0x40 * state->m_video_regs[0x21], state->m_video_regs + 0x16);
-		vii_blit_sprites(screen->machine(), bitmap, cliprect, i);
+		vii_blit_page(screen.machine(), bitmap, cliprect, i, 0x40 * state->m_video_regs[0x20], state->m_video_regs + 0x10);
+		vii_blit_page(screen.machine(), bitmap, cliprect, i, 0x40 * state->m_video_regs[0x21], state->m_video_regs + 0x16);
+		vii_blit_sprites(screen.machine(), bitmap, cliprect, i);
 	}
 
 	for(y = 0; y < 240; y++)

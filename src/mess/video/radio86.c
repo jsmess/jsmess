@@ -95,7 +95,7 @@ I8275_DISPLAY_PIXELS(partner_display_pixels)
 
 SCREEN_UPDATE( radio86 )
 {
-	device_t *devconf = screen->machine().device("i8275");
+	device_t *devconf = screen.machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
 	SCREEN_UPDATE_CALL ( generic_bitmapped );
 	return 0;

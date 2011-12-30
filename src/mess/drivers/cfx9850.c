@@ -195,7 +195,7 @@ static PALETTE_INIT( cfx9850 )
 
 static SCREEN_UPDATE( cfx9850 )
 {
-	cfx9850_state *state = screen->machine().driver_data<cfx9850_state>();
+	cfx9850_state *state = screen.machine().driver_data<cfx9850_state>();
 	UINT16 offset = 0;
 
 	for ( int i = 0; i < 16; i++ )

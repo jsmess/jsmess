@@ -393,14 +393,14 @@ VIDEO_START( svi328_806 )
 
 SCREEN_UPDATE( svi328_806 )
 {
-	if (!strcmp(screen->tag(), "svi806"))
+	if (!strcmp(screen.tag(), "svi806"))
 	{
-		mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+		mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
 		mc6845->update(bitmap, cliprect);
 	}
 	else
 	{
-		fatalerror("Unknown screen '%s'", screen->tag());
+		fatalerror("Unknown screen '%s'", screen.tag());
 	}
 	return 0;
 }

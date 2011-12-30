@@ -565,13 +565,13 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_t *bitmap,const rect
 
 SCREEN_UPDATE( x1 )
 {
-	x1_state *state = screen->machine().driver_data<x1_state>();
+	x1_state *state = screen.machine().driver_data<x1_state>();
 
 	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
-	draw_gfxbitmap(screen->machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri);
-	draw_fgtilemap(screen->machine(),bitmap,cliprect);
-	draw_gfxbitmap(screen->machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri^0xff);
+	draw_gfxbitmap(screen.machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri);
+	draw_fgtilemap(screen.machine(),bitmap,cliprect);
+	draw_gfxbitmap(screen.machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri^0xff);
 
 	return 0;
 }

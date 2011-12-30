@@ -663,7 +663,7 @@ READ8_HANDLER(arcadia_vsync_r)
 
 SCREEN_UPDATE( arcadia )
 {
-	arcadia_state *state = screen->machine().driver_data<arcadia_state>();
+	arcadia_state *state = screen.machine().driver_data<arcadia_state>();
 	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

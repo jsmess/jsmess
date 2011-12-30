@@ -17,10 +17,10 @@ VIDEO_START( llc1 )
 
 SCREEN_UPDATE( llc1 )
 {
-	llc_state *state = screen->machine().driver_data<llc_state>();
+	llc_state *state = screen.machine().driver_data<llc_state>();
 	UINT8 code,disp;
 	int y, x, b,c,inv;
-	UINT8 *gfx = screen->machine().region("gfx1")->base();
+	UINT8 *gfx = screen.machine().region("gfx1")->base();
 
 	for (x = 0; x < 64; x++)
 	{
@@ -49,10 +49,10 @@ VIDEO_START( llc2 )
 
 SCREEN_UPDATE( llc2 )
 {
-	llc_state *state = screen->machine().driver_data<llc_state>();
+	llc_state *state = screen.machine().driver_data<llc_state>();
 	UINT8 code,disp;
 	int y, x, b,c;
-	UINT8 *gfx = screen->machine().region("gfx1")->base();
+	UINT8 *gfx = screen.machine().region("gfx1")->base();
 
 	for (x = 0; x < 64; x++)
 	{
