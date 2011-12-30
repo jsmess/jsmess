@@ -114,7 +114,7 @@ NAND Flash Controller (4KB internal buffer)
 static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22 };
 
 
-static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
+static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	UINT32 data = state->m_bballoon_port[port];
@@ -135,7 +135,7 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 	return data;
 }
 
-static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
+static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data, UINT32 mask)
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
 	UINT32 old_value = state->m_bballoon_port[port];
@@ -391,6 +391,8 @@ static NAND_INTERFACE( bballoon_nand_intf )
 
 static const s3c2410_interface bballoon_s3c2410_intf =
 {
+	// CORE (pin read / pin write)
+	{ NULL, NULL },
 	// GPIO (port read / port write)
 	{ s3c2410_gpio_port_r, s3c2410_gpio_port_w },
 	// I2C (scl write / sda read / sda write)
@@ -400,7 +402,9 @@ static const s3c2410_interface bballoon_s3c2410_intf =
 	// I2S (data write)
 	{ NULL },
 	// NAND (command write, address write, data read, data write)
-	{ s3c2410_nand_command_w, s3c2410_nand_address_w, s3c2410_nand_data_r, s3c2410_nand_data_w }
+	{ s3c2410_nand_command_w, s3c2410_nand_address_w, s3c2410_nand_data_r, s3c2410_nand_data_w },
+	// LCD (flags)
+	{ 0 }	
 };
 
 static const i2cmem_interface i2cmem_interface =
