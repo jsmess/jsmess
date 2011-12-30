@@ -597,7 +597,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 		case 2:		/* VDP register write */
 			reg_num = data & 0x0f;
 			m_reg[reg_num] = m_addr & 0xff;
-			logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xf );
+			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xf );
 			if ( reg_num == 0 && ( m_addr & 0x02 ) )
 				logerror("overscan enabled.\n");
 
