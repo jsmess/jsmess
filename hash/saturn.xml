@@ -12847,7 +12847,7 @@
 
   <!-- Identifying Cross Romance - Ai to Maajan to Hanafuda to (T-7103G)... -->
   <software name="crossrom" supported="no">
-    <description>Cross Romance - Ai to Maajan to Hanafuda to (T-7103G)</description>
+    <description>Cross Romance - Ai to Mahjong to Hanafuda to (T-7103G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -14763,7 +14763,7 @@
   <!-- Identifying Idol Maajan Final Romance R Premium Package Disc 1 (T-16705G-01)... -->
   <!-- Identifying Idol Maajan Final Romance R Premium Package Disc 2 (T-16705G)... -->
   <software name="fromancr" supported="no">
-    <description>Idol Maajan Final Romance R Premium Package (T-16705G-01)</description>
+    <description>Idol Mahjong Final Romance R Premium Package (T-16705G-01)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -15966,7 +15966,7 @@
 
   <!-- Identifying Real Maajan Adventure Umi-He ~Summer Waltz~ P's Club Genteiban (T-16512G)... -->
   <software name="mjadventcg" cloneof="mjadvent" supported="no">
-    <description>Real Maajan Adventure Umi-He ~Summer Waltz~ P's Club Genteiban (T-16512G)</description>
+    <description>Real Mahjong Adventure Umi-He ~Summer Waltz~ P's Club Genteiban (T-16512G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -16754,7 +16754,7 @@
 
   <!-- Identifying Super Real Maajan P7 (T-16509G)... -->
   <software name="srmp7" supported="no">
-    <description>Super Real Maajan P7 (T-16509G)</description>
+    <description>Super Real Mahjong P7 (T-16509G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -18966,7 +18966,7 @@
 
   <!-- Identifying Honkaku 4Jin Uchi Geinoujin Taikyoku Maajan - The Wareme DE Pon (T-3001G)... -->
   <software name="waremepo" supported="no">
-    <description>Honkaku 4Jin Uchi Geinoujin Taikyoku Maajan - The Wareme DE Pon (T-3001G)</description>
+    <description>Honkaku 4Jin Uchi Geinoujin Taikyoku Mahjong - The Wareme DE Pon (T-3001G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -18980,7 +18980,7 @@
   <!-- Identifying Honkaku Pro Maajan Tetsuman Special (J) (T-18709G)... -->
   <!-- Identifying Honkaku Pro Maajan Tetsuman Special (Satakore) (T-18716G)... -->
   <software name="honkprom" supported="no">
-    <description>Honkaku Pro Maajan Tetsuman Special (Jpn) (T-18709G)</description>
+    <description>Honkaku Pro Mahjong Tetsuman Special (Jpn) (T-18709G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19020,7 +19020,7 @@
 
   <!-- Identifying Ide Yousuke Meijin No Shin Jissen Maajan (T-1208G)... -->
   <software name="ideyousu" supported="no">
-    <description>Ide Yousuke Meijin No Shin Jissen Maajan (T-1208G)</description>
+    <description>Ide Yousuke Meijin No Shin Jissen Mahjong (T-1208G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19112,7 +19112,7 @@
 
   <!-- Identifying Idol Maajan Final Romance 4 (T-3003G)... -->
   <software name="fromanc4"  supported="no">
-    <description>Idol Maajan Final Romance 4 (T-3003G)</description>
+    <description>Idol Mahjong Final Romance 4 (T-3003G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19125,7 +19125,7 @@
 
   <!-- Identifying Idol Maajan Final Romance R Audio Disc (T-16703G)... -->
   <software name="fromancra" cloneof="fromancr" supported="no">
-    <description>Idol Maajan Final Romance R Audio Disc (T-16703G)</description>
+    <description>Idol Mahjong Final Romance R Audio Disc (T-16703G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19205,7 +19205,7 @@
 
   <!-- Identifying Jissen Maajan (T-15002G)... -->
   <software name="jissenmj" supported="no">
-    <description>Jissen Maajan (T-15002G)</description>
+    <description>Jissen Mahjong (T-15002G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19412,7 +19412,7 @@
 
   <!-- Identifying Kurubushi Kyoudai Gekijou Daiikkan Maajan Hen (T-21803G)... -->
   <software name="kurubush" supported="no">
-    <description>Kurubushi Kyoudai Gekijou Daiikkan Maajan Hen (T-21803G)</description>
+    <description>Kurubushi Kyoudai Gekijou Daiikkan Mahjong Hen (T-21803G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19590,7 +19590,7 @@
   <!-- Identifying Maajan Doukyuusei Special (Genteiban) Disc 1 (T-25302G)... -->
   <!-- Identifying Maajan Doukyuusei Special (Genteiban) Disc 2 (T-25302G)... -->
   <software name="mjdoukspgen" cloneof="mjdouksp" supported="no">
-    <description>Maajan Doukyuusei Special (Genteiban) (T-25302G)</description>
+    <description>Mahjong Doukyuusei Special (Genteiban) (T-25302G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19608,7 +19608,7 @@
 
   <!-- Identifying Maajan Doukyuusei Special (J) (T-25301G)... -->
   <software name="mjdouksp" supported="no">
-    <description>Maajan Doukyuusei Special (Jpn) (T-25301G)</description>
+    <description>Mahjong Doukyuusei Special (Jpn) (T-25301G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19622,7 +19622,7 @@
   <!-- Identifying Maajan Gakuensai (Genteiban) Disc 1 (J) (T-25305G)... -->
   <!-- Identifying Maajan Gakuensai (Genteiban) Disc 2 (J) (T-25305G)... -->
   <software name="mjgakugen" cloneof="mjgaku" supported="no">
-    <description>Maajan Gakuensai (Genteiban) (Jpn) (T-25305G)</description>
+    <description>Mahjong Gakuensai (Genteiban) (Jpn) (T-25305G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19641,7 +19641,7 @@
 
   <!-- Identifying Maajan Gakuensai (T-25304G)... -->
   <software name="mjgaku" supported="no">
-    <description>Maajan Gakuensai (T-25304G)</description>
+    <description>Mahjong Gakuensai (T-25304G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19654,7 +19654,7 @@
 
   <!-- Identifying Maajan Gakuensai DX - Zenjitsu ni Matsuwaru Funsenki (T-25306G)... -->
   <software name="mjgakudx" supported="no">
-    <description>Maajan Gakuensai DX - Zenjitsu ni Matsuwaru Funsenki (T-25306G)</description>
+    <description>Mahjong Gakuensai DX - Zenjitsu ni Matsuwaru Funsenki (T-25306G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19667,7 +19667,7 @@
 
   <!-- Identifying Maajan Ganryuujima (T-2101G)... -->
   <software name="mjganryu" supported="no">
-    <description>Maajan Ganryuujima (T-2101G)</description>
+    <description>Mahjong Ganryuujima (T-2101G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19680,7 +19680,7 @@
 
   <!-- Identifying Maajan Gokuu Tenjiku (T-10601G)... -->
   <software name="mjgokuua" cloneof="mjgokuu" supported="no">
-    <description>Maajan Gokuu Tenjiku (T-10601G)</description>
+    <description>Mahjong Gokuu Tenjiku (T-10601G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19693,7 +19693,7 @@
 
   <!-- Identifying Maajan Hyper Reaction R (T-2402G)... -->
   <software name="mjhyperr" supported="no">
-    <description>Maajan Hyper Reaction R (T-2402G)</description>
+    <description>Mahjong Hyper Reaction R (T-2402G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19706,7 +19706,7 @@
 
   <!-- Identifying Maajan Kaigan Monogatari - Maajankyou Jidai Sexy Idol Hen (T-2201G)... -->
   <software name="mjkaigan" supported="no">
-    <description>Maajan Kaigan Monogatari - Maajankyou Jidai Sexy Idol Hen (T-2201G)</description>
+    <description>Mahjong Kaigan Monogatari - Mahjong Kyou Jidai Sexy Idol Hen (T-2201G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19719,7 +19719,7 @@
 
   <!-- Identifying Maajan Taikai II Special (T-7621G)... -->
   <software name="mjtai2s" supported="no">
-    <description>Maajan Taikai II Special (T-7621G)</description>
+    <description>Mahjong Taikai II Special (T-7621G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19732,7 +19732,7 @@
 
   <!-- Identifying Maajan Tenshi Angel Lips (T-27001G)... -->
   <software name="mjangel" supported="no">
-    <description>Maajan Tenshi Angel Lips (T-27001G)</description>
+    <description>Mahjong Tenshi Angel Lips (T-27001G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19745,7 +19745,7 @@
 
   <!-- Identifying Maajan Yon Shimai (J) (T-18704G)... -->
   <software name="mjshimai" supported="no">
-    <description>Maajan Yon Shimai (Jpn) (T-18704G)</description>
+    <description>Mahjong Yon Shimai (Jpn) (T-18704G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19759,7 +19759,7 @@
   <!-- Identifying Maajankyou Jidai Cebu Island 96 Disc 1 (J) (T-2204G)... -->
   <!-- Identifying Maajankyou Jidai Cebu Island 96 Disc 2 (J) (T-2204G)... -->
   <software name="mjcebu96a" cloneof="mjcebu96" supported="no">
-    <description>Maajankyou Jidai Cebu Island 96 (Jpn) (T-2204G)</description>
+    <description>Mahjong Kyou Jidai Cebu Island 96 (Jpn) (T-2204G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -19778,7 +19778,7 @@
 
   <!-- Identifying Maajankyou Jidai Cogal Houkago Hen (J) (T-2203G)... -->
   <software name="mjhoukag" supported="no">
-    <description>Maajankyou Jidai Cogal Houkago Hen (Jpn) (T-2203G)</description>
+    <description>Mahjong Kyou Jidai Cogal Houkago Hen (Jpn) (T-2203G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -20137,7 +20137,7 @@
   <!-- Identifying Virtual Maajan (T-2206G)... -->
   <!-- Identifying My Fair Lady Virtual Maajan 2 Disc 1 (T-2207G)... -->
   <software name="vmahjong" supported="no">
-    <description>Virtual Maajan (T-2206G) / My Fair Lady Virtual Maajan 2 (Virtual Mahjong CD) (T-2207G)</description>
+    <description>Virtual Mahjong (T-2206G) / My Fair Lady Virtual Mahjong 2 (Virtual Mahjong CD) (T-2207G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -20150,7 +20150,7 @@
 
   <!-- Identifying My Fair Lady Virtual Maajan 2 Disc 2 (T-2207G)... -->
   <software name="myfairld" supported="no">
-    <description>My Fair Lady Virtual Maajan 2 (Virtual Mahjong 2 CD) (T-2207G)</description>
+    <description>My Fair Lady Virtual Mahjong 2 (Virtual Mahjong 2 CD) (T-2207G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -20488,7 +20488,7 @@
 
   <!-- Identifying Pro Maajan Kiwame S (T-16801G)... -->
   <software name="kiwames" supported="no">
-    <description>Pro Maajan Kiwame S (T-16801G)</description>
+    <description>Pro Mahjong Kiwame S (T-16801G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -20593,7 +20593,7 @@
 
   <!-- Identifying Real Maajan Adventure Umi-He - Summer Waltz (T-16511G)... -->
   <software name="mjadventa" cloneof="mjadvent" supported="no">
-    <description>Real Maajan Adventure Umi-He - Summer Waltz (T-16511G)</description>
+    <description>Real Mahjong Adventure Umi-He - Summer Waltz (T-16511G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -21297,7 +21297,7 @@
 
   <!-- Identifying Super Real Maajan P VI P's Club Genteiban (T-16508G)... -->
   <software name="srmp6cg" supported="no">
-    <description>Super Real Maajan P VI P's Club Genteiban (T-16508G)</description>
+    <description>Super Real Mahjong P VI P's Club Genteiban (T-16508G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -21599,7 +21599,7 @@
 
   <!-- Identifying Tokimeki Maajan Graffiti - Toshishita no Tenshi Tachi (T-20202G)... -->
   <software name="tokimjgr" supported="no">
-    <description>Tokimeki Maajan Graffiti - Toshishita no Tenshi Tachi (T-20202G)</description>
+    <description>Tokimeki Mahjong Graffiti - Toshishita no Tenshi Tachi (T-20202G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -21612,7 +21612,7 @@
 
   <!-- Identifying Tokimeki Maajan Paradise (J) (T-20201G)... -->
   <software name="tokimjpa" supported="no">
-    <description>Tokimeki Maajan Paradise (Jpn) (T-20201G)</description>
+    <description>Tokimeki Mahjong Paradise (Jpn) (T-20201G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -21903,7 +21903,7 @@
 
   <!-- Identifying Yoshimoto Maajan Club (J) (T-20403G)... -->
   <software name="yoshmja" cloneof="yoshmj" supported="no">
-    <description>Yoshimoto Maajan Club (Jpn) (T-20403G)</description>
+    <description>Yoshimoto Mahjong Club (Jpn) (T-20403G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -22331,7 +22331,7 @@
 
   <!-- Identifying Nihon Pro Maajan Renmei Kounin Doujou Yaburi (J) (T-18714G)... -->
   <software name="npmjren" supported="no">
-    <description>Nihon Pro Maajan Renmei Kounin Doujou Yaburi (Jpn) (T-18714G)</description>
+    <description>Nihon Pro Mahjong Renmei Kounin Doujou Yaburi (Jpn) (T-18714G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -22435,7 +22435,7 @@
 
   <!-- Identifying Pro Maajan Kiwame S (Satakore) T-16807G... -->
   <software name="kiwamessa" cloneof="kiwames" supported="no">
-    <description>Pro Maajan Kiwame S (Satakore) T-16807G</description>
+    <description>Pro Mahjong Kiwame S (Satakore) T-16807G</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -22461,7 +22461,7 @@
 
   <!-- Identifying Pyon Pyon Kyaruru no Maajan Hiyori (T-31101G)... -->
   <software name="pyonpyona" cloneof="pyonpyon" supported="no">
-    <description>Pyon Pyon Kyaruru no Maajan Hiyori (T-31101G)</description>
+    <description>Pyon Pyon Kyaruru no Mahjong Hiyori (T-31101G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
@@ -22649,7 +22649,7 @@
 
   <!-- Identifying Shusse Maajan Daisettai (J) (T-24902G)... -->
   <software name="shussemj" supported="no">
-    <description>Shusse Maajan Daisettai (Jpn) (T-24902G)</description>
+    <description>Shusse Mahjong Daisettai (Jpn) (T-24902G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
