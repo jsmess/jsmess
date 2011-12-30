@@ -911,18 +911,22 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 
 				if (!(priority_selected[pixel_plot_x] & PRIORITY_BIT))
 				{
-					priority_selected[pixel_plot_x] = line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
-					priority_selected[pixel_plot_x + 1] = line_buffer[pixel_plot_x + 1] = m_current_palette[pen_selected];
+					line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+					priority_selected[pixel_plot_x] = pen_selected;
+					line_buffer[pixel_plot_x + 1] = m_current_palette[pen_selected];
+					priority_selected[pixel_plot_x + 1] = pen_selected;
 				}
 				else
 				{
 					if (priority_selected[pixel_plot_x] == PRIORITY_BIT)
 					{
-						priority_selected[pixel_plot_x] = line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+						line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+						priority_selected[pixel_plot_x] = pen_selected;
 					}
 					if (priority_selected[pixel_plot_x + 1] == PRIORITY_BIT)
 					{
-						priority_selected[pixel_plot_x + 1] = line_buffer[pixel_plot_x + 1] = m_current_palette[pen_selected];
+						line_buffer[pixel_plot_x + 1] = m_current_palette[pen_selected];
+						priority_selected[pixel_plot_x + 1] = pen_selected;
 					}
 				}
 				if (m_collision_buffer[pixel_plot_x] != 1)
@@ -956,13 +960,15 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 
 				if (!(priority_selected[pixel_plot_x] & PRIORITY_BIT))
 				{
-					priority_selected[pixel_plot_x] = line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+					line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+					priority_selected[pixel_plot_x] = pen_selected;
 				}
 				else
 				{
 					if (priority_selected[pixel_plot_x] == PRIORITY_BIT)
 					{
-						priority_selected[pixel_plot_x] = line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+						line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+						priority_selected[pixel_plot_x] = pen_selected;
 					}
 				}
 				if (m_collision_buffer[pixel_plot_x] != 1)
