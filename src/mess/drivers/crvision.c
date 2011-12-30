@@ -164,10 +164,10 @@ WRITE8_MEMBER( crvision_state::centronics_ctrl_w )
 static ADDRESS_MAP_START( crvision_map, AS_PROGRAM, 8, crvision_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
-	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, vram_read)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, register_read)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_DEVWRITE(TMS9929_TAG, tms9928a_device, vram_write)
+	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_DEVWRITE(TMS9929_TAG, tms9928a_device, register_write)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
 //  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
@@ -184,10 +184,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lasr2001_map, AS_PROGRAM, 8, laser2001_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
-	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, vram_read)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_DEVREAD(TMS9929_TAG, tms9928a_device, register_read)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_DEVWRITE(TMS9929_TAG, tms9928a_device, vram_write)
+	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_DEVWRITE(TMS9929_TAG, tms9928a_device, register_write)
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(BANK_ROM1)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
@@ -513,7 +513,7 @@ static TMS9928A_INTERFACE(crvision_tms9928a_interface)
 
 static SCREEN_UPDATE( crvision )
 {
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
+	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( TMS9929_TAG );
 
 	tms9928a->update( bitmap, cliprect );
 	return 0;
@@ -1010,7 +1010,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, creativision )
     // video hardware
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9918, crvision_tms9928a_interface )
+	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9918, crvision_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE( crvision )
 MACHINE_CONFIG_END
@@ -1021,7 +1021,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( pal, creativision, crvision_pal_state )
 	// video hardware
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9929, crvision_tms9928a_interface )
+	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929, crvision_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE( crvision )
 MACHINE_CONFIG_END
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	// video hardware
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, crvision_tms9928a_interface )
+	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929A, crvision_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE( crvision )
 
