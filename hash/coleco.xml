@@ -2618,7 +2618,7 @@
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="24576">
 				<rom name="l12-chip1-5-11-c9c1.bin" size="8192" crc="cb1b7786" sha1="22b0edd4afe820250225eebf707b508fa252080b" offset="0x0000" />
 				<rom name="l12-chip2-5-11-c9c1.bin" size="8192" crc="e9a69d3b" sha1="0ccc593260aef53749e70bbf9f9fd9a96914c64f" offset="0x2000" />
 				<rom name="l12-chip3-5-11-c9c1.bin" size="8192" crc="314c3478" sha1="f644970051b66d6c7bc1e9d5511618c95c534902" offset="0x4000" />
