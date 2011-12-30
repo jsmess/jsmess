@@ -149,13 +149,13 @@ static SCREEN_UPDATE( spec8s3 )
 {
 	UINT32 *scanline;
 	int x, y;
-	nubus_spec8s3_device *card = downcast<nubus_spec8s3_device *>(screen->owner());
+	nubus_spec8s3_device *card = downcast<nubus_spec8s3_device *>(screen.owner());
 	UINT8 pixels, *vram;
 
 	// first time?  kick off the VBL timer
 	if (!card->m_screen)
 	{
-		card->m_screen = screen;
+		card->m_screen = &screen;
 		card->m_timer->adjust(card->m_screen->time_until_pos(767, 0), 0);
 	}
 	vram = card->m_vram + 0x400;

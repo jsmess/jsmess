@@ -72,30 +72,30 @@ PALETTE_INIT( super80m )
 
 SCREEN_EOF( super80m )
 {
-	super80_state *state = machine.driver_data<super80_state>();
+	super80_state *state = screen.machine().driver_data<super80_state>();
 	/* if we chose another palette or colour mode, enable it */
-	UINT8 chosen_palette = (input_port_read(machine, "CONFIG") & 0x60)>>5;				// read colour dipswitches
+	UINT8 chosen_palette = (input_port_read(screen.machine(), "CONFIG") & 0x60)>>5;				// read colour dipswitches
 
 	if (chosen_palette != state->m_current_palette)						// any changes?
 	{
 		state->m_current_palette = chosen_palette;					// save new palette
 		if (!state->m_current_palette)
-			palette_set_colors_rgb(machine, super80_comp_palette);		// composite colour
+			palette_set_colors_rgb(screen.machine(), super80_comp_palette);		// composite colour
 		else
-			palette_set_colors_rgb(machine, super80_rgb_palette);		// rgb and b&w
+			palette_set_colors_rgb(screen.machine(), super80_rgb_palette);		// rgb and b&w
 	}
 }
 
 SCREEN_UPDATE( super80 )
 {
-	super80_state *state = screen->machine().driver_data<super80_state>();
+	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = screen->machine().region("maincpu")->base();
+	UINT8 *RAM = screen.machine().region("maincpu")->base();
 
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
-	if ((state->m_shared & 4) || (!(input_port_read(screen->machine(), "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((state->m_shared & 4) || (!(input_port_read(screen.machine(), "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -130,14 +130,14 @@ SCREEN_UPDATE( super80 )
 
 SCREEN_UPDATE( super80d )
 {
-	super80_state *state = screen->machine().driver_data<super80_state>();
+	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = screen->machine().region("maincpu")->base();
+	UINT8 *RAM = screen.machine().region("maincpu")->base();
 
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
-	if ((state->m_shared & 4) || (!(input_port_read(screen->machine(), "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((state->m_shared & 4) || (!(input_port_read(screen.machine(), "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -172,14 +172,14 @@ SCREEN_UPDATE( super80d )
 
 SCREEN_UPDATE( super80e )
 {
-	super80_state *state = screen->machine().driver_data<super80_state>();
+	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 *RAM = screen->machine().region("maincpu")->base();
+	UINT8 *RAM = screen.machine().region("maincpu")->base();
 
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 
-	if ((state->m_shared & 4) || (!(input_port_read(screen->machine(), "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((state->m_shared & 4) || (!(input_port_read(screen.machine(), "CONFIG") & 4)))	/* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -214,11 +214,11 @@ SCREEN_UPDATE( super80e )
 
 SCREEN_UPDATE( super80m )
 {
-	super80_state *state = screen->machine().driver_data<super80_state>();
+	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=state->m_vidpg,x;
-	UINT8 col, bg=0, fg=0, options=input_port_read(screen->machine(), "CONFIG");
-	UINT8 *RAM = screen->machine().region("maincpu")->base();
+	UINT8 col, bg=0, fg=0, options=input_port_read(screen.machine(), "CONFIG");
+	UINT8 *RAM = screen.machine().region("maincpu")->base();
 
 	/* get selected character generator */
 	UINT8 cgen = state->m_current_charset ^ ((options & 0x10)>>4);	/* bit 0 of port F1 and cgen config switch */
@@ -384,11 +384,11 @@ VIDEO_START( super80v )
 
 SCREEN_UPDATE( super80v )
 {
-	super80_state *state = screen->machine().driver_data<super80_state>();
+	super80_state *state = screen.machine().driver_data<super80_state>();
 	state->m_framecnt++;
 	state->m_speed = state->m_mc6845_reg[10]&0x20, state->m_flash = state->m_mc6845_reg[10]&0x40; // cursor modes
 	state->m_cursor = (state->m_mc6845_reg[14]<<8) | state->m_mc6845_reg[15]; // get cursor position
-	state->m_s_options=input_port_read(screen->machine(), "CONFIG");
+	state->m_s_options=input_port_read(screen.machine(), "CONFIG");
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
 	state->m_6845->update(bitmap, cliprect);
 	return 0;

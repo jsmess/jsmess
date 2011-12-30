@@ -402,7 +402,7 @@ static const cassette_interface pv2000_cassette_interface =
 
 static SCREEN_UPDATE( pv2000 )
 {
-	tms9928a_device *tms9928a = screen->machine().device<tms9928a_device>( "tms9928a" );
+	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
 
 	tms9928a->update( bitmap, cliprect );
 	return 0;

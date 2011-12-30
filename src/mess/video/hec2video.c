@@ -118,26 +118,26 @@ VIDEO_START( hec2hrp )
 
 SCREEN_UPDATE( hec2hrp )
 {
-	hec2hrp_state *state = screen->machine().driver_data<hec2hrp_state>();
+	hec2hrp_state *state = screen.machine().driver_data<hec2hrp_state>();
 	UINT8 *videoram = state->m_videoram;
 	UINT8 *videoram_HR = state->m_hector_videoram;
 	if (state->m_hector_flag_hr==1)
 		{
 		if (state->m_hector_flag_80c==0)
 			{
-				screen->set_visible_area(0, 243, 0, 227);
-				hector_hr( screen->machine(), bitmap , &videoram_HR[0], 227, 64);
+				screen.set_visible_area(0, 243, 0, 227);
+				hector_hr( screen.machine(), bitmap , &videoram_HR[0], 227, 64);
 			}
 		else
 			{
-				screen->set_visible_area(0, 243*2, 0, 227);
-				hector_80c( screen->machine(), bitmap , &videoram_HR[0], 227, 64);
+				screen.set_visible_area(0, 243*2, 0, 227);
+				hector_80c( screen.machine(), bitmap , &videoram_HR[0], 227, 64);
 			}
 		}
 	else
 		{
-			screen->set_visible_area(0, 113, 0, 75);
-			hector_hr( screen->machine(), bitmap, videoram,  77, 32);
+			screen.set_visible_area(0, 113, 0, 75);
+			hector_hr( screen.machine(), bitmap, videoram,  77, 32);
 		}
 	return 0;
 }

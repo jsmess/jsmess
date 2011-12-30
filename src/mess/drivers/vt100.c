@@ -310,7 +310,7 @@ INPUT_PORTS_END
 
 static SCREEN_UPDATE( vt100 )
 {
-	device_t *devconf = screen->machine().device("vt100_video");
+	device_t *devconf = screen.machine().device("vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
 	return 0;
 }

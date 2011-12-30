@@ -71,7 +71,7 @@ VIDEO_START( pdp1 )
 
 SCREEN_EOF( pdp1 )
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
+	pdp1_state *state = screen.machine().driver_data<pdp1_state>();
 
 	crt_eof(state->m_crt);
 }
@@ -94,12 +94,12 @@ void pdp1_plot(running_machine &machine, int x, int y)
 */
 SCREEN_UPDATE( pdp1 )
 {
-	pdp1_state *state = screen->machine().driver_data<pdp1_state>();
+	pdp1_state *state = screen.machine().driver_data<pdp1_state>();
 	pdp1_erase_lightpen(state, bitmap);
 	crt_update(state->m_crt, bitmap);
 	pdp1_draw_lightpen(state, bitmap);
 
-	pdp1_draw_panel(screen->machine(), state->m_panel_bitmap);
+	pdp1_draw_panel(screen.machine(), state->m_panel_bitmap);
 	copybitmap(bitmap, state->m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
 	copybitmap(bitmap, state->m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);

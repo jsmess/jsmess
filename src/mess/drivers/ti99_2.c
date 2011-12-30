@@ -153,7 +153,7 @@ static PALETTE_INIT(ti99_2)
 
 static SCREEN_UPDATE(ti99_2)
 {
-	ti99_2_state *state = screen->machine().driver_data<ti99_2_state>();
+	ti99_2_state *state = screen.machine().driver_data<ti99_2_state>();
 	UINT8 *videoram = state->m_videoram;
 	int i, sx, sy;
 
@@ -163,7 +163,7 @@ static SCREEN_UPDATE(ti99_2)
 	for (i = 0; i < 768; i++)
 	{
 		/* Is the char code masked or not ??? */
-		drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], videoram[i] & 0x7F, 0,
+		drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], videoram[i] & 0x7F, 0,
 			0, 0, sx, sy);
 
 		sx += 8;

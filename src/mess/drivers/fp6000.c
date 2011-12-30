@@ -63,10 +63,10 @@ static VIDEO_START( fp6000 )
 
 static SCREEN_UPDATE( fp6000 )
 {
-	fp6000_state *state = screen->machine().driver_data<fp6000_state>();
+	fp6000_state *state = screen.machine().driver_data<fp6000_state>();
 	int x,y;
 	int xi,yi;
-	UINT8 *gfx_rom = screen->machine().region("pcg")->base();
+	UINT8 *gfx_rom = screen.machine().region("pcg")->base();
 	UINT32 count;
 
 	count = 0;
@@ -80,7 +80,7 @@ static SCREEN_UPDATE( fp6000 )
 				int dot = (state->m_gvram[count] >> (12-xi*4)) & 0xf;
 
 				if(y < 400 && x*4+xi < 640) /* TODO: safety check */
-					*BITMAP_ADDR16(bitmap, y, x*4+xi) = screen->machine().pens[dot];
+					*BITMAP_ADDR16(bitmap, y, x*4+xi) = screen.machine().pens[dot];
 			}
 
 			count++;
@@ -103,7 +103,7 @@ static SCREEN_UPDATE( fp6000 )
 
 					if(pen != -1)
 						if(y*mc6845_tile_height < 400 && x*8+xi < 640) /* TODO: safety check */
-							*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[pen];
+							*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[pen];
 				}
 			}
 		}
@@ -118,7 +118,7 @@ static SCREEN_UPDATE( fp6000 )
 			{
 				x = mc6845_cursor_addr % mc6845_h_display;
 				y = mc6845_cursor_addr / mc6845_h_display;
-				*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen->machine().pens[7];
+				*BITMAP_ADDR16(bitmap, y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[7];
 			}
 		}
 	}

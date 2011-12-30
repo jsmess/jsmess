@@ -144,7 +144,7 @@ static const ptm6840_interface poly_ptm_intf =
 
 static SCREEN_UPDATE( poly )
 {
-	device_t *saa5050 = screen->machine().device("saa5050");
+	device_t *saa5050 = screen.machine().device("saa5050");
 
 	saa5050_update(saa5050, bitmap, NULL);
 	return 0;

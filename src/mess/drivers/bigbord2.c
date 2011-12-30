@@ -566,7 +566,7 @@ GFXDECODE_END
 
 static SCREEN_UPDATE( bigbord2 )
 {
-	bigbord2_state *state = screen->machine().driver_data<bigbord2_state>();
+	bigbord2_state *state = screen.machine().driver_data<bigbord2_state>();
 	state->m_framecnt++;
 	state->m_6845->update( bitmap, cliprect);
 	return 0;

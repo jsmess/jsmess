@@ -427,7 +427,7 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 
 static SCREEN_UPDATE( c16 )
 {
-	c16_state *state = screen->machine().driver_data<c16_state>();
+	c16_state *state = screen.machine().driver_data<c16_state>();
 	ted7360_video_update(state->m_ted7360, bitmap, cliprect);
 	return 0;
 }

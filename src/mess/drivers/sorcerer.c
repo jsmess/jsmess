@@ -347,7 +347,7 @@ static SCREEN_UPDATE( sorcerer )
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0xf080,x;
-	UINT8 *RAM = screen->machine().region("maincpu")->base();
+	UINT8 *RAM = screen.machine().region("maincpu")->base();
 
 	for (y = 0; y < 30; y++)
 	{

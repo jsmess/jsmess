@@ -17,7 +17,7 @@ VIDEO_START( bk0010 )
 
 SCREEN_UPDATE( bk0010 )
 {
-	bk_state *state = screen->machine().driver_data<bk_state>();
+	bk_state *state = screen.machine().driver_data<bk_state>();
 	UINT16 code;
 	int y, x, b;
 	int nOfs;

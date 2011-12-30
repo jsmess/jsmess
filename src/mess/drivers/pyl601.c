@@ -361,7 +361,7 @@ static VIDEO_START( pyl601 )
 
 static SCREEN_UPDATE( pyl601 )
 {
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
 	mc6845->update( bitmap, cliprect);
 	return 0;
 }

@@ -648,7 +648,7 @@ static PALETTE_INIT( vic20 )
 
 static SCREEN_UPDATE( vic20 )
 {
-	vic20_state *state = screen->machine().driver_data<vic20_state>();
+	vic20_state *state = screen.machine().driver_data<vic20_state>();
 	mos6560_video_update(state->m_mos6560, bitmap, cliprect);
 	return 0;
 }

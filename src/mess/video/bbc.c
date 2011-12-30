@@ -341,7 +341,7 @@ READ8_HANDLER (bbc_6845_r)
 SCREEN_UPDATE( bbc )
 {
 
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("mc6845");
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("mc6845");
 	mc6845->update( bitmap, cliprect);
 
     return 0;
@@ -653,14 +653,14 @@ WRITE8_HANDLER ( bbc_6845_w )
 SCREEN_UPDATE( bbc )
 {
 
-    mc6845_device *mc6845 = screen->machine().device<mc6845_device>("mc6845");
+    mc6845_device *mc6845 = screen.machine().device<mc6845_device>("mc6845");
     mc6845->update( bitmap, cliprect);
 
     return 0;
 
 
 
-    bbc_state *state = screen->machine().driver_data<bbc_state>();
+    bbc_state *state = screen.machine().driver_data<bbc_state>();
     long c;
 
     //logerror ("Box %d by %d \n",cliprect->min_y,cliprect->max_y);
@@ -679,7 +679,7 @@ SCREEN_UPDATE( bbc )
     while((state->m_BBC_VSync)&&(c<60000))
     {
         // Clock the 6845
-        m6845_clock(screen->machine());
+        m6845_clock(screen.machine());
         c++;
     }
 
@@ -688,13 +688,13 @@ SCREEN_UPDATE( bbc )
     // or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
     while((!state->m_BBC_VSync)&&(c<60000))
     {
-        if ((state->m_y_screen_pos>=cliprect->min_y) && (state->m_y_screen_pos<=cliprect->max_y)) (state->m_draw_function)(screen->machine());
+        if ((state->m_y_screen_pos>=cliprect->min_y) && (state->m_y_screen_pos<=cliprect->max_y)) (state->m_draw_function)(screen.machine());
 
         // and check the cursor
         if (state->m_VideoULA_CR) BBC_Clock_CR(state);
 
         // Clock the 6845
-        m6845_clock(screen->machine());
+        m6845_clock(screen.machine());
         c++;
     }
 

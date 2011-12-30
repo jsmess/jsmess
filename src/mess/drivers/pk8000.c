@@ -325,7 +325,7 @@ static VIDEO_START( pk8000 )
 
 static SCREEN_UPDATE( pk8000 )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, screen->machine().device<ram_device>(RAM_TAG)->pointer());
+	return pk8000_video_update(screen, bitmap, cliprect, screen.machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
 /* Machine driver */

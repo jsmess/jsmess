@@ -1818,7 +1818,7 @@ VIDEO_START( busicom )
 
 SCREEN_UPDATE( busicom )
 {
-	busicom_state *state = screen->machine().driver_data<busicom_state>();
+	busicom_state *state = screen.machine().driver_data<busicom_state>();
 	int y, x, b, j;
 	//34x44
 	for (y = 0; y < 11; y++)

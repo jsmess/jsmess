@@ -1078,7 +1078,7 @@ static MACHINE_RESET( academy )
 
 SCREEN_UPDATE( chess_lcd )
 {
-    hd44780_device * hd44780 = screen->machine().device<hd44780_device>("hd44780");
+    hd44780_device * hd44780 = screen.machine().device<hd44780_device>("hd44780");
     return hd44780->video_update(bitmap, cliprect );
 }
 

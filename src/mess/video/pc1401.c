@@ -133,8 +133,8 @@ static const POCKETC_FIGURE busy={
 
 SCREEN_UPDATE( pc1401 )
 {
-	pc1401_state *state = screen->machine().driver_data<pc1401_state>();
-	running_machine &machine = screen->machine();
+	pc1401_state *state = screen.machine().driver_data<pc1401_state>();
+	running_machine &machine = screen.machine();
 	int x, y, i, j;
 	int color[2];
 
@@ -154,12 +154,12 @@ SCREEN_UPDATE( pc1401 )
 		for (x=RIGHT,y=DOWN,i=0; i<0x28;x+=2)
 		{
 			for (j=0; j<5;j++,i++,x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,x,y);
+			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,x,y);
 		}
 		for (i=0x67; i>=0x40;x+=2)
 		{
 			for (j=0; j<5;j++,i--,x+=2)
-			drawgfx_opaque(bitmap, 0, screen->machine().gfx[0], state->m_reg[i],CONTRAST,0,0,x,y);
+			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,x,y);
 		}
 	}
 

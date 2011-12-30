@@ -132,7 +132,7 @@ static SCREEN_UPDATE( cb264 )
 {
 	UINT32 *scanline, *base;
 	int x, y;
-	nubus_cb264_device *card = downcast<nubus_cb264_device *>(screen->owner());
+	nubus_cb264_device *card = downcast<nubus_cb264_device *>(screen.owner());
 	UINT8 pixels;
 
 	if (!card->m_cb264_vbl_disable)

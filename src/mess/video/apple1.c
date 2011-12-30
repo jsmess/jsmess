@@ -394,8 +394,8 @@ static void apple1_vh_cursor_blink (running_machine &machine)
 
 SCREEN_UPDATE( apple1 )
 {
-	apple1_state *state = screen->machine().driver_data<apple1_state>();
-	apple1_vh_cursor_blink(screen->machine());
-	terminal_draw(screen->machine(), bitmap, NULL, state->m_terminal);
+	apple1_state *state = screen.machine().driver_data<apple1_state>();
+	apple1_vh_cursor_blink(screen.machine());
+	terminal_draw(screen.machine(), bitmap, NULL, state->m_terminal);
 	return 0;
 }

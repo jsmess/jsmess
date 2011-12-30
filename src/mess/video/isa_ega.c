@@ -659,7 +659,7 @@ void isa8_ega_device::install_banks()
 
 static SCREEN_UPDATE( pc_ega )
 {
-	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(screen->owner());
+	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(screen.owner());
 	crtc_ega_update( ega->m_crtc_ega, bitmap, cliprect);
 	return 0;
 }

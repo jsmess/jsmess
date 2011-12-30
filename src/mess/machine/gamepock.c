@@ -140,7 +140,7 @@ void gamepock_state::machine_reset()
 
 SCREEN_UPDATE( gamepock )
 {
-	gamepock_state *state = screen->machine().driver_data<gamepock_state>();
+	gamepock_state *state = screen.machine().driver_data<gamepock_state>();
 	UINT8	ad;
 	int		i,j;
 

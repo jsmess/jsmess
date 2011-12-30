@@ -157,7 +157,7 @@ static struct
 
 static SCREEN_UPDATE( mc6845_t1000 )
 {
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(T1000_MC6845_NAME);
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(T1000_MC6845_NAME);
 	mc6845->update( bitmap, cliprect);
 	return 0;
 }

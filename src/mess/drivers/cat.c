@@ -319,7 +319,7 @@ static VIDEO_START( cat )
 
 static SCREEN_UPDATE( cat )
 {
-	cat_state *state = screen->machine().driver_data<cat_state>();
+	cat_state *state = screen.machine().driver_data<cat_state>();
 	UINT16 code;
 	int y, x, b;
 
@@ -365,7 +365,7 @@ static VIDEO_START( swyft )
 
 static SCREEN_UPDATE( swyft )
 {
-	cat_state *state = screen->machine().driver_data<cat_state>();
+	cat_state *state = screen.machine().driver_data<cat_state>();
 	UINT16 code;
 	int y, x, b;
 

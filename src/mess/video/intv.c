@@ -776,7 +776,7 @@ WRITE8_MEMBER( intv_state::intvkbd_tms9927_w )
 
 SCREEN_UPDATE( intvkbd )
 {
-	intv_state *state = screen->machine().driver_data<intv_state>();
+	intv_state *state = screen.machine().driver_data<intv_state>();
 	UINT8 *videoram = state->m_videoram;
 	int x,y,offs;
 	int current_row;
@@ -795,7 +795,7 @@ SCREEN_UPDATE( intvkbd )
 			{
 				offs = current_row*64+x;
 				drawgfx_transpen(bitmap, NULL,
-					screen->machine().gfx[1],
+					screen.machine().gfx[1],
 					videoram[offs],
 					7, /* white */
 					0,0,
@@ -806,7 +806,7 @@ SCREEN_UPDATE( intvkbd )
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
 				drawgfx_transpen(bitmap, NULL,
-					screen->machine().gfx[1],
+					screen.machine().gfx[1],
 					191, /* a block */
 					7,   /* white   */
 					0,0,

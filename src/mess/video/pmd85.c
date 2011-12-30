@@ -61,6 +61,6 @@ SCREEN_UPDATE( pmd85 )
 	int pmd85_scanline;
 
 	for (pmd85_scanline=0; pmd85_scanline<256; pmd85_scanline++)
-		pmd85_draw_scanline (screen->machine(),bitmap, pmd85_scanline);
+		pmd85_draw_scanline (screen.machine(),bitmap, pmd85_scanline);
 	return 0;
 }

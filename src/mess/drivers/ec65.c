@@ -159,7 +159,7 @@ static VIDEO_START( ec65 )
 
 static SCREEN_UPDATE( ec65 )
 {
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>(MC6845_TAG);
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(MC6845_TAG);
 	mc6845->update( bitmap, cliprect);
 	return 0;
 }

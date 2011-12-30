@@ -65,15 +65,15 @@ static VIDEO_START( smc777 )
 
 static SCREEN_UPDATE( smc777 )
 {
-	smc777_state *state = screen->machine().driver_data<smc777_state>();
+	smc777_state *state = screen.machine().driver_data<smc777_state>();
 	int x,y,yi;
 	UINT16 count;
-	UINT8 *vram = screen->machine().region("vram")->base();
-	UINT8 *attr = screen->machine().region("attr")->base();
-	UINT8 *gram = screen->machine().region("fbuf")->base();
+	UINT8 *vram = screen.machine().region("vram")->base();
+	UINT8 *attr = screen.machine().region("attr")->base();
+	UINT8 *gram = screen.machine().region("fbuf")->base();
 	int x_width;
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[state->m_backdrop_pen]);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[state->m_backdrop_pen]);
 
 	x_width = (state->m_display_reg & 0x80) ? 2 : 4;
 
@@ -91,23 +91,23 @@ static SCREEN_UPDATE( smc777 )
 				/* todo: clean this up! */
 				if(x_width == 2)
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = screen->machine().pens[color];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = screen.machine().pens[color];
 				}
 				else
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen->machine().pens[color];
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen->machine().pens[color];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen.machine().pens[color];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen.machine().pens[color];
 				}
 
 				color = (gram[count] & 0x0f) >> 0;
 				if(x_width == 2)
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = screen->machine().pens[color];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = screen.machine().pens[color];
 				}
 				else
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen->machine().pens[color];
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen->machine().pens[color];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen.machine().pens[color];
+					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen.machine().pens[color];
 				}
 
 				count++;
@@ -147,20 +147,20 @@ static SCREEN_UPDATE( smc777 )
 				case 3: bk_pen = (color ^ 0xf); break; //complementary
 			}
 
-			if(blink && screen->machine().primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
+			if(blink && screen.machine().primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
 			for(yi=0;yi<8;yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 *gfx_data = screen->machine().region("pcg")->base();
+					UINT8 *gfx_data = screen.machine().region("pcg")->base();
 					int pen;
 
 					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->m_pal_mode) : bk_pen;
 
 					if(pen != -1)
-						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen->machine().pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen.machine().pens[pen];
 				}
 			}
 
@@ -174,8 +174,8 @@ static SCREEN_UPDATE( smc777 )
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(screen->machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(screen->machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(screen.machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(screen.machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -184,7 +184,7 @@ static SCREEN_UPDATE( smc777 )
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = screen->machine().pens[0x7];
+							*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = screen.machine().pens[0x7];
 						}
 					}
 				}

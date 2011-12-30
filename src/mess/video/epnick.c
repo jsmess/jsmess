@@ -1037,7 +1037,7 @@ VIDEO_START( epnick )
 
 SCREEN_UPDATE( epnick )
 {
-	ep_state *state = screen->machine().driver_data<ep_state>();
-	Nick_DoScreen(state->nick,screen->machine().generic.tmpbitmap);
+	ep_state *state = screen.machine().driver_data<ep_state>();
+	Nick_DoScreen(state->nick,screen.machine().generic.tmpbitmap);
 	return SCREEN_UPDATE_CALL(generic_bitmapped);
 }

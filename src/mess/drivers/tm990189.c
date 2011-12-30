@@ -228,7 +228,7 @@ static TIMER_DEVICE_CALLBACK( display_callback )
 
 static SCREEN_UPDATE( tm990_189_v )
 {
-	tm990189_state *state = screen->machine().driver_data<tm990189_state>();
+	tm990189_state *state = screen.machine().driver_data<tm990189_state>();
 	state->m_tms9918->update( bitmap, cliprect );
 	return 0;
 }

@@ -52,7 +52,7 @@ static MACHINE_RESET(a6809)
 
 static SCREEN_UPDATE( a6809 )
 {
-	device_t *saa5050 = screen->machine().device("saa5050");
+	device_t *saa5050 = screen.machine().device("saa5050");
 
 	saa5050_update(saa5050, bitmap, NULL);
 	return 0;

@@ -492,7 +492,7 @@ static VIDEO_START( terminal )
 
 static SCREEN_UPDATE(terminal )
 {
-	device_t *devconf = screen->machine().device(TERMINAL_TAG);
+	device_t *devconf = screen.machine().device(TERMINAL_TAG);
 	generic_terminal_update( devconf, bitmap, cliprect);
 	return 0;
 }

@@ -128,10 +128,10 @@ static MACHINE_START(interact)
 
 static SCREEN_UPDATE( interact )
 {
-	interact_state *state = screen->machine().driver_data<interact_state>();
+	interact_state *state = screen.machine().driver_data<interact_state>();
 	UINT8 *videoram = state->m_videoram;
-	screen->set_visible_area(0, 113, 0, 75);
-	hector_hr( screen->machine(), bitmap, videoram,  77, 32);
+	screen.set_visible_area(0, 113, 0, 75);
+	hector_hr( screen.machine(), bitmap, videoram,  77, 32);
 	return 0;
 }
 

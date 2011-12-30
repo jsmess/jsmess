@@ -628,7 +628,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool ri
 
 static SCREEN_UPDATE( vboy_left )
 {
-	vboy_state *state = screen->machine().driver_data<vboy_state>();
+	vboy_state *state = screen.machine().driver_data<vboy_state>();
 	bitmap_fill(state->m_screen_output, cliprect, state->m_vip_regs.BKCOL);
 
 	for(int i=31; i>=0; i--)
@@ -641,7 +641,7 @@ static SCREEN_UPDATE( vboy_left )
 
 static SCREEN_UPDATE( vboy_right )
 {
-	vboy_state *state = screen->machine().driver_data<vboy_state>();
+	vboy_state *state = screen.machine().driver_data<vboy_state>();
 	bitmap_fill(state->m_screen_output, cliprect, state->m_vip_regs.BKCOL);
 
 	for(int i=31; i>=0; i--)

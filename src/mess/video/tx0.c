@@ -58,7 +58,7 @@ VIDEO_START( tx0 )
 
 SCREEN_EOF( tx0 )
 {
-	tx0_state *state = machine.driver_data<tx0_state>();
+	tx0_state *state = screen.machine().driver_data<tx0_state>();
 
 	crt_eof(state->m_crt);
 }
@@ -83,10 +83,10 @@ void tx0_plot(running_machine &machine, int x, int y)
 */
 SCREEN_UPDATE( tx0 )
 {
-	tx0_state *state = screen->machine().driver_data<tx0_state>();
+	tx0_state *state = screen.machine().driver_data<tx0_state>();
 	crt_update(state->m_crt, bitmap);
 
-	tx0_draw_panel(screen->machine(), state->m_panel_bitmap);
+	tx0_draw_panel(screen.machine(), state->m_panel_bitmap);
 	copybitmap(bitmap, state->m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);
 
 	copybitmap(bitmap, state->m_typewriter_bitmap, 0, 0, typewriter_window_offset_x, typewriter_window_offset_y, cliprect);

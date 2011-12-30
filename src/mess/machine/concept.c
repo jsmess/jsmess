@@ -103,7 +103,7 @@ VIDEO_START(concept)
 SCREEN_UPDATE(concept)
 {
 	/* resolution is 720*560 */
-	concept_state *state = screen->machine().driver_data<concept_state>();
+	concept_state *state = screen.machine().driver_data<concept_state>();
 	UINT16 *videoram = state->m_videoram;
 	int x, y;
 	UINT16 *line;

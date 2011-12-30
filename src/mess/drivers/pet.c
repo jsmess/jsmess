@@ -638,7 +638,7 @@ static VIDEO_START( pet_crtc )
 
 static SCREEN_UPDATE( pet_crtc )
 {
-	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
 	mc6845->update( bitmap, cliprect);
 	return 0;
 }

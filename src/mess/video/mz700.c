@@ -48,12 +48,12 @@ PALETTE_INIT( mz700 )
 
 SCREEN_UPDATE( mz700 )
 {
-	mz_state *state = screen->machine().driver_data<mz_state>();
+	mz_state *state = screen.machine().driver_data<mz_state>();
 	UINT8 *videoram = state->m_videoram;
 	int offs;
-	mz_state *mz = screen->machine().driver_data<mz_state>();
+	mz_state *mz = screen.machine().driver_data<mz_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	for(offs = 0; offs < 40*25; offs++)
 	{
@@ -65,7 +65,7 @@ SCREEN_UPDATE( mz700 )
 		color = mz->m_colorram[offs];
 		code = videoram[offs] | (color & 0x80) << 1;
 
-		drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], code, color, 0, 0, sx, sy);
+		drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], code, color, 0, 0, sx, sy);
 	}
 
 	return 0;
@@ -84,11 +84,11 @@ VIDEO_START( mz800 )
 
 SCREEN_UPDATE( mz800 )
 {
-	mz_state *state = screen->machine().driver_data<mz_state>();
+	mz_state *state = screen.machine().driver_data<mz_state>();
 	UINT8 *videoram = state->m_videoram;
-	mz_state *mz = screen->machine().driver_data<mz_state>();
+	mz_state *mz = screen.machine().driver_data<mz_state>();
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen.machine()));
 
 	if (mz->m_mz700_mode)
 		return SCREEN_UPDATE_CALL(mz700);

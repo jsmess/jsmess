@@ -93,7 +93,7 @@ VIDEO_START( sapi1 )
 
 SCREEN_UPDATE( sapi1 )
 {
-	sapi1_state *state = screen->machine().driver_data<sapi1_state>();
+	sapi1_state *state = screen.machine().driver_data<sapi1_state>();
 	int x,y,j,b;
 	UINT16 addr;
 	int xpos;

@@ -127,7 +127,7 @@ static SCREEN_UPDATE( vikbw )
 {
 	UINT32 *scanline;
 	int x, y;
-	nubus_vikbw_device *card = downcast<nubus_vikbw_device *>(screen->owner());
+	nubus_vikbw_device *card = downcast<nubus_vikbw_device *>(screen.owner());
 	UINT8 pixels;
 
 	if (!card->m_vbl_disable)

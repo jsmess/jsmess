@@ -207,7 +207,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 
 static SCREEN_UPDATE( pv1000 )
 {
-	pv1000_state *state = screen->machine().driver_data<pv1000_state>();
+	pv1000_state *state = screen.machine().driver_data<pv1000_state>();
 	int x, y;
 
 	for ( y = 0; y < 24; y++ )
@@ -219,12 +219,12 @@ static SCREEN_UPDATE( pv1000 )
 			if ( tile < 0xe0 )
 			{
 				tile += ( state->m_io_regs[7] * 8 );
-				drawgfx_opaque( bitmap, cliprect, screen->machine().gfx[0], tile, 0, 0, 0, x*8, y*8 );
+				drawgfx_opaque( bitmap, cliprect, screen.machine().gfx[0], tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
 			{
 				tile -= 0xe0;
-				drawgfx_opaque( bitmap, cliprect, screen->machine().gfx[1], tile, 0, 0, 0, x*8, y*8 );
+				drawgfx_opaque( bitmap, cliprect, screen.machine().gfx[1], tile, 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}

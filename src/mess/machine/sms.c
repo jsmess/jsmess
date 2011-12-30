@@ -438,17 +438,17 @@ static void sms_vdp_hcount_latch( address_space *space )
 }
 
 
-static UINT16 screen_hpos_nonscaled( screen_device *screen, int scaled_hpos )
+static UINT16 screen_hpos_nonscaled( screen_device &screen, int scaled_hpos )
 {
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 	int offset_x = (scaled_hpos * (visarea.max_x - visarea.min_x)) / 255;
 	return visarea.min_x + offset_x;
 }
 
 
-static UINT16 screen_vpos_nonscaled( screen_device *screen, int scaled_vpos )
+static UINT16 screen_vpos_nonscaled( screen_device &screen, int scaled_vpos )
 {
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = screen.visible_area();
 	int offset_y = (scaled_vpos * (visarea.max_y - visarea.min_y)) / 255;
 	return visarea.min_y + offset_y;
 }
@@ -457,8 +457,8 @@ static UINT16 screen_vpos_nonscaled( screen_device *screen, int scaled_vpos )
 static void lphaser1_sensor_check( running_machine &machine )
 {
 	sms_state *state = machine.driver_data<sms_state>();
-	const int x = screen_hpos_nonscaled(machine.first_screen(), input_port_read(machine, "LPHASER0"));
-	const int y = screen_vpos_nonscaled(machine.first_screen(), input_port_read(machine, "LPHASER1"));
+	const int x = screen_hpos_nonscaled(*machine.first_screen(), input_port_read(machine, "LPHASER0"));
+	const int y = screen_vpos_nonscaled(*machine.first_screen(), input_port_read(machine, "LPHASER1"));
 
 	if (lgun_bright_aim_area(machine, state->m_lphaser_1_timer, x, y))
 	{
@@ -473,8 +473,8 @@ static void lphaser1_sensor_check( running_machine &machine )
 static void lphaser2_sensor_check( running_machine &machine )
 {
 	sms_state *state = machine.driver_data<sms_state>();
-	const int x = screen_hpos_nonscaled(machine.first_screen(), input_port_read(machine, "LPHASER2"));
-	const int y = screen_vpos_nonscaled(machine.first_screen(), input_port_read(machine, "LPHASER3"));
+	const int x = screen_hpos_nonscaled(*machine.first_screen(), input_port_read(machine, "LPHASER2"));
+	const int y = screen_vpos_nonscaled(*machine.first_screen(), input_port_read(machine, "LPHASER3"));
 
 	if (lgun_bright_aim_area(machine, state->m_lphaser_2_timer, x, y))
 	{
@@ -2209,10 +2209,10 @@ DRIVER_INIT( gamegeaj )
 }
 
 
-static void sms_black_bitmap( const screen_device *screen, bitmap_t *bitmap )
+static void sms_black_bitmap( const screen_device &screen, bitmap_t *bitmap )
 {
-	const int width = screen->width();
-	const int height = screen->height();
+	const int width = screen.width();
+	const int height = screen.height();
 	int x, y;
 
 	for (y = 0; y < height; y++)
@@ -2235,21 +2235,21 @@ VIDEO_START( sms1 )
 
 SCREEN_UPDATE( sms1 )
 {
-	sms_state *state = screen->machine().driver_data<sms_state>();
-	UINT8 sscope = input_port_read_safe(screen->machine(), "SEGASCOPE", 0x00);
-	UINT8 sscope_binocular_hack = input_port_read_safe(screen->machine(), "SSCOPE_BINOCULAR", 0x00);
+	sms_state *state = screen.machine().driver_data<sms_state>();
+	UINT8 sscope = input_port_read_safe(screen.machine(), "SEGASCOPE", 0x00);
+	UINT8 sscope_binocular_hack = input_port_read_safe(screen.machine(), "SSCOPE_BINOCULAR", 0x00);
 	UINT8 occluded_view = 0;
 
 	// without SegaScope, both LCDs for glasses go black
-	if ((screen != state->m_main_scr) && !sscope)
+	if ((&screen != state->m_main_scr) && !sscope)
 		occluded_view = 1;
 
 	// with SegaScope, sscope_state 0 = left screen OFF, right screen ON
-	if (!(state->m_sscope_state & 0x01) && (screen == state->m_left_lcd))
+	if (!(state->m_sscope_state & 0x01) && (&screen == state->m_left_lcd))
 		occluded_view = 1;
 
 	// with SegaScope, sscope_state 1 = left screen ON, right screen OFF
-	if ((state->m_sscope_state & 0x01) && (screen == state->m_right_lcd))
+	if ((state->m_sscope_state & 0x01) && (&screen == state->m_right_lcd))
 		occluded_view = 1;
 
 	if (!occluded_view)
@@ -2258,9 +2258,9 @@ SCREEN_UPDATE( sms1 )
 
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// save a copy of current bitmap for the binocular hack
-		if (sscope && (screen == state->m_left_lcd) && (sscope_binocular_hack & 0x01))
+		if (sscope && (&screen == state->m_left_lcd) && (sscope_binocular_hack & 0x01))
 			copybitmap(state->m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-		if (sscope && (screen == state->m_right_lcd) && (sscope_binocular_hack & 0x02))
+		if (sscope && (&screen == state->m_right_lcd) && (sscope_binocular_hack & 0x02))
 			copybitmap(state->m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
@@ -2269,9 +2269,9 @@ SCREEN_UPDATE( sms1 )
 
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// use the copied bitmap for the binocular hack
-		if (sscope && (screen == state->m_left_lcd) && (sscope_binocular_hack & 0x01))
+		if (sscope && (&screen == state->m_left_lcd) && (sscope_binocular_hack & 0x01))
 			copybitmap(bitmap, state->m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
-		if (sscope && (screen == state->m_right_lcd) && (sscope_binocular_hack & 0x02))
+		if (sscope && (&screen == state->m_right_lcd) && (sscope_binocular_hack & 0x02))
 			copybitmap(bitmap, state->m_prevright_bitmap, 0, 0, 0, 0, cliprect);
 	}
 
@@ -2280,7 +2280,7 @@ SCREEN_UPDATE( sms1 )
 
 SCREEN_UPDATE( sms )
 {
-	sms_state *state = screen->machine().driver_data<sms_state>();
+	sms_state *state = screen.machine().driver_data<sms_state>();
 	state->m_vdp->update_video(bitmap, cliprect);
 	return 0;
 }
@@ -2299,9 +2299,9 @@ VIDEO_START( gamegear )
 
 SCREEN_UPDATE( gamegear )
 {
-	sms_state *state = screen->machine().driver_data<sms_state>();
-	int width = screen->width();
-	int height = screen->height();
+	sms_state *state = screen.machine().driver_data<sms_state>();
+	int width = screen.width();
+	int height = screen.height();
 	int x, y;
 
 	state->m_vdp->update_video(state->m_tmp_bitmap, cliprect);

@@ -294,18 +294,18 @@ static void s3c44b0_video_start( device_t *device, running_machine &machine)
 	// do nothing
 }
 
-static UINT32 s3c44b0_video_update( device_t *device, screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static UINT32 s3c44b0_video_update( device_t *device, screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	s3c44b0_lcd_t *lcd = &(get_token( device)->lcd);
 	if (lcd->regs.lcdcon1 & (1 << 0))
 	{
 		if (lcd->bitmap)
 		{
-			for (int y = 0; y < screen->height(); y++)
+			for (int y = 0; y < screen.height(); y++)
 			{
 				UINT32 *scanline = BITMAP_ADDR32( bitmap, y, 0);
 				UINT8 *vram = lcd->bitmap + y * (lcd->hpos_max - lcd->hpos_min + 1);
-				for (int x = 0; x < screen->width(); x++)
+				for (int x = 0; x < screen.width(); x++)
 				{
 					*scanline++ = MAKE_RGB( vram[0], vram[1], vram[2]);
 					vram += 3;
@@ -315,10 +315,10 @@ static UINT32 s3c44b0_video_update( device_t *device, screen_device *screen, bit
 	}
 	else
 	{
-		for (int y = 0; y < screen->height(); y++)
+		for (int y = 0; y < screen.height(); y++)
 		{
 			UINT32 *scanline = BITMAP_ADDR32( bitmap, y, 0);
-			memset( scanline, 0, screen->width() * 4);
+			memset( scanline, 0, screen.width() * 4);
 		}
 	}
 	return 0;
@@ -1994,7 +1994,7 @@ VIDEO_START( s3c44b0 )
 
 SCREEN_UPDATE( s3c44b0 )
 {
-	device_t *device = screen->machine().device( S3C44B0_TAG);
+	device_t *device = screen.machine().device( S3C44B0_TAG);
 	return s3c44b0_video_update( device, screen, bitmap, cliprect);
 }
 

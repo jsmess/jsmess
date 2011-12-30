@@ -165,6 +165,6 @@ VIDEO_START( gf4500 )
 
 SCREEN_UPDATE( gf4500 )
 {
-	gf4500_render_screen( screen->machine(), screen->machine().generic.tmpbitmap);
+	gf4500_render_screen( screen.machine(), screen.machine().generic.tmpbitmap);
 	return SCREEN_UPDATE_CALL(generic_bitmapped);
 }

@@ -152,7 +152,7 @@ static VIDEO_START( ti990_10 )
 
 static SCREEN_UPDATE( ti990_10 )
 {
-	ti990_10_state *state = screen->machine().driver_data<ti990_10_state>();
+	ti990_10_state *state = screen.machine().driver_data<ti990_10_state>();
 	vdt911_refresh(state->m_terminal, bitmap, 0, 0);
 	return 0;
 }

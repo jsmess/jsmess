@@ -182,7 +182,7 @@ static void ts2068_lores_scanline(running_machine &machine,bitmap_t *bitmap, int
 SCREEN_UPDATE( ts2068 )
 {
 	/* for now TS2068 will do a full-refresh */
-	spectrum_state *state = screen->machine().driver_data<spectrum_state>();
+	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
 	int count;
 	int full_refresh = 1;
 
@@ -191,28 +191,28 @@ SCREEN_UPDATE( ts2068 )
 		/* 64 Column mode */
 		unsigned short inkcolor = (state->m_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
-			ts2068_64col_scanline(screen->machine(),bitmap, count, TS2068_TOP_BORDER, inkcolor);
+			ts2068_64col_scanline(screen.machine(),bitmap, count, TS2068_TOP_BORDER, inkcolor);
 	}
 	else if ((state->m_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
-			ts2068_hires_scanline(screen->machine(),bitmap, count, TS2068_TOP_BORDER);
+			ts2068_hires_scanline(screen.machine(),bitmap, count, TS2068_TOP_BORDER);
 	}
 	else if ((state->m_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(screen->machine(),bitmap, count, TS2068_TOP_BORDER, 1);
+			ts2068_lores_scanline(screen.machine(),bitmap, count, TS2068_TOP_BORDER, 1);
 	}
 	else
 	{
 		/* Screen 4000-5aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(screen->machine(),bitmap, count, TS2068_TOP_BORDER, 0);
+			ts2068_lores_scanline(screen.machine(),bitmap, count, TS2068_TOP_BORDER, 0);
 	}
 
-	spectrum_border_draw(screen->machine(), bitmap, full_refresh,
+	spectrum_border_draw(screen.machine(), bitmap, full_refresh,
 		TS2068_TOP_BORDER, SPEC_DISPLAY_YSIZE, TS2068_BOTTOM_BORDER,
 		TS2068_LEFT_BORDER, TS2068_DISPLAY_XSIZE, TS2068_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,
@@ -223,7 +223,7 @@ SCREEN_UPDATE( ts2068 )
 SCREEN_UPDATE( tc2048 )
 {
 	/* for now TS2068 will do a full-refresh */
-	spectrum_state *state = screen->machine().driver_data<spectrum_state>();
+	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
 	int count;
 	int full_refresh = 1;
 
@@ -232,28 +232,28 @@ SCREEN_UPDATE( tc2048 )
 		/* 64 Column mode */
 		unsigned short inkcolor = (state->m_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
-			ts2068_64col_scanline(screen->machine(),bitmap, count, SPEC_TOP_BORDER, inkcolor);
+			ts2068_64col_scanline(screen.machine(),bitmap, count, SPEC_TOP_BORDER, inkcolor);
 	}
 	else if ((state->m_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
-			ts2068_hires_scanline(screen->machine(),bitmap, count, SPEC_TOP_BORDER);
+			ts2068_hires_scanline(screen.machine(),bitmap, count, SPEC_TOP_BORDER);
 	}
 	else if ((state->m_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(screen->machine(),bitmap, count, SPEC_TOP_BORDER, 1);
+			ts2068_lores_scanline(screen.machine(),bitmap, count, SPEC_TOP_BORDER, 1);
 	}
 	else
 	{
 		/* Screen 4000-5aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(screen->machine(),bitmap, count, SPEC_TOP_BORDER, 0);
+			ts2068_lores_scanline(screen.machine(),bitmap, count, SPEC_TOP_BORDER, 0);
 	}
 
-	spectrum_border_draw(screen->machine(), bitmap, full_refresh,
+	spectrum_border_draw(screen.machine(), bitmap, full_refresh,
 		SPEC_TOP_BORDER, SPEC_DISPLAY_YSIZE, SPEC_BOTTOM_BORDER,
 		TS2068_LEFT_BORDER, TS2068_DISPLAY_XSIZE, TS2068_RIGHT_BORDER,
 		SPEC_LEFT_BORDER_CYCLES, SPEC_DISPLAY_XSIZE_CYCLES,

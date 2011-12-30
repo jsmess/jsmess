@@ -546,7 +546,7 @@ static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
 
 static SCREEN_UPDATE( sg1000 )
 {
-	tms9918a_device *tms9918a = screen->machine().device<tms9918a_device>( TMS9918A_TAG );
+	tms9918a_device *tms9918a = screen.machine().device<tms9918a_device>( TMS9918A_TAG );
 
 	tms9918a->update( bitmap, cliprect );
 	return 0;

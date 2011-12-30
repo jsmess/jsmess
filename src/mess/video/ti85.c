@@ -150,7 +150,7 @@ VIDEO_START( ti85 )
 
 SCREEN_UPDATE( ti85 )
 {
-	ti85_state *state = screen->machine().driver_data<ti85_state>();
+	ti85_state *state = screen.machine().driver_data<ti85_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	int x,y,b;
 	int brightnes;
@@ -197,7 +197,7 @@ PALETTE_INIT( ti82 )
 
 SCREEN_UPDATE( ti82 )
 {
-	t6a04_device* t6a04 = screen->machine().device<t6a04_device>("t6a04");
+	t6a04_device* t6a04 = screen.machine().device<t6a04_device>("t6a04");
 
 	return t6a04->video_update(bitmap, cliprect);
 }

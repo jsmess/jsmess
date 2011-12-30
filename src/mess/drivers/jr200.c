@@ -100,7 +100,7 @@ static VIDEO_START( jr200 )
 
 static SCREEN_UPDATE( jr200 )
 {
-	jr200_state *state = screen->machine().driver_data<jr200_state>();
+	jr200_state *state = screen.machine().driver_data<jr200_state>();
 	int x,y,xi,yi,pen;
 
 	bitmap_fill(bitmap, cliprect, state->m_border_col);
@@ -139,12 +139,12 @@ static SCREEN_UPDATE( jr200 )
 					}
 					else // tile mode
 					{
-						gfx_data = screen->machine().region(attr & 0x40 ? "pcg" : "gfx_ram")->base();
+						gfx_data = screen.machine().region(attr & 0x40 ? "pcg" : "gfx_ram")->base();
 
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
 
-					*BITMAP_ADDR16(bitmap, y*8+yi+16, x*8+xi+16) = screen->machine().pens[pen];
+					*BITMAP_ADDR16(bitmap, y*8+yi+16, x*8+xi+16) = screen.machine().pens[pen];
 				}
 			}
 		}

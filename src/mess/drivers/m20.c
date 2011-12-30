@@ -61,12 +61,12 @@ static VIDEO_START( m20 )
 
 static SCREEN_UPDATE( m20 )
 {
-	m20_state *state = screen->machine().driver_data<m20_state>();
+	m20_state *state = screen.machine().driver_data<m20_state>();
 	int x,y,i;
 	UINT8 pen;
 	UINT32 count;
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen.machine()));
 
 	count = (0);
 
@@ -78,8 +78,8 @@ static SCREEN_UPDATE( m20 )
 			{
 				pen = (state->m_p_videoram[count]) >> (15 - i) & 1;
 
-				if ((x + i) <= screen->visible_area().max_x && (y + 0) < screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine().pens[pen];
+				if ((x + i) <= screen.visible_area().max_x && (y + 0) < screen.visible_area().max_y)
+					*BITMAP_ADDR32(bitmap, y, x + i) = screen.machine().pens[pen];
 			}
 
 			count++;

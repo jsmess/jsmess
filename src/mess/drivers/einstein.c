@@ -426,7 +426,7 @@ static TMS9928A_INTERFACE(einstein_tms9929a_interface)
 
 static SCREEN_UPDATE( einstein )
 {
-	tms9929a_device *tms9929a = screen->machine().device<tms9929a_device>( "tms9929a" );
+	tms9929a_device *tms9929a = screen.machine().device<tms9929a_device>( "tms9929a" );
 
 	tms9929a->update( bitmap, cliprect );
 	return 0;
@@ -502,14 +502,14 @@ static MACHINE_START( einstein2 )
 
 static SCREEN_UPDATE( einstein2 )
 {
-	einstein_state *einstein = screen->machine().driver_data<einstein_state>();
+	einstein_state *einstein = screen.machine().driver_data<einstein_state>();
 
-	if (screen == einstein->m_color_screen)
+	if (&screen == einstein->m_color_screen)
 		SCREEN_UPDATE_CALL(einstein);
-	else if (screen == einstein->m_crtc_screen)
+	else if (&screen == einstein->m_crtc_screen)
 		einstein->m_mc6845->update( bitmap, cliprect);
 	else
-		fatalerror("Unknown screen '%s'", screen->tag());
+		fatalerror("Unknown screen '%s'", screen.tag());
 
 	return 0;
 }

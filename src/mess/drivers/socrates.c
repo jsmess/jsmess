@@ -591,7 +591,7 @@ static VIDEO_START( socrates )
 
 static SCREEN_UPDATE( socrates )
 {
-	socrates_state *state = screen->machine().driver_data<socrates_state>();
+	socrates_state *state = screen.machine().driver_data<socrates_state>();
 	static const UINT8 fixedcolors[8] =
 	{
 	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0xF7

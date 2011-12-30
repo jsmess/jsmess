@@ -421,14 +421,14 @@ static void pc6001_screen_draw(running_machine &machine, bitmap_t *bitmap,const 
 
 static SCREEN_UPDATE( pc6001 )
 {
-	pc6001_screen_draw(screen->machine(),bitmap,cliprect,1);
+	pc6001_screen_draw(screen.machine(),bitmap,cliprect,1);
 
 	return 0;
 }
 
 static SCREEN_UPDATE( pc6001m2 )
 {
-	pc6001_state *state = screen->machine().driver_data<pc6001_state>();
+	pc6001_state *state = screen.machine().driver_data<pc6001_state>();
 	int x,y,tile,attr;
 
 	/* note: bitmap mode have priority over everything else, check American Truck */
@@ -464,10 +464,10 @@ static SCREEN_UPDATE( pc6001m2 )
 					color |= ((pen[1] & 1) << 1);
 					color |= ((pen[1] & 2) << 2);
 
-					if (((x+i)*2+0) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y, (x+i)*2+0) = screen->machine().pens[color];
-					if (((x+i)*2+1) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y, (x+i)*2+1) = screen->machine().pens[color];
+					if (((x+i)*2+0) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y, (x+i)*2+0) = screen.machine().pens[color];
+					if (((x+i)*2+1) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y, (x+i)*2+1) = screen.machine().pens[color];
 				}
 
 				count++;
@@ -512,8 +512,8 @@ static SCREEN_UPDATE( pc6001m2 )
 						color |= ((state->m_bgcol_bank & 2) << 2);
 					}
 
-					if ((x+i) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y, (x+i)) = screen->machine().pens[color];
+					if ((x+i) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
+						*BITMAP_ADDR16(bitmap, y, (x+i)) = screen.machine().pens[color];
 				}
 
 				count++;
@@ -524,7 +524,7 @@ static SCREEN_UPDATE( pc6001m2 )
 	else if(state->m_exgfx_text_mode)
 	{
 		int xi,yi,pen,fgcol,bgcol,color;
-		UINT8 *gfx_data = screen->machine().region("gfx1")->base();
+		UINT8 *gfx_data = screen.machine().region("gfx1")->base();
 
 		for(y=0;y<20;y++)
 		{
@@ -552,8 +552,8 @@ static SCREEN_UPDATE( pc6001m2 )
 
 						color = pen ? fgcol : bgcol;
 
-						if ((x*8+xi) <= screen->visible_area().max_x && (y*12+yi) <= screen->visible_area().max_y)
-							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine().pens[color];
+						if ((x*8+xi) <= screen.visible_area().max_x && (y*12+yi) <= screen.visible_area().max_y)
+							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
 					}
 				}
 			}
@@ -562,7 +562,7 @@ static SCREEN_UPDATE( pc6001m2 )
 	else
 	{
 		attr = state->m_video_ram[0];
-		pc6001_screen_draw(screen->machine(),bitmap,cliprect,0);
+		pc6001_screen_draw(screen.machine(),bitmap,cliprect,0);
 	}
 
 	return 0;
@@ -570,10 +570,10 @@ static SCREEN_UPDATE( pc6001m2 )
 
 static SCREEN_UPDATE( pc6001sr )
 {
-	pc6001_state *state = screen->machine().driver_data<pc6001_state>();
+	pc6001_state *state = screen.machine().driver_data<pc6001_state>();
 	int x,y,tile,attr;
 	int xi,yi,pen,fgcol,bgcol,color;
-	UINT8 *gfx_data = screen->machine().region("gfx1")->base();
+	UINT8 *gfx_data = screen.machine().region("gfx1")->base();
 
 
 	if(state->m_sr_video_mode & 8) // text mode
@@ -597,8 +597,8 @@ static SCREEN_UPDATE( pc6001sr )
 
 						color = pen ? fgcol : bgcol;
 
-						if ((x*8+xi) <= screen->visible_area().max_x && (y*12+yi) <= screen->visible_area().max_y)
-							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen->machine().pens[color];
+						if ((x*8+xi) <= screen.visible_area().max_x && (y*12+yi) <= screen.visible_area().max_y)
+							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
 					}
 				}
 			}
@@ -616,43 +616,43 @@ static SCREEN_UPDATE( pc6001sr )
 			{
 				color = state->m_video_ram[count] & 0x0f;
 
-				if ((x+0) <= screen->visible_area().max_x && (y+0) <= screen->visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+0), (x+0)) = screen->machine().pens[color+0x10];
+				if ((x+0) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+0), (x+0)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count] & 0xf0) >> 4;
 
-				if ((x+1) <= screen->visible_area().max_x && (y+0) <= screen->visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+0), (x+1)) = screen->machine().pens[color+0x10];
+				if ((x+1) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+0), (x+1)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+1] & 0x0f;
 
-				if ((x+2) <= screen->visible_area().max_x && (y+0) <= screen->visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+0), (x+2)) = screen->machine().pens[color+0x10];
+				if ((x+2) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+0), (x+2)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+1] & 0xf0) >> 4;
 
-				if ((x+3) <= screen->visible_area().max_x && (y+0) <= screen->visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+0), (x+3)) = screen->machine().pens[color+0x10];
+				if ((x+3) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+0), (x+3)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+2] & 0x0f;
 
-				if ((x+0) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+1), (x+0)) = screen->machine().pens[color+0x10];
+				if ((x+0) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+1), (x+0)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+2] & 0xf0) >> 4;
 
-				if ((x+1) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+1), (x+1)) = screen->machine().pens[color+0x10];
+				if ((x+1) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+1), (x+1)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+3] & 0x0f;
 
-				if ((x+2) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+1), (x+2)) = screen->machine().pens[color+0x10];
+				if ((x+2) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+1), (x+2)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+3] & 0xf0) >> 4;
 
-				if ((x+3) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+1), (x+3)) = screen->machine().pens[color+0x10];
+				if ((x+3) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
+					*BITMAP_ADDR16(bitmap, (y+1), (x+3)) = screen.machine().pens[color+0x10];
 
 
 				count+=4;

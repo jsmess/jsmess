@@ -62,11 +62,11 @@ INLINE void electron_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 SCREEN_UPDATE( electron )
 {
-	electron_state *state = screen->machine().driver_data<electron_state>();
+	electron_state *state = screen.machine().driver_data<electron_state>();
 	int i;
 	int x = 0;
 	int pal[16];
-	int scanline = screen->vpos();
+	int scanline = screen.vpos();
 	rectangle r = *cliprect;
 	r.min_y = r.max_y = scanline;
 

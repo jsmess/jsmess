@@ -206,7 +206,7 @@ VIDEO_START( zx )
 
 SCREEN_EOF( zx )
 {
-	zx_state *state = machine.driver_data<zx_state>();
+	zx_state *state = screen.machine().driver_data<zx_state>();
 	/* decrement video synchronization counter */
 	if (state->m_ula_frame_vsync)
 		--state->m_ula_frame_vsync;

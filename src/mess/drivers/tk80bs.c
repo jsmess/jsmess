@@ -259,7 +259,7 @@ static VIDEO_START( tk80bs )
 
 static SCREEN_UPDATE( tk80bs )
 {
-	tk80bs_state *state = screen->machine().driver_data<tk80bs_state>();
+	tk80bs_state *state = screen.machine().driver_data<tk80bs_state>();
 	int x,y;
 	int count;
 
@@ -271,7 +271,7 @@ static SCREEN_UPDATE( tk80bs )
 		{
 			int tile = state->m_p_videoram[count++];
 
-			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile, 0, 0, 0, x*8, y*8);
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], tile, 0, 0, 0, x*8, y*8);
 		}
 	}
 

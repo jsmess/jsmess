@@ -760,7 +760,7 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t* bitma
 
 static SCREEN_UPDATE( supracan )
 {
-	supracan_state *state = (supracan_state *)screen->machine().driver_data<supracan_state>();
+	supracan_state *state = (supracan_state *)screen.machine().driver_data<supracan_state>();
 
 
 
@@ -770,12 +770,12 @@ static SCREEN_UPDATE( supracan )
 	{
 		if (cliprect->min_y == 0x00)
 		{
-			const rectangle &visarea = screen->visible_area();
+			const rectangle &visarea = screen.visible_area();
 
 			bitmap_fill(state->m_sprite_final_bitmap, &visarea, 0x00);
 			bitmap_fill(bitmap, &visarea, 0x80);
 
-			draw_sprites(screen->machine(), state->m_sprite_final_bitmap, &visarea);
+			draw_sprites(screen.machine(), state->m_sprite_final_bitmap, &visarea);
 		}
 	}
 	else
@@ -784,7 +784,7 @@ static SCREEN_UPDATE( supracan )
 		bitmap_fill(state->m_sprite_final_bitmap, cliprect, 0x00);
 		bitmap_fill(bitmap, cliprect, 0x80);
 
-		draw_sprites(screen->machine(), state->m_sprite_final_bitmap, cliprect);
+		draw_sprites(screen.machine(), state->m_sprite_final_bitmap, cliprect);
 	}
 
 
@@ -825,9 +825,9 @@ static SCREEN_UPDATE( supracan )
 			if (priority==pri)
 			{
 //            tilemap_num = layer;
-				which_tilemap_size = get_tilemap_dimensions(screen->machine(), xsize, ysize, layer);
+				which_tilemap_size = get_tilemap_dimensions(screen.machine(), xsize, ysize, layer);
 				src_bitmap = tilemap_get_pixmap(state->m_tilemap_sizes[layer][which_tilemap_size]);
-				int gfx_region = supracan_tilemap_get_region(screen->machine(), layer);
+				int gfx_region = supracan_tilemap_get_region(screen.machine(), layer);
 				int transmask = 0xff;
 
 				switch (gfx_region)
@@ -953,12 +953,12 @@ static SCREEN_UPDATE( supracan )
 
 
 								if (state->m_vram[state->m_roz_unk_base0/2 + y]) // incxx = 0, no draw?
-									supracan_suprnova_draw_roz(screen->machine(), bitmap, &clip, state->m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+									supracan_suprnova_draw_roz(screen.machine(), bitmap, &clip, state->m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 							}
 						}
 						else
 						{
-							supracan_suprnova_draw_roz(screen->machine(), bitmap, cliprect, state->m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+							supracan_suprnova_draw_roz(screen.machine(), bitmap, cliprect, state->m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 						}
 					}
 				}

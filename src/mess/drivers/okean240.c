@@ -392,7 +392,7 @@ VIDEO_START_MEMBER( okean240_state )
 
 static SCREEN_UPDATE( okean240 )
 {
-	okean240_state *state = screen->machine().driver_data<okean240_state>();
+	okean240_state *state = screen.machine().driver_data<okean240_state>();
 	UINT8 gfx,ma; // ma must be 8bit
 	UINT16 x,y;
 

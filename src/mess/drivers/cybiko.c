@@ -310,7 +310,7 @@ PALETTE_INIT( hd66421 )
 
 static SCREEN_UPDATE( cybiko )
 {
-	hd66421_device *hd66421 = screen->machine().device<hd66421_device>( "hd66421" );
+	hd66421_device *hd66421 = screen.machine().device<hd66421_device>( "hd66421" );
 	hd66421->update_screen(bitmap, cliprect);
 	return 0;
 }

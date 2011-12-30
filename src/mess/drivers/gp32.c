@@ -294,7 +294,7 @@ static VIDEO_START( gp32 )
 
 static SCREEN_UPDATE( gp32 )
 {
-	running_machine &machine = screen->machine();
+	running_machine &machine = screen.machine();
 	SCREEN_UPDATE_CALL(generic_bitmapped);
 	s3c240x_lcd_dma_init( machine);
 	return 0;

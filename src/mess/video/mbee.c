@@ -388,7 +388,7 @@ VIDEO_START( mbeeppc )
 
 SCREEN_UPDATE( mbee )
 {
-	mbee_state *state = screen->machine().driver_data<mbee_state>();
+	mbee_state *state = screen.machine().driver_data<mbee_state>();
 	state->m_framecnt++;
 	state->m_speed = state->m_sy6545_reg[10]&0x20, state->m_flash = state->m_sy6545_reg[10]&0x40;			// cursor modes
 	state->m_cursor = (state->m_sy6545_reg[14]<<8) | state->m_sy6545_reg[15];					// get cursor position

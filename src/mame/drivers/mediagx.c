@@ -76,6 +76,7 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "sound/dmadac.h"
+#include "video/ramdac.h"
 
 #define SPEEDUP_HACKS	1
 
@@ -345,14 +346,14 @@ static void draw_cga(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 static SCREEN_UPDATE(mediagx)
 {
-	mediagx_state *state = screen->machine().driver_data<mediagx_state>();
+	mediagx_state *state = screen.machine().driver_data<mediagx_state>();
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_framebuffer(screen->machine(), bitmap, cliprect);
+	draw_framebuffer(screen.machine(), bitmap, cliprect);
 
 	if (state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
-		draw_cga(screen->machine(), bitmap, cliprect);
+		draw_cga(screen.machine(), bitmap, cliprect);
 	}
 	return 0;
 }
@@ -384,6 +385,7 @@ static WRITE32_HANDLER( disp_ctrl_w )
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
+//	printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(state->m_disp_ctrl_reg + offset);
 }
 
@@ -432,18 +434,30 @@ static WRITE32_HANDLER( memory_ctrl_w )
 {
 	mediagx_state *state = space->machine().driver_data<mediagx_state>();
 
-	//mame_printf_debug("memory_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
-	if (offset == 7)
+//	printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
+	if (offset == 0x20/4)
 	{
-		state->m_pal_index = 0;
-	}
-	else if (offset == 8)
-	{
-		state->m_pal[state->m_pal_index] = data & 0xff;
-		state->m_pal_index++;
-		if (state->m_pal_index >= 768)
+		ramdac_device *ramdac = space->machine().device<ramdac_device>("ramdac");
+
+		if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
-			state->m_pal_index = 0;
+			// guess: crtc params?
+			// ...
+		}
+		else if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
+		{
+			state->m_pal_index = data;
+			ramdac->index_w( *space, 0, data );
+		}
+		else if((state->m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
+		{
+			state->m_pal[state->m_pal_index] = data & 0xff;
+			state->m_pal_index++;
+			if (state->m_pal_index >= 768)
+			{
+				state->m_pal_index = 0;
+			}
+			ramdac->pal_w( *space, 0, data );
 		}
 	}
 	else
@@ -1103,6 +1117,14 @@ static const struct pit8253_config mediagx_pit8254_config =
 	}
 };
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+ADDRESS_MAP_END
+
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	0
+};
 
 static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
@@ -1133,6 +1155,8 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1142,7 +1166,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SCREEN_UPDATE(mediagx)
 
 	MCFG_GFXDECODE(CGA)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START(mediagx)
 
@@ -1297,8 +1321,10 @@ static DRIVER_INIT( a51site4 )
 
 ROM_START( a51site4 )
 	ROM_REGION32_LE(0x40000, "bios", 0)
-	ROM_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe)) /* Build date 07/11/98 string stored at 0x3fff5 */
-	ROM_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778)) /* Build date 09/15/98 string stored at 0x3fff5 */
+	ROM_SYSTEM_BIOS(0, "new", "v1.0h" )
+	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(1)) /* Build date 09/15/98 string stored at 0x3fff5 */
+	ROM_SYSTEM_BIOS(1, "old", "v1.0f" )
+	ROMX_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe), ROM_BIOS(2)) /* Build date 07/11/98 string stored at 0x3fff5 */
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))

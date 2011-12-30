@@ -666,9 +666,9 @@ SCREEN_EOF( nimbus )
 
 SCREEN_UPDATE( nimbus )
 {
-	rmnimbus_state *state = screen->machine().driver_data<rmnimbus_state>();
+	rmnimbus_state *state = screen.machine().driver_data<rmnimbus_state>();
     int     XCoord;
-    int     YCoord = screen->vpos();
+    int     YCoord = screen.vpos();
 
     for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
     {

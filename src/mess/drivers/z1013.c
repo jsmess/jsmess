@@ -192,7 +192,7 @@ VIDEO_START( z1013 )
 
 SCREEN_UPDATE( z1013 )
 {
-	z1013_state *state = screen->machine().driver_data<z1013_state>();
+	z1013_state *state = screen.machine().driver_data<z1013_state>();
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
 

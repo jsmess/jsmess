@@ -100,7 +100,7 @@ VIDEO_START_MEMBER( z9001_state )
 
 static SCREEN_UPDATE( z9001 )
 {
-	z9001_state *state = screen->machine().driver_data<z9001_state>();
+	z9001_state *state = screen.machine().driver_data<z9001_state>();
 	UINT8 y,ra,chr,gfx,col,fg,bg;
 	UINT16 sy=0,ma=0,x;
 	state->m_framecnt++;

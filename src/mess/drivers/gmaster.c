@@ -178,7 +178,7 @@ static PALETTE_INIT( gmaster )
 
 static SCREEN_UPDATE( gmaster )
 {
-	gmaster_state *state = screen->machine().driver_data<gmaster_state>();
+	gmaster_state *state = screen.machine().driver_data<gmaster_state>();
     int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0); //xmess rounds up to 64 pixel
     for (y = 0; y < ARRAY_LENGTH(state->m_video.pixels); y++)

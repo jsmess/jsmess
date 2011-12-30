@@ -370,21 +370,21 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 
 static SCREEN_UPDATE( pasopia7 )
 {
-	pasopia7_state *state = screen->machine().driver_data<pasopia7_state>();
+	pasopia7_state *state = screen.machine().driver_data<pasopia7_state>();
 	int width;
 
-	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
+	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
 
-	fake_keyboard_data(screen->machine());
+	fake_keyboard_data(screen.machine());
 
 	width = state->m_x_width ? 80 : 40;
 
 	if(state->m_gfx_mode)
-		draw_mixed_screen(screen->machine(),bitmap,cliprect,width);
+		draw_mixed_screen(screen.machine(),bitmap,cliprect,width);
 	else
 	{
-		draw_cg4_screen(screen->machine(),bitmap,cliprect,width);
-		draw_tv_screen(screen->machine(),bitmap,cliprect,width);
+		draw_cg4_screen(screen.machine(),bitmap,cliprect,width);
+		draw_tv_screen(screen.machine(),bitmap,cliprect,width);
 	}
 
 	return 0;

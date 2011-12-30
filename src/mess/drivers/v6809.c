@@ -235,7 +235,7 @@ static VIDEO_START( v6809 )
 
 static SCREEN_UPDATE( v6809 )
 {
-	v6809_state *state = screen->machine().driver_data<v6809_state>();
+	v6809_state *state = screen.machine().driver_data<v6809_state>();
 	state->m_crtc->update( bitmap, cliprect);
 	return 0;
 }

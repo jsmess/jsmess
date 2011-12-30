@@ -393,7 +393,7 @@ static PALETTE_INIT( pasogo )
 static SCREEN_UPDATE( pasogo )
 {
 	//static int width=-1,height=-1;
-	UINT8 *rom = screen->machine().region("maincpu")->base()+0xb8000;
+	UINT8 *rom = screen.machine().region("maincpu")->base()+0xb8000;
 	static const UINT16 c[]={ 3, 0 };
 	int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0);
@@ -442,7 +442,7 @@ static SCREEN_UPDATE( pasogo )
 	{
 		width=w; height=h;
 //      machine.primary_screen->set_visible_area(0, width-1, 0, height-1);
-		screen->set_visible_area(0, width-1, 0, height-1);
+		screen.set_visible_area(0, width-1, 0, height-1);
 	}
 #endif
 	return 0;

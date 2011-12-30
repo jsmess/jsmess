@@ -29,7 +29,7 @@ VIDEO_START( poly88 )
 
 SCREEN_UPDATE( poly88 )
 {
-	poly88_state *state = screen->machine().driver_data<poly88_state>();
+	poly88_state *state = screen.machine().driver_data<poly88_state>();
 	int x,y,j,b;
 	UINT16 addr;
 	int xpos;
