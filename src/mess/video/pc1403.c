@@ -154,7 +154,7 @@ SCREEN_UPDATE( pc1403 )
 	int x, y, i, j;
 	int color[3];
 
-	bitmap_fill(bitmap, cliprect, 11);
+	bitmap->fill(11, *cliprect);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = 7; // pocketc_colortable[CONTRAST][0];

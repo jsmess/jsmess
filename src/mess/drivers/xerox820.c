@@ -634,7 +634,7 @@ bool xerox820_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
+			UINT16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{

@@ -406,7 +406,7 @@ static SCREEN_UPDATE( vii )
 	vii_state *state = screen.machine().driver_data<vii_state>();
 	int i, x, y;
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	memset(state->m_screen, 0, sizeof(state->m_screen));
 
@@ -421,7 +421,7 @@ static SCREEN_UPDATE( vii )
 	{
 		for(x = 0; x < 320; x++)
 		{
-			*BITMAP_ADDR32(bitmap, y, x) = (state->m_screen[x + 320*y].r << 16) | (state->m_screen[x + 320*y].g << 8) | state->m_screen[x + 320*y].b;
+			bitmap->pix32(y, x) = (state->m_screen[x + 320*y].r << 16) | (state->m_screen[x + 320*y].g << 8) | state->m_screen[x + 320*y].b;
 		}
 	}
 

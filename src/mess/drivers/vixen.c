@@ -473,7 +473,7 @@ bool vixen_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 				{
 					int color = (BIT(char_data, 7 - x) ^ reverse) & !blank;
 
-					*BITMAP_ADDR16(&bitmap, (txadr * 10) + scan, (chadr * 8) + x) = color;
+					bitmap.pix16((txadr * 10) + scan, (chadr * 8) + x) = color;
 				}
 			}
 		}

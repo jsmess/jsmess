@@ -971,7 +971,7 @@ static PALETTE_INIT( x07 )
 
 bool x07_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	bitmap_fill(&bitmap, NULL, 0);
+	bitmap.fill(0);
 
 	if (m_lcd_on)
 	{
@@ -980,9 +980,9 @@ bool x07_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 				for(int y = 0; y < 8; y++)
 					for (int x=0; x<6; x++)
 						if(m_cursor.on && m_blink && m_cursor.x == px && m_cursor.y == py)
-							*BITMAP_ADDR16(&bitmap, py * 8 + y, px * 6 + x) = (y == 7) ? 1: 0;
+							bitmap.pix16(py * 8 + y, px * 6 + x) = (y == 7) ? 1: 0;
 						else
-							*BITMAP_ADDR16(&bitmap, py * 8 + y, px * 6 + x) = m_lcd_map[py * 8 + y][px * 6 + x]? 1: 0;
+							bitmap.pix16(py * 8 + y, px * 6 + x) = m_lcd_map[py * 8 + y][px * 6 + x]? 1: 0;
 
 	}
 

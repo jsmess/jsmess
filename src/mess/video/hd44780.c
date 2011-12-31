@@ -165,9 +165,9 @@ void hd44780_device::set_busy_flag(UINT16 usec)
 
 int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	assert(height*9 <= bitmap->height && width*6 <= bitmap->width);
+	assert(height*9 <= bitmap->height() && width*6 <= bitmap->width());
 
-	bitmap_fill(bitmap, cliprect, 0);
+	bitmap->fill(0, *cliprect);
 
 	if (m_display_on)
 		for (int l=0; l<height; l++)
@@ -197,21 +197,21 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 						if (m_ddram[char_pos] <= 0x10)
 						{
 							//draw CGRAM characters
-							*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(m_cgram[(m_ddram[char_pos]&0x07)*8+y], 4-x);
+							bitmap->pix16(l*9 + y, i*6 + x) = BIT(m_cgram[(m_ddram[char_pos]&0x07)*8+y], 4-x);
 						}
 						else
 						{
 							//draw CGROM characters
 							if (region()->bytes() <= 0x800)
 							{
-								*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(region()->u8(m_ddram[char_pos]*8+y), 4-x);
+								bitmap->pix16(l*9 + y, i*6 + x) = BIT(region()->u8(m_ddram[char_pos]*8+y), 4-x);
 							}
 							else
 							{
 								if(m_ddram[char_pos] < 0xe0)
-									*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(region()->u8(m_ddram[char_pos]*8+y), 4-x);
+									bitmap->pix16(l*9 + y, i*6 + x) = BIT(region()->u8(m_ddram[char_pos]*8+y), 4-x);
 								else
-									*BITMAP_ADDR16(bitmap, l*9 + y, i*6 + x) = BIT(region()->u8(0x700+((m_ddram[char_pos]-0xe0)*11)+y), 4-x);
+									bitmap->pix16(l*9 + y, i*6 + x) = BIT(region()->u8(0x700+((m_ddram[char_pos]-0xe0)*11)+y), 4-x);
 							}
 						}
 
@@ -221,12 +221,12 @@ int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 					//draw the cursor
 					if (m_cursor_on)
 						for (int x=0; x<5; x++)
-							*BITMAP_ADDR16(bitmap, l*9 + 7, i * 6 + x) = 1;
+							bitmap->pix16(l*9 + 7, i * 6 + x) = 1;
 
 					if (!m_blink && m_blink_on)
 						for (int y=0; y<7; y++)
 							for (int x=0; x<5; x++)
-								*BITMAP_ADDR16(bitmap, l*9 + y, i * 6 + x) = 1;
+								bitmap->pix16(l*9 + y, i * 6 + x) = 1;
 				}
 			}
 

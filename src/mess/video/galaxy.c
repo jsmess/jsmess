@@ -47,14 +47,14 @@ static TIMER_CALLBACK( gal_video )
 				y = state->m_gal_cnt / 48 - 2;
 				x = (state->m_gal_cnt % 48) * 8;
 
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 0) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 1) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 2) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 3) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 4) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 5) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 6) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 7) & 1;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 0) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 1) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 2) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 3) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 4) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 5) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 6) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 7) & 1;
 			}
 			else
 			{ // Graphics mode
@@ -89,14 +89,14 @@ static TIMER_CALLBACK( gal_video )
 				}
 				/* end of hack */
 
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 0) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 1) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 2) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 3) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 4) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 5) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 6) & 1; x++;
-				*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x ) = (state->m_code >> 7) & 1;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 0) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 1) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 2) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 3) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 4) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 5) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 6) & 1; x++;
+				machine.generic.tmpbitmap->pix16(y, x ) = (state->m_code >> 7) & 1;
 			}
 		}
 		state->m_gal_cnt++;
@@ -127,8 +127,8 @@ SCREEN_UPDATE( galaxy )
 	state->m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 	if (state->m_interrupts_enabled == FALSE)
 	{
-		static const rectangle black_area = {0, 384 - 1, 0, 208 - 1};
-		bitmap_fill(screen.machine().generic.tmpbitmap, &black_area, 0);
+		const rectangle black_area(0, 384 - 1, 0, 208 - 1);
+		screen.machine().generic.tmpbitmap->fill(0, black_area);
 	}
 	state->m_interrupts_enabled = FALSE;
 	return SCREEN_UPDATE_CALL ( generic_bitmapped );

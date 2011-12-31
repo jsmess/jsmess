@@ -116,11 +116,11 @@ static SCREEN_UPDATE( bml3 )
 
 					if(height)
 					{
-						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+0, x*8+xi) = pen;
-						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+1, x*8+xi) = pen;
+						bitmap->pix16((y*8+yi)*2+0, x*8+xi) = pen;
+						bitmap->pix16((y*8+yi)*2+1, x*8+xi) = pen;
 					}
 					else
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = pen;
+						bitmap->pix16(y*8+yi, x*8+xi) = pen;
 				}
 			}
 
@@ -145,11 +145,11 @@ static SCREEN_UPDATE( bml3 )
 						{
 							if(height)
 							{
-								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+0, x*8+xc) = 7;
-								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+1, x*8+xc) = 7;
+								bitmap->pix16((y*8+yc+7)*2+0, x*8+xc) = 7;
+								bitmap->pix16((y*8+yc+7)*2+1, x*8+xc) = 7;
 							}
 							else
-								*BITMAP_ADDR16(bitmap, y*8+yc+7, x*8+xc) = 7;
+								bitmap->pix16(y*8+yc+7, x*8+xc) = 7;
 						}
 					}
 				}

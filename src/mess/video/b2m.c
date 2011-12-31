@@ -38,7 +38,7 @@ SCREEN_UPDATE( b2m )
 			for (b = 7; b >= 0; b--)
 			{
 				col = (((code2 >> b) & 0x01)<<1) + ((code1 >> b) & 0x01);
-				*BITMAP_ADDR16(bitmap, y, x*8+b) =  col;
+				bitmap->pix16(y, x*8+b) =  col;
 			}
 		}
 	}

@@ -228,7 +228,7 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 	dim68k_state *state = device->machine().driver_data<dim68k_state>();
 	UINT8 chr,gfx,x,xx,inv;
 	UINT16 chr16=0x2020; // set to spaces if screen is off
-	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *p = &bitmap->pix16(y);
 	UINT8 screen_on = ~state->m_video_control & 4;
 	UINT8 dot8 = ~state->m_video_control & 40;
 

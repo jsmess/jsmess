@@ -188,21 +188,21 @@ static SCREEN_UPDATE( gmaster )
 			UINT8 d = state->m_video.pixels[y][x];
 			UINT16 *line;
 
-			line = BITMAP_ADDR16(bitmap, (y * 8), x);
+			line = &bitmap->pix16((y * 8), x);
 			line[0] = BIT(d, 0);
-			line = BITMAP_ADDR16(bitmap, (y * 8 + 1), x);
+			line = &bitmap->pix16((y * 8 + 1), x);
 			line[0] = BIT(d, 1);
-			line = BITMAP_ADDR16(bitmap, (y * 8 + 2), x);
+			line = &bitmap->pix16((y * 8 + 2), x);
 			line[0] = BIT(d, 2);
-			line = BITMAP_ADDR16(bitmap, (y * 8 + 3), x);
+			line = &bitmap->pix16((y * 8 + 3), x);
 			line[0] = BIT(d, 3);
-			line = BITMAP_ADDR16(bitmap, (y * 8 + 4), x);
+			line = &bitmap->pix16((y * 8 + 4), x);
 			line[0] = BIT(d, 4);
-			line = BITMAP_ADDR16(bitmap, (y * 8 + 5), x);
+			line = &bitmap->pix16((y * 8 + 5), x);
 			line[0] = BIT(d, 5);
-			line = BITMAP_ADDR16(bitmap, (y * 8 + 6), x);
+			line = &bitmap->pix16((y * 8 + 6), x);
 			line[0] = BIT(d, 6);
-			line = BITMAP_ADDR16(bitmap, (y * 8 + 7), x);
+			line = &bitmap->pix16((y * 8 + 7), x);
 			line[0] = BIT(d, 7);
 		}
     }

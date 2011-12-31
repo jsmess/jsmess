@@ -75,7 +75,7 @@ void hector_hr(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int ymax
 	UINT8 gfx,y;
 	UINT16 sy=0,ma=0,x;
 	for (y = 0; y <= ymax; y++) {  //224
-		UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+		UINT16  *p = &bitmap->pix16(sy++);
 		for (x = ma; x < ma + yram; x++) {  // 64
 			gfx = *(page+x);
 			/* Display a scanline of a character (4 pixels !) */
@@ -93,7 +93,7 @@ void hector_80c(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int yma
 	UINT8 gfx,y;
 	UINT16 sy=0,ma=0,x;
 	for (y = 0; y <= ymax; y++) {  //224
-		UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+		UINT16  *p = &bitmap->pix16(sy++);
 		for (x = ma; x < ma + yram; x++) {  // 64
 			gfx = *(page+x);
 			/* Display a scanline of a character (8 pixels !) */

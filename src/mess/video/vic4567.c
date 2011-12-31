@@ -307,14 +307,14 @@ static void vic3_draw_character( device_t *device, int ybegin, int yend, int ch,
 	{
 		code = vic3->dma_read(device->machine(), vic3->chargenaddr + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = code;
-		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
-		if ((xoff + 1 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
-		if ((xoff + 2 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 2) = color[(code >> 5) & 1];
-		if ((xoff + 3 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 3) = color[(code >> 4) & 1];
-		if ((xoff + 4 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 4) = color[(code >> 3) & 1];
-		if ((xoff + 5 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 5) = color[(code >> 2) & 1];
-		if ((xoff + 6 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 6) = color[(code >> 1) & 1];
-		if ((xoff + 7 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 7) = color[code & 1];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
+		if ((xoff + 1 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
+		if ((xoff + 2 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = color[(code >> 5) & 1];
+		if ((xoff + 3 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 3) = color[(code >> 4) & 1];
+		if ((xoff + 4 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 4) = color[(code >> 3) & 1];
+		if ((xoff + 5 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 5) = color[(code >> 2) & 1];
+		if ((xoff + 6 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 6) = color[(code >> 1) & 1];
+		if ((xoff + 7 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 7) = color[code & 1];
 	}
 }
 
@@ -327,14 +327,14 @@ static void vic3_draw_character_multi( device_t *device, int ybegin, int yend, i
 	{
 		code = vic3->dma_read(device->machine(), vic3->chargenaddr + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = vic3->foreground[code];
-		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic3->multi[code >> 6];
-		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic3->multi[code >> 6];
-		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 2) = vic3->multi[(code >> 4) & 3];
-		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic3->multi[(code >> 4) & 3];
-		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 4) = vic3->multi[(code >> 2) & 3];
-		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic3->multi[(code >> 2) & 3];
-		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 6) = vic3->multi[code & 3];
-		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic3->multi[code & 3];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = vic3->multi[code >> 6];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = vic3->multi[code >> 6];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = vic3->multi[(code >> 4) & 3];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 3) = vic3->multi[(code >> 4) & 3];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 4) = vic3->multi[(code >> 2) & 3];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 5) = vic3->multi[(code >> 2) & 3];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 6) = vic3->multi[code & 3];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 7) = vic3->multi[code & 3];
 	}
 }
 
@@ -347,14 +347,14 @@ static void vic3_draw_bitmap( device_t *device, int ybegin, int yend, int ch, in
 	{
 		code = vic3->dma_read(device->machine(), (vic3->chargenaddr & 0x2000) + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = code;
-		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic3->c64_bitmap[code >> 7];
-		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic3->c64_bitmap[(code >> 6) & 1];
-		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 2) = vic3->c64_bitmap[(code >> 5) & 1];
-		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic3->c64_bitmap[(code >> 4) & 1];
-		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 4) = vic3->c64_bitmap[(code >> 3) & 1];
-		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic3->c64_bitmap[(code >> 2) & 1];
-		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 6) = vic3->c64_bitmap[(code >> 1) & 1];
-		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic3->c64_bitmap[code & 1];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = vic3->c64_bitmap[code >> 7];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = vic3->c64_bitmap[(code >> 6) & 1];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = vic3->c64_bitmap[(code >> 5) & 1];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 3) = vic3->c64_bitmap[(code >> 4) & 1];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 4) = vic3->c64_bitmap[(code >> 3) & 1];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 5) = vic3->c64_bitmap[(code >> 2) & 1];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 6) = vic3->c64_bitmap[(code >> 1) & 1];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 7) = vic3->c64_bitmap[code & 1];
 	}
 }
 
@@ -367,14 +367,14 @@ static void vic3_draw_bitmap_multi( device_t *device, int ybegin, int yend, int 
 	{
 		code = vic3->dma_read(device->machine(), (vic3->chargenaddr & 0x2000) + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = vic3->foreground[code];
-		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 0) = vic3->bitmapmulti[code >> 6];
-		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 1) = vic3->bitmapmulti[code >> 6];
-		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 2) = vic3->bitmapmulti[(code >> 4) & 3];
-		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 3) = vic3->bitmapmulti[(code >> 4) & 3];
-		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 4) = vic3->bitmapmulti[(code >> 2) & 3];
-		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 5) = vic3->bitmapmulti[(code >> 2) & 3];
-		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 6) = vic3->bitmapmulti[code & 3];
-		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) *BITMAP_ADDR16(vic3->bitmap, y + yoff + FIRSTLINE, xoff + 7) = vic3->bitmapmulti[code & 3];
+		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = vic3->bitmapmulti[code >> 6];
+		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = vic3->bitmapmulti[code >> 6];
+		if ((xoff + 2 > start_x) && (xoff + 2 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 2) = vic3->bitmapmulti[(code >> 4) & 3];
+		if ((xoff + 3 > start_x) && (xoff + 3 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 3) = vic3->bitmapmulti[(code >> 4) & 3];
+		if ((xoff + 4 > start_x) && (xoff + 4 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 4) = vic3->bitmapmulti[(code >> 2) & 3];
+		if ((xoff + 5 > start_x) && (xoff + 5 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 5) = vic3->bitmapmulti[(code >> 2) & 3];
+		if ((xoff + 6 > start_x) && (xoff + 6 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 6) = vic3->bitmapmulti[code & 3];
+		if ((xoff + 7 > start_x) && (xoff + 7 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 7) = vic3->bitmapmulti[code & 3];
 	}
 }
 
@@ -391,7 +391,7 @@ static void vic3_draw_sprite_code( device_t *device, int y, int xbegin, int code
 		if (code & mask)
 		{
 			if ((xbegin + x > start_x) && (xbegin + x < end_x))
-				*BITMAP_ADDR16(vic3->bitmap, y + FIRSTLINE, xbegin + x) = color;
+				vic3->bitmap->pix16(y + FIRSTLINE, xbegin + x) = color;
 		}
 	}
 }
@@ -414,17 +414,17 @@ static void vic3_draw_sprite_code_multi( device_t *device, int y, int xbegin, in
 			{
 			case 1:
 				if ((xbegin + x + 1 > start_x) && (xbegin + x + 1 < end_x))
-					*BITMAP_ADDR16(vic3->bitmap, y + FIRSTLINE, xbegin + x + 1) = vic3->spritemulti[(code >> shift) & 3];
+					vic3->bitmap->pix16(y + FIRSTLINE, xbegin + x + 1) = vic3->spritemulti[(code >> shift) & 3];
 				break;
 			case 2:
 				if ((xbegin + x > start_x) && (xbegin + x < end_x))
-					*BITMAP_ADDR16(vic3->bitmap, y + FIRSTLINE, xbegin + x) = vic3->spritemulti[(code >> shift) & 3];
+					vic3->bitmap->pix16(y + FIRSTLINE, xbegin + x) = vic3->spritemulti[(code >> shift) & 3];
 				break;
 			case 3:
 				if ((xbegin + x > start_x) && (xbegin + x < end_x))
-					*BITMAP_ADDR16(vic3->bitmap, y + FIRSTLINE, xbegin + x) = vic3->spritemulti[(code >> shift) & 3];
+					vic3->bitmap->pix16(y + FIRSTLINE, xbegin + x) = vic3->spritemulti[(code >> shift) & 3];
 				if ((xbegin + x + 1> start_x) && (xbegin + x + 1< end_x))
-					*BITMAP_ADDR16(vic3->bitmap, y + FIRSTLINE, xbegin + x + 1) = vic3->spritemulti[(code >> shift) & 3];
+					vic3->bitmap->pix16(y + FIRSTLINE, xbegin + x + 1) = vic3->spritemulti[(code >> shift) & 3];
 				break;
 			}
 		}
@@ -711,9 +711,9 @@ static void vic3_drawlines( device_t *device, int first, int last, int start_x, 
 
 	if (!SCREENON)
 	{
-		for (line = first; (line < last) && (line < vic3->bitmap->height); line++)
+		for (line = first; (line < last) && (line < vic3->bitmap->height()); line++)
 		{
-			memset16(BITMAP_ADDR16(vic3->bitmap, line + FIRSTLINE, 0), 0, vic3->bitmap->width);
+			memset16(&vic3->bitmap->pix16(line + FIRSTLINE), 0, vic3->bitmap->width());
 		}
 		return;
 	}
@@ -729,7 +729,7 @@ static void vic3_drawlines( device_t *device, int first, int last, int start_x, 
 
 	for (line = first; line < end; line++)
 	{
-		memset16(BITMAP_ADDR16(vic3->bitmap, line + FIRSTLINE, 0), FRAMECOLOR, vic3->bitmap->width);
+		memset16(&vic3->bitmap->pix16(line + FIRSTLINE), FRAMECOLOR, vic3->bitmap->width());
 	}
 
 	if (LINES25)
@@ -890,18 +890,18 @@ static void vic3_drawlines( device_t *device, int first, int last, int start_x, 
 
 		for (i = ybegin; i <= yend; i++)
 		{
-			plot_box(vic3->bitmap, 0, yoff + ybegin + FIRSTLINE, xbegin, yend-ybegin+1, FRAMECOLOR);
-			plot_box(vic3->bitmap, xend, yoff + ybegin + FIRSTLINE, vic3->bitmap->width - xend, yend-ybegin+1, FRAMECOLOR);
+			vic3->bitmap->plot_box(0, yoff + ybegin + FIRSTLINE, xbegin, yend-ybegin+1, FRAMECOLOR);
+			vic3->bitmap->plot_box(xend, yoff + ybegin + FIRSTLINE, vic3->bitmap->width() - xend, yend-ybegin+1, FRAMECOLOR);
 		}
 	}
-	if (last < vic3->bitmap->height)
+	if (last < vic3->bitmap->height())
 		end = last;
 	else
-		end = vic3->bitmap->height;
+		end = vic3->bitmap->height();
 
 	for (; line < end; line++)
 	{
-		memset16 (BITMAP_ADDR16(vic3->bitmap, line + FIRSTLINE, 0), FRAMECOLOR, vic3->bitmap->width);
+		memset16 (&vic3->bitmap->pix16(line + FIRSTLINE), FRAMECOLOR, vic3->bitmap->width());
 	}
 }
 
@@ -936,13 +936,13 @@ static void vic2_drawlines( device_t *device, int first, int last, int start_x, 
 		xbegin = VIC2_STARTVISIBLECOLUMNS;
 		xend = xbegin + VIC2_VISIBLECOLUMNS;
 		if ((start_x <= xbegin) && (end_x >= xend))
-			plot_box(vic3->bitmap, xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
 		if ((start_x > xbegin) && (end_x >= xend))
-			plot_box(vic3->bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
 		if ((start_x <= xbegin) && (end_x < xend))
-			plot_box(vic3->bitmap, xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
 		if ((start_x > xbegin) && (end_x < xend))
-			plot_box(vic3->bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 		return;
 	}
 
@@ -967,13 +967,13 @@ static void vic2_drawlines( device_t *device, int first, int last, int start_x, 
 	if (line < end)
 	{
 		if ((start_x <= xbegin) && (end_x >= xend))
-			plot_box(vic3->bitmap, xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
 		if ((start_x > xbegin) && (end_x >= xend))
-			plot_box(vic3->bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
 		if ((start_x <= xbegin) && (end_x < xend))
-			plot_box(vic3->bitmap, xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
 		if ((start_x > xbegin) && (end_x < xend))
-			plot_box(vic3->bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 		line = end;
 	}
 
@@ -1108,40 +1108,40 @@ static void vic2_drawlines( device_t *device, int first, int last, int start_x, 
 
 	// left border
 	if ((start_x <= VIC2_STARTVISIBLECOLUMNS) && (end_x >= xbegin))
-		plot_box(vic3->bitmap, VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xbegin - VIC2_STARTVISIBLECOLUMNS, 1, FRAMECOLOR);
+		vic3->bitmap->plot_box(VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xbegin - VIC2_STARTVISIBLECOLUMNS, 1, FRAMECOLOR);
 	else if ((start_x > VIC2_STARTVISIBLECOLUMNS) && (end_x >= xbegin))
-		plot_box(vic3->bitmap, start_x, first + FIRSTLINE, xbegin - start_x, 1, FRAMECOLOR);
+		vic3->bitmap->plot_box(start_x, first + FIRSTLINE, xbegin - start_x, 1, FRAMECOLOR);
 	else if ((start_x <= VIC2_STARTVISIBLECOLUMNS) && (end_x < xbegin))
-		plot_box(vic3->bitmap, VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x, 1, FRAMECOLOR);
+		vic3->bitmap->plot_box(VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x, 1, FRAMECOLOR);
 	else if ((start_x > VIC2_STARTVISIBLECOLUMNS) && (end_x < xbegin))
-		plot_box(vic3->bitmap, start_x, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
+		vic3->bitmap->plot_box(start_x, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 
 	// right border
 	if ((start_x <= xend) && (end_x >= VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS))
-		plot_box(vic3->bitmap, xend, first + FIRSTLINE, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - xend, 1, FRAMECOLOR);
+		vic3->bitmap->plot_box(xend, first + FIRSTLINE, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - xend, 1, FRAMECOLOR);
 	else if ((start_x > xend) && (end_x >= VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS))
-		plot_box(vic3->bitmap, start_x, first + FIRSTLINE, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - start_x, 1, FRAMECOLOR);
+		vic3->bitmap->plot_box(start_x, first + FIRSTLINE, VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS - start_x, 1, FRAMECOLOR);
 	else if ((start_x <= xend) && (end_x < VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS))
-		plot_box(vic3->bitmap, xend, first + FIRSTLINE, end_x - xend, 1, FRAMECOLOR);
+		vic3->bitmap->plot_box(xend, first + FIRSTLINE, end_x - xend, 1, FRAMECOLOR);
 	else if ((start_x > VIC2_STARTVISIBLECOLUMNS) && (end_x < xbegin))
-		plot_box(vic3->bitmap, start_x, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
+		vic3->bitmap->plot_box(start_x, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 
-	if (first + 1 < vic3->bitmap->height)
+	if (first + 1 < vic3->bitmap->height())
 		end = first + 1;
 	else
-		end = vic3->bitmap->height;
+		end = vic3->bitmap->height();
 
 	// bottom border
 	if (line < end)
 	{
 		if ((start_x <= xbegin) && (end_x >= xend))
-			plot_box(vic3->bitmap, xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(xbegin, first + FIRSTLINE, xend - xbegin, 1, FRAMECOLOR);
 		if ((start_x > xbegin) && (end_x >= xend))
-			plot_box(vic3->bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, xend - start_x, 1, FRAMECOLOR);
 		if ((start_x <= xbegin) && (end_x < xend))
-			plot_box(vic3->bitmap, xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(xbegin, first + FIRSTLINE, end_x - xbegin , 1, FRAMECOLOR);
 		if ((start_x > xbegin) && (end_x < xend))
-			plot_box(vic3->bitmap, start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
+			vic3->bitmap->plot_box(start_x - VIC2_STARTVISIBLECOLUMNS, first + FIRSTLINE, end_x - start_x, 1, FRAMECOLOR);
 		line = end;
 	}
 }
@@ -1614,7 +1614,7 @@ READ8_DEVICE_HANDLER( vic3_port_r )
                 p |= colors[7] & 0x80;                          \
                 colors[7] >>= 1;                                \
             }                                                   \
-            *BITMAP_ADDR16(vic3->bitmap, YPOS + y, XPOS + x + i) = p; \
+            vic3->bitmap->pix16(YPOS + y, XPOS + x + i) = p; \
         }                                                       \
     }
 
@@ -1672,7 +1672,7 @@ static void vic3_interlace_draw_block( device_t *device, int x, int y, int offse
 
 		for (i = 7; i >= 0; i--)
 		{
-			*BITMAP_ADDR16(vic3->bitmap, YPOS + y, XPOS + x + i) =
+			vic3->bitmap->pix16(YPOS + y, XPOS + x + i) =
 				(colors[0] & 0x01) | (colors[1] & 0x02)
 							 | (colors[2] & 0x04) | (colors[3] & 0x08)
 							 | (colors[4] & 0x10) | (colors[5] & 0x20)
@@ -1744,7 +1744,7 @@ static void vic3_draw_block( device_t *device, int x, int y, int offset )
 
 		for (i = 7; i >= 0; i--)
 		{
-			*BITMAP_ADDR16(vic3->bitmap, YPOS + y, XPOS + x + i) =
+			vic3->bitmap->pix16(YPOS + y, XPOS + x + i) =
 				(colors[0] & 0x01) | (colors[1] & 0x02)
 							 | (colors[2] & 0x04) | (colors[3] & 0x08)
 							 | (colors[4] & 0x10) | (colors[5] & 0x20)
@@ -1806,7 +1806,7 @@ static void vic3_draw_bitplanes( device_t *device )
 		vis.max_x = XPOS - 1;
 		vis.min_y = 0;
 		vis.max_y = visarea.max_y;
-		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
+		vic3->bitmap->fill(FRAMECOLOR, vis);
 	}
 
 	if (XPOS + VIC3_BITPLANES_WIDTH < visarea.max_x)
@@ -1815,7 +1815,7 @@ static void vic3_draw_bitplanes( device_t *device )
 		vis.max_x = visarea.max_x;
 		vis.min_y = 0;
 		vis.max_y = visarea.max_y;
-		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
+		vic3->bitmap->fill(FRAMECOLOR, vis);
 	}
 
 	if (YPOS > 0)
@@ -1824,7 +1824,7 @@ static void vic3_draw_bitplanes( device_t *device )
 		vis.max_y = YPOS - 1;
 		vis.min_x = 0;
 		vis.max_x = visarea.max_x;
-		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
+		vic3->bitmap->fill(FRAMECOLOR, vis);
 	}
 
 	if (YPOS + VIC3_LINES < visarea.max_y)
@@ -1833,7 +1833,7 @@ static void vic3_draw_bitplanes( device_t *device )
 		vis.max_y = visarea.max_y;
 		vis.min_x = 0;
 		vis.max_x = visarea.max_x;
-		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
+		vic3->bitmap->fill(FRAMECOLOR, vis);
 	}
 }
 

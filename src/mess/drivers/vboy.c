@@ -511,7 +511,7 @@ static void put_char(vboy_state *state, bitmap_t *bitmap, int x, int y, UINT16 c
 			if (!dat) col=0;
 
 			if (!trans || ( trans && col ))
-				*BITMAP_ADDR16(bitmap, (y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
+				bitmap->pix16((y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
 		}
 	}
 }
@@ -568,11 +568,11 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool ri
 					if (mode==1)
 						x1 += vboy_paramtab[y*2];
 
-					pix = *BITMAP_ADDR16(state->m_bg_map[bg_map_num], (y+my) & 0x1ff, (x+mx-mp) & 0x1ff);
+					pix = state->m_bg_map[bg_map_num]->pix16((y+my) & 0x1ff, (x+mx-mp) & 0x1ff);
 					if (pix)
 						if (y1>=0 && y1<224)
 							if (x1>=0 && x1<384)
-								*BITMAP_ADDR16(bitmap, y1, x1) = pix;
+								bitmap->pix16(y1, x1) = pix;
 				}
 			}
 		}
@@ -590,11 +590,11 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool ri
 					if (mode==1)
 						x1 += vboy_paramtab[y*2+1];
 
-					pix = *BITMAP_ADDR16(state->m_bg_map[bg_map_num], (y+my) & 0x1ff, (x+mx+mp) & 0x1ff);
+					pix = state->m_bg_map[bg_map_num]->pix16((y+my) & 0x1ff, (x+mx+mp) & 0x1ff);
 					if (pix)
 						if (y1>=0 && y1<224)
 							if (x1>=0 && x1<384)
-								*BITMAP_ADDR16(bitmap, y1, x1) = pix;
+								bitmap->pix16(y1, x1) = pix;
 				}
 			}
 		}
@@ -629,7 +629,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool ri
 static SCREEN_UPDATE( vboy_left )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	bitmap_fill(state->m_screen_output, cliprect, state->m_vip_regs.BKCOL);
+	state->m_screen_output->fill(state->m_vip_regs.BKCOL, *cliprect);
 
 	for(int i=31; i>=0; i--)
 		if (display_world(state, i, state->m_screen_output, 0)) break;
@@ -642,7 +642,7 @@ static SCREEN_UPDATE( vboy_left )
 static SCREEN_UPDATE( vboy_right )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	bitmap_fill(state->m_screen_output, cliprect, state->m_vip_regs.BKCOL);
+	state->m_screen_output->fill(state->m_vip_regs.BKCOL, *cliprect);
 
 	for(int i=31; i>=0; i--)
 		if (display_world(state, i, state->m_screen_output, 1)) break;

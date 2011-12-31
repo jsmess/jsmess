@@ -161,7 +161,7 @@ bool mstation_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 				// columns are inverted (right to left)
 				int col = ((x < 20) ? 19 : 59) - x;
 
-				*BITMAP_ADDR16(&bitmap, y, col*8 + b)= BIT(data, 0);
+				bitmap.pix16(y, col*8 + b)= BIT(data, 0);
 				data >>= 1;
 			}
 		}

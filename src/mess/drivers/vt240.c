@@ -87,7 +87,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;
 
-				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+				bitmap->pix16(res_y, res_x) = pen;
 			}
 		}
 	}

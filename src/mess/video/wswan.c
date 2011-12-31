@@ -16,9 +16,9 @@ INLINE void wswan_plot_pixel(running_machine &machine,int x, int y, int pen) {
 	wswan_state *state = machine.driver_data<wswan_state>();
 	y += 5*8;
 	if ( state->m_vdp.display_vertical ) {
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, 28*8 - 1 - x, y) = pen;
+		machine.generic.tmpbitmap->pix16(28*8 - 1 - x, y) = pen;
 	} else {
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, x) = pen;
+		machine.generic.tmpbitmap->pix16(y, x) = pen;
 	}
 }
 
@@ -42,9 +42,9 @@ INLINE void wswan_fillbitmap( running_machine &machine,int pen, rectangle *rec )
 		rec2.max_y = 28*8 - 1 - rec->min_x;
 		rec2.min_x = rec->min_y;
 		rec2.max_x = rec->max_y;
-		bitmap_fill( machine.generic.tmpbitmap, &rec2 , pen);
+		machine.generic.tmpbitmap->fill(pen, rec2 );
 	} else {
-		bitmap_fill( machine.generic.tmpbitmap, rec , pen);
+		machine.generic.tmpbitmap->fill(pen, *rec );
 	}
 }
 

@@ -302,7 +302,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 		ra = y % 10;
 		/* Draw a line of the display */
 		ma = (state->m_new_start_y + (y/10)) * 128 + state->m_new_start_x;
-		UINT16 *p = BITMAP_ADDR16( machine.generic.tmpbitmap, y, 0 );
+		UINT16 *p = &machine.generic.tmpbitmap->pix16(y);
 
 		for ( x = 0; x < 52; x++ )
 		{

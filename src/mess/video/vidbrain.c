@@ -71,7 +71,7 @@
 	((_y >= cliprect.min_y) && (_y <= cliprect.max_y))
 
 #define DRAW_PIXEL(_scanline, _dot) \
-	if (IS_VISIBLE(_scanline)) *BITMAP_ADDR16(&bitmap, (_scanline), _dot) = pixel;
+	if (IS_VISIBLE(_scanline)) bitmap.pix16((_scanline), _dot) = pixel;
 
 
 
@@ -354,11 +354,11 @@ bool vidbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 
 	if (!(m_cmd & COMMAND_ENB))
 	{
-		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine()));
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
 	}
 
-	bitmap_fill(&bitmap, &cliprect, m_bg);
+	bitmap.fill(m_bg, cliprect);
 
 	for (int i = 0; i < 16; i++)
 	{

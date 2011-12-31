@@ -135,7 +135,7 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 	mycom_state *state = device->machine().driver_data<mycom_state>();
 	UINT8 chr,gfx=0,z;
 	UINT16 mem,x;
-	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *p = &bitmap->pix16(y);
 
 	if (state->m_0a & 0x40)
 	{

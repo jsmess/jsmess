@@ -551,7 +551,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 	if ( y < 240 )
 	{
 		UINT16 row_addr = ( y / 10 ) * 128;
-		UINT16 *p = BITMAP_ADDR16( machine.generic.tmpbitmap, y, 0 );
+		UINT16 *p = &machine.generic.tmpbitmap->pix16(y);
 		UINT8 char_line = y % 10;
 
 		for ( int x = 0; x < 80; x++ )

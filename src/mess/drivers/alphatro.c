@@ -154,7 +154,7 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 	bool palette = BIT(input_port_read(device->machine(), "CONFIG"), 5);
 	UINT8 chr,gfx,attr,fg,inv;
 	UINT16 mem,x;
-	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *p = &bitmap->pix16(y);
 
 	for (x = 0; x < x_count; x++)
 	{

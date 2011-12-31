@@ -233,7 +233,7 @@ void grip_device::crtc_update_row(mc6845_device *device, bitmap_t *bitmap, const
 			int x = (column * 8) + bit;
 			int color = m_flash ? 0 : BIT(data, bit);
 
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			bitmap->pix16(y, x) = color;
 		}
 	}
 }
@@ -260,7 +260,7 @@ static MC6845_UPDATE_ROW( grip5_update_row )
             int x = (column * 8) + bit;
             int color = state->m_flash ? 0 : BIT(data, bit);
 
-            *BITMAP_ADDR16(bitmap, y, x) = color;
+            bitmap->pix16(y, x) = color;
         }
     }
 }

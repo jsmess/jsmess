@@ -125,7 +125,7 @@ protected:
 
 	pixel_t *bitmap_addr(bitmap_t *bitmap, int y, int x)
 	{
-		return BITMAP_ADDR32(bitmap, y, x);
+		return &bitmap->pix32(y, x);
 	}
 
 	static UINT8 simplify_mode(UINT8 data, UINT8 mode)

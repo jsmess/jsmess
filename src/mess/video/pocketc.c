@@ -60,7 +60,7 @@ void pocketc_draw_special(bitmap_t *bitmap, int x, int y, const POCKETC_FIGURE f
 			switch(fig[i][j])
 			{
 			case '1':
-				*BITMAP_ADDR16(bitmap, y, x+j) = color;
+				bitmap->pix16(y, x+j) = color;
 				break;
 			case 'e':
 				return;

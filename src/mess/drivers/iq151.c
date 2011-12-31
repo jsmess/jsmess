@@ -373,7 +373,7 @@ MACHINE_RESET_MEMBER( iq151_state )
 // this machine don't have a built-in video controller, but uses external cartridge
 SCREEN_UPDATE_MEMBER( iq151_state )
 {
-	bitmap_fill(&bitmap, &cliprect, 0);
+	bitmap.fill(0, cliprect);
 
 	for (int i=0; i<5; i++)
 		m_carts[i]->video_update(bitmap, cliprect);

@@ -105,7 +105,7 @@ void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_t *bitmap, c
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) ? 7 : 0;
 
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			bitmap->pix16(y, x) = color;
 
 			data <<= 1;
 		}

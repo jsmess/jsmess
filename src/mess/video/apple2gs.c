@@ -48,7 +48,7 @@ SCREEN_UPDATE( apple2gs )
 				return 0;
 			}
 
-			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
+			scanline = &bitmap->pix16(beamy);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
 				scanline[col] = state->m_bordercolor;
@@ -62,7 +62,7 @@ SCREEN_UPDATE( apple2gs )
 			palette = ((scb & 0x0f) << 4) + 16;
 
 			vram = &state->m_slowmem[0x12000 + (shrline * 160)];
-			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
+			scanline = &bitmap->pix16(beamy);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT; col++)
@@ -143,7 +143,7 @@ SCREEN_UPDATE( apple2gs )
 				return 0;
 			}
 
-			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
+			scanline = &bitmap->pix16(beamy);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
 				scanline[col] = state->m_bordercolor;
@@ -151,7 +151,7 @@ SCREEN_UPDATE( apple2gs )
 		}
 		else
 		{
-			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
+			scanline = &bitmap->pix16(beamy);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT + 40; col++)
@@ -160,7 +160,7 @@ SCREEN_UPDATE( apple2gs )
 				scanline[col+BORDER_LEFT+600] = state->m_bordercolor;
 			}
 
-			memcpy(scanline + 40 + BORDER_LEFT, BITMAP_ADDR16(state->m_legacy_gfx, beamy-(BORDER_TOP+4), 0), 560 * sizeof(UINT16));
+			memcpy(scanline + 40 + BORDER_LEFT, &state->m_legacy_gfx->pix16(beamy-(BORDER_TOP+4)), 560 * sizeof(UINT16));
 		}
 	}
 	return 0;

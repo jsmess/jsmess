@@ -76,7 +76,7 @@ void abc800c_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = m_fgctl_prom[fgctl_addr] & 0x07;
 
-				*BITMAP_ADDR16(bitmap, y, x++) = color;
+				bitmap->pix16(y, x++) = color;
 
 				data <<= 2;
 			}
@@ -108,7 +108,7 @@ void abc800_state::video_start()
 bool abc800c_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap_fill(&bitmap, &cliprect, get_black_pen(machine()));
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw HR graphics
 	hr_update(&bitmap, &cliprect);
@@ -197,8 +197,8 @@ void abc800m_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = (m_fgctl_prom[fgctl_addr] & 0x07) ? 1 : 0;
 
-				*BITMAP_ADDR16(bitmap, y, x++) = color;
-				*BITMAP_ADDR16(bitmap, y, x++) = color;
+				bitmap->pix16(y, x++) = color;
+				bitmap->pix16(y, x++) = color;
 
 				data <<= 2;
 			}
@@ -242,7 +242,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 			if (BIT(data, 7))
 			{
-				*BITMAP_ADDR16(bitmap, y, x) = 1;
+				bitmap->pix16(y, x) = 1;
 			}
 
 			data <<= 1;
@@ -280,7 +280,7 @@ bool abc800m_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	screen.set_visible_area(0, 767, 0, 311);
 
 	// clear screen
-	bitmap_fill(&bitmap, &cliprect, get_black_pen(machine()));
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw HR graphics
 	hr_update(&bitmap, &cliprect);

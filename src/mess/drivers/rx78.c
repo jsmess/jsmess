@@ -118,7 +118,7 @@ SCREEN_UPDATE_MEMBER( rx78_state )
 	UINT8 *vram = machine().region("vram")->base();
 	int x,y,count;
 
-	bitmap_fill(&bitmap, &cliprect, 16);
+	bitmap.fill(16, cliprect);
 
 	count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
 
@@ -140,7 +140,7 @@ SCREEN_UPDATE_MEMBER( rx78_state )
 				color |= ((pen[2] & 1) << 2);
 
 				if(color)
-					*BITMAP_ADDR16(&bitmap, y, x+i) = color;
+					bitmap.pix16(y, x+i) = color;
 
 				/* fg color */
 				pen[0] = (m_pri_mask & 0x01) ? (vram[count + 0x0000] >> (i)) : 0x00;
@@ -152,7 +152,7 @@ SCREEN_UPDATE_MEMBER( rx78_state )
 				color |= ((pen[2] & 1) << 2);
 
 				if(color)
-					*BITMAP_ADDR16(&bitmap, y, x+i) = color;
+					bitmap.pix16(y, x+i) = color;
 			}
 			count++;
 		}

@@ -531,7 +531,7 @@ static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
         {
             if (BIT(charram_data, 7))
             {
-                *BITMAP_ADDR16(bitmap, y, x + (sx * 10) + bit) = 1;
+                bitmap->pix16(y, x + (sx * 10) + bit) = 1;
             }
 
             charram_data <<= 1;

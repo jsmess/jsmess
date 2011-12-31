@@ -35,7 +35,7 @@ SCREEN_UPDATE( kayproii )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -80,7 +80,7 @@ SCREEN_UPDATE( omni2 )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -140,7 +140,7 @@ SCREEN_UPDATE( kaypro2x )
 MC6845_UPDATE_ROW( kaypro2x_update_row )
 {
 	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *p = &bitmap->pix16(y);
 	UINT16 x;
 	UINT8 gfx,fg,bg;
 

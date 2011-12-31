@@ -437,13 +437,13 @@ INLINE void arcadia_draw_char(running_machine &machine, bitmap_t *bitmap, UINT8 
 
     if (state->m_doublescan)
 	{
-	for (k=0; (k<8)&&(y<bitmap->height); k++, y+=2)
+	for (k=0; (k<8)&&(y<bitmap->height()); k++, y+=2)
 		{
 	    b=ch[k];
 	    state->m_bg[y][x>>3]|=b>>(x&7);
 	    state->m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-            if (y+1<bitmap->height) {
+            if (y+1<bitmap->height()) {
                 state->m_bg[y+1][x>>3]|=b>>(x&7);
                 state->m_bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
                 drawgfx_opaque(bitmap, 0, machine.gfx[0], b,colour,
@@ -455,7 +455,7 @@ INLINE void arcadia_draw_char(running_machine &machine, bitmap_t *bitmap, UINT8 
     }
 	else
 	{
-	for (k=0; (k<8)&&(y<bitmap->height); k++, y++)
+	for (k=0; (k<8)&&(y<bitmap->height()); k++, y++)
 		{
 	    b=ch[k];
             state->m_bg[y][x>>3]|=b>>(x&7);
@@ -475,10 +475,10 @@ INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_t *bitmap,
     int graphics=state->m_graphics;
     h=state->m_doublescan?16:8;
 
-    if (bitmap->height-state->m_line<h)
-		h=bitmap->height-state->m_line;
+    if (bitmap->height()-state->m_line<h)
+		h=bitmap->height()-state->m_line;
 
-	plot_box(bitmap, 0, y, bitmap->width, h, (state->m_reg.d.pal[1]&7));
+	bitmap->plot_box(0, y, bitmap->width(), h, (state->m_reg.d.pal[1]&7));
     memset(state->m_bg[y], 0, sizeof(state->m_bg[0])*h);
 
 	for (x=XPOS+state->m_shift, j=0; j<16;j++,x+=8)
@@ -533,7 +533,7 @@ static void arcadia_draw_sprites(running_machine &machine, bitmap_t *bitmap)
 	{
 	int doublescan = FALSE;
 	if (state->m_pos[i].y<=-YPOS) continue;
-	if (state->m_pos[i].y>=bitmap->height-YPOS-8) continue;
+	if (state->m_pos[i].y>=bitmap->height()-YPOS-8) continue;
 	if (state->m_pos[i].x<=-XPOS) continue;
 	if (state->m_pos[i].x>=128+XPOS-8) continue;
 
@@ -568,7 +568,7 @@ static void arcadia_draw_sprites(running_machine &machine, bitmap_t *bitmap)
 		{
 			if (b & m)
 			{
-				*BITMAP_ADDR16(bitmap, y, x + j) = color;
+				bitmap->pix16(y, x + j) = color;
 			}
 		}
 	    }
@@ -579,8 +579,8 @@ static void arcadia_draw_sprites(running_machine &machine, bitmap_t *bitmap)
 		{
 			if (b & m)
 			{
-				*BITMAP_ADDR16(bitmap, y, x + j) = color;
-				*BITMAP_ADDR16(bitmap, y+1, x + j) = color;
+				bitmap->pix16(y, x + j) = color;
+				bitmap->pix16(y+1, x + j) = color;
 			}
 		}
 	    }
@@ -617,7 +617,7 @@ INTERRUPT_GEN( arcadia_video_line )
 
 	if (state->m_line<state->m_ypos)
 	{
-		plot_box(state->m_bitmap, 0, state->m_line, width, 1, (state->m_reg.d.pal[1])&7);
+		state->m_bitmap->plot_box(0, state->m_line, width, 1, (state->m_reg.d.pal[1])&7);
 		memset(state->m_bg[state->m_line], 0, sizeof(state->m_bg[0]));
 	}
 	else
@@ -647,7 +647,7 @@ INTERRUPT_GEN( arcadia_video_line )
 			else
 			{
 			state->m_charline=0xd;
-			plot_box(state->m_bitmap, 0, state->m_line, width, 1, (state->m_reg.d.pal[1])&7);
+			state->m_bitmap->plot_box(0, state->m_line, width, 1, (state->m_reg.d.pal[1])&7);
 			memset(state->m_bg[state->m_line], 0, sizeof(state->m_bg[0]));
 			}
 	}

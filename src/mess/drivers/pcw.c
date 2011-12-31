@@ -674,7 +674,7 @@ static void pcw_printer_fire_pins(running_machine &machine, UINT16 pins)
 	{
 		line = x % PCW_PRINTER_HEIGHT;
 		if((pins & 0x01) == 0)
-			*BITMAP_ADDR16(state->m_prn_output,line,state->m_printer_headpos) = (UINT16)(pins & 0x01);
+			state->m_prn_output->pix16(line, state->m_printer_headpos) = (UINT16)(pins & 0x01);
 		pins >>= 1;
 	}
 //  if(state->m_printer_headpos < PCW_PRINTER_WIDTH)

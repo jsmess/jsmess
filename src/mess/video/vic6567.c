@@ -521,7 +521,7 @@ INLINE void vic2_draw_background( vic2_state *vic2 )
 				c = 0;
 				break;
 		}
-		plot_box(vic2->bitmap, vic2->graphic_x, VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, c);
+		vic2->bitmap->plot_box(vic2->graphic_x, VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, c);
 	}
 }
 
@@ -533,21 +533,21 @@ INLINE void vic2_draw_mono( vic2_state *vic2, UINT16 p, UINT8 c0, UINT8 c1 )
 	c[0] = c0;
 	c[1] = c1;
 
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = c[data & 1];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = c[data & 1];
 	vic2->fore_coll_buf[p + 7] = data & 1; data >>= 1;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = c[data & 1];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = c[data & 1];
 	vic2->fore_coll_buf[p + 6] = data & 1; data >>= 1;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = c[data & 1];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = c[data & 1];
 	vic2->fore_coll_buf[p + 5] = data & 1; data >>= 1;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = c[data & 1];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = c[data & 1];
 	vic2->fore_coll_buf[p + 4] = data & 1; data >>= 1;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = c[data & 1];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = c[data & 1];
 	vic2->fore_coll_buf[p + 3] = data & 1; data >>= 1;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = c[data & 1];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = c[data & 1];
 	vic2->fore_coll_buf[p + 2] = data & 1; data >>= 1;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = c[data & 1];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = c[data & 1];
 	vic2->fore_coll_buf[p + 1] = data & 1; data >>= 1;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = c[data];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = c[data];
 	vic2->fore_coll_buf[p + 0] = data & 1;
 }
 
@@ -561,21 +561,21 @@ INLINE void vic2_draw_multi( vic2_state *vic2, UINT16 p, UINT8 c0, UINT8 c1, UIN
 	c[2] = c2;
 	c[3] = c3;
 
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = c[data & 3];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = c[data & 3];
 	vic2->fore_coll_buf[p + 7] = data & 2;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = c[data & 3];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = c[data & 3];
 	vic2->fore_coll_buf[p + 6] = data & 2; data >>= 2;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = c[data & 3];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = c[data & 3];
 	vic2->fore_coll_buf[p + 5] = data & 2;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = c[data & 3];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = c[data & 3];
 	vic2->fore_coll_buf[p + 4] = data & 2; data >>= 2;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = c[data & 3];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = c[data & 3];
 	vic2->fore_coll_buf[p + 3] = data & 2;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = c[data & 3];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = c[data & 3];
 	vic2->fore_coll_buf[p + 2] = data & 2; data >>= 2;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = c[data];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = c[data];
 	vic2->fore_coll_buf[p + 1] = data & 2;
-	*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = c[data];
+	vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = c[data];
 	vic2->fore_coll_buf[p + 0] = data & 2;
 }
 
@@ -642,57 +642,57 @@ static void vic2_draw_graphics( vic2_state *vic2 )
 				vic2_draw_mono(vic2, p, tmp_col, vic2->color_data & 0x0f);
 				break;
 			case 5:
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = 0;
 				vic2->fore_coll_buf[p + 7] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = 0;
 				vic2->fore_coll_buf[p + 6] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = 0;
 				vic2->fore_coll_buf[p + 5] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = 0;
 				vic2->fore_coll_buf[p + 4] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = 0;
 				vic2->fore_coll_buf[p + 3] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = 0;
 				vic2->fore_coll_buf[p + 2] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = 0;
 				vic2->fore_coll_buf[p + 1] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = 0;
 				vic2->fore_coll_buf[p + 0] = 0;
 				break;
 			case 6:
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = 0;
 				vic2->fore_coll_buf[p + 7] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = 0;
 				vic2->fore_coll_buf[p + 6] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = 0;
 				vic2->fore_coll_buf[p + 5] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = 0;
 				vic2->fore_coll_buf[p + 4] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = 0;
 				vic2->fore_coll_buf[p + 3] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = 0;
 				vic2->fore_coll_buf[p + 2] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = 0;
 				vic2->fore_coll_buf[p + 1] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = 0;
 				vic2->fore_coll_buf[p + 0] = 0;
 				break;
 			case 7:
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 7) = 0;
 				vic2->fore_coll_buf[p + 7] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 6) = 0;
 				vic2->fore_coll_buf[p + 6] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 5) = 0;
 				vic2->fore_coll_buf[p + 5] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 4) = 0;
 				vic2->fore_coll_buf[p + 4] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 3) = 0;
 				vic2->fore_coll_buf[p + 3] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 2) = 0;
 				vic2->fore_coll_buf[p + 2] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 1) = 0;
 				vic2->fore_coll_buf[p + 1] = 0;
-				*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = 0;
+				vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + 0) = 0;
 				vic2->fore_coll_buf[p + 0] = 0;
 				break;
 		}
@@ -767,12 +767,12 @@ static void vic2_draw_sprites( running_machine &machine, vic2_state *vic2 )
 							if (SPRITE_PRIORITY(snum))
 							{
 								if (vic2->fore_coll_buf[p + i] == 0)
-									*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
+									vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
 								vic2->spr_coll_buf[p + i] = sbit;
 							}
 							else
 							{
-								*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
+								vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
 								vic2->spr_coll_buf[p + i] = sbit;
 							}
 						}
@@ -815,12 +815,12 @@ static void vic2_draw_sprites( running_machine &machine, vic2_state *vic2 )
 							if (SPRITE_PRIORITY(snum))
 							{
 								if (vic2->fore_coll_buf[p + i] == 0)
-									*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
+									vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
 								vic2->spr_coll_buf[p + i] = sbit;
 							}
 							else
 							{
-								*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
+								vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
 								vic2->spr_coll_buf[p + i] = sbit;
 							}
 						}
@@ -846,12 +846,12 @@ static void vic2_draw_sprites( running_machine &machine, vic2_state *vic2 )
 								if (SPRITE_PRIORITY(snum))
 								{
 									if (vic2->fore_coll_buf[p + i] == 0)
-										*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
+										vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
 									vic2->spr_coll_buf[p + i] = sbit;
 								}
 								else
 								{
-									*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
+									vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
 									vic2->spr_coll_buf[p + i] = sbit;
 								}
 							}
@@ -872,12 +872,12 @@ static void vic2_draw_sprites( running_machine &machine, vic2_state *vic2 )
 								if (SPRITE_PRIORITY(snum))
 								{
 									if (vic2->fore_coll_buf[p + i] == 0)
-										*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
+										vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
 									vic2->spr_coll_buf[p + i] = sbit;
 								}
 								else
 								{
-									*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
+									vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
 									vic2->spr_coll_buf[p + i] = sbit;
 								}
 							}
@@ -927,12 +927,12 @@ static void vic2_draw_sprites( running_machine &machine, vic2_state *vic2 )
 							if (SPRITE_PRIORITY(snum))
 							{
 								if (vic2->fore_coll_buf[p + i] == 0)
-									*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
+									vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
 								vic2->spr_coll_buf[p + i] = sbit;
 							}
 							else
 							{
-								*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
+								vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = col;
 								vic2->spr_coll_buf[p + i] = sbit;
 							}
 						}
@@ -957,12 +957,12 @@ static void vic2_draw_sprites( running_machine &machine, vic2_state *vic2 )
 								if (SPRITE_PRIORITY(snum))
 								{
 									if (vic2->fore_coll_buf[p + i] == 0)
-										*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
+										vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
 									vic2->spr_coll_buf[p + i] = sbit;
 								}
 								else
 								{
-									*BITMAP_ADDR16(vic2->bitmap, VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
+									vic2->bitmap->pix16(VIC2_RASTER_2_EMU(vic2->rasterline), p + i) = color;
 									vic2->spr_coll_buf[p + i] = sbit;
 								}
 							}
@@ -1532,24 +1532,24 @@ if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3
 
 			if (vic2->border_on_sample[0])
 				for (i = 0; i < 4; i++)
-					plot_box(vic2->bitmap, VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
+					vic2->bitmap->plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
 
 			if (vic2->border_on_sample[1])
-				plot_box(vic2->bitmap, VIC2_X_2_EMU(4 * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[4]);
+				vic2->bitmap->plot_box(VIC2_X_2_EMU(4 * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[4]);
 
 			if (vic2->border_on_sample[2])
 				for (i = 5; i < 43; i++)
-					plot_box(vic2->bitmap, VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
+					vic2->bitmap->plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
 
 			if (vic2->border_on_sample[3])
-				plot_box(vic2->bitmap, VIC2_X_2_EMU(43 * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[43]);
+				vic2->bitmap->plot_box(VIC2_X_2_EMU(43 * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[43]);
 
 			if (vic2->border_on_sample[4])
 			{
 				for (i = 44; i < 48; i++)
-					plot_box(vic2->bitmap, VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
+					vic2->bitmap->plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
 				for (i = 48; i < 51; i++)
-					plot_box(vic2->bitmap, VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[47]);
+					vic2->bitmap->plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[47]);
 			}
 		}
 
@@ -2121,24 +2121,24 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 
 			if (vic2->border_on_sample[0])
 				for (i = 0; i < 4; i++)
-					plot_box(vic2->bitmap, VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
+					vic2->bitmap->plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
 
 			if (vic2->border_on_sample[1])
-				plot_box(vic2->bitmap, VIC2_X_2_EMU(4 * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[4]);
+				vic2->bitmap->plot_box(VIC2_X_2_EMU(4 * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[4]);
 
 			if (vic2->border_on_sample[2])
 				for (i = 5; i < 43; i++)
-					plot_box(vic2->bitmap, VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
+					vic2->bitmap->plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
 
 			if (vic2->border_on_sample[3])
-				plot_box(vic2->bitmap, VIC2_X_2_EMU(43 * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[43]);
+				vic2->bitmap->plot_box(VIC2_X_2_EMU(43 * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[43]);
 
 			if (vic2->border_on_sample[4])
 			{
 				for (i = 44; i < 48; i++)
-					plot_box(vic2->bitmap, VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
+					vic2->bitmap->plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[i]);
 				for (i = 48; i < 53; i++)
-					plot_box(vic2->bitmap, VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[47]);
+					vic2->bitmap->plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(vic2->rasterline), 8, 1, vic2->border_color_sample[47]);
 			}
 		}
 

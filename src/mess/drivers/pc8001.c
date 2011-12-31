@@ -343,7 +343,7 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			*BITMAP_ADDR16(bitmap, y, (sx * 8) + i) = color ? 7 : 0;
+			bitmap->pix16(y, (sx * 8) + i) = color ? 7 : 0;
 
 			data <<= 1;
 		}
@@ -356,8 +356,8 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			*BITMAP_ADDR16(bitmap, y, (sx/2 * 16) + (i * 2)) = color ? 7 : 0;
-			*BITMAP_ADDR16(bitmap, y, (sx/2 * 16) + (i * 2) + 1) = color ? 7 : 0;
+			bitmap->pix16(y, (sx/2 * 16) + (i * 2)) = color ? 7 : 0;
+			bitmap->pix16(y, (sx/2 * 16) + (i * 2) + 1) = color ? 7 : 0;
 
 			data <<= 1;
 		}

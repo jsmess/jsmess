@@ -72,7 +72,7 @@ static SCREEN_UPDATE( vta2000 )
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			xx = ma << 1;
 			for (x = ma; x < ma + 80; x++)

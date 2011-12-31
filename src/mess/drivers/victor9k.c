@@ -103,7 +103,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 				if (sx == cursor_x) color = 1;
 
-				*BITMAP_ADDR16(bitmap, y, x + sx*10) = color;
+				bitmap->pix16(y, x + sx*10) = color;
 			}
 
 			video_ram_addr += 2;

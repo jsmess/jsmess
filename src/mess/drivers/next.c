@@ -41,7 +41,7 @@ bool next_state::screen_update(screen_device &screen, bitmap_t &bitmap, const re
 				if((x+xi)>screen.machine().primary_screen->visible_area().max_x || (y)>screen.machine().primary_screen->visible_area().max_y)
 					continue;
 
-				*BITMAP_ADDR16(&bitmap, y, x+xi) = screen.machine().pens[pen];
+				bitmap.pix16(y, x+xi) = screen.machine().pens[pen];
 			}
 
 			count++;

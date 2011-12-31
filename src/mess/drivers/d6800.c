@@ -134,7 +134,7 @@ static SCREEN_UPDATE( d6800 )
 
 	for (y = 0; y < 32; y++)
 	{
-		UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *p = &bitmap->pix16(y);
 
 		for (x = 0; x < 8; x++)
 		{

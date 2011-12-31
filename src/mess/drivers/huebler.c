@@ -246,7 +246,7 @@ bool amu880_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 			{
 				int color = ((line > 7) ? 0 : BIT(data, 7)) ^ BIT(videoram_data, 7);
 
-				*BITMAP_ADDR16(&bitmap, y, (sx * 6) + x) = color;
+				bitmap.pix16(y, (sx * 6) + x) = color;
 
 				data <<= 1;
 			}

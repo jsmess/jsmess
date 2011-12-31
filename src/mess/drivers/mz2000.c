@@ -81,8 +81,8 @@ static SCREEN_UPDATE( mz2000 )
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
 				pen &= state->m_gvram_mask;
 
-				*BITMAP_ADDR16(bitmap, y*2+0, x+xi) = screen.machine().pens[pen];
-				*BITMAP_ADDR16(bitmap, y*2+1, x+xi) = screen.machine().pens[pen];
+				bitmap->pix16(y*2+0, x+xi) = screen.machine().pens[pen];
+				bitmap->pix16(y*2+1, x+xi) = screen.machine().pens[pen];
 			}
 			count++;
 		}
@@ -122,27 +122,27 @@ static SCREEN_UPDATE( mz2000 )
 						{
 							if(state->m_width80 == 0)
 							{
-								*BITMAP_ADDR16(bitmap, res_y, res_x*2+0) = screen.machine().pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y, res_x*2+1) = screen.machine().pens[pen];
+								bitmap->pix16(res_y, res_x*2+0) = screen.machine().pens[pen];
+								bitmap->pix16(res_y, res_x*2+1) = screen.machine().pens[pen];
 							}
 							else
 							{
-								*BITMAP_ADDR16(bitmap, res_y, res_x) = screen.machine().pens[pen];
+								bitmap->pix16(res_y, res_x) = screen.machine().pens[pen];
 							}
 						}
 						else
 						{
 							if(state->m_width80 == 0)
 							{
-								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+0) = screen.machine().pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x*2+1) = screen.machine().pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x*2+0) = screen.machine().pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x*2+1) = screen.machine().pens[pen];
+								bitmap->pix16(res_y*2+0, res_x*2+0) = screen.machine().pens[pen];
+								bitmap->pix16(res_y*2+0, res_x*2+1) = screen.machine().pens[pen];
+								bitmap->pix16(res_y*2+1, res_x*2+0) = screen.machine().pens[pen];
+								bitmap->pix16(res_y*2+1, res_x*2+1) = screen.machine().pens[pen];
 							}
 							else
 							{
-								*BITMAP_ADDR16(bitmap, res_y*2+0, res_x) = screen.machine().pens[pen];
-								*BITMAP_ADDR16(bitmap, res_y*2+1, res_x) = screen.machine().pens[pen];
+								bitmap->pix16(res_y*2+0, res_x) = screen.machine().pens[pen];
+								bitmap->pix16(res_y*2+1, res_x) = screen.machine().pens[pen];
 							}
 						}
 					}

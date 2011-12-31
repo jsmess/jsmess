@@ -189,7 +189,7 @@ void iq151_grafik_device::video_update(bitmap_t &bitmap, const rectangle &clipre
 			{
 				for (int ra = 0; ra < 8; ra++)
 				{
-					*BITMAP_ADDR16(&bitmap, y, x*8 + ra) |= BIT(m_videoram[(32*8 -1 - y)*64 + x], ra);
+					bitmap.pix16(y, x*8 + ra) |= BIT(m_videoram[(32*8 -1 - y)*64 + x], ra);
 				}
 			}
 		}

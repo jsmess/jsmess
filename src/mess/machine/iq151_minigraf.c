@@ -61,7 +61,7 @@ void iq151_minigraf_device::device_start()
 
 	// allocate a bitmap for represent the paper
 	m_paper = auto_bitmap_alloc(machine(), PAPER_WIDTH, PAPER_HEIGHT, BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(m_paper, NULL , 0);
+	m_paper->fill(0);
 
 	m_pen = 0;
 	m_posx = m_posy = 0;
@@ -159,7 +159,7 @@ void iq151_minigraf_device::plotter_update(UINT8 control)
 
 	// if pen is down draws a point
 	if (m_pen)
-		*BITMAP_ADDR16(m_paper, ((PAPER_HEIGHT-PAPER_MAX_Y)/2) + PAPER_MAX_Y - m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
+		m_paper->pix16(((PAPER_HEIGHT-PAPER_MAX_Y)/2) + PAPER_MAX_Y - m_posy, ((PAPER_WIDTH-PAPER_MAX_X)/2) + m_posx) = 1;
 
 	m_control = control;
 }

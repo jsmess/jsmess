@@ -165,7 +165,7 @@ static SCREEN_UPDATE( mc6845_t1000 )
 
 static MC6845_UPDATE_ROW( t1000_text_inten_update_row )
 {
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	int i;
 
 	if ( y == 0 ) logerror("t1000_text_inten_update_row\n");
@@ -197,7 +197,7 @@ static MC6845_UPDATE_ROW( t1000_text_inten_update_row )
 
 static MC6845_UPDATE_ROW( t1000_text_blink_update_row )
 {
-	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16	*p = &bitmap->pix16(y);
 	int i;
 
 	for ( i = 0; i < x_count; i++ )
@@ -238,7 +238,7 @@ static MC6845_UPDATE_ROW( t1000_text_blink_update_row )
 
 static MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row )
 {
-	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16	*p = &bitmap->pix16(y);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
@@ -264,7 +264,7 @@ static MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row )
 
 static MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row )
 {
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
@@ -290,7 +290,7 @@ static MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row )
 
 static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 {
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	UINT8   *vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
@@ -314,7 +314,7 @@ static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 
 static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row )
 {
-	UINT16	*p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16	*p = &bitmap->pix16(y);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
@@ -340,7 +340,7 @@ static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row )
 
 static MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row )
 {
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
 	UINT8	fg = pcjr.palette_base + pcjr.reg.data[0x11];
 	UINT8	bg = pcjr.palette_base + pcjr.reg.data[0x10];

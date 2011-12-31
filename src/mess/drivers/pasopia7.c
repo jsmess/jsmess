@@ -221,7 +221,7 @@ static void draw_cg4_screen(running_machine &machine, bitmap_t *bitmap,const rec
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-					*BITMAP_ADDR16(bitmap, y+yi, x+xi) = machine.pens[color+0x20];
+					bitmap->pix16(y+yi, x+xi) = machine.pens[color+0x20];
 				}
 				count+=8;
 			}
@@ -254,7 +254,7 @@ static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rect
 					int pen;
 					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-					*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine.pens[pen];
+					bitmap->pix16(y*8+yi, x*8+xi) = machine.pens[pen];
 				}
 			}
 
@@ -278,7 +278,7 @@ static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rect
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = machine.pens[7];
+							bitmap->pix16(y*8-yc+7, x*8+xc) = machine.pens[7];
 						}
 					}
 				}
@@ -320,7 +320,7 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 
 						pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine.pens[pen];
+						bitmap->pix16(y*8+yi, x*8+xi) = machine.pens[pen];
 					}
 				}
 				else
@@ -332,7 +332,7 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 						int pen;
 						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = machine.pens[pen];
+						bitmap->pix16(y*8+yi, x*8+xi) = machine.pens[pen];
 					}
 				}
 			}
@@ -357,7 +357,7 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const r
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = machine.pens[7];
+							bitmap->pix16(y*8-yc+7, x*8+xc) = machine.pens[7];
 						}
 					}
 				}
@@ -373,7 +373,7 @@ static SCREEN_UPDATE( pasopia7 )
 	pasopia7_state *state = screen.machine().driver_data<pasopia7_state>();
 	int width;
 
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]);
+	bitmap->fill(screen.machine().pens[0], *cliprect);
 
 	fake_keyboard_data(screen.machine());
 

@@ -89,7 +89,7 @@ UINT8 pc1500_state::pc1500_kb_r(device_t *device)
 
 bool pc1500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	bitmap_fill(&bitmap, &cliprect, 0);
+	bitmap.fill(0, cliprect);
 
 	for (int p=0; p<=1; p++)
 		for (int a=0; a<0x4e; a++)
@@ -98,9 +98,9 @@ bool pc1500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 			for (int b=0; b<8; b++)
 			{
 				if(b<4)
-					*BITMAP_ADDR16(&bitmap, b + 4 * (BIT( a,0)), (a>>1) + 0x00 + 0x27*p) = BIT(data, b);
+					bitmap.pix16(b + 4 * (BIT( a, 0)), (a>>1) + 0x00 + 0x27*p) = BIT(data, b);
 				else
-					*BITMAP_ADDR16(&bitmap, b - 4 * (BIT(~a,0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
+					bitmap.pix16(b - 4 * (BIT(~a, 0)), (a>>1) + 0x4e + 0x27*p) = BIT(data, b);
 			}
 		}
 

@@ -132,14 +132,14 @@ int t6a04_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
 
 				for (int b=7; b>=0; b--)
 				{
-					*BITMAP_ADDR16(bitmap, x&0x3f, y*8+b) = data & 1;
+					bitmap->pix16(x&0x3f, y*8+b) = data & 1;
 					data>>=1;
 				}
 			}
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, 0);
+		bitmap->fill(0, *cliprect);
 	}
 
 	return 0;

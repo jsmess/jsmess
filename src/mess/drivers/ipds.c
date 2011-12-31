@@ -97,7 +97,7 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 		pixels ^= 0xff;
 
 	for(i=0;i<6;i++)
-		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap->pix16(y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 }
 
 const i8275_interface ipds_i8275_interface = {

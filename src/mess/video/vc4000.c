@@ -396,7 +396,7 @@ static void vc4000_draw_digit(vc4000_state *state, bitmap_t *bitmap, int x, int 
 	for (j=0; j<sizeof(led[0]); j++)
 	{
 		if (digit_to_segment[d]&(1<<(led[i][j]-'a')) )
-			*BITMAP_ADDR16(bitmap, y+i, x+j) = ((state->m_video.reg.d.background>>4)&7)^7;
+			bitmap->pix16(y+i, x+j) = ((state->m_video.reg.d.background>>4)&7)^7;
 	}
 }
 
@@ -534,7 +534,7 @@ INLINE void vc4000_draw_grid(running_machine &machine, UINT8 *collision)
 
 	if (state->m_video.line>=height) return;
 
-	plot_box(state->m_video.bitmap, 0, state->m_video.line, width, 1, (state->m_video.reg.d.background)&7);
+	state->m_video.bitmap->plot_box(0, state->m_video.line, width, 1, (state->m_video.reg.d.background)&7);
 
 	if (line<0 || line>=200) return;
 	if (~state->m_video.reg.d.background & 8) return;
@@ -574,7 +574,7 @@ INLINE void vc4000_draw_grid(running_machine &machine, UINT8 *collision)
 		{
 			int l;
 			for (l=0; l<w; l++) collision[x+l]|=0x10;
-			plot_box(state->m_video.bitmap, x, state->m_video.line, w, 1, (state->m_video.reg.d.background>>4)&7);
+			state->m_video.bitmap->plot_box(x, state->m_video.line, w, 1, (state->m_video.reg.d.background>>4)&7);
 		}
 		if (j==7) m=0x100;
 	}
@@ -625,7 +625,7 @@ INTERRUPT_GEN( vc4000_video_line )
 			state->m_video.background_collision|=state->m_background_collision[collision[i]];
 			/* display final object colours */
 			if (state->m_objects[i] < 8)
-					*BITMAP_ADDR16(state->m_video.bitmap, state->m_video.line, i) = state->m_objects[i];
+					state->m_video.bitmap->pix16(state->m_video.line, i) = state->m_objects[i];
 		}
 
 		y = state->m_video.reg.d.score_control&1?200:20;

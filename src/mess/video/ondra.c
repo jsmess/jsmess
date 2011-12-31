@@ -35,8 +35,8 @@ SCREEN_UPDATE( ondra )
 				code2 = screen.machine().device<ram_device>(RAM_TAG)->pointer()[0xd700 + Vaddr + 0x00];
 				for (b = 0; b < 8; b++)
 				{
-					*BITMAP_ADDR16(bitmap, 2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;
-					*BITMAP_ADDR16(bitmap, 2*y+1,   x*8+b) =  ((code2 << b) & 0x80) ? 1 : 0;
+					bitmap->pix16(2*y, x*8+b) =  ((code1 << b) & 0x80) ? 1 : 0;
+					bitmap->pix16(2*y+1, x*8+b) =  ((code2 << b) & 0x80) ? 1 : 0;
 				}
 				Vaddr++;
 			}

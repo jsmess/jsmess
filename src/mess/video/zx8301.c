@@ -269,7 +269,7 @@ void zx8301_device::draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da)
 			int green = BIT(byte_high, 7);
 			int color = (green << 1) | red;
 
-			*BITMAP_ADDR16(bitmap, y, x++) = ZX8301_COLOR_MODE4[color];
+			bitmap->pix16(y, x++) = ZX8301_COLOR_MODE4[color];
 
 			byte_high <<= 1;
 			byte_low <<= 1;
@@ -305,8 +305,8 @@ void zx8301_device::draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da)
 				color = 0;
 			}
 
-			*BITMAP_ADDR16(bitmap, y, x++) = color;
-			*BITMAP_ADDR16(bitmap, y, x++) = color;
+			bitmap->pix16(y, x++) = color;
+			bitmap->pix16(y, x++) = color;
 
 			byte_high <<= 2;
 			byte_low <<= 2;
@@ -341,6 +341,6 @@ void zx8301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
+		bitmap->fill(get_black_pen(machine()), *cliprect);
 	}
 }

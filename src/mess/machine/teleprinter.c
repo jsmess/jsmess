@@ -235,7 +235,7 @@ static void generic_teleprinter_update(device_t *device, bitmap_t *bitmap, const
 				code = teleprinter_font[(term->buffer[y*TELEPRINTER_WIDTH + x]  & 0x7f) *8 + c];
 				for (b = 0; b < 8; b++)
 				{
-					*BITMAP_ADDR16(bitmap, y*8 + c, horpos++) =  (code >> b) & 0x01 ? 0 : 1;
+					bitmap->pix16(y*8 + c, horpos++) =  (code >> b) & 0x01 ? 0 : 1;
 				}
 			}
 		}

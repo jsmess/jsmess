@@ -316,7 +316,7 @@ static MC6845_UPDATE_ROW( h19_update_row )
 	h19_state *state = device->machine().driver_data<h19_state>();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
-	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *p = &bitmap->pix16(y);
 
 	for (x = 0; x < x_count; x++)
 	{

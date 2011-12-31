@@ -138,7 +138,7 @@ SCREEN_UPDATE( pc1401 )
 	int x, y, i, j;
 	int color[2];
 
-	bitmap_fill(bitmap, cliprect, 11);
+	bitmap->fill(11, *cliprect);
 
 #if 0
 	/* HJB: we cannot initialize array with values from other arrays, thus... */

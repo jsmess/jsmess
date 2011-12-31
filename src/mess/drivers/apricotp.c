@@ -94,7 +94,7 @@ bool fp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 				{
 					int color = BIT(data, 15);
 
-					*BITMAP_ADDR16(&bitmap, y, (sx * 16) + x) = color;
+					bitmap.pix16(y, (sx * 16) + x) = color;
 
 					data <<= 1;
 				}

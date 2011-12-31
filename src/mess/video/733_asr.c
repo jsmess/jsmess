@@ -34,14 +34,6 @@ enum
 	asr_scroll_step = 8
 };
 
-static const rectangle asr_scroll_clear_window =
-{
-	asr_window_offset_x,									/* min_x */
-	asr_window_offset_x+asr_window_width-1,					/* max_x */
-	asr_window_offset_y+asr_window_height-asr_scroll_step,	/* min_y */
-	asr_window_offset_y+asr_window_height-1					/* max_y */
-};
-
 typedef struct
 {
 #if 0
@@ -190,7 +182,7 @@ static DEVICE_START( asr733 )
 	asr->last_key_pressed = 0x80;
 	asr->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
 
-	bitmap_fill(asr->bitmap, &visarea, 0);
+	asr->bitmap->fill(0, visarea);
 
 	asr->int_callback = params->int_callback;
 }
@@ -267,7 +259,13 @@ static void asr_linefeed(device_t *device)
 		draw_scanline8(asr->bitmap, asr_window_offset_x, y, asr_window_width, buf, device->machine().pens);
 	}
 
-	bitmap_fill(asr->bitmap, &asr_scroll_clear_window, 0);
+	const rectangle asr_scroll_clear_window(
+		asr_window_offset_x,									/* min_x */
+		asr_window_offset_x+asr_window_width-1,					/* max_x */
+		asr_window_offset_y+asr_window_height-asr_scroll_step,	/* min_y */
+		asr_window_offset_y+asr_window_height-1					/* max_y */
+	);
+	asr->bitmap->fill(0, asr_scroll_clear_window);
 }
 
 static void asr_transmit(device_t *device, UINT8 data)

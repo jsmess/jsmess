@@ -412,7 +412,7 @@ static void glyph_print(running_machine &machine, bitmap_t *bitmap, INT32 x, INT
 			INT32 line = 0;
 			for(line = 0; line < 8; line++)
 			{
-				UINT32 *d = BITMAP_ADDR32(bitmap, y + line, 0);
+				UINT32 *d = &bitmap->pix32(y + line);
 				INT32 bit = 0;
 				for(bit = 0; bit < 8; bit++)
 				{

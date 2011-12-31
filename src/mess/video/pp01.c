@@ -33,7 +33,7 @@ SCREEN_UPDATE( pp01 )
 			for (b = 0; b < 8; b++)
 			{
 				col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
-				*BITMAP_ADDR16(bitmap, y,  x*8+(7-b)) =  col;
+				bitmap->pix16(y, x*8+(7-b)) =  col;
 			}
 		}
 	}

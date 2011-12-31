@@ -49,7 +49,7 @@ bool f1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 				{
 					int color = (BIT(data, 15) << 1) | BIT(data, 7);
 
-					*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = color;
+					bitmap.pix16(y, (sx * 8) + x) = color;
 
 					data <<= 1;
 				}
@@ -60,8 +60,8 @@ bool f1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 				{
 					int color = (BIT(data, 15) << 3) | (BIT(data, 14) << 2) | (BIT(data, 7) << 1) | BIT(data, 6);
 
-					*BITMAP_ADDR16(&bitmap, y, (sx * 8) + (x * 2)) = color;
-					*BITMAP_ADDR16(&bitmap, y, (sx * 8) + (x * 2) + 1) = color;
+					bitmap.pix16(y, (sx * 8) + (x * 2)) = color;
+					bitmap.pix16(y, (sx * 8) + (x * 2) + 1) = color;
 
 					data <<= 2;
 				}

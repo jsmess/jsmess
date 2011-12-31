@@ -94,7 +94,7 @@ SCREEN_UPDATE_MEMBER( b16_state )
 					pen = (gfx_rom[tile*16+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(y*mc6845_tile_height < 400 && x*8+xi < 640) /* TODO: safety check */
-						*BITMAP_ADDR16(&bitmap, y*mc6845_tile_height+yi, x*8+xi) = machine().pens[pen];
+						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = machine().pens[pen];
 				}
 			}
 		}

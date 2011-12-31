@@ -136,9 +136,9 @@ static void kc85_draw_8_pixels(kc_state *state, bitmap_t *bitmap,int x,int y, un
 		{
 			int pen = pens[((gfx_byte>>7) & 0x07) | ((colour_byte>>6) & 0x02)];
 
-			if ((px >= 0) && (px < bitmap->width) && (y >= 0) && (y < bitmap->height))
+			if ((px >= 0) && (px < bitmap->width()) && (y >= 0) && (y < bitmap->height()))
 			{
-				*BITMAP_ADDR16(bitmap, y, px) = pen;
+				bitmap->pix16(y, px) = pen;
 			}
 
 			px++;
@@ -179,9 +179,9 @@ static void kc85_draw_8_pixels(kc_state *state, bitmap_t *bitmap,int x,int y, un
 		{
 			int pen = pens[(gfx_byte>>7) & 0x01];
 
-			if ((px >= 0) && (px < bitmap->width) && (y >= 0) && (y < bitmap->height))
+			if ((px >= 0) && (px < bitmap->width()) && (y >= 0) && (y < bitmap->height()))
 			{
-				*BITMAP_ADDR16(bitmap, y, px) = pen;
+				bitmap->pix16(y, px) = pen;
 			}
 			px++;
 			gfx_byte = gfx_byte<<1;

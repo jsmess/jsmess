@@ -124,7 +124,7 @@ INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t *bitma
 
 			for (i = 0; i < xscale; i++)
 			{
-				*BITMAP_ADDR16(bitmap, ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap->pix16(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -203,12 +203,12 @@ static void apple2_lores_draw(running_machine &machine, bitmap_t *bitmap, const 
 			for (y = 0; y < 4; y++)
 			{
 				for (x = 0; x < 14; x++)
-					*BITMAP_ADDR16(bitmap, row + y, col * 14 + x) = (code >> 0) & 0x0F;
+					bitmap->pix16(row + y, col * 14 + x) = (code >> 0) & 0x0F;
 			}
 			for (y = 4; y < 8; y++)
 			{
 				for (x = 0; x < 14; x++)
-					*BITMAP_ADDR16(bitmap, row + y, col * 14 + x) = (code >> 4) & 0x0F;
+					bitmap->pix16(row + y, col * 14 + x) = (code >> 4) & 0x0F;
 			}
 		}
 	}
@@ -269,7 +269,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 			}
 		}
 
-		p = BITMAP_ADDR16(bitmap, row, 0);
+		p = &bitmap->pix16(row);
 
 		for (col = 0; col < columns; col++)
 		{

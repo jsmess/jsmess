@@ -158,7 +158,7 @@ void st_state::shifter_tick()
 		break;
 	}
 
-	*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x) = pen;
+	machine().generic.tmpbitmap->pix32(y, x) = pen;
 }
 
 
@@ -251,36 +251,36 @@ void st_state::glue_tick()
 	{
 	case 0:
 		pen = shift_mode_0();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x) = pen;
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+1) = pen;
+		machine().generic.tmpbitmap->pix32(y, x) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+1) = pen;
 		pen = shift_mode_0();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+2) = pen;
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+3) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+2) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+3) = pen;
 		pen = shift_mode_0();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+4) = pen;
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+5) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+4) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+5) = pen;
 		pen = shift_mode_0();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+6) = pen;
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+7) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+6) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+7) = pen;
 		break;
 
 	case 1:
 		pen = shift_mode_1();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x) = pen;
+		machine().generic.tmpbitmap->pix32(y, x) = pen;
 		pen = shift_mode_1();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+1) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+1) = pen;
 		pen = shift_mode_1();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+2) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+2) = pen;
 		pen = shift_mode_1();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+3) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+3) = pen;
 		pen = shift_mode_1();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+4) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+4) = pen;
 		pen = shift_mode_1();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+5) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+5) = pen;
 		pen = shift_mode_1();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+6) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+6) = pen;
 		pen = shift_mode_1();
-		*BITMAP_ADDR32(machine().generic.tmpbitmap, y, x+7) = pen;
+		machine().generic.tmpbitmap->pix32(y, x+7) = pen;
 		break;
 
 	case 2:

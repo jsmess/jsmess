@@ -259,23 +259,23 @@ static void x1_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x
 
 	if(width && height)
 	{
-		*BITMAP_ADDR32(bitmap, y+0, x+0) = machine.pens[pen];
-		*BITMAP_ADDR32(bitmap, y+0, x+1) = machine.pens[pen];
-		*BITMAP_ADDR32(bitmap, y+1, x+0) = machine.pens[pen];
-		*BITMAP_ADDR32(bitmap, y+1, x+1) = machine.pens[pen];
+		bitmap->pix32(y+0, x+0) = machine.pens[pen];
+		bitmap->pix32(y+0, x+1) = machine.pens[pen];
+		bitmap->pix32(y+1, x+0) = machine.pens[pen];
+		bitmap->pix32(y+1, x+1) = machine.pens[pen];
 	}
 	else if(width)
 	{
-		*BITMAP_ADDR32(bitmap, y, x+0) = machine.pens[pen];
-		*BITMAP_ADDR32(bitmap, y, x+1) = machine.pens[pen];
+		bitmap->pix32(y, x+0) = machine.pens[pen];
+		bitmap->pix32(y, x+1) = machine.pens[pen];
 	}
 	else if(height)
 	{
-		*BITMAP_ADDR32(bitmap, y+0, x) = machine.pens[pen];
-		*BITMAP_ADDR32(bitmap, y+1, x) = machine.pens[pen];
+		bitmap->pix32(y+0, x) = machine.pens[pen];
+		bitmap->pix32(y+1, x) = machine.pens[pen];
 	}
 	else
-		*BITMAP_ADDR32(bitmap, y, x) = machine.pens[pen];
+		bitmap->pix32(y, x) = machine.pens[pen];
 }
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -567,7 +567,7 @@ SCREEN_UPDATE( x1 )
 {
 	x1_state *state = screen.machine().driver_data<x1_state>();
 
-	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
+	bitmap->fill(MAKE_ARGB(0xff,0x00,0x00,0x00), *cliprect);
 
 	draw_gfxbitmap(screen.machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri);
 	draw_fgtilemap(screen.machine(),bitmap,cliprect);

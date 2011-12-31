@@ -490,14 +490,14 @@ bool ti68k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 	UINT8 x, y, b;
 
 	if (!m_lcd_on || !m_lcd_base)
-		bitmap_fill(&bitmap, NULL, 0);
+		bitmap.fill(0);
 	else
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width / 8; x++)
 			{
 				UINT8 s_byte= m_maincpu->space(AS_PROGRAM)->read_byte(m_lcd_base + y * (width/8) + x);
 				for (b = 0; b<8; b++)
-					*BITMAP_ADDR16(&bitmap, y, x * 8 + (7 - b)) = BIT(s_byte, b);
+					bitmap.pix16(y, x * 8 + (7 - b)) = BIT(s_byte, b);
 			}
 
 	return 0;

@@ -181,7 +181,7 @@ void crt_update(device_t *device, bitmap_t *bitmap)
 		/* some time has elapsed: let's update the screen */
 		for (y=0; y<crt->window_height; y++)
 		{
-			UINT16 *line = BITMAP_ADDR16(bitmap, y+crt->window_offset_y, 0);
+			UINT16 *line = &bitmap->pix16(y+crt->window_offset_y);
 
 			p_i = -1;
 

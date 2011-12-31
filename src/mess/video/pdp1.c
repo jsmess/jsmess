@@ -25,17 +25,7 @@
 
 
 
-static const rectangle typewriter_bitmap_bounds =
-{
-	0,	typewriter_window_width-1,	/* min_x, max_x */
-	0,	typewriter_window_height-1,	/* min_y, max_y */
-};
 
-static const rectangle panel_bitmap_bounds =
-{
-	0,	panel_window_width-1,	/* min_x, max_x */
-	0,	panel_window_height-1,	/* min_y, max_y */
-};
 
 static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap);
 static void pdp1_draw_panel(running_machine &machine, bitmap_t *bitmap);
@@ -45,7 +35,7 @@ static void pdp1_draw_lightpen(pdp1_state *state, bitmap_t *bitmap);
 
 INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = color;
+	bitmap->pix16(y, x) = color;
 }
 
 /*
@@ -63,7 +53,8 @@ VIDEO_START( pdp1 )
 	/* set up out bitmaps */
 	pdp1_draw_panel_backdrop(machine, state->m_panel_bitmap);
 
-	bitmap_fill(state->m_typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
+	const rectangle typewriter_bitmap_bounds(0, typewriter_window_width-1, 0, typewriter_window_height-1);
+	state->m_typewriter_bitmap->fill(pen_typewriter_bg, typewriter_bitmap_bounds);
 
 	state->m_crt = machine.device("crt");
 }
@@ -262,7 +253,8 @@ static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap)
 {
 	pdp1_state *state = machine.driver_data<pdp1_state>();
 	/* fill with black */
-	bitmap_fill(state->m_panel_bitmap, &panel_bitmap_bounds, pen_panel_bg);
+	const rectangle panel_bitmap_bounds(0, panel_window_width-1,	0, panel_window_height-1);
+	state->m_panel_bitmap->fill(pen_panel_bg, panel_bitmap_bounds);
 
 	/* column 1: registers, test word, test address */
 	pdp1_draw_string(machine, bitmap, "program counter", x_panel_col1_offset, y_panel_pc_offset, color_panel_caption);
@@ -274,7 +266,7 @@ static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap)
 	pdp1_draw_string(machine, bitmap, "test word", x_panel_col1_offset, y_panel_tw_offset, color_panel_caption);
 
 	/* column separator */
-	plot_box(bitmap, x_panel_col2_offset-4, panel_window_offset_y+8, 1, 96, pen_panel_caption);
+	bitmap->plot_box(x_panel_col2_offset-4, panel_window_offset_y+8, 1, 96, pen_panel_caption);
 
 	/* column 2: 1-bit indicators */
 	pdp1_draw_string(machine, bitmap, "run", x_panel_col2_offset+8, y_panel_run_offset, color_panel_caption);
@@ -292,17 +284,17 @@ static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap)
 	pdp1_draw_string(machine, bitmap, "i-o sync", x_panel_col2_offset+8, y_panel_ios_offset, color_panel_caption);
 
 	/* column separator */
-	plot_box(bitmap, x_panel_col3_offset-4, panel_window_offset_y+8, 1, 96, pen_panel_caption);
+	bitmap->plot_box(x_panel_col3_offset-4, panel_window_offset_y+8, 1, 96, pen_panel_caption);
 
 	/* column 3: power, single step, single inst, sense, flags, instr... */
 	pdp1_draw_string(machine, bitmap, "power", x_panel_col3_offset+16, y_panel_power_offset, color_panel_caption);
 	pdp1_draw_string(machine, bitmap, "single step", x_panel_col3_offset+16, y_panel_sngl_step_offset, color_panel_caption);
 	pdp1_draw_string(machine, bitmap, "single inst.", x_panel_col3_offset+16, y_panel_sngl_inst_offset, color_panel_caption);
 	/* separator */
-	plot_box(bitmap, x_panel_col3_offset+8, y_panel_sep1_offset+4, 96, 1, pen_panel_caption);
+	bitmap->plot_box(x_panel_col3_offset+8, y_panel_sep1_offset+4, 96, 1, pen_panel_caption);
 	pdp1_draw_string(machine, bitmap, "sense switches", x_panel_col3_offset, y_panel_ss_offset, color_panel_caption);
 	/* separator */
-	plot_box(bitmap, x_panel_col3_offset+8, y_panel_sep2_offset+4, 96, 1, pen_panel_caption);
+	bitmap->plot_box(x_panel_col3_offset+8, y_panel_sep2_offset+4, 96, 1, pen_panel_caption);
 	pdp1_draw_string(machine, bitmap, "program flags", x_panel_col3_offset, y_panel_pf_offset, color_panel_caption);
 	pdp1_draw_string(machine, bitmap, "instruction", x_panel_col3_offset, y_panel_ir_offset, color_panel_caption);
 }
@@ -364,11 +356,6 @@ enum
 	typewriter_write_offset_y = typewriter_window_height-typewriter_line_height,
 	typewriter_scroll_step = typewriter_line_height
 };
-static const rectangle typewriter_scroll_clear_window =
-{
-	0, typewriter_window_width-1,	/* min_x, max_x */
-	typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1,	/* min_y, max_y */
-};
 
 enum
 {
@@ -388,7 +375,8 @@ static void pdp1_typewriter_linefeed(running_machine &machine)
 		draw_scanline8(state->m_typewriter_bitmap, 0, y, typewriter_window_width, buf, machine.pens);
 	}
 
-	bitmap_fill(state->m_typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);
+	const rectangle typewriter_scroll_clear_window(0, typewriter_window_width-1,	typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1);
+	state->m_typewriter_bitmap->fill(pen_typewriter_bg, typewriter_scroll_clear_window);
 }
 
 void pdp1_typewriter_drawchar(running_machine &machine, int character)

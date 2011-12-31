@@ -147,23 +147,23 @@ static void mz2500_draw_pixel(running_machine &machine, bitmap_t *bitmap,int x,i
 {
 	if(width && height)
 	{
-		*BITMAP_ADDR16(bitmap, y*2+0, x*2+0) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y*2+0, x*2+1) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y*2+1, x*2+0) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y*2+1, x*2+1) = machine.pens[pen];
+		bitmap->pix16(y*2+0, x*2+0) = machine.pens[pen];
+		bitmap->pix16(y*2+0, x*2+1) = machine.pens[pen];
+		bitmap->pix16(y*2+1, x*2+0) = machine.pens[pen];
+		bitmap->pix16(y*2+1, x*2+1) = machine.pens[pen];
 	}
 	else if(width)
 	{
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = machine.pens[pen];
+		bitmap->pix16(y, x*2+0) = machine.pens[pen];
+		bitmap->pix16(y, x*2+1) = machine.pens[pen];
 	}
 	else if(height)
 	{
-		*BITMAP_ADDR16(bitmap, y*2+0, x) = machine.pens[pen];
-		*BITMAP_ADDR16(bitmap, y*2+1, x) = machine.pens[pen];
+		bitmap->pix16(y*2+0, x) = machine.pens[pen];
+		bitmap->pix16(y*2+1, x) = machine.pens[pen];
 	}
 	else
-		*BITMAP_ADDR16(bitmap, y, x) = machine.pens[pen];
+		bitmap->pix16(y, x) = machine.pens[pen];
 }
 
 static void draw_80x25(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 map_addr)
@@ -582,7 +582,7 @@ static void draw_cg_screen(running_machine &machine, bitmap_t *bitmap,const rect
 static SCREEN_UPDATE( mz2500 )
 {
 	//mz2500_state *state = screen.machine().driver_data<mz2500_state>();
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[0]); //TODO: correct?
+	bitmap->fill(screen.machine().pens[0], *cliprect); //TODO: correct?
 
 	draw_cg_screen(screen.machine(),bitmap,cliprect,0);
 	draw_tv_screen(screen.machine(),bitmap,cliprect);

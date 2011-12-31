@@ -57,7 +57,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	{
 		pen = ((gfx >> xi) & 1) ? 1 : 0;
 
-		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
+		bitmap->pix16(y, x + xi) = pen;
 	}
 }
 

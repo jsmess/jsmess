@@ -15,20 +15,9 @@
 
 INLINE void tx0_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = color;
+	bitmap->pix16(y, x) = color;
 }
 
-static const rectangle panel_bitmap_bounds =
-{
-	0,	panel_window_width-1,	/* min_x, max_x */
-	0,	panel_window_height-1,	/* min_y, max_y */
-};
-
-static const rectangle typewriter_bitmap_bounds =
-{
-	0,	typewriter_window_width-1,	/* min_x, max_x */
-	0,	typewriter_window_height-1,	/* min_y, max_y */
-};
 
 static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap);
 static void tx0_draw_panel(running_machine &machine, bitmap_t *bitmap);
@@ -50,7 +39,8 @@ VIDEO_START( tx0 )
 	/* set up out bitmaps */
 	tx0_draw_panel_backdrop(machine, state->m_panel_bitmap);
 
-	bitmap_fill(state->m_typewriter_bitmap, &typewriter_bitmap_bounds, pen_typewriter_bg);
+	const rectangle typewriter_bitmap_bounds(0, typewriter_window_width-1, 0, typewriter_window_height-1);
+	state->m_typewriter_bitmap->fill(pen_typewriter_bg, typewriter_bitmap_bounds);
 
 	state->m_crt = machine.device("crt");
 }
@@ -258,7 +248,8 @@ static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_t *bitmap)
 	char buf[3];
 
 	/* fill with black */
-	bitmap_fill(state->m_panel_bitmap, &panel_bitmap_bounds, pen_panel_bg);
+	const rectangle panel_bitmap_bounds(0, panel_window_width-1,	0, panel_window_height-1);
+	state->m_panel_bitmap->fill(pen_panel_bg, panel_bitmap_bounds);
 
 	/* column 1: registers, test accumulator, test buffer, toggle switch storage */
 	tx0_draw_string(machine, bitmap, "program counter", x_panel_col1b_offset, y_panel_pc_offset, color_panel_caption);
@@ -353,12 +344,6 @@ enum
 	typewriter_scroll_step = typewriter_line_height
 };
 
-static const rectangle typewriter_scroll_clear_window =
-{
-	0, typewriter_window_width-1,	/* min_x, max_x */
-	typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1,	/* min_y, max_y */
-};
-
 enum
 {
 	tab_step = 8
@@ -377,7 +362,8 @@ static void tx0_typewriter_linefeed(running_machine &machine)
 		draw_scanline8(state->m_typewriter_bitmap, 0, y, typewriter_window_width, buf, machine.pens);
 	}
 
-	bitmap_fill(state->m_typewriter_bitmap, &typewriter_scroll_clear_window, pen_typewriter_bg);
+	const rectangle typewriter_scroll_clear_window(0, typewriter_window_width-1, typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1);
+	state->m_typewriter_bitmap->fill(pen_typewriter_bg, typewriter_scroll_clear_window);
 }
 
 void tx0_typewriter_drawchar(running_machine &machine, int character)

@@ -106,7 +106,7 @@ SCREEN_UPDATE( mc8020 )
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = ma; x < ma + 32; x++)
 			{
@@ -151,7 +151,7 @@ SCREEN_UPDATE( mc8030 )
 
 	for(y = 0; y < 256; y++ )
 	{
-		UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *p = &bitmap->pix16(y);
 		{
 			for (x = ma; x < ma + 64; x++)
 			{

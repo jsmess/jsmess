@@ -70,7 +70,7 @@ SCREEN_UPDATE( trs80 )
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -152,7 +152,7 @@ SCREEN_UPDATE( trs80m4 )
 	{
 		for (ra = 0; ra < lines; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = ma; x < ma + cols; x+=skip)
 			{
@@ -237,7 +237,7 @@ SCREEN_UPDATE( ht1080z )
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -306,7 +306,7 @@ SCREEN_UPDATE( lnw80 )
 			{
 				for (ra = 0; ra < 12; ra++)
 				{
-					UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+					UINT16 *p = &bitmap->pix16(sy++);
 
 					for (x = ma; x < ma + 64; x++)
 					{
@@ -351,7 +351,7 @@ SCREEN_UPDATE( lnw80 )
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+					UINT16 *p = &bitmap->pix16(sy++);
 
 					for (x = 0; x < 0x40; x++)
 					{
@@ -387,7 +387,7 @@ SCREEN_UPDATE( lnw80 )
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+					UINT16 *p = &bitmap->pix16(sy++);
 
 					for (x = 0; x < 0x40; x++)
 					{
@@ -414,7 +414,7 @@ SCREEN_UPDATE( lnw80 )
 			{
 				for (ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+					UINT16 *p = &bitmap->pix16(sy++);
 
 					for (x = 0; x < 0x40; x++)
 					{
@@ -469,7 +469,7 @@ SCREEN_UPDATE( radionic )
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{
@@ -512,7 +512,7 @@ SCREEN_UPDATE( meritum )
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = ma; x < ma + 64; x+=skip)
 			{

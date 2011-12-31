@@ -102,7 +102,7 @@ SCREEN_UPDATE( super80 )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = 0; x < 32; x++)	// done this way to avoid x overflowing on page FF
 			{
@@ -144,7 +144,7 @@ SCREEN_UPDATE( super80d )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -186,7 +186,7 @@ SCREEN_UPDATE( super80e )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -240,7 +240,7 @@ SCREEN_UPDATE( super80m )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			UINT16 *p = &bitmap->pix16(sy++);
 
 			for (x = 0; x < 32; x++)
 			{
@@ -399,7 +399,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 	super80_state *state = device->machine().driver_data<super80_state>();
 	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
-	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *p = &bitmap->pix16(y);
 
 	for (x = 0; x < x_count; x++)				// for each character
 	{

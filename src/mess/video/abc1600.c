@@ -1006,7 +1006,7 @@ void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const re
 			{
 				int color = (BIT(data, 15) ^ PIX_POL) & !BLANK;
 
-				*BITMAP_ADDR16(bitmap, y + VFP, x++) = color;
+				bitmap->pix16(y + VFP, x++) = color;
 
 				data <<= 1;
 			}
@@ -1098,12 +1098,12 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 
 	if (m_endisp)
 	{
-		bitmap_fill(&bitmap, &cliprect, FRAME_POL);
+		bitmap.fill(FRAME_POL, cliprect);
 		m_crtc->update(&bitmap, &cliprect);
 	}
 	else
 	{
-		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine()));
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
 
 	return 0;

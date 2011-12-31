@@ -32,7 +32,7 @@ SCREEN_UPDATE( irisha )
 			for (b = 0; b < 8; b++)
 			{
 				col = ((code1 >> b) & 0x01);
-				*BITMAP_ADDR16(bitmap, y, x * 8 + (7 - b)) =  col;
+				bitmap->pix16(y, x * 8 + (7 - b)) =  col;
 			}
 		}
 	}

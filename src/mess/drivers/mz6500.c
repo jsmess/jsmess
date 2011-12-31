@@ -37,7 +37,7 @@ public:
 
 SCREEN_UPDATE_MEMBER( mz6500_state )
 {
-	bitmap_fill(&bitmap, &cliprect, 0);
+	bitmap.fill(0, cliprect);
 
 	/* graphics */
 	m_hgdc->update_screen(&bitmap, &cliprect);
@@ -59,7 +59,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	{
 		pen = (BIT(gfx[0], i)) | (BIT(gfx[1], i) << 1) | (BIT(gfx[2], i) << 2);
 
-		*BITMAP_ADDR16(bitmap, y, x + i) = pen;
+		bitmap->pix16(y, x + i) = pen;
 	}
 }
 

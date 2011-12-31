@@ -451,7 +451,7 @@ SCREEN_UPDATE_MEMBER( fk1_state )
 			code = ram[x * 0x100 + ((y + m_video_rol) & 0xff) + 0x10000];
 			for (b = 0; b < 8; b++)
 			{
-				*BITMAP_ADDR16(&bitmap, y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;
+				bitmap.pix16(y, x*8+b) =  ((code << b) & 0x80) ? 1 : 0;
 			}
 		}
 	}

@@ -167,7 +167,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		pen|= ((gfx[1] >> (7-xi)) & 1) ? 2 : 0;
 		pen|= ((gfx[2] >> (7-xi)) & 1) ? 4 : 0;
 
-		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
+		bitmap->pix16(y, x + xi) = pen;
 	}
 }
 
@@ -218,7 +218,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					continue;
 
 				if(pen)
-					*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+					bitmap->pix16(res_y, res_x) = pen;
 			}
 		}
 	}
@@ -967,7 +967,7 @@ void qx10_state::video_start()
 
 bool qx10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	bitmap_fill(&bitmap, &cliprect, 0);
+	bitmap.fill(0, cliprect);
 
 	/* graphics */
 	m_hgdc->update_screen(&bitmap, &cliprect);

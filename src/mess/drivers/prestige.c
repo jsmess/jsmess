@@ -457,7 +457,7 @@ bool prestige_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 
 			for (int x = 0; x < 8; x++)
 			{
-				*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = BIT(data, 7);
+				bitmap.pix16(y, (sx * 8) + x) = BIT(data, 7);
 
 				data <<= 1;
 			}

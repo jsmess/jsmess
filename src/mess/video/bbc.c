@@ -226,7 +226,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			{
 				int col=returned_pixels[pixelno];
 
-					*BITMAP_ADDR16(bitmap, y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
+					bitmap->pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
 			}
 
 
@@ -247,7 +247,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
 				{
 					int col=state->m_videoULA_pallet_lookup[state->m_pixel_bits[i]];
-					*BITMAP_ADDR16(bitmap, y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
+					bitmap->pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
 					i=(i<<1)|1;
 				}
 			}
@@ -258,7 +258,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			{
 				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
 				{
-					*BITMAP_ADDR16(bitmap, y, (x_pos*state->m_pixels_per_byte)+pixelno)=7;
+					bitmap->pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=7;
 				}
 			}
 		}
@@ -538,11 +538,11 @@ static void BBC_Set_HSync(running_machine &machine, int offset, int data)
 
         if ((state->m_y_screen_pos>=0) && (state->m_y_screen_pos<300))
         {
-            state->m_BBC_display_left = BITMAP_ADDR16(state->m_BBC_bitmap, state->m_y_screen_pos, 0);
+            state->m_BBC_display_left = &state->m_BBC_bitmap->pix16(state->m_y_screen_pos);
             state->m_BBC_display_right = state->m_BBC_display_left + 800;
 
         } else {
-            state->m_BBC_display_left = BITMAP_ADDR16(state->m_BBC_bitmap, 0, 0);
+            state->m_BBC_display_left = &state->m_BBC_bitmap->pix16(0);
             state->m_BBC_display_right = state->m_BBC_display_left;
         }
 
@@ -563,11 +563,11 @@ static void BBC_Set_VSync(running_machine &machine, int offset, int data)
 
         if ((state->m_y_screen_pos>=0) && (state->m_y_screen_pos<300))
         {
-            state->m_BBC_display_left = BITMAP_ADDR16(state->m_BBC_bitmap, state->m_y_screen_pos, 0);
+            state->m_BBC_display_left = &state->m_BBC_bitmap->pix16(state->m_y_screen_pos);
             state->m_BBC_display_right = state->m_BBC_display_left + 800;
 
         } else {
-            state->m_BBC_display_left = BITMAP_ADDR16(state->m_BBC_bitmap, 0, 0);
+            state->m_BBC_display_left = &state->m_BBC_bitmap->pix16(0);
             state->m_BBC_display_right = state->m_BBC_display_left;
         }
 
@@ -670,7 +670,7 @@ SCREEN_UPDATE( bbc )
 
     state->m_BBC_bitmap=bitmap;
 
-    state->m_BBC_display_left=BITMAP_ADDR16(state->m_BBC_bitmap, 0, 0);
+    state->m_BBC_display_left=&state->m_BBC_bitmap->pix16(0);
     state->m_BBC_display_right=state->m_BBC_display_left;
     state->m_BBC_display=state->m_BBC_display_left;
 
