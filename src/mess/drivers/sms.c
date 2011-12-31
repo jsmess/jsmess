@@ -63,7 +63,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/2413intf.h"
-#include "video/smsvdp.h"
+#include "video/315_5124.h"
 #include "imagedev/cartslot.h"
 #include "machine/eeprom.h"
 #include "includes/sms.h"

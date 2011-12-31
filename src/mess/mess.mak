@@ -1384,7 +1384,6 @@ $(MESSOBJ)/sega.a:				\
 	$(MESS_DRIVERS)/dc.o		\
 	$(MAME_MACHINE)/gdrom.o 	\
 	$(MESS_MACHINE)/dccons.o	\
-	$(MESS_VIDEO)/smsvdp.o		\
 	$(MESS_MACHINE)/sms.o	\
 	$(MESS_DRIVERS)/sms.o	\
 	$(MESS_DRIVERS)/sg1000.o	\

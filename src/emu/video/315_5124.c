@@ -46,7 +46,7 @@ PAL frame timing
 */
 
 #include "emu.h"
-#include "video/smsvdp.h"
+#include "video/315_5124.h"
 #include "machine/devhelpr.h"
 
 
