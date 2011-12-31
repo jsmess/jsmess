@@ -1771,11 +1771,12 @@
 		</part>
 	</software>
 
-	<software name="f1spirit" cloneof="f16fight">
+	<software name="f1spirit">
 		<description>F-1 Spirit - The way to Formula-1 (Kor)</description>
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="pcb" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="f-1 spirit - the way to formula-1 (kr)" size="131072" crc="06965ed9" sha1="5df1b4c00adb2b494f7298353d92b4d7ad3f50f6" offset="000000" />
 			</dataarea>
@@ -3081,6 +3082,7 @@
 		<year>199?</year>
 		<publisher>Zemina?</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="pcb" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="knightmare ii - the maze of galious [kr].bin" size="131072" crc="f89af3cc" sha1="b716266e936b7cd0a6e29785ae3e7686e1b35793" offset="000000"/>
 			</dataarea>
