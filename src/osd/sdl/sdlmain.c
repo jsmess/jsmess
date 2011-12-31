@@ -816,7 +816,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 
       bitmap = auto_alloc(machine(), bitmap_t(bitmap_width, bitmap_height, BITMAP_FORMAT_ARGB32));
 
-      context_ref = CGBitmapContextCreate( bitmap->base, bitmap_width, bitmap_height, bits_per_component, bitmap->rowpixels*4, color_space, bitmap_info );
+      context_ref = CGBitmapContextCreate( bitmap->raw_pixptr(0), bitmap_width, bitmap_height, bits_per_component, bitmap->rowpixels()*4, color_space, bitmap_info );
 
       if( context_ref != NULL )
       {
