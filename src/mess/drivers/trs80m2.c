@@ -716,7 +716,7 @@ bool trs80m2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	}
 	else
 	{
-		m_crtc->update(&bitmap, &cliprect);
+		m_crtc->update(&bitmap, cliprect);
 	}
 
 	return 0;

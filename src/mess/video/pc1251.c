@@ -121,7 +121,7 @@ SCREEN_UPDATE( pc1251 )
 	int color[2];
 	running_machine &machine = screen.machine();
 
-	bitmap->fill(11, *cliprect);
+	bitmap->fill(11, cliprect);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = 7; //pocketc_colortable[PC1251_CONTRAST][0];
@@ -130,14 +130,14 @@ SCREEN_UPDATE( pc1251 )
 	for (x=RIGHT,y=DOWN, i=0; i<60; x+=3)
 	{
 		for (j=0; j<5; j++, i++, x+=3)
-			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}
 	for (i=0x7b; i>=0x40; x+=3)
 	{
 		for (j=0; j<5; j++, i--, x+=3)
-			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}

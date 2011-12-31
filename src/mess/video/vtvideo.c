@@ -233,7 +233,7 @@ static void vt_video_display_char(device_t *device,bitmap_t *bitmap, UINT8 code,
 	}
 }
 
-void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	vt_video_t *vt = get_safe_token(device);
 

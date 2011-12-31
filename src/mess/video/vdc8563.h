@@ -39,7 +39,7 @@ DECLARE_LEGACY_DEVICE(VDC8563, vdc8563);
 /*----------- defined in video/vdc8563.c -----------*/
 
 void vdc8563_set_rastering(device_t *device, int on);
-UINT32 vdc8563_video_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
+UINT32 vdc8563_video_update(device_t *device, bitmap_t *bitmap, const rectangle &cliprect);
 
 WRITE8_DEVICE_HANDLER( vdc8563_port_w );
 READ8_DEVICE_HANDLER( vdc8563_port_r );

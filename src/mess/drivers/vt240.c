@@ -106,7 +106,7 @@ VIDEO_START_MEMBER( vt240_state )
 SCREEN_UPDATE_MEMBER( vt240_state )
 {
 	/* graphics */
-	m_hgdc->update_screen(&bitmap, &cliprect);
+	m_hgdc->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

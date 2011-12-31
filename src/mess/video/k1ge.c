@@ -811,7 +811,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 }
 
 
-void k1ge_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k1ge_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 

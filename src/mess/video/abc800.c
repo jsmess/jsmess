@@ -58,12 +58,12 @@ WRITE8_MEMBER( abc800_state::hrc_w )
 //  screen update
 //-------------------------------------------------
 
-void abc800c_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
+void abc800c_state::hr_update(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
 	int sx, y, dot;
 
-	for (y = m_hrs; y < MIN(cliprect->max_y + 1, m_hrs + 240); y++)
+	for (y = m_hrs; y < MIN(cliprect.max_y + 1, m_hrs + 240); y++)
 	{
 		int x = 0;
 
@@ -111,12 +111,12 @@ bool abc800c_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw HR graphics
-	hr_update(&bitmap, &cliprect);
+	hr_update(&bitmap, cliprect);
 
 	if (!BIT(m_fgctl, 7))
 	{
 		// draw text
-		//saa5050_update(m_trom, &bitmap, &cliprect);
+		//saa5050_update(m_trom, &bitmap, cliprect);
 	}
 
 	return 0;
@@ -179,12 +179,12 @@ static PALETTE_INIT( abc800m )
 //  screen update
 //-------------------------------------------------
 
-void abc800m_state::hr_update(bitmap_t *bitmap, const rectangle *cliprect)
+void abc800m_state::hr_update(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
 	int sx, y, dot;
 
-	for (y = m_hrs + VERTICAL_PORCH_HACK; y < MIN(cliprect->max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
+	for (y = m_hrs + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
 	{
 		int x = HORIZONTAL_PORCH_HACK;
 
@@ -283,12 +283,12 @@ bool abc800m_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw HR graphics
-	hr_update(&bitmap, &cliprect);
+	hr_update(&bitmap, cliprect);
 
 	if (!BIT(m_fgctl, 7))
 	{
 		// draw text
-		m_crtc->update(&bitmap, &cliprect);
+		m_crtc->update(&bitmap, cliprect);
 	}
 
 	return 0;

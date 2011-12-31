@@ -113,7 +113,7 @@ bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 {
 	if (screen.width() == CDP1869_SCREEN_WIDTH)
 	{
-		m_vis->update_screen(&bitmap, &cliprect);
+		m_vis->update_screen(&bitmap, cliprect);
 	}
 	else
 	{

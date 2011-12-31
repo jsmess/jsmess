@@ -144,7 +144,7 @@ VIDEO_START_MEMBER( alphatro_state )
 
 SCREEN_UPDATE_MEMBER( alphatro_state )
 {
-	m_crtc->update( &bitmap, &cliprect);
+	m_crtc->update( &bitmap, cliprect);
 	return 0;
 }
 

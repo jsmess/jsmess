@@ -42,7 +42,7 @@ public:
 	virtual void machine_start();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { m_vis->update_screen(&bitmap, &cliprect); return false; }
+	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { m_vis->update_screen(&bitmap, cliprect); return false; }
 
 	DECLARE_WRITE8_MEMBER( keyboard_latch_w );
 	DECLARE_WRITE8_MEMBER( vismac_register_w );

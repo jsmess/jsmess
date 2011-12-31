@@ -339,8 +339,8 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	bitmap.fill(0, cliprect);
 
 	/* graphics */
-	m_hgdc2->update_screen(&bitmap, &cliprect);
-	m_hgdc1->update_screen(&bitmap, &cliprect);
+	m_hgdc2->update_screen(&bitmap, cliprect);
+	m_hgdc1->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

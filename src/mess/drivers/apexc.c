@@ -570,7 +570,7 @@ static void apexc_draw_led(bitmap_t *bitmap, int x, int y, int state)
 /* write a single char on screen */
 static void apexc_draw_char(running_machine &machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
-	drawgfx_transpen(bitmap, NULL, machine.gfx[0], character-32, color, 0, 0,
+	drawgfx_transpen(bitmap, bitmap->cliprect(), machine.gfx[0], character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
@@ -598,7 +598,7 @@ static SCREEN_UPDATE( apexc )
 	apexc_draw_string(screen.machine(), bitmap, "running", 8, 8, 0);
 	apexc_draw_string(screen.machine(), bitmap, "data :", 0, 24, 0);
 
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, &teletyper_window);
+	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, teletyper_window);
 
 
 	apexc_draw_led(bitmap, 0, 0, 1);

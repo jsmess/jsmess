@@ -80,7 +80,7 @@ static VIDEO_START( pc88va )
 
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	UINT16 *tvram = (UINT16 *)machine.region("tvram")->base();
@@ -190,7 +190,7 @@ static UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
 	return 0;
 }
 
-static void draw_text(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_text(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	UINT8 *tvram = machine.region("tvram")->base();
@@ -376,7 +376,7 @@ static SCREEN_UPDATE( pc88va )
 	pc88va_state *state = screen.machine().driver_data<pc88va_state>();
 	UINT8 pri,cur_pri_lv;
 	UINT32 screen_pri;
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	if(state->m_tsp.disp_on == 0) // don't bother if we are under DSPOFF command
 		return 0;

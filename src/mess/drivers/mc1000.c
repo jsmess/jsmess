@@ -272,7 +272,7 @@ READ8_MEMBER( mc1000_state::videoram_r )
 
 bool mc1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_vdg->update(&bitmap, &cliprect);
+	return m_vdg->update(&bitmap, cliprect);
 }
 
 /* AY-3-8910 Interface */

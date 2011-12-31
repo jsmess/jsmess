@@ -163,11 +163,11 @@ void hd44780_device::set_busy_flag(UINT16 usec)
 //  device interface
 //**************************************************************************
 
-int hd44780_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
+int hd44780_device::video_update(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	assert(height*9 <= bitmap->height() && width*6 <= bitmap->width());
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	if (m_display_on)
 		for (int l=0; l<height; l++)

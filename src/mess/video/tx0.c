@@ -205,7 +205,7 @@ static void tx0_draw_multipleswitch(running_machine &machine, bitmap_t *bitmap, 
 /* write a single char on screen */
 static void tx0_draw_char(running_machine &machine, bitmap_t *bitmap, char character, int x, int y, int color)
 {
-	drawgfx_transpen(bitmap, NULL, machine.gfx[0], character-32, color, 0, 0,
+	drawgfx_transpen(bitmap, bitmap->cliprect(), machine.gfx[0], character-32, color, 0, 0,
 				x+1, y, 0);
 }
 

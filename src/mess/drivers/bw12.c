@@ -410,7 +410,7 @@ void bw12_state::video_start()
 
 bool bw12_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update( &bitmap, &cliprect);
+	m_crtc->update( &bitmap, cliprect);
 
 	return 0;
 }

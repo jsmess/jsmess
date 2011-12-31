@@ -17,7 +17,7 @@ SCREEN_UPDATE( nascom1 )
 
 	for (sx = 0; sx < 48; sx++)
 	{
-		drawgfx_opaque (bitmap, NULL,
+		drawgfx_opaque (bitmap, cliprect,
 			screen.machine().gfx[0], videoram[0x03ca + sx],
 			1, 0, 0, sx * 8, 0);
 	}
@@ -26,7 +26,7 @@ SCREEN_UPDATE( nascom1 )
 	{
 		for (sx = 0; sx < 48; sx++)
 		{
-			drawgfx_opaque (bitmap, NULL,
+			drawgfx_opaque (bitmap, cliprect,
 				screen.machine().gfx[0], videoram[0x000a + (sy * 64) + sx],
 				1, 0, 0, sx * 8, (sy + 1) * 16);
 		}
@@ -42,7 +42,7 @@ SCREEN_UPDATE( nascom2 )
 
 	for (sx = 0; sx < 48; sx++)
 	{
-		drawgfx_opaque (bitmap, NULL,
+		drawgfx_opaque (bitmap, cliprect,
 			screen.machine().gfx[0], videoram[0x03ca + sx],
 			1, 0, 0, sx * 8, 0);
 	}
@@ -51,7 +51,7 @@ SCREEN_UPDATE( nascom2 )
 	{
 		for (sx = 0; sx < 48; sx++)
 		{
-			drawgfx_opaque (bitmap, NULL,
+			drawgfx_opaque (bitmap, cliprect,
 				screen.machine().gfx[0], videoram[0x000a + (sy * 64) + sx],
 				1, 0, 0, sx * 8, (sy + 1) * 14);
 		}

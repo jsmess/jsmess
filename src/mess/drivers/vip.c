@@ -443,11 +443,11 @@ bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 	switch (input_port_read(machine(), "VIDEO"))
 	{
 	case VIDEO_CDP1861:
-		m_vdc->update_screen(&bitmap, &cliprect);
+		m_vdc->update_screen(&bitmap, cliprect);
 		break;
 
 	case VIDEO_CDP1862:
-		m_cgc->update_screen(&bitmap, &cliprect);
+		m_cgc->update_screen(&bitmap, cliprect);
 		break;
 	}
 

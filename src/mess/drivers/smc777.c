@@ -73,7 +73,7 @@ static SCREEN_UPDATE( smc777 )
 	UINT8 *gram = screen.machine().region("fbuf")->base();
 	int x_width;
 
-	bitmap->fill(screen.machine().pens[state->m_backdrop_pen], *cliprect);
+	bitmap->fill(screen.machine().pens[state->m_backdrop_pen], cliprect);
 
 	x_width = (state->m_display_reg & 0x80) ? 2 : 4;
 

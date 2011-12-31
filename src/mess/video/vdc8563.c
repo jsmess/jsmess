@@ -416,7 +416,7 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t *bitmap, 
 		{
 			if (vdc8563->dirty[i])
 			{
-				drawgfx_opaque(bitmap,&rect,machine.gfx[0], vdc8563->ram[i], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
+				drawgfx_opaque(bitmap,rect,machine.gfx[0], vdc8563->ram[i], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
 						machine.gfx[0]->width * x + 8, height * y + height);
 
 				if ((vdc8563->cursor_on) && (i == (CRTC6845_CURSOR_POS & vdc8563->mask)))
@@ -526,7 +526,7 @@ static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_t *bitmap, i
 				k = ((i << 4) + j) & vdc8563->mask;
 				if (vdc8563->dirty[k])
 				{
-					drawgfx_opaque(bitmap, &rect, machine.gfx[1], vdc8563->ram[k], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
+					drawgfx_opaque(bitmap, rect, machine.gfx[1], vdc8563->ram[k], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
 							machine.gfx[0]->width * x + 8, height * y + height + j);
 					vdc8563->dirty[k] = 0;
 				}
@@ -536,7 +536,7 @@ static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_t *bitmap, i
 	}
 }
 
-UINT32 vdc8563_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 vdc8563_video_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	int i;

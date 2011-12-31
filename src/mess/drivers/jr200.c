@@ -103,7 +103,7 @@ static SCREEN_UPDATE( jr200 )
 	jr200_state *state = screen.machine().driver_data<jr200_state>();
 	int x,y,xi,yi,pen;
 
-	bitmap->fill(state->m_border_col, *cliprect);
+	bitmap->fill(state->m_border_col, cliprect);
 
 	for (y = 0; y < 24; y++)
 	{

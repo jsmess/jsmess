@@ -188,7 +188,7 @@ static SCREEN_UPDATE( apricot )
 	if (!state->m_display_on)
 		state->m_crtc->update( bitmap, cliprect);
 	else
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 
 	return 0;
 }

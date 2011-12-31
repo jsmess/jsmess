@@ -82,7 +82,7 @@ const rom_entry *c64_xl80_device::device_rom_region() const
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_t *bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	for (int column = 0; column < x_count; column++)
 	{
@@ -291,7 +291,7 @@ int c64_xl80_device::c64_exrom_r()
 
 bool c64_xl80_device::c64_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update(&bitmap, &cliprect);
+	m_crtc->update(&bitmap, cliprect);
 
 	return false;
 }

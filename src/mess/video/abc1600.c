@@ -987,7 +987,7 @@ inline UINT16 abc1600_state::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 	return (cr << 10) | ((ra & 0x0f) << 6) | ((cc << 1) & 0x3c);
 }
 
-void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void abc1600_state::crtc_update_row(device_t *device, bitmap_t *bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 0x3ff) return;
 
@@ -1099,7 +1099,7 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	if (m_endisp)
 	{
 		bitmap.fill(FRAME_POL, cliprect);
-		m_crtc->update(&bitmap, &cliprect);
+		m_crtc->update(&bitmap, cliprect);
 	}
 	else
 	{

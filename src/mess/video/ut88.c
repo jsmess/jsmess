@@ -36,7 +36,7 @@ SCREEN_UPDATE( ut88 )
 		{
 			int code = state->m_p_videoram[ x + y*64 ] & 0x7f;
 			int attr = state->m_p_videoram[ x+1 + y*64 ] & 0x80;
-			drawgfx_opaque(bitmap, NULL, screen.machine().gfx[0], code | attr, 0, 0,0, x*8,y*8);
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], code | attr, 0, 0,0, x*8,y*8);
 		}
 	}
 	return 0;

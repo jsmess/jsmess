@@ -263,7 +263,7 @@ static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
 
 bool spc1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_vdg->update(&bitmap, &cliprect);
+	return m_vdg->update(&bitmap, cliprect);
 }
 
 static const ay8910_interface spc1000_ay_interface =

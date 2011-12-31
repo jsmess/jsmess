@@ -53,7 +53,7 @@ SCREEN_UPDATE( mz700 )
 	int offs;
 	mz_state *mz = screen.machine().driver_data<mz_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	for(offs = 0; offs < 40*25; offs++)
 	{
@@ -88,7 +88,7 @@ SCREEN_UPDATE( mz800 )
 	UINT8 *videoram = state->m_videoram;
 	mz_state *mz = screen.machine().driver_data<mz_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	if (mz->m_mz700_mode)
 		return SCREEN_UPDATE_CALL(mz700);

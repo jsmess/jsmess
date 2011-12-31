@@ -322,7 +322,7 @@ static UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,i
 	return height;
 }
 
-static void draw_fgtilemap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_fgtilemap(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect)
 {
 	/*
         attribute table:
@@ -469,7 +469,7 @@ static void draw_fgtilemap(running_machine &machine, bitmap_t *bitmap,const rect
 						res_x = x*8+xi*(width+1);
 						res_y = y*(mc6845_tile_height)+yi;
 
-						if(res_y < cliprect->min_y || res_y > cliprect->max_y) // partial update, TODO: optimize
+						if(res_y < cliprect.min_y || res_y > cliprect.max_y) // partial update, TODO: optimize
 							continue;
 
 						x1_draw_pixel(machine,bitmap,res_y,res_x,pcg_pen,width,0);
@@ -511,7 +511,7 @@ static int priority_mixer_pri(running_machine &machine,int color)
 	return pri_mask_calc;
 }
 
-static void draw_gfxbitmap(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int plane,int pri)
+static void draw_gfxbitmap(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect, int plane,int pri)
 {
 	x1_state *state = machine.driver_data<x1_state>();
 	int xi,yi,x,y;
@@ -553,7 +553,7 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_t *bitmap,const rect
 					if((color == 8 && state->m_scrn_reg.blackclip & 0x10) || (color == 9 && state->m_scrn_reg.blackclip & 0x20)) // bitmap color clip to black conditions
 						color = 0;
 
-					if(y*(mc6845_tile_height)+yi < cliprect->min_y || y*(mc6845_tile_height)+yi > cliprect->max_y) // partial update TODO: optimize
+					if(y*(mc6845_tile_height)+yi < cliprect.min_y || y*(mc6845_tile_height)+yi > cliprect.max_y) // partial update TODO: optimize
 						continue;
 
 					x1_draw_pixel(machine,bitmap,y*(mc6845_tile_height)+yi,x*8+xi,color,0,0);
@@ -567,7 +567,7 @@ SCREEN_UPDATE( x1 )
 {
 	x1_state *state = screen.machine().driver_data<x1_state>();
 
-	bitmap->fill(MAKE_ARGB(0xff,0x00,0x00,0x00), *cliprect);
+	bitmap->fill(MAKE_ARGB(0xff,0x00,0x00,0x00), cliprect);
 
 	draw_gfxbitmap(screen.machine(),bitmap,cliprect,state->m_scrn_reg.disp_bank,state->m_scrn_reg.pri);
 	draw_fgtilemap(screen.machine(),bitmap,cliprect);

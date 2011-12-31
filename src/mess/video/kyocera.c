@@ -8,23 +8,23 @@ static PALETTE_INIT( kc85 )
 
 bool kc85_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_lcdc0->update_screen(&bitmap, &cliprect);
-	m_lcdc1->update_screen(&bitmap, &cliprect);
-	m_lcdc2->update_screen(&bitmap, &cliprect);
-	m_lcdc3->update_screen(&bitmap, &cliprect);
-	m_lcdc4->update_screen(&bitmap, &cliprect);
-	m_lcdc5->update_screen(&bitmap, &cliprect);
-	m_lcdc6->update_screen(&bitmap, &cliprect);
-	m_lcdc7->update_screen(&bitmap, &cliprect);
-	m_lcdc8->update_screen(&bitmap, &cliprect);
-	m_lcdc9->update_screen(&bitmap, &cliprect);
+	m_lcdc0->update_screen(&bitmap, cliprect);
+	m_lcdc1->update_screen(&bitmap, cliprect);
+	m_lcdc2->update_screen(&bitmap, cliprect);
+	m_lcdc3->update_screen(&bitmap, cliprect);
+	m_lcdc4->update_screen(&bitmap, cliprect);
+	m_lcdc5->update_screen(&bitmap, cliprect);
+	m_lcdc6->update_screen(&bitmap, cliprect);
+	m_lcdc7->update_screen(&bitmap, cliprect);
+	m_lcdc8->update_screen(&bitmap, cliprect);
+	m_lcdc9->update_screen(&bitmap, cliprect);
 
 	return 0;
 }
 
 bool tandy200_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_lcdc->update_screen(&bitmap, &cliprect);
+	m_lcdc->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

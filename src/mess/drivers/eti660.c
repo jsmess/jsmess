@@ -120,7 +120,7 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 
 bool eti660_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_cti->update_screen(&bitmap, &cliprect);
+	m_cti->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

@@ -308,7 +308,7 @@ void vg5k_state::machine_reset()
 
 bool vg5k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_ef9345->video_update(&bitmap, &cliprect);
+	m_ef9345->video_update(&bitmap, cliprect);
 
 	return 0;
 }

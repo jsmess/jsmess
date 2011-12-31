@@ -591,7 +591,7 @@ static void draw_text_40(running_machine &machine, bitmap_t *bitmap, int y_size)
 static SCREEN_UPDATE( pc8801 )
 {
 	pc8801_state *state = screen.machine().driver_data<pc8801_state>();
-	bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
 
 	if(state->m_gfx_ctrl & 8)
 	{
