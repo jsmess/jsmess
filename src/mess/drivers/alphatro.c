@@ -377,6 +377,14 @@ void alphatro_state::machine_reset()
 static PALETTE_INIT( alphatro )
 {
 // 0 to 7 need to be determined - using defaults for now
+	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00);
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff);
+	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00);
+	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff);
+	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00);
+	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff);
+	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00);
+	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff);
 	palette_set_color_rgb(machine, 8, 0xf7, 0xaa, 0x00); /* amber */
 }
 
