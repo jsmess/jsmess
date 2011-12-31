@@ -2198,6 +2198,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="T-120098-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="mapper" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="ernie els golf (europe) (en,fr,de,es,it).bin" size="262144" crc="5e53c7f7" sha1="a8d75c2af514dc81ba4dc66a508384d730a77ce4" offset="000000" />
 			</dataarea>
