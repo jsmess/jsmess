@@ -171,7 +171,7 @@ void abc80_state::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 				color ^= (cursor & m_blink);
 				color &= blank;
 
-				*BITMAP_ADDR16(bitmap, y, x) = color;
+				bitmap->pix16(y, x) = color;
 
 				data <<= 1;
 			}

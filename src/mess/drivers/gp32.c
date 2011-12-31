@@ -142,7 +142,7 @@ static void s3c240x_lcd_render_01( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
 	bitmap_t *bitmap = machine.generic.tmpbitmap;
-	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+	UINT32 *scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
@@ -156,7 +156,7 @@ static void s3c240x_lcd_render_01( running_machine &machine)
 			{
 				state->m_s3c240x_lcd.vpos = (state->m_s3c240x_lcd.vpos + 1) % (state->m_s3c240x_lcd.lineval + 1);
 				state->m_s3c240x_lcd.hpos = 0;
-				scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+				scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -166,7 +166,7 @@ static void s3c240x_lcd_render_02( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
 	bitmap_t *bitmap = machine.generic.tmpbitmap;
-	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+	UINT32 *scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
@@ -180,7 +180,7 @@ static void s3c240x_lcd_render_02( running_machine &machine)
 			{
 				state->m_s3c240x_lcd.vpos = (state->m_s3c240x_lcd.vpos + 1) % (state->m_s3c240x_lcd.lineval + 1);
 				state->m_s3c240x_lcd.hpos = 0;
-				scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+				scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -190,7 +190,7 @@ static void s3c240x_lcd_render_04( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
 	bitmap_t *bitmap = machine.generic.tmpbitmap;
-	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+	UINT32 *scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
@@ -204,7 +204,7 @@ static void s3c240x_lcd_render_04( running_machine &machine)
 			{
 				state->m_s3c240x_lcd.vpos = (state->m_s3c240x_lcd.vpos + 1) % (state->m_s3c240x_lcd.lineval + 1);
 				state->m_s3c240x_lcd.hpos = 0;
-				scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+				scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -214,7 +214,7 @@ static void s3c240x_lcd_render_08( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
 	bitmap_t *bitmap = machine.generic.tmpbitmap;
-	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+	UINT32 *scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
@@ -228,7 +228,7 @@ static void s3c240x_lcd_render_08( running_machine &machine)
 			{
 				state->m_s3c240x_lcd.vpos = (state->m_s3c240x_lcd.vpos + 1) % (state->m_s3c240x_lcd.lineval + 1);
 				state->m_s3c240x_lcd.hpos = 0;
-				scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+				scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 			}
 		}
 	}
@@ -238,7 +238,7 @@ static void s3c240x_lcd_render_16( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
 	bitmap_t *bitmap = machine.generic.tmpbitmap;
-	UINT32 *scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+	UINT32 *scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
 	{
@@ -252,7 +252,7 @@ static void s3c240x_lcd_render_16( running_machine &machine)
 			{
 				state->m_s3c240x_lcd.vpos = (state->m_s3c240x_lcd.vpos + 1) % (state->m_s3c240x_lcd.lineval + 1);
 				state->m_s3c240x_lcd.hpos = 0;
-				scanline = BITMAP_ADDR32( bitmap, state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
+				scanline = &bitmap->pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 			}
 		}
 	}

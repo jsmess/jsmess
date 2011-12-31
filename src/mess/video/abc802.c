@@ -133,7 +133,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
 					int color = BIT(data, 7) ^ ri;
 
-					*BITMAP_ADDR16(bitmap, y, x) = color;
+					bitmap->pix16(y, x) = color;
 
 					data <<= 1;
 				}
@@ -145,8 +145,8 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
 					int color = BIT(data, 7) ^ ri;
 
-					*BITMAP_ADDR16(bitmap, y, x) = color;
-					*BITMAP_ADDR16(bitmap, y, x + 1) = color;
+					bitmap->pix16(y, x) = color;
+					bitmap->pix16(y, x + 1) = color;
 
 					data <<= 1;
 				}

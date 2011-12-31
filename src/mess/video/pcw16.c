@@ -50,7 +50,7 @@ static const rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
 
 INLINE void pcw16_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+	bitmap->pix16(y, x) = (UINT16)color;
 }
 
 /* Initialise the palette */
@@ -187,7 +187,7 @@ SCREEN_UPDATE( pcw16 )
 		rect.max_x = PCW16_SCREEN_WIDTH;
 		rect.max_y = PCW16_SCREEN_HEIGHT;
 
-		bitmap_fill(bitmap, &rect, border_colour);
+		bitmap->fill(border_colour, rect);
 	}
 	else
 	{
@@ -200,18 +200,18 @@ SCREEN_UPDATE( pcw16 )
 		rect.min_y = 0;
 		rect.max_x = PCW16_SCREEN_WIDTH;
 		rect.max_y = PCW16_BORDER_HEIGHT;
-		bitmap_fill(bitmap, &rect, border_colour);
+		bitmap->fill(border_colour, rect);
 
 		/* render bottom border */
 		rect.min_x = 0;
 		rect.min_y = PCW16_BORDER_HEIGHT + PCW16_DISPLAY_HEIGHT;
 		rect.max_x = PCW16_SCREEN_WIDTH;
 		rect.max_y = rect.min_y + PCW16_BORDER_HEIGHT;
-		bitmap_fill(bitmap, &rect, border_colour);
+		bitmap->fill(border_colour, rect);
 
 		/* render border on either side of display */
-		plot_box(bitmap, 0,											PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);
-		plot_box(bitmap, PCW16_DISPLAY_WIDTH + PCW16_BORDER_WIDTH,	PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);
+		bitmap->plot_box(0,											PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);
+		bitmap->plot_box(PCW16_DISPLAY_WIDTH + PCW16_BORDER_WIDTH,	PCW16_BORDER_HEIGHT, 8, PCW16_DISPLAY_HEIGHT, border_colour);
 
 		/* render display */
 		for (y=0; y<PCW16_DISPLAY_HEIGHT; y++)

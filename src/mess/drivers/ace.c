@@ -394,7 +394,7 @@ bool ace_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 40);
+			UINT16 *p = &bitmap.pix16(sy++, 40);
 
 			for (x = ma; x < ma+32; x++)
 			{

@@ -426,7 +426,7 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t *bitmap, 
 						k = CRTC6845_CURSOR_BOTTOM - CRTC6845_CURSOR_TOP + 1;
 
 					if (k > 0)
-						plot_box(bitmap, machine.gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width, k, FRAMECOLOR);
+						bitmap->plot_box(machine.gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width, k, FRAMECOLOR);
 				}
 
 				vdc8563->dirty[i] = 0;
@@ -474,7 +474,7 @@ static void vdc8563_text_screenrefresh( device_t *device, bitmap_t *bitmap, int 
 					{
 						for (h2 = 0; h2 < 8; h2++)
 						{
-							pixel = BITMAP_ADDR16(bitmap, (y * height) + height + v, (x * 8) + 8 + h2);
+							pixel = &bitmap->pix16((y * height) + height + v, (x * 8) + 8 + h2);
 							*pixel = (charptr[v] & (0x80 >> h2)) ? fg : bg;
 						}
 					}
@@ -487,7 +487,7 @@ static void vdc8563_text_screenrefresh( device_t *device, bitmap_t *bitmap, int 
 						k = CRTC6845_CURSOR_BOTTOM - CRTC6845_CURSOR_TOP + 1;
 
 					if (k > 0)
-						plot_box(bitmap, machine.gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width,
+						bitmap->plot_box(machine.gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine.gfx[0]->width,
 								k, 0x10 | (vdc8563->ram[j] & 0x0f));
 				}
 
@@ -575,13 +575,13 @@ UINT32 vdc8563_video_update( device_t *device, bitmap_t *bitmap, const rectangle
 		int h = CRTC6845_CHAR_LINES;
 		int height = CRTC6845_CHAR_HEIGHT;
 
-		plot_box(bitmap, 0, 0, device->machine().gfx[0]->width * (w + 2), height, FRAMECOLOR);
+		bitmap->plot_box(0, 0, device->machine().gfx[0]->width * (w + 2), height, FRAMECOLOR);
 
-		plot_box(bitmap, 0, height, device->machine().gfx[0]->width, height * h, FRAMECOLOR);
+		bitmap->plot_box(0, height, device->machine().gfx[0]->width, height * h, FRAMECOLOR);
 
-		plot_box(bitmap, device->machine().gfx[0]->width * (w + 1), height, device->machine().gfx[0]->width, height * h, FRAMECOLOR);
+		bitmap->plot_box(device->machine().gfx[0]->width * (w + 1), height, device->machine().gfx[0]->width, height * h, FRAMECOLOR);
 
-		plot_box(bitmap, 0, height * (h + 1), device->machine().gfx[0]->width * (w + 2), height, FRAMECOLOR);
+		bitmap->plot_box(0, height * (h + 1), device->machine().gfx[0]->width * (w + 2), height, FRAMECOLOR);
 	}
 
 	vdc8563->changed = 0;

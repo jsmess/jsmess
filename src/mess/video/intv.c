@@ -21,17 +21,17 @@ INLINE void intv_set_pixel(intv_state *state, bitmap_t *bitmap, int x, int y, UI
 
 	for (h = 0; h < state->m_y_scale; h++)
 		for (w = 0; w < state->m_x_scale; w++)
-			*BITMAP_ADDR16(bitmap, y + h, x + w) = color;
+			bitmap->pix16(y + h, x + w) = color;
 }
 
 INLINE UINT32 intv_get_pixel(intv_state *state, bitmap_t *bitmap, int x, int y)
 {
-	return GET_COLOR(*BITMAP_ADDR16(bitmap, y * state->m_y_scale, x * state->m_x_scale));
+	return GET_COLOR(bitmap->pix16(y * state->m_y_scale, x * state->m_x_scale));
 }
 
 INLINE void intv_plot_box(intv_state *state, bitmap_t *bm, int x, int y, int w, int h, int color)
 {
-	plot_box(bm, x * state->m_x_scale, y * state->m_y_scale, w * state->m_x_scale, h * state->m_y_scale, SET_COLOR(color));
+	bm->plot_box(x * state->m_x_scale, y * state->m_y_scale, w * state->m_x_scale, h * state->m_y_scale, SET_COLOR(color));
 }
 
 VIDEO_START( intv )
@@ -719,7 +719,7 @@ void intv_stic_screenrefresh(running_machine &machine)
 	else
 	{
 		/* STIC disabled, just fill with border color */
-		bitmap_fill(machine.generic.tmpbitmap, NULL, SET_COLOR(state->m_border_color));
+		machine.generic.tmpbitmap->fill(SET_COLOR(state->m_border_color));
 	}
 }
 

@@ -162,7 +162,7 @@ static SCREEN_UPDATE( mac_48gc )
 		case 0:	// 1bpp
 			for (y = 0; y < card->m_yres; y++)
 			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				scanline = &bitmap->pix32(y);
 				for (x = 0; x < card->m_xres/8; x++)
 				{
 					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
@@ -182,7 +182,7 @@ static SCREEN_UPDATE( mac_48gc )
 		case 1:	// 2bpp
 			for (y = 0; y < card->m_yres; y++)
 			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				scanline = &bitmap->pix32(y);
 				for (x = 0; x < card->m_xres/4; x++)
 				{
 					pixels = vram8[(y * card->m_stride) + (BYTE4_XOR_BE(x))];
@@ -198,7 +198,7 @@ static SCREEN_UPDATE( mac_48gc )
 		case 2: // 4 bpp
 			for (y = 0; y < card->m_yres; y++)
 			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				scanline = &bitmap->pix32(y);
 
 				for (x = 0; x < card->m_xres/2; x++)
 				{
@@ -213,7 +213,7 @@ static SCREEN_UPDATE( mac_48gc )
 		case 3: // 8 bpp
 			for (y = 0; y < card->m_yres; y++)
 			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				scanline = &bitmap->pix32(y);
 
 				for (x = 0; x < card->m_xres; x++)
 				{
@@ -226,7 +226,7 @@ static SCREEN_UPDATE( mac_48gc )
 		case 4: // 24 bpp
 			for (y = 0; y < card->m_yres; y++)
 			{
-				scanline = BITMAP_ADDR32(bitmap, y, 0);
+				scanline = &bitmap->pix32(y);
 				base = (UINT32 *)&card->m_vram[y * card->m_stride];
 				for (x = 0; x < card->m_xres; x++)
 				{

@@ -108,7 +108,7 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 		pixels ^= 0xff;
 
 	for(i=0;i<8;i++)
-		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap->pix16(y, x + i) = (pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 }
 
 const i8275_interface sm1800_i8275_interface = {

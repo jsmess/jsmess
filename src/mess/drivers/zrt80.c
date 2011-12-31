@@ -208,7 +208,7 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 	zrt80_state *state = device->machine().driver_data<zrt80_state>();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
-	UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 *p = &bitmap->pix16(y);
 	UINT8 polarity = input_port_read(device->machine(), "DIPSW1") & 4 ? 0xff : 0;
 
 	for (x = 0; x < x_count; x++)

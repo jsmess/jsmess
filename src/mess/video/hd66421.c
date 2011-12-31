@@ -200,7 +200,7 @@ WRITE8_MEMBER( hd66421_device::reg_dat_w )
 
 void hd66421_device::plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+	bitmap->pix16(y, x) = (UINT16)color;
 }
 
 void hd66421_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
@@ -253,6 +253,6 @@ void hd66421_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 		rect.max_x = HD66421_WIDTH - 1;
 		rect.min_y = 0;
 		rect.max_y = HD66421_HEIGHT - 1;
-		bitmap_fill(bitmap, &rect, get_white_pen(machine()));
+		bitmap->fill(get_white_pen(machine()), rect);
 	}
 }

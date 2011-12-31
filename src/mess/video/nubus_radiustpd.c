@@ -160,7 +160,7 @@ static SCREEN_UPDATE( radiustpd )
 
 	for (y = 0; y < 880; y++)
 	{
-		scanline = BITMAP_ADDR32(bitmap, y, 0);
+		scanline = &bitmap->pix32(y);
 		for (x = 0; x < 1152/8; x++)
 		{
 			pixels = vram[(y * (1152/8)) + (BYTE4_XOR_BE(x))];

@@ -103,11 +103,11 @@ static void multi8_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,i
 
 	if(width)
 	{
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = pen;
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = pen;
+		bitmap->pix16(y, x*2+0) = pen;
+		bitmap->pix16(y, x*2+1) = pen;
 	}
 	else
-		*BITMAP_ADDR16(bitmap, y, x) = pen;
+		bitmap->pix16(y, x) = pen;
 }
 
 static SCREEN_UPDATE( multi8 )

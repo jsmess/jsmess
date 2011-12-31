@@ -78,7 +78,7 @@ static void cirrus_update_8bpp(bitmap_t *bitmap)
 
 	for (y = 0; y < 480; y++)
 	{
-		line = BITMAP_ADDR16(bitmap, y, 0);
+		line = &bitmap->pix16(y);
 
 		for (x = 0; x < 640; x++)
 			*line++ = *vram++;

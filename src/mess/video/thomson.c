@@ -909,9 +909,9 @@ SCREEN_UPDATE ( thom )
 	const int ybot = THOM_BORDER_HEIGHT + thom_bheight + 200;
 	UINT16* v = thom_vbody;
 	pen_t border = 0;
-	rectangle wrect = { 0, xright - 1, 0, 0 };
-	rectangle lrect = { 0, xbleft - 1, 0, 0 };
-	rectangle rrect = { xbright, xright - 1, 0, 0 };
+	rectangle wrect(0, xright - 1, 0, 0);
+	rectangle lrect(0, xbleft - 1, 0, 0);
+	rectangle rrect(xbright, xright - 1, 0, 0);
 
 	//LOG (( "%f thom: video update called\n", machine.time().as_double()));
 
@@ -934,7 +934,7 @@ SCREEN_UPDATE ( thom )
 		}
 		while ( y < THOM_BORDER_HEIGHT && thom_border_l[ y ] == -1 );
 		wrect.max_y = ypos - 1;
-		bitmap_fill( bitmap,  &wrect , border);
+		bitmap->fill(border, wrect );
 	}
 
 	/* left border */
@@ -950,7 +950,7 @@ SCREEN_UPDATE ( thom )
 		}
 		while ( y < yup && thom_border_l[ y ] == -1 );
 		lrect.max_y = ypos - 1;
-		bitmap_fill( bitmap, &lrect , border);
+		bitmap->fill(border, lrect );
 	}
 
 	/* lower border */
@@ -965,7 +965,7 @@ SCREEN_UPDATE ( thom )
 			ypos ++ /* += scale */;
 		} while ( y < ybot && thom_border_l[ y ] == -1 );
 		wrect.max_y = ypos - 1;
-		bitmap_fill( bitmap, &wrect , border);
+		bitmap->fill(border, wrect );
 	}
 
 	/* right border */
@@ -986,7 +986,7 @@ SCREEN_UPDATE ( thom )
 		}
 		while ( y < yup && thom_border_r[ y ] == -1 );
 		rrect.max_y = ypos - 1;
-		bitmap_fill( bitmap, &rrect , border);
+		bitmap->fill(border, rrect );
 	}
 
 	/* active area */

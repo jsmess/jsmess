@@ -156,7 +156,7 @@ int hd44352_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 cw = m_char_width;
 
-	bitmap_fill(&bitmap, &cliprect, 0);
+	bitmap.fill(0, cliprect);
 
 	if (m_control_lines&0x80 && m_lcd_on)
 	{
@@ -171,7 +171,7 @@ int hd44352_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
 							UINT8 d = compute_newval((m_cursor_status>>5) & 0x07, m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48], m_cursor[c]);
 							for (int b=0; b<8; b++)
 							{
-								*BITMAP_ADDR16(&bitmap, py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
+								bitmap.pix16(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
 							}
 						}
 					}
@@ -182,7 +182,7 @@ int hd44352_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
 							UINT8 d = m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48];
 							for (int b=0; b<8; b++)
 							{
-								*BITMAP_ADDR16(&bitmap, py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
+								bitmap.pix16(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
 							}
 						}
 					}

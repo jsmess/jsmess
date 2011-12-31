@@ -881,7 +881,7 @@ static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 	bitmap_clone_existing(avconfig->video, fullbitmap);
 	if (interlaced)
 	{
-		avconfig->video->base = BITMAP_ADDR16(avconfig->video, framenum % interlace_factor, 0);
+		avconfig->video->base = &avconfig->video->pix16(framenum % interlace_factor);
 		avconfig->video->rowpixels *= 2;
 		avconfig->video->height /= 2;
 	}
@@ -951,7 +951,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 	bitmap_clone_existing(avconfig->video, fullbitmap);
 	if (interlaced)
 	{
-		avconfig->video->base = BITMAP_ADDR16(avconfig->video, framenum % interlace_factor, 0);
+		avconfig->video->base = &avconfig->video->pix16(framenum % interlace_factor);
 		avconfig->video->rowpixels *= 2;
 		avconfig->video->height /= 2;
 	}
@@ -959,7 +959,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 	/* loop over the data and copy it to the cache */
 	for (y = 0; y < avconfig->video->height; y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(avconfig->video, y, 0);
+		UINT16 *dest = &avconfig->video->pix16(y);
 
 		/* white flag? */
 		if (y == 11 && whiteflag)
@@ -1944,7 +1944,7 @@ static int do_extractav(int argc, char *argv[], int param)
 		bitmap_clone_existing(avconfig.video, fullbitmap);
 		if (interlaced)
 		{
-			avconfig.video->base = BITMAP_ADDR16(avconfig.video, framenum % 2, 0);
+			avconfig.video->base = &avconfig.video->pix16(framenum % 2);
 			avconfig.video->rowpixels *= 2;
 			avconfig.video->height /= 2;
 		}

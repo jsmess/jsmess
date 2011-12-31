@@ -665,7 +665,7 @@ bool nakajies_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 
 			for (int px=0; px<8; px++)
 			{
-				*BITMAP_ADDR16(&bitmap, y, (x * 8) + px) = BIT(data, 7);
+				bitmap.pix16(y, (x * 8) + px) = BIT(data, 7);
 				data <<= 1;
 			}
 		}

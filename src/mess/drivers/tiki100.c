@@ -392,7 +392,7 @@ bool tiki100_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 				{
 					int x = (sx * 8) + pixel;
 
-					*BITMAP_ADDR16(&bitmap, y, x) = 0;
+					bitmap.pix16(y, x) = 0;
 				}
 				break;
 
@@ -402,7 +402,7 @@ bool tiki100_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 					int x = (sx * 8) + pixel;
 					int color = BIT(data, 0);
 
-					*BITMAP_ADDR16(&bitmap, y, x) = color;
+					bitmap.pix16(y, x) = color;
 
 					data >>= 1;
 				}
@@ -414,8 +414,8 @@ bool tiki100_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 					int x = (sx * 8) + (pixel * 2);
 					int color = data & 0x03;
 
-					*BITMAP_ADDR16(&bitmap, y, x) = color;
-					*BITMAP_ADDR16(&bitmap, y, x + 1) = color;
+					bitmap.pix16(y, x) = color;
+					bitmap.pix16(y, x + 1) = color;
 
 					data >>= 2;
 				}
@@ -427,10 +427,10 @@ bool tiki100_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 					int x = (sx * 8) + (pixel * 4);
 					int color = data & 0x0f;
 
-					*BITMAP_ADDR16(&bitmap, y, x) = color;
-					*BITMAP_ADDR16(&bitmap, y, x + 1) = color;
-					*BITMAP_ADDR16(&bitmap, y, x + 2) = color;
-					*BITMAP_ADDR16(&bitmap, y, x + 3) = color;
+					bitmap.pix16(y, x) = color;
+					bitmap.pix16(y, x + 1) = color;
+					bitmap.pix16(y, x + 2) = color;
+					bitmap.pix16(y, x + 3) = color;
 
 					data >>= 4;
 				}

@@ -67,11 +67,11 @@ void newbrain_state::screen_update(bitmap_t *bitmap, const rectangle *cliprect)
 			{
 				int color = BIT(charrom_data, 7) ^ rv;
 
-				*BITMAP_ADDR16(bitmap, y, x++) = color;
+				bitmap->pix16(y, x++) = color;
 
 				if (columns == 40)
 				{
-					*BITMAP_ADDR16(bitmap, y, x++) = color;
+					bitmap->pix16(y, x++) = color;
 				}
 
 				charrom_data <<= 1;
@@ -109,7 +109,7 @@ bool newbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 	}
 	else
 	{
-		bitmap_fill(&bitmap, &cliprect, get_black_pen(machine()));
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
 
 	return 0;

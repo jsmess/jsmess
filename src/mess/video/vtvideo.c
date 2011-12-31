@@ -214,21 +214,21 @@ static void vt_video_display_char(device_t *device,bitmap_t *bitmap, UINT8 code,
 		{
 			bit = ((line << b) & 0x80) ? 1 : 0;
 			if (double_width) {
-				*BITMAP_ADDR16(bitmap, y*10+i, x*20+b*2)   =  bit;
-				*BITMAP_ADDR16(bitmap, y*10+i, x*20+b*2+1) =  bit;
+				bitmap->pix16(y*10+i, x*20+b*2)   =  bit;
+				bitmap->pix16(y*10+i, x*20+b*2+1) =  bit;
 			} else {
-				*BITMAP_ADDR16(bitmap, y*10+i, x*10+b) =  bit;
+				bitmap->pix16(y*10+i, x*10+b) =  bit;
 			}
 		}
 		// char interleave is filled with last bit
 		if (double_width) {
-			*BITMAP_ADDR16(bitmap, y*10+i, x*20+16) =  bit;
-			*BITMAP_ADDR16(bitmap, y*10+i, x*20+17) =  bit;
-			*BITMAP_ADDR16(bitmap, y*10+i, x*20+18) =  bit;
-			*BITMAP_ADDR16(bitmap, y*10+i, x*20+19) =  bit;
+			bitmap->pix16(y*10+i, x*20+16) =  bit;
+			bitmap->pix16(y*10+i, x*20+17) =  bit;
+			bitmap->pix16(y*10+i, x*20+18) =  bit;
+			bitmap->pix16(y*10+i, x*20+19) =  bit;
 		} else {
-			*BITMAP_ADDR16(bitmap, y*10+i, x*10+8) =  bit;
-			*BITMAP_ADDR16(bitmap, y*10+i, x*10+9) =  bit;
+			bitmap->pix16(y*10+i, x*10+8) =  bit;
+			bitmap->pix16(y*10+i, x*10+9) =  bit;
 		}
 	}
 }

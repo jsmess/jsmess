@@ -30,7 +30,7 @@ SCREEN_UPDATE( special )
 			code = state->m_specialist_video_ram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
-				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  (code >> b) & 0x01;
+				bitmap->pix16(y, x*8+(7-b)) =  (code >> b) & 0x01;
 			}
 		}
 	}
@@ -53,7 +53,7 @@ SCREEN_UPDATE( specialp )
 			code = state->m_specialist_video_ram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
-				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  (code >> b) & 0x01;
+				bitmap->pix16(y, x*8+(7-b)) =  (code >> b) & 0x01;
 			}
 		}
 	}
@@ -108,7 +108,7 @@ SCREEN_UPDATE( specimx )
 			for (b = 7; b >= 0; b--)
 			{
 
-				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  ((code >> b) & 0x01)==0 ? color & 0x0f : (color >> 4)& 0x0f ;
+				bitmap->pix16(y, x*8+(7-b)) =  ((code >> b) & 0x01)==0 ? color & 0x0f : (color >> 4)& 0x0f ;
 			}
 		}
 	}
@@ -160,7 +160,7 @@ SCREEN_UPDATE( erik )
 			{
 				color1 = ((code1 >> b) & 0x01)==0 ? state->m_erik_background : state->m_erik_color_1;
 				color2 = ((code2 >> b) & 0x01)==0 ? state->m_erik_background : state->m_erik_color_2;
-				*BITMAP_ADDR16(bitmap, y, x*8+(7-b)) =  color1 | color2;
+				bitmap->pix16(y, x*8+(7-b)) =  color1 | color2;
 			}
 		}
 	}

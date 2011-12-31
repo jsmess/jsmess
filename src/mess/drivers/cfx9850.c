@@ -209,7 +209,7 @@ static SCREEN_UPDATE( cfx9850 )
 
 			for ( int b = 0; b < 8; b++ )
 			{
-				*BITMAP_ADDR16(bitmap, 63-j, x+b) = ( data1 & 0x80 ) ? ( data2 & 0x80 ? 3 : 2 ) : ( data2 & 0x80 ? 1 : 0 );
+				bitmap->pix16(63-j, x+b) = ( data1 & 0x80 ) ? ( data2 & 0x80 ? 3 : 2 ) : ( data2 & 0x80 ? 1 : 0 );
 				data1 <<= 1;
 				data2 <<= 1;
 			}

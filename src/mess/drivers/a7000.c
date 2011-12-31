@@ -268,7 +268,7 @@ SCREEN_UPDATE_MEMBER( a7000_state )
 	UINT32 count;
 	UINT8 *vram = machine().region("vram")->base();
 
-	bitmap_fill(&bitmap, &cliprect, machine().pens[0x100]);
+	bitmap.fill(machine().pens[0x100], cliprect);
 
 	x_size = (m_vidc20_horz_reg[HDER]-m_vidc20_horz_reg[HDSR]);
 	y_size = (m_vidc20_vert_reg[VDER]-m_vidc20_vert_reg[VDSR]);
@@ -292,7 +292,7 @@ SCREEN_UPDATE_MEMBER( a7000_state )
 				for(x=0;x<x_size;x+=8)
 				{
 					for(xi=0;xi<8;xi++)
-						*BITMAP_ADDR32(&bitmap, y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi))&1];
+						bitmap.pix32(y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi))&1];
 
 					count++;
 				}
@@ -306,7 +306,7 @@ SCREEN_UPDATE_MEMBER( a7000_state )
 				for(x=0;x<x_size;x+=4)
 				{
 					for(xi=0;xi<4;xi++)
-						*BITMAP_ADDR32(&bitmap, y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi*2))&3];
+						bitmap.pix32(y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi*2))&3];
 
 					count++;
 				}
@@ -320,7 +320,7 @@ SCREEN_UPDATE_MEMBER( a7000_state )
 				for(x=0;x<x_size;x+=2)
 				{
 					for(xi=0;xi<2;xi++)
-						*BITMAP_ADDR32(&bitmap, y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi*4))&0xf];
+						bitmap.pix32(y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi*4))&0xf];
 
 					count++;
 				}
@@ -333,7 +333,7 @@ SCREEN_UPDATE_MEMBER( a7000_state )
 			{
 				for(x=0;x<x_size;x++)
 				{
-					*BITMAP_ADDR32(&bitmap, y+y_start, x+x_start) = machine().pens[(vram[count])&0xff];
+					bitmap.pix32(y+y_start, x+x_start) = machine().pens[(vram[count])&0xff];
 
 					count++;
 				}
@@ -356,7 +356,7 @@ SCREEN_UPDATE_MEMBER( a7000_state )
 					g = (g << 4) | (g & 0xf);
 					b = (b << 4) | (b & 0xf);
 
-					*BITMAP_ADDR32(&bitmap, y+y_start, x+x_start) =  b | g << 8 | r << 16;
+					bitmap.pix32(y+y_start, x+x_start) =  b | g << 8 | r << 16;
 
 					count+=2;
 				}
@@ -376,7 +376,7 @@ SCREEN_UPDATE_MEMBER( a7000_state )
 					g = (pen & 0x00ff00) >> 8;
 					b = (pen & 0xff0000) >> 16;
 
-					*BITMAP_ADDR32(&bitmap, y+y_start, x+x_start) =  b | g << 8 | r << 16;
+					bitmap.pix32(y+y_start, x+x_start) =  b | g << 8 | r << 16;
 
 					count+=4;
 				}

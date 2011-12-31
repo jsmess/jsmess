@@ -192,7 +192,7 @@ void ef9345_device::device_reset()
 	memset(m_border, 0, sizeof(m_border));
 	memset(m_border, 0, sizeof(m_ram_base));
 
-	bitmap_fill(m_screen_out, NULL, 0);
+	m_screen_out->fill(0);
 
 	set_video_mode();
 }
@@ -231,7 +231,7 @@ void ef9345_device::draw_char_40(UINT8 *c, UINT16 x, UINT16 y)
 
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 8; j++)
-				*BITMAP_ADDR16(m_screen_out, y * 10 + i, x * 8 + j)  = c[8 * i + j] & 0x07;
+				m_screen_out->pix16(y * 10 + i, x * 8 + j)  = c[8 * i + j] & 0x07;
 }
 
 // draw a char in 80 char line mode
@@ -243,7 +243,7 @@ void ef9345_device::draw_char_80(UINT8 *c, UINT16 x, UINT16 y)
 
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 6; j++)
-				*BITMAP_ADDR16(m_screen_out, y * 10 + i, x * 6 + j)  = c[6 * i + j] & 0x07;
+				m_screen_out->pix16(y * 10 + i, x * 6 + j)  = c[6 * i + j] & 0x07;
 }
 
 

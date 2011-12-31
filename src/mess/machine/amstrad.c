@@ -665,7 +665,7 @@ INLINE void amstrad_update_video( running_machine &machine )
 			state->m_gate_array.draw_p++;
 			cycles_passed--;
 			state->m_gate_array.line_ticks++;
-			if ( state->m_gate_array.line_ticks > state->m_gate_array.bitmap->width )
+			if ( state->m_gate_array.line_ticks > state->m_gate_array.bitmap->width() )
 			{
 				state->m_gate_array.draw_p = NULL;
 				cycles_passed = 0;
@@ -756,7 +756,7 @@ INLINE void amstrad_plus_update_video( running_machine &machine )
 			state->m_gate_array.draw_p++;
 			cycles_passed--;
 			state->m_gate_array.line_ticks++;
-			if ( state->m_gate_array.line_ticks > state->m_gate_array.bitmap->width )
+			if ( state->m_gate_array.line_ticks > state->m_gate_array.bitmap->width() )
 			{
 				state->m_gate_array.draw_p = NULL;
 				cycles_passed = 0;
@@ -771,7 +771,7 @@ INLINE void amstrad_plus_update_video( running_machine &machine )
 INLINE void amstrad_plus_update_video_sprites( running_machine &machine )
 {
 	amstrad_state *state = machine.driver_data<amstrad_state>();
-	UINT16	*p = BITMAP_ADDR16( state->m_gate_array.bitmap, state->m_gate_array.y, state->m_asic.h_start );
+	UINT16	*p = &state->m_gate_array.bitmap->pix16(state->m_gate_array.y, state->m_asic.h_start );
 	int i;
 
 	if ( state->m_gate_array.y < 0 )
@@ -830,9 +830,9 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_hsync_changed )
 		/* Advance to next drawing line */
 		drvstate->m_gate_array.y++;
 		drvstate->m_gate_array.line_ticks = 0;
-		if ( drvstate->m_gate_array.y >= 0 && drvstate->m_gate_array.y < drvstate->m_gate_array.bitmap->height )
+		if ( drvstate->m_gate_array.y >= 0 && drvstate->m_gate_array.y < drvstate->m_gate_array.bitmap->height() )
 		{
-			drvstate->m_gate_array.draw_p = BITMAP_ADDR16( drvstate->m_gate_array.bitmap, drvstate->m_gate_array.y, 0 );
+			drvstate->m_gate_array.draw_p = &drvstate->m_gate_array.bitmap->pix16(drvstate->m_gate_array.y);
 		}
 		else
 		{
@@ -874,9 +874,9 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 		/* Advance to next drawing line */
 		drvstate->m_gate_array.y++;
 		drvstate->m_gate_array.line_ticks = 0;
-		if ( drvstate->m_gate_array.y >= 0 && drvstate->m_gate_array.y < drvstate->m_gate_array.bitmap->height )
+		if ( drvstate->m_gate_array.y >= 0 && drvstate->m_gate_array.y < drvstate->m_gate_array.bitmap->height() )
 		{
-			drvstate->m_gate_array.draw_p = BITMAP_ADDR16( drvstate->m_gate_array.bitmap, drvstate->m_gate_array.y, 0 );
+			drvstate->m_gate_array.draw_p = &drvstate->m_gate_array.bitmap->pix16(drvstate->m_gate_array.y);
 		}
 		else
 		{

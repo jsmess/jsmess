@@ -112,7 +112,7 @@ SCREEN_EOF( spectrum )
 
 INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+	bitmap->pix16(y, x) = (UINT16)color;
 }
 
 SCREEN_UPDATE( spectrum )
@@ -281,23 +281,23 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 		r.max_x = TotalScreenWidth-1;
 		r.min_y = 0;
 		r.max_y = TopBorderLines-1;
-		bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+		bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 
 		r.min_x = 0;
 		r.max_x = LeftBorderPixels-1;
 		r.min_y = TopBorderLines;
 		r.max_y = TopBorderLines+ScreenLines-1;
-		bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+		bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 
 		r.min_x = LeftBorderPixels+ScreenPixels;
 		r.max_x = TotalScreenWidth-1;
-		bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+		bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 
 		r.min_x = 0;
 		r.max_x = TotalScreenWidth-1;
 		r.min_y = TopBorderLines+ScreenLines;
 		r.max_y = TotalScreenHeight-1;
-		bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+		bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 
 //          logerror ("Setting border colour to %d (Last = %d, Full Refresh = %d)\n", state->m_CurrBorderColor, state->m_LastDisplayedBorderColor, full_refresh);
 		state->m_LastDisplayedBorderColor = state->m_CurrBorderColor;
@@ -325,14 +325,14 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 			{
 				/* Single colour on line */
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 			else
 			{
 				/* Multiple colours on a line */
 				ScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
 				r.max_x = ScrX-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 				state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
 				do {
 					CurrItem++;
@@ -343,7 +343,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
 					r.min_x = ScrX;
 					r.max_x = NextScrX-1;
-					bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+					bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 					ScrX = NextScrX;
 					state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
 					do {
@@ -352,7 +352,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 				}
 				r.min_x = ScrX;
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 
 			/* Process colour changes during horizontal retrace */
@@ -377,14 +377,14 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 			{
 				/* Single colour */
 				r.max_x = LeftBorderPixels-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 			else
 			{
 				/* Multiple colours */
 				ScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)LeftBorderPixels / (float)LeftBorderCycles;
 				r.max_x = ScrX-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 				state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
 				do {
 					CurrItem++;
@@ -395,7 +395,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)LeftBorderPixels / (float)LeftBorderCycles;
 					r.min_x = ScrX;
 					r.max_x = NextScrX-1;
-					bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+					bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 					ScrX = NextScrX;
 					state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
 					do {
@@ -404,7 +404,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 				}
 				r.min_x = ScrX;
 				r.max_x = LeftBorderPixels-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 
 			/* Process colour changes during screen draw */
@@ -422,14 +422,14 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 			{
 				/* Single colour */
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 			else
 			{
 				/* Multiple colours */
 				ScrX = LeftBorderPixels + ScreenPixels + (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)RightBorderPixels / (float)RightBorderCycles;
 				r.max_x = ScrX-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 				state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
 				do {
 					CurrItem++;
@@ -440,7 +440,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 					NextScrX = LeftBorderPixels + ScreenPixels + (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)RightBorderPixels / (float)RightBorderCycles;
 					r.min_x = ScrX;
 					r.max_x = NextScrX-1;
-					bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+					bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 					ScrX = NextScrX;
 					state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
 					do {
@@ -449,7 +449,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 				}
 				r.min_x = ScrX;
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 
 			/* Process colour changes during horizontal retrace */
@@ -472,14 +472,14 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 			{
 				/* Single colour on line */
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 			else
 			{
 				/* Multiple colours on a line */
 				ScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
 				r.max_x = ScrX-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 				state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
 				do {
 					CurrItem++;
@@ -490,7 +490,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
 					r.min_x = ScrX;
 					r.max_x = NextScrX-1;
-					bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+					bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 					ScrX = NextScrX;
 					state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
 					do {
@@ -499,7 +499,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap,
 				}
 				r.min_x = ScrX;
 				r.max_x = TotalScreenWidth-1;
-				bitmap_fill(bitmap, &r, machine.pens[state->m_CurrBorderColor]);
+				bitmap->fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 
 			/* Process colour changes during horizontal retrace */

@@ -163,7 +163,7 @@ static SCREEN_UPDATE( gp2x )
 
 			for (y = 0; y < 240; y++)
 			{
-				UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
+				UINT32 *scanline = &bitmap->pix32(y);
 
 				for (x = 0; x < 320; x++)
 				{

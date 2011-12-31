@@ -334,13 +334,13 @@ static SCREEN_UPDATE( cat )
 				code = state->m_p_videoram[addr++];
 				for (b = 15; b >= 0; b--)
 				{
-					*BITMAP_ADDR16(bitmap, y, horpos++) = (code >> b) & 0x01;
+					bitmap->pix16(y, horpos++) = (code >> b) & 0x01;
 				}
 			}
 		}
 	} else {
-		static const rectangle black_area = {0, 672 - 1, 0, 344 - 1};
-		bitmap_fill(bitmap, &black_area, 0);
+		const rectangle black_area(0, 672 - 1, 0, 344 - 1);
+		bitmap->fill(0, black_area);
 	}
 	return 0;
 }
@@ -378,7 +378,7 @@ static SCREEN_UPDATE( swyft )
 			code = state->m_p_videoram[addr++];
 			for (b = 15; b >= 0; b--)
 			{
-				*BITMAP_ADDR16(bitmap, y, horpos++) = (code >> b) & 0x01;
+				bitmap->pix16(y, horpos++) = (code >> b) & 0x01;
 			}
 		}
 	}

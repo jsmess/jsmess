@@ -17,7 +17,7 @@ static TIMER_CALLBACK( gamecom_scanline )
 		rec.min_x = 0;
 		rec.max_x = Y_PIXELS - 1;
 		rec.min_y = rec.max_y = state->m_scanline;
-		bitmap_fill( machine.generic.tmpbitmap, &rec , 0);
+		machine.generic.tmpbitmap->fill(0, rec );
 		return;
 	}
 	else
@@ -56,10 +56,10 @@ static TIMER_CALLBACK( gamecom_scanline )
 		for( i = 0; i < 40; i++ )
 		{
 			UINT8 p = line[i];
-			*BITMAP_ADDR16(machine.generic.tmpbitmap, i * 4 + 0, state->m_scanline) = pal[ ( p >> 6 ) & 3 ];
-			*BITMAP_ADDR16(machine.generic.tmpbitmap, i * 4 + 1, state->m_scanline) = pal[ ( p >> 4 ) & 3 ];
-			*BITMAP_ADDR16(machine.generic.tmpbitmap, i * 4 + 2, state->m_scanline) = pal[ ( p >> 2 ) & 3 ];
-			*BITMAP_ADDR16(machine.generic.tmpbitmap, i * 4 + 3, state->m_scanline) = pal[ ( p      ) & 3 ];
+			machine.generic.tmpbitmap->pix16(i * 4 + 0, state->m_scanline) = pal[ ( p >> 6 ) & 3 ];
+			machine.generic.tmpbitmap->pix16(i * 4 + 1, state->m_scanline) = pal[ ( p >> 4 ) & 3 ];
+			machine.generic.tmpbitmap->pix16(i * 4 + 2, state->m_scanline) = pal[ ( p >> 2 ) & 3 ];
+			machine.generic.tmpbitmap->pix16(i * 4 + 3, state->m_scanline) = pal[ ( p      ) & 3 ];
 		}
 	}
 

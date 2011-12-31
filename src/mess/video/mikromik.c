@@ -41,7 +41,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 		int color = hlt_in ? 2 : (video_in ^ compl_in);
 
-		*BITMAP_ADDR16(device->machine().generic.tmpbitmap, y, x + i) = color;
+		device->machine().generic.tmpbitmap->pix16(y, x + i) = color;
 	}
 }
 
@@ -77,7 +77,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(data, i)) *BITMAP_ADDR16(bitmap, y, x + i) = 1;
+		if (BIT(data, i)) bitmap->pix16(y, x + i) = 1;
 	}
 }
 

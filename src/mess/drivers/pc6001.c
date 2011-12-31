@@ -235,7 +235,7 @@ static void draw_gfx_mode4(running_machine &machine, bitmap_t *bitmap,const rect
 
 					color = ((tile)>>(7-xi) & 1) ? fgcol : 0;
 
-					*BITMAP_ADDR16(bitmap, (y+24), (x*8+xi)+32) = machine.pens[color];
+					bitmap->pix16((y+24), (x*8+xi)+32) = machine.pens[color];
 				}
 			}
 			else
@@ -246,8 +246,8 @@ static void draw_gfx_mode4(running_machine &machine, bitmap_t *bitmap,const rect
 
 					color = (attr & 2) ? (pen_wattr[col_setting-1][fgcol]) : (pen_gattr[col_setting-1][fgcol]);
 
-					*BITMAP_ADDR16(bitmap, (y+24), ((x*8+xi*2)+0)+32) = machine.pens[color];
-					*BITMAP_ADDR16(bitmap, (y+24), ((x*8+xi*2)+1)+32) = machine.pens[color];
+					bitmap->pix16((y+24), ((x*8+xi*2)+0)+32) = machine.pens[color];
+					bitmap->pix16((y+24), ((x*8+xi*2)+1)+32) = machine.pens[color];
 				}
 			}
 		}
@@ -279,7 +279,7 @@ static void draw_bitmap_2bpp(running_machine &machine, bitmap_t *bitmap,const re
 					color = ((tile >> i) & 3)+8;
 					color+= col_bank;
 
-					*BITMAP_ADDR16(bitmap, ((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine.pens[color];
+					bitmap->pix16(((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine.pens[color];
 				}
 			}
 		}
@@ -313,7 +313,7 @@ static void draw_tile_3bpp(running_machine &machine, bitmap_t *bitmap,const rect
 
 			color = ((tile >> i) & 1) ? pen+8 : 0;
 
-			*BITMAP_ADDR16(bitmap, ((y*12+(11-yi))+24), (x*8+(7-xi))+32) = machine.pens[color];
+			bitmap->pix16(((y*12+(11-yi))+24), (x*8+(7-xi))+32) = machine.pens[color];
 		}
 	}
 }
@@ -349,7 +349,7 @@ static void draw_tile_text(running_machine &machine, bitmap_t *bitmap,const rect
 					color = pen ? fgcol : 0;
 			}
 
-			*BITMAP_ADDR16(bitmap, ((y*12+yi)+24), (x*8+xi)+32) = machine.pens[color];
+			bitmap->pix16(((y*12+yi)+24), (x*8+xi)+32) = machine.pens[color];
 		}
 	}
 }
@@ -371,7 +371,7 @@ static void draw_border(running_machine &machine, bitmap_t *bitmap,const rectang
 			else
 				color = 0; //FIXME: other modes not yet checked
 
-			*BITMAP_ADDR16(bitmap, y, x) = machine.pens[color];
+			bitmap->pix16(y, x) = machine.pens[color];
 		}
 	}
 }
@@ -465,9 +465,9 @@ static SCREEN_UPDATE( pc6001m2 )
 					color |= ((pen[1] & 2) << 2);
 
 					if (((x+i)*2+0) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y, (x+i)*2+0) = screen.machine().pens[color];
+						bitmap->pix16(y, (x+i)*2+0) = screen.machine().pens[color];
 					if (((x+i)*2+1) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y, (x+i)*2+1) = screen.machine().pens[color];
+						bitmap->pix16(y, (x+i)*2+1) = screen.machine().pens[color];
 				}
 
 				count++;
@@ -513,7 +513,7 @@ static SCREEN_UPDATE( pc6001m2 )
 					}
 
 					if ((x+i) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
-						*BITMAP_ADDR16(bitmap, y, (x+i)) = screen.machine().pens[color];
+						bitmap->pix16(y, (x+i)) = screen.machine().pens[color];
 				}
 
 				count++;
@@ -553,7 +553,7 @@ static SCREEN_UPDATE( pc6001m2 )
 						color = pen ? fgcol : bgcol;
 
 						if ((x*8+xi) <= screen.visible_area().max_x && (y*12+yi) <= screen.visible_area().max_y)
-							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
+							bitmap->pix16(((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
 					}
 				}
 			}
@@ -598,7 +598,7 @@ static SCREEN_UPDATE( pc6001sr )
 						color = pen ? fgcol : bgcol;
 
 						if ((x*8+xi) <= screen.visible_area().max_x && (y*12+yi) <= screen.visible_area().max_y)
-							*BITMAP_ADDR16(bitmap, ((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
+							bitmap->pix16(((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
 					}
 				}
 			}
@@ -617,42 +617,42 @@ static SCREEN_UPDATE( pc6001sr )
 				color = state->m_video_ram[count] & 0x0f;
 
 				if ((x+0) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+0), (x+0)) = screen.machine().pens[color+0x10];
+					bitmap->pix16((y+0), (x+0)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count] & 0xf0) >> 4;
 
 				if ((x+1) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+0), (x+1)) = screen.machine().pens[color+0x10];
+					bitmap->pix16((y+0), (x+1)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+1] & 0x0f;
 
 				if ((x+2) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+0), (x+2)) = screen.machine().pens[color+0x10];
+					bitmap->pix16((y+0), (x+2)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+1] & 0xf0) >> 4;
 
 				if ((x+3) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+0), (x+3)) = screen.machine().pens[color+0x10];
+					bitmap->pix16((y+0), (x+3)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+2] & 0x0f;
 
 				if ((x+0) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+1), (x+0)) = screen.machine().pens[color+0x10];
+					bitmap->pix16((y+1), (x+0)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+2] & 0xf0) >> 4;
 
 				if ((x+1) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+1), (x+1)) = screen.machine().pens[color+0x10];
+					bitmap->pix16((y+1), (x+1)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+3] & 0x0f;
 
 				if ((x+2) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+1), (x+2)) = screen.machine().pens[color+0x10];
+					bitmap->pix16((y+1), (x+2)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+3] & 0xf0) >> 4;
 
 				if ((x+3) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
-					*BITMAP_ADDR16(bitmap, (y+1), (x+3)) = screen.machine().pens[color+0x10];
+					bitmap->pix16((y+1), (x+3)) = screen.machine().pens[color+0x10];
 
 
 				count+=4;

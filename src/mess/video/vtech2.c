@@ -121,7 +121,7 @@ SCREEN_UPDATE( laser )
 	int full_refresh = 1;
 
 	if( full_refresh )
-		bitmap_fill(bitmap, cliprect, ((state->m_laser_bg_mode >> 4) & 15)<<1);
+		bitmap->fill(((state->m_laser_bg_mode >> 4) & 15)<<1, *cliprect);
 
 	if (state->m_laser_latch & 0x08)
 	{

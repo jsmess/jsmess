@@ -93,7 +93,7 @@ static SCREEN_UPDATE( pc100 )
 					dot |= pen[pen_i]<<pen_i;
 
 				if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-					*BITMAP_ADDR16(bitmap, y, x*16+xi) = screen.machine().pens[dot];
+					bitmap->pix16(y, x*16+xi) = screen.machine().pens[dot];
 			}
 
 			count++;

@@ -76,7 +76,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	{
 		pen = ((gfx >> xi) & 1) ? 7 : 0;
 
-		*BITMAP_ADDR16(bitmap, y, x + xi) = pen;
+		bitmap->pix16(y, x + xi) = pen;
 	}
 }
 
@@ -113,7 +113,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;
 
-				*BITMAP_ADDR16(bitmap, res_y, res_x) = pen;
+				bitmap->pix16(res_y, res_x) = pen;
 			}
 		}
 	}

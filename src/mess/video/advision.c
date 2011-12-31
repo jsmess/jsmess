@@ -104,9 +104,9 @@ bool advision_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 		for( y = 0; y < 128; y+=2 )
 		{
 			if( *led > 0 )
-				*BITMAP_ADDR16(&bitmap, 30 + y, 85 + x) = --(*led);
+				bitmap.pix16(30 + y, 85 + x) = --(*led);
 			else
-				*BITMAP_ADDR16(&bitmap, 30 + y, 85 + x) = 0;
+				bitmap.pix16(30 + y, 85 + x) = 0;
 
 			led += 256;
 		}

@@ -73,7 +73,7 @@ static SCREEN_UPDATE( smc777 )
 	UINT8 *gram = screen.machine().region("fbuf")->base();
 	int x_width;
 
-	bitmap_fill(bitmap, cliprect, screen.machine().pens[state->m_backdrop_pen]);
+	bitmap->fill(screen.machine().pens[state->m_backdrop_pen], *cliprect);
 
 	x_width = (state->m_display_reg & 0x80) ? 2 : 4;
 
@@ -91,23 +91,23 @@ static SCREEN_UPDATE( smc777 )
 				/* todo: clean this up! */
 				if(x_width == 2)
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap->pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = screen.machine().pens[color];
 				}
 				else
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen.machine().pens[color];
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap->pix16(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap->pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen.machine().pens[color];
 				}
 
 				color = (gram[count] & 0x0f) >> 0;
 				if(x_width == 2)
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap->pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = screen.machine().pens[color];
 				}
 				else
 				{
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen.machine().pens[color];
-					*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap->pix16(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen.machine().pens[color];
+					bitmap->pix16(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen.machine().pens[color];
 				}
 
 				count++;
@@ -160,7 +160,7 @@ static SCREEN_UPDATE( smc777 )
 					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+state->m_pal_mode) : bk_pen;
 
 					if(pen != -1)
-						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen.machine().pens[pen];
+						bitmap->pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = screen.machine().pens[pen];
 				}
 			}
 
@@ -184,7 +184,7 @@ static SCREEN_UPDATE( smc777 )
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = screen.machine().pens[0x7];
+							bitmap->pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = screen.machine().pens[0x7];
 						}
 					}
 				}

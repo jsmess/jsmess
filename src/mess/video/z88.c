@@ -11,7 +11,7 @@
 
 INLINE void z88_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+	bitmap->pix16(y, x) = (UINT16)color;
 }
 
 /***************************************************************************

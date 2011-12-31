@@ -27,7 +27,7 @@ I8275_DISPLAY_PIXELS(radio86_display_pixels)
 		pixels ^= 0xff;
 	}
 	for(i=0;i<6;i++) {
-		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap->pix16(y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 	}
 }
 
@@ -49,7 +49,7 @@ I8275_DISPLAY_PIXELS(mikrosha_display_pixels)
 		pixels ^= 0xff;
 	}
 	for(i=0;i<6;i++) {
-		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap->pix16(y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 	}
 }
 
@@ -69,7 +69,7 @@ I8275_DISPLAY_PIXELS(apogee_display_pixels)
 		pixels ^= 0xff;
 	}
 	for(i=0;i<6;i++) {
-		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap->pix16(y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 	}
 }
 
@@ -89,7 +89,7 @@ I8275_DISPLAY_PIXELS(partner_display_pixels)
 		pixels ^= 0xff;
 	}
 	for(i=0;i<6;i++) {
-		*BITMAP_ADDR16(bitmap, y, x + i) = (pixels >> (5-i)) & 1;
+		bitmap->pix16(y, x + i) = (pixels >> (5-i)) & 1;
 	}
 }
 

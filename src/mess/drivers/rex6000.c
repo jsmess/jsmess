@@ -502,14 +502,14 @@ bool rex6000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 
 				for (int b=0; b<8; b++)
 				{
-					*BITMAP_ADDR16(&bitmap, y, (x * 8) + b) = BIT(data, 7);
+					bitmap.pix16(y, (x * 8) + b) = BIT(data, 7);
 					data <<= 1;
 				}
 			}
 	}
 	else
 	{
-		bitmap_fill(&bitmap, &cliprect, 0);
+		bitmap.fill(0, cliprect);
 	}
 
 	return 0;

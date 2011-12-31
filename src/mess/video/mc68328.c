@@ -38,7 +38,7 @@ SCREEN_UPDATE( mc68328 )
     {
         for (y = 0; y < 160; y++)
         {
-            line = BITMAP_ADDR16(bitmap, y, 0);
+            line = &bitmap->pix16(y);
 
             for (x = 0; x < 160; x += 16)
             {
@@ -54,7 +54,7 @@ SCREEN_UPDATE( mc68328 )
     {
         for (y = 0; y < 160; y++)
         {
-            line = BITMAP_ADDR16(bitmap, y, 0);
+            line = &bitmap->pix16(y);
 
             for (x = 0; x < 160; x++)
             {

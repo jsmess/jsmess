@@ -272,7 +272,7 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 	{
 		/* make a fake bitmap for this field */
 		bitmap_clone_existing(&fakebitmap, bitmap);
-		fakebitmap.base = BITMAP_ADDR16(&fakebitmap, fieldnum, 0);
+		fakebitmap.base = &&fakebitmap->pix16(fieldnum);
 		fakebitmap.rowpixels *= interlace_factor;
 		fakebitmap.height /= interlace_factor;
 
@@ -366,7 +366,7 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 			fprintf(stderr, "%6d.%d...\r", frame, fieldnum);
 
 		/* parse the VBI data */
-		vbi_parse_all(BITMAP_ADDR16(bitmap, fieldnum, 0), bitmap->rowpixels * 2, bitmap->width, 8, &metadata);
+		vbi_parse_all(&bitmap->pix16(fieldnum), bitmap->rowpixels * 2, bitmap->width, 8, &metadata);
 
 		/* if we have data in both 17 and 18, it should match */
 		if (metadata.line17 != 0 && metadata.line18 != 0 && metadata.line17 != metadata.line18)
@@ -526,11 +526,11 @@ static void verify_video(video_info *video, int frame, bitmap_t *bitmap)
 		{
 			for (x = 16; x < 720 - 16; x++)
 			{
-				yhisto[*BITMAP_ADDR16(bitmap, y, x) >> 8]++;
+				yhisto[bitmap->pix16(y, x) >> 8]++;
 				if (x % 2 == 0)
-					cbhisto[*BITMAP_ADDR16(bitmap, y, x) & 0xff]++;
+					cbhisto[bitmap->pix16(y, x) & 0xff]++;
 				else
-					crhisto[*BITMAP_ADDR16(bitmap, y, x) & 0xff]++;
+					crhisto[bitmap->pix16(y, x) & 0xff]++;
 			}
 			pixels += 720 - 16 - 16;
 		}

@@ -382,7 +382,7 @@ static MC6845_UPDATE_ROW( lynx48k_update_row )
 {
 	UINT8 *RAM = device->machine().region("maincpu")->base();
 	UINT8 r,g,b;
-	UINT16 x, *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 x, *p = &bitmap->pix16(y);
 
 	for (x = (y << 5); x < x_count + (y << 5); x++)
 	{
@@ -405,7 +405,7 @@ static MC6845_UPDATE_ROW( lynx128k_update_row )
 {
 	UINT8 *RAM = device->machine().region("maincpu")->base();
 	UINT8 r,g,b;
-	UINT16 x, *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16 x, *p = &bitmap->pix16(y);
 
 	for (x = (y << 6); x < x_count + (y << 6); x++)
 	{

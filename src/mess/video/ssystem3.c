@@ -105,7 +105,7 @@ static void ssystem3_draw_7segment(bitmap_t *bitmap,int value, int x, int y)
 
 		if (mask!=0) {
 			color=(value&mask)?1:0;
-			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
+			bitmap->pix16(y+yi, x+xi) = color;
 		}
 		if (led[i]!='\r') xi++;
 		else { yi++, xi=0; }
@@ -169,7 +169,7 @@ static void ssystem3_draw_led(bitmap_t *bitmap,INT16 color, int x, int y, int ch
 		switch (single_led[j]) {
 		default:
 			if (ch==single_led[j]) {
-				*BITMAP_ADDR16(bitmap, y, x+xi) = color;
+				bitmap->pix16(y, x+xi) = color;
 			}
 			xi++;
 			break;

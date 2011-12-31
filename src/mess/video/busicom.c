@@ -1830,11 +1830,11 @@ SCREEN_UPDATE( busicom )
 			for (j = 0; j < 44; j++) {
 				for (b = 0; b < 34; b++)
 				{
-					*BITMAP_ADDR16(bitmap, (y*44)+j, x*40+b) =  printer_font[44*34 * chr + j*34 + b] + col ;
+					bitmap->pix16((y*44)+j, x*40+b) =  printer_font[44*34 * chr + j*34 + b] + col ;
 				}
 				for (b = 34; b < 40; b++)
 				{
-					*BITMAP_ADDR16(bitmap, (y*44)+j, x*40+b) =  0;
+					bitmap->pix16((y*44)+j, x*40+b) =  0;
 				}
 
 			}

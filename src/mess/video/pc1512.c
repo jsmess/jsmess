@@ -406,10 +406,10 @@ offs_t pc1512_state::get_char_rom_offset()
 void pc1512_state::draw_alpha(mc6845_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	offs_t char_rom_offset = get_char_rom_offset();
-	UINT16 *p = BITMAP_ADDR16(bitmap, y + VFP_HIRES, HFP_HIRES);
+	UINT16 *p = &bitmap->pix16(y + VFP_HIRES, HFP_HIRES);
 
 	if (get_display_mode(m_vdu_mode) == ALPHA_40)
-		p = BITMAP_ADDR16(bitmap, y + VFP_LORES, HFP_LORES);
+		p = &bitmap->pix16(y + VFP_LORES, HFP_LORES);
 
 	if (y > 199) return;
 
@@ -476,7 +476,7 @@ void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_t *bitmap, cons
 {
 	if (y > 199) return;
 
-	UINT16 *p = BITMAP_ADDR16(bitmap, y + VFP_LORES, HFP_LORES);
+	UINT16 *p = &bitmap->pix16(y + VFP_LORES, HFP_LORES);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -496,7 +496,7 @@ void pc1512_state::draw_graphics_2(mc6845_device *device, bitmap_t *bitmap, cons
 {
 	if (y > 199) return;
 
-	UINT16 *p = BITMAP_ADDR16(bitmap, y + VFP_HIRES, HFP_HIRES);
+	UINT16 *p = &bitmap->pix16(y + VFP_HIRES, HFP_HIRES);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -604,11 +604,11 @@ bool pc1512_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 		case ALPHA_40:
 		case ALPHA_80:
 		case GRAPHICS_1:
-			bitmap_fill(&bitmap, &cliprect, m_vdu_color & 0x0f);
+			bitmap.fill(m_vdu_color & 0x0f, cliprect);
 			break;
 
 		case GRAPHICS_2:
-			bitmap_fill(&bitmap, &cliprect, m_vdu_border & 0x0f);
+			bitmap.fill(m_vdu_border & 0x0f, cliprect);
 			break;
 		}
 
@@ -616,7 +616,7 @@ bool pc1512_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	}
 	else
 	{
-		bitmap_fill(&bitmap, &cliprect, 0);
+		bitmap.fill(0, cliprect);
 	}
 
 	return false;

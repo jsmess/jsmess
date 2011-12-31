@@ -379,7 +379,7 @@ static int lgun_bright_aim_area( running_machine &machine, emu_timer *timer, int
 			if (beam_x < SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH || beam_x >= SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256)
 				return 0;
 
-			rgb_t color = *BITMAP_ADDR32(bitmap, beam_y, beam_x);
+			rgb_t color = bitmap->pix32(beam_y, beam_x);
 
 			/* reference: http://www.w3.org/TR/AERT#color-contrast */
 			UINT8 brightness = (RGB_RED(color) * 0.299) + (RGB_GREEN(color) * 0.587) + (RGB_BLUE(color) * 0.114);
@@ -2217,7 +2217,7 @@ static void sms_black_bitmap( const screen_device &screen, bitmap_t *bitmap )
 
 	for (y = 0; y < height; y++)
 		for (x = 0; x < width; x++)
-			*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(0,0,0);
+			bitmap->pix32(y, x) = MAKE_RGB(0,0,0);
 }
 
 VIDEO_START( sms1 )
@@ -2310,8 +2310,8 @@ SCREEN_UPDATE( gamegear )
 	// (it would be better to generalize this in the core, to be used for all LCD systems)
 	for (y = 0; y < height; y++)
 	{
-		UINT32 *line0 = BITMAP_ADDR32(state->m_tmp_bitmap, y, 0);
-		UINT32 *line1 = BITMAP_ADDR32(state->m_prev_bitmap, y, 0);
+		UINT32 *line0 = &state->m_tmp_bitmap->pix32(y);
+		UINT32 *line1 = &state->m_prev_bitmap->pix32(y);
 		for (x = 0; x < width; x++)
 		{
 			UINT32 color0 = line0[x];
@@ -2325,7 +2325,7 @@ SCREEN_UPDATE( gamegear )
 			UINT8 r = (UINT8)((r0 + r1) >> 1);
 			UINT8 g = (UINT8)((g0 + g1) >> 1);
 			UINT8 b = (UINT8)((b0 + b1) >> 1);
-			*BITMAP_ADDR32(bitmap, y, x) = (r << 16) | (g << 8) | b;
+			bitmap->pix32(y, x) = (r << 16) | (g << 8) | b;
 		}
 	}
 	copybitmap(state->m_prev_bitmap, state->m_tmp_bitmap, 0, 0, 0, 0, cliprect);

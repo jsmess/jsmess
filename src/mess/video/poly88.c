@@ -51,22 +51,22 @@ SCREEN_UPDATE( poly88 )
 					{
 						r = b/5;
 						if (l==0 && r==0)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,5) ? 0 : 1;
+							bitmap->pix16(y*15+j, xpos+b ) = BIT(code,5) ? 0 : 1;
 
 						if (l==0 && r==1)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,2) ? 0 : 1;
+							bitmap->pix16(y*15+j, xpos+b ) = BIT(code,2) ? 0 : 1;
 
 						if (l==1 && r==0)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,4) ? 0 : 1;
+							bitmap->pix16(y*15+j, xpos+b ) = BIT(code,4) ? 0 : 1;
 
 						if (l==1 && r==1)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,1) ? 0 : 1;
+							bitmap->pix16(y*15+j, xpos+b ) = BIT(code,1) ? 0 : 1;
 
 						if (l==2 && r==0)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,3) ? 0 : 1;
+							bitmap->pix16(y*15+j, xpos+b ) = BIT(code,3) ? 0 : 1;
 
 						if (l==2 && r==1)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,0) ? 0 : 1;
+							bitmap->pix16(y*15+j, xpos+b ) = BIT(code,0) ? 0 : 1;
 					}
 				}
 			}
@@ -88,11 +88,11 @@ SCREEN_UPDATE( poly88 )
 					}
 
 					for(b = 0; b < 7; b++ )
-						*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) =  (l >> (6-b)) & 1;
+						bitmap->pix16(y*15+j, xpos+b ) =  (l >> (6-b)) & 1;
 
-					*BITMAP_ADDR16(bitmap, y*15+j, xpos+7 ) =  0;
-					*BITMAP_ADDR16(bitmap, y*15+j, xpos+8 ) =  0;
-					*BITMAP_ADDR16(bitmap, y*15+j, xpos+9 ) =  0;
+					bitmap->pix16(y*15+j, xpos+7 ) =  0;
+					bitmap->pix16(y*15+j, xpos+8 ) =  0;
+					bitmap->pix16(y*15+j, xpos+9 ) =  0;
 				}
 			}
 			xpos += 10;

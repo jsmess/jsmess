@@ -37,10 +37,10 @@ static void draw_mode4_line(running_machine &machine, int y, int hpos)
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
 		/* draw 2 pixels (doublewidth) */
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, hpos + i * 4 + 0) = state->m_clut[(*vram >> 4) & 0x0f];
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, hpos + i * 4 + 1) = state->m_clut[(*vram >> 4) & 0x0f];
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, hpos + i * 4 + 2) = state->m_clut[(*vram >> 0) & 0x0f];
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, hpos + i * 4 + 3) = state->m_clut[(*vram >> 0) & 0x0f];
+		machine.generic.tmpbitmap->pix16(y, hpos + i * 4 + 0) = state->m_clut[(*vram >> 4) & 0x0f];
+		machine.generic.tmpbitmap->pix16(y, hpos + i * 4 + 1) = state->m_clut[(*vram >> 4) & 0x0f];
+		machine.generic.tmpbitmap->pix16(y, hpos + i * 4 + 2) = state->m_clut[(*vram >> 0) & 0x0f];
+		machine.generic.tmpbitmap->pix16(y, hpos + i * 4 + 3) = state->m_clut[(*vram >> 0) & 0x0f];
 
 		/* move to next address */
 		vram++;
@@ -62,10 +62,10 @@ static void draw_mode3_line(running_machine &machine, int y, int hpos)
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
 		/* draw 4 pixels */
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, hpos + i * 4 + 0) = state->m_clut[(*vram >> 6) & 0x03];
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, hpos + i * 4 + 1) = state->m_clut[(*vram >> 4) & 0x03];
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, hpos + i * 4 + 2) = state->m_clut[(*vram >> 2) & 0x03];
-		*BITMAP_ADDR16(machine.generic.tmpbitmap, y, hpos + i * 4 + 3) = state->m_clut[(*vram >> 0) & 0x03];
+		machine.generic.tmpbitmap->pix16(y, hpos + i * 4 + 0) = state->m_clut[(*vram >> 6) & 0x03];
+		machine.generic.tmpbitmap->pix16(y, hpos + i * 4 + 1) = state->m_clut[(*vram >> 4) & 0x03];
+		machine.generic.tmpbitmap->pix16(y, hpos + i * 4 + 2) = state->m_clut[(*vram >> 2) & 0x03];
+		machine.generic.tmpbitmap->pix16(y, hpos + i * 4 + 3) = state->m_clut[(*vram >> 0) & 0x03];
 
 		/* move to next address */
 		vram++;
@@ -85,8 +85,8 @@ static void draw_mode12_block(samcoupe_state *state, bitmap_t *bitmap, int vpos,
 	/* draw block of 8 pixels (doubled to 16) */
 	for (int i = 0; i < SAM_BLOCK; i++)
 	{
-		*BITMAP_ADDR16(bitmap, vpos, hpos + i*2 + 0) = BIT(mask, 7 - i) ? ink : pap;
-		*BITMAP_ADDR16(bitmap, vpos, hpos + i*2 + 1) = BIT(mask, 7 - i) ? ink : pap;
+		bitmap->pix16(vpos, hpos + i*2 + 0) = BIT(mask, 7 - i) ? ink : pap;
+		bitmap->pix16(vpos, hpos + i*2 + 1) = BIT(mask, 7 - i) ? ink : pap;
 	}
 }
 
@@ -133,7 +133,7 @@ TIMER_CALLBACK( sam_video_update_callback )
 	/* display disabled? (only in mode 3 or 4) */
 	if (BIT(state->m_vmpr, 6) && BIT(state->m_border, 7))
 	{
-		plot_box(machine.generic.tmpbitmap, hpos, vpos, SAM_BLOCK*2, 1, 0);
+		machine.generic.tmpbitmap->plot_box(hpos, vpos, SAM_BLOCK*2, 1, 0);
 	}
 	else
 	{
@@ -141,7 +141,7 @@ TIMER_CALLBACK( sam_video_update_callback )
 		if (vpos < SAM_BORDER_TOP || vpos >= SAM_BORDER_TOP + SAM_SCREEN_HEIGHT || hpos < SAM_BORDER_LEFT || hpos >= SAM_BORDER_LEFT + SAM_SCREEN_WIDTH)
 		{
 			state->m_attribute = 0xff;
-			plot_box(machine.generic.tmpbitmap, hpos, vpos, SAM_BLOCK*2, 1, state->m_clut[BORDER_COLOR(state->m_border)]);
+			machine.generic.tmpbitmap->plot_box(hpos, vpos, SAM_BLOCK*2, 1, state->m_clut[BORDER_COLOR(state->m_border)]);
 		}
 		else
 		{

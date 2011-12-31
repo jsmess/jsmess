@@ -166,7 +166,7 @@ MC6845_UPDATE_ROW( applix_update_row )
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
 	UINT16 colourm = (state->m_08 & 0x0e) << 7;
-	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
+	UINT16  *p = &bitmap->pix16(y);
 
 	for (x = 0; x < x_count; x++)			// for each character
 	{

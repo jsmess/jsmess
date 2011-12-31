@@ -253,7 +253,7 @@ SCREEN_UPDATE_MEMBER( beehive_state )
 
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
+			UINT16 *p = &bitmap.pix16(sy++);
 			UINT8 chars = 0;
 
 			for (x = ma; x < ma + line_length; x++)

@@ -600,8 +600,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			UINT32 delta = (1 << 17) / xscale;
 			for(int sy = 0; sy < ysize*8; sy++)
 			{
-				UINT16 *src = BITMAP_ADDR16(sprite_bitmap, sy, 0);
-				UINT16 *dst = BITMAP_ADDR16(bitmap, y + sy, 0);
+				UINT16 *src = &sprite_bitmap->pix16(sy);
+				UINT16 *dst = &bitmap->pix16(y + sy);
 				UINT32 dx = x << 16;
 				for(int sx = 0; sx < xsize*8; sx++)
 				{
@@ -639,10 +639,10 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t* bitma
 	//bitmap_t *destbitmap = bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
 	//bitmap_t *srcbitmapflags = tilemap_get_flagsmap(tmap);
-	const int xmask = srcbitmap->width-1;
-	const int ymask = srcbitmap->height-1;
-	const int widthshifted = srcbitmap->width << 16;
-	const int heightshifted = srcbitmap->height << 16;
+	const int xmask = srcbitmap->width()-1;
+	const int ymask = srcbitmap->height()-1;
+	const int widthshifted = srcbitmap->width() << 16;
+	const int heightshifted = srcbitmap->height() << 16;
 	UINT32 cx;
 	UINT32 cy;
 	int x;
@@ -678,8 +678,8 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t* bitma
 			cy = starty;
 
 			/* get dest and priority pointers */
-			dest = BITMAP_ADDR16( bitmap, sy, sx);
-			//destflags = BITMAP_ADDR8( bitmapflags, sy, sx);
+			dest = &bitmap->pix16(sy, sx);
+			//destflags = &bitmapflags->pix8(sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
@@ -692,28 +692,28 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t* bitma
 						int scroll = 0;//scrollram[(cx>>16)&0x3ff]);
 
 
-						UINT16 data = BITMAP_ADDR16(srcbitmap,
-												((cy >> 16) - scroll) & ymask,
+						UINT16 data = &srcbitmap->pix16(
+												((cy >> 16) - scroll) & ymask, 
 												(cx >> 16) & xmask)[0];
 
 						if ((data & transmask)!=0)
 							dest[0] = data;
 
-						//destflags[0] = BITMAP_ADDR8(srcbitmapflags, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
+						//destflags[0] = &srcbitmapflags->pix8(((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
 					}
 					else
 					#endif
 					{
 						int scroll = 0;//scrollram[(cy>>16)&0x3ff]);
-						UINT16 data =  BITMAP_ADDR16(srcbitmap,
-											   (cy >> 16) & ymask,
-											   ((cx >> 16) - scroll) & xmask)[0];
+						UINT16 data =  srcbitmap->pix16(
+											   (cy >> 16) & ymask, 
+											   ((cx >> 16) - scroll) & xmask);
 
 
 						if ((data & transmask)!=0)
 							dest[0] = data;
 
-						//destflags[0] = BITMAP_ADDR8(srcbitmapflags, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+						//destflags[0] = &srcbitmapflags->pix8((cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
 					}
 				}
 
@@ -772,8 +772,8 @@ static SCREEN_UPDATE( supracan )
 		{
 			const rectangle &visarea = screen.visible_area();
 
-			bitmap_fill(state->m_sprite_final_bitmap, &visarea, 0x00);
-			bitmap_fill(bitmap, &visarea, 0x80);
+			state->m_sprite_final_bitmap->fill(0x00, visarea);
+			bitmap->fill(0x80, visarea);
 
 			draw_sprites(screen.machine(), state->m_sprite_final_bitmap, &visarea);
 		}
@@ -781,8 +781,8 @@ static SCREEN_UPDATE( supracan )
 	else
 	{
 
-		bitmap_fill(state->m_sprite_final_bitmap, cliprect, 0x00);
-		bitmap_fill(bitmap, cliprect, 0x80);
+		state->m_sprite_final_bitmap->fill(0x00, *cliprect);
+		bitmap->fill(0x80, *cliprect);
 
 		draw_sprites(screen.machine(), state->m_sprite_final_bitmap, cliprect);
 	}
@@ -861,7 +861,7 @@ static SCREEN_UPDATE( supracan )
 						for (y=cliprect->min_y;y<=cliprect->max_y;y++)
 						{
 							// these will have to change to ADDR32 etc. once alpha blending is supported
-							UINT16* screen = BITMAP_ADDR16(bitmap, y, 0);
+							UINT16* screen = &bitmap->pix16(y);
 
 							int actualy = y&mosaic_mask;
 
@@ -872,7 +872,7 @@ static SCREEN_UPDATE( supracan )
 									continue;
 
 
-							UINT16* src = BITMAP_ADDR16(src_bitmap, (realy)&((ysize*8)-1), 0);
+							UINT16* src = &src_bitmap->pix16((realy)&((ysize*8)-1));
 
 							for (x=cliprect->min_x;x<=cliprect->max_x;x++)
 							{
@@ -972,8 +972,8 @@ static SCREEN_UPDATE( supracan )
 	{
 		for (int y=cliprect->min_y;y<=cliprect->max_y;y++)
 		{
-			UINT16* src = BITMAP_ADDR16( state->m_sprite_final_bitmap, y, 0);
-			UINT16* dst = BITMAP_ADDR16( bitmap, y, 0);
+			UINT16* src = &state->m_sprite_final_bitmap->pix16(y);
+			UINT16* dst = &bitmap->pix16(y);
 
 			for (int x=cliprect->min_x;x<=cliprect->max_x;x++)
 			{

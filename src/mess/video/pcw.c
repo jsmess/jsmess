@@ -12,7 +12,7 @@
 
 INLINE void pcw_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
-	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+	bitmap->pix16(y, x) = (UINT16)color;
 }
 
 /***************************************************************************
@@ -28,7 +28,7 @@ VIDEO_START( pcw )
 	rect.max_y = PCW_PRINTER_HEIGHT - 1;
 
 	state->m_prn_output = auto_bitmap_alloc(machine,PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT,BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(state->m_prn_output,&rect,1);
+	state->m_prn_output->fill(1, rect);
 }
 
 /* two colours */
@@ -85,14 +85,14 @@ SCREEN_UPDATE( pcw )
 		rect.min_y = 0;
 		rect.max_x = PCW_SCREEN_WIDTH;
 		rect.max_y = PCW_BORDER_HEIGHT;
-		bitmap_fill(bitmap, &rect, pen0);
+		bitmap->fill(pen0, rect);
 
 		/* render bottom border */
 		rect.min_x = 0;
 		rect.min_y = PCW_BORDER_HEIGHT + PCW_DISPLAY_HEIGHT;
 		rect.max_x = PCW_SCREEN_WIDTH;
 		rect.max_y = rect.min_y + PCW_BORDER_HEIGHT;
-		bitmap_fill(bitmap, &rect, pen0);
+		bitmap->fill(pen0, rect);
 
 		/* offset to start in table */
 		roller_ram_offs = (state->m_roller_ram_offset<<1);
@@ -180,7 +180,7 @@ SCREEN_UPDATE( pcw )
 		rect.max_x = PCW_SCREEN_WIDTH;
 		rect.max_y = PCW_SCREEN_HEIGHT;
 
-		bitmap_fill(bitmap, &rect, pen0);
+		bitmap->fill(pen0, rect);
 	}
 	return 0;
 }
@@ -197,13 +197,13 @@ SCREEN_UPDATE( pcw_printer )
 	rect.max_y = PCW_PRINTER_HEIGHT - 1;
 	feed = -(state->m_paper_feed / 2);
 	copyscrollbitmap(bitmap,state->m_prn_output,0,NULL,1,&feed,&rect);
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->m_printer_headpos) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->m_printer_headpos) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-3,state->m_printer_headpos) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->m_printer_headpos-1) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->m_printer_headpos-1) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-1,state->m_printer_headpos+1) = 0;
-	*BITMAP_ADDR16(bitmap,PCW_PRINTER_HEIGHT-2,state->m_printer_headpos+1) = 0;
+	bitmap->pix16(PCW_PRINTER_HEIGHT-1, state->m_printer_headpos) = 0;
+	bitmap->pix16(PCW_PRINTER_HEIGHT-2, state->m_printer_headpos) = 0;
+	bitmap->pix16(PCW_PRINTER_HEIGHT-3, state->m_printer_headpos) = 0;
+	bitmap->pix16(PCW_PRINTER_HEIGHT-1, state->m_printer_headpos-1) = 0;
+	bitmap->pix16(PCW_PRINTER_HEIGHT-2, state->m_printer_headpos-1) = 0;
+	bitmap->pix16(PCW_PRINTER_HEIGHT-1, state->m_printer_headpos+1) = 0;
+	bitmap->pix16(PCW_PRINTER_HEIGHT-2, state->m_printer_headpos+1) = 0;
 	return 0;
 }
 

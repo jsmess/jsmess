@@ -70,7 +70,7 @@ static void gf4500_render_screen( running_machine &machine, bitmap_t *bitmap)
 	int x, y;
 	for (y = 0; y < 240; y++)
 	{
-		UINT32 *scanline = BITMAP_ADDR32( bitmap, y, 0);
+		UINT32 *scanline = &bitmap->pix32(y);
 		for (x = 0; x < 320; x++)
 		{
 			*scanline++ = gf4500_get_color_16( *vram++);

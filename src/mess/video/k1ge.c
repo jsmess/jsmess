@@ -271,7 +271,7 @@ INLINE void k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priority, in
 static void k1ge_draw( device_t *device, int line )
 {
 	k1ge_t *k1ge = get_safe_token( device );
-	UINT16 *p = BITMAP_ADDR16( k1ge->bitmap, line, 0 );
+	UINT16 *p = &k1ge->bitmap->pix16(line);
 	UINT16 oowcol = k1ge->vram[0x012] & 0x07;
 	int i;
 
@@ -634,7 +634,7 @@ INLINE void k2ge_k1ge_draw_sprite_plane( k1ge_t *k1ge, UINT16 *p, UINT16 priorit
 static void k2ge_draw( device_t *device, int line )
 {
 	k1ge_t *k1ge = get_safe_token( device );
-	UINT16 *p = BITMAP_ADDR16( k1ge->bitmap, line, 0 );
+	UINT16 *p = &k1ge->bitmap->pix16(line);
 	UINT16 col = 0;
 	UINT16 oowcol;
 	int i;

@@ -360,7 +360,7 @@ MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 
 		for( j=0; j < 8; j++ )
 		{
-			*BITMAP_ADDR16(bitmap, y, i * 8 + j ) = TMS9928A_PALETTE_SIZE + ( ( data & 0x80 ) ? 1 : 0 );
+			bitmap->pix16(y, i * 8 + j ) = TMS9928A_PALETTE_SIZE + ( ( data & 0x80 ) ? 1 : 0 );
 			data = data << 1;
 		}
 	}

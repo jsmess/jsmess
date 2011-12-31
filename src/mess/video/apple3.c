@@ -134,7 +134,7 @@ static void apple3_video_text40(running_machine &machine,bitmap_t *bitmap)
 			{
 				for (col = 0; col < 7; col++)
 				{
-					dest = BITMAP_ADDR16(bitmap, y * 8 + row, x * 14 + col * 2);
+					dest = &bitmap->pix16(y * 8 + row, x * 14 + col * 2);
 					dest[0] = (char_data[row] & (1 << col)) ? fg : bg;
 					dest[1] = (char_data[row] & (1 << col)) ? fg : bg;
 				}
@@ -173,7 +173,7 @@ static void apple3_video_text80(running_machine &machine,bitmap_t *bitmap)
 			{
 				for (col = 0; col < 7; col++)
 				{
-					dest = BITMAP_ADDR16(bitmap, y * 8 + row, x * 14 + col + 0);
+					dest = &bitmap->pix16(y * 8 + row, x * 14 + col + 0);
 					*dest = (char_data[row] & (1 << col)) ? fg : bg;
 				}
 			}
@@ -188,7 +188,7 @@ static void apple3_video_text80(running_machine &machine,bitmap_t *bitmap)
 			{
 				for (col = 0; col < 7; col++)
 				{
-					dest = BITMAP_ADDR16(bitmap, y * 8 + row, x * 14 + col + 7);
+					dest = &bitmap->pix16(y * 8 + row, x * 14 + col + 7);
 					*dest = (char_data[row] & (1 << col)) ? fg : bg;
 				}
 			}
@@ -214,7 +214,7 @@ static void apple3_video_graphics_hgr(running_machine &machine,bitmap_t *bitmap)
 			pix_info = &ram[state->m_hgr_map[y]];
 		else
 			pix_info = &ram[state->m_hgr_map[y] - 0x2000];
-		ptr = BITMAP_ADDR16(bitmap, y, 0);
+		ptr = &bitmap->pix16(y);
 
 		for (i = 0; i < 40; i++)
 		{
@@ -266,7 +266,7 @@ static void apple3_video_graphics_chgr(running_machine &machine,bitmap_t *bitmap
 			pix_info = &ram[state->m_hgr_map[y] - 0x2000];
 			col_info = &ram[state->m_hgr_map[y]];
 		}
-		ptr = BITMAP_ADDR16(bitmap, y, 0);
+		ptr = &bitmap->pix16(y);
 
 		for (i = 0; i < 40; i++)
 		{
@@ -312,7 +312,7 @@ static void apple3_video_graphics_shgr(running_machine &machine,bitmap_t *bitmap
 			pix_info1 = &ram[state->m_hgr_map[y] - 0x2000];
 			pix_info2 = &ram[state->m_hgr_map[y]];
 		}
-		ptr = BITMAP_ADDR16(bitmap, y, 0);
+		ptr = &bitmap->pix16(y);
 
 		for (i = 0; i < 40; i++)
 		{
@@ -342,7 +342,7 @@ static void apple3_video_graphics_chires(running_machine &machine,bitmap_t *bitm
 
 	for (y = 0; y < 192; y++)
 	{
-		pen = BITMAP_ADDR16(bitmap, y, 0);
+		pen = &bitmap->pix16(y);
 		for (i = 0; i < 20; i++)
 		{
 			pix.b.l  = ram[state->m_hgr_map[y] - 0x2000 + (i * 2) + (state->m_flags & VAR_VM2 ? 1 : 0) + 0];

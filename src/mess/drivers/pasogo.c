@@ -409,7 +409,7 @@ static SCREEN_UPDATE( pasogo )
 			{
 				int a=(y&1)*0x2000;
 				UINT8 d=rom[a+(y&~1)*80/2+x/4];
-				UINT16 *line=BITMAP_ADDR16(bitmap, y, x);
+				UINT16 *line=&bitmap->pix16(y, x);
 				*line++=(d>>6)&3;
 				*line++=(d>>4)&3;
 				*line++=(d>>2)&3;
@@ -425,7 +425,7 @@ static SCREEN_UPDATE( pasogo )
 			{
 				int a=(y&3)*0x2000;
 				UINT8 d=rom[a+(y&~3)*80/4+x/8];
-				UINT16 *line=BITMAP_ADDR16(bitmap, y, x);
+				UINT16 *line=&bitmap->pix16(y, x);
 				*line++=c[(d>>7)&1];
 				*line++=c[(d>>6)&1];
 				*line++=c[(d>>5)&1];

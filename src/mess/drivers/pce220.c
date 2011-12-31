@@ -134,11 +134,11 @@ bool pce220_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 					{
 						//first 12 columns
 						int panel1_addr = ((m_lcd_start_line>>3) + y)*0x40 + row_pos;
-						*BITMAP_ADDR16(&bitmap, y*8 + yi, x*6 + xi) = (m_vram[panel1_addr & 0x1ff] >> yi) & 1;
+						bitmap.pix16(y*8 + yi, x*6 + xi) = (m_vram[panel1_addr & 0x1ff] >> yi) & 1;
 
 						//last 12 columns
 						int panel2_addr = ((m_lcd_start_line>>3) + y + 4)*0x40 + (59-row_pos);
-						*BITMAP_ADDR16(&bitmap, y*8 + yi, (x+12)*6 + xi) = (m_vram[panel2_addr & 0x1ff] >> yi) & 1;
+						bitmap.pix16(y*8 + yi, (x+12)*6 + xi) = (m_vram[panel2_addr & 0x1ff] >> yi) & 1;
 					}
 
 					row_pos++;
@@ -153,7 +153,7 @@ bool pce220_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	}
 	else
 	{
-		bitmap_fill(&bitmap, &cliprect, 0);
+		bitmap.fill(0, cliprect);
 		memset(lcd_symbols, 0, sizeof(lcd_symbols));
 	}
 
@@ -218,7 +218,7 @@ bool pcg850v_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 					for (int yi = 0; yi < 8; yi++)
 					{
 						int addr = ((m_lcd_start_line>>3) + y)*0x100 + row_pos;
-						*BITMAP_ADDR16(&bitmap, y*8 + yi, x*6 + xi) = ((m_vram[addr & 0x7ff] >> yi) & 1 ) ? color1 : color0;
+						bitmap.pix16(y*8 + yi, x*6 + xi) = ((m_vram[addr & 0x7ff] >> yi) & 1 ) ? color1 : color0;
 					}
 
 					row_pos++;
@@ -235,7 +235,7 @@ bool pcg850v_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	}
 	else
 	{
-		bitmap_fill(&bitmap, &cliprect, 0);
+		bitmap.fill(0, cliprect);
 		memset(lcd_symbols, 0, sizeof(lcd_symbols));
 	}
 

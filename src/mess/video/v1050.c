@@ -81,7 +81,7 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
 
-			*BITMAP_ADDR16(bitmap, y, x) = color;
+			bitmap->pix16(y, x) = color;
 
 			data <<= 1;
 		}

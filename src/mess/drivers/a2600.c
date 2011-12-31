@@ -1495,12 +1495,14 @@ static READ8_HANDLER(a2600_get_databus_contents)
 	return last_byte;
 }
 
+#if 0
 static const rectangle visarea[4] = {
 	{ 26, 26 + 160 + 16, 24, 24 + 192 + 31 },	/* 262 */
 	{ 26, 26 + 160 + 16, 32, 32 + 228 + 31 },	/* 312 */
 	{ 26, 26 + 160 + 16, 45, 45 + 240 + 31 },	/* 328 */
 	{ 26, 26 + 160 + 16, 48, 48 + 240 + 31 }	/* 342 */
 };
+#endif
 
 static WRITE16_HANDLER( a2600_tia_vsync_callback )
 {

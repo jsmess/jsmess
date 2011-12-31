@@ -111,7 +111,7 @@ SCREEN_UPDATE_MEMBER(cd2650_state)
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = BITMAP_ADDR16(&bitmap, sy++, 0);
+			UINT16 *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 80; x++)
 			{

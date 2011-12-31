@@ -502,7 +502,7 @@ bool jtc_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 			for (x = 0; x < 8; x++)
 			{
 				int color = BIT(data, x);
-				*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = color;
+				bitmap.pix16(y, (sx * 8) + x) = color;
 			}
 		}
 	}
@@ -527,7 +527,7 @@ bool jtces23_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 			for (x = 0; x < 8; x++)
 			{
 				int color = BIT(data, x);
-				*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = color;
+				bitmap.pix16(y, (sx * 8) + x) = color;
 			}
 		}
 	}
@@ -572,7 +572,7 @@ bool jtces40_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 			{
 				int color = (BIT(color_r, x) << 3) | (BIT(color_g, x) << 2) | (BIT(color_b, x) << 1) | BIT(data, x);
 
-				*BITMAP_ADDR16(&bitmap, y, (sx * 8) + x) = color;
+				bitmap.pix16(y, (sx * 8) + x) = color;
 			}
 		}
 	}

@@ -426,13 +426,13 @@ static TIMER_CALLBACK( scv_vb_callback )
 INLINE void plot_sprite_part( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col )
 {
 	if ( pat & 0x08 )
-		*BITMAP_ADDR16( bitmap, y, x ) = col;
+		bitmap->pix16(y, x ) = col;
 	if ( pat & 0x04 && x < 255 )
-		*BITMAP_ADDR16( bitmap, y, x + 1 ) = col;
+		bitmap->pix16(y, x + 1 ) = col;
 	if ( pat & 0x02 && x < 254 )
-		*BITMAP_ADDR16( bitmap, y, x + 2 ) = col;
+		bitmap->pix16(y, x + 2 ) = col;
 	if ( pat & 0x01 && x < 253 )
-		*BITMAP_ADDR16( bitmap, y, x + 3 ) = col;
+		bitmap->pix16(y, x + 3 ) = col;
 }
 
 
@@ -486,26 +486,26 @@ INLINE void draw_text( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 *char_data, UIN
 	{
 		UINT8 d = char_data[i];
 
-		*BITMAP_ADDR16( bitmap, y + i, x + 0 ) = ( d & 0x80 ) ? fg : bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 1 ) = ( d & 0x40 ) ? fg : bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 2 ) = ( d & 0x20 ) ? fg : bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 3 ) = ( d & 0x10 ) ? fg : bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 4 ) = ( d & 0x08 ) ? fg : bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 5 ) = ( d & 0x04 ) ? fg : bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 6 ) = ( d & 0x02 ) ? fg : bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 7 ) = ( d & 0x01 ) ? fg : bg;
+		bitmap->pix16(y + i, x + 0 ) = ( d & 0x80 ) ? fg : bg;
+		bitmap->pix16(y + i, x + 1 ) = ( d & 0x40 ) ? fg : bg;
+		bitmap->pix16(y + i, x + 2 ) = ( d & 0x20 ) ? fg : bg;
+		bitmap->pix16(y + i, x + 3 ) = ( d & 0x10 ) ? fg : bg;
+		bitmap->pix16(y + i, x + 4 ) = ( d & 0x08 ) ? fg : bg;
+		bitmap->pix16(y + i, x + 5 ) = ( d & 0x04 ) ? fg : bg;
+		bitmap->pix16(y + i, x + 6 ) = ( d & 0x02 ) ? fg : bg;
+		bitmap->pix16(y + i, x + 7 ) = ( d & 0x01 ) ? fg : bg;
 	}
 
 	for ( i = 8; i < 16; i++ )
 	{
-		*BITMAP_ADDR16( bitmap, y + i, x + 0 ) = bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 1 ) = bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 2 ) = bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 3 ) = bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 4 ) = bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 5 ) = bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 6 ) = bg;
-		*BITMAP_ADDR16( bitmap, y + i, x + 7 ) = bg;
+		bitmap->pix16(y + i, x + 0 ) = bg;
+		bitmap->pix16(y + i, x + 1 ) = bg;
+		bitmap->pix16(y + i, x + 2 ) = bg;
+		bitmap->pix16(y + i, x + 3 ) = bg;
+		bitmap->pix16(y + i, x + 4 ) = bg;
+		bitmap->pix16(y + i, x + 5 ) = bg;
+		bitmap->pix16(y + i, x + 6 ) = bg;
+		bitmap->pix16(y + i, x + 7 ) = bg;
 	}
 
 }
@@ -520,10 +520,10 @@ INLINE void draw_semi_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 data, UIN
 
 	for ( i = 0; i < 4; i++ )
 	{
-		*BITMAP_ADDR16(bitmap, y + i, x + 0) = fg;
-		*BITMAP_ADDR16(bitmap, y + i, x + 1) = fg;
-		*BITMAP_ADDR16(bitmap, y + i, x + 2) = fg;
-		*BITMAP_ADDR16(bitmap, y + i, x + 3) = fg;
+		bitmap->pix16(y + i, x + 0) = fg;
+		bitmap->pix16(y + i, x + 1) = fg;
+		bitmap->pix16(y + i, x + 2) = fg;
+		bitmap->pix16(y + i, x + 3) = fg;
 	}
 }
 
@@ -534,14 +534,14 @@ INLINE void draw_block_graph( bitmap_t *bitmap, UINT8 x, UINT8 y, UINT8 col )
 
 	for ( i = 0; i < 8; i++ )
 	{
-		*BITMAP_ADDR16(bitmap, y + i, x + 0) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 1) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 2) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 3) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 4) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 5) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 6) = col;
-		*BITMAP_ADDR16(bitmap, y + i, x + 7) = col;
+		bitmap->pix16(y + i, x + 0) = col;
+		bitmap->pix16(y + i, x + 1) = col;
+		bitmap->pix16(y + i, x + 2) = col;
+		bitmap->pix16(y + i, x + 3) = col;
+		bitmap->pix16(y + i, x + 4) = col;
+		bitmap->pix16(y + i, x + 5) = col;
+		bitmap->pix16(y + i, x + 6) = col;
+		bitmap->pix16(y + i, x + 7) = col;
 	}
 }
 
@@ -558,7 +558,7 @@ static SCREEN_UPDATE( scv )
 	int clip_y = state->m_p_videoram[0x1402] >> 4;
 
 	/* Clear the screen */
-	bitmap_fill( bitmap, cliprect, gr_bg );
+	bitmap->fill(gr_bg , *cliprect);
 
 	/* Draw background */
 	for ( y = 0; y < 16; y++ )

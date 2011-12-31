@@ -30,7 +30,7 @@ SCREEN_UPDATE( orao )
 			code = state->m_video_ram[addr++];
 			for (b = 0; b < 8; b++)
 			{
-				*BITMAP_ADDR16(bitmap, y, horpos++) =  (code >> b) & 0x01;
+				bitmap->pix16(y, horpos++) =  (code >> b) & 0x01;
 			}
 		}
 	}

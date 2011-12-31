@@ -1009,9 +1009,9 @@ static void Nick_DoScreen(NICK_STATE *nick, bitmap_t *bm)
 	{
 
 		/* set write address for line */
-		nick->dest = BITMAP_ADDR16(bm, line, 0);
+		nick->dest = &bm->pix16(line);
 		nick->dest_pos = 0;
-		nick->dest_max_pos = bm->width;
+		nick->dest_max_pos = bm->width();
 
 		/* write line */
 		Nick_DoLine(nick);

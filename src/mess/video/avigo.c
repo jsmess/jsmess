@@ -101,7 +101,7 @@ bool avigo_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 			px = x;
 			for (b=7; b>=0; b--)
 			{
-				*BITMAP_ADDR16(&bitmap, y, px) = ((byte>>7) & 0x01);
+				bitmap.pix16(y, px) = ((byte>>7) & 0x01);
 				px++;
 				byte = byte<<1;
 			}

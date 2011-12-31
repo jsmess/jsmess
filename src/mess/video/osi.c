@@ -71,7 +71,7 @@ bool sb2m600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
-					*BITMAP_ADDR16(&bitmap, y, x++) = color;
+					bitmap.pix16(y, x++) = color;
 
 					charrom_data <<= 1;
 				}
@@ -104,8 +104,8 @@ bool sb2m600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 						color = (color ^ BIT(colorram_data, 0)) ? (((colorram_data >> 1) & 0x07) + 2) : 0;
 					}
 
-					*BITMAP_ADDR16(&bitmap, y, x++) = color;
-					*BITMAP_ADDR16(&bitmap, y, x++) = color;
+					bitmap.pix16(y, x++) = color;
+					bitmap.pix16(y, x++) = color;
 
 					charrom_data <<= 1;
 				}
@@ -136,7 +136,7 @@ bool uk101_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 
 			for (bit = 0; bit < 8; bit++)
 			{
-				*BITMAP_ADDR16(&bitmap, y, x) = BIT(charrom_data, 7);
+				bitmap.pix16(y, x) = BIT(charrom_data, 7);
 				x++;
 				charrom_data <<= 1;
 			}

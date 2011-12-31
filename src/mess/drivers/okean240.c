@@ -399,7 +399,7 @@ static SCREEN_UPDATE( okean240 )
 	for (y = 0; y < 256; y++)
 	{
 		ma = y + state->m_scroll;
-		UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 *p = &bitmap->pix16(y);
 
 		for (x = 0; x < 0x4000; x+=0x200)
 		{
