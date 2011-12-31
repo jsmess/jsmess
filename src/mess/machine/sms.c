@@ -1938,6 +1938,10 @@ static void setup_banks( running_machine &machine )
 	{
 		state->m_BIOS = NULL;
 		state->m_bios_port |= IO_BIOS_ROM;
+		state->m_has_bios_0400 = 0;
+		state->m_has_bios_2000 = 0;
+		state->m_has_bios_full = 0;
+		state->m_has_bios = 0;
 	}
 
 	if (state->m_BIOS)
@@ -2196,6 +2200,7 @@ DRIVER_INIT( gamegear )
 	sms_state *state = machine.driver_data<sms_state>();
 	sms_set_zero_flag(machine);
 	state->m_is_gamegear = 1;
+	state->m_has_bios_0400 = 1;
 }
 
 
