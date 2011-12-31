@@ -15,7 +15,7 @@ void pc8401a_state::video_start()
 
 bool pc8401a_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_lcdc->update_screen(&bitmap, &cliprect);
+	m_lcdc->update_screen(&bitmap, cliprect);
 
 	return 0;
 }
@@ -28,16 +28,16 @@ void pc8500_state::video_start()
 
 bool pc8500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_lcdc->update_screen(&bitmap, &cliprect);
+	m_lcdc->update_screen(&bitmap, cliprect);
 
 	/*
     if (strcmp(screen.tag(), SCREEN_TAG) == 0)
     {
-        sed1330_update(m_lcdc, &bitmap, &cliprect);
+        sed1330_update(m_lcdc, &bitmap, cliprect);
     }
     else
     {
-        m_crtc->update(&bitmap, &cliprect);
+        m_crtc->update(&bitmap, cliprect);
     }
     */
 

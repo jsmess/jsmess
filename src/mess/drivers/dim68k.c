@@ -218,7 +218,7 @@ VIDEO_START_MEMBER( dim68k_state )
 
 SCREEN_UPDATE_MEMBER( dim68k_state )
 {
-	m_crtc->update( &bitmap, &cliprect);
+	m_crtc->update( &bitmap, cliprect);
 	return 0;
 }
 

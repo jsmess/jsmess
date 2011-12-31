@@ -794,7 +794,7 @@ SCREEN_UPDATE( intvkbd )
 			for(x=0;x<40;x++)
 			{
 				offs = current_row*64+x;
-				drawgfx_transpen(bitmap, NULL,
+				drawgfx_transpen(bitmap, cliprect,
 					screen.machine().gfx[1],
 					videoram[offs],
 					7, /* white */
@@ -805,7 +805,7 @@ SCREEN_UPDATE( intvkbd )
 			{
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
-				drawgfx_transpen(bitmap, NULL,
+				drawgfx_transpen(bitmap, cliprect,
 					screen.machine().gfx[1],
 					191, /* a block */
 					7,   /* white   */

@@ -154,7 +154,7 @@ SCREEN_UPDATE( pc1403 )
 	int x, y, i, j;
 	int color[3];
 
-	bitmap->fill(11, *cliprect);
+	bitmap->fill(11, cliprect);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = 7; // pocketc_colortable[CONTRAST][0];
@@ -165,37 +165,37 @@ SCREEN_UPDATE( pc1403 )
 	{
 		for (x=state->m_RIGHT, y=state->m_DOWN, i=0; i<6*5; x+=2) {
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=9*5; i<12*5; x+=2)
 		{
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=6*5; i<9*5; x+=2)
 		{
 			for (j=0; j<5; j++, i++, x+=2)
-			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b-3*5; i>0x7b-6*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-				drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
+				drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b; i>0x7b-3*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b-6*5; i>0x7b-12*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-			drawgfx_opaque(bitmap, 0, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0], state->m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 	}

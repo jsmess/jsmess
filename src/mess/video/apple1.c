@@ -90,7 +90,7 @@ static TILE_GET_INFO(terminal_gettileinfo)
 		0);			/* flags */
 }
 
-static void terminal_draw(running_machine &machine, bitmap_t *dest, const rectangle *cliprect, terminal_t *terminal)
+static void terminal_draw(running_machine &machine, bitmap_t *dest, const rectangle &cliprect, terminal_t *terminal)
 {
 	apple1_state *state = machine.driver_data<apple1_state>();
 	state->m_current_terminal = terminal;
@@ -396,6 +396,6 @@ SCREEN_UPDATE( apple1 )
 {
 	apple1_state *state = screen.machine().driver_data<apple1_state>();
 	apple1_vh_cursor_blink(screen.machine());
-	terminal_draw(screen.machine(), bitmap, NULL, state->m_terminal);
+	terminal_draw(screen.machine(), bitmap, cliprect, state->m_terminal);
 	return 0;
 }

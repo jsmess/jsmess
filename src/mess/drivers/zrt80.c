@@ -199,7 +199,7 @@ VIDEO_START_MEMBER( zrt80_state )
 
 SCREEN_UPDATE_MEMBER( zrt80_state )
 {
-	m_crtc->update(&bitmap, &cliprect);
+	m_crtc->update(&bitmap, cliprect);
 	return 0;
 }
 

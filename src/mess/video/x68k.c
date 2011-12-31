@@ -996,9 +996,9 @@ static void x68k_draw_sprites(running_machine &machine, bitmap_t* bitmap, int pr
 			sx += state->m_sprite_shift;
 
 			if(state->m_crtc.interlace != 0)
-				drawgfxzoom_transpen(bitmap,&cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->m_crtc.hbegin+sx,state->m_crtc.vbegin+(sy*2),0x10000,0x20000,0x00);
+				drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->m_crtc.hbegin+sx,state->m_crtc.vbegin+(sy*2),0x10000,0x20000,0x00);
 			else
-				drawgfx_transpen(bitmap,&cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->m_crtc.hbegin+sx,state->m_crtc.vbegin+sy,0x00);
+				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],code,colour+0x10,xflip,yflip,state->m_crtc.hbegin+sx,state->m_crtc.vbegin+sy,0x00);
 		}
 	}
 }
@@ -1137,7 +1137,7 @@ SCREEN_UPDATE( x68000 )
 	}
 //  rect.max_x=state->m_crtc.width;
 //  rect.max_y=state->m_crtc.height;
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	if(state->m_sysport.contrast == 0)  // if monitor contrast is 0, then don't bother displaying anything
 		return 0;
@@ -1149,10 +1149,10 @@ SCREEN_UPDATE( x68000 )
 	rect.max_x=state->m_crtc.hend;
 	rect.max_y=state->m_crtc.vend;
 
-	if(rect.min_y < cliprect->min_y)
-		rect.min_y = cliprect->min_y;
-	if(rect.max_y > cliprect->max_y)
-		rect.max_y = cliprect->max_y;
+	if(rect.min_y < cliprect.min_y)
+		rect.min_y = cliprect.min_y;
+	if(rect.max_y > cliprect.max_y)
+		rect.max_y = cliprect.max_y;
 
 	// update tiles
 	//rom = screen.machine().region("user1")->base();
@@ -1186,13 +1186,13 @@ SCREEN_UPDATE( x68000 )
 				{
 					tilemap_set_scrollx(x68k_bg0,0,(state->m_spritereg[0x402] - state->m_crtc.hbegin) & 0x3ff);
 					tilemap_set_scrolly(x68k_bg0,0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
-					tilemap_draw(bitmap,&rect,x68k_bg0,0,0);
+					tilemap_draw(bitmap,rect,x68k_bg0,0,0);
 				}
 				else
 				{
 					tilemap_set_scrollx(x68k_bg1,0,(state->m_spritereg[0x402] - state->m_crtc.hbegin) & 0x3ff);
 					tilemap_set_scrolly(x68k_bg1,0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
-					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
+					tilemap_draw(bitmap,rect,x68k_bg1,0,0);
 				}
 			}
 			x68k_draw_sprites(screen.machine(),bitmap,2,rect);
@@ -1202,13 +1202,13 @@ SCREEN_UPDATE( x68000 )
 				{
 					tilemap_set_scrollx(x68k_bg0,0,(state->m_spritereg[0x400] - state->m_crtc.hbegin) & 0x3ff);
 					tilemap_set_scrolly(x68k_bg0,0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
-					tilemap_draw(bitmap,&rect,x68k_bg0,0,0);
+					tilemap_draw(bitmap,rect,x68k_bg0,0,0);
 				}
 				else
 				{
 					tilemap_set_scrollx(x68k_bg1,0,(state->m_spritereg[0x400] - state->m_crtc.hbegin) & 0x3ff);
 					tilemap_set_scrolly(x68k_bg1,0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
-					tilemap_draw(bitmap,&rect,x68k_bg1,0,0);
+					tilemap_draw(bitmap,rect,x68k_bg1,0,0);
 				}
 			}
 			x68k_draw_sprites(screen.machine(),bitmap,3,rect);

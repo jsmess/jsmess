@@ -147,7 +147,7 @@ public:
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	void hr_update(bitmap_t *bitmap, const rectangle *cliprect);
+	void hr_update(bitmap_t *bitmap, const rectangle &cliprect);
 };
 
 class abc800c_state : public abc800_state
@@ -162,7 +162,7 @@ public:
 
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	void hr_update(bitmap_t *bitmap, const rectangle *cliprect);
+	void hr_update(bitmap_t *bitmap, const rectangle &cliprect);
 };
 
 // ======================> abc802_state
@@ -230,7 +230,7 @@ public:
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
-	void hr_update(bitmap_t *bitmap, const rectangle *cliprect);
+	void hr_update(bitmap_t *bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mai_r );
 	DECLARE_WRITE8_MEMBER( mao_w );

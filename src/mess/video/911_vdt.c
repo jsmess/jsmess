@@ -494,7 +494,7 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 /*
     Video refresh
 */
-void vdt911_refresh(device_t *device, bitmap_t *bitmap, int x, int y)
+void vdt911_refresh(device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int x, int y)
 {
 	vdt_t *vdt = get_safe_token(device);
 	const gfx_element *gfx = device->machine().gfx[vdt->model];
@@ -538,7 +538,7 @@ void vdt911_refresh(device_t *device, bitmap_t *bitmap, int x, int y)
 
 				address++;
 
-				drawgfx_opaque(bitmap, NULL, gfx, cur_char, color, 0, 0,
+				drawgfx_opaque(bitmap, cliprect, gfx, cur_char, color, 0, 0,
 						x+j*7, y+i*10);
 			}
 		}

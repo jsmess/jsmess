@@ -67,7 +67,7 @@ SCREEN_UPDATE( electron )
 	int x = 0;
 	int pal[16];
 	int scanline = screen.vpos();
-	rectangle r = *cliprect;
+	rectangle r = cliprect;
 	r.min_y = r.max_y = scanline;
 
 	/* set up palette */

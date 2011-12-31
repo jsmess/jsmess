@@ -462,7 +462,7 @@ static int get_tilemap_dimensions(running_machine &machine, int &xsize, int &ysi
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 	UINT16 *supracan_vram = state->m_vram;
@@ -634,7 +634,7 @@ static void mark_active_tilemap_all_dirty(running_machine &machine, int layer)
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t* bitmap, const rectangle *cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, UINT32* scrollram*/, int transmask)
+static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t* bitmap, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, UINT32* scrollram*/, int transmask)
 {
 	//bitmap_t *destbitmap = bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
@@ -658,14 +658,14 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t* bitma
 	//int destadvance = destbitmap->bpp / 8;
 
 	/* pre-advance based on the cliprect */
-	startx += cliprect->min_x * incxx + cliprect->min_y * incyx;
-	starty += cliprect->min_x * incxy + cliprect->min_y * incyy;
+	startx += cliprect.min_x * incxx + cliprect.min_y * incyx;
+	starty += cliprect.min_x * incxy + cliprect.min_y * incyy;
 
 	/* extract start/end points */
-	sx = cliprect->min_x;
-	sy = cliprect->min_y;
-	ex = cliprect->max_x;
-	ey = cliprect->max_y;
+	sx = cliprect.min_x;
+	sy = cliprect.min_y;
+	ex = cliprect.max_x;
+	ey = cliprect.max_y;
 
 	{
 		/* loop over rows */
@@ -768,21 +768,21 @@ static SCREEN_UPDATE( supracan )
 
 	if (0)
 	{
-		if (cliprect->min_y == 0x00)
+		if (cliprect.min_y == 0x00)
 		{
 			const rectangle &visarea = screen.visible_area();
 
 			state->m_sprite_final_bitmap->fill(0x00, visarea);
 			bitmap->fill(0x80, visarea);
 
-			draw_sprites(screen.machine(), state->m_sprite_final_bitmap, &visarea);
+			draw_sprites(screen.machine(), state->m_sprite_final_bitmap, visarea);
 		}
 	}
 	else
 	{
 
-		state->m_sprite_final_bitmap->fill(0x00, *cliprect);
-		bitmap->fill(0x80, *cliprect);
+		state->m_sprite_final_bitmap->fill(0x00, cliprect);
+		bitmap->fill(0x80, cliprect);
 
 		draw_sprites(screen.machine(), state->m_sprite_final_bitmap, cliprect);
 	}
@@ -858,7 +858,7 @@ static SCREEN_UPDATE( supracan )
 						int y,x;
 						// yes, it will draw a single line if you specify a cliprect as such (partial updates...)
 
-						for (y=cliprect->min_y;y<=cliprect->max_y;y++)
+						for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 						{
 							// these will have to change to ADDR32 etc. once alpha blending is supported
 							UINT16* screen = &bitmap->pix16(y);
@@ -874,7 +874,7 @@ static SCREEN_UPDATE( supracan )
 
 							UINT16* src = &src_bitmap->pix16((realy)&((ysize*8)-1));
 
-							for (x=cliprect->min_x;x<=cliprect->max_x;x++)
+							for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 							{
 								int actualx = x & mosaic_mask;
 								int realx = actualx+scrollx;
@@ -929,11 +929,11 @@ static SCREEN_UPDATE( supracan )
 						if (!(state->m_roz_mode & 0x0200) && (state->m_roz_mode&0xf000) ) // HACK - Not Trusted, Acan Logo, Speedy Dragon Intro ,Speed Dragon Bonus stage need it.  Monopoly and JTT *don't* causes graphical issues
 						{
 							// NOT accurate, causes issues when the attract mode loops and the logo is shown the 2nd time in some games - investigate
-							for (int y=cliprect->min_y;y<=cliprect->max_y;y++)
+							for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 							{
 								rectangle clip;
-								clip.min_x = cliprect->min_x;
-								clip.max_x = cliprect->max_x;
+								clip.min_x = cliprect.min_x;
+								clip.max_x = cliprect.max_x;
 
 								clip.min_y = clip.max_y = y;
 
@@ -953,7 +953,7 @@ static SCREEN_UPDATE( supracan )
 
 
 								if (state->m_vram[state->m_roz_unk_base0/2 + y]) // incxx = 0, no draw?
-									supracan_suprnova_draw_roz(screen.machine(), bitmap, &clip, state->m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
+									supracan_suprnova_draw_roz(screen.machine(), bitmap, clip, state->m_tilemap_sizes[layer][which_tilemap_size], scrollx<<8, scrolly<<8, incxx<<8, incxy<<8, incyx<<8, incyy<<8, wrap, transmask);
 							}
 						}
 						else
@@ -970,12 +970,12 @@ static SCREEN_UPDATE( supracan )
 	// just draw the sprites on top for now
 	if(state->m_video_flags & 0x08)
 	{
-		for (int y=cliprect->min_y;y<=cliprect->max_y;y++)
+		for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 		{
 			UINT16* src = &state->m_sprite_final_bitmap->pix16(y);
 			UINT16* dst = &bitmap->pix16(y);
 
-			for (int x=cliprect->min_x;x<=cliprect->max_x;x++)
+			for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
 			{
 				UINT16 dat = src[x];
 				if (dat) dst[x] = dat;

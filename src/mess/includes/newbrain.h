@@ -107,7 +107,7 @@ public:
 	void tvram_w(UINT8 data, int a6);
 	inline int get_reset_t();
 	inline int get_pwrup_t();
-	void screen_update(bitmap_t *bitmap, const rectangle *cliprect);
+	void screen_update(bitmap_t *bitmap, const rectangle &cliprect);
 
 	// processor state
 	int m_pwrup;			// power up

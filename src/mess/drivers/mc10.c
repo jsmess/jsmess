@@ -227,9 +227,9 @@ READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 bool mc10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (m_mc6847)		//mc10, alice
-		return m_mc6847->update(&bitmap, &cliprect);
+		return m_mc6847->update(&bitmap, cliprect);
 	else if (m_ef9345)	//alice32
-		m_ef9345->video_update(&bitmap, &cliprect);
+		m_ef9345->video_update(&bitmap, cliprect);
 
 	return 0;
 }

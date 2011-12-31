@@ -729,7 +729,7 @@ static PALETTE_INIT( ql )
 
 bool ql_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_zx8301->update_screen(&bitmap, &cliprect);
+	m_zx8301->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

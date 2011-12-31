@@ -309,7 +309,7 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 
 bool studio2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_vdc->update_screen(&bitmap, &cliprect);
+	m_vdc->update_screen(&bitmap, cliprect);
 
 	return 0;
 }
@@ -357,7 +357,7 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 
 bool mpt02_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_cti->update_screen(&bitmap, &cliprect);
+	m_cti->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

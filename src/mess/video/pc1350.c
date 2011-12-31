@@ -136,7 +136,7 @@ SCREEN_UPDATE( pc1350 )
 	int color[4];
 	running_machine &machine = screen.machine();
 
-	bitmap->fill(11, *cliprect);
+	bitmap->fill(11, cliprect);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = pocketc_colortable[PC1350_CONTRAST][0];

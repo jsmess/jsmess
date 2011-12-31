@@ -234,7 +234,7 @@ static SCREEN_UPDATE( z100 )
 	int dot;
 	int i;
 
-	bitmap->fill(0, *cliprect);
+	bitmap->fill(0, cliprect);
 
 	for(y=0;y<mc6845_v_display;y++)
 	{

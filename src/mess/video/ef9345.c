@@ -955,7 +955,7 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
             EF9345 interface
 **************************************************************/
 
-void ef9345_device::video_update(bitmap_t *bitmap, const rectangle *cliprect)
+void ef9345_device::video_update(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_screen_out, 0, 0, 0, 0, cliprect);
 }

@@ -558,7 +558,7 @@ static SCREEN_UPDATE( scv )
 	int clip_y = state->m_p_videoram[0x1402] >> 4;
 
 	/* Clear the screen */
-	bitmap->fill(gr_bg , *cliprect);
+	bitmap->fill(gr_bg , cliprect);
 
 	/* Draw background */
 	for ( y = 0; y < 16; y++ )

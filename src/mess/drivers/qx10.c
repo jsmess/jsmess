@@ -970,7 +970,7 @@ bool qx10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const re
 	bitmap.fill(0, cliprect);
 
 	/* graphics */
-	m_hgdc->update_screen(&bitmap, &cliprect);
+	m_hgdc->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

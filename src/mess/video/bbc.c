@@ -663,7 +663,7 @@ SCREEN_UPDATE( bbc )
     bbc_state *state = screen.machine().driver_data<bbc_state>();
     long c;
 
-    //logerror ("Box %d by %d \n",cliprect->min_y,cliprect->max_y);
+    //logerror ("Box %d by %d \n",cliprect.min_y,cliprect.max_y);
 
     c = 0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
 
@@ -688,7 +688,7 @@ SCREEN_UPDATE( bbc )
     // or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
     while((!state->m_BBC_VSync)&&(c<60000))
     {
-        if ((state->m_y_screen_pos>=cliprect->min_y) && (state->m_y_screen_pos<=cliprect->max_y)) (state->m_draw_function)(screen.machine());
+        if ((state->m_y_screen_pos>=cliprect.min_y) && (state->m_y_screen_pos<=cliprect.max_y)) (state->m_draw_function)(screen.machine());
 
         // and check the cursor
         if (state->m_VideoULA_CR) BBC_Clock_CR(state);

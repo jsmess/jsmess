@@ -196,7 +196,7 @@ SCREEN_UPDATE( pcw_printer )
 	rect.max_x = PCW_PRINTER_WIDTH - 1;
 	rect.max_y = PCW_PRINTER_HEIGHT - 1;
 	feed = -(state->m_paper_feed / 2);
-	copyscrollbitmap(bitmap,state->m_prn_output,0,NULL,1,&feed,&rect);
+	copyscrollbitmap(bitmap,state->m_prn_output,0,NULL,1,&feed,rect);
 	bitmap->pix16(PCW_PRINTER_HEIGHT-1, state->m_printer_headpos) = 0;
 	bitmap->pix16(PCW_PRINTER_HEIGHT-2, state->m_printer_headpos) = 0;
 	bitmap->pix16(PCW_PRINTER_HEIGHT-3, state->m_printer_headpos) = 0;

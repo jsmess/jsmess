@@ -198,7 +198,7 @@ static void fake_keyboard_data(running_machine &machine)
 	keyb_press(KEYCODE_ASTERISK, '*');
 }
 
-static void draw_cg4_screen(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
+static void draw_cg4_screen(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int width)
 {
 	UINT8 *vram = machine.region("vram")->base();
 	int x,y,xi,yi;
@@ -229,7 +229,7 @@ static void draw_cg4_screen(running_machine &machine, bitmap_t *bitmap,const rec
 	}
 }
 
-static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
+static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int width)
 {
 	pasopia7_state *state = machine.driver_data<pasopia7_state>();
 	UINT8 *vram = machine.region("vram")->base();
@@ -288,7 +288,7 @@ static void draw_tv_screen(running_machine &machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int width)
+static void draw_mixed_screen(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int width)
 {
 	pasopia7_state *state = machine.driver_data<pasopia7_state>();
 	UINT8 *vram = machine.region("vram")->base();
@@ -373,7 +373,7 @@ static SCREEN_UPDATE( pasopia7 )
 	pasopia7_state *state = screen.machine().driver_data<pasopia7_state>();
 	int width;
 
-	bitmap->fill(screen.machine().pens[0], *cliprect);
+	bitmap->fill(screen.machine().pens[0], cliprect);
 
 	fake_keyboard_data(screen.machine());
 

@@ -243,7 +243,7 @@ static void asr_draw_char(device_t *device, int character, int x, int y, int col
 {
 	asr_t *asr = get_safe_token(device);
 
-	drawgfx_opaque(asr->bitmap, NULL, device->machine().gfx[0], character-32, color, 0, 0,
+	drawgfx_opaque(asr->bitmap, asr->bitmap->cliprect(), device->machine().gfx[0], character-32, color, 0, 0,
 				x+1, y);
 }
 
@@ -455,7 +455,7 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 void asr733_refresh(device_t *device, bitmap_t *bitmap, int x, int y)
 {
 	asr_t *asr = get_safe_token(device);
-	copybitmap(bitmap, asr->bitmap, 0, 0, x, y, NULL);
+	copybitmap(bitmap, asr->bitmap, 0, 0, x, y, asr->bitmap->cliprect());
 }
 
 

@@ -1064,7 +1064,7 @@ static SCREEN_UPDATE( px4 )
 	else
 	{
 		/* display is disabled, draw an empty screen */
-		bitmap->fill(0, *cliprect);
+		bitmap->fill(0, cliprect);
 	}
 
 	return 0;

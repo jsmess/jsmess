@@ -313,7 +313,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-static void generic_terminal_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+static void generic_terminal_update(device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	terminal_state *term = get_safe_token(device);
 	UINT8 options = input_port_read(device, "TERM_CONF");

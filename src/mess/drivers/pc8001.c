@@ -320,7 +320,7 @@ void pc8001_state::video_start()
 
 bool pc8001_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update_screen(&bitmap, &cliprect);
+	m_crtc->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

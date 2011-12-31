@@ -712,16 +712,16 @@ ATTR_FORCE_INLINE mc6847_base_device::pixel_t mc6847_base_device::border_value(U
 //  update
 //-------------------------------------------------
 
-bool mc6847_base_device::update(bitmap_t *bitmap, const rectangle *cliprect)
+bool mc6847_base_device::update(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	int base_x = 32;
 	int base_y = 25;
 	int x, x2, y;
 	bool is_mc6847t1 = (type() == MC6847T1_NTSC) || (type() == MC6847T1_PAL);
-	int min_x = USE_HORIZONTAL_CLIP ? cliprect->min_x : 0;
-	int max_x = USE_HORIZONTAL_CLIP ? cliprect->max_x : (base_x * 2 + 256 - 1);
-	int min_y = cliprect->min_y;
-	int max_y = cliprect->max_y;
+	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
+	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + 256 - 1);
+	int min_y = cliprect.min_y;
+	int max_y = cliprect.max_y;
 	const pixel_t *palette = m_palette;
 
 	/* if the video didn't change, indicate as much */

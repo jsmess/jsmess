@@ -1757,13 +1757,13 @@ ATTR_FORCE_INLINE void gime_base_device::render_scanline(const scanline_record *
 //  update_screen
 //-------------------------------------------------
 
-bool gime_base_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect, const pixel_t *RESTRICT palette)
+bool gime_base_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect, const pixel_t *RESTRICT palette)
 {
 	int base_x = 64;
-	int min_x = USE_HORIZONTAL_CLIP ? cliprect->min_x : 0;
-	int max_x = USE_HORIZONTAL_CLIP ? cliprect->max_x : (base_x * 2 + 512 - 1);
-	int min_y = cliprect->min_y;
-	int max_y = cliprect->max_y;
+	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
+	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + 512 - 1);
+	int min_y = cliprect.min_y;
+	int max_y = cliprect.max_y;
 	palette_resolver resolver(this, palette);
 
 	/* if the video didn't change, indicate as much */
@@ -1858,7 +1858,7 @@ bool gime_base_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect
 //  update_composite
 //-------------------------------------------------
 
-bool gime_base_device::update_composite(bitmap_t *bitmap, const rectangle *cliprect)
+bool gime_base_device::update_composite(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	update_value(&m_displayed_rgb, false);
 	const pixel_t *palette = (m_gime_registers[0x08] & 0x10)
@@ -1873,7 +1873,7 @@ bool gime_base_device::update_composite(bitmap_t *bitmap, const rectangle *clipr
 //  update_rgb
 //-------------------------------------------------
 
-bool gime_base_device::update_rgb(bitmap_t *bitmap, const rectangle *cliprect)
+bool gime_base_device::update_rgb(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	update_value(&m_displayed_rgb, true);
 	return update_screen(bitmap, cliprect, m_rgb_palette);

@@ -146,7 +146,7 @@ static SCREEN_UPDATE( poly )
 {
 	device_t *saa5050 = screen.machine().device("saa5050");
 
-	saa5050_update(saa5050, bitmap, NULL);
+	saa5050_update(saa5050, bitmap, cliprect);
 	return 0;
 }
 

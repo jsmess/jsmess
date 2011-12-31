@@ -327,7 +327,7 @@ void phc25_state::video_start()
 
 bool phc25_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_vdg->update(&bitmap, &cliprect);
+	return m_vdg->update(&bitmap, cliprect);
 }
 
 /* AY-3-8910 Interface */

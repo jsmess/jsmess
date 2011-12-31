@@ -1949,7 +1949,7 @@ void vic3_raster_interrupt_gen( device_t *device )
 		}
 }
 
-UINT32 vic3_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 vic3_video_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	vic3_state *vic3 = get_safe_token(device);
 

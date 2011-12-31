@@ -42,7 +42,7 @@ public:
 	READ8_MEMBER( data_r );
 	WRITE8_MEMBER( data_w );
 	void update_scanline(UINT16 scanline);
-	void video_update(bitmap_t *bitmap, const rectangle *cliprect);
+	void video_update(bitmap_t *bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides

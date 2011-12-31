@@ -88,7 +88,7 @@ public:
     DECLARE_READ8_MEMBER( data_r );
     DECLARE_WRITE8_MEMBER( data_w );
 
-	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides

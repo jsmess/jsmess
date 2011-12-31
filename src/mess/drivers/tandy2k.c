@@ -509,7 +509,7 @@ bool tandy2k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 {
 	if (m_vidouts)
 	{
-		m_vac->update_screen(&bitmap, &cliprect);
+		m_vac->update_screen(&bitmap, cliprect);
 	}
 
 	return 0;

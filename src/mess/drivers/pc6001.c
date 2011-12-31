@@ -201,7 +201,7 @@ static VIDEO_START( pc6001 )
 }
 
 /* this is known as gfx mode 4 */
-static void draw_gfx_mode4(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
+static void draw_gfx_mode4(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int attr)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
 	int x,y,xi;
@@ -254,7 +254,7 @@ static void draw_gfx_mode4(running_machine &machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static void draw_bitmap_2bpp(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int attr)
+static void draw_bitmap_2bpp(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect, int attr)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
 	int color,x,y,xi,yi;
@@ -286,7 +286,7 @@ static void draw_bitmap_2bpp(running_machine &machine, bitmap_t *bitmap,const re
 	}
 }
 
-static void draw_tile_3bpp(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int tile,int attr)
+static void draw_tile_3bpp(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int x,int y,int tile,int attr)
 {
 	int color,pen,xi,yi;
 
@@ -318,7 +318,7 @@ static void draw_tile_3bpp(running_machine &machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static void draw_tile_text(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int tile,int attr,int has_mc6847)
+static void draw_tile_text(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847)
 {
 	int xi,yi,pen,fgcol,color;
 	UINT8 *gfx_data = machine.region("gfx1")->base();
@@ -354,7 +354,7 @@ static void draw_tile_text(running_machine &machine, bitmap_t *bitmap,const rect
 	}
 }
 
-static void draw_border(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int attr,int has_mc6847)
+static void draw_border(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect,int attr,int has_mc6847)
 {
 	int x,y,color;
 
@@ -376,7 +376,7 @@ static void draw_border(running_machine &machine, bitmap_t *bitmap,const rectang
 	}
 }
 
-static void pc6001_screen_draw(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect, int has_mc6847)
+static void pc6001_screen_draw(running_machine &machine, bitmap_t *bitmap,const rectangle &cliprect, int has_mc6847)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
 	int x,y;

@@ -403,7 +403,7 @@ offs_t pc1512_state::get_char_rom_offset()
 	return ((input_port_read(machine(), "LK") >> 5) & 0x03) << 11;
 }
 
-void pc1512_state::draw_alpha(mc6845_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_alpha(mc6845_device *device, bitmap_t *bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	offs_t char_rom_offset = get_char_rom_offset();
 	UINT16 *p = &bitmap->pix16(y + VFP_HIRES, HFP_HIRES);
@@ -472,7 +472,7 @@ int pc1512_state::get_color(UINT8 data)
 	return color;
 };
 
-void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_t *bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 199) return;
 
@@ -492,7 +492,7 @@ void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_t *bitmap, cons
 	}
 }
 
-void pc1512_state::draw_graphics_2(mc6845_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_graphics_2(mc6845_device *device, bitmap_t *bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 199) return;
 
@@ -612,7 +612,7 @@ bool pc1512_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 			break;
 		}
 
-		m_vdu->update(&bitmap, &cliprect);
+		m_vdu->update(&bitmap, cliprect);
 	}
 	else
 	{

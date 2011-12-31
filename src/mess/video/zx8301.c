@@ -319,7 +319,7 @@ void zx8301_device::draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da)
 //  update_screen -
 //-------------------------------------------------
 
-void zx8301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+void zx8301_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 {
 	if (!m_dispoff)
 	{
@@ -341,6 +341,6 @@ void zx8301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap->fill(get_black_pen(machine()), *cliprect);
+		bitmap->fill(get_black_pen(machine()), cliprect);
 	}
 }

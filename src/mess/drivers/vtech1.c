@@ -616,7 +616,7 @@ static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 
 bool vtech1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_mc6847->update(&bitmap, &cliprect);
+	return m_mc6847->update(&bitmap, cliprect);
 }
 
 

@@ -40,7 +40,7 @@ SCREEN_UPDATE_MEMBER( mz6500_state )
 	bitmap.fill(0, cliprect);
 
 	/* graphics */
-	m_hgdc->update_screen(&bitmap, &cliprect);
+	m_hgdc->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

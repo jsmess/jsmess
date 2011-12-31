@@ -348,7 +348,7 @@ INPUT_PORTS_END
 
 bool atom_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_vdg->update(&bitmap, &cliprect);
+	return m_vdg->update(&bitmap, cliprect);
 }
 
 /***************************************************************************

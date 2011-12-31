@@ -650,11 +650,10 @@ static void update_cursor_state(crtc_ega_t *crtc_ega)
 }
 
 
-void crtc_ega_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void crtc_ega_update(device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
 {
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 	assert(bitmap != NULL);
-	assert(cliprect != NULL);
 
 	if (crtc_ega->has_valid_parameters)
 	{
@@ -669,7 +668,7 @@ void crtc_ega_update(device_t *device, bitmap_t *bitmap, const rectangle *clipre
 		if (crtc_ega->intf->begin_update != NULL)
 			param = crtc_ega->intf->begin_update(device, bitmap, cliprect);
 
-		if (cliprect->min_y == 0)
+		if (cliprect.min_y == 0)
 		{
 			/* read the start address at the beginning of the frame */
 			crtc_ega->current_disp_addr = crtc_ega->disp_start_addr;
@@ -679,7 +678,7 @@ void crtc_ega_update(device_t *device, bitmap_t *bitmap, const rectangle *clipre
 		}
 
 		/* for each row in the visible region */
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			/* compute the current raster line */
 			UINT8 ra = y % (crtc_ega->max_ras_addr + 1);

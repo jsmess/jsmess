@@ -2581,7 +2581,7 @@ READ8_DEVICE_HANDLER( vic2_port_r )
 	return val;
 }
 
-UINT32 vic2_video_update( device_t *device, bitmap_t *bitmap, const rectangle *cliprect )
+UINT32 vic2_video_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
 {
 	vic2_state *vic2 = get_safe_token(device);
 

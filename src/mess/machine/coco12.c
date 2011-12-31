@@ -127,7 +127,7 @@ void coco12_state::pia1_pb_changed(void)
 
 bool coco12_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_vdg->update(&bitmap, &cliprect);
+	return m_vdg->update(&bitmap, cliprect);
 }
 
 

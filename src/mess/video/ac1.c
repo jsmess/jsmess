@@ -36,7 +36,7 @@ SCREEN_UPDATE( ac1 )
 		for(x = 0; x < 64; x++ )
 		{
 			int code = space->read_byte(AC1_VIDEO_MEMORY + x + y*64);
-			drawgfx_opaque(bitmap, NULL, screen.machine().gfx[0],  code , 0, 0,0, 63*6-x*6,15*8-y*8);
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, 63*6-x*6,15*8-y*8);
 		}
 	}
 	return 0;
@@ -52,7 +52,7 @@ SCREEN_UPDATE( ac1_32 )
 		for(x = 0; x < 64; x++ )
 		{
 			int code = space->read_byte(AC1_VIDEO_MEMORY + x + y*64);
-			drawgfx_opaque(bitmap, NULL, screen.machine().gfx[0],  code , 0, 0,0, 63*6-x*6,31*8-y*8);
+			drawgfx_opaque(bitmap, cliprect, screen.machine().gfx[0],  code , 0, 0,0, 63*6-x*6,31*8-y*8);
 		}
 	}
 	return 0;

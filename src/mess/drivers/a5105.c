@@ -412,7 +412,7 @@ VIDEO_START_MEMBER( a5105_state )
 SCREEN_UPDATE_MEMBER( a5105_state )
 {
 	/* graphics */
-	m_hgdc->update_screen(&bitmap, &cliprect);
+	m_hgdc->update_screen(&bitmap, cliprect);
 
 	return 0;
 }

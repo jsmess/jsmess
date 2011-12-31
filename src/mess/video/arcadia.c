@@ -446,9 +446,9 @@ INLINE void arcadia_draw_char(running_machine &machine, bitmap_t *bitmap, UINT8 
             if (y+1<bitmap->height()) {
                 state->m_bg[y+1][x>>3]|=b>>(x&7);
                 state->m_bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
-                drawgfx_opaque(bitmap, 0, machine.gfx[0], b,colour,
+                drawgfx_opaque(bitmap, bitmap->cliprect(), machine.gfx[0], b,colour,
                         0,0,x,y);
-                drawgfx_opaque(bitmap, 0, machine.gfx[0], b,colour,
+                drawgfx_opaque(bitmap, bitmap->cliprect(), machine.gfx[0], b,colour,
                         0,0,x,y+1);
             }
 		}
@@ -461,7 +461,7 @@ INLINE void arcadia_draw_char(running_machine &machine, bitmap_t *bitmap, UINT8 
             state->m_bg[y][x>>3]|=b>>(x&7);
 	    state->m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-	    drawgfx_opaque(bitmap, 0, machine.gfx[0], b,colour,
+	    drawgfx_opaque(bitmap, bitmap->cliprect(), machine.gfx[0], b,colour,
 		    0,0,x,y);
 		}
     }

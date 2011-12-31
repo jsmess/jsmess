@@ -66,7 +66,7 @@ static SCREEN_UPDATE( m20 )
 	UINT8 pen;
 	UINT32 count;
 
-	bitmap->fill(get_black_pen(screen.machine()), *cliprect);
+	bitmap->fill(get_black_pen(screen.machine()), cliprect);
 
 	count = (0);
 

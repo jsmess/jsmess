@@ -307,7 +307,7 @@ VIDEO_START_MEMBER( h19_state )
 
 SCREEN_UPDATE_MEMBER( h19_state )
 {
-	m_crtc->update( &bitmap, &cliprect);
+	m_crtc->update( &bitmap, cliprect);
 	return 0;
 }
 

@@ -109,7 +109,7 @@ public:
     DECLARE_READ8_MEMBER( vram_r );
     DECLARE_WRITE8_MEMBER( vram_w );
 
-	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
@@ -150,9 +150,9 @@ private:
 	void draw_char(int x, int y);
 	int translate_command(UINT8 data);
 	void process_fifo();
-	void update_text(bitmap_t *bitmap, const rectangle *cliprect);
+	void update_text(bitmap_t *bitmap, const rectangle &cliprect);
 	void draw_graphics_line(bitmap_t *bitmap, UINT32 addr, int y, int wd);
-	void update_graphics(bitmap_t *bitmap, const rectangle *cliprect, int force_bitmap);
+	void update_graphics(bitmap_t *bitmap, const rectangle &cliprect, int force_bitmap);
 
 	devcb_resolved_write_line	m_out_drq_func;
 	devcb_resolved_write_line	m_out_hsync_func;

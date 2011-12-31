@@ -126,7 +126,7 @@ VIDEO_START_MEMBER( mycom_state )
 
 SCREEN_UPDATE_MEMBER( mycom_state )
 {
-	m_crtc->update( &bitmap, &cliprect);
+	m_crtc->update( &bitmap, cliprect);
 	return 0;
 }
 
