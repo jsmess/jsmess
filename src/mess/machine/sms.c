@@ -1040,7 +1040,7 @@ WRITE8_HANDLER( sms_mapper_w )
 		{
 			if (state->m_bios_port & IO_BIOS_ROM || ! state->m_has_bios)
 			{
-				if ( ! ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_NOBANK_MAPPER ) )
+				if ( ! ( state->m_cartridge[state->m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 				{
 					if ( state->m_cartridge[state->m_current_cartridge].features & CF_93C46_EEPROM )
 					{
@@ -1069,7 +1069,7 @@ WRITE8_HANDLER( sms_mapper_w )
 	case 1: /* Select 16k ROM bank for 0400-3FFF */
 		if ( cartridge_selected || state->m_is_gamegear )
 		{
-			if ( ! ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_NOBANK_MAPPER ) )
+			if ( ! ( state->m_cartridge[state->m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 			{
 				state->map_cart_16k( 0x400, data );
 			}
@@ -1083,7 +1083,7 @@ WRITE8_HANDLER( sms_mapper_w )
 	case 2: /* Select 16k ROM bank for 4000-7FFF */
 		if ( cartridge_selected || state->m_is_gamegear )
 		{
-			if ( ! ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_NOBANK_MAPPER ) )
+			if ( ! ( state->m_cartridge[state->m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 			{
 				state->map_cart_16k( 0x4000, data );
 			}
@@ -1104,7 +1104,7 @@ WRITE8_HANDLER( sms_mapper_w )
 
 			if ( ! ( state->m_mapper[0] & 0x08 ) )		// Is RAM disabled
 			{
-				if ( ! ( state->m_cartridge[state->m_current_cartridge].features & CF_KOREAN_NOBANK_MAPPER ) )
+				if ( ! ( state->m_cartridge[state->m_current_cartridge].features & ( CF_KOREAN_NOBANK_MAPPER | CF_KOREAN_ZEMINA_MAPPER ) ) )
 				{
 					state->map_cart_16k( 0x8000, data );
 				}
