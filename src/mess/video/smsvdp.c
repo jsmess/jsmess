@@ -48,7 +48,6 @@ PAL frame timing
 #include "emu.h"
 #include "video/smsvdp.h"
 #include "machine/devhelpr.h"
-#include "debugger.h"
 
 
 #define STATUS_VINT           0x80	/* Pending vertical interrupt flag */
