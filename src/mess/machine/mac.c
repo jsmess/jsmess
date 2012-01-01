@@ -71,7 +71,7 @@
      341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, "Gossamer" G3, others?
                                     (verified found in PMac 5500-225, G3-333)
      341S0262 - 0x???????? (?.??) - some PMac 6500
-     341S0285 - 0x???????? (?.??) - PMac 4400 + Mac clones
+     341S0285 - 0x???????? (?.??) - PMac 4400 + Mac clones ("Cuda Lite" with 768 bytes more ROM + PS/2 keyboard/mouse support)
      341S0417 - 0x???????? (?.??) - Color Classic
      341S0788 - 0x00020025 (2.37) - LC 475/575/Quadra 605, Quadra 660AV/840AV, PMac 7200
      343S0788 - 0x???????? (?.??) - PMac x100 (typo - actually 341S0788?)
@@ -418,7 +418,7 @@ void mac_state::v8_resize()
 		// force unmap of entire RAM region
 		space->unmap_write(0, 0x9fffff, 0x9fffff, 0);
 
-		// LC  2 MB built-in, all other V8-style machines have 4 MB
+		// LC and Classic II have 2 MB built-in, all other V8-style machines have 4 MB
 		// we reserve the first 2 or 4 MB of mess_ram for the onboard,
 		// RAM above that mark is the SIMM
 		onboard_amt = ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_CLASSIC_II)) ? 2*1024*1024 : 4*1024*1024;
@@ -485,7 +485,7 @@ void mac_state::set_memory_overlay(int overlay)
 		if (((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_COLOR_CLASSIC) && ((m_model != MODEL_MAC_LC_III) && (m_model != MODEL_MAC_LC_III_PLUS))) || (m_model == MODEL_MAC_CLASSIC_II))
 		{
 			m_overlay = overlay;
-			this->v8_resize();
+			v8_resize();
 		}
 		else if ((m_model >= MODEL_MAC_POWERMAC_6100) && (m_model >= MODEL_MAC_POWERMAC_8100))
 		{
@@ -1995,9 +1995,9 @@ DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
 				mac->set_memory_overlay(0);		// kill the overlay
 			}
 		}
-		else if ((mac->m_model == MODEL_MAC_LC) || (mac->m_model == MODEL_MAC_LC_II) || (mac->m_model == MODEL_MAC_CLASSIC_II))
+		else if ((mac->m_model == MODEL_MAC_LC) || (mac->m_model == MODEL_MAC_LC_II) || (mac->m_model == MODEL_MAC_CLASSIC_II) || (mac->m_model == MODEL_MAC_COLOR_CLASSIC))
 		{
-			if ((address >= 0xa00000) && (address <= 0xafffff))
+			if (((address >= 0xa00000) && (address <= 0xafffff)) || ((address >= 0x40a00000) && (address <= 0x40afffff)))
 			{
 				mac->set_memory_overlay(0);		// kill the overlay
 			}
@@ -2075,7 +2075,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 
 	memset(mac->m_ram->pointer(), 0, mac->m_ram->size());
 
-	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
+	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) ||
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (mac->m_model >= MODEL_MAC_QUADRA_700 && mac->m_model <= MODEL_MAC_QUADRA_800))
 	{
