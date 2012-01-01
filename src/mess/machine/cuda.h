@@ -71,7 +71,7 @@ public:
     void set_tip(UINT8 val) { tip = val; }
     void set_byteack(UINT8 val) { byteack = val; }
     UINT8 get_via_data() { return via_data; }
-    void set_via_data(UINT8 dat) { via_data = dat; printf("68K-> VIA_DATA: %d\n", dat); }
+    void set_via_data(UINT8 dat) { via_data = dat; }
     UINT8 get_via_clock() { return via_clock; }
 
     int rom_offset;
@@ -93,14 +93,14 @@ private:
     UINT8 ports[3];
     UINT8 pll_ctrl;
     UINT8 timer_ctrl;
-    UINT8 timer_counter;
+    UINT8 timer_counter, ripple_counter;
     UINT8 onesec;
     UINT8 treq, byteack, tip, via_data, via_clock, last_adb;
     UINT64 last_adb_time;
     bool cuda_controls_power;
     bool adb_in;
     int reset_line;
-    emu_timer *m_timer;
+    emu_timer *m_timer, *m_prog_timer;
     UINT8 pram[0x100], disk_pram[0x100];
     bool pram_loaded;
 
