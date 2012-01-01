@@ -270,13 +270,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritum_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	// There are specific writes to ports 03, F3, F7, F8, FA, FB, FD
+	// so perhaps this system uses devices at these locations.
+	// The disk input expects values that are different to the usual,
+	// eg. port F0 should be 5, port F2 should have bit 3 set.
+	//AM_RANGE(0x03, 0x03) unknown
+	AM_RANGE(0xf0, 0xf0) AM_READ(trs80_wd179x_r)
 	AM_RANGE(0xf0, 0xf0) AM_DEVWRITE_LEGACY("wd179x", wd17xx_command_w)
 	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE_LEGACY("wd179x", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE_LEGACY("wd179x", wd17xx_sector_r, wd17xx_sector_w)
 	AM_RANGE(0xf3, 0xf3) AM_DEVREADWRITE_LEGACY("wd179x", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(trs80m4_f4_w)
 	AM_RANGE(0xf8, 0xfb) AM_READWRITE(trs80_printer_r, trs80_printer_w)
-	AM_RANGE(0xfc, 0xff) AM_READWRITE(trs80m4_ff_r, trs80m4_ff_w)
+	//AM_RANGE(0xfc, 0xfd) unknown
+	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
 /**************************************************************************
@@ -499,6 +506,19 @@ static const gfx_layout radionic_charlayout =
 	8*8		   /* every char takes 16 bytes */
 };
 
+static const gfx_layout meritum_charlayout =
+{
+	6, 11,			/* 8 x 16 characters */
+	256,			/* 256 characters */
+	1,			/* 1 bits per pixel */
+	{ 0 },			/* no bitplanes */
+	/* x offsets */
+	{ 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8 },
+	8*16		   /* every char takes 16 bytes (unused scanlines are blank) */
+};
+
 static GFXDECODE_START(trs80)
 	GFXDECODE_ENTRY( "chargen", 0, trs80_charlayout, 0, 1 )
 GFXDECODE_END
@@ -517,6 +537,10 @@ GFXDECODE_END
 
 static GFXDECODE_START(radionic)
 	GFXDECODE_ENTRY( "chargen", 0, radionic_charlayout, 0, 1 )
+GFXDECODE_END
+
+static GFXDECODE_START(meritum)
+	GFXDECODE_ENTRY( "chargen", 0, meritum_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -667,6 +691,7 @@ static MACHINE_CONFIG_DERIVED( meritum, sys80 )
 	MCFG_CPU_IO_MAP( meritum_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE( meritum )
+	MCFG_GFXDECODE(meritum)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -736,8 +761,7 @@ ROM_START(lnw80)
 	ROM_REGION(0x00800, "chargen",0)
 	ROM_LOAD("lnw_chr.bin",  0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
 
-	ROM_REGION(0x04400, "gfx2",0)
-	ROM_FILL(0, 0x4400, 0xff)	/* 0x4000 for trs80_gfxram + 0x400 for videoram */
+	ROM_REGION(0x04400, "gfx2", ROMREGION_ERASEFF) /* 0x4000 for trs80_gfxram + 0x400 for videoram */
 ROM_END
 
 ROM_START(trs80m3)
@@ -834,7 +858,7 @@ ROM_START( meritum)
 	ROM_LOAD( "05.bin", 0x2000, 0x0800, CRC(461fbf0d) SHA1(bd19187dd992168af43bd68055343d515f152624))
 	ROM_LOAD( "06.bin", 0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
 	ROM_LOAD( "07.bin", 0x3000, 0x0800, CRC(044b1459) SHA1(faace7353ffbef6587b1b9e7f8b312e0892e3427))
-	ROM_REGION(0x1000, "chargen",0)
+	ROM_REGION(0x1000, "chargen", ROMREGION_INVERT)
 	ROM_LOAD( "chargen.bin", 0x0000, 0x1000, CRC(3dfc6439) SHA1(6e45a27f68c3491c403b4eafe45a108f348dd2fd))
 ROM_END
 
@@ -847,7 +871,7 @@ ROM_START( meritum_net )
 	ROM_LOAD( "05_440_m11_02.bin",   0x2000, 0x0800, CRC(461fbf0d) SHA1(bd19187dd992168af43bd68055343d515f152624))
 	ROM_LOAD( "06_440_m12_01.bin",   0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
 	ROM_LOAD( "07_447_m13_015m.bin", 0x3000, 0x0800, CRC(789f6964) SHA1(9b2231ca7ffd82bbca1f53988a7df833290ddbf2))
-	ROM_REGION(0x1000, "chargen",0)
+	ROM_REGION(0x1000, "chargen", ROMREGION_INVERT)
 	ROM_LOAD( "char.bin", 0x0000, 0x1000, CRC(2c09a5a7) SHA1(146891b3ddfc2de95e6a5371536394a657880054))
 ROM_END
 
