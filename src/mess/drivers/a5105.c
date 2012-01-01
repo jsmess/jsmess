@@ -20,6 +20,7 @@ ToDo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/upd7220.h"
+#include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
@@ -55,6 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
 	UINT8 *m_video_ram;
+	UINT8 *m_ram_base;
+	UINT8 *m_rom_base;
 	UINT8 *m_char_rom;
 	UINT16 m_pcg_addr;
 	UINT16 m_pcg_internal_addr;
@@ -124,10 +127,10 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 static ADDRESS_MAP_START(a5105_mem, AS_PROGRAM, 8, a5105_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROM //ROM bank
-	AM_RANGE(0xc000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_BANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE_BANK("bank4")
 ADDRESS_MAP_END
 
 WRITE8_MEMBER( a5105_state::pcg_addr_w )
@@ -216,10 +219,86 @@ READ8_MEMBER( a5105_state::a5105_memsel_r )
 
 WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 {
-	m_memsel[0] = (data & 0x03) >> 0;
-	m_memsel[1] = (data & 0x0c) >> 2;
-	m_memsel[2] = (data & 0x30) >> 4;
-	m_memsel[3] = (data & 0xc0) >> 6;
+	address_space *prog = m_maincpu->memory().space( AS_PROGRAM );
+
+	if (m_memsel[0] != ((data & 0x03) >> 0))
+	{
+		m_memsel[0] = (data & 0x03) >> 0;
+
+		switch (m_memsel[0])
+		{
+		case 0:
+			memory_set_bankptr(machine(), "bank1", m_rom_base);
+			prog->install_read_bank(0x0000, 0x3fff, "bank1");
+			prog->unmap_write(0x0000, 0x3fff);
+			break;
+		case 2:
+			memory_set_bankptr(machine(), "bank1", m_ram_base);
+			prog->install_readwrite_bank(0x0000, 0x3fff, "bank1");
+			break;
+		default:
+			prog->unmap_readwrite(0x0000, 0x3fff);
+			break;
+		}
+	}
+
+	if (m_memsel[1] != ((data & 0x0c) >> 2))
+	{
+		m_memsel[1] = (data & 0x0c) >> 2;
+
+		switch (m_memsel[1])
+		{
+		case 0:
+			memory_set_bankptr(machine(), "bank2", m_rom_base + 0x4000);
+			prog->install_read_bank(0x4000, 0x7fff, "bank2");
+			prog->unmap_write(0x4000, 0x4000);
+			break;
+		case 2:
+			memory_set_bankptr(machine(), "bank2", m_ram_base + 0x4000);
+			prog->install_readwrite_bank(0x4000, 0x7fff, "bank2");
+			break;
+		default:
+			prog->unmap_readwrite(0x4000, 0x7fff);
+			break;
+		}
+	}
+
+	if (m_memsel[2] != ((data & 0x30) >> 4))
+	{
+		m_memsel[2] = (data & 0x30) >> 4;
+
+		switch (m_memsel[2])
+		{
+		case 0:
+			memory_set_bankptr(machine(), "bank3", m_rom_base + 0x8000);
+			prog->install_read_bank(0x8000, 0xbfff, "bank3");
+			prog->unmap_write(0x8000, 0xbfff);
+			break;
+		case 2:
+			memory_set_bankptr(machine(), "bank3", m_ram_base + 0x8000);
+			prog->install_readwrite_bank(0x8000, 0xbfff, "bank3");
+			break;
+		default:
+			prog->unmap_readwrite(0x8000, 0xbfff);
+			break;
+		}
+	}
+
+	if (m_memsel[3] != ((data & 0xc0) >> 6))
+	{
+		m_memsel[3] = (data & 0xc0) >> 6;
+
+		switch (m_memsel[3])
+		{
+		case 2:
+			memory_set_bankptr(machine(), "bank4", m_ram_base + 0xc000);
+			prog->install_readwrite_bank(0xc000, 0xffff, "bank4");
+			break;
+		default:
+			prog->unmap_readwrite(0xc000, 0xffff);
+			break;
+		}
+	}
 
 	//printf("Memsel change to %02x %02x %02x %02x\n",m_memsel[0],m_memsel[1],m_memsel[2],m_memsel[3]);
 }
@@ -365,6 +444,14 @@ MACHINE_RESET_MEMBER(a5105_state)
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 	a5105_ab_w(*space, 0, 9); // turn motor off
 	beep_set_frequency(m_beep, 500);
+
+	m_ram_base = (UINT8*)machine().device<ram_device>(RAM_TAG)->pointer();
+	m_rom_base = (UINT8*)machine().region("maincpu")->base();
+
+	memory_set_bankptr(machine(), "bank1", m_rom_base);
+	memory_set_bankptr(machine(), "bank2", m_rom_base + 0x4000);
+	memory_set_bankptr(machine(), "bank3", m_ram_base);
+	memory_set_bankptr(machine(), "bank4", m_ram_base + 0x4000);
 }
 
 
@@ -488,6 +575,10 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_15MHz / 4, a5105_pio_intf )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROM definition */
