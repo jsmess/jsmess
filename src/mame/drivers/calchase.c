@@ -2,14 +2,11 @@
 
 California Chase (c) 1999 The Game Room
 
-preliminary driver by Angelo Salese
+preliminary driver by Angelo Salese & Grull Osgo
 
 TODO:
-- currently calls int 13h with ah=0 -> "Reset Disk Drives" and returns an error code
-for whatever reason;
-- video emulation not even started (it currently fills vram with 0x0720, hence it's
-unneeded for now...)
-- clean-ups;
+- Fix CPU core bugs;
+- get Win 98 to boot;
 
 I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
 46E8    ----    8514/A and compatible video cards (e.g. ATI Graphics Ultra)
@@ -126,7 +123,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "video/pc_vga.h" //GRULL-ADDVGA
+#include "video/pc_vga.h"
 
 
 
@@ -137,7 +134,6 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_bios_ram;
-	//UINT32 *m_vga_vram; //GRULL-ADDVGA
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
@@ -154,45 +150,6 @@ public:
 
 static void ide_interrupt(device_t *device, int state);
 
-/*GRULL-ADDVGA
-static VIDEO_START(calchase)
-{
-}
-*/
-
-
-/*GRULL-ADDVGA
-static SCREEN_UPDATE(calchase)
-{
-    calchase_state *state = screen.machine().driver_data<calchase_state>();
-    int x,y,count,i;
-
-    bitmap->fill(get_black_pen(screen.machine()), *cliprect);
-
-    count = (0);
-
-    for(y=0;y<256;y++)
-    {
-        for(x=0;x<320;x+=32)
-        {
-            for (i=0;i<32;i++)
-            {
-                UINT32 color;
-
-                color = (state->m_vga_vram[count])>>(32-i) & 0x1;
-
-                if((x+i)<screen.visible_area().max_x && ((y)+0)<screen.visible_area().max_y)
-                    bitmap->pix32(y, x+(32-i)) = screen.machine().pens[color];
-
-            }
-
-            count++;
-        }
-    }
-    return 0;
-
-}
-*/
 
 static READ8_DEVICE_HANDLER(at_dma8237_2_r)
 {
@@ -360,7 +317,7 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 
 
 // Intel 82439TX System Controller (MXTC)
-//GRULL VIA82C585VPX (North Bridge - APOLLO Chipset)
+// TODO: change with a VIA82C585VPX (North Bridge - APOLLO Chipset)
 
 static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
@@ -377,17 +334,26 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 
 	switch(reg)
 	{
-		//GRULLcase 0x59:
+		//case 0x59:
 		case 0x63:	// PAM0
 		{
-			//GRULLif (data & 0x10)     // enable RAM access to region 0xf0000 - 0xfffff
+			//if (data & 0x10)     // enable RAM access to region 0xf0000 - 0xfffff
 			if ((data & 0x50) | (data & 0xA0))
 			{
 				memory_set_bankptr(busdevice->machine(), "bank1", state->m_bios_ram);
 			}
 			else				// disable RAM access (reads go to BIOS ROM)
 			{
-				//GRULLmemory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x10000);
+				//Execution Hack to avoid crash when switch back from Shadow RAM to Bios ROM, since i386 emu haven't yet pipelined execution structure.
+				//It happens when exit from BIOS SETUP.
+				#if 0
+				if ((state->m_mxtc_config_reg[0x63] & 0x50) | ( state->m_mxtc_config_reg[0x63] & 0xA0)) // Only DO if comes a change to disable ROM.
+				{
+					if ( cpu_get_pc(busdevice->machine().device("maincpu"))==0xff74e) cpu_set_reg(busdevice->machine().device("maincpu"), STATE_GENPC, 0xff74d);
+				}
+				#endif
+
+				//memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x10000);
 				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base());
 			}
 			break;
@@ -451,7 +417,7 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-//GRULL Cambiar por VIA82C586B (South Bridge - APOLLO Chipset)
+//TODO: change with VIA82C586B (South Bridge - APOLLO Chipset)
 
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
@@ -512,7 +478,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 static WRITE32_HANDLER(bios_ram_w)
 {
 	calchase_state *state = space->machine().driver_data<calchase_state>();
-	//GRULLif (state->m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
+	//if (state->m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 	       if (state->m_mxtc_config_reg[0x63] & 0x50)
 	{
 		COMBINE_DATA(state->m_bios_ram + offset);
@@ -521,8 +487,7 @@ static WRITE32_HANDLER(bios_ram_w)
 
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	//AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE_MEMBER(calchase_state, m_vga_vram) //GRULL-ADDVGA
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000c8000, 0x000dffff) AM_NOP
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
@@ -553,7 +518,7 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP //GRULL AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
+	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
 	AM_RANGE(0x0170, 0x0177) AM_NOP //To debug
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0200, 0x021f) AM_NOP //To debug
@@ -569,8 +534,8 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32)
 	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug
 	AM_RANGE(0x03e0, 0x03ef) AM_NOP //To debug
 	AM_RANGE(0x0378, 0x037f) AM_NOP //To debug
-	//GRULL-ADDVGA AM_RANGE(0x0300, 0x03af) AM_NOP
-	//GRULL-ADDVGA AM_RANGE(0x03b0, 0x03df) AM_NOP
+	// AM_RANGE(0x0300, 0x03af) AM_NOP
+	// AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
@@ -583,26 +548,6 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32)
 	AM_RANGE(0x92e8, 0x92ef) AM_NOP //To debug
 
 ADDRESS_MAP_END
-
-/*GRULL-ADDVGA
-static const gfx_layout CGA_charlayout =
-{
-    8,8,
-    256,
-    1,
-    { 0 },
-    { 0,1,2,3,4,5,6,7 },
-    { 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
-    8*8
-};
-*/
-
-/*GRULL-ADDVGA
-static GFXDECODE_START( CGA )
-    GFXDECODE_ENTRY( "video_bios", 0x5182, CGA_charlayout,              0, 256 )
-    //there's also a 8x16 entry (just after the 8x8)
-GFXDECODE_END
-*/
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
@@ -681,7 +626,6 @@ static MACHINE_START(calchase)
 
 static WRITE_LINE_DEVICE_HANDLER( calchase_pic8259_1_set_int_line )
 {
-
 	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
@@ -739,7 +683,7 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-	//GRULLmemory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x10000);
+	//memory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x10000);
 	memory_set_bankptr(machine, "bank1", machine.region("bios")->base());
 }
 
@@ -798,31 +742,16 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_PCI_BUS_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	//GRULL-ADDVGA MCFG_PALETTE_LENGTH(0x200)
-	//GRULL-ADDVGA MCFG_GFXDECODE( CGA )
-
-
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )	//GRULL-ADDVGA
-	//GRULL-ADDVGA MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_MODIFY("screen")
-	//PROBAR QUITANDO MCFG_SCREEN_REFRESH_RATE(60)
-	//PROBAR QUITANDO MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //GRULL-ADDVGA Before 0
-	//GRULL-ADDVGA MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	//GRULL-ADDVGA MCFG_SCREEN_SIZE(64*8, 32*8) // 80*8, 25*8
-	//GRULL-ADDVGA MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1) //
-	//GRULL-ADDVGA MCFG_SCREEN_UPDATE(calchase)
-
-	//GRULL-ADDVGA MCFG_VIDEO_START(calchase)
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( calchase )
 {
 	calchase_state *state = machine.driver_data<calchase_state>();
-	//GRULLstate->m_bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
 	state->m_bios_ram = auto_alloc_array(machine, UINT32, 0x20000/4);
 
-	pc_vga_init(machine, &vga_interface, NULL); //GRULL_ADDVGA
+	pc_vga_init(machine, &vga_interface, NULL);
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);
 
 	intel82439tx_init(machine);
