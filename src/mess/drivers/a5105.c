@@ -21,11 +21,14 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "video/upd7220.h"
 #include "machine/ram.h"
+#include "machine/upd765.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "sound/wave.h"
 #include "sound/beep.h"
+#include "formats/basicdsk.h"
 
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -53,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(key_mux_w);
 	DECLARE_WRITE8_MEMBER(a5105_ab_w);
 	DECLARE_WRITE8_MEMBER(a5105_memsel_w);
+	WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
 	UINT8 *m_video_ram;
@@ -253,6 +257,11 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 			prog->install_read_bank(0x4000, 0x7fff, "bank2");
 			prog->unmap_write(0x4000, 0x4000);
 			break;
+		case 1:
+			memory_set_bankptr(machine(), "bank2", machine().region("k5651")->base());
+			prog->install_read_bank(0x4000, 0x7fff, "bank2");
+			prog->unmap_write(0x4000, 0x4000);
+			break;
 		case 2:
 			memory_set_bankptr(machine(), "bank2", m_ram_base + 0x4000);
 			prog->install_readwrite_bank(0x4000, 0x7fff, "bank2");
@@ -303,10 +312,18 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 	//printf("Memsel change to %02x %02x %02x %02x\n",m_memsel[0],m_memsel[1],m_memsel[2],m_memsel[3]);
 }
 
+WRITE8_MEMBER( a5105_state::a5105_upd765_w )
+{
+	upd765_tc_w(machine().device("upd765"), BIT(data, 4));
+}
+
 static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x40, 0x4b) fdc, upd765?
+	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
+	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
+	AM_RANGE(0x48, 0x4f) AM_WRITE(a5105_upd765_w)
+
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
@@ -517,6 +534,38 @@ static ADDRESS_MAP_START( upd7220_map, AS_0, 8, a5105_state)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
+static LEGACY_FLOPPY_OPTIONS_START(a5105)
+	LEGACY_FLOPPY_OPTION(a5105, "img", "A5105 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+LEGACY_FLOPPY_OPTIONS_END
+
+static const floppy_interface a5105_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSDD,
+	LEGACY_FLOPPY_OPTIONS_NAME(a5105),
+	"floppy_5_25",
+	NULL
+};
+
+
+static const upd765_interface a5105_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL,
+	UPD765_RDY_PIN_NOT_CONNECTED,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
+
 static Z80CTC_INTERFACE( a5105_ctc_intf )
 {
 	0,												/* timer disablers */
@@ -576,6 +625,9 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
+	MCFG_UPD765A_ADD("upd765", a5105_interface)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(a5105_floppy_interface)
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -589,7 +641,7 @@ ROM_START( a5105 )
 
 	ROM_REGION( 0x800, "pcg", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x4000, "gfx2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "k5651", ROMREGION_ERASEFF )
 	ROM_LOAD( "k5651_40.rom", 0x0000, 0x2000, CRC(f4ad4739) SHA1(9a7bbe6f0d180dd513c7854f441cee986c8d9765))
 	ROM_LOAD( "k5651_60.rom", 0x2000, 0x2000, CRC(c77dde3f) SHA1(7c16226be6c4c71013e8008fba9d2e9c5640b6a7))
 ROM_END
