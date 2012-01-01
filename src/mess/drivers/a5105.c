@@ -20,9 +20,12 @@ ToDo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/upd7220.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "sound/beep.h"
+
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
@@ -225,8 +228,8 @@ static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x40, 0x4b) fdc, upd765?
-//  AM_RANGE(0x80, 0x83) z80ctc
-//  AM_RANGE(0x90, 0x93) ppi8255?
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 
 	AM_RANGE(0x9c, 0x9c) AM_WRITE(pcg_val_w)
@@ -257,10 +260,9 @@ static INPUT_PORTS_START( a5105 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("< >") PORT_CODE(KEYCODE_COLON) PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ *") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('+') PORT_CHAR('*')
-	/* TODO: following three produce foreign symbols and aren't marked correctly */
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("??") PORT_CODE(KEYCODE_F10)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("??") PORT_CODE(KEYCODE_F11)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("??") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xb6 \xc3\x96") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00f6) PORT_CHAR(0x00d6)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xa4 \xc3\x84") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00e4) PORT_CHAR(0x00c4)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xbc \xc3\x9c") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00fc) PORT_CHAR(0x00dc)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("# ^") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('#') PORT_CHAR('^')
 
 	PORT_START("KEY2")
@@ -381,10 +383,6 @@ static GFXDECODE_START( a5105 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, a5105_chars_8x8, 0, 8 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( a5105_vblank_irq )
-{
-	device_set_input_line_and_vector(device, 0, HOLD_LINE,0x44);
-}
 
 static PALETTE_INIT( gdc )
 {
@@ -432,12 +430,39 @@ static ADDRESS_MAP_START( upd7220_map, AS_0, 8, a5105_state)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_BASE(m_video_ram)
 ADDRESS_MAP_END
 
+static Z80CTC_INTERFACE( a5105_ctc_intf )
+{
+	0,												/* timer disablers */
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),				/* interrupt callback */
+	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg2_w),		/* ZC/TO0 callback */
+	DEVCB_NULL,										/* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w)		/* ZC/TO2 callback */
+};
+
+static Z80PIO_INTERFACE( a5105_pio_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", 0),				/* callback when change interrupt status */
+	DEVCB_NULL,										/* port A read callback */
+	DEVCB_NULL,										/* port A write callback */
+	DEVCB_NULL,										/* portA ready active callback */
+	DEVCB_NULL,										/* port B read callback */
+	DEVCB_NULL,										/* port B write callback */
+	DEVCB_NULL										/* portB ready active callback */
+};
+
+static const z80_daisy_config a5105_daisy_chain[] =
+{
+	{ "z80ctc" },
+	{ "z80pio" },
+	{ NULL }
+};
+
 static MACHINE_CONFIG_START( a5105, a5105_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_15MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(a5105_mem)
 	MCFG_CPU_IO_MAP(a5105_io)
-	MCFG_CPU_VBLANK_INT("screen",a5105_vblank_irq)
+	MCFG_CPU_CONFIG(a5105_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -458,7 +483,10 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_UPD7220_ADD("upd7220", XTAL_15MHz, hgdc_intf, upd7220_map)
+	MCFG_Z80CTC_ADD( "z80ctc", XTAL_15MHz / 4, a5105_ctc_intf )
+	MCFG_Z80PIO_ADD( "z80pio", XTAL_15MHz / 4, a5105_pio_intf )
+
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
