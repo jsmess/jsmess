@@ -121,14 +121,14 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 
 			if ((data & 0x80) != last_adb)
 			{
-/*              if (data & 0x80)
+/*                if (data & 0x80)
                 {
                     printf("CU ADB: 1->0 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
                 }
                 else
                 {
                     printf("CU ADB: 0->1 time %lld\n", m_maincpu->total_cycles()-last_adb_time);
-                }*/
+                }                      */
 				last_adb = data & 0x80;
 				last_adb_time = m_maincpu->total_cycles();
 			}
@@ -319,12 +319,12 @@ WRITE8_MEMBER( cuda_device::timer_ctrl_w )
 
 	if ((timer_ctrl & 0x80) && !(data & 0x80))
     {
-        device_set_input_line(m_maincpu, M68HC05EG_INT_CPI, CLEAR_LINE);
+        device_set_input_line(m_maincpu, M68HC05EG_INT_TIMER, CLEAR_LINE);
         timer_ctrl &= ~0x80;
     }
 	else if ((timer_ctrl & 0x40) && !(data & 0x40))
     {
-        device_set_input_line(m_maincpu, M68HC05EG_INT_CPI, CLEAR_LINE);
+        device_set_input_line(m_maincpu, M68HC05EG_INT_TIMER, CLEAR_LINE);
         timer_ctrl &= ~0x40;
     }
 
@@ -502,12 +502,12 @@ void cuda_device::nvram_default()
 	memset(pram, 0, 0x100);
 	memset(disk_pram, 0, 0x100);
 
-	pram[0x1] = 0x80;
+	pram[0x1] = 0x10;
 	pram[0x2] = 0x4f;
 	pram[0x3] = 0x48;
 	pram[0x8] = 0x13;
 	pram[0x9] = 0x88;
-	pram[0xb] = 0x4c;
+	pram[0xb] = 0xcc;
 	pram[0xc] = 0x4e;
 	pram[0xd] = 0x75;
 	pram[0xe] = 0x4d;
@@ -518,20 +518,22 @@ void cuda_device::nvram_default()
 	pram[0x16] = 0xcc;
 	pram[0x17] = 0x0a;
 	pram[0x1d] = 0x02;
-	pram[0x17] = 0x63;
+	pram[0x1e] = 0x63;
+	pram[0x4a] = 0x90;
+	pram[0x4b] = 0xc7;
+    pram[0x57] = 0x29;
+    pram[0x58] = 0x80;
+    pram[0x59] = 0x68;
+    pram[0x5a] = 0x80;
+    pram[0x5b] = 0x80;
 	pram[0x6f] = 0x28;
-	pram[0x70] = 0x83;
-	pram[0x71] = 0x26;
 	pram[0x77] = 0x01;
 	pram[0x78] = 0xff;
 	pram[0x79] = 0xff;
 	pram[0x7a] = 0xff;
 	pram[0x7b] = 0xdf;
-	pram[0x7d] = 0x09;
-	pram[0xf3] = 0x12;
-	pram[0xf9] = 0x01;
-	pram[0xf3] = 0x12;
-	pram[0xfb] = 0x8d;
+	pram[0xb8] = 0x35;
+	pram[0xb9] = 0x80;
 	pram_loaded = false;
 }
 

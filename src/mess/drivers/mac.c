@@ -1169,15 +1169,7 @@ static MACHINE_CONFIG_DERIVED( maclc2, maclc )
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maccclas, maclc )
-
-	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
-	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT(MAC_SCREEN_NAME, mac_rbv_vbl)
-
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
+static MACHINE_CONFIG_DERIVED( maccclas, maclc2 )
 
     MCFG_EGRET_REMOVE()
     MCFG_CUDA_ADD(CUDA_341S0788)    // should be 341s0417, but only the color classic used that rev and those are "collectable" ($$$$)
