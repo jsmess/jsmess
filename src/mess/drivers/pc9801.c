@@ -339,8 +339,8 @@ bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	bitmap.fill(0, cliprect);
 
 	/* graphics */
-	m_hgdc2->update_screen(&bitmap, cliprect);
-	m_hgdc1->update_screen(&bitmap, cliprect);
+	m_hgdc2->update_screen(bitmap, cliprect);
+	m_hgdc1->update_screen(bitmap, cliprect);
 
 	return 0;
 }
@@ -370,12 +370,12 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		if(interlace_on)
 		{
 			if(res_y*2+0 < 400)
-				bitmap->pix16(res_y*2+0, res_x) = pen + 8;
+				bitmap.pix16(res_y*2+0, res_x) = pen + 8;
 			if(res_y*2+1 < 400)
-				bitmap->pix16(res_y*2+1, res_x) = pen + 8;
+				bitmap.pix16(res_y*2+1, res_x) = pen + 8;
 		}
 		else
-			bitmap->pix16(res_y, res_x) = pen + 8;
+			bitmap.pix16(res_y, res_x) = pen + 8;
 	}
 }
 
@@ -438,14 +438,14 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					pen = (tile_data >> (7-xi) & 1) ? color : 0;
 
 				if(pen)
-					bitmap->pix16(res_y, res_x) = pen;
+					bitmap.pix16(res_y, res_x) = pen;
 
 				if(state->m_video_ff[WIDTH40_REG])
 				{
 					if(res_x+1 > 640 || res_y > char_size*25) //TODO
 						continue;
 
-					bitmap->pix16(res_y, res_x+1) = pen;
+					bitmap.pix16(res_y, res_x+1) = pen;
 				}
 			}
 		}

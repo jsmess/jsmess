@@ -109,7 +109,7 @@ static SCREEN_UPDATE( z9001 )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap->pix16(sy++);
+			UINT16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 40; x++)
 			{

@@ -27,7 +27,7 @@ VIDEO_START( cgenie )
 
 	VIDEO_START_CALL(generic_bitmapped);
 
-	state->m_dlybitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_dlybitmap.allocate(width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 /***************************************************************************
@@ -240,14 +240,14 @@ void cgenie_mode_select(running_machine &machine, int mode)
 }
 
 
-static void cgenie_refresh_monitor(running_machine &machine, bitmap_t * bitmap, const rectangle &cliprect)
+static void cgenie_refresh_monitor(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	cgenie_state *state = machine.driver_data<cgenie_state>();
 	UINT8 *videoram = state->m_videoram;
 	int i, address, offset, cursor, size, code, x, y;
     rectangle r;
 
-	bitmap->fill(get_black_pen(machine), cliprect);
+	bitmap.fill(get_black_pen(machine), cliprect);
 
 	if(state->m_crt.vertical_displayed || state->m_crt.horizontal_displayed)
 	{
@@ -320,7 +320,7 @@ static void cgenie_refresh_monitor(running_machine &machine, bitmap_t * bitmap, 
 	}
 }
 
-static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t * bitmap, const rectangle &cliprect)
+static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	cgenie_state *state = machine.driver_data<cgenie_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -328,7 +328,7 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t * bitmap, c
 	rectangle r;
 
 	machine.generic.tmpbitmap->fill(get_black_pen(machine), cliprect);
-	state->m_dlybitmap->fill(get_black_pen(machine), cliprect);
+	state->m_dlybitmap.fill(get_black_pen(machine), cliprect);
 
 	if(state->m_crt.vertical_displayed || state->m_crt.horizontal_displayed)
 	{
@@ -355,7 +355,7 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t * bitmap, c
 			{
 				/* get graphics code */
 				code = videoram[i];
-				drawgfx_opaque(machine.generic.tmpbitmap, r, machine.gfx[1], code, 1,
+				drawgfx_opaque(*machine.generic.tmpbitmap, r, machine.gfx[1], code, 1,
 					0, 0, r.min_x, r.min_y);
 				drawgfx_opaque(state->m_dlybitmap, r, machine.gfx[1], code, 2,
 					0, 0, r.min_x, r.min_y);
@@ -367,7 +367,7 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t * bitmap, c
 
 				/* translate defined character sets */
 				code += state->m_font_offset[(code >> 6) & 3];
-				drawgfx_opaque(machine.generic.tmpbitmap, r, machine.gfx[0], code, state->m_colorram[i&0x3ff] + 16,
+				drawgfx_opaque(*machine.generic.tmpbitmap, r, machine.gfx[0], code, state->m_colorram[i&0x3ff] + 16,
 					0, 0, r.min_x, r.min_y);
 				drawgfx_opaque(state->m_dlybitmap, r, machine.gfx[0], code, state->m_colorram[i&0x3ff] + 32,
 					0, 0, r.min_x, r.min_y);
@@ -399,7 +399,7 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t * bitmap, c
 				rc.min_y = r.min_y + (state->m_crt.cursor_top & 15);
 				rc.max_y = r.min_y + (state->m_crt.cursor_bottom & 15);
 
-				drawgfx_opaque(machine.generic.tmpbitmap, rc, machine.gfx[0], 0x7f, state->m_colorram[i&0x3ff] + 16,
+				drawgfx_opaque(*machine.generic.tmpbitmap, rc, machine.gfx[0], 0x7f, state->m_colorram[i&0x3ff] + 16,
 					0, 0, rc.min_x, rc.min_y);
 				drawgfx_opaque(state->m_dlybitmap, rc, machine.gfx[0], 0x7f, state->m_colorram[i&0x3ff] + 32,
 					0, 0, rc.min_x, rc.min_y);
@@ -407,7 +407,7 @@ static void cgenie_refresh_tv_set(running_machine &machine, bitmap_t * bitmap, c
 		}
 	}
 
-	copybitmap(bitmap, machine.generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *machine.generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, state->m_dlybitmap, 0, 0, 1, 0, cliprect, 0);
 }
 

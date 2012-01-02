@@ -96,18 +96,18 @@ static VIDEO_START( multi8 )
 	state->m_p_chargen = machine.region("chargen")->base();
 }
 
-static void multi8_draw_pixel(running_machine &machine, bitmap_t *bitmap,int y,int x,UINT8 pen,UINT8 width)
+static void multi8_draw_pixel(running_machine &machine, bitmap_t &bitmap,int y,int x,UINT8 pen,UINT8 width)
 {
 	if((x)>machine.primary_screen->visible_area().max_x || (y)>machine.primary_screen->visible_area().max_y)
 		return;
 
 	if(width)
 	{
-		bitmap->pix16(y, x*2+0) = pen;
-		bitmap->pix16(y, x*2+1) = pen;
+		bitmap.pix16(y, x*2+0) = pen;
+		bitmap.pix16(y, x*2+1) = pen;
 	}
 	else
-		bitmap->pix16(y, x) = pen;
+		bitmap.pix16(y, x) = pen;
 }
 
 static SCREEN_UPDATE( multi8 )

@@ -229,7 +229,7 @@ static SCREEN_UPDATE( bcs3 )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap->pix16(sy++);
+			UINT16 *p = &bitmap.pix16(sy++);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 28; x++)
@@ -275,7 +275,7 @@ static SCREEN_UPDATE( bcs3a )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap->pix16(sy++);
+			UINT16 *p = &bitmap.pix16(sy++);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 29; x++)
@@ -319,7 +319,7 @@ static SCREEN_UPDATE( bcs3b )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap->pix16(sy++);
+			UINT16 *p = &bitmap.pix16(sy++);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 40; x++)
@@ -363,7 +363,7 @@ static SCREEN_UPDATE( bcs3c )
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap->pix16(sy++);
+			UINT16 *p = &bitmap.pix16(sy++);
 			rat = (ra + 1) & 7;
 
 			for (x = ma; x < ma + 29; x++)

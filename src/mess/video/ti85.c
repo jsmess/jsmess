@@ -161,7 +161,7 @@ SCREEN_UPDATE( ti85 )
 		for (y=0; y<state->m_ti_screen_y_size; y++)
 			for (x=0; x<state->m_ti_screen_x_size; x++)
 				for (b=0; b<8; b++)
-					bitmap->pix16(y, x*8+b) = ti85_palette[state->m_LCD_contrast&0x1f][6];
+					bitmap.pix16(y, x*8+b) = ti85_palette[state->m_LCD_contrast&0x1f][6];
 		return 0;
 	}
 
@@ -184,7 +184,7 @@ SCREEN_UPDATE( ti85 )
 					  + ((*(state->m_frames+4*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x)>>(7-b)) & 0x01)
 					  + ((*(state->m_frames+5*state->m_ti_video_memory_size+y*state->m_ti_screen_x_size+x)>>(7-b)) & 0x01);
 
-				bitmap->pix16(y, x*8+b) = ti85_palette[state->m_LCD_contrast&0x1f][brightnes];
+				bitmap.pix16(y, x*8+b) = ti85_palette[state->m_LCD_contrast&0x1f][brightnes];
 			}
 	return 0;
 }

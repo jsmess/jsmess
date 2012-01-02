@@ -52,7 +52,7 @@ public:
 	DECLARE_READ8_MEMBER( sti_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( speaker_w );
 
-	void crtc_update_row(mc6845_device *device, bitmap_t *bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	void crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
 protected:
 	// device-level overrides

@@ -248,8 +248,8 @@ public:
 	int m_old_tw_keys;
 	int m_old_ta_keys;
 	int m_typewriter_color;
-	bitmap_t *m_panel_bitmap;
-	bitmap_t *m_typewriter_bitmap;
+	bitmap_t m_panel_bitmap;
+	bitmap_t m_typewriter_bitmap;
 	lightpen_t m_lightpen_state;
 	lightpen_t m_previous_lightpen_state;
 	int m_pos;

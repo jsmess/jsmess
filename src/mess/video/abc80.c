@@ -75,7 +75,7 @@ static TIMER_DEVICE_CALLBACK( vsync_off_tick )
 //  update_screen -
 //-------------------------------------------------
 
-void abc80_state::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
+void abc80_state::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	int c = 0;
 	int r = 0;
@@ -171,7 +171,7 @@ void abc80_state::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 				color ^= (cursor & m_blink);
 				color &= blank;
 
-				bitmap->pix16(y, x) = color;
+				bitmap.pix16(y, x) = color;
 
 				data <<= 1;
 			}
@@ -222,7 +222,7 @@ void abc80_state::video_start()
 
 bool abc80_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	update_screen(&bitmap, cliprect);
+	update_screen(bitmap, cliprect);
 
 	return 0;
 }

@@ -284,7 +284,7 @@ static SCREEN_UPDATE( tvc )
 static MC6845_UPDATE_ROW( tvc_update_row )
 {
 	tvc_state *state = device->machine().driver_data<tvc_state>();
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	int i;
 
 	switch(state->m_video_mode) {

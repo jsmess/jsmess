@@ -169,7 +169,7 @@ static void oric_vh_update_attribute(running_machine &machine,int c)
 
 /* render 6-pixels using foreground and background colours specified */
 /* used in hires and text mode */
-static void oric_vh_render_6pixels(bitmap_t *bitmap,int x,int y, int fg, int bg,int data, int invert_flag)
+static void oric_vh_render_6pixels(bitmap_t &bitmap,int x,int y, int fg, int bg,int data, int invert_flag)
 {
 	int i;
 	int pens[2];
@@ -191,7 +191,7 @@ static void oric_vh_render_6pixels(bitmap_t *bitmap,int x,int y, int fg, int bg,
 		int col;
 
 		col = pens[(data>>5) & 0x01];
-		bitmap->pix16(y, px) = col;
+		bitmap.pix16(y, px) = col;
 		px++;
 		data = data<<1;
 	}

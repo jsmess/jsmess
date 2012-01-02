@@ -28,7 +28,7 @@ DECLARE_LEGACY_DEVICE(ASR733, asr733);
 READ8_DEVICE_HANDLER(asr733_cru_r);
 WRITE8_DEVICE_HANDLER(asr733_cru_w);
 
-void asr733_refresh(device_t *device, bitmap_t *bitmap, int x, int y);
+void asr733_refresh(device_t *device, bitmap_t &bitmap, int x, int y);
 
 void asr733_keyboard(device_t *device);
 

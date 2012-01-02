@@ -88,7 +88,7 @@ public:
     DECLARE_READ8_MEMBER( data_r );
     DECLARE_WRITE8_MEMBER( data_w );
 
-	void update_screen(bitmap_t *bitmap, const rectangle &cliprect);
+	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -105,8 +105,8 @@ protected:
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
 
-	void draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da);
-	void draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da);
+	void draw_line_mode4(bitmap_t &bitmap, int y, UINT16 da);
+	void draw_line_mode8(bitmap_t &bitmap, int y, UINT16 da);
 
 private:
 	static const device_timer_id TIMER_VSYNC = 0;

@@ -122,14 +122,14 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 		char_code = einstein->m_crtc_ram[(ma + i) & 0x07ff];
 		data_byte = data[(char_code << 3) + (ra & 0x07) + ((ra & 0x08) << 8)];
 
-		bitmap->pix16(y, x + 0) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 7);
-		bitmap->pix16(y, x + 1) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 6);
-		bitmap->pix16(y, x + 2) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 5);
-		bitmap->pix16(y, x + 3) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 4);
-		bitmap->pix16(y, x + 4) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 3);
-		bitmap->pix16(y, x + 5) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 2);
-		bitmap->pix16(y, x + 6) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 1);
-		bitmap->pix16(y, x + 7) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 0);
+		bitmap.pix16(y, x + 0) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 7);
+		bitmap.pix16(y, x + 1) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 6);
+		bitmap.pix16(y, x + 2) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 5);
+		bitmap.pix16(y, x + 3) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 4);
+		bitmap.pix16(y, x + 4) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 3);
+		bitmap.pix16(y, x + 5) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 2);
+		bitmap.pix16(y, x + 6) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 1);
+		bitmap.pix16(y, x + 7) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 0);
 	}
 }
 

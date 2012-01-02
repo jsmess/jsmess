@@ -68,7 +68,7 @@
 
 #define LOG_PCIACCESS	0
 
-static void cirrus_update_8bpp(bitmap_t *bitmap)
+static void cirrus_update_8bpp(bitmap_t &bitmap)
 {
 	UINT16 *line;
 	const UINT8 *vram;
@@ -78,7 +78,7 @@ static void cirrus_update_8bpp(bitmap_t *bitmap)
 
 	for (y = 0; y < 480; y++)
 	{
-		line = &bitmap->pix16(y);
+		line = &bitmap.pix16(y);
 
 		for (x = 0; x < 640; x++)
 			*line++ = *vram++;
@@ -87,21 +87,21 @@ static void cirrus_update_8bpp(bitmap_t *bitmap)
 
 
 
-static void cirrus_update_16bpp(bitmap_t *bitmap)
+static void cirrus_update_16bpp(bitmap_t &bitmap)
 {
 	fatalerror("NYI");
 }
 
 
 
-static void cirrus_update_24bpp(bitmap_t *bitmap)
+static void cirrus_update_24bpp(bitmap_t &bitmap)
 {
 	fatalerror("NYI");
 }
 
 
 
-static void cirrus_update_32bpp(bitmap_t *bitmap)
+static void cirrus_update_32bpp(bitmap_t &bitmap)
 {
 	fatalerror("NYI");
 }

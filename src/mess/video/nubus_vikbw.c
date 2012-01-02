@@ -137,7 +137,7 @@ static SCREEN_UPDATE( vikbw )
 
 	for (y = 0; y < 768; y++)
 	{
-		scanline = &bitmap->pix32(y);
+		scanline = &bitmap.pix32(y);
 		for (x = 0; x < 1024/8; x++)
 		{
 			pixels = card->m_vram[(y * 128) + (BYTE4_XOR_BE(x))];

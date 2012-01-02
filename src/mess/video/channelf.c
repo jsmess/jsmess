@@ -57,7 +57,7 @@ SCREEN_UPDATE( channelf )
 
 	for(y = 0; y < 64; y++ )
 	{
-		UINT16 *p = &bitmap->pix16(y);
+		UINT16 *p = &bitmap.pix16(y);
 		palette_offset = recalc_palette_offset(state->m_p_videoram[y*128+125]&3, state->m_p_videoram[y*128+126]&3);
 
 		for (x = ma; x < ma + 128; x++)

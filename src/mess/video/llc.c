@@ -35,7 +35,7 @@ SCREEN_UPDATE( llc1 )
 				{
 					disp = gfx[code + b*0x80];
 					if (inv==0x80) disp = disp ^ 0xff;
-					bitmap->pix16(y*8+b, x*8+c) =  ((disp<< c) & 0x80) ? 1 : 0;
+					bitmap.pix16(y*8+b, x*8+c) =  ((disp<< c) & 0x80) ? 1 : 0;
 				}
 			}
 		}
@@ -64,7 +64,7 @@ SCREEN_UPDATE( llc2 )
 				disp = gfx[code * 8 + b];
 				for (c = 0; c < 8; c++)
 				{
-					bitmap->pix16(y*8+b, x*8+c) =  ((disp<< c) & 0x80) ? 1 : 0;
+					bitmap.pix16(y*8+b, x*8+c) =  ((disp<< c) & 0x80) ? 1 : 0;
 				}
 			}
 		}

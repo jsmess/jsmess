@@ -494,7 +494,7 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 /*
     Video refresh
 */
-void vdt911_refresh(device_t *device, bitmap_t *bitmap, const rectangle &cliprect, int x, int y)
+void vdt911_refresh(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int x, int y)
 {
 	vdt_t *vdt = get_safe_token(device);
 	const gfx_element *gfx = device->machine().gfx[vdt->model];
@@ -518,7 +518,7 @@ void vdt911_refresh(device_t *device, bitmap_t *bitmap, const rectangle &cliprec
 		my_rect.min_y = y;
 		my_rect.max_y = y + height*10 - 1;
 
-		bitmap->fill(0, my_rect);
+		bitmap.fill(0, my_rect);
 	}
 	else
 		for (i=0; i<height; i++)

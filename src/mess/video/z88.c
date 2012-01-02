@@ -9,9 +9,9 @@
 #include "includes/z88.h"
 
 
-INLINE void z88_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+INLINE void z88_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
 {
-	bitmap->pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (UINT16)color;
 }
 
 /***************************************************************************
@@ -41,7 +41,7 @@ PALETTE_INIT( z88 )
 
 /* temp - change to gfxelement structure */
 
-static void z88_vh_render_8x8(bitmap_t *bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)
+static void z88_vh_render_8x8(bitmap_t &bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)
 {
 	int h,b;
 
@@ -70,7 +70,7 @@ static void z88_vh_render_8x8(bitmap_t *bitmap, int x, int y, int pen0, int pen1
 	}
 }
 
-static void z88_vh_render_6x8(bitmap_t *bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)
+static void z88_vh_render_6x8(bitmap_t &bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)
 {
 	int h,b;
 
@@ -102,7 +102,7 @@ static void z88_vh_render_6x8(bitmap_t *bitmap, int x, int y, int pen0, int pen1
 	}
 }
 
-static void z88_vh_render_line(bitmap_t *bitmap, int x, int y,int pen)
+static void z88_vh_render_line(bitmap_t &bitmap, int x, int y,int pen)
 {
 	z88_plot_pixel(bitmap, x, y+7, pen);
 	z88_plot_pixel(bitmap, x+1, y+7, pen);

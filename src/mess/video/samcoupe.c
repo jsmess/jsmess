@@ -76,7 +76,7 @@ static void draw_mode3_line(running_machine &machine, int y, int hpos)
 	}
 }
 
-static void draw_mode12_block(samcoupe_state *state, bitmap_t *bitmap, int vpos, int hpos, UINT8 mask)
+static void draw_mode12_block(samcoupe_state *state, bitmap_t &bitmap, int vpos, int hpos, UINT8 mask)
 {
 	/* extract colors from attribute */
 	UINT8 ink = state->m_clut[ATTR_FG(state->m_attribute)];
@@ -85,8 +85,8 @@ static void draw_mode12_block(samcoupe_state *state, bitmap_t *bitmap, int vpos,
 	/* draw block of 8 pixels (doubled to 16) */
 	for (int i = 0; i < SAM_BLOCK; i++)
 	{
-		bitmap->pix16(vpos, hpos + i*2 + 0) = BIT(mask, 7 - i) ? ink : pap;
-		bitmap->pix16(vpos, hpos + i*2 + 1) = BIT(mask, 7 - i) ? ink : pap;
+		bitmap.pix16(vpos, hpos + i*2 + 0) = BIT(mask, 7 - i) ? ink : pap;
+		bitmap.pix16(vpos, hpos + i*2 + 1) = BIT(mask, 7 - i) ? ink : pap;
 	}
 }
 
@@ -100,7 +100,7 @@ static void draw_mode2_line(running_machine &machine, int y, int hpos)
 	UINT8 mask = videoram[cell];
 	state->m_attribute = videoram[cell + 0x2000];
 
-	draw_mode12_block(state, machine.generic.tmpbitmap, y, hpos, mask);
+	draw_mode12_block(state, *machine.generic.tmpbitmap, y, hpos, mask);
 }
 
 static void draw_mode1_line(running_machine &machine, int y, int hpos)
@@ -111,7 +111,7 @@ static void draw_mode1_line(running_machine &machine, int y, int hpos)
 	UINT8 mask = videoram[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 	state->m_attribute = videoram[32*192 + (((y - SAM_BORDER_TOP) & 0xf8) << 2) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 
-	draw_mode12_block(state, machine.generic.tmpbitmap, y, hpos, mask);
+	draw_mode12_block(state, *machine.generic.tmpbitmap, y, hpos, mask);
 }
 
 TIMER_CALLBACK( sam_video_update_callback )

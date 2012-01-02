@@ -83,8 +83,8 @@ public:
 	UINT16 *m_objects;
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
-	bitmap_t *m_bg_map[16];
-	bitmap_t *m_screen_output;
+	bitmap_t m_bg_map[16];
+	bitmap_t m_screen_output;
 };
 
 READ32_MEMBER( vboy_state::port_02_read )
@@ -476,9 +476,9 @@ static VIDEO_START( vboy )
 
 	// Allocate memory for temporary screens
 	for(i = 0; i < 16; i++)
-		state->m_bg_map[i] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+		state->m_bg_map[i].allocate(512, 512, BITMAP_FORMAT_INDEXED16);
 
-	state->m_screen_output = auto_bitmap_alloc(machine, 384, 224, BITMAP_FORMAT_INDEXED16);
+	state->m_screen_output.allocate(384, 224, BITMAP_FORMAT_INDEXED16);
 	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
 	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
 	state->m_objects = state->m_bgmap + (0x1E000 >> 1);
@@ -487,7 +487,7 @@ static VIDEO_START( vboy )
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
 }
 
-static void put_char(vboy_state *state, bitmap_t *bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
+static void put_char(vboy_state *state, bitmap_t &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
 {
 	UINT16 data, code = ch;
 	UINT8 i, b, dat, col;
@@ -511,12 +511,12 @@ static void put_char(vboy_state *state, bitmap_t *bitmap, int x, int y, UINT16 c
 			if (!dat) col=0;
 
 			if (!trans || ( trans && col ))
-				bitmap->pix16((y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
+				bitmap.pix16((y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
 		}
 	}
 }
 
-static void fill_bg_map(vboy_state *state, int num, bitmap_t *bitmap)
+static void fill_bg_map(vboy_state *state, int num, bitmap_t &bitmap)
 {
 	int i, j;
 
@@ -531,7 +531,7 @@ static void fill_bg_map(vboy_state *state, int num, bitmap_t *bitmap)
 	}
 }
 
-static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool right)
+static UINT8 display_world(vboy_state *state, int num, bitmap_t &bitmap, bool right)
 {
 	num <<= 4;
 	UINT16 def = state->m_world[num];
@@ -568,11 +568,11 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool ri
 					if (mode==1)
 						x1 += vboy_paramtab[y*2];
 
-					pix = state->m_bg_map[bg_map_num]->pix16((y+my) & 0x1ff, (x+mx-mp) & 0x1ff);
+					pix = state->m_bg_map[bg_map_num].pix16((y+my) & 0x1ff, (x+mx-mp) & 0x1ff);
 					if (pix)
 						if (y1>=0 && y1<224)
 							if (x1>=0 && x1<384)
-								bitmap->pix16(y1, x1) = pix;
+								bitmap.pix16(y1, x1) = pix;
 				}
 			}
 		}
@@ -590,11 +590,11 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool ri
 					if (mode==1)
 						x1 += vboy_paramtab[y*2+1];
 
-					pix = state->m_bg_map[bg_map_num]->pix16((y+my) & 0x1ff, (x+mx+mp) & 0x1ff);
+					pix = state->m_bg_map[bg_map_num].pix16((y+my) & 0x1ff, (x+mx+mp) & 0x1ff);
 					if (pix)
 						if (y1>=0 && y1<224)
 							if (x1>=0 && x1<384)
-								bitmap->pix16(y1, x1) = pix;
+								bitmap.pix16(y1, x1) = pix;
 				}
 			}
 		}
@@ -629,7 +629,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t *bitmap, bool ri
 static SCREEN_UPDATE( vboy_left )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	state->m_screen_output->fill(state->m_vip_regs.BKCOL, cliprect);
+	state->m_screen_output.fill(state->m_vip_regs.BKCOL, cliprect);
 
 	for(int i=31; i>=0; i--)
 		if (display_world(state, i, state->m_screen_output, 0)) break;
@@ -642,7 +642,7 @@ static SCREEN_UPDATE( vboy_left )
 static SCREEN_UPDATE( vboy_right )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	state->m_screen_output->fill(state->m_vip_regs.BKCOL, cliprect);
+	state->m_screen_output.fill(state->m_vip_regs.BKCOL, cliprect);
 
 	for(int i=31; i>=0; i--)
 		if (display_world(state, i, state->m_screen_output, 1)) break;

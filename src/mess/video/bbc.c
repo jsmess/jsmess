@@ -226,7 +226,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			{
 				int col=returned_pixels[pixelno];
 
-					bitmap->pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
+					bitmap.pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
 			}
 
 
@@ -247,7 +247,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
 				{
 					int col=state->m_videoULA_pallet_lookup[state->m_pixel_bits[i]];
-					bitmap->pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
+					bitmap.pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
 					i=(i<<1)|1;
 				}
 			}
@@ -258,7 +258,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			{
 				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
 				{
-					bitmap->pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=7;
+					bitmap.pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=7;
 				}
 			}
 		}

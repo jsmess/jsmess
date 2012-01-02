@@ -702,7 +702,7 @@ static CRTC_EGA_ON_VBLANK_CHANGED( ega_vblank_changed )
 
 static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 {
-	UINT16	*p = &bitmap->pix16(y);
+	UINT16	*p = &bitmap.pix16(y);
 	int	i;
 
 //  logerror( "pc_ega_graphics: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
@@ -717,7 +717,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 {
 	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
-	UINT16	*p = &bitmap->pix16(y);
+	UINT16	*p = &bitmap.pix16(y);
 	int	i;
 
 //  logerror( "pc_ega_text: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );

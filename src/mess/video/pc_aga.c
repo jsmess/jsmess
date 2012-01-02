@@ -125,7 +125,7 @@ static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
 /* colors need fixing in the mda_text_* functions ! */
 static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16	*p = &bitmap->pix16(y);
+	UINT16	*p = &bitmap.pix16(y);
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
@@ -184,7 +184,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 
 static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16	*p = &bitmap->pix16(y);
+	UINT16	*p = &bitmap.pix16(y);
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
@@ -244,7 +244,7 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_text_inten_update_row\n");
@@ -273,7 +273,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_text_inten_alt_update_row\n");
@@ -301,7 +301,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16	*p = &bitmap->pix16(y);
+	UINT16	*p = &bitmap.pix16(y);
 	int i;
 
 	for ( i = 0; i < x_count; i++ ) {
@@ -333,7 +333,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_text_blink_alt_update_row\n");
@@ -367,7 +367,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_gfx_4bppl_update_row\n");
@@ -391,7 +391,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	int i;
 
 	if ( y == 0 ) logerror("cga_gfx_4bpph_update_row\n");
@@ -423,7 +423,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	int i;
 
 //  if ( y == 0 ) logerror("cga_gfx_2bpp_update_row\n");
@@ -447,7 +447,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	UINT8	fg = aga.cga_color_select & 0x0F;
 	int i;
 

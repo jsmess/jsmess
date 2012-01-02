@@ -206,7 +206,7 @@ void lcmate2_state::machine_start()
 
 bool lcmate2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_lcdc->video_update(&bitmap, cliprect);
+	return m_lcdc->video_update(bitmap, cliprect);
 }
 
 static const hd44780_interface lcmate2_display =

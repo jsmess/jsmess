@@ -1949,11 +1949,11 @@ void vic3_raster_interrupt_gen( device_t *device )
 		}
 }
 
-UINT32 vic3_video_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+UINT32 vic3_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	vic3_state *vic3 = get_safe_token(device);
 
-	copybitmap(bitmap, vic3->bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *vic3->bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -2054,7 +2054,7 @@ static DEVICE_START( vic3 )
 
 	device->save_item(NAME(vic3->on));
 
-	device->save_item(NAME(*vic3->bitmap));
+	device->save_item(NAME(vic3->bitmap));
 
 	device->save_item(NAME(vic3->lines));
 

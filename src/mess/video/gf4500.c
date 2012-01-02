@@ -64,13 +64,13 @@ static rgb_t gf4500_get_color_16( UINT16 data)
 	return MAKE_RGB( r, g, b);
 }
 
-static void gf4500_render_screen( running_machine &machine, bitmap_t *bitmap)
+static void gf4500_render_screen( running_machine &machine, bitmap_t &bitmap)
 {
 	UINT16 *vram = (UINT16 *)(gf4500.data + GF4500_FRAMEBUF_OFFSET / 4);
 	int x, y;
 	for (y = 0; y < 240; y++)
 	{
-		UINT32 *scanline = &bitmap->pix32(y);
+		UINT32 *scanline = &bitmap.pix32(y);
 		for (x = 0; x < 320; x++)
 		{
 			*scanline++ = gf4500_get_color_16( *vram++);
@@ -165,6 +165,6 @@ VIDEO_START( gf4500 )
 
 SCREEN_UPDATE( gf4500 )
 {
-	gf4500_render_screen( screen.machine(), screen.machine().generic.tmpbitmap);
+	gf4500_render_screen( screen.machine(), *screen.machine().generic.tmpbitmap);
 	return SCREEN_UPDATE_CALL(generic_bitmapped);
 }

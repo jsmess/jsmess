@@ -13,7 +13,7 @@ void newbrain_state::video_start()
 	save_item(NAME(m_segment_data));
 }
 
-void newbrain_state::screen_update(bitmap_t *bitmap, const rectangle &cliprect)
+void newbrain_state::screen_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
@@ -67,11 +67,11 @@ void newbrain_state::screen_update(bitmap_t *bitmap, const rectangle &cliprect)
 			{
 				int color = BIT(charrom_data, 7) ^ rv;
 
-				bitmap->pix16(y, x++) = color;
+				bitmap.pix16(y, x++) = color;
 
 				if (columns == 40)
 				{
-					bitmap->pix16(y, x++) = color;
+					bitmap.pix16(y, x++) = color;
 				}
 
 				charrom_data <<= 1;
@@ -105,7 +105,7 @@ bool newbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 {
 	if (m_enrg1 & NEWBRAIN_ENRG1_TVP)
 	{
-		screen_update(&bitmap, cliprect);
+		screen_update(bitmap, cliprect);
 	}
 	else
 	{

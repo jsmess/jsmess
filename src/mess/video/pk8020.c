@@ -41,7 +41,7 @@ SCREEN_UPDATE( pk8020 )
 					col |= (((code3 >> b) & 0x01) ? 0x04 : 0x00);
 					col |= (((code2 >> b) & 0x01) ? 0x02 : 0x00);
 					col |= (((code1 >> b) & 0x01) ? 0x01 : 0x00);
-					bitmap->pix16((y*16)+j, x*8+(7-b)) =  col;
+					bitmap.pix16((y*16)+j, x*8+(7-b)) =  col;
 				}
 			}
 		}

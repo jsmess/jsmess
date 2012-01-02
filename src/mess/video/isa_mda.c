@@ -226,7 +226,7 @@ static SCREEN_UPDATE( mc6845_mda )
 static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 {
 	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device->owner());
-	UINT16	*p = &bitmap->pix16(y);
+	UINT16	*p = &bitmap.pix16(y);
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
@@ -299,7 +299,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 static MC6845_UPDATE_ROW( mda_text_blink_update_row )
 {
 	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device->owner());
-	UINT16	*p = &bitmap->pix16(y);
+	UINT16	*p = &bitmap.pix16(y);
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
@@ -628,7 +628,7 @@ void isa8_hercules_device::device_reset()
 static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 {
 	isa8_hercules_device *herc  = downcast<isa8_hercules_device *>(device->owner());
-	UINT16	*p = &bitmap->pix16(y);
+	UINT16	*p = &bitmap.pix16(y);
 	UINT16	gfx_base = ( ( herc->mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;
 	if ( y == 0 ) MDA_LOG(1,"hercules_gfx_update_row",("\n"));

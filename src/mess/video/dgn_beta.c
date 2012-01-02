@@ -100,7 +100,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 {
 	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
 	UINT8 *videoram = state->m_videoram;
-	UINT16  *p = &bitmap->pix16(y);
+	UINT16  *p = &bitmap.pix16(y);
 	int i;
 	if(IsTextMode)
 	{

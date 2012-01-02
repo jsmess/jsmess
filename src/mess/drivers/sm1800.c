@@ -95,7 +95,7 @@ static INTERRUPT_GEN( sm1800_vblank_interrupt )
 static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 {
 	int i;
-	bitmap_t *bitmap = device->machine().generic.tmpbitmap;
+	bitmap_t &bitmap = *device->machine().generic.tmpbitmap;
 	UINT8 *charmap = device->machine().region("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
@@ -108,7 +108,7 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 		pixels ^= 0xff;
 
 	for(i=0;i<8;i++)
-		bitmap->pix16(y, x + i) = (pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap.pix16(y, x + i) = (pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 }
 
 const i8275_interface sm1800_i8275_interface = {

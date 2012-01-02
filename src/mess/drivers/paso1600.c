@@ -106,7 +106,7 @@ static SCREEN_UPDATE( paso1600 )
 				int pen = (state->m_p_gvram[count] >> xi) & 1;
 
 				if(y < 475 && x*16+xi < 640) /* TODO: safety check */
-					bitmap->pix16(y, x*16+xi) = screen.machine().pens[pen];
+					bitmap.pix16(y, x*16+xi) = screen.machine().pens[pen];
 			}
 
 			count++;
@@ -135,7 +135,7 @@ static SCREEN_UPDATE( paso1600 )
 
 					//if(pen != -1)
 						if(y*19 < 475 && x*8+xi < 640) /* TODO: safety check */
-							bitmap->pix16(y*19+yi, x*8+xi) = screen.machine().pens[pen];
+							bitmap.pix16(y*19+yi, x*8+xi) = screen.machine().pens[pen];
 				}
 			}
 		}
@@ -151,7 +151,7 @@ static SCREEN_UPDATE( paso1600 )
 			{
 				x = mc6845_cursor_addr % mc6845_h_display;
 				y = mc6845_cursor_addr / mc6845_h_display;
-				bitmap->pix16(y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[7];
+				bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[7];
 			}
 		}
 	}

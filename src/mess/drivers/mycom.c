@@ -126,7 +126,7 @@ VIDEO_START_MEMBER( mycom_state )
 
 SCREEN_UPDATE_MEMBER( mycom_state )
 {
-	m_crtc->update( &bitmap, cliprect);
+	m_crtc->update( bitmap, cliprect);
 	return 0;
 }
 
@@ -135,7 +135,7 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 	mycom_state *state = device->machine().driver_data<mycom_state>();
 	UINT8 chr,gfx=0,z;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap->pix16(y);
+	UINT16 *p = &bitmap.pix16(y);
 
 	if (state->m_0a & 0x40)
 	{

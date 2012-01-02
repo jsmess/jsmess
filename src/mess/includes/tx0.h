@@ -140,8 +140,8 @@ public:
 	int m_old_tsr_keys;
 	int m_tsr_index;
 	int m_typewriter_color;
-	bitmap_t *m_panel_bitmap;
-	bitmap_t *m_typewriter_bitmap;
+	bitmap_t m_panel_bitmap;
+	bitmap_t m_typewriter_bitmap;
 	int m_pos;
 	int m_case_shift;
 	device_t *m_crt;

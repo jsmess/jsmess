@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER( apf_state::apf_mc6847_fs_w )
 
 bool apf_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_crtc->update(&bitmap, cliprect);
+	return m_crtc->update(bitmap, cliprect);
 }
 
 READ8_MEMBER( apf_state::apf_m1000_pia_in_a_func)

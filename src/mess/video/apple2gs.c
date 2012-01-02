@@ -48,7 +48,7 @@ SCREEN_UPDATE( apple2gs )
 				return 0;
 			}
 
-			scanline = &bitmap->pix16(beamy);
+			scanline = &bitmap.pix16(beamy);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
 				scanline[col] = state->m_bordercolor;
@@ -62,7 +62,7 @@ SCREEN_UPDATE( apple2gs )
 			palette = ((scb & 0x0f) << 4) + 16;
 
 			vram = &state->m_slowmem[0x12000 + (shrline * 160)];
-			scanline = &bitmap->pix16(beamy);
+			scanline = &bitmap.pix16(beamy);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT; col++)
@@ -133,7 +133,7 @@ SCREEN_UPDATE( apple2gs )
 			new_cliprect.min_y = 0;
 			new_cliprect.max_x = 559;
 			new_cliprect.max_y = 191;
-			SCREEN_UPDATE_NAME(apple2)(screen, state->m_legacy_gfx, new_cliprect);
+			SCREEN_UPDATE_NAME(apple2)(screen, *state->m_legacy_gfx, new_cliprect);
 		}
 
 		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
@@ -143,7 +143,7 @@ SCREEN_UPDATE( apple2gs )
 				return 0;
 			}
 
-			scanline = &bitmap->pix16(beamy);
+			scanline = &bitmap.pix16(beamy);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
 				scanline[col] = state->m_bordercolor;
@@ -151,7 +151,7 @@ SCREEN_UPDATE( apple2gs )
 		}
 		else
 		{
-			scanline = &bitmap->pix16(beamy);
+			scanline = &bitmap.pix16(beamy);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT + 40; col++)

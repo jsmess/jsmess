@@ -87,7 +87,7 @@ const rom_entry *comx_clm_device::device_rom_region() const
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_t *bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	for (int column = 0; column < x_count; column++)
 	{
@@ -105,7 +105,7 @@ void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_t *bitmap, c
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) ? 7 : 0;
 
-			bitmap->pix16(y, x) = color;
+			bitmap.pix16(y, x) = color;
 
 			data <<= 1;
 		}
@@ -294,7 +294,7 @@ void comx_clm_device::comx_mwr_w(offs_t offset, UINT8 data)
 
 bool comx_clm_device::comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update(&bitmap, cliprect);
+	m_crtc->update(bitmap, cliprect);
 
 	return false;
 }

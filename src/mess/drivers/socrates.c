@@ -610,7 +610,7 @@ static SCREEN_UPDATE( socrates )
 				colidx &= 0xF;
 				if (colidx > 7) color=state->m_videoram[0xF000+(colidx<<8)+((y+state->m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
-				bitmap->pix16(y, x) = color;
+				bitmap.pix16(y, x) = color;
 			}
 			else
 			{
@@ -619,7 +619,7 @@ static SCREEN_UPDATE( socrates )
 				colidx &= 0xF;
 				if (colidx > 7) color=state->m_videoram[0xF000+(colidx<<8)+((y+state->m_scroll_offset)&0xFF)];
 				else color=fixedcolors[colidx];
-				bitmap->pix16(y, x) = color;
+				bitmap.pix16(y, x) = color;
 			}
 		}
 	}

@@ -83,7 +83,7 @@ static const char led[]={
         "  dddddddddddd"
 };
 
-static void ssystem3_draw_7segment(bitmap_t *bitmap,int value, int x, int y)
+static void ssystem3_draw_7segment(bitmap_t &bitmap,int value, int x, int y)
 {
 	int i, xi, yi, mask, color;
 
@@ -105,7 +105,7 @@ static void ssystem3_draw_7segment(bitmap_t *bitmap,int value, int x, int y)
 
 		if (mask!=0) {
 			color=(value&mask)?1:0;
-			bitmap->pix16(y+yi, x+xi) = color;
+			bitmap.pix16(y+yi, x+xi) = color;
 		}
 		if (led[i]!='\r') xi++;
 		else { yi++, xi=0; }
@@ -162,14 +162,14 @@ static const char single_led[]=
 " 55555555   55555555          000000   000000   00   00   00  00         000000      00     00  00    00   0000000"
 ;
 
-static void ssystem3_draw_led(bitmap_t *bitmap,INT16 color, int x, int y, int ch)
+static void ssystem3_draw_led(bitmap_t &bitmap,INT16 color, int x, int y, int ch)
 {
 	int j, xi=0;
 	for (j=0; single_led[j]; j++) {
 		switch (single_led[j]) {
 		default:
 			if (ch==single_led[j]) {
-				bitmap->pix16(y, x+xi) = color;
+				bitmap.pix16(y, x+xi) = color;
 			}
 			xi++;
 			break;

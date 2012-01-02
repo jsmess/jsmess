@@ -445,7 +445,7 @@ void psion_state::machine_reset()
 
 bool psion_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_lcdc->video_update( &bitmap, cliprect );
+	return m_lcdc->video_update( bitmap, cliprect );
 }
 
 static PALETTE_INIT( psion )

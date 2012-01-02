@@ -150,9 +150,9 @@ PALETTE_INIT( megaduck )
 }
 
 
-INLINE void gb_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+INLINE void gb_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
 {
-	bitmap->pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (UINT16)color;
 }
 
 /*
@@ -202,7 +202,7 @@ static void gb_select_sprites( gb_state *state )
 INLINE void gb_update_sprites ( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t *bitmap = machine.generic.tmpbitmap;
+	bitmap_t &bitmap = *machine.generic.tmpbitmap;
 	UINT8 height, tilemask, line, *oam, *vram;
 	int i, yindex;
 
@@ -290,7 +290,7 @@ INLINE void gb_update_sprites ( running_machine &machine )
 static void gb_update_scanline( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t *bitmap = machine.generic.tmpbitmap;
+	bitmap_t &bitmap = *machine.generic.tmpbitmap;
 
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -352,7 +352,7 @@ static void gb_update_scanline( running_machine &machine )
 				r.min_y = r.max_y = state->m_lcd.current_line;
 				r.min_x = state->m_lcd.start_x;
 				r.max_x = state->m_lcd.end_x - 1;
-				bitmap->fill(state->m_lcd.gb_bpal[0], r );
+				bitmap.fill(state->m_lcd.gb_bpal[0], r );
 			}
 			while ( l < 2 )
 			{
@@ -431,7 +431,7 @@ static void gb_update_scanline( running_machine &machine )
 					r1.min_y = r1.max_y = state->m_lcd.current_line;
 					r1.min_x = r.min_x;
 					r1.max_x = r.max_x;
-					bitmap->fill(0, r1 );
+					bitmap.fill(0, r1 );
 				}
 				state->m_lcd.previous_line = state->m_lcd.current_line;
 			}
@@ -446,7 +446,7 @@ static void gb_update_scanline( running_machine &machine )
 INLINE void sgb_update_sprites (running_machine &machine)
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t *bitmap = machine.generic.tmpbitmap;
+	bitmap_t &bitmap = *machine.generic.tmpbitmap;
 	UINT8 height, tilemask, line, *oam, *vram, pal;
 	INT16 i, yindex;
 
@@ -546,7 +546,7 @@ static void sgb_refresh_border(running_machine &machine)
 	UINT16 yidx, xidx, xindex;
 	UINT8 *map, *tiles, *tiles2;
 	UINT8 pal, i;
-	bitmap_t *bitmap = machine.generic.tmpbitmap;
+	bitmap_t &bitmap = *machine.generic.tmpbitmap;
 
 	map = state->m_sgb_tile_map - 64;
 
@@ -616,7 +616,7 @@ static void sgb_refresh_border(running_machine &machine)
 static void sgb_update_scanline( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t *bitmap = machine.generic.tmpbitmap;
+	bitmap_t &bitmap = *machine.generic.tmpbitmap;
 
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -684,7 +684,7 @@ static void sgb_update_scanline( running_machine &machine )
 					r.max_x = SGB_XOFFSET + 160-1;
 					r.min_y = SGB_YOFFSET;
 					r.max_y = SGB_YOFFSET + 144 - 1;
-					bitmap->fill(0, r );
+					bitmap.fill(0, r );
 				} return;
 			case 3: /* Blank screen (white - or should it be color 0?) */
 				{
@@ -693,7 +693,7 @@ static void sgb_update_scanline( running_machine &machine )
 					r.max_x = SGB_XOFFSET + 160 - 1;
 					r.min_y = SGB_YOFFSET;
 					r.max_y = SGB_YOFFSET + 144 - 1;
-					bitmap->fill(32767, r );
+					bitmap.fill(32767, r );
 				} return;
 			}
 
@@ -714,7 +714,7 @@ static void sgb_update_scanline( running_machine &machine )
 				r.min_x = SGB_XOFFSET;
 				r.max_x = SGB_XOFFSET + 160 - 1;
 				r.min_y = r.max_y = state->m_lcd.current_line + SGB_YOFFSET;
-				bitmap->fill(0, r );
+				bitmap.fill(0, r );
 			}
 			while( l < 2 )
 			{
@@ -796,7 +796,7 @@ static void sgb_update_scanline( running_machine &machine )
 					r.min_x = SGB_XOFFSET;
 					r.max_x = SGB_XOFFSET + 160 - 1;
 					r.min_y = r.max_y = state->m_lcd.current_line + SGB_YOFFSET;
-					bitmap->fill(0, r);
+					bitmap.fill(0, r);
 				}
 				state->m_lcd.previous_line = state->m_lcd.current_line;
 			}
@@ -811,7 +811,7 @@ static void sgb_update_scanline( running_machine &machine )
 INLINE void cgb_update_sprites ( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t *bitmap = machine.generic.tmpbitmap;
+	bitmap_t &bitmap = *machine.generic.tmpbitmap;
 	UINT8 height, tilemask, line, *oam;
 	int i, xindex, yindex;
 
@@ -924,7 +924,7 @@ INLINE void cgb_update_sprites ( running_machine &machine )
 static void cgb_update_scanline ( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t *bitmap = machine.generic.tmpbitmap;
+	bitmap_t &bitmap = *machine.generic.tmpbitmap;
 
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -986,7 +986,7 @@ static void cgb_update_scanline ( running_machine &machine )
 				r.min_y = r.max_y = state->m_lcd.current_line;
 				r.min_x = state->m_lcd.start_x;
 				r.max_x = state->m_lcd.end_x - 1;
-				bitmap->fill(( ! state->m_lcd.gbc_mode ) ? 0 : 32767 , r);
+				bitmap.fill(( ! state->m_lcd.gbc_mode ) ? 0 : 32767 , r);
 			}
 			while ( l < 2 )
 			{
@@ -1105,7 +1105,7 @@ static void cgb_update_scanline ( running_machine &machine )
 					r.min_x = r1.min_x;
 					r.max_x = r1.max_x;
 					r.min_y = r.max_y = state->m_lcd.current_line;
-					bitmap->fill(( ! state->m_lcd.gbc_mode ) ? 0 : 32767 , r);
+					bitmap.fill(( ! state->m_lcd.gbc_mode ) ? 0 : 32767 , r);
 				}
 				state->m_lcd.previous_line = state->m_lcd.current_line;
 			}

@@ -31,7 +31,7 @@ SCREEN_UPDATE( bk0010 )
 			code = state->m_bk0010_video_ram[((y+nOfs) %256)*32 + x];
 			for (b = 0; b < 16; b++)
 			{
-				bitmap->pix16(y, x*16 + b) =  (code >> b) & 0x01;
+				bitmap.pix16(y, x*16 + b) =  (code >> b) & 0x01;
 			}
 		}
 	}

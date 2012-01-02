@@ -153,12 +153,12 @@ bool coco3_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 	if (!strcmp(screen.tag(), COMPOSITE_SCREEN_TAG))
 	{
 		/* composite screen */
-		result = m_gime->update_composite(&bitmap, cliprect);
+		result = m_gime->update_composite(bitmap, cliprect);
 	}
 	else if (!strcmp(screen.tag(), RGB_SCREEN_TAG))
 	{
 		/* rgb screen */
-		result = m_gime->update_rgb(&bitmap, cliprect);
+		result = m_gime->update_rgb(bitmap, cliprect);
 	}
 	else
 	{

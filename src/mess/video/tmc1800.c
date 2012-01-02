@@ -18,7 +18,7 @@ static CDP1861_INTERFACE( tmc1800_cdp1861_intf )
 
 bool tmc1800_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_vdc->update_screen(&bitmap, cliprect);
+	m_vdc->update_screen(bitmap, cliprect);
 
 	return 0;
 }
@@ -60,7 +60,7 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 
 bool tmc2000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_cti->update_screen(&bitmap, cliprect);
+	m_cti->update_screen(bitmap, cliprect);
 
 	return 0;
 }
@@ -87,7 +87,7 @@ static CDP1864_INTERFACE( nano_cdp1864_intf )
 
 bool nano_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_cti->update_screen(&bitmap, cliprect);
+	m_cti->update_screen(bitmap, cliprect);
 
 	return 0;
 }

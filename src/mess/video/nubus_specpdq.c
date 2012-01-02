@@ -174,7 +174,7 @@ static SCREEN_UPDATE( specpdq )
 		case 0: // 1 bpp
 			for (y = 0; y < 844; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 1152/8; x++)
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
@@ -194,7 +194,7 @@ static SCREEN_UPDATE( specpdq )
 		case 1: // 2 bpp
 			for (y = 0; y < 844; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 1152/4; x++)
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
@@ -210,7 +210,7 @@ static SCREEN_UPDATE( specpdq )
 		case 2: // 4 bpp
 			for (y = 0; y < 844; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < 1152/2; x++)
 				{
@@ -225,7 +225,7 @@ static SCREEN_UPDATE( specpdq )
 		case 3: // 8 bpp
 			for (y = 0; y < 844; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < 1152; x++)
 				{

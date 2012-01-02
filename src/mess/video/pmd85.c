@@ -32,14 +32,14 @@ VIDEO_START( pmd85 )
 {
 }
 
-static void pmd85_draw_scanline(running_machine &machine,bitmap_t *bitmap, int pmd85_scanline)
+static void pmd85_draw_scanline(running_machine &machine,bitmap_t &bitmap, int pmd85_scanline)
 {
 	int x, i;
 	int pen0, pen1;
 	UINT8 data;
 
 	/* set up scanline */
-	UINT16 *scanline = &bitmap->pix16(pmd85_scanline);
+	UINT16 *scanline = &bitmap.pix16(pmd85_scanline);
 
 	/* address of current line in PMD-85 video memory */
 	UINT8* pmd85_video_ram_line = machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000 + 0x40*pmd85_scanline;

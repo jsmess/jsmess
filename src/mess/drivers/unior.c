@@ -263,7 +263,7 @@ static SCREEN_UPDATE( unior )
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap->pix16(sy++);
+			UINT16 *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 80; x++)
 			{

@@ -25,7 +25,7 @@ SCREEN_UPDATE( vector06 )
 	int width = (state->m_video_mode==0x00) ? 256 : 512;
 	rectangle screen_area(0,width+64-1,0,256+64-1);
 	// fill border color
-	bitmap->fill(state->m_color_index, screen_area);
+	bitmap.fill(state->m_color_index, screen_area);
 
 	// draw image
 	for (x = 0; x < 32; x++)
@@ -42,10 +42,10 @@ SCREEN_UPDATE( vector06 )
 			{
 				col = ((code1 >> b) & 0x01) * 8 + ((code2 >> b) & 0x01) * 4 + ((code3 >> b) & 0x01)* 2+ ((code4 >> b) & 0x01);
 				if (state->m_video_mode==0x00) {
-					bitmap->pix16(draw_y, x*8+(7-b)+32) =  col;
+					bitmap.pix16(draw_y, x*8+(7-b)+32) =  col;
 				} else {
-					bitmap->pix16(draw_y, x*16+(7-b)*2+1+32) =  ((code2 >> b) & 0x01) * 2;
-					bitmap->pix16(draw_y, x*16+(7-b)*2+32)   =  ((code3 >> b) & 0x01) * 2;
+					bitmap.pix16(draw_y, x*16+(7-b)*2+1+32) =  ((code2 >> b) & 0x01) * 2;
+					bitmap.pix16(draw_y, x*16+(7-b)*2+32)   =  ((code3 >> b) & 0x01) * 2;
 				}
 			}
 		}

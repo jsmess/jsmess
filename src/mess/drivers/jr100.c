@@ -191,7 +191,7 @@ static SCREEN_UPDATE( jr100 )
 				for(xi=0;xi<8;xi++)
 				{
 					UINT8 pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1);
-					bitmap->pix16(y*8+yi, x*8+xi) = attr ^ pen;
+					bitmap.pix16(y*8+yi, x*8+xi) = attr ^ pen;
 				}
 			}
 		}

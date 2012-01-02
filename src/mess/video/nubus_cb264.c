@@ -145,7 +145,7 @@ static SCREEN_UPDATE( cb264 )
 		case 0: // 1 bpp
 			for (y = 0; y < 480; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 640/8; x++)
 				{
 					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
@@ -165,7 +165,7 @@ static SCREEN_UPDATE( cb264 )
 		case 1: // 2 bpp (3f/7f/bf/ff)
 			for (y = 0; y < 480; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 640/4; x++)
 				{
 					pixels = card->m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
@@ -181,7 +181,7 @@ static SCREEN_UPDATE( cb264 )
 		case 2: // 4 bpp
 			for (y = 0; y < 480; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < 640/2; x++)
 				{
@@ -196,7 +196,7 @@ static SCREEN_UPDATE( cb264 )
 		case 3: // 8 bpp
 			for (y = 0; y < 480; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < 640; x++)
 				{
@@ -213,7 +213,7 @@ static SCREEN_UPDATE( cb264 )
 
 				for (y = 0; y < 480; y++)
 				{
-					scanline = &bitmap->pix32(y);
+					scanline = &bitmap.pix32(y);
 					base = &vram32[y * 1024];
 					for (x = 0; x < 640; x++)
 					{

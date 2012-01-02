@@ -121,7 +121,7 @@ SCREEN_UPDATE( pc1251 )
 	int color[2];
 	running_machine &machine = screen.machine();
 
-	bitmap->fill(11, cliprect);
+	bitmap.fill(11, cliprect);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = 7; //pocketc_colortable[PC1251_CONTRAST][0];

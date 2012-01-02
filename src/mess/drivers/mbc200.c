@@ -169,7 +169,7 @@ static SCREEN_UPDATE( mbc200 )
 					dot = (state->m_vram[count] >> (7-xi)) & 1;
 
 					if(y*4+yi < 400 && x*8+xi < 640) /* TODO: safety check */
-						bitmap->pix16(y*4+yi, x*8+xi) = screen.machine().pens[dot];
+						bitmap.pix16(y*4+yi, x*8+xi) = screen.machine().pens[dot];
 				}
 
 				count++;

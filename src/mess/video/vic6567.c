@@ -2581,12 +2581,12 @@ READ8_DEVICE_HANDLER( vic2_port_r )
 	return val;
 }
 
-UINT32 vic2_video_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+UINT32 vic2_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	vic2_state *vic2 = get_safe_token(device);
 
 	if (vic2->on)
-		copybitmap(bitmap, vic2->bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(bitmap, *vic2->bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -2673,7 +2673,7 @@ static DEVICE_START( vic2 )
 
 	device->save_item(NAME(vic2->on));
 
-	device->save_item(NAME(*vic2->bitmap));
+	device->save_item(NAME(vic2->bitmap));
 
 	device->save_item(NAME(vic2->chargenaddr));
 	device->save_item(NAME(vic2->videoaddr));

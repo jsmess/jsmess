@@ -83,7 +83,7 @@ MACHINE_RESET_MEMBER(ipds_state)
 static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
-	bitmap_t *bitmap = device->machine().generic.tmpbitmap;
+	bitmap_t &bitmap = *device->machine().generic.tmpbitmap;
 	UINT8 *charmap = device->machine().region("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
@@ -97,7 +97,7 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 		pixels ^= 0xff;
 
 	for(i=0;i<6;i++)
-		bitmap->pix16(y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap.pix16(y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 }
 
 const i8275_interface ipds_i8275_interface = {

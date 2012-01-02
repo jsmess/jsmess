@@ -22,7 +22,7 @@ struct _crt_interface
 
 void crt_plot(device_t *device, int x, int y);
 void crt_eof(device_t *device);
-void crt_update(device_t *device, bitmap_t *bitmap);
+void crt_update(device_t *device, bitmap_t &bitmap);
 
 DECLARE_LEGACY_DEVICE(CRT, crt);
 

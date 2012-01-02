@@ -58,7 +58,7 @@ public:
 	UINT8 m_control_port;
 	CRTC6845 m_crt;
 	int m_graphics;
-	bitmap_t *m_dlybitmap;
+	bitmap_t m_dlybitmap;
 	int m_off_x;
 	int m_off_y;
 };

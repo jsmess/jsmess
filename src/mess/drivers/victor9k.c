@@ -103,7 +103,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 				if (sx == cursor_x) color = 1;
 
-				bitmap->pix16(y, x + sx*10) = color;
+				bitmap.pix16(y, x + sx*10) = color;
 			}
 
 			video_ram_addr += 2;
@@ -128,7 +128,7 @@ static const mc6845_interface hd46505s_intf =
 
 bool victor9k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update(&bitmap, cliprect);
+	m_crtc->update(bitmap, cliprect);
 
 	return 0;
 }

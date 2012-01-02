@@ -66,7 +66,7 @@ static SCREEN_UPDATE( indiana )
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = &bitmap->pix16(sy++);
+			UINT16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 160; x+=2)
 			{

@@ -79,7 +79,7 @@ SCREEN_UPDATE( orion128 )
 									 break;
 						}
 				}
-				bitmap->pix16(y, x*8+(7-b)) = color;
+				bitmap.pix16(y, x*8+(7-b)) = color;
 			}
 		}
 	}

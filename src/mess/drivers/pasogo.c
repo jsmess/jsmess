@@ -396,7 +396,7 @@ static SCREEN_UPDATE( pasogo )
 	UINT8 *rom = screen.machine().region("maincpu")->base()+0xb8000;
 	static const UINT16 c[]={ 3, 0 };
 	int x,y;
-//  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0);
+//  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0);
 	int w=640;
 	int h=240;
 	if (0)
@@ -409,7 +409,7 @@ static SCREEN_UPDATE( pasogo )
 			{
 				int a=(y&1)*0x2000;
 				UINT8 d=rom[a+(y&~1)*80/2+x/4];
-				UINT16 *line=&bitmap->pix16(y, x);
+				UINT16 *line=&bitmap.pix16(y, x);
 				*line++=(d>>6)&3;
 				*line++=(d>>4)&3;
 				*line++=(d>>2)&3;
@@ -425,7 +425,7 @@ static SCREEN_UPDATE( pasogo )
 			{
 				int a=(y&3)*0x2000;
 				UINT8 d=rom[a+(y&~3)*80/4+x/8];
-				UINT16 *line=&bitmap->pix16(y, x);
+				UINT16 *line=&bitmap.pix16(y, x);
 				*line++=c[(d>>7)&1];
 				*line++=c[(d>>6)&1];
 				*line++=c[(d>>5)&1];

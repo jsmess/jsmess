@@ -142,7 +142,7 @@ SCREEN_EOF( spectrum );
 
 void spectrum_border_force_redraw (running_machine &machine);
 void spectrum_border_set_last_color (running_machine &machine, int NewColor);
-void spectrum_border_draw(running_machine &machine, bitmap_t *bitmap, int full_refresh,
+void spectrum_border_draw(running_machine &machine, bitmap_t &bitmap, int full_refresh,
                 int TopBorderLines, int ScreenLines, int BottomBorderLines,
                 int LeftBorderPixels, int ScreenPixels, int RightBorderPixels,
                 int LeftBorderCycles, int ScreenCycles, int RightBorderCycles,

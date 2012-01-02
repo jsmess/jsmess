@@ -170,7 +170,7 @@ void crt_eof(device_t *device)
 
     update the bitmap
 */
-void crt_update(device_t *device, bitmap_t *bitmap)
+void crt_update(device_t *device, bitmap_t &bitmap)
 {
 	crt_t *crt = get_safe_token(device);
 	int i, p_i;
@@ -181,7 +181,7 @@ void crt_update(device_t *device, bitmap_t *bitmap)
 		/* some time has elapsed: let's update the screen */
 		for (y=0; y<crt->window_height; y++)
 		{
-			UINT16 *line = &bitmap->pix16(y+crt->window_offset_y);
+			UINT16 *line = &bitmap.pix16(y+crt->window_offset_y);
 
 			p_i = -1;
 

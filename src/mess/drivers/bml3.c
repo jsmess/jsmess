@@ -116,11 +116,11 @@ static SCREEN_UPDATE( bml3 )
 
 					if(height)
 					{
-						bitmap->pix16((y*8+yi)*2+0, x*8+xi) = pen;
-						bitmap->pix16((y*8+yi)*2+1, x*8+xi) = pen;
+						bitmap.pix16((y*8+yi)*2+0, x*8+xi) = pen;
+						bitmap.pix16((y*8+yi)*2+1, x*8+xi) = pen;
 					}
 					else
-						bitmap->pix16(y*8+yi, x*8+xi) = pen;
+						bitmap.pix16(y*8+yi, x*8+xi) = pen;
 				}
 			}
 
@@ -145,11 +145,11 @@ static SCREEN_UPDATE( bml3 )
 						{
 							if(height)
 							{
-								bitmap->pix16((y*8+yc+7)*2+0, x*8+xc) = 7;
-								bitmap->pix16((y*8+yc+7)*2+1, x*8+xc) = 7;
+								bitmap.pix16((y*8+yc+7)*2+0, x*8+xc) = 7;
+								bitmap.pix16((y*8+yc+7)*2+1, x*8+xc) = 7;
 							}
 							else
-								bitmap->pix16(y*8+yc+7, x*8+xc) = 7;
+								bitmap.pix16(y*8+yc+7, x*8+xc) = 7;
 						}
 					}
 				}
