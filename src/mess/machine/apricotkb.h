@@ -58,14 +58,15 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	UINT8 read_keyboard();
-	READ8_MEMBER( kb_lo_r );
-	READ8_MEMBER( kb_hi_r );
-	READ8_MEMBER( kb_p6_r );
-	WRITE8_MEMBER( kb_p3_w );
-	WRITE8_MEMBER( kb_y0_w );
-	WRITE8_MEMBER( kb_y4_w );
-	WRITE8_MEMBER( kb_y8_w );
-	WRITE8_MEMBER( kb_yc_w );
+	
+	DECLARE_READ8_MEMBER( kb_lo_r );
+	DECLARE_READ8_MEMBER( kb_hi_r );
+	DECLARE_READ8_MEMBER( kb_p6_r );
+	DECLARE_WRITE8_MEMBER( kb_p3_w );
+	DECLARE_WRITE8_MEMBER( kb_y0_w );
+	DECLARE_WRITE8_MEMBER( kb_y4_w );
+	DECLARE_WRITE8_MEMBER( kb_y8_w );
+	DECLARE_WRITE8_MEMBER( kb_yc_w );
 
 protected:
     // device-level overrides
