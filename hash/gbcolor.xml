@@ -36,7 +36,6 @@ Undumped:
 - MTV Sports - Skateboarding featuring Andy MacDonald CGB-BMTP-EUR
 - NBA Jam 2001 CGB-BJAP-EUR
 - NHL 2000 DMG-ANRP-EUR
-- Oddworld Adventures II DMG-AOWP-EUR
 - Power Rangers - Time Force CGB-B4TP-EUR
 - Pro Pool CGB-BPLP-EUR
 - Rampage 2 - Universal Tour CGB-AUTP-EUR
@@ -11517,13 +11516,25 @@ Undumped Pirates:
 	</software>
 
 	<software name="oddworld">
+		<description>Oddworld Adventures II (Euro)</description>
+		<year>2000</year>
+		<publisher>GT Interactive</publisher>
+		<info name="serial" value="DMG-AOWP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="oddworld adventures ii (europe) (en,fr,de,es,it).bin" size="1048576" crc="4b83b14f" sha1="c9d4d1dd1c33a9fa9b54e9f2a7a5f6dd90069b91" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oddworldu" cloneof="oddworld">
 		<description>Oddworld Adventures II (USA)</description>
 		<year>2000</year>
 		<publisher>GT Interactive</publisher>
 		<info name="serial" value="DMG-AOWE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="oddworld adventures ii (usa, europe) (en,fr,de,es,it).bin" size="1048576" crc="5c260d5a" sha1="a35ccdf0789ce84df3c12cfe7c4b9b98af08ca9a" offset="000000" />
+				<rom name="oddworld adventures ii (usa) (en,fr,de,es,it).bin" size="1048576" crc="5c260d5a" sha1="a35ccdf0789ce84df3c12cfe7c4b9b98af08ca9a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
