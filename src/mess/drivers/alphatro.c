@@ -11,8 +11,8 @@
 
         The Z80 must start at E000, but unlike other designs (Super80 for
         example) which causes the ROMs to appear everywhere during boot,
-        this one (it seems) forces E000 onto the address bus for a short
-        time. This kind of boot still needs to be emulated.
+        this one (it seems) holds the data bus low until E000 is reached.
+        This kind of boot still needs to be emulated.
 
         This machine has 64k RAM, the ROMs being copied into RAM when
         needed.
@@ -42,12 +42,14 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "crtc"),
 	m_usart(*this, "usart"),
+	m_cass(*this, CASSETTE_TAG),
 	m_beep(*this, BEEPER_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_usart;
+	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_beep;
 
 	DECLARE_READ8_MEMBER(port10_r);
@@ -87,24 +89,25 @@ READ8_MEMBER( alphatro_state::port10_r )
 
 WRITE8_MEMBER( alphatro_state::port10_w )
 {
-// This seems to be for the beeper. The length varies with the byte.
 // Bit 0 -> 0 = 40 cols; 1 = 80 cols
+// Bit 1 ? each keystroke, and a lot when it scrolls
+// Bit 2 ? after a cload
+// Bit 3 -> cassette relay
+// Bit 4 -> BEEP
 
 	UINT16 length = 0;
 	data &= 0xfe;
 
-	//if (data == 0x02)
-	//  length = 4; // keyclick + when it scrolls?
-	//else
 	if (data == 0x10)
 		length = 400; // BEEP command
-
 
 	if (length)
 	{
 		machine().scheduler().timer_set(attotime::from_msec(length), FUNC(alphatro_beepoff));
 		beep_set_state(m_beep, 1);
 	}
+
+	m_cass->change_state( BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -123,18 +126,12 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ_LINE_MEMBER( alphatro_state::rxdata_callback )
 {
-	if(machine().device<cassette_image_device>(CASSETTE_TAG)->input() > -0.1)
-		return 1;
-	else
-		return 0;
+	return (m_cass->input() > -0.1) ? 1 : 0;
 }
 
 WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 {
-	if(state)
-		machine().device<cassette_image_device>(CASSETTE_TAG)->output(0.8);
-	else
-		machine().device<cassette_image_device>(CASSETTE_TAG)->output(-0.8);
+	m_cass->output( (state) ? 0.8 : -0.8);
 }
 
 VIDEO_START_MEMBER( alphatro_state )
@@ -187,7 +184,7 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 
 INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 {
-	device_set_input_line(m_maincpu,INPUT_LINE_IRQ0,HOLD_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
@@ -359,12 +356,12 @@ void alphatro_state::machine_start()
 void alphatro_state::machine_reset()
 {
 	// do what the IPL does
-//  UINT8* RAM = machine().device<ram_device>("ram")->pointer();
+	//  UINT8* RAM = machine().device<ram_device>("ram")->pointer();
 	UINT8* ROM = machine().region("maincpu")->base();
 	cpu_set_reg(m_maincpu, STATE_GENPC, 0xe000);
 	memcpy(m_p_ram, ROM, 0xf000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
 	memcpy(m_p_videoram, ROM+0x1000, 0x1000);
-//  memory_set_bankptr(machine(), "bank1", RAM);
+	//  memory_set_bankptr(machine(), "bank1", RAM);
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
@@ -376,7 +373,7 @@ void alphatro_state::machine_reset()
 
 static PALETTE_INIT( alphatro )
 {
-// 0 to 7 need to be determined - using defaults for now
+	// RGB colours
 	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00);
 	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff);
 	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00);
@@ -385,7 +382,8 @@ static PALETTE_INIT( alphatro )
 	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff);
 	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00);
 	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff);
-	palette_set_color_rgb(machine, 8, 0xf7, 0xaa, 0x00); /* amber */
+	// Amber
+	palette_set_color_rgb(machine, 8, 0xf7, 0xaa, 0x00);
 }
 
 static const mc6845_interface alphatro_crtc6845_interface =
@@ -404,8 +402,8 @@ static const mc6845_interface alphatro_crtc6845_interface =
 
 static const i8251_interface alphatro_usart_interface =
 {
-	DEVCB_LINE_MEMBER(alphatro_state,rxdata_callback), //rxd_cb
-	DEVCB_LINE_MEMBER(alphatro_state,txdata_callback), //txd_cb
+	DEVCB_DRIVER_LINE_MEMBER(alphatro_state,rxdata_callback), //rxd_cb
+	DEVCB_DRIVER_LINE_MEMBER(alphatro_state,txdata_callback), //txd_cb
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -417,11 +415,12 @@ static const i8251_interface alphatro_usart_interface =
 
 static const cassette_interface alphatro_cassette_interface =
 {
-		cassette_default_formats,
-		NULL,
-		(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-		"alphatro_cass",
-		NULL
+	cassette_default_formats,
+	NULL,
+	//(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	"alphatro_cass",
+	NULL
 };
 
 static MACHINE_CONFIG_START( alphatro, alphatro_state )
@@ -446,7 +445,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 
