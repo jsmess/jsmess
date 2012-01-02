@@ -202,7 +202,7 @@ static void gb_select_sprites( gb_state *state )
 INLINE void gb_update_sprites ( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t &bitmap = *machine.generic.tmpbitmap;
+	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
 	UINT8 height, tilemask, line, *oam, *vram;
 	int i, yindex;
 
@@ -290,7 +290,7 @@ INLINE void gb_update_sprites ( running_machine &machine )
 static void gb_update_scanline( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t &bitmap = *machine.generic.tmpbitmap;
+	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
 
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -446,7 +446,7 @@ static void gb_update_scanline( running_machine &machine )
 INLINE void sgb_update_sprites (running_machine &machine)
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t &bitmap = *machine.generic.tmpbitmap;
+	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
 	UINT8 height, tilemask, line, *oam, *vram, pal;
 	INT16 i, yindex;
 
@@ -546,7 +546,7 @@ static void sgb_refresh_border(running_machine &machine)
 	UINT16 yidx, xidx, xindex;
 	UINT8 *map, *tiles, *tiles2;
 	UINT8 pal, i;
-	bitmap_t &bitmap = *machine.generic.tmpbitmap;
+	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
 
 	map = state->m_sgb_tile_map - 64;
 
@@ -616,7 +616,7 @@ static void sgb_refresh_border(running_machine &machine)
 static void sgb_update_scanline( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t &bitmap = *machine.generic.tmpbitmap;
+	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
 
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -811,7 +811,7 @@ static void sgb_update_scanline( running_machine &machine )
 INLINE void cgb_update_sprites ( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t &bitmap = *machine.generic.tmpbitmap;
+	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
 	UINT8 height, tilemask, line, *oam;
 	int i, xindex, yindex;
 
@@ -924,7 +924,7 @@ INLINE void cgb_update_sprites ( running_machine &machine )
 static void cgb_update_scanline ( running_machine &machine )
 {
 	gb_state *state = machine.driver_data<gb_state>();
-	bitmap_t &bitmap = *machine.generic.tmpbitmap;
+	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
 
 	g_profiler.start(PROFILER_VIDEO);
 

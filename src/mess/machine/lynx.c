@@ -1372,7 +1372,7 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 		j -= 160 * 102 / 2 - 1;
 		for ( ; state->m_line_y < yend; state->m_line_y++)
 		{
-			line = &machine.generic.tmpbitmap->pix16(102 - 1 - state->m_line_y);
+			line = &machine.primary_screen->default_bitmap().pix16(102 - 1 - state->m_line_y);
 			for (x = 160 - 2; x >= 0; j++, x -= 2)
 			{
 				byte = lynx_read_vram(state, j);
@@ -1385,7 +1385,7 @@ static void lynx_draw_lines(running_machine &machine, int newline)
 	{
 		for ( ; state->m_line_y < yend; state->m_line_y++)
 		{
-			line = &machine.generic.tmpbitmap->pix16(state->m_line_y);
+			line = &machine.primary_screen->default_bitmap().pix16(state->m_line_y);
 			for (x = 0; x < 160; j++, x += 2)
 			{
 				byte = lynx_read_vram(state, j);

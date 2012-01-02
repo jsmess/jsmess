@@ -1001,7 +1001,7 @@ WRITE8_HANDLER( epnick_reg_w )
 	}
 }
 
-static void Nick_DoScreen(NICK_STATE *nick, bitmap_t *bm)
+static void Nick_DoScreen(NICK_STATE *nick, bitmap_t &bm)
 {
 	int line = 0;
 
@@ -1009,9 +1009,9 @@ static void Nick_DoScreen(NICK_STATE *nick, bitmap_t *bm)
 	{
 
 		/* set write address for line */
-		nick->dest = &bm->pix16(line);
+		nick->dest = &bm.pix16(line);
 		nick->dest_pos = 0;
-		nick->dest_max_pos = bm->width();
+		nick->dest_max_pos = bm.width();
 
 		/* write line */
 		Nick_DoLine(nick);
@@ -1031,13 +1031,13 @@ VIDEO_START( epnick )
 
 	state->nick->videoram = machine.device<ram_device>(RAM_TAG)->pointer();
 	Nick_Init(state->nick);
-	VIDEO_START_CALL(generic_bitmapped);
 }
 
 
 SCREEN_UPDATE( epnick )
 {
 	ep_state *state = screen.machine().driver_data<ep_state>();
-	Nick_DoScreen(state->nick,screen.machine().generic.tmpbitmap);
-	return SCREEN_UPDATE_CALL(generic_bitmapped);
+	Nick_DoScreen(state->nick,screen.default_bitmap());
+	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+	return 0;
 }

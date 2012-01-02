@@ -77,8 +77,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual void video_start();
-
 	DECLARE_READ8_MEMBER( mailbox_wx319_r );
 	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
 	DECLARE_READ8_MEMBER( tms7020_porta_r );
@@ -502,14 +500,6 @@ static PALETTE_INIT( exelv )
 }
 
 
-/* Video Initialization  */
-
-void exelv_state::video_start()
-{
-	video_start_generic_bitmapped(machine());
-}
-
-
 /* Machine Initialization */
 
 void exelv_state::machine_start()
@@ -562,7 +552,6 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
 #endif
-	MCFG_SCREEN_UPDATE(generic_bitmapped)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(exelv)
 
@@ -604,7 +593,6 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
 #endif
-	MCFG_SCREEN_UPDATE(generic_bitmapped)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(exelv)
 

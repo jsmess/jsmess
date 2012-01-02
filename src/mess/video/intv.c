@@ -40,7 +40,6 @@ VIDEO_START( intv )
 	//int i,j,k;
 
 	state->m_tms9927_num_rows = 25;
-	VIDEO_START_CALL(generic_bitmapped);
 
 #if 0
 	for (i = 0; i < STIC_MOBS; i++)
@@ -705,21 +704,21 @@ void intv_stic_screenrefresh(running_machine &machine)
 	{
 		state->m_stic_handshake = 0;
 		// Render the background
-		render_background(machine, *machine.generic.tmpbitmap);
+		render_background(machine, machine.primary_screen->default_bitmap());
 		// Render the sprites into their buffers
 		render_sprites(machine);
 		for (i = 0; i < STIC_MOBS; i++) state->m_sprite[i].collision = 0;
 		// Copy the sprites to the background
-		copy_sprites_to_background(machine, *machine.generic.tmpbitmap);
+		copy_sprites_to_background(machine, machine.primary_screen->default_bitmap());
 		determine_sprite_collisions(state);
 		for (i = 0; i < STIC_MOBS; i++) state->m_stic_registers[STIC_MCR + i] |= state->m_sprite[i].collision;
 		/* draw the screen borders if enabled */
-		draw_borders(machine, *machine.generic.tmpbitmap);
+		draw_borders(machine, machine.primary_screen->default_bitmap());
 	}
 	else
 	{
 		/* STIC disabled, just fill with border color */
-		machine.generic.tmpbitmap->fill(SET_COLOR(state->m_border_color));
+		machine.primary_screen->default_bitmap().fill(SET_COLOR(state->m_border_color));
 	}
 }
 
@@ -783,7 +782,7 @@ SCREEN_UPDATE( intvkbd )
 //  char c;
 
 	/* Draw the underlying INTV screen first */
-	SCREEN_UPDATE_CALL(generic_bitmapped);
+	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
 
 	/* if the intvkbd text is not blanked, overlay it */
 	if (!state->m_intvkbd_text_blanked)

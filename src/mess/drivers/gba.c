@@ -3188,13 +3188,10 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_SCREEN_ADD("gbalcd", RASTER)	// htot hst vwid vtot vst vis
 	MCFG_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_UPDATE(generic_bitmapped)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT( gba )
-
-	MCFG_VIDEO_START(generic_bitmapped)
 
 	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)

@@ -477,7 +477,7 @@ void tms3556_device::draw_line_mixed(UINT16 *ln)
 //  duplicate the line.
 //-------------------------------------------------
 
-void tms3556_device::draw_line(bitmap_t *bmp, int line)
+void tms3556_device::draw_line(bitmap_t &bmp, int line)
 {
 	int double_lines = 0;
 	UINT16 *ln, *ln2 = NULL;
@@ -488,8 +488,8 @@ void tms3556_device::draw_line(bitmap_t *bmp, int line)
 //  }
 //  else
 	{	/* non-interlaced mode */
-		ln = &bmp->pix16(line);
-		ln2 = &bmp->pix16(line, 1);
+		ln = &bmp.pix16(line);
+		ln2 = &bmp.pix16(line, 1);
 		double_lines = 1;
 	}
 
@@ -567,7 +567,7 @@ void tms3556_device::interrupt(running_machine &machine)
 	if ((m_scanline >= 0) && (m_scanline < TMS3556_TOTAL_HEIGHT))
 	{
 		//if (!video_skip_this_frame())
-			draw_line(machine.generic.tmpbitmap, m_scanline);
+			draw_line(machine.primary_screen->default_bitmap(), m_scanline);
 	}
 
 	if (++m_scanline == 313)

@@ -160,11 +160,11 @@ WRITE32_HANDLER( gf4500_w )
 VIDEO_START( gf4500 )
 {
 	gf4500_init( machine);
-	return VIDEO_START_CALL(generic_bitmapped);
 }
 
 SCREEN_UPDATE( gf4500 )
 {
-	gf4500_render_screen( screen.machine(), *screen.machine().generic.tmpbitmap);
-	return SCREEN_UPDATE_CALL(generic_bitmapped);
+	gf4500_render_screen( screen.machine(), screen.default_bitmap());
+	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+	return 0;
 }

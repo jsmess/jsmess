@@ -551,7 +551,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 	if ( y < 240 )
 	{
 		UINT16 row_addr = ( y / 10 ) * 128;
-		UINT16 *p = &machine.generic.tmpbitmap->pix16(y);
+		UINT16 *p = &machine.primary_screen->default_bitmap().pix16(y);
 		UINT8 char_line = y % 10;
 
 		for ( int x = 0; x < 80; x++ )
@@ -634,12 +634,9 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )	/* May not be correct */
-	MCFG_SCREEN_UPDATE( generic_bitmapped )
 
 	MCFG_PALETTE_LENGTH( 3 )
 	MCFG_PALETTE_INIT( osbexec )
-
-	MCFG_VIDEO_START( generic_bitmapped )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)

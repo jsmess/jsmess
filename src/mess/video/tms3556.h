@@ -77,7 +77,7 @@ protected:
 	void draw_line_text(UINT16 *ln);
 	void draw_line_bitmap(UINT16 *ln);
 	void draw_line_mixed(UINT16 *ln);
-	void draw_line(bitmap_t *bmp, int line);
+	void draw_line(bitmap_t &bmp, int line);
 	void interrupt_start_vblank(void);
 
 private:

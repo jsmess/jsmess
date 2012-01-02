@@ -22,19 +22,10 @@ public:
 
 	required_device<upd7220_device> m_hgdc;
 
-	virtual void video_start();
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	UINT8 *m_video_ram;
 };
-
-void if800_state::video_start()
-{
-	// find memory regions
-//  m_char_rom = machine.region("pcg")->base();
-
-	VIDEO_START_NAME(generic_bitmapped)(machine());
-}
 
 bool if800_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {

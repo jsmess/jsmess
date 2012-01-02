@@ -422,7 +422,6 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
-	MCFG_VIDEO_START(generic_bitmapped)
 
 	MCFG_VT100_VIDEO_ADD("vt100_video", vt100_video_interface)
 
