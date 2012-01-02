@@ -310,7 +310,10 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", ti99_4p_hblank_interrupt, "screen", 0, 1)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	/* video hardware */
-	MCFG_TI_V9938_ADD("video", 60, "screen", 2500, 512+32, (212+28)*2, tms9901_sg_set_int2)
+	/* FIXME: (MZ) Lowered the screen rate to 30 Hz. This is a quick hack to
+    restore normal video speed for V9938-based systems until the V9938 implementation
+    is properly fixed. */
+	MCFG_TI_V9938_ADD("video", 30, "screen", 2500, 512+32, (212+28)*2, tms9901_sg_set_int2)
 
 	MCFG_MACHINE_START( ti99_4p )
 	MCFG_MACHINE_RESET( ti99_4p )
