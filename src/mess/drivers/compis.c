@@ -83,13 +83,6 @@ static PALETTE_INIT( compis )
 	palette_set_color(machine, 2, MAKE_RGB(0x00, 0xff, 0x00)); // highlight
 }
 
-void compis_state::video_start()
-{
-	// find memory regions
-
-	VIDEO_START_NAME(generic_bitmapped)(machine());
-}
-
 static SCREEN_UPDATE( compis )
 {
 	compis_state *state = screen.machine().driver_data<compis_state>();

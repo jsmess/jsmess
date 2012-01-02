@@ -41,7 +41,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 		int color = hlt_in ? 2 : (video_in ^ compl_in);
 
-		device->machine().generic.tmpbitmap->pix16(y, x + i) = color;
+		device->machine().primary_screen->default_bitmap().pix16(y, x + i) = color;
 	}
 }
 
@@ -100,8 +100,6 @@ void mm1_state::video_start()
 {
 	// find memory regions
 	m_char_rom = machine().region("chargen")->base();
-
-	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
 
@@ -113,7 +111,7 @@ bool mm1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rec
 {
 	/* text */
 	i8275_update(m_crtc, bitmap, cliprect);
-	copybitmap(bitmap, *screen.machine().generic.tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
 
 	/* graphics */
 	m_hgdc->update_screen(bitmap, cliprect);

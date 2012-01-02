@@ -171,7 +171,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_master_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(compis_pic8259_slave_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	virtual void video_start();
 	i186_state m_i186;
 	TYP_COMPIS m_compis;
 	UINT8 *m_p_videoram;

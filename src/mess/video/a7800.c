@@ -53,8 +53,6 @@ VIDEO_START( a7800 )
 	a7800_state *state = machine.driver_data<a7800_state>();
 	int i;
 
-	VIDEO_START_CALL(generic_bitmapped);
-
 	for(i=0; i<8; i++)
 	{
 		state->m_maria_palette[i][0]=0;
@@ -96,7 +94,7 @@ static void maria_draw_scanline(running_machine &machine)
 	UINT16 *scanline;
 
 	/* set up scanline */
-	scanline = &machine.generic.tmpbitmap->pix16(state->m_maria_scanline);
+	scanline = &machine.primary_screen->default_bitmap().pix16(state->m_maria_scanline);
 	for (i = 0; i < 320; i++)
 		scanline[i] = state->m_maria_backcolor;
 
@@ -433,7 +431,7 @@ SCREEN_UPDATE( a7800 )
 {
 	a7800_state *state = screen.machine().driver_data<a7800_state>();
 	state->m_maria_scanline = 0;
-	SCREEN_UPDATE_CALL(generic_bitmapped);
+	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

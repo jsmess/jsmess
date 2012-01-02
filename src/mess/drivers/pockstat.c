@@ -997,8 +997,6 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_VIDEO_START(generic_bitmapped)
-
     MCFG_SPEAKER_STANDARD_MONO("mono")
     MCFG_SOUND_ADD("dac", DAC, 0)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

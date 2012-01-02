@@ -122,12 +122,6 @@ static WRITE8_HANDLER( rt1715_rom_disable )
     VIDEO EMULATION
 ***************************************************************************/
 
-static SCREEN_UPDATE( rt1715 )
-{
-	SCREEN_UPDATE_CALL(generic_bitmapped);
-	return 0;
-}
-
 static I8275_DISPLAY_PIXELS( rt1715_display_pixels )
 {
 
@@ -331,13 +325,10 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
-	MCFG_SCREEN_UPDATE(rt1715)
 
 	MCFG_GFXDECODE(rt1715)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT(rt1715)
-
-	MCFG_VIDEO_START(generic_bitmapped)
 
 	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
 	MCFG_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)

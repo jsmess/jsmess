@@ -1743,7 +1743,7 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff_)
 
 void gba_draw_scanline(running_machine &machine, int y)
 {
-	bitmap_t &bitmap = *machine.generic.tmpbitmap;
+	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
 	UINT16 *scanline = &bitmap.pix16(y);
 	int i, x;
 	gba_state *state = machine.driver_data<gba_state>();

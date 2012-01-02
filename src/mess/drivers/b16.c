@@ -67,8 +67,6 @@ VIDEO_START_MEMBER( b16_state )
 {
 	// find memory regions
 	m_char_rom = machine().region("pcg")->base();
-
-	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
 

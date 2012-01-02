@@ -79,8 +79,6 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 
 	MCFG_PALETTE_LENGTH(0x1000)
 
-	MCFG_VIDEO_START(generic_bitmapped)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("avr8")
 	MCFG_SOUND_ADD("dac", DAC, 0)

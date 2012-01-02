@@ -83,7 +83,7 @@ MACHINE_RESET_MEMBER(ipds_state)
 static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
-	bitmap_t &bitmap = *device->machine().generic.tmpbitmap;
+	bitmap_t &bitmap = device->machine().primary_screen->default_bitmap();
 	UINT8 *charmap = device->machine().region("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
@@ -113,7 +113,7 @@ static SCREEN_UPDATE( ipds )
 {
 	device_t *devconf = screen.machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
-	SCREEN_UPDATE_CALL ( generic_bitmapped );
+	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -160,7 +160,6 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_VIDEO_START(generic_bitmapped)
 	MCFG_SCREEN_UPDATE(ipds)
 	MCFG_GFXDECODE(ipds)
 	MCFG_PALETTE_LENGTH(2)

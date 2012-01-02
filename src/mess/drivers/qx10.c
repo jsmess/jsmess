@@ -961,8 +961,6 @@ void qx10_state::video_start()
 
 	// find memory regions
 	m_char_rom = machine().region("chargen")->base();
-
-	VIDEO_START_NAME(generic_bitmapped)(machine());
 }
 
 bool qx10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
