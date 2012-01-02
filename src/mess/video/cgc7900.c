@@ -109,7 +109,7 @@ void cgc7900_state::update_clut()
     draw_bitmap - draw bitmap image
 -------------------------------------------------*/
 
-void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_t *bitmap)
+void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_t &bitmap)
 {
 }
 
@@ -117,7 +117,7 @@ void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_t *bitmap)
     draw_overlay - draw text overlay
 -------------------------------------------------*/
 
-void cgc7900_state::draw_overlay(screen_device *screen, bitmap_t *bitmap)
+void cgc7900_state::draw_overlay(screen_device *screen, bitmap_t &bitmap)
 {
 	for (int y = 0; y < 768; y++)
 	{
@@ -138,18 +138,18 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_t *bitmap)
 				{
 					if (!OVERLAY_CURSOR_BLINK || m_blink)
 					{
-						bitmap->pix16(y, (sx * 8) + x) = 7;
+						bitmap.pix16(y, (sx * 8) + x) = 7;
 					}
 				}
 				else
 				{
 					if (BIT(data, x) && (!OVERLAY_CHARACTER_BLINK || m_blink))
 					{
-						if (OVERLAY_VF) bitmap->pix16(y, (sx * 8) + x) = fg;
+						if (OVERLAY_VF) bitmap.pix16(y, (sx * 8) + x) = fg;
 					}
 					else
 					{
-						if (OVERLAY_VB) bitmap->pix16(y, (sx * 8) + x) = bg;
+						if (OVERLAY_VB) bitmap.pix16(y, (sx * 8) + x) = bg;
 					}
 				}
 			}
@@ -201,8 +201,8 @@ void cgc7900_state::video_start()
 bool cgc7900_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	update_clut();
-	draw_bitmap(&screen, &bitmap);
-	draw_overlay(&screen, &bitmap);
+	draw_bitmap(&screen, bitmap);
+	draw_overlay(&screen, bitmap);
 
     return 0;
 }

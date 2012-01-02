@@ -928,7 +928,7 @@ static SCREEN_UPDATE( pockstat )
 	int y = 0;
 	for(y = 0; y < 32; y++)
 	{
-		UINT32 *scanline = &bitmap->pix32(y);
+		UINT32 *scanline = &bitmap.pix32(y);
 		for(x = 0; x < 32; x++)
 		{
 			if(state->m_lcd_control != 0) // Hack

@@ -199,7 +199,7 @@ VIDEO_START_MEMBER( zrt80_state )
 
 SCREEN_UPDATE_MEMBER( zrt80_state )
 {
-	m_crtc->update(&bitmap, cliprect);
+	m_crtc->update(bitmap, cliprect);
 	return 0;
 }
 
@@ -208,7 +208,7 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 	zrt80_state *state = device->machine().driver_data<zrt80_state>();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap->pix16(y);
+	UINT16 *p = &bitmap.pix16(y);
 	UINT8 polarity = input_port_read(device->machine(), "DIPSW1") & 4 ? 0xff : 0;
 
 	for (x = 0; x < x_count; x++)

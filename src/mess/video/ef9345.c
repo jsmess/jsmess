@@ -143,7 +143,7 @@ void ef9345_device::device_start()
 	m_videoram = space(0);
 	m_charset = region();
 
-	m_screen_out = auto_bitmap_alloc(machine(), 496, m_screen->height() , BITMAP_FORMAT_INDEXED16);
+	m_screen_out.allocate(496, m_screen->height() , BITMAP_FORMAT_INDEXED16);
 
 	m_blink_timer->adjust(attotime::from_msec(500), 0, attotime::from_msec(500));
 
@@ -168,7 +168,7 @@ void ef9345_device::device_start()
 	save_item(NAME(m_latchi));
 	save_item(NAME(m_latchu));
 
-	save_item(NAME(*m_screen_out));
+	save_item(NAME(m_screen_out));
 }
 
 //-------------------------------------------------
@@ -192,7 +192,7 @@ void ef9345_device::device_reset()
 	memset(m_border, 0, sizeof(m_border));
 	memset(m_border, 0, sizeof(m_ram_base));
 
-	m_screen_out->fill(0);
+	m_screen_out.fill(0);
 
 	set_video_mode();
 }
@@ -231,7 +231,7 @@ void ef9345_device::draw_char_40(UINT8 *c, UINT16 x, UINT16 y)
 
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 8; j++)
-				m_screen_out->pix16(y * 10 + i, x * 8 + j)  = c[8 * i + j] & 0x07;
+				m_screen_out.pix16(y * 10 + i, x * 8 + j)  = c[8 * i + j] & 0x07;
 }
 
 // draw a char in 80 char line mode
@@ -243,7 +243,7 @@ void ef9345_device::draw_char_80(UINT8 *c, UINT16 x, UINT16 y)
 
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 6; j++)
-				m_screen_out->pix16(y * 10 + i, x * 6 + j)  = c[6 * i + j] & 0x07;
+				m_screen_out.pix16(y * 10 + i, x * 6 + j)  = c[6 * i + j] & 0x07;
 }
 
 
@@ -955,7 +955,7 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
             EF9345 interface
 **************************************************************/
 
-void ef9345_device::video_update(bitmap_t *bitmap, const rectangle &cliprect)
+void ef9345_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_screen_out, 0, 0, 0, 0, cliprect);
 }

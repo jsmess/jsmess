@@ -110,7 +110,7 @@ SCREEN_UPDATE(concept)
 
 	for (y = 0; y < 560; y++)
 	{
-		line = &bitmap->pix16(560-1-y);
+		line = &bitmap.pix16(560-1-y);
 		for (x = 0; x < 720; x++)
 			line[720-1-x] = (videoram[(x+48+y*768)>>4] & (0x8000 >> ((x+48+y*768) & 0xf))) ? 0 : 1;
 	}

@@ -254,7 +254,7 @@ static VIDEO_START( pc8801 )
 
 }
 
-static void draw_bitmap_3bpp(running_machine &machine, bitmap_t *bitmap)
+static void draw_bitmap_3bpp(running_machine &machine, bitmap_t &bitmap)
 {
 	int x,y,xi;
 	UINT32 count;
@@ -277,7 +277,7 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_t *bitmap)
 				pen |= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1;
 				pen |= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2;
 
-				bitmap->pix16(y, x+xi) = machine.pens[pen & 7];
+				bitmap.pix16(y, x+xi) = machine.pens[pen & 7];
 			}
 
 			count++;
@@ -285,7 +285,7 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_t *bitmap)
 	}
 }
 
-static void draw_bitmap_1bpp(running_machine &machine, bitmap_t *bitmap)
+static void draw_bitmap_1bpp(running_machine &machine, bitmap_t &bitmap)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y,xi;
@@ -306,7 +306,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_t *bitmap)
 				/* TODO: dunno if state->m_layer_mask is correct here */
 				if(!(state->m_layer_mask & 2)) { pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
 
-				bitmap->pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
+				bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
 			}
 
 			count++;
@@ -329,7 +329,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_t *bitmap)
 					/* TODO: dunno if state->m_layer_mask is correct here */
 					if(!(state->m_layer_mask & 4)) { pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0; }
 
-					bitmap->pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
+					bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
 				}
 
 				count++;
@@ -396,7 +396,7 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 	return 0;
 }
 
-static void pc8801_draw_char(running_machine &machine,bitmap_t *bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
+static void pc8801_draw_char(running_machine &machine,bitmap_t &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int xi,yi;
@@ -456,7 +456,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_t *bitmap,int x,int
 					continue;
 
 				if(color != -1)
-					bitmap->pix16(res_y, res_x) = machine.pens[color];
+					bitmap.pix16(res_y, res_x) = machine.pens[color];
 
 				if(width)
 				{
@@ -464,7 +464,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_t *bitmap,int x,int
 						continue;
 
 					if(color != -1)
-						bitmap->pix16(res_y, res_x+1) = machine.pens[color];
+						bitmap.pix16(res_y, res_x+1) = machine.pens[color];
 				}
 				if(height)
 				{
@@ -472,20 +472,20 @@ static void pc8801_draw_char(running_machine &machine,bitmap_t *bitmap,int x,int
 						continue;
 
 					if(color != -1)
-						bitmap->pix16(res_y+1, res_x) = machine.pens[color];
+						bitmap.pix16(res_y+1, res_x) = machine.pens[color];
 
 					if((res_x+1)>machine.primary_screen->visible_area().max_x && (res_y+1)>machine.primary_screen->visible_area().max_y)
 						continue;
 
 					if(color != -1)
-						bitmap->pix16(res_y+1, res_x+1) = machine.pens[color];
+						bitmap.pix16(res_y+1, res_x+1) = machine.pens[color];
 				}
 			}
 		}
 	}
 }
 
-static void draw_text_80(running_machine &machine, bitmap_t *bitmap,int y_size)
+static void draw_text_80(running_machine &machine, bitmap_t &bitmap,int y_size)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y;
@@ -535,7 +535,7 @@ static void draw_text_80(running_machine &machine, bitmap_t *bitmap,int y_size)
 	}
 }
 
-static void draw_text_40(running_machine &machine, bitmap_t *bitmap, int y_size)
+static void draw_text_40(running_machine &machine, bitmap_t &bitmap, int y_size)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y;
@@ -591,7 +591,7 @@ static void draw_text_40(running_machine &machine, bitmap_t *bitmap, int y_size)
 static SCREEN_UPDATE( pc8801 )
 {
 	pc8801_state *state = screen.machine().driver_data<pc8801_state>();
-	bitmap->fill(screen.machine().pens[0], cliprect);
+	bitmap.fill(screen.machine().pens[0], cliprect);
 
 	if(state->m_gfx_ctrl & 8)
 	{

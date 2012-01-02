@@ -254,7 +254,7 @@ WRITE8_MEMBER( zx8301_device::data_w )
 //  draw_line_mode4 - draw mode 4 line
 //-------------------------------------------------
 
-void zx8301_device::draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da)
+void zx8301_device::draw_line_mode4(bitmap_t &bitmap, int y, UINT16 da)
 {
 	int x = 0;
 
@@ -269,7 +269,7 @@ void zx8301_device::draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da)
 			int green = BIT(byte_high, 7);
 			int color = (green << 1) | red;
 
-			bitmap->pix16(y, x++) = ZX8301_COLOR_MODE4[color];
+			bitmap.pix16(y, x++) = ZX8301_COLOR_MODE4[color];
 
 			byte_high <<= 1;
 			byte_low <<= 1;
@@ -282,7 +282,7 @@ void zx8301_device::draw_line_mode4(bitmap_t *bitmap, int y, UINT16 da)
 //  draw_line_mode8 - draw mode 8 line
 //-------------------------------------------------
 
-void zx8301_device::draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da)
+void zx8301_device::draw_line_mode8(bitmap_t &bitmap, int y, UINT16 da)
 {
 	int x = 0;
 
@@ -305,8 +305,8 @@ void zx8301_device::draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da)
 				color = 0;
 			}
 
-			bitmap->pix16(y, x++) = color;
-			bitmap->pix16(y, x++) = color;
+			bitmap.pix16(y, x++) = color;
+			bitmap.pix16(y, x++) = color;
 
 			byte_high <<= 2;
 			byte_low <<= 2;
@@ -319,7 +319,7 @@ void zx8301_device::draw_line_mode8(bitmap_t *bitmap, int y, UINT16 da)
 //  update_screen -
 //-------------------------------------------------
 
-void zx8301_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
+void zx8301_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	if (!m_dispoff)
 	{
@@ -341,6 +341,6 @@ void zx8301_device::update_screen(bitmap_t *bitmap, const rectangle &cliprect)
 	}
 	else
 	{
-		bitmap->fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
 }

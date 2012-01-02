@@ -320,7 +320,7 @@ void pc8001_state::video_start()
 
 bool pc8001_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update_screen(&bitmap, cliprect);
+	m_crtc->update_screen(bitmap, cliprect);
 
 	return 0;
 }
@@ -343,7 +343,7 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			bitmap->pix16(y, (sx * 8) + i) = color ? 7 : 0;
+			bitmap.pix16(y, (sx * 8) + i) = color ? 7 : 0;
 
 			data <<= 1;
 		}
@@ -356,8 +356,8 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			bitmap->pix16(y, (sx/2 * 16) + (i * 2)) = color ? 7 : 0;
-			bitmap->pix16(y, (sx/2 * 16) + (i * 2) + 1) = color ? 7 : 0;
+			bitmap.pix16(y, (sx/2 * 16) + (i * 2)) = color ? 7 : 0;
+			bitmap.pix16(y, (sx/2 * 16) + (i * 2) + 1) = color ? 7 : 0;
 
 			data <<= 1;
 		}

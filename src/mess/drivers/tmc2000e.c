@@ -150,7 +150,7 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 
 bool tmc2000e_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_cti->update_screen(&bitmap, cliprect);
+	m_cti->update_screen(bitmap, cliprect);
 
 	return 0;
 }

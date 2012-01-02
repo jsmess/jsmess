@@ -53,7 +53,7 @@ SCREEN_UPDATE( mz700 )
 	int offs;
 	mz_state *mz = screen.machine().driver_data<mz_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	for(offs = 0; offs < 40*25; offs++)
 	{
@@ -88,7 +88,7 @@ SCREEN_UPDATE( mz800 )
 	UINT8 *videoram = state->m_videoram;
 	mz_state *mz = screen.machine().driver_data<mz_state>();
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	if (mz->m_mz700_mode)
 		return SCREEN_UPDATE_CALL(mz700);
@@ -107,14 +107,14 @@ SCREEN_UPDATE( mz800 )
 			{
 				for (y = 0; y < 200; y++)
 				{
-					bitmap->pix16(y, x * 8 + 0) = BIT(start_addr[x * 8 + y], 0);
-					bitmap->pix16(y, x * 8 + 1) = BIT(start_addr[x * 8 + y], 1);
-					bitmap->pix16(y, x * 8 + 2) = BIT(start_addr[x * 8 + y], 2);
-					bitmap->pix16(y, x * 8 + 3) = BIT(start_addr[x * 8 + y], 3);
-					bitmap->pix16(y, x * 8 + 4) = BIT(start_addr[x * 8 + y], 4);
-					bitmap->pix16(y, x * 8 + 5) = BIT(start_addr[x * 8 + y], 5);
-					bitmap->pix16(y, x * 8 + 6) = BIT(start_addr[x * 8 + y], 6);
-					bitmap->pix16(y, x * 8 + 7) = BIT(start_addr[x * 8 + y], 7);
+					bitmap.pix16(y, x * 8 + 0) = BIT(start_addr[x * 8 + y], 0);
+					bitmap.pix16(y, x * 8 + 1) = BIT(start_addr[x * 8 + y], 1);
+					bitmap.pix16(y, x * 8 + 2) = BIT(start_addr[x * 8 + y], 2);
+					bitmap.pix16(y, x * 8 + 3) = BIT(start_addr[x * 8 + y], 3);
+					bitmap.pix16(y, x * 8 + 4) = BIT(start_addr[x * 8 + y], 4);
+					bitmap.pix16(y, x * 8 + 5) = BIT(start_addr[x * 8 + y], 5);
+					bitmap.pix16(y, x * 8 + 6) = BIT(start_addr[x * 8 + y], 6);
+					bitmap.pix16(y, x * 8 + 7) = BIT(start_addr[x * 8 + y], 7);
 				}
 			}
 		}

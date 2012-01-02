@@ -123,9 +123,9 @@ protected:
 	// pixel definitions
 	typedef UINT32 pixel_t;
 
-	pixel_t *bitmap_addr(bitmap_t *bitmap, int y, int x)
+	pixel_t *bitmap_addr(bitmap_t &bitmap, int y, int x)
 	{
-		return &bitmap->pix32(y, x);
+		return &bitmap.pix32(y, x);
 	}
 
 	static UINT8 simplify_mode(UINT8 data, UINT8 mode)
@@ -496,7 +496,7 @@ public:
 	/* updates the screen -- this will call begin_update(),
        followed by update_row() reapeatedly and after all row
        updating is complete, end_update() */
-	bool update(bitmap_t *bitmap, const rectangle &cliprect);
+	bool update(bitmap_t &bitmap, const rectangle &cliprect);
 
 	// mode changing operations
 	DECLARE_WRITE_LINE_MEMBER( ag_w )		{ change_mode(MODE_AG, state); }

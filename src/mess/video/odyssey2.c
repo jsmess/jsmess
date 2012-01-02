@@ -280,7 +280,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 		rect.min_y = rect.max_y = vpos;
 		rect.min_x = I824X_START_ACTIVE_SCAN;
 		rect.max_x = I824X_END_ACTIVE_SCAN - 1;
-		state->m_tmp_bitmap->fill(( (state->m_o2_vdc.s.color >> 3) & 0x7 ) | ( ( state->m_lum << 3 ) ^ 0x08 ), rect );
+		state->m_tmp_bitmap.fill(( (state->m_o2_vdc.s.color >> 3) & 0x7 ) | ( ( state->m_lum << 3 ) ^ 0x08 ), rect );
 
 		/* Clear collision map */
 		memset( collision_map, 0, sizeof( collision_map ) );
@@ -309,7 +309,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 							{
 								int px = x_grid_offset + i * width + k;
 								collision_map[ px ] |= COLLISION_HORIZ_GRID_DOTS;
-								state->m_tmp_bitmap->pix16(vpos, I824X_START_ACTIVE_SCAN + px ) = color;
+								state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + px ) = color;
 							}
 						}
 					}
@@ -340,7 +340,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 									state->m_collision_status |= collision_map[ px ];
 								}
 								collision_map[ px ] |= COLLISION_VERTICAL_GRID;
-								state->m_tmp_bitmap->pix16(vpos, I824X_START_ACTIVE_SCAN + px ) = color;
+								state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + px ) = color;
 							}
 						}
 					}
@@ -382,7 +382,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 									state->m_collision_status |= collision_map[ x ];
 								}
 								collision_map[ x ] |= COLLISION_CHARACTERS;
-								state->m_tmp_bitmap->pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+								state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 							}
 						}
 					}
@@ -426,7 +426,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 											state->m_collision_status |= collision_map[ x ];
 										}
 										collision_map[ x ] |= COLLISION_CHARACTERS;
-										state->m_tmp_bitmap->pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+										state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 									}
 								}
 							}
@@ -472,7 +472,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 										state->m_collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									state->m_tmp_bitmap->pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+									state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 								}
 								if ( x >= -1 && x < 159 )
 								{
@@ -487,7 +487,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 										state->m_collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									state->m_tmp_bitmap->pix16(vpos, I824X_START_ACTIVE_SCAN + x + 1 ) = color;
+									state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x + 1 ) = color;
 								}
 							}
 						}
@@ -520,7 +520,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 										state->m_collision_status |= collision_map[ x ];
 									}
 									collision_map[ x ] |= ( 1 << i );
-									state->m_tmp_bitmap->pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
+									state->m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN + x ) = color;
 								}
 							}
 						}
@@ -589,7 +589,7 @@ VIDEO_START( odyssey2 )
 	state->m_control_status = 0;
 	state->m_iff = 0;
 
-	state->m_tmp_bitmap = auto_bitmap_alloc( machine, width, height, screen->format() );
+	state->m_tmp_bitmap.allocate( width, height, screen->format() );
 
 	state->m_i824x_line_timer = machine.scheduler().timer_alloc(FUNC(i824x_scanline_callback));
 	state->m_i824x_line_timer->adjust( machine.primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine.primary_screen->scan_period() );

@@ -369,7 +369,7 @@ static int lgun_bright_aim_area( running_machine &machine, emu_timer *timer, int
 
 		if (!pos_changed)
 		{
-			bitmap_t *bitmap = state->m_vdp->get_bitmap();
+			bitmap_t &bitmap = *state->m_vdp->get_bitmap();
 
 			/* brightness of the lightgray color in the frame drawn by Light Phaser games */
 			const UINT8 sensor_min_brightness = 0x7f;
@@ -379,7 +379,7 @@ static int lgun_bright_aim_area( running_machine &machine, emu_timer *timer, int
 			if (beam_x < SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH || beam_x >= SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256)
 				return 0;
 
-			rgb_t color = bitmap->pix32(beam_y, beam_x);
+			rgb_t color = bitmap.pix32(beam_y, beam_x);
 
 			/* reference: http://www.w3.org/TR/AERT#color-contrast */
 			UINT8 brightness = (RGB_RED(color) * 0.299) + (RGB_GREEN(color) * 0.587) + (RGB_BLUE(color) * 0.114);
@@ -2214,7 +2214,7 @@ DRIVER_INIT( gamegeaj )
 }
 
 
-static void sms_black_bitmap( const screen_device &screen, bitmap_t *bitmap )
+static void sms_black_bitmap( const screen_device &screen, bitmap_t &bitmap )
 {
 	const int width = screen.width();
 	const int height = screen.height();
@@ -2222,7 +2222,7 @@ static void sms_black_bitmap( const screen_device &screen, bitmap_t *bitmap )
 
 	for (y = 0; y < height; y++)
 		for (x = 0; x < width; x++)
-			bitmap->pix32(y, x) = MAKE_RGB(0,0,0);
+			bitmap.pix32(y, x) = MAKE_RGB(0,0,0);
 }
 
 VIDEO_START( sms1 )
@@ -2232,10 +2232,10 @@ VIDEO_START( sms1 )
 	int width = screen->width();
 	int height = screen->height();
 
-	state->m_prevleft_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
-	state->m_prevright_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
-	state->save_item(NAME(*state->m_prevleft_bitmap));
-	state->save_item(NAME(*state->m_prevright_bitmap));
+	state->m_prevleft_bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED32);
+	state->m_prevright_bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED32);
+	state->save_item(NAME(state->m_prevleft_bitmap));
+	state->save_item(NAME(state->m_prevright_bitmap));
 }
 
 SCREEN_UPDATE( sms1 )
@@ -2297,9 +2297,9 @@ VIDEO_START( gamegear )
 	int width = screen->width();
 	int height = screen->height();
 
-	state->m_prev_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
-	state->m_tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
-	state->save_item(NAME(*state->m_prev_bitmap));
+	state->m_prev_bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED32);
+	state->m_tmp_bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED32);
+	state->save_item(NAME(state->m_prev_bitmap));
 }
 
 SCREEN_UPDATE( gamegear )
@@ -2315,8 +2315,8 @@ SCREEN_UPDATE( gamegear )
 	// (it would be better to generalize this in the core, to be used for all LCD systems)
 	for (y = 0; y < height; y++)
 	{
-		UINT32 *line0 = &state->m_tmp_bitmap->pix32(y);
-		UINT32 *line1 = &state->m_prev_bitmap->pix32(y);
+		UINT32 *line0 = &state->m_tmp_bitmap.pix32(y);
+		UINT32 *line1 = &state->m_prev_bitmap.pix32(y);
 		for (x = 0; x < width; x++)
 		{
 			UINT32 color0 = line0[x];
@@ -2330,7 +2330,7 @@ SCREEN_UPDATE( gamegear )
 			UINT8 r = (UINT8)((r0 + r1) >> 1);
 			UINT8 g = (UINT8)((g0 + g1) >> 1);
 			UINT8 b = (UINT8)((b0 + b1) >> 1);
-			bitmap->pix32(y, x) = (r << 16) | (g << 8) | b;
+			bitmap.pix32(y, x) = (r << 16) | (g << 8) | b;
 		}
 	}
 	copybitmap(state->m_prev_bitmap, state->m_tmp_bitmap, 0, 0, 0, 0, cliprect);

@@ -1198,11 +1198,11 @@ void ted7360_raster_interrupt_gen( device_t *device )
 	}
 }
 
-UINT32 ted7360_video_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect )
+UINT32 ted7360_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 
-	copybitmap(bitmap, ted7360->bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *ted7360->bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

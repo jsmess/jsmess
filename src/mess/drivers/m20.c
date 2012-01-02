@@ -66,7 +66,7 @@ static SCREEN_UPDATE( m20 )
 	UINT8 pen;
 	UINT32 count;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	count = (0);
 
@@ -79,7 +79,7 @@ static SCREEN_UPDATE( m20 )
 				pen = (state->m_p_videoram[count]) >> (15 - i) & 1;
 
 				if ((x + i) <= screen.visible_area().max_x && (y + 0) < screen.visible_area().max_y)
-					bitmap->pix32(y, x + i) = screen.machine().pens[pen];
+					bitmap.pix32(y, x + i) = screen.machine().pens[pen];
 			}
 
 			count++;

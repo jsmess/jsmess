@@ -410,7 +410,7 @@ WRITE8_HANDLER(arcadia_video_w)
 	}
 }
 
-INLINE void arcadia_draw_char(running_machine &machine, bitmap_t *bitmap, UINT8 *ch, int charcode,
+INLINE void arcadia_draw_char(running_machine &machine, bitmap_t &bitmap, UINT8 *ch, int charcode,
 			      int y, int x)
 {
 	arcadia_state *state = machine.driver_data<arcadia_state>();
@@ -437,37 +437,37 @@ INLINE void arcadia_draw_char(running_machine &machine, bitmap_t *bitmap, UINT8 
 
     if (state->m_doublescan)
 	{
-	for (k=0; (k<8)&&(y<bitmap->height()); k++, y+=2)
+	for (k=0; (k<8)&&(y<bitmap.height()); k++, y+=2)
 		{
 	    b=ch[k];
 	    state->m_bg[y][x>>3]|=b>>(x&7);
 	    state->m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-            if (y+1<bitmap->height()) {
+            if (y+1<bitmap.height()) {
                 state->m_bg[y+1][x>>3]|=b>>(x&7);
                 state->m_bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
-                drawgfx_opaque(bitmap, bitmap->cliprect(), machine.gfx[0], b,colour,
+                drawgfx_opaque(bitmap, bitmap.cliprect(), machine.gfx[0], b,colour,
                         0,0,x,y);
-                drawgfx_opaque(bitmap, bitmap->cliprect(), machine.gfx[0], b,colour,
+                drawgfx_opaque(bitmap, bitmap.cliprect(), machine.gfx[0], b,colour,
                         0,0,x,y+1);
             }
 		}
     }
 	else
 	{
-	for (k=0; (k<8)&&(y<bitmap->height()); k++, y++)
+	for (k=0; (k<8)&&(y<bitmap.height()); k++, y++)
 		{
 	    b=ch[k];
             state->m_bg[y][x>>3]|=b>>(x&7);
 	    state->m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-	    drawgfx_opaque(bitmap, bitmap->cliprect(), machine.gfx[0], b,colour,
+	    drawgfx_opaque(bitmap, bitmap.cliprect(), machine.gfx[0], b,colour,
 		    0,0,x,y);
 		}
     }
 }
 
-INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_t *bitmap,
+INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_t &bitmap,
 				 int y, UINT8 chars1[16])
 {
 	arcadia_state *state = machine.driver_data<arcadia_state>();
@@ -475,10 +475,10 @@ INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_t *bitmap,
     int graphics=state->m_graphics;
     h=state->m_doublescan?16:8;
 
-    if (bitmap->height()-state->m_line<h)
-		h=bitmap->height()-state->m_line;
+    if (bitmap.height()-state->m_line<h)
+		h=bitmap.height()-state->m_line;
 
-	bitmap->plot_box(0, y, bitmap->width(), h, (state->m_reg.d.pal[1]&7));
+	bitmap.plot_box(0, y, bitmap.width(), h, (state->m_reg.d.pal[1]&7));
     memset(state->m_bg[y], 0, sizeof(state->m_bg[0])*h);
 
 	for (x=XPOS+state->m_shift, j=0; j<16;j++,x+=8)
@@ -521,7 +521,7 @@ static int arcadia_sprite_collision(arcadia_state *state, int n1, int n2)
     return FALSE;
 }
 
-static void arcadia_draw_sprites(running_machine &machine, bitmap_t *bitmap)
+static void arcadia_draw_sprites(running_machine &machine, bitmap_t &bitmap)
 {
 	arcadia_state *state = machine.driver_data<arcadia_state>();
     int i, k, x, y, color=0;
@@ -533,7 +533,7 @@ static void arcadia_draw_sprites(running_machine &machine, bitmap_t *bitmap)
 	{
 	int doublescan = FALSE;
 	if (state->m_pos[i].y<=-YPOS) continue;
-	if (state->m_pos[i].y>=bitmap->height()-YPOS-8) continue;
+	if (state->m_pos[i].y>=bitmap.height()-YPOS-8) continue;
 	if (state->m_pos[i].x<=-XPOS) continue;
 	if (state->m_pos[i].x>=128+XPOS-8) continue;
 
@@ -568,7 +568,7 @@ static void arcadia_draw_sprites(running_machine &machine, bitmap_t *bitmap)
 		{
 			if (b & m)
 			{
-				bitmap->pix16(y, x + j) = color;
+				bitmap.pix16(y, x + j) = color;
 			}
 		}
 	    }
@@ -579,8 +579,8 @@ static void arcadia_draw_sprites(running_machine &machine, bitmap_t *bitmap)
 		{
 			if (b & m)
 			{
-				bitmap->pix16(y, x + j) = color;
-				bitmap->pix16(y+1, x + j) = color;
+				bitmap.pix16(y, x + j) = color;
+				bitmap.pix16(y+1, x + j) = color;
 			}
 		}
 	    }
@@ -630,7 +630,7 @@ INTERRUPT_GEN( arcadia_video_line )
 		{
 			if (((state->m_line-state->m_ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(device->machine(), state->m_bitmap, state->m_charline*h+state->m_ypos,
+				arcadia_vh_draw_line(device->machine(), *state->m_bitmap, state->m_charline*h+state->m_ypos,
 					state->m_reg.d.chars1[state->m_charline]);
 			}
 		}
@@ -639,7 +639,7 @@ INTERRUPT_GEN( arcadia_video_line )
 			{
 				if (((state->m_line-state->m_ypos)&(h-1))==0)
 				{
-					arcadia_vh_draw_line(device->machine(), state->m_bitmap, state->m_charline*h+state->m_ypos,
+					arcadia_vh_draw_line(device->machine(), *state->m_bitmap, state->m_charline*h+state->m_ypos,
 						state->m_reg.d.chars2[state->m_charline-13]);
 				}
 			state->m_charline-=13;
@@ -652,7 +652,7 @@ INTERRUPT_GEN( arcadia_video_line )
 			}
 	}
 	if (state->m_line==261)
-		arcadia_draw_sprites(device->machine(), state->m_bitmap);
+		arcadia_draw_sprites(device->machine(), *state->m_bitmap);
 }
 
 READ8_HANDLER(arcadia_vsync_r)
@@ -664,6 +664,6 @@ READ8_HANDLER(arcadia_vsync_r)
 SCREEN_UPDATE( arcadia )
 {
 	arcadia_state *state = screen.machine().driver_data<arcadia_state>();
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, *state->m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

@@ -381,7 +381,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7);
 
-			bitmap->pix16(y, x) = color;
+			bitmap.pix16(y, x) = color;
 
 			data <<= 1;
 		}
@@ -410,7 +410,7 @@ void bw12_state::video_start()
 
 bool bw12_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update( &bitmap, cliprect);
+	m_crtc->update(bitmap, cliprect);
 
 	return 0;
 }

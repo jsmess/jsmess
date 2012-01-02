@@ -81,7 +81,7 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
 
-			bitmap->pix16(y, x) = color;
+			bitmap.pix16(y, x) = color;
 
 			data <<= 1;
 		}
@@ -134,7 +134,7 @@ void v1050_state::video_start()
 
 bool v1050_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update(&bitmap, cliprect);
+	m_crtc->update(bitmap, cliprect);
 
 	return 0;
 }

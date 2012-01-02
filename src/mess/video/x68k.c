@@ -35,9 +35,9 @@
 
 static void x68k_crtc_refresh_mode(running_machine &machine);
 
-INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+INLINE void x68k_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
 {
-	bitmap->pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (UINT16)color;
 }
 /*
 static bitmap_t* x68k_get_gfx_page(int pri,int type)
@@ -771,7 +771,7 @@ READ16_HANDLER( x68k_spriteram_r )
 	return state->m_spriteram[offset];
 }
 
-static void x68k_draw_text(running_machine &machine,bitmap_t* bitmap, int xscr, int yscr, rectangle rect)
+static void x68k_draw_text(running_machine &machine,bitmap_t &bitmap, int xscr, int yscr, rectangle rect)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	unsigned int line,pixel; // location on screen
@@ -796,10 +796,10 @@ static void x68k_draw_text(running_machine &machine,bitmap_t* bitmap, int xscr, 
 			{
 				// Colour 0 is displayable if the text layer is at the priority level 2
 				if(colour == 0 && (state->m_video.reg[1] & 0x0c00) == 0x0800)
-					bitmap->pix16(line, pixel) = 512 + (state->m_video.text_pal[colour] >> 1);
+					bitmap.pix16(line, pixel) = 512 + (state->m_video.text_pal[colour] >> 1);
 				else
 					if(colour != 0)
-						bitmap->pix16(line, pixel) = 512 + (state->m_video.text_pal[colour] >> 1);
+						bitmap.pix16(line, pixel) = 512 + (state->m_video.text_pal[colour] >> 1);
 			}
 			bit--;
 			if(bit < 0)
@@ -812,7 +812,7 @@ static void x68k_draw_text(running_machine &machine,bitmap_t* bitmap, int xscr, 
 	}
 }
 
-static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t* bitmap, rectangle cliprect, UINT8 priority)
+static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t &bitmap, rectangle cliprect, UINT8 priority)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	int pixel;
@@ -853,7 +853,7 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t* bitmap, r
 						break;
 					}
 					if(colour != 0)
-						bitmap->pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour] >> 1);
+						bitmap.pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour] >> 1);
 					loc++;
 					loc &= 0x3ff;
 				}
@@ -877,7 +877,7 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t* bitmap, r
 					{
 						colour = ((state->m_gvram[lineoffset + loc] >> page*shift) & 0x000f);
 						if(colour != 0)
-							bitmap->pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour & 0x0f] >> 1);
+							bitmap.pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour & 0x0f] >> 1);
 						loc++;
 						loc &= 0x1ff;
 					}
@@ -894,7 +894,7 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t* bitmap, r
 						{
 							colour = ((state->m_gvram[lineoffset + loc] >> page*shift) & 0x00ff);
 							if(colour != 0)
-								bitmap->pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour & 0xff] >> 1);
+								bitmap.pix16(scanline, pixel) = 512 + (state->m_video.gfx_pal[colour & 0xff] >> 1);
 							loc++;
 							loc &= 0x1ff;
 						}
@@ -909,7 +909,7 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t* bitmap, r
 					{
 						colour = state->m_gvram[lineoffset + loc];
 						if(colour != 0)
-							bitmap->pix16(scanline, pixel) = 512 + (colour >> 1);
+							bitmap.pix16(scanline, pixel) = 512 + (colour >> 1);
 						loc++;
 						loc &= 0x1ff;
 					}
@@ -920,7 +920,7 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t* bitmap, r
 	}
 }
 
-static void x68k_draw_gfx(running_machine &machine, bitmap_t* bitmap,rectangle cliprect)
+static void x68k_draw_gfx(running_machine &machine, bitmap_t &bitmap,rectangle cliprect)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	int priority;
@@ -938,7 +938,7 @@ static void x68k_draw_gfx(running_machine &machine, bitmap_t* bitmap,rectangle c
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-static void x68k_draw_sprites(running_machine &machine, bitmap_t* bitmap, int priority, rectangle cliprect)
+static void x68k_draw_sprites(running_machine &machine, bitmap_t &bitmap, int priority, rectangle cliprect)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*
@@ -1137,7 +1137,7 @@ SCREEN_UPDATE( x68000 )
 	}
 //  rect.max_x=state->m_crtc.width;
 //  rect.max_y=state->m_crtc.height;
-	bitmap->fill(0, cliprect);
+	bitmap.fill(0, cliprect);
 
 	if(state->m_sysport.contrast == 0)  // if monitor contrast is 0, then don't bother displaying anything
 		return 0;

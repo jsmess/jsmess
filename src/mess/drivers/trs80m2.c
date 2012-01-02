@@ -662,7 +662,7 @@ static MC6845_UPDATE_ROW( trs80m2_update_row )
 		{
 			int x = (column * 8) + bit;
 
-			bitmap->pix16(y, x) = BIT(data, 7);
+			bitmap.pix16(y, x) = BIT(data, 7);
 
 			data <<= 1;
 		}
@@ -716,7 +716,7 @@ bool trs80m2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	}
 	else
 	{
-		m_crtc->update(&bitmap, cliprect);
+		m_crtc->update(bitmap, cliprect);
 	}
 
 	return 0;

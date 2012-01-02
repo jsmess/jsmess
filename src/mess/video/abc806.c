@@ -327,11 +327,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		{
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 
-			bitmap->pix16(y, x++) = color;
+			bitmap.pix16(y, x++) = color;
 
 			if (e5 || e6)
 			{
-				bitmap->pix16(y, x++) = color;
+				bitmap.pix16(y, x++) = color;
 			}
 
 			chargen_data <<= 1;
@@ -428,7 +428,7 @@ static const mc6845_interface crtc_intf =
 //  hr_update - high resolution screen update
 //-------------------------------------------------
 
-void abc806_state::hr_update(bitmap_t *bitmap, const rectangle &cliprect)
+void abc806_state::hr_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT32 addr = (m_hrs & 0x0f) << 15;
 
@@ -443,9 +443,9 @@ void abc806_state::hr_update(bitmap_t *bitmap, const rectangle &cliprect)
 			{
 				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
-				if (BIT(dot, 15) || bitmap->pix16(y, x) == 0)
+				if (BIT(dot, 15) || bitmap.pix16(y, x) == 0)
 				{
-					bitmap->pix16(y, x) = (dot >> 12) & 0x07;
+					bitmap.pix16(y, x) = (dot >> 12) & 0x07;
 				}
 
 				dot <<= 4;
@@ -516,11 +516,11 @@ bool abc806_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	if (!m_txoff)
 	{
 		// draw text
-		m_crtc->update(&bitmap, cliprect);
+		m_crtc->update(bitmap, cliprect);
 	}
 
 	// draw HR graphics
-	hr_update(&bitmap, cliprect);
+	hr_update(bitmap, cliprect);
 
 	return 0;
 }

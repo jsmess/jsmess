@@ -93,7 +93,7 @@ SCREEN_UPDATE( mac )
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
-		line = &bitmap->pix16(y);
+		line = &bitmap.pix16(y);
 
 		for (x = 0; x < MAC_H_VIS; x += 16)
 		{
@@ -121,7 +121,7 @@ SCREEN_UPDATE( macse30 )
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
-		line = &bitmap->pix16(y);
+		line = &bitmap.pix16(y);
 
 		for (x = 0; x < MAC_H_VIS; x += 16)
 		{
@@ -147,7 +147,7 @@ SCREEN_UPDATE( macprtb )
 
 	for (y = 0; y < 400; y++)
 	{
-		line = &bitmap->pix16(y);
+		line = &bitmap.pix16(y);
 
 		for (x = 0; x < 640; x += 16)
 		{
@@ -173,7 +173,7 @@ SCREEN_UPDATE( macpb140 )
 
 	for (y = 0; y < 400; y++)
 	{
-		line = &bitmap->pix16(y);
+		line = &bitmap.pix16(y);
 
 		for (x = 0; x < 640; x += 16)
 		{
@@ -197,7 +197,7 @@ SCREEN_UPDATE( macpb160 )
 
 	for (y = 0; y < 400; y++)
 	{
-		line = &bitmap->pix16(y);
+		line = &bitmap.pix16(y);
 
 		for (x = 0; x < 640/4; x++)
 		{
@@ -421,7 +421,7 @@ SCREEN_UPDATE( macrbv )
 
 			for (y = 0; y < vres; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < hres; x+=8)
 				{
 					pixels = vram8[(y * (hres/8)) + ((x/8)^3)];
@@ -445,7 +445,7 @@ SCREEN_UPDATE( macrbv )
 
 			for (y = 0; y < vres; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < hres/4; x++)
 				{
 					pixels = vram8[(y * (hres/4)) + (BYTE4_XOR_BE(x))];
@@ -465,7 +465,7 @@ SCREEN_UPDATE( macrbv )
 
 			for (y = 0; y < vres; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < hres/2; x++)
 				{
@@ -484,7 +484,7 @@ SCREEN_UPDATE( macrbv )
 
 			for (y = 0; y < vres; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < hres; x++)
 				{
@@ -534,7 +534,7 @@ SCREEN_UPDATE( macrbvvram )
 			{
 				for (y = 0; y < 480; y++)
 				{
-					scanline = &bitmap->pix32(y);
+					scanline = &bitmap.pix32(y);
 					for (x = 0; x < 640; x+=8)
 					{
 						pixels = vram8[(y * 80) + ((x/8)^3)];
@@ -554,7 +554,7 @@ SCREEN_UPDATE( macrbvvram )
 			{
 				for (y = 0; y < 480; y++)
 				{
-					scanline = &bitmap->pix32(y);
+					scanline = &bitmap.pix32(y);
 					for (x = 0; x < 640; x+=8)
 					{
 						pixels = vram8[(y * 0x400) + ((x/8)^3)];
@@ -580,7 +580,7 @@ SCREEN_UPDATE( macrbvvram )
 
 			for (y = 0; y < 480; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 640/4; x++)
 				{
 					pixels = vram8[(y * 160) + (BYTE4_XOR_BE(x))];
@@ -601,7 +601,7 @@ SCREEN_UPDATE( macrbvvram )
 
 			for (y = 0; y < 480; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < 640/2; x++)
 				{
@@ -623,7 +623,7 @@ SCREEN_UPDATE( macrbvvram )
 			{
 				for (y = 0; y < 480; y++)
 				{
-					scanline = &bitmap->pix32(y);
+					scanline = &bitmap.pix32(y);
 
 					for (x = 0; x < 640; x++)
 					{
@@ -636,7 +636,7 @@ SCREEN_UPDATE( macrbvvram )
 			{
 				for (y = 0; y < 480; y++)
 				{
-					scanline = &bitmap->pix32(y);
+					scanline = &bitmap.pix32(y);
 
 					for (x = 0; x < 640; x++)
 					{
@@ -886,7 +886,7 @@ SCREEN_UPDATE( macdafb )
 
 			for (y = 0; y < 870; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 1152; x+=8)
 				{
 					pixels = vram8[(y * mac->m_dafb_stride) + ((x/8)^3)];
@@ -912,7 +912,7 @@ SCREEN_UPDATE( macdafb )
 
 			for (y = 0; y < 870; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				for (x = 0; x < 1152/4; x++)
 				{
 					pixels = vram8[(y * mac->m_dafb_stride) + (BYTE4_XOR_BE(x))];
@@ -934,7 +934,7 @@ SCREEN_UPDATE( macdafb )
 
 			for (y = 0; y < 870; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < 1152/2; x++)
 				{
@@ -955,7 +955,7 @@ SCREEN_UPDATE( macdafb )
 
 			for (y = 0; y < 870; y++)
 			{
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 
 				for (x = 0; x < 1152; x++)
 				{
@@ -971,7 +971,7 @@ SCREEN_UPDATE( macdafb )
 			{
 				UINT32 *base;
 
-				scanline = &bitmap->pix32(y);
+				scanline = &bitmap.pix32(y);
 				base = (UINT32 *)&mac->m_vram[(y * (mac->m_dafb_stride/4)) + (mac->m_dafb_base/4)];
 				for (x = 0; x < 640; x++)
 				{
@@ -996,7 +996,7 @@ SCREEN_UPDATE( macpbwd )    /* Color PowerBooks using an off-the-shelf WD video 
 
     for (y = 0; y < 480; y++)
     {
-        scanline = &bitmap->pix32(y);
+        scanline = &bitmap.pix32(y);
         for (x = 0; x < 640; x++)
         {
             pixels = vram8[(y * 640) + (BYTE4_XOR_BE(x))];

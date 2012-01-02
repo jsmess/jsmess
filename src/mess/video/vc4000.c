@@ -62,7 +62,7 @@ VIDEO_START(vc4000)
 	state->m_video.sprites[3].data = &state->m_video.reg.d.sprite4;
 	state->m_video.sprites[3].mask = 1 << 3;
 
-	state->m_video.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_video.bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 INLINE UINT8 vc4000_joystick_return_to_centre(UINT8 joy)
@@ -385,7 +385,7 @@ static const char led[20][12+1] =
 };
 
 
-static void vc4000_draw_digit(vc4000_state *state, bitmap_t *bitmap, int x, int y, int d, int line)
+static void vc4000_draw_digit(vc4000_state *state, bitmap_t &bitmap, int x, int y, int d, int line)
 {
 	static const int digit_to_segment[0x10]={
 	0x0fff, 0x007c, 0x17df, 0x15ff, 0x1c7d, 0x1df7, 0x1ff7, 0x007f, 0x1fff, 0x1dff
@@ -396,7 +396,7 @@ static void vc4000_draw_digit(vc4000_state *state, bitmap_t *bitmap, int x, int 
 	for (j=0; j<sizeof(led[0]); j++)
 	{
 		if (digit_to_segment[d]&(1<<(led[i][j]-'a')) )
-			bitmap->pix16(y+i, x+j) = ((state->m_video.reg.d.background>>4)&7)^7;
+			bitmap.pix16(y+i, x+j) = ((state->m_video.reg.d.background>>4)&7)^7;
 	}
 }
 
@@ -414,7 +414,7 @@ INLINE void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int
 }
 
 
-static void vc4000_sprite_update(vc4000_state *state, bitmap_t *bitmap, UINT8 *collision, SPRITE *This)
+static void vc4000_sprite_update(vc4000_state *state, bitmap_t &bitmap, UINT8 *collision, SPRITE *This)
 {
 	int i,j,m;
 
@@ -534,7 +534,7 @@ INLINE void vc4000_draw_grid(running_machine &machine, UINT8 *collision)
 
 	if (state->m_video.line>=height) return;
 
-	state->m_video.bitmap->plot_box(0, state->m_video.line, width, 1, (state->m_video.reg.d.background)&7);
+	state->m_video.bitmap.plot_box(0, state->m_video.line, width, 1, (state->m_video.reg.d.background)&7);
 
 	if (line<0 || line>=200) return;
 	if (~state->m_video.reg.d.background & 8) return;
@@ -574,7 +574,7 @@ INLINE void vc4000_draw_grid(running_machine &machine, UINT8 *collision)
 		{
 			int l;
 			for (l=0; l<w; l++) collision[x+l]|=0x10;
-			state->m_video.bitmap->plot_box(x, state->m_video.line, w, 1, (state->m_video.reg.d.background>>4)&7);
+			state->m_video.bitmap.plot_box(x, state->m_video.line, w, 1, (state->m_video.reg.d.background>>4)&7);
 		}
 		if (j==7) m=0x100;
 	}
@@ -625,7 +625,7 @@ INTERRUPT_GEN( vc4000_video_line )
 			state->m_video.background_collision|=state->m_background_collision[collision[i]];
 			/* display final object colours */
 			if (state->m_objects[i] < 8)
-					state->m_video.bitmap->pix16(state->m_video.line, i) = state->m_objects[i];
+					state->m_video.bitmap.pix16(state->m_video.line, i) = state->m_objects[i];
 		}
 
 		y = state->m_video.reg.d.score_control&1?200:20;

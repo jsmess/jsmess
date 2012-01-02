@@ -243,7 +243,7 @@ static void asr_draw_char(device_t *device, int character, int x, int y, int col
 {
 	asr_t *asr = get_safe_token(device);
 
-	drawgfx_opaque(asr->bitmap, asr->bitmap->cliprect(), device->machine().gfx[0], character-32, color, 0, 0,
+	drawgfx_opaque(*asr->bitmap, asr->bitmap->cliprect(), device->machine().gfx[0], character-32, color, 0, 0,
 				x+1, y);
 }
 
@@ -255,8 +255,8 @@ static void asr_linefeed(device_t *device)
 
 	for (y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
-		extract_scanline8(asr->bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
-		draw_scanline8(asr->bitmap, asr_window_offset_x, y, asr_window_width, buf, device->machine().pens);
+		extract_scanline8(*asr->bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
+		draw_scanline8(*asr->bitmap, asr_window_offset_x, y, asr_window_width, buf, device->machine().pens);
 	}
 
 	const rectangle asr_scroll_clear_window(
@@ -452,10 +452,10 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 /*
     Video refresh
 */
-void asr733_refresh(device_t *device, bitmap_t *bitmap, int x, int y)
+void asr733_refresh(device_t *device, bitmap_t &bitmap, int x, int y)
 {
 	asr_t *asr = get_safe_token(device);
-	copybitmap(bitmap, asr->bitmap, 0, 0, x, y, asr->bitmap->cliprect());
+	copybitmap(bitmap, *asr->bitmap, 0, 0, x, y, asr->bitmap->cliprect());
 }
 
 

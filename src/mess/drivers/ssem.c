@@ -392,7 +392,7 @@ static const UINT8 char_glyphs[0x80][8] =
 	{ 0xff, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xff },
 };
 
-static void glyph_print(running_machine &machine, bitmap_t *bitmap, INT32 x, INT32 y, const char *msg, ...)
+static void glyph_print(running_machine &machine, bitmap_t &bitmap, INT32 x, INT32 y, const char *msg, ...)
 {
 	va_list arg_list;
 	char buf[32768];
@@ -412,7 +412,7 @@ static void glyph_print(running_machine &machine, bitmap_t *bitmap, INT32 x, INT
 			INT32 line = 0;
 			for(line = 0; line < 8; line++)
 			{
-				UINT32 *d = &bitmap->pix32(y + line);
+				UINT32 *d = &bitmap.pix32(y + line);
 				INT32 bit = 0;
 				for(bit = 0; bit < 8; bit++)
 				{

@@ -89,7 +89,7 @@ static void adjust_begin_and_end_row(const rectangle &cliprect, int *beginrow, i
     textual character
 -------------------------------------------------*/
 
-INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t *bitmap, int xpos, int ypos, int xscale, UINT32 code,
+INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t &bitmap, int xpos, int ypos, int xscale, UINT32 code,
 	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
@@ -124,7 +124,7 @@ INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t *bitma
 
 			for (i = 0; i < xscale; i++)
 			{
-				bitmap->pix16(ypos + y, xpos + (x * xscale) + i) = color;
+				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
 			}
 		}
 	}
@@ -137,7 +137,7 @@ INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t *bitma
     column or 80 column)
 -------------------------------------------------*/
 
-static void apple2_text_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
+static void apple2_text_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int row, col;
@@ -178,7 +178,7 @@ static void apple2_text_draw(running_machine &machine, bitmap_t *bitmap, const r
     apple2_lores_draw - renders lo-res text
 -------------------------------------------------*/
 
-static void apple2_lores_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
+static void apple2_lores_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int row, col, y, x;
@@ -203,12 +203,12 @@ static void apple2_lores_draw(running_machine &machine, bitmap_t *bitmap, const 
 			for (y = 0; y < 4; y++)
 			{
 				for (x = 0; x < 14; x++)
-					bitmap->pix16(row + y, col * 14 + x) = (code >> 0) & 0x0F;
+					bitmap.pix16(row + y, col * 14 + x) = (code >> 0) & 0x0F;
 			}
 			for (y = 4; y < 8; y++)
 			{
 				for (x = 0; x < 14; x++)
-					bitmap->pix16(row + y, col * 14 + x) = (code >> 4) & 0x0F;
+					bitmap.pix16(row + y, col * 14 + x) = (code >> 4) & 0x0F;
 			}
 		}
 	}
@@ -219,7 +219,7 @@ static void apple2_lores_draw(running_machine &machine, bitmap_t *bitmap, const 
     HIGH RESOLUTION GRAPHICS
 ***************************************************************************/
 
-static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
+static void apple2_hires_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	const UINT8 *vram;
@@ -269,7 +269,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_t *bitmap, const 
 			}
 		}
 
-		p = &bitmap->pix16(row);
+		p = &bitmap.pix16(row);
 
 		for (col = 0; col < columns; col++)
 		{

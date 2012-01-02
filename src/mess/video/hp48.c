@@ -147,7 +147,7 @@ SCREEN_UPDATE ( hp48 )
 	if ( !display || refresh )
 	{
 		LOG(( "display off\n" ));
-		bitmap->fill(0 );
+		bitmap.fill(0 );
 		return 0;
 	}
 
@@ -192,7 +192,7 @@ SCREEN_UPDATE ( hp48 )
 				acc += state->m_screens[ i ][ y ][ x+8 ];
 			}
 			acc = (acc * 255) / (33 * HP48_NB_SCREENS);
-			bitmap->pix16(y, x ) = acc;
+			bitmap.pix16(y, x ) = acc;
 		}
 	}
 

@@ -227,7 +227,7 @@ static MM74C923_INTERFACE( keyboard_intf )
 
 bool elf2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_vdc->update_screen(&bitmap, cliprect);
+	m_vdc->update_screen(bitmap, cliprect);
 
 	return 0;
 }

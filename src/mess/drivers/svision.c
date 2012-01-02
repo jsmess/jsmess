@@ -363,7 +363,7 @@ static SCREEN_UPDATE( svision )
 	{
 		for (y=0; y<160; y++)
 		{
-			UINT16 *line = &bitmap->pix16(y, 3 - (XPOS & 3));
+			UINT16 *line = &bitmap.pix16(y, 3 - (XPOS & 3));
 			for (x=3-(XPOS&3),i=0; x<160+3 && x<XSIZE+3; x+=4,i++)
 			{
 				UINT8 b=videoram[j+i];
@@ -380,7 +380,7 @@ static SCREEN_UPDATE( svision )
 	}
 	else
 	{
-		bitmap->plot_box(3, 0, 162, 159, PALETTE_START);
+		bitmap.plot_box(3, 0, 162, 159, PALETTE_START);
 	}
 	return 0;
 }
@@ -395,7 +395,7 @@ static SCREEN_UPDATE( tvlink )
 	{
 		for (y = 0; y < 160; y++)
 		{
-			UINT16 *line = &bitmap->pix16(y, 3 - (XPOS & 3));
+			UINT16 *line = &bitmap.pix16(y, 3 - (XPOS & 3));
 			for (x = 3 - (XPOS & 3), i = 0; x < 160 + 3 && x < XSIZE + 3; x += 4, i++)
 			{
 				UINT8 b=videoram[j+i];
@@ -412,7 +412,7 @@ static SCREEN_UPDATE( tvlink )
 	}
 	else
 	{
-		bitmap->plot_box(3, 0, 162, 159, screen.machine().pens[PALETTE_START]);
+		bitmap.plot_box(3, 0, 162, 159, screen.machine().pens[PALETTE_START]);
 	}
 	return 0;
 }

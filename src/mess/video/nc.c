@@ -104,7 +104,7 @@ SCREEN_UPDATE( nc )
 			px = x;
 			for (b=0; b<8; b++)
 			{
-				bitmap->pix16(y, px) = pens[(byte>>7) & 0x01];
+				bitmap.pix16(y, px) = pens[(byte>>7) & 0x01];
 				byte = byte<<1;
 				px++;
 			}

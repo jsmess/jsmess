@@ -112,7 +112,7 @@ static SCREEN_UPDATE( compis2 ) // temporary
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = &bitmap->pix16(sy++);
+			UINT16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 240; x+=3)
 			{
@@ -145,7 +145,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	UINT8 i,gfx = state->m_video_ram[address & 0x1ffff];
 
 	for(i=0; i<8; i++)
-		bitmap->pix16(y, x + i) = BIT((gfx >> i), 0);
+		bitmap.pix16(y, x + i) = BIT((gfx >> i), 0);
 }
 
 

@@ -125,10 +125,10 @@ SCREEN_UPDATE( sapi1 )
 						}
 					}
 					if(attr==3) {
-						bitmap->pix16(y*9+j, xpos+2*b   ) = val;
-						bitmap->pix16(y*9+j, xpos+2*b+1 ) = val;
+						bitmap.pix16(y*9+j, xpos+2*b   ) = val;
+						bitmap.pix16(y*9+j, xpos+2*b+1 ) = val;
 					} else {
-						bitmap->pix16(y*9+j, xpos+b ) = val;
+						bitmap.pix16(y*9+j, xpos+b ) = val;
 					}
 				}
 			}

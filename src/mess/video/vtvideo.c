@@ -179,7 +179,7 @@ WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 	//palette_set_color_rgb(device->machine(), 1, data, data, data);
 }
 
-static void vt_video_display_char(device_t *device,bitmap_t *bitmap, UINT8 code,
+static void vt_video_display_char(device_t *device,bitmap_t &bitmap, UINT8 code,
 	int x, int y,UINT8 scroll_region,UINT8 display_type)
 {
 	UINT8 line=0;
@@ -214,26 +214,26 @@ static void vt_video_display_char(device_t *device,bitmap_t *bitmap, UINT8 code,
 		{
 			bit = ((line << b) & 0x80) ? 1 : 0;
 			if (double_width) {
-				bitmap->pix16(y*10+i, x*20+b*2)   =  bit;
-				bitmap->pix16(y*10+i, x*20+b*2+1) =  bit;
+				bitmap.pix16(y*10+i, x*20+b*2)   =  bit;
+				bitmap.pix16(y*10+i, x*20+b*2+1) =  bit;
 			} else {
-				bitmap->pix16(y*10+i, x*10+b) =  bit;
+				bitmap.pix16(y*10+i, x*10+b) =  bit;
 			}
 		}
 		// char interleave is filled with last bit
 		if (double_width) {
-			bitmap->pix16(y*10+i, x*20+16) =  bit;
-			bitmap->pix16(y*10+i, x*20+17) =  bit;
-			bitmap->pix16(y*10+i, x*20+18) =  bit;
-			bitmap->pix16(y*10+i, x*20+19) =  bit;
+			bitmap.pix16(y*10+i, x*20+16) =  bit;
+			bitmap.pix16(y*10+i, x*20+17) =  bit;
+			bitmap.pix16(y*10+i, x*20+18) =  bit;
+			bitmap.pix16(y*10+i, x*20+19) =  bit;
 		} else {
-			bitmap->pix16(y*10+i, x*10+8) =  bit;
-			bitmap->pix16(y*10+i, x*10+9) =  bit;
+			bitmap.pix16(y*10+i, x*10+8) =  bit;
+			bitmap.pix16(y*10+i, x*10+9) =  bit;
 		}
 	}
 }
 
-void vt_video_update(device_t *device, bitmap_t *bitmap, const rectangle &cliprect)
+void vt_video_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	vt_video_t *vt = get_safe_token(device);
 

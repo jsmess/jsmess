@@ -17,9 +17,9 @@
 #include "includes/spectrum.h"
 #include "machine/ram.h"
 
-INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+INLINE void spectrum_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
 {
-	bitmap->pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (UINT16)color;
 }
 
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
@@ -54,7 +54,7 @@ VIDEO_START( ts2068 )
  *******************************************************************/
 
 /* Draw a scanline in TS2068/TC2048 hires mode (code modified from COUPE.C) */
-static void ts2068_hires_scanline(running_machine &machine,bitmap_t *bitmap, int y, int borderlines)
+static void ts2068_hires_scanline(running_machine &machine,bitmap_t &bitmap, int y, int borderlines)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	int x,b,scrx,scry;
@@ -100,7 +100,7 @@ static void ts2068_hires_scanline(running_machine &machine,bitmap_t *bitmap, int
 }
 
 /* Draw a scanline in TS2068/TC2048 64-column mode */
-static void ts2068_64col_scanline(running_machine &machine,bitmap_t *bitmap, int y, int borderlines, unsigned short inkcolor)
+static void ts2068_64col_scanline(running_machine &machine,bitmap_t &bitmap, int y, int borderlines, unsigned short inkcolor)
 {
 	int x,b,scrx,scry;
 	unsigned char *scr1, *scr2;
@@ -134,7 +134,7 @@ static void ts2068_64col_scanline(running_machine &machine,bitmap_t *bitmap, int
 }
 
 /* Draw a scanline in TS2068/TC2048 lores (normal Spectrum) mode */
-static void ts2068_lores_scanline(running_machine &machine,bitmap_t *bitmap, int y, int borderlines, int screen)
+static void ts2068_lores_scanline(running_machine &machine,bitmap_t &bitmap, int y, int borderlines, int screen)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	int x,b,scrx,scry;

@@ -55,9 +55,9 @@ INLINE UINT8 read_vram( electron_state *state, UINT16 addr )
 	return state->m_ula.vram[ addr % state->m_ula.screen_size ];
 }
 
-INLINE void electron_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+INLINE void electron_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
 {
-	bitmap->pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (UINT16)color;
 }
 
 SCREEN_UPDATE( electron )
@@ -147,7 +147,7 @@ SCREEN_UPDATE( electron )
 
 	case 3:
 		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) )
-			bitmap->fill(7, r );
+			bitmap.fill(7, r );
 		else
 		{
 			for( i = 0; i < 80; i++ )
@@ -223,7 +223,7 @@ SCREEN_UPDATE( electron )
 
 	case 6:
 		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) )
-			bitmap->fill(7, r );
+			bitmap.fill(7, r );
 		else
 		{
 			for( i = 0; i < 40; i++ )

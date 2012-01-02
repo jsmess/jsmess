@@ -50,8 +50,8 @@ SCREEN_UPDATE( p2000m )
 		{
 			for (loop = 0; loop < 12; loop++)
 			{
-				bitmap->pix16(sy + 18, sx + loop) = 0;	/* cursor */
-				bitmap->pix16(sy + 19, sx + loop) = 0;	/* cursor */
+				bitmap.pix16(sy + 18, sx + loop) = 0;	/* cursor */
+				bitmap.pix16(sy + 19, sx + loop) = 0;	/* cursor */
 			}
 		}
 	}

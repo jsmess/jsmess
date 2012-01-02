@@ -58,7 +58,7 @@ WRITE8_MEMBER( abc800_state::hrc_w )
 //  screen update
 //-------------------------------------------------
 
-void abc800c_state::hr_update(bitmap_t *bitmap, const rectangle &cliprect)
+void abc800c_state::hr_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
 	int sx, y, dot;
@@ -76,7 +76,7 @@ void abc800c_state::hr_update(bitmap_t *bitmap, const rectangle &cliprect)
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = m_fgctl_prom[fgctl_addr] & 0x07;
 
-				bitmap->pix16(y, x++) = color;
+				bitmap.pix16(y, x++) = color;
 
 				data <<= 2;
 			}
@@ -111,7 +111,7 @@ bool abc800c_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw HR graphics
-	hr_update(&bitmap, cliprect);
+	hr_update(bitmap, cliprect);
 
 	if (!BIT(m_fgctl, 7))
 	{
@@ -179,7 +179,7 @@ static PALETTE_INIT( abc800m )
 //  screen update
 //-------------------------------------------------
 
-void abc800m_state::hr_update(bitmap_t *bitmap, const rectangle &cliprect)
+void abc800m_state::hr_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
 	int sx, y, dot;
@@ -197,8 +197,8 @@ void abc800m_state::hr_update(bitmap_t *bitmap, const rectangle &cliprect)
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = (m_fgctl_prom[fgctl_addr] & 0x07) ? 1 : 0;
 
-				bitmap->pix16(y, x++) = color;
-				bitmap->pix16(y, x++) = color;
+				bitmap.pix16(y, x++) = color;
+				bitmap.pix16(y, x++) = color;
 
 				data <<= 2;
 			}
@@ -242,7 +242,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 			if (BIT(data, 7))
 			{
-				bitmap->pix16(y, x) = 1;
+				bitmap.pix16(y, x) = 1;
 			}
 
 			data <<= 1;
@@ -283,12 +283,12 @@ bool abc800m_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw HR graphics
-	hr_update(&bitmap, cliprect);
+	hr_update(bitmap, cliprect);
 
 	if (!BIT(m_fgctl, 7))
 	{
 		// draw text
-		m_crtc->update(&bitmap, cliprect);
+		m_crtc->update(bitmap, cliprect);
 	}
 
 	return 0;

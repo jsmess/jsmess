@@ -323,7 +323,7 @@ static PALETTE_INIT( micronic )
 
 bool micronic_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	m_lcdc->update_screen(&bitmap, cliprect);
+	m_lcdc->update_screen(bitmap, cliprect);
 
 	return 0;
 }

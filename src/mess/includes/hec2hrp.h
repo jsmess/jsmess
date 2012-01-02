@@ -142,8 +142,8 @@ WRITE8_HANDLER( hector_io_8255_w);
 WRITE8_HANDLER( hector_179x_register_w);
 /*----------- defined in video/hec2video.c -----------*/
 
-void hector_80c(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
-void hector_hr(running_machine &machine, bitmap_t *bitmap, UINT8 *page, int ymax, int yram) ;
+void hector_80c(running_machine &machine, bitmap_t &bitmap, UINT8 *page, int ymax, int yram) ;
+void hector_hr(running_machine &machine, bitmap_t &bitmap, UINT8 *page, int ymax, int yram) ;
 VIDEO_START( hec2hrp );
 SCREEN_UPDATE( hec2hrp );
 

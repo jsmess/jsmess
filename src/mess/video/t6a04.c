@@ -118,7 +118,7 @@ void t6a04_device::device_reset()
 //  device interface
 //**************************************************************************
 
-int t6a04_device::video_update(bitmap_t *bitmap, const rectangle &cliprect)
+int t6a04_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
 {
 	UINT8 ypages = width>>3;
 	UINT8 last_line = m_zpos + height;
@@ -132,14 +132,14 @@ int t6a04_device::video_update(bitmap_t *bitmap, const rectangle &cliprect)
 
 				for (int b=7; b>=0; b--)
 				{
-					bitmap->pix16(x&0x3f, y*8+b) = data & 1;
+					bitmap.pix16(x&0x3f, y*8+b) = data & 1;
 					data>>=1;
 				}
 			}
 	}
 	else
 	{
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 	}
 
 	return 0;

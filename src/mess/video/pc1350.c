@@ -136,7 +136,7 @@ SCREEN_UPDATE( pc1350 )
 	int color[4];
 	running_machine &machine = screen.machine();
 
-	bitmap->fill(11, cliprect);
+	bitmap.fill(11, cliprect);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = pocketc_colortable[PC1350_CONTRAST][0];
@@ -148,7 +148,7 @@ SCREEN_UPDATE( pc1350 )
 		for (x=RIGHT, i=pc1350_addr[k]; i<0xa00; i+=0x200)
 			for (j=0; j<=0x1d; j++, x+=2)
 				for (b = 0; b < 8; b++)
-					bitmap->plot_box(x, y + b * 2, 2, 2, color[(state->m_reg[j+i] >> b) & 1]);
+					bitmap.plot_box(x, y + b * 2, 2, 2, color[(state->m_reg[j+i] >> b) & 1]);
 
 
 	/* 783c: 0 SHIFT 1 DEF 4 RUN 5 PRO 6 JAPAN 7 SML */

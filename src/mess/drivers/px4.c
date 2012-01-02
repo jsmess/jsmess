@@ -1045,14 +1045,14 @@ static SCREEN_UPDATE( px4 )
 
 			for (x = 0; x < 240/8; x++)
 			{
-				bitmap->pix16(row, x * 8 + 0) = BIT(*vram, 7);
-				bitmap->pix16(row, x * 8 + 1) = BIT(*vram, 6);
-				bitmap->pix16(row, x * 8 + 2) = BIT(*vram, 5);
-				bitmap->pix16(row, x * 8 + 3) = BIT(*vram, 4);
-				bitmap->pix16(row, x * 8 + 4) = BIT(*vram, 3);
-				bitmap->pix16(row, x * 8 + 5) = BIT(*vram, 2);
-				bitmap->pix16(row, x * 8 + 6) = BIT(*vram, 1);
-				bitmap->pix16(row, x * 8 + 7) = BIT(*vram, 0);
+				bitmap.pix16(row, x * 8 + 0) = BIT(*vram, 7);
+				bitmap.pix16(row, x * 8 + 1) = BIT(*vram, 6);
+				bitmap.pix16(row, x * 8 + 2) = BIT(*vram, 5);
+				bitmap.pix16(row, x * 8 + 3) = BIT(*vram, 4);
+				bitmap.pix16(row, x * 8 + 4) = BIT(*vram, 3);
+				bitmap.pix16(row, x * 8 + 5) = BIT(*vram, 2);
+				bitmap.pix16(row, x * 8 + 6) = BIT(*vram, 1);
+				bitmap.pix16(row, x * 8 + 7) = BIT(*vram, 0);
 
 				vram++;
 			}
@@ -1064,7 +1064,7 @@ static SCREEN_UPDATE( px4 )
 	else
 	{
 		/* display is disabled, draw an empty screen */
-		bitmap->fill(0, cliprect);
+		bitmap.fill(0, cliprect);
 	}
 
 	return 0;

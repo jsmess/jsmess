@@ -180,7 +180,7 @@ static SCREEN_UPDATE( gmaster )
 {
 	gmaster_state *state = screen.machine().driver_data<gmaster_state>();
     int x,y;
-//  plot_box(bitmap, 0, 0, 64/*bitmap->width*/, bitmap->height, 0); //xmess rounds up to 64 pixel
+//  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0); //xmess rounds up to 64 pixel
     for (y = 0; y < ARRAY_LENGTH(state->m_video.pixels); y++)
 	{
 		for (x = 0; x < ARRAY_LENGTH(state->m_video.pixels[0]); x++)
@@ -188,21 +188,21 @@ static SCREEN_UPDATE( gmaster )
 			UINT8 d = state->m_video.pixels[y][x];
 			UINT16 *line;
 
-			line = &bitmap->pix16((y * 8), x);
+			line = &bitmap.pix16((y * 8), x);
 			line[0] = BIT(d, 0);
-			line = &bitmap->pix16((y * 8 + 1), x);
+			line = &bitmap.pix16((y * 8 + 1), x);
 			line[0] = BIT(d, 1);
-			line = &bitmap->pix16((y * 8 + 2), x);
+			line = &bitmap.pix16((y * 8 + 2), x);
 			line[0] = BIT(d, 2);
-			line = &bitmap->pix16((y * 8 + 3), x);
+			line = &bitmap.pix16((y * 8 + 3), x);
 			line[0] = BIT(d, 3);
-			line = &bitmap->pix16((y * 8 + 4), x);
+			line = &bitmap.pix16((y * 8 + 4), x);
 			line[0] = BIT(d, 4);
-			line = &bitmap->pix16((y * 8 + 5), x);
+			line = &bitmap.pix16((y * 8 + 5), x);
 			line[0] = BIT(d, 5);
-			line = &bitmap->pix16((y * 8 + 6), x);
+			line = &bitmap.pix16((y * 8 + 6), x);
 			line[0] = BIT(d, 6);
-			line = &bitmap->pix16((y * 8 + 7), x);
+			line = &bitmap.pix16((y * 8 + 7), x);
 			line[0] = BIT(d, 7);
 		}
     }

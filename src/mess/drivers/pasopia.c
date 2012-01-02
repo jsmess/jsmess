@@ -88,7 +88,7 @@ MC6845_UPDATE_ROW( pasopia_update_row )
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
 	UINT8 chr,gfx,fg=7,bg=0; // colours need to be determined
 	UINT16 mem,x;
-	UINT16 *p = &bitmap->pix16(y);
+	UINT16 *p = &bitmap.pix16(y);
 
 	for (x = 0; x < x_count; x++)
 	{

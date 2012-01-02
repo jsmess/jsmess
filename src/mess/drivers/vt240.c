@@ -87,7 +87,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;
 
-				bitmap->pix16(res_y, res_x) = pen;
+				bitmap.pix16(res_y, res_x) = pen;
 			}
 		}
 	}
@@ -106,7 +106,7 @@ VIDEO_START_MEMBER( vt240_state )
 SCREEN_UPDATE_MEMBER( vt240_state )
 {
 	/* graphics */
-	m_hgdc->update_screen(&bitmap, cliprect);
+	m_hgdc->update_screen(bitmap, cliprect);
 
 	return 0;
 }

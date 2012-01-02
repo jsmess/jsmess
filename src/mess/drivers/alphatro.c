@@ -144,7 +144,7 @@ VIDEO_START_MEMBER( alphatro_state )
 
 SCREEN_UPDATE_MEMBER( alphatro_state )
 {
-	m_crtc->update( &bitmap, cliprect);
+	m_crtc->update( bitmap, cliprect);
 	return 0;
 }
 
@@ -154,7 +154,7 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 	bool palette = BIT(input_port_read(device->machine(), "CONFIG"), 5);
 	UINT8 chr,gfx,attr,fg,inv;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap->pix16(y);
+	UINT16 *p = &bitmap.pix16(y);
 
 	for (x = 0; x < x_count; x++)
 	{

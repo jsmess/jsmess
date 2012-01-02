@@ -114,7 +114,7 @@ void kc85_video_set_blink_state(running_machine &machine, int data)
 
 
 /* draw 8 pixels */
-static void kc85_draw_8_pixels(kc_state *state, bitmap_t *bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
+static void kc85_draw_8_pixels(kc_state *state, bitmap_t &bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
 {
 	int background_pen;
 	int foreground_pen;
@@ -136,9 +136,9 @@ static void kc85_draw_8_pixels(kc_state *state, bitmap_t *bitmap,int x,int y, un
 		{
 			int pen = pens[((gfx_byte>>7) & 0x07) | ((colour_byte>>6) & 0x02)];
 
-			if ((px >= 0) && (px < bitmap->width()) && (y >= 0) && (y < bitmap->height()))
+			if ((px >= 0) && (px < bitmap.width()) && (y >= 0) && (y < bitmap.height()))
 			{
-				bitmap->pix16(y, px) = pen;
+				bitmap.pix16(y, px) = pen;
 			}
 
 			px++;
@@ -179,9 +179,9 @@ static void kc85_draw_8_pixels(kc_state *state, bitmap_t *bitmap,int x,int y, un
 		{
 			int pen = pens[(gfx_byte>>7) & 0x01];
 
-			if ((px >= 0) && (px < bitmap->width()) && (y >= 0) && (y < bitmap->height()))
+			if ((px >= 0) && (px < bitmap.width()) && (y >= 0) && (y < bitmap.height()))
 			{
-				bitmap->pix16(y, px) = pen;
+				bitmap.pix16(y, px) = pen;
 			}
 			px++;
 			gfx_byte = gfx_byte<<1;
@@ -344,7 +344,7 @@ static void kc85_common_process_cycles(kc_state *state, struct video_update_stat
 					/* grab colour and pixel information */
 					video_update->pixel_grab_callback(&video_update->grab_data,video_update->x,video_update->y,&colour_byte, &gfx_byte);
 					/* draw to screen */
-					kc85_draw_8_pixels(state, video_update->bitmap, video_update->render_x, video_update->render_y,colour_byte, gfx_byte);
+					kc85_draw_8_pixels(state, *video_update->bitmap, video_update->render_x, video_update->render_y,colour_byte, gfx_byte);
 					/* update render coordinate */
 					video_update->render_x+=8;
 					video_update->x++;
@@ -514,7 +514,7 @@ static void kc85_common_vh_process_lines(kc_state *state, struct video_update_st
 
 /* the kc85 screen is 320 pixels wide and 256 pixels tall */
 /* if we assume a 50Hz display, there are 312 lines for the complete frame, leaving 56 lines not visible */
-static void kc85_common_process_frame(running_machine &machine, bitmap_t *bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
+static void kc85_common_process_frame(running_machine &machine, bitmap_t &bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
 {
 	kc_state *state = machine.driver_data<kc_state>();
 	int cycles_remaining_in_frame = KC85_CYCLES_PER_FRAME;
@@ -530,7 +530,7 @@ static void kc85_common_process_frame(running_machine &machine, bitmap_t *bitmap
 	video_update.x = 0;
 	video_update.y = 0;
 	memcpy(&video_update.grab_data, grab_data, sizeof(struct grab_info));
-	video_update.bitmap = bitmap;
+	video_update.bitmap = &bitmap;
 	video_update.pixel_grab_callback = pixel_grab_callback;
 	video_update.horizontal.state = 0;
 	video_update.horizontal.cycles_remaining_in_state = horizontal_graphics_state_cycles[video_update.horizontal.state];

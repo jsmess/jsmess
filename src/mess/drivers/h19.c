@@ -307,7 +307,7 @@ VIDEO_START_MEMBER( h19_state )
 
 SCREEN_UPDATE_MEMBER( h19_state )
 {
-	m_crtc->update( &bitmap, cliprect);
+	m_crtc->update(bitmap, cliprect);
 	return 0;
 }
 
@@ -316,7 +316,7 @@ static MC6845_UPDATE_ROW( h19_update_row )
 	h19_state *state = device->machine().driver_data<h19_state>();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap->pix16(y);
+	UINT16 *p = &bitmap.pix16(y);
 
 	for (x = 0; x < x_count; x++)
 	{

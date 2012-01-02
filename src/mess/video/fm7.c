@@ -1604,7 +1604,7 @@ SCREEN_UPDATE( fm7 )
 					col |= (((code_g >> b) & 0x01) ? 128 : 0) | (((code_g2 >> b) & 0x01) ? 64 : 0) | (((code_g3 >> b) & 0x01) ? 32 : 0) | (((code_g4 >> b) & 0x01) ? 16 : 0);
 					col |= (((code_r >> b) & 0x01) ? 2048 : 0) | (((code_r2 >> b) & 0x01) ? 1024 : 0) | (((code_r3 >> b) & 0x01) ? 512 : 0) | (((code_r4 >> b) & 0x01) ? 256 : 0);
 					col += 8;  // use analog palette
-					bitmap->pix16(y, x*8+(7-b)) =  col;
+					bitmap.pix16(y, x*8+(7-b)) =  col;
 				}
 			}
 		}
@@ -1624,7 +1624,7 @@ SCREEN_UPDATE( fm7 )
 				for (b = 0; b < 8; b++)
 				{
 					col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);
-					bitmap->pix16(y, x*8+(7-b)) =  col;
+					bitmap.pix16(y, x*8+(7-b)) =  col;
 				}
 			}
 		}

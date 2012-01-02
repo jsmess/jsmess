@@ -151,7 +151,7 @@ WRITE8_DEVICE_HANDLER( vic3_palette_w );
 READ8_DEVICE_HANDLER( vic3_port_r );
 
 void vic3_raster_interrupt_gen( device_t *device );
-UINT32 vic3_video_update( device_t *device, bitmap_t *bitmap, const rectangle &cliprect );
+UINT32 vic3_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect );
 
 
 #endif /* __VIC4567_H__ */

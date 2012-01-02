@@ -672,7 +672,7 @@ SCREEN_UPDATE( nimbus )
 
     for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
     {
-        bitmap->pix16(YCoord, XCoord)=state->m_video_mem[XCoord][YCoord];
+        bitmap.pix16(YCoord, XCoord)=state->m_video_mem[XCoord][YCoord];
     }
 
     state->m_hs_count++;

@@ -86,7 +86,7 @@ READ_LINE_DEVICE_HANDLER( ted7360_rom_switch_r );
 
 void ted7360_frame_interrupt_gen(device_t *device);
 void ted7360_raster_interrupt_gen(device_t *device);
-UINT32 ted7360_video_update(device_t *device, bitmap_t *bitmap, const rectangle &cliprect);
+UINT32 ted7360_video_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
 
 
 #endif /* __TED7360_H__ */

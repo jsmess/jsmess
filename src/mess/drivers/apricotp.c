@@ -103,7 +103,7 @@ bool fp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 	}
 	else
 	{
-		m_crtc->update(&bitmap, cliprect);
+		m_crtc->update(bitmap, cliprect);
 	}
 
 	return false;

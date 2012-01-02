@@ -88,7 +88,7 @@ public:
 	int m_iff;
 	emu_timer *m_i824x_line_timer;
 	emu_timer *m_i824x_hblank_timer;
-	bitmap_t *m_tmp_bitmap;
+	bitmap_t m_tmp_bitmap;
 	int m_start_vpos;
 	int m_start_vblank;
 	UINT8 m_lum;

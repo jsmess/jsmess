@@ -62,7 +62,7 @@ typedef struct
 		} d;
 	} reg;
 
-	bitmap_t *bitmap;
+	bitmap_t bitmap;
 } vc4000_video_t;
 
 class vc4000_state : public driver_device

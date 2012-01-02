@@ -38,7 +38,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// not really public
-	void crtc_update_row(mc6845_device *device, bitmap_t *bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	void crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 	DECLARE_WRITE_LINE_MEMBER( hsync_w );
 
 protected:

@@ -52,7 +52,7 @@ public:
 
 bool pc2000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	return m_lcdc->video_update( &bitmap, cliprect );
+	return m_lcdc->video_update( bitmap, cliprect );
 }
 
 /* TODO: put a breakpoint at 1625 and test the inputs, writes at dce4 are the scancode values */

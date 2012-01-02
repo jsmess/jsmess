@@ -214,13 +214,13 @@ SCREEN_UPDATE( newport )
 {
 	int y;
 
-	bitmap->fill(get_black_pen(screen.machine()), cliprect );
+	bitmap.fill(get_black_pen(screen.machine()), cliprect );
 
 	/* loop over rows and copy to the destination */
 	for( y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
 		UINT32 *src = &pNVID->base[1344 * y];
-		UINT16 *dest = &bitmap->pix16(y, cliprect.min_x);
+		UINT16 *dest = &bitmap.pix16(y, cliprect.min_x);
 		int x;
 
 		/* loop over columns */

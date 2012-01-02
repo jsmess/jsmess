@@ -509,7 +509,7 @@ bool tandy2k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 {
 	if (m_vidouts)
 	{
-		m_vac->update_screen(&bitmap, cliprect);
+		m_vac->update_screen(bitmap, cliprect);
 	}
 
 	return 0;
@@ -531,7 +531,7 @@ static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
         {
             if (BIT(charram_data, 7))
             {
-                bitmap->pix16(y, x + (sx * 10) + bit) = 1;
+                bitmap.pix16(y, x + (sx * 10) + bit) = 1;
             }
 
             charram_data <<= 1;

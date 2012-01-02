@@ -88,7 +88,7 @@ static SCREEN_UPDATE( myb3k )
 						dot = 0;
 
 					if(y*mc6845_tile_height+yi < 200 && x*8+xi < 320) /* TODO: safety check */
-						bitmap->pix16(y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[dot];
+						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = screen.machine().pens[dot];
 				}
 			}
 		}
