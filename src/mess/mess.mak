@@ -1684,6 +1684,7 @@ $(MESSOBJ)/vidbrain.a:			\
 $(MESSOBJ)/visual.a:			\
 	$(MESS_DRIVERS)/v1050.o		\
 	$(MESS_VIDEO)/v1050.o		\
+	$(MESS_MACHINE)/v1050kb.o	\
 
 $(MESSOBJ)/votrax.a:			\
 	$(MESS_DRIVERS)/votrpss.o	\
