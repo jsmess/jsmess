@@ -53,10 +53,10 @@ static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( floppy_io, AS_IO, 8, victor9k_state )
-//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
-//  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
-//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_NOP
 ADDRESS_MAP_END
 
 // Input Ports
@@ -463,7 +463,7 @@ static const via6522_interface via2_intf =
 	DEVCB_DRIVER_MEMBER(victor9k_state, via2_pa_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL, // KBRDY
+	DEVCB_DEVICE_LINE_MEMBER(VICTOR9K_KEYBOARD_TAG, victor9k_keyboard_device, kbrdy_r),
 	DEVCB_NULL, // SRQ/BUSY
 	DEVCB_DEVICE_LINE_MEMBER(VICTOR9K_KEYBOARD_TAG, victor9k_keyboard_device, kbdata_r),
 
@@ -874,9 +874,18 @@ static const via6522_interface via6_intf =
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via6_irq_w)
 };
 
+// Keyboard
+
+WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
+{
+	m_via2->write_cb1(state);
+	
+	pic8259_ir6_w(m_pic, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(M6522_2_TAG, via6522_device, write_cb1)
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, kbrdy_w)
 };
 
 // Floppy Configuration
