@@ -4,6 +4,70 @@
 
 Titles, publishers and release dates taken from:
   - X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
+but the website only covers post 1985 titles...
+
+Games I haven't managed to start (possibly due to my mistakes):
+* zeliard, algarna: at the end of the intro it prints "read EMM address [00]" while waiting for something
+* ys2: after the Falcom screen it prints a message on-screen and waits for something to happen
+* suikoden, sangoku2, sangoku2a, nobunasg: sits to a jpn message waiting for who knows what
+* revolty2: waits for something to happen
+* reviver: waits for something to happen
+* mule, mulea: waits for something to happen
+* mugen2: waits for something to happen
+* lastarma: sits forever at the first intro screen
+* lagrange, dside: incomplete dump, needs system disc?
+* hajafuin: waits for something to happen
+* gatlabyr: how to start a game?
+* gambler2: how to pass the first menu?
+* crimson, crimsona: which disk combination is expected?
+* blassty: stuck at no animation menu
+
+Games with possible issues (either in emulation or in dump):
+* wizardry->4: can't add character name. also how to create a duplicate disk (in pc8801 they were in the disk set)?
+* profmj: true 400 lines mode not implemented?
+* mightmag: corrupted chars
+* lkage, jetterm: crashes x1turbo (Z80 DMA issue) and has gfx issues in x1
+* lizard: waits for something to happen
+* hydlide2b has no saved data, while hydlide2 &amp; hydlide2a have characters in them
+* hydlide3b: fails to see the user disk + the set contains at least 1 hydlide disk (check crc16)
+* gruppe: starts loading then errors out as if the disk is not recognized
+* gradiusk: is this supposed to do something?
+* frontlin: input issue?
+* dione: does not display text correctly
+* chackn: is it only the OS disk?!?
+* blckonyx: is it missing a data disk?
+* bastard: does not start. input issue?
+* arcus: black screen after wolfteam logo
+* aokiooka: glitches (chars cut in half)
+* alpha: is the title screen correct or is it glitched (I'd bet the latter)?
+* advfant: glitches
+
+Games which start loading but never reach the program:
+* vipc
+* vipd
+* turbobas (but not the clone turbobasa)
+* turbzbas
+* scruiser
+* psyoblad
+* powermj
+* kingkngt
+* jesus
+* jesusd
+* hydlide3, hydlide3a (invalid disks 2?)
+* aztec
+
+Games which are completely not recognized (maybe not for x1?)
+* ys3
+* unk_fl1
+* srdemo
+* robowres
+* poplemon
+* punchbal
+* manilove
+* fmdata
+* fairires
+
+Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 
 -->
 
@@ -216,7 +280,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="aztec">
+	<software name="aztec" supported="no">
 		<description>Aztec</description>
 		<year>1985</year>
 		<publisher>コンプティーク (Comptiq)</publisher>
@@ -331,6 +395,19 @@ Titles, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="chackn.d88" size="348848" crc="257df7de" sha1="2bd62b1c1bdeacdeeef80d603b1e1b34a99cbaa0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cprowsp">
+		<description>Champion ProWres Special</description>
+		<year>1985</year>
+		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="release" value="198511xx"/>
+		<info name="alt_title" value="チャンピオンプロレススペシャル"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="champ_p.d88" size="348288" crc="25977c4c" sha1="fc53b372d4e6535c31db6a1140541c4f6b9f8b60" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -830,7 +907,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="gradiusk" cloneof="gradius">
+	<software name="gradiusk" cloneof="gradius" supported="no">
 		<description>Gradius Kai</description>
 		<year>19??</year>
 		<publisher>コナミ (Konami)</publisher>
@@ -1046,7 +1123,7 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="hydlide3a" cloneof="hydlide3">
-		<description>Hydlide 3 (Alt)</description>
+		<description>Hydlide 3 - The Space Memories (Alt)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198807xx"/>
@@ -1070,9 +1147,11 @@ Titles, publishers and release dates taken from:
 
 <!-- is this correct? it mixes hydlide 1 and 3 -->
 	<software name="hydlide3b" cloneof="hydlide3">
-		<description>The Hydlide 3 - Space Memories</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>The Hydlide 3 - The Space Memories (Alt 2)</description>
+		<year>1988</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="release" value="198807xx"/>
+		<info name="alt_title" value="ハイドライド３"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="hydlide 3 - space memories, the (19xx)(-)(disk 1 of 4).d88" size="392368" crc="9fe31b0f" sha1="b075776790b10c8d1e3c3f7c8d45f4004dd4af49" offset="0" />
@@ -1163,7 +1242,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="kingkngt">
+	<software name="kingkngt" supported="no">
 		<description>King's Knight Special</description>
 		<year>1987</year>
 		<publisher>スクウェア (Square)</publisher>
@@ -1181,7 +1260,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="powermj">
+	<software name="powermj" supported="no">
 		<description>Kon'yamo Asamade Powerful Mahjong</description>
 		<year>1988</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -1218,7 +1297,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="lagrange">
+	<software name="lagrange" supported="no">
 		<description>Lagrange L-2 - Escape from the Space Colony</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -1651,7 +1730,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="mightmag">
+	<software name="mightmag" supported="partial">
 		<description>Might &amp; Magic</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -1732,27 +1811,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="murasaki">
-		<description>Murasaki Miniku Kaka</description>
-		<year>1988</year>
-		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<!-- Turbo only -->
-		<info name="release" value="198802xx"/>
-		<info name="alt_title" value="紫醜罹"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="414992">
-				<rom name="murasaki x1 (disk a).d88" size="414992" crc="e38fcbcc" sha1="7b61912e322cb4a17b82b62e25d9a2c1b896fd1d" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="415840">
-				<rom name="murasaki x1 (disk b).d88" size="415840" crc="ef7b083b" sha1="d3d863381bf8e6e6b8928334aeca8a1eb506c3f8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nobunaga">
+	<software name="nobunaga" supported="no">
 		<description>Nobunaga no Yabou</description>
 		<year>1987</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -1765,7 +1824,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="nobunasg">
+	<software name="nobunasg" supported="no">
 		<description>Nobunaga no Yabou - Sengoku Gunyou Den</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -1875,6 +1934,19 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="outroyd">
+		<description>Outroyd</description>
+		<year>1986</year>
+		<publisher>ストラットフォードC.C.C. (Stratford)</publisher>
+		<info name="release" value="198606xx"/>
+		<info name="alt_title" value="アウトロイド"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="outroyd.d88" size="348848" crc="34c7df8c" sha1="c54103e3e3df00ee6417b80fe1d8f3ae4dd64b82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="phantas">
 		<description>Phantasie - Jerunoa no Shu</description>
 		<year>1987</year>
@@ -1884,17 +1956,30 @@ Titles, publishers and release dates taken from:
 		<info name="alt_title" value="ファンタジー ジェルノアの章"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="phantasie1_playerdisk.d88" size="348848" crc="b8b60e50" sha1="dfad5d552ddd9509414a88e5ba19b76ce1abe3a7" offset="0" />
+				<rom name="phantasie1_programdisk.d88" size="348848" crc="4fdac684" sha1="4238f1f15fa5f898c2681134ecd637235a0ed5fe" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="phantasie1_programdisk.d88" size="348848" crc="4fdac684" sha1="4238f1f15fa5f898c2681134ecd637235a0ed5fe" offset="0" />
+				<rom name="phantasie1_playerdisk.d88" size="348848" crc="b8b60e50" sha1="dfad5d552ddd9509414a88e5ba19b76ce1abe3a7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="psyoblad">
+	<software name="profmj" supported="no">
+		<description>Professional Mahjong</description>
+		<year>1985</year>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="release" value="198506xx"/>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="professional mahjong.2d" size="327680" crc="bc91c664" sha1="c26f5492a4d4b65640d76c43235fc84afcb8654d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psyoblad" supported="no">
 		<description>Psy-O-Blade</description>
 		<year>1989</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -2262,22 +2347,22 @@ Titles, publishers and release dates taken from:
 		<info name="alt_title" value="ソーサリアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="sor-1.d88" size="415840" crc="be74169d" sha1="e17f79d4b383a46ce6081868e2e39f1693c4dfdd" offset="0" />
+				<rom name="sor-sys.d88" size="415840" crc="fe07e879" sha1="dd0c68dbb2ab0faef9f679f7a8593d334196dbdf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="sor-2.d88" size="415840" crc="01d79758" sha1="34581d971b5ac27dfcc3582be782f3ed6f7effe9" offset="0" />
+				<rom name="sor-1.d88" size="415840" crc="be74169d" sha1="e17f79d4b383a46ce6081868e2e39f1693c4dfdd" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="sor-3.d88" size="415840" crc="3f30018c" sha1="9c4f5e1b4cd9d041797f6671d8bf3a3bb58beedc" offset="0" />
+				<rom name="sor-2.d88" size="415840" crc="01d79758" sha1="34581d971b5ac27dfcc3582be782f3ed6f7effe9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="sor-sys.d88" size="415840" crc="fe07e879" sha1="dd0c68dbb2ab0faef9f679f7a8593d334196dbdf" offset="0" />
+				<rom name="sor-3.d88" size="415840" crc="3f30018c" sha1="9c4f5e1b4cd9d041797f6671d8bf3a3bb58beedc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
@@ -2564,6 +2649,24 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="sharriera" cloneof="sharrier">
+		<description>Space Harrier (Alt)</description>
+		<year>1988</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="release" value="198808xx"/>
+		<info name="alt_title" value="スペースハリアー"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="sphari_a.d88" size="348848" crc="7e40e4e1" sha1="d3be30ef1c0302be8c77cd44849e9a7ec4282a97" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="sphari_b.d88" size="348848" crc="30fe74c5" sha1="fd21f230a448b060c451f2fcaf6f17c3cc260d3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spchange">
 		<description>Spare Change</description>
 		<year>1985</year>
@@ -2590,7 +2693,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="scruiser">
+	<software name="scruiser" supported="no">
 		<description>Star Cruiser</description>
 		<year>1988</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
@@ -3014,7 +3117,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="will">
+	<software name="will" supported="no">
 		<description>Will - The Death Trap II</description>
 		<year>1985</year>
 		<publisher>スクウェア (Square)</publisher>
@@ -3335,9 +3438,9 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="bastard">
-		<description>Bastard!! Special</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Bastard Special</description>
+		<year>1988?</year>
+		<publisher>ザインソフト (Xain Soft)</publisher>
 		<info name="alt_title" value="バスタードスペシャル"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -3346,21 +3449,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="champp">
-		<description>Champ P?</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="champ_p.d88" size="348288" crc="25977c4c" sha1="fc53b372d4e6535c31db6a1140541c4f6b9f8b60" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mars">
 		<description>The Curse of Mars</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="the curse of mars.2d" size="327680" crc="2d7eceae" sha1="e50d56313904d5c246abddac3293a0dd51aeca36" offset="0" />
@@ -3370,7 +3462,7 @@ Titles, publishers and release dates taken from:
 
 	<software name="marsa" cloneof="mars">
 		<description>The Curse of Mars (Alt)</description>
-		<year>1988</year>
+		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3381,8 +3473,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="darkstrm">
 		<description>Darkstorm - Demon Crystal III</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="darkstorm - demon crystal iii.2d" size="327680" crc="c48459d6" sha1="9ccac539f38cddfc4b7c5cee7a7bc8676790e272" offset="0" />
@@ -3392,8 +3484,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="dezeni">
 		<description>Dezeni Land</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983?</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="デゼニランド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="284752">
@@ -3404,8 +3496,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="dialide">
 		<description>Dialide</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989?</year>
+		<publisher>CATsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="dialide_01.2d" size="327680" crc="cf25ac18" sha1="b06d6aba7fde74befcfb5b0e729bdfaf995e640a" offset="0" />
@@ -3420,8 +3512,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="dialidea" cloneof="dialide">
 		<description>Dialide (Alt?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989?</year>
+		<publisher>CATsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="dialide.d88" size="348848" crc="ccf0c49c" sha1="1b55edcfe542663eff2587145b830810a4fc8e5e" offset="0" />
@@ -3436,8 +3528,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="dione">
 		<description>Dione</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987?</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="ディオーネ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -3464,26 +3556,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="extrahyp">
-		<description>Extra Hyper</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="26800">
-				<rom name="extrahyper_system.d88" size="26800" crc="a69b99d1" sha1="d98eeb70fb4c8fecd08cffbb16ccb7187726c129" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="extrahyper_data.d88" size="348848" crc="f0ef51bd" sha1="ead6d7e35a1a43f1a0e96a0b57d8f314ee424b4c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fairires">
+	<software name="fairires" supported="no">
 		<description>Faeries Residence</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986?</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<info name="alt_title" value="フェアリーズレジデンス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3497,8 +3573,8 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="5sdreams">
-		<description>Five Sweet Dreams</description>
+	<software name="5sdream">
+		<description>Five Sweet Dream.</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3516,7 +3592,7 @@ Titles, publishers and release dates taken from:
 	<software name="frontlin">
 		<description>Front Line</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ニデコム (Nidecom) / タイトー (Taito)</publisher>
 		<info name="alt_title" value="フロントライン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="305872">
@@ -3527,8 +3603,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="galaga">
 		<description>Galaga</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="galaga.2d" size="327680" crc="e78a43a0" sha1="92dd612cd53be19e34405f2ae80a211cdb02bb51" offset="0" />
@@ -3538,8 +3614,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="galaxian">
 		<description>Galaxian X-1</description>
-		<year>19??</year>
-		<publisher>Namco</publisher>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ギャラクシアン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3550,8 +3626,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="gatlabyr">
 		<description>Gate of Labyrinth</description>
-		<year>1987</year>
-		<publisher>Ymcat</publisher>
+		<year>1987?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="迷宮への扉"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3562,8 +3638,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="hyprol84">
 		<description>Hyper Olympics '84</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984?</year>
+		<publisher>デービーソフト (dB-Soft)?</publisher>
 		<info name="alt_title" value="ハイパーオリンピック '84"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3574,8 +3650,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="iroha">
 		<description>Irohanihoheto</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988?</year>
+		<publisher>全流通 (Zenryutsu)? / Angel?</publisher>
 		<info name="alt_title" value="いろはにほへと (or イロハニホヘト)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="413296">
@@ -3607,8 +3683,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="knither">
 		<description>Knither - Demon Crystal II</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ナイザー　=デーモンクリスタルⅡ="/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3619,7 +3695,7 @@ Titles, publishers and release dates taken from:
 
 	<software name="labyrint">
 		<description>Labyrinth</description>
-		<year>1986</year>
+		<year>1986?</year>
 		<publisher>パックインビデオ (Pack-in Video)</publisher>
 		<info name="alt_title" value="ラビリンス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -3636,8 +3712,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="lizard">
 		<description>Lizard</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984?</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<info name="alt_title" value="リザード"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="346032">
@@ -3648,8 +3724,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="lovechas">
 		<description>Love Chaser</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987?</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<info name="alt_title" value="ラブチェイサー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -3665,8 +3741,9 @@ Titles, publishers and release dates taken from:
 
 	<software name="lovechasa" cloneof="lovechas">
 		<description>Love Chaser (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987?</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="ラブチェイサー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="loveca_1.d88" size="348848" crc="17b20908" sha1="a1aa3f1e506923aae8d8a67fc12600fcbe8d7d21" offset="0" />
@@ -3679,10 +3756,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="marvel">
+	<software name="marvels">
 		<description>Marvelous</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986?</year>
+		<publisher>データウエスト (Data West)</publisher>
 		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3691,10 +3768,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="merver">
+	<software name="marvelsa" cloneof="marvels">
 		<description>Marvelous (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986?</year>
+		<publisher>データウエスト (Data West)</publisher>
 		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3703,10 +3780,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="mervera" cloneof="merver">
+	<software name="marvelsb" cloneof="marvels">
 		<description>Marvelous (Alt 2)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986?</year>
+		<publisher>データウエスト (Data West)</publisher>
 		<info name="alt_title" value="マーベラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3716,10 +3793,10 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="mikichan">
-		<description>Mikichan</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="がんばれ美樹ちゃん！"/>
+		<description>Ganbare! Miki-chan</description>
+		<year>1986?</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="がんばれ！美樹ちゃん"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="mikichan.2d" size="327680" crc="06965b19" sha1="b33c79c4444f53419beb5db300ef536d1df9d432" offset="0" />
@@ -3729,7 +3806,7 @@ Titles, publishers and release dates taken from:
 
 	<software name="newtype">
 		<description>Newtype X-1</description>
-		<year>19??</year>
+		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3740,7 +3817,7 @@ Titles, publishers and release dates taken from:
 
 	<software name="newtypea" cloneof="newtype">
 		<description>Newtype X-1 (Alt)</description>
-		<year>1986</year>
+		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3749,22 +3826,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="outroyd">
-		<description>Outroyd</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="アウトロイド"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="outroyd.d88" size="348848" crc="34c7df8c" sha1="c54103e3e3df00ee6417b80fe1d8f3ae4dd64b82" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="panch">
-		<description>Panch</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="punchbal" supported="no">
+		<description>Punch Ball Mario Bros.</description>
+		<year>1984?</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="パンチボールマリオ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -3773,10 +3838,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="poplemon">
+	<software name="poplemon" supported="no">
 		<description>Pop Lemon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986?</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<info name="alt_title" value="ポップレモン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3790,10 +3855,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="portpia">
-		<description>Portpia</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="portopia">
+		<description>Portopia Renzokusatsujin Jiken</description>
+		<year>1983?</year>
+		<publisher>エニックス (Enix)</publisher>
 		<info name="alt_title" value="ポートピア連続殺人事件"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3804,7 +3869,7 @@ Titles, publishers and release dates taken from:
 
 	<software name="rwings">
 		<description>Right Wings</description>
-		<year>19??</year>
+		<year>1990?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -3814,9 +3879,10 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="saziri">
-		<description>Saziri</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sa・Zi・Ri</description>
+		<year>1988?</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="紫醜羅"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="423312">
 				<rom name="saziri (turbo)-a.d88" size="423312" crc="267efc66" sha1="52b8a0e121430bd15d6352eb8e48ac2c275c1861" offset="0" />
@@ -3834,18 +3900,20 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="sphari">
-		<description>Sphari??</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="saziria" cloneof="saziri">
+		<description>Sa・Zi・Ri (Alt)</description>
+		<year>1988?</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="紫醜羅"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="sphari_a.d88" size="348848" crc="7e40e4e1" sha1="d3be30ef1c0302be8c77cd44849e9a7ec4282a97" offset="0" />
+			<dataarea name="flop" size="414992">
+				<rom name="murasaki x1 (disk a).d88" size="414992" crc="e38fcbcc" sha1="7b61912e322cb4a17b82b62e25d9a2c1b896fd1d" offset="0" />
 			</dataarea>
 		</part>
+
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="sphari_b.d88" size="348848" crc="30fe74c5" sha1="fd21f230a448b060c451f2fcaf6f17c3cc260d3a" offset="0" />
+			<dataarea name="flop" size="415840">
+				<rom name="murasaki x1 (disk b).d88" size="415840" crc="ef7b083b" sha1="d3d863381bf8e6e6b8928334aeca8a1eb506c3f8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3853,7 +3921,7 @@ Titles, publishers and release dates taken from:
 	<software name="state">
 		<description>State</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>JR Soft?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="state_01.2d" size="327680" crc="e096b557" sha1="dba05559e3dc0c114e1e7bfb7d56b676805ccd5e" offset="0" />
@@ -3866,9 +3934,9 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="studioct">
-		<description>Studio Cut</description>
-		<year>19??</year>
+	<software name="bshashsc">
+		<description>Bishojo Shashinkan Studio Cut</description>
+		<year>1987?</year>
 		<publisher>ハード (Hard)</publisher>
 		<info name="alt_title" value="美少女写真館 STUDIO CUT"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -3880,7 +3948,7 @@ Titles, publishers and release dates taken from:
 
 	<software name="thundfrc">
 		<description>Thunder Force</description>
-		<year>1984</year>
+		<year>1984?</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348816">
@@ -3932,10 +4000,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="vipc" cloneof="vip">
+	<software name="vipc" cloneof="vip" supported="no">
 		<description>V.I.P. - Visual Instrument Player (Alt 3?)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Kamiya</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="system_z.d88" size="1089776" crc="f3e03a73" sha1="321c6631ba11ca04cd2dfdbd95d2b941b6cc6fd4" offset="0" />
@@ -3943,7 +4011,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="vipd" cloneof="vip">
+	<software name="vipd" cloneof="vip" supported="no">
 		<description>FM Ongen Music Tool V.I.P.</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3955,9 +4023,9 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="wizardr3">
-		<description>Wizardry 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Wizardry 3 - The Legacy of Llylgamyn</description>
+		<year>1987?</year>
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380048">
 				<rom name="wiz3.d88" size="380048" crc="df710fae" sha1="00a9c50a16a8cd31133e0d5535c919dd8eacdf09" offset="0" />
@@ -3968,7 +4036,7 @@ Titles, publishers and release dates taken from:
 	<software name="xevious">
 		<description>Xevious</description>
 		<year>19??</year>
-		<publisher>Namco</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ゼビウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344768">
@@ -3980,7 +4048,8 @@ Titles, publishers and release dates taken from:
 	<software name="xeviousa" cloneof="xevious">
 		<description>Xevious (Alt)</description>
 		<year>19??</year>
-		<publisher>Namco</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="ゼビウス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="xevious.2d" size="327680" crc="ae2009bf" sha1="85ac12e13b493d3d4e146eaa213ed8ce1e113fa1" offset="0" />
@@ -3988,10 +4057,10 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="ys3">
-		<description>Ys III - Wanderers from Ys</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="ys3" supported="no">
+		<description>Wanderers from Ys</description>
+		<year>1989?</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="ys3_d1.d88" size="415840" crc="7ce0c5f0" sha1="a9db94fd74038d1cba8a338a1319830e9b3f4aaa" offset="0" />
@@ -4015,9 +4084,10 @@ Titles, publishers and release dates taken from:
 	</software>
 
 	<software name="zeta5">
-		<description>Zeta 5</description>
-		<year>19??</year>
+		<description>Zeta Dai 5 Go</description>
+		<year>1987?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="ゼータ 第５号"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="zeta 5 (19xx)(championsoft)(jp)(disk 1 of 2).2d" size="327680" crc="4e6f66f4" sha1="0b2c0e708ebd9df2d24e6ade3694ed3e0882746b" offset="0" />
@@ -4032,8 +4102,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="pstar2">
 		<description>Polar Star 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983?</year>
+		<publisher>SPS</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="polar star 2.2d" size="327680" crc="e8b8bdb6" sha1="97b9099d2cfde575410d5c1db40a43833108d0f6" offset="0" />
@@ -4043,8 +4113,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="dokkin">
 		<description>Dokkin Minako Sensei</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988?</year>
+		<publisher>テクトハウス (Tect House)</publisher>
 		<info name="alt_title" value="ドッキン美奈子先生！"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -4061,8 +4131,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="triviaq">
 		<description>Trivia Q</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985?</year>
+		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<info name="alt_title" value="トリビアＱ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="396176">
@@ -4071,8 +4141,8 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="videogam">
-		<description>Video Game Music vol.1</description>
+	<software name="namcovgm">
+		<description>Namco Video Game Music Library vol.1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="ナムコ　ビデオゲームミュージックライブラリ Vol.1"/>
@@ -4109,8 +4179,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="sayaka">
 		<description>Yumeshojo Sayaka</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988?</year>
+		<publisher>パスカル２ (Pascal2)</publisher>
 		<info name="alt_title" value="夢少女さやか"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -4127,8 +4197,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="moritash">
 		<description>Kazuo Morita no Shougi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985?</year>
+		<publisher>エニックス (Enix)</publisher>
 		<info name="alt_title" value="森田和郎の将棋"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -4139,8 +4209,8 @@ Titles, publishers and release dates taken from:
 
 	<software name="emono1">
 		<description>Utsukushiki Emono-Tachi 1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987?</year>
+		<publisher>グレイト (Great)</publisher>
 		<info name="alt_title" value="美しき獲物たち"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
@@ -4151,24 +4221,12 @@ Titles, publishers and release dates taken from:
 
 	<software name="tenshit">
 		<description>Tenshi-tachi no Gogo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985?</year>
+		<publisher>ジャスト (Jast)</publisher>
 		<info name="alt_title" value="天使たちの午後"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="tenshi-tachi no gogo.2d" size="327680" crc="44c8af0c" sha1="b76c80b27607cb952ee3b71f5d8f581dcbd77ef6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="profmj">
-		<description>Professional Mahjong</description>
-		<year>19??</year>
-		<publisher>シャノアール (Chat Noir)</publisher>
-		<info name="alt_title" value="プロフェッショナル麻雀"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
-				<rom name="professional mahjong.2d" size="327680" crc="bc91c664" sha1="c26f5492a4d4b65640d76c43235fc84afcb8654d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4199,7 +4257,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="x1demoa">
+	<software name="x1demoa" supported="no">
 		<description>X1 Demo (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4254,7 +4312,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="srdemo">
+	<software name="srdemo" supported="no">
 		<description>SR Demo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4289,7 +4347,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="turbobas">
+	<software name="turbobas" supported="no">
 		<description>Turbo BASIC CZ-8FB02</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4311,7 +4369,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="turbzbas">
+	<software name="turbzbas" supported="no">
 		<description>Turbo-Z BASIC CZ-8FB03</description>
 		<year>19??</year>
 		<publisher>Sharp</publisher>
@@ -4344,6 +4402,22 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="extrahyp">
+		<description>Extra Hyper</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="26800">
+				<rom name="extrahyper_system.d88" size="26800" crc="a69b99d1" sha1="d98eeb70fb4c8fecd08cffbb16ccb7187726c129" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="extrahyper_data.d88" size="348848" crc="f0ef51bd" sha1="ead6d7e35a1a43f1a0e96a0b57d8f314ee424b4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hyperdsk">
 		<description>Hyper Disk Monitor</description>
 		<year>19??</year>
@@ -4354,6 +4428,7 @@ Titles, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="jetterm">
 		<description>Jet Turbo Terminal (v1.0)</description>
 		<year>19??</year>
@@ -4364,6 +4439,7 @@ Titles, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="filemast">
 		<description>The File Master x1 (v0.8)</description>
 		<year>1987</year>
@@ -4374,6 +4450,7 @@ Titles, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="graphtol">
 		<description>Graphic Tool</description>
 		<year>19??</year>
@@ -4384,6 +4461,7 @@ Titles, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="newfmdrv">
 		<description>New FM Driver</description>
 		<year>19??</year>
@@ -4433,7 +4511,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="fmdata">
+	<software name="fmdata" supported="no">
 		<description>FM data</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

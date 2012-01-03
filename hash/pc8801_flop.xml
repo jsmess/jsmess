@@ -12941,12 +12941,12 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<software name="ganbarem">
+	<software name="mikichan">
 		<description>Ganbare! Miki-chan</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
-		<info name="alt_title" value="がんばれ美樹ちゃん"/>
+		<info name="alt_title" value="がんばれ！美樹ちゃん"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ganbare! miki-chan.d88" size="348848" crc="b71a357a" sha1="b02f2f06ffb71a7c16b56d525b054df37289a018" offset="0" />
@@ -13113,7 +13113,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<software name="gegegeno">
+	<software name="gegege">
 		<description>Gegege no Kitarou</description>
 		<year>1985</year>
 		<publisher>バンダイ (Bandai)</publisher>
