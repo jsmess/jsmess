@@ -110,6 +110,9 @@ void victor9k_keyboard_device::device_start()
 {
 	// resolve callbacks
     m_out_kbrdy_func.resolve(m_out_kbrdy_cb, *this);
+
+	// state saving
+	save_item(NAME(m_kbdata));
 }
 
 
