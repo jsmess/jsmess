@@ -59,16 +59,10 @@ static ADDRESS_MAP_START( floppy_io, AS_IO, 8, victor9k_state )
 //  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keyboard_io, AS_IO, 8, victor9k_state )
-//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
-//  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
-//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
-ADDRESS_MAP_END
-
 // Input Ports
 
 static INPUT_PORTS_START( victor9k )
+	// defined in machine/victor9kb.c
 INPUT_PORTS_END
 
 // Video
@@ -402,6 +396,9 @@ READ8_MEMBER( victor9k_state::via2_pa_r )
     */
 
 	UINT8 data = 0;
+	
+	// keyboard data
+	data |= m_kb->kbdata_r() << 6;
 
 	// vertical sync
 	data |= m_crtc->vsync_r() << 7;
@@ -444,6 +441,9 @@ WRITE8_MEMBER( victor9k_state::via2_pb_w )
 
     */
 
+	// keyboard acknowledge
+	m_kb->kback_w(BIT(data, 1));
+	
 	// brightness
 	m_brt = (data >> 2) & 0x07;
 
@@ -465,7 +465,7 @@ static const via6522_interface via2_intf =
 	DEVCB_NULL,
 	DEVCB_NULL, // KBRDY
 	DEVCB_NULL, // SRQ/BUSY
-	DEVCB_NULL, // KBDATA
+	DEVCB_DEVICE_LINE_MEMBER(VICTOR9K_KEYBOARD_TAG, victor9k_keyboard_device, kbdata_r),
 
 	DEVCB_DRIVER_MEMBER(victor9k_state, via2_pa_w),
 	DEVCB_DRIVER_MEMBER(victor9k_state, via2_pb_w),
@@ -874,6 +874,11 @@ static const via6522_interface via6_intf =
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via6_irq_w)
 };
 
+static VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
+{
+	DEVCB_DEVICE_LINE_MEMBER(M6522_2_TAG, via6522_device, write_cb1)
+};
+
 // Floppy Configuration
 
 static const floppy_interface victor9k_floppy_interface =
@@ -885,7 +890,7 @@ static const floppy_interface victor9k_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSQD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -932,9 +937,6 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MCFG_CPU_IO_MAP(floppy_io)
 
-	MCFG_CPU_ADD(I8021_TAG, I8021, 100000)
-	MCFG_CPU_IO_MAP(keyboard_io)
-
     // video hardware
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -966,6 +968,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_ADD(M6522_5_TAG, XTAL_30MHz/30, via5_intf)
 	MCFG_VIA6522_ADD(M6522_6_TAG, XTAL_30MHz/30, via6_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(victor9k_floppy_interface)
+	MCFG_VICTOR9K_KEYBOARD_ADD(kb_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -985,14 +988,11 @@ ROM_START( victor9k )
 	ROMX_LOAD( "v9000 univ. fe f3f7 13db.7j", 0x0000, 0x1000, CRC(25c7a59f) SHA1(8784e9aa7eb9439f81e18b8e223c94714e033911), ROM_BIOS(2) )
 	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(2) )
 
-	ROM_REGION( 0x800, "gcr", 0 )
-	ROM_LOAD( "100836-001.4k", 0x000, 0x800, CRC(adc601bd) SHA1(6eeff3d2063ae2d97452101aa61e27ef83a467e5) )
-
 	ROM_REGION( 0x400, I8048_TAG, 0)
 	ROM_LOAD( "36080.5d", 0x000, 0x400, CRC(9bf49f7d) SHA1(b3a11bb65105db66ae1985b6f482aab6ea1da38b) )
 
-	ROM_REGION( 0x400, I8021_TAG, 0)
-	ROM_LOAD( "20-8021-139.z3", 0x000, 0x400, CRC(0fe9d53d) SHA1(61d92ba90f98f8978bbd9303c1ac3134cde8cdcb) )
+	ROM_REGION( 0x800, "gcr", 0 )
+	ROM_LOAD( "100836-001.4k", 0x000, 0x800, CRC(adc601bd) SHA1(6eeff3d2063ae2d97452101aa61e27ef83a467e5) )
 ROM_END
 
 // System Drivers

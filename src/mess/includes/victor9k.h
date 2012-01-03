@@ -17,13 +17,13 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/upd7201.h"
+#include "machine/victor9kb.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
 
 #define SCREEN_TAG		"screen"
 #define I8088_TAG		"8l"
 #define I8048_TAG		"5d"
-#define I8021_TAG		"z3"
 #define I8253_TAG		"13h"
 #define I8259A_TAG		"7l"
 #define UPD7201_TAG		"16e"
@@ -53,7 +53,8 @@ public:
 		  m_crtc(*this, HD46505S_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1)
+		  m_floppy1(*this, FLOPPY_1),
+		  m_kb(*this, VICTOR9K_KEYBOARD_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -67,6 +68,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
+	required_device<victor9k_keyboard_device> m_kb;
 
 	virtual void machine_start();
 
