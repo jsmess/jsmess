@@ -101,6 +101,25 @@ Notes:
     - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
 
         chdman -createblankhd cm5412.chd 306 4 17 512
+		
+	- scsibus.c starts data out phase immediately, so the last command byte acknowledge kills the data out request
+	
+		SASI data write 04
+		set_scsi_line(acknoledge,1), changed=1, linestate=E5
+		sending command 0x0C to ScsiID 0
+		0C 00 00 00 00 04 
+
+		SCSIBUS: init_drive_params: Xebec S1410
+		scsi_change_phase() from=command, to=data out
+		scsi_out_line_change(C/D,1)
+		scsi_out_line_change(I/O,1)
+		scsi_out_line_change(message,1)
+		SCSIBUS:xfer_count=08, bytes_left=00 data_idx=00
+		scsi_out_line_change(request,0)
+		set_scsi_line(select,1), changed=0, linestate=F9
+		set_scsi_line(acknoledge,0), changed=1, linestate=F9
+		set_scsi_line(reset,1), changed=0, linestate=F9
+		scsi_out_line_change(request,1)
 
 */
 
@@ -342,7 +361,31 @@ WRITE8_MEMBER( v1050_state::dvint_clr_w )
 	device_set_input_line(m_subcpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-READ8_MEMBER( v1050_state::sasi_r )
+READ8_MEMBER( v1050_state::sasi_data_r )
+{
+	// read data
+	UINT8 data = scsi_data_r(m_sasibus);
+
+	logerror("SASI data write %02x\n", data);
+	
+	// acknowledge
+	scsi_ack_w(m_sasibus, 1);
+
+	return data;
+}
+
+WRITE8_MEMBER( v1050_state::sasi_data_w )
+{
+	logerror("SASI data write %02x\n", data);
+
+	// write data
+	scsi_data_w(m_sasibus, data);
+	
+	// acknowledge
+	scsi_ack_w(m_sasibus, 1);
+}
+
+READ8_MEMBER( v1050_state::sasi_status_r )
 {
 	/*
 
@@ -370,7 +413,7 @@ READ8_MEMBER( v1050_state::sasi_r )
 	return data;
 }
 
-WRITE8_MEMBER( v1050_state::sasi_w )
+WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 {
 	/*
 
@@ -420,8 +463,8 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE_LEGACY(SASIBUS_TAG, scsi_data_r, scsi_data_w)
-	AM_RANGE(0xe1, 0xe1) AM_READWRITE(sasi_r, sasi_w)
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE(sasi_data_r, sasi_data_w)
+	AM_RANGE(0xe1, 0xe1) AM_READWRITE(sasi_status_r, sasi_ctrl_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_crt_mem, AS_PROGRAM, 8, v1050_state )

@@ -124,8 +124,10 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
-	DECLARE_READ8_MEMBER( sasi_r );
-	DECLARE_WRITE8_MEMBER( sasi_w );
+	DECLARE_READ8_MEMBER( sasi_data_r );
+	DECLARE_WRITE8_MEMBER( sasi_data_w );
+	DECLARE_READ8_MEMBER( sasi_status_r );
+	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
 
 	void bankswitch();
 	void set_interrupt(UINT8 mask, int state);
