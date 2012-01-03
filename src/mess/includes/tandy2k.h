@@ -1,11 +1,27 @@
 #ifndef __TANDY2K__
 #define __TANDY2K__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/i86/i86.h"
+#include "cpu/mcs48/mcs48.h"
+#include "imagedev/flopdrv.h"
+#include "machine/ctronics.h"
+#include "machine/i8255.h"
+#include "machine/i8251.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "machine/tandy2kb.h"
+#include "machine/upd765.h"
+#include "sound/speaker.h"
+#include "video/crt9007.h"
+#include "video/crt9021.h"
+#include "video/crt9212.h"
 
 #define SCREEN_TAG		"screen"
 #define I80186_TAG		"u76"
-#define I8048_TAG		"m1"
 #define I8255A_TAG		"u75"
 #define I8251A_TAG		"u41"
 #define I8253_TAG		"u40"
@@ -71,9 +87,6 @@ public:
 	DECLARE_READ16_MEMBER( vpac_r );
 	DECLARE_WRITE16_MEMBER( vpac_w );
 	DECLARE_WRITE8_MEMBER( addr_ctrl_w );
-	DECLARE_READ8_MEMBER( keyboard_x0_r );
-	DECLARE_WRITE8_MEMBER( keyboard_y0_w );
-	DECLARE_WRITE8_MEMBER( keyboard_y8_w );
 	DECLARE_WRITE_LINE_MEMBER( busdmarq0_w );
 	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
@@ -91,7 +104,6 @@ public:
 
 	/* keyboard state */
 	int m_kben;
-	UINT16 m_keylatch;
 
 	/* serial state */
 	int m_extclk;
