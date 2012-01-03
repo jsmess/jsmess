@@ -208,8 +208,7 @@ static DEVICE_RESET( ti99_speech )
 			return;
 		}
 
-		astring region;
-		astring_assemble_3(&region, device->tag(), ":", speech_region);
+		astring region(device->tag(), ":", speech_region);
 
 		adapter->speechrom_data = device->machine().region(region.cstr())->base();
 		adapter->speechROMlen = device->machine().region(region.cstr())->bytes();

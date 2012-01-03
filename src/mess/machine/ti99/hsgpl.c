@@ -634,8 +634,7 @@ static DEVICE_NVRAM( hsgpl )
 {
 	// Called between START and RESET
 	hsgpl_state *card = get_safe_token(device);
-	astring hsname;
-	astring_assemble_3(&hsname, device->machine().system().name, PATH_SEPARATOR, "hsgpl.nv");
+	astring hsname(device->machine().system().name, PATH_SEPARATOR, "hsgpl.nv");
 	file_error filerr;
 
 	if (read_or_write==0)

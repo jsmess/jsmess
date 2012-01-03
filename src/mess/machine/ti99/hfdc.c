@@ -661,8 +661,7 @@ static DEVICE_START( ti99_hfdc )
 	card->ram_offset[0] = 0x2000; // static bank
 	card->controller = device->subdevice("smc92x4");
 	card->clock = device->subdevice("mm58274c");
-	astring region;
-	astring_assemble_3(&region, device->tag(), ":", hfdc_region);
+	astring region(device->tag(), ":", hfdc_region);
 	card->rom = device->machine().region(region.cstr())->base();
 }
 

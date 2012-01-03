@@ -316,8 +316,8 @@ static DEVICE_START( beta_disk )
 	assert(device->tag() != NULL);
 
 	/* find our WD179x */
-	astring_printf(&tempstring, "%s:%s", device->tag(), "wd179x");
-	beta->wd179x = device->machine().device(tempstring.cstr());
+	tempstring.printf("%s:%s", device->tag(), "wd179x");
+	beta->wd179x = device->machine().device(tempstring);
 }
 
 /*-------------------------------------------------

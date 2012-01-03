@@ -106,8 +106,7 @@ NVRAM_HANDLER( cybikoxt )
 static emu_file *nvram_system_fopen( running_machine &machine, UINT32 openflags, const char *name)
 {
 	file_error filerr;
-	astring fname;
-	astring_assemble_4(&fname, machine.system().name, PATH_SEPARATOR, name, ".nv");
+	astring fname(machine.system().name, PATH_SEPARATOR, name, ".nv");
 	emu_file *file = global_alloc(emu_file(machine.options().nvram_directory(), openflags));
 	filerr = file->open(fname.cstr());
 	return (filerr == FILERR_NONE) ? file : NULL;

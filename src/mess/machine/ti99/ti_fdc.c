@@ -351,8 +351,7 @@ static DEVICE_START( ti99_fdc )
 
 	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
 
-	astring region;
-	astring_assemble_3(&region, device->tag(), ":", fdc_region);
+	astring region(device->tag(), ":", fdc_region);
 	card->rom = device->machine().region(region.cstr())->base();
 	card->controller = device->subdevice("fd1771");
 }

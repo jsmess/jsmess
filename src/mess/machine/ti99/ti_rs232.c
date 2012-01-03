@@ -1120,8 +1120,7 @@ static DEVICE_START( ti_rs232 )
 	ti_rs232_state *card = get_safe_token(device);
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
 
-	astring region;
-	astring_assemble_3(&region, device->tag(), ":", ser_region);
+	astring region(device->tag(), ":", ser_region);
 	card->rom = device->machine().region(region.cstr())->base();
 	card->lines.inta.resolve(topeb->inta, *device);
 	// READY and INTB are not used

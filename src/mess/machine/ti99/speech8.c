@@ -176,8 +176,7 @@ static DEVICE_RESET( ti99_speech8 )
 {
 	ti99_speech8_state *spsys = get_safe_token(device);
 
-	astring region;
-	astring_assemble_3(&region, device->tag(), ":", speech8_region);
+	astring region(device->tag(), ":", speech8_region);
 
 	spsys->speechrom_data = device->machine().region(region.cstr())->base();
 	spsys->speechROMlen = device->machine().region(region.cstr())->bytes();
