@@ -604,7 +604,7 @@ static const floppy_interface tandy2k_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSQD,
+	FLOPPY_STANDARD_5_25_DSQD, // Mitsubishi M4853
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	"floppy_5_25",
 	NULL
@@ -750,7 +750,9 @@ static MACHINE_CONFIG_DERIVED( tandy2k_hd, tandy2k )
     MCFG_CPU_IO_MAP(tandy2k_hd_io)
 
 	// Tandon TM502 hard disk
+	MCFG_HARDDISK_ADD("harddisk0")
 	//MCFG_WD1010_ADD(WD1010_TAG, wd1010_intf)
+	//MCFG_WD1100_11_ADD(WD1100_11_TAG, wd1100_11_intf)
 MACHINE_CONFIG_END
 
 // ROMs
@@ -768,6 +770,7 @@ ROM_START( tandy2k )
 	ROM_LOAD( "pal16l8a.u102", 0x000, 0x100, NO_DUMP ) // bus interface
 	ROM_LOAD( "pal16l8a.u103", 0x000, 0x100, NO_DUMP ) // bus interface
 	ROM_LOAD( "pal20l8.u103", 0x000, 0x100, NO_DUMP ) // bus interface, alternate
+	ROM_LOAD( "pal16r6a.u16", 0x000, 0x100, NO_DUMP ) // HDC
 ROM_END
 
 #define rom_tandy2khd rom_tandy2k

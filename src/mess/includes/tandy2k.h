@@ -7,6 +7,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/flopdrv.h"
+#include "imagedev/harddriv.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
@@ -33,6 +34,7 @@
 #define CRT9212_1_TAG	"u15"
 #define CRT9021B_TAG	"u14"
 #define WD1010_TAG		"u18"
+#define WD1100_11_TAG	"u12"
 #define CENTRONICS_TAG	"centronics"
 
 class tandy2k_state : public driver_device
