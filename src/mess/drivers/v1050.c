@@ -101,25 +101,6 @@ Notes:
     - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
 
         chdman -createblankhd cm5412.chd 306 4 17 512
-		
-	- scsibus.c starts data out phase immediately, so the last command byte acknowledge kills the data out request
-	
-		SASI data write 04
-		set_scsi_line(acknoledge,1), changed=1, linestate=E5
-		sending command 0x0C to ScsiID 0
-		0C 00 00 00 00 04 
-
-		SCSIBUS: init_drive_params: Xebec S1410
-		scsi_change_phase() from=command, to=data out
-		scsi_out_line_change(C/D,1)
-		scsi_out_line_change(I/O,1)
-		scsi_out_line_change(message,1)
-		SCSIBUS:xfer_count=08, bytes_left=00 data_idx=00
-		scsi_out_line_change(request,0)
-		set_scsi_line(select,1), changed=0, linestate=F9
-		set_scsi_line(acknoledge,0), changed=1, linestate=F9
-		set_scsi_line(reset,1), changed=0, linestate=F9
-		scsi_out_line_change(request,1)
 
 */
 
@@ -366,10 +347,10 @@ READ8_MEMBER( v1050_state::sasi_data_r )
 	// read data
 	UINT8 data = scsi_data_r(m_sasibus);
 
-	logerror("SASI data write %02x\n", data);
+	logerror("SASI data read %02x\n", data);
 	
 	// acknowledge
-	scsi_ack_w(m_sasibus, 1);
+	scsi_ack_w(m_sasibus, 0);
 
 	return data;
 }
@@ -382,7 +363,7 @@ WRITE8_MEMBER( v1050_state::sasi_data_w )
 	scsi_data_w(m_sasibus, data);
 	
 	// acknowledge
-	scsi_ack_w(m_sasibus, 1);
+	scsi_ack_w(m_sasibus, 0);
 }
 
 READ8_MEMBER( v1050_state::sasi_status_r )
@@ -431,7 +412,7 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 	*/
 
 	scsi_sel_w(m_sasibus, !BIT(data, 0));
-	scsi_ack_w(m_sasibus, !BIT(data, 1));
+	scsi_ack_w(m_sasibus, BIT(data, 1));
 	scsi_rst_w(m_sasibus, !BIT(data, 7));
 }
 
