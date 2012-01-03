@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( victor9k_keyboard )
-	MCFG_CPU_ADD(I8021_TAG, I8021, 10000000) // XTAL 48-300-010
+	MCFG_CPU_ADD(I8021_TAG, I8021, XTAL_3_579545MHz)
 	MCFG_CPU_IO_MAP(victor9k_keyboard_io)
 MACHINE_CONFIG_END
 
