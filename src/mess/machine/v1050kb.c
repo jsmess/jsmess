@@ -258,6 +258,9 @@ v1050_keyboard_device::v1050_keyboard_device(const machine_config &mconfig, cons
 
 void v1050_keyboard_device::device_start()
 {
+	// state saving
+	save_item(NAME(m_y));
+	save_item(NAME(m_so));
 }
 
 
