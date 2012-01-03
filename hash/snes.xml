@@ -5749,7 +5749,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 	</software>
 
 	<software name="gegege">
-		<description>Gegege no Kitarou - Fukkatsu! Tenma Daiou (Jpn)</description>
+		<description>GeGeGe no Kitarou - Fukkatsu! Tenma Daiou (Jpn)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-G4"/>
@@ -29717,7 +29717,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="stgegege" supported="no">
-		<description>Gegege no Kitarou - Youkai Donjara (Jpn)</description>
+		<description>GeGeGe no Kitarou - Youkai Donjara (Jpn)</description>
 		<!-- ST -->
 		<year>1996</year>
 		<publisher>Bandai</publisher>

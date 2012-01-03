@@ -8,10 +8,6 @@ Titles, publishers and release dates taken from:
   - PC88 Library ( http://refugee2005.sakura.ne.jp/library/frame1.htm )
   - 8bitters ( http://www.8-bits.info/ )
 
-Missing games to investigate:
-
- - Courageous Perseus: image found is broken (file is smaller than what the header says... underdumped!)
-
 Are the following undumped or mistransalted (check also if available in TOSEC)?
 
  - DEFLEKTOR (199107xx) by BPS
@@ -233,7 +229,6 @@ Are the following undumped or mistransalted (check also if available in TOSEC)?
  - 機動戦士ガンダム　ジェットストリームアタック (198411xx) by Bandai
  - 戦略連合艦隊 (198411xx) by Bandai
  - ミスターライオン (198411xx) by Cosmos Computer
- - カレイジアスペルセウス (198411xx) by Cosmos Computer
  - Cosmo Traveler 2 - Protector (198411xx) by Soft Pro
  - ペルセウス 洋上の殺意 (198411xx) by Champion Soft
  - トリッキー (198411xx) by Nihon Telenet
@@ -6271,6 +6266,19 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 			<feature name="part_id" value="Default" />
 			<dataarea name="flop" size="348848">
 				<rom name="comsight (default).d88" size="348848" crc="510e8dfe" sha1="c3c21bd7648b0f67c87e342f3c02c3a9e4997f6f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perseus">
+		<description>Corageous Perseus</description>
+		<year>1984</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<info name="release" value="198411xx"/>
+		<info name="alt_title" value="カレイジアスペルセウス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="328848">
+				<rom name="perseus.d88" size="328848" crc="42049b10" sha1="8c2283f9c54ed6c0b224bb90445d711cc4f56d40" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13114,7 +13122,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 	</software>
 
 	<software name="gegege">
-		<description>Gegege no Kitarou</description>
+		<description>GeGeGe no Kitarou</description>
 		<year>1985</year>
 		<publisher>バンダイ (Bandai)</publisher>
 		<!-- PC8801 -->

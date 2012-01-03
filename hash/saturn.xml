@@ -14229,7 +14229,7 @@
 
   <!-- Identifying Gegege No Kitaro (J) (T-13310G)... -->
   <software name="gegege" supported="no">
-    <description>Gegege No Kitaro (Jpn) (T-13310G)</description>
+    <description>GeGeGe no Kitarou (Jpn) (T-13310G)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>

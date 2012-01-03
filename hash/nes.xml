@@ -41839,7 +41839,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="gegegep" cloneof="ninjakid" supported="no">
-		<description>Gegege no Kitarou - Youkai Dai Makyou (Jpn, Prototype)</description>
+		<description>GeGeGe no Kitarou - Youkai Dai Makyou (Jpn, Prototype)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
