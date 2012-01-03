@@ -348,7 +348,7 @@ static const multicartslot_pcb_type *identify_pcb(device_image_interface &image)
 		if (me == MCERR_NONE)
 		{
 			/* this was a multicart - read from it */
-			astring_cpyc(&pcb_name, mc->pcb_type);
+			pcb_name.cpy(mc->pcb_type);
 			multicart_close(image.device().machine().options(), mc);
 		}
 		else
@@ -360,7 +360,7 @@ static const multicartslot_pcb_type *identify_pcb(device_image_interface &image)
 		/* look for PCB type with matching name */
 		for (i = 0; (i < ARRAY_LENGTH(config->pcb_types)) && (config->pcb_types[i].name != NULL); i++)
 		{
-			if ((config->pcb_types[i].name[0] == '\0') || !strcmp(astring_c(&pcb_name), config->pcb_types[i].name))
+			if ((config->pcb_types[i].name[0] == '\0') || !strcmp(pcb_name, config->pcb_types[i].name))
 			{
 				pcb_type = &config->pcb_types[i];
 				break;
@@ -369,7 +369,7 @@ static const multicartslot_pcb_type *identify_pcb(device_image_interface &image)
 
 		/* check for unknown PCB type */
 		if ((mc != NULL) && (pcb_type == NULL))
-			fatalerror("Unknown PCB type \"%s\"", astring_c(&pcb_name));
+			fatalerror("Unknown PCB type \"%s\"", pcb_name.cstr());
 	}
 	else
 	{
@@ -550,8 +550,6 @@ static multicart_open_error load_ram_resource(emu_options &options, multicart_lo
 	const char *ram_type;
 	const char *ram_filename;
 
-	astring *ram_pathname;
-
 	/* locate the 'length' attribute */
 	length_string = xml_get_attribute_string(resource_node, "length", NULL);
 	if (length_string == NULL)
@@ -580,11 +578,11 @@ static multicart_open_error load_ram_resource(emu_options &options, multicart_lo
 			if (ram_filename==NULL)
 				return MCERR_XML_ERROR;
 
-			ram_pathname = astring_assemble_3(&tmp, state->multicart->gamedrv_name, PATH_SEPARATOR, ram_filename);
+			astring ram_pathname(state->multicart->gamedrv_name, PATH_SEPARATOR, ram_filename);
 
 			/* Save the file name so that we can write the contents on unloading.
                If the RAM resource has no filename, we know that it was volatile only. */
-			resource->filename = pool_strdup_lib(state->multicart->data->pool, astring_c(ram_pathname));
+			resource->filename = pool_strdup_lib(state->multicart->data->pool, ram_pathname.cstr());
 
 			if (resource->filename == NULL)
 				return MCERR_OUT_OF_MEMORY;

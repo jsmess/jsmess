@@ -363,8 +363,7 @@ static DEVICE_RESET( ti99_evpc )
 	card->RAMEN = 0;
 	card->dsr_page = 0;
 
-	astring region;
-	astring_assemble_3(&region, device->tag(), ":", evpc_region);
+	astring region(device->tag(), ":", evpc_region);
 
 	card->dsrrom = device->machine().region(region.cstr())->base();
 }
@@ -373,8 +372,7 @@ static DEVICE_NVRAM( ti99_evpc )
 {
 	// Called between START and RESET
 	ti99_evpc_state *card = get_safe_token(device);
-	astring hsname;
-	astring_assemble_3(&hsname, device->machine().system().name, PATH_SEPARATOR, "evpc.nv");
+	astring hsname(device->machine().system().name, PATH_SEPARATOR, "evpc.nv");
 	file_error filerr;
 
 	if (read_or_write==0)
