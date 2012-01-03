@@ -79,6 +79,7 @@ INLINE X87_REG X87_FROUND(i386_state *cpustate, X87_REG t)
 	return t;
 }
 
+
 static void I386OP(fpu_group_d8)(i386_state *cpustate)		// Opcode 0xd8
 {
 	UINT8 modrm = FETCH(cpustate);
