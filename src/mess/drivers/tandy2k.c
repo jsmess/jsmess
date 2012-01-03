@@ -24,23 +24,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "cpu/i86/i86.h"
-#include "cpu/mcs48/mcs48.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/ctronics.h"
-#include "machine/i8255.h"
-#include "machine/i8251.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/upd765.h"
-#include "sound/speaker.h"
-#include "video/crt9007.h"
-#include "video/crt9021.h"
-#include "video/crt9212.h"
 #include "includes/tandy2k.h"
 
 /* Read/Write Handlers */
@@ -254,83 +237,6 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 	logerror("Address Control %02x\n", data);
 }
 
-READ8_MEMBER( tandy2k_state::keyboard_x0_r )
-{
-  /*
-
-        bit     description
-
-        0       X0
-        1       X1
-        2       X2
-        3       X3
-        4       X4
-        5       X5
-        6       X6
-        7       X7
-
-    */
-
-	UINT8 data = 0xff;
-
-	if (!BIT(m_keylatch, 0)) data &= input_port_read(machine(), "Y0");
-	if (!BIT(m_keylatch, 1)) data &= input_port_read(machine(), "Y1");
-	if (!BIT(m_keylatch, 2)) data &= input_port_read(machine(), "Y2");
-	if (!BIT(m_keylatch, 3)) data &= input_port_read(machine(), "Y3");
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "Y4");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "Y5");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "Y6");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "Y7");
-	if (!BIT(m_keylatch, 8)) data &= input_port_read(machine(), "Y8");
-	if (!BIT(m_keylatch, 9)) data &= input_port_read(machine(), "Y9");
-	if (!BIT(m_keylatch, 10)) data &= input_port_read(machine(), "Y10");
-	if (!BIT(m_keylatch, 11)) data &= input_port_read(machine(), "Y11");
-
-	return ~data;
-}
-
-WRITE8_MEMBER( tandy2k_state::keyboard_y0_w )
-{
-	/*
-
-        bit     description
-
-        0       Y0
-        1       Y1
-        2       Y2
-        3       Y3
-        4       Y4
-        5       Y5
-        6       Y6
-        7       Y7
-
-    */
-
-	/* keyboard row select */
-	m_keylatch = (m_keylatch & 0xff00) | data;
-}
-
-WRITE8_MEMBER( tandy2k_state::keyboard_y8_w )
-{
-	/*
-
-        bit     description
-
-        0       Y8
-        1       Y9
-        2       Y10
-        3       Y11
-        4       LED 2
-        5       LED 1
-        6
-        7
-
-    */
-
-	/* keyboard row select */
-	m_keylatch = ((data & 0x0f) << 8) | (m_keylatch & 0xff);
-}
-
 /* Memory Maps */
 
 static ADDRESS_MAP_START( tandy2k_mem, AS_PROGRAM, 16, tandy2k_state )
@@ -373,134 +279,10 @@ static ADDRESS_MAP_START( vpac_mem, AS_0, 8, tandy2k_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(videoram_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keyboard_io, AS_IO, 8, tandy2k_state )
-  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_y0_w)
-  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_y8_w)
-  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(keyboard_x0_r)
-ADDRESS_MAP_END
-
 /* Input Ports */
 
 static INPUT_PORTS_START( tandy2k )
-	PORT_START("ROW0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW1")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW2")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW3")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW4")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW5")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW6")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW8")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW9")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW10")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-
-	PORT_START("ROW11")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	// defined in machine/tandy2kb.c
 INPUT_PORTS_END
 
 /* Video */
@@ -811,7 +593,7 @@ static const floppy_interface tandy2k_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSQD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -860,7 +642,6 @@ void tandy2k_state::machine_start()
 	/* register for state saving */
 	save_item(NAME(m_dma_mux));
 	save_item(NAME(m_kben));
-	save_item(NAME(m_keylatch));
 	save_item(NAME(m_extclk));
 	save_item(NAME(m_rxrdy));
 	save_item(NAME(m_txrdy));
@@ -879,10 +660,6 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_CPU_ADD(I80186_TAG, I80186, XTAL_16MHz)
     MCFG_CPU_PROGRAM_MAP(tandy2k_mem)
     MCFG_CPU_IO_MAP(tandy2k_io)
-
-	MCFG_CPU_ADD(I8048_TAG, I8048, 1000000) // ?
-	MCFG_CPU_IO_MAP(keyboard_io)
-	MCFG_DEVICE_DISABLE()
 
     /* video hardware */
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -914,6 +691,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_UPD765A_ADD(I8272A_TAG, i8272_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tandy2k_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_TANDY2K_KEYBOARD_ADD()
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -936,9 +714,6 @@ ROM_START( tandy2k )
 	ROM_REGION( 0x2000, I80186_TAG, 0 )
 	ROM_LOAD16_BYTE( "484a00.u48", 0x0000, 0x1000, CRC(a5ee3e90) SHA1(4b1f404a4337c67065dd272d62ff88dcdee5e34b) )
 	ROM_LOAD16_BYTE( "474600.u47", 0x0001, 0x1000, CRC(345701c5) SHA1(a775cbfa110b7a88f32834aaa2a9b868cbeed25b) )
-
-	ROM_REGION( 0x400, I8048_TAG, 0 )
-	ROM_LOAD( "keyboard.m1", 0x0000, 0x0400, NO_DUMP )
 ROM_END
 
 #define rom_tandy2khd rom_tandy2k
