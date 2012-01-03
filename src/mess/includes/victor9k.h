@@ -49,6 +49,7 @@ public:
 		  m_pic(*this, I8259A_TAG),
 		  m_ssda(*this, MC6852_TAG),
 		  m_via1(*this, M6522_1_TAG),
+		  m_via2(*this, M6522_2_TAG),
 		  m_cvsd(*this, HC55516_TAG),
 		  m_crtc(*this, HD46505S_TAG),
 		  m_ram(*this, RAM_TAG),
@@ -62,7 +63,8 @@ public:
 	required_device<ieee488_device> m_ieee488;
 	required_device<device_t> m_pic;
 	required_device<mc6852_device> m_ssda;
-	required_device<device_t> m_via1;
+	required_device<via6522_device> m_via1;
+	required_device<via6522_device> m_via2;
 	required_device<device_t> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
@@ -103,6 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER( via6_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( drw_w );
 	DECLARE_WRITE_LINE_MEMBER( erase_w );
+	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
 
 	/* video state */
 	UINT8 *m_video_ram;

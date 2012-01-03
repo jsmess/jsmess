@@ -43,6 +43,9 @@ const rom_entry *victor9k_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( victor9k_keyboard_io, AS_IO, 8, victor9k_keyboard_device )
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(kb_t1_r)
 ADDRESS_MAP_END
 
 
@@ -51,7 +54,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( victor9k_keyboard )
-	MCFG_CPU_ADD(I8021_TAG, I8021, 100000) // XTAL 48-300-010, 30 clocks/cycle
+	MCFG_CPU_ADD(I8021_TAG, I8021, 10000000) // XTAL 48-300-010
 	MCFG_CPU_IO_MAP(victor9k_keyboard_io)
 MACHINE_CONFIG_END
 
@@ -72,6 +75,135 @@ machine_config_constructor victor9k_keyboard_device::device_mconfig_additions() 
 //-------------------------------------------------
 
 INPUT_PORTS_START( victor9k_keyboard )
+    PORT_START("Y0")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y1")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y2")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y3")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y4")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y5")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y6")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y7")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y8")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("Y9")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("YA")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("YB")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+    PORT_START("YC")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 INPUT_PORTS_END
 
 
@@ -97,7 +229,10 @@ ioport_constructor victor9k_keyboard_device::device_input_ports() const
 victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, VICTOR9K_KEYBOARD, "Victor 9000 Keyboard", tag, owner, clock),
 	  m_maincpu(*this, I8021_TAG),
-	  m_kbdata(0)
+	  m_y(0),
+	  m_kbrdy(1),
+	  m_kbdata(1),
+	  m_kback(1)
 {
 }
 
@@ -112,7 +247,10 @@ void victor9k_keyboard_device::device_start()
     m_out_kbrdy_func.resolve(m_out_kbrdy_cb, *this);
 
 	// state saving
+	save_item(NAME(m_y));
+	save_item(NAME(m_kbrdy));
 	save_item(NAME(m_kbdata));
+	save_item(NAME(m_kback));
 }
 
 
@@ -126,11 +264,22 @@ void victor9k_keyboard_device::device_reset()
 
 
 //-------------------------------------------------
+//  kbrdy_r - 
+//-------------------------------------------------
+
+READ_LINE_MEMBER( victor9k_keyboard_device::kbrdy_r )
+{
+	return m_kbrdy;
+}
+
+
+//-------------------------------------------------
 //  kback_w - 
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( victor9k_keyboard_device::kback_w )
 {
+	m_kback = state;
 }
 
 
@@ -141,4 +290,91 @@ WRITE_LINE_MEMBER( victor9k_keyboard_device::kback_w )
 READ_LINE_MEMBER( victor9k_keyboard_device::kbdata_r )
 {
 	return m_kbdata;
+}
+
+
+//-------------------------------------------------
+//  kb_p1_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( victor9k_keyboard_device::kb_p1_r )
+{
+	UINT8 data = 0xff;
+	
+	switch (m_y)
+	{
+		case 0: data &= input_port_read(this, "Y0"); break;
+		case 1: data &= input_port_read(this, "Y1"); break;
+		case 2: data &= input_port_read(this, "Y2"); break;
+		case 3: data &= input_port_read(this, "Y3"); break;
+		case 4: data &= input_port_read(this, "Y4"); break;
+		case 5: data &= input_port_read(this, "Y5"); break;
+		case 6: data &= input_port_read(this, "Y6"); break;
+		case 7: data &= input_port_read(this, "Y7"); break;
+		case 8: data &= input_port_read(this, "Y8"); break;
+		case 9: data &= input_port_read(this, "Y9"); break;
+		case 0xa: data &= input_port_read(this, "YA"); break;
+		case 0xb: data &= input_port_read(this, "YB"); break;
+		case 0xc: data &= input_port_read(this, "YC"); break;
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  kb_p1_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( victor9k_keyboard_device::kb_p1_w )
+{
+	if ((data & 0xf0) == 0x20)
+	{
+		m_y = data & 0x0f;
+	}
+	
+	logerror("P1 %02x\n", data);
+}
+
+
+//-------------------------------------------------
+//  kb_p2_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( victor9k_keyboard_device::kb_p2_w )
+{
+	/*
+
+        bit     description
+
+        P20		keylatch enable ?
+        P21		
+        P22		key available ?
+        P23		data ?
+
+	*/
+	
+	int kbrdy = BIT(data, 2);
+	
+	if (m_kbrdy != kbrdy)
+	{
+		m_kbrdy = kbrdy;
+		m_out_kbrdy_func(m_kbrdy);
+	}
+	
+	m_kbdata = BIT(data, 3);
+	
+	logerror("P2 %01x\n", data & 0x0f);
+}
+
+
+//-------------------------------------------------
+//  kb_t1_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( victor9k_keyboard_device::kb_t1_r )
+{
+	logerror("read T1 %u\n", m_kback);
+	
+	return m_kback;
 }
