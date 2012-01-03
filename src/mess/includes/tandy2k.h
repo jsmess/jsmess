@@ -54,7 +54,9 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1)
+		  m_floppy1(*this, FLOPPY_1),
+		  m_kb(*this, TANDY2K_KEYBOARD_TAG),
+		  m_kbdclk(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -72,6 +74,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
+	required_device<tandy2k_keyboard_device> m_kb;
 
 	virtual void machine_start();
 
@@ -84,6 +87,7 @@ public:
 	DECLARE_READ8_MEMBER( enable_r );
 	DECLARE_WRITE8_MEMBER( enable_w );
 	DECLARE_WRITE8_MEMBER( dma_mux_w );
+	DECLARE_READ8_MEMBER( kbint_clr_r );
 	DECLARE_READ16_MEMBER( vpac_r );
 	DECLARE_WRITE16_MEMBER( vpac_w );
 	DECLARE_WRITE8_MEMBER( addr_ctrl_w );
@@ -98,12 +102,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vpac_vlt_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_drb_w );
 	DECLARE_WRITE_LINE_MEMBER( vac_ld_ht_w );
+	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
+	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
 
 	/* DMA state */
 	UINT8 m_dma_mux;
 
 	/* keyboard state */
-	int m_kben;
+	int m_kbdclk;
+	int m_kbddat;
+	UINT8 m_kbdin;
 
 	/* serial state */
 	int m_extclk;

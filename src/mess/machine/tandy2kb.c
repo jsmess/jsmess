@@ -8,6 +8,11 @@
 
 #define I8048_TAG		"m1"
 
+enum
+{
+	LED_1 = 0,
+	LED_2
+};
 
 
 //**************************************************************************
@@ -43,9 +48,9 @@ const rom_entry *tandy2k_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( tandy2k_keyboard_io, AS_IO, 8, tandy2k_keyboard_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kb_y0_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_y8_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(kb_x0_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kb_p1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_p2_w)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(kb_p1_r)
 ADDRESS_MAP_END
 
 
@@ -220,7 +225,9 @@ ioport_constructor tandy2k_keyboard_device::device_input_ports() const
 tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock),
 	  m_maincpu(*this, I8048_TAG),
-	  m_keylatch(0xffff)
+	  m_keylatch(0xffff),
+	  m_clock(0),
+	  m_data(0)
 {
 }
 
@@ -231,6 +238,10 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 
 void tandy2k_keyboard_device::device_start()
 {
+	// resolve callbacks
+    m_out_clock_func.resolve(m_out_clock_cb, *this);
+    m_out_data_func.resolve(m_out_data_cb, *this);
+
 	// state saving
 	save_item(NAME(m_keylatch));
 }
@@ -246,10 +257,53 @@ void tandy2k_keyboard_device::device_reset()
 
 
 //-------------------------------------------------
-//  kb_x0_r - 
+//  power_w - 
 //-------------------------------------------------
 
-READ8_MEMBER( tandy2k_keyboard_device::kb_x0_r )
+WRITE_LINE_MEMBER( tandy2k_keyboard_device::power_w )
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
+//  reset_w - 
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( tandy2k_keyboard_device::reset_w )
+{
+	if (!state)
+	{
+		device_reset();
+	}
+}
+
+
+//-------------------------------------------------
+//  busy_w - 
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( tandy2k_keyboard_device::busy_w )
+{
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  data_r - 
+//-------------------------------------------------
+
+READ_LINE_MEMBER( tandy2k_keyboard_device::data_r )
+{
+	return m_data;
+}
+
+
+//-------------------------------------------------
+//  kb_p1_r - 
+//-------------------------------------------------
+
+READ8_MEMBER( tandy2k_keyboard_device::kb_p1_r )
 {
   /*
 
@@ -286,10 +340,10 @@ READ8_MEMBER( tandy2k_keyboard_device::kb_x0_r )
 
 
 //-------------------------------------------------
-//  kb_y0_w - 
+//  kb_p1_w - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( tandy2k_keyboard_device::kb_y0_w )
+WRITE8_MEMBER( tandy2k_keyboard_device::kb_p1_w )
 {
 	/*
 
@@ -306,15 +360,16 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_y0_w )
 
     */
 
+	// keyboard row
 	m_keylatch = (m_keylatch & 0xff00) | data;
 }
 
 
 //-------------------------------------------------
-//  kb_y8_w - 
+//  kb_p2_w - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( tandy2k_keyboard_device::kb_y8_w )
+WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
 {
 	/*
 
@@ -326,10 +381,35 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_y8_w )
         3       Y11
         4       LED 2
         5       LED 1
-        6
-        7
+        6		CLOCK
+        7		DATA
 
     */
 
+	// keyboard row
 	m_keylatch = ((data & 0x0f) << 8) | (m_keylatch & 0xff);
+	
+	// led output
+	output_set_led_value(LED_2, !BIT(data, 4));
+	output_set_led_value(LED_1, !BIT(data, 5));
+	
+	// keyboard clock
+	int clock = BIT(data, 6);
+	
+	if (m_clock != clock)
+	{
+		m_clock = clock;
+		
+		m_out_clock_func(m_clock);
+	}
+	
+	// keyboard data
+	int kbddat = BIT(data, 7);
+
+	if (m_data != kbddat)
+	{
+		m_data = kbddat;
+		
+		m_out_data_func(m_data);
+	}
 }
