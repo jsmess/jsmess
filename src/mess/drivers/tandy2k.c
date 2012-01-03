@@ -26,7 +26,14 @@
 
 #include "includes/tandy2k.h"
 
-/* Read/Write Handlers */
+enum
+{
+	LPINEN = 0,
+	KBDINEN,
+	PORTINEN
+};
+
+// Read/Write Handlers
 
 void tandy2k_state::dma_request(int line, int state)
 {
@@ -71,7 +78,7 @@ READ8_MEMBER( tandy2k_state::enable_r )
         6
         7       _ACLOW
 
-    */
+	*/
 
 	return 0x80;
 }
@@ -87,36 +94,36 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
         2       SPKRGATE    enable periodic m_speaker output
         3       SPKRDATA    direct output to m_speaker
         4       RFRQGATE    enable refresh and baud rate clocks
-        5       _FDCRESET   reset 8272
+        5       FDCRESET*   reset 8272
         6       TMRIN0      enable 80186 timer 0
         7       TMRIN1      enable 80186 timer 1
 
-    */
+	*/
 
-	/* keyboard enable */
-	m_kben = BIT(data, 0);
+	// keyboard enable
+	m_kb->power_w(BIT(data, 0));
 
-	/* external baud rate clock */
+	// external baud rate clock
 	m_extclk = BIT(data, 1);
 
-	/* m_speaker gate */
+	// m_speaker gate
 	pit8253_gate0_w(m_pit, BIT(data, 2));
 
-	/* m_speaker data */
+	// m_speaker data
 	m_spkrdata = BIT(data, 3);
 	speaker_update();
 
-	/* refresh and baud rate clocks */
+	// refresh and baud rate clocks
 	pit8253_gate1_w(m_pit, BIT(data, 4));
 	pit8253_gate2_w(m_pit, BIT(data, 4));
 
-	/* FDC reset */
+	// FDC reset
 	upd765_reset_w(m_fdc, BIT(data, 5));
 
-	/* timer 0 enable */
+	// timer 0 enable
 	device_set_input_line(m_maincpu, INPUT_LINE_TMRIN0, BIT(data, 6));
 
-	/* timer 1 enable */
+	// timer 1 enable
 	device_set_input_line(m_maincpu, INPUT_LINE_TMRIN1, BIT(data, 7));
 }
 
@@ -135,11 +142,11 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
         6       DMA channel 2 select
         7       DMA channel 3 select
 
-    */
+	*/
 
 	m_dma_mux = data;
 
-	/* check for DMA error */
+	// check for DMA error
 	int drq0 = 0;
 	int drq1 = 0;
 
@@ -151,6 +158,17 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 	int dme = (drq0 > 2) || (drq1 > 2);
 
 	pic8259_ir6_w(m_pic1, dme);
+}
+
+READ8_MEMBER( tandy2k_state::kbint_clr_r )
+{
+	if (m_pb_sel == KBDINEN)
+	{
+		m_kb->busy_w(1);
+		pic8259_ir0_w(m_pic1, CLEAR_LINE);
+	}
+	
+	return 0xff;
 }
 
 READ16_MEMBER( tandy2k_state::vpac_r )
@@ -206,12 +224,12 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
         14      CLKCNT      dots/char (0 = 10 [800x400], 1 = 8 [640x400])
         15      VIDOUTS     selects the video source for display on monochrome monitor
 
-    */
+	*/
 
-	/* video access */
+	// video access
 	m_vram_base = data & 0x1f;
 
-	/* dots per char */
+	// dots per char
 	int character_width = BIT(data, 6) ? 8 : 10;
 
 	if (m_clkcnt != BIT(data, 6))
@@ -220,7 +238,7 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 		m_clkcnt = BIT(data, 6);
 	}
 
-	/* video clock speed */
+	// video clock speed
 	if (m_clkspd != BIT(data, 5))
 	{
 		float pixel_clock = BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20;
@@ -231,13 +249,13 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 		m_clkspd = BIT(data, 5);
 	}
 
-	/* video source select */
+	// video source select
 	m_vidouts = BIT(data, 7);
 
 	logerror("Address Control %02x\n", data);
 }
 
-/* Memory Maps */
+// Memory Maps
 
 static ADDRESS_MAP_START( tandy2k_mem, AS_PROGRAM, 16, tandy2k_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -256,6 +274,7 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	AM_RANGE(0x00030, 0x00031) AM_DEVREAD8_LEGACY(I8272A_TAG, upd765_status_r, 0x00ff)
 	AM_RANGE(0x00032, 0x00033) AM_DEVREADWRITE8_LEGACY(I8272A_TAG, upd765_data_r, upd765_data_w, 0x00ff)
 	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x00052, 0x00053) AM_READ8(kbint_clr_r, 0x00ff)
 	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8_LEGACY(I8259A_0_TAG, pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8_LEGACY(I8259A_1_TAG, pic8259_r, pic8259_w, 0x00ff)
@@ -279,13 +298,13 @@ static ADDRESS_MAP_START( vpac_mem, AS_0, 8, tandy2k_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(videoram_r)
 ADDRESS_MAP_END
 
-/* Input Ports */
+// Input Ports
 
 static INPUT_PORTS_START( tandy2k )
 	// defined in machine/tandy2kb.c
 INPUT_PORTS_END
 
-/* Video */
+// Video
 
 bool tandy2k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
@@ -376,7 +395,7 @@ static CRT9021_INTERFACE( vac_intf )
 	DEVCB_LINE_VCC // ATTEN
 };
 
-/* Intel 8251A Interface */
+// Intel 8251A Interface
 
 WRITE_LINE_MEMBER( tandy2k_state::rxrdy_w )
 {
@@ -390,7 +409,7 @@ WRITE_LINE_MEMBER( tandy2k_state::txrdy_w )
 	pic8259_ir2_w(m_pic0, m_rxrdy | m_txrdy);
 }
 
-static const i8251_interface i8251_intf =
+static const i8251_interface usart_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -403,7 +422,7 @@ static const i8251_interface i8251_intf =
 	DEVCB_NULL
 };
 
-/* Intel 8253 Interface */
+// Intel 8253 Interface
 
 WRITE_LINE_MEMBER( tandy2k_state::outspkr_w )
 {
@@ -424,7 +443,7 @@ WRITE_LINE_MEMBER( tandy2k_state::rfrqpulse_w )
 {
 }
 
-static const struct pit8253_config i8253_intf =
+static const struct pit8253_config pit_intf =
 {
 	{
 		{
@@ -443,14 +462,7 @@ static const struct pit8253_config i8253_intf =
 	}
 };
 
-/* Intel 8255A Interface */
-
-enum
-{
-	LPINEN = 0,
-	KBDINEN,
-	PORTINEN
-};
+// Intel 8255A Interface
 
 READ8_MEMBER( tandy2k_state::ppi_pb_r )
 {
@@ -467,35 +479,36 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
         6       LPRPAEM         paper empty
         7       LPRBSY          busy
 
-    */
+	*/
 
 	UINT8 data = 0;
 
 	switch (m_pb_sel)
 	{
 	case LPINEN:
-		/* printer acknowledge */
+		// printer acknowledge
 		data |= centronics_ack_r(m_centronics) << 3;
 
-		/* printer fault */
+		// printer fault
 		data |= centronics_fault_r(m_centronics) << 4;
 
-		/* printer select */
+		// printer select
 		data |= centronics_vcc_r(m_centronics) << 5;
 
-		/* paper empty */
+		// paper empty
 		data |= centronics_pe_r(m_centronics) << 6;
 
-		/* printer busy */
+		// printer busy
 		data |= centronics_busy_r(m_centronics) << 7;
 		break;
 
 	case KBDINEN:
-		/* keyboard data */
+		// keyboard data
+		data = m_kbdin;
 		break;
 
 	case PORTINEN:
-		/* PCB revision */
+		// PCB revision
 		data = 0x03;
 		break;
 	}
@@ -518,19 +531,19 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
         6       _LPRACK
         7       _LPRDATSTB
 
-    */
+	*/
 
-	/* input select */
+	// input select
 	m_pb_sel = (data >> 1) & 0x03;
 
-	/* interrupt */
+	// interrupt
 	pic8259_ir3_w(m_pic1, BIT(data, 3));
 
-	/* printer strobe */
+	// printer strobe
 	centronics_strobe_w(m_centronics, BIT(data, 7));
 }
 
-static I8255A_INTERFACE( i8255_intf )
+static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,													// Port A read
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port A write
@@ -540,7 +553,7 @@ static I8255A_INTERFACE( i8255_intf )
 	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pc_w)				// Port C write
 };
 
-/* Intel 8259 Interfaces */
+// Intel 8259 Interfaces
 
 /*
 
@@ -555,7 +568,7 @@ static I8255A_INTERFACE( i8255_intf )
 
 */
 
-static const struct pic8259_interface i8259_0_intf =
+static const struct pic8259_interface pic0_intf =
 {
 	DEVCB_CPU_INPUT_LINE(I80186_TAG, INPUT_LINE_INT0),
 	DEVCB_LINE_VCC,
@@ -575,14 +588,14 @@ static const struct pic8259_interface i8259_0_intf =
 
 */
 
-static const struct pic8259_interface i8259_1_intf =
+static const struct pic8259_interface pic1_intf =
 {
 	DEVCB_CPU_INPUT_LINE(I80186_TAG, INPUT_LINE_INT1),
 	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };
 
-/* Floppy Configuration */
+// Floppy Configuration
 
 static const floppy_interface tandy2k_floppy_interface =
 {
@@ -597,14 +610,14 @@ static const floppy_interface tandy2k_floppy_interface =
 	NULL
 };
 
-/* Intel 8272 Interface */
+// Intel 8272 Interface
 
 WRITE_LINE_MEMBER( tandy2k_state::busdmarq0_w )
 {
 	dma_request(0, state);
 }
 
-static const struct upd765_interface i8272_intf =
+static const struct upd765_interface fdc_intf =
 {
 	DEVCB_DEVICE_LINE(I8259A_0_TAG, pic8259_ir4_w),
 	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, busdmarq0_w),
@@ -613,35 +626,67 @@ static const struct upd765_interface i8272_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-/* Centronics Interface */
+// Centronics Interface
 
 static const centronics_interface centronics_intf =
 {
-	0,												/* is IBM PC? */
-	DEVCB_DEVICE_LINE_MEMBER(I8255A_TAG, i8255_device, pc6_w),	/* ACK output */
-	DEVCB_NULL,										/* BUSY output */
-	DEVCB_NULL										/* NOT BUSY output */
+	0,												// is IBM PC?
+	DEVCB_DEVICE_LINE_MEMBER(I8255A_TAG, i8255_device, pc6_w),	// ACK output
+	DEVCB_NULL,										// BUSY output
+	DEVCB_NULL										// NOT BUSY output
 };
 
-/* Machine Initialization */
+// Keyboard
+
+WRITE_LINE_MEMBER( tandy2k_state::kbdclk_w )
+{
+	if (!m_kbdclk && state)
+	{
+		m_kbdin >>= 1;
+		m_kbdin |= m_kb->data_r() << 7;
+	}
+	
+	m_kbdclk = state;
+}
+
+WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
+{
+	if (!m_kbddat && state)
+	{
+		m_kb->busy_w(m_kbdclk);
+		pic8259_ir0_w(m_pic1, !m_kbdclk);
+	}
+	
+	m_kbddat = state;
+}
+
+static TANDY2K_KEYBOARD_INTERFACE( kb_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, kbdclk_w),
+	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, kbddat_w)
+};
+
+// Machine Initialization
 
 void tandy2k_state::machine_start()
 {
-	/* memory banking */
+	// memory banking
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	int ram_size = m_ram->size();
 
 	program->install_ram(0x00000, ram_size - 1, ram);
 
-	/* patch out i186 relocation register check */
+	// patch out i186 relocation register check
 	UINT8 *rom = machine().region(I80186_TAG)->base();
 	rom[0x1f16] = 0x90;
 	rom[0x1f17] = 0x90;
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_dma_mux));
-	save_item(NAME(m_kben));
+	save_item(NAME(m_kbdclk));
+	save_item(NAME(m_kbddat));
+	save_item(NAME(m_kbdin));
 	save_item(NAME(m_extclk));
 	save_item(NAME(m_rxrdy));
 	save_item(NAME(m_txrdy));
@@ -653,18 +698,18 @@ void tandy2k_state::machine_start()
 	save_item(NAME(m_spkrdata));
 }
 
-/* Machine Driver */
+// Machine Driver
 
 static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
-    /* basic machine hardware */
+    // basic machine hardware
 	MCFG_CPU_ADD(I80186_TAG, I80186, XTAL_16MHz)
     MCFG_CPU_PROGRAM_MAP(tandy2k_mem)
     MCFG_CPU_IO_MAP(tandy2k_io)
 
-    /* video hardware */
+    // video hardware
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
     MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
@@ -677,49 +722,58 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_CRT9212_ADD(CRT9212_1_TAG, drb1_intf)
 	MCFG_CRT9021_ADD(CRT9021B_TAG, XTAL_16MHz*28/16/8, vac_intf)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* devices */
-	MCFG_I8255A_ADD(I8255A_TAG, i8255_intf)
-	MCFG_I8251_ADD(I8251A_TAG, i8251_intf)
-	MCFG_PIT8253_ADD(I8253_TAG, i8253_intf)
-	MCFG_PIC8259_ADD(I8259A_0_TAG, i8259_0_intf)
-	MCFG_PIC8259_ADD(I8259A_1_TAG, i8259_1_intf)
-	MCFG_UPD765A_ADD(I8272A_TAG, i8272_intf)
+	// devices
+	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
+	MCFG_I8251_ADD(I8251A_TAG, usart_intf)
+	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
+	MCFG_PIC8259_ADD(I8259A_0_TAG, pic0_intf)
+	MCFG_PIC8259_ADD(I8259A_1_TAG, pic1_intf)
+	MCFG_UPD765A_ADD(I8272A_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tandy2k_floppy_interface)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_TANDY2K_KEYBOARD_ADD()
+	MCFG_TANDY2K_KEYBOARD_ADD(kb_intf)
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tandy2k_hd, tandy2k )
-    /* basic machine hardware */
+    // basic machine hardware
 	MCFG_CPU_MODIFY(I80186_TAG)
     MCFG_CPU_IO_MAP(tandy2k_hd_io)
 
-	/* Tandon TM502 hard disk */
+	// Tandon TM502 hard disk
 	//MCFG_WD1010_ADD(WD1010_TAG, wd1010_intf)
 MACHINE_CONFIG_END
 
-/* ROMs */
+// ROMs
 
 ROM_START( tandy2k )
 	ROM_REGION( 0x2000, I80186_TAG, 0 )
 	ROM_LOAD16_BYTE( "484a00.u48", 0x0000, 0x1000, CRC(a5ee3e90) SHA1(4b1f404a4337c67065dd272d62ff88dcdee5e34b) )
 	ROM_LOAD16_BYTE( "474600.u47", 0x0001, 0x1000, CRC(345701c5) SHA1(a775cbfa110b7a88f32834aaa2a9b868cbeed25b) )
+
+	ROM_REGION( 0x100, "plds", 0 )
+	ROM_LOAD( "82s153.u62", 0x000, 0x100, NO_DUMP ) // interrupt/DMA
+	ROM_LOAD( "82s153.u68", 0x000, 0x100, NO_DUMP ) // video
+	ROM_LOAD( "82s153.u95", 0x000, 0x100, NO_DUMP ) // memory timing
+	ROM_LOAD( "pal10l8.u82", 0x000, 0x100, NO_DUMP ) // video
+	ROM_LOAD( "pal16l8a.u102", 0x000, 0x100, NO_DUMP ) // bus interface
+	ROM_LOAD( "pal16l8a.u103", 0x000, 0x100, NO_DUMP ) // bus interface
+	ROM_LOAD( "pal20l8.u103", 0x000, 0x100, NO_DUMP ) // bus interface, alternate
 ROM_END
 
 #define rom_tandy2khd rom_tandy2k
 
-/* System Drivers */
+// System Drivers
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS */
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS
 COMP( 1983, tandy2k,	0,			0,		tandy2k,	tandy2k,	0,		"Tandy Radio Shack",	"Tandy 2000",	GAME_NOT_WORKING)
 COMP( 1983, tandy2khd,	tandy2k,	0,		tandy2k_hd,	tandy2k,	0,		"Tandy Radio Shack",	"Tandy 2000HD",	GAME_NOT_WORKING)
