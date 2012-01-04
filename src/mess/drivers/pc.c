@@ -1979,6 +1979,17 @@ ROM_START( olivm15 )
 	ROM_LOAD( "oliv_m15.bin",0xfc000, 0x04000, CRC(bf2ef795) SHA1(02d497131f5ca2c78f2accd38ab0eab6813e3ebf))
 ROM_END
 
+// Siemens PC-D (80186)
+ROM_START( pcd )
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD16_BYTE( "sni_pcd1.bin", 0xfc001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73))
+	ROM_LOAD16_BYTE( "sni_pcd2.bin", 0xfc000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda))
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0) /* original font rom is undumped */
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -2022,3 +2033,5 @@ COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0,  	    0,  		"Oliv
 COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga,      pccga,      "International Business Machines", "IBM 5550", GAME_NOT_WORKING)
 
 COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga,      pccga,      "Sharp", "PC-7000", GAME_NOT_WORKING)
+
+COMP( 198?, pcd,        ibm5150,    0,          pccga,      pccga,      pccga,      "Siemens", "PC-D", GAME_NOT_WORKING)
