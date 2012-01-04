@@ -1418,7 +1418,7 @@
 		</part>
 	</software>
 
-	<software name="ringnoue" supported="no">
+	<software name="ringnoue">
 		<description>リングの上はおおさわぎ</description>
 		<year>19??</year>
 		<publisher>Micro Arts</publisher>
