@@ -27,7 +27,6 @@
 		</part>
 	</software>
 
-<!-- アリオン -->
 	<software name="arion">
 		<description>アリオン</description>
 		<year>19??</year>
@@ -44,7 +43,6 @@
 		</part>
 	</software>
 
-<!-- A列車で行こう -->
 	<software name="atrain">
 		<description>A列車で行こう</description>
 		<year>1986</year>
@@ -56,12 +54,11 @@
 		</part>
 	</software>
 
-<!-- ｿフトセット（ナイザー メイガス ビデオ君 BlueFox Lizerd) -->
-<!-- Does not autoboot, run from F-Basic -->
 	<software name="bluefox">
 		<description>ナイザー メイガス ビデオ君 BlueFox Lizard</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Run from F-BASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="disk1.d77" size="348848" crc="9D46E9BA" sha1="1CED7F39C95299C32382BFAFB8402019BD52D26B" offset="000000" />
@@ -69,11 +66,11 @@
 		</part>
 	</software>
 
-<!-- ザ・キャッスル&キャッスルエクセレント -->
 	<software name="cas_casx">
 		<description>The Castle &amp; The Castle Excellent</description>
 		<year>19??</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ザ・キャッスル&amp;キャッスルエクセレント"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="castle.d77" size="348848" crc="E69D5A7A" sha1="8D24B38A3C823003EE3FCC4AB1ABCDC1879456FD" offset="000000" />
@@ -92,7 +89,6 @@
 		</part>
 	</software>
 
-<!-- 超次元伝説ラル -->
 	<software name="chojigen">
 		<description>超次元伝説ラル</description>
 		<year>1988</year>
@@ -132,7 +128,7 @@
 	</software>
 
 <!-- does not work, AV only, perhaps.  A different AV-specific version does exist, and works on the fm77av driver, see fm77av.xml   -->
-	<software name="daiva">
+	<software name="daiva" supported="no">
 		<description>Daiva</description>
 		<year>19??</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -169,7 +165,6 @@
 		</part>
 	</software>
 
-<!-- 魔法使いの妹子２ -->
 	<software name="deshi2">
 		<description>魔法使いの妹子２</description>
 		<year>1986</year>
@@ -186,7 +181,6 @@
 		</part>
 	</software>
 
-<!-- デゼニランド -->
 	<software name="dezeni">
 		<description>デゼニランド</description>
 		<year>19??</year>
@@ -198,8 +192,7 @@
 		</part>
 	</software>
 
-<!-- デスフォース - not working -->
-	<software name="dforce">
+	<software name="dforce" supported="no">
 		<description>デスフォース</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -279,6 +272,7 @@
 		</part>
 	</software>
 
+<!-- Golf Kyo -->
 	<software name="hcc">
 		<description>Hudson Country Club</description>
 		<year>1983</year>
@@ -290,11 +284,11 @@
 		</part>
 	</software>
 
-<!-- ヘリコイド -->
 	<software name="helicoid">
 		<description>Helicoid</description>
 		<year>19??</year>
 		<publisher>Microfun</publisher>
+		<info name="alt_title" value="ヘリコイド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="347488">
 				<rom name="heli.d77" size="347488" crc="CED1D125" sha1="C9F29081BAE14AB87E4AB0E59173826C6F592FD6" offset="000000" />
@@ -302,7 +296,6 @@
 		</part>
 	</software>
 
-<!-- 北斗の拳 -->
 	<software name="hokuto">
 		<description>北斗の拳</description>
 		<year>19??</year>
@@ -319,7 +312,6 @@
 		</part>
 	</software>
 
-<!-- 夕なぎのホライゾン -->
 	<software name="horizon">
 		<description>Horizon - 夕なぎのホライゾン</description>
 		<year>19??</year>
@@ -331,8 +323,7 @@
 		</part>
 	</software>
 
-<!-- ホットドッグ - not working -->
-	<software name="hotdog">
+	<software name="hotdog" supported="no">
 		<description>ホットドッグ</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -354,7 +345,6 @@
 		</part>
 	</software>
 
-<!-- スーパー漢字住所録 -->
 	<software name="jushorok">
 		<description>スーパー漢字住所録</description>
 		<year>19??</year>
@@ -366,7 +356,6 @@
 		</part>
 	</software>
 
-<!-- 賢者の遺言 -->
 	<software name="kenja">
 		<description>賢者の遺言 - They, Adventurers Go On</description>
 		<year>1986</year>
@@ -383,11 +372,11 @@
 		</part>
 	</software>
 
-<!-- ザ ナイト オブ ワンダーランド -->
 	<software name="kow">
 		<description>The Knight of Wonderland</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ザ ナイト オブ ワンダーランド"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348752">
 				<rom name="night.d77" size="348752" crc="A837C718" sha1="6BFDFBD5CA87E4749BEE4D1F5EE663EAA06EF26B" offset="000000" />
@@ -447,7 +436,6 @@
 		</part>
 	</software>
 
-<!-- 魔法使いの妹子 -->
 	<software name="mahoutsu">
 		<description>魔法使いの妹子</description>
 		<year>1985</year>
@@ -459,8 +447,7 @@
 		</part>
 	</software>
 
-<!-- メルヘンヴェール - not working -->
-	<software name="merchen">
+	<software name="merchen" supported="no">
 		<description>メルヘンヴェール</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -482,11 +469,11 @@
 		</part>
 	</software>
 
-<!-- ムービングスクール -->
 	<software name="mschool">
 		<description>Moving School</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ムービングスクール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="school.d77" size="348848" crc="BDE764C2" sha1="60DB1B5A944B099CB1A5121F72477F3979647A90" offset="000000" />
@@ -505,11 +492,11 @@
 		</part>
 	</software>
 
-<!-- プリンセスクエスト -->
 	<software name="pquest">
 		<description>Princess Quest</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="プリンセスクエスト"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409248">
 				<rom name="pquest.d77" size="409248" crc="8F880625" sha1="CC30F8A4E28BF7DCCF3E6E47900CF63593303CB3" offset="000000" />
@@ -522,7 +509,6 @@
 		</part>
 	</software>
 
-<!-- PRINCESS QUEST(正常版) -->
 	<software name="pquesta" cloneof="pquest">
 		<description>Princess Quest (正常版)</description>
 		<year>19??</year>
@@ -539,7 +525,6 @@
 		</part>
 	</software>
 
-<!-- リバイバー -->
 	<software name="reviver">
 		<description>リバイバー</description>
 		<year>19??</year>
@@ -551,11 +536,11 @@
 		</part>
 	</software>
 
-<!-- リグラス -->
 	<software name="riglas">
 		<description>Riglas</description>
 		<year>1985</year>
 		<publisher>ランダムハウス (Random House)</publisher>
+		<info name="alt_title" value="リグラス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="384608">
 				<rom name="riglas.d77" size="384608" crc="57828D4D" sha1="774966B21D06177B6A0AAC9C271E769B00FF6BE4" offset="000000" />
@@ -563,11 +548,11 @@
 		</part>
 	</software>
 
-<!-- does not autoboot, must be run from F-Basic -->
 	<software name="sod">
 		<description>SOD</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Run from F-BASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="sod.d77" size="348848" crc="E083A342" sha1="3E18A330E60C267A8FC150CF375E9689094F5BC8" offset="000000" />
@@ -575,7 +560,6 @@
 		</part>
 	</software>
 
-<!-- 倉庫番２ -->
 	<software name="sokoban2">
 		<description>倉庫番２</description>
 		<year>19??</year>
@@ -614,7 +598,6 @@
 		</part>
 	</software>
 
-<!-- トリトーン -->
 	<software name="tritorn">
 		<description>トリトーン</description>
 		<year>19??</year>
@@ -626,7 +609,6 @@
 		</part>
 	</software>
 
-<!-- ユリシーズ -->
 	<software name="ulysses">
 		<description>ユリシーズ</description>
 		<year>19??</year>
@@ -643,12 +625,11 @@
 		</part>
 	</software>
 
-<!-- 占いプログラム集 -->
-<!-- Disk is not bootable, must be run from F-Basic -->
 	<software name="uranaifm">
 		<description>占いプログラム集</description>
 		<year>19??</year>
 		<publisher>A.R.C.</publisher>
+		<info name="usage" value="Run from F-BASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="uranaifm.d77" size="348848" crc="1AC4B98D" sha1="12179A924E54F3DB12EF8C75AEBA7EE4C1AA8869" offset="000000" />
@@ -656,7 +637,6 @@
 		</part>
 	</software>
 
-<!-- 美しき獲物たち -->
 	<software name="utsuku">
 		<description>美しき獲物たち</description>
 		<year>19??</year>
@@ -679,7 +659,6 @@
 		</part>
 	</software>
 
-<!-- XANADU1&2(Alt) -->
 	<software name="xanadu12">
 		<description>Xanadu 1 and 2</description>
 		<year>19??</year>
@@ -727,12 +706,11 @@
 		</part>
 	</software>
 
-<!-- ヤンパラアドベンチャー -->
-<!-- Does not autoboot, must be run from F-BASIC -->
 	<software name="yanpara">
 		<description>ヤンパラアドベンチャー</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Run from F-BASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="yanpara1.d77" size="348848" crc="34992E32" sha1="14D15FF72029BF9C056AF2CE82695442E860B789" offset="000000" />
