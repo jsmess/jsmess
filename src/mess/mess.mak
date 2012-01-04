@@ -1758,6 +1758,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/digel804.o	\
 	$(MESS_DRIVERS)/dim68k.o	\
 	$(MESS_DRIVERS)/dm7000.o	\
+	$(MESS_DRIVERS)/dmv.o		\
 	$(MESS_DRIVERS)/dolphin.o	\
 	$(MESS_DRIVERS)/dual68.o	\
 	$(MESS_DRIVERS)/eacc.o		\
