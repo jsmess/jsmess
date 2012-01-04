@@ -5,10 +5,9 @@
         12/05/2009 Skeleton driver.
 
 ToDo:
-- Everything I/O related (ROM & RAM are correct)
-- Display
-- Inputs
-- Layout (was copied from slc1; needs to be made suitable for sc1)
+- speaker
+- LEDs
+- 7seg sometimes flashes
 
 Port 80-83 could be a device
 
@@ -39,6 +38,7 @@ Port 82 in - upper byte = 0 thru 7
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
+#include "machine/z80pio.h"
 #include "sc1.lh"
 
 
@@ -53,6 +53,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
+
+	DECLARE_WRITE8_MEMBER( matrix_w );
+	DECLARE_WRITE8_MEMBER( pio_port_a_w );
+	DECLARE_READ8_MEMBER( pio_port_b_r );
+
+	UINT8 m_matrix;
 };
 
 /***************************************************************************
@@ -61,7 +67,19 @@ public:
 
 ***************************************************************************/
 
+WRITE8_MEMBER( sc1_state::pio_port_a_w )
+{
+	UINT8 digit = BITSWAP8( data,3,4,6,0,1,2,7,5 );
 
+	if (m_matrix & 0x04)
+		output_set_digit_value(3, digit & 0x7f);
+	if (m_matrix & 0x08)
+		output_set_digit_value(2, digit & 0x7f);
+	if (m_matrix & 0x10)
+		output_set_digit_value(1, digit & 0x7f);
+	if (m_matrix & 0x20)
+		output_set_digit_value(0, digit & 0x7f);
+}
 
 
 /***************************************************************************
@@ -69,6 +87,35 @@ public:
     Keyboard
 
 ***************************************************************************/
+
+WRITE8_MEMBER( sc1_state::matrix_w )
+{
+	m_matrix = data;
+}
+
+READ8_MEMBER( sc1_state::pio_port_b_r )
+{
+	UINT8 data = 0;
+
+	if (m_matrix & 0x01)
+		data |= input_port_read(machine(), "LINE1");
+	if (m_matrix & 0x02)
+		data |= input_port_read(machine(), "LINE2");
+	if (m_matrix & 0x04)
+		data |= input_port_read(machine(), "LINE3");
+	if (m_matrix & 0x08)
+		data |= input_port_read(machine(), "LINE4");
+	if (m_matrix & 0x10)
+		data |= input_port_read(machine(), "LINE5");
+	if (m_matrix & 0x20)
+		data |= input_port_read(machine(), "LINE6");
+	if (m_matrix & 0x40)
+		data |= input_port_read(machine(), "LINE7");
+	if (m_matrix & 0x80)
+		data |= input_port_read(machine(), "LINE8");
+
+	return data;
+}
 
 
 static ADDRESS_MAP_START(sc1_mem, AS_PROGRAM, 8, sc1_state)
@@ -80,16 +127,57 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sc1_io, AS_IO, 8, sc1_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(matrix_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( sc1 )
+	PORT_START("LINE1")
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_UNUSED
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D)
+
+	PORT_START("LINE2")
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_B)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F)
+
+	PORT_START("LINE3")
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_C)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_G)
+
+	PORT_START("LINE4")
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_A)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_E)
+
+	PORT_START("LINE5")
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_H)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CE") PORT_CODE(KEYCODE_DEL)
+
+	PORT_START("LINE6")
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ENT") PORT_CODE(KEYCODE_ENTER)
+
+	PORT_START("LINE7")
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_O)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("W/S") PORT_CODE(KEYCODE_W)
+
+	PORT_START("LINE8")
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C") PORT_CODE(KEYCODE_M)
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(sc1)
+static Z80PIO_INTERFACE( pio_intf )
 {
-}
+	DEVCB_NULL,										/* callback when change interrupt status */
+	DEVCB_NULL,										/* port A read callback */
+	DEVCB_DRIVER_MEMBER(sc1_state, pio_port_a_w),	/* port A write callback */
+	DEVCB_NULL,										/* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(sc1_state, pio_port_b_r),	/* port B read callback */
+	DEVCB_NULL,										/* port B write callback */
+	DEVCB_NULL										/* portB ready active callback */
+};
+
 
 static MACHINE_CONFIG_START( sc1, sc1_state )
 	/* basic machine hardware */
@@ -97,10 +185,11 @@ static MACHINE_CONFIG_START( sc1, sc1_state )
 	MCFG_CPU_PROGRAM_MAP(sc1_mem)
 	MCFG_CPU_IO_MAP(sc1_io)
 
-	MCFG_MACHINE_RESET(sc1)
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc1)
+
+	/* devices */
+	MCFG_Z80PIO_ADD("z80pio", XTAL_4MHz, pio_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
