@@ -40,6 +40,8 @@
 #define CENTRONICS_TAG			"centronics"
 #define TIMER_KB_TAG			"timer_kb"
 #define TIMER_SIO_TAG			"timer_sio"
+#define TIMER_ACK_TAG			"timer_ack"
+#define TIMER_RST_TAG			"timer_rst"
 #define SASIBUS_TAG				"sasi"
 
 #define V1050_VIDEORAM_SIZE		0x8000
@@ -72,6 +74,8 @@ public:
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
 		  m_timer_sio(*this, TIMER_SIO_TAG),
+		  m_timer_ack(*this, TIMER_ACK_TAG),
+		  m_timer_rst(*this, TIMER_RST_TAG),
 		  m_sasibus(*this, SASIBUS_TAG)
 	{ }
 
@@ -88,6 +92,8 @@ public:
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 	required_device<timer_device> m_timer_sio;
+	required_device<timer_device> m_timer_ack;
+	required_device<timer_device> m_timer_rst;
 	required_device<device_t> m_sasibus;
 
 	virtual void machine_start();
@@ -124,8 +130,6 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
-	DECLARE_READ8_MEMBER( sasi_data_r );
-	DECLARE_WRITE8_MEMBER( sasi_data_w );
 	DECLARE_READ8_MEMBER( sasi_status_r );
 	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
 
