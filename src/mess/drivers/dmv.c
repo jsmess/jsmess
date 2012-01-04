@@ -44,6 +44,24 @@ static SCREEN_UPDATE( dmv )
     return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout dmv_charlayout =
+{
+	8, 16,					/* 8 x 16 characters */
+	128,					/* 128 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{ STEP16(0,8) },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( dmv )
+	GFXDECODE_ENTRY("maincpu", 0x1000, dmv_charlayout, 0, 1)
+GFXDECODE_END
+
 static MACHINE_CONFIG_START( dmv, dmv_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -61,6 +79,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
     MCFG_SCREEN_UPDATE(dmv)
 
+	MCFG_GFXDECODE(dmv)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
