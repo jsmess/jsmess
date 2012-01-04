@@ -172,12 +172,10 @@ UINT8 scsi_data_r(device_t *device)
 
         case SCSI_PHASE_STATUS :
             result=bus->status;		// return command status
-            bus->cmd_idx++;
             break;
 
         case SCSI_PHASE_MESSAGE_IN :
             result=0;              // no errors for the time being !
-            bus->cmd_idx++;
             break;
     }
 
@@ -287,8 +285,8 @@ READ_LINE_DEVICE_HANDLER( scsi_cd_r ) { return get_scsi_line(device, SCSI_LINE_C
 READ_LINE_DEVICE_HANDLER( scsi_io_r ) { return get_scsi_line(device, SCSI_LINE_IO); }
 READ_LINE_DEVICE_HANDLER( scsi_msg_r ) { return get_scsi_line(device, SCSI_LINE_MSG); }
 READ_LINE_DEVICE_HANDLER( scsi_req_r ) { return get_scsi_line(device, SCSI_LINE_REQ); }
-READ_LINE_DEVICE_HANDLER( scsi_ack_r ) { return get_scsi_line(device, SCSI_LINE_RESET); }
-READ_LINE_DEVICE_HANDLER( scsi_rst_r ) { return get_scsi_line(device, SCSI_LINE_ACK); }
+READ_LINE_DEVICE_HANDLER( scsi_ack_r ) { return get_scsi_line(device, SCSI_LINE_ACK); }
+READ_LINE_DEVICE_HANDLER( scsi_rst_r ) { return get_scsi_line(device, SCSI_LINE_RESET); }
 
 void set_scsi_line(device_t *device, UINT8 line, UINT8 state)
 {
@@ -720,8 +718,11 @@ static void scsi_in_line_changed(device_t *device, UINT8 line, UINT8 state)
                     else
                         scsi_out_line_change(device,SCSI_LINE_REQ,0);
                 }
-                else
+				else
+				{
+					bus->cmd_idx++;
                     scsi_out_line_change(device,SCSI_LINE_REQ,1);
+				}
             }
             break;
 
@@ -741,7 +742,10 @@ static void scsi_in_line_changed(device_t *device, UINT8 line, UINT8 state)
                         scsi_out_line_change(device,SCSI_LINE_REQ,0);
                 }
                 else
+				{
+					bus->cmd_idx++;
                     scsi_out_line_change(device,SCSI_LINE_REQ,1);
+				}
             }
             break;
     }

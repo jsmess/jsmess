@@ -100,6 +100,7 @@ Notes:
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
     - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
 
+		chdman -createblankhd tm501.chd 306 2 17 512
         chdman -createblankhd cm5412.chd 306 4 17 512
 
 */
@@ -342,30 +343,6 @@ WRITE8_MEMBER( v1050_state::dvint_clr_w )
 	device_set_input_line(m_subcpu, INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-READ8_MEMBER( v1050_state::sasi_data_r )
-{
-	// read data
-	UINT8 data = scsi_data_r(m_sasibus);
-
-	logerror("SASI data read %02x\n", data);
-	
-	// acknowledge
-	scsi_ack_w(m_sasibus, 0);
-
-	return data;
-}
-
-WRITE8_MEMBER( v1050_state::sasi_data_w )
-{
-	logerror("SASI data write %02x\n", data);
-
-	// write data
-	scsi_data_w(m_sasibus, data);
-	
-	// acknowledge
-	scsi_ack_w(m_sasibus, 0);
-}
-
 READ8_MEMBER( v1050_state::sasi_status_r )
 {
 	/*
@@ -394,6 +371,20 @@ READ8_MEMBER( v1050_state::sasi_status_r )
 	return data;
 }
 
+static TIMER_DEVICE_CALLBACK( sasi_ack_tick )
+{
+	v1050_state *state = timer.machine().driver_data<v1050_state>();
+
+	scsi_ack_w(state->m_sasibus, 1);
+}
+
+static TIMER_DEVICE_CALLBACK( sasi_rst_tick )
+{
+	v1050_state *state = timer.machine().driver_data<v1050_state>();
+
+	scsi_rst_w(state->m_sasibus, 1);
+}
+
 WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 {
 	/*
@@ -412,8 +403,22 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 	*/
 
 	scsi_sel_w(m_sasibus, !BIT(data, 0));
-	scsi_ack_w(m_sasibus, BIT(data, 1));
-	scsi_rst_w(m_sasibus, !BIT(data, 7));
+	
+	if (BIT(data, 1))
+	{
+		// send acknowledge pulse
+		scsi_ack_w(m_sasibus, 0);
+		
+		m_timer_ack->adjust(attotime::from_nsec(100));
+	}
+	
+	if (BIT(data, 7))
+	{
+		// send reset pulse
+		scsi_rst_w(m_sasibus, 0);
+		
+		m_timer_rst->adjust(attotime::from_nsec(100));
+	}
 }
 
 // Memory Maps
@@ -444,7 +449,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_READWRITE(sasi_data_r, sasi_data_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE_LEGACY(SASIBUS_TAG, scsi_data_r, scsi_data_w)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(sasi_status_r, sasi_ctrl_w)
 ADDRESS_MAP_END
 
@@ -1111,8 +1116,14 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(v1050_floppy_interface)
 	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
 	MCFG_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
+	
+	// SASI bus
     MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
+	MCFG_TIMER_ADD(TIMER_ACK_TAG, sasi_ack_tick)
+	MCFG_TIMER_ADD(TIMER_RST_TAG, sasi_rst_tick)
 	MCFG_HARDDISK_ADD("harddisk0")
+	
+	// keyboard
 	MCFG_V1050_KEYBOARD_ADD()
 
 	// software lists
