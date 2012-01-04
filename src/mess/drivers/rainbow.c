@@ -20,9 +20,13 @@ public:
 			{ }
 	required_device<device_t> m_crtc;
 	UINT8 *m_p_ram;
+	UINT8 m_diagnostic;
 	
 	DECLARE_READ8_MEMBER(read_video_ram_r);
 	DECLARE_WRITE8_MEMBER(clear_video_interrupt);
+	
+	DECLARE_READ8_MEMBER(diagnostic_r);
+	DECLARE_WRITE8_MEMBER(diagnostic_w);
 };
 
 
@@ -36,9 +40,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)	
 	// 0x04 Video processor DC011
 	AM_RANGE (0x04, 0x04) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc011_w)
+	
+	AM_RANGE (0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
 	// 0x0C Video processor DC012
 	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc012_w)	
 ADDRESS_MAP_END
@@ -76,6 +82,16 @@ READ8_MEMBER( rainbow_state::read_video_ram_r )
 
 WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
 {
+}
+
+READ8_MEMBER( rainbow_state::diagnostic_r )
+{
+	return m_diagnostic | 0x0e;
+}
+
+WRITE8_MEMBER( rainbow_state::diagnostic_w )
+{
+	m_diagnostic = data;
 }
 
 static const vt_video_interface video_interface =
