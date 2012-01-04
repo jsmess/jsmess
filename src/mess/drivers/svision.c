@@ -12,10 +12,10 @@
 #include "imagedev/cartslot.h"
 #include "svision.lh"
 
-#define MAKE8_RGB15(red3, green3, blue2) ( ( (red3)<<(10+2)) | ( (green3)<<(5+2)) | ( (blue2)<<(0+3)) )
-#define MAKE9_RGB15(red3, green3, blue3) ( ( (red3)<<(10+2)) | ( (green3)<<(5+2)) | ( (blue3)<<(0+2)) )
-#define MAKE12_RGB15(red4, green4, blue4) ( ( (red4)<<(10+1)) | ((green4)<<(5+1)) | ((blue4)<<(0+1)) )
-#define MAKE24_RGB15(red8, green8, blue8) ( (((red8)&0xf8)<<(10-3)) | (((green8)&0xf8)<<(5-3)) | (((blue8)&0xf8)>>3) )
+#define MAKE8_RGB32(red3, green3, blue2) ( ( (red3)<<(16+5)) | ( (green3)<<(8+5)) | ( (blue2)<<(0+6)) )
+#define MAKE9_RGB32(red3, green3, blue3) ( ( (red3)<<(16+5)) | ( (green3)<<(8+5)) | ( (blue3)<<(0+5)) )
+#define MAKE12_RGB32(red4, green4, blue4) ( ( (red4)<<(16+4)) | ((green4)<<(8+4)) | ((blue4)<<(0+4)) )
+#define MAKE24_RGB32(red8, green8, blue8) ( (((red8)&0xf8)<<16) | (((green8)&0xf8)<<8) | (((blue8)&0xf8)) )
 
 
 // in pixel
@@ -191,18 +191,18 @@ static WRITE8_HANDLER(tvlink_w)
 			if (state->m_tvlink.palette_on)
 			{
 				// hack, normally initialising with palette from ram
-				state->m_tvlink.palette[0] = MAKE12_RGB15(163/16,172/16,115/16); // these are the tron colors messured from screenshot
-				state->m_tvlink.palette[1] = MAKE12_RGB15(163/16,155/16,153/16);
-				state->m_tvlink.palette[2] = MAKE12_RGB15(77/16,125/16,73/16);
-				state->m_tvlink.palette[3] = MAKE12_RGB15(59/16,24/16,20/16);
+				state->m_tvlink.palette[0] = MAKE12_RGB32(163/16,172/16,115/16); // these are the tron colors messured from screenshot
+				state->m_tvlink.palette[1] = MAKE12_RGB32(163/16,155/16,153/16);
+				state->m_tvlink.palette[2] = MAKE12_RGB32(77/16,125/16,73/16);
+				state->m_tvlink.palette[3] = MAKE12_RGB32(59/16,24/16,20/16);
 			}
 			else
 			{
 				// cleaner to use colors from compile time palette, or compose from "fixed" palette values
-				state->m_tvlink.palette[0]=MAKE12_RGB15(0,0,0);
-				state->m_tvlink.palette[1]=MAKE12_RGB15(5*16/256,18*16/256,9*16/256);
-				state->m_tvlink.palette[2]=MAKE12_RGB15(48*16/256,76*16/256,100*16/256);
-				state->m_tvlink.palette[3]=MAKE12_RGB15(190*16/256,190*16/256,190*16/256);
+				state->m_tvlink.palette[0]=MAKE12_RGB32(0,0,0);
+				state->m_tvlink.palette[1]=MAKE12_RGB32(5*16/256,18*16/256,9*16/256);
+				state->m_tvlink.palette[2]=MAKE12_RGB32(48*16/256,76*16/256,100*16/256);
+				state->m_tvlink.palette[3]=MAKE12_RGB32(190*16/256,190*16/256,190*16/256);
 			}
 			break;
 		default:
@@ -219,13 +219,13 @@ static WRITE8_HANDLER(tvlink_w)
 					state->m_reg[0x0807]=0x00;
 				}
 				c = state->m_reg[0x800] | (state->m_reg[0x804] << 8);
-				state->m_tvlink.palette[0] = MAKE9_RGB15( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				state->m_tvlink.palette[0] = MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
 				c = state->m_reg[0x801] | (state->m_reg[0x805] << 8);
-				state->m_tvlink.palette[1] = MAKE9_RGB15( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				state->m_tvlink.palette[1] = MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
 				c = state->m_reg[0x802] | (state->m_reg[0x806]<<8);
-				state->m_tvlink.palette[2]=MAKE9_RGB15( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				state->m_tvlink.palette[2]=MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
 				c = state->m_reg[0x803] | (state->m_reg[0x807]<<8);
-				state->m_tvlink.palette[3]=MAKE9_RGB15( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				state->m_tvlink.palette[3]=MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
 				/* writes to palette effect video color immediately */
 				/* some writes modify other registers, */
 				/* encoding therefor not known (rgb8 or rgb9) */
@@ -395,7 +395,7 @@ static SCREEN_UPDATE( tvlink )
 	{
 		for (y = 0; y < 160; y++)
 		{
-			UINT16 *line = &bitmap.pix16(y, 3 - (XPOS & 3));
+			UINT32 *line = &bitmap.pix32(y, 3 - (XPOS & 3));
 			for (x = 3 - (XPOS & 3), i = 0; x < 160 + 3 && x < XSIZE + 3; x += 4, i++)
 			{
 				UINT8 b=videoram[j+i];
@@ -511,10 +511,10 @@ static MACHINE_RESET( tvlink )
 	memset(state->m_reg + 0x800, 0xff, 0x40); // normally done from state->m_tvlink microcontroller
 	state->m_reg[0x82a] = 0xdf;
 
-	state->m_tvlink.palette[0] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+0)*3+0], svisionp_palette[(PALETTE_START+0)*3+1], svisionp_palette[(PALETTE_START+0)*3+2]);
-	state->m_tvlink.palette[1] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+1)*3+0], svisionp_palette[(PALETTE_START+1)*3+1], svisionp_palette[(PALETTE_START+1)*3+2]);
-	state->m_tvlink.palette[2] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+2)*3+0], svisionp_palette[(PALETTE_START+2)*3+1], svisionp_palette[(PALETTE_START+2)*3+2]);
-	state->m_tvlink.palette[3] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
+	state->m_tvlink.palette[0] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+0)*3+0], svisionp_palette[(PALETTE_START+0)*3+1], svisionp_palette[(PALETTE_START+0)*3+2]);
+	state->m_tvlink.palette[1] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+1)*3+0], svisionp_palette[(PALETTE_START+1)*3+1], svisionp_palette[(PALETTE_START+1)*3+2]);
+	state->m_tvlink.palette[2] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+2)*3+0], svisionp_palette[(PALETTE_START+2)*3+1], svisionp_palette[(PALETTE_START+2)*3+2]);
+	state->m_tvlink.palette[3] = MAKE24_RGB32(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
 static MACHINE_CONFIG_START( svision, svision_state )
@@ -582,7 +582,7 @@ static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 	MCFG_MACHINE_RESET( tvlink )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_UPDATE( tvlink )
 
 MACHINE_CONFIG_END

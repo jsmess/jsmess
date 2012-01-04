@@ -23,7 +23,7 @@ typedef struct
 
 typedef struct
 {
-	UINT16 palette[4/*0x40?*/]; /* rgb8 */
+	UINT32 palette[4/*0x40?*/]; /* rgb8 */
 	int palette_on;
 } tvlink_t;
 
