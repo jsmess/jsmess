@@ -220,14 +220,13 @@ SCREEN_UPDATE( newport )
 	for( y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
 		UINT32 *src = &pNVID->base[1344 * y];
-		UINT16 *dest = &bitmap.pix16(y, cliprect.min_x);
+		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
 		int x;
 
 		/* loop over columns */
 		for( x = cliprect.min_x; x < cliprect.max_x; x++ )
 		{
-			UINT32 nPix = *src++;
-			*dest++ = ( ( nPix & 0x00f80000 ) >> 9 ) | ( ( nPix & 0x0000f800 ) >> 6 ) | ( ( nPix & 0x000000f8 ) >> 3 );
+			*dest++ = (*src++) & 0x00f8f8f8;
 		}
 	}
 	return 0;
