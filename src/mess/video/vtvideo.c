@@ -286,6 +286,60 @@ void vt_video_update(device_t *device, bitmap_t &bitmap, const rectangle &clipre
 
 }
 
+
+void rainbow_video_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+{
+	vt_video_t *vt = get_safe_token(device);
+
+	UINT16 addr = 0;
+	UINT16 attr_addr = 0;
+	int line = 0;
+	int xpos = 0;
+	int ypos = 0;
+	UINT8 code;
+	int x = 0;
+	UINT8 scroll_region = 1; // binary 1
+	UINT8 display_type = 3;  // binary 11
+	UINT16 temp =0;
+
+	while(line < (vt->height + vt->skip_lines)) {
+		code =  vt->in_ram_func(addr + xpos);
+		if (code == 0xff) {
+			// end of line, fill empty till end of line
+			if (line >= vt->skip_lines) {
+				for(x = xpos; x < ((display_type==2) ? (vt->columns / 2) : vt->columns); x++ )
+				{
+					vt_video_display_char(device,bitmap,code,x,ypos,scroll_region,display_type);
+				}
+			}
+			// move to new data
+			temp = vt->in_ram_func(addr+xpos+2)*256 + vt->in_ram_func(addr+xpos+1);
+			addr = (temp) & 0x0fff;
+			attr_addr = ((temp) & 0x1fff) - 2;
+			// if A12 is 1 then it is 0x2000 block, if 0 then 0x4000 (AVO)
+			if (temp & 0x1000) attr_addr &= 0xfff; else attr_addr |= 0x1000;
+			temp = vt->in_ram_func(attr_addr);
+			scroll_region = (temp) & 1;
+			display_type  = (temp>> 1) & 3;
+			if (line >= vt->skip_lines) {
+				ypos++;
+			}
+			xpos=0;
+			line++;
+		} else {
+			// display regular char
+			if (line >= vt->skip_lines) {
+				vt_video_display_char(device,bitmap,code,xpos,ypos,scroll_region,display_type);
+			}
+			xpos++;
+			if (xpos > vt->columns) {
+				line++;
+				xpos=0;
+			}
+		}
+	}
+
+}
 /*-------------------------------------------------
     DEVICE_START( vt_video )
 -------------------------------------------------*/
