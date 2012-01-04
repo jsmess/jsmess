@@ -100,9 +100,11 @@ Notes:
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
     - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
 
-		chdman -createblankhd tm501.chd 306 2 17 512
+		chdman -createblankhd tm501.chd 306 2 32 256
         chdman -createblankhd cm5412.chd 306 4 17 512
 
+	- scsihd.c does not support 256 byte sectors
+	
 */
 
 #include "includes/v1050.h"
