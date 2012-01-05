@@ -538,6 +538,16 @@ static void scsibus_exec_command(device_t *device)
             bus->bytes_left=0;
 			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
 			break;
+
+		// Commodore D9060/9090
+		case SCSI_CMD_PHYSICAL_DEVICE_ID :
+			LOG(1,"SCSIBUS: physical device ID\n");
+            command_local=1;
+			bus->xfer_count=0;
+            bus->data_last=bus->xfer_count;
+            bus->bytes_left=0;
+			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
+			break;	
 	}
 
 
