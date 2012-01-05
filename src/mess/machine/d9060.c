@@ -13,6 +13,12 @@
 
     - scsihd.c wants the harddisk device to be at the driver level
     - scsihd.c/scsibus.c have a fixed block size of 512
+	- D9090 uses unsupported SASI command (Vendor specific, Physical Device Identification)
+	
+		sending command 0xC0 to ScsiID 0
+		C0 04 00 98 05 1F 
+
+		(no context): SCSIDEV unknown command c0
 
 */
 

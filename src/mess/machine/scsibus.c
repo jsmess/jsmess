@@ -919,7 +919,7 @@ int get_scsi_cmd_len(int cbyte)
 
 	group = (cbyte>>5) & 7;
 
-	if (group == 0 || group == 7 || group == 3) return 6;
+	if (group == 0 || group == 3 || group == 6 || group == 7) return 6;
 	if (group == 1 || group == 2) return 10;
 	if (group == 5) return 12;
 
