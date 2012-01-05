@@ -296,7 +296,8 @@ ROM_END
 
 ROM_START( oc118 )
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
-	ROM_LOAD_OPTIONAL( "oc118.u3", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD_OPTIONAL( "oc118a.u3", 0x0000, 0x4000, CRC(edf18265) SHA1(47a7c4bdcc20ecc5e59d694b151f493229becaea) ) // scrambled address/data lines?
+	ROM_LOAD_OPTIONAL( "oc118b.u3", 0x0000, 0x4000, CRC(b39e4600) SHA1(991132fcc6e70e9a428062ae76055a150f2f7ac6) ) // scrambled address/data lines?
 	ROM_LOAD( "jiffydos v5.0.u3", 0x0000, 0x4000, CRC(46c3302c) SHA1(e3623658cb7af30c9d3bce2ba3b6ad5ee89ac1b8) )
 ROM_END
 
