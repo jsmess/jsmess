@@ -49,8 +49,6 @@ DECLARE_LEGACY_DEVICE(SCSIBUS, scsibus);
 #define CMD_BUF_SIZE    			32
 #define ADAPTEC_BUF_SIZE			1024
 
-#define DATA_BLOCK_SIZE				512
-
 #define SCSI_CMD_TEST_READY			0x00
 #define SCSI_CMD_RECALIBRATE		0x01
 #define SCSI_CMD_REQUEST_SENSE		0x03
@@ -216,6 +214,6 @@ UINT8 scsibus_driveno(UINT8  drivesel);
 int get_scsi_cmd_len(int cbyte);
 
 /* Initialisation at machine reset time */
-void init_scsibus(device_t *device);
+void init_scsibus(device_t *device, int sectorbytes);
 
 #endif

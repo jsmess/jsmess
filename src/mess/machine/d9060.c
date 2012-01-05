@@ -7,15 +7,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - scsihd.c wants the harddisk device to be at the driver level
-    - scsihd.c/scsibus.c have a fixed block size of 512
-
-*/
-
 #include "d9060.h"
 
 
@@ -476,7 +467,7 @@ static MACHINE_CONFIG_FRAGMENT( d9060 )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_4MHz/4, via_intf)
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
-	//MCFG_HARDDISK_ADD("harddisk0") this needs to be in pet.c for now
+	MCFG_HARDDISK_ADD("harddisk0")
 MACHINE_CONFIG_END
 
 
@@ -574,7 +565,7 @@ void base_d9060_device::device_start()
 
 void base_d9060_device::device_reset()
 {
-	init_scsibus(m_sasibus);
+	init_scsibus(m_sasibus, 256);
 
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);

@@ -57,6 +57,7 @@ struct _scsibus_t
 	int         xfer_count;
 	int         bytes_left;
 	int         data_last;
+	int			sectorbytes;
 
 	emu_timer   *req_timer;
 	emu_timer   *ack_timer;
@@ -127,7 +128,7 @@ static void dump_data_bytes(scsibus_t   *bus, int count)
 
 static void scsibus_read_data(scsibus_t   *bus)
 {
-    bus->data_last = (bus->bytes_left >= DATA_BLOCK_SIZE) ? DATA_BLOCK_SIZE : bus->bytes_left;
+    bus->data_last = (bus->bytes_left >= bus->sectorbytes) ? bus->sectorbytes : bus->bytes_left;
 
     LOG(2,"SCSIBUS:scsibus_read_data bus->bytes_left=%04X, bus->data_last=%04X, bus->xfer_count=%04X\n",bus->bytes_left,bus->data_last,bus->xfer_count);
 
@@ -141,11 +142,11 @@ static void scsibus_read_data(scsibus_t   *bus)
 
 static void scsibus_write_data(scsibus_t   *bus)
 {
-    if(bus->bytes_left >= DATA_BLOCK_SIZE)
+    if(bus->bytes_left >= bus->sectorbytes)
     {
-        SCSIWriteData(bus->devices[bus->last_id], bus->data, DATA_BLOCK_SIZE);
+        SCSIWriteData(bus->devices[bus->last_id], bus->data, bus->sectorbytes);
 
-        bus->bytes_left-=DATA_BLOCK_SIZE;
+        bus->bytes_left-=bus->sectorbytes;
         bus->data_idx=0;
     }
 }
@@ -164,7 +165,7 @@ UINT8 scsi_data_r(device_t *device)
 
             // check to see if we have reached the end of the block buffer
             // and that there is more data to read from the scsi disk
-            if((bus->data_idx==DATA_BLOCK_SIZE) && (bus->bytes_left>0) && IS_READ_COMMAND())
+            if((bus->data_idx==bus->sectorbytes) && (bus->bytes_left>0) && IS_READ_COMMAND())
             {
                 scsibus_read_data(bus);
             }
@@ -237,7 +238,7 @@ void scsi_data_w(device_t *device, UINT8 data)
 			}
 
             // If the data buffer is full, and we are writing blocks flush it to the SCSI disk
-            if((bus->data_idx == DATA_BLOCK_SIZE) && IS_WRITE_COMMAND())
+            if((bus->data_idx == bus->sectorbytes) && IS_WRITE_COMMAND())
                 scsibus_write_data(bus);
             break;
     }
@@ -938,7 +939,7 @@ int get_scsi_cmd_len(int cbyte)
 	return 6;
 }
 
-void init_scsibus(device_t *device)
+void init_scsibus(device_t *device, int sectorbytes)
 {
     scsibus_t               *bus = get_token(device);
     const SCSIConfigTable   *scsidevs = bus->interface->scsidevs;
@@ -955,6 +956,8 @@ void init_scsibus(device_t *device)
 
         bus->initialised=1;
     }
+	
+	bus->sectorbytes = sectorbytes;
 }
 
 static DEVICE_START( scsibus )
