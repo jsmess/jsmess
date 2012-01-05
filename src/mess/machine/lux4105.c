@@ -182,7 +182,7 @@ void luxor_4105_device::device_start()
 
 void luxor_4105_device::device_reset()
 {
-	init_scsibus(m_sasibus);
+	init_scsibus(m_sasibus, 512);
 
 	m_cs = 0;
 	m_data = 0;

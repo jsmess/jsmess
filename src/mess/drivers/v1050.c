@@ -102,8 +102,6 @@ Notes:
 
 		chdman -createblankhd tm501.chd 306 2 32 256
         chdman -createblankhd cm5412.chd 306 4 17 512
-
-	- scsihd.c does not support 256 byte sectors
 	
 */
 
@@ -1030,7 +1028,7 @@ void v1050_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	// initialize SASI bus
-	init_scsibus(m_sasibus);
+	init_scsibus(m_sasibus, 256);
 
 	// initialize I8214
 	m_pic->etlg_w(1);
