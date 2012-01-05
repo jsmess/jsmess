@@ -3,6 +3,7 @@
 <!--
 List of mostly undumped cartridges:
 http://www.retroport.de/C64_C128_Hardware.html
+http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 -->
 <softwarelist name="c64_cart" description="Commodore 64 cartridges">
 
@@ -987,6 +988,317 @@ http://www.retroport.de/C64_C128_Hardware.html
 
 			<dataarea name="rom" size="0x4000">
 				<rom name="stardos.bin" size="0x4000" crc="feda3c5d" sha1="8a6851ae17f99d2b76f7548119c20eb7f68326da" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bi80" supported="no">
+		<description>BI-80</description>
+		<year>1984</year>
+		<publisher>Batteries Included</publisher>
+		<!--
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="bi80" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x1000">
+				<rom name="bi80.bin" size="0x1000" crc="6bd582c7" sha1="0d9eecbaaad06aa95e8907379dea62d89bf8254a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ramlink" supported="no">
+		<description>RAMLink</description>
+		<year>1990</year>
+		<publisher>Creative Micro Designs</publisher>
+		<!--
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="ramlink" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x10000">
+				<rom name="ramlink1.bin" size="0x8000" crc="da953716" sha1="adde7308c7155fc1942c98b674189e89f4965f91" offset="0x0000" />
+				<rom name="ramlink2.bin" size="0x8000" crc="ab8b6dda" sha1="e35e776387bd8b9ab16bacff70c2a3f3ef9b65bd" offset="0x8000" />
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grappler" supported="no">
+		<description>Grappler CD</description>
+		<year>1984</year>
+		<publisher>Orange Micro</publisher>
+		<!--
+		-->
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="grappler" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="grap.u6" size="0x1000" crc="7d26ca10" sha1="7c21199ec71ee691b9e67f1e1103c801123e75a5" offset="0x0000" />
+				<rom name="grap.u5" size="0x1000" crc="899467df" sha1="71ff1989b792dc027872c7a688102427d12d7c81" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hrdcpytb">
+		<description>Hardcopy+Turbo-Modul (Ger)</description>
+		<year>1985</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX 9505" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="rex9505.bin" size="0x2000" crc="fa9d4ac3" sha1="c1fc837228e7be3ee2f8961e57bd6b6f3d48334a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="spdtape">
+		<description>Speed-Tape (Ger)</description>
+		<year>1985</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX 9510" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="rex9510.bin" size="0x2000" crc="46b3ee3d" sha1="699846aa90609c38a18603ba8c420360e1112066" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="epbnk256" supported="no">
+		<description>Eprom Bank 256k (Ger)</description>
+		<year>198?</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX 9513" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="rex9513.bin" size="0x2000" crc="eb7342aa" sha1="6c2ecd59522fa3035388c66eec6a4ecbb2106d6a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ppm" supported="no">
+		<description>Picture-Printer Modul (Ger)</description>
+		<year>1986</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX 9545" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="rex9545.bin" size="0x2000" crc="a51817c2" sha1="5540931a04002951c3eb316d106054a365097f23" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="turbodsk" supported="no">
+		<description>Turbo-Disk</description>
+		<year>198?</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX 9583" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="rex9510.bin" size="0x2000" crc="f5aba609" sha1="3296ab9fd47183d193dcbf4d793e400bd1801372" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="goliath" supported="no">
+		<description>1MB Goliath Eprom-Cart (Ger)</description>
+		<year>19??</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX 9600" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="goliath" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="rex9600.bin" size="0x4000" crc="81adb366" sha1="7d065e0b45258f3b3e3398090f428587c1eec466" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+		
+	<software name="qkbyte2" supported="no">
+		<description>Quickbyte II (Ger)</description>
+		<year>1986</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX 9603" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="quickbyte2" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="quickbyte2_rex.bin" size="0x4000" crc="e177fe30" sha1="f87b396348b3bb36d14d7593925c9f164db27f2b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="qkbyte2j" cloneof="qkbyte2" supported="no">
+		<description>Quickbyte II</description>
+		<year>1986</year>
+		<publisher>Jann Datentechnik</publisher>
+		<info name="serial" value="REX 9603" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="quickbyte2" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="quickbyte2_jann.bin" size="0x4000" crc="ca40950d" sha1="c6aa067d5c32f7dace4e79e3b73421651ff93d41" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardcopy">
+		<description>Hardcopy-Modul (Ger)</description>
+		<year>19??</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX 9629" />
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="rex_utility" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="rex9629.bin" size="0x2000" crc="b2accac5" sha1="5f10917fa99ef0b4898c829873c0f7c7dbabce4c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="flash8" supported="no">
+		<description>Flash 8</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="flash8" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="rex9629.bin" size="0x8000" crc="3c4fb703" sha1="6608127419ded5909f3fd9aa871146b8c26d438a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="compieee" supported="no">
+		<description>Computapix IEEE-488</description>
+		<year>19??</year>
+		<publisher>Pixstik</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="computapix_ieee488" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x1000">
+				<rom name="dams.bin" size="0x1000" crc="0af8f00a" sha1="d6282daabd08af8aa83815efe41712b270519d50" offset="0x0000" /> <!-- scrambled address/data -->
+				<rom name="dams_decoded.bin" size="0x1000" crc="21ca0eba" sha1="9d6477332c4c49267f7d105e63fa35e585311254" offset="0x0000" status="baddump" /> <!-- decoded -->
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="msdcie" supported="no">
+		<description>C64-IEEE</description>
+		<year>19??</year>
+		<publisher>Micro Systems Development</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="msd_ieee488" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x400">
+				<rom name="msd cie (telesys) ieee interface.bin" size="0x400" crc="2ff6de42" sha1="f43654fc264d0a6f8229119bf149f1443024d0f5" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cie utilities.d64" size="174848" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="stkieee" supported="no">
+		<description>Stack IEEE-488</description>
+		<year>19??</year>
+		<publisher>Stack</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="stack_ieee488" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x1000">
+				<rom name="stack ieee cartridge.bin" size="0x1000" crc="7457922c" sha1="4c1a22121a6af76ed4d2f45dd4e417bc7682c0e0" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="cbmieee" supported="no">
+		<description>Commodore IEEE-488</description>
+		<year>19??</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="cbm_ieee488" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x1000">
+				<rom name="commodore ieee-488 cartridge.bin" size="0x1000" crc="e894e448" sha1="c62b88b73d79b485ebb250d56065dfa54b8baf4c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="tforieee" supported="no">
+		<description>Technofor IEEE Interface</description>
+		<year>1984</year>
+		<publisher>Technofor</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="technofor_ieee488" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x1000">
+				<rom name="technofor ieee interface.bin" size="0x1000" crc="0be30815" sha1="40b76f38259a69d02867e51492ab279dddbbd380" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="hobbiel" supported="no">
+		<description>Hobbi Elektronika (Hun)</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="hobbi_elektronika" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="hobbi elektronika.bin" size="0x4000" crc="a4ab3bdc" sha1="884cacee1b1a7f811db97fb11c59c797d16b3602" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="dela7x8k" supported="no">
+		<description>7x8K-EPROM-Bank (Ger)</description>
+		<year>19??</year>
+		<publisher>Dela Elektronik</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="dela_7x8k" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="dela_7x8k-eprom-bank.bin" size="0x2000" crc="546d7ea8" sha1="6ab7a279144bcaaa20e7b2d12d67d3ed5cc3f6b6" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4300,7 +4612,7 @@ http://www.retroport.de/C64_C128_Hardware.html
 	</software>
 
 	<software name="delas4">
-		<description>Dela S-4-Modul</description>
+		<description>Dela S/4-Modul</description>
 		<year>19??</year>
 		<publisher>Dela Elektronik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -4308,6 +4620,22 @@ http://www.retroport.de/C64_C128_Hardware.html
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="dela s4 modul (19xx)(dela elektronik).80" size="0x2000" crc="f3988344" sha1="0d373df666f6cbb013a4fc97f6dade84f73407e5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="delas4a" cloneof="delas4">
+		<description>Dela S/4-Modul (Alt)</description>
+		<year>19??</year>
+		<publisher>Dela Elektronik</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="dela_80_steuerprogram.bin" size="0x2000" crc="3033f87a" sha1="f5dbeee929a5b168ba43ea0e1a8b621ba944c32e" offset="0x0000" />
+			</dataarea>
+			<dataarea name="romh" size="0x2000">
+				<rom name="dela_80_zeichensatz.bin" size="0x2000" crc="8b6b24ae" sha1="beb85d8c22a1430aaed9884af16b429f7ff123e0" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
