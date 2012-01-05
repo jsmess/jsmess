@@ -2673,7 +2673,7 @@ static DEVICE_START( vic2 )
 
 	device->save_item(NAME(vic2->on));
 
-	device->save_item(NAME(vic2->bitmap));
+	//device->save_item(NAME(vic2->bitmap));
 
 	device->save_item(NAME(vic2->chargenaddr));
 	device->save_item(NAME(vic2->videoaddr));
