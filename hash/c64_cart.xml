@@ -734,21 +734,6 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="ieee488" supported="no">
-		<description>IEEE-488</description>
-		<year>198?</year>
-		<publisher>Commodore</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="cart_type" value="ieee488" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="roml" size="0x2000">
-				<rom name="ieee488.bin" size="0x1000" crc="e894e448" sha1="c62b88b73d79b485ebb250d56065dfa54b8baf4c" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="magicvce" supported="no">
 		<description>Magic Voice</description>
 		<year>1984</year>
@@ -1302,7 +1287,35 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="c64link">
+		<description>C64-Link</description>
+		<year>1982</year>
+		<publisher>Richvale Telecommunications</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="c64link" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="rtclink1.bin" size="0x1000" crc="07a33c49" sha1="5EC53BC279AFECB74BC65F3F008A2694BC78F2F1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="c64link2">
+		<description>C64-Link II</description>
+		<year>1984</year>
+		<publisher>Richvale Telecommunications</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="cart_type" value="c64link2" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="rtclink2.bin" size="0x2000" crc="fdf72b67" sha1="3b9cd0f52170ca2ad38789af094ed4f15bd83a11" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Games Added by k1w1 -->
 
 	<software name="advcrtor">
