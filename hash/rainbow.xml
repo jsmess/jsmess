@@ -33,7 +33,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204393">
-				<rom name="cpmv11.td0" size="204393" crc="38f9ad05" sha1="ec39d974cdb757573ce026de84056dad08df3ce3a" offset="0" />
+				<rom name="cpmv11.td0" size="204393" crc="38f9ad05" sha1="ec39d974cdb757573ce026de84056dad08df3ce3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
