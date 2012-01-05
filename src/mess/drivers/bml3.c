@@ -101,6 +101,7 @@ static SCREEN_UPDATE( bml3 )
 			int tile = vram[count+0x0000];
 			int color = vram[count+0x4000] & 7;
 			int reverse = vram[count+0x4000] & 8;
+			int h_factor = (height^1) + 1;
 			//attr & 0x10 is used ... bitmap mode? (apparently bits 4 and 7 are used for that)
 
 			for(yi=0;yi<8;yi++)
@@ -110,17 +111,11 @@ static SCREEN_UPDATE( bml3 )
 					int pen;
 
 					if(reverse)
-						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
+						pen = (state->m_p_chargen[tile*16+yi*h_factor] >> (7-xi) & 1) ? 0 : color;
 					else
-						pen = (state->m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? color : 0;
+						pen = (state->m_p_chargen[tile*16+yi*h_factor] >> (7-xi) & 1) ? color : 0;
 
-					if(height)
-					{
-						bitmap.pix16((y*8+yi)*2+0, x*8+xi) = pen;
-						bitmap.pix16((y*8+yi)*2+1, x*8+xi) = pen;
-					}
-					else
-						bitmap.pix16(y*8+yi, x*8+xi) = pen;
+					bitmap.pix16(y*8+yi, x*8+xi) = pen;
 				}
 			}
 
@@ -515,21 +510,49 @@ static MACHINE_RESET(bml3)
 }
 
 /* F4 Character Displayer */
-static const gfx_layout bml3_charlayout =
+static const gfx_layout bml3_charlayout8x8even =
 {
 	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
+	RGN_FRAC(1,1),					/* 256 characters */
 	1,					/* 1 bits per pixel */
 	{ 0 },					/* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	{ 0*8, 2*8,4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
+	8*16					/* every char takes 8 bytes */
+};
+
+static const gfx_layout bml3_charlayout8x8odd =
+{
+	8, 8,					/* 8 x 8 characters */
+	RGN_FRAC(1,1),					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 1*8, 3*8, 5*8, 7*8, 9*8, 11*8, 13*8, 15*8 },
+	8*16					/* every char takes 8 bytes */
+};
+
+static const gfx_layout bml3_charlayout8x16 =
+{
+	8, 16,					/* 8 x 8 characters */
+	RGN_FRAC(1,1),					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( bml3 )
-	GFXDECODE_ENTRY( "chargen", 0, bml3_charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "chargen", 0, bml3_charlayout8x8even, 0, 4 )
+	GFXDECODE_ENTRY( "chargen", 0, bml3_charlayout8x8odd, 0, 4 )
+	GFXDECODE_ENTRY( "chargen", 0, bml3_charlayout8x16, 0, 4 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( bml3, bml3_state )
@@ -573,9 +596,8 @@ ROM_START( bml3 )
 	ROM_LOAD( "599 p16561.ic4", 0xc000, 0x2000, BAD_DUMP CRC(b27a48f5) SHA1(94cb616df4caa6415c5076f9acdf675acb7453e2))
 	ROM_LOAD( "600 p16681.ic5", 0xe000, 0x2000, BAD_DUMP CRC(fe3988a5) SHA1(edc732f1cd421e0cf45ffcfc71c5589958ceaae7))
 
-	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD("char.rom", 0x00000, 0x00800, BAD_DUMP CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) ) //Taken from Sharp X1
-	ROM_FILL( 0x0000, 0x0008, 0x00)
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("font.rom", 0x00000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 
 	ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF )
 ROM_END
