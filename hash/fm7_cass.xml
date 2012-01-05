@@ -5,6 +5,14 @@
 <!-- Multi-image games are currently untested -->
 
 <!--
+
+Titles, serial #s, publishers and release dates taken from:
+  - Oh!FM-7 ( http://retropc.net/fm-7/ )
+
+-->
+
+
+<!--
 	Loading instructions:
 	At the F-Basic Ready prompt, type run"" and press Return.
 	If a Bad File Mode error occurs, then you must type loadm"",r and press Return.  Once the loader has loaded,
@@ -17,8 +25,9 @@
 
 	<software name="alde">
 		<description>Aldebaran</description>
-		<year>19??</year>
+		<year>1981</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="serial" value="LA-1004"/>
 		<info name="alt_title" value="アルデバラン"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="471592">
@@ -30,7 +39,7 @@
 	<software name="alien">
 		<description>The Alien</description>
 		<year>1983</year>
-		<publisher>Kiya Overseas Industry / Avalon Hill</publisher>
+		<publisher>富士音響マイコンセンターRAM (Fuji Onkyo RAM)</publisher>
 		<info name="alt_title" value="ザ・エイリアン"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2728122">
@@ -41,8 +50,8 @@
 
 	<software name="alienfld">
 		<description>Alien Field in 7</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>CPU</publisher>
 		<info name="alt_title" value="エイリアンフィールド"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="301842">
@@ -53,8 +62,9 @@
 
 	<software name="american">
 		<description>American Truck</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="アメリカントラック"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="6037920">
@@ -65,8 +75,11 @@
 
 	<software name="anko">
 		<description>暗黒城</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G077"/>
+		<info name="release" value="198407xx"/>
+		<info name="alt_title" value="Rukteu Dark Castle - Dragon Angel's Miracle Voyage (Vol. 1)"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5857184">
 				<rom name="anko_a.t77" size="5857184" crc="905a90da" sha1="cf5b91a356f915a6ee10fd8554da3f6e7d95427f" offset="000000" />
@@ -84,7 +97,8 @@
 		<description>Muscat Arrange</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="テープアスキー"/>
+		<info name="release" value="198408xx"/>
+		<info name="alt_title" value="マスカット"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1236938">
 				<rom name="asc1.t77" size="1236938" crc="408b4006" sha1="bdefaa50da786e8c8c58dd4a1b697b99dceea31f" offset="000000" />
@@ -94,8 +108,9 @@
 
 	<software name="battlep">
 		<description>Battle Pod</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="serial" value="CF-1171"/>
 		<info name="alt_title" value="バトルポッド"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
@@ -107,8 +122,8 @@
 
 	<software name="bgammon">
 		<description>Backgammon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>新企画社 (Shinkikakusha)</publisher>
 		<info name="alt_title" value="バックギャモン"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="903036">
@@ -118,9 +133,12 @@
 	</software>
 
 	<software name="blacko">
-		<description>ブラックオニキス</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>ザ・ブラックオニキス</description>
+		<year>1985</year>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<info name="serial" value="FUBP-13001"/>
+		<info name="release" value="198503xx"/>
+		<info name="alt_title" value="The Black Onyx"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="16">
 				<rom name="azusa_chara.t77" size="16" crc="24b4d6c4" sha1="0f397f343cc74993777e10deffe6f9579713fb8e" offset="000000" />
@@ -217,6 +235,7 @@
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<info name="serial" value="2014307"/>
 		<info name="alt_title" value="ボコスカウォーズ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2218190">
@@ -227,8 +246,11 @@
 
 	<software name="bushman">
 		<description>ハッピーブッシュマン</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<info name="serial" value="K33M5027"/>
+		<info name="release" value="198303xx"/>
+		<info name="alt_title" value="Happy Bushman"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1642830">
 				<rom name="bushman.t77" size="1642830" crc="728062ab" sha1="8b0cd10f01585f12ce33179ac6f7d8fc999f2d91" offset="000000" />
@@ -239,7 +261,8 @@
 	<software name="capricrn">
 		<description>南の島のカプリコーン</description>
 		<year>1983</year>
-		<publisher>ツクモ (Tsukumo)</publisher>
+		<publisher>九十九電機 (Tsukumo Denki)</publisher>
+		<info name="alt_title" value="Minami no Shima no Capricorn"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2693020">
 				<rom name="cap.t77" size="2693020" crc="634256e6" sha1="8ab55c19b72be26f9a0ae5ab9a4d90a9991ea618" offset="000000" />
@@ -251,6 +274,7 @@
 		<description>The Castle</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="ザ・キャッスル"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3810142">
@@ -261,8 +285,10 @@
 
 	<software name="chackn">
 		<description>Chack'n Pop</description>
-		<year>19??</year>
-		<publisher>Nidecom / Carry Soft</publisher>
+		<year>1984</year>
+		<publisher>ニデコム (Nidecom)</publisher>
+		<info name="serial" value="NH-S49"/>
+		<info name="release" value="198409xx"/>
 		<info name="alt_title" value="ちゃっくんポップ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2818296">
@@ -273,8 +299,10 @@
 
 	<software name="chackna" cloneof="chackn">
 		<description>Chack'n Pop (Alt)</description>
-		<year>19??</year>
-		<publisher>Nidecom / Carry Soft</publisher>
+		<year>1984</year>
+		<publisher>ニデコム (Nidecom)</publisher>
+		<info name="serial" value="NH-S49"/>
+		<info name="release" value="198409xx"/>
 		<info name="alt_title" value="ちゃっくんポップ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2770776">
@@ -285,8 +313,10 @@
 
 	<software name="chima">
 		<description>妖怪探偵ちまちま</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>ボーステック (Bothtec)</publisher>
+		<info name="release" value="198501xx"/>
+		<info name="alt_title" value="Yokai Tantei Chima Chima"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3000980">
 				<rom name="chi.t77" size="3000980" crc="7275cc2c" sha1="7a996aa47a2a828f6fcab7695c7485e9c8b673f3" offset="000000" />
@@ -296,8 +326,9 @@
 
 	<software name="choplift">
 		<description>チョップリフター</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>ソフトプロ (Soft Pro)</publisher>
+		<info name="alt_title" value="Choplifter"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2073552">
@@ -308,8 +339,10 @@
 
 	<software name="cockpit">
 		<description>ザ・コクピット</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="serial" value="CF-1173"/>
+		<info name="alt_title" value="The Cockpit"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="987856">
 				<rom name="fli.t77" size="987856" crc="76fe23af" sha1="ec50d145be3eed6b1d1da43c4e6d25e7023784f9" offset="000000" />
@@ -319,8 +352,9 @@
 
 	<software name="coron">
 		<description>Coron</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="コロン"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1846176">
 				<rom name="cor.t77" size="1846176" crc="f1b3dbdc" sha1="183c10eb58baa16f0124df9eb253ad9fe8dd2b54" offset="000000" />
@@ -331,7 +365,9 @@
 	<software name="daidasso">
 		<description>大脱走</description>
 		<year>1985</year>
-		<publisher>Carry Soft</publisher>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="serial" value="GA-104"/>
+		<info name="alt_title" value="Dai Dassou"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3748336">
 				<rom name="dattu.t77" size="3748336" crc="00b8d39e" sha1="8b809e249ba495afc6f24ec68c387d0ed9f5da5c" offset="000000" />
@@ -340,10 +376,12 @@
 	</software>
 
 	<software name="delphis">
-		<description>DELPHIS</description>
+		<description>Delphis</description>
 		<year>1984</year>
-		<publisher>Kohgaku-sha</publisher>
-		<info name="alt_title" value="デルフォス"/>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="serial" value="CD-1135"/>
+		<info name="release" value="198404xx"/>
+		<info name="alt_title" value="デルフィス"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2113922">
 				<rom name="del.t77" size="2113922" crc="da2c5b1e" sha1="e48082992a51530beb5cd9e90556e6de409a9454" offset="000000" />
@@ -353,8 +391,10 @@
 
 	<software name="denzeni">
 		<description>デゼニランド</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="serial" value="LA-2003"/>
+		<info name="alt_title" value="Dezeni Land"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="55598">
 				<rom name="dezeni1.t77" size="55598" crc="63299423" sha1="ee0c36ffd66ba06a59108dbb840e185773aca606" offset="000000" />
@@ -439,8 +479,9 @@
 
 	<software name="digdug">
 		<description>Dig Dug</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="serial" value="DP-3301143"/>
 		<info name="alt_title" value="ディグダグ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="4500408">
@@ -451,8 +492,9 @@
 
 	<software name="dslayer">
 		<description>Dragon Slayer</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="release" value="198410xx"/>
 		<info name="alt_title" value="ドラゴンスレイヤー"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3586648">
@@ -465,6 +507,8 @@
 		<description>Earthbound</description>
 		<year>1983</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<info name="serial" value="FUXA-13004"/>
+		<info name="alt_title" value="アースバウンド"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="4055314">
 				<rom name="earthbou.t77" size="4055314" crc="840c5f73" sha1="b225e8fd97eed419380e03e21dbd259a057c5dbf" offset="000000" />
@@ -474,8 +518,9 @@
 
 	<software name="eggbomb">
 		<description>Egg Bomb</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="serial" value="CC-1096"/>
 		<info name="alt_title" value="エッグボンブ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="904832">
@@ -486,9 +531,11 @@
 
 	<software name="explorer">
 		<description>Explorer</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="エクスプローラ"/>
+		<year>1983</year>
+		<publisher>日本ソフト (Nihon Soft) / ハード (Hard)</publisher>
+		<info name="serial" value="SF077209"/>
+		<info name="release" value="198305xx"/>
+		<info name="alt_title" value="エクスプローラー"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1425504">
@@ -499,8 +546,9 @@
 
 	<software name="f2">
 		<description>F2 Grand Prix</description>
-		<year>1984</year>
-		<publisher>Carry Soft</publisher>
+		<year>1985</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="serial" value="GA-084"/>
 		<info name="alt_title" value="F2グランプリ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3464088">
@@ -511,8 +559,10 @@
 
 	<software name="field">
 		<description>フィールドウォーズ</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="serial" value="LA-1038"/>
+		<info name="alt_title" value="Field Wars"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1071104">
@@ -522,9 +572,12 @@
 	</software>
 
 	<software name="fighter">
-		<description>Fighter</description>
-		<year>19??</year>
+		<description>Space Fighter</description>
+		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="FUBP-13004"/>
+		<info name="release" value="198202xx"/>
+		<info name="alt_title" value="スペースファイター"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="875804">
 				<rom name="fig.t77" size="875804" crc="d213688d" sha1="1b53ac3843d53492e704c72f352057197838245e" offset="000000" />
@@ -533,10 +586,12 @@
 	</software>
 
 	<software name="fire">
-		<description>Fire Crystal</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ファイヤークリスタル"/>
+		<description>The Fire Crystal</description>
+		<year>1986?</year>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<info name="serial" value="FUBP-13004"/>
+		<info name="release" value="198601xx"/>
+		<info name="alt_title" value="ザ・ファイヤークリスタル"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5482702">
 				<rom name="fire1.t77" size="5482702" crc="4a58f1d5" sha1="7143cafc29201997fcd5b2725e686cdfc041416d" offset="000000" />
@@ -551,8 +606,9 @@
 
 	<software name="flappy">
 		<description>Flappy</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
+		<info name="serial" value="F2-G0101"/>
 		<info name="alt_title" value="フラッピー"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5613848">
@@ -564,8 +620,9 @@
 	<software name="flsim">
 		<description>Flight Simulator</description>
 		<year>1983</year>
-		<publisher>Carry</publisher>
-		<info name="alt_title" value="フライトシミュレータ"/>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="フライトシミュレーター"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2267792">
@@ -598,8 +655,10 @@
 
 	<software name="frontlin">
 		<description>Front Line</description>
-		<year>19??</year>
-		<publisher>Nidecom / Carry / Taito</publisher>
+		<year>1983</year>
+		<publisher>ニデコム (Nidecom)</publisher>
+		<info name="serial" value="NH-S31"/>
+		<info name="release" value="198308xx"/>
 		<info name="alt_title" value="フロントライン"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
@@ -611,8 +670,9 @@
 
 	<software name="galaga">
 		<description>Galaga</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="serial" value="DP-3301178"/>
 		<info name="alt_title" value="ギャラガ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3843814">
@@ -623,8 +683,9 @@
 
 	<software name="galaxy">
 		<description>Galaxy Fly</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="serial" value="814"/>
 		<info name="alt_title" value="ギャラクシーフライ"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
@@ -637,7 +698,8 @@
 	<software name="gbank">
 		<description>Gutchan Bank</description>
 		<year>1985</year>
-		<publisher>Oh!FM</publisher>
+		<publisher>日本ソフトバンク (Nihon SoftBank)</publisher>
+		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ぐっちゃんバンク"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2345284">
@@ -648,8 +710,11 @@
 
 	<software name="golfsim">
 		<description>ゴルフシミュレーション</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1982</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="serial" value="SP0009"/>
+		<info name="release" value="198201xx"/>
+		<info name="alt_title" value="Golf Simulation"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="4150660">
 				<rom name="golf.t77" size="4150660" crc="9f244c8f" sha1="c7efcc07b2a1fd132938f0ac5f0b8ded9ab1335c" offset="000000" />
@@ -657,11 +722,12 @@
 		</part>
 	</software>
 
-<!-- Giant Gorg -->
 	<software name="gorg">
 		<description>巨神ゴーグ</description>
-		<year>19??</year>
-		<publisher>Nippon Sunrise / ASCII</publisher>
+		<year>1985</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="release" value="198507xx"/>
+		<info name="alt_title" value="Kyoshin Gorg"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3978352">
 				<rom name="gorg.t77" size="3978352" crc="d8434671" sha1="4b8e3f1d364f28cffd4d702bf03b5f7a7feab561" offset="000000" />
@@ -685,6 +751,7 @@
 		<description>Gunman</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="serial" value="LA-1024"/>
 		<info name="alt_title" value="ガンマン"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
@@ -696,8 +763,9 @@
 
 	<software name="hanafuda">
 		<description>花札狂</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="Hanafuda Kyo"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="84398">
 				<rom name="hanafuda1.t77" size="84398" crc="986babe7" sha1="f66f2d069649bb68bb815f3074766b922f8f36a0" offset="000000" />
@@ -717,9 +785,11 @@
 
 	<software name="hhouse">
 		<description>Haunted House</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ホーンデッドハウス"/>
+		<year>1983</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="serial" value="CD-1071"/>
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="ハウンテッドハウス"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1657464">
 				<rom name="house.t77" size="1657464" crc="e6b10029" sha1="1b7112208394e58d699bd77a2dee3d326c10fda6" offset="000000" />
@@ -729,8 +799,11 @@
 
 	<software name="hisha">
 		<description>飛車</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="serial" value="GA-063"/>
+		<info name="release" value="198504xx"/>
+		<info name="alt_title" value="Hisha"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1408932">
 				<rom name="ous.t77" size="1408932" crc="b49bbcc1" sha1="16a839d74a0ae410c3a01cdfca708fe48a343dab" offset="000000" />
@@ -1909,9 +1982,9 @@
 	</software>
 
 	<software name="zgundam">
-		<description>Z Gundam</description>
-		<year>19??</year>
-		<publisher>Nippon Sunrise</publisher>
+		<description>Mobile Suit Z Gundam</description>
+		<year>1985</year>
+		<publisher>バンダイ (Bandai)</publisher>
 		<info name="alt_title" value="Zガンダム"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5088378">
