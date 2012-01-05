@@ -104,11 +104,11 @@ static const vt_video_interface video_interface =
 
 static MACHINE_CONFIG_START( rainbow, rainbow_state )
     /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",I8088, 4772720)
+    MCFG_CPU_ADD("maincpu",I8088, XTAL_24_0734MHz / 5)
     MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
     MCFG_CPU_IO_MAP(rainbow8088_io)	
 
-    MCFG_CPU_ADD("subcpu",Z80, XTAL_4MHz)
+    MCFG_CPU_ADD("subcpu",Z80, XTAL_24_0734MHz / 6)
     MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
     MCFG_CPU_IO_MAP(rainbowz80_io)
 	MCFG_DEVICE_DISABLE()	
