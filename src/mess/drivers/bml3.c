@@ -319,6 +319,30 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_READWRITE(bml3_io_r,bml3_io_w)
+//	AM_RANGE(0xff00, 0xff00) PSG data
+//	AM_RANGE(0xff02, 0xff02) PSG address/data select
+//	AM_RANGE(0xff18, 0xff1f) FDC
+//	AM_RANGE(0xff20, 0xff20) FDD drive select
+//	AM_RANGE(0xff75, 0xff76) kanji i/f
+//	AM_RANGE(0xffc0, 0xffc3) pia
+//	AM_RANGE(0xffc4, 0xffc5) ACIA
+//	AM_RANGE(0xffc6, 0xffc7) HD46505
+//	AM_RANGE(0xffc8, 0xffc8) keyboard nmi
+//	AM_RANGE(0xffca, 0xffca) timer irq
+//	AM_RANGE(0xffcb, 0xffcb) light pen flag
+//	AM_RANGE(0xffd0, 0xffd0) mode select
+//	AM_RANGE(0xffd1, 0xffd1) trace counter
+//	AM_RANGE(0xffd2, 0xffd2) remote switch
+//	AM_RANGE(0xffd3, 0xffd3) music select
+//	AM_RANGE(0xffd4, 0xffd4) time mask
+//	AM_RANGE(0xffd5, 0xffd5) light pen
+//	AM_RANGE(0xffd6, 0xffd6) interlace select
+//	AM_RANGE(0xffd7, 0xffd7) baud select
+//	AM_RANGE(0xffd8, 0xffd8) attribute register
+//	AM_RANGE(0xffe0, 0xffe0) keyboard mode register
+//	AM_RANGE(0xffe8, 0xffe8) bank register
+//	AM_RANGE(0xffe9, 0xffe9) IG mode register
+//	AM_RANGE(0xffea, 0xffea) IG enable register
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
