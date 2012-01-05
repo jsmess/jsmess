@@ -31,6 +31,8 @@
 #define M6502_HDC_TAG	"4a"
 #define M6522_TAG		"4b"
 
+#define AM2910_TAG		"9d"
+
 #define SASIBUS_TAG		"sasi"
 
 enum
@@ -87,6 +89,13 @@ ROM_START( d9060 )
 	ROM_REGION( 0x800, M6502_HDC_TAG, 0 )
 	ROM_LOAD_OPTIONAL( "300515-reva.4c", 0x000, 0x800, CRC(99e096f7) SHA1(a3d1deb27bf5918b62b89c27fa3e488eb8f717a4) )
 	ROM_LOAD( "300515-revb.4c", 0x000, 0x800, CRC(49adf4fb) SHA1(59dafbd4855083074ba8dc96a04d4daa5b76e0d6) )
+
+	ROM_REGION( 0x5000, AM2910_TAG, 0 )
+	ROM_LOAD( "441.5b", 0x0000, 0x1000, NO_DUMP ) // 82S137
+	ROM_LOAD( "442.6b", 0x1000, 0x1000, NO_DUMP ) // 82S137
+	ROM_LOAD( "573.7b", 0x2000, 0x1000, NO_DUMP ) // 82S137
+	ROM_LOAD( "444.8b", 0x3000, 0x1000, NO_DUMP ) // 82S137
+	ROM_LOAD( "445.9b", 0x4000, 0x1000, NO_DUMP ) // 82S137
 ROM_END
 
 
@@ -183,7 +192,7 @@ READ8_MEMBER( base_d9060_device::dio_r )
         PA6     DI6
         PA7     DI7
 
-    */
+	*/
 
 	return m_bus->dio_r();
 }
@@ -204,7 +213,7 @@ WRITE8_MEMBER( base_d9060_device::dio_w )
         PB6     DO6
         PB7     DO7
 
-    */
+	*/
 
 	m_bus->dio_w(this, data);
 }
@@ -239,17 +248,17 @@ READ8_MEMBER( base_d9060_device::riot1_pa_r )
         PA6     DAVI
         PA7     _ATN
 
-    */
+	*/
 
 	UINT8 data = 0;
 
-	/* end or identify in */
+	// end or identify in
 	data |= m_bus->eoi_r() << 5;
 
-	/* data valid in */
+	// data valid in
 	data |= m_bus->dav_r() << 6;
 
-	/* attention */
+	// attention
 	data |= !m_bus->atn_r() << 7;
 
 	return data;
@@ -270,21 +279,21 @@ WRITE8_MEMBER( base_d9060_device::riot1_pa_w )
         PA6
         PA7
 
-    */
+	*/
 
-	/* attention acknowledge */
+	// attention acknowledge
 	m_atna = BIT(data, 0);
 
-	/* data accepted out */
+	// data accepted out
 	m_daco = BIT(data, 1);
 
-	/* not ready for data out */
+	// not ready for data out
 	m_rfdo = BIT(data, 2);
 
-	/* end or identify out */
+	// end or identify out
 	m_bus->eoi_w(this, BIT(data, 3));
 
-	/* data valid out */
+	// data valid out
 	m_bus->dav_w(this, BIT(data, 4));
 
 	update_ieee_signals();
@@ -305,7 +314,7 @@ READ8_MEMBER( base_d9060_device::riot1_pb_r )
         PB6     DACI
         PB7     RFDI
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -336,7 +345,7 @@ WRITE8_MEMBER( base_d9060_device::riot1_pb_w )
         PB6
         PB7
 
-    */
+	*/
 
 	// ready led
 	output_set_led_value(LED_READY, BIT(data, 4));
@@ -377,7 +386,7 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
         PB6     I/O
         PB7     MSG
 
-    */
+	*/
 
 	UINT8 data = 0;
 
@@ -407,7 +416,7 @@ WRITE8_MEMBER( base_d9060_device::via_pb_w )
         PB6
         PB7
 
-    */
+	*/
 
 	scsi_sel_w(m_sasibus, !BIT(data, 0));
 	scsi_rst_w(m_sasibus, !BIT(data, 1));
@@ -575,7 +584,7 @@ void base_d9060_device::device_reset()
 
 
 //-------------------------------------------------
-//  m_bus->atn -
+//  ieee488_atn - attention
 //-------------------------------------------------
 
 void base_d9060_device::ieee488_atn(int state)
@@ -588,7 +597,7 @@ void base_d9060_device::ieee488_atn(int state)
 
 
 //-------------------------------------------------
-//  m_bus->ifc -
+//  ieee488_ifc - interface clear
 //-------------------------------------------------
 
 void base_d9060_device::ieee488_ifc(int state)
