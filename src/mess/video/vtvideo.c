@@ -286,7 +286,59 @@ void vt_video_update(device_t *device, bitmap_t &bitmap, const rectangle &clipre
 
 }
 
+static void rainbow_video_display_char(device_t *device,bitmap_t &bitmap, UINT8 code,
+	int x, int y,UINT8 scroll_region,UINT8 display_type)
+{
+	UINT8 line=0;
+	int i,b,bit=0,j;
+	int double_width = (display_type==2) ? 1 : 0;
+	vt_video_t *vt = get_safe_token(device);
 
+	for (i = 0; i < 10; i++)
+	{
+
+		switch(display_type) {
+			case 0 : // bottom half, double height
+					 j = (i >> 1)+5; break;
+			case 1 : // top half, double height
+					 j = (i >> 1); break;
+			case 2 : // double width
+			case 3 : // normal
+					 j = i;	break;
+			default : j = 0; break;
+		}
+		// modify line since that is how it is stored in rom
+		if (j==0) j=15; else j=j-1;
+
+		line = vt->gfx[code*16 + j];
+		if (vt->basic_attribute==1) {
+			if ((code & 0x80)==0x80) {
+				line = line ^ 0xff;
+			}
+		}
+
+		for (b = 0; b < 8; b++)
+		{
+			bit = ((line << b) & 0x80) ? 1 : 0;
+			if (double_width) {
+				bitmap.pix16(y*10+i, x*20+b*2)   =  bit;
+				bitmap.pix16(y*10+i, x*20+b*2+1) =  bit;
+			} else {
+				bitmap.pix16(y*10+i, x*10+b) =  bit;
+			}
+		}
+		// char interleave is filled with last bit
+		if (double_width) {
+			bitmap.pix16(y*10+i, x*20+16) =  bit;
+			bitmap.pix16(y*10+i, x*20+17) =  bit;
+			bitmap.pix16(y*10+i, x*20+18) =  bit;
+			bitmap.pix16(y*10+i, x*20+19) =  bit;
+		} else {
+			bitmap.pix16(y*10+i, x*10+8) =  bit;
+			bitmap.pix16(y*10+i, x*10+9) =  bit;
+		}
+	}
+}
 void rainbow_video_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
 {
 	vt_video_t *vt = get_safe_token(device);
@@ -309,7 +361,7 @@ void rainbow_video_update(device_t *device, bitmap_t &bitmap, const rectangle &c
 			if (line >= vt->skip_lines) {
 				for(x = xpos; x < ((display_type==2) ? (vt->columns / 2) : vt->columns); x++ )
 				{
-					vt_video_display_char(device,bitmap,code,x,ypos,scroll_region,display_type);
+					rainbow_video_display_char(device,bitmap,code,x,ypos,scroll_region,display_type);
 				}
 			}
 			// move to new data
@@ -329,7 +381,7 @@ void rainbow_video_update(device_t *device, bitmap_t &bitmap, const rectangle &c
 		} else {
 			// display regular char
 			if (line >= vt->skip_lines) {
-				vt_video_display_char(device,bitmap,code,xpos,ypos,scroll_region,display_type);
+				rainbow_video_display_char(device,bitmap,code,xpos,ypos,scroll_region,display_type);
 			}
 			xpos++;
 			if (xpos > vt->columns) {
