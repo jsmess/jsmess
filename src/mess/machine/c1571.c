@@ -48,6 +48,7 @@ enum
 const device_type C1570 = &device_creator<c1570_device>;
 const device_type C1571 = &device_creator<c1571_device>;
 const device_type C1571CR = &device_creator<c1571cr_device>;
+const device_type MINI_CHIEF = &device_creator<mini_chief_device>;
 
 
 //-------------------------------------------------
@@ -71,6 +72,10 @@ void base_c1571_device::device_config_complete()
 
 	case TYPE_1571CR:
 		m_shortname = "c1571cr";
+		break;
+		
+	case TYPE_MINI_CHIEF:
+		m_shortname = "minichif";
 		break;
 	}
 }
@@ -110,6 +115,16 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( minichief )
+//-------------------------------------------------
+
+ROM_START( minichief )
+	ROM_REGION( 0x8000, M6502_TAG, 0 )
+	ROM_LOAD( "ictdos710.u2", 0x0000, 0x8000, CRC(aaacf7e9) SHA1(c1296995238ef23f18e7fec70a144a0566a25a27) )
+ROM_END
+
+
+//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
@@ -126,6 +141,9 @@ const rom_entry *base_c1571_device::device_rom_region() const
 
 	case TYPE_1571CR:
 		return ROM_NAME( c1571cr );
+
+	case TYPE_MINI_CHIEF:
+		return ROM_NAME( minichief );
 	}
 }
 
@@ -715,6 +733,14 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 
 c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: base_c1571_device(mconfig, C1571CR, "C1571CR", tag, owner, clock, TYPE_1571CR) { }
+
+
+//-------------------------------------------------
+//  mini_chief_device - constructor
+//-------------------------------------------------
+
+mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: base_c1571_device(mconfig, MINI_CHIEF, "ICT Mini Chief", tag, owner, clock, TYPE_MINI_CHIEF) { }
 
 
 //-------------------------------------------------
