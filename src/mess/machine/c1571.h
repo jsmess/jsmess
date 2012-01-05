@@ -49,7 +49,8 @@ public:
 	{
 		TYPE_1570,
 		TYPE_1571,
-		TYPE_1571CR
+		TYPE_1571CR,
+		TYPE_MINI_CHIEF
 	};
 
     // construction/destruction
@@ -150,10 +151,21 @@ public:
 };
 
 
+// ======================> mini_chief_device
+
+class mini_chief_device :  public base_c1571_device
+{
+public:
+    // construction/destruction
+    mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 // device type definition
 extern const device_type C1570;
 extern const device_type C1571;
 extern const device_type C1571CR;
+extern const device_type MINI_CHIEF;
 
 
 
