@@ -64,7 +64,8 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="daiva">
+<!-- the alt set with crcs 21fc2e80 and 22ecff45 only differs for d77 headers, but data in the disks are identical -->
+	<software name="daiva" supported="no">
 		<description>Daiva - Active Simulation War</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -79,6 +80,25 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="daiva_b.d77" size="348848" crc="83f48c67" sha1="e182bc6186a185de89acc492ccdb69eb42a30dea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- According to Oh!FM-7 the game was released for the 77AV in 3.5" disks... does this change anything in the format? -->
+	<software name="dforce" supported="no">
+		<description>デスフォース</description>
+		<year>1987</year>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<info name="serial" value="FURH-19001"/>
+		<info name="alt_title" value="Death Force"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="392880">
+				<rom name="dforce1.d77" size="392880" crc="968512c6" sha1="fe7fe9bec16949a4f24cbdb7b1e842c743d4688d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="392880">
+				<rom name="dforce2.d77" size="392880" crc="c7feb23c" sha1="fb5a25c736c20a2dd0ba3ac2be488612c7017855" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -157,6 +177,19 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="hotdog">
+		<description>ホットドッグ</description>
+		<year>1986</year>
+		<publisher>ボーステック (Bothtec)</publisher>
+		<info name="serial" value="SD-7512"/>
+		<info name="alt_title" value="Hotdog"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="364976">
+				<rom name="hotdog.d77" size="364976" crc="4e63fa35" sha1="6f094715edbe60edbb091e3b5f8bcbf6e019be6c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- is this really for the AV only? -->
 	<software name="ishtar">
 		<description>The Return of Ishtar</description>
@@ -171,6 +204,62 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ishtar_b.d77" size="348848" crc="87d3dec0" sha1="237d55d296d1179f4373e0f9c03d65f4f1fce05f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kohakuir">
+		<description>Kohakuiro no Yuigon</description>
+		<year>1988</year>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<info name="release" value="198811xx"/>
+		<info name="alt_title" value="琥珀色の遺言"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="kohaku1d.d77" size="473776" crc="3778278b" sha1="ee61c6756bd6a882056c8123e56491de3e7681cb" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="kohaku2d.d77" size="473776" crc="029f9afe" sha1="0810835a6e9cf3774c66e2f5081d9a4ad435e948" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="kohaku3d.d77" size="473776" crc="a2dce416" sha1="14259104d2a023876becd09b461c9a7cd512506e" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="kohaku4d.d77" size="473776" crc="a317b71d" sha1="c45ea740ce2138b15e5ff2db4e1282539809cdc0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kohakuira" cloneof="kohakuir">
+		<description>Kohakuiro no Yuigon (original?)</description>
+		<year>1988</year>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<info name="release" value="198811xx"/>
+		<info name="alt_title" value="琥珀色の遺言"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="416384">
+				<rom name="k1.d77" size="416384" crc="00e0c527" sha1="7017440ad4f2eb09e0d036905dca010bfb31aff0" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="416688">
+				<rom name="k2.d77" size="416688" crc="cc35b1d0" sha1="622a69b1156849d9d6c3f4965bbf0949d41b5c36" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="416688">
+				<rom name="k3.d77" size="416688" crc="a98a8b0c" sha1="1b9b521f4b2ec79fa3e28a2c7d16d8d776f0684b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="416688">
+				<rom name="k4.d77" size="416688" crc="c03f7ff5" sha1="8fd07d1fa49e6b07b02175ed63e7d08b11c15d16" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
