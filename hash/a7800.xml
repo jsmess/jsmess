@@ -242,13 +242,13 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="alienbrgu" cloneof="alienbrg">
 		<description>Alien Brigade (NTSC)</description>
-		<!-- Works with Lightgun -->
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7855"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-A" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="147456">
 				<rom name="alienbrg.bin" size="147456" crc="c8849d36" sha1="a8629fac962cc20b263a60bb2d2386d605713387" offset="0" />
 			</dataarea>
@@ -342,7 +342,6 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="barnblstu" cloneof="barnblst">
 		<description>Barnyard Blaster (NTSC)</description>
-		<!-- Works with Lightgun -->
 		<!-- Final Release Proto - C300051-059A (Matches NTSC)
                      10/5/88 (#1/U3 27256 SUM16=9676)
                              (#2/U2 27256 SUM16=0C34)
@@ -354,6 +353,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-3" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="barnyard.bin" size="131072" crc="ed0a587d" sha1="cbcde3d85c8778dea402394568677884cd781de3" offset="0" />
 			</dataarea>
@@ -557,13 +557,13 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="crossbowu" cloneof="crossbow">
 		<description>Crossbow (NTSC)</description>
-		<!-- Works with Lightgun -->
 		<year>1988</year>
 		<publisher>Atari / Exidy</publisher>
 		<info name="serial" value="CX7844"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-A" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="147456">
 				<rom name="crossbow.bin" size="147456" crc="d2ea5686" sha1="d5e47da88e232cd9ea059e133e7c0f13d921a04c" offset="0" />
 			</dataarea>
@@ -572,13 +572,13 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 
 	<software name="crossbow">
 		<description>Crossbow (PAL)</description>
-		<!-- Works with Lightgun -->
 		<year>1988</year>
 		<publisher>Atari / Exidy</publisher>
 		<info name="serial" value="CX7844"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-A" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="147456">
 				<rom name="crossbeu.bin" size="147456" crc="e93d8894" sha1="f26d292210a91a714b4b87712ff53b8e49da611e" offset="0" />
 			</dataarea>
@@ -1370,13 +1370,13 @@ the buttons not work in emulators.
 
 	<software name="meltdownu" cloneof="meltdown">
 		<description>Meltdown (NTSC)</description>
-		<!-- Works with Lightgun -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7875"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="meltdown.bin" size="131072" crc="4a8f2171" sha1="e601c45aaa1cc25f01493867664c8b9fefeca70e" offset="0" />
 			</dataarea>
@@ -1385,13 +1385,13 @@ the buttons not work in emulators.
 
 	<software name="meltdown">
 		<description>Meltdown (PAL)</description>
-		<!-- Works with Lightgun -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7875"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="meltdoeu.bin" size="131072" crc="177fc850" sha1="ac448f369c3c6334415095e4ff344fdd73b473be" offset="0" />
 			</dataarea>
@@ -1855,13 +1855,13 @@ almost nothing like the prototype.
 
 	<software name="sentinelu" cloneof="sentinel">
 		<description>Sentinel (NTSC, Prototype)</description>
-		<!-- Works with Lightgun -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7869"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="sentinel.bin" size="131072" crc="2fddad78" sha1="bd7de03a28b168c992bcaa96539c2310f3bfe30c" offset="0" />
 			</dataarea>
@@ -1870,13 +1870,13 @@ almost nothing like the prototype.
 
 	<software name="sentinel">
 		<description>Sentinel (PAL)</description>
-		<!-- Works with Lightgun -->
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7869"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-2" />
+			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="sentineu.bin" size="131072" crc="47340df9" sha1="6d85a73a56d2f02ff439736eace86691aa613444" offset="0" />
 			</dataarea>

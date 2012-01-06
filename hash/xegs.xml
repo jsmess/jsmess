@@ -19,11 +19,6 @@ Compiled by K1W1
   - Joust (Same as the retail cartridge, see a800 list)
   - Flight Simulator 2 (Proper demo version, included on this list)
 
-  Cartridges to use with the XEGS Light Gun
-  - Barnyard Blasterokook
-  - Bug Hunt
-  - Crime Buster
-  - Crossbow
 -->
 
 <softwarelist name="xegs" description="Atari XE Game System cartridges">
@@ -84,6 +79,7 @@ Compiled by K1W1
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8086" />
 		<part name="cart" interface="xegs_cart">
+			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="barnyard blaster (atari)(1987)(rx8086).rom" size="131072" crc="13ae30ed" sha1="e4b22790fce8e2e0f7c972960aec692b7fd5e016" offset="0" /> <!-- Verified -->
 			</dataarea>
@@ -120,6 +116,7 @@ Compiled by K1W1
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8087" />
 		<part name="cart" interface="xegs_cart">
+			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
 			<dataarea name="rom" size="65536">
 				<rom name="bug hunt (atari)(1987)(rx8087).rom" size="65536" crc="246f3872" sha1="48eeec190dbb27e1311938498b087088077dd530" offset="0" /> <!-- Verified -->
 			</dataarea>
@@ -155,6 +152,7 @@ Compiled by K1W1
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8104" />
 		<part name="cart" interface="xegs_cart">
+			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="crime buster (atari)(1988)(rx8104).rom" size="131072" crc="143fbad9" sha1="d936dee2676d4fb8ea84960bf6c7cef707dc45a2" offset="0" /> <!-- Verified -->
 			</dataarea>
@@ -167,6 +165,7 @@ Compiled by K1W1
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8088" />
 		<part name="cart" interface="xegs_cart">
+			<feature name="peripheral" value="lightgun" /> <!-- Uses Lightgun -->
 			<dataarea name="rom" size="131072">
 				<rom name="crossbow (atari)(1988)(rx8088).rom" size="131072" crc="0557a91f" sha1="7778002227315ab9fa3410b3a686634877cdd22e" offset="0" /> <!-- Verified -->
 			</dataarea>

@@ -717,7 +717,7 @@ Compiled by K1W1
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="1190" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -728,10 +728,10 @@ Compiled by K1W1
 
 	<software name="astrgrvr">
 		<description>Astro Grover</description>
-		<!-- Keyboard overlay was supplied with cartridge. -->
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
 		<info name="serial" value="4L-0502" />
+		<info name="usage" value="Keyboard overlay was supplied with cartridge" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -826,11 +826,11 @@ Compiled by K1W1
 
 	<software name="aartist">
 		<description>AtariArtist</description>
-		<!-- Works with Atari CX77 touch tablet device. -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8053" />
 		<part name="cart" interface="a800_cart">
+			<feature name="peripheral" value="cx77_touch" /> <!-- Works with the Atari CX77 touch tablet device -->
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="atariartist.rom" size="16384" crc="bbe37542" sha1="f7a8923c1e72b346a69b858bdd1f01c31b7c8dee" offset="0" /> <!-- Verified -->
@@ -923,7 +923,7 @@ Compiled by K1W1
 		<description>Attack at EP-CYG-4</description>
 		<year>1982</year>
 		<publisher>Romox</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -947,12 +947,12 @@ Compiled by K1W1
 
 	<software name="agraphcs">
 		<description>AtariGraphics</description>
-		<!-- Works with the Atari CX75 light pen device. -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8054" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
+			<feature name="peripheral" value="cx75_pen" /> <!-- Works with the Atari CX75 light pen device -->
 			<dataarea name="rom" size="16384">
 				<rom name="atarigraphics.rom" size="16384" crc="6ccdb004" sha1="9ebc119316113950c98e984cc9b0110047ad34a1" offset="0" /> <!-- Verified -->
 			</dataarea>
@@ -1080,11 +1080,11 @@ Compiled by K1W1
 
 	<software name="bearjamf">
 		<description>BearJam (Fixed)</description>
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. This ROM has been fixed to run on the A800 but will not play without device attached. -->
+		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<info name="serial" value="10031A-3" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only, Chalkboard Inc.'s Powerpad Tablet required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1095,10 +1095,10 @@ Compiled by K1W1
 
 	<software name="bigbrdfh">
 		<description>Big Bird's Funhouse</description>
-		<!-- Keybpoard overlay was supplied with cartridge. -->
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
 		<info name="serial" value="4L-0505" />
+		<info name="usage" value="Keyboard overlay was supplied with cartridge" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -1342,7 +1342,7 @@ Compiled by K1W1
 		<description>Chicken</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1585,7 +1585,7 @@ Compiled by K1W1
 		<description>Danger Ranger (Pirate)</description>
 		<year>1984</year>
 		<publisher>Microdeal</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1665,7 +1665,7 @@ Compiled by K1W1
 		<year>1982</year>
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720149" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1833,7 +1833,7 @@ Compiled by K1W1
 
 	<software name="dynakill">
 		<description>DynaKillers</description>
-		<!-- Re-package & Re-release of GMG 1997 release. -->
+		<!-- Re-package & Re-release of GMG's 1997 release. -->
 		<year>1999</year>
 		<publisher>Video 61 / GMG</publisher>
 		<part name="cart" interface="a800_cart">
@@ -1949,9 +1949,9 @@ Compiled by K1W1
 
 	<software name="expando1">
 		<description>Expando-Vision 1 - Weight Control and Exercise</description>
-		<!-- Requires Expando-Vision hardware device. -->
 		<year>1983</year>
 		<publisher>Stimultech</publisher>
+		<info name="usage" value="Expando-Vision hardware device required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1962,9 +1962,9 @@ Compiled by K1W1
 
 	<software name="expando2">
 		<description>Expando-Vision 2 - Control Smoking and Calm Nerves</description>
-		<!-- Requires Expando-Vision hardware device. -->
 		<year>1983</year>
 		<publisher>Stimultech</publisher>
+		<info name="usage" value="Expando-Vision hardware device required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1975,9 +1975,9 @@ Compiled by K1W1
 
 	<software name="expando3">
 		<description>Expando-Vision 3 - Stress Control and Positive Thinking</description>
-		<!-- Requires Expando-Vision hardware device. -->
 		<year>1983</year>
 		<publisher>Stimultech</publisher>
+		<info name="usage" value="Expando-Vision hardware device required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1988,9 +1988,9 @@ Compiled by K1W1
 
 	<software name="expando4">
 		<description>Expando-Vision 4 - Control Drinking and Responsibility</description>
-		<!-- Requires Expando-Vision hardware device. -->
 		<year>1983</year>
 		<publisher>Stimultech</publisher>
+		<info name="usage" value="Expando-Vision hardware device required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2003,7 +2003,7 @@ Compiled by K1W1
 		<description>Express! v1.12</description>
 		<year>1989</year>
 		<publisher>Orion Micro Systems</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="express 64" />
 			<dataarea name="rom" size="65536">
@@ -2143,7 +2143,7 @@ Compiled by K1W1
 		<description>Fort Apoalypse</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -2261,7 +2261,7 @@ Compiled by K1W1
 		<year>1981</year>
 		<publisher>Roklan</publisher>
 		<info name="serial" value="09-01102" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2338,7 +2338,7 @@ Compiled by K1W1
 		<description>Hamsoft</description>
 		<year>1982</year>
 		<publisher>Kantronics</publisher>
-		<info name="usage" value="Requires a Kantronics interface II" />
+		<info name="usage" value="Kantronics interface II required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2544,7 +2544,7 @@ Compiled by K1W1
 		<year>1982</year>
 		<publisher>CBS Software</publisher>
 		<info name="serial" value="M8788" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2558,7 +2558,7 @@ Compiled by K1W1
 		<year>1981</year>
 		<publisher>K-Byte</publisher>
 		<info name="serial" value="ATR1001" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2623,7 +2623,7 @@ Compiled by K1W1
 		<description>Kangaroo (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -2686,12 +2686,12 @@ Compiled by K1W1
 
 	<software name="kpainter">
 		<description>Koala Painter</description>
-		<!-- Works with Koala pad & Koala light pen devices. -->
 		<year>1983</year>
 		<publisher>Koala</publisher>
 		<info name="serial" value="AT00315-1" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
+			<feature name="peripheral" value="koala_pad,koala_pen" /> <!-- Works with Koala pad &amp; Koala light pen devices -->
 			<dataarea name="rom" size="16384">
 				<rom name="koala painter.rom" size="16384" crc="4835333a" sha1="d3d00bad005ba488fa734bf365c52c49d245c7b9" offset="0" /> <!-- Verified -->
 			</dataarea>
@@ -2725,11 +2725,11 @@ Compiled by K1W1
 
 	<software name="llpaintf">
 		<description>Leo's 'Lectric Paintbrush (Fixed)</description>
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. This ROM has been fixed to run on the A800 but will not play without device attached. -->
+		<!-- This ROM has been fixed to run on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<info name="serial" value="10011A-3" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only, Chalkboard Inc.'s Powerpad Tablet required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2742,7 +2742,7 @@ Compiled by K1W1
 		<description>Letter Perfect (40 Column Version)</description>
 		<year>1981</year>
 		<publisher>LJK</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2755,7 +2755,7 @@ Compiled by K1W1
 		<description>Letter Perfect (40 Column Version) (Alt)</description>
 		<year>1981</year>
 		<publisher>LJK</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2766,11 +2766,11 @@ Compiled by K1W1
 
 	<software name="lettrtut">
 		<description>Letter Tutor (Prototype)</description>
-		<!-- Works with the Atari CX75 light pen device. -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
+			<feature name="peripheral" value="cx75_pen" /> <!-- Works with the Atari CX75 light pen device -->
 			<dataarea name="rom" size="8192">
 				<rom name="letter tutor (proto).rom" size="8192" crc="21111576" sha1="139076b365095bdc17b11e8b4e2b6524cb863a52" offset="0" />
 			</dataarea>
@@ -2817,11 +2817,10 @@ Compiled by K1W1
 
 	<software name="logcmstr">
 		<description>LogicMaster</description>
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. Will not run without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<info name="serial" value="10042A-3" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only, Chalkboard Inc.'s Powerpad Tablet required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2832,11 +2831,11 @@ Compiled by K1W1
 
 	<software name="lgcmstrf" cloneof="logcmstr">
 		<description>LogicMaster (Fixed)</description>
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. This ROM has been fixed to run on the A800 but will not play without device attached. -->
+		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<info name="serial" value="10042A-3" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only, Chalkboard Inc.'s Powerpad Tablet required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3008,7 +3007,7 @@ Compiled by K1W1
 		<description>Pocket Modem Software v2.08</description>
 		<year>1984</year>
 		<publisher>BOT Engineering</publisher>
-		<info name="usage" value="Requires a Pocket Modem" />
+		<info name="usage" value="Pocket Modem required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3059,7 +3058,7 @@ Compiled by K1W1
 		<description>Microprinter System 800</description>
 		<year>1983</year>
 		<publisher>MSI</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3070,11 +3069,10 @@ Compiled by K1W1
 
 	<software name="microill">
 		<description>MicroIllustrator</description>
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. Will not run without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<info name="serial" value="10016A-3" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only, Chalkboard Inc.'s Powerpad Tablet required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3085,11 +3083,10 @@ Compiled by K1W1
 
 	<software name="maestro">
 		<description>MicroMaestro</description>
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. Will not run without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<info name="serial" value="10021A-3" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only, Chalkboard Inc.'s Powerpad Tablet required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3100,11 +3097,11 @@ Compiled by K1W1
 
 	<software name="maestrof" cloneof="maestro">
 		<description>MicroMaestro (Fixed)</description>
-		<!-- Requires Chalkboard Inc.'s Powerpad Tablet device. This ROM has been fixed to run on the A800 but will not play without device attached. -->
+		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
 		<publisher>Chalkboard</publisher>
 		<info name="serial" value="10021A-3" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only, Chalkboard Inc.'s Powerpad Tablet required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3153,12 +3150,12 @@ Compiled by K1W1
 
 	<software name="missile">
 		<description>Missile Command</description>
-		<!-- Works with Trackball controller. -->
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL4012" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
+			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="8192">
 				<rom name="missile command.rom" size="8192" crc="d2e36392" sha1="df5474e89183ca0313f50ea4fc72c67bf81c7351" offset="0" /> <!-- Verified -->
 			</dataarea>
@@ -3167,11 +3164,11 @@ Compiled by K1W1
 
 	<software name="missilep" cloneof="missile">
 		<description>Missile Command+ (Hack)</description>
-		<!-- Works with Trackball controller. -->
 		<year>2006</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
+			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="missile command+.rom" size="16384" crc="2acfd240" sha1="ba7d4b781adc402c1335aafa0ae8cc9a3d8928ba" offset="0" />
 			</dataarea>
@@ -3196,7 +3193,7 @@ Compiled by K1W1
 		<year>1982</year>
 		<publisher>Epyx</publisher>
 		<info name="serial" value="56" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3482,7 +3479,7 @@ Compiled by K1W1
 		<description>Picnic Paranoia</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3703,7 +3700,7 @@ Compiled by K1W1
 		<description>Protector II</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3883,10 +3880,10 @@ Compiled by K1W1
 
 	<software name="letter">
 		<description>Sesame Street Letter-Go-Round</description>
-		<!-- Keybpoard overlay was supplied with cartridge. -->
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
 		<info name="serial" value="4L-0365" />
+		<info name="usage" value="Keyboard overlay was supplied with cartridge" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3899,7 +3896,7 @@ Compiled by K1W1
 		<description>Shamus</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3938,7 +3935,7 @@ Compiled by K1W1
 		<description>Slime</description>
 		<year>1982</year>
 		<publisher>Synapse</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -4173,7 +4170,7 @@ Compiled by K1W1
 		<year>1982</year>
 		<publisher>IDSI</publisher>
 		<info name="serial" value="AC1021" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -4210,10 +4207,10 @@ Compiled by K1W1
 
 	<software name="spyhuntr">
 		<description>Spy Hunter</description>
-		<!-- This cartridge requires 2 joysticks to play. -->
 		<year>1984</year>
 		<publisher>SEGA</publisher>
 		<info name="serial" value="011-03" />
+		<info name="usage" value="2 joysticks required to play." />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -4402,10 +4399,10 @@ Compiled by K1W1
 
 	<software name="sketch">
 		<description>Super Sketch Graphics Master</description>
-		<!-- Requires the Personal Peripherals Inc. Super Sketch device. -->
 		<year>1984</year>
 		<publisher>PPI</publisher>
 		<info name="serial" value="G2300" />
+		<info name="usage" value="Personal Peripherals Inc. Super Sketch device required" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -4466,9 +4463,9 @@ Compiled by K1W1
 
 	<software name="target">
 		<description>Target Electronic Banking</description>
-		<!-- Requires modem and a working Chemical Bank service, obviously inactive for decades. -->
 		<year>1986</year>
 		<publisher>COVIDEA</publisher>
+		<info name="usage" value="Modem required (and a working Chemical Bank service, obviously inactive for decades)" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="N/A" />
 			<dataarea name="rom" size="16384">
@@ -4482,7 +4479,7 @@ Compiled by K1W1
 		<year>1981</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL4015" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -4496,7 +4493,7 @@ Compiled by K1W1
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL4016" />
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="N/A" />
 			<dataarea name="rom" size="8192">
@@ -4613,7 +4610,7 @@ Compiled by K1W1
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1983</year>
 		<publisher>Eastern House</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="right slot 8k" />
 			<dataarea name="rom" size="8192">
@@ -4627,7 +4624,7 @@ Compiled by K1W1
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1983</year>
 		<publisher>Eastern House</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="right slot 8k" />
 			<dataarea name="rom" size="8192">
@@ -4641,7 +4638,7 @@ Compiled by K1W1
 		<!-- This cartridge could only be used in the A800 Right Cartridge Slot. -->
 		<year>1981</year>
 		<publisher>Eastern House</publisher>
-		<info name="usage" value="OSb required" />
+		<info name="usage" value="OSb only" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="right slot 8k" />
 			<dataarea name="rom" size="8192">
@@ -4700,13 +4697,13 @@ Compiled by K1W1
 
 	<software name="trackfld">
 		<description>Track and Field</description>
-		<!-- Works with Track & Field controller -->
 		<!-- When run in PAL the title screen says "Los Angeles 1984 Games". -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8069" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
+			<feature name="peripheral" value="trackfld" /> <!-- Works with Track &amp; Field controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="track and field.rom" size="16384" crc="9e2484c8" sha1="899305b96e204e8091183733bec43fbd84c18d4a" offset="0" /> <!-- Verified -->
 			</dataarea>
