@@ -69,9 +69,19 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_psg_latch_w);
 	DECLARE_READ8_MEMBER(bml3_vram_attr_r);
 	DECLARE_WRITE8_MEMBER(bml3_vram_attr_w);
+	DECLARE_READ8_MEMBER(bml3_beep_r);
 	DECLARE_WRITE8_MEMBER(bml3_beep_w);
 	DECLARE_WRITE8_MEMBER(bml3_piaA_w);
 	DECLARE_READ8_MEMBER(bml3_keyb_nmi_r);
+	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
+	DECLARE_READ8_MEMBER(bml3_firq_status_r);
+
+
+	DECLARE_READ_LINE_MEMBER( bml3_acia_rx_r );
+	DECLARE_WRITE_LINE_MEMBER( bml3_acia_tx_w );
+	DECLARE_READ_LINE_MEMBER( bml3_acia_dts_r );
+	DECLARE_WRITE_LINE_MEMBER( bml3_acia_rts_w );
+	DECLARE_READ_LINE_MEMBER(bml3_acia_dcd_r);
 
 	DECLARE_READ8_MEMBER(bml3_a000_r); DECLARE_WRITE8_MEMBER(bml3_a000_w);
 	DECLARE_READ8_MEMBER(bml3_c000_r); DECLARE_WRITE8_MEMBER(bml3_c000_w);
@@ -91,6 +101,7 @@ public:
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT16 m_kanji_addr;
 	UINT8 *m_extram;
+	UINT8 m_firq_mask,m_firq_status;
 
 protected:
 	virtual void machine_reset();
@@ -336,65 +347,48 @@ WRITE8_MEMBER( bml3_state::bml3_vram_attr_w)
 	m_attr_latch = data;
 }
 
+READ8_MEMBER( bml3_state::bml3_beep_r)
+{
+	return -1; // BEEP status read?
+}
+
 WRITE8_MEMBER( bml3_state::bml3_beep_w)
 {
 	beep_set_state(m_beep,!BIT(data, 7));
 }
 
-READ8_MEMBER( bml3_state::bml3_a000_r)
-{
-	return m_extram[offset + 0xa000];
-}
-
-WRITE8_MEMBER( bml3_state::bml3_a000_w)
-{
-	m_extram[offset + 0xa000] = data;
-}
-
-READ8_MEMBER( bml3_state::bml3_c000_r)
-{
-	return m_extram[offset + 0xc000];
-}
-
-WRITE8_MEMBER( bml3_state::bml3_c000_w)
-{
-	m_extram[offset + 0xc000] = data;
-}
-
-READ8_MEMBER( bml3_state::bml3_e000_r)
-{
-	return m_extram[offset + 0xe000];
-}
-
-WRITE8_MEMBER( bml3_state::bml3_e000_w)
-{
-	m_extram[offset + 0xe000] = data;
-}
-
-READ8_MEMBER( bml3_state::bml3_f000_r)
-{
-	return m_extram[offset + 0xf000];
-}
-
-WRITE8_MEMBER( bml3_state::bml3_f000_w)
-{
-	m_extram[offset + 0xf000] = data;
-}
-
-
-READ8_MEMBER( bml3_state::bml3_fff0_r)
-{
-	return m_extram[offset + 0xfff0];
-}
-
-WRITE8_MEMBER( bml3_state::bml3_fff0_w)
-{
-	m_extram[offset + 0xfff0] = data;
-}
+READ8_MEMBER( bml3_state::bml3_a000_r) { return m_extram[offset + 0xa000]; }
+WRITE8_MEMBER( bml3_state::bml3_a000_w) { m_extram[offset + 0xa000] = data; }
+READ8_MEMBER( bml3_state::bml3_c000_r) { return m_extram[offset + 0xc000]; }
+WRITE8_MEMBER( bml3_state::bml3_c000_w) { m_extram[offset + 0xc000] = data; }
+READ8_MEMBER( bml3_state::bml3_e000_r) { return m_extram[offset + 0xe000]; }
+WRITE8_MEMBER( bml3_state::bml3_e000_w) { m_extram[offset + 0xe000] = data; }
+READ8_MEMBER( bml3_state::bml3_f000_r) { return m_extram[offset + 0xf000]; }
+WRITE8_MEMBER( bml3_state::bml3_f000_w) { m_extram[offset + 0xf000] = data; }
+READ8_MEMBER( bml3_state::bml3_fff0_r) { return m_extram[offset + 0xfff0]; }
+WRITE8_MEMBER( bml3_state::bml3_fff0_w) { m_extram[offset + 0xfff0] = data; }
 
 READ8_MEMBER( bml3_state::bml3_keyb_nmi_r)
 {
 	return 0; // bit 7 used to signal a BREAK key pressure
+}
+
+WRITE8_MEMBER( bml3_state::bml3_firq_mask_w)
+{
+	m_firq_mask = data & 0x80;
+	if(m_firq_mask)
+	{
+		m_firq_status = 0; // clear pending firq
+		device_set_input_line(m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	}
+}
+
+READ8_MEMBER( bml3_state::bml3_firq_status_r )
+{
+	UINT8 res = m_firq_status << 7;
+	m_firq_status = 0;
+	device_set_input_line(m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	return res;
 }
 
 static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
@@ -413,13 +407,13 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0xffc6, 0xffc7) AM_WRITE(bml3_6845_w)
 	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
 	AM_RANGE(0xffc9, 0xffc9) AM_READ_PORT("DSW")
-//	AM_RANGE(0xffca, 0xffca) timer irq
+	AM_RANGE(0xffca, 0xffca) AM_READ(bml3_firq_status_r) // timer irq
 //	AM_RANGE(0xffcb, 0xffcb) light pen flag
 	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(bml3_hres_reg_w) // mode select
 //	AM_RANGE(0xffd1, 0xffd1) trace counter
 //	AM_RANGE(0xffd2, 0xffd2) remote switch
-	AM_RANGE(0xffd3, 0xffd3) AM_WRITE(bml3_beep_w) // music select
-//	AM_RANGE(0xffd4, 0xffd4) time mask
+	AM_RANGE(0xffd3, 0xffd3) AM_READWRITE(bml3_beep_r,bml3_beep_w) // music select
+	AM_RANGE(0xffd4, 0xffd4) AM_WRITE(bml3_firq_mask_w)
 //	AM_RANGE(0xffd5, 0xffd5) light pen
 	AM_RANGE(0xffd6, 0xffd6) AM_WRITE(bml3_vres_reg_w) // interlace select
 //	AM_RANGE(0xffd7, 0xffd7) baud select
@@ -605,13 +599,19 @@ static INTERRUPT_GEN( bml3_irq )
 {
 	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
-
-static INTERRUPT_GEN( bml3_firq )
-{
-	/* almost surely used to load the tapes */
-	cputag_set_input_line(device->machine(), "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
-}
 #endif
+
+
+static INTERRUPT_GEN( bml3_timer_firq )
+{
+	bml3_state *state = device->machine().driver_data<bml3_state>();
+
+	if(!state->m_firq_mask)
+	{
+		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
+		state->m_firq_status = 1;
+	}
+}
 
 static PALETTE_INIT( bml3 )
 {
@@ -654,6 +654,8 @@ void bml3_state::machine_reset()
 	mem->install_write_handler(0xfff0, 0xffff, 0, 0,
 		write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),
 		0);
+
+	m_firq_mask = -1; // disable firq
 }
 
 /* F4 Character Displayer */
@@ -816,15 +818,45 @@ static const pia6821_interface bml3_pia_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
+
+READ_LINE_MEMBER( bml3_state::bml3_acia_rx_r )
+{
+	printf("TAPE R\n");
+	return 1;
+}
+
+WRITE_LINE_MEMBER( bml3_state::bml3_acia_tx_w )
+{
+	printf("%02x TAPE\n",state);
+}
+
+
+READ_LINE_MEMBER( bml3_state::bml3_acia_dts_r )
+{
+	printf("TAPE R DTS\n");
+	return 1;
+}
+
+WRITE_LINE_MEMBER( bml3_state::bml3_acia_rts_w )
+{
+	printf("%02x TAPE RTS\n",state);
+}
+
+READ_LINE_MEMBER( bml3_state::bml3_acia_dcd_r )
+{
+	printf("TAPE R DCD\n");
+	return 1;
+}
+
 static ACIA6850_INTERFACE( bml3_acia_if )
 {
-	0,
-	0,
-	DEVCB_NULL,//LINE(m6809_acia_rx_r),
-	DEVCB_NULL,//LINE(m6809_acia_tx_w),
-	DEVCB_NULL,//LINE(m6809_acia_cts_r),
-	DEVCB_NULL,//LINE(m6809_acia_rts_w),
-	DEVCB_NULL,//LINE(m6809_acia_dcd_r),
+	600,
+	600,
+	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_rx_r),
+	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_tx_w),
+	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_dts_r),
+	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_rts_w),
+	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_dcd_r),
 	DEVCB_NULL//LINE(m6809_acia_irq)
 };
 
@@ -859,7 +891,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(bml3_mem)
-//  MCFG_CPU_VBLANK_INT("screen", bml3_irq )
+	MCFG_CPU_VBLANK_INT("screen", bml3_timer_firq )
 //  MCFG_CPU_PERIODIC_INT(bml3_firq,45)
 
 	MCFG_MACHINE_START(bml3)
