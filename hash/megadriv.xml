@@ -26851,6 +26851,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="souledge">
+		<description>Soul Edge vs Samurai Spirits (Pirate, Cracked)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="soul edge vs samurai spirits (unl)[f1].bin" size="2097152" crc="74a6d7a7" sha1="679e74efc254f08c7fe830f8394f10f24272d00b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smario2a" cloneof="smario2" supported="no">
 		<description>Super Mario 2 (Alt?)</description>
 		<year>199?</year>
