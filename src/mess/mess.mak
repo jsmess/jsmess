@@ -1798,6 +1798,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/ptcsol.o	\
 	$(MESS_DRIVERS)/pv9234.o	\
 	$(MESS_DRIVERS)/qtsbc.o		\
+	$(MESS_DRIVERS)/rm380z.o	\
 	$(MESS_DRIVERS)/rvoice.o	\
 	$(MESS_DRIVERS)/sacstate.o	\
 	$(MESS_DRIVERS)/sage2.o		\
