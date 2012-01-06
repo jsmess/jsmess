@@ -93,7 +93,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 <!-- Tape ASCII 84/09 -->
-	<software name="asc">
+	<software name="muscat">
 		<description>Muscat Arrange</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -389,7 +389,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="denzeni">
+	<software name="dezeni">
 		<description>デゼニランド</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -557,7 +557,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="field">
+	<software name="fieldwar">
 		<description>フィールドウォーズ</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -585,7 +585,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="fire">
+	<software name="firecrys">
 		<description>The Fire Crystal</description>
 		<year>1986?</year>
 		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
@@ -737,9 +737,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 <!-- 機動戦士ガンダム・ジェットストリームアタック - not working (Device I/O error) -->
 	<software name="gundam" supported="no">
-		<description>ガンダム</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>機動戦士ガンダム・ジェットストリームアタック</description>
+		<year>1984</year>
+		<publisher>バンダイ (Bandai)</publisher>
+		<info name="serial" value="BF7-410"/>
+		<info name="alt_title" value="Kidou Senshi Gundam - Jet Stream Attack"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2693198">
 				<rom name="gun.t77" size="2693198" crc="1f6d8270" sha1="5e2d665ea152baf866015fb3a1a8587e5cce38fe" offset="000000" />
@@ -811,10 +813,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="hydlide1">
-		<description>Hydlide 1</description>
-		<year>19??</year>
+	<software name="hydlide">
+		<description>Hydlide</description>
+		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="TET-53"/>
+		<info name="release" value="198503xx"/>
 		<info name="alt_title" value="ハイドライド"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
@@ -824,10 +828,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="hydlidea" cloneof="hydlide1">
-		<description>Hydlide 1 (Alt)</description>
-		<year>19??</year>
+	<software name="hydlidea" cloneof="hydlide">
+		<description>Hydlide (Alt)</description>
+		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="TET-53"/>
+		<info name="release" value="198503xx"/>
 		<info name="alt_title" value="ハイドライド"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
@@ -838,9 +844,11 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="hydlide2">
-		<description>Hydlide 2</description>
-		<year>19??</year>
+		<description>Hydlide II - Shine of Darkness</description>
+		<year>1986</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="TET-65"/>
+		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="ハイドライド2"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1403954">
@@ -860,9 +868,11 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="hydlide2a" cloneof="hydlide2">
-		<description>Hydlide 2 (Alt)</description>
-		<year>19??</year>
+		<description>Hydlide II - Shine of Darkness (Alt)</description>
+		<year>1986</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="TET-65"/>
+		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="ハイドライド2"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1080668">
@@ -883,8 +893,8 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="ixion">
 		<description>Ixion</description>
-		<year>19??</year>
-		<publisher>Try-Base / Y.Katayama</publisher>
+		<year>1985</year>
+		<publisher>トライベース (Try-Base)</publisher>
 		<info name="alt_title" value="イクシオン"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2381806">
@@ -895,8 +905,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="jelda2">
 		<description>ジェルダ２</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="serial" value="GA-025"/>
+		<info name="release" value="198408xx"/>
+		<info name="alt_title" value="ジェルダ2"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="445632">
 				<rom name="g2_1.t77" size="445632" crc="852c8110" sha1="a209a1ebdf1d29b12bddee153c1e2069bad8a1c3" offset="000000" />
@@ -910,9 +923,12 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="kaguya">
-		<description>おーいかぐや姫</description>
-		<year>19??</year>
-		<publisher>ポニカ (Pony Canyon)</publisher>
+		<description>おーい！かぐや姫　- 衣衣 のわかれ</description>
+		<year>1983</year>
+		<publisher>ポニカ (PonyCa)</publisher>
+		<info name="serial" value="K40M5047"/>
+		<info name="release" value="198311xx"/>
+		<info name="alt_title" value="Ohi! Kaguya Hime - Koromo Koromo no Waka re"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2274254">
 				<rom name="ooikagu.t77" size="2274254" crc="9f0057ff" sha1="da5947960734ef53cd3b5332e971ad14be680f62" offset="000000" />
@@ -922,8 +938,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="kaito">
 		<description>華麗なる怪盗</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="serial" value="LA-1035"/>
+		<info name="alt_title" value="Kareina Kaitou"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="969610">
@@ -932,10 +950,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="kami">
+	<software name="kamuiken">
 		<description>カムイの剣</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>コンプティーク (Comptiq)</publisher>
+		<info name="serial" value="158111"/>
+		<info name="alt_title" value="Kamui no Ken"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2390932">
 				<rom name="kam1a_b.t77" size="2390932" crc="f486a854" sha1="c6c1ba1213f409e4aaf62a2ef49c8260acb13167" offset="000000" />
@@ -958,10 +978,13 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="karu">
+	<software name="karuizaw">
 		<description>軽井沢誘拐案内</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G135"/>
+		<info name="release" value="198507xx"/>
+		<info name="alt_title" value="Karuizawa Yukai Annai"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2670614">
 				<rom name="karu1.t77" size="2670614" crc="157131a0" sha1="586ca6b034a3edbea9452545a6072a9d26140e55" offset="000000" />
@@ -987,7 +1010,9 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="kiki">
 		<description>マリちゃん危機一髪</description>
 		<year>1983</year>
-		<publisher>Tadashi Makimura</publisher>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="release" value="198302xx"/>
+		<info name="alt_title" value="Mari-chan Kiki Ippatsu"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="4555760">
 				<rom name="kiki.t77" size="4555760" crc="cf535f2f" sha1="f14df460bd63bba2bc0db4869ea865a2bd8b900c" offset="000000" />
@@ -997,8 +1022,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="kokushi">
 		<description>国士無双</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
+		<info name="serial" value="K28M5021"/>
+		<info name="release" value="198310xx"/>
+		<info name="alt_title" value="Kokushi Musou"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2162090">
 				<rom name="kok.t77" size="2162090" crc="072a8753" sha1="fce7ad1a32e31398df17f445f4faa6b1b567e617" offset="000000" />
@@ -1009,8 +1037,9 @@ Titles, serial #s, publishers and release dates taken from:
 <!-- カレイドスコープ・7万光年の胞子たち -->
 	<software name="kscope">
 		<description>カレイドスコープ</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>HOT・B</publisher>
+		<info name="alt_title" value="Kaleidoscope"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1124694">
 				<rom name="kalei_s.t77" size="1124694" crc="6ee69eb0" sha1="57947f1195834f2089b453d1bfaf7133ee5bdfbd" offset="000000" />
@@ -1031,8 +1060,9 @@ Titles, serial #s, publishers and release dates taken from:
 <!-- Nothing more than a single-screen version of Mappy... -->
 	<software name="littleg">
 		<description>Little Gang</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>日本ソフト (Nihon Soft) / ハード (Hard)</publisher>
+		<info name="alt_title" value="リトルギャング"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1425834">
 				<rom name="littleg.t77" size="1425834" crc="3b9e282e" sha1="0dc0b0aaa87397c40d72b1c59dc4435f1a3946ea" offset="000000" />
@@ -1042,8 +1072,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="lizard">
 		<description>Lizard</description>
-		<year>19??</year>
-		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<year>1985</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="リザード"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2444224">
@@ -1052,10 +1083,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="lode">
+	<software name="loderun">
 		<description>Lode Runner</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>ソフトプロ (Soft Pro)</publisher>
+		<info name="serial" value="SHG011"/>
+		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="ロードランナー"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2258856">
@@ -1080,10 +1113,10 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="lupin3">
-		<description>Lupin the 3rd</description>
-		<year>19??</year>
-		<publisher>CPU Software</publisher>
-		<info name="alt_title" value="ルパンＩＩＩ世"/>
+		<description>Lupin the 3</description>
+		<year>1983</year>
+		<publisher>CPU</publisher>
+		<info name="alt_title" value="ルパンIII"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="387298">
 				<rom name="lupin.t77" size="387298" crc="e36dec5e" sha1="60f413ed19952a179f4897e2eb8e65c129d7923b" offset="000000" />
@@ -1093,8 +1126,8 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="mainroyl">
 		<description>Main Royal</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="メインロイヤル"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1227180">
@@ -1105,8 +1138,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="mappy">
 		<description>Mappy</description>
-		<year>19??</year>
+		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="serial" value="DP-3301183"/>
 		<info name="alt_title" value="マッピー"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2808984">
@@ -1115,10 +1149,11 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="mariobrs">
+	<software name="mariosp">
 		<description>Mario Bros. Special</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="マリオブラザーズ スペシャル"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2453598">
 				<rom name="mariobrs.t77" size="2453598" crc="6da2355e" sha1="e1af54a873dce91a4bca2f75c1c628af74891424" offset="000000" />
@@ -1128,8 +1163,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="mazinger">
 		<description>マジンガーＺ</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>バンダイ (Bandai)</publisher>
+		<info name="serial" value="BF7-406"/>
+		<info name="alt_title" value="Mazinger Z"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3789260">
 				<rom name="majin.t77" size="3789260" crc="3aa0b3da" sha1="f28e2d3c0eb564c55114e43cc8bd393d499c3454" offset="000000" />
@@ -1141,6 +1178,8 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Midway</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="serial" value="DP-3036"/>
+		<info name="release" value="198309xx"/>
 		<info name="alt_title" value="ミッドウェイ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1361648">
@@ -1153,6 +1192,8 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Mole Mole</description>
 		<year>1985</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
+		<info name="serial" value="F-1015"/>
+		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="モールモール"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3875684">
@@ -1163,8 +1204,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="mrbatfry">
 		<description>ミスターバタフライ</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="serial" value="LA-1019"/>
+		<info name="alt_title" value="Mr. Butterfly"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1102476">
@@ -1175,8 +1218,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="mu">
 		<description>ムー大陸の謎</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>マジカルズゥ (MagicalZoo)</publisher>
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="Mu Tairiku no Nazo"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2637670">
 				<rom name="mu.t77" size="2637670" crc="fb9fea6f" sha1="e0e0cd9061b970d46f275973dfef38ecf9db1f14" offset="000000" />
@@ -1186,8 +1231,8 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="mysteryh">
 		<description>Mystery House</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="ミステリーハウス"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1742136">
@@ -1197,9 +1242,11 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="nampa">
-		<description>Tokyo-Nampa-Street</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tokyo Nampa Street</description>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G108"/>
+		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="東京ナンパストリート"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2665584">
@@ -1231,8 +1278,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="nihon">
 		<description>日本海海戦</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>ソフトネット (Soft Net)</publisher>
+		<info name="serial" value="N-01"/>
+		<info name="alt_title" value="Nihon Kaikaisen"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1064148">
 				<rom name="nihon.t77" size="1064148" crc="29e895e6" sha1="ea8b398c673eeb8de9882f354984b8e14f68642b" offset="000000" />
@@ -1241,9 +1290,11 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="nobu">
-		<description>信長の野望 (初代)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>信長の野望</description>
+		<year>1983</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="serial" value="104E"/>
+		<info name="alt_title" value="Nobunaga no Yabou"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1390214">
 				<rom name="nobu.t77" size="1390214" crc="bd35fdbe" sha1="a3e7eda42ab9c04330b28d471dd87997eef240a3" offset="000000" />
@@ -1251,11 +1302,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-<!-- Ougon no Haka -->
 	<software name="ougon">
 		<description>黄金の墓</description>
 		<year>1983</year>
 		<publisher>マジカルズゥ (MagicalZoo)</publisher>
+		<info name="serial" value="SF-07"/>
+		<info name="alt_title" value="Ougon no Haka"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="7402016">
 				<rom name="ogon.t77" size="7402016" crc="12a27634" sha1="ab18df8858e9d6eb121915dd7b1a4c51b24bdfa1" offset="000000" />
@@ -1265,8 +1317,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="oushou">
 		<description>王将</description>
-		<year>19??</year>
-		<publisher>Zero Soft / Carry</publisher>
+		<year>1983</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="serial" value="PP23"/>
+		<info name="alt_title" value="Oushou"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="789194">
@@ -1277,8 +1331,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="pacman">
 		<description>パックマン</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="serial" value="DP-3991"/>
+		<info name="alt_title" value="Pac-Man"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1126162">
@@ -1289,8 +1345,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="panic">
 		<description>女子寮パニック</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G027"/>
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="Joshi Ryou Panic"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="11369494">
 				<rom name="panic.t77" size="11369494" crc="e42b289e" sha1="bf44e13d984ff5bec00c3a5660b3b897ed0ace7a" offset="000000" />
@@ -1300,8 +1359,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="penguin">
 		<description>ペンギンくん</description>
-		<year>19??</year>
-		<publisher>Open-Reach</publisher>
+		<year>1983</year>
+		<publisher>日本ソフト (Nihon Soft) / ハード (Hard)</publisher>
+		<info name="release" value="198306xx"/>
+		<info name="alt_title" value="Penguin-kun"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1289414">
@@ -1310,10 +1371,11 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="per">
+	<software name="perseus">
 		<description>カレイジアス・ペルセウス</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984?</year>
+		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<info name="alt_title" value="Corageous Perseus"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="42158">
 				<rom name="per.t77" size="42158" crc="83b6ced1" sha1="da468ffc4d331fdb8c4584e11349d093281a301d" offset="000000" />
@@ -1328,8 +1390,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="portpia">
 		<description>ポートピア連続殺人事件</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G034"/>
+		<info name="alt_title" value="Portopia Renzoku Satsujin Jiken"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="55320">
 				<rom name="portpia1.t77" size="55320" crc="c828949f" sha1="5a45ca2c832eb41122816bed92f76af0bac605b7" offset="000000" />
@@ -1347,10 +1411,11 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="priv">
+	<software name="private">
 		<description>女子大生プライベート</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="Joshidai-sei Private"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2097526">
 				<rom name="priv.t77" size="2097526" crc="6b81e064" sha1="a619775d7b380db5fe918066b739d5058e9080cf" offset="000000" />
@@ -1360,8 +1425,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="proyakyu">
 		<description>プロ野球スーパーシミュレーション</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>JDS</publisher>
+		<info name="serial" value="JS-05"/>
+		<info name="alt_title" value="Pro Yakyu Super Simulation"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2627702">
@@ -1372,8 +1439,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="psychic">
 		<description>サイキックシティ</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>HOT・B</publisher>
+		<info name="serial" value="FUHB-23004"/>
+		<info name="release" value="198410xx"/>
+		<info name="alt_title" value="Psychic City"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="222184">
 				<rom name="data.t77" size="222184" crc="4fe8ca64" sha1="9353a973bec6774daa92273486f65883b9346f11" offset="000000" />
@@ -1394,8 +1464,9 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="punchbal">
 		<description>Punch Ball Mario Bros.</description>
 		<year>1984</year>
-		<publisher>Kiku / Hudson Soft</publisher>
-		<info name="alt_title" value="パンチボールマリオ"/>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="release" value="198410xx"/>
+		<info name="alt_title" value="パンチボール マリオブラザーズ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1857252">
 				<rom name="punchbal.t77" size="1857252" crc="d2355b5b" sha1="c60d5403bd4691802d9f264871eafc40e24f5427" offset="000000" />
@@ -1406,8 +1477,9 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="punchbala" cloneof="punchbal">
 		<description>Punch Ball Mario Bros. (Alt)</description>
 		<year>1984</year>
-		<publisher>Kiku / Hudson Soft</publisher>
-		<info name="alt_title" value="パンチボールマリオ"/>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="release" value="198410xx"/>
+		<info name="alt_title" value="パンチボール マリオブラザーズ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2132424">
 				<rom name="punch.t77" size="2132424" crc="df66e659" sha1="37f81f05983f5d68ccfa56da82cb686ddec5a134" offset="000000" />
@@ -1417,8 +1489,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="raizer">
 		<description>地球戦士ライーザ</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G153"/>
+		<info name="release" value="198510xx"/>
+		<info name="alt_title" value="Chikyuu Senshi Raizer"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3385768">
 				<rom name="raizer1_a.t77" size="3385768" crc="c2d37bbb" sha1="62092c3517445bb1d98ab4fd0f8d7741dec510cb" offset="000000" />
@@ -1443,8 +1518,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="rallyx">
 		<description>Rally-X</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="serial" value="DP-3301162"/>
 		<info name="alt_title" value="ラリーＸ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="122012">
@@ -1463,10 +1539,11 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="ren">
+	<software name="renju">
 		<description>連珠</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1981</year>
+		<publisher>九十九電機 (Tsukumo Denki)</publisher>
+		<info name="alt_title" value="Renju"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="352882">
@@ -1475,10 +1552,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="riguras">
+	<software name="riglas">
 		<description>リグラス</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ランダムハウス (Random House)</publisher>
+		<info name="release" value="198607xx"/>
+		<info name="alt_title" value="Riglas"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="8374364">
 				<rom name="riguras1.t77" size="8374364" crc="4bee872a" sha1="ddad41626e967e40e8f981f1b92c183ca976e969" offset="000000" />
@@ -1492,9 +1571,12 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="ringnoue">
-		<description>リングの上はおおさわぎ</description>
-		<year>19??</year>
-		<publisher>Micro Arts</publisher>
+		<description>リングの上は大さわぎ</description>
+		<year>1984</year>
+		<publisher>日本ソフトバンク (Nihon SoftBank)</publisher>
+		<info name="serial" value="FUJE-13001"/>
+		<info name="release" value="198411xx"/>
+		<info name="alt_title" value="Ring no Ue wa - Dai Sawagi"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3383716">
 				<rom name="ringnoue.t77" size="3383716" crc="f80c7887" sha1="e9bc0609204a2b1d96d1e6df36cfc1ffa4c59223" offset="000000" />
@@ -1502,10 +1584,11 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="salada">
+	<software name="salad">
 		<description>サラダの国のトマト姫</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="Salad no Kuni no Tomato Hime"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="34030">
 				<rom name="salada3.t77" size="34030" crc="bb3ad189" sha1="1a959989704b3616e9e9ea8112595a86e6e2936c" offset="000000" />
@@ -1525,8 +1608,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="sanjutsu">
 		<description>医は算術なり</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1982</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="serial" value="LA-1009"/>
+		<info name="alt_title" value="Iwasanjutsunari"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1232372">
 				<rom name="san.t77" size="1232372" crc="6fc56674" sha1="22f36cb798cf3059c2a890532fcedffc5461ffef" offset="000000" />
@@ -1537,7 +1622,9 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="sbasebal">
 		<description>スーパーベースボール</description>
 		<year>1983</year>
-		<publisher>Tinysoft</publisher>
+		<publisher>サワダデンキ (Sawada Denki)</publisher>
+		<info name="serial" value="F7-1002"/>
+		<info name="alt_title" value="Super Baseball"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1217884">
 				<rom name="bas.t77" size="1217884" crc="db17a54b" sha1="7d302e32aa45d834d4d4086d2affd221932c5611" offset="000000" />
@@ -1545,10 +1632,11 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="selaphis">
+	<software name="serapis">
 		<description>セラピスの神殿</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>T.I.P.</publisher>
+		<info name="alt_title" value="Serapis no Shinden"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1521974">
 				<rom name="ser.t77" size="1521974" crc="3c023dfa" sha1="6356caad4c17ca4ef27f447b8145d53ab88e94d1" offset="000000" />
@@ -1558,8 +1646,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="sokoban">
 		<description>倉庫番</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1982</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<info name="serial" value="FUTQ13003"/>
+		<info name="release" value="198212xx"/>
+		<info name="alt_title" value="Sokouban"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1292496">
 				<rom name="soko.t77" size="1292496" crc="43d2305e" sha1="d186c7b109996d81d996bd195f06ccce7c1c24bf" offset="000000" />
@@ -1569,8 +1660,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="sokoban2">
 		<description>倉庫番２</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<info name="release" value="198402xx"/>
+		<info name="alt_title" value="Sokouban 2"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1161332">
 				<rom name="sokoban.t77" size="1161332" crc="40d4f9ea" sha1="d962a6b54099160c059b4ee11efeb9e3002ea89d" offset="000000" />
@@ -1584,9 +1677,10 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="sonic">
-		<description>Sonicboom</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sonic Boom</description>
+		<year>1985</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="serial" value="CF-1185"/>
 		<info name="alt_title" value="ソニックブーン"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3569132">
@@ -1595,10 +1689,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="sou">
+	<software name="southern">
 		<description>サザンクロス</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>バンダイ (Bandai)</publisher>
+		<info name="serial" value="BF7-411T"/>
+		<info name="alt_title" value="Southern Cross"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="26822">
 				<rom name="1-sou.t77" size="26822" crc="35003f53" sha1="144fcf3a183ccb789637abda933d100b0171c2e9" offset="000000" />
@@ -1633,8 +1729,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="spacebee">
 		<description>Space Bee</description>
-		<year>19??</year>
-		<publisher>Carry</publisher>
+		<year>1983</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="release" value="198306xx"/>
 		<info name="alt_title" value="スペースビー"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
@@ -1646,8 +1743,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="spc2030">
 		<description>Space 2030</description>
-		<year>19??</year>
-		<publisher>Brain Computer</publisher>
+		<year>1983</year>
+		<publisher>ブレーンコンピュータ (Brain Computer)</publisher>
+		<info name="serial" value="CS-1001"/>
 		<info name="alt_title" value="スペース２０３０"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3992296">
@@ -1658,8 +1756,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="spcwarp">
 		<description>Space Warp</description>
-		<year>19??</year>
-		<publisher>Star Pack</publisher>
+		<year>1984</year>
+		<publisher>スターパック (Star Pack)</publisher>
+		<info name="release" value="198405xx"/>
 		<info name="alt_title" value="スペースワープ"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="238484">
@@ -1680,10 +1779,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="star">
-		<description>スターアーサー伝説</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="wakumeph">
+		<description>スターアーサー伝説 Ⅰ -惑星メフィウス-</description>
+		<year>1983</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="release" value="198307xx"/>
+		<info name="alt_title" value="Star Arthur Densetsu I - Wakusei Mephius"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5392962">
 				<rom name="tera_1.t77" size="5392962" crc="5f45f75f" sha1="6223a4f21d2d2f6155aa34514c8df1d707e02421" offset="000000" />
@@ -1722,9 +1823,9 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="startrek">
-		<description>Star Trek v1.2</description>
-		<year>19??</year>
-		<publisher>ツクモ (Tsukumo)</publisher>
+		<description>Star Trek</description>
+		<year>1981</year>
+		<publisher>九十九電機 (Tsukumo Denki)</publisher>
 		<info name="alt_title" value="スーパースタートレック"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="470560">
@@ -1735,8 +1836,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="strhouse">
 		<description>Strange House</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>スターパック (Star Pack)</publisher>
+		<info name="release" value="198405xx"/>
 		<info name="alt_title" value="ストレンジハウス"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1212934">
@@ -1747,8 +1849,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="tankgame">
 		<description>タンクゲーム</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983?</year>
+		<publisher>九十九電機 (Tsukumo Denki)</publisher>
+		<info name="alt_title" value="Tank Game"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="408904">
@@ -1757,10 +1860,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="tdfever">
-		<description>タッチダウンフィーバー</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="tdown">
+		<description>タッチダウン</description>
+		<year>1985</year>
+		<publisher>ウィンキーソフト (Winky Soft)</publisher>
+		<info name="alt_title" value="Touch Down"/>
+		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1409672">
 				<rom name="tac.t77" size="1409672" crc="653feb50" sha1="5e1314a9a8b1fa3f56dd695219d85532fe8630cf" offset="000000" />
@@ -1772,6 +1877,8 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Thunder Force</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
+		<info name="serial" value="TF7-010"/>
+		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="サンダーフォース"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2329036">
@@ -1784,6 +1891,8 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Thunder Force (Alt)</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Tecno Soft)</publisher>
+		<info name="serial" value="TF7-010"/>
+		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="サンダーフォース"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2698972">
@@ -1792,10 +1901,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="tritorn">
+	<software name="triton">
 		<description>トリトーン</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ザインソフト (Sein Soft)</publisher>
+		<info name="serial" value="FUZS-13008"/>
+		<info name="alt_title" value="Triton"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="194560">
 				<rom name="tri1.t77" size="194560" crc="c4a686f7" sha1="2ffbba4b9ff644c4e1c7237c66dd32d9dbc93eb4" offset="000000" />
@@ -1810,8 +1921,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="udice">
 		<description>ウルトラダイス</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>スターパック (Star Pack)</publisher>
+		<info name="release" value="198405xx"/>
+		<info name="alt_title" value="Ultra Dice"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="447614">
 				<rom name="ult.t77" size="447614" crc="c7f51123" sha1="5c3286552b0b2b572b531834a4ea8ea7c4bc9c8a" offset="000000" />
@@ -1821,8 +1934,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="ultramah">
 		<description>ウルトラ四人麻雀</description>
-		<year>19??</year>
-		<publisher>A.Taguchi</publisher>
+		<year>1983</year>
+		<publisher>九十九電機 (Tsukumo Denki)</publisher>
+		<info name="alt_title" value="Ultra Yonin Mahjong"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1123700">
 				<rom name="mah.t77" size="1123700" crc="699d71e1" sha1="56546522b779f9e9216bd6d7307e847969c0bb92" offset="000000" />
@@ -1832,8 +1946,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="uootoy">
 		<description>ウットイ</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="serial" value="CH-1150"/>
+		<info name="alt_title" value="Uootoy"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1882972">
 				<rom name="uootoy.t77" size="1882972" crc="3bf4d54c" sha1="73e072daadbac3fe36325bec0489a42323cb8afe" offset="000000" />
@@ -1859,8 +1975,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="volguard">
 		<description>Volguard</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
+		<info name="serial" value="F2-G0105"/>
 		<info name="alt_title" value="ヴォルガード"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3893070">
@@ -1871,9 +1988,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="wedding">
 		<description>Wedding Race</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
-		<info name="alt_title" value="ウェディングレース"/>
+		<info name="alt_title" value="ウエディングレース"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="899396">
 				<rom name="wed.t77" size="899396" crc="45958fc1" sha1="5916a44bc3b54eb33628accd1c5998dd9ee623b1" offset="000000" />
@@ -1886,6 +2003,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>オランダ妻は電気ウナギの夢を見るか?</description>
 		<year>1985</year>
 		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="Holland Tsuma wa Denki Unagi no Yume wo Miruka?"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5823560">
 				<rom name="wife.t77" size="5823560" crc="063a1cf5" sha1="688f322a9b60799b8011aae7ef07aa1878e30512" offset="000000" />
@@ -1893,10 +2011,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="wired2">
-		<description>Wired 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="weird2">
+		<description>Weird 2</description>
+		<year>1985</year>
+		<publisher>ポリシー (Policy)</publisher>
+		<info name="serial" value="KG-5105"/>
+		<info name="alt_title" value="ワイアード2"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3114060">
 				<rom name="wir2.t77" size="3114060" crc="3e27a3ba" sha1="31401d73bfbba1e52b5f704de55aaeebb87a39be" offset="000000" />
@@ -1911,8 +2031,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="wldgolf">
 		<description>ワールドゴルフ</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G151"/>
+		<info name="release" value="198510xx"/>
+		<info name="alt_title" value="World Golf"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="8156366">
 				<rom name="golf.t77" size="8156366" crc="065b7dc1" sha1="f98a36ea743ef60b0aea6069f583622740f96902" offset="000000" />
@@ -1927,8 +2050,11 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="yakyu">
 		<description>野球狂</description>
-		<year>1984</year>
+		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="serial" value="LA-2008"/>
+		<info name="release" value="198503xx"/>
+		<info name="alt_title" value="Yakyu Kyo"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2945320">
 				<rom name="yakyu.t77" size="2945320" crc="02cf29fb" sha1="adc85a3c81d524ea21aca33aa15124484f8d642f" offset="000000" />
@@ -1938,8 +2064,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="yakyuken">
 		<description>野球拳</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1982</year>
+		<publisher>九十九電機 (Tsukumo Denki)</publisher>
+		<info name="alt_title" value="Yakyu Ken"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="598028">
 				<rom name="yakyu.t77" size="598028" crc="d70a43cf" sha1="ba87e6104b4a150c0f2cc345d989b2ea212d1b93" offset="000000" />
@@ -1949,8 +2076,10 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="yama">
 		<description>山手線アドベンチャー</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="198308xx"/>
+		<info name="alt_title" value="Yamanotesen Adventure"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1221136">
 				<rom name="yama.t77" size="1221136" crc="08eacb43" sha1="51ebb742424385a8dd736266e1435dd7d57a7637" offset="000000" />
@@ -1971,8 +2100,9 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="zero">
 		<description>零戦</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>バンダイ (Bandai)</publisher>
+		<info name="alt_title" value="Zerosen"/>
 		<info name="usage" value="Type LOADM&quot;&quot;,R to load"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2977554">

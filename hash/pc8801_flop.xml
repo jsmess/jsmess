@@ -25782,7 +25782,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2		   " -> "phantasie iv the birth of heroes_03.d8
 	</software>
 
 	<software name="portopia">
-		<description>Portopia Renzokusatsujin Jiken</description>
+		<description>Portopia Renzoku Satsujin Jiken</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -25796,7 +25796,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2		   " -> "phantasie iv the birth of heroes_03.d8
 	</software>
 
 	<software name="portopiaa" cloneof="portopia">
-		<description>Portopia Renzokusatsujin Jiken (Fixed?)</description>
+		<description>Portopia Renzoku Satsujin Jiken (Fixed?)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -25810,7 +25810,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2		   " -> "phantasie iv the birth of heroes_03.d8
 	</software>
 
 	<software name="portopiab" cloneof="portopia">
-		<description>Portopia Renzokusatsujin Jiken (Alt)</description>
+		<description>Portopia Renzoku Satsujin Jiken (Alt)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
