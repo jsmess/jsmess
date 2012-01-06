@@ -11,6 +11,7 @@
 #include "machine/c8280.h"
 #include "machine/d9060.h"
 #include "machine/interpod.h"
+#include "machine/softbox.h"
 
 
 #define MCFG_CBM_IEC_ADD(_intf, _default_drive) \

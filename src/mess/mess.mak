@@ -765,6 +765,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c2040.o		\
 	$(MESS_MACHINE)/c8280.o		\
 	$(MESS_MACHINE)/d9060.o		\
+	$(MESS_MACHINE)/softbox.o	\
 	$(MESS_DRIVERS)/clcd.o		\
 	$(MESS_MACHINE)/cbm.o		\
 	$(MESS_MACHINE)/cbmipt.o	\
