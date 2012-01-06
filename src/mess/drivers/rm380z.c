@@ -40,6 +40,7 @@ COS 4.0 disassembly
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
+#include "machine/terminal.h"
 #include "machine/wd17xx.h"
 
 
@@ -101,8 +102,10 @@ public:
 
 	DECLARE_WRITE8_MEMBER(disk_0_control);
 
-	int keyboard_decode();
+	DECLARE_WRITE8_MEMBER( keyboard_put );
+
 };
+
 
 WRITE8_MEMBER( rm380z_state::port_fbfc_write )
 {
@@ -201,7 +204,6 @@ static TIMER_CALLBACK(static_vblank_timer)
 	state->m_ksampler++;
 	if (state->m_ksampler>(4*100*LINE_SUBDIVISION))
 	{
-		state->m_port0_kbd=state->keyboard_decode();
 		state->m_ksampler=0;
 	}
 }
@@ -478,149 +480,8 @@ static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	AM_RANGE(0xcc, 0xcc) AM_NOP // CTC (?)
 ADDRESS_MAP_END
 
-//
-// how do we simulate the "keyup" event in MESS?
-// rm380z documentation says that data from the keyboard appears in the FBFC latch
-// when key is *released*
-//
-
-int rm380z_state::keyboard_decode()
-{
-		int outKb=0x00;
-		bool controlPressed=false;
-
-		int k2=input_port_read(machine(),"kbModifiers");
-		if ((k2&0x01)||(k2&0x02))
-		{
-			controlPressed=true;
-		}
-		
-		int k=input_port_read(machine(),"pc_keyboard_0");
-		if (k&1)      outKb=0x51; //Q
-		else if (k&2)	outKb=0x52; //R
-		else if (k&4) outKb=0x53; //S
-		else if (k&8) outKb=0x54; //T
-		else if (k&0x10) 
-		{
-			if (controlPressed)	outKb=0x15; //ctrl-u
-			else outKb=0x55; //U
-		}
-		else if (k&0x20) outKb=0x56; //V
-		else if (k&0x40) 
-		{
-			if (controlPressed)	outKb=0x16; //ctrl-w
-			else outKb=0x57; //W
-		}
-		else if (k&0x80) outKb=0x58; //X
-		else if (k&0x100) outKb=0x59; //Y
-		else if (k&0x200) outKb=0x5a; //Z
-		else if (k&0x400) outKb=0x7f; // backspace
-
-		k=input_port_read(machine(),"pc_keyboard_1");
-		if (k&1)      outKb=0x31; //1
-		else if (k&2)	outKb=0x32; //2
-		else if (k&4)	outKb=0x33; //3
-		else if (k&8)	outKb=0x34; //4
-		else if (k&0x10)	outKb=0x35; //5
-		else if (k&0x20)	outKb=0x36; //6
-		else if (k&0x40)	outKb=0x37; //7
-		else if (k&0x80)	outKb=0x38; //8
-		else if (k&0x100)	outKb=0x39; //9
-		else if (k&0x200)	outKb=0x30; //0
-		else if (k&0x400)	outKb=0x0d; //enter
-		else if (k&0x800)	outKb=0x2e; //.
-
-		k=input_port_read(machine(),"pc_keyboard_2");
-		if (k&1)      
-		{
-			if (controlPressed)	outKb=0x01; //ctrl-a
-			else outKb=0x41; //A
-		}
-		else if (k&2)	outKb=0x42; //B
-		else if (k&4) outKb=0x43; //C
-		else if (k&8) outKb=0x44; //D
-		else if (k&0x10) outKb=0x45; //E
-		else if (k&0x20) 
-		{
-			if (controlPressed)	outKb=0x06; //ctrl-f
-			else outKb=0x46;
-		}
-		else if (k&0x40) 
-		{
-			if (controlPressed)	outKb=0x07; //bell/ctrl-g
-			else outKb=0x47; //G
-		}
-		else if (k&0x80) outKb=0x48; //H
-		else if (k&0x100) outKb=0x49; //I
-		else if (k&0x200) 
-		{
-			if (controlPressed)	outKb=0x0a; //ctrl-j/cursor down
-			else outKb=0x4a; //J
-		}
-		else if (k&0x400) outKb=0x4b; //k
-		else if (k&0x800)
-		{
-			if (controlPressed)	outKb=0x0c; //ctrl-l
-			else outKb=0x4c; //L
-		}
-		else if (k&0x1000) outKb=0x4d; //m
-		else if (k&0x2000) outKb=0x4e; //n
-		else if (k&0x4000) outKb=0x4f; //o
-		else if (k&0x8000) outKb=0x50; //p
-
-		return outKb;
-}
 
 INPUT_PORTS_START( rm380z )
-	PORT_START("pc_keyboard_0")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("backspace") PORT_CODE(KEYCODE_BACKSPACE)
-
-	PORT_START("pc_keyboard_1")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
-
-	PORT_START("pc_keyboard_2")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
-
-	PORT_START("kbModifiers")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("lctrl") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("rctrl") PORT_CODE(KEYCODE_RCONTROL)
-
 INPUT_PORTS_END
 
 //
@@ -673,9 +534,18 @@ static SCREEN_UPDATE( rm380z )
 	return 0;
 }
 
-//
-//
-//
+
+WRITE8_MEMBER( rm380z_state::keyboard_put )
+{
+	m_port0_kbd = data;
+}
+
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(rm380z_state, keyboard_put)
+};
+
 
 static const floppy_interface rm380z_floppy_interface =
 {
@@ -712,6 +582,7 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, rm380z_floppy_interface)
 
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
