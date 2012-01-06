@@ -6,13 +6,15 @@
 
     TODO:
     - keyboard shift key is ugly mapped.
+	- keyboard is actually tied to crtc hsync timer
     - understand how to load a tape
-    - every time that you switch with NEW ON command, there's a "device i/o error" if
-      the hres_reg bit 5 is active.
+    - some NEWON commands now makes the keyboard to not work anymore (it does if you
+      soft reset)
+    - video bugs for the interlaced video modes.
     - LINE command doesn't work? It says "type mismatch"
 
     NOTES:
-    - NEW ON changes the video mode, they are:
+    - NEWON changes the video mode, they are:
         0: 320 x 200, bit 5 active
         1: 320 x 200, bit 5 unactive
         2: 320 x 375, bit 5 active
@@ -82,6 +84,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( bml3_acia_dts_r );
 	DECLARE_WRITE_LINE_MEMBER( bml3_acia_rts_w );
 	DECLARE_READ_LINE_MEMBER(bml3_acia_dcd_r);
+	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
 
 	DECLARE_READ8_MEMBER(bml3_a000_r); DECLARE_WRITE8_MEMBER(bml3_a000_w);
 	DECLARE_READ8_MEMBER(bml3_c000_r); DECLARE_WRITE8_MEMBER(bml3_c000_w);
@@ -848,6 +851,12 @@ READ_LINE_MEMBER( bml3_state::bml3_acia_dcd_r )
 	return 1;
 }
 
+WRITE_LINE_MEMBER( bml3_state::bml3_acia_irq_w )
+{
+	printf("%02x TAPE IRQ\n",state);
+}
+
+
 static ACIA6850_INTERFACE( bml3_acia_if )
 {
 	600,
@@ -857,7 +866,7 @@ static ACIA6850_INTERFACE( bml3_acia_if )
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_dts_r),
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_dcd_r),
-	DEVCB_NULL//LINE(m6809_acia_irq)
+	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_irq_w)
 };
 
 static const ym2203_interface ym2203_interface_1 =
