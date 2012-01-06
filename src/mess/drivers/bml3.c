@@ -32,8 +32,15 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
+#include "machine/mc6843.h"
 #include "sound/beep.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "sound/2203intf.h"
 
+//#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
 
 class bml3_state : public driver_device
 {
@@ -52,12 +59,19 @@ public:
 	required_device<device_t> m_beep;
 	DECLARE_WRITE8_MEMBER(bml3_6845_w);
 	DECLARE_READ8_MEMBER(bml3_keyboard_r);
-	DECLARE_READ8_MEMBER(bml3_io_r);
 	DECLARE_WRITE8_MEMBER(bml3_hres_reg_w);
 	DECLARE_WRITE8_MEMBER(bml3_vres_reg_w);
-	DECLARE_WRITE8_MEMBER(bml3_io_w);
 	DECLARE_READ8_MEMBER(bml3_vram_r);
 	DECLARE_WRITE8_MEMBER(bml3_vram_w);
+	DECLARE_READ8_MEMBER(bml3_fdd_r);
+	DECLARE_WRITE8_MEMBER(bml3_fdd_w);
+	DECLARE_READ8_MEMBER(bml3_kanji_r);
+	DECLARE_WRITE8_MEMBER(bml3_kanji_w);
+	DECLARE_READ8_MEMBER(bml3_psg_latch_r);
+	DECLARE_WRITE8_MEMBER(bml3_psg_latch_w);
+	DECLARE_READ8_MEMBER(bml3_vram_attr_r);
+	DECLARE_WRITE8_MEMBER(bml3_vram_attr_w);
+	DECLARE_WRITE8_MEMBER(bml3_beep_w);
 	UINT16 m_cursor_addr;
 	UINT16 m_cursor_raster;
 	UINT8 m_attr_latch;
@@ -68,6 +82,7 @@ public:
 	UINT8 m_keyb_press_flag;
 	int m_addr_latch;
 	UINT8 *m_p_chargen;
+	UINT8 m_psg_latch;
 	void m6845_change_clock(UINT8 setting);
 };
 
@@ -190,42 +205,6 @@ READ8_MEMBER( bml3_state::bml3_keyboard_r )
 	return 0x00;
 }
 
-/* Note: this custom code is there just for simplicity, it'll be nuked in the end */
-READ8_MEMBER( bml3_state::bml3_io_r )
-{
-	UINT8 *rom = machine().region("maincpu")->base();
-
-	if(offset == 0x19) return m_io_latch;
-	if(offset == 0xc4) return 0xff; //some video modes wants this to be high
-//  if(offset == 0xc5 || offset == 0xca) return machine().rand(); //tape related
-	if(offset == 0xc8) return 0; //??? checks bit 7, scrolls vertically if active high
-	if(offset == 0xc9) return 0x11; //0x01 put 320 x 200 mode, 0x07 = 640 x 375
-
-	/* one of these sets something, apparently available RAM space is smaller if one of these bits is zero (?) */
-//  if(offset == 0x40) return 0 ? 0xff : 0x00;
-//  if(offset == 0x42) return 0 ? 0xff : 0x00;
-//  if(offset == 0x44) return 0 ? 0xff : 0x00;
-//  if(offset == 0x46) return 0 ? 0xff : 0x00;
-
-	if(offset == 0xd8) return m_attr_latch;
-	if(offset == 0xe0) return bml3_keyboard_r(space,0);
-
-//  if(offset == 0xcb)
-
-//  if(offset == 0x40 || offset == 0x42 || offset == 0x44 || offset == 0x46)
-
-	if(offset < 0xf0)
-	{
-		//if(cpu_get_pc(m_maincpu) != 0xf838 && cpu_get_pc(m_maincpu) != 0xfac4 && cpu_get_pc(m_maincpu) != 0xf83c)
-		if(offset >= 0xd0 && offset < 0xe0)
-			logerror("I/O read [%02x] at PC=%04x\n",offset,cpu_get_pc(m_maincpu));
-		return 0;//machine().rand();
-	}
-
-	/* TODO: pretty sure that there's a bankswitch for this */
-	return rom[offset+0xff00];
-}
-
 void bml3_state::m6845_change_clock(UINT8 setting)
 {
 	int m6845_clock = XTAL_3_579545MHz;
@@ -264,31 +243,6 @@ WRITE8_MEMBER( bml3_state::bml3_vres_reg_w )
 	m6845_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
 }
 
-WRITE8_MEMBER( bml3_state::bml3_io_w )
-{
-	if(offset == 0x19)
-		m_io_latch = data; //???
-//  else
-	if(offset == 0xc4)
-		{/* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
-	else
-	if(offset == 0xc6 || offset == 0xc7)
-		bml3_6845_w(space,offset-0xc6,data);
-	else
-	if(offset == 0xd0)
-		bml3_hres_reg_w(space,0,data);
-	else
-	if(offset == 0xd3)
-		beep_set_state(m_beep,!BIT(data, 7));
-	else
-	if(offset == 0xd6)
-		bml3_vres_reg_w(space,0,data);
-	else
-	if(offset == 0xd8)
-		m_attr_latch = data;
-	else
-		logerror("I/O write %02x -> [%02x] at PC=%04x\n",data,offset,cpu_get_pc(m_maincpu));
-}
 
 READ8_MEMBER( bml3_state::bml3_vram_r )
 {
@@ -308,33 +262,97 @@ WRITE8_MEMBER( bml3_state::bml3_vram_w )
 	vram[offset+0x4000] = m_attr_latch;
 }
 
+READ8_MEMBER( bml3_state::bml3_fdd_r )
+{
+	printf("FDD 0xff20 R\n");
+	return -1;
+}
+
+WRITE8_MEMBER( bml3_state::bml3_fdd_w )
+{
+	printf("FDD 0xff20 W %02x\n",data);
+}
+
+READ8_MEMBER( bml3_state::bml3_kanji_r )
+{
+	printf("KANJI %04x R\n",offset+0xff75);
+	return -1;
+}
+
+WRITE8_MEMBER( bml3_state::bml3_kanji_w )
+{
+	printf("KANJI %04x W %02x\n",offset+0xff75,data);
+}
+
+READ8_MEMBER( bml3_state::bml3_psg_latch_r)
+{
+	return 0x7f;
+}
+
+WRITE8_MEMBER( bml3_state::bml3_psg_latch_w)
+{
+	m_psg_latch = data;
+}
+
+static READ8_DEVICE_HANDLER( bml3_ym2203_r )
+{
+	bml3_state *state = device->machine().driver_data<bml3_state>();
+	UINT8 dev_offs = ((state->m_psg_latch & 3) != 3);
+
+	return ym2203_r(device,dev_offs);
+}
+
+static WRITE8_DEVICE_HANDLER( bml3_ym2203_w )
+{
+	bml3_state *state = device->machine().driver_data<bml3_state>();
+	UINT8 dev_offs = ((state->m_psg_latch & 3) != 3);
+
+	ym2203_w(device,dev_offs,data);
+}
+
+READ8_MEMBER( bml3_state::bml3_vram_attr_r)
+{
+	return m_attr_latch;
+}
+
+WRITE8_MEMBER( bml3_state::bml3_vram_attr_w)
+{
+	m_attr_latch = data;
+}
+
+WRITE8_MEMBER( bml3_state::bml3_beep_w)
+{
+	beep_set_state(m_beep,!BIT(data, 7));
+}
+
 static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE(bml3_io_r,bml3_io_w)
-//	AM_RANGE(0xff00, 0xff00) PSG data
-//	AM_RANGE(0xff02, 0xff02) PSG address/data select
-//	AM_RANGE(0xff18, 0xff1f) FDC
-//	AM_RANGE(0xff20, 0xff20) FDD drive select
-//	AM_RANGE(0xff75, 0xff76) kanji i/f
-//	AM_RANGE(0xffc0, 0xffc3) pia
-//	AM_RANGE(0xffc4, 0xffc5) ACIA
-//	AM_RANGE(0xffc6, 0xffc7) HD46505
+	AM_RANGE(0xff00, 0xff00) AM_DEVREADWRITE_LEGACY("ym2203",bml3_ym2203_r,bml3_ym2203_w)
+	AM_RANGE(0xff02, 0xff02) AM_READWRITE(bml3_psg_latch_r,bml3_psg_latch_w) // PSG address/data select
+	AM_RANGE(0xff18, 0xff1f) AM_DEVREADWRITE_LEGACY("mc6843",mc6843_r,mc6843_w)
+	AM_RANGE(0xff20, 0xff20) AM_READWRITE(bml3_fdd_r,bml3_fdd_w) // FDD drive select
+	AM_RANGE(0xff75, 0xff76) AM_READWRITE(bml3_kanji_r,bml3_kanji_w)// kanji i/f
+	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
+	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
+	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
+	AM_RANGE(0xffc6, 0xffc7) AM_WRITE(bml3_6845_w)
 //	AM_RANGE(0xffc8, 0xffc8) keyboard nmi
+	AM_RANGE(0xffc9, 0xffc9) AM_READ_PORT("DSW")
 //	AM_RANGE(0xffca, 0xffca) timer irq
 //	AM_RANGE(0xffcb, 0xffcb) light pen flag
-//	AM_RANGE(0xffd0, 0xffd0) mode select
+	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(bml3_hres_reg_w) // mode select
 //	AM_RANGE(0xffd1, 0xffd1) trace counter
 //	AM_RANGE(0xffd2, 0xffd2) remote switch
-//	AM_RANGE(0xffd3, 0xffd3) music select
+	AM_RANGE(0xffd3, 0xffd3) AM_WRITE(bml3_beep_w) // music select
 //	AM_RANGE(0xffd4, 0xffd4) time mask
 //	AM_RANGE(0xffd5, 0xffd5) light pen
-//	AM_RANGE(0xffd6, 0xffd6) interlace select
+	AM_RANGE(0xffd6, 0xffd6) AM_WRITE(bml3_vres_reg_w) // interlace select
 //	AM_RANGE(0xffd7, 0xffd7) baud select
-//	AM_RANGE(0xffd8, 0xffd8) attribute register
-//	AM_RANGE(0xffe0, 0xffe0) keyboard mode register
+	AM_RANGE(0xffd8, 0xffd8) AM_READWRITE(bml3_vram_attr_r,bml3_vram_attr_w) // attribute register
+	AM_RANGE(0xffe0, 0xffe0) AM_READ(bml3_keyboard_r) // keyboard mode register
 //	AM_RANGE(0xffe8, 0xffe8) bank register
 //	AM_RANGE(0xffe9, 0xffe9) IG mode register
 //	AM_RANGE(0xffea, 0xffea) IG enable register
@@ -345,6 +363,32 @@ ADDRESS_MAP_END
 /* Input ports */
 
 static INPUT_PORTS_START( bml3 )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "DSW" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Show F help" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
 	PORT_START("key1") //0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
@@ -555,6 +599,54 @@ static GFXDECODE_START( bml3 )
 	GFXDECODE_ENTRY( "chargen", 0, bml3_charlayout8x16, 0, 4 )
 GFXDECODE_END
 
+const mc6843_interface bml3_6843_if = { NULL };
+
+static const pia6821_interface bml3_pia_config =
+{
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+};
+
+static ACIA6850_INTERFACE( bml3_acia_if )
+{
+	0,
+	0,
+	DEVCB_NULL,//LINE(m6809_acia_rx_r),
+	DEVCB_NULL,//LINE(m6809_acia_tx_w),
+	DEVCB_NULL,//LINE(m6809_acia_cts_r),
+	DEVCB_NULL,//LINE(m6809_acia_rts_w),
+	DEVCB_NULL,//LINE(m6809_acia_dcd_r),
+	DEVCB_NULL//LINE(m6809_acia_irq)
+};
+
+static const ym2203_interface ym2203_interface_1 =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL,	// read A
+		DEVCB_NULL,	// read B
+		DEVCB_NULL,	// write A
+		DEVCB_NULL	// write B
+	},
+	NULL
+};
+
+/* TODO */
+static const floppy_interface bml3_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
+	"floppy_3_5",
+	NULL
+};
+
 static MACHINE_CONFIG_START( bml3, bml3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809, XTAL_1MHz)
@@ -577,14 +669,27 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(bml3)
 	MCFG_GFXDECODE(bml3)
+
+	/* Devices */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/8))
+	MCFG_MC6843_ADD( "mc6843", bml3_6843_if )
+	MCFG_PIA6821_ADD("pia6821", bml3_pia_config)
+	MCFG_ACIA6850_ADD("acia6850", bml3_acia_if)
+
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_floppy_interface)
+
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
-	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/8))
+	MCFG_SOUND_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
+	MCFG_SOUND_CONFIG(ym2203_interface_1)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.50)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */
