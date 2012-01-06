@@ -140,13 +140,13 @@ static SCREEN_UPDATE( bml3 )
 	bml3_state *state = screen.machine().driver_data<bml3_state>();
 	int x,y,count;
 	int xi,yi;
-	int width,height;
+	int width; //,height;
 	UINT8 *vram = screen.machine().region("vram")->base();
 
 	count = 0x0000;
 
 	width = (state->m_hres_reg & 0x80) ? 80 : 40;
-	height = (state->m_vres_reg & 0x08) ? 1 : 0;
+//	height = (state->m_vres_reg & 0x08) ? 1 : 0;
 
 //  popmessage("%02x %02x",state->m_hres_reg,state->m_vres_reg);
 
