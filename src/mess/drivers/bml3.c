@@ -5,8 +5,6 @@
     preliminary driver by Angelo Salese
 
     TODO:
-    - no documentation, the entire driver is just a bunch of educated
-      guesses ...
     - keyboard shift key is ugly mapped.
     - understand how to load a tape
     - every time that you switch with NEW ON command, there's a "device i/o error" if
@@ -72,20 +70,35 @@ public:
 	DECLARE_READ8_MEMBER(bml3_vram_attr_r);
 	DECLARE_WRITE8_MEMBER(bml3_vram_attr_w);
 	DECLARE_WRITE8_MEMBER(bml3_beep_w);
-	UINT16 m_cursor_addr;
-	UINT16 m_cursor_raster;
 	UINT8 m_attr_latch;
 	UINT8 m_io_latch;
 	UINT8 m_hres_reg;
 	UINT8 m_vres_reg;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
-	int m_addr_latch;
 	UINT8 *m_p_chargen;
 	UINT8 m_psg_latch;
 	void m6845_change_clock(UINT8 setting);
+	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	UINT16 m_kanji_addr;
 };
 
+#define mc6845_h_char_total 	(state->m_crtc_vreg[0])
+#define mc6845_h_display		(state->m_crtc_vreg[1])
+#define mc6845_h_sync_pos		(state->m_crtc_vreg[2])
+#define mc6845_sync_width		(state->m_crtc_vreg[3])
+#define mc6845_v_char_total		(state->m_crtc_vreg[4])
+#define mc6845_v_total_adj		(state->m_crtc_vreg[5])
+#define mc6845_v_display		(state->m_crtc_vreg[6])
+#define mc6845_v_sync_pos		(state->m_crtc_vreg[7])
+#define mc6845_mode_ctrl		(state->m_crtc_vreg[8])
+#define mc6845_tile_height		(state->m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start	(state->m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end 	(state->m_crtc_vreg[0x0b])
+#define mc6845_start_addr		(((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr  	(((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr	(((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
 static VIDEO_START( bml3 )
@@ -116,30 +129,29 @@ static SCREEN_UPDATE( bml3 )
 			int tile = vram[count+0x0000];
 			int color = vram[count+0x4000] & 7;
 			int reverse = vram[count+0x4000] & 8;
-			int h_factor = (height^1) + 1;
 			//attr & 0x10 is used ... bitmap mode? (apparently bits 4 and 7 are used for that)
 
-			for(yi=0;yi<8;yi++)
+			for(yi=0;yi<mc6845_tile_height;yi++)
 			{
 				for(xi=0;xi<8;xi++)
 				{
 					int pen;
 
 					if(reverse)
-						pen = (state->m_p_chargen[tile*16+yi*h_factor] >> (7-xi) & 1) ? 0 : color;
+						pen = (state->m_p_chargen[tile*16+yi*2] >> (7-xi) & 1) ? 0 : color;
 					else
-						pen = (state->m_p_chargen[tile*16+yi*h_factor] >> (7-xi) & 1) ? color : 0;
+						pen = (state->m_p_chargen[tile*16+yi*2] >> (7-xi) & 1) ? color : 0;
 
-					bitmap.pix16(y*8+yi, x*8+xi) = pen;
+					bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = pen;
 				}
 			}
 
-			if(state->m_cursor_addr-0x400 == count)
+			if(mc6845_cursor_addr-0x400 == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->m_cursor_raster & 0x60)
+				switch(mc6845_cursor_y_start & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -149,17 +161,11 @@ static SCREEN_UPDATE( bml3 )
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->m_cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(mc6845_cursor_y_start & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							if(height)
-							{
-								bitmap.pix16((y*8+yc+7)*2+0, x*8+xc) = 7;
-								bitmap.pix16((y*8+yc+7)*2+1, x*8+xc) = 7;
-							}
-							else
-								bitmap.pix16(y*8+yc+7, x*8+xc) = 7;
+							bitmap.pix16(y*mc6845_tile_height+yc+7, x*8+xc) = 7;
 						}
 					}
 				}
@@ -176,18 +182,12 @@ WRITE8_MEMBER( bml3_state::bml3_6845_w )
 {
 	if(offset == 0)
 	{
-		m_addr_latch = data;
+		m_crtc_index = data;
 		m_crtc->address_w(space, 0, data);
 	}
 	else
 	{
-		if(m_addr_latch == 0x0a)
-			m_cursor_raster = data;
-		if(m_addr_latch == 0x0e)
-			m_cursor_addr = ((data<<8) & 0x3f00) | (m_cursor_addr & 0xff);
-		else if(m_addr_latch == 0x0f)
-			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
-
+		m_crtc_vreg[m_crtc_index] = data;
 		m_crtc->register_w(space, 0, data);
 	}
 }
@@ -207,14 +207,14 @@ READ8_MEMBER( bml3_state::bml3_keyboard_r )
 
 void bml3_state::m6845_change_clock(UINT8 setting)
 {
-	int m6845_clock = XTAL_3_579545MHz;
+	int m6845_clock = XTAL_1MHz;
 
 	switch(setting & 0x88)
 	{
-		case 0x00: m6845_clock = XTAL_3_579545MHz/4; break; //320 x 200
-		case 0x08: m6845_clock = XTAL_3_579545MHz/2; break; //320 x 375
-		case 0x80: m6845_clock = XTAL_3_579545MHz/2; break; //640 x 200
-		case 0x88: m6845_clock = XTAL_3_579545MHz/1; break; //640 x 375
+		case 0x00: m6845_clock = XTAL_1MHz; break; //320 x 200
+		case 0x08: m6845_clock = XTAL_1MHz*2; break; //320 x 375
+		case 0x80: m6845_clock = XTAL_1MHz*2; break; //640 x 200
+		case 0x88: m6845_clock = XTAL_1MHz*4; break; //640 x 375
 	}
 
 	m_crtc->set_clock(m6845_clock);
@@ -264,24 +264,25 @@ WRITE8_MEMBER( bml3_state::bml3_vram_w )
 
 READ8_MEMBER( bml3_state::bml3_fdd_r )
 {
-	printf("FDD 0xff20 R\n");
+	//printf("FDD 0xff20 R\n");
 	return -1;
 }
 
 WRITE8_MEMBER( bml3_state::bml3_fdd_w )
 {
-	printf("FDD 0xff20 W %02x\n",data);
+	//printf("FDD 0xff20 W %02x\n",data);
 }
 
 READ8_MEMBER( bml3_state::bml3_kanji_r )
 {
-	printf("KANJI %04x R\n",offset+0xff75);
-	return -1;
+//	return m_kanji_rom[m_kanji_addr << 1 + offset];
+	return machine().rand();
 }
 
 WRITE8_MEMBER( bml3_state::bml3_kanji_w )
 {
-	printf("KANJI %04x W %02x\n",offset+0xff75,data);
+	m_kanji_addr &= (0xff << (offset*8));
+	m_kanji_addr |= (data << ((offset^1)*8));
 }
 
 READ8_MEMBER( bml3_state::bml3_psg_latch_r)
@@ -364,15 +365,15 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bml3 )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "DSW" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x01, "NewOn" ) // TODO
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -671,7 +672,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_GFXDECODE(bml3)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, XTAL_1MHz, mc6845_intf)
 	MCFG_TIMER_ADD_PERIODIC("keyboard_timer", keyboard_callback, attotime::from_hz(240/8))
 	MCFG_MC6843_ADD( "mc6843", bml3_6843_if )
 	MCFG_PIA6821_ADD("pia6821", bml3_pia_config)
@@ -705,6 +706,9 @@ ROM_START( bml3 )
 	ROM_LOAD("font.rom", 0x00000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 
 	ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD("kanji.rom", 0x00000, 0x20000, NO_DUMP )
 ROM_END
 
 /* Driver */
