@@ -90,14 +90,8 @@ public:
 	{ 
 	}
 
-	void port_1bfc_write(int offset,UINT8 data);
-	UINT8 port_1bfc_read(int offset);
-
 	DECLARE_READ8_MEMBER( port_fbfc_read );
 	DECLARE_WRITE8_MEMBER( port_fbfc_write );
-
-	void port_write(int offset,UINT8 data);
-	UINT8 port_read(int offset);
 
 	DECLARE_READ8_MEMBER( main_read );
 	DECLARE_WRITE8_MEMBER( main_write );
@@ -110,29 +104,7 @@ public:
 	int keyboard_decode();
 };
 
-//
-
-void rm380z_state::port_1bfc_write(int offset,UINT8 data)
-{
-	port_write(offset, data );
-}
-
-UINT8 rm380z_state::port_1bfc_read(int offset)
-{
-	return port_read(offset );
-}
-
 WRITE8_MEMBER( rm380z_state::port_fbfc_write )
-{
-	port_write(offset, data );
-}
-
-READ8_MEMBER( rm380z_state::port_fbfc_read )
-{
-	return port_read(offset );
-}
-
-void rm380z_state::port_write(int offset,UINT8 data)
 {
 	switch ( offset )
 	{
@@ -161,8 +133,7 @@ void rm380z_state::port_write(int offset,UINT8 data)
 		break;
 	}
 }
-
-UINT8 rm380z_state::port_read(int offset)
+READ8_MEMBER( rm380z_state::port_fbfc_read )
 {
 	UINT8 data = 0xFF;
 
@@ -266,7 +237,7 @@ WRITE8_MEMBER( rm380z_state::main_write )
 	{
 		if ((offset>=0x1bfc)&&(offset<=0x1bff))
 		{
-			state->port_1bfc_write(offset-0x1bfc,data);
+			state->port_fbfc_write(space,offset-0x1bfc,data);
 			return;
 		}
 
@@ -315,7 +286,7 @@ READ8_MEMBER( rm380z_state::main_read )
 	{
 		if ((offset>=0x1bfc)&&(offset<=0x1bff))
 		{
-			return state->port_1bfc_read(offset-0x1bfc);
+			return state->port_fbfc_read(space,offset-0x1bfc);
 		}
 
 		if ((offset>=0x0000)&&(offset<0x1000))
