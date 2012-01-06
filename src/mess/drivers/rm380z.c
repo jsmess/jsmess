@@ -105,8 +105,7 @@ public:
 	DECLARE_READ8_MEMBER( videoram_read );
 	DECLARE_WRITE8_MEMBER( videoram_write );
 
-	DECLARE_READ8_MEMBER(rm380z_io_r);
-	DECLARE_WRITE8_MEMBER(rm380z_io_w);
+	DECLARE_WRITE8_MEMBER(disk_0_control);
 
 	int keyboard_decode();
 };
@@ -322,11 +321,11 @@ READ8_MEMBER( rm380z_state::main_read )
 		if ((offset>=0x0000)&&(offset<0x1000))
 		{
 			// ROM
-			return state->m_cos_rom[offset];
+			return state->m_cos_rom[offset+ 0xe000];
 		}
 		else if ((offset>=0x1c00)&&(offset<=0x1dff))
 		{
-			return m_cos_rom[offset-0x800];
+			return m_cos_rom[offset];
 		}
 		else if ((offset>=0x1000)&&(offset<0x4000))
 		{
@@ -450,113 +449,45 @@ READ8_MEMBER( rm380z_state::videoram_read )
 //
 
 
-WRITE8_MEMBER( rm380z_state::rm380z_io_w )
+WRITE8_MEMBER( rm380z_state::disk_0_control )
 {
-	UINT8 portnum=offset&0xff;
 	device_t *fdc = machine().device("wd1771");
 	
-	//printf("port write of [%x] at [%x] from PC [%x]\n",data,portnum,cpu_get_pc(machine().device("maincpu")));
+	printf("disk drive port0 write [%x]\n",data);
 	
-	if (portnum==0xc0)
+	// drive port0
+	if (data&0x01)
 	{
-		wd17xx_command_w(fdc, 0, data);
-		//printf("wrote command [%x] to floppy disk\n",data);
+		// drive select bit 0
+		wd17xx_set_drive(fdc,0);
 	}
-	else if (portnum==0xc1)
+	
+	if (data&0x08)
 	{
-		wd17xx_track_w(fdc, 0, data);
-		//printf("wrote track data [%x] to floppy disk\n",data);
+		// motor on
 	}
-	else if (portnum==0xc2)
+	
+	// "MSEL (dir/side select bit)
+	if (data&0x20)
 	{
-		wd17xx_sector_w(fdc, 0, data);
-		//printf("wrote sector data [%x] to floppy disk\n",data);
+		wd17xx_set_side(fdc,1);
 	}
-	else if (portnum==0xc3)
+	else
 	{
-		wd17xx_data_w(fdc, 0, data);
-		//printf("wrote data [%x] to floppy disk\n",data);
+		wd17xx_set_side(fdc,0);
 	}
-	else if (portnum==0xc4)
+	
+	// set drive en- (?)
+	if (data&0x40)
 	{
-		printf("disk drive port0 write [%x]\n",data);
-		
-		// drive port0
-		if (data&0x01)
-		{
-			// drive select bit 0
-			wd17xx_set_drive(fdc,0);
-		}
-		
-		if (data&0x08)
-		{
-			// motor on
-		}
-		
-		// "MSEL (dir/side select bit)
-		if (data&0x20)
-		{
-			wd17xx_set_side(fdc,1);
-		}
-		else
-		{
-			wd17xx_set_side(fdc,0);
-		}
-		
-		// set drive en- (?)
-		if (data&0x40)
-		{
-		}
 	}
-}
-
-READ8_MEMBER( rm380z_state::rm380z_io_r )
-{
-	UINT8 retval=0;
-	UINT8 portnum=offset&0xff;
-	device_t *fdc = machine().device("wd1771");
-
-	//printf("port read at [%x] from PC [%x]\n",portnum,cpu_get_pc(machine().device("maincpu")));
-
-	if (portnum==0xc0)
-	{
-		retval=wd17xx_status_r(fdc,0);
-		//printf("disk drive status read is [%x]\n",retval);
-	}
-	else if (portnum==0xc1)
-	{
-		retval=wd17xx_track_r(fdc, 0);
-		//printf("disk drive track read is [%x]\n",retval);
-	}
-	else if (portnum==0xc2)
-	{
-		retval=wd17xx_sector_r(fdc, 0);
-		//printf("disk drive sector read is [%x]\n",retval);
-	}
-	else if (portnum==0xc3)
-	{
-		retval=wd17xx_data_r(fdc, 0);
-		//printf("disk drive data read [%x] at PC [%x]\n",retval,cpu_get_pc(machine().device("maincpu")));
-	}
-	else if (portnum==0xcc)
-	{
-		// CTC (?)
-		return 0x00;
-	}
-	else 
-	{
-		printf("other disk drive port read [%x] PC [%x]\n",portnum,cpu_get_pc(machine().device("maincpu")));
-		return 0x00;
-	}
-
-	return retval;
 }
 
 static ADDRESS_MAP_START(rm380z_mem, AS_PROGRAM, 8, rm380z_state)
 	AM_RANGE( 0x0000, 0xdfff ) AM_READWRITE(main_read,main_write)
-	AM_RANGE( 0xe000, 0xefff ) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE( 0xe000, 0xefff ) AM_ROM
 	AM_RANGE( 0xf000, 0xf5ff ) AM_READWRITE(videoram_read,videoram_write)
-	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM AM_REGION("maincpu", 0x1000)		/* Extra ROM space for COS4.0 */
+	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM /* Extra ROM space for COS4.0 */
 	AM_RANGE( 0xfa00, 0xfbfb ) AM_RAM
 	AM_RANGE( 0xfbfc, 0xfbff ) AM_READWRITE( port_fbfc_read, port_fbfc_write )
 	AM_RANGE( 0xfc00, 0xffff ) AM_RAM
@@ -568,11 +499,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(rm380z_io_r, rm380z_io_w)
-//	AM_RANGE(0xc3, 0xc3) AM_DEVWRITE_LEGACY("wd1771", wd17xx_command_w)
-//	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_track_r, wd17xx_track_w)
-//	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_sector_r, wd17xx_sector_w)
-//	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_data_r, wd17xx_data_w)	
+	AM_RANGE(0xc4, 0xc4) AM_WRITE(disk_0_control)
+	AM_RANGE(0xcc, 0xcc) AM_NOP // CTC (?)
 ADDRESS_MAP_END
 
 //
@@ -755,7 +687,7 @@ static SCREEN_UPDATE( rm380z )
 {
 	rm380z_state *state = screen.machine().driver_data<rm380z_state>();
 
-	unsigned char* pChar=screen.machine().region("maincpu")->base()+0x1600;
+	unsigned char* pChar=screen.machine().region("gfx")->base();
 	UINT16* scrptr = &bitmap.pix16(0, 0);
 
 	for (int row=0;row<screenrows;row++)
@@ -813,11 +745,12 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( rm380z )
-	ROM_REGION( 0x1600+0x1680, "maincpu", 0 )
-	ROM_LOAD( "cos40b-m.bin", 0x0000, 0x1000, CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
-	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x400, CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))
-	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x200, CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff))
-	ROM_LOAD( "ch3.raw", 0x1600, 0x1680, CRC(e0b10221) SHA1(95304ccad9a7af49d79a349feb2bc23035f90abc))
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1c00, 0x0200, CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff))
+	ROM_LOAD( "cos40b-m.bin", 			0xe000, 0x1000, CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
+	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0xf600, 0x0400, CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))
+	ROM_REGION( 0x1680, "gfx", 0 )
+	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, CRC(e0b10221) SHA1(95304ccad9a7af49d79a349feb2bc23035f90abc))
 ROM_END
 
 /* Driver */
