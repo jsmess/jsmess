@@ -70,6 +70,15 @@ public:
 	DECLARE_READ8_MEMBER(bml3_vram_attr_r);
 	DECLARE_WRITE8_MEMBER(bml3_vram_attr_w);
 	DECLARE_WRITE8_MEMBER(bml3_beep_w);
+	DECLARE_WRITE8_MEMBER(bml3_piaA_w);
+	DECLARE_READ8_MEMBER(bml3_keyb_nmi_r);
+
+	DECLARE_READ8_MEMBER(bml3_a000_r); DECLARE_WRITE8_MEMBER(bml3_a000_w);
+	DECLARE_READ8_MEMBER(bml3_c000_r); DECLARE_WRITE8_MEMBER(bml3_c000_w);
+	DECLARE_READ8_MEMBER(bml3_e000_r); DECLARE_WRITE8_MEMBER(bml3_e000_w);
+	DECLARE_READ8_MEMBER(bml3_f000_r); DECLARE_WRITE8_MEMBER(bml3_f000_w);
+	DECLARE_READ8_MEMBER(bml3_fff0_r); DECLARE_WRITE8_MEMBER(bml3_fff0_w);
+
 	UINT8 m_attr_latch;
 	UINT8 m_io_latch;
 	UINT8 m_hres_reg;
@@ -81,6 +90,11 @@ public:
 	void m6845_change_clock(UINT8 setting);
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT16 m_kanji_addr;
+	UINT8 *m_extram;
+
+protected:
+	virtual void machine_reset();
+
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -126,7 +140,8 @@ static SCREEN_UPDATE( bml3 )
 	{
 		for(x=0;x<width;x++)
 		{
-			int tile = vram[count+0x0000];
+			int tile = vram[count+0x0000] & 0x7f;
+			int tile_bank = (vram[count+0x0000] & 0x80) >> 7;
 			int color = vram[count+0x4000] & 7;
 			int reverse = vram[count+0x4000] & 8;
 			//attr & 0x10 is used ... bitmap mode? (apparently bits 4 and 7 are used for that)
@@ -138,9 +153,9 @@ static SCREEN_UPDATE( bml3 )
 					int pen;
 
 					if(reverse)
-						pen = (state->m_p_chargen[tile*16+yi*2] >> (7-xi) & 1) ? 0 : color;
+						pen = (state->m_p_chargen[tile*16+yi*2+tile_bank] >> (7-xi) & 1) ? 0 : color;
 					else
-						pen = (state->m_p_chargen[tile*16+yi*2] >> (7-xi) & 1) ? color : 0;
+						pen = (state->m_p_chargen[tile*16+yi*2+tile_bank] >> (7-xi) & 1) ? color : 0;
 
 					bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = pen;
 				}
@@ -326,6 +341,62 @@ WRITE8_MEMBER( bml3_state::bml3_beep_w)
 	beep_set_state(m_beep,!BIT(data, 7));
 }
 
+READ8_MEMBER( bml3_state::bml3_a000_r)
+{
+	return m_extram[offset + 0xa000];
+}
+
+WRITE8_MEMBER( bml3_state::bml3_a000_w)
+{
+	m_extram[offset + 0xa000] = data;
+}
+
+READ8_MEMBER( bml3_state::bml3_c000_r)
+{
+	return m_extram[offset + 0xc000];
+}
+
+WRITE8_MEMBER( bml3_state::bml3_c000_w)
+{
+	m_extram[offset + 0xc000] = data;
+}
+
+READ8_MEMBER( bml3_state::bml3_e000_r)
+{
+	return m_extram[offset + 0xe000];
+}
+
+WRITE8_MEMBER( bml3_state::bml3_e000_w)
+{
+	m_extram[offset + 0xe000] = data;
+}
+
+READ8_MEMBER( bml3_state::bml3_f000_r)
+{
+	return m_extram[offset + 0xf000];
+}
+
+WRITE8_MEMBER( bml3_state::bml3_f000_w)
+{
+	m_extram[offset + 0xf000] = data;
+}
+
+
+READ8_MEMBER( bml3_state::bml3_fff0_r)
+{
+	return m_extram[offset + 0xfff0];
+}
+
+WRITE8_MEMBER( bml3_state::bml3_fff0_w)
+{
+	m_extram[offset + 0xfff0] = data;
+}
+
+READ8_MEMBER( bml3_state::bml3_keyb_nmi_r)
+{
+	return 0; // bit 7 used to signal a BREAK key pressure
+}
+
 static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
@@ -340,7 +411,7 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
 	AM_RANGE(0xffc6, 0xffc7) AM_WRITE(bml3_6845_w)
-//	AM_RANGE(0xffc8, 0xffc8) keyboard nmi
+	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
 	AM_RANGE(0xffc9, 0xffc9) AM_READ_PORT("DSW")
 //	AM_RANGE(0xffca, 0xffca) timer irq
 //	AM_RANGE(0xffcb, 0xffcb) light pen flag
@@ -357,7 +428,13 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 //	AM_RANGE(0xffe8, 0xffe8) bank register
 //	AM_RANGE(0xffe9, 0xffe9) IG mode register
 //	AM_RANGE(0xffea, 0xffea) IG enable register
-	AM_RANGE(0xa000, 0xffff) AM_ROM
+	AM_RANGE(0xa000, 0xfeff) AM_ROM AM_REGION("maincpu", 0xa000)
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xfff0)
+	AM_RANGE(0xa000, 0xbfff) AM_WRITE(bml3_a000_w)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(bml3_c000_w)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(bml3_e000_w)
+	AM_RANGE(0xf000, 0xfeff) AM_WRITE(bml3_f000_w)
+	AM_RANGE(0xfff0, 0xffff) AM_WRITE(bml3_fff0_w)
 ADDRESS_MAP_END
 
 
@@ -546,12 +623,37 @@ static PALETTE_INIT( bml3 )
 
 static MACHINE_START(bml3)
 {
+	bml3_state *state = machine.driver_data<bml3_state>();
+
 	beep_set_frequency(machine.device(BEEPER_TAG),1200); //guesswork
 	beep_set_state(machine.device(BEEPER_TAG),0);
+	state->m_extram = auto_alloc_array(machine,UINT8,0x10000);
 }
 
-static MACHINE_RESET(bml3)
+void bml3_state::machine_reset()
 {
+	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+
+	/* defaults */
+	mem->install_rom(0xa000, 0xfeff,mem->machine().
+		region("maincpu")->base() + 0xa000);
+	mem->install_rom(0xfff0, 0xffff,mem->machine().
+		region("maincpu")->base() + 0xfff0);
+	mem->install_write_handler(0xa000, 0xbfff, 0, 0,
+		write8_delegate(FUNC(bml3_state::bml3_a000_w), this),
+		0);
+	mem->install_write_handler(0xc000, 0xdfff, 0, 0,
+		write8_delegate(FUNC(bml3_state::bml3_c000_w), this),
+		0);
+	mem->install_write_handler(0xe000, 0xefff, 0, 0,
+		write8_delegate(FUNC(bml3_state::bml3_e000_w), this),
+		0);
+	mem->install_write_handler(0xf000, 0xfeff, 0, 0,
+		write8_delegate(FUNC(bml3_state::bml3_f000_w), this),
+		0);
+	mem->install_write_handler(0xfff0, 0xffff, 0, 0,
+		write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),
+		0);
 }
 
 /* F4 Character Displayer */
@@ -602,10 +704,115 @@ GFXDECODE_END
 
 const mc6843_interface bml3_6843_if = { NULL };
 
+WRITE8_MEMBER(bml3_state::bml3_piaA_w)
+{
+	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	/* ROM banking:
+	-0-- --0- 0xa000 - 0xbfff ROM R RAM W
+	-1-- --0- 0xa000 - 0xbfff RAM R/W
+	-x-- --1- 0xa000 - 0xbfff no change
+	0--- -0-- 0xc000 - 0xdfff ROM R RAM W
+	1--- -0-- 0xc000 - 0xdfff RAM R/W
+	x--- -1-- 0xc000 - 0xdfff no change
+	0--- 0--- 0xe000 - 0xefff ROM R RAM W
+	1--- 0--- 0xe000 - 0xefff RAM R/W
+	x--- 1--- 0xe000 - 0xefff no change
+	---- ---x 0xf000 - 0xfeff (0) ROM R RAM W (1) RAM R/W
+	---- --x- 0xfff0 - 0xffff (0) ROM R RAM W (1) RAM R/W
+	*/
+	printf("Check banking PIA A -> %02x\n",data);
+
+	if(!(data & 0x2))
+	{
+		if(data & 0x40)
+		{
+			mem->install_readwrite_handler(0xa000, 0xbfff, 0, 0,
+				read8_delegate(FUNC(bml3_state::bml3_a000_r), this),
+				write8_delegate(FUNC(bml3_state::bml3_a000_w), this), 0);
+		}
+		else
+		{
+			mem->install_rom(0xa000, 0xbfff,
+				mem->machine().region("maincpu")->base() + 0xa000);
+			mem->install_write_handler(0xa000, 0xbfff, 0, 0,
+				write8_delegate(FUNC(bml3_state::bml3_a000_w), this),
+				0);
+		}
+	}
+
+	if(!(data & 0x4))
+	{
+		if(data & 0x40)
+		{
+			mem->install_readwrite_handler(0xc000, 0xdfff, 0, 0,
+				read8_delegate(FUNC(bml3_state::bml3_c000_r), this),
+				write8_delegate(FUNC(bml3_state::bml3_c000_w), this), 0);
+		}
+		else
+		{
+			mem->install_rom(0xc000, 0xdfff,
+				mem->machine().region("maincpu")->base() + 0xc000);
+			mem->install_write_handler(0xc000, 0xdfff, 0, 0,
+				write8_delegate(FUNC(bml3_state::bml3_c000_w), this),
+				0);
+		}
+	}
+
+	if(!(data & 0x8))
+	{
+		if(data & 0x80)
+		{
+			mem->install_readwrite_handler(0xe000, 0xefff, 0, 0,
+				read8_delegate(FUNC(bml3_state::bml3_e000_r), this),
+				write8_delegate(FUNC(bml3_state::bml3_e000_w), this), 0);
+		}
+		else
+		{
+			mem->install_rom(0xe000, 0xefff,
+				mem->machine().region("maincpu")->base() + 0xe000);
+			mem->install_write_handler(0xe000, 0xefff, 0, 0,
+				write8_delegate(FUNC(bml3_state::bml3_e000_w), this),
+				0);
+		}
+	}
+
+	if(data & 1)
+	{
+		mem->install_readwrite_handler(0xf000, 0xfeff, 0, 0,
+			read8_delegate(FUNC(bml3_state::bml3_f000_r), this),
+			write8_delegate(FUNC(bml3_state::bml3_f000_w), this), 0);
+	}
+	else
+	{
+		mem->install_rom(0xf000, 0xfeff,
+			mem->machine().region("maincpu")->base() + 0xf000);
+		mem->install_write_handler(0xf000, 0xfeff, 0, 0,
+			write8_delegate(FUNC(bml3_state::bml3_f000_w), this),
+			0);
+	}
+
+	if(data & 2)
+	{
+		mem->install_readwrite_handler(0xfff0, 0xffff, 0, 0,
+			read8_delegate(FUNC(bml3_state::bml3_fff0_r), this),
+			write8_delegate(FUNC(bml3_state::bml3_fff0_w), this), 0);
+	}
+	else
+	{
+		mem->install_rom(0xfff0, 0xffff,
+			mem->machine().region("maincpu")->base() + 0xfff0);
+		mem->install_write_handler(0xfff0, 0xffff, 0, 0,
+			write8_delegate(FUNC(bml3_state::bml3_fff0_w), this),
+			0);
+	}
+}
+
 static const pia6821_interface bml3_pia_config =
 {
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
+
+	DEVCB_DRIVER_MEMBER(bml3_state, bml3_piaA_w),	/* port A output */
+	DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
@@ -656,7 +863,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 //  MCFG_CPU_PERIODIC_INT(bml3_firq,45)
 
 	MCFG_MACHINE_START(bml3)
-	MCFG_MACHINE_RESET(bml3)
+//	MCFG_MACHINE_RESET(bml3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
