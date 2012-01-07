@@ -1348,6 +1348,9 @@ $(MESSOBJ)/rca.a:				\
 	$(MESS_AUDIO)/vp595.o		\
 
 $(MESSOBJ)/rm.a:				\
+	$(MESS_DRIVERS)/rm380z.o	\
+	$(MESS_MACHINE)/rm380z.o	\
+	$(MESS_VIDEO)/rm380z.o		\
 	$(MESS_DRIVERS)/rmnimbus.o	\
 	$(MESS_MACHINE)/rmnimbus.o  \
 	$(MESS_VIDEO)/rmnimbus.o    \
@@ -1800,7 +1803,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/ptcsol.o	\
 	$(MESS_DRIVERS)/pv9234.o	\
 	$(MESS_DRIVERS)/qtsbc.o		\
-	$(MESS_DRIVERS)/rm380z.o	\
 	$(MESS_DRIVERS)/rvoice.o	\
 	$(MESS_DRIVERS)/sacstate.o	\
 	$(MESS_DRIVERS)/sage2.o		\
