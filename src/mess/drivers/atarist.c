@@ -25,6 +25,7 @@
 #include "formats/st_dsk.h"
 #include "formats/pasti_dsk.h"
 #include "formats/mfi_dsk.h"
+#include "formats/dfi_dsk.h"
 #include "formats/ipf_dsk.h"
 
 
@@ -2336,7 +2337,7 @@ void stbook_state::machine_start()
 }
 
 const floppy_format_type st_state::floppy_formats[] = {
-	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_PASTI_FORMAT, FLOPPY_IPF_FORMAT, FLOPPY_MFI_FORMAT,
+	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_PASTI_FORMAT, FLOPPY_IPF_FORMAT, FLOPPY_MFI_FORMAT, FLOPPY_DFI_FORMAT,
 	NULL
 };
 
