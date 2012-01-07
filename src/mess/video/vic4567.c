@@ -2054,7 +2054,7 @@ static DEVICE_START( vic3 )
 
 	device->save_item(NAME(vic3->on));
 
-	device->save_item(NAME(vic3->bitmap));
+	//device->save_item(NAME(vic3->bitmap));
 
 	device->save_item(NAME(vic3->lines));
 
