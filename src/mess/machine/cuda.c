@@ -42,7 +42,6 @@
 #include "cpu/m6805/m6805.h"
 #include "machine/6522via.h"
 #include "sound/asc.h"
-#include "includes/mac.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -172,21 +171,16 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				// falling edge, should reset the machine too
 				if ((ports[2] & 8) && !(data&8))
 				{
-					mac_state *mac = machine().driver_data<mac_state>();
-
-					// force the memory overlay
-					mac->set_memory_overlay(0);
-					mac->set_memory_overlay(1);
+                    m_out_reset_func(ASSERT_LINE);
+                    m_out_reset_func(CLEAR_LINE);
 
 					// if PRAM's waiting to be loaded, transfer it now
 					if (!pram_loaded)
 					{
-						memcpy(pram, disk_pram, 0x100);
+//						memcpy(pram, disk_pram, 0x100);
 						pram_loaded = true;
 					}
 				}
-
-				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, (reset_line & 8) ? ASSERT_LINE : CLEAR_LINE);
 			}
 			break;
 	}
@@ -399,6 +393,8 @@ void cuda_device::static_set_type(device_t &device, int type)
 
 void cuda_device::device_start()
 {
+    m_out_reset_func.resolve(m_out_reset_cb, *this);
+
 	m_timer = timer_alloc(0, NULL);
     m_prog_timer = timer_alloc(1, NULL);
 	save_item(NAME(ddrs[0]));
@@ -492,6 +488,23 @@ void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
             }
         }
     }
+}
+
+void cuda_device::device_config_complete()
+{
+    m_shortname = "cuda";
+
+	// inherit a copy of the static data
+	const cuda_interface *intf = reinterpret_cast<const cuda_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<cuda_interface *>(this) = *intf;
+	}
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
+	}
 }
 
 // the 6805 program clears PRAM on startup (on h/w it's always running once a battery is inserted)

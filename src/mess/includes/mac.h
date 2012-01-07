@@ -27,7 +27,7 @@
 #define ADB_IS_BITBANG	((mac->m_model == MODEL_MAC_SE || mac->m_model == MODEL_MAC_CLASSIC) || (mac->m_model >= MODEL_MAC_II && mac->m_model <= MODEL_MAC_IICI) || (mac->m_model == MODEL_MAC_SE30) || (mac->m_model == MODEL_MAC_QUADRA_700))
 #define ADB_IS_BITBANG_CLASS	((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_QUADRA_700))
 #define ADB_IS_EGRET	(mac->m_model >= MODEL_MAC_LC && mac->m_model <= MODEL_MAC_CLASSIC_II) || ((mac->m_model >= MODEL_MAC_IISI) && (mac->m_model <= MODEL_MAC_IIVI))
-#define ADB_IS_CUDA	    ((mac->m_model >= MODEL_MAC_TV && mac->m_model <= MODEL_MAC_COLOR_CLASSIC) || ((mac->m_model >= MODEL_MAC_QUADRA_660AV) && (mac->m_model <= MODEL_MAC_QUADRA_630)) || (mac->m_model >= MODEL_MAC_POWERMAC_6100))
+#define ADB_IS_CUDA	    ((mac->m_model >= MODEL_MAC_COLOR_CLASSIC && mac->m_model <= MODEL_MAC_LC_580) || ((mac->m_model >= MODEL_MAC_QUADRA_660AV) && (mac->m_model <= MODEL_MAC_QUADRA_630)) || (mac->m_model >= MODEL_MAC_POWERMAC_6100))
 #define ADB_IS_PM_VIA1	(mac->m_model >= MODEL_MAC_PORTABLE && mac->m_model <= MODEL_MAC_PB100)
 #define ADB_IS_PM_VIA2	(mac->m_model >= MODEL_MAC_PB140 && mac->m_model <= MODEL_MAC_PBDUO_270c)
 #define ADB_IS_PM_VIA1_CLASS	(m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100)
@@ -80,8 +80,14 @@ typedef enum
 	MODEL_MAC_LC_III,
 	MODEL_MAC_LC_III_PLUS,
 	MODEL_MAC_CLASSIC_II,
-	MODEL_MAC_TV,
 	MODEL_MAC_COLOR_CLASSIC,
+
+    MODEL_MAC_LC_475,   // LC III clones with Cuda instead of Egret and 68LC040 on most models
+    MODEL_MAC_LC_520,
+    MODEL_MAC_LC_550,
+	MODEL_MAC_TV,
+    MODEL_MAC_LC_575,
+    MODEL_MAC_LC_580,
 
 	MODEL_MAC_PB140,	// 68030 PowerBooks.  140/145/145B/170 all have the same machine ID
 	MODEL_MAC_PB160,    // 160/180/165 all have the same machine ID too
@@ -164,6 +170,7 @@ DRIVER_INIT(maciivx);
 DRIVER_INIT(maciifx);
 DRIVER_INIT(macpd210);
 DRIVER_INIT(macquadra700);
+DRIVER_INIT(maclc520);
 
 NVRAM_HANDLER( mac );
 
@@ -422,6 +429,8 @@ public:
 
     DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
     DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
+
+    DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
 
 private:
 	int has_adb();

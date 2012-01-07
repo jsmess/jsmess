@@ -628,6 +628,8 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/macrtc.o	\
 	$(MESS_MACHINE)/macadb.o	\
 	$(MESS_DRIVERS)/mac.o		\
+	$(MESS_MACHINE)/macpci.o	\
+	$(MESS_DRIVERS)/macpci.o	\
 	$(MESS_VIDEO)/apple1.o		\
 	$(MESS_MACHINE)/apple1.o	\
 	$(MESS_DRIVERS)/apple1.o	\
@@ -691,7 +693,6 @@ $(MESSOBJ)/bally.a:                     \
 	$(MESS_DRIVERS)/astrocde.o	\
 
 $(MESSOBJ)/bandai.a:			\
-	$(MESS_DRIVERS)/pippin.o	\
 	$(MESS_DRIVERS)/rx78.o		\
 	$(MESS_DRIVERS)/wswan.o		\
 	$(MESS_MACHINE)/wswan.o		\

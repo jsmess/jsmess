@@ -403,7 +403,7 @@ void mac_state::v8_resize()
 		is_rom = FALSE;
 	}
 
-//  printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, m_rbv_regs[1] & 0xe0, m_overlay, is_rom ? "ROM" : "RAM");
+//    printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, m_rbv_regs[1] & 0xe0, m_overlay, is_rom ? "ROM" : "RAM");
 
 	if (is_rom)
 	{
@@ -519,7 +519,7 @@ void mac_state::set_memory_overlay(int overlay)
 		{
 			mac_install_memory(machine(), 0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS))	// up to 36 MB
+		else if ((m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))	// up to 36 MB
 		{
 			mac_install_memory(machine(), 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -1961,7 +1961,16 @@ void mac_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
+WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
+{
+    if (state == ASSERT_LINE)
+    {
+        set_memory_overlay(0);
+        set_memory_overlay(1);
+    }
 
+    cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, state);
+}
 
 static void mac_state_load(mac_state *mac)
 {
@@ -2026,6 +2035,18 @@ READ32_MEMBER(mac_state::mac_read_id)
 		case MODEL_MAC_LC_III_PLUS:
 			return 0xa55a0003;	// 33 MHz LC III+
 
+        case MODEL_MAC_LC_475:
+            return 0xa55a2221;
+
+        case MODEL_MAC_LC_520:
+            return 0xa55a0100;
+
+        case MODEL_MAC_LC_550:
+            return 0xa55a0101;
+
+        case MODEL_MAC_LC_575:
+            return 0xa55a222e;
+
 		case MODEL_MAC_POWERMAC_6100:
 			return 0xa55a3011;
 
@@ -2043,6 +2064,18 @@ READ32_MEMBER(mac_state::mac_read_id)
 
 		case MODEL_MAC_PBDUO_250:
 			return 0xa55a1006;
+
+        case MODEL_MAC_QUADRA_605:
+            return 0xa55a2225;
+
+        case MODEL_MAC_QUADRA_610:
+        case MODEL_MAC_QUADRA_650:
+        case MODEL_MAC_QUADRA_800:
+            return 0xa55a2bad;
+
+        case MODEL_MAC_QUADRA_660AV:
+        case MODEL_MAC_QUADRA_840AV:
+            return 0xa55a2830;
 
 		default:
 			return 0;
@@ -2075,9 +2108,9 @@ static void mac_driver_init(running_machine &machine, model_t model)
 
 	memset(mac->m_ram->pointer(), 0, mac->m_ram->size());
 
-	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) ||
+	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) || (model >= MODEL_MAC_LC_475 && model <= MODEL_MAC_LC_580) ||
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
-	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (mac->m_model >= MODEL_MAC_QUADRA_700 && mac->m_model <= MODEL_MAC_QUADRA_800))
+	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (model >= MODEL_MAC_QUADRA_700 && model <= MODEL_MAC_QUADRA_800))
 	{
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(overlay_opbaseoverride), &machine));
 	}
@@ -2126,6 +2159,7 @@ MAC_DRIVER_INIT(macquadra700, MODEL_MAC_QUADRA_700)
 MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
 MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
 MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX);
+MAC_DRIVER_INIT(maclc520, MODEL_MAC_LC_520)
 
 void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 {

@@ -20,13 +20,18 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CUDA_ADD(_type) \
+#define MCFG_CUDA_ADD(_type, _config) \
     MCFG_DEVICE_ADD(CUDA_TAG, CUDA, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
     MCFG_CUDA_TYPE(_type)
 
-#define MCFG_CUDA_REPLACE(_type) \
+#define MCFG_CUDA_REPLACE(_type, _config) \
     MCFG_DEVICE_REPLACE(CUDA_TAG, CUDA, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
     MCFG_CUDA_TYPE(_type)
+
+#define MCFG_CUDA_REMOVE() \
+    MCFG_DEVICE_REMOVE(CUDA_TAG)
 
 #define MCFG_CUDA_TYPE(_type) \
     cuda_device::static_set_type(*device, _type);
@@ -35,9 +40,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+struct cuda_interface
+{
+    devcb_write_line    m_out_reset_cb;
+};
+
 // ======================> cuda_device
 
-class cuda_device :  public device_t, public device_nvram_interface
+class cuda_device :  public device_t, public device_nvram_interface, public cuda_interface
 {
 public:
     // construction/destruction
@@ -80,7 +90,7 @@ protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "cuda"; }
+    virtual void device_config_complete();
     virtual machine_config_constructor device_mconfig_additions() const;
     virtual const rom_entry *device_rom_region() const;
 
@@ -105,6 +115,8 @@ private:
     bool pram_loaded;
 
     void send_port(address_space &space, UINT8 offset, UINT8 data);
+
+	devcb_resolved_write_line	m_out_reset_func;
 };
 
 // device type definition

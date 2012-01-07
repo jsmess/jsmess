@@ -183,6 +183,7 @@ READ8_MEMBER( mac_state::mac_sonora_vctl_r )
 {
 	if (offset == 2)
 	{
+//        printf("Sonora: read monitor ID at PC=%x\n", cpu_get_pc(m_maincpu));
 		return (6 << 4);	// 640x480 RGB monitor
 	}
 
@@ -240,7 +241,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		{
 			data &= ~0x38;
 			data |= (input_port_read_safe(space.machine(), "MONTYPE", 2)<<3);
-//          printf("rbv_r montype: %02x (PC %x)\n", data, cpu_get_pc(space.cpu));
+//            printf("rbv_r montype: %02x (PC %x)\n", data, cpu_get_pc(space.cpu));
 		}
 
 		// bit 7 of these registers always reads as 0 on RBV
@@ -886,6 +887,11 @@ static const struct harddisk_interface mac_harddisk_config =
 	NULL
 };
 
+static const cuda_interface mac_cuda_interface =
+{
+    DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w)
+};
+
 static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	/* basic machine hardware */
@@ -1172,8 +1178,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( maccclas, maclc2 )
 
     MCFG_EGRET_REMOVE()
-    MCFG_CUDA_ADD(CUDA_341S0788)    // should be 341s0417, but only the color classic used that rev and those are "collectable" ($$$$)
-    MCFG_QUANTUM_PERFECT_CPU("maincpu")
+    MCFG_CUDA_ADD(CUDA_341S0788, mac_cuda_interface)    // should be 341s0417, but only the color classic used that rev and those are "collectable" ($$$$)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc3, maclc )
@@ -1197,6 +1202,12 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_EGRET_REPLACE(EGRET_341S0851)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( maclc520, maclc3 )
+
+    MCFG_EGRET_REMOVE()
+    MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciivx, maclc )
@@ -2128,6 +2139,11 @@ ROM_END
     ROM_LOAD( "ecfa989b.rom", 0x000000, 0x100000, CRC(b86ed854) SHA1(ed1371c97117a5884da4a6605ecfc5abed48ae5a) )
 ROM_END*/
 
+ROM_START( maclc520 )
+	ROM_REGION32_BE(0x100000, "bootrom", 0)
+    ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) ) 
+ROM_END
+
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */
 COMP( 1984, mac128k,  0,		0,	mac128k,  macplus,  mac128k512k,  "Apple Computer", "Macintosh 128k",  GAME_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k,  0,	mac512ke, macplus,  mac128k512k,  "Apple Computer", "Macintosh 512k",  GAME_NOT_WORKING )
@@ -2163,4 +2179,5 @@ COMP( 1992, macpb145b,macpb140, 0,  macpb170, macadb,   macpb140,	  "Apple Compu
 COMP( 1993, maclc3,   0,		0,	maclc3,   maciici,  maclc3,	      "Apple Computer", "Macintosh LC III",  GAME_NOT_WORKING )
 COMP( 1993, maciivx,  0,		0,	maciivx,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvx",  GAME_NOT_WORKING )
 COMP( 1993, maciivi,  maciivx,	0,	maciivi,  maciici,  maciivx,	  "Apple Computer", "Macintosh IIvi",  GAME_NOT_WORKING )
+COMP( 1993, maclc520, 0,		0,	maclc520, maciici,  maclc520,     "Apple Computer", "Macintosh LC 520",  GAME_NOT_WORKING )
 COMP( 1994, pmac6100, 0,		0,	pwrmac,   macadb,   macpm6100,	  "Apple Computer", "Power Macintosh 6100/60",  GAME_NOT_WORKING | GAME_NO_SOUND )
