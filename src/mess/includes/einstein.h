@@ -47,7 +47,7 @@ public:
 		  m_fdc(*this, IC_I042)
 		  { }
 
-	required_device<wd1772_t> m_fdc;
+	required_device<wd1770_t> m_fdc;
 	device_t *m_color_screen;
 	device_t *m_ctc;
 
