@@ -107,22 +107,11 @@ ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, d
 
 void ncr5380_device::device_start()
 {
-	int i;
-
 	memset(m_5380_Registers, 0, sizeof(m_5380_Registers));
 	memset(m_5380_Data, 0, sizeof(m_5380_Data));
 	memset(m_scsi_devices, 0, sizeof(m_scsi_devices));
 
 	m_next_req_flag = 0;
-
-	// try to open the devices
-	for (i = 0; i < scsidevs->devs_present; i++)
-	{
-		SCSIAllocInstance( machine(),
-				scsidevs->devices[i].scsiClass,
-				&m_scsi_devices[scsidevs->devices[i].scsiID],
-				scsidevs->devices[i].diskregion );
-	}
 
 	save_item(NAME(m_5380_Registers));
 	save_item(NAME(m_5380_Command));
