@@ -137,8 +137,6 @@ mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, d
 
 void mb89352_device::device_start()
 {
-	int x;
-
     m_phase = SCSI_PHASE_BUS_FREE;
     m_target = 0;
     m_command_index = 0;
@@ -153,14 +151,6 @@ void mb89352_device::device_start()
     m_drq_func.resolve(drq_callback,*this);
 
     memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
-
-    // initialise SCSI devices, if any present
-    for(x=0;x<scsidevs->devs_present;x++)
-    {
-    	SCSIAllocInstance(machine(), scsidevs->devices[x].scsiClass,
-				&m_SCSIdevices[scsidevs->devices[x].scsiID],
-				scsidevs->devices[x].diskregion );
-    }
 
     // allocate read timer
     m_transfer_timer = timer_alloc(TIMER_TRANSFER);
