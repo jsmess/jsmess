@@ -16,6 +16,8 @@ Titles, serial #s, publishers and release dates taken from:
 -->
 
 <softwarelist name="fm77av" description="Fujitsu FM-77AV disk images">
+
+<!-- the alt set with crcs 63033bba and b1511bd6 only differs for d77 headers, but data in the disks are identical -->
 	<software name="9gyokudn">
 		<description>九玉伝</description>
 		<year>1986</year>
@@ -31,6 +33,39 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="9gyokuden_b.d77" size="416688" crc="d34cd804" sha1="a39338e29255c7fe8b60a1b43f8fd9500e76fb7a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="9gyokudna" cloneof="9gyokudn">
+		<description>九玉伝 (Alt Disk 1)</description>
+		<year>1986</year>
+		<publisher>テクノソフト (TecnoSoft)</publisher>
+		<info name="serial" value="FUTJ-19002"/>
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="Ku Gyoku Den"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="416688">
+				<rom name="kugyokuden (1986)(tecno soft)(jp) (disk 1).d77" size="416688" crc="98160ebc" sha1="06933c513916a89888be7a67c45752cef5e9e7e6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="416688">
+				<rom name="9gyokuden_b.d77" size="416688" crc="d34cd804" sha1="a39338e29255c7fe8b60a1b43f8fd9500e76fb7a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amnork">
+		<description>Amnork</description>
+		<year>1986</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="serial" value="2019501"/>
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="アムノーク"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="amnork (1986)(ascii)(jp).d77" size="348848" crc="f3f71308" sha1="a5091d43926919e95105c688829ffb53518ead76" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +91,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="avdemo">
 		<description>77AV Demo</description>
 		<year>19??</year>
-		<publisher>Fujitsu</publisher>
+		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
 				<rom name="77avdemo.d77" size="353200" crc="7046810d" sha1="116a422147107943c0d378e99923cb14cd31a13f" offset="000000" />
@@ -85,6 +120,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 <!-- According to Oh!FM-7 the game was released for the 77AV in 3.5" disks... does this change anything in the format? -->
+<!-- the alt set with crcs 9937fd56 and c84c5dac only differs for d77 headers, but data in the disks are identical -->
 	<software name="dforce" supported="no">
 		<description>デスフォース</description>
 		<year>1987</year>
@@ -97,6 +133,11 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="user disk.d77" size="473776" crc="0e342f31" sha1="32a5a85b36b646da6f9e8bbd48b9e27d2bd1857c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="392880">
 				<rom name="dforce2.d77" size="392880" crc="c7feb23c" sha1="fb5a25c736c20a2dd0ba3ac2be488612c7017855" offset="000000" />
 			</dataarea>
@@ -121,7 +162,29 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="drabus">
+	<software name="megamit">
+		<description>Digital Devil Monogatari - Megami Tensei</description>
+		<year>1987</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="release" value="198709xx"/>
+		<info name="alt_title" value="デジタルデビル物語 女神転生"/>
+		<!--combined image-->
+		<!--rom name="megami tensei (1987)(telenet)(jp).d77" size="832528" crc="aaccf4ed" sha1="d836d6d90870741142bc4e5b01f37d2d5540d5fc" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="megami tensei (disk 1).d77" size="415840" crc="d5893caa" sha1="fbb2c717e0070404714612fc52626a72e2b6fc5b" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="416688">
+				<rom name="megami tensei (disk 2).d77" size="416688" crc="566efd18" sha1="f64f01cc2e3b4ca4ff97ba88d87881ff586c7179" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbuster">
 		<description>Dragon Buster</description>
 		<year>1987</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -130,6 +193,19 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="drabus.d77" size="348848" crc="6100e7f0" sha1="4671fadc689cb3e0c708119082f0db083d260232" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbustera" cloneof="dbuster">
+		<description>Dragon Buster (Alt)</description>
+		<year>1987</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="serial" value="DP-3301212"/>
+		<info name="alt_title" value="ドラゴンバスター"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dragon buster (1987)(dempa)(jp).d77" size="348848" crc="24edc828" sha1="f6e584d4ede1016eb3167c2acb47b259c59301f0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -150,7 +226,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="fb_33l11">
 		<description>F-BASIC v3.3 L11</description>
 		<year>19??</year>
-		<publisher>Fujitsu</publisher>
+		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="v33l11.d77" size="348848" crc="d5d8393a" sha1="14b97869f650e913bceea91f02b428768ae7afc6" offset="000000" />
@@ -204,6 +280,35 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ishtar_b.d77" size="348848" crc="87d3dec0" sha1="237d55d296d1179f4373e0f9c03d65f4f1fce05f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jesus">
+		<description>Jesus</description>
+		<year>1987</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G195"/>
+		<info name="release" value="198707xx"/>
+		<info name="alt_title" value="ジーザス"/>
+		<!--combined image-->
+		<!--rom name="jesus (1987)(enix)(jp).d77" size="1044640" crc="279e91a7" sha1="8c9e3dc85920b7ae5d53d266f5ae04990f48fd81" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="346944">
+				<rom name="jesus (disk 1).d77" size="346944" crc="2d07dd03" sha1="874fad7b117429ffd2e2bbed3e11ccb1d0188ab6" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="jesus (disk 2).d77" size="348848" crc="cb32cf13" sha1="7c3181f98ee90c9f78367244a7c3849fa7fe8238" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="jesus (disk 3).d77" size="348848" crc="94a49af2" sha1="cafdc7f89cb5084e8edd15a6f1c122b783e6895f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -283,6 +388,47 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="laydocka" cloneof="laydock">
+		<description>Laydock (Alt)</description>
+		<year>1986</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="TEM-66"/>
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="レイドック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="414992">
+				<rom name="laydocka1.d77" size="416048" crc="3b53877e" sha1="e2f3579fe93622a74fb07d0b8d2cd7bfb2b39132" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="122544">
+				<rom name="laydocka2.d77" size="122544" crc="93ec6454" sha1="cae77215f6acf7d47d0b914f148c4f4f4fc804fa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laydockb" cloneof="laydock">
+		<description>Laydock (Alt 2)</description>
+		<year>1986</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="TEM-66"/>
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="レイドック"/>
+		<!--combined image-->
+		<!--rom name="laydock (1986)(t&amp;e)(jp).d77" size="538592" crc="60fc8306" sha1="65f73297d0ee4f07ec5f513eef54dfbc1d3a5094" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="414992">
+				<rom name="laydock (disk 1).d77" size="416048" crc="3b53877e" sha1="e2f3579fe93622a74fb07d0b8d2cd7bfb2b39132" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="122544">
+				<rom name="laydock (disk 2).d77" size="122544" crc="cdc8d21d" sha1="ce4f3e5b4601afc2882ce2abc55d08e41048dc8d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="luxsor">
 		<description>Luxsor</description>
 		<year>1987</year>
@@ -301,6 +447,28 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="mahjongk">
+		<description>Mahjong Kyo Jidai Special</description>
+		<year>1988</year>
+		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="release" value="198809xx"/>
+		<info name="alt_title" value="麻雀狂時代スペシャル"/>
+		<!--combined image-->
+		<!--rom name="mah-jongg kyo jidai special (1988)(micro net)(jp).d77" size="829136" crc="e638b5d9" sha1="379d9d90f909740aa58815ef6f0705642f3ef7f0" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="412448">
+				<rom name="mah-jongg kyo jidai special (disk 1).d77" size="412448" crc="ecec6676" sha1="428d07e6f417729005b2dd477969697dbdbb681d" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="416688">
+				<rom name="mah-jongg kyo jidai special (disk 2).d77" size="416688" crc="f29c3bea" sha1="5e03eac26e1c65a960951eeae7a5782939ccc71a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mike">
 		<description>少年マイクのひとり旅</description>
 		<year>1986</year>
@@ -314,7 +482,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="mm1">
+	<software name="mightmag">
 		<description>Might &amp; Magic</description>
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -338,6 +506,84 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="mm1_d.d77" size="348848" crc="f2b3dfb0" sha1="f448cecfca9dc88e72a71f9784f5216c822f74ca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightmaga" cloneof="mightmag">
+		<description>Might &amp; Magic (Alt Disk 1)</description>
+		<year>1987</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="release" value="198712xx"/>
+		<info name="alt_title" value="マイトアンドマジック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="might and magic (1987)(star craft)(jp) (disk 1).d77" size="348848" crc="bd47a2aa" sha1="ab3de776f3bc2b0282698a3d81ff18447ae0601c" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mm1_b.d77" size="348848" crc="e14992f6" sha1="ce71077fb63ffef1fd47107a4f481c8d4fa083f7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mm1_c.d77" size="348848" crc="ff56dedb" sha1="05cedbbd313659246e65b3311e71aa2594213609" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="mm1_d.d77" size="348848" crc="f2b3dfb0" sha1="f448cecfca9dc88e72a71f9784f5216c822f74ca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightmagb" cloneof="mightmag">
+		<description>Might &amp; Magic (Alt 2)</description>
+		<year>1987</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="release" value="198712xx"/>
+		<info name="alt_title" value="マイトアンドマジック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="m&amp;m_dska.d77" size="473776" crc="6573514c" sha1="bf1c2dae90cf4960da85333ce6c61220c0481d03" offset="000000"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="m&amp;m_dskb.d77" size="473776" crc="17c0d40d" sha1="60f7140f9ac819a39302aa321ecdf2894523945a" offset="000000"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="m&amp;m_dskc.d77" size="473776" crc="e7288721" sha1="ed37f1f3ef6fae2e17caec67e6abbef0702a192d" offset="000000"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="m&amp;m_dskd.d77" size="473776" crc="1efc568b" sha1="5496d24e7b880df24a2a2d440ebe21f142edc8c3" offset="000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valis">
+		<description>Mugen Senshi Valis</description>
+		<year>1987</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="release" value="198706xx"/>
+		<info name="alt_title" value="夢幻戦士ヴァリス"/>
+		<!--combined image-->
+		<!--rom name="mugen sensi valis (1987)(telenet)(jp).d77" size="831408" crc="a2ef12ee" sha1="a9cfc21ebb9e7d1132c1841b0d80a7734ecfe2d9" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="mugen senshi valis (disk 1).d77" size="415840" crc="b01c3dff" sha1="f2a968336d22ed0a66142dcafbeb79b1c9f8f580" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="415568">
+				<rom name="mugen senshi valis (disk 2).d77" size="415568" crc="9db26724" sha1="b8891ade07d745542abb840ea576e08b1d40c94e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -383,6 +629,53 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="psyoblad">
+		<description>Psy-O-Blade</description>
+		<year>1988</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="release" value="198812xx"/>
+		<info name="alt_title" value="サイオブレード"/>
+		<!--combined image-->
+		<!--rom name="psy-o-blade (1988)(t&amp;e soft)(jp).d77" size="2014832" crc="0dc4de0a" sha1="41d216cf1925a6b7ec7c26bc759911b6573eebfe" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="392368">
+				<rom name="psy-o-blade (disk 1).d77" size="392368" crc="8358c090" sha1="481d597ad71aa2ebf2277f9754b5ea2d916f7788" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="394272">
+				<rom name="psy-o-blade (disk 2).d77" size="394272" crc="c4d450e9" sha1="3de83973a355a12b19fce0377e1e1b60b2a67b1a" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="420000">
+				<rom name="psy-o-blade (disk 3).d77" size="420000" crc="460950ae" sha1="605b86a2393a66f6ff00305a196f64c43eb6a4df" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="399088">
+				<rom name="psy-o-blade (disk 4).d77" size="399088" crc="10593f27" sha1="1f8919398f2560aba894d40bd5559ba8b87d8aef" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="398896">
+				<rom name="psy-o-blade (disk 5).d77" size="398896" crc="cbbecc02" sha1="04bc4ba428623983ccb943f98e4d16b0c057c3a2" offset="0"/>
+			</dataarea>
+		</part>
+
+		<!-- what is this? -->
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="10208">
+				<rom name="psy-o-blade (disk 6).d77" size="10208" crc="f12070dc" sha1="54e0feebe1b3939389cc40a941e3562650d2461a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="seles">
 		<description>Seles</description>
 		<year>1990</year>
@@ -396,6 +689,26 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="seles_b.d77" size="348848" crc="b7646c75" sha1="47b9f46b2506e05457569cfdd3d63794206849d3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="selesa" cloneof="seles">
+		<description>Seles (Alt Disk 2)</description>
+		<year>1990</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="セレス"/>
+		<!--combined image-->
+		<!--rom name="seles (1990)(ascii)(jp).d77" size="697696" crc="1e6cb186" sha1="50b8e31b8e3d5065dda58706bf4abbd7c7192133" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="seles (disc a).d77" size="348848" crc="b75dc08f" sha1="ab085cafa1fd4c0ab0f0ff93301abce5ffda334d" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="seles (disc b).d77" size="348848" crc="77abb3c5" sha1="b409c7ffde557c392ef7648781b8d0b001b9391d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -426,18 +739,93 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="シルフィード"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 28788 -->
 				<rom name="sil_a.d77" size="348848" crc="3233658c" sha1="0594a90a0462a6324f929cc2ec9d5788f496b248" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 39767 -->
 				<rom name="sil_b.d77" size="348848" crc="4b298065" sha1="63e8c73165d6e871e5da413ec7606ad7724186a2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
+<!-- Disk 1 only differs in the d77 header -->
+	<software name="silpheeda" cloneof="silpheed">
+		<description>Silpheed (Alt Disk 2)</description>
+		<year>1988</year>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<info name="serial" value="GA8CF3"/>
+		<info name="release" value="198803xx"/>
+		<info name="alt_title" value="シルフィード"/>
+		<!--combined image-->
+		<!--rom name="silpheed (1988)(game arts)(jp).d77" size="697696" crc="dc3394b4" sha1="f08fa8346180ecf6ebfca0da1ad19a559a1ef3f6" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 28788 -->
+				<rom name="silpheed (disk 1).d77" size="348848" crc="fa446a5a" sha1="4da0ba7dad37e6698c71535c55c3b44c4fb80d69" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">    <!-- Data CRC16: 48335 -->
+				<rom name="silpheed (disk 2).d77" size="348848" crc="1fdaa3d7" sha1="456548ab6ae7a1acd1a6c59d8912345c2c6d0e63" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>1988</year>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<info name="release" value="198811xx"/>
+		<info name="alt_title" value="テトリス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="tetris (1988)(bps)(jp).d77" size="473776" crc="d20a12fb" sha1="f6ea48495e7d5b6d0851ac8dc6134777e1edc440" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uruseiya">
+		<description>Urusei Yatsura</description>
+		<year>1987</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="release" value="198712xx"/>
+		<info name="alt_title" value="うる星やつら"/>
+		<!--combined image-->
+		<!--rom name="urusei yatura (1987)(micro cabin)(jp).d77" size="1618368" crc="07a6d4b2" sha1="da6d7c2cd13150985031aa42fb35e14364562b6c" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="382896">
+				<rom name="urusei yatsura (disk 1).d77" size="382896" crc="101117bb" sha1="1c523cce67a8f3afa1a1d5199ccf51e17745be92" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="380848">
+				<rom name="urusei yatsura (disk 2).d77" size="380848" crc="425e0f44" sha1="b8072a47336e08ff58e9f6135b9aebbf0994b16e" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="380848">
+				<rom name="urusei yatsura (disk 3).d77" size="380848" crc="1fb0f1c0" sha1="625868c5ec5774c45b5faca9a3dc9809980c1e00" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Default?" />
+			<dataarea name="flop" size="473776">
+				<rom name="urusei yatsura (default).d77" size="473776" crc="a9e0a66d" sha1="7fab2b724025e0174e1ae6f27e19dbb413cc1ec2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- is this really for the AV only? -->
+<!-- the alt set with crcs 5d516c49, 30683a80 and a8aa8048 only differs for d77 headers, but data in the disks are identical -->
 	<software name="wiz4">
 		<description>Wizardry 4 - The Return of Werdna</description>
 		<year>1989</year>
@@ -461,7 +849,82 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="ys1_av">
+	<software name="woodypoc">
+		<description>Woody Poco</description>
+		<year>1987</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<info name="serial" value="FUDF-19002 (F06-G5116-P1)"/>
+		<info name="alt_title" value="うっでぃぽこ"/>
+		<description>.d77</description>
+		<!--combined image-->
+		<!--rom name="woody poco (1987)(db-soft)(jp).d77" size="697696" crc="8f8464b0" sha1="25a1882c20f08ec349448ecb021fa24adf348a77" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="woody poco (disk 1).d77" size="348848" crc="b8d7abe6" sha1="74c02c0da9b9ed7ba16750242b2771685ebb214f" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="woody poco (disk 2).d77" size="348848" crc="d5b8ef32" sha1="ae2b75699aa42c5e5222bc2cce6adecbae9ab099" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worldgl2">
+		<description>World Golf II</description>
+		<year>1987</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G203"/>
+		<info name="release" value="198710xx"/>
+		<info name="alt_title" value="ワールドゴルフ２"/>
+		<!--combined image-->
+		<!--rom name="world golf ii (1987)(enix)(jp).d77" size="697696" crc="a9693ac3" sha1="038a711add7c9e4c5120ead813e4d83391647e40" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="world golf ii (disk 1).d77" size="348848" crc="e1c3afe2" sha1="2a37f4f4020144b5e86b950783fadc20f1f401a7" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="world golf ii (disk 2).d77" size="348848" crc="54929a3f" sha1="e7af322070b9c367aea441fbbb6430bc87bc0572" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yaminoiy">
+		<description>Yami no Iyo Densetsu</description>
+		<year>1989</year>
+		<publisher>HOT・B</publisher>
+		<info name="release" value="198908xx"/>
+		<info name="alt_title" value="闇の壱与伝説"/>
+		<!--combined image-->
+		<!--rom name="yami no iyo densetsu (1989)(hot b)(jp).d77" size="985536" crc="5ab2bd0e" sha1="f0a222c275c0a36f7823e0181fda1ad494d8cc53" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="yami no iyo densetsu (disk 1).d77" size="348576" crc="22ef1340" sha1="d0f25223334de819b273e855016e7f6f1af6c00b" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="yami no iyo densetsu (disk 2).d77" size="348576" crc="330e2bab" sha1="19e05c2737cea975de64011da40162f2fb2167b3" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="288384">
+				<rom name="yami no iyo densetsu (disk 3).d77" size="288384" crc="9a1e2efe" sha1="9b772c64eda51d045168e4c978ac27b952e38a57" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- the alt set with crcs cdb1c25a and a9dce60d only differs for d77 headers, but data in the disks are identical -->
+	<software name="ys">
 		<description>Ys - Ancient Ys Vanished Omen</description>
 		<year>1987</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -476,6 +939,47 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="ys_bp.d77" size="415840" crc="289bc187" sha1="98fdc648d2e1efafe013b8ca0d76cc97a1259b3b" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="473776">
+				<rom name="user disk.d77" size="473776" crc="fb765059" sha1="063931647b798085e3c1033ad1c4913678df6d17" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys2">
+		<description>Ys II - Ancient Ys Vanished The Final Chapter</description>
+		<year>1988</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="serial" value="FVNW19002"/>
+		<info name="release" value="198807xx"/>
+		<info name="alt_title" value="イース２"/>
+		<!--combined image-->
+		<!--rom name="ys 2 (1988)(falcom).d77" size="1895520" crc="95862e02" sha1="6eb7ccb810d3d24dc01602a94fdd7fba43b553e6" offset="0"/-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="589520">
+				<rom name="ys 2 (disk 1).d77" size="589520" crc="90039c2d" sha1="9fb918b5bd69abaa6c3b31a64a800638accf5dfc" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="ys 2 (disk 2).d77" size="473776" crc="54e875a4" sha1="a58415aba1da7300b5bfabf33dbbceec72d249ed" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="416112">
+				<rom name="ys 2 (disk 3).d77" size="416112" crc="e96f6240" sha1="b1eed6f3a21e4d304e61212a31922331c95b539e" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="416112">
+				<rom name="ys 2 (disk 4).d77" size="416112" crc="e68509d0" sha1="465c555df02d4e944e7f73ba32829c238e319469" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

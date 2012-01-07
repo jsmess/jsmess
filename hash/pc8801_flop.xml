@@ -36696,7 +36696,7 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<software name="wizardan">  <!-- this was labeled as "new version", why? -->
+	<software name="wizprinc">  <!-- this was labeled as "new version", why? -->
 		<description>Wizard and The Princess</description>
 		<year>1983</year>
 		<publisher>スタークラフト (Starcraft)</publisher>

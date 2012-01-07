@@ -634,7 +634,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="fm7demo">
 		<description>ＦＭ-7デモ</description>
 		<year>19??</year>
-		<publisher>Fujitsu</publisher>
+		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2162424">
 				<rom name="demo.t77" size="2162424" crc="b3308220" sha1="0d997aafbe880cc588b56384a1b1364d434d120a" offset="000000" />
@@ -645,7 +645,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="fmdemo" supported="no">
 		<description>FM音源デモ</description>
 		<year>19??</year>
-		<publisher>Fujitsu</publisher>
+		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="14937776">
 				<rom name="fm.t77" size="14937776" crc="7ee3790a" sha1="19353756c375acd03f0dbe0078eb8ce703d33144" offset="000000" />
@@ -1268,7 +1268,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="new7demo">
 		<description>FM-NEW7デモ</description>
 		<year>19??</year>
-		<publisher>Fujitsu</publisher>
+		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5718960">
 				<rom name="demo.t77" size="5718960" crc="9416ca8a" sha1="8b0feed6648c3c264d6ce1b8a78e97b541924c4a" offset="000000" />
@@ -1518,6 +1518,19 @@ Titles, serial #s, publishers and release dates taken from:
 
 	<software name="rallyx">
 		<description>Rally-X</description>
+		<year>1984</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="serial" value="DP-3301162"/>
+		<info name="alt_title" value="ラリーＸ"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="1260288">
+				<rom name="rally x.t77" size="1260288" crc="1204cf6b" sha1="dd66cddb9e69250c208bb4184818a231c4f94328" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rallyxa" cloneof="rallyx">
+		<description>Rally-X (Alt)</description>
 		<year>1984</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="serial" value="DP-3301162"/>
@@ -2119,6 +2132,129 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="5088378">
 				<rom name="zgun.t77" size="5088378" crc="4990921e" sha1="b6be73ac2463902f2af3071af06c63a710c969e8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- To sort, probably all FM7/FM8 tapes by ASCII! -->
+
+	<software name="demofm8">
+		<description>FM8 Demonstration</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="デモンストレーション"/> <!-- Marked デモンストレーション 1 in the pack I found -->
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="328964">
+				<rom name="demonstration.t77" size="328964" crc="c80a32c1" sha1="64db2b9ecf50a239ad103be7aa52f6ca84d4c20f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graph">
+		<description>Graph</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="グラフ"/> <!-- Marked グラフ 2 in the pack I found -->
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="924508">
+				<rom name="graph.t77" size="924508" crc="f7c65807" sha1="8b079cfaaab3670cc2cd250d7ad3b9d273c8a5cd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumwint">
+		<description>Summer Winter</description>
+		<year>1981?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="サマーウインター"/> <!-- Marked サマーウインター 3 in the pack I found -->
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="416272">
+				<rom name="sumwint.t77" size="416272" crc="d219f306" sha1="6f2b6abdd71101047e482cd80930b8ddab15280a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordpro">
+		<description>Word Processor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ワードプロセッサ"/> <!-- Marked ワードプロセッサ 4 in the pack I found -->
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="394700">
+				<rom name="wordpro.t77" size="394700" crc="3c5c622c" sha1="d1322d3c4ef0f19037e39e1c9308db5ad791ce58" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llander">
+		<description>Lunar Lander</description>
+		<year>1981?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ルナーランダー"/> <!-- Marked ルナーランダー 5 in the pack I found -->
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="419418">
+				<rom name="lunar lander.t77" size="419418" crc="ca58b4d0" sha1="b34f6f71c04f4b9f135334463f88032067215785" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjbonus">
+		<description>Black Jack &amp; Bonus</description>
+		<year>1981?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ブラックジャック＆ボーナス"/> <!-- Marked ブラックジャック＆ボーナス 6 in the pack I found -->
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="448498">
+				<rom name="bjbonus.t77" size="448498" crc="90bd16b0" sha1="95b5a8c8a9259063017d409e1d3c5bb2826ac898" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sort">
+		<description>Sort Kenkyuu</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ソート研究"/> <!-- Marked ソート研究 7 in the pack I found -->
+		<part name="cass1" interface="fm7_cass">
+		    <dataarea name="cass" size="201096">
+				<rom name="sort.t77" size="201096" crc="4f1a8a23" sha1="b0610ee3414d49149a81bf8b9986b229338407b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meibo">
+		<description>Meibo</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="名簿"/> <!-- Marked 名簿 8 in the pack I found -->
+		<part name="cass1" interface="fm7_cass">
+		    <dataarea name="cass" size="426582">
+				<rom name="meibo.t77" size="426582" crc="6048ed8a" sha1="be297c0119fe9f5d634f9ccb1538e5547229a980" offset="0"/>
+		    </dataarea>
+		</part>
+	</software>
+
+	<software name="fm8pl3">
+		<description>FM-8 Program Library No. 3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ＦＭ−８プログラムライブラリＮＯ．3"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="3453092">
+				<rom name="fm-8 program library 3.t77" size="3453092" crc="bb5bc9eb" sha1="85c75f9c8d243a9b94fcabcb50fbd581bb5d4ae9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="fm8pl4">
+		<description>FM-8 Program Library No. 4</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ＦＭ−８プログラムライブラリＮＯ．4"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="3230932">
+				<rom name="fm-8 program library 4.t77" size="3230932" crc="2b2c73c1" sha1="02e6fadf819d7b5337b590c670106b379ff95030" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
