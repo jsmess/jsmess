@@ -2,7 +2,7 @@
  
   macpci.c: second-generation Old World PowerMacs based on PCI instead of NuBus
  
-  Preliminary driver by R. Belmont
+  Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
  
   Pippin:
  
@@ -18,13 +18,23 @@
   Z8530 SCC
   CS4217 audio DAC
   Bt856 video DAC
-
-  PowerMac 6500 partial memory map (Pippin should be similar)
-  F3010000 : SCSI (53C96?)
+ 
+  Pippin-type map
+  F3000000 : Grand Central DMA/IRQ controller
   F3012000 : SCC
+  F3013000 : Grand Central system controller
+  F3014000 : AWACS audio
   F3015000 : SWIM III
   F3016000 : VIA1
-
+  F3018000 : SCSI (53C96)
+ 
+  NOTE: the 68HC05 reboots the PowerPC after it's ready to go.  In the debugger,
+  step past fff00108, then bpset fff00108, g until the HC05 reboots the system,
+  *then* you can start debugging ;-)  Probably should just halt the PowerPC until
+  cuda_reset_w is called...
+ 
+  NOTE 2: goes off into the weeds in the subroutine at fff05010 
+ 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -49,36 +59,7 @@ READ64_MEMBER( macpci_state::unk2_r )
 	return 0;
 }
 
-
-#if 0
-READ64_MEMBER( macpci_state::adb_portb_r )
-{
-	if (ACCESSING_BITS_56_63)
-	{
-		if (m_portb_data == 0x10)
-			return (UINT64)0x08 << 56;
-
-		if (m_portb_data == 0x38)	//fff04c80
-			return (UINT64)0x20 << 56; //almost sure this is wrong
-
-		//printf("PORTB R %02x\n", m_portb_data);
-
-		return 0;
-	}
-	return 0;
-}
-
-WRITE64_MEMBER( macpci_state::adb_portb_w )
-{
-	if (ACCESSING_BITS_56_63)
-	{
-		m_portb_data = (UINT64)data >> 56;
-	}
-}
-#endif
-
 static ADDRESS_MAP_START(pippin_mem, AS_PROGRAM, 64, macpci_state)
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x005fffff) AM_RAM
 
 	/* writes at 0x0*c01000 the string "Mr. Kesh" and wants it to be read back, true color VRAMs perhaps? */
@@ -162,7 +143,6 @@ static MACHINE_CONFIG_START( pippin, macpci_state )
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, pcimac_via6522_intf)
 //	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
     MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
-
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
