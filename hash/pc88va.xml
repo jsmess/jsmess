@@ -35,12 +35,42 @@
     * Ultima I-IV ~ ウルティマI～IV, by Pony Canyon
     * Heroes of the Lance ~ ヒーローオブランス, by Pony Canyon
     * Lightning Bacchus? ~ ライトニングバッカス, by NCS
+
+PC88VA doujin games (mostly undumped)
+
+    * 最終平気UPOプレリリース (by UPYOLIC SOFT, 1992)  [DUMPED!]
+    * AIR HUNTER 2 (by H-VA, 1992)
+    * Speedy Drug!! (by H-VA, 1993)
+    * 65536ショクカミシバイVA (by KAFCOBA-東京, 1993)
+    * E square (by SIGNAL, 1993)
+    * ネコメーカー (by LOKAPALA, 1994)
+    * ハティの森で (by LOKAPALA, 1994)
+    * 3D MAZE (by W341連合, 1994)
+    * ハティの空で (by LOKAPALA, 1994)  [DUMPED!]
+    * ネコメーカーおかわり (by LOKAPALA, 1994)
+    * ハティの峰で (by LOKAPALA, 1995)
+    * Star Dust Magic (by Wing software, 1995)
+    * DRAGON BALL Z キャラクター事典 (by Fredia, 1995)
+    * ハティの館で (by LOKAPALA, 1995)
+    * Flame Symbol 2 (by Wing software/Morning Bread, 1995)
+    * Boomering (by Fredia, 1996)  [DUMPED!]
+    * ばる〜んぶ れ〜か〜 (by Fredia, 1996)  [DUMPED!]
+    * 翼君の宝箱9 (by Wing software, 1996)
+    * 冒険島漫遊記 (by Wing softwre/Morning Bread, 1997)
+    * 翼くんのたからばこ拾 (by Wing software, 1997)
+    * Frediaがらくた箱 (by Fredia, 1997)
+    * 翼君の宝箱12 (by Wing software, 1998)
+    * Tear Drops (by Fredia, 1998)
+    * 翼君の宝箱13 (by Wing software, 1998)
+    * 翼君の宝箱14 (by Wing software, 1999)
+    * くるッ★彡 (by Cenkeil, 1999)
+    * Frail Rulers (by Fredia, 1999)
 -->
 
 
 <!-- Demos and Utilities -->
 
-	<software name="pc88vad">
+	<software name="pc88vad" supported="no">
 		<description>PC88-VA Demo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -54,7 +84,7 @@
 
 <!-- These were in a folder called 基本システムセット, i.e. Kihon System Set (AKA Basic System Set) -->
 
-	<software name="88va1td">
+	<software name="88va1td" supported="no">
 		<description>88VA1 Tentou Demo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -66,7 +96,7 @@
 		</part>
 	</software>
 
-	<software name="88va2d">
+	<software name="88va2d" supported="no">
 		<description>88VA2 Demo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -77,7 +107,7 @@
 		</part>
 	</software>
 
-	<software name="animefrm">
+	<software name="animefrm" supported="no">
 		<description>AnimeFramer</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -98,7 +128,7 @@
 	</software>
 
 <!-- Is this an Alt version of the program above (mistranslated), or another program? -->
-	<software name="paint">
+	<software name="paint" supported="no">
 		<description>Paint?</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -118,7 +148,7 @@
 
 	</software>
 
-	<software name="Micromus">
+	<software name="Micromus" supported="no">
 		<description>Micromusician VA</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -129,7 +159,7 @@
 		</part>
 	</software>
 
-	<software name="pceva2tb">
+	<software name="pceva2tb" supported="no">
 		<description>PC-Engine (VA2 Tenpu-ban)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -141,7 +171,7 @@
 		</part>
 	</software>
 
-	<software name="pce11">
+	<software name="pce11" supported="no">
 		<description>PC-Engine v1.1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -155,7 +185,7 @@
 
 <!-- Games -->
 
-	<software name="famista">
+	<software name="famista" supported="no">
 		<description>Family Stadium</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -182,7 +212,7 @@
 		</part>
 	</software>
 
-	<software name="famist89">
+	<software name="famist89" supported="no">
 		<description>Family Stadium '89 - Pennant Race Hen</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -205,7 +235,7 @@
 		</part>
 	</software>
 
-	<software name="famist89a" cloneof="famist89">
+	<software name="famist89a" cloneof="famist89" supported="no">
 		<description>Family Stadium '89 (Alt?)</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
@@ -231,7 +261,7 @@
 		</part>
 	</software>
 
-	<software name="mightmag">
+	<software name="mightmag" supported="no">
 		<description>Might &amp; Magic</description>
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -258,7 +288,7 @@
 		</part>
 	</software>
 
-	<software name="mightmg2">
+	<software name="mightmg2" supported="no">
 		<description>Might &amp; Magic Book 2</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -292,7 +322,7 @@
 		</part>
 	</software>
 
-	<software name="olteus">
+	<software name="olteus" supported="no">
 		<description>Olteus</description>
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
@@ -327,7 +357,7 @@
 	</software>
 
 <!-- First 4th disk in TOSEC has diff crc than the one above -->
-	<software name="olteusa" cloneof="olteus">
+	<software name="olteusa" cloneof="olteus" supported="no">
 		<description>Olteus (Alt Disk D)</description>
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
@@ -361,7 +391,7 @@
 		</part>
 	</software>
 
-	<software name="rtype">
+	<software name="rtype" supported="no">
 		<description>R-Type</description>
 		<year>1988?</year>
 		<publisher>NEC</publisher>
@@ -378,7 +408,7 @@
 		</part>
 	</software>
 
-	<software name="rogueall">
+	<software name="rogueall" supported="no">
 		<description>Rogue Alliance</description>
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -406,7 +436,7 @@
 		</part>
 	</software>
 
-	<software name="shanghai">
+	<software name="shanghai" supported="no">
 		<description>Shanghai</description>
 		<year>1986</year>
 		<publisher>システムソフト (System Software)</publisher>
@@ -418,7 +448,7 @@
 		</part>
 	</software>
 
-	<software name="shinraba">
+	<software name="shinraba" supported="no">
 		<description>Shinra Bansho</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -438,7 +468,7 @@
 		</part>
 	</software>
 
-	<software name="sorcer">
+	<software name="sorcer" supported="no">
 		<description>Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -481,7 +511,7 @@
 		</part>
 	</software>
 
-	<software name="sorcerutil" cloneof="sorcer">
+	<software name="sorcerutil" cloneof="sorcer" supported="no">
 		<description>Sorcerian Utility Vol.1</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -494,7 +524,7 @@
 		</part>
 	</software>
 
-	<software name="sorcerexp" cloneof="sorcer">
+	<software name="sorcerexp" cloneof="sorcer" supported="no">
 		<description>Sorcerian Tsuika Scenario</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -507,7 +537,7 @@
 		</part>
 	</software>
 
-	<software name="sorcerexp2" cloneof="sorcer">
+	<software name="sorcerexp2" cloneof="sorcer" supported="no">
 		<description>Sorcerian Tsuika Scenario 2 - Sengoku Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -520,7 +550,7 @@
 		</part>
 	</software>
 
-	<software name="sorcerexp3" cloneof="sorcer">
+	<software name="sorcerexp3" cloneof="sorcer" supported="no">
 		<description>Sorcerian Tsuika Scenario 3 - Pyramid Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -533,7 +563,7 @@
 		</part>
 	</software>
 
-	<software name="sorcerexp4" cloneof="sorcer">
+	<software name="sorcerexp4" cloneof="sorcer" supported="no">
 		<description>Sorcerian New Scenario Vol.1 - Uchuu Kara no Homonsha</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -546,7 +576,7 @@
 		</part>
 	</software>
 
-	<software name="gilgasor" cloneof="sorcer">
+	<software name="gilgasor" cloneof="sorcer" supported="no">
 		<description>Gilgamesh Sorcerian</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -559,7 +589,7 @@
 		</part>
 	</software>
 
-	<software name="sorcersel1" cloneof="sorcer">
+	<software name="sorcersel1" cloneof="sorcer" supported="no">
 		<description>Sorcerian Selected 1</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -572,7 +602,7 @@
 		</part>
 	</software>
 
-	<software name="sorcersel2" cloneof="sorcer">
+	<software name="sorcersel2" cloneof="sorcer" supported="no">
 		<description>Sorcerian Selected 2</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -585,7 +615,7 @@
 		</part>
 	</software>
 
-	<software name="sorcersel3" cloneof="sorcer">
+	<software name="sorcersel3" cloneof="sorcer" supported="no">
 		<description>Sorcerian Selected 3</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -598,7 +628,7 @@
 		</part>
 	</software>
 
-	<software name="sorcersel4" cloneof="sorcer">
+	<software name="sorcersel4" cloneof="sorcer" supported="no">
 		<description>Sorcerian Selected 4</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -611,7 +641,7 @@
 		</part>
 	</software>
 
-	<software name="sorcersel5" cloneof="sorcer">
+	<software name="sorcersel5" cloneof="sorcer" supported="no">
 		<description>Sorcerian Selected 5</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -624,9 +654,9 @@
 		</part>
 	</software>
 
-<!-- Dual floppies, should work both on the PC88VA and on the PC98 -->
+<!-- Dual floppies, should work both on the PC88VA and on the PC98 (usually you just have to switch the first two disks depending on the system) -->
 
-	<software name="illcity">
+	<software name="illcity" supported="no">
 		<description>Illusion City - Genei Toshi</description>
 		<year>1992</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -683,9 +713,67 @@
 		</part>
 	</software>
 
-<!-- Dual floppies, should work both on the PC88VA and on the X68000 -->
+	<software name="xak2" supported="no">
+		<description>Xak II</description>
+		<year>1990</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="release" value="19901102"/>
+		<info name="alt_title" value="Ｘａｋ２"/>
 
-	<software name="abunaten">
+		<part name="flop1" interface="floppy_5_25" >
+			<dataarea name="flop" size="1281968">
+				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25" >
+			<dataarea name="flop" size="1281968">
+				<rom name="xak 2 (disk 2).d88" size="1281968" crc="3927cdcf" sha1="555daba18a61ea2219b5685a850b512dea085cf2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25" >
+			<dataarea name="flop" size="1281968">
+				<rom name="xak 2 (disk 3).d88" size="1281968" crc="42e25779" sha1="897b62c7fdb604f5bb729e0aeb183566e08c4e33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fray" supported="no">
+		<description>Fray - In Magical Adventure</description>
+		<year>1991</year>
+		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<info name="release" value="19911220"/>
+		<info name="alt_title" value="フレイ"/>
+
+		<part name="flop1" interface="floppy_5_25" >
+			<dataarea name="flop" size="1261568">
+				<rom name="fray - in magical adventure (disk 1).fdi" size="1261568" crc="3a88990a" sha1="252e2589bb8c12800cdd678508b0abd868d0ab83" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25" >
+			<dataarea name="flop" size="1261568">
+				<rom name="fray - in magical adventure (disk 2).fdi" size="1261568" crc="9cbfb7b4" sha1="b040e4ed4e3e516effb1f6997b0f766f4b376ab4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25" >
+			<dataarea name="flop" size="1261568">
+				<rom name="fray - in magical adventure (disk 3).fdi" size="1261568" crc="9f79f4bb" sha1="2d3ebbaa844bd451190d899a7f53829b07b830eb" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25" >
+			<dataarea name="flop" size="1261568">
+				<rom name="fray - in magical adventure (disk 4).fdi" size="1261568" crc="c074800a" sha1="bf114221bdcc8e6545c4566ae58cea1af324aa9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Dual floppies, should work both on the PC88VA and on the X68000 (usually you just have to switch the first two disks depending on the system) -->
+
+	<software name="abunaten" supported="no">
 		<description>Abunai Tengu Densetsu</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -714,7 +802,7 @@
 		</part>
 	</software>
 
-	<software name="cresmoon">
+	<software name="cresmoon" supported="no">
 		<description>Crescent Moon Aru</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -743,7 +831,7 @@
 		</part>
 	</software>
 
-	<software name="dps">
+	<software name="dps" supported="no">
 		<description>D.P.S - Dream Program System</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -765,7 +853,7 @@
 		</part>
 	</software>
 
-	<software name="dpssg">
+	<software name="dpssg" supported="no">
 		<description>D.P.S. SG - Dream Program System SG</description>
 		<year>1990</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -779,21 +867,21 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 1" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 1.xdf" size="1261568" crc="a96f5768" sha1="3b84125f81d610ba218a2df9aab163d044ee84d4" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 2" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 2.xdf" size="1261568" crc="030bbe44" sha1="7fe3bd38370c67fbd80c9b069299abcf914c45ab" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 3 ~ Fahnen Fliegen" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 3.xdf" size="1261568" crc="ee47af10" sha1="3db3f994df5701ec2811c4f628ca7552845a07ab" offset="0" />
@@ -801,7 +889,7 @@
 		</part>
 	</software>
 
-	<software name="dpssg2">
+	<software name="dpssg2" supported="no">
 		<description>D.P.S. SG 2 - Dream Program System SG Set 2</description>
 		<year>1991</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -815,21 +903,21 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 1" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 1.xdf" size="1261568" crc="d1bdb2bf" sha1="ea58a504414d0824ddd9adc23ca504a974573f26" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 2" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 2.xdf" size="1261568" crc="10250dff" sha1="550696eb596e0c3ffbb670d2fd003faf664866d5" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 3 ~ Antique House" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 3.xdf" size="1261568" crc="b8d09260" sha1="d4067d8c87e3fe6f66396145edeb64fdcbe22842" offset="0" />
@@ -837,7 +925,7 @@
 		</part>
 	</software>
 
-	<software name="dpssg3">
+	<software name="dpssg3" supported="no">
 		<description>D.P.S. SG 3 - Dream Program System SG Set 3</description>
 		<year>1991</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -851,21 +939,21 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 1" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 1.xdf" size="1261568" crc="03631feb" sha1="f13f294c47993cff8d8a87baa481170a697c9cd5" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 2" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 2.xdf" size="1261568" crc="0c58a147" sha1="2c009163532b104757e119a20d947b91469aaad6" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario 3 ~ Rabbit P4P" />
 			<dataarea name="flop" size="1261568">
 				<rom name="scenario 3.xdf" size="1261568" crc="4ebe2833" sha1="d29eaad46e44af04d140f4ee18262490e46f1b79" offset="0" />
@@ -873,7 +961,7 @@
 		</part>
 	</software>
 
-	<software name="rance">
+	<software name="rance" supported="no">
 		<description>Rance - Hikari wo Motomete</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -909,7 +997,7 @@
 		</part>
 	</software>
 
-	<software name="rance2">
+	<software name="rance2" supported="no">
 		<description>Rance 2 - Hangyaku no Shojo-tachi</description>
 		<year>1990</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
@@ -959,10 +1047,108 @@
 	</software>
 
 
+<!-- Doujin -->
+
+	<software name="ballbrkr" supported="no">
+		<description>Balloon Breaker</description>
+		<year>1996</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Fredia" />
+		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1331888">
+				<rom name="balloon breaker.d88" size="1331888" crc="352d976e" sha1="c56f916f84673539bf29d6fc564e69b4d4b82484" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boomer" supported="no">
+		<description>Boomering</description>
+		<year>1996</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Fredia" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1331888">
+				<rom name="boomering.d88" size="1331888" crc="11b2a411" sha1="299d971e36b03ce6fbd9ffa13d45019936461c4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harehare" supported="no">
+		<description>Hare Hare Yukai</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Shinra" />
+		<info name="alt_title" value="ハレ晴レユカイ" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1331888">
+				<rom name="harehare1.d88" size="1331888" crc="1488f784" sha1="96f93801318ed850f1074fb5f050420d098d85b5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1331888">
+				<rom name="harehare2.d88" size="1331888" crc="61d820e5" sha1="ff667f767e9a27be286053bc198eb0855925e7e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hatisora" supported="no">
+		<description>Hati no Sora de</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="LOKAPALA" />
+		<info name="alt_title" value="ハティの空で" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1298608">
+				<rom name="hati sora.d88" size="1298608" crc="bdee6770" sha1="445ba8da78cce7fd3c4d1bce263d8c8edd88849d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="upo" supported="no">
+		<description>Saishuu Heiki UPO (Pre-Release)</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Upyolic Soft" />
+		<info name="alt_title" value="最終平気UPOプレリリース" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1289040">
+				<rom name="upo.d88" size="1289040" crc="cfbcfdda" sha1="0b57d9c9df6c4186339f484794905417ea0dccb4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- According to the guy who posted of this d88, this can be started from V3 BASIC with the command BASIC PACMAN.BAS... to be verified when emulation progresses -->
+	<software name="pacman" supported="no">
+		<description>Pac-Man</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Shinra" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1331888">
+				<rom name="pacman.d88" size="1331888" crc="9198eae1" sha1="2abf462b72c29e2ff56ea7c1401836f01b97dfe1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Is this the same program as above or a diff one? -->
+	<software name="pacmana" cloneof="pacman" supported="no">
+		<description>Pac-Man (Alt?)</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Shinra" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="pacmana.d88" size="1281968" crc="14ecc6d5" sha1="a0d4b7fa7c68323a8542d3739782d216ffab85a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- PC88 Images which have been patched to work on the VA? -->
 	<!-- is this legit? -->
-	<software name="midgarts">
+	<software name="midgarts" supported="no">
 		<description>Mid Garts (VA patched?)</description>
 		<year>19??</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
