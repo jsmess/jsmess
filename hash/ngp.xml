@@ -150,7 +150,7 @@ NEOP00060 Dokodemo Mahjong
 		<info name="alt_title" value="連結パズル つなげてポンッ！" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="renketsu puzzle tsunagete pon! (japan).bin" size="524288" crc="37e79afc" sha1="7a75e3b6874a18b29ba636ff22308d944a7901e6" offset="000000" />
+				<rom name="renketsu puzzle tsunagete pon! (japan).bin" size="524288" crc="ce09f534" sha1="cbe53b08d03ef684c08fc6ee28fca168a3d091a7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
