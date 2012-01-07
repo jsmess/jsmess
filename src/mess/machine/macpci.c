@@ -51,9 +51,9 @@ static void mac_via_irq(device_t *device, int state)
 
 static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
-	macpci_state *mac = device->machine().driver_data<macpci_state>();
+//	macpci_state *mac = device->machine().driver_data<macpci_state>();
 
-    printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(mac->m_maincpu));
+//    printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(mac->m_maincpu));
 
 	return 0x80;
 }
@@ -65,23 +65,23 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 
     val |= mac->m_cuda->get_treq()<<3;
 
-    printf("VIA1 IN B = %02x (PC %x)\n", val, cpu_get_pc(mac->m_maincpu));
+//    printf("VIA1 IN B = %02x (PC %x)\n", val, cpu_get_pc(mac->m_maincpu));
 
     return val;
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
-	macpci_state *mac = device->machine().driver_data<macpci_state>();
+//	macpci_state *mac = device->machine().driver_data<macpci_state>();
 
-    printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(mac->m_maincpu));
+//    printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(mac->m_maincpu));
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
 	macpci_state *mac = device->machine().driver_data<macpci_state>();
 
-    printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(mac->m_maincpu));
+//    printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(mac->m_maincpu));
 
     #if LOG_ADB
     printf("PPC: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, cpu_get_pc(mac->m_maincpu));
@@ -92,7 +92,6 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 
 READ16_MEMBER ( macpci_state::mac_via_r )
 {
-#if 0
     UINT16 data;
 
 	offset >>= 8;
@@ -101,18 +100,10 @@ READ16_MEMBER ( macpci_state::mac_via_r )
 	if (LOG_VIA)
 		printf("mac_via_r: offset=0x%02x (PC=%x)\n", offset, cpu_get_pc(m_maincpu));
 	data = m_via1->read(space, offset);
-    printf("via1 returned %02x\n", data);
 
 	device_adjust_icount(m_maincpu, m_via_cycles);
 
-	if (ACCESSING_BITS_0_7)
-    {
-        return data;
-    }
-
-    return data<<8;
-#endif
-    return 0x5555;
+    return data | (data<<8);
 }
 
 WRITE16_MEMBER ( macpci_state::mac_via_w )
@@ -166,7 +157,6 @@ void macpci_state::machine_reset()
 
 WRITE_LINE_MEMBER(macpci_state::cuda_reset_w)
 {
-    printf("cuda_reset_w: %d\n", state);
     cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, state);
 }
 
