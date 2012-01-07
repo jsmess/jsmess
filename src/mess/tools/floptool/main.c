@@ -19,6 +19,7 @@
 #include "corestr.h"
 
 #include "formats/mfi_dsk.h"
+#include "formats/dfi_dsk.h"
 #include "formats/ipf_dsk.h"
 
 #include "formats/hxcmfm_dsk.h"
@@ -29,8 +30,11 @@
 
 #include "formats/dsk_dsk.h"
 
+#include "formats/pc_dsk.h"
+
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
+	FLOPPY_DFI_FORMAT,
 	FLOPPY_IPF_FORMAT,
 
 	FLOPPY_MFM_FORMAT,
@@ -40,7 +44,9 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_MSA_FORMAT,
 	FLOPPY_PASTI_FORMAT,
 
-	FLOPPY_DSK_FORMAT
+	FLOPPY_DSK_FORMAT,
+
+	FLOPPY_PC_FORMAT,
 };
 
 void CLIB_DECL logerror(const char *format, ...)
