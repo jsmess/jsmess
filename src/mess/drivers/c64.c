@@ -881,6 +881,8 @@ static MACHINE_CONFIG_START( c64gs, c64_state )
 	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c64_pal_cia0)
 	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
 
+	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
+	
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
