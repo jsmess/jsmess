@@ -121,7 +121,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bustmove.bin" size="1048576" crc="4c2160bc" sha1="fdef7891c5d5b211b6f7a4da4830c42d86d98d74" offset="000000" />
+				<rom name="bustmove.bin" size="1048576" crc="78a1361d" sha1="2af0197415bdf1679342d8aeca5c35ea3eff8b73" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -233,7 +233,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="beastbust.bin" size="2097152" crc="1bab21a4" sha1="2909cf69b42474547726b3e30f1a22ae17f76773" offset="000000" />
+				<rom name="beastbust.bin" size="2097152" crc="77caa548" sha1="c32afc4348a1adbf9f6855b658b5eb5767e7ebcd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -588,6 +588,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
+<!-- The prototype found and released by NeoTurfMasta has only different NVRAM data compared to the final version -->
 	<software name="magdrop">
 		<description>Magical Drop Pocket (Euro, USA)</description>
 		<year>1999</year>
@@ -595,18 +596,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<info name="serial" value="NeoP00580" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="magical drop pocket (usa, europe).bin" size="1048576" crc="72184de7" sha1="05ebf0147961eda2ed804dc369cd0a4dee923c9c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="magdropp" cloneof="magdrop">
-		<description>Magical Drop Pocket (Prototype)</description>
-		<year>1999</year>
-		<publisher>SNK</publisher>
-		<part name="cart" interface="ngp_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="magicaldrop.bin" size="1048576" crc="9fe98b78" sha1="46e41662e5f1102d9800fb5499a51b0bd48e708c" offset="000000" />
+				<rom name="magical drop pocket (usa, europe).bin" size="1048576" crc="7712f82d" sha1="42717bda4f505083d51108fecd5aa37b08e904cb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -621,7 +611,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<info name="alt_title" value="マジカルドロップ ポケット" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="magical drop pocket (japan).bin" size="1048576" crc="6c465716" sha1="9baa97ef2b825f36ee3d3e894d1b6156ac414c0c" offset="000000" />
+				<rom name="magical drop pocket (japan).bin" size="1048576" crc="694ce2dc" sha1="dfde0db9026b74988eaa1bdfc2a9ea0b0f52a48a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -757,7 +747,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="baccarat.bin" size="1048576" crc="2a63b5a5" sha1="c19b992a91b1020e8f3b6c24fac97ec9d73f52b8" offset="000000" />
+				<rom name="baccarat.bin" size="1048576" crc="80880498" sha1="aeb77b92155e0a291d00ef3c97319788cc3d1006" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1288,11 +1278,12 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<info name="serial" value="NeoP00540" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="puzzle link (europe).bin" size="524288" crc="fe95938c" sha1="6e7b48b59d4df857dd76a964c521b93cb0c4c9a7" offset="000000" />
+				<rom name="puzzle link (europe).bin" size="524288" crc="8d0610ac" sha1="2507d1bdeb67bdb6379424817707693549efb487" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
+<!-- The prototype found and released by NeoTurfMasta has only different NVRAM data compared to the final version -->
 	<software name="puzzlnk2">
 		<description>Puzzle Link 2 (Euro, USA)</description>
 		<year>2000</year>
@@ -1300,18 +1291,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<info name="serial" value="NeoP00760" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="puzzle link 2 (usa, europe).bin" size="1048576" crc="e2a09bb7" sha1="d4522d1a454968cccd57b03c2aff99616d0b5174" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="puzzlnk2p" cloneof="puzzlnk2">
-		<description>Puzzle Link 2 (Prototype)</description>
-		<year>2000</year>
-		<publisher>SNK</publisher>
-		<part name="cart" interface="ngp_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="puzzlelnk2.bin" size="1048576" crc="3ba84cc0" sha1="715aa0a18260c5e498f84f23febc607d6a73eff4" offset="000000" />
+				<rom name="puzzle link 2 (usa, europe).bin" size="1048576" crc="ba9ca21c" sha1="57e44ee5168b69fd3b0ede0fe0dda44070e0aad1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1326,7 +1306,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<info name="alt_title" value="連結パズル つなげてポンッ！ Color" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="renketsu puzzle tsunagete pon! color (japan).bin" size="524288" crc="615f1f2f" sha1="048b85a8e8e0cbd9324bc373fc875288f81c21db" offset="000000" />
+				<rom name="renketsu puzzle tsunagete pon! color (japan).bin" size="524288" crc="c3f3e83c" sha1="e8e903bc4baf5ab61726626af7c0d1a571db4a40" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1621,7 +1601,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<info name="alt_title" value="つなげてポンッ！2" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="tsunagete pon! 2 (japan).bin" size="1048576" crc="98acc37a" sha1="4912c271a140291dbfc523017844a1afc68bd5e4" offset="000000" />
+				<rom name="tsunagete pon! 2 (japan).bin" size="1048576" crc="129091bb" sha1="db030e02819d50315f15c00b93c3a46f1f89d126" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
