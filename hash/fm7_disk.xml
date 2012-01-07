@@ -314,6 +314,24 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 -->
 
+	<software name="gamblerj">
+	<!-- Keys listed in readme are as follows:
+キー操作/ リターン：チー　F1:リーチ　F2:ポン　F3:カン F4:和了　F10:九種九牌
+　　　　　F5:指導機能ON/OFF　F6:サウンドON/OFF　F7:オープンモード　F8:オートモード
+　　　　　ESC(XM7:半角/全角):ポーズ・点数表示　HOME:捨て牌指導	-->
+		<description>ぎゅわんぶらぁ自己中心派</description>
+		<year>1989</year>
+		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<info name="serial" value="GA7LF2"/>
+		<info name="release" value="198909xx"/>
+		<info name="alt_title" value="Gambler Jikochuushinha"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ganjiko.d77" size="348848" crc="2cc9b92b" sha1="2bbc4f984a24812720ae9c56a991e4085155f90b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="girlpara">
 		<description>Girls Paradise</description>
 		<year>1988</year>
@@ -445,6 +463,23 @@ Titles, serial #s, publishers and release dates taken from:
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="473776">
 				<rom name="user disk.d77" size="473776" crc="6fbd6aad" sha1="903b0789001097dfce247dfee5f90b09a7df7e82" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ishtar">
+		<description>The Return of Ishtar</description>
+		<year>1989?</year>
+		<publisher>SPS</publisher>
+		<info name="alt_title" value="ザリターンオブイシター"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ishtar_a.d77" size="348848" crc="40d544ae" sha1="b81d39df0f94f07fab409b62ca1bfc92920c1ea9" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ishtar_b.d77" size="348848" crc="87d3dec0" sha1="237d55d296d1179f4373e0f9c03d65f4f1fce05f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1053,6 +1088,30 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="wizardry #3.d77" size="348848" crc="64f53163" sha1="9eb779dc7bfe09b49ca69a5589a6358e0738ff84" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- the alt set with crcs 5d516c49, 30683a80 and a8aa8048 only differs for d77 headers, but data in the disks are identical -->
+	<software name="wizardr4">
+		<description>Wizardry 4 - The Return of Werdna</description>
+		<year>1989</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="release" value="198905xx"/>
+		<info name="alt_title" value="ウィザードリィ4"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="380448">
+				<rom name="wiz4a.d77" size="380448" crc="2bc2e6a2" sha1="3e821ffec654301d3d3643a0c84a003e63dd21e7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="380448">
+				<rom name="wiz4b.d77" size="380448" crc="46fbb06b" sha1="1c115d866c043350d007f0b7cb0471ee57e3e5c2" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="380448">
+				<rom name="wiz4c.d77" size="380448" crc="de390aa3" sha1="336f2c45724f39dd4d59f84db83f05ce762f9db9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
