@@ -90,18 +90,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="bluefox">
-		<description>ナイザー メイガス ビデオ君 BlueFox Lizard</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Run from F-BASIC"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="disk1.d77" size="348848" crc="9d46e9ba" sha1="1ced7f39c95299c32382bfafb8402019bd52d26b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cas_casx">
 		<description>The Castle &amp; Castle Excellent</description>
 		<year>19??</year>
@@ -458,7 +446,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="473776">
-				<rom name="user disk.d77" size="473776" crc="7865e6c2" sha1="09881da1593a9e51abc4f157d1d8f9f7355d8e0b" offset="0" />
+				<rom name="user disk (a).d77" size="473776" crc="7865e6c2" sha1="09881da1593a9e51abc4f157d1d8f9f7355d8e0b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1012,7 +1000,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="473776">
-				<rom name="wibarm (data).d77" size="473776" crc="b5be863b" sha1="e63d943f1b795395da4a9e340541d478f5bfbbdc" offset="0" />
+				<rom name="wibarm (data) (a).d77" size="473776" crc="b5be863b" sha1="e63d943f1b795395da4a9e340541d478f5bfbbdc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1317,6 +1305,87 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="exp_note.d88" size="348848" crc="1bfa4035" sha1="815196dfd8528a52e7a4628cfd5d6362b3e3f7a0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- To Sort -->
+
+	<software name="5in1">
+<!-- From the readme 5in1.txt (it's not explained how to launch the 5th game...):
+
+タイトル：メイガス
+メーカー：ソフトプロ          機  種 ：FM-7
+ジャンル：TBL               備  考 ：RUN"MAGUS"で起動
+　　　　　
+タイトル：リザード
+メーカー：マイクロキャビン      機  種 ：FM-7
+ジャンル：RPG                備  考 ：RUN"LIZARD"で起動
+
+タイトル：BLUE FOX
+メーカー：ENIX               機  種 ：FM-7
+ジャンル：STG                備  考 ：RUN"BLUE.FOX"で起動
+
+タイトル：ナイザー
+メーカー：電波新聞社           機  種 ：FM-7
+ジャンル：ACT                備  考 ：RUN"ナイザー"で起動
+
+ -->
+		<description>ナイザー メイガス ビデオ君 BlueFox Lizard</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Type RUN&quot;XXX&quot; with XXX=MAGUS, LIZARD, BLUE.FOX or ナイザー in F-BASIC"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="disk1.d77" size="348848" crc="9d46e9ba" sha1="1ced7f39c95299c32382bfafb8402019bd52d26b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pack01">
+		<description>Game Pack</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+					<rom name="game pack 1.d77" size="348848" crc="732e4275" sha1="ef1c29f4ea79bd73ec994bec103d0f65bfbf0f18" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pack02">
+		<description>Game Pack (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+					<rom name="game pack 2.d77" size="348848" crc="0efd8e5d" sha1="d85f66b51bfb1e8c63a27bbeaf0d2d0fc1784304" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pack03">
+		<description>Game Pack (Alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+					<rom name="game pack 3.d77" size="348848" crc="652a9aec" sha1="b7bfd70cbb52b086704f6a3b98556ecc83733032" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pack04">
+		<description>Game Pack (Alt 3)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+					<rom name="game pack 4.d77" size="348848" crc="ad232598" sha1="711552ffe2ce4439a6f389fe2d92938d268995fc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

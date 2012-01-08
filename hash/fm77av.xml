@@ -899,6 +899,52 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+
+	<software name="inthedrm">
+		<description>Tabibito no Gakufu - Yume no Nakani... In the Dream</description>
+		<year>1990</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Team AB" />
+		<info name="alt_title" value="旅人の楽譜"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="348848">
+				<rom name="in the dream (disk 1).d77" size="348848" crc="d68a7c27" sha1="e7894b5266a99102d242ad73ac3f32620007bd42" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="in the dream (disk 2).d77" size="348848" crc="dcaac17f" sha1="ccb1ca64bc12283a5ebeaf47750afbb713a9508e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="littlbox">
+		<description>Tabibito no Gakufu 2 - Little Box</description>
+		<year>1993</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Team AB" />
+		<info name="alt_title" value="旅人の楽譜２"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="348848">
+				<rom name="little box (disk 1).d77" size="348848" crc="2c5915ca" sha1="50ac2d734d0e966b2ef3135d545cd6e95c8db306" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="little box (disk 2).d77" size="348848" crc="a93e1cfc" sha1="94abaf862db049223ef7cd20d2cfbb56d860b28b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Misc -->
 
 <!-- FM-77AV Demo program -->
