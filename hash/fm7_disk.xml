@@ -412,7 +412,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<info name="serial" value="F-3531"/>
 		<info name="release" value="198611xx"/>
-		<info name="alt_title" value="Yunagi no Horizon"/>
+		<info name="alt_title" value="Yuunagi no Horizon"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350480">
 				<rom name="yunagi.d77" size="350480" crc="383b8095" sha1="5fd7f22bcbb50fa448b9311e847b2c31aa422df6" offset="0" />
@@ -441,6 +441,28 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+<!-- Disk 2 only differs in the d77 header -->
+	<software name="hydlide2a" cloneof="hydlide2">
+		<description>Hydlide II - Shine of Darkness (Alt Disk 1)</description>
+		<year>1986</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="TED-65, TEM-65"/>
+		<info name="release" value="198601xx"/>
+		<info name="alt_title" value="ハイドライド2"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hydlide2a.d77" size="348848" crc="2f7347ef" sha1="da5713dfe4b46e5ad7e1d9bf4d5b1e7c900ece7a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="473776">
+				<rom name="user disk.d77" size="473776" crc="7865e6c2" sha1="09881da1593a9e51abc4f157d1d8f9f7355d8e0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ishtar">
 		<description>The Return of Ishtar</description>
 		<year>1989?</year>
@@ -454,18 +476,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ishtar_b.d77" size="348848" crc="87d3dec0" sha1="237d55d296d1179f4373e0f9c03d65f4f1fce05f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jushorok">
-		<description>スーパー漢字住所録</description>
-		<year>19??</year>
-		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<info name="alt_title" value="Super Kanji Jushoroku"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="jushorok.d77" size="348848" crc="df48a011" sha1="a3e22e5bf5605c2e2fd863c5d886c9b1f437bd5a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -775,11 +785,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="sod">
-		<description>SOD</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Run from F-BASIC"/>
+<!-- These appeared in Oh!FM 1988-06 and 1988-11 respectively -->
+	<software name="sod12">
+		<description>Stone of Deity ~ Stone of Deity II - Stolen Stone</description>
+		<year>1989?</year>
+		<publisher>FMサークル事務局 (FM Circle Jimukyoku)</publisher>
+		<info name="usage" value="Type RUN&quot;SD1&quot; or RUN&quot;SD2&quot; in F-BASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="sod.d77" size="348848" crc="e083a342" sha1="3e18a330e60c267a8fc150cf375e9689094f5bc8" offset="0" />
@@ -792,7 +803,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1984</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<info name="release" value="198402xx"/>
-		<info name="alt_title" value="Sokouban 2"/>
+		<info name="alt_title" value="Sokoban 2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349888">
 				<rom name="sokoban2.d77" size="349888" crc="ea4b0035" sha1="565b0b894a763fe897da2d1e4934721081aa4b67" offset="0" />
@@ -925,6 +936,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>占いプログラム集</description>
 		<year>19??</year>
 		<publisher>A.R.C.</publisher>
+		<info name="alt_title" value="Noroi Program Shuu"/>
 		<info name="usage" value="Run from F-BASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -978,6 +990,29 @@ Titles, serial #s, publishers and release dates taken from:
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="473776">
 				<rom name="wibarm (data).d77" size="473776" crc="45f340b3" sha1="d845966a0f24309637146cf842d6735b44062803" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wibarma" cloneof="wibarm">
+		<description>Wibarm (Alt Data Disk)</description>
+		<year>1986</year>
+		<publisher>アルシスソフト (Arsys Soft)</publisher>
+		<info name="release" value="198610xx"/>
+		<info name="alt_title" value="ウィバーン"/>
+		<!--combined image-->
+		<!--rom name="wibarm (1986)(arsys)(jp).d77" size="889168" crc="d5e3f07c" sha1="146fa5747b464f652bc4ccb961a8827d91321566" offset="000000" /-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="415392">
+				<rom name="wibarm.d77" size="415392" crc="929d9eb2" sha1="9a5f0283fdc6623703bda8c48bf106e3d1046d73" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="473776">
+				<rom name="wibarm (data).d77" size="473776" crc="b5be863b" sha1="e63d943f1b795395da4a9e340541d478f5bfbbdc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1104,12 +1139,12 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="xanadu_b.d77" size="415840" crc="01060464" sha1="dd0a227171439bc34d8204f03f4bb8e255bad5e8" offset="0" />
+				<rom name="xanadu_u.d77" size="415840" crc="ea89fffd" sha1="6f646119d72354d93717cfe202544b704580133a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="xanadu_u.d77" size="415840" crc="ea89fffd" sha1="6f646119d72354d93717cfe202544b704580133a" offset="0" />
+				<rom name="xanadu_b.d77" size="415840" crc="01060464" sha1="dd0a227171439bc34d8204f03f4bb8e255bad5e8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1151,12 +1186,14 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+<!-- This appeared in LOGIN 1985-11, the Pony Canyon release is not dumped -->
 	<software name="yanpara">
 		<description>ヤンパラアドベンチャー</description>
-		<year>1986?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>アスキー (ASCII)</publisher>	
+		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="Yanpara Adventure"/>
-		<info name="usage" value="Run from F-BASIC"/>
+		<info name="usage" value="In F-BASIC, set 1 drive and 0 files, then type LOAD&quot;START&quot;,R"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="yanpara1.d77" size="348848" crc="34992e32" sha1="14d15ff72029bf9c056af2ce82695442e860b789" offset="0" />
@@ -1238,6 +1275,18 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="f-basic.d77" size="348848" crc="d5a4551c" sha1="4caea850d2024ec3b25b8c4f1f9b544abe60163e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jushorok">
+		<description>スーパー漢字住所録</description>
+		<year>19??</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="Super Kanji Jyusyoroku"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="jushorok.d77" size="348848" crc="df48a011" sha1="a3e22e5bf5605c2e2fd863c5d886c9b1f437bd5a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
