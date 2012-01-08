@@ -30758,7 +30758,7 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 	</software>
 
 	<software name="sokoban">
-		<description>Sokouban</description>
+		<description>Sokoban</description>
 		<year>1983</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<!-- PC8801 -->
@@ -30772,7 +30772,7 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 	</software>
 
 	<software name="sokoban2">
-		<description>Sokouban 2</description>
+		<description>Sokoban 2</description>
 		<year>1984</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<!-- PC8801 -->
@@ -30786,7 +30786,7 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 	</software>
 
 	<software name="sokoban2a" cloneof="sokoban2">
-		<description>Sokouban 2? (Alt?)</description>
+		<description>Sokoban 2? (Alt?)</description>
 		<year>1984</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<!-- PC8801 -->
