@@ -152,31 +152,31 @@
 			<bounds left="320" right="340" top="300" bottom="320" />
 		</bezel>
 
-		<bezel name="digit1" element="r_digit">
+		<bezel name="digit0" element="r_digit">
 			<bounds left="407" top="075" right="454" bottom="146" />
 		</bezel>
-		<bezel name="digit2" element="r_digit">
+		<bezel name="digit1" element="r_digit">
 			<bounds left="455" top="075" right="502" bottom="146" />
 		</bezel>
-		<bezel name="digit3" element="r_digit">
+		<bezel name="digit2" element="r_digit">
 			<bounds left="503" top="075" right="550" bottom="146" />
 		</bezel>
-		<bezel name="digit4" element="r_digit">
+		<bezel name="digit3" element="r_digit">
 			<bounds left="575" top="075" right="622" bottom="146" />
 		</bezel>
-		<bezel name="digit5" element="r_digit">
+		<bezel name="digit4" element="r_digit">
 			<bounds left="623" top="075" right="670" bottom="146" />
 		</bezel>
-		<bezel name="digit6" element="r_digit">
+		<bezel name="digit5" element="r_digit">
 			<bounds left="671" top="075" right="718" bottom="146" />
 		</bezel>
-		<bezel name="digit7" element="r_digit">
+		<bezel name="digit6" element="r_digit">
 			<bounds left="743" top="075" right="790" bottom="146" />
 		</bezel>
-		<bezel name="digit8" element="r_digit">
+		<bezel name="digit7" element="r_digit">
 			<bounds left="791" top="075" right="838" bottom="146" />
 		</bezel>
-		<bezel name="digit9" element="r_digit">
+		<bezel name="digit8" element="r_digit">
 			<bounds left="839" top="075" right="886" bottom="146" />
 		</bezel>
 
