@@ -905,6 +905,55 @@
 		</part>
 	</software>
 
+	<software name="bublbokc">
+		<description>Bubble Bobble (Kor, Clover)</description>
+		<year>1990</year>
+		<publisher>Clover</publisher>
+		<info name="alt_title" value="Bobble Bobble (Box)" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="bobble bobble [clover] (kr).bin" size="32768" crc="25eb9f80" sha1="564b1505fcbc009c2453bdc401181f2c2e28da5c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bublboky" supported="no">
+		<description>Bubble Bobble (Kor, YM Soft)</description>
+		<year>1990</year>
+		<publisher>YM Soft</publisher>
+		<info name="alt_title" value="파워 보글 보글 (Power Boggle Boggle, Box)" />
+		<part name="cart" interface="sms_cart">
+			<feature name="mapper" value="korean_nobank" />
+			<dataarea name="rom" size="32768">
+				<rom name="power boggle boggle (kr).bin" size="32768" crc="6d309ac5" sha1="d7e67d15ccc12e9bf40611dc91a080a99716ca6e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprbubl">
+		<description>Super Bubble Bobble (Kor)</description>
+		<year>1989</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="슈퍼 바블 바블"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="super bubble bobble (kr).bin" size="32768" crc="22c09cfd" sha1="507bfa2b21fde4d33014fc4ab98e3a934f5b339a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newbogl2">
+		<description>New Boggle Boggle 2 (Kor)</description>
+		<year>1989</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="sms_cart">
+		<info name="alt_title" value="뉴 보글 보글 2"/>
+			<dataarea name="rom" size="32768">
+				<rom name="new boggle boggle (kr).bin" size="32768" crc="dbbf4dd1" sha1="3149e453387cf1a4e0eaf4c8da4fb3aa015b3054" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Alt. Title: Dragon Maze (Bra Box?) -->
 	<software name="bublbobl">
 		<description>Bubble Bobble (Euro, Bra)</description>
