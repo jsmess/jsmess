@@ -751,6 +751,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
+	$(DRIVERS)/pgm2.o \
 	$(DRIVERS)/spoker.o \
 	$(MACHINE)/pgmcrypt.o \
 	$(MACHINE)/pgmprot.o \
@@ -1824,6 +1825,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/sstrangr.o \
 	$(DRIVERS)/statriv2.o \
 	$(DRIVERS)/stellafr.o \
+	$(DRIVERS)/su2000.o \
 	$(DRIVERS)/summit.o \
 	$(DRIVERS)/sumt8035.o \
 	$(DRIVERS)/supertnk.o \
