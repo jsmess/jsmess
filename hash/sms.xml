@@ -946,8 +946,8 @@
 		<description>New Boggle Boggle 2 (Kor)</description>
 		<year>1989</year>
 		<publisher>Zemina</publisher>
-		<part name="cart" interface="sms_cart">
 		<info name="alt_title" value="뉴 보글 보글 2"/>
+		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="new boggle boggle (kr).bin" size="32768" crc="dbbf4dd1" sha1="3149e453387cf1a4e0eaf4c8da4fb3aa015b3054" offset="000000" />
 			</dataarea>
