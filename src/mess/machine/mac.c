@@ -68,13 +68,12 @@
      344S0100 - 0x0100 (1.00) - Some (early production?) IIsi
 
      Cuda version spotting:
+     341S0262 - 0x0003f200 (3.02) - some PMac 6500, Bondi blue iMac
+     341S0285 - No version (x.xx) - PMac 4400 + Mac clones ("Cuda Lite" with 768 bytes more ROM + PS/2 keyboard/mouse support)
      341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, "Gossamer" G3, others?
                                     (verified found in PMac 5500-225, G3-333)
-     341S0262 - 0x???????? (?.??) - some PMac 6500
-     341S0285 - 0x???????? (?.??) - PMac 4400 + Mac clones ("Cuda Lite" with 768 bytes more ROM + PS/2 keyboard/mouse support)
      341S0417 - 0x???????? (?.??) - Color Classic
      341S0788 - 0x00020025 (2.37) - LC 475/575/Quadra 605, Quadra 660AV/840AV, PMac 7200
-     343S0788 - 0x???????? (?.??) - PMac x100 (typo - actually 341S0788?)
 
      Caboose version spotting:
      341S0853 - 0x0100 (1.00) - Quadra 950
