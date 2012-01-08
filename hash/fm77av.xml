@@ -87,18 +87,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<!-- FM-77AV Demo program -->
-	<software name="avdemo">
-		<description>77AV Demo</description>
-		<year>19??</year>
-		<publisher>富士通 (Fujitsu)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="353200">
-				<rom name="77avdemo.d77" size="353200" crc="7046810d" sha1="116a422147107943c0d378e99923cb14cd31a13f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- the alt set with crcs 21fc2e80 and 22ecff45 only differs for d77 headers, but data in the disks are identical -->
 	<software name="daiva" supported="no">
 		<description>Daiva - Active Simulation War</description>
@@ -219,17 +207,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="druaga.d77" size="348848" crc="2d5e1a08" sha1="c6cdcf38ca98514c96dab84eed22ed8cb277c54b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fb_33l11">
-		<description>F-BASIC v3.3 L11</description>
-		<year>19??</year>
-		<publisher>富士通 (Fujitsu)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="v33l11.d77" size="348848" crc="d5d8393a" sha1="14b97869f650e913bceea91f02b428768ae7afc6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -918,6 +895,231 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="416112">
 				<rom name="ys 2 (disk 4).d77" size="416112" crc="e68509d0" sha1="465c555df02d4e944e7f73ba32829c238e319469" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Misc -->
+
+<!-- FM-77AV Demo program -->
+	<software name="avdemo" supported="no">
+		<description>FM-77AV Demo</description>
+		<year>19??</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="77avdemo.d77" size="353200" crc="7046810d" sha1="116a422147107943c0d378e99923cb14cd31a13f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avdemoa" cloneof="avdemo" supported="no">
+		<description>FM-77AV Demo (Alt?)</description>
+		<year>19??</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="fm77av demo (1985)(fujitsu)(jp).d77" size="353200" crc="58087f4a" sha1="b9099d6a250fcd4bba5e8d541efea4c839aaf18c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nyumond" supported="no">
+		<description>FM-77AV/40SX Nyumon Disk</description>
+		<year>1988</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="入門DISK"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="701360">
+				<rom name="nyumon disk.d77" size="701360" crc="afae2446" sha1="89fa7ee1fccdd38be3131cffe12924e4d5d65477" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fb_33l10">
+		<description>F-BASIC V3.3L10</description>
+		<year>1985?</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="353200">
+				<rom name="v33l10.d77" size="353200" crc="1f99c170" sha1="e404c28d343b3b891916a5eedabb6be2924852e6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fb_33l11">
+		<description>F-BASIC V3.3L11</description>
+		<year>1986?</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="v33l11.d77" size="348848" crc="d5d8393a" sha1="14b97869f650e913bceea91f02b428768ae7afc6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fb_34l21">
+		<description>F-BASIC V3.4L21</description>
+		<year>1988</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="usage" value="Requires FM-77AV40SX"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="701360">
+				<rom name="fb34l21.d77" size="701360" crc="308a3195" sha1="b42905c7a3150588573cc8fb67c161eda9b552f6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fmgeii">
+		<description>FM Graphic Editor II V1.0</description>
+		<year>1986</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B273D080"/>
+		<info name="alt_title" value="FMグラフィックエディタII V1.0"/>
+		<info name="usage" value="Requires FM77AV40"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="701360">
+				<rom name="fmge2.d77" size="701360" crc="6902a90b" sha1="4cd0513553407633de4b40db9a989fd77add0b50" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fmse">
+		<description>FM Sound Editor V1.0</description>
+		<year>1985</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B273D030"/>
+		<info name="release" value="198511xx"/>
+		<info name="alt_title" value="FMサウンドエディタ V1.0"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="fm sound editor v1.0 (1985)(fujitsu)(jp).d77" size="348848" crc="4d5603c1" sha1="3d8a6c1d98891e7a5b87e06077ad9979f5e9f5a0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tfm">
+		<description>The File Master FM</description>
+		<year>1986</year>
+		<publisher>Kyoto Media</publisher>
+		<!--combined image (with hfe1->8)-->
+		<!--rom name="tfm-hfe.d77" size="3488480" crc="1D635297" sha1="BA40C6BC4D51BF33A657B53B7BAE201C95D2769B" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="tfm_fm.d77" size="348848" crc="fe47e70b" sha1="bef8b87030af1af1b1231a35e4f8a49e771e1066" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe8" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19870210)</description>
+		<year>1987</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+                <rom name="hfe87210 (a).d77" size="348848" crc="1adb0fae" sha1="c6d25f73a7e14bfa7993d429528758aa801a6f9b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe8a" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19870210, Alt?)</description>
+		<year>1987</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe87210.d77" size="348848" crc="6aea2a87" sha1="356395a77ac148cfb301c89c36ffa98219b0b196" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe7" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19870316)</description>
+		<year>1987</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe870316.d77" size="348848" crc="27e3b455" sha1="95a23a4107226f35cd6cdbcff21af754233b5a54" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe6" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19871220)</description>
+		<year>1987</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe871220.d77" size="348848" crc="33890fa7" sha1="a7c8f927b5c8ece84652f7f25e7305999785f89c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe5" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19880430)</description>
+		<year>1988</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe880430.d77" size="348848" crc="58b46f67" sha1="ae06db1c2c5ab40266f321e3c1510db5f4fdd439" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe4" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19880711)</description>
+		<year>1988</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe880711.d77" size="348848" crc="2e604ba1" sha1="752b13324ea4f5f8447b1300ab6ede1cd662aa0c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe3" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19880821)</description>
+		<year>1988</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe880821.d77" size="348848" crc="946e85d1" sha1="24cf5f2a27e4968a67b4ad003816384b0e45a34a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe2" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19890119)</description>
+		<year>1989</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe890119.d77" size="348848" crc="db6c9a2c" sha1="b1744959b5c300f2b2ca44ca738dffde9bba7b9d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe1" cloneof="hfe">
+		<description>The File Master FM - Hot File Express (19890121)</description>
+		<year>1989</year>
+		<publisher>Kyoto Media</publisher>
+		<description>HFE89121</description>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe890121.d77" size="348848" crc="bd4f390b" sha1="a83b8f2809fe74fe5531407574f6d6993ad0af9b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfe">
+		<description>The File Master FM - Hot File Express (19890901)</description>
+		<year>1989</year>
+		<publisher>Kyoto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="hfe890901.d77" size="348848" crc="f00a22c6" sha1="45446deac50199da3baa23f40a2f00620e887dc7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

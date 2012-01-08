@@ -262,17 +262,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="fbasic">
-		<description>F-BASIC 3.0 (disk version)</description>
-		<year>1981</year>
-		<publisher>富士通 (Fujitsu)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="f-basic.d77" size="348848" crc="d5a4551c" sha1="4caea850d2024ec3b25b8c4f1f9b544abe60163e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="flolita">
 		<description>Final Lolita</description>
 		<year>1985</year>
@@ -298,21 +287,6 @@ Titles, serial #s, publishers and release dates taken from:
 			</dataarea>
 		</part>
 	</software>
-
-<!-- FILEMASTERandHotFileExpress -->
-<!-- This one won't load, as the image needs to be split -->
-<!-- commented out for now...
-	<software name="fmaster">
-		<description>Filemaster and Hot File Express</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="3488480">
-				<rom name="tfm-hfe.d77" size="3488480" crc="1D635297" sha1="BA40C6BC4D51BF33A657B53B7BAE201C95D2769B" offset="0" />
-			</dataarea>
-		</part>
-	</software>
--->
 
 	<software name="gamblerj">
 	<!-- Keys listed in readme are as follows:
@@ -1251,6 +1225,49 @@ Titles, serial #s, publishers and release dates taken from:
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="348848">
 				<rom name="ys - ancient ys vanished omen (data).d77" size="348848" crc="a2aed90e" sha1="945b83f044efb45147394f378336366c0c9ab507" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Misc -->
+
+	<software name="fbasic">
+		<description>F-BASIC 3.0 (disk version)</description>
+		<year>1981</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="f-basic.d77" size="348848" crc="d5a4551c" sha1="4caea850d2024ec3b25b8c4f1f9b544abe60163e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expfm">
+		<description>Expert-FM v3.1</description>
+		<year>1985</year>
+		<publisher>Softpal?</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="expert-fm v3.1 (1985)(softpal)(jp).d77" size="348848" crc="076667d0" sha1="52bab2a7f2d30a44bb69f485cf41a94f6f47c4b1" offset="0"/>
+			</dataarea>
+		</part>
+
+        <!-- What are these? Tracks created/extracted with FMEXPERT? Data Disks? Add-ons? -->
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="exp_c1.d77" size="348848" crc="38f229a4" sha1="88adc54db634de9fad929509653ef40ee62860d8" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="exp_c2.d77" size="348848" crc="7344432f" sha1="8bee00c7d604e3428ba507613e8761fa19267deb" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="exp_note.d88" size="348848" crc="1bfa4035" sha1="815196dfd8528a52e7a4628cfd5d6362b3e3f7a0" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
