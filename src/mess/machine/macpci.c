@@ -153,6 +153,8 @@ void macpci_state::machine_reset()
     m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 
     m_via_cycles = -256;    // for a 66 MHz PowerMac
+
+    cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(macpci_state::cuda_reset_w)

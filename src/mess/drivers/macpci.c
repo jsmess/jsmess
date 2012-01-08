@@ -28,10 +28,7 @@
   F3016000 : VIA1
   F3018000 : SCSI (53C96)
  
-  NOTE: the 68HC05 reboots the PowerPC after it's ready to go.  In the debugger,
-  step past fff00108, then bpset fff00108, g until the HC05 reboots the system,
-  *then* you can start debugging ;-)  Probably should just halt the PowerPC until
-  cuda_reset_w is called...
+  NOTE: the PowerPC starts off disabled; the Cuda 68HC05 starts it up once it's booted.
  
   NOTE 2: goes off into the weeds in the subroutine at fff05010 
  
