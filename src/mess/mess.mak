@@ -638,6 +638,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_DRIVERS)/apple3.o	\
 	$(MESS_MACHINE)/egret.o     \
 	$(MESS_MACHINE)/cuda.o      \
+	$(MESS_MACHINE)/mackbd.o    \
 	$(MESS_VIDEO)/nubus_48gc.o	\
 	$(MESS_VIDEO)/nubus_cb264.o \
 	$(MESS_VIDEO)/nubus_vikbw.o \

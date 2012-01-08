@@ -16,6 +16,7 @@
 #include "machine/cuda.h"
 #include "machine/nubus.h"
 #include "machine/ncr539x.h"
+#include "machine/mackbd.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
 
@@ -227,7 +228,8 @@ public:
 		m_ram(*this, RAM_TAG),
         m_screen(*this, MAC_SCREEN_NAME),
         m_539x_1(*this, MAC_539X_1_TAG),
-        m_539x_2(*this, MAC_539X_2_TAG)
+        m_539x_2(*this, MAC_539X_2_TAG),
+        m_mackbd(*this, MACKBD_TAG)
 	 { }
 
 	required_device<cpu_device> m_maincpu;
@@ -241,6 +243,7 @@ public:
     optional_device<screen_device> m_screen;
     optional_device<ncr539x_device> m_539x_1;
     optional_device<ncr539x_device> m_539x_2;
+    optional_device<mackbd_device> m_mackbd;
 
 	virtual void machine_start();
 	virtual void machine_reset();
