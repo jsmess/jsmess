@@ -5,9 +5,9 @@
 
 	<software name="addtot">
 		<description>Advanced Dungeons and Dragons: Treasue of Tarmin</description>
-		<!-- Serial: 4023 -->
 		<year>1982</year>
 		<publisher>TRS Hobbies, Inc.</publisher>
+		<info name="serial" value="4023" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="treasue of tarmin.bin" size="16384" crc="2fe95594" sha1="e3e494b9dd9623c92f54cc7d12af29b1103f000f" offset="000000" />
@@ -17,7 +17,6 @@
 
 	<software name="basic">
 		<description>Aquarius BASIC ROM</description>
-		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -29,9 +28,9 @@
 
 	<software name="astrsmah">
 		<description>Astrosmash</description>
-		<!-- Serial: 4003 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4003" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="astrosmash.bin" size="16384" crc="ce76c898" sha1="f47034bbfacd3042090388f0e459d48a830ab9c6" offset="000000" />
@@ -41,9 +40,9 @@
 
 	<software name="biorhtms">
 		<description>Biorhythms</description>
-		<!-- Serial: 4673 -->
 		<year>1983</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4673" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="biorhythms.bin" size="16384" crc="47e1c47b" sha1="68fccc2c2cb0841496ea1c5681b17cb689ac102a" offset="000000" />
@@ -53,9 +52,9 @@
 
 	<software name="btime">
 		<description>Burgertime</description>
-		<!-- Serial: 4653 -->
 		<year>1982</year>
 		<publisher>Data East</publisher>
+		<info name="serial" value="4653" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="burgertime.bin" size="16384" crc="be678f07" sha1="8b72793cd9cfdd3bd17412bdaf2411ca06bb1abd" offset="000000" />
@@ -65,9 +64,9 @@
 
 	<software name="chess">
 		<description>Chess</description>
-		<!-- Serial: 4594 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4594" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="chess.bin" size="16384" crc="0243e59f" sha1="7e7a47071d915c6e1408b3618d172daea889f02b" offset="000000" />
@@ -77,9 +76,9 @@
 
 	<software name="ebasic">
 		<description>Extended BASIC</description>
-		<!-- Serial: 4392 -->
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
+		<info name="serial" value="4392" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="extended basic.bin" size="16384" crc="0dba1241" sha1="3559249c4ed6ed0662d44df64283cf15cdbd2561" offset="000000" />
@@ -89,7 +88,6 @@
 
 	<software name="dosbasic">
 		<description>Dos BASIC</description>
-		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -101,9 +99,9 @@
 
 	<software name="fileform">
 		<description>Fileform</description>
-		<!-- Serial: 4177 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4177" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="fileform.bin" size="16384" crc="a7d29abd" sha1="e46a258628a38fe8b13f85fc56e9e687963a74a3" offset="000000" />
@@ -113,9 +111,9 @@
 
 	<software name="finform">
 		<description>Finform</description>
-		<!-- Serial: 4178 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4178" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="finform.bin" size="16384" crc="366a6a5b" sha1="c6224efc44e5974684be88e093e6fc6d9a7ea2a8" offset="000000" />
@@ -125,9 +123,9 @@
 
 	<software name="logo">
 		<description>Aquarius LOGO</description>
-		<!-- Serial: 4391 -->
 		<year>1983</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4391" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="logo.bin" size="16384" crc="0b8d198e" sha1="8e1fa06e81f9cc02d00fceb33a794591d5ea83cd" offset="000000" />
@@ -137,7 +135,6 @@
 
 	<software name="demo">
 		<description>MarqueeDemo</description>
-		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -149,9 +146,9 @@
 
 	<software name="melchase">
 		<description>Melody Chase</description>
-		<!-- Serial: 4652 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4652" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="melodychase.bin" size="16384" crc="6f99dbaf" sha1="8d0742149bf71620b2dd471bd5d05f1156fbd6a6" offset="000000" />
@@ -160,11 +157,10 @@
 	</software>
 
 	<software name="modem" supported="no">
-	<!-- no modem emulation -->
 		<description>Modem Terminal Software</description>
-		<!-- Serial: N/A -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="usage" value="Modem required" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="modem terminal software.bin" size="16384" crc="052dd522" sha1="35230b695470d9df1c37233107c2b29a18124f7b" offset="000000" />
@@ -174,9 +170,9 @@
 
 	<software name="nstalker">
 		<description>Night Stalker</description>
-		<!-- Serial: 4595 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4595" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="night stalker.bin" size="16384" crc="032ae514" sha1="3183bb81a428ce68c9919d96d91be29fcc1aad3f" offset="000000" />
@@ -186,7 +182,6 @@
 
 	<software name="shark">
 		<description>Shark!</description>
-		<!-- Serial: N/A -->
 		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -198,9 +193,9 @@
 
 	<software name="snafu">
 		<description>Snafu</description>
-		<!-- Serial: 4028 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4028" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="snafu.bin" size="16384" crc="aed0ea34" sha1="d65b3d4b0e3abdc844ecabbaecc6d095a27aa982" offset="000000" />
@@ -210,9 +205,9 @@
 
 	<software name="speller">
 		<description>Space Speller</description>
-		<!-- Serial: 4682 -->
 		<year>1983</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4682" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="space speller.bin" size="16384" crc="49a88710" sha1="9fc967addeba5280e5e5390eaf81c3fe9ff8ab10" offset="000000" />
@@ -222,9 +217,9 @@
 
 	<software name="tron">
 		<description>Tron Deadly Discs</description>
-		<!-- Serial: 4024 -->
 		<year>1982</year>
 		<publisher>Walt Disney</publisher>
+		<info name="serial" value="4024" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="tron deadly discs.bin" size="16384" crc="6d6ebd1d" sha1="8750fea11e97ae754be6134d9849e3b039b78f55" offset="000000" />
@@ -234,9 +229,9 @@
 
 	<software name="utopia">
 		<description>Utopia</description>
-		<!-- Serial: 4596 -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4596" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="utopia.bin" size="16384" crc="1fc3002e" sha1="b9244274929cad68afb978e991edde1fc282f172" offset="000000" />
@@ -246,7 +241,6 @@
 
 	<software name="word">
 		<description>Word Processor</description>
-		<!-- Serial: N/A -->
 		<year>1986</year>
 		<publisher>Balen</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -258,9 +252,9 @@
 
 	<software name="zeroin">
 		<description>Zero-in</description>
-		<!-- Serial: 4895C -->
 		<year>1982</year>
 		<publisher>Mattel</publisher>
+		<info name="serial" value="4895C" />
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="zeroin.bin" size="8192" crc="277f1716" sha1="a256a18d5e9c5d03a8610c5de58cb8725de0247c" offset="000000" />
