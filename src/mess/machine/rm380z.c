@@ -14,23 +14,39 @@ RM 380Z machine
 #include "includes/rm380z.h"
 
 
+/*
+
+PORT0 write in COS 4.0B/M:
+
+bit0: 1=reset keyboard latch
+bit1: ?
+bit2: ?
+bit3: ?
+bit4: ?
+bit5: 40/80 cols switch (?)
+bit6: 0=write to char RAM/1=write to attribute RAM
+bit7: 1=map ROM at 0000-0fff/0=RAM
+
+*/
+
 WRITE8_MEMBER( rm380z_state::port_write )
 {
 	switch ( offset )
 	{
 	case 0x00:		// PORT0
-		//printf("write of [%x] to FBFC\n",data);
+		//printf("write of [%x] to FBFC at PC [%x]\n",data,cpu_get_pc(machine().device("maincpu")));
 		m_port0 = data;
 		if (data&0x01)
 		{
 			//printf("WARNING: bit0 of port0 reset\n");
 			m_port0_kbd=0;
 		}
+		config_videomode();
 		config_memory_map();
 		break;
 
 	case 0x01:		// screen line counter (?)
-		printf("write of [%x] to FBFD at PC [%x]\n",data,cpu_get_pc(machine().device("maincpu")));
+		//printf("write of [%x] to FBFD at PC [%x] FBFE [%x]\n",data,cpu_get_pc(machine().device("maincpu")),m_fbfe);
 		m_fbfd=data;
 		break;
 
@@ -118,125 +134,23 @@ static TIMER_CALLBACK(static_vblank_timer)
 // at 0x0080 to 0x00FF, then jumps to it if there is no error."
 //
 
-/*
-WRITE8_MEMBER( rm380z_state::rm380z_io_w )
-{
-    UINT8 portnum=offset&0xff;
-    device_t *fdc = machine().device("wd1771");
-
-    //printf("port write of [%x] at [%x] from PC [%x]\n",data,portnum,cpu_get_pc(machine().device("maincpu")));
-
-    if (portnum==0xc0)
-    {
-        wd17xx_command_w(fdc, 0, data);
-        //printf("wrote command [%x] to floppy disk\n",data);
-    }
-    else if (portnum==0xc1)
-    {
-        wd17xx_track_w(fdc, 0, data);
-        //printf("wrote track data [%x] to floppy disk\n",data);
-    }
-    else if (portnum==0xc2)
-    {
-        wd17xx_sector_w(fdc, 0, data);
-        //printf("wrote sector data [%x] to floppy disk\n",data);
-    }
-    else if (portnum==0xc3)
-    {
-        wd17xx_data_w(fdc, 0, data);
-        //printf("wrote data [%x] to floppy disk\n",data);
-    }
-    else if (portnum==0xc4)
-    {
-        //printf("disk drive port0 write [%x]\n",data);
-
-        // drive port0
-        if (data&0x01)
-        {
-            // drive select bit 0
-            wd17xx_set_drive(fdc,0);
-        }
-
-        if (data&0x08)
-        {
-            // motor on
-        }
-
-        // "MSEL (dir/side select bit)
-        if (data&0x20)
-        {
-            wd17xx_set_side(fdc,1);
-        }
-        else
-        {
-            wd17xx_set_side(fdc,0);
-        }
-
-        // set drive en- (?)
-        if (data&0x40)
-        {
-        }
-    }
-}
-
-READ8_MEMBER( rm380z_state::rm380z_io_r )
-{
-    UINT8 retval=0;
-    UINT8 portnum=offset&0xff;
-    device_t *fdc = machine().device("wd1771");
-
-    //printf("port read at [%x] from PC [%x]\n",portnum,cpu_get_pc(machine().device("maincpu")));
-
-    if (portnum==0xc0)
-    {
-        retval=wd17xx_status_r(fdc,0);
-        //printf("disk drive status read is [%x]\n",retval);
-    }
-    else if (portnum==0xc1)
-    {
-        retval=wd17xx_track_r(fdc, 0);
-        //printf("disk drive track read is [%x]\n",retval);
-    }
-    else if (portnum==0xc2)
-    {
-        retval=wd17xx_sector_r(fdc, 0);
-        //printf("disk drive sector read is [%x]\n",retval);
-    }
-    else if (portnum==0xc3)
-    {
-        retval=wd17xx_data_r(fdc, 0);
-        //printf("disk drive data read [%x] at PC [%x]\n",retval,cpu_get_pc(machine().device("maincpu")));
-    }
-    else if (portnum==0xc9)
-    {
-        return 0x01;
-    }
-    else if (portnum==0xcc)
-    {
-        // CTC (?)
-        return 0x00;
-    }
-    else
-    {
-        printf("Unknown system port read [%x] PC [%x]\n",portnum,cpu_get_pc(machine().device("maincpu")));
-        return 0x00;
-    }
-
-    return retval;
-}
-*/
-
 WRITE8_MEMBER( rm380z_state::disk_0_control )
 {
 	device_t *fdc = machine().device("wd1771");
 
-	printf("disk drive port0 write [%x]\n",data);
+	//printf("disk drive port0 write [%x]\n",data);
 
 	// drive port0
 	if (data&0x01)
 	{
 		// drive select bit 0
 		wd17xx_set_drive(fdc,0);
+	}
+
+	if (data&0x02)
+	{
+		// drive select bit 1
+		wd17xx_set_drive(fdc,1);
 	}
 
 	if (data&0x08)
@@ -273,13 +187,19 @@ void rm380z_state::machine_reset()
 	m_fbfd=0x00;
 	m_fbfe=0x00;
 	m_old_fbfd=0x00;
+	maxrow=0;
+	m_pageAdder=0;
+	m_videomode=RM380Z_VIDEOMODE_80COL;
+	m_old_videomode=m_videomode;
 
 	m_rasterlineCtr=0;
 
+	// note: from COS 4.0 videos, RAM seems to have garbage at the beginning
 	memset(m_mainVideoram,0,0x600);
-	memset(m_vramattribs,0,0x600);
-	memset(m_vramchars,0,0x600);
-	memset(m_vram,0,0x600);
+
+	memset(m_vramattribs,0,RM380Z_SCREENSIZE);
+	memset(m_vramchars,0,RM380Z_SCREENSIZE);
+	memset(m_vram,0,RM380Z_SCREENSIZE);
 
 	config_memory_map();
 
@@ -291,10 +211,10 @@ void rm380z_state::machine_reset()
 void rm380z_state::config_memory_map()
 {
 	address_space *program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = machine().region(MAINCPU_TAG)->base();
+	UINT8 *rom = machine().region(RM380Z_MAINCPU_TAG)->base();
 	UINT8* m_ram_p = m_messram->pointer();
 
-	if ( PORTS_ENABLED_HIGH )
+	if ( RM380Z_PORTS_ENABLED_HIGH )
 	{
 		program->install_ram( 0x0000, 0xDFFF, m_ram_p );
 	}
