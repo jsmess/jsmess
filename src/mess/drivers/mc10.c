@@ -218,6 +218,7 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
 
 READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 {
+	if (offset == ~0) return 0xff;
 	m_mc6847->inv_w(BIT(m_ram_base[offset], 6));
 	m_mc6847->as_w(BIT(m_ram_base[offset], 7));
 

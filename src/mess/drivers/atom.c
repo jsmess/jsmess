@@ -632,6 +632,8 @@ static const cassette_interface atom_cassette_interface =
 
 READ8_MEMBER( atom_state::vdg_videoram_r )
 {
+	if (offset == ~0) return 0xff;
+
 	m_vdg->as_w(BIT(m_video_ram[offset], 6));
 	m_vdg->intext_w(BIT(m_video_ram[offset], 6));
 	m_vdg->inv_w(BIT(m_video_ram[offset], 7));

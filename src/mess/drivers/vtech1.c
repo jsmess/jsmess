@@ -608,6 +608,7 @@ static WRITE8_HANDLER( vtech1_video_bank_w )
 static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 {
 	vtech1_state *vtech1 = device->machine().driver_data<vtech1_state>();
+	if (offset == ~0) return 0xff;
 	vtech1->m_mc6847->inv_w(BIT(vtech1->m_videoram[offset], 6));
 	vtech1->m_mc6847->as_w(BIT(vtech1->m_videoram[offset], 7));
 
