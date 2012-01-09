@@ -204,6 +204,9 @@ void i8279_device::new_fifo(UINT8 data)
 		m_status |= 8; // full
 	else
 		m_status = (m_status & 0xe8) + fifo_size + 1;
+
+	if (!fifo_size)
+		set_irq(1); // something just went into fifo, so int
 }
 
 
@@ -335,6 +338,8 @@ UINT8 i8279_device::data_r()
 					for (i = 1; i < 8; i++)
 						m_fifo[i-1] = m_fifo[i];
 					fifo_size--;
+					if (!fifo_size)
+						set_irq(0);
 				}
 				break;
 			case 0x28: // overrun
@@ -358,7 +363,7 @@ UINT8 i8279_device::data_r()
 
 
 void i8279_device::ctrl_w( UINT8 data )
-{//printf("Command: %X=%X ",data>>5,data&31);printf("Autoinc=%X\n",m_autoinc);
+{//printf("Command: %X=%X ",data>>5,data&31);
 	UINT8 cmd = data >> 5;
 	data &= 0x1f;
 	m_ctrls[cmd] = data;
@@ -393,15 +398,15 @@ void i8279_device::ctrl_w( UINT8 data )
 
 
 void i8279_device::data_w( UINT8 data )
-{//printf("Data: %X ",data);printf("%X ",m_d_ram_ptr);
-	if (BIT(m_ctrls[0], 3))
+{//printf("Data: %X ",data);
+	if (BIT(m_ctrls[0], 4))
+	{
+	}
+	else
 	{
 		m_d_ram[m_d_ram_ptr] = data;
 		if (m_autoinc)
 			m_d_ram_ptr++;
-	}
-	else
-	{
 	}
 	m_d_ram_ptr &= 15;
 }
