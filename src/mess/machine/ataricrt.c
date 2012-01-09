@@ -606,16 +606,23 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 {
 	UINT8 *mem = image.device().machine().region("maincpu")->base();
 	UINT32 size;
+	bool A13_mirr = FALSE;
 
 	if (image.software_entry() == NULL)
 	{
 		/* load an optional (dual) cartidge */
 		size = image.fread(&mem[0x4000], 0x8000);
+		const char *info = hashfile_extrainfo(image);
+		if (info && !strcmp(info, "A13MIRRORING"))
+			A13_mirr = TRUE;
 	}
 	else
 	{
 		size = image.get_software_region_length("rom");
 		memcpy(mem + 0x4000, image.get_software_region("rom"), size);
+		const char *pcb_name = image.get_feature("cart_type");
+		if (pcb_name && !strcmp(pcb_name, "A13MIRRORING"))
+			A13_mirr = TRUE;
 	}
 
 	if (size<0x8000) memmove(mem+0x4000+0x8000-size, mem+0x4000, size);
@@ -624,9 +631,8 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 	if (size <= 0x2000) memcpy(mem+0x8000, mem+0xa000, 0x2000);
 	if (size <= 0x4000)
 	{
-		const char *info = hashfile_extrainfo(image);
 		memcpy(&mem[0x4000], &mem[0x8000], 0x4000);
-		if (info && !strcmp(info, "A13MIRRORING"))
+		if (A13_mirr)
 		{
 			memcpy(&mem[0x8000], &mem[0xa000], 0x2000);
 			memcpy(&mem[0x6000], &mem[0x4000], 0x2000);
