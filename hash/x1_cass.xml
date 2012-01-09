@@ -103,6 +103,19 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="cprowspb" cloneof="cprowsp">
+		<description>Champion ProWres Special (Alt 2)</description>
+		<year>1985</year>
+		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="release" value="198511xx"/>
+		<info name="alt_title" value="チャンピオンプロレススペシャル"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="960004">
+				<rom name="champion prowres sp (a).tap" size="960004" crc="f958ba84" sha1="769b3a06f75282757115a33f71c9628a5ae08848" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cockpit">
 		<description>The Cockpit</description>
 		<year>1985</year>
@@ -258,6 +271,19 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+
+	<software name="dstukaa" cloneof="dstuka">
+		<description>JU87A DSTUKA (Alt)</description>
+		<year>1987</year>
+		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="release" value="198506xx"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="480004">
+				<rom name="dstukaa.tap" size="480004" crc="e7a1a3ff" sha1="4a8c7e9db80ac8b1c2b6877385cba396f3652834" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lizard" supported="no">
 		<description>Lizard</description>
 		<year>1985</year>
@@ -360,6 +386,21 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="pac-man (basic).tap" size="240004" crc="1b4a9af7" sha1="8bf5a7dc818669901fda4416a696ea3adb492291" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmana" cloneof="pacman">
+		<description>Pac-Man (Alt)</description>
+		<year>1985</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="release" value="198506xx"/>
+		<info name="alt_title" value="パックマン"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="240004">
+				<rom name="pac-man.tap" size="240004" crc="a384d58f" sha1="bd92ad9be1053292f175db948fe2ee6f15fe7ce2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -837,6 +878,19 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="hovattcka" cloneof="hovattck">
+		<description>Hover Attack (Alt)</description>
+		<year>1985?</year>
+		<publisher>コムパック (Compaq)</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="240004">
+				<rom name="hover attack.tap" size="240004" crc="c9a0bd38" sha1="310bb463060d6bbd10dde6b7ae83ec99f6ec9dd2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hpohsho">
 		<description>HP Ohsho</description>
 		<year>19??</year>
@@ -902,6 +956,17 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="180004">
 				<rom name="jeldaa.tap" size="180004" crc="c7825068" sha1="6743ccf33d0e663ca97705d2860ca57a54ae3c57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeldab" cloneof="jelda">
+		<description>Jelda (Alt 2)</description>
+		<year>1983?</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="180004">
+				<rom name="jelda_1.tap" size="180004" crc="980c0f3b" sha1="6720afff2ac1af3aeada699ea1ad73ef2d900efb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1087,6 +1152,17 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="pstar2a" cloneof="pstar2">
+		<description>Polar Star 2 (Alt)</description>
+		<year>1983?</year>
+		<publisher>SPS</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="300004">
+				<rom name="polar2.tap" size="300004" crc="cf412e3a" sha1="0e6ad93516351d437ae9b19410b818fe4c0c9d20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="popbalon">
 		<description>Pop Balloon</description>
 		<year>1984?</year>
@@ -1146,6 +1222,19 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="rowdy ball (basic).tap" size="120004" crc="e64d46c0" sha1="16d872e5841a9ac1a582ebf1037a69f718a3ed8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rowballa" cloneof="rowball">
+		<description>Rowdy Ball (Alt)</description>
+		<year>19??</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="120004">
+				<rom name="rowdy ball.tap" size="120004" crc="0f1d916a" sha1="51002b8708e7b477577046f3b7c7f2d1b389e98e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1231,6 +1320,17 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="120004">
 				<rom name="super buggon.tap" size="120004" crc="256b7157" sha1="61c3d7f202fd2448b909de27c7e66bd9f3f660ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbuggona" cloneof="sbuggon">
+		<description>Super Buggon (Alt)</description>
+		<year>19??</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="120004">
+				<rom name="super buggon_1.tap" size="120004" crc="42591c6e" sha1="97b604d17ae4e8e556c09cab88722e0c430fd50f" offset="0" />
 			</dataarea>
 		</part>
 	</software>

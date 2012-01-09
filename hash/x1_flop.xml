@@ -1,13 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-
 Titles, publishers and release dates taken from:
   - X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
 but the website only covers post 1985 titles...
 
 Games I haven't managed to start (possibly due to my mistakes):
-* zeliard, algarna: at the end of the intro it prints "read EMM address [00]" while waiting for something
+* zeliard: at the end of the intro it prints "read EMM address [00]" while waiting for something
 * ys2: after the Falcom screen it prints a message on-screen and waits for something to happen
 * suikoden, sangoku2, sangoku2a, nobunasg: sits to a jpn message waiting for who knows what
 * revolty2: waits for something to happen
@@ -26,7 +25,6 @@ Games with possible issues (either in emulation or in dump):
 * wizardry->4: can't add character name. also how to create a duplicate disk (in pc8801 they were in the disk set)?
 * profmj: true 400 lines mode not implemented?
 * mightmag: corrupted chars
-* lkage, jetterm: crashes x1turbo (Z80 DMA issue) and has gfx issues in x1
 * lizard: waits for something to happen
 * hydlide2b has no saved data, while hydlide2 &amp; hydlide2a have characters in them
 * hydlide3b: fails to see the user disk + the set contains at least 1 hydlide disk (check crc16)
@@ -34,7 +32,6 @@ Games with possible issues (either in emulation or in dump):
 * gradiusk: is this supposed to do something?
 * frontlin: input issue?
 * dione: does not display text correctly
-* chackn: is it only the OS disk?!?
 * blckonyx: is it missing a data disk?
 * bastard: does not start. input issue?
 * arcus: black screen after wolfteam logo
@@ -61,11 +58,9 @@ Games which are completely not recognized (maybe not for x1?)
 * unk_fl1
 * srdemo
 * robowres
-* poplemon
 * punchbal
 * manilove
 * fmdata
-* fairires
 
 Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 
@@ -392,6 +387,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<publisher>ニデコム (Nidecom)</publisher>
 		<info name="release" value="198507xx"/>
 		<info name="alt_title" value="ちゃっくんぽっぷ"/>
+		<info name="usage" value="Type FILES then move the cursor to the line of the game and type LOAD (to load) and type RUN when loaded"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="chackn.d88" size="348848" crc="257df7de" sha1="2bd62b1c1bdeacdeeef80d603b1e1b34a99cbaa0" offset="0" />
@@ -539,6 +535,24 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="daiva2.d88" size="348848" crc="487b2157" sha1="306a2538d37f7d8e18376219e26cc67304b23aec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daivaa" cloneof="daiva">
+		<description>Daiva (Alt)</description>
+		<year>1987</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="release" value="198703xx"/>
+		<info name="alt_title" value="ディーヴァ"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348304">
+				<rom name="daivaa1.d88" size="348304" crc="dfe64250" sha1="e3e2bc53ad128bfd42b41184d0fa616335328fcd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="daivaa2.d88" size="348848" crc="703fbdd8" sha1="1bf3067dfd7b25865178833a801144a59f7f5516" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1279,7 +1293,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="kugyoku">
+	<software name="kugyokud">
 		<description>Kugyokuden</description>
 		<year>1986</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
@@ -1288,6 +1302,24 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ku gyoku den a.d88" size="348848" crc="53de7ada" sha1="ecd020fce0f35fc11f5d11d21a0537dc19a6aaa7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="ku gyoku den b.d88" size="348576" crc="86988be6" sha1="49b7ddd67e0d849281e6fb15bf518aa00d0029c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kugyokuda" cloneof="kugyokud">
+		<description>Kugyokuden (Alt)</description>
+		<year>1986</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<info name="release" value="198612xx"/>
+		<info name="alt_title" value="九玉伝"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="kugyokuda.d88" size="348848" crc="5731aeaa" sha1="a2572e660319c7744dcfada26b8e0d79ccb2d1f1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -1947,6 +1979,19 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+	<software name="outroyda" cloneof="outroyd">
+		<description>Outroyd (Alt)</description>
+		<year>1986</year>
+		<publisher>ストラットフォードC.C.C. (Stratford)</publisher>
+		<info name="release" value="198606xx"/>
+		<info name="alt_title" value="アウトロイド"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="outroyda.d88" size="348848" crc="5037a384" sha1="2446acfe701129a8d3f81d48f81ad5c08307fb20" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="phantas">
 		<description>Phantasie - Jerunoa no Shu</description>
 		<year>1987</year>
@@ -2284,6 +2329,23 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="shanghai.2d" size="327680" crc="0e4a28c0" sha1="6b1eb1e990f89c4d333345b7ad3b2d39807c20a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- is this missing a 2nd disk?? -->
+	<software name="skugyokd">
+		<description>Shin Kugyokuden</description>
+		<year>1988</year>
+		<publisher>テクノソフト (Techno Soft)</publisher>
+		<!-- Turbo only -->
+		<info name="release" value="198812xx"/>
+		<info name="alt_title" value="新九玉伝"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="665440">
+				<rom name="shin9_1.d88" size="665440" crc="4a009e39" sha1="9c7e5f5d6d4cf0865c31358c36d6f6677df1ccdb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2835,6 +2897,26 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="user.d88" size="392368" crc="c3c0069b" sha1="69c2cb9187200bfaa63dae9c17ad233b1eb0ee81" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankent2">
+		<description>Tanken-tai 2 - Makyo Amazon no Okuchi ni Kogane Densetsu wo Mita!</description>
+		<year>1985</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<!-- Turbo only -->
+		<info name="release" value="198508xx"/>
+		<info name="alt_title" value="探検隊　第２弾　魔境アマゾンの奥地に黄金伝説を見た！"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="tankentai 2 - makyo amazon disk1.2d" size="327680" crc="0898c771" sha1="da338bbe824525110e2572632efac18ebd912f52" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="tankentai 2 - makyo amazon disk2.2d" size="327680" crc="76efd447" sha1="17f7b97914d304bdd0df56664e46f8d51b4e5022" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3471,6 +3553,17 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+	<software name="marsb" cloneof="mars">
+		<description>The Curse of Mars (Alt 2?)</description>
+		<year>1988?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="mars (a).2d" size="327680" crc="f0d9f6c2" sha1="2feb02d2805fc3f9e29f0dce303b118ec7033e82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkstrm">
 		<description>Darkstorm - Demon Crystal III</description>
 		<year>1988?</year>
@@ -3484,6 +3577,19 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 
 	<software name="dezeni">
 		<description>Dezeni Land</description>
+		<year>1983?</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="デゼニランド"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="284752">
+				<rom name="dezeni land.d88" size="284752" crc="2502df21" sha1="454a351d00907bc439e7bf600355083bce582539" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This displays "デゼニランド" at loading time, but title screen is different... what is this?? -->
+	<software name="dezenia" cloneof="dezeni">
+		<description>Dezeni Land (?)</description>
 		<year>1983?</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<info name="alt_title" value="デゼニランド"/>
@@ -3556,11 +3662,12 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="fairires" supported="no">
+	<software name="fairires">
 		<description>Faeries Residence</description>
 		<year>1986?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<info name="alt_title" value="フェアリーズレジデンス"/>
+		<info name="usage" value="Runs in HuBASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="fairiesa.2d" size="327680" crc="573c4145" sha1="9663371e9b31710e322658bbfd05d6cb603ec46e" offset="0" />
@@ -3838,11 +3945,12 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="poplemon" supported="no">
+	<software name="poplemon">
 		<description>Pop Lemon</description>
 		<year>1986?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<info name="alt_title" value="ポップレモン"/>
+		<info name="usage" value="Runs in HuBASIC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="poplem_a.2d" size="327680" crc="29b09279" sha1="1d12cfd7778bc1c52412947adc895006ca15a3b3" offset="0" />
@@ -3856,7 +3964,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="portopia">
-		<description>Portopia Renzokusatsujin Jiken</description>
+		<description>Portopia Renzoku Satsujin Jiken</description>
 		<year>1983?</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="alt_title" value="ポートピア連続殺人事件"/>
@@ -4012,9 +4120,9 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="vipd" cloneof="vip" supported="no">
-		<description>FM Ongen Music Tool V.I.P.</description>
+		<description>Music Tool V.I.P.</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="fm ongen.d88" size="1089776" crc="3676fbc2" sha1="483023bae28c20c9de8cdba005ceeebd063fa5ae" offset="0" />
@@ -4328,7 +4436,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="hubasic1">
 		<description>HuBASIC CZ-8FB01 (v1.0, Disk vers.)</description>
 		<year>19??</year>
-		<publisher>Sharp</publisher>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="8fb01v10.2d" size="327680" crc="f567794d" sha1="38cda7667d3ba9c5d51161f6b0d2f500ec1947b7" offset="0" />
@@ -4339,7 +4447,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="hubasic2">
 		<description>HuBASIC CZ-8FB01 (v2.0, Disk vers.)</description>
 		<year>19??</year>
-		<publisher>Sharp</publisher>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="347488">
 				<rom name="8fb01v20.d88" size="347488" crc="21f89c4a" sha1="709faeaba3a9ae5524a1c1650f5480543bce2e2e" offset="0" />
@@ -4361,7 +4469,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="turbobasa" cloneof="turbobas">
 		<description>Turbo BASIC CZ-8FB02 (Alt)</description>
 		<year>19??</year>
-		<publisher>Sharp</publisher>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="zzz-unk-cz8fb02.2d" size="327680" crc="48bcb22e" sha1="0ee3f7de9b172544115560b6333a2d88618f56c4" offset="0" />
@@ -4372,7 +4480,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="turbzbas" supported="no">
 		<description>Turbo-Z BASIC CZ-8FB03</description>
 		<year>19??</year>
-		<publisher>Sharp</publisher>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="cz-8fb03 turboz basic.d88" size="1089776" crc="01215aa3" sha1="cc15f2d6dfe561e53f3ee642034e412f5a321264" offset="0" />
@@ -4383,7 +4491,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	<software name="tapbas">
 		<description>HuBASIC CZ-8CB01 (v1.0, Tape vers.)</description>
 		<year>19??</year>
-		<publisher>Sharp</publisher>
+		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="cz8cb01.2d" size="327680" crc="36719812" sha1="d016b8b87d890f35d622082c1b23ae128bb39b2f" offset="0" />
@@ -4398,6 +4506,78 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="db-basic.2d" size="327680" crc="437e3774" sha1="5b67a1170a9480288f7ba341cfbbb1f8f588579f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22">
+		<description>CP/M v2.2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="cp_mv2.2.d88" size="348848" crc="68c42add" sha1="cdb4e7c9f38bd5e8f43866df5d7891bd0ec867df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swordos">
+		<description>Sword-OS for x1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="sword-os for x1.2d" size="327680" crc="a0076da0" sha1="9674f2f7256e62b474acb2ad93621983cfab13a3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swordosa" cloneof="swordos">
+		<description>Sword-OS (Alt)?</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="swordosa.d88" size="348848" crc="c2307ad2" sha1="7c497eeed68e8e7f6e3e0f9608017ae7c78bd65e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jodanos">
+		<description>Jodan-OS</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="jodan.d88" size="348848" crc="3b1ceebf" sha1="a02029058b5c0d20c3ae08e0b2c6da869bed903c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jodanosa" cloneof="jodanos">
+		<description>Jodan-OS (Alt?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="jodan-dos.2d" size="327680" crc="1713d1a0" sha1="f24bbe51e84e9b8ce915bee73be57488b414b11d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xdos">
+		<description>X-DOS</description>
+		<year>1990</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="xdos_sys.d88" size="422160" crc="a35c4f89" sha1="52d503c349132af1a5bf8bbca2ba480e4b5a8d6e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="xdosutil.d88" size="422160" crc="73617547" sha1="0cee25e4ef6bf9723687e8427ea0ce6892bdfd03" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4418,6 +4598,23 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+<!-- This was a spare "ExtraHyper_Game.d88" file, which is not bootable. Investigate what is it! -->
+	<software name="extrahypa" cloneof="extrahyp">
+		<description>Extra Hyper (Alt Data?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="26800">
+				<rom name="extrahyper_system.d88" size="26800" crc="a69b99d1" sha1="d98eeb70fb4c8fecd08cffbb16ccb7187726c129" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348576">
+				<rom name="extrahyper_game.d88" size="348576" crc="4f579ef3" sha1="d2db498e13c51e8d1225254ad05a01a61a1ab29b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hyperdsk">
 		<description>Hyper Disk Monitor</description>
 		<year>19??</year>
@@ -4430,9 +4627,14 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="jetterm">
-		<description>Jet Turbo Terminal (v1.0)</description>
+    <!-- From readme:
+このソフトはパソコン通信用のソフトですが、
+CDOSというMS-DOSと同様なコマンドライン作動させることが出来ます。
+-->
+		<description>Jet Turbo Terminal (v1.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Jetターボ ターミナルVer1.1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="379264">
 				<rom name="jet turbo terminal ver1.1.d88" size="379264" crc="7a423e74" sha1="68103847d1ddd1fce7af915038103ce0502b47aa" offset="0" />
@@ -4451,10 +4653,22 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+	<software name="tap2dsk">
+		<description>TAP2DSK</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="tap2dsk.2d" size="327680" crc="7b7e57a5" sha1="9f5161d13b387f131cf1208ec75a23f79dd8b84c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="graphtol">
 		<description>Graphic Tool</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>シャープ (Sharp) ~ Zeit</publisher>
+		<info name="alt_title" value="グラフィックツール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089776">
 				<rom name="graphic tool.d88" size="1089776" crc="97817d8a" sha1="3a5dbdc20584d2a7b25803ffc308e89ee0ff5f42" offset="0" />
@@ -4522,39 +4736,6 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="swordos">
-		<description>Sword-OS for x1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
-				<rom name="sword-os for x1.2d" size="327680" crc="a0076da0" sha1="9674f2f7256e62b474acb2ad93621983cfab13a3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swordosa" cloneof="swordos">
-		<description>Sword-OS (Alt)?</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="swordosa.d88" size="348848" crc="c2307ad2" sha1="7c497eeed68e8e7f6e3e0f9608017ae7c78bd65e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jodanos">
-		<description>Jodan-OS</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="jodan.d88" size="348848" crc="3b1ceebf" sha1="a02029058b5c0d20c3ae08e0b2c6da869bed903c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 <!-- is this part of a multi-disk game? -->
 
 	<software name="unk_fl1">
@@ -4576,6 +4757,781 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="brank.2d" size="327680" crc="166f974a" sha1="27c77f2d2eb6898e0c388b1f5a6b5c6a76575385" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- To Sort -->
+<!-- 
+These (game) packs shall be eventually removed when the original disks get dumped,
+but given the difficulty to find dumpers and/or friendly collectors for these old 
+systems, for the moment they stay here!
+-->
+	<software name="basic1">
+		<description>BASIC Pack 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="basic1.2d" size="327680" crc="153f7873" sha1="c0c3c444881e59dc7ac4b05e53284370f9858070" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic2">
+		<description>BASIC Pack 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="basic2.2d" size="327680" crc="95b278aa" sha1="7eca1379c6f67f58937d2c3645efb6f00d307ead" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game6">
+<!-- From GAME6.txt:
+　　　 ウォーロイド（ASCII）
+　　　 テニス（任天堂のあれ）
+　　　 マイナー２０４９（COMPTIQ）
+　　　 ドアドア（ENIX）
+　　　 デーモンクリスタル（電波新聞）
+　　　 コスモ・トラベラー（APOLO TECHNICA）
+　　　 ボンバーマンはないです(^^；
+[i.e. Bomberman is not included even if listed in the menu (probably it did
+not fit the disk)]
+-->
+		<description>Game Pack 6</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game6.2d" size="327680" crc="8d5c79b5" sha1="3400a20f9d4f824f0e754287912135cb90a15958" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game01">
+<!-- From GAME1-25_List.txt:
+1. ポートピア連続殺人事件
+2. F2 GRAND PRIX
+3. ミステリーハウス Worry
+4. ザ・キャッスル
+-->
+		<description>Game 01</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_01.2d" size="327680" crc="6d98ff9a" sha1="481888cd82c2eccc5cd4057e4204b0ea87adeb55" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game02">
+<!-- From GAME1-25_List.txt:
+1. フラッピー
+3. ヴォルガード
+5. HIROTON WARS
+7. ニュートン
+8. ちゃっくんぽっぷ
+
+＊ゲームを起動するには「Sys」とついている方を選んで
+　起動してください。
+-->
+		<description>Game 02</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_02.2d" size="327680" crc="dba36517" sha1="e2ea769253024195e1b362abf7146559b82200b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game03">
+<!-- From GAME1-25_List.txt:
+1. 妖怪探偵ちまちま
+4. 妖怪探偵ちまちま（敵キャラ西洋版)
+7. YELLOW CAB
+8. Building Hopper
+
+＊ゲームを起動するには「Sys」とついている方を選んで
+　起動してください。
+-->
+		<description>Game 03</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_03.2d" size="327680" crc="c07d519f" sha1="78f8891c6a2d79471ff7130a0bb79e1d1cf3ad7d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game04">
+<!-- From GAME1-25_List.txt:
+1. パンチボール マリオブラザーズ
+2. マリオブラザーズスペシャル
+3. ギャラクシアン
+4. 野球狂
+5. ジャン狂
+6. 花札狂
+-->
+		<description>Game 04</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_04.2d" size="327680" crc="b23ab1af" sha1="89db946ef4ac23d9fc539766381aa1eca8ad7c6f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game05">
+<!-- From GAME1-25_List.txt:
+1. ？
+2. EGGY
+3. プラズマライン
+4. グッツン
+5. Mr.Pac!
+
+＊ゲームを起動するには「Sys」とついている方を選んで
+　起動してください。
+-->
+		<description>Game 05</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_05.2d" size="327680" crc="613941ef" sha1="62289383aa4ab49034db20dbeab23dbbbd249cc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game06">
+<!-- From GAME1-25_List.txt:
+1. JELDA
+2. スウォーム
+3. EXOA
+4. EXOAⅡ WARROID
+5. フロントライン
+6. ギャラクシアン
+-->
+		<description>Game 06</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_06.2d" size="327680" crc="b89ac1fd" sha1="1c354d10778a8f40a6efaf0d0b7aa3e6cd40fffb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game07">
+<!-- From GAME1-25_List.txt:
+1. ディグダグ
+2. キングフラッピー
+3. デーモンクリスタル
+4. グロブダー
+5. チョップリフター
+-->
+		<description>Game 07</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_07.2d" size="327680" crc="a0d6c9f9" sha1="41e3357fef70afab316303e0d558a6690ac5884d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game08">
+<!-- From GAME1-25_List.txt:
+1. 大脱走
+2. JELDA Ⅱ
+3. POPINS
+4. ザ・ファイヤーキャッスル
+-->
+		<description>Game 08</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_08.2d" size="327680" crc="f6c0ff72" sha1="de49d9efda165e19a3a044ff43c90d014d25568b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game09">
+<!-- From GAME1-25_List.txt:
+1. ギャラガ
+2. ドアドア
+3. 王将
+4. コロン
+5. コックピット
+7. サンダーフォース
+-->
+		<description>Game 09</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_09.2d" size="327680" crc="53d85caa" sha1="4c56ba2567e224e517ac6ee9a54df7f74911b71b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game10">
+<!-- From GAME1-25_List.txt:
+1. CHANGER
+2. ボコスカウォーズ
+3. エレベーターアクション
+4. ちゃっくんぽっぷ
+5. モールモール
+6. ウルトラ４人マージャン
+-->
+		<description>Game 10</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_10.2d" size="327680" crc="9b745227" sha1="50fc0d71702c8a04b33562e10dcb8b0ae7cdf52f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game11">
+<!-- From GAME1-25_List.txt:
+1. SPRING BUG
+2. JUPITER ROAD (同人ソフト？)
+3. 明るい農園
+4. GANG MAN
+5. GUNMAN
+6. スーパーゴルフ２
+7. 始皇帝
+8. Minami Aoyama Adventure
+-->
+		<description>Game 11</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_11.2d" size="327680" crc="c4c5f3f0" sha1="37662737785829a297abc86c379fa50300f920ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game12">
+<!-- From GAME1-25_List.txt:
+1. 暴龍ゴジラ 〜大都市壊滅！！〜
+2. PERSEUS
+3. フォーメーションＺ
+4. オービットⅢ
+5. 舞臓魔(BU U MA)
+-->
+		<description>Game 12</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_12.2d" size="327680" crc="f6a508a4" sha1="496e16ce9cfa7b6771163333db8d7aabe7ecf54b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game13">
+<!-- From GAME1-25_List.txt:
+1. ＮＥＷボコスカウォーズ
+2. 宇宙ＤＥ婚約大作戦
+3. 忍者 影
+4. アイスクライマー
+5. エキサイトバイク
+6. ラリーＸ
+-->
+		<description>Game 13</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_13.2d" size="327680" crc="da2ecb04" sha1="5032638e71e23f7ecbd4ceed6c9a47a4b3a6851d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game14">
+<!-- From GAME1-25_List.txt:
+1. アステロイドチャレンジャー (IPL-ROMをturboZモード以外で正常)
+2. スーパービリヤード
+3. ナッツ＆ミルク
+4. ハーベスト
+5. ドクロンの館
+6. ザ・えんま大王
+7. MINER 2049er
+-->
+		<description>Game 14</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_14.2d" size="327680" crc="8a3f6bb1" sha1="163ae5373ac388488bae396f94f95997ef22330c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game15">
+<!-- From GAME1-25_List.txt:
+1. アメリカントラック
+2. アメリカントラック(コピー失敗版？動かない)
+3. トリトーン
+4. ザ・ブラックオニキス
+5. ファンタジアン
+-->
+		<description>Game 15</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_15.2d" size="327680" crc="0f96a21b" sha1="366e742df63164d64f97545931a9f30755448f36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game16">
+<!-- From GAME1-25_List.txt:
+1. ハイパーオリンピック'８４ No.1
+3. ハイパーオリンピック'８４ No.2
+5. スターライトアドベンチャー
+6. スターライトアドベンチャーⅡ
+
+＊ゲームを起動するには「Sys」とついている方を選んで
+　起動してください。
+-->
+		<description>Game 16</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_16.2d" size="327680" crc="0683b075" sha1="3664ae8b6b5120c3871e0abc10055df42b58552d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game17">
+<!-- From GAME1-25_List.txt:
+1. ゴーストタウン
+3. POLAR STAR Ⅱ
+4. マッピー
+5. マッピー ＮＥＷバージョン
+7. キャノンボール
+
+＊ゲームを起動するには「Sys」とついている方を選んで
+　起動してください。
+-->
+		<description>Game 17</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_17.2d" size="327680" crc="2c3b1b78" sha1="616fb20bed8332d6ea315ac80125f2223ceb3fea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game18">
+<!-- From GAME1-25_List.txt:
+MB-GAME Disk Utility No.2
+
+1. ゴルフ(任天堂)
+2. テニス(任天堂)
+3. BEAN'S JACK
+4. マハリト
+5. ボンバーマン
+6. タイムトンネル
+7. コックピット
+8. Vegetable (同人ソフト？)
+-->
+		<description>Game 18</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_18.2d" size="327680" crc="7f3985a3" sha1="111f1e4ecdc69073814bd16442559ce30a4f1c0e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game19">
+<!-- From GAME1-25_List.txt:
+1. UOOTOY
+2. ZEPLIS Ⅱ
+3. 妖魔仕事人 魔童
+4. STAR BEE
+-->
+		<description>Game 19</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_19.2d" size="327680" crc="68d4493c" sha1="7e163be4b494d3ba16744a5f884f94ed42bbc849" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game20">
+<!--
+ From GAME1-25_List.txt:
+1. ハイドライド
+2. チョップリフター
+3. ファンタジアン
+4. HOLY GRAIL
+-->
+		<description>Game 20</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_20.2d" size="327680" crc="0eb7a5b3" sha1="8c5399136569aad47c622644070b6cc68d47e443" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This also appears as GAME_21 in the 01->25 Game Packs set -->
+	<software name="x1gmpk1">
+<!-- From X1GM_PK1.txt:
+db-IBASIC VER1.0   (dB-SOFT)
+Apple tree
+THE COCKPIT        (COMPAC)
+BOMBERMAN          (HUDSON)
+キャノンボール     (PONYCA)
+DIGDUG             (電波新聞社)
+GUNMAN             (HUDSON)
+ねずみとり         (HUDSON)
+野球拳                     (TSUKUMO)
+
+From GAME1-25_List.txt:
+01. db-IBASIC VER1.0   (dB-SOFT)
+03. Apple tree
+04. コックピット        (COMPAC)
+05. ボンバーマン        (HUDSON)
+06. キャノンボール      (PONYCA)
+08. ディグダグ      (電波新聞社)
+09. GUNMAN              (HUDSON)
+0A. ねずみとり          (HUDSON)
+-->
+		<description>X1GM Pack 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="x1gm_pk1.d88" size="348848" crc="36b58bdf" sha1="cba2847cbba633eaaca5a7c049f42e7730af1ad0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This also appears as GAME_22 in the 01->25 Game Packs set -->
+	<software name="x1gmpk2">
+<!-- From X1GM_PK2.txt:
+Thunder Force     Techno soft
+MAPPY             namco / Dempa
+GURUGURU          Hudson Soft
+MJ-05             Hudson Soft
+ICE BLOCK         dB-SOFT
+COSMO TRAVELER    APOLLO TECHNICA SOFT
+Super Burger      ???
+Vegetable         ???
+Zombi Panic       ???
+キナサイ！        ???
+JUPITER ROAD      ???
+STAR WORLD 2      ???
+
+From GAME1-25_List.txt:
+01. サンダーフォース  (Techno soft)
+02. マッピー          (namco / Dempa)
+03. Space Burger      (同人ソフト？)
+04. Vegetable         (同人ソフト？)
+05. Zombi Panic       (同人ソフト？) (動かない)
+06. ICE BLOCK         (dB-SOFT)
+07. COSMO TRAVELER    (APOLLO TECHNICA SOFT)
+08. キナサイ！        (同人ソフト？)
+0A. JUPITER ROAD      (同人ソフト？)
+0B. GURU GURU         (Hudson Soft)
+0C. MJ-05             (Hudson Soft)
+0D. STAR WORLD 2      (同人ソフト？) (動かない)
+-->
+		<description>X1GM Pack 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="x1gm_pk2.d88" size="348848" crc="9bbeaa1d" sha1="e8792976965706ee4e1fa6babb4e66d883f7bd05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This also appears as GAME_23 in the 01->25 Game Packs set -->
+	<software name="x1gmpk3">
+<!-- From X1GM_PK3.txt:
+７並べ                     (TSUKUMO)
+ウルトラ４人マージャン     (TSUKUMO)
+野球拳                     (TSUKUMO)
+
+From GAME1-25_List.txt:
+1. ウルトラ４人マージャン     (TSUKUMO)
+2. ７並べ                     (TSUKUMO)
+3. 野球拳                     (TSUKUMO)
+-->
+		<description>X1GM Pack 3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="x1gm_pk3.d88" size="348848" crc="319650a3" sha1="138b400c7b32bae2238f5bc5257c13507ada2e8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This also appears as GAME_24 in the 01->25 Game Packs set -->
+	<software name="casgame1">
+<!-- From CASGAME1.txt:
+1. ミステリーハウス Worry     MICROCABIN
+2. プロフェッショナル麻雀     Chatnoir
+3. 戦闘伝説エルフ             COSMOS
+4. ZEXAS                      dB-SOFT
+
+From GAME1-25_List.txt:
+01. ミステリーハウス Worry         (MICROCABIN)
+06. プロフェッショナル麻雀 Ver2.0  (Chatnoir)
+07. 戦闘伝説エルフ                 (COSMOS)
+08. ZEXAS                          (dB-SOFT)
+-->
+		<description>Cassette Games Pack 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="casgame1.d88" size="348848" crc="26e2cac3" sha1="4bd5081f42933a2288244091b46e06b64351af22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This also appears as GAME_25 in the 01->25 Game Packs set -->
+	<software name="casgame2">
+<!-- From CASGAME2.txt:
+1. The Castle             ASCII
+2. Baloon Fight           HUDSON
+3. FLAPPY (起動不可)      dB-SOFT
+4. TENNIS                 HUDSON
+5. BU U MA                PAX
+6. ボコスカウォーズ       ASCII
+
+From GAME1-25_List.txt:
+1. ザ・キャッスル         (ASCII)
+2. バルーンファイト       (HUDSON)
+3. フラッピー             (dB-SOFT) (画面バグあり)
+4. テニス(任天堂)         (HUDSON)
+5. 舞臓魔(BU U MA)        (PAX)
+6. ボコスカウォーズ       (ASCII)
+-->
+		<description>Cassette Games Pack 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="casgame2.d88" size="348848" crc="73fc260d" sha1="8ae457c4c947203c0fae69a90557c220ee425b17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="gamee">
+<!-- From GAME_E.txt:
+   1. ASTEROID CHALLENGER
+   2. Super Billiards          (HAL研)
+   3. NUTS & MILK              (HUDSON)
+   4. HARVEST                  (Micronet)
+   5. ドクロンの館             (ENIX)
+   6. THEえんま大王            (HUDSON)
+   7. MINER 2049er             (COMPTIQ)
+-->
+		<description>Game E</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_e.2d" size="327680" crc="8a3f6bb1" sha1="163ae5373ac388488bae396f94f95997ef22330c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gameea" cloneof="gamee">
+		<description>Game E (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game_e (a).2d" size="327680" crc="37517fa3" sha1="0bb9b80153398e12ab48e6c9f77c747be60f5b90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepck1">
+		<description>Game Pack 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="gamepack1.2d" size="327680" crc="29f3f564" sha1="4c87621161fa506da982be5e6f4a640d206ddd72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepck2">
+<!-- From gamepack2.txt:
+Polar Star II
+Plazma Line
+HP Osho
+-->
+		<description>Game Pack 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="gamepack2.2d" size="327680" crc="637ef194" sha1="2c6a0c9d7ab19ba8d9414712656c0c4cb4f5493b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepck3">
+		<description>Game Pack 3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="gamepack3.2d" size="327680" crc="0eb7a5b3" sha1="8c5399136569aad47c622644070b6cc68d47e443" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepck4">
+<!-- From Gamepack4.txt:
+01 - Galaga X-1      (Namco - Dempa)
+02 - Balloon Fight   (Hudson)
+03 - Hamburger       (Data East - Dempa)
+04 - Demon Crystal   (Dempa)
+05 - Pentan          (Not Working)
+06 - The Entertainer (Unison World)
+-->
+		<description>Game Pack 4</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="gamepack4.2d" size="327680" crc="226ffdc4" sha1="5cc1bec2a5982e0c496719ad267c0631dbb0b056" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepk1">
+<!-- From GAMEPK1.txt:
+01 BU U MA
+02 Black Onyx
+03 Thunder Force
+-->
+		<description>GAMEPK1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="gamepk1.2d" size="327680" crc="e9f5d4a3" sha1="e4f77849b55aabfebf3cb83e128d8a3bba683f05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepk2">
+<!-- From GAMEPK2.txt:
+  1. UOOTOY
+  2. ZEPLIS ][
+  3. 妖魔仕事人 魔童
+  4. STAR BEE
+-->
+		<description>GAMEPK2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="gamepk2.2d" size="327680" crc="68d4493c" sha1="7e163be4b494d3ba16744a5f884f94ed42bbc849" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jodanpk1">
+<!-- From JODANPK1.txt:
+・戦闘伝説エルフ                 COSMOS
+・YELLOW CAB                     dB-SOFT
+・ロマンシア  (Normal版)         Falcom
+・ロマンシア  (X1turbo版)        Falcom
+・ロマンシア  (FM音源版)         Falcom
+-->
+		<description>JODANPK1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="jodanpk1.d88" size="348848" crc="4eaf4e99" sha1="1ce7bd45b9857bcee792884d97fcc490ab6cdda5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbm">
+		<description>Micro BASIC Magazine - Program-shuu</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type FILES to list the disk content"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="x1-basic.2d" size="327680" crc="f509de90" sha1="d71af4c1639143b5f5c56b0bfb62a8982c0cbb5b" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game1.2d" size="327680" crc="a4bf39a2" sha1="52950278b7e419a31affeae73a04078b9ab67471" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game2.2d" size="327680" crc="a371f382" sha1="711d9cd9f6cffd32eb61e9ae655a2c2992d3b5cd" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="game3.2d" size="327680" crc="eeb78b37" sha1="4302dcc2d8cd7e79c79121e4003d272abebc3acc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uedabgm1">
+		<description>Junichi Ueda BGM Collection Vol.1 for X1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="422160">
+				<rom name="bgmx1v1.d88" size="422160" crc="3769cff2" sha1="12bf9219340eeacf3088c342e6a2be2a194fdbeb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uedabgm2">
+		<description>Junichi Ueda BGM Collection Vol.2 for X1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="422160">
+				<rom name="bgmx1v2.d88" size="422160" crc="150d1d60" sha1="ab835259ba6ec3bcfc6cb6cdc7a67b66d3bb4cc6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
