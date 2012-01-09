@@ -1257,6 +1257,7 @@ static int upd765_sector_count_complete(device_t *device)
 			} else {
 				if (fdc->side==1)
 					return 2;
+				return 1; // do not advance to next cylinder
 			}
 		}
 
