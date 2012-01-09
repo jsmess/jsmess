@@ -100,9 +100,9 @@ Notes:
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
     - Winchester (Tandon TM501/CMI CM-5412 10MB drive on Xebec S1410 controller)
 
-		chdman -createblankhd tm501.chd 306 2 32 256
+        chdman -createblankhd tm501.chd 306 2 32 256
         chdman -createblankhd cm5412.chd 306 4 17 512
-	
+
 */
 
 #include "includes/v1050.h"
@@ -358,7 +358,7 @@ READ8_MEMBER( v1050_state::sasi_status_r )
         6
         7
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -400,23 +400,23 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
         6
         7       RST
 
-	*/
+    */
 
 	scsi_sel_w(m_sasibus, !BIT(data, 0));
-	
+
 	if (BIT(data, 1))
 	{
 		// send acknowledge pulse
 		scsi_ack_w(m_sasibus, 0);
-		
+
 		m_timer_ack->adjust(attotime::from_nsec(100));
 	}
-	
+
 	if (BIT(data, 7))
 	{
 		// send reset pulse
 		scsi_rst_w(m_sasibus, 0);
-		
+
 		m_timer_rst->adjust(attotime::from_nsec(100));
 	}
 }
@@ -673,7 +673,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
         PA6     f_motor_on* floppy motor
         PA7     f_dden*     double density select
 
-	*/
+    */
 
 	int f_motor_on = !BIT(data, 6);
 
@@ -716,7 +716,7 @@ static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
         PC6
         PC7
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -741,7 +741,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
         PC6
         PC7
 
-	*/
+    */
 
 	// printer strobe
 	centronics_strobe_w(m_centronics, BIT(data, 0));
@@ -803,7 +803,7 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
         PB6                 expansion B
         PB7                 expansion A
 
-	*/
+    */
 
 	m_int_mask = data;
 }
@@ -823,7 +823,7 @@ READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
         PC6
         PC7
 
-	*/
+    */
 
 	return m_rtc->busy_r() << 3;
 }
@@ -843,7 +843,7 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
         PC6                 clock data read
         PC7                 clock device select
 
-	*/
+    */
 
 	m_rtc->address_write_w(BIT(data, 4));
 	m_rtc->write_w(BIT(data, 5));
@@ -1116,13 +1116,13 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(v1050_floppy_interface)
 	MCFG_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
 	MCFG_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
-	
+
 	// SASI bus
     MCFG_SCSIBUS_ADD(SASIBUS_TAG, sasi_intf)
 	MCFG_TIMER_ADD(TIMER_ACK_TAG, sasi_ack_tick)
 	MCFG_TIMER_ADD(TIMER_RST_TAG, sasi_rst_tick)
 	MCFG_HARDDISK_ADD("harddisk0")
-	
+
 	// keyboard
 	MCFG_V1050_KEYBOARD_ADD()
 

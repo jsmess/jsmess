@@ -83,11 +83,11 @@ void i8279_device::device_start()
 	m_in_shift_func.resolve(m_in_shift_cb, *this);
 	m_in_ctrl_func.resolve(m_in_ctrl_cb, *this);
 	m_clock = clock();
-//	m_p_ram = machine().region("i8279")->base();
-//	m_ctrls = m_p_ram + 0x10;
-//	m_d_ram = m_p_ram + 0x20;
-//	m_s_ram = m_p_ram + 0x40;
-//	m_fifo = m_p_ram + 0x60;
+//  m_p_ram = machine().region("i8279")->base();
+//  m_ctrls = m_p_ram + 0x10;
+//  m_d_ram = m_p_ram + 0x20;
+//  m_s_ram = m_p_ram + 0x40;
+//  m_fifo = m_p_ram + 0x60;
 	m_timer = machine().scheduler().timer_alloc(FUNC(timerproc_callback), (void *)this);
 }
 

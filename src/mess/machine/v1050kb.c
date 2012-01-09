@@ -274,7 +274,7 @@ void v1050_keyboard_device::device_reset()
 
 
 //-------------------------------------------------
-//  si_w - 
+//  si_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( v1050_keyboard_device::si_w )
@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER( v1050_keyboard_device::si_w )
 
 
 //-------------------------------------------------
-//  so_r - 
+//  so_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( v1050_keyboard_device::so_r )
@@ -294,13 +294,13 @@ READ_LINE_MEMBER( v1050_keyboard_device::so_r )
 
 
 //-------------------------------------------------
-//  kb_p1_r - 
+//  kb_p1_r -
 //-------------------------------------------------
 
 READ8_MEMBER( v1050_keyboard_device::kb_p1_r )
 {
 	UINT8 data = 0xff;
-	
+
 	switch (m_y)
 	{
 		case 0: data &= input_port_read(this, "X0"); break;
@@ -316,7 +316,7 @@ READ8_MEMBER( v1050_keyboard_device::kb_p1_r )
 		case 0xa: data &= input_port_read(this, "XA"); break;
 		case 0xb: data &= input_port_read(this, "XB"); break;
 	}
-	
+
 	return data;
 }
 
@@ -341,16 +341,16 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 
         bit     description
 
-        P20		Z8 A8 (8039 external ROM)
-        P21		Z8 A9
-        P22		Z8 A10
+        P20     Z8 A8 (8039 external ROM)
+        P21     Z8 A9
+        P22     Z8 A10
         P23
         P24
         P25     led output
         P26     speaker (NE555) output
         P27     serial output
 
-	*/
+    */
 
 	// led output
 	output_set_led_value(0, BIT(data, 5));

@@ -1,11 +1,11 @@
 /***************************************************************************
- 
+
   macpci.c: second-generation Old World PowerMacs based on PCI instead of NuBus
- 
+
   Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
- 
+
   Pippin:
- 
+
   Apple ASICs identified:
   -----------------------
   343S1125    Grand Central (SWIM III, Sound, VIA)
@@ -18,7 +18,7 @@
   Z8530 SCC
   CS4217 audio DAC
   Bt856 video DAC
- 
+
   Pippin-type map
   F3000000 : Grand Central DMA/IRQ controller
   F3012000 : SCC
@@ -27,11 +27,11 @@
   F3015000 : SWIM III
   F3016000 : VIA1
   F3018000 : SCSI (53C96)
- 
+
   NOTE: the PowerPC starts off disabled; the Cuda 68HC05 starts it up once it's booted.
- 
-  NOTE 2: goes off into the weeds in the subroutine at fff05010 
- 
+
+  NOTE 2: goes off into the weeds in the subroutine at fff05010
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START(pippin_mem, AS_PROGRAM, 64, macpci_state)
 
 	AM_RANGE(0xf00dfff8, 0xf00dffff) AM_READ(unk2_r)
 	AM_RANGE(0xf3008800, 0xf3008807) AM_READ(unk1_r)
-                                                                          
+
 	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, U64(0xffffffffffffffff))
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom",0)
@@ -138,7 +138,7 @@ static MACHINE_CONFIG_START( pippin, macpci_state )
 	MCFG_RAM_DEFAULT_SIZE("32M")
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, pcimac_via6522_intf)
-//	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+//  MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
     MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END

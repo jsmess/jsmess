@@ -1,5 +1,5 @@
 
-/*  
+/*
 
 RM 380Z machine
 
@@ -21,7 +21,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 	case 0x00:		// PORT0
 		//printf("write of [%x] to FBFC\n",data);
 		m_port0 = data;
-		if (data&0x01) 
+		if (data&0x01)
 		{
 			//printf("WARNING: bit0 of port0 reset\n");
 			m_port0_kbd=0;
@@ -59,7 +59,7 @@ READ8_MEMBER( rm380z_state::port_read )
 		//m_port0_kbd=0;
 		//printf("read of port0 (kbd) at [%f] from PC [%x]\n",machine().time().as_double(),cpu_get_pc(machine().device("maincpu")));
 		break;
- 
+
 	case 0x01:		// "counter" (?)
 		//printf("%s: Read from counter FBFD\n", machine().describe_context());
 		data = 0x00;
@@ -82,7 +82,7 @@ READ8_MEMBER( rm380z_state::port_read )
 
 //
 // this simulates line+frame blanking
-// according to the System manual, "frame blanking bit (bit 6) of port1 becomes high 
+// according to the System manual, "frame blanking bit (bit 6) of port1 becomes high
 // for about 4.5 milliseconds every 20 milliseconds"
 //
 
@@ -91,16 +91,16 @@ static TIMER_CALLBACK(static_vblank_timer)
 	//printf("timer callback called at [%f]\n",machine.time().as_double());
 
 	rm380z_state *state = machine.driver_data<rm380z_state>();
-	
-	state->m_rasterlineCtr++; 
+
+	state->m_rasterlineCtr++;
 	state->m_rasterlineCtr%=(100*LINE_SUBDIVISION);
-	
+
 	if (state->m_rasterlineCtr>=((100-22)*LINE_SUBDIVISION))
 	{
 		// frame blanking
 		state->m_port1=0x41;
 	}
-	else 
+	else
 	{
 		state->m_port1=0x00;
 	}
@@ -121,129 +121,129 @@ static TIMER_CALLBACK(static_vblank_timer)
 /*
 WRITE8_MEMBER( rm380z_state::rm380z_io_w )
 {
-	UINT8 portnum=offset&0xff;
-	device_t *fdc = machine().device("wd1771");
-	
-	//printf("port write of [%x] at [%x] from PC [%x]\n",data,portnum,cpu_get_pc(machine().device("maincpu")));
-	
-	if (portnum==0xc0)
-	{
-		wd17xx_command_w(fdc, 0, data);
-		//printf("wrote command [%x] to floppy disk\n",data);
-	}
-	else if (portnum==0xc1)
-	{
-		wd17xx_track_w(fdc, 0, data);
-		//printf("wrote track data [%x] to floppy disk\n",data);
-	}
-	else if (portnum==0xc2)
-	{
-		wd17xx_sector_w(fdc, 0, data);
-		//printf("wrote sector data [%x] to floppy disk\n",data);
-	}
-	else if (portnum==0xc3)
-	{
-		wd17xx_data_w(fdc, 0, data);
-		//printf("wrote data [%x] to floppy disk\n",data);
-	}
-	else if (portnum==0xc4)
-	{
-		//printf("disk drive port0 write [%x]\n",data);
-		
-		// drive port0
-		if (data&0x01)
-		{
-			// drive select bit 0
-			wd17xx_set_drive(fdc,0);
-		}
-		
-		if (data&0x08)
-		{
-			// motor on
-		}
-		
-		// "MSEL (dir/side select bit)
-		if (data&0x20)
-		{
-			wd17xx_set_side(fdc,1);
-		}
-		else
-		{
-			wd17xx_set_side(fdc,0);
-		}
-		
-		// set drive en- (?)
-		if (data&0x40)
-		{
-		}
-	}
+    UINT8 portnum=offset&0xff;
+    device_t *fdc = machine().device("wd1771");
+
+    //printf("port write of [%x] at [%x] from PC [%x]\n",data,portnum,cpu_get_pc(machine().device("maincpu")));
+
+    if (portnum==0xc0)
+    {
+        wd17xx_command_w(fdc, 0, data);
+        //printf("wrote command [%x] to floppy disk\n",data);
+    }
+    else if (portnum==0xc1)
+    {
+        wd17xx_track_w(fdc, 0, data);
+        //printf("wrote track data [%x] to floppy disk\n",data);
+    }
+    else if (portnum==0xc2)
+    {
+        wd17xx_sector_w(fdc, 0, data);
+        //printf("wrote sector data [%x] to floppy disk\n",data);
+    }
+    else if (portnum==0xc3)
+    {
+        wd17xx_data_w(fdc, 0, data);
+        //printf("wrote data [%x] to floppy disk\n",data);
+    }
+    else if (portnum==0xc4)
+    {
+        //printf("disk drive port0 write [%x]\n",data);
+
+        // drive port0
+        if (data&0x01)
+        {
+            // drive select bit 0
+            wd17xx_set_drive(fdc,0);
+        }
+
+        if (data&0x08)
+        {
+            // motor on
+        }
+
+        // "MSEL (dir/side select bit)
+        if (data&0x20)
+        {
+            wd17xx_set_side(fdc,1);
+        }
+        else
+        {
+            wd17xx_set_side(fdc,0);
+        }
+
+        // set drive en- (?)
+        if (data&0x40)
+        {
+        }
+    }
 }
 
 READ8_MEMBER( rm380z_state::rm380z_io_r )
 {
-	UINT8 retval=0;
-	UINT8 portnum=offset&0xff;
-	device_t *fdc = machine().device("wd1771");
+    UINT8 retval=0;
+    UINT8 portnum=offset&0xff;
+    device_t *fdc = machine().device("wd1771");
 
-	//printf("port read at [%x] from PC [%x]\n",portnum,cpu_get_pc(machine().device("maincpu")));
+    //printf("port read at [%x] from PC [%x]\n",portnum,cpu_get_pc(machine().device("maincpu")));
 
-	if (portnum==0xc0)
-	{
-		retval=wd17xx_status_r(fdc,0);
-		//printf("disk drive status read is [%x]\n",retval);
-	}
-	else if (portnum==0xc1)
-	{
-		retval=wd17xx_track_r(fdc, 0);
-		//printf("disk drive track read is [%x]\n",retval);
-	}
-	else if (portnum==0xc2)
-	{
-		retval=wd17xx_sector_r(fdc, 0);
-		//printf("disk drive sector read is [%x]\n",retval);
-	}
-	else if (portnum==0xc3)
-	{
-		retval=wd17xx_data_r(fdc, 0);
-		//printf("disk drive data read [%x] at PC [%x]\n",retval,cpu_get_pc(machine().device("maincpu")));
-	}
-	else if (portnum==0xc9)
-	{
-		return 0x01;
-	}
-	else if (portnum==0xcc)
-	{
-		// CTC (?)
-		return 0x00;
-	}
-	else 
-	{
-		printf("Unknown system port read [%x] PC [%x]\n",portnum,cpu_get_pc(machine().device("maincpu")));
-		return 0x00;
-	}
+    if (portnum==0xc0)
+    {
+        retval=wd17xx_status_r(fdc,0);
+        //printf("disk drive status read is [%x]\n",retval);
+    }
+    else if (portnum==0xc1)
+    {
+        retval=wd17xx_track_r(fdc, 0);
+        //printf("disk drive track read is [%x]\n",retval);
+    }
+    else if (portnum==0xc2)
+    {
+        retval=wd17xx_sector_r(fdc, 0);
+        //printf("disk drive sector read is [%x]\n",retval);
+    }
+    else if (portnum==0xc3)
+    {
+        retval=wd17xx_data_r(fdc, 0);
+        //printf("disk drive data read [%x] at PC [%x]\n",retval,cpu_get_pc(machine().device("maincpu")));
+    }
+    else if (portnum==0xc9)
+    {
+        return 0x01;
+    }
+    else if (portnum==0xcc)
+    {
+        // CTC (?)
+        return 0x00;
+    }
+    else
+    {
+        printf("Unknown system port read [%x] PC [%x]\n",portnum,cpu_get_pc(machine().device("maincpu")));
+        return 0x00;
+    }
 
-	return retval;
+    return retval;
 }
 */
 
 WRITE8_MEMBER( rm380z_state::disk_0_control )
 {
 	device_t *fdc = machine().device("wd1771");
-	
+
 	printf("disk drive port0 write [%x]\n",data);
-	
+
 	// drive port0
 	if (data&0x01)
 	{
 		// drive select bit 0
 		wd17xx_set_drive(fdc,0);
 	}
-	
+
 	if (data&0x08)
 	{
 		// motor on
 	}
-	
+
 	// "MSEL (dir/side select bit)
 	if (data&0x20)
 	{
@@ -253,7 +253,7 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 	{
 		wd17xx_set_side(fdc,0);
 	}
-	
+
 	// set drive en- (?)
 	if (data&0x40)
 	{
@@ -273,18 +273,18 @@ void rm380z_state::machine_reset()
 	m_fbfd=0x00;
 	m_fbfe=0x00;
 	m_old_fbfd=0x00;
-	
+
 	m_rasterlineCtr=0;
 
-	memset(m_mainVideoram,0,0x600);	
+	memset(m_mainVideoram,0,0x600);
 	memset(m_vramattribs,0,0x600);
 	memset(m_vramchars,0,0x600);
 	memset(m_vram,0,0x600);
-	
+
 	config_memory_map();
 
 	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), FUNC(static_vblank_timer));
-		
+
 	wd17xx_reset(machine().device("wd1771"));
 }
 

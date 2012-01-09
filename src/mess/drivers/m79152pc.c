@@ -1,8 +1,8 @@
 /***************************************************************************
-   
+
         Mera-Elzab 79152pc
-		
-		This is terminal
+
+        This is terminal
 
         29/12/2011 Skeleton driver.
 
@@ -35,8 +35,8 @@ INPUT_PORTS_START( m79152pc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(m79152pc) 
-{	
+static MACHINE_RESET(m79152pc)
+{
 }
 
 static VIDEO_START( m79152pc )
@@ -52,10 +52,10 @@ static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MCFG_CPU_PROGRAM_MAP(m79152pc_mem)
-    MCFG_CPU_IO_MAP(m79152pc_io)	
+    MCFG_CPU_IO_MAP(m79152pc_io)
 
     MCFG_MACHINE_RESET(m79152pc)
-	
+
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
@@ -64,11 +64,11 @@ static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE(m79152pc)
-	
+
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(m79152pc)    
+    MCFG_VIDEO_START(m79152pc)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -83,5 +83,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( ????, m79152pc,  0,       0, 	m79152pc, 	m79152pc, 	 0,   "Mera-Elzab",   "79152pc",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, m79152pc,  0,       0,	m79152pc,	m79152pc,	 0,   "Mera-Elzab",   "79152pc",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -396,7 +396,7 @@ READ8_MEMBER( victor9k_state::via2_pa_r )
     */
 
 	UINT8 data = 0;
-	
+
 	// keyboard data
 	data |= m_kb->kbdata_r() << 6;
 
@@ -443,7 +443,7 @@ WRITE8_MEMBER( victor9k_state::via2_pb_w )
 
 	// keyboard acknowledge
 	m_kb->kback_w(BIT(data, 1));
-	
+
 	// brightness
 	m_brt = (data >> 2) & 0x07;
 
@@ -879,7 +879,7 @@ static const via6522_interface via6_intf =
 WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 {
 	m_via2->write_cb1(state);
-	
+
 	pic8259_ir6_w(m_pic, state ? CLEAR_LINE : ASSERT_LINE);
 }
 

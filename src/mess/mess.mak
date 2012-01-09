@@ -1665,7 +1665,7 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_DRIVERS)/trs80m2.o	\
 	$(MESS_DRIVERS)/tandy2k.o	\
 	$(MESS_MACHINE)/tandy2kb.o	\
-	
+
 $(MESSOBJ)/unisys.a:			\
 	$(MESS_DRIVERS)/univac.o	\
 

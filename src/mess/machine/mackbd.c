@@ -4,9 +4,9 @@
 
     Port definitions from "IM Underground Volume 1"
     http://bitsavers.org/pdf/apple/mac/IM_Underground_Vol_1_1985.pdf
- 
+
     Key matrix for keyboard:
- 
+
     Cols  0   1   2   3   4   5   6   7   8    Rows
           G   B   T   5   0   P   ;   .  n/a     0
           H  n/a  Y   6   8   I   K   M  Enter   1
@@ -14,7 +14,7 @@
           D   C   E   3   7   U   J   /   `      3
           S   X   W   2   9   O   L   ,  Space   4
           A   Z   Q   1   =   ]  Ret  \  Tab     5
- 
+
     Port 0:
 
     x-------  Clock to Mac
@@ -40,9 +40,9 @@
     Port 2:
     x---      Command/Apple
     -x--      Shift
-    --x-      Column 0   
+    --x-      Column 0
     ---x      Data to Mac
- 
+
     The T1 line is "Option".
 */
 
@@ -75,7 +75,7 @@ ROM_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mackbd_map, AS_PROGRAM, 8, mackbd_device )
-//	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(MACKBD_CPU_TAG, 0)
+//  AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(MACKBD_CPU_TAG, 0)
 ADDRESS_MAP_END
 
 //-------------------------------------------------

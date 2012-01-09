@@ -5,7 +5,7 @@
     PCI-based Power Macintosh hardware
 
     R. Belmont
- 
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -51,7 +51,7 @@ static void mac_via_irq(device_t *device, int state)
 
 static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
-//	macpci_state *mac = device->machine().driver_data<macpci_state>();
+//  macpci_state *mac = device->machine().driver_data<macpci_state>();
 
 //    printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(mac->m_maincpu));
 
@@ -72,7 +72,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
-//	macpci_state *mac = device->machine().driver_data<macpci_state>();
+//  macpci_state *mac = device->machine().driver_data<macpci_state>();
 
 //    printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(mac->m_maincpu));
 }
@@ -252,5 +252,5 @@ WRITE_LINE_MEMBER(macpci_state::drq_539x_1_w)
 
 static TIMER_CALLBACK(mac_6015_tick)
 {
-//	macpci_state *mac = machine.driver_data<macpci_state>();
+//  macpci_state *mac = machine.driver_data<macpci_state>();
 }

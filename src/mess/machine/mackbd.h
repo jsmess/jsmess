@@ -50,7 +50,7 @@ protected:
 
 private:
 
-//	devcb_resolved_write_line	m_out_reset_func;
+//  devcb_resolved_write_line   m_out_reset_func;
 };
 
 // device type definition

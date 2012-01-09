@@ -548,7 +548,7 @@ static void scsibus_exec_command(device_t *device)
             bus->data_last=bus->xfer_count;
             bus->bytes_left=0;
 			SCSISetPhase(bus->devices[bus->last_id],SCSI_PHASE_STATUS);
-			break;	
+			break;
 	}
 
 
@@ -956,7 +956,7 @@ void init_scsibus(device_t *device, int sectorbytes)
 
         bus->initialised=1;
     }
-	
+
 	bus->sectorbytes = sectorbytes;
 }
 

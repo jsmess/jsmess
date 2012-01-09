@@ -6,7 +6,7 @@
 
     TODO:
     - keyboard shift key is ugly mapped.
-	- keyboard is actually tied to crtc hsync timer
+    - keyboard is actually tied to crtc hsync timer
     - understand how to load a tape
     - some NEWON commands now makes the keyboard to not work anymore (it does if you
       soft reset)
@@ -146,7 +146,7 @@ static SCREEN_UPDATE( bml3 )
 	count = 0x0000;
 
 	width = (state->m_hres_reg & 0x80) ? 80 : 40;
-//	height = (state->m_vres_reg & 0x08) ? 1 : 0;
+//  height = (state->m_vres_reg & 0x08) ? 1 : 0;
 
 //  popmessage("%02x %02x",state->m_hres_reg,state->m_vres_reg);
 
@@ -304,7 +304,7 @@ WRITE8_MEMBER( bml3_state::bml3_fdd_w )
 
 READ8_MEMBER( bml3_state::bml3_kanji_r )
 {
-//	return m_kanji_rom[m_kanji_addr << 1 + offset];
+//  return m_kanji_rom[m_kanji_addr << 1 + offset];
 	return machine().rand();
 }
 
@@ -411,20 +411,20 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
 	AM_RANGE(0xffc9, 0xffc9) AM_READ_PORT("DSW")
 	AM_RANGE(0xffca, 0xffca) AM_READ(bml3_firq_status_r) // timer irq
-//	AM_RANGE(0xffcb, 0xffcb) light pen flag
+//  AM_RANGE(0xffcb, 0xffcb) light pen flag
 	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(bml3_hres_reg_w) // mode select
-//	AM_RANGE(0xffd1, 0xffd1) trace counter
-//	AM_RANGE(0xffd2, 0xffd2) remote switch
+//  AM_RANGE(0xffd1, 0xffd1) trace counter
+//  AM_RANGE(0xffd2, 0xffd2) remote switch
 	AM_RANGE(0xffd3, 0xffd3) AM_READWRITE(bml3_beep_r,bml3_beep_w) // music select
 	AM_RANGE(0xffd4, 0xffd4) AM_WRITE(bml3_firq_mask_w)
-//	AM_RANGE(0xffd5, 0xffd5) light pen
+//  AM_RANGE(0xffd5, 0xffd5) light pen
 	AM_RANGE(0xffd6, 0xffd6) AM_WRITE(bml3_vres_reg_w) // interlace select
-//	AM_RANGE(0xffd7, 0xffd7) baud select
+//  AM_RANGE(0xffd7, 0xffd7) baud select
 	AM_RANGE(0xffd8, 0xffd8) AM_READWRITE(bml3_vram_attr_r,bml3_vram_attr_w) // attribute register
 	AM_RANGE(0xffe0, 0xffe0) AM_READ(bml3_keyboard_r) // keyboard mode register
-//	AM_RANGE(0xffe8, 0xffe8) bank register
-//	AM_RANGE(0xffe9, 0xffe9) IG mode register
-//	AM_RANGE(0xffea, 0xffea) IG enable register
+//  AM_RANGE(0xffe8, 0xffe8) bank register
+//  AM_RANGE(0xffe9, 0xffe9) IG mode register
+//  AM_RANGE(0xffea, 0xffea) IG enable register
 	AM_RANGE(0xa000, 0xfeff) AM_ROM AM_REGION("maincpu", 0xa000)
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xfff0)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(bml3_a000_w)
@@ -713,18 +713,18 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 {
 	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
 	/* ROM banking:
-	-0-- --0- 0xa000 - 0xbfff ROM R RAM W
-	-1-- --0- 0xa000 - 0xbfff RAM R/W
-	-x-- --1- 0xa000 - 0xbfff no change
-	0--- -0-- 0xc000 - 0xdfff ROM R RAM W
-	1--- -0-- 0xc000 - 0xdfff RAM R/W
-	x--- -1-- 0xc000 - 0xdfff no change
-	0--- 0--- 0xe000 - 0xefff ROM R RAM W
-	1--- 0--- 0xe000 - 0xefff RAM R/W
-	x--- 1--- 0xe000 - 0xefff no change
-	---- ---x 0xf000 - 0xfeff (0) ROM R RAM W (1) RAM R/W
-	---- --x- 0xfff0 - 0xffff (0) ROM R RAM W (1) RAM R/W
-	*/
+    -0-- --0- 0xa000 - 0xbfff ROM R RAM W
+    -1-- --0- 0xa000 - 0xbfff RAM R/W
+    -x-- --1- 0xa000 - 0xbfff no change
+    0--- -0-- 0xc000 - 0xdfff ROM R RAM W
+    1--- -0-- 0xc000 - 0xdfff RAM R/W
+    x--- -1-- 0xc000 - 0xdfff no change
+    0--- 0--- 0xe000 - 0xefff ROM R RAM W
+    1--- 0--- 0xe000 - 0xefff RAM R/W
+    x--- 1--- 0xe000 - 0xefff no change
+    ---- ---x 0xf000 - 0xfeff (0) ROM R RAM W (1) RAM R/W
+    ---- --x- 0xfff0 - 0xffff (0) ROM R RAM W (1) RAM R/W
+    */
 	printf("Check banking PIA A -> %02x\n",data);
 
 	if(!(data & 0x2))
@@ -904,7 +904,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 //  MCFG_CPU_PERIODIC_INT(bml3_firq,45)
 
 	MCFG_MACHINE_START(bml3)
-//	MCFG_MACHINE_RESET(bml3)
+//  MCFG_MACHINE_RESET(bml3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

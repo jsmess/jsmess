@@ -1,9 +1,9 @@
 /***************************************************************************
-   
+
         Mera-Elzab Konin
 
-		It's industrial computer used in Poland
-		
+        It's industrial computer used in Poland
+
         29/12/2011 Skeleton driver.
 
 'maincpu' (0384): unmapped i/o memory write to 00F8 = 56 & FF
@@ -56,8 +56,8 @@ static INPUT_PORTS_START( konin )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(konin) 
-{	
+static MACHINE_RESET(konin)
+{
 }
 
 static VIDEO_START( konin )
@@ -73,10 +73,10 @@ static MACHINE_CONFIG_START( konin, konin_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(konin_mem)
-	MCFG_CPU_IO_MAP(konin_io)	
+	MCFG_CPU_IO_MAP(konin_io)
 
 	MCFG_MACHINE_RESET(konin)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

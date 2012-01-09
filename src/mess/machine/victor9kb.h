@@ -73,12 +73,12 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "victor9kb"; }
-	
+
 private:
 	devcb_resolved_write_line	m_out_kbrdy_func;
 
 	required_device<cpu_device> m_maincpu;
-	
+
 	UINT8 m_y;
 	int m_kbrdy;
 	int m_kbdata;

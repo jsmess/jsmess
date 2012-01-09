@@ -78,7 +78,7 @@ READ8_MEMBER( tandy2k_state::enable_r )
         6
         7       _ACLOW
 
-	*/
+    */
 
 	return 0x80;
 }
@@ -98,7 +98,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
         6       TMRIN0      enable 80186 timer 0
         7       TMRIN1      enable 80186 timer 1
 
-	*/
+    */
 
 	// keyboard enable
 	m_kb->power_w(BIT(data, 0));
@@ -142,7 +142,7 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
         6       DMA channel 2 select
         7       DMA channel 3 select
 
-	*/
+    */
 
 	m_dma_mux = data;
 
@@ -167,7 +167,7 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 		m_kb->busy_w(1);
 		pic8259_ir0_w(m_pic1, CLEAR_LINE);
 	}
-	
+
 	return 0xff;
 }
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
         14      CLKCNT      dots/char (0 = 10 [800x400], 1 = 8 [640x400])
         15      VIDOUTS     selects the video source for display on monochrome monitor
 
-	*/
+    */
 
 	// video access
 	m_vram_base = data & 0x1f;
@@ -479,7 +479,7 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
         6       LPRPAEM         paper empty
         7       LPRBSY          busy
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -531,7 +531,7 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
         6       _LPRACK
         7       _LPRDATSTB
 
-	*/
+    */
 
 	// input select
 	m_pb_sel = (data >> 1) & 0x03;
@@ -645,7 +645,7 @@ WRITE_LINE_MEMBER( tandy2k_state::kbdclk_w )
 		m_kbdin >>= 1;
 		m_kbdin |= m_kb->data_r() << 7;
 	}
-	
+
 	m_kbdclk = state;
 }
 
@@ -656,7 +656,7 @@ WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
 		m_kb->busy_w(m_kbdclk);
 		pic8259_ir0_w(m_pic1, !m_kbdclk);
 	}
-	
+
 	m_kbddat = state;
 }
 

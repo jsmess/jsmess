@@ -13,45 +13,45 @@ MMD-1
  S - puts the number into memory pointed to by HL and then increments HL.
  G - Loads the program counter with the contents of HL
 
-1) There is a 'working byte' which you can enter using the octal digits 
-(just press them in order), and which is displayed on the port 2 LEDs 
-when KEX is running. 
+1) There is a 'working byte' which you can enter using the octal digits
+(just press them in order), and which is displayed on the port 2 LEDs
+when KEX is running.
 
 2) 'R' is a hardware reset
 
-3) 'H' and 'L' are used to load the address (high and low parts, and it 
-really is the HL register of the 8080). So to enter a particular address, 
-you type in the high half (in octal), press H. Then type in the low half 
-and press L. The address is displayed on the port 0 and port 1 LEDs when 
+3) 'H' and 'L' are used to load the address (high and low parts, and it
+really is the HL register of the 8080). So to enter a particular address,
+you type in the high half (in octal), press H. Then type in the low half
+and press L. The address is displayed on the port 0 and port 1 LEDs when
 KEX is running.
 
-4) 'S' is 'Step' or 'Store'. It stores the working byte at the current 
-address (in HL), and then increments the address. It's used to enter 
+4) 'S' is 'Step' or 'Store'. It stores the working byte at the current
+address (in HL), and then increments the address. It's used to enter
 bytes into memory
 
-5) 'G' is 'go'. It loads the 8080 PC with the address in HL, and thus 
+5) 'G' is 'go'. It loads the 8080 PC with the address in HL, and thus
 executes a program at that address.
 
 OK, this is what I would try.
 
 1) Press 'R' to reset the 8080 and start KEX running.
 
-2) Type 004 H 000 L  to load the start address of your program. The bytes 
-should appear on the rightmost 8 LEDs as you enter them and should then 
+2) Type 004 H 000 L  to load the start address of your program. The bytes
+should appear on the rightmost 8 LEDs as you enter them and should then
 also appear on the left and middle sets of LEDs when you press H and L.
 
-3) Enter the program 
+3) Enter the program
 
-076 S 123 S 323 S 000 S 166S 
+076 S 123 S 323 S 000 S 166S
 
-As you type each byte it should appear on the rightmost LEDs. When you 
+As you type each byte it should appear on the rightmost LEDs. When you
 press S, the address on the rest of the LEDs should increment by 1.
 
 4) Re-enter the start address
 004 H 000 L
 
-5) Press G to run the program. The left most LEDs should change to 
-.*.*..** (. = off, * = on), I think. The keys will then do nothing (as 
+5) Press G to run the program. The left most LEDs should change to
+.*.*..** (. = off, * = on), I think. The keys will then do nothing (as
 the CPU is halted) until you press R again to re-run KEX.
 
 When is keyboard LINE3 scanned? it isn't - it's a reset button.
@@ -64,7 +64,7 @@ Memory map:
 
     * 4K RAM addresses $0000..$0FFF
     * ROM addresses $D800..$E7FF
-    * 256 bytes of RAM, ($FC00..$FCFF?) 
+    * 256 bytes of RAM, ($FC00..$FCFF?)
 
 DIP switches:
 
@@ -76,7 +76,7 @@ DIP switches:
     * HEX OCT - choose display and entry to be in Hexadecimal or Octal
     * PUP RESET - ???
     * EXEC USER - update binary LED's with data entry? Or not?
-      (in either setting, outputs to ports 0,1,2 still show) 
+      (in either setting, outputs to ports 0,1,2 still show)
 
 Operation:
 
@@ -85,7 +85,7 @@ Operation:
     * ... LSByte ... "LOW"
     * Change contents of memory at the selected address by entering the new value & pressing "STORE".
     * Look at adjacent memory locations with "NEXT" and "PREV".
-    * Execute the program at the selected address by pressing "GO". 
+    * Execute the program at the selected address by pressing "GO".
 
 AUX functions:
 
@@ -100,7 +100,7 @@ AUX functions:
     * DUP TST ON - test if PROM duplicated okay
     * PROM 2708/2716
     * MEM MAP RAM/ROM
-    * BAUD 110/150/300/600/1200 
+    * BAUD 110/150/300/600/1200
 
 The memory map can be rearranged by the system by using IN5, IN6, IN7.
 A pair of undumped proms control what goes where on each map.

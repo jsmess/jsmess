@@ -51,7 +51,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 	DECLARE_READ_LINE_MEMBER( so_r );
-	
+
 	// not really public
 	DECLARE_READ8_MEMBER( kb_p1_r );
 	DECLARE_WRITE8_MEMBER( kb_p1_w );
@@ -62,7 +62,7 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "v1050kb"; }
-	
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_discrete;

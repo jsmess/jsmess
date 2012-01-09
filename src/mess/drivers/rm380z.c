@@ -39,7 +39,7 @@ PAGE SEL bit in PORT0 set to 1:
   FC00-FFFF - RAM
 
 40x24 - 6 pixels wide (5 + spacing), 9 pixels high = 240x216
-Video input clock is 4MHz (8MHz/2) 
+Video input clock is 4MHz (8MHz/2)
 
 According to the manuals, VDU-1 chargen is Texas 74LS262.
 
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_status_r, wd17xx_command_w)
 	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_data_r, wd17xx_data_w)	
+	AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_data_r, wd17xx_data_w)
 	AM_RANGE(0xc4, 0xc4) AM_WRITE(disk_0_control)
 	AM_RANGE(0xcc, 0xcc) AM_NOP // CTC (?)
 ADDRESS_MAP_END
@@ -141,7 +141,7 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	/* floppy disk */
 	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, rm380z_floppy_interface)
-	
+
 	/* keyboard */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 

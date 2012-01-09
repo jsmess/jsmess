@@ -177,7 +177,7 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 					// if PRAM's waiting to be loaded, transfer it now
 					if (!pram_loaded)
 					{
-//						memcpy(pram, disk_pram, 0x100);
+//                      memcpy(pram, disk_pram, 0x100);
 						pram_loaded = true;
 					}
 				}
