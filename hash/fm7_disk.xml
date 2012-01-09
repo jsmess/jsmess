@@ -219,7 +219,7 @@ Titles, serial #s, publishers and release dates taken from:
 				<rom name="darkcr1a.d77" size="348848" crc="7e584eb4" sha1="da059adce55e6640c669075a28c09aa14f79e45e" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="darkcr1b.d77" size="348848" crc="5deeaabc" sha1="70fed569a6dbe0ac2a2f60b885bc4e51861519b9" offset="0" />
 			</dataarea>
@@ -1254,6 +1254,105 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="takeout1">
+		<description>Takeout 1</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Marionet" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409904">
+				<rom name="takeout1.d88" size="409904" crc="dcc33d7e" sha1="578c3fe929ca94a87c109be66f634ddbb244c2a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takeout2">
+		<description>Takeout 2</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Marionet" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409904">
+				<rom name="takeout2.d88" size="409904" crc="5c798e9c" sha1="3b6c4d6645e6557537b73b95f11915670a6c5b74" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takeout3">
+		<description>Takeout 3</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Marionet" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409904">
+				<rom name="takeout3.d88" size="409904" crc="5109091a" sha1="6ae61781c168e3f6f8aead292ba663395829e84b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takeout4">
+		<description>Takeout 4</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Marionet" />
+		<!--combined image-->
+		<!--rom name="takeout4.d88" size="697696" crc="c46552ed" sha1="94820c4fe7c9be0124195b4d0836e7e7b7e1ead5" offset="0" /-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="takeout4_01.d88" size="348848" crc="0f4ee05d" sha1="d48b907e282c16fa91964e8bff77fc1e959a2fd1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="takeout4_02.d88" size="348848" crc="8cd57727" sha1="ff1289de520a49a780fe196964252c22f6d7c891" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takeout5">
+		<description>Takeout 5</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Marionet" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="takeout5.d88" size="348848" crc="aa9ea632" sha1="02d783cbc9bdf1f234673b220da44691af76405e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takeout6">
+		<description>Takeout 6</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Marionet" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="takeout6.d88" size="348848" crc="c52c9706" sha1="0776e645edb7bb6b516ceb33753e7122624cc788" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takeout7">
+		<description>Takeout 7</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Marionet" />
+		<!--combined image-->
+		<!--rom name="takeout7.d88" size="697696" crc="81c0ce67" sha1="3e16a8099bc059a6682597e81d658c968b25c953" offset="0" /-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="takeout7_01.d88" size="348848" crc="328901c2" sha1="595674f755319f388d128a85b49c337b234f97f2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="takeout7_02.d88" size="348848" crc="d983679c" sha1="27d43fccd7ae07f9f821c3f161e3c04b2ef8499e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Misc -->
 
 	<software name="fbasic">
@@ -1310,6 +1409,11 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 <!-- To Sort -->
+<!--
+These (game) packs shall be eventually removed when the original disks get dumped,
+but given the difficulty to find dumpers and/or friendly collectors for these old
+systems, for the moment they stay here!
+-->
 
 	<software name="5in1">
 <!-- From the readme 5in1.txt (it's not explained how to launch the 5th game...):

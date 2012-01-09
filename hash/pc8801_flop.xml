@@ -24176,7 +24176,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		<!--rom name="oji binbin monogatari(a).d88" size="697680" crc="0e1b4c3b" sha1="b253fc86e05ca21c4fb078259cc5abb070aa274a" offset="0" /-->
 
 		<!-- Disk 1 is same as Alt 2 -->
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="oji binbin monogatari(a)_02.d88" size="348848" crc="c9204e68" sha1="09f1191c869382068945a414cb3cc8795ac7c7fd" offset="0" />
 			</dataarea>
@@ -32003,7 +32003,7 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="437488">
 				<rom name="suiryushi (a) (disk 2).d88" size="437488" crc="c014c7a0" sha1="1a8d2ebf79b2f5df308406ce4ad695a1733edfbb" offset="0" />
@@ -36738,6 +36738,7 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		<!--combined image-->
 		<!--rom name="wiz1a.d88" size="697696" crc="c13bb4d0" sha1="7053b96ec0ecfa1713683c33c6d5ca0b0dee0962" offset="0" /-->
 
+		<!-- Same data of the other disk, diff d88 header -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Duplicate Disk" />
 			<dataarea name="flop" size="348848">
@@ -36763,6 +36764,7 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		<!--combined image-->
 		<!--rom name="wiz2a.d88" size="697696" crc="abd0303a" sha1="85a7452abf914d88c8b83204b18fcd55ea076274" offset="0" /-->
 
+		<!-- Same data of the other disk, diff d88 header -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Duplicate Disk" />
 			<dataarea name="flop" size="348848">
@@ -45076,6 +45078,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		<description>Gokan Anime MKII</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="強姦アニメmkⅡ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gokan anime mkii.d88" size="348848" crc="e98d6527" sha1="70e828f0209db75a393f27d03fa8964553a7b1aa" offset="0" />
@@ -50851,6 +50854,11 @@ ExtractDisk  [02]"sos sword	   " -> "s-os sword_02.d88"
 
 
 <!-- GAME PACKS AND MUSIC PACKS -->
+<!-- 
+These (game) packs shall be eventually removed when the original disks get dumped,
+but given the difficulty to find dumpers and/or friendly collectors for these old 
+systems, for the moment they stay here!
+-->
 
 <!--
 ExtractDisk  [01]"DISK_A		  " -> "game music library_01.d88"
