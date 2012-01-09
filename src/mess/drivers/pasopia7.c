@@ -221,7 +221,7 @@ static void draw_cg4_screen(running_machine &machine, bitmap_t &bitmap,const rec
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-					bitmap.pix16(y+yi, x+xi) = machine.pens[color+0x20];
+					bitmap.pix16(y+yi, x+xi) = machine.pens[color];
 				}
 				count+=8;
 			}
