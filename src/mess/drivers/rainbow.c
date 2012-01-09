@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         DEC Rainbow 100
 
         04/01/2012 Skeleton driver.
@@ -15,16 +15,16 @@ class rainbow_state : public driver_device
 {
 public:
 	rainbow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),			
+		: driver_device(mconfig, type, tag),
 			m_crtc(*this, "vt100_video")
 			{ }
 	required_device<device_t> m_crtc;
 	UINT8 *m_p_ram;
 	UINT8 m_diagnostic;
-	
+
 	DECLARE_READ8_MEMBER(read_video_ram_r);
 	DECLARE_WRITE8_MEMBER(clear_video_interrupt);
-	
+
 	DECLARE_READ8_MEMBER(diagnostic_r);
 	DECLARE_WRITE8_MEMBER(diagnostic_w);
 };
@@ -34,19 +34,19 @@ static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xec000, 0xedfff) AM_RAM
-	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_BASE(m_p_ram)	
+	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_BASE(m_p_ram)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)	
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 0x04 Video processor DC011
 	AM_RANGE (0x04, 0x04) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc011_w)
-	
+
 	AM_RANGE (0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
 	// 0x0C Video processor DC012
-	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc012_w)	
+	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc012_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
@@ -64,8 +64,8 @@ INPUT_PORTS_START( rainbow )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(rainbow) 
-{	
+static MACHINE_RESET(rainbow)
+{
 }
 
 static SCREEN_UPDATE( rainbow )
@@ -106,15 +106,15 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",I8088, XTAL_24_0734MHz / 5)
     MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
-    MCFG_CPU_IO_MAP(rainbow8088_io)	
+    MCFG_CPU_IO_MAP(rainbow8088_io)
 
     MCFG_CPU_ADD("subcpu",Z80, XTAL_24_0734MHz / 6)
     MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
     MCFG_CPU_IO_MAP(rainbowz80_io)
-	MCFG_DEVICE_DISABLE()	
+	MCFG_DEVICE_DISABLE()
 
     MCFG_MACHINE_RESET(rainbow)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -134,13 +134,13 @@ MACHINE_CONFIG_END
 ROM_START( rainbow )
     ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "23-022e5-00.bin",  0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
-	ROM_RELOAD(0xf4000,0x4000)	
+	ROM_RELOAD(0xf4000,0x4000)
 	ROM_LOAD( "23-020e5-00.bin", 0xf8000, 0x4000, CRC(8638712f) SHA1(8269b0d95dc6efbe67d500dac3999df4838625d8)) // German, French, English
 	//ROM_LOAD( "23-015e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Dutch, French, English
 	//ROM_LOAD( "23-016e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Finish, Swedish, English
 	//ROM_LOAD( "23-017e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Danish, Norwegian, English
 	//ROM_LOAD( "23-018e5-00.bin", 0xf8000, 0x4000, NO_DUMP) // Spanish, Italian, English
-	ROM_RELOAD(0xfc000,0x4000)	
+	ROM_RELOAD(0xfc000,0x4000)
 	ROM_REGION(0x1000, "chargen", 0)
     ROM_LOAD( "chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
@@ -148,5 +148,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, rainbow,  0,       0, 	rainbow, 	rainbow, 	 0,  "Digital Equipment Corporation",   "Rainbow 100B",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, rainbow,  0,       0,	rainbow,	rainbow,	 0,  "Digital Equipment Corporation",   "Rainbow 100B",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -29,11 +29,11 @@ UINT8 rm380z_state::decode_videoram_char(UINT8 ch1,UINT8 ch2)
 		// blank out ?
 		return 0x80;
 	}
-//	else if (ch1==0x80)
-//	{
-//		// blank out
-//		return 0x20;
-//	}
+//  else if (ch1==0x80)
+//  {
+//      // blank out
+//      return 0x20;
+//  }
 	else if ((ch1==0)&&(ch2==8))
 	{
 		// cursor
@@ -58,7 +58,7 @@ UINT8 rm380z_state::decode_videoram_char(UINT8 ch1,UINT8 ch2)
 	{
 		//printf("unhandled character combination [%x][%x]\n",ch1,ch2);
 	}
-	
+
 	return 0;
 }
 
@@ -69,9 +69,9 @@ UINT8 rm380z_state::decode_videoram_char(UINT8 ch1,UINT8 ch2)
 WRITE8_MEMBER( rm380z_state::videoram_write )
 {
 	rm380z_state *state = machine().driver_data<rm380z_state>();
- 
+
 	//printf("vramw [%x][%x] port0 [%x] fbfd [%x] PC [%x]\n",offset,data,state->m_port0,m_fbfd,cpu_get_pc(machine().device("maincpu")));
-	
+
 	if (m_old_fbfd>m_fbfd)
 	{
 		printf("WARN: fbfd wrapped\n");
@@ -102,7 +102,7 @@ WRITE8_MEMBER( rm380z_state::videoram_write )
 READ8_MEMBER( rm380z_state::videoram_read )
 {
 	rm380z_state *state = machine().driver_data<rm380z_state>();
-	//printf("read from videoram at [%x]\n",offset);	
+	//printf("read from videoram at [%x]\n",offset);
 	//return state->m_vram[offset];
 	return state->m_mainVideoram[offset];
 }
@@ -113,10 +113,10 @@ static void putChar(int charnum,int x,int y,UINT16* pscr,unsigned char* chsb)
 	{
 		int basex=chdimx*(charnum/ncy);
 		int basey=chdimy*(charnum%ncy);
-		
+
 		int inix=x*chdimx;
 		int iniy=y*chdimx*screencols*chdimy;
-		
+
 		for (int r=0;r<chdimy;r++)
 		{
 			for (int c=0;c<chdimx;c++)
@@ -137,7 +137,7 @@ void rm380z_state::update_screen(bitmap_t &bitmap)
 		for (int col=0;col<screencols;col++)
 		{
 			unsigned char curchar=m_vram[(row*64)+col];
-			putChar(curchar,col,row,scrptr,pChar);			
+			putChar(curchar,col,row,scrptr,pChar);
 		}
 	}
 }

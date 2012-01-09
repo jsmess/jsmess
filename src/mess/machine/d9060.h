@@ -12,9 +12,9 @@
 
     D9090: Tandon TM603S
     chdman -createblankhd d9090.chd 153 6 32 256
-	
-	How to format the disk:
-	HEADER "LABEL",D0,I01
+
+    How to format the disk:
+    HEADER "LABEL",D0,I01
 
 **********************************************************************/
 

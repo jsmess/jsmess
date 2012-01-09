@@ -30,10 +30,10 @@ Research Machines RM 380Z
 
 class rm380z_state : public driver_device
 {
-private: 
-	
+private:
+
 	UINT8 decode_videoram_char(UINT8 ch1,UINT8 ch2);
-	
+
 protected:
 	virtual void machine_reset();
 
@@ -59,11 +59,11 @@ public:
 	required_device<ram_device> m_messram;
 	optional_device<device_t> m_fdc;
 
-	rm380z_state(const machine_config &mconfig, device_type type, const char *tag): driver_device(mconfig, type, tag), 
+	rm380z_state(const machine_config &mconfig, device_type type, const char *tag): driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_messram(*this, RAM_TAG),
 		m_fdc(*this, "wd1771")
-	{ 
+	{
 	}
 
 	DECLARE_WRITE8_MEMBER( port_write );
@@ -79,7 +79,7 @@ public:
 	//DECLARE_WRITE8_MEMBER(rm380z_io_w);
 
 	DECLARE_WRITE8_MEMBER(disk_0_control);
-	
+
 	DECLARE_WRITE8_MEMBER( keyboard_put );
 
 	void config_memory_map();

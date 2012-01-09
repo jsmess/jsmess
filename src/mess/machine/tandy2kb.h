@@ -74,7 +74,7 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "tandy2kb"; }
-	
+
 private:
 	devcb_resolved_write_line	m_out_clock_func;
 	devcb_resolved_write_line	m_out_data_func;
@@ -82,7 +82,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	UINT16 m_keylatch;
-	
+
 	int m_clock;
 	int m_data;
 };

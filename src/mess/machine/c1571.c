@@ -73,7 +73,7 @@ void base_c1571_device::device_config_complete()
 	case TYPE_1571CR:
 		m_shortname = "c1571cr";
 		break;
-		
+
 	case TYPE_MINI_CHIEF:
 		m_shortname = "minichif";
 		break;

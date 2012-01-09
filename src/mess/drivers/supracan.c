@@ -693,7 +693,7 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t &bitma
 
 
 						UINT16 data = &srcbitmap.pix16(
-												((cy >> 16) - scroll) & ymask, 
+												((cy >> 16) - scroll) & ymask,
 												(cx >> 16) & xmask)[0];
 
 						if ((data & transmask)!=0)
@@ -706,7 +706,7 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t &bitma
 					{
 						int scroll = 0;//scrollram[(cy>>16)&0x3ff]);
 						UINT16 data =  srcbitmap.pix16(
-											   (cy >> 16) & ymask, 
+											   (cy >> 16) & ymask,
 											   ((cx >> 16) - scroll) & xmask);
 
 

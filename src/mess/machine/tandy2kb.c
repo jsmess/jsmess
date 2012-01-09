@@ -257,7 +257,7 @@ void tandy2k_keyboard_device::device_reset()
 
 
 //-------------------------------------------------
-//  power_w - 
+//  power_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( tandy2k_keyboard_device::power_w )
@@ -267,7 +267,7 @@ WRITE_LINE_MEMBER( tandy2k_keyboard_device::power_w )
 
 
 //-------------------------------------------------
-//  reset_w - 
+//  reset_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( tandy2k_keyboard_device::reset_w )
@@ -280,7 +280,7 @@ WRITE_LINE_MEMBER( tandy2k_keyboard_device::reset_w )
 
 
 //-------------------------------------------------
-//  busy_w - 
+//  busy_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( tandy2k_keyboard_device::busy_w )
@@ -290,7 +290,7 @@ WRITE_LINE_MEMBER( tandy2k_keyboard_device::busy_w )
 
 
 //-------------------------------------------------
-//  data_r - 
+//  data_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( tandy2k_keyboard_device::data_r )
@@ -300,7 +300,7 @@ READ_LINE_MEMBER( tandy2k_keyboard_device::data_r )
 
 
 //-------------------------------------------------
-//  kb_p1_r - 
+//  kb_p1_r -
 //-------------------------------------------------
 
 READ8_MEMBER( tandy2k_keyboard_device::kb_p1_r )
@@ -340,7 +340,7 @@ READ8_MEMBER( tandy2k_keyboard_device::kb_p1_r )
 
 
 //-------------------------------------------------
-//  kb_p1_w - 
+//  kb_p1_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( tandy2k_keyboard_device::kb_p1_w )
@@ -366,7 +366,7 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p1_w )
 
 
 //-------------------------------------------------
-//  kb_p2_w - 
+//  kb_p2_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
@@ -381,35 +381,35 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
         3       Y11
         4       LED 2
         5       LED 1
-        6		CLOCK
-        7		DATA
+        6       CLOCK
+        7       DATA
 
     */
 
 	// keyboard row
 	m_keylatch = ((data & 0x0f) << 8) | (m_keylatch & 0xff);
-	
+
 	// led output
 	output_set_led_value(LED_2, !BIT(data, 4));
 	output_set_led_value(LED_1, !BIT(data, 5));
-	
+
 	// keyboard clock
 	int clock = BIT(data, 6);
-	
+
 	if (m_clock != clock)
 	{
 		m_clock = clock;
-		
+
 		m_out_clock_func(m_clock);
 	}
-	
+
 	// keyboard data
 	int kbddat = BIT(data, 7);
 
 	if (m_data != kbddat)
 	{
 		m_data = kbddat;
-		
+
 		m_out_data_func(m_data);
 	}
 }

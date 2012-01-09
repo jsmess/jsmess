@@ -134,7 +134,7 @@ private:
 	UINT8 m_status;     // Returned via status_r
 	UINT32 m_clock;     // Internal scan clock
 	UINT8 m_scanner;    // next output on SL lines
-	
+
 	bool m_autoinc;     // auto-increment flag
 	bool m_read_flag;   // read from where
 	bool m_ctrl_key;    // previous state of strobe input

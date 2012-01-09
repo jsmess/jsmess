@@ -183,7 +183,7 @@ READ8_MEMBER( base_d9060_device::dio_r )
         PA6     DI6
         PA7     DI7
 
-	*/
+    */
 
 	return m_bus->dio_r();
 }
@@ -204,7 +204,7 @@ WRITE8_MEMBER( base_d9060_device::dio_w )
         PB6     DO6
         PB7     DO7
 
-	*/
+    */
 
 	m_bus->dio_w(this, data);
 }
@@ -239,7 +239,7 @@ READ8_MEMBER( base_d9060_device::riot1_pa_r )
         PA6     DAVI
         PA7     _ATN
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -270,7 +270,7 @@ WRITE8_MEMBER( base_d9060_device::riot1_pa_w )
         PA6
         PA7
 
-	*/
+    */
 
 	// attention acknowledge
 	m_atna = BIT(data, 0);
@@ -305,7 +305,7 @@ READ8_MEMBER( base_d9060_device::riot1_pb_r )
         PB6     DACI
         PB7     RFDI
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -336,7 +336,7 @@ WRITE8_MEMBER( base_d9060_device::riot1_pb_w )
         PB6
         PB7
 
-	*/
+    */
 
 	// ready led
 	output_set_led_value(LED_READY, BIT(data, 4));
@@ -377,7 +377,7 @@ READ8_MEMBER( base_d9060_device::via_pb_r )
         PB6     I/O
         PB7     MSG
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -407,7 +407,7 @@ WRITE8_MEMBER( base_d9060_device::via_pb_w )
         PB6
         PB7
 
-	*/
+    */
 
 	scsi_sel_w(m_sasibus, !BIT(data, 0));
 	scsi_rst_w(m_sasibus, !BIT(data, 1));

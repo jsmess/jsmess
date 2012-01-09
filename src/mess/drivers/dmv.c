@@ -1,6 +1,6 @@
 /***************************************************************************
-   
-        NCR Decision Mate V 
+
+        NCR Decision Mate V
 
         04/01/2012 Skeleton driver.
 

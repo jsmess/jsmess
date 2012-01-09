@@ -58,7 +58,7 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	UINT8 read_keyboard();
-	
+
 	DECLARE_READ8_MEMBER( kb_lo_r );
 	DECLARE_READ8_MEMBER( kb_hi_r );
 	DECLARE_READ8_MEMBER( kb_p6_r );
