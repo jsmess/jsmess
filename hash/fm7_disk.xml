@@ -12,11 +12,11 @@ Titles, serial #s, publishers and release dates taken from:
 -->
 
 <softwarelist name="fm7_disk" description="Fujitsu FM-7 disk images">
-	
+
 	<software name="1942">
 		<description>1942</description>
 		<year>1987</year>
-		<publisher>アスキー (ASCII)</publisher>	
+		<publisher>アスキー (ASCII)</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="1942 (1987)(ascii)(jp).d77" size="348848" crc="83e6ec01" sha1="58f25e598326ede20c054f573dc484204745f4cd" offset="0" />
@@ -1178,7 +1178,7 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="yanpara">
 		<description>ヤンパラアドベンチャー</description>
 		<year>1985</year>
-		<publisher>アスキー (ASCII)</publisher>	
+		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="Yanpara Adventure"/>
 		<info name="usage" value="In F-BASIC, set 1 drive and 0 files, then type LOAD&quot;START&quot;,R"/>
@@ -1346,43 +1346,43 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>Game Pack</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 					<rom name="game pack 1.d77" size="348848" crc="732e4275" sha1="ef1c29f4ea79bd73ec994bec103d0f65bfbf0f18" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pack02">
 		<description>Game Pack (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 					<rom name="game pack 2.d77" size="348848" crc="0efd8e5d" sha1="d85f66b51bfb1e8c63a27bbeaf0d2d0fc1784304" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pack03">
 		<description>Game Pack (Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 					<rom name="game pack 3.d77" size="348848" crc="652a9aec" sha1="b7bfd70cbb52b086704f6a3b98556ecc83733032" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pack04">
 		<description>Game Pack (Alt 3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 					<rom name="game pack 4.d77" size="348848" crc="ad232598" sha1="711552ffe2ce4439a6f389fe2d92938d268995fc" offset="0"/>

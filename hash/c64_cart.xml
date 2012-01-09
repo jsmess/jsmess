@@ -1034,7 +1034,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hrdcpytb">
 		<description>Hardcopy+Turbo-Modul (Ger)</description>
 		<year>1985</year>
@@ -1049,7 +1049,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="spdtape">
 		<description>Speed-Tape (Ger)</description>
 		<year>1985</year>
@@ -1064,7 +1064,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="epbnk256" supported="no">
 		<description>Eprom Bank 256k (Ger)</description>
 		<year>198?</year>
@@ -1079,7 +1079,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ppm" supported="no">
 		<description>Picture-Printer Modul (Ger)</description>
 		<year>1986</year>
@@ -1094,7 +1094,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="turbodsk" supported="no">
 		<description>Turbo-Disk</description>
 		<year>198?</year>
@@ -1109,7 +1109,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="goliath" supported="no">
 		<description>1MB Goliath Eprom-Cart (Ger)</description>
 		<year>19??</year>
@@ -1124,7 +1124,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="qkbyte2" supported="no">
 		<description>Quickbyte II (Ger)</description>
 		<year>1986</year>
@@ -1139,7 +1139,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="qkbyte2j" cloneof="qkbyte2" supported="no">
 		<description>Quickbyte II</description>
 		<year>1986</year>
@@ -1169,7 +1169,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="flash8" supported="no">
 		<description>Flash 8</description>
 		<year>19??</year>
@@ -1183,7 +1183,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="compieee" supported="no">
 		<description>Computapix IEEE-488</description>
 		<year>19??</year>
@@ -1198,7 +1198,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="msdcie" supported="no">
 		<description>C64-IEEE</description>
 		<year>19??</year>
@@ -1217,7 +1217,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="stkieee" supported="no">
 		<description>Stack IEEE-488</description>
 		<year>19??</year>
@@ -1231,7 +1231,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cbmieee" supported="no">
 		<description>Commodore IEEE-488</description>
 		<year>19??</year>
@@ -1245,7 +1245,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="tforieee" supported="no">
 		<description>Technofor IEEE Interface</description>
 		<year>1984</year>
@@ -1259,7 +1259,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="hobbiel" supported="no">
 		<description>Hobbi Elektronika (Hun)</description>
 		<year>1986</year>
@@ -1273,7 +1273,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dela7x8k" supported="no">
 		<description>7x8K-EPROM-Bank (Ger)</description>
 		<year>19??</year>
@@ -1287,7 +1287,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="c64link">
 		<description>C64-Link</description>
 		<year>1982</year>
@@ -1301,7 +1301,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="c64link2">
 		<description>C64-Link II</description>
 		<year>1984</year>
@@ -1315,7 +1315,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Games Added by k1w1 -->
 
 	<software name="advcrtor">
