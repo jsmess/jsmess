@@ -66,9 +66,9 @@ Notes on COS 4.0 disassembly:
 
 
 static ADDRESS_MAP_START(rm380z_mem, AS_PROGRAM, 8, rm380z_state)
-	AM_RANGE( 0xe000, 0xefff ) AM_ROM AM_REGION(MAINCPU_TAG, 0)
+	AM_RANGE( 0xe000, 0xefff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0)
 	AM_RANGE( 0xf000, 0xf5ff ) AM_READWRITE(videoram_read,videoram_write)
-	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM AM_REGION(MAINCPU_TAG, 0x1000)		/* Extra ROM space for COS4.0 */
+	AM_RANGE( 0xf600, 0xf9ff ) AM_ROM AM_REGION(RM380Z_MAINCPU_TAG, 0x1000)		/* Extra ROM space for COS4.0 */
 	AM_RANGE( 0xfa00, 0xfbfb ) AM_RAM
 	AM_RANGE( 0xfbfc, 0xfbff ) AM_READWRITE( port_read, port_write )
 	AM_RANGE( 0xfc00, 0xffff ) AM_RAM
@@ -106,7 +106,7 @@ static const floppy_interface rm380z_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSSD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy0",
+	NULL,
 	NULL
 };
 
@@ -119,7 +119,7 @@ static SCREEN_UPDATE( rm380z )
 
 static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(rm380z_mem)
 	MCFG_CPU_IO_MAP(rm380z_io)
 
@@ -128,8 +128,8 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE((screencols*chdimx), (screenrows*chdimy))
-	MCFG_SCREEN_VISIBLE_AREA(0, (screencols*chdimx)-1, 0, (screenrows*chdimy)-1)
+	MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*RM380Z_CHDIMX), (RM380Z_SCREENROWS*RM380Z_CHDIMY))
+	MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*RM380Z_CHDIMX)-1, 0, (RM380Z_SCREENROWS*RM380Z_CHDIMY)-1)
 	MCFG_SCREEN_UPDATE(rm380z)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -140,7 +140,7 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 
 	/* floppy disk */
 	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, rm380z_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rm380z_floppy_interface)
 
 	/* keyboard */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
@@ -149,13 +149,13 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( rm380z )
-	ROM_REGION( 0x10000, MAINCPU_TAG, 0 )
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
 	ROM_LOAD( "cos40b-m.bin", 0x0000, 0x1000, CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
 	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x400, CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))
 	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x200, CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff))
 	// chargen ROM is undumped, afaik
 	ROM_REGION( 0x1680, "gfx", 0 )
-	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(e0b10221) SHA1(95304ccad9a7af49d79a349feb2bc23035f90abc))
+	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
 ROM_END
 
 /* Driver */
