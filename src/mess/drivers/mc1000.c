@@ -265,6 +265,8 @@ WRITE_LINE_MEMBER( mc1000_state::hs_w )
 
 READ8_MEMBER( mc1000_state::videoram_r )
 {
+	if (offset == ~0) return 0xff;
+
 	m_vdg->inv_w(BIT(m_mc6847_video_ram[offset], 7));
 
 	return m_mc6847_video_ram[offset];

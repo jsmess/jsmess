@@ -247,6 +247,8 @@ static MACHINE_RESET(spc1000)
 static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
 {
 	spc1000_state *state = device->machine().driver_data<spc1000_state>();
+	if (offset == ~0) return 0xff;
+
 	// state->m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
 	//  [PS2,PS1] is used to set screen 0/1 pages
 	if ( !BIT(state->m_GMODE, 3) ) {	// text mode (~A/G set to A)
