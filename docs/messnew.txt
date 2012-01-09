@@ -1,4 +1,73 @@
-﻿0.144u4
+﻿0.144u5
+
+New System Drivers Supported:
+-----------------------------
+- Palm Z22 [Tim Schuerewegen]
+- Mini2440 [Tim Schuerewegen]
+- Mera-Elzab Meritum I (model 2) [Miodrag Milanovic]
+- RM-380Z [Gabriele D'Antona]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- SLC1 [Robbbert]
+
+Skeleton drivers:
+-----------------
+- Axel AX-20
+- Didaktik M 92
+- Mera 79152PC
+- Mera Konin
+- Siemens PC-D [rfka01]
+- NCR Decision Mate V [rfka01]
+- DEC Rainbow 100B [rfka01]
+
+System Driver Changes:
+----------------------
+-poly1: Added Terminal roms [Andrew Trotman]
+-Fix for a400, a800 and clones which caused a crash navigating the Input menu.  [hap]
+-a5105: Implemented memory banking. [Sandro Ronco]
+-mac: Cuda device talks to the 680x0 properly; Color Classic now shows something. [R. Belmont]
+-mac: Fixed Cuda timer interrupt ack and default PRAM for Egret and Cuda [R. Belmont]
+-victor9k: Fixed keyboard MCU clock. [Lord Nightmare]
+-nc: Added v1.02 Danish and v1.02 German bios variations
+ of the NC100.  [Roberto Carlos Fernandez Gerhardt]
+-cbm: Added ICT Mini Chief hard disk ROMs. [Curt Coder]
+-mac: add preliminary support for LC520 (not working yet) [R. Belmont]
+-pet: Added skeleton for SSE SoftBox IEEE-488 peripheral. [Curt Coder]
+-macpci: new driver to support PCI-based Old World Macs, including Pippin [R. Belmont]
+-c64: Added skeleton for Serial Box IEC peripheral. [Curt Coder]
+-mac: Added skeleton device for low-level emulation of the original Mac keyboard [R. Belmont]
+-ip22: Made the SGI Indy driver about 130% faster on my machine (from 50% speed to 115% speed on a 3.2GHz i7)
+ by commenting out debug logging wholesale rather than leaving in an inline do-nothing if(). [MooglyGuy]
+
+Software Lists:
+----------------
+-coleco.xml: added an earlier dump of dkong. [k1w1]
+-rainbow.xml: DEC Rainbow 100 Softlist [Kaylee]
+
+Source Changes:
+----------------
+-pc_cga.c: Fixed selection of mc6845 input clock.  [Wilbert Pol]
+-floppy: Add media type and write splice information to the internal 
+ representation, and start handling HD [O. Galibert]
+-8530scc: Modernize.  Hopefully nothing broke [O. Galibert]
+-floppy: Add an "unknown" form factor and use it to fix floptool [O. Galibert]
+-mcs48: Fixed I8021/I8022 clock divider. [Curt Coder]
+-i386: Patch for i386 helps booting Phoenix bios [Carl]
+-scsibus: Increment command index on acknowledge instead of data read, 
+ since Visual 1050 BIOS skips the message byte read and just acks it. [Curt Coder]
+-Fix four spc700 opcodes which didn't disassemble correctly [kevtris]
+-scsibus: Added group 6 (vendor specific) command length. [Curt Coder]
+-scsibus: Implemented SASI group 6 command 00 (C0, Physical Device ID). [Curt Coder]
+-scsibus: Sector size is now configurable in init_scsibus. [Curt Coder]
+-scsihd: Get sector size from CHD metadata to support old 256 bytes/sector 
+ SASI drives, and allow hard disk image subdevices. [Curt Coder]
+-uiimage/diimage: Dumbify the menus and add a control layer [O. Galibert]
+-floppy: Add diskferret format support, and a minimal pc support [O. Galibert]
+-First draft of i8279 device. Hooked up to mmd2, which now nearly works [Robbbert]
+-softlist: Fix entry count tracking issue [O. Galibert]
+
+0.144u4
 
 New System Drivers Supported:
 -----------------------------
