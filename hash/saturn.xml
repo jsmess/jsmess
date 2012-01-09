@@ -4142,7 +4142,7 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="grandia (japan) (disc 1) (1m)" sha1="b87ee6035b1703d0c2d6a847f018368edd8a27b8" />
       </diskarea>
@@ -4157,7 +4157,7 @@ Demo Discs
         <disk name="grandia (japan) (disc 2) (3m)" sha1="980a466c2a9c7c94c67bb9ef2be8c0c31e24246a" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom4" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="grandia (japan) (disc 2) (4m)" sha1="a750792d0d761b62ae877ea44d1fb20b2311d1c3" />
       </diskarea>
@@ -8461,22 +8461,22 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="azel panzer dragoon rpg (disc 1 of 4) (jap) (dw0309)" sha1="b5757bde9395d2bda8d9742bd0c9d39bf8510e41" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="azel panzer dragoon rpg (disc 2 of 4) (jap) (dw0309)" sha1="8d5fd9cdfaecb37a4ffe8a6f02bd1d5e41335ab9" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom3" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="azel panzer dragoon rpg (disc 3 of 4) (jap) (dw0309)" sha1="c8a6a99b877e59596493a5edc34a37677401542c" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom4" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="azel panzer dragoon rpg (disc 4 of 4) (jap) (dw0309)" sha1="8cf2ab5d07a10ad380eb5bd6bf4568d9a09d6d56" />
       </diskarea>
@@ -8730,12 +8730,12 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="d no shokutaku (disc 1 of 2) (jap) (dw0511)" sha1="0d3f8d81f5d5de2164141ac8257044f18d7a3cba" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="d no shokutaku (disc 2 of 2) (jap) (dw0511)" sha1="e203e82e005c771565c857276a35d17395a7aa7b" />
       </diskarea>
@@ -11274,12 +11274,12 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="shinseiki evangelion koutetsu no girlfriend (disc 1 of 2) (jap) (dw0448)" sha1="c3e49deddde4aa616180eaf56a6c998ea52f4dbe" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="shinseiki evangelion koutetsu no girlfriend (disc 2 of 2) (jap) (dw0448)" sha1="a6afc245608d77b1fde5ccf084a9ed595f08a13e" />
       </diskarea>
@@ -12960,12 +12960,12 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="ayakashi ninden kunoichiban plus disc 1 (t-21512g)" sha1="f017b5cc1a65effe94a36ce134219138cdd94d39" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="ayakashi ninden kunoichiban plus disc 2 (t-21512g)" sha1="ec0d1c0e8dba59dd67892f9e39448b72f4ad92b4" />
       </diskarea>
@@ -14350,12 +14350,12 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="eberouge disc 1 (t-10309g)" sha1="02be37c91af7edb2f8c93d1746cb052a06639513" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="eberouge disc 2 (t-10309g)" sha1="a8614b9866b95acf726003c245898e50c978a3ce" />
       </diskarea>
@@ -14734,12 +14734,12 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="friends - seishun no kagayaki disc 1 (t-20109g)" sha1="7214e6bd1ef8649da012b7ad883921f8cf5ac8bb" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="friends - seishun no kagayaki disc 2 (t-20109g)" sha1="59bcacb6a39f5822d3483dfdf3bdf1f4fc3ac539" />
       </diskarea>
@@ -19195,12 +19195,12 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="d no shokutaku disc 1 (t-8101g)" sha1="d54f2589ccb8c66af6edeecab0c55f07c1afa657" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="d no shokutaku disc 2 (t-8101g)" sha1="6a5d7e4d9e1f82b40e3e8ea5804880550806888f" />
       </diskarea>
@@ -19796,12 +19796,12 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="idol jansi suchie-pai ii disc 1 (t-5705g)" sha1="920446102f40549c01f127983523dc2783de749d" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="idol jansi suchie-pai ii disc 2 (t-5705g)" sha1="17413c94a81c855d76b9a709908155278d8aae1e" />
       </diskarea>
@@ -20979,12 +20979,12 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="neon genesis evangelion iron maiden disc 1 (j) (gs-9194)" sha1="491c27115c83f5084d1b5ee5f4fa228cf004dee7" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="neon genesis evangelion iron maiden disc 2 (j) (gs-9194)" sha1="3540783b892753638539fb35b7ff1af22f7db7a2" />
       </diskarea>
@@ -21456,22 +21456,22 @@ Demo Discs
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
     <sharedfeat name="compatibility" value="NTSC-J"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="riven the sequel to myst disc 1 (t-35503g)" sha1="ae57482b59f951aeba7c9138ff9b612ba4b9ec60" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="riven the sequel to myst disc 2 (t-35503g)" sha1="2f33ac7b26e44b6b5e85474e5e4c5075473956b1" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom3" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="riven the sequel to myst disc 3 (t-35503g)" sha1="7ec4ea97d19696244c3c13666a01409376f0c007" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom4" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="riven the sequel to myst disc 4 (t-35503g)" sha1="8bf3345e850c7cdfef16c20845b3817d50608461" />
       </diskarea>
@@ -28214,22 +28214,22 @@ Demo Discs
     <year>199?</year>
     <publisher>unknown</publisher>
     <sharedfeat name="compatibility" value="PAL"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 1 of 4)[!]" sha1="00966d9785be07440ed1963d140585f71ff6ac14" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 2 of 4)[!]" sha1="6a8e7519d610e2a0f25f1872b8e5a3e4376a0dc3" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom3" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 3 of 4)[!]" sha1="617fcb42ebb5e7087c30a466d07d976eb115705a" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom4" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="riven - the sequel to myst v1.003 (1998)(sega)(pal)(disc 4 of 4)[!]" sha1="9f42a31a963ead1c16ace8bfd3ced36d099838e9" />
       </diskarea>
@@ -32440,22 +32440,22 @@ Demo Discs
     <year>199?</year>
     <publisher>unknown</publisher>
     <sharedfeat name="compatibility" value="NTSC-U"/>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom1" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="panzer dragoon saga (disc 1) (sat) (u)-redump" sha1="753aa12b16e198aceb5ea2b9f6376fff31b417f5" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom2" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="panzer dragoon saga (disc 2) (sat) (u)-redump" sha1="7fdb2909a0dd4ba4cac11f114bd720bebb473c7b" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom3" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="panzer dragoon saga (disc 3) (sat) (u)-redump" sha1="d3ea9a2baf32e9771e7a54a0275103bbdf70591d" />
       </diskarea>
     </part>
-    <part name="cdrom" interface="sat_cdrom">
+    <part name="cdrom4" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="panzer dragoon saga (disc 4) (sat) (u)-redump" sha1="53673d459f31e36841217f05d925ce4227d51d76" />
       </diskarea>
