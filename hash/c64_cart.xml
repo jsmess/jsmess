@@ -525,10 +525,11 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="chasehq2" supported="no">
+    <!-- commented out until dumped -->
+	<!--software name="chasehq2" supported="no">
 		<description>Chase H.Q. 2: Special Criminal Investigation</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher>
+		<publisher>Ocean</publisher-->
 		<!--
 		|===========================|
 		|=|                   LS02  |
@@ -544,7 +545,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		ROM0,1 - 28-pin ROM (Toshiba TC531000 pinout, markings scratched off)
 		bankswitch latch @ I/O1: D3-D0 = A16-A13
 		-->
-		<part name="cart" interface="c64_cart">
+		<!--part name="cart" interface="c64_cart">
 			<feature name="cart_type" value="ocean" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
@@ -558,7 +559,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 				<rom name="h.u2" size="0x20000" status="nodump" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="xl80" supported="no">
 		<description>XL 80</description>
