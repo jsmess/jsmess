@@ -1719,16 +1719,16 @@
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4206"/>
-		<part name="cdrom" interface="scd_cdrom">
+		<part name="cdrom1" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 1" />
-			<diskarea name="cdrom1">
+			<diskarea name="cdrom">
 				<disk name="prize fighter (1993)(sega)(ntsc)(us)(disc 1 of 2)[!]" sha1="d87caca431393968825b8913d10e254bd888fd8f"/>
 			</diskarea>
 		</part>
 
-		<part name="cdrom" interface="scd_cdrom">
+		<part name="cdrom2" interface="scd_cdrom">
 			<feature name="part_id" value="Disc 2" />
-			<diskarea name="cdrom2">
+			<diskarea name="cdrom">
 				<disk name="prize fighter (1993)(sega)(ntsc)(us)(disc 2 of 2)[!]" sha1="46f731d613d08eba5534331ce85fb5bab1e1b387"/>
 			</diskarea>
 		</part>
