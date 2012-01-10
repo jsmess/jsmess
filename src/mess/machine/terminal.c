@@ -380,7 +380,7 @@ static UINT8 row_number(UINT8 code) {
 
 UINT8 terminal_keyboard_handler(running_machine &machine, devcb_resolved_write8 &callback, UINT8 last_code, UINT8 *scan_line, UINT8 *tx_shift, int *tx_state, device_t *device)
 {
-	static const char *const keynames[] = { "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3", "TERM_LINE4", "TERM_LINE5", "TERM_LINE6" };
+	static const char *const keynames[] = { "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3", "TERM_LINE4", "TERM_LINE5", "TERM_LINE6", "TERM_LINE7" };
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
@@ -460,6 +460,13 @@ UINT8 terminal_keyboard_handler(running_machine &machine, devcb_resolved_write8 
 					case 7: key_code = 0x0D; break; // Enter
 				}
 			}
+			if (i==7)
+			{
+				switch(row_number(code))
+				{
+					case 0: key_code = 0x1B; break; // Escape
+				}
+			}
 			if (last_code != key_code ) {
 				callback(0, key_code);
 				if (tx_shift) *tx_shift = key_code;
@@ -468,7 +475,7 @@ UINT8 terminal_keyboard_handler(running_machine &machine, devcb_resolved_write8 
 			retVal = key_code;
 		} else {
 			*scan_line += 1;
-			if (*scan_line==7) {
+			if (*scan_line==8) {
 				*scan_line = 0;
 			}
 		}
@@ -659,6 +666,9 @@ INPUT_PORTS_START( generic_terminal )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_RALT) PORT_CHAR(10)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+
+	PORT_START("TERM_LINE7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START("TERM_CONF")
 	PORT_CONFNAME( 0x01, 0x01, "Cursor")
