@@ -5413,8 +5413,8 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="rom" size="0x6000">
-				<rom name="final_cartridge_internal_27128_eprom.bin" size="0x4000" crc="b648329a" sha1="daa1c5bf42773ee0e187a2063d459955889b033b" offset="0x4000"/>
-				<rom name="final_cartridge_internal_2764_eprom.bin" size="0x2000" crc="03c5e7f9" sha1="b20138182c920ba5c4fce7a58151482094e8c4d1" offset="0x0000"/>
+				<rom name="final_cartridge_internal_27128_eprom.bin" size="0x4000" crc="b648329a" sha1="daa1c5bf42773ee0e187a2063d459955889b033b" offset="0x0000"/>
+				<rom name="final_cartridge_internal_2764_eprom.bin" size="0x2000" crc="03c5e7f9" sha1="b20138182c920ba5c4fce7a58151482094e8c4d1" offset="0x4000"/>
 			</dataarea>
 		</part>
 	</software>
