@@ -1317,6 +1317,62 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
+	<software name="c64anblt" supported="no">
+		<description>C64anabalt (Encore)</description>
+		<year>2012</year>
+		<publisher>RGCD</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x4000">
+				<rom name="c64anabalt_encore.bin" size="0x4000" crc="3569502b" sha1="99fdeb4a4d51a7455e8922f82c99940169404a20" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c64anbltg" cloneof="c64anblt" supported="no">
+		<description>C64anabalt (Gharmak)</description>
+		<year>2012</year>
+		<publisher>RGCD</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x4000">
+				<rom name="c64anabalt_ghormak.bin" size="0x4000" crc="b5a86ee0" sha1="a870a3feab469917e01892fbb587392e48b0b844" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blokcopy" supported="no">
+		<description>Blok Copy</description>
+		<year>2011</year>
+		<publisher>RGCD</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x4000">
+				<rom name="blok_copy.bin" size="0x4000" crc="99ef3840" sha1="81c779c0fd748ce90666d1bcfaa110a16c99ab61" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="edgegrnd" supported="no">
+		<description>Edge Grinder</description>
+		<year>2011</year>
+		<publisher>RGCD</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x4000">
+				<rom name="edge_grinder.bin" size="0x4000" crc="e5a73b59" sha1="febd424843c19d862dd9d31469a4225da160d097" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Games Added by k1w1 -->
 
 	<software name="advcrtor">
