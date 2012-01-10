@@ -54569,7 +54569,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- This was included in the DVD release of a 2008 Japanese TV show describing the creation of a Famicom game
-It was also distributed in form of Famicom carts, whose checksums (according to the developer websit) match this set
+It was also distributed in form of Famicom carts, whose checksums (according to the developer's website) match this set
 Also available (in form of IPS patches from the dev) some hacks featuring alt. levels: Mondo21 hack, gg version & Meteor version
 We don't include these hacks because they were not burned into real carts nor sold!  -->
 	<software name="mrsplash">
@@ -66319,6 +66319,21 @@ be better to redump them properly. -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="655360">
 				<rom name="22 in 1 (reset based).prg" size="655360" crc="03fdefad" sha1="4e84be9a20c5e385ae71c466a02613d5a74de01e" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_245" supported="no">
+		<description>245 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23CA" />
+			<dataarea name="prg" size="16777216">
+				<rom name="23 plus 222-in-1 (unl)[u][!].prg" size="16777216" crc="e79f157e" sha1="63b37851ee0716472d20e2f27b3f708dfc16a8af" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
