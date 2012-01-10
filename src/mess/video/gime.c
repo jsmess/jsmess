@@ -1692,7 +1692,7 @@ template<int sample_count, gime_base_device::emit_samples_proc emit_samples>
 ATTR_FORCE_INLINE void gime_base_device::render_scanline(const scanline_record *scanline, pixel_t *pixels, int min_x, int max_x, palette_resolver *resolver)
 {
 	int left_border, right_border;
-	int x, x2;
+	int x, x2, pixel_position;
 	pixel_t border_color = resolver->lookup(scanline->m_border);
 	const pixel_t *resolved_palette = NULL;
 
@@ -1728,6 +1728,7 @@ ATTR_FORCE_INLINE void gime_base_device::render_scanline(const scanline_record *
 
 	/* body */
 	x = 0;
+	pixel_position = 0;
 	while(x < sample_count)
 	{
 		/* determine how many bytes exist for which the mode is identical */
@@ -1738,7 +1739,7 @@ ATTR_FORCE_INLINE void gime_base_device::render_scanline(const scanline_record *
 		resolved_palette = resolver->get_palette(scanline->m_palette[x]);
 
 		/* emit the samples, with a (hopefully) aggressively inlined function */
-		pixels += ((*this).*(emit_samples))(scanline, x, x2 - x, pixels, resolved_palette);
+		pixel_position += ((*this).*(emit_samples))(scanline, x, x2 - x, &pixels[pixel_position], resolved_palette);
 
 		/* update x */
 		x = x2;
