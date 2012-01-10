@@ -36,7 +36,8 @@ class rm380z_state : public driver_device
 {
 private:
 
-	UINT8 decode_videoram_char(UINT8 ch1,UINT8 ch2);
+	void putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsigned char* chsb,int vmode);
+	void decode_videoram_char(int pos,UINT8& chr,UINT8& attrib);
 	void scroll_videoram();
 	void config_videomode();
 
