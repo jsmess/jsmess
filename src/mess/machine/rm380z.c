@@ -176,6 +176,8 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 
 WRITE8_MEMBER( rm380z_state::keyboard_put )
 {
+	//printf("pressed [%x]\n",data);
+	//if (data==0x60) data=0x1d; // remap ESC
 	m_port0_kbd = data;
 }
 
