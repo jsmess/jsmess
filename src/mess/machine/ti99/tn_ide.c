@@ -391,6 +391,7 @@ static DEVICE_RESET( tn_ide )
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_RTC65271_ADD( "ide_rtc", clock_interrupt_callback )
 	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback )
+	MCFG_IDE_CONTROLLER_REGIONS("harddisk", NULL)	
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;

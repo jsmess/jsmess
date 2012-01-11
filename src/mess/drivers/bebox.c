@@ -148,8 +148,6 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2 )			/* TODO: Verify model */
 	MCFG_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3 )			/* TODO: Verify model */
 
-	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt )	/* FIXME */
-
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
@@ -164,6 +162,9 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_CDROM_ADD( "cdrom",bebox_cdrom )
 	MCFG_HARDDISK_ADD( "harddisk1" )
+
+	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt )	/* FIXME */
+	MCFG_IDE_CONTROLLER_REGIONS("harddisk1", NULL)
 
 	MCFG_MPC105_ADD("mpc105","ppc1",0)
 	MCFG_CIRRUS_ADD("cirrus")

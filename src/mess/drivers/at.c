@@ -563,8 +563,10 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
 	/* harddisk */
-	MCFG_HARDDISK_ADD("harddisk")
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_ADD("harddisk2")
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_CONTROLLER_REGIONS("harddisk1", "harddisk2")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
