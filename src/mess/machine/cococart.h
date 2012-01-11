@@ -62,6 +62,12 @@ struct cococart_interface
     devcb_write_line	m_halt_callback;
 };
 
+// ======================> cococart_base_update_delegate
+
+// direct region update handler
+typedef delegate<void (UINT8 *)> cococart_base_update_delegate;
+
+
 // ======================> cococart_slot_device
 class device_cococart_interface;
 
@@ -107,7 +113,10 @@ public:
 	/* hack to support twiddling the Q line */
 	void twiddle_q_lines();
 
+	/* cart base */
 	UINT8* get_cart_base();
+	void set_cart_base_update(cococart_base_update_delegate update);
+
 protected:
 	static TIMER_CALLBACK( cart_timer_callback );
 	static TIMER_CALLBACK( nmi_timer_callback );
@@ -141,6 +150,13 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write);
 
 	virtual UINT8* get_cart_base();
+	void set_cart_base_update(cococart_base_update_delegate update);
+
+protected:
+	void cart_base_changed(void);
+
+private:
+	cococart_base_update_delegate m_update;
 };
 
 /***************************************************************************

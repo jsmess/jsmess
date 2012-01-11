@@ -131,8 +131,8 @@ void gime_base_device::device_start(void)
 		throw device_missing_dependencies();
 
 	/* find the CART device - make sure that it is started */
-	cococart_slot_device *cart_device = machine().device<cococart_slot_device>(config->m_ext_tag);
-	if (!cart_device->started())
+	m_cart_device = machine().device<cococart_slot_device>(config->m_ext_tag);
+	if (!m_cart_device->started())
 		throw device_missing_dependencies();
 
 	/* find the CPU device - make sure that it is started */
@@ -161,7 +161,7 @@ void gime_base_device::device_start(void)
 
 	/* set up ROM/RAM pointers */
 	m_rom = machine().region(config->m_maincpu_tag)->base();
-	m_cart_rom = cart_device->get_cart_base();
+	m_cart_rom = m_cart_device->get_cart_base();
 
 	/* populate palettes */
 	for (int color = 0; color < 64; color++)
@@ -617,6 +617,18 @@ void gime_base_device::update_memory(int bank)
 UINT8 *gime_base_device::memory_pointer(UINT32 address)
 {
 	return &m_ram->pointer()[address % m_ram->size()];
+}
+
+
+
+//-------------------------------------------------
+//  update_cart_rom
+//-------------------------------------------------
+
+void gime_base_device::update_cart_rom(void)
+{
+	m_cart_rom = m_cart_device->get_cart_base();
+	update_memory();
 }
 
 

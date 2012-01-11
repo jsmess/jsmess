@@ -51,6 +51,8 @@ struct _gime_interface
 //  GIME CORE
 //**************************************************************************
 
+class cococart_slot_device;
+\
 class gime_base_device : public mc6847_friend_device, public sam6883_friend_device
 {
 public:
@@ -64,17 +66,20 @@ public:
 	// the GIME seems to intercept writes to $FF22 (not precisely sure how)
 	void ff22_write(UINT8 data) { m_ff22_value = data; }
 
+	// updates the cart ROM
+	void update_cart_rom(void);
+
 	/* updates the screen -- this will call begin_update(),
        followed by update_row() reapeatedly and after all row
        updating is complete, end_update() */
 	bool update_composite(bitmap_t &bitmap, const rectangle &cliprect);
 	bool update_rgb(bitmap_t &bitmap, const rectangle &cliprect);
 
-	/* interrupt outputs */
+	// interrupt outputs
 	bool firq_r(void) { return m_firq != 0x00; }
 	bool irq_r(void) { return m_irq != 0x00; }
 
-	/* interrupt inputs */
+	// interrupt inputs
 	void set_il0(bool value) { set_interrupt_value(INTERRUPT_EI0, value); }
 	void set_il1(bool value) { set_interrupt_value(INTERRUPT_EI1, value); }
 	void set_il2(bool value) { set_interrupt_value(INTERRUPT_EI2, value); }
@@ -179,6 +184,7 @@ private:
 	// incidentals
 	ram_device *m_ram;
 	emu_timer *m_gime_clock_timer;
+	cococart_slot_device *m_cart_device;
 	UINT8 *m_rom;
 	UINT8 *m_cart_rom;
 	pixel_t m_composite_palette[64];
