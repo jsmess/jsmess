@@ -246,6 +246,10 @@ static INPUT_PORTS_START( kb_keytronic_common )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_CODE(KEYCODE_CLOSEBRACE)	PORT_CHAR(']')						/* 1b */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START( "kb_keytronic_36_1" )
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_CODE(KEYCODE_F2)			PORT_CHAR(UCHAR_MAMEKEY(F2))		/* 3c */
+
 	PORT_START( "kb_keytronic_37_0" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )									PORT_NAME("PA1")					/* 7b */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )									PORT_NAME("|<--")					/* 7e */
@@ -536,7 +540,7 @@ static WRITE8_HANDLER( kb_keytronic_internal_data_w )
 			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_35_1");
 			break;
 		case 0x36:
-			keytronic->p1_data = 0xff;
+			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_36_1");
 			break;
 		case 0x37:
 			keytronic->p1_data = input_port_read(space->machine(), "kb_keytronic_37_1");
