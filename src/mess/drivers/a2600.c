@@ -2188,7 +2188,7 @@ static const cassette_interface a2600_cassette_interface =
 	a26_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
+	"a2600_cass",
 	NULL
 };
 
@@ -2202,6 +2202,7 @@ static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","a2600")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","a2600_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( a2600, a2600_state )
