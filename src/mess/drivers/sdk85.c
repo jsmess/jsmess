@@ -17,14 +17,13 @@ then press NEXT to increment the address.
 
 ToDo:
 - Artwork
-- Proper emulation of the 8279 chip (there's only just enough to get this
-  driver to work atm)
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8279.h"
 #include "sdk85.lh"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -35,62 +34,19 @@ public:
 	sdk85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_WRITE8_MEMBER(data_w);
-	UINT8 m_digit; // next digit to display
-	UINT8 m_kbd; // keyscan code being returned
-	UINT8 m_keytemp; // to see when key gets released
-	bool m_kbd_ready; // get ready to return keyscan code
+	DECLARE_WRITE8_MEMBER(scanlines_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_READ8_MEMBER(kbd_r);
+	UINT8 m_digit;
 	virtual void machine_reset();
 };
-
-READ8_MEMBER( sdk85_state::keyboard_r )
-{
-	if (m_kbd_ready)
-	{
-		UINT8 ret = m_kbd;
-		m_kbd_ready = FALSE;
-		m_kbd = 0xff;
-		return ret;
-	}
-	else
-		return 0;
-}
-
-READ8_MEMBER( sdk85_state::status_r )
-{
-	return 0;
-}
-
-WRITE8_MEMBER( sdk85_state::command_w )
-{
-	if ((data & 0x90)==0x90)
-		m_digit = data & 7;
-	else
-	if (data==0x40)
-		m_kbd_ready = TRUE;
-}
-
-WRITE8_MEMBER( sdk85_state::data_w )
-{
-	if (m_digit < 6)
-	{
-		output_set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
-		m_digit++;
-	}
-	else
-		m_digit = 15;
-}
-
 
 static ADDRESS_MAP_START(sdk85_mem, AS_PROGRAM, 8, sdk85_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor rom (A14)
 	AM_RANGE(0x0800, 0x0fff) AM_ROM // Expansion rom (A15)
-	AM_RANGE(0x1800, 0x1800) AM_READWRITE(keyboard_r,data_w)
-	AM_RANGE(0x1900, 0x1900) AM_READWRITE(status_r,command_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("i8279", i8279_device, i8279_data_r, i8279_data_w )
+	AM_RANGE(0x1900, 0x1900) AM_DEVREADWRITE("i8279", i8279_device, i8279_status_r, i8279_ctrl_w)
 	//AM_RANGE(0x1800, 0x1fff) AM_RAM // i8279 (A13)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // i8155 (A16)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM // i8155 (A17)
@@ -124,7 +80,7 @@ static INPUT_PORTS_START( sdk85 )
 
 	PORT_START("X2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXEC") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT") PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GO") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SUBST") PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXAM") PORT_CODE(KEYCODE_Y)
@@ -135,76 +91,42 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( sdk85_state )
 {
-	m_digit = 15;
-	m_kbd_ready = FALSE;
-	m_kbd = 0xff;
-	m_keytemp = 0xfe;
 }
 
-// This is an internal function of the 8279 chip
-static TIMER_DEVICE_CALLBACK( sdk85_keyscan )
+WRITE8_MEMBER( sdk85_state::scanlines_w )
 {
-	sdk85_state *state = timer.machine().driver_data<sdk85_state>();
-	UINT8 keyscan, keytemp = 0xff,i;
-	keyscan = input_port_read(timer.machine(), "X0");
-	if (keyscan < 0xff)
-	{
-		for (i = 0; i < 8; i++)
-		{
-			if (!BIT(keyscan, i))
-			{
-				keytemp = i;
-				i = 9;
-			}
-		}
-	}
-	else
-	{
-		keyscan = input_port_read(timer.machine(), "X1");
-		if (keyscan < 0xff)
-		{
-			for (i = 0; i < 8; i++)
-			{
-				if (!BIT(keyscan, i))
-				{
-					keytemp = i+8;
-					i = 9;
-				}
-			}
-		}
-		else
-		{
-			keyscan = input_port_read(timer.machine(), "X2");
-			if (keyscan < 0xff)
-			{
-				for (i = 0; i < 6; i++)
-				{
-					if (!BIT(keyscan, i))
-					{
-						keytemp = i+16;
-						i = 9;
-					}
-				}
-			}
-		}
-	}
-
-	device_t *cpu = timer.machine().device( "maincpu" );
-
-	if ((state->m_kbd == 0xff) && (keytemp < 0xff) && (keytemp != state->m_keytemp))
-	{
-		state->m_kbd = keytemp;
-		state->m_keytemp = keytemp;
-		device_set_input_line(cpu, I8085_RST55_LINE, HOLD_LINE);
-	}
-	else
-	if (keytemp==0xff)
-	{
-		state->m_keytemp = 0xfe;
-		device_set_input_line(cpu, I8085_RST55_LINE, CLEAR_LINE);
-	}
+	m_digit = data;
 }
 
+WRITE8_MEMBER( sdk85_state::digit_w )
+{
+	if (m_digit < 6)
+		output_set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
+}
+
+READ8_MEMBER( sdk85_state::kbd_r )
+{
+	UINT8 data = 0xff;
+
+	if (m_digit < 3)
+	{
+		char kbdrow[6];
+		sprintf(kbdrow,"X%X",m_digit);
+		data = input_port_read(machine(), kbdrow);
+	}
+	return data;
+}
+
+static I8279_INTERFACE( sdk85_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST55_LINE),	// irq
+	DEVCB_DRIVER_MEMBER(sdk85_state, scanlines_w),	// scan SL lines
+	DEVCB_DRIVER_MEMBER(sdk85_state, digit_w),		// display A&B
+	DEVCB_NULL,						// BD
+	DEVCB_DRIVER_MEMBER(sdk85_state, kbd_r),		// kbd RL lines
+	DEVCB_LINE_VCC,						// Shift key
+	DEVCB_LINE_VCC
+};
 
 static MACHINE_CONFIG_START( sdk85, sdk85_state )
 	/* basic machine hardware */
@@ -215,7 +137,8 @@ static MACHINE_CONFIG_START( sdk85, sdk85_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sdk85)
 
-	MCFG_TIMER_ADD_PERIODIC("keyscan", sdk85_keyscan, attotime::from_hz(15))
+	/* Devices */
+	MCFG_I8279_ADD("i8279", 3500, sdk85_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

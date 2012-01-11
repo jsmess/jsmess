@@ -8,7 +8,6 @@
 
     TODO:
     Add 8251A for serial
-    Add 8279 for keypad reading and led display handling
     Add optional 2x 8255A
 
 
@@ -21,8 +20,6 @@ Download the User Manual to get the operating procedures.
 
 ToDo:
 - Artwork
-- Proper emulation of the 8279 chip (there's only just enough to get this
-  driver to work atm)
 - Add INTR and RESET keys
 - Add terminal interface and option to enable it.
 
@@ -31,6 +28,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "machine/i8279.h"
 #include "sdk86.lh"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -39,55 +37,39 @@ class sdk86_state : public driver_device
 {
 public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_i8279(*this, "i8279") { }
 
+	required_device<i8279_device> m_i8279;
 	DECLARE_READ16_MEMBER(keyboard_r);
 	DECLARE_READ16_MEMBER(status_r);
 	DECLARE_WRITE16_MEMBER(command_w);
 	DECLARE_WRITE16_MEMBER(data_w);
+	DECLARE_WRITE8_MEMBER(scanlines_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_READ8_MEMBER(kbd_r);
 	UINT8 m_digit; // next digit to display
-	UINT8 m_kbd; // keyscan code being returned
-	UINT8 m_keytemp; // to see when key gets released
-	bool m_kbd_ready; // get ready to return keyscan code
 	virtual void machine_reset();
 };
 
 READ16_MEMBER( sdk86_state::keyboard_r )
 {
-	if (m_kbd_ready)
-	{
-		UINT16 ret = m_kbd;
-		m_kbd_ready = FALSE;
-		m_kbd = 0xff;
-		return ret;
-	}
-	else
-		return 0;
+	return m_i8279->i8279_data_r(space, offset);
 }
 
 READ16_MEMBER( sdk86_state::status_r )
 {
-	return (m_kbd==0xff) ? 0 : 7;
+	return m_i8279->i8279_status_r(space, offset);
 }
 
 WRITE16_MEMBER( sdk86_state::command_w )
 {
-	if ((data & 0x90)==0x90)
-		m_digit = data & 7;
-	else
-	if (data==0x40)
-		m_kbd_ready = TRUE;
+	m_i8279->i8279_ctrl_w(space, offset, data);
 }
 
 WRITE16_MEMBER( sdk86_state::data_w )
 {
-	if (m_digit < 8)
-	{
-		output_set_digit_value(m_digit, data);
-		m_digit++;
-	}
-	else
-		m_digit = 15;
+	m_i8279->i8279_data_w(space, offset, data);
 }
 
 static ADDRESS_MAP_START(sdk86_mem, AS_PROGRAM, 16, sdk86_state)
@@ -131,83 +113,55 @@ static INPUT_PORTS_START( sdk86 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("X2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
 MACHINE_RESET_MEMBER( sdk86_state )
 {
-	m_digit = 15;
-	m_kbd_ready = FALSE;
-	m_kbd = 0xff;
-	m_keytemp = 0xfe;
 }
 
-// This is an internal function of the 8279 chip
-static TIMER_DEVICE_CALLBACK( sdk86_keyscan )
+
+WRITE8_MEMBER( sdk86_state::scanlines_w )
 {
-	sdk86_state *state = timer.machine().driver_data<sdk86_state>();
-	UINT8 keyscan, keytemp = 0xff,i;
-	keyscan = input_port_read(timer.machine(), "X0");
-	if (keyscan < 0xff)
-	{
-		for (i = 0; i < 8; i++)
-		{
-			if (!BIT(keyscan, i))
-			{
-				keytemp = i;
-				i = 9;
-			}
-		}
-	}
-	else
-	{
-		keyscan = input_port_read(timer.machine(), "X1");
-		if (keyscan < 0xff)
-		{
-			for (i = 0; i < 8; i++)
-			{
-				if (!BIT(keyscan, i))
-				{
-					keytemp = i+8;
-					i = 9;
-				}
-			}
-		}
-		else
-		{
-			keyscan = input_port_read(timer.machine(), "X2");
-			if (keyscan < 0xff)
-			{
-				for (i = 0; i < 6; i++)
-				{
-					if (!BIT(keyscan, i))
-					{
-						keytemp = i+16;
-						i = 9;
-					}
-				}
-			}
-		}
-	}
-
-	if ((state->m_kbd == 0xff) && (keytemp < 0xff) && (keytemp != state->m_keytemp))
-	{
-		state->m_kbd = keytemp;
-		state->m_keytemp = keytemp;
-	}
-	else
-	if (keytemp==0xff)
-	{
-		state->m_keytemp = 0xfe;
-	}
+	m_digit = data;
 }
+
+WRITE8_MEMBER( sdk86_state::digit_w )
+{
+	if (m_digit < 8)
+		output_set_digit_value(m_digit, data);
+}
+
+READ8_MEMBER( sdk86_state::kbd_r )
+{
+	UINT8 data = 0xff;
+
+	if (m_digit < 3)
+	{
+		char kbdrow[6];
+		sprintf(kbdrow,"X%X",m_digit);
+		data = input_port_read(machine(), kbdrow);
+	}
+	return data;
+}
+
+static I8279_INTERFACE( sdk86_intf )
+{
+	DEVCB_NULL,	// irq
+	DEVCB_DRIVER_MEMBER(sdk86_state, scanlines_w),	// scan SL lines
+	DEVCB_DRIVER_MEMBER(sdk86_state, digit_w),		// display A&B
+	DEVCB_NULL,						// BD
+	DEVCB_DRIVER_MEMBER(sdk86_state, kbd_r),		// kbd RL lines
+	DEVCB_LINE_GND,						// Shift key
+	DEVCB_LINE_GND
+};
 
 static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	/* basic machine hardware */
@@ -219,7 +173,8 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sdk86)
 
-	MCFG_TIMER_ADD_PERIODIC("keyscan", sdk86_keyscan, attotime::from_hz(15))
+	/* Devices */
+	MCFG_I8279_ADD("i8279", 3500, sdk86_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

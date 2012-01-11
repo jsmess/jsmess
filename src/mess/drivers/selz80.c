@@ -9,9 +9,6 @@ No diagram has been found. The following is guesswork.
 Another trainer that looks almost identical has been seen. It is called
 the DAG-Z80. Bios dump is needed.
 
-It seems that the keyboard controller has certain similarities to the 8279.
-Therefore copied a bunch of code from sdk86 - and it worked.
-
 Test sequence: Press -, enter an address, press = to show contents, press
                up/down-arrow to cycle through addresses.
 
@@ -26,6 +23,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8279.h"
 #include "selz80.lh"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -36,45 +34,12 @@ public:
 	selz80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	DECLARE_READ8_MEMBER(selz80_00_r);
-	DECLARE_READ8_MEMBER(selz80_01_r);
-	DECLARE_WRITE8_MEMBER(selz80_01_w);
-	DECLARE_WRITE8_MEMBER(selz80_00_w);
+	DECLARE_WRITE8_MEMBER(scanlines_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_READ8_MEMBER(kbd_r);
 	UINT8 m_digit;
-	UINT8 m_segment;
-	UINT8 m_kbd;
-	UINT8 m_keytemp; // to see when key gets released
 	virtual void machine_reset();
 };
-
-
-
-READ8_MEMBER( selz80_state::selz80_00_r )
-{
-		UINT8 ret = m_kbd;
-		m_kbd = 0xff;
-		return ret;
-}
-
-READ8_MEMBER( selz80_state::selz80_01_r )
-{
-	return (m_kbd==0xff) ? 0 : 7;
-}
-
-WRITE8_MEMBER( selz80_state::selz80_01_w )
-{
-	if ((data & 0xc0)==0x80)
-	{
-		m_digit = data & 7;
-		output_set_digit_value(m_digit, m_segment);
-	}
-}
-
-WRITE8_MEMBER( selz80_state::selz80_00_w )
-{
-	m_segment = BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4);
-	output_set_digit_value(m_digit, m_segment);
-}
 
 static ADDRESS_MAP_START(selz80_mem, AS_PROGRAM, 8, selz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -86,8 +51,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(selz80_io, AS_IO, 8, selz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(selz80_00_r,selz80_00_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(selz80_01_r,selz80_01_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("i8279", i8279_device, i8279_data_r, i8279_data_w )
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("i8279", i8279_device, i8279_status_r, i8279_ctrl_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -139,83 +104,43 @@ RG EN SA SD     0(AF)  1(BC)  2(DE)  3(HL)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RG") PORT_CODE(KEYCODE_L)
 INPUT_PORTS_END
 
-static TIMER_DEVICE_CALLBACK( selz80_keyscan )
-{
-	selz80_state *state = timer.machine().driver_data<selz80_state>();
-	UINT8 keyscan, keytemp = 0xff,i;
-	keyscan = input_port_read(timer.machine(), "X0");
-	if (keyscan < 0xff)
-	{
-		for (i = 0; i < 8; i++)
-		{
-			if (!BIT(keyscan, i))
-			{
-				keytemp = i;
-				i = 9;
-			}
-		}
-	}
-	else
-	{
-		keyscan = input_port_read(timer.machine(), "X1");
-		if (keyscan < 0xff)
-		{
-			for (i = 0; i < 8; i++)
-			{
-				if (!BIT(keyscan, i))
-				{
-					keytemp = i+8;
-					i = 9;
-				}
-			}
-		}
-		else
-		{
-			keyscan = input_port_read(timer.machine(), "X2");
-			if (keyscan < 0xff)
-			{
-				for (i = 0; i < 8; i++)
-				{
-					if (!BIT(keyscan, i))
-					{
-						keytemp = i+16;
-						i = 9;
-					}
-				}
-			}
-			else
-			{
-				keyscan = input_port_read(timer.machine(), "X3");
-				if (keyscan < 0xff)
-				{
-					for (i = 0; i < 8; i++)
-					{
-						if (!BIT(keyscan, i))
-						{
-							keytemp = i+24;
-							i = 9;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if ((state->m_kbd == 0xff) && (keytemp < 0xff) && (keytemp != state->m_keytemp))
-	{
-		state->m_kbd = keytemp;
-		state->m_keytemp = keytemp;
-	}
-	else
-	if (keytemp==0xff)
-	{
-		state->m_keytemp = 0xfe;
-	}
-}
-
 MACHINE_RESET_MEMBER( selz80_state )
 {
 }
+
+WRITE8_MEMBER( selz80_state::scanlines_w )
+{
+	m_digit = data;
+}
+
+WRITE8_MEMBER( selz80_state::digit_w )
+{
+	output_set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4));
+}
+
+READ8_MEMBER( selz80_state::kbd_r )
+{
+	UINT8 data = 0xff;
+
+	if (m_digit < 4)
+	{
+		char kbdrow[6];
+		sprintf(kbdrow,"X%X",m_digit);
+		data = input_port_read(machine(), kbdrow);
+	}
+	return data;
+}
+
+static I8279_INTERFACE( selz80_intf )
+{
+	DEVCB_NULL,	// irq
+	DEVCB_DRIVER_MEMBER(selz80_state, scanlines_w),	// scan SL lines
+	DEVCB_DRIVER_MEMBER(selz80_state, digit_w),		// display A&B
+	DEVCB_NULL,						// BD
+	DEVCB_DRIVER_MEMBER(selz80_state, kbd_r),		// kbd RL lines
+	DEVCB_LINE_VCC,						// Shift key
+	DEVCB_LINE_VCC
+};
 
 static MACHINE_CONFIG_START( selz80, selz80_state )
 	/* basic machine hardware */
@@ -226,7 +151,8 @@ static MACHINE_CONFIG_START( selz80, selz80_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_selz80)
 
-	MCFG_TIMER_ADD_PERIODIC("keyscan", selz80_keyscan, attotime::from_hz(15))
+	/* Devices */
+	MCFG_I8279_ADD("i8279", 3500, selz80_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
