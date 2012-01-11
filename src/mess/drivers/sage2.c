@@ -9,62 +9,352 @@
         06/12/2009 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/i8251.h"
-#include "machine/terminal.h"
+/*
 
+	TODO:
 
-class sage2_state : public driver_device
-{
-public:
-	sage2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+	- dip switches
+	- centronics ACK interrupt flipflop
+	- centronics signals
+	- floppy interrupt
+	- TMS9914 IEEE-488 controller
+	- board 2 (4x 2651 USART)
+	- Winchester controller
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT16* m_p_ram;
-};
+*/
 
+#include "includes/sage2.h"
 
 
-static ADDRESS_MAP_START(sage2_mem, AS_PROGRAM, 16, sage2_state)
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ADDRESS_MAP( sage2_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff ) AM_RAM AM_BASE(m_p_ram) // 512 KB RAM / ROM at boot
-//  Board #1
-//  AM_RANGE(0xffc000, 0xffc007 ) // 8253-S, RTC
-//  AM_RANGE(0xffc010, 0xffc01f ) // TMS9914, IEEE-488 Interface
-//  AM_RANGE(0xffc020, 0xffc027 ) // i8255, DIPs + Floppy ctrl port
-//  AM_RANGE(0xffc030, 0xffc033 ) // i8251, Serial Port 2
-//  AM_RANGE(0xffc040, 0xffc045 ) // i8259
-//  AM_RANGE(0xffc050, 0xffc051 ) // FDC 765, status
-//  AM_RANGE(0xffc052, 0xffc053 ) // FDC 765, control
-//  AM_RANGE(0xffc060, 0xffc067 ) // i8255, Printer
-	AM_RANGE(0xffc070, 0xffc071 ) AM_DEVREADWRITE8("uart", i8251_device, data_r, data_w, 0x00ff) // terminal data
-	AM_RANGE(0xffc072, 0xffc073 ) AM_DEVREADWRITE8("uart", i8251_device, status_r, control_w, 0x00ff) // terminal control/status
-//  AM_RANGE(0xffc080, 0xffc087 ) // RTC? i8253-S
-//  Board #2
-//  AM_RANGE(0xffc400, 0xffc4ff ) // AUX Serial Channels (2651)
-//  AM_RANGE(0xffc500, 0xffc7ff ) // Winchester drive ports
-
-	AM_RANGE(0xfe0000, 0xfeffff ) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_REGION(M68000_TAG, 0)
+	AM_RANGE(0x002000, 0x07ffff) AM_RAM
+	AM_RANGE(0xffc000, 0xffc007) AM_DEVREADWRITE8_LEGACY(I8253_1_TAG, pit8253_r, pit8253_w, 0x00ff)
+//  AM_RANGE(0xffc010, 0xffc01f) AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	AM_RANGE(0xffc020, 0xffc027) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, DIPs + Floppy ctrl port
+	AM_RANGE(0xffc030, 0xffc031) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffc032, 0xffc033) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xffc040, 0xffc041) AM_DEVREADWRITE8_LEGACY(I8259_TAG, pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0xffc050, 0xffc051) AM_DEVREADWRITE8_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w, 0x00ff) // FDC 765, status
+	AM_RANGE(0xffc052, 0xffc053) AM_DEVREAD8_LEGACY(UPD765_TAG, upd765_status_r, 0x00ff) // FDC 765, control
+	AM_RANGE(0xffc060, 0xffc067) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, Printer
+	AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffc072, 0xffc073) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0xffc080, 0xffc087) AM_DEVREADWRITE8_LEGACY(I8253_0_TAG, pit8253_r, pit8253_w, 0x00ff)
+//	AM_RANGE(0xffc400, 0xffc407) AM_DEVREADWRITE8(S2651_0_TAG, s2651_device, read, write, 0x00ff)
+//	AM_RANGE(0xffc440, 0xffc447) AM_DEVREADWRITE8(S2651_1_TAG, s2651_device, read, write, 0x00ff)
+//	AM_RANGE(0xffc480, 0xffc487) AM_DEVREADWRITE8(S2651_2_TAG, s2651_device, read, write, 0x00ff)
+//	AM_RANGE(0xffc4c0, 0xffc4c7) AM_DEVREADWRITE8(S2651_3_TAG, s2651_device, read, write, 0x00ff)
+//  AM_RANGE(0xffc500, 0xffc7ff) // Winchester drive ports
+	AM_RANGE(0xfe0000, 0xfe1fff) AM_MIRROR(0x1e000) AM_ROM AM_REGION(M68000_TAG, 0)
 ADDRESS_MAP_END
 
-/* Input ports */
+
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( sage2 )
+//-------------------------------------------------
+
 static INPUT_PORTS_START( sage2 )
+	PORT_START("J6")
+
+	PORT_START("J7")
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(sage2)
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  I8255A_INTERFACE( ppi0_intf )
+//-------------------------------------------------
+
+/*
+	
+	IR0		U74 OUT2
+	IR1		RX2I+
+	IR2		TX1I+
+	IR3		TX2I+
+	IR4		MI-
+	IR5		CNI+
+	IR6		U74 OUT0
+	IR7		SI+
+	
+*/
+
+static const struct pic8259_interface pic_intf =
 {
-	sage2_state *state = machine.driver_data<sage2_state>();
-	UINT8* user1 = machine.region("user1")->base();
+	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_1),
+	DEVCB_LINE_VCC,
+	DEVCB_NULL
+};
 
-	memcpy((UINT8*)state->m_p_ram, user1, 0x2000);
 
-	machine.device("maincpu")->reset();
+//-------------------------------------------------
+//  I8255A_INTERFACE( ppi0_intf )
+//-------------------------------------------------
+
+WRITE8_MEMBER( sage2_state::ppi0_pc_w )
+{
+	/*
+
+        bit     signal
+
+        PC0     TC+
+        PC1     RDY+
+        PC2     FDIE+
+        PC3     SL0-
+        PC4     SL1-
+        PC5     MOT-
+        PC6		PCRMP-
+        PC7		FRES+
+
+    */
+	
+	// floppy motor
+	floppy_mon_w(m_floppy0, BIT(data, 5));
+	floppy_mon_w(m_floppy1, BIT(data, 5));
+	
+	// FDC reset
+	upd765_reset_w(m_fdc, BIT(data, 7));
 }
+
+static I8255A_INTERFACE( ppi0_intf )
+{
+	DEVCB_INPUT_PORT("J7"),
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("J6"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(sage2_state, ppi0_pc_w)
+};
+
+
+//-------------------------------------------------
+//  I8255A_INTERFACE( ppi1_intf )
+//-------------------------------------------------
+
+READ8_MEMBER( sage2_state::ppi1_pb_r )
+{
+	/*
+
+        bit     signal
+
+        PB0     FDI+
+        PB1     WP+
+        PB2     RG-
+        PB3     CD-
+        PB4     BUSY
+        PB5     PAPER
+        PB6		SEL
+        PB7		FAULT-
+
+    */
+	
+	return 0;
+}
+
+WRITE8_MEMBER( sage2_state::ppi1_pc_w )
+{
+	/*
+
+        bit     signal
+
+        PC0     PRES-
+        PC1     SC+
+        PC2     SI+
+        PC3     LEDR+
+        PC4     STROBE-
+        PC5     PRIME-
+        PC6		U38 CL
+        PC7		RMI-
+
+    */	
+}
+
+static I8255A_INTERFACE( ppi1_intf )
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_DRIVER_MEMBER(sage2_state, ppi1_pb_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(sage2_state, ppi1_pc_w)
+};
+
+
+//-------------------------------------------------
+//  pit8253_config pit0_intf
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( sage2_state::br1_w )
+{
+	m_usart0->transmit_clock();
+	m_usart0->receive_clock();
+}
+
+WRITE_LINE_MEMBER( sage2_state::br2_w )
+{
+	m_usart1->transmit_clock();
+	m_usart1->receive_clock();
+}
+
+static const struct pit8253_config pit0_intf =
+{
+	{
+		{
+			0, // from U75 OUT0
+			DEVCB_LINE_VCC,
+			DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir6_w)
+		}, {
+			XTAL_16MHz/2/125,
+			DEVCB_LINE_VCC,
+			DEVCB_DEVICE_LINE(I8253_0_TAG, pit8253_clk2_w)
+		}, {
+			0, // from OUT2
+			DEVCB_LINE_VCC,
+			DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir0_w)
+		}
+	}
+};
+
+
+//-------------------------------------------------
+//  pit8253_config pit1_intf
+//-------------------------------------------------
+
+static const struct pit8253_config pit1_intf =
+{
+	{
+		{
+			XTAL_16MHz/2/125,
+			DEVCB_LINE_VCC,
+			DEVCB_DEVICE_LINE(I8253_0_TAG, pit8253_clk0_w)
+		}, {
+			XTAL_16MHz/2/13,
+			DEVCB_LINE_VCC,
+			DEVCB_DRIVER_LINE_MEMBER(sage2_state, br1_w)
+		}, {
+			XTAL_16MHz/2/13,
+			DEVCB_LINE_VCC,
+			DEVCB_DRIVER_LINE_MEMBER(sage2_state, br1_w)
+		}
+	}
+};
+
+
+//-------------------------------------------------
+//  i8251_interface usart0_intf
+//-------------------------------------------------
+
+static const i8251_interface usart0_intf =
+{
+	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
+	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_5),
+	DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir2_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  i8251_interface usart1_intf
+//-------------------------------------------------
+
+static const i8251_interface usart1_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir1_w),
+	DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir3_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  upd765_interface fdc_intf
+//-------------------------------------------------
+
+static const floppy_interface floppy_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSDD,
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
+	"floppy_5_25",
+	NULL
+};
+
+static const upd765_interface fdc_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL,
+	UPD765_RDY_PIN_NOT_CONNECTED,
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
+
+//-------------------------------------------------
+//  centronics_interface centronics_intf
+//-------------------------------------------------
+
+static const centronics_interface centronics_intf =
+{
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  IEEE488_INTERFACE( ieee488_intf )
+//-------------------------------------------------
+
+static IEEE488_INTERFACE( ieee488_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  GENERIC_TERMINAL_INTERFACE( terminal_intf )
+//-------------------------------------------------
 
 WRITE8_MEMBER( sage2_state::kbd_put )
 {
@@ -75,29 +365,110 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(sage2_state, kbd_put)
 };
 
+
+
+//**************************************************************************
+//  MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_RESET( sage2 )
+//-------------------------------------------------
+
+void sage2_state::machine_reset()
+{
+	m_reset = 1;
+}
+
+
+
+//**************************************************************************
+//  MACHINE DRIVERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( sage2 )
+//-------------------------------------------------
+
 static MACHINE_CONFIG_START( sage2, sage2_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	// basic machine hardware
+	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sage2_mem)
 
-	MCFG_MACHINE_RESET(sage2)
-
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
+	// video hardware
+	MCFG_FRAGMENT_ADD(generic_terminal)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
-	/* uart */
-	MCFG_I8251_ADD("uart", default_i8251_interface)
+	// devices
+	MCFG_PIC8259_ADD(I8259_TAG, pic_intf)
+	MCFG_I8255A_ADD(I8255A_0_TAG, ppi0_intf)
+	MCFG_I8255A_ADD(I8255A_1_TAG, ppi1_intf)
+	MCFG_PIT8253_ADD(I8253_0_TAG, pit0_intf)
+	MCFG_PIT8253_ADD(I8253_1_TAG, pit1_intf)
+	MCFG_I8251_ADD(I8251_0_TAG, usart0_intf)
+	MCFG_I8251_ADD(I8251_1_TAG, usart1_intf)
+	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "sage2")
 MACHINE_CONFIG_END
 
-/* ROM definition */
+
+
+//**************************************************************************
+//  ROMS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ROM( sage2 )
+//-------------------------------------------------
+
 ROM_START( sage2 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "sage2.u18", 0x0000, 0x1000, CRC(ca9b312d) SHA1(99436a6d166aa5280c3b2d28355c4d20528fe48c))
-	ROM_LOAD16_BYTE( "sage2.u17", 0x0001, 0x1000, CRC(27e25045) SHA1(041cd9d4617473d089f31f18cbb375046c3b61bb))
+	ROM_REGION( 0x2000, M68000_TAG, 0 )
+	ROM_LOAD16_BYTE( "sage2.u18", 0x0001, 0x1000, CRC(ca9b312d) SHA1(99436a6d166aa5280c3b2d28355c4d20528fe48c) )
+	ROM_LOAD16_BYTE( "sage2.u17", 0x0000, 0x1000, CRC(27e25045) SHA1(041cd9d4617473d089f31f18cbb375046c3b61bb) )
 ROM_END
 
-/* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY         FULLNAME       FLAGS */
-COMP( 1982, sage2,  0,       0,      sage2,     sage2,    0, "Sage Technology", "Sage II", GAME_NOT_WORKING | GAME_NO_SOUND)
+
+//**************************************************************************
+//  DRIVER INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  DRIVER_INIT( sage2 )
+//-------------------------------------------------
+
+DIRECT_UPDATE_HANDLER( sage2_direct_update_handler )
+{
+	sage2_state *state = machine.driver_data<sage2_state>();
+
+	if (state->m_reset && address >= 0xfe0000)
+	{
+		state->m_reset = 0;
+	}
+	
+	return address;
+}
+
+static DRIVER_INIT( sage2 )
+{
+	address_space *program = machine.device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate(FUNC(sage2_direct_update_handler), &machine));
+}
+
+
+
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
+
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
+COMP( 1982, sage2,  0,       0,      sage2,     sage2,    sage2, "Sage Technology", "Sage II", GAME_NOT_WORKING | GAME_NO_SOUND )
