@@ -112,7 +112,7 @@ void i8279_device::device_reset()
 	m_read_flag = 0;
 	m_scanner = 0;
 	m_ctrl_key = 1;
-	m_key_down = 0xff;
+	m_key_down = 0xffff;
 
 	// from here is confirmed
 	m_ctrls[0] = 8;
@@ -123,8 +123,13 @@ void i8279_device::device_reset()
 
 void i8279_device::timer_adjust()
 {
-	UINT8 divider = (m_ctrls[1]) ? m_ctrls[1] : 1;
-	m_clock = clock() / divider;
+// Real device runs at about 100kHz internally, clock divider is chosen so that
+// this is the case. We do not need such speed, 200Hz is enough.
+
+	//UINT8 divider = (m_ctrls[1]) ? m_ctrls[1] : 1;
+	//m_clock = clock() / divider;
+
+	m_clock = 200;
 	m_timer->adjust(attotime::from_hz(m_clock), 0, attotime::from_hz(m_clock));
 }
 
@@ -179,12 +184,6 @@ void i8279_device::new_key(UINT8 data, bool skey, bool ckey)
 
 void i8279_device::new_fifo(UINT8 data)
 {
-	// see if key still down from last time
-	UINT16 key_down = (m_scanner << 8) | data;
-	if (key_down == m_key_down)
-		return;
-	m_key_down = key_down;
-
 	// see if already overrun
 	if (BIT(m_status, 5))
 		return;
@@ -224,7 +223,7 @@ void i8279_device::timer_mainloop()
 	// bit 3 - number of digits to display
 	// bit 4 - left or right entry
 
-	UINT8 scanner_mask = 15; //BIT(m_ctrls[0], 0) ? 15 : BIT(m_ctrls[0], 3) ? 15 : 7;
+	UINT8 scanner_mask = BIT(m_ctrls[0], 0) ? 15 : BIT(m_ctrls[0], 3) ? 15 : 7;
 	bool decoded = BIT(m_ctrls[0], 0);
 	UINT8 kbd_type = (m_ctrls[0] & 6) >> 1;
 	bool shift_key = 1;
@@ -254,8 +253,19 @@ void i8279_device::timer_mainloop()
 	if ( !m_in_rl_func.isnull() )
 	{
 		UINT8 rl = m_in_rl_func(0);
+
+		// see if key still down from last time
+		UINT16 key_down = (m_scanner << 8) | rl;
+		if (key_down == m_key_down)
+			rl = 0xff;
+		else
+		if ((rl == 0xff) && (m_scanner == m_key_down >> 8))
+			m_key_down = 0xffff;
+
+		// now process new key
 		if (rl < 0xff)
 		{
+			m_key_down = key_down;
 			switch (kbd_type)
 			{
 				case 0:
@@ -270,8 +280,6 @@ void i8279_device::timer_mainloop()
 					break;
 			}
 		}
-		else
-			m_key_down = 0xff;
 	}
 
 	// Increment scanline
@@ -399,8 +407,9 @@ void i8279_device::ctrl_w( UINT8 data )
 
 void i8279_device::data_w( UINT8 data )
 {//printf("Data: %X ",data);
-	if (BIT(m_ctrls[0], 4))
+	if (BIT(m_ctrls[0], 4) & m_autoinc)
 	{
+	// right-entry autoincrement not implemented yet
 	}
 	else
 	{

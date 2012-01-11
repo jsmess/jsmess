@@ -21,7 +21,7 @@
 
 		<!-- Background -->
 		<backdrop element="background">
-			<bounds left="0" top="0" right="406" bottom="69" />
+			<bounds left="0" top="0" right="362" bottom="69" />
 		</backdrop>
 
 		<!-- LEDs -->
