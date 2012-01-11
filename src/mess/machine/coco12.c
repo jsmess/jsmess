@@ -122,6 +122,17 @@ void coco12_state::pia1_pb_changed(void)
 
 
 //-------------------------------------------------
+//  update_cart_base
+//-------------------------------------------------
+
+void coco12_state::update_cart_base(UINT8 *cart_base)
+{
+	m_sam->configure_bank(3, cart_base, 0x4000, true);		// $C000-$FEFF
+}
+
+
+
+//-------------------------------------------------
 //  screen_update
 //-------------------------------------------------
 

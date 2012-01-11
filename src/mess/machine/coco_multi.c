@@ -39,17 +39,18 @@
      line is connected to the 6809's IRQ line. This allowed any hardware
      device in any slot to signal an IRQ to the CPU, no matter what the
      switch position was. OS-9 was designed from the very start to poll
-     each device attached on every IQR signal.
+     each device attached on every IRQ signal.
 
      Because of sloppy address decoding the original MPI also responds to
-     0xff9f. No software is known to take advantage of this. After the
-     introduction of the CoCo 3, which uses 0xff9f internally, Tandy provided
+     $FF9F. No software is known to take advantage of this. After the
+     introduction of the CoCo 3, which uses $FF9F internally, Tandy provided
      free upgrades to any MPI to fix this problem.
 
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/coco.h"
 #include "coco_multi.h"
 #include "coco_232.h"
 #include "coco_orch90.h"
@@ -60,6 +61,8 @@
 #define SLOT2_TAG			"slot2"
 #define SLOT3_TAG			"slot3"
 #define SLOT4_TAG			"slot4"
+
+
 
 /***************************************************************************
     IMPLEMENTATION
@@ -117,6 +120,8 @@ MACHINE_CONFIG_END
 
 const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
 
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -124,11 +129,14 @@ const device_type COCO_MULTIPAK = &device_creator<coco_multipak_device>;
 //-------------------------------------------------
 //  coco_multipak_device - constructor
 //-------------------------------------------------
+
 coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, COCO_MULTIPAK, "CoCo Multi-Pak Interface", tag, owner, clock),
 		device_cococart_interface( mconfig, *this )
 {
 }
+
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -136,14 +144,36 @@ coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const 
 
 void coco_multipak_device::device_start()
 {
-	m_slot1 = dynamic_cast<cococart_slot_device *>(subdevice(SLOT1_TAG));
-	m_slot2 = dynamic_cast<cococart_slot_device *>(subdevice(SLOT2_TAG));
-	m_slot3 = dynamic_cast<cococart_slot_device *>(subdevice(SLOT3_TAG));
-	m_slot4 = dynamic_cast<cococart_slot_device *>(subdevice(SLOT4_TAG));
+	// identify slots
+	m_slots[0] = dynamic_cast<cococart_slot_device *>(subdevice(SLOT1_TAG));
+	m_slots[1] = dynamic_cast<cococart_slot_device *>(subdevice(SLOT2_TAG));
+	m_slots[2] = dynamic_cast<cococart_slot_device *>(subdevice(SLOT3_TAG));
+	m_slots[3] = dynamic_cast<cococart_slot_device *>(subdevice(SLOT4_TAG));
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 
-	m_active = m_slot4;
+	// install $FF7F handler
+	write8_delegate wh = write8_delegate(FUNC(coco_multipak_device::ff7f_write), this);
+	machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM)->install_write_handler(0xFF7F, 0xFF7F, wh);
+
+	// initial state
+	m_select = 0xFF;
+
+	// save state
+	save_item(NAME(m_select));
 }
+
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void coco_multipak_device::device_reset()
+{
+	m_select = 0xFF;
+}
+
+
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
@@ -155,29 +185,82 @@ machine_config_constructor coco_multipak_device::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( coco_multi );
 }
 
-/*-------------------------------------------------
-    get_cart_base
--------------------------------------------------*/
+
+
+//-------------------------------------------------
+//  get_cart_base
+//-------------------------------------------------
 
 UINT8* coco_multipak_device::get_cart_base()
 {
-	return m_active->get_cart_base();
+	return active_cts_slot()->get_cart_base();
 }
 
-/*-------------------------------------------------
-    read
--------------------------------------------------*/
+
+
+//-------------------------------------------------
+//  read
+//-------------------------------------------------
 
 READ8_MEMBER(coco_multipak_device::read)
 {
-	return m_active->read(space,offset);
+	return active_scs_slot()->read(space,offset);
 }
 
-/*-------------------------------------------------
-    write
--------------------------------------------------*/
+
+
+//-------------------------------------------------
+//  write
+//-------------------------------------------------
 
 WRITE8_MEMBER(coco_multipak_device::write)
 {
-	m_active->write(space,offset,data);
+	active_scs_slot()->write(space,offset,data);
+}
+
+
+
+//-------------------------------------------------
+//  ff7f_write
+//-------------------------------------------------
+
+WRITE8_MEMBER(coco_multipak_device::ff7f_write)
+{
+	set_select(data);
+}
+
+
+
+//-------------------------------------------------
+//  set_select
+//-------------------------------------------------
+
+void coco_multipak_device::set_select(UINT8 new_select)
+{
+	UINT8 xorval = m_select ^ new_select;
+	m_select = new_select;
+	if (xorval & 0x30)
+		cart_base_changed();
+}
+
+
+
+//-------------------------------------------------
+//  active_scs_slot
+//-------------------------------------------------
+
+cococart_slot_device *coco_multipak_device::active_scs_slot(void)
+{
+	return m_slots[(m_select >> 0) & 0x03];
+}
+
+
+
+//-------------------------------------------------
+//  active_cts_slot
+//-------------------------------------------------
+
+cococart_slot_device *coco_multipak_device::active_cts_slot(void)
+{
+	return m_slots[(m_select >> 4) & 0x03];
 }

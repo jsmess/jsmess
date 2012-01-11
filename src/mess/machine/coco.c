@@ -145,6 +145,9 @@ void coco_state::device_start()
 	m_hiresjoy_transition_timer[1] = timer_alloc(TIMER_HIRES_JOYSTICK_Y);
 	m_diecom_lightgun_timer = timer_alloc(TIMER_DIECOM_LIGHTGUN);
 
+	/* cart base update */
+	m_cococart->set_cart_base_update(cococart_base_update_delegate(FUNC(coco_state::update_cart_base), this));
+
 	/* save state support */
 	save_item(NAME(m_dac_output));
 	save_item(NAME(m_hiresjoy_ca));

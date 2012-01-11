@@ -141,6 +141,7 @@ protected:
 	virtual void update_keyboard_input(UINT8 value, UINT8 z);
 	virtual void cart_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
+	virtual void update_cart_base(UINT8 *cart_base) = 0;
 
 	/* PIA0 */
 	DECLARE_WRITE8_MEMBER( pia0_pb_w );
