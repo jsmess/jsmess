@@ -212,12 +212,12 @@ READ8_MEMBER( rm380z_state::videoram_read )
 
 void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsigned char* chsb,int vmode)
 {
-	bool attrDim=false;
+//	bool attrDim=false;
 	bool attrRev=false;
 	bool attrUnder=false;
 	
 	if (attribs&0x02) attrUnder=true;
-	if (attribs&0x04) attrDim=true;
+//	if (attribs&0x04) attrDim=true;
 	if (attribs&0x08) attrRev=true;
 	
 	if ((charnum>0)&&(charnum<=0x7f))
