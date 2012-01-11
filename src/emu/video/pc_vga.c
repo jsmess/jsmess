@@ -1109,6 +1109,7 @@ static void vga_vh_vga(bitmap_t &bitmap)
 	UINT16 *bitmapline;
 	UINT16 mask_comp;
 
+	/* line compare is screen sensitive */
 	mask_comp = 0xff | (LINES & 0x300);
 
 	curr_addr = 0;
