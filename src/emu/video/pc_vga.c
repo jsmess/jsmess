@@ -23,7 +23,8 @@
     - add emulated mc6845 hook-up
     - fix resolution change
     - fix video update.
-    - fix partial updates (example: The Incredible Machine)
+    - fix partial updates (The Incredible Machine)
+    - check doublescan condition (Robotron)
     - (and many more ...)
 
     ROM declarations:
@@ -260,10 +261,10 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 	UINT32 *newbitmapline;
 	pen_t pen;
 
-	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
+	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES * (DOUBLESCAN+1);
 		 line += height, addr=(addr+EGA_LINE_LENGTH)&0x3ffff)
 	{
-		bitmapline = &bitmap.pix32(line);
+		bitmapline = &bitmap.pix32(line >> DOUBLESCAN);
 
 		for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+4)&0x3ffff)
 		{
@@ -448,6 +449,8 @@ SCREEN_UPDATE_RGB32( pc_video )
 
 		bitmap.fill(0, cliprect);
 	}
+
+	//popmessage("%02x",cur_mode);
 
 	switch(cur_mode)
 	{
@@ -827,6 +830,8 @@ static WRITE8_HANDLER(vga_crtc_w)
 				vga.line_compare = (((vga.crtc.data[0x09] & 0x40) << 3) | ((vga.crtc.data[0x07] & 0x10) << 4) | vga.crtc.data[0x18])/2;
 			if (vga.crtc.index < vga.svga_intf.crtc_regcount)
 				vga.crtc.data[vga.crtc.index] = data;
+
+			//printf("%02x %02x\n",vga.crtc.index,data);
 			break;
 	}
 }
