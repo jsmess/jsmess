@@ -23,6 +23,7 @@
     - add emulated mc6845 hook-up
     - fix resolution change
     - fix video update.
+    - fix partial updates (example: The Incredible Machine)
     - (and many more ...)
 
     ROM declarations:
@@ -320,14 +321,14 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 			{
 				if(pos + 0x20 > vga.svga_intf.vram_size)
 					return;
-				bitmapline[c+0] = vga.memory[pos+0];
-				bitmapline[c+1] = vga.memory[pos+1];
-				bitmapline[c+2] = vga.memory[pos+2];
-				bitmapline[c+3] = vga.memory[pos+3];
-				bitmapline[c+4] = vga.memory[pos+0x10];
-				bitmapline[c+5] = vga.memory[pos+0x11];
-				bitmapline[c+6] = vga.memory[pos+0x12];
-				bitmapline[c+7] = vga.memory[pos+0x13];
+				bitmapline[c+0] = machine.pens[vga.memory[pos+0]];
+				bitmapline[c+1] = machine.pens[vga.memory[pos+1]];
+				bitmapline[c+2] = machine.pens[vga.memory[pos+2]];
+				bitmapline[c+3] = machine.pens[vga.memory[pos+3]];
+				bitmapline[c+4] = machine.pens[vga.memory[pos+0x10]];
+				bitmapline[c+5] = machine.pens[vga.memory[pos+0x11]];
+				bitmapline[c+6] = machine.pens[vga.memory[pos+0x12]];
+				bitmapline[c+7] = machine.pens[vga.memory[pos+0x13]];
 			}
 		}
 	}
@@ -345,14 +346,14 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 			{
 				if(pos + 0x08 > vga.svga_intf.vram_size)
 					return;
-				bitmapline[c+0] = vga.memory[pos+0];
-				bitmapline[c+1] = vga.memory[pos+1];
-				bitmapline[c+2] = vga.memory[pos+2];
-				bitmapline[c+3] = vga.memory[pos+3];
-				bitmapline[c+4] = vga.memory[pos+4];
-				bitmapline[c+5] = vga.memory[pos+5];
-				bitmapline[c+6] = vga.memory[pos+6];
-				bitmapline[c+7] = vga.memory[pos+7];
+				bitmapline[c+0] = machine.pens[vga.memory[pos+0]];
+				bitmapline[c+1] = machine.pens[vga.memory[pos+1]];
+				bitmapline[c+2] = machine.pens[vga.memory[pos+2]];
+				bitmapline[c+3] = machine.pens[vga.memory[pos+3]];
+				bitmapline[c+4] = machine.pens[vga.memory[pos+4]];
+				bitmapline[c+5] = machine.pens[vga.memory[pos+5]];
+				bitmapline[c+6] = machine.pens[vga.memory[pos+6]];
+				bitmapline[c+7] = machine.pens[vga.memory[pos+7]];
 			}
 		}
 	}
