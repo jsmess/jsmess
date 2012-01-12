@@ -14,10 +14,7 @@
 
 	TODO:
 
-	- dip switches
-	- centronics ACK interrupt flipflop
-	- centronics signals
-	- floppy interrupt
+	- boot ROM mirror
 	- TMS9914 IEEE-488 controller
 	- board 2 (4x 2651 USART)
 	- Winchester controller
@@ -70,9 +67,74 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( sage2 )
-	PORT_START("J6")
-
 	PORT_START("J7")
+	PORT_DIPNAME( 0x07, 0x00, "Terminal Baud Rate" ) PORT_DIPLOCATION("J7:1,2,3")
+	PORT_DIPSETTING(    0x00, "19200" )
+	PORT_DIPSETTING(    0x01, "9600" )
+	PORT_DIPSETTING(    0x02, "4800" )
+	PORT_DIPSETTING(    0x03, "2400" )
+	PORT_DIPSETTING(    0x04, "1200" )
+	PORT_DIPSETTING(    0x05, "600" )
+	PORT_DIPSETTING(    0x06, "300" )
+	PORT_DIPSETTING(    0x07, "Reserved (19200)" )
+	PORT_DIPNAME( 0x08, 0x08, "Parity Control" ) PORT_DIPLOCATION("J7:4")
+	PORT_DIPSETTING(    0x00, "Even Parity" )
+	PORT_DIPSETTING(    0x08, "Disabled" )
+	PORT_DIPNAME( 0x30, 0x00, "Boot Device" ) PORT_DIPLOCATION("J7:5,6")
+	PORT_DIPSETTING(    0x00, "Debugger" )
+	PORT_DIPSETTING(    0x10, "Floppy Drive 0" )
+	PORT_DIPSETTING(    0x20, "Winchester" )
+	PORT_DIPSETTING(    0x30, "Reserved (Debugger)" )
+	PORT_DIPNAME( 0x40, 0x00, "Floppy Configuration" ) PORT_DIPLOCATION("J7:7")
+	PORT_DIPSETTING(    0x00, "96 TPI" )
+	PORT_DIPSETTING(    0x40, "48 TPI" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("J7:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("J6")
+	PORT_DIPNAME( 0x1f, 0x07, "IEEE-488 Bus Address" ) PORT_DIPLOCATION("J6:1,2,3,4,5")
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9" )
+	PORT_DIPSETTING(    0x0a, "10" )
+	PORT_DIPSETTING(    0x0b, "11" )
+	PORT_DIPSETTING(    0x0c, "12" )
+	PORT_DIPSETTING(    0x0d, "13" )
+	PORT_DIPSETTING(    0x0e, "14" )
+	PORT_DIPSETTING(    0x0f, "15" )
+	PORT_DIPSETTING(    0x10, "16" )
+	PORT_DIPSETTING(    0x11, "17" )
+	PORT_DIPSETTING(    0x12, "18" )
+	PORT_DIPSETTING(    0x13, "19" )
+	PORT_DIPSETTING(    0x14, "20" )
+	PORT_DIPSETTING(    0x15, "21" )
+	PORT_DIPSETTING(    0x16, "22" )
+	PORT_DIPSETTING(    0x17, "23" )
+	PORT_DIPSETTING(    0x18, "24" )
+	PORT_DIPSETTING(    0x19, "25" )
+	PORT_DIPSETTING(    0x1a, "26" )
+	PORT_DIPSETTING(    0x1b, "27" )
+	PORT_DIPSETTING(    0x1c, "28" )
+	PORT_DIPSETTING(    0x1d, "29" )
+	PORT_DIPSETTING(    0x1e, "30" )
+	PORT_DIPSETTING(    0x1f, "31" )
+	PORT_DIPNAME( 0x20, 0x00, "IEEE-488 TALK" ) PORT_DIPLOCATION("J6:6")
+	PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x20, "Enabled" )
+	PORT_DIPNAME( 0x40, 0x00, "IEEE-488 LISTEN" ) PORT_DIPLOCATION("J6:7")
+	PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x40, "Enabled" )
+	PORT_DIPNAME( 0x80, 0x00, "IEEE-488 Consecutive Adresses" ) PORT_DIPLOCATION("J6:8")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
 INPUT_PORTS_END
 
 
@@ -127,6 +189,20 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 
     */
 	
+	// floppy terminal count
+	upd765_tc_w(m_fdc, BIT(data, 0));
+	
+	// floppy ready
+	upd765_ready_w(m_fdc, BIT(data, 1));
+	
+	// floppy interrupt enable
+	m_fdie = BIT(data, 2);
+	update_fdc_int();
+	
+	// drive select
+	m_sl0 = BIT(data, 3);
+	m_sl1 = BIT(data, 4);
+	
 	// floppy motor
 	floppy_mon_w(m_floppy0, BIT(data, 5));
 	floppy_mon_w(m_floppy1, BIT(data, 5));
@@ -167,7 +243,26 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 
     */
 	
-	return 0;
+	UINT8 data = 0;
+	
+	// floppy interrupt
+	data = upd765_int_r(m_fdc);
+	
+	// floppy write protected
+	if (!m_sl0) data |= floppy_wpt_r(m_floppy0) << 1;
+	if (!m_sl1) data |= floppy_wpt_r(m_floppy1) << 1;
+	
+	// RS-232 ring indicator
+	
+	// RS-232 carrier detect
+	
+	// centronics
+	data |= centronics_busy_r(m_centronics) << 4;
+	data |= centronics_pe_r(m_centronics) << 5;
+	data |= centronics_vcc_r(m_centronics) << 6;
+	data |= centronics_fault_r(m_centronics) << 7;
+
+	return data;
 }
 
 WRITE8_MEMBER( sage2_state::ppi1_pc_w )
@@ -177,15 +272,43 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
         bit     signal
 
         PC0     PRES-
-        PC1     SC+
+        PC1     U8 SC+
         PC2     SI+
         PC3     LEDR+
         PC4     STROBE-
         PC5     PRIME-
-        PC6		U38 CL
+        PC6		U38 CL-
         PC7		RMI-
 
-    */	
+    */
+	
+	if (!BIT(data, 0))
+	{
+		// clear parity error interrupt
+		m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+	}
+	
+	// s? interrupt
+	pic8259_ir7_w(m_pic, BIT(data, 2));
+	
+	// processor LED
+	output_set_led_value(0, BIT(data, 3));
+	
+	// centronics
+	centronics_strobe_w(m_centronics, BIT(data, 4));
+	centronics_prime_w(m_centronics, BIT(data, 5));
+	
+	if (!BIT(data, 6))
+	{
+		// clear ACK interrupt
+		pic8259_ir5_w(m_pic, CLEAR_LINE);
+	}
+	
+	if (!BIT(data, 7))
+	{
+		// clear modem interrupt
+		pic8259_ir4_w(m_pic, CLEAR_LINE);
+	}
 }
 
 static I8255A_INTERFACE( ppi1_intf )
@@ -202,18 +325,6 @@ static I8255A_INTERFACE( ppi1_intf )
 //-------------------------------------------------
 //  pit8253_config pit0_intf
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER( sage2_state::br1_w )
-{
-	m_usart0->transmit_clock();
-	m_usart0->receive_clock();
-}
-
-WRITE_LINE_MEMBER( sage2_state::br2_w )
-{
-	m_usart1->transmit_clock();
-	m_usart1->receive_clock();
-}
 
 static const struct pit8253_config pit0_intf =
 {
@@ -239,6 +350,18 @@ static const struct pit8253_config pit0_intf =
 //  pit8253_config pit1_intf
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( sage2_state::br1_w )
+{
+	m_usart0->transmit_clock();
+	m_usart0->receive_clock();
+}
+
+WRITE_LINE_MEMBER( sage2_state::br2_w )
+{
+	m_usart1->transmit_clock();
+	m_usart1->receive_clock();
+}
+
 static const struct pit8253_config pit1_intf =
 {
 	{
@@ -253,7 +376,7 @@ static const struct pit8253_config pit1_intf =
 		}, {
 			XTAL_16MHz/2/13,
 			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(sage2_state, br1_w)
+			DEVCB_DRIVER_LINE_MEMBER(sage2_state, br2_w)
 		}
 	}
 };
@@ -312,11 +435,32 @@ static const floppy_interface floppy_intf =
 	NULL
 };
 
+void sage2_state::update_fdc_int()
+{
+	m_maincpu->set_input_line(M68K_IRQ_6, m_fdie & m_fdc_int);
+}
+
+WRITE_LINE_MEMBER( sage2_state::fdc_int_w )
+{
+	m_fdc_int = state;
+	update_fdc_int();
+}
+
+static UPD765_GET_IMAGE( fdc_get_image )
+{
+	sage2_state *state = device->machine().driver_data<sage2_state>();
+
+	if (!state->m_sl0) return state->m_floppy0;
+	if (!state->m_sl1) return state->m_floppy1;
+	
+	return NULL;
+}
+
 static const upd765_interface fdc_intf =
 {
+	DEVCB_DRIVER_LINE_MEMBER(sage2_state, fdc_int_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL,
+	fdc_get_image,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
@@ -326,10 +470,18 @@ static const upd765_interface fdc_intf =
 //  centronics_interface centronics_intf
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( sage2_state::ack_w )
+{
+	if (!state)
+	{
+		pic8259_ir5_w(m_pic, ASSERT_LINE);
+	}
+}
+
 static const centronics_interface centronics_intf =
 {
 	0,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(sage2_state, ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

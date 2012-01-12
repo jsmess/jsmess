@@ -31,33 +31,52 @@ public:
 	sage2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, M68000_TAG),
-		  m_ieee488(*this, IEEE488_TAG),
+		  m_pic(*this, I8259_TAG),
 		  m_usart0(*this, I8251_0_TAG),
 		  m_usart1(*this, I8251_1_TAG),
 		  m_fdc(*this, UPD765_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1)
+		  m_floppy1(*this, FLOPPY_1),
+		  m_centronics(*this, CENTRONICS_TAG),
+		  m_ieee488(*this, IEEE488_TAG),
+		  m_reset(1),
+		  m_fdc_int(0),
+		  m_fdie(0),
+		  m_sl0(1),
+		  m_sl1(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<ieee488_device> m_ieee488;
+	required_device<device_t> m_pic;
 	required_device<i8251_device> m_usart0;
 	required_device<i8251_device> m_usart1;
 	required_device<device_t> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
+	required_device<device_t> m_centronics;
+	required_device<ieee488_device> m_ieee488;
 
 	virtual void machine_reset();
+	
+	void update_fdc_int();
 
 	DECLARE_WRITE_LINE_MEMBER( br1_w );
 	DECLARE_WRITE_LINE_MEMBER( br2_w );
 	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
 	DECLARE_READ8_MEMBER( ppi1_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
+	DECLARE_WRITE_LINE_MEMBER( ack_w );
 		
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	
 	int m_reset;
+
+	// floppy state
+	int m_fdc_int;
+	int m_fdie;
+	int m_sl0;
+	int m_sl1;
 };
