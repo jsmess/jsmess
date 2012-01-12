@@ -17,7 +17,7 @@ const device_type SCC8530 = &device_creator<scc8530_t>;
     PARAMETERS
 ***************************************************************************/
 
-#define LOG_SCC	(1)
+#define LOG_SCC	(0)
 
 /***************************************************************************
     IMPLEMENTATION
@@ -220,7 +220,7 @@ UINT8 scc8530_t::getareg()
 
 	if (reg == 0)
 	{
-		UINT8 rv = 5; // TX buffer empty, RX available
+		UINT8 rv = 0;
 
 		Chan *ourCh = &channel[0];
 
@@ -250,7 +250,7 @@ UINT8 scc8530_t::getbreg()
 
 	if (reg == 0)
 	{
-		UINT8 rv = 5; // TX buffer empty, RX available
+		UINT8 rv = 0;
 
 		Chan *ourCh = &channel[1];
 
