@@ -7,6 +7,7 @@
         29/12/2011 Skeleton driver.
 
 ****************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -17,21 +18,26 @@ public:
 	m79152pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	UINT8 *m_p_chargen;
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_attributes;
 };
 
-static ADDRESS_MAP_START(m79152pc_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(m79152pc_mem, AS_PROGRAM, 8, m79152pc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xffff) AM_RAM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE(m_p_attributes)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m79152pc_io , AS_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
+static ADDRESS_MAP_START( m79152pc_io, AS_IO, 8, m79152pc_state)
+	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( m79152pc )
+static INPUT_PORTS_START( m79152pc )
 INPUT_PORTS_END
 
 
@@ -41,47 +47,96 @@ static MACHINE_RESET(m79152pc)
 
 static VIDEO_START( m79152pc )
 {
+	m79152pc_state *state = machine.driver_data<m79152pc_state>();
+	state->m_p_chargen = machine.region("chargen")->base()+4;
 }
 
 static SCREEN_UPDATE( m79152pc )
 {
-    return 0;
+// Attributes are unknown so are not implemented
+	m79152pc_state *state = screen.machine().driver_data<m79152pc_state>();
+	UINT8 y,ra,chr,gfx; //,attr;
+	UINT16 sy=0,ma=0,x;
+
+	for (y = 0; y < 25; y++)
+	{
+		for (ra = 0; ra < 12; ra++)
+		{
+			UINT16 *p = &bitmap.pix16(sy++);
+
+			for (x = ma; x < ma + 80; x++)
+			{
+				chr = state->m_p_videoram[x];
+				//attr = state->m_p_attributes[x];
+				gfx = state->m_p_chargen[(chr<<4) | ra ];
+
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
+			}
+		}
+		ma+=80;
+	}
+	return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout m79152pc_charlayout =
+{
+	8, 12,					/* 8 x 16 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16					/* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( m79152pc )
+	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MCFG_CPU_PROGRAM_MAP(m79152pc_mem)
-    MCFG_CPU_IO_MAP(m79152pc_io)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(m79152pc_mem)
+	MCFG_CPU_IO_MAP(m79152pc_io)
 
-    MCFG_MACHINE_RESET(m79152pc)
+	MCFG_MACHINE_RESET(m79152pc)
 
-    /* video hardware */
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MCFG_SCREEN_SIZE(640, 480)
-    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 300-1)
+	MCFG_VIDEO_START(m79152pc)
 	MCFG_SCREEN_UPDATE(m79152pc)
-
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(black_and_white)
-
-    MCFG_VIDEO_START(m79152pc)
+	MCFG_GFXDECODE(m79152pc)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( m79152pc )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "left.bin", 0x0000, 0x4000, CRC(8cd677fc) SHA1(7ad28f3ba984383f24a36639ca27fc1eb5a5d002))
-	ROM_REGION( 0x1800, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "right.bin", 0x0000, 0x1000, CRC(93f83fdc) SHA1(e8121b3d175c46c02828f43ec071a7d9c62e7c26))
-	ROM_LOAD( "char.bin",  0x1000, 0x0800, CRC(da3792a5) SHA1(b4a4f0d61d8082b7909a346a5b01494c53cf8d05))
+
+	ROM_REGION( 0x1800, "chargen", ROMREGION_INVERT )
+	ROM_LOAD( "right.bin", 0x0000, 0x1000, CRC(93f83fdc) SHA1(e8121b3d175c46c02828f43ec071a7d9c62e7c26)) // chargen
+	ROM_LOAD( "char.bin",  0x1000, 0x0800, CRC(da3792a5) SHA1(b4a4f0d61d8082b7909a346a5b01494c53cf8d05)) // unknown
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( ????, m79152pc,  0,       0,	m79152pc,	m79152pc,	 0,   "Mera-Elzab",   "79152pc",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME       FLAGS */
+COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, 0,   "Mera-Elzab", "79152pc", GAME_NOT_WORKING | GAME_NO_SOUND)
