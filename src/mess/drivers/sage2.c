@@ -14,6 +14,16 @@
 
 	TODO:
 
+	- floppy loading
+	- PROM test fails
+	- i8251 test fails on boot
+	
+		001BD8: move.b  D6, $c071.w
+		001BDC: moveq   #$e, D7
+		001BDE: dbra    D7, $1bde
+		001BE2: btst    #$2, $c073.w
+		001BE8: bne     $1bec
+		
 	- TMS9914 IEEE-488 controller
 	- board 2 (4x 2651 USART)
 	- Winchester controller
@@ -79,13 +89,14 @@ static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	AM_RANGE(0xffc020, 0xffc027) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, DIPs + Floppy ctrl port
 	AM_RANGE(0xffc030, 0xffc031) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xffc032, 0xffc033) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffc040, 0xffc041) AM_DEVREADWRITE8_LEGACY(I8259_TAG, pic8259_r, pic8259_w, 0x00ff)
-	AM_RANGE(0xffc050, 0xffc051) AM_DEVREADWRITE8_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w, 0x00ff) // FDC 765, status
-	AM_RANGE(0xffc052, 0xffc053) AM_DEVREAD8_LEGACY(UPD765_TAG, upd765_status_r, 0x00ff) // FDC 765, control
+	AM_RANGE(0xffc040, 0xffc043) AM_DEVREADWRITE8_LEGACY(I8259_TAG, pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0xffc050, 0xffc051) AM_DEVREAD8_LEGACY(UPD765_TAG, upd765_status_r, 0x00ff)
+	AM_RANGE(0xffc052, 0xffc053) AM_DEVREADWRITE8_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w, 0x00ff)
 	AM_RANGE(0xffc060, 0xffc067) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, Printer
-	AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffc070, 0xffc071) AM_DEVREAD8(I8251_0_TAG, i8251_device, data_r, 0x00ff) AM_DEVWRITE8_LEGACY(TERMINAL_TAG, terminal_write, 0x00ff)
+//	AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xffc072, 0xffc073) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffc080, 0xffc087) AM_DEVREADWRITE8_LEGACY(I8253_0_TAG, pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0xffc080, 0xffc087) AM_MIRROR(0x78) AM_DEVREADWRITE8_LEGACY(I8253_0_TAG, pit8253_r, pit8253_w, 0x00ff)
 //	AM_RANGE(0xffc400, 0xffc407) AM_DEVREADWRITE8(S2651_0_TAG, s2651_device, read, write, 0x00ff)
 //	AM_RANGE(0xffc440, 0xffc447) AM_DEVREADWRITE8(S2651_1_TAG, s2651_device, read, write, 0x00ff)
 //	AM_RANGE(0xffc480, 0xffc487) AM_DEVREADWRITE8(S2651_2_TAG, s2651_device, read, write, 0x00ff)
@@ -105,29 +116,29 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sage2 )
 	PORT_START("J7")
-	PORT_DIPNAME( 0x07, 0x00, "Terminal Baud Rate" ) PORT_DIPLOCATION("J7:1,2,3")
-	PORT_DIPSETTING(    0x00, "19200" )
-	PORT_DIPSETTING(    0x01, "9600" )
-	PORT_DIPSETTING(    0x02, "4800" )
-	PORT_DIPSETTING(    0x03, "2400" )
-	PORT_DIPSETTING(    0x04, "1200" )
-	PORT_DIPSETTING(    0x05, "600" )
-	PORT_DIPSETTING(    0x06, "300" )
-	PORT_DIPSETTING(    0x07, "Reserved (19200)" )
+	PORT_DIPNAME( 0x07, 0x07, "Terminal Baud Rate" ) PORT_DIPLOCATION("J7:1,2,3")
+	PORT_DIPSETTING(    0x07, "19200" )
+	PORT_DIPSETTING(    0x06, "9600" )
+	PORT_DIPSETTING(    0x05, "4800" )
+	PORT_DIPSETTING(    0x04, "2400" )
+	PORT_DIPSETTING(    0x03, "1200" )
+	PORT_DIPSETTING(    0x02, "600" )
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x00, "Reserved (19200)" )
 	PORT_DIPNAME( 0x08, 0x08, "Parity Control" ) PORT_DIPLOCATION("J7:4")
-	PORT_DIPSETTING(    0x00, "Even Parity" )
-	PORT_DIPSETTING(    0x08, "Disabled" )
-	PORT_DIPNAME( 0x30, 0x00, "Boot Device" ) PORT_DIPLOCATION("J7:5,6")
-	PORT_DIPSETTING(    0x00, "Debugger" )
-	PORT_DIPSETTING(    0x10, "Floppy Drive 0" )
-	PORT_DIPSETTING(    0x20, "Winchester" )
-	PORT_DIPSETTING(    0x30, "Reserved (Debugger)" )
-	PORT_DIPNAME( 0x40, 0x00, "Floppy Configuration" ) PORT_DIPLOCATION("J7:7")
-	PORT_DIPSETTING(    0x00, "96 TPI" )
-	PORT_DIPSETTING(    0x40, "48 TPI" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("J7:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, "Even Parity" )
+	PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPNAME( 0x30, 0x30, "Boot Device" ) PORT_DIPLOCATION("J7:5,6")
+	PORT_DIPSETTING(    0x30, "Debugger" )
+	PORT_DIPSETTING(    0x20, "Floppy Drive 0" )
+	PORT_DIPSETTING(    0x10, "Winchester" )
+	PORT_DIPSETTING(    0x00, "Reserved (Debugger)" )
+	PORT_DIPNAME( 0x40, 0x40, "Floppy Configuration" ) PORT_DIPLOCATION("J7:7")
+	PORT_DIPSETTING(    0x40, "96 TPI" )
+	PORT_DIPSETTING(    0x00, "48 TPI" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("J7:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("J6")
 	PORT_DIPNAME( 0x1f, 0x07, "IEEE-488 Bus Address" ) PORT_DIPLOCATION("J6:1,2,3,4,5")
@@ -425,8 +436,8 @@ static const struct pit8253_config pit1_intf =
 
 static const i8251_interface usart0_intf =
 {
-	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
-	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
+	DEVCB_NULL, //DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
+	DEVCB_NULL, //DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -547,6 +558,7 @@ static IEEE488_INTERFACE( ieee488_intf )
 
 WRITE8_MEMBER( sage2_state::kbd_put )
 {
+	m_usart0->receive_character(data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
@@ -651,6 +663,10 @@ static DRIVER_INIT( sage2 )
 {
 	address_space *program = machine.device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
 	program->set_direct_update_handler(direct_update_delegate(FUNC(sage2_direct_update_handler), &machine));
+	
+	// patch out i8251 test
+	machine.region(M68000_TAG)->base()[0x1be8] = 0xd6;
+	machine.region(M68000_TAG)->base()[0x1be9] = 0x4e;
 }
 
 
