@@ -85,6 +85,13 @@ static int global_omit_untested;
 static void (*global_warn)(const char *message);
 
 
+void CLIB_DECL logerror(const char *format, ...)
+{
+	va_list arg;
+	va_start(arg, format);
+	printf(format, arg);
+	va_end(arg);
+}
 
 /***************************************************************************
 
