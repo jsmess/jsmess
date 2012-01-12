@@ -4,6 +4,8 @@
 
         12/05/2009 Initial version
 
+        2011-JAN-12 MMD2 working {Robbbert]
+
 MMD-1
 *****
 
@@ -135,8 +137,7 @@ SW8 Control if the PORT displays echo the 7-segment displays (high), or just act
 
 ToDo
 - Hook up reset key and dipswitch
-- Connect 3 status LEDs
-- Add interrupt module
+- Add interrupt module (INTE LED is always on atm)
 - Lots of other things
 
 ****************************************************************************/
@@ -164,6 +165,8 @@ public:
 	DECLARE_READ8_MEMBER(mmd2_kbd_r);
 	DECLARE_WRITE8_MEMBER(mmd2_scanlines_w);
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
+	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
+	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
 	UINT8 m_return_code;
 	UINT8 m_digit;
 };
@@ -233,28 +236,6 @@ READ8_MEMBER( mmd1_state::mmd1_keyboard_r )
 	else
 		return m_return_code;
 }
-
-READ8_MEMBER( mmd1_state::mmd2_bank_r )
-{
-	memory_set_bank(machine(), "bank1", offset);
-	memory_set_bank(machine(), "bank2", offset);
-	memory_set_bank(machine(), "bank3", offset);
-	memory_set_bank(machine(), "bank4", offset);
-	memory_set_bank(machine(), "bank5", offset);
-	memory_set_bank(machine(), "bank6", offset);
-	memory_set_bank(machine(), "bank7", offset);
-	memory_set_bank(machine(), "bank8", offset);
-	return 0xff;
-}
-
-READ8_MEMBER( mmd1_state::mmd2_01_r )
-{
-	// need to add cassin, ttyin bits
-	UINT8 data = 0x87;
-	data |= input_port_read(machine(),"DSW");
-	return data;
-}
-
 
 static ADDRESS_MAP_START(mmd1_mem, AS_PROGRAM, 8, mmd1_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -377,6 +358,27 @@ C  D  E  F      MEM  REGS  AUX  CANCEL
 
 */
 
+READ8_MEMBER( mmd1_state::mmd2_bank_r )
+{
+	memory_set_bank(machine(), "bank1", offset);
+	memory_set_bank(machine(), "bank2", offset);
+	memory_set_bank(machine(), "bank3", offset);
+	memory_set_bank(machine(), "bank4", offset);
+	memory_set_bank(machine(), "bank5", offset);
+	memory_set_bank(machine(), "bank6", offset);
+	memory_set_bank(machine(), "bank7", offset);
+	memory_set_bank(machine(), "bank8", offset);
+	return 0xff;
+}
+
+READ8_MEMBER( mmd1_state::mmd2_01_r )
+{
+	// need to add cassin, ttyin bits
+	UINT8 data = 0x87;
+	data |= input_port_read(machine(),"DSW");
+	return data;
+}
+
 WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
 {
 	m_digit = data;
@@ -411,6 +413,29 @@ static I8279_INTERFACE( mmd2_intf )
 	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_kbd_r),		// kbd RL lines
 	DEVCB_LINE_VCC,						// Shift key
 	DEVCB_LINE_VCC
+};
+
+WRITE8_MEMBER( mmd1_state::mmd2_status_callback )
+{
+	// operate the HALT LED
+	output_set_value("led_halt", ~data & I8085_STATUS_HLTA);
+	// operate the HOLD LED - this should connect to the HLDA pin,
+	// but it isn't emulated, using WO instead (whatever that does).
+	output_set_value("led_hold", data & I8085_STATUS_WO);
+}
+
+WRITE_LINE_MEMBER( mmd1_state::mmd2_inte_callback )
+{
+	// operate the INTE LED
+	output_set_value("led_inte", state);
+}
+
+static I8085_CONFIG( mmd2_cpu_config )
+{
+	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_status_callback),		/* Status changed callback */
+	DEVCB_DRIVER_LINE_MEMBER(mmd1_state, mmd2_inte_callback),			/* INTE changed callback */
+	DEVCB_NULL,					/* SID changed callback (I8085A only) */
+	DEVCB_NULL					/* SOD changed callback (I8085A only) */
 };
 
 static MACHINE_RESET( mmd1 )
@@ -482,6 +507,7 @@ static MACHINE_CONFIG_START( mmd2, mmd1_state )
 	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
 	MCFG_CPU_PROGRAM_MAP(mmd2_mem)
 	MCFG_CPU_IO_MAP(mmd2_io)
+	MCFG_CPU_CONFIG(mmd2_cpu_config)
 
 	MCFG_MACHINE_RESET(mmd2)
 
@@ -489,7 +515,7 @@ static MACHINE_CONFIG_START( mmd2, mmd1_state )
 	MCFG_DEFAULT_LAYOUT(layout_mmd2)
 
 	/* Devices */
-	MCFG_I8279_ADD("i8279", 500, mmd2_intf)
+	MCFG_I8279_ADD("i8279", 400000, mmd2_intf) // based on divider
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -504,11 +530,10 @@ ROM_START( mmd2 )
 	ROM_LOAD( "mmd2340.bin", 0x0800, 0x0800, CRC(70681bd6) SHA1(c37e3cf34a75e8538471030bb49b8aed45d00ec3))
 	ROM_LOAD( "mmd2350.bin", 0x1000, 0x0800, CRC(359f577c) SHA1(9405ca0c1977721e4540a4017907c06dab08d398))
 	ROM_LOAD( "mmd2360.bin", 0x1800, 0x0800, CRC(967e69b8) SHA1(c21ec8bef955806a2c6e1b1c8e9068662fb88038))
-	//ROM_REGION( 0x100, "i8279", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY            FULLNAME       FLAGS */
 COMP( 1976, mmd1,    0,       0,     mmd1,      mmd1,     0,   "E&L Instruments Inc", "MMD-1", GAME_NO_SOUND_HW)
-COMP( 1976, mmd2,    mmd1,    0,     mmd2,      mmd2,    mmd2, "E&L Instruments Inc", "MMD-2", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1976, mmd2,    mmd1,    0,     mmd2,      mmd2,    mmd2, "E&L Instruments Inc", "MMD-2", GAME_NO_SOUND_HW)

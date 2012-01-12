@@ -26,7 +26,6 @@ ToDo:
 #include "machine/i8279.h"
 #include "sdk85.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class sdk85_state : public driver_device
 {
@@ -38,7 +37,6 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 	UINT8 m_digit;
-	virtual void machine_reset();
 };
 
 static ADDRESS_MAP_START(sdk85_mem, AS_PROGRAM, 8, sdk85_state)
@@ -89,10 +87,6 @@ static INPUT_PORTS_START( sdk85 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( sdk85_state )
-{
-}
-
 WRITE8_MEMBER( sdk85_state::scanlines_w )
 {
 	m_digit = data;
@@ -138,7 +132,7 @@ static MACHINE_CONFIG_START( sdk85, sdk85_state )
 	MCFG_DEFAULT_LAYOUT(layout_sdk85)
 
 	/* Devices */
-	MCFG_I8279_ADD("i8279", 3500, sdk85_intf)
+	MCFG_I8279_ADD("i8279", 3100000, sdk85_intf) // based on divider
 MACHINE_CONFIG_END
 
 /* ROM definition */

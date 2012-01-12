@@ -18,6 +18,14 @@ ToDo:
 - Keys are a guess, need to be confirmed.
 - Needs to be tested by a subject-matter expert.
 
+- Unknown I/O:
+'maincpu' (00F2): unmapped i/o memory write to 000C = 00 & FF
+'maincpu' (00F8): unmapped i/o memory write to 0010 = FF & FF
+'maincpu' (0122): unmapped i/o memory write to 0019 = 91 & FF
+'maincpu' (0122): unmapped i/o memory write to 0019 = 40 & FF
+'maincpu' (0122): unmapped i/o memory write to 0019 = CE & FF
+'maincpu' (0122): unmapped i/o memory write to 0019 = 17 & FF
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 
@@ -26,7 +34,6 @@ ToDo:
 #include "machine/i8279.h"
 #include "selz80.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class selz80_state : public driver_device
 {
@@ -38,7 +45,6 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 	UINT8 m_digit;
-	virtual void machine_reset();
 };
 
 static ADDRESS_MAP_START(selz80_mem, AS_PROGRAM, 8, selz80_state)
@@ -104,9 +110,6 @@ RG EN SA SD     0(AF)  1(BC)  2(DE)  3(HL)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RG") PORT_CODE(KEYCODE_L)
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( selz80_state )
-{
-}
 
 WRITE8_MEMBER( selz80_state::scanlines_w )
 {
@@ -152,7 +155,7 @@ static MACHINE_CONFIG_START( selz80, selz80_state )
 	MCFG_DEFAULT_LAYOUT(layout_selz80)
 
 	/* Devices */
-	MCFG_I8279_ADD("i8279", 3500, selz80_intf)
+	MCFG_I8279_ADD("i8279", 2500000, selz80_intf) // based on divider
 MACHINE_CONFIG_END
 
 /* ROM definition */
