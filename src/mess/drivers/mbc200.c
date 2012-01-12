@@ -149,7 +149,7 @@ static VIDEO_START( mbc200 )
 {
 }
 
-static SCREEN_UPDATE( mbc200 )
+static SCREEN_UPDATE_IND16( mbc200 )
 {
 	mbc200_state *state = screen.machine().driver_data<mbc200_state>();
 	int x,y,xi,yi;
@@ -260,10 +260,9 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(640, 400)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-    MCFG_SCREEN_UPDATE(mbc200)
+    MCFG_SCREEN_UPDATE_STATIC(mbc200)
 	MCFG_GFXDECODE(mbc200)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)

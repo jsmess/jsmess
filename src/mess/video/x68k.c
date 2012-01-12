@@ -35,12 +35,12 @@
 
 static void x68k_crtc_refresh_mode(running_machine &machine);
 
-INLINE void x68k_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void x68k_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 /*
-static bitmap_t* x68k_get_gfx_page(int pri,int type)
+static bitmap_ind16* x68k_get_gfx_page(int pri,int type)
 {
     if(type == GFX16)
     {
@@ -771,7 +771,7 @@ READ16_HANDLER( x68k_spriteram_r )
 	return state->m_spriteram[offset];
 }
 
-static void x68k_draw_text(running_machine &machine,bitmap_t &bitmap, int xscr, int yscr, rectangle rect)
+static void x68k_draw_text(running_machine &machine,bitmap_ind16 &bitmap, int xscr, int yscr, rectangle rect)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	unsigned int line,pixel; // location on screen
@@ -812,7 +812,7 @@ static void x68k_draw_text(running_machine &machine,bitmap_t &bitmap, int xscr, 
 	}
 }
 
-static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t &bitmap, rectangle cliprect, UINT8 priority)
+static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	int pixel;
@@ -920,7 +920,7 @@ static void x68k_draw_gfx_scanline(running_machine &machine, bitmap_t &bitmap, r
 	}
 }
 
-static void x68k_draw_gfx(running_machine &machine, bitmap_t &bitmap,rectangle cliprect)
+static void x68k_draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,rectangle cliprect)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	int priority;
@@ -938,7 +938,7 @@ static void x68k_draw_gfx(running_machine &machine, bitmap_t &bitmap,rectangle c
 }
 
 // Sprite controller "Cynthia" at 0xeb0000
-static void x68k_draw_sprites(running_machine &machine, bitmap_t &bitmap, int priority, rectangle cliprect)
+static void x68k_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, int priority, rectangle cliprect)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*
@@ -1114,7 +1114,7 @@ VIDEO_START( x68000 )
 //  state->m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
 
-SCREEN_UPDATE( x68000 )
+SCREEN_UPDATE_IND16( x68000 )
 {
 	x68k_state *state = screen.machine().driver_data<x68k_state>();
 	rectangle rect(0,0,0,0);

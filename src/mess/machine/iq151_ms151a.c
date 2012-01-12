@@ -59,7 +59,7 @@ void iq151_ms151a_device::device_start()
 	m_rom = (UINT8*)subregion("ms151a")->base();
 
 	// allocate a bitmap for represent the paper
-	m_paper = auto_bitmap_alloc(machine(), PAPER_WIDTH, PAPER_HEIGHT, BITMAP_FORMAT_INDEXED16);
+	m_paper = auto_bitmap_ind16_alloc(machine(), PAPER_WIDTH, PAPER_HEIGHT);
 	m_paper->fill(0);
 
 	m_pen = 0;

@@ -48,8 +48,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { m_lcdc->update_screen(bitmap, cliprect); return 0; }
-
 	void check_interrupt();
 	void trigger_interrupt(int level);
 	void scan_keyboard();

@@ -1743,10 +1743,10 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff_)
 
 void gba_draw_scanline(running_machine &machine, int y)
 {
-	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+	gba_state *state = machine.driver_data<gba_state>();
+	bitmap_ind16 &bitmap = state->m_bitmap;
 	UINT16 *scanline = &bitmap.pix16(y);
 	int i, x;
-	gba_state *state = machine.driver_data<gba_state>();
 	UINT8 submode = 0;
 	int bpp = 0;
 
@@ -1799,6 +1799,14 @@ void gba_draw_scanline(running_machine &machine, int y)
 	return;
 }
 
-void gba_video_start(running_machine &machine)
+void gba_state::video_start()
 {
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
 }
+
+UINT32 gba_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+

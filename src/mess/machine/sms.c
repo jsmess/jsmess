@@ -369,7 +369,7 @@ static int lgun_bright_aim_area( running_machine &machine, emu_timer *timer, int
 
 		if (!pos_changed)
 		{
-			bitmap_t &bitmap = *state->m_vdp->get_bitmap();
+			bitmap_rgb32 &bitmap = state->m_vdp->get_bitmap();
 
 			/* brightness of the lightgray color in the frame drawn by Light Phaser games */
 			const UINT8 sensor_min_brightness = 0x7f;
@@ -2214,7 +2214,7 @@ DRIVER_INIT( gamegeaj )
 }
 
 
-static void sms_black_bitmap( const screen_device &screen, bitmap_t &bitmap )
+static void sms_black_bitmap( const screen_device &screen, bitmap_rgb32 &bitmap )
 {
 	const int width = screen.width();
 	const int height = screen.height();
@@ -2232,13 +2232,13 @@ VIDEO_START( sms1 )
 	int width = screen->width();
 	int height = screen->height();
 
-	state->m_prevleft_bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED32);
-	state->m_prevright_bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED32);
+	state->m_prevleft_bitmap.allocate(width, height, BITMAP_FORMAT_IND32);
+	state->m_prevright_bitmap.allocate(width, height, BITMAP_FORMAT_IND32);
 	state->save_item(NAME(state->m_prevleft_bitmap));
 	state->save_item(NAME(state->m_prevright_bitmap));
 }
 
-SCREEN_UPDATE( sms1 )
+SCREEN_UPDATE_RGB32( sms1 )
 {
 	sms_state *state = screen.machine().driver_data<sms_state>();
 	UINT8 sscope = input_port_read_safe(screen.machine(), "SEGASCOPE", 0x00);
@@ -2259,7 +2259,7 @@ SCREEN_UPDATE( sms1 )
 
 	if (!occluded_view)
 	{
-		state->m_vdp->update_video(bitmap, cliprect);
+		state->m_vdp->screen_update(screen, bitmap, cliprect);
 
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// save a copy of current bitmap for the binocular hack
@@ -2283,10 +2283,10 @@ SCREEN_UPDATE( sms1 )
 	return 0;
 }
 
-SCREEN_UPDATE( sms )
+SCREEN_UPDATE_RGB32( sms )
 {
 	sms_state *state = screen.machine().driver_data<sms_state>();
-	state->m_vdp->update_video(bitmap, cliprect);
+	state->m_vdp->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -2297,19 +2297,19 @@ VIDEO_START( gamegear )
 	int width = screen->width();
 	int height = screen->height();
 
-	state->m_prev_bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED32);
-	state->m_tmp_bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED32);
+	state->m_prev_bitmap.allocate(width, height, BITMAP_FORMAT_IND32);
+	state->m_tmp_bitmap.allocate(width, height, BITMAP_FORMAT_IND32);
 	state->save_item(NAME(state->m_prev_bitmap));
 }
 
-SCREEN_UPDATE( gamegear )
+SCREEN_UPDATE_RGB32( gamegear )
 {
 	sms_state *state = screen.machine().driver_data<sms_state>();
 	int width = screen.width();
 	int height = screen.height();
 	int x, y;
 
-	state->m_vdp->update_video(state->m_tmp_bitmap, cliprect);
+	state->m_vdp->screen_update(screen, state->m_tmp_bitmap, cliprect);
 
 	// HACK: fake LCD persistence effect
 	// (it would be better to generalize this in the core, to be used for all LCD systems)

@@ -987,10 +987,11 @@ inline UINT16 abc1600_state::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 	return (cr << 10) | ((ra & 0x0f) << 6) | ((cc << 1) & 0x3c);
 }
 
-void abc1600_state::crtc_update_row(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void abc1600_state::crtc_update_row(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 0x3ff) return;
 
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int x = HFP;
 
 	for (int column = 0; column < x_count; column += 2)
@@ -1006,7 +1007,7 @@ void abc1600_state::crtc_update_row(device_t *device, bitmap_t &bitmap, const re
 			{
 				int color = (BIT(data, 15) ^ PIX_POL) & !BLANK;
 
-				bitmap.pix16(y + VFP, x++) = color;
+				bitmap.pix32(y + VFP, x++) = palette[color];
 
 				data <<= 1;
 			}
@@ -1088,10 +1089,10 @@ void abc1600_state::video_start()
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE( abc1600 )
+//  SCREEN_UPDATE_IND16( abc1600 )
 //-------------------------------------------------
 
-bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 abc1600_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// HACK expand visible area to workaround MC6845
 	screen.set_visible_area(0, 958, 0, 1067);
@@ -1099,7 +1100,7 @@ bool abc1600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	if (m_endisp)
 	{
 		bitmap.fill(FRAME_POL, cliprect);
-		m_crtc->update(bitmap, cliprect);
+		m_crtc->screen_update(screen, bitmap, cliprect);
 	}
 	else
 	{
@@ -1120,7 +1121,7 @@ MACHINE_CONFIG_FRAGMENT( abc1600_video )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(abc1600_state, screen_update)
     MCFG_SCREEN_SIZE(958, 1067)
     MCFG_SCREEN_VISIBLE_AREA(0, 958-1, 0, 1067-1)
     MCFG_PALETTE_LENGTH(2)

@@ -14,12 +14,11 @@
 
 #define VRAM_SIZE	(0x200000)	// 2 megs, maxed out
 
-static SCREEN_UPDATE( mac_48gc );
+static SCREEN_UPDATE_RGB32( mac_48gc );
 
 MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
 	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE( mac_48gc )
+	MCFG_SCREEN_UPDATE_STATIC( mac_48gc )
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 //  MCFG_SCREEN_SIZE(1152, 870)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
@@ -142,7 +141,7 @@ void jmfb_device::device_reset()
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( mac_48gc )
+static SCREEN_UPDATE_RGB32( mac_48gc )
 {
 	jmfb_device *card = downcast<jmfb_device *>(screen.owner());
 	UINT32 *scanline, *base;

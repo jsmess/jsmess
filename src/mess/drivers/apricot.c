@@ -181,12 +181,12 @@ static const wd17xx_interface apricot_wd17xx_intf =
     VIDEO EMULATION
 ***************************************************************************/
 
-static SCREEN_UPDATE( apricot )
+static SCREEN_UPDATE_RGB32( apricot )
 {
 	apricot_state *state = screen.machine().driver_data<apricot_state>();
 
 	if (!state->m_display_on)
-		state->m_crtc->update( bitmap, cliprect);
+		state->m_crtc->screen_update( screen, bitmap, cliprect);
 	else
 		bitmap.fill(0, cliprect);
 
@@ -196,6 +196,7 @@ static SCREEN_UPDATE( apricot )
 static MC6845_UPDATE_ROW( apricot_update_row )
 {
 	apricot_state *state = device->machine().driver_data<apricot_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *ram = state->m_ram->pointer();
 	int i, x;
 
@@ -217,7 +218,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 			{
 				int color = fill ? 1 : BIT(data, x);
 				if (BIT(code, 15)) color = !color; /* reverse? */
-				bitmap.pix16(y, x + i*10) = color ? 1 + BIT(code, 14) : 0;
+				bitmap.pix32(y, x + i*10) = palette[color ? 1 + BIT(code, 14) : 0];
 			}
 		}
 	}
@@ -356,11 +357,10 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
-	MCFG_SCREEN_UPDATE(apricot)
+	MCFG_SCREEN_UPDATE_STATIC(apricot)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT(apricot)
 

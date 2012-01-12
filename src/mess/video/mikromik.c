@@ -41,7 +41,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 		int color = hlt_in ? 2 : (video_in ^ compl_in);
 
-		device->machine().primary_screen->default_bitmap().pix16(y, x + i) = color;
+		state->m_bitmap.pix16(y, x + i) = color;
 	}
 }
 
@@ -100,21 +100,23 @@ void mm1_state::video_start()
 {
 	// find memory regions
 	m_char_rom = machine().region("chargen")->base();
+	
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
 }
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE( mm1 )
+//  SCREEN_UPDATE_IND16( mm1 )
 //-------------------------------------------------
 
-bool mm1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 mm1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* text */
 	i8275_update(m_crtc, bitmap, cliprect);
-	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
 	/* graphics */
-	m_hgdc->update_screen(bitmap, cliprect);
+	m_hgdc->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -153,7 +155,7 @@ GFXDECODE_END
 MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER )
 	MCFG_SCREEN_REFRESH_RATE( 50 )
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_UPDATE_DRIVER(mm1_state, screen_update)
 	MCFG_SCREEN_SIZE( 800, 400 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 400-1 )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)

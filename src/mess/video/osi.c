@@ -43,7 +43,7 @@ void sb2m600_state::video_start()
 
 /* Video Update */
 
-bool sb2m600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 sb2m600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, bit, sx;
 
@@ -118,7 +118,7 @@ bool sb2m600_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	return 0;
 }
 
-bool uk101_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 uk101_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, bit, sx;
 
@@ -151,7 +151,7 @@ bool uk101_state::screen_update(screen_device &screen, bitmap_t &bitmap, const r
 MACHINE_CONFIG_FRAGMENT( osi600_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(X1/256/256) // 60 Hz
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(sb2m600_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 
@@ -162,7 +162,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( uk101_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(uk101_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 
@@ -173,7 +173,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( osi630_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(X1/256/256) // 60 Hz
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(sb2m600_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 

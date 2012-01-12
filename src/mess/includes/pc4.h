@@ -24,7 +24,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_beep;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start();
 
 	DECLARE_WRITE8_MEMBER( beep_w );

@@ -190,9 +190,10 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( v6809_update_row )
 {
 	v6809_state *state = device->machine().driver_data<v6809_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx,col,bg,fg;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	ma &= 0x7ff;
 
@@ -210,14 +211,14 @@ MC6845_UPDATE_ROW( v6809_update_row )
 		gfx = state->m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = BIT(gfx, 7) ? fg : bg;
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		*p++ = BIT(gfx, 1) ? fg : bg;
-		*p++ = BIT(gfx, 0) ? fg : bg;
+		*p++ = palette[BIT(gfx, 7) ? fg : bg];
+		*p++ = palette[BIT(gfx, 6) ? fg : bg];
+		*p++ = palette[BIT(gfx, 5) ? fg : bg];
+		*p++ = palette[BIT(gfx, 4) ? fg : bg];
+		*p++ = palette[BIT(gfx, 3) ? fg : bg];
+		*p++ = palette[BIT(gfx, 2) ? fg : bg];
+		*p++ = palette[BIT(gfx, 1) ? fg : bg];
+		*p++ = palette[BIT(gfx, 0) ? fg : bg];
 	}
 }
 
@@ -231,13 +232,6 @@ static VIDEO_START( v6809 )
 	v6809_state *state = machine.driver_data<v6809_state>();
 	state->m_p_chargen = machine.region("chargen")->base();
 	state->m_p_videoram = machine.region("videoram")->base();
-}
-
-static SCREEN_UPDATE( v6809 )
-{
-	v6809_state *state = screen.machine().driver_data<v6809_state>();
-	state->m_crtc->update( bitmap, cliprect);
-	return 0;
 }
 
 static const mc6845_interface v6809_crtc = {
@@ -275,10 +269,9 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(v6809)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_VIDEO_START(v6809)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_GFXDECODE(v6809)

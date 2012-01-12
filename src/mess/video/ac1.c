@@ -26,7 +26,7 @@ VIDEO_START( ac1 )
 {
 }
 
-SCREEN_UPDATE( ac1 )
+SCREEN_UPDATE_IND16( ac1 )
 {
 	int x,y;
 	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
@@ -42,7 +42,7 @@ SCREEN_UPDATE( ac1 )
 	return 0;
 }
 
-SCREEN_UPDATE( ac1_32 )
+SCREEN_UPDATE_IND16( ac1_32 )
 {
 	int x,y;
 	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);

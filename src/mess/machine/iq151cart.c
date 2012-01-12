@@ -162,7 +162,7 @@ void iq151cart_slot_device::io_write(offs_t offset, UINT8 data)
    video update
 -------------------------------------------------*/
 
-void iq151cart_slot_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
+void iq151cart_slot_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_cart)
 		m_cart->video_update(bitmap, cliprect);

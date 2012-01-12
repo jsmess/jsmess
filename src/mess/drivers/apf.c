@@ -127,9 +127,6 @@ public:
 	UINT8 *m_p_videoram;
 	UINT8 m_apf_ints;
 	void apf_update_ints(UINT8 intnum);
-
-protected:
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -145,11 +142,6 @@ READ8_MEMBER( apf_state::apf_mc6847_videoram_r )
 WRITE_LINE_MEMBER( apf_state::apf_mc6847_fs_w )
 {
 	apf_update_ints(0x10);
-}
-
-bool apf_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_crtc->update(bitmap, cliprect);
 }
 
 READ8_MEMBER( apf_state::apf_m1000_pia_in_a_func)
@@ -708,7 +700,7 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_MACHINE_START( apf_imagination )
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen")
+	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, apf_mc6847_intf)
 
 	/* sound hardware */

@@ -61,7 +61,7 @@ ToDo:
 #include "video/iq151_video64.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 
 class iq151_state : public driver_device
@@ -91,7 +91,7 @@ public:
 	DECLARE_READ8_MEMBER(cartslot_io_r);
 	DECLARE_WRITE8_MEMBER(cartslot_io_w);
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	UINT8 m_vblank_irq_state;
 	UINT8 m_cassette_clk;
@@ -371,7 +371,7 @@ MACHINE_RESET_MEMBER( iq151_state )
 }
 
 // this machine don't have a built-in video controller, but uses external cartridge
-SCREEN_UPDATE_MEMBER( iq151_state )
+SCREEN_UPDATE16_MEMBER( iq151_state )
 {
 	bitmap.fill(0, cliprect);
 
@@ -444,7 +444,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(iq151_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 	MCFG_PALETTE_LENGTH(2)

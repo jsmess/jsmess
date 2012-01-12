@@ -179,7 +179,7 @@ WRITE8_DEVICE_HANDLER( vt_video_brightness_w )
 	//palette_set_color_rgb(device->machine(), 1, data, data, data);
 }
 
-static void vt_video_display_char(device_t *device,bitmap_t &bitmap, UINT8 code,
+static void vt_video_display_char(device_t *device,bitmap_ind16 &bitmap, UINT8 code,
 	int x, int y,UINT8 scroll_region,UINT8 display_type)
 {
 	UINT8 line=0;
@@ -233,7 +233,7 @@ static void vt_video_display_char(device_t *device,bitmap_t &bitmap, UINT8 code,
 	}
 }
 
-void vt_video_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void vt_video_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	vt_video_t *vt = get_safe_token(device);
 
@@ -286,7 +286,7 @@ void vt_video_update(device_t *device, bitmap_t &bitmap, const rectangle &clipre
 
 }
 
-static void rainbow_video_display_char(device_t *device,bitmap_t &bitmap, UINT8 code,
+static void rainbow_video_display_char(device_t *device,bitmap_ind16 &bitmap, UINT8 code,
 	int x, int y,UINT8 scroll_region,UINT8 display_type)
 {
 	UINT8 line=0;
@@ -339,7 +339,7 @@ static void rainbow_video_display_char(device_t *device,bitmap_t &bitmap, UINT8 
 		}
 	}
 }
-void rainbow_video_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void rainbow_video_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	vt_video_t *vt = get_safe_token(device);
 

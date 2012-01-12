@@ -381,8 +381,9 @@ static PALETTE_INIT( lynx48k )
 static MC6845_UPDATE_ROW( lynx48k_update_row )
 {
 	UINT8 *RAM = device->machine().region("maincpu")->base();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 r,g,b;
-	UINT16 x, *p = &bitmap.pix16(y);
+	UINT32 x, *p = &bitmap.pix32(y);
 
 	for (x = (y << 5); x < x_count + (y << 5); x++)
 	{
@@ -390,22 +391,23 @@ static MC6845_UPDATE_ROW( lynx48k_update_row )
 		g = RAM[0x1c000+x];
 		b = RAM[0x10000+x];
 
-		*p++ = (BIT(r, 7) << 1) | (BIT(g, 7) << 2) | (BIT(b, 7));
-		*p++ = (BIT(r, 6) << 1) | (BIT(g, 6) << 2) | (BIT(b, 6));
-		*p++ = (BIT(r, 5) << 1) | (BIT(g, 5) << 2) | (BIT(b, 5));
-		*p++ = (BIT(r, 4) << 1) | (BIT(g, 4) << 2) | (BIT(b, 4));
-		*p++ = (BIT(r, 3) << 1) | (BIT(g, 3) << 2) | (BIT(b, 3));
-		*p++ = (BIT(r, 2) << 1) | (BIT(g, 2) << 2) | (BIT(b, 2));
-		*p++ = (BIT(r, 1) << 1) | (BIT(g, 1) << 2) | (BIT(b, 1));
-		*p++ = (BIT(r, 0) << 1) | (BIT(g, 0) << 2) | (BIT(b, 0));
+		*p++ = palette[(BIT(r, 7) << 1) | (BIT(g, 7) << 2) | (BIT(b, 7))];
+		*p++ = palette[(BIT(r, 6) << 1) | (BIT(g, 6) << 2) | (BIT(b, 6))];
+		*p++ = palette[(BIT(r, 5) << 1) | (BIT(g, 5) << 2) | (BIT(b, 5))];
+		*p++ = palette[(BIT(r, 4) << 1) | (BIT(g, 4) << 2) | (BIT(b, 4))];
+		*p++ = palette[(BIT(r, 3) << 1) | (BIT(g, 3) << 2) | (BIT(b, 3))];
+		*p++ = palette[(BIT(r, 2) << 1) | (BIT(g, 2) << 2) | (BIT(b, 2))];
+		*p++ = palette[(BIT(r, 1) << 1) | (BIT(g, 1) << 2) | (BIT(b, 1))];
+		*p++ = palette[(BIT(r, 0) << 1) | (BIT(g, 0) << 2) | (BIT(b, 0))];
 	}
 }
 
 static MC6845_UPDATE_ROW( lynx128k_update_row )
 {
 	UINT8 *RAM = device->machine().region("maincpu")->base();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 r,g,b;
-	UINT16 x, *p = &bitmap.pix16(y);
+	UINT32 x, *p = &bitmap.pix32(y);
 
 	for (x = (y << 6); x < x_count + (y << 6); x++)
 	{
@@ -413,29 +415,20 @@ static MC6845_UPDATE_ROW( lynx128k_update_row )
 		g = RAM[0x28100+x];
 		b = RAM[0x24100+x];
 
-		*p++ = (BIT(r, 7) << 1) | (BIT(g, 7) << 2) | (BIT(b, 7));
-		*p++ = (BIT(r, 6) << 1) | (BIT(g, 6) << 2) | (BIT(b, 6));
-		*p++ = (BIT(r, 5) << 1) | (BIT(g, 5) << 2) | (BIT(b, 5));
-		*p++ = (BIT(r, 4) << 1) | (BIT(g, 4) << 2) | (BIT(b, 4));
-		*p++ = (BIT(r, 3) << 1) | (BIT(g, 3) << 2) | (BIT(b, 3));
-		*p++ = (BIT(r, 2) << 1) | (BIT(g, 2) << 2) | (BIT(b, 2));
-		*p++ = (BIT(r, 1) << 1) | (BIT(g, 1) << 2) | (BIT(b, 1));
-		*p++ = (BIT(r, 0) << 1) | (BIT(g, 0) << 2) | (BIT(b, 0));
+		*p++ = palette[(BIT(r, 7) << 1) | (BIT(g, 7) << 2) | (BIT(b, 7))];
+		*p++ = palette[(BIT(r, 6) << 1) | (BIT(g, 6) << 2) | (BIT(b, 6))];
+		*p++ = palette[(BIT(r, 5) << 1) | (BIT(g, 5) << 2) | (BIT(b, 5))];
+		*p++ = palette[(BIT(r, 4) << 1) | (BIT(g, 4) << 2) | (BIT(b, 4))];
+		*p++ = palette[(BIT(r, 3) << 1) | (BIT(g, 3) << 2) | (BIT(b, 3))];
+		*p++ = palette[(BIT(r, 2) << 1) | (BIT(g, 2) << 2) | (BIT(b, 2))];
+		*p++ = palette[(BIT(r, 1) << 1) | (BIT(g, 1) << 2) | (BIT(b, 1))];
+		*p++ = palette[(BIT(r, 0) << 1) | (BIT(g, 0) << 2) | (BIT(b, 0))];
 	}
 }
 
 static VIDEO_START( lynx48k )
 {
 }
-
-static SCREEN_UPDATE( lynx48k )
-{
-	camplynx_state *state = screen.machine().driver_data<camplynx_state>();
-
-	state->m_crtc->update( bitmap, cliprect);
-	return 0;
-}
-
 
 static const mc6845_interface lynx48k_crtc6845_interface = {
 	"screen",
@@ -475,10 +468,9 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
-	MCFG_SCREEN_UPDATE(lynx48k)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_VIDEO_START(lynx48k)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(lynx48k)
@@ -505,10 +497,9 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
-	MCFG_SCREEN_UPDATE(lynx48k)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_VIDEO_START(lynx48k)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(lynx48k)

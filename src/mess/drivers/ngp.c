@@ -623,7 +623,7 @@ void ngp_state::machine_reset()
 }
 
 
-static SCREEN_UPDATE( ngp )
+static SCREEN_UPDATE_IND16( ngp )
 {
 	ngp_state *state = screen.machine().driver_data<ngp_state>();
 
@@ -777,9 +777,8 @@ static MACHINE_CONFIG_START( ngp_common, ngp_state )
 	MCFG_CPU_IO_MAP( z80_io)
 
 	MCFG_SCREEN_ADD( "screen", LCD )
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_6_144MHz, 515, 0, 160 /*480*/, 199, 0, 152 )
-	MCFG_SCREEN_UPDATE( ngp )
+	MCFG_SCREEN_UPDATE_STATIC( ngp )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

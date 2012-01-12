@@ -135,7 +135,7 @@ static VIDEO_START( bml3 )
 	state->m_p_chargen = machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( bml3 )
+static SCREEN_UPDATE_IND16( bml3 )
 {
 	bml3_state *state = screen.machine().driver_data<bml3_state>();
 	int x,y,count;
@@ -910,10 +910,9 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(bml3)
+	MCFG_SCREEN_UPDATE_STATIC(bml3)
 	MCFG_VIDEO_START(bml3)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(bml3)

@@ -47,14 +47,14 @@ static TIMER_CALLBACK( gal_video )
 				y = state->m_gal_cnt / 48 - 2;
 				x = (state->m_gal_cnt % 48) * 8;
 
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 0) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 1) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 2) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 3) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 4) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 5) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 6) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 7) & 1;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 0) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 1) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 2) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 3) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 4) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 5) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 6) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 7) & 1;
 			}
 			else
 			{ // Graphics mode
@@ -89,14 +89,14 @@ static TIMER_CALLBACK( gal_video )
 				}
 				/* end of hack */
 
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 0) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 1) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 2) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 3) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 4) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 5) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 6) & 1; x++;
-				machine.primary_screen->default_bitmap().pix16(y, x ) = (state->m_code >> 7) & 1;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 0) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 1) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 2) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 3) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 4) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 5) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 6) & 1; x++;
+				state->m_bitmap.pix16(y, x ) = (state->m_code >> 7) & 1;
 			}
 		}
 		state->m_gal_cnt++;
@@ -117,19 +117,21 @@ VIDEO_START( galaxy )
 
 	state->m_gal_video_timer = machine.scheduler().timer_alloc(FUNC(gal_video));
 	state->m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
+	
+	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
-SCREEN_UPDATE( galaxy )
+SCREEN_UPDATE_IND16( galaxy )
 {
 	galaxy_state *state = screen.machine().driver_data<galaxy_state>();
 	state->m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 	if (state->m_interrupts_enabled == FALSE)
 	{
 		const rectangle black_area(0, 384 - 1, 0, 208 - 1);
-		screen.default_bitmap().fill(0, black_area);
+		state->m_bitmap.fill(0, black_area);
 	}
 	state->m_interrupts_enabled = FALSE;
-	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

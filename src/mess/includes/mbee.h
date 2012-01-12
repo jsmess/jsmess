@@ -155,11 +155,11 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee_update_addr );
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr );
 
 VIDEO_START( mbee );
-SCREEN_UPDATE( mbee );
+SCREEN_UPDATE_RGB32( mbee );
 VIDEO_START( mbeeic );
-SCREEN_UPDATE( mbeeic );
+SCREEN_UPDATE_RGB32( mbeeic );
 VIDEO_START( mbeeppc );
-SCREEN_UPDATE( mbeeppc );
+SCREEN_UPDATE_RGB32( mbeeppc );
 PALETTE_INIT( mbeeic );
 PALETTE_INIT( mbeepc85b );
 PALETTE_INIT( mbeeppc );

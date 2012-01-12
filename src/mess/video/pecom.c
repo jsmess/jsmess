@@ -108,18 +108,8 @@ static VIDEO_START( pecom )
 	state->save_pointer(NAME(state->m_charram), PECOM_CHAR_RAM_SIZE);
 }
 
-static SCREEN_UPDATE( pecom )
-{
-	pecom_state *state = screen.machine().driver_data<pecom_state>();
-
-	state->m_cdp1869->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 MACHINE_CONFIG_FRAGMENT( pecom_video )
-	MCFG_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, CDP1869_DOT_CLK_PAL)
-	MCFG_SCREEN_UPDATE(pecom)
+	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
 
 	MCFG_VIDEO_START(pecom)
 

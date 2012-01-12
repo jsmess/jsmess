@@ -1554,7 +1554,7 @@ VIDEO_START( fm7 )
 	state->m_video.vsync_flag = 0;
 }
 
-SCREEN_UPDATE( fm7 )
+SCREEN_UPDATE_IND16( fm7 )
 {
 	fm7_state *state = screen.machine().driver_data<fm7_state>();
 	UINT8 code_r = 0,code_g = 0,code_b = 0;

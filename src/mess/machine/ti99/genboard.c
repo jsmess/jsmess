@@ -287,7 +287,7 @@ TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt )
 	int scanline = param;
 	//genboard_state *board = get_safe_token(dev);
 
-	v9938_interrupt(timer.machine(), 0);
+	timer.machine().device<v9938_device>("video_v9938")->interrupt();
 	//board->line_count++;
 	if (scanline == 0) // was 262
 	{
@@ -1533,9 +1533,9 @@ WRITE_LINE_DEVICE_HANDLER( board_ready )
 /*
     set the state of int2 (called by the v9938 core)
 */
-void tms9901_gen_set_int2(running_machine &machine, int state)
+void tms9901_gen_set_int2(device_t *, v99x8_device &tms, int state)
 {
-	tms9901_set_single_int(machine.device("tms9901"), 2, state);
+	tms9901_set_single_int(tms.machine().device("tms9901"), 2, state);
 }
 
 /***************************************************************************

@@ -359,16 +359,10 @@ static VIDEO_START( pyl601 )
 {
 }
 
-static SCREEN_UPDATE( pyl601 )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
-	mc6845->update( bitmap, cliprect);
-	return 0;
-}
-
 static MC6845_UPDATE_ROW( pyl601_update_row )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *charrom = device->machine().region("gfx1")->base();
 
 	int column, bit, i;
@@ -392,7 +386,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 				int x = (column * 8) + bit;
 				int color = BIT(data, 7) ? 1 : 0;
 
-				bitmap.pix16(y, x) = color;
+				bitmap.pix32(y, x) = palette[color];
 
 				data <<= 1;
 			}
@@ -405,7 +399,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 			data = device->machine().device<ram_device>(RAM_TAG)->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix16(y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
+				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7) ? 1 : 0];
 				data <<= 1;
 			}
 		}
@@ -415,6 +409,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 static MC6845_UPDATE_ROW( pyl601a_update_row )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *charrom = device->machine().region("gfx1")->base();
 
 	int column, bit, i;
@@ -435,7 +430,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 				int x = (column * 8) + bit;
 				int color = BIT(data, 7) ? 1 : 0;
 
-				bitmap.pix16(y, x) = color;
+				bitmap.pix32(y, x) = palette[color];
 
 				data <<= 1;
 			}
@@ -448,7 +443,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 			data = device->machine().device<ram_device>(RAM_TAG)->pointer()[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
-				bitmap.pix16(y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
+				bitmap.pix32(y, (i * 8) + bit) = palette[BIT(data, 7) ? 1 : 0];
 				data <<= 1;
 			}
 		}
@@ -565,10 +560,9 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE( pyl601 )
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_GFXDECODE(pyl601)
 	MCFG_PALETTE_LENGTH(2)

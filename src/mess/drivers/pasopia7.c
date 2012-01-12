@@ -198,7 +198,7 @@ static void fake_keyboard_data(running_machine &machine)
 	keyb_press(KEYCODE_ASTERISK, '*');
 }
 
-static void draw_cg4_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int width)
+static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
 	UINT8 *vram = machine.region("vram")->base();
 	int x,y,xi,yi;
@@ -229,7 +229,7 @@ static void draw_cg4_screen(running_machine &machine, bitmap_t &bitmap,const rec
 	}
 }
 
-static void draw_tv_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int width)
+static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
 	pasopia7_state *state = machine.driver_data<pasopia7_state>();
 	UINT8 *vram = machine.region("vram")->base();
@@ -288,7 +288,7 @@ static void draw_tv_screen(running_machine &machine, bitmap_t &bitmap,const rect
 	}
 }
 
-static void draw_mixed_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int width)
+static void draw_mixed_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
 	pasopia7_state *state = machine.driver_data<pasopia7_state>();
 	UINT8 *vram = machine.region("vram")->base();
@@ -368,7 +368,7 @@ static void draw_mixed_screen(running_machine &machine, bitmap_t &bitmap,const r
 	}
 }
 
-static SCREEN_UPDATE( pasopia7 )
+static SCREEN_UPDATE_IND16( pasopia7 )
 {
 	pasopia7_state *state = screen.machine().driver_data<pasopia7_state>();
 	int width;
@@ -1073,11 +1073,10 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
 	MCFG_VIDEO_START(pasopia7)
-	MCFG_SCREEN_UPDATE(pasopia7)
+	MCFG_SCREEN_UPDATE_STATIC(pasopia7)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(p7_raster)
 	MCFG_GFXDECODE( pasopia7 )
@@ -1090,11 +1089,10 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_VIDEO_START(pasopia7)
-	MCFG_SCREEN_UPDATE(pasopia7)
+	MCFG_SCREEN_UPDATE_STATIC(pasopia7)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(p7_lcd)
 	MCFG_GFXDECODE( pasopia7 )

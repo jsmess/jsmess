@@ -14,13 +14,6 @@ VIDEO_START( cbmb_crtc )
 {
 }
 
-SCREEN_UPDATE( cbmb_crtc )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
-	mc6845->update(bitmap, cliprect);
-	return 0;
-}
-
 void cbm600_vh_init(running_machine &machine)
 {
 	UINT8 *gfx = machine.region("gfx1")->base();
@@ -72,12 +65,13 @@ void cbmb_vh_set_font(running_machine &machine, int font)
 MC6845_UPDATE_ROW( cbm600_update_row )
 {
 	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *videoram = state->m_videoram;
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
-			bitmap.plot_box( device->machine().gfx[state->m_font]->width * i, y, device->machine().gfx[state->m_font]->width, 1, 1 );
+			bitmap.plot_box( device->machine().gfx[state->m_font]->width * i, y, device->machine().gfx[state->m_font]->width, 1, palette[1] );
 		} else {
 			drawgfx_opaque( bitmap, cliprect, device->machine().gfx[state->m_font], videoram[(ma+i )& 0x7ff], 0, 0, 0, device->machine().gfx[state->m_font]->width * i, y-ra );
 		}
@@ -87,12 +81,13 @@ MC6845_UPDATE_ROW( cbm600_update_row )
 MC6845_UPDATE_ROW( cbm700_update_row )
 {
 	cbmb_state *state = device->machine().driver_data<cbmb_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *videoram = state->m_videoram;
 	int i;
 
 	for( i = 0; i < x_count; i++ ) {
 		if ( i == cursor_x ) {
-			bitmap.plot_box( device->machine().gfx[state->m_font]->width * i, y, device->machine().gfx[state->m_font]->width, 1, 1 );
+			bitmap.plot_box( device->machine().gfx[state->m_font]->width * i, y, device->machine().gfx[state->m_font]->width, 1, palette[1] );
 		} else {
 			drawgfx_opaque( bitmap, cliprect, device->machine().gfx[state->m_font], videoram[(ma+i) & 0x7ff], 0, 0, 0, device->machine().gfx[state->m_font]->width * i, y-ra );
 		}

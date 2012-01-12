@@ -38,7 +38,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// not really public
-	void crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
 protected:
 	// device-level overrides
@@ -51,7 +51,6 @@ protected:
 	virtual void c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
 	virtual int c64_game_r();
 	virtual int c64_exrom_r();
-	virtual bool c64_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 private:
 	c64_expansion_slot_device *m_slot;

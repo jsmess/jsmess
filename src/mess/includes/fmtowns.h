@@ -188,7 +188,7 @@ class towns_state : public driver_device
 	virtual void driver_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(towns_system_r);
 	DECLARE_WRITE8_MEMBER(towns_system_w);
@@ -267,6 +267,6 @@ class marty_state : public towns_state
 
 INTERRUPT_GEN( towns_vsync_irq );
 //VIDEO_START( towns );
-//SCREEN_UPDATE( towns );
+//SCREEN_UPDATE_RGB32( towns );
 
 #endif /*FMTOWNS_H_*/

@@ -328,7 +328,6 @@ PCB Layouts missing
 #include "machine/rp5c01.h"
 #include "machine/wd17xx.h"
 #include "video/tms9928a.h"
-#include "video/v9938.h"
 #include "machine/ctronics.h"
 #include "includes/msx_slot.h"
 #include "includes/msx.h"
@@ -392,10 +391,7 @@ static ADDRESS_MAP_START (msx2_io_map, AS_IO, 8)
 	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("centronics", msx_printer_data_w)
 	AM_RANGE( 0xa0, 0xa7) AM_DEVREADWRITE("ay8910", ay8910_r, msx_ay8910_w )
 	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0x98, 0x98) AM_READWRITE( v9938_0_vram_r, v9938_0_vram_w )
-	AM_RANGE( 0x99, 0x99) AM_READWRITE( v9938_0_status_r, v9938_0_command_w )
-	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
-	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
+	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write)
 	AM_RANGE( 0xb4, 0xb4) AM_WRITE( msx_rtc_latch_w )
 	AM_RANGE( 0xb5, 0xb5) AM_READWRITE( msx_rtc_reg_r, msx_rtc_reg_w )
 	AM_RANGE( 0xd8, 0xd9) AM_READWRITE( msx_kanji_r, msx_kanji_w )
@@ -1040,11 +1036,6 @@ static const ay8910_interface msx_ay8910_interface =
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, msx_psg_port_b_w)
 };
 
-static VIDEO_START( msx2 )
-{
-	v9938_init(machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(), MODEL_V9938, 0x20000, msx_vdp_interrupt);
-}
-
 #define MSX_XBORDER_PIXELS		15
 #define MSX_YBORDER_PIXELS		27
 #define MSX_TOTAL_XRES_PIXELS		256 + (MSX_XBORDER_PIXELS * 2)
@@ -1139,15 +1130,6 @@ static WRITE_LINE_DEVICE_HANDLER(tms9928a_interrupt)
 }
 
 
-static SCREEN_UPDATE( msx )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
-
 static TMS9928A_INTERFACE(msx_tms9928a_interface)
 {
 	"screen",
@@ -1160,7 +1142,7 @@ static MACHINE_CONFIG_DERIVED( msx_ntsc, msx )
 	/* Video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, msx_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( msx )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
 
@@ -1168,7 +1150,7 @@ static MACHINE_CONFIG_DERIVED( msx_pal, msx )
 	/* Video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, msx_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( msx )
+	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
 
@@ -1198,18 +1180,19 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_I8255_ADD( "ppi8255", msx_ppi8255_interface )
 
 	/* video hardware */
+	MCFG_V9938_ADD("v9938", "screen", 0x20000)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(msx_vdp_interrupt)
+
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT(v9938)
-
-	MCFG_VIDEO_START(msx2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

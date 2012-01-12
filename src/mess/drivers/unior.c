@@ -248,7 +248,7 @@ static VIDEO_START( unior )
 	state->m_p_vram = machine.region("vram")->base();
 }
 
-static SCREEN_UPDATE( unior )
+static SCREEN_UPDATE_IND16( unior )
 {
 	unior_state *state = screen.machine().driver_data<unior_state>();
 	UINT8 y,ra,gfx;
@@ -324,11 +324,10 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_VIDEO_START(unior)
-	MCFG_SCREEN_UPDATE(unior)
+	MCFG_SCREEN_UPDATE_STATIC(unior)
 	MCFG_GFXDECODE(unior)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

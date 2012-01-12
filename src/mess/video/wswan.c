@@ -16,9 +16,9 @@ INLINE void wswan_plot_pixel(running_machine &machine,int x, int y, int pen) {
 	wswan_state *state = machine.driver_data<wswan_state>();
 	y += 5*8;
 	if ( state->m_vdp.display_vertical ) {
-		machine.primary_screen->default_bitmap().pix16(28*8 - 1 - x, y) = pen;
+		state->m_bitmap.pix16(28*8 - 1 - x, y) = pen;
 	} else {
-		machine.primary_screen->default_bitmap().pix16(y, x) = pen;
+		state->m_bitmap.pix16(y, x) = pen;
 	}
 }
 
@@ -42,9 +42,9 @@ INLINE void wswan_fillbitmap( running_machine &machine,int pen, rectangle *rec )
 		rec2.max_y = 28*8 - 1 - rec->min_x;
 		rec2.min_x = rec->min_y;
 		rec2.max_x = rec->max_y;
-		machine.primary_screen->default_bitmap().fill(pen, rec2 );
+		state->m_bitmap.fill(pen, rec2 );
 	} else {
-		machine.primary_screen->default_bitmap().fill(pen, *rec );
+		state->m_bitmap.fill(pen, *rec );
 	}
 }
 
@@ -610,5 +610,17 @@ void wswan_refresh_scanline( running_machine &machine )
 	if ( state->m_vdp.sprites_enable ) {
 		wswan_handle_sprites( machine, 0x2000 );
 	}
+}
+
+
+void wswan_state::video_start()
+{
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+}
+	
+UINT32 wswan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
 }
 

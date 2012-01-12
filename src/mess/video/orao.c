@@ -15,7 +15,7 @@ VIDEO_START( orao )
 {
 }
 
-SCREEN_UPDATE( orao )
+SCREEN_UPDATE_IND16( orao )
 {
 	orao_state *state = screen.machine().driver_data<orao_state>();
 	UINT8 code;

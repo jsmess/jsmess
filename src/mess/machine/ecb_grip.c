@@ -219,8 +219,9 @@ ADDRESS_MAP_END
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void grip_device::crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void grip_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int column, bit;
 
 	for (column = 0; column < x_count; column++)
@@ -233,7 +234,7 @@ void grip_device::crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const
 			int x = (column * 8) + bit;
 			int color = m_flash ? 0 : BIT(data, bit);
 
-			bitmap.pix16(y, x) = color;
+			bitmap.pix32(y, x) = palette[color];
 		}
 	}
 }
@@ -248,6 +249,7 @@ static MC6845_UPDATE_ROW( grip_update_row )
 static MC6845_UPDATE_ROW( grip5_update_row )
 {
     grip5_state *state = device->machine().driver_data<grip5_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
     int column, bit;
 
     for (column = 0; column < x_count; column++)
@@ -260,7 +262,7 @@ static MC6845_UPDATE_ROW( grip5_update_row )
             int x = (column * 8) + bit;
             int color = state->m_flash ? 0 : BIT(data, bit);
 
-            bitmap.pix16(y, x) = color;
+            bitmap.pix32(y, x) = palette[color];
         }
     }
 }
@@ -1021,9 +1023,9 @@ void grip_device::ecbbus_io_w(offs_t offset, UINT8 data)
 //  ecbbus_screen_update - screen update
 //-------------------------------------------------
 
-bool grip_device::ecbbus_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 grip_device::ecbbus_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_crtc->update(bitmap, cliprect);
+	m_crtc->screen_update(screen, bitmap, cliprect);
 
 	return false;
 }

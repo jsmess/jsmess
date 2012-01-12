@@ -636,13 +636,6 @@ static VIDEO_START( pet_crtc )
 {
 }
 
-static SCREEN_UPDATE( pet_crtc )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
-	mc6845->update( bitmap, cliprect);
-	return 0;
-}
-
 static IEEE488_INTERFACE( ieee488_intf )
 {
 	DEVCB_NULL,
@@ -674,10 +667,9 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE( pet )
+	MCFG_SCREEN_UPDATE_STATIC( pet )
 
 	MCFG_GFXDECODE( pet )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pet_palette) / 3)
@@ -736,7 +728,7 @@ static MACHINE_CONFIG_DERIVED( pet40, pet )
 
 	MCFG_VIDEO_START( pet_crtc )
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE( pet_crtc )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
 	MCFG_FRAGMENT_ADD(pet4_cartslot)
 MACHINE_CONFIG_END
@@ -758,10 +750,9 @@ static MACHINE_CONFIG_DERIVED( pet80, pet_general )
 
     /* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MCFG_SCREEN_UPDATE( pet_crtc )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 2	/* This is a wild guess and mostly likely incorrect */, crtc_pet80)
 

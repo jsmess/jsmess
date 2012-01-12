@@ -36,6 +36,7 @@ static struct {
 	int screen_y_max;
 	int screen_x_min;
 	int screen_y_min;
+	bitmap_rgb32 bitmap;
 } gf4500;
 
 static void gf4500_init( running_machine &machine)
@@ -43,6 +44,7 @@ static void gf4500_init( running_machine &machine)
 	gf4500.data = auto_alloc_array( machine, UINT32, 0x140000 / 4);
 	gf4500.screen_x = gf4500.screen_y = 0;
 	gf4500.screen_x_max = gf4500.screen_y_max = gf4500.screen_x_min = gf4500.screen_y_min = 0;
+	gf4500.bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
 static void gf4500_vram_write16( UINT16 data)
@@ -64,7 +66,7 @@ static rgb_t gf4500_get_color_16( UINT16 data)
 	return MAKE_RGB( r, g, b);
 }
 
-static void gf4500_render_screen( running_machine &machine, bitmap_t &bitmap)
+static void gf4500_render_screen( running_machine &machine, bitmap_rgb32 &bitmap)
 {
 	UINT16 *vram = (UINT16 *)(gf4500.data + GF4500_FRAMEBUF_OFFSET / 4);
 	int x, y;
@@ -162,9 +164,9 @@ VIDEO_START( gf4500 )
 	gf4500_init( machine);
 }
 
-SCREEN_UPDATE( gf4500 )
+SCREEN_UPDATE_RGB32( gf4500 )
 {
-	gf4500_render_screen( screen.machine(), screen.default_bitmap());
-	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+	gf4500_render_screen( screen.machine(), gf4500.bitmap);
+	copybitmap(bitmap, gf4500.bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

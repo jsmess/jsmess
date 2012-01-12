@@ -1076,12 +1076,6 @@ static MACHINE_RESET( academy )
 	common_chess_start();
 }
 
-SCREEN_UPDATE( chess_lcd )
-{
-    hd44780_device * hd44780 = screen.machine().device<hd44780_device>("hd44780");
-    return hd44780->video_update(bitmap, cliprect );
-}
-
 static PALETTE_INIT( chess_lcd )
 {
 	// palette_set_color(machine, 0, MAKE_RGB(138, 146, 148)); // some think this is closer, but slightly less readable
@@ -1534,10 +1528,9 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(100, 22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 100-1, 0, 22-3)
-    MCFG_SCREEN_UPDATE(chess_lcd)
+    MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(chess_lcd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1606,13 +1599,18 @@ static MACHINE_CONFIG_DERIVED( academy, polgar )
 
 MACHINE_CONFIG_END
 
+static SCREEN_UPDATE_IND16( finalchs )
+{
+	return 0;
+}
+
 static MACHINE_CONFIG_START( finalchs, driver_device )
 	MCFG_CPU_ADD("maincpu",M65C02,5000000)
 	MCFG_CPU_PROGRAM_MAP(finalchs_mem)
 	MCFG_MACHINE_START(finalchs)
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_STATIC(finalchs)
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
     MCFG_PALETTE_LENGTH(2)

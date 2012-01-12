@@ -102,7 +102,7 @@ public:
 	virtual void comx_io_w(offs_t offset, UINT8 data) { };
 
 	// video
-	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect) { return false; }
+	virtual UINT32 comx_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
 };
 
 
@@ -131,7 +131,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( wait_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 
-	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides

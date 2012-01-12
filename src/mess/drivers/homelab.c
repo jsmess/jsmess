@@ -180,7 +180,7 @@ VIDEO_START_MEMBER( homelab_state )
 	m_p_chargen = machine().region("chargen")->base();
 }
 
-static SCREEN_UPDATE( homelab )
+static SCREEN_UPDATE_IND16( homelab )
 {
 	homelab_state *state = screen.machine().driver_data<homelab_state>();
 	UINT8 y,ra,chr,gfx;
@@ -213,7 +213,7 @@ static SCREEN_UPDATE( homelab )
 	return 0;
 }
 
-static SCREEN_UPDATE( homelab3 )
+static SCREEN_UPDATE_IND16( homelab3 )
 {
 	homelab_state *state = screen.machine().driver_data<homelab_state>();
 	UINT8 y,ra,chr,gfx;
@@ -277,10 +277,9 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 
 	/* video hardware */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_SCREEN_UPDATE( homelab )
+	MCFG_SCREEN_UPDATE_STATIC( homelab )
 	MCFG_GFXDECODE(homelab)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
@@ -294,7 +293,7 @@ static MACHINE_CONFIG_DERIVED( homelab3, homelab )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE( homelab3 )
+	MCFG_SCREEN_UPDATE_STATIC( homelab3 )
 MACHINE_CONFIG_END
 
 /* ROM definition */

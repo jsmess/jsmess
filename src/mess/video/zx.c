@@ -44,7 +44,7 @@ void zx_state::zx_ula_bkgnd(UINT8 color)
 	{
 		int y, new_x, new_y;
 		rectangle r;
-		bitmap_t &bitmap = machine().primary_screen->default_bitmap();
+		bitmap_ind16 &bitmap = m_bitmap;
 
 		new_y = machine().primary_screen->vpos();
 		new_x = machine().primary_screen->hpos();
@@ -100,7 +100,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	const rectangle r1 = screen->visible_area();
 	rectangle r;
 
-	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+	bitmap_ind16 &bitmap = state->m_bitmap;
 	r.min_x = r1.min_x;
 	r.max_x = r1.max_x;
 	r.min_y = r.max_y = state->m_ula_scanline_count;
@@ -139,7 +139,7 @@ void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT
 
 	if ((!state->m_ula_irq_active) && (chr == 0x76))
 	{
-		bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+		bitmap_ind16 &bitmap = state->m_bitmap;
 		UINT16 y, *scanline;
 		UINT16 ireg = cpu_get_reg(machine.device("maincpu"), Z80_I) << 8;
 		UINT8 data, *chrgen, creg;
@@ -201,6 +201,7 @@ VIDEO_START( zx )
 	zx_state *state = machine.driver_data<zx_state>();
 	state->m_ula_nmi = machine.scheduler().timer_alloc(FUNC(zx_ula_nmi));
 	state->m_ula_irq_active = 0;
+	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
 SCREEN_EOF( zx )
@@ -209,4 +210,10 @@ SCREEN_EOF( zx )
 	/* decrement video synchronization counter */
 	if (state->m_ula_frame_vsync)
 		--state->m_ula_frame_vsync;
+}
+
+UINT32 zx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
 }

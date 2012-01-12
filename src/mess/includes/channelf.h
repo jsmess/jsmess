@@ -55,7 +55,7 @@ public:
 
 PALETTE_INIT( channelf );
 VIDEO_START( channelf );
-SCREEN_UPDATE( channelf );
+SCREEN_UPDATE_IND16( channelf );
 
 
 /*----------- defined in audio/channelf.c -----------*/

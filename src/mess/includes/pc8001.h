@@ -53,7 +53,6 @@ public:
 	virtual void machine_start();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( port10_w );
 	DECLARE_WRITE8_MEMBER( port30_w );

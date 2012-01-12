@@ -193,7 +193,7 @@ static PALETTE_INIT( cfx9850 )
 }
 
 
-static SCREEN_UPDATE( cfx9850 )
+static SCREEN_UPDATE_IND16( cfx9850 )
 {
 	cfx9850_state *state = screen.machine().driver_data<cfx9850_state>();
 	UINT16 offset = 0;
@@ -229,10 +229,9 @@ static MACHINE_CONFIG_START( cfx9850, cfx9850_state )
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_SIZE( 128, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 127, 0, 63 )
-	MCFG_SCREEN_UPDATE( cfx9850 )
+	MCFG_SCREEN_UPDATE_STATIC( cfx9850 )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

@@ -29,7 +29,7 @@ public:
 	required_device<nextkbd_device> keyboard;
 	required_device<n82077aa_device> fdc;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	READ8_MEMBER( io_r );
 	WRITE8_MEMBER( io_w );

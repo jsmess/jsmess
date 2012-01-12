@@ -19,6 +19,7 @@ typedef struct _ti99_video_state
 	address_space	*space;
 	device_t	*cpu;
 	int				chip;
+	v9938_device *v9938;
 } ti99_video_state;
 
 INLINE ti99_video_state *get_safe_token(device_t *device)
@@ -88,11 +89,11 @@ READ16_DEVICE_HANDLER( ti_v9938_r16 )
 
 	if (offset & 1)
 	{	/* read VDP status */
-		return ((int) v9938_0_status_r(video->space, 0)) << 8;
+		return ((int) video->v9938->status_r()) << 8;
 	}
 	else
 	{	/* read VDP RAM */
-		return ((int) v9938_0_vram_r(video->space, 0)) << 8;
+		return ((int) video->v9938->vram_r()) << 8;
 	}
 }
 
@@ -146,19 +147,19 @@ WRITE16_DEVICE_HANDLER ( ti_v9938_w16 )
 	{
 	case 0:
 		/* write VDP data */
-		v9938_0_vram_w(video->space, 0, (data >> 8) & 0xff);
+		video->v9938->vram_w((data >> 8) & 0xff);
 		break;
 	case 1:
 		/* write VDP address */
-		v9938_0_command_w(video->space, 0, (data >> 8) & 0xff);
+		video->v9938->command_w((data >> 8) & 0xff);
 		break;
 	case 2:
 		/* write VDP palette */
-		v9938_0_palette_w(video->space, 0, (data >> 8) & 0xff);
+		video->v9938->palette_w((data >> 8) & 0xff);
 		break;
 	case 3:
 		/* write VDP register pointer (indirect access) */
-		v9938_0_register_w(video->space, 0, (data >> 8) & 0xff);
+		video->v9938->register_w((data >> 8) & 0xff);
 		break;
 	}
 }
@@ -175,19 +176,19 @@ WRITE8_DEVICE_HANDLER ( gen_v9938_w )
 	{
 	case 0:
 		/* write VDP data */
-		v9938_0_vram_w(video->space, 0, data);
+		video->v9938->vram_w(data);
 		break;
 	case 2:
 		/* write VDP address */
-		v9938_0_command_w(video->space, 0, data);
+		video->v9938->command_w(data);
 		break;
 	case 4:
 		/* write VDP palette */
-		v9938_0_palette_w(video->space, 0, data);
+		video->v9938->palette_w(data);
 		break;
 	case 6:
 		/* write VDP register pointer (indirect access) */
-		v9938_0_register_w(video->space, 0, data);
+		video->v9938->register_w(data);
 		break;
 	}
 }
@@ -202,11 +203,11 @@ READ8Z_DEVICE_HANDLER( gen_v9938_rz )
 
 	if (offset & 2)
 	{	/* read VDP status */
-		*value = v9938_0_status_r(video->space, 0);
+		*value = video->v9938->status_r();
 	}
 	else
 	{	/* read VDP RAM */
-		*value = v9938_0_vram_r(video->space, 0);
+		*value = video->v9938->vram_r();
 	}
 }
 
@@ -230,7 +231,7 @@ void video_update_mouse( device_t *device, int delta_x, int delta_y, int buttons
 	ti99_video_state *video = get_safe_token(device);
 	// TODO: V9938 to be devicified
 	if (video->chip==TI_V9938)
-		v9938_update_mouse_state(0, delta_x, delta_y, buttons & 3);
+		video->v9938->update_mouse_state(delta_x, delta_y, buttons & 3);
 }
 
 
@@ -244,6 +245,13 @@ static DEVICE_START( ti99_video )
 	video->cpu = device->machine().device("maincpu");
 	video->space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	video->chip = conf->chip;
+	
+	if (video->chip == TI_V9938)
+	{
+		astring temp(device->tag(), "_v9938");
+		video->v9938 = device->machine().device<v9938_device>(temp);
+		assert(video->v9938 != NULL);
+	}
 }
 
 static DEVICE_STOP( ti99_video )
@@ -255,12 +263,12 @@ static DEVICE_RESET( ti99_video )
 	const ti99_video_config* conf = (const ti99_video_config*)get_config(device);
 	if (conf->chip!=TI_TMS991X)
 	{
-		running_machine &machine = device->machine();
-		int memsize = (input_port_read(machine, "V9938-MEM")==0)? 0x20000 : 0x30000;
-
-		v9938_init(machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(),
-			MODEL_V9938, memsize, conf->callback);
-		v9938_reset(0);
+//		running_machine &machine = device->machine();
+//		int memsize = (input_port_read(machine, "V9938-MEM")==0)? 0x20000 : 0x30000;
+//
+//		v9938_init(machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(),
+//			MODEL_V9938, memsize, conf->callback);
+//		v9938_reset(0);
 	}
 }
 

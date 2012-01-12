@@ -325,11 +325,6 @@ void phc25_state::video_start()
 	m_char_rom = machine().region(Z80_TAG)->base() + 0x5000;
 }
 
-bool phc25_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_vdg->update(bitmap, cliprect);
-}
-
 /* AY-3-8910 Interface */
 
 static const ay8910_interface ay8910_intf =
@@ -378,13 +373,13 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pal, phc25 )
     /* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG)
+	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, pal_vdg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
     /* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG)
+	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
 	MCFG_MC6847_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz, ntsc_vdg_intf)
 MACHINE_CONFIG_END
 

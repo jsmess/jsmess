@@ -33,9 +33,6 @@ public:
 		spc1000_state *state = machine.driver_data<spc1000_state>();
 		return state->m_video_ram[0x1000+(ch&0x7F)*16+line];
 	}
-
-protected:
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -263,11 +260,6 @@ static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
 	}
 }
 
-bool spc1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_vdg->update(bitmap, cliprect);
-}
-
 static const ay8910_interface spc1000_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -312,7 +304,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_MACHINE_RESET(spc1000)
 
     /* video hardware */
-    MCFG_SCREEN_MC6847_NTSC_ADD("screen")
+    MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, spc1000_mc6847_intf)
 
 	/* sound hardware */

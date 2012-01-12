@@ -30,7 +30,7 @@
 //  VIDEO
 //**************************************************************************
 
-bool f1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	int lines = m_200_256 ? 200 : 256;
@@ -71,7 +71,7 @@ bool f1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rect
 		}
 	}
 
-	return false;
+	return 0;
 }
 
 READ16_MEMBER( f1_state::palette_r )
@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(f1_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 	MCFG_PALETTE_LENGTH(16)

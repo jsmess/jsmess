@@ -58,7 +58,8 @@ public:
 	UINT8 m_control_port;
 	CRTC6845 m_crt;
 	int m_graphics;
-	bitmap_t m_dlybitmap;
+	bitmap_ind16 m_bitmap;
+	bitmap_ind16 m_dlybitmap;
 	int m_off_x;
 	int m_off_y;
 };
@@ -115,7 +116,7 @@ WRITE8_HANDLER ( cgenie_videoram_w );
 /*----------- defined in video/cgenie.c -----------*/
 
 VIDEO_START( cgenie );
-SCREEN_UPDATE( cgenie );
+SCREEN_UPDATE_IND16( cgenie );
 
 READ8_HANDLER ( cgenie_index_r );
 READ8_HANDLER ( cgenie_register_r );

@@ -51,7 +51,7 @@ static VIDEO_START( m79152pc )
 	state->m_p_chargen = machine.region("chargen")->base()+4;
 }
 
-static SCREEN_UPDATE( m79152pc )
+static SCREEN_UPDATE_IND16( m79152pc )
 {
 // Attributes are unknown so are not implemented
 	m79152pc_state *state = screen.machine().driver_data<m79152pc_state>();
@@ -112,15 +112,14 @@ static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
 
 	MCFG_MACHINE_RESET(m79152pc)
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(640, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 300-1)
+    /* video hardware */
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MCFG_SCREEN_SIZE(640, 480)
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_VIDEO_START(m79152pc)
-	MCFG_SCREEN_UPDATE(m79152pc)
+	MCFG_SCREEN_UPDATE_STATIC(m79152pc)
 	MCFG_GFXDECODE(m79152pc)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

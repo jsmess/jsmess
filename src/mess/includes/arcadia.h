@@ -67,7 +67,7 @@ public:
 			UINT8 ram3[3][16];
 	} d;
     } m_reg;
-    bitmap_t *m_bitmap;
+    bitmap_ind16 *m_bitmap;
 };
 
 
@@ -80,7 +80,7 @@ READ8_HANDLER(arcadia_video_r);
 WRITE8_HANDLER(arcadia_video_w);
 
 extern VIDEO_START( arcadia );
-extern SCREEN_UPDATE( arcadia );
+extern SCREEN_UPDATE_IND16( arcadia );
 
 
 /*----------- defined in audio/arcadia.c -----------*/

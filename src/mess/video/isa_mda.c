@@ -40,7 +40,6 @@ static const unsigned char mda_palette[4][3] =
 	{ 0x00,0xff,0x00 }
 };
 
-static SCREEN_UPDATE( mc6845_mda );
 static READ8_DEVICE_HANDLER( pc_MDA_r );
 static WRITE8_DEVICE_HANDLER( pc_MDA_w );
 static MC6845_UPDATE_ROW( mda_update_row );
@@ -106,9 +105,8 @@ static const pc_lpt_interface pc_lpt_config =
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MCFG_SCREEN_UPDATE( mc6845_mda)
+	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )
 
 	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_mda_intf)
 
@@ -209,14 +207,6 @@ void isa8_mda_device::device_reset()
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( mc6845_mda )
-{
-	mc6845_device *mc6845 = downcast<mc6845_device *>(screen.owner()->subdevice(MDA_MC6845_NAME));
-	mc6845->update( bitmap, cliprect );
-	return 0;
-}
-
-
 /***************************************************************************
   Draw text mode with 80x25 characters (default) and intense background.
   The character cell size is 9x15. Column 9 is column 8 repeated for
@@ -226,7 +216,8 @@ static SCREEN_UPDATE( mc6845_mda )
 static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 {
 	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device->owner());
-	UINT16	*p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32	*p = &bitmap.pix32(y);
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
@@ -270,21 +261,21 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 			data = 0xFF;
 		}
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 		if ( ( chr & 0xE0 ) == 0xC0 )
 		{
-			*p = ( data & 0x01 ) ? fg : bg; p++;
+			*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 		}
 		else
 		{
-			*p = bg; p++;
+			*p = palette[bg]; p++;
 		}
 	}
 }
@@ -299,7 +290,8 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 static MC6845_UPDATE_ROW( mda_text_blink_update_row )
 {
 	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device->owner());
-	UINT16	*p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32	*p = &bitmap.pix32(y);
 	UINT16	chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
 
@@ -352,21 +344,21 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row )
 			}
 		}
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 		if ( ( chr & 0xE0 ) == 0xC0 )
 		{
-			*p = ( data & 0x01 ) ? fg : bg; p++;
+			*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 		}
 		else
 		{
-			*p = bg; p++;
+			*p = palette[bg]; p++;
 		}
 	}
 }
@@ -502,7 +494,6 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( mc6845_hercules );
 static READ8_DEVICE_HANDLER( hercules_r );
 static WRITE8_DEVICE_HANDLER( hercules_w );
 
@@ -534,9 +525,8 @@ GFXDECODE_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 	MCFG_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MCFG_SCREEN_UPDATE( mc6845_hercules )
+	MCFG_SCREEN_UPDATE_DEVICE( HERCULES_MC6845_NAME, mc6845_device, screen_update )
 
 	MCFG_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, MDA_CLOCK/9, mc6845_hercules_intf)
 
@@ -628,7 +618,8 @@ void isa8_hercules_device::device_reset()
 static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 {
 	isa8_hercules_device *herc  = downcast<isa8_hercules_device *>(device->owner());
-	UINT16	*p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32	*p = &bitmap.pix32(y);
 	UINT16	gfx_base = ( ( herc->mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;
 	if ( y == 0 ) MDA_LOG(1,"hercules_gfx_update_row",("\n"));
@@ -636,35 +627,26 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 	{
 		UINT8	data = herc->videoram[ gfx_base + ( ( ma + i ) << 1 ) ];
 
-		*p = ( data & 0x80 ) ? 2 : 0; p++;
-		*p = ( data & 0x40 ) ? 2 : 0; p++;
-		*p = ( data & 0x20 ) ? 2 : 0; p++;
-		*p = ( data & 0x10 ) ? 2 : 0; p++;
-		*p = ( data & 0x08 ) ? 2 : 0; p++;
-		*p = ( data & 0x04 ) ? 2 : 0; p++;
-		*p = ( data & 0x02 ) ? 2 : 0; p++;
-		*p = ( data & 0x01 ) ? 2 : 0; p++;
+		*p = palette[( data & 0x80 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x40 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x20 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x10 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x08 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x04 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x02 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x01 ) ? 2 : 0]; p++;
 
 		data = herc->videoram[ gfx_base + ( ( ma + i ) << 1 ) + 1 ];
 
-		*p = ( data & 0x80 ) ? 2 : 0; p++;
-		*p = ( data & 0x40 ) ? 2 : 0; p++;
-		*p = ( data & 0x20 ) ? 2 : 0; p++;
-		*p = ( data & 0x10 ) ? 2 : 0; p++;
-		*p = ( data & 0x08 ) ? 2 : 0; p++;
-		*p = ( data & 0x04 ) ? 2 : 0; p++;
-		*p = ( data & 0x02 ) ? 2 : 0; p++;
-		*p = ( data & 0x01 ) ? 2 : 0; p++;
+		*p = palette[( data & 0x80 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x40 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x20 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x10 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x08 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x04 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x02 ) ? 2 : 0]; p++;
+		*p = palette[( data & 0x01 ) ? 2 : 0]; p++;
 	}
-}
-
-
-static SCREEN_UPDATE( mc6845_hercules )
-{
-	mc6845_device *mc6845 = downcast<mc6845_device *>(screen.owner()->subdevice(HERCULES_MC6845_NAME));
-
-	mc6845->update( bitmap, cliprect );
-	return 0;
 }
 
 

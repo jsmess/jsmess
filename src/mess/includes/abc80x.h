@@ -145,9 +145,9 @@ public:
 
 	required_device<mc6845_device> m_crtc;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void hr_update(bitmap_t &bitmap, const rectangle &cliprect);
+	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 class abc800c_state : public abc800_state
@@ -160,9 +160,9 @@ public:
 
 	required_device<device_t> m_trom;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hr_update(bitmap_t &bitmap, const rectangle &cliprect);
+	void hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 // ======================> abc802_state
@@ -183,7 +183,7 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
 
@@ -227,10 +227,10 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
-	void hr_update(bitmap_t &bitmap, const rectangle &cliprect);
+	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mai_r );
 	DECLARE_WRITE8_MEMBER( mao_w );

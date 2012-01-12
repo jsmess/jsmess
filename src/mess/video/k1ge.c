@@ -24,7 +24,7 @@ struct k1ge
 
 	emu_timer *timer;
 	emu_timer *hblank_on_timer;
-	bitmap_t *bitmap;
+	bitmap_ind16 *bitmap;
 };
 
 
@@ -811,7 +811,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 }
 
 
-void k1ge_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
+void k1ge_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
@@ -832,7 +832,7 @@ static DEVICE_START( k1ge )
 	k1ge->hblank_on_timer = device->machine().scheduler().timer_alloc(FUNC(k1ge_hblank_on_timer_callback), (void *) device );
 	k1ge->screen = device->machine().device<screen_device>(k1ge->intf->screen_tag);
 	k1ge->vram = device->machine().region( k1ge->intf->vram_tag )->base();
-	k1ge->bitmap = auto_bitmap_alloc( device->machine(), k1ge->screen->width(), k1ge->screen->height(), k1ge->screen->format() );
+	k1ge->bitmap = auto_bitmap_ind16_alloc( device->machine(), k1ge->screen->width(), k1ge->screen->height() );
 	k1ge->draw = k1ge_draw;
 }
 

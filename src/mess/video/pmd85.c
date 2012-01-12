@@ -32,7 +32,7 @@ VIDEO_START( pmd85 )
 {
 }
 
-static void pmd85_draw_scanline(running_machine &machine,bitmap_t &bitmap, int pmd85_scanline)
+static void pmd85_draw_scanline(running_machine &machine,bitmap_ind16 &bitmap, int pmd85_scanline)
 {
 	int x, i;
 	int pen0, pen1;
@@ -56,7 +56,7 @@ static void pmd85_draw_scanline(running_machine &machine,bitmap_t &bitmap, int p
 	}
 }
 
-SCREEN_UPDATE( pmd85 )
+SCREEN_UPDATE_IND16( pmd85 )
 {
 	int pmd85_scanline;
 

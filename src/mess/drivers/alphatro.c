@@ -32,7 +32,7 @@
 #define MAIN_CLOCK XTAL_4MHz
 
 #define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class alphatro_state : public driver_device
 {
@@ -66,7 +66,6 @@ public:
 	virtual void video_start();
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -139,19 +138,14 @@ VIDEO_START_MEMBER( alphatro_state )
 	m_p_chargen = machine().region("chargen")->base();
 }
 
-SCREEN_UPDATE_MEMBER( alphatro_state )
-{
-	m_crtc->update( bitmap, cliprect);
-	return 0;
-}
-
 static MC6845_UPDATE_ROW( alphatro_update_row )
 {
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
+	const rgb_t *pens = palette_entry_list_raw(bitmap.palette());
 	bool palette = BIT(input_port_read(device->machine(), "CONFIG"), 5);
 	UINT8 chr,gfx,attr,fg,inv;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -171,14 +165,14 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = BIT(gfx, 7) ? fg : 0;
-		*p++ = BIT(gfx, 6) ? fg : 0;
-		*p++ = BIT(gfx, 5) ? fg : 0;
-		*p++ = BIT(gfx, 4) ? fg : 0;
-		*p++ = BIT(gfx, 3) ? fg : 0;
-		*p++ = BIT(gfx, 2) ? fg : 0;
-		*p++ = BIT(gfx, 1) ? fg : 0;
-		*p++ = BIT(gfx, 0) ? fg : 0;
+		*p++ = pens[BIT(gfx, 7) ? fg : 0];
+		*p++ = pens[BIT(gfx, 6) ? fg : 0];
+		*p++ = pens[BIT(gfx, 5) ? fg : 0];
+		*p++ = pens[BIT(gfx, 4) ? fg : 0];
+		*p++ = pens[BIT(gfx, 3) ? fg : 0];
+		*p++ = pens[BIT(gfx, 2) ? fg : 0];
+		*p++ = pens[BIT(gfx, 1) ? fg : 0];
+		*p++ = pens[BIT(gfx, 0) ? fg : 0];
 	}
 }
 
@@ -434,7 +428,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_GFXDECODE(alphatro)

@@ -18,12 +18,11 @@
 
 #define VRAM_SIZE	(0xc0000)   // 768k of VRAM for 1024x768 @ 8 bit
 
-static SCREEN_UPDATE( spec8s3 );
+static SCREEN_UPDATE_RGB32( spec8s3 );
 
 MACHINE_CONFIG_FRAGMENT( spec8s3 )
 	MCFG_SCREEN_ADD( SPEC8S3_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE(spec8s3)
+	MCFG_SCREEN_UPDATE_STATIC(spec8s3)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
@@ -145,7 +144,7 @@ void nubus_spec8s3_device::device_timer(emu_timer &timer, device_timer_id tid, i
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( spec8s3 )
+static SCREEN_UPDATE_RGB32( spec8s3 )
 {
 	UINT32 *scanline;
 	int x, y;

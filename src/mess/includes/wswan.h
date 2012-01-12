@@ -129,6 +129,10 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
 	{ }
+	
+	virtual void video_start();
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(wswan_port_r);
@@ -148,6 +152,7 @@ public:
 	UINT8 *m_ws_bios_bank;
 	UINT8 m_bios_disabled;
 	int m_pal[16][16];
+	bitmap_ind16 m_bitmap;
 	void wswan_clear_irq_line(int irq);
 };
 

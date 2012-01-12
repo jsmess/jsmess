@@ -2,6 +2,7 @@
 #define __GENBOARD__
 
 #include "machine/tms9901.h"
+#include "video/v9938.h"
 
 enum
 {
@@ -23,7 +24,7 @@ READ8_DEVICE_HANDLER( geneve_cru_r );
 WRITE8_DEVICE_HANDLER( geneve_cru_w );
 
 extern const tms9901_interface tms9901_wiring_geneve;
-void tms9901_gen_set_int2(running_machine &machine, int state);
+void tms9901_gen_set_int2(device_t *, v99x8_device &tms, int state);
 void set_gm_switches(device_t *board, int number, int value);
 
 TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt );

@@ -103,7 +103,7 @@ public:
 	UINT8 *m_vram;
 
 	virtual void machine_start();
-	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( bankswitch_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -445,7 +445,7 @@ static PALETTE_INIT( prestige )
 	palette_set_color(machine, 1, MAKE_RGB(16, 37, 84));
 }
 
-bool prestige_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 prestige_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
 
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
     MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update)
 	MCFG_SCREEN_SIZE( 240, 100 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
 

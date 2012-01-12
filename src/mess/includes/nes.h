@@ -277,7 +277,7 @@ void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned 
 
 PALETTE_INIT( nes );
 VIDEO_START( nes );
-SCREEN_UPDATE( nes );
+SCREEN_UPDATE_IND16( nes );
 
 
 #endif /* NES_H_ */

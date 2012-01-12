@@ -390,7 +390,7 @@ static PALETTE_INIT( pasogo )
 	}
 }
 
-static SCREEN_UPDATE( pasogo )
+static SCREEN_UPDATE_IND16( pasogo )
 {
 	//static int width=-1,height=-1;
 	UINT8 *rom = screen.machine().region("maincpu")->base()+0xb8000;
@@ -512,11 +512,10 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_PIC8259_ADD( "pic8259", pasogo_pic8259_config )
 
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE(pasogo)
+	MCFG_SCREEN_UPDATE_STATIC(pasogo)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pasogo_palette))
 	MCFG_PALETTE_INIT(pasogo)

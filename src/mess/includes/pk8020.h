@@ -47,6 +47,6 @@ extern INTERRUPT_GEN( pk8020_interrupt );
 
 extern PALETTE_INIT( pk8020 );
 extern VIDEO_START( pk8020 );
-extern SCREEN_UPDATE( pk8020 );
+extern SCREEN_UPDATE_IND16( pk8020 );
 
 #endif /* pk8020_H_ */

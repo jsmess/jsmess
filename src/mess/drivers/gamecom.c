@@ -84,6 +84,12 @@ static PALETTE_INIT( gamecom )
 	}
 }
 
+UINT32 gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+
 static INTERRUPT_GEN( gamecom_interrupt )
 {
 	cputag_set_input_line(device->machine(), "maincpu", LCDC_INT, ASSERT_LINE );
@@ -108,7 +114,7 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE( 59.732155 )
 	MCFG_SCREEN_VBLANK_TIME(500)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(gamecom_state, screen_update)
 	MCFG_SCREEN_SIZE( 200, 200 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
 

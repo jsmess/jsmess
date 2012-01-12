@@ -63,7 +63,7 @@ VIDEO_START( lviv )
 {
 }
 
-SCREEN_UPDATE( lviv )
+SCREEN_UPDATE_IND16( lviv )
 {
 	lviv_state *state = screen.machine().driver_data<lviv_state>();
 	int x,y;

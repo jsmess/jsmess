@@ -157,19 +157,13 @@ static VIDEO_START( ec65 )
 	state->m_p_chargen = machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( ec65 )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(MC6845_TAG);
-	mc6845->update( bitmap, cliprect);
-	return 0;
-}
-
 static MC6845_UPDATE_ROW( ec65_update_row )
 {
 	ec65_state *state = device->machine().driver_data<ec65_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -181,14 +175,14 @@ static MC6845_UPDATE_ROW( ec65_update_row )
 		gfx = state->m_p_chargen[(chr<<4) | (ra & 0x0f)] ^ inv;
 
 		/* Display a scanline of a character */
-		*p++ = BIT(gfx, 7);
-		*p++ = BIT(gfx, 6);
-		*p++ = BIT(gfx, 5);
-		*p++ = BIT(gfx, 4);
-		*p++ = BIT(gfx, 3);
-		*p++ = BIT(gfx, 2);
-		*p++ = BIT(gfx, 1);
-		*p++ = BIT(gfx, 0);
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
 	}
 }
 
@@ -237,10 +231,9 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE(ec65)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
 	MCFG_GFXDECODE(ec65)
 	MCFG_PALETTE_LENGTH(2)
@@ -270,10 +263,9 @@ static MACHINE_CONFIG_START( ec65k, ec65_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_SCREEN_UPDATE(ec65)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
 	MCFG_GFXDECODE(ec65)
 	MCFG_PALETTE_LENGTH(2)

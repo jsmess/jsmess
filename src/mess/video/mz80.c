@@ -37,7 +37,7 @@ VIDEO_START( mz80k )
 	state->m_p_chargen = machine.region("chargen")->base();
 }
 
-SCREEN_UPDATE( mz80k )
+SCREEN_UPDATE_IND16( mz80k )
 {
 	mz80_state *state = screen.machine().driver_data<mz80_state>();
 	state->m_mz80k_vertical ^= 1;
@@ -73,7 +73,7 @@ SCREEN_UPDATE( mz80k )
 }
 
 // same as above except bits are in reverse order
-SCREEN_UPDATE( mz80kj )
+SCREEN_UPDATE_IND16( mz80kj )
 {
 	mz80_state *state = screen.machine().driver_data<mz80_state>();
 	state->m_mz80k_vertical ^= 1;
@@ -109,7 +109,7 @@ SCREEN_UPDATE( mz80kj )
 }
 
 // has twice as much video ram and uses a scroll register
-SCREEN_UPDATE( mz80a )
+SCREEN_UPDATE_IND16( mz80a )
 {
 	mz80_state *state = screen.machine().driver_data<mz80_state>();
 	state->m_mz80k_vertical ^= 1;

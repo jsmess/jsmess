@@ -138,6 +138,12 @@ class gba_state : public driver_device
 public:
 	gba_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+		
+	virtual void video_start();
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	bitmap_ind16 m_bitmap;
 
 	UINT32 m_DISPSTAT;
 	UINT32 m_BG2X, m_BG2Y, m_BG3X, m_BG3Y;
@@ -215,6 +221,5 @@ public:
 /*----------- defined in video/gba.c -----------*/
 
 void gba_draw_scanline(running_machine &machine, int y);
-void gba_video_start(running_machine &machine);
 
 #endif

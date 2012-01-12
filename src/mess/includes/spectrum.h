@@ -137,12 +137,12 @@ PALETTE_INIT( spectrum );
 VIDEO_START( spectrum );
 VIDEO_START( spectrum_128 );
 
-SCREEN_UPDATE( spectrum );
+SCREEN_UPDATE_IND16( spectrum );
 SCREEN_EOF( spectrum );
 
 void spectrum_border_force_redraw (running_machine &machine);
 void spectrum_border_set_last_color (running_machine &machine, int NewColor);
-void spectrum_border_draw(running_machine &machine, bitmap_t &bitmap, int full_refresh,
+void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap, int full_refresh,
                 int TopBorderLines, int ScreenLines, int BottomBorderLines,
                 int LeftBorderPixels, int ScreenPixels, int RightBorderPixels,
                 int LeftBorderCycles, int ScreenCycles, int RightBorderCycles,
@@ -158,8 +158,8 @@ EVENT_LIST_ITEM *spectrum_EventList_GetFirstItem(running_machine &machine);
 /*----------- defined in video/timex.c -----------*/
 
 VIDEO_START( ts2068 );
-SCREEN_UPDATE( ts2068 );
+SCREEN_UPDATE_IND16( ts2068 );
 
-SCREEN_UPDATE( tc2048 );
+SCREEN_UPDATE_IND16( tc2048 );
 
 #endif /* __SPECTRUM_H__ */

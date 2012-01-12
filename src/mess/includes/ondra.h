@@ -30,6 +30,6 @@ extern WRITE8_HANDLER( ondra_port_0a_w );
 /*----------- defined in video/ondra.c -----------*/
 
 extern VIDEO_START( ondra );
-extern SCREEN_UPDATE( ondra );
+extern SCREEN_UPDATE_IND16( ondra );
 
 #endif

@@ -274,17 +274,11 @@ static VIDEO_START( tvc )
 {
 }
 
-static SCREEN_UPDATE( tvc )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
-	mc6845->update(bitmap, cliprect);
-	return 0;
-}
-
 static MC6845_UPDATE_ROW( tvc_update_row )
 {
 	tvc_state *state = device->machine().driver_data<tvc_state>();
-	UINT16  *p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
 	switch(state->m_video_mode) {
@@ -293,14 +287,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
-					*p++ = state->m_col[(data >> 7)];
-					*p++ = state->m_col[(data >> 6)];
-					*p++ = state->m_col[(data >> 5)];
-					*p++ = state->m_col[(data >> 4)];
-					*p++ = state->m_col[(data >> 3)];
-					*p++ = state->m_col[(data >> 2)];
-					*p++ = state->m_col[(data >> 1)];
-					*p++ = state->m_col[(data >> 0)];
+					*p++ = palette[state->m_col[(data >> 7)]];
+					*p++ = palette[state->m_col[(data >> 6)]];
+					*p++ = palette[state->m_col[(data >> 5)]];
+					*p++ = palette[state->m_col[(data >> 4)]];
+					*p++ = palette[state->m_col[(data >> 3)]];
+					*p++ = palette[state->m_col[(data >> 2)]];
+					*p++ = palette[state->m_col[(data >> 1)]];
+					*p++ = palette[state->m_col[(data >> 0)]];
 				}
 				break;
 		case 1 :
@@ -308,14 +302,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
-					*p++ = state->m_col[BIT(data,7)*2 + BIT(data,3)];
-					*p++ = state->m_col[BIT(data,7)*2 + BIT(data,3)];
-					*p++ = state->m_col[BIT(data,6)*2 + BIT(data,2)];
-					*p++ = state->m_col[BIT(data,6)*2 + BIT(data,2)];
-					*p++ = state->m_col[BIT(data,5)*2 + BIT(data,1)];
-					*p++ = state->m_col[BIT(data,5)*2 + BIT(data,1)];
-					*p++ = state->m_col[BIT(data,4)*2 + BIT(data,0)];
-					*p++ = state->m_col[BIT(data,4)*2 + BIT(data,0)];
+					*p++ = palette[state->m_col[BIT(data,7)*2 + BIT(data,3)]];
+					*p++ = palette[state->m_col[BIT(data,7)*2 + BIT(data,3)]];
+					*p++ = palette[state->m_col[BIT(data,6)*2 + BIT(data,2)]];
+					*p++ = palette[state->m_col[BIT(data,6)*2 + BIT(data,2)]];
+					*p++ = palette[state->m_col[BIT(data,5)*2 + BIT(data,1)]];
+					*p++ = palette[state->m_col[BIT(data,5)*2 + BIT(data,1)]];
+					*p++ = palette[state->m_col[BIT(data,4)*2 + BIT(data,0)]];
+					*p++ = palette[state->m_col[BIT(data,4)*2 + BIT(data,0)]];
 				}
 				break;
 		default:
@@ -323,14 +317,14 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				{
 					UINT16 offset = i  + (y * 64);
 					UINT8 data = device->machine().device<ram_device>(RAM_TAG)->pointer()[ offset + 0x10000];
-					*p++ = state->m_col[(data >> 4) & 0xf];
-					*p++ = state->m_col[(data >> 4) & 0xf];
-					*p++ = state->m_col[(data >> 4) & 0xf];
-					*p++ = state->m_col[(data >> 4) & 0xf];
-					*p++ = state->m_col[(data >> 0) & 0xf];
-					*p++ = state->m_col[(data >> 0) & 0xf];
-					*p++ = state->m_col[(data >> 0) & 0xf];
-					*p++ = state->m_col[(data >> 0) & 0xf];
+					*p++ = palette[state->m_col[(data >> 4) & 0xf]];
+					*p++ = palette[state->m_col[(data >> 4) & 0xf]];
+					*p++ = palette[state->m_col[(data >> 4) & 0xf]];
+					*p++ = palette[state->m_col[(data >> 4) & 0xf]];
+					*p++ = palette[state->m_col[(data >> 0) & 0xf]];
+					*p++ = palette[state->m_col[(data >> 0) & 0xf]];
+					*p++ = palette[state->m_col[(data >> 0) & 0xf]];
+					*p++ = palette[state->m_col[(data >> 0) & 0xf]];
 				}
 				break;
 
@@ -400,10 +394,9 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(512, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
-    MCFG_SCREEN_UPDATE(tvc)
+    MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_LENGTH( 16 )
 	MCFG_PALETTE_INIT(tvc)

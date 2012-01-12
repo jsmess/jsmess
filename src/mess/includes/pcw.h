@@ -56,7 +56,7 @@ public:
 	UINT16 m_printer_pins;
 	UINT8 m_printer_p2;  // MCU port P2 state
 	UINT32 m_paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
-	bitmap_t* m_prn_output;
+	bitmap_ind16* m_prn_output;
 	UINT8 m_printer_p2_prev;
 	emu_timer* m_prn_stepper;
 	emu_timer* m_prn_pins;
@@ -66,8 +66,8 @@ public:
 /*----------- defined in video/pcw.c -----------*/
 
 extern VIDEO_START( pcw );
-extern SCREEN_UPDATE( pcw );
-extern SCREEN_UPDATE( pcw_printer );
+extern SCREEN_UPDATE_IND16( pcw );
+extern SCREEN_UPDATE_IND16( pcw_printer );
 extern PALETTE_INIT( pcw );
 
 

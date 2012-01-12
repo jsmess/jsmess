@@ -87,7 +87,7 @@ VIDEO_START( apple3 )
 
 
 
-static void apple3_video_text40(running_machine &machine,bitmap_t &bitmap)
+static void apple3_video_text40(running_machine &machine,bitmap_ind16 &bitmap)
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
 	int x, y, col, row;
@@ -145,7 +145,7 @@ static void apple3_video_text40(running_machine &machine,bitmap_t &bitmap)
 
 
 
-static void apple3_video_text80(running_machine &machine,bitmap_t &bitmap)
+static void apple3_video_text80(running_machine &machine,bitmap_ind16 &bitmap)
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
 	int x, y, col, row;
@@ -198,7 +198,7 @@ static void apple3_video_text80(running_machine &machine,bitmap_t &bitmap)
 
 
 
-static void apple3_video_graphics_hgr(running_machine &machine,bitmap_t &bitmap)
+static void apple3_video_graphics_hgr(running_machine &machine,bitmap_ind16 &bitmap)
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
 	/* hi-res mode: 280x192x2 */
@@ -242,7 +242,7 @@ static UINT8 swap_bits(UINT8 b)
 
 
 
-static void apple3_video_graphics_chgr(running_machine &machine,bitmap_t &bitmap)
+static void apple3_video_graphics_chgr(running_machine &machine,bitmap_ind16 &bitmap)
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
 	/* color hi-res mode: 280x192x16 */
@@ -289,7 +289,7 @@ static void apple3_video_graphics_chgr(running_machine &machine,bitmap_t &bitmap
 
 
 
-static void apple3_video_graphics_shgr(running_machine &machine,bitmap_t &bitmap)
+static void apple3_video_graphics_shgr(running_machine &machine,bitmap_ind16 &bitmap)
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
 	/* super hi-res mode: 560x192x2 */
@@ -332,7 +332,7 @@ static void apple3_video_graphics_shgr(running_machine &machine,bitmap_t &bitmap
 
 
 
-static void apple3_video_graphics_chires(running_machine &machine,bitmap_t &bitmap)
+static void apple3_video_graphics_chires(running_machine &machine,bitmap_ind16 &bitmap)
 {
 	apple3_state *state = machine.driver_data<apple3_state>();
 	UINT16 *pen;
@@ -364,7 +364,7 @@ static void apple3_video_graphics_chires(running_machine &machine,bitmap_t &bitm
 
 
 
-SCREEN_UPDATE( apple3 )
+SCREEN_UPDATE_IND16( apple3 )
 {
 	apple3_state *state = screen.machine().driver_data<apple3_state>();
 	switch(state->m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))

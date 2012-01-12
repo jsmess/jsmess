@@ -14,7 +14,7 @@
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 #define LOG	1
 
@@ -47,7 +47,7 @@ public:
 	UINT8		m_ram_1800[0x800];
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -210,7 +210,7 @@ VIDEO_START_MEMBER( phunsy_state )
 }
 
 
-SCREEN_UPDATE_MEMBER( phunsy_state )
+SCREEN_UPDATE16_MEMBER( phunsy_state )
 {
 	UINT8 y,ra,chr,gfx,col;
 	UINT16 sy=0,ma=0,x;
@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
        - 313 line display of which 256 are displayed.
     */
 	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
 	MCFG_GFXDECODE(phunsy)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(phunsy)

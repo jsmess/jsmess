@@ -146,7 +146,7 @@ extern const via6522_interface lisa_via6522_0_intf;
 extern const via6522_interface lisa_via6522_1_intf;
 
 VIDEO_START( lisa );
-SCREEN_UPDATE( lisa );
+SCREEN_UPDATE_IND16( lisa );
 
 extern NVRAM_HANDLER(lisa);
 

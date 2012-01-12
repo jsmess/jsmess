@@ -33,7 +33,7 @@
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class cd2650_state : public driver_device
 {
@@ -53,7 +53,7 @@ public:
 	UINT8 m_term_data;
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -95,7 +95,7 @@ VIDEO_START_MEMBER(cd2650_state)
 	m_p_chargen = machine().region("chargen")->base();
 }
 
-SCREEN_UPDATE_MEMBER(cd2650_state)
+SCREEN_UPDATE16_MEMBER(cd2650_state)
 {
 /* The video is unusual in that the characters in each line are spaced at 16 bytes in memory,
     thus line 1 starts at 1000, line 2 at 1001, etc. There are 16 lines of 80 characters.
@@ -166,7 +166,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 159)
 	MCFG_PALETTE_LENGTH(2)

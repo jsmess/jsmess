@@ -56,7 +56,7 @@ PALETTE_INIT( nes )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( nes )
+SCREEN_UPDATE_IND16( nes )
 {
 	nes_state *state = screen.machine().driver_data<nes_state>();
 

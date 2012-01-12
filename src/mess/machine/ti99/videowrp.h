@@ -21,7 +21,7 @@
 typedef struct _ti99_video_config
 {
 	int							chip;
-	void						(*callback)(running_machine &, int);
+	void						(*callback)(device_t *, v99x8_device &, int);
 
 } ti99_video_config;
 
@@ -40,27 +40,29 @@ void video_update_mouse( device_t *device, int delta_x, int delta_y, int buttons
 
 DECLARE_LEGACY_DEVICE( TIVIDEO, ti99_video );
 
-#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _screen_update, _tmsparam)	\
+#define MCFG_TI_TMS991x_ADD_NTSC(_tag, _chip, _tmsparam)	\
 	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)										\
 	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_TMS991X)			\
 	MCFG_TMS9928A_ADD( TMS9928A_TAG, _chip, _tmsparam ) 					\
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG ) 							\
-	MCFG_SCREEN_UPDATE( _screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS9928A_TAG, tms9928a_device, screen_update )
 
 #define MCFG_TI_TMS991x_ADD_PAL(_tag, _chip, _screen_update, _tmsparam)		\
 	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)										\
 	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_TMS991X)			\
 	MCFG_TMS9928A_ADD( TMS9928A_TAG, _chip, _tmsparam )						\
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )								\
-	MCFG_SCREEN_UPDATE( _screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS9928A_TAG, tms9928a_device, screen_update )
 
 #define MCFG_TI_V9938_ADD(_tag, _rate, _screen, _blank, _x, _y, _int)		\
 	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)										\
 	MCFG_DEVICE_CONFIG_DATAPTR(ti99_video_config, callback, _int)			\
 	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_V9938)			\
+	MCFG_V9938_ADD(_tag "_v9938", _screen, 0x20000)							\
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(_int)								\
 	MCFG_SCREEN_ADD(_screen, RASTER)										\
 	MCFG_SCREEN_REFRESH_RATE(_rate)											\
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)								\
+	MCFG_SCREEN_UPDATE_DEVICE(_tag "_v9938", v9938_device, screen_update)	\
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(_blank))					\
 	MCFG_SCREEN_SIZE(_x, _y)												\
 	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)							\

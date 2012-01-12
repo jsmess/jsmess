@@ -437,7 +437,7 @@ WRITE16_HANDLER (nimbus_video_io_w);
 
 VIDEO_START( nimbus );
 SCREEN_EOF( nimbus );
-SCREEN_UPDATE( nimbus );
+SCREEN_UPDATE_IND16( nimbus );
 VIDEO_RESET( nimbus );
 
 #define RED                     0

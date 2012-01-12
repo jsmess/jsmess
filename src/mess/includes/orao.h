@@ -33,7 +33,7 @@ extern WRITE8_HANDLER( orao_io_w );
 /*----------- defined in video/orao.c -----------*/
 
 extern VIDEO_START( orao );
-extern SCREEN_UPDATE( orao );
+extern SCREEN_UPDATE_IND16( orao );
 
 
 #endif /* ORAO_H_ */

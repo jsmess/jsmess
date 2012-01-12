@@ -60,7 +60,6 @@
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define MACHINE_START_MEMBER(name) void name::machine_start()
 #define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 #define MSM5832RS_TAG "rtc"
 
 class mycom_state : public driver_device
@@ -113,7 +112,6 @@ public:
 	virtual void machine_reset();
 	virtual void machine_start();
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -124,18 +122,13 @@ VIDEO_START_MEMBER( mycom_state )
 	m_p_chargen = machine().region("chargen")->base();
 }
 
-SCREEN_UPDATE_MEMBER( mycom_state )
-{
-	m_crtc->update( bitmap, cliprect);
-	return 0;
-}
-
 static MC6845_UPDATE_ROW( mycom_update_row )
 {
 	mycom_state *state = device->machine().driver_data<mycom_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx=0,z;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	if (state->m_0a & 0x40)
 	{
@@ -146,15 +139,15 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 			mem = (ma + x) & 0x7ff;
 			chr = state->m_p_videoram[mem];
 			z = ra / 3;
-			*p++ = BIT( chr, z ) ? dbit: dbit^1;
-			*p++ = BIT( chr, z ) ? dbit: dbit^1;
-			*p++ = BIT( chr, z ) ? dbit: dbit^1;
-			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
+			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
+			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
+			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
 			z += 4;
-			*p++ = BIT( chr, z ) ? dbit: dbit^1;
-			*p++ = BIT( chr, z ) ? dbit: dbit^1;
-			*p++ = BIT( chr, z ) ? dbit: dbit^1;
-			*p++ = BIT( chr, z ) ? dbit: dbit^1;
+			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
+			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
+			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
+			*p++ = palette[BIT( chr, z ) ? dbit: dbit^1];
 		}
 	}
 	else
@@ -575,7 +568,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_PALETTE_LENGTH(2)

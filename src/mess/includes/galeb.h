@@ -22,7 +22,7 @@ public:
 extern const gfx_layout galeb_charlayout;
 
 extern VIDEO_START( galeb );
-extern SCREEN_UPDATE( galeb );
+extern SCREEN_UPDATE_IND16( galeb );
 
 
 #endif /* GALEB_H_ */

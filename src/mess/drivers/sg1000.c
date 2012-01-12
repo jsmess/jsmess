@@ -544,14 +544,6 @@ static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
 	DEVCB_LINE(sg1000_vdp_interrupt)
 };
 
-static SCREEN_UPDATE( sg1000 )
-{
-	tms9918a_device *tms9918a = screen.machine().device<tms9918a_device>( TMS9918A_TAG );
-
-	tms9918a->update( bitmap, cliprect );
-	return 0;
-}
-
 /*-------------------------------------------------
     I8255_INTERFACE( sc3000_ppi_intf )
 -------------------------------------------------*/
@@ -1046,7 +1038,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
     /* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( sg1000 )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1099,7 +1091,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
     /* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( sg1000 )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1138,7 +1130,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
     /* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( sg1000 )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

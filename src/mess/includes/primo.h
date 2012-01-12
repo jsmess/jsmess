@@ -45,7 +45,7 @@ extern QUICKLOAD_LOAD( primo );
 
 /*----------- defined in video/primo.c -----------*/
 
-extern SCREEN_UPDATE( primo );
+extern SCREEN_UPDATE_IND16( primo );
 
 
 #endif /* PRIMO_H_ */

@@ -304,14 +304,6 @@ static DEVICE_IMAGE_LOAD( czz50_cart )
 	}
 }
 
-static SCREEN_UPDATE( coleco )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( coleco, coleco_state )
@@ -323,7 +315,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	// video hardware
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, coleco_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( coleco )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -351,7 +343,7 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	// video hardware
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, coleco_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( coleco )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -377,7 +369,7 @@ static MACHINE_CONFIG_DERIVED( dina, czz50 )
 
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, coleco_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( coleco )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /* ROMs */

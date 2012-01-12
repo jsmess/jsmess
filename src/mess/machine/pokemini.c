@@ -1533,14 +1533,14 @@ static TIMER_CALLBACK( pokemini_prc_counter_callback )
 					for( x = 0; x < 96; x++ ) {
 						UINT8 data = state->m_p_ram[ ( y * 12 ) + x ];
 
-						machine.primary_screen->default_bitmap().pix16(y + 0, x) = ( data & 0x01 ) ? 3 : 0;
-						machine.primary_screen->default_bitmap().pix16(y + 1, x) = ( data & 0x02 ) ? 3 : 0;
-						machine.primary_screen->default_bitmap().pix16(y + 2, x) = ( data & 0x04 ) ? 3 : 0;
-						machine.primary_screen->default_bitmap().pix16(y + 3, x) = ( data & 0x08 ) ? 3 : 0;
-						machine.primary_screen->default_bitmap().pix16(y + 4, x) = ( data & 0x10 ) ? 3 : 0;
-						machine.primary_screen->default_bitmap().pix16(y + 5, x) = ( data & 0x20 ) ? 3 : 0;
-						machine.primary_screen->default_bitmap().pix16(y + 6, x) = ( data & 0x40 ) ? 3 : 0;
-						machine.primary_screen->default_bitmap().pix16(y + 7, x) = ( data & 0x80 ) ? 3 : 0;
+						state->m_bitmap.pix16(y + 0, x) = ( data & 0x01 ) ? 3 : 0;
+						state->m_bitmap.pix16(y + 1, x) = ( data & 0x02 ) ? 3 : 0;
+						state->m_bitmap.pix16(y + 2, x) = ( data & 0x04 ) ? 3 : 0;
+						state->m_bitmap.pix16(y + 3, x) = ( data & 0x08 ) ? 3 : 0;
+						state->m_bitmap.pix16(y + 4, x) = ( data & 0x10 ) ? 3 : 0;
+						state->m_bitmap.pix16(y + 5, x) = ( data & 0x20 ) ? 3 : 0;
+						state->m_bitmap.pix16(y + 6, x) = ( data & 0x40 ) ? 3 : 0;
+						state->m_bitmap.pix16(y + 7, x) = ( data & 0x80 ) ? 3 : 0;
 					}
 				}
 

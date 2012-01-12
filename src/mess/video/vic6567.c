@@ -89,7 +89,7 @@ struct _vic2_state
 
 	UINT16 chargenaddr, videoaddr, bitmapaddr;
 
-	bitmap_t *bitmap;
+	bitmap_ind16 *bitmap;
 
 	UINT16 colors[4], spritemulti[4];
 
@@ -2581,7 +2581,7 @@ READ8_DEVICE_HANDLER( vic2_port_r )
 	return val;
 }
 
-UINT32 vic2_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
+UINT32 vic2_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	vic2_state *vic2 = get_safe_token(device);
 
@@ -2607,7 +2607,7 @@ static DEVICE_START( vic2 )
 	width = vic2->screen->width();
 	height = vic2->screen->height();
 
-	vic2->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
+	vic2->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
 
 	vic2->type = intf->type;
 

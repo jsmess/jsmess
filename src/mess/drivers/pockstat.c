@@ -921,7 +921,7 @@ static MACHINE_RESET( pockstat )
 	state->m_ps_flash_write_count = 0;
 }
 
-static SCREEN_UPDATE( pockstat )
+static SCREEN_UPDATE_RGB32( pockstat )
 {
 	pockstat_state *state = screen.machine().driver_data<pockstat_state>();
 	int x = 0;
@@ -989,10 +989,9 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE(pockstat)
+	MCFG_SCREEN_UPDATE_STATIC(pockstat)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

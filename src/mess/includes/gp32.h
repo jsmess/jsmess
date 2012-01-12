@@ -88,6 +88,8 @@ public:
 	gp32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void video_start();
+
 	UINT32 *m_s3c240x_ram;
 	UINT8 *m_eeprom_data;
 	UINT32 m_s3c240x_lcd_regs[0x400/4];
@@ -119,6 +121,7 @@ public:
 	UINT32 m_s3c240x_adc_regs[0x08/4];
 	UINT32 m_s3c240x_spi_regs[0x18/4];
 	UINT32 m_s3c240x_mmc_regs[0x40/4];
+	bitmap_rgb32 m_bitmap;
 };
 
 

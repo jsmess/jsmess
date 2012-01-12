@@ -260,7 +260,7 @@ static  INT16 thom_border_r[THOM_TOTAL_HEIGHT+1];
 
 
 /* active area, updated one scan-line at a time every 64us,
-   then blitted in SCREEN_UPDATE
+   then blitted in SCREEN_UPDATE_IND16
 */
 static UINT16 thom_vbody[640*200];
 
@@ -897,7 +897,7 @@ void thom_floppy_active ( running_machine &machine, int write )
 
 
 
-SCREEN_UPDATE ( thom )
+SCREEN_UPDATE_IND16 ( thom )
 {
 	int y, ypos;
 	const int scale = thom_hires ? 2 : 1;

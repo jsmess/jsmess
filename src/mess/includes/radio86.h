@@ -17,6 +17,12 @@ public:
 	radio86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void video_start();
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	bitmap_ind16 m_bitmap;
+
 	UINT8 m_tape_value;
 	UINT8 m_mikrosha_font_page;
 	int m_keyboard_mask;
@@ -70,7 +76,7 @@ extern I8275_DISPLAY_PIXELS(partner_display_pixels);
 extern I8275_DISPLAY_PIXELS(mikrosha_display_pixels);
 extern I8275_DISPLAY_PIXELS(apogee_display_pixels);
 
-extern SCREEN_UPDATE( radio86 );
+extern SCREEN_UPDATE_IND16( radio86 );
 extern PALETTE_INIT( radio86 );
 
 #endif /* radio86_H_ */

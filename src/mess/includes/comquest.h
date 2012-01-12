@@ -26,7 +26,7 @@ public:
 /*----------- defined in video/comquest.c -----------*/
 
 VIDEO_START( comquest );
-SCREEN_UPDATE( comquest );
+SCREEN_UPDATE_IND16( comquest );
 
 
 #endif /* COMQUEST_H_ */

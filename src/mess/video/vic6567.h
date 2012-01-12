@@ -153,7 +153,7 @@ int vic2e_k1_r(device_t *device);
 int vic2e_k2_r(device_t *device);
 
 void vic2_raster_interrupt_gen( device_t *device );
-UINT32 vic2_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect );
+UINT32 vic2_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 
 extern void vic2_set_rastering(device_t *device, int onoff);

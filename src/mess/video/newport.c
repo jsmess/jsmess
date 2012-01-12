@@ -210,7 +210,7 @@ VIDEO_START( newport )
 	pNVID->base = auto_alloc_array_clear(machine, UINT32, (1280+64) * (1024+64));
 }
 
-SCREEN_UPDATE( newport )
+SCREEN_UPDATE_RGB32( newport )
 {
 	int y;
 

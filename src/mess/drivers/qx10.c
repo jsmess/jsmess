@@ -84,7 +84,6 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	void update_memory_mapping();
 
@@ -963,16 +962,6 @@ void qx10_state::video_start()
 	m_char_rom = machine().region("chargen")->base();
 }
 
-bool qx10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	/* graphics */
-	m_hgdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 static UPD7220_INTERFACE( hgdc_intf )
 {
 	"screen",
@@ -1026,7 +1015,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_GFXDECODE(qx10)

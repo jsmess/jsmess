@@ -20,6 +20,8 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	virtual void machine_reset();
+	
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -57,6 +59,10 @@ void pcfx_state::machine_reset()
 	memory_set_bankptr( machine(), "bank1", machine().region("user1")->base() );
 }
 
+UINT32 pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MCFG_CPU_ADD( "maincpu", V810, 21477270 )
@@ -64,7 +70,7 @@ static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MCFG_CPU_IO_MAP( pcfx_io)
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
+	MCFG_SCREEN_UPDATE_DRIVER(pcfx_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(21477270/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
 MACHINE_CONFIG_END
 

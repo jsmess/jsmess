@@ -110,12 +110,12 @@ SCREEN_EOF( spectrum )
 
 ***************************************************************************/
 
-INLINE void spectrum_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 
-SCREEN_UPDATE( spectrum )
+SCREEN_UPDATE_IND16( spectrum )
 {
 	/* for now do a full-refresh */
 	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
@@ -221,7 +221,7 @@ void spectrum_border_set_last_color(running_machine &machine, int NewColor)
 	state->m_CurrBorderColor = NewColor;
 }
 
-void spectrum_border_draw(running_machine &machine, bitmap_t &bitmap,
+void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 	int full_refresh,               /* Full refresh flag */
 	int TopBorderLines,             /* Border lines before actual screen */
 	int ScreenLines,                /* Screen height in pixels */

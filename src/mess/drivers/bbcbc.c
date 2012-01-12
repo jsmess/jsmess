@@ -169,15 +169,6 @@ static MACHINE_RESET( bbcbc )
 }
 
 
-static SCREEN_UPDATE( bbcbc )
-{
-	tms9928a_device *tms9129 = screen.machine().device<tms9928a_device>( "tms9129" );
-
-	tms9129->update( bitmap, cliprect );
-	return 0;
-}
-
-
 static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
 	MCFG_CPU_PROGRAM_MAP( bbcbc_prg)
@@ -191,7 +182,7 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 
 	MCFG_TMS9928A_ADD( "tms9129", TMS9129, tms9129_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( bbcbc )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9129", tms9928a_device, screen_update )
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_NOT_MANDATORY

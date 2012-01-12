@@ -109,24 +109,24 @@ void comx35_state::video_start()
 	save_pointer(NAME(m_charram), COMX35_CHARRAM_SIZE);
 }
 
-bool comx35_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 comx35_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (screen.width() == CDP1869_SCREEN_WIDTH)
 	{
-		m_vis->update_screen(bitmap, cliprect);
+		m_vis->screen_update(screen, bitmap, cliprect);
 	}
 	else
 	{
 		m_expansion->screen_update(screen, bitmap, cliprect);
 	}
 
-	return false;
+	return 0;
 }
 
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
-	MCFG_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, CDP1869_DOT_CLK_PAL)
+	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -139,7 +139,7 @@ MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( comx35_ntsc_video )
-	MCFG_CDP1869_SCREEN_NTSC_ADD(SCREEN_TAG, CDP1869_DOT_CLK_NTSC)
+	MCFG_CDP1869_SCREEN_NTSC_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_NTSC)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

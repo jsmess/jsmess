@@ -145,13 +145,6 @@ static VIDEO_START( applix )
 {
 }
 
-static SCREEN_UPDATE( applix )
-{
-	applix_state *state = screen.machine().driver_data<applix_state>();
-	state->m_crtc->update( bitmap, cliprect);
-	return 0;
-}
-
 MC6845_UPDATE_ROW( applix_update_row )
 {
 #if 0
@@ -163,10 +156,11 @@ MC6845_UPDATE_ROW( applix_update_row )
 // Display is bitmapped, no character generator.
 // The video page can be moved around to almost anywhere in memory.
 	applix_state *state = device->machine().driver_data<applix_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
 	UINT16 colourm = (state->m_08 & 0x0e) << 7;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)			// for each character
 	{
@@ -181,14 +175,14 @@ MC6845_UPDATE_ROW( applix_update_row )
 		bg = (col & 0x07e0) >> 5;					// and background palette
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = ( gfx & 0x80 ) ? fg : bg;
-		*p++ = ( gfx & 0x40 ) ? fg : bg;
-		*p++ = ( gfx & 0x20 ) ? fg : bg;
-		*p++ = ( gfx & 0x10 ) ? fg : bg;
-		*p++ = ( gfx & 0x08 ) ? fg : bg;
-		*p++ = ( gfx & 0x04 ) ? fg : bg;
-		*p++ = ( gfx & 0x02 ) ? fg : bg;
-		*p++ = ( gfx & 0x01 ) ? fg : bg;
+		*p++ = palette[( gfx & 0x80 ) ? fg : bg];
+		*p++ = palette[( gfx & 0x40 ) ? fg : bg];
+		*p++ = palette[( gfx & 0x20 ) ? fg : bg];
+		*p++ = palette[( gfx & 0x10 ) ? fg : bg];
+		*p++ = palette[( gfx & 0x08 ) ? fg : bg];
+		*p++ = palette[( gfx & 0x04 ) ? fg : bg];
+		*p++ = palette[( gfx & 0x02 ) ? fg : bg];
+		*p++ = palette[( gfx & 0x01 ) ? fg : bg];
 	}
 #endif
 }
@@ -217,10 +211,9 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(applix)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(applix)

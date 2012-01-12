@@ -113,6 +113,7 @@ static READ8_HANDLER( einstein_80col_ram_r )
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	einstein_state *einstein = device->machine().driver_data<einstein_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *data = device->machine().region("gfx1")->base();
 	UINT8 char_code, data_byte;
 	int i, x;
@@ -122,14 +123,14 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 		char_code = einstein->m_crtc_ram[(ma + i) & 0x07ff];
 		data_byte = data[(char_code << 3) + (ra & 0x07) + ((ra & 0x08) << 8)];
 
-		bitmap.pix16(y, x + 0) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 7);
-		bitmap.pix16(y, x + 1) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 6);
-		bitmap.pix16(y, x + 2) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 5);
-		bitmap.pix16(y, x + 3) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 4);
-		bitmap.pix16(y, x + 4) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 3);
-		bitmap.pix16(y, x + 5) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 2);
-		bitmap.pix16(y, x + 6) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 1);
-		bitmap.pix16(y, x + 7) = TMS9928A_PALETTE_SIZE + BIT(data_byte, 0);
+		bitmap.pix32(y, x + 0) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 7)];
+		bitmap.pix32(y, x + 1) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 6)];
+		bitmap.pix32(y, x + 2) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 5)];
+		bitmap.pix32(y, x + 3) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 4)];
+		bitmap.pix32(y, x + 4) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 3)];
+		bitmap.pix32(y, x + 5) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 2)];
+		bitmap.pix32(y, x + 6) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 1)];
+		bitmap.pix32(y, x + 7) = palette[TMS9928A_PALETTE_SIZE + BIT(data_byte, 0)];
 	}
 }
 
@@ -424,14 +425,6 @@ static TMS9928A_INTERFACE(einstein_tms9929a_interface)
 	DEVCB_NULL
 };
 
-static SCREEN_UPDATE( einstein )
-{
-	tms9929a_device *tms9929a = screen.machine().device<tms9929a_device>( "tms9929a" );
-
-	tms9929a->update( bitmap, cliprect );
-	return 0;
-}
-
 static MACHINE_START( einstein )
 {
 }
@@ -500,14 +493,21 @@ static MACHINE_START( einstein2 )
     VIDEO EMULATION
 ***************************************************************************/
 
-static SCREEN_UPDATE( einstein2 )
+static SCREEN_UPDATE_RGB32( einstein2 )
 {
 	einstein_state *einstein = screen.machine().driver_data<einstein_state>();
 
 	if (&screen == einstein->m_color_screen)
-		SCREEN_UPDATE_CALL(einstein);
+	{
+		tms9929a_device *tms9929a = screen.machine().device<tms9929a_device>( "tms9929a" );
+		const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+		bitmap_ind16 &src = tms9929a->get_bitmap();
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				bitmap.pix32(y, x) = palette[src.pix16(y, x)];
+	}
 	else if (&screen == einstein->m_crtc_screen)
-		einstein->m_mc6845->update( bitmap, cliprect);
+		einstein->m_mc6845->screen_update( screen, bitmap, cliprect);
 	else
 		fatalerror("Unknown screen '%s'", screen.tag());
 
@@ -812,7 +812,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9929a", TMS9929A, einstein_tms9929a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( einstein )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -855,12 +855,11 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("80column", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE(einstein2)
+	MCFG_SCREEN_UPDATE_STATIC(einstein2)
 	MCFG_GFXDECODE(einstei2)
 
 	/* 2 additional colors for the 80 column screen */

@@ -76,7 +76,7 @@ static VIDEO_START( paso1600 )
 	state->m_p_pcg = machine.region("pcg")->base();
 }
 
-static SCREEN_UPDATE( paso1600 )
+static SCREEN_UPDATE_IND16( paso1600 )
 {
 	paso1600_state *state = screen.machine().driver_data<paso1600_state>();
 	int x,y;
@@ -341,11 +341,10 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_VIDEO_START(paso1600)
-	MCFG_SCREEN_UPDATE(paso1600)
+	MCFG_SCREEN_UPDATE_STATIC(paso1600)
 	MCFG_GFXDECODE(paso1600)
 	MCFG_PALETTE_LENGTH(8)
 //  MCFG_PALETTE_INIT(black_and_white)

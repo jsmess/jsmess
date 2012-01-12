@@ -91,7 +91,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( bankswitch_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -478,7 +478,7 @@ void rex6000_state::machine_reset()
 	m_beep_mode = 0;
 }
 
-bool rex6000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 lcd_bank = MAKE_BANK(m_lcd_base[0], m_lcd_base[1]&0x1f);
 	UINT8 mem_type = identify_bank_type(lcd_bank);
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
     MCFG_SCREEN_ADD("screen", LCD)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(rex6000_state, screen_update)
     MCFG_SCREEN_SIZE(240, 120)
     MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)

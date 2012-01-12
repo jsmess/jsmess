@@ -664,7 +664,7 @@ SCREEN_EOF( nimbus )
 //    logerror("SCREEN_EOF( nimbus )\n");
 }
 
-SCREEN_UPDATE( nimbus )
+SCREEN_UPDATE_IND16( nimbus )
 {
 	rmnimbus_state *state = screen.machine().driver_data<rmnimbus_state>();
     int     XCoord;

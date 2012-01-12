@@ -393,7 +393,7 @@ static void vdc8563_time( device_t *device )
 	}
 }
 
-static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t &bitmap, int full_refresh )
+static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_ind16 &bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	running_machine &machine = device->machine();
@@ -436,7 +436,7 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_t &bitmap, 
 	}
 }
 
-static void vdc8563_text_screenrefresh( device_t *device, bitmap_t &bitmap, int full_refresh )
+static void vdc8563_text_screenrefresh( device_t *device, bitmap_ind16 &bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	running_machine &machine = device->machine();
@@ -500,7 +500,7 @@ static void vdc8563_text_screenrefresh( device_t *device, bitmap_t &bitmap, int 
 	}
 }
 
-static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_t &bitmap, int full_refresh )
+static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_ind16 &bitmap, int full_refresh )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	running_machine &machine = device->machine();
@@ -536,7 +536,7 @@ static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_t &bitmap, i
 	}
 }
 
-UINT32 vdc8563_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
+UINT32 vdc8563_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
 	int i;

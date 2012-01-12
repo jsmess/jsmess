@@ -237,6 +237,7 @@ WRITE8_MEMBER( abc806_state::sso_w )
 static MC6845_UPDATE_ROW( abc806_update_row )
 {
 	abc806_state *state = device->machine().driver_data<abc806_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 //  UINT8 old_data = 0xff;
 	int fg_color = 7;
@@ -327,11 +328,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		{
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 
-			bitmap.pix16(y, x++) = color;
+			bitmap.pix32(y, x++) = palette[color];
 
 			if (e5 || e6)
 			{
-				bitmap.pix16(y, x++) = color;
+				bitmap.pix32(y, x++) = palette[color];
 			}
 
 			chargen_data <<= 1;
@@ -428,8 +429,9 @@ static const mc6845_interface crtc_intf =
 //  hr_update - high resolution screen update
 //-------------------------------------------------
 
-void abc806_state::hr_update(bitmap_t &bitmap, const rectangle &cliprect)
+void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT32 addr = (m_hrs & 0x0f) << 15;
 
 	for (int y = m_sync + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
@@ -443,9 +445,9 @@ void abc806_state::hr_update(bitmap_t &bitmap, const rectangle &cliprect)
 			{
 				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
-				if (BIT(dot, 15) || bitmap.pix16(y, x) == 0)
+				if (BIT(dot, 15) || bitmap.pix32(y, x) == palette[0])
 				{
-					bitmap.pix16(y, x) = (dot >> 12) & 0x07;
+					bitmap.pix32(y, x) = palette[(dot >> 12) & 0x07];
 				}
 
 				dot <<= 4;
@@ -505,7 +507,7 @@ void abc806_state::video_start()
 //  SCREEN_UPDATE( abc806 )
 //-------------------------------------------------
 
-bool abc806_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// HACK expand visible area to workaround MC6845
 	screen.set_visible_area(0, 767, 0, 311);
@@ -516,7 +518,7 @@ bool abc806_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 	if (!m_txoff)
 	{
 		// draw text
-		m_crtc->update(bitmap, cliprect);
+		m_crtc->screen_update(screen, bitmap, cliprect);
 	}
 
 	// draw HR graphics
@@ -534,7 +536,7 @@ MACHINE_CONFIG_FRAGMENT( abc806_video )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)
 
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

@@ -147,7 +147,7 @@ static const POCKETC_FIGURE busy={
 	"11  1 1 111e"
 };
 
-SCREEN_UPDATE( pc1403 )
+SCREEN_UPDATE_IND16( pc1403 )
 {
 	pc1403_state *state = screen.machine().driver_data<pc1403_state>();
 	running_machine &machine = screen.machine();

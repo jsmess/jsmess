@@ -127,7 +127,7 @@ void iq151_video64_device::io_read(offs_t offset, UINT8 &data)
 //  video update
 //-------------------------------------------------
 
-void iq151_video64_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
+void iq151_video64_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 ma = 0, sy = 0;
 

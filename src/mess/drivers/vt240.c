@@ -24,7 +24,7 @@
 #include "machine/ram.h"
 #include "video/upd7220.h"
 
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class vt240_state : public driver_device
 {
@@ -44,8 +44,6 @@ public:
 	//UINT16 m_pcg_addr;
 	//UINT8 m_pcg_internal_addr;
 	//UINT8 *m_char_rom;
-
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	UINT8 *m_video_ram;
 };
@@ -92,14 +90,6 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	#endif
 }
 
-
-SCREEN_UPDATE_MEMBER( vt240_state )
-{
-	/* graphics */
-	m_hgdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
 
 /* presumably communication with T11 */
 READ8_MEMBER( vt240_state::test_r )
@@ -182,11 +172,10 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 //  MCFG_VIDEO_START(vt240)
-//  MCFG_SCREEN_UPDATE(vt240)
+	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(vt240)

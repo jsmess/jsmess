@@ -219,7 +219,7 @@ WRITE8_DEVICE_HANDLER ( teleprinter_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-static void generic_teleprinter_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+static void generic_teleprinter_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 code;
 	int y, c, x, b;
@@ -256,7 +256,7 @@ static VIDEO_START( teleprinter )
 
 }
 
-static SCREEN_UPDATE(teleprinter )
+static SCREEN_UPDATE_IND16(teleprinter )
 {
 	device_t *devconf = screen.machine().device(TELEPRINTER_TAG);
 	generic_teleprinter_update( devconf, bitmap, cliprect);
@@ -267,10 +267,9 @@ MACHINE_CONFIG_FRAGMENT( generic_teleprinter )
 	MCFG_SCREEN_ADD(TELEPRINTER_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(TELEPRINTER_WIDTH*8, TELEPRINTER_HEIGHT*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*8-1, 0, TELEPRINTER_HEIGHT*8-1)
-	MCFG_SCREEN_UPDATE(teleprinter)
+	MCFG_SCREEN_UPDATE_STATIC(teleprinter)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

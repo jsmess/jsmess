@@ -125,12 +125,12 @@ INTERRUPT_GEN( trs80_fdc_interrupt );
 /*----------- defined in video/trs80.c -----------*/
 
 VIDEO_START( trs80 );
-SCREEN_UPDATE( trs80 );
-SCREEN_UPDATE( ht1080z );
-SCREEN_UPDATE( meritum );
-SCREEN_UPDATE( lnw80 );
-SCREEN_UPDATE( radionic );
-SCREEN_UPDATE( trs80m4 );
+SCREEN_UPDATE_IND16( trs80 );
+SCREEN_UPDATE_IND16( ht1080z );
+SCREEN_UPDATE_IND16( meritum );
+SCREEN_UPDATE_IND16( lnw80 );
+SCREEN_UPDATE_IND16( radionic );
+SCREEN_UPDATE_IND16( trs80m4 );
 
 
 PALETTE_INIT( lnw80 );

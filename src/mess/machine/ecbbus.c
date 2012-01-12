@@ -267,7 +267,7 @@ WRITE_LINE_MEMBER( ecbbus_device::nmi_w )
 //  screen_update -
 //-------------------------------------------------
 
-bool ecbbus_device::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 ecbbus_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool value = false;
 

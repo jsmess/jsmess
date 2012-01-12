@@ -34,7 +34,7 @@ extern WRITE8_HANDLER (pp01_video_write_mode_w);
 /*----------- defined in video/pp01.c -----------*/
 
 extern VIDEO_START( pp01 );
-extern SCREEN_UPDATE( pp01 );
+extern SCREEN_UPDATE_IND16( pp01 );
 extern PALETTE_INIT( pp01 );
 
 #endif

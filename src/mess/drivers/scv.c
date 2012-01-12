@@ -423,7 +423,7 @@ static TIMER_CALLBACK( scv_vb_callback )
 }
 
 
-INLINE void plot_sprite_part( bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col )
+INLINE void plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col )
 {
 	if ( pat & 0x08 )
 		bitmap.pix16(y, x ) = col;
@@ -436,7 +436,7 @@ INLINE void plot_sprite_part( bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 pat, UIN
 }
 
 
-INLINE void draw_sprite( scv_state *state, bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y )
+INLINE void draw_sprite( scv_state *state, bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y )
 {
 	int j;
 
@@ -478,7 +478,7 @@ INLINE void draw_sprite( scv_state *state, bitmap_t &bitmap, UINT8 x, UINT8 y, U
 }
 
 
-INLINE void draw_text( bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 *char_data, UINT8 fg, UINT8 bg )
+INLINE void draw_text( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 *char_data, UINT8 fg, UINT8 bg )
 {
 	int i;
 
@@ -511,7 +511,7 @@ INLINE void draw_text( bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 *char_data, UIN
 }
 
 
-INLINE void draw_semi_graph( bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 fg )
+INLINE void draw_semi_graph( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 data, UINT8 fg )
 {
 	int i;
 
@@ -528,7 +528,7 @@ INLINE void draw_semi_graph( bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 data, UIN
 }
 
 
-INLINE void draw_block_graph( bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 col )
+INLINE void draw_block_graph( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 col )
 {
 	int i;
 
@@ -546,7 +546,7 @@ INLINE void draw_block_graph( bitmap_t &bitmap, UINT8 x, UINT8 y, UINT8 col )
 }
 
 
-static SCREEN_UPDATE( scv )
+static SCREEN_UPDATE_IND16( scv )
 {
 	scv_state *state = screen.machine().driver_data<scv_state>();
 	int x, y;
@@ -760,9 +760,8 @@ static MACHINE_CONFIG_START( scv, scv_state )
 
 	/* Video chip is EPOCH TV-1 */
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 17, 209, 262, 0, 240 )	/* TODO: Verify */
-	MCFG_SCREEN_UPDATE( scv )
+	MCFG_SCREEN_UPDATE_STATIC( scv )
 
 	MCFG_GFXDECODE(scv)
 	MCFG_PALETTE_LENGTH( 16 )
@@ -798,9 +797,8 @@ static MACHINE_CONFIG_START( scv_pal, scv_state )
 
 	/* Video chip is EPOCH TV-1A */
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_13_4MHz/2, 456, 17, 209, 342, 0, 256 )		/* TODO: Verify */
-	MCFG_SCREEN_UPDATE( scv )
+	MCFG_SCREEN_UPDATE_STATIC( scv )
 
 	MCFG_GFXDECODE(scv)
 	MCFG_PALETTE_LENGTH( 16 )

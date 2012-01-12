@@ -83,7 +83,7 @@ static const char led[]={
         "  dddddddddddd"
 };
 
-static void ssystem3_draw_7segment(bitmap_t &bitmap,int value, int x, int y)
+static void ssystem3_draw_7segment(bitmap_ind16 &bitmap,int value, int x, int y)
 {
 	int i, xi, yi, mask, color;
 
@@ -162,7 +162,7 @@ static const char single_led[]=
 " 55555555   55555555          000000   000000   00   00   00  00         000000      00     00  00    00   0000000"
 ;
 
-static void ssystem3_draw_led(bitmap_t &bitmap,INT16 color, int x, int y, int ch)
+static void ssystem3_draw_led(bitmap_ind16 &bitmap,INT16 color, int x, int y, int ch)
 {
 	int j, xi=0;
 	for (j=0; single_led[j]; j++) {
@@ -184,7 +184,7 @@ static void ssystem3_draw_led(bitmap_t &bitmap,INT16 color, int x, int y, int ch
 	}
 }
 
-SCREEN_UPDATE( ssystem3 )
+SCREEN_UPDATE_IND16( ssystem3 )
 {
 	ssystem3_state *state = screen.machine().driver_data<ssystem3_state>();
 	int i;

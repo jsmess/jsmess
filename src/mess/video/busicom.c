@@ -1816,7 +1816,7 @@ VIDEO_START( busicom )
 {
 }
 
-SCREEN_UPDATE( busicom )
+SCREEN_UPDATE_IND16( busicom )
 {
 	busicom_state *state = screen.machine().driver_data<busicom_state>();
 	int y, x, b, j;

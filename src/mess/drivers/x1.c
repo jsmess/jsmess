@@ -252,7 +252,7 @@ VIDEO_START( x1 )
 	state->m_pal_4096 = auto_alloc_array_clear(machine, UINT8, 0x1000*3);
 }
 
-static void x1_draw_pixel(running_machine &machine, bitmap_t &bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
+static void x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
 {
 	if((x)>machine.primary_screen->visible_area().max_x || (y)>machine.primary_screen->visible_area().max_y)
 		return;
@@ -322,7 +322,7 @@ static UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,i
 	return height;
 }
 
-static void draw_fgtilemap(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	/*
         attribute table:
@@ -511,7 +511,7 @@ static int priority_mixer_pri(running_machine &machine,int color)
 	return pri_mask_calc;
 }
 
-static void draw_gfxbitmap(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int plane,int pri)
+static void draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri)
 {
 	x1_state *state = machine.driver_data<x1_state>();
 	int xi,yi,x,y;
@@ -563,7 +563,7 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_t &bitmap,const rect
 	}
 }
 
-SCREEN_UPDATE( x1 )
+SCREEN_UPDATE_RGB32( x1 )
 {
 	x1_state *state = screen.machine().driver_data<x1_state>();
 
@@ -2676,10 +2676,9 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(x1)
+	MCFG_SCREEN_UPDATE_STATIC(x1)
 
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
 	MCFG_PALETTE_LENGTH(0x10+0x1000)

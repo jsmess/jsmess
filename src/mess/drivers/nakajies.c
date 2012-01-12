@@ -292,7 +292,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs( running_machine &machine );
 	DECLARE_READ8_MEMBER( irq_clear_r );
@@ -653,7 +653,7 @@ void nakajies_state::machine_reset()
 	update_banks();
 }
 
-bool nakajies_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8* lcd_memory_start = m_ram_base + (m_lcd_memory_start<<9);
 	int height = screen.height();
@@ -744,7 +744,7 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 50 )	/* Wild guess */
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_UPDATE_DRIVER( nakajies_state, screen_update )
 	MCFG_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE(wales210)

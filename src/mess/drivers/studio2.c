@@ -307,13 +307,6 @@ static CDP1861_INTERFACE( studio2_cdp1861_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
-bool studio2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_vdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 static PALETTE_INIT( visicom )
 {
     palette_set_color_rgb(machine, 0, 0x00, 0x80, 0x00);
@@ -354,13 +347,6 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 	RES_K(5.1),	// unverified
 	RES_K(4.7)	// unverified
 };
-
-bool mpt02_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_cti->update_screen(bitmap, cliprect);
-
-	return 0;
-}
 
 /* CDP1802 Configuration */
 
@@ -480,7 +466,7 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 	MCFG_CPU_CONFIG(studio2_cosmac_intf)
 
     /* video hardware */
-	MCFG_CDP1861_SCREEN_ADD(SCREEN_TAG, 1760000)
+	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 1760000)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -503,7 +489,7 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 	MCFG_CPU_CONFIG(studio2_cosmac_intf)
 
     /* video hardware */
-	MCFG_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_579545MHz/2)
+	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2)
 
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_PALETTE_INIT(visicom)
@@ -527,6 +513,7 @@ static MACHINE_CONFIG_START( mpt02, mpt02_state )
 
     /* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)
+	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(8+8)
 

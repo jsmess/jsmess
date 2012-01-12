@@ -54,7 +54,7 @@ static VIDEO_START( multi16 )
 #define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
-static SCREEN_UPDATE( multi16 )
+static SCREEN_UPDATE_IND16( multi16 )
 {
 	multi16_state *state = screen.machine().driver_data<multi16_state>();
 	int x,y;
@@ -168,11 +168,10 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_VIDEO_START(multi16)
-	MCFG_SCREEN_UPDATE(multi16)
+	MCFG_SCREEN_UPDATE_STATIC(multi16)
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */

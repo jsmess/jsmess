@@ -375,9 +375,9 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 	}
 }
 
-void msx_vdp_interrupt(running_machine &machine, int i)
+void msx_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-	cputag_set_input_line (machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line (device.machine(), "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static void msx_ch_reset_core (running_machine &machine)
@@ -405,7 +405,6 @@ MACHINE_RESET( msx )
 
 MACHINE_RESET( msx2 )
 {
-	v9938_reset (0);
 	msx_ch_reset_core (machine);
 }
 
@@ -551,9 +550,10 @@ DRIVER_INIT( msx )
 
 TIMER_DEVICE_CALLBACK( msx2_interrupt )
 {
-	v9938_set_sprite_limit(0, input_port_read(timer.machine(), "DSW") & 0x20);
-	v9938_set_resolution(0, input_port_read(timer.machine(), "DSW") & 0x03);
-	v9938_interrupt(timer.machine(), 0);
+	msx_state *state = timer.machine().driver_data<msx_state>();
+	state->m_v9938->set_sprite_limit(input_port_read(timer.machine(), "DSW") & 0x20);
+	state->m_v9938->set_resolution(input_port_read(timer.machine(), "DSW") & 0x03);
+	state->m_v9938->interrupt();
 }
 
 INTERRUPT_GEN( msx_interrupt )

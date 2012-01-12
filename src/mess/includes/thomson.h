@@ -299,7 +299,7 @@ extern void thom_set_lightpen_callback ( running_machine &machine, int nb, void 
 /***************************** commons *****************************/
 
 extern VIDEO_START  ( thom );
-extern SCREEN_UPDATE ( thom );
+extern SCREEN_UPDATE_IND16 ( thom );
 extern PALETTE_INIT ( thom );
 extern SCREEN_EOF    ( thom );
 

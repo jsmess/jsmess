@@ -294,7 +294,7 @@ static void s3c44b0_video_start( device_t *device, running_machine &machine)
 	// do nothing
 }
 
-static UINT32 s3c44b0_video_update( device_t *device, screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+static UINT32 s3c44b0_video_update( device_t *device, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	s3c44b0_lcd_t *lcd = &(get_token( device)->lcd);
 	if (lcd->regs.lcdcon1 & (1 << 0))
@@ -1992,7 +1992,7 @@ VIDEO_START( s3c44b0 )
 	s3c44b0_video_start( device, machine);
 }
 
-SCREEN_UPDATE( s3c44b0 )
+SCREEN_UPDATE_RGB32( s3c44b0 )
 {
 	device_t *device = screen.machine().device( S3C44B0_TAG);
 	return s3c44b0_video_update( device, screen, bitmap, cliprect);

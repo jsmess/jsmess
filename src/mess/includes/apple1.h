@@ -59,7 +59,7 @@ WRITE8_HANDLER( apple1_cassette_w );
 /*----------- defined in video/apple1.c -----------*/
 
 VIDEO_START( apple1 );
-SCREEN_UPDATE( apple1 );
+SCREEN_UPDATE_IND16( apple1 );
 
 void apple1_vh_dsp_w (running_machine &machine, int data);
 void apple1_vh_dsp_clr (running_machine &machine);

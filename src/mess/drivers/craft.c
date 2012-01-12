@@ -949,7 +949,7 @@ INPUT_PORTS_END
 * Video hardware                                     *
 \****************************************************/
 
-static SCREEN_UPDATE( craft )
+static SCREEN_UPDATE_RGB32( craft )
 {
     return 0;
 }
@@ -993,10 +993,9 @@ static MACHINE_CONFIG_START( craft, craft_state )
     //MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 634, 0, 633, 525, 0, 481 )
     MCFG_SCREEN_REFRESH_RATE(60.08)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395)) /* accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
     MCFG_SCREEN_SIZE(634, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
-    MCFG_SCREEN_UPDATE(craft)
+    MCFG_SCREEN_UPDATE_STATIC(craft)
 
     MCFG_PALETTE_LENGTH(0x1000)
 

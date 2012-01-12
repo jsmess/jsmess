@@ -114,7 +114,7 @@ void kc85_video_set_blink_state(running_machine &machine, int data)
 
 
 /* draw 8 pixels */
-static void kc85_draw_8_pixels(kc_state *state, bitmap_t &bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
+static void kc85_draw_8_pixels(kc_state *state, bitmap_ind16 &bitmap,int x,int y, unsigned char colour_byte, unsigned char gfx_byte)
 {
 	int background_pen;
 	int foreground_pen;
@@ -294,7 +294,7 @@ struct grab_info
 struct video_update_state
 {
 	/* bitmap to render to */
-	bitmap_t *bitmap;
+	bitmap_ind16 *bitmap;
 	/* grab colour and pixel information for 8-pixels referenced by x,y coordinate */
 	void (*pixel_grab_callback)(struct grab_info *,int x,int y, unsigned char *colour_ptr, unsigned char *pixel_ptr);
 	/* current coords */
@@ -514,7 +514,7 @@ static void kc85_common_vh_process_lines(kc_state *state, struct video_update_st
 
 /* the kc85 screen is 320 pixels wide and 256 pixels tall */
 /* if we assume a 50Hz display, there are 312 lines for the complete frame, leaving 56 lines not visible */
-static void kc85_common_process_frame(running_machine &machine, bitmap_t &bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
+static void kc85_common_process_frame(running_machine &machine, bitmap_ind16 &bitmap, void (*pixel_grab_callback)(struct grab_info *,int x,int y,unsigned char *, unsigned char *),struct grab_info *grab_data)
 {
 	kc_state *state = machine.driver_data<kc_state>();
 	int cycles_remaining_in_frame = KC85_CYCLES_PER_FRAME;
@@ -653,11 +653,11 @@ static void kc85_4_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
 
 
 /***************************************************************************
-  Draw the game screen in the given bitmap_t.
+  Draw the game screen in the given bitmap_ind16.
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-SCREEN_UPDATE( kc85_4 )
+SCREEN_UPDATE_IND16( kc85_4 )
 {
 	kc85_4_state *state = screen.machine().driver_data<kc85_4_state>();
 #if 0
@@ -733,11 +733,11 @@ static void kc85_3_pixel_grab_callback(struct grab_info *grab_data,int x,int y, 
 }
 
 /***************************************************************************
-  Draw the game screen in the given bitmap_t.
+  Draw the game screen in the given bitmap_ind16.
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-SCREEN_UPDATE( kc85_3 )
+SCREEN_UPDATE_IND16( kc85_3 )
 {
 	kc_state *state = screen.machine().driver_data<kc_state>();
 

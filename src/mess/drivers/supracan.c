@@ -192,7 +192,7 @@ public:
 	bool m_hack_68k_to_6502_access;
 
 	tilemap_t *m_tilemap_sizes[4][4];
-	bitmap_t m_sprite_final_bitmap;
+	bitmap_ind16 m_sprite_final_bitmap;
 	void write_swapped_byte(int offset, UINT8 byte);
 };
 
@@ -398,7 +398,7 @@ static TILE_GET_INFO( get_supracan_roz_tile_info )
 static VIDEO_START( supracan )
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
-	state->m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_INDEXED16);
+	state->m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
 
 	state->m_vram = (UINT16*)machine.region("ram_gfx")->base();
 	state->m_vram_swapped = (UINT16*)machine.region("ram_gfx2")->base();
@@ -462,7 +462,7 @@ static int get_tilemap_dimensions(running_machine &machine, int &xsize, int &ysi
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 	UINT16 *supracan_vram = state->m_vram;
@@ -634,11 +634,11 @@ static void mark_active_tilemap_all_dirty(running_machine &machine, int layer)
 
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, UINT32* scrollram*/, int transmask)
+static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, UINT32* scrollram*/, int transmask)
 {
-	//bitmap_t *destbitmap = bitmap;
-	bitmap_t &srcbitmap = tilemap_get_pixmap(tmap);
-	//bitmap_t &srcbitmapflags = tilemap_get_flagsmap(tmap);
+	//bitmap_ind16 *destbitmap = bitmap;
+	bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
+	//bitmap_ind16 &srcbitmapflags = tilemap_get_flagsmap(tmap);
 	const int xmask = srcbitmap.width()-1;
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
@@ -758,7 +758,7 @@ static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_t &bitma
 // Sango Fighter Intro: 03c8: 0000 0011 1100 1000   ----: ---- ---- ---- ----   6c20        4620        ----        0x01
 // Sango Fighter Game:  03ce: 0000 0011 1100 1110   0622: 0000 0110 0010 0010   2620        4620        ----        0x01
 
-static SCREEN_UPDATE( supracan )
+static SCREEN_UPDATE_IND16( supracan )
 {
 	supracan_state *state = (supracan_state *)screen.machine().driver_data<supracan_state>();
 
@@ -825,7 +825,7 @@ static SCREEN_UPDATE( supracan )
 			{
 //            tilemap_num = layer;
 				which_tilemap_size = get_tilemap_dimensions(screen.machine(), xsize, ysize, layer);
-				bitmap_t &src_bitmap = tilemap_get_pixmap(state->m_tilemap_sizes[layer][which_tilemap_size]);
+				bitmap_ind16 &src_bitmap = tilemap_get_pixmap(state->m_tilemap_sizes[layer][which_tilemap_size]);
 				int gfx_region = supracan_tilemap_get_region(screen.machine(), layer);
 				int transmask = 0xff;
 
@@ -1921,10 +1921,8 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_MACHINE_RESET( supracan )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	//MCFG_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )	/* No idea if this is correct */
-	MCFG_SCREEN_UPDATE( supracan )
+	MCFG_SCREEN_UPDATE_STATIC( supracan )
 	MCFG_VIDEO_START( supracan )
 	MCFG_PALETTE_LENGTH( 32768 )
 	MCFG_PALETTE_INIT( supracan )

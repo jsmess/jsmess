@@ -53,7 +53,7 @@ DECLARE_LEGACY_DEVICE(VDT911, vdt911);
  READ8_DEVICE_HANDLER(vdt911_cru_r);
 WRITE8_DEVICE_HANDLER(vdt911_cru_w);
 
-void vdt911_refresh(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, int x, int y);
+void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
 
 void vdt911_keyboard(device_t *device);
 

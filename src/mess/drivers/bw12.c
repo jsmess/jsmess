@@ -362,6 +362,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( bw12_update_row )
 {
 	bw12_state *state = device->machine().driver_data<bw12_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	int column, bit;
 
@@ -381,7 +382,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7);
 
-			bitmap.pix16(y, x) = color;
+			bitmap.pix32(y, x) = palette[color];
 
 			data <<= 1;
 		}
@@ -406,13 +407,6 @@ void bw12_state::video_start()
 {
 	/* find memory regions */
 	m_char_rom = machine().region("chargen")->base();
-}
-
-bool bw12_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_crtc->update(bitmap, cliprect);
-
-	return 0;
 }
 
 /* UPD765 Interface */
@@ -780,7 +774,7 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 

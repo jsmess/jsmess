@@ -19,12 +19,11 @@
 
 #define VRAM_SIZE	(0x80000)	// 512k max
 
-static SCREEN_UPDATE( wsportrait );
+static SCREEN_UPDATE_RGB32( wsportrait );
 
 MACHINE_CONFIG_FRAGMENT( wsportrait )
 	MCFG_SCREEN_ADD( WSPORTRAIT_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE(wsportrait)
+	MCFG_SCREEN_UPDATE_STATIC(wsportrait)
 	MCFG_SCREEN_SIZE(1024,960)
 	MCFG_SCREEN_REFRESH_RATE(75.0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 870-1)
@@ -141,7 +140,7 @@ void nubus_wsportrait_device::device_timer(emu_timer &timer, device_timer_id tid
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( wsportrait )
+static SCREEN_UPDATE_RGB32( wsportrait )
 {
 	UINT32 *scanline;
 	int x, y;

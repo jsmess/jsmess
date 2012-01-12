@@ -61,7 +61,7 @@ static VIDEO_START( fp6000 )
 #define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
-static SCREEN_UPDATE( fp6000 )
+static SCREEN_UPDATE_IND16( fp6000 )
 {
 	fp6000_state *state = screen.machine().driver_data<fp6000_state>();
 	int x,y;
@@ -307,10 +307,9 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(fp6000)
+	MCFG_SCREEN_UPDATE_STATIC(fp6000)
 
 	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 

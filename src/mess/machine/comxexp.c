@@ -208,7 +208,7 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::q_w )
 //  screen_update -
 //-------------------------------------------------
 
-bool comx_expansion_slot_device::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 comx_expansion_slot_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool value = false;
 

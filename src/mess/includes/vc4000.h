@@ -62,7 +62,7 @@ typedef struct
 		} d;
 	} reg;
 
-	bitmap_t bitmap;
+	bitmap_ind16 bitmap;
 } vc4000_video_t;
 
 class vc4000_state : public driver_device
@@ -92,7 +92,7 @@ extern  READ8_HANDLER(vc4000_video_r);
 extern WRITE8_HANDLER(vc4000_video_w);
 
 extern VIDEO_START( vc4000 );
-extern SCREEN_UPDATE( vc4000 );
+extern SCREEN_UPDATE_IND16( vc4000 );
 
 
 /*----------- defined in audio/vc4000.c -----------*/

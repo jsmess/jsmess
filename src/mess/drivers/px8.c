@@ -693,10 +693,10 @@ static PALETTE_INIT( px8 )
 }
 
 /*-------------------------------------------------
-    SCREEN_UPDATE( px8 )
+    SCREEN_UPDATE_IND16( px8 )
 -------------------------------------------------*/
 
-bool px8_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -813,7 +813,7 @@ static MACHINE_CONFIG_START( px8, px8_state )
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(72)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(px8_state, screen_update)
 	MCFG_SCREEN_SIZE(480, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
 

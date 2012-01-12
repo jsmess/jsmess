@@ -111,7 +111,7 @@ static const floppy_interface rm380z_floppy_interface =
 	NULL
 };
 
-static SCREEN_UPDATE( rm380z )
+static SCREEN_UPDATE_IND16( rm380z )
 {
 	rm380z_state *state = screen.machine().driver_data<rm380z_state>();
 	state->update_screen(bitmap);
@@ -128,11 +128,10 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	// according to videos and pictures of the real hardware, chars are spaced of at least 1 pixel
 	MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*RM380Z_CHDIMY))
 	MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*RM380Z_CHDIMY)-1)
-	MCFG_SCREEN_UPDATE(rm380z)
+	MCFG_SCREEN_UPDATE_STATIC(rm380z)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 

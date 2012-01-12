@@ -2,8 +2,9 @@
 #define __SGCPU__
 
 #include "machine/tms9901.h"
+#include "video/v9938.h"
 
-void tms9901_sg_set_int2(running_machine &machine, int state);
+void tms9901_sg_set_int2(device_t *, v99x8_device &tms, int state);
 
 READ16_DEVICE_HANDLER( sgcpu_r );
 WRITE16_DEVICE_HANDLER( sgcpu_w );

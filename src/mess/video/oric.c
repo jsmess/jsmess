@@ -169,7 +169,7 @@ static void oric_vh_update_attribute(running_machine &machine,int c)
 
 /* render 6-pixels using foreground and background colours specified */
 /* used in hires and text mode */
-static void oric_vh_render_6pixels(bitmap_t &bitmap,int x,int y, int fg, int bg,int data, int invert_flag)
+static void oric_vh_render_6pixels(bitmap_ind16 &bitmap,int x,int y, int fg, int bg,int data, int invert_flag)
 {
 	int i;
 	int pens[2];
@@ -204,7 +204,7 @@ static void oric_vh_render_6pixels(bitmap_t &bitmap,int x,int y, int fg, int bg,
 /***************************************************************************
   oric_vh_screenrefresh
 ***************************************************************************/
-SCREEN_UPDATE( oric )
+SCREEN_UPDATE_IND16( oric )
 {
 	oric_state *state = screen.machine().driver_data<oric_state>();
 	unsigned char *RAM;

@@ -61,7 +61,7 @@ extern WRITE8_HANDLER( b2m_localmachine_w );
 /*----------- defined in video/b2m.c -----------*/
 
 extern VIDEO_START( b2m );
-extern SCREEN_UPDATE( b2m );
+extern SCREEN_UPDATE_IND16( b2m );
 extern PALETTE_INIT( b2m );
 
 #endif

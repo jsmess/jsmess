@@ -6,25 +6,25 @@ static PALETTE_INIT( kc85 )
 	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
 }
 
-bool kc85_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 kc85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_lcdc0->update_screen(bitmap, cliprect);
-	m_lcdc1->update_screen(bitmap, cliprect);
-	m_lcdc2->update_screen(bitmap, cliprect);
-	m_lcdc3->update_screen(bitmap, cliprect);
-	m_lcdc4->update_screen(bitmap, cliprect);
-	m_lcdc5->update_screen(bitmap, cliprect);
-	m_lcdc6->update_screen(bitmap, cliprect);
-	m_lcdc7->update_screen(bitmap, cliprect);
-	m_lcdc8->update_screen(bitmap, cliprect);
-	m_lcdc9->update_screen(bitmap, cliprect);
+	m_lcdc0->screen_update(screen, bitmap, cliprect);
+	m_lcdc1->screen_update(screen, bitmap, cliprect);
+	m_lcdc2->screen_update(screen, bitmap, cliprect);
+	m_lcdc3->screen_update(screen, bitmap, cliprect);
+	m_lcdc4->screen_update(screen, bitmap, cliprect);
+	m_lcdc5->screen_update(screen, bitmap, cliprect);
+	m_lcdc6->screen_update(screen, bitmap, cliprect);
+	m_lcdc7->screen_update(screen, bitmap, cliprect);
+	m_lcdc8->screen_update(screen, bitmap, cliprect);
+	m_lcdc9->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
 
-bool tandy200_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_lcdc->update_screen(bitmap, cliprect);
+	m_lcdc->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -43,7 +43,7 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_FRAGMENT( kc85_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(44)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(kc85_state, screen_update)
 	MCFG_SCREEN_SIZE(240, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 
@@ -70,7 +70,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( tandy200_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(tandy200_state, screen_update)
 	MCFG_SCREEN_SIZE(240, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
 

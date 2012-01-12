@@ -66,7 +66,7 @@ public:
 	UINT8 m_pr_counter;
 	UINT8 m_pr_state;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mc10_bfff_r );
 	DECLARE_WRITE8_MEMBER( mc10_bfff_w );
@@ -225,12 +225,12 @@ READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 	return m_ram_base[offset];
 }
 
-bool mc10_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 mc10_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_mc6847)		//mc10, alice
-		return m_mc6847->update(bitmap, cliprect);
+		return m_mc6847->screen_update(screen, bitmap, cliprect);
 	else if (m_ef9345)	//alice32
-		m_ef9345->video_update(bitmap, cliprect);
+		return m_ef9345->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_CPU_IO_MAP(mc10_io)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen")
+	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, mc10_mc6847_intf)
 
 	/* sound hardware */
@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(mc10_state, screen_update)
 	MCFG_SCREEN_SIZE(336, 270)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 	MCFG_PALETTE_LENGTH(8)

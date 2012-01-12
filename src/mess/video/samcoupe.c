@@ -26,6 +26,17 @@
     IMPLEMENTATION
 ***************************************************************************/
 
+void samcoupe_state::video_start()
+{
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+}
+
+UINT32 samcoupe_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+
 static void draw_mode4_line(running_machine &machine, int y, int hpos)
 {
 	samcoupe_state *state = machine.driver_data<samcoupe_state>();
@@ -37,10 +48,10 @@ static void draw_mode4_line(running_machine &machine, int y, int hpos)
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
 		/* draw 2 pixels (doublewidth) */
-		machine.primary_screen->default_bitmap().pix16(y, hpos + i * 4 + 0) = state->m_clut[(*vram >> 4) & 0x0f];
-		machine.primary_screen->default_bitmap().pix16(y, hpos + i * 4 + 1) = state->m_clut[(*vram >> 4) & 0x0f];
-		machine.primary_screen->default_bitmap().pix16(y, hpos + i * 4 + 2) = state->m_clut[(*vram >> 0) & 0x0f];
-		machine.primary_screen->default_bitmap().pix16(y, hpos + i * 4 + 3) = state->m_clut[(*vram >> 0) & 0x0f];
+		state->m_bitmap.pix16(y, hpos + i * 4 + 0) = state->m_clut[(*vram >> 4) & 0x0f];
+		state->m_bitmap.pix16(y, hpos + i * 4 + 1) = state->m_clut[(*vram >> 4) & 0x0f];
+		state->m_bitmap.pix16(y, hpos + i * 4 + 2) = state->m_clut[(*vram >> 0) & 0x0f];
+		state->m_bitmap.pix16(y, hpos + i * 4 + 3) = state->m_clut[(*vram >> 0) & 0x0f];
 
 		/* move to next address */
 		vram++;
@@ -62,10 +73,10 @@ static void draw_mode3_line(running_machine &machine, int y, int hpos)
 	for (int i = 0; i < (SAM_BLOCK*2)/4; i++)
 	{
 		/* draw 4 pixels */
-		machine.primary_screen->default_bitmap().pix16(y, hpos + i * 4 + 0) = state->m_clut[(*vram >> 6) & 0x03];
-		machine.primary_screen->default_bitmap().pix16(y, hpos + i * 4 + 1) = state->m_clut[(*vram >> 4) & 0x03];
-		machine.primary_screen->default_bitmap().pix16(y, hpos + i * 4 + 2) = state->m_clut[(*vram >> 2) & 0x03];
-		machine.primary_screen->default_bitmap().pix16(y, hpos + i * 4 + 3) = state->m_clut[(*vram >> 0) & 0x03];
+		state->m_bitmap.pix16(y, hpos + i * 4 + 0) = state->m_clut[(*vram >> 6) & 0x03];
+		state->m_bitmap.pix16(y, hpos + i * 4 + 1) = state->m_clut[(*vram >> 4) & 0x03];
+		state->m_bitmap.pix16(y, hpos + i * 4 + 2) = state->m_clut[(*vram >> 2) & 0x03];
+		state->m_bitmap.pix16(y, hpos + i * 4 + 3) = state->m_clut[(*vram >> 0) & 0x03];
 
 		/* move to next address */
 		vram++;
@@ -76,7 +87,7 @@ static void draw_mode3_line(running_machine &machine, int y, int hpos)
 	}
 }
 
-static void draw_mode12_block(samcoupe_state *state, bitmap_t &bitmap, int vpos, int hpos, UINT8 mask)
+static void draw_mode12_block(samcoupe_state *state, bitmap_ind16 &bitmap, int vpos, int hpos, UINT8 mask)
 {
 	/* extract colors from attribute */
 	UINT8 ink = state->m_clut[ATTR_FG(state->m_attribute)];
@@ -100,7 +111,7 @@ static void draw_mode2_line(running_machine &machine, int y, int hpos)
 	UINT8 mask = videoram[cell];
 	state->m_attribute = videoram[cell + 0x2000];
 
-	draw_mode12_block(state, machine.primary_screen->default_bitmap(), y, hpos, mask);
+	draw_mode12_block(state, state->m_bitmap, y, hpos, mask);
 }
 
 static void draw_mode1_line(running_machine &machine, int y, int hpos)
@@ -111,7 +122,7 @@ static void draw_mode1_line(running_machine &machine, int y, int hpos)
 	UINT8 mask = videoram[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 	state->m_attribute = videoram[32*192 + (((y - SAM_BORDER_TOP) & 0xf8) << 2) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 
-	draw_mode12_block(state, machine.primary_screen->default_bitmap(), y, hpos, mask);
+	draw_mode12_block(state, state->m_bitmap, y, hpos, mask);
 }
 
 TIMER_CALLBACK( sam_video_update_callback )
@@ -133,7 +144,7 @@ TIMER_CALLBACK( sam_video_update_callback )
 	/* display disabled? (only in mode 3 or 4) */
 	if (BIT(state->m_vmpr, 6) && BIT(state->m_border, 7))
 	{
-		machine.primary_screen->default_bitmap().plot_box(hpos, vpos, SAM_BLOCK*2, 1, 0);
+		state->m_bitmap.plot_box(hpos, vpos, SAM_BLOCK*2, 1, 0);
 	}
 	else
 	{
@@ -141,7 +152,7 @@ TIMER_CALLBACK( sam_video_update_callback )
 		if (vpos < SAM_BORDER_TOP || vpos >= SAM_BORDER_TOP + SAM_SCREEN_HEIGHT || hpos < SAM_BORDER_LEFT || hpos >= SAM_BORDER_LEFT + SAM_SCREEN_WIDTH)
 		{
 			state->m_attribute = 0xff;
-			machine.primary_screen->default_bitmap().plot_box(hpos, vpos, SAM_BLOCK*2, 1, state->m_clut[BORDER_COLOR(state->m_border)]);
+			state->m_bitmap.plot_box(hpos, vpos, SAM_BLOCK*2, 1, state->m_clut[BORDER_COLOR(state->m_border)]);
 		}
 		else
 		{

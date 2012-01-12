@@ -53,13 +53,13 @@ class x1twin_state : public x1_state
 #define VDP_CLOCK  XTAL_42_9545MHz
 #define MCU_CLOCK  XTAL_6MHz
 
-static SCREEN_UPDATE( x1twin )
+static SCREEN_UPDATE_RGB32( x1twin )
 {
 	device_t *left_screen  = screen.machine().device("x1_screen");
 	//device_t *right_screen = screen.machine().device("pce_screen");
 
 	if (&screen==left_screen)
-		SCREEN_UPDATE_CALL( x1 );
+		SCREEN_UPDATE16_CALL( x1 );
 
 	return 0;
 }
@@ -570,15 +570,14 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SCREEN_ADD("x1_screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(x1twin)
+	MCFG_SCREEN_UPDATE_STATIC(x1twin)
 
 	MCFG_SCREEN_ADD("pce_screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
 
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
@@ -591,7 +590,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 	MCFG_MB8877_ADD("fdc",x1_mb8877a_interface)
 
-	MCFG_CARTSLOT_ADD("cart")
+ 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
 

@@ -23,6 +23,7 @@ public:
 	UINT8 m_first;
 	UINT32 m_start_addr;
 	emu_timer *m_gal_video_timer;
+	bitmap_ind16 m_bitmap;
 };
 
 
@@ -43,7 +44,7 @@ DRIVER_INIT( galaxyp );
 /*----------- defined in video/galaxy.c -----------*/
 
 VIDEO_START( galaxy );
-SCREEN_UPDATE( galaxy );
+SCREEN_UPDATE_IND16( galaxy );
 
 void galaxy_set_timer(running_machine &machine);
 

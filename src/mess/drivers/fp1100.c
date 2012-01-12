@@ -119,19 +119,13 @@ static VIDEO_START( fp1100 )
 {
 }
 
-static SCREEN_UPDATE( fp1100 )
-{
-	fp1100_state *state = screen.machine().driver_data<fp1100_state>();
-	state->m_crtc->update( bitmap, cliprect);
-	return 0;
-}
-
 static MC6845_UPDATE_ROW( fp1100_update_row )
 {
 	fp1100_state *state = device->machine().driver_data<fp1100_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 r,g,b,col,i;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -144,7 +138,7 @@ static MC6845_UPDATE_ROW( fp1100_update_row )
 		{
 			col = BIT(r, i) + (BIT(g, i) << 1) + (BIT(b, i) << 2);
 			if (x == cursor_x) col ^= 7;
-			*p++ = col;
+			*p++ = palette[col];
 		}
 	}
 }
@@ -431,11 +425,10 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_VIDEO_START(fp1100)
-	MCFG_SCREEN_UPDATE(fp1100)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_GFXDECODE(fp1100)
 

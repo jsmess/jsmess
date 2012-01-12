@@ -198,12 +198,12 @@ WRITE8_MEMBER( hd66421_device::reg_dat_w )
 	}
 }
 
-void hd66421_device::plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+void hd66421_device::plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 
-void hd66421_device::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+void hd66421_device::update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pen_t pen[4];
 

@@ -498,23 +498,6 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  VIDEO
-//**************************************************************************
-
-//-------------------------------------------------
-//  SCREEN_UPDATE( prof80 )
-//-------------------------------------------------
-
-bool prof80_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_ecb->screen_update(screen, bitmap, cliprect);
-
-	return 0;
-}
-
-
-
-//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -646,7 +629,7 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DEVICE(ECBBUS_TAG, ecbbus_device, screen_update)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
     MCFG_PALETTE_LENGTH(2)

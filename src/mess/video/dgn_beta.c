@@ -99,8 +99,9 @@ the access to the video memory is unclear to me at the moment.
 static MC6845_UPDATE_ROW( dgnbeta_update_row )
 {
 	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *videoram = state->m_videoram;
-	UINT16  *p = &bitmap.pix16(y);
+	UINT32  *p = &bitmap.pix32(y);
 	int i;
 	if(IsTextMode)
 	{
@@ -150,22 +151,22 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 
 			UINT8 data = chr_gen[ chr * 16 + ra ];
 
-			*p = ( data & 0x80 ) ? fg : bg; p++;
-			*p = ( data & 0x80 ) ? fg : bg; p++;
-			*p = ( data & 0x40 ) ? fg : bg; p++;
-			*p = ( data & 0x40 ) ? fg : bg; p++;
-			*p = ( data & 0x20 ) ? fg : bg; p++;
-			*p = ( data & 0x20 ) ? fg : bg; p++;
-			*p = ( data & 0x10 ) ? fg : bg; p++;
-			*p = ( data & 0x10 ) ? fg : bg; p++;
-			*p = ( data & 0x08 ) ? fg : bg; p++;
-			*p = ( data & 0x08 ) ? fg : bg; p++;
-			*p = ( data & 0x04 ) ? fg : bg; p++;
-			*p = ( data & 0x04 ) ? fg : bg; p++;
-			*p = ( data & 0x02 ) ? fg : bg; p++;
-			*p = ( data & 0x02 ) ? fg : bg; p++;
-			*p = ( data & 0x01 ) ? fg : bg; p++;
-			*p = ( data & 0x01 ) ? fg : bg; p++;
+			*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+			*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 		}
 
 	}
@@ -199,10 +200,10 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 
 				for (Dot=0;Dot<4;Dot++)
 				{
-					*p = Colour; p++;
-					*p = Colour; p++;
-					*p = Colour; p++;
-					*p = Colour; p++;
+					*p = palette[Colour]; p++;
+					*p = palette[Colour]; p++;
+					*p = palette[Colour]; p++;
+					*p = palette[Colour]; p++;
 
 					Intense	=Intense<<1;
 					Red	=Red<<1;
@@ -216,7 +217,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 				{
 					Colour=state->m_ColourRAM[((Word&0x8000)>>15)];
 
-					*p = Colour; p++;
+					*p = palette[Colour]; p++;
 
 					Hi=(Word&0x8000) >> 15;
 					Word=((Word<<1)&0xFFFE) | Hi;
@@ -227,8 +228,8 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 				for (Dot=0;Dot<8;Dot++)
 				{
 					Colour=state->m_ColourRAM[((Word&0x8000)>>14) | ((Word&0x80)>>7)];
-					*p = Colour; p++;
-					*p = Colour; p++;
+					*p = palette[Colour]; p++;
+					*p = palette[Colour]; p++;
 
 					Hi=(Word&0x8000) >> 15;
 					Word=((Word<<1)&0xFFFE) | Hi;
@@ -291,14 +292,6 @@ void dgnbeta_vid_set_gctrl(running_machine &machine, int data)
 {
 	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	state->m_GCtrl=data;
-}
-
-/* Update video screen, calls either text or graphics update routine as needed */
-SCREEN_UPDATE( dgnbeta )
-{
-	dgn_beta_state *state = screen.machine().driver_data<dgn_beta_state>();
-	state->m_mc6845->update(bitmap, cliprect);
-	return 0;
 }
 
 

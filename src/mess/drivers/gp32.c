@@ -141,7 +141,7 @@ static UINT32 s3c240x_lcd_dma_read( running_machine &machine)
 static void s3c240x_lcd_render_01( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
-	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+	bitmap_rgb32 &bitmap = state->m_bitmap;
 	UINT32 *scanline = &bitmap.pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -165,7 +165,7 @@ static void s3c240x_lcd_render_01( running_machine &machine)
 static void s3c240x_lcd_render_02( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
-	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+	bitmap_rgb32 &bitmap = state->m_bitmap;
 	UINT32 *scanline = &bitmap.pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -189,7 +189,7 @@ static void s3c240x_lcd_render_02( running_machine &machine)
 static void s3c240x_lcd_render_04( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
-	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+	bitmap_rgb32 &bitmap = state->m_bitmap;
 	UINT32 *scanline = &bitmap.pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -213,7 +213,7 @@ static void s3c240x_lcd_render_04( running_machine &machine)
 static void s3c240x_lcd_render_08( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
-	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+	bitmap_rgb32 &bitmap = state->m_bitmap;
 	UINT32 *scanline = &bitmap.pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -237,7 +237,7 @@ static void s3c240x_lcd_render_08( running_machine &machine)
 static void s3c240x_lcd_render_16( running_machine &machine)
 {
 	gp32_state *state = machine.driver_data<gp32_state>();
-	bitmap_t &bitmap = machine.primary_screen->default_bitmap();
+	bitmap_rgb32 &bitmap = state->m_bitmap;
 	UINT32 *scanline = &bitmap.pix32(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos);
 	int i, j;
 	for (i = 0; i < 4; i++)
@@ -287,10 +287,16 @@ static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 	state->m_s3c240x_lcd_timer->adjust( screen->time_until_pos(state->m_s3c240x_lcd.vpos, state->m_s3c240x_lcd.hpos));
 }
 
-static SCREEN_UPDATE( gp32 )
+void gp32_state::video_start()
 {
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+}
+
+static SCREEN_UPDATE_RGB32( gp32 )
+{
+	gp32_state *state = screen.machine().driver_data<gp32_state>();
 	running_machine &machine = screen.machine();
-	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
 	s3c240x_lcd_dma_init( machine);
 	return 0;
 }
@@ -1837,12 +1843,11 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-	MCFG_SCREEN_UPDATE(gp32)
+	MCFG_SCREEN_UPDATE_STATIC(gp32)
 
 	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
 	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)

@@ -295,7 +295,7 @@ MACHINE_RESET( ti99_4p )
 
 TIMER_DEVICE_CALLBACK( ti99_4p_hblank_interrupt )
 {
-	v9938_interrupt(timer.machine(), 0);
+	timer.machine().device<v9938_device>("video_v9938")->interrupt();
 }
 
 /*

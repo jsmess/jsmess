@@ -403,13 +403,14 @@ offs_t pc1512_state::get_char_rom_offset()
 	return ((input_port_read(machine(), "LK") >> 5) & 0x03) << 11;
 }
 
-void pc1512_state::draw_alpha(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_alpha(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	offs_t char_rom_offset = get_char_rom_offset();
-	UINT16 *p = &bitmap.pix16(y + VFP_HIRES, HFP_HIRES);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32 *p = &bitmap.pix32(y + VFP_HIRES, HFP_HIRES);
 
 	if (get_display_mode(m_vdu_mode) == ALPHA_40)
-		p = &bitmap.pix16(y + VFP_LORES, HFP_LORES);
+		p = &bitmap.pix32(y + VFP_LORES, HFP_LORES);
 
 	if (y > 199) return;
 
@@ -442,7 +443,7 @@ void pc1512_state::draw_alpha(mc6845_device *device, bitmap_t &bitmap, const rec
 		{
 			int color = BIT(data, 7) ? fg : bg;
 
-			*p = color; p++;
+			*p = palette[color]; p++;
 
 			data <<= 1;
 		}
@@ -472,11 +473,12 @@ int pc1512_state::get_color(UINT8 data)
 	return color;
 };
 
-void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 199) return;
 
-	UINT16 *p = &bitmap.pix16(y + VFP_LORES, HFP_LORES);
+	UINT32 *p = &bitmap.pix32(y + VFP_LORES, HFP_LORES);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -486,17 +488,18 @@ void pc1512_state::draw_graphics_1(mc6845_device *device, bitmap_t &bitmap, cons
 
 		for (int x = 0; x < 8; x++)
 		{
-			*p = get_color((BIT(b, 15) << 1) | BIT(b, 14)); p++;
+			*p = palette[get_color((BIT(b, 15) << 1) | BIT(b, 14))]; p++;
 			b <<= 2;
 		}
 	}
 }
 
-void pc1512_state::draw_graphics_2(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_graphics_2(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	if (y > 199) return;
 
-	UINT16 *p = &bitmap.pix16(y + VFP_HIRES, HFP_HIRES);
+	UINT32 *p = &bitmap.pix32(y + VFP_HIRES, HFP_HIRES);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -509,7 +512,7 @@ void pc1512_state::draw_graphics_2(mc6845_device *device, bitmap_t &bitmap, cons
 
 		for (int x = 0; x < 16; x++)
 		{
-			*p = (BIT(i, 15) << 3) | (BIT(r, 15) << 2) | (BIT(g, 15) << 1) | BIT(b, 15); p++;
+			*p = palette[(BIT(i, 15) << 3) | (BIT(r, 15) << 2) | (BIT(g, 15) << 1) | BIT(b, 15)]; p++;
 			i <<= 1; r <<= 1; g <<= 1; b <<= 1;
 		}
 	}
@@ -566,11 +569,12 @@ void pc1512_state::video_start()
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE( pc1512 )
+//  SCREEN_UPDATE_RGB32( pc1512 )
 //-------------------------------------------------
 
-bool pc1512_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	if (m_vdu_mode & MODE_ENABLE_VIDEO)
 	{
 		m_blink_ctr++;
@@ -604,22 +608,22 @@ bool pc1512_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 		case ALPHA_40:
 		case ALPHA_80:
 		case GRAPHICS_1:
-			bitmap.fill(m_vdu_color & 0x0f, cliprect);
+			bitmap.fill(palette[m_vdu_color & 0x0f], cliprect);
 			break;
 
 		case GRAPHICS_2:
-			bitmap.fill(m_vdu_border & 0x0f, cliprect);
+			bitmap.fill(palette[m_vdu_border & 0x0f], cliprect);
 			break;
 		}
 
-		m_vdu->update(bitmap, cliprect);
+		m_vdu->screen_update(screen, bitmap, cliprect);
 	}
 	else
 	{
-		bitmap.fill(0, cliprect);
+		bitmap.fill(palette[0], cliprect);
 	}
 
-	return false;
+	return 0;
 }
 
 
@@ -629,7 +633,7 @@ bool pc1512_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 
 MACHINE_CONFIG_FRAGMENT( pc1512_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(pc1512_state, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

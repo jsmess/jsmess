@@ -47,7 +47,7 @@ struct _vic3_state
 
 	UINT16 chargenaddr, videoaddr, bitmapaddr;
 
-	bitmap_t *bitmap;
+	bitmap_ind16 *bitmap;
 	int x_begin, x_end;
 	int y_begin, y_end;
 
@@ -1949,7 +1949,7 @@ void vic3_raster_interrupt_gen( device_t *device )
 		}
 }
 
-UINT32 vic3_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
+UINT32 vic3_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	vic3_state *vic3 = get_safe_token(device);
 
@@ -1974,7 +1974,7 @@ static DEVICE_START( vic3 )
 	width = vic3->main_screen->width();
 	height = vic3->main_screen->height();
 
-	vic3->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
+	vic3->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
 
 	vic3->type = intf->type;
 

@@ -83,8 +83,8 @@ public:
 	UINT16 *m_objects;
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
-	bitmap_t m_bg_map[16];
-	bitmap_t m_screen_output;
+	bitmap_ind16 m_bg_map[16];
+	bitmap_ind16 m_screen_output;
 };
 
 READ32_MEMBER( vboy_state::port_02_read )
@@ -476,9 +476,9 @@ static VIDEO_START( vboy )
 
 	// Allocate memory for temporary screens
 	for(i = 0; i < 16; i++)
-		state->m_bg_map[i].allocate(512, 512, BITMAP_FORMAT_INDEXED16);
+		state->m_bg_map[i].allocate(512, 512, BITMAP_FORMAT_IND16);
 
-	state->m_screen_output.allocate(384, 224, BITMAP_FORMAT_INDEXED16);
+	state->m_screen_output.allocate(384, 224, BITMAP_FORMAT_IND16);
 	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
 	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
 	state->m_objects = state->m_bgmap + (0x1E000 >> 1);
@@ -487,7 +487,7 @@ static VIDEO_START( vboy )
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
 }
 
-static void put_char(vboy_state *state, bitmap_t &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
+static void put_char(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
 {
 	UINT16 data, code = ch;
 	UINT8 i, b, dat, col;
@@ -516,7 +516,7 @@ static void put_char(vboy_state *state, bitmap_t &bitmap, int x, int y, UINT16 c
 	}
 }
 
-static void fill_bg_map(vboy_state *state, int num, bitmap_t &bitmap)
+static void fill_bg_map(vboy_state *state, int num, bitmap_ind16 &bitmap)
 {
 	int i, j;
 
@@ -531,7 +531,7 @@ static void fill_bg_map(vboy_state *state, int num, bitmap_t &bitmap)
 	}
 }
 
-static UINT8 display_world(vboy_state *state, int num, bitmap_t &bitmap, bool right)
+static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, bool right)
 {
 	num <<= 4;
 	UINT16 def = state->m_world[num];
@@ -626,7 +626,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_t &bitmap, bool ri
 	return BIT(def,6);
 }
 
-static SCREEN_UPDATE( vboy_left )
+static SCREEN_UPDATE_IND16( vboy_left )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
 	state->m_screen_output.fill(state->m_vip_regs.BKCOL, cliprect);
@@ -639,7 +639,7 @@ static SCREEN_UPDATE( vboy_left )
 	return 0;
 }
 
-static SCREEN_UPDATE( vboy_right )
+static SCREEN_UPDATE_IND16( vboy_right )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
 	state->m_screen_output.fill(state->m_vip_regs.BKCOL, cliprect);
@@ -698,21 +698,19 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(50.2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE(vboy_left)
+	MCFG_SCREEN_UPDATE_STATIC(vboy_left)
 
 	/* Right screen */
 	MCFG_SCREEN_ADD("3dright", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(50.2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE(vboy_right)
+	MCFG_SCREEN_UPDATE_STATIC(vboy_right)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

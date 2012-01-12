@@ -21,7 +21,7 @@
 #include "includes/next.h"
 #include "machine/pc_fdc.h"
 
-bool next_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 next_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT32 count;
 	int x,y,xi;
@@ -309,7 +309,7 @@ static MACHINE_CONFIG_START( next, next_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
     MCFG_SCREEN_SIZE(1120, 832)
     MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
 

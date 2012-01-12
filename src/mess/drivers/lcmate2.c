@@ -54,7 +54,6 @@ public:
 	required_device<device_t> m_speaker;
 
 	virtual void machine_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_WRITE8_MEMBER( speaker_w );
@@ -204,11 +203,6 @@ void lcmate2_state::machine_start()
 	memory_configure_bank(machine(), "rombank", 0, 0x10, (UINT8*)machine().region("maincpu")->base(), 0x4000);
 }
 
-bool lcmate2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_lcdc->video_update(bitmap, cliprect);
-}
-
 static const hd44780_interface lcmate2_display =
 {
 	2,					// number of lines
@@ -248,7 +242,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_SIZE(120, 18)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
 	MCFG_PALETTE_LENGTH(2)

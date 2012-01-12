@@ -438,16 +438,16 @@ WRITE8_MEMBER( vip_state::colorram_w )
 	m_cgc->con_w(0);
 }
 
-bool vip_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 vip_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	switch (input_port_read(machine(), "VIDEO"))
 	{
 	case VIDEO_CDP1861:
-		m_vdc->update_screen(bitmap, cliprect);
+		m_vdc->screen_update(screen, bitmap, cliprect);
 		break;
 
 	case VIDEO_CDP1862:
-		m_cgc->update_screen(bitmap, cliprect);
+		m_cgc->screen_update(screen, bitmap, cliprect);
 		break;
 	}
 
@@ -683,7 +683,8 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	MCFG_CPU_CONFIG(cosmac_intf)
 
     /* video hardware */
-	MCFG_CDP1861_SCREEN_ADD(SCREEN_TAG, XTAL_3_52128MHz/2)
+	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_52128MHz/2)
+	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(black_and_white)

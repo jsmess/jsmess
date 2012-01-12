@@ -10,7 +10,7 @@
 #include "includes/pcw.h"
 #include "machine/ram.h"
 
-INLINE void pcw_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
@@ -27,7 +27,7 @@ VIDEO_START( pcw )
 	rect.max_x = PCW_PRINTER_WIDTH - 1;
 	rect.max_y = PCW_PRINTER_HEIGHT - 1;
 
-	state->m_prn_output = auto_bitmap_alloc(machine,PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT,BITMAP_FORMAT_INDEXED16);
+	state->m_prn_output = auto_bitmap_ind16_alloc(machine,PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
 	state->m_prn_output->fill(1, rect);
 }
 
@@ -52,11 +52,11 @@ PALETTE_INIT( pcw )
 }
 
 /***************************************************************************
-  Draw the game screen in the given bitmap_t.
+  Draw the game screen in the given bitmap_ind16.
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-SCREEN_UPDATE( pcw )
+SCREEN_UPDATE_IND16( pcw )
 {
 	pcw_state *state = screen.machine().driver_data<pcw_state>();
 	int x,y,b;
@@ -185,7 +185,7 @@ SCREEN_UPDATE( pcw )
 	return 0;
 }
 
-SCREEN_UPDATE( pcw_printer )
+SCREEN_UPDATE_IND16( pcw_printer )
 {
 	pcw_state *state = screen.machine().driver_data<pcw_state>();
 

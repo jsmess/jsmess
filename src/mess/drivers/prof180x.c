@@ -29,6 +29,11 @@
 #include "machine/upd765.h"
 #include "includes/prof180x.h"
 
+UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
 void prof180x_state::bankswitch()
 {
 	switch ((m_mm1 << 1) | m_mm0)
@@ -236,7 +241,7 @@ static MACHINE_CONFIG_START( prof180x, prof180x_state )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(prof180x_state, screen_update)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
     MCFG_PALETTE_LENGTH(2)
