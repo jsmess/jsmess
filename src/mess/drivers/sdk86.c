@@ -31,46 +31,19 @@ ToDo:
 #include "machine/i8279.h"
 #include "sdk86.lh"
 
-#define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
 class sdk86_state : public driver_device
 {
 public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_i8279(*this, "i8279") { }
+		: driver_device(mconfig, type, tag)
+	{}
 
-	required_device<i8279_device> m_i8279;
-	DECLARE_READ16_MEMBER(keyboard_r);
-	DECLARE_READ16_MEMBER(status_r);
-	DECLARE_WRITE16_MEMBER(command_w);
-	DECLARE_WRITE16_MEMBER(data_w);
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	UINT8 m_digit; // next digit to display
-	virtual void machine_reset();
+	UINT8 m_digit;
 };
-
-READ16_MEMBER( sdk86_state::keyboard_r )
-{
-	return m_i8279->i8279_data_r(space, offset);
-}
-
-READ16_MEMBER( sdk86_state::status_r )
-{
-	return m_i8279->i8279_status_r(space, offset);
-}
-
-WRITE16_MEMBER( sdk86_state::command_w )
-{
-	m_i8279->i8279_ctrl_w(space, offset, data);
-}
-
-WRITE16_MEMBER( sdk86_state::data_w )
-{
-	m_i8279->i8279_data_w(space, offset, data);
-}
 
 static ADDRESS_MAP_START(sdk86_mem, AS_PROGRAM, 16, sdk86_state)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM //2K standard, or 4k (board fully populated)
@@ -79,10 +52,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sdk86_io, AS_IO, 16, sdk86_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xffe8, 0xffe9) AM_MIRROR(4) AM_READWRITE(keyboard_r,data_w)
-	AM_RANGE(0xffea, 0xffeb) AM_MIRROR(4) AM_READWRITE(status_r,command_w)
+	AM_RANGE(0xffe8, 0xffe9) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, i8279_data_r, i8279_data_w, 0xff)
+	AM_RANGE(0xffea, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, i8279_status_r, i8279_ctrl_w, 0xff)
 
-	// FFE8-FFEB = 8279 kbd/display chip (even -> data, control) AM_MIRROR(4)
 	// FFF0-FFF3 = 8251 serial chip (even -> data, control) AM_MIRROR(4)
 	// FFF8-FFFF = 2 x 8255A i/o chips. chip 1 uses the odd addresses, chip 2 uses the even addresses.
 	//             ports are A,B,C,control in that order.
@@ -121,11 +93,6 @@ static INPUT_PORTS_START( sdk86 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
-
-
-MACHINE_RESET_MEMBER( sdk86_state )
-{
-}
 
 
 WRITE8_MEMBER( sdk86_state::scanlines_w )
@@ -169,12 +136,11 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	MCFG_CPU_PROGRAM_MAP(sdk86_mem)
 	MCFG_CPU_IO_MAP(sdk86_io)
 
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sdk86)
 
 	/* Devices */
-	MCFG_I8279_ADD("i8279", 3500, sdk86_intf)
+	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
 MACHINE_CONFIG_END
 
 /* ROM definition */

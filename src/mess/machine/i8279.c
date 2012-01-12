@@ -1,12 +1,13 @@
 /**********************************************************************
 
-    8279
+    i8279
 
-2012-01-08 First draft [Robbbert]
+2012-JAN-08 First draft [Robbbert]
+2012-JAN-12 Implemented
 
 Notes:
 - All keys MUST be ACTIVE_LOW
-- The data sheet doesn't say everything, so a lot of assumptions have been made.
+
 
 ToDo:
 - Command 5 (Nibble masking and blanking)
@@ -15,7 +16,59 @@ ToDo:
 - BD pin
 - Sensor ram stuff
 - save state
-- Keyboard isn't working properly
+
+
+What has been done:
+CMD 0:
+- Display Mode
+-- Left & Right with no increment are the same thing
+-- Right with increment is not emulated yet ***
+- Keyboard Mode
+-- No particular code has been added for 2-key/N-key rollover, no need
+-- Sensor mode is not complete yet ***
+-- Encoded and Decoded are done
+-- Strobe is done
+-- Sensor and FIFO may share the same internal RAM, not sure
+CMD 1:
+- Clock Divider
+-- Value is stored, but internally a fixed value is always used
+CMD 2:
+- Read FIFO/Sensor RAM
+-- FIFO works
+-- Sensor not done yet ***
+CMD 3:
+- Read Display RAM
+-- This works
+CMD 4:
+- Write Display RAM
+-- Right with increment does nothing, the rest is working ***
+CMD 5:
+- Blank Nibble
+-- Not done ***
+- Mask Nibble
+-- Not done ***
+CMD 6:
+-- All implemented
+CMD 7:
+- Interrupt
+-- Not done
+- Error Mode
+-- No need to do.
+
+Interface:
+-- All done except BD pin ***
+
+Status word:
+- FIFO bits
+-- All done
+- Error bit
+-- Not done (no need)
+- Display unavailable
+-- Not done (no need)
+
+
+Items marked (***) can be added if a system appears
+that uses this feature.
 
 **********************************************************************/
 
@@ -83,11 +136,6 @@ void i8279_device::device_start()
 	m_in_shift_func.resolve(m_in_shift_cb, *this);
 	m_in_ctrl_func.resolve(m_in_ctrl_cb, *this);
 	m_clock = clock();
-//  m_p_ram = machine().region("i8279")->base();
-//  m_ctrls = m_p_ram + 0x10;
-//  m_d_ram = m_p_ram + 0x20;
-//  m_s_ram = m_p_ram + 0x40;
-//  m_fifo = m_p_ram + 0x60;
 	m_timer = machine().scheduler().timer_alloc(FUNC(timerproc_callback), (void *)this);
 }
 
@@ -101,7 +149,7 @@ void i8279_device::device_reset()
 	UINT8 i;
 
 	// startup values are unknown: setting to 0
-	for (i = 2; i < 8; i++) m_ctrls[i] = 0;
+	for (i = 2; i < 8; i++) m_cmd[i] = 0;
 	for (i = 0; i < 8; i++) m_fifo[i] = 0;
 	for (i = 0; i < 8; i++) m_s_ram[i] = 0;
 	for (i = 0; i < 16; i++) m_d_ram[i] = 0;
@@ -115,8 +163,9 @@ void i8279_device::device_reset()
 	m_key_down = 0xffff;
 
 	// from here is confirmed
-	m_ctrls[0] = 8;
-	m_ctrls[1] = 31;
+	m_cmd[0] = 8;
+	m_cmd[1] = 31;
+	logerror("Initial clock = 3100kHz\n");
 	timer_adjust();
 }
 
@@ -126,7 +175,7 @@ void i8279_device::timer_adjust()
 // Real device runs at about 100kHz internally, clock divider is chosen so that
 // this is the case. We do not need such speed, 200Hz is enough.
 
-	//UINT8 divider = (m_ctrls[1]) ? m_ctrls[1] : 1;
+	//UINT8 divider = (m_cmd[1]) ? m_cmd[1] : 1;
 	//m_clock = clock() / divider;
 
 	m_clock = 200;
@@ -138,10 +187,10 @@ void i8279_device::clear_display()
 {
 	// clear all digits
 	UINT8 i,patterns[4] = { 0, 0, 0x20, 0xff };
-	UINT8 data = patterns[(m_ctrls[6] & 12) >> 2];
+	UINT8 data = patterns[(m_cmd[6] & 12) >> 2];
 
 	// The CD high bit (also done by CA)
-	if (m_ctrls[6] & 11)
+	if (m_cmd[6] & 11)
 		for (i = 0; i < 16; i++)
 			m_d_ram[i] = data;
 
@@ -149,7 +198,7 @@ void i8279_device::clear_display()
 	m_d_ram_ptr = 0; // not in the datasheet, but needed
 
 	// The CF bit (also done by CA)
-	if (m_ctrls[6] & 3)
+	if (m_cmd[6] & 3)
 	{
 		m_status &= 0xc0; // blow away fifo
 		m_s_ram_ptr = 0; // reset sensor pointer
@@ -170,7 +219,7 @@ void i8279_device::new_key(UINT8 data, bool skey, bool ckey)
 	UINT8 i, rl, sl;
 	for (i = 0; BIT(data, i); i++);
 	rl = i;
-	if (BIT(m_ctrls[0], 0))
+	if (BIT(m_cmd[0], 0))
 	{
 		for (i = 0; !BIT(data, i); i++);
 		sl = i;
@@ -223,9 +272,9 @@ void i8279_device::timer_mainloop()
 	// bit 3 - number of digits to display
 	// bit 4 - left or right entry
 
-	UINT8 scanner_mask = BIT(m_ctrls[0], 0) ? 15 : BIT(m_ctrls[0], 3) ? 15 : 7;
-	bool decoded = BIT(m_ctrls[0], 0);
-	UINT8 kbd_type = (m_ctrls[0] & 6) >> 1;
+	UINT8 scanner_mask = BIT(m_cmd[0], 0) ? 15 : BIT(m_cmd[0], 3) ? 15 : 7;
+	bool decoded = BIT(m_cmd[0], 0);
+	UINT8 kbd_type = (m_cmd[0] & 6) >> 1;
 	bool shift_key = 1;
 	bool ctrl_key = 1;
 	bool strobe_pulse = 0;
@@ -314,7 +363,7 @@ UINT8 i8279_device::status_r()
 UINT8 i8279_device::data_r()
 {
 	UINT8 i;
-	bool sensor_mode = ((m_ctrls[0] & 6)==4);
+	bool sensor_mode = ((m_cmd[0] & 6)==4);
 	UINT8 data;
 	if (m_read_flag)
 	{
@@ -374,16 +423,19 @@ void i8279_device::ctrl_w( UINT8 data )
 {//printf("Command: %X=%X ",data>>5,data&31);
 	UINT8 cmd = data >> 5;
 	data &= 0x1f;
-	m_ctrls[cmd] = data;
+	m_cmd[cmd] = data;
 	switch (cmd)
 	{
 		case 1:
 			if (data > 1)
+			{
+				logerror("Clock set to %dkHz\n",data*100);
 				timer_adjust();
+			}
 			break;
 		case 2:
 			m_read_flag = 0;
-			if ((m_ctrls[0] & 6)==4) // sensor mode only
+			if ((m_cmd[0] & 6)==4) // sensor mode only
 			{
 				m_autoinc = BIT(data, 4);
 				m_s_ram_ptr = data & 7;
@@ -407,7 +459,7 @@ void i8279_device::ctrl_w( UINT8 data )
 
 void i8279_device::data_w( UINT8 data )
 {//printf("Data: %X ",data);
-	if (BIT(m_ctrls[0], 4) & m_autoinc)
+	if (BIT(m_cmd[0], 4) & m_autoinc)
 	{
 	// right-entry autoincrement not implemented yet
 	}

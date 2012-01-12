@@ -124,13 +124,12 @@ private:
 
 	emu_timer *m_timer;
 
-	//UINT8 *m_p_ram;
 	UINT8 m_d_ram[16];		// display ram
 	UINT8 m_d_ram_ptr;
 	UINT8 m_s_ram[8]; // might be same as fifo ram
 	UINT8 m_s_ram_ptr;
 	UINT8 m_fifo[8];    // queued keystrokes
-	UINT8 m_ctrls[8];   // Device settings
+	UINT8 m_cmd[8];   // Device settings
 	UINT8 m_status;     // Returned via status_r
 	UINT32 m_clock;     // Internal scan clock
 	UINT8 m_scanner;    // next output on SL lines
