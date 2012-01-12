@@ -19,7 +19,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -43,7 +43,7 @@ void clcd_state::video_start()
 {
 }
 
-bool clcd_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 clcd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -56,7 +56,7 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(clcd_state, screen_update)
 	MCFG_SCREEN_SIZE(480, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 

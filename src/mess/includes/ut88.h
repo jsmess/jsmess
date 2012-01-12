@@ -58,7 +58,7 @@ extern DRIVER_INIT( ut88mini );
 extern const gfx_layout ut88_charlayout;
 
 extern VIDEO_START( ut88 );
-extern SCREEN_UPDATE( ut88 );
+extern SCREEN_UPDATE_IND16( ut88 );
 
 
 #endif /* UT88_H_ */

@@ -20,7 +20,7 @@
  ****************************/
 typedef struct
 {
-	bitmap_t	*bitmap;		/* The bitmap we work on */
+	bitmap_ind16	*bitmap;		/* The bitmap we work on */
 	UINT8	pen_selected;		/* Pen selection */
 	UINT8	mrer;				/* Mode and ROM Enable Register */
 	UINT8	upper_bank;
@@ -157,7 +157,7 @@ extern const mc6845_interface amstrad_mc6845_intf;
 extern const mc6845_interface amstrad_plus_mc6845_intf;
 
 VIDEO_START( amstrad );
-SCREEN_UPDATE( amstrad );
+SCREEN_UPDATE_IND16( amstrad );
 SCREEN_EOF( amstrad );
 
 PALETTE_INIT( amstrad_cpc );			/* For CPC464, CPC664, and CPC6128 */

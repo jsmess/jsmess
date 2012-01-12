@@ -650,7 +650,7 @@ static void update_cursor_state(crtc_ega_t *crtc_ega)
 }
 
 
-void crtc_ega_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+void crtc_ega_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	crtc_ega_t *crtc_ega = get_safe_token(device);
 	assert(bitmap.valid());

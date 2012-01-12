@@ -43,7 +43,7 @@ NVRAM_HANDLER( pc1350 );
 
 READ8_HANDLER(pc1350_lcd_read);
 WRITE8_HANDLER(pc1350_lcd_write);
-SCREEN_UPDATE( pc1350 );
+SCREEN_UPDATE_IND16( pc1350 );
 
 int pc1350_keyboard_line_r(running_machine &machine);
 

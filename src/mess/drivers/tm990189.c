@@ -226,14 +226,6 @@ static TIMER_DEVICE_CALLBACK( display_callback )
 }
 
 
-static SCREEN_UPDATE( tm990_189_v )
-{
-	tm990189_state *state = screen.machine().driver_data<tm990189_state>();
-	state->m_tms9918->update( bitmap, cliprect );
-	return 0;
-}
-
-
 /*
     tms9901 code
 */
@@ -790,7 +782,7 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9918", TMS9918, tms9918_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE(tm990_189_v)
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918_device, screen_update )
 	MCFG_DEFAULT_LAYOUT(layout_tm990189v)
 
 	/* sound hardware */

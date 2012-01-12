@@ -63,7 +63,7 @@ static VIDEO_START( smc777 )
 {
 }
 
-static SCREEN_UPDATE( smc777 )
+static SCREEN_UPDATE_IND16( smc777 )
 {
 	smc777_state *state = screen.machine().driver_data<smc777_state>();
 	int x,y,yi;
@@ -1056,10 +1056,9 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MCFG_SCREEN_SIZE(0x400, 400)
     MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
-    MCFG_SCREEN_UPDATE(smc777)
+    MCFG_SCREEN_UPDATE_STATIC(smc777)
 
     MCFG_PALETTE_LENGTH(0x10+8) //16 palette entries + 8 special colors
     MCFG_PALETTE_INIT(smc777)

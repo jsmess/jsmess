@@ -47,8 +47,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gime_firq_w) { recalculate_firq(); }
 	DECLARE_WRITE_LINE_MEMBER(gime_irq_w) { recalculate_irq(); }
 
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	virtual void update_cart_base(UINT8 *cart_base);
 
 	/* interrupts */

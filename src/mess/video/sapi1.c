@@ -91,7 +91,7 @@ VIDEO_START( sapi1 )
 	state->m_refresh_counter = 0;
 }
 
-SCREEN_UPDATE( sapi1 )
+SCREEN_UPDATE_IND16( sapi1 )
 {
 	sapi1_state *state = screen.machine().driver_data<sapi1_state>();
 	int x,y,j,b;
@@ -145,7 +145,7 @@ VIDEO_START( sapizps3 )
 {
 }
 
-SCREEN_UPDATE( sapizps3 )
+SCREEN_UPDATE_IND16( sapizps3 )
 {
 	return 0;
 }

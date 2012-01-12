@@ -384,7 +384,7 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 //  comx_screen_update - screen update
 //-------------------------------------------------
 
-bool comx_eb_device::comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 comx_eb_device::comx_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool value = false;
 

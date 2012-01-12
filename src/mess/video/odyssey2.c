@@ -604,7 +604,7 @@ VIDEO_START( odyssey2 )
 
 ***************************************************************************/
 
-SCREEN_UPDATE( odyssey2 )
+SCREEN_UPDATE_IND16( odyssey2 )
 {
 	odyssey2_state *state = screen.machine().driver_data<odyssey2_state>();
 	copybitmap( bitmap, state->m_tmp_bitmap, 0, 0, 0, 0, cliprect );

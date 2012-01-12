@@ -142,10 +142,10 @@ WRITE8_HANDLER( hector_io_8255_w);
 WRITE8_HANDLER( hector_179x_register_w);
 /*----------- defined in video/hec2video.c -----------*/
 
-void hector_80c(running_machine &machine, bitmap_t &bitmap, UINT8 *page, int ymax, int yram) ;
-void hector_hr(running_machine &machine, bitmap_t &bitmap, UINT8 *page, int ymax, int yram) ;
+void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
+void hector_hr(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
 VIDEO_START( hec2hrp );
-SCREEN_UPDATE( hec2hrp );
+SCREEN_UPDATE_IND16( hec2hrp );
 
 /* Sound function*/
 extern const sn76477_interface hector_sn76477_interface;

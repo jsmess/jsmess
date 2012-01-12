@@ -115,10 +115,19 @@ void tms3556_device::device_start()
 	save_item(NAME(m_cg_flag));
 	save_item(NAME(m_char_line_counter));
 	save_item(NAME(m_dbl_h_phase));
+	
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
 }
 
 
 /*static const char *const tms3556_mode_names[] = { "DISPLAY OFF", "TEXT", "GRAPHIC", "MIXED" };*/
+
+
+UINT32 tms3556_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
 
 
 //-------------------------------------------------
@@ -477,7 +486,7 @@ void tms3556_device::draw_line_mixed(UINT16 *ln)
 //  duplicate the line.
 //-------------------------------------------------
 
-void tms3556_device::draw_line(bitmap_t &bmp, int line)
+void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 {
 	int double_lines = 0;
 	UINT16 *ln, *ln2 = NULL;
@@ -567,7 +576,7 @@ void tms3556_device::interrupt(running_machine &machine)
 	if ((m_scanline >= 0) && (m_scanline < TMS3556_TOTAL_HEIGHT))
 	{
 		//if (!video_skip_this_frame())
-			draw_line(machine.primary_screen->default_bitmap(), m_scanline);
+			draw_line(m_bitmap, m_scanline);
 	}
 
 	if (++m_scanline == 313)

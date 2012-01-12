@@ -78,35 +78,28 @@ void fp_state::video_start()
 }
 
 
-bool fp_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (&screen == machine().first_screen())
+	offs_t addr = (!BIT(m_video, 4) << 15) | (BIT(m_video, 1) << 14);
+
+	for (int y = 0; y < 200; y++)
 	{
-		offs_t addr = (!BIT(m_video, 4) << 15) | (BIT(m_video, 1) << 14);
-
-		for (int y = 0; y < 200; y++)
+		for (int sx = 0; sx < 40; sx++)
 		{
-			for (int sx = 0; sx < 40; sx++)
+			UINT16 data = m_video_ram[addr++];
+
+			for (int x = 0; x < 16; x++)
 			{
-				UINT16 data = m_video_ram[addr++];
+				int color = BIT(data, 15);
 
-				for (int x = 0; x < 16; x++)
-				{
-					int color = BIT(data, 15);
+				bitmap.pix16(y, (sx * 16) + x) = color;
 
-					bitmap.pix16(y, (sx * 16) + x) = color;
-
-					data <<= 1;
-				}
+				data <<= 1;
 			}
 		}
 	}
-	else
-	{
-		m_crtc->update(bitmap, cliprect);
-	}
 
-	return false;
+	return 0;
 }
 
 
@@ -592,14 +585,14 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_SCREEN_ADD(SCREEN_LCD_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(fp_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
 	MCFG_SCREEN_ADD(SCREEN_CRT_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 

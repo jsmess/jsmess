@@ -306,7 +306,7 @@ VIDEO_START( arcadia )
 		screen_device *screen = machine.first_screen();
 		int width = screen->width();
 		int height = screen->height();
-		state->m_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+		state->m_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
 	}
 }
 
@@ -410,7 +410,7 @@ WRITE8_HANDLER(arcadia_video_w)
 	}
 }
 
-INLINE void arcadia_draw_char(running_machine &machine, bitmap_t &bitmap, UINT8 *ch, int charcode,
+INLINE void arcadia_draw_char(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *ch, int charcode,
 			      int y, int x)
 {
 	arcadia_state *state = machine.driver_data<arcadia_state>();
@@ -467,7 +467,7 @@ INLINE void arcadia_draw_char(running_machine &machine, bitmap_t &bitmap, UINT8 
     }
 }
 
-INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_t &bitmap,
+INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_ind16 &bitmap,
 				 int y, UINT8 chars1[16])
 {
 	arcadia_state *state = machine.driver_data<arcadia_state>();
@@ -521,7 +521,7 @@ static int arcadia_sprite_collision(arcadia_state *state, int n1, int n2)
     return FALSE;
 }
 
-static void arcadia_draw_sprites(running_machine &machine, bitmap_t &bitmap)
+static void arcadia_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	arcadia_state *state = machine.driver_data<arcadia_state>();
     int i, k, x, y, color=0;
@@ -661,7 +661,7 @@ READ8_HANDLER(arcadia_vsync_r)
     return state->m_line>=216?0x80:0;
 }
 
-SCREEN_UPDATE( arcadia )
+SCREEN_UPDATE_IND16( arcadia )
 {
 	arcadia_state *state = screen.machine().driver_data<arcadia_state>();
 	copybitmap(bitmap, *state->m_bitmap, 0, 0, 0, 0, cliprect);

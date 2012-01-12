@@ -148,7 +148,7 @@ static MACHINE_CONFIG_START( dragon_base, dragon_state )
 	MCFG_PRINTER_ADD(PRINTER_TAG)
 
 	// video hardware
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG)
+	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)
 	MCFG_MC6847_ADD(VDG_TAG, MC6847_PAL, XTAL_4_433619MHz, dragon_state::mc6847_config)
 
 	// sound hardware

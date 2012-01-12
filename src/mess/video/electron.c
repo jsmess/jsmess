@@ -55,12 +55,12 @@ INLINE UINT8 read_vram( electron_state *state, UINT16 addr )
 	return state->m_ula.vram[ addr % state->m_ula.screen_size ];
 }
 
-INLINE void electron_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 
-SCREEN_UPDATE( electron )
+SCREEN_UPDATE_IND16( electron )
 {
 	electron_state *state = screen.machine().driver_data<electron_state>();
 	int i;

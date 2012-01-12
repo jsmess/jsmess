@@ -16,12 +16,11 @@
 
 #define VRAM_SIZE	(0x18000)  // 1024x768 @ 1bpp is 98,304 bytes (0x18000)
 
-static SCREEN_UPDATE( vikbw );
+static SCREEN_UPDATE_RGB32( vikbw );
 
 MACHINE_CONFIG_FRAGMENT( vikbw )
 	MCFG_SCREEN_ADD( VIKBW_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE(vikbw)
+	MCFG_SCREEN_UPDATE_STATIC(vikbw)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
@@ -123,7 +122,7 @@ void nubus_vikbw_device::device_reset()
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( vikbw )
+static SCREEN_UPDATE_RGB32( vikbw )
 {
 	UINT32 *scanline;
 	int x, y;

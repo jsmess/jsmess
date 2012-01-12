@@ -152,5 +152,5 @@ extern MACHINE_RESET( hp48 );
 
 /****************************** video ********************************/
 
-extern SCREEN_UPDATE ( hp48 );
+extern SCREEN_UPDATE_IND16 ( hp48 );
 extern PALETTE_INIT ( hp48 );

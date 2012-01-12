@@ -48,6 +48,7 @@ public:
 	int m_maria_kangaroo;
 	int m_maria_rm;
 	unsigned int m_maria_charbase;
+	bitmap_ind16 m_bitmap;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -56,7 +57,7 @@ public:
 /*----------- defined in video/a7800.c -----------*/
 
 VIDEO_START( a7800 );
-SCREEN_UPDATE( a7800 );
+SCREEN_UPDATE_IND16( a7800 );
 TIMER_DEVICE_CALLBACK( a7800_interrupt );
  READ8_HANDLER( a7800_MARIA_r );
 WRITE8_HANDLER( a7800_MARIA_w );

@@ -202,7 +202,7 @@ static void vii_set_pixel(vii_state *state, UINT32 offset, UINT16 rgb)
 	state->m_screen[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
-static void vii_blit(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
+static void vii_blit(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
 {
 	vii_state *state = machine.driver_data<vii_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -271,7 +271,7 @@ static void vii_blit(running_machine &machine, bitmap_t &bitmap, const rectangle
 	}
 }
 
-static void vii_blit_page(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs)
+static void vii_blit_page(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs)
 {
 	UINT32 x0, y0;
 	UINT32 xscroll = regs[0];
@@ -340,7 +340,7 @@ static void vii_blit_page(running_machine &machine, bitmap_t &bitmap, const rect
 	}
 }
 
-static void vii_blit_sprite(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr)
+static void vii_blit_sprite(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr)
 {
 	vii_state *state = machine.driver_data<vii_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -382,7 +382,7 @@ static void vii_blit_sprite(running_machine &machine, bitmap_t &bitmap, const re
 	vii_blit(machine, bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
 }
 
-static void vii_blit_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int depth)
+static void vii_blit_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
 {
 	vii_state *state = machine.driver_data<vii_state>();
 	UINT32 n;
@@ -401,7 +401,7 @@ static void vii_blit_sprites(running_machine &machine, bitmap_t &bitmap, const r
 	}
 }
 
-static SCREEN_UPDATE( vii )
+static SCREEN_UPDATE_RGB32( vii )
 {
 	vii_state *state = screen.machine().driver_data<vii_state>();
 	int i, x, y;
@@ -1092,11 +1092,10 @@ static MACHINE_CONFIG_START( vii, vii_state )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_VIDEO_START( vii )
-	MCFG_SCREEN_UPDATE( vii )
+	MCFG_SCREEN_UPDATE_STATIC( vii )
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_CARTSLOT_ADD( "cart" )
@@ -1118,11 +1117,10 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_VIDEO_START( vii )
-	MCFG_SCREEN_UPDATE( vii )
+	MCFG_SCREEN_UPDATE_STATIC( vii )
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_CARTSLOT_ADD( "cart" )
@@ -1149,11 +1147,10 @@ static MACHINE_CONFIG_START( batman, vii_state )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_VIDEO_START( vii )
-	MCFG_SCREEN_UPDATE( vii )
+	MCFG_SCREEN_UPDATE_STATIC( vii )
 	MCFG_PALETTE_LENGTH(32768)
 MACHINE_CONFIG_END
 

@@ -337,14 +337,6 @@ static TMS9928A_INTERFACE(mtx_tms9928a_interface)
     DEVCB_LINE(mtx_tms9929a_interrupt)
 };
 
-static SCREEN_UPDATE( mtx )
-{
-	tms9929a_device *tms9929a = screen.machine().device<tms9929a_device>( "tms9929a" );
-
-	tms9929a->update( bitmap, cliprect );
-	return 0;
-}
-
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -367,7 +359,7 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9929a", TMS9929A, mtx_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( mtx )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

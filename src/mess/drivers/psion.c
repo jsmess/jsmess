@@ -443,11 +443,6 @@ void psion_state::machine_reset()
 		update_banks(machine());
 }
 
-bool psion_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_lcdc->video_update( bitmap, cliprect );
-}
-
 static PALETTE_INIT( psion )
 {
 	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
@@ -485,7 +480,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -536,7 +531,7 @@ static MACHINE_CONFIG_START( psion_4lines, psion_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_SIZE(6*20, 9*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*20-1, 0, 9*4-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)

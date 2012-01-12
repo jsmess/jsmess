@@ -225,13 +225,6 @@ static MM74C923_INTERFACE( keyboard_intf )
 
 /* CDP1861 Interface */
 
-bool elf2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_vdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 static CDP1861_INTERFACE( elf2_cdp1861_intf )
 {
 	CDP1802_TAG,
@@ -313,7 +306,7 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 	MCFG_DEFAULT_LAYOUT( layout_elf2 )
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE(CDP1861_TAG, cdp1861_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_3_579545MHz/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
 	MCFG_PALETTE_LENGTH(2)

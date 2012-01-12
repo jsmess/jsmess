@@ -1920,10 +1920,9 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
-	MCFG_SCREEN_UPDATE(pdp1)
+	MCFG_SCREEN_UPDATE_STATIC(pdp1)
 	MCFG_SCREEN_EOF(pdp1)
 
 	MCFG_CRT_ADD( "crt", pdp1_crt_interface )

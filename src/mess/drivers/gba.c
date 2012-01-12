@@ -2224,8 +2224,6 @@ static MACHINE_START( gba )
 	/* and an IRQ handling timer */
 	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(handle_irq));
 	state->m_irq_timer->adjust(attotime::never);
-
-	gba_video_start(machine);
 }
 
 ROM_START( gba )
@@ -3187,7 +3185,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 
 	MCFG_SCREEN_ADD("gbalcd", RASTER)	// htot hst vwid vtot vst vis
 	MCFG_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(gba_state, screen_update)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_LENGTH(32768)

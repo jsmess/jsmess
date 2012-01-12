@@ -83,16 +83,7 @@ static PALETTE_INIT( compis )
 	palette_set_color(machine, 2, MAKE_RGB(0x00, 0xff, 0x00)); // highlight
 }
 
-static SCREEN_UPDATE( compis )
-{
-	compis_state *state = screen.machine().driver_data<compis_state>();
-	/* graphics */
-	state->m_crtc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
-static SCREEN_UPDATE( compis2 ) // temporary
+static SCREEN_UPDATE_IND16( compis2 ) // temporary
 {
 	compis_state *state = screen.machine().driver_data<compis_state>();
 	UINT8 *m_p_chargen;
@@ -392,10 +383,9 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE(compis)
+	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 #if 0
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(compis_gdc)
@@ -438,10 +428,9 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE(compis2)
+	MCFG_SCREEN_UPDATE_STATIC(compis2)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT(compis)
 

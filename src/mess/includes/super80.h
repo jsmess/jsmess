@@ -81,14 +81,14 @@ public:
 /*----------- defined in video/super80.c -----------*/
 
 PALETTE_INIT( super80m );
-SCREEN_UPDATE( super80 );
-SCREEN_UPDATE( super80d );
-SCREEN_UPDATE( super80e );
-SCREEN_UPDATE( super80m );
+SCREEN_UPDATE_IND16( super80 );
+SCREEN_UPDATE_IND16( super80d );
+SCREEN_UPDATE_IND16( super80e );
+SCREEN_UPDATE_IND16( super80m );
 VIDEO_START( super80 );
 SCREEN_EOF( super80m );
 VIDEO_START( super80v );
-SCREEN_UPDATE( super80v );
+SCREEN_UPDATE_RGB32( super80v );
 MC6845_UPDATE_ROW( super80v_update_row );
 
 /*----------- defined in machine/super80.c -----------*/

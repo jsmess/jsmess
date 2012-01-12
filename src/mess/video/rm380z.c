@@ -324,7 +324,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 	}
 }
 
-void rm380z_state::update_screen(bitmap_t &bitmap)
+void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 {
 	unsigned char* pChar=machine().region("gfx")->base();
 	UINT16* scrptr = &bitmap.pix16(0);

@@ -179,7 +179,7 @@ void iq151_grafik_device::io_write(offs_t offset, UINT8 data)
 //  video update
 //-------------------------------------------------
 
-void iq151_grafik_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
+void iq151_grafik_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_ev)
 	{

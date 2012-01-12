@@ -76,6 +76,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 {
 	victor9k_state *state = device->machine().driver_data<victor9k_state>();
 	address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	if (BIT(ma, 13))
 	{
@@ -97,7 +98,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 				if (sx == cursor_x) color = 1;
 
-				bitmap.pix16(y, x + sx*10) = color;
+				bitmap.pix32(y, x + sx*10) = palette[color];
 			}
 
 			video_ram_addr += 2;
@@ -119,13 +120,6 @@ static const mc6845_interface hd46505s_intf =
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir7_w),
 	NULL
 };
-
-bool victor9k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_crtc->update(bitmap, cliprect);
-
-	return 0;
-}
 
 // Intel 8253 Interface
 
@@ -950,7 +944,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DEVICE(HD46505S_TAG, hd6845_device, screen_update)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 

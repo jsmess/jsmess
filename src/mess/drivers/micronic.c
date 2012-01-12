@@ -321,13 +321,6 @@ static PALETTE_INIT( micronic )
 	palette_set_color(machine, 1, MAKE_RGB(92, 83, 88));
 }
 
-bool micronic_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_lcdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 static HD61830_INTERFACE( lcdc_intf )
 {
 	SCREEN_TAG,
@@ -373,7 +366,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
     /* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE(HD61830_TAG, hd61830_device, screen_update)
 	MCFG_SCREEN_SIZE(120, 64)	//6x20, 8x8
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
 

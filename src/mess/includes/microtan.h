@@ -69,7 +69,7 @@ WRITE8_HANDLER ( microtan_sound_w );
 extern WRITE8_HANDLER ( microtan_videoram_w );
 
 extern VIDEO_START( microtan );
-extern SCREEN_UPDATE( microtan );
+extern SCREEN_UPDATE_IND16( microtan );
 
 
 #endif /* MICROTAN_H_ */

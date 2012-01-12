@@ -317,7 +317,7 @@ static VIDEO_START( cat )
 {
 }
 
-static SCREEN_UPDATE( cat )
+static SCREEN_UPDATE_IND16( cat )
 {
 	cat_state *state = screen.machine().driver_data<cat_state>();
 	UINT16 code;
@@ -363,7 +363,7 @@ static VIDEO_START( swyft )
 {
 }
 
-static SCREEN_UPDATE( swyft )
+static SCREEN_UPDATE_IND16( swyft )
 {
 	cat_state *state = screen.machine().driver_data<cat_state>();
 	UINT16 code;
@@ -448,10 +448,9 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(672, 344)
 	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
-	MCFG_SCREEN_UPDATE(cat)
+	MCFG_SCREEN_UPDATE_STATIC(cat)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -476,10 +475,9 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 242)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 242-1)
-	MCFG_SCREEN_UPDATE(swyft)
+	MCFG_SCREEN_UPDATE_STATIC(swyft)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

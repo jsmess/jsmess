@@ -16,13 +16,6 @@ static CDP1861_INTERFACE( tmc1800_cdp1861_intf )
 	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
-bool tmc1800_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_vdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 /* Telmac 2000 */
 
 READ_LINE_MEMBER( tmc2000_state::rdata_r )
@@ -58,13 +51,6 @@ static CDP1864_INTERFACE( tmc2000_cdp1864_intf )
 	RES_K(3.92)		// RL65 (also RH62 (2K pot) in series, but ignored here)
 };
 
-bool tmc2000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_cti->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 /* OSCOM Nano */
 
 static CDP1864_INTERFACE( nano_cdp1864_intf )
@@ -85,16 +71,9 @@ static CDP1864_INTERFACE( nano_cdp1864_intf )
 	0  // not connected
 };
 
-bool nano_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_cti->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 /* OSM-200 */
 
-bool osc1000b_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 osc1000b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -102,9 +81,7 @@ bool osc1000b_state::screen_update(screen_device &screen, bitmap_t &bitmap, cons
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( tmc1800_video )
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_1_75MHz, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
+	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_1_75MHz)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -114,7 +91,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( osc1000b_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(osc1000b_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
@@ -125,6 +102,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( tmc2000_video )
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
+	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(8+8)
 
@@ -135,6 +113,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( nano_video )
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
+	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(8+8)
 

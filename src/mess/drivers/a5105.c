@@ -33,7 +33,6 @@ ToDo:
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class a5105_state : public driver_device
 {
@@ -69,7 +68,6 @@ public:
 	UINT8 m_memsel[4];
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 /* TODO */
@@ -509,14 +507,6 @@ VIDEO_START_MEMBER( a5105_state )
 	m_char_rom = machine().region("pcg")->base();
 }
 
-SCREEN_UPDATE_MEMBER( a5105_state )
-{
-	/* graphics */
-	m_hgdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 static UPD7220_INTERFACE( hgdc_intf )
 {
 	"screen",
@@ -602,7 +592,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
 	MCFG_GFXDECODE(a5105)

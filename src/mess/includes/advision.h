@@ -29,7 +29,7 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void update_dac();
 	void vh_write(int data);

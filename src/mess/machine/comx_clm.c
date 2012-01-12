@@ -87,8 +87,9 @@ const rom_entry *comx_clm_device::device_rom_region() const
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
@@ -105,7 +106,7 @@ void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_t &bitmap, c
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) ? 7 : 0;
 
-			bitmap.pix16(y, x) = color;
+			bitmap.pix32(y, x) = palette[color];
 
 			data <<= 1;
 		}
@@ -160,7 +161,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( comx_clm )
 	MCFG_SCREEN_ADD(MC6845_SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -285,16 +286,4 @@ void comx_clm_device::comx_mwr_w(offs_t offset, UINT8 data)
 	{
 		m_crtc->register_w(*space, 0, data);
 	}
-}
-
-
-//-------------------------------------------------
-//  comx_screen_update - screen update
-//-------------------------------------------------
-
-bool comx_clm_device::comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_crtc->update(bitmap, cliprect);
-
-	return false;
 }

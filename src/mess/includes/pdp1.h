@@ -248,8 +248,8 @@ public:
 	int m_old_tw_keys;
 	int m_old_ta_keys;
 	int m_typewriter_color;
-	bitmap_t m_panel_bitmap;
-	bitmap_t m_typewriter_bitmap;
+	bitmap_ind16 m_panel_bitmap;
+	bitmap_ind16 m_typewriter_bitmap;
 	lightpen_t m_lightpen_state;
 	lightpen_t m_previous_lightpen_state;
 	int m_pos;
@@ -263,7 +263,7 @@ public:
 
 VIDEO_START( pdp1 );
 SCREEN_EOF( pdp1 );
-SCREEN_UPDATE( pdp1 );
+SCREEN_UPDATE_IND16( pdp1 );
 
 void pdp1_plot(running_machine &machine, int x, int y);
 void pdp1_typewriter_drawchar(running_machine &machine, int character);

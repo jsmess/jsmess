@@ -237,12 +237,11 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
        is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
        total blanking time is about 4450 microseconds. */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* It would be nice if we could implement some sort of display
        overscan here. */
 	MCFG_SCREEN_SIZE(40 * 7, 24 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
-	MCFG_SCREEN_UPDATE(apple1)
+	MCFG_SCREEN_UPDATE_STATIC(apple1)
 
 
 	MCFG_GFXDECODE(apple1)

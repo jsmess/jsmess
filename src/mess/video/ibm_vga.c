@@ -220,13 +220,6 @@ static const mc6845_interface mc6845_vga_intf =
 	NULL
 };
 
-static SCREEN_UPDATE( mc6845_vga )
-{
-	mc6845_device *mc6845 = downcast<mc6845_device *>(screen.owner()->subdevice(VGA_MC6845_NAME));
-	mc6845->update(bitmap, cliprect);
-	return 0;
-}
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -235,9 +228,8 @@ const device_type IBM_VGA = &device_creator<ibm_vga_device>;
 
 static MACHINE_CONFIG_FRAGMENT( ibm_vga )
 	MCFG_SCREEN_ADD(VGA_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE( mc6845_vga )
+	MCFG_SCREEN_UPDATE_DEVICE( VGA_MC6845_NAME, mc6845_device, screen_update )
 
 	MCFG_MC6845_ADD(VGA_MC6845_NAME, MC6845, XTAL_14_31818MHz/8, mc6845_vga_intf)
 MACHINE_CONFIG_END

@@ -511,14 +511,6 @@ static TMS9928A_INTERFACE(crvision_tms9928a_interface)
 	DEVCB_LINE(crvision_vdp_interrupt)
 };
 
-static SCREEN_UPDATE( crvision )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( TMS9929_TAG );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 /*-------------------------------------------------
     pia6821_interface pia_intf
 -------------------------------------------------*/
@@ -1012,7 +1004,7 @@ static MACHINE_CONFIG_DERIVED( ntsc, creativision )
     // video hardware
 	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9918, crvision_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( crvision )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9918_device, screen_update )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1023,7 +1015,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( pal, creativision, crvision_pal_state )
 	// video hardware
 	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929, crvision_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( crvision )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929_device, screen_update )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -1044,7 +1036,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	// video hardware
 	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929A, crvision_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( crvision )
+	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929a_device, screen_update )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

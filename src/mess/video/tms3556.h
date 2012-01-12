@@ -57,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER( reg_w );
 
 	void interrupt(running_machine &machine);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -77,7 +79,7 @@ protected:
 	void draw_line_text(UINT16 *ln);
 	void draw_line_bitmap(UINT16 *ln);
 	void draw_line_mixed(UINT16 *ln);
-	void draw_line(bitmap_t &bmp, int line);
+	void draw_line(bitmap_ind16 &bmp, int line);
 	void interrupt_start_vblank(void);
 
 private:
@@ -99,6 +101,8 @@ private:
 	int m_char_line_counter;	// character line counter (decrements from 10, 0 when we have reached
 								// last line of character row)
 	int m_dbl_h_phase[40];		// double height phase flags (one per horizontal character position)
+
+	bitmap_ind16 m_bitmap;
 };
 
 

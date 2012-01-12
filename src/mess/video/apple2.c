@@ -89,7 +89,7 @@ static void adjust_begin_and_end_row(const rectangle &cliprect, int *beginrow, i
     textual character
 -------------------------------------------------*/
 
-INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t &bitmap, int xpos, int ypos, int xscale, UINT32 code,
+INLINE void apple2_plot_text_character(running_machine &machine, bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
 	const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
@@ -137,7 +137,7 @@ INLINE void apple2_plot_text_character(running_machine &machine, bitmap_t &bitma
     column or 80 column)
 -------------------------------------------------*/
 
-static void apple2_text_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
+static void apple2_text_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int row, col;
@@ -178,7 +178,7 @@ static void apple2_text_draw(running_machine &machine, bitmap_t &bitmap, const r
     apple2_lores_draw - renders lo-res text
 -------------------------------------------------*/
 
-static void apple2_lores_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
+static void apple2_lores_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int row, col, y, x;
@@ -219,7 +219,7 @@ static void apple2_lores_draw(running_machine &machine, bitmap_t &bitmap, const 
     HIGH RESOLUTION GRAPHICS
 ***************************************************************************/
 
-static void apple2_hires_draw(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
+static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	const UINT8 *vram;
@@ -450,7 +450,7 @@ VIDEO_START( apple2e )
 }
 
 
-SCREEN_UPDATE( apple2 )
+SCREEN_UPDATE_IND16( apple2 )
 {
 	apple2_state *state = screen.machine().driver_data<apple2_state>();
 	int page;

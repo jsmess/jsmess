@@ -45,7 +45,7 @@ private:
 	UINT8		m_pen;
 	UINT8		m_control;
 
-	bitmap_t *	m_paper;
+	bitmap_ind16 *	m_paper;
 };
 
 

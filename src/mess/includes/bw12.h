@@ -50,7 +50,6 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
 	void floppy_motor_off();

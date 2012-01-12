@@ -38,7 +38,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// not really public
-	void crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 	DECLARE_WRITE_LINE_MEMBER( hsync_w );
 
 protected:
@@ -51,7 +51,6 @@ protected:
 	virtual void comx_ds_w(int state);
 	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
 	virtual void comx_mwr_w(offs_t offset, UINT8 data);
-	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 private:
 	// internal state

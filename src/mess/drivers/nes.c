@@ -467,10 +467,9 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	// non-rendering scanlines, we compensate. This ends up being 2500 cycles for the non-rendering portion, 2273
 	// cycles for the actual vblank period.
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_NTSC-PPU_VBLANK_FIRST_SCANLINE+1+2)))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE(nes)
+	MCFG_SCREEN_UPDATE_STATIC(nes)
 
 	MCFG_PALETTE_INIT(nes)
 	MCFG_VIDEO_START(nes)

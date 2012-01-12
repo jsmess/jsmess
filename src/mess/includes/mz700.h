@@ -96,9 +96,9 @@ WRITE8_HANDLER( mz800_palette_w );
 /*----------- defined in video/mz700.c -----------*/
 
 PALETTE_INIT( mz700 );
-SCREEN_UPDATE( mz700 );
+SCREEN_UPDATE_IND16( mz700 );
 VIDEO_START( mz800 );
-SCREEN_UPDATE( mz800 );
+SCREEN_UPDATE_IND16( mz800 );
 WRITE8_HANDLER( mz800_cgram_w );
 
 

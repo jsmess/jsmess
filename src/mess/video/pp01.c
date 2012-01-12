@@ -15,7 +15,7 @@ VIDEO_START( pp01 )
 {
 }
 
-SCREEN_UPDATE( pp01 )
+SCREEN_UPDATE_IND16( pp01 )
 {
 	pp01_state *state = screen.machine().driver_data<pp01_state>();
 	UINT8 code_r,code_g,code_b;

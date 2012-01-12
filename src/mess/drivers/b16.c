@@ -18,7 +18,7 @@
 #include "machine/8237dma.h"
 
 #define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 
 class b16_state : public driver_device
@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_dev_w);
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	mc6845_device *m_mc6845;
 	i8237_device  *m_dma8237;
@@ -70,7 +70,7 @@ VIDEO_START_MEMBER( b16_state )
 }
 
 
-SCREEN_UPDATE_MEMBER( b16_state )
+SCREEN_UPDATE16_MEMBER( b16_state )
 {
 	b16_state *state = machine().driver_data<b16_state>();
 	int x,y;
@@ -291,7 +291,7 @@ static MACHINE_CONFIG_START( b16, b16_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(b16_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 

@@ -452,14 +452,6 @@ static TMS9928A_INTERFACE(m5_tms9928a_interface)
 	DEVCB_LINE(sordm5_video_interrupt_callback)
 };
 
-static SCREEN_UPDATE( m5 )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 //-------------------------------------------------
 //  I8255_INTERFACE( ppi_intf )
 //-------------------------------------------------
@@ -707,7 +699,7 @@ static MACHINE_CONFIG_DERIVED( ntsc, m5 )
 	// video hardware
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, m5_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( m5 )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 
@@ -719,7 +711,7 @@ static MACHINE_CONFIG_DERIVED( pal, m5 )
 	// video hardware
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, m5_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( m5 )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 

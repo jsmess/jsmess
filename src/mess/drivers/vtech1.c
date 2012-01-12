@@ -187,9 +187,6 @@ public:
 	int m_fdc_write;
 	int m_fdc_offs;
 	int m_fdc_latch;
-
-protected:
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -615,11 +612,6 @@ static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 	return vtech1->m_videoram[offset];
 }
 
-bool vtech1_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_mc6847->update(bitmap, cliprect);
-}
-
 
 /***************************************************************************
     DRIVER INIT
@@ -975,7 +967,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_CPU_IO_MAP(vtech1_io)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD("screen")
+	MCFG_SCREEN_MC6847_PAL_ADD("screen", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_mc6847_bw_intf)
 
 	/* sound hardware */

@@ -31,7 +31,7 @@ public:
 	virtual void machine_start();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /* Memory Maps */
@@ -54,7 +54,7 @@ void tek4107a_state::video_start()
 {
 }
 
-bool tek4107a_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 tek4107a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -92,7 +92,7 @@ static MACHINE_CONFIG_START( tek4107a, tek4107a_state )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(tek4107a_state, screen_update)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 

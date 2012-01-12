@@ -17,7 +17,7 @@
 #include "includes/spectrum.h"
 #include "machine/ram.h"
 
-INLINE void spectrum_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
@@ -54,7 +54,7 @@ VIDEO_START( ts2068 )
  *******************************************************************/
 
 /* Draw a scanline in TS2068/TC2048 hires mode (code modified from COUPE.C) */
-static void ts2068_hires_scanline(running_machine &machine,bitmap_t &bitmap, int y, int borderlines)
+static void ts2068_hires_scanline(running_machine &machine,bitmap_ind16 &bitmap, int y, int borderlines)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	int x,b,scrx,scry;
@@ -100,7 +100,7 @@ static void ts2068_hires_scanline(running_machine &machine,bitmap_t &bitmap, int
 }
 
 /* Draw a scanline in TS2068/TC2048 64-column mode */
-static void ts2068_64col_scanline(running_machine &machine,bitmap_t &bitmap, int y, int borderlines, unsigned short inkcolor)
+static void ts2068_64col_scanline(running_machine &machine,bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor)
 {
 	int x,b,scrx,scry;
 	unsigned char *scr1, *scr2;
@@ -134,7 +134,7 @@ static void ts2068_64col_scanline(running_machine &machine,bitmap_t &bitmap, int
 }
 
 /* Draw a scanline in TS2068/TC2048 lores (normal Spectrum) mode */
-static void ts2068_lores_scanline(running_machine &machine,bitmap_t &bitmap, int y, int borderlines, int screen)
+static void ts2068_lores_scanline(running_machine &machine,bitmap_ind16 &bitmap, int y, int borderlines, int screen)
 {
 	spectrum_state *state = machine.driver_data<spectrum_state>();
 	int x,b,scrx,scry;
@@ -179,7 +179,7 @@ static void ts2068_lores_scanline(running_machine &machine,bitmap_t &bitmap, int
 	}
 }
 
-SCREEN_UPDATE( ts2068 )
+SCREEN_UPDATE_IND16( ts2068 )
 {
 	/* for now TS2068 will do a full-refresh */
 	spectrum_state *state = screen.machine().driver_data<spectrum_state>();
@@ -220,7 +220,7 @@ SCREEN_UPDATE( ts2068 )
 	return 0;
 }
 
-SCREEN_UPDATE( tc2048 )
+SCREEN_UPDATE_IND16( tc2048 )
 {
 	/* for now TS2068 will do a full-refresh */
 	spectrum_state *state = screen.machine().driver_data<spectrum_state>();

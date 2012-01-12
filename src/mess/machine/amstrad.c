@@ -1059,12 +1059,12 @@ VIDEO_START( amstrad )
 
 	amstrad_init_lookups(state);
 
-	state->m_gate_array.bitmap = auto_bitmap_alloc( machine, screen->width(), screen->height(), screen->format() );
+	state->m_gate_array.bitmap = auto_bitmap_ind16_alloc( machine, screen->width(), screen->height() );
 	state->m_gate_array.hsync_after_vsync_counter = 3;
 }
 
 
-SCREEN_UPDATE( amstrad )
+SCREEN_UPDATE_IND16( amstrad )
 {
 	amstrad_state *state = screen.machine().driver_data<amstrad_state>();
 	copybitmap( bitmap, *state->m_gate_array.bitmap, 0, 0, 0, 0, cliprect );

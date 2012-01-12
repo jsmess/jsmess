@@ -96,7 +96,7 @@ static VIDEO_START( multi8 )
 	state->m_p_chargen = machine.region("chargen")->base();
 }
 
-static void multi8_draw_pixel(running_machine &machine, bitmap_t &bitmap,int y,int x,UINT8 pen,UINT8 width)
+static void multi8_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
 {
 	if((x)>machine.primary_screen->visible_area().max_x || (y)>machine.primary_screen->visible_area().max_y)
 		return;
@@ -110,7 +110,7 @@ static void multi8_draw_pixel(running_machine &machine, bitmap_t &bitmap,int y,i
 		bitmap.pix16(y, x) = pen;
 }
 
-static SCREEN_UPDATE( multi8 )
+static SCREEN_UPDATE_IND16( multi8 )
 {
 	multi8_state *state = screen.machine().driver_data<multi8_state>();
 	int x,y,count;
@@ -669,11 +669,10 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_VIDEO_START(multi8)
-	MCFG_SCREEN_UPDATE(multi8)
+	MCFG_SCREEN_UPDATE_STATIC(multi8)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(multi8)
 	MCFG_GFXDECODE(multi8)

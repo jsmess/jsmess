@@ -80,7 +80,7 @@ static VIDEO_START( pc88va )
 
 }
 
-static void draw_sprites(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	UINT16 *tvram = (UINT16 *)machine.region("tvram")->base();
@@ -190,7 +190,7 @@ static UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
 	return 0;
 }
 
-static void draw_text(running_machine &machine, bitmap_t &bitmap, const rectangle &cliprect)
+static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
 	UINT8 *tvram = machine.region("tvram")->base();
@@ -371,7 +371,7 @@ static void draw_text(running_machine &machine, bitmap_t &bitmap, const rectangl
 	}
 }
 
-static SCREEN_UPDATE( pc88va )
+static SCREEN_UPDATE_RGB32( pc88va )
 {
 	pc88va_state *state = screen.machine().driver_data<pc88va_state>();
 	UINT8 pri,cur_pri_lv;
@@ -1652,10 +1652,9 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE( pc88va )
+	MCFG_SCREEN_UPDATE_STATIC( pc88va )
 
 	MCFG_PALETTE_LENGTH(32)
 //  MCFG_PALETTE_INIT( pc8801 )

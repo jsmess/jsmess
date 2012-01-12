@@ -38,7 +38,6 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( keypad_r );
 	DECLARE_READ8_MEMBER( status_flag_r );

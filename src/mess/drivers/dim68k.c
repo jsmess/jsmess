@@ -39,7 +39,6 @@
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class dim68k_state : public driver_device
 {
@@ -73,7 +72,6 @@ public:
 	UINT8 m_video_control;
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 READ16_MEMBER( dim68k_state::dim68k_duart_r )
@@ -216,19 +214,14 @@ VIDEO_START_MEMBER( dim68k_state )
 	m_p_chargen = machine().region("chargen")->base();
 }
 
-SCREEN_UPDATE_MEMBER( dim68k_state )
-{
-	m_crtc->update( bitmap, cliprect);
-	return 0;
-}
-
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
 MC6845_UPDATE_ROW( dim68k_update_row )
 {
 	dim68k_state *state = device->machine().driver_data<dim68k_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx,x,xx,inv;
 	UINT16 chr16=0x2020; // set to spaces if screen is off
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 	UINT8 screen_on = ~state->m_video_control & 4;
 	UINT8 dot8 = ~state->m_video_control & 40;
 
@@ -248,14 +241,14 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 
 		chr = chr16>>8;
 		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-		*p++ = BIT(gfx, 7);
-		*p++ = BIT(gfx, 6);
-		*p++ = BIT(gfx, 5);
-		*p++ = BIT(gfx, 4);
-		*p++ = BIT(gfx, 3);
-		*p++ = BIT(gfx, 2);
-		*p++ = BIT(gfx, 1);
-		if (dot8) *p++ = BIT(gfx, 1);
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		if (dot8) *p++ = palette[BIT(gfx, 1)];
 
 		inv = 0;
 		if (xx == cursor_x) inv=0xff;
@@ -263,14 +256,14 @@ MC6845_UPDATE_ROW( dim68k_update_row )
 
 		chr = chr16;
 		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv ^ ((chr & 0x80) ? 0xff : 0);
-		*p++ = BIT(gfx, 7);
-		*p++ = BIT(gfx, 6);
-		*p++ = BIT(gfx, 5);
-		*p++ = BIT(gfx, 4);
-		*p++ = BIT(gfx, 3);
-		*p++ = BIT(gfx, 2);
-		*p++ = BIT(gfx, 1);
-		if (dot8) *p++ = BIT(gfx, 1);
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		if (dot8) *p++ = palette[BIT(gfx, 1)];
 	}
 }
 
@@ -314,7 +307,7 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
 	MCFG_PALETTE_LENGTH(2)

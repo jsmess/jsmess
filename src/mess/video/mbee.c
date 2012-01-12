@@ -386,13 +386,13 @@ VIDEO_START( mbeeppc )
 	state->m_is_premium = 1;
 }
 
-SCREEN_UPDATE( mbee )
+SCREEN_UPDATE_RGB32( mbee )
 {
 	mbee_state *state = screen.machine().driver_data<mbee_state>();
 	state->m_framecnt++;
 	state->m_speed = state->m_sy6545_reg[10]&0x20, state->m_flash = state->m_sy6545_reg[10]&0x40;			// cursor modes
 	state->m_cursor = (state->m_sy6545_reg[14]<<8) | state->m_sy6545_reg[15];					// get cursor position
-	state->m_crtc->update( bitmap, cliprect);
+	state->m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -412,9 +412,10 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr )
 MC6845_UPDATE_ROW( mbee_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)			// for each character
 	{
@@ -435,14 +436,14 @@ MC6845_UPDATE_ROW( mbee_update_row )
 		gfx = state->m_p_gfxram[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = BIT(gfx, 7);
-		*p++ = BIT(gfx, 6);
-		*p++ = BIT(gfx, 5);
-		*p++ = BIT(gfx, 4);
-		*p++ = BIT(gfx, 3);
-		*p++ = BIT(gfx, 2);
-		*p++ = BIT(gfx, 1);
-		*p++ = BIT(gfx, 0);
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
 	}
 }
 
@@ -450,10 +451,11 @@ MC6845_UPDATE_ROW( mbee_update_row )
 MC6845_UPDATE_ROW( mbeeic_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
 	UINT16 colourm = (state->m_08 & 0x0e) << 7;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)			// for each character
 	{
@@ -477,14 +479,14 @@ MC6845_UPDATE_ROW( mbeeic_update_row )
 		bg = (col & 0x07e0) >> 5;					// and background palette
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = BIT(gfx, 7) ? fg : bg;
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		*p++ = BIT(gfx, 1) ? fg : bg;
-		*p++ = BIT(gfx, 0) ? fg : bg;
+		*p++ = palette[BIT(gfx, 7) ? fg : bg];
+		*p++ = palette[BIT(gfx, 6) ? fg : bg];
+		*p++ = palette[BIT(gfx, 5) ? fg : bg];
+		*p++ = palette[BIT(gfx, 4) ? fg : bg];
+		*p++ = palette[BIT(gfx, 3) ? fg : bg];
+		*p++ = palette[BIT(gfx, 2) ? fg : bg];
+		*p++ = palette[BIT(gfx, 1) ? fg : bg];
+		*p++ = palette[BIT(gfx, 0) ? fg : bg];
 	}
 }
 
@@ -493,9 +495,10 @@ MC6845_UPDATE_ROW( mbeeic_update_row )
 MC6845_UPDATE_ROW( mbeeppc_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 gfx,fg,bg;
 	UINT16 mem,x,col,chr;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)			// for each character
 	{
@@ -533,14 +536,14 @@ MC6845_UPDATE_ROW( mbeeppc_update_row )
 		bg = (col & 0xf0) >> 4;						// and background palette
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = BIT(gfx, 7) ? fg : bg;
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		*p++ = BIT(gfx, 1) ? fg : bg;
-		*p++ = BIT(gfx, 0) ? fg : bg;
+		*p++ = palette[BIT(gfx, 7) ? fg : bg];
+		*p++ = palette[BIT(gfx, 6) ? fg : bg];
+		*p++ = palette[BIT(gfx, 5) ? fg : bg];
+		*p++ = palette[BIT(gfx, 4) ? fg : bg];
+		*p++ = palette[BIT(gfx, 3) ? fg : bg];
+		*p++ = palette[BIT(gfx, 2) ? fg : bg];
+		*p++ = palette[BIT(gfx, 1) ? fg : bg];
+		*p++ = palette[BIT(gfx, 0) ? fg : bg];
 	}
 }
 

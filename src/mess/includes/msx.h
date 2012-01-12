@@ -8,6 +8,7 @@
 #define __MSX_H__
 
 #include "machine/wd17xx.h"
+#include "video/v9938.h"
 #include "formats/flopimg.h"
 
 #define MSX_MAX_CARTS	(2)
@@ -18,7 +19,8 @@ class msx_state : public driver_device
 {
 public:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_v9938(*this, "v9938") { }
 
 	/* PSG */
 	int m_psg_b;
@@ -50,6 +52,7 @@ public:
 	UINT8 *m_top_page;
 	int m_port_c_old;
 	int keylatch;
+	optional_device<v9938_device> m_v9938;
 };
 
 
@@ -69,7 +72,7 @@ extern TIMER_DEVICE_CALLBACK( msx2_interrupt );
 DEVICE_IMAGE_LOAD( msx_cart );
 DEVICE_IMAGE_UNLOAD( msx_cart );
 
-void msx_vdp_interrupt(running_machine &machine, int i);
+void msx_vdp_interrupt(device_t *, v99x8_device &device, int i);
 
 /* I/O functions */
 READ8_DEVICE_HANDLER( msx_printer_status_r );

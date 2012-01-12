@@ -183,6 +183,6 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 VIDEO_START( apple2 );
 VIDEO_START( apple2p );
 VIDEO_START( apple2e );
-SCREEN_UPDATE( apple2 );
+SCREEN_UPDATE_IND16( apple2 );
 
 #endif /* APPLE2_H_ */

@@ -39,7 +39,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( key_matrix_r );
 	DECLARE_WRITE8_MEMBER( key_matrix_w );
@@ -49,11 +49,6 @@ public:
 	DECLARE_WRITE8_MEMBER( beep_w );
 };
 
-
-bool pc2000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_lcdc->video_update( bitmap, cliprect );
-}
 
 /* TODO: put a breakpoint at 1625 and test the inputs, writes at dce4 are the scancode values */
 READ8_MEMBER( pc2000_state::key_matrix_r )
@@ -340,7 +335,7 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
     MCFG_SCREEN_SIZE(120, 18) //2x20 chars
     MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
 

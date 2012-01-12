@@ -887,7 +887,7 @@ static void draw_sprites(running_machine &machine, const rectangle* rect)
 	state->m_video.sprite_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(128 * (1025-sprite_limit)));
 }
 
-static void towns_crtc_draw_scan_layer_hicolour(running_machine &machine, bitmap_t &bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_hicolour(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
 	towns_state* state = machine.driver_data<towns_state>();
 	UINT32 off = 0;
@@ -1080,7 +1080,7 @@ static void towns_crtc_draw_scan_layer_hicolour(running_machine &machine, bitmap
 	}
 }
 
-static void towns_crtc_draw_scan_layer_256(running_machine &machine, bitmap_t &bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_256(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
 	towns_state* state = machine.driver_data<towns_state>();
 	int off = 0;
@@ -1271,7 +1271,7 @@ static void towns_crtc_draw_scan_layer_256(running_machine &machine, bitmap_t &b
 	}
 }
 
-static void towns_crtc_draw_scan_layer_16(running_machine &machine, bitmap_t &bitmap,const rectangle* rect,int layer,int line,int scanline)
+static void towns_crtc_draw_scan_layer_16(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
 	towns_state* state = machine.driver_data<towns_state>();
 	int off = 0;
@@ -1542,7 +1542,7 @@ static void towns_crtc_draw_scan_layer_16(running_machine &machine, bitmap_t &bi
 	}
 }
 
-static void towns_crtc_draw_layer(running_machine &machine,bitmap_t &bitmap,const rectangle* rect,int layer)
+static void towns_crtc_draw_layer(running_machine &machine,bitmap_rgb32 &bitmap,const rectangle* rect,int layer)
 {
 	towns_state* state = machine.driver_data<towns_state>();
 	int line;
@@ -1798,7 +1798,7 @@ void towns_state::video_start()
 	m_video.sprite_timer = machine().scheduler().timer_alloc(FUNC(towns_sprite_done));
 }
 
-bool towns_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x00000000, cliprect);
 

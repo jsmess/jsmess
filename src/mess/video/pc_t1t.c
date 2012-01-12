@@ -24,7 +24,6 @@
 static PALETTE_INIT( pcjr );
 static VIDEO_START( pc_t1t );
 static VIDEO_START( pc_pcjr );
-static SCREEN_UPDATE( mc6845_t1000 );
 static MC6845_UPDATE_ROW( t1000_update_row );
 static WRITE_LINE_DEVICE_HANDLER( t1000_de_changed );
 static WRITE_LINE_DEVICE_HANDLER( t1000_vsync_changed );
@@ -47,9 +46,8 @@ static const mc6845_interface mc6845_t1000_intf = {
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_t1000 )
 	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE( mc6845_t1000 )
+	MCFG_SCREEN_UPDATE_DEVICE( T1000_MC6845_NAME, mc6845_device, screen_update )
 
 	MCFG_PALETTE_LENGTH( 32 )
 	MCFG_PALETTE_INIT(pcjr)
@@ -76,9 +74,8 @@ static const mc6845_interface mc6845_pcjr_intf = {
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_pcjr )
 	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
-	MCFG_SCREEN_UPDATE( mc6845_t1000 )
+	MCFG_SCREEN_UPDATE_DEVICE( T1000_MC6845_NAME, mc6845_device, screen_update )
 
 	MCFG_PALETTE_LENGTH( 32 )
 	MCFG_PALETTE_INIT(pcjr)
@@ -155,17 +152,10 @@ static struct
 } pcjr = { 0 };
 
 
-static SCREEN_UPDATE( mc6845_t1000 )
-{
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>(T1000_MC6845_NAME);
-	mc6845->update( bitmap, cliprect);
-	return 0;
-}
-
-
 static MC6845_UPDATE_ROW( t1000_text_inten_update_row )
 {
-	UINT16  *p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
 	if ( y == 0 ) logerror("t1000_text_inten_update_row\n");
@@ -183,21 +173,22 @@ static MC6845_UPDATE_ROW( t1000_text_inten_update_row )
 			data = 0xFF;
 		}
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
 
 static MC6845_UPDATE_ROW( t1000_text_blink_update_row )
 {
-	UINT16	*p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32	*p = &bitmap.pix32(y);
 	int i;
 
 	for ( i = 0; i < x_count; i++ )
@@ -224,21 +215,22 @@ static MC6845_UPDATE_ROW( t1000_text_blink_update_row )
 			}
 		}
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
 
 static MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row )
 {
-	UINT16	*p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32	*p = &bitmap.pix32(y);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
@@ -247,24 +239,25 @@ static MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x1fff;
 		UINT8 data = vid[ offset ];
 
-		*p = pcjr.palette_base + pcjr.reg.data[0x10 + ( data >> 4 )]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[0x10 + ( data >> 4 )]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[0x10 + ( data & 0x0F )]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[0x10 + ( data & 0x0F )]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[0x10 + ( data >> 4 )]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[0x10 + ( data >> 4 )]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[0x10 + ( data & 0x0F )]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[0x10 + ( data & 0x0F )]]; p++;
 
 		data = vid[ offset + 1 ];
 
-		*p = pcjr.palette_base + pcjr.reg.data[0x10 + ( data >> 4 )]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[0x10 + ( data >> 4 )]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[0x10 + ( data & 0x0F )]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[0x10 + ( data & 0x0F )]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[0x10 + ( data >> 4 )]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[0x10 + ( data >> 4 )]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[0x10 + ( data & 0x0F )]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[0x10 + ( data & 0x0F )]]; p++;
 	}
 }
 
 
 static MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row )
 {
-	UINT16  *p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32  *p = &bitmap.pix32(y);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
@@ -273,24 +266,25 @@ static MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x1fff;
 		UINT8 data = vid[ offset ];
 
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 6 ) & 0x03 ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 4 ) & 0x03 ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 2 ) & 0x03 ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + (   data        & 0x03 ) ]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 6 ) & 0x03 ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 4 ) & 0x03 ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 2 ) & 0x03 ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + (   data        & 0x03 ) ]]; p++;
 
 		data = vid[ offset+1 ];
 
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 6 ) & 0x03 ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 4 ) & 0x03 ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 2 ) & 0x03 ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + (   data        & 0x03 ) ]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 6 ) & 0x03 ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 4 ) & 0x03 ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( data >> 2 ) & 0x03 ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + (   data        & 0x03 ) ]]; p++;
 	}
 }
 
 
 static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 {
-	UINT16  *p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32  *p = &bitmap.pix32(y);
 	UINT8   *vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
@@ -300,21 +294,22 @@ static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 		UINT8 data0 = vid[ offset ];
 		UINT8 data1 = vid[ offset + 1 ];
 
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x80 ) >> 7 ) | ( ( data1 & 0x80 ) >> 6 ) ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x40 ) >> 6 ) | ( ( data1 & 0x40 ) >> 5 ) ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x20 ) >> 5 ) | ( ( data1 & 0x20 ) >> 4 ) ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x10 ) >> 4 ) | ( ( data1 & 0x10 ) >> 3 ) ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x08 ) >> 3 ) | ( ( data1 & 0x08 ) >> 2 ) ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x04 ) >> 2 ) | ( ( data1 & 0x04 ) >> 1 ) ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x02 ) >> 1 ) | ( ( data1 & 0x02 )      ) ) ]; p++;
-		*p = pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x01 )      ) | ( ( data1 & 0x01 ) << 1 ) ) ]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x80 ) >> 7 ) | ( ( data1 & 0x80 ) >> 6 ) ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x40 ) >> 6 ) | ( ( data1 & 0x40 ) >> 5 ) ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x20 ) >> 5 ) | ( ( data1 & 0x20 ) >> 4 ) ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x10 ) >> 4 ) | ( ( data1 & 0x10 ) >> 3 ) ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x08 ) >> 3 ) | ( ( data1 & 0x08 ) >> 2 ) ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x04 ) >> 2 ) | ( ( data1 & 0x04 ) >> 1 ) ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x02 ) >> 1 ) | ( ( data1 & 0x02 )      ) ) ]]; p++;
+		*p = palette[pcjr.palette_base + pcjr.reg.data[ 0x10 + ( ( ( data0 & 0x01 )      ) | ( ( data1 & 0x01 ) << 1 ) ) ]]; p++;
 	}
 }
 
 
 static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row )
 {
-	UINT16	*p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32	*p = &bitmap.pix32(y);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
 	int i;
 
@@ -325,22 +320,23 @@ static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row )
 		UINT8 data = vid[ offset ];
 		UINT16 data2 = ( vid[ offset + 1 ] ) << 1;
 
-		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x100 ) | ( data & 0x80 ) ) >> 7 ) ]; p++;
-		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x80 ) | ( data & 0x40 ) ) >> 6 ) ]; p++;
-		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x40 ) | ( data & 0x20 ) ) >> 5 ) ]; p++;
-		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x20 ) | ( data & 0x10 ) ) >> 4 ) ]; p++;
+		*p = palette[pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x100 ) | ( data & 0x80 ) ) >> 7 ) ]]; p++;
+		*p = palette[pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x80 ) | ( data & 0x40 ) ) >> 6 ) ]]; p++;
+		*p = palette[pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x40 ) | ( data & 0x20 ) ) >> 5 ) ]]; p++;
+		*p = palette[pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x20 ) | ( data & 0x10 ) ) >> 4 ) ]]; p++;
 
-		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x10 ) | ( data & 0x08 ) ) >> 3 ) ]; p++;
-		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x08 ) | ( data & 0x04 ) ) >> 2 ) ]; p++;
-		*p = pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x04 ) | ( data & 0x02 ) ) >> 1 ) ]; p++;
-		*p = pcjr.reg.data[ 0x10 + (   ( data2 & 0x02 ) | ( data & 0x01 )        ) ]; p++;
+		*p = palette[pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x10 ) | ( data & 0x08 ) ) >> 3 ) ]]; p++;
+		*p = palette[pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x08 ) | ( data & 0x04 ) ) >> 2 ) ]]; p++;
+		*p = palette[pcjr.reg.data[ 0x10 + ( ( ( data2 & 0x04 ) | ( data & 0x02 ) ) >> 1 ) ]]; p++;
+		*p = palette[pcjr.reg.data[ 0x10 + (   ( data2 & 0x02 ) | ( data & 0x01 )        ) ]]; p++;
 	}
 }
 
 
 static MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row )
 {
-	UINT16  *p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32  *p = &bitmap.pix32(y);
 	UINT8	*vid = pcjr.displayram + ( ra << 13 );
 	UINT8	fg = pcjr.palette_base + pcjr.reg.data[0x11];
 	UINT8	bg = pcjr.palette_base + pcjr.reg.data[0x10];
@@ -352,25 +348,25 @@ static MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row )
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x1fff;
 		UINT8 data = vid[ offset ];
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x40 ) ? fg : bg; p++;
-		*p = ( data & 0x20 ) ? fg : bg; p++;
-		*p = ( data & 0x10 ) ? fg : bg; p++;
-		*p = ( data & 0x08 ) ? fg : bg; p++;
-		*p = ( data & 0x04 ) ? fg : bg; p++;
-		*p = ( data & 0x02 ) ? fg : bg; p++;
-		*p = ( data & 0x01 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 
 		data = vid[ offset + 1 ];
 
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x80 ) ? fg : bg; p++;
-		*p = ( data & 0x80 ) ? fg : bg; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
 	}
 }
 

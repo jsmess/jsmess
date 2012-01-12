@@ -246,13 +246,6 @@ static TMS9928A_INTERFACE(tutor_tms9928a_interface)
 	DEVCB_NULL
 };
 
-static SCREEN_UPDATE( tutor )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 static MACHINE_START(tutor)
 {
 }
@@ -761,7 +754,7 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, tutor_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( tutor )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

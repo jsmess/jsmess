@@ -79,7 +79,7 @@ VIDEO_START( mac )
 #define MAC_MAIN_SCREEN_BUF_OFFSET	0x5900
 #define MAC_ALT_SCREEN_BUF_OFFSET	0xD900
 
-SCREEN_UPDATE( mac )
+SCREEN_UPDATE_IND16( mac )
 {
 	UINT32 video_base;
 	const UINT16 *video_ram;
@@ -107,7 +107,7 @@ SCREEN_UPDATE( mac )
 	return 0;
 }
 
-SCREEN_UPDATE( macse30 )
+SCREEN_UPDATE_IND16( macse30 )
 {
 	UINT32 video_base;
 	const UINT16 *video_ram;
@@ -135,7 +135,7 @@ SCREEN_UPDATE( macse30 )
 	return 0;
 }
 
-SCREEN_UPDATE( macprtb )
+SCREEN_UPDATE_IND16( macprtb )
 {
 	const UINT16 *video_ram;
 	UINT16 word;
@@ -161,7 +161,7 @@ SCREEN_UPDATE( macprtb )
 	return 0;
 }
 
-SCREEN_UPDATE( macpb140 )
+SCREEN_UPDATE_IND16( macpb140 )
 {
 	const UINT16 *video_ram;
 	UINT16 word;
@@ -187,7 +187,7 @@ SCREEN_UPDATE( macpb140 )
 	return 0;
 }
 
-SCREEN_UPDATE( macpb160 )
+SCREEN_UPDATE_IND16( macpb160 )
 {
 	UINT16 *line;
 	int y, x;
@@ -381,7 +381,7 @@ VIDEO_START( macv8 )
 	mac->m_rbv_type = RBV_TYPE_V8;
 }
 
-SCREEN_UPDATE( macrbv )
+SCREEN_UPDATE_RGB32( macrbv )
 {
 	UINT32 *scanline;
 	int x, y, hres, vres;
@@ -498,7 +498,7 @@ SCREEN_UPDATE( macrbv )
 	return 0;
 }
 
-SCREEN_UPDATE( macrbvvram )
+SCREEN_UPDATE_RGB32( macrbvvram )
 {
 	UINT32 *scanline;
 	int x, y;
@@ -870,7 +870,7 @@ WRITE32_MEMBER(mac_state::dafb_dac_w)
 	}
 }
 
-SCREEN_UPDATE( macdafb )
+SCREEN_UPDATE_RGB32( macdafb )
 {
 	UINT32 *scanline;
 	int x, y;
@@ -984,7 +984,7 @@ SCREEN_UPDATE( macdafb )
 	return 0;
 }
 
-SCREEN_UPDATE( macpbwd )    /* Color PowerBooks using an off-the-shelf WD video chipset */
+SCREEN_UPDATE_RGB32( macpbwd )    /* Color PowerBooks using an off-the-shelf WD video chipset */
 {
 	UINT32 *scanline;
 	int x, y;

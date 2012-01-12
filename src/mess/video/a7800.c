@@ -74,6 +74,8 @@ VIDEO_START( a7800 )
 	state->m_maria_bcntl = 0;
 	state->m_maria_kangaroo = 0;
 	state->m_maria_rm = 0;
+	
+	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
 /***************************************************************************
@@ -94,7 +96,7 @@ static void maria_draw_scanline(running_machine &machine)
 	UINT16 *scanline;
 
 	/* set up scanline */
-	scanline = &machine.primary_screen->default_bitmap().pix16(state->m_maria_scanline);
+	scanline = &state->m_bitmap.pix16(state->m_maria_scanline);
 	for (i = 0; i < 320; i++)
 		scanline[i] = state->m_maria_backcolor;
 
@@ -427,11 +429,11 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt )
 
 ***************************************************************************/
 /* This routine is called at the start of vblank to refresh the screen */
-SCREEN_UPDATE( a7800 )
+SCREEN_UPDATE_IND16( a7800 )
 {
 	a7800_state *state = screen.machine().driver_data<a7800_state>();
 	state->m_maria_scanline = 0;
-	copybitmap(bitmap, screen.default_bitmap(), 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

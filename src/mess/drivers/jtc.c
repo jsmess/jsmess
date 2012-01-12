@@ -489,7 +489,7 @@ void jtc_state::video_start()
 {
 }
 
-bool jtc_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, sx;
 
@@ -514,7 +514,7 @@ void jtces23_state::video_start()
 {
 }
 
-bool jtces23_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, sx;
 
@@ -555,7 +555,7 @@ void jtces40_state::video_start()
 	save_pointer(NAME(m_color_ram_b), JTC_ES40_VIDEORAM_SIZE);
 }
 
-bool jtces40_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, sx;
 
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(jtc_state, screen_update)
     MCFG_SCREEN_SIZE(64, 64)
     MCFG_SCREEN_VISIBLE_AREA(0, 64-1, 0, 64-1)
 
@@ -690,7 +690,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(jtc_state, screen_update)
     MCFG_SCREEN_SIZE(128, 128)
     MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces40, basic, jtces40_state )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(jtc_state, screen_update)
     MCFG_SCREEN_SIZE(320, 192)
     MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 

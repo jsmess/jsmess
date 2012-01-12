@@ -81,7 +81,7 @@ void electron_interrupt_handler(running_machine &machine, int mode, int interrup
 /*----------- defined in video/electron.c -----------*/
 
 VIDEO_START( electron );
-SCREEN_UPDATE( electron );
+SCREEN_UPDATE_IND16( electron );
 
 
 #endif /* ELECTRON_H_ */

@@ -302,7 +302,7 @@ static TIMER_CALLBACK(osborne1_video_callback)
 		ra = y % 10;
 		/* Draw a line of the display */
 		ma = (state->m_new_start_y + (y/10)) * 128 + state->m_new_start_x;
-		UINT16 *p = &machine.primary_screen->default_bitmap().pix16(y);
+		UINT16 *p = &state->m_bitmap.pix16(y);
 
 		for ( x = 0; x < 52; x++ )
 		{
@@ -409,6 +409,17 @@ DRIVER_INIT( osborne1 )
 	machine.scheduler().timer_set(attotime::zero, FUNC(setup_osborne1));
 }
 
+
+void osborne1_state::video_start()
+{
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+}
+
+UINT32 osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
 
 /****************************************************************
     Osborne1 specific daisy chain code

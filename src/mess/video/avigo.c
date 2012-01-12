@@ -80,7 +80,7 @@ PALETTE_INIT( avigo )
 	palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
 }
 
-bool avigo_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 avigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 	int b;

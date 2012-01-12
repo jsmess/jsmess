@@ -42,7 +42,7 @@ INPUT_PORTS_END
 * Video hardware                                     *
 \****************************************************/
 
-static SCREEN_UPDATE( uzebox )
+static SCREEN_UPDATE_RGB32( uzebox )
 {
 	return 0;
 }
@@ -72,10 +72,9 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.08)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(634, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 633, 0, 479)
-	MCFG_SCREEN_UPDATE(uzebox)
+	MCFG_SCREEN_UPDATE_STATIC(uzebox)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 

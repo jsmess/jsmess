@@ -141,7 +141,7 @@ static const char *const gp2x_regnames[0x200] =
 	"YUV Source region A H",
 };
 #endif
-static SCREEN_UPDATE( gp2x )
+static SCREEN_UPDATE_RGB32( gp2x )
 {
 	gp2x_state *state = screen.machine().driver_data<gp2x_state>();
 	// display enabled?
@@ -359,12 +359,11 @@ static MACHINE_CONFIG_START( gp2x, gp2x_state )
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(gp2x)
+	MCFG_SCREEN_UPDATE_STATIC(gp2x)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END

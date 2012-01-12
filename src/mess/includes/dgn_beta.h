@@ -123,7 +123,7 @@ public:
 	int m_VSyncMin;
 	int m_DEPos;
 	int m_NoScreen;
-	bitmap_t *m_bit;
+	bitmap_ind16 *m_bit;
 	int m_MinAddr;
 	int m_MaxAddr;
 	int m_MinX;
@@ -167,7 +167,6 @@ void dgn_beta_frame_interrupt (running_machine &machine, int data);
 /*----------- defined in video/dgn_beta.c -----------*/
 
 /* mc6845 video display generator */
-extern SCREEN_UPDATE( dgnbeta );
 void dgnbeta_vid_set_gctrl(running_machine &machine, int data);
 
 /* 74HC670 4x4bit colour ram */

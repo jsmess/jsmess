@@ -15,18 +15,18 @@ DECLARE_LEGACY_DEVICE(CRTC_EGA, crtc_ega);
 	MCFG_DEVICE_CONFIG(_intrf)
 
 /* callback definitions */
-typedef void * (*crtc_ega_begin_update_func)(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-#define CRTC_EGA_BEGIN_UPDATE(name)	void *name(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+typedef void * (*crtc_ega_begin_update_func)(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+#define CRTC_EGA_BEGIN_UPDATE(name)	void *name(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
-typedef void (*crtc_ega_update_row_func)(device_t *device, bitmap_t &bitmap,
+typedef void (*crtc_ega_update_row_func)(device_t *device, bitmap_ind16 &bitmap,
 									   const rectangle &cliprect, UINT16 ma, UINT8 ra,
 									   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-#define CRTC_EGA_UPDATE_ROW(name)		void name(device_t *device, bitmap_t &bitmap,	\
+#define CRTC_EGA_UPDATE_ROW(name)		void name(device_t *device, bitmap_ind16 &bitmap,	\
 											  const rectangle &cliprect, UINT16 ma, UINT8 ra,					\
 											  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
-typedef void (*crtc_ega_end_update_func)(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, void *param);
-#define CRTC_EGA_END_UPDATE(name)		void name(device_t *device, bitmap_t &bitmap, const rectangle &cliprect, void *param)
+typedef void (*crtc_ega_end_update_func)(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, void *param);
+#define CRTC_EGA_END_UPDATE(name)		void name(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, void *param)
 
 typedef void (*crtc_ega_on_de_changed_func)(device_t *device, int display_enabled);
 #define CRTC_EGA_ON_DE_CHANGED(name)	void name(device_t *device, int display_enabled)
@@ -102,7 +102,7 @@ void crtc_ega_set_hpixels_per_column(device_t *device, int hpixels_per_column);
 /* updates the screen -- this will call begin_update(),
    followed by update_row() reapeatedly and after all row
    updating is complete, end_update() */
-void crtc_ega_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
+void crtc_ega_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
 #endif

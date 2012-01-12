@@ -18,7 +18,6 @@
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define MACHINE_START_MEMBER(name) void name::machine_start()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 
 class a7000_state : public driver_device
 {
@@ -57,7 +56,8 @@ public:
 	void vidc20_dynamic_screen_change();
 	virtual void machine_reset();
 	virtual void machine_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -261,7 +261,7 @@ WRITE32_MEMBER( a7000_state::a7000_vidc20_w )
 	}
 }
 
-SCREEN_UPDATE_MEMBER( a7000_state )
+UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x_size,y_size,x_start,y_start;
 	int x,y,xi;
@@ -798,9 +798,9 @@ static MACHINE_CONFIG_START( a7000, a7000_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(1900, 1080) //max available size
 	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
+	MCFG_SCREEN_UPDATE_DRIVER(a7000_state, screen_update)
 	MCFG_PALETTE_LENGTH(0x200)
 MACHINE_CONFIG_END
 

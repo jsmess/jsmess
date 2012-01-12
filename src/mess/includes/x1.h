@@ -114,7 +114,7 @@ public:
 };
 
 VIDEO_START( x1 );
-SCREEN_UPDATE( x1 );
+SCREEN_UPDATE_RGB32( x1 );
 
 READ8_HANDLER( x1_sub_io_r );
 WRITE8_HANDLER( x1_sub_io_w );

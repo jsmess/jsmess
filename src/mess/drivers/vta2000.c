@@ -58,7 +58,7 @@ static VIDEO_START( vta2000 )
 	state->m_p_videoram = machine.region("maincpu")->base()+0x8000;
 }
 
-static SCREEN_UPDATE( vta2000 )
+static SCREEN_UPDATE_IND16( vta2000 )
 /* Cursor is missing. */
 {
 	vta2000_state *state = screen.machine().driver_data<vta2000_state>();
@@ -161,11 +161,10 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*8, 25*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
 	MCFG_VIDEO_START(vta2000)
-	MCFG_SCREEN_UPDATE(vta2000)
+	MCFG_SCREEN_UPDATE_STATIC(vta2000)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT(vta2000)
 	MCFG_GFXDECODE(vta2000)

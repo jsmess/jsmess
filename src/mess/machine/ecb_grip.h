@@ -52,7 +52,7 @@ public:
 	DECLARE_READ8_MEMBER( sti_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( speaker_w );
 
-	void crtc_update_row(mc6845_device *device, bitmap_t &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
 protected:
 	// device-level overrides
@@ -64,7 +64,7 @@ protected:
 	// device_ecbbus_card_interface overrides
 	virtual UINT8 ecbbus_io_r(offs_t offset);
 	virtual void ecbbus_io_w(offs_t offset, UINT8 data);
-	virtual bool ecbbus_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual UINT32 ecbbus_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<i8255_device> m_ppi;

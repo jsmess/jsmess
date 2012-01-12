@@ -93,7 +93,7 @@ public:
 
 	void config_memory_map();
 	int keyboard_decode();
-	void update_screen(bitmap_t &bitmap);
+	void update_screen(bitmap_ind16 &bitmap);
 };
 
 

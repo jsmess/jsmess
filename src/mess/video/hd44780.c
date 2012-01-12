@@ -163,7 +163,7 @@ void hd44780_device::set_busy_flag(UINT16 usec)
 //  device interface
 //**************************************************************************
 
-int hd44780_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	assert(height*9 <= bitmap.height() && width*6 <= bitmap.width());
 

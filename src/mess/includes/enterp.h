@@ -22,6 +22,7 @@ public:
 
 	UINT8 exdos_card_value;  /* state of the wd1770 irq/drq lines */
 	UINT8 keyboard_line;     /* index of keyboard line to read */
+	bitmap_ind16 m_bitmap;
 	struct _NICK_STATE *nick;
 };
 
@@ -30,7 +31,7 @@ public:
 
 PALETTE_INIT( epnick );
 VIDEO_START( epnick );
-SCREEN_UPDATE( epnick );
+SCREEN_UPDATE_IND16( epnick );
 
 WRITE8_HANDLER( epnick_reg_w );
 

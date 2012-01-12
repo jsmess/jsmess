@@ -724,10 +724,10 @@ static PALETTE_INIT( ql )
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE( ql )
+//  SCREEN_UPDATE_IND16( ql )
 //-------------------------------------------------
 
-bool ql_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 ql_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_zx8301->update_screen(bitmap, cliprect);
 
@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50.08)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(ql_state, screen_update)
 	MCFG_SCREEN_SIZE(960, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 

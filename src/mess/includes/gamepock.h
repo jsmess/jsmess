@@ -34,7 +34,7 @@ public:
 
 /*----------- defined in machine/gamepock.c -----------*/
 
-SCREEN_UPDATE( gamepock );
+SCREEN_UPDATE_IND16( gamepock );
 
 int gamepock_io_callback( device_t *device, int ioline, int state );
 

@@ -86,7 +86,7 @@ SCREEN_EOF( super80m )
 	}
 }
 
-SCREEN_UPDATE( super80 )
+SCREEN_UPDATE_IND16( super80 )
 {
 	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
@@ -128,7 +128,7 @@ SCREEN_UPDATE( super80 )
 	return 0;
 }
 
-SCREEN_UPDATE( super80d )
+SCREEN_UPDATE_IND16( super80d )
 {
 	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
@@ -170,7 +170,7 @@ SCREEN_UPDATE( super80d )
 	return 0;
 }
 
-SCREEN_UPDATE( super80e )
+SCREEN_UPDATE_IND16( super80e )
 {
 	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
@@ -212,7 +212,7 @@ SCREEN_UPDATE( super80e )
 	return 0;
 }
 
-SCREEN_UPDATE( super80m )
+SCREEN_UPDATE_IND16( super80m )
 {
 	super80_state *state = screen.machine().driver_data<super80_state>();
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
@@ -382,7 +382,7 @@ VIDEO_START( super80v )
 	state->m_p_colorram = machine.region("colorram")->base();
 }
 
-SCREEN_UPDATE( super80v )
+SCREEN_UPDATE_RGB32( super80v )
 {
 	super80_state *state = screen.machine().driver_data<super80_state>();
 	state->m_framecnt++;
@@ -390,16 +390,17 @@ SCREEN_UPDATE( super80v )
 	state->m_cursor = (state->m_mc6845_reg[14]<<8) | state->m_mc6845_reg[15]; // get cursor position
 	state->m_s_options=input_port_read(screen.machine(), "CONFIG");
 	output_set_value("cass_led",(state->m_shared & 0x20) ? 1 : 0);
-	state->m_6845->update(bitmap, cliprect);
+	state->m_6845->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
 MC6845_UPDATE_ROW( super80v_update_row )
 {
 	super80_state *state = device->machine().driver_data<super80_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)				// for each character
 	{
@@ -437,13 +438,13 @@ MC6845_UPDATE_ROW( super80v_update_row )
 		gfx = state->m_p_pcgram[(chr<<4) | ra] ^ inv;
 
 		/* Display a scanline of a character */
-		*p++ = BIT(gfx, 7) ? fg : bg;
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		*p++ = BIT(gfx, 1) ? fg : bg;
+		*p++ = palette[BIT(gfx, 7) ? fg : bg];
+		*p++ = palette[BIT(gfx, 6) ? fg : bg];
+		*p++ = palette[BIT(gfx, 5) ? fg : bg];
+		*p++ = palette[BIT(gfx, 4) ? fg : bg];
+		*p++ = palette[BIT(gfx, 3) ? fg : bg];
+		*p++ = palette[BIT(gfx, 2) ? fg : bg];
+		*p++ = palette[BIT(gfx, 1) ? fg : bg];
 	}
 }
 

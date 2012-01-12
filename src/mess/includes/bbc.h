@@ -185,7 +185,7 @@ public:
 	UINT16 *m_BBC_display;
 	UINT16 *m_BBC_display_left;
 	UINT16 *m_BBC_display_right;
-	bitmap_t *m_BBC_bitmap;
+	bitmap_ind16 *m_BBC_bitmap;
 	int m_y_screen_pos;
 	unsigned char m_pixel_bits[256];
 	int m_BBC_HSync;
@@ -307,7 +307,7 @@ VIDEO_START( bbca );
 VIDEO_START( bbcb );
 VIDEO_START( bbcbp );
 VIDEO_START( bbcm );
-SCREEN_UPDATE( bbc );
+SCREEN_UPDATE_IND16( bbc );
 
 void bbc_draw_RGB_in(device_t *device, int offset, int data);
 void bbc_set_video_memory_lookups(running_machine &machine, int ramsize);

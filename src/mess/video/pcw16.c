@@ -48,7 +48,7 @@ static const rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
 };
 
 
-INLINE void pcw16_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
@@ -64,7 +64,7 @@ VIDEO_START( pcw16 )
 }
 
 /* 640, 1 bit per pixel */
-static void pcw16_vh_decode_mode0(pcw16_state *state, bitmap_t &bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode0(pcw16_state *state, bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int local_byte;
@@ -87,7 +87,7 @@ static void pcw16_vh_decode_mode0(pcw16_state *state, bitmap_t &bitmap, int x, i
 }
 
 /* 320, 2 bits per pixel */
-static void pcw16_vh_decode_mode1(pcw16_state *state, bitmap_t &bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode1(pcw16_state *state, bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int px;
@@ -118,7 +118,7 @@ static void pcw16_vh_decode_mode1(pcw16_state *state, bitmap_t &bitmap, int x, i
 }
 
 /* 160, 4 bits per pixel */
-static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_t &bitmap, int x, int y, unsigned char byte)
+static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
 {
 	int px;
 	int b;
@@ -150,11 +150,11 @@ static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_t &bitmap, int x, i
 }
 
 /***************************************************************************
-  Draw the game screen in the given bitmap_t.
+  Draw the game screen in the given bitmap_ind16.
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-SCREEN_UPDATE( pcw16 )
+SCREEN_UPDATE_IND16( pcw16 )
 {
 	pcw16_state *state = screen.machine().driver_data<pcw16_state>();
 	UINT8 *ram = screen.machine().device<ram_device>(RAM_TAG)->pointer();

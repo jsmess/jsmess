@@ -1026,7 +1026,7 @@ static NVRAM_HANDLER( px4_ramdisk )
     VIDEO EMULATION
 ***************************************************************************/
 
-static SCREEN_UPDATE( px4 )
+static SCREEN_UPDATE_IND16( px4 )
 {
 	px4_state *px4 = screen.machine().driver_data<px4_state>();
 
@@ -1368,10 +1368,9 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(72)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(240, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
-	MCFG_SCREEN_UPDATE(px4)
+	MCFG_SCREEN_UPDATE_STATIC(px4)
 
 	MCFG_DEFAULT_LAYOUT(layout_px4)
 

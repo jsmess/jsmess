@@ -59,12 +59,12 @@ public:
 	UINT8 m_input_port1;
 
 	// for gamegear LCD persistence hack
-	bitmap_t m_tmp_bitmap;
-	bitmap_t m_prev_bitmap;
+	bitmap_rgb32 m_tmp_bitmap;
+	bitmap_rgb32 m_prev_bitmap;
 
 	// for 3D glass binocular hack
-	bitmap_t m_prevleft_bitmap;
-	bitmap_t m_prevright_bitmap;
+	bitmap_rgb32 m_prevleft_bitmap;
+	bitmap_rgb32 m_prevright_bitmap;
 
 	/* Model identifiers */
 	UINT8 m_is_gamegear;
@@ -193,8 +193,8 @@ DRIVER_INIT( gamegeaj );
 
 VIDEO_START( sms1 );
 VIDEO_START( gamegear );
-SCREEN_UPDATE( sms1 );
-SCREEN_UPDATE( sms );
-SCREEN_UPDATE( gamegear );
+SCREEN_UPDATE_RGB32( sms1 );
+SCREEN_UPDATE_RGB32( sms );
+SCREEN_UPDATE_RGB32( gamegear );
 
 #endif /* SMS_H_ */

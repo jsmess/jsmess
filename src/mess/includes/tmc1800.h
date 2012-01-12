@@ -39,7 +39,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_READ8_MEMBER( dispon_r );
@@ -68,7 +68,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_READ_LINE_MEMBER( clear_r );
@@ -99,7 +99,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -145,7 +145,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );

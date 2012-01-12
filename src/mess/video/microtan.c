@@ -51,7 +51,7 @@ VIDEO_START( microtan )
 	state->m_chunky_graphics = 0;
 }
 
-SCREEN_UPDATE( microtan )
+SCREEN_UPDATE_IND16( microtan )
 {
 	microtan_state *state = screen.machine().driver_data<microtan_state>();
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);

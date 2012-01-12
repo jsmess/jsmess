@@ -80,7 +80,7 @@ extern MACHINE_START( c128 );
 extern MACHINE_RESET( c128 );
 extern INTERRUPT_GEN( c128_frame_interrupt );
 
-extern SCREEN_UPDATE( c128 );
+extern SCREEN_UPDATE_IND16( c128 );
 
 void c128_bankswitch_64(running_machine &machine, int reset);
 

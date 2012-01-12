@@ -502,7 +502,7 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
 
 	/* video hardware */
-    MCFG_SCREEN_MC6847_PAL_ADD("lx388")
+    MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
 
 	MCFG_DEFAULT_LAYOUT(layout_z80net)
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( z80netb, z80ne_state )
 	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
 
 	/* video hardware */
-    MCFG_SCREEN_MC6847_PAL_ADD("lx388")
+    MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
 
 	MCFG_DEFAULT_LAYOUT(layout_z80netb)
@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
 
 	/* video hardware */
-    MCFG_SCREEN_MC6847_PAL_ADD("lx388")
+    MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, z80net_mc6847_intf)
 
 	MCFG_FD1771_ADD("wd1771", default_wd17xx_interface)

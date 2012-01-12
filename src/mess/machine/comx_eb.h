@@ -67,7 +67,7 @@ protected:
 	virtual void comx_mwr_w(offs_t offset, UINT8 data);
 	virtual UINT8 comx_io_r(offs_t offset);
 	virtual void comx_io_w(offs_t offset, UINT8 data);
-	virtual bool comx_screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual UINT32 comx_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// internal state
 	comx_expansion_slot_device *m_owner_slot;

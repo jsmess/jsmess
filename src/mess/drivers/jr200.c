@@ -98,7 +98,7 @@ static VIDEO_START( jr200 )
 {
 }
 
-static SCREEN_UPDATE( jr200 )
+static SCREEN_UPDATE_IND16( jr200 )
 {
 	jr200_state *state = screen.machine().driver_data<jr200_state>();
 	int x,y,xi,yi,pen;
@@ -504,10 +504,9 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
 	MCFG_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
-	MCFG_SCREEN_UPDATE(jr200)
+	MCFG_SCREEN_UPDATE_STATIC(jr200)
 
 	MCFG_GFXDECODE(jr200)
 	MCFG_PALETTE_LENGTH(8)

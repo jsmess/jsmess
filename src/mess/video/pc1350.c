@@ -129,7 +129,7 @@ static const int pc1350_addr[4]={ 0, 0x40, 0x1e, 0x5e };
 #define DOWN 45
 #define RIGHT 76
 
-SCREEN_UPDATE( pc1350 )
+SCREEN_UPDATE_IND16( pc1350 )
 {
 	pc1350_state *state = screen.machine().driver_data<pc1350_state>();	/* The contrast colours need some work done - select contrast level 7 for now */
 	int x, y=DOWN, i, j, k=0, b;

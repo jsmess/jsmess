@@ -7,7 +7,7 @@
   Krzysztof Strzecha
 
   All video modes are emulated but not fully tested yet.
-  SCREEN_UPDATE function needs strong cleanup and optimalisation.
+  SCREEN_UPDATE_IND16 function needs strong cleanup and optimalisation.
 
 
 ***************************************************************************/
@@ -55,7 +55,7 @@ VIDEO_START( dai )
 {
 }
 
-SCREEN_UPDATE( dai )
+SCREEN_UPDATE_IND16( dai )
 {
 	dai_state *state = screen.machine().driver_data<dai_state>();
 	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);

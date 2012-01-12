@@ -118,13 +118,6 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 	RES_K(4.7)	/* R4 */
 };
 
-bool eti660_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_cti->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 /* CDP1802 Interface */
 
 READ_LINE_MEMBER( eti660_state::clear_r )
@@ -265,6 +258,7 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 
     /* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_8_867238MHz/5)
+	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(8+8)
 

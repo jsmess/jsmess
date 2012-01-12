@@ -20,7 +20,7 @@ public:
                                 be edited - the existence of this register is a personnal
                                 guess */
 
-	bitmap_t *m_bitmap;
+	bitmap_ind16 *m_bitmap;
 
 	UINT32 m_old_edit_keys;
 	int m_old_control_keys;
@@ -553,12 +553,12 @@ static VIDEO_START( apexc )
 	int width = screen->width();
 	int height = screen->height();
 
-	state->m_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_bitmap = auto_bitmap_ind16_alloc(machine, width, height);
 	state->m_bitmap->fill(0, /*machine.visible_area*/teletyper_window);
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
-static void apexc_draw_led(bitmap_t &bitmap, int x, int y, int state)
+static void apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
@@ -568,14 +568,14 @@ static void apexc_draw_led(bitmap_t &bitmap, int x, int y, int state)
 }
 
 /* write a single char on screen */
-static void apexc_draw_char(running_machine &machine, bitmap_t &bitmap, char character, int x, int y, int color)
+static void apexc_draw_char(running_machine &machine, bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
 	drawgfx_transpen(bitmap, bitmap.cliprect(), machine.gfx[0], character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
 /* write a string on screen */
-static void apexc_draw_string(running_machine &machine, bitmap_t &bitmap, const char *buf, int x, int y, int color)
+static void apexc_draw_string(running_machine &machine, bitmap_ind16 &bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
@@ -587,7 +587,7 @@ static void apexc_draw_string(running_machine &machine, bitmap_t &bitmap, const 
 }
 
 
-static SCREEN_UPDATE( apexc )
+static SCREEN_UPDATE_IND16( apexc )
 {
 	apexc_state *state = screen.machine().driver_data<apexc_state>();
 	int i;
@@ -874,10 +874,9 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE(apexc)
+	MCFG_SCREEN_UPDATE_STATIC(apexc)
 
 	MCFG_GFXDECODE(apexc)
 	MCFG_PALETTE_LENGTH(APEXC_PALETTE_SIZE)

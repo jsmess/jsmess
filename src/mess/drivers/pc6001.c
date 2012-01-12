@@ -201,7 +201,7 @@ static VIDEO_START( pc6001 )
 }
 
 /* this is known as gfx mode 4 */
-static void draw_gfx_mode4(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int attr)
+static void draw_gfx_mode4(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int attr)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
 	int x,y,xi;
@@ -254,7 +254,7 @@ static void draw_gfx_mode4(running_machine &machine, bitmap_t &bitmap,const rect
 	}
 }
 
-static void draw_bitmap_2bpp(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int attr)
+static void draw_bitmap_2bpp(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int attr)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
 	int color,x,y,xi,yi;
@@ -286,7 +286,7 @@ static void draw_bitmap_2bpp(running_machine &machine, bitmap_t &bitmap,const re
 	}
 }
 
-static void draw_tile_3bpp(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr)
+static void draw_tile_3bpp(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr)
 {
 	int color,pen,xi,yi;
 
@@ -318,7 +318,7 @@ static void draw_tile_3bpp(running_machine &machine, bitmap_t &bitmap,const rect
 	}
 }
 
-static void draw_tile_text(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847)
+static void draw_tile_text(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int tile,int attr,int has_mc6847)
 {
 	int xi,yi,pen,fgcol,color;
 	UINT8 *gfx_data = machine.region("gfx1")->base();
@@ -354,7 +354,7 @@ static void draw_tile_text(running_machine &machine, bitmap_t &bitmap,const rect
 	}
 }
 
-static void draw_border(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int attr,int has_mc6847)
+static void draw_border(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int attr,int has_mc6847)
 {
 	int x,y,color;
 
@@ -376,7 +376,7 @@ static void draw_border(running_machine &machine, bitmap_t &bitmap,const rectang
 	}
 }
 
-static void pc6001_screen_draw(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect, int has_mc6847)
+static void pc6001_screen_draw(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847)
 {
 	pc6001_state *state = machine.driver_data<pc6001_state>();
 	int x,y;
@@ -419,14 +419,14 @@ static void pc6001_screen_draw(running_machine &machine, bitmap_t &bitmap,const 
 	}
 }
 
-static SCREEN_UPDATE( pc6001 )
+static SCREEN_UPDATE_IND16( pc6001 )
 {
 	pc6001_screen_draw(screen.machine(),bitmap,cliprect,1);
 
 	return 0;
 }
 
-static SCREEN_UPDATE( pc6001m2 )
+static SCREEN_UPDATE_IND16( pc6001m2 )
 {
 	pc6001_state *state = screen.machine().driver_data<pc6001_state>();
 	int x,y,tile,attr;
@@ -568,7 +568,7 @@ static SCREEN_UPDATE( pc6001m2 )
 	return 0;
 }
 
-static SCREEN_UPDATE( pc6001sr )
+static SCREEN_UPDATE_IND16( pc6001sr )
 {
 	pc6001_state *state = screen.machine().driver_data<pc6001_state>();
 	int x,y,tile,attr;
@@ -2286,11 +2286,9 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE(pc6001)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_STATIC(pc6001)
 //  MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-//  MCFG_SCREEN_UPDATE(m6847)
-//  MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+//  MCFG_SCREEN_UPDATE_STATIC(m6847)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
@@ -2333,7 +2331,7 @@ static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 	MCFG_MACHINE_RESET(pc6001m2)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(pc6001m2)
+	MCFG_SCREEN_UPDATE_STATIC(pc6001m2)
 	MCFG_PALETTE_LENGTH(16+16)
 	MCFG_PALETTE_INIT(pc6001m2)
 
@@ -2360,7 +2358,7 @@ static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
 	MCFG_MACHINE_RESET(pc6001sr)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(pc6001sr)
+	MCFG_SCREEN_UPDATE_STATIC(pc6001sr)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models

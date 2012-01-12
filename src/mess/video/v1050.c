@@ -53,6 +53,7 @@ WRITE8_MEMBER( v1050_state::videoram_w )
 static MC6845_UPDATE_ROW( v1050_update_row )
 {
 	v1050_state *state = device->machine().driver_data<v1050_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	int column, bit;
 
@@ -79,7 +80,7 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
 
-			bitmap.pix16(y, x) = color;
+			bitmap.pix32(y, x) = palette[color];
 
 			data <<= 1;
 		}
@@ -128,22 +129,13 @@ void v1050_state::video_start()
 	save_pointer(NAME(m_attr_ram), V1050_VIDEORAM_SIZE);
 }
 
-/* Video Update */
-
-bool v1050_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_crtc->update(bitmap, cliprect);
-
-	return 0;
-}
-
 /* Machine Drivers */
 
 MACHINE_CONFIG_FRAGMENT( v1050_video )
 	MCFG_MC6845_ADD(H46505_TAG, H46505, XTAL_15_36MHz/8, crtc_intf)
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE(H46505_TAG, h46505_device, screen_update)
 
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

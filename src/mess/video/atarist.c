@@ -158,7 +158,7 @@ void st_state::shifter_tick()
 		break;
 	}
 
-	machine().primary_screen->default_bitmap().pix32(y, x) = pen;
+	m_bitmap.pix32(y, x) = pen;
 }
 
 
@@ -251,36 +251,36 @@ void st_state::glue_tick()
 	{
 	case 0:
 		pen = shift_mode_0();
-		machine().primary_screen->default_bitmap().pix32(y, x) = pen;
-		machine().primary_screen->default_bitmap().pix32(y, x+1) = pen;
+		m_bitmap.pix32(y, x) = pen;
+		m_bitmap.pix32(y, x+1) = pen;
 		pen = shift_mode_0();
-		machine().primary_screen->default_bitmap().pix32(y, x+2) = pen;
-		machine().primary_screen->default_bitmap().pix32(y, x+3) = pen;
+		m_bitmap.pix32(y, x+2) = pen;
+		m_bitmap.pix32(y, x+3) = pen;
 		pen = shift_mode_0();
-		machine().primary_screen->default_bitmap().pix32(y, x+4) = pen;
-		machine().primary_screen->default_bitmap().pix32(y, x+5) = pen;
+		m_bitmap.pix32(y, x+4) = pen;
+		m_bitmap.pix32(y, x+5) = pen;
 		pen = shift_mode_0();
-		machine().primary_screen->default_bitmap().pix32(y, x+6) = pen;
-		machine().primary_screen->default_bitmap().pix32(y, x+7) = pen;
+		m_bitmap.pix32(y, x+6) = pen;
+		m_bitmap.pix32(y, x+7) = pen;
 		break;
 
 	case 1:
 		pen = shift_mode_1();
-		machine().primary_screen->default_bitmap().pix32(y, x) = pen;
+		m_bitmap.pix32(y, x) = pen;
 		pen = shift_mode_1();
-		machine().primary_screen->default_bitmap().pix32(y, x+1) = pen;
+		m_bitmap.pix32(y, x+1) = pen;
 		pen = shift_mode_1();
-		machine().primary_screen->default_bitmap().pix32(y, x+2) = pen;
+		m_bitmap.pix32(y, x+2) = pen;
 		pen = shift_mode_1();
-		machine().primary_screen->default_bitmap().pix32(y, x+3) = pen;
+		m_bitmap.pix32(y, x+3) = pen;
 		pen = shift_mode_1();
-		machine().primary_screen->default_bitmap().pix32(y, x+4) = pen;
+		m_bitmap.pix32(y, x+4) = pen;
 		pen = shift_mode_1();
-		machine().primary_screen->default_bitmap().pix32(y, x+5) = pen;
+		m_bitmap.pix32(y, x+5) = pen;
 		pen = shift_mode_1();
-		machine().primary_screen->default_bitmap().pix32(y, x+6) = pen;
+		m_bitmap.pix32(y, x+6) = pen;
 		pen = shift_mode_1();
-		machine().primary_screen->default_bitmap().pix32(y, x+7) = pen;
+		m_bitmap.pix32(y, x+7) = pen;
 		break;
 
 	case 2:
@@ -1114,6 +1114,8 @@ void st_state::video_start()
 //  m_shifter_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
 	m_glue_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
 
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+
 	/* register for state saving */
 	save_item(NAME(m_shifter_base));
 	save_item(NAME(m_shifter_ofs));
@@ -1170,3 +1172,11 @@ void ste_state::video_start()
 void stbook_state::video_start()
 {
 }
+
+
+UINT32 st_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+

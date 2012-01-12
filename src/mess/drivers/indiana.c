@@ -56,7 +56,7 @@ static VIDEO_START( indiana )
 	state->m_p_chargen = machine.region("user1")->base()+chargens[rom_system_bios(machine)-1];
 }
 
-static SCREEN_UPDATE( indiana )
+static SCREEN_UPDATE_IND16( indiana )
 {
 	indiana_state *state = screen.machine().driver_data<indiana_state>();
 	UINT8 y,ra,chr,gfx,fg;
@@ -120,11 +120,10 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_VIDEO_START(indiana)
-	MCFG_SCREEN_UPDATE(indiana)
+	MCFG_SCREEN_UPDATE_STATIC(indiana)
 	MCFG_GFXDECODE(indiana)
 	MCFG_PALETTE_LENGTH(8)
 	//MCFG_PALETTE_INIT(black_and_white)

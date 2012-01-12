@@ -31,12 +31,11 @@
 
 #define VRAM_SIZE	(0x400000)
 
-static SCREEN_UPDATE( specpdq );
+static SCREEN_UPDATE_RGB32( specpdq );
 
 MACHINE_CONFIG_FRAGMENT( specpdq )
 	MCFG_SCREEN_ADD( SPECPDQ_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE(specpdq)
+	MCFG_SCREEN_UPDATE_STATIC(specpdq)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(1280,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 844-1)
@@ -154,7 +153,7 @@ void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, i
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( specpdq )
+static SCREEN_UPDATE_RGB32( specpdq )
 {
 	UINT32 *scanline;
 	int x, y;

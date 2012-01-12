@@ -62,7 +62,7 @@ static VIDEO_START( myb3k )
 #define mc6845_update_addr  	(((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
 
 
-static SCREEN_UPDATE( myb3k )
+static SCREEN_UPDATE_IND16( myb3k )
 {
 	myb3k_state *state = screen.machine().driver_data<myb3k_state>();
 	int x,y;
@@ -277,11 +277,10 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_VIDEO_START(myb3k)
-	MCFG_SCREEN_UPDATE(myb3k)
+	MCFG_SCREEN_UPDATE_STATIC(myb3k)
 	MCFG_GFXDECODE(myb3k)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

@@ -57,7 +57,7 @@ static VIDEO_START( bmjr )
 	state->m_p_chargen = machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( bmjr )
+static SCREEN_UPDATE_IND16( bmjr )
 {
 	bmjr_state *state = screen.machine().driver_data<bmjr_state>();
 	UINT8 y,ra,chr,gfx,fg=4;
@@ -354,11 +354,10 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_VIDEO_START(bmjr)
-	MCFG_SCREEN_UPDATE(bmjr)
+	MCFG_SCREEN_UPDATE_STATIC(bmjr)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(bmjr)
 	MCFG_GFXDECODE(bmjr)

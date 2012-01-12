@@ -87,7 +87,7 @@ struct _s3c44b0_interface
 DEVICE_GET_INFO( s3c44b0 );
 
 VIDEO_START( s3c44b0 );
-SCREEN_UPDATE( s3c44b0 );
+SCREEN_UPDATE_RGB32( s3c44b0 );
 
 void s3c44b0_request_eint( device_t *device, UINT32 number);
 

@@ -170,7 +170,7 @@ void crt_eof(device_t *device)
 
     update the bitmap
 */
-void crt_update(device_t *device, bitmap_t &bitmap)
+void crt_update(device_t *device, bitmap_ind16 &bitmap)
 {
 	crt_t *crt = get_safe_token(device);
 	int i, p_i;

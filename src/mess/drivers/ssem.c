@@ -392,7 +392,7 @@ static const UINT8 char_glyphs[0x80][8] =
 	{ 0xff, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xff },
 };
 
-static void glyph_print(running_machine &machine, bitmap_t &bitmap, INT32 x, INT32 y, const char *msg, ...)
+static void glyph_print(running_machine &machine, bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char *msg, ...)
 {
 	va_list arg_list;
 	char buf[32768];
@@ -441,7 +441,7 @@ static void glyph_print(running_machine &machine, bitmap_t &bitmap, INT32 x, INT
 	}
 }
 
-static SCREEN_UPDATE( ssem )
+static SCREEN_UPDATE_RGB32( ssem )
 {
 	ssem_state *state = screen.machine().driver_data<ssem_state>();
 	UINT32 line = 0;
@@ -641,10 +641,9 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(256, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
-	MCFG_SCREEN_UPDATE(ssem)
+	MCFG_SCREEN_UPDATE_STATIC(ssem)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 

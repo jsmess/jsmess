@@ -27,13 +27,13 @@
 
 
 
-static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t &bitmap);
-static void pdp1_draw_panel(running_machine &machine, bitmap_t &bitmap);
+static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_ind16 &bitmap);
+static void pdp1_draw_panel(running_machine &machine, bitmap_ind16 &bitmap);
 
-static void pdp1_erase_lightpen(pdp1_state *state, bitmap_t &bitmap);
-static void pdp1_draw_lightpen(pdp1_state *state, bitmap_t &bitmap);
+static void pdp1_erase_lightpen(pdp1_state *state, bitmap_ind16 &bitmap);
+static void pdp1_draw_lightpen(pdp1_state *state, bitmap_ind16 &bitmap);
 
-INLINE void pdp1_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = color;
 }
@@ -47,8 +47,8 @@ VIDEO_START( pdp1 )
 	state->m_typewriter_color = color_typewriter_black;
 
 	/* alloc bitmaps for our private fun */
-	state->m_panel_bitmap.allocate(panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
-	state->m_typewriter_bitmap.allocate(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
+	state->m_panel_bitmap.allocate(panel_window_width, panel_window_height, BITMAP_FORMAT_IND16);
+	state->m_typewriter_bitmap.allocate(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_IND16);
 
 	/* set up out bitmaps */
 	pdp1_draw_panel_backdrop(machine, state->m_panel_bitmap);
@@ -83,7 +83,7 @@ void pdp1_plot(running_machine &machine, int x, int y)
 /*
     video_update_pdp1: effectively redraw the screen
 */
-SCREEN_UPDATE( pdp1 )
+SCREEN_UPDATE_IND16( pdp1 )
 {
 	pdp1_state *state = screen.machine().driver_data<pdp1_state>();
 	pdp1_erase_lightpen(state, bitmap);
@@ -148,7 +148,7 @@ enum
 };
 
 /* draw a small 8*8 LED (or is this a lamp? ) */
-static void pdp1_draw_led(running_machine &machine, bitmap_t &bitmap, int x, int y, int state)
+static void pdp1_draw_led(running_machine &machine, bitmap_ind16 &bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
@@ -158,7 +158,7 @@ static void pdp1_draw_led(running_machine &machine, bitmap_t &bitmap, int x, int
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
-static void pdp1_draw_multipleled(running_machine &machine, bitmap_t &bitmap, int x, int y, int value, int nb_bits)
+static void pdp1_draw_multipleled(running_machine &machine, bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -172,7 +172,7 @@ static void pdp1_draw_multipleled(running_machine &machine, bitmap_t &bitmap, in
 
 
 /* draw a small 8*8 switch */
-static void pdp1_draw_switch(running_machine &machine, bitmap_t &bitmap, int x, int y, int state)
+static void pdp1_draw_switch(running_machine &machine, bitmap_ind16 &bitmap, int x, int y, int state)
 {
 	int xx, yy;
 	int i;
@@ -213,7 +213,7 @@ static void pdp1_draw_switch(running_machine &machine, bitmap_t &bitmap, int x, 
 
 
 /* draw nb_bits switches which represent nb_bits bits in value */
-static void pdp1_draw_multipleswitch(running_machine &machine, bitmap_t &bitmap, int x, int y, int value, int nb_bits)
+static void pdp1_draw_multipleswitch(running_machine &machine, bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -227,14 +227,14 @@ static void pdp1_draw_multipleswitch(running_machine &machine, bitmap_t &bitmap,
 
 
 /* write a single char on screen */
-static void pdp1_draw_char(running_machine &machine, bitmap_t &bitmap, char character, int x, int y, int color)
+static void pdp1_draw_char(running_machine &machine, bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
 	drawgfx_transpen(bitmap, bitmap.cliprect(), machine.gfx[0], character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
 /* write a string on screen */
-static void pdp1_draw_string(running_machine &machine, bitmap_t &bitmap, const char *buf, int x, int y, int color)
+static void pdp1_draw_string(running_machine &machine, bitmap_ind16 &bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
@@ -249,7 +249,7 @@ static void pdp1_draw_string(running_machine &machine, bitmap_t &bitmap, const c
 /*
     draw the operator control panel (fixed backdrop)
 */
-static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t &bitmap)
+static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	pdp1_state *state = machine.driver_data<pdp1_state>();
 	/* fill with black */
@@ -302,7 +302,7 @@ static void pdp1_draw_panel_backdrop(running_machine &machine, bitmap_t &bitmap)
 /*
     draw the operator control panel (dynamic elements)
 */
-static void pdp1_draw_panel(running_machine &machine, bitmap_t &bitmap)
+static void pdp1_draw_panel(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	/* column 1: registers, test word, test address */
 	pdp1_draw_multipleled(machine, bitmap, x_panel_col1_offset+16, y_panel_pc_offset+8, cpu_get_reg(machine.device("maincpu"), PDP1_PC), 16);
@@ -499,7 +499,7 @@ void pdp1_update_lightpen_state(running_machine &machine, const lightpen_t *new_
 }
 
 #if 1
-static void pdp1_draw_circle(bitmap_t &bitmap, int x, int y, int radius, int color_)
+static void pdp1_draw_circle(bitmap_ind16 &bitmap, int x, int y, int radius, int color_)
 {
 	int interval;
 	int a;
@@ -534,7 +534,7 @@ static void pdp1_draw_circle(bitmap_t &bitmap, int x, int y, int radius, int col
 	}
 }
 #else
-static void pdp1_draw_circle(bitmap_t &bitmap, int x, int y, int radius, int color)
+static void pdp1_draw_circle(bitmap_ind16 &bitmap, int x, int y, int radius, int color)
 {
 	float fx, fy;
 	float interval;
@@ -566,7 +566,7 @@ static void pdp1_draw_circle(bitmap_t &bitmap, int x, int y, int radius, int col
 }
 #endif
 
-static void pdp1_erase_lightpen(pdp1_state *state, bitmap_t &bitmap)
+static void pdp1_erase_lightpen(pdp1_state *state, bitmap_ind16 &bitmap)
 {
 	if (state->m_previous_lightpen_state.active)
 	{
@@ -584,7 +584,7 @@ static void pdp1_erase_lightpen(pdp1_state *state, bitmap_t &bitmap)
 	}
 }
 
-static void pdp1_draw_lightpen(pdp1_state *state, bitmap_t &bitmap)
+static void pdp1_draw_lightpen(pdp1_state *state, bitmap_ind16 &bitmap)
 {
 	if (state->m_lightpen_state.active)
 	{

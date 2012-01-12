@@ -45,7 +45,6 @@ public:
 
 protected:
 	virtual void device_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	virtual void update_cart_base(UINT8 *cart_base);
 
 	/* PIA1 */

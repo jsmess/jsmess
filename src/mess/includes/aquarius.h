@@ -27,6 +27,6 @@ WRITE8_HANDLER( aquarius_colorram_w );
 
 PALETTE_INIT( aquarius );
 VIDEO_START( aquarius );
-SCREEN_UPDATE( aquarius );
+SCREEN_UPDATE_IND16( aquarius );
 
 #endif /* AQUARIUS_H_ */

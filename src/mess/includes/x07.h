@@ -163,7 +163,7 @@ public:
 
 	void machine_start();
 	void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( x07_io_r );
 	DECLARE_WRITE8_MEMBER( x07_io_w );
 

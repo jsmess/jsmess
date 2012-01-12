@@ -143,7 +143,8 @@ void ef9345_device::device_start()
 	m_videoram = space(0);
 	m_charset = region();
 
-	m_screen_out.allocate(496, m_screen->height() , BITMAP_FORMAT_INDEXED16);
+	m_screen_out.allocate(496, m_screen->height());
+	m_screen_out.set_palette(machine().palette);
 
 	m_blink_timer->adjust(attotime::from_msec(500), 0, attotime::from_msec(500));
 
@@ -229,9 +230,10 @@ void ef9345_device::draw_char_40(UINT8 *c, UINT16 x, UINT16 y)
 	if (y * 10 >= m_screen->height() || x * 8 >= m_screen->width())
 		return;
 
+	const rgb_t *palette = palette_entry_list_raw(m_screen_out.palette());
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 8; j++)
-				m_screen_out.pix16(y * 10 + i, x * 8 + j)  = c[8 * i + j] & 0x07;
+				m_screen_out.pix32(y * 10 + i, x * 8 + j)  = palette[c[8 * i + j] & 0x07];
 }
 
 // draw a char in 80 char line mode
@@ -241,9 +243,10 @@ void ef9345_device::draw_char_80(UINT8 *c, UINT16 x, UINT16 y)
 	if (y * 10 >= m_screen->height() || x * 6 >= m_screen->width())
 		return;
 
+	const rgb_t *palette = palette_entry_list_raw(m_screen_out.palette());
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 6; j++)
-				m_screen_out.pix16(y * 10 + i, x * 6 + j)  = c[6 * i + j] & 0x07;
+				m_screen_out.pix32(y * 10 + i, x * 6 + j)  = palette[c[6 * i + j] & 0x07];
 }
 
 
@@ -955,9 +958,10 @@ void ef9345_device::ef9345_exec(UINT8 cmd)
             EF9345 interface
 **************************************************************/
 
-void ef9345_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 ef9345_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_screen_out, 0, 0, 0, 0, cliprect);
+	return 0;
 }
 
 void ef9345_device::update_scanline(UINT16 scanline)

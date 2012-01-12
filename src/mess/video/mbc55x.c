@@ -90,6 +90,7 @@ static void video_debug(running_machine &machine, int ref, int params, const cha
 static MC6845_UPDATE_ROW( vid_update_row )
 {
 	mbc55x_state *mstate = device->machine().driver_data<mbc55x_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	UINT8	*ram	= &mstate->m_ram->pointer()[0];
 	UINT8	*red	= &mstate->m_video_mem[RED_PLANE_OFFSET];
@@ -142,7 +143,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 
 			colour=(rb<<2) | (gb<<1) | (bb<<0);
 
-			bitmap.pix16(y, (x_pos*8)+pixelno)=colour;
+			bitmap.pix32(y, (x_pos*8)+pixelno)=palette[colour];
 			//logerror("set pixel (%d,%d)=%d\n",y, ((x_pos*8)+pixelno),colour);
 			bitno=bitno>>1;
 			shifts--;
@@ -197,11 +198,4 @@ VIDEO_RESET( mbc55x )
 SCREEN_EOF( mbc55x )
 {
 //  logerror("SCREEN_EOF( mbc55x )\n");
-}
-
-SCREEN_UPDATE( mbc55x )
-{
-	mbc55x_state *state = screen.machine().driver_data<mbc55x_state>();
-	state->m_crtc->update(bitmap, cliprect);
-	return 0;
 }

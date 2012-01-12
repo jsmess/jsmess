@@ -712,7 +712,7 @@ ATTR_FORCE_INLINE mc6847_base_device::pixel_t mc6847_base_device::border_value(U
 //  update
 //-------------------------------------------------
 
-bool mc6847_base_device::update(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int base_x = 32;
 	int base_y = 25;

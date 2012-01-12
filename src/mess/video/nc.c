@@ -49,11 +49,11 @@ void nc200_video_set_backlight(running_machine &machine, int state)
 
 
 /***************************************************************************
-  Draw the game screen in the given bitmap_t.
+  Draw the game screen in the given bitmap_ind16.
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-SCREEN_UPDATE( nc )
+SCREEN_UPDATE_IND16( nc )
 {
 	nc_state *state = screen.machine().driver_data<nc_state>();
 	int y;

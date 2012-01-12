@@ -12,8 +12,6 @@
 #include "machine/upd765.h"
 #include "video/upd7220.h"
 
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-
 class mz6500_state : public driver_device
 {
 public:
@@ -31,19 +29,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mz6500_vram_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 	UINT8 *m_video_ram;
 };
-
-SCREEN_UPDATE_MEMBER( mz6500_state )
-{
-	bitmap.fill(0, cliprect);
-
-	/* graphics */
-	m_hgdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
@@ -192,7 +179,7 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_VIDEO_START(mz6500)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)

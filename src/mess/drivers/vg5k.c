@@ -80,7 +80,6 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( printer_r );
 	DECLARE_WRITE8_MEMBER( printer_w );
@@ -306,13 +305,6 @@ void vg5k_state::machine_reset()
 	m_ef9345_offset = 0;
 }
 
-bool vg5k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_ef9345->video_update(bitmap, cliprect);
-
-	return 0;
-}
-
 /* F4 Character Displayer */
 static const gfx_layout vg5k_charlayout =
 {
@@ -393,7 +385,7 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("ef9345", ef9345_device, screen_update)
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 

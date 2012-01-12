@@ -353,7 +353,7 @@ static PALETTE_INIT( svisionp )
 	}
 }
 
-static SCREEN_UPDATE( svision )
+static SCREEN_UPDATE_IND16( svision )
 {
 	svision_state *state = screen.machine().driver_data<svision_state>();
 	int x, y, i, j=XPOS/4+YPOS*0x30;
@@ -385,7 +385,7 @@ static SCREEN_UPDATE( svision )
 	return 0;
 }
 
-static SCREEN_UPDATE( tvlink )
+static SCREEN_UPDATE_RGB32( tvlink )
 {
 	svision_state *state = screen.machine().driver_data<svision_state>();
 	int x, y, i, j = XPOS/4+YPOS*0x30;
@@ -528,10 +528,9 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(61)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(3+160+3, 160)
 	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
-	MCFG_SCREEN_UPDATE( svision )
+	MCFG_SCREEN_UPDATE_STATIC( svision )
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(svision_palette) * 3)
 	MCFG_PALETTE_INIT( svision )
@@ -582,8 +581,7 @@ static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 	MCFG_MACHINE_RESET( tvlink )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE( tvlink )
+	MCFG_SCREEN_UPDATE_STATIC( tvlink )
 
 MACHINE_CONFIG_END
 

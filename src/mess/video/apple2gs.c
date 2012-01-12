@@ -18,14 +18,14 @@ VIDEO_START( apple2gs )
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	state->m_bordercolor = 0;
 	apple2_video_start(machine, state->m_slowmem, 0x20000, 0, 8);
-	state->m_legacy_gfx = auto_bitmap_alloc(machine, 560, 192, BITMAP_FORMAT_INDEXED16);
+	state->m_legacy_gfx = auto_bitmap_ind16_alloc(machine, 560, 192);
 
 	state_save_register_item(machine, "BORDERCLR", NULL, 0, state->m_bordercolor);
 }
 
 
 
-SCREEN_UPDATE( apple2gs )
+SCREEN_UPDATE_IND16( apple2gs )
 {
 	apple2gs_state *state = screen.machine().driver_data<apple2gs_state>();
 	const UINT8 *vram;
@@ -133,7 +133,7 @@ SCREEN_UPDATE( apple2gs )
 			new_cliprect.min_y = 0;
 			new_cliprect.max_x = 559;
 			new_cliprect.max_y = 191;
-			SCREEN_UPDATE_NAME(apple2)(screen, *state->m_legacy_gfx, new_cliprect);
+			SCREEN_UPDATE_NAME(apple2)(NULL, screen, *state->m_legacy_gfx, new_cliprect);
 		}
 
 		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))

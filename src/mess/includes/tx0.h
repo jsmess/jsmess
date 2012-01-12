@@ -140,8 +140,8 @@ public:
 	int m_old_tsr_keys;
 	int m_tsr_index;
 	int m_typewriter_color;
-	bitmap_t m_panel_bitmap;
-	bitmap_t m_typewriter_bitmap;
+	bitmap_ind16 m_panel_bitmap;
+	bitmap_ind16 m_typewriter_bitmap;
 	int m_pos;
 	int m_case_shift;
 	device_t *m_crt;
@@ -152,7 +152,7 @@ public:
 
 VIDEO_START( tx0 );
 SCREEN_EOF( tx0 );
-SCREEN_UPDATE( tx0 );
+SCREEN_UPDATE_IND16( tx0 );
 
 void tx0_plot(running_machine &machine, int x, int y);
 void tx0_typewriter_drawchar(running_machine &machine, int character);

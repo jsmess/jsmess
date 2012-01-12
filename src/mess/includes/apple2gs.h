@@ -97,7 +97,7 @@ public:
 	UINT8 m_sndglu_ctrl;
 	int m_sndglu_addr;
 	int m_sndglu_dummy_read;
-	bitmap_t *m_legacy_gfx;
+	bitmap_ind16 *m_legacy_gfx;
     bool m_is_rom3;
     UINT8 m_echo_bank;
 };
@@ -117,7 +117,7 @@ void apple2gs_doc_irq(device_t *device, int state);
 /*----------- defined in video/apple2gs.c -----------*/
 
 VIDEO_START( apple2gs );
-SCREEN_UPDATE( apple2gs );
+SCREEN_UPDATE_IND16( apple2gs );
 
 
 #endif /* APPLE2GS_H_ */

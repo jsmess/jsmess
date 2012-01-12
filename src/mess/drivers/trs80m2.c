@@ -645,6 +645,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( trs80m2_update_row )
 {
 	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -662,7 +663,7 @@ static MC6845_UPDATE_ROW( trs80m2_update_row )
 		{
 			int x = (column * 8) + bit;
 
-			bitmap.pix16(y, x) = BIT(data, 7);
+			bitmap.pix32(y, x) = palette[BIT(data, 7)];
 
 			data <<= 1;
 		}
@@ -708,7 +709,7 @@ void trs80m2_state::video_start()
 	m_char_rom = machine().region(MC6845_TAG)->base();
 }
 
-bool trs80m2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_blnkvid)
 	{
@@ -716,7 +717,7 @@ bool trs80m2_state::screen_update(screen_device &screen, bitmap_t &bitmap, const
 	}
 	else
 	{
-		m_crtc->update(bitmap, cliprect);
+		m_crtc->screen_update(screen, bitmap, cliprect);
 	}
 
 	return 0;
@@ -970,7 +971,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 

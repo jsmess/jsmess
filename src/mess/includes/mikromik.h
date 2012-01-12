@@ -65,7 +65,7 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mmu_r );
 	DECLARE_WRITE8_MEMBER( mmu_w );
@@ -95,6 +95,7 @@ public:
 	const UINT8 *m_key_rom;
 
 	// video state
+	bitmap_ind16 m_bitmap;
 	const UINT8 *m_video_ram;
 	const UINT8 *m_char_rom;
 	int m_llen;

@@ -111,6 +111,8 @@ public:
 	gb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	UINT16 m_sgb_pal_data[4096];
 	UINT8 m_sgb_pal_map[20][18];
 	UINT16 m_sgb_pal[128];
@@ -177,6 +179,8 @@ public:
 	UINT8 m_mmm01_bank_mask;
 	gb_lcd_t m_lcd;
 	void (*update_scanline)( running_machine &machine );
+	
+	bitmap_ind16 m_bitmap;
 };
 
 

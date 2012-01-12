@@ -61,6 +61,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
     */
 
 	abc802_state *state =  device->machine().driver_data<abc802_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	int rf = 0, rc = 0, rg = 0;
 
@@ -133,7 +134,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
 					int color = BIT(data, 7) ^ ri;
 
-					bitmap.pix16(y, x) = color;
+					bitmap.pix32(y, x) = palette[color];
 
 					data <<= 1;
 				}
@@ -145,8 +146,8 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
 					int color = BIT(data, 7) ^ ri;
 
-					bitmap.pix16(y, x) = color;
-					bitmap.pix16(y, x + 1) = color;
+					bitmap.pix32(y, x) = palette[color];
+					bitmap.pix32(y, x + 1) = palette[color];
 
 					data <<= 1;
 				}
@@ -222,13 +223,13 @@ void abc802_state::video_start()
 //  SCREEN_UPDATE( abc802 )
 //-------------------------------------------------
 
-bool abc802_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// HACK expand visible area to workaround MC6845
 	screen.set_visible_area(0, 767, 0, 311);
 
 	// draw text
-	m_crtc->update(bitmap, cliprect);
+	m_crtc->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -242,7 +243,7 @@ MACHINE_CONFIG_FRAGMENT( abc802_video )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, ABC800_CCLK, crtc_intf)
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(abc802_state, screen_update)
 
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

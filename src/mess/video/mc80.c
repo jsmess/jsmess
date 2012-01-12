@@ -96,7 +96,7 @@ VIDEO_START( mc8020 )
 {
 }
 
-SCREEN_UPDATE( mc8020 )
+SCREEN_UPDATE_IND16( mc8020 )
 {
 	mc80_state *state = screen.machine().driver_data<mc80_state>();
 	UINT8 y,ra,chr,gfx;
@@ -143,7 +143,7 @@ VIDEO_START( mc8030 )
 	state->m_p_videoram = machine.region("vram")->base();
 }
 
-SCREEN_UPDATE( mc8030 )
+SCREEN_UPDATE_IND16( mc8030 )
 {
 	mc80_state *state = screen.machine().driver_data<mc80_state>();
 	UINT8 gfx;

@@ -27,7 +27,7 @@ VIDEO_START( kramermc )
 {
 }
 
-SCREEN_UPDATE( kramermc )
+SCREEN_UPDATE_IND16( kramermc )
 {
 	int x,y;
 	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);

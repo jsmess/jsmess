@@ -13,7 +13,7 @@
 
 
 
-static void primo_draw_scanline(running_machine &machine,bitmap_t &bitmap, int primo_scanline)
+static void primo_draw_scanline(running_machine &machine,bitmap_ind16 &bitmap, int primo_scanline)
 {
 	primo_state *state = machine.driver_data<primo_state>();
 	int x, i;
@@ -36,7 +36,7 @@ static void primo_draw_scanline(running_machine &machine,bitmap_t &bitmap, int p
 }
 
 
-SCREEN_UPDATE( primo )
+SCREEN_UPDATE_IND16( primo )
 {
 	int primo_scanline;
 

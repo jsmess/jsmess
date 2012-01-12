@@ -775,7 +775,7 @@ GFXDECODE_END
 
 static WRITE_LINE_DEVICE_HANDLER(set_int2)
 {
-	tms9901_set_int2( device->machine(), state );
+	tms9901_set_int2( NULL, *device->machine().device<v9938_device>("video_v9938"), state );
 }
 
 static TMS9928A_INTERFACE(ti99_4_tms9928a_interface)
@@ -824,14 +824,6 @@ MACHINE_RESET( ti99_4a )
 {
 }
 
-static SCREEN_UPDATE( ti99_4 )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( TMS9928A_TAG );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
@@ -848,7 +840,7 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x_state )
 	// MCFG_SCREEN_REFRESH_RATE(60)
 	// MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_TI_TMS991x_ADD_NTSC("video", TMS9118, ti99_4, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_NTSC("video", TMS9118, ti99_4_tms9928a_interface)
 	MCFG_GFXDECODE(ti99)
 
 	/* sound hardware */
@@ -939,7 +931,7 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x_state )
 	MCFG_MACHINE_RESET( ti99_4a )
 
 	/* video hardware */
-	MCFG_TI_TMS991x_ADD_NTSC("video", TMS9918A, ti99_4, ti99_4_tms9928a_interface)
+	MCFG_TI_TMS991x_ADD_NTSC("video", TMS9918A, ti99_4_tms9928a_interface)
 	MCFG_GFXDECODE(ti99a)
 
 	/* sound hardware */
@@ -1018,7 +1010,7 @@ MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK( ti99_4ev_hblank_interrupt )
 {
-	v9938_interrupt(timer.machine(), 0);
+	timer.machine().device<v9938_device>("video_v9938")->interrupt();
 }
 
 static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )

@@ -377,7 +377,7 @@ void pc1640_state::video_start()
 //  SCREEN_UPDATE( pc1640 )
 //-------------------------------------------------
 
-bool pc1640_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 pc1640_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return false;
 }
@@ -389,7 +389,7 @@ bool pc1640_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
 
 MACHINE_CONFIG_FRAGMENT( pc1640_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(pc1640_state, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

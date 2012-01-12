@@ -50,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER( reg_dat_r );
 	DECLARE_WRITE8_MEMBER( reg_dat_w );
 
-	void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
+	void update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -65,7 +65,7 @@ protected:
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
 
-	void plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color);
+	void plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 
 private:
 	UINT8 m_cmd, m_reg[32];

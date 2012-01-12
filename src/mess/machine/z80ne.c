@@ -638,14 +638,6 @@ READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 	return videoram[offset];
 }
 
-bool z80ne_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	if (m_vdg != NULL)
-		return m_vdg->update(bitmap, cliprect);
-	else
-		return 0;
-}
-
 READ8_HANDLER(lx388_data_r)
 {
 	z80ne_state *state = space->machine().driver_data<z80ne_state>();

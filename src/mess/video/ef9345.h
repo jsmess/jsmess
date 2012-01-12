@@ -42,7 +42,7 @@ public:
 	READ8_MEMBER( data_r );
 	WRITE8_MEMBER( data_w );
 	void update_scanline(UINT16 scanline);
-	void video_update(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
     // device-level overrides
@@ -110,7 +110,7 @@ private:
 	UINT8 m_latchi;							//insert atribute latch
 	UINT8 m_latchu;							//underline atribute latch
 
-	bitmap_t m_screen_out;
+	bitmap_rgb32 m_screen_out;
 
 	// timers
 	emu_timer *m_busy_timer;

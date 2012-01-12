@@ -130,7 +130,7 @@ static VIDEO_START( ti990_4 )
 	state->m_terminal = machine.device("vdt911");
 }
 
-static SCREEN_UPDATE( ti990_4 )
+static SCREEN_UPDATE_IND16( ti990_4 )
 {
 	ti990_4_state *state = screen.machine().driver_data<ti990_4_state>();
 	vdt911_refresh(state->m_terminal, bitmap, cliprect, 0, 0);
@@ -151,7 +151,7 @@ static VIDEO_START( ti990_4 )
 	state->m_terminal = machine.device("asr733");
 }
 
-static SCREEN_UPDATE( ti990_4 )
+static SCREEN_UPDATE_IND16( ti990_4 )
 {
 	ti990_4_state *state = screen.machine().driver_data<ti990_4_state>();
 	asr733_refresh(state->m_terminal, bitmap, 0, 0);
@@ -250,8 +250,7 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_UPDATE(ti990_4)
+	MCFG_SCREEN_UPDATE_STATIC(ti990_4)
 #if VIDEO_911
 	MCFG_SCREEN_SIZE(560, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)

@@ -51,7 +51,7 @@ WRITE8_DEVICE_HANDLER ( vt_video_brightness_w );
 
 
 /* screen update */
-void vt_video_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
-void rainbow_video_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect);
+void vt_video_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+void rainbow_video_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 #endif

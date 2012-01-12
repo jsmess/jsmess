@@ -52,7 +52,7 @@ VIDEO_START( trs80 )
 
 
 /* 7 or 8-bit video, 32/64 characters per line = trs80, trs80l2, sys80 */
-SCREEN_UPDATE( trs80 )
+SCREEN_UPDATE_IND16( trs80 )
 {
 	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx,gfxbit;
@@ -124,7 +124,7 @@ SCREEN_UPDATE( trs80 )
 }
 
 /* 8-bit video, 32/64/40/80 characters per line = trs80m3, trs80m4. */
-SCREEN_UPDATE( trs80m4 )
+SCREEN_UPDATE_IND16( trs80m4 )
 {
 	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx,gfxbit;
@@ -219,7 +219,7 @@ SCREEN_UPDATE( trs80m4 )
 }
 
 /* 7 or 8-bit video, 64/32 characters per line = ht1080z, ht1080z2, ht108064 */
-SCREEN_UPDATE( ht1080z )
+SCREEN_UPDATE_IND16( ht1080z )
 {
 	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx,gfxbit;
@@ -278,7 +278,7 @@ SCREEN_UPDATE( ht1080z )
 }
 
 /* 8-bit video, 64/80 characters per line = lnw80 */
-SCREEN_UPDATE( lnw80 )
+SCREEN_UPDATE_IND16( lnw80 )
 {
 	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	static const UINT16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
@@ -451,7 +451,7 @@ SCREEN_UPDATE( lnw80 )
 }
 
 /* lores characters are in the character generator. Each character is 8x16. */
-SCREEN_UPDATE( radionic )
+SCREEN_UPDATE_IND16( radionic )
 {
 	trs80_state *state = screen.machine().driver_data<trs80_state>();
 	UINT8 y,ra,chr,gfx;
@@ -494,7 +494,7 @@ SCREEN_UPDATE( radionic )
 	return 0;
 }
 
-SCREEN_UPDATE( meritum )
+SCREEN_UPDATE_IND16( meritum )
 /* lores characters are in the character generator. Each character is 6x11. */
 {
 	trs80_state *state = screen.machine().driver_data<trs80_state>();

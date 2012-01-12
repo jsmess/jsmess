@@ -133,18 +133,6 @@ void coco12_state::update_cart_base(UINT8 *cart_base)
 
 
 //-------------------------------------------------
-//  screen_update
-//-------------------------------------------------
-
-bool coco12_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_vdg->update(bitmap, cliprect);
-}
-
-
-
-
-//-------------------------------------------------
 //  mc6847_config
 //-------------------------------------------------
 

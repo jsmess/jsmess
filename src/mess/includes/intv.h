@@ -60,6 +60,7 @@ public:
 	DECLARE_READ8_MEMBER( intv_right_control_r );
 	DECLARE_READ8_MEMBER( intv_left_control_r );
 
+	bitmap_ind16 m_bitmap;
 	UINT8 *m_videoram;
 	intv_sprite_type m_sprite[STIC_MOBS];
 	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH*2][STIC_CARD_HEIGHT*4*2*2];
@@ -126,7 +127,8 @@ public:
 /*----------- defined in video/intv.c -----------*/
 
 extern VIDEO_START( intv );
-extern SCREEN_UPDATE( intvkbd );
+extern SCREEN_UPDATE_IND16( intv );
+extern SCREEN_UPDATE_IND16( intvkbd );
 
 void intv_stic_screenrefresh(running_machine &machine);
 

@@ -33,7 +33,7 @@ public:
 	UINT8 *m_lcd_data;
 	UINT8 m_kb_matrix;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
@@ -87,7 +87,7 @@ UINT8 pc1500_state::pc1500_kb_r(device_t *device)
 	return data;
 }
 
-bool pc1500_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))	// not accurate
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(pc1500_state, screen_update)
 	MCFG_SCREEN_SIZE(156, 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
 	MCFG_DEFAULT_LAYOUT(layout_pc1500)

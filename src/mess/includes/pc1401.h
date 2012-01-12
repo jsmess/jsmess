@@ -44,7 +44,7 @@ NVRAM_HANDLER( pc1401 );
 
 READ8_HANDLER(pc1401_lcd_read);
 WRITE8_HANDLER(pc1401_lcd_write);
-SCREEN_UPDATE( pc1401 );
+SCREEN_UPDATE_IND16( pc1401 );
 
 
 #endif /* PC1401_H_ */

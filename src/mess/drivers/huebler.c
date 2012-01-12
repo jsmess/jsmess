@@ -226,7 +226,7 @@ void amu880_state::video_start()
 	m_char_rom = machine().region("chargen")->base();
 }
 
-bool amu880_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 amu880_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, sx, x, line;
 
@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(amu880_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
 	MCFG_GFXDECODE(amu880)

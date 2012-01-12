@@ -138,7 +138,7 @@ void gamepock_state::machine_reset()
 	hd44102ch_init( 2 );
 }
 
-SCREEN_UPDATE( gamepock )
+SCREEN_UPDATE_IND16( gamepock )
 {
 	gamepock_state *state = screen.machine().driver_data<gamepock_state>();
 	UINT8	ad;

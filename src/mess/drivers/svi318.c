@@ -272,14 +272,6 @@ static TMS9928A_INTERFACE(svi318_tms9928a_interface)
     DEVCB_LINE(vdp_interrupt)
 };
 
-static SCREEN_UPDATE( svi318 )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
 static const cassette_interface svi318_cassette_interface =
 {
 	svi_cassette_formats,
@@ -333,7 +325,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	/* Video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, svi318_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( svi318 )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9929a_device, screen_update )
 
 	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -372,7 +364,7 @@ static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, svi318_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( svi318 )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	MCFG_MACHINE_START( svi318_ntsc )
 	MCFG_MACHINE_RESET( svi318 )
@@ -446,16 +438,15 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, svi318_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE( svi318 )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9929a_device, screen_update )
 	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)	/* 2 additional entries for monochrome svi806 output */
 
 	MCFG_SCREEN_ADD("svi806", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE( svi328_806 )
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_GFXDECODE(svi328)
 

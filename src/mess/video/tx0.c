@@ -13,14 +13,14 @@
 
 
 
-INLINE void tx0_plot_pixel(bitmap_t &bitmap, int x, int y, UINT32 color)
+INLINE void tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = color;
 }
 
 
-static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_t &bitmap);
-static void tx0_draw_panel(running_machine &machine, bitmap_t &bitmap);
+static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_ind16 &bitmap);
+static void tx0_draw_panel(running_machine &machine, bitmap_ind16 &bitmap);
 
 
 
@@ -33,8 +33,8 @@ VIDEO_START( tx0 )
 	state->m_typewriter_color = color_typewriter_black;
 
 	/* alloc bitmaps for our private fun */
-	state->m_panel_bitmap.allocate(panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
-	state->m_typewriter_bitmap.allocate(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
+	state->m_panel_bitmap.allocate(panel_window_width, panel_window_height, BITMAP_FORMAT_IND16);
+	state->m_typewriter_bitmap.allocate(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_IND16);
 
 	/* set up out bitmaps */
 	tx0_draw_panel_backdrop(machine, state->m_panel_bitmap);
@@ -69,9 +69,9 @@ void tx0_plot(running_machine &machine, int x, int y)
 
 
 /*
-    SCREEN_UPDATE( tx0 ): effectively redraw the screen
+    SCREEN_UPDATE_IND16( tx0 ): effectively redraw the screen
 */
-SCREEN_UPDATE( tx0 )
+SCREEN_UPDATE_IND16( tx0 )
 {
 	tx0_state *state = screen.machine().driver_data<tx0_state>();
 	crt_update(state->m_crt, bitmap);
@@ -124,7 +124,7 @@ enum
 };
 
 /* draw a small 8*8 LED (or is this a lamp? ) */
-static void tx0_draw_led(running_machine &machine, bitmap_t &bitmap, int x, int y, int state)
+static void tx0_draw_led(running_machine &machine, bitmap_ind16 &bitmap, int x, int y, int state)
 {
 	int xx, yy;
 
@@ -134,7 +134,7 @@ static void tx0_draw_led(running_machine &machine, bitmap_t &bitmap, int x, int 
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
-static void tx0_draw_multipleled(running_machine &machine, bitmap_t &bitmap, int x, int y, int value, int nb_bits)
+static void tx0_draw_multipleled(running_machine &machine, bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -148,7 +148,7 @@ static void tx0_draw_multipleled(running_machine &machine, bitmap_t &bitmap, int
 
 
 /* draw a small 8*8 switch */
-static void tx0_draw_switch(running_machine &machine, bitmap_t &bitmap, int x, int y, int state)
+static void tx0_draw_switch(running_machine &machine, bitmap_ind16 &bitmap, int x, int y, int state)
 {
 	int xx, yy;
 	int i;
@@ -189,7 +189,7 @@ static void tx0_draw_switch(running_machine &machine, bitmap_t &bitmap, int x, i
 
 
 /* draw nb_bits switches which represent nb_bits bits in value */
-static void tx0_draw_multipleswitch(running_machine &machine, bitmap_t &bitmap, int x, int y, int value, int nb_bits)
+static void tx0_draw_multipleswitch(running_machine &machine, bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits)
 {
 	while (nb_bits)
 	{
@@ -203,14 +203,14 @@ static void tx0_draw_multipleswitch(running_machine &machine, bitmap_t &bitmap, 
 
 
 /* write a single char on screen */
-static void tx0_draw_char(running_machine &machine, bitmap_t &bitmap, char character, int x, int y, int color)
+static void tx0_draw_char(running_machine &machine, bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
 	drawgfx_transpen(bitmap, bitmap.cliprect(), machine.gfx[0], character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
 /* write a string on screen */
-static void tx0_draw_string(running_machine &machine, bitmap_t &bitmap, const char *buf, int x, int y, int color)
+static void tx0_draw_string(running_machine &machine, bitmap_ind16 &bitmap, const char *buf, int x, int y, int color)
 {
 	while (* buf)
 	{
@@ -223,7 +223,7 @@ static void tx0_draw_string(running_machine &machine, bitmap_t &bitmap, const ch
 
 
 /* draw a vertical line */
-static void tx0_draw_vline(bitmap_t &bitmap, int x, int y, int height, int color)
+static void tx0_draw_vline(bitmap_ind16 &bitmap, int x, int y, int height, int color)
 {
 	while (height--)
 		tx0_plot_pixel(bitmap, x, y++, color);
@@ -231,7 +231,7 @@ static void tx0_draw_vline(bitmap_t &bitmap, int x, int y, int height, int color
 
 #ifdef UNUSED_FUNCTION
 /* draw a horizontal line */
-static void tx0_draw_hline(bitmap_t &bitmap, int x, int y, int width, int color)
+static void tx0_draw_hline(bitmap_ind16 &bitmap, int x, int y, int width, int color)
 {
 	while (width--)
 		tx0_plot_pixel(bitmap, x++, y, color);
@@ -241,7 +241,7 @@ static void tx0_draw_hline(bitmap_t &bitmap, int x, int y, int width, int color)
 /*
     draw the operator control panel (fixed backdrop)
 */
-static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_t &bitmap)
+static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	tx0_state *state = machine.driver_data<tx0_state>();
 	int i;
@@ -290,7 +290,7 @@ static void tx0_draw_panel_backdrop(running_machine &machine, bitmap_t &bitmap)
 /*
     draw the operator control panel (dynamic elements)
 */
-static void tx0_draw_panel(running_machine &machine, bitmap_t &bitmap)
+static void tx0_draw_panel(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	int cm_sel, lr_sel;
 	int i;

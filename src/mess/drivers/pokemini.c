@@ -53,6 +53,18 @@ static const i2cmem_interface i2cmem_interface =
        I2CMEM_SLAVE_ADDRESS, 0, 0x2000
 };
 
+void pokemini_state::video_start()
+{
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+}
+
+UINT32 pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+
+
 static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", MINX, 4000000 )
@@ -64,7 +76,7 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 
 	/* This still needs to be improved to actually match the hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(pokemini_state, screen_update)
 	MCFG_SCREEN_SIZE( 96, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
 	MCFG_SCREEN_REFRESH_RATE( 72 )

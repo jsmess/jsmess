@@ -23,18 +23,18 @@
 	MCFG_DEVICE_ADD(_tag, _variant, _clock)						\
 	MCFG_DEVICE_CONFIG(_config)
 
-#define MCFG_SCREEN_MC6847_NTSC_ADD(_tag) \
+#define MCFG_SCREEN_MC6847_NTSC_ADD(_tag, _mctag) \
 	MCFG_SCREEN_ADD(_tag, RASTER)								\
+	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
 	MCFG_SCREEN_REFRESH_RATE(60)								\
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)						\
 	MCFG_SCREEN_SIZE(320, 243)									\
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)				\
 	MCFG_SCREEN_VBLANK_TIME(0)									\
 
-#define MCFG_SCREEN_MC6847_PAL_ADD(_tag) \
+#define MCFG_SCREEN_MC6847_PAL_ADD(_tag, _mctag) \
 	MCFG_SCREEN_ADD(_tag, RASTER)								\
+	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
 	MCFG_SCREEN_REFRESH_RATE(50)								\
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)						\
 	MCFG_SCREEN_SIZE(320, 243)									\
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)				\
 	MCFG_SCREEN_VBLANK_TIME(0)									\
@@ -123,7 +123,7 @@ protected:
 	// pixel definitions
 	typedef UINT32 pixel_t;
 
-	pixel_t *bitmap_addr(bitmap_t &bitmap, int y, int x)
+	pixel_t *bitmap_addr(bitmap_rgb32 &bitmap, int y, int x)
 	{
 		return &bitmap.pix32(y, x);
 	}
@@ -496,7 +496,7 @@ public:
 	/* updates the screen -- this will call begin_update(),
        followed by update_row() reapeatedly and after all row
        updating is complete, end_update() */
-	bool update(bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// mode changing operations
 	DECLARE_WRITE_LINE_MEMBER( ag_w )		{ change_mode(MODE_AG, state); }

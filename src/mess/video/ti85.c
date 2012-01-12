@@ -148,7 +148,7 @@ VIDEO_START( ti85 )
 {
 }
 
-SCREEN_UPDATE( ti85 )
+SCREEN_UPDATE_IND16( ti85 )
 {
 	ti85_state *state = screen.machine().driver_data<ti85_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
@@ -195,7 +195,7 @@ PALETTE_INIT( ti82 )
 	palette_set_color(machine, 1, MAKE_RGB(83, 111, 138));
 }
 
-SCREEN_UPDATE( ti82 )
+SCREEN_UPDATE_IND16( ti82 )
 {
 	t6a04_device* t6a04 = screen.machine().device<t6a04_device>("t6a04");
 

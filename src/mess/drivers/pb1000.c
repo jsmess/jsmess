@@ -45,7 +45,7 @@ public:
 	UINT8 m_gatearray[2];
 
 	virtual void machine_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( gatearray_w );
 	UINT16 pb2000c_kb_r(running_machine &machine);
 	UINT16 pb1000_kb_r(running_machine &machine);
@@ -311,11 +311,6 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 		memory_set_bankptr(machine(), "bank1", machine().region("rom")->base());
 }
 
-bool pb1000_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	return m_hd44352->video_update(bitmap, cliprect);
-}
-
 static void lcd_control(hd61700_cpu_device &device, UINT8 data)
 {
 	pb1000_state *state = device.machine().driver_data<pb1000_state>();
@@ -516,7 +511,7 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44352", hd44352_device, screen_update)
 	MCFG_SCREEN_SIZE(192, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -545,7 +540,7 @@ static MACHINE_CONFIG_START( pb2000c, pb1000_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE("hd44352", hd44352_device, screen_update)
 	MCFG_SCREEN_SIZE(192, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)

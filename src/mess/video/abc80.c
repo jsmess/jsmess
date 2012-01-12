@@ -75,7 +75,7 @@ static TIMER_DEVICE_CALLBACK( vsync_off_tick )
 //  update_screen -
 //-------------------------------------------------
 
-void abc80_state::update_screen(bitmap_t &bitmap, const rectangle &cliprect)
+void abc80_state::update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int c = 0;
 	int r = 0;
@@ -217,10 +217,10 @@ void abc80_state::video_start()
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE( abc80 )
+//  SCREEN_UPDATE_IND16( abc80 )
 //-------------------------------------------------
 
-bool abc80_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 abc80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_screen(bitmap, cliprect);
 
@@ -238,7 +238,7 @@ MACHINE_CONFIG_FRAGMENT( abc80_video )
 	MCFG_TIMER_ADD_SCANLINE("vsync_off", vsync_off_tick, SCREEN_TAG, 16, ABC80_VTOTAL)
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(abc80_state, screen_update)
 
 	MCFG_GFXDECODE(abc80)
 

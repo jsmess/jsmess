@@ -45,7 +45,7 @@ private:
 	INT32		m_posy;
 	UINT8		m_pen;
 
-	bitmap_t *	m_paper;
+	bitmap_ind16 *	m_paper;
 };
 
 

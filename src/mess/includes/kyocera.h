@@ -88,7 +88,7 @@ public:
 
 	virtual void machine_start();
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( uart_status_r );
 	DECLARE_WRITE8_MEMBER( uart_ctrl_w );
@@ -173,7 +173,7 @@ public:
 
 	virtual void machine_start();
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( bank_r );
 	DECLARE_WRITE8_MEMBER( bank_w );

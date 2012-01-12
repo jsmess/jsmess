@@ -50,7 +50,7 @@ PALETTE_INIT( pocketc )
 
 
 /* Draw an indicator (DEG, SHIFT, etc) */
-void pocketc_draw_special(bitmap_t &bitmap, int x, int y, const POCKETC_FIGURE fig, int color)
+void pocketc_draw_special(bitmap_ind16 &bitmap, int x, int y, const POCKETC_FIGURE fig, int color)
 {
 	int i,j;
 	for (i=0; fig[i]; i++, y++)

@@ -346,6 +346,7 @@ static READ8_HANDLER( svi318_fdc_irqdrq_r )
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 {
 	svi318_state *state = device->machine().driver_data<svi318_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int i;
 
 	for( i = 0; i < x_count; i++ )
@@ -360,7 +361,7 @@ MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 
 		for( j=0; j < 8; j++ )
 		{
-			bitmap.pix16(y, i * 8 + j ) = TMS9928A_PALETTE_SIZE + ( ( data & 0x80 ) ? 1 : 0 );
+			bitmap.pix32(y, i * 8 + j ) = palette[TMS9928A_PALETTE_SIZE + ( ( data & 0x80 ) ? 1 : 0 )];
 			data = data << 1;
 		}
 	}
@@ -389,20 +390,6 @@ static WRITE8_HANDLER( svi806_ram_enable_w )
 
 VIDEO_START( svi328_806 )
 {
-}
-
-SCREEN_UPDATE( svi328_806 )
-{
-	if (!strcmp(screen.tag(), "svi806"))
-	{
-		mc6845_device *mc6845 = screen.machine().device<mc6845_device>("crtc");
-		mc6845->update(bitmap, cliprect);
-	}
-	else
-	{
-		fatalerror("Unknown screen '%s'", screen.tag());
-	}
-	return 0;
 }
 
 MACHINE_RESET( svi328_806 )

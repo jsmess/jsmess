@@ -182,8 +182,8 @@ extern PALETTE_INIT( kc85 );
 
 void kc85_video_set_blink_state(running_machine &machine, int data);
 
-SCREEN_UPDATE( kc85_3 );
-SCREEN_UPDATE( kc85_4 );
+SCREEN_UPDATE_IND16( kc85_3 );
+SCREEN_UPDATE_IND16( kc85_4 );
 
 /* select video ram to display */
 void kc85_4_video_ram_select_bank(running_machine &machine, int bank);

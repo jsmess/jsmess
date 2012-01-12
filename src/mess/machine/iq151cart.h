@@ -77,7 +77,7 @@ public:
 	virtual UINT8* get_cart_base() { return NULL; }
 
 	// video update
-	virtual void video_update(bitmap_t &bitmap, const rectangle &cliprect) { }
+	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) { }
 };
 
 // ======================> iq151cart_slot_device
@@ -118,7 +118,7 @@ public:
 	virtual void write(offs_t offset, UINT8 data);
 	virtual void io_read(offs_t offset, UINT8 &data);
 	virtual void io_write(offs_t offset, UINT8 data);
-	virtual void video_update(bitmap_t &bitmap, const rectangle &cliprect);
+	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	devcb_resolved_write_line	m_out_irq0_func;
 	devcb_resolved_write_line	m_out_irq1_func;

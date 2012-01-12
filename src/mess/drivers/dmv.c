@@ -36,7 +36,6 @@ public:
 
 	virtual void video_start();
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
@@ -161,12 +160,6 @@ void dmv_state::video_start()
 {
 }
 
-bool dmv_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_hgdc->update_screen(bitmap, cliprect);
-	return 0;
-}
-
 /* F4 Character Displayer */
 static const gfx_layout dmv_charlayout =
 {
@@ -261,7 +254,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 

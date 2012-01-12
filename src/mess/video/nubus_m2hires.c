@@ -16,12 +16,11 @@
 
 #define VRAM_SIZE	(0x80000)	// 512k max
 
-static SCREEN_UPDATE( m2hires );
+static SCREEN_UPDATE_RGB32( m2hires );
 
 MACHINE_CONFIG_FRAGMENT( m2hires )
 	MCFG_SCREEN_ADD( M2HIRES_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE(m2hires)
+	MCFG_SCREEN_UPDATE_STATIC(m2hires)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
@@ -141,7 +140,7 @@ void nubus_m2hires_device::device_timer(emu_timer &timer, device_timer_id tid, i
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( m2hires )
+static SCREEN_UPDATE_RGB32( m2hires )
 {
 	UINT32 *scanline;
 	int x, y;

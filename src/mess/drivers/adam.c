@@ -1511,15 +1511,6 @@ static TMS9928A_INTERFACE(adam_tms9928a_interface)
 	DEVCB_LINE(adam_vdp_interrupt)
 };
 
-static SCREEN_UPDATE( adam )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
-
 //-------------------------------------------------
 //  cassette_interface adam_cassette_interface
 //-------------------------------------------------
@@ -1709,7 +1700,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	// video hardware
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, adam_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( adam )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

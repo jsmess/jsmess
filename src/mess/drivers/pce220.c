@@ -70,7 +70,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( lcd_status_r );
 	DECLARE_WRITE8_MEMBER( lcd_control_w );
 	DECLARE_READ8_MEMBER( lcd_data_r );
@@ -107,7 +107,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( g850v_bank_r );
 	DECLARE_WRITE8_MEMBER( g850v_bank_w );
 	DECLARE_READ8_MEMBER( g850v_lcd_status_r );
@@ -116,7 +116,7 @@ public:
 	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
 };
 
-bool pce220_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 lcd_symbols[4];
 
@@ -179,7 +179,7 @@ bool pce220_state::screen_update(screen_device &screen, bitmap_t &bitmap, const 
     return 0;
 }
 
-bool pcg850v_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 lcd_symbols[6];
 	int color0 = 0;
@@ -951,7 +951,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(pce220_state, screen_update)
     MCFG_SCREEN_SIZE(24*6, 4*8)
     MCFG_SCREEN_VISIBLE_AREA(0, 24*6-1, 0, 4*8-1)
 
@@ -986,7 +986,7 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(pcg850v_state, screen_update)
     MCFG_SCREEN_SIZE(144, 48)
     MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 48-1)
 

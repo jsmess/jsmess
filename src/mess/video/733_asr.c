@@ -57,7 +57,7 @@ typedef struct
 
 	void (*int_callback)(running_machine &, int state);
 
-	bitmap_t *bitmap;
+	bitmap_ind16 *bitmap;
 } asr_t;
 
 enum
@@ -180,7 +180,7 @@ static DEVICE_START( asr733 )
 	const rectangle &visarea = screen->visible_area();
 
 	asr->last_key_pressed = 0x80;
-	asr->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
+	asr->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
 
 	asr->bitmap->fill(0, visarea);
 
@@ -452,7 +452,7 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 /*
     Video refresh
 */
-void asr733_refresh(device_t *device, bitmap_t &bitmap, int x, int y)
+void asr733_refresh(device_t *device, bitmap_ind16 &bitmap, int x, int y)
 {
 	asr_t *asr = get_safe_token(device);
 	copybitmap(bitmap, *asr->bitmap, 0, 0, x, y, asr->bitmap->cliprect());

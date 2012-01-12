@@ -22,18 +22,8 @@ public:
 
 	required_device<upd7220_device> m_hgdc;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-
 	UINT8 *m_video_ram;
 };
-
-bool if800_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	/* graphics */
-	m_hgdc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
@@ -107,10 +97,9 @@ static MACHINE_CONFIG_START( if800, if800_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-//  MCFG_SCREEN_UPDATE(if800)
+	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(8)
 //  MCFG_PALETTE_INIT(black_and_white)

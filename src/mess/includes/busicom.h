@@ -27,6 +27,6 @@ public:
 
 extern PALETTE_INIT( busicom );
 extern VIDEO_START( busicom );
-extern SCREEN_UPDATE( busicom );
+extern SCREEN_UPDATE_IND16( busicom );
 
 #endif /* BUSICOM_H_ */

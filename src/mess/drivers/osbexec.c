@@ -42,6 +42,12 @@ public:
 	required_device<z80dart_device>	m_sio;
 	required_device<device_t>	m_speaker;
 
+	virtual void video_start();
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	bitmap_ind16 m_bitmap;
+
 	memory_region	*m_fontram_region;
 	memory_region *m_vram_region;
 	UINT8	*m_fontram;
@@ -298,6 +304,16 @@ static PALETTE_INIT( osbexec )
 	palette_set_color_rgb( machine, 2, 0, 128, 0 );	/* Dimmed */
 }
 
+void osbexec_state::video_start()
+{
+	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+}
+
+UINT32 osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
 
 /*
   UD12 - 6821 PIA
@@ -551,7 +567,7 @@ static TIMER_CALLBACK( osbexec_video_callback )
 	if ( y < 240 )
 	{
 		UINT16 row_addr = ( y / 10 ) * 128;
-		UINT16 *p = &machine.primary_screen->default_bitmap().pix16(y);
+		UINT16 *p = &state->m_bitmap.pix16(y);
 		UINT8 char_line = y % 10;
 
 		for ( int x = 0; x < 80; x++ )
@@ -632,7 +648,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_MACHINE_RESET( osbexec )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
+	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )	/* May not be correct */
 
 	MCFG_PALETTE_LENGTH( 3 )

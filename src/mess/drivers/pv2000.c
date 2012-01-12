@@ -400,15 +400,6 @@ static const cassette_interface pv2000_cassette_interface =
 };
 
 
-static SCREEN_UPDATE( pv2000 )
-{
-	tms9928a_device *tms9928a = screen.machine().device<tms9928a_device>( "tms9928a" );
-
-	tms9928a->update( bitmap, cliprect );
-	return 0;
-}
-
-
 /* Machine Drivers */
 static MACHINE_CONFIG_START( pv2000, pv2000_state )
 
@@ -423,7 +414,7 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	// video hardware
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pv2000_tms9928a_interface )
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE( pv2000 )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

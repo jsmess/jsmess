@@ -27,6 +27,8 @@ public:
 	void bankswitch();
 	void ls259_w(int flag, int value);
 
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	int m_c0;
 	int m_c1;
 	int m_c2;

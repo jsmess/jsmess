@@ -76,19 +76,13 @@ static VIDEO_START( pasopia )
 	state->m_p_chargen = machine.region("chargen")->base();
 }
 
-static SCREEN_UPDATE( pasopia )
-{
-	pasopia_state *state = screen.machine().driver_data<pasopia_state>();
-	state->m_crtc->update(bitmap, cliprect);
-	return 0;
-}
-
 MC6845_UPDATE_ROW( pasopia_update_row )
 {
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx,fg=7,bg=0; // colours need to be determined
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -101,14 +95,14 @@ MC6845_UPDATE_ROW( pasopia_update_row )
 		gfx = state->m_p_chargen[(chr<<3) | ra] ^ inv;
 
 		/* Display a scanline of a character */
-		*p++ = BIT(gfx, 7) ? fg : bg;
-		*p++ = BIT(gfx, 6) ? fg : bg;
-		*p++ = BIT(gfx, 5) ? fg : bg;
-		*p++ = BIT(gfx, 4) ? fg : bg;
-		*p++ = BIT(gfx, 3) ? fg : bg;
-		*p++ = BIT(gfx, 2) ? fg : bg;
-		*p++ = BIT(gfx, 1) ? fg : bg;
-		*p++ = BIT(gfx, 0) ? fg : bg;
+		*p++ = palette[BIT(gfx, 7) ? fg : bg];
+		*p++ = palette[BIT(gfx, 6) ? fg : bg];
+		*p++ = palette[BIT(gfx, 5) ? fg : bg];
+		*p++ = palette[BIT(gfx, 4) ? fg : bg];
+		*p++ = palette[BIT(gfx, 3) ? fg : bg];
+		*p++ = palette[BIT(gfx, 2) ? fg : bg];
+		*p++ = palette[BIT(gfx, 1) ? fg : bg];
+		*p++ = palette[BIT(gfx, 0) ? fg : bg];
 	}
 }
 
@@ -375,11 +369,10 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_VIDEO_START(pasopia)
-	MCFG_SCREEN_UPDATE(pasopia)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_GFXDECODE(pasopia)
 	MCFG_PALETTE_LENGTH(8)
 

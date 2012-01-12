@@ -87,7 +87,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER( mstation_state::flash_0x0000_read_handler )
@@ -149,7 +149,7 @@ WRITE8_MEMBER( mstation_state::lcd_left_w )  {	lcd_w(offset, m_screen_column, da
 READ8_MEMBER ( mstation_state::lcd_right_r ) {	return lcd_r(offset, m_screen_column + 20);	}
 WRITE8_MEMBER( mstation_state::lcd_right_w ) {	lcd_w(offset, m_screen_column + 20, data);	}
 
-bool mstation_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int x=0; x<40; x++)
 		for (int y=0; y<128; y++)
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(mstation_state, screen_update)
     MCFG_SCREEN_SIZE(320, 128)
     MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 128-1)
 

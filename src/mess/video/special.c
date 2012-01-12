@@ -17,7 +17,7 @@ VIDEO_START( special )
 {
 }
 
-SCREEN_UPDATE( special )
+SCREEN_UPDATE_IND16( special )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
   UINT8 code;
@@ -40,7 +40,7 @@ VIDEO_START( specialp )
 {
 }
 
-SCREEN_UPDATE( specialp )
+SCREEN_UPDATE_IND16( specialp )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
   UINT8 code;
@@ -93,7 +93,7 @@ VIDEO_START( specimx )
 	memset(state->m_specimx_colorram,0x70,0x3000);
 }
 
-SCREEN_UPDATE( specimx )
+SCREEN_UPDATE_IND16( specimx )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
 	UINT8 code,color;
@@ -136,7 +136,7 @@ VIDEO_START( erik )
 {
 }
 
-SCREEN_UPDATE( erik )
+SCREEN_UPDATE_IND16( erik )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
   UINT8 code1;

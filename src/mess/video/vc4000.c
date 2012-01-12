@@ -62,7 +62,7 @@ VIDEO_START(vc4000)
 	state->m_video.sprites[3].data = &state->m_video.reg.d.sprite4;
 	state->m_video.sprites[3].mask = 1 << 3;
 
-	state->m_video.bitmap.allocate(width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_video.bitmap.allocate(width, height, BITMAP_FORMAT_IND16);
 }
 
 INLINE UINT8 vc4000_joystick_return_to_centre(UINT8 joy)
@@ -385,7 +385,7 @@ static const char led[20][12+1] =
 };
 
 
-static void vc4000_draw_digit(vc4000_state *state, bitmap_t &bitmap, int x, int y, int d, int line)
+static void vc4000_draw_digit(vc4000_state *state, bitmap_ind16 &bitmap, int x, int y, int d, int line)
 {
 	static const int digit_to_segment[0x10]={
 	0x0fff, 0x007c, 0x17df, 0x15ff, 0x1c7d, 0x1df7, 0x1ff7, 0x007f, 0x1fff, 0x1dff
@@ -414,7 +414,7 @@ INLINE void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int
 }
 
 
-static void vc4000_sprite_update(vc4000_state *state, bitmap_t &bitmap, UINT8 *collision, SPRITE *This)
+static void vc4000_sprite_update(vc4000_state *state, bitmap_ind16 &bitmap, UINT8 *collision, SPRITE *This)
 {
 	int i,j,m;
 
@@ -653,7 +653,7 @@ INTERRUPT_GEN( vc4000_video_line )
 		}
 }
 
-SCREEN_UPDATE( vc4000 )
+SCREEN_UPDATE_IND16( vc4000 )
 {
 	vc4000_state *state = screen.machine().driver_data<vc4000_state>();
 	copybitmap(bitmap, state->m_video.bitmap, 0, 0, 0, 0, cliprect);

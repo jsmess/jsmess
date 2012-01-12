@@ -19,12 +19,11 @@
 
 #define VRAM_SIZE	(0x200000)	// 2 megs, maxed out
 
-static SCREEN_UPDATE( cb264 );
+static SCREEN_UPDATE_RGB32( cb264 );
 
 MACHINE_CONFIG_FRAGMENT( cb264 )
 	MCFG_SCREEN_ADD( CB264_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE(cb264)
+	MCFG_SCREEN_UPDATE_STATIC(cb264)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
@@ -128,7 +127,7 @@ void nubus_cb264_device::device_reset()
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( cb264 )
+static SCREEN_UPDATE_RGB32( cb264 )
 {
 	UINT32 *scanline, *base;
 	int x, y;

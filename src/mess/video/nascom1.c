@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/nascom1.h"
 
-SCREEN_UPDATE( nascom1 )
+SCREEN_UPDATE_IND16( nascom1 )
 {
 	nascom1_state *state = screen.machine().driver_data<nascom1_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -34,7 +34,7 @@ SCREEN_UPDATE( nascom1 )
 	return 0;
 }
 
-SCREEN_UPDATE( nascom2 )
+SCREEN_UPDATE_IND16( nascom2 )
 {
 	nascom1_state *state = screen.machine().driver_data<nascom1_state>();
 	UINT8 *videoram = state->m_videoram;

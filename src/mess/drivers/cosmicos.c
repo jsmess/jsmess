@@ -394,13 +394,6 @@ static CDP1864_INTERFACE( cosmicos_cdp1864_intf )
 	0  // not connected
 };
 
-bool cosmicos_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_cti->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 /* CDP1802 Configuration */
 
 READ_LINE_MEMBER( cosmicos_state::wait_r )
@@ -589,6 +582,7 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	MCFG_TIMER_ADD_PERIODIC("interrupt", int_tick, attotime::from_hz(1000))
 
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
+	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(8+8)
 

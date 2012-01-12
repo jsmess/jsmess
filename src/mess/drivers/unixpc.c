@@ -39,7 +39,7 @@ public:
 	required_device<device_t> m_wd2797;
 	required_device<device_t> m_floppy;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset();
 
@@ -138,7 +138,7 @@ WRITE_LINE_MEMBER( unixpc_state::wd2797_drq_w )
     VIDEO
 ***************************************************************************/
 
-bool unixpc_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 unixpc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 348; y++)
 		for (int x = 0; x < 720/16; x++)
@@ -206,7 +206,7 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(unixpc_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz, 896, 0, 720, 367, 0, 348)
 	// vsync should actually last 17264 pixels
 

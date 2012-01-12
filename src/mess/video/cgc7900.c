@@ -109,7 +109,7 @@ void cgc7900_state::update_clut()
     draw_bitmap - draw bitmap image
 -------------------------------------------------*/
 
-void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_t &bitmap)
+void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_ind16 &bitmap)
 {
 }
 
@@ -117,7 +117,7 @@ void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_t &bitmap)
     draw_overlay - draw text overlay
 -------------------------------------------------*/
 
-void cgc7900_state::draw_overlay(screen_device *screen, bitmap_t &bitmap)
+void cgc7900_state::draw_overlay(screen_device *screen, bitmap_ind16 &bitmap)
 {
 	for (int y = 0; y < 768; y++)
 	{
@@ -195,10 +195,10 @@ void cgc7900_state::video_start()
 }
 
 /*-------------------------------------------------
-    SCREEN_UPDATE( cgc7900 )
+    SCREEN_UPDATE_IND16( cgc7900 )
 -------------------------------------------------*/
 
-bool cgc7900_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 cgc7900_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_clut();
 	draw_bitmap(&screen, bitmap);
@@ -242,7 +242,7 @@ MACHINE_CONFIG_FRAGMENT( cgc7900_video )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_UPDATE_DRIVER(cgc7900_state, screen_update)
     MCFG_SCREEN_SIZE(1024, 768)
     MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 

@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
-#define SCREEN_UPDATE_MEMBER(name) bool name::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+#define SCREEN_UPDATE16_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 class fk1_state : public driver_device
 {
@@ -54,7 +54,7 @@ public:
 	UINT8 m_video_rol;
 	UINT8 m_int_vector;
 	virtual void machine_reset();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -438,7 +438,7 @@ MACHINE_RESET_MEMBER( fk1_state )
 	device_set_irq_callback(machine().device("maincpu"), fk1_irq_callback);
 }
 
-SCREEN_UPDATE_MEMBER( fk1_state )
+SCREEN_UPDATE16_MEMBER( fk1_state )
 {
 	UINT8 code;
 	int y, x, b;
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(fk1_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_PALETTE_LENGTH(2)

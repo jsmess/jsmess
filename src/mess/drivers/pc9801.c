@@ -268,7 +268,7 @@ public:
 	required_device<upd7220_device> m_hgdc2;
 
 	virtual void video_start();
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	UINT8 *m_video_ram_1;
 	UINT8 *m_video_ram_2;
@@ -332,13 +332,13 @@ void pc9801_state::video_start()
 	m_char_rom = machine().region("chargen")->base();
 }
 
-bool pc9801_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
 	/* graphics */
-	m_hgdc2->update_screen(bitmap, cliprect);
-	m_hgdc1->update_screen(bitmap, cliprect);
+	m_hgdc2->screen_update(screen, bitmap, cliprect);
+	m_hgdc1->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -2501,7 +2501,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(pc9801_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
@@ -2560,7 +2560,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(pc9801_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
@@ -2620,7 +2620,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(pc9801_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 

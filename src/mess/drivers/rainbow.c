@@ -68,7 +68,7 @@ static MACHINE_RESET(rainbow)
 {
 }
 
-static SCREEN_UPDATE( rainbow )
+static SCREEN_UPDATE_IND16( rainbow )
 {
     device_t *devconf = screen.machine().device("vt100_video");
 	rainbow_video_update( devconf, bitmap, cliprect);
@@ -119,10 +119,9 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(80*10, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
-	MCFG_SCREEN_UPDATE(rainbow)
+	MCFG_SCREEN_UPDATE_STATIC(rainbow)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)

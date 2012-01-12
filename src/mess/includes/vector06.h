@@ -77,6 +77,6 @@ extern INTERRUPT_GEN( vector06_interrupt );
 
 extern PALETTE_INIT( vector06 );
 extern VIDEO_START( vector06 );
-extern SCREEN_UPDATE( vector06 );
+extern SCREEN_UPDATE_IND16( vector06 );
 
 #endif /* VECTOR06_H_ */

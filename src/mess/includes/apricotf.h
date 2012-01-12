@@ -60,7 +60,7 @@ public:
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_centronics;
 
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( palette_r );
 	DECLARE_WRITE16_MEMBER( palette_w );

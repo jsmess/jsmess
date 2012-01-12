@@ -227,10 +227,10 @@ void tdv2324_state::video_start()
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE( tdv2324 )
+//  SCREEN_UPDATE_IND16( tdv2324 )
 //-------------------------------------------------
 
-bool tdv2324_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(tdv2324_state, screen_update)
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 

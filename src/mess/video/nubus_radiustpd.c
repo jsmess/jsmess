@@ -16,12 +16,11 @@
 
 #define VRAM_SIZE	(0x40000)	// 256k.  1152x880 1 bit per pixel fits nicely.
 
-static SCREEN_UPDATE( radiustpd );
+static SCREEN_UPDATE_RGB32( radiustpd );
 
 MACHINE_CONFIG_FRAGMENT( radiustpd )
 	MCFG_SCREEN_ADD( RADIUSTPD_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_UPDATE(radiustpd)
+	MCFG_SCREEN_UPDATE_STATIC(radiustpd)
 	MCFG_SCREEN_SIZE(1280, 960)
 	MCFG_SCREEN_REFRESH_RATE(70)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 880-1)
@@ -142,7 +141,7 @@ void nubus_radiustpd_device::device_timer(emu_timer &timer, device_timer_id tid,
 
 ***************************************************************************/
 
-static SCREEN_UPDATE( radiustpd )
+static SCREEN_UPDATE_RGB32( radiustpd )
 {
 	UINT32 *scanline;
 	int x, y;

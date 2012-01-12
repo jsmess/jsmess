@@ -97,7 +97,7 @@ VIDEO_START( aquarius )
 	state->m_tilemap = tilemap_create(machine, aquarius_gettileinfo, tilemap_scan_rows, 8, 8, 40, 25);
 }
 
-SCREEN_UPDATE( aquarius )
+SCREEN_UPDATE_IND16( aquarius )
 {
 	aquarius_state *state = screen.machine().driver_data<aquarius_state>();
 	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);

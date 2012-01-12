@@ -68,7 +68,6 @@ public:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	//virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_6845;
@@ -103,7 +102,6 @@ public:
 	UINT8 *m_videoram;					/* video RAM */
 	UINT8 *m_char_rom;					/* character ROM */
 	UINT8 m_scroll;						/* vertical scroll */
-	UINT8 m_framecnt;
 	int m_ncset2;						/* national character set */
 	int m_vatt;							/* X120 video attribute */
 	int m_lowlite;						/* low light attribute */
@@ -564,20 +562,13 @@ static GFXDECODE_START( bigbord2 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bigbord2_charlayout, 0, 1 )
 GFXDECODE_END
 
-static SCREEN_UPDATE( bigbord2 )
-{
-	bigbord2_state *state = screen.machine().driver_data<bigbord2_state>();
-	state->m_framecnt++;
-	state->m_6845->update( bitmap, cliprect);
-	return 0;
-}
-
 MC6845_UPDATE_ROW( bigbord2_update_row )
 {
 	bigbord2_state *state = device->machine().driver_data<bigbord2_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
-	UINT16 *p = &bitmap.pix16(y);
+	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)				// for each character
 	{
@@ -590,14 +581,14 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 		gfx = state->m_char_rom[(chr<<4) | ra ] ^ inv;
 
 		/* Display a scanline of a character */
-		*p++ = BIT( gfx, 7 ) ? 1 : 0;
-		*p++ = BIT( gfx, 6 ) ? 1 : 0;
-		*p++ = BIT( gfx, 5 ) ? 1 : 0;
-		*p++ = BIT( gfx, 4 ) ? 1 : 0;
-		*p++ = BIT( gfx, 3 ) ? 1 : 0;
-		*p++ = BIT( gfx, 2 ) ? 1 : 0;
-		*p++ = BIT( gfx, 1 ) ? 1 : 0;
-		*p++ = BIT( gfx, 0 ) ? 1 : 0;
+		*p++ = palette[BIT( gfx, 7 ) ? 1 : 0];
+		*p++ = palette[BIT( gfx, 6 ) ? 1 : 0];
+		*p++ = palette[BIT( gfx, 5 ) ? 1 : 0];
+		*p++ = palette[BIT( gfx, 4 ) ? 1 : 0];
+		*p++ = palette[BIT( gfx, 3 ) ? 1 : 0];
+		*p++ = palette[BIT( gfx, 2 ) ? 1 : 0];
+		*p++ = palette[BIT( gfx, 1 ) ? 1 : 0];
+		*p++ = palette[BIT( gfx, 0 ) ? 1 : 0];
 	}
 }
 
@@ -628,9 +619,8 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
-	MCFG_SCREEN_UPDATE(bigbord2)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_GFXDECODE(bigbord2)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)

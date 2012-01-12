@@ -50,7 +50,7 @@ public:
 /*----------- defined in video/p2000m.c -----------*/
 
 extern VIDEO_START( p2000m );
-extern SCREEN_UPDATE( p2000m );
+extern SCREEN_UPDATE_IND16( p2000m );
 
 
 #endif /* P2000T_H_ */

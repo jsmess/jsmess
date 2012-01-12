@@ -34,8 +34,8 @@ extern WRITE8_HANDLER(sapi1_keyboard_w );
 /*----------- defined in video/sapi1.c -----------*/
 
 extern VIDEO_START( sapi1 );
-extern SCREEN_UPDATE( sapi1 );
+extern SCREEN_UPDATE_IND16( sapi1 );
 extern VIDEO_START( sapizps3 );
-extern SCREEN_UPDATE( sapizps3 );
+extern SCREEN_UPDATE_IND16( sapizps3 );
 
 #endif

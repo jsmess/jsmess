@@ -68,7 +68,7 @@ static void Init_Hector_Palette( running_machine &machine)
 	palette_set_color( machine,15,MAKE_RGB(128,128,128));//Blanc
 }
 
-void hector_hr(running_machine &machine, bitmap_t &bitmap, UINT8 *page, int ymax, int yram)
+void hector_hr(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)
 {
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	UINT8 *hector_color = state->m_hector_color;
@@ -88,7 +88,7 @@ void hector_hr(running_machine &machine, bitmap_t &bitmap, UINT8 *page, int ymax
 	}
 }
 
-void hector_80c(running_machine &machine, bitmap_t &bitmap, UINT8 *page, int ymax, int yram)
+void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)
 {
 	UINT8 gfx,y;
 	UINT16 sy=0,ma=0,x;
@@ -116,7 +116,7 @@ VIDEO_START( hec2hrp )
 	Init_Hector_Palette(machine);
 }
 
-SCREEN_UPDATE( hec2hrp )
+SCREEN_UPDATE_IND16( hec2hrp )
 {
 	hec2hrp_state *state = screen.machine().driver_data<hec2hrp_state>();
 	UINT8 *videoram = state->m_videoram;

@@ -152,7 +152,7 @@ void hd44352_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  device interface
 //**************************************************************************
 
-int hd44352_device::video_update(bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 cw = m_char_width;
 

@@ -126,7 +126,7 @@ static MACHINE_START(interact)
 	hector_init(machine);
 }
 
-static SCREEN_UPDATE( interact )
+static SCREEN_UPDATE_IND16( interact )
 {
 	interact_state *state = screen.machine().driver_data<interact_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -149,10 +149,9 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 79)
 	MCFG_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
-	MCFG_SCREEN_UPDATE(interact)
+	MCFG_SCREEN_UPDATE_STATIC(interact)
 
 	MCFG_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
 
@@ -191,10 +190,9 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(256, 79)
 	MCFG_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
-	MCFG_SCREEN_UPDATE(interact)
+	MCFG_SCREEN_UPDATE_STATIC(interact)
 
 	MCFG_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
 

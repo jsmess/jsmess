@@ -127,7 +127,7 @@ PALETTE_INIT ( hp48 )
 	draw_pixel; draw_pixel; draw_pixel; draw_pixel;
 
 
-SCREEN_UPDATE ( hp48 )
+SCREEN_UPDATE_IND16 ( hp48 )
 {
 	hp48_state *state = screen.machine().driver_data<hp48_state>();
 	address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);

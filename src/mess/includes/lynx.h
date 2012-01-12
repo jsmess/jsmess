@@ -90,6 +90,10 @@ public:
 	lynx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void video_start();
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	UINT8 *m_mem_0000;
 	UINT8 *m_mem_fc00;
 	UINT8 *m_mem_fd00;
@@ -111,6 +115,7 @@ public:
 	MIKEY m_mikey;
 	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
 	UART m_uart;
+	bitmap_ind16 m_bitmap;
 };
 
 

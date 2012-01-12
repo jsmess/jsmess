@@ -318,13 +318,6 @@ void pc8001_state::video_start()
 	m_char_rom = machine().region("chargen")->base();
 }
 
-bool pc8001_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
-{
-	m_crtc->update_screen(bitmap, cliprect);
-
-	return 0;
-}
-
 /* uPD3301 Interface */
 
 static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
@@ -531,7 +524,7 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 220)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
@@ -568,7 +561,7 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DEVICE(UPD3301_TAG, upd3301_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 220)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 

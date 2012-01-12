@@ -33,7 +33,7 @@ protected:
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void write(offs_t offset, UINT8 data);
 	virtual void io_read(offs_t offset, UINT8 &data);
-	virtual void video_update(bitmap_t &bitmap, const rectangle &cliprect);
+	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	UINT8 * 	m_videoram;

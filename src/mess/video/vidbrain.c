@@ -345,10 +345,10 @@ void vidbrain_state::video_start()
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE( vidbrain )
+//  SCREEN_UPDATE_IND16( vidbrain )
 //-------------------------------------------------
 
-bool vidbrain_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 vidbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
@@ -498,7 +498,7 @@ static TIMER_DEVICE_CALLBACK( y_int_tick )
 
 MACHINE_CONFIG_FRAGMENT( vidbrain_video )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(vidbrain_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 455, 0, 320, 525, 0, 243)
 
 	MCFG_GFXDECODE(vidbrain)

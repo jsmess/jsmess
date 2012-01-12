@@ -188,15 +188,15 @@ VIDEO_RESET(macdafb);
 VIDEO_RESET(maceagle);
 VIDEO_RESET(macsonora);
 
-SCREEN_UPDATE( mac );
-SCREEN_UPDATE( macse30 );
-SCREEN_UPDATE( macprtb );
-SCREEN_UPDATE( macpb140 );
-SCREEN_UPDATE( macpb160 );
-SCREEN_UPDATE( macrbv );
-SCREEN_UPDATE( macrbvvram );
-SCREEN_UPDATE( macdafb );
-SCREEN_UPDATE( macpbwd );
+SCREEN_UPDATE_IND16( mac );
+SCREEN_UPDATE_IND16( macse30 );
+SCREEN_UPDATE_IND16( macprtb );
+SCREEN_UPDATE_IND16( macpb140 );
+SCREEN_UPDATE_IND16( macpb160 );
+SCREEN_UPDATE_RGB32( macrbv );
+SCREEN_UPDATE_RGB32( macrbvvram );
+SCREEN_UPDATE_RGB32( macdafb );
+SCREEN_UPDATE_RGB32( macpbwd );
 
 PALETTE_INIT( mac );
 PALETTE_INIT( macgsc );

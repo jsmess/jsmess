@@ -382,10 +382,10 @@ static TIMER_DEVICE_CALLBACK( clear_irq )
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE( ace )
+//  SCREEN_UPDATE_IND16( ace )
 //-------------------------------------------------
 
-bool ace_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=56,ma=0,x;
@@ -629,7 +629,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(ace_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_6_5MHz, 416, 0, 336, 312, 0, 304)
 	MCFG_TIMER_ADD_SCANLINE("set_irq", set_irq, SCREEN_TAG, 31*8, 264)
 	MCFG_TIMER_ADD_SCANLINE("clear_irq", clear_irq, SCREEN_TAG, 32*8, 264)

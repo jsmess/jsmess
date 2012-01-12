@@ -254,7 +254,7 @@ static VIDEO_START( pc8801 )
 
 }
 
-static void draw_bitmap_3bpp(running_machine &machine, bitmap_t &bitmap)
+static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	int x,y,xi;
 	UINT32 count;
@@ -285,7 +285,7 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_t &bitmap)
 	}
 }
 
-static void draw_bitmap_1bpp(running_machine &machine, bitmap_t &bitmap)
+static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y,xi;
@@ -396,7 +396,7 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 	return 0;
 }
 
-static void pc8801_draw_char(running_machine &machine,bitmap_t &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
+static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int xi,yi;
@@ -485,7 +485,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_t &bitmap,int x,int
 	}
 }
 
-static void draw_text_80(running_machine &machine, bitmap_t &bitmap,int y_size)
+static void draw_text_80(running_machine &machine, bitmap_ind16 &bitmap,int y_size)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y;
@@ -535,7 +535,7 @@ static void draw_text_80(running_machine &machine, bitmap_t &bitmap,int y_size)
 	}
 }
 
-static void draw_text_40(running_machine &machine, bitmap_t &bitmap, int y_size)
+static void draw_text_40(running_machine &machine, bitmap_ind16 &bitmap, int y_size)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y;
@@ -588,7 +588,7 @@ static void draw_text_40(running_machine &machine, bitmap_t &bitmap, int y_size)
 	}
 }
 
-static SCREEN_UPDATE( pc8801 )
+static SCREEN_UPDATE_IND16( pc8801 )
 {
 	pc8801_state *state = screen.machine().driver_data<pc8801_state>();
 	bitmap.fill(screen.machine().pens[0], cliprect);
@@ -2256,10 +2256,9 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE(pc8801)
+	MCFG_SCREEN_UPDATE_STATIC(pc8801)
 
 	MCFG_GFXDECODE( pc8801 )
 	MCFG_PALETTE_LENGTH(0x10)

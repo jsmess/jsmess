@@ -371,7 +371,7 @@ struct _ted7360_state
 
 	UINT8 reg[0x20];
 
-	bitmap_t *bitmap;
+	bitmap_ind16 *bitmap;
 
 	int rom;
 
@@ -1198,7 +1198,7 @@ void ted7360_raster_interrupt_gen( device_t *device )
 	}
 }
 
-UINT32 ted7360_video_update( device_t *device, bitmap_t &bitmap, const rectangle &cliprect )
+UINT32 ted7360_video_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
 
@@ -1394,7 +1394,7 @@ static DEVICE_START( ted7360 )
 	width = ted7360->screen->width();
 	height = ted7360->screen->height();
 
-	ted7360->bitmap = auto_bitmap_alloc(device->machine(), width, height, BITMAP_FORMAT_INDEXED16);
+	ted7360->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
 
 	ted7360->type = intf->type;
 

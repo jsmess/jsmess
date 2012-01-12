@@ -313,7 +313,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-static void generic_terminal_update(device_t *device, bitmap_t &bitmap, const rectangle &cliprect)
+static void generic_terminal_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	terminal_state *term = get_safe_token(device);
 	UINT8 options = input_port_read(device, "TERM_CONF");
@@ -497,7 +497,7 @@ static VIDEO_START( terminal )
 
 }
 
-static SCREEN_UPDATE(terminal )
+static SCREEN_UPDATE_IND16(terminal )
 {
 	device_t *devconf = screen.machine().device(TERMINAL_TAG);
 	generic_terminal_update( devconf, bitmap, cliprect);
@@ -508,10 +508,9 @@ MACHINE_CONFIG_FRAGMENT( generic_terminal )
 	MCFG_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
-	MCFG_SCREEN_UPDATE(terminal)
+	MCFG_SCREEN_UPDATE_STATIC(terminal)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)

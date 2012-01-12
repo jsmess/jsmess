@@ -84,7 +84,6 @@ MACHINE_CONFIG_EXTERN( cbmb_cartslot );
 /*----------- defined in video/cbmb.c -----------*/
 
 VIDEO_START( cbmb_crtc );
-SCREEN_UPDATE( cbmb_crtc );
 MC6845_UPDATE_ROW( cbm600_update_row );
 MC6845_UPDATE_ROW( cbm700_update_row );
 WRITE_LINE_DEVICE_HANDLER( cbmb_display_enable_changed );

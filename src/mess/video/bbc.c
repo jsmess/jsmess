@@ -194,6 +194,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 {
 
 	bbc_state *state = device->machine().driver_data<bbc_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
     logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
 
@@ -226,7 +227,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			{
 				int col=returned_pixels[pixelno];
 
-					bitmap.pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
+					bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno)=palette[col];
 			}
 
 
@@ -247,7 +248,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
 				{
 					int col=state->m_videoULA_pallet_lookup[state->m_pixel_bits[i]];
-					bitmap.pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=col;
+					bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno)=palette[col];
 					i=(i<<1)|1;
 				}
 			}
@@ -258,7 +259,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			{
 				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
 				{
-					bitmap.pix16(y, (x_pos*state->m_pixels_per_byte)+pixelno)=7;
+					bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno)=palette[7];
 				}
 			}
 		}
@@ -332,21 +333,6 @@ READ8_HANDLER (bbc_6845_r)
 
 
 
-
-/************************************************************************
- * bbc_vh_screenrefresh
- * resfresh the BBC video screen
- ************************************************************************/
-
-SCREEN_UPDATE( bbc )
-{
-
-	mc6845_device *mc6845 = screen.machine().device<mc6845_device>("mc6845");
-	mc6845->update( bitmap, cliprect);
-
-    return 0;
-
-}
 
 /**** BBC B+ Shadow Ram change ****/
 
@@ -650,7 +636,7 @@ WRITE8_HANDLER ( bbc_6845_w )
 
 
 
-SCREEN_UPDATE( bbc )
+SCREEN_UPDATE_IND16( bbc )
 {
 
     mc6845_device *mc6845 = screen.machine().device<mc6845_device>("mc6845");

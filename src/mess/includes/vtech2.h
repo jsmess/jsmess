@@ -64,7 +64,7 @@ extern WRITE8_HANDLER ( laser_bank_select_w );
 /*----------- defined in video/vtech2.c -----------*/
 
 extern VIDEO_START( laser );
-extern SCREEN_UPDATE( laser );
+extern SCREEN_UPDATE_IND16( laser );
 extern WRITE8_HANDLER ( laser_bg_mode_w );
 extern WRITE8_HANDLER ( laser_two_color_w );
 

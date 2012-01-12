@@ -306,11 +306,11 @@ INPUT_PORTS_END
 
 // Video
 
-bool tandy2k_state::screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
+UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_vidouts)
 	{
-		m_vac->update_screen(bitmap, cliprect);
+		m_vac->screen_update(screen, bitmap, cliprect);
 	}
 
 	return 0;
@@ -710,7 +710,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
     MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
     MCFG_SCREEN_REFRESH_RATE(50)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_UPDATE_DRIVER(tandy2k_state, screen_update)
     MCFG_SCREEN_SIZE(640, 480)
     MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 

@@ -143,7 +143,7 @@ static VIDEO_START( mz2500 )
 */
 
 /* helper function, to draw stuff without getting crazy with height / width conditions :) */
-static void mz2500_draw_pixel(running_machine &machine, bitmap_t &bitmap,int x,int y,UINT16	 pen,UINT8 width,UINT8 height)
+static void mz2500_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int x,int y,UINT16	 pen,UINT8 width,UINT8 height)
 {
 	if(width && height)
 	{
@@ -166,7 +166,7 @@ static void mz2500_draw_pixel(running_machine &machine, bitmap_t &bitmap,int x,i
 		bitmap.pix16(y, x) = machine.pens[pen];
 }
 
-static void draw_80x25(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,UINT16 map_addr)
+static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT8 *vram = machine.region("maincpu")->base();
@@ -257,7 +257,7 @@ static void draw_80x25(running_machine &machine, bitmap_t &bitmap,const rectangl
 	}
 }
 
-static void draw_40x25(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
+static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT8 *vram = machine.region("maincpu")->base();
@@ -348,7 +348,7 @@ static void draw_40x25(running_machine &machine, bitmap_t &bitmap,const rectangl
 	}
 }
 
-static void draw_cg4_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int pri)
+static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	//mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
@@ -390,7 +390,7 @@ static void draw_cg4_screen(running_machine &machine, bitmap_t &bitmap,const rec
 	}
 }
 
-static void draw_cg16_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
+static void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
@@ -448,7 +448,7 @@ static void draw_cg16_screen(running_machine &machine, bitmap_t &bitmap,const re
 	}
 }
 
-static void draw_cg256_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int plane,int pri)
+static void draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
@@ -506,7 +506,7 @@ static void draw_cg256_screen(running_machine &machine, bitmap_t &bitmap,const r
 	}
 }
 
-static void draw_tv_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect)
+static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT16 base_addr;
@@ -544,7 +544,7 @@ static void draw_tv_screen(running_machine &machine, bitmap_t &bitmap,const rect
 	}
 }
 
-static void draw_cg_screen(running_machine &machine, bitmap_t &bitmap,const rectangle &cliprect,int pri)
+static void draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	mz2500_state *state = machine.driver_data<mz2500_state>();
 	//popmessage("%02x %02x",state->m_cg_reg[0x0e],state->m_cg_reg[0x18]);
@@ -579,7 +579,7 @@ static void draw_cg_screen(running_machine &machine, bitmap_t &bitmap,const rect
 	}
 }
 
-static SCREEN_UPDATE( mz2500 )
+static SCREEN_UPDATE_IND16( mz2500 )
 {
 	//mz2500_state *state = screen.machine().driver_data<mz2500_state>();
 	bitmap.fill(screen.machine().pens[0], cliprect); //TODO: correct?
@@ -2094,9 +2094,8 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
-    MCFG_SCREEN_UPDATE(mz2500)
+    MCFG_SCREEN_UPDATE_STATIC(mz2500)
 
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT(mz2500)

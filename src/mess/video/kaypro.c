@@ -16,7 +16,7 @@ PALETTE_INIT( kaypro )
 	palette_set_color(machine, 2, MAKE_RGB(0, 110, 0)); /* low intensity green */
 }
 
-SCREEN_UPDATE( kayproii )
+SCREEN_UPDATE_IND16( kayproii )
 {
 	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
 /* The display consists of 80 columns and 24 rows. Each row is allocated 128 bytes of ram,
@@ -68,7 +68,7 @@ SCREEN_UPDATE( kayproii )
 	return 0;
 }
 
-SCREEN_UPDATE( omni2 )
+SCREEN_UPDATE_IND16( omni2 )
 {
 	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
 	UINT8 y,ra,chr,gfx;
@@ -113,14 +113,14 @@ SCREEN_UPDATE( omni2 )
 	return 0;
 }
 
-SCREEN_UPDATE( kaypro2x )
+SCREEN_UPDATE_RGB32( kaypro2x )
 {
 	kaypro_state *state = screen.machine().driver_data<kaypro_state>();
 	state->m_framecnt++;
 	state->m_speed = state->m_mc6845_reg[10]&0x20;
 	state->m_flash = state->m_mc6845_reg[10]&0x40;				// cursor modes
 	state->m_cursor = (state->m_mc6845_reg[14]<<8) | state->m_mc6845_reg[15];					// get cursor position
-	state->m_crtc->update(bitmap, cliprect);
+	state->m_crtc->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -140,7 +140,8 @@ SCREEN_UPDATE( kaypro2x )
 MC6845_UPDATE_ROW( kaypro2x_update_row )
 {
 	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	UINT16 *p = &bitmap.pix16(y);
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32 *p = &bitmap.pix32(y);
 	UINT16 x;
 	UINT8 gfx,fg,bg;
 
@@ -193,14 +194,14 @@ MC6845_UPDATE_ROW( kaypro2x_update_row )
 			gfx = state->m_p_chargen[(chr<<4) | ra ] ^ inv;
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = BIT( gfx, 7 ) ? fg : bg;
-		*p++ = BIT( gfx, 6 ) ? fg : bg;
-		*p++ = BIT( gfx, 5 ) ? fg : bg;
-		*p++ = BIT( gfx, 4 ) ? fg : bg;
-		*p++ = BIT( gfx, 3 ) ? fg : bg;
-		*p++ = BIT( gfx, 2 ) ? fg : bg;
-		*p++ = BIT( gfx, 1 ) ? fg : bg;
-		*p++ = BIT( gfx, 0 ) ? fg : bg;
+		*p++ = palette[BIT( gfx, 7 ) ? fg : bg];
+		*p++ = palette[BIT( gfx, 6 ) ? fg : bg];
+		*p++ = palette[BIT( gfx, 5 ) ? fg : bg];
+		*p++ = palette[BIT( gfx, 4 ) ? fg : bg];
+		*p++ = palette[BIT( gfx, 3 ) ? fg : bg];
+		*p++ = palette[BIT( gfx, 2 ) ? fg : bg];
+		*p++ = palette[BIT( gfx, 1 ) ? fg : bg];
+		*p++ = palette[BIT( gfx, 0 ) ? fg : bg];
 	}
 }
 

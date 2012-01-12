@@ -80,9 +80,6 @@ public:
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
-
-protected:
-	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 };
 
 
@@ -95,7 +92,6 @@ WRITE8_HANDLER(lx385_data_w);
 READ8_HANDLER(lx385_ctrl_r);
 WRITE8_HANDLER(lx385_ctrl_w);
 READ8_DEVICE_HANDLER(lx388_mc6847_videoram_r);
-SCREEN_UPDATE(lx388);
 READ8_HANDLER(lx388_data_r);
 READ8_HANDLER(lx388_read_field_sync);
 READ8_DEVICE_HANDLER(lx390_fdc_r);
