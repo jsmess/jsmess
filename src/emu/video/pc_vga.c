@@ -54,7 +54,7 @@ static struct
 
 	UINT8 *memory;
 	UINT8 *fontdirty;
-	UINT16 pens[16]; /* the current 16 pens */
+	UINT32 pens[16]; /* the current 16 pens */
 
 	UINT8 miscellaneous_output;
 	UINT8 feature_control;
@@ -184,12 +184,12 @@ void pc_video_start(running_machine &machine)
 	pc_current_width = -1;
 }
 
-static void vga_vh_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
+static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 ch, attr;
 	UINT8 bits;
 	UINT8 *font;
-	UINT16 *bitmapline;
+	UINT32 *bitmapline;
 	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT;
 	int pos, line, column, mask, w, h, addr;
 	pen_t pen;
@@ -214,7 +214,7 @@ static void vga_vh_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 			for (h = MAX(-line, 0); (h < height) && (line+h < MIN(TEXT_LINES, bitmap.height())); h++)
 			{
-				bitmapline = &bitmap.pix16(line+h);
+				bitmapline = &bitmap.pix32(line+h);
 				bits = font[h<<2];
 
 				assert(bitmapline);
@@ -251,18 +251,18 @@ static void vga_vh_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-static void vga_vh_ega(bitmap_ind16 &bitmap,  const rectangle &cliprect)
+static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 {
 	int pos, line, column, c, addr, i;
 	int height = CRTC_CHAR_HEIGHT;
-	UINT16 *bitmapline;
-	UINT16 *newbitmapline;
+	UINT32 *bitmapline;
+	UINT32 *newbitmapline;
 	pen_t pen;
 
 	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
 		 line += height, addr=(addr+EGA_LINE_LENGTH)&0x3ffff)
 	{
-		bitmapline = &bitmap.pix16(line);
+		bitmapline = &bitmap.pix32(line);
 
 		for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+4)&0x3ffff)
 		{
@@ -290,16 +290,16 @@ static void vga_vh_ega(bitmap_ind16 &bitmap,  const rectangle &cliprect)
 			if (line + i >= LINES)
 				break;
 
-			newbitmapline = &bitmap.pix16(line+i);
+			newbitmapline = &bitmap.pix32(line+i);
 			memcpy(newbitmapline, bitmapline, EGA_COLUMNS * 8 * sizeof(UINT16));
 		}
 	}
 }
 
-static void vga_vh_vga(bitmap_ind16 &bitmap, const rectangle &cliprect)
+static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int pos, line, column, c, addr, curr_addr;
-	UINT16 *bitmapline;
+	UINT32 *bitmapline;
 	UINT16 mask_comp;
 
 	/* line compare is screen sensitive */
@@ -314,7 +314,7 @@ static void vga_vh_vga(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				curr_addr = addr;
 			if(line == (vga.line_compare & mask_comp))
 				curr_addr = 0;
-			bitmapline = &bitmap.pix16(line);
+			bitmapline = &bitmap.pix32(line);
 			addr %= vga.svga_intf.vram_size;
 			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x20)
 			{
@@ -339,7 +339,7 @@ static void vga_vh_vga(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				curr_addr = addr;
 			if(line == (vga.line_compare & mask_comp))
 				curr_addr = 0;
-			bitmapline = &bitmap.pix16(line);
+			bitmapline = &bitmap.pix32(line);
 			addr %= vga.svga_intf.vram_size;
 			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x08)
 			{
@@ -422,7 +422,7 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine, int *width, int *h
 	return 0;
 }
 
-SCREEN_UPDATE_IND16( pc_video )
+SCREEN_UPDATE_RGB32( pc_video )
 {
 	UINT8 cur_mode = 0;
 	int w = 0, h = 0;
@@ -451,9 +451,9 @@ SCREEN_UPDATE_IND16( pc_video )
 	switch(cur_mode)
 	{
 		case 0: bitmap.fill(get_black_pen(screen.machine()), cliprect);break;
-		case 1: vga_vh_text(bitmap,cliprect); break;
-		case 2: vga_vh_vga(bitmap,cliprect); break;
-		case 3: vga_vh_ega(bitmap,cliprect); break;
+		case 1: vga_vh_text(screen.machine(), bitmap,cliprect); break;
+		case 2: vga_vh_vga (screen.machine(), bitmap,cliprect); break;
+		case 3: vga_vh_ega (screen.machine(), bitmap,cliprect); break;
 		/* Nothing uses this so far, to be nuked */
 		case 4: vga.svga_intf.choosevideomode(vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
 	}
