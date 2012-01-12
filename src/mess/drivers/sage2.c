@@ -14,7 +14,6 @@
 
 	TODO:
 
-	- boot ROM mirror
 	- TMS9914 IEEE-488 controller
 	- board 2 (4x 2651 USART)
 	- Winchester controller
@@ -22,6 +21,46 @@
 */
 
 #include "includes/sage2.h"
+
+
+
+//**************************************************************************
+//  MEMORY MANAGEMENT UNIT
+//**************************************************************************
+
+//-------------------------------------------------
+//  mmu_r -
+//-------------------------------------------------
+
+READ8_MEMBER( sage2_state::mmu_r )
+{
+	UINT8 data = 0xff;
+	
+	if (m_reset || (offset >= 0xfe0000))
+	{
+		data = machine().region(M68000_TAG)->base()[offset & 0x1fff];
+	}
+	else if (offset < 0x080000)
+	{
+		data = m_ram->pointer()[offset];
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  mmu_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( sage2_state::mmu_w )
+{
+	if (offset < 0x080000)
+	{
+		m_ram->pointer()[offset] = data;
+	}
+}
+
 
 
 //**************************************************************************
@@ -34,8 +73,7 @@
 
 static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_REGION(M68000_TAG, 0)
-	AM_RANGE(0x002000, 0x07ffff) AM_RAM
+	AM_RANGE(0x000000, 0xfeffff) AM_READWRITE8(mmu_r, mmu_w, 0xffff)
 	AM_RANGE(0xffc000, 0xffc007) AM_DEVREADWRITE8_LEGACY(I8253_1_TAG, pit8253_r, pit8253_w, 0x00ff)
 //  AM_RANGE(0xffc010, 0xffc01f) AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
 	AM_RANGE(0xffc020, 0xffc027) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, DIPs + Floppy ctrl port
@@ -53,7 +91,6 @@ static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 //	AM_RANGE(0xffc480, 0xffc487) AM_DEVREADWRITE8(S2651_2_TAG, s2651_device, read, write, 0x00ff)
 //	AM_RANGE(0xffc4c0, 0xffc4c7) AM_DEVREADWRITE8(S2651_3_TAG, s2651_device, read, write, 0x00ff)
 //  AM_RANGE(0xffc500, 0xffc7ff) // Winchester drive ports
-	AM_RANGE(0xfe0000, 0xfe1fff) AM_MIRROR(0x1e000) AM_ROM AM_REGION(M68000_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -584,8 +621,8 @@ MACHINE_CONFIG_END
 
 ROM_START( sage2 )
 	ROM_REGION( 0x2000, M68000_TAG, 0 )
-	ROM_LOAD16_BYTE( "sage2.u18", 0x0001, 0x1000, CRC(ca9b312d) SHA1(99436a6d166aa5280c3b2d28355c4d20528fe48c) )
-	ROM_LOAD16_BYTE( "sage2.u17", 0x0000, 0x1000, CRC(27e25045) SHA1(041cd9d4617473d089f31f18cbb375046c3b61bb) )
+	ROM_LOAD16_BYTE( "sage2.u18", 0x0000, 0x1000, CRC(ca9b312d) SHA1(99436a6d166aa5280c3b2d28355c4d20528fe48c) )
+	ROM_LOAD16_BYTE( "sage2.u17", 0x0001, 0x1000, CRC(27e25045) SHA1(041cd9d4617473d089f31f18cbb375046c3b61bb) )
 ROM_END
 
 

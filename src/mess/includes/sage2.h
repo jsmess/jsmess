@@ -62,6 +62,8 @@ public:
 	
 	void update_fdc_int();
 
+	DECLARE_READ8_MEMBER( mmu_r );
+	DECLARE_WRITE8_MEMBER( mmu_w );
 	DECLARE_WRITE_LINE_MEMBER( br1_w );
 	DECLARE_WRITE_LINE_MEMBER( br2_w );
 	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
