@@ -1513,7 +1513,6 @@ static void I386OP(popfd)(i386_state *cpustate)				// Opcode 0x9d
 		}
 		mask &= ~0x00003000;  // IOPL cannot be changed while in V8086 mode
 	}
-
 	set_flags(cpustate,(current & ~mask) | (value & mask));  // mask out reserved bits
 	CYCLES(cpustate,CYCLES_POPF);
 }
