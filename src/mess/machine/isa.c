@@ -194,7 +194,16 @@ void isa8_device::install_device(device_t *dev, offs_t start, offs_t end, offs_t
 			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
 			break;
 		case 32:
-			m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+			if ((start % 4) == 0) {
+				if ((end-start)==1) {
+					m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
+				} else {
+					m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+				}
+			} else {
+				// we handle just misalligned by 2
+				m_maincpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*dev, start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
+			}
 			break;
 		default:
 			fatalerror("ISA8: Bus width %d not supported", buswidth);
@@ -214,7 +223,16 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
 			break;
 		case 32:
-			m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffffffff);
+			if ((start % 4) == 0) {
+				if ((end-start)==1) {
+					m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
+				} else {
+					m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
+				}
+			} else {
+				// we handle just misalligned by 2
+				m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
+			}		
 			break;
 		default:
 			fatalerror("ISA8: Bus width %d not supported", buswidth);
