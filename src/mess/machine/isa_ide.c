@@ -22,7 +22,11 @@ static WRITE16_DEVICE_HANDLER( ide16_w )
 static void ide_interrupt(device_t *device, int state)
 {
 	isa16_ide_device *ide  = downcast<isa16_ide_device *>(device->owner());
-	ide->m_isa->irq14_w(state);
+	if (ide->is_primary()) {
+		ide->m_isa->irq14_w(state);
+	} else {
+		ide->m_isa->irq15_w(state);
+	}
 }
 
 
@@ -33,6 +37,13 @@ static MACHINE_CONFIG_FRAGMENT( ide )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MCFG_IDE_CONTROLLER_REGIONS("harddisk1", "harddisk2")
 MACHINE_CONFIG_END
+
+static INPUT_PORTS_START( ide )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "IDE Configuration")
+	PORT_DIPSETTING(	0x00, "Primary" )
+	PORT_DIPSETTING(	0x01, "Secondary" )
+INPUT_PORTS_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -50,6 +61,15 @@ machine_config_constructor isa16_ide_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ide );
 }
 
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor isa16_ide_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ide );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -60,7 +80,8 @@ machine_config_constructor isa16_ide_device::device_mconfig_additions() const
 
 isa16_ide_device::isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
       : device_t(mconfig, ISA16_IDE, "ISA16_IDE", tag, owner, clock),
-		device_isa16_card_interface( mconfig, *this )
+		device_isa16_card_interface( mconfig, *this ),
+		m_is_primary(true)
 {
 }
 
@@ -71,7 +92,6 @@ isa16_ide_device::isa16_ide_device(const machine_config &mconfig, const char *ta
 void isa16_ide_device::device_start()
 {
 	set_isa_device();
-	m_isa->install16_device(subdevice("ide"), 0x01f0, 0x01f7, 0, 0, FUNC(ide16_r), FUNC(ide16_w) );
 }
 
 //-------------------------------------------------
@@ -79,5 +99,11 @@ void isa16_ide_device::device_start()
 //-------------------------------------------------
 
 void isa16_ide_device::device_reset()
-{
+{	
+	m_is_primary = (input_port_read(this, "DSW") & 1) ? false : true;
+	if (m_is_primary) {	
+		m_isa->install16_device(subdevice("ide"), 0x01f0, 0x01f7, 0, 0, FUNC(ide16_r), FUNC(ide16_w) );
+	} else {
+		m_isa->install16_device(subdevice("ide"), 0x0170, 0x0177, 0, 0, FUNC(ide16_r), FUNC(ide16_w) );
+	}
 }
