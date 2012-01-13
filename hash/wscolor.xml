@@ -1200,13 +1200,13 @@
 	</software>
 
 	<software name="sorobang" supported="partial">
-		<!-- Alt title: そろばんぐ -->
         <!-- WSC -->
 		<description>Sorobang</description>
 		<year>2000</year>
 		<publisher>Kaga Tech</publisher>
 		<info name="serial" value="SWJ-KGTC09"/>
 		<info name="release" value="20001209"/>
+		<info name="alt_title" value="そろばんぐ"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">

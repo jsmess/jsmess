@@ -2609,7 +2609,7 @@ Info from Atariage and Atarimania
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="cpkadv-rev4-atari-7-27-84-8Aed.bin" size="8192" crc="3d5f4684" sha1="159b2ead2e5455c87264565c628396cca997a7f3" offset="0" />
+				<rom name="cpkadv-rev4-atari-7-27-84-8aed.bin" size="8192" crc="3d5f4684" sha1="159b2ead2e5455c87264565c628396cca997a7f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
