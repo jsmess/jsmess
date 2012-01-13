@@ -617,13 +617,6 @@ static const cassette_interface super80_cassette_interface =
 };
 
 
-static DEVICE_IMAGE_LOAD( super80_cart )
-{
-	image.fread( image.device().machine().region("maincpu")->base() + 0xc000, 0x3000);
-
-	return IMAGE_INIT_PASS;
-}
-
 static const mc6845_interface super80v_crtc = {
 	"screen",			/* name of screen */
 	SUPER80V_DOTS,			/* number of dots per character */
@@ -637,12 +630,6 @@ static const mc6845_interface super80v_crtc = {
 	NULL
 };
 
-static MACHINE_CONFIG_FRAGMENT( super80_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(super80_cart)
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( super80, super80_state )
 	/* basic machine hardware */
@@ -680,9 +667,6 @@ static MACHINE_CONFIG_START( super80, super80_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_interface )
-
-	/* cartridge */
-	MCFG_FRAGMENT_ADD(super80_cartslot)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80d, super80 )
@@ -752,9 +736,6 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, super80_cassette_interface )
-
-	/* cartridge */
-	MCFG_FRAGMENT_ADD(super80_cartslot)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80r, super80v )
