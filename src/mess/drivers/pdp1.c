@@ -1923,7 +1923,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 	MCFG_SCREEN_UPDATE_STATIC(pdp1)
-	MCFG_SCREEN_EOF(pdp1)
+	MCFG_SCREEN_EOF_STATIC(pdp1)
 
 	MCFG_CRT_ADD( "crt", pdp1_crt_interface )
 	MCFG_DEVICE_ADD("readt", PDP1_READTAPE, 0)
