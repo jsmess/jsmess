@@ -267,7 +267,8 @@ static ADDRESS_MAP_START(mmd2_io, AS_IO, 8, mmd1_state)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(mmd1_port0_w)
 	AM_RANGE( 0x01, 0x01 ) AM_READWRITE(mmd2_01_r,mmd1_port1_w)
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(mmd1_port2_w)
-	AM_RANGE( 0x03, 0x04 ) AM_DEVREADWRITE("i8279", i8279_device, read, write)
+	AM_RANGE( 0x03, 0x03 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE( 0x04, 0x04 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
 	AM_RANGE( 0x05, 0x07 ) AM_READ(mmd2_bank_r)
 ADDRESS_MAP_END
 

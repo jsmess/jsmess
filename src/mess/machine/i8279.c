@@ -73,7 +73,6 @@ that uses this feature.
 **********************************************************************/
 
 #include "i8279.h"
-#include "machine/devhelpr.h"
 
 
 //**************************************************************************
@@ -354,13 +353,13 @@ void i8279_device::timer_mainloop()
 }
 
 
-UINT8 i8279_device::status_r()
+READ8_MEMBER( i8279_device::status_r )
 {
 	return m_status;
 }
 
 
-UINT8 i8279_device::data_r()
+READ8_MEMBER( i8279_device::data_r )
 {
 	UINT8 i;
 	bool sensor_mode = ((m_cmd[0] & 6)==4);
@@ -419,7 +418,7 @@ UINT8 i8279_device::data_r()
 }
 
 
-void i8279_device::ctrl_w( UINT8 data )
+WRITE8_MEMBER( i8279_device::cmd_w )
 {//printf("Command: %X=%X ",data>>5,data&31);
 	UINT8 cmd = data >> 5;
 	data &= 0x1f;
@@ -457,7 +456,7 @@ void i8279_device::ctrl_w( UINT8 data )
 }
 
 
-void i8279_device::data_w( UINT8 data )
+WRITE8_MEMBER( i8279_device::data_w )
 {//printf("Data: %X ",data);
 	if (BIT(m_cmd[0], 4) & m_autoinc)
 	{
@@ -472,25 +471,3 @@ void i8279_device::data_w( UINT8 data )
 	m_d_ram_ptr &= 15;
 }
 
-
-// These 2 are only to be used if the port numbers are sequential
-READ8_MEMBER( i8279_device::read )
-{
-	return BIT(offset, 0) ? data_r() : status_r();
-}
-
-
-WRITE8_MEMBER( i8279_device::write)
-{
-	BIT(offset, 0) ? data_w(data) : ctrl_w(data);
-}
-
-
-/***************************************************************************
-    TRAMPOLINES
-***************************************************************************/
-
-WRITE8_MEMBER( i8279_device::i8279_ctrl_w ) { ctrl_w(data); }
-WRITE8_MEMBER( i8279_device::i8279_data_w ) { data_w(data); }
-READ8_MEMBER( i8279_device::i8279_status_r ) { return status_r(); }
-READ8_MEMBER( i8279_device::i8279_data_r ) { return data_r(); }

@@ -80,14 +80,11 @@ public:
 	// construction/destruction
 	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	/* read data register */
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(i8279_status_r);
-	DECLARE_READ8_MEMBER(i8279_data_r);
-	DECLARE_WRITE8_MEMBER(i8279_ctrl_w);
-	DECLARE_WRITE8_MEMBER(i8279_data_w);
-
+	// read & write handlers
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_WRITE8_MEMBER(cmd_w);
+	DECLARE_WRITE8_MEMBER(data_w);
 	void timer_mainloop();
 
 protected:
@@ -109,10 +106,6 @@ private:
 	UINT8 get_segments();
 	void set_irq(bool state);
 	void set_display_mode(UINT8 data);
-	void ctrl_w(UINT8 data);
-	void data_w(UINT8 data);
-	UINT8 status_r();
-	UINT8 data_r();
 
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write8		m_out_sl_func;
