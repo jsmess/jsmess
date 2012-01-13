@@ -84,9 +84,8 @@
 
 #define MCFG_ISA_ONBOARD_ADD(_isatag, _tag, _dev_type, _def_inp) \
     MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	device_isa8_card_interface::static_set_isabus_tag(*device, _isatag); \
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-
+	device_isa8_card_interface::static_set_isabus_tag(*device, _isatag); \
 
 #define MCFG_ISA16_BUS_ADD(_tag, _cputag, _config) \
     MCFG_DEVICE_ADD(_tag, ISA16, 0) \
