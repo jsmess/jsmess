@@ -13,16 +13,6 @@
 
 #include "includes/at.h"
 
-READ32_MEMBER( at_state::ide_r )
-{
-	return ide_controller32_r(m_ide, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER( at_state::ide_w )
-{
-	ide_controller32_w(m_ide, 0x1f0/4 + offset, data, mem_mask);
-}
-
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK("bank10")
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
@@ -152,7 +142,6 @@ static ADDRESS_MAP_START( at386_io, AS_IO, 32, at_state )
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 ADDRESS_MAP_END
 
 
@@ -195,7 +184,6 @@ static ADDRESS_MAP_START( ct486_io, AS_IO, 32, at_state )
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 ADDRESS_MAP_END
 
 
@@ -210,7 +198,6 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at_state )
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e0, 0x00ef) AM_NOP // used for timing?
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r, pci_32le_w)
 ADDRESS_MAP_END
 
@@ -316,11 +303,6 @@ static const kb_keytronic_interface at_keytronic_intf =
 	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_clock_w),
 	DEVCB_DEVICE_LINE_MEMBER("keybc", at_keyboard_controller_device, keyboard_data_w)
 };
-
-static void ide_interrupt(device_t *device, int state)
-{
-	pic8259_ir6_w(device->machine().device("pic8259_slave"),state);
-}
 
 WRITE_LINE_MEMBER( at_state::at_mc146818_irq )
 {
@@ -559,18 +541,13 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
 	MCFG_ISA_ONBOARD_ADD("isabus", "fdc", ISA8_FDC, NULL)
 	MCFG_ISA_ONBOARD_ADD("isabus", "com", ISA8_COM_AT, NULL)
+	MCFG_ISA_ONBOARD_ADD("isabus", "ide", ISA16_IDE, NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, NULL, NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, NULL, NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, NULL, NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, NULL, NULL)
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-
-	/* harddisk */
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-	MCFG_IDE_CONTROLLER_REGIONS("harddisk1", "harddisk2")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -600,6 +577,14 @@ static MACHINE_CONFIG_DERIVED( ct486, at386 )
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
 MACHINE_CONFIG_END
 
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( ide_2nd)
+//-------------------------------------------------
+
+static DEVICE_INPUT_DEFAULTS_START( ide_2nd )
+	DEVICE_INPUT_DEFAULTS("DSW", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END
+
 
 static MACHINE_CONFIG_DERIVED( at586, at386 )
 	MCFG_CPU_REPLACE("maincpu", PENTIUM, 60000000)
@@ -613,6 +598,8 @@ static MACHINE_CONFIG_DERIVED( at586, at386 )
 	MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
 	MCFG_PCI_BUS_DEVICE(1, "i82371ab", i82371ab_pci_read, i82371ab_pci_write)
 
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, "ide", ide_2nd) //2nd-ary IDE
+	
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
