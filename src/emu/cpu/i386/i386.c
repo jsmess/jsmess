@@ -3032,6 +3032,7 @@ static CPU_EXECUTE( i386 )
 
 	while( cpustate->cycles > 0 )
 	{
+		i386_check_irq_line(cpustate);
 		cpustate->operand_size = cpustate->sreg[CS].d;
 		cpustate->address_size = cpustate->sreg[CS].d;
 		cpustate->operand_prefix = 0;
@@ -3044,7 +3045,6 @@ static CPU_EXECUTE( i386 )
 
 		debugger_instruction_hook(device, cpustate->pc);
 
-		i386_check_irq_line(cpustate);
 		if(cpustate->delayed_interrupt_enable != 0)
 		{
 			cpustate->IF = 1;
