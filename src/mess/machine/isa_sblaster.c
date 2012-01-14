@@ -45,6 +45,7 @@ static struct {
 	UINT8 fifo_r[16],fifo_r_ptr;
 	UINT16 version;
 	UINT8 test_reg;
+	UINT8 speaker_on;
 }m_dsp;
 
 
@@ -64,7 +65,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Ax */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Bx */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Cx */
-	-1, -1, -1,  1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Dx */
+	-1,  1, -1,  1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Dx */
 	 2,  1, -1, -1,  2, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
 	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1  /* Fx */
 };
@@ -255,8 +256,16 @@ static void process_fifo(running_machine &machine, UINT8 cmd)
 		/* get FIFO params */
 		switch(cmd)
 		{
+			case 0xd1: // speaker on
+				// ...
+				m_dsp.speaker_on = 1;
+				break;
 			case 0xd3: // speaker off
-				queue_r(0);
+				// ...
+				m_dsp.speaker_on = 0;
+				break;
+			case 0xd8: // speaker status
+				queue_r(m_dsp.speaker_on ? 0xff : 0x00);
 				break;
 			case 0xe0: // get DSP identification
 				queue_r(m_dsp.fifo[1] ^ 0xff);
@@ -272,9 +281,11 @@ static void process_fifo(running_machine &machine, UINT8 cmd)
 				queue_r(m_dsp.test_reg);
 				break;
 			case 0xf2: // send PIC irq
+				//m_isa->irq5_w(1);
 				pic8259_ir5_w(machine.device("pic8259_master"), 1);
 				break;
 			case 0xf8: // ???
+				logerror("SB: Unknown command write 0xf8");
 				queue_r(0);
 				break;
 		}
