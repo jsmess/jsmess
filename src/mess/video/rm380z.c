@@ -14,6 +14,44 @@ RM 380Z video code
 #include "includes/rm380z.h"
 
 
+void rm380z_state::put_point(int charnum,int x,int y,int col)
+{
+	int mx=3;
+	if (y==6) mx=4;
+	
+	for (int r=y;r<(y+mx);r++)
+	{
+		for (int c=x;c<(x+3);c++)
+		{
+			m_graphic_chars[charnum][c+(r*(RM380Z_CHDIMX+1))]=col;
+		}
+	}
+}
+
+void rm380z_state::init_graphic_chars()
+{
+	for (int c=0;c<0x3f;c++)
+	{
+		if (c&0x01) put_point(c,0,0,1);
+		else 				put_point(c,0,0,0);
+
+		if (c&0x02) put_point(c,3,0,1);
+		else 				put_point(c,3,0,0);
+
+		if (c&0x04) put_point(c,0,3,1);
+		else 				put_point(c,0,3,0);
+
+		if (c&0x08) put_point(c,3,3,1);
+		else 				put_point(c,3,3,0);
+
+		if (c&0x10) put_point(c,0,6,1);
+		else 				put_point(c,0,6,0);
+
+		if (c&0x20) put_point(c,3,6,1);
+		else 				put_point(c,3,6,0);
+	}
+}
+
 void rm380z_state::config_videomode()
 {
 	if (m_port0&0x20)
@@ -30,11 +68,6 @@ void rm380z_state::config_videomode()
 	if (m_old_videomode!=m_videomode)
 	{
 		m_old_videomode=m_videomode;
-		memset(m_vram,0x20,RM380Z_SCREENSIZE);
-		memset(m_vramchars,0x20,RM380Z_SCREENSIZE);
-		memset(m_vramattribs,0x00,RM380Z_SCREENSIZE);
-		maxrow=0;
-		m_pageAdder=0;
 	}
 }
 
@@ -131,6 +164,31 @@ void rm380z_state::scroll_videoram()
 	}	
 }
 
+void rm380z_state::check_scroll_register()
+{
+	UINT8 r[3];
+	
+	r[0]=m_old_old_fbfd;
+	r[1]=m_old_fbfd;
+	r[2]=m_fbfd;
+
+	if ( ((r[1]&0x20)==0) && ((r[2]&0x20)==0) )
+	{
+		// it's a scroll command
+		
+		if (r[2]>r[1])
+		{
+			scroll_videoram();
+		}
+		else if ((r[2]==0x00)&&(r[1]==0x17))
+		{
+			// wrap-scroll
+			scroll_videoram();
+		}
+		
+	}
+}
+
 // after ctrl-L (clear screen?): routine at EBBD is executed
 // EB30??? next line?
 // memory at FF02 seems to hold the line counter (same as FBFD)
@@ -143,47 +201,19 @@ WRITE8_MEMBER( rm380z_state::videoram_write )
 {
 	rm380z_state *state = machine().driver_data<rm380z_state>();
 
-	//printf("vramw [%x][%x] port0 [%x] fbfd [%x] fbfe [%x] PC [%x]\n",offset,data,state->m_port0,m_fbfd,m_fbfe,cpu_get_pc(machine().device("maincpu")));
-	//printf("maxrow is [%x]\n",maxrow);
-
+	//printf("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,state->m_port0,m_fbfd,m_fbfe,cpu_get_pc(machine().device("maincpu")));
+	
 	int lineWidth=0x80;
 	if (m_videomode==RM380Z_VIDEOMODE_40COL)
 	{
 		lineWidth=0x40;
 	}
-
-	if (m_old_fbfd>m_fbfd)
-	{
-		//printf("WARN: fbfd wrapped\n");
-		m_pageAdder+=(0x18*lineWidth);
-	}
-	m_old_fbfd=m_fbfd;
-
-	//
-	 
-	int rowadder=(m_fbfe&0x0f)*2;
-	int fbfdadder=m_fbfd&0x1f;
-
-	int lineAdder=(rowadder+fbfdadder)*lineWidth;
-	int realA=offset+lineAdder+m_pageAdder;
-
-	if ((realA/lineWidth)>maxrow)
-	{
-		maxrow=realA/lineWidth;
-		//printf("setting new maxrow [%x]\n",maxrow);
-		if (maxrow>0x17) 
-		{
-			//printf("ok, scrolling videoram\n");
-			scroll_videoram();
-		}
-	}
 	
-	int scrollsub=0;
-	if (maxrow>0x17)
-	{
-		scrollsub=(maxrow-0x17)*lineWidth;
-	}
-	realA-=scrollsub;
+	int rowadder=(m_fbfe&0x0f)*2;
+	if (m_videomode==RM380Z_VIDEOMODE_40COL) rowadder=0; // FBFE register is not used in VDU-40
+
+	int lineAdder=rowadder*lineWidth;
+	int realA=(offset+lineAdder);
 
 	// we suppose videoram is being written as character/attribute couple
 	// fbfc 6th bit set=attribute, unset=char
@@ -205,30 +235,30 @@ WRITE8_MEMBER( rm380z_state::videoram_write )
 READ8_MEMBER( rm380z_state::videoram_read )
 {
 	rm380z_state *state = machine().driver_data<rm380z_state>();
-	//printf("read from videoram at [%x]\n",offset);
-	//return state->m_vram[offset];
 	return state->m_mainVideoram[offset];
 }
 
 void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsigned char* chsb,int vmode)
 {
-//	bool attrDim=false;
+	//bool attrDim=false;
 	bool attrRev=false;
 	bool attrUnder=false;
 	
 	if (attribs&0x02) attrUnder=true;
-//	if (attribs&0x04) attrDim=true;
+	//if (attribs&0x04) attrDim=true;
 	if (attribs&0x08) attrRev=true;
 	
 	if ((charnum>0)&&(charnum<=0x7f))
 	{
+		// normal chars (base set)
+
 		if (vmode==RM380Z_VIDEOMODE_80COL)
 		{
 			int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
 			int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
 			
 			int inix=x*(RM380Z_CHDIMX+1);
-			int iniy=y*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS*RM380Z_CHDIMY;
+			int iniy=y*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS*(RM380Z_CHDIMY+1);
 			
 			for (int r=0;r<RM380Z_CHDIMY;r++)
 			{
@@ -276,7 +306,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 			int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
 			
 			int inix=(x*(RM380Z_CHDIMX+1)*2);
-			int iniy=y*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)*RM380Z_CHDIMY;
+			int iniy=y*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)*(RM380Z_CHDIMY+1);
 			
 			for (int r=0;r<RM380Z_CHDIMY;r++)
 			{
@@ -322,6 +352,37 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 			}
 		}
 	}
+	else
+	{
+		// graphic chars: 0x80-0xbf is "dimmed", 0xc0-0xff is full bright
+		if (vmode==RM380Z_VIDEOMODE_80COL)
+		{
+			int inix=x*(RM380Z_CHDIMX+1);
+			int iniy=y*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS*(RM380Z_CHDIMY+1);
+			
+			for (int r=0;r<(RM380Z_CHDIMY+1);r++)
+			{
+				for (int c=0;c<RM380Z_CHDIMX;c++)
+				{
+					pscr[(inix+c)+(iniy+(r*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS))]=m_graphic_chars[charnum&0x3f][c+(r*(RM380Z_CHDIMX+1))];
+				}
+			}
+		}
+		else
+		{
+			int inix=(x*(RM380Z_CHDIMX+1)*2);
+			int iniy=y*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)*(RM380Z_CHDIMY+1);
+			
+			for (int r=0;r<RM380Z_CHDIMY;r++)
+			{
+				for (int c=0;c<(RM380Z_CHDIMX*2);c+=2)
+				{
+					pscr[(inix+c)+(iniy+(r*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
+					pscr[(inix+c+1)+(iniy+(r*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
+				}
+			}
+		}
+	}
 }
 
 void rm380z_state::update_screen(bitmap_ind16 &bitmap)
@@ -329,7 +390,8 @@ void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 	unsigned char* pChar=machine().region("gfx")->base();
 	UINT16* scrptr = &bitmap.pix16(0);
 	
-	memset(scrptr,0,(RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))*(RM380Z_SCREENROWS*RM380Z_CHDIMY)*2);
+	// blank screen
+	memset(scrptr,0,(RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))*(RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))*2);
 
 	int lineWidth=0x80;
 	int ncols=80;
@@ -347,8 +409,6 @@ void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 			UINT8 curch,attribs;
 			decode_videoram_char((row*lineWidth)+col,curch,attribs);
 			putChar(curch,attribs,col,row,scrptr,pChar,m_videomode);			
-
-			//putChar(0x4f,10,10,scrptr,pChar,RM380Z_VIDEOMODE_40COL);			
 		}
 	}
 }

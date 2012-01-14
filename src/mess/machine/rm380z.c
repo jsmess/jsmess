@@ -18,7 +18,7 @@ RM 380Z machine
 
 PORT0 write in COS 4.0B/M:
 
-bit0: 1=reset keyboard latch
+bit0: 1=reset keyboard latch (?)
 bit1: ?
 bit2: ?
 bit3: ?
@@ -33,32 +33,45 @@ WRITE8_MEMBER( rm380z_state::port_write )
 {
 	switch ( offset )
 	{
-	case 0x00:		// PORT0
-		//printf("write of [%x] to FBFC at PC [%x]\n",data,cpu_get_pc(machine().device("maincpu")));
+	case 0xFC:		// PORT0
+		//printf("FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",data,m_fbfd,m_fbfe,cpu_get_pc(machine().device("maincpu")),writenum); 
 		m_port0 = data;
 		if (data&0x01)
 		{
 			//printf("WARNING: bit0 of port0 reset\n");
 			m_port0_kbd=0;
 		}
+		m_port1&=~0x01; //?
+
 		config_videomode();
 		config_memory_map();
 		break;
 
-	case 0x01:		// screen line counter (?)
-		//printf("write of [%x] to FBFD at PC [%x] FBFE [%x]\n",data,cpu_get_pc(machine().device("maincpu")),m_fbfe);
+	case 0xFD:		// screen line counter (?)
+		//printf("FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,data,m_fbfe,cpu_get_pc(machine().device("maincpu")),writenum); 
+		
+		m_old_old_fbfd=m_old_fbfd;
+		m_old_fbfd=m_fbfd;
 		m_fbfd=data;
+
+		writenum++;
+
+		check_scroll_register();
+		
 		break;
 
-	case 0x02:		// something related to screen position
-		//printf("write of [%x] to FBFE\n",data);
+	case 0xFE:		// line on screen to write to divided by 2
+		//printf("FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,m_fbfd,data,cpu_get_pc(machine().device("maincpu")),writenum); 
 		m_fbfe=data;
 		break;
 
-	case 0x03:		// user I/O port
+	case 0xFF:		// user I/O port
 		//printf("write of [%x] to FBFF\n",data);
 		//logerror("%s: Write %02X to user I/O port\n", machine().describe_context(), data );
 		break;
+		
+	default:
+		printf("unknown port [%2.2x] write of [%2.2x]\n",offset,data);
 	}
 }
 
@@ -68,33 +81,81 @@ READ8_MEMBER( rm380z_state::port_read )
 
 	switch ( offset )
 	{
-	case 0x00:		// PORT0
+	case 0xFC:		// PORT0
 		//m_port0_kbd=getKeyboard();
 		data = m_port0_kbd;
 		//if (m_port0_kbd!=0) m_port0_kbd=0;
 		//m_port0_kbd=0;
-		//printf("read of port0 (kbd) at [%f] from PC [%x]\n",machine().time().as_double(),cpu_get_pc(machine().device("maincpu")));
+		//printf("read of port0 (kbd) from PC [%x]\n",cpu_get_pc(machine().device("maincpu")));
 		break;
 
-	case 0x01:		// "counter" (?)
+	case 0xFD:		// "counter" (?)
 		//printf("%s: Read from counter FBFD\n", machine().describe_context());
 		data = 0x00;
 		break;
 
-	case 0x02:		// PORT1
+	case 0xFE:		// PORT1
 		data = m_port1;
+		//printf("read of port1 from PC [%x]\n",cpu_get_pc(machine().device("maincpu")));
 		break;
 
-	case 0x03:		// user port
+	case 0xFF:		// user port
 		//printf("%s: Read from user port\n", machine().describe_context());
 		break;
+		
+	default:
+		printf("read from unknown port [%2.2x]\n",offset);
 	}
 
 	return data;
 }
 
-#define LINE_SUBDIVISION 40
-#define TIMER_SPEED 50*100*LINE_SUBDIVISION
+WRITE8_MEMBER( rm380z_state::port_write_1b00 )
+{
+	address_space *program = m_maincpu->space(AS_PROGRAM);
+	port_write(*program,offset+0xfc,data);
+}
+
+READ8_MEMBER( rm380z_state::port_read_1b00 )
+{
+	address_space *program = m_maincpu->space(AS_PROGRAM);
+	return port_read(*program,offset+0xfc);
+}
+
+READ8_MEMBER( rm380z_state::hiram_read )
+{
+	return hiram[offset];
+}
+
+WRITE8_MEMBER( rm380z_state::hiram_write )
+{
+	hiram[offset]=data;
+}
+
+READ8_MEMBER( rm380z_state::rm380z_portlow_r )
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER( rm380z_state::rm380z_portlow_w )
+{
+	//printf("port write [%x] [%x] at PC [%x]\n",offset,data,cpu_get_pc(machine().device("maincpu")));
+}
+
+READ8_MEMBER( rm380z_state::rm380z_porthi_r )
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER( rm380z_state::rm380z_porthi_w )
+{
+	//printf("port write [%x] [%x]\n",offset+0xc5,data);
+}
+
+
+#define LINE_SUBDIVISION 82
+#define HORZ_LINES 100
+#define TIMER_SPEED 50*HORZ_LINES*LINE_SUBDIVISION
 
 //
 // this simulates line+frame blanking
@@ -109,19 +170,33 @@ static TIMER_CALLBACK(static_vblank_timer)
 	rm380z_state *state = machine.driver_data<rm380z_state>();
 
 	state->m_rasterlineCtr++;
-	state->m_rasterlineCtr%=(100*LINE_SUBDIVISION);
+	state->m_rasterlineCtr%=(HORZ_LINES*LINE_SUBDIVISION);
 
-	if (state->m_rasterlineCtr>=((100-22)*LINE_SUBDIVISION))
+	// frame blanking
+	if (state->m_rasterlineCtr>=((HORZ_LINES-22)*LINE_SUBDIVISION))
 	{
-		// frame blanking
-		state->m_port1=0x41;
+		state->m_port1|=0x40;
 	}
 	else
 	{
-		state->m_port1=0x00;
+		state->m_port1&=~0x40;
 	}
 
-	if ((state->m_rasterlineCtr%LINE_SUBDIVISION)==0) state->m_port1|=0x80; // line blanking
+	// line blanking
+	if ((state->m_rasterlineCtr%LINE_SUBDIVISION)>80) 
+	{
+		state->m_port1|=0x80;
+	}
+	else
+	{
+		state->m_port1&=~0x80;
+	}
+}
+
+WRITE8_MEMBER( rm380z_state::keyboard_put )
+{
+	m_port0_kbd = data;
+	m_port1|=0x01;
 }
 
 //
@@ -158,7 +233,7 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 		// motor on
 	}
 
-	// "MSEL (dir/side select bit)
+	// "MSEL (dir/side select bit)"
 	if (data&0x20)
 	{
 		wd17xx_set_side(fdc,1);
@@ -174,13 +249,6 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 	}
 }
 
-WRITE8_MEMBER( rm380z_state::keyboard_put )
-{
-	//printf("pressed [%x]\n",data);
-	//if (data==0x60) data=0x1d; // remap ESC
-	m_port0_kbd = data;
-}
-
 void rm380z_state::machine_reset()
 {
 	m_port0=0x00;
@@ -189,25 +257,25 @@ void rm380z_state::machine_reset()
 	m_fbfd=0x00;
 	m_fbfe=0x00;
 	m_old_fbfd=0x00;
-	maxrow=0;
-	m_pageAdder=0;
+	m_old_old_fbfd=0x00;
+	writenum=0;
+
 	m_videomode=RM380Z_VIDEOMODE_80COL;
 	m_old_videomode=m_videomode;
-
 	m_rasterlineCtr=0;
 
-	// note: from COS 4.0 videos, RAM seems to have garbage at the beginning
-	memset(m_mainVideoram,0,0x600);
+	// note: from COS 4.0 videos, screen seems to show garbage at the beginning
+	memset(m_mainVideoram,0,RM380Z_VIDEORAM_SIZE);
 
 	memset(m_vramattribs,0,RM380Z_SCREENSIZE);
 	memset(m_vramchars,0,RM380Z_SCREENSIZE);
 	memset(m_vram,0,RM380Z_SCREENSIZE);
-
+	
 	config_memory_map();
-
 	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), FUNC(static_vblank_timer));
-
 	wd17xx_reset(machine().device("wd1771"));
+
+	init_graphic_chars();
 }
 
 void rm380z_state::config_memory_map()
@@ -223,7 +291,7 @@ void rm380z_state::config_memory_map()
 	else
 	{
 		program->install_rom( 0x0000, 0x0FFF, rom );
-		program->install_readwrite_handler(0x1BFC, 0x1BFF,read8_delegate(FUNC(rm380z_state::port_read), this),write8_delegate(FUNC(rm380z_state::port_write), this)	);
+		program->install_readwrite_handler(0x1BFC, 0x1BFF,read8_delegate(FUNC(rm380z_state::port_read_1b00), this),write8_delegate(FUNC(rm380z_state::port_write_1b00), this)	);
 		program->install_rom( 0x1C00, 0x1DFF, rom + 0x1400 );
 		program->install_ram( 0x4000, 0xDFFF, m_ram_p );
 	}
