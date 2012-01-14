@@ -79,7 +79,8 @@ joyman			// hack
 ctrpllrp		// hack
 eyes			// (c) 1982 Digitrex Techstar + "Rockola presents"
 eyes2			// (c) 1982 Techstar + "Rockola presents"
-eyeszac			// (c) 1982 Zaccaria / bootleg
+eyeszac			// (c) 1982 Techstar / Zaccaria
+eyeszacb		// bootleg
 birdiy			// (c) 1983 Mama Top
 mrtnt			// (c) 1983 Telko
 gorkans			// (c) 1984 Techstar
@@ -1104,6 +1105,7 @@ highspltb		// (c) 1979 Nintendo
 spacelnc		// (c) 1979 Nintendo
 sheriff			// (c) 1979 Nintendo
 bandido			// (c) 1980 Exidy
+westgun2		// (c) 1980 Taito Corporation
 helifire		// (c) 1980 Nintendo
 helifirea		// (c) 1980 Nintendo
 radarscp		// (c) 1980 Nintendo
@@ -8116,7 +8118,8 @@ galpani4k		// 1996.09 (c) 1996 Kaneko (Korea)
 jjparads		// 1996.12 (c) 1996 Electro Design Co. (Japan)
 sarukani		// 1997.01 (c) 1997 Kaneko / Mediaworks (Japan)
 vblokbrk		// 1997.?? (c) 1997 Kaneko / Mediaworks (Asia)
-galpanis		// 1997.04 (c) 1997 Kaneko (Japan)
+galpanis		// 1997.04 (c) 1997 Kaneko (Europe)
+galpanisj		// 1997.04 (c) 1997 Kaneko (Japan)
 galpanisk		// 1997.04 (c) 1997 Kaneko (Korea)
 sengekis		// 1997.?? (c) 1997 Kaneko / Warashi (Asia)
 sengekisj		// 1997.07 (c) 1997 Kaneko / Warashi (Japan)
@@ -9975,7 +9978,7 @@ fitfight		// bootleg of Art of Fighting
 histryma		// bootleg of Fighter's History
 bbprot			// unfinished prototype
 beaminv			// (c) 1979 Tekunon Kougyou (Arcade TV Game List - P.95, Left, 9 from top)
-beaminva		// (c) 1979 Tekunon Kougyou (Arcade TV Game List - P.95, Left, 9 from top)
+pacominv		// (c) 1979 Pacom Corporation
 mcatadv			// (c) 1993 Wintechno
 mcatadvj		// (c) 1993 Wintechno
 catt			// (c) 1993 Wintechno
