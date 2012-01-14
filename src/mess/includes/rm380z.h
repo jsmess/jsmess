@@ -25,7 +25,10 @@ Research Machines RM 380Z
 #define RM380Z_NCY 16
 #define RM380Z_SCREENCOLS 80
 #define RM380Z_SCREENROWS 24
+
+#define RM380Z_VIDEORAM_SIZE 0x600
 #define RM380Z_SCREENSIZE 0x1200
+
 
 //
 //
@@ -36,10 +39,16 @@ class rm380z_state : public driver_device
 {
 private:
 
+	void put_point(int charnum,int x,int y,int col);
+	void init_graphic_chars();
+
 	void putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsigned char* chsb,int vmode);
 	void decode_videoram_char(int pos,UINT8& chr,UINT8& attrib);
 	void scroll_videoram();
 	void config_videomode();
+	void check_scroll_register();
+
+	int writenum;
 
 protected:
 	virtual void machine_reset();
@@ -52,21 +61,22 @@ public:
 	UINT8 m_fbfd;
 	UINT8 m_fbfe;
 
-	UINT8	m_mainVideoram[0x600];
+	UINT8 m_graphic_chars[0x80][(RM380Z_CHDIMX+1)*(RM380Z_CHDIMY+1)];
 
+	UINT8	m_mainVideoram[RM380Z_VIDEORAM_SIZE];
 	UINT8	m_vramchars[RM380Z_SCREENSIZE];
 	UINT8	m_vramattribs[RM380Z_SCREENSIZE];
 	UINT8	m_vram[RM380Z_SCREENSIZE];
 
 	int m_rasterlineCtr;
 	emu_timer* m_vblankTimer;
+	
 	int m_old_fbfd;
-	int maxrow; // maximum row where the code wrote to videoram
-	int m_pageAdder; // pages to add (incremented by one page when FBFD wraps)
+	int m_old_old_fbfd;
 	
 	int m_videomode;
 	int m_old_videomode;
-
+	
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_messram;
 	optional_device<device_t> m_fdc;
@@ -80,12 +90,23 @@ public:
 
 	DECLARE_WRITE8_MEMBER( port_write );
 	DECLARE_READ8_MEMBER( port_read );
+	DECLARE_WRITE8_MEMBER( port_write_1b00 );
+	DECLARE_READ8_MEMBER( port_read_1b00 );
 
 	DECLARE_READ8_MEMBER( main_read );
 	DECLARE_WRITE8_MEMBER( main_write );
 
 	DECLARE_READ8_MEMBER( videoram_read );
 	DECLARE_WRITE8_MEMBER( videoram_write );
+
+	UINT8 hiram[0x1000];
+	DECLARE_READ8_MEMBER( hiram_read );
+	DECLARE_WRITE8_MEMBER( hiram_write );
+
+	DECLARE_READ8_MEMBER( rm380z_portlow_r );
+	DECLARE_WRITE8_MEMBER( rm380z_portlow_w );
+	DECLARE_READ8_MEMBER( rm380z_porthi_r );
+	DECLARE_WRITE8_MEMBER( rm380z_porthi_w );
 
 	DECLARE_WRITE8_MEMBER(disk_0_control);
 
