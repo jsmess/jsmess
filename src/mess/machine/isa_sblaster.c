@@ -6,7 +6,7 @@
   - DSP type is unknown at current time, and probably has an internal ROM
     that needs decapping;
   - joystick port;
-  - implement jumpers dip-sw;
+  - implement jumpers DIP-SWs;
   - state machine + read/write members
 
 ***************************************************************************/
@@ -16,6 +16,7 @@
 #include "sound/speaker.h"
 #include "sound/3812intf.h"
 #include "sound/saa1099.h"
+#include "machine/pic8259.h"
 
 /*
   adlib (YM3812/OPL2 chip), part of many many soundcards (soundblaster)
@@ -42,6 +43,8 @@ static struct {
 	UINT8 wbuf_status;
 	UINT8 fifo[16],fifo_ptr;
 	UINT8 fifo_r[16],fifo_r_ptr;
+	UINT16 version;
+	UINT8 test_reg;
 }m_dsp;
 
 
@@ -62,8 +65,8 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Bx */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Cx */
 	-1, -1, -1,  1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Dx */
-	 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
-	-1, -1, -1, -1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1  /* Fx */
+	 2,  1, -1, -1,  2, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
+	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1  /* Fx */
 };
 
 static const ym3812_interface pc_ym3812_interface =
@@ -241,7 +244,7 @@ static WRITE8_DEVICE_HANDLER(dsp_rbuf_status_w)
 	logerror("Soundblaster DSP Read Buffer status undocumented write\n");
 }
 
-static void process_fifo(UINT8 cmd)
+static void process_fifo(running_machine &machine, UINT8 cmd)
 {
 	if (m_cmd_fifo_length[cmd] == -1)
 	{
@@ -257,6 +260,19 @@ static void process_fifo(UINT8 cmd)
 				break;
 			case 0xe0: // get DSP identification
 				queue_r(m_dsp.fifo[1] ^ 0xff);
+				break;
+			case 0xe1: // get DSP version
+				queue_r(m_dsp.version >> 8);
+				queue_r(m_dsp.version & 0xff);
+				break;
+			case 0xe4: // write test register
+				m_dsp.test_reg = m_dsp.fifo[1];
+				break;
+			case 0xe8: // read test register
+				queue_r(m_dsp.test_reg);
+				break;
+			case 0xf2: // send PIC irq
+				pic8259_ir5_w(machine.device("pic8259_master"), 1);
 				break;
 			case 0xf8: // ???
 				queue_r(0);
@@ -274,7 +290,7 @@ static WRITE8_DEVICE_HANDLER(dsp_cmd_w)
 
 	queue(data);
 
-	process_fifo(m_dsp.fifo[0]);
+	process_fifo(device->machine(),m_dsp.fifo[0]);
 }
 
 //**************************************************************************
@@ -334,6 +350,7 @@ void isa8_sblaster1_0_device::device_start()
 	m_isa->install_device(this,                   0x022c, 0x022d, 0, 0, FUNC(dsp_wbuf_status_r),  FUNC(dsp_cmd_w) );
 	m_isa->install_device(this,                   0x022e, 0x022f, 0, 0, FUNC(dsp_rbuf_status_r),  FUNC(dsp_rbuf_status_w) );
 	m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
+	m_dsp.version = 0x0105;
 }
 
 void isa8_sblaster1_5_device::device_start()
@@ -346,6 +363,7 @@ void isa8_sblaster1_5_device::device_start()
 	m_isa->install_device(this,                   0x022c, 0x022d, 0, 0, FUNC(dsp_wbuf_status_r),  FUNC(dsp_cmd_w) );
 	m_isa->install_device(this,                   0x022e, 0x022f, 0, 0, FUNC(dsp_rbuf_status_r),  FUNC(dsp_rbuf_status_w) );
 	m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
+	m_dsp.version = 0x0200;
 }
 
 //-------------------------------------------------
