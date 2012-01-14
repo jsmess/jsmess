@@ -151,7 +151,7 @@ public:
 /*----------- defined in video/tx0.c -----------*/
 
 VIDEO_START( tx0 );
-SCREEN_EOF( tx0 );
+SCREEN_VBLANK( tx0 );
 SCREEN_UPDATE_IND16( tx0 );
 
 void tx0_plot(running_machine &machine, int x, int y);

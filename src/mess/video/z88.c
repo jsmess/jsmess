@@ -121,14 +121,18 @@ static unsigned char *z88_convert_address(running_machine &machine, unsigned lon
 }
 
 
-SCREEN_EOF( z88 )
+SCREEN_VBLANK( z88 )
 {
-	z88_state *state = screen.machine().driver_data<z88_state>();
-	state->m_frame_number++;
-	if (state->m_frame_number >= 50)
+	// rising edge
+	if (vblank_on)
 	{
-		state->m_frame_number = 0;
-		state->m_flash_invert = !state->m_flash_invert;
+		z88_state *state = screen.machine().driver_data<z88_state>();
+		state->m_frame_number++;
+		if (state->m_frame_number >= 50)
+		{
+			state->m_frame_number = 0;
+			state->m_flash_invert = !state->m_flash_invert;
+		}
 	}
 }
 

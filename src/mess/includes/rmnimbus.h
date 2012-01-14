@@ -436,7 +436,7 @@ READ16_HANDLER (nimbus_video_io_r);
 WRITE16_HANDLER (nimbus_video_io_w);
 
 VIDEO_START( nimbus );
-SCREEN_EOF( nimbus );
+SCREEN_VBLANK( nimbus );
 SCREEN_UPDATE_IND16( nimbus );
 VIDEO_RESET( nimbus );
 

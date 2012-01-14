@@ -631,7 +631,7 @@ static MACHINE_CONFIG_START( to7, driver_device )
      MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
 				0, THOM_TOTAL_HEIGHT - 1 )
      MCFG_SCREEN_UPDATE_STATIC ( thom )
-     MCFG_SCREEN_EOF_STATIC ( thom )
+     MCFG_SCREEN_VBLANK_STATIC ( thom )
 
      MCFG_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
      MCFG_PALETTE_INIT ( thom )

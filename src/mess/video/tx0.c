@@ -46,11 +46,15 @@ VIDEO_START( tx0 )
 }
 
 
-SCREEN_EOF( tx0 )
+SCREEN_VBLANK( tx0 )
 {
-	tx0_state *state = screen.machine().driver_data<tx0_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		tx0_state *state = screen.machine().driver_data<tx0_state>();
 
-	crt_eof(state->m_crt);
+		crt_eof(state->m_crt);
+	}
 }
 
 

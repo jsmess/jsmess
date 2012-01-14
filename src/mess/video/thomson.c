@@ -1034,59 +1034,63 @@ static TIMER_CALLBACK( thom_set_init )
 }
 
 /* call this at the very beginning of each new frame */
-SCREEN_EOF ( thom )
+SCREEN_VBLANK ( thom )
 {
-	int fnew, fold = FLOP_STATE;
-	int i;
-	UINT16 b = 0;
-	struct thom_vsignal l = thom_get_lightpen_vsignal( screen.machine(), 0, -1, 0 );
-
-	LOG (( "%f thom: video eof called\n", screen.machine().time().as_double() ));
-
-	/* floppy indicator count */
-	if ( thom_floppy_wcount )
-		thom_floppy_wcount--;
-	if ( thom_floppy_rcount )
-		thom_floppy_rcount--;
-	fnew = FLOP_STATE;
-	if ( fnew != fold )
-		output_set_value( "floppy", fnew );
-
-	/* prepare state for next frame */
-	for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
+	// rising edge
+	if (vblank_on)
 	{
-		if ( thom_border_l[ i ] != -1 )
-			b = thom_border_l[ i ];
-		if ( thom_border_r[ i ] != -1 )
-			b = thom_border_r[ i ];
+		int fnew, fold = FLOP_STATE;
+		int i;
+		UINT16 b = 0;
+		struct thom_vsignal l = thom_get_lightpen_vsignal( screen.machine(), 0, -1, 0 );
+
+		LOG (( "%f thom: video eof called\n", screen.machine().time().as_double() ));
+
+		/* floppy indicator count */
+		if ( thom_floppy_wcount )
+			thom_floppy_wcount--;
+		if ( thom_floppy_rcount )
+			thom_floppy_rcount--;
+		fnew = FLOP_STATE;
+		if ( fnew != fold )
+			output_set_value( "floppy", fnew );
+
+		/* prepare state for next frame */
+		for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
+		{
+			if ( thom_border_l[ i ] != -1 )
+				b = thom_border_l[ i ];
+			if ( thom_border_r[ i ] != -1 )
+				b = thom_border_r[ i ];
+		}
+		memset( thom_border_l, 0xff, sizeof( thom_border_l ) );
+		memset( thom_border_r, 0xff, sizeof( thom_border_r ) );
+		thom_border_l[ 0 ] = b;
+		thom_border_r[ 0 ] = b;
+		thom_vstate_last_dirty = thom_vstate_dirty;
+		thom_vstate_dirty = 0;
+
+		/* schedule first init signal */
+		thom_init_timer->adjust(attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7 ));
+
+		/* schedule first lightpen signal */
+		l.line &= ~1; /* hack (avoid lock in MO6 palette selection) */
+		thom_lightpen_timer->adjust(
+				   attotime::from_usec( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ), 0);
+
+		/* schedule first active-area scanline call-back */
+		thom_scanline_timer->adjust(attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7), -1);
+
+		/* reset video frame time */
+		thom_video_timer->adjust(attotime::zero);
+
+		/* update screen size according to user options */
+		if ( thom_update_screen_size( screen.machine() ) )
+			thom_vstate_dirty = 1;
+
+		/* hi-res automatic */
+		thom_hires_better = thom_mode_is_hires( thom_vmode );
 	}
-	memset( thom_border_l, 0xff, sizeof( thom_border_l ) );
-	memset( thom_border_r, 0xff, sizeof( thom_border_r ) );
-	thom_border_l[ 0 ] = b;
-	thom_border_r[ 0 ] = b;
-	thom_vstate_last_dirty = thom_vstate_dirty;
-	thom_vstate_dirty = 0;
-
-	/* schedule first init signal */
-	thom_init_timer->adjust(attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7 ));
-
-	/* schedule first lightpen signal */
-	l.line &= ~1; /* hack (avoid lock in MO6 palette selection) */
-	thom_lightpen_timer->adjust(
-			   attotime::from_usec( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ), 0);
-
-	/* schedule first active-area scanline call-back */
-	thom_scanline_timer->adjust(attotime::from_usec( 64 * THOM_BORDER_HEIGHT + 7), -1);
-
-	/* reset video frame time */
-	thom_video_timer->adjust(attotime::zero);
-
-	/* update screen size according to user options */
-	if ( thom_update_screen_size( screen.machine() ) )
-		thom_vstate_dirty = 1;
-
-	/* hi-res automatic */
-	thom_hires_better = thom_mode_is_hires( thom_vmode );
 }
 
 

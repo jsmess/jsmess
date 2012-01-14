@@ -301,7 +301,7 @@ extern void thom_set_lightpen_callback ( running_machine &machine, int nb, void 
 extern VIDEO_START  ( thom );
 extern SCREEN_UPDATE_IND16 ( thom );
 extern PALETTE_INIT ( thom );
-extern SCREEN_EOF    ( thom );
+extern SCREEN_VBLANK    ( thom );
 
 /* pass video init signal */
 extern void thom_set_init_callback ( running_machine &machine, void (*cb) ( running_machine &machine, int init ) );

@@ -204,12 +204,16 @@ VIDEO_START( zx )
 	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
 }
 
-SCREEN_EOF( zx )
+SCREEN_VBLANK( zx )
 {
-	zx_state *state = screen.machine().driver_data<zx_state>();
-	/* decrement video synchronization counter */
-	if (state->m_ula_frame_vsync)
-		--state->m_ula_frame_vsync;
+	// rising edge
+	if (vblank_on)
+	{
+		zx_state *state = screen.machine().driver_data<zx_state>();
+		/* decrement video synchronization counter */
+		if (state->m_ula_frame_vsync)
+			--state->m_ula_frame_vsync;
+	}
 }
 
 UINT32 zx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
