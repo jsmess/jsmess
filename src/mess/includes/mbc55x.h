@@ -216,7 +216,7 @@ READ16_HANDLER (mbc55x_video_io_r);
 WRITE16_HANDLER (mbc55x_video_io_w);
 
 VIDEO_START( mbc55x );
-SCREEN_EOF( mbc55x );
+SCREEN_VBLANK( mbc55x );
 VIDEO_RESET( mbc55x );
 
 #define RED                     0

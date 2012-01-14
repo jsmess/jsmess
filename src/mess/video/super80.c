@@ -70,19 +70,23 @@ PALETTE_INIT( super80m )
 
 
 
-SCREEN_EOF( super80m )
+SCREEN_VBLANK( super80m )
 {
-	super80_state *state = screen.machine().driver_data<super80_state>();
-	/* if we chose another palette or colour mode, enable it */
-	UINT8 chosen_palette = (input_port_read(screen.machine(), "CONFIG") & 0x60)>>5;				// read colour dipswitches
-
-	if (chosen_palette != state->m_current_palette)						// any changes?
+	// rising edge
+	if (vblank_on)
 	{
-		state->m_current_palette = chosen_palette;					// save new palette
-		if (!state->m_current_palette)
-			palette_set_colors_rgb(screen.machine(), super80_comp_palette);		// composite colour
-		else
-			palette_set_colors_rgb(screen.machine(), super80_rgb_palette);		// rgb and b&w
+		super80_state *state = screen.machine().driver_data<super80_state>();
+		/* if we chose another palette or colour mode, enable it */
+		UINT8 chosen_palette = (input_port_read(screen.machine(), "CONFIG") & 0x60)>>5;				// read colour dipswitches
+
+		if (chosen_palette != state->m_current_palette)						// any changes?
+		{
+			state->m_current_palette = chosen_palette;					// save new palette
+			if (!state->m_current_palette)
+				palette_set_colors_rgb(screen.machine(), super80_comp_palette);		// composite colour
+			else
+				palette_set_colors_rgb(screen.machine(), super80_rgb_palette);		// rgb and b&w
+		}
 	}
 }
 

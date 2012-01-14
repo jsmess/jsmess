@@ -658,10 +658,10 @@ VIDEO_RESET( nimbus )
     logerror("Video reset\n");
 }
 
-SCREEN_EOF( nimbus )
+SCREEN_VBLANK( nimbus )
 {
 
-//    logerror("SCREEN_EOF( nimbus )\n");
+//    logerror("SCREEN_VBLANK( nimbus )\n");
 }
 
 SCREEN_UPDATE_IND16( nimbus )

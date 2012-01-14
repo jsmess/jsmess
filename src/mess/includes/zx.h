@@ -59,7 +59,7 @@ MACHINE_RESET( pc8300 );
 /*----------- defined in video/zx.c -----------*/
 
 VIDEO_START( zx );
-SCREEN_EOF( zx );
+SCREEN_VBLANK( zx );
 
 void zx_ula_bkgnd(running_machine &machine, int color);
 void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT8 param);

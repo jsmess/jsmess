@@ -2388,13 +2388,17 @@ static void kccomp_reset_machine(running_machine &machine)
 }
 
 
-SCREEN_EOF( amstrad )
+SCREEN_VBLANK( amstrad )
 {
-	cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(screen.machine(),"multiface2"));
-
-	if(mface2 != NULL)
+	// rising edge
+	if (vblank_on)
 	{
-		mface2->check_button_state();
+		cpc_multiface2_device* mface2 = dynamic_cast<cpc_multiface2_device*>(get_expansion_device(screen.machine(),"multiface2"));
+
+		if(mface2 != NULL)
+		{
+			mface2->check_button_state();
+		}
 	}
 }
 

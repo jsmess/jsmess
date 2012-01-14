@@ -60,11 +60,15 @@ VIDEO_START( pdp1 )
 }
 
 
-SCREEN_EOF( pdp1 )
+SCREEN_VBLANK( pdp1 )
 {
-	pdp1_state *state = screen.machine().driver_data<pdp1_state>();
+	// rising edge
+	if (vblank_on)
+	{
+		pdp1_state *state = screen.machine().driver_data<pdp1_state>();
 
-	crt_eof(state->m_crt);
+		crt_eof(state->m_crt);
+	}
 }
 
 /*

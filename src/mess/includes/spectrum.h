@@ -138,7 +138,7 @@ VIDEO_START( spectrum );
 VIDEO_START( spectrum_128 );
 
 SCREEN_UPDATE_IND16( spectrum );
-SCREEN_EOF( spectrum );
+SCREEN_VBLANK( spectrum );
 
 void spectrum_border_force_redraw (running_machine &machine);
 void spectrum_border_set_last_color (running_machine &machine, int NewColor);

@@ -262,7 +262,7 @@ public:
 /*----------- defined in video/pdp1.c -----------*/
 
 VIDEO_START( pdp1 );
-SCREEN_EOF( pdp1 );
+SCREEN_VBLANK( pdp1 );
 SCREEN_UPDATE_IND16( pdp1 );
 
 void pdp1_plot(running_machine &machine, int x, int y);

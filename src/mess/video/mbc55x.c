@@ -195,7 +195,7 @@ VIDEO_RESET( mbc55x )
 	logerror("Video reset\n");
 }
 
-SCREEN_EOF( mbc55x )
+SCREEN_VBLANK( mbc55x )
 {
-//  logerror("SCREEN_EOF( mbc55x )\n");
+//  logerror("SCREEN_VBLANK( mbc55x )\n");
 }
