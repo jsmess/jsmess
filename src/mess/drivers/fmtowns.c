@@ -234,10 +234,9 @@ READ8_MEMBER(towns_state::towns_system_r)
 			return 0x00;
 		case 0x06:
 			//logerror("SYS: (0x26) timer read\n");
-			m_ftimer -= 0x13;
-			return m_ftimer;
+			return m_freerun_timer;
 		case 0x07:
-			return m_ftimer >> 8;
+			return m_freerun_timer >> 8;
 		case 0x08:
 			//logerror("SYS: (0x28) NMI mask read\n");
 			return m_nmi_mask & 0x01;
@@ -359,8 +358,6 @@ READ8_MEMBER(towns_state::towns_sys6c_r)
 
 WRITE8_MEMBER(towns_state::towns_sys6c_w)
 {
-//  logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
-	m_ftimer -= 0x54;
 	// halts the CPU for a period of time (exact length unknown)
 	device_set_input_line(m_maincpu,INPUT_LINE_HALT,ASSERT_LINE);
 	m_towns_wait_timer->adjust(attotime::from_usec(1),0,attotime::never);
@@ -2007,18 +2004,19 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 	if(tstate->m_towns_timer_mask & 0x01)
 	{
 		pic8259_ir0_w(dev, state);
-		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer) set to %i\n",state);
+		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch0) set to %i\n",state);
 	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
 {
 	towns_state* tstate = device->machine().driver_data<towns_state>();
-//  device_t* dev = tstate->m_pic_master;
+	device_t* dev = tstate->m_pic_master;
 
 	if(tstate->m_towns_timer_mask & 0x02)
 	{
-		//pic8259_ir0_w(dev, state);
+		pic8259_ir0_w(dev, state);
+		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch1) set to %i\n",state);
 	}
 }
 
@@ -2116,6 +2114,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
   AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0x00ff00ff)
   AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffffffff)
   AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8_LEGACY("pit",pit8253_r, pit8253_w, 0x00ff00ff)
+  AM_RANGE(0x0050,0x0057) AM_DEVREADWRITE8_LEGACY("pit2",pit8253_r, pit8253_w, 0x00ff00ff)
   AM_RANGE(0x0060,0x0063) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x000000ff)
   AM_RANGE(0x0068,0x006b) AM_READWRITE8(towns_intervaltimer2_r, towns_intervaltimer2_w, 0xffffffff)
   AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
@@ -2492,8 +2491,7 @@ void towns_state::machine_reset()
 	m_intervaltimer2_irqmask = 1;  // masked
 	m_towns_rtc_timer->adjust(attotime::zero,0,attotime::from_hz(1));
 	m_towns_kb_timer->adjust(attotime::zero,0,attotime::from_msec(10));
-	/* Why does enabling this timer break the driver? */
-	//m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
+	m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
 }
 
 static const struct pit8253_config towns_pit8253_config =
@@ -2513,6 +2511,27 @@ static const struct pit8253_config towns_pit8253_config =
 			307200,
 			DEVCB_NULL,
 			DEVCB_LINE(towns_pit_out2_changed)
+		}
+	}
+};
+
+static const struct pit8253_config towns_pit8253_config_2 =
+{
+	{
+		{
+			307200,
+			DEVCB_NULL,
+			DEVCB_NULL  // reserved
+		},
+		{
+			307200,
+			DEVCB_NULL,
+			DEVCB_NULL  // RS-232
+		},
+		{
+			307200,
+			DEVCB_NULL,
+			DEVCB_NULL  // reserved
 		}
 	}
 };
@@ -2673,6 +2692,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_PIT8253_ADD("pit",towns_pit8253_config)
+	MCFG_PIT8253_ADD("pit2",towns_pit8253_config_2)
 
 	MCFG_PIC8259_ADD( "pic8259_master", towns_pic8259_master_config )
 
