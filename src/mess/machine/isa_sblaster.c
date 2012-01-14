@@ -2,6 +2,13 @@
 
   ISA 8 bit Creative Labs Sound Blaster Sound Card
 
+  TODO:
+  - DSP type is unknown at current time, and probably has an internal ROM
+    that needs decapping;
+  - joystick port;
+  - implement jumpers dip-sw;
+  - state machine + read/write members
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -27,14 +34,46 @@
 
   jumperable? normally 0x220
 */
-#define ym3812_StdClock 3579545
+#define ym3812_StdClock XTAL_3_579545MHz
+
+static struct {
+	UINT8 reset_latch;
+	UINT8 rbuf_status;
+	UINT8 wbuf_status;
+	UINT8 in_data;
+	UINT8 fifo_cmd;
+	UINT8 cmd;
+}m_dsp;
+
+static UINT8 m_fifo[16],m_fifo_ptr;
+
+static const int m_cmd_fifo_length[256] =
+{
+/*   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F        */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 0x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 1x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 2x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 3x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 4x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 5x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 6x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 7x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 8x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 9x */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Ax */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Bx */
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Cx */
+	-1, -1, -1,  1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Dx */
+	 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
+	-1, -1, -1, -1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1  /* Fx */
+};
 
 static const ym3812_interface pc_ym3812_interface =
 {
 	NULL
 };
 
-static MACHINE_CONFIG_FRAGMENT( sblaster_config )
+static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
 	MCFG_SOUND_CONFIG(pc_ym3812_interface)
@@ -44,6 +83,16 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_config )
 	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
+	MCFG_SOUND_CONFIG(pc_ym3812_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	/* no CM/S support (empty sockets) */
+
+MACHINE_CONFIG_END
+
 
 static READ8_DEVICE_HANDLER( ym3812_16_r )
 {
@@ -78,20 +127,157 @@ static WRITE8_DEVICE_HANDLER( saa1099_16_w )
 	}
 }
 
+static READ8_DEVICE_HANDLER( dsp_reset_r )
+{
+	if(offset)
+		return 0xff;
+	logerror("Soundblaster DSP Reset port undocumented read\n");
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( dsp_reset_w )
+{
+	if(offset)
+		return;
+
+	if(data == 0 && m_dsp.reset_latch == 1)
+	{
+		// reset routine
+		m_dsp.rbuf_status |= 0x80;
+		m_dsp.in_data = 0xaa; // reset OK ID
+		//m_dsp.fifo_cmd = 0;
+	}
+
+	m_dsp.reset_latch = data;
+
+	printf("%02x\n",data);
+}
+
+static READ8_DEVICE_HANDLER( dsp_data_r )
+{
+	if(offset)
+		return 0xff;
+
+	return m_dsp.in_data;
+}
+
+static WRITE8_DEVICE_HANDLER( dsp_data_w )
+{
+	if(offset)
+		return;
+	logerror("Soundblaster DSP data port undocumented write\n");
+}
+
+static READ8_DEVICE_HANDLER(dsp_rbuf_status_r)
+{
+	UINT8 res;
+
+	res = 0;
+
+	if(offset)
+		return 0xff;
+
+	if(m_dsp.rbuf_status & 0x80)
+	{
+		m_dsp.rbuf_status &= ~0x80;
+		res |= 0x80;
+	}
+
+	return res;
+}
+
+static READ8_DEVICE_HANDLER(dsp_wbuf_status_r)
+{
+	if(offset)
+		return 0xff;
+
+	return m_dsp.wbuf_status;
+}
+
+static WRITE8_DEVICE_HANDLER(dsp_rbuf_status_w)
+{
+	if(offset)
+		return;
+
+	logerror("Soundblaster DSP Read Buffer status undocumented write\n");
+}
+
+static void queue(UINT8 data)
+{
+	if (m_fifo_ptr < 15)
+	{
+		m_fifo_ptr++;
+
+		m_fifo[m_fifo_ptr] = data;
+	}
+	else
+	{
+		// FIFO gets to la-la-land
+		//logerror("FIFO?\n");
+	}
+}
+
+static void process_fifo(UINT8 cmd)
+{
+	if (m_cmd_fifo_length[cmd] == -1)
+	{
+		logerror("unemulated or undefined fifo command %02x\n",cmd);
+	}
+	else if(m_fifo_ptr == m_cmd_fifo_length[cmd])
+	{
+		/* get FIFO params */
+		switch(cmd)
+		{
+			case 0xd3: // speaker off
+				m_dsp.rbuf_status |= 0x80;
+				m_dsp.in_data = 0;
+				break;
+			case 0xe0: // get DSP identification
+				m_dsp.rbuf_status |= 0x80;
+				m_dsp.in_data = m_fifo[2] ^ 0xff;
+				break;
+			case 0xf8: // ???
+				m_dsp.rbuf_status |= 0x80;
+				m_dsp.in_data = 0;
+				break;
+		}
+
+		m_fifo_ptr = 0;
+	}
+}
+
+static WRITE8_DEVICE_HANDLER(dsp_cmd_w)
+{
+	if(offset)
+		return;
+
+	printf("%02x %02x\n",m_dsp.fifo_cmd,m_dsp.cmd);
+
+	queue(data);
+
+	process_fifo(m_fifo[1]);
+}
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SOUND_BLASTER_1_0 = &device_creator<isa8_sblaster_device>;
+const device_type ISA8_SOUND_BLASTER_1_0 = &device_creator<isa8_sblaster1_0_device>;
+const device_type ISA8_SOUND_BLASTER_1_5 = &device_creator<isa8_sblaster1_5_device>;
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_sblaster_device::device_mconfig_additions() const
+machine_config_constructor isa8_sblaster1_0_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( sblaster_config );
+	return MACHINE_CONFIG_NAME( sblaster1_0_config );
+}
+
+machine_config_constructor isa8_sblaster1_5_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sblaster1_5_config );
 }
 
 //**************************************************************************
@@ -102,8 +288,14 @@ machine_config_constructor isa8_sblaster_device::device_mconfig_additions() cons
 //  isa8_sblaster_device - constructor
 //-------------------------------------------------
 
-isa8_sblaster_device::isa8_sblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8_SOUND_BLASTER_1_0, "ISA8_SOUND_BLASTER_1_0", tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this)
+{
+}
+
+isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_SOUND_BLASTER_1_5, "ISA8_SOUND_BLASTER_1_5", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this)
 {
 }
@@ -112,18 +304,42 @@ isa8_sblaster_device::isa8_sblaster_device(const machine_config &mconfig, const 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void isa8_sblaster_device::device_start()
+void isa8_sblaster1_0_device::device_start()
 {
     set_isa_device();
-	m_isa->install_device(subdevice("ym3812"), 0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
+	m_isa->install_device(this,                   0x0226, 0x0227, 0, 0, FUNC(dsp_reset_r), FUNC(dsp_reset_w) );
+	m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
+	m_isa->install_device(this,                   0x022a, 0x022b, 0, 0, FUNC(dsp_data_r),  FUNC(dsp_data_w) );
+	m_isa->install_device(this,                   0x022c, 0x022d, 0, 0, FUNC(dsp_wbuf_status_r),  FUNC(dsp_cmd_w) );
+	m_isa->install_device(this,                   0x022e, 0x022f, 0, 0, FUNC(dsp_rbuf_status_r),  FUNC(dsp_rbuf_status_w) );
+	m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
+}
+
+void isa8_sblaster1_5_device::device_start()
+{
+    set_isa_device();
+	/* 1.5 ditches CM/S support (empty sockets) */
+	m_isa->install_device(this,                   0x0226, 0x0227, 0, 0, FUNC(dsp_reset_r), FUNC(dsp_reset_w) );
+	m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
+	m_isa->install_device(this,                   0x022a, 0x022b, 0, 0, FUNC(dsp_data_r),  FUNC(dsp_data_w) );
+	m_isa->install_device(this,                   0x022c, 0x022d, 0, 0, FUNC(dsp_wbuf_status_r),  FUNC(dsp_cmd_w) );
+	m_isa->install_device(this,                   0x022e, 0x022f, 0, 0, FUNC(dsp_rbuf_status_r),  FUNC(dsp_rbuf_status_w) );
+	m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void isa8_sblaster_device::device_reset()
+void isa8_sblaster1_0_device::device_reset()
 {
+//	...
 }
+
+void isa8_sblaster1_5_device::device_reset()
+{
+// ...
+}
+
