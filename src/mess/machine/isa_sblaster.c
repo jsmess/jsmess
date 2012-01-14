@@ -40,12 +40,10 @@ static struct {
 	UINT8 reset_latch;
 	UINT8 rbuf_status;
 	UINT8 wbuf_status;
-	UINT8 in_data;
-	UINT8 fifo_cmd;
-	UINT8 cmd;
+	UINT8 fifo[16],fifo_ptr;
+	UINT8 fifo_r[16],fifo_r_ptr;
 }m_dsp;
 
-static UINT8 m_fifo[16],m_fifo_ptr;
 
 static const int m_cmd_fifo_length[256] =
 {
@@ -127,6 +125,59 @@ static WRITE8_DEVICE_HANDLER( saa1099_16_w )
 	}
 }
 
+static void queue(UINT8 data)
+{
+	if (m_dsp.fifo_ptr < 15)
+	{
+		m_dsp.fifo[m_dsp.fifo_ptr] = data;
+
+		m_dsp.fifo_ptr++;
+	}
+	else
+	{
+		// FIFO gets to la-la-land
+		//logerror("FIFO?\n");
+	}
+}
+
+static void queue_r(UINT8 data)
+{
+	m_dsp.rbuf_status |= 0x80;
+
+	if (m_dsp.fifo_r_ptr < 15)
+	{
+		m_dsp.fifo_r[m_dsp.fifo_r_ptr] = data;
+
+		m_dsp.fifo_r_ptr++;
+	}
+	else
+	{
+		// FIFO gets to la-la-land
+		//logerror("FIFO?\n");
+	}
+}
+
+static UINT8 dequeue_r()
+{
+	UINT8 data = m_dsp.fifo_r[0];
+
+	if (m_dsp.fifo_r_ptr > 0)
+	{
+		for (int i = 0; i < 15; i++)
+			m_dsp.fifo_r[i] = m_dsp.fifo_r[i + 1];
+
+		m_dsp.fifo_r[15] = 0;
+
+		m_dsp.fifo_r_ptr--;
+	}
+
+	if(m_dsp.fifo_r_ptr == 0)
+		m_dsp.rbuf_status &= ~0x80;
+
+	return data;
+}
+
+
 static READ8_DEVICE_HANDLER( dsp_reset_r )
 {
 	if(offset)
@@ -143,14 +194,12 @@ static WRITE8_DEVICE_HANDLER( dsp_reset_w )
 	if(data == 0 && m_dsp.reset_latch == 1)
 	{
 		// reset routine
-		m_dsp.rbuf_status |= 0x80;
-		m_dsp.in_data = 0xaa; // reset OK ID
-		//m_dsp.fifo_cmd = 0;
+		queue_r(0xaa); // reset OK ID
 	}
 
 	m_dsp.reset_latch = data;
 
-	printf("%02x\n",data);
+	//printf("%02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER( dsp_data_r )
@@ -158,7 +207,7 @@ static READ8_DEVICE_HANDLER( dsp_data_r )
 	if(offset)
 		return 0xff;
 
-	return m_dsp.in_data;
+	return dequeue_r();
 }
 
 static WRITE8_DEVICE_HANDLER( dsp_data_w )
@@ -170,20 +219,10 @@ static WRITE8_DEVICE_HANDLER( dsp_data_w )
 
 static READ8_DEVICE_HANDLER(dsp_rbuf_status_r)
 {
-	UINT8 res;
-
-	res = 0;
-
 	if(offset)
 		return 0xff;
 
-	if(m_dsp.rbuf_status & 0x80)
-	{
-		m_dsp.rbuf_status &= ~0x80;
-		res |= 0x80;
-	}
-
-	return res;
+	return m_dsp.rbuf_status;
 }
 
 static READ8_DEVICE_HANDLER(dsp_wbuf_status_r)
@@ -202,47 +241,29 @@ static WRITE8_DEVICE_HANDLER(dsp_rbuf_status_w)
 	logerror("Soundblaster DSP Read Buffer status undocumented write\n");
 }
 
-static void queue(UINT8 data)
-{
-	if (m_fifo_ptr < 15)
-	{
-		m_fifo_ptr++;
-
-		m_fifo[m_fifo_ptr] = data;
-	}
-	else
-	{
-		// FIFO gets to la-la-land
-		//logerror("FIFO?\n");
-	}
-}
-
 static void process_fifo(UINT8 cmd)
 {
 	if (m_cmd_fifo_length[cmd] == -1)
 	{
-		logerror("unemulated or undefined fifo command %02x\n",cmd);
+		printf("unemulated or undefined fifo command %02x\n",cmd);
 	}
-	else if(m_fifo_ptr == m_cmd_fifo_length[cmd])
+	else if(m_dsp.fifo_ptr == m_cmd_fifo_length[cmd])
 	{
 		/* get FIFO params */
 		switch(cmd)
 		{
 			case 0xd3: // speaker off
-				m_dsp.rbuf_status |= 0x80;
-				m_dsp.in_data = 0;
+				queue_r(0);
 				break;
 			case 0xe0: // get DSP identification
-				m_dsp.rbuf_status |= 0x80;
-				m_dsp.in_data = m_fifo[2] ^ 0xff;
+				queue_r(m_dsp.fifo[1] ^ 0xff);
 				break;
 			case 0xf8: // ???
-				m_dsp.rbuf_status |= 0x80;
-				m_dsp.in_data = 0;
+				queue_r(0);
 				break;
 		}
 
-		m_fifo_ptr = 0;
+		m_dsp.fifo_ptr = 0;
 	}
 }
 
@@ -251,11 +272,9 @@ static WRITE8_DEVICE_HANDLER(dsp_cmd_w)
 	if(offset)
 		return;
 
-	printf("%02x %02x\n",m_dsp.fifo_cmd,m_dsp.cmd);
-
 	queue(data);
 
-	process_fifo(m_fifo[1]);
+	process_fifo(m_dsp.fifo[0]);
 }
 
 //**************************************************************************
