@@ -22,7 +22,7 @@
 #include "machine/scsi.h"
 #include "machine/fm_scsi.h"
 
-#define IRQ_LOG 1  // set to 1 to log IRQ line activity
+#define IRQ_LOG 0  // set to 1 to log IRQ line activity
 
 READ8_HANDLER( towns_gfx_high_r );
 WRITE8_HANDLER( towns_gfx_high_w );
