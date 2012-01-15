@@ -68,19 +68,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Release Disk (C)"/>
 			<dataarea name="flop" size="536201">
-				<rom name="master-c.imd" size="536201" crc="bf30bd39" sha1="832620f71444c24c755dba83ce675b7af87248f4"/>
+				<rom name="master-c.imd" size="536201" crc="bf30bd39" sha1="832620f71444c24c755dba83ce675b7af87248f4" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Release Disk 1&amp;2&amp;4"/>
 			<dataarea name="flop" size="611310">
-				<rom name="master-a.imd" size="611310" crc="4b197ce0" sha1="6fed9530e71535f10c51b0a0e49f4ac5cb0e3bd3"/>
+				<rom name="master-a.imd" size="611310" crc="4b197ce0" sha1="6fed9530e71535f10c51b0a0e49f4ac5cb0e3bd3" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Release Disk 3&amp;5"/>
 			<dataarea name="flop" size="472315">
-				<rom name="master-b.imd" size="472315" crc="97be282a" sha1="0dd3ad00b40c1c1f57fe513140603a0f4b4cbc40"/>
+				<rom name="master-b.imd" size="472315" crc="97be282a" sha1="0dd3ad00b40c1c1f57fe513140603a0f4b4cbc40" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
