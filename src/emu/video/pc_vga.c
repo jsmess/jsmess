@@ -455,11 +455,10 @@ SCREEN_UPDATE_RGB32( pc_video )
 	switch(cur_mode)
 	{
 		case 0: bitmap.fill(get_black_pen(screen.machine()), cliprect);break;
-		case 1: vga_vh_text(screen.machine(), bitmap,cliprect); break;
-		case 2: vga_vh_vga (screen.machine(), bitmap,cliprect); break;
-		case 3: vga_vh_ega (screen.machine(), bitmap,cliprect); break;
-		/* Nothing uses this so far, to be nuked */
-		case 4: vga.svga_intf.choosevideomode(vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
+		case 1: vga_vh_text(screen.machine(), bitmap, cliprect); break;
+		case 2: vga_vh_vga (screen.machine(), bitmap, cliprect); break;
+		case 3: vga_vh_ega (screen.machine(), bitmap, cliprect); break;
+		case 4: vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
 	}
 
 	return 0;
