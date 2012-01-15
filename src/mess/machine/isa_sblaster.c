@@ -41,7 +41,7 @@ static const int m_cmd_fifo_length[256] =
 {
 /*   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F        */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 0x */
-	-1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 1x */
+	 2, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 1x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 2x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 3x */
 	 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 4x */
@@ -259,8 +259,6 @@ WRITE8_MEMBER(sb8_device::dsp_rbuf_status_w)
 
 void sb8_device::process_fifo(UINT8 cmd)
 {
-	printf("%02x\n",cmd);
-
 	if (m_cmd_fifo_length[cmd] == -1)
 	{
 		printf("unemulated or undefined fifo command %02x\n",cmd);
@@ -271,6 +269,9 @@ void sb8_device::process_fifo(UINT8 cmd)
         printf("SB FIFO command: %02x\n", cmd);
 		switch(cmd)
 		{
+            case 0x10:  // Direct DAC
+                break;
+
             case 0x14:  // 8-bit DMA
                 m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 //                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
@@ -460,6 +461,7 @@ bool sb8_device::have_dack(int line)
 UINT8 sb8_device::dack_r(int line)
 {
 //    printf("dack_r: line %x out = %02x\n", line, m_dack_out);
+	m_isa->drq1_w(0);	// drop DRQ?
     return m_dack_out;
 }
 
@@ -470,8 +472,8 @@ void sb8_device::dack_w(int line, UINT8 data)
     if (m_dsp.dma_transferred >= m_dsp.dma_length)
     {
 //        printf("DMA completed\n");
-//        m_isa->drq1_w(1);
-        m_isa->irq5_w(1);
+        m_isa->drq1_w(0);	// drop DRQ?
+        m_isa->irq5_w(1);	// definitely raise IRQ as per the Creative manual
     }
 }
 
