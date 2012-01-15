@@ -103,6 +103,69 @@ static SCREEN_UPDATE_IND16( pda600 )
 	return 0;
 }
 
+static const gfx_layout pda600_charlayout_8 =
+{
+	8, 8,
+	49,
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout pda600_charlayout_13 =
+{
+	8, 13,
+	123,
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 8*9, 8*10, 8*11, 8*12 },
+	8*13
+};
+
+static const gfx_layout pda600_charlayout_13a =
+{
+	8, 13,
+	132,
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 8*9, 8*10, 8*11, 8*12 },
+	8*13
+};
+
+static const gfx_layout pda600_charlayout_19 =
+{
+	8, 19,
+	32,
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 8*9, 8*10, 8*11, 8*12, 8*13, 8*14, 8*15, 8*16, 8*17, 8*18 },
+	8*19
+};
+
+static const gfx_layout pda600_charlayout_19a =
+{
+	8, 19,
+	11,
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 8*9, 8*10, 8*11, 8*12, 8*13, 8*14, 8*15, 8*16, 8*17, 8*18 },
+	8*19
+};
+
+static GFXDECODE_START( pda600 )
+	GFXDECODE_ENTRY( "maincpu", 0x45cd, pda600_charlayout_19, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x4892, pda600_charlayout_19a, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x4d73, pda600_charlayout_8, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x5b8f, pda600_charlayout_13, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x61d3, pda600_charlayout_13a, 0, 1 )
+GFXDECODE_END
+
 static MACHINE_CONFIG_START( pda600, pda600_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
@@ -117,12 +180,11 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
+	MCFG_VIDEO_START(pda600)
 	MCFG_SCREEN_UPDATE_STATIC(pda600)
-
+	MCFG_GFXDECODE(pda600)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(pda600)
 MACHINE_CONFIG_END
 
 /* ROM definition */
