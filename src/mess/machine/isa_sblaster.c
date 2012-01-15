@@ -410,3 +410,9 @@ void sb8_device::device_reset()
     m_dsp.prot_count = 0;
 }
 
+bool sb8_device::have_dack(int line)
+{
+	if (line==1) return TRUE;
+	return FALSE;
+}
+

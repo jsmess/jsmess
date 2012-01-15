@@ -52,6 +52,7 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
+		virtual bool have_dack(int line);
 
         struct sb8_dsp_state m_dsp;
 
