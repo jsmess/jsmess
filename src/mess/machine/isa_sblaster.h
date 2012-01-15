@@ -20,8 +20,8 @@ struct sb8_dsp_state
     UINT16 version;
     UINT8 test_reg;
     UINT8 speaker_on;
-    UINT8 prot_count;
-    INT8 prot_value;
+    UINT32 prot_count;
+    INT32 prot_value;
 };
 
 // ======================> sb8_device (parent)
@@ -52,10 +52,12 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-		virtual bool have_dack(int line);
+	virtual bool have_dack(int line);
+        virtual UINT8 dack_r(int line);
+        virtual void dack_w(int line, UINT8 data);
 
         struct sb8_dsp_state m_dsp;
-
+        UINT8 m_dack_out;
 private:
 };
 

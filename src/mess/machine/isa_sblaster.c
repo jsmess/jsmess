@@ -272,20 +272,19 @@ void sb8_device::process_fifo(UINT8 cmd)
 				queue_r(m_dsp.version >> 8);
 				queue_r(m_dsp.version & 0xff);
 				break;
-            case 0xe2: // DSP protection
+        case 0xe2: // DSP protection
                 for (int i = 0; i < 8; i++)
                 {
                     if ((m_dsp.fifo[1] >> i) & 0x01)
                     {
                         m_dsp.prot_value += protection_magic[m_dsp.prot_count % 4][i];
                     }
-
-                    m_dsp.prot_value += protection_magic[m_dsp.prot_count % 4][8];
-                    m_dsp.prot_count++;
                 }
+
+                m_dsp.prot_value += protection_magic[m_dsp.prot_count % 4][8];
+                m_dsp.prot_count++;
                 
-                // this wants to return prot_data by a 1 byte DMA.  how does ISA DMA work?
-                queue_r(m_dsp.prot_value);
+                m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
                 m_isa->drq1_w(1);
                 break;
 			case 0xe4: // write test register
@@ -408,11 +407,23 @@ void sb8_device::device_reset()
 {
     m_dsp.prot_value = 0xaa;
     m_dsp.prot_count = 0;
+    m_dack_out = 0;
 }
 
 bool sb8_device::have_dack(int line)
 {
 	if (line==1) return TRUE;
 	return FALSE;
+}
+
+UINT8 sb8_device::dack_r(int line)
+{
+//    printf("dack_r: line %x out = %02x\n", line, m_dack_out);
+    return m_dack_out;
+}
+
+void sb8_device::dack_w(int line, UINT8 data)
+{
+//    printf("dack_w: line %x data %02x\n", line, data);
 }
 
