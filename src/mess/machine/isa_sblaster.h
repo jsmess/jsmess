@@ -10,11 +10,55 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> isa8_sblaster_device
+struct sb8_dsp_state
+{
+    UINT8 reset_latch;
+    UINT8 rbuf_status;
+    UINT8 wbuf_status;
+    UINT8 fifo[16],fifo_ptr;
+    UINT8 fifo_r[16],fifo_r_ptr;
+    UINT16 version;
+    UINT8 test_reg;
+    UINT8 speaker_on;
+    UINT8 prot_count;
+    INT8 prot_value;
+};
 
-class isa8_sblaster1_0_device :
+// ======================> sb8_device (parent)
+
+class sb8_device :
 		public device_t,
 		public device_isa8_card_interface
+{
+public:
+        // construction/destruction
+        sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name);
+
+        void process_fifo(UINT8 cmd);
+        void queue(UINT8 data);
+        void queue_r(UINT8 data);
+        UINT8 dequeue_r();
+
+        DECLARE_READ8_MEMBER(dsp_reset_r);
+        DECLARE_WRITE8_MEMBER(dsp_reset_w);
+        DECLARE_READ8_MEMBER(dsp_data_r);
+        DECLARE_WRITE8_MEMBER(dsp_data_w);
+        DECLARE_READ8_MEMBER(dsp_rbuf_status_r);
+        DECLARE_READ8_MEMBER(dsp_wbuf_status_r);
+        DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
+        DECLARE_WRITE8_MEMBER(dsp_cmd_w);
+
+protected:
+        // device-level overrides
+        virtual void device_start();
+        virtual void device_reset();
+
+        struct sb8_dsp_state m_dsp;
+
+private:
+};
+
+class isa8_sblaster1_0_device : public sb8_device
 {
 public:
         // construction/destruction
@@ -25,15 +69,12 @@ public:
 protected:
         // device-level overrides
         virtual void device_start();
-        virtual void device_reset();
 
 private:
         // internal state
 };
 
-class isa8_sblaster1_5_device :
-		public device_t,
-		public device_isa8_card_interface
+class isa8_sblaster1_5_device : public sb8_device
 {
 public:
         // construction/destruction
@@ -44,7 +85,6 @@ public:
 protected:
         // device-level overrides
         virtual void device_start();
-        virtual void device_reset();
 
 private:
         // internal state

@@ -37,18 +37,6 @@
 */
 #define ym3812_StdClock XTAL_3_579545MHz
 
-static struct {
-	UINT8 reset_latch;
-	UINT8 rbuf_status;
-	UINT8 wbuf_status;
-	UINT8 fifo[16],fifo_ptr;
-	UINT8 fifo_r[16],fifo_r_ptr;
-	UINT16 version;
-	UINT8 test_reg;
-	UINT8 speaker_on;
-}m_dsp;
-
-
 static const int m_cmd_fifo_length[256] =
 {
 /*   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F        */
@@ -66,8 +54,16 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Bx */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Cx */
 	-1,  1, -1,  1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Dx */
-	 2,  1, -1, -1,  2, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
+	 2,  1,  1, -1,  2, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
 	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1  /* Fx */
+};
+
+static const int protection_magic[4][9] = 
+{
+    {  1, -2, -4,  8, -16,  32,  64, -128, -106 },
+    { -1,  2, -4,  8,  16, -32,  64, -128,  165 },
+    { -1,  2,  4, -8,  16, -32, -64,  128, -151 },
+    {  1, -2,  4, -8, -16,  32, -64,  128,  90 }
 };
 
 static const ym3812_interface pc_ym3812_interface =
@@ -129,7 +125,7 @@ static WRITE8_DEVICE_HANDLER( saa1099_16_w )
 	}
 }
 
-static void queue(UINT8 data)
+void sb8_device::queue(UINT8 data)
 {
 	if (m_dsp.fifo_ptr < 15)
 	{
@@ -144,7 +140,7 @@ static void queue(UINT8 data)
 	}
 }
 
-static void queue_r(UINT8 data)
+void sb8_device::queue_r(UINT8 data)
 {
 	m_dsp.rbuf_status |= 0x80;
 
@@ -161,7 +157,7 @@ static void queue_r(UINT8 data)
 	}
 }
 
-static UINT8 dequeue_r()
+UINT8 sb8_device::dequeue_r()
 {
 	UINT8 data = m_dsp.fifo_r[0];
 
@@ -182,7 +178,7 @@ static UINT8 dequeue_r()
 }
 
 
-static READ8_DEVICE_HANDLER( dsp_reset_r )
+READ8_MEMBER( sb8_device::dsp_reset_r )
 {
 	if(offset)
 		return 0xff;
@@ -190,7 +186,7 @@ static READ8_DEVICE_HANDLER( dsp_reset_r )
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( dsp_reset_w )
+WRITE8_MEMBER( sb8_device::dsp_reset_w )
 {
 	if(offset)
 		return;
@@ -206,7 +202,7 @@ static WRITE8_DEVICE_HANDLER( dsp_reset_w )
 	//printf("%02x\n",data);
 }
 
-static READ8_DEVICE_HANDLER( dsp_data_r )
+READ8_MEMBER( sb8_device::dsp_data_r )
 {
 	if(offset)
 		return 0xff;
@@ -214,14 +210,14 @@ static READ8_DEVICE_HANDLER( dsp_data_r )
 	return dequeue_r();
 }
 
-static WRITE8_DEVICE_HANDLER( dsp_data_w )
+WRITE8_MEMBER( sb8_device::dsp_data_w )
 {
 	if(offset)
 		return;
 	logerror("Soundblaster DSP data port undocumented write\n");
 }
 
-static READ8_DEVICE_HANDLER(dsp_rbuf_status_r)
+READ8_MEMBER(sb8_device::dsp_rbuf_status_r)
 {
 	if(offset)
 		return 0xff;
@@ -229,7 +225,7 @@ static READ8_DEVICE_HANDLER(dsp_rbuf_status_r)
 	return m_dsp.rbuf_status;
 }
 
-static READ8_DEVICE_HANDLER(dsp_wbuf_status_r)
+READ8_MEMBER(sb8_device::dsp_wbuf_status_r)
 {
 	if(offset)
 		return 0xff;
@@ -237,7 +233,7 @@ static READ8_DEVICE_HANDLER(dsp_wbuf_status_r)
 	return m_dsp.wbuf_status;
 }
 
-static WRITE8_DEVICE_HANDLER(dsp_rbuf_status_w)
+WRITE8_MEMBER(sb8_device::dsp_rbuf_status_w)
 {
 	if(offset)
 		return;
@@ -245,7 +241,7 @@ static WRITE8_DEVICE_HANDLER(dsp_rbuf_status_w)
 	logerror("Soundblaster DSP Read Buffer status undocumented write\n");
 }
 
-static void process_fifo(running_machine &machine, UINT8 cmd)
+void sb8_device::process_fifo(UINT8 cmd)
 {
 	if (m_cmd_fifo_length[cmd] == -1)
 	{
@@ -254,6 +250,7 @@ static void process_fifo(running_machine &machine, UINT8 cmd)
 	else if(m_dsp.fifo_ptr == m_cmd_fifo_length[cmd])
 	{
 		/* get FIFO params */
+        printf("SB FIFO command: %02x\n", cmd);
 		switch(cmd)
 		{
 			case 0xd1: // speaker on
@@ -274,6 +271,21 @@ static void process_fifo(running_machine &machine, UINT8 cmd)
 				queue_r(m_dsp.version >> 8);
 				queue_r(m_dsp.version & 0xff);
 				break;
+            case 0xe2: // DSP protection
+                for (int i = 0; i < 8; i++)
+                {
+                    if ((m_dsp.fifo[1] >> i) & 0x01)
+                    {
+                        m_dsp.prot_value += protection_magic[m_dsp.prot_count % 4][i];
+                    }
+
+                    m_dsp.prot_value += protection_magic[m_dsp.prot_count % 4][8];
+                    m_dsp.prot_count++;
+                }
+                
+                // this wants to return prot_data by DMA.  how does ISA DMA work?
+                m_isa->drq1_w(1);
+                break;
 			case 0xe4: // write test register
 				m_dsp.test_reg = m_dsp.fifo[1];
 				break;
@@ -281,8 +293,7 @@ static void process_fifo(running_machine &machine, UINT8 cmd)
 				queue_r(m_dsp.test_reg);
 				break;
 			case 0xf2: // send PIC irq
-				//m_isa->irq5_w(1);
-				pic8259_ir5_w(machine.device("pic8259_master"), 1);
+				m_isa->irq5_w(1);
 				break;
 			case 0xf8: // ???
 				logerror("SB: Unknown command write 0xf8");
@@ -294,14 +305,14 @@ static void process_fifo(running_machine &machine, UINT8 cmd)
 	}
 }
 
-static WRITE8_DEVICE_HANDLER(dsp_cmd_w)
+WRITE8_MEMBER(sb8_device::dsp_cmd_w)
 {
 	if(offset)
 		return;
 
 	queue(data);
 
-	process_fifo(device->machine(),m_dsp.fifo[0]);
+	process_fifo(m_dsp.fifo[0]);
 }
 
 //**************************************************************************
@@ -317,7 +328,7 @@ const device_type ISA8_SOUND_BLASTER_1_5 = &device_creator<isa8_sblaster1_5_devi
 //-------------------------------------------------
 
 machine_config_constructor isa8_sblaster1_0_device::device_mconfig_additions() const
-{
+{                                                          
 	return MACHINE_CONFIG_NAME( sblaster1_0_config );
 }
 
@@ -330,19 +341,24 @@ machine_config_constructor isa8_sblaster1_5_device::device_mconfig_additions() c
 //  LIVE DEVICE
 //**************************************************************************
 
+sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
+    device_t(mconfig, type, name, tag, owner, clock),
+    device_isa8_card_interface(mconfig, *this)
+{
+}
+
+
 //-------------------------------------------------
 //  isa8_sblaster_device - constructor
 //-------------------------------------------------
 
 isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_SOUND_BLASTER_1_0, "ISA8_SOUND_BLASTER_1_0", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this)
+    sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0")
 {
 }
 
 isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_SOUND_BLASTER_1_5, "ISA8_SOUND_BLASTER_1_5", tag, owner, clock),
-		device_isa8_card_interface(mconfig, *this)
+    sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5")
 {
 }
 
@@ -350,16 +366,20 @@ isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+void sb8_device::device_start()
+{
+}
+
 void isa8_sblaster1_0_device::device_start()
 {
     set_isa_device();
 	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
-	m_isa->install_device(this,                   0x0226, 0x0227, 0, 0, FUNC(dsp_reset_r), FUNC(dsp_reset_w) );
+	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb8_device::dsp_reset_r), this), write8_delegate(FUNC(sb8_device::dsp_reset_w), this));
 	m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
-	m_isa->install_device(this,                   0x022a, 0x022b, 0, 0, FUNC(dsp_data_r),  FUNC(dsp_data_w) );
-	m_isa->install_device(this,                   0x022c, 0x022d, 0, 0, FUNC(dsp_wbuf_status_r),  FUNC(dsp_cmd_w) );
-	m_isa->install_device(this,                   0x022e, 0x022f, 0, 0, FUNC(dsp_rbuf_status_r),  FUNC(dsp_rbuf_status_w) );
+	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb8_device::dsp_data_r), this), write8_delegate(FUNC(sb8_device::dsp_data_w), this) );
+	m_isa->install_device(                   0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb8_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb8_device::dsp_cmd_w), this) );
+	m_isa->install_device(                   0x022e, 0x022f, 0, 0, read8_delegate(FUNC(sb8_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb8_device::dsp_rbuf_status_w), this) );
 	m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	m_dsp.version = 0x0105;
 }
@@ -367,12 +387,12 @@ void isa8_sblaster1_0_device::device_start()
 void isa8_sblaster1_5_device::device_start()
 {
     set_isa_device();
-	/* 1.5 ditches CM/S support (empty sockets) */
-	m_isa->install_device(this,                   0x0226, 0x0227, 0, 0, FUNC(dsp_reset_r), FUNC(dsp_reset_w) );
+	/* 1.5 makes CM/S support optional (empty sockets, but they work if the user populates them!) */
+	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb8_device::dsp_reset_r), this), write8_delegate(FUNC(sb8_device::dsp_reset_w), this));
 	m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
-	m_isa->install_device(this,                   0x022a, 0x022b, 0, 0, FUNC(dsp_data_r),  FUNC(dsp_data_w) );
-	m_isa->install_device(this,                   0x022c, 0x022d, 0, 0, FUNC(dsp_wbuf_status_r),  FUNC(dsp_cmd_w) );
-	m_isa->install_device(this,                   0x022e, 0x022f, 0, 0, FUNC(dsp_rbuf_status_r),  FUNC(dsp_rbuf_status_w) );
+	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb8_device::dsp_data_r), this), write8_delegate(FUNC(sb8_device::dsp_data_w), this) );
+	m_isa->install_device(                   0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb8_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb8_device::dsp_cmd_w), this) );
+	m_isa->install_device(                   0x022e, 0x022f, 0, 0, read8_delegate(FUNC(sb8_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb8_device::dsp_rbuf_status_w), this) );
 	m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	m_dsp.version = 0x0200;
 }
@@ -381,13 +401,9 @@ void isa8_sblaster1_5_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void isa8_sblaster1_0_device::device_reset()
+void sb8_device::device_reset()
 {
-//	...
-}
-
-void isa8_sblaster1_5_device::device_reset()
-{
-// ...
+    m_dsp.prot_value = 0xaa;
+    m_dsp.prot_count = 0;
 }
 
