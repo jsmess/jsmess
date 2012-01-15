@@ -9,8 +9,6 @@
 #ifndef PC_VGA_H
 #define PC_VGA_H
 
-typedef void (*pc_video_update_proc)(bitmap_ind16 &bitmap);
-
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 
 struct pc_vga_interface
@@ -37,7 +35,7 @@ struct pc_svga_interface
 	int seq_regcount;
 	int gc_regcount;
 	int crtc_regcount;
-	pc_video_update_proc (*choosevideomode)(const UINT8 *sequencer, const UINT8 *crtc, const UINT8 *gc, int *width, int *height);
+	void (*choosevideomode)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *sequencer, const UINT8 *crtc, const UINT8 *gc, int *width, int *height);
 };
 
 void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf);
