@@ -54,7 +54,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Bx */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Cx */
 	-1,  1, -1,  1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Dx */
-	 2,  1,  1, -1,  2, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
+	 2,  1,  2, -1,  2, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
 	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1  /* Fx */
 };
 
@@ -204,6 +204,7 @@ WRITE8_MEMBER( sb8_device::dsp_reset_w )
 
 READ8_MEMBER( sb8_device::dsp_data_r )
 {
+//    printf("dsp_data_r: offset %x\n", offset);
 	if(offset)
 		return 0xff;
 
@@ -283,7 +284,8 @@ void sb8_device::process_fifo(UINT8 cmd)
                     m_dsp.prot_count++;
                 }
                 
-                // this wants to return prot_data by DMA.  how does ISA DMA work?
+                // this wants to return prot_data by a 1 byte DMA.  how does ISA DMA work?
+                queue_r(m_dsp.prot_value);
                 m_isa->drq1_w(1);
                 break;
 			case 0xe4: // write test register
@@ -307,6 +309,7 @@ void sb8_device::process_fifo(UINT8 cmd)
 
 WRITE8_MEMBER(sb8_device::dsp_cmd_w)
 {
+//    printf("dsp_cmd_w: offset %x data %02x\n", offset, data);
 	if(offset)
 		return;
 
