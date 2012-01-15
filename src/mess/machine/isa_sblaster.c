@@ -58,7 +58,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1  /* Fx */
 };
 
-static const int protection_magic[4][9] = 
+static const int protection_magic[4][9] =
 {
     {  1, -2, -4,  8, -16,  32,  64, -128, -106 },
     { -1,  2, -4,  8,  16, -32,  64, -128,  165 },
@@ -196,6 +196,13 @@ WRITE8_MEMBER( sb8_device::dsp_reset_w )
 	if(data == 0 && m_dsp.reset_latch == 1)
 	{
 		// reset routine
+		m_dsp.fifo_ptr = 0;
+		m_dsp.fifo_r_ptr = 0;
+		for(int i=0;i < 15; i++)
+		{
+			m_dsp.fifo[i] = 0;
+			m_dsp.fifo_r[i] = 0;
+		}
 		queue_r(0xaa); // reset OK ID
 	}
 
@@ -252,6 +259,8 @@ WRITE8_MEMBER(sb8_device::dsp_rbuf_status_w)
 
 void sb8_device::process_fifo(UINT8 cmd)
 {
+	printf("%02x\n",cmd);
+
 	if (m_cmd_fifo_length[cmd] == -1)
 	{
 		printf("unemulated or undefined fifo command %02x\n",cmd);
@@ -308,7 +317,7 @@ void sb8_device::process_fifo(UINT8 cmd)
 
                 m_dsp.prot_value += protection_magic[m_dsp.prot_count % 4][8];
                 m_dsp.prot_count++;
-                
+
                 m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
                 m_isa->drq1_w(1);
                 break;
@@ -337,7 +346,7 @@ void sb8_device::process_fifo(UINT8 cmd)
 
 WRITE8_MEMBER(sb8_device::dsp_cmd_w)
 {
-//    printf("%02x to DSP command @ %x\n", data, offset);
+//  printf("%02x to DSP command @ %x\n", data, offset);
 
     if(offset)
 		return;
@@ -360,7 +369,7 @@ const device_type ISA8_SOUND_BLASTER_1_5 = &device_creator<isa8_sblaster1_5_devi
 //-------------------------------------------------
 
 machine_config_constructor isa8_sblaster1_0_device::device_mconfig_additions() const
-{                                                          
+{
 	return MACHINE_CONFIG_NAME( sblaster1_0_config );
 }
 
@@ -438,6 +447,8 @@ void sb8_device::device_reset()
     m_dsp.prot_value = 0xaa;
     m_dsp.prot_count = 0;
     m_dack_out = 0;
+    m_dsp.fifo_ptr = 0;
+    m_dsp.fifo_r_ptr = 0;
 }
 
 bool sb8_device::have_dack(int line)
