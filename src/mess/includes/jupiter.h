@@ -34,7 +34,18 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_start();
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(key_r);
+	UINT8 m_term_data;
+
+	UINT8 *m_p_ram;
+	const UINT8 *m_p_chargen;
+	UINT8 *m_p_videoram;
+
+	virtual void machine_reset();
+	virtual void video_start();
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 #endif
