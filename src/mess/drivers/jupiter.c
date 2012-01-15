@@ -5,6 +5,8 @@ Wave Mate Jupiter
 */
 
 #define ADDRESS_MAP_MODERN
+#define VIDEO_START_MEMBER(name) void name::video_start()
+#define SCREEN_UPDATE_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -60,7 +62,10 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( jupiter3_mem, AS_PROGRAM, 8, jupiter3_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z80_TAG, 0)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(m_p_ram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION(Z80_TAG, 0)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -69,6 +74,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( jupiter3_io, AS_IO, 8, jupiter3_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xb0, 0xb0) AM_READ(status_r)
+	AM_RANGE(0xb2, 0xb2) AM_READ(key_r)
 ADDRESS_MAP_END
 
 
@@ -81,8 +89,72 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( jupiter )
 //-------------------------------------------------
 
-INPUT_PORTS_START( jupiter )
+static INPUT_PORTS_START( jupiter )
 INPUT_PORTS_END
+
+READ8_MEMBER( jupiter3_state::key_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+READ8_MEMBER( jupiter3_state::status_r )
+{
+	return (m_term_data) ? 0x80 : 0x00;
+}
+
+WRITE8_MEMBER( jupiter3_state::kbd_put )
+{
+	m_term_data = data ^ 0x80;
+}
+
+
+//**************************************************************************
+//  VIDEO
+//**************************************************************************
+
+VIDEO_START_MEMBER( jupiter3_state )
+{
+	m_p_chargen = machine().region("chargen")->base();
+}
+
+SCREEN_UPDATE_MEMBER( jupiter3_state )
+{
+	UINT8 y,ra,chr,gfx;
+	UINT16 sy=0,ma=0,x;
+
+	for (y = 0; y < 32; y++)
+	{
+		for (ra = 0; ra < 10; ra++)
+		{
+			UINT16 *p = &bitmap.pix16(sy++);
+
+			for (x = ma; x < ma + 64; x++)
+			{
+				gfx = 0;
+				if (ra < 9)
+				{
+					chr = m_p_videoram[x];
+					gfx = m_p_chargen[(chr<<4) | ra ];
+				}
+
+				/* Display a scanline of a character */
+				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 6);
+				*p++ = BIT(gfx, 5);
+				*p++ = BIT(gfx, 4);
+				*p++ = BIT(gfx, 3);
+				*p++ = BIT(gfx, 2);
+				*p++ = BIT(gfx, 1);
+				*p++ = BIT(gfx, 0);
+			}
+		}
+		ma+=64;
+	}
+	return 0;
+}
+
 
 
 
@@ -96,14 +168,14 @@ INPUT_PORTS_END
 
 static const floppy_interface jupiter_floppy_interface =
 {
-    DEVCB_NULL,
 	DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_SSDD_40,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_SSDD_40,
+	LEGACY_FLOPPY_OPTIONS_NAME(default),
+	NULL,
 	NULL
 };
 
@@ -120,9 +192,14 @@ static const wd17xx_interface fdc_intf =
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static GENERIC_TERMINAL_INTERFACE( jupiter2_terminal_intf )
 {
 	DEVCB_NULL
+};
+
+static GENERIC_TERMINAL_INTERFACE( jupiter3_terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(jupiter3_state, kbd_put)
 };
 
 
@@ -144,8 +221,11 @@ void jupiter2_state::machine_start()
 //  MACHINE_START( jupiter3 )
 //-------------------------------------------------
 
-void jupiter3_state::machine_start()
+void jupiter3_state::machine_reset()
 {
+	UINT8* ROM = machine().region(Z80_TAG)->base();
+	memcpy(m_p_ram, ROM, 0x1000);
+	cpu_set_reg(m_maincpu, STATE_GENPC, 0xe000);
 }
 
 
@@ -159,17 +239,17 @@ void jupiter3_state::machine_start()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( jupiter, jupiter2_state )
-    // basic machine hardware
-    MCFG_CPU_ADD(MCM6571AP_TAG, M6800, 2000000)
-    MCFG_CPU_PROGRAM_MAP(jupiter_m6800_mem)
-    MCFG_CPU_IO_MAP(jupiter_m6800_io)
+	// basic machine hardware
+	MCFG_CPU_ADD(MCM6571AP_TAG, M6800, 2000000)
+	MCFG_CPU_PROGRAM_MAP(jupiter_m6800_mem)
+	MCFG_CPU_IO_MAP(jupiter_m6800_io)
 
-    // video hardware
+	// video hardware
 	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// devices
 	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, jupiter2_terminal_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -182,17 +262,24 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
-    // basic machine hardware
+	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
-    MCFG_CPU_PROGRAM_MAP(jupiter3_mem)
-    MCFG_CPU_IO_MAP(jupiter3_io)
+	MCFG_CPU_PROGRAM_MAP(jupiter3_mem)
+	MCFG_CPU_IO_MAP(jupiter3_io)
 
-    // video hardware
-	MCFG_FRAGMENT_ADD( generic_terminal )
+	// video hardware
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(jupiter3_state, screen_update)
+	MCFG_SCREEN_SIZE(512, 320)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 320-1)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 
 	// devices
 	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, jupiter3_terminal_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -229,6 +316,10 @@ ROM_START( jupiter3 )
 	ROM_LOAD( "jove 2.0 78_034 4v2d000 2.6c", 0x0400, 0x0400, CRC(ee98dd32) SHA1(0513261c7c0d911225ea957ee67394871a36ada4) )
 	ROM_LOAD( "jove 2.0 78_034 4v2d000 3.1d", 0x0800, 0x0400, CRC(51476b1d) SHA1(ab6f4eb244bcf9718aafdae67da086ec81f33fa6) )
 	ROM_LOAD( "jove 2.0 78_034 4v2d000 4.6d", 0x0c00, 0x0400, CRC(16a9595d) SHA1(06150278650590497732e1f3f42356de56737921) )
+
+	// character generator is missing, using one from c10 for now
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 
@@ -284,6 +375,6 @@ static DRIVER_INIT( jupiter3 )
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1976, jupiter2,	0,		0,	jupiter,	jupiter,	 jupiter,	"Wave Mate",   "Jupiter II",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1976, jupiter3,	0,		0,	jupiter3,	jupiter,	 jupiter3,	"Wave Mate",   "Jupiter III",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT      COMPANY          FULLNAME       FLAGS
+COMP( 1976, jupiter2, 0,      0,       jupiter,   jupiter, jupiter, "Wave Mate",   "Jupiter II",  GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1976, jupiter3, 0,      0,       jupiter3,  jupiter, jupiter3,"Wave Mate",   "Jupiter III", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
