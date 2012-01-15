@@ -41,10 +41,10 @@ static const int m_cmd_fifo_length[256] =
 {
 /*   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F        */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 0x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 1x */
+	-1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 1x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 2x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 3x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 4x */
+	 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 4x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 5x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 6x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 7x */
@@ -180,6 +180,7 @@ UINT8 sb8_device::dequeue_r()
 
 READ8_MEMBER( sb8_device::dsp_reset_r )
 {
+//    printf("read DSP reset @ %x\n", offset);
 	if(offset)
 		return 0xff;
 	logerror("Soundblaster DSP Reset port undocumented read\n");
@@ -188,6 +189,7 @@ READ8_MEMBER( sb8_device::dsp_reset_r )
 
 WRITE8_MEMBER( sb8_device::dsp_reset_w )
 {
+//    printf("%02x to DSP reset @ %x\n", data, offset);
 	if(offset)
 		return;
 
@@ -204,7 +206,7 @@ WRITE8_MEMBER( sb8_device::dsp_reset_w )
 
 READ8_MEMBER( sb8_device::dsp_data_r )
 {
-//    printf("dsp_data_r: offset %x\n", offset);
+//    printf("read DSP data @ %x\n", offset);
 	if(offset)
 		return 0xff;
 
@@ -213,6 +215,7 @@ READ8_MEMBER( sb8_device::dsp_data_r )
 
 WRITE8_MEMBER( sb8_device::dsp_data_w )
 {
+//    printf("%02x to DSP data @ %x\n", data, offset);
 	if(offset)
 		return;
 	logerror("Soundblaster DSP data port undocumented write\n");
@@ -220,7 +223,10 @@ WRITE8_MEMBER( sb8_device::dsp_data_w )
 
 READ8_MEMBER(sb8_device::dsp_rbuf_status_r)
 {
-	if(offset)
+//    printf("read Rbufstat @ %x\n", offset);
+    m_isa->irq5_w(0);   // reading this port ACKs the card's IRQ
+
+    if(offset)
 		return 0xff;
 
 	return m_dsp.rbuf_status;
@@ -228,6 +234,7 @@ READ8_MEMBER(sb8_device::dsp_rbuf_status_r)
 
 READ8_MEMBER(sb8_device::dsp_wbuf_status_r)
 {
+//    printf("read Wbufstat @ %x\n", offset);
 	if(offset)
 		return 0xff;
 
@@ -236,6 +243,7 @@ READ8_MEMBER(sb8_device::dsp_wbuf_status_r)
 
 WRITE8_MEMBER(sb8_device::dsp_rbuf_status_w)
 {
+//    printf("%02x to Rbufstat @ %x\n", data, offset);
 	if(offset)
 		return;
 
@@ -254,25 +262,42 @@ void sb8_device::process_fifo(UINT8 cmd)
         printf("SB FIFO command: %02x\n", cmd);
 		switch(cmd)
 		{
-			case 0xd1: // speaker on
+            case 0x14:  // 8-bit DMA
+                m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
+//                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
+                m_dsp.dma_transferred = 0;
+                m_isa->drq1_w(1);
+                break;
+
+            case 0x40:  // set time constant
+                m_dsp.frequency = (1000000 / (256 - m_dsp.fifo[1]));
+//                printf("Set time constant: %02x -> %d\n", m_dsp.fifo[1], m_dsp.frequency);
+                break;
+
+            case 0xd1: // speaker on
 				// ...
 				m_dsp.speaker_on = 1;
 				break;
+
 			case 0xd3: // speaker off
 				// ...
 				m_dsp.speaker_on = 0;
 				break;
+
 			case 0xd8: // speaker status
 				queue_r(m_dsp.speaker_on ? 0xff : 0x00);
 				break;
+
 			case 0xe0: // get DSP identification
 				queue_r(m_dsp.fifo[1] ^ 0xff);
 				break;
+
 			case 0xe1: // get DSP version
 				queue_r(m_dsp.version >> 8);
 				queue_r(m_dsp.version & 0xff);
 				break;
-        case 0xe2: // DSP protection
+
+            case 0xe2: // DSP protection
                 for (int i = 0; i < 8; i++)
                 {
                     if ((m_dsp.fifo[1] >> i) & 0x01)
@@ -287,15 +312,19 @@ void sb8_device::process_fifo(UINT8 cmd)
                 m_dack_out = (UINT8)(m_dsp.prot_value & 0xff);
                 m_isa->drq1_w(1);
                 break;
+
 			case 0xe4: // write test register
 				m_dsp.test_reg = m_dsp.fifo[1];
 				break;
+
 			case 0xe8: // read test register
 				queue_r(m_dsp.test_reg);
 				break;
+
 			case 0xf2: // send PIC irq
 				m_isa->irq5_w(1);
 				break;
+
 			case 0xf8: // ???
 				logerror("SB: Unknown command write 0xf8");
 				queue_r(0);
@@ -308,8 +337,9 @@ void sb8_device::process_fifo(UINT8 cmd)
 
 WRITE8_MEMBER(sb8_device::dsp_cmd_w)
 {
-//    printf("dsp_cmd_w: offset %x data %02x\n", offset, data);
-	if(offset)
+//    printf("%02x to DSP command @ %x\n", data, offset);
+
+    if(offset)
 		return;
 
 	queue(data);
@@ -425,5 +455,12 @@ UINT8 sb8_device::dack_r(int line)
 void sb8_device::dack_w(int line, UINT8 data)
 {
 //    printf("dack_w: line %x data %02x\n", line, data);
+    m_dsp.dma_transferred++;
+    if (m_dsp.dma_transferred >= m_dsp.dma_length)
+    {
+//        printf("DMA completed\n");
+//        m_isa->drq1_w(1);
+        m_isa->irq5_w(1);
+    }
 }
 
