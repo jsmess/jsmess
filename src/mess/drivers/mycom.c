@@ -166,14 +166,14 @@ static MC6845_UPDATE_ROW( mycom_update_row )
 			}
 
 			/* Display a scanline of a character */
-			*p++ = BIT(gfx, 7);
-			*p++ = BIT(gfx, 6);
-			*p++ = BIT(gfx, 5);
-			*p++ = BIT(gfx, 4);
-			*p++ = BIT(gfx, 3);
-			*p++ = BIT(gfx, 2);
-			*p++ = BIT(gfx, 1);
-			*p++ = BIT(gfx, 0);
+			*p++ = palette[BIT(gfx, 7)];
+			*p++ = palette[BIT(gfx, 6)];
+			*p++ = palette[BIT(gfx, 5)];
+			*p++ = palette[BIT(gfx, 4)];
+			*p++ = palette[BIT(gfx, 3)];
+			*p++ = palette[BIT(gfx, 2)];
+			*p++ = palette[BIT(gfx, 1)];
+			*p++ = palette[BIT(gfx, 0)];
 		}
 	}
 }
