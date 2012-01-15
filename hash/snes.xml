@@ -22908,7 +22908,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<machine name="arcadeghu" cloneof="arcadegh">
+	<software name="arcadeghu" cloneof="arcadegh">
 		<description>Arcade's Greatest Hits (USA)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
@@ -22918,7 +22918,7 @@ Alternate board (XL-1)
 				<rom name="arcade's greatest hits (usa).sfc" size="524288" crc="471b12b0" sha1="d6219e7078f58ffccba64c24fc7fa1fc06bdfb30" offset="000000" />
 			</dataarea>
 		</part>
-	</machine>
+	</software>
 
 	<software name="arcadeac">
 		<description>Arcade's Greatest Hits - The Atari Collection 1 (Euro)</description>
