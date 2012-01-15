@@ -509,7 +509,7 @@ GFXDECODE_END
 
 static WRITE_LINE_DEVICE_HANDLER(set_int2)
 {
-	tms9901_set_int2( NULL, *device->machine().device<v9938_device>("video_v9938"), state );
+	tms9901_set_int2(device->machine().device("ti_board"), state );
 }
 
 static TMS9928A_INTERFACE(ti99_8_tms9928a_interface)

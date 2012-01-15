@@ -4,7 +4,8 @@
 #include "machine/tms9901.h"
 #include "video/v9938.h"
 
-void tms9901_set_int2(device_t *, v99x8_device &tms, int state);
+void tms9901_set_int2(device_t *device, int state);
+void tms9901_set_int2_v9938(device_t *, v99x8_device &tms, int state);
 
 extern const tms9901_interface tms9901_wiring_ti99_4;
 extern const tms9901_interface tms9901_wiring_ti99_4a;
