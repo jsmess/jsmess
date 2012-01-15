@@ -22,6 +22,8 @@ struct sb8_dsp_state
     UINT8 speaker_on;
     UINT32 prot_count;
     INT32 prot_value;
+    UINT32 frequency;
+    UINT32 dma_length, dma_transferred;
 };
 
 // ======================> sb8_device (parent)
