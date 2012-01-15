@@ -21,7 +21,6 @@
 typedef struct _ti99_video_config
 {
 	int							chip;
-	void						(*callback)(device_t *, v99x8_device &, int);
 
 } ti99_video_config;
 
@@ -56,7 +55,6 @@ DECLARE_LEGACY_DEVICE( TIVIDEO, ti99_video );
 
 #define MCFG_TI_V9938_ADD(_tag, _rate, _screen, _blank, _x, _y, _int)		\
 	MCFG_DEVICE_ADD(_tag, TIVIDEO, 0)										\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_video_config, callback, _int)			\
 	MCFG_DEVICE_CONFIG_DATA32(ti99_video_config, chip, TI_V9938)			\
 	MCFG_V9938_ADD(_tag "_v9938", _screen, 0x20000)							\
 	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(_int)								\

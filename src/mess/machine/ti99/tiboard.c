@@ -125,10 +125,21 @@ nota:
 /*
     set the state of int2 (called by the tms9928 core)
 */
-void tms9901_set_int2(device_t *, v99x8_device &tms, int state)
+void tms9901_set_int2(device_t *device, int state)
+{
+	device_t *dev = device->machine().device("ti_board");
+	tiboard_state *board = get_safe_token(dev);
+	tms9901_set_single_int(board->tms9901, 2, state);
+}
+
+/*
+    set the state of int2 (called by the v9938 core)
+*/
+void tms9901_set_int2_v9938(device_t *, v99x8_device &tms, int state)
 {
 	tms9901_set_single_int(tms.machine().device("tms9901"), 2, state);
 }
+
 
 /*
     Called by the 9901 core whenever the state of INTREQ and IC0-3 changes

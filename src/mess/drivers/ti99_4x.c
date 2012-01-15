@@ -775,7 +775,7 @@ GFXDECODE_END
 
 static WRITE_LINE_DEVICE_HANDLER(set_int2)
 {
-	tms9901_set_int2( NULL, *device->machine().device<v9938_device>("video_v9938"), state );
+	tms9901_set_int2(device->machine().device("ti_board"), state );
 }
 
 static TMS9928A_INTERFACE(ti99_4_tms9928a_interface)
@@ -1027,7 +1027,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	/* FIXME: (MZ) Lowered the screen rate to 30 Hz. This is a quick hack to
     restore normal video speed for V9938-based systems until the V9938 implementation
     is properly fixed. */
-	MCFG_TI_V9938_ADD("video", 30, "screen", 2500, 512+32, (212+28)*2, tms9901_set_int2)
+	MCFG_TI_V9938_ADD("video", 30, "screen", 2500, 512+32, (212+28)*2, tms9901_set_int2_v9938)
 
 	MCFG_GFXDECODE(ti99b)
 
