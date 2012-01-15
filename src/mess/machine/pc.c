@@ -1082,9 +1082,6 @@ static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine()
 
 static const struct pc_vga_interface vga_interface =
 {
-	NULL,
-	NULL,
-
 	input_port_0_r,
 	AS_PROGRAM,
 	0xa0000,
