@@ -146,20 +146,8 @@ cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-static void bebox_map_vga_memory(running_machine &machine, offs_t begin, offs_t end, read8_space_func rh, const char *rh_name, write8_space_func wh, const char *wh_name )
-{
-	address_space *space = machine.device("ppc1")->memory().space(AS_PROGRAM);
-
-	space->nop_readwrite(0xC00A0000, 0xC00BFFFF);
-
-	space->install_readwrite_bank(0xC0000000 + begin, 0xC0000000 + end, "bank4");
-}
-
 static const struct pc_vga_interface bebox_vga_interface =
 {
-	"bank4",
-	bebox_map_vga_memory,
-
 	NULL,
 	AS_PROGRAM,
 	0xC00A0000,
