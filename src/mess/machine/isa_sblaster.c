@@ -3,11 +3,9 @@
   ISA 8 bit Creative Labs Sound Blaster Sound Card
 
   TODO:
-  - DSP type is unknown at current time, and probably has an internal ROM
-    that needs decapping;
+  - fix DAC  - DSP type is a MCS-51 family, it has an internal ROM that needs decapping;
   - joystick port;
   - implement jumpers DIP-SWs;
-  - state machine + read/write members
 
 ***************************************************************************/
 
@@ -41,7 +39,7 @@ static const int m_cmd_fifo_length[256] =
 {
 /*   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F        */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 0x */
-	 2, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 1x */
+	 2, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1,	-1,  1, -1, -1, -1, /* 1x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 2x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* 3x */
 	 2, -1, -1, -1, -1, -1, -1, -1,  3, -1, -1,	-1, -1, -1, -1, -1, /* 4x */
@@ -276,12 +274,21 @@ void sb8_device::process_fifo(UINT8 cmd)
                 m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 //                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
                 m_dsp.dma_transferred = 0;
+                m_dsp.dma_autoinit = 0;
                 m_isa->drq1_w(1);
                 break;
 
+            case 0x1c:
+            	printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
+                m_dsp.dma_transferred = 0;
+                m_dsp.dma_autoinit = 1;
+                m_isa->drq1_w(1);
+            	break;
+
+
             case 0x40:  // set time constant
                 m_dsp.frequency = (1000000 / (256 - m_dsp.fifo[1]));
-//                printf("Set time constant: %02x -> %d\n", m_dsp.fifo[1], m_dsp.frequency);
+                printf("Set time constant: %02x -> %d\n", m_dsp.fifo[1], m_dsp.frequency);
                 break;
 
 			case 0x48:	// set DMA block size (for auto-init)
@@ -469,15 +476,21 @@ UINT8 sb8_device::dack_r(int line)
     return m_dack_out;
 }
 
+/* TODO: this mustn't be instant! */
 void sb8_device::dack_w(int line, UINT8 data)
 {
 //    printf("dack_w: line %x data %02x\n", line, data);
+//	if(data != 0x80)
+//		printf("%02x\n",data);
     m_dsp.dma_transferred++;
     if (m_dsp.dma_transferred >= m_dsp.dma_length)
     {
-//        printf("DMA completed\n");
-        m_isa->drq1_w(0);	// drop DRQ?
-        m_isa->irq5_w(1);	// definitely raise IRQ as per the Creative manual
+        //printf("DMA completed\n");
+        if(m_dsp.dma_autoinit)
+			m_dsp.dma_transferred = 0;
+
+   		m_isa->drq1_w(0);	// drop DRQ?
+      	m_isa->irq5_w(1);	// definitely raise IRQ as per the Creative manual
     }
 }
 
