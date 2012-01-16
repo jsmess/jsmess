@@ -50,6 +50,9 @@ public:
         DECLARE_READ8_MEMBER(dsp_wbuf_status_r);
         DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
         DECLARE_WRITE8_MEMBER(dsp_cmd_w);
+        DECLARE_READ8_MEMBER(joy_port_r);
+        DECLARE_WRITE8_MEMBER(joy_port_w);
+		virtual ioport_constructor device_input_ports() const;
 
 protected:
         // device-level overrides
@@ -62,6 +65,7 @@ protected:
 
         struct sb8_dsp_state m_dsp;
         UINT8 m_dack_out;
+        attotime m_joy_time;
 
 private:
         emu_timer *m_timer;

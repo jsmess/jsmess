@@ -3,8 +3,8 @@
   ISA 8 bit Creative Labs Sound Blaster Sound Card
 
   TODO:
-  - fix DAC  - DSP type is a MCS-51 family, it has an internal ROM that needs decapping;
-  - joystick port;
+  - implement DAC
+  - DSP type is a MCS-51 family, it has an internal ROM that needs decapping;
   - implement jumpers DIP-SWs;
 
 ***************************************************************************/
@@ -34,6 +34,26 @@
   jumperable? normally 0x220
 */
 #define ym3812_StdClock XTAL_3_579545MHz
+
+static INPUT_PORTS_START( sblaster )
+	PORT_START("pc_joy")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW,	 IPT_UNUSED ) // x/y ad stick to digital converters
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,   IPT_BUTTON1) PORT_NAME("SB: Joystick Button 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,   IPT_BUTTON2) PORT_NAME("SB: Joystick Button 2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,   IPT_BUTTON3) PORT_NAME("SB: Joystick Button 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,   IPT_BUTTON4) PORT_NAME("SB: Joystick Button 4")
+
+	PORT_START("pc_joy_1")
+	PORT_BIT(0xff,0x80,IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
+
+	PORT_START("pc_joy_2")
+	PORT_BIT(0xff,0x80,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
+INPUT_PORTS_END
+
+ioport_constructor sb8_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( sblaster );
+}
 
 static const int m_cmd_fifo_length[256] =
 {
@@ -372,6 +392,35 @@ WRITE8_MEMBER(sb8_device::dsp_cmd_w)
 	process_fifo(m_dsp.fifo[0]);
 }
 
+
+READ8_MEMBER ( sb8_device::joy_port_r )
+{
+	UINT8 data = 0;
+	int delta;
+	attotime new_time = machine().time();
+
+	{
+		data = input_port_read(this, "pc_joy") | 0x0f;
+
+		{
+			delta = ((new_time - m_joy_time) * 256 * 1000).seconds;
+
+			if (input_port_read(this, "pc_joy_1") < delta) data &= ~0x01;
+			if (input_port_read(this, "pc_joy_2") < delta) data &= ~0x02;
+		}
+	}
+
+	return data;
+}
+
+
+
+WRITE8_MEMBER ( sb8_device::joy_port_w )
+{
+	m_joy_time = machine().time();
+}
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -425,6 +474,7 @@ isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, 
 
 void sb8_device::device_start()
 {
+	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(sb8_device::joy_port_r), this), write8_delegate(FUNC(sb8_device::joy_port_w), this));
 	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb8_device::dsp_reset_r), this), write8_delegate(FUNC(sb8_device::dsp_reset_w), this));
 	m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb8_device::dsp_data_r), this), write8_delegate(FUNC(sb8_device::dsp_data_w), this) );
