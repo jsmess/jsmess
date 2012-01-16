@@ -1,4 +1,53 @@
-﻿0.144u5
+﻿0.144u6
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+-MMD2 [Robbbert]
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+-rm380z: Added support for switching between 40- and 80-column modes.  [Gabriele D'Antona]
+-a5200: added workaround for a13 mirroring when loading from softlist. Now the software 
+ list behavior matches 100% the fullpath loading. [Fabio Priuli]
+-rm380z: More video fixes and improvements.  [Gabriele D'Antona]
+- rm380z: Fixed keybaord inputs. Improved scrolling and partial 
+ implementation of grpahics characters.  [Gabriele D'Antona]
+- N64: Various changes: [MooglyGuy, Happy]
+  - Converted AI / VI / MI / RI / SI / PI into a modernized device
+  - PI DMA now takes place after an appropriate delay to simulate transfer time
+  - SP DMA no longer rejects transfers of 0 bytes (should transfer one 8-byte word)
+- Jupiter3: Hooked up screen and keyboard [Robbbert]
+
+Software Lists:
+----------------
+-rainbow.xml: updated software list [Kaylee]
+-sage2.xml: Added floppy software list. [Curt Coder]
+
+Source Changes:
+----------------
+- enabling load of multi part softlist items on all available device [Fabio Priuli]
+- floppy: DiskCopy 4.2 support  [O. Galibert]
+- i8279 improvements. Hooked up to sdk85, sdk86, selz80. [Robbbert]
+- i386: Bit more progress towards getting 386 enhanced mode Windows running. [Carl]
+- upd765: Added INT/DMA read handlers. [Curt Coder]
+- Added support for 2 drives on IDE controller [Miodrag Milanovic]
+- Connected ISA slot devices for 32bit PC machines [Miodrag Milanovic]
+- i386: Beginning to implement page faults. [Carl]
+- ipf: Fix a stupid memory leak, thanks Firewave [O. Galibert]
+- i386: Added I/O permissions. Windows 3.0 can now start up in 386 enhanced mode. [Carl]
+- SoundBlaster: E2 protection check fixed.  test-sbc.exe now passes initial tests. [R. Belmont]
+- SoundBlaster: recognize command 0x10 for Inertia Player [R. Belmont]
+
+
+0.144u5
 
 New System Drivers Supported:
 -----------------------------
