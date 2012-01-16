@@ -99,28 +99,25 @@ static void draw_sprites(running_machine &machine, const rectangle* rect);
 static void towns_crtc_refresh_mode(running_machine &machine)
 {
 	towns_state* state = machine.driver_data<towns_state>();
-	rectangle scr;
 	unsigned int width,height;
 
-	scr.min_x = scr.min_y = 0;
-	scr.max_x = state->m_video.towns_crtc_reg[4];
-	scr.max_y = state->m_video.towns_crtc_reg[8] / 2;
+	rectangle scr(0, state->m_video.towns_crtc_reg[4], 0, state->m_video.towns_crtc_reg[8] / 2);
 
 	// layer 0
 	width = state->m_video.towns_crtc_reg[10] - state->m_video.towns_crtc_reg[9];
 	height = (state->m_video.towns_crtc_reg[14] - state->m_video.towns_crtc_reg[13]) / 2;
-	state->m_video.towns_crtc_layerscr[0].min_x = (scr.max_x / 2) - (width / 2);
-	state->m_video.towns_crtc_layerscr[0].min_y = (scr.max_y / 2) - (height / 2);
-	state->m_video.towns_crtc_layerscr[0].max_x = (scr.max_x / 2) + (width / 2);
-	state->m_video.towns_crtc_layerscr[0].max_y = (scr.max_y / 2) + (height / 2);
+	state->m_video.towns_crtc_layerscr[0].min_x = scr.xcenter() - (width / 2);
+	state->m_video.towns_crtc_layerscr[0].min_y = scr.ycenter() - (height / 2);
+	state->m_video.towns_crtc_layerscr[0].max_x = scr.xcenter() + (width / 2);
+	state->m_video.towns_crtc_layerscr[0].max_y = scr.ycenter() + (height / 2);
 
 	// layer 1
 	width = state->m_video.towns_crtc_reg[12] - state->m_video.towns_crtc_reg[11];
 	height = (state->m_video.towns_crtc_reg[16] - state->m_video.towns_crtc_reg[15]) / 2;
-	state->m_video.towns_crtc_layerscr[1].min_x = (scr.max_x / 2) - (width / 2);
-	state->m_video.towns_crtc_layerscr[1].min_y = (scr.max_y / 2) - (height / 2);
-	state->m_video.towns_crtc_layerscr[1].max_x = (scr.max_x / 2) + (width / 2);
-	state->m_video.towns_crtc_layerscr[1].max_y = (scr.max_y / 2) + (height / 2);
+	state->m_video.towns_crtc_layerscr[1].min_x = scr.xcenter() - (width / 2);
+	state->m_video.towns_crtc_layerscr[1].min_y = scr.ycenter() - (height / 2);
+	state->m_video.towns_crtc_layerscr[1].max_x = scr.xcenter() + (width / 2);
+	state->m_video.towns_crtc_layerscr[1].max_y = scr.ycenter() + (height / 2);
 
 	// sanity checks
 	if(scr.max_x == 0 || scr.max_y == 0)

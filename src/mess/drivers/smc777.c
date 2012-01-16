@@ -544,9 +544,7 @@ static WRITE8_HANDLER( display_reg_w )
 
 			x_width = (data & 0x80) ? 320 : 640;
 
-			visarea.min_x = visarea.min_y = 0;
-			visarea.max_y = (200+(CRTC_MIN_Y*2)) - 1;
-			visarea.max_x = (x_width+(CRTC_MIN_X*2)) - 1;
+			visarea.set(0, (x_width+(CRTC_MIN_X*2)) - 1, 0, (200+(CRTC_MIN_Y*2)) - 1);
 
 			space->machine().primary_screen->configure(660, 220, visarea, space->machine().primary_screen->frame_period().attoseconds);
 		}

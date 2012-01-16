@@ -276,14 +276,9 @@ static void recompute_parameters(crtc_ega_t *crtc_ega, int postload)
 				(hsync_on_pos <= horiz_pix_total) && (vsync_on_pos <= vert_pix_total) &&
 				(hsync_on_pos != hsync_off_pos))
 			{
-				rectangle visarea;
-
 				attoseconds_t refresh = HZ_TO_ATTOSECONDS(crtc_ega->clock) * (crtc_ega->horiz_char_total + 1) * vert_pix_total;
 
-				visarea.min_x = 0;
-				visarea.min_y = 0;
-				visarea.max_x = max_visible_x;
-				visarea.max_y = max_visible_y;
+				rectangle visarea(0, max_visible_x, 0, max_visible_y);
 
 				if (LOG) logerror("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));

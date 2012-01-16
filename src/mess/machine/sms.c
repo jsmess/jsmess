@@ -441,7 +441,7 @@ static void sms_vdp_hcount_latch( address_space *space )
 static UINT16 screen_hpos_nonscaled( screen_device &screen, int scaled_hpos )
 {
 	const rectangle &visarea = screen.visible_area();
-	int offset_x = (scaled_hpos * (visarea.max_x - visarea.min_x)) / 255;
+	int offset_x = (scaled_hpos * visarea.width()) / 255;
 	return visarea.min_x + offset_x;
 }
 

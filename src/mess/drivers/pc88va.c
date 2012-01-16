@@ -348,7 +348,7 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 					res_x = x*8+xi;
 					res_y = y*16+yi;
 
-					if((res_x)>machine.primary_screen->visible_area().max_x || (res_y)>machine.primary_screen->visible_area().max_y)
+					if(!cliprect.contains(res_x, res_y))
 						continue;
 
 					pen = kanji[((yi*2)+lr_half_gfx)+tile_num] >> (7-xi) & 1;
@@ -662,10 +662,7 @@ static void execute_sync_cmd(running_machine &machine)
 	x_vis_area = state->m_buf_ram[4] * 4;
 	y_vis_area = (state->m_buf_ram[0xa])|((state->m_buf_ram[0xb] & 0x40)<<2);
 
-	visarea.min_x = 0;
-	visarea.min_y = 0;
-	visarea.max_x = x_vis_area - 1;
-	visarea.max_y = y_vis_area - 1;
+	visarea.set(0, x_vis_area - 1, 0, y_vis_area - 1);
 
 	//if(y_vis_area == 400)
 	//  refresh = HZ_TO_ATTOSECONDS(24800) * x_vis_area * y_vis_area; //24.8 KHz

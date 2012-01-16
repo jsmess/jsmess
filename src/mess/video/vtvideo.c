@@ -83,10 +83,7 @@ static void vt_video_recompute_parameters(device_t *device)
 	horiz_pix_total = vt->columns * 10;
 	vert_pix_total  = 25 * 10;
 
-	visarea.min_x = 0;
-	visarea.min_y = 0;
-	visarea.max_x = horiz_pix_total - 1;
-	visarea.max_y = vert_pix_total - 1;
+	visarea.set(0, horiz_pix_total - 1, 0, vert_pix_total - 1);
 
 	vt->screen->configure(horiz_pix_total, vert_pix_total, visarea,
 				vt->screen->frame_period().attoseconds);

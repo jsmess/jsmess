@@ -1150,20 +1150,15 @@ READ8_HANDLER( fm77av_sub_modestatus_r )
 WRITE8_HANDLER( fm77av_sub_modestatus_w )
 {
 	fm7_state *state = space->machine().driver_data<fm7_state>();
-	rectangle rect;
 	state->m_video.modestatus = data & 0x40;
 	if(data & 0x40)
 	{
-		rect.min_x = rect.min_y = 0;
-		rect.max_x = 320-1;
-		rect.max_y = 200-1;
+		rectangle rect(0, 320-1, 0, 200-1);
 		space->machine().primary_screen->configure(320,200,rect,HZ_TO_ATTOSECONDS(60));
 	}
 	else
 	{
-		rect.min_x = rect.min_y = 0;
-		rect.max_x = 640-1;
-		rect.max_y = 200-1;
+		rectangle rect(0, 640-1, 0, 200-1);
 		space->machine().primary_screen->configure(640,200,rect,HZ_TO_ATTOSECONDS(60));
 	}
 }

@@ -78,7 +78,7 @@ static SCREEN_UPDATE_RGB32( m20 )
 			{
 				pen = (state->m_p_videoram[count]) >> (15 - i) & 1;
 
-				if ((x + i) <= screen.visible_area().max_x && (y + 0) < screen.visible_area().max_y)
+				if (screen.visible_area().contains(x + i, y))
 					bitmap.pix32(y, x + i) = screen.machine().pens[pen];
 			}
 

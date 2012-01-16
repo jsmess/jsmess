@@ -403,8 +403,7 @@ static void vdc8563_monotext_screenrefresh( device_t *device, bitmap_ind16 &bitm
 	int h = CRTC6845_CHAR_LINES;
 	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = vdc8563->screen->visible_area().min_x;
-	rect.max_x = vdc8563->screen->visible_area().max_x;
+	rect.setx(vdc8563->screen->visible_area().min_x, vdc8563->screen->visible_area().max_x);
 
 	if (full_refresh)
 		memset(vdc8563->dirty + vdc8563->videoram_start, 1, vdc8563->videoram_size);
@@ -446,8 +445,7 @@ static void vdc8563_text_screenrefresh( device_t *device, bitmap_ind16 &bitmap, 
 	int h = CRTC6845_CHAR_LINES;
 	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = vdc8563->screen->visible_area().min_x;
-	rect.max_x = vdc8563->screen->visible_area().max_x;
+	rect.setx(vdc8563->screen->visible_area().min_x, vdc8563->screen->visible_area().max_x);
 
 	if (full_refresh)
 		memset(vdc8563->dirty + vdc8563->videoram_start, 1, vdc8563->videoram_size);
@@ -510,8 +508,7 @@ static void vdc8563_graphic_screenrefresh( device_t *device, bitmap_ind16 &bitma
 	int h = CRTC6845_CHAR_LINES;
 	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = vdc8563->screen->visible_area().min_x;
-	rect.max_x = vdc8563->screen->visible_area().max_x;
+	rect.setx(vdc8563->screen->visible_area().min_x, vdc8563->screen->visible_area().max_x);
 
 	if (full_refresh)
 		memset(vdc8563->dirty, 1, vdc8563->mask + 1);

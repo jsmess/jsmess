@@ -98,7 +98,7 @@ static VIDEO_START( multi8 )
 
 static void multi8_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
 {
-	if((x)>machine.primary_screen->visible_area().max_x || (y)>machine.primary_screen->visible_area().max_y)
+	if(!machine.primary_screen->visible_area().contains(x, y))
 		return;
 
 	if(width)

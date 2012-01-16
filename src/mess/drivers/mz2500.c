@@ -609,10 +609,7 @@ static void mz2500_reconfigure_screen(running_machine &machine)
 	else
 		state->m_scr_y_size = 200 * ((state->m_text_font_reg) ? 1 : 2);
 
-	visarea.min_x = 0;
-	visarea.min_y = 0;
-	visarea.max_x = state->m_scr_x_size - 1;
-	visarea.max_y = state->m_scr_y_size - 1;
+	visarea.set(0, state->m_scr_x_size - 1, 0, state->m_scr_y_size - 1);
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,state->m_cg_reg[0x0e]);
 

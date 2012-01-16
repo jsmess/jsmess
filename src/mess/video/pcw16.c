@@ -180,33 +180,20 @@ SCREEN_UPDATE_IND16( pcw16 )
 	if ((state->m_video_control & (1<<6))==0)
 	{
 		/* blank */
-		rectangle rect;
-
-		rect.min_x = 0;
-		rect.min_y = 0;
-		rect.max_x = PCW16_SCREEN_WIDTH;
-		rect.max_y = PCW16_SCREEN_HEIGHT;
-
+		rectangle rect(0, PCW16_SCREEN_WIDTH, 0, PCW16_SCREEN_HEIGHT);
 		bitmap.fill(border_colour, rect);
 	}
 	else
 	{
 		/* no blank */
 
-		rectangle rect;
 
 		/* render top border */
-		rect.min_x = 0;
-		rect.min_y = 0;
-		rect.max_x = PCW16_SCREEN_WIDTH;
-		rect.max_y = PCW16_BORDER_HEIGHT;
+		rectangle rect(0, PCW16_SCREEN_WIDTH, 0, PCW16_BORDER_HEIGHT);
 		bitmap.fill(border_colour, rect);
 
 		/* render bottom border */
-		rect.min_x = 0;
-		rect.min_y = PCW16_BORDER_HEIGHT + PCW16_DISPLAY_HEIGHT;
-		rect.max_x = PCW16_SCREEN_WIDTH;
-		rect.max_y = rect.min_y + PCW16_BORDER_HEIGHT;
+		rect.set(0, PCW16_SCREEN_WIDTH, PCW16_BORDER_HEIGHT + PCW16_DISPLAY_HEIGHT, PCW16_BORDER_HEIGHT + PCW16_DISPLAY_HEIGHT + PCW16_BORDER_HEIGHT);
 		bitmap.fill(border_colour, rect);
 
 		/* render border on either side of display */

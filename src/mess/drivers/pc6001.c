@@ -464,9 +464,9 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 					color |= ((pen[1] & 1) << 1);
 					color |= ((pen[1] & 2) << 2);
 
-					if (((x+i)*2+0) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
+					if (cliprect.contains((x+i)*2+0, y))
 						bitmap.pix16(y, (x+i)*2+0) = screen.machine().pens[color];
-					if (((x+i)*2+1) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
+					if (cliprect.contains((x+i)*2+1, y))
 						bitmap.pix16(y, (x+i)*2+1) = screen.machine().pens[color];
 				}
 
@@ -512,7 +512,7 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 						color |= ((state->m_bgcol_bank & 2) << 2);
 					}
 
-					if ((x+i) <= screen.visible_area().max_x && (y) <= screen.visible_area().max_y)
+					if (cliprect.contains(x+i, y))
 						bitmap.pix16(y, (x+i)) = screen.machine().pens[color];
 				}
 
@@ -552,7 +552,7 @@ static SCREEN_UPDATE_IND16( pc6001m2 )
 
 						color = pen ? fgcol : bgcol;
 
-						if ((x*8+xi) <= screen.visible_area().max_x && (y*12+yi) <= screen.visible_area().max_y)
+						if (cliprect.contains(x*8+xi, y*12+yi))
 							bitmap.pix16(((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
 					}
 				}
@@ -597,7 +597,7 @@ static SCREEN_UPDATE_IND16( pc6001sr )
 
 						color = pen ? fgcol : bgcol;
 
-						if ((x*8+xi) <= screen.visible_area().max_x && (y*12+yi) <= screen.visible_area().max_y)
+						if (cliprect.contains(x*8+xi, y*12+yi))
 							bitmap.pix16(((y*12+yi)), (x*8+xi)) = screen.machine().pens[color];
 					}
 				}
@@ -616,42 +616,42 @@ static SCREEN_UPDATE_IND16( pc6001sr )
 			{
 				color = state->m_video_ram[count] & 0x0f;
 
-				if ((x+0) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
+				if (cliprect.contains(x+0, y+0))
 					bitmap.pix16((y+0), (x+0)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count] & 0xf0) >> 4;
 
-				if ((x+1) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
+				if (cliprect.contains(x+1, y+0))
 					bitmap.pix16((y+0), (x+1)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+1] & 0x0f;
 
-				if ((x+2) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
+				if (cliprect.contains(x+2, y+0))
 					bitmap.pix16((y+0), (x+2)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+1] & 0xf0) >> 4;
 
-				if ((x+3) <= screen.visible_area().max_x && (y+0) <= screen.visible_area().max_y)
+				if (cliprect.contains(x+3, y+0))
 					bitmap.pix16((y+0), (x+3)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+2] & 0x0f;
 
-				if ((x+0) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
+				if (cliprect.contains(x+0, y+1))
 					bitmap.pix16((y+1), (x+0)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+2] & 0xf0) >> 4;
 
-				if ((x+1) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
+				if (cliprect.contains(x+1, y+1))
 					bitmap.pix16((y+1), (x+1)) = screen.machine().pens[color+0x10];
 
 				color = state->m_video_ram[count+3] & 0x0f;
 
-				if ((x+2) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
+				if (cliprect.contains(x+2, y+1))
 					bitmap.pix16((y+1), (x+2)) = screen.machine().pens[color+0x10];
 
 				color = (state->m_video_ram[count+3] & 0xf0) >> 4;
 
-				if ((x+3) <= screen.visible_area().max_x && (y+1) <= screen.visible_area().max_y)
+				if (cliprect.contains(x+3, y+1))
 					bitmap.pix16((y+1), (x+3)) = screen.machine().pens[color+0x10];
 
 
@@ -1214,9 +1214,7 @@ static WRITE8_HANDLER( pc6001m2_vram_bank_w )
 
 			y_height = (state->m_exgfx_bitmap_mode || state->m_exgfx_2bpp_mode) ? 200 : 240;
 
-			visarea.min_x = visarea.min_y = 0;
-			visarea.max_y = (y_height) - 1;
-			visarea.max_x = (320) - 1;
+			visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
 			space->machine().primary_screen->configure(320, 240, visarea, space->machine().primary_screen->frame_period().attoseconds);
 		}

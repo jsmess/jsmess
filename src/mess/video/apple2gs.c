@@ -116,7 +116,6 @@ SCREEN_UPDATE_IND16( apple2gs )
 		/* call legacy Apple II video rendering at scanline 0 to draw into the off-screen buffer */
 		if (beamy == 0)
 		{
-			rectangle new_cliprect;
 			apple2_state *a2state = screen.machine().driver_data<apple2_state>();
 
 			// check if DHR should be monochrome 560x192
@@ -129,10 +128,7 @@ SCREEN_UPDATE_IND16( apple2gs )
 				a2state->m_monochrome_dhr = false;
 			}
 
-			new_cliprect.min_x = 0;
-			new_cliprect.min_y = 0;
-			new_cliprect.max_x = 559;
-			new_cliprect.max_y = 191;
+			rectangle new_cliprect(0, 559, 0, 191);
 			SCREEN_UPDATE_NAME(apple2)(NULL, screen, *state->m_legacy_gfx, new_cliprect);
 		}
 

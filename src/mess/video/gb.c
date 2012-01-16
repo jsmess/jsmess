@@ -348,10 +348,7 @@ static void gb_update_scanline( running_machine &machine )
 			/* Draw empty pixels when the background is disabled */
 			if ( ! ( LCDCONT & 0x01 ) )
 			{
-				rectangle r;
-				r.min_y = r.max_y = state->m_lcd.current_line;
-				r.min_x = state->m_lcd.start_x;
-				r.max_x = state->m_lcd.end_x - 1;
+				rectangle r(state->m_lcd.start_x, state->m_lcd.end_x - 1, state->m_lcd.current_line, state->m_lcd.current_line);
 				bitmap.fill(state->m_lcd.gb_bpal[0], r );
 			}
 			while ( l < 2 )
@@ -426,11 +423,8 @@ static void gb_update_scanline( running_machine &machine )
 				if ( state->m_lcd.current_line < 144 )
 				{
 					screen_device *screen = machine.first_screen();
-					rectangle r1;
 					const rectangle &r = screen->visible_area();
-					r1.min_y = r1.max_y = state->m_lcd.current_line;
-					r1.min_x = r.min_x;
-					r1.max_x = r.max_x;
+					rectangle r1(r.min_x, r.max_x, state->m_lcd.current_line, state->m_lcd.current_line);
 					bitmap.fill(0, r1 );
 				}
 				state->m_lcd.previous_line = state->m_lcd.current_line;
@@ -679,20 +673,12 @@ static void sgb_update_scanline( running_machine &machine )
 				return;
 			case 2: /* Blank screen (black) */
 				{
-					rectangle r;
-					r.min_x = SGB_XOFFSET;
-					r.max_x = SGB_XOFFSET + 160-1;
-					r.min_y = SGB_YOFFSET;
-					r.max_y = SGB_YOFFSET + 144 - 1;
+					rectangle r(SGB_XOFFSET, SGB_XOFFSET + 160-1, SGB_YOFFSET, SGB_YOFFSET + 144 - 1);
 					bitmap.fill(0, r );
 				} return;
 			case 3: /* Blank screen (white - or should it be color 0?) */
 				{
-					rectangle r;
-					r.min_x = SGB_XOFFSET;
-					r.max_x = SGB_XOFFSET + 160 - 1;
-					r.min_y = SGB_YOFFSET;
-					r.max_y = SGB_YOFFSET + 144 - 1;
+					rectangle r(SGB_XOFFSET, SGB_XOFFSET + 160 - 1, SGB_YOFFSET, SGB_YOFFSET + 144 - 1);
 					bitmap.fill(32767, r );
 				} return;
 			}
@@ -710,10 +696,7 @@ static void sgb_update_scanline( running_machine &machine )
 			/* if background or screen disabled clear line */
 			if ( ! ( LCDCONT & 0x01 ) )
 			{
-				rectangle r;
-				r.min_x = SGB_XOFFSET;
-				r.max_x = SGB_XOFFSET + 160 - 1;
-				r.min_y = r.max_y = state->m_lcd.current_line + SGB_YOFFSET;
+				rectangle r(SGB_XOFFSET, SGB_XOFFSET + 160 - 1, state->m_lcd.current_line + SGB_YOFFSET, state->m_lcd.current_line + SGB_YOFFSET);
 				bitmap.fill(0, r );
 			}
 			while( l < 2 )
@@ -792,10 +775,7 @@ static void sgb_update_scanline( running_machine &machine )
 				/* Also refresh border here??? */
 				if ( state->m_lcd.current_line < 144 )
 				{
-					rectangle r;
-					r.min_x = SGB_XOFFSET;
-					r.max_x = SGB_XOFFSET + 160 - 1;
-					r.min_y = r.max_y = state->m_lcd.current_line + SGB_YOFFSET;
+					rectangle r(SGB_XOFFSET, SGB_XOFFSET + 160 - 1, state->m_lcd.current_line + SGB_YOFFSET, state->m_lcd.current_line + SGB_YOFFSET);
 					bitmap.fill(0, r);
 				}
 				state->m_lcd.previous_line = state->m_lcd.current_line;
@@ -982,10 +962,7 @@ static void cgb_update_scanline ( running_machine &machine )
 			/* Draw empty line when the background is disabled */
 			if ( ! ( LCDCONT & 0x01 ) )
 			{
-				rectangle r;
-				r.min_y = r.max_y = state->m_lcd.current_line;
-				r.min_x = state->m_lcd.start_x;
-				r.max_x = state->m_lcd.end_x - 1;
+				rectangle r(state->m_lcd.start_x, state->m_lcd.end_x - 1, state->m_lcd.current_line, state->m_lcd.current_line);
 				bitmap.fill(( ! state->m_lcd.gbc_mode ) ? 0 : 32767 , r);
 			}
 			while ( l < 2 )
@@ -1100,11 +1077,8 @@ static void cgb_update_scanline ( running_machine &machine )
 				if ( state->m_lcd.current_line < 144 )
 				{
 					screen_device *screen = machine.first_screen();
-					rectangle r;
 					const rectangle &r1 = screen->visible_area();
-					r.min_x = r1.min_x;
-					r.max_x = r1.max_x;
-					r.min_y = r.max_y = state->m_lcd.current_line;
+					rectangle r(r1.min_x, r1.max_x, state->m_lcd.current_line, state->m_lcd.current_line);
 					bitmap.fill(( ! state->m_lcd.gbc_mode ) ? 0 : 32767 , r);
 				}
 				state->m_lcd.previous_line = state->m_lcd.current_line;

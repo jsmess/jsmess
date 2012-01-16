@@ -254,7 +254,7 @@ VIDEO_START( x1 )
 
 static void x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
 {
-	if((x)>machine.primary_screen->visible_area().max_x || (y)>machine.primary_screen->visible_area().max_y)
+	if(!machine.primary_screen->visible_area().contains(x, y))
 		return;
 
 	if(width && height)

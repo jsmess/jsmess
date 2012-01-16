@@ -85,12 +85,7 @@ WRITE8_HANDLER ( orion128_romdisk_w )
 
 static void orion_set_video_mode(running_machine &machine, int width)
 {
-		rectangle visarea;
-
-		visarea.min_x = 0;
-		visarea.min_y = 0;
-		visarea.max_x = width-1;
-		visarea.max_y = 255;
+		rectangle visarea(0, width-1, 0, 255);
 		machine.primary_screen->configure(width, 256, visarea, machine.primary_screen->frame_period().attoseconds);
 }
 
