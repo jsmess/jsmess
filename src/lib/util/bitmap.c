@@ -59,7 +59,7 @@ const UINT32 BITMAP_ROWBYTES_ALIGN = 128;
 //**************************************************************************
 
 //-------------------------------------------------
-//  compute_rowpixels - compute an aligned 
+//  compute_rowpixels - compute an aligned
 //  rowpixels value
 //-------------------------------------------------
 
@@ -161,7 +161,7 @@ void bitmap_t::allocate(int width, int height, int xslop, int yslop)
 
 	// delete any existing stuff
 	reset();
-	
+
 	// handle empty requests cleanly
 	if (width <= 0 || height <= 0)
 		return;
@@ -204,7 +204,7 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 	int new_rowpixels = compute_rowpixels(width, xslop);
 	UINT32 new_allocbytes = new_rowpixels * (height + 2 * yslop) * m_bpp / 8;
 	new_allocbytes += BITMAP_OVERALL_ALIGN - 1;
-	
+
 	// if we need more memory, just realloc
 	if (new_allocbytes > m_allocbytes)
 	{
@@ -213,7 +213,7 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 		set_palette(palette);
 		return;
 	}
-	
+
 	// otherwise, reconfigure
 	m_rowpixels = new_rowpixels;
 	m_width = width;
@@ -247,7 +247,7 @@ void bitmap_t::reset()
 
 
 //-------------------------------------------------
-//  wrap -- wrap an array of memory; the target 
+//  wrap -- wrap an array of memory; the target
 //  bitmap does not own the memory
 //-------------------------------------------------
 
@@ -255,7 +255,7 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
 {
 	// delete any existing stuff
 	reset();
-	
+
 	// initialize relevant fields
 	m_base = base;
 	m_rowpixels = rowpixels;
@@ -266,8 +266,8 @@ void bitmap_t::wrap(void *base, int width, int height, int rowpixels)
 
 
 //-------------------------------------------------
-//  wrap -- wrap a subrectangle of an existing 
-//  bitmap by copying its fields; the target 
+//  wrap -- wrap a subrectangle of an existing
+//  bitmap by copying its fields; the target
 //  bitmap does not own the memory
 //-------------------------------------------------
 
@@ -279,7 +279,7 @@ void bitmap_t::wrap(bitmap_t &source, const rectangle &subrect)
 
 	// delete any existing stuff
 	reset();
-	
+
 	// copy relevant fields
 	m_base = source.raw_pixptr(subrect.min_y, subrect.min_x);
 	m_rowpixels = source.m_rowpixels;
@@ -331,7 +331,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 		case 8:
 			// 8bpp always uses memset
 			for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-				memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.max_x + 1 - fill.min_x);
+				memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.width());
 			break;
 
 		case 16:
@@ -339,7 +339,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(raw_pixptr(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 2);
+					memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.width() * 2);
 			}
 			else
 			{
@@ -353,7 +353,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
 					destrow = &pixt<UINT16>(y, fill.min_x);
-					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 2);
+					memcpy(destrow, destrow0, fill.width() * 2);
 				}
 			}
 			break;
@@ -363,7 +363,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pixt<UINT32>(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 4);
+					memset(&pixt<UINT32>(y, fill.min_x), (UINT8)color, fill.width() * 4);
 			}
 			else
 			{
@@ -377,7 +377,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
 					destrow = &pixt<UINT32>(y, fill.min_x);
-					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 4);
+					memcpy(destrow, destrow0, fill.width() * 4);
 				}
 			}
 			break;
@@ -387,7 +387,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
 			{
 				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pixt<UINT64>(y, fill.min_x), (UINT8)color, (fill.max_x + 1 - fill.min_x) * 8);
+					memset(&pixt<UINT64>(y, fill.min_x), (UINT8)color, fill.width() * 8);
 			}
 			else
 			{
@@ -401,7 +401,7 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
 					destrow = &pixt<UINT64>(y, fill.min_x);
-					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 4);
+					memcpy(destrow, destrow0, fill.width() * 8);
 				}
 			}
 			break;

@@ -154,15 +154,9 @@ SCREEN_VBLANK( xmen6p )
 		int offset;
 
 	//  const rectangle *visarea = screen.machine().primary_screen->visible_area();
-	//  cliprect.min_x = visarea->min_x;
-	//  cliprect.max_x = visarea->max_x;
-	//  cliprect.min_y = visarea->min_y;
-	//  cliprect.max_y = visarea->max_y;
+	//  cliprect = *visarea;
 
-		cliprect.min_x = 0;
-		cliprect.max_x = 64 * 8 - 1;
-		cliprect.min_y = 2 * 8;
-		cliprect.max_y = 30 * 8 - 1;
+		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
 
 		if (screen.machine().primary_screen->frame_number() & 0x01)
@@ -172,9 +166,9 @@ SCREEN_VBLANK( xmen6p )
 			memcpy(state->m_k053247_ram, state->m_xmen6p_spriteramright, 0x1000);
 
 			/* we write the entire content of the tileram to the chip to ensure
-	           everything gets marked as dirty and the desired tilemap is rendered
-	           this is not very efficient!
-	           */
+               everything gets marked as dirty and the desired tilemap is rendered
+               this is not very efficient!
+               */
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
 	//          K052109_lsb_w
@@ -190,10 +184,10 @@ SCREEN_VBLANK( xmen6p )
 			memcpy(state->m_k053247_ram, state->m_xmen6p_spriteramleft, 0x1000);
 
 			/* we write the entire content of the tileram to the chip to ensure
-	           everything gets marked as dirty and the desired tilemap is rendered
+               everything gets marked as dirty and the desired tilemap is rendered
 
-	           this is not very efficient!
-	           */
+               this is not very efficient!
+               */
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
 	//          K052109_lsb_w
@@ -230,7 +224,7 @@ SCREEN_VBLANK( xmen6p )
 		k052109_tilemap_draw(state->m_k052109, *renderbitmap, cliprect, layer[2], 0, 4);
 
 	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-	    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
+        pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 		k053247_sprites_draw(state->m_k053246, *renderbitmap, cliprect);
 	}
 }
