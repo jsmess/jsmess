@@ -118,7 +118,7 @@ void t6a04_device::device_reset()
 //  device interface
 //**************************************************************************
 
-int t6a04_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 t6a04_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 ypages = width>>3;
 	UINT8 last_line = m_zpos + height;
