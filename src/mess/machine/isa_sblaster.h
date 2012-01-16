@@ -55,13 +55,16 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-		virtual bool have_dack(int line);
+        virtual bool have_dack(int line);
         virtual UINT8 dack_r(int line);
         virtual void dack_w(int line, UINT8 data);
+        virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
         struct sb8_dsp_state m_dsp;
         UINT8 m_dack_out;
+
 private:
+        emu_timer *m_timer;
 };
 
 class isa8_sblaster1_0_device : public sb8_device
