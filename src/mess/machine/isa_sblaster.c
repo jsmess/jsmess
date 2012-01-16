@@ -51,7 +51,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Ax */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Bx */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,	-1, -1, -1, -1, -1, /* Cx */
-	-1,  1, -1,  1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Dx */
+	 1,  1, -1,  1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Dx */
 	 2,  1,  2, -1,  2, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1, /* Ex */
 	-1, -1,  1, -1, -1, -1, -1, -1,  1, -1, -1,	-1, -1, -1, -1, -1  /* Fx */
 };
@@ -270,21 +270,20 @@ void sb8_device::process_fifo(UINT8 cmd)
             case 0x10:  // Direct DAC
                 break;
 
-            case 0x14:  // 8-bit DMA
+            case 0x14:  // 8-bit DMA, no autoinit
                 m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
-//                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
+                printf("Start DMA (not autoinit, size = %x)\n", m_dsp.dma_length);
                 m_dsp.dma_transferred = 0;
                 m_dsp.dma_autoinit = 0;
                 m_isa->drq1_w(1);
                 break;
 
-            case 0x1c:
+            case 0x1c:  // 8-bit DMA with autoinit
             	printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
                 m_dsp.dma_transferred = 0;
                 m_dsp.dma_autoinit = 1;
                 m_isa->drq1_w(1);
             	break;
-
 
             case 0x40:  // set time constant
                 m_dsp.frequency = (1000000 / (256 - m_dsp.fifo[1]));
@@ -294,6 +293,11 @@ void sb8_device::process_fifo(UINT8 cmd)
 			case 0x48:	// set DMA block size (for auto-init)
                 m_dsp.dma_length = (m_dsp.fifo[1] + (m_dsp.fifo[2]<<8)) + 1;
 				break;
+
+            case 0xd0:  // halt 8-bit DMA
+                m_timer->adjust(attotime::never, 0);
+                m_isa->drq1_w(0);   // drop DRQ
+                break;
 
             case 0xd1: // speaker on
 				// ...
@@ -421,33 +425,32 @@ isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, 
 
 void sb8_device::device_start()
 {
-}
-
-void isa8_sblaster1_0_device::device_start()
-{
-    set_isa_device();
-	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
-	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb8_device::dsp_reset_r), this), write8_delegate(FUNC(sb8_device::dsp_reset_w), this));
 	m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb8_device::dsp_data_r), this), write8_delegate(FUNC(sb8_device::dsp_data_w), this) );
 	m_isa->install_device(                   0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb8_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb8_device::dsp_cmd_w), this) );
 	m_isa->install_device(                   0x022e, 0x022f, 0, 0, read8_delegate(FUNC(sb8_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb8_device::dsp_rbuf_status_w), this) );
 	m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
+
+    m_timer = timer_alloc(0, NULL);
+}
+
+void isa8_sblaster1_0_device::device_start()
+{
+    set_isa_device();
+    // 1.0 always has the SAA1099s for CMS back-compatibility
+	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
+	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
 	m_dsp.version = 0x0105;
+    sb8_device::device_start();
 }
 
 void isa8_sblaster1_5_device::device_start()
 {
     set_isa_device();
 	/* 1.5 makes CM/S support optional (empty sockets, but they work if the user populates them!) */
-	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb8_device::dsp_reset_r), this), write8_delegate(FUNC(sb8_device::dsp_reset_w), this));
-	m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
-	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb8_device::dsp_data_r), this), write8_delegate(FUNC(sb8_device::dsp_data_w), this) );
-	m_isa->install_device(                   0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb8_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb8_device::dsp_cmd_w), this) );
-	m_isa->install_device(                   0x022e, 0x022f, 0, 0, read8_delegate(FUNC(sb8_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb8_device::dsp_rbuf_status_w), this) );
-	m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
 	m_dsp.version = 0x0200;
+    sb8_device::device_start();
 }
 
 //-------------------------------------------------
@@ -482,15 +485,36 @@ void sb8_device::dack_w(int line, UINT8 data)
 //    printf("dack_w: line %x data %02x\n", line, data);
 //	if(data != 0x80)
 //		printf("%02x\n",data);
+
+    // set the transfer over timer on the 1st byte
+    if (m_dsp.dma_transferred == 0)
+    {
+        double time_constant = (double)m_dsp.frequency;
+
+        time_constant /= (double)m_dsp.dma_length;
+//        printf("DMA timer set for %f Hz\n", time_constant);
+
+        m_timer->adjust(attotime::from_hz(time_constant), 0);
+    }
+
     m_dsp.dma_transferred++;
     if (m_dsp.dma_transferred >= m_dsp.dma_length)
     {
-        //printf("DMA completed\n");
-        if(m_dsp.dma_autoinit)
-			m_dsp.dma_transferred = 0;
-
-   		m_isa->drq1_w(0);	// drop DRQ?
-      	m_isa->irq5_w(1);	// definitely raise IRQ as per the Creative manual
+//        printf("DMA fill completed (%d out of %d)\n", m_dsp.dma_transferred, m_dsp.dma_length);
+        m_isa->drq1_w(0);	// drop DRQ here
     }
 }
 
+void sb8_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+{
+    printf("DMA timer expire\n");
+    if(m_dsp.dma_autoinit)
+    {
+        m_dsp.dma_transferred = 0;
+        m_isa->drq1_w(1);   // raise DRQ again (page 3-15 of the Creative manual indicates auto-init will keep going until you stop it)
+    }
+
+    m_isa->irq5_w(1);	// raise IRQ as per the Creative manual
+
+    m_timer->adjust(attotime::never, 0);
+}
