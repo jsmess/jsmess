@@ -830,6 +830,7 @@ MACHINE_CONFIG_END
     Telcom 1.1 for the mbeeic (It could have 1.0, 1.1 or 1.2)
 
     ROM_LOAD("bn54.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
+    ROM_LOAD("bn55.bin",              0x0000,  0x2000, CRC(ca2c1073) SHA1(355d90d181de899cc7af892df96305fead9c81b4) )
     ROM_LOAD("bn56.bin",              0x0000,  0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f) )
     These are alternate boot roms for the 128k. They have no menu, and look just like the 64k/56k bootup.
 
@@ -1076,7 +1077,7 @@ ROM_START( mbee56 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( mbee64 )
+ROM_START( mbee64 ) // CIAB (Computer-In-A-Book)
 	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
@@ -1094,7 +1095,7 @@ ROM_START( mbee64 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( mbee128 )
+ROM_START( mbee128 ) // 128K
 	ROM_REGION(0x20000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
@@ -1109,11 +1110,12 @@ ROM_START( mbee128 )
 	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( mbee256 )
+ROM_START( mbee256 ) // 256tc
 	ROM_REGION(0x40000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
-	ROM_LOAD("mbee256.bin",           0x0000,  0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4) )
+	ROM_LOAD("256tc_boot_1.20.rom", 0x0000,  0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4) )
+	//ROM_LOAD("256tc_boot_1.15.rom", 0x0000,  0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e) )
 
 	ROM_REGION(0x9800, "gfx", 0)
 	ROM_LOAD("char256.bin",           0x1000,  0x1000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
