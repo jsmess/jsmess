@@ -1,8 +1,20 @@
-/*
+/**************************************************************************
 
 Wave Mate Jupiter
 
-*/
+
+
+Jupiter 3
+*********
+
+Status: Preliminary
+Hangs if your input line starts with 'k'.
+
+ToDo:
+- Connect all devices
+- Everything!
+
+***************************************************************************/
 
 #define ADDRESS_MAP_MODERN
 #define VIDEO_START_MEMBER(name) void name::video_start()
@@ -75,11 +87,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jupiter3_io, AS_IO, 8, jupiter3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xa1, 0xa4) AM_READ(ff_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(status_r)
 	AM_RANGE(0xb2, 0xb2) AM_READ(key_r)
 ADDRESS_MAP_END
 
-
+READ8_MEMBER( jupiter3_state::ff_r )
+{
+	return 0xfd;
+}
 
 //**************************************************************************
 //  INPUT PORTS

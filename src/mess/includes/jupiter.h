@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_READ8_MEMBER(ff_r);
 	UINT8 m_term_data;
 
 	UINT8 *m_p_ram;
