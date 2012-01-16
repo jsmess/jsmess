@@ -28,8 +28,6 @@ VIDEO_START(vc4000)
 {
 	vc4000_state *state = machine.driver_data<vc4000_state>();
 	screen_device *screen = machine.first_screen();
-	int width = screen->width();
-	int height = screen->height();
 	int i;
 
 	for (i=0;i<0x20; i++)
@@ -62,7 +60,7 @@ VIDEO_START(vc4000)
 	state->m_video.sprites[3].data = &state->m_video.reg.d.sprite4;
 	state->m_video.sprites[3].mask = 1 << 3;
 
-	state->m_video.bitmap.allocate(width, height, BITMAP_FORMAT_IND16);
+	screen->register_screen_bitmap(state->m_video.bitmap);
 }
 
 INLINE UINT8 vc4000_joystick_return_to_centre(UINT8 joy)

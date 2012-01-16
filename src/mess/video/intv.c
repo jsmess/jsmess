@@ -41,7 +41,7 @@ VIDEO_START( intv )
 
 	state->m_tms9927_num_rows = 25;
 	
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 
 #if 0
 	for (i = 0; i < STIC_MOBS; i++)

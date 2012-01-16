@@ -80,7 +80,7 @@ MACHINE_RESET_MEMBER(sm1800_state)
 
 void sm1800_state::video_start()
 {
-	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 	
 }
 

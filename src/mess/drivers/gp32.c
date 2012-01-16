@@ -289,7 +289,7 @@ static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 
 void gp32_state::video_start()
 {
-	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 static SCREEN_UPDATE_RGB32( gp32 )

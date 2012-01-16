@@ -22,11 +22,9 @@ VIDEO_START( cgenie )
 {
 	cgenie_state *state = machine.driver_data<cgenie_state>();
 	screen_device *screen = machine.first_screen();
-	int width = screen->width();
-	int height = screen->height();
 
-	state->m_dlybitmap.allocate(width, height, BITMAP_FORMAT_IND16);
-	state->m_bitmap.allocate(width, height, BITMAP_FORMAT_IND16);
+	screen->register_screen_bitmap(state->m_dlybitmap);
+	screen->register_screen_bitmap(state->m_bitmap);
 }
 
 /***************************************************************************
