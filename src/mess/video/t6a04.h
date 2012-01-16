@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(data_write);
 	DECLARE_READ8_MEMBER(data_read);
 
-	int video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
