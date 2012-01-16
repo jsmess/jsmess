@@ -84,7 +84,7 @@ MACHINE_RESET_MEMBER(ipds_state)
 
 void ipds_state::video_start()
 {
-	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 static I8275_DISPLAY_PIXELS(ipds_display_pixels)

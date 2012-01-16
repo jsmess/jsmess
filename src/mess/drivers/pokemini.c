@@ -55,7 +55,7 @@ static const i2cmem_interface i2cmem_interface =
 
 void pokemini_state::video_start()
 {
-	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

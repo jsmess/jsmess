@@ -2229,11 +2229,9 @@ VIDEO_START( sms1 )
 {
 	sms_state *state = machine.driver_data<sms_state>();
 	screen_device *screen = machine.first_screen();
-	int width = screen->width();
-	int height = screen->height();
 
-	state->m_prevleft_bitmap.allocate(width, height, BITMAP_FORMAT_IND32);
-	state->m_prevright_bitmap.allocate(width, height, BITMAP_FORMAT_IND32);
+	screen->register_screen_bitmap(state->m_prevleft_bitmap);
+	screen->register_screen_bitmap(state->m_prevright_bitmap);
 	state->save_item(NAME(state->m_prevleft_bitmap));
 	state->save_item(NAME(state->m_prevright_bitmap));
 }
@@ -2294,11 +2292,9 @@ VIDEO_START( gamegear )
 {
 	sms_state *state = machine.driver_data<sms_state>();
 	screen_device *screen = machine.first_screen();
-	int width = screen->width();
-	int height = screen->height();
 
-	state->m_prev_bitmap.allocate(width, height, BITMAP_FORMAT_IND32);
-	state->m_tmp_bitmap.allocate(width, height, BITMAP_FORMAT_IND32);
+	screen->register_screen_bitmap(state->m_prev_bitmap);
+	screen->register_screen_bitmap(state->m_tmp_bitmap);
 	state->save_item(NAME(state->m_prev_bitmap));
 }
 

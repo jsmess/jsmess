@@ -566,8 +566,6 @@ VIDEO_START( odyssey2 )
 {
 	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	screen_device *screen = machine.first_screen();
-	int width = screen->width();
-	int height = screen->height();
 
 	memset(state->m_o2_vdc.reg, 0, 0x100);
 
@@ -589,7 +587,7 @@ VIDEO_START( odyssey2 )
 	state->m_control_status = 0;
 	state->m_iff = 0;
 
-	state->m_tmp_bitmap.allocate( width, height, screen->format() );
+	screen->register_screen_bitmap(state->m_tmp_bitmap);
 
 	state->m_i824x_line_timer = machine.scheduler().timer_alloc(FUNC(i824x_scanline_callback));
 	state->m_i824x_line_timer->adjust( machine.primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine.primary_screen->scan_period() );

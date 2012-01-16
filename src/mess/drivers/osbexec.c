@@ -306,7 +306,7 @@ static PALETTE_INIT( osbexec )
 
 void osbexec_state::video_start()
 {
-	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -201,7 +201,7 @@ VIDEO_START( zx )
 	zx_state *state = machine.driver_data<zx_state>();
 	state->m_ula_nmi = machine.scheduler().timer_alloc(FUNC(zx_ula_nmi));
 	state->m_ula_irq_active = 0;
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 }
 
 SCREEN_VBLANK( zx )

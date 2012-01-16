@@ -75,7 +75,7 @@ VIDEO_START( a7800 )
 	state->m_maria_kangaroo = 0;
 	state->m_maria_rm = 0;
 	
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 }
 
 /***************************************************************************

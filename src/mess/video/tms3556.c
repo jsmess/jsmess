@@ -116,7 +116,7 @@ void tms3556_device::device_start()
 	save_item(NAME(m_char_line_counter));
 	save_item(NAME(m_dbl_h_phase));
 	
-	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 

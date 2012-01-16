@@ -1232,14 +1232,14 @@ MACHINE_START( gb_video )
 {
 	gb_state *state = machine.driver_data<gb_state>();
 	state->m_lcd.lcd_timer = machine.scheduler().timer_alloc(FUNC(gb_lcd_timer_proc));
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 }
 
 MACHINE_START( gbc_video )
 {
 	gb_state *state = machine.driver_data<gb_state>();
 	state->m_lcd.lcd_timer = machine.scheduler().timer_alloc(FUNC(gbc_lcd_timer_proc));
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 }
 
 UINT32 gb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

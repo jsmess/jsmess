@@ -1114,7 +1114,7 @@ void st_state::video_start()
 //  m_shifter_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
 	m_glue_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
 
-	m_bitmap.allocate(machine().primary_screen->width(), machine().primary_screen->height());
+	machine().primary_screen->register_screen_bitmap(m_bitmap);
 
 	/* register for state saving */
 	save_item(NAME(m_shifter_base));

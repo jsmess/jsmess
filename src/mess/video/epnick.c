@@ -1031,7 +1031,7 @@ VIDEO_START( epnick )
 
 	state->nick->videoram = machine.device<ram_device>(RAM_TAG)->pointer();
 	Nick_Init(state->nick);
-	state->m_bitmap.allocate(machine.primary_screen->width(), machine.primary_screen->height());
+	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 }
 
 
