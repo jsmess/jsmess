@@ -24,6 +24,7 @@ struct sb8_dsp_state
     INT32 prot_value;
     UINT32 frequency;
     UINT32 dma_length, dma_transferred;
+    UINT8 dma_autoinit;
 };
 
 // ======================> sb8_device (parent)
@@ -54,7 +55,7 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-	virtual bool have_dack(int line);
+		virtual bool have_dack(int line);
         virtual UINT8 dack_r(int line);
         virtual void dack_w(int line, UINT8 data);
 
