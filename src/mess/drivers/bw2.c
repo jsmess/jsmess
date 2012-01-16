@@ -23,7 +23,6 @@
 
     TODO:
 
-    - floppy broken once again
     - modem card
 
 ***************************************************************************/
@@ -538,7 +537,7 @@ static const struct pit8253_config pit_intf =
 {
 	{
 		{
-			XTAL_4MHz,	/* 8251 USART TXC, RXC */
+			XTAL_16MHz/4,	/* 8251 USART TXC, RXC */
 			DEVCB_LINE_VCC,
 			DEVCB_DRIVER_LINE_MEMBER(bw2_state, pit_out0_w)
 		},
@@ -600,9 +599,9 @@ static const floppy_interface bw2_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_3_5_SSDD, // Teac FD-35
 	LEGACY_FLOPPY_OPTIONS_NAME(bw2),
-	"floppy_5_25",
+	"floppy_3_5",
 	NULL
 };
 
