@@ -1095,7 +1095,7 @@ void abc1600_state::video_start()
 UINT32 abc1600_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// HACK expand visible area to workaround MC6845
-	screen.set_visible_area(0, 958, 0, 1067);
+	screen.set_visible_area(0, 958-1, 0, 1067-1);
 
 	if (m_endisp)
 	{
