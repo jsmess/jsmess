@@ -452,7 +452,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 						color = char_data ? pal : -1;
 				}
 
-				if((res_x)>machine.primary_screen->visible_area().max_x && (res_y)>machine.primary_screen->visible_area().max_y)
+				if(!machine.primary_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(color != -1)
@@ -460,7 +460,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 
 				if(width)
 				{
-					if((res_x+1)>machine.primary_screen->visible_area().max_x && (res_y)>machine.primary_screen->visible_area().max_y)
+					if(!machine.primary_screen->visible_area().contains(res_x+1, res_y))
 						continue;
 
 					if(color != -1)
@@ -468,13 +468,13 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				}
 				if(height)
 				{
-					if((res_x)>machine.primary_screen->visible_area().max_x && (res_y+1)>machine.primary_screen->visible_area().max_y)
+					if(!machine.primary_screen->visible_area().contains(res_x, res_y+1))
 						continue;
 
 					if(color != -1)
 						bitmap.pix16(res_y+1, res_x) = machine.pens[color];
 
-					if((res_x+1)>machine.primary_screen->visible_area().max_x && (res_y+1)>machine.primary_screen->visible_area().max_y)
+					if(!machine.primary_screen->visible_area().contains(res_x+1, res_y+1))
 						continue;
 
 					if(color != -1)
@@ -976,10 +976,7 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	rectangle visarea;
 
-	visarea.min_x = 0;
-	visarea.min_y = 0;
-	visarea.max_x = 640 - 1;
-	visarea.max_y = ((monitor_24KHz) ? 400 : 200) - 1;
+	visarea.set(0, 640 - 1, 0, ((monitor_24KHz) ? 400 : 200) - 1);
 
 	machine.primary_screen->configure(640, 480, visarea, machine.primary_screen->frame_period().attoseconds);
 }

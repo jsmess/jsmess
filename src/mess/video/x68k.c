@@ -132,17 +132,12 @@ static void x68k_crtc_refresh_mode(running_machine &machine)
 	state->m_crtc.hsync_end = (state->m_crtc.reg[1]) * 8;
 	state->m_crtc.vsync_end = (state->m_crtc.reg[5]) / state->m_crtc.vmultiple;
 	state->m_crtc.hsyncadjust = state->m_crtc.reg[8];
-	scr.min_x = scr.min_y = 0;
-	scr.max_x = state->m_crtc.htotal - 8;
-	scr.max_y = state->m_crtc.vtotal;
+	scr.set(0, state->m_crtc.htotal - 8, 0, state->m_crtc.vtotal);
 	if(scr.max_y <= state->m_crtc.vend)
 		scr.max_y = state->m_crtc.vend + 2;
 	if(scr.max_x <= state->m_crtc.hend)
 		scr.max_x = state->m_crtc.hend + 2;
-	visiblescr.min_x = state->m_crtc.hbegin;
-	visiblescr.max_x = state->m_crtc.hend;
-	visiblescr.min_y = state->m_crtc.vbegin;
-	visiblescr.max_y = state->m_crtc.vend;
+	visiblescr.set(state->m_crtc.hbegin, state->m_crtc.hend, state->m_crtc.vbegin, state->m_crtc.vend);
 
 	// expand visible area to the size indicated by CRTC reg 20
 	length = state->m_crtc.hend - state->m_crtc.hbegin;

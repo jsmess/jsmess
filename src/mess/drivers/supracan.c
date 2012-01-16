@@ -930,11 +930,7 @@ static SCREEN_UPDATE_IND16( supracan )
 							// NOT accurate, causes issues when the attract mode loops and the logo is shown the 2nd time in some games - investigate
 							for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
 							{
-								rectangle clip;
-								clip.min_x = cliprect.min_x;
-								clip.max_x = cliprect.max_x;
-
-								clip.min_y = clip.max_y = y;
+								rectangle clip(cliprect.min_x, cliprect.max_x, y, y);
 
 								scrollx = (state->m_roz_scrollx);
 								scrolly = (state->m_roz_scrolly);
@@ -1639,10 +1635,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 
 				rectangle visarea = machine().primary_screen->visible_area();
 
-				visarea.min_x = 0;
-				visarea.min_y = 8;
-				visarea.max_y = 232 - 1;
-				visarea.max_x = ((m_video_flags & 0x100) ? 320 : 256) - 1;
+				visarea.set(0, ((m_video_flags & 0x100) ? 320 : 256) - 1, 8, 232 - 1);
 				machine().primary_screen->configure(348, 256, visarea, machine().primary_screen->frame_period().attoseconds);
 			}
 			break;

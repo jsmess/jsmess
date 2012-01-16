@@ -510,13 +510,7 @@ void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cli
 
 	if (! vdt->display_enable)
 	{
-		rectangle my_rect;
-
-		my_rect.min_x = x;
-		my_rect.max_x = x + 80*7 - 1;
-
-		my_rect.min_y = y;
-		my_rect.max_y = y + height*10 - 1;
+		rectangle my_rect(x, x + 80*7 - 1, y, y + height*10 - 1);
 
 		bitmap.fill(0, my_rect);
 	}

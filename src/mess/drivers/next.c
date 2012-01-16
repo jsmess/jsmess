@@ -38,10 +38,8 @@ UINT32 next_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 				pen ^= 3;
 
-				if((x+xi)>screen.machine().primary_screen->visible_area().max_x || (y)>screen.machine().primary_screen->visible_area().max_y)
-					continue;
-
-				bitmap.pix16(y, x+xi) = screen.machine().pens[pen];
+				if(cliprect.contains(x+xi, y))
+					bitmap.pix16(y, x+xi) = screen.machine().pens[pen];
 			}
 
 			count++;

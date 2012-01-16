@@ -13,10 +13,7 @@ static TIMER_CALLBACK( gamecom_scanline )
 
 	if ( ~state->m_p_ram[SM8521_LCDC] & 0x80 )
 	{
-		rectangle rec;
-		rec.min_x = 0;
-		rec.max_x = Y_PIXELS - 1;
-		rec.min_y = rec.max_y = state->m_scanline;
+		rectangle rec(0, Y_PIXELS - 1, state->m_scanline, state->m_scanline);
 		state->m_bitmap.fill(0, rec );
 		return;
 	}

@@ -281,26 +281,16 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
                 or after the last visible border line however the whole
                 border would be redrawn in the correct colour during the
                 next frame anyway! */
-		r.min_x = 0;
-		r.max_x = TotalScreenWidth-1;
-		r.min_y = 0;
-		r.max_y = TopBorderLines-1;
+		r.set(0, TotalScreenWidth-1, 0, TopBorderLines-1);
 		bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 
-		r.min_x = 0;
-		r.max_x = LeftBorderPixels-1;
-		r.min_y = TopBorderLines;
-		r.max_y = TopBorderLines+ScreenLines-1;
+		r.set(0, LeftBorderPixels-1, TopBorderLines, TopBorderLines+ScreenLines-1);
 		bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 
-		r.min_x = LeftBorderPixels+ScreenPixels;
-		r.max_x = TotalScreenWidth-1;
+		r.setx(LeftBorderPixels+ScreenPixels, TotalScreenWidth-1);
 		bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 
-		r.min_x = 0;
-		r.max_x = TotalScreenWidth-1;
-		r.min_y = TopBorderLines+ScreenLines;
-		r.max_y = TotalScreenHeight-1;
+		r.set(0, TotalScreenWidth-1, TopBorderLines+ScreenLines, TotalScreenHeight-1);
 		bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 
 //          logerror ("Setting border colour to %d (Last = %d, Full Refresh = %d)\n", state->m_CurrBorderColor, state->m_LastDisplayedBorderColor, full_refresh);
@@ -345,8 +335,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 				while ((CurrItem < NumItems) && (pItem[CurrItem].Event_Time < (CyclesSoFar+DisplayCyclesPerLine)))
 				{
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
-					r.min_x = ScrX;
-					r.max_x = NextScrX-1;
+					r.setx(ScrX, NextScrX-1);
 					bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 					ScrX = NextScrX;
 					state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
@@ -354,8 +343,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 						CurrItem++;
 					} while ((CurrItem < NumItems) && (pItem[CurrItem].Event_ID != EventID));
 				}
-				r.min_x = ScrX;
-				r.max_x = TotalScreenWidth-1;
+				r.setx(ScrX, TotalScreenWidth-1);
 				bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 
@@ -397,8 +385,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 				while ((CurrItem < NumItems) && (pItem[CurrItem].Event_Time < (CyclesSoFar+LeftBorderCycles)))
 				{
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)LeftBorderPixels / (float)LeftBorderCycles;
-					r.min_x = ScrX;
-					r.max_x = NextScrX-1;
+					r.setx(ScrX, NextScrX-1);
 					bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 					ScrX = NextScrX;
 					state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
@@ -406,8 +393,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 						CurrItem++;
 					} while ((CurrItem < NumItems) && (pItem[CurrItem].Event_ID != EventID));
 				}
-				r.min_x = ScrX;
-				r.max_x = LeftBorderPixels-1;
+				r.setx(ScrX, LeftBorderPixels-1);
 				bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 
@@ -442,8 +428,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 				while ((CurrItem < NumItems) && (pItem[CurrItem].Event_Time < (CyclesSoFar+DisplayCyclesPerLine)))
 				{
 					NextScrX = LeftBorderPixels + ScreenPixels + (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)RightBorderPixels / (float)RightBorderCycles;
-					r.min_x = ScrX;
-					r.max_x = NextScrX-1;
+					r.setx(ScrX, NextScrX-1);
 					bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 					ScrX = NextScrX;
 					state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
@@ -451,8 +436,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 						CurrItem++;
 					} while ((CurrItem < NumItems) && (pItem[CurrItem].Event_ID != EventID));
 				}
-				r.min_x = ScrX;
-				r.max_x = TotalScreenWidth-1;
+				r.setx(ScrX, TotalScreenWidth-1);
 				bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 
@@ -492,8 +476,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 				while ((CurrItem < NumItems) && (pItem[CurrItem].Event_Time < (CyclesSoFar+DisplayCyclesPerLine)))
 				{
 					NextScrX = (int)(pItem[CurrItem].Event_Time - CyclesSoFar) * (float)TotalScreenWidth / (float)DisplayCyclesPerLine;
-					r.min_x = ScrX;
-					r.max_x = NextScrX-1;
+					r.setx(ScrX, NextScrX-1);
 					bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 					ScrX = NextScrX;
 					state->m_CurrBorderColor = pItem[CurrItem].Event_Data;
@@ -501,8 +484,7 @@ void spectrum_border_draw(running_machine &machine, bitmap_ind16 &bitmap,
 						CurrItem++;
 					} while ((CurrItem < NumItems) && (pItem[CurrItem].Event_ID != EventID));
 				}
-				r.min_x = ScrX;
-				r.max_x = TotalScreenWidth-1;
+				r.setx(ScrX, TotalScreenWidth-1);
 				bitmap.fill(machine.pens[state->m_CurrBorderColor], r);
 			}
 

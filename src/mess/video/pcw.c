@@ -22,10 +22,7 @@ INLINE void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 VIDEO_START( pcw )
 {
 	pcw_state *state = machine.driver_data<pcw_state>();
-	rectangle rect;
-	rect.min_x = rect.min_y = 0;
-	rect.max_x = PCW_PRINTER_WIDTH - 1;
-	rect.max_y = PCW_PRINTER_HEIGHT - 1;
+	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
 
 	state->m_prn_output = auto_bitmap_ind16_alloc(machine,PCW_PRINTER_WIDTH,PCW_PRINTER_HEIGHT);
 	state->m_prn_output->fill(1, rect);
@@ -78,20 +75,12 @@ SCREEN_UPDATE_IND16( pcw )
 	/* video enable? */
 	if ((state->m_vdu_video_control_register & (1<<6))!=0)
 	{
-		rectangle rect;
-
 		/* render top border */
-		rect.min_x = 0;
-		rect.min_y = 0;
-		rect.max_x = PCW_SCREEN_WIDTH;
-		rect.max_y = PCW_BORDER_HEIGHT;
+		rectangle rect(0, PCW_SCREEN_WIDTH, 0, PCW_BORDER_HEIGHT);
 		bitmap.fill(pen0, rect);
 
 		/* render bottom border */
-		rect.min_x = 0;
-		rect.min_y = PCW_BORDER_HEIGHT + PCW_DISPLAY_HEIGHT;
-		rect.max_x = PCW_SCREEN_WIDTH;
-		rect.max_y = rect.min_y + PCW_BORDER_HEIGHT;
+		rect.set(0, PCW_SCREEN_WIDTH, PCW_BORDER_HEIGHT + PCW_DISPLAY_HEIGHT, PCW_BORDER_HEIGHT + PCW_DISPLAY_HEIGHT + PCW_BORDER_HEIGHT);
 		bitmap.fill(pen0, rect);
 
 		/* offset to start in table */
@@ -172,14 +161,7 @@ SCREEN_UPDATE_IND16( pcw )
 	else
 	{
 		/* not video - render whole lot in pen 0 */
-		rectangle rect;
-
-		/* render top border */
-		rect.min_x = 0;
-		rect.min_y = 0;
-		rect.max_x = PCW_SCREEN_WIDTH;
-		rect.max_y = PCW_SCREEN_HEIGHT;
-
+		rectangle rect(0, PCW_SCREEN_WIDTH, 0, PCW_SCREEN_HEIGHT);
 		bitmap.fill(pen0, rect);
 	}
 	return 0;
@@ -190,11 +172,8 @@ SCREEN_UPDATE_IND16( pcw_printer )
 	pcw_state *state = screen.machine().driver_data<pcw_state>();
 
 	// printer output
-	rectangle rect;
 	INT32 feed;
-	rect.min_x = rect.min_y = 0;
-	rect.max_x = PCW_PRINTER_WIDTH - 1;
-	rect.max_y = PCW_PRINTER_HEIGHT - 1;
+	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);
 	feed = -(state->m_paper_feed / 2);
 	copyscrollbitmap(bitmap,*state->m_prn_output,0,NULL,1,&feed,rect);
 	bitmap.pix16(PCW_PRINTER_HEIGHT-1, state->m_printer_headpos) = 0;

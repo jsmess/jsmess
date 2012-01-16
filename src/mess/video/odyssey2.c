@@ -277,9 +277,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 		state->m_control_status &= ~ 0x01;
 
 		/* Draw a line */
-		rect.min_y = rect.max_y = vpos;
-		rect.min_x = I824X_START_ACTIVE_SCAN;
-		rect.max_x = I824X_END_ACTIVE_SCAN - 1;
+		rect.set(I824X_START_ACTIVE_SCAN, I824X_END_ACTIVE_SCAN - 1, vpos, vpos);
 		state->m_tmp_bitmap.fill(( (state->m_o2_vdc.s.color >> 3) & 0x7 ) | ( ( state->m_lum << 3 ) ^ 0x08 ), rect );
 
 		/* Clear collision map */

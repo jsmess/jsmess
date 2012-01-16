@@ -54,17 +54,13 @@ void zx_state::zx_ula_bkgnd(UINT8 color)
 		{
 			if (y == new_y)
 			{
-				r.min_x = m_old_x;
-				r.max_x = new_x;
-				r.min_y = r.max_y = y;
+				r.set(m_old_x, new_x, y, y);
 				bitmap.fill(color, r);
 				break;
 			}
 			else
 			{
-				r.min_x = m_old_x;
-				r.max_x = visarea.max_x;
-				r.min_y = r.max_y = y;
+				r.set(m_old_x, visarea.max_x, y, y);
 				bitmap.fill(color, r);
 				m_old_x = 0;
 			}
@@ -101,9 +97,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	rectangle r;
 
 	bitmap_ind16 &bitmap = state->m_bitmap;
-	r.min_x = r1.min_x;
-	r.max_x = r1.max_x;
-	r.min_y = r.max_y = state->m_ula_scanline_count;
+	r.set(r1.min_x, r1.max_x, state->m_ula_scanline_count, state->m_ula_scanline_count);
 	bitmap.fill(1, r);
 //  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine.primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_R), (unsigned) cpu_get_reg(machine.device("maincpu"), Z80_PC));
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);

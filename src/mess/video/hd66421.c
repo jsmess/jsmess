@@ -248,11 +248,7 @@ void hd66421_device::update_screen(bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 	else
 	{
-		rectangle rect;
-		rect.min_x = 0;
-		rect.max_x = HD66421_WIDTH - 1;
-		rect.min_y = 0;
-		rect.max_y = HD66421_HEIGHT - 1;
+		rectangle rect(0, HD66421_WIDTH - 1, 0, HD66421_HEIGHT - 1);
 		bitmap.fill(get_white_pen(machine()), rect);
 	}
 }

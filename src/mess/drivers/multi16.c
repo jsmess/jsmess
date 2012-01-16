@@ -71,7 +71,7 @@ static SCREEN_UPDATE_IND16( multi16 )
 			{
 				int dot = (BITSWAP16(state->m_p_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
 
-				if(y < screen.machine().primary_screen->visible_area().max_y && x*16+xi < screen.machine().primary_screen->visible_area().max_x) /* TODO: safety check */
+				if(screen.visible_area().contains(x*16+xi, y))
 					bitmap.pix16(y, x*16+xi) = screen.machine().pens[dot];
 			}
 
