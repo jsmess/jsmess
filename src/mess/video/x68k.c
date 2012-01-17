@@ -697,20 +697,20 @@ WRITE16_HANDLER( x68k_spritereg_w )
 	switch(offset)
 	{
 	case 0x400:
-		tilemap_set_scrollx(state->m_bg0_8,0,(data - state->m_crtc.hbegin) & 0x3ff);
-		tilemap_set_scrollx(state->m_bg0_16,0,(data - state->m_crtc.hbegin) & 0x3ff);
+		state->m_bg0_8->set_scrollx(0,(data - state->m_crtc.hbegin) & 0x3ff);
+		state->m_bg0_16->set_scrollx(0,(data - state->m_crtc.hbegin) & 0x3ff);
 		break;
 	case 0x401:
-		tilemap_set_scrolly(state->m_bg0_8,0,(data - state->m_crtc.vbegin) & 0x3ff);
-		tilemap_set_scrolly(state->m_bg0_16,0,(data - state->m_crtc.vbegin) & 0x3ff);
+		state->m_bg0_8->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
+		state->m_bg0_16->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
 		break;
 	case 0x402:
-		tilemap_set_scrollx(state->m_bg1_8,0,(data - state->m_crtc.hbegin) & 0x3ff);
-		tilemap_set_scrollx(state->m_bg1_16,0,(data - state->m_crtc.hbegin) & 0x3ff);
+		state->m_bg1_8->set_scrollx(0,(data - state->m_crtc.hbegin) & 0x3ff);
+		state->m_bg1_16->set_scrollx(0,(data - state->m_crtc.hbegin) & 0x3ff);
 		break;
 	case 0x403:
-		tilemap_set_scrolly(state->m_bg1_8,0,(data - state->m_crtc.vbegin) & 0x3ff);
-		tilemap_set_scrolly(state->m_bg1_16,0,(data - state->m_crtc.vbegin) & 0x3ff);
+		state->m_bg1_8->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
+		state->m_bg1_16->set_scrolly(0,(data - state->m_crtc.vbegin) & 0x3ff);
 		break;
 	case 0x405:  // BG H-DISP (like CRTC reg 2)
 		if(data != 0x00ff)
@@ -743,20 +743,20 @@ WRITE16_HANDLER( x68k_spriteram_w )
 	state->m_video.tile16_dirty[offset / 64] = 1;
 	if(offset < 0x2000)
 	{
-        tilemap_mark_all_tiles_dirty(state->m_bg1_8);
-        tilemap_mark_all_tiles_dirty(state->m_bg1_16);
-        tilemap_mark_all_tiles_dirty(state->m_bg0_8);
-        tilemap_mark_all_tiles_dirty(state->m_bg0_16);
+        state->m_bg1_8->mark_all_dirty();
+        state->m_bg1_16->mark_all_dirty();
+        state->m_bg0_8->mark_all_dirty();
+        state->m_bg0_16->mark_all_dirty();
     }
     if(offset >= 0x2000 && offset < 0x3000)
     {
-        tilemap_mark_tile_dirty(state->m_bg1_8,offset & 0x0fff);
-        tilemap_mark_tile_dirty(state->m_bg1_16,offset & 0x0fff);
+        state->m_bg1_8->mark_tile_dirty(offset & 0x0fff);
+        state->m_bg1_16->mark_tile_dirty(offset & 0x0fff);
     }
     if(offset >= 0x3000)
     {
-        tilemap_mark_tile_dirty(state->m_bg0_8,offset & 0x0fff);
-        tilemap_mark_tile_dirty(state->m_bg0_16,offset & 0x0fff);
+        state->m_bg0_8->mark_tile_dirty(offset & 0x0fff);
+        state->m_bg0_16->mark_tile_dirty(offset & 0x0fff);
     }
 }
 
@@ -1101,10 +1101,10 @@ VIDEO_START( x68000 )
 	state->m_bg0_16 = tilemap_create(machine, x68k_get_bg0_tile_16,tilemap_scan_rows,16,16,64,64);
 	state->m_bg1_16 = tilemap_create(machine, x68k_get_bg1_tile_16,tilemap_scan_rows,16,16,64,64);
 
-	tilemap_set_transparent_pen(state->m_bg0_8,0);
-	tilemap_set_transparent_pen(state->m_bg1_8,0);
-	tilemap_set_transparent_pen(state->m_bg0_16,0);
-	tilemap_set_transparent_pen(state->m_bg1_16,0);
+	state->m_bg0_8->set_transparent_pen(0);
+	state->m_bg1_8->set_transparent_pen(0);
+	state->m_bg0_16->set_transparent_pen(0);
+	state->m_bg1_16->set_transparent_pen(0);
 
 //  state->m_scanline_timer->adjust(attotime::zero, 0, attotime::from_hz(55.45)/568);
 }
@@ -1179,15 +1179,15 @@ SCREEN_UPDATE_IND16( x68000 )
 			{
 				if((state->m_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
 				{
-					tilemap_set_scrollx(x68k_bg0,0,(state->m_spritereg[0x402] - state->m_crtc.hbegin) & 0x3ff);
-					tilemap_set_scrolly(x68k_bg0,0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
-					tilemap_draw(bitmap,rect,x68k_bg0,0,0);
+					x68k_bg0->set_scrollx(0,(state->m_spritereg[0x402] - state->m_crtc.hbegin) & 0x3ff);
+					x68k_bg0->set_scrolly(0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
+					x68k_bg0->draw(bitmap,rect,0,0);
 				}
 				else
 				{
-					tilemap_set_scrollx(x68k_bg1,0,(state->m_spritereg[0x402] - state->m_crtc.hbegin) & 0x3ff);
-					tilemap_set_scrolly(x68k_bg1,0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
-					tilemap_draw(bitmap,rect,x68k_bg1,0,0);
+					x68k_bg1->set_scrollx(0,(state->m_spritereg[0x402] - state->m_crtc.hbegin) & 0x3ff);
+					x68k_bg1->set_scrolly(0,(state->m_spritereg[0x403] - state->m_crtc.vbegin) & 0x3ff);
+					x68k_bg1->draw(bitmap,rect,0,0);
 				}
 			}
 			x68k_draw_sprites(screen.machine(),bitmap,2,rect);
@@ -1195,15 +1195,15 @@ SCREEN_UPDATE_IND16( x68000 )
 			{
 				if((state->m_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
 				{
-					tilemap_set_scrollx(x68k_bg0,0,(state->m_spritereg[0x400] - state->m_crtc.hbegin) & 0x3ff);
-					tilemap_set_scrolly(x68k_bg0,0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
-					tilemap_draw(bitmap,rect,x68k_bg0,0,0);
+					x68k_bg0->set_scrollx(0,(state->m_spritereg[0x400] - state->m_crtc.hbegin) & 0x3ff);
+					x68k_bg0->set_scrolly(0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
+					x68k_bg0->draw(bitmap,rect,0,0);
 				}
 				else
 				{
-					tilemap_set_scrollx(x68k_bg1,0,(state->m_spritereg[0x400] - state->m_crtc.hbegin) & 0x3ff);
-					tilemap_set_scrolly(x68k_bg1,0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
-					tilemap_draw(bitmap,rect,x68k_bg1,0,0);
+					x68k_bg1->set_scrollx(0,(state->m_spritereg[0x400] - state->m_crtc.hbegin) & 0x3ff);
+					x68k_bg1->set_scrolly(0,(state->m_spritereg[0x401] - state->m_crtc.vbegin) & 0x3ff);
+					x68k_bg1->draw(bitmap,rect,0,0);
 				}
 			}
 			x68k_draw_sprites(screen.machine(),bitmap,3,rect);
