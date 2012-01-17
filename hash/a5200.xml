@@ -135,9 +135,9 @@ Possible Undumped protos: -
 
 	<software name="asteroid">
 		<description>Asteroids (Prototype)</description>
-		<info name="serial" value="CX5201" />
 		<year>1982</year>
 		<publisher>Atari</publisher>
+		<info name="serial" value="CX5201" />
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="asteroid.bin" size="8192" crc="38480891" sha1="18697dd8e640fa1578b3b4ae09af484c14fb8410" offset="0" />
@@ -147,9 +147,9 @@ Possible Undumped protos: -
 
 	<software name="astrchse">
 		<description>Astro Chase</description>
-		<info name="serial" value="9560" />
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="9560" />
 		<part name="cart" interface="a5200_cart">
 			<feature name="cart_type" value="A13MIRRORING" />
 			<dataarea name="rom" size="16384">
@@ -160,9 +160,9 @@ Possible Undumped protos: -
 
 	<software name="ballblze">
 		<description>Ballblazer</description>
-		<info name="serial" value="CX5255" />
 		<year>1986</year>
 		<publisher>Atari / Lucasfilm</publisher>
+		<info name="serial" value="CX5255" />
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="ballblze.bin" size="32768" crc="94d97d14" sha1="ed92ffd21abd50339f5be0cbff9bdcc8fafbc67f" offset="0" />

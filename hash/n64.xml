@@ -9318,6 +9318,17 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="toystor2g" cloneof="toystor2">
+		<description>Toy Story 2 (Ger, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="12582912">
+				<rom name="toy story 2 (germany) (rev a).bin" size="12582912" crc="1878086f" sha1="9786f138231509156bf23b1e9f1c327acec89b41" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2ga" cloneof="toystor2">
 		<description>Toy Story 2 (Ger)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>

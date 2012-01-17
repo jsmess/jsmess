@@ -12,7 +12,6 @@ Undumped:
 - Army Men 2 CGB-BA2P-EUU
 - Army Men - Air Combat  CGB-BATP-EUR
 - Bionic Command CGB-AV4P-AUS
-- Bugs Bunny et le chateau des catastrophes CGB-AO4F-FRA
 - Caterpillar Construction Zone DMG-AR4P-EUU? [unclear pic]
 - Championship Motocross 2001 featuring Ricky Carmichael CGB-BCMP-EUR
 - Daffy Duck - Fowl Play DMG-AD7P-UKV
@@ -23,7 +22,6 @@ Undumped:
 - Hands of Time CGB-BWCP-EUR
 - Heroes of Might and Magic CGB-AUHP-EUR/EUU
 - Hot Wheels - Stunt Track Driver DMG-AHEP-EUR
-- International Superstar Soccer '99 DMG-AWZE-USA
 - Joust &amp; Defender DMG-AAOP-EUR
 - Klax CGB-ALXP-EUR
 - The Lion King - Simba's Mighty Adventure CGB-BLKP-UKV
@@ -2072,6 +2070,19 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="bugs bunny in crazy castle 4 (europe).bin" size="1048576" crc="53155e60" sha1="3654f532a77035b3fc5bf7b0e1ae6941fc649b6a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugsbcc4f" cloneof="bugsbcc4">
+		<!-- Notes: GBC only -->
+		<description>Bugs Bunny et le Château des Catastrophes (Fra)</description>
+		<year>2000</year>
+		<publisher>Kemco</publisher>
+		<info name="serial" value="CGB-AO4F-FRA"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="bugs bunny et le chateau des catastrophes (france).bin" size="1048576" crc="6da8e6eb" sha1="19590017c888266c285360f824f5ef6cea166287" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6935,6 +6946,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="iss99">
+		<!-- Notes: SGB enhanced -->
 		<description>International Superstar Soccer '99 (Euro)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
@@ -6942,6 +6954,19 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="international superstar soccer '99 (europe).bin" size="1048576" crc="1b76d115" sha1="d9d9fffb463d4c35f8a1a753908cddfbe17fc671" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iss99u" cloneof="iss99">
+		<!-- Notes: SGB enhanced -->
+		<description>International Superstar Soccer '99 (USA)</description>
+		<year>2000</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="DMG-AWZE-USA"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="international superstar soccer '99 (usa).bin" size="1048576" crc="9d0290a7" sha1="6f491e6f919a677627090f949b8e69abb8bfd1db" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

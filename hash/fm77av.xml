@@ -770,7 +770,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<info name="serial" value="FUDF-19002 (F06-G5116-P1)"/>
 		<info name="alt_title" value="うっでぃぽこ"/>
-		<description>.d77</description>
 		<!--combined image-->
 		<!--rom name="woody poco (1987)(db-soft)(jp).d77" size="697696" crc="8f8464b0" sha1="25a1882c20f08ec349448ecb021fa24adf348a77" offset="0"/-->
 
@@ -1151,7 +1150,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<description>The File Master FM - Hot File Express (19890121)</description>
 		<year>1989</year>
 		<publisher>Kyoto Media</publisher>
-		<description>HFE89121</description>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="hfe890121.d77" size="348848" crc="bd4f390b" sha1="a83b8f2809fe74fe5531407574f6d6993ad0af9b" offset="0"/>
