@@ -69,14 +69,14 @@ WRITE8_HANDLER( aquarius_videoram_w )
 	aquarius_state *state = space->machine().driver_data<aquarius_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( aquarius_colorram_w )
 {
 	aquarius_state *state = space->machine().driver_data<aquarius_state>();
 	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tilemap, offset);
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO(aquarius_gettileinfo)
@@ -100,7 +100,7 @@ VIDEO_START( aquarius )
 SCREEN_UPDATE_IND16( aquarius )
 {
 	aquarius_state *state = screen.machine().driver_data<aquarius_state>();
-	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
+	state->m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

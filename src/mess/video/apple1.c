@@ -94,7 +94,7 @@ static void terminal_draw(running_machine &machine, bitmap_ind16 &dest, const re
 {
 	apple1_state *state = machine.driver_data<apple1_state>();
 	state->m_current_terminal = terminal;
-	tilemap_draw(dest, cliprect, terminal->tm, 0, 0);
+	terminal->tm->draw(dest, cliprect, 0, 0);
 	state->m_current_terminal = NULL;
 }
 
@@ -116,7 +116,7 @@ static void terminal_putchar(terminal_t *terminal, int x, int y, int ch)
 	if (terminal->mem[offs] != ch)
 	{
 		terminal->mem[offs] = ch;
-		tilemap_mark_tile_dirty(terminal->tm, offs);
+		terminal->tm->mark_tile_dirty(offs);
 	}
 }
 
@@ -137,7 +137,7 @@ static void terminal_putblank(terminal_t *terminal, int x, int y)
 static void terminal_dirtycursor(terminal_t *terminal)
 {
 	if (terminal->cur_offset >= 0)
-		tilemap_mark_tile_dirty(terminal->tm, terminal->cur_offset);
+		terminal->tm->mark_tile_dirty(terminal->cur_offset);
 }
 
 static void terminal_setcursor(terminal_t *terminal, int x, int y)
@@ -170,7 +170,7 @@ static void terminal_fill(terminal_t *terminal, int val)
 	int i;
 	for (i = 0; i < terminal->num_cols * terminal->num_rows; i++)
 		terminal->mem[i] = val;
-	tilemap_mark_all_tiles_dirty(terminal->tm);
+	terminal->tm->mark_all_dirty();
 }
 
 static void terminal_clear(terminal_t *terminal)

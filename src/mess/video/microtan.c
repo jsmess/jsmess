@@ -25,7 +25,7 @@ WRITE8_HANDLER( microtan_videoram_w )
 	if ((videoram[offset] != data) || (state->m_chunky_buffer[offset] != state->m_chunky_graphics))
 	{
 		videoram[offset] = data;
-		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+		state->m_bg_tilemap->mark_tile_dirty(offset);
 		state->m_chunky_buffer[offset] = state->m_chunky_graphics;
 	}
 }
@@ -54,6 +54,6 @@ VIDEO_START( microtan )
 SCREEN_UPDATE_IND16( microtan )
 {
 	microtan_state *state = screen.machine().driver_data<microtan_state>();
-	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

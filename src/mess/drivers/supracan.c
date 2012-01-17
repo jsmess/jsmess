@@ -260,7 +260,7 @@ static int supracan_tilemap_get_region(running_machine &machine, int layer)
 
 }
 
-static void supracan_tilemap_get_info_common(running_machine &machine, int layer, tile_data *tileinfo, int count)
+static void supracan_tilemap_get_info_common(running_machine &machine, int layer, tile_data &tileinfo, int count)
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 
@@ -315,7 +315,7 @@ static void supracan_tilemap_get_info_common(running_machine &machine, int layer
 }
 
 // I wonder how different this really is.. my guess, not at all.
-static void supracan_tilemap_get_info_roz(running_machine &machine, int layer, tile_data *tileinfo, int count)
+static void supracan_tilemap_get_info_roz(running_machine &machine, int layer, tile_data &tileinfo, int count)
 {
 	supracan_state *state = machine.driver_data<supracan_state>();
 
@@ -628,7 +628,7 @@ static void mark_active_tilemap_all_dirty(running_machine &machine, int layer)
 	which_tilemap_size = get_tilemap_dimensions(machine, xsize, ysize, layer);
 //  for (int i=0;i<4;i++)
 //    tilemap_mark_all_tiles_dirty(state->m_tilemap_sizes[layer][i]);
-	tilemap_mark_all_tiles_dirty(state->m_tilemap_sizes[layer][which_tilemap_size]);
+	state->m_tilemap_sizes[layer][which_tilemap_size]->mark_all_dirty();
 }
 
 
@@ -637,8 +637,8 @@ static void mark_active_tilemap_all_dirty(running_machine &machine, int layer)
 static void supracan_suprnova_draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, UINT32* scrollram*/, int transmask)
 {
 	//bitmap_ind16 *destbitmap = bitmap;
-	bitmap_ind16 &srcbitmap = tilemap_get_pixmap(tmap);
-	//bitmap_ind16 &srcbitmapflags = tilemap_get_flagsmap(tmap);
+	bitmap_ind16 &srcbitmap = tmap->pixmap();
+	//bitmap_ind16 &srcbitmapflags = tmap->flagsmap();
 	const int xmask = srcbitmap.width()-1;
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
@@ -825,7 +825,7 @@ static SCREEN_UPDATE_IND16( supracan )
 			{
 //            tilemap_num = layer;
 				which_tilemap_size = get_tilemap_dimensions(screen.machine(), xsize, ysize, layer);
-				bitmap_ind16 &src_bitmap = tilemap_get_pixmap(state->m_tilemap_sizes[layer][which_tilemap_size]);
+				bitmap_ind16 &src_bitmap = state->m_tilemap_sizes[layer][which_tilemap_size]->pixmap();
 				int gfx_region = supracan_tilemap_get_region(screen.machine(), layer);
 				int transmask = 0xff;
 
