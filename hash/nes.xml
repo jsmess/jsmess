@@ -15088,7 +15088,7 @@
 		</part>
 	</software>
 
-	<software name="honshigi">
+	<software name="honshogi">
 		<description>Hon Shougi: Naitou 9 Dan Shougi Hiden (Jpn)</description>
 		<year>1985</year>
 		<publisher>Seta</publisher>
@@ -15336,7 +15336,7 @@
 		</part>
 	</software>
 
-	<software name="hudson" supported="no">
+	<software name="hudson">
 		<description>Hudson Hawk (Euro)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
@@ -51964,10 +51964,11 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="hdsj1" cloneof="chaoswld">
-		<description>Hun Dun Shi Jie (Chi, Beta?)</description>
-		<year>19??</year>
+		<description>Hun Dun Shi Jie (Chi)</description>
+		<year>2006</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1115"/>
+		<info name="alt_title" value="混沌世界"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-E" />
 			<dataarea name="chr" size="262144">
@@ -51982,9 +51983,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+<!-- This has infinite bonus points for the character! -->
 	<software name="hdsj" cloneof="chaoswld">
-		<description>Hun Dun Shi Jie (Chi)</description>
-		<year>19??</year>
+		<description>Hun Dun Shi Jie (Chi, Hacked?)</description>
+		<year>2006</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1115"/>
 		<info name="alt_title" value="混沌世界"/>
