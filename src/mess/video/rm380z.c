@@ -238,7 +238,7 @@ READ8_MEMBER( rm380z_state::videoram_read )
 	return state->m_mainVideoram[offset];
 }
 
-void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsigned char* chsb,int vmode)
+void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bitmap,unsigned char* chsb,int vmode)
 {
 	//bool attrDim=false;
 	bool attrRev=false;
@@ -256,9 +256,6 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 		{
 			int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
 			int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
-			
-			int inix=x*(RM380Z_CHDIMX+1);
-			int iniy=y*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS*(RM380Z_CHDIMY+1);
 			
 			for (int r=0;r<RM380Z_CHDIMY;r++)
 			{
@@ -280,15 +277,17 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 							else chval=1;
 						}
 					}
-					
-					pscr[(inix+c)+(iniy+(r*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS))]=chval;
+
+					UINT16 *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+c);
+					*dest=chval;
 				}
 			}
 			
 			// last pixel of underline
-			if (attrUnder) 
+			if (attrUnder&&(!attrRev)) 
 			{
-				pscr[(inix+RM380Z_CHDIMX)+(iniy+((RM380Z_CHDIMY-1)*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS))]=attrRev?0:1;
+				UINT16 *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+(RM380Z_CHDIMY-1),(x*(RM380Z_CHDIMX+1))+RM380Z_CHDIMX);
+				*dest=attrRev?0:1;
 			}
 			
 			// if reversed, print another column of pixels on the right
@@ -296,7 +295,8 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 			{
 				for (int r=0;r<RM380Z_CHDIMY;r++)
 				{
-					pscr[(inix+RM380Z_CHDIMX)+(iniy+(r*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS))]=1;
+					UINT16 *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+RM380Z_CHDIMX);
+					*dest=1;
 				}
 			}
 		}
@@ -304,9 +304,6 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 		{
 			int basex=RM380Z_CHDIMX*(charnum/RM380Z_NCY);
 			int basey=RM380Z_CHDIMY*(charnum%RM380Z_NCY);
-			
-			int inix=(x*(RM380Z_CHDIMX+1)*2);
-			int iniy=y*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)*(RM380Z_CHDIMY+1);
 			
 			for (int r=0;r<RM380Z_CHDIMY;r++)
 			{
@@ -329,16 +326,20 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 						}
 					}
 
-					pscr[(inix+c)+(iniy+(r*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=chval;
-					pscr[(inix+c+1)+(iniy+(r*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=chval;
+					UINT16 *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c);
+					UINT16 *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c+1);
+					*dest=chval; 
+					*dest2=chval;
 				}
 			}
 
 			// last 2 pixels of underline
 			if (attrUnder) 
 			{
-				pscr[(inix+(RM380Z_CHDIMX*2))+(iniy+((RM380Z_CHDIMY-1)*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=attrRev?0:1;
-				pscr[(inix+(RM380Z_CHDIMX*2)+1)+(iniy+((RM380Z_CHDIMY-1)*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=attrRev?0:1;
+				UINT16 *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+RM380Z_CHDIMY-1 , ((x*(RM380Z_CHDIMX+1))*2)+(RM380Z_CHDIMX*2));
+				UINT16 *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+RM380Z_CHDIMY-1 , ((x*(RM380Z_CHDIMX+1))*2)+(RM380Z_CHDIMX*2)+1);
+				*dest=attrRev?0:1; 
+				*dest2=attrRev?0:1;
 			}
 		
 			// if reversed, print another 2 columns of pixels on the right
@@ -346,8 +347,10 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 			{
 				for (int r=0;r<RM380Z_CHDIMY;r++)
 				{
-					pscr[(inix+(RM380Z_CHDIMX*2))+(iniy+(r*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=1;
-					pscr[(inix+(RM380Z_CHDIMX*2)+1)+(iniy+(r*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=1;
+					UINT16 *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+((RM380Z_CHDIMX)*2));
+					UINT16 *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+((RM380Z_CHDIMX)*2)+1);
+					*dest=1; 
+					*dest2=1;
 				}
 			}
 		}
@@ -357,28 +360,25 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 		// graphic chars: 0x80-0xbf is "dimmed", 0xc0-0xff is full bright
 		if (vmode==RM380Z_VIDEOMODE_80COL)
 		{
-			int inix=x*(RM380Z_CHDIMX+1);
-			int iniy=y*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS*(RM380Z_CHDIMY+1);
-			
 			for (int r=0;r<(RM380Z_CHDIMY+1);r++)
 			{
 				for (int c=0;c<RM380Z_CHDIMX;c++)
 				{
-					pscr[(inix+c)+(iniy+(r*(RM380Z_CHDIMX+1)*RM380Z_SCREENCOLS))]=m_graphic_chars[charnum&0x3f][c+(r*(RM380Z_CHDIMX+1))];
+					UINT16 *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+c);
+					*dest=m_graphic_chars[charnum&0x3f][c+(r*(RM380Z_CHDIMX+1))];
 				}
 			}
 		}
 		else
 		{
-			int inix=(x*(RM380Z_CHDIMX+1)*2);
-			int iniy=y*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)*(RM380Z_CHDIMY+1);
-			
 			for (int r=0;r<RM380Z_CHDIMY;r++)
 			{
 				for (int c=0;c<(RM380Z_CHDIMX*2);c+=2)
 				{
-					pscr[(inix+c)+(iniy+(r*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
-					pscr[(inix+c+1)+(iniy+(r*(RM380Z_CHDIMX+1)*(RM380Z_SCREENCOLS)))]=m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
+					UINT16 *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c);
+					UINT16 *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c+1);
+					*dest=m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
+					*dest2=m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
 				}
 			}
 		}
@@ -388,10 +388,6 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,UINT16* pscr,unsi
 void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 {
 	unsigned char* pChar=machine().region("gfx")->base();
-	UINT16* scrptr = &bitmap.pix16(0);
-	
-	// blank screen
-	memset(scrptr,0,(RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))*(RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))*2);
 
 	int lineWidth=0x80;
 	int ncols=80;
@@ -402,13 +398,17 @@ void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 		ncols=40;
 	}
 
+	// blank screen
+	bitmap.fill(0);
+
 	for (int row=0;row<RM380Z_SCREENROWS;row++)
 	{
 		for (int col=0;col<ncols;col++)
 		{
 			UINT8 curch,attribs;
 			decode_videoram_char((row*lineWidth)+col,curch,attribs);
-			putChar(curch,attribs,col,row,scrptr,pChar,m_videomode);			
+			putChar(curch,attribs,col,row,bitmap,pChar,m_videomode);			
+			//putChar(0x44,0x00,10,10,bitmap,pChar,m_videomode);			
 		}
 	}
 }
