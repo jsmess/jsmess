@@ -71,11 +71,53 @@ static struct
 		UINT8 index;
 		UINT8 *data;
 	} sequencer;
+
+	/* An empty comment at the start of the line indicates that register is currently unused */
 	struct
 	{
 		UINT8 index;
 		UINT8 *data;
+/**/	UINT16 horz_total;
+/**/	UINT16 horz_disp_end;
+/**/	UINT8 horz_blank_start;
+/**/	UINT8 horz_blank_end;
+/**/	UINT8 disp_enable_skew;
+/**/	UINT8 evra;
+/**/	UINT16 vert_total;
+/**/	UINT16 vert_retrace_start;
+/**/	UINT8 vert_retrace_end;
+/**/	UINT16 vert_disp_end;
+/**/	UINT16 line_compare;
+/**/	UINT16 vert_blank_start;
+/**/	UINT8 horz_retrace_start;
+/**/	UINT8 horz_retrace_skew;
+/**/	UINT8 horz_retrace_end;
+/**/	UINT16 cursor_addr;
+/**/	UINT8 byte_panning;
+/**/	UINT8 preset_row_scan;
+/**/	UINT8 scan_doubling;
+/**/	UINT8 maximum_scan_line;
+/**/	UINT8 cursor_enable;
+/**/	UINT8 cursor_scan_start;
+/**/	UINT8 cursor_skew;
+/**/	UINT8 cursor_scan_end;
+/**/	UINT16 start_addr;
+/**/	UINT8 protect_enable;
+/**/	UINT8 bandwidth;
+/**/	UINT8 offset;
+/**/	UINT8 word_mode;
+/**/	UINT8 dw;
+/**/	UINT8 div4;
+/**/	UINT8 underline_loc;
+/**/	UINT8 vert_blank_end;
+		UINT8 sync_en;
+/**/	UINT8 aw;
+/**/	UINT8 div2;
+/**/	UINT8 sldiv;
+/**/	UINT8 map14;
+/**/	UINT8 map13;
 	} crtc;
+
 	struct
 	{
 		UINT8 index;
@@ -131,8 +173,6 @@ static struct
 #define DOUBLESCAN ((vga.crtc.data[9]&0x80)>>7)
 #define MAX_SCAN_LINES ((vga.crtc.data[9]&0x1f)+1)
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
-
-#define CRTC_ON (vga.crtc.data[0x17]&0x80)
 
 #define LINES_HELPER ( (vga.crtc.data[0x12] \
 				|((vga.crtc.data[7]&2)<<7) \
@@ -373,7 +413,7 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine, int *width, int *h
 {
 	int i;
 
-	if (CRTC_ON)
+	if (vga.crtc.sync_en)
 	{
 		if (vga.dac.dirty)
 		{
@@ -503,7 +543,7 @@ static int vga_get_clock(void)
 
 static int vga_get_crtc_columns(void) /* in clocks! */
 {
-	int columns=vga.crtc.data[0]+5;
+	int columns=vga.crtc.data[0]+5; // htotal
 
 	if (!GRAPHIC_MODE)
 		columns *= CHAR_WIDTH;
@@ -742,6 +782,140 @@ static void vga_cpu_interface(running_machine &machine)
 	}
 }
 
+#if 0
+static UINT8 crtc_reg_read(UINT8 index)
+{
+	UINT8 res;
+
+	res = 0xff;
+
+	switch(index)
+	{
+		default:
+			printf("Unhandled CRTC reg r %02x\n",index);
+	}
+
+	return res;
+}
+#endif
+
+static void crtc_reg_write(UINT8 index, UINT8 data)
+{
+	switch(index)
+	{
+		case 0x00: vga.crtc.horz_total = (data & 0xff) + 5; break;
+		case 0x01: vga.crtc.horz_disp_end = (data & 0xff) + 1; break;
+		case 0x02: vga.crtc.horz_blank_start = (data & 0xff); break;
+		case 0x03:
+			vga.crtc.horz_blank_end &= ~0x1f;
+			vga.crtc.horz_blank_end |= data & 0x1f;
+			vga.crtc.disp_enable_skew = (data & 0x60) >> 5;
+			vga.crtc.evra = (data & 0x80) >> 7;
+			break;
+		case 0x04:
+			vga.crtc.horz_retrace_start = data & 0xff;
+			break;
+		case 0x05:
+			vga.crtc.horz_blank_end &= ~0x20;
+			vga.crtc.horz_blank_end |= ((data & 0x80) >> 2);
+			vga.crtc.horz_retrace_skew = ((data & 0x60) >> 5);
+			vga.crtc.horz_retrace_end = data & 0x1f;
+			break;
+		case 0x06:
+			vga.crtc.vert_total &= ~0xff;
+			vga.crtc.vert_total |= data & 0xff;
+			break;
+		case 0x07: // Overflow Register
+			vga.crtc.vert_total         &= ~0x300;
+			vga.crtc.vert_retrace_start &= ~0x300;
+			vga.crtc.vert_disp_end      &= ~0x300;
+			vga.crtc.line_compare       &= ~0x100;
+			vga.crtc.vert_blank_start   &= ~0x100;
+			vga.crtc.vert_retrace_start |= ((data & 0x80) << (9-7));
+			vga.crtc.vert_disp_end      |= ((data & 0x40) << (9-6));
+			vga.crtc.vert_total         |= ((data & 0x20) << (9-5));
+			vga.crtc.line_compare       |= ((data & 0x10) << (8-4));
+			vga.crtc.vert_blank_start   |= ((data & 0x08) << (8-3));
+			vga.crtc.vert_retrace_start |= ((data & 0x04) << (8-2));
+			vga.crtc.vert_disp_end      |= ((data & 0x02) << (8-1));
+			vga.crtc.vert_total         |= ((data & 0x01) << (8-0));
+			break;
+		case 0x08: // Preset Row Scan Register
+			vga.crtc.byte_panning = (data & 0x60) >> 5;
+			vga.crtc.preset_row_scan = (data & 0x1f);
+			break;
+		case 0x09: // Maximum Scan Line Register
+			vga.crtc.line_compare      &= ~0x200;
+			vga.crtc.vert_blank_start  &= ~0x200;
+			vga.crtc.scan_doubling      = ((data & 0x80) >> 7) + 1;
+			vga.crtc.line_compare      |= ((data & 0x40) << (9-6));
+			vga.crtc.vert_blank_start  |= ((data & 0x20) << (9-5));
+			vga.crtc.maximum_scan_line  = (data & 0x1f) + 1;
+			break;
+		case 0x0a:
+			vga.crtc.cursor_enable = ((data & 0x20) ^ 0x20) >> 5;
+			vga.crtc.cursor_scan_start = data & 0x1f;
+			break;
+		case 0x0b:
+			vga.crtc.cursor_skew = (data & 0x60) >> 5;
+			vga.crtc.cursor_scan_end = data & 0x1f;
+			break;
+		case 0x0c:
+		case 0x0d:
+			vga.crtc.start_addr &= ~(0xff << (((index & 1)^1) * 8));
+			vga.crtc.start_addr |= (data << (((index & 1)^1) * 8));
+			break;
+		case 0x0e:
+		case 0x0f:
+			vga.crtc.cursor_addr &= ~(0xff << (((index & 1)^1) * 8));
+			vga.crtc.cursor_addr |= (data << (((index & 1)^1) * 8));
+			break;
+		case 0x10:
+			vga.crtc.vert_retrace_start &= ~0xff;
+			vga.crtc.vert_retrace_start |= data & 0xff;
+			break;
+		case 0x11:
+			vga.crtc.protect_enable = (data & 0x80) >> 7;
+			vga.crtc.bandwidth = (data & 0x40) >> 6;
+			vga.crtc.vert_retrace_end = data & 0x0f;
+			break;
+		case 0x12:
+			vga.crtc.vert_disp_end &= ~0xff;
+			vga.crtc.vert_disp_end |= data & 0xff;
+			break;
+		case 0x13:
+			vga.crtc.offset = data & 0xff;
+			break;
+		case 0x14:
+			vga.crtc.dw = (data & 0x40) >> 6;
+			vga.crtc.div4 = (data & 0x20) >> 5;
+			vga.crtc.underline_loc = (data & 0x1f);
+			break;
+		case 0x15:
+			vga.crtc.vert_blank_start &= ~0xff;
+			vga.crtc.vert_blank_start |= data & 0xff;
+			break;
+		case 0x16:
+			vga.crtc.vert_blank_end = data & 0x7f;
+			break;
+		case 0x17:
+			vga.crtc.sync_en = (data & 0x80) >> 7;
+			vga.crtc.word_mode = (data & 0x40) >> 6;
+			vga.crtc.aw = (data & 0x20) >> 5;
+			vga.crtc.div2 = (data & 0x08) >> 3;
+			vga.crtc.sldiv = (data & 0x04) >> 2;
+			vga.crtc.map14 = (data & 0x02) >> 1;
+			vga.crtc.map13 = (data & 0x01) >> 0;
+			break;
+		case 0x18:
+			vga.crtc.line_compare &= ~0xff;
+			vga.crtc.line_compare |= data & 0xff;
+			break;
+		default:
+			printf("Unhandled CRTC reg w %02x %02x\n",index,data);
+	}
+}
+
 static READ8_HANDLER(vga_crtc_r)
 {
 	UINT8 data = 0xff;
@@ -818,6 +992,7 @@ static WRITE8_HANDLER(vga_crtc_w)
 			if (vga.crtc.index < vga.svga_intf.crtc_regcount)
 				vga.crtc.data[vga.crtc.index] = data;
 
+			crtc_reg_write(vga.crtc.index,data);
 			//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 			//printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
 			break;
