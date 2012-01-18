@@ -62,7 +62,7 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 
 // MAC
@@ -289,7 +289,7 @@ UINT8 abc1600_state::read_internal_io(offs_t offset)
 			break;
 
 		case SCC:
-			data = m_scc->reg_r(*m_maincpu->memory().space(AS_PROGRAM), A1_A2);
+			data = m_scc->reg_r(*program, A1_A2);
 			break;
 
 		case CIO:
@@ -543,7 +543,7 @@ void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
 			break;
 
 		case SCC:
-			m_scc->reg_w(*m_maincpu->memory().space(AS_PROGRAM), A1_A2, data);
+			m_scc->reg_w(*program, A1_A2, data);
 			break;
 
 		case CIO:
@@ -985,7 +985,7 @@ WRITE8_MEMBER( abc1600_state::segment_w )
         4       SEGD4
         5       SEGD5
         6       SEGD6
-        7
+        7		0
 
     */
 
@@ -1018,10 +1018,10 @@ READ8_MEMBER( abc1600_state::page_r )
 
         8       X19
         9       X20
-        10
-        11
-        12
-        13
+        10		X20
+        11		X20
+        12		X20
+        13		X20
         14      _WP
         15      NONX
 
@@ -1033,9 +1033,22 @@ READ8_MEMBER( abc1600_state::page_r )
 
 	// page
 	offs_t pga = get_page_address(offset, segd);
-	UINT16 data = m_page_ram[pga];
+	UINT16 pgd = m_page_ram[pga];
 
-	return A0 ? (data & 0xff) : (data >> 8);
+	UINT8 data = 0;
+	
+	if (A0)
+	{
+		data = pgd & 0xff;
+	}
+	else
+	{
+		int x20 = BIT(pgd, 9);
+		
+		data = (pgd >> 8) | x20 << 2 | x20 << 3 | x20 << 4 | x20 << 5;
+	}
+	
+	return data;
 }
 
 
@@ -1082,7 +1095,7 @@ WRITE8_MEMBER( abc1600_state::page_w )
 	}
 	else
 	{
-		m_page_ram[pga] = (data << 8) | (m_page_ram[pga] & 0xff);
+		m_page_ram[pga] = ((data & 0xc3) << 8) | (m_page_ram[pga] & 0xff);
 	}
 
 	if (LOG) logerror("%s: %06x Task %u Segment %03x Page %03x : %02x -> %04x\n", machine().describe_context(), offset, get_current_task(offset), sega, pga, data, m_page_ram[pga]);
