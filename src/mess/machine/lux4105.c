@@ -98,8 +98,27 @@ machine_config_constructor luxor_4105_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 INPUT_PORTS_START( luxor_4105 )
-	PORT_START("DSW")
-	// TODO
+	PORT_START("1E")
+	PORT_DIPNAME( 0x03, 0x00, "Stepping" ) PORT_DIPLOCATION("1E:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, "Half (Seagate/Texas)" )
+	PORT_DIPSETTING(    0x02, "Half (Tandon)" )
+	PORT_DIPSETTING(    0x03, "Buffered" )
+	PORT_DIPNAME( 0x0c, 0x00, "Heads" ) PORT_DIPLOCATION("1E:3,4")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x08, "6" )
+	PORT_DIPSETTING(    0x0c, "8" )
+	PORT_DIPNAME( 0xf0, 0x00, "Drive Type" ) PORT_DIPLOCATION("1E:5,6,7,8")
+	PORT_DIPSETTING(    0x00, "Seagate ST506" )
+	PORT_DIPSETTING(    0x10, "Rodime RO100" )
+	PORT_DIPSETTING(    0x20, "Shugart SA600" )
+	PORT_DIPSETTING(    0x30, "Seagate ST412" )
+
+	PORT_START("5E")
+	PORT_DIPNAME( 0x7f, 0x25, "Card Address" ) PORT_DIPLOCATION("5E:1,2,3,4,5,6,7")
+	PORT_DIPSETTING(    0x25, "37" )
+	PORT_DIPSETTING(    0x2d, "45" )
 INPUT_PORTS_END
 
 
@@ -206,7 +225,7 @@ void luxor_4105_device::device_reset()
 
 void luxor_4105_device::abc1600bus_cs(UINT8 data)
 {
-	m_cs = (data == ADDRESS);
+	m_cs = (data == input_port_read(this, "5E"));
 }
 
 
@@ -277,7 +296,7 @@ UINT8 luxor_4105_device::abc1600bus_inp()
 	{
 		if (scsi_bsy_r(m_sasibus))
 		{
-			input_port_read(this, "DSW");
+			input_port_read(this, "1E");
 		}
 		else
 		{
