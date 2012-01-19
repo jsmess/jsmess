@@ -1823,6 +1823,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/unistar.o	\
+	$(MESS_DRIVERS)/wangpc.o	\
 	$(MESS_DRIVERS)/v6809.o		\
 	$(MESS_DRIVERS)/vector4.o	\
 	$(MESS_DRIVERS)/vii.o		\
