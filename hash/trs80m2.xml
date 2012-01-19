@@ -17,7 +17,7 @@
 		<description>TRSDOS v2.0a</description>
 		<year>1980</year>
 		<publisher>Tandy</publisher>
-		<info name="catalog" value="26-4910" />
+		<info name="serial" value="26-4910" />
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="146181">
 				<rom name="tdos20a.imd" size="146181" crc="b6d2fa9a" sha1="a93accf032b19cdd0122ccf45ba0af90d44f0f84" offset="0" />
@@ -39,7 +39,7 @@
 		<description>PROFILE II</description>
 		<year>1980</year>
 		<publisher>Tandy</publisher>
-		<info name="catalog" value="26-4512" />
+		<info name="serial" value="26-4512" />
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="215804">
 				<rom name="profile2.imd" size="215804" crc="8997532d" sha1="b0b7c738f5e23b7631741475bec25df2451c2a63" offset="0" />
@@ -51,7 +51,7 @@
 		<description>SCRIPTSIT 2.0</description>
 		<year>1981</year>
 		<publisher>Tandy</publisher>
-		<info name="catalog" value="26-4531" />
+		<info name="serial" value="26-4531" />
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="227787">
 				<rom name="script.imd" size="227787" crc="1cec0e85" sha1="73bfa56e2382ca04fd42f5b108699a1d9904dba2" offset="0" />
