@@ -48,6 +48,7 @@ Notes:
 
     TODO:
 
+	- revision F boot ROM dump
     - wmb_org.imd does not load
     - z80dart wait/ready
     - floppy type dips
@@ -56,19 +57,6 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/ctronics.h"
-#include "machine/terminal.h"
-#include "machine/wd17xx.h"
-#include "machine/z80ctc.h"
-#include "machine/z80dart.h"
-#include "machine/z80dma.h"
-#include "machine/z80pio.h"
 #include "includes/bullet.h"
 
 
@@ -78,7 +66,8 @@ Notes:
 //**************************************************************************
 
 // DMA ready sources
-enum {
+enum
+{
 	FDRDY = 0,
 	DARTARDY,
 	DARTBRDY,
@@ -87,104 +76,66 @@ enum {
 	EXRDY2
 };
 
+#define SEG0 \
+	BIT(m_mbank, 0)
+
+#define SEG5 \
+	BIT(m_mbank, 5)
+
+#define DMB4 \
+	BIT(m_xdma0, 4)
+
+#define DMB6 \
+	BIT(m_xdma0, 6)
+
+
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  bankswitch -
+//  mreq_r -
 //-------------------------------------------------
 
-void bullet_state::bankswitch()
+READ8_MEMBER( bullet_state::mreq_r )
 {
-	if (m_brom)
+	UINT8 data = 0;
+	
+	if (!m_brom && !BIT(offset, 5))
 	{
-		memory_set_bank(machine(), "bank1", 2);
+		data = machine().region(Z80_TAG)->base()[offset & 0x1f];
 	}
 	else
 	{
-		memory_set_bank(machine(), "bank1", m_segst);
+		if (offset < 0xc000)
+		{
+			data = m_ram->pointer()[(m_segst << 16) | offset];
+		}
+		else
+		{
+			data = m_ram->pointer()[offset];
+		}
 	}
-
-	memory_set_bank(machine(), "bank2", m_segst);
-	memory_set_bank(machine(), "bank3", m_segst);
-	memory_set_bank(machine(), "bank4", 0);
-}
-
-
-//-------------------------------------------------
-//  update_dma_rdy -
-//-------------------------------------------------
-
-void bullet_state::update_dma_rdy()
-{
-	int rdy = 1;
-
-	switch (m_exdma & 0x07)
-	{
-	case FDRDY:
-		rdy = m_fdrdy;
-		break;
-
-	case DARTARDY:
-		rdy = m_dartardy;
-		break;
-
-	case DARTBRDY:
-		rdy = m_dartbrdy;
-		break;
-
-	case WINRDY:
-		rdy = m_winrdy;
-		break;
-
-	case EXRDY1:
-		rdy = m_exrdy1;
-		break;
-
-	case EXRDY2:
-		rdy = m_exrdy2;
-		break;
-	}
-
-	z80dma_rdy_w(m_dmac, rdy);
-}
-
-
-//-------------------------------------------------
-//  info_r -
-//-------------------------------------------------
-
-READ8_MEMBER( bullet_state::info_r )
-{
-	/*
-
-        bit     signal      description
-
-        0                   DIP switch 1
-        1                   DIP switch 2
-        2                   DIP switch 3
-        3                   DIP switch 4
-        4       HLDST       floppy disk head load status
-        5       *XDCG       floppy disk exchange (8" only)
-        6       FDIRQ       FDC interrupt request line
-        7       FDDRQ       FDC data request line
-
-    */
-
-	UINT8 data = 0x10;
-
-	// DIP switches
-	data |= input_port_read(machine(), "SW1") & 0x0f;
-
-	// floppy interrupt
-	data |= wd17xx_intrq_r(m_fdc) << 6;
-
-	// floppy data request
-	data |= wd17xx_drq_r(m_fdc) << 7;
-
+	
 	return data;
+}
+
+
+//-------------------------------------------------
+//  mreq_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( bullet_state::mreq_w )
+{
+	if (offset < 0xc000)
+	{
+		m_ram->pointer()[(m_segst << 16) | offset] = data;
+	}
+	else
+	{
+		m_ram->pointer()[offset] = data;
+	}
 }
 
 
@@ -213,8 +164,7 @@ WRITE8_MEMBER( bullet_state::wstrobe_w )
 
 READ8_MEMBER( bullet_state::brom_r )
 {
-	m_brom = 0;
-	bankswitch();
+	m_brom = 1;
 
 	return 0;
 }
@@ -226,8 +176,7 @@ READ8_MEMBER( bullet_state::brom_r )
 
 WRITE8_MEMBER( bullet_state::brom_w )
 {
-	m_brom = 0;
-	bankswitch();
+	m_brom = 1;
 }
 
 
@@ -325,13 +274,271 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 
 
 //-------------------------------------------------
+//  info_r -
+//-------------------------------------------------
+
+READ8_MEMBER( bullet_state::info_r )
+{
+	/*
+
+        bit     signal      description
+
+        0       SW1         DIP switch 1
+        1       SW2         DIP switch 2
+        2       SW3         DIP switch 3
+        3       SW4         DIP switch 4
+        4       HLDST       floppy disk head load status
+        5       *XDCG       floppy disk exchange (8" only)
+        6       FDIRQ       FDC interrupt request line
+        7       FDDRQ       FDC data request line
+
+    */
+
+	UINT8 data = 0x10;
+
+	// DIP switches
+	data |= input_port_read(machine(), "SW1") & 0x0f;
+
+	// floppy interrupt
+	data |= wd17xx_intrq_r(m_fdc) << 6;
+
+	// floppy data request
+	data |= wd17xx_drq_r(m_fdc) << 7;
+
+	return data;
+}
+
+
+//-------------------------------------------------
 //  segst_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( bullet_state::segst_w )
 {
 	m_segst = BIT(data, 0);
-	bankswitch();
+}
+
+
+//-------------------------------------------------
+//  mreq_r -
+//-------------------------------------------------
+
+READ8_MEMBER( bulletf_state::mreq_r )
+{
+	UINT8 data = 0;
+	
+	if (!m_rome && !BIT(offset, 5))
+	{
+		data = machine().region(Z80_TAG)->base()[offset & 0x1f];
+	}
+	else
+	{
+		if (offset < 0xc000)
+		{
+			if (!SEG5)
+			{
+				data = m_ram->pointer()[(SEG0 << 16) | offset];
+			}
+			else if (offset >= 0x8000)
+			{
+				data = m_ram->pointer()[0x1c000 + (offset - 0x8000)];
+			}
+		}
+		else
+		{
+			data = m_ram->pointer()[offset];
+		}
+	}
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  mreq_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( bulletf_state::mreq_w )
+{
+	if (offset < 0xc000)
+	{
+		if (!SEG5)
+		{
+			m_ram->pointer()[(SEG0 << 16) | offset] = data;
+		}
+		else if (offset >= 0x8000)
+		{
+			m_ram->pointer()[0x1c000 + (offset - 0x8000)] = data;
+		}
+	}
+	else
+	{
+		m_ram->pointer()[offset] = data;
+	}
+}
+
+
+//-------------------------------------------------
+//  xdma0_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( bulletf_state::xdma0_w )
+{
+	/*
+
+        bit     signal
+
+        0       device select (0=FDC, 1=SCSI)
+        1       
+        2       
+        3       
+        4       DMB4		Source bank
+        5
+        6		DMB6		Destination bank
+        7
+
+    */
+	
+	m_rome = 1;
+	
+	m_xdma0 = data;
+}
+
+
+//-------------------------------------------------
+//  xfdc_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( bulletf_state::xfdc_w )
+{
+	/*
+
+        bit     signal
+
+        0       Unit select number
+        1       Unit select number
+        2       Unit select number
+        3       Unit select number
+        4       Select side 2
+        5		Disable 3 & 5 inch spindle motors
+        6		Set for 1 MHz controller operation, reset for 2 MHz controller operation
+        7		Set to select single density
+
+    */
+
+	// floppy drive select
+	wd17xx_set_drive(m_fdc, data & 0x0f);
+	
+	// floppy side select
+	wd17xx_set_side(m_fdc, BIT(data, 4));
+
+	// floppy motor
+	floppy_mon_w(m_floppy0, BIT(data, 5));
+	floppy_mon_w(m_floppy1, BIT(data, 5));
+	floppy_drive_set_ready_state(m_floppy0, BIT(data, 5), 1);
+	floppy_drive_set_ready_state(m_floppy1, BIT(data, 5), 1);
+	
+	// FDC clock
+	m_fdc->set_unscaled_clock(BIT(data, 6) ? XTAL_16MHz/16 : XTAL_16MHz/8);
+
+	// density select
+	wd17xx_dden_w(m_fdc, BIT(data, 7));
+}
+
+
+//-------------------------------------------------
+//  mbank_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( bulletf_state::mbank_w )
+{
+	/*
+
+        bit     signal
+
+        0       Select active bank (0=bank 0, 1=bank 1)
+        1       
+        2       
+        3       
+        4       Select system space overlay (0=no overlay, 1=overlay)
+        5
+        6
+        7
+
+    */
+	
+	m_mbank = data;
+}
+
+
+//-------------------------------------------------
+//  scsi_r -
+//-------------------------------------------------
+
+READ8_MEMBER( bulletf_state::scsi_r )
+{
+	UINT8 data = scsi_data_r(m_scsibus, 0);
+	
+	scsi_ack_w(m_scsibus, 0);
+	
+	m_wack = 0;
+	update_dma_rdy();
+	
+	return data;
+}
+
+
+//-------------------------------------------------
+//  scsi_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( bulletf_state::scsi_w )
+{
+	scsi_data_w(m_scsibus, 0, data);
+	
+	scsi_ack_w(m_scsibus, 0);
+
+	m_wack = 0;
+	update_dma_rdy();
+}
+
+
+//-------------------------------------------------
+//  hwsts_r -
+//-------------------------------------------------
+
+READ8_MEMBER( bulletf_state::hwsts_r )
+{
+	/*
+
+        bit     signal
+
+        0       CBUSY	Centronics busy
+        1       SW2		DIP switch 2
+        2       SW3		DIP switch 3
+        3       FD2S	*Floppy disk two sided
+        4       HLDST	Floppy disk head load status
+        5		XDCG	*Floppy disk exchange (8-inch only)
+        6		FDIRQ	FDC interrupt request line
+        7		FDDRQ	FDC data request line
+
+    */
+	
+	UINT8 data = 0x10;
+	
+	// centronics busy
+	data |= centronics_busy_r(m_centronics);
+
+	// DIP switches
+	data |= input_port_read(machine(), "SW1") & 0x06;
+
+	// floppy interrupt
+	data |= wd17xx_intrq_r(m_fdc) << 6;
+
+	// floppy data request
+	data |= wd17xx_drq_r(m_fdc) << 7;
+
+	return data;
 }
 
 
@@ -345,10 +552,7 @@ WRITE8_MEMBER( bullet_state::segst_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( bullet_mem, AS_PROGRAM, 8, bullet_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x0020, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
 
 
@@ -357,9 +561,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
@@ -375,6 +577,34 @@ static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
 ADDRESS_MAP_END
 
 
+//-------------------------------------------------
+//  ADDRESS_MAP( bulletf_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( bulletf_mem, AS_PROGRAM, 8, bulletf_state )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( bulletf_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( bulletf_io, AS_IO, 8, bulletf_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x3f)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(MB8877_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE(xdma0_w)
+	AM_RANGE(0x16, 0x16) AM_WRITE(xfdc_w)
+	AM_RANGE(0x17, 0x17) AM_WRITE(mbank_w)
+	AM_RANGE(0x19, 0x19) AM_READWRITE(scsi_r, scsi_w)
+	AM_RANGE(0x1a, 0x1a) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1b, 0x1b) AM_READ(hwsts_r)
+ADDRESS_MAP_END
+
+
 
 //**************************************************************************
 //  INPUT PORTS
@@ -385,7 +615,6 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 INPUT_PORTS_START( bullet )
-
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -401,6 +630,33 @@ INPUT_PORTS_START( bullet )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0xf0, 0xf0, "Floppy Type" ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	// TODO
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( bulletf )
+//-------------------------------------------------
+
+INPUT_PORTS_START( bulletf )
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "SCSI Bus Termination" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Boot ROM Device" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, "Onboard" )
+	PORT_DIPSETTING(    0x08, "EPROM" )
+	PORT_DIPNAME( 0xf0, 0xc0, "Floppy Type" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x10, "3\" DD" )
+	PORT_DIPSETTING(    0xc0, "5.25\" SD" )
+	PORT_DIPSETTING(    0x40, "3\" DD" )
+	PORT_DIPSETTING(    0xa0, "8\" SD" )
+	PORT_DIPSETTING(    0x20, "8\" DD" )
 INPUT_PORTS_END
 
 
@@ -485,15 +741,43 @@ static Z80DART_INTERFACE( dart_intf )
 //  Z80DMA_INTERFACE( dma_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::dma_mreq_r )
+void bullet_state::update_dma_rdy()
 {
-	if (m_buf)
+	int rdy = 1;
+
+	switch (m_exdma & 0x07)
 	{
-		offset |= 0x10000;
+	case FDRDY:
+		rdy = m_fdrdy;
+		break;
+
+	case DARTARDY:
+		rdy = m_dartardy;
+		break;
+
+	case DARTBRDY:
+		rdy = m_dartbrdy;
+		break;
+
+	case WINRDY:
+		rdy = m_winrdy;
+		break;
+
+	case EXRDY1:
+		rdy = m_exrdy1;
+		break;
+
+	case EXRDY2:
+		rdy = m_exrdy2;
+		break;
 	}
 
-	UINT8 *ram = m_ram->pointer();
-	UINT8 data = ram[offset];
+	z80dma_rdy_w(m_dmac, rdy);
+}
+
+READ8_MEMBER( bullet_state::dma_mreq_r )
+{
+	UINT8 data = m_ram->pointer()[(m_buf << 16) | offset];
 
 	if (BIT(m_exdma, 4))
 	{
@@ -505,13 +789,7 @@ READ8_MEMBER( bullet_state::dma_mreq_r )
 
 WRITE8_MEMBER( bullet_state::dma_mreq_w )
 {
-	if (m_buf)
-	{
-		offset |= 0x10000;
-	}
-
-	UINT8 *ram = m_ram->pointer();
-	ram[offset] = data;
+	m_ram->pointer()[(m_buf << 16) | offset] = data;
 
 	if (BIT(m_exdma, 4))
 	{
@@ -529,6 +807,48 @@ static Z80DMA_INTERFACE( dma_intf )
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(bullet_state, dma_mreq_r),
 	DEVCB_DRIVER_MEMBER(bullet_state, dma_mreq_w),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_read_byte),
+	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_write_byte)
+};
+
+
+//-------------------------------------------------
+//  Z80DMA_INTERFACE( bulletf_dma_intf )
+//-------------------------------------------------
+
+void bulletf_state::update_dma_rdy()
+{
+	int rdy = 1;
+
+	if (BIT(m_xdma0, 0))
+	{
+		rdy = m_wack | m_wrdy;
+	}
+	else
+	{
+		rdy = m_fdrdy;
+	}
+
+	z80dma_rdy_w(m_dmac, rdy);
+}
+
+READ8_MEMBER( bulletf_state::dma_mreq_r )
+{
+	return m_ram->pointer()[(DMB4 << 16) | offset];
+}
+
+WRITE8_MEMBER( bulletf_state::dma_mreq_w )
+{
+	m_ram->pointer()[(DMB6 << 16) | offset] = data;
+}
+
+static Z80DMA_INTERFACE( bulletf_dma_intf )
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(bulletf_state, dma_mreq_r),
+	DEVCB_DRIVER_MEMBER(bulletf_state, dma_mreq_w),
 	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_read_byte),
 	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_write_byte)
 };
@@ -585,6 +905,77 @@ static Z80PIO_INTERFACE( pio_intf )
 
 
 //-------------------------------------------------
+//  Z80PIO_INTERFACE( bulletf_pio_intf )
+//-------------------------------------------------
+
+READ8_MEMBER( bulletf_state::pio_pa_r )
+{
+	/*
+
+        bit     signal
+
+        0       
+        1       
+        2       
+        3       BUSY
+        4       MSG
+        5       C/D
+        6       REQ
+        7       I/O
+
+    */
+
+	UINT8 data = 0;
+
+	data |= !scsi_bsy_r(m_scsibus) << 3;
+	data |= !scsi_msg_r(m_scsibus) << 4;
+	data |= !scsi_cd_r(m_scsibus) << 5;
+	data |= !scsi_req_r(m_scsibus) << 6;
+	data |= !scsi_io_r(m_scsibus) << 7;
+
+	return data;
+}
+
+WRITE8_MEMBER( bulletf_state::pio_pa_w )
+{
+	/*
+
+        bit     signal
+
+        0       ATN
+        1       RST
+        2       SEL
+        3       
+        4       
+        5       
+        6       
+        7       
+
+    */
+	
+	//scsi_atn_w(m_scsibus, !BIT(data, 0));
+	scsi_rst_w(m_scsibus, !BIT(data, 1));
+	scsi_sel_w(m_scsibus, !BIT(data, 2));
+}
+
+WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
+{
+	centronics_strobe_w(m_centronics, !state);
+}
+
+static Z80PIO_INTERFACE( bulletf_pio_intf )
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_r),
+	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_w),
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(bulletf_state, cstrb_w)
+};
+
+
+//-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
@@ -613,6 +1004,58 @@ static const wd17xx_interface fdc_intf =
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcda_w),
 	DEVCB_DRIVER_LINE_MEMBER(bullet_state, fdrdy_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
+
+//-------------------------------------------------
+//  wd17xx_interface bulletf_fdc_intf
+//-------------------------------------------------
+
+static const wd17xx_interface bulletf_fdc_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rib_w),
+	DEVCB_DRIVER_LINE_MEMBER(bullet_state, fdrdy_w),
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
+
+//-------------------------------------------------
+//  SCSIBus_interface scsi_intf
+//-------------------------------------------------
+
+static const SCSIConfigTable scsi_dev_table =
+{
+	1,
+	{
+		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK }
+	}
+};
+
+WRITE_LINE_MEMBER( bulletf_state::req_w )
+{
+	if (state)
+	{
+		scsi_ack_w(m_scsibus, 1);
+
+		m_wack = 1;
+	}
+
+	m_wrdy = !state;
+	update_dma_rdy();
+}
+
+static const SCSIBus_interface scsi_intf =
+{
+    &scsi_dev_table,
+    NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(bulletf_state, req_w),
+	DEVCB_NULL
 };
 
 
@@ -656,16 +1099,7 @@ static const z80_daisy_config daisy_chain[] =
 
 void bullet_state::machine_start()
 {
-	// setup memory banking
-	UINT8 *ram = m_ram->pointer();
-
-	memory_configure_bank(machine(), "bank1", 0, 2, ram, 0x10000);
-	memory_configure_bank(machine(), "bank1", 2, 1, machine().region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank2", 0, 2, ram, 0x10000);
-	memory_configure_bank(machine(), "bank3", 0, 2, ram + 0x0020, 0x10000);
-	memory_configure_bank(machine(), "bank4", 0, 1, ram + 0xc000, 0);
-
-	// register for state saving
+	// state saving
 	save_item(NAME(m_segst));
 	save_item(NAME(m_brom));
 	save_item(NAME(m_exdma));
@@ -680,21 +1114,57 @@ void bullet_state::machine_start()
 
 
 //-------------------------------------------------
+//  MACHINE_START( bulletf )
+//-------------------------------------------------
+
+void bulletf_state::machine_start()
+{
+	// initialize SASI bus
+	init_scsibus(m_scsibus, 512);
+
+	// state saving
+	save_item(NAME(m_fdrdy));
+	save_item(NAME(m_rome));
+	save_item(NAME(m_xdma0));
+	save_item(NAME(m_mbank));
+	save_item(NAME(m_wack));
+	save_item(NAME(m_wrdy));
+}
+
+
+//-------------------------------------------------
 //  MACHINE_RESET( bullet )
 //-------------------------------------------------
 
 void bullet_state::machine_reset()
 {
 	// memory banking
+	m_brom = 0;
 	m_segst = 0;
-	m_brom = 1;
-	bankswitch();
 
 	// DMA ready
 	m_exdma = 0;
+	m_buf = 0;
 	update_dma_rdy();
 }
 
+
+//-------------------------------------------------
+//  MACHINE_RESET( bulletf )
+//-------------------------------------------------
+
+void bulletf_state::machine_reset()
+{
+	// memory banking
+	m_rome = 0;
+	m_mbank = 0;
+
+	// DMA ready
+	m_xdma0 = 0;
+	m_wack = 0;
+	m_wrdy = 0;
+	update_dma_rdy();
+}
 
 
 //**************************************************************************
@@ -732,6 +1202,39 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 MACHINE_CONFIG_END
 
 
+//-------------------------------------------------
+//  MACHINE_CONFIG( bulletf )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( bulletf, bulletf_state )
+    // basic machine hardware
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+    MCFG_CPU_PROGRAM_MAP(bulletf_mem)
+    MCFG_CPU_IO_MAP(bulletf_io)
+	MCFG_CPU_CONFIG(daisy_chain)
+
+    // video hardware
+	MCFG_FRAGMENT_ADD( generic_terminal )
+
+	// devices
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
+	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
+	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, bulletf_pio_intf)
+	MCFG_MB8877_ADD(MB8877_TAG, bulletf_fdc_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bullet_floppy_interface)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+    MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
+	MCFG_HARDDISK_ADD("harddisk0")
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+MACHINE_CONFIG_END
+
+
 
 //**************************************************************************
 //  ROMS
@@ -741,10 +1244,13 @@ MACHINE_CONFIG_END
 //  ROM( bullet )
 //-------------------------------------------------
 
-ROM_START( wmbullet )
-    ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "sr70x.u8", 0x0000, 0x0020, CRC(d54b8a30) SHA1(65ff8753dd63c9dd1899bc9364a016225585d050) )
+ROM_START( bullet )
+    ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "sr70x.u8", 0x00, 0x20, CRC(d54b8a30) SHA1(65ff8753dd63c9dd1899bc9364a016225585d050) )
 ROM_END
+
+
+#define rom_bulletf rom_bullet
 
 
 
@@ -753,5 +1259,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME                FLAGS
-COMP( 1982, wmbullet,		0,			0,		bullet,		bullet,		0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-//COMP( 1982, wmbullete,  bullet,     0,      bullet,     bullet,     0,      "Wave Mate",    "Bullet (Revision E)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1982, bullet,		0,			0,		bullet,		bullet,		0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1984, bulletf,	bullet,		0,		bulletf,	bulletf,	0,		"Wave Mate",	"Bullet (Revision F)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )

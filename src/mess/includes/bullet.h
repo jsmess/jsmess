@@ -3,7 +3,21 @@
 #ifndef __BULLET__
 #define __BULLET__
 
+#define ADDRESS_MAP_MODERN
+
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/harddriv.h"
+#include "machine/ctronics.h"
 #include "machine/ram.h"
+#include "machine/scsibus.h"
+#include "machine/terminal.h"
+#include "machine/wd17xx.h"
+#include "machine/z80ctc.h"
+#include "machine/z80dart.h"
+#include "machine/z80dma.h"
+#include "machine/z80pio.h"
 
 #define Z80_TAG			"u20"
 #define Z80CTC_TAG		"u1"
@@ -12,6 +26,7 @@
 #define Z80PIO_TAG		"z80pio"
 #define MB8877_TAG		"u55"
 #define CENTRONICS_TAG	"centronics"
+#define SCSIBUS_TAG		"scsi"
 
 class bullet_state : public driver_device
 {
@@ -27,7 +42,8 @@ public:
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
 		  m_terminal(*this, TERMINAL_TAG),
-		  m_centronics(*this, CENTRONICS_TAG)
+		  m_centronics(*this, CENTRONICS_TAG),
+		  m_fdrdy(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -44,6 +60,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
+	DECLARE_READ8_MEMBER( mreq_r );
+	DECLARE_WRITE8_MEMBER( mreq_w );
 	DECLARE_READ8_MEMBER( info_r );
 	DECLARE_READ8_MEMBER( brom_r );
 	DECLARE_WRITE8_MEMBER( brom_w );
@@ -77,6 +95,44 @@ public:
 	int m_winrdy;
 	int m_exrdy1;
 	int m_exrdy2;
+};
+
+class bulletf_state : public bullet_state
+{
+public:
+	bulletf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: bullet_state(mconfig, type, tag),
+		  m_scsibus(*this, SCSIBUS_TAG)
+	{ }
+
+	required_device<device_t> m_scsibus;
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	DECLARE_READ8_MEMBER( mreq_r );
+	DECLARE_WRITE8_MEMBER( mreq_w );
+	DECLARE_WRITE8_MEMBER( xdma0_w );
+	DECLARE_WRITE8_MEMBER( xfdc_w );
+	DECLARE_WRITE8_MEMBER( mbank_w );
+	DECLARE_READ8_MEMBER( hwsts_r );
+	DECLARE_READ8_MEMBER( scsi_r );
+	DECLARE_WRITE8_MEMBER( scsi_w );
+	
+	DECLARE_READ8_MEMBER( dma_mreq_r );
+	DECLARE_WRITE8_MEMBER( dma_mreq_w );
+	DECLARE_READ8_MEMBER( pio_pa_r );
+	DECLARE_WRITE8_MEMBER( pio_pa_w );
+	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
+	DECLARE_WRITE_LINE_MEMBER( req_w );
+	
+	void update_dma_rdy();
+
+	int m_rome;
+	UINT8 m_xdma0;
+	UINT8 m_mbank;
+	int m_wack;
+	int m_wrdy;
 };
 
 #endif
