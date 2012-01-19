@@ -12,6 +12,7 @@
 
     TODO:
 
+	- floppy broken
     - palette RAM should be written during HBLANK
     - double sided disks have t0s0,t0s1,t1s0,t1s1... format
     - DART clocks
@@ -574,6 +575,7 @@ void tiki100_state::machine_start()
 	save_item(NAME(m_keylatch));
 }
 
+// physical disks have 2:1 sector interleave
 static LEGACY_FLOPPY_OPTIONS_START(tiki100)
 	LEGACY_FLOPPY_OPTION(tiki100, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -608,9 +610,9 @@ static const floppy_interface tiki100_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(tiki100),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -618,7 +620,7 @@ static const floppy_interface tiki100_floppy_interface =
 
 static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	/* basic machine hardware */
-    MCFG_CPU_ADD(Z80_TAG, Z80, 2000000)
+    MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/4)
     MCFG_CPU_PROGRAM_MAP(tiki100_mem)
     MCFG_CPU_IO_MAP(tiki100_io)
 	MCFG_CPU_CONFIG(tiki100_daisy_chain)
@@ -632,24 +634,28 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
     MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
 
 	MCFG_PALETTE_LENGTH(16)
+	// pixel clock 20.01782 MHz
 
 	/* devices */
-	MCFG_Z80DART_ADD(Z80DART_TAG, 2000000, dart_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, 2000000, pio_intf)
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(2000000))
+	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, dart_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/4, pio_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/4, ctc_intf)
+	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_8MHz/4))
 	MCFG_FD1797_ADD(FD1797_TAG, fdc_intf) // FD1767PL-02 or FD1797-PL
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tiki100_floppy_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8912_TAG, AY8912, 2000000)
+	MCFG_SOUND_ADD(AY8912_TAG, AY8912, XTAL_8MHz/4)
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+	
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "tiki100")
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -657,6 +663,9 @@ MACHINE_CONFIG_END
 ROM_START( kontiki )
 	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "tikirom-1.30.u10",  0x0000, 0x2000, CRC(c482dcaf) SHA1(d140706bb7fc8b1fbb37180d98921f5bdda73cf9) )
+	
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "63ls140.u4", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 ROM_START( tiki100 )
@@ -667,6 +676,9 @@ ROM_START( tiki100 )
 	ROMX_LOAD( "tikirom-1.35.u10",  0x0000, 0x2000, CRC(7dac5ee7) SHA1(14d622fd843833faec346bf5357d7576061f5a3d), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v203w", "TIKI ROM v2.03 W" )
 	ROMX_LOAD( "tikirom-2.03w.u10", 0x0000, 0x2000, CRC(79662476) SHA1(96336633ecaf1b2190c36c43295ac9f785d1f83a), ROM_BIOS(2) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "63ls140.u4", 0x000, 0x100, NO_DUMP )
 ROM_END
 
 /* System Drivers */
