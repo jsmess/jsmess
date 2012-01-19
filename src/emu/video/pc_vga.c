@@ -19,7 +19,6 @@
     TODO:
     - modernize
     - convert to an ISA device.
-    - fix pixel clock
     - add emulated mc6845 hook-up
     - fix resolution change
     - fix video update.
@@ -29,7 +28,8 @@
     - (and many more ...)
 
 	per-game issues:
-	- fix partial updates (The Incredible Machine)
+	- The Incredible Machine: fix partial updates
+	- MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
 
     ROM declarations:
 
@@ -76,8 +76,8 @@ static struct
 	{
 		UINT8 index;
 		UINT8 *data;
-/**/	UINT16 horz_total;
-/**/	UINT16 horz_disp_end;
+		UINT16 horz_total;
+		UINT16 horz_disp_end;
 /**/	UINT8 horz_blank_start;
 /**/	UINT8 horz_blank_end;
 /**/	UINT8 horz_retrace_start;
@@ -85,10 +85,10 @@ static struct
 /**/	UINT8 horz_retrace_end;
 /**/	UINT8 disp_enable_skew;
 /**/	UINT8 evra;
-/**/	UINT16 vert_total;
+		UINT16 vert_total;
 /**/	UINT16 vert_retrace_start;
 /**/	UINT8 vert_retrace_end;
-/**/	UINT16 vert_disp_end;
+		UINT16 vert_disp_end;
 /**/	UINT16 vert_blank_start;
 		UINT16 line_compare;
 /**/	UINT16 cursor_addr;
@@ -138,19 +138,6 @@ static struct
 		int time;
 		int visible;
 	} cursor;
-
-	struct {
-		int (*get_clock)(void);
-
-		int (*get_lines)(void);
-		int (*get_sync_lines)(void);
-
-		int (*get_columns)(void);
-		int (*get_sync_columns)(void);
-
-		attotime start_time;
-		int retrace;
-	} monitor;
 
 	/* oak vga */
 	struct { UINT8 reg; } oak;
@@ -406,7 +393,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	}
 }
 
-static UINT8 pc_vga_choosevideomode(running_machine &machine, int *width, int *height)
+static UINT8 pc_vga_choosevideomode(running_machine &machine)
 {
 	int i;
 
@@ -447,22 +434,25 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine, int *width, int *h
 		else if (!GRAPHIC_MODE)
 		{
 			//proc = vga_vh_text;
-			*height = TEXT_LINES;
-			*width = TEXT_COLUMNS * CHAR_WIDTH;
+			//*height = TEXT_LINES;
+			//*width = TEXT_COLUMNS * CHAR_WIDTH;
+			if(vga.crtc.scan_doubling)
+				popmessage("Text mode with double scan enabled, contact MAMEdev");
+
 			return 1;
 		}
 		else if (vga.gc.data[5]&0x40)
 		{
 			//proc = vga_vh_vga;
-			*height = LINES;
-			*width = VGA_COLUMNS * 8;
+			//*height = LINES;
+			//*width = VGA_COLUMNS * 8;
 			return 2;
 		}
 		else
 		{
 			//proc = vga_vh_ega;
-			*height = LINES;
-			*width = EGA_COLUMNS * 8;
+			//*height = LINES;
+			//*width = EGA_COLUMNS * 8;
 			return 3;
 		}
 	}
@@ -475,26 +465,7 @@ SCREEN_UPDATE_RGB32( pc_video )
 	UINT8 cur_mode = 0;
 	int w = 0, h = 0;
 
-	cur_mode = pc_vga_choosevideomode(screen.machine(), &w, &h);
-
-	if ((pc_current_width != w) || (pc_current_height != h))
-	{
-		int width = screen.width();
-		int height = screen.height();
-
-		pc_current_width = w;
-		pc_current_height = h;
-
-		if (pc_current_width > width)
-			pc_current_width = width;
-		if (pc_current_height > height)
-			pc_current_height = height;
-
-		if ((pc_current_width > 100) && (pc_current_height > 100))
-			screen.set_visible_area(0, pc_current_width-1, 0, pc_current_height-1);
-
-		bitmap.fill(0, cliprect);
-	}
+	cur_mode = pc_vga_choosevideomode(screen.machine());
 
 	//popmessage("%02x",cur_mode);
 
@@ -523,53 +494,6 @@ INLINE UINT8 rotate_right(UINT8 val, UINT8 rot)
 	return (val >> rot) | (val << (8 - rot));
 }
 
-
-
-static int vga_get_clock(void)
-{
-	int clck=0;
-	switch(vga.miscellaneous_output&0xc) {
-	case 0: clck=25000000;break;
-	case 4: clck=28000000;break;
-	/* case 8: external */
-	/* case 0xc: reserved */
-	}
-	if (vga.sequencer.data[1]&8) clck/=2;
-	return clck;
-}
-
-static int vga_get_crtc_columns(void) /* in clocks! */
-{
-	int columns=vga.crtc.data[0]+5; // htotal
-
-	if (!GRAPHIC_MODE)
-		columns *= CHAR_WIDTH;
-	else if (vga.gc.data[5]&0x40)
-		columns *= 4;
-	else
-		columns *= 8;
-
-	return columns;
-}
-
-static int vga_get_crtc_lines(void)
-{
-	int lines=(vga.crtc.data[6]
-			   |((vga.crtc.data[7]&1)<<8)
-			   |((vga.crtc.data[7]&0x20)<<(8-4)))+2;
-
-	return lines;
-}
-
-static int vga_get_crtc_sync_lines(void)
-{
-	return 10;
-}
-
-static int vga_get_crtc_sync_columns(void)
-{
-	return 40;
-}
 
 INLINE WRITE8_HANDLER(vga_dirty_w)
 {
@@ -796,12 +720,48 @@ static UINT8 crtc_reg_read(UINT8 index)
 }
 #endif
 
-static void crtc_reg_write(UINT8 index, UINT8 data)
+static void recompute_params(running_machine &machine)
+{
+	int vblank_period,hblank_period;
+	attoseconds_t refresh;
+	UINT8 hclock_m,hclock_d;
+	int pixel_clock;
+
+	hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
+
+	/* TODO: actually display is 640 x 400 in "VGA" mode */
+	if(!GRAPHIC_MODE)
+		hclock_d = CHAR_WIDTH;
+	else
+		hclock_d = vga.gc.data[5]&0x40 ? 4 : 8;
+
+	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * hclock_d)-1, 0, vga.crtc.vert_disp_end);
+
+	vblank_period = (vga.crtc.vert_total + 2);
+	hblank_period = ((vga.crtc.horz_total + 5) * hclock_m);
+
+	/* TODO: 10b and 11b settings aren't known */
+	pixel_clock  = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+	pixel_clock /= 	(((vga.sequencer.data[1]&8) >> 3) + 1);
+
+	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+
+	machine.primary_screen->configure((hblank_period), (vblank_period), visarea, refresh );
+//	popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
+}
+
+static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 {
 	switch(index)
 	{
-		case 0x00: vga.crtc.horz_total = (data & 0xff) + 5; break;
-		case 0x01: vga.crtc.horz_disp_end = (data & 0xff) + 1; break;
+		case 0x00:
+			vga.crtc.horz_total = (data & 0xff);
+			recompute_params(machine);
+			break;
+		case 0x01:
+			vga.crtc.horz_disp_end = (data & 0xff);
+			recompute_params(machine);
+			break;
 		case 0x02: vga.crtc.horz_blank_start = (data & 0xff); break;
 		case 0x03:
 			vga.crtc.horz_blank_end &= ~0x1f;
@@ -821,6 +781,7 @@ static void crtc_reg_write(UINT8 index, UINT8 data)
 		case 0x06:
 			vga.crtc.vert_total &= ~0xff;
 			vga.crtc.vert_total |= data & 0xff;
+			recompute_params(machine);
 			break;
 		case 0x07: // Overflow Register
 			vga.crtc.vert_total         &= ~0x300;
@@ -836,6 +797,7 @@ static void crtc_reg_write(UINT8 index, UINT8 data)
 			vga.crtc.vert_retrace_start |= ((data & 0x04) << (8-2));
 			vga.crtc.vert_disp_end      |= ((data & 0x02) << (8-1));
 			vga.crtc.vert_total         |= ((data & 0x01) << (8-0));
+			recompute_params(machine);
 			break;
 		case 0x08: // Preset Row Scan Register
 			vga.crtc.byte_panning = (data & 0x60) >> 5;
@@ -879,6 +841,7 @@ static void crtc_reg_write(UINT8 index, UINT8 data)
 		case 0x12:
 			vga.crtc.vert_disp_end &= ~0xff;
 			vga.crtc.vert_disp_end |= data & 0xff;
+			recompute_params(machine);
 			break;
 		case 0x13:
 			vga.crtc.offset = data & 0xff;
@@ -989,7 +952,7 @@ static WRITE8_HANDLER(vga_crtc_w)
 			if (vga.crtc.index < vga.svga_intf.crtc_regcount)
 				vga.crtc.data[vga.crtc.index] = data;
 
-			crtc_reg_write(vga.crtc.index,data);
+			crtc_reg_write(space->machine(),vga.crtc.index,data);
 			//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 			//printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
 			break;
@@ -1161,6 +1124,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		break;
 	case 2:
 		vga.miscellaneous_output=data;
+		recompute_params(space->machine());
 		break;
 	case 3:
 		vga.oak.reg = data;
@@ -1181,8 +1145,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 			vga.sequencer.data[vga.sequencer.index] = data;
 			vga_cpu_interface(space->machine());
 
-			if (vga.sequencer.index == 0)
-				vga.monitor.start_time = space->machine().time();
+			recompute_params(space->machine());
 		}
 		break;
 	case 6:
@@ -1277,7 +1240,6 @@ void pc_vga_reset(running_machine &machine)
 	memset(&vga.attribute, 0, sizeof(vga.attribute));
 	memset(&vga.dac, 0, sizeof(vga.dac));
 	memset(&vga.cursor, 0, sizeof(vga.cursor));
-	memset(&vga.monitor, 0, sizeof(vga.monitor));
 	memset(&vga.oak, 0, sizeof(vga.oak));
 	vga.log = 0;
 
@@ -1288,7 +1250,12 @@ void pc_vga_reset(running_machine &machine)
 	vga.sequencer.data[4] = 0;
 	vga_cpu_interface(machine);
 
+	/* TODO: real defaults */
 	vga.crtc.line_compare = 0x3ff;
+	vga.crtc.horz_total = 0xff;
+	vga.crtc.vert_total = 0xff;
+	vga.crtc.horz_disp_end = 0xff;
+	vga.crtc.vert_disp_end = 0x3ff;
 }
 
 void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf)
@@ -1377,11 +1344,6 @@ void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_in
 
 static VIDEO_START( vga )
 {
-	vga.monitor.get_clock=vga_get_clock;
-	vga.monitor.get_lines=vga_get_crtc_lines;
-	vga.monitor.get_columns=vga_get_crtc_columns;
-	vga.monitor.get_sync_lines=vga_get_crtc_sync_lines;
-	vga.monitor.get_sync_columns=vga_get_crtc_sync_columns;
 	pc_video_start(machine);
 }
 
@@ -1406,7 +1368,7 @@ size_t pc_vga_memory_size(void)
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,800,0,640,525,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_STATIC(pc_video)
 
 	MCFG_PALETTE_LENGTH(0x100)
