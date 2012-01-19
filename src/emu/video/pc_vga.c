@@ -20,7 +20,6 @@
     - modernize
     - convert to an ISA device.
     - add emulated mc6845 hook-up
-    - fix resolution change
     - fix video update.
 	- rewrite video drawing functions (they are horrible)
 	- add emulated CGA
@@ -86,9 +85,9 @@ static struct
 /**/	UINT8 disp_enable_skew;
 /**/	UINT8 evra;
 		UINT16 vert_total;
+		UINT16 vert_disp_end;
 /**/	UINT16 vert_retrace_start;
 /**/	UINT8 vert_retrace_end;
-		UINT16 vert_disp_end;
 /**/	UINT16 vert_blank_start;
 		UINT16 line_compare;
 /**/	UINT16 cursor_addr;
@@ -323,6 +322,7 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 	}
 }
 
+/* TODO: I'm guessing that in 256 colors mode every pixel actually outputs two pixels. Is it right? */
 static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int pos, line, column, c, addr, curr_addr;
@@ -330,6 +330,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	UINT16 mask_comp;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int yi;
+	int xi,xi_h;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x0ff | (LINES & 0x300);
@@ -347,18 +348,16 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
 				addr %= vga.svga_intf.vram_size;
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x20)
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x20)
 				{
 					if(pos + 0x20 > vga.svga_intf.vram_size)
 						return;
-					bitmapline[c+0] = machine.pens[vga.memory[pos+0]];
-					bitmapline[c+1] = machine.pens[vga.memory[pos+1]];
-					bitmapline[c+2] = machine.pens[vga.memory[pos+2]];
-					bitmapline[c+3] = machine.pens[vga.memory[pos+3]];
-					bitmapline[c+4] = machine.pens[vga.memory[pos+0x10]];
-					bitmapline[c+5] = machine.pens[vga.memory[pos+0x11]];
-					bitmapline[c+6] = machine.pens[vga.memory[pos+0x12]];
-					bitmapline[c+7] = machine.pens[vga.memory[pos+0x13]];
+
+					for(xi=0;xi<0x10;xi++)
+					{
+						xi_h = ((xi & 6) >> 1) | ((xi & 8) << 1);
+						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
+					}
 				}
 			}
 		}
@@ -375,18 +374,16 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
 				addr %= vga.svga_intf.vram_size;
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x08)
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x08)
 				{
 					if(pos + 0x08 > vga.svga_intf.vram_size)
 						return;
-					bitmapline[c+0] = machine.pens[vga.memory[pos+0]];
-					bitmapline[c+1] = machine.pens[vga.memory[pos+1]];
-					bitmapline[c+2] = machine.pens[vga.memory[pos+2]];
-					bitmapline[c+3] = machine.pens[vga.memory[pos+3]];
-					bitmapline[c+4] = machine.pens[vga.memory[pos+4]];
-					bitmapline[c+5] = machine.pens[vga.memory[pos+5]];
-					bitmapline[c+6] = machine.pens[vga.memory[pos+6]];
-					bitmapline[c+7] = machine.pens[vga.memory[pos+7]];
+
+					for(xi=0;xi<0x10;xi++)
+					{
+						xi_h = (xi & 0xe) >> 1;
+						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
+					}
 				}
 			}
 		}
@@ -724,18 +721,12 @@ static void recompute_params(running_machine &machine)
 {
 	int vblank_period,hblank_period;
 	attoseconds_t refresh;
-	UINT8 hclock_m,hclock_d;
+	UINT8 hclock_m;
 	int pixel_clock;
 
 	hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
 
-	/* TODO: actually display is 640 x 400 in "VGA" mode */
-	if(!GRAPHIC_MODE)
-		hclock_d = CHAR_WIDTH;
-	else
-		hclock_d = vga.gc.data[5]&0x40 ? 4 : 8;
-
-	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * hclock_d)-1, 0, vga.crtc.vert_disp_end);
+	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * hclock_m)-1, 0, vga.crtc.vert_disp_end);
 
 	vblank_period = (vga.crtc.vert_total + 2);
 	hblank_period = ((vga.crtc.horz_total + 5) * hclock_m);
@@ -752,6 +743,10 @@ static void recompute_params(running_machine &machine)
 
 static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 {
+	/* Doom does this */
+//	if(vga.crtc.protect_enable && index <= 0x07)
+//		printf("write to protected address %02x\n",index);
+
 	switch(index)
 	{
 		case 0x00:
