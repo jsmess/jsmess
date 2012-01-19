@@ -389,6 +389,7 @@ DRVLIBS += \
 	$(MESSOBJ)/visual.a \
 	$(MESSOBJ)/votrax.a \
 	$(MESSOBJ)/vtech.a \
+	$(MESSOBJ)/wang.a \
 	$(MESSOBJ)/wavemate.a \
 	$(MESSOBJ)/xerox.a \
 	$(MESSOBJ)/zpa.a \
@@ -1715,6 +1716,10 @@ $(MESSOBJ)/vtech.a:				\
 	$(MESS_DRIVERS)/pc2000.o	\
 	$(MESS_DRIVERS)/prestige.o	\
 
+$(MESSOBJ)/wang.a:				\
+	$(MESS_DRIVERS)/wangpc.o	\
+	$(MESS_MACHINE)/wangpckb.o	\
+
 $(MESSOBJ)/wavemate.a:			\
 	$(MESS_DRIVERS)/bullet.o	\
 	$(MESS_DRIVERS)/jupiter.o	\
@@ -1823,7 +1828,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/unistar.o	\
-	$(MESS_DRIVERS)/wangpc.o	\
 	$(MESS_DRIVERS)/v6809.o		\
 	$(MESS_DRIVERS)/vector4.o	\
 	$(MESS_DRIVERS)/vii.o		\
