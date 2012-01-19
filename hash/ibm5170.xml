@@ -307,7 +307,7 @@
 		<description>Genius Scroll Mouse</description>
 		<year>2004</year>
 		<publisher>KYE Systems Corp.</publisher>
-		<info name="Alt Title" value="MouseMate Software Scroll Mouse for Windows XP/Me/98/2000/2003" />
+		<info name="alt_title" value="MouseMate Software Scroll Mouse for Windows XP/Me/98/2000/2003" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="scroll mouse.img" size="1474560" crc="5ed59ff2" sha1="da4405fda8f12616f0fe4ab71ca0aac92933b22e" offset="0" />
@@ -414,7 +414,7 @@
 		<description>GEM/3</description>
 		<year>1988</year>
 		<publisher>Digital Research Inc.</publisher>
-		<info name="Alt Title" value="GEM Application Environment Services Version 3.0" />
+		<info name="alt_title" value="GEM Application Environment Services Version 3.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="master.img" size="368640" crc="2ebdb5fe" sha1="e2190f07fb6d4f36ca3c9fc5524ac5ab7440855c" offset="0" status="baddump" />
