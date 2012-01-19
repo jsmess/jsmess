@@ -6,7 +6,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="assist.dsk" size="409600" crc="8f80fad3" offset="0"/>
 			</dataarea>
 		</part>
@@ -17,7 +17,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="92160">
 				<rom name="basic.dsk" size="92160" crc="8ee788e4" offset="0"/>
 			</dataarea>
 		</part>
@@ -28,7 +28,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="basis.dsk" size="204800" crc="23ef2326" offset="0"/>
 			</dataarea>
 		</part>
@@ -39,7 +39,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="bjelker.dsk" size="409600" crc="430c3224" offset="0"/>
 			</dataarea>
 		</part>
@@ -50,7 +50,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="brage.dsk" size="409600" crc="a15307a2" offset="0"/>
 			</dataarea>
 		</part>
@@ -61,7 +61,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="brok.dsk" size="204800" crc="fb5f0d5a" offset="0"/>
 			</dataarea>
 		</part>
@@ -72,12 +72,12 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="brum-iid.dsk" size="204800" crc="b62be27b" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="brum-iip.dsk" size="204800" crc="ac0a7384" offset="0"/>
 			</dataarea>
 		</part>
@@ -88,7 +88,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="cb-eks.dsk" size="409600" crc="c00defdc" offset="0"/>
 			</dataarea>
 		</part>
@@ -99,7 +99,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="conset.dsk" size="409600" crc="add05b6a" offset="0"/>
 			</dataarea>
 		</part>
@@ -110,7 +110,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="dataflor.dsk" size="409600" crc="35abe5ec" offset="0"/>
 			</dataarea>
 		</part>
@@ -121,7 +121,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="dbase.dsk" size="409600" crc="09b4fbcf" offset="0"/>
 			</dataarea>
 		</part>
@@ -132,7 +132,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="dgraf.dsk" size="409600" crc="f3c77843" offset="0"/>
 			</dataarea>
 		</part>
@@ -143,7 +143,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="368640">
 				<rom name="dos-gbib.dsk" size="368640" crc="fd2a2a42" offset="0"/>
 			</dataarea>
 		</part>
@@ -154,7 +154,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="368640">
 				<rom name="dos-ml.dsk" size="368640" crc="9084184a" offset="0"/>
 			</dataarea>
 		</part>
@@ -165,7 +165,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="drlogo.dsk" size="409600" crc="e0b77156" offset="0"/>
 			</dataarea>
 		</part>
@@ -176,7 +176,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="ds_gbib.dsk" size="409600" crc="96d14216" offset="0"/>
 			</dataarea>
 		</part>
@@ -187,7 +187,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="dyr.dsk" size="204800" crc="f35e370e" offset="0"/>
 			</dataarea>
 		</part>
@@ -198,7 +198,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="engelsk-heis.dsk" size="204800" crc="3a979612" offset="0"/>
 			</dataarea>
 		</part>
@@ -209,7 +209,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="engelsk-svoop.dsk" size="204800" crc="4a6762c3" offset="0"/>
 			</dataarea>
 		</part>
@@ -220,7 +220,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="eurogeo.dsk" size="204800" crc="40f4a631" offset="0"/>
 			</dataarea>
 		</part>
@@ -231,7 +231,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="europa.dsk" size="204800" crc="b110da59" offset="0"/>
 			</dataarea>
 		</part>
@@ -242,7 +242,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="farge.dsk" size="204800" crc="9d69062c" offset="0"/>
 			</dataarea>
 		</part>
@@ -253,7 +253,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="feilfinn.dsk" size="409600" crc="a9f099a7" offset="0"/>
 			</dataarea>
 		</part>
@@ -264,7 +264,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="femten.dsk" size="409600" crc="202d5972" offset="0"/>
 			</dataarea>
 		</part>
@@ -275,7 +275,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="fgraf.dsk" size="409600" crc="af4f6821" offset="0"/>
 			</dataarea>
 		</part>
@@ -286,7 +286,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="fls.dsk" size="409600" crc="4fc4c072" offset="0"/>
 			</dataarea>
 		</part>
@@ -297,7 +297,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="flytte.dsk" size="204800" crc="9f19c356" offset="0"/>
 			</dataarea>
 		</part>
@@ -308,7 +308,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="grammatikk.dsk" size="204800" crc="6a8cf440" offset="0"/>
 			</dataarea>
 		</part>
@@ -319,12 +319,12 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="heis-install_40.dsk" size="204800" crc="cbb65416" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="heis-install_80.dsk" size="204800" crc="f7b4a172" offset="0"/>
 			</dataarea>
 		</part>
@@ -335,7 +335,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="husk.dsk" size="204800" crc="b36acf06" offset="0"/>
 			</dataarea>
 		</part>
@@ -346,7 +346,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="invaders.dsk" size="204800" crc="10a9a21a" offset="0"/>
 			</dataarea>
 		</part>
@@ -357,7 +357,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="jeg.dsk" size="204800" crc="2ea3ebcd" offset="0"/>
 			</dataarea>
 		</part>
@@ -368,7 +368,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="kermit.dsk" size="409600" crc="44a30870" offset="0"/>
 			</dataarea>
 		</part>
@@ -379,7 +379,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="kom.dsk" size="204800" crc="6acffc16" offset="0"/>
 			</dataarea>
 		</part>
@@ -390,7 +390,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="kpm11.dsk" size="204800" crc="48980bb7" offset="0"/>
 			</dataarea>
 		</part>
@@ -401,7 +401,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="kpm115.dsk" size="204800" crc="9dc38eeb" offset="0"/>
 			</dataarea>
 		</part>
@@ -412,7 +412,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="kpm117.dsk" size="204800" crc="435e8947" offset="0"/>
 			</dataarea>
 		</part>
@@ -423,7 +423,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="kryssord.dsk" size="409600" crc="ac177b7b" offset="0"/>
 			</dataarea>
 		</part>
@@ -434,7 +434,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="kud1v21.dsk" size="409600" crc="fec1b3f7" offset="0"/>
 			</dataarea>
 		</part>
@@ -445,7 +445,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="kud2v21.dsk" size="409600" crc="0fceb4d0" offset="0"/>
 			</dataarea>
 		</part>
@@ -456,7 +456,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="kud3v21.dsk" size="409600" crc="f7adeb75" offset="0"/>
 			</dataarea>
 		</part>
@@ -467,7 +467,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="legge_sammen.dsk" size="204800" crc="1d74611b" offset="0"/>
 			</dataarea>
 		</part>
@@ -478,7 +478,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="magnimaster.dsk" size="204800" crc="cc087c39" offset="0"/>
 			</dataarea>
 		</part>
@@ -489,7 +489,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="matematikk1.dsk" size="204800" crc="289aee7f" offset="0"/>
 			</dataarea>
 		</part>
@@ -500,7 +500,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="matematikk2.dsk" size="204800" crc="047fc998" offset="0"/>
 			</dataarea>
 		</part>
@@ -511,7 +511,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="matematikk3.dsk" size="204800" crc="dd70c67c" offset="0"/>
 			</dataarea>
 		</part>
@@ -522,7 +522,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="matte_lom.dsk" size="204800" crc="a90fbf24" offset="0"/>
 			</dataarea>
 		</part>
@@ -533,7 +533,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="matte_rogdata.dsk" size="204800" crc="444585d1" offset="0"/>
 			</dataarea>
 		</part>
@@ -544,7 +544,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="mscopy.dsk" size="204800" crc="a176faad" offset="0"/>
 			</dataarea>
 		</part>
@@ -556,7 +556,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="368640">
 				<rom name="msdos.dsk" size="368640" crc="4475dfa0" offset="0"/>
 			</dataarea>
 		</part>
@@ -567,7 +567,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="muslyd.dsk" size="409600" crc="ba792214" offset="0"/>
 			</dataarea>
 		</part>
@@ -578,7 +578,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="nor-geo.dsk" size="409600" crc="f560d885" offset="0"/>
 			</dataarea>
 		</part>
@@ -589,7 +589,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="norsk-dagros.dsk" size="204800" crc="264582da" offset="0"/>
 			</dataarea>
 		</part>
@@ -600,7 +600,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="norsk-geo-heis.dsk" size="204800" crc="efcf3c34" offset="0"/>
 			</dataarea>
 		</part>
@@ -611,7 +611,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="norsk-trim_1.dsk" size="204800" crc="a9cf3faa" offset="0"/>
 			</dataarea>
 		</part>
@@ -622,7 +622,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="norsk_lom.dsk" size="204800" crc="b80039cf" offset="0"/>
 			</dataarea>
 		</part>
@@ -633,7 +633,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="norsk_rogdata.dsk" size="204800" crc="bf7cbf33" offset="0"/>
 			</dataarea>
 		</part>
@@ -644,7 +644,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="nsd-stat.dsk" size="409600" crc="70c32e53" offset="0"/>
 			</dataarea>
 		</part>
@@ -655,7 +655,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="ofag.dsk" size="204800" crc="93539e5f" offset="0"/>
 			</dataarea>
 		</part>
@@ -666,7 +666,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="oppgaver.dsk" size="204800" crc="1c8e635b" offset="0"/>
 			</dataarea>
 		</part>
@@ -677,7 +677,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="orac.dsk" size="204800" crc="c3e5bfdd" offset="0"/>
 			</dataarea>
 		</part>
@@ -688,7 +688,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="ord1.dsk" size="204800" crc="2c2f9f0d" offset="0"/>
 			</dataarea>
 		</part>
@@ -699,7 +699,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="ord2.dsk" size="204800" crc="dbb0e0d9" offset="0"/>
 			</dataarea>
 		</part>
@@ -710,7 +710,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="ordklass.dsk" size="409600" crc="3ee6065e" offset="0"/>
 			</dataarea>
 		</part>
@@ -721,7 +721,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="ov-tast.dsk" size="409600" crc="36d822c6" offset="0"/>
 			</dataarea>
 		</part>
@@ -732,7 +732,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="regnetrener.dsk" size="409600" crc="c7d0c2b4" offset="0"/>
 			</dataarea>
 		</part>
@@ -743,7 +743,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="rettulf.dsk" size="409600" crc="3122e868" offset="0"/>
 			</dataarea>
 		</part>
@@ -754,7 +754,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="rf.dsk" size="409600" crc="fccdb425" offset="0"/>
 			</dataarea>
 		</part>
@@ -765,7 +765,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="skjuler.dsk" size="409600" crc="05b632e0" offset="0"/>
 			</dataarea>
 		</part>
@@ -776,7 +776,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="spill1.dsk" size="204800" crc="cb2171cd" offset="0"/>
 			</dataarea>
 		</part>
@@ -787,7 +787,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="stor-brum.dsk" size="409600" crc="ebb6ced7" offset="0"/>
 			</dataarea>
 		</part>
@@ -798,7 +798,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="tartist.dsk" size="409600" crc="17f0b19e" offset="0"/>
 			</dataarea>
 		</part>
@@ -809,7 +809,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="tast.dsk" size="409600" crc="6dc2fad5" offset="0"/>
 			</dataarea>
 		</part>
@@ -820,7 +820,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="tegne.dsk" size="204800" crc="08d82a87" offset="0"/>
 			</dataarea>
 		</part>
@@ -831,7 +831,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="telle.dsk" size="204800" crc="f7d1031c" offset="0"/>
 			</dataarea>
 		</part>
@@ -842,7 +842,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="tikibas.dsk" size="409600" crc="1e4001e0" offset="0"/>
 			</dataarea>
 		</part>
@@ -853,12 +853,12 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="tiko208r-200k.dsk" size="204800" crc="81908dda" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="tiko208r-400k.dsk" size="409600" crc="625a9680" offset="0"/>
 			</dataarea>
 		</part>
@@ -869,7 +869,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="tikos20.dsk" size="409600" crc="44ac5d24" offset="0"/>
 			</dataarea>
 		</part>
@@ -880,7 +880,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="timeplan.dsk" size="409600" crc="6338f616" offset="0"/>
 			</dataarea>
 		</part>
@@ -891,7 +891,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="tkjer401.dsk" size="409600" crc="9049393a" offset="0"/>
 			</dataarea>
 		</part>
@@ -902,7 +902,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="tp310a.dsk" size="409600" crc="da023e3e" offset="0"/>
 			</dataarea>
 		</part>
@@ -913,7 +913,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="tpascal.dsk" size="409600" crc="3538995d" offset="0"/>
 			</dataarea>
 		</part>
@@ -924,7 +924,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="409600">
 				<rom name="trespill.dsk" size="409600" crc="133ca04c" offset="0"/>
 			</dataarea>
 		</part>
@@ -935,7 +935,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="uni2.dsk" size="204800" crc="3e69f38b" offset="0"/>
 			</dataarea>
 		</part>
@@ -946,7 +946,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="verdensgeografi.dsk" size="204800" crc="1f91b849" offset="0"/>
 			</dataarea>
 		</part>
@@ -957,7 +957,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="819200">
 				<rom name="wcsys.dsk" size="819200" crc="d536cdad" offset="0"/>
 			</dataarea>
 		</part>
@@ -968,7 +968,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="">
+			<dataarea name="flop" size="204800">
 				<rom name="wordstar.dsk" size="204800" crc="e3ff829d" offset="0"/>
 			</dataarea>
 		</part>
