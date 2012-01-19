@@ -39,10 +39,22 @@ static TIMER_CALLBACK(ti85_timer_callback)
 	}
 }
 
+inline void ti8x_update_bank(address_space *space, UINT8 bank, UINT8 *base, UINT8 page, bool is_ram)
+{
+	static const char *const tag[] = {"bank1", "bank2", "bank3", "bank4"};
+
+	memory_set_bankptr(space->machine(), tag[bank&3], base + (0x4000 * page));
+
+	if (is_ram)
+		space->install_write_bank(bank * 0x4000, bank * 0x4000 + 0x3fff, tag[bank&3]);
+	else
+		space->nop_write(bank * 0x4000, bank * 0x4000 + 0x3fff);
+}
+
 static void update_ti85_memory (running_machine &machine)
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
-	memory_set_bankptr(machine, "bank2",machine.region("maincpu")->base() + 0x010000 + 0x004000*state->m_ti8x_memory_page_1);
+	memory_set_bankptr(machine, "bank2", state->m_bios + 0x004000*state->m_ti8x_memory_page_1);
 }
 
 static void update_ti83p_memory (running_machine &machine)
@@ -52,58 +64,20 @@ static void update_ti83p_memory (running_machine &machine)
 
 	if (state->m_ti8x_memory_page_1 & 0x40)
 	{
-		if (state->m_ti83p_port4 & 1)
-		{
-
-			memory_set_bankptr(machine, "bank3", state->m_ti8x_ram + 0x004000*(state->m_ti8x_memory_page_1&0x01));
-			space->install_write_bank(0x8000, 0xbfff, "bank3");
-		}
-		else
-		{
-			memory_set_bankptr(machine, "bank2", state->m_ti8x_ram + 0x004000*(state->m_ti8x_memory_page_1&0x01));
-			space->install_write_bank(0x4000, 0x7fff, "bank2");
-		}
+		ti8x_update_bank(space, (state->m_ti83p_port4 & 1) ? 2 : 1, state->m_ti8x_ram, state->m_ti8x_memory_page_1 & 0x01, true);
 	}
 	else
 	{
-		if (state->m_ti83p_port4 & 1)
-		{
-			memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->m_ti8x_memory_page_1&0x1f));
-			space->unmap_write(0x8000, 0xbfff);
-		}
-		else
-		{
-			memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->m_ti8x_memory_page_1&0x1f));
-			space->unmap_write(0x4000, 0x7fff);
-		}
+		ti8x_update_bank(space, (state->m_ti83p_port4 & 1) ? 2 : 1, state->m_bios, state->m_ti8x_memory_page_1 & 0x1f, false);
 	}
 
 	if (state->m_ti8x_memory_page_2 & 0x40)
 	{
-		if (state->m_ti83p_port4 & 1)
-		{
-			memory_set_bankptr(machine, "bank4", state->m_ti8x_ram + 0x004000*(state->m_ti8x_memory_page_2&0x01));
-			space->install_write_bank(0xc000, 0xffff, "bank4");
-		}
-		else
-		{
-			memory_set_bankptr(machine, "bank3", state->m_ti8x_ram + 0x004000*(state->m_ti8x_memory_page_2&0x01));
-			space->install_write_bank(0x8000, 0xbfff, "bank3");
-		}
-
+		ti8x_update_bank(space, (state->m_ti83p_port4 & 1) ? 3 : 2, state->m_ti8x_ram, state->m_ti8x_memory_page_2 & 0x01, true);
 	}
 	else
 	{
-		if (state->m_ti83p_port4 & 1)
-		{
-			memory_set_bankptr(machine, "bank4", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->m_ti8x_memory_page_2&0x1f));
-			space->unmap_write(0xc000, 0xffff);
-		}
-		else
-		{
-			memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->m_ti8x_memory_page_2&0x1f));
-			space->unmap_write(0x8000, 0xbfff);
-		}
+		ti8x_update_bank(space, (state->m_ti83p_port4 & 1) ? 3 : 2, state->m_bios, state->m_ti8x_memory_page_2 & 0x1f, false);
 	}
 }
 
@@ -114,24 +88,20 @@ static void update_ti86_memory (running_machine &machine)
 
 	if (state->m_ti8x_memory_page_1 & 0x40)
 	{
-		memory_set_bankptr(machine, "bank2", state->m_ti8x_ram + 0x004000*(state->m_ti8x_memory_page_1&0x07));
-		space->install_write_bank(0x4000, 0x7fff, "bank2");
+		ti8x_update_bank(space, 1, state->m_ti8x_ram, state->m_ti8x_memory_page_1 & 0x07, true);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->m_ti8x_memory_page_1&0x0f));
-		space->unmap_write(0x4000, 0x7fff);
+		ti8x_update_bank(space, 1, state->m_bios, state->m_ti8x_memory_page_1 & 0x0f, false);
 	}
 
 	if (state->m_ti8x_memory_page_2 & 0x40)
 	{
-		memory_set_bankptr(machine, "bank3", state->m_ti8x_ram + 0x004000*(state->m_ti8x_memory_page_2&0x07));
-		space->install_write_bank(0x8000, 0xbfff, "bank3");
+		ti8x_update_bank(space, 2, state->m_ti8x_ram, state->m_ti8x_memory_page_2 & 0x07, true);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank3", machine.region("maincpu")->base() + 0x010000 + 0x004000*(state->m_ti8x_memory_page_2&0x0f));
-		space->unmap_write(0x8000, 0xbfff);
+		ti8x_update_bank(space, 2, state->m_bios, state->m_ti8x_memory_page_2 & 0x0f, false);
 	}
 
 }
@@ -144,7 +114,7 @@ MACHINE_START( ti81 )
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine.region("maincpu")->base();
+	state->m_bios = machine.region("bios")->base();
 
 	state->m_timer_interrupt_mask = 0;
 	state->m_timer_interrupt_status = 0;
@@ -166,8 +136,8 @@ MACHINE_START( ti81 )
 
 	space->unmap_write(0x0000, 0x3fff);
 	space->unmap_write(0x4000, 0x7fff);
-	memory_set_bankptr(machine, "bank1", mem + 0x010000);
-	memory_set_bankptr(machine, "bank2", mem + 0x014000);
+	memory_set_bankptr(machine, "bank1", state->m_bios);
+	memory_set_bankptr(machine, "bank2", state->m_bios + 0x04000);
 }
 
 MACHINE_RESET( ti85 )
@@ -183,7 +153,7 @@ MACHINE_START( ti83p )
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine.region("maincpu")->base();
+	state->m_bios = machine.region("bios")->base();
 
 	state->m_timer_interrupt_mask = 0;
 	state->m_timer_interrupt_status = 0;
@@ -208,9 +178,9 @@ MACHINE_START( ti83p )
 	space->unmap_write(0x4000, 0x7fff);
 	space->unmap_write(0x8000, 0xbfff);
 
-	memory_set_bankptr(machine, "bank1", mem + 0x010000);
-	memory_set_bankptr(machine, "bank2", mem + 0x010000);
-	memory_set_bankptr(machine, "bank3", mem + 0x010000);
+	memory_set_bankptr(machine, "bank1", state->m_bios);
+	memory_set_bankptr(machine, "bank2", state->m_bios);
+	memory_set_bankptr(machine, "bank3", state->m_bios);
 	memory_set_bankptr(machine, "bank4", state->m_ti8x_ram);
 
 	machine.scheduler().timer_pulse(attotime::from_hz(200), FUNC(ti85_timer_callback));
@@ -222,7 +192,7 @@ MACHINE_START( ti86 )
 {
 	ti85_state *state = machine.driver_data<ti85_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine.region("maincpu")->base();
+	state->m_bios = machine.region("bios")->base();
 
 	state->m_timer_interrupt_mask = 0;
 	state->m_timer_interrupt_status = 0;
@@ -245,8 +215,8 @@ MACHINE_START( ti86 )
 
 	space->unmap_write(0x0000, 0x3fff);
 
-	memory_set_bankptr(machine, "bank1", mem + 0x010000);
-	memory_set_bankptr(machine, "bank2", mem + 0x014000);
+	memory_set_bankptr(machine, "bank1", state->m_bios);
+	memory_set_bankptr(machine, "bank2", state->m_bios + 0x04000);
 
 	memory_set_bankptr(machine, "bank4", state->m_ti8x_ram);
 
