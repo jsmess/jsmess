@@ -768,7 +768,7 @@
 		<description>Lisa Toolkit 3.0</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="date" value="09-01-1984"/>
+		<info name="release" value="19840109"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="419284">
 				<rom name="toolkitd1.image" size="419284" crc="d6c63821" sha1="17f517d84fae373bc7bb9457b8984488875d8fa0" offset="000000" />

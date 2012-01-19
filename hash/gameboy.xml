@@ -2584,7 +2584,7 @@
 		<year>1992</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="DMG-CEJ"/>
-		<info name="release" value="1992-08-07 (reprinted on 1997-09-26, ハッピープライス, DMGCEJ1)"/>
+		<info name="release" value="19920807 (reprinted on 19970926, ハッピープライス, DMGCEJ1)"/>
 		<info name="alt_title" value="シーザース パレス"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
@@ -2677,7 +2677,7 @@
 		<year>1990</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="DMG-CGA"/>
-		<info name="release" value="1990-06-15 (reprinted on 1997-09-26, ハッピープライス, DMGCGA1)"/>
+		<info name="release" value="19900615 (reprinted on 19970926, ハッピープライス, DMGCGA1)"/>
 		<info name="alt_title" value="カード・ゲーム"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
@@ -7577,7 +7577,8 @@
 		<year>1995</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-AJSJ-JPN"/>
-		<info name="release" value="1995-1124 Alt. Title: Jリーグ ビッグウェイブサッカー"/>
+		<info name="release" value="19951124"/>
+		<info name="alt_title" value="Jリーグ ビッグウェイブサッカー"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="j.league big wave soccer (japan).bin" size="262144" crc="cdd02f22" sha1="00369c42d2c4be0506901b64f7d5424538574ce0" offset="000000" />
@@ -7841,7 +7842,8 @@
 		<year>1993</year>
 		<publisher>Misawa</publisher>
 		<info name="serial" value="DMG-JCA"/>
-		<info name="release" value="1993-0723 Alt. Title: ジミーコナーズのプロテニスツアー"/>
+		<info name="release" value="19930723"/>
+		<info name="alt_title" value="ジミーコナーズのプロテニスツアー"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="jimmy connors no pro tennis tour (japan).bin" size="65536" crc="18671602" sha1="43ae08919dccb5129e17a3fdac553901fb6e3918" offset="000000" />
@@ -12127,7 +12129,8 @@
 		<year>1991</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="DMG-NGJ"/>
-		<info name="release" value="1991-1213 Alt. Title: 忍者龍剣伝GB 摩天楼決戦"/>
+		<info name="release" value="19911213"/> 
+        <info name="alt_title" value="忍者龍剣伝GB 摩天楼決戦"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="ninja ryuukenden - matenrou kessen (japan).bin" size="131072" crc="d2be3397" sha1="7200ac959877b4e4e423997d699a0e5c144f5b0b" offset="000000" />
@@ -12246,7 +12249,7 @@
 		<year>1990</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="DMG-NYJ"/>
-		<info name="release" value="1990-10-10 (reprinted on 19970725, 名作シリーズ)"/>
+		<info name="release" value="19901010 (reprinted on 19970725, 名作シリーズ)"/>
 		<info name="alt_title" value="信長の野望 ゲームボーイ版"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
@@ -12695,7 +12698,7 @@
 		<year>1993</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="DMG-K3J"/>
-		<info name="release" value="1993-06-18 (reprinted on 1997-12-26, ハッピープライス, DMGK3J1)"/>
+		<info name="release" value="19930618 (reprinted on 19971226, ハッピープライス, DMGK3J1)"/>
 		<info name="alt_title" value="パチスロキッズ"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
@@ -12709,7 +12712,7 @@
 		<year>1994</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="DMG-OHJ"/>
-		<info name="release" value="1994-06-10 (reprinted on 1997-12-26, ハッピープライス, DMGOHJ1)"/>
+		<info name="release" value="19940610 (reprinted on 19971226, ハッピープライス, DMGOHJ1)"/>
 		<info name="alt_title" value="パチスロキッズ2"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
@@ -13440,7 +13443,8 @@
 		<year>1998</year>
 		<publisher>Bottom Up</publisher>
 		<info name="serial" value="DMG-ABFJ-JPN"/>
-		<info name="release" value="1998-0424 Alt. Title: ポケットバスフィッシング"/>
+		<info name="release" value="19980424"/>
+		<info name="alt_title" value="ポケットバスフィッシング"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="pocket bass fishing (japan).bin" size="131072" crc="2c88f996" sha1="c59402eaf86fb8d52ddf81e3054ab78a06a07eb3" offset="000000" />
@@ -15610,7 +15614,7 @@
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="DMG-ISJ"/>
-		<info name="release" value="1992-09-30 (reprinted on 19970725, 名作シリーズ)"/>
+		<info name="release" value="19920930 (reprinted on 19970725, 名作シリーズ)"/>
 		<info name="alt_title" value="三國志 ゲームボーイ版"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
@@ -16090,7 +16094,8 @@
 		<year>1994</year>
 		<publisher>Visit</publisher>
 		<info name="serial" value="DMG-VKJ"/>
-		<info name="release" value="1994-06-10 (reprinted on 1997-0808, 廉価版) Alt. Title: ザ・心理ゲーム"/>
+		<info name="release" value="19940610 (reprinted on 19970808, 廉価版)"/>
+		<info name="alt_title" value="ザ・心理ゲーム"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="shinri game, the (japan).bin" size="262144" crc="fb2fe362" sha1="f47114a20db53b8b789790ddcff1cd3105b35482" offset="000000" />
@@ -17443,7 +17448,7 @@
 		<year>1995</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="DMG-ASBJ-JPN"/>
-		<info name="release" value="1995-03-17 (reprinted on 1997-10-10, 廉価版, DMGASBJ1)"/>
+		<info name="release" value="19950317 (reprinted on 19971010, 廉価版, DMGASBJ1)"/>
 		<info name="alt_title" value="スーパーボンブリス"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
@@ -20017,7 +20022,7 @@
 		<year>1991</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="DMG-WIJ"/>
-		<info name="release" value="1991-10-01 (reprinted in 1999-02-19, 復刻版, DMGWIJ1)"/>
+		<info name="release" value="19911001 (reprinted in 19990219, 復刻版, DMGWIJ1)"/>
 		<info name="alt_title" value="ウィザードリィ・外伝I 女王の受難"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
@@ -20031,7 +20036,7 @@
 		<year>1992</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="DMG-W5J"/>
-		<info name="release" value="1992-12-26 (reprinted in 1999-02-19, 復刻版, DMGW5J1)"/>
+		<info name="release" value="19921226 (reprinted in 19990219, 復刻版, DMGW5J1)"/>
 		<info name="alt_title" value="ウィザードリィ・外伝II 古代皇帝の呪い"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="262144">
@@ -20045,7 +20050,7 @@
 		<year>1993</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="DMG-W6J"/>
-		<info name="release" value="1993-09-25 (reprinted in 1999-02-19, 復刻版, DMGW6J1)"/>
+		<info name="release" value="19930925 (reprinted in 19990219, 復刻版, DMGW6J1)"/>
 		<info name="alt_title" value="ウィザードリィ・外伝III 闇の聖典"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
@@ -20173,7 +20178,7 @@
 		<year>1994</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="DMG-YKA"/>
-		<info name="release" value="1994-06-17 (reprinted on 1997-09-26, ハッピープライス, DMGYKA1, SGB enh?)"/>
+		<info name="release" value="19940617 (reprinted on 19970926, ハッピープライス, DMGYKA1, SGB enh?)"/>
 		<info name="alt_title" value="ワールドカップストライカー"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">
