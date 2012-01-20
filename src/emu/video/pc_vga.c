@@ -255,6 +255,8 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 						pen = vga.pens[attr & 0x0f];
 					else
 						pen = vga.pens[attr >> 4];
+
+
 					bitmapline[column*width+w] = pen;
 				}
 				if (w<width)
@@ -264,6 +266,8 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 						pen = vga.pens[attr & 0x0f];
 					else
 						pen = vga.pens[attr >> 4];
+					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
+						continue;
 					bitmapline[column*width+w] = pen;
 				}
 			}
@@ -274,6 +278,8 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 					 (h<=CRTC_CURSOR_BOTTOM)&&(h<height)&&(line+h<TEXT_LINES);
 					 h++)
 				{
+					if(!machine.primary_screen->visible_area().contains(column*width, line+h))
+						continue;
 					bitmap.plot_box(column*width, line+h, width, 1, vga.pens[attr&0xf]);
 				}
 			}
@@ -293,9 +299,6 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 	{
 		for(yi=0;yi<height;yi++)
 		{
-			if(!machine.primary_screen->visible_area().contains(0, line + yi))
-				return;
-
 			bitmapline = &bitmap.pix32(line + yi);
 
 			for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+4)&0x3ffff)
@@ -310,6 +313,8 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 				for (i = 7; i >= 0; i--)
 				{
 					pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
+					if(!machine.primary_screen->visible_area().contains(c+i, line + yi))
+						continue;
 					bitmapline[c+i] = pen;
 
 					data[0]>>=1;
@@ -356,6 +361,8 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					for(xi=0;xi<0x10;xi++)
 					{
 						xi_h = ((xi & 6) >> 1) | ((xi & 8) << 1);
+						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+							continue;
 						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
 					}
 				}
@@ -382,6 +389,8 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					for(xi=0;xi<0x10;xi++)
 					{
 						xi_h = (xi & 0xe) >> 1;
+						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+							continue;
 						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
 					}
 				}
