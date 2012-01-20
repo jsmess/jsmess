@@ -36,7 +36,13 @@ public:
 		  m_pic(*this, I8259A_TAG),
 		  m_ppi(*this, I8255A_TAG),
 		  m_pit(*this, I8253_TAG),
-		  m_fdc(*this, UPD765_TAG)
+		  m_fdc(*this, UPD765_TAG),
+		  m_ram(*this, RAM_TAG),
+		  m_floppy0(*this, FLOPPY_0),
+		  m_floppy1(*this, FLOPPY_1),
+		  m_timer2_irq(1),
+		  m_ds1(1),
+		  m_ds2(1)
 	{ }
 	
 	required_device<cpu_device> m_maincpu;
@@ -45,6 +51,9 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_pit;
 	required_device<device_t> m_fdc;
+	required_device<ram_device> m_ram;
+	required_device<device_t> m_floppy0;
+	required_device<device_t> m_floppy1;
 
 	virtual void machine_start();
 	
@@ -53,6 +62,47 @@ public:
 		bitmap.fill(RGB_BLACK);
 		return 0;
 	}
+	
+	DECLARE_WRITE8_MEMBER( fdc_ctrl_w );
+	DECLARE_READ8_MEMBER( deselect_drive1_r );
+	DECLARE_WRITE8_MEMBER( deselect_drive1_w );
+	DECLARE_READ8_MEMBER( select_drive1_r );
+	DECLARE_WRITE8_MEMBER( select_drive1_w );
+	DECLARE_READ8_MEMBER( deselect_drive2_r );
+	DECLARE_WRITE8_MEMBER( deselect_drive2_w );
+	DECLARE_READ8_MEMBER( select_drive2_r );
+	DECLARE_WRITE8_MEMBER( select_drive2_w );
+	DECLARE_READ8_MEMBER( motor1_off_r );
+	DECLARE_WRITE8_MEMBER( motor1_off_w );
+	DECLARE_READ8_MEMBER( motor1_on_r );
+	DECLARE_WRITE8_MEMBER( motor1_on_w );
+	DECLARE_READ8_MEMBER( motor2_off_r );
+	DECLARE_WRITE8_MEMBER( motor2_off_w );
+	DECLARE_READ8_MEMBER( motor2_on_r );
+	DECLARE_WRITE8_MEMBER( motor2_on_w );
+	DECLARE_READ8_MEMBER( fdc_reset_r );
+	DECLARE_WRITE8_MEMBER( fdc_reset_w );
+	DECLARE_READ8_MEMBER( fdc_tc_r );
+	DECLARE_WRITE8_MEMBER( fdc_tc_w );
+	DECLARE_WRITE8_MEMBER( dma_page_w );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( timer0_irq_clr_w );
+	DECLARE_READ8_MEMBER( timer2_irq_clr_r );
+	DECLARE_READ8_MEMBER( option_id_r );
+	
+	DECLARE_READ8_MEMBER( ppi_pa_r );
+	DECLARE_READ8_MEMBER( ppi_pb_r );
+	DECLARE_READ8_MEMBER( ppi_pc_r );
+	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_WRITE_LINE_MEMBER( pit0_w );
+	DECLARE_WRITE_LINE_MEMBER( pit2_w );
+	
+	UINT8 m_dma_page[3];
+	
+	int m_timer2_irq;
+	
+	int m_ds1;
+	int m_ds2;
 };
 
 
