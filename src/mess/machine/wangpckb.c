@@ -7,6 +7,7 @@
 //**************************************************************************
 
 #define I8051_TAG		"i8051"
+#define SN76489AN_TAG	"sn76489an"
 
 
 
@@ -53,6 +54,11 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_FRAGMENT( wangpc_keyboard )
 	MCFG_CPU_ADD(I8051_TAG, I8051, 4000000) // ???
 	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, 2000000) // ???
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
