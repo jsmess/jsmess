@@ -9,6 +9,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/8237dma.h"
 #include "machine/i8255.h"
+#include "machine/im6402.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -37,6 +38,7 @@ public:
 		  m_pic(*this, I8259A_TAG),
 		  m_ppi(*this, I8255A_TAG),
 		  m_pit(*this, I8253_TAG),
+		  m_uart(*this, IM6402_TAG),
 		  m_fdc(*this, UPD765_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
@@ -51,6 +53,7 @@ public:
 	required_device<device_t> m_pic;
 	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_pit;
+	required_device<im6402_device> m_uart;
 	required_device<device_t> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
