@@ -539,6 +539,28 @@ static WANGPC_KEYBOARD_INTERFACE( kb_intf )
 };
 
 
+//-------------------------------------------------
+//  WANGPC_BUS_INTERFACE( kb_intf )
+//-------------------------------------------------
+
+static WANGPC_BUS_INTERFACE( bus_intf )
+{
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir2_w),
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir3_w),
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir4_w),
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir5_w),
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir6_w),
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir7_w),
+	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq1_w),
+	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq2_w),
+	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq3_w),
+	DEVCB_NULL
+};
+
+static SLOT_INTERFACE_START( wangpc_cards )
+SLOT_INTERFACE_END
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -565,7 +587,7 @@ void wangpc_state::machine_start()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( wangpc, wangpc_state )
-	MCFG_CPU_ADD(I8086_TAG, I8086, 4000000)
+	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)
 
@@ -586,6 +608,14 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 	MCFG_WANGPC_KEYBOARD_ADD(kb_intf)
+	
+	// bus
+	MCFG_WANGPC_BUS_ADD(bus_intf)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, NULL, NULL)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, NULL, NULL)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot3", 3, wangpc_cards, NULL, NULL)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot4", 4, wangpc_cards, NULL, NULL)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

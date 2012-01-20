@@ -1718,6 +1718,7 @@ $(MESSOBJ)/vtech.a:				\
 
 $(MESSOBJ)/wang.a:				\
 	$(MESS_DRIVERS)/wangpc.o	\
+	$(MESS_MACHINE)/wangpcbus.o	\
 	$(MESS_MACHINE)/wangpckb.o	\
 
 $(MESSOBJ)/wavemate.a:			\
