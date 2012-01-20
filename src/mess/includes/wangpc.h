@@ -13,6 +13,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
+#include "machine/wangpcbus.h"
 #include "machine/wangpckb.h"
 
 #define I8086_TAG		"i8086"
