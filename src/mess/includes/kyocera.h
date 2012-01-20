@@ -12,6 +12,7 @@
 #include "machine/ctronics.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
+#include "machine/im6402.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "machine/upd1990a.h"
@@ -53,6 +54,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, I8085_TAG),
 		  m_rtc(*this, UPD1990A_TAG),
+		  m_uart(*this, IM6402_TAG),
 		  m_lcdc0(*this, HD44102_0_TAG),
 		  m_lcdc1(*this, HD44102_1_TAG),
 		  m_lcdc2(*this, HD44102_2_TAG),
@@ -71,6 +73,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
+	optional_device<im6402_device> m_uart;
 	required_device<hd44102_device> m_lcdc0;
 	required_device<hd44102_device> m_lcdc1;
 	required_device<hd44102_device> m_lcdc2;

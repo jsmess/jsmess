@@ -493,6 +493,22 @@ static const struct pit8253_config pit_intf =
 
 
 //-------------------------------------------------
+//  IM6402_INTERFACE( uart_intf )
+//-------------------------------------------------
+
+static IM6402_INTERFACE( uart_intf )
+{
+	0,
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
@@ -603,7 +619,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
-	// IM6402 for keyboard
+	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 	// SCN2661 for RS-232
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)

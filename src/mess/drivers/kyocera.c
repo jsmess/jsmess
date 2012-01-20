@@ -227,13 +227,14 @@ WRITE8_MEMBER( kc85_state::uart_ctrl_w )
         7
 
     */
-/*
+
     m_uart->sbs_w(BIT(data, 0));
     m_uart->epe_w(BIT(data, 1));
     m_uart->pi_w(BIT(data, 2));
     m_uart->cls1_w(BIT(data, 3));
     m_uart->cls2_w(BIT(data, 4));
-*/
+	
+	m_uart->crl_w(1);
 }
 
 READ8_MEMBER( kc85_state::uart_status_r )
@@ -255,20 +256,19 @@ READ8_MEMBER( kc85_state::uart_status_r )
 
 	UINT8 data = 0x40;
 
-	// carrier detect
-	//data |= m_uart->cd_r();
+	// TODO carrier detect
 
 	// overrun error
-	//data |= m_uart->oe_r() << 1;
+	data |= m_uart->oe_r() << 1;
 
 	// framing error
-	//data |= m_uart->fe_r() << 2;
+	data |= m_uart->fe_r() << 2;
 
 	// parity error
-	//data |= m_uart->pe_r() << 3;
+	data |= m_uart->pe_r() << 3;
 
 	// transmit buffer register empty
-	//data |= m_uart->tbre_r() << 4;
+	data |= m_uart->tbre_r() << 4;
 
 	// rp TODO
 	data |= 0x20;
@@ -298,20 +298,19 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 
 	UINT8 data = 0x40;
 
-	// data carrier detect / ring detect
-	//data |= m_uart->cd_r();
+	// TODO data carrier detect / ring detect
 
 	// overrun error
-	//data |= m_uart->oe_r() << 1;
+	data |= m_uart->oe_r() << 1;
 
 	// framing error
-	//data |= m_uart->fe_r() << 2;
+	data |= m_uart->fe_r() << 2;
 
 	// parity error
-	//data |= m_uart->pe_r() << 3;
+	data |= m_uart->pe_r() << 3;
 
 	// transmit buffer register empty
-	//data |= m_uart->tbre_r() << 4;
+	data |= m_uart->tbre_r() << 4;
 
 	// rp TODO
 	data |= 0x20;
@@ -585,7 +584,7 @@ static ADDRESS_MAP_START( kc85_io, AS_IO, 8, kc85_state )
 //  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
 //  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, data_r, data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_device, read, write)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READWRITE(uart_status_r, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READWRITE(keyboard_r, ctrl_w)
 	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
@@ -606,7 +605,7 @@ static ADDRESS_MAP_START( pc8201_io, AS_IO, 8, pc8201_state )
 	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(scp_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(bank_r, bank_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, data_r, data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_device, read, write)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READ(uart_status_r) AM_WRITE_BASE(kc85_state, uart_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ_BASE(kc85_state, keyboard_r)
 	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE_BASE(kc85_state, lcd_r, lcd_w)
@@ -989,6 +988,9 @@ WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
 	{
 		speaker_level_w(m_speaker, state);
 	}
+	
+	m_uart->trc_w(state);
+	m_uart->rrc_w(state);
 }
 
 static I8155_INTERFACE( kc85_8155_intf )
@@ -1091,6 +1093,19 @@ static I8155_INTERFACE( tandy200_8155_intf )
 	DEVCB_DRIVER_MEMBER(tandy200_state, i8155_pc_r),		/* port C read */
 	DEVCB_NULL,												/* port C write */
 	DEVCB_DRIVER_LINE_MEMBER(tandy200_state, i8155_to_w)	/* timer output */
+};
+
+/* IM6402 Interface */
+
+static IM6402_INTERFACE( uart_intf )
+{
+	0,
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* I8251 Interface */
@@ -1299,6 +1314,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
+	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 
@@ -1335,6 +1351,7 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
+	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 
@@ -1377,6 +1394,7 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
+	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
