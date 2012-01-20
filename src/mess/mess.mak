@@ -1900,7 +1900,8 @@ $(MESS_DRIVERS)/beta.o:		$(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:	$(MESS_LAYOUT)/bob85.lh
 $(MAME_DRIVERS)/cdi.o:		$(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/chessmst.o:	$(MESS_LAYOUT)/chessmst.lh
-$(MESS_DRIVERS)/chesstrv.o:	$(MESS_LAYOUT)/chesstrv.lh
+$(MESS_DRIVERS)/chesstrv.o:	$(MESS_LAYOUT)/chesstrv.lh \
+							$(MESS_LAYOUT)/borisdpl.lh
 $(MESS_DRIVERS)/cvicny.o:	$(MESS_LAYOUT)/cvicny.lh
 $(MESS_DRIVERS)/coco.o:		$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/coco3.o:	$(MESS_LAYOUT)/coco3.lh
