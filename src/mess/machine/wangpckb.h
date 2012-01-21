@@ -58,7 +58,13 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
-
+	
+	// not really public
+	DECLARE_READ8_MEMBER( kb_p1_r );
+	DECLARE_WRITE8_MEMBER( kb_p1_w );
+	DECLARE_WRITE8_MEMBER( kb_p2_w );
+	DECLARE_WRITE8_MEMBER( kb_p3_w );
+	
 protected:
     // device-level overrides
     virtual void device_start();
