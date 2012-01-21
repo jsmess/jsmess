@@ -28,6 +28,7 @@
 #include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
 #include "machine/isa_sblaster.h"
+#include "machine/isa_mpu401.h"
 #include "machine/3c503.h"
 #include "machine/ne1000.h"
 
@@ -117,6 +118,7 @@ static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
 	SLOT_INTERFACE("sblaster1_0", ISA8_SOUND_BLASTER_1_0)
 	SLOT_INTERFACE("sblaster1_5", ISA8_SOUND_BLASTER_1_5)
+	SLOT_INTERFACE("mpu401", ISA8_MPU401)
 	SLOT_INTERFACE("ne1000", NE1000)
 	SLOT_INTERFACE("3c503", EL2_3C503)
 SLOT_INTERFACE_END
