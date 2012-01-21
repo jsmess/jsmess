@@ -13,26 +13,7 @@
 
 static void nes_vh_reset( running_machine &machine )
 {
-	nes_state *state = machine.driver_data<nes_state>();
 	ppu2c0x_set_vidaccess_callback(machine.device("ppu"), nes_ppu_vidaccess);
-
-	if (state->m_four_screen_vram)
-		set_nt_mirroring(machine, PPU_MIRROR_4SCREEN);
-	else
-	{
-		switch (state->m_hard_mirroring)
-		{
-			case PPU_MIRROR_HORZ:
-			case PPU_MIRROR_VERT:
-			case PPU_MIRROR_HIGH:
-			case PPU_MIRROR_LOW:
-				set_nt_mirroring(machine, state->m_hard_mirroring);
-				break;
-			default:
-				set_nt_mirroring(machine, PPU_MIRROR_NONE);
-				break;
-		}
-	}
 }
 
 VIDEO_START( nes )
