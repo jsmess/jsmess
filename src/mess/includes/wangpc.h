@@ -92,6 +92,11 @@ public:
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( timer0_irq_clr_w );
 	DECLARE_READ8_MEMBER( timer2_irq_clr_r );
+	DECLARE_WRITE8_MEMBER( nmi_mask_w );
+	DECLARE_READ8_MEMBER( led_on_r );
+	DECLARE_WRITE8_MEMBER( fpu_mask_w );
+	DECLARE_READ8_MEMBER( led_off_r );
+	DECLARE_WRITE8_MEMBER( parity_nmi_clr_w );
 	DECLARE_READ8_MEMBER( option_id_r );
 	
 	DECLARE_READ8_MEMBER( ppi_pa_r );

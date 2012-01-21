@@ -1,6 +1,16 @@
 #include "includes/wangpc.h"
 
 
+//**************************************************************************
+//  MACROS/CONSTANTS
+//**************************************************************************
+
+enum
+{
+	LED_DIAGNOSTIC = 0
+};
+
+
 
 //**************************************************************************
 //  DIRECT MEMORY ACCESS
@@ -233,6 +243,57 @@ READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
 
 
 //-------------------------------------------------
+//  nmi_mask_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wangpc_state::nmi_mask_w )
+{
+}
+
+
+//-------------------------------------------------
+//  led_on_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wangpc_state::led_on_r )
+{
+	output_set_led_value(LED_DIAGNOSTIC, 1);
+	
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  fpu_mask_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wangpc_state::fpu_mask_w )
+{
+}
+
+
+//-------------------------------------------------
+//  led_off_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wangpc_state::led_off_r )
+{
+	output_set_led_value(LED_DIAGNOSTIC, 0);
+	
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  parity_nmi_clr_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wangpc_state::parity_nmi_clr_w )
+{
+}
+
+
+//-------------------------------------------------
 //  option_id_r -
 //-------------------------------------------------
 
@@ -300,8 +361,10 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x10a0, 0x10bf) AM_DEVREADWRITE8_LEGACY(AM9517A_TAG, i8237_r, i8237_w, 0x00ff)
 	AM_RANGE(0x10c2, 0x10c7) AM_WRITE8(dma_page_w, 0x00ff)
 	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
-	AM_RANGE(0x10e2, 0x10e3) AM_READ8(timer2_irq_clr_r, 0x00ff)
+	AM_RANGE(0x10e2, 0x10e3) AM_READWRITE8(timer2_irq_clr_r, nmi_mask_w, 0x00ff)
+	AM_RANGE(0x10e4, 0x10e5) AM_READWRITE8(led_on_r, fpu_mask_w, 0x00ff)
 	AM_RANGE(0x10e8, 0x10e9) AM_DEVREADWRITE8(IM6402_TAG, im6402_device, read, write, 0x00ff)
+	AM_RANGE(0x10ee, 0x10ef) AM_READWRITE8(led_off_r, parity_nmi_clr_w, 0x00ff)
 	AM_RANGE(0x10fe, 0x10ff) AM_READ8(option_id_r, 0x00ff)
 ADDRESS_MAP_END
 
