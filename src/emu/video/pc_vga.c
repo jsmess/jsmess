@@ -256,8 +256,10 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 					else
 						pen = vga.pens[attr >> 4];
 
-
+					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
+						continue;
 					bitmapline[column*width+w] = pen;
+
 				}
 				if (w<width)
 				{
@@ -266,6 +268,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 						pen = vga.pens[attr & 0x0f];
 					else
 						pen = vga.pens[attr >> 4];
+
 					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
 						continue;
 					bitmapline[column*width+w] = pen;
@@ -734,6 +737,10 @@ static void recompute_params(running_machine &machine)
 	int pixel_clock;
 
 	hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
+
+	/* safety check */
+	if(!vga.crtc.horz_disp_end || !vga.crtc.vert_disp_end || !vga.crtc.horz_total || !vga.crtc.vert_total)
+		return;
 
 	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * hclock_m)-1, 0, vga.crtc.vert_disp_end);
 
@@ -1256,10 +1263,6 @@ void pc_vga_reset(running_machine &machine)
 
 	/* TODO: real defaults */
 	vga.crtc.line_compare = 0x3ff;
-	vga.crtc.horz_total = 0xff;
-	vga.crtc.vert_total = 0xff;
-	vga.crtc.horz_disp_end = 0xff;
-	vga.crtc.vert_disp_end = 0x3ff;
 }
 
 void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf)
