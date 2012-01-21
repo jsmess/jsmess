@@ -140,8 +140,26 @@ static void init_nes_core( running_machine &machine )
 
 	if (state->m_four_screen_vram)
 	{
-		state->m_extended_ntram = auto_alloc_array(machine, UINT8, 0x2000);
+		state->m_extended_ntram = auto_alloc_array_clear(machine, UINT8, 0x2000);
 		state->save_pointer(NAME(state->m_extended_ntram), 0x2000);
+	}
+
+	if (state->m_four_screen_vram)
+		set_nt_mirroring(machine, PPU_MIRROR_4SCREEN);
+	else
+	{
+		switch (state->m_hard_mirroring)
+		{
+			case PPU_MIRROR_HORZ:
+			case PPU_MIRROR_VERT:
+			case PPU_MIRROR_HIGH:
+			case PPU_MIRROR_LOW:
+				set_nt_mirroring(machine, state->m_hard_mirroring);
+				break;
+			default:
+				set_nt_mirroring(machine, PPU_MIRROR_NONE);
+				break;
+		}
 	}
 
 	// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
