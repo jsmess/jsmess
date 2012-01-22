@@ -28,6 +28,13 @@ public:
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
 
+		DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+		DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+		DECLARE_READ8_MEMBER(io_read);
+		DECLARE_WRITE8_MEMBER(io_write);
+		DECLARE_READ8_MEMBER(status_r);
+		DECLARE_WRITE8_MEMBER(mode_control_w);
+
 protected:
         // device-level overrides
         virtual void device_start();
