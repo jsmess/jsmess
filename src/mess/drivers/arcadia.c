@@ -115,23 +115,18 @@ Interrupts are not supported
 The Read/Write 2650 CPU Port-Commands do not appear to be connected to
 anything in hardware. No cartridge has been found which uses them.
 
- ******************************************************************************/
+******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
-#include <assert.h>
-#include "emu.h"
-#include "cpu/s2650/s2650.h"
 #include "includes/arcadia.h"
-#include "imagedev/cartslot.h"
 
-static ADDRESS_MAP_START( arcadia_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( arcadia_mem, AS_PROGRAM, 8, arcadia_state )
 	AM_RANGE( 0x0000, 0x0fff) AM_ROM
 	AM_RANGE( 0x1800, 0x1aff) AM_READWRITE( arcadia_video_r, arcadia_video_w )
 	AM_RANGE( 0x2000, 0x2fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( arcadia_io, AS_IO, 8)
-//{ S2650_CTRL_PORT,S2650_CTRL_PORT, },
-//{ S2650_DATA_PORT,S2650_DATA_PORT, },
+static ADDRESS_MAP_START( arcadia_io, AS_IO, 8, arcadia_state )
 	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ( arcadia_vsync_r)
 ADDRESS_MAP_END
 
