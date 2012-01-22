@@ -7,9 +7,28 @@
 #ifndef __MSX_H__
 #define __MSX_H__
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/rp5c01.h"
 #include "machine/wd17xx.h"
+#include "machine/ctronics.h"
+#include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/wave.h"
+#include "sound/k051649.h"
+#include "sound/2413intf.h"
 #include "video/v9938.h"
-#include "formats/flopimg.h"
+#include "video/tms9928a.h"
+#include "imagedev/flopdrv.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "formats/basicdsk.h"
+#include "formats/fmsx_cas.h"
+#include "formats/msx_dsk.h"
+//#include "osdepend.h"
+#include "hashfile.h"
+#include "includes/msx_slot.h"
 
 #define MSX_MAX_CARTS	(2)
 
@@ -20,7 +39,41 @@ class msx_state : public driver_device
 public:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_v9938(*this, "v9938") { }
+	m_v9938(*this, "v9938"),
+	m_cass(*this, CASSETTE_TAG),
+	m_ym(*this, "ym2413"),
+	m_dac(*this, "dac"),
+	m_rtc(*this, TC8521_TAG)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(msx_page0_w);
+	DECLARE_WRITE8_MEMBER(msx_page0_1_w);
+	DECLARE_WRITE8_MEMBER(msx_page1_w);
+	DECLARE_WRITE8_MEMBER(msx_page1_1_w);
+	DECLARE_WRITE8_MEMBER(msx_page1_2_w);
+	DECLARE_WRITE8_MEMBER(msx_page2_w);
+	DECLARE_WRITE8_MEMBER(msx_page2_1_w);
+	DECLARE_WRITE8_MEMBER(msx_page2_2_w);
+	DECLARE_WRITE8_MEMBER(msx_page2_3_w);
+	DECLARE_WRITE8_MEMBER(msx_page3_w);
+	DECLARE_WRITE8_MEMBER(msx_page3_1_w);
+	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
+	DECLARE_READ8_MEMBER(msx_sec_slot_r);
+	DECLARE_WRITE8_MEMBER(msx_ram_mapper_w);
+	DECLARE_READ8_MEMBER(msx_ram_mapper_r);
+	DECLARE_READ8_MEMBER(msx_kanji_r);
+	DECLARE_WRITE8_MEMBER(msx_kanji_w);
+	DECLARE_WRITE8_MEMBER(msx_90in1_w);
+	DECLARE_WRITE8_MEMBER(msx_ppi_port_a_w);
+	DECLARE_WRITE8_MEMBER(msx_ppi_port_c_w);
+	DECLARE_READ8_MEMBER(msx_ppi_port_b_r);
+	DECLARE_WRITE8_MEMBER(msx_fmpac_w);
+	DECLARE_READ8_MEMBER(msx_rtc_reg_r);
+	DECLARE_WRITE8_MEMBER(msx_rtc_reg_w);
+	DECLARE_WRITE8_MEMBER(msx_rtc_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(msx_wd179x_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(msx_wd179x_drq_w);
+
 
 	/* PSG */
 	int m_psg_b;
@@ -52,7 +105,16 @@ public:
 	UINT8 *m_top_page;
 	int m_port_c_old;
 	int keylatch;
+	void msx_memory_map_all ();
+	void msx_memory_map_page (UINT8 page);
+	void msx_ch_reset_core ();
+	void msx_memory_reset ();
+
 	optional_device<v9938_device> m_v9938;
+	required_device<cassette_image_device> m_cass;
+	required_device<device_t> m_ym;
+	required_device<device_t> m_dac;
+	optional_device<rp5c01_device> m_rtc;
 };
 
 
@@ -83,29 +145,5 @@ WRITE8_HANDLER ( msx_psg_port_a_w );
 READ8_HANDLER ( msx_psg_port_a_r );
 WRITE8_HANDLER ( msx_psg_port_b_w );
 READ8_HANDLER ( msx_psg_port_b_r );
-WRITE8_HANDLER ( msx_fmpac_w );
-READ8_HANDLER ( msx_rtc_reg_r );
-WRITE8_HANDLER ( msx_rtc_reg_w );
-WRITE8_HANDLER ( msx_rtc_latch_w );
-WRITE8_HANDLER ( msx_90in1_w );
-
-/* new memory emulation */
-WRITE8_HANDLER (msx_page0_w);
-WRITE8_HANDLER (msx_page0_1_w);
-WRITE8_HANDLER (msx_page1_w);
-WRITE8_HANDLER (msx_page1_1_w);
-WRITE8_HANDLER (msx_page1_2_w);
-WRITE8_HANDLER (msx_page2_w);
-WRITE8_HANDLER (msx_page2_1_w);
-WRITE8_HANDLER (msx_page2_2_w);
-WRITE8_HANDLER (msx_page2_3_w);
-WRITE8_HANDLER (msx_page3_w);
-WRITE8_HANDLER (msx_page3_1_w);
-WRITE8_HANDLER (msx_sec_slot_w);
- READ8_HANDLER (msx_sec_slot_r);
-WRITE8_HANDLER (msx_ram_mapper_w);
- READ8_HANDLER (msx_ram_mapper_r);
- READ8_HANDLER (msx_kanji_r);
-WRITE8_HANDLER (msx_kanji_w);
 
 #endif /* __MSX_H__ */
