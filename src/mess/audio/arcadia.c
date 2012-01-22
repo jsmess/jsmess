@@ -9,7 +9,7 @@
   PAL  UVI sound clock: 15625Hz (Soundic MPT-03 - owned by plgDavid)
 ***************************************************************************/
 
-#include "emu.h"
+
 #include "includes/arcadia.h"
 
 //known UVI audio clocks

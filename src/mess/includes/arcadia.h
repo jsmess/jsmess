@@ -7,6 +7,10 @@
 #ifndef ARCADIA_H_
 #define ARCADIA_H_
 
+#include "emu.h"
+#include "cpu/s2650/s2650.h"
+#include "imagedev/cartslot.h"
+
 
 // space vultures sprites above
 // combat below and invisible
@@ -22,32 +26,36 @@ class arcadia_state : public driver_device
 {
 public:
 	arcadia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+	{ }
 
-    int m_line;
-    int m_charline;
-    int m_shift;
-    int m_ad_delay;
-    int m_ad_select;
-    int m_ypos;
-    int m_graphics;
-    int m_doublescan;
-    int m_lines26;
-    int m_multicolor;
-    struct { int x, y; } m_pos[4];
-    UINT8 m_bg[262][16+2*XPOS/8];
-    UINT8 m_rectangle[0x40][8];
-    UINT8 m_chars[0x40][8];
-    int m_breaker;
-    union {
-	UINT8 data[0x400];
-	struct	{
+	DECLARE_READ8_MEMBER(arcadia_vsync_r);
+	DECLARE_READ8_MEMBER(arcadia_video_r);
+	DECLARE_WRITE8_MEMBER(arcadia_video_w);
+	int m_line;
+	int m_charline;
+	int m_shift;
+	int m_ad_delay;
+	int m_ad_select;
+	int m_ypos;
+	int m_graphics;
+	int m_doublescan;
+	int m_lines26;
+	int m_multicolor;
+	struct { int x, y; } m_pos[4];
+	UINT8 m_bg[262][16+2*XPOS/8];
+	UINT8 m_rectangle[0x40][8];
+	UINT8 m_chars[0x40][8];
+	int m_breaker;
+	union
+	{
+		UINT8 data[0x400];
+		struct
+		{
 			// 0x1800
 			UINT8 chars1[13][16];
 			UINT8 ram1[2][16];
-			struct	{
-				UINT8 y,x;
-			} pos[4];
+			struct	{ UINT8 y,x; } pos[4];
 			UINT8 ram2[4];
 			UINT8 vpos;
 			UINT8 sound1, sound2;
@@ -65,20 +73,15 @@ public:
 			// 0x1a00
 			UINT8 chars2[13][16];
 			UINT8 ram3[3][16];
-	} d;
-    } m_reg;
-    bitmap_ind16 *m_bitmap;
+		} d;
+	} m_reg;
+	bitmap_ind16 *m_bitmap;
 };
 
 
 /*----------- defined in video/arcadia.c -----------*/
 
 extern INTERRUPT_GEN( arcadia_video_line );
-READ8_HANDLER(arcadia_vsync_r);
-
-READ8_HANDLER(arcadia_video_r);
-WRITE8_HANDLER(arcadia_video_w);
-
 extern VIDEO_START( arcadia );
 extern SCREEN_UPDATE_IND16( arcadia );
 
