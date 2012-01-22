@@ -27,7 +27,7 @@ Notes:
 
     CPU         - Intel P8051AH "20-8051-225"
     PSG         - Texas Instruments SN76496N
-	XR          - Exar Semiconductor XR22-908-030? (hard to read)
+	XR          - Exar Semiconductor XR22-908-03B? (hard to read)
     CN1         - 1x6 pin PCB header
     SW1         - 8-way DIP switch
     SW2         - 8-way DIP switch
@@ -80,25 +80,9 @@ const rom_entry *wangpc_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wangpc_keyboard_io, AS_IO, 8, wangpc_keyboard_device )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(kb_p1_r) AM_WRITENOP
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(kb_p2_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(kb_p3_w)
-	AM_RANGE(0x4848, 0x4848) AM_READ_PORT("Y0")
-	AM_RANGE(0x4949, 0x4949) AM_READ_PORT("Y1")
-	AM_RANGE(0x4a4a, 0x4a4a) AM_READ_PORT("Y2")
-	AM_RANGE(0x4b4b, 0x4b4b) AM_READ_PORT("Y3")
-	AM_RANGE(0x4c4c, 0x4c4c) AM_READ_PORT("Y4")
-	AM_RANGE(0x4d4d, 0x4d4d) AM_READ_PORT("Y5")
-	AM_RANGE(0x4e4e, 0x4e4e) AM_READ_PORT("Y6")
-	AM_RANGE(0x4f4f, 0x4f4f) AM_READ_PORT("Y7")
-	AM_RANGE(0x5050, 0x5050) AM_READ_PORT("Y8")
-	AM_RANGE(0x5151, 0x5151) AM_READ_PORT("Y9")
-	AM_RANGE(0x5252, 0x5252) AM_READ_PORT("YA")
-	AM_RANGE(0x5353, 0x5353) AM_READ_PORT("YB")
-	AM_RANGE(0x5454, 0x5454) AM_READ_PORT("YC")
-	AM_RANGE(0x5555, 0x5555) AM_READ_PORT("YD")
-	AM_RANGE(0x5656, 0x5656) AM_READ_PORT("YE")
-	AM_RANGE(0x5757, 0x5757) AM_READ_PORT("YF")
 ADDRESS_MAP_END
 
 
@@ -397,16 +381,29 @@ void wangpc_keyboard_device::device_reset()
 
 READ8_MEMBER( wangpc_keyboard_device::kb_p1_r )
 {
-	return 0xff;
-}
+	UINT8 data = 0xff;
 
+	switch (m_y & 0x0f)
+	{
+		case 0: data &= input_port_read(this, "Y0"); break;
+		case 1: data &= input_port_read(this, "Y1"); break;
+		case 2: data &= input_port_read(this, "Y2"); break;
+		case 3: data &= input_port_read(this, "Y3"); break;
+		case 4: data &= input_port_read(this, "Y4"); break;
+		case 5: data &= input_port_read(this, "Y5"); break;
+		case 6: data &= input_port_read(this, "Y6"); break;
+		case 7: data &= input_port_read(this, "Y7"); break;
+		case 8: data &= input_port_read(this, "Y8"); break;
+		case 9: data &= input_port_read(this, "Y9"); break;
+		case 0xa: data &= input_port_read(this, "YA"); break;
+		case 0xb: data &= input_port_read(this, "YB"); break;
+		case 0xc: data &= input_port_read(this, "YC"); break;
+		case 0xd: data &= input_port_read(this, "YD"); break;
+		case 0xe: data &= input_port_read(this, "YE"); break; // SW1?
+		case 0xf: data &= input_port_read(this, "YF"); break; // SW2?
+	}
 
-//-------------------------------------------------
-//  kb_p1_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
-{
+	return data;
 }
 
 
@@ -416,6 +413,22 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p1_w )
 
 WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
 {
+	/*
+	
+		bit		description
+		
+		P2.0	row 0
+		P2.1	row 1
+		P2.2	row 2
+		P2.3	row 3
+		P2.4
+		P2.5
+		P2.6	chip enable for something
+		P2.7
+
+	*/
+
+	m_y = data;
 }
 
 
@@ -425,4 +438,18 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
 
 WRITE8_MEMBER( wangpc_keyboard_device::kb_p3_w )
 {
+	/*
+	
+		bit		description
+		
+		P3.0	
+		P3.1	
+		P3.2
+		P3.3	chip enable for something
+		P3.4
+		P3.5
+		P3.6
+		P3.7
+
+	*/
 }
