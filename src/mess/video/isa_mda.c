@@ -40,11 +40,7 @@ static const unsigned char mda_palette[4][3] =
 	{ 0x00,0xff,0x00 }
 };
 
-static READ8_DEVICE_HANDLER( pc_MDA_r );
-static WRITE8_DEVICE_HANDLER( pc_MDA_w );
 static MC6845_UPDATE_ROW( mda_update_row );
-static WRITE_LINE_DEVICE_HANDLER( mda_hsync_changed );
-static WRITE_LINE_DEVICE_HANDLER( mda_vsync_changed );
 
 /* F4 Character Displayer */
 static const gfx_layout pc_16_charlayout =
@@ -87,8 +83,8 @@ static const mc6845_interface mc6845_mda_intf =
 	NULL,				/* end_update */
 	DEVCB_NULL,				/* on_de_changed */
 	DEVCB_NULL,				/* on_cur_changed */
-	DEVCB_LINE(mda_hsync_changed),	/* on_hsync_changed */
-	DEVCB_LINE(mda_vsync_changed),	/* on_vsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_mda_device, hsync_changed),	/* on_hsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_mda_device, vsync_changed),	/* on_vsync_changed */
 	NULL
 };
 
@@ -177,7 +173,7 @@ void isa8_mda_device::device_start()
 {
 	set_isa_device();
 	videoram = auto_alloc_array(machine(), UINT8, 0x1000);
-	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(pc_MDA_r), FUNC(pc_MDA_w) );
+	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_mda_device::io_read), this ), write8_delegate( FUNC(isa8_mda_device::io_write), this ) );
 	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", videoram);
 
 	/* Initialise the mda palette */
@@ -374,20 +370,18 @@ static MC6845_UPDATE_ROW( mda_update_row )
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( mda_hsync_changed )
+WRITE_LINE_MEMBER( isa8_mda_device::hsync_changed )
 {
-	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device->owner());
-	mda->hsync = state ? 1 : 0;
+	hsync = state ? 1 : 0;
 }
 
 
-static WRITE_LINE_DEVICE_HANDLER( mda_vsync_changed )
+WRITE_LINE_MEMBER( isa8_mda_device::vsync_changed )
 {
-	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device->owner());
-	mda->vsync = state ? 0x80 : 0;
+	vsync = state ? 0x80 : 0;
 	if ( state )
 	{
-		mda->framecnt++;
+		framecnt++;
 	}
 }
 
@@ -395,23 +389,20 @@ static WRITE_LINE_DEVICE_HANDLER( mda_vsync_changed )
 /*
  *  rW  MDA mode control register (see #P138)
  */
-static WRITE8_DEVICE_HANDLER(mda_mode_control_w)
+WRITE8_MEMBER( isa8_mda_device::mode_control_w )
 {
-	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device);
-	MDA_LOG(1,"MDA_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
-		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
-	mda->mode_control = data;
+	mode_control = data;
 
-	switch( mda->mode_control & 0x2a )
+	switch( mode_control & 0x2a )
 	{
 	case 0x08:
-		mda->update_row = mda_text_inten_update_row;
+		update_row = mda_text_inten_update_row;
 		break;
 	case 0x28:
-		mda->update_row = mda_text_blink_update_row;
+		update_row = mda_text_blink_update_row;
 		break;
 	default:
-		mda->update_row = NULL;
+		update_row = NULL;
 	}
 }
 
@@ -427,10 +418,9 @@ static WRITE8_DEVICE_HANDLER(mda_mode_control_w)
  *      2-1  reserved
  *      0    horizontal drive enable
  */
-static READ8_DEVICE_HANDLER(mda_status_r)
+READ8_MEMBER( isa8_mda_device::status_r)
 {
-    isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device);
-	return 0x08 | mda->hsync;
+	return 0x08 | hsync;
 }
 
 
@@ -440,21 +430,20 @@ static READ8_DEVICE_HANDLER(mda_status_r)
  *      monochrome display adapter
  *
  *************************************************************************/
-WRITE8_DEVICE_HANDLER ( pc_MDA_w )
+WRITE8_MEMBER( isa8_mda_device::io_write)
 {
-	mc6845_device *mc6845 = downcast<mc6845_device *>(device->subdevice(MDA_MC6845_NAME));
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *lpt = device->subdevice("lpt");
+	mc6845_device *mc6845 = subdevice<mc6845_device>(MDA_MC6845_NAME);
+	device_t *lpt = subdevice("lpt");
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			mc6845->address_w( *space, offset, data );
+			mc6845->address_w( space, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			mc6845->register_w( *space, offset, data );
+			mc6845->register_w( space, offset, data );
 			break;
 		case 8:
-			mda_mode_control_w(device, offset, data);
+			mode_control_w(space, offset, data);
 			break;
 		case 12: case 13:  case 14:
 			pc_lpt_w(lpt, offset - 12, data);
@@ -462,22 +451,21 @@ WRITE8_DEVICE_HANDLER ( pc_MDA_w )
 	}
 }
 
- READ8_DEVICE_HANDLER ( pc_MDA_r )
+READ8_MEMBER( isa8_mda_device::io_read)
 {
 	int data = 0xff;
-	mc6845_device *mc6845 = downcast<mc6845_device *>(device->subdevice(MDA_MC6845_NAME));
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *lpt = device->subdevice("lpt");
+	mc6845_device *mc6845 = subdevice<mc6845_device>(MDA_MC6845_NAME);
+	device_t *lpt = subdevice("lpt");
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
 			/* return last written mc6845 address value here? */
 			break;
 		case 1: case 3: case 5: case 7:
-			data = mc6845->register_r( *space, offset );
+			data = mc6845->register_r( space, offset );
 			break;
 		case 10:
-			data = mda_status_r(device, offset);
+			data = status_r(space, offset);
 			break;
 		/* 12, 13, 14  are the LPT ports */
 		case 12: case 13:  case 14:
@@ -514,8 +502,8 @@ static const mc6845_interface mc6845_hercules_intf =
 	NULL,					/* end_update */
 	DEVCB_NULL,				/* on_de_changed */
 	DEVCB_NULL,				/* on_cur_changed */
-	DEVCB_LINE(mda_hsync_changed),		/* on_hsync_changed */
-	DEVCB_LINE(mda_vsync_changed),		/* on_vsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_mda_device, hsync_changed),	/* on_hsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_mda_device, vsync_changed),	/* on_vsync_changed */
 	NULL
 };
 
