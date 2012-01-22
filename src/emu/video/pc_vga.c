@@ -402,6 +402,18 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	}
 }
 
+static void vga_vh_cga(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	popmessage("CGA mode");
+}
+
+static void vga_vh_mono(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	popmessage("Mono mode");
+}
+
+
+
 static UINT8 pc_vga_choosevideomode(running_machine &machine)
 {
 	int i;
@@ -438,7 +450,7 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 
 		if (vga.svga_intf.choosevideomode)
 		{
-			return 4;
+			return 6;
 		}
 		else if (!GRAPHIC_MODE)
 		{
@@ -457,12 +469,20 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 			//*width = VGA_COLUMNS * 8;
 			return 2;
 		}
+		else if (vga.gc.data[5]&0x20)
+		{
+			return 3;
+		}
+		else if ((vga.gc.data[6]&0x0c) == 0x0c)
+		{
+			return 4;
+		}
 		else
 		{
 			//proc = vga_vh_ega;
 			//*height = LINES;
 			//*width = EGA_COLUMNS * 8;
-			return 3;
+			return 5;
 		}
 	}
 
@@ -483,8 +503,10 @@ SCREEN_UPDATE_RGB32( pc_video )
 		case 0: bitmap.fill(get_black_pen(screen.machine()), cliprect);break;
 		case 1: vga_vh_text(screen.machine(), bitmap, cliprect); break;
 		case 2: vga_vh_vga (screen.machine(), bitmap, cliprect); break;
-		case 3: vga_vh_ega (screen.machine(), bitmap, cliprect); break;
-		case 4: vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
+		case 3: vga_vh_cga (screen.machine(), bitmap, cliprect); break;
+		case 4: vga_vh_mono(screen.machine(), bitmap, cliprect); break;
+		case 5: vga_vh_ega (screen.machine(), bitmap, cliprect); break;
+		case 6: vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, vga.gc.data, &w, &h); break;
 	}
 
 	return 0;
