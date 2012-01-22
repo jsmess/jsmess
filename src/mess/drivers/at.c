@@ -90,6 +90,7 @@ WRITE8_MEMBER( at_state::at_keybc_w )
 }
 
 static ADDRESS_MAP_START( at16_io, AS_IO, 16, at_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
@@ -120,6 +121,7 @@ WRITE16_MEMBER( at_state::neat_chipset_w )
 }
 
 static ADDRESS_MAP_START( neat_io, AS_IO, 16, at_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0022, 0x0023) AM_READWRITE(neat_chipset_r, neat_chipset_w)
@@ -133,6 +135,7 @@ static ADDRESS_MAP_START( neat_io, AS_IO, 16, at_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at386_io, AS_IO, 32, at_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
@@ -175,6 +178,7 @@ WRITE32_MEMBER( at_state::ct486_chipset_w )
 }
 
 static ADDRESS_MAP_START( ct486_io, AS_IO, 32, at_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x0023) AM_READWRITE(ct486_chipset_r, ct486_chipset_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
@@ -188,6 +192,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( at586_io, AS_IO, 32, at_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
@@ -202,6 +207,7 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megapc_io, AS_IO, 32, at_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
