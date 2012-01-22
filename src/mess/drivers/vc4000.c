@@ -45,61 +45,58 @@ elektor TV Game Computer which is a kind of developer machine for the VC4000.
 
 Go to the bottom to see the game list and emulation status of each.
 ******************************************************************************/
-
-#include "emu.h"
-#include "cpu/s2650/s2650.h"
+#define ADDRESS_MAP_MODERN
 
 #include "includes/vc4000.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/snapquik.h"
 
 static QUICKLOAD_LOAD( vc4000 );
 
-static READ8_HANDLER(vc4000_key_r)
+READ8_MEMBER( vc4000_state::vc4000_key_r )
 {
 	UINT8 data=0;
-	switch(offset & 0x0f) {
+	switch(offset & 0x0f)
+	{
 	case 0x08:
-		data = input_port_read(space->machine(), "KEYPAD1_1");
+		data = input_port_read(machine(), "KEYPAD1_1");
 		break;
 	case 0x09:
-		data = input_port_read(space->machine(), "KEYPAD1_2");
+		data = input_port_read(machine(), "KEYPAD1_2");
 		break;
 	case 0x0a:
-		data = input_port_read(space->machine(), "KEYPAD1_3");
+		data = input_port_read(machine(), "KEYPAD1_3");
 		break;
 	case 0x0b:
-		data = input_port_read(space->machine(), "PANEL");
+		data = input_port_read(machine(), "PANEL");
 		break;
 	case 0x0c:
-		data = input_port_read(space->machine(), "KEYPAD2_1");
+		data = input_port_read(machine(), "KEYPAD2_1");
 		break;
 	case 0x0d:
-		data = input_port_read(space->machine(), "KEYPAD2_2");
+		data = input_port_read(machine(), "KEYPAD2_2");
 		break;
 	case 0x0e:
-		data = input_port_read(space->machine(), "KEYPAD2_3");
+		data = input_port_read(machine(), "KEYPAD2_3");
 		break;
 	}
 	return data;
 }
 
-static WRITE8_HANDLER(vc4000_sound_ctl)
+WRITE8_MEMBER( vc4000_state::vc4000_sound_ctl )
 {
 	logerror("Write to sound control register offset= %d value= %d\n", offset, data);
 }
 
 
-static ADDRESS_MAP_START( vc4000_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( vc4000_mem, AS_PROGRAM, 8, vc4000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1680, 0x16ff) AM_READWRITE( vc4000_key_r, vc4000_sound_ctl ) AM_MIRROR(0x0800)
-	AM_RANGE(0x1700, 0x17ff) AM_READWRITE( vc4000_video_r, vc4000_video_w ) AM_MIRROR(0x0800)
+	AM_RANGE(0x1680, 0x16ff) AM_READWRITE(vc4000_key_r, vc4000_sound_ctl) AM_MIRROR(0x0800)
+	AM_RANGE(0x1700, 0x17ff) AM_READWRITE(vc4000_video_r, vc4000_video_w) AM_MIRROR(0x0800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vc4000_io , AS_IO, 8)
-	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ( vc4000_vsync_r)
+static ADDRESS_MAP_START( vc4000_io, AS_IO, 8, vc4000_state )
+	AM_RANGE( S2650_SENSE_PORT,S2650_SENSE_PORT) AM_READ(vc4000_vsync_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vc4000 )

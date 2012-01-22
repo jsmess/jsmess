@@ -7,7 +7,10 @@
 #ifndef VC4000_H_
 #define VC4000_H_
 
-
+#include "emu.h"
+#include "cpu/s2650/s2650.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/snapquik.h"
 
 // define this to use digital inputs instead of the slow
 // autocentering analog mame joys
@@ -61,16 +64,20 @@ typedef struct
 			UINT8 sprite_collision;
 		} d;
 	} reg;
-
-	bitmap_ind16 bitmap;
 } vc4000_video_t;
 
 class vc4000_state : public driver_device
 {
 public:
 	vc4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+	{ }
 
+	DECLARE_WRITE8_MEMBER(vc4000_sound_ctl);
+	DECLARE_READ8_MEMBER(vc4000_key_r);
+	DECLARE_READ8_MEMBER(vc4000_video_r);
+	DECLARE_WRITE8_MEMBER(vc4000_video_w);
+	DECLARE_READ8_MEMBER(vc4000_vsync_r);
 	vc4000_video_t m_video;
 	UINT8 m_sprite_collision[0x20];
 	UINT8 m_background_collision[0x20];
@@ -80,6 +87,7 @@ public:
 	UINT8 m_joy2_y;
 	UINT8 m_objects[512];
 	UINT8 m_irq_pause;
+	bitmap_ind16 *m_bitmap;
 };
 
 
