@@ -9,17 +9,60 @@
 
 #include "emu.h"
 #include "isa_mpu401.h"
+#include "machine/pic8259.h"
 
+/*
+DIP-SWs
+1-2-3-4
+         0x200
+      1  0x210
+    1    0x220
+...
+1   1 1  0x330 (default)
+...
+1 1 1 1  0x370
 
+5-6-7-8
+1        irq2 (default)
+  1      irq3
+    1    irq5
+      1  irq7
+*/
 
 READ8_MEMBER( isa8_mpu401_device::mpu401_r )
 {
-	return 0xff;
+	UINT8 res;
+
+	if(offset == 0) // data
+	{
+		res = 0xff;
+	}
+	else // status
+	{
+		res = 0x3f | 0x80; // bit 7 queue empty (DSR), bit 6 DRR (Data Receive Ready?)
+	}
+
+	return res;
 }
 
 WRITE8_MEMBER( isa8_mpu401_device::mpu401_w )
 {
-	// ...
+	if(offset == 0) // data
+	{
+		printf("%02x %02x\n",offset,data);
+	}
+	else // command
+	{
+		printf("%02x %02x\n",offset,data);
+
+		switch(data)
+		{
+			case 0xff: // reset
+				//m_isa->irq2_w(1);
+				break;
+		}
+	}
+
 }
 
 //**************************************************************************
