@@ -11,16 +11,9 @@ ToDo:
     - Front panel Run/Step switch (switch S2)
 
 ******************************************************************************/
+#define ADDRESS_MAP_MODERN
 
-#include "emu.h"
 #include "includes/aim65.h"
-#include "cpu/m6502/m6502.h"
-#include "video/dl1416.h"
-#include "machine/6522via.h"
-#include "machine/6532riot.h"
-#include "machine/6821pia.h"
-#include "imagedev/cartslot.h"
-#include "machine/ram.h"
 #include "aim65.lh"
 
 
@@ -29,14 +22,14 @@ ToDo:
 ***************************************************************************/
 
 /* Note: RAM is mapped dynamically in machine/aim65.c */
-static ADDRESS_MAP_START( aim65_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( aim65_mem, AS_PROGRAM, 8, aim65_state )
 	AM_RANGE( 0x1000, 0x9fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)/* User VIA */
+	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_1", via6522_device, read, write) // user via
 	AM_RANGE( 0xa400, 0xa47f ) AM_RAM /* RIOT RAM */
-	AM_RANGE( 0xa480, 0xa497 ) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
+	AM_RANGE( 0xa480, 0xa497 ) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
-	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0)  AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE_MODERN("pia6821", pia6821_device, read, write)
+	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_DEVREADWRITE("via6522_0", via6522_device, read, write) // system via
+	AM_RANGE( 0xac00, 0xac03 ) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
 	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
 	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */
 	AM_RANGE( 0xb000, 0xffff ) AM_ROM /* 5 ROM sockets */
@@ -140,16 +133,17 @@ INPUT_PORTS_END
     DEVICE INTERFACES
 ***************************************************************************/
 
+/* Riot interface Z33 */
 static const riot6532_interface aim65_riot_interface =
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(aim65_riot_b_r),
-	DEVCB_HANDLER(aim65_riot_a_w),
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_riot_b_r),
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_riot_a_w),
 	DEVCB_NULL,
-	DEVCB_LINE(aim65_riot_irq)
+	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
-/* system via interface */
+/* system via interface Z32 */
 static const via6522_interface aim65_system_via =
 {
 	DEVCB_NULL,
@@ -158,28 +152,48 @@ static const via6522_interface aim65_system_via =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_printer_data_a),
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_printer_data_b),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_printer_on),
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
-/* user via interface */
+/* user via interface Z1 */
 static const via6522_interface aim65_user_via =
 {
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
+/* R6520 interface U1 */
 static const pia6821_interface aim65_pia_config =
 {
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	DEVCB_HANDLER(aim65_pia_a_w), DEVCB_HANDLER(aim65_pia_b_w),
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pia_a_w),
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pia_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -268,5 +282,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY     FULLNAME  FLAGS */
-COMP(1977, aim65,		0,      0,      aim65,   aim65,  0,      "Rockwell", "AIM 65", GAME_NO_SOUND )
+/*   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY    FULLNAME    FLAGS */
+COMP(1977, aim65,       0,      0,      aim65,   aim65,  0,     "Rockwell", "AIM 65", GAME_NO_SOUND_HW )

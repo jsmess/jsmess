@@ -5,12 +5,7 @@
 
 ******************************************************************************/
 
-#include "emu.h"
-
 #include "includes/aim65.h"
-#include "machine/6522via.h"
-
-
 
 //UINT16 *printerRAM;
 
@@ -37,14 +32,21 @@
  */
 
 
-static void aim65_printer_inc(aim65_state *state)
+static TIMER_CALLBACK(aim65_printer_timer)
 {
+	aim65_state *state = machine.driver_data<aim65_state>();
+	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
+
+	via_0->write_cb1(state->m_printer_level);
+	via_0->write_cb1(!state->m_printer_level);
+	state->m_printer_level ^= 1;
+
 	if (state->m_printer_dir)
 	{
-		if (state->m_printer_x > 0) {
+		if (state->m_printer_x > 0)
 			state->m_printer_x--;
-		}
-		else {
+		else
+		{
 			state->m_printer_dir = 0;
 			state->m_printer_x++;
 			state->m_printer_y++;
@@ -52,10 +54,10 @@ static void aim65_printer_inc(aim65_state *state)
 	}
 	else
 	{
-		if (state->m_printer_x < 9) {
+		if (state->m_printer_x < 9)
 			state->m_printer_x++;
-		}
-		else {
+		else
+		{
 			state->m_printer_dir = 1;
 			state->m_printer_x--;
 			state->m_printer_y++;
@@ -68,62 +70,47 @@ static void aim65_printer_inc(aim65_state *state)
 	state->m_flag_b=0;
 }
 
-static void aim65_printer_cr(aim65_state *state)
+
+WRITE8_MEMBER( aim65_state::aim65_printer_on )
 {
-	state->m_printer_x=0;
-	state->m_printer_y++;
-	if (state->m_printer_y > 500) state->m_printer_y = 0;
-	state->m_flag_a=state->m_flag_b=0;
-}
-
-static TIMER_CALLBACK(aim65_printer_timer)
-{
-	aim65_state *state = machine.driver_data<aim65_state>();
-	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
-
-	via_0->write_cb1(state->m_printer_level);
-	via_0->write_cb1(!state->m_printer_level);
-	state->m_printer_level = !state->m_printer_level;
-	aim65_printer_inc(state);
-}
-
-
-WRITE8_DEVICE_HANDLER( aim65_printer_on )
-{
-	aim65_state *state = device->machine().driver_data<aim65_state>();
-	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 	if (!data)
 	{
-		aim65_printer_cr(state);
-		state->m_print_timer->adjust(attotime::zero, 0, attotime::from_usec(10));
+		m_printer_x=0;
+		m_printer_y++;
+		if (m_printer_y > 500) m_printer_y = 0;
+		m_flag_a = m_flag_b=0;
 		via_0->write_cb1(0);
-		state->m_printer_level = 1;
+		//m_print_timer->adjust(attotime::zero, 0, attotime::from_usec(10));
+		m_printer_level = 1;
 	}
 	else
-		state->m_print_timer->reset();
+	{
+		m_print_timer->reset();
+	}
 }
 
 
-WRITE8_DEVICE_HANDLER( aim65_printer_data_a )
+WRITE8_MEMBER( aim65_state::aim65_printer_data_a )
 {
 #if 0
-	aim65_state *state = device->machine().driver_data<aim65_state>();
-	if (state->m_flag_a == 0) {
-		printerRAM[(state->m_printer_y * 20) + state->m_printer_x] |= data;
-		state->m_flag_a = 1;
+	if (m_flag_a == 0)
+	{
+		printerRAM[(m_printer_y * 20) + m_printer_x] |= data;
+		m_flag_a = 1;
 	}
 #endif
 }
 
-WRITE8_DEVICE_HANDLER( aim65_printer_data_b )
+WRITE8_MEMBER( aim65_state::aim65_printer_data_b )
 {
 #if 0
-	aim65_state *state = device->machine().driver_data<aim65_state>();
 	data &= 0x03;
 
-	if (state->m_flag_b == 0) {
-		printerRAM[(state->m_printer_y * 20) + state->m_printer_x ] |= (data << 8);
-		state->m_flag_b = 1;
+	if (m_flag_b == 0)
+	{
+		printerRAM[(m_printer_y * 20) + m_printer_x ] |= (data << 8);
+		m_flag_b = 1;
 	}
 #endif
 }
@@ -137,17 +124,14 @@ VIDEO_START( aim65 )
 	videoram_size = 600 * 10 * 2;
 	printerRAM = auto_alloc_array(machine, UINT16, videoram_size / 2);
 	memset(printerRAM, 0, videoram_size);
+	VIDEO_START_CALL(generic);
+#endif
 	state->m_printer_x = 0;
 	state->m_printer_y = 0;
 	state->m_printer_dir = 0;
-	state->m_flag_a=0;
-	state->m_flag_b=0;
-
-
+	state->m_flag_a = 0;
+	state->m_flag_b = 0;
 	state->m_printer_level = 0;
-
-	VIDEO_START_CALL(generic);
-#endif
 }
 
 
@@ -155,7 +139,6 @@ VIDEO_START( aim65 )
 SCREEN_UPDATE( aim65 )
 {
 	/* Display printer output */
-#if 0
 	dir = 1;
 	for(y = 0; y<500;y++)
 	{
@@ -182,9 +165,6 @@ SCREEN_UPDATE( aim65 )
 		else
 			dir = 0;
 	}
-#endif
-
 	return 0;
 }
 #endif
-
