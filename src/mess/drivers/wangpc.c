@@ -237,6 +237,7 @@ WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
 {
 	m_timer2_irq = 1;
+	check_level1_interrupts();
 
 	return 0;
 }
@@ -269,6 +270,43 @@ READ8_MEMBER( wangpc_state::led_on_r )
 
 WRITE8_MEMBER( wangpc_state::fpu_mask_w )
 {
+}
+
+
+//-------------------------------------------------
+//  uart_tre_clr_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wangpc_state::uart_tre_clr_w  )
+{
+	m_uart_tre = 0;
+	check_level2_interrupts();
+}
+
+
+//-------------------------------------------------
+//  uart_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wangpc_state::uart_r )
+{
+	m_uart_dr = 0;
+	check_level2_interrupts();
+	
+	return m_uart->read(space, 0);
+}
+
+
+//-------------------------------------------------
+//  uart_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wangpc_state::uart_w  )
+{
+	m_uart_tre = 0;
+	check_level2_interrupts();
+	
+	m_uart->write(space, 0, data);
 }
 
 
@@ -363,7 +401,8 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
 	AM_RANGE(0x10e2, 0x10e3) AM_READWRITE8(timer2_irq_clr_r, nmi_mask_w, 0x00ff)
 	AM_RANGE(0x10e4, 0x10e5) AM_READWRITE8(led_on_r, fpu_mask_w, 0x00ff)
-	AM_RANGE(0x10e8, 0x10e9) AM_DEVREADWRITE8(IM6402_TAG, im6402_device, read, write, 0x00ff)
+	AM_RANGE(0x10e6, 0x10e7) AM_WRITE8(uart_tre_clr_w, 0x00ff)
+	AM_RANGE(0x10e8, 0x10e9) AM_READWRITE8(uart_r, uart_w, 0x00ff)
 	AM_RANGE(0x10ee, 0x10ef) AM_READWRITE8(led_off_r, parity_nmi_clr_w, 0x00ff)
 	AM_RANGE(0x10fe, 0x10ff) AM_READ8(option_id_r, 0x00ff)
 ADDRESS_MAP_END
@@ -407,6 +446,20 @@ static I8237_INTERFACE( dmac_intf )
 //  pic8259_interface pic_intf
 //-------------------------------------------------
 
+void wangpc_state::check_level1_interrupts()
+{
+	int state = !m_timer2_irq | !m_ecpi_irq | !m_ppi_irq;
+	
+	pic8259_ir1_w(m_pic, state);
+}
+
+void wangpc_state::check_level2_interrupts()
+{
+	int state = /* !i8237_eop_r(m_dmac) | */ m_uart_dr | m_uart_tre | upd765_int_r(m_fdc) | m_fpu_irq;
+	
+	pic8259_ir2_w(m_pic, state);
+}
+
 static IRQ_CALLBACK( wangpc_irq_callback )
 {
 	wangpc_state *state = device->machine().driver_data<wangpc_state>();
@@ -416,8 +469,8 @@ static IRQ_CALLBACK( wangpc_irq_callback )
 
 static const struct pic8259_interface pic_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE(I8086_TAG, INPUT_LINE_IRQ0),
+	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };
 
@@ -468,8 +521,24 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 	// timer 2 interrupt
 	data |= m_timer2_irq;
 	
+	// serial interrupt
+	data |= m_ecpi_irq << 1;
+	
+	// parallel port interrupt
+	data |= m_ppi_irq << 2;
+	
+	// DMA interrupt
+	// data |= i8237_eop_r(m_dmac) << 3;
+		
+	// keyboard interrupt
+	data |= m_uart_tre << 4;
+	data |= m_uart_dr << 5;
+	
 	// FDC interrupt
 	data |= upd765_int_r(m_fdc) << 6;
+	
+	// 8087 interrupt
+	data |= m_fpu_irq << 7;
 	
 	return data;
 }
@@ -532,6 +601,7 @@ WRITE_LINE_MEMBER( wangpc_state::pit2_w )
 	if (state)
 	{
 		m_timer2_irq = 0;
+		check_level1_interrupts();
 	}
 }
 
@@ -539,15 +609,15 @@ static const struct pit8253_config pit_intf =
 {
 	{
 		{
-			0,
+			500000,
 			DEVCB_LINE_VCC,
 			DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir0_w)
 		}, {
-			0,
+			2000000,
 			DEVCB_LINE_VCC,
 			DEVCB_NULL
 		}, {
-			0,
+			500000,
 			DEVCB_LINE_VCC,
 			DEVCB_DRIVER_LINE_MEMBER(wangpc_state, pit2_w)
 		}
@@ -559,15 +629,33 @@ static const struct pit8253_config pit_intf =
 //  IM6402_INTERFACE( uart_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( wangpc_state::uart_dr_w )
+{
+	if (state)
+	{
+		m_uart_dr = 1;		
+		check_level2_interrupts();
+	}
+}
+
+WRITE_LINE_MEMBER( wangpc_state::uart_tre_w )
+{
+	if (state)
+	{
+		m_uart_tre = 1;
+		check_level2_interrupts();
+	}
+}
+
 static IM6402_INTERFACE( uart_intf )
 {
-	0,
-	0,
+	62500,
+	62500,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_dr_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_tre_w)
 };
 
 
@@ -582,11 +670,16 @@ static const floppy_interface floppy_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSSD,
+	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
 	"floppy_5_25",
 	NULL
 };
+
+WRITE_LINE_MEMBER( wangpc_state::fdc_int_w )
+{
+	check_level2_interrupts();
+}
 
 static UPD765_GET_IMAGE( wangpc_fdc_get_image )
 {
@@ -600,7 +693,7 @@ static UPD765_GET_IMAGE( wangpc_fdc_get_image )
 
 static const upd765_interface fdc_intf =
 {
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, fdc_int_w),
 	DEVCB_NULL,
 	wangpc_fdc_get_image,
 	UPD765_RDY_PIN_NOT_CONNECTED,
@@ -622,9 +715,14 @@ static WANGPC_KEYBOARD_INTERFACE( kb_intf )
 //  WANGPC_BUS_INTERFACE( kb_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
+{
+	check_level2_interrupts();
+}
+
 static WANGPC_BUS_INTERFACE( bus_intf )
 {
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir2_w),
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, bus_irq2_w),
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir3_w),
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir4_w),
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir5_w),
@@ -633,7 +731,7 @@ static WANGPC_BUS_INTERFACE( bus_intf )
 	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq1_w),
 	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq2_w),
 	DEVCB_DEVICE_LINE(AM9517A_TAG, i8237_dreq3_w),
-	DEVCB_NULL
+	DEVCB_CPU_INPUT_LINE(I8086_TAG, INPUT_LINE_NMI)
 };
 
 static SLOT_INTERFACE_START( wangpc_cards )
@@ -653,6 +751,24 @@ void wangpc_state::machine_start()
 {
 	// register CPU IRQ callback
 	device_set_irq_callback(m_maincpu, wangpc_irq_callback);
+	
+	// connect serial keyboard
+	m_uart->connect(m_kb);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( wangpc )
+//-------------------------------------------------
+
+void wangpc_state::machine_reset()
+{
+	// initialize UART
+	m_uart->cls1_w(1);
+	m_uart->cls2_w(1);
+	m_uart->pi_w(1);
+	m_uart->sbs_w(1);
+	m_uart->crl_w(1);
 }
 
 

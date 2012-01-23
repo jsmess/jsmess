@@ -25,6 +25,7 @@
 #define IM6402_TAG		"im6402"
 #define SCN2661_TAG		"scn2661"
 #define UPD765_TAG		"upd765"
+#define KB_TAG			"serkb"
 #define SCREEN_TAG		"screen"
 
 class wangpc_state : public driver_device
@@ -43,7 +44,13 @@ public:
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
+		  m_kb(*this, WANGPC_KEYBOARD_TAG),
 		  m_timer2_irq(1),
+		  m_ecpi_irq(1),
+		  m_ppi_irq(1),
+		  m_uart_dr(0),
+		  m_uart_tre(0),
+		  m_fpu_irq(0),
 		  m_ds1(1),
 		  m_ds2(1)
 	{ }
@@ -58,14 +65,19 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
+	required_device<wangpc_keyboard_device> m_kb;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 	
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		bitmap.fill(RGB_BLACK);
 		return 0;
 	}
+	
+	void check_level1_interrupts();
+	void check_level2_interrupts();
 	
 	DECLARE_WRITE8_MEMBER( fdc_ctrl_w );
 	DECLARE_READ8_MEMBER( deselect_drive1_r );
@@ -95,6 +107,9 @@ public:
 	DECLARE_WRITE8_MEMBER( nmi_mask_w );
 	DECLARE_READ8_MEMBER( led_on_r );
 	DECLARE_WRITE8_MEMBER( fpu_mask_w );
+	DECLARE_WRITE8_MEMBER( uart_tre_clr_w );
+	DECLARE_READ8_MEMBER( uart_r );
+	DECLARE_WRITE8_MEMBER( uart_w );
 	DECLARE_READ8_MEMBER( led_off_r );
 	DECLARE_WRITE8_MEMBER( parity_nmi_clr_w );
 	DECLARE_READ8_MEMBER( option_id_r );
@@ -105,13 +120,23 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( pit0_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
+	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
+	DECLARE_WRITE_LINE_MEMBER( uart_tre_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
+	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
 	
 	UINT8 m_dma_page[3];
 	
 	int m_timer2_irq;
+	int m_ecpi_irq;
+	int m_ppi_irq;
+	int m_uart_dr;
+	int m_uart_tre;
+	int m_fpu_irq;
 	
 	int m_ds1;
 	int m_ds2;
+	
 };
 
 

@@ -352,6 +352,7 @@ ioport_constructor wangpc_keyboard_device::device_input_ports() const
 
 wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, WANGPC_KEYBOARD, "Wang PC Keyboard", tag, owner, clock),
+	  device_serial_interface(mconfig, *this),
 	  m_maincpu(*this, I8051_TAG)
 {
 }
@@ -363,6 +364,10 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 
 void wangpc_keyboard_device::device_start()
 {
+	// set serial callbacks
+	i8051_set_serial_tx_callback(m_maincpu, wangpc_keyboard_device::mcs51_tx_callback);
+	i8051_set_serial_rx_callback(m_maincpu, wangpc_keyboard_device::mcs51_rx_callback);
+	set_data_frame(8, 2, SERIAL_PARITY_NONE);
 }
 
 
@@ -372,6 +377,68 @@ void wangpc_keyboard_device::device_start()
 
 void wangpc_keyboard_device::device_reset()
 {
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void wangpc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	// receive
+	int bit = get_in_data_bit();
+	receive_register_update_bit(bit);
+	/*
+	if (start bit)
+	{
+		m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	}
+	*/
+	if (is_receive_register_full())
+	{
+		receive_register_extract();
+	}
+	
+	// transmit
+	if (!is_transmit_register_empty())
+	{
+		transmit_register_get_data_bit();
+		serial_connection_out();
+	}
+}
+
+
+//-------------------------------------------------
+//  input_callback -
+//-------------------------------------------------
+
+void wangpc_keyboard_device::input_callback(UINT8 state)
+{
+}
+
+
+//-------------------------------------------------
+//  mcs51_rx_callback -
+//-------------------------------------------------
+
+int wangpc_keyboard_device::mcs51_rx_callback(device_t *device)
+{
+	wangpc_keyboard_device *kb = static_cast<wangpc_keyboard_device *>(device->owner());
+	
+	return kb->get_received_char();
+}
+
+
+//-------------------------------------------------
+//  mcs51_tx_callback -
+//-------------------------------------------------
+
+void wangpc_keyboard_device::mcs51_tx_callback(device_t *device, int data)
+{
+	wangpc_keyboard_device *kb = static_cast<wangpc_keyboard_device *>(device->owner());
+	
+	kb->transmit_register_setup(data);
 }
 
 
