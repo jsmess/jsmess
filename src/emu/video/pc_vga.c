@@ -22,7 +22,8 @@
     - add emulated mc6845 hook-up
     - fix video update.
 	- rewrite video drawing functions (they are horrible)
-	- add emulated CGA
+	- fix RAM read/writes, CGA and Mono has video bugs due of corrupted vga.memory
+	- fix emulated CGA and Mono modes
 	- add VESA etc.
     - (and many more ...)
 
@@ -404,12 +405,100 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 
 static void vga_vh_cga(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	popmessage("CGA mode");
+	UINT32 *bitmapline;
+	//int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int x,y,yi;
+	UINT32 addr;
+	pen_t pen;
+
+	addr = 0;
+
+	for(y=0;y<200;y++)
+	{
+		//addr = (y) * test;
+
+		for(x=0;x<640;x+=16)
+		{
+			for(yi=0;yi<1;yi++)
+			{
+				bitmapline = &bitmap.pix32(y + yi);
+
+				/* TODO: debug dirty assignment */
+				{
+					pen = vga.pens[(vga.memory[addr] >> (6)) & 3];
+					bitmapline[x+0] = pen;
+					pen = vga.pens[(vga.memory[addr] >> (4)) & 3];
+					bitmapline[x+1] = pen;
+					pen = vga.pens[(vga.memory[addr] >> (2)) & 3];
+					bitmapline[x+2] = pen;
+					pen = vga.pens[(vga.memory[addr] >> (0)) & 3];
+					bitmapline[x+3] = pen;
+					pen = vga.pens[(vga.memory[addr+0x4000] >> (6)) & 3];
+					bitmapline[x+4] = pen;
+					pen = vga.pens[(vga.memory[addr+0x4000] >> (4)) & 3];
+					bitmapline[x+5] = pen;
+					pen = vga.pens[(vga.memory[addr+0x4000] >> (2)) & 3];
+					bitmapline[x+6] = pen;
+					pen = vga.pens[(vga.memory[addr+0x4000] >> (0)) & 3];
+					bitmapline[x+7] = pen;
+					pen = vga.pens[(vga.memory[addr+1] >> (6)) & 3];
+					bitmapline[x+8] = pen;
+					pen = vga.pens[(vga.memory[addr+1] >> (4)) & 3];
+					bitmapline[x+9] = pen;
+					pen = vga.pens[(vga.memory[addr+1] >> (2)) & 3];
+					bitmapline[x+10] = pen;
+					pen = vga.pens[(vga.memory[addr+1] >> (0)) & 3];
+					bitmapline[x+11] = pen;
+					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (6)) & 3];
+					bitmapline[x+12] = pen;
+					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (4)) & 3];
+					bitmapline[x+13] = pen;
+					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (2)) & 3];
+					bitmapline[x+14] = pen;
+					pen = vga.pens[(vga.memory[addr+1+0x4000] >> (0)) & 3];
+					bitmapline[x+15] = pen;
+				}
+			}
+
+			//popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vga.memory[0],vga.memory[1],vga.memory[2],vga.memory[3],vga.memory[4],vga.memory[5],vga.memory[6],vga.memory[7]);
+
+			addr+=2;
+		}
+	}
 }
 
 static void vga_vh_mono(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	popmessage("Mono mode");
+	UINT32 *bitmapline;
+	//int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int x,xi,y,yi;
+	UINT32 addr;
+	pen_t pen;
+
+	addr = 0;
+
+	for(y=0;y<200;y++)
+	{
+		//addr = (y) * test;
+
+		for(x=0;x<640;x+=8)
+		{
+			for(yi=0;yi<1;yi++)
+			{
+				bitmapline = &bitmap.pix32(y + yi);
+
+				for(xi=0;xi<8;xi++)
+				{
+					pen = vga.pens[(vga.memory[addr] >> (xi)) & 1];
+					bitmapline[x+xi] = pen;
+				}
+			}
+
+			//popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vga.memory[0],vga.memory[1],vga.memory[2],vga.memory[3],vga.memory[4],vga.memory[5],vga.memory[6],vga.memory[7]);
+
+			addr++;
+		}
+	}
 }
 
 
