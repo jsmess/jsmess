@@ -91,8 +91,9 @@ WRITE8_MEMBER( aim65_state::aim65_printer_on )
 }
 
 
-WRITE8_MEMBER( aim65_state::aim65_printer_data_a )
+WRITE8_MEMBER( aim65_state::aim65_pa_w )
 {
+// All bits are for printer data (not emulated)
 #if 0
 	if (m_flag_a == 0)
 	{
@@ -102,8 +103,42 @@ WRITE8_MEMBER( aim65_state::aim65_printer_data_a )
 #endif
 }
 
-WRITE8_MEMBER( aim65_state::aim65_printer_data_b )
+WRITE8_MEMBER( aim65_state::aim65_pb_w )
 {
+/*
+	d7 = cass out (both decks)
+	d5 = cass2 motor
+	d4 = cass1 motor
+	d2 = tty out (not emulated)
+	d0/1 = printer data (not emulated)
+*/
+
+	UINT8 bits = data ^ m_pb_save;
+	m_pb_save = data;
+
+	if (BIT(bits, 7))
+	{
+		m_cass1->output(BIT(data, 7) ? -1.0 : +1.0);
+		m_cass2->output(BIT(data, 7) ? -1.0 : +1.0);
+	}
+
+	if (BIT(bits, 5))
+	{
+		if (BIT(data, 5))
+			m_cass2->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		else
+			m_cass2->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+	}
+
+	if (BIT(bits, 4))
+	{
+		if (BIT(data, 4))
+			m_cass1->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		else
+			m_cass1->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+	}
+
+
 #if 0
 	data &= 0x03;
 
@@ -132,6 +167,7 @@ VIDEO_START( aim65 )
 	state->m_flag_a = 0;
 	state->m_flag_b = 0;
 	state->m_printer_level = 0;
+	state->m_pb_save = 0;
 }
 
 
@@ -168,3 +204,20 @@ SCREEN_UPDATE( aim65 )
 	return 0;
 }
 #endif
+
+
+READ8_MEMBER( aim65_state::aim65_pb_r )
+{
+/*
+	d7 = cassette in (deck 1)
+	d6 = tty in (not emulated)
+	d3 = kb/tty switch
+*/
+
+	UINT8 data = input_port_read(machine(), "switches");
+	data |= (m_cass1->input() > +0.03) ? 0x80 : 0;
+	data |= 0x40; // TTY must be H if not used.
+	data |= m_pb_save & 0x37;
+	return data;
+}
+
