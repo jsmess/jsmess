@@ -37,6 +37,7 @@
 #define AMS40041_TAG	"ic126"
 #define CENTRONICS_TAG	"centronics"
 #define SPEAKER_TAG		"speaker"
+#define ISA_BUS_TAG		"isa"
 #define SCREEN_TAG		"screen"
 
 class pc1512_state : public driver_device
@@ -58,6 +59,7 @@ public:
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
+		  m_bus(*this, ISA_BUS_TAG),
 		  m_pit1(0),
 		  m_pit2(0),
 		  m_status1(0),
@@ -92,6 +94,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	optional_device<device_t> m_floppy1;
+	required_device<isa8_device> m_bus;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -138,9 +141,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
 	DECLARE_READ8_MEMBER( memr_r );
 	DECLARE_WRITE8_MEMBER( memw_w );
-	DECLARE_WRITE8_MEMBER( dma0_w );
-	DECLARE_READ8_MEMBER( fdc_dack_r );
-	DECLARE_WRITE8_MEMBER( fdc_dack_w );
+	DECLARE_READ8_MEMBER( ior1_r );
+	DECLARE_READ8_MEMBER( ior2_r );
+	DECLARE_READ8_MEMBER( ior3_r );
+	DECLARE_WRITE8_MEMBER( iow0_w );
+	DECLARE_WRITE8_MEMBER( iow1_w );
+	DECLARE_WRITE8_MEMBER( iow2_w );
+	DECLARE_WRITE8_MEMBER( iow3_w );
 	DECLARE_WRITE_LINE_MEMBER( dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );

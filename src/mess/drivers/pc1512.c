@@ -907,24 +907,46 @@ WRITE8_MEMBER( pc1512_state::memw_w )
 	program->write_byte(page_offset + offset, data);
 }
 
-WRITE8_MEMBER( pc1512_state::dma0_w )
+READ8_MEMBER( pc1512_state::ior1_r )
+{
+	return m_bus->dack_r(1);
+}
+
+READ8_MEMBER( pc1512_state::ior2_r )
+{
+	if (m_nden)
+		return upd765_dack_r(m_fdc, 0);
+	else
+		return m_bus->dack_r(2);
+}
+
+READ8_MEMBER( pc1512_state::ior3_r )
+{
+	return m_bus->dack_r(3);
+}
+
+WRITE8_MEMBER( pc1512_state::iow0_w )
 {
 	m_dreq0 = 0;
 	i8237_dreq0_w(m_dmac, m_dreq0);
 }
 
-READ8_MEMBER( pc1512_state::fdc_dack_r )
+WRITE8_MEMBER( pc1512_state::iow1_w )
 {
-	UINT8 data = 0;
-
-	if (m_nden) data = upd765_dack_r(m_fdc, 0);
-
-	return data;
+	m_bus->dack_w(1, data);
 }
 
-WRITE8_MEMBER( pc1512_state::fdc_dack_w )
+WRITE8_MEMBER( pc1512_state::iow2_w )
 {
-	if (m_nden) upd765_dack_w(m_fdc, 0, data);
+	if (m_nden)
+		upd765_dack_w(m_fdc, 0, data);
+	else
+		m_bus->dack_w(2, data);
+}
+
+WRITE8_MEMBER( pc1512_state::iow3_w )
+{
+	m_bus->dack_w(3, data);
 }
 
 WRITE_LINE_MEMBER( pc1512_state::dack0_w )
@@ -953,10 +975,18 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(pc1512_state, eop_w),
 	DEVCB_DRIVER_MEMBER(pc1512_state, memr_r),
 	DEVCB_DRIVER_MEMBER(pc1512_state, memw_w),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc1512_state, fdc_dack_r), DEVCB_NULL },
-	{ DEVCB_DRIVER_MEMBER(pc1512_state, dma0_w), DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc1512_state, fdc_dack_w), DEVCB_NULL },
-	{ DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack1_w),
-	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack3_w) }
+	{ DEVCB_NULL,
+	  DEVCB_DRIVER_MEMBER(pc1512_state, ior1_r),
+	  DEVCB_DRIVER_MEMBER(pc1512_state, ior2_r),
+	  DEVCB_DRIVER_MEMBER(pc1512_state, ior3_r) },
+	{ DEVCB_DRIVER_MEMBER(pc1512_state, iow0_w),
+	  DEVCB_DRIVER_MEMBER(pc1512_state, iow1_w),
+	  DEVCB_DRIVER_MEMBER(pc1512_state, iow2_w),
+	  DEVCB_DRIVER_MEMBER(pc1512_state, iow3_w) },
+	{ DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack0_w),
+	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack1_w),
+	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack2_w),
+	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack3_w) }	
 };
 
 
@@ -1341,10 +1371,10 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 
 	// ISA8 bus
-	MCFG_ISA8_BUS_ADD("isa", I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc1512_isa8_cards, NULL, NULL)
-	MCFG_ISA8_SLOT_ADD("isa", "isa2", pc1512_isa8_cards, NULL, NULL)
-	MCFG_ISA8_SLOT_ADD("isa", "isa3", pc1512_isa8_cards, NULL, NULL)
+	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, I8086_TAG, isabus_intf)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1385,10 +1415,10 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 
 	// ISA8 bus
-	MCFG_ISA8_BUS_ADD("isa", I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc1512_isa8_cards, "wdxt_gen", NULL)
-	MCFG_ISA8_SLOT_ADD("isa", "isa2", pc1512_isa8_cards, NULL, NULL)
-	MCFG_ISA8_SLOT_ADD("isa", "isa3", pc1512_isa8_cards, NULL, NULL)
+	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, I8086_TAG, isabus_intf)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, "wdxt_gen", NULL)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
