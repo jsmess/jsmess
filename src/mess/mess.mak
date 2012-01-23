@@ -512,6 +512,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/s100.o		\
 	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
+	$(MESS_MACHINE)/ncr5390.o	\
 	$(MESS_MACHINE)/pc_lpt.o	\
 	$(MESS_MACHINE)/pc_mouse.o	\
 	$(MESS_MACHINE)/pcf8593.o	\
@@ -541,6 +542,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/wd1772.o	\
 	$(MESS_MACHINE)/3c503.o		\
 	$(MESS_FORMATS)/z80bin.o	\
+	$(MESS_MACHINE)/n82077aa.o	\
+	$(MESS_MACHINE)/mb8795.o	\
 
 
 
@@ -1210,7 +1213,7 @@ $(MESSOBJ)/netronic.a:			\
 $(MESSOBJ)/next.a:				\
 	$(MESS_DRIVERS)/next.o		\
 	$(MESS_MACHINE)/nextkbd.o	\
-	$(MESS_MACHINE)/n82077aa.o	\
+	$(MESS_MACHINE)/nextmo.o	\
 
 $(MESSOBJ)/nintendo.a:			\
 	$(MESS_MACHINE)/nes_mmc.o	\

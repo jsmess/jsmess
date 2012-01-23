@@ -9,7 +9,7 @@
 
 class nextkbd_device : public device_t {
 public:
-	typedef delegate<void ()> int_cb_t;
+	typedef delegate<void (bool state)> int_cb_t;
 
 	nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void set_int_change_cb(int_cb_t int_change_cb);
