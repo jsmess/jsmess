@@ -15,13 +15,9 @@
     gberetb is a bootleg hacked to run on different hardware.
 
     TODO
-        - Original Green Beret is currently running too fast so it was downgraded to an unlikely
-          refresh rate (30 Hz). Possible causes ranges from irq sources not understood (there's a custom
-          IC that controls irq timings) or even waitstates (see MT #3600).
-        - Dump Green Beret Bootleg proms.  Bootleg has four proms while the original has three
-          and correct the locations.
+        - Measure IRQ and NMI frequency (of an original board), is IRQ really tied to the same timer that triggers NMI?
+        - Dump Green Beret Bootleg proms and correct the locations. Bootleg has four proms while the original has three.
         - Dump Green Beret Bootleg PAL
-        - Green Beret bootleg xtal is 20.000 MHz
 
 ****************************************************************************
 
@@ -70,7 +66,7 @@
 
     Interrupts
 
-    The game uses both IRQ (mode 1) and NMI.
+    The game uses both IRQ (mode 1) and NMI via a custom interrupt controller.
 
 ***************************************************************************/
 
@@ -80,95 +76,79 @@
 #include "includes/konamipt.h"
 #include "includes/gberet.h"
 
-#define MASTER_CLOCK XTAL_18_432MHz
-
 /*************************************
  *
  *  Interrupt generators
  *
  *************************************/
 
-static TIMER_DEVICE_CALLBACK( gberet_scanline )
+static TIMER_DEVICE_CALLBACK( gberet_interrupt_tick )
 {
 	gberet_state *state = timer.machine().driver_data<gberet_state>();
-	int scanline = param;
+	UINT8 ticks_mask = ~state->m_interrupt_ticks & (state->m_interrupt_ticks + 1); // 0->1
+	state->m_interrupt_ticks++;
 
-	if(scanline == 240)
-	{
-		if (state->m_irq_enable)
-			cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
-	}
-	else if ((scanline % 16) == 0)
-	{
-		if (state->m_nmi_enable)
-			cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
+	// NMI on d0
+	if (ticks_mask & state->m_interrupt_mask & 1)
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	
+	// IRQ on d3 (used by mrgoemon)
+	if (ticks_mask & state->m_interrupt_mask<<2 & 8)
+		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
 
-static TIMER_DEVICE_CALLBACK( mrgoemon_scanline )
-{
-	gberet_state *state = timer.machine().driver_data<gberet_state>();
-	int scanline = param;
-
-	if(scanline == 240)
-	{
-		if (state->m_irq_enable)
-			cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
-	}
-	else if ((scanline % 32) == 0)
-	{
-		if (state->m_nmi_enable)
-			cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-	}
+	// IRQ on d4 (used by gberet)
+	if (ticks_mask & state->m_interrupt_mask<<2 & 16)
+		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
 }
 
 
 /*************************************
  *
- *  Memory handlers
+ *  Address maps / Memory handlers
  *
  *************************************/
 
 static WRITE8_HANDLER( gberet_coin_counter_w )
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
-}
-
-static WRITE8_HANDLER( gberet_flipscreen_w )
-{
-	gberet_state *state = space->machine().driver_data<gberet_state>();
-	state->m_nmi_enable = data & 0x01;
-	state->m_irq_enable = data & 0x04;
-
-	flip_screen_set(space->machine(), data & 0x08);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 }
 
 static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(space->machine(), 1, data & 2);
 
 	/* bits 5-7 = ROM bank select */
 	memory_set_bank(space->machine(), "bank1", ((data & 0xe0) >> 5));
 }
 
-static WRITE8_HANDLER( mrgoemon_flipscreen_w )
+static WRITE8_HANDLER( gberet_flipscreen_w )
 {
 	gberet_state *state = space->machine().driver_data<gberet_state>();
-	state->m_nmi_enable = data & 0x01;
-	state->m_irq_enable = data & 0x02;
 
-	flip_screen_set(space->machine(), data & 0x08);
+	/* bits 0/1/2 = interrupt enable */
+	UINT8 ack_mask = ~data & state->m_interrupt_mask; // 1->0
+
+	if (ack_mask & 1)
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+
+	if (ack_mask & 6)
+		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+
+	state->m_interrupt_mask = data & 7;
+
+	/* bit 3 = flip screen */
+	flip_screen_set(space->machine(), data & 8);
 }
 
-/*************************************
- *
- *  Address maps
- *
- *************************************/
+static WRITE8_HANDLER( gberet_sound_w )
+{
+	gberet_state *state = space->machine().driver_data<gberet_state>();
+	sn76496_w(space->machine().device("snsnd"), 0, *state->m_soundlatch);
+}
 
 static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -182,34 +162,12 @@ static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(gberet_coin_counter_w)
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITENOP			// Loads the snd command into the snd latch
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_DEVWRITE("snsnd", sn76496_w)	// This address triggers the SN chip to read the data port.
-	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(gberet_state, m_soundlatch)
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_WRITE(gberet_sound_w)
+	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(watchdog_reset_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, m_videoram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe03f) AM_RAM
-	AM_RANGE(0xe040, 0xe043) AM_WRITENOP // ???
-	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM
-	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_BASE_SIZE_MEMBER(gberet_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP				// coin counter not supported
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("snsnd", sn76496_w)
-	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("P2")
-	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
-	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf800, 0xf800) AM_NOP						// IRQ/NMI acknowledge
-	AM_RANGE(0xf900, 0xf901) AM_WRITE(gberetb_scroll_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8 )
@@ -222,16 +180,55 @@ static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE_MEMBER(gberet_state, m_scrollram)
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???
 	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
-	AM_RANGE(0xe044, 0xe044) AM_WRITE(mrgoemon_flipscreen_w)
+	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mrgoemon_coin_counter_w)
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITENOP				// Loads the snd command into the snd latch
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_DEVWRITE("snsnd", sn76496_w)		// This address triggers the SN chip to read the data port.
+	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(gberet_state, m_soundlatch)
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_WRITE(gberet_sound_w)
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf800, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
+
+
+static WRITE8_HANDLER( gberetb_flipscreen_w )
+{
+	flip_screen_set(space->machine(), data & 8);
+}
+
+static READ8_HANDLER( gberetb_irq_ack_r )
+{
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	return 0xff;
+}
+
+static WRITE8_HANDLER( gberetb_nmi_ack_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, m_videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe03f) AM_RAM
+	AM_RANGE(0xe040, 0xe043) AM_WRITENOP // ???
+	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberetb_flipscreen_w) // did hw even support flipscreen?
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM
+	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_BASE_SIZE_MEMBER(gberet_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // coin counter not supported
+	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2")
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("snsnd", sn76496_w)
+	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("P2")
+	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
+	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(gberetb_irq_ack_r, gberetb_nmi_ack_w)
+	AM_RANGE(0xf900, 0xf901) AM_WRITE(gberetb_scroll_w)
+ADDRESS_MAP_END
+
 
 /*************************************
  *
@@ -241,7 +238,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gberet )
 	PORT_START("P1")
-	KONAMI8_MONO_B12_UNK					// button 1 = knife, button 2 = shoot
+	KONAMI8_MONO_B12_UNK
 
 	PORT_START("P2")
 	KONAMI8_COCKTAIL_B12_UNK
@@ -256,7 +253,7 @@ static INPUT_PORTS_START( gberet )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )		// factory default
+	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:3")
@@ -264,12 +261,12 @@ static INPUT_PORTS_START( gberet )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "30K, 70K, Every 70K" )
-	PORT_DIPSETTING(    0x10, "40K, 80K, Every 80K" )		// Japanese default
-	PORT_DIPSETTING(    0x08, "50K, 100K, Every 100K" )		// US default
+	PORT_DIPSETTING(    0x10, "40K, 80K, Every 80K" )	// Japanese default
+	PORT_DIPSETTING(    0x08, "50K, 100K, Every 100K" )	// US default
 	PORT_DIPSETTING(    0x00, "50K, 200K, Every 200K" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )			// factory default
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
@@ -309,7 +306,7 @@ static INPUT_PORTS_START( mrgoemon )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "20K, Every 60K" )	// factory default
+	PORT_DIPSETTING(    0x18, "20K, Every 60K" )
 	PORT_DIPSETTING(    0x10, "30K, Every 70K" )
 	PORT_DIPSETTING(    0x08, "40K, Every 80K" )
 	PORT_DIPSETTING(    0x00, "50K, Every 90K" )
@@ -317,6 +314,7 @@ static INPUT_PORTS_START( mrgoemon )
 	PORT_MODIFY("DSW3")
 	PORT_SERVICE_DIPLOC(   0x04, IP_ACTIVE_LOW, "SW3:3" )
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -385,7 +383,7 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Machine driver
+ *  Machine drivers
  *
  *************************************/
 
@@ -393,8 +391,8 @@ static MACHINE_START( gberet )
 {
 	gberet_state *state = machine.driver_data<gberet_state>();
 
-	state->save_item(NAME(state->m_irq_enable));
-	state->save_item(NAME(state->m_nmi_enable));
+	state->save_item(NAME(state->m_interrupt_mask));
+	state->save_item(NAME(state->m_interrupt_ticks));
 	state->save_item(NAME(state->m_spritebank));
 }
 
@@ -402,24 +400,24 @@ static MACHINE_RESET( gberet )
 {
 	gberet_state *state = machine.driver_data<gberet_state>();
 
-	state->m_irq_enable = 0;
-	state->m_nmi_enable = 0;
+	state->m_interrupt_mask = 0;
+	state->m_interrupt_ticks = 0;
 	state->m_spritebank = 0;
 }
 
 static MACHINE_CONFIG_START( gberet, gberet_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	// X1S (generated by a custom IC)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)		// X1S (generated by a custom IC)
 	MCFG_CPU_PROGRAM_MAP(gberet_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", gberet_scanline, "screen", 0, 1)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", gberet_interrupt_tick, "screen", 0, 16) // ?
 
 	MCFG_MACHINE_START(gberet)
 	MCFG_MACHINE_RESET(gberet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_REFRESH_RATE(60.60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
@@ -434,24 +432,8 @@ static MACHINE_CONFIG_START( gberet, gberet_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, MASTER_CLOCK/12) /* type verified on real and bootleg pcb */
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12) /* type verified on real and bootleg pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( gberetb, gberet )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gberetb_map)
-	MCFG_TIMER_MODIFY("scantimer")//, mrgoemon_scanline, "screen", 0, 1)
-	MCFG_TIMER_CALLBACK(mrgoemon_scanline)
-
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_STATIC(gberetb)
-
-	MCFG_GFXDECODE(gberetb)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrgoemon, gberet )
@@ -459,12 +441,40 @@ static MACHINE_CONFIG_DERIVED( mrgoemon, gberet )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mrgoemon_map)
-	MCFG_TIMER_MODIFY("scantimer")//, mrgoemon_scanline, "screen", 0, 1)
-	MCFG_TIMER_CALLBACK(mrgoemon_scanline)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( gberetb, gberet_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4) // divider guessed
+	MCFG_CPU_PROGRAM_MAP(gberetb_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_PERIODIC_INT(nmi_line_assert, XTAL_20MHz/0x8000) // divider guessed
+
+	MCFG_MACHINE_START(gberet)
+	MCFG_MACHINE_RESET(gberet)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_STATIC(gberetb)
+
+	MCFG_GFXDECODE(gberetb)
+	MCFG_PALETTE_LENGTH(2*16*16)
+
+	MCFG_PALETTE_INIT(gberet)
+	MCFG_VIDEO_START(gberet)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_20MHz/12) // divider guessed
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
 
 /*************************************
  *
@@ -569,9 +579,10 @@ static DRIVER_INIT( mrgoemon )
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x800);
 }
 
+
 /*************************************
  *
- *  Game driver(s)
+ *  Game drivers
  *
  *************************************/
 
