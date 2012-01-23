@@ -1432,7 +1432,7 @@ The software list will be divided in four categories:
 	<software name="batldod2">
 		<description>Battle Dodge Ball II (Jpn)</description>
 		<year>1993</year>
-		<publisher>1993</publisher>
+		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-D2 "/>
 		<info name="release" value="19930723"/>
 		<info name="alt_title" value="バトルドッジボールII"/>
