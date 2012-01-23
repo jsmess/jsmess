@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/8237dma.h"
+#include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"
 #include "machine/pic8259.h"
@@ -25,6 +26,7 @@
 #define IM6402_TAG		"im6402"
 #define SCN2661_TAG		"scn2661"
 #define UPD765_TAG		"upd765"
+#define CENTRONICS_TAG	"centronics"
 #define KB_TAG			"serkb"
 #define SCREEN_TAG		"screen"
 
@@ -44,13 +46,21 @@ public:
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
+		  m_centronics(*this, CENTRONICS_TAG),
 		  m_kb(*this, WANGPC_KEYBOARD_TAG),
+		  m_bus(*this, WANGPC_BUS_TAG),
 		  m_timer2_irq(1),
 		  m_ecpi_irq(1),
-		  m_ppi_irq(1),
+		  m_acknlg(1),
+		  m_dav(1),
+		  m_busy(1),
+		  m_dma_eop(1),
 		  m_uart_dr(0),
-		  m_uart_tre(0),
+		  m_uart_tbre(0),
 		  m_fpu_irq(0),
+		  m_fdc_tc_enable(0),
+		  m_fdc_dma_enable(1),
+		  m_fdc_drq(1),
 		  m_ds1(1),
 		  m_ds2(1)
 	{ }
@@ -65,7 +75,9 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
+	required_device<device_t> m_centronics;
 	required_device<wangpc_keyboard_device> m_kb;
+	required_device<wangpcbus_device> m_bus;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -78,6 +90,8 @@ public:
 	
 	void check_level1_interrupts();
 	void check_level2_interrupts();
+	void update_fdc_drq();
+	void update_fdc_tc();
 	
 	DECLARE_WRITE8_MEMBER( fdc_ctrl_w );
 	DECLARE_READ8_MEMBER( deselect_drive1_r );
@@ -107,13 +121,31 @@ public:
 	DECLARE_WRITE8_MEMBER( nmi_mask_w );
 	DECLARE_READ8_MEMBER( led_on_r );
 	DECLARE_WRITE8_MEMBER( fpu_mask_w );
-	DECLARE_WRITE8_MEMBER( uart_tre_clr_w );
+	DECLARE_WRITE8_MEMBER( uart_tbre_clr_w );
 	DECLARE_READ8_MEMBER( uart_r );
 	DECLARE_WRITE8_MEMBER( uart_w );
+	DECLARE_READ8_MEMBER( centronics_r );
+	DECLARE_WRITE8_MEMBER( centronics_w );
+	DECLARE_READ8_MEMBER( busy_clr_r );
+	DECLARE_WRITE8_MEMBER( acknlg_clr_w );
 	DECLARE_READ8_MEMBER( led_off_r );
 	DECLARE_WRITE8_MEMBER( parity_nmi_clr_w );
 	DECLARE_READ8_MEMBER( option_id_r );
 	
+	DECLARE_WRITE_LINE_MEMBER( hrq_w );
+	DECLARE_WRITE_LINE_MEMBER( eop_w );
+	DECLARE_READ8_MEMBER( memr_r );
+	DECLARE_WRITE8_MEMBER( memw_w );
+	DECLARE_READ8_MEMBER( ior1_r );
+	DECLARE_READ8_MEMBER( ior2_r );
+	DECLARE_READ8_MEMBER( ior3_r );
+	DECLARE_WRITE8_MEMBER( iow1_w );
+	DECLARE_WRITE8_MEMBER( iow2_w );
+	DECLARE_WRITE8_MEMBER( iow3_w );
+	DECLARE_WRITE_LINE_MEMBER( dack0_w );
+	DECLARE_WRITE_LINE_MEMBER( dack1_w );
+	DECLARE_WRITE_LINE_MEMBER( dack2_w );
+	DECLARE_WRITE_LINE_MEMBER( dack3_w );
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_READ8_MEMBER( ppi_pc_r );
@@ -121,22 +153,31 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pit0_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
-	DECLARE_WRITE_LINE_MEMBER( uart_tre_w );
+	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	DECLARE_WRITE_LINE_MEMBER( ack_w );
+	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
 	
 	UINT8 m_dma_page[3];
+	int m_dma_channel;
 	
 	int m_timer2_irq;
 	int m_ecpi_irq;
-	int m_ppi_irq;
+	int m_acknlg;
+	int m_dav;
+	int m_busy;
+	int m_dma_eop;
 	int m_uart_dr;
-	int m_uart_tre;
+	int m_uart_tbre;
 	int m_fpu_irq;
 	
+	int m_fdc_tc_enable;
+	int m_fdc_dma_enable;
+	int m_fdc_drq;
 	int m_ds1;
 	int m_ds2;
-	
 };
 
 

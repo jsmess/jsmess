@@ -1,4 +1,15 @@
+/*
+
+	Wang Professional Computer
+
+	http://www.seasip.info/VintagePC/wangpc.html
+	
+	chdman -createblankhd q540.chd 512 8 17 512
+	
+*/
+
 #include "includes/wangpc.h"
+
 
 
 //**************************************************************************
@@ -32,6 +43,12 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 		7		
 		
 	*/
+	
+	m_fdc_tc_enable = BIT(data, 0);
+	m_fdc_dma_enable = BIT(data, 1);
+
+	update_fdc_tc();
+	update_fdc_drq();
 }
 
 
@@ -186,7 +203,7 @@ WRITE8_MEMBER( wangpc_state::fdc_tc_w )
 
 WRITE8_MEMBER( wangpc_state::dma_page_w )
 {
-	m_dma_page[offset] = data;
+	m_dma_page[offset] = data & 0x0f;
 }
 
 
@@ -274,12 +291,12 @@ WRITE8_MEMBER( wangpc_state::fpu_mask_w )
 
 
 //-------------------------------------------------
-//  uart_tre_clr_w -
+//  uart_tbre_clr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::uart_tre_clr_w  )
+WRITE8_MEMBER( wangpc_state::uart_tbre_clr_w  )
 {
-	m_uart_tre = 0;
+	m_uart_tbre = 0;
 	check_level2_interrupts();
 }
 
@@ -303,10 +320,63 @@ READ8_MEMBER( wangpc_state::uart_r )
 
 WRITE8_MEMBER( wangpc_state::uart_w  )
 {
-	m_uart_tre = 0;
+	m_uart_tbre = 0;
 	check_level2_interrupts();
 	
 	m_uart->write(space, 0, data);
+}
+
+
+//-------------------------------------------------
+//  centronics_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wangpc_state::centronics_r )
+{
+	m_dav = 1;
+	check_level1_interrupts();
+	
+	return centronics_data_r(m_centronics, 0);
+}
+
+
+//-------------------------------------------------
+//  centronics_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wangpc_state::centronics_w )
+{
+	m_acknlg = 1;
+	check_level1_interrupts();
+	
+	centronics_data_w(m_centronics, 0, data);
+	
+	centronics_strobe_w(m_centronics, 0);
+	centronics_strobe_w(m_centronics, 1);
+}
+
+
+//-------------------------------------------------
+//  busy_clr_r -
+//-------------------------------------------------
+
+READ8_MEMBER( wangpc_state::busy_clr_r )
+{
+	m_busy = 1;
+	check_level1_interrupts();
+	
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  acknlg_clr_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( wangpc_state::acknlg_clr_w )
+{
+	m_acknlg = 1;
+	check_level1_interrupts();
 }
 
 
@@ -401,8 +471,10 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
 	AM_RANGE(0x10e2, 0x10e3) AM_READWRITE8(timer2_irq_clr_r, nmi_mask_w, 0x00ff)
 	AM_RANGE(0x10e4, 0x10e5) AM_READWRITE8(led_on_r, fpu_mask_w, 0x00ff)
-	AM_RANGE(0x10e6, 0x10e7) AM_WRITE8(uart_tre_clr_w, 0x00ff)
+	AM_RANGE(0x10e6, 0x10e7) AM_WRITE8(uart_tbre_clr_w, 0x00ff)
 	AM_RANGE(0x10e8, 0x10e9) AM_READWRITE8(uart_r, uart_w, 0x00ff)
+	AM_RANGE(0x10ea, 0x10eb) AM_READWRITE8(centronics_r, centronics_w, 0x00ff)
+	AM_RANGE(0x10ec, 0x10ed) AM_READWRITE8(busy_clr_r, acknlg_clr_w, 0x00ff)
 	AM_RANGE(0x10ee, 0x10ef) AM_READWRITE8(led_off_r, parity_nmi_clr_w, 0x00ff)
 	AM_RANGE(0x10fe, 0x10ff) AM_READ8(option_id_r, 0x00ff)
 ADDRESS_MAP_END
@@ -418,6 +490,21 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( wangpc )
+	// keyboard defined in machine/wangpckb.c
+	
+	PORT_START("SW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -430,15 +517,119 @@ INPUT_PORTS_END
 //  I8237_INTERFACE( dmac_intf )
 //-------------------------------------------------
 
+void wangpc_state::update_fdc_tc()
+{
+	if (m_fdc_tc_enable)
+		upd765_tc_w(m_fdc, m_dma_eop);
+	else
+		upd765_tc_w(m_fdc, 1);
+}
+
+WRITE_LINE_MEMBER( wangpc_state::hrq_w )
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	i8237_hlda_w(m_dmac, state);
+}
+
+WRITE_LINE_MEMBER( wangpc_state::eop_w )
+{
+	m_dma_eop = !state;
+	
+	update_fdc_tc();
+	check_level2_interrupts();
+}
+
+READ8_MEMBER( wangpc_state::memr_r )
+{
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
+
+	return program->read_byte(page_offset + offset);
+}
+
+WRITE8_MEMBER( wangpc_state::memw_w )
+{
+	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
+	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
+
+	program->write_byte(page_offset + offset, data);
+}
+
+READ8_MEMBER( wangpc_state::ior1_r )
+{
+	return m_bus->dack_r(1);
+}
+
+READ8_MEMBER( wangpc_state::ior2_r )
+{
+	if (m_fdc_dma_enable)
+		return m_bus->dack_r(2);
+	else
+		return upd765_dack_r(m_fdc, 0);
+}
+
+READ8_MEMBER( wangpc_state::ior3_r )
+{
+	return m_bus->dack_r(3);
+}
+
+WRITE8_MEMBER( wangpc_state::iow1_w )
+{
+	m_bus->dack_w(1, data);
+}
+
+WRITE8_MEMBER( wangpc_state::iow2_w )
+{
+	if (m_fdc_dma_enable)
+		m_bus->dack_w(2, data);
+	else
+		upd765_dack_w(m_fdc, 0, data);
+}
+
+WRITE8_MEMBER( wangpc_state::iow3_w )
+{
+	m_bus->dack_w(3, data);
+}
+
+WRITE_LINE_MEMBER( wangpc_state::dack0_w )
+{
+	if (!state) m_dma_channel = 0;
+}
+
+WRITE_LINE_MEMBER( wangpc_state::dack1_w )
+{
+	if (!state) m_dma_channel = 1;
+}
+
+WRITE_LINE_MEMBER( wangpc_state::dack2_w )
+{
+	if (!state) m_dma_channel = 2;
+}
+
+WRITE_LINE_MEMBER( wangpc_state::dack3_w )
+{
+	if (!state) m_dma_channel = 3;
+}
+
 static I8237_INTERFACE( dmac_intf )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, hrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, eop_w),
+	DEVCB_DRIVER_MEMBER(wangpc_state, memr_r),
+	DEVCB_DRIVER_MEMBER(wangpc_state, memw_w),
+	{ DEVCB_NULL,
+	  DEVCB_DRIVER_MEMBER(wangpc_state, ior1_r),
+	  DEVCB_DRIVER_MEMBER(wangpc_state, ior2_r),
+	  DEVCB_DRIVER_MEMBER(wangpc_state, ior3_r) },
+	{ DEVCB_NULL,
+	  DEVCB_DRIVER_MEMBER(wangpc_state, iow1_w),
+	  DEVCB_DRIVER_MEMBER(wangpc_state, iow2_w),
+	  DEVCB_DRIVER_MEMBER(wangpc_state, iow3_w) },
+	{ DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack0_w),
+	  DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack1_w),
+	  DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack2_w),
+	  DEVCB_DRIVER_LINE_MEMBER(wangpc_state, dack3_w) }
 };
 
 
@@ -448,14 +639,14 @@ static I8237_INTERFACE( dmac_intf )
 
 void wangpc_state::check_level1_interrupts()
 {
-	int state = !m_timer2_irq | !m_ecpi_irq | !m_ppi_irq;
+	int state = !m_timer2_irq | !m_ecpi_irq | !m_acknlg | !m_dav | !m_busy;
 	
 	pic8259_ir1_w(m_pic, state);
 }
 
 void wangpc_state::check_level2_interrupts()
 {
-	int state = /* !i8237_eop_r(m_dmac) | */ m_uart_dr | m_uart_tre | upd765_int_r(m_fdc) | m_fpu_irq;
+	int state = !m_dma_eop | m_uart_dr | m_uart_tbre | upd765_int_r(m_fdc) | m_fpu_irq;
 	
 	pic8259_ir2_w(m_pic, state);
 }
@@ -496,7 +687,15 @@ READ8_MEMBER( wangpc_state::ppi_pa_r )
 		
 	*/
 	
-	return 0;
+	UINT8 data = 0x08 | 0x02 | 0x01;
+	
+	data |= m_dav << 2;
+	data |= centronics_busy_r(m_centronics) << 4;
+	data |= centronics_fault_r(m_centronics) << 5;
+	data |= centronics_pe_r(m_centronics) << 6;
+	data |= m_acknlg << 7;
+	
+	return data;
 }
 
 READ8_MEMBER( wangpc_state::ppi_pb_r )
@@ -525,13 +724,13 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 	data |= m_ecpi_irq << 1;
 	
 	// parallel port interrupt
-	data |= m_ppi_irq << 2;
+	data |= m_acknlg << 2;
 	
 	// DMA interrupt
-	// data |= i8237_eop_r(m_dmac) << 3;
+	data |= m_dma_eop << 3;
 		
 	// keyboard interrupt
-	data |= m_uart_tre << 4;
+	data |= m_uart_tbre << 4;
 	data |= m_uart_dr << 5;
 	
 	// FDC interrupt
@@ -560,7 +759,7 @@ READ8_MEMBER( wangpc_state::ppi_pc_r )
 		
 	*/
 	
-	return 0;
+	return input_port_read(machine(), "SW") << 4;
 }
 
 WRITE8_MEMBER( wangpc_state::ppi_pc_w )
@@ -569,9 +768,9 @@ WRITE8_MEMBER( wangpc_state::ppi_pc_w )
 		
 		bit		description
 		
-		0		/USR0
-		1		/USR1
-		2		/RESET
+		0		/USR0 (pin 14)
+		1		/USR1 (pin 36)
+		2		/RESET (pin 31)
 		3		Unassigned
 		4		
 		5		
@@ -579,6 +778,9 @@ WRITE8_MEMBER( wangpc_state::ppi_pc_w )
 		7		
 		
 	*/
+	
+	centronics_autofeed_w(m_centronics, BIT(data, 0));
+	centronics_init_w(m_centronics, BIT(data, 2));
 }
 
 static I8255A_INTERFACE( ppi_intf )
@@ -638,11 +840,11 @@ WRITE_LINE_MEMBER( wangpc_state::uart_dr_w )
 	}
 }
 
-WRITE_LINE_MEMBER( wangpc_state::uart_tre_w )
+WRITE_LINE_MEMBER( wangpc_state::uart_tbre_w )
 {
 	if (state)
 	{
-		m_uart_tre = 1;
+		m_uart_tbre = 1;
 		check_level2_interrupts();
 	}
 }
@@ -654,8 +856,8 @@ static IM6402_INTERFACE( uart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_dr_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_tre_w)
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_tbre_w),
+	DEVCB_NULL
 };
 
 
@@ -681,6 +883,20 @@ WRITE_LINE_MEMBER( wangpc_state::fdc_int_w )
 	check_level2_interrupts();
 }
 
+WRITE_LINE_MEMBER( wangpc_state::fdc_drq_w )
+{
+	m_fdc_drq = state;
+	update_fdc_drq();
+}
+
+void wangpc_state::update_fdc_drq()
+{
+	if (m_fdc_dma_enable)
+		i8237_dreq2_w(m_dmac, m_fdc_drq);
+	else
+		i8237_dreq2_w(m_dmac, CLEAR_LINE);
+}
+
 static UPD765_GET_IMAGE( wangpc_fdc_get_image )
 {
 	wangpc_state *state = device->machine().driver_data<wangpc_state>();
@@ -694,10 +910,35 @@ static UPD765_GET_IMAGE( wangpc_fdc_get_image )
 static const upd765_interface fdc_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, fdc_int_w),
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, fdc_drq_w),
 	wangpc_fdc_get_image,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
+
+//-------------------------------------------------
+//  centronics_interface centronics_intf
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( wangpc_state::ack_w )
+{
+	m_acknlg = state;
+	check_level1_interrupts();
+}
+
+WRITE_LINE_MEMBER( wangpc_state::busy_w )
+{
+	m_busy = state;
+	check_level1_interrupts();
+}
+
+static const centronics_interface centronics_intf =
+{
+	1,
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, ack_w),
+	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, busy_w),
+	DEVCB_NULL
 };
 
 
@@ -802,6 +1043,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	// SCN2661 for RS-232
 	MCFG_UPD765A_ADD(UPD765_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_WANGPC_KEYBOARD_ADD(kb_intf)
 	
 	// bus
