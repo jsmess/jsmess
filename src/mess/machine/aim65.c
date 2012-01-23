@@ -5,28 +5,7 @@
 ******************************************************************************/
 
 
-#include "emu.h"
 #include "includes/aim65.h"
-
-/* Peripheral chips */
-#include "machine/6821pia.h"
-#include "machine/6522via.h"
-
-/* DL1416A display chip */
-#include "video/dl1416.h"
-
-/* M6502 main CPU */
-#include "cpu/m6502/m6502.h"
-
-#include "machine/ram.h"
-
-
-/******************************************************************************
- Global variables
-******************************************************************************/
-
-
-
 
 
 /******************************************************************************
@@ -81,19 +60,17 @@ static void aim65_pia(running_machine &machine)
 }
 
 
-WRITE8_DEVICE_HANDLER(aim65_pia_a_w)
+WRITE8_MEMBER( aim65_state::aim65_pia_a_w )
 {
-	aim65_state *state = device->machine().driver_data<aim65_state>();
-	state->m_pia_a = data;
-	aim65_pia(device->machine());
+	m_pia_a = data;
+	aim65_pia(machine());
 }
 
 
-WRITE8_DEVICE_HANDLER(aim65_pia_b_w)
+WRITE8_MEMBER( aim65_state::aim65_pia_b_w )
 {
-	aim65_state *state = device->machine().driver_data<aim65_state>();
-	state->m_pia_b = data;
-	aim65_pia(device->machine());
+	m_pia_b = data;
+	aim65_pia(machine());
 }
 
 
@@ -129,38 +106,30 @@ void aim65_update_ds5(device_t *device, int digit, int data)
 ******************************************************************************/
 
 
-READ8_DEVICE_HANDLER(aim65_riot_b_r)
+READ8_MEMBER( aim65_state::aim65_riot_b_r )
 {
-	aim65_state *state = device->machine().driver_data<aim65_state>();
 	static const char *const keynames[] =
 	{
 		"keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
 		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
 	};
 
-	int row, data = 0xff;
+	UINT8 row, data = 0xff;
 
 	/* scan keyboard rows */
 	for (row = 0; row < 8; row++)
 	{
-		if (!(state->m_riot_port_a & (1 << row)))
-			data &= input_port_read(device->machine(), keynames[row]);
+		if (!BIT(m_riot_port_a, row))
+			data &= input_port_read(machine(), keynames[row]);
 	}
 
 	return data;
 }
 
 
-WRITE8_DEVICE_HANDLER(aim65_riot_a_w)
+WRITE8_MEMBER( aim65_state::aim65_riot_a_w )
 {
-	aim65_state *state = device->machine().driver_data<aim65_state>();
-	state->m_riot_port_a = data;
-}
-
-
-WRITE_LINE_DEVICE_HANDLER(aim65_riot_irq)
-{
-	cputag_set_input_line(device->machine(), "maincpu", M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	m_riot_port_a = data;
 }
 
 
