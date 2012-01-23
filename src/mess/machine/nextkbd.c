@@ -54,7 +54,7 @@ void nextkbd_device::send()
 	control |= FLAG_DATA;
 	if(!(control & FLAG_INT)) {
 		control |= FLAG_INT;
-		int_change_cb();
+		int_change_cb(true);
 	}
 }
 
@@ -101,6 +101,7 @@ bool nextkbd_device::fifo_empty() const
 
 READ32_MEMBER( nextkbd_device::ctrl_r )
 {
+	//	logerror("nextkbd: ctrl_r %08x @ %08x\n", control, mem_mask);
 	return control;
 }
 
@@ -111,7 +112,10 @@ READ32_MEMBER( nextkbd_device::ctrl2_r )
 
 READ32_MEMBER( nextkbd_device::data_r )
 {
-	control &= ~FLAG_DATA;
+	UINT32 old = control;
+	control &= ~(FLAG_DATA|FLAG_INT);
+	if(old & FLAG_INT)
+		int_change_cb(false);
 	return data;
 }
 
@@ -126,11 +130,13 @@ WRITE32_MEMBER( nextkbd_device::ctrl_w )
 		control = data;
 	}
 	if(diff & FLAG_INT)
-		int_change_cb();
+		int_change_cb(control & FLAG_INT);
+	//	logerror("nextkbd: ctrl_w %08x @ %08x\n", data, mem_mask);
 }
 
 WRITE32_MEMBER( nextkbd_device::ctrl2_w )
 {
+	//	logerror("nextkbd: ctrl2_w %08x @ %08x\n", data, mem_mask);
 }
 
 WRITE32_MEMBER( nextkbd_device::data_w )
@@ -145,7 +151,7 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 			modifiers_state |= field.mask;
 		else
 			modifiers_state &= ~field.mask;
-		fifo_push(modifiers_state);
+		fifo_push(modifiers_state | (1<<28));
 	} else {
 		int index;
 		for(index=0; index < 32; index++)
@@ -156,7 +162,7 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 		UINT16 val = index | modifiers_state | KEYVALID;
 		if(newval)
 			val |= KEYUP;
-		fifo_push(val);
+		fifo_push(val | (1<<28));
 	}
 	send();
 }
