@@ -19,12 +19,13 @@ public:
 	size_t      m_spriteram_size;
 
 	/* video-related */
-	tilemap_t     *m_bg_tilemap;
+	tilemap_t * m_bg_tilemap;
 	UINT8       m_spritebank;
 
 	/* misc */
-	UINT8       m_nmi_enable;
-	UINT8       m_irq_enable;
+	UINT8 *     m_soundlatch;
+	UINT8       m_interrupt_mask;
+	UINT8       m_interrupt_ticks;
 };
 
 
