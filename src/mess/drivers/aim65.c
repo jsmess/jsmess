@@ -5,10 +5,20 @@ Rewrite in progress, Dirk Best, 2007-07-31
 
 ToDo:
     - Printer. Tried to implement this but it was not working, currently disabled.
-    - Dual tape interface
+    - Dual tape interface (done, but see bugs below)
     - Implement punchtape reader/writer and TTY keyboard
     - Front panel Reset switch (switch S1)
     - Front panel Run/Step switch (switch S2)
+
+Bugs
+    - Cassette should output data on PB7, but the bit stays High.
+    - At the end of saving, both motors sometimes get turned on!
+    - CA2 should switch the cassette circuits between input and output.
+      It goes High on Read (correct) but doesn't go Low for Write.
+    - Read of CA1 is to check the printer, but it never happens.
+    - Write to CB1 should occur to activate printer's Start line, but it
+      also never happens.
+    - The common factor is the 6522, maybe it has problems..
 
 ******************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -133,6 +143,7 @@ INPUT_PORTS_END
     DEVICE INTERFACES
 ***************************************************************************/
 
+
 /* Riot interface Z33 */
 static const riot6532_interface aim65_riot_interface =
 {
@@ -146,19 +157,19 @@ static const riot6532_interface aim65_riot_interface =
 /* system via interface Z32 */
 static const via6522_interface aim65_system_via =
 {
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("switches"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_printer_data_a),
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_printer_data_b),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_printer_on),
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
+	DEVCB_NULL, // in port A
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pb_r), // in port B
+	DEVCB_NULL, // in CA1 printer ready?
+	DEVCB_NULL, // in CB1
+	DEVCB_NULL, // in CA2
+	DEVCB_NULL, // in CB2
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pa_w), // out port A
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pb_w), // out port B
+	DEVCB_NULL, // out CA1
+	DEVCB_NULL, // out CB1 printer start
+	DEVCB_NULL, // out CA2 cass control (H=in)
+	DEVCB_DRIVER_MEMBER(aim65_state, aim65_printer_on), // out CB2
+	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE) //IRQ
 };
 
 /* user via interface Z1 */
@@ -196,6 +207,26 @@ static const pia6821_interface aim65_pia_config =
 	DEVCB_NULL
 };
 
+// Deck 1 can play and record
+static const cassette_interface aim65_1_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
+	NULL
+};
+
+// Deck 2 can only record
+static const cassette_interface aim65_2_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
+	NULL
+};
+
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -219,11 +250,19 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 
 	MCFG_VIDEO_START(aim65)
 
+	/* Sound - wave sound only */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	/* other devices */
 	MCFG_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_riot_interface)
 	MCFG_VIA6522_ADD("via6522_0", 0, aim65_system_via)
 	MCFG_VIA6522_ADD("via6522_1", 0, aim65_user_via)
 	MCFG_PIA6821_ADD("pia6821", aim65_pia_config)
+
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, aim65_1_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE2_TAG, aim65_2_cassette_interface )
 
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("z26")

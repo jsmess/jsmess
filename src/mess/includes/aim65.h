@@ -15,8 +15,11 @@
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
-#include "imagedev/cartslot.h"
 #include "machine/ram.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
+
 
 /** R6502 Clock.
  *
@@ -31,18 +34,24 @@ class aim65_state : public driver_device
 {
 public:
 	aim65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_cass1(*this, CASSETTE_TAG),
+	m_cass2(*this, CASSETTE2_TAG)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
 	DECLARE_WRITE8_MEMBER(aim65_pia_b_w);
 	DECLARE_READ8_MEMBER(aim65_riot_b_r);
 	DECLARE_WRITE8_MEMBER(aim65_riot_a_w);
-	DECLARE_WRITE8_MEMBER(aim65_printer_data_a);
-	DECLARE_WRITE8_MEMBER(aim65_printer_data_b);
+	DECLARE_WRITE8_MEMBER(aim65_pa_w);
+	DECLARE_WRITE8_MEMBER(aim65_pb_w);
 	DECLARE_WRITE8_MEMBER(aim65_printer_on);
+	DECLARE_READ8_MEMBER(aim65_pb_r);
 	UINT8 m_pia_a;
 	UINT8 m_pia_b;
 	UINT8 m_riot_port_a;
+	UINT8 m_pb_save;
 	emu_timer *m_print_timer;
 	int m_printer_x;
 	int m_printer_y;
@@ -50,6 +59,10 @@ public:
 	bool m_flag_a;
 	bool m_flag_b;
 	bool m_printer_level;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass1;
+	required_device<cassette_image_device> m_cass2;
 };
 
 
