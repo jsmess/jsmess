@@ -127,7 +127,7 @@ public:
 
 	/* devices */
 	device_t      *m_maincpu;
-	device_t      *m_ppu;
+	ppu2c0x_device      *m_ppu;
 	device_t      *m_sound;
 	device_t      *m_cart;
 

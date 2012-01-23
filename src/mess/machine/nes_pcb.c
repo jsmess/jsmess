@@ -2003,7 +2003,7 @@ static WRITE8_HANDLER( exrom_l_w )
 			{
 				state->m_mmc5_vrom_regA[offset & 0x07] = data;
 				state->m_mmc5_last_chr_a = 1;
-				if (ppu2c0x_get_current_scanline(state->m_ppu) == 240 || !ppu2c0x_is_sprite_8x16(state->m_ppu))
+				if (state->m_ppu->get_current_scanline() == 240 || !state->m_ppu->is_sprite_8x16())
 					mmc5_update_chr_a(space->machine());
 			}
 			break;
@@ -2016,7 +2016,7 @@ static WRITE8_HANDLER( exrom_l_w )
 			data |= (state->m_mmc5_chr_high << 8);
 			state->m_mmc5_vrom_regB[offset & 0x03] = data;
 			state->m_mmc5_last_chr_a = 0;
-			if (ppu2c0x_get_current_scanline(state->m_ppu) == 240 || !ppu2c0x_is_sprite_8x16(state->m_ppu))
+			if (state->m_ppu->get_current_scanline() == 240 || !state->m_ppu->is_sprite_8x16())
 				mmc5_update_chr_b(space->machine());
 			break;
 
@@ -5811,7 +5811,7 @@ static WRITE8_HANDLER( nanjing_l_w )
 		case 0x000:
 		case 0x200:
 			state->m_mmc_reg[BIT(offset, 9)] = data;
-			if (!BIT(state->m_mmc_reg[0], 7) && ppu2c0x_get_current_scanline(state->m_ppu) <= 127)
+			if (!BIT(state->m_mmc_reg[0], 7) && state->m_ppu->get_current_scanline() <= 127)
 				chr8(space->machine(), 0, CHRRAM);
 			break;
 		case 0x300:
@@ -11983,7 +11983,6 @@ void pcb_handlers_setup( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
 	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->m_pcb_id);
-	device_t *ppu = machine.device("ppu");
 
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
@@ -12002,7 +12001,7 @@ void pcb_handlers_setup( running_machine &machine )
 		state->m_mmc_read_mid_name = intf->mmc_m.read_name;
 		state->m_mmc_read = intf->mmc_h.read;	// in progress
 		state->m_mmc_read_name = intf->mmc_h.read_name;
-		ppu2c0x_set_latch(ppu, intf->mmc_ppu_latch);
+		state->m_ppu->set_latch(intf->mmc_ppu_latch);
 	}
 	else
 	{
@@ -12013,7 +12012,7 @@ void pcb_handlers_setup( running_machine &machine )
 		state->m_mmc_read_low = NULL;
 		state->m_mmc_read_mid = NULL;	// in progress
 		state->m_mmc_read = NULL;	// in progress
-		ppu2c0x_set_latch(ppu, NULL);
+		state->m_ppu->set_latch(NULL);
 	}
 
 	state->m_mmc3_prg_cb = prg8_x;
@@ -13024,8 +13023,8 @@ int nes_pcb_reset( running_machine &machine )
 		fatalerror("Missing PCB interface\n");
 
 	/* Set the mapper irq callback */
-	ppu2c0x_set_scanline_callback(state->m_ppu, intf ? intf->mmc_scanline : NULL);
-	ppu2c0x_set_hblank_callback(state->m_ppu, intf ? intf->mmc_hblank : NULL);
+	state->m_ppu->set_scanline_callback(intf ? intf->mmc_scanline : NULL);
+	state->m_ppu->set_hblank_callback(intf ? intf->mmc_hblank : NULL);
 
 	err = pcb_initialize(machine, state->m_pcb_id);
 
