@@ -211,7 +211,7 @@ MACHINE_RESET( nes )
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (state->m_disk_expansion && state->m_pcb_id == NO_BOARD)
-		ppu2c0x_set_hblank_callback(state->m_ppu, fds_irq);
+		state->m_ppu->set_hblank_callback(fds_irq);
 	else
 		nes_pcb_reset(machine);
 
@@ -299,7 +299,7 @@ MACHINE_START( nes )
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nes_machine_stop),&machine));
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_ppu = machine.device("ppu");
+	state->m_ppu = machine.device<ppu2c0x_device>("ppu");
 	state->m_sound = machine.device("nessound");
 	state->m_cart = machine.device("cart");
 
@@ -348,10 +348,10 @@ READ8_HANDLER( nes_IN0_r )
 			UINT32 pix, color_base;
 
 			/* get the pixel at the gun position */
-			pix = ppu2c0x_get_pixel(state->m_ppu, x, y);
+			pix = state->m_ppu->get_pixel(x, y);
 
 			/* get the color base from the ppu */
-			color_base = ppu2c0x_get_colorbase(state->m_ppu);
+			color_base = state->m_ppu->get_colorbase();
 
 			/* look at the screen and see if the cursor is over a bright pixel */
 			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
@@ -426,10 +426,10 @@ READ8_HANDLER( nes_IN1_r )
 			UINT32 pix, color_base;
 
 			/* get the pixel at the gun position */
-			pix = ppu2c0x_get_pixel(state->m_ppu, x, y);
+			pix = state->m_ppu->get_pixel(x, y);
 
 			/* get the color base from the ppu */
-			color_base = ppu2c0x_get_colorbase(state->m_ppu);
+			color_base = state->m_ppu->get_colorbase();
 
 			/* look at the screen and see if the cursor is over a bright pixel */
 			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||

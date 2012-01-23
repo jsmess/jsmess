@@ -13,7 +13,8 @@
 
 static void nes_vh_reset( running_machine &machine )
 {
-	ppu2c0x_set_vidaccess_callback(machine.device("ppu"), nes_ppu_vidaccess);
+	nes_state *state = machine.driver_data<nes_state>();
+	state->m_ppu->set_vidaccess_callback(nes_ppu_vidaccess);
 }
 
 VIDEO_START( nes )
@@ -27,7 +28,8 @@ VIDEO_START( nes )
 
 PALETTE_INIT( nes )
 {
-	ppu2c0x_init_palette(machine, 0);
+	nes_state *state = machine.driver_data<nes_state>();
+	state->m_ppu->init_palette(machine, 0);
 }
 
 
@@ -42,7 +44,7 @@ SCREEN_UPDATE_IND16( nes )
 	nes_state *state = screen.machine().driver_data<nes_state>();
 
 	/* render the ppu */
-	ppu2c0x_render(state->m_ppu, bitmap, 0, 0, 0, 0);
+	state->m_ppu->render(bitmap, 0, 0, 0, 0);
 
 	/* if this is a disk system game, check for the flip-disk key */
 	if (state->m_disk_expansion && state->m_pcb_id == NO_BOARD)
