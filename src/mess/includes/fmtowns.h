@@ -40,6 +40,7 @@ READ8_HANDLER(towns_video_fd90_r);
 WRITE8_HANDLER(towns_video_fd90_w);
 READ8_HANDLER(towns_video_ff81_r);
 WRITE8_HANDLER(towns_video_ff81_w);
+READ32_HANDLER(towns_video_unknown_r);
 READ8_HANDLER(towns_spriteram_low_r);
 WRITE8_HANDLER(towns_spriteram_low_w);
 READ8_HANDLER(towns_spriteram_r);
@@ -246,6 +247,7 @@ class towns_state : public driver_device
 	DECLARE_READ8_MEMBER(towns_video_fd90_r);
 	DECLARE_WRITE8_MEMBER(towns_video_fd90_w);
 	DECLARE_READ8_MEMBER(towns_video_ff81_r);
+	DECLARE_READ32_MEMBER(towns_video_unknown_r);
 	DECLARE_WRITE8_MEMBER(towns_video_ff81_w);
 	DECLARE_READ8_MEMBER(towns_spriteram_low_r);
 	DECLARE_WRITE8_MEMBER(towns_spriteram_low_w);

@@ -265,10 +265,10 @@ READ8_MEMBER( towns_state::towns_video_cff80_r )
 			else
 				return 0x00;
 		case 0x06:
-			if(m_video.towns_vblank_flag != 0)
-				return 0x10;
-			else
-				return 0x00;
+//			if(m_video.towns_vblank_flag != 0)
+//				return 0x10;
+//			else
+//				return 0x00;
 		case 0x16:  // Kanji character data
 			return ROM[(m_video.towns_kanji_offset << 1) + 0x180000];
 		case 0x17:  // Kanji character data
@@ -572,6 +572,11 @@ WRITE8_MEMBER(towns_state::towns_video_ff81_w)
 	m_video.towns_vram_rplane = (data & 0xc0) >> 6;
 	towns_update_video_banks(space);
 	logerror("VGA: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
+}
+
+READ32_MEMBER(towns_state::towns_video_unknown_r)
+{
+	return 0x00000000;
 }
 
 /*
