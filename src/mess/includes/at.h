@@ -22,9 +22,9 @@
 #include "machine/cs4031.h"
 #include "machine/cs8221.h"
 #include "machine/pit8253.h"
-#include "video/pc_vga.h"
 #include "video/pc_cga.h"
 #include "video/isa_ega.h"
+#include "video/isa_vga.h"
 
 #include "machine/idectrl.h"
 #include "machine/at_keybc.h"
