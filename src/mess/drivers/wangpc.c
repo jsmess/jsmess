@@ -441,6 +441,8 @@ READ8_MEMBER( wangpc_state::option_id_r )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wangpc_mem, AS_PROGRAM, 16, wangpc_state )
+//	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mrdc_r, amwc_c)
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
@@ -450,6 +452,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
+	AM_RANGE(0x1000, 0x1001) AM_WRITE8(fdc_ctrl_w, 0x00ff)
 	AM_RANGE(0x1004, 0x1005) AM_READWRITE8(deselect_drive1_r, deselect_drive1_w, 0x00ff)
 	AM_RANGE(0x1006, 0x1007) AM_READWRITE8(select_drive1_r, select_drive1_w, 0x00ff)
 	AM_RANGE(0x1008, 0x1009) AM_READWRITE8(deselect_drive2_r, deselect_drive2_w, 0x00ff)
@@ -465,7 +468,8 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x1020, 0x1027) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x1040, 0x1047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x1060, 0x1063) AM_DEVREADWRITE8_LEGACY(I8259A_TAG, pic8259_r, pic8259_w, 0x00ff)
-//	AM_RANGE(0x1080, 0x108f) AM_DEVREADWRITE8(SCN2661_TAG, scn2661_device, read, write, 0x00ff)
+//	AM_RANGE(0x1080, 0x1087) AM_DEVREAD8(SCN2661_TAG, scn2661_device, read, 0x00ff)
+//	AM_RANGE(0x1088, 0x108f) AM_DEVWRITE8(SCN2661_TAG, scn2661_device, write, 0x00ff)
 	AM_RANGE(0x10a0, 0x10bf) AM_DEVREADWRITE8_LEGACY(AM9517A_TAG, i8237_r, i8237_w, 0x00ff)
 	AM_RANGE(0x10c2, 0x10c7) AM_WRITE8(dma_page_w, 0x00ff)
 	AM_RANGE(0x10e0, 0x10e1) AM_READWRITE8(status_r, timer0_irq_clr_w, 0x00ff)
@@ -477,6 +481,7 @@ static ADDRESS_MAP_START( wangpc_io, AS_IO, 16, wangpc_state )
 	AM_RANGE(0x10ec, 0x10ed) AM_READWRITE8(busy_clr_r, acknlg_clr_w, 0x00ff)
 	AM_RANGE(0x10ee, 0x10ef) AM_READWRITE8(led_off_r, parity_nmi_clr_w, 0x00ff)
 	AM_RANGE(0x10fe, 0x10ff) AM_READ8(option_id_r, 0x00ff)
+	AM_RANGE(0x1100, 0x1fff) AM_DEVREADWRITE(WANGPC_BUS_TAG, wangpcbus_device, sad_r, sad_w)
 ADDRESS_MAP_END
 
 
@@ -976,6 +981,7 @@ static WANGPC_BUS_INTERFACE( bus_intf )
 };
 
 static SLOT_INTERFACE_START( wangpc_cards )
+	SLOT_INTERFACE("lores", WANGPC_LORES_VIDEO)
 SLOT_INTERFACE_END
 
 
@@ -1026,13 +1032,6 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)
-
-	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(wangpc_state, screen_update)
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0,639, 0,479)
-	MCFG_SCREEN_REFRESH_RATE(60)
 	
 	// devices
 	MCFG_I8237_ADD(AM9517A_TAG, 4000000, dmac_intf)
@@ -1049,7 +1048,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	// bus
 	MCFG_WANGPC_BUS_ADD(bus_intf)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, NULL, NULL)
-	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, NULL, NULL)
+	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "lores", NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot3", 3, wangpc_cards, NULL, NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot4", 4, wangpc_cards, NULL, NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, NULL, NULL)

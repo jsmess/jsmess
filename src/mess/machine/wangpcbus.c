@@ -49,7 +49,7 @@ void wangpcbus_slot_device::device_start()
 {
 	m_bus = machine().device<wangpcbus_device>(WANGPC_BUS_TAG);
 	device_wangpcbus_card_interface *dev = dynamic_cast<device_wangpcbus_card_interface *>(get_card_device());
-	if (dev) m_bus->add_wangpcbus_card(dev);
+	if (dev) m_bus->add_wangpcbus_card(dev, m_sid);
 }
 
 
@@ -141,9 +141,12 @@ void wangpcbus_device::device_reset()
 //  add_wangpcbus_card - add S100 card
 //-------------------------------------------------
 
-void wangpcbus_device::add_wangpcbus_card(device_wangpcbus_card_interface *card)
+void wangpcbus_device::add_wangpcbus_card(device_wangpcbus_card_interface *card, int sid)
 {
 	m_device_list.append(*card);
+	
+	card->m_bus = this;
+	card->m_sid = sid;
 }
 
 
@@ -151,15 +154,15 @@ void wangpcbus_device::add_wangpcbus_card(device_wangpcbus_card_interface *card)
 //  mrdc_r - memory read
 //-------------------------------------------------
 
-READ8_MEMBER( wangpcbus_device::mrdc_r )
+READ16_MEMBER( wangpcbus_device::mrdc_r )
 {
-	UINT8 data = 0;
+	UINT16 data = 0xffff;
 
 	device_wangpcbus_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		data |= entry->wangpcbus_mrdc_r(offset);
+		data |= entry->wangpcbus_mrdc_r(space, offset, mem_mask);
 		entry = entry->next();
 	}
 
@@ -171,31 +174,31 @@ READ8_MEMBER( wangpcbus_device::mrdc_r )
 //  amwc_w - memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpcbus_device::amwc_w )
+WRITE16_MEMBER( wangpcbus_device::amwc_w )
 {
 	device_wangpcbus_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		entry->wangpcbus_amwc_w(offset, data);
+		entry->wangpcbus_amwc_w(space, offset, mem_mask, data);
 		entry = entry->next();
 	}
 }
 
 
 //-------------------------------------------------
-//  iorc_r - I/O read
+//  sad_r - I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( wangpcbus_device::iorc_r )
+READ16_MEMBER( wangpcbus_device::sad_r )
 {
-	UINT8 data = 0;
+	UINT16 data = 0xffff;
 
 	device_wangpcbus_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		data |= entry->wangpcbus_iorc_r(offset);
+		data |= entry->wangpcbus_iorc_r(space, offset + 0x880, mem_mask);
 		entry = entry->next();
 	}
 
@@ -204,16 +207,16 @@ READ8_MEMBER( wangpcbus_device::iorc_r )
 
 
 //-------------------------------------------------
-//  aiowc_w - I/O write
+//  sad_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpcbus_device::aiowc_w )
+WRITE16_MEMBER( wangpcbus_device::sad_w )
 {
 	device_wangpcbus_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		entry->wangpcbus_aiowc_w(offset, data);
+		entry->wangpcbus_aiowc_w(space, offset + 0x880, mem_mask, data);
 		entry = entry->next();
 	}
 }
