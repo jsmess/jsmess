@@ -52,13 +52,6 @@ public:
 	UINT8 m_pia_b;
 	UINT8 m_riot_port_a;
 	UINT8 m_pb_save;
-	emu_timer *m_print_timer;
-	int m_printer_x;
-	int m_printer_y;
-	bool m_printer_dir;
-	bool m_flag_a;
-	bool m_flag_b;
-	bool m_printer_level;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass1;
@@ -76,14 +69,5 @@ void aim65_update_ds5(device_t *device, int digit, int data);
 
 
 MACHINE_START( aim65 );
-
-
-/*----------- defined in video/aim65.c -----------*/
-
-VIDEO_START( aim65 );
-
-/* Printer */
-
-
 
 #endif /* AIM65_H_ */
