@@ -91,6 +91,6 @@ IMGTOOL_OBJS = \
 # rules to build the imgtool executable
 #-------------------------------------------------
 
-$(IMGTOOL): $(IMGTOOL_OBJS) $(LIBIMGTOOL) $(FORMATS_LIB) $(LIBEMU) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+$(IMGTOOL): $(IMGTOOL_OBJS) $(LIBIMGTOOL) $(FORMATS_LIB) $(LIBEMU) $(LIBUTIL) $(EXPAT) $(ZLIB) $(FLAC_LIB) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
