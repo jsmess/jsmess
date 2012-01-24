@@ -303,19 +303,19 @@ READ8_MEMBER( victor9k_keyboard_device::kb_p1_r )
 
 	switch (m_y)
 	{
-		case 0: data &= input_port_read(this, "Y0"); break;
-		case 1: data &= input_port_read(this, "Y1"); break;
-		case 2: data &= input_port_read(this, "Y2"); break;
-		case 3: data &= input_port_read(this, "Y3"); break;
-		case 4: data &= input_port_read(this, "Y4"); break;
-		case 5: data &= input_port_read(this, "Y5"); break;
-		case 6: data &= input_port_read(this, "Y6"); break;
-		case 7: data &= input_port_read(this, "Y7"); break;
-		case 8: data &= input_port_read(this, "Y8"); break;
-		case 9: data &= input_port_read(this, "Y9"); break;
-		case 0xa: data &= input_port_read(this, "YA"); break;
-		case 0xb: data &= input_port_read(this, "YB"); break;
-		case 0xc: data &= input_port_read(this, "YC"); break;
+		case 0: data &= input_port_read(*this, "Y0"); break;
+		case 1: data &= input_port_read(*this, "Y1"); break;
+		case 2: data &= input_port_read(*this, "Y2"); break;
+		case 3: data &= input_port_read(*this, "Y3"); break;
+		case 4: data &= input_port_read(*this, "Y4"); break;
+		case 5: data &= input_port_read(*this, "Y5"); break;
+		case 6: data &= input_port_read(*this, "Y6"); break;
+		case 7: data &= input_port_read(*this, "Y7"); break;
+		case 8: data &= input_port_read(*this, "Y8"); break;
+		case 9: data &= input_port_read(*this, "Y9"); break;
+		case 0xa: data &= input_port_read(*this, "YA"); break;
+		case 0xb: data &= input_port_read(*this, "YB"); break;
+		case 0xc: data &= input_port_read(*this, "YC"); break;
 	}
 
 	return data;

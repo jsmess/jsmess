@@ -111,7 +111,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const device_list &devlist, emu_options &options) const;
+	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) const;
 
 	// reading and writing
 	virtual void read(offs_t offset, UINT8 &data);

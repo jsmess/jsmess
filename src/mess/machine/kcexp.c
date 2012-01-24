@@ -388,7 +388,7 @@ bool kccart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entr
     get default card software
 -------------------------------------------------*/
 
-const char * kccart_slot_device::get_default_card_software(const device_list &devlist, emu_options &options) const
+const char * kccart_slot_device::get_default_card_software(const machine_config &config, emu_options &options) const
 {
-	return software_get_default_slot(devlist, options, this, "standard");
+	return software_get_default_slot(config, options, this, "standard");
 }

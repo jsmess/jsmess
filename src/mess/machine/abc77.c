@@ -440,7 +440,7 @@ void abc77_device::device_start()
 void abc77_device::device_reset()
 {
 	int t = 1.1 * RES_K(100) * CAP_N(100) * 1000; // t = 1.1 * R1 * C1
-	int ea = BIT(input_port_read(this, "DSW"), 7);
+	int ea = BIT(input_port_read(*this, "DSW"), 7);
 
 	// trigger reset
 	device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
@@ -495,7 +495,7 @@ READ8_MEMBER( abc77_device::p1_r )
 
 	if (m_stb && m_keylatch < 12)
 	{
-		data = input_port_read(this, keynames[m_keylatch]);
+		data = input_port_read(*this, keynames[m_keylatch]);
 	}
 
 	return data;

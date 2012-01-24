@@ -27,7 +27,7 @@ are connected */
 static void pc_com_refresh_connected_common(device_t *device, int n, int data)
 {
 	/* mouse connected to this port? */
-	if (input_port_read(device->owner(), "DSW") & (0x80>>n))
+	if (input_port_read(*device->owner(), "DSW") & (0x80>>n))
 		pc_mouse_handshake_in(device,data);
 }
 

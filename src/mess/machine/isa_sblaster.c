@@ -400,13 +400,13 @@ READ8_MEMBER ( sb8_device::joy_port_r )
 	attotime new_time = machine().time();
 
 	{
-		data = input_port_read(this, "pc_joy") | 0x0f;
+		data = input_port_read(*this, "pc_joy") | 0x0f;
 
 		{
 			delta = ((new_time - m_joy_time) * 256 * 1000).seconds;
 
-			if (input_port_read(this, "pc_joy_1") < delta) data &= ~0x01;
-			if (input_port_read(this, "pc_joy_2") < delta) data &= ~0x02;
+			if (input_port_read(*this, "pc_joy_1") < delta) data &= ~0x01;
+			if (input_port_read(*this, "pc_joy_2") < delta) data &= ~0x02;
 		}
 	}
 

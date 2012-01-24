@@ -139,17 +139,9 @@ void rom_image_device::call_unload()
 
 void rom_image_device::update_names()
 {
-	const device_image_interface *image = NULL;
-	int count = 0;
-	int index = -1;
-
-	for (bool gotone = device().mconfig().devicelist().first(image); gotone; gotone = image->next(image))
-	{
-		if (this == image)
-			index = count;
-		if (image->image_type() == IO_UNKNOWN)
-			count++;
-	}
+	image_interface_iterator iter(device().mconfig().root_device());
+	int count = iter.count();
+	int index = iter.indexof(*this);
 	if (count > 1) {
 		m_instance_name.printf("romimage%d", index + 1);
 		m_brief_instance_name.printf("rom%d", index + 1);
