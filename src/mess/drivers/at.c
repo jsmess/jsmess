@@ -464,6 +464,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "vga", NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -508,6 +509,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "ne2000", NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, "vga", NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -527,7 +529,8 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL)
-
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "vga", NULL)
+	
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
