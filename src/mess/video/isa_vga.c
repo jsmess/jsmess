@@ -67,6 +67,11 @@ void isa8_vga_device::device_start()
 
 	pc_vga_init(machine(), input_port_0_r, NULL);
 
+	int i;
+	for (i = 0; i < 0x100; i++)
+		palette_set_color_rgb(machine(), i, 0, 0, 0);	
+	pc_video_start(machine());
+	
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "et4000", "et4000");
 	
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
