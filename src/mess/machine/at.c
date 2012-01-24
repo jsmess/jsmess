@@ -319,9 +319,6 @@ static void init_at_common(running_machine &machine)
 	st->m_at_offset1 = 0xff;
 }
 
-
-static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine(), "IN0"); }
-
 DRIVER_INIT( atcga )
 {
 	init_at_common(machine);
@@ -330,8 +327,6 @@ DRIVER_INIT( atcga )
 DRIVER_INIT( atvga)
 {
 	init_at_common(machine);
-	pc_vga_init(machine, input_port_0_r, NULL);
-	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);	
 }
 
 static IRQ_CALLBACK(at_irq_callback)
