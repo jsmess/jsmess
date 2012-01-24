@@ -255,7 +255,7 @@ void mb8795_device::receive()
 	fprintf(stderr, "mb8975: received packet for %02x.%02x.%02x.%02x.%02x.%02x len=%04x, mode=%d\n",
 			rxbuf[0], rxbuf[1], rxbuf[2], rxbuf[3], rxbuf[4], rxbuf[5],
 			rxlen, rxmode & 3);
-	bool keep;
+	bool keep = false;
 	switch(rxmode & EN_RMD_WHATRECV) {
 	case EN_RMD_RECV_NONE:
 		keep = false;
