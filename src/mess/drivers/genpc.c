@@ -14,10 +14,10 @@
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
 
-#include "video/ibm_vga.h"
 #include "video/pc_cga.h"
 #include "video/isa_ega.h"
 #include "video/isa_mda.h"
+#include "video/isa_vga.h"
 
 #include "machine/ram.h"
 #include "machine/isa.h"
@@ -110,6 +110,7 @@ DEVICE_INPUT_DEFAULTS_END
 static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("mda", ISA8_MDA)
 	SLOT_INTERFACE("ega", ISA8_EGA)
+	SLOT_INTERFACE("vga", ISA8_VGA)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
 	SLOT_INTERFACE("hdc", ISA8_HDC)
@@ -249,11 +250,10 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa2", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa3", pc_isa8_cards, "hdc", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa4", pc_isa8_cards, "sblaster1_0", NULL)
-	MCFG_ISA8_SLOT_ADD("mb:isa","isa5", pc_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD("mb:isa","isa5", pc_isa8_cards, "vga", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa6", pc_isa8_cards, NULL, NULL)
 
 	/* video hardware */
-	MCFG_IBM_VGA_ADD( "vga" )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	/* keyboard */
