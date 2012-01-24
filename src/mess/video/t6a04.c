@@ -42,17 +42,10 @@ void t6a04_device::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool t6a04_device::device_validity_check( emu_options &options, const game_driver &driver ) const
+void t6a04_device::device_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-
 	if (height == 0 || width == 0)
-	{
-		mame_printf_error("%s: %s device '%s' has invalid parameter\n", driver.source_file, driver.name, tag());
-		error = true;
-	}
-
-	return error;
+		mame_printf_error("Configured with invalid parameter\n");
 }
 
 //**************************************************************************

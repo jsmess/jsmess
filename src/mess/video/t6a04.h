@@ -47,7 +47,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
-	virtual bool device_validity_check( emu_options &options, const game_driver &driver ) const;
+	virtual void device_validity_check(validity_checker &valid) const;
 
 private:
 	UINT8 m_busy_flag;

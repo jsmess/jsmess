@@ -46,18 +46,11 @@ void hd44780_device::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool hd44780_device::device_validity_check( emu_options &options, const game_driver &driver ) const
+void hd44780_device::device_validity_check(validity_checker &valid) const
 {
-	bool error = false;
-
 	// display with more than 2 lines requires a layout
 	if ((custom_layout == NULL && height > 2) || height == 0 || width == 0)
-	{
-		mame_printf_error("%s: %s device '%s' has invalid parameter\n", driver.source_file, driver.name, tag());
-		error = true;
-	}
-
-	return error;
+		mame_printf_error("Configured with invalid parameter\n");
 }
 
 //**************************************************************************
