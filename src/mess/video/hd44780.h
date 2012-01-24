@@ -51,7 +51,7 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
-	virtual bool device_validity_check( emu_options &options, const game_driver &driver ) const;
+	virtual void device_validity_check(validity_checker &valid) const;
 
 private:
 	// internal helper
