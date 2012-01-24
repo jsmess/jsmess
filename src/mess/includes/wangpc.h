@@ -17,6 +17,7 @@
 #include "machine/upd765.h"
 #include "machine/wangpcbus.h"
 #include "machine/wangpckb.h"
+#include "machine/wangpc_lores.h"
 
 #define I8086_TAG		"i8086"
 #define AM9517A_TAG		"am9517a"
@@ -27,8 +28,6 @@
 #define SCN2661_TAG		"scn2661"
 #define UPD765_TAG		"upd765"
 #define CENTRONICS_TAG	"centronics"
-#define KB_TAG			"serkb"
-#define SCREEN_TAG		"screen"
 
 class wangpc_state : public driver_device
 {
@@ -81,12 +80,6 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-	{
-		bitmap.fill(RGB_BLACK);
-		return 0;
-	}
 	
 	void check_level1_interrupts();
 	void check_level2_interrupts();

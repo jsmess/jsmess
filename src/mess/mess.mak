@@ -1723,6 +1723,7 @@ $(MESSOBJ)/wang.a:				\
 	$(MESS_DRIVERS)/wangpc.o	\
 	$(MESS_MACHINE)/wangpcbus.o	\
 	$(MESS_MACHINE)/wangpckb.o	\
+	$(MESS_MACHINE)/wangpc_lores.o	\
 
 $(MESSOBJ)/wavemate.a:			\
 	$(MESS_DRIVERS)/bullet.o	\

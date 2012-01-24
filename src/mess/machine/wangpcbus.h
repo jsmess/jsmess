@@ -107,13 +107,13 @@ public:
 	// construction/destruction
 	wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void add_wangpcbus_card(device_wangpcbus_card_interface *card);
+	void add_wangpcbus_card(device_wangpcbus_card_interface *card, int sid);
 
-	DECLARE_READ8_MEMBER( mrdc_r );
-	DECLARE_WRITE8_MEMBER( amwc_w );
+	DECLARE_READ16_MEMBER( mrdc_r );
+	DECLARE_WRITE16_MEMBER( amwc_w );
 
-	DECLARE_READ8_MEMBER( iorc_r );
-	DECLARE_WRITE8_MEMBER( aiowc_w );
+	DECLARE_READ16_MEMBER( sad_r );
+	DECLARE_WRITE16_MEMBER( sad_w );
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq3_w );
@@ -171,12 +171,13 @@ public:
 	device_wangpcbus_card_interface *next() const { return m_next; }
 
 	// memory access
-	virtual UINT8 wangpcbus_mrdc_r(offs_t offset) { return 0; };
-	virtual void wangpcbus_amwc_w(offs_t offset, UINT8 data) { };
+	virtual UINT16 wangpcbus_mrdc_r(address_space &space, offs_t offset, UINT16 mem_mask) { return 0; };
+	virtual void wangpcbus_amwc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data) { };
 
 	// I/O access
-	virtual UINT8 wangpcbus_iorc_r(offs_t offset) { return 0; };
-	virtual void wangpcbus_aiowc_w(offs_t offset, UINT8 data) { };
+	virtual UINT16 wangpcbus_iorc_r(address_space &space, offs_t offset, UINT16 mem_mask) { return 0; };
+	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data) { };
+	bool sad(offs_t offset) { return ((offset & 0xf80) == (0x800 | (m_sid << 7))) ? true : false; }
 
 	// DMA
 	virtual UINT8 wangpcbus_dack_r(int line) { return 0; }
@@ -184,8 +185,8 @@ public:
 	virtual void wangpcbus_tc_w(int state) { }
 	virtual bool wangpcbus_have_dack(int line) { return false; }
 
-public:
-	wangpcbus_device  *m_wangpcbus;
+	wangpcbus_device  *m_bus;
+	int m_sid;
 	device_wangpcbus_card_interface *m_next;
 };
 
