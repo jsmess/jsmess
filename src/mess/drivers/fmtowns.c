@@ -232,7 +232,13 @@ READ8_MEMBER(towns_state::towns_system_r)
 		case 0x05:
 			logerror("SYS: port 0x25 read\n");
 			return 0x00;
-		case 0x06:
+/*		case 0x06:
+			count = (m_towns_freerun_counter->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
+			return count & 0xff;
+		case 0x07:
+			count = (m_towns_freerun_counter->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
+			return (count >> 8) & 0xff;
+*/		case 0x06:
 			//logerror("SYS: (0x26) timer read\n");
 			return m_freerun_timer;
 		case 0x07:
@@ -358,7 +364,7 @@ READ8_MEMBER(towns_state::towns_sys6c_r)
 
 WRITE8_MEMBER(towns_state::towns_sys6c_w)
 {
-	// halts the CPU for a period of time (exact length unknown)
+	// halts the CPU for 1 microsecond
 	device_set_input_line(m_maincpu,INPUT_LINE_HALT,ASSERT_LINE);
 	m_towns_wait_timer->adjust(attotime::from_usec(1),0,attotime::never);
 }
@@ -2110,6 +2116,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
   // I/O ports derived from FM Towns/Bochs, these are specific to the FM Towns
   // System ports
+  ADDRESS_MAP_UNMAP_HIGH
   AM_RANGE(0x0000,0x0003) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff00ff)
   AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0x00ff00ff)
   AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffffffff)
@@ -2127,7 +2134,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
   // Floppy controller
   AM_RANGE(0x0200,0x020f) AM_READWRITE8(towns_floppy_r, towns_floppy_w, 0xffffffff)
   // CRTC / Video
-  AM_RANGE(0x0400,0x0403) AM_NOP  // R/O (0x400)
+  AM_RANGE(0x0400,0x0403) AM_READ(towns_video_unknown_r)  // R/O (0x400)
   AM_RANGE(0x0404,0x0407) AM_READWRITE(towns_video_404_r, towns_video_404_w)  // R/W (0x404)
   AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffffffff)
   // System port
@@ -2153,7 +2160,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
   // Something (MS-DOS wants this 0x41ff to be 1)
-  AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
+//  AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
   // CRTC / Video (again)
   AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
   AM_RANGE(0xff80,0xffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
