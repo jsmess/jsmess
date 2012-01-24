@@ -27,7 +27,7 @@ const device_type ISA8_VGA = &device_creator<isa8_vga_device>;
 
 machine_config_constructor isa8_vga_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( pcvideo_vga );
+	return MACHINE_CONFIG_NAME( pcvideo_vga_isa );
 }
 
 //-------------------------------------------------
@@ -63,6 +63,8 @@ void isa8_vga_device::device_start()
 {
 	set_isa_device();
 	
+	video_start_vga( machine() );
+
 	pc_vga_init(machine(), input_port_0_r, NULL);
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "et4000", "et4000");
