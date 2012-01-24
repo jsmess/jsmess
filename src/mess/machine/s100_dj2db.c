@@ -82,7 +82,7 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 {
 	if (state) m_s100->rdy_w(CLEAR_LINE);
 
-	switch (input_port_read(this, "J1A"))
+	switch (input_port_read(*this, "J1A"))
 	{
 	case 0: m_s100->vi0_w(state); break;
 	case 1: m_s100->vi1_w(state); break;
@@ -296,7 +296,7 @@ void s100_dj2db_device::device_start()
 
 void s100_dj2db_device::device_reset()
 {
-	m_board_enbl = input_port_read(this, "J4");
+	m_board_enbl = input_port_read(*this, "J4");
 }
 
 
@@ -486,7 +486,7 @@ void s100_dj2db_device::s100_sout_w(offs_t offset, UINT8 data)
 {
 	if (offset == 0x41)
 	{
-		m_board_enbl = (data & input_port_read(this, "J3A")) ? 1 : 0;
+		m_board_enbl = (data & input_port_read(*this, "J3A")) ? 1 : 0;
 	}
 }
 
@@ -497,7 +497,7 @@ void s100_dj2db_device::s100_sout_w(offs_t offset, UINT8 data)
 
 void s100_dj2db_device::s100_phantom_w(int state)
 {
-	if (!BIT(input_port_read(this, "SW1"), 2))
+	if (!BIT(input_port_read(*this, "SW1"), 2))
 	{
 		m_phantom = state;
 	}

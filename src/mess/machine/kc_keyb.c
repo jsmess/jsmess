@@ -544,7 +544,7 @@ void kc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			// scan all lines (excluding shift)
 			for (int i=0; i<8; i++)
 			{
-				UINT8 keyboard_line_data = input_port_read(this, keynames[i]);
+				UINT8 keyboard_line_data = input_port_read(*this, keynames[i]);
 
 				// scan through each bit
 				for (int b=0; b<8; b++)
@@ -615,7 +615,7 @@ void kc_keyboard_device::transmit_scancode(UINT8 scan_code)
 	add_pulse_to_transmit_buffer(1);
 
 	// state of shift key
-	add_bit((input_port_read(this, "SHIFT") & 0x01)^0x01);
+	add_bit((input_port_read(*this, "SHIFT") & 0x01)^0x01);
 
 	for (int i=0; i<6; i++)
 	{

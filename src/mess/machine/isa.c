@@ -131,7 +131,7 @@ void isa8_device::device_config_complete()
     	memset(&m_out_drq2_cb, 0, sizeof(m_out_drq2_cb));
     	memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
 	}
-	m_maincpu = mconfig().devicelist().find(m_cputag);
+	m_maincpu = mconfig().device(m_cputag);
 }
 
 //**************************************************************************
@@ -492,7 +492,7 @@ void isa16_device::device_config_complete()
     	memset(&m_out_drq6_cb, 0, sizeof(m_out_drq6_cb));
     	memset(&m_out_drq7_cb, 0, sizeof(m_out_drq7_cb));
 	}
-	m_maincpu = mconfig().devicelist().find(m_cputag);
+	m_maincpu = mconfig().device(m_cputag);
 }
 
 //-------------------------------------------------

@@ -74,7 +74,7 @@ void sam6883_device::device_start()
 	const sam6883_interface *config = (const sam6883_interface *) static_config();
 
 	/* find the CPU */
-	m_cpu = downcast<cpu_device *>(machine().devicelist().find(config->m_cpu_tag));
+	m_cpu = machine().device<cpu_device>(config->m_cpu_tag);
 	m_cpu_space = m_cpu->space(config->m_cpu_space);
 
 	/* resolve callbacks */

@@ -1268,7 +1268,7 @@ void ti85_update_serial (device_t *device)
 
 	if (ti85serial->status == TI85_SEND_STOP)
 	{
-		if (input_port_read(device, "SERIAL") & 0x01)
+		if (input_port_read(*device, "SERIAL") & 0x01)
 		{
 			if(!ti85_alloc_serial_data_memory(device, 15)) return;
 			if(!ti85_receive_serial (device, ti85serial->receive_buffer, 7*8))
@@ -1287,7 +1287,7 @@ void ti85_update_serial (device_t *device)
 		{
 			ti85_receive_serial(device, NULL, 0);
 			ti85_free_serial_data_memory(device);
-			if (input_port_read(device, "DUMP") & 0x01)
+			if (input_port_read(*device, "DUMP") & 0x01)
 			{
 				ti85serial->status = TI85_PREPARE_SCREEN_REQUEST;
 				ti85serial->transfer_type = TI85_RECEIVE_SCREEN;

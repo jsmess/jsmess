@@ -214,7 +214,7 @@ bool iq151cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_e
     get default card software
 -------------------------------------------------*/
 
-const char * iq151cart_slot_device::get_default_card_software(const device_list &devlist, emu_options &options) const
+const char * iq151cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options) const
 {
-	return software_get_default_slot(devlist, options, this, NULL);
+	return software_get_default_slot(config, options, this, NULL);
 }

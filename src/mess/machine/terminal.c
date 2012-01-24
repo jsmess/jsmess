@@ -316,7 +316,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 static void generic_terminal_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	terminal_state *term = get_safe_token(device);
-	UINT8 options = input_port_read(device, "TERM_CONF");
+	UINT8 options = input_port_read(*device, "TERM_CONF");
 	UINT16 cursor = term->y_pos * TERMINAL_WIDTH + term->x_pos;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
@@ -385,12 +385,12 @@ UINT8 terminal_keyboard_handler(running_machine &machine, devcb_resolved_write8 
 	UINT8 code;
 	UINT8 key_code = 0;
 	UINT8 retVal = 0;
-	UINT8 shift = BIT(input_port_read(device, "TERM_LINEC"), 1);
-	UINT8 caps  = BIT(input_port_read(device, "TERM_LINEC"), 2);
-	UINT8 ctrl  = BIT(input_port_read(device, "TERM_LINEC"), 0);
+	UINT8 shift = BIT(input_port_read(*device, "TERM_LINEC"), 1);
+	UINT8 caps  = BIT(input_port_read(*device, "TERM_LINEC"), 2);
+	UINT8 ctrl  = BIT(input_port_read(*device, "TERM_LINEC"), 0);
 	i = *scan_line;
 	{
-		code =	input_port_read(device, keynames[i]);
+		code =	input_port_read(*device, keynames[i]);
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {

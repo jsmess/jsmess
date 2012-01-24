@@ -221,7 +221,7 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 	UINT8 data = 0x04;
 
 	// single/double sided drive
-	UINT8 sw1 = input_port_read(this, "SW1") & 0x0f;
+	UINT8 sw1 = input_port_read(*this, "SW1") & 0x0f;
 	int ds0 = m_sel0 ? BIT(sw1, 0) : 1;
 	int ds1 = m_sel1 ? BIT(sw1, 1) : 1;
 	data |= !(ds0 & ds1);
@@ -460,7 +460,7 @@ void luxor_55_10828_device::device_reset()
 
 void luxor_55_10828_device::abcbus_cs(UINT8 data)
 {
-	UINT8 address = 0x2c | BIT(input_port_read(this, "S1"), 0);
+	UINT8 address = 0x2c | BIT(input_port_read(*this, "S1"), 0);
 
 	m_cs = (data == address);
 }

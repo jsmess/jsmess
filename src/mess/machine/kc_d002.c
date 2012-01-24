@@ -165,7 +165,7 @@ void kc_d002_device::io_read(offs_t offset, UINT8 &data)
 	{
 		UINT8 slot_id = (offset>>8) & 0xff;
 
-		if ((slot_id & 0xf0) == input_port_read(this, "ID") && !(slot_id & 0x03))
+		if ((slot_id & 0xf0) == input_port_read(*this, "ID") && !(slot_id & 0x03))
 			data = m_expansions[(slot_id>>2) & 3]->module_id_r();
 		else
 			m_expansions[4]->io_read(offset, data);
@@ -187,7 +187,7 @@ void kc_d002_device::io_write(offs_t offset, UINT8 data)
 	{
 		UINT8 slot_id = (offset>>8) & 0xff;
 
-		if ((slot_id & 0xf0) == input_port_read(this, "ID") && !(slot_id & 0x03))
+		if ((slot_id & 0xf0) == input_port_read(*this, "ID") && !(slot_id & 0x03))
 			m_expansions[(slot_id>>2) & 3]->control_w(data);
 		else
 			m_expansions[4]->io_write(offset, data);
