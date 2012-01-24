@@ -163,12 +163,12 @@ static const via6522_interface aim65_system_via =
 	DEVCB_NULL, // in CB1
 	DEVCB_NULL, // in CA2
 	DEVCB_NULL, // in CB2
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pa_w), // out port A
+	DEVCB_NULL, // out Port A
 	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pb_w), // out port B
 	DEVCB_NULL, // out CA1
 	DEVCB_NULL, // out CB1 printer start
 	DEVCB_NULL, // out CA2 cass control (H=in)
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_printer_on), // out CB2
+	DEVCB_NULL, // out CB2 turn printer on
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE) //IRQ
 };
 
@@ -247,8 +247,6 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_DL1416T_ADD("ds3", aim65_update_ds3)
 	MCFG_DL1416T_ADD("ds4", aim65_update_ds4)
 	MCFG_DL1416T_ADD("ds5", aim65_update_ds5)
-
-	MCFG_VIDEO_START(aim65)
 
 	/* Sound - wave sound only */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

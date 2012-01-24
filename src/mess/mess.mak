@@ -1373,7 +1373,6 @@ $(MESSOBJ)/robotron.a:			\
 	$(MESS_DRIVERS)/z9001.o		\
 
 $(MESSOBJ)/rockwell.a:			\
-	$(MESS_VIDEO)/aim65.o		\
 	$(MESS_MACHINE)/aim65.o		\
 	$(MESS_DRIVERS)/aim65.o		\
 	$(MESS_DRIVERS)/aim65_40.o	\
