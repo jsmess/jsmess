@@ -1339,6 +1339,20 @@ ROM_START( ficvt503 )
 	ROMX_LOAD("115gk140.awd", 0x20000, 0x20000, CRC(65e88956) SHA1(f94bb0732e00b5b0f18f4e349db24a289f8379c5), ROM_BIOS(5))
 ROM_END
 
+ROM_START( aprpand )
+	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+
+	ROM_LOAD( "pf10226.std", 0xe0000, 0x20000, CRC(7396fb87) SHA1(a109cbad2179eec55f86c0297a59bb015461da21))
+ROM_END
+
+ROM_START( aprfte )
+	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
+
+	ROM_LOAD( "1-2r2-4.486", 0xe0000, 0x20000, CRC(bccc236d) SHA1(0765299363e68cf65710a688c360a087856ece8f))
+ROM_END
+
 ROM_START( megapc )
 	ROM_REGION(0x1000000,"maincpu", 0)
 	ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
@@ -1401,7 +1415,9 @@ COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga,      atcga,  "<unknow
 COMP ( 1993, megapc,   ibm5170, 0,       megapc,    atvga,      atvga,  "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
 COMP ( 199?, megapcpl, ibm5170, 0,       megapcpl,  atvga,      atvga,  "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
 COMP ( 1989, pc2386,   ibm5170, 0,       at386,     atvga,      atvga,  "Amstrad plc", "Amstrad PC2386", GAME_NOT_WORKING )
+COMP ( 1991, aprfte,   ibm5170, 0,       at486,     atvga,      atvga,  "Apricot",  "Apricot FT//ex 486 (J3 Motherboard)", GAME_NOT_WORKING )
 COMP ( 1991, ftsserv,  ibm5170, 0,       at486,     atvga,      atvga,  "Apricot",  "Apricot FTs (Scorpion)", GAME_NOT_WORKING )
+COMP ( 1992, aprpand,  ibm5170, 0,       at486,     atvga,      atvga,  "Apricot",  "Apricot FTs (Panther Rev F 1.02.26)", GAME_NOT_WORKING )
 COMP ( 1990, aplanst,  ibm5170, 0,       at386,     atvga,      atvga,  "Apricot",  "Apricot LANstation (Krypton Motherboard)", GAME_NOT_WORKING )
 COMP ( 1990, aplannb,  ibm5170, 0,       at386,     atvga,      atvga,  "Apricot",  "Apricot LANstation (Novell Remote Boot)", GAME_NOT_WORKING )
 COMP ( 1992, aplscar,  ibm5170, 0,       at386,     atvga,      atvga,  "Apricot",  "Apricot LS Pro (Caracal Motherboard)", GAME_NOT_WORKING )
