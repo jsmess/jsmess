@@ -133,7 +133,7 @@ coco_rtc_type_t coco_fdc_device::real_time_clock()
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 {
-	coco_fdc_device *fdc = dynamic_cast<coco_fdc_device *>(device->owner());
+	coco_fdc_device *fdc = dynamic_cast<coco_fdc_device *>(device);
 	fdc->set_intrq(state);
 	fdc->update_lines();
 }
@@ -145,7 +145,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 {
-	coco_fdc_device *fdc = dynamic_cast<coco_fdc_device *>(device->owner());
+	coco_fdc_device *fdc = dynamic_cast<coco_fdc_device *>(device);
 	fdc->set_drq(state);
 	fdc->update_lines();
 }

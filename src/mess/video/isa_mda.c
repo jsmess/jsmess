@@ -90,7 +90,7 @@ static const mc6845_interface mc6845_mda_intf =
 
 static WRITE_LINE_DEVICE_HANDLER(pc_cpu_line)
 {
-	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device->owner());
+	isa8_mda_device	*mda  = downcast<isa8_mda_device *>(device);
 	mda->m_isa->irq7_w(state);
 }
 static const pc_lpt_interface pc_lpt_config =

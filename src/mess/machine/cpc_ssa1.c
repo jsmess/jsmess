@@ -68,25 +68,25 @@ WRITE8_MEMBER(cpc_dkspeech_device::dkspeech_w)
 
 static WRITE_LINE_DEVICE_HANDLER(ssa1_lrq_cb)
 {
-	cpc_ssa1_device* ssa1 = dynamic_cast<cpc_ssa1_device*>(device->owner());
+	cpc_ssa1_device* ssa1 = dynamic_cast<cpc_ssa1_device*>(device);
 	ssa1->set_lrq(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(ssa1_sby_cb)
 {
-	cpc_ssa1_device* ssa1 = dynamic_cast<cpc_ssa1_device*>(device->owner());
+	cpc_ssa1_device* ssa1 = dynamic_cast<cpc_ssa1_device*>(device);
 	ssa1->set_sby(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(dk_lrq_cb)
 {
-	cpc_dkspeech_device* dk = dynamic_cast<cpc_dkspeech_device*>(device->owner());
+	cpc_dkspeech_device* dk = dynamic_cast<cpc_dkspeech_device*>(device);
 	dk->set_lrq(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER(dk_sby_cb)
 {
-	cpc_dkspeech_device* dk = dynamic_cast<cpc_dkspeech_device*>(device->owner());
+	cpc_dkspeech_device* dk = dynamic_cast<cpc_dkspeech_device*>(device);
 	dk->set_sby(state);
 }
 

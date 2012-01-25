@@ -70,7 +70,7 @@ static const floppy_interface kc_d004_floppy_interface =
 
 static device_t *kc_d004_get_fdd(device_t *device, int floppy_index)
 {
-	kc_d004_device* owner = dynamic_cast<kc_d004_device *>(device->owner());
+	kc_d004_device* owner = dynamic_cast<kc_d004_device *>(device);
 	return owner->get_active_fdd();
 }
 
