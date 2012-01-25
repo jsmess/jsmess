@@ -430,6 +430,8 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	assert(height > 0);
 	assert(visarea.min_x >= 0);
 	assert(visarea.min_y >= 0);
+//	assert(visarea.max_x < width);
+//	assert(visarea.max_y < height);
 	assert(m_type == SCREEN_TYPE_VECTOR || visarea.min_x < width);
 	assert(m_type == SCREEN_TYPE_VECTOR || visarea.min_y < height);
 	assert(frame_period > 0);
@@ -504,12 +506,17 @@ void screen_device::reset_origin(int beamy, int beamx)
 
 void screen_device::realloc_screen_bitmaps()
 {
+	// doesn't apply for vector games
 	if (m_type == SCREEN_TYPE_VECTOR)
 		return;
+	
+	// determine effective size to allocate
+	INT32 effwidth = MAX(m_width, m_visarea.max_x + 1);
+	INT32 effheight = MAX(m_height, m_visarea.max_y + 1);
 
 	// reize all registered screen bitmaps
 	for (auto_bitmap_item *item = m_auto_bitmap_list.first(); item != NULL; item = item->next())
-		item->m_bitmap.resize(m_width, m_height);
+		item->m_bitmap.resize(effwidth, effheight);
 
 	// re-set up textures
 	m_texture[0]->set_bitmap(m_bitmap[0], m_visarea, m_bitmap[0].texformat());
@@ -785,15 +792,15 @@ void screen_device::vblank_begin()
 	m_vblank_start_time = machine().time();
 	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
+	// if this is the primary screen and we need to update now
+	if (this == machine().primary_screen && !(machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+		machine().video().frame_update();
+
 	// call the screen specific callbacks
 	for (callback_item *item = m_callback_list.first(); item != NULL; item = item->next())
 		item->m_callback(*this, true);
 	if (!m_screen_vblank.isnull())
 		m_screen_vblank(*this, true);
-
-	// if this is the primary screen and we need to update now
-	if (this == machine().primary_screen && !(machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
-		machine().video().frame_update();
 
 	// reset the VBLANK start timer for the next frame
 	m_vblank_begin_timer->adjust(time_until_vblank_start());
