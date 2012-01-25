@@ -1594,7 +1594,7 @@ static MACHINE_CONFIG_DERIVED( academy, polgar )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(academy_mem)
 	MCFG_MACHINE_RESET( academy )
-	MCFG_DEVICE_REMOVE("int_timer")
+	//MCFG_DEVICE_REMOVE("int_timer")
 	MCFG_TIMER_ADD_PERIODIC("int_timer", timer_update_irq_academy, attotime::from_hz(600))
 
 MACHINE_CONFIG_END
