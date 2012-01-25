@@ -201,7 +201,7 @@ MACOSX_USE_LIBSDL = 1
 #-------------------------------------------------
 
 # uncomment next line if you are building for a 64-bit target
-PTR64 = 0
+PTR64 = 1
 
 # uncomment next line if you are building for a big-endian target
 # BIGENDIAN = 1
@@ -233,7 +233,7 @@ VERBOSE = 1
 
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
-OPTIMIZE = 3
+OPTIMIZE = 0
 
 
 ###########################################################################
@@ -298,13 +298,13 @@ BUILD_EXE = $(EXE)
 endif
 
 # compiler, linker and utilities
-AR=/Users/devesine/Source/personal/jsmess/emscripten/emar
-CXX=/Users/devesine/Source/personal/jsmess/emscripten/emc++
-LD=/Users/devesine/Source/personal/jsmess/emscripten/emld
-CC=/Users/devesine/Source/personal/jsmess/emscripten/emcc
-#AR = @ar
-#CC = @gcc
-#LD = @g++
+#AR=/Users/devesine/Source/personal/jsmess/emscripten/emar
+#CXX=/Users/devesine/Source/personal/jsmess/emscripten/emc++
+#LD=/Users/devesine/Source/personal/jsmess/emscripten/emld
+#CC=/Users/devesine/Source/personal/jsmess/emscripten/emcc
+AR = @ar
+CC = @gcc
+LD = @g++
 MD = -mkdir$(EXE)
 RM = @rm -f
 OBJDUMP = @objdump
@@ -432,7 +432,7 @@ CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS)
 
 # we compile C-only to C89 standard with GNU extensions
 # we compile C++ code to C++98 standard with GNU extensions
-CONLYFLAGS += -std=c90
+CONLYFLAGS += -std=c89
 CPPONLYFLAGS += -x c++ -std=gnu++98
 COBJFLAGS += -x objective-c++
 
@@ -472,7 +472,7 @@ endif
 endif
 
 # add a basic set of warnings
-CCOMFLAGS += \
+BCCOMFLAGS += \
 	-Wall \
 	-Wno-format-security \
 	-Wwrite-strings \
