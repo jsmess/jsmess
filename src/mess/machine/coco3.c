@@ -161,12 +161,12 @@ void coco3_state::update_cart_base(UINT8 *cart_base)
 UINT32 coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bool result;
-	if (!strcmp(screen.tag(), COMPOSITE_SCREEN_TAG))
+	if (!strcmp(screen.tag(), ":" COMPOSITE_SCREEN_TAG))
 	{
 		/* composite screen */
 		result = m_gime->update_composite(bitmap, cliprect);
 	}
-	else if (!strcmp(screen.tag(), RGB_SCREEN_TAG))
+	else if (!strcmp(screen.tag(), ":" RGB_SCREEN_TAG))
 	{
 		/* rgb screen */
 		result = m_gime->update_rgb(bitmap, cliprect);
