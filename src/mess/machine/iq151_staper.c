@@ -21,12 +21,12 @@
 
 static I8255_INTERFACE( iq151_staper_ppi_intf )
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_staper_device, ppi_porta_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, iq151_staper_device, ppi_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_staper_device, ppi_portb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, iq151_staper_device, ppi_portb_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_staper_device, ppi_portc_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, iq151_staper_device, ppi_portc_w)
 };
 
 static MACHINE_CONFIG_FRAGMENT( iq151_staper )

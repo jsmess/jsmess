@@ -430,10 +430,10 @@ WRITE8_MEMBER( base_c2040_device::dio_w )
 
 static const riot6532_interface riot0_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, dio_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, dio_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, dio_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, dio_w),
 	DEVCB_NULL
 };
 
@@ -572,10 +572,10 @@ WRITE8_MEMBER( base_c2040_device::riot1_pb_w )
 
 static const riot6532_interface riot1_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, riot1_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, riot1_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, riot1_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, riot1_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, riot1_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, riot1_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, riot1_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, riot1_pb_w),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
 };
 
@@ -679,19 +679,19 @@ WRITE_LINE_MEMBER( base_c2040_device::rw_sel_w )
 
 static const via6522_interface via_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, via_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, via_pa_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, ready_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, err_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c2040_device, ready_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c2040_device, err_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, via_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, mode_sel_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, rw_sel_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c2040_device, mode_sel_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c2040_device, rw_sel_w),
 
 	DEVCB_NULL
 };
@@ -766,19 +766,19 @@ WRITE8_MEMBER( base_c2040_device::c8050_via_pb_w )
 
 static const via6522_interface c8050_via_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, via_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, c8050_via_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, ready_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, err_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, via_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, c8050_via_pb_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c2040_device, ready_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c2040_device, err_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, c8050_via_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, c8050_via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, mode_sel_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, rw_sel_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c2040_device, mode_sel_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c2040_device, rw_sel_w),
 
 	DEVCB_NULL
 };
@@ -895,10 +895,10 @@ WRITE8_MEMBER( base_c2040_device::miot_pb_w )
 
 static MOS6530_INTERFACE( miot_intf )
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, pi_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, pi_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, miot_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, miot_pb_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, pi_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, pi_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, miot_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, miot_pb_w)
 };
 
 
@@ -990,10 +990,10 @@ WRITE8_MEMBER( base_c2040_device::c8050_miot_pb_w )
 
 static MOS6530_INTERFACE( c8050_miot_intf )
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, pi_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, pi_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, c8050_miot_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, c8050_miot_pb_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, pi_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, pi_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, c8050_miot_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c2040_device, c8050_miot_pb_w)
 };
 
 

@@ -56,7 +56,7 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::pic_int_w )
 
 static struct pic8259_interface pic_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, s100_wunderbus_device, pic_int_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, s100_wunderbus_device, pic_int_w),
 	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };
@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 static UPD1990A_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, s100_wunderbus_device, rtc_tp_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, s100_wunderbus_device, rtc_tp_w)
 };
 
 

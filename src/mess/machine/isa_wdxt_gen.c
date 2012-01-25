@@ -140,15 +140,15 @@ WRITE8_MEMBER( wdxt_gen_device::ram_w )
 
 static WD11C00_17_INTERFACE( host_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, irq5_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, drq3_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, mr_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, wdxt_gen_device, irq5_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, wdxt_gen_device, drq3_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, wdxt_gen_device, mr_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(WD1015_TAG, MCS48_INPUT_IRQ),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, rd322_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, ram_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, wdxt_gen_device, ram_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, wdxt_gen_device, rd322_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, wdxt_gen_device, ram_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF, wdxt_gen_device, ram_w),
 	DEVCB_DEVICE_MEMBER(WD2010A_TAG, wd2010_device, read),
 	DEVCB_DEVICE_MEMBER(WD2010A_TAG, wd2010_device, write)
 };

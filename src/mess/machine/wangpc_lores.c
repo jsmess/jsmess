@@ -86,7 +86,7 @@ static const mc6845_interface crtc_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, wangpc_lores_video_device, vsync_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, wangpc_lores_video_device, vsync_w),
 	NULL
 };
 
