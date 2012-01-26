@@ -827,7 +827,7 @@ WRITE8_MEMBER( intv_state::intv_ecs_porta_w )
 
 DEVICE_IMAGE_LOAD( intvkbd_cart )
 {
-	if (strcmp(image.device().tag(),"cart1") == 0) /* Legacy cartridge slot */
+	if (strcmp(image.device().tag(),":cart1") == 0) /* Legacy cartridge slot */
 	{
 		/* First, initialize these as empty so that the intellivision
          * will think that the playcable is not attached */
@@ -840,7 +840,7 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 		intv_load_rom_file(image);
 	}
 
-	if (strcmp(image.device().tag(),"cart2") == 0) /* Keyboard component cartridge slot */
+	if (strcmp(image.device().tag(),":cart2") == 0) /* Keyboard component cartridge slot */
 	{
 		UINT8 *memory = image.device().machine().region("keyboard")->base();
 

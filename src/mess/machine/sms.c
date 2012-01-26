@@ -1634,37 +1634,37 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	sms_state *state = machine.driver_data<sms_state>();
 	int size, index = 0, offset = 0;
 
-	if (strcmp(image.device().tag(), "cart1") == 0)
+	if (strcmp(image.device().tag(), ":cart1") == 0)
 		index = 0;
-	if (strcmp(image.device().tag(), "cart2") == 0)
+	if (strcmp(image.device().tag(), ":cart2") == 0)
 		index = 1;
-	if (strcmp(image.device().tag(), "cart3") == 0)
+	if (strcmp(image.device().tag(), ":cart3") == 0)
 		index = 2;
-	if (strcmp(image.device().tag(), "cart4") == 0)
+	if (strcmp(image.device().tag(), ":cart4") == 0)
 		index = 3;
-	if (strcmp(image.device().tag(), "cart5") == 0)
+	if (strcmp(image.device().tag(), ":cart5") == 0)
 		index = 4;
-	if (strcmp(image.device().tag(), "cart6") == 0)
+	if (strcmp(image.device().tag(), ":cart6") == 0)
 		index = 5;
-	if (strcmp(image.device().tag(), "cart7") == 0)
+	if (strcmp(image.device().tag(), ":cart7") == 0)
 		index = 6;
-	if (strcmp(image.device().tag(), "cart8") == 0)
+	if (strcmp(image.device().tag(), ":cart8") == 0)
 		index = 7;
-	if (strcmp(image.device().tag(), "cart9") == 0)
+	if (strcmp(image.device().tag(), ":cart9") == 0)
 		index = 8;
-	if (strcmp(image.device().tag(), "cart10") == 0)
+	if (strcmp(image.device().tag(), ":cart10") == 0)
 		index = 9;
-	if (strcmp(image.device().tag(), "cart11") == 0)
+	if (strcmp(image.device().tag(), ":cart11") == 0)
 		index = 10;
-	if (strcmp(image.device().tag(), "cart12") == 0)
+	if (strcmp(image.device().tag(), ":cart12") == 0)
 		index = 11;
-	if (strcmp(image.device().tag(), "cart13") == 0)
+	if (strcmp(image.device().tag(), ":cart13") == 0)
 		index = 12;
-	if (strcmp(image.device().tag(), "cart14") == 0)
+	if (strcmp(image.device().tag(), ":cart14") == 0)
 		index = 13;
-	if (strcmp(image.device().tag(), "cart15") == 0)
+	if (strcmp(image.device().tag(), ":cart15") == 0)
 		index = 14;
-	if (strcmp(image.device().tag(), "cart16") == 0)
+	if (strcmp(image.device().tag(), ":cart16") == 0)
 		index = 15;
 
 	state->m_cartridge[index].features = 0;

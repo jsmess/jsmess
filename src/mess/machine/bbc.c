@@ -1960,19 +1960,19 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 
 	size = image.length();
 
-	if (strcmp(image.device().tag(),"cart1") == 0)
+	if (strcmp(image.device().tag(),":cart1") == 0)
 	{
 		index = 0;
 	}
-	if (strcmp(image.device().tag(),"cart2") == 0)
+	if (strcmp(image.device().tag(),":cart2") == 0)
 	{
 		index = 1;
 	}
-	if (strcmp(image.device().tag(),"cart3") == 0)
+	if (strcmp(image.device().tag(),":cart3") == 0)
 	{
 		index = 2;
 	}
-	if (strcmp(image.device().tag(),"cart4") == 0)
+	if (strcmp(image.device().tag(),":cart4") == 0)
 	{
 		index = 3;
 	}
