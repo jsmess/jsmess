@@ -159,12 +159,12 @@ const struct pit8253_config b2m_pit8253_intf =
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_LINE(bm2_pit_out1)
+			DEVCB_DEVICE_LINE("pit8253", bm2_pit_out1)
 		},
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk0_w)
+			DEVCB_DEVICE_LINE("pit8253", pit8253_clk0_w)
 		}
 	}
 };
@@ -198,11 +198,11 @@ static READ8_DEVICE_HANDLER (b2m_8255_portb_r )
 I8255A_INTERFACE( b2m_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER(b2m_8255_porta_w),
-	DEVCB_HANDLER(b2m_8255_portb_r),
-	DEVCB_HANDLER(b2m_8255_portb_w),
+	DEVCB_DEVICE_HANDLER("ppi8255_1", b2m_8255_porta_w),
+	DEVCB_DEVICE_HANDLER("ppi8255_1", b2m_8255_portb_r),
+	DEVCB_DEVICE_HANDLER("ppi8255_1", b2m_8255_portb_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(b2m_8255_portc_w)
+	DEVCB_DEVICE_HANDLER("ppi8255_1", b2m_8255_portc_w)
 };
 
 
@@ -237,7 +237,7 @@ I8255A_INTERFACE( b2m_ppi8255_interface_2 )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(b2m_ext_8255_portc_w)
+	DEVCB_DEVICE_HANDLER("ppi8255_2", b2m_ext_8255_portc_w)
 };
 
 static READ8_DEVICE_HANDLER (b2m_romdisk_porta_r )
@@ -262,12 +262,12 @@ static WRITE8_DEVICE_HANDLER (b2m_romdisk_portc_w )
 
 I8255A_INTERFACE( b2m_ppi8255_interface_3 )
 {
-	DEVCB_HANDLER(b2m_romdisk_porta_r),
+	DEVCB_DEVICE_HANDLER("ppi8255_3", b2m_romdisk_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(b2m_romdisk_portb_w),
+	DEVCB_DEVICE_HANDLER("ppi8255_3", b2m_romdisk_portb_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(b2m_romdisk_portc_w)
+	DEVCB_DEVICE_HANDLER("ppi8255_3", b2m_romdisk_portc_w)
 };
 
 static WRITE_LINE_DEVICE_HANDLER( b2m_pic_set_int_line )
