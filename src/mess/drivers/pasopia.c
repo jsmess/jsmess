@@ -65,7 +65,6 @@ public:
 	bool m_video_wl;
 	bool m_ram_bank;
 	UINT8 *m_p_vram;
-	UINT8 dummy[0x100]; // stops crash at start/exit
 };
 
 static VIDEO_START( pasopia )
@@ -123,6 +122,7 @@ static ADDRESS_MAP_START(pasopia_io, AS_IO, 8, pasopia_state)
 	AM_RANGE(0x10,0x10) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x11,0x11) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 //  0x18 - 0x1b pac2
+//  0x1c - 0x1f something
 	AM_RANGE(0x20,0x23) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x28,0x2b) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x30,0x33) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_cd_ba_w)
