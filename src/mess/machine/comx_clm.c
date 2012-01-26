@@ -140,7 +140,7 @@ static const mc6845_interface crtc_intf =
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, comx_clm_device, hsync_w),
+	DEVCB_LINE_MEMBER(comx_clm_device, hsync_w),
 	DEVCB_NULL,
 	NULL
 };

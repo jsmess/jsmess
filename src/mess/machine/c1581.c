@@ -272,12 +272,12 @@ static MOS8520_INTERFACE( cia_intf )
 	XTAL_16MHz/8,
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1581_device, cnt_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1581_device, sp_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1581_device, cia_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1581_device, cia_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1581_device, cia_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1581_device, cia_pb_w)
+	DEVCB_LINE_MEMBER(base_c1581_device, cnt_w),
+	DEVCB_LINE_MEMBER(base_c1581_device, sp_w),
+	DEVCB_MEMBER(base_c1581_device, cia_pa_r),
+	DEVCB_MEMBER(base_c1581_device, cia_pa_w),
+	DEVCB_MEMBER(base_c1581_device, cia_pb_r),
+	DEVCB_MEMBER(base_c1581_device, cia_pb_w)
 };
 
 

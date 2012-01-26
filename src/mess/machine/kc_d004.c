@@ -76,8 +76,8 @@ static device_t *kc_d004_get_fdd(device_t *device, int floppy_index)
 
 static const upd765_interface kc_d004_interface =
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, kc_d004_device, fdc_interrupt),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, kc_d004_device, fdc_dma_request),
+	DEVCB_LINE_MEMBER(kc_d004_device, fdc_interrupt),
+	DEVCB_LINE_MEMBER(kc_d004_device, fdc_dma_request),
 	kc_d004_get_fdd,
 	UPD765_RDY_PIN_NOT_CONNECTED,
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}

@@ -434,21 +434,21 @@ READ_LINE_MEMBER( c1541_device::atn_in_r )
 
 static const via6522_interface c1541_via0_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, c1541_device, via0_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, c1541_device, via0_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c1541_device, atn_in_r),
+	DEVCB_MEMBER(c1541_device, via0_pa_r),
+	DEVCB_MEMBER(c1541_device, via0_pb_r),
+	DEVCB_LINE_MEMBER(c1541_device, atn_in_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, c1541_device, via0_pb_w),
+	DEVCB_MEMBER(c1541_device, via0_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c1541_device, via0_irq_w)
+	DEVCB_LINE_MEMBER(c1541_device, via0_irq_w)
 };
 
 
@@ -479,21 +479,21 @@ READ8_MEMBER( c1541c_device::via0_pa_r )
 
 static const via6522_interface c1541c_via0_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, c1541c_device, via0_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, c1541_device, via0_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c1541_device, atn_in_r),
+	DEVCB_MEMBER(c1541c_device, via0_pa_r),
+	DEVCB_MEMBER(c1541_device, via0_pb_r),
+	DEVCB_LINE_MEMBER(c1541_device, atn_in_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, c1541_device, via0_pb_w),
+	DEVCB_MEMBER(c1541_device, via0_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c1541_device, via0_irq_w)
+	DEVCB_LINE_MEMBER(c1541_device, via0_irq_w)
 };
 
 
@@ -572,20 +572,20 @@ WRITE8_MEMBER( c1541_device::via1_pb_w )
 static const via6522_interface c1541_via1_intf =
 {
 	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, c1541_device, via1_pb_r),
+	DEVCB_MEMBER(c1541_device, via1_pb_r),
 	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, c1541_device, via1_pb_w),
+	DEVCB_MEMBER(c1541_device, via1_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, soe_w),
 	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, oe_w),
 
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c1541_device, via1_irq_w)
+	DEVCB_LINE_MEMBER(c1541_device, via1_irq_w)
 };
 
 
@@ -608,9 +608,9 @@ WRITE_LINE_MEMBER( c1541_device::byte_w )
 
 static C64H156_INTERFACE( ga_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c1541_device, atn_w),
+	DEVCB_LINE_MEMBER(c1541_device, atn_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c1541_device, byte_w)
+	DEVCB_LINE_MEMBER(c1541_device, byte_w)
 };
 
 
