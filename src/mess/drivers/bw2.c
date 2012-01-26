@@ -544,7 +544,7 @@ static const struct pit8253_config pit_intf =
 		{
 			11000,		/* LCD controller */
 			DEVCB_LINE_VCC,
-			DEVCB_LINE(pit8253_clk2_w)
+			DEVCB_DEVICE_LINE(PIT8253_TAG, pit8253_clk2_w)
 		},
 		{
 			0,		/* Floppy /MTRON */

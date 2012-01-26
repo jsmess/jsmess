@@ -551,9 +551,9 @@ static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,              			/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_LINE(ctc_z0_w),		/* ZC/TO0 callback */
-	DEVCB_LINE(z80ctc_trg2_w),	/* ZC/TO1 callback */
-	DEVCB_LINE(ctc_z2_w)		/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE(Z80CTC_TAG, ctc_z0_w),		/* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE(Z80CTC_TAG, z80ctc_trg2_w),	/* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE(Z80CTC_TAG, ctc_z2_w)		/* ZC/TO2 callback */
 };
 
 /* Z80 Daisy Chain */
