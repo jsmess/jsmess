@@ -172,11 +172,11 @@ static struct
 #define GRAPHIC_MODE (vga.gc.data[6]&1) /* else textmodus */
 
 #define EGA_COLUMNS (vga.crtc.data[1]+1)
-#define EGA_START_ADDRESS ((vga.crtc.data[0xd]|(vga.crtc.data[0xc]<<8)))
+#define EGA_START_ADDRESS (vga.crtc.start_addr)
 #define EGA_LINE_LENGTH (vga.crtc.offset<<1)
 
 #define VGA_COLUMNS (vga.crtc.data[1]+1)
-#define VGA_START_ADDRESS (vga.crtc.start_addr<<3)
+#define VGA_START_ADDRESS (vga.crtc.start_addr)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 #define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
@@ -344,10 +344,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	/* line compare is screen sensitive */
 	mask_comp = 0x0ff | (LINES & 0x300);
 
-	popmessage("%02x",vga.sequencer.data[4]);
-
 	curr_addr = 0;
-	/* TODO: fix me */
 	if(!(vga.sequencer.data[4] & 0x08))
 	{
 		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH/4, curr_addr+=VGA_LINE_LENGTH/4)
@@ -360,22 +357,18 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
 				addr %= vga.svga_intf.vram_size;
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x8)
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos++)
 				{
-					if(pos + 0x08 > vga.svga_intf.vram_size)
+					if(pos > vga.svga_intf.vram_size/4)
 						return;
 
-					for(xi=0;xi<0x10/4;xi++)
+					for(xi=0;xi<8;xi++)
 					{
-						int bank_n;
-						xi_h = (xi);
-
-						for(bank_n=0;bank_n<4;bank_n++)
+						for(xi_h=0;xi_h<8;xi_h++)
 						{
-							if(!machine.primary_screen->visible_area().contains(c+xi+bank_n, line + yi))
+							if(!machine.primary_screen->visible_area().contains(c+xi*8+xi_h, line + yi))
 								continue;
-
-							bitmapline[c+xi*4+bank_n] = machine.pens[vga.memory[pos+xi_h+bank_n*0x20000]];
+							bitmapline[c+xi*8+xi_h] = machine.pens[vga.memory[pos+((xi_h >> 1)*0x20000)]];
 						}
 					}
 				}
