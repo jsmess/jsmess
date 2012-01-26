@@ -927,8 +927,8 @@ static const pokey_interface atari_pokey_interface =
 
 static const pia6821_interface atari_pia_interface =
 {
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
@@ -943,14 +943,14 @@ static const pia6821_interface atari_pia_interface =
 
 static const pia6821_interface a600xl_pia_interface =
 {
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(a600xl_pia_pb_w),		/* port B out */
+	DEVCB_DEVICE_HANDLER("pia", a600xl_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -959,14 +959,14 @@ static const pia6821_interface a600xl_pia_interface =
 
 static const pia6821_interface a1200xl_pia_interface =
 {
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(a1200xl_pia_pb_w),		/* port B out */
+	DEVCB_DEVICE_HANDLER("pia", a1200xl_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -975,14 +975,14 @@ static const pia6821_interface a1200xl_pia_interface =
 
 static const pia6821_interface a800xl_pia_interface =
 {
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(a800xl_pia_pb_w),		/* port B out */
+	DEVCB_DEVICE_HANDLER("pia", a800xl_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -991,14 +991,14 @@ static const pia6821_interface a800xl_pia_interface =
 
 static const pia6821_interface xegs_pia_interface =
 {
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_HANDLER(xegs_pia_pb_w),		/* port B out */
+	DEVCB_DEVICE_HANDLER("pia", xegs_pia_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -1026,8 +1026,8 @@ static const pokey_interface a5200_pokey_interface =
 
 static const pia6821_interface a5200_pia_interface =
 {
-	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
-	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),		/* port A in */
+	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),	/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
