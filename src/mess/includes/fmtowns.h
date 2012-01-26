@@ -190,6 +190,7 @@ class towns_state : public driver_device
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	DECLARE_READ8_MEMBER(towns_system_r);
 	DECLARE_WRITE8_MEMBER(towns_system_w);
@@ -254,7 +255,31 @@ class towns_state : public driver_device
 	DECLARE_READ8_MEMBER(towns_spriteram_r);
 	DECLARE_WRITE8_MEMBER(towns_spriteram_w);
 
+	DECLARE_WRITE_LINE_MEMBER(mb8877a_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+
 	void towns_update_video_banks(address_space&);
+	void init_serial_rom(running_machine&);
+	void init_rtc(running_machine&);
+	void kb_sendcode(UINT8 scancode, int release);
+	UINT8 speaker_get_spk();
+	void speaker_set_spkrdata(UINT8 data);
+	void speaker_set_input(UINT8 data);
+
+	private:
+	static const device_timer_id TIMER_RTC = 0;
+	static const device_timer_id TIMER_FREERUN = 1;
+	static const device_timer_id TIMER_INTERVAL2 = 2;
+	static const device_timer_id TIMER_KEYBOARD = 3;
+	static const device_timer_id TIMER_MOUSE = 4;
+	static const device_timer_id TIMER_WAIT = 5;
+	void rtc_second();
+	void freerun_inc();
+	void intervaltimer2_timeout();
+	void poll_keyboard();
+	void mouse_timeout();
+	void wait_end();
 };
 
 class marty_state : public towns_state
