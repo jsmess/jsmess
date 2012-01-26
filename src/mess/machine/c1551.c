@@ -421,7 +421,7 @@ static C64H156_INTERFACE( ga_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE_MEMBER(c64h156_device, atni_w)
+	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, atni_w)
 };
 
 
