@@ -239,9 +239,9 @@ static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,					// timer disables
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_LINE(z80ctc_trg1_w),		// ZC/TO0 callback
-	DEVCB_LINE(z80ctc_trg2_w),		// ZC/TO1 callback, beep interface
-	DEVCB_LINE(z80ctc_trg3_w)		// ZC/TO2 callback
+	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg1_w),		// ZC/TO0 callback
+	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg2_w),		// ZC/TO1 callback, beep interface
+	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w)		// ZC/TO2 callback
 };
 
 READ8_MEMBER( pasopia_state::testa_r )
