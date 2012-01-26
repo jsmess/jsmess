@@ -766,7 +766,7 @@ const device_type ISA8_CGA_MC1502 = &device_creator<isa8_cga_mc1502_device>;
 //-------------------------------------------------
 
 isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_MC1502, "ISA8_CGA_MC1502", "mc1502", tag, owner, clock )
+		isa8_cga_device( mconfig, ISA8_CGA_MC1502, "ISA8_CGA_MC1502", "cga_mc1502", tag, owner, clock )
 {
 	m_vram_size = 0x8000;
 }
@@ -819,7 +819,7 @@ const device_type ISA8_CGA_POISK1 = &device_creator<isa8_cga_poisk1_device>;
 //-------------------------------------------------
 
 isa8_cga_poisk1_device::isa8_cga_poisk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_POISK1, "ISA8_CGA_POISK1", "poisk1", tag, owner, clock )
+		isa8_cga_device( mconfig, ISA8_CGA_POISK1, "ISA8_CGA_POISK1", "cga_poisk1", tag, owner, clock )
 {
 	m_chr_gen_offset[0] = 0x0000;
 	m_font_selection_mask = 0;
@@ -847,7 +847,7 @@ const device_type ISA8_CGA_POISK2 = &device_creator<isa8_cga_poisk2_device>;
 //-------------------------------------------------
 
 isa8_cga_poisk2_device::isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_POISK2, "ISA8_CGA_POISK2", "poisk2", tag, owner, clock )
+		isa8_cga_device( mconfig, ISA8_CGA_POISK2, "ISA8_CGA_POISK2", "cga_poisk2", tag, owner, clock )
 {
 	m_chr_gen_offset[0] = 0x0000;
 	m_chr_gen_offset[1] = 0x0800;
@@ -876,7 +876,7 @@ const device_type ISA8_CGA_SUPERIMPOSE = &device_creator<isa8_cga_superimpose_de
 //-------------------------------------------------
 
 isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        isa8_cga_device( mconfig, ISA8_CGA_SUPERIMPOSE, "ISA8_CGA_SUPERIMPOSE", "superimpose", tag, owner, clock )
+        isa8_cga_device( mconfig, ISA8_CGA_SUPERIMPOSE, "ISA8_CGA_SUPERIMPOSE", "cga_superimpose", tag, owner, clock )
 {
 	m_superimpose = true;
 }
@@ -1984,7 +1984,7 @@ const UINT8 isa8_cga_pc1512_device::mc6845_writeonce_register[31] =
 //-------------------------------------------------
 
 isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_PC1512, "ISA8_CGA_PC1512", "pc1512", tag, owner, clock )
+		isa8_cga_device( mconfig, ISA8_CGA_PC1512, "ISA8_CGA_PC1512", "cga_pc1512", tag, owner, clock )
 {
 	m_vram_size = 0x10000;
 	m_chr_gen_offset[0] = 0x0000;
