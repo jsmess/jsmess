@@ -18,13 +18,12 @@
 
     TODO:
     - modernize
-    - convert to an ISA device.
     - add emulated mc6845 hook-up
     - fix video update.
 	- rewrite video drawing functions (they are horrible)
-	- fix RAM read/writes, CGA and Mono has video bugs due of corrupted vga.memory
-	- fix emulated CGA and Mono modes
 	- add VESA etc.
+    - can't find info regarding cursor speed in text mode, I think it toggles
+      every 32 frames?
     - (and many more ...)
 
 	per-game issues:
@@ -139,8 +138,7 @@ static struct
 	} dac;
 
 	struct {
-		int time;
-		int visible;
+		UINT8 visible;
 	} cursor;
 
 	/* oak vga */
@@ -226,14 +224,10 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	int pos, line, column, mask, w, h, addr;
 	pen_t pen;
 
-	if (CRTC_CURSOR_MODE!=CRTC_CURSOR_OFF)
-	{
-		if (++vga.cursor.time>=0x10)
-		{
-			vga.cursor.visible^=1;
-			vga.cursor.time=0;
-		}
-	}
+	if(vga.crtc.cursor_enable)
+		vga.cursor.visible = machine.primary_screen->frame_number() & 0x20;
+	else
+		vga.cursor.visible = 0;
 
 	for (addr = vga.crtc.start_addr, line = -CRTC_SKEW; line < TEXT_LINES;
 		 line += height, addr += TEXT_LINE_LENGTH)
