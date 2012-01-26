@@ -1066,13 +1066,13 @@ astring &game_info_astring(running_machine &machine, astring &string)
 
 		/* count how many identical sound chips we have */
 		int count = 1;
-		for (device_sound_interface *scan = snditer.next(); scan != NULL; scan = snditer.next())
-		{
-			if (sound->device().type() != scan->device().type() || sound->device().clock() != scan->device().clock())
-				break;
-			count++;
-			sound = scan;
-		}
+//		for (device_sound_interface *scan = snditer.current(); scan != NULL; scan = snditer.next())
+//		{
+//			if (sound->device().type() != scan->device().type() || sound->device().clock() != scan->device().clock())
+//				break;
+//			count++;
+//			sound = scan;
+//		}
 		snditer.set_current(*sound);
 
 		/* if more than one, prepend a #x in front of the CPU name */
