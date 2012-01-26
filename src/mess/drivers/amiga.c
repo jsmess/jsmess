@@ -284,12 +284,12 @@ static MACHINE_RESET( cdtv )
 static const mos6526_interface cia_0_ntsc_intf =
 {
 	60,														/* tod_clock */
-	DEVCB_LINE(amiga_cia_0_irq),							/* irq_func */
+	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),							/* irq_func */
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(amiga_cia_0_portA_r),
-	DEVCB_HANDLER(amiga_cia_0_portA_w),						/* port A */
+	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_r),
+	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),						/* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w)	/* port B */
 };
@@ -297,12 +297,12 @@ static const mos6526_interface cia_0_ntsc_intf =
 static const mos6526_interface cia_0_pal_intf =
 {
 	50,														/* tod_clock */
-	DEVCB_LINE(amiga_cia_0_irq),							/* irq_func */
+	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),							/* irq_func */
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(amiga_cia_0_portA_r),
-	DEVCB_HANDLER(amiga_cia_0_portA_w),						/* port A */
+	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_r),
+	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),						/* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w)	/* port B */
 };
@@ -310,7 +310,7 @@ static const mos6526_interface cia_0_pal_intf =
 static const mos6526_interface cia_1_intf =
 {
 	0,														/* tod_clock */
-	DEVCB_LINE(amiga_cia_1_irq),							/* irq_func */
+	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),							/* irq_func */
 	DEVCB_NULL,												/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -323,12 +323,12 @@ static const mos6526_interface cia_1_intf =
 static const mos6526_interface cia_0_cdtv_intf =
 {
 	0,														/* tod_clock */
-	DEVCB_LINE(amiga_cia_0_irq),							/* irq_func */
+	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),							/* irq_func */
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(amiga_cia_0_cdtv_portA_r),
-	DEVCB_HANDLER(amiga_cia_0_portA_w),						/* port A */
+	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_cdtv_portA_r),
+	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),						/* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w)	/* port B */
 };
@@ -336,7 +336,7 @@ static const mos6526_interface cia_0_cdtv_intf =
 static const mos6526_interface cia_1_cdtv_intf =
 {
 	0,														/* tod_clock */
-	DEVCB_LINE(amiga_cia_1_irq),							/* irq_func */
+	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),							/* irq_func */
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -348,12 +348,12 @@ static const mos6526_interface cia_1_cdtv_intf =
 
 static const tpi6525_interface cdtv_tpi_intf =
 {
-	DEVCB_LINE(amigacd_tpi6525_irq),
+	DEVCB_DEVICE_LINE("tpi6525", amigacd_tpi6525_irq),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(amigacd_tpi6525_portb_w),
-	DEVCB_HANDLER(amigacd_tpi6525_portc_r),
+	DEVCB_DEVICE_HANDLER("tpi6525", amigacd_tpi6525_portb_w),
+	DEVCB_DEVICE_HANDLER("tpi6525", amigacd_tpi6525_portc_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

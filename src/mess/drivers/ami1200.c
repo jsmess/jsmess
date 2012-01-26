@@ -255,20 +255,20 @@ static READ8_DEVICE_HANDLER( a1200_cia_0_portA_r )
 static const mos6526_interface a1200_cia_0_intf =
 {
 	0,													/* tod_clock */
-	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
+	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(a1200_cia_0_portA_r),
-	DEVCB_HANDLER(ami1200_cia_0_porta_w),		/* port A */
-	DEVCB_HANDLER(ami1200_cia_0_portb_r),
-	DEVCB_HANDLER(ami1200_cia_0_portb_w)		/* port B */
+	DEVCB_DEVICE_HANDLER("cia_0", a1200_cia_0_portA_r),
+	DEVCB_DEVICE_HANDLER("cia_0", ami1200_cia_0_porta_w),		/* port A */
+	DEVCB_DEVICE_HANDLER("cia_0", ami1200_cia_0_portb_r),
+	DEVCB_DEVICE_HANDLER("cia_0", ami1200_cia_0_portb_w)		/* port B */
 };
 
 static const mos6526_interface a1200_cia_1_intf =
 {
 	0,													/* tod_clock */
-	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
+	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),									/* irq_func */
 	DEVCB_NULL,	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
