@@ -172,13 +172,13 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, stat
 
 I8237_INTERFACE( ibm5150_dma8237_config )
 {
-	DEVCB_LINE(pc_dma_hrq_changed),
-	DEVCB_LINE(pc_dma8237_out_eop),
+	DEVCB_DEVICE_LINE("dma8237", pc_dma_hrq_changed),
+	DEVCB_DEVICE_LINE("dma8237", pc_dma8237_out_eop),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(pc_dma8237_fdc_dack_r), DEVCB_HANDLER(pc_dma8237_hdc_dack_r) },
-	{ DEVCB_HANDLER(pc_dma8237_0_dack_w), DEVCB_NULL, DEVCB_HANDLER(pc_dma8237_fdc_dack_w), DEVCB_HANDLER(pc_dma8237_hdc_dack_w) },
-	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_fdc_dack_r), DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_hdc_dack_r) },
+	{ DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_0_dack_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_fdc_dack_w), DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_hdc_dack_w) },
+	{ DEVCB_DEVICE_LINE("dma8237", pc_dack0_w), DEVCB_DEVICE_LINE("dma8237", pc_dack1_w), DEVCB_DEVICE_LINE("dma8237", pc_dack2_w), DEVCB_DEVICE_LINE("dma8237", pc_dack3_w) }
 };
 
 
