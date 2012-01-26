@@ -73,16 +73,16 @@ static TIMER_CALLBACK(apple1_dsp_ready_end);
 
 const pia6821_interface apple1_pia0 =
 {
-	DEVCB_HANDLER(apple1_pia0_kbdin),				/* Port A input (keyboard) */
+	DEVCB_DEVICE_HANDLER("pia", apple1_pia0_kbdin),				/* Port A input (keyboard) */
 	DEVCB_NULL,										/* Port B input (display status) */
 	DEVCB_NULL,										/* CA1 input (key pressed) */
 	DEVCB_NULL,										/* CB1 input (display ready) */
 	DEVCB_NULL,										/* CA2 not used as input */
 	DEVCB_NULL,										/* CB2 not used as input */
 	DEVCB_NULL,										/* Port A not used as output */
-	DEVCB_HANDLER(apple1_pia0_dspout),				/* Port B output (display) */
+	DEVCB_DEVICE_HANDLER("pia", apple1_pia0_dspout),				/* Port B output (display) */
 	DEVCB_NULL,										/* CA2 not used as output */
-	DEVCB_HANDLER(apple1_pia0_dsp_write_signal),	/* CB2 output (display write) */
+	DEVCB_DEVICE_HANDLER("pia", apple1_pia0_dsp_write_signal),	/* CB2 output (display write) */
 	DEVCB_NULL,										/* IRQA not connected */
 	DEVCB_NULL										/* IRQB not connected */
 };
