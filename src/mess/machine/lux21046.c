@@ -238,7 +238,7 @@ static const wd17xx_interface fdc_intf =
 	DEVCB_NULL,
 	DEVCB_LINE_MEMBER(luxor_55_21046_device, fdc_intrq_w),
 	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+	{ ":"FLOPPY_0, ":"FLOPPY_1, NULL, NULL }
 };
 
 
