@@ -40,11 +40,10 @@ public:
 	required_device<device_t> m_ctc;
 	required_device<device_t> m_pio;
 	required_device<mc6845_device> m_crtc;
+
 	DECLARE_READ8_MEMBER(pasopia_romram_r);
 	DECLARE_WRITE8_MEMBER(pasopia_ram_w);
 	DECLARE_WRITE8_MEMBER(pasopia_ctrl_w);
-	DECLARE_WRITE8_MEMBER(pasopia_6845_address_w);
-	DECLARE_WRITE8_MEMBER(pasopia_6845_data_w);
 	DECLARE_WRITE8_MEMBER(vram_addr_lo_w);
 	DECLARE_WRITE8_MEMBER(vram_latch_w);
 	DECLARE_READ8_MEMBER(vram_latch_r);
@@ -57,29 +56,27 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(testa_w);
 	DECLARE_WRITE_LINE_MEMBER(testb_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT8 m_ram_bank;
-	UINT8 *m_p_rom;
-	UINT8 *m_p_wram;
-	UINT8 *m_p_vram;
-	const UINT8 *m_p_chargen;
+
 	UINT8 m_hblank;
 	UINT16 m_vram_addr;
-	UINT8 m_vram_latch,m_attr_latch;
-	UINT8 m_video_wl;
-	UINT8 m_gfx_mode;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	UINT8 m_vram_latch;
+	UINT8 m_attr_latch;
+//	UINT8 m_gfx_mode;
+	bool m_video_wl;
+	bool m_ram_bank;
+	UINT8 *m_p_vram;
+	UINT8 dummy[0x100]; // stops crash at start/exit
 };
 
 static VIDEO_START( pasopia )
 {
-	pasopia_state *state = machine.driver_data<pasopia_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
 }
 
 MC6845_UPDATE_ROW( pasopia_update_row )
 {
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT8 *m_p_chargen = device->machine().region("chargen")->base();
 	UINT8 chr,gfx,fg=7,bg=0; // colours need to be determined
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -92,7 +89,7 @@ MC6845_UPDATE_ROW( pasopia_update_row )
 		chr = state->m_p_vram[mem];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<3) | ra] ^ inv;
+		gfx = m_p_chargen[(chr<<3) | ra] ^ inv;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT(gfx, 7) ? fg : bg];
@@ -106,51 +103,25 @@ MC6845_UPDATE_ROW( pasopia_update_row )
 	}
 }
 
-READ8_MEMBER( pasopia_state::pasopia_romram_r )
-{
-	if (m_ram_bank)
-		return m_p_wram[offset];
-
-	return m_p_rom[offset];
-}
-
-WRITE8_MEMBER( pasopia_state::pasopia_ram_w )
-{
-	m_p_wram[offset] = data;
-}
-
 WRITE8_MEMBER( pasopia_state::pasopia_ctrl_w )
 {
-	m_ram_bank = data & 2;
+	m_ram_bank = BIT(data, 1);
+	memory_set_bank(machine(), "bank1", m_ram_bank);
 }
 
 static ADDRESS_MAP_START(pasopia_map, AS_PROGRAM, 8, pasopia_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x7fff) AM_READWRITE(pasopia_romram_r,pasopia_ram_w)
+	AM_RANGE(0x0000,0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 	AM_RANGE(0x8000,0xffff) AM_RAM
 ADDRESS_MAP_END
 
-
-WRITE8_MEMBER( pasopia_state::pasopia_6845_address_w )
-{
-	data &= 0x1f;
-	m_crtc_index = data;
-	m_crtc->address_w( space, offset, data );
-}
-
-WRITE8_MEMBER( pasopia_state::pasopia_6845_data_w )
-{
-	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w( space, offset, data );
-}
 
 static ADDRESS_MAP_START(pasopia_io, AS_IO, 8, pasopia_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x08,0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x10,0x10) AM_WRITE(pasopia_6845_address_w)
-	AM_RANGE(0x11,0x11) AM_WRITE(pasopia_6845_data_w)
+	AM_RANGE(0x10,0x10) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0x11,0x11) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 //  0x18 - 0x1b pac2
 	AM_RANGE(0x20,0x23) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x28,0x2b) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
@@ -166,10 +137,10 @@ INPUT_PORTS_END
 static MACHINE_START(pasopia)
 {
 	pasopia_state *state = machine.driver_data<pasopia_state>();
-
-	state->m_p_rom = machine.region("ipl")->base();
-	state->m_p_wram = machine.region("wram")->base();
 	state->m_p_vram = machine.region("vram")->base();
+	state->m_hblank = 0;
+	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank2", 0);
 }
 
 static MACHINE_RESET(pasopia)
@@ -178,7 +149,7 @@ static MACHINE_RESET(pasopia)
 
 WRITE8_MEMBER( pasopia_state::vram_addr_lo_w )
 {
-	m_vram_addr = (m_vram_addr & 0xff00) | data;
+	m_vram_addr = (m_vram_addr & 0x3f00) | data;
 }
 
 WRITE8_MEMBER( pasopia_state::vram_latch_w )
@@ -188,7 +159,7 @@ WRITE8_MEMBER( pasopia_state::vram_latch_w )
 
 READ8_MEMBER( pasopia_state::vram_latch_r )
 {
-	return m_p_vram[m_vram_addr & 0x3fff];
+	return m_p_vram[m_vram_addr];
 }
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
@@ -212,7 +183,7 @@ READ8_MEMBER( pasopia_state::portb_1_r )
 	UINT8 grph_latch,lcd_mode;
 
 	m_hblank ^= 0x40; //TODO
-	grph_latch = (m_p_vram[(m_vram_addr & 0x3fff)+0x4000] & 0x80);
+	grph_latch = (m_p_vram[m_vram_addr | 0x4000] & 0x80);
 	lcd_mode = 0x10;
 
 	return m_hblank | lcd_mode | grph_latch; //bit 4: LCD mode
@@ -222,19 +193,19 @@ READ8_MEMBER( pasopia_state::portb_1_r )
 WRITE8_MEMBER( pasopia_state::vram_addr_hi_w )
 {
 	m_attr_latch = (data & 0x80) | (m_attr_latch & 0x7f);
-	if (data & 0x40 && ((m_video_wl & 0x40) == 0))
+	if ( BIT(data, 6) && !m_video_wl )
 	{
-		m_p_vram[m_vram_addr & 0x3fff] = m_vram_latch;
-		m_p_vram[(m_vram_addr & 0x3fff)+0x4000] = m_attr_latch;
+		m_p_vram[m_vram_addr] = m_vram_latch;
+		m_p_vram[m_vram_addr | 0x4000] = m_attr_latch;
 	}
 
-	m_video_wl = data & 0x40;
+	m_video_wl = BIT(data, 6);
 	m_vram_addr = (m_vram_addr & 0xff) | ((data & 0x3f) << 8);
 }
 
 WRITE8_MEMBER( pasopia_state::screen_mode_w )
 {
-	m_gfx_mode = (data & 0xe0) >> 5;
+	//m_gfx_mode = (data & 0xe0) >> 5; unused variable
 	m_attr_latch = (m_attr_latch & 0x80) | (data & 7);
 	printf("Screen Mode=%02x\n",data);
 }
@@ -251,7 +222,7 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 
 READ8_MEMBER( pasopia_state::rombank_r )
 {
-	return m_ram_bank<<1;
+	return (m_ram_bank) ? 4 : 0;
 }
 
 static I8255A_INTERFACE( ppi8255_intf_2 )
@@ -355,6 +326,18 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(pasopia_state, kbd_put)
 };
 
+DRIVER_INIT( pasopia )
+{
+/*
+We preset all banks here, so that bankswitching will incur no speed penalty.
+0000 indicates ROMs, 10000 indicates RAM.
+*/
+
+	UINT8 *p_ram = machine.region("maincpu")->base();
+	memory_configure_bank(machine, "bank1", 0, 2, &p_ram[0x00000], 0x10000);
+	memory_configure_bank(machine, "bank2", 0, 1, &p_ram[0x10000], 0);
+}
+
 static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -390,18 +373,16 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pasopia )
-	ROM_REGION( 0x8000, "ipl", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "tbasic.rom", 0x0000, 0x8000, CRC(f53774ff) SHA1(bbec45a3bad8d184505cc6fe1f6e2e60a7fb53f2))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412)) //stolen from pasopia7
-
-	ROM_REGION( 0x8000, "wram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x8000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY      FULLNAME       FLAGS */
-COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, 0,     "Toshiba",   "Pasopia", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT      COMPANY      FULLNAME       FLAGS */
+COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, pasopia, "Toshiba",   "Pasopia", GAME_NOT_WORKING | GAME_NO_SOUND)
