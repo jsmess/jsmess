@@ -22,8 +22,6 @@
     - fix video update.
 	- rewrite video drawing functions (they are horrible)
 	- add VESA etc.
-    - can't find info regarding cursor speed in text mode, I think it toggles
-      every 32 frames?
     - (and many more ...)
 
 	per-game issues:
@@ -225,7 +223,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	pen_t pen;
 
 	if(vga.crtc.cursor_enable)
-		vga.cursor.visible = machine.primary_screen->frame_number() & 0x20;
+		vga.cursor.visible = machine.primary_screen->frame_number() & 0x10;
 	else
 		vga.cursor.visible = 0;
 
@@ -333,7 +331,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	UINT16 mask_comp;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int yi;
-	int xi,xi_h;
+	int xi;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x0ff | (LINES & 0x300);
@@ -358,12 +356,9 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 
 					for(xi=0;xi<8;xi++)
 					{
-						for(xi_h=0;xi_h<8;xi_h++)
-						{
-							if(!machine.primary_screen->visible_area().contains(c+xi*8+xi_h, line + yi))
-								continue;
-							bitmapline[c+xi*8+xi_h] = machine.pens[vga.memory[pos+((xi_h >> 1)*0x20000)]];
-						}
+						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+							continue;
+						bitmapline[c+xi] = machine.pens[vga.memory[pos+((xi >> 1)*0x20000)]];
 					}
 				}
 			}
@@ -388,10 +383,9 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 
 					for(xi=0;xi<0x10;xi++)
 					{
-						xi_h = (xi & 0xe) >> 1;
 						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 							continue;
-						bitmapline[c+xi] = machine.pens[vga.memory[pos+xi_h]];
+						bitmapline[c+xi] = machine.pens[vga.memory[pos+(xi >> 1)]];
 					}
 				}
 			}
