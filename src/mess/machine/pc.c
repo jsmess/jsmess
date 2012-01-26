@@ -1190,7 +1190,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 	UINT32	address;
 	UINT32	size;
 
-	address = ( ! strcmp( "cart2", image.device().tag() ) ) ? 0xd0000 : 0xe0000;
+	address = ( ! strcmp( ":cart2", image.device().tag() ) ) ? 0xd0000 : 0xe0000;
 
 	if ( image.software_entry() )
 	{

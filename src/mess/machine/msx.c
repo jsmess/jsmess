@@ -81,10 +81,10 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	slot_state *st;
 	int id = -1;
 
-	if (strcmp(image.device().tag(),"cart1")==0)
+	if (strcmp(image.device().tag(),":cart1")==0)
 		id = 0;
 
-	if (strcmp(image.device().tag(),"cart2")==0)
+	if (strcmp(image.device().tag(),":cart2")==0)
 		id = 1;
 
 	if( id == -1 )
@@ -340,10 +340,10 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 	msx_state *state = image.device().machine().driver_data<msx_state>();
 	int id = -1;
 
-	if (strcmp(image.device().tag(),"cart1")==0)
+	if (strcmp(image.device().tag(),":cart1")==0)
 		id = 0;
 
-	if (strcmp(image.device().tag(),"cart2")==0)
+	if (strcmp(image.device().tag(),":cart2")==0)
 		id = 1;
 
 	if( id == -1 )

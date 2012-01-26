@@ -465,7 +465,7 @@ static int a800_check_cart_type(device_image_interface &image)
 			type = A800_16K;
 		else if (size == 0x2000)
 		{
-			if (strcmp(image.device().tag(),"cart2") == 0)
+			if (strcmp(image.device().tag(),":cart2") == 0)
 				type = A800_RIGHT_8K;
 			else
 				type = A800_8K;
@@ -492,7 +492,7 @@ static int a800_check_cart_type(device_image_interface &image)
 		}
 	}
 
-	if ((strcmp(image.device().tag(),"cart2") == 0) && (type != A800_RIGHT_8K))
+	if ((strcmp(image.device().tag(),":cart2") == 0) && (type != A800_RIGHT_8K))
 		fatalerror("You cannot load this image '%s' in the right slot", image.filename());
 
 	return type;

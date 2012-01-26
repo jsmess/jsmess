@@ -238,10 +238,10 @@ static void sufami_load_sram(running_machine &machine, const char *cart_tag)
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device(cart_tag));
 	image->battery_load(battery_ram, 0x20000, 0);
 
-	if (strcmp(cart_tag, "slot_a") == 0)
+	if (strcmp(cart_tag, ":slot_a") == 0)
 		st_sram_offset = 0x608000;
 
-	if (strcmp(cart_tag, "slot_b") == 0)
+	if (strcmp(cart_tag, ":slot_b") == 0)
 		st_sram_offset = 0x708000;
 
 	/* Cart RAM is at 0x60-0x63:0x8000-0xffff (+0x10 for slot2) */
@@ -1155,13 +1155,13 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 
 	snes_ram = machine.region("maincpu")->base();
 
-	if (strcmp(image.device().tag(), "slot_a") == 0)
+	if (strcmp(image.device().tag(), ":slot_a") == 0)
 	{
 		st_data_offset = 0x200000;
 		slot_id = 0;
 	}
 
-	if (strcmp(image.device().tag(), "slot_b") == 0)
+	if (strcmp(image.device().tag(), ":slot_b") == 0)
 	{
 		st_data_offset = 0x400000;
 		slot_id = 1;
