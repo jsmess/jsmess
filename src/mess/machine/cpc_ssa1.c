@@ -66,40 +66,36 @@ WRITE8_MEMBER(cpc_dkspeech_device::dkspeech_w)
 	sp0256_ALD_w(m_sp0256_device,0,data & 0x3f);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(ssa1_lrq_cb)
+WRITE_LINE_MEMBER(cpc_ssa1_device::lrq_cb)
 {
-	cpc_ssa1_device* ssa1 = dynamic_cast<cpc_ssa1_device*>(device);
-	ssa1->set_lrq(state);
+	set_lrq(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(ssa1_sby_cb)
+WRITE_LINE_MEMBER(cpc_ssa1_device::sby_cb)
 {
-	cpc_ssa1_device* ssa1 = dynamic_cast<cpc_ssa1_device*>(device);
-	ssa1->set_sby(state);
+	set_sby(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(dk_lrq_cb)
+WRITE_LINE_MEMBER(cpc_dkspeech_device::lrq_cb)
 {
-	cpc_dkspeech_device* dk = dynamic_cast<cpc_dkspeech_device*>(device);
-	dk->set_lrq(state);
+	set_lrq(state);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(dk_sby_cb)
+WRITE_LINE_MEMBER(cpc_dkspeech_device::sby_cb)
 {
-	cpc_dkspeech_device* dk = dynamic_cast<cpc_dkspeech_device*>(device);
-	dk->set_sby(state);
+	set_sby(state);
 }
 
 static sp0256_interface sp0256_intf =
 {
-	DEVCB_DEVICE_LINE("sp0256",ssa1_lrq_cb),
-	DEVCB_DEVICE_LINE("sp0256",ssa1_sby_cb)
+	DEVCB_LINE_MEMBER(cpc_ssa1_device,lrq_cb),
+	DEVCB_LINE_MEMBER(cpc_ssa1_device,sby_cb)
 };
 
 static sp0256_interface sp0256_dk_intf =
 {
-	DEVCB_DEVICE_LINE("sp0256",dk_lrq_cb),
-	DEVCB_DEVICE_LINE("sp0256",dk_sby_cb)
+	DEVCB_LINE_MEMBER(cpc_dkspeech_device,lrq_cb),
+	DEVCB_LINE_MEMBER(cpc_dkspeech_device,sby_cb)
 };
 
 //-------------------------------------------------

@@ -65,6 +65,8 @@ public:
 
 	DECLARE_READ8_MEMBER(ssa1_r);
 	DECLARE_WRITE8_MEMBER(ssa1_w);
+	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
+	DECLARE_WRITE_LINE_MEMBER(sby_cb);
 
 protected:
 	// device-level overrides
@@ -100,6 +102,8 @@ public:
 
 	DECLARE_READ8_MEMBER(dkspeech_r);
 	DECLARE_WRITE8_MEMBER(dkspeech_w);
+	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
+	DECLARE_WRITE_LINE_MEMBER(sby_cb);
 
 protected:
 	// device-level overrides
