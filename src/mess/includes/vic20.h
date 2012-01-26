@@ -15,6 +15,7 @@
 #include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/ram.h"
+#include "machine/vic20exp.h"
 #include "machine/vic1112.h"
 #include "sound/dac.h"
 #include "sound/mos6560.h"

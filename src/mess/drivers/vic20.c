@@ -56,9 +56,9 @@ block of RAM instead of 8.
 
     TODO:
 
+	- load cartridges with expansion port device
+	- implement RAM expansion with expansion port device
     - C1540 is not working currently
-    - clean up inputs
-    - clean up VIA interface
     - access violation in mos6560.c
         * In the Chips (Japan, USA).60
         * K-Star Patrol (Europe).60
@@ -222,21 +222,21 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 
 static ADDRESS_MAP_START( vic20_mem, AS_PROGRAM, 8, vic20_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-//  AM_RANGE(0x0400, 0x07ff) RAM1
-//  AM_RANGE(0x0800, 0x0bff) RAM2
-//  AM_RANGE(0x0c00, 0x0fff) RAM3
+	AM_RANGE(0x0400, 0x07ff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, ram1_r, ram1_w)
+	AM_RANGE(0x0800, 0x0bff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, ram2_r, ram2_w)
+	AM_RANGE(0x0c00, 0x0fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, ram3_r, ram3_w)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
-//  AM_RANGE(0x2000, 0x3fff) BLK1
-//  AM_RANGE(0x4000, 0x5fff) BLK2
-//  AM_RANGE(0x6000, 0x7fff) BLK3
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, blk1_r, blk1_w)
+	AM_RANGE(0x4000, 0x5fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, blk2_r, blk2_w)
+	AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, blk3_r, blk3_w)
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x900f) AM_DEVREADWRITE_LEGACY(M6560_TAG, mos6560_port_r, mos6560_port_w)
 	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM
-//  AM_RANGE(0x9800, 0x9bff) I/O2
-//  AM_RANGE(0x9c00, 0x9fff) I/O3
-//  AM_RANGE(0xa000, 0xbfff) BLK5
+	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, io2_r, io2_w)
+	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, io3_r, io3_w)
+	AM_RANGE(0xa000, 0xbfff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, blk5_r, blk5_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -679,6 +679,21 @@ static const mos6560_interface vic_pal_intf =
 };
 
 
+//-------------------------------------------------
+//  VIC20_EXPANSION_INTERFACE( expansion_intf )
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( vic20_expansion_cards )
+	SLOT_INTERFACE("ieee488", VIC1112)
+SLOT_INTERFACE_END
+
+static VIC20_EXPANSION_INTERFACE( expansion_intf )
+{
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_NMI),
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_RESET)
+};
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -736,14 +751,14 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface )
 
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
-#ifdef INCLUDE_VIC1112
-    MCFG_VIC1112_ADD()
-#endif
+
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("20,40,60,70,a0,b0")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("vic1001_cart")
 	MCFG_CARTSLOT_LOAD(vic20_cart)
+	
+	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, expansion_intf, vic20_expansion_cards, NULL, NULL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic1001_cart")

@@ -19,11 +19,9 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
+#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
-#include "machine/c2031.h"
-#include "machine/c2040.h"
-#include "machine/c8280.h"
-#include "machine/d9060.h"
+#include "machine/vic20exp.h"
 
 
 
@@ -48,51 +46,45 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic1112_interface
-
-struct vic1112_interface
-{
-	const char *m_bus_tag;
-};
-
 // ======================> vic1112_device
 
 class vic1112_device :  public device_t,
-						public vic1112_interface
+						public device_vic20_expansion_card_interface
 {
 public:
     // construction/destruction
     vic1112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	DECLARE_READ8_MEMBER( via0_pb_r );
 	DECLARE_WRITE8_MEMBER( via0_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_READ8_MEMBER( dio_r );
-	DECLARE_WRITE8_MEMBER( dio_w );
-	DECLARE_WRITE_LINE_MEMBER( atn_w );
-	DECLARE_READ_LINE_MEMBER( srq_r );
-	DECLARE_WRITE_LINE_MEMBER( eoi_w );
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
     virtual void device_config_complete() { m_shortname = "vic1112"; }
+	
+	// device_vic20_expansion_card_interface overrides
+	virtual UINT8 vic20_io2_r(address_space &space, offs_t offset);
+	virtual void vic20_io2_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 vic20_blk5_r(address_space &space, offs_t offset);
 
 private:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<ieee488_device> m_bus;
 
+	UINT8 *m_rom;
+
 	int m_via0_irq;
 	int m_via1_irq;
-
-	const char *m_bus_tag;
 };
 
 
