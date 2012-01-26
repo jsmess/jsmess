@@ -159,7 +159,7 @@ static const SCSIBus_interface sasi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_d9060_device, req_w),
+	DEVCB_LINE_MEMBER(base_d9060_device, req_w),
 	DEVCB_NULL
 };
 
@@ -212,10 +212,10 @@ WRITE8_MEMBER( base_d9060_device::dio_w )
 
 static const riot6532_interface riot0_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_d9060_device, dio_r),
+	DEVCB_MEMBER(base_d9060_device, dio_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_d9060_device, dio_w),
+	DEVCB_MEMBER(base_d9060_device, dio_w),
 	DEVCB_NULL
 };
 
@@ -350,10 +350,10 @@ WRITE8_MEMBER( base_d9060_device::riot1_pb_w )
 
 static const riot6532_interface riot1_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_d9060_device, riot1_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_d9060_device, riot1_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_d9060_device, riot1_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_d9060_device, riot1_pb_w),
+	DEVCB_MEMBER(base_d9060_device, riot1_pa_r),
+	DEVCB_MEMBER(base_d9060_device, riot1_pb_r),
+	DEVCB_MEMBER(base_d9060_device, riot1_pa_w),
+	DEVCB_MEMBER(base_d9060_device, riot1_pb_w),
 	DEVCB_CPU_INPUT_LINE(M6502_DOS_TAG, INPUT_LINE_IRQ0)
 };
 
@@ -431,18 +431,18 @@ WRITE_LINE_MEMBER( base_d9060_device::enable_w )
 static const via6522_interface via_intf =
 {
 	DEVCB_DEVICE_HANDLER(SASIBUS_TAG, scsi_data_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_d9060_device, via_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_d9060_device, req_r),
+	DEVCB_MEMBER(base_d9060_device, via_pb_r),
+	DEVCB_LINE_MEMBER(base_d9060_device, req_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_DEVICE_HANDLER(SASIBUS_TAG, scsi_data_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_d9060_device, via_pb_w),
+	DEVCB_MEMBER(base_d9060_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_d9060_device, ack_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_d9060_device, enable_w),
+	DEVCB_LINE_MEMBER(base_d9060_device, ack_w),
+	DEVCB_LINE_MEMBER(base_d9060_device, enable_w),
 
 	DEVCB_CPU_INPUT_LINE(M6502_HDC_TAG, INPUT_LINE_IRQ0)
 };

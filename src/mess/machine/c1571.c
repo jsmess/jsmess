@@ -338,21 +338,21 @@ READ_LINE_MEMBER( base_c1571_device::wprt_r )
 
 static const via6522_interface via0_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1571_device, via0_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1571_device, via0_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, atn_in_r),
+	DEVCB_MEMBER(base_c1571_device, via0_pa_r),
+	DEVCB_MEMBER(base_c1571_device, via0_pb_r),
+	DEVCB_LINE_MEMBER(base_c1571_device, atn_in_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, wprt_r),
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1571_device, via0_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1571_device, via0_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE_MEMBER(base_c1571_device, wprt_r),
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, via0_irq_w)
+	DEVCB_MEMBER(base_c1571_device, via0_pa_w),
+	DEVCB_MEMBER(base_c1571_device, via0_pb_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_LINE_MEMBER(base_c1571_device, via0_irq_w)
 };
 
 
@@ -430,20 +430,20 @@ WRITE8_MEMBER( base_c1571_device::via1_pb_w )
 static const via6522_interface via1_intf =
 {
 	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1571_device, via1_pb_r),
+	DEVCB_MEMBER(base_c1571_device, via1_pb_r),
 	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, base_c1571_device, via1_pb_w),
+	DEVCB_MEMBER(base_c1571_device, via1_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, soe_w),
 	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, oe_w),
 
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, via1_irq_w)
+	DEVCB_LINE_MEMBER(base_c1571_device, via1_irq_w)
 };
 
 
@@ -478,10 +478,10 @@ WRITE_LINE_MEMBER( base_c1571_device::cia_sp_w )
 static MOS6526_INTERFACE( cia_intf )
 {
 	0,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, cia_irq_w),
+	DEVCB_LINE_MEMBER(base_c1571_device, cia_irq_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, cia_cnt_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, cia_sp_w),
+	DEVCB_LINE_MEMBER(base_c1571_device, cia_cnt_w),
+	DEVCB_LINE_MEMBER(base_c1571_device, cia_sp_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -508,9 +508,9 @@ WRITE_LINE_MEMBER( base_c1571_device::byte_w )
 
 static C64H156_INTERFACE( ga_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, atn_w),
+	DEVCB_LINE_MEMBER(base_c1571_device, atn_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, byte_w)
+	DEVCB_LINE_MEMBER(base_c1571_device, byte_w)
 };
 
 
@@ -553,7 +553,7 @@ static const floppy_interface c1571_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, wpt_w),
+	DEVCB_LINE_MEMBER(base_c1571_device, wpt_w),
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(c1571),
@@ -581,7 +581,7 @@ static const floppy_interface c1570_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, base_c1571_device, wpt_w),
+	DEVCB_LINE_MEMBER(base_c1571_device, wpt_w),
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(c1570),

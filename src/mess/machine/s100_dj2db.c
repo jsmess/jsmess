@@ -104,8 +104,8 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, s100_dj2db_device, fdc_intrq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, s100_dj2db_device, fdc_drq_w),
+	DEVCB_LINE_MEMBER(s100_dj2db_device, fdc_intrq_w),
+	DEVCB_LINE_MEMBER(s100_dj2db_device, fdc_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 

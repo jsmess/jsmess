@@ -408,12 +408,12 @@ WRITE8_MEMBER( grip_device::ppi_pc_w )
 
 static I8255A_INTERFACE( ppi_intf )
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, grip_device, ppi_pa_r),	// Port A read
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, grip_device, ppi_pa_w),	// Port A write
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, grip_device, ppi_pb_r),	// Port B read
+	DEVCB_MEMBER(grip_device, ppi_pa_r),	// Port A read
+	DEVCB_MEMBER(grip_device, ppi_pa_w),	// Port A write
+	DEVCB_MEMBER(grip_device, ppi_pb_r),	// Port B read
 	DEVCB_NULL,														// Port B write
 	DEVCB_NULL,														// Port C read
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, grip_device, ppi_pc_w)	// Port C write
+	DEVCB_MEMBER(grip_device, ppi_pc_w)	// Port C write
 };
 
 
@@ -470,12 +470,12 @@ static Z80STI_INTERFACE( sti_intf )
 	0,														// serial receive clock
 	0,														// serial transmit clock
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),			// interrupt
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF, grip_device, sti_gpio_r),	// GPIO read
+	DEVCB_MEMBER(grip_device, sti_gpio_r),	// GPIO read
 	DEVCB_NULL,												// GPIO write
 	DEVCB_NULL,												// serial input
 	DEVCB_NULL,												// serial output
 	DEVCB_NULL,												// timer A output
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, grip_device, speaker_w),	// timer B output
+	DEVCB_LINE_MEMBER(grip_device, speaker_w),	// timer B output
 	DEVCB_LINE(z80sti_tc_w),								// timer C output
 	DEVCB_LINE(z80sti_rc_w)									// timer D output
 };
