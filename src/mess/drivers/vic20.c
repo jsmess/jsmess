@@ -57,7 +57,6 @@ block of RAM instead of 8.
     TODO:
 
 	- load cartridges with expansion port device
-	- implement RAM expansion with expansion port device
     - C1540 is not working currently
     - access violation in mos6560.c
         * In the Chips (Japan, USA).60
@@ -683,16 +682,13 @@ static const mos6560_interface vic_pal_intf =
 //  VIC20_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( vic20_expansion_cards )
-	SLOT_INTERFACE("ieee488", VIC1112)
-SLOT_INTERFACE_END
-
 static VIC20_EXPANSION_INTERFACE( expansion_intf )
 {
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_NMI),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_RESET)
 };
+
 
 
 //**************************************************************************
@@ -705,27 +701,6 @@ static VIC20_EXPANSION_INTERFACE( expansion_intf )
 
 void vic20_state::machine_start()
 {
-	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-
-	// find devices
-	m_cassette_timer = machine().device<timer_device>(TIMER_C1530_TAG);
-
-	// memory expansions
-	switch (m_ram->size())
-	{
-	case 32*1024:
-		program->install_ram(0x6000, 0x7fff, NULL);
-		// fall through
-	case 24*1024:
-		program->install_ram(0x4000, 0x5fff, NULL);
-		// fall through
-	case 16*1024:
-		program->install_ram(0x2000, 0x3fff, NULL);
-		// fall through
-	case 8*1024:
-		program->install_ram(0x0400, 0x0fff, NULL);
-	}
-
 	// register for state saving
 	save_item(NAME(m_key_col));
 }
@@ -767,7 +742,6 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("5K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K,24K,32K")
 MACHINE_CONFIG_END
 
 

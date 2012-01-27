@@ -753,6 +753,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/interpod.o	\
 	$(MESS_DRIVERS)/vic20.o		\
 	$(MESS_MACHINE)/vic20exp.o	\
+	$(MESS_MACHINE)/vic1110.o	\
 	$(MESS_MACHINE)/vic1112.o	\
 	$(MESS_AUDIO)/ted7360.o		\
 	$(MESS_AUDIO)/t6721.o		\
