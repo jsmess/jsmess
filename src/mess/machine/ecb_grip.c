@@ -282,7 +282,7 @@ static const speaker_interface speaker_intf =
 
 static const mc6845_interface crtc_intf =
 {
-	SCREEN_TAG,
+	":" SCREEN_TAG,
 	8,
 	NULL,
 	grip_update_row,
