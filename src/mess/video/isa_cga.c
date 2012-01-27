@@ -614,8 +614,8 @@ static const mc6845_interface mc6845_cga_intf =
 	NULL,				/* end_update */
 	DEVCB_NULL,				/* on_de_changed */
 	DEVCB_NULL,				/* on_cur_changed */
-	DEVCB_LINE_MEMBER(isa8_cga_device, hsync_changed),	/* on_hsync_changed */
-	DEVCB_LINE_MEMBER(isa8_cga_device, vsync_changed),	/* on_vsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, hsync_changed),	/* on_hsync_changed */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, vsync_changed),	/* on_vsync_changed */
 	NULL
 };
 
