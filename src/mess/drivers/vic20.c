@@ -604,7 +604,7 @@ static VIC20_EXPANSION_INTERFACE( expansion_intf )
 
 void vic20_state::machine_start()
 {
-	// register for state saving
+	// state saving
 	save_item(NAME(m_key_col));
 }
 
@@ -671,8 +671,8 @@ static MACHINE_CONFIG_DERIVED( vic20_ntsc, vic20_common )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	
 	// software lists
-	//MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
-	//MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
 MACHINE_CONFIG_END
 
 
@@ -705,8 +705,8 @@ static MACHINE_CONFIG_DERIVED( vic20_pal, vic20_common )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	
 	// software lists
-	//MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
-	//MCFG_SOFTWARE_LIST_FILTER("disk_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list", "PAL")
 MACHINE_CONFIG_END
 
 
