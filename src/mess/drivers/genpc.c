@@ -18,6 +18,7 @@
 #include "video/isa_ega.h"
 #include "video/isa_mda.h"
 #include "video/isa_vga.h"
+#include "video/isa_svga_s3.h"
 
 #include "machine/ram.h"
 #include "machine/isa.h"
@@ -111,6 +112,7 @@ static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("mda", ISA8_MDA)
 	SLOT_INTERFACE("ega", ISA8_EGA)
 	SLOT_INTERFACE("vga", ISA8_VGA)
+	SLOT_INTERFACE("svga",ISA8_SVGA_S3)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
 	SLOT_INTERFACE("hdc", ISA8_HDC)
