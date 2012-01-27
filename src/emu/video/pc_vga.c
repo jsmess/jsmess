@@ -291,8 +291,6 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 	UINT32 *bitmapline;
 	pen_t pen;
 
-	popmessage("%08x",EGA_START_ADDRESS);
-
 	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
 		 line += height, addr += EGA_LINE_LENGTH)
 	{
