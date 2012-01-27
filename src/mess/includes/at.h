@@ -25,6 +25,7 @@
 #include "video/pc_cga.h"
 #include "video/isa_ega.h"
 #include "video/isa_vga.h"
+#include "video/isa_svga_s3.h"
 
 #include "machine/idectrl.h"
 #include "machine/at_keybc.h"
