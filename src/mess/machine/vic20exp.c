@@ -124,8 +124,38 @@ void vic20_expansion_slot_device::device_reset()
 
 bool vic20_expansion_slot_device::call_load()
 {
-	// TODO
-	return IMAGE_INIT_FAIL;
+	if (m_cart)
+	{
+		offs_t size = 0;
+
+		if (software_entry() == NULL)
+		{
+			size = length();
+
+			if (!mame_stricmp(filetype(), "20")) fread(m_cart->vic20_blk1_pointer(), size);
+			else if (!mame_stricmp(filetype(), "40")) fread(m_cart->vic20_blk2_pointer(), size);
+			else if (!mame_stricmp(filetype(), "60")) fread(m_cart->vic20_blk3_pointer(), size);
+			else if (!mame_stricmp(filetype(), "70")) fread(m_cart->vic20_blk3_pointer() + 0x1000, size);
+			else if (!mame_stricmp(filetype(), "a0")) fread(m_cart->vic20_blk5_pointer(), size);
+			else if (!mame_stricmp(filetype(), "b0")) fread(m_cart->vic20_blk5_pointer() + 0x1000, size);
+		}
+		else
+		{
+			size = get_software_region_length("blk1");
+			if (size) memcpy(m_cart->vic20_blk1_pointer(), get_software_region("blk1"), size);
+			
+			size = get_software_region_length("blk2");
+			if (size) memcpy(m_cart->vic20_blk2_pointer(), get_software_region("blk2"), size);
+			
+			size = get_software_region_length("blk3");
+			if (size) memcpy(m_cart->vic20_blk3_pointer(), get_software_region("blk3"), size);
+			
+			size = get_software_region_length("blk5");
+			if (size) memcpy(m_cart->vic20_blk5_pointer(), get_software_region("blk5"), size);
+		}
+	}
+
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -152,12 +182,70 @@ const char * vic20_expansion_slot_device::get_default_card_software(const machin
 
 
 //-------------------------------------------------
-//  get_cart_base -
+//  blk1_pointer -
 //-------------------------------------------------
 
-UINT8* vic20_expansion_slot_device::get_cart_base()
+UINT8* vic20_expansion_slot_device::blk1_pointer()
 {
-	return NULL;
+	UINT8 *ptr = NULL;
+	
+	if (m_cart != NULL)
+	{
+		ptr = m_cart->vic20_blk1_pointer();
+	}
+
+	return ptr;
+}
+
+
+//-------------------------------------------------
+//  blk2_pointer -
+//-------------------------------------------------
+
+UINT8* vic20_expansion_slot_device::blk2_pointer()
+{
+	UINT8 *ptr = NULL;
+	
+	if (m_cart != NULL)
+	{
+		ptr = m_cart->vic20_blk2_pointer();
+	}
+
+	return ptr;
+}
+
+
+//-------------------------------------------------
+//  blk3_pointer -
+//-------------------------------------------------
+
+UINT8* vic20_expansion_slot_device::blk3_pointer()
+{
+	UINT8 *ptr = NULL;
+	
+	if (m_cart != NULL)
+	{
+		ptr = m_cart->vic20_blk3_pointer();
+	}
+
+	return ptr;
+}
+
+
+//-------------------------------------------------
+//  blk5_pointer -
+//-------------------------------------------------
+
+UINT8* vic20_expansion_slot_device::blk5_pointer()
+{
+	UINT8 *ptr = NULL;
+	
+	if (m_cart != NULL)
+	{
+		ptr = m_cart->vic20_blk5_pointer();
+	}
+
+	return ptr;
 }
 
 

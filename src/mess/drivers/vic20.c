@@ -56,7 +56,6 @@ block of RAM instead of 8.
 
     TODO:
 
-	- load cartridges with expansion port device
     - C1540 is not working currently
     - access violation in mos6560.c
         * In the Chips (Japan, USA).60
@@ -111,102 +110,6 @@ static INTERRUPT_GEN( vic20_raster_interrupt )
 {
 	vic20_state *state = device->machine().driver_data<vic20_state>();
 	mos6560_raster_interrupt_gen(state->m_vic);
-}
-
-
-
-//**************************************************************************
-//  CARTRIDGE
-//**************************************************************************
-
-//-------------------------------------------------
-//  DEVICE_IMAGE_LOAD( vic20_cart )
-//-------------------------------------------------
-
-static DEVICE_IMAGE_LOAD( vic20_cart )
-{
-	address_space *program = image.device().machine().device(M6502_TAG)->memory().space(AS_PROGRAM);
-	const char *filetype = image.filetype();
-	UINT32 address = 0;
-	UINT32 size;
-	UINT8 *ptr = image.device().machine().region(M6502_TAG)->base();
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-
-		if (!mame_stricmp(filetype, "20"))
-			address = 0x2000;
-		else if (!mame_stricmp(filetype, "40"))
-			address = 0x4000;
-		else if (!mame_stricmp(filetype, "60"))
-			address = 0x6000;
-		else if (!mame_stricmp(filetype, "70"))
-			address = 0x7000;
-		else if (!mame_stricmp(filetype, "a0"))
-			address = 0xa000;
-		else if (!mame_stricmp(filetype, "b0"))
-			address = 0xb000;
-
-		// special case for a 16K image containing two 8K files glued together
-		if (size == 0x4000 && address != 0x4000)
-		{
-			image.fread(ptr + address, 0x2000);
-			image.fread(ptr + 0xa000, 0x2000);
-
-			program->install_rom(address, address + 0x1fff, ptr + address);
-			program->install_rom(0xa000, 0xbfff, ptr + 0xa000);
-		}
-		else
-		{
-			image.fread(ptr + address, size);
-			program->install_rom(address, (address + size) - 1, ptr + address);
-		}
-	}
-	else
-	{
-		size = image.get_software_region_length("blk1");
-		if (size)
-		{
-			address = 0x2000;
-			memcpy(ptr + address, image.get_software_region("blk1"), size);
-			program->install_rom(address, (address + size) - 1, ptr + address);
-		}
-
-		size = image.get_software_region_length("blk2");
-		if (size)
-		{
-			address = 0x4000;
-			memcpy(ptr + address, image.get_software_region("blk2"), size);
-			program->install_rom(address, (address + size) - 1, ptr + address);
-		}
-
-		size = image.get_software_region_length("blk3");
-		if (size)
-		{
-			address = 0x6000;
-			memcpy(ptr + address, image.get_software_region("blk3"), size);
-			program->install_rom(address, (address + size) - 1, ptr + address);
-		}
-
-		size = image.get_software_region_length("blk5");
-		if (size)
-		{
-			address = 0xa000;
-			memcpy(ptr + address, image.get_software_region("blk5"), size);
-			program->install_rom(address, (address + size) - 1, ptr + address);
-		}
-
-		size = image.get_software_region_length("b000");
-		if (size)
-		{
-			address = 0xb000;
-			memcpy(ptr + address, image.get_software_region("b000"), size);
-			program->install_rom(address, (address + size) - 1, ptr + address);
-		}
-	}
-
-	return IMAGE_INIT_PASS;
 }
 
 
@@ -726,12 +629,6 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface )
 
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
-
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("20,40,60,70,a0,b0")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("vic1001_cart")
-	MCFG_CARTSLOT_LOAD(vic20_cart)
 	
 	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, expansion_intf, vic20_expansion_cards, NULL, NULL)
 

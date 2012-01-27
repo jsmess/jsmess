@@ -134,14 +134,17 @@ protected:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return "vic20_cart"; }
+	virtual const char *image_interface() const { return "vic1001_cart"; }
 	virtual const char *file_extensions() const { return "20,40,60,70,a0,b0"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) const;
 
-	virtual UINT8* get_cart_base();
+	virtual UINT8* blk1_pointer();
+	virtual UINT8* blk2_pointer();
+	virtual UINT8* blk3_pointer();
+	virtual UINT8* blk5_pointer();
 
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;
@@ -187,6 +190,11 @@ public:
 
 	virtual UINT8 vic20_blk5_r(address_space &space, offs_t offset) { return 0; };
 	virtual void vic20_blk5_w(address_space &space, offs_t offset, UINT8 data) { };
+
+	virtual UINT8* vic20_blk1_pointer() { return NULL; }
+	virtual UINT8* vic20_blk2_pointer() { return NULL; }
+	virtual UINT8* vic20_blk3_pointer() { return NULL; }
+	virtual UINT8* vic20_blk5_pointer() { return NULL; }
 
 	// I/O
 	virtual UINT8 vic20_io2_r(address_space &space, offs_t offset) { return 0; };
