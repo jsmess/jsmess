@@ -231,7 +231,7 @@
 		<year>198?</year>
 		<publisher>Machine Language Games</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="amazing maze (machine language games)(198-)(jue).a0" size="0x1000" crc="e50e9e0d" sha1="b702f86e18eb51ffbe357b074ab27331b03671c7" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -254,7 +254,7 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1611" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="amok! (umi)(1981)(1611)(jue).a0" size="0x1000" crc="77738d0b" sha1="a354481bdc5411e07a446a8a41397e7237d9f198" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -279,10 +279,10 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI-AP-C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="apple panic (creative)(1982)(vi-ap-c)(e).60" size="0x1000" crc="d9594f49" sha1="be2101da88fba906682c8f44e4a27f740afa05b3" offset="0x0000" />
 			</dataarea>
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="apple panic (creative)(1982)(vi-ap-c)(e).a0" size="0x1000" crc="503b053c" sha1="f8c0932d59d5699db883bec090c955ce00ed81af" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -348,7 +348,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI-AB-C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="astroblitz (creative)(1982)(vi-ab-c)(ju).a0" size="0x1000" crc="2a26ef6c" sha1="b34c362907c17c78120b06a589d28e8430443efb" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -360,7 +360,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI-AB-C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="astroblitz (creative)(1982)(vi-ab-c)(e).a0" size="0x1000" crc="0f6c5ed9" sha1="b8cf27b4768ef9eda8e2466f8d0471fd6905814c" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -372,7 +372,7 @@
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720051-1A" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="atlantis (imagic)(1983)(720051-1a)(ju).a0" size="0x1000" crc="f1ff8b52" sha1="47d5907a2b6c53a316a7a56d5b5fab6b26298bbb" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -384,7 +384,7 @@
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720051-1A" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="atlantis (imagic)(1983)(720051-1a)(e).a0" size="0x1000" crc="b81c0e71" sha1="81531534830b1431e324cdc952127682e5b13bd4" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -423,7 +423,7 @@
 			<dataarea name="blk1" size="0x2000">
 				<rom name="baldor's castle (daedalus)(1983)(ju) (sys 20182).20" size="0x2000" crc="f01e2642" sha1="dd890ef9391159ae4a252a318b789c98cd355f34" offset="0x0000" />
 			</dataarea>
-			<dataarea name="blk2" size="0x1000">
+			<dataarea name="blk2" size="0x2000">
 				<rom name="baldor's castle (daedalus)(1983)(ju) (sys 20182).40" size="0x1000" crc="282bc964" sha1="a2186040572cde2a39f4b350bd8475316096d394" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -553,7 +553,7 @@
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="basic v4.0 (commodore)(198-)(jue).a0" size="0x1000" crc="3438e66a" sha1="bc7847a44f49b7d9b65ed42d308efb7c11795062" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -590,7 +590,7 @@
 		<year>1995</year>
 		<publisher>Imagine</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="bewitched (imagine)(1995).a0" size="0x1000" crc="020d46f3" sha1="49d6da09d9029f70a6bc2125e6dcbd29fe8c44a9" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -602,7 +602,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI-BH-C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="black hole (creative)(1982)(vi-bh-c)(ju).a0" size="0x1000" crc="204ee9f6" sha1="b693f426134148ed333055465c3dfa46633de688" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -614,7 +614,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI-BH-C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="black hole (creative)(1982)(vi-bh-c)(e).a0" size="0x1000" crc="c72e5b1a" sha1="d0b1006f71ee5e833cea180c212d9cda0d866485" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -655,7 +655,7 @@
 		<year>1983</year>
 		<publisher>OEM</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="bug crusher (oem)(1983)(jue).a0" size="0x1000" crc="cfc4446e" sha1="8714770c914b88392385bec6031e3ec81edd5c72" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -667,7 +667,7 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="16??" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="buti - basic utility (umi)198-)(16--)(jue).a0" size="0x1000" crc="cb38dae6" sha1="377cd5d4059c272fd6395419cfc48e0dbfabe094" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -679,7 +679,7 @@
 		<publisher>Sierra</publisher>
 		<info name="serial" value="CBL-401" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk1" size="0x1000">
+			<dataarea name="blk1" size="0x2000">
 				<rom name="cannonball blitz (sierra)(1982)(cbl-401)(ju).20" size="0x1000" crc="a72e825a" sha1="1e9ca737475b7bb6f87bba66f69125f8c894e1e7" offset="0x0000" />
 			</dataarea>
 			<dataarea name="blk5" size="0x2000">
@@ -718,7 +718,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="cassette turbo (198-)(jue).a0" size="0x1000" crc="f241e75b" sha1="00fa1b78acfb08071a5f97b750ca9cb2ac98f1e6" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -804,7 +804,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="close encounters (198-).a0" size="0x1000" crc="c7484cdb" sha1="769f8c49707097ae980e95d0179adb2aa5c280c1" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -816,7 +816,7 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1632" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="cloudburst (umi)(1982)(1632)(ju).a0" size="0x1000" crc="1c4f62bd" sha1="db6020c1b881278587b2ad46d219f1b28b014658" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -828,7 +828,7 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1632" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="cloudburst (umi)(1982)(1632)(e).a0" size="0x1000" crc="7bc4e9f3" sha1="240c9327aa5503cf56c4317cb250b211c542fe8d" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -864,8 +864,8 @@
 		<publisher>ComBasic</publisher>
 		<info name="usage" value="Enter 'SYS 45056' to run" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="b000" size="0x1000">
-				<rom name="combasic (combasic)(1982)(jue)(sys 45056).b0" size="0x1000" crc="1378b4a1" sha1="75edd57e870e2ebc46b388baac1774bf09160386" offset="0x0000" />
+			<dataarea name="blk5" size="0x2000">
+				<rom name="combasic (combasic)(1982)(jue)(sys 45056).b0" size="0x1000" crc="1378b4a1" sha1="75edd57e870e2ebc46b388baac1774bf09160386" offset="0x1000" />
 			</dataarea>
 		</part>
 	</software>
@@ -876,7 +876,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1935" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="commodore artist (commodore)(1982)(vic-1935)(ju).a0" size="0x1000" crc="fb14bb45" sha1="933427166fd600bf56ab23e0eb55e95a44facdd3" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -966,7 +966,7 @@
 		<publisher>Boone</publisher>
 		<info name="serial" value="20001" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="crater raider (boone)(1983)(20001).a0" size="0x1000" crc="7f325cc7" sha1="19f344f744e59bb3fe08b9ac80ea2018dd030cbe" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1052,7 +1052,7 @@
 		<publisher>Sirius</publisher>
 		<info name="serial" value="220??" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="deadly duck (sirius)(1982)(220--)(e).a0" size="0x1000" crc="bc0cf5d8" sha1="9a14eebc56a16a0cbb6edb54fc626347dbf6e2d4" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1063,7 +1063,7 @@
 		<year>1983</year>
 		<publisher>Tronix</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="deadly skies (tronix)(1983)(e).a0" size="0x1000" crc="6ea53c70" sha1="e85c5b2a41c10d30bf64001b10506e201a49a068" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1090,7 +1090,7 @@
 		<publisher>Tronix</publisher>
 		<info name="serial" value="720050-1A" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="demon attack (imagic)(1983)(720050-1a)(ju).a0" size="0x1000" crc="a8ee03a2" sha1="4dccf54de3e0d3e0578640f585a23b2851593bac" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1102,7 +1102,7 @@
 		<publisher>Tronix</publisher>
 		<info name="serial" value="720050-1A" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="demon attack (imagic)(1983)(720050-1a)(e).a0" size="0x1000" crc="fd031042" sha1="99277547d3aa48417374e43ad4b1da2c95472199" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1143,7 +1143,7 @@
 		<year>198?</year>
 		<publisher>Machine Language Games</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="dot gobbler (machine language games)(198-)(ju).a0" size="0x1000" crc="c7c7b768" sha1="728b321bde8b3b48fca0d205ba5c5a336b1358d4" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1343,7 +1343,7 @@
 		<year>1983</year>
 		<publisher>Tronix</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="gold fever (tronix)(1983)(jue).a0" size="0x1000" crc="90c65375" sha1="a689b2efb42e2b3db90af64f288a2a1f13e28e9d" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1367,7 +1367,7 @@
 		<publisher>HES</publisher>
 		<info name="serial" value="C312" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="gridrunner (hes)(1982)(c312) (ju).a0" size="0x1000" crc="2b190aea" sha1="1f985ceb947b336f8600348e2d0636f64fb90873" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1379,7 +1379,7 @@
 		<publisher>HES</publisher>
 		<info name="serial" value="C312" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="gridrunner (hes)(1982)(c312)(e).a0" size="0x1000" crc="c1b3e1ca" sha1="878f5adda944a9bc2852c13952d40fca971964d2" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1402,7 +1402,7 @@
 		<publisher>HES</publisher>
 		<info name="serial" value="C302" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="hesmon v1.1 (hes)(1982)(c302)(jue).a0" size="0x1000" crc="e6c5b849" sha1="7802ba9bd3787cf9b7883659cf82c6200248bc59" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1414,7 +1414,7 @@
 		<publisher>HES</publisher>
 		<info name="serial" value="C302" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="hesmon v1.1 (hes)(1982)(c302)(jue)[a].a0" size="0x1000" crc="de4937f5" sha1="2944eb748747bcf2f1e8a8b1ce71b7199a6f36f8" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x05a1 : 0x8d ('hesmon') - 0xcd ('hesmona') -->
@@ -1441,8 +1441,8 @@
 		<publisher>TSP</publisher>
 		<info name="usage" value="Enter 'SYS 45056' to run" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="b000" size="0x1000">
-				<rom name="hires toolkit (tsp)(198-)(jue) (sys 45056).b0" size="0x1000" crc="d131ec0c" sha1="d32076b8af6b1a8b0073ef84ae02a9c7c43656bc" offset="0x0000" />
+			<dataarea name="blk5" size="0x2000">
+				<rom name="hires toolkit (tsp)(198-)(jue) (sys 45056).b0" size="0x1000" crc="d131ec0c" sha1="d32076b8af6b1a8b0073ef84ae02a9c7c43656bc" offset="0x1000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1632,7 +1632,7 @@
 		<publisher>CBS Software</publisher>
 		<info name="serial" value="22107" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="k-razy antiks (cbs software)(1982)(22107)(e).60" size="0x1000" crc="86479a98" sha1="146a05d559f76edc267c68a65aca1fc759f4a9a9" offset="0x0000" />
 			</dataarea>
 			<dataarea name="blk5" size="0x2000">
@@ -1688,7 +1688,7 @@
 		<publisher>Sierra</publisher>
 		<info name="serial" value="LLL-401" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk1" size="0x1000">
+			<dataarea name="blk1" size="0x2000">
 				<rom name="lunar leeper (sierra)(1981)(lll-401)(ju).20" size="0x1000" crc="d1c647e2" sha1="2034e60a8a38c2962cfaf0fe5c4212afd161db8a" offset="0x0000" />
 			</dataarea>
 			<dataarea name="blk5" size="0x2000">
@@ -1704,7 +1704,7 @@
 		<info name="serial" value="VIC-1213" />
 		<info name="usage" value="Enter 'SYS 24576' to run" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk1" size="0x1000">
+			<dataarea name="blk1" size="0x2000">
 				<rom name="machine language monitor (commodore)(198-)(vic-1213)(jue) (sys 24576).20" size="0x1000" crc="c771e5c1" sha1="16464fca7e950116f333327cecbda886bde99dfb" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1908,7 +1908,7 @@
 		<publisher>HES</publisher>
 		<info name="serial" value="C3??" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="mosquito infestation (hes)(1982)(c3??).a0" size="0x1000" crc="ab89be36" sha1="575fc5d44c90b46b07e7ba22adfcf713042f025d" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1962,7 +1962,7 @@
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22004" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="mutant herd (thorn emi)(1982)(thc22004)(e).a0" size="0x2000" crc="ef92c07e" sha1="0346916eec6e82b5a4145dbfde87f98db1cd2944" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2010,10 +2010,10 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1635" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="outworld (umi)(1981)(1635)(ju).60" size="0x1000" crc="6dd5da16" sha1="91899c4769880277e16cb63e825e2e2b5e2b0071" offset="0x0000" />
 			</dataarea>
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="outworld (umi)(1981)(1635)(ju).a0" size="0x1000" crc="f67a2b0f" sha1="71cb6c1cfd4eab706c58c47e7ac5b666db60c890" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2215,8 +2215,8 @@
 		<info name="serial" value="VIC-1212" />
 		<info name="usage" value="Enter 'SYS 28681' to run" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="7000" size="0x2000">
-				<rom name="programmer's aid cartridge (commodore)(198-)(vic-1212)(jue) (sys 28681).70" size="0x1000" crc="1eead29f" sha1="17311a74f6e6fbf0222dbe866c82c8ce1dd5dd6d" offset="0x0000" />
+			<dataarea name="blk3" size="0x2000">
+				<rom name="programmer's aid cartridge (commodore)(198-)(vic-1212)(jue) (sys 28681).70" size="0x1000" crc="1eead29f" sha1="17311a74f6e6fbf0222dbe866c82c8ce1dd5dd6d" offset="0x1000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2286,10 +2286,10 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1600" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="renaissance (umi)(1982)(1600).60" size="0x1000" crc="44eeb525" sha1="89127b505a4d956bf77d445e4c371af178934444" offset="0x0000" />
 			</dataarea>
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="renaissance (umi)(1982)(1600).a0" size="0x1000" crc="40033ecb" sha1="3710f155e34b77affc9b48e144937bfac952b87f" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2350,7 +2350,7 @@
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8520" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="robotron - 2084 (atarisoft)(1983)(rx8520).60" size="4094" crc="6a91181a" sha1="a09d2cb31890b2767b84ae908f41e3855cfda4f4" offset="0x0000" />
 			</dataarea>
 			<dataarea name="blk5" size="0x2000">
@@ -2400,10 +2400,10 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1650" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="satellites and meteorites! (umi)(1982)(1650)(ju).60" size="0x1000" crc="eb3361c6" sha1="7376391e363074bf99843bfb2ecf4277edb6d17d" offset="0x0000" />
 			</dataarea>
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="satellites and meteorites! (umi)(1982)(1650)(ju).a0" size="0x1000" crc="be390d00" sha1="53afad6a1c2fb87a82ecb28d86258ea2d78615cb" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2437,7 +2437,7 @@
 		<year>1983</year>
 		<publisher>Nalin Sharma</publisher>
 				<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="scram 20 (nalin sharma)(1983)(jue).a0" size="0x1000" crc="24d08856" sha1="54bfccc2df8ee0e27b7c11986897f8f4b4210736" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2448,7 +2448,7 @@
 		<year>1982</year>
 		<publisher>Handic</publisher>
 				<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="screen master (handic)(1982)(jue).a0" size="0x1000" crc="1b61cd52" sha1="5420b4d54f7a9eaeaa8a32760b771214a2567e55" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2537,7 +2537,7 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1641" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="skibbereen (umi)(1982)(1641)(ju).a0" size="0x1000" crc="eaf65586" sha1="54ecf775299e37d3e9f8287da691efdeaf3a98a2" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2549,7 +2549,7 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1641" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="skibbereen (umi)(1982)(1641)(e).a0" size="0x1000" crc="376b9a3e" sha1="c848869daefd55f7c2cd8029320d05780a288767" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2601,7 +2601,7 @@
 		<publisher>Sirius</publisher>
 		<info name="serial" value="22031" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="snake byte (sirius)(1982)(22031).a0" size="0x1000" crc="1840411b" sha1="8e6d796acfe40d7b5357f78ac5a088562b602c6b" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2625,7 +2625,7 @@
 		<publisher>OEM</publisher>
 		<info name="serial" value="&lt;unknown&gt;" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="space ric-o-shay (oem)(198-)(ju).a0" size="0x1000" crc="af2fd976" sha1="e44317b0943e1d77bf5826c13f51c4085a1a7669" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2649,7 +2649,7 @@
 		<publisher>Sirius</publisher>
 		<info name="serial" value="22015" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="spider city (sirius)(1983)(22015)(ju).a0" size="0x1000" crc="b9b5cffe" sha1="38c2e4ac0bc3eca5d0fb12f25843d0ba1d8bca88" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2661,7 +2661,7 @@
 		<publisher>Sirius</publisher>
 		<info name="serial" value="22015" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="spider city (sirius)(1983)(22015)(ju)[a].a0" size="0x1000" crc="12d40755" sha1="8e657056525d3fbce967aec908ce975c6117e121" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x0e86 : 0x60 ('spider') - 0xa0 ('spider1') -->
@@ -2687,10 +2687,10 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="1604" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="spiders of mars (umi)(1982)(1604)(e).60" size="0x1000" crc="619fc2f8" sha1="fbfae17cb7ca8fbecc099ea07341a39a020b688f" offset="0x0000" />
 			</dataarea>
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="spiders of mars (umi)(1982)(1604)(e).a0" size="0x1000" crc="b1f31ddc" sha1="9dd7507761b9ae818ce17c04239bdc1ae2445f44" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2796,7 +2796,7 @@
 			<dataarea name="blk3" size="0x2000">
 				<rom name="story machine (hes)(1983)(c323)(jue).60" size="0x2000" crc="8ba0e1a0" sha1="97052c7bc17688faebc1483c8cc9f958ad1ff9d6" offset="0x0000" />
 			</dataarea>
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="story machine (hes)(1983)(c323)(jue).a0" size="0x1000" crc="b691d4df" sha1="7be1deccc0b9ded4a49d1991dc421cfa199f91aa" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2808,7 +2808,7 @@
 		<publisher>UMI</publisher>
 		<info name="serial" value="16??" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="sub chase (umi)(1982)(16--)(e).a0" size="0x1000" crc="585a901f" sha1="077ceaeb63fb95a8255321aded3f246c1142bd18" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2820,7 +2820,7 @@
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22003" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="submarine commander (thorn emi)(1982)(thc22003)(jue).60" size="0x1000" crc="8817b702" sha1="3311c1c9b864447349da3987056de2e7628496ce" offset="0x0000" />
 			</dataarea>
 			<dataarea name="blk5" size="0x2000">
@@ -2847,7 +2847,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1211A" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="super expander(commadore)(198-)(vic-1211a).a0" size="0x1000" crc="c576ba40" sha1="aa92ac00a945d8496d7f2bf1c869736ee840d7c5" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2909,7 +2909,7 @@
 		<year>198?</year>
 		<publisher>Machine Language Games</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="tank wars (machine language games)(198-).a0" size="0x1000" crc="a0678801" sha1="1fb132603c241c45c2fcef4d2f75a5acb79b6bde" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2921,7 +2921,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI TG C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="terraguard (creative)(1982)(vi tg c)(ju).a0" size="0x1000" crc="bc4eb662" sha1="24570432675476fed13a8bccc33e93c54e62eff2" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -2933,7 +2933,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI TG C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="terraguard (creative)(1982)(vi tg c)(ju)[a].a0" size="0x1000" crc="3079a31b" sha1="34548ad6f1e61c99cf7d5575101b0f8186390201" offset="0x0000" />
 				<!-- File Difference -->
 				<!-- 0x0460 : 0xea 0xea 0xea ('teragard') - 0x8c 0x8c 0xaa3 ('teragard1') -->
@@ -2948,7 +2948,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI TG C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="terraguard (creative)(1982)(vi tg c)(e).a0" size="0x1000" crc="08d51a03" sha1="8fa90ca6cbc32db4efc01a1bb8329b0900d57558" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -3045,10 +3045,10 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI TM C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk3" size="0x1000">
+			<dataarea name="blk3" size="0x2000">
 				<rom name="trashman (creative)(1982)(vi tm c).60" size="0x1000" crc="d2c807e5" sha1="da05171341e6a0b5aa2ca880c7e296ade01333d4" offset="0x0000" />
 			</dataarea>
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="trashman (creative)(1982)(vi tm c).a0" size="0x1000" crc="16d0af06" sha1="03859da8bdced9c404baf387bff3d03e2a3bdd6c" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -3188,8 +3188,8 @@
 		<year>1983</year>
 		<publisher>Bill Yee</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="b000" size="0x1000">
-				<rom name="vic 20 micromon v1.2 (bill yee)(1983)(jue).b0" size="0x1000" crc="91828167" sha1="60753be59f87fafd4931dbf48a5248dc3d25fcc9" offset="0x0000" />
+			<dataarea name="blk5" size="0x2000">
+				<rom name="vic 20 micromon v1.2 (bill yee)(1983)(jue).b0" size="0x1000" crc="91828167" sha1="60753be59f87fafd4931dbf48a5248dc3d25fcc9" offset="0x1000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3199,8 +3199,8 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="2048">
-				<rom name="vic color test (g).a0" size="2048" crc="076cf09c" sha1="3269d14e73f961254a8f3afeb5c73f7dc6855e6b" offset="0x0000" />
+			<dataarea name="blk5" size="0x800">
+				<rom name="vic color test (g).a0" size="0x800" crc="076cf09c" sha1="3269d14e73f961254a8f3afeb5c73f7dc6855e6b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3318,7 +3318,7 @@
 		<year>1980</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="vic20 diagnostic cartridge (commodore)(1980)(ju).a0" size="0x1000" crc="a351a316" sha1="bf90b19e175d60bff7a52e9a9feee6ad20f3b38b" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -3329,7 +3329,7 @@
 		<year>1980</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="324173-01 vc 20 diag" size="0x1000" crc="bead85aa" sha1="b0f54a7a736f92c2a47fbb7fa44854407033b8ec" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -3341,7 +3341,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1610" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="victerm 40 (commodore)(198-)(vic-1610)(jue).a0" size="0x1000" crc="3acd824e" sha1="893653dd0e54ff37fbf68afbfb84626eeb16a848" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -3353,8 +3353,8 @@
 		<publisher>VCC</publisher>
 		<info name="usage" value="Enter 'SYS 45056' to run" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="b000" size="2048">
-				<rom name="victool (vcc)(198-)(jue) (sys 45056).b0" size="2048" crc="b17037e0" sha1="f585462ad2c8241380895c99e2f57f75758d7b82" offset="0x0000" />
+			<dataarea name="blk5" size="0x2000">
+				<rom name="victool (vcc)(198-)(jue) (sys 45056).b0" size="0x800" crc="b17037e0" sha1="f585462ad2c8241380895c99e2f57f75758d7b82" offset="0x1000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3413,7 +3413,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI VM C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="videomania (creative)(1982)(vi vm c)(ju).a0" size="0x1000" crc="5e62733d" sha1="cf5afd0db85f4959d8601ea10240345b527a825b" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -3425,7 +3425,7 @@
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI VM C" />
 		<part name="cart" interface="vic1001_cart">
-			<dataarea name="blk5" size="0x1000">
+			<dataarea name="blk5" size="0x2000">
 				<rom name="videomania (creative)(1982)(vi vm c)(e).a0" size="0x1000" crc="e32563a9" sha1="e8b7be53ef5b8d2660483721c984a5a584aae0a0" offset="0x0000" />
 			</dataarea>
 		</part>

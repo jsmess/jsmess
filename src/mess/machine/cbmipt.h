@@ -20,6 +20,7 @@
 #include "machine/vic1111.h"
 #include "machine/vic1112.h"
 #include "machine/vic1210.h"
+#include "machine/vic20std.h"
 
 
 #define MCFG_CBM_IEC_ADD(_intf, _default_drive) \
