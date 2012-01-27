@@ -35,10 +35,10 @@ dp8390_device::dp8390_device(const machine_config &mconfig, device_type type, co
 }
 
 void dp8390_device::device_start() {
-	irq_func.resolve(irq_cb, *this);
-	breq_func.resolve(breq_cb, *this);
-	mem_read.resolve(mem_read_cb, *this);
-	mem_write.resolve(mem_write_cb, *this);
+	irq_func.resolve(irq_cb, *this->owner());
+	breq_func.resolve(breq_cb, *this->owner());
+	mem_read.resolve(mem_read_cb, *this->owner());
+	mem_write.resolve(mem_write_cb, *this->owner());
 }
 
 void dp8390_device::stop() {
