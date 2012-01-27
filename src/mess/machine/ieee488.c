@@ -351,6 +351,15 @@ void ieee488_device::device_start()
     m_out_ren_func.resolve(m_out_ren_cb, *this);
 }
 
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void ieee488_device::device_stop()
+{
+	m_device_list.reset();
+}
+
 
 //-------------------------------------------------
 //  add_device -
