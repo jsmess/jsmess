@@ -138,27 +138,27 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack3_w ) { if (!state) m_dma_channel =
 
 I8237_INTERFACE( pc_dma8237_config )
 {
-	DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_dma_hrq_changed),
-	DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_dma8237_out_eop),
-	DEVCB_MEMBER(ibm5160_mb_device, pc_dma_read_byte),
-	DEVCB_MEMBER(ibm5160_mb_device, pc_dma_write_byte),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma_hrq_changed),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_out_eop),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma_read_byte),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma_write_byte),
 
 	{ DEVCB_NULL,
-	  DEVCB_MEMBER(ibm5160_mb_device, pc_dma8237_1_dack_r),
-	  DEVCB_MEMBER(ibm5160_mb_device, pc_dma8237_2_dack_r),
-	  DEVCB_MEMBER(ibm5160_mb_device, pc_dma8237_3_dack_r) },
+	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_1_dack_r),
+	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_2_dack_r),
+	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_3_dack_r) },
 
 
-	{ DEVCB_MEMBER(ibm5160_mb_device, pc_dma8237_0_dack_w),
-	  DEVCB_MEMBER(ibm5160_mb_device, pc_dma8237_1_dack_w),
-	  DEVCB_MEMBER(ibm5160_mb_device, pc_dma8237_2_dack_w),
-	  DEVCB_MEMBER(ibm5160_mb_device, pc_dma8237_3_dack_w) },
+	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_0_dack_w),
+	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_1_dack_w),
+	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_2_dack_w),
+	  DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dma8237_3_dack_w) },
 
 	// DACK's
-	{ DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_dack0_w),
-	  DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_dack1_w),
-	  DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_dack2_w),
-	  DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_dack3_w) }
+	{ DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack0_w),
+	  DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack1_w),
+	  DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack2_w),
+	  DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_dack3_w) }
 };
 
 
@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER(ibm5160_mb_device::pc_cpu_line)
 
 const struct pic8259_interface pc_pic8259_config =
 {
-	DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_cpu_line),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_cpu_line),
 	DEVCB_LINE_VCC,
 	DEVCB_NULL
 };
@@ -222,11 +222,11 @@ const struct pit8253_config pc_pit8253_config =
 		}, {
 			XTAL_14_31818MHz/12,				/* dram refresh */
 			DEVCB_NULL,
-			DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_pit8253_out1_changed)
+			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_pit8253_out1_changed)
 		}, {
 			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_LINE_MEMBER(ibm5160_mb_device, pc_pit8253_out2_changed)
+			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_pit8253_out2_changed)
 		}
 	}
 };
@@ -407,11 +407,11 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 
 I8255A_INTERFACE( pc_ppi8255_interface )
 {
-	DEVCB_MEMBER(ibm5160_mb_device, pc_ppi_porta_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_porta_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMBER(ibm5160_mb_device, pc_ppi_portb_w),
-	DEVCB_MEMBER(ibm5160_mb_device, pc_ppi_portc_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_portb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_ppi_portc_r),
 	DEVCB_NULL
 };
 
