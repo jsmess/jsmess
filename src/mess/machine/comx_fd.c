@@ -105,8 +105,8 @@ WRITE_LINE_MEMBER( comx_fd_device::drq_w )
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_LINE_VCC,
-	DEVCB_LINE_MEMBER(comx_fd_device, intrq_w),
-	DEVCB_LINE_MEMBER(comx_fd_device, drq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, comx_fd_device, intrq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, comx_fd_device, drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 

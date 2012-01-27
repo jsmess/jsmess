@@ -212,7 +212,7 @@ static void memory_write_byte(address_space *space, offs_t address, UINT8 data) 
 static Z80DMA_INTERFACE( dma_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_LINE_MEMBER(luxor_55_21046_device, dma_int_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21046_device, dma_int_w),
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_LINE_MEMBER(luxor_55_21046_device, fdc_intrq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21046_device, fdc_intrq_w),
 	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
 	{ ":"FLOPPY_0, ":"FLOPPY_1, NULL, NULL }
 };

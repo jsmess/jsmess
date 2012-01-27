@@ -59,9 +59,9 @@ WRITE_LINE_MEMBER(kc_d002_device::out_halt_w)
 
 static const kcexp_interface kc_d002_interface =
 {
-	DEVCB_LINE_MEMBER(kc_d002_device, out_irq_w),
-	DEVCB_LINE_MEMBER(kc_d002_device, out_nmi_w),
-	DEVCB_LINE_MEMBER(kc_d002_device, out_halt_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, kc_d002_device, out_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, kc_d002_device, out_nmi_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, kc_d002_device, out_halt_w)
 };
 
 static MACHINE_CONFIG_FRAGMENT( kc_d002 )

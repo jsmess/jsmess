@@ -271,11 +271,11 @@ WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
 static Z80PIO_INTERFACE( pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_MEMBER(luxor_55_10828_device, pio_pa_r),
-	DEVCB_MEMBER(luxor_55_10828_device, pio_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, pio_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, pio_pa_w),
 	DEVCB_NULL,
-	DEVCB_MEMBER(luxor_55_10828_device, pio_pb_r),
-	DEVCB_MEMBER(luxor_55_10828_device, pio_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, pio_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, pio_pb_w),
 	DEVCB_NULL
 };
 
@@ -313,8 +313,8 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_LINE_MEMBER(luxor_55_10828_device, fdc_intrq_w),
-	DEVCB_LINE_MEMBER(luxor_55_10828_device, fdc_drq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, fdc_intrq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, fdc_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 

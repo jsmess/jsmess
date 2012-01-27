@@ -159,8 +159,8 @@ static const m6502_interface m6510t_intf =
 {
 	NULL,			// read_indexed_func
 	NULL,			// write_indexed_func
-	DEVCB_MEMBER(c1551_device, port_r),
-	DEVCB_MEMBER(c1551_device, port_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, port_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, port_w)
 };
 
 
@@ -276,12 +276,12 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 static const tpi6525_interface tpi0_intf =
 {
 	DEVCB_NULL,
-	DEVCB_MEMBER(c1551_device, tcbm_data_r),
-	DEVCB_MEMBER(c1551_device, tcbm_data_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_w),
 	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_r),
 	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_w),
-	DEVCB_MEMBER(c1551_device, tpi0_pc_r),
-	DEVCB_MEMBER(c1551_device, tpi0_pc_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi0_pc_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi0_pc_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -363,12 +363,12 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 static const tpi6525_interface tpi1_intf =
 {
 	DEVCB_NULL,
-	DEVCB_MEMBER(c1551_device, tcbm_data_r),
-	DEVCB_MEMBER(c1551_device, tcbm_data_w),
-	DEVCB_MEMBER(c1551_device, tpi1_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi1_pb_r),
 	DEVCB_NULL,
-	DEVCB_MEMBER(c1551_device, tpi1_pc_r),
-	DEVCB_MEMBER(c1551_device, tpi1_pc_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi1_pc_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi1_pc_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
