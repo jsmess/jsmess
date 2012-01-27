@@ -16,7 +16,6 @@
 #include "machine/ieee488.h"
 #include "machine/ram.h"
 #include "machine/vic20exp.h"
-#include "machine/vic1112.h"
 #include "sound/dac.h"
 #include "sound/mos6560.h"
 
@@ -40,7 +39,8 @@ public:
 		  m_vic(*this, M6560_TAG),
 		  m_iec(*this, CBM_IEC_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_cassette_timer(*this, TIMER_C1530_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -50,6 +50,7 @@ public:
 	required_device<cbm_iec_device> m_iec;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<timer_device> m_cassette_timer;
 	
 	virtual void machine_start();
 
@@ -66,9 +67,6 @@ public:
 
 	// keyboard state
 	int m_key_col;
-
-	// timers
-	timer_device *m_cassette_timer;
 };
 
 #endif

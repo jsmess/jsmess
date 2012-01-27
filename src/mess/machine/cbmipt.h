@@ -13,6 +13,8 @@
 #include "machine/interpod.h"
 #include "machine/serialbox.h"
 #include "machine/softbox.h"
+#include "machine/vic1110.h"
+#include "machine/vic1112.h"
 
 
 #define MCFG_CBM_IEC_ADD(_intf, _default_drive) \
@@ -79,6 +81,7 @@ INPUT_PORTS_EXTERN( vic_controls );
 
 extern const slot_interface slot_interface_cbm_iec_devices[];
 extern const slot_interface slot_interface_cbm_ieee488_devices[];
+extern const slot_interface slot_interface_vic20_expansion_cards[];
 extern const slot_interface slot_interface_c64_expansion_cards[];
 
 
