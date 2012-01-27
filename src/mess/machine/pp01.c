@@ -173,17 +173,17 @@ const struct pit8253_config pp01_pit8253_intf =
 		{
 			0,
 			DEVCB_NULL,
-			DEVCB_LINE(pp01_pit_out0)
+			DEVCB_DEVICE_LINE("pit8253", pp01_pit_out0)
 		},
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_LINE(pp01_pit_out1)
+			DEVCB_DEVICE_LINE("pit8253", pp01_pit_out1)
 		},
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk0_w)
+			DEVCB_DEVICE_LINE("pit8253", pit8253_clk0_w)
 		}
 	}
 };
@@ -230,11 +230,11 @@ static READ8_DEVICE_HANDLER (pp01_8255_portc_r )
 
 I8255A_INTERFACE( pp01_ppi8255_interface )
 {
-	DEVCB_HANDLER(pp01_8255_porta_r),
-	DEVCB_HANDLER(pp01_8255_porta_w),
-	DEVCB_HANDLER(pp01_8255_portb_r),
-	DEVCB_HANDLER(pp01_8255_portb_w),
-	DEVCB_HANDLER(pp01_8255_portc_r),
-	DEVCB_HANDLER(pp01_8255_portc_w)
+	DEVCB_DEVICE_HANDLER("ppi8255", pp01_8255_porta_r),
+	DEVCB_DEVICE_HANDLER("ppi8255", pp01_8255_porta_w),
+	DEVCB_DEVICE_HANDLER("ppi8255", pp01_8255_portb_r),
+	DEVCB_DEVICE_HANDLER("ppi8255", pp01_8255_portb_w),
+	DEVCB_DEVICE_HANDLER("ppi8255", pp01_8255_portc_r),
+	DEVCB_DEVICE_HANDLER("ppi8255", pp01_8255_portc_w)
 };
 

@@ -1874,12 +1874,12 @@ static WRITE8_DEVICE_HANDLER( mz2500_portc_w )
 
 static I8255_INTERFACE( ppi8255_intf )
 {
-	DEVCB_HANDLER(mz2500_porta_r),						/* Port A read */
-	DEVCB_HANDLER(mz2500_porta_w),						/* Port A write */
-	DEVCB_HANDLER(mz2500_portb_r),						/* Port B read */
-	DEVCB_HANDLER(mz2500_portb_w),						/* Port B write */
-	DEVCB_HANDLER(mz2500_portc_r),						/* Port C read */
-	DEVCB_HANDLER(mz2500_portc_w)						/* Port C write */
+	DEVCB_DEVICE_HANDLER("i8255_0", mz2500_porta_r),						/* Port A read */
+	DEVCB_DEVICE_HANDLER("i8255_0", mz2500_porta_w),						/* Port A write */
+	DEVCB_DEVICE_HANDLER("i8255_0", mz2500_portb_r),						/* Port B read */
+	DEVCB_DEVICE_HANDLER("i8255_0", mz2500_portb_w),						/* Port B write */
+	DEVCB_DEVICE_HANDLER("i8255_0", mz2500_portc_r),						/* Port C read */
+	DEVCB_DEVICE_HANDLER("i8255_0", mz2500_portc_w)						/* Port C write */
 };
 
 static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
@@ -1934,10 +1934,10 @@ static READ8_DEVICE_HANDLER( mz2500_pio1_portb_r )
 static Z80PIO_INTERFACE( mz2500_pio1_intf )
 {
 	DEVCB_NULL,
-	DEVCB_HANDLER( mz2500_pio1_porta_r ),
-	DEVCB_HANDLER( mz2500_pio1_porta_w ),
+	DEVCB_DEVICE_HANDLER( "z80pio_1", mz2500_pio1_porta_r ),
+	DEVCB_DEVICE_HANDLER( "z80pio_1", mz2500_pio1_porta_w ),
 	DEVCB_NULL,
-	DEVCB_HANDLER( mz2500_pio1_porta_r ),
+	DEVCB_DEVICE_HANDLER( "z80pio_1", mz2500_pio1_porta_r ),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1969,9 +1969,9 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_HANDLER(opn_porta_r),	// read A
+		DEVCB_DEVICE_HANDLER("ym", opn_porta_r),	// read A
 		DEVCB_INPUT_PORT("DSW1"),	// read B
-		DEVCB_HANDLER(opn_porta_w),	// write A
+		DEVCB_DEVICE_HANDLER("ym", opn_porta_w),	// write A
 		DEVCB_NULL					// write B
 	},
 	NULL
@@ -2031,7 +2031,7 @@ static const struct pit8253_config mz2500_pit8253_intf =
 		{
 			31250,
 			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk0_irq)
+			DEVCB_DEVICE_LINE("pit", pit8253_clk0_irq)
 		},
 		{
 			0,
@@ -2041,7 +2041,7 @@ static const struct pit8253_config mz2500_pit8253_intf =
 		{
 			16, //CH2, trusted, used by Super MZ demo / The Black Onyx and a bunch of others (TODO: timing of this)
 			DEVCB_NULL,
-			DEVCB_LINE(pit8253_clk1_w)
+			DEVCB_DEVICE_LINE("pit", pit8253_clk1_w)
 		}
 	}
 };
@@ -2056,7 +2056,7 @@ static WRITE_LINE_DEVICE_HANDLER( mz2500_rtc_alarm_irq )
 
 static RP5C15_INTERFACE( rtc_intf )
 {
-	DEVCB_LINE(mz2500_rtc_alarm_irq),
+	DEVCB_DEVICE_LINE(RP5C15_TAG, mz2500_rtc_alarm_irq),
 	DEVCB_NULL
 };
 

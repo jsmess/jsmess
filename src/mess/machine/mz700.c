@@ -47,8 +47,8 @@ I8255_INTERFACE( mz700_ppi8255_interface )
 	DEVCB_DEVICE_HANDLER("ls145", pio_port_a_w),
 	DEVCB_DEVICE_HANDLER("ls145", pio_port_b_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(pio_port_c_r),
-	DEVCB_HANDLER(pio_port_c_w)
+	DEVCB_DEVICE_HANDLER("ppi8255", pio_port_c_r),
+	DEVCB_DEVICE_HANDLER("ppi8255", pio_port_c_w)
 };
 
 
@@ -59,9 +59,9 @@ const struct pit8253_config mz700_pit8253_config =
 {
 	{
 		/* clockin             gate            callback */
-		{ XTAL_17_73447MHz/20, DEVCB_NULL,     DEVCB_LINE(pit_out0_changed) },
-		{	          15611.0, DEVCB_LINE_VCC, DEVCB_LINE(pit8253_clk2_w)   },
-		{		            0, DEVCB_LINE_VCC, DEVCB_LINE(pit_irq_2)        },
+		{ XTAL_17_73447MHz/20, DEVCB_NULL,     DEVCB_DEVICE_LINE("pit8253", pit_out0_changed) },
+		{	          15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
+		{		            0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit_irq_2)        },
 	}
 };
 
@@ -69,9 +69,9 @@ const struct pit8253_config mz800_pit8253_config =
 {
 	{
 		/* clockin             gate            callback */
-		{ XTAL_17_73447MHz/16, DEVCB_NULL,     DEVCB_LINE(pit_out0_changed) },
-		{	          15611.0, DEVCB_LINE_VCC, DEVCB_LINE(pit8253_clk2_w)   },
-		{		            0, DEVCB_LINE_VCC, DEVCB_LINE(pit_irq_2)        },
+		{ XTAL_17_73447MHz/16, DEVCB_NULL,     DEVCB_DEVICE_LINE("pit8253", pit_out0_changed) },
+		{	          15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
+		{		            0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit_irq_2)        },
 	}
 };
 
@@ -594,12 +594,12 @@ static WRITE8_DEVICE_HANDLER( mz800_printer_data_w )
 
 const z80pio_interface mz800_z80pio_config =
 {
-	DEVCB_LINE(mz800_z80pio_irq),
-	DEVCB_HANDLER(mz800_z80pio_port_a_r),
-	DEVCB_HANDLER(mz800_z80pio_port_a_w),
+	DEVCB_DEVICE_LINE("z80pio", mz800_z80pio_irq),
+	DEVCB_DEVICE_HANDLER("z80pio", mz800_z80pio_port_a_r),
+	DEVCB_DEVICE_HANDLER("z80pio", mz800_z80pio_port_a_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(mz800_printer_data_w),
+	DEVCB_DEVICE_HANDLER("z80pio", mz800_printer_data_w),
 	DEVCB_NULL,
 };
 
