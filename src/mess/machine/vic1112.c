@@ -128,20 +128,20 @@ WRITE8_MEMBER( vic1112_device::via0_pb_w )
 static const via6522_interface via0_intf =
 {
 	DEVCB_NULL,
-	DEVCB_MEMBER(vic1112_device, via0_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, via0_pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
-	DEVCB_MEMBER(vic1112_device, via0_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, via0_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_LINE_MEMBER(vic1112_device, via0_irq_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, via0_irq_w)
 };
 
 
@@ -172,7 +172,7 @@ static const via6522_interface via1_intf =
 	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, atn_w),
 	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),
 
-	DEVCB_LINE_MEMBER(vic1112_device, via1_irq_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, via1_irq_w)
 };
 
 

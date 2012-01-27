@@ -159,7 +159,7 @@ static const SCSIBus_interface sasi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE_MEMBER(base_d9060_device, req_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, req_w),
 	DEVCB_NULL
 };
 
@@ -212,10 +212,10 @@ WRITE8_MEMBER( base_d9060_device::dio_w )
 
 static const riot6532_interface riot0_intf =
 {
-	DEVCB_MEMBER(base_d9060_device, dio_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, dio_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMBER(base_d9060_device, dio_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, dio_w),
 	DEVCB_NULL
 };
 
@@ -350,10 +350,10 @@ WRITE8_MEMBER( base_d9060_device::riot1_pb_w )
 
 static const riot6532_interface riot1_intf =
 {
-	DEVCB_MEMBER(base_d9060_device, riot1_pa_r),
-	DEVCB_MEMBER(base_d9060_device, riot1_pb_r),
-	DEVCB_MEMBER(base_d9060_device, riot1_pa_w),
-	DEVCB_MEMBER(base_d9060_device, riot1_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, riot1_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, riot1_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, riot1_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, riot1_pb_w),
 	DEVCB_CPU_INPUT_LINE(M6502_DOS_TAG, INPUT_LINE_IRQ0)
 };
 

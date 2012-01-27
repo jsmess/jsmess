@@ -152,10 +152,10 @@ WRITE8_MEMBER( c8280_device::dio_w )
 
 static const riot6532_interface riot0_intf =
 {
-	DEVCB_MEMBER(c8280_device, dio_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, dio_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMBER(c8280_device, dio_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, dio_w),
 	DEVCB_NULL
 };
 
@@ -291,10 +291,10 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 
 static const riot6532_interface riot1_intf =
 {
-	DEVCB_MEMBER(c8280_device, riot1_pa_r),
-	DEVCB_MEMBER(c8280_device, riot1_pb_r),
-	DEVCB_MEMBER(c8280_device, riot1_pa_w),
-	DEVCB_MEMBER(c8280_device, riot1_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, riot1_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, riot1_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, riot1_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8280_device, riot1_pb_w),
 	DEVCB_CPU_INPUT_LINE(M6502_DOS_TAG, INPUT_LINE_IRQ0)
 };
 

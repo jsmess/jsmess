@@ -16,11 +16,11 @@
 static I8255_INTERFACE( grafik_ppi8255_intf )
 {
 	DEVCB_NULL,
-	DEVCB_MEMBER(iq151_grafik_device, x_write),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_grafik_device, x_write),
 	DEVCB_NULL,
-	DEVCB_MEMBER(iq151_grafik_device, y_write),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_grafik_device, y_write),
 	DEVCB_NULL,
-	DEVCB_MEMBER(iq151_grafik_device, control_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, iq151_grafik_device, control_w),
 };
 
 static MACHINE_CONFIG_FRAGMENT( iq151_grafik )

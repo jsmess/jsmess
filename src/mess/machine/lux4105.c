@@ -63,12 +63,12 @@ static const SCSIBus_interface sasi_intf =
 {
     &sasi_dev_table,
     NULL,
-	DEVCB_LINE_MEMBER(luxor_4105_device, sasi_bsy_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_4105_device, sasi_bsy_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE_MEMBER(luxor_4105_device, sasi_io_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_4105_device, sasi_io_w),
 	DEVCB_NULL,
-	DEVCB_LINE_MEMBER(luxor_4105_device, sasi_req_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_4105_device, sasi_req_w),
 	DEVCB_NULL
 };
 
