@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef CBMIPT_H_
 #define CBMIPT_H_
 
@@ -13,6 +15,7 @@
 #include "machine/interpod.h"
 #include "machine/serialbox.h"
 #include "machine/softbox.h"
+#include "machine/vic1010.h"
 #include "machine/vic1110.h"
 #include "machine/vic1111.h"
 #include "machine/vic1112.h"
