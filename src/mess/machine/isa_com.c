@@ -12,13 +12,13 @@
 /* called when a interrupt is set/cleared from com hardware */
 static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_1 )
 {
-	isa8_com_device	*com  = downcast<isa8_com_device *>(device);
+	isa8_com_device	*com  = downcast<isa8_com_device *>(device->owner());
 	com->m_isa->irq4_w(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_2 )
 {
-	isa8_com_device	*com  = downcast<isa8_com_device *>(device);
+	isa8_com_device	*com  = downcast<isa8_com_device *>(device->owner());
 	com->m_isa->irq3_w(state);
 }
 
