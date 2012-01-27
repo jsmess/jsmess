@@ -2577,8 +2577,8 @@ static const struct pic8259_interface towns_pic8259_slave_config =
 static const wd17xx_interface towns_mb8877a_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE_MEMBER( towns_state, mb8877a_irq_w),
-	DEVCB_LINE_MEMBER( towns_state, mb8877a_drq_w),
+	DEVCB_DRIVER_LINE_MEMBER( towns_state, mb8877a_irq_w),
+	DEVCB_DRIVER_LINE_MEMBER( towns_state, mb8877a_drq_w),
 	{FLOPPY_0,FLOPPY_1,0,0}
 };
 
