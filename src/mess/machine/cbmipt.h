@@ -14,6 +14,7 @@
 #include "machine/serialbox.h"
 #include "machine/softbox.h"
 #include "machine/vic1110.h"
+#include "machine/vic1111.h"
 #include "machine/vic1112.h"
 #include "machine/vic1210.h"
 
