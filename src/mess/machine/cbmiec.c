@@ -457,6 +457,15 @@ void cbm_iec_device::device_start()
     m_out_reset_func.resolve(m_out_reset_cb, *this);
 }
 
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void cbm_iec_device::device_stop()
+{
+	m_device_list.reset();
+}
+
 
 //-------------------------------------------------
 //  add_device -
