@@ -103,25 +103,25 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_DEVICE_HANDLER( int_w )
 {
-	comx_eb_device *eb = downcast<comx_eb_device *>(device);
+	comx_eb_device *eb = downcast<comx_eb_device *>(device->owner());
 	eb->set_int(device->tag(), state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( ef4_w )
 {
-	comx_eb_device *eb = downcast<comx_eb_device *>(device);
+	comx_eb_device *eb = downcast<comx_eb_device *>(device->owner());
 	eb->set_ef4(device->tag(), state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( wait_w )
 {
-	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner());
+	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
 	slot->wait_w(state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( clear_w )
 {
-	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner());
+	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
 	slot->clear_w(state);
 }
 

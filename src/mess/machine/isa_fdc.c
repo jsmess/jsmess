@@ -144,7 +144,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_fdc_set_tc_state)
 
 static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt )
 {
-	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
+	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device->owner());
 
 	fdc->int_state = state;
 
@@ -159,7 +159,7 @@ static WRITE_LINE_DEVICE_HANDLER(  pc_fdc_hw_interrupt )
 
 static WRITE_LINE_DEVICE_HANDLER( pc_fdc_hw_dma_drq )
 {
-	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device);
+	isa8_fdc_device	*fdc  = downcast<isa8_fdc_device *>(device->owner());
 	fdc->dma_state = state;
 
 	/* if dma is not enabled, drqs are masked */
@@ -244,12 +244,12 @@ static WRITE8_DEVICE_HANDLER( pc_fdc_dor_w )
 	/* changing the DMA enable bit, will affect the dma drq state
     from reaching us - if dma is enabled this will send it through
     otherwise it will be ignored */
-	pc_fdc_hw_dma_drq(fdc, fdc->dma_state);
+	pc_fdc_hw_dma_drq(fdc->m_upd765, fdc->dma_state);
 
 	/* changing the DMA enable bit, will affect the irq state
     from reaching us - if dma is enabled this will send it through
     otherwise it will be ignored */
-	pc_fdc_hw_interrupt(fdc, fdc->int_state);
+	pc_fdc_hw_interrupt(fdc->m_upd765, fdc->int_state);
 
 	/* reset? */
 	if ((fdc->digital_output_register & PC_FDC_FLAGS_DOR_FDC_ENABLED)==0)

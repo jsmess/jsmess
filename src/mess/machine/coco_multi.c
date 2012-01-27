@@ -84,19 +84,19 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_DEVICE_HANDLER(multi_cart_w)
 {
-	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner());
+	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner()->owner());
 	cart->m_cart_callback.writeline(device,state);
 }
 
 WRITE_LINE_DEVICE_HANDLER(multi_nmi_w)
 {
-	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner());
+	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner()->owner());
 	cart->m_nmi_callback.writeline(device,state);
 }
 
 WRITE_LINE_DEVICE_HANDLER(multi_halt_w)
 {
-	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner());
+	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner()->owner());
 	cart->m_halt_callback.writeline(device,state);
 }
 
