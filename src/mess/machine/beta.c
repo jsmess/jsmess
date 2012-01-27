@@ -69,7 +69,7 @@ void betadisk_clear_status(device_t *device)
 
 static WRITE_LINE_DEVICE_HANDLER( betadisk_wd179x_intrq_w )
 {
-	beta_disk_state *beta = get_safe_token(device);
+	beta_disk_state *beta = get_safe_token(device->owner());
 
 	if (state)
 		beta->betadisk_status |= (1<<7);
@@ -79,7 +79,7 @@ static WRITE_LINE_DEVICE_HANDLER( betadisk_wd179x_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( betadisk_wd179x_drq_w )
 {
-	beta_disk_state *beta = get_safe_token(device);
+	beta_disk_state *beta = get_safe_token(device->owner());
 
 	if (state)
 		beta->betadisk_status |= (1<<6);
