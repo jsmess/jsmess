@@ -382,7 +382,7 @@ static void memory_write_byte(address_space *space, offs_t address, UINT8 data) 
 
 static I8237_INTERFACE( qx10_dma8237_1_interface )
 {
-	DEVCB_LINE(dma_hrq_changed),
+	DEVCB_DEVICE_LINE("8237dma_1", dma_hrq_changed),
 	DEVCB_DRIVER_LINE_MEMBER(qx10_state, tc_w),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),

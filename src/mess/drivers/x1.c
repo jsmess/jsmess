@@ -1102,7 +1102,7 @@ static const wd17xx_interface x1turbo_mb8877a_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(fdc_drq_w),
+	DEVCB_DEVICE_LINE("fdc", fdc_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
@@ -1979,12 +1979,12 @@ WRITE8_DEVICE_HANDLER( x1_portc_w )
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_HANDLER(x1_porta_r),						/* Port A read */
-	DEVCB_HANDLER(x1_porta_w),						/* Port A write */
-	DEVCB_HANDLER(x1_portb_r),						/* Port B read */
-	DEVCB_HANDLER(x1_portb_w),						/* Port B write */
-	DEVCB_HANDLER(x1_portc_r),						/* Port C read */
-	DEVCB_HANDLER(x1_portc_w)						/* Port C write */
+	DEVCB_DEVICE_HANDLER("ppi8255_0", x1_porta_r),						/* Port A read */
+	DEVCB_DEVICE_HANDLER("ppi8255_0", x1_porta_w),						/* Port A write */
+	DEVCB_DEVICE_HANDLER("ppi8255_0", x1_portb_r),						/* Port B read */
+	DEVCB_DEVICE_HANDLER("ppi8255_0", x1_portb_w),						/* Port B write */
+	DEVCB_DEVICE_HANDLER("ppi8255_0", x1_portc_r),						/* Port C read */
+	DEVCB_DEVICE_HANDLER("ppi8255_0", x1_portc_w)						/* Port C write */
 };
 
 static const mc6845_interface mc6845_intf =
@@ -2373,9 +2373,9 @@ static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,					// timer disables
 	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_LINE(z80ctc_trg3_w),		// ZC/TO0 callback
-	DEVCB_LINE(z80ctc_trg1_w),		// ZC/TO1 callback
-	DEVCB_LINE(z80ctc_trg2_w),		// ZC/TO2 callback
+	DEVCB_DEVICE_LINE("ctc", z80ctc_trg3_w),		// ZC/TO0 callback
+	DEVCB_DEVICE_LINE("ctc", z80ctc_trg1_w),		// ZC/TO1 callback
+	DEVCB_DEVICE_LINE("ctc", z80ctc_trg2_w),		// ZC/TO2 callback
 };
 
 #if 0
