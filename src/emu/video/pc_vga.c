@@ -22,12 +22,16 @@
     - fix video update.
 	- rewrite video drawing functions (they are horrible)
 	- add VESA etc.
+	- "System Information" UI currently crashes the emulation
     - (and many more ...)
 
 	per-game issues:
 	- The Incredible Machine: fix partial updates
 	- MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
 	- Bio Menace: jerky H scrolling (uses EGA mode)
+    - Virtual Pool: ET4k unrecognized;
+    - California Chase (calchase): init bug causes messed up chars at POST
+      (gfxs works if you soft reset).
 
     ROM declarations:
 
@@ -355,7 +359,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 				addr %= vga.svga_intf.vram_size;
 				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos++)
 				{
-					if(pos > vga.svga_intf.vram_size/4)
+					if(pos > 0x80000/4)
 						return;
 
 					for(xi=0;xi<8;xi++)
@@ -382,7 +386,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 				addr %= vga.svga_intf.vram_size;
 				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x8)
 				{
-					if(pos + 0x08 > vga.svga_intf.vram_size)
+					if(pos + 0x08 > 0x80000)
 						return;
 
 					for(xi=0;xi<0x10;xi++)
@@ -494,14 +498,14 @@ static void svga_vh_rgb8(running_machine &machine, bitmap_rgb32 &bitmap, const r
 			addr %= vga.svga_intf.vram_size;
 			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
 			{
-				if(pos + 0x08 > vga.svga_intf.vram_size)
+				if(pos + 0x08 > 0x80000)
 					return;
 
 				for(xi=0;xi<8;xi++)
 				{
 					if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 						continue;
-					bitmapline[c+xi] = machine.pens[vga.memory[pos+(xi)]];
+					bitmapline[c+xi] = machine.pens[vga.memory[(pos+(xi))|0x80000]];
 				}
 			}
 		}
@@ -1364,7 +1368,7 @@ void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, cons
 	}
 	else
 	{
-		vga.svga_intf.vram_size = 0x80000;
+		vga.svga_intf.vram_size = 0x100000;
 		vga.svga_intf.seq_regcount = 0x05;
 		vga.svga_intf.gc_regcount = 0x09;
 		vga.svga_intf.crtc_regcount = 0x19;
@@ -1376,10 +1380,11 @@ void pc_vga_init(running_machine &machine, read8_space_func read_dipswitch, cons
 	vga.gc.data			= auto_alloc_array(machine, UINT8, vga.svga_intf.gc_regcount);
 	memset(vga.memory, '\0', vga.svga_intf.vram_size);
 	memset(vga.sequencer.data, '\0', vga.svga_intf.seq_regcount);
-	memset(vga.crtc.data, '\0', vga.svga_intf.crtc_regcount);
+	memset(vga.crtc.data, '\0', 0x100);
 	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
 	pc_vga_reset(machine);
+
 }
 
 void pc_vga_io_init(running_machine &machine, address_space *mem_space, offs_t mem_offset, address_space *io_space, offs_t port_offset)
@@ -1629,7 +1634,8 @@ READ8_HANDLER( tseng_mem_r )
 {
 	if(svga.rgb8_en)
 	{
-		return vga.memory[offset+svga.bank_r*0x10000];
+		offset &= 0xffff;
+		return vga.memory[(offset+svga.bank_r*0x10000) | 0x80000];
 	}
 
 	return vga_mem_r(space,offset);
@@ -1639,7 +1645,8 @@ WRITE8_HANDLER( tseng_mem_w )
 {
 	if(svga.rgb8_en)
 	{
-		vga.memory[offset+svga.bank_w*0x10000] = data;
+		offset &= 0xffff;
+		vga.memory[(offset+svga.bank_w*0x10000) | 0x80000] = data;
 	}
 	else
 		vga_mem_w(space,offset,data);
