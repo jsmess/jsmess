@@ -75,10 +75,10 @@ void isa8_vga_device::device_start()
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "et4000", "et4000");
 
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(vga_port_03c0_r), FUNC(vga_port_03c0_w));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w));
+	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(tseng_et4k_03c0_r), FUNC(tseng_et4k_03c0_w));
+	m_isa->install_device(0x3d0, 0x3df, 0, 0, FUNC(tseng_et4k_03d0_r), FUNC(tseng_et4k_03d0_w));
 
-	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, FUNC(vga_mem_r), FUNC(vga_mem_w));
+	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, FUNC(tseng_mem_r), FUNC(tseng_mem_w));
 }
 
 //-------------------------------------------------
