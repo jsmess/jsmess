@@ -1588,7 +1588,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="battlety">
+	<software name="battletya" cloneof="battlety">
 		<description>Battle Tycoon - Flash Hiders SFX (Jpn)</description>
 		<year>1995</year>
 		<publisher>Right Stuff</publisher>
@@ -2859,7 +2859,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="daimonog">
+	<software name="daimonoga" cloneof="daimonog">
 		<description>Daikaijuu Monogatari (Jpn)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -3689,7 +3689,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dbzbutodja" cloneof="dbzbutod">
+	<software name="dbzbutodj" cloneof="dbzbutod">
 		<description>Dragon Ball Z - Super Butouden (Jpn)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
@@ -3708,7 +3708,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dbzbutodj" cloneof="dbzbutod">
+	<software name="dbzbutodja" cloneof="dbzbutod">
 		<description>Dragon Ball Z - Super Butouden (Jpn, Alt)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
@@ -3938,7 +3938,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dquest6a">
+	<software name="dquest6">
 		<description>Dragon Quest VI - Maboroshi no Daichi (Jpn)</description>
 		<year>1995</year>
 		<publisher>Enix</publisher>
@@ -3962,7 +3962,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dquest6">
+	<software name="dquest6a" cloneof="dquest6">
 		<description>Dragon Quest VI - Maboroshi no Daichi (Jpn, Alt)</description>
 		<year>1995</year>
 		<publisher>Enix</publisher>
@@ -13696,7 +13696,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="starfoxj" cloneof="starwing">
+	<software name="starfoxja" cloneof="starwing">
 		<description>Star Fox (Jpn)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -16229,7 +16229,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="smkartja" cloneof="smkart">
+	<software name="smkartj" cloneof="smkart">
 		<!-- Revision A uses an upgraded DSP (DSP1 B) -->
 		<description>Super Mario Kart (Jpn, Rev. A)</description>
 		<year>1992</year>
@@ -16257,7 +16257,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="smkartj" cloneof="smkart">
+	<software name="smkartja" cloneof="smkart">
 		<description>Super Mario Kart (Jpn)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -19204,7 +19204,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="ultrabbj">
+	<software name="ultrabb">
 		<description>Ultra Baseball Jitsumei Ban (Jpn)</description>
 		<year>1992</year>
 		<publisher>Culture Brain</publisher>
@@ -20187,7 +20187,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 <!-- wip-x -->
-	<software name="xzonej" cloneof="xzone">
+	<software name="xzoneju" cloneof="xzone">
 		<description>X Zone (Jpn, USA)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
@@ -21363,7 +21363,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="starfoxja" cloneof="starwing">
+	<software name="starfoxj" cloneof="starwing">
 		<!-- Dumped from a Super Famicom Box, CONFIRMATION NEEDED on a retail cartridge -->
 		<description>Star Fox (Jpn, Rev. A)</description>
 		<year>1993</year>
@@ -21556,7 +21556,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sgossuns" cloneof="sgossun">
+	<software name="sgossunp" cloneof="sgossun">
 		<!-- dizrythmia, badinsults -->
 		<description>Super Gussun Oyoyo (Jpn, Prototype)</description>
 		<year>1995</year>
@@ -21621,9 +21621,9 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sgossunsa" cloneof="sgossun">
+	<software name="sgossunpa" cloneof="sgossun">
 		<!-- No visible difference with the retail version,
-		the title screen doesn't dislay 'sample' like the verified prototype does,
+		the title screen doesn't display 'sample' like the verified prototype does,
 		very doubtful ROM, REMOVAL RECOMMENDED -->
 		<description>Super Gussun Oyoyo (Jpn, Prototype, Alt)</description>
 		<year>1995</year>
@@ -23569,7 +23569,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="battlety1" cloneof="battlety">
+	<software name="battlety">
 		<description>Battle Tycoon - Flash Hiders SFX (Jpn, Rev. A)</description>
 		<year>1995</year>
 		<publisher>Right Stuff</publisher>
@@ -25726,7 +25726,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="cliff">
+	<software name="cliffh">
 		<description>Cliffhanger (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -25737,7 +25737,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="cliffu" cloneof="cliff">
+	<software name="cliffhu" cloneof="cliffh">
 		<description>Cliffhanger (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -26260,7 +26260,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="daimonoga" cloneof="daimonog">
+	<software name="daimonog">
 		<description>Daikaijuu Monogatari (Jpn, Rev. A)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -26502,7 +26502,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="demo">
+	<software name="demoman">
 		<description>Demolition Man (Euro)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -26513,7 +26513,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="demou" cloneof="demo">
+	<software name="demomanu" cloneof="demoman">
 		<description>Demolition Man (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -28098,8 +28098,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="europes">
-		<description>Europe Sensen (Jpn)</description>
+	<software name="europas">
+		<description>Europa Sensen (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-YP"/>
@@ -30986,7 +30986,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="heiwapr8">
+	<software name="parlmin8">
 		<description>Heiwa Parlor! Mini 8 - Pachinko Jikki Simulation Game (Jpn)</description>
 		<year>1998</year>
 		<publisher>Nihon Telenet</publisher>
@@ -43144,7 +43144,7 @@ Alternate board (XL-1)
 		<publisher>Atlus</publisher>
 		<info name="serial" value="SHVC-ZE"/>
 		<info name="release" value="19940318"/>
-		<info name="alt_title" value="??????II"/>
+		<info name="alt_title" value="真・女神転生II"/>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="shin megami tensei ii (japan) (rev 2).sfc" size="2097152" crc="e38228a7" sha1="84bb8a37b2575762d825d820d76175071bee1ca2" offset="0x000000" />
@@ -43761,7 +43761,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="skyblazrua" cloneof="skyblazr">
+	<software name="skyblazrupa" cloneof="skyblazr">
 		<description>Skyblazer (USA, Prototype, Alt)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -43946,7 +43946,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="solstic2p" cloneof="equinox">
-		<description>Solstice II (Jpn, Prototype, 19930303)</description>
+		<description>Solstice II (Jpn, Prototype 19930303)</description>
 		<year>1993</year>
 		<publisher>Epic / Sony Records</publisher>
 		<part name="cart" interface="snes_cart">
@@ -46064,7 +46064,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sddragonj" cloneof="sddragon">
+	<software name="syakuman">
 		<description>Super Double Yakuman (Jpn)</description>
 		<year>1994</year>
 		<publisher>VAP</publisher>
@@ -48012,7 +48012,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sturric2ua" cloneof="sturric2">
+	<software name="sturric2upa" cloneof="sturric2">
 		<description>Super Turrican 2 (USA, Prototype, Alt)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
@@ -49852,7 +49852,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="totalcarua" cloneof="totalcar">
+	<software name="totalcarupa" cloneof="totalcar">
 		<description>Total Carnage (USA, Prototype, Alt)</description>
 		<year>1993</year>
 		<publisher>Malibu Interactive</publisher>
@@ -50334,6 +50334,48 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="janjugak">
+		<description>U-Jin Janjuu Gakuen (Jpn)</description>
+		<year>1993</year>
+		<publisher>Varie</publisher>
+		<info name="serial" value="SHVC-UJ"/>
+		<info name="release" value="19931119"/>
+		<info name="alt_title" value="遊人 雀獣学園"/>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="yuujin janjuu gakuen (japan).sfc" size="1048576" crc="d6fece51" sha1="63dc15c44ea78adf5ecdd832d90da8f0f90f4f64" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="janjuga2">
+		<description>U-Jin Janjuu Gakuen 2 (Jpn)</description>
+		<year>1994</year>
+		<publisher>Varie</publisher>
+		<info name="serial" value="SHVC-9U"/>
+		<info name="release" value="19941118"/>
+		<info name="alt_title" value="遊人 雀獣学園2"/>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="yuujin janjuu gakuen 2 (japan).sfc" size="2097152" crc="70fbff3b" sha1="e5c73ab8894e67a7df8cf1a6ea2db810695f19e1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="furifuri">
+		<description>U-Jin no Furi Furi Girls (Jpn)</description>
+		<year>1994</year>
+		<publisher>Planning Office WADA</publisher>
+		<info name="serial" value="SHVC-U3"/>
+		<info name="release" value="19940701"/>
+		<info name="alt_title" value="遊人のふりふりガールス"/>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="yuujin no furi furi girls (japan).sfc" size="1048576" crc="02855382" sha1="eb0b180e4bede40580c60b0af6a8359074d8670e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ufokamenk" cloneof="ufokamen">
 		<description>U.F.O. Kamen Yakisoban - Kettler no Kuroi Inbou (Jpn, Keihin Ban)</description>
 		<year>1994</year>
@@ -50439,7 +50481,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="ultimar2p" cloneof="ultimar2">
-		<description>Ultima - Runes of Virtue II (USA, Prototype, 19930730)</description>
+		<description>Ultima - Runes of Virtue II (USA, Prototype 19930730)</description>
 		<year>1994</year>
 		<publisher>FCI</publisher>
 		<part name="cart" interface="snes_cart">
@@ -50451,7 +50493,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="ultimar2a" cloneof="ultimar2">
+	<software name="ultimar2pa" cloneof="ultimar2">
 		<description>Ultima - Runes of Virtue II (USA, Prototype 1994xxxx)</description>
 		<year>1994</year>
 		<publisher>FCI</publisher>
@@ -50891,7 +50933,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="valdiserfp" cloneof="valdiser">
-		<description>Val d'Isere Championship (Fra, Prototype, 19931027)</description>
+		<description>Val d'Isere Championship (Fra, Prototype 19931027)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="snes_cart">
@@ -50957,7 +50999,7 @@ Alternate board (XL-1)
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="SHVC-AVWJ"/>
 		<info name="release" value="19950929"/>
-		<info name="alt_title" value="ヴェルヌワールト"/>
+		<info name="alt_title" value="ヴェルヌワールド"/>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2621440">
 				<rom name="verne world (japan).sfc" size="2621440" crc="832c8449" sha1="f892f9dbcb8715ad5c71e5b43df7bf2523d39e50" offset="0x000000" />
@@ -51779,7 +51821,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wolverinua" cloneof="wolverin">
+	<software name="wolverinupa" cloneof="wolverin">
 		<description>Wolverine - Adamantium Rage (USA, Prototype, Alt)</description>
 		<year>1994</year>
 		<publisher>LJN</publisher>
@@ -52565,48 +52607,6 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="yuu yuu hakusho final - makai saikyou retsuden (japan).sfc" size="3145728" crc="5617a42e" sha1="73a444501a9aecc390ec9dfa6d6726e0e2fced9a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yujingak">
-		<description>Yuujin Janjuu Gakuen (Jpn)</description>
-		<year>1993</year>
-		<publisher>Varie</publisher>
-		<info name="serial" value="SHVC-UJ"/>
-		<info name="release" value="19931119"/>
-		<info name="alt_title" value="遊人 雀獣学園"/>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="yuujin janjuu gakuen (japan).sfc" size="1048576" crc="d6fece51" sha1="63dc15c44ea78adf5ecdd832d90da8f0f90f4f64" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yujinga2">
-		<description>Yuujin Janjuu Gakuen 2 (Jpn)</description>
-		<year>1994</year>
-		<publisher>Varie</publisher>
-		<info name="serial" value="SHVC-9U"/>
-		<info name="release" value="19941118"/>
-		<info name="alt_title" value="遊人 雀獣学園2"/>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="yuujin janjuu gakuen 2 (japan).sfc" size="2097152" crc="70fbff3b" sha1="e5c73ab8894e67a7df8cf1a6ea2db810695f19e1" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yujinffg">
-		<description>Yuujin no Furi Furi Girls (Jpn)</description>
-		<year>1994</year>
-		<publisher>Planning Office WADA</publisher>
-		<info name="serial" value="SHVC-U3"/>
-		<info name="release" value="19940701"/>
-		<info name="alt_title" value="遊人のふりふりガールス"/>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="yuujin no furi furi girls (japan).sfc" size="1048576" crc="02855382" sha1="eb0b180e4bede40580c60b0af6a8359074d8670e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
