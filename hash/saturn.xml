@@ -33287,9 +33287,6 @@ Demo Discs
     <description>Werewolf (Prototype, Internal Date 1994/08/01 Creation Date 1994/11/11 Modification Date 1996/06/28)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="PAL"/>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="werewolf" sha1="c641e289b89e9a3e2f775468edcddf42f0092126" />
@@ -33368,9 +33365,6 @@ Demo Discs
     <description>Return Fire (Prototype)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="PAL"/>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="return_fire" sha1="50e45e977280ce5d889abc24946a9a5487022794" />
@@ -33401,8 +33395,7 @@ Demo Discs
     <description>Nights (E3 Demo)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
+    <sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="nightse3" sha1="96aca2a1f20eff06b85e18ae9dd5420b35d27e50" />
@@ -33466,9 +33459,6 @@ Demo Discs
     <description>Earthworm Jim 2 (Beta, 19951229, Modified 1996/01/05) </description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="ejim2beta" sha1="9b7c3a4cff02e8fea9a0a91af08b095869ee53d6" />
@@ -33481,9 +33471,6 @@ Demo Discs
     <description>Crypt Killer (Prototype - Jan 8, 1997)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="crypt killer (prototype - jan 8, 1997)" sha1="8e0be3d0581b50a1464305cb50800e6120d70a8c" />
@@ -33496,9 +33483,6 @@ Demo Discs
     <description>Duke Nukem (Prototype - Sep 18, 1997)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="duke nukem (prototype - sep 18, 1997)" sha1="c25cfc3b778f485195e51a6aabb4ec4115a26662" />
@@ -33511,9 +33495,6 @@ Demo Discs
     <description>Fighters Megamix (Prototype - Apr 08, 1997)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="fighters megamix (prototype - apr 08, 1997)" sha1="8fa6814c1f296931b3ead102b49f3737669306e4" />
@@ -33526,9 +33507,6 @@ Demo Discs
     <description>Fighting Vipers (Prototype - Sep 06, 1996)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="fighting vipers (prototype - sep 06, 1996)" sha1="ed5e9009dfb570a855947a369ed0228fd9efe25b" />
@@ -33541,9 +33519,6 @@ Demo Discs
     <description>Loaded (Prototype - Sep 3, 1996)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="loaded (prototype - sep 3, 1996)" sha1="0de17389283d4582f4b445762d1b9e27ba04d9d6" />
@@ -33556,9 +33531,6 @@ Demo Discs
     <description>Panzer Dragoon Saga (Prototype - Dec 22, 1997) (Disc 1)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="panzer dragoon saga (prototype - dec 22, 1997) (disc 1)" sha1="36192872e9751643fbcc3b9ab4053231d72e3ee4" />
@@ -33573,9 +33545,6 @@ Demo Discs
     <description>Panzer Dragoon Saga (Prototype - Dec 30, 1997) (Disc 3)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
 
     <!-- no discs 1 + 2 dumped? -->
     <part name="cdrom" interface="sat_cdrom">
@@ -33598,9 +33567,6 @@ Demo Discs
     <description>Panzer Dragoon Saga (Prototype - Nov 30, 1997) (Disc 1)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="panzer dragoon saga (prototype - nov 30, 1997) (disc 1)" sha1="2216d711c522c8fd9035e1a0743604422cab0fac" />
@@ -33626,9 +33592,6 @@ Demo Discs
     <description>Panzer Dragoon Zwei (Prototype Preview - Feb 02, 1996)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="panzer dragoon zwei (prototype preview - feb 02, 1996)" sha1="a81ecaa5f102b170c178b98103704b1a92dca6ab" />
@@ -33654,9 +33617,6 @@ Demo Discs
     <description>Sega Rally Championship (Prototype - Oct 31, 1995)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="sega rally championship (prototype - oct 31, 1995)" sha1="f7f386289e1e11e6fffd619696e1be7322de87f2" />
@@ -33669,9 +33629,6 @@ Demo Discs
     <description>Sega Saturn System-Disc (KD01)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="sega saturn system-disc (kd01)" sha1="1f098bd478efc96b00c71c1dde147ee84b2619a6" />
@@ -33684,9 +33641,6 @@ Demo Discs
     <description>Slam N' Jam 96 (Prototype - Feb 1, 1996)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="slam n' jam 96 (prototype - feb 1, 1996)" sha1="07cd759aac1b09665bfdf9cd9b962da7df774ea5" />
@@ -33699,9 +33653,6 @@ Demo Discs
     <description>Sonic 3D (Tech Demo - Oct 08)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="sonic 3d (tech demo - oct 08)" sha1="cdea20487cb5d7abda67020cfe40f508e2b0525e" />
@@ -33714,9 +33665,6 @@ Demo Discs
     <description>Ultimate Mortal Kombat 3 (Prototype - Feb 07, 1996)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="ultimate mortal kombat 3 (prototype - feb 07, 1996)" sha1="8bff13e762f41216a859156478fff4ca96fd2ca1" />
@@ -33731,9 +33679,6 @@ Demo Discs
     <description>Judgement Force (Prototype - Nov 26, 1996)</description>
     <year>199?</year>
     <publisher>unknown</publisher>
-    <sharedfeat name="compatibility" value="NTSC-U"/>
-    <sharedfeat name="compatibility" value="NTSC-J"/>
-    <sharedfeat name="compatibility" value="PAL"/>
     <part name="cdrom" interface="sat_cdrom">
       <diskarea name="cdrom">
         <disk name="judgement force (prototype - nov 26, 1996)" sha1="63675697cec5616583f00db5cd53d6f0ecd6c0dd" />
