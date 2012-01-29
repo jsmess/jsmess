@@ -1,4 +1,4 @@
-/*
+/*************************************************************************************
 
     Cybiko Wireless Inter-tainment System
 
@@ -8,20 +8,16 @@
     Cybiko Classic (V2)
     Cybiko Xtreme
 
-*/
+ToDo:
+- Remove the memory leak in the nvram handler.
+- Provide facility to load games via a "cart".
+- Need instructions! The black screen doesn't fill me with confidence..unable to test.
 
-/* Core includes */
-#include "emu.h"
-#include "sound/speaker.h"
+**************************************************************************************/
+
+#define ADDRESS_MAP_MODERN
+
 #include "includes/cybiko.h"
-
-/* Components */
-#include "cpu/h83002/h8.h"
-#include "video/hd66421.h"
-#include "machine/pcf8593.h"
-#include "machine/at45dbxx.h"
-#include "machine/sst39vfx.h"
-#include "machine/ram.h"
 #include "rendlay.h"
 
 //extern NVRAM_HANDLER( cybikov1 );
@@ -63,7 +59,7 @@
 ///////////////////////////
 
 // 512 kbyte ram + no memory mapped flash
-static ADDRESS_MAP_START( cybikov1_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikov1_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0xe00000, 0xe07fff ) AM_READ( cybikov1_key_r )
@@ -87,7 +83,7 @@ ADDRESS_MAP_END
 //  +-------------------------------------+
 
 // 256 kbyte ram + 256 kbyte memory mapped flash
-static ADDRESS_MAP_START( cybikov2_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikov2_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x100000, 0x13ffff ) AM_READ_BANK("bank2") AM_MIRROR( 0x0c0000 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w ) AM_MIRROR( 0x1ffffe )
@@ -95,7 +91,7 @@ static ADDRESS_MAP_START( cybikov2_mem, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 // 2048 kbyte ram + 512 kbyte memory mapped flash
-static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM AM_MIRROR( 0x038000 )
 	AM_RANGE( 0x100000, 0x100001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0x200000, 0x200003 ) AM_WRITE( cybiko_usb_w )
@@ -107,15 +103,15 @@ ADDRESS_MAP_END
 // ADDRESS MAP - IO //
 //////////////////////
 
-static ADDRESS_MAP_START( cybikov1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cybikov1_io, AS_IO, 8, cybiko_state )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikov1_io_reg_r, cybikov1_io_reg_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cybikov2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cybikov2_io, AS_IO, 8, cybiko_state )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikov2_io_reg_r, cybikov2_io_reg_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 8, cybiko_state )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikoxt_io_reg_r, cybikoxt_io_reg_w )
 ADDRESS_MAP_END
 

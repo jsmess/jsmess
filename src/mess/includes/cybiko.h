@@ -15,6 +15,18 @@
 #ifndef CYBIKO_H_
 #define CYBIKO_H_
 
+/* Core includes */
+#include "emu.h"
+#include "emuopts.h"
+#include "sound/speaker.h"
+
+/* Components */
+#include "cpu/h83002/h8.h"
+#include "video/hd66421.h"
+#include "machine/pcf8593.h"
+#include "machine/at45dbxx.h"
+#include "machine/sst39vfx.h"
+#include "machine/ram.h"
 
 typedef struct
 {
@@ -33,9 +45,37 @@ class cybiko_state : public driver_device
 {
 public:
 	cybiko_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_crtc(*this, "hd66421"),
+	m_speaker(*this, SPEAKER_TAG),
+	m_rtc(*this, "rtc"),
+	m_flash1(*this, "flash1")
+	{ }
 
 	CYBIKO_RS232 m_rs232;
+	DECLARE_READ16_MEMBER(cybiko_lcd_r);
+	DECLARE_WRITE16_MEMBER(cybiko_lcd_w);
+	DECLARE_READ16_MEMBER(cybikov1_key_r);
+	DECLARE_READ16_MEMBER(cybikov2_key_r);
+	DECLARE_READ16_MEMBER(cybikoxt_key_r);
+	DECLARE_WRITE16_MEMBER(cybiko_usb_w);
+	DECLARE_READ8_MEMBER(cybikov1_io_reg_r);
+	DECLARE_READ8_MEMBER(cybikov2_io_reg_r);
+	DECLARE_READ8_MEMBER(cybikoxt_io_reg_r);
+	DECLARE_WRITE8_MEMBER(cybikov1_io_reg_w);
+	DECLARE_WRITE8_MEMBER(cybikov2_io_reg_w);
+	DECLARE_WRITE8_MEMBER(cybikoxt_io_reg_w);
+	UINT16 cybiko_key_r( UINT16 offset, UINT16 mem_mask);
+	void cybiko_rs232_write_byte(UINT8 data);
+	void cybiko_rs232_pin_sck(UINT8 data);
+	void cybiko_rs232_pin_txd(UINT8 data);
+	bool cybiko_rs232_pin_rxd();
+	UINT8 cybiko_rs232_rx_queue();
+
+	required_device<hd66421_device> m_crtc;
+	required_device<device_t> m_speaker;
+	required_device<device_t> m_rtc;
+	optional_device<device_t> m_flash1;
 };
 
 
@@ -62,26 +102,6 @@ MACHINE_START( cybikoxt );
 MACHINE_RESET( cybikov1 );
 MACHINE_RESET( cybikov2 );
 MACHINE_RESET( cybikoxt );
-
-// lcd read/write
-READ16_HANDLER( cybiko_lcd_r );
-WRITE16_HANDLER( cybiko_lcd_w );
-
-// key read
-READ16_HANDLER( cybikov1_key_r );
-READ16_HANDLER( cybikov2_key_r );
-READ16_HANDLER( cybikoxt_key_r );
-
-// usb
-WRITE16_HANDLER( cybiko_usb_w );
-
-// onchip registers read/write
-READ8_HANDLER( cybikov1_io_reg_r );
-READ8_HANDLER( cybikov2_io_reg_r );
-READ8_HANDLER( cybikoxt_io_reg_r );
-WRITE8_HANDLER( cybikov1_io_reg_w );
-WRITE8_HANDLER( cybikov2_io_reg_w );
-WRITE8_HANDLER( cybikoxt_io_reg_w );
 
 
 #endif /* CYBIKO_H_ */
