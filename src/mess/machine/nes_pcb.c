@@ -668,13 +668,13 @@ INLINE UINT8 mmc_hi_access_rom( running_machine &machine, UINT32 offset )
 	switch (offset & 0x6000)
 	{
 		case 0x0000:
-			return state->m_rom[0x10000 + state->m_prg_bank[0] * 0x2000 + (offset & 0x1fff)];
+			return state->m_prg[state->m_prg_bank[0] * 0x2000 + (offset & 0x1fff)];
 		case 0x2000:
-			return state->m_rom[0x10000 + state->m_prg_bank[1] * 0x2000 + (offset & 0x1fff)];
+			return state->m_prg[state->m_prg_bank[1] * 0x2000 + (offset & 0x1fff)];
 		case 0x4000:
-			return state->m_rom[0x10000 + state->m_prg_bank[2] * 0x2000 + (offset & 0x1fff)];
+			return state->m_prg[state->m_prg_bank[2] * 0x2000 + (offset & 0x1fff)];
 		case 0x6000:
-			return state->m_rom[0x10000 + state->m_prg_bank[3] * 0x2000 + (offset & 0x1fff)];
+			return state->m_prg[state->m_prg_bank[3] * 0x2000 + (offset & 0x1fff)];
 	}
 	return 0;
 }
