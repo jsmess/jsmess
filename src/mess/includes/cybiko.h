@@ -65,12 +65,12 @@ public:
 	DECLARE_WRITE8_MEMBER(cybikov1_io_reg_w);
 	DECLARE_WRITE8_MEMBER(cybikov2_io_reg_w);
 	DECLARE_WRITE8_MEMBER(cybikoxt_io_reg_w);
-	UINT16 cybiko_key_r( UINT16 offset, UINT16 mem_mask);
-	void cybiko_rs232_write_byte(UINT8 data);
-	void cybiko_rs232_pin_sck(UINT8 data);
-	void cybiko_rs232_pin_txd(UINT8 data);
-	bool cybiko_rs232_pin_rxd();
-	UINT8 cybiko_rs232_rx_queue();
+	int cybiko_key_r( offs_t offset, int mem_mask);
+	void cybiko_rs232_write_byte(int data);
+	void cybiko_rs232_pin_sck(int data);
+	void cybiko_rs232_pin_txd(int data);
+	int cybiko_rs232_pin_rxd();
+	int cybiko_rs232_rx_queue();
 
 	required_device<hd66421_device> m_crtc;
 	required_device<device_t> m_speaker;
