@@ -242,6 +242,17 @@ According to Planet Virtual Boy, the following undumped protos exist
 		</part>
 	</software>
 
+	<software name="spacepin" cloneof="galactic" supported="no">
+		<description>Space Pinball (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="vboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="space pinball prototype (j).bin" size="2097152" crc="44c2b723" sha1="dc182360c7c8d26323db8921f09db76638e81ced" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Developers: Tomcat System -->
 	<software name="ssquash" supported="no">
 		<description>Space Squash (Jpn)</description>
