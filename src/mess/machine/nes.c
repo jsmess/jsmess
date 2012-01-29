@@ -42,11 +42,9 @@ static void init_nes_core( running_machine &machine )
 	int prg_banks = (state->m_prg_chunks == 1) ? (2 * 2) : (state->m_prg_chunks * 2);
 	int i;
 
-	/* We set these here in case they weren't set in the cart loader */
 	state->m_rom = machine.region("maincpu")->base();
-	state->m_vrom = machine.region("gfx1")->base();
-	state->m_vram = machine.region("gfx2")->base();
-	state->m_ciram = machine.region("gfx3")->base();
+	state->m_ciram = machine.region("ciram")->base();
+	// other pointers got set in the loading routine
 
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */
 	space->install_readwrite_bank(0x0000, 0x07ff, 0, 0x1800, "bank10");
@@ -64,9 +62,9 @@ static void init_nes_core( running_machine &machine )
          memory for use in nes_fds_r/nes_fds_w. Same goes for allocation of fds_ram (used for bank2)  */
 		if (state->m_fds_data == NULL)
 		{
-			UINT32 size = machine.region("maincpu")->bytes() - 0x10000;
+			UINT32 size = (state->m_prg_chunks == 1) ? 2 * 0x4000 : state->m_prg_chunks * 0x4000;
 			state->m_fds_data = auto_alloc_array_clear(machine, UINT8, size);
-			memcpy(state->m_fds_data, state->m_rom, size);	// copy in fds_data the cart PRG
+			memcpy(state->m_fds_data, state->m_prg, size);	// copy in fds_data the cart PRG
 		}
 		if (state->m_fds_ram == NULL)
 			state->m_fds_ram = auto_alloc_array(machine, UINT8, 0x8000);
@@ -96,7 +94,7 @@ static void init_nes_core( running_machine &machine )
 	/* configure banks 1-4 */
 	for (i = 0; i < 4; i++)
 	{
-		memory_configure_bank(machine, bank_names[i], 0, prg_banks, machine.region("maincpu")->base() + 0x10000, 0x2000);
+		memory_configure_bank(machine, bank_names[i], 0, prg_banks, state->m_prg, 0x2000);
 		// some mappers (e.g. MMC5) can map PRG RAM in  0x8000-0xffff as well
 		if (state->m_prg_ram)
 			memory_configure_bank(machine, bank_names[i], prg_banks, state->m_wram_size / 0x2000, state->m_wram, 0x2000);
@@ -107,7 +105,7 @@ static void init_nes_core( running_machine &machine )
 
 	/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
 	/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->m_wram) */
-	memory_configure_bank(machine, "bank5", 0, prg_banks, machine.region("maincpu")->base() + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank5", 0, prg_banks, state->m_prg, 0x2000);
 	state->m_battery_bank5_start = prg_banks;
 	state->m_prgram_bank5_start = prg_banks;
 	state->m_empty_bank5_start = prg_banks;
@@ -303,6 +301,19 @@ MACHINE_START( nes )
 	state->m_sound = machine.device("nessound");
 	state->m_cart = machine.device("cart");
 
+	// If we're starting famicom with no disk inserted, we still haven't initialized the VRAM needed for
+	// video emulation, so we need to take care of it now
+	if (!state->m_vram)
+	{
+		state->m_vram = auto_alloc_array(machine, UINT8, 0x4000);
+		for (int i = 0; i < 8; i++)
+		{
+			state->m_chr_map[i].source = CHRRAM;
+			state->m_chr_map[i].origin = i * 0x400; // for save state uses!
+			state->m_chr_map[i].access = &state->m_vram[state->m_chr_map[i].origin];
+		}
+	}	
+	
 	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(nes_irq_callback));
 	nes_state_register(machine);
 }
@@ -773,21 +784,15 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				logerror("-- TV System: %d\n", extend[4] & 3);
 			}
 
-			/* Free the regions that were allocated by the ROM loader */
-			image.device().machine().region_free("maincpu");
-			image.device().machine().region_free("gfx1");
-
-			/* Allocate them again with the proper size */
+			// Allocate class pointers for PRG/VROM/VRAM/WRAM
 			prg_size = (state->m_prg_chunks == 1) ? 2 * 0x4000 : state->m_prg_chunks * 0x4000;
-			image.device().machine().region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
+			state->m_prg = auto_alloc_array(image.device().machine(), UINT8, prg_size);
 			if (state->m_chr_chunks)
-				image.device().machine().region_alloc("gfx1", state->m_chr_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
+				state->m_vrom = auto_alloc_array(image.device().machine(), UINT8, state->m_chr_chunks * 0x2000);
 
-			state->m_rom = image.device().machine().region("maincpu")->base();
-			state->m_vrom = image.device().machine().region("gfx1")->base();
+			state->m_vram_chunks = 2;
+			state->m_vram = auto_alloc_array(image.device().machine(), UINT8, 0x4000);
 
-			state->m_vram_chunks = image.device().machine().region("gfx2")->bytes() / 0x2000;
-			state->m_vram = image.device().machine().region("gfx2")->base();
 			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->m_prg_ram = 1)!
 			// or if there is a trainer, I think
 			state->m_wram_size = 0x10000;
@@ -932,9 +937,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				image.fread(&state->m_wram[0x1000], 0x200);
 
 			/* Read in the program chunks */
-			image.fread(&state->m_rom[0x10000], 0x4000 * state->m_prg_chunks);
+			image.fread(&state->m_prg[0], 0x4000 * state->m_prg_chunks);
 			if (state->m_prg_chunks == 1)
-				memcpy(&state->m_rom[0x14000], &state->m_rom[0x10000], 0x4000);
+				memcpy(&state->m_prg[0x4000], &state->m_prg[0], 0x4000);
 
 #if SPLIT_PRG
 			{
@@ -945,7 +950,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				prgout = fopen(outname, "wb");
 				if (prgout)
 				{
-					fwrite(&state->m_rom[0x10000], 1, 0x4000 * state->m_prg_chunks, prgout);
+					fwrite(&state->m_prg[0], 1, 0x4000 * state->m_prg_chunks, prgout);
 					mame_printf_error("Created PRG chunk\n");
 				}
 
@@ -1257,35 +1262,27 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				fatalerror("Unsupported UNIF chunk or corrupted header. Please report the problem at MESS Board.\n");
 			}
 
-			/* Free the regions that were allocated by the ROM loader */
-			image.device().machine().region_free("maincpu");
-			image.device().machine().region_free("gfx1");
-			image.device().machine().region_free("gfx2");
+			// Allocate class pointers for PRG/VROM/VRAM/WRAM and copy data there from the temp copies
 
-			/* Allocate them again, and copy PRG/CHR from temp buffers */
 			/* Take care of PRG */
 			prg_size = (state->m_prg_chunks == 1) ? 2 * 0x4000 : state->m_prg_chunks * 0x4000;
-			image.device().machine().region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
-			state->m_rom = image.device().machine().region("maincpu")->base();
-			memcpy(&state->m_rom[0x10000], &temp_prg[0x00000], state->m_prg_chunks * 0x4000);
+			state->m_prg = auto_alloc_array(image.device().machine(), UINT8, prg_size);
+
+			memcpy(&state->m_prg[0], &temp_prg[0], state->m_prg_chunks * 0x4000);
 			/* If only a single 16K PRG chunk is present, mirror it! */
 			if (state->m_prg_chunks == 1)
-				memcpy(&state->m_rom[0x14000], &state->m_rom[0x10000], 0x4000);
+				memcpy(&state->m_prg[0x4000], &state->m_prg[0], 0x4000);
 
 			/* Take care of CHR ROM */
 			if (state->m_chr_chunks)
 			{
-				image.device().machine().region_alloc("gfx1", state->m_chr_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
-				state->m_vrom = image.device().machine().region("gfx1")->base();
+				state->m_vrom = auto_alloc_array(image.device().machine(), UINT8, state->m_chr_chunks * 0x2000);
 				memcpy(&state->m_vrom[0x00000], &temp_chr[0x00000], state->m_chr_chunks * 0x2000);
 			}
 
 			/* Take care of CHR RAM */
 			if (state->m_vram_chunks)
-			{
-				image.device().machine().region_alloc("gfx2", state->m_vram_chunks * 0x2000, 1, ENDIANNESS_LITTLE);
-				state->m_vram = image.device().machine().region("gfx2")->base();
-			}
+				state->m_vram = auto_alloc_array(image.device().machine(), UINT8, state->m_vram_chunks * 0x2000);
 
 			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->m_prg_ram = 1)!
 			state->m_wram_size = 0x10000;
@@ -1300,7 +1297,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				prgout = fopen(outname, "wb");
 				if (prgout)
 				{
-					fwrite(&state->m_rom[0x10000], 1, 0x4000 * state->m_prg_chunks, prgout);
+					fwrite(&state->m_prg[0], 1, 0x4000 * state->m_prg_chunks, prgout);
 					mame_printf_error("Created PRG chunk\n");
 				}
 
@@ -1342,31 +1339,22 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		UINT32 vram_size = image.get_software_region_length("vram");
 		vram_size += image.get_software_region_length("vram2");
 
-		/* Free the regions that were allocated by the ROM loader */
-		image.device().machine().region_free("maincpu");
-		image.device().machine().region_free("gfx1");
-		image.device().machine().region_free("gfx2");
-
-		/* Allocate them again with the proper size */
-		image.device().machine().region_alloc("maincpu", 0x10000 + prg_size, 1, ENDIANNESS_LITTLE);
-
 		// validate the xml fields
 		if (!prg_size)
 			fatalerror("No PRG entry for this software! Please check if the xml list got corrupted");
 		if (prg_size < 0x8000)
 			fatalerror("PRG entry is too small! Please check if the xml list got corrupted");
-
+		
+		// Allocate class pointers for PRG/VROM/VRAM/WRAM and copy data there from the temp copies
+		state->m_prg = auto_alloc_array(image.device().machine(), UINT8, prg_size);
+		
 		if (chr_size)
-			image.device().machine().region_alloc("gfx1", chr_size, 1, ENDIANNESS_LITTLE);
+			state->m_vrom = auto_alloc_array(image.device().machine(), UINT8, chr_size);
 
 		if (vram_size)
-			image.device().machine().region_alloc("gfx2", vram_size, 1, ENDIANNESS_LITTLE);
+			state->m_vram = auto_alloc_array(image.device().machine(), UINT8, vram_size);
 
-		state->m_rom = image.device().machine().region("maincpu")->base();
-		state->m_vrom = image.device().machine().region("gfx1")->base();
-		state->m_vram = image.device().machine().region("gfx2")->base();
-
-		memcpy(state->m_rom + 0x10000, image.get_software_region("prg"), prg_size);
+		memcpy(state->m_prg, image.get_software_region("prg"), prg_size);
 
 		if (chr_size)
 			memcpy(state->m_vrom, image.get_software_region("chr"), chr_size);
@@ -1688,8 +1676,7 @@ static void nes_unload_proc( device_image_interface &image )
 DRIVER_INIT( famicom )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	int i;
-
+	
 	/* clear some of the variables we don't use */
 	state->m_trainer = 0;
 	state->m_battery = 0;
@@ -1715,15 +1702,6 @@ DRIVER_INIT( famicom )
 	state->m_fds_data = auto_alloc_array_clear(machine, UINT8, 65500 * 2);
 	state->m_fds_ram = auto_alloc_array_clear(machine, UINT8, 0x8000);
 	state->save_pointer(NAME(state->m_fds_ram), 0x8000);
-
-	// setup CHR accesses to 8k VRAM
-	state->m_vram = machine.region("gfx2")->base();
-	for (i = 0; i < 8; i++)
-	{
-		state->m_chr_map[i].source = CHRRAM;
-		state->m_chr_map[i].origin = i * 0x400; // for save state uses!
-		state->m_chr_map[i].access = &state->m_vram[state->m_chr_map[i].origin];
-	}
 
 	floppy_install_load_proc(floppy_get_device(machine, 0), nes_load_proc);
 	floppy_install_unload_proc(floppy_get_device(machine, 0), nes_unload_proc);

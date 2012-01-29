@@ -134,6 +134,7 @@ public:
 	/* misc region to be allocated at init */
 	// variables which don't change at run-time
 	UINT8      *m_rom;
+	UINT8      *m_prg;
 	UINT8      *m_vrom;
 	UINT8      *m_vram;
 	UINT8      *m_wram;
