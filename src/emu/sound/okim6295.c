@@ -130,7 +130,6 @@ void okim6295_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
 
 	save_item(NAME(m_command));
-	save_item(NAME(m_bank_installed));
 	save_item(NAME(m_bank_offs));
 	save_item(NAME(m_pin7_state));
 
