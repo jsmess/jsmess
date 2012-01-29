@@ -190,7 +190,7 @@ static void cybiko_ramdisk_load(running_machine &machine, emu_file *file)
 static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
 {
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
-	#ifdef LSB_FIRST
+#ifdef LSB_FIRST
 	UINT8 *temp = (UINT8*)malloc( RAMDISK_SIZE);
 	for (int i = 0; i < RAMDISK_SIZE; i += 2)
 	{
@@ -199,9 +199,9 @@ static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
 	}
 	file->write( temp, RAMDISK_SIZE);
 	free( temp);
-	#else
+#else
 	file->write( ram, RAMDISK_SIZE);
-	#endif
+#endif
 }
 
 MACHINE_START( cybikov1 )
@@ -338,12 +338,12 @@ static void cybiko_rs232_reset()
 	_logerror( 0, ("cybiko_rs232_reset\n"));
 }
 
-void cybiko_state::cybiko_rs232_write_byte( UINT8 data )
+void cybiko_state::cybiko_rs232_write_byte( int data )
 {
 //  printf( "%c", data);
 }
 
-void cybiko_state::cybiko_rs232_pin_sck( UINT8 data )
+void cybiko_state::cybiko_rs232_pin_sck( int data )
 {
 	_logerror( 3, ("cybiko_rs232_pin_sck (%d)\n", data));
 	// clock high-to-low
@@ -371,19 +371,19 @@ void cybiko_state::cybiko_rs232_pin_sck( UINT8 data )
 	m_rs232.pin.sck = data;
 }
 
-void cybiko_state::cybiko_rs232_pin_txd( UINT8 data )
+void cybiko_state::cybiko_rs232_pin_txd( int data )
 {
 	_logerror( 3, ("cybiko_rs232_pin_txd (%d)\n", data));
 	m_rs232.pin.txd = data;
 }
 
-bool cybiko_state::cybiko_rs232_pin_rxd()
+int cybiko_state::cybiko_rs232_pin_rxd()
 {
 	_logerror( 3, ("cybiko_rs232_pin_rxd\n"));
 	return m_rs232.pin.rxd;
 }
 
-UINT8 cybiko_state::cybiko_rs232_rx_queue()
+int cybiko_state::cybiko_rs232_rx_queue()
 {
 	return 0;
 }
@@ -406,7 +406,7 @@ WRITE16_MEMBER( cybiko_state::cybiko_lcd_w )
 	if (ACCESSING_BITS_0_7) m_crtc->reg_dat_w(space, offset, (data >> 0) & 0xff);
 }
 
-UINT16 cybiko_state::cybiko_key_r( UINT16 offset, UINT16 mem_mask)
+int cybiko_state::cybiko_key_r( offs_t offset, int mem_mask)
 {
 	static const char *const keynames[] = { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12", "A13", "A14", "A15" };
 	UINT16 data = 0xFFFF;
