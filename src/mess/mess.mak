@@ -1307,6 +1307,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/isa_adlib.o	\
 	$(MESS_MACHINE)/isa_com.o	\
 	$(MESS_MACHINE)/isa_fdc.o	\
+	$(MESS_MACHINE)/isa_finalchs.o	\
 	$(MESS_MACHINE)/isa_gblaster.o	\
 	$(MESS_MACHINE)/isa_hdc.o	\
 	$(MESS_MACHINE)/isa_mpu401.o	\

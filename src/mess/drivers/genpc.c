@@ -26,6 +26,7 @@
 #include "machine/isa_adlib.h"
 #include "machine/isa_com.h"
 #include "machine/isa_fdc.h"
+#include "machine/isa_finalchs.h"
 #include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
 #include "machine/isa_sblaster.h"
@@ -115,6 +116,7 @@ static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("svga",ISA8_SVGA_S3)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
+	SLOT_INTERFACE("finalchs", ISA8_FINALCHS)
 	SLOT_INTERFACE("hdc", ISA8_HDC)
 	SLOT_INTERFACE("adlib", ISA8_ADLIB)
 	SLOT_INTERFACE("hercules", ISA8_HERCULES)
