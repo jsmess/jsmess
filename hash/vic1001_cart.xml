@@ -41,8 +41,7 @@
 		<year>1982</year>
 		<publisher>Brøderbund</publisher>
 		<info name="serial" value="VicCart-224" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue).60" size="0x2000" crc="5b8f0411" sha1="06db59f9c2def1d9a12dad588ab9ccec9fd9f33b" offset="0x0000" />
@@ -58,8 +57,7 @@
 		<year>1982</year>
 		<publisher>Brøderbund</publisher>
 		<info name="serial" value="VicCart-224" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="a.e. (broderbund)(1982)(viccart-224)(jue)[a].60" size="0x2000" crc="7f942bcd" sha1="770762ccff81231ef703af35d86850391fa7dd94" offset="0x0000" />
@@ -80,8 +78,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1914" />
 		<info name="usage" value="Enter 'SYS 32592' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk2" size="0x2000">
 				<rom name="adventure #1 - adventureland (commodore)(1981)(vic-1914)(jue)(sys 32592).40" size="0x2000" crc="ad91885f" sha1="cad13a0ac5585e28a71666132f71b8e770d9b601" offset="0x0000" />
@@ -98,8 +95,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1915" />
 		<info name="usage" value="Enter 'SYS 32592' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk2" size="0x2000">
 				<rom name="adventure #2 - pirate's cove (commodore)(1981)(vic-1915)(jue)(sys 32592).40" size="0x2000" crc="59597b72" sha1="89d0d1a7c02e5f3fa11b57b23216765898a93149" offset="0x0000" />
@@ -116,8 +112,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1916" />
 		<info name="usage" value="Enter 'SYS 32592' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk2" size="0x2000">
 				<rom name="adventure #3 - mission impossible (commodore)(1981)(vic-1916)(jue)(sys 32592).40" size="0x2000" crc="58fdfdc1" sha1="4e9b681028ec61f493e7b16f5d7df23f4e9311a5" offset="0x0000" />
@@ -134,8 +129,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1918" />
 		<info name="usage" value="Enter 'SYS 32592' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk2" size="0x2000">
 				<rom name="adventure #4 - voodoo castle (commodore)(1981)(vic-1918)(jue)(sys 32592).40" size="0x2000" crc="900be158" sha1="7eadb81028c2efb61d90755f2750f47f2b23a8e0" offset="0x0000" />
@@ -152,8 +146,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1917" />
 		<info name="usage" value="Enter 'SYS 32592' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk2" size="0x2000">
 				<rom name="adventure #5 - the count (commodore)(1981)(vic-1917)(jue)(sys 32592).40" size="0x2000" crc="42d604c0" sha1="cdfe5f089c74c846ea1f1ac24d088460c5bb5001" offset="0x0000" />
@@ -169,8 +162,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C305" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="aggressor (hes)(1982)(c305).a0" size="0x2000" crc="505ba5ea" sha1="77e480f56259459a0654751efda1417a689d83c5" offset="0x0000" />
@@ -183,8 +175,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C305" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="aggressor (hes)(1982)(c305)[a].a0" size="0x2000" crc="8610fbab" sha1="c89c75d5c543c68b429c7d7f98f68105464d3b19" offset="0x0000" />
@@ -213,8 +204,7 @@
 		<year>1981</year>
 		<publisher>UMI</publisher>
 		<info name="serial" value="1619" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="alien blitz (umi)(1981)(1619).a0" size="0x1000" crc="b53d9458" sha1="f78fece59b9ff2f281489211cadef7d459c209b2" offset="0x0000" />
@@ -254,8 +244,7 @@
 		<description>Amazing Maze</description>
 		<year>198?</year>
 		<publisher>Machine Language Games</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="amazing maze (machine language games)(198-)(jue).a0" size="0x1000" crc="e50e9e0d" sha1="b702f86e18eb51ffbe357b074ab27331b03671c7" offset="0x0000" />
@@ -280,8 +269,7 @@
 		<year>1981</year>
 		<publisher>UMI</publisher>
 		<info name="serial" value="1611" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="amok! (umi)(1981)(1611)(jue).a0" size="0x1000" crc="77738d0b" sha1="a354481bdc5411e07a446a8a41397e7237d9f198" offset="0x0000" />
@@ -294,8 +282,7 @@
 		<year>1982</year>
 		<publisher>Spectravideo</publisher>
 		<info name="serial" value="SC-215" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="ape escape (spectravideo)(1982)(sc-215)(jue).a0" size="0x2000" crc="771eff92" sha1="81a6483ec3989586c6dc4442443ccabb3f4aafe7" offset="0x0000" />
@@ -325,8 +312,7 @@
 		<year>1982</year>
 		<publisher>UMI</publisher>
 		<info name="serial" value="1605" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="arachnoid (umi)(1982)(1605).60" size="0x2000" crc="ad217e63" sha1="5bedc3462509987c325723d08d08745223ddaf6f" offset="0x0000" />
@@ -371,8 +357,7 @@
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Enter 'SYS 700' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="assam - assembler (198-)(jue)(sys 700).a0" size="0x2000" crc="122a4ad8" sha1="b3a31ba894f021f30521e22251cb2091345dee09" offset="0x0000" />
@@ -437,8 +422,7 @@
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C318" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="attack of the mutant camels (hes)(1983)(c318)(jue).a0" size="0x2000" crc="d754b1ed" sha1="b5915e82f965f77b76379ea29ee9f20252313207" offset="0x0000" />
@@ -451,8 +435,7 @@
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1901" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="avenger (aka vic avenger) (commodore)(1981)(vic-1901).a0" size="0x2000" crc="8a7c3a97" sha1="42b5cbbc15b537b7be7286120d36f5c4eb9b2061" offset="0x0000" />
@@ -557,8 +540,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1913" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="raid on fort knox (commodore)(1982)(vic-1913)(jue).a0" size="0x2000" crc="d83dcb0e" sha1="3f1de25a22ecd94d15ea3e3a2f65c7bf4453aec7" offset="0x0000" />
@@ -572,8 +554,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1913" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="bank robber (commodore)(1982)(vic-1913)(jue).a0" size="0x2000" crc="4c19c3d8" sha1="e4fa9d952eb79d50668ad3c1a4edf372cd1a6a0f" offset="0x0000" />
@@ -611,8 +592,7 @@
 		<description>CBM BASIC v4.0</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="basic v4.0 (commodore)(198-)(jue).a0" size="0x1000" crc="3438e66a" sha1="bc7847a44f49b7d9b65ed42d308efb7c11795062" offset="0x0000" />
@@ -624,8 +604,7 @@
 		<description>CBM BASIC v5.0</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="basic v5.0 (commodore)(198-)(jue).a0" size="0x2000" crc="995b9a2f" sha1="41127378a4bd93900308d94c13a4ca86e253edb2" offset="0x0000" />
@@ -653,8 +632,7 @@
 		<description>Bewitched</description>
 		<year>1995</year>
 		<publisher>Imagine</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="bewitched (imagine)(1995).a0" size="0x1000" crc="020d46f3" sha1="49d6da09d9029f70a6bc2125e6dcbd29fe8c44a9" offset="0x0000" />
@@ -680,8 +658,7 @@
 		<year>1982</year>
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI-BH-C" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="black hole (creative)(1982)(vi-bh-c)(e).a0" size="0x1000" crc="c72e5b1a" sha1="d0b1006f71ee5e833cea180c212d9cda0d866485" offset="0x0000" />
@@ -710,8 +687,7 @@
 		<year>1983</year>
 		<publisher>SEGA</publisher>
 		<info name="serial" value="005-04" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="buck rogers - planet of zoom (sega)(1983)(005-04)(jue).60" size="0x2000" crc="980ee881" sha1="9a0155f962401fa4ffcc0d6dbbc731c0127513d8" offset="0x0000" />
@@ -726,8 +702,7 @@
 		<description>Bug Crusher</description>
 		<year>1983</year>
 		<publisher>OEM</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="bug crusher (oem)(1983)(jue).a0" size="0x1000" crc="cfc4446e" sha1="8714770c914b88392385bec6031e3ec81edd5c72" offset="0x0000" />
@@ -740,8 +715,7 @@
 		<year>198?</year>
 		<publisher>UMI</publisher>
 		<info name="serial" value="16??" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="buti - basic utility (umi)198-)(16--)(jue).a0" size="0x1000" crc="cb38dae6" sha1="377cd5d4059c272fd6395419cfc48e0dbfabe094" offset="0x0000" />
@@ -796,8 +770,7 @@
 		<description>Cassette Turbo</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="cassette turbo (198-)(jue).a0" size="0x1000" crc="f241e75b" sha1="00fa1b78acfb08071a5f97b750ca9cb2ac98f1e6" offset="0x0000" />
@@ -878,8 +851,7 @@
 		<year>1983</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="6235-B" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="chuck norris superkicks (xonox)(1983)(6235-b).a0" size="0x2000" crc="2c3f7680" sha1="958b227c2378930b38db2c3bdf5b7d771f830649" offset="0x0000" />
@@ -891,8 +863,7 @@
 		<description>Close Encounters</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="close encounters (198-).a0" size="0x1000" crc="c7484cdb" sha1="769f8c49707097ae980e95d0179adb2aa5c280c1" offset="0x0000" />
@@ -957,8 +928,7 @@
 		<year>1982</year>
 		<publisher>ComBasic</publisher>
 		<info name="usage" value="Enter 'SYS 45056' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="combasic (combasic)(1982)(jue)(sys 45056).b0" size="0x1000" crc="1378b4a1" sha1="75edd57e870e2ebc46b388baac1774bf09160386" offset="0x1000" />
@@ -984,8 +954,7 @@
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22006" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="computer war (thorn emi)(1983)(thc22006)(jue).a0" size="0x2000" crc="f956c5d6" sha1="b33735d2762cb9968ad4245a5d33186f73f486b3" offset="0x0000" />
@@ -998,8 +967,7 @@
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22006" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="computer war (thorn emi)(1983)(thc22006)(jue)[a].a0" size="0x2000" crc="24b7cdd6" sha1="3cb69d196c3614d86be94f1f6fea53e37a184305" offset="0x0000" />
@@ -1029,8 +997,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1922" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="cosmic cruncher (commodore)(1982)(vic-1922)(jue).a0" size="0x2000" crc="27c4962a" sha1="dc1bccb54fe7dc7466adb6b34182fd5f400a3b94" offset="0x0000" />
@@ -1043,8 +1010,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1922" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="cosmic cruncher (commodore)(1982)(vic-1922)(jue)[a].a0" size="0x2000" crc="b545bd68" sha1="bcec5781f40b2522bca9b303b14d2ce137ba9ac1" offset="0x0000" />
@@ -1059,8 +1025,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1927" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="cosmic jailbreak (commodore)(1982)(vic-1927)(jue).a0" size="0x2000" crc="951aada1" sha1="45d9dd7a3188fb2e8f0147e40d7fafd94da4c250" offset="0x0000" />
@@ -1073,8 +1038,7 @@
 		<year>1983</year>
 		<publisher>Boone</publisher>
 		<info name="serial" value="20001" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="crater raider (boone)(1983)(20001).a0" size="0x1000" crc="7f325cc7" sha1="19f344f744e59bb3fe08b9ac80ea2018dd030cbe" offset="0x0000" />
@@ -1126,8 +1090,7 @@
 		<year>1983</year>
 		<publisher>Boone</publisher>
 		<info name="serial" value="20003" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="cyclon (boone)(1983)(20003)(jue).a0" size="0x2000" crc="d6c393ab" sha1="4a4a5a2b4bc08b6cd5b5da39b5dc7bb8c2747e24" offset="0x0000" />
@@ -1140,8 +1103,7 @@
 		<year>1984</year>
 		<publisher>Tymac</publisher>
 		<info name="serial" value="V2CDF" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="d'fuse (tymac)(1984)(v2cdf).a0" size="0x2000" crc="f9abf6c0" sha1="8b92be771e4a74923ae6cf5a866ff678996afff8" offset="0x0000" />
@@ -1194,8 +1156,7 @@
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8507" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="defender (atarisoft)(1983)(rx8507)(jue).60" size="0x2000" crc="c5e2f1a0" sha1="9213cf81a2b3201d90b4a318d9cacddb74df6335" offset="0x0000" />
@@ -1281,8 +1242,7 @@
 		<year>1983</year>
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720052-1A" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="dragonfire (imagic)(1983)(720052-1a).a0" size="0x2000" crc="3a0b13ab" sha1="431487b8a822412024bfc8c252b23452450d3c93" offset="0x0000" />
@@ -1294,8 +1254,7 @@
 		<description>Droids</description>
 		<year>1983</year>
 		<publisher>TG Software</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="droids (tg software)(1983)(jue).a0" size="0x2000" crc="42bf39be" sha1="3ac9668259e4abbf98d4f6d98c28044e1f4a3b8d" offset="0x0000" />
@@ -1334,8 +1293,7 @@
 		<description>ExBasic Level II</description>
 		<year>1982</year>
 		<publisher>Andreas Dipke &amp; Michael Krause</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="exbasic level ii (andreas dipke &amp; michael krause)(1982)(jue).a0" size="0x2000" crc="3f3a0e1b" sha1="7e1bc9ebc42e812afde4ca834c517df5510656f2" offset="0x0000" />
@@ -1348,8 +1306,7 @@
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C324" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="face maker (hes)(1983)(c324)(jue).a0" size="0x2000" crc="965f0448" sha1="289000ca65c21cb2ed73fe6afe8c3e6b5f18b533" offset="0x0000" />
@@ -1362,8 +1319,7 @@
 		<year>1982</year>
 		<publisher>Sirius</publisher>
 		<info name="serial" value="222??" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="fast eddie (sirius)(1982)(220--).a0" size="0x2000" crc="59323c50" sha1="14e2e9c9c560764e9425896a9186a6a14cd1e6f2" offset="0x0000" />
@@ -1388,8 +1344,7 @@
 		<description>Flipper 1.0</description>
 		<year>198?</year>
 		<publisher>Micro Digital</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="flipper 1.0 (micro digital)(198-).a0" size="0x2000" crc="24c56b66" sha1="1e715264fa9a505c792348052a35ce40073ab4eb" offset="0x0000" />
@@ -1402,8 +1357,7 @@
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22005" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="fourth encounter, the (thorn emi)(1983)(thc22005)(jue).a0" size="0x2000" crc="da4a0922" sha1="0655948ea8d48060ce7acd43da4fbc82741d8ce8" offset="0x0000" />
@@ -1416,8 +1370,7 @@
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="PB1410" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="frogger (parker brothers)(1983)(pb1410).a0" size="0x2000" crc="f8bd8024" sha1="7e41246cca49929f7237eab8ca0622af6d8bc009" offset="0x0000" />
@@ -1429,8 +1382,7 @@
 		<description>Frogman</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="frogman (198-).a0" size="0x2000" crc="83d11d1a" sha1="af16b7f5e7f7c31e1a3e24fb33aa474fef722243" offset="0x0000" />
@@ -1442,8 +1394,7 @@
 		<description>Fun with Music</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="fun with music (epyx)(1983)(jue).a0" size="0x2000" crc="fff7e3d2" sha1="f02ccfa0b793e984a0bced6460a7844861d62d8e" offset="0x0000" />
@@ -1456,8 +1407,7 @@
 		<year>1984</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8541" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="galaxian (atarisoft)(1984)(rx8541)(jue).a0" size="0x2000" crc="bde05533" sha1="f9b179da71893813e9a70494dea9babc85595e18" offset="0x0000" />
@@ -1496,8 +1446,7 @@
 		<description>Gold Fever</description>
 		<year>1983</year>
 		<publisher>Tronix</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="gold fever (tronix)(1983)(jue).a0" size="0x1000" crc="90c65375" sha1="a689b2efb42e2b3db90af64f288a2a1f13e28e9d" offset="0x0000" />
@@ -1510,8 +1459,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1923" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="gorf (commodore)(1982)(vic-1923)(jue).a0" size="0x2000" crc="3f06ac97" sha1="3b3969e33f46960d401ad6a677add9fd5e9dd108" offset="0x0000" />
@@ -1549,8 +1497,7 @@
 		<description>Handy Toolkit (NL)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="handy toolkit (198-)(nl).a0" size="0x2000" crc="486eea49" sha1="3f9988391c9475939224a8b42f8fb686220e2152" offset="0x0000" />
@@ -1563,8 +1510,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C302" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="hesmon v1.1 (hes)(1982)(c302)(jue).a0" size="0x1000" crc="e6c5b849" sha1="7802ba9bd3787cf9b7883659cf82c6200248bc59" offset="0x0000" />
@@ -1577,8 +1523,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C302" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="hesmon v1.1 (hes)(1982)(c302)(jue)[a].a0" size="0x1000" crc="de4937f5" sha1="2944eb748747bcf2f1e8a8b1ce71b7199a6f36f8" offset="0x0000" />
@@ -1594,8 +1539,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C304" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="heswriter v1.1 (hes)(1982)(c304)(jue).a0" size="0x2000" crc="d60a9372" sha1="d53bb228bb72c5725ec6e33caf37f759361eaa92" offset="0x0000" />
@@ -1608,8 +1552,7 @@
 		<year>198?</year>
 		<publisher>TSP</publisher>
 		<info name="usage" value="Enter 'SYS 45056' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="hires toolkit (tsp)(198-)(jue) (sys 45056).b0" size="0x1000" crc="d131ec0c" sha1="d32076b8af6b1a8b0073ef84ae02a9c7c43656bc" offset="0x1000" />
@@ -1622,8 +1565,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1828" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="home babysitter ii (commodore)(1982)(vic-1928)(jue).a0" size="0x2000" crc="dea14651" sha1="6af39698f9056e31cae185076dd11b6a7647ab81" offset="0x0000" />
@@ -1636,8 +1578,7 @@
 		<year>1983</year>
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI HF C" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="household finance (creative)(1983)(vi hf c)(jue).a0" size="0x2000" crc="a2a3dc00" sha1="ec36c91f0de9f94c762ab4e492e9f84715bee36c" offset="0x0000" />
@@ -1649,8 +1590,7 @@
 		<description>IFR: Flight Simulator</description>
 		<year>1983</year>
 		<publisher>Academy</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="ifr - flight simulator (academy)(1983)(jue).a0" size="0x2000" crc="9770700a" sha1="bff917be0ba3067639787b03ece0beb6af39d15a" offset="0x0000" />
@@ -1662,8 +1602,7 @@
 		<description>IFR: Flight Simulator (Alt)</description>
 		<year>1983</year>
 		<publisher>Academy</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="ifr - flight simulator (academy)(1983)(jue)[a].a0" size="0x2000" crc="fb97bd96" sha1="130873b7e2dde965af451f730d08956d12cfadbe" offset="0x0000" />
@@ -1720,8 +1659,7 @@
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="Vic-1905" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="jelly monsters v2.0 (commodore)(1981)(vic-1905).a0" size="0x2000" crc="9cce34e3" sha1="2af73eb9680f8c3d001b819ce6de54f6d1e75321" offset="0x0000" />
@@ -1734,8 +1672,7 @@
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="Vic-1905" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="jelly monsters v1.0 (commodore)(1981)(vic-1905).a0" size="0x2000" crc="d8af8fe3" sha1="e46f91b0e9355bf260e4cd85ab4b10fa89c24a20" offset="0x0000" />
@@ -1763,8 +1700,7 @@
 		<description>Key-Quest</description>
 		<year>1983</year>
 		<publisher>Microware</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="key-quest (microware)(1983).a0" size="0x2000" crc="c10c8596" sha1="663bb204211b932648223a483dc174e27b3fae87" offset="0x0000" />
@@ -1777,8 +1713,7 @@
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C325" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="kids on keys (hes)(1983)(c325).a0" size="0x2000" crc="e695bd44" sha1="e970e6f979607fbd92f3836cdfe309cc77979805" offset="0x0000" />
@@ -1791,8 +1726,7 @@
 		<year>1984</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C322" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="kindercomp (hes)(1983)(c322)(jue).60" size="0x2000" crc="2f2d47bf" sha1="5cc398ab6d3cba6e925b2bf477484430b9bf41cc" offset="0x0000" />
@@ -1856,8 +1790,7 @@
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C319" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="lazer zone (hes)(1983)(c319)(jue).a0" size="0x2000" crc="019d102b" sha1="d816fae84d86928cdd2a3fe9bd5903f15378c154" offset="0x0000" />
@@ -1869,8 +1802,7 @@
 		<description>Lode Runner</description>
 		<year>1983</year>
 		<publisher>Brøderbund</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="lode runner (br0derbund)(1983)(jue).60" size="0x2000" crc="320149be" sha1="94e7492a2fa267158c301c9b0e21ac049947dc69" offset="0x0000" />
@@ -1903,8 +1835,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1213" />
 		<info name="usage" value="Enter 'SYS 24576' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk1" size="0x2000">
 				<rom name="machine language monitor (commodore)(198-)(vic-1213)(jue) (sys 24576).20" size="0x1000" crc="c771e5c1" sha1="16464fca7e950116f333327cecbda886bde99dfb" offset="0x0000" />
@@ -1917,8 +1848,7 @@
 		<year>1983</year>
 		<publisher>Brøderbund</publisher>
 		<info name="serial" value="VicCart-221" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="mastertype (br0derbund)(1983)(viccart-221)(jue).60" size="0x2000" crc="e58e5e56" sha1="d43be1b72c161bfa3260f54501ee4c1f28b56315" offset="0x0000" />
@@ -1947,8 +1877,7 @@
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22007" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="medieval joust (thorn emi)(1983)(thc22007)(jue).a0" size="0x2000" crc="8bcd8c00" sha1="1f0f22f19bb9e47af76b08e2dd480ce448e08053" offset="0x0000" />
@@ -1961,8 +1890,7 @@
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22007" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="medieval joust (thorn emi)(1983)(thc22007)(jue)[a].a0" size="0x2000" crc="25d9a370" sha1="e762520166c7e60086e28f5e9119e9f5b6248703" offset="0x0000" />
@@ -2029,8 +1957,7 @@
 		<description>Mobile Attack</description>
 		<year>1982</year>
 		<publisher>MSD</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="mobile attack (msd)(1982).a0" size="0x2000" crc="b6148c28" sha1="ea140363d708e5ec956f2bf59f8a66d633e81af0" offset="0x0000" />
@@ -2099,8 +2026,7 @@
 		<description>Monster Maze</description>
 		<year>1982</year>
 		<publisher>Epyx</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="monster maze (epyx)(1982).a0" size="0x2000" crc="3dd2f438" sha1="5ca560e1621746adba4a9e9ce82c745b997bb52c" offset="0x0000" />
@@ -2129,8 +2055,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C3??" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="mosquito infestation (hes)(1982)(c3??).a0" size="0x1000" crc="ab89be36" sha1="575fc5d44c90b46b07e7ba22adfcf713042f025d" offset="0x0000" />
@@ -2227,8 +2152,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1924" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="omega race (commodore)(1982)(vic-1924).a0" size="0x2000" crc="59581bf3" sha1="cc0bfc09237f51ffe8eaf7c189acf50ccfdc4fde" offset="0x0000" />
@@ -2270,8 +2194,7 @@
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8501" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="pac-man (atarisoft)(rx8501)(1983)(jue).a0" size="0x2000" crc="659a30ba" sha1="544781944934288524460c30d67c8474a7476095" offset="0x0000" />
@@ -2283,8 +2206,7 @@
 		<description>Paratrooper</description>
 		<year>198?</year>
 		<publisher>Antiram</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="paratrooper (antiram)(198-).a0" size="0x2000" crc="534b1190" sha1="c8a01127d12d7d37071c895da32882f69fcc9c5d" offset="0x0000" />
@@ -2297,8 +2219,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1929" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="personal finance (commodore)(1982)(vic-1929)(jue).a0" size="0x2000" crc="276857e9" sha1="f3467d3af4d3974b2eb56c89d9fe0f872ade62a4" offset="0x0000" />
@@ -2323,8 +2244,7 @@
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C321" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="pharaoh's curse (hes)(1983)(c321)(jue).60" size="0x2000" crc="61ae6e79" sha1="1f03ef463547c9364d9c56fbd932a814cf134944" offset="0x0000" />
@@ -2385,8 +2305,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1908" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="poker (aka draw poker) (commodore)(1981)(vic-1908).a0" size="0x2000" crc="9fe0bd6d" sha1="ed0979602a67a34a928c85792218184edac4350c" offset="0x0000" />
@@ -2399,8 +2318,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1908" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="poker (aka draw poker) (commodore)(1981)(vic-1908)[a].a0" size="0x2000" crc="4c543cbb" sha1="16406655efff06e702ca77bf8a9857ba6468f4c4" offset="0x0000" />
@@ -2426,8 +2344,7 @@
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8535" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="pole position (atarisoft)(1983)(rx8535)(ju).60" size="0x2000" crc="e0c6b380" sha1="8b4563c9b57fc9cd24abede74296f190f5761de5" offset="0x0000" />
@@ -2469,8 +2386,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1212" />
 		<info name="usage" value="Enter 'SYS 28681' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="programmer's aid cartridge (commodore)(198-)(vic-1212)(jue) (sys 28681).70" size="0x1000" crc="1eead29f" sha1="17311a74f6e6fbf0222dbe866c82c8ce1dd5dd6d" offset="0x1000" />
@@ -2483,8 +2399,7 @@
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C308" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="protector (hes)(1983)(c308)(jue).a0" size="0x2000" crc="451d0e1e" sha1="63e6ba97b833dfe1c74386fca2dfc018ab73e784" offset="0x0000" />
@@ -2497,8 +2412,7 @@
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="PB1420" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="qbert (parker brothers)(1983)(pb1420).a0" size="0x2000" crc="da471219" sha1="a255010a03a941c9224732f93115dd33f6438d2e" offset="0x0000" />
@@ -2523,8 +2437,7 @@
 		<year>1982</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="usage" value="Enter 'SYS 32692' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="quick brown fox (quick brown fox)(1982)(jue) (sys 32692).60" size="0x2000" crc="16954b5e" sha1="a38d2259489c6862d2e73b0f8977f8fc729bdda3" offset="0x0000" />
@@ -2550,8 +2463,7 @@
 		<year>1982</year>
 		<publisher>UMI</publisher>
 		<info name="serial" value="1600" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="renaissance (umi)(1982)(1600).60" size="0x1000" crc="44eeb525" sha1="89127b505a4d956bf77d445e4c371af178934444" offset="0x0000" />
@@ -2567,8 +2479,7 @@
 		<year>1982</year>
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22001" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="river rescue (thorn emi)(1982)(thc22001)(jue).a0" size="0x2000" crc="9176e97f" sha1="b136ed904c95d8496e0935493f05eb264566aa31" offset="0x0000" />
@@ -2581,8 +2492,7 @@
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1909" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="road race (aka midnight  drive) (commodore)(1981)(vic-1909).a0" size="0x2000" crc="49ed41da" sha1="5cb8f3cc2529a0144b1e66e1cd7af41ad1ba78b4" offset="0x0000" />
@@ -2609,8 +2519,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C310" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="robot panic (hes)(1982)(c310)(jue).a0" size="0x2000" crc="9282db33" sha1="4d65707384b7be4ee4f59ad79186cb296c7dbc74" offset="0x0000" />
@@ -2623,8 +2532,7 @@
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8520" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="robotron - 2084 (atarisoft)(1983)(rx8520).60" size="4094" crc="6a91181a" sha1="a09d2cb31890b2767b84ae908f41e3855cfda4f4" offset="0x0000" />
@@ -2639,8 +2547,7 @@
 		<description>SamMON</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk1" size="0x2000">
 				<rom name="sammon (198-).20" size="7684" crc="e11e43a1" sha1="9440be029d31e1cb1beaf43fdec7dab115035e69" offset="0x0000" />
@@ -2719,8 +2626,7 @@
 		<description>Scram 20</description>
 		<year>1983</year>
 		<publisher>Nalin Sharma</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="scram 20 (nalin sharma)(1983)(jue).a0" size="0x1000" crc="24d08856" sha1="54bfccc2df8ee0e27b7c11986897f8f4b4210736" offset="0x0000" />
@@ -2732,8 +2638,7 @@
 		<description>Screen Master</description>
 		<year>1982</year>
 		<publisher>Handic</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="screen master (handic)(1982)(jue).a0" size="0x1000" crc="1b61cd52" sha1="5420b4d54f7a9eaeaa8a32760b771214a2567e55" offset="0x0000" />
@@ -2746,8 +2651,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1937" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="sea wolf (commodore)(1982)(vic-1937).a0" size="0x2000" crc="6770e9bb" sha1="79a69acc8847e0b8d90498fc97a9b87c7e75b7c1" offset="0x0000" />
@@ -2803,8 +2707,7 @@
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C307" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="shamus (hes)(1983)(c307).a0" size="0x2000" crc="21e7bda6" sha1="e8ac7374bd5292edec15848660c64dcc3c748642" offset="0x0000" />
@@ -2874,8 +2777,7 @@
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1904" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="slot (commodore)(1981)(vic-1904).a0" size="0x2000" crc="64d4a871" sha1="4e1582c516007613e2ca02cfa8f482603cbbd38f" offset="0x0000" />
@@ -2888,8 +2790,7 @@
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1904" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="super slot (commodore)(1981)(vic-1904).a0" size="0x2000" crc="183c0866" sha1="a0b3cf83e4f780007c17986586c204863c0c3027" offset="0x0000" />
@@ -2902,8 +2803,7 @@
 		<year>1982</year>
 		<publisher>Sirius</publisher>
 		<info name="serial" value="22031" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="snake byte (sirius)(1982)(22031).a0" size="0x1000" crc="1840411b" sha1="8e6d796acfe40d7b5357f78ac5a088562b602c6b" offset="0x0000" />
@@ -2916,8 +2816,7 @@
 		<year>1982</year>
 		<publisher>Handic</publisher>
 		<info name="serial" value="Vic-7301" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="space snake (handic)(1982)(vic-7301).a0" size="0x2000" crc="a52ef578" sha1="b268b7a0cada2314872ae3986191fb2eead3b903" offset="0x0000" />
@@ -3085,8 +2984,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1939" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="star post (commodore)(1982)(vic-1939).a0" size="0x2000" crc="34e894f9" sha1="7ae08def878f0397cd23fb9d1bd345740787acab" offset="0x0000" />
@@ -3099,8 +2997,7 @@
 		<year>1983</year>
 		<publisher>SEGA</publisher>
 		<info name="serial" value="006-04" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="star trek - strategic operations simulator (sega)(1983)(006-04)(jue).a0" size="0x2000" crc="dc95800f" sha1="4d2c6b511f9e7666bfdf66dafb3c1f043956f291" offset="0x0000" />
@@ -3113,8 +3010,7 @@
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C323" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="story machine (hes)(1983)(c323)(jue).60" size="0x2000" crc="8ba0e1a0" sha1="97052c7bc17688faebc1483c8cc9f958ad1ff9d6" offset="0x0000" />
@@ -3143,8 +3039,7 @@
 		<year>1982</year>
 		<publisher>Thorn EMI</publisher>
 		<info name="serial" value="THC22003" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="submarine commander (thorn emi)(1982)(thc22003)(jue).60" size="0x1000" crc="8817b702" sha1="3311c1c9b864447349da3987056de2e7628496ce" offset="0x0000" />
@@ -3173,8 +3068,7 @@
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1211A" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="super expander(commadore)(198-)(vic-1211a).a0" size="0x1000" crc="c576ba40" sha1="aa92ac00a945d8496d7f2bf1c869736ee840d7c5" offset="0x0000" />
@@ -3217,8 +3111,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C306" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="synthesound (hes)(1982)(c306)(jue).a0" size="0x2000" crc="ed36a7fe" sha1="e456598df2e6ef4bb3ea4e3d21716355da332f33" offset="0x0000" />
@@ -3242,8 +3135,7 @@
 		<description>Tank Wars</description>
 		<year>198?</year>
 		<publisher>Machine Language Games</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="tank wars (machine language games)(198-).a0" size="0x1000" crc="a0678801" sha1="1fb132603c241c45c2fcef4d2f75a5acb79b6bde" offset="0x0000" />
@@ -3299,8 +3191,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1911" />
 		<info name="usage" value="Game Paddles required" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="the sky is falling (commodore)(1981)(vic-1911)(paddles).a0" size="0x2000" crc="1f89c40d" sha1="dbed847a8d6d318ae267cdf1e2ffcdc55170fe23" offset="0x0000" />
@@ -3314,8 +3205,7 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1911" />
 		<info name="usage" value="Game Paddles required" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="the sky is falling (commodore)(1981)(vic-1911)(paddles)[a].a0" size="0x2000" crc="c29a3a27" sha1="1a600e542333f0e36632955035acc70c05159ac2" offset="0x0000" />
@@ -3340,8 +3230,7 @@
 		<description>Titan</description>
 		<year>1981</year>
 		<publisher>Commodore</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="titan (commodore)(1981)(jue).a0" size="0x2000" crc="b2625ec5" sha1="616e9f26135653061b36cddb77e2e2da12660f22" offset="0x0000" />
@@ -3355,8 +3244,7 @@
 		<year>1984</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="6245-A" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="tomarc the barbarian (xonox)(1984)(6245-a)(jue).a0" size="0x2000" crc="6678daf4" sha1="2100d4d96a68b5c523c740f6e3c935e4811c6843" offset="0x0000" />
@@ -3394,8 +3282,7 @@
 		<year>1982</year>
 		<publisher>Creative</publisher>
 		<info name="serial" value="VI TM C" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="trashman (creative)(1982)(vi tm c).60" size="0x1000" crc="d2c807e5" sha1="da05171341e6a0b5aa2ca880c7e296ade01333d4" offset="0x0000" />
@@ -3411,8 +3298,7 @@
 		<year>1982</year>
 		<publisher>Sirius</publisher>
 		<info name="serial" value="22005" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="turmoil (sirius)(1982)(22005).a0" size="0x2000" crc="15a24c3e" sha1="4838ad99e260fbf1fbc851c0f4d0f87719f3e8e9" offset="0x0000" />
@@ -3425,8 +3311,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C303" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="turtle graphics (hes)(1982)(c303)(jue).a0" size="0x2000" crc="b0fc4418" sha1="4ed3ba195a1255e8d5ea74082f012ebbde98668b" offset="0x0000" />
@@ -3439,8 +3324,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C303" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="turtle graphics (hes)(1982)(c303)(jue)[a].a0" size="0x2000" crc="c7bf4db9" sha1="f6723c8225ed7efd0f277bdef42f27d51fe2525a" offset="0x0000" />
@@ -3453,8 +3337,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C303" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="turtle graphics (hes)(1982)(c303)(jue)[a2].a0" size="0x2000" crc="8e25f1d3" sha1="7ff339e27c464e4a6758bbd65efd3e72e83d3a6a" offset="0x0000" />
@@ -3467,8 +3350,7 @@
 		<year>198?</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="PB1430" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="tutankham (parker brothers)(198-)(pb1430).a0" size="0x2000" crc="bf4d8607" sha1="8373441050ef0cdb5af93fc11009d43e5f608ddb" offset="0x0000" />
@@ -3505,8 +3387,7 @@
 		<description>VC Extra</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vc extra (198-).a0" size="0x2000" crc="74f0ab30" sha1="314198eef14266c83b088781ed3fbf0c06daa236" offset="0x0000" />
@@ -3518,8 +3399,7 @@
 		<description>VC Song-Cartridge: The Mad Boogy (Ger)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vc song-cartridge - the mad boogy (g).a0" size="0x2000" crc="98730bfb" sha1="46f0c59278716fc337672c952d8a9eb07bd1d013" offset="0x0000" />
@@ -3531,8 +3411,7 @@
 		<description>VC Song-Cartridge: The Mad Boogy (Ger, Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vc song-cartridge - the mad boogy (g) [a].a0" size="0x2000" crc="a1aef256" sha1="2de4d9786cb56bf4fad52059d6b41803fd279c76" offset="0x0000" />
@@ -3546,8 +3425,7 @@
 		<description>VC Song-Cartridge: The Synthe-Song (Ger)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vc song-cartridge - the synthe-song (g).a0" size="0x2000" crc="73000cb0" sha1="670410e00d52442dcee2221327bf832e115ba691" offset="0x0000" />
@@ -3559,8 +3437,7 @@
 		<description>VIC 20 Micromon v1.2</description>
 		<year>1983</year>
 		<publisher>Bill Yee</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vic 20 micromon v1.2 (bill yee)(1983)(jue).b0" size="0x1000" crc="91828167" sha1="60753be59f87fafd4931dbf48a5248dc3d25fcc9" offset="0x1000" />
@@ -3572,8 +3449,7 @@
 		<description>VIC Color Test (Ger)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x800">
 				<rom name="vic color test (g).a0" size="0x800" crc="076cf09c" sha1="3269d14e73f961254a8f3afeb5c73f7dc6855e6b" offset="0x0000" />
@@ -3586,8 +3462,7 @@
 		<year>1998</year>
 		<publisher>Flat Earth Software</publisher>
 		<info name="usage" value="Enter 'SYS 40960' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vic debug 98 (flat earth software)(1998)(sys40960).a0" size="0x2000" crc="8f760726" sha1="1e8f4187e025fd52bdde9eb1753588324082c996" offset="0x0000" />
@@ -3600,8 +3475,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C301" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vic forth v1.1 (hes)(1982)(c301)(jue).a0" size="0x2000" crc="e4b00103" sha1="8d0012e12e9dfda39644993ee94a5e9ecf881629" offset="0x0000" />
@@ -3614,8 +3488,7 @@
 		<year>1982</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C301" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vic forth v1.0 (hes)(1982)(c301)(jue).a0" size="0x2000" crc="9008d71d" sha1="f1ea128567ed23dd2e0e528595a0474e2a4f1d81" offset="0x0000" />
@@ -3627,8 +3500,7 @@
 		<description>VIC Graph</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vic graph (commodore)(198-)(jue).a0" size="0x2000" crc="b0e6262a" sha1="cdb5ceceef44220399fe794a0a92dfade7cd269a" offset="0x0000" />
@@ -3641,8 +3513,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1926" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="menagerie  (commodore)(1982)(vic-1926)(jue).a0" size="0x2000" crc="a3c74629" sha1="aec46a3e6f9797b116cbe6a8792e00530234ae80" offset="0x0000" />
@@ -3655,8 +3526,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1926" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vic menagerie (commodore)(1982)(vic-1926)(jue)[a].a0" size="0x2000" crc="1653f246" sha1="26e60943fe75de30945c9459421dc8c9b295e952" offset="0x0000" />
@@ -3696,8 +3566,7 @@
 		<description>VIC Stat</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vic stat (commodore)(198-)(jue).a0" size="0x2000" crc="a66c4bc1" sha1="3d643ecb7bc55130c2ca23ce1dd4070973e0ad9e" offset="0x0000" />
@@ -3734,8 +3603,7 @@
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1610" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="victerm 40 (commodore)(198-)(vic-1610)(jue).a0" size="0x1000" crc="3acd824e" sha1="893653dd0e54ff37fbf68afbfb84626eeb16a848" offset="0x0000" />
@@ -3748,8 +3616,7 @@
 		<year>198?</year>
 		<publisher>VCC</publisher>
 		<info name="usage" value="Enter 'SYS 45056' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="victool (vcc)(198-)(jue) (sys 45056).b0" size="0x800" crc="b17037e0" sha1="f585462ad2c8241380895c99e2f57f75758d7b82" offset="0x1000" />
@@ -3762,8 +3629,7 @@
 		<year>1982</year>
 		<publisher>UMI</publisher>
 		<info name="serial" value="1638" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="video vermin (umi)(1982)(1638)(jue).a0" size="0x2000" crc="a4fe2362" sha1="6df279e642dfe5cc2915ac99382ad43c6c60ad9f" offset="0x0000" />
@@ -3776,8 +3642,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1930" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="visible solar system (commodore)(1982)(vic-1930)(jue).a0" size="0x2000" crc="0a9b0456" sha1="a7b767173316eecb1407083ab4715963bef9d751" offset="0x0000" />
@@ -3790,8 +3655,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1930" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="visible solar system (commodore)(1982)(vic-1930)(jue)[a].a0" size="0x2000" crc="c4967f23" sha1="459a22a9affdc73b5fa6868fef398b0707a70a17" offset="0x0000" />
@@ -3804,8 +3668,7 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1930" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 					<rom name="visible solar system (commodore)(1982)(vic-1930)(jue)[a2].a0" size="0x2000" crc="ee5d7a91" sha1="94f2ac4d58e9ffe4861c00de5551bdcb60b9dbf7" offset="0x0000" />
@@ -3844,8 +3707,7 @@
 		<year>1982</year>
 		<publisher>UMI</publisher>
 		<info name="serial" value="16??" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk3" size="0x2000">
 				<rom name="wordcraft 20 (umi)(1982)(16--).60" size="0x2000" crc="7478d259" sha1="f96b9d229dbd6e0acd7f4084a2a48e017ea6a6a8" offset="0x0000" />
@@ -3861,8 +3723,7 @@
 		<year>1983</year>
 		<publisher>Cardco</publisher>
 		<info name="usage" value="Enter 'SYS 41000' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="write now! (cardco)(1983)(jue)(sys 41000).a0" size="0x2000" crc="3616451e" sha1="e4b9a71dfd5b31406a681a7e5b09888039789fd2" offset="0x0000" />
@@ -3876,8 +3737,7 @@
 		<publisher>STACK</publisher>
 		<info name="serial" value="VS0174" />
 		<info name="usage" value="Enter 'SYS 45056' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vickit 1" size="0x800" crc="ca5842eb" sha1="bac8b89c831e46b45b821b130a84131c38106d08" offset="0x1000" />
@@ -3891,8 +3751,7 @@
 		<publisher>STACK</publisher>
 		<info name="serial" value="VS0175" />
 		<info name="usage" value="Enter 'SYS 45056' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vickit ii.ba1" size="0x1000" crc="6d576f16" sha1="03ac70455d3836724a983cd7c133709949d7faf8" offset="0x1000" />
@@ -3906,8 +3765,7 @@
 		<publisher>STACK</publisher>
 		<info name="serial" value="VS0169" />
 		<info name="usage" value="Enter 'SYS 45056' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vickit 3a.ba2" size="0x1000" crc="f33c1782" sha1="a8adc0b42ef511708589bd45614897191cb0081f" offset="0x1000" />
@@ -3921,8 +3779,7 @@
 		<publisher>STACK</publisher>
 		<info name="serial" value="VS0171" />
 		<info name="usage" value="Enter 'SYS 40999' to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vickit 4" size="0x1000" crc="0b5d9a00" sha1="661e65462dfc5db971c7f4c9ea154a18cb50af57" offset="0x0000" />
@@ -3936,8 +3793,7 @@
 		<publisher>STACK</publisher>
 		<info name="serial" value="VS152" />
 		<info name="usage" value="Needs VICKIT 4 to run" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
 				<rom name="vickit 5.b2" size="0x1000" crc="73f7099f" sha1="a2d3dd16b81b3d45e5b849d634018d434c4be7d3" offset="0x1000" />
