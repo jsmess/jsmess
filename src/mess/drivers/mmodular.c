@@ -26,7 +26,6 @@
  misc non-modular/non-68K boards
 
  RISC 2500 (Skeleton, does not work, and not sure the same internal chessboard connections are used)
- Final Chess Card by TASC (this is not Mephisto at all, but wanted to make sure it didn't get lost)
  Academy 65C02 4.9152mhz
  Monte Carlo IV, Mega IV and any others not listed above have correct ROM/RAM and maybe LCD, not much else for now
 
@@ -105,9 +104,6 @@ static UINT32 *save_ram32;
 
 // Berlin Pro 68020
 static UINT32 BPL32latch_data = 0;
-
-// Final Chess Card
-static UINT8 FCH_latch_data = 0;
 
 
 // Mephisto Academy
@@ -934,30 +930,6 @@ static WRITE32_HANDLER( write_1000000 )
 	logerror("Write to  RISC2500 1000000\n");
 }
 
-static WRITE8_HANDLER( io7ff8_write )
-{
-	FCH_latch_data = data;
-}
-
-static READ8_HANDLER( io7ff8_read )
-{
-	static unsigned char table[] = { 0xff, 0xfd, 0xfe };
-	static int i = -1;
-	i++;
-	if (i == 3) i = 0;
-	return table[i];  // exercise the NMI handler for now with known commands
-}
-
-static READ8_HANDLER( io6000_read )
-{
-	return 0x55;
-}
-
-static WRITE8_HANDLER( io6000_write )
-{
-	FCH_latch_data = data;
-}
-
 static TIMER_DEVICE_CALLBACK( timer_update_irq6 )
 {
 	cputag_set_input_line(timer.machine(), "maincpu", 6, HOLD_LINE);
@@ -1019,11 +991,6 @@ static MACHINE_START( sfortea )
 {
 	common_chess_start();
 	mboard_savestate_register(machine);
-}
-
-static MACHINE_START( finalchs )
-{
-//  timer_pulse(machine, ATTOTIME_IN_HZ(1), NULL, 0, cause_M6502_irq);
 }
 
 static MACHINE_START( diablo68 )
@@ -1254,15 +1221,6 @@ static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x2000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START(finalchs_mem , AS_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_READ(io7ff8_read)
-	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_WRITE(io7ff8_write)
-	AM_RANGE( 0x6000, 0x6000 ) AM_READ(io6000_read)
-	AM_RANGE( 0x6000, 0x6000 ) AM_WRITE(io6000_write)
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
@@ -1599,24 +1557,6 @@ static MACHINE_CONFIG_DERIVED( academy, polgar )
 
 MACHINE_CONFIG_END
 
-static SCREEN_UPDATE_IND16( finalchs )
-{
-	return 0;
-}
-
-static MACHINE_CONFIG_START( finalchs, driver_device )
-	MCFG_CPU_ADD("maincpu",M65C02,5000000)
-	MCFG_CPU_PROGRAM_MAP(finalchs_mem)
-	MCFG_MACHINE_START(finalchs)
-    MCFG_SCREEN_ADD("screen", RASTER)
-    MCFG_SCREEN_REFRESH_RATE(50)
-    MCFG_SCREEN_UPDATE_STATIC(finalchs)
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-    MCFG_PALETTE_LENGTH(2)
-    MCFG_PALETTE_INIT(chess_lcd)
-
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( milano, polgar )
 	MCFG_CPU_MODIFY("maincpu")
@@ -1815,11 +1755,6 @@ ROM_START(academy)
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
-ROM_START(finalchs)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("finalchs.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098))
-ROM_END
-
 ROM_START(megaiv)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("megaiv.bin", 0x8000, 0x8000, CRC(dee355d2) SHA1(6bc79c0fb169020f017412f5f9696b9ecafbf99f))
@@ -1998,7 +1933,6 @@ static DRIVER_INIT( polgar )
   CONS(  1988, sforteba,  sfortea, 0,     sfortea,  sfortea,   0,"Novag", "Novag Super Forte B Chess Computer (ALT)",GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
   CONS(  1988, sexpertb,  sfortea, 0,     sfortea,  sfortea,   0,"Novag", "Novag Expert B Chess Computer",GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
   CONS(  1989, academy,    0,   0, academy,    academy,   0,   "Hegener & Glaser", "Mephisto Academy Schachcomputer",GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING )
-  CONS(  1989, finalchs,0, 0,finalchs,   0,  0,"TASC", "The Final Chess Card",GAME_NOT_WORKING|GAME_NO_SOUND )
   CONS(  1989, megaiv,   0,    0,      megaiv,   megaiv,   0,   "Hegener & Glaser", "Mephisto Mega IV Schachcomputer",GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
   CONS(  1989, milano,     polgar,      0,      milano,     polgar,   polgar,   "Hegener & Glaser", "Mephisto Milano Schachcomputer",GAME_REQUIRES_ARTWORK )
 //CONS(  1989, montec4,   0,      0,      monteciv,   monteciv,   0,   "Hegener & Glaser", "Mephisto Monte Carlo IV",GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )

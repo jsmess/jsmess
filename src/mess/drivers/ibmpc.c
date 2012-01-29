@@ -260,6 +260,7 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 #include "machine/isa_adlib.h"
 #include "machine/isa_com.h"
 #include "machine/isa_fdc.h"
+#include "machine/isa_finalchs.h"
 #include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
 #include "machine/isa_sblaster.h"
@@ -329,6 +330,7 @@ static SLOT_INTERFACE_START(ibm_isa8_cards)
 	SLOT_INTERFACE("mda", ISA8_MDA)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
+	SLOT_INTERFACE("fdc", ISA8_FINALCHS)
 	SLOT_INTERFACE("hdc", ISA8_HDC)
 	SLOT_INTERFACE("adlib", ISA8_ADLIB)
 	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
