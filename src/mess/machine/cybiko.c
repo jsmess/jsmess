@@ -10,17 +10,7 @@
 
 */
 
-#include "emu.h"
-#include "emuopts.h"
 #include "includes/cybiko.h"
-
-#include "cpu/h83002/h8.h"
-#include "video/hd66421.h"
-#include "sound/speaker.h"
-#include "machine/pcf8593.h"
-#include "machine/at45dbxx.h"
-#include "machine/sst39vfx.h"
-#include "machine/ram.h"
 
 #define LOG_LEVEL  1
 #define _logerror(level,x)  do { if (LOG_LEVEL > level) logerror x; } while (0)
@@ -183,7 +173,7 @@ static void cybiko_sst39vfx_save(running_machine &machine, emu_file *file)
 static void cybiko_ramdisk_load(running_machine &machine, emu_file *file)
 {
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
-	#ifdef LSB_FIRST
+#ifdef LSB_FIRST
 	UINT8 *temp = (UINT8*)malloc( RAMDISK_SIZE);
 	file->read( temp, RAMDISK_SIZE);
 	for (int i = 0; i < RAMDISK_SIZE; i += 2)
@@ -192,9 +182,9 @@ static void cybiko_ramdisk_load(running_machine &machine, emu_file *file)
 		ram[i+1] = temp[i+0];
 	}
 	free( temp);
-	#else
+#else
 	file->read( ram, RAMDISK_SIZE);
-	#endif
+#endif
 }
 
 static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
@@ -338,62 +328,62 @@ static void cybiko_rs232_init(running_machine &machine)
 //  machine.scheduler().timer_pulse(TIME_IN_HZ( 10), FUNC(rs232_timer_callback));
 }
 
-static void cybiko_rs232_exit( void)
+static void cybiko_rs232_exit()
 {
 	_logerror( 0, ("cybiko_rs232_exit\n"));
 }
 
-static void cybiko_rs232_reset( void)
+static void cybiko_rs232_reset()
 {
 	_logerror( 0, ("cybiko_rs232_reset\n"));
 }
 
-static void cybiko_rs232_write_byte( UINT8 data)
+void cybiko_state::cybiko_rs232_write_byte( UINT8 data )
 {
 //  printf( "%c", data);
 }
 
-static void cybiko_rs232_pin_sck(cybiko_state *state, int data)
+void cybiko_state::cybiko_rs232_pin_sck( UINT8 data )
 {
 	_logerror( 3, ("cybiko_rs232_pin_sck (%d)\n", data));
 	// clock high-to-low
-	if ((state->m_rs232.pin.sck == 1) && (data == 0))
+	if ((m_rs232.pin.sck == 1) && (data == 0))
 	{
 		// transmit
-		if (state->m_rs232.pin.txd) state->m_rs232.tx_byte = state->m_rs232.tx_byte | (1 << state->m_rs232.tx_bits);
-		state->m_rs232.tx_bits++;
-		if (state->m_rs232.tx_bits == 8)
+		if (m_rs232.pin.txd) m_rs232.tx_byte = m_rs232.tx_byte | (1 << m_rs232.tx_bits);
+		m_rs232.tx_bits++;
+		if (m_rs232.tx_bits == 8)
 		{
-			state->m_rs232.tx_bits = 0;
-			cybiko_rs232_write_byte( state->m_rs232.tx_byte);
-			state->m_rs232.tx_byte = 0;
+			m_rs232.tx_bits = 0;
+			cybiko_rs232_write_byte(m_rs232.tx_byte);
+			m_rs232.tx_byte = 0;
 		}
 		// receive
-		state->m_rs232.pin.rxd = (state->m_rs232.rx_byte >> state->m_rs232.rx_bits) & 1;
-		state->m_rs232.rx_bits++;
-		if (state->m_rs232.rx_bits == 8)
+		m_rs232.pin.rxd = (m_rs232.rx_byte >> m_rs232.rx_bits) & 1;
+		m_rs232.rx_bits++;
+		if (m_rs232.rx_bits == 8)
 		{
-			state->m_rs232.rx_bits = 0;
-			state->m_rs232.rx_byte = 0;
+			m_rs232.rx_bits = 0;
+			m_rs232.rx_byte = 0;
 		}
 	}
 	// save sck
-	state->m_rs232.pin.sck = data;
+	m_rs232.pin.sck = data;
 }
 
-static void cybiko_rs232_pin_txd(cybiko_state *state, int data)
+void cybiko_state::cybiko_rs232_pin_txd( UINT8 data )
 {
 	_logerror( 3, ("cybiko_rs232_pin_txd (%d)\n", data));
-	state->m_rs232.pin.txd = data;
+	m_rs232.pin.txd = data;
 }
 
-static int cybiko_rs232_pin_rxd(cybiko_state *state)
+bool cybiko_state::cybiko_rs232_pin_rxd()
 {
 	_logerror( 3, ("cybiko_rs232_pin_rxd\n"));
-	return state->m_rs232.pin.rxd;
+	return m_rs232.pin.rxd;
 }
 
-static int cybiko_rs232_rx_queue( void)
+UINT8 cybiko_state::cybiko_rs232_rx_queue()
 {
 	return 0;
 }
@@ -402,32 +392,28 @@ static int cybiko_rs232_rx_queue( void)
 // READ/WRITE HANDLERS //
 /////////////////////////
 
-READ16_HANDLER( cybiko_lcd_r )
+READ16_MEMBER( cybiko_state::cybiko_lcd_r )
 {
-	hd66421_device *hd66421 = space->machine().device<hd66421_device>( "hd66421" );
 	UINT16 data = 0;
-	if (ACCESSING_BITS_8_15) data = data | (hd66421->reg_idx_r(*space, offset) << 8);
-	if (ACCESSING_BITS_0_7) data = data | (hd66421->reg_dat_r(*space, offset) << 0);
+	if (ACCESSING_BITS_8_15) data |= (m_crtc->reg_idx_r(space, offset) << 8);
+	if (ACCESSING_BITS_0_7) data |= (m_crtc->reg_dat_r(space, offset) << 0);
 	return data;
 }
 
-WRITE16_HANDLER( cybiko_lcd_w )
+WRITE16_MEMBER( cybiko_state::cybiko_lcd_w )
 {
-	hd66421_device *hd66421 = space->machine().device<hd66421_device>( "hd66421" );
-	if (ACCESSING_BITS_8_15) hd66421->reg_idx_w(*space, offset, (data >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7) hd66421->reg_dat_w(*space, offset, (data >> 0) & 0xff);
+	if (ACCESSING_BITS_8_15) m_crtc->reg_idx_w(space, offset, (data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) m_crtc->reg_dat_w(space, offset, (data >> 0) & 0xff);
 }
 
-static READ16_HANDLER( cybiko_key_r )
+UINT16 cybiko_state::cybiko_key_r( UINT16 offset, UINT16 mem_mask)
 {
 	static const char *const keynames[] = { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12", "A13", "A14", "A15" };
 	UINT16 data = 0xFFFF;
-	for (int i = 0; i < 15; i++)
+	for (UINT8 i = 0; i < 15; i++)
 	{
-		if (!(offset & (1 << i)))
-		{
-			data &= ~input_port_read_safe(space->machine(), keynames[i], 0);
-		}
+		if (!BIT(offset, i))
+			data &= ~input_port_read_safe(machine(), keynames[i], 0);
 	}
 	if (data != 0xFFFF)
 	{
@@ -436,26 +422,26 @@ static READ16_HANDLER( cybiko_key_r )
 	return data;
 }
 
-READ16_HANDLER( cybikov1_key_r )
+READ16_MEMBER( cybiko_state::cybikov1_key_r )
 {
-	return cybiko_key_r( space, offset, mem_mask);
+	return cybiko_key_r(offset, mem_mask);
 }
 
-READ16_HANDLER( cybikov2_key_r )
+READ16_MEMBER( cybiko_state::cybikov2_key_r )
 {
-	UINT16 data = cybiko_key_r( space, offset, mem_mask);
-	if (!(offset & 1)) data |= 0x0002; // or else [esc] does not work in "lost in labyrinth"
+	UINT16 data = cybiko_key_r(offset, mem_mask);
+	if (!BIT(offset, 0))
+		data |= 0x0002; // or else [esc] does not work in "lost in labyrinth"
 	return data;
 }
 
-READ16_HANDLER( cybikoxt_key_r )
+READ16_MEMBER( cybiko_state::cybikoxt_key_r )
 {
-	return cybiko_key_r( space, offset, mem_mask);
+	return cybiko_key_r(offset, mem_mask);
 }
 
-READ8_HANDLER( cybikov1_io_reg_r )
+READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
 {
-	cybiko_state *state = space->machine().driver_data<cybiko_state>();
 	UINT8 data = 0;
 	_logerror( 2, ("cybikov1_io_reg_r (%08X)\n", offset));
 	switch (offset)
@@ -463,43 +449,45 @@ READ8_HANDLER( cybikov1_io_reg_r )
 		// keyboard
 		case H8S_IO_PORT1 :
 		{
-			if (!(input_port_read(space->machine(), "A1") & 0x02)) data = data | (1 << 3); // "esc" key
+			if (!BIT(input_port_read(machine(), "A1"), 1))
+				data |= (1 << 3); // "esc" key
 		}
 		break;
 		// serial dataflash
 		case H8S_IO_PORT3 :
 		{
-			device_t *device = space->machine().device("flash1");
-			if (at45dbxx_pin_so(device)) data = data | H8S_P3_RXD1;
+			if (at45dbxx_pin_so(m_flash1))
+				data |= H8S_P3_RXD1;
 		}
 		break;
 		// rs232
 		case H8S_IO_PORT5 :
 		{
-			if (cybiko_rs232_pin_rxd(state)) data = data | H8S_P5_RXD2;
+			if (cybiko_rs232_pin_rxd())
+				data |= H8S_P5_RXD2;
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PORTF :
 		{
-			device_t *device = space->machine().device("rtc");
 			data = H8S_PF_PF2;
-			if (pcf8593_pin_sda_r(device)) data |= H8S_PF_PF0;
+			if (pcf8593_pin_sda_r(m_rtc))
+				data |= H8S_PF_PF0;
 		}
 		break;
 		// serial 2
 		case H8S_IO_SSR2 :
 		{
-			if (cybiko_rs232_rx_queue()) data = data | H8S_SSR_RDRF;
+			if (cybiko_rs232_rx_queue())
+				data |= H8S_SSR_RDRF;
 		}
 		break;
 	}
 	return data;
 }
 
-READ8_HANDLER( cybikov2_io_reg_r )
+READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
 {
-	cybiko_state *state = space->machine().driver_data<cybiko_state>();
 	UINT8 data = 0;
 	_logerror( 2, ("cybikov2_io_reg_r (%08X)\n", offset));
 	switch (offset)
@@ -507,43 +495,45 @@ READ8_HANDLER( cybikov2_io_reg_r )
 		// keyboard
 		case H8S_IO_PORT1 :
 		{
-			if (!(input_port_read(space->machine(), "A1") & 0x02)) data = data | (1 << 3); // "esc" key
+			if (!BIT(input_port_read(machine(), "A1"), 1))
+				data |= (1 << 3); // "esc" key
 		}
 		break;
 		// serial dataflash
 		case H8S_IO_PORT3 :
 		{
-			device_t *device = space->machine().device("flash1");
-			if (at45dbxx_pin_so(device)) data = data | H8S_P3_RXD1;
+			if (at45dbxx_pin_so(m_flash1))
+				data |= H8S_P3_RXD1;
 		}
 		break;
 		// rs232
 		case H8S_IO_PORT5 :
 		{
-			if (cybiko_rs232_pin_rxd(state)) data = data | H8S_P5_RXD2;
+			if (cybiko_rs232_pin_rxd())
+				data |= H8S_P5_RXD2;
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PORTF :
 		{
-			device_t *device = space->machine().device("rtc");
 			data = H8S_PF_PF2;
-			if (pcf8593_pin_sda_r(device)) data |= H8S_PF_PF0;
+			if (pcf8593_pin_sda_r(m_rtc))
+				data |= H8S_PF_PF0;
 		}
 		break;
 		// serial 2
 		case H8S_IO_SSR2 :
 		{
-			if (cybiko_rs232_rx_queue()) data = data | H8S_SSR_RDRF;
+			if (cybiko_rs232_rx_queue())
+				data |= H8S_SSR_RDRF;
 		}
 		break;
 	}
 	return data;
 }
 
-READ8_HANDLER( cybikoxt_io_reg_r )
+READ8_MEMBER( cybiko_state::cybikoxt_io_reg_r )
 {
-	cybiko_state *state = space->machine().driver_data<cybiko_state>();
 	UINT8 data = 0;
 	_logerror( 2, ("cybikoxt_io_reg_r (%08X)\n", offset));
 	switch (offset)
@@ -551,7 +541,8 @@ READ8_HANDLER( cybikoxt_io_reg_r )
 		// rs232
 		case H8S_IO_PORT3 :
 		{
-			if (cybiko_rs232_pin_rxd(state)) data = data | H8S_P3_RXD1;
+			if (cybiko_rs232_pin_rxd())
+				data |= H8S_P3_RXD1;
 		}
 		break;
 		// ...
@@ -564,141 +555,131 @@ READ8_HANDLER( cybikoxt_io_reg_r )
 		// real-time clock
 		case H8S_IO_PORTF :
 		{
-			device_t *device = space->machine().device("rtc");
-			if (pcf8593_pin_sda_r(device)) data |= H8S_PF_PF6;
+			if (pcf8593_pin_sda_r(m_rtc))
+				data |= H8S_PF_PF6;
 		}
 		break;
 		// serial 1
 		case H8S_IO_SSR1 :
 		{
-			if (cybiko_rs232_rx_queue()) data = data | H8S_SSR_RDRF;
+			if (cybiko_rs232_rx_queue())
+				data |= H8S_SSR_RDRF;
 		}
 		break;
 	}
 	return data;
 }
 
-WRITE8_HANDLER( cybikov1_io_reg_w )
+WRITE8_MEMBER( cybiko_state::cybikov1_io_reg_w )
 {
-	cybiko_state *state = space->machine().driver_data<cybiko_state>();
-	device_t *rtc = space->machine().device("rtc");
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	_logerror( 2, ("cybikov1_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
 		// speaker
 		case H8S_IO_P1DR :
 		{
-			speaker_level_w( speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
+			speaker_level_w(m_speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
 		}
 		break;
 		// serial dataflash
 		case H8S_IO_P3DR :
 		{
-			device_t *device = space->machine().device("flash1");
-			at45dbxx_pin_cs ( device, (data & H8S_P3_SCK0) ? 0 : 1);
-			at45dbxx_pin_si ( device, (data & H8S_P3_TXD1) ? 1 : 0);
-			at45dbxx_pin_sck( device, (data & H8S_P3_SCK1) ? 1 : 0);
+			at45dbxx_pin_cs (m_flash1, (data & H8S_P3_SCK0) ? 0 : 1);
+			at45dbxx_pin_si (m_flash1, (data & H8S_P3_TXD1) ? 1 : 0);
+			at45dbxx_pin_sck(m_flash1, (data & H8S_P3_SCK1) ? 1 : 0);
 		}
 		break;
 		// rs232
 		case H8S_IO_P5DR :
 		{
-			cybiko_rs232_pin_txd(state, (data & H8S_P5_TXD2) ? 1 : 0);
-			cybiko_rs232_pin_sck(state, (data & H8S_P5_SCK2) ? 1 : 0);
+			cybiko_rs232_pin_txd((data & H8S_P5_TXD2) ? 1 : 0);
+			cybiko_rs232_pin_sck((data & H8S_P5_SCK2) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDR :
 		{
-			pcf8593_pin_scl(rtc, (data & H8S_PF_PF1) ? 1 : 0);
+			pcf8593_pin_scl(m_rtc, (data & H8S_PF_PF1) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDDR :
 		{
-			pcf8593_pin_sda_w(rtc, (data & H8S_PF_PF0) ? 0 : 1);
+			pcf8593_pin_sda_w(m_rtc, (data & H8S_PF_PF0) ? 0 : 1);
 		}
 		break;
 	}
 }
 
-WRITE8_HANDLER( cybikov2_io_reg_w )
+WRITE8_MEMBER( cybiko_state::cybikov2_io_reg_w )
 {
-	cybiko_state *state = space->machine().driver_data<cybiko_state>();
-	device_t *rtc = space->machine().device("rtc");
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	_logerror( 2, ("cybikov2_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
 		// speaker
 		case H8S_IO_P1DR :
 		{
-			speaker_level_w( speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
+			speaker_level_w(m_speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
 		}
 		break;
 		// serial dataflash
 		case H8S_IO_P3DR :
 		{
-			device_t *device = space->machine().device("flash1");
-			at45dbxx_pin_cs ( device, (data & H8S_P3_SCK0) ? 0 : 1);
-			at45dbxx_pin_si ( device, (data & H8S_P3_TXD1) ? 1 : 0);
-			at45dbxx_pin_sck( device, (data & H8S_P3_SCK1) ? 1 : 0);
+			at45dbxx_pin_cs (m_flash1, (data & H8S_P3_SCK0) ? 0 : 1);
+			at45dbxx_pin_si (m_flash1, (data & H8S_P3_TXD1) ? 1 : 0);
+			at45dbxx_pin_sck(m_flash1, (data & H8S_P3_SCK1) ? 1 : 0);
 		}
 		break;
 		// rs232
 		case H8S_IO_P5DR :
 		{
-			cybiko_rs232_pin_txd(state, (data & H8S_P5_TXD2) ? 1 : 0);
-			cybiko_rs232_pin_sck(state, (data & H8S_P5_SCK2) ? 1 : 0);
+			cybiko_rs232_pin_txd((data & H8S_P5_TXD2) ? 1 : 0);
+			cybiko_rs232_pin_sck((data & H8S_P5_SCK2) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDR :
 		{
-			pcf8593_pin_scl(rtc, (data & H8S_PF_PF1) ? 1 : 0);
+			pcf8593_pin_scl(m_rtc, (data & H8S_PF_PF1) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDDR :
 		{
-			pcf8593_pin_sda_w(rtc, (data & H8S_PF_PF0) ? 0 : 1);
+			pcf8593_pin_sda_w(m_rtc, (data & H8S_PF_PF0) ? 0 : 1);
 		}
 		break;
 	}
 }
 
-WRITE8_HANDLER( cybikoxt_io_reg_w )
+WRITE8_MEMBER( cybiko_state::cybikoxt_io_reg_w )
 {
-	cybiko_state *state = space->machine().driver_data<cybiko_state>();
-	device_t *rtc = space->machine().device("rtc");
-	device_t *speaker = space->machine().device(SPEAKER_TAG);
 	_logerror( 2, ("cybikoxt_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
 		// speaker
 		case H8S_IO_P1DR :
 		{
-			speaker_level_w( speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
+			speaker_level_w(m_speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
 		}
 		break;
 		// rs232
 		case H8S_IO_P3DR :
 		{
-			cybiko_rs232_pin_txd(state, (data & H8S_P3_TXD1) ? 1 : 0);
-			cybiko_rs232_pin_sck(state, (data & H8S_P3_SCK1) ? 1 : 0);
+			cybiko_rs232_pin_txd((data & H8S_P3_TXD1) ? 1 : 0);
+			cybiko_rs232_pin_sck((data & H8S_P3_SCK1) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDR :
 		{
-			pcf8593_pin_scl(rtc, (data & H8S_PF_PF1) ? 1 : 0);
+			pcf8593_pin_scl(m_rtc, (data & H8S_PF_PF1) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDDR :
 		{
-			pcf8593_pin_sda_w(rtc, (data & H8S_PF_PF6) ? 0 : 1);
+			pcf8593_pin_sda_w(m_rtc, (data & H8S_PF_PF6) ? 0 : 1);
 		}
 		break;
 	}
@@ -708,7 +689,7 @@ WRITE8_HANDLER( cybikoxt_io_reg_w )
 // 00/01, 00/C0, 0F/32, 0D/03, 0B/03, 09/50, 07/D6, 05/00, 04/00, 20/00, 23/08, 27/01, 2F/08, 2C/02, 2B/08, 28/01
 // 04/80, 05/02, 00/C8, 00/C8, 00/C0, 1B/2C, 00/01, 00/C0, 1B/6C, 0F/10, 0D/07, 0B/07, 09/D2, 07/D6, 05/00, 04/00,
 // 20/00, 23/08, 27/01, 2F/08, 2C/02, 2B/08, 28/01, 37/08, 34/04, 33/08, 30/03, 04/80, 05/02, 1B/6C, 00/C8
-WRITE16_HANDLER( cybiko_usb_w )
+WRITE16_MEMBER( cybiko_state::cybiko_usb_w )
 {
 	if (ACCESSING_BITS_8_15) _logerror( 2, ("[%08X] <- %02X\n", 0x200000 + offset * 2 + 0, (data >> 8) & 0xFF));
 	if (ACCESSING_BITS_0_7) _logerror( 2, ("[%08X] <- %02X\n", 0x200000 + offset * 2 + 1, (data >> 0) & 0xFF));
