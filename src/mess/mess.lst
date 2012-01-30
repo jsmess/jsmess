@@ -549,7 +549,7 @@ vic20s	// Commodore VIC 20 (Swedish Expanson Kit)
 
 max	   // Commodore Max Machine (Japan)
 c64	   // Commodore 64 (NTSC)
-c64pal	// Commodore 64 (PAL)
+//  c64pal	// Commodore 64 (PAL)
 c64jpn	// Commodore 64 (Japan)
 c64swe	// Commodore 64 (Sweden)
 vic64s	// Commodore VIC 64S (Sweden)
