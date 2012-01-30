@@ -115,15 +115,14 @@ static void c64_cia0_interrupt( device_t *device, int level )
 	c64_irq (device->machine(), level || state->m_vicirq);
 }
 
-void c64_vic_interrupt( running_machine &machine, int level )
+WRITE_LINE_MEMBER( c64_state::c64_vic_interrupt )
 {
-	c64_state *state = machine.driver_data<c64_state>();
-	device_t *cia_0 = machine.device("cia_0");
+	device_t *cia_0 = machine().device("cia_0");
 #if 1
-	if (level != state->m_vicirq)
+	if (state != m_vicirq)
 	{
-		c64_irq(machine, level || mos6526_irq_r(cia_0));
-		state->m_vicirq = level;
+		c64_irq(machine(), state || mos6526_irq_r(cia_0));
+		m_vicirq = state;
 	}
 #endif
 }

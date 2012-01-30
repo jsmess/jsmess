@@ -43,6 +43,15 @@ public:
 
 	optional_device<cbm_iec_device> m_iec;
 
+	DECLARE_READ8_MEMBER( c64_lightpen_x_cb );
+	DECLARE_READ8_MEMBER( c64_lightpen_y_cb );
+	DECLARE_READ8_MEMBER( c64_lightpen_button_cb );
+	DECLARE_READ8_MEMBER( c64_dma_read );
+	DECLARE_READ8_MEMBER( c64_dma_read_ultimax );
+	DECLARE_READ8_MEMBER( c64_dma_read_color );
+	DECLARE_WRITE_LINE_MEMBER( c64_vic_interrupt );
+	DECLARE_READ8_MEMBER( c64_rdy_cb );
+	
 	int m_old_level;
 	int m_old_data;
 	int m_old_exrom;
@@ -109,7 +118,6 @@ WRITE8_HANDLER(c64_ioarea_w);
 WRITE8_HANDLER ( c64_write_io );
 READ8_HANDLER ( c64_read_io );
 int c64_paddle_read (device_t *device, int which);
-void c64_vic_interrupt (running_machine &machine, int level);
 
 extern const mos6526_interface c64_ntsc_cia0, c64_pal_cia0;
 extern const mos6526_interface c64_ntsc_cia1, c64_pal_cia1;

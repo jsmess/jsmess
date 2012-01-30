@@ -23,6 +23,15 @@ public:
 	c128_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64_state(mconfig, type, tag) { }
 
+	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
+	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
+	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
+	DECLARE_READ8_MEMBER( vic_dma_read );
+	DECLARE_READ8_MEMBER( vic_dma_read_ultimax );
+	DECLARE_READ8_MEMBER( vic_dma_read_color );
+	DECLARE_WRITE_LINE_MEMBER( vic_interrupt );
+	DECLARE_READ8_MEMBER( vic_rdy_cb );
+
 	UINT8 *m_c128_basic;
 	UINT8 *m_c128_kernal;
 	UINT8 *m_c128_chargen;

@@ -679,50 +679,50 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
  *
  *************************************/
 
-static UINT8 c128_lightpen_x_cb( running_machine &machine )
+READ8_MEMBER( c128_state::vic_lightpen_x_cb )
 {
-	return input_port_read(machine, "LIGHTX") & ~0x01;
+	return input_port_read(machine(), "LIGHTX") & ~0x01;
 }
 
-static UINT8 c128_lightpen_y_cb( running_machine &machine )
+READ8_MEMBER( c128_state::vic_lightpen_y_cb )
 {
-	return input_port_read(machine, "LIGHTY") & ~0x01;
+	return input_port_read(machine(), "LIGHTY") & ~0x01;
 }
 
-static UINT8 c128_lightpen_button_cb( running_machine &machine )
+READ8_MEMBER( c128_state::vic_lightpen_button_cb )
 {
-	return input_port_read(machine, "OTHER") & 0x04;
+	return input_port_read(machine(), "OTHER") & 0x04;
 }
 
-static UINT8 c128_rdy_cb( running_machine &machine )
+READ8_MEMBER( c128_state::vic_rdy_cb )
 {
-	return input_port_read(machine, "CTRLSEL") & 0x08;
+	return input_port_read(machine(), "CTRLSEL") & 0x08;
 }
 
 static const vic2_interface c128_vic2_ntsc_intf = {
 	"screen",
 	"maincpu",
 	VIC8564,
-	c128_lightpen_x_cb,
-	c128_lightpen_y_cb,
-	c128_lightpen_button_cb,
-	c128_dma_read,
-	c128_dma_read_color,
-	c128_vic_interrupt,
-	c128_rdy_cb
+	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_dma_read),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_dma_read_color),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_interrupt),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_rdy_cb)
 };
 
 static const vic2_interface c128_vic2_pal_intf = {
 	"screen",
 	"maincpu",
 	VIC8566,
-	c128_lightpen_x_cb,
-	c128_lightpen_y_cb,
-	c128_lightpen_button_cb,
-	c128_dma_read,
-	c128_dma_read_color,
-	c128_vic_interrupt,
-	c128_rdy_cb
+	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_dma_read),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_dma_read_color),
+	DEVCB_DRIVER_LINE_MEMBER(c128_state, vic_interrupt),
+	DEVCB_DRIVER_MEMBER(c128_state, vic_rdy_cb)
 };
 
 static const vdc8563_interface c128_vdc8563_intf = {

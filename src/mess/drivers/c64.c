@@ -580,95 +580,92 @@ static SCREEN_UPDATE_IND16( c64 )
 	return 0;
 }
 
-static UINT8 c64_lightpen_x_cb( running_machine &machine )
+READ8_MEMBER( c64_state::c64_lightpen_x_cb )
 {
-	return input_port_read(machine, "LIGHTX") & ~0x01;
+	return input_port_read(machine(), "LIGHTX") & ~0x01;
 }
 
-static UINT8 c64_lightpen_y_cb( running_machine &machine )
+READ8_MEMBER( c64_state::c64_lightpen_y_cb )
 {
-	return input_port_read(machine, "LIGHTY") & ~0x01;
+	return input_port_read(machine(), "LIGHTY") & ~0x01;
 }
 
-static UINT8 c64_lightpen_button_cb( running_machine &machine )
+READ8_MEMBER( c64_state::c64_lightpen_button_cb )
 {
-	return input_port_read(machine, "OTHER") & 0x04;
+	return input_port_read(machine(), "OTHER") & 0x04;
 }
 
-static int c64_dma_read( running_machine &machine, int offset )
+READ8_MEMBER( c64_state::c64_dma_read )
 {
-	c64_state *state = machine.driver_data<c64_state>();
-	if (!state->m_game && state->m_exrom)
+	if (!m_game && m_exrom)
 	{
 		if (offset < 0x3000)
-			return state->m_memory[offset];
+			return m_memory[offset];
 
-		return state->m_c64_romh[offset & 0x1fff];
+		return m_c64_romh[offset & 0x1fff];
 	}
 
-	if (((state->m_vicaddr - state->m_memory + offset) & 0x7000) == 0x1000)
-		return state->m_chargen[offset & 0xfff];
+	if (((m_vicaddr - m_memory + offset) & 0x7000) == 0x1000)
+		return m_chargen[offset & 0xfff];
 
-	return state->m_vicaddr[offset];
+	return m_vicaddr[offset];
 }
 
-static int c64_dma_read_ultimax( running_machine &machine, int offset )
+READ8_MEMBER( c64_state::c64_dma_read_ultimax )
 {
-	c64_state *state = machine.driver_data<c64_state>();
 	if (offset < 0x3000)
-		return state->m_memory[offset];
+		return m_memory[offset];
 
-	return state->m_c64_romh[offset & 0x1fff];
+	return m_c64_romh[offset & 0x1fff];
 }
 
-static int c64_dma_read_color( running_machine &machine, int offset )
+READ8_MEMBER( c64_state::c64_dma_read_color )
 {
-	c64_state *state = machine.driver_data<c64_state>();
-	return state->m_colorram[offset & 0x3ff] & 0xf;
+	return m_colorram[offset & 0x3ff] & 0xf;
 }
 
-static UINT8 c64_rdy_cb( running_machine &machine )
+READ8_MEMBER( c64_state::c64_rdy_cb )
 {
-	return input_port_read(machine, "CYCLES") & 0x07;
+	return input_port_read(machine(), "CYCLES") & 0x07;
 }
 
 static const vic2_interface c64_vic2_ntsc_intf = {
 	"screen",
 	"maincpu",
 	VIC6567,
-	c64_lightpen_x_cb,
-	c64_lightpen_y_cb,
-	c64_lightpen_button_cb,
-	c64_dma_read,
-	c64_dma_read_color,
-	c64_vic_interrupt,
-	c64_rdy_cb
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read_color),
+	DEVCB_DRIVER_LINE_MEMBER(c64_state, c64_vic_interrupt),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_rdy_cb)
 };
 
 static const vic2_interface c64_vic2_pal_intf = {
 	"screen",
 	"maincpu",
 	VIC6569,
-	c64_lightpen_x_cb,
-	c64_lightpen_y_cb,
-	c64_lightpen_button_cb,
-	c64_dma_read,
-	c64_dma_read_color,
-	c64_vic_interrupt,
-	c64_rdy_cb
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read_color),
+	DEVCB_DRIVER_LINE_MEMBER(c64_state, c64_vic_interrupt),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_rdy_cb)
 };
 
 static const vic2_interface ultimax_vic2_intf = {
 	"screen",
 	"maincpu",
 	VIC6567,
-	c64_lightpen_x_cb,
-	c64_lightpen_y_cb,
-	c64_lightpen_button_cb,
-	c64_dma_read_ultimax,
-	c64_dma_read_color,
-	c64_vic_interrupt,
-	c64_rdy_cb
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read_ultimax),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read_color),
+	DEVCB_DRIVER_LINE_MEMBER(c64_state, c64_vic_interrupt),
+	DEVCB_DRIVER_MEMBER(c64_state, c64_rdy_cb)
 };
 
 static C64_EXPANSION_INTERFACE( c64_expansion_intf )
@@ -676,9 +673,7 @@ static C64_EXPANSION_INTERFACE( c64_expansion_intf )
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
 	DEVCB_NULL, // DMA
-	DEVCB_NULL, // RESET
-	DEVCB_NULL, // GAME
-	DEVCB_NULL  // EXROM
+	DEVCB_NULL // RESET
 };
 
 
@@ -1092,7 +1087,7 @@ ROM_END
 COMP(1982, max,		0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (NTSC)", 0)
-COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64 (PAL)",  0)
+//COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64 (PAL)",  0)
 COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (Japan)", 0)
 COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines", "VIC 64S", 0)
 COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines", "Commodore 64 (Sweden/Finland)", 0)

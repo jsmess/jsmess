@@ -184,15 +184,14 @@ static void c128_cia0_interrupt( device_t *device, int level )
 	c128_irq(device->machine(), level || state->m_vicirq);
 }
 
-void c128_vic_interrupt( running_machine &machine, int level )
+WRITE_LINE_MEMBER( c128_state::vic_interrupt )
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	device_t *cia_0 = machine.device("cia_0");
+	device_t *cia_0 = machine().device("cia_0");
 #if 1
-	if (level != state->m_vicirq)
+	if (state  != m_vicirq)
 	{
-		c128_irq (machine, level || mos6526_irq_r(cia_0));
-		state->m_vicirq = level;
+		c128_irq (machine(), state || mos6526_irq_r(cia_0));
+		m_vicirq = state;
 	}
 #endif
 }
@@ -1030,38 +1029,36 @@ WRITE8_HANDLER( c128_write_ff05 )
  * a15 and a14 portlines
  * 0x1000-0x1fff, 0x9000-0x9fff char rom
  */
-int c128_dma_read(running_machine &machine, int offset)
+READ8_MEMBER( c128_state::vic_dma_read )
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	UINT8 c64_port6510 = m6510_get_port(machine.device<legacy_cpu_device>("m8502"));
+	UINT8 c64_port6510 = m6510_get_port(machine().device<legacy_cpu_device>("m8502"));
 
 	/* main memory configuration to include */
-	if (state->m_c64mode)
+	if (m_c64mode)
 	{
-		if (!state->m_game && state->m_exrom)
+		if (!m_game && m_exrom)
 		{
 			if (offset < 0x3000)
-				return state->m_memory[offset];
-			return state->m_romh[offset & 0x1fff];
+				return m_memory[offset];
+			return m_romh[offset & 0x1fff];
 		}
-		if (((state->m_vicaddr - state->m_memory + offset) & 0x7000) == 0x1000)
-			return state->m_chargen[offset & 0xfff];
-		return state->m_vicaddr[offset];
+		if (((m_vicaddr - m_memory + offset) & 0x7000) == 0x1000)
+			return m_chargen[offset & 0xfff];
+		return m_vicaddr[offset];
 	}
-	if (!(c64_port6510 & 4) && (((state->m_c128_vicaddr - state->m_memory + offset) & 0x7000) == 0x1000))
-		return state->m_c128_chargen[offset & 0xfff];
-	return state->m_c128_vicaddr[offset];
+	if (!(c64_port6510 & 4) && (((m_c128_vicaddr - m_memory + offset) & 0x7000) == 0x1000))
+		return m_c128_chargen[offset & 0xfff];
+	return m_c128_vicaddr[offset];
 }
 
-int c128_dma_read_color(running_machine &machine, int offset)
+READ8_MEMBER( c128_state::vic_dma_read_color )
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	UINT8 c64_port6510 = m6510_get_port(machine.device<legacy_cpu_device>("m8502"));
+	UINT8 c64_port6510 = m6510_get_port(machine().device<legacy_cpu_device>("m8502"));
 
-	if (state->m_c64mode)
-		return state->m_colorram[offset & 0x3ff] & 0xf;
+	if (m_c64mode)
+		return m_colorram[offset & 0x3ff] & 0xf;
 	else
-		return state->m_colorram[(offset & 0x3ff)|((c64_port6510 & 0x3) << 10)] & 0xf;
+		return m_colorram[(offset & 0x3ff)|((c64_port6510 & 0x3) << 10)] & 0xf;
 }
 
 /* 2008-09-01
