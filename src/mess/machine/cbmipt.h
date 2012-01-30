@@ -89,6 +89,7 @@ extern const slot_interface slot_interface_cbm_iec_devices[];
 extern const slot_interface slot_interface_cbm_ieee488_devices[];
 extern const slot_interface slot_interface_vic20_expansion_cards[];
 extern const slot_interface slot_interface_c64_expansion_cards[];
+extern const slot_interface slot_interface_c64_user_port_cards[];
 
 
 
