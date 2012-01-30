@@ -70,9 +70,9 @@ assumes that the floppy devices are either at root level or at the parent
 level. Our floppy devices, however, are at the grandparent level as seen from
 the controller. */
 
-#define PFLOPPY_0 "peribox:floppy0"
-#define PFLOPPY_1 "peribox:floppy1"
-#define PFLOPPY_2 "peribox:floppy2"
+#define PFLOPPY_0 ":peribox:floppy0"
+#define PFLOPPY_1 ":peribox:floppy1"
+#define PFLOPPY_2 ":peribox:floppy2"
 
 INLINE ti99_fdc_state *get_safe_token(device_t *device)
 {
