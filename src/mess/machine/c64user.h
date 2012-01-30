@@ -89,12 +89,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( pa2_r );
 	DECLARE_WRITE_LINE_MEMBER( pa2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
-
 	DECLARE_WRITE_LINE_MEMBER( sp1_w );
 	DECLARE_WRITE_LINE_MEMBER( cnt1_w );
 	DECLARE_WRITE_LINE_MEMBER( sp2_w );
 	DECLARE_WRITE_LINE_MEMBER( cnt2_w );
 	DECLARE_WRITE_LINE_MEMBER( flag2_w );
+	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
@@ -134,6 +134,7 @@ public:
 	virtual void c64_pc2_w(int level) { };
 	virtual void c64_cnt2_w(int level) { };
 	virtual void c64_sp2_w(int level) { };
+	virtual void c64_atn_w(int level) { };
 
 	// reset
 	virtual void c64_reset_w(int level) { };
