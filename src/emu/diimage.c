@@ -1106,10 +1106,12 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 	image = _image;
 
 	sld = 0;
-	software_list_device_iterator iter(machine.config().root_device());
-	for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
-	{
-		if (strcmp(swlist->list_name(),image->software_list_name())==0) sld = swlist;
+	if (image->software_list_name()) {
+		software_list_device_iterator iter(machine.config().root_device());	
+		for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
+		{
+			if (strcmp(swlist->list_name(),image->software_list_name())==0) sld = swlist;
+		}
 	}
 	swi = image->software_entry();
 	swp = image->part_entry();
