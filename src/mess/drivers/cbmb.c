@@ -344,24 +344,37 @@ static SCREEN_UPDATE_IND16( p500 )
 	return 0;
 }
 
-static UINT8 cbmb_lightpen_x_cb( running_machine &machine )
+READ8_MEMBER( cbmb_state::vic_lightpen_x_cb )
 {
-	return input_port_read(machine, "LIGHTX") & ~0x01;
+	return input_port_read(machine(), "LIGHTX") & ~0x01;
 }
 
-static UINT8 cbmb_lightpen_y_cb( running_machine &machine )
+READ8_MEMBER( cbmb_state::vic_lightpen_y_cb )
 {
-	return input_port_read(machine, "LIGHTY") & ~0x01;
+	return input_port_read(machine(), "LIGHTY") & ~0x01;
 }
 
-static UINT8 cbmb_lightpen_button_cb( running_machine &machine )
+READ8_MEMBER( cbmb_state::vic_lightpen_button_cb )
 {
-	return input_port_read(machine, "OTHER") & 0x04;
+	return input_port_read(machine(), "OTHER") & 0x04;
 }
 
-static UINT8 cbmb_rdy_cb( running_machine &machine )
+READ8_MEMBER( cbmb_state::vic_dma_read )
 {
-	return input_port_read(machine, "CTRLSEL") & 0x08;
+	if (offset >= 0x1000)
+		return m_videoram[offset & 0x3ff];
+	else
+		return m_chargen[offset & 0xfff];
+}
+
+READ8_MEMBER( cbmb_state::vic_dma_read_color )
+{
+	return m_colorram[offset & 0x3ff];
+}
+
+READ8_MEMBER( cbmb_state::vic_rdy_cb )
+{
+	return input_port_read(machine(), "CTRLSEL") & 0x08;
 }
 
 
@@ -369,13 +382,13 @@ static const vic2_interface p500_vic2_intf = {
 	"screen",
 	"maincpu",
 	VIC6567,
-	cbmb_lightpen_x_cb,
-	cbmb_lightpen_y_cb,
-	cbmb_lightpen_button_cb,
-	cbmb_dma_read,
-	cbmb_dma_read_color,
-	NULL,
-	cbmb_rdy_cb
+	DEVCB_DRIVER_MEMBER(cbmb_state, vic_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(cbmb_state, vic_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(cbmb_state, vic_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(cbmb_state, vic_dma_read),
+	DEVCB_DRIVER_MEMBER(cbmb_state, vic_dma_read_color),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(cbmb_state, vic_rdy_cb)
 };
 
 /*************************************

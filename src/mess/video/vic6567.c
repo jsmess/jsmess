@@ -149,19 +149,19 @@ struct _vic2_state
 	UINT8 device_suspended;
 
 	/* DMA */
-	vic2_dma_read          dma_read;
-	vic2_dma_read_color    dma_read_color;
+	devcb_resolved_read8          in_dma_read_func;
+	devcb_resolved_read8    in_dma_read_color_func;
 
 	/* IRQ */
-	vic2_irq               interrupt;
+	devcb_resolved_write_line               out_interrupt_func;
 
 	/* RDY */
-	vic2_rdy_callback      rdy_workaround_cb;
+	devcb_resolved_read8      in_rdy_workaround_func;
 
 	/* lightpen */
-	vic2_lightpen_button_callback lightpen_button_cb;
-	vic2_lightpen_x_callback lightpen_x_cb;
-	vic2_lightpen_y_callback lightpen_y_cb;
+	devcb_resolved_read8 in_lightpen_button_func;
+	devcb_resolved_read8 in_lightpen_x_func;
+	devcb_resolved_read8 in_lightpen_y_func;
 };
 
 
@@ -193,9 +193,9 @@ struct _vic2_state
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 
-#define LIGHTPEN_BUTTON		(vic2->lightpen_button_cb(machine))
-#define LIGHTPEN_X_VALUE	(vic2->lightpen_x_cb(machine))
-#define LIGHTPEN_Y_VALUE	(vic2->lightpen_y_cb(machine))
+#define LIGHTPEN_BUTTON		(vic2->in_lightpen_button_func(0))
+#define LIGHTPEN_X_VALUE	(vic2->in_lightpen_x_func(0))
+#define LIGHTPEN_Y_VALUE	(vic2->in_lightpen_y_func(0))
 
 /* lightpen delivers values from internal counters; they do not start with the visual area or frame area */
 #define VIC2_MAME_XPOS			0
@@ -291,7 +291,7 @@ static void vic2_set_interrupt( running_machine &machine, int mask, vic2_state *
 		{
 			DBG_LOG(2, "vic2", ("irq start %.2x\n", mask));
 			vic2->reg[0x19] |= 0x80;
-			vic2->interrupt(machine, 1);
+			vic2->out_interrupt_func(1);
 		}
 	}
 	vic2->reg[0x19] |= mask;
@@ -304,7 +304,7 @@ static void vic2_clear_interrupt( running_machine &machine, int mask, vic2_state
 	{
 		DBG_LOG(2, "vic2", ("irq end %.2x\n", mask));
 		vic2->reg[0x19] &= ~0x80;
-		vic2->interrupt(machine, 0);
+		vic2->out_interrupt_func(0);
 	}
 }
 
@@ -340,13 +340,13 @@ static TIMER_CALLBACK( vic2_timer_timeout )
 // Idle access
 INLINE void vic2_idle_access( running_machine &machine, vic2_state *vic2 )
 {
-	vic2->dma_read(machine, 0x3fff);
+	vic2->in_dma_read_func(0x3fff);
 }
 
 // Fetch sprite data pointer
 INLINE void vic2_spr_ptr_access( running_machine &machine, vic2_state *vic2, int num )
 {
-	vic2->spr_ptr[num] = vic2->dma_read(machine, SPRITE_ADDR(num)) << 6;
+	vic2->spr_ptr[num] = vic2->in_dma_read_func(SPRITE_ADDR(num)) << 6;
 }
 
 // Fetch sprite data, increment data counter
@@ -354,7 +354,7 @@ INLINE void vic2_spr_data_access( running_machine &machine, vic2_state *vic2, in
 {
 	if (vic2->spr_dma_on & (1 << num))
 	{
-		vic2->spr_data[num][bytenum] = vic2->dma_read(machine, (vic2->mc[num] & 0x3f) | vic2->spr_ptr[num]);
+		vic2->spr_data[num][bytenum] = vic2->in_dma_read_func((vic2->mc[num] & 0x3f) | vic2->spr_ptr[num]);
 		vic2->mc[num]++;
 	}
 	else
@@ -375,7 +375,7 @@ INLINE void vic2_suspend_cpu( running_machine &machine, vic2_state *vic2 )
 	if (vic2->device_suspended == 0)
 	{
 		vic2->first_ba_cycle = vic2->cycles_counter;
-		if ((vic2->rdy_workaround_cb != NULL) && (vic2->rdy_workaround_cb(machine) != 7 ))
+		if (vic2->in_rdy_workaround_func(0) != 7 )
 		{
 //          device_suspend(machine.firstcpu, SUSPEND_REASON_SPIN, 0);
 		}
@@ -388,10 +388,7 @@ INLINE void vic2_resume_cpu( running_machine &machine, vic2_state *vic2 )
 {
 	if (vic2->device_suspended == 1)
 	{
-		if ((vic2->rdy_workaround_cb != NULL))
-		{
-//  device_resume(machine.firstcpu, SUSPEND_REASON_SPIN);
-		}
+	//  device_resume(machine.firstcpu, SUSPEND_REASON_SPIN);
 		vic2->device_suspended = 0;
 	}
 }
@@ -399,7 +396,7 @@ INLINE void vic2_resume_cpu( running_machine &machine, vic2_state *vic2 )
 // Refresh access
 INLINE void vic2_refresh_access( running_machine &machine, vic2_state *vic2 )
 {
-	vic2->dma_read(machine, 0x3f00 | vic2->ref_cnt--);
+	vic2->in_dma_read_func(0x3f00 | vic2->ref_cnt--);
 }
 
 
@@ -458,8 +455,8 @@ INLINE void vic2_matrix_access( running_machine &machine, vic2_state *vic2 )
 		else
 		{
 			UINT16 adr = (vic2->vc & 0x03ff) | VIDEOADDR;
-			vic2->matrix_line[vic2->ml_index] = vic2->dma_read(machine, adr); \
-			vic2->color_line[vic2->ml_index] = vic2->dma_read_color(machine, (adr & 0x03ff)); \
+			vic2->matrix_line[vic2->ml_index] = vic2->in_dma_read_func(adr); \
+			vic2->color_line[vic2->ml_index] = vic2->in_dma_read_color_func((adr & 0x03ff)); \
 		}
 	}
 }
@@ -476,7 +473,7 @@ INLINE void vic2_graphics_access( running_machine &machine, vic2_state *vic2 )
 			adr = (vic2->matrix_line[vic2->ml_index] << 3) | vic2->chargenaddr | vic2->rc;
 		if (ECMON)
 			adr &= 0xf9ff;
-		vic2->gfx_data = vic2->dma_read(machine, adr);
+		vic2->gfx_data = vic2->in_dma_read_func(adr);
 		vic2->char_data = vic2->matrix_line[vic2->ml_index];
 		vic2->color_data = vic2->color_line[vic2->ml_index];
 		vic2->ml_index++;
@@ -484,7 +481,7 @@ INLINE void vic2_graphics_access( running_machine &machine, vic2_state *vic2 )
 	}
 	else
 	{
-		vic2->gfx_data = vic2->dma_read(machine, (ECMON ? 0x39ff : 0x3fff));
+		vic2->gfx_data = vic2->in_dma_read_func((ECMON ? 0x39ff : 0x3fff));
 		vic2->char_data = 0;
 	}
 }
@@ -1235,7 +1232,7 @@ if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3
 
 		vic2->raster_x = 0xfffc;
 
-		if ((vic2->rdy_workaround_cb(machine) == 0 ) && (vic2->is_bad_line))
+		if ((vic2->in_rdy_workaround_func(0) == 0 ) && (vic2->is_bad_line))
 			vic2->rdy_cycles += (43+adjust(0));
 
 		vic2->cycle++;
@@ -1250,7 +1247,7 @@ if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3
 
 		vic2->vc = vic2->vc_base;
 
-		if ((vic2->rdy_workaround_cb(machine) == 1 ) && (vic2->is_bad_line))
+		if ((vic2->in_rdy_workaround_func(0) == 1 ) && (vic2->is_bad_line))
 			vic2->rdy_cycles += (42+adjust(0));
 
 		vic2->cycle++;
@@ -1270,7 +1267,7 @@ if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3
 		vic2->ml_index = 0;
 		vic2_matrix_access(machine, vic2);
 
-		if ((vic2->rdy_workaround_cb(machine) == 2 ) && (vic2->is_bad_line))
+		if ((vic2->in_rdy_workaround_func(0) == 2 ) && (vic2->is_bad_line))
 			vic2->rdy_cycles += (41+adjust(0));
 
 		vic2->cycle++;
@@ -1294,7 +1291,7 @@ if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3
 
 		vic2_matrix_access(machine, vic2);
 
-		if ((vic2->rdy_workaround_cb(machine) == 3 ) && (vic2->is_bad_line))
+		if ((vic2->in_rdy_workaround_func(0) == 3 ) && (vic2->is_bad_line))
 			vic2->rdy_cycles += (40+adjust(0));
 
 		vic2->cycle++;
@@ -1331,7 +1328,7 @@ if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3
 		vic2_fetch_if_bad_line(vic2);
 		vic2_matrix_access(machine, vic2);
 
-		if ((vic2->rdy_workaround_cb(machine) == 4 ) && (vic2->is_bad_line))
+		if ((vic2->in_rdy_workaround_func(0) == 4 ) && (vic2->is_bad_line))
 			vic2->rdy_cycles += (40+adjust(0));
 
 		vic2->cycle++;
@@ -2601,6 +2598,15 @@ static DEVICE_START( vic2 )
 	int width, height;
 	int i;
 
+	// resolve callbacks
+	vic2->in_lightpen_x_func.resolve(intf->in_x_cb, *device);
+	vic2->in_lightpen_y_func.resolve(intf->in_y_cb, *device);
+	vic2->in_lightpen_button_func.resolve(intf->in_button_cb, *device);
+	vic2->in_dma_read_func.resolve(intf->in_dma_read_cb, *device);
+	vic2->in_dma_read_color_func.resolve(intf->in_dma_read_color_cb, *device);
+	vic2->out_interrupt_func.resolve(intf->out_irq_cb, *device);
+	vic2->in_rdy_workaround_func.resolve(intf->in_rdy_cb, *device);
+
 	vic2->cpu = device->machine().device(intf->cpu);
 
 	vic2->screen = device->machine().device<screen_device>(intf->screen);
@@ -2610,16 +2616,6 @@ static DEVICE_START( vic2 )
 	vic2->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
 
 	vic2->type = intf->type;
-
-	vic2->dma_read = intf->dma_read;
-	vic2->dma_read_color = intf->dma_read_color;
-	vic2->interrupt = intf->irq;
-
-	vic2->rdy_workaround_cb = intf->rdy_cb;
-
-	vic2->lightpen_button_cb = intf->button_cb;
-	vic2->lightpen_x_cb = intf->x_cb;
-	vic2->lightpen_y_cb = intf->y_cb;
 
 	// immediately call the timer to handle the first line
 	if (vic2->type == VIC6569 || vic2->type == VIC8566)

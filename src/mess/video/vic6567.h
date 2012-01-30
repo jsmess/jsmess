@@ -14,16 +14,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*vic2_lightpen_x_callback)(running_machine &machine);
-typedef UINT8 (*vic2_lightpen_y_callback)(running_machine &machine);
-typedef UINT8 (*vic2_lightpen_button_callback)(running_machine &machine);
-
-typedef int (*vic2_dma_read)(running_machine &machine, int);
-typedef int (*vic2_dma_read_color)(running_machine &machine, int);
-typedef void (*vic2_irq) (running_machine&, int);
-
-typedef UINT8 (*vic2_rdy_callback)(running_machine &machine);
-
 typedef enum
 {
 	VIC6567,	// VIC II NTSC
@@ -35,20 +25,20 @@ typedef enum
 typedef struct _vic2_interface vic2_interface;
 struct _vic2_interface
 {
-	const char         *screen;
-	const char         *cpu;
+	const char			*screen;
+	const char			*cpu;
 
 	vic2_type type;
 
-	vic2_lightpen_x_callback        x_cb;
-	vic2_lightpen_y_callback        y_cb;
-	vic2_lightpen_button_callback   button_cb;
+	devcb_read8			in_x_cb;
+	devcb_read8			in_y_cb;
+	devcb_read8			in_button_cb;
 
-	vic2_dma_read          dma_read;
-	vic2_dma_read_color    dma_read_color;
-	vic2_irq               irq;
+	devcb_read8			in_dma_read_cb;
+	devcb_read8    		in_dma_read_color_cb;
+	devcb_write_line	out_irq_cb;
 
-	vic2_rdy_callback        rdy_cb;
+	devcb_read8			in_rdy_cb;
 };
 
 /***************************************************************************

@@ -26,6 +26,13 @@ public:
 
 	required_device<ieee488_device> m_ieee;
 
+	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
+	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
+	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
+	DECLARE_READ8_MEMBER( vic_dma_read );
+	DECLARE_READ8_MEMBER( vic_dma_read_color );
+	DECLARE_READ8_MEMBER( vic_rdy_cb );
+
 	/* keyboard lines */
 	int m_cbmb_keyline_a;
 	int m_cbmb_keyline_b;

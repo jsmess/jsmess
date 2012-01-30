@@ -276,21 +276,6 @@ WRITE8_HANDLER( cbmb_colorram_w )
 	state->m_colorram[offset] = data | 0xf0;
 }
 
-int cbmb_dma_read( running_machine &machine, int offset )
-{
-	cbmb_state *state = machine.driver_data<cbmb_state>();
-	if (offset >= 0x1000)
-		return state->m_videoram[offset & 0x3ff];
-	else
-		return state->m_chargen[offset & 0xfff];
-}
-
-int cbmb_dma_read_color( running_machine &machine, int offset )
-{
-	cbmb_state *state = machine.driver_data<cbmb_state>();
-	return state->m_colorram[offset & 0x3ff];
-}
-
 WRITE_LINE_DEVICE_HANDLER( cbmb_change_font )
 {
 	cbmb_vh_set_font(device->machine(), state);
