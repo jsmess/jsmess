@@ -498,14 +498,14 @@ static void svga_vh_rgb8(running_machine &machine, bitmap_rgb32 &bitmap, const r
 			addr %= vga.svga_intf.vram_size;
 			for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
 			{
-				if(pos + 0x08 > 0x80000)
+				if(pos + 0x08 > 0x100000)
 					return;
 
 				for(xi=0;xi<8;xi++)
 				{
 					if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 						continue;
-					bitmapline[c+xi] = machine.pens[vga.memory[(pos+(xi))|0x80000]];
+					bitmapline[c+xi] = machine.pens[vga.memory[(pos+(xi))]];
 				}
 			}
 		}
@@ -1652,7 +1652,7 @@ READ8_HANDLER( tseng_mem_r )
 	if(svga.rgb8_en)
 	{
 		offset &= 0xffff;
-		return vga.memory[(offset+svga.bank_r*0x10000) | 0x80000];
+		return vga.memory[(offset+svga.bank_r*0x10000)];
 	}
 
 	return vga_mem_r(space,offset);
@@ -1663,7 +1663,7 @@ WRITE8_HANDLER( tseng_mem_w )
 	if(svga.rgb8_en)
 	{
 		offset &= 0xffff;
-		vga.memory[(offset+svga.bank_w*0x10000) | 0x80000] = data;
+		vga.memory[(offset+svga.bank_w*0x10000)] = data;
 	}
 	else
 		vga_mem_w(space,offset,data);
