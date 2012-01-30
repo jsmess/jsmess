@@ -1087,7 +1087,7 @@ ROM_END
 COMP(1982, max,		0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (NTSC)", 0)
-//COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64 (PAL)",  0)
+COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64 (PAL)",  0)
 COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (Japan)", 0)
 COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines", "VIC 64S", 0)
 COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines", "Commodore 64 (Sweden/Finland)", 0)
