@@ -1753,7 +1753,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 			new_part++;
 		}
 		*list_name = auto_strdup( image->device().machine(), swlist_name );
-	
+
 		/* Tell the world which part we actually loaded */
 		*full_sw_name = auto_alloc_array( image->device().machine(), char, strlen(swlist_name) + strlen(software_info_ptr->shortname) + strlen(software_part_ptr->name) + 3 );
 		sprintf( *full_sw_name, "%s:%s:%s", swlist_name, software_info_ptr->shortname, software_part_ptr->name );
