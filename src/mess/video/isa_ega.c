@@ -487,6 +487,48 @@ ROM_START( ega )
 	ROM_REGION(0x4000, "user2", ROMREGION_ERASE00)
 ROM_END
 
+/*
+0000 - MONOC PRIMARY, EGA COLOR, 40x25
+0001 - MONOC PRIMARY, EGA COLOR, 80x25
+0010 - MONOC PRIMARY, EGA HI RES EMULATE (SAME AS 0001)
+0011 - MONOC PRIMARY, EGA HI RES ENHANCED
+0100 - COLOR 40 PRIMARY, EGA MONOCHROME
+0101 - COLOR 80 PRIMARY, EGA MONOCHROME
+
+0110 - MONOC SECONDARY, EGA COLOR, 40x24
+0111 - MONOC SECONDARY, EGA COLOR, 80x25
+1000 - MONOC SECONDARY, EGA HI RES EMULATE (SAME AS 0111)
+1001 - MONOC SECONDARY, EGA HI RES ENHANCED
+1010 - COLOR 40 SECONDARY, EGA
+1011 - COLOR 80 SECONDARY, EGA
+
+1100 - RESERVED
+1101 - RESERVED
+1110 - RESERVED
+1111 - RESERVED
+*/
+
+INPUT_PORTS_START( ega )
+	PORT_START( "config" )
+	PORT_CONFNAME( 0x0f, 0x0e, "dipswitches" )
+	PORT_CONFSETTING( 0x00, "0000 - MDA PRIMARY, EGA COLOR, 40x25" )
+	PORT_CONFSETTING( 0x08, "0001 - MDA PRIMARY, EGA COLOR, 80x25" )
+	PORT_CONFSETTING( 0x04, "0010 - MDA PRIMARY, EGA HI RES EMULATE (SAME AS 0001)" )
+	PORT_CONFSETTING( 0x0c, "0011 - MDA PRIMARY, EGA HI RES ENHANCED" )
+	PORT_CONFSETTING( 0x02, "0100 - CGA 40 PRIMARY, EGA MONOCHROME" )
+	PORT_CONFSETTING( 0x0a, "0101 - CGA 80 PRIMARY, EGA MONOCHROME" )
+	PORT_CONFSETTING( 0x06, "0110 - MDA SECONDARY, EGA COLOR, 40x25" )
+	PORT_CONFSETTING( 0x0e, "0111 - MDA SECONDARY, EGA COLOR, 80x25" )
+	PORT_CONFSETTING( 0x01, "1000 - MDA SECONDARY, EGA HI RES EMULATE (SAME AS 0111)" )
+	PORT_CONFSETTING( 0x09, "1001 - MDA SECONDARY, EGA HI RES ENHANCED" )
+	PORT_CONFSETTING( 0x05, "1010 - COLOR 40 SECONDARY, EGA" )
+	PORT_CONFSETTING( 0x0d, "1011 - COLOR 80 SECONDARY, EGA" )
+	PORT_CONFSETTING( 0x03, "1100 - RESERVED" )
+	PORT_CONFSETTING( 0x0b, "1101 - RESERVED" )
+	PORT_CONFSETTING( 0x07, "1110 - RESERVED" )
+	PORT_CONFSETTING( 0x0f, "1111 - RESERVED" )
+INPUT_PORTS_END
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -511,6 +553,11 @@ machine_config_constructor isa8_ega_device::device_mconfig_additions() const
 const rom_entry *isa8_ega_device::device_rom_region() const
 {
 	return ROM_NAME( ega );
+}
+
+ioport_constructor isa8_ega_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ega );
 }
 
 //**************************************************************************
@@ -730,6 +777,11 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 		UINT16	fg = ega->m_attribute.data[ attr & 0x0F ];
 		UINT16	bg = ega->m_attribute.data[ attr >> 4 ];
 
+		if ( i == cursor_x && ega->m_frame_cnt & 0x08 )
+		{
+			data = 0xFF;
+		}
+
 		*p = ( data & 0x80 ) ? fg : bg; p++;
 		*p = ( data & 0x40 ) ? fg : bg; p++;
 		*p = ( data & 0x20 ) ? fg : bg; p++;
@@ -912,27 +964,6 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3d0_w )
 
 READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 {
-	UINT8	dips = 0x0e; // bits in reverse order 0111 == > 1110
-/*
-0000 - MONOC PRIMARY, EGA COLOR, 40x25
-0001 - MONOC PRIMARY, EGA COLOR, 80x25
-0010 - MONOC PRIMARY, EGA HI RES EMULATE (SAME AS 0001)
-0011 - MONOC PRIMARY, EGA HI RES ENHANCED
-0100 - COLOR 40 PRIMARY, EGA MONOCHROME
-0101 - COLOR 80 PRIMARY, EGA MONOCHROME
-
-0110 - MONOC SECONDARY, EGA COLOR, 40x24
-0111 - MONOC SECONDARY, EGA COLOR, 80x25
-1000 - MONOC SECONDARY, EGA HI RES EMULATE (SAME AS 0111)
-1001 - MONOC SECONDARY, EGA HI RES ENHANCED
-1010 - COLOR 40 SECONDARY, EGA
-1011 - COLOR 80 SECONDARY, EGA
-
-1100 - RESERVED
-1101 - RESERVED
-1110 - RESERVED
-1111 - RESERVED
-*/
 	int data = 0xff;
 
 	if ( VERBOSE_EGA )
@@ -948,10 +979,14 @@ READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 
 	/* Feature Read */
 	case 2:
-		data = ( data & 0x0f );
-		data |= ( ( m_feature_control & 0x03 ) << 5 );
-		data |= ( m_vsync ? 0x00 : 0x80 );
-		data |= ( ( ( dips >> ( ( ( m_misc_output & 0x0c ) >> 2 ) ) ) & 0x01 ) << 4 );
+		{
+			UINT8 dips = input_port_read(*this, "config" );
+
+			data = ( data & 0x0f );
+			data |= ( ( m_feature_control & 0x03 ) << 5 );
+			data |= ( m_vsync ? 0x00 : 0x80 );
+			data |= ( ( ( dips >> ( ( ( m_misc_output & 0x0c ) >> 2 ) ) ) & 0x01 ) << 4 );
+		}
 		break;
 
 	/* Sequencer */
