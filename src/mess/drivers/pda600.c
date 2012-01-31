@@ -56,23 +56,34 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "machine/nvram.h"
+#include "rendlay.h"
 
 
 class pda600_state : public driver_device
 {
 public:
 	pda600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+		{}
 
+	required_device<cpu_device> m_maincpu;
+
+	virtual void video_start();
+	virtual void machine_reset();
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	UINT8 *		m_video_ram;
 };
 
 
 static ADDRESS_MAP_START(pda600_mem, AS_PROGRAM, 8, pda600_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_RAM
-	//AM_RANGE(0x90000, 0x92fff) AM_RAM // video ram
-	AM_RANGE(0xf0000, 0xfffff) AM_RAM
+	//AM_RANGE(0x20000, 0x9ffff) AM_RAM // PCMCIA Card
+	AM_RANGE(0xa0000, 0xa7fff) AM_RAM	AM_REGION("videoram", 0)
+	AM_RANGE(0xe0000, 0xfffff) AM_RAM	AM_REGION("mainram", 0)		AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pda600_io, AS_IO, 8, pda600_state)
@@ -90,16 +101,32 @@ static INPUT_PORTS_START( pda600 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pda600)
+void pda600_state::machine_reset()
 {
+	// the PDA600 soon after start waits for something from the Z180 CSIO, I do not know exactly for what
+	// the CSIO is used and for now I forced the CNTR End-Flag bit to 1 for allow the emulation to continue.
+	cpu_set_reg(m_maincpu, Z180_CNTR, cpu_get_reg(m_maincpu, Z180_CNTR) | 0x80);
 }
 
-static VIDEO_START( pda600 )
+void pda600_state::video_start()
 {
+	m_video_ram = machine().region("videoram")->base();
 }
 
-static SCREEN_UPDATE_IND16( pda600 )
+UINT32 pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int y=0; y<320; y++)
+		for (int x=0; x<30; x++)
+		{
+			UINT8 data = m_video_ram[y*30 + x];
+
+			for (int px=0; px<8; px++)
+			{
+				bitmap.pix16(y, (x * 8) + px) = BIT(data, 7);
+				data <<= 1;
+			}
+		}
+
 	return 0;
 }
 
@@ -172,25 +199,32 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 	MCFG_CPU_PROGRAM_MAP(pda600_mem)
 	MCFG_CPU_IO_MAP(pda600_io)
 
-	MCFG_MACHINE_RESET(pda600)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
-	MCFG_VIDEO_START(pda600)
-	MCFG_SCREEN_UPDATE_STATIC(pda600)
+	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
 	MCFG_GFXDECODE(pda600)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
+
+	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
+	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pda600 )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pdarom.bin", 0x00000, 0x20000, CRC(f793a6c5) SHA1(ab14b0fdcedb927c66357368a2bfff605ba758fb))
+
+	// 128KB RAM
+	ROM_REGION( 0x20000, "mainram", ROMREGION_ERASE )
+
+	// 32KB Video RAM
+	ROM_REGION( 0x8000, "videoram", ROMREGION_ERASE )
 ROM_END
 
 /* Driver */
