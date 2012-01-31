@@ -23,6 +23,7 @@
 #include "machine/cs8221.h"
 #include "machine/pit8253.h"
 #include "video/pc_cga.h"
+#include "video/isa_cga.h"
 #include "video/isa_ega.h"
 #include "video/isa_vga.h"
 #include "video/isa_svga_s3.h"
