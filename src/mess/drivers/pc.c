@@ -1989,6 +1989,15 @@ ROM_START( pcd )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+ROM_START( olypeopl )
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD16_BYTE( "uo1271c0.bin", 0xfe000, 0x1000, CRC(c9187bce) SHA1(464e1f96046657b49afa4223ede1040650643d58))
+	ROM_LOAD16_BYTE( "uo1271d0.bin", 0xfe001, 0x1000, CRC(10e6437b) SHA1(0b77bb7a62f0a8240602f4cdcc3d6765e62894f4))
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0) /* original font rom is undumped */
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
 
 /***************************************************************************
 
@@ -2035,3 +2044,4 @@ COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga,      pccga,  
 COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga,      pccga,      "Sharp", "PC-7000", GAME_NOT_WORKING)
 
 COMP( 198?, pcd,        ibm5150,    0,          pccga,      pccga,      pccga,      "Siemens", "PC-D", GAME_NOT_WORKING)
+COMP( 198?, olypeopl,   ibm5150,    0,          pccga,      pccga,      pccga,      "Olympia", "People PC", GAME_NOT_WORKING)
