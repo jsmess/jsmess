@@ -36,8 +36,6 @@ the line_functions to be not completely correct.
 This whole part will be eventually moved to video/ once I'm satisfied (or I give up).
 */
 
-#define GET_WORD(mem, index) ((mem)[(index)]|((mem)[(index)+1]<<8))
-
 /* modes from blitter command */
 enum {
 	BACKGROUND = 0,
@@ -50,6 +48,35 @@ enum {
 	SHADOW
 };
 
+static UINT8 lynx_read_ram(lynx_state *state, UINT16 address)
+{
+	UINT8 result = 0x00;
+	if (address <= 0xfbff)
+		result = state->m_mem_0000[address - 0x0000];
+	else if (address <= 0xfcff)
+		result = state->m_mem_fc00[address - 0xfc00];
+	else if (address <= 0xfdff)
+		result = state->m_mem_fd00[address - 0xfd00];
+	else if (address <= 0xfff7)
+		result = state->m_mem_fe00[address - 0xfe00];
+	else if (address >= 0xfffa)
+		result = state->m_mem_fffa[address - 0xfffa];
+	return result;
+}
+
+static void lynx_write_ram(lynx_state *state, UINT16 address, UINT8 data)
+{
+	if (address <= 0xfbff)
+		state->m_mem_0000[address - 0x0000] = data;
+	else if (address <= 0xfcff)
+		state->m_mem_fc00[address - 0xfc00] = data;
+	else if (address <= 0xfdff)
+		state->m_mem_fd00[address - 0xfd00] = data;
+	else if (address <= 0xfff7)
+		state->m_mem_fe00[address - 0xfe00] = data;
+	else if (address >= 0xfffa)
+		state->m_mem_fffa[address - 0xfffa] = data;
+}
 
 /* The pen numbers range from '0' to 'F. Pen numbers '1' through 'D' are always collidable and opaque. The other
 ones have different behavior depending on the sprite type: there are 8 types of sprites, each has different
@@ -82,12 +109,12 @@ The sprite types relate to specific hardware functions according to the followin
 INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, const int y, const int color)
 {
 	UINT8 back;
-	UINT8 *screen;
-	UINT8 *colbuf;
+	UINT16 screen;
+	UINT16 colbuf;
 
 	state->m_blitter.everon = TRUE;
-	screen = state->m_blitter.mem + state->m_blitter.screen + y * 80 + x / 2;
-	colbuf = state->m_blitter.mem + state->m_blitter.colbuf + y * 80 + x / 2;
+	screen = state->m_blitter.screen + y * 80 + x / 2;
+	colbuf = state->m_blitter.colbuf + y * 80 + x / 2;
 
 	switch (mode&0x7)
 	{
@@ -98,27 +125,29 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
 			{
-				*screen = (*screen & 0x0f) | (color << 4);
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
 
 				if(state->m_sprite_collide)
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0xf0) | (state->m_blitter.spritenr << 4);
-					if ((back >> 4) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back >> 4;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0xf0) | (state->m_blitter.spritenr << 4));
+					if ((back >> 4) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back >> 4);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
 			else					/* Lower nibble */
 			{
-				*screen = (*screen & 0xf0) | color;
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0xf0) | color);
 
 				if(state->m_sprite_collide)
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0x0f) | (state->m_blitter.spritenr);
-					if ((back & 0x0f) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back & 0x0f;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0x0f) | (state->m_blitter.spritenr));
+					if ((back & 0x0f) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back & 0x0f);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
@@ -134,15 +163,16 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 			{
 				if (color != 0x0f)
 				{
-					*screen = (*screen & 0x0f) | (color << 4);
+					back = lynx_read_ram(state, screen);
+					lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
 					state->m_blitter.memory_accesses++;
 				}
 				if(state->m_sprite_collide)
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0xf0) | (state->m_blitter.spritenr << 4);
-					if ((back >> 4) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back >> 4;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0xf0) | (state->m_blitter.spritenr << 4));
+					if ((back >> 4) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back >> 4);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
@@ -150,15 +180,16 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 			{
 				if (color != 0x0f)
 				{
-					*screen = (*screen & 0xf0) | color;
+					back = lynx_read_ram(state, screen);
+					lynx_write_ram(state, screen, (back & 0xf0) | color);
 					state->m_blitter.memory_accesses++;
 				}
 				if(state->m_sprite_collide)
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0x0f) | (state->m_blitter.spritenr);
-					if ((back & 0x0f) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back & 0x0f;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0x0f) | (state->m_blitter.spritenr));
+					if ((back & 0x0f) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back & 0x0f);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
@@ -171,27 +202,29 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
 			{
-				*screen = (*screen & 0x0f) | (color << 4);
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
 
 				if (state->m_sprite_collide && (color != 0x0e))
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0xf0) | (state->m_blitter.spritenr << 4);
-					if ((back >> 4) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back >> 4;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0xf0) | (state->m_blitter.spritenr << 4));
+					if ((back >> 4) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back >> 4);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
 			else					/* Lower nibble */
 			{
-				*screen = (*screen & 0xf0) | color;
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0xf0) | color);
 
 				if (state->m_sprite_collide && (color != 0x0e))
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0x0f) | (state->m_blitter.spritenr);
-					if ((back & 0x0f) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back & 0x0f;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0x0f) | (state->m_blitter.spritenr));
+					if ((back & 0x0f) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back & 0x0f);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
@@ -208,15 +241,16 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 			{
 				if (color != 0x0f)
 				{
-					*screen = (*screen & 0x0f) | (color << 4);
+					back = lynx_read_ram(state, screen);
+					lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
 					state->m_blitter.memory_accesses++;
 				}
 				if (state->m_sprite_collide && (color != 0x0e))
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0xf0) | (state->m_blitter.spritenr << 4);
-					if ((back >> 4) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back >> 4;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0xf0) | (state->m_blitter.spritenr << 4));
+					if ((back >> 4) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back >> 4);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
@@ -224,15 +258,16 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 			{
 				if (color != 0x0f)
 				{
-					*screen = (*screen & 0xf0) | color;
+					back = lynx_read_ram(state, screen);
+					lynx_write_ram(state, screen, (back & 0xf0) | color);
 					state->m_blitter.memory_accesses++;
 				}
 				if (state->m_sprite_collide && (color != 0x0e))
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0x0f) | (state->m_blitter.spritenr);
-					if ((back & 0x0f) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back & 0x0f;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0x0f) | (state->m_blitter.spritenr));
+					if ((back & 0x0f) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back & 0x0f);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
@@ -246,21 +281,25 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
         and therefore not clear the collision buffer */
 			if (!(x & 0x01))		/* Upper nibble */
 			{
-				*screen = (*screen & 0x0f) | (color << 4);
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
 
 				if (state->m_sprite_collide && (color != 0x0e))
 				{
-					*colbuf = (*colbuf & ~0xf0) | (state->m_blitter.spritenr << 4);
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0xf0) | (state->m_blitter.spritenr << 4));
 					state->m_blitter.memory_accesses++;
 				}
 			}
 			else					/* Lower nibble */
 			{
-				*screen = (*screen & 0xf0) | color;
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0xf0) | color);
 
 				if (state->m_sprite_collide && (color != 0x0e))
 				{
-					*colbuf = (*colbuf & ~0x0f) | (state->m_blitter.spritenr);
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0x0f) | (state->m_blitter.spritenr));
 					state->m_blitter.memory_accesses++;
 				}
 			}
@@ -270,9 +309,15 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 		case BACKGROUND_NO_COLL:
 		/* This is a 'background' sprite with the exception that no activity occurs in the collision buffer */
 			if (!(x & 0x01))		/* Upper nibble */
-				*screen = (*screen & 0x0f) | (color << 4);
+			{
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
+			}
 			else					/* Lower nibble */
-				*screen = (*screen & 0xf0) | color;
+			{
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0xf0) | color);
+			}
 			state->m_blitter.memory_accesses++;
 			break;
 
@@ -282,9 +327,15 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 			if (color == 0)
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
-				*screen = (*screen & 0x0f) | (color << 4);
+			{
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0x0f) | (color << 4));
+			}
 			else					/* Lower nibble */
-				*screen = (*screen & 0xf0) | color;
+			{
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, (back & 0xf0) | color);
+			}
 			state->m_blitter.memory_accesses++;
 			break;
 
@@ -297,25 +348,27 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 				break;
 			if (!(x & 0x01))		/* Upper nibble */
 			{
-				*screen = (*screen)^(color<<4);
-				if (color != 0x0e)
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, back^(color << 4));
+				if (state->m_sprite_collide && (color != 0x0e))
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0xf0) | (state->m_blitter.spritenr << 4);
-					if ((back >> 4) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back >> 4;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0xf0) | (state->m_blitter.spritenr << 4));
+					if ((back >> 4) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back >> 4);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
 			else					/* Lower nibble */
 			{
-				*screen = (*screen)^color;
-				if (color != 0x0e)
+				back = lynx_read_ram(state, screen);
+				lynx_write_ram(state, screen, back^color);
+				if (state->m_sprite_collide && (color != 0x0e))
 				{
-					back = *colbuf;
-					*colbuf = (back & ~0x0f) | (state->m_blitter.spritenr);
-					if ((back & 0x0f) > state->m_blitter.mem[state->m_blitter.colpos])
-						state->m_blitter.mem[state->m_blitter.colpos] = back & 0x0f;
+					back = lynx_read_ram(state, colbuf);
+					lynx_write_ram(state, colbuf, (back & ~0x0f) | (state->m_blitter.spritenr));
+					if ((back & 0x0f) > (lynx_read_ram(state, state->m_blitter.colpos) & 0x0f))
+						lynx_write_ram(state, state->m_blitter.colpos, back & 0x0f);
 					state->m_blitter.memory_accesses += 2;
 				}
 			}
@@ -330,13 +383,13 @@ static void lynx_blit_do_work( lynx_state *state, const int y, const int xdir, c
 	int xi, bits, color;
 	UINT16 width_accum, buffer;
 
-	next_line_addr = state->m_blitter.mem[state->m_blitter.bitmap]; // offset to second sprite line
+	next_line_addr = lynx_read_ram(state, state->m_blitter.bitmap); // offset to second sprite line
 	width_accum = (xdir == 1) ? state->m_blitter.width_offset : 0;
 	state->m_blitter.memory_accesses++;
 
 	for (xi = state->m_blitter.x_pos - state->m_blitter.xoff, bits = 0, buffer = 0, j = 1; j < next_line_addr;j++)
 	{
-		buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
+		buffer = (buffer << 8) | lynx_read_ram(state, state->m_blitter.bitmap + j);
 		bits += 8; // current bits in buffer
 		state->m_blitter.memory_accesses++;
 
@@ -356,59 +409,10 @@ static void lynx_blit_do_work( lynx_state *state, const int y, const int xdir, c
 	}
 }
 
-
-static void lynx_blit_2color_line(lynx_state *state, const int y, const int xdir)
-{
-	const int bits = 1;
-	const int mask = 0x01;
-
-	lynx_blit_do_work(state, y, xdir, bits, mask);
-}
-static void lynx_blit_4color_line(lynx_state *state, const int y, const int xdir)
-{
-	const int bits = 2;
-	const int mask = 0x03;
-
-	lynx_blit_do_work(state, y, xdir, bits, mask);
-}
-static void lynx_blit_8color_line(lynx_state *state, const int y, const int xdir)
-{
-	const int bits = 3;
-	const int mask = 0x07;
-
-	lynx_blit_do_work(state, y, xdir, bits, mask);
-}
-static void lynx_blit_16color_line(lynx_state *state, const int y, const int xdir)
-{
-	const int bits = 4;
-	const int mask = 0x0f;
-
-	lynx_blit_do_work(state, y, xdir, bits, mask);
-}
-
-/*
-2 color rle: ??
- 0, 4 bit repeat count-1, 1 bit color
- 1, 4 bit count of values-1, 1 bit color, ....
-*/
-
-/*
-4 color rle:
- 0, 4 bit repeat count-1, 2 bit color
- 1, 4 bit count of values-1, 2 bit color, ....
-*/
-
-/*
-8 color rle:
- 0, 4 bit repeat count-1, 3 bit color
- 1, 4 bit count of values-1, 3 bit color, ....
-*/
-
-/*
-16 color rle:
- 0, 4 bit repeat count-1, 4 bit color
- 1, 4 bit count of values-1, 4 bit color, ....
-*/
+static void lynx_blit_2color_line(lynx_state *state, const int y, const int xdir) {lynx_blit_do_work(state, y, xdir, 1, 0x01);}
+static void lynx_blit_4color_line(lynx_state *state, const int y, const int xdir) {lynx_blit_do_work(state, y, xdir, 2, 0x03);}
+static void lynx_blit_8color_line(lynx_state *state, const int y, const int xdir) {lynx_blit_do_work(state, y, xdir, 3, 0x07);}
+static void lynx_blit_16color_line(lynx_state *state, const int y, const int xdir) {lynx_blit_do_work(state, y, xdir, 4, 0x0f);}
 
 static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int xdir, const int bits_per_pixel, const int mask )
 {
@@ -424,11 +428,11 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 		if (bits < 5 + bits_per_pixel) /* under 7 bits no complete entry */
 		{
 			j++;
-			if (j >= state->m_blitter.mem[state->m_blitter.bitmap])
+			if (j >= lynx_read_ram(state, state->m_blitter.bitmap))
 				return;
 
 			bits += 8;
-			buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
+			buffer = (buffer << 8) | lynx_read_ram(state,state->m_blitter.bitmap + j);
 			state->m_blitter.memory_accesses++;
 		}
 
@@ -444,10 +448,10 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 				if (bits < bits_per_pixel)
 				{
 					j++;
-					if (j >= state->m_blitter.mem[state->m_blitter.bitmap])
+					if (j >= lynx_read_ram(state, state->m_blitter.bitmap))
 						return;
 					bits += 8;
-					buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
+					buffer = (buffer << 8) | lynx_read_ram(state, state->m_blitter.bitmap + j);
 					state->m_blitter.memory_accesses++;
 				}
 
@@ -470,10 +474,10 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 			if (bits < bits_per_pixel)
 			{
 				j++;
-				if (j >= state->m_blitter.mem[state->m_blitter.bitmap])
+				if (j >= lynx_read_ram(state, state->m_blitter.bitmap))
 					return;
 				bits += 8;
-				buffer = (buffer << 8) | state->m_blitter.mem[state->m_blitter.bitmap + j];
+				buffer = (buffer << 8) | lynx_read_ram(state, state->m_blitter.bitmap + j);
 				state->m_blitter.memory_accesses++;
 			}
 
@@ -494,35 +498,10 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 	}
 }
 
-static void lynx_blit_2color_rle_line(lynx_state *state, const int y, const int xdir)
-{
-	const int bits = 1;
-	const int mask = 0x01;
-
-	lynx_blit_rle_do_work(state, y, xdir, bits, mask);
-}
-static void lynx_blit_4color_rle_line(lynx_state *state, const int y, const int xdir)
-{
-	const int bits = 2;
-	const int mask = 0x03;
-
-	lynx_blit_rle_do_work(state, y, xdir, bits, mask);
-}
-static void lynx_blit_8color_rle_line(lynx_state *state, const int y, const int xdir)
-{
-	const int bits = 3;
-	const int mask = 0x07;
-
-	lynx_blit_rle_do_work(state, y, xdir, bits, mask);
-}
-static void lynx_blit_16color_rle_line(lynx_state *state, const int y, const int xdir)
-{
-	const int bits = 4;
-	const int mask = 0x0f;
-
-	lynx_blit_rle_do_work(state, y, xdir, bits, mask);
-}
-
+static void lynx_blit_2color_rle_line(lynx_state *state, const int y, const int xdir) {lynx_blit_rle_do_work(state, y, xdir, 1, 0x01);}
+static void lynx_blit_4color_rle_line(lynx_state *state, const int y, const int xdir) {lynx_blit_rle_do_work(state, y, xdir, 2, 0x03);}
+static void lynx_blit_8color_rle_line(lynx_state *state, const int y, const int xdir) {lynx_blit_rle_do_work(state, y, xdir, 3, 0x07);}
+static void lynx_blit_16color_rle_line(lynx_state *state, const int y, const int xdir) {lynx_blit_rle_do_work(state, y, xdir, 4, 0x0f);}
 
 static void lynx_blit_lines(lynx_state *state)
 {
@@ -560,19 +539,17 @@ static void lynx_blit_lines(lynx_state *state)
 	if (state->m_blitter.spr_ctl0 & 0x20)	/* Horizontal Flip */
 	{
 		xdir *= -1;
-		//state->m_blitter.x_pos -= xdir; // causes blank lines in todds adventures, klax, etc
 	}
 
 	if (state->m_blitter.spr_ctl0 & 0x10)	/* Vertical Flip */
 	{
 		ydir *= -1;
-		//state->m_blitter.y_pos -= ydir; // causes blank lines in todds adventures, klax, etc
 	}
 
 	// Set height accumulator based on drawing direction
 	state->m_blitter.height_accumulator = (ydir == 1) ? state->m_blitter.height_offset : 0x00;
 
-	for (y = state->m_blitter.y_pos - state->m_blitter.yoff; (i = state->m_blitter.mem[state->m_blitter.bitmap]); state->m_blitter.bitmap += i)
+	for (y = state->m_blitter.y_pos - state->m_blitter.yoff; (i = lynx_read_ram(state, state->m_blitter.bitmap)); state->m_blitter.bitmap += i)
 	{
 		state->m_blitter.memory_accesses++;
 
@@ -598,10 +575,6 @@ static void lynx_blit_lines(lynx_state *state)
 			continue;
 		}
 
-		INT16 x = state->m_blitter.x_pos - state->m_blitter.xoff;
-		// superclipping
-		if (((x > 159) && (xdir == 1)) || ((x < 0) && (xdir == -1)) || ((y > 101) && (ydir == 1)) || ((y < 0) && (ydir == -1)))
-			continue;
 
 		state->m_blitter.height_accumulator += state->m_blitter.height;
 		for (int i=0; i < (state->m_blitter.height_accumulator>>8); i++, y += ydir)
@@ -609,7 +582,7 @@ static void lynx_blit_lines(lynx_state *state)
 			if (y >= 0 && y < 102)
 				state->m_blitter.line_function(state, y, xdir);
 			state->m_blitter.width += (INT16)state->m_blitter.stretch;
-			if (state->m_suzy.data[SPRSYS] & 0x10) // Vertical stretch enabled (doesn't seem to be used)
+			if (state->m_blitter.vstretch) // doesn't seem to be used
 			{
 				state->m_blitter.height += (INT16)state->m_blitter.stretch;
 				logerror("vertical stretch enabled");
@@ -633,7 +606,7 @@ static void lynx_blit_lines(lynx_state *state)
 static TIMER_CALLBACK(lynx_blitter_timer)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
-	state->m_suzy.data[SPRSYS] &= ~0x01; //state->m_blitter finished
+	state->m_blitter.busy=0; // blitter finished
 }
 
 /*
@@ -728,6 +701,7 @@ static void lynx_blitter(running_machine &machine)
 	lynx_blit_8color_rle_line,
 	lynx_blit_16color_rle_line
 	};
+	
 	int i; int colors;
 
 	state->m_blitter.memory_accesses = 0;
@@ -735,8 +709,8 @@ static void lynx_blitter(running_machine &machine)
 
 	// these might be never set by the state->m_blitter hardware
 	state->m_sprite_collide  = 0;
-
-	state->m_blitter.memory_accesses += 2;
+	
+	//state->m_blitter.busy = 1; // blitter working (there's a bug somewhere that's causing slowdown when this is enabled)
 
 	// Last SCB is indicated by zero in the high byte of SCBNEXT
 	while (state->m_blitter.scb_next & 0xff00)
@@ -745,31 +719,33 @@ static void lynx_blitter(running_machine &machine)
 		state->m_blitter.tilt    = 0;
 		state->m_blitter.tilt_accumulator = 0;
 
-		state->m_blitter.memory_accesses += 1;
-
 		// move to load_scb() function
 		state->m_blitter.scb = state->m_blitter.scb_next; // current scb
-		state->m_blitter.scb_next = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SCBNEXT); // next scb
-
-		state->m_blitter.spr_ctl0 = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCTL0];
-		state->m_blitter.spr_ctl1 = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCTL1];
-		state->m_blitter.spr_coll = state->m_blitter.mem[state->m_blitter.scb + SCB_SPRCOLL];
+		state->m_blitter.scb_next = lynx_read_ram(state, state->m_blitter.scb + SCB_SCBNEXT) | (lynx_read_ram(state, state->m_blitter.scb + SCB_SCBNEXT + 1) << 8); // next scb
+		state->m_blitter.spr_ctl0 = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRCTL0);
+		state->m_blitter.spr_ctl1 = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRCTL1);
+		state->m_blitter.spr_coll = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRCOLL);
+		state->m_blitter.memory_accesses += 8;
 
 		if(!(state->m_blitter.spr_ctl1 & 0x04)) // sprite will be processed (if sprite is skipped first 5 bytes are still copied to suzy)
 		{
-			state->m_blitter.bitmap = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRDLINE);
-			state->m_blitter.x_pos = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_HPOSSTRT);
-			state->m_blitter.y_pos = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_VPOSSTRT);
+			state->m_blitter.bitmap = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRDLINE) | (lynx_read_ram(state, state->m_blitter.scb + SCB_SPRDLINE + 1) << 8);
+			state->m_blitter.x_pos = lynx_read_ram(state, state->m_blitter.scb + SCB_HPOSSTRT) | (lynx_read_ram(state, state->m_blitter.scb + SCB_HPOSSTRT + 1) << 8);
+			state->m_blitter.y_pos = lynx_read_ram(state, state->m_blitter.scb + SCB_VPOSSTRT) | (lynx_read_ram(state, state->m_blitter.scb + SCB_VPOSSTRT + 1) << 8);
+			state->m_blitter.memory_accesses += 6;
 
 			switch(state->m_blitter.spr_ctl1 & 0x30) // reload sprite scaling
 			{
 				case 0x30: // width, height, tilt, stretch
-					state->m_blitter.tilt = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_TILT);
+					state->m_blitter.tilt = lynx_read_ram(state, state->m_blitter.scb + SCB_TILT) | (lynx_read_ram(state, state->m_blitter.scb + SCB_TILT + 1) << 8);
+					state->m_blitter.memory_accesses+=2;
 				case 0x20: // width, height, stretch
-					state->m_blitter.stretch = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_STRETCH);
+					state->m_blitter.stretch = lynx_read_ram(state, state->m_blitter.scb + SCB_STRETCH) | (lynx_read_ram(state, state->m_blitter.scb + SCB_STRETCH + 1) << 8);
+					state->m_blitter.memory_accesses+=2;
 				case 0x10: // width, height
-					state->m_blitter.width = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRHSIZ);
-					state->m_blitter.height = GET_WORD(state->m_blitter.mem, state->m_blitter.scb + SCB_SPRVSIZ);
+					state->m_blitter.width = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRHSIZ) | (lynx_read_ram(state, state->m_blitter.scb + SCB_SPRHSIZ + 1) << 8);
+					state->m_blitter.height = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRVSIZ) | (lynx_read_ram(state, state->m_blitter.scb + SCB_SPRVSIZ + 1) << 8);
+					state->m_blitter.memory_accesses+=4;
 			}
 
 			if(!(state->m_blitter.spr_ctl1 & 0x08)) // reload palette
@@ -783,8 +759,8 @@ static void lynx_blitter(running_machine &machine)
 
 				for (i = 0; i < colors / 2; i++)
 				{
-					state->m_blitter.color[i * 2]      = state->m_blitter.mem[state->m_blitter.scb + palette_offset + i] >> 4;
-					state->m_blitter.color[i * 2 + 1 ] = state->m_blitter.mem[state->m_blitter.scb + palette_offset + i] & 0x0f;
+					state->m_blitter.color[i * 2]      = lynx_read_ram(state, state->m_blitter.scb + palette_offset + i) >> 4;
+					state->m_blitter.color[i * 2 + 1 ] = lynx_read_ram(state, state->m_blitter.scb + palette_offset + i) & 0x0f;
 					state->m_blitter.memory_accesses++;
 				}
 			}
@@ -793,9 +769,7 @@ static void lynx_blitter(running_machine &machine)
 
 		if (!(state->m_blitter.spr_ctl1 & 0x04))		// if 0, we skip this sprite
 		{
-			state->m_blitter.colpos = state->m_blitter.scb + GET_WORD(state->m_suzy.data, COLLOFFL);
-			state->m_blitter.memory_accesses += 6;
-
+			state->m_blitter.colpos = state->m_blitter.scb + (state->m_suzy.data[COLLOFFL] | (state->m_suzy.data[COLLOFFH]<<8));
 			state->m_blitter.mode = state->m_blitter.spr_ctl0 & 0x07;
 
 			if (state->m_blitter.spr_ctl1 & 0x80) // totally literal sprite
@@ -803,7 +777,7 @@ static void lynx_blitter(running_machine &machine)
 			else
 				state->m_blitter.line_function = blit_rle_line[state->m_blitter.spr_ctl0 >> 6];
 
-			if (!(state->m_blitter.spr_coll & 0x20) && !(state->m_suzy.data[SPRSYS] & 0x20))
+			if (!(state->m_blitter.spr_coll & 0x20) && !(state->m_blitter.no_collide))
 			{
 				switch (state->m_blitter.mode)
 				{
@@ -813,7 +787,7 @@ static void lynx_blitter(running_machine &machine)
 					case XOR_SPRITE:
 					case SHADOW:
 						state->m_sprite_collide = 1;
-						state->m_blitter.mem[state->m_blitter.colpos] = 0;
+						lynx_write_ram(state, state->m_blitter.colpos, 0);
 						state->m_blitter.spritenr = state->m_blitter.spr_coll & 0x0f;
 					break;
 					case BACKGROUND:
@@ -825,11 +799,15 @@ static void lynx_blitter(running_machine &machine)
 			/* Draw Sprites */
 			lynx_blit_lines(state);
 		}
-		state->m_blitter.memory_accesses += 2;
 	}
-
-	if (0)
-		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(state->m_blitter.memory_accesses*20), FUNC(lynx_blitter_timer));
+	
+	if (0) // turned off for now as it cuases slowdown in some games due to a bug somewhere
+	{
+		if (state->m_blitter.memory_accesses != 0)
+			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(state->m_blitter.memory_accesses), FUNC(lynx_blitter_timer));
+		else
+			state->m_blitter.busy = 0; // blitter done
+	}
 }
 
 
@@ -910,7 +888,7 @@ static void lynx_multiply( lynx_state *state )
 
 	res = left * right;
 
-	if (state->m_suzy.data[SPRSYS] & 0x80)		/* signed math */
+	if (state->m_suzy.signed_math)
 	{
 		if (!(state->m_sign_AB + state->m_sign_CD))	/* different signs */
 			res = (res ^ 0xffffffff) + 1;
@@ -921,7 +899,7 @@ static void lynx_multiply( lynx_state *state )
 	state->m_suzy.data[MATH_F] = res >> 16;
 	state->m_suzy.data[MATH_E] = res >> 24;
 
-	if (state->m_suzy.data[SPRSYS] & 0x40)		/* is accumulation allowed? */
+	if (state->m_suzy.accumulate)
 	{
 		accu = state->m_suzy.data[MATH_M] | state->m_suzy.data[MATH_L] << 8 | state->m_suzy.data[MATH_K] << 16 | state->m_suzy.data[MATH_J] << 24;
 		accu += res;
@@ -1017,20 +995,16 @@ static READ8_HANDLER( suzy_read )
 		//case PROCADRL:
 		case SUZYHREV:
 			return 0x01; // must not be 0 for correct power up
-		case SPRSYS:	/* Better check this with docs! */
-			if (state->m_blitter.time==attotime::zero)
-			{
-				if (space->machine().device<cpu_device>("maincpu")->attotime_to_cycles(space->machine().time() - state->m_blitter.time) > state->m_blitter.memory_accesses * 20)
-				{
-					state->m_suzy.data[offset] &= ~0x01; //state->m_blitter finished
-					state->m_blitter.time = attotime::zero;
-				}
-			}
-			value = state->m_suzy.data[offset];
-			value &= ~0x80; // math finished
-			value &= ~0x40;
+		case SPRSYS:
+			// math busy, last carry, unsafe access, and stop on current sprite bits not implemented.
 			if (state->m_suzy.accumulate_overflow)
 				value |= 0x40;
+			if (state->m_blitter.vstretch)
+				value |= 0x10;
+			if (state->m_blitter.lefthanded)
+				value |= 0x08;
+			if (state->m_blitter.busy)
+				value |= 0x01;
 			break;
 		case JOYSTICK:
 			input = input_port_read(space->machine(), "JOY");
@@ -1053,7 +1027,7 @@ static READ8_HANDLER( suzy_read )
 					if (value & PAD_LEFT) input |= PAD_UP;
 					break;
 			}
-			if (state->m_suzy.data[SPRSYS] & 0x08) /* Left handed controls */
+			if (state->m_blitter.lefthanded)
 			{
 				value = input & 0x0f;
 				if (input & PAD_UP) value |= PAD_DOWN;
@@ -1076,7 +1050,7 @@ static READ8_HANDLER( suzy_read )
 		case SPRCTL1:
 		case SPRCOLL:
 		case SPRINIT:
-		//case SUZYBUSEN:
+		case SUZYBUSEN:
 		case SPRGO:
 			logerror("read from write only register %x\n", offset);
 			value = 0;
@@ -1092,7 +1066,7 @@ static WRITE8_HANDLER( suzy_write )
 {
 	lynx_state *state = space->machine().driver_data<lynx_state>();
 	state->m_suzy.data[offset] = data;
-
+	//logerror("suzy write %.2x %.2x\n",offset,data);
 	/* Additional effects of a write */
 	/* Even addresses are the LSB. Any CPU write to an LSB in 0x00-0x7f will set the MSB to 0. */
 	/* This in particular holds for math quantities:  Writing to B (0x54), D (0x52),
@@ -1232,7 +1206,7 @@ static WRITE8_HANDLER( suzy_write )
 		case MATH_C:
 			/* If we are going to perform a signed multiplication, we store the sign and convert the number
             to an unsigned one */
-			if (state->m_suzy.data[SPRSYS] & 0x80)		/* signed math */
+			if (state->m_suzy.signed_math)
 			{
 				UINT16 factor, temp;
 				factor = state->m_suzy.data[MATH_D] | (state->m_suzy.data[MATH_C] << 8);
@@ -1251,7 +1225,7 @@ static WRITE8_HANDLER( suzy_write )
 		/* If we are going to perform a signed multiplication, we also store the sign and convert the
         number to an unsigned one */
 		case MATH_A:
-			if (state->m_suzy.data[SPRSYS] & 0x80)		/* signed math */
+			if (state->m_suzy.signed_math)
 			{
 				UINT16 factor, temp;
 				factor = state->m_suzy.data[MATH_B] | (state->m_suzy.data[MATH_A] << 8);
@@ -1280,10 +1254,21 @@ static WRITE8_HANDLER( suzy_write )
 		case SPRCOLL:
 			state->m_blitter.spr_coll = data;
 			break;
+		case SUZYBUSEN:
+			logerror("write to SUSYBUSEN %x \n", data);
+			break;
+		case SPRSYS:
+				state->m_suzy.signed_math = data & 0x80;
+				state->m_suzy.accumulate = data & 0x40;
+				state->m_blitter.no_collide = data & 0x20;
+				state->m_blitter.vstretch = data & 0x10;
+				state->m_blitter.lefthanded = data & 0x08;
+				// unsafe access clear and sprite engine stop request are not enabled
+				break;
 		case SPRGO:
-			if (data & 0x01)
+			if ((data & 0x01) && state->m_suzy.data[SUZYBUSEN])
 			{
-				state->m_blitter.time = space->machine().time();
+				//state->m_blitter.time = space->machine().time();
 				lynx_blitter(space->machine());
 			}
 			break;
@@ -1314,24 +1299,6 @@ static WRITE8_HANDLER( suzy_write )
 */
 
 
-
-static UINT8 lynx_read_vram(lynx_state *state, UINT16 address)
-{
-	UINT8 result = 0x00;
-	if (address <= 0xfbff)
-		result = state->m_mem_0000[address - 0x0000];
-	else if (address <= 0xfcff)
-		result = state->m_mem_fc00[address - 0xfc00];
-	else if (address <= 0xfdff)
-		result = state->m_mem_fd00[address - 0xfd00];
-	else if (address <= 0xfff7)
-		result = state->m_mem_fe00[address - 0xfe00];
-	else if (address >= 0xfffa)
-		result = state->m_mem_fffa[address - 0xfffa];
-	return result;
-}
-
-
 /*
 DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 
@@ -1341,61 +1308,43 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 ; B1    1 EQU flip screen
 ; B0    1 EQU video DMA enabled
 */
-static void lynx_draw_lines(running_machine &machine, int newline)
+
+static void lynx_draw_line(running_machine &machine)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
-	int x, yend;
+	int x, y;
 	UINT16 j; // clipping needed!
 	UINT8 byte;
 	UINT16 *line;
-
-	if (newline == -1)
-		yend = 102;
-	else
-		yend = newline;
-
-	if (yend > 102)
-		yend = 102;
-
-	if (yend == state->m_line_y)
-	{
-		if (newline == -1)
-			state->m_line_y = 0;
-		return;
-	}
-
+	
+	
+	// calculate y: first three lines are vblank,  
+	y = 101-state->m_timer[2].counter;
 	// Documentation states lower two bits of buffer address are ignored (thus 0xfffc mask)
-	j = (state->m_mikey.disp_addr & 0xfffc) + state->m_line_y * 160 / 2;
+	j = (state->m_mikey.disp_addr & 0xfffc) + y * 160 / 2;
 
 	if (state->m_mikey.data[0x92] & 0x02)
 	{
 		j -= 160 * 102 / 2 - 1;
-		for ( ; state->m_line_y < yend; state->m_line_y++)
+		line = &state->m_bitmap_temp.pix16(102 - 1 - y);
+		for (x = 160 - 2; x >= 0; j++, x -= 2)
 		{
-			line = &state->m_bitmap.pix16(102 - 1 - state->m_line_y);
-			for (x = 160 - 2; x >= 0; j++, x -= 2)
-			{
-				byte = lynx_read_vram(state, j);
-				line[x + 1] = state->m_palette[(byte >> 4) & 0x0f];
-				line[x + 0] = state->m_palette[(byte >> 0) & 0x0f];
-			}
+			byte = lynx_read_ram(state, j);
+			line[x + 1] = state->m_palette[(byte >> 4) & 0x0f];
+			line[x + 0] = state->m_palette[(byte >> 0) & 0x0f];
 		}
 	}
 	else
 	{
-		for ( ; state->m_line_y < yend; state->m_line_y++)
+		line = &state->m_bitmap_temp.pix16(y);
+		for (x = 0; x < 160; j++, x += 2)
 		{
-			line = &state->m_bitmap.pix16(state->m_line_y);
-			for (x = 0; x < 160; j++, x += 2)
-			{
-				byte = lynx_read_vram(state, j);
-				line[x + 0] = state->m_palette[(byte >> 4) & 0x0f];
-				line[x + 1] = state->m_palette[(byte >> 0) & 0x0f];
-			}
+			byte = lynx_read_ram(state, j);
+			line[x + 0] = state->m_palette[(byte >> 4) & 0x0f];
+			line[x + 1] = state->m_palette[(byte >> 0) & 0x0f];
 		}
 	}
 }
-
 
 /****************************************
 
@@ -1460,24 +1409,27 @@ static void lynx_timer_signal_irq(running_machine &machine, int which)
 	switch ( which ) // count down linked timers
 	{
 	case 0:
-		if ((state->m_line == 2) || (state->m_line == 3) || (state->m_line == 4))
+		switch (state->m_timer[2].counter)
 		{
-			//state->m_mikey.vb_rest = 1;
-		}
-		else
-			state->m_mikey.vb_rest = 0;
-		if (state->m_line == 3)
-		{
-			state->m_mikey.disp_addr = state->m_mikey.data[0x94] | (state->m_mikey.data[0x95] << 8);
-			lynx_draw_lines( machine, -1 );
+			case 104:
+			case 103:
+				state->m_mikey.vb_rest = 1;
+				break;
+			case 102:
+				state->m_mikey.disp_addr = state->m_mikey.data[0x94] | (state->m_mikey.data[0x95] << 8);
+				break;
+			case 101:
+				state->m_mikey.vb_rest = 0;
+				lynx_draw_line( machine );
+				break;
+			default:
+				lynx_draw_line( machine );
 		}
 		lynx_timer_count_down( machine, 2 );
-		state->m_line++;
 		break;
-	case 2:
+	case 2:	
+		copybitmap(state->m_bitmap, state->m_bitmap_temp, 0, 0, 0, 0, machine.primary_screen->cliprect());
 		lynx_timer_count_down( machine, 4 );
-		lynx_draw_lines( machine, -1 );
-		state->m_line=0;
 		break;
 	case 1:
 		lynx_timer_count_down( machine, 3 );
@@ -1502,23 +1454,33 @@ void lynx_timer_count_down(running_machine &machine, int which)
 		if ( state->m_timer[which].counter > 0 )
 		{
 			state->m_timer[which].counter--;
+			//state->m_timer[which].borrow_in = 1;
 			return;
 		}
 		if ( state->m_timer[which].counter == 0 )
 		{
-			state->m_timer[which].cntrl2 |= 8; // set timer done
+			if (state->m_timer[which].cntrl2 & 0x01) // borrow out
+			{
 				lynx_timer_signal_irq(machine, which);
 				if ( state->m_timer[which].cntrl1 & 0x10 ) // if reload enabled
 				{
 					state->m_timer[which].counter = state->m_timer[which].bakup;
-				// should we unset timer done?
 				}
 				else
 				{
-				state->m_timer[which].counter--; // Is this correct or should it stop at zero?
+					state->m_timer[which].cntrl2 |= 8; // set timer done
 				}
+				state->m_timer[which].cntrl2 &= ~0x01; // clear borrow out
+			}
+			else
+				state->m_timer[which].cntrl2 |= 0x01; // set borrow out
 			return;
 		}
+	}
+	else
+	{
+		//state->m_timer[which].borrow_in = 0;
+		state->m_timer[which].cntrl2 &= ~0x01;
 	}
 }
 
@@ -1540,10 +1502,12 @@ static UINT32 lynx_time_factor(int val)
 static TIMER_CALLBACK(lynx_timer_shot)
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
-	state->m_timer[param].cntrl2 |= 8; // set timer done
 	lynx_timer_signal_irq( machine, param );
 	if ( ! ( state->m_timer[param].cntrl1 & 0x10 ) ) // if reload not enabled
+	{
 		state->m_timer[param].timer_active = 0;
+		state->m_timer[param].cntrl2 |= 8; // set timer done
+	}
 	else
 	{
 		attotime t = (attotime::from_hz(lynx_time_factor(state->m_timer[param].cntrl1 & 0x07)) * (state->m_timer[param].bakup + 1));
@@ -1571,8 +1535,10 @@ static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)
 			else
 			{
 				if ( state->m_timer[which].timer_active )
-					//value = (UINT8) ( state->m_timer[which].bakup - (state->m_timer[which].timer->remaining() * lynx_time_factor( state->m_timer[which].cntrl1 & 0x07 )).seconds);
-					value = (UINT8) (state->m_timer[which].timer->remaining().as_ticks(1000000>>(state->m_timer[which].cntrl1 & 0x07))); // aren't we just returning the remaining time?
+				{
+					state->m_timer[which].counter = (UINT8) (state->m_timer[which].timer->remaining().as_ticks(1000000>>(state->m_timer[which].cntrl1 & 0x07)));
+					state->m_timer[which].counter -= (state->m_timer[which].counter) ? 1 : 0;
+				}
 			}
 			break;
 
@@ -1586,8 +1552,15 @@ static UINT8 lynx_timer_read(lynx_state *state, int which, int offset)
 
 static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 data)
 {
-	// logerror("timer %d write %x %.2x\n", which, offset, data);
+	//logerror("timer %d write %x %.2x\n", which, offset, data);
 	attotime t;
+	
+	if ( state->m_timer[which].timer_active && ((state->m_timer[which].cntrl1 & 0x07) != 0x07))
+	{
+		state->m_timer[which].counter = (UINT8) (state->m_timer[which].timer->remaining().as_ticks(1000000>>(state->m_timer[which].cntrl1 & 0x07)));
+		state->m_timer[which].counter -= (state->m_timer[which].counter) ? 1 : 0;
+	}
+
 	switch (offset)
 	{
 		case 0:
@@ -1607,23 +1580,20 @@ static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 dat
 	}
 
 	/* Update timers */
-	if ( offset < 3 )
-	{
+	//if ( offset < 3 )
+	//{
 		state->m_timer[which].timer->reset();
 		state->m_timer[which].timer_active = 0;
-		if ((state->m_timer[which].cntrl1 & 0x08))		// if enable count
+		if ((state->m_timer[which].cntrl1 & 0x08) && !(state->m_timer[which].cntrl2 & 0x08))		// if enable count
 		{
-			if ((state->m_timer[which].cntrl1 & 0x07) != 0x07) // if not set to link mode
+			if ((state->m_timer[which].cntrl1 & 0x07) != 0x07)  // if not set to link mode
 			{
-				if (state->m_timer[which].cntrl1 & 0x10) // reload enabled
-					t = (attotime::from_hz(lynx_time_factor(state->m_timer[which].cntrl1 & 0x07)) * (state->m_timer[which].bakup + 1));
-				else
-					t = (attotime::from_hz(lynx_time_factor(state->m_timer[which].cntrl1 & 0x07)) * (state->m_timer[which].counter + 1));
+				t = (attotime::from_hz(lynx_time_factor(state->m_timer[which].cntrl1 & 0x07)) * (state->m_timer[which].counter + 1));
 				state->m_timer[which].timer->adjust(t, which);
 				state->m_timer[which].timer_active = 1;
 			}
 		}
-	}
+	//}
 }
 
 
@@ -1678,14 +1648,14 @@ static  READ8_HANDLER(lynx_uart_r)
 			value = state->m_uart.data_received;
 			break;
 	}
-	// logerror("uart read %.2x %.2x\n", offset, value);
+	logerror("uart read %.2x %.2x\n", offset, value);
 	return value;
 }
 
 static WRITE8_HANDLER(lynx_uart_w)
 {
 	lynx_state *state = space->machine().driver_data<lynx_state>();
-	// logerror("uart write %.2x %.2x\n", offset, data);
+	logerror("uart write %.2x %.2x\n", offset, data);
 	switch (offset)
 	{
 		case 0x8c:
@@ -1813,14 +1783,14 @@ static WRITE8_HANDLER( mikey_write )
 	case 0x80:
 		state->m_mikey.data[0x81] &= ~data; // clear interrupt source
 		// logerror("mikey write %.2x %.2x\n", offset, data);
-		if (!state->m_mikey.data[0x81])
+		if (!(state->m_mikey.data[0x81] & ~0x10))
 			cputag_set_input_line(space->machine(), "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	/* Is this correct? */ // Notes say writing to register will result in interupt being triggered.
 	case 0x81:
 		state->m_mikey.data[0x81] |= data;
-		if (data)
+		if (data & ~0x10)
 			cputag_set_input_line(space->machine(), "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
 		break;
 
@@ -1853,7 +1823,6 @@ static WRITE8_HANDLER( mikey_write )
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 	case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 		state->m_mikey.data[offset] = data;
-		lynx_draw_lines(space->machine(), state->m_line);
 
 		/* RED = 0xb- & 0x0f, GREEN = 0xa- & 0x0f, BLUE = (0xb- & 0xf0) >> 4 */
 		state->m_palette[offset & 0x0f] = space->machine().pens[
@@ -1971,12 +1940,12 @@ static void lynx_reset(running_machine &machine)
 */
 
 	lynx_uart_reset(state);
-
+	
 	// hack to allow current object loading to work
-#if 1
+#if 0
 	lynx_timer_write( state, 0, 0, 160 ); // set backup value (hpos) = 160
 	lynx_timer_write( state, 0, 1, 0x10 | 0x8 | 0 ); // enable count, enable reload, 1us period
-	lynx_timer_write( state, 2, 0, 102 ); // set backup value (vpos) = 102
+	lynx_timer_write( state, 2, 0, 105 ); // set backup value (vpos) = 102
 	lynx_timer_write( state, 2, 1, 0x10 | 0x8 | 7 ); // enable count, enable reload, link
 #endif
 }
@@ -1989,6 +1958,8 @@ static void lynx_postload(lynx_state *state)
 MACHINE_START( lynx )
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
+	state->m_bitmap_temp.allocate(160,102,0,0);
+	
 	int i;
 	state->save_item(NAME(state->m_memory_config));
 	state->save_pointer(NAME(state->m_mem_fe00), state->m_mem_fe00_size);
