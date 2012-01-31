@@ -255,8 +255,6 @@ static void recompute_parameters(crtc_ega_t *crtc_ega, int postload)
 		vsync_on_pos = crtc_ega->vert_retr_start;		/* + 1 ?? */
 		vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
 
-		/* the Commodore PET computers program a horizontal synch pulse that extends
-          past the scanline width.  I assume that the real device will clamp it */
 		if (hsync_off_pos > horiz_pix_total)
 			hsync_off_pos = horiz_pix_total;
 
@@ -402,8 +400,8 @@ static void update_vblank_changed_timers(crtc_ega_t *crtc_ega)
 {
 	if (crtc_ega->has_valid_parameters && (crtc_ega->vblank_on_timer != NULL))
 	{
-		crtc_ega->vblank_on_timer->adjust(crtc_ega->screen->time_until_pos(crtc_ega->vert_disp_end,  crtc_ega->hsync_on_pos));
-		crtc_ega->vblank_off_timer->adjust(crtc_ega->screen->time_until_pos(0, crtc_ega->hsync_off_pos));
+		crtc_ega->vblank_on_timer->adjust(crtc_ega->screen->time_until_pos(crtc_ega->vert_disp_end,  crtc_ega->hsync_off_pos));
+		crtc_ega->vblank_off_timer->adjust(crtc_ega->screen->time_until_pos(0, crtc_ega->hsync_on_pos));
 	}
 }
 
@@ -620,6 +618,7 @@ static void update_cursor_state(crtc_ega_t *crtc_ega)
 	UINT8 last_cursor_blink_count = crtc_ega->cursor_blink_count;
 	crtc_ega->cursor_blink_count = crtc_ega->cursor_blink_count + 1;
 
+printf("update_cursor_state - ");
 	/* switch on cursor blinking mode */
 	switch (crtc_ega->cursor_start_ras & 0x60)
 	{
@@ -627,19 +626,22 @@ static void update_cursor_state(crtc_ega_t *crtc_ega)
 		case 0x00: crtc_ega->cursor_state = TRUE; break;
 
 		/* always off */
-		default:
 		case 0x20: crtc_ega->cursor_state = FALSE; break;
 
 		/* fast blink */
 		case 0x40:
 			if ((last_cursor_blink_count & 0x10) != (crtc_ega->cursor_blink_count & 0x10))
+			{
 				crtc_ega->cursor_state = !crtc_ega->cursor_state;
+			}
 			break;
 
 		/* slow blink */
 		case 0x60:
 			if ((last_cursor_blink_count & 0x20) != (crtc_ega->cursor_blink_count & 0x20))
+			{
 				crtc_ega->cursor_state = !crtc_ega->cursor_state;
+			}
 			break;
 	}
 }
@@ -681,7 +683,7 @@ void crtc_ega_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 			/* check if the cursor is visible and is on this scanline */
 			int cursor_visible = crtc_ega->cursor_state &&
 								(ra >= (crtc_ega->cursor_start_ras & 0x1f)) &&
-								(ra <= crtc_ega->cursor_end_ras) &&
+								( (ra <= (crtc_ega->cursor_end_ras & 0x1f)) || ((crtc_ega->cursor_end_ras & 0x1f) == 0x00 )) &&
 								(crtc_ega->cursor_addr >= crtc_ega->current_disp_addr) &&
 								(crtc_ega->cursor_addr < (crtc_ega->current_disp_addr + ( crtc_ega->horiz_disp + 1 )));
 
