@@ -51,7 +51,7 @@ public:
 	DECLARE_READ8_MEMBER( c64_dma_read_color );
 	DECLARE_WRITE_LINE_MEMBER( c64_vic_interrupt );
 	DECLARE_READ8_MEMBER( c64_rdy_cb );
-	
+
 	int m_old_level;
 	int m_old_data;
 	int m_old_exrom;

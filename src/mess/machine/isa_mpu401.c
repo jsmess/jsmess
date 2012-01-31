@@ -1,9 +1,9 @@
 /***************************************************************************
 
-	MPU-401 MIDI device interface
+    MPU-401 MIDI device interface
 
-	TODO:
-	- skeleton, doesn't do anything
+    TODO:
+    - skeleton, doesn't do anything
 
 ***************************************************************************/
 

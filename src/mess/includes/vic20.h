@@ -51,7 +51,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<timer_device> m_cassette_timer;
-	
+
 	virtual void machine_start();
 
 	DECLARE_READ8_MEMBER( via0_pa_r );

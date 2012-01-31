@@ -20,7 +20,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	virtual void machine_reset();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

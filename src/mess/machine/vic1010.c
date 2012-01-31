@@ -109,12 +109,12 @@ void vic1010_device::device_start()
 UINT8 vic1010_device::vic20_ram1_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
 		data |= m_expansion_slot[i]->ram1_r(space, offset);
 	}
-	
+
 	return data;
 }
 
@@ -139,12 +139,12 @@ void vic1010_device::vic20_ram1_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1010_device::vic20_ram2_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
 		data |= m_expansion_slot[i]->ram2_r(space, offset);
 	}
-	
+
 	return data;
 }
 
@@ -169,12 +169,12 @@ void vic1010_device::vic20_ram2_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1010_device::vic20_ram3_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
 		data |= m_expansion_slot[i]->ram3_r(space, offset);
 	}
-	
+
 	return data;
 }
 
@@ -199,12 +199,12 @@ void vic1010_device::vic20_ram3_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1010_device::vic20_blk1_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
 		data |= m_expansion_slot[i]->blk1_r(space, offset);
 	}
-	
+
 	return data;
 }
 
@@ -229,12 +229,12 @@ void vic1010_device::vic20_blk1_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1010_device::vic20_blk2_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
 		data |= m_expansion_slot[i]->blk2_r(space, offset);
 	}
-	
+
 	return data;
 }
 
@@ -259,12 +259,12 @@ void vic1010_device::vic20_blk2_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1010_device::vic20_blk3_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
 		data |= m_expansion_slot[i]->blk3_r(space, offset);
 	}
-	
+
 	return data;
 }
 
@@ -289,12 +289,12 @@ void vic1010_device::vic20_blk3_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1010_device::vic20_blk5_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
 		data |= m_expansion_slot[i]->blk5_r(space, offset);
 	}
-	
+
 	return data;
 }
 

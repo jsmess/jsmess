@@ -31,11 +31,11 @@ class vic20_standard_cartridge_device :  public device_t,
 public:
     // construction/destruction
     vic20_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
     // device-level overrides
     virtual void device_start();
-	
+
 	// device_vic20_expansion_card_interface overrides
 	virtual UINT8 vic20_blk1_r(address_space &space, offs_t offset);
 	virtual UINT8 vic20_blk2_r(address_space &space, offs_t offset);

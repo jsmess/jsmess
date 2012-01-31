@@ -119,7 +119,7 @@ WRITE8_MEMBER(n82077aa_device::dor_w)
 			if(fi.dev && (diff & (0x10 << i)))
 				fi.dev->mon_w(!(dor & (0x10 << i)));
 		}
-				
+
 }
 
 READ8_MEMBER(n82077aa_device::tdr_r)
@@ -154,7 +154,7 @@ READ8_MEMBER(n82077aa_device::msr_r)
 		if(flopi[i].main_state == RECALIBRATE)
 			msr |= 1<<i;
 
-	//	fprintf(stderr, "msr_r %02x (%08x)\n", msr, cpu_get_pc(&space.device()));
+	//  fprintf(stderr, "msr_r %02x (%08x)\n", msr, cpu_get_pc(&space.device()));
 	return msr;
 }
 
@@ -177,7 +177,7 @@ READ8_MEMBER(n82077aa_device::fifo_r)
 		break;
 	default:
 		fprintf(stderr, "fifo_r in phase %d\n", main_phase);
-		//		exit(1);
+		//      exit(1);
 	}
 
 	fprintf(stderr, "fifo_r %02x (%08x)\n", r, cpu_get_pc(&space.device()));
@@ -195,7 +195,7 @@ WRITE8_MEMBER(n82077aa_device::fifo_w)
 			break;
 		if(cmd == C_INVALID) {
 			fprintf(stderr, "Invalid on %02x\n", command[0]);
-			//			exit(1);
+			//          exit(1);
 			command_pos = 0;
 			return;
 		}
@@ -282,7 +282,7 @@ void n82077aa_device::live_start(floppy_info &fi, int state)
 	cur_live.data_bit_context = false;
 	cur_live.byte_counter = 0;
 	cur_live.pll.reset(cur_live.tm);
-	//	cur_live.pll.set_clock(attotime::from_hz(rates[dsr & 3]*2));
+	//  cur_live.pll.set_clock(attotime::from_hz(rates[dsr & 3]*2));
 	cur_live.pll.set_clock(attotime::from_hz(rates[dsr & 3]));
 	checkpoint_live = cur_live;
 	fi.live = true;
@@ -336,7 +336,7 @@ void n82077aa_device::live_sync()
 
 void n82077aa_device::live_abort()
 {
-		
+
 	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
 		rollback();
 		live_run(machine().time());
@@ -515,7 +515,7 @@ void n82077aa_device::live_run(attotime limit)
 		}
 
 		case SEARCH_ADDRESS_MARK_DATA_FAILED:
-			//			status |= S_RNF;
+			//          status |= S_RNF;
 			cur_live.state = IDLE;
 			return;
 
@@ -542,7 +542,7 @@ void n82077aa_device::live_run(attotime limit)
 		}
 
 		case READ_SECTOR_DATA_BYTE:
-			//			fprintf(stderr, "databyte = %02x\n", cur_live.data_reg);
+			//          fprintf(stderr, "databyte = %02x\n", cur_live.data_reg);
 			fifo_push(cur_live.data_reg);
 			cur_live.state = READ_SECTOR_DATA;
 			checkpoint();
@@ -594,7 +594,7 @@ int n82077aa_device::check_command()
 		return C_SENSE_INTERRUPT_STATUS;
 
 	case 0x0f:
-		
+
 	case 0x12:
 		return command_pos == 2 ? C_PERPENDICULAR : C_INCOMPLETE;
 
@@ -727,7 +727,7 @@ void n82077aa_device::seek_continue(floppy_info &fi)
 				command_end(fi, 0);
 				return;
 			}
-			fi.sub_state = SEEK_MOVE;			
+			fi.sub_state = SEEK_MOVE;
 			break;
 		}
 		}
@@ -738,7 +738,7 @@ void n82077aa_device::read_data_start(floppy_info &fi)
 {
 	fi.main_state = READ_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
-	
+
 	fprintf(stderr, "Read data%s%s%s\n",
 			command[0] & 0x80 ? " mt" : "",
 			command[0] & 0x40 ? " mfm" : "",
@@ -964,9 +964,9 @@ bool n82077aa_device::sector_matches() const
 				cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
 				command[2], command[3], command[4], command[5]);
 	return
-		cur_live.idbuf[0] == command[2] && 
-		cur_live.idbuf[1] == command[3] && 
-		cur_live.idbuf[2] == command[4] && 
+		cur_live.idbuf[0] == command[2] &&
+		cur_live.idbuf[1] == command[3] &&
+		cur_live.idbuf[2] == command[4] &&
 		cur_live.idbuf[3] == command[5];
 }
 

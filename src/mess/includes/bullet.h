@@ -118,14 +118,14 @@ public:
 	DECLARE_READ8_MEMBER( hwsts_r );
 	DECLARE_READ8_MEMBER( scsi_r );
 	DECLARE_WRITE8_MEMBER( scsi_w );
-	
+
 	DECLARE_READ8_MEMBER( dma_mreq_r );
 	DECLARE_WRITE8_MEMBER( dma_mreq_w );
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
-	
+
 	void update_dma_rdy();
 
 	int m_rome;

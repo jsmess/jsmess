@@ -76,7 +76,7 @@ SCREEN_VBLANK( spectrum )
 		}
 
 		/* Empty event buffer for undisplayed frames noting the last border
-	       colour (in case colours are not changed in the next frame). */
+           colour (in case colours are not changed in the next frame). */
 		NumItems = spectrum_EventList_NumEvents(screen.machine());
 		if (NumItems)
 		{

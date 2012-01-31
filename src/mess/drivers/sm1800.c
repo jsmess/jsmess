@@ -81,7 +81,7 @@ MACHINE_RESET_MEMBER(sm1800_state)
 void sm1800_state::video_start()
 {
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
-	
+
 }
 
 static SCREEN_UPDATE_IND16( sm1800 )

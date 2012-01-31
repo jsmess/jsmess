@@ -197,7 +197,7 @@ INPUT_PORTS_END
 /*
 static TIMER_DEVICE_CALLBACK( borisdpl_timer_interrupt )
 {
-	cputag_set_input_line_and_vector(timer.machine(), "maincpu", F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
+    cputag_set_input_line_and_vector(timer.machine(), "maincpu", F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
 }
 */
 
@@ -227,7 +227,7 @@ static MACHINE_CONFIG_START( borisdpl, chesstrv_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_borisdpl )
-	
+
 	//MCFG_TIMER_ADD_PERIODIC("timer_interrupt", borisdpl_timer_interrupt, attotime::from_hz(40))
 MACHINE_CONFIG_END
 

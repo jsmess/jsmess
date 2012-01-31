@@ -986,7 +986,7 @@ static I8237_INTERFACE( dmac_intf )
 	{ DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack0_w),
 	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack1_w),
 	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack2_w),
-	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack3_w) }	
+	  DEVCB_DRIVER_LINE_MEMBER(pc1512_state, dack3_w) }
 };
 
 

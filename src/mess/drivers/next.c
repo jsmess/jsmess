@@ -252,7 +252,7 @@ const char *next_state::dma_name(int slot)
 
 void next_state::dma_drq_w(int slot, bool state)
 {
-	//	fprintf(stderr, "DMA drq_w %d, %d\n", slot, state);
+	//  fprintf(stderr, "DMA drq_w %d, %d\n", slot, state);
 	dma_slot &ds = dma_slots[slot];
 	ds.drq = state;
 	if(state && (ds.state & DMA_ENABLE)) {
@@ -480,7 +480,7 @@ void next_state::dma_do_ctrl_w(int slot, UINT8 data)
 	}
 	if(data & DMA_SETENABLE) {
 		ds.state |= DMA_ENABLE;
-		//		fprintf(stderr, "dma slot %d drq=%s\n", slot, ds.drq ? "on" : "off");
+		//      fprintf(stderr, "dma slot %d drq=%s\n", slot, ds.drq ? "on" : "off");
 		if(ds.drq)
 			dma_drq_w(slot, ds.drq);
 	}

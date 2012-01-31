@@ -1,9 +1,9 @@
 /***************************************************************************
 
-	Final Chess Card by TASC
+    Final Chess Card by TASC
 
-	TODO:
-	- skeleton, just boots the CPU
+    TODO:
+    - skeleton, just boots the CPU
 
 ***************************************************************************/
 

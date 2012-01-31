@@ -48,7 +48,7 @@ Notes:
 
     TODO:
 
-	- revision F boot ROM dump
+    - revision F boot ROM dump
     - wmb_org.imd does not load
     - z80dart wait/ready
     - floppy type dips
@@ -101,7 +101,7 @@ enum
 READ8_MEMBER( bullet_state::mreq_r )
 {
 	UINT8 data = 0;
-	
+
 	if (!m_brom && !BIT(offset, 5))
 	{
 		data = machine().region(Z80_TAG)->base()[offset & 0x1f];
@@ -117,7 +117,7 @@ READ8_MEMBER( bullet_state::mreq_r )
 			data = m_ram->pointer()[offset];
 		}
 	}
-	
+
 	return data;
 }
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER( bullet_state::segst_w )
 READ8_MEMBER( bulletf_state::mreq_r )
 {
 	UINT8 data = 0;
-	
+
 	if (!m_rome && !BIT(offset, 5))
 	{
 		data = machine().region(Z80_TAG)->base()[offset & 0x1f];
@@ -349,7 +349,7 @@ READ8_MEMBER( bulletf_state::mreq_r )
 			data = m_ram->pointer()[offset];
 		}
 	}
-	
+
 	return data;
 }
 
@@ -389,18 +389,18 @@ WRITE8_MEMBER( bulletf_state::xdma0_w )
         bit     signal
 
         0       device select (0=FDC, 1=SCSI)
-        1       
-        2       
-        3       
-        4       DMB4		Source bank
+        1
+        2
+        3
+        4       DMB4        Source bank
         5
-        6		DMB6		Destination bank
+        6       DMB6        Destination bank
         7
 
     */
-	
+
 	m_rome = 1;
-	
+
 	m_xdma0 = data;
 }
 
@@ -420,15 +420,15 @@ WRITE8_MEMBER( bulletf_state::xfdc_w )
         2       Unit select number
         3       Unit select number
         4       Select side 2
-        5		Disable 3 & 5 inch spindle motors
-        6		Set for 1 MHz controller operation, reset for 2 MHz controller operation
-        7		Set to select single density
+        5       Disable 3 & 5 inch spindle motors
+        6       Set for 1 MHz controller operation, reset for 2 MHz controller operation
+        7       Set to select single density
 
     */
 
 	// floppy drive select
 	wd17xx_set_drive(m_fdc, data & 0x0f);
-	
+
 	// floppy side select
 	wd17xx_set_side(m_fdc, BIT(data, 4));
 
@@ -437,7 +437,7 @@ WRITE8_MEMBER( bulletf_state::xfdc_w )
 	floppy_mon_w(m_floppy1, BIT(data, 5));
 	floppy_drive_set_ready_state(m_floppy0, BIT(data, 5), 1);
 	floppy_drive_set_ready_state(m_floppy1, BIT(data, 5), 1);
-	
+
 	// FDC clock
 	m_fdc->set_unscaled_clock(BIT(data, 6) ? XTAL_16MHz/16 : XTAL_16MHz/8);
 
@@ -457,16 +457,16 @@ WRITE8_MEMBER( bulletf_state::mbank_w )
         bit     signal
 
         0       Select active bank (0=bank 0, 1=bank 1)
-        1       
-        2       
-        3       
+        1
+        2
+        3
         4       Select system space overlay (0=no overlay, 1=overlay)
         5
         6
         7
 
     */
-	
+
 	m_mbank = data;
 }
 
@@ -478,12 +478,12 @@ WRITE8_MEMBER( bulletf_state::mbank_w )
 READ8_MEMBER( bulletf_state::scsi_r )
 {
 	UINT8 data = scsi_data_r(m_scsibus, 0);
-	
+
 	scsi_ack_w(m_scsibus, 0);
-	
+
 	m_wack = 0;
 	update_dma_rdy();
-	
+
 	return data;
 }
 
@@ -495,7 +495,7 @@ READ8_MEMBER( bulletf_state::scsi_r )
 WRITE8_MEMBER( bulletf_state::scsi_w )
 {
 	scsi_data_w(m_scsibus, 0, data);
-	
+
 	scsi_ack_w(m_scsibus, 0);
 
 	m_wack = 0;
@@ -513,19 +513,19 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 
         bit     signal
 
-        0       CBUSY	Centronics busy
-        1       SW2		DIP switch 2
-        2       SW3		DIP switch 3
-        3       FD2S	*Floppy disk two sided
-        4       HLDST	Floppy disk head load status
-        5		XDCG	*Floppy disk exchange (8-inch only)
-        6		FDIRQ	FDC interrupt request line
-        7		FDDRQ	FDC data request line
+        0       CBUSY   Centronics busy
+        1       SW2     DIP switch 2
+        2       SW3     DIP switch 3
+        3       FD2S    *Floppy disk two sided
+        4       HLDST   Floppy disk head load status
+        5       XDCG    *Floppy disk exchange (8-inch only)
+        6       FDIRQ   FDC interrupt request line
+        7       FDDRQ   FDC data request line
 
     */
-	
+
 	UINT8 data = 0x10;
-	
+
 	// centronics busy
 	data |= centronics_busy_r(m_centronics);
 
@@ -914,9 +914,9 @@ READ8_MEMBER( bulletf_state::pio_pa_r )
 
         bit     signal
 
-        0       
-        1       
-        2       
+        0
+        1
+        2
         3       BUSY
         4       MSG
         5       C/D
@@ -945,14 +945,14 @@ WRITE8_MEMBER( bulletf_state::pio_pa_w )
         0       ATN
         1       RST
         2       SEL
-        3       
-        4       
-        5       
-        6       
-        7       
+        3
+        4
+        5
+        6
+        7
 
     */
-	
+
 	//scsi_atn_w(m_scsibus, !BIT(data, 0));
 	scsi_rst_w(m_scsibus, !BIT(data, 1));
 	scsi_sel_w(m_scsibus, !BIT(data, 2));

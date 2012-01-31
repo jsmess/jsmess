@@ -249,7 +249,7 @@ static MC6845_UPDATE_ROW( grip_update_row )
 static MC6845_UPDATE_ROW( grip5_update_row )
 {
     grip5_state *state = device->machine().driver_data<grip5_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+    const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
     int column, bit;
 
     for (column = 0; column < x_count; column++)

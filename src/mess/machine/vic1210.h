@@ -1,7 +1,7 @@
 /**********************************************************************
 
     Commodore VIC-1210 3K RAM Expansion Cartridge emulation
-	Commodore VIC-1211A Super Expander with 3K RAM Cartridge emulation
+    Commodore VIC-1211A Super Expander with 3K RAM Cartridge emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -33,11 +33,11 @@ public:
     // construction/destruction
 	vic1210_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
     vic1210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
     // device-level overrides
     virtual void device_start();
-	
+
 	// device_vic20_expansion_card_interface overrides
 	virtual UINT8 vic20_ram1_r(address_space &space, offs_t offset);
 	virtual void vic20_ram1_w(address_space &space, offs_t offset, UINT8 data);
@@ -65,7 +65,7 @@ protected:
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
-	
+
 	// device_vic20_expansion_card_interface overrides
 	virtual UINT8 vic20_blk5_r(address_space &space, offs_t offset);
 

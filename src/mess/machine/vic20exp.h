@@ -207,7 +207,7 @@ public:
 	virtual UINT32 vic20_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
 
 	virtual UINT8* get_cart_base() { return NULL; }
-	
+
 protected:
 	vic20_expansion_slot_device *m_slot;
 };

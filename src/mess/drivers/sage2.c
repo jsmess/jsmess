@@ -12,21 +12,21 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- floppy loading
-	- PROM test fails
-	- i8251 test fails on boot
-	
-		001BD8: move.b  D6, $c071.w
-		001BDC: moveq   #$e, D7
-		001BDE: dbra    D7, $1bde
-		001BE2: btst    #$2, $c073.w
-		001BE8: bne     $1bec
-		
-	- TMS9914 IEEE-488 controller
-	- board 2 (4x 2651 USART)
-	- Winchester controller
+    - floppy loading
+    - PROM test fails
+    - i8251 test fails on boot
+
+        001BD8: move.b  D6, $c071.w
+        001BDC: moveq   #$e, D7
+        001BDE: dbra    D7, $1bde
+        001BE2: btst    #$2, $c073.w
+        001BE8: bne     $1bec
+
+    - TMS9914 IEEE-488 controller
+    - board 2 (4x 2651 USART)
+    - Winchester controller
 
 */
 
@@ -45,7 +45,7 @@
 READ8_MEMBER( sage2_state::mmu_r )
 {
 	UINT8 data = 0xff;
-	
+
 	if (m_reset || (offset >= 0xfe0000))
 	{
 		data = machine().region(M68000_TAG)->base()[offset & 0x1fff];
@@ -54,7 +54,7 @@ READ8_MEMBER( sage2_state::mmu_r )
 	{
 		data = m_ram->pointer()[offset];
 	}
-	
+
 	return data;
 }
 
@@ -94,13 +94,13 @@ static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	AM_RANGE(0xffc052, 0xffc053) AM_DEVREADWRITE8_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w, 0x00ff)
 	AM_RANGE(0xffc060, 0xffc067) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, Printer
 	AM_RANGE(0xffc070, 0xffc071) AM_DEVREAD8(I8251_0_TAG, i8251_device, data_r, 0x00ff) AM_DEVWRITE8_LEGACY(TERMINAL_TAG, terminal_write, 0x00ff)
-//	AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
+//  AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xffc072, 0xffc073) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xffc080, 0xffc087) AM_MIRROR(0x78) AM_DEVREADWRITE8_LEGACY(I8253_0_TAG, pit8253_r, pit8253_w, 0x00ff)
-//	AM_RANGE(0xffc400, 0xffc407) AM_DEVREADWRITE8(S2651_0_TAG, s2651_device, read, write, 0x00ff)
-//	AM_RANGE(0xffc440, 0xffc447) AM_DEVREADWRITE8(S2651_1_TAG, s2651_device, read, write, 0x00ff)
-//	AM_RANGE(0xffc480, 0xffc487) AM_DEVREADWRITE8(S2651_2_TAG, s2651_device, read, write, 0x00ff)
-//	AM_RANGE(0xffc4c0, 0xffc4c7) AM_DEVREADWRITE8(S2651_3_TAG, s2651_device, read, write, 0x00ff)
+//  AM_RANGE(0xffc400, 0xffc407) AM_DEVREADWRITE8(S2651_0_TAG, s2651_device, read, write, 0x00ff)
+//  AM_RANGE(0xffc440, 0xffc447) AM_DEVREADWRITE8(S2651_1_TAG, s2651_device, read, write, 0x00ff)
+//  AM_RANGE(0xffc480, 0xffc487) AM_DEVREADWRITE8(S2651_2_TAG, s2651_device, read, write, 0x00ff)
+//  AM_RANGE(0xffc4c0, 0xffc4c7) AM_DEVREADWRITE8(S2651_3_TAG, s2651_device, read, write, 0x00ff)
 //  AM_RANGE(0xffc500, 0xffc7ff) // Winchester drive ports
 ADDRESS_MAP_END
 
@@ -196,16 +196,16 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 /*
-	
-	IR0		U74 OUT2
-	IR1		RX2I+
-	IR2		TX1I+
-	IR3		TX2I+
-	IR4		MI-
-	IR5		CNI+
-	IR6		U74 OUT0
-	IR7		SI+
-	
+
+    IR0     U74 OUT2
+    IR1     RX2I+
+    IR2     TX1I+
+    IR3     TX2I+
+    IR4     MI-
+    IR5     CNI+
+    IR6     U74 OUT0
+    IR7     SI+
+
 */
 
 static const struct pic8259_interface pic_intf =
@@ -232,29 +232,29 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
         PC3     SL0-
         PC4     SL1-
         PC5     MOT-
-        PC6		PCRMP-
-        PC7		FRES+
+        PC6     PCRMP-
+        PC7     FRES+
 
     */
-	
+
 	// floppy terminal count
 	upd765_tc_w(m_fdc, BIT(data, 0));
-	
+
 	// floppy ready
 	upd765_ready_w(m_fdc, BIT(data, 1));
-	
+
 	// floppy interrupt enable
 	m_fdie = BIT(data, 2);
 	update_fdc_int();
-	
+
 	// drive select
 	m_sl0 = BIT(data, 3);
 	m_sl1 = BIT(data, 4);
-	
+
 	// floppy motor
 	floppy_mon_w(m_floppy0, BIT(data, 5));
 	floppy_mon_w(m_floppy1, BIT(data, 5));
-	
+
 	// FDC reset
 	upd765_reset_w(m_fdc, BIT(data, 7));
 }
@@ -286,24 +286,24 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
         PB3     CD-
         PB4     BUSY
         PB5     PAPER
-        PB6		SEL
-        PB7		FAULT-
+        PB6     SEL
+        PB7     FAULT-
 
     */
-	
+
 	UINT8 data = 0;
-	
+
 	// floppy interrupt
 	data = upd765_int_r(m_fdc);
-	
+
 	// floppy write protected
 	if (!m_sl0) data |= floppy_wpt_r(m_floppy0) << 1;
 	if (!m_sl1) data |= floppy_wpt_r(m_floppy1) << 1;
-	
+
 	// RS-232 ring indicator
-	
+
 	// RS-232 carrier detect
-	
+
 	// centronics
 	data |= centronics_busy_r(m_centronics) << 4;
 	data |= centronics_pe_r(m_centronics) << 5;
@@ -325,33 +325,33 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
         PC3     LEDR+
         PC4     STROBE-
         PC5     PRIME-
-        PC6		U38 CL-
-        PC7		RMI-
+        PC6     U38 CL-
+        PC7     RMI-
 
     */
-	
+
 	if (!BIT(data, 0))
 	{
 		// clear parity error interrupt
 		m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 	}
-	
+
 	// s? interrupt
 	pic8259_ir7_w(m_pic, BIT(data, 2));
-	
+
 	// processor LED
 	output_set_led_value(0, BIT(data, 3));
-	
+
 	// centronics
 	centronics_strobe_w(m_centronics, BIT(data, 4));
 	centronics_prime_w(m_centronics, BIT(data, 5));
-	
+
 	if (!BIT(data, 6))
 	{
 		// clear ACK interrupt
 		pic8259_ir5_w(m_pic, CLEAR_LINE);
 	}
-	
+
 	if (!BIT(data, 7))
 	{
 		// clear modem interrupt
@@ -500,7 +500,7 @@ static UPD765_GET_IMAGE( fdc_get_image )
 
 	if (!state->m_sl0) return state->m_floppy0;
 	if (!state->m_sl1) return state->m_floppy1;
-	
+
 	return NULL;
 }
 
@@ -655,7 +655,7 @@ DIRECT_UPDATE_HANDLER( sage2_direct_update_handler )
 	{
 		state->m_reset = 0;
 	}
-	
+
 	return address;
 }
 
@@ -663,7 +663,7 @@ static DRIVER_INIT( sage2 )
 {
 	address_space *program = machine.device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
 	program->set_direct_update_handler(direct_update_delegate(FUNC(sage2_direct_update_handler), &machine));
-	
+
 	// patch out i8251 test
 	machine.region(M68000_TAG)->base()[0x1be8] = 0xd6;
 	machine.region(M68000_TAG)->base()[0x1be9] = 0x4e;

@@ -212,20 +212,20 @@ static INPUT_PORTS_START( vic20s )
 	PORT_MODIFY( "ROW0" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)		PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)			PORT_CHAR('-')
-	
+
 	PORT_MODIFY( "ROW1" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)		PORT_CHAR('@')
-	
+
 	PORT_MODIFY( "ROW2" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)			PORT_CHAR(0x00C4)
-	
+
 	PORT_MODIFY( "ROW5" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)		PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)			PORT_CHAR(0x00D6)
-	
+
 	PORT_MODIFY( "ROW6" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)		PORT_CHAR(0x00C5)
-	
+
 	PORT_MODIFY( "ROW7" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)			PORT_CHAR('=')
 INPUT_PORTS_END
@@ -255,7 +255,7 @@ READ8_MEMBER( vic20_state::via0_pa_r )
         PA6     CASS SWITCH
         PA7     SERIAL ATN OUT
 
-	*/
+    */
 
 	UINT8 data = 0xfc;
 
@@ -292,7 +292,7 @@ WRITE8_MEMBER( vic20_state::via0_pa_w )
         PA6     CASS SWITCH
         PA7     SERIAL ATN OUT
 
-	*/
+    */
 
 	// serial attention out
 	m_iec->atn_w(!BIT(data, 7));
@@ -313,7 +313,7 @@ READ8_MEMBER( vic20_state::via0_pb_r )
         PB6     USER PORT K
         PB7     USER PORT L
 
-	*/
+    */
 
 	return 0;
 }
@@ -333,7 +333,7 @@ WRITE8_MEMBER( vic20_state::via0_pb_w )
         PB6     USER PORT K
         PB7     USER PORT L
 
-	*/
+    */
 }
 
 WRITE_LINE_MEMBER( vic20_state::via0_ca2_w )
@@ -387,7 +387,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
         PA6     ROW 6
         PA7     ROW 7
 
-	*/
+    */
 
 	UINT8 data = 0xff;
 
@@ -418,7 +418,7 @@ READ8_MEMBER( vic20_state::via1_pb_r )
         PB6     COL 6
         PB7     COL 7, JOY 3
 
-	*/
+    */
 
 	UINT8 data = 0xff;
 
@@ -443,7 +443,7 @@ WRITE8_MEMBER( vic20_state::via1_pb_w )
         PB6     COL 6
         PB7     COL 7, JOY 3
 
-	*/
+    */
 
 	// cassette write
 	m_cassette->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
@@ -629,7 +629,7 @@ static MACHINE_CONFIG_START( vic20_common, vic20_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface )
 
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
-	
+
 	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, expansion_intf, vic20_expansion_cards, NULL, NULL)
 
 	// software lists
@@ -669,7 +669,7 @@ static MACHINE_CONFIG_DERIVED( vic20_ntsc, vic20_common )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	
+
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
 	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
@@ -703,7 +703,7 @@ static MACHINE_CONFIG_DERIVED( vic20_pal, vic20_common )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	
+
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
 	MCFG_SOFTWARE_LIST_FILTER("disk_list", "PAL")
@@ -714,7 +714,7 @@ MACHINE_CONFIG_END
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
-	
+
 //-------------------------------------------------
 //  ROM( vic1001 )
 //-------------------------------------------------

@@ -498,9 +498,9 @@ INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_ind16 &bitmap,
 			{
 				case 0xc0: graphics=TRUE;break;
 				case 0x40: graphics=FALSE;break;
-//		  case 0x80:
-//		  alien invaders shields are empty 0x80
-//			  popmessage(5, "graphics code 0x80 used");
+//        case 0x80:
+//        alien invaders shields are empty 0x80
+//            popmessage(5, "graphics code 0x80 used");
 			}
 		}
 		if (graphics)

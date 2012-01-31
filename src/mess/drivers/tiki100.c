@@ -12,7 +12,7 @@
 
     TODO:
 
-	- floppy broken
+    - floppy broken
     - palette RAM should be written during HBLANK
     - double sided disks have t0s0,t0s1,t1s0,t1s1... format
     - DART clocks
@@ -653,7 +653,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	
+
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tiki100")
 MACHINE_CONFIG_END
@@ -663,7 +663,7 @@ MACHINE_CONFIG_END
 ROM_START( kontiki )
 	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "tikirom-1.30.u10",  0x0000, 0x2000, CRC(c482dcaf) SHA1(d140706bb7fc8b1fbb37180d98921f5bdda73cf9) )
-	
+
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "63ls140.u4", 0x000, 0x100, NO_DUMP )
 ROM_END

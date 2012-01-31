@@ -23,7 +23,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	bitmap_ind16 m_bitmap;
 
 	DECLARE_READ8_MEMBER(zx_ram_r);

@@ -47,13 +47,13 @@ public:
 	DECLARE_READ8_MEMBER( via0_pb_r );
 	DECLARE_WRITE8_MEMBER( via0_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	
+
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
     virtual void device_config_complete() { m_shortname = "vic1112"; }
-	
+
 	// device_vic20_expansion_card_interface overrides
 	virtual UINT8 vic20_io2_r(address_space &space, offs_t offset);
 	virtual void vic20_io2_w(address_space &space, offs_t offset, UINT8 data);

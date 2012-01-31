@@ -35,7 +35,7 @@ struct _vic2_interface
 	devcb_read8			in_button_cb;
 
 	devcb_read8			in_dma_read_cb;
-	devcb_read8    		in_dma_read_color_cb;
+	devcb_read8 		in_dma_read_color_cb;
 	devcb_write_line	out_irq_cb;
 
 	devcb_read8			in_rdy_cb;

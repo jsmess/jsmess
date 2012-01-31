@@ -108,7 +108,7 @@ void ncr5390_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	default:
 		logerror("ncr5390: device_timer unexpected param %d\n", param);
 		exit(0);
-	}	
+	}
 }
 
 void ncr5390_device::delay(int cycles, int param)

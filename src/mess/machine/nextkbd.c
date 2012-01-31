@@ -101,7 +101,7 @@ bool nextkbd_device::fifo_empty() const
 
 READ32_MEMBER( nextkbd_device::ctrl_r )
 {
-	//	logerror("nextkbd: ctrl_r %08x @ %08x\n", control, mem_mask);
+	//  logerror("nextkbd: ctrl_r %08x @ %08x\n", control, mem_mask);
 	return control;
 }
 
@@ -131,12 +131,12 @@ WRITE32_MEMBER( nextkbd_device::ctrl_w )
 	}
 	if(diff & FLAG_INT)
 		int_change_cb(control & FLAG_INT);
-	//	logerror("nextkbd: ctrl_w %08x @ %08x\n", data, mem_mask);
+	//  logerror("nextkbd: ctrl_w %08x @ %08x\n", data, mem_mask);
 }
 
 WRITE32_MEMBER( nextkbd_device::ctrl2_w )
 {
-	//	logerror("nextkbd: ctrl2_w %08x @ %08x\n", data, mem_mask);
+	//  logerror("nextkbd: ctrl2_w %08x @ %08x\n", data, mem_mask);
 }
 
 WRITE32_MEMBER( nextkbd_device::data_w )

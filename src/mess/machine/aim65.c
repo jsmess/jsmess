@@ -170,11 +170,11 @@ MACHINE_START( aim65 )
 WRITE8_MEMBER( aim65_state::aim65_pb_w )
 {
 /*
-	d7 = cass out (both decks)
-	d5 = cass2 motor
-	d4 = cass1 motor
-	d2 = tty out (not emulated)
-	d0/1 = printer data (not emulated)
+    d7 = cass out (both decks)
+    d5 = cass2 motor
+    d4 = cass1 motor
+    d2 = tty out (not emulated)
+    d0/1 = printer data (not emulated)
 */
 
 	UINT8 bits = data ^ m_pb_save;
@@ -207,9 +207,9 @@ WRITE8_MEMBER( aim65_state::aim65_pb_w )
 READ8_MEMBER( aim65_state::aim65_pb_r )
 {
 /*
-	d7 = cassette in (deck 1)
-	d6 = tty in (not emulated)
-	d3 = kb/tty switch
+    d7 = cassette in (deck 1)
+    d6 = tty in (not emulated)
+    d3 = kb/tty switch
 */
 
 	UINT8 data = input_port_read(machine(), "switches");
@@ -260,26 +260,26 @@ device - the output will be gibberish.
 
 /* Part of aim65_pb_w
 
-	data &= 0x03;
+    data &= 0x03;
 
-	if (m_flag_b == 0)
-	{
-		printerRAM[(m_printer_y * 20) + m_printer_x ] |= (data << 8);
-		m_flag_b = 1;
-	}
+    if (m_flag_b == 0)
+    {
+        printerRAM[(m_printer_y * 20) + m_printer_x ] |= (data << 8);
+        m_flag_b = 1;
+    }
 */
 
 
 /* Items for driver state
 
-	emu_timer *m_print_timer;
-	int m_printer_x;
-	int m_printer_y;
-	bool m_printer_dir;
-	bool m_flag_a;
-	bool m_flag_b;
-	bool m_printer_level;
-	UINT16 *m_printerRAM;
+    emu_timer *m_print_timer;
+    int m_printer_x;
+    int m_printer_y;
+    bool m_printer_dir;
+    bool m_flag_a;
+    bool m_flag_b;
+    bool m_printer_level;
+    UINT16 *m_printerRAM;
 */
 
 
@@ -296,8 +296,8 @@ DRIVER_MEMBER(aim65_state, aim65_printer_on), // out CB2
 
 
 /* From Machine Config
-	MCFG_VIDEO_START(aim65)
-	MCFG_VIDEO_UPDATE(aim65)
+    MCFG_VIDEO_START(aim65)
+    MCFG_VIDEO_UPDATE(aim65)
 */
 
 

@@ -94,15 +94,15 @@ static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	AM_RANGE(0xc4, 0xc4) AM_WRITE(disk_0_control)
 	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
 ADDRESS_MAP_END
- 
+
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
 	DEVCB_DRIVER_MEMBER(rm380z_state, keyboard_put)
 };
 
 INPUT_PORTS_START( rm380z )
-//	PORT_START("additional_chars")
-//	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CODE(KEYCODE_ESC)
+//  PORT_START("additional_chars")
+//  PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CODE(KEYCODE_ESC)
 INPUT_PORTS_END
 
 //
@@ -164,7 +164,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( rm380z )
 	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
-//	ROM_LOAD( "cos34e-m.bin", 0x0000, 0x1000, CRC(20e2ddf4) SHA1(3177b28793d5a348c94fd0ae6393d74e2e9a8662))
+//  ROM_LOAD( "cos34e-m.bin", 0x0000, 0x1000, CRC(20e2ddf4) SHA1(3177b28793d5a348c94fd0ae6393d74e2e9a8662))
 	// I'm not sure of how those roms have been dumped. I don't know if those are good dumps or not.
 	ROM_LOAD( "cos40b-m.bin", 0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
 	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))

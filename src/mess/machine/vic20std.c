@@ -50,12 +50,12 @@ void vic20_standard_cartridge_device::device_start()
 UINT8 vic20_standard_cartridge_device::vic20_blk1_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (m_blk1 != NULL)
 	{
 		data = m_blk1[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 
@@ -67,12 +67,12 @@ UINT8 vic20_standard_cartridge_device::vic20_blk1_r(address_space &space, offs_t
 UINT8 vic20_standard_cartridge_device::vic20_blk2_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (m_blk2 != NULL)
 	{
 		data = m_blk2[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 
@@ -84,12 +84,12 @@ UINT8 vic20_standard_cartridge_device::vic20_blk2_r(address_space &space, offs_t
 UINT8 vic20_standard_cartridge_device::vic20_blk3_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (m_blk3 != NULL)
 	{
 		data = m_blk3[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 
@@ -101,12 +101,12 @@ UINT8 vic20_standard_cartridge_device::vic20_blk3_r(address_space &space, offs_t
 UINT8 vic20_standard_cartridge_device::vic20_blk5_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (m_blk5 != NULL)
 	{
 		data = m_blk5[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 
@@ -121,7 +121,7 @@ UINT8* vic20_standard_cartridge_device::vic20_blk1_pointer()
 	{
 		m_blk1 = auto_alloc_array(machine(), UINT8, 0x2000);
 	}
-	
+
 	return m_blk1;
 }
 
@@ -136,7 +136,7 @@ UINT8* vic20_standard_cartridge_device::vic20_blk2_pointer()
 	{
 		m_blk2 = auto_alloc_array(machine(), UINT8, 0x2000);
 	}
-	
+
 	return m_blk2;
 }
 
@@ -151,7 +151,7 @@ UINT8* vic20_standard_cartridge_device::vic20_blk3_pointer()
 	{
 		m_blk3 = auto_alloc_array(machine(), UINT8, 0x2000);
 	}
-	
+
 	return m_blk3;
 }
 
@@ -166,6 +166,6 @@ UINT8* vic20_standard_cartridge_device::vic20_blk5_pointer()
 	{
 		m_blk5 = auto_alloc_array(machine(), UINT8, 0x2000);
 	}
-	
+
 	return m_blk5;
 }

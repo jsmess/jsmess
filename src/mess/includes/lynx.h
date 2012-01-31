@@ -45,7 +45,7 @@ typedef struct
 	int everon;
 	int memory_accesses;
 	attotime time;
-	
+
 	int no_collide;
 	int vstretch;
 	int lefthanded;

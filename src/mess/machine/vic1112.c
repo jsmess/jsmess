@@ -81,9 +81,9 @@ READ8_MEMBER( vic1112_device::via0_pb_r )
 
         bit     description
 
-        PB0     
-        PB1     
-        PB2     
+        PB0
+        PB1
+        PB2
         PB3     _EOI
         PB4     _DAV IN
         PB5     _NRFD IN
@@ -112,11 +112,11 @@ WRITE8_MEMBER( vic1112_device::via0_pb_w )
         PB0     _DAV OUT
         PB1     _NRFD OUT
         PB2     _NDAC OUT
-        PB3     
-        PB4     
-        PB5     
-        PB6     
-        PB7     
+        PB3
+        PB4
+        PB5
+        PB6
+        PB7
 
     */
 
@@ -226,7 +226,7 @@ void vic1112_device::device_start()
 {
 	// find memory regions
 	m_rom = subregion("blk5")->base();
-	
+
 	// state saving
 	save_item(NAME(m_via0_irq));
 	save_item(NAME(m_via1_irq));
@@ -251,7 +251,7 @@ void vic1112_device::device_reset()
 UINT8 vic1112_device::vic20_io2_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (offset & 0x10)
 	{
 		data = m_via1->read(space, offset & 0x0f);
@@ -260,7 +260,7 @@ UINT8 vic1112_device::vic20_io2_r(address_space &space, offs_t offset)
 	{
 		data = m_via0->read(space, offset & 0x0f);
 	}
-	
+
 	return data;
 }
 
@@ -289,11 +289,11 @@ void vic1112_device::vic20_io2_w(address_space &space, offs_t offset, UINT8 data
 UINT8 vic1112_device::vic20_blk5_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (offset & 0x1000)
 	{
 		data = m_rom[offset & 0x7ff];
 	}
-	
+
 	return data;
 }
