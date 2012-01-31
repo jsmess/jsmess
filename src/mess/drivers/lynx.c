@@ -111,7 +111,7 @@ MACHINE_CONFIG_END
 #endif
 
 /* these 2 dumps are saved from an running machine,
-   and therefor the rom byte at 0xff09 is not readable!
+   and therefor the rom byte at 0xfff9 is not readable!
    (memory configuration)
    these 2 dumps differ only in this byte!
 */

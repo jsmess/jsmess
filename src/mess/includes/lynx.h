@@ -45,6 +45,11 @@ typedef struct
 	int everon;
 	int memory_accesses;
 	attotime time;
+	
+	int no_collide;
+	int vstretch;
+	int lefthanded;
+	int busy;
 } BLITTER;
 
 typedef struct
@@ -60,9 +65,11 @@ typedef struct
 typedef struct
 {
 	UINT8 data[0x100];
-	int accumulate_overflow;
 	UINT8 high;
 	int low;
+	int signed_math;
+	int accumulate;
+	int accumulate_overflow;
 } SUZY;
 
 typedef struct
@@ -101,8 +108,6 @@ public:
 	UINT8 *m_mem_fffa;
 	size_t m_mem_fe00_size;
 	UINT16 m_granularity;
-	int m_line;
-	int m_line_y;
 	int m_sign_AB;
 	int m_sign_CD;
 	UINT32 m_palette[0x10];
@@ -116,6 +121,7 @@ public:
 	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
 	UART m_uart;
 	bitmap_ind16 m_bitmap;
+	bitmap_ind16 m_bitmap_temp;
 };
 
 
@@ -218,6 +224,7 @@ void lynx_audio_count_down(device_t *device, int nr);
 
 #define SUZYHREV	0x88 // Suzy Hardware Revision (R) = '01'
 
+#define SUZYBUSEN   0x90 // Suzy Bus Enable (W)
 #define SPRGO		0x91 // Sprite Process Start Bit (W)
 #define SPRSYS		0x92 // System Control Bits (R/W)
 
