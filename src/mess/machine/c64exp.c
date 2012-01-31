@@ -91,6 +91,9 @@ void c64_expansion_slot_device::device_config_complete()
     	memset(&m_out_dma_cb, 0, sizeof(m_out_dma_cb));
     	memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
 	}
+
+	// set brief and instance name
+	update_names();	
 }
 
 
