@@ -144,10 +144,10 @@ assumes that the floppy devices are either at root level or at the parent
 level. Our floppy devices, however, are at the grandparent level as seen from
 the controller. */
 
-#define PFLOPPY_0 "peribox:floppy0"
-#define PFLOPPY_1 "peribox:floppy1"
-#define PFLOPPY_2 "peribox:floppy2"
-#define PFLOPPY_3 "peribox:floppy3"
+#define PFLOPPY_0 ":peribox:floppy0"
+#define PFLOPPY_1 ":peribox:floppy1"
+#define PFLOPPY_2 ":peribox:floppy2"
+#define PFLOPPY_3 ":peribox:floppy3"
 
 static void set_all_geometries(device_t *device, floppy_type_t type)
 {
