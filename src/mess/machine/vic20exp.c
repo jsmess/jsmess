@@ -91,6 +91,9 @@ void vic20_expansion_slot_device::device_config_complete()
     	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
     	memset(&m_out_res_cb, 0, sizeof(m_out_res_cb));
 	}
+	
+	// set brief and instance name
+	update_names();	
 }
 
 
