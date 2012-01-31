@@ -37,11 +37,11 @@ typedef struct
 	UINT8 reg;
 } expansion_ram_t;
 
-class c65_state : public c64_state
+class c65_state : public legacy_c64_state
 {
 public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: c64_state(mconfig, type, tag) { }
+		: legacy_c64_state(mconfig, type, tag) { }
 
 	UINT8 *m_chargen;
 	UINT8 *m_interface;

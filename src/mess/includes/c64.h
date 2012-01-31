@@ -32,10 +32,10 @@ struct _c64_cart_t {
 	UINT8       n_banks;
 };
 
-class c64_state : public driver_device
+class legacy_c64_state : public driver_device
 {
 public:
-	c64_state(const machine_config &mconfig, device_type type, const char *tag)
+	legacy_c64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_iec(*this, CBM_IEC_TAG),
 		  m_roml_writable(0)

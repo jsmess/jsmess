@@ -49,7 +49,7 @@
 
 static void c64_nmi( running_machine &machine )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	device_t *cia_1 = machine.device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
@@ -100,7 +100,7 @@ static WRITE8_DEVICE_HANDLER( c64_cia0_port_b_w )
 
 static void c64_irq( running_machine &machine, int level )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	if (level != state->m_old_level)
 	{
 		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
@@ -111,11 +111,11 @@ static void c64_irq( running_machine &machine, int level )
 
 static void c64_cia0_interrupt( device_t *device, int level )
 {
-	c64_state *state = device->machine().driver_data<c64_state>();
+	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
 	c64_irq (device->machine(), level || state->m_vicirq);
 }
 
-WRITE_LINE_MEMBER( c64_state::c64_vic_interrupt )
+WRITE_LINE_MEMBER( legacy_c64_state::c64_vic_interrupt )
 {
 	device_t *cia_0 = machine().device("cia_0");
 #if 1
@@ -179,7 +179,7 @@ const mos6526_interface c64_pal_cia0 =
  */
 static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 {
-	c64_state *state = device->machine().driver_data<c64_state>();
+	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
 
 	UINT8 value = 0xff;
 
@@ -194,7 +194,7 @@ static READ8_DEVICE_HANDLER( c64_cia1_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( c64_cia1_port_a_w )
 {
-	c64_state *state = device->machine().driver_data<c64_state>();
+	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
 
 	state->m_iec->clk_w(!(data & 0x10));
@@ -242,7 +242,7 @@ const mos6526_interface c64_pal_cia1 =
 
 WRITE8_HANDLER( c64_roml_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 
 	state->m_memory[offset + 0x8000] = data;
 
@@ -252,7 +252,7 @@ WRITE8_HANDLER( c64_roml_w )
 
 WRITE8_HANDLER( c64_write_io )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	device_t *cia_0 = space->machine().device("cia_0");
 	device_t *cia_1 = space->machine().device("cia_1");
 	device_t *sid = space->machine().device("sid6581");
@@ -282,7 +282,7 @@ WRITE8_HANDLER( c64_write_io )
 
 WRITE8_HANDLER( c64_ioarea_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	if (state->m_io_enabled)
 		c64_write_io(space, offset, data);
 	else
@@ -291,7 +291,7 @@ WRITE8_HANDLER( c64_ioarea_w )
 
 READ8_HANDLER( c64_read_io )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	device_t *cia_0 = space->machine().device("cia_0");
 	device_t *cia_1 = space->machine().device("cia_1");
 	device_t *sid = space->machine().device("sid6581");
@@ -326,7 +326,7 @@ READ8_HANDLER( c64_read_io )
 
 READ8_HANDLER( c64_ioarea_r )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	return state->m_io_enabled ? c64_read_io(space, offset) : state->m_io_ram_r_ptr[offset];
 }
 
@@ -446,7 +446,7 @@ configuration is active (the -GAME line is shorted to ground), the
 
 static void c64_bankswitch( running_machine &machine, int reset )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	int loram, hiram, charen;
 	int ultimax_mode = 0;
 	int data = m6510_get_port(machine.device<legacy_cpu_device>("maincpu")) & 0x07;
@@ -549,7 +549,7 @@ static void c64_bankswitch( running_machine &machine, int reset )
 
 WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 {
-	c64_state *state = device->machine().driver_data<c64_state>();
+	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
 
 	UINT8 direction = offset; // HACK ALERT!
 
@@ -600,7 +600,7 @@ WRITE8_DEVICE_HANDLER(c64_m6510_port_write)
 
 READ8_DEVICE_HANDLER(c64_m6510_port_read)
 {
-	c64_state *state = device->machine().driver_data<c64_state>();
+	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
 	UINT8 data = state->m_port_data;
 
 	if (state->m_tape_on)
@@ -731,13 +731,13 @@ int c64_paddle_read( device_t *device, int which )
 
 READ8_HANDLER( c64_colorram_read )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	return state->m_colorram[offset & 0x3ff];
 }
 
 WRITE8_HANDLER( c64_colorram_write )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	state->m_colorram[offset & 0x3ff] = data | 0xf0;
 }
 
@@ -751,7 +751,7 @@ TIMER_CALLBACK( c64_tape_timer )
 
 static void c64_common_driver_init( running_machine &machine )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	cbm_common_init();
 	state->m_game = 1;
 	state->m_exrom = 1;
@@ -781,7 +781,7 @@ static void c64_common_driver_init( running_machine &machine )
 
 DRIVER_INIT( c64 )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	state->m_ultimax = 0;
 	state->m_is_sx64 = 0;
 	state->m_pal = 0;
@@ -792,7 +792,7 @@ DRIVER_INIT( c64 )
 
 DRIVER_INIT( c64pal )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	state->m_ultimax = 0;
 	state->m_is_sx64 = 0;
 	state->m_pal = 1;
@@ -803,7 +803,7 @@ DRIVER_INIT( c64pal )
 
 DRIVER_INIT( ultimax )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	state->m_ultimax = 1;
 	state->m_is_sx64 = 0;
 	state->m_pal = 0;
@@ -814,7 +814,7 @@ DRIVER_INIT( ultimax )
 
 DRIVER_INIT( c64gs )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	state->m_ultimax = 0;
 	state->m_is_sx64 = 0;
 	state->m_pal = 1;
@@ -825,7 +825,7 @@ DRIVER_INIT( c64gs )
 
 DRIVER_INIT( sx64 )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	state->m_ultimax = 0;
 	state->m_is_sx64 = 1;
 	state->m_pal = 1;
@@ -836,7 +836,7 @@ DRIVER_INIT( sx64 )
 
 MACHINE_START( c64 )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	state->m_port_data = 0x17;
 
 	state->m_io_mirror = auto_alloc_array(machine, UINT8, 0x1000);
@@ -994,7 +994,7 @@ enum {
 
 static DEVICE_IMAGE_UNLOAD( c64_cart )
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
+	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>();
 	int i;
 
 	for (i = 0; i < C64_MAX_ROMBANK; i++)
@@ -1009,7 +1009,7 @@ static DEVICE_IMAGE_UNLOAD( c64_cart )
 
 static DEVICE_START( c64_cart )
 {
-	c64_state *state = device->machine().driver_data<c64_state>();
+	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
 	/* In the first slot we can load a .crt file. In this case we want
         to use game & exrom values from the header, not the default ones. */
 	state->m_cart.game = -1;
@@ -1020,7 +1020,7 @@ static DEVICE_START( c64_cart )
 
 static int c64_crt_load( device_image_interface &image )
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
+	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>();
 	int size = image.length(), test, i = 0, ii;
 	int _80_loaded = 0, _90_loaded = 0, a0_loaded = 0, b0_loaded = 0, e0_loaded = 0, f0_loaded = 0;
 	const char *filetype = image.filetype();
@@ -1278,12 +1278,12 @@ static int c64_crt_load( device_image_interface &image )
 	image.device().machine().firstcpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xdf00, 0xdf00, 0, 0xff, FUNC(_handler));
 
 #define allocate_cartridge_timer(_period, _func) \
-	c64_state *state = image.device().machine().driver_data<c64_state>(); \
+	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>(); \
 	state->m_cartridge_timer = image.device().machine().scheduler().timer_alloc(FUNC(_func)); \
 	state->m_cartridge_timer->adjust(_period, 0);
 
 #define set_game_line(_machine, _state) \
-	_machine.driver_data<c64_state>()->m_game = _state; \
+	_machine.driver_data<legacy_c64_state>()->m_game = _state; \
 	c64_bankswitch(_machine, 0);
 
 INLINE void load_cartridge_region(device_image_interface &image, const char *name, offs_t offset, size_t size)
@@ -1295,21 +1295,21 @@ INLINE void load_cartridge_region(device_image_interface &image, const char *nam
 
 INLINE void map_cartridge_roml(running_machine &machine, offs_t offset)
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	UINT8 *cart = machine.region("user1")->base();
 	memcpy(state->m_roml, cart + offset, 0x2000);
 }
 
 INLINE void map_cartridge_romh(running_machine &machine, offs_t offset)
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	UINT8 *cart = machine.region("user1")->base();
 	memcpy(state->m_romh, cart + offset, 0x2000);
 }
 
 static void load_standard_c64_cartridge(device_image_interface &image)
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
+	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>();
 	UINT32 size;
 
 	// is there anything to load at 0x8000?
@@ -1463,7 +1463,7 @@ static WRITE8_HANDLER( pagefox_bank_w )
 
     */
 
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	UINT8 *cart = space->machine().region("user1")->base();
 
 	if (data == 0xff)
@@ -1515,7 +1515,7 @@ static void load_pagefox_cartridge(device_image_interface &image)
 
 static WRITE8_HANDLER( multiscreen_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	UINT8 *cart = space->machine().region("user1")->base();
 	int bank = data & 0x0f;
 	offs_t address = bank * 0x4000;
@@ -1570,7 +1570,7 @@ static void load_simons_basic_cartridge(device_image_interface &image)
 
 static READ8_HANDLER( super_explode_r )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 
 	return state->m_roml[0x1f00 | offset];
 }
@@ -1594,7 +1594,7 @@ static void load_super_explode_cartridge(device_image_interface &image)
 
 static void c64_software_list_cartridge_load(device_image_interface &image)
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
+	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>();
 
 	// initialize ROML and ROMH pointers
 	state->m_roml = state->m_c64_roml;
@@ -1669,7 +1669,7 @@ static DEVICE_IMAGE_LOAD( c64_cart )
 
 static DEVICE_IMAGE_LOAD( max_cart )
 {
-	c64_state *state = image.device().machine().driver_data<c64_state>();
+	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>();
 	int result = IMAGE_INIT_PASS;
 
 	if (image.software_entry() != NULL)
@@ -1709,7 +1709,7 @@ static DEVICE_IMAGE_LOAD( max_cart )
 
 static WRITE8_HANDLER( fc3_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 3
 	// working:
 	// not working:
@@ -1739,7 +1739,7 @@ static WRITE8_HANDLER( fc3_bank_w )
 
 static WRITE8_HANDLER( ocean1_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 5
 	// working: Double Dragon, Ghostbusters, Terminator 2
 	// not working: Pang, Robocop 2, Toki
@@ -1774,7 +1774,7 @@ static WRITE8_HANDLER( ocean1_bank_w )
 
 static WRITE8_HANDLER( funplay_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 7
 	// working:
 	// not working:
@@ -1804,7 +1804,7 @@ static WRITE8_HANDLER( funplay_bank_w )
 
 static WRITE8_HANDLER( supergames_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 8
 	// working:
 	// not working:
@@ -1843,7 +1843,7 @@ static WRITE8_HANDLER( supergames_bank_w )
 
 static WRITE8_HANDLER( c64gs_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 15
 	// working:
 	// not working: The Last Ninja Remix
@@ -1867,7 +1867,7 @@ static WRITE8_HANDLER( c64gs_bank_w )
 
 static READ8_HANDLER( dinamic_bank_r )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 17
 	// working: Satan
 	// not working:
@@ -1892,7 +1892,7 @@ static READ8_HANDLER( dinamic_bank_r )
 
 static READ8_HANDLER( zaxxon_bank_r )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 18
 	// working:
 	// not working:
@@ -1915,7 +1915,7 @@ static READ8_HANDLER( zaxxon_bank_r )
 
 static WRITE8_HANDLER( domark_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 19
 	// working:
 	// not working:
@@ -1938,7 +1938,7 @@ static WRITE8_HANDLER( domark_bank_w )
 
 static WRITE8_HANDLER( comal80_bank_w )
 {
-	c64_state *state = space->machine().driver_data<c64_state>();
+	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
 	// Type # 21
 	// working: Comal 80
 	// not working:
@@ -1967,7 +1967,7 @@ static WRITE8_HANDLER( comal80_bank_w )
 
 static void setup_c64_custom_mappers(running_machine &machine)
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 
 	switch (state->m_cart.mapper)
@@ -2030,7 +2030,7 @@ static void setup_c64_custom_mappers(running_machine &machine)
 
 MACHINE_RESET( c64 )
 {
-	c64_state *state = machine.driver_data<c64_state>();
+	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	if (state->m_cart.n_banks)
 		setup_c64_custom_mappers(machine);
 }

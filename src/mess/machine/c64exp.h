@@ -79,35 +79,9 @@ struct c64_expansion_slot_interface
 };
 
 
-// ======================> device_c64_expansion_card_interface
-
-// class representing interface-specific live c64_expansion card
-class device_c64_expansion_card_interface : public device_slot_card_interface
-{
-public:
-	// construction/destruction
-	device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_c64_expansion_card_interface();
-
-	// memory access
-	virtual UINT8 c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2) { return 0; };
-	virtual void c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2) { };
-
-	// memory banking
-	virtual int c64_game_r() { return 1; };
-	virtual int c64_exrom_r() { return 1; };
-
-	// reset
-	virtual void c64_reset_w() { };
-
-	// video
-	virtual UINT32 c64_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
-
-	virtual UINT8* get_cart_base() { return NULL; }
-};
-
-
 // ======================> c64_expansion_slot_device
+
+class device_c64_expansion_card_interface;
 
 class c64_expansion_slot_device : public device_t,
 								  public c64_expansion_slot_interface,
@@ -167,6 +141,33 @@ protected:
 	devcb_resolved_write_line	m_out_reset_func;
 
 	device_c64_expansion_card_interface *m_cart;
+};
+
+
+// ======================> device_c64_expansion_card_interface
+
+class device_c64_expansion_card_interface : public device_slot_card_interface
+{
+public:
+	// construction/destruction
+	device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_c64_expansion_card_interface();
+
+	// memory access
+	virtual UINT8 c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2) { return 0; };
+	virtual void c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2) { };
+
+	// memory banking
+	virtual int c64_game_r() { return 1; };
+	virtual int c64_exrom_r() { return 1; };
+
+	// reset
+	virtual void c64_reset_w() { };
+
+	// video
+	virtual UINT32 c64_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
+
+	virtual UINT8* get_cart_base() { return NULL; }
 };
 
 

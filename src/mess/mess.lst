@@ -549,12 +549,11 @@ vic20s	// Commodore VIC 20 (Swedish Expanson Kit)
 
 max	   // Commodore Max Machine (Japan)
 c64	   // Commodore 64 (NTSC)
-c64pal	// Commodore 64 (PAL)
-c64jpn	// Commodore 64 (Japan)
-c64swe	// Commodore 64 (Sweden)
-vic64s	// Commodore VIC 64S (Sweden)
+c64n
+c64p	// Commodore 64 (PAL)
+c64j	// Commodore 64 (Japan)
+c64sw	// Commodore 64 (Sweden)
 pet64	 // Commodore PET 64
-cbm4064   // Commodore CBM 4064
 edu64	 // Commodore Educator 64
 //  clipper  // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 //  tesa6240  //  modified SX64 with label printer

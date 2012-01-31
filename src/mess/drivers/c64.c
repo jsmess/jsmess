@@ -399,17 +399,17 @@ C64DTV TODO:
  *************************************/
 
 static ADDRESS_MAP_START(ultimax_mem , AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(c64_state, m_memory)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE_MEMBER(c64_state, m_c64_roml)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(legacy_c64_state, m_memory)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE_MEMBER(legacy_c64_state, m_c64_roml)
 	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2", vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd7ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE( c64_colorram_write) AM_BASE_MEMBER(c64_state, m_colorram) /* colorram  */
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE( c64_colorram_write) AM_BASE_MEMBER(legacy_c64_state, m_colorram) /* colorram  */
 	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", mos6526_r, mos6526_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_MEMBER(c64_state, m_c64_romh)				/* ram or kernel rom */
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_MEMBER(legacy_c64_state, m_c64_romh)				/* ram or kernel rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(c64_mem, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(c64_state, m_memory)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(legacy_c64_state, m_memory)
 	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank1") AM_WRITE(c64_roml_w)		/* ram or external roml */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3") AM_WRITEONLY				/* ram or basic rom or external romh */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -460,21 +460,6 @@ static INPUT_PORTS_START (c64gs)
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START (vic64s)
-	PORT_INCLUDE( c64 )
-
-	PORT_MODIFY( "ROW5" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa5") PORT_CODE(KEYCODE_OPENBRACE)	PORT_CHAR('\xA5')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)								PORT_CHAR(';') PORT_CHAR(']')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)							PORT_CHAR('=')
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)								PORT_CHAR('-')
-
-	PORT_MODIFY( "ROW6" )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa4") PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR('\xA4')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb6") PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR('\xB6')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('@')
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)						PORT_CHAR(':') PORT_CHAR('*')
-INPUT_PORTS_END
 
 static INPUT_PORTS_START (vip64)
 	PORT_INCLUDE( c64 )
@@ -523,13 +508,6 @@ static PALETTE_INIT( c64 )
 	}
 }
 
-static PALETTE_INIT( pet64 )
-{
-	int i;
-	for (i = 0; i < 16; i++)
-		palette_set_color_rgb(machine, i, 0, c64_palette[i * 3 + 1], 0);
-}
-
 
 /*************************************
  *
@@ -551,10 +529,6 @@ static const m6502_interface c64_m6510_interface =
 	DEVCB_HANDLER(c64_m6510_port_read),
 	DEVCB_HANDLER(c64_m6510_port_write)
 };
-
-static SLOT_INTERFACE_START( sx1541_iec_devices )
-	SLOT_INTERFACE("sx1541", SX1541)
-SLOT_INTERFACE_END
 
 static CBM_IEC_INTERFACE( cbm_iec_intf )
 {
@@ -580,22 +554,22 @@ static SCREEN_UPDATE_IND16( c64 )
 	return 0;
 }
 
-READ8_MEMBER( c64_state::c64_lightpen_x_cb )
+READ8_MEMBER( legacy_c64_state::c64_lightpen_x_cb )
 {
 	return input_port_read(machine(), "LIGHTX") & ~0x01;
 }
 
-READ8_MEMBER( c64_state::c64_lightpen_y_cb )
+READ8_MEMBER( legacy_c64_state::c64_lightpen_y_cb )
 {
 	return input_port_read(machine(), "LIGHTY") & ~0x01;
 }
 
-READ8_MEMBER( c64_state::c64_lightpen_button_cb )
+READ8_MEMBER( legacy_c64_state::c64_lightpen_button_cb )
 {
 	return input_port_read(machine(), "OTHER") & 0x04;
 }
 
-READ8_MEMBER( c64_state::c64_dma_read )
+READ8_MEMBER( legacy_c64_state::c64_dma_read )
 {
 	if (!m_game && m_exrom)
 	{
@@ -611,7 +585,7 @@ READ8_MEMBER( c64_state::c64_dma_read )
 	return m_vicaddr[offset];
 }
 
-READ8_MEMBER( c64_state::c64_dma_read_ultimax )
+READ8_MEMBER( legacy_c64_state::c64_dma_read_ultimax )
 {
 	if (offset < 0x3000)
 		return m_memory[offset];
@@ -619,12 +593,12 @@ READ8_MEMBER( c64_state::c64_dma_read_ultimax )
 	return m_c64_romh[offset & 0x1fff];
 }
 
-READ8_MEMBER( c64_state::c64_dma_read_color )
+READ8_MEMBER( legacy_c64_state::c64_dma_read_color )
 {
 	return m_colorram[offset & 0x3ff] & 0xf;
 }
 
-READ8_MEMBER( c64_state::c64_rdy_cb )
+READ8_MEMBER( legacy_c64_state::c64_rdy_cb )
 {
 	return input_port_read(machine(), "CYCLES") & 0x07;
 }
@@ -633,39 +607,39 @@ static const vic2_interface c64_vic2_ntsc_intf = {
 	"screen",
 	"maincpu",
 	VIC6567,
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read_color),
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, c64_vic_interrupt),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_rdy_cb)
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_dma_read),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_dma_read_color),
+	DEVCB_DRIVER_LINE_MEMBER(legacy_c64_state, c64_vic_interrupt),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_rdy_cb)
 };
 
 static const vic2_interface c64_vic2_pal_intf = {
 	"screen",
 	"maincpu",
 	VIC6569,
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read_color),
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, c64_vic_interrupt),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_rdy_cb)
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_dma_read),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_dma_read_color),
+	DEVCB_DRIVER_LINE_MEMBER(legacy_c64_state, c64_vic_interrupt),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_rdy_cb)
 };
 
 static const vic2_interface ultimax_vic2_intf = {
 	"screen",
 	"maincpu",
 	VIC6567,
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_x_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_y_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_lightpen_button_cb),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read_ultimax),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_dma_read_color),
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, c64_vic_interrupt),
-	DEVCB_DRIVER_MEMBER(c64_state, c64_rdy_cb)
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_x_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_y_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_lightpen_button_cb),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_dma_read_ultimax),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_dma_read_color),
+	DEVCB_DRIVER_LINE_MEMBER(legacy_c64_state, c64_vic_interrupt),
+	DEVCB_DRIVER_MEMBER(legacy_c64_state, c64_rdy_cb)
 };
 
 static C64_EXPANSION_INTERFACE( c64_expansion_intf )
@@ -683,7 +657,7 @@ static C64_EXPANSION_INTERFACE( c64_expansion_intf )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ultimax, c64_state )
+static MACHINE_CONFIG_START( ultimax, legacy_c64_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP( ultimax_mem)
@@ -731,7 +705,7 @@ static MACHINE_CONFIG_START( ultimax, c64_state )
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c64, c64_state )
+static MACHINE_CONFIG_START( c64, legacy_c64_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
@@ -783,7 +757,7 @@ static MACHINE_CONFIG_START( c64, c64_state )
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c64pal, c64_state )
+static MACHINE_CONFIG_START( c64pal, legacy_c64_state )
 	MCFG_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG( c64_m6510_interface )
@@ -834,11 +808,7 @@ static MACHINE_CONFIG_START( c64pal, c64_state )
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pet64, c64 )
-	MCFG_PALETTE_INIT( pet64 )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( c64gs, c64_state )
+static MACHINE_CONFIG_START( c64gs, legacy_c64_state )
 	MCFG_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG( c64_m6510_interface )
@@ -879,7 +849,7 @@ static MACHINE_CONFIG_START( c64gs, c64_state )
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sx64, c64_state )
+static MACHINE_CONFIG_START( sx64, legacy_c64_state )
 	MCFG_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
 	MCFG_CPU_CONFIG( c64_m6510_interface )
@@ -960,44 +930,6 @@ ROM_START( c64 )
 
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
 ROM_END
-
-#define rom_c64pal	rom_c64
-
-ROM_START( c64jpn )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
-	ROM_LOAD( "906145-02.bin", 0x12000, 0x2000, CRC(3a9ef6f1) SHA1(4ff0f11e80f4b57430d8f0c3799ed0f0e0f4565d) )
-	ROM_LOAD( "906143-02.bin", 0x14000, 0x1000, CRC(1604f6c1) SHA1(0fad19dbcdb12461c99657b2979dbb5c2e47b527) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
-
-ROM_START( vic64s )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	ROM_LOAD( "901226-01.bin",	0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
-	ROM_LOAD( "kernel.swe",	0x12000, 0x2000, CRC(f10c2c25) SHA1(e4f52d9b36c030eb94524eb49f6f0774c1d02e5e) )
-	ROM_SYSTEM_BIOS(0, "default", "Swedish Characters" )
-	ROMX_LOAD( "charswe.bin",0x14000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "alt", "Swedish Characters (Alt)" )
-	ROMX_LOAD( "charswe2.bin",0x14000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac), ROM_BIOS(2) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
-#define rom_c64swe	rom_vic64s
-
-ROM_START( pet64 )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
-	ROM_LOAD( "901246-01.bin", 0x12000, 0x2000, CRC(789c8cc5) SHA1(6c4fa9465f6091b174df27dfe679499df447503c) )
-	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
-#define rom_cbm4064 rom_pet64
-#define rom_edu64	rom_c64
 
 ROM_START( sx64 )
 	ROM_REGION( 0x19400, "maincpu", 0 )
@@ -1087,14 +1019,7 @@ ROM_END
 COMP(1982, max,		0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (NTSC)", 0)
-COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64 (PAL)",  0)
-COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (Japan)", 0)
-COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines", "VIC 64S", 0)
-COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines", "Commodore 64 (Sweden/Finland)", 0)
 
-COMP(1983, pet64,	c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "PET 64 (NTSC)", 0)
-COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "CBM 4064 (NTSC)", 0)
-COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "Educator 64 (NTSC)", 0) // maybe different palette?
 //COMP(1983, clipper,  c64,  0, c64pal,  clipper, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 //COMP(1983, tesa6240, c64,  0, c64pal,  c64,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
 
