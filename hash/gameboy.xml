@@ -12129,7 +12129,7 @@
 		<year>1991</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="DMG-NGJ"/>
-		<info name="release" value="19911213"/> 
+		<info name="release" value="19911213"/>
         <info name="alt_title" value="忍者龍剣伝GB 摩天楼決戦"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="131072">

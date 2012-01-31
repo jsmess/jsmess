@@ -30,7 +30,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="psysiv21">
 		<description>p-System IV.21</description>
 		<year>1983</year>
@@ -60,7 +60,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cpm68k">
 		<description>CP/M 68K v1.1</description>
 		<year>1983</year>

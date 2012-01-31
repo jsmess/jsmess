@@ -13,18 +13,18 @@ a Creativision would not see the difference between them.
 
 -->
 
-<!-- 
+<!--
 Notes from MADrigal:
 1. In real carts, roms sometimes are EPROMs with a sticker, but the same data could
-well be found on EPROMs with no stickers or with a different sticker (due to different 
-manufacturers producing the carts). same argument applies to the EPROM specific types 
-(by Toshiba, Hitachi or General Instruments) and production date. As a result these 
-info are mostly confusing when not misleading and it's probably safer not to list them 
+well be found on EPROMs with no stickers or with a different sticker (due to different
+manufacturers producing the carts). same argument applies to the EPROM specific types
+(by Toshiba, Hitachi or General Instruments) and production date. As a result these
+info are mostly confusing when not misleading and it's probably safer not to list them
 based on a specific model
 2. Concerning the usage of "Alt ROM config" in some games below: there exist at least
 4 different PCB types for Creativision carts and *each* of them can have 1, 2 or 3 ROM
-chips. The choice of PCB for each game and the presence of ROMs split into different sizes 
-follows no pattern and was probably based only on the chip availability at manufacturing 
+chips. The choice of PCB for each game and the presence of ROMs split into different sizes
+follows no pattern and was probably based only on the chip availability at manufacturing
 time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 -->
 
