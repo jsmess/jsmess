@@ -1236,11 +1236,11 @@ void gb_video_reset( running_machine &machine, int mode )
 	if (mode == GB_VIDEO_CGB) vram_size = 0x4000;
 
 	/* free regions if already allocated */
-	if (machine.region("gfx1")->base())		machine.region_free("gfx1");
-	if (machine.region("gfx2")->base())		machine.region_free("gfx2");
+	if (machine.region("gfx1")->base())		machine.region_free(":gfx1");
+	if (machine.region("gfx2")->base())		machine.region_free(":gfx2");
 
-	state->m_lcd.gb_vram = machine.region_alloc("gfx1", vram_size, 1, ENDIANNESS_LITTLE );
-	state->m_lcd.gb_oam = machine.region_alloc("gfx2", 0x100, 1, ENDIANNESS_LITTLE );
+	state->m_lcd.gb_vram = machine.region_alloc(":gfx1", vram_size, 1, ENDIANNESS_LITTLE );
+	state->m_lcd.gb_oam = machine.region_alloc(":gfx2", 0x100, 1, ENDIANNESS_LITTLE );
 	memset( state->m_lcd.gb_vram->base(), 0, vram_size );
 
 	state->m_lcd.gb_vram_ptr = state->m_lcd.gb_vram->base();
