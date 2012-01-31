@@ -89,7 +89,7 @@ WRITE8_MEMBER(nextmo_device::r7_w)
 		sector_pos = 0;
 		if(!drq_cb.isnull())
 			drq_cb(true);
-	}		
+	}
 }
 
 UINT8 nextmo_device::dma_r()

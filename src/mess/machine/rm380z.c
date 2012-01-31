@@ -34,7 +34,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 	switch ( offset )
 	{
 	case 0xFC:		// PORT0
-		//printf("FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",data,m_fbfd,m_fbfe,cpu_get_pc(machine().device("maincpu")),writenum); 
+		//printf("FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",data,m_fbfd,m_fbfe,cpu_get_pc(machine().device("maincpu")),writenum);
 		m_port0 = data;
 		if (data&0x01)
 		{
@@ -48,8 +48,8 @@ WRITE8_MEMBER( rm380z_state::port_write )
 		break;
 
 	case 0xFD:		// screen line counter (?)
-		//printf("FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,data,m_fbfe,cpu_get_pc(machine().device("maincpu")),writenum); 
-		
+		//printf("FBFC [%2.2x] FBFDw[%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,data,m_fbfe,cpu_get_pc(machine().device("maincpu")),writenum);
+
 		m_old_old_fbfd=m_old_fbfd;
 		m_old_fbfd=m_fbfd;
 		m_fbfd=data;
@@ -57,11 +57,11 @@ WRITE8_MEMBER( rm380z_state::port_write )
 		writenum++;
 
 		check_scroll_register();
-		
+
 		break;
 
 	case 0xFE:		// line on screen to write to divided by 2
-		//printf("FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,m_fbfd,data,cpu_get_pc(machine().device("maincpu")),writenum); 
+		//printf("FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,m_fbfd,data,cpu_get_pc(machine().device("maincpu")),writenum);
 		m_fbfe=data;
 		break;
 
@@ -69,7 +69,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 		//printf("write of [%x] to FBFF\n",data);
 		//logerror("%s: Write %02X to user I/O port\n", machine().describe_context(), data );
 		break;
-		
+
 	default:
 		printf("unknown port [%2.2x] write of [%2.2x]\n",offset,data);
 	}
@@ -102,7 +102,7 @@ READ8_MEMBER( rm380z_state::port_read )
 	case 0xFF:		// user port
 		//printf("%s: Read from user port\n", machine().describe_context());
 		break;
-		
+
 	default:
 		printf("read from unknown port [%2.2x]\n",offset);
 	}
@@ -183,7 +183,7 @@ static TIMER_CALLBACK(static_vblank_timer)
 	}
 
 	// line blanking
-	if ((state->m_rasterlineCtr%LINE_SUBDIVISION)>80) 
+	if ((state->m_rasterlineCtr%LINE_SUBDIVISION)>80)
 	{
 		state->m_port1|=0x80;
 	}
@@ -270,7 +270,7 @@ void rm380z_state::machine_reset()
 	memset(m_vramattribs,0,RM380Z_SCREENSIZE);
 	memset(m_vramchars,0,RM380Z_SCREENSIZE);
 	memset(m_vram,0,RM380Z_SCREENSIZE);
-	
+
 	config_memory_map();
 	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), FUNC(static_vblank_timer));
 	wd17xx_reset(machine().device("wd1771"));

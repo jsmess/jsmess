@@ -109,7 +109,7 @@ public:
 	static const floppy_format_type floppy_formats[];
 	static const cdrom_interface cdrom_intf;
 	static const harddisk_interface harddisk_intf;
-	
+
 protected:
 	struct dma_slot {
 		UINT32 start, limit, chain_start, chain_limit, current;

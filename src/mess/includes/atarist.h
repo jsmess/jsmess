@@ -101,7 +101,7 @@ public:
 	void machine_start();
 
 	void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// video
@@ -271,7 +271,7 @@ public:
 	emu_timer *m_mouse_timer;
 	emu_timer *m_glue_timer;
 	emu_timer *m_shifter_timer;
-	
+
 	bitmap_rgb32 m_bitmap;
 
 	floppy_image_device *floppy_devices[2];

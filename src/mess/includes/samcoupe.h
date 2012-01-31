@@ -38,9 +38,9 @@ public:
 			: driver_device(mconfig, type, tag) { }
 
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	bitmap_ind16 m_bitmap;
 
 	emu_timer *m_video_update_timer;

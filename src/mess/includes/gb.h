@@ -179,7 +179,7 @@ public:
 	UINT8 m_mmm01_bank_mask;
 	gb_lcd_t m_lcd;
 	void (*update_scanline)( running_machine &machine );
-	
+
 	bitmap_ind16 m_bitmap;
 };
 

@@ -35,7 +35,7 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
-	
+
 	// device_vic20_expansion_card_interface overrides
 	virtual UINT8 vic20_blk1_r(address_space &space, offs_t offset);
 	virtual void vic20_blk1_w(address_space &space, offs_t offset, UINT8 data);

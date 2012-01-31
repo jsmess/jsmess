@@ -74,7 +74,7 @@ VIDEO_START( a7800 )
 	state->m_maria_bcntl = 0;
 	state->m_maria_kangaroo = 0;
 	state->m_maria_rm = 0;
-	
+
 	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 }
 

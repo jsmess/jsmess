@@ -79,7 +79,7 @@ private:
 		SEARCH_ADDRESS_MARK_DATA_FAILED,
 		READ_SECTOR_DATA,
 		READ_SECTOR_DATA_BYTE,
-		
+
 	};
 
 	struct pll_t {

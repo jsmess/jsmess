@@ -533,8 +533,8 @@ UINT8 sb8_device::dack_r(int line)
 void sb8_device::dack_w(int line, UINT8 data)
 {
 //    printf("dack_w: line %x data %02x\n", line, data);
-//	if(data != 0x80)
-//		printf("%02x\n",data);
+//  if(data != 0x80)
+//      printf("%02x\n",data);
 
     // set the transfer over timer on the 1st byte
     if (m_dsp.dma_transferred == 0)

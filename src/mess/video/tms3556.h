@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER( reg_w );
 
 	void interrupt(running_machine &machine);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

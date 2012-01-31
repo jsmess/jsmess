@@ -56,7 +56,7 @@ public:
 	void vidc20_dynamic_screen_change();
 	virtual void machine_reset();
 	virtual void machine_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

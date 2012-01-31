@@ -40,7 +40,7 @@ class vic1010_device :  public device_t,
 public:
     // construction/destruction
     vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -49,7 +49,7 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
-	
+
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
@@ -68,7 +68,7 @@ protected:
 	virtual void vic20_blk3_w(address_space &space, offs_t offset, UINT8 data);
 	virtual UINT8 vic20_blk5_r(address_space &space, offs_t offset);
 	virtual void vic20_blk5_w(address_space &space, offs_t offset, UINT8 data);
-	
+
 private:
 	vic20_expansion_slot_device *m_expansion_slot[MAX_SLOTS];
 };

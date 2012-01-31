@@ -233,7 +233,7 @@ WRITE8_MEMBER( kc85_state::uart_ctrl_w )
     m_uart->pi_w(BIT(data, 2));
     m_uart->cls1_w(BIT(data, 3));
     m_uart->cls2_w(BIT(data, 4));
-	
+
 	m_uart->crl_w(1);
 }
 
@@ -988,7 +988,7 @@ WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
 	{
 		speaker_level_w(m_speaker, state);
 	}
-	
+
 	m_uart->trc_w(state);
 	m_uart->rrc_w(state);
 }

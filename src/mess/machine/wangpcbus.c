@@ -144,7 +144,7 @@ void wangpcbus_device::device_reset()
 void wangpcbus_device::add_wangpcbus_card(device_wangpcbus_card_interface *card, int sid)
 {
 	m_device_list.append(*card);
-	
+
 	card->m_bus = this;
 	card->m_sid = sid;
 }
@@ -242,18 +242,18 @@ UINT8 wangpcbus_device::dack_r(int line)
 {
 	UINT8 retVal = 0xff;
 	device_wangpcbus_card_interface *entry = m_device_list.first();
-	
+
 	while (entry)
 	{
-		if (entry->wangpcbus_have_dack(line)) 
+		if (entry->wangpcbus_have_dack(line))
 		{
 			retVal = entry->wangpcbus_dack_r(line);
 			break;
 		}
-		
+
 		entry = entry->next();
 	}
-	
+
 	return retVal;
 }
 
@@ -265,14 +265,14 @@ UINT8 wangpcbus_device::dack_r(int line)
 void wangpcbus_device::dack_w(int line,UINT8 data)
 {
 	device_wangpcbus_card_interface *entry = m_device_list.first();
-	
+
 	while (entry)
 	{
 		if (entry->wangpcbus_have_dack(line))
 		{
 			entry->wangpcbus_dack_w(line,data);
 		}
-		
+
 		entry = entry->next();
 	}
 }
@@ -285,7 +285,7 @@ void wangpcbus_device::dack_w(int line,UINT8 data)
 void wangpcbus_device::tc_w(int state)
 {
 	device_wangpcbus_card_interface *entry = m_device_list.first();
-	
+
 	while (entry)
 	{
 		entry->wangpcbus_tc_w(state);

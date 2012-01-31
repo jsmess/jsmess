@@ -45,7 +45,7 @@ INPUT_PORTS_START( vic1110 )
 	PORT_DIPSETTING(    BLK5, "$A000-B3FFF" )
 INPUT_PORTS_END
 
-	
+
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
@@ -91,12 +91,12 @@ void vic1110_device::device_start()
 UINT8 vic1110_device::vic20_blk1_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (input_port_read(*this, "SW") == BLK1)
 	{
 		data = m_ram[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 
@@ -121,12 +121,12 @@ void vic1110_device::vic20_blk1_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1110_device::vic20_blk2_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (input_port_read(*this, "SW") == BLK2)
 	{
 		data = m_ram[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 
@@ -151,12 +151,12 @@ void vic1110_device::vic20_blk2_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1110_device::vic20_blk3_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (input_port_read(*this, "SW") == BLK3)
 	{
 		data = m_ram[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 
@@ -181,12 +181,12 @@ void vic1110_device::vic20_blk3_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1110_device::vic20_blk5_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (input_port_read(*this, "SW") == BLK5)
 	{
 		data = m_ram[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 

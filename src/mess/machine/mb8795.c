@@ -70,7 +70,7 @@ void mb8795_device::device_reset()
 
 	set_promisc(true);
 
-	start_send();	
+	start_send();
 }
 
 void mb8795_device::recv_cb(UINT8 *buf, int len)
@@ -87,7 +87,7 @@ bool mb8795_device::mcast_chk(const UINT8 *buf, int len)
 
 READ8_MEMBER(mb8795_device::txstat_r)
 {
-	//	fprintf(stderr, "mb8795: txstat_r %02x (%08x)\n", txstat, cpu_get_pc(&space.device()));
+	//  fprintf(stderr, "mb8795: txstat_r %02x (%08x)\n", txstat, cpu_get_pc(&space.device()));
 	return txstat;
 }
 
@@ -208,7 +208,7 @@ void mb8795_device::tx_dma_w(UINT8 data, bool eof)
 	drq_tx = false;
 	if(!drq_tx_cb.isnull())
 		drq_tx_cb(drq_tx);
-	
+
 	if(eof) {
 		fprintf(stderr, "mb8795: send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x\n",
 				txbuf[0], txbuf[1], txbuf[2], txbuf[3], txbuf[4], txbuf[5],
@@ -283,11 +283,11 @@ void mb8795_device::receive()
 bool mb8795_device::recv_is_broadcast()
 {
 	return
-		rxbuf[0] == 0xff && 
-		rxbuf[1] == 0xff && 
-		rxbuf[2] == 0xff && 
-		rxbuf[3] == 0xff && 
-		rxbuf[4] == 0xff && 
+		rxbuf[0] == 0xff &&
+		rxbuf[1] == 0xff &&
+		rxbuf[2] == 0xff &&
+		rxbuf[3] == 0xff &&
+		rxbuf[4] == 0xff &&
 		rxbuf[5] == 0xff;
 }
 
@@ -305,7 +305,7 @@ bool mb8795_device::recv_is_me()
 bool mb8795_device::recv_is_local_multicast()
 {
 	return
-		(rxbuf[0] & 0x01) && 
+		(rxbuf[0] & 0x01) &&
 		(rxbuf[0] & 0xfe) == mac[0] &&
 		rxbuf[1] == mac[1] &&
 		rxbuf[2] == mac[2];

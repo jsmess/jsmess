@@ -61,7 +61,7 @@ public:
 	UINT16 m_vram_addr;
 	UINT8 m_vram_latch;
 	UINT8 m_attr_latch;
-//	UINT8 m_gfx_mode;
+//  UINT8 m_gfx_mode;
 	bool m_video_wl;
 	bool m_ram_bank;
 	UINT8 *m_p_vram;

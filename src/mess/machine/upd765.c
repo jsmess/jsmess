@@ -693,14 +693,14 @@ static void upd765_set_dma_drq(device_t *device, int state)
 READ_LINE_DEVICE_HANDLER( upd765_int_r )
 {
 	upd765_t *fdc = get_safe_token(device);
-	
+
 	return (fdc->upd765_flags & UPD765_INT) ? 1 : 0;
 }
 
 READ_LINE_DEVICE_HANDLER( upd765_drq_r )
 {
 	upd765_t *fdc = get_safe_token(device);
-	
+
 	return (fdc->upd765_flags & UPD765_DMA_DRQ) ? 1 : 0;
 }
 

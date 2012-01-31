@@ -22,8 +22,8 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual ioport_constructor device_input_ports() const;		
-		
+		virtual ioport_constructor device_input_ports() const;
+
 		bool is_primary() { return m_is_primary; }
 protected:
         // device-level overrides

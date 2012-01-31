@@ -14,7 +14,7 @@ public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void set_cb(line_cb_t irq_cb, line_cb_t drq_cb);
 	void set_slots(const SCSIConfigTable &slots);
-	
+
 	DECLARE_ADDRESS_MAP(map, 8);
 
 	DECLARE_READ8_MEMBER(tcount_lo_r);

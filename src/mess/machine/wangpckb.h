@@ -59,28 +59,28 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
-	
+
 	// not really public
 	DECLARE_READ8_MEMBER( kb_p1_r );
 	DECLARE_WRITE8_MEMBER( kb_p2_w );
 	DECLARE_WRITE8_MEMBER( kb_p3_w );
-	
+
 	static int mcs51_rx_callback(device_t *device);
 	static void mcs51_tx_callback(device_t *device, int data);
-	
+
 protected:
     // device-level overrides
 	virtual void device_config_complete() { m_shortname = "wangpckb"; }
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 	// device_serial_interface overrides
 	virtual void input_callback(UINT8 state);
 
 private:
 	required_device<cpu_device> m_maincpu;
-	
+
 	UINT8 m_y;
 };
 

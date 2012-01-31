@@ -290,7 +290,7 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 			} else {
 				// we handle just misalligned by 2
 				m_maincpu->memory().space(AS_IO)->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
-			}		
+			}
 			break;
 		default:
 			fatalerror("ISA8: Bus width %d not supported", buswidth);

@@ -40,7 +40,7 @@ VIDEO_START( intv )
 	//int i,j,k;
 
 	state->m_tms9927_num_rows = 25;
-	
+
 	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 
 #if 0

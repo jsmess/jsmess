@@ -117,7 +117,7 @@ VIDEO_START( galaxy )
 
 	state->m_gal_video_timer = machine.scheduler().timer_alloc(FUNC(gal_video));
 	state->m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
-	
+
 	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
 }
 

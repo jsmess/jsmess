@@ -70,13 +70,13 @@ public:
 
 	int m_rasterlineCtr;
 	emu_timer* m_vblankTimer;
-	
+
 	int m_old_fbfd;
 	int m_old_old_fbfd;
-	
+
 	int m_videomode;
 	int m_old_videomode;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_messram;
 	optional_device<device_t> m_fdc;

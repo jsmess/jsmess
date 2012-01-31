@@ -701,7 +701,7 @@ static void lynx_blitter(running_machine &machine)
 	lynx_blit_8color_rle_line,
 	lynx_blit_16color_rle_line
 	};
-	
+
 	int i; int colors;
 
 	state->m_blitter.memory_accesses = 0;
@@ -709,7 +709,7 @@ static void lynx_blitter(running_machine &machine)
 
 	// these might be never set by the state->m_blitter hardware
 	state->m_sprite_collide  = 0;
-	
+
 	//state->m_blitter.busy = 1; // blitter working (there's a bug somewhere that's causing slowdown when this is enabled)
 
 	// Last SCB is indicated by zero in the high byte of SCBNEXT
@@ -800,7 +800,7 @@ static void lynx_blitter(running_machine &machine)
 			lynx_blit_lines(state);
 		}
 	}
-	
+
 	if (0) // turned off for now as it cuases slowdown in some games due to a bug somewhere
 	{
 		if (state->m_blitter.memory_accesses != 0)
@@ -1316,9 +1316,9 @@ static void lynx_draw_line(running_machine &machine)
 	UINT16 j; // clipping needed!
 	UINT8 byte;
 	UINT16 *line;
-	
-	
-	// calculate y: first three lines are vblank,  
+
+
+	// calculate y: first three lines are vblank,
 	y = 101-state->m_timer[2].counter;
 	// Documentation states lower two bits of buffer address are ignored (thus 0xfffc mask)
 	j = (state->m_mikey.disp_addr & 0xfffc) + y * 160 / 2;
@@ -1427,7 +1427,7 @@ static void lynx_timer_signal_irq(running_machine &machine, int which)
 		}
 		lynx_timer_count_down( machine, 2 );
 		break;
-	case 2:	
+	case 2:
 		copybitmap(state->m_bitmap, state->m_bitmap_temp, 0, 0, 0, 0, machine.primary_screen->cliprect());
 		lynx_timer_count_down( machine, 4 );
 		break;
@@ -1554,7 +1554,7 @@ static void lynx_timer_write(lynx_state *state, int which, int offset, UINT8 dat
 {
 	//logerror("timer %d write %x %.2x\n", which, offset, data);
 	attotime t;
-	
+
 	if ( state->m_timer[which].timer_active && ((state->m_timer[which].cntrl1 & 0x07) != 0x07))
 	{
 		state->m_timer[which].counter = (UINT8) (state->m_timer[which].timer->remaining().as_ticks(1000000>>(state->m_timer[which].cntrl1 & 0x07)));
@@ -1940,7 +1940,7 @@ static void lynx_reset(running_machine &machine)
 */
 
 	lynx_uart_reset(state);
-	
+
 	// hack to allow current object loading to work
 #if 0
 	lynx_timer_write( state, 0, 0, 160 ); // set backup value (hpos) = 160
@@ -1959,7 +1959,7 @@ MACHINE_START( lynx )
 {
 	lynx_state *state = machine.driver_data<lynx_state>();
 	state->m_bitmap_temp.allocate(160,102,0,0);
-	
+
 	int i;
 	state->save_item(NAME(state->m_memory_config));
 	state->save_pointer(NAME(state->m_mem_fe00), state->m_mem_fe00_size);

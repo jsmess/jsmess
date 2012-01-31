@@ -27,7 +27,7 @@ Notes:
 
     CPU         - Intel P8051AH "20-8051-225"
     PSG         - Texas Instruments SN76496N
-	XR          - Exar Semiconductor XR22-908-03B? (hard to read)
+    XR          - Exar Semiconductor XR22-908-03B? (hard to read)
     CN1         - 1x6 pin PCB header
     SW1         - 8-way DIP switch
     SW2         - 8-way DIP switch
@@ -391,16 +391,16 @@ void wangpc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, 
 	int bit = get_in_data_bit();
 	receive_register_update_bit(bit);
 	/*
-	if (start bit)
-	{
-		m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	}
-	*/
+    if (start bit)
+    {
+        m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+    }
+    */
 	if (is_receive_register_full())
 	{
 		receive_register_extract();
 	}
-	
+
 	// transmit
 	if (!is_transmit_register_empty())
 	{
@@ -426,7 +426,7 @@ void wangpc_keyboard_device::input_callback(UINT8 state)
 int wangpc_keyboard_device::mcs51_rx_callback(device_t *device)
 {
 	wangpc_keyboard_device *kb = static_cast<wangpc_keyboard_device *>(device->owner());
-	
+
 	return kb->get_received_char();
 }
 
@@ -438,7 +438,7 @@ int wangpc_keyboard_device::mcs51_rx_callback(device_t *device)
 void wangpc_keyboard_device::mcs51_tx_callback(device_t *device, int data)
 {
 	wangpc_keyboard_device *kb = static_cast<wangpc_keyboard_device *>(device->owner());
-	
+
 	kb->transmit_register_setup(data);
 }
 
@@ -482,19 +482,19 @@ READ8_MEMBER( wangpc_keyboard_device::kb_p1_r )
 WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
 {
 	/*
-	
-		bit		description
-		
-		P2.0	row 0
-		P2.1	row 1
-		P2.2	row 2
-		P2.3	row 3
-		P2.4
-		P2.5
-		P2.6	chip enable for something
-		P2.7
 
-	*/
+        bit     description
+
+        P2.0    row 0
+        P2.1    row 1
+        P2.2    row 2
+        P2.3    row 3
+        P2.4
+        P2.5
+        P2.6    chip enable for something
+        P2.7
+
+    */
 
 	m_y = data;
 }
@@ -507,17 +507,17 @@ WRITE8_MEMBER( wangpc_keyboard_device::kb_p2_w )
 WRITE8_MEMBER( wangpc_keyboard_device::kb_p3_w )
 {
 	/*
-	
-		bit		description
-		
-		P3.0	
-		P3.1	
-		P3.2
-		P3.3	chip enable for something
-		P3.4
-		P3.5
-		P3.6
-		P3.7
 
-	*/
+        bit     description
+
+        P3.0
+        P3.1
+        P3.2
+        P3.3    chip enable for something
+        P3.4
+        P3.5
+        P3.6
+        P3.7
+
+    */
 }

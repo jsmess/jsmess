@@ -63,7 +63,7 @@ public:
 		  m_ds1(1),
 		  m_ds2(1)
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8237_device> m_dmac;
 	required_device<device_t> m_pic;
@@ -80,12 +80,12 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	void check_level1_interrupts();
 	void check_level2_interrupts();
 	void update_fdc_drq();
 	void update_fdc_tc();
-	
+
 	DECLARE_WRITE8_MEMBER( fdc_ctrl_w );
 	DECLARE_READ8_MEMBER( deselect_drive1_r );
 	DECLARE_WRITE8_MEMBER( deselect_drive1_w );
@@ -124,7 +124,7 @@ public:
 	DECLARE_READ8_MEMBER( led_off_r );
 	DECLARE_WRITE8_MEMBER( parity_nmi_clr_w );
 	DECLARE_READ8_MEMBER( option_id_r );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
 	DECLARE_READ8_MEMBER( memr_r );
@@ -152,10 +152,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
-	
+
 	UINT8 m_dma_page[3];
 	int m_dma_channel;
-	
+
 	int m_timer2_irq;
 	int m_ecpi_irq;
 	int m_acknlg;
@@ -165,7 +165,7 @@ public:
 	int m_uart_dr;
 	int m_uart_tbre;
 	int m_fpu_irq;
-	
+
 	int m_fdc_tc_enable;
 	int m_fdc_dma_enable;
 	int m_fdc_drq;

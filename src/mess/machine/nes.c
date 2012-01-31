@@ -312,8 +312,8 @@ MACHINE_START( nes )
 			state->m_chr_map[i].origin = i * 0x400; // for save state uses!
 			state->m_chr_map[i].access = &state->m_vram[state->m_chr_map[i].origin];
 		}
-	}	
-	
+	}
+
 	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(nes_irq_callback));
 	nes_state_register(machine);
 }
@@ -1344,10 +1344,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			fatalerror("No PRG entry for this software! Please check if the xml list got corrupted");
 		if (prg_size < 0x8000)
 			fatalerror("PRG entry is too small! Please check if the xml list got corrupted");
-		
+
 		// Allocate class pointers for PRG/VROM/VRAM/WRAM and copy data there from the temp copies
 		state->m_prg = auto_alloc_array(image.device().machine(), UINT8, prg_size);
-		
+
 		if (chr_size)
 			state->m_vrom = auto_alloc_array(image.device().machine(), UINT8, chr_size);
 
@@ -1676,7 +1676,7 @@ static void nes_unload_proc( device_image_interface &image )
 DRIVER_INIT( famicom )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	
+
 	/* clear some of the variables we don't use */
 	state->m_trainer = 0;
 	state->m_battery = 0;

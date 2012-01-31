@@ -138,7 +138,7 @@ public:
 
 	// reset
 	virtual void c64_reset_w(int level) { };
-	
+
 protected:
 	c64_user_port_device *m_slot;
 };

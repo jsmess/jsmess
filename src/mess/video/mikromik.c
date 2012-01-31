@@ -100,7 +100,7 @@ void mm1_state::video_start()
 {
 	// find memory regions
 	m_char_rom = machine().region("chargen")->base();
-	
+
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 

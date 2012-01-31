@@ -59,7 +59,7 @@ public:
 	required_device<ieee488_device> m_ieee488;
 
 	virtual void machine_reset();
-	
+
 	void update_fdc_int();
 
 	DECLARE_READ8_MEMBER( mmu_r );
@@ -71,9 +71,9 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
-		
+
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	
+
 	int m_reset;
 
 	// floppy state

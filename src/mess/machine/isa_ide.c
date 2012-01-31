@@ -99,9 +99,9 @@ void isa16_ide_device::device_start()
 //-------------------------------------------------
 
 void isa16_ide_device::device_reset()
-{	
+{
 	m_is_primary = (input_port_read(*this, "DSW") & 1) ? false : true;
-	if (m_is_primary) {	
+	if (m_is_primary) {
 		m_isa->install16_device(subdevice("ide"), 0x01f0, 0x01f7, 0, 0, FUNC(ide16_r), FUNC(ide16_w) );
 	} else {
 		m_isa->install16_device(subdevice("ide"), 0x0170, 0x0177, 0, 0, FUNC(ide16_r), FUNC(ide16_w) );

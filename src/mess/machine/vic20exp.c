@@ -91,9 +91,9 @@ void vic20_expansion_slot_device::device_config_complete()
     	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
     	memset(&m_out_res_cb, 0, sizeof(m_out_res_cb));
 	}
-	
+
 	// set brief and instance name
-	update_names();	
+	update_names();
 }
 
 
@@ -146,13 +146,13 @@ bool vic20_expansion_slot_device::call_load()
 		{
 			size = get_software_region_length("blk1");
 			if (size) memcpy(m_cart->vic20_blk1_pointer(), get_software_region("blk1"), size);
-			
+
 			size = get_software_region_length("blk2");
 			if (size) memcpy(m_cart->vic20_blk2_pointer(), get_software_region("blk2"), size);
-			
+
 			size = get_software_region_length("blk3");
 			if (size) memcpy(m_cart->vic20_blk3_pointer(), get_software_region("blk3"), size);
-			
+
 			size = get_software_region_length("blk5");
 			if (size) memcpy(m_cart->vic20_blk5_pointer(), get_software_region("blk5"), size);
 		}
@@ -191,7 +191,7 @@ const char * vic20_expansion_slot_device::get_default_card_software(const machin
 UINT8* vic20_expansion_slot_device::blk1_pointer()
 {
 	UINT8 *ptr = NULL;
-	
+
 	if (m_cart != NULL)
 	{
 		ptr = m_cart->vic20_blk1_pointer();
@@ -208,7 +208,7 @@ UINT8* vic20_expansion_slot_device::blk1_pointer()
 UINT8* vic20_expansion_slot_device::blk2_pointer()
 {
 	UINT8 *ptr = NULL;
-	
+
 	if (m_cart != NULL)
 	{
 		ptr = m_cart->vic20_blk2_pointer();
@@ -225,7 +225,7 @@ UINT8* vic20_expansion_slot_device::blk2_pointer()
 UINT8* vic20_expansion_slot_device::blk3_pointer()
 {
 	UINT8 *ptr = NULL;
-	
+
 	if (m_cart != NULL)
 	{
 		ptr = m_cart->vic20_blk3_pointer();
@@ -242,7 +242,7 @@ UINT8* vic20_expansion_slot_device::blk3_pointer()
 UINT8* vic20_expansion_slot_device::blk5_pointer()
 {
 	UINT8 *ptr = NULL;
-	
+
 	if (m_cart != NULL)
 	{
 		ptr = m_cart->vic20_blk5_pointer();

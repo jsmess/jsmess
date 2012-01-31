@@ -985,7 +985,7 @@ WRITE8_MEMBER( abc1600_state::segment_w )
         4       SEGD4
         5       SEGD5
         6       SEGD6
-        7		0
+        7       0
 
     */
 
@@ -1018,10 +1018,10 @@ READ8_MEMBER( abc1600_state::page_r )
 
         8       X19
         9       X20
-        10		X20
-        11		X20
-        12		X20
-        13		X20
+        10      X20
+        11      X20
+        12      X20
+        13      X20
         14      _WP
         15      NONX
 
@@ -1036,7 +1036,7 @@ READ8_MEMBER( abc1600_state::page_r )
 	UINT16 pgd = m_page_ram[pga];
 
 	UINT8 data = 0;
-	
+
 	if (A0)
 	{
 		data = pgd & 0xff;
@@ -1044,10 +1044,10 @@ READ8_MEMBER( abc1600_state::page_r )
 	else
 	{
 		int x20 = BIT(pgd, 9);
-		
+
 		data = (pgd >> 8) | x20 << 2 | x20 << 3 | x20 << 4 | x20 << 5;
 	}
-	
+
 	return data;
 }
 
