@@ -2233,6 +2233,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, a2600_cassette_interface )
 MACHINE_CONFIG_END
 
@@ -2265,6 +2266,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, a2600_cassette_interface )
 MACHINE_CONFIG_END
 
