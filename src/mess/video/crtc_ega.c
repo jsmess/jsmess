@@ -618,7 +618,6 @@ static void update_cursor_state(crtc_ega_t *crtc_ega)
 	UINT8 last_cursor_blink_count = crtc_ega->cursor_blink_count;
 	crtc_ega->cursor_blink_count = crtc_ega->cursor_blink_count + 1;
 
-printf("update_cursor_state - ");
 	/* switch on cursor blinking mode */
 	switch (crtc_ega->cursor_start_ras & 0x60)
 	{
