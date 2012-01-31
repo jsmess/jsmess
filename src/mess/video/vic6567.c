@@ -80,7 +80,7 @@ struct _vic2_state
 	vic2_type  type;
 
 	screen_device *screen;			// screen which sets bitmap properties
-	device_t *cpu;
+	cpu_device *cpu;
 
 	UINT8 rdy_cycles;
 	UINT8 reg[0x80];
@@ -997,7 +997,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 	UINT8 mask;
 	//static int adjust[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	UINT8 cpu_cycles = machine.device<cpu_device>("maincpu")->total_cycles() & 0xff;
+	UINT8 cpu_cycles = vic2->cpu->total_cycles() & 0xff;
 	UINT8 vic_cycles = (vic2->cycles_counter + 1) & 0xff;
 	vic2->cycles_counter++;
 
@@ -1607,12 +1607,12 @@ if (machine.input().code_pressed_once(KEYCODE_Z)) printf("b:%02x 1:%02x 2:%02x 3
 
 	if ((cpu_cycles == vic_cycles) && (vic2->rdy_cycles > 0))
 	{
-		device_spin_until_time (machine.firstcpu, machine.device<cpu_device>("maincpu")->cycles_to_attotime(vic2->rdy_cycles));
+		device_spin_until_time (machine.firstcpu, vic2->cpu->cycles_to_attotime(vic2->rdy_cycles));
 		vic2->rdy_cycles = 0;
 	}
 
 	vic2->raster_x += 8;
-	machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(pal_timer_callback), 0, vic2);
+	machine.scheduler().timer_set(vic2->cpu->cycles_to_attotime(1), FUNC(pal_timer_callback), 0, vic2);
 }
 
 static TIMER_CALLBACK( ntsc_timer_callback )
@@ -2191,7 +2191,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 	}
 
 	vic2->raster_x += 8;
-	machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(1), FUNC(ntsc_timer_callback), 0, vic2);
+	machine.scheduler().timer_set(vic2->cpu->cycles_to_attotime(1), FUNC(ntsc_timer_callback), 0, vic2);
 }
 
 
@@ -2607,7 +2607,7 @@ static DEVICE_START( vic2 )
 	vic2->out_interrupt_func.resolve(intf->out_irq_cb, *device);
 	vic2->in_rdy_workaround_func.resolve(intf->in_rdy_cb, *device);
 
-	vic2->cpu = device->machine().device(intf->cpu);
+	vic2->cpu = device->machine().device<cpu_device>(intf->cpu);
 
 	vic2->screen = device->machine().device<screen_device>(intf->screen);
 	width = vic2->screen->width();

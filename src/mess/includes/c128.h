@@ -17,11 +17,11 @@
 #include "includes/c64.h"
 #include "machine/6526cia.h"
 
-class c128_state : public c64_state
+class c128_state : public legacy_c64_state
 {
 public:
 	c128_state(const machine_config &mconfig, device_type type, const char *tag)
-		: c64_state(mconfig, type, tag) { }
+		: legacy_c64_state(mconfig, type, tag) { }
 
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );

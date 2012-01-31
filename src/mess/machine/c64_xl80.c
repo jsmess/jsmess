@@ -194,7 +194,7 @@ void c64_xl80_device::device_start()
 
 	m_rom = subregion("roml")->base();
 	m_char_rom = subregion(HD46505SP_TAG)->base();
-	m_video_ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);;
+	m_video_ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);
 
 	// state saving
 	save_pointer(NAME(m_video_ram), RAM_SIZE);
