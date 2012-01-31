@@ -25,6 +25,7 @@ public:
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
+		virtual ioport_constructor device_input_ports() const;
 
 		DECLARE_READ8_MEMBER(pc_ega8_3b0_r);
 		DECLARE_WRITE8_MEMBER(pc_ega8_3b0_w);
