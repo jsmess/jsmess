@@ -1,4 +1,58 @@
-﻿0.144u6
+﻿0.144u7
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Wang Professional Computer [Anna Wu]
+- Boris Diplomat [Sean Riddle, Justin Kerk]
+- Apricot FT//ex 486 (J3 Motherboard) [Kaylee]
+- Apricot FTs (Panther Rev F 1.02.26) [Kaylee]
+
+System Driver Changes:
+----------------------
+-nespal: fixed bug #1394, the driver is back to the correct speed. [Fabio Priuli]
+-bullet: Implemented Wave Mate Bullet Revision F hardware, a ROM dump is missing though. [Curt Coder]
+-nes: fixed longstanding regression in 4screen mirroring games (e.g. Gauntlet) [Fabio Priuli]
+-vic20: Implemented the expansion port. You can now plug in an IEEE-488 
+ cartridge and any of the CBM IEEE floppy/hard drives. 
+ (e.g. mess vic20p -exp ieee488 -exp:ieee488:ieee9 c4040 
+ -flop2 diskimage.d64; SYS 45065; LOAD "$",9) [Curt Coder]
+-vic20: Emulated the VIC-1110 8K RAM Expansion cartridge. [Curt Coder]
+-vic20: Emulated the VIC-1210 3K RAM Expansion cartridge. [Curt Coder]
+-vic20: Emulated the VIC-1111 16K RAM Expansion cartridge. [Curt Coder]
+-vic20: Emulated the VIC-1211A Super Expander with 3K RAM cartridge. [Curt Coder]
+-vic20: Emulated the VIC-1010 Expansion Module. You can now connect up to 6 
+ cartridges using this expander. (e.g. mess vic20p -exp exp -exp:exp:slot1 ieee488 
+ -exp:exp:slot2 8k -exp:exp:slot3 8k -exp:exp:slot4 8k) [Curt Coder]
+-lynx: timer changes (fixes a palette change bug in viking child) [Huygens]
+ xor sprites check if collision processing is enabled (fixes todd's adventures intro flicker and xenophobe) 
+ added rendering to a secondary bitmap to fix tearing (there's probably a better way to do this)
+
+Software Lists:
+----------------
+-tiki100.xml: Added software list. [Curt Coder]
+-a2600.xml: added a couple of dumps and region compatibility. [Kaylee]
+
+Source Changes:
+----------------
+-i386: Various improvements of cpu core, mostly protected mode related [Carl,Barry Rodewald]
+-SoundBlaster: added DMA timer for more realistic IRQ acks, added 0xD0 stop DMA command,
+ cleaned up DRQ semantics. [R. Belmont]
+-floppy: Do specific UI handling [O. Galibert]
+-ppu2c0x: converted NES PPU to be a modern device. [Fabio Priuli]
+-m68fpu: Accept some more variants of fsave/frestore [O. Galibert]
+-flopimg.h: docbookified documentation [balrog]
+-floppy: libertarian relicensing [O. Galibert]
+-m4510: initialize the input callback too [O. Galibert]
+
+0.144u6
 
 New System Drivers Supported:
 -----------------------------
