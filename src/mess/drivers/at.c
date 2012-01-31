@@ -1123,9 +1123,7 @@ ROM_END
 
 // Unknown 486 board with Chips & Technologies CS4031 chipset
 ROM_START( ct486 )
-	ROM_REGION(0x100000, "isa", 0)
-	ROM_LOAD("et4000.bin", 0xc0000, 0x8000, CRC(f1e817a8) SHA1(945d405b0fb4b8f26830d495881f8587d90e5ef9) )
-
+	ROM_REGION(0x100000, "isa", ROMREGION_ERASEFF)
 	ROM_REGION(0x100000, "bios", 0)
 	ROM_LOAD("chips_1.ami", 0xf0000, 0x10000, CRC(a14a7511) SHA1(b88d09be66905ed2deddc26a6f8522e7d2d6f9a8))
 ROM_END
