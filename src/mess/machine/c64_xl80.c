@@ -190,8 +190,6 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 
 void c64_xl80_device::device_start()
 {
-	m_slot = dynamic_cast<c64_expansion_slot_device *>(owner());
-
 	m_rom = subregion("roml")->base();
 	m_char_rom = subregion(HD46505SP_TAG)->base();
 	m_video_ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);

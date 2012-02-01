@@ -111,9 +111,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
 	virtual void device_config_complete();
+	virtual void device_start();
 
 	// image-level overrides
 	virtual bool call_load();
@@ -127,13 +126,11 @@ protected:
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 1; }
 	virtual const char *image_interface() const { return "c64_cart"; }
-	virtual const char *file_extensions() const { return "bin,rom,80"; }
+	virtual const char *file_extensions() const { return "80,a0,e0"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) const;
-
-	virtual UINT8* get_cart_base();
 
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;
@@ -158,8 +155,10 @@ public:
 	virtual void c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2) { };
 
 	// memory banking
-	virtual int c64_game_r() { return 1; };
-	virtual int c64_exrom_r() { return 1; };
+	virtual int c64_game_r() { return m_game; }
+	virtual int c64_exrom_r() { return m_exrom; }
+	virtual void c64_game_w(int state) { m_game = state; }
+	virtual void c64_exrom_w(int state) { m_exrom = state; }
 
 	// reset
 	virtual void c64_reset_w() { };
@@ -167,7 +166,15 @@ public:
 	// video
 	virtual UINT32 c64_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
 
-	virtual UINT8* get_cart_base() { return NULL; }
+	// standard ROM cartridge
+	virtual UINT8* c64_roml_pointer() { return NULL; }
+	virtual UINT8* c64_romh_pointer() { return NULL; }
+
+protected:
+	c64_expansion_slot_device *m_slot;
+	
+	int m_game;
+	int m_exrom;
 };
 
 
