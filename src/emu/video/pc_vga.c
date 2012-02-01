@@ -129,7 +129,12 @@ static struct
 		UINT8 *data;
 		UINT8 latch[4];
 	} gc;
-	struct { UINT8 index, data[0x15]; int state; } attribute;
+
+	struct
+	{
+		UINT8 index, data[0x15]; int state;
+		UINT8 prot_bit;
+	} attribute;
 
 
 	struct {
@@ -166,33 +171,27 @@ static struct
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
-#define LINES_HELPER ( (vga.crtc.data[0x12] \
-				|((vga.crtc.data[7]&2)<<7) \
-				|((vga.crtc.data[7]&0x40)<<3))+1 )
 //#define TEXT_LINES (LINES_HELPER)
-#define LINES (LINES_HELPER)
-#define TEXT_LINES (LINES_HELPER >> ((vga.crtc.data[9]&0x80) ? 1 : 0))
+#define LINES (vga.crtc.vert_disp_end+1)
+#define TEXT_LINES (vga.crtc.vert_disp_end+1)
 
-#define GRAPHIC_MODE (vga.gc.data[6]&1) /* else textmodus */
+#define GRAPHIC_MODE (vga.gc.data[6]&1) /* else text mode */
 
-#define EGA_COLUMNS (vga.crtc.data[1]+1)
+#define EGA_COLUMNS (vga.crtc.horz_disp_end+1)
 #define EGA_START_ADDRESS (vga.crtc.start_addr)
 #define EGA_LINE_LENGTH (vga.crtc.offset<<1)
 
-#define VGA_COLUMNS (vga.crtc.data[1]+1)
+#define VGA_COLUMNS (vga.crtc.horz_disp_end+1)
 #define VGA_START_ADDRESS (vga.crtc.start_addr)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
 #define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
 
-#define TEXT_COLUMNS (vga.crtc.data[1]+1)
+#define TEXT_COLUMNS (vga.crtc.horz_disp_end+1)
 #define TEXT_START_ADDRESS (vga.crtc.start_addr<<3)
 #define TEXT_LINE_LENGTH (vga.crtc.offset<<1)
 
-#define TEXT_COPY_9COLUMN(ch) ((ch>=192)&&(ch<=223)&&(vga.attribute.data[0x10]&4))
-
-#define FONT1 (  ((vga.sequencer.data[3]&0x3)    |((vga.sequencer.data[3]&0x10)<<2))*0x2000 )
-#define FONT2 ( (((vga.sequencer.data[3]&0xc)>>2)|((vga.sequencer.data[3]&0x20)<<3))*0x2000 )
+#define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0)&&(vga.attribute.data[0x10]&4))
 
 
 /***************************************************************************
@@ -228,6 +227,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	UINT32 *bitmapline;
 	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT;
 	int pos, line, column, mask, w, h, addr;
+	UINT8 blink_en,fore_col,back_col;
 	pen_t pen;
 
 	if(vga.crtc.cursor_enable)
@@ -244,6 +244,11 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 			attr = vga.memory[(pos<<1) + 1];
 			font_base = 0x40000+(ch<<5);
 			font_base += ((attr & 8) ? vga.sequencer.char_sel.B : vga.sequencer.char_sel.A)*0x2000;
+			blink_en = (vga.attribute.data[0x10]&8&&machine.primary_screen->frame_number() & 0x20) ? attr & 0x80 : 0;
+
+			fore_col = attr & 0xf;
+			back_col = (attr & 0x70) >> 4;
+			back_col |= (vga.attribute.data[0x10]&8) ? 0 : ((attr & 0x80) >> 4);
 
 			for (h = MAX(-line, 0); (h < height) && (line+h < MIN(TEXT_LINES, bitmap.height())); h++)
 			{
@@ -253,9 +258,9 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 				for (mask=0x80, w=0; (w<width)&&(w<8); w++, mask>>=1)
 				{
 					if (bits&mask)
-						pen = vga.pens[attr & 0x0f];
+						pen = vga.pens[blink_en ? back_col : fore_col];
 					else
-						pen = vga.pens[(attr & 0xf0) >> 4];
+						pen = vga.pens[back_col];
 
 					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
 						continue;
@@ -266,9 +271,9 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 				{
 					/* 9 column */
 					if (TEXT_COPY_9COLUMN(ch)&&(bits&1))
-						pen = vga.pens[attr & 0x0f];
+						pen = vga.pens[blink_en ? back_col : fore_col];
 					else
-						pen = vga.pens[(attr & 0xf0) >> 4];
+						pen = vga.pens[back_col];
 
 					if(!machine.primary_screen->visible_area().contains(column*width+w, line+h))
 						continue;
@@ -867,8 +872,6 @@ static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 	}
 }
 
-#include "debugger.h"
-
 static void seq_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 {
 	switch(index)
@@ -993,7 +996,7 @@ READ8_HANDLER( vga_port_03c0_r )
 			break;
 		case 1:
 			if( vga.attribute.index & 0x20) // protection bit
-				data = 0xff; // TODO: actually undefined
+				data = 0xff;
 			else if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
 				data=vga.attribute.data[vga.attribute.index&0x1f];
 			break;
@@ -1116,6 +1119,26 @@ WRITE8_HANDLER( vga_port_03b0_w )
 		vga_crtc_w(space, offset, data);
 }
 
+static void attribute_reg_write(UINT8 index, UINT8 data)
+{
+	if((index & 0x30) == 0)
+	{
+		vga.attribute.data[index & 0x1f] = data & 0x3f;
+	}
+	else
+	{
+		switch(index & 0x1f)
+		{
+			/* TODO: intentional dirtiness, variable names to be properly changed */
+			case 0x10: vga.attribute.data[0x10] = data; break;
+			case 0x11: vga.attribute.data[0x11] = data; break;
+			case 0x12: vga.attribute.data[0x12] = data; break;
+			case 0x13: vga.attribute.data[0x13] = data; break;
+			case 0x14: vga.attribute.data[0x14] = data; break;
+		}
+	}
+}
+
 WRITE8_HANDLER(vga_port_03c0_w)
 {
 	if (LOG_ACCESSES)
@@ -1129,12 +1152,25 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		}
 		else
 		{
-			if(!(vga.attribute.index & 0x20)) // protection bit
-				if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
-					vga.attribute.data[vga.attribute.index&0x1f]=data;
+			attribute_reg_write(vga.attribute.index,data);
 		}
 		vga.attribute.state=!vga.attribute.state;
 		break;
+	#if 0
+	case 0:
+		if (vga.attribute.state==0)
+		{
+			vga.attribute.index=data & 0x1f;
+			vga.attribute.prot_bit = data & 0x20;
+		}
+		else
+		{
+			attribute_reg_write(vga.attribute.index,data);
+			printf("%02x %d %02x\n",vga.attribute.index,vga.attribute.prot_bit,data);
+		}
+		vga.attribute.state=!vga.attribute.state;
+		break;
+	#endif
 	case 2:
 		vga.miscellaneous_output=data;
 		recompute_params(space->machine());
