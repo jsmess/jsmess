@@ -225,7 +225,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	UINT8 bits;
 	UINT32 font_base;
 	UINT32 *bitmapline;
-	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT;
+	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT * (vga.crtc.scan_doubling + 1);
 	int pos, line, column, mask, w, h, addr;
 	UINT8 blink_en,fore_col,back_col;
 	pen_t pen;
@@ -253,7 +253,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 			for (h = MAX(-line, 0); (h < height) && (line+h < MIN(TEXT_LINES, bitmap.height())); h++)
 			{
 				bitmapline = &bitmap.pix32(line+h);
-				bits = vga.memory[font_base+(h<<0)];
+				bits = vga.memory[font_base+(h>>(vga.crtc.scan_doubling))];
 
 				for (mask=0x80, w=0; (w<width)&&(w<8); w++, mask>>=1)
 				{
@@ -577,8 +577,6 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 			//proc = vga_vh_text;
 			//*height = TEXT_LINES;
 			//*width = TEXT_COLUMNS * CHAR_WIDTH;
-			if(vga.crtc.scan_doubling)
-				popmessage("Text mode with double scan enabled, contact MAMEdev");
 
 			return TEXT_MODE;
 		}
