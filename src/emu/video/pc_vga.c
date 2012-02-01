@@ -1000,7 +1000,8 @@ READ8_HANDLER( vga_port_03c0_r )
 			break;
 
 		case 2:
-			data = 0;
+			// TODO: in VGA bit 4 is actually always on?
+			data = 0x60; // is VGA
 			switch ((vga.miscellaneous_output>>2)&3)
 			{
 				case 3:
@@ -1040,10 +1041,7 @@ READ8_HANDLER( vga_port_03c0_r )
 			break;
 
 		case 7:
-			if (vga.dac.read)
-				data = 0;
-			else
-				data = 3;
+			data = (vga.dac.read) ? 3 : 0;
 			break;
 
 		case 8:
@@ -1154,21 +1152,6 @@ WRITE8_HANDLER(vga_port_03c0_w)
 		}
 		vga.attribute.state=!vga.attribute.state;
 		break;
-	#if 0
-	case 0:
-		if (vga.attribute.state==0)
-		{
-			vga.attribute.index=data & 0x1f;
-			vga.attribute.prot_bit = data & 0x20;
-		}
-		else
-		{
-			attribute_reg_write(vga.attribute.index,data);
-			printf("%02x %d %02x\n",vga.attribute.index,vga.attribute.prot_bit,data);
-		}
-		vga.attribute.state=!vga.attribute.state;
-		break;
-	#endif
 	case 2:
 		vga.miscellaneous_output=data;
 		recompute_params(space->machine());
@@ -1225,18 +1208,6 @@ WRITE8_HANDLER(vga_port_03c0_w)
 			vga.dac.dirty=1;
 			if (vga.dac.state==3) {
 				vga.dac.state=0; vga.dac.write_index++;
-#if 0
-				if (vga.dac.write_index==64) {
-					int i;
-					mame_printf_debug("start palette\n");
-					for (i=0;i<64;i++) {
-						mame_printf_debug(" 0x%.2x, 0x%.2x, 0x%.2x,\n",
-							   vga.dac.color[i].red*4,
-							   vga.dac.color[i].green*4,
-							   vga.dac.color[i].blue*4);
-					}
-				}
-#endif
 			}
 		}
 		break;
