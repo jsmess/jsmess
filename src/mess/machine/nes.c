@@ -293,11 +293,11 @@ MACHINE_START( nes )
 {
 	nes_state *state = machine.driver_data<nes_state>();
 
+	state->m_ppu = machine.device<ppu2c0x_device>("ppu");
 	init_nes_core(machine);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nes_machine_stop),&machine));
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_ppu = machine.device<ppu2c0x_device>("ppu");
 	state->m_sound = machine.device("nessound");
 	state->m_cart = machine.device("cart");
 
