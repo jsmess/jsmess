@@ -243,3 +243,89 @@ WRITE8_DEVICE_HANDLER( pc_lpt_w )
 }
 
 DEFINE_LEGACY_DEVICE(PC_LPT, pc_lpt);
+
+static WRITE_LINE_DEVICE_HANDLER(pc_cpu_line)
+{
+	isa8_lpt_device	*lpt  = downcast<isa8_lpt_device *>(device->owner());
+	if (lpt->is_primary())
+		lpt->m_isa->irq7_w(state);
+	else 
+		lpt->m_isa->irq5_w(state);
+}
+static const pc_lpt_interface pc_lpt_config =
+{
+	DEVCB_LINE(pc_cpu_line)
+};
+
+static MACHINE_CONFIG_FRAGMENT( lpt_config )
+	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)
+MACHINE_CONFIG_END
+
+static INPUT_PORTS_START( lpt_dsw )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "Base address")
+	PORT_DIPSETTING(	0x00, "0x378" )
+	PORT_DIPSETTING(	0x01, "0x278" )
+INPUT_PORTS_END
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type ISA8_LPT = &device_creator<isa8_lpt_device>;
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor isa8_lpt_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( lpt_config );
+}
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor isa8_lpt_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( lpt_dsw );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  isa8_lpt_device - constructor
+//-------------------------------------------------
+
+isa8_lpt_device::isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_LPT, "ISA8_LPT", tag, owner, clock),
+		device_isa8_card_interface(mconfig, *this)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void isa8_lpt_device::device_start()
+{
+	set_isa_device();
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void isa8_lpt_device::device_reset()
+{
+	m_is_primary = (input_port_read(*this, "DSW") & 1) ? false : true;
+	if (m_is_primary) {
+		m_isa->install_device(subdevice("lpt"), 0x0378, 0x037b, 0, 0, FUNC(pc_lpt_r), FUNC(pc_lpt_w) );
+	} else {
+		m_isa->install_device(subdevice("lpt"), 0x0278, 0x027b, 0, 0, FUNC(pc_lpt_r), FUNC(pc_lpt_w) );
+	}
+}
