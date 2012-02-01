@@ -119,9 +119,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
 	virtual void device_config_complete();
+	virtual void device_start();
 
 	// image-level overrides
 	virtual bool call_load();
@@ -141,21 +140,12 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) const;
 
-	virtual UINT8* blk1_pointer();
-	virtual UINT8* blk2_pointer();
-	virtual UINT8* blk3_pointer();
-	virtual UINT8* blk5_pointer();
-
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;
 	devcb_resolved_write_line	m_out_res_func;
 
 	device_vic20_expansion_card_interface *m_cart;
 };
-
-
-// device type definition
-extern const device_type VIC20_EXPANSION_SLOT;
 
 
 // ======================> device_vic20_expansion_card_interface
@@ -211,6 +201,10 @@ public:
 protected:
 	vic20_expansion_slot_device *m_slot;
 };
+
+
+// device type definition
+extern const device_type VIC20_EXPANSION_SLOT;
 
 
 

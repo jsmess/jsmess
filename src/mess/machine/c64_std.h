@@ -33,28 +33,19 @@ public:
 	// construction/destruction
 	c64_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
     virtual void device_config_complete() { m_shortname = "c64_std"; }
+	virtual void device_start();
 
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2);
-	virtual int c64_game_r() { return m_game; }
-	virtual int c64_exrom_r() { return m_exrom; }
-
-	virtual UINT8* get_cart_base() { return m_rom; }
+	virtual UINT8* c64_roml_pointer();
+	virtual UINT8* c64_romh_pointer();
 
 private:
-	c64_expansion_slot_device *m_slot;
-
-	UINT8 *m_rom;
-	int m_game;
-	int m_exrom;
+	UINT8 *m_roml;
+	UINT8 *m_romh;
 };
 
 

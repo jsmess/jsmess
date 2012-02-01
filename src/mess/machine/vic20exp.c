@@ -113,15 +113,6 @@ void vic20_expansion_slot_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vic20_expansion_slot_device::device_reset()
-{
-}
-
-
-//-------------------------------------------------
 //  call_load -
 //-------------------------------------------------
 
@@ -129,7 +120,7 @@ bool vic20_expansion_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t size = 0;
+		size_t size = 0;
 
 		if (software_entry() == NULL)
 		{
@@ -181,74 +172,6 @@ bool vic20_expansion_slot_device::call_softlist_load(char *swlist, char *swname,
 const char * vic20_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options) const
 {
 	return software_get_default_slot(config, options, this, "standard");
-}
-
-
-//-------------------------------------------------
-//  blk1_pointer -
-//-------------------------------------------------
-
-UINT8* vic20_expansion_slot_device::blk1_pointer()
-{
-	UINT8 *ptr = NULL;
-
-	if (m_cart != NULL)
-	{
-		ptr = m_cart->vic20_blk1_pointer();
-	}
-
-	return ptr;
-}
-
-
-//-------------------------------------------------
-//  blk2_pointer -
-//-------------------------------------------------
-
-UINT8* vic20_expansion_slot_device::blk2_pointer()
-{
-	UINT8 *ptr = NULL;
-
-	if (m_cart != NULL)
-	{
-		ptr = m_cart->vic20_blk2_pointer();
-	}
-
-	return ptr;
-}
-
-
-//-------------------------------------------------
-//  blk3_pointer -
-//-------------------------------------------------
-
-UINT8* vic20_expansion_slot_device::blk3_pointer()
-{
-	UINT8 *ptr = NULL;
-
-	if (m_cart != NULL)
-	{
-		ptr = m_cart->vic20_blk3_pointer();
-	}
-
-	return ptr;
-}
-
-
-//-------------------------------------------------
-//  blk5_pointer -
-//-------------------------------------------------
-
-UINT8* vic20_expansion_slot_device::blk5_pointer()
-{
-	UINT8 *ptr = NULL;
-
-	if (m_cart != NULL)
-	{
-		ptr = m_cart->vic20_blk5_pointer();
-	}
-
-	return ptr;
 }
 
 
