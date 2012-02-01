@@ -11,26 +11,9 @@
     - Needs video mods
 
 ************************************************************************************************/
+#define ADDRESS_MAP_MODERN
 
-#include "emu.h"
 #include "includes/x1.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "machine/z80ctc.h"
-//#include "machine/z80sio.h"
-#include "machine/z80dart.h"
-#include "machine/i8255.h"
-#include "machine/z80dma.h"
-#include "sound/ay8910.h"
-#include "video/mc6845.h"
-#include "sound/2151intf.h"
-#include "sound/wave.h"
-#include "machine/wd17xx.h"
-#include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "formats/x1_tap.h"
-#include "imagedev/cartslot.h"
 
 #include "includes/pce.h"
 #include "video/vdc.h"
@@ -64,12 +47,12 @@ static SCREEN_UPDATE_RGB32( x1twin )
 	return 0;
 }
 
-static ADDRESS_MAP_START( x1_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( x1_mem, AS_PROGRAM, 8, x1twin_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x1_io , AS_IO, 8 )
+static ADDRESS_MAP_START( x1_io , AS_IO, 8, x1twin_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_io_r, x1_io_w)
 ADDRESS_MAP_END
@@ -101,12 +84,12 @@ static const wd17xx_interface x1_mb8877a_interface =
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_HANDLER(x1_porta_r),						/* Port A read */
-	DEVCB_HANDLER(x1_porta_w),						/* Port A write */
-	DEVCB_HANDLER(x1_portb_r),						/* Port B read */
-	DEVCB_HANDLER(x1_portb_w),						/* Port B write */
-	DEVCB_HANDLER(x1_portc_r),						/* Port C read */
-	DEVCB_HANDLER(x1_portc_w)						/* Port C write */
+	DEVCB_DRIVER_MEMBER(x1_state, x1_porta_r),						/* Port A read */
+	DEVCB_DRIVER_MEMBER(x1_state, x1_porta_w),						/* Port A write */
+	DEVCB_DRIVER_MEMBER(x1_state, x1_portb_r),						/* Port B read */
+	DEVCB_DRIVER_MEMBER(x1_state, x1_portb_w),						/* Port B write */
+	DEVCB_DRIVER_MEMBER(x1_state, x1_portc_r),						/* Port C read */
+	DEVCB_DRIVER_MEMBER(x1_state, x1_portc_w)						/* Port C write */
 };
 
 static const mc6845_interface mc6845_intf =
@@ -446,9 +429,9 @@ static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,					// timer disables
 	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_LINE(z80ctc_trg3_w),		// ZC/TO0 callback
-	DEVCB_LINE(z80ctc_trg1_w),		// ZC/TO1 callback
-	DEVCB_LINE(z80ctc_trg2_w),		// ZC/TO2 callback
+	DEVCB_DEVICE_LINE("ctc", z80ctc_trg3_w),		// ZC/TO0 callback
+	DEVCB_DEVICE_LINE("ctc", z80ctc_trg1_w),		// ZC/TO1 callback
+	DEVCB_DEVICE_LINE("ctc", z80ctc_trg2_w),		// ZC/TO2 callback
 };
 
 #if 0
@@ -574,11 +557,11 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_STATIC(x1twin)
 
-	//MCFG_SCREEN_ADD("pce_screen", RASTER)
-	//MCFG_SCREEN_REFRESH_RATE(60)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	//MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	//MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
+	MCFG_SCREEN_ADD("pce_screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
+	MCFG_SCREEN_UPDATE_STATIC(x1twin)
 
 	MCFG_MC6845_ADD("crtc", H46505, (VDP_CLOCK/48), mc6845_intf) //unknown divider
 	MCFG_PALETTE_LENGTH(0x10+0x1000)
