@@ -59,6 +59,7 @@
 #include "machine/isa_ide.h"
 
 #include "machine/pc_mouse.h"
+#include "machine/pc_lpt.h"
 
 
 class at_state : public driver_device
