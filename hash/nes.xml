@@ -43421,7 +43421,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="pachiprop" cloneof="pachipro">
+	<software name="pachikunp" cloneof="pachikun">
 		<description>Mezase Pachi Pro: Pachio-kun (Jpn, Prototype)</description>
 		<year>1987</year>
 		<publisher>Coconuts Japan</publisher>
