@@ -568,11 +568,11 @@ static void mz800_z80pio_irq(device_t *device, int which)
 
 static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
-	result |= centronics_busy_r(printer);
-	result |= centronics_pe_r(printer) << 1;
+	result |= centronics->busy_r();
+	result |= centronics->pe_r() << 1;
 	result |= device->machine().primary_screen->hblank() << 5;
 
 	return result;
@@ -580,16 +580,10 @@ static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( mz800_z80pio_port_a_w )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
 
-	centronics_prime_w(printer, BIT(data, 6));
-	centronics_strobe_w(printer, BIT(data, 7));
-}
-
-static WRITE8_DEVICE_HANDLER( mz800_printer_data_w )
-{
-	device_t *printer = device->machine().device("centronics");
-	centronics_data_w(printer, 0, data);
+	centronics->init_prime_w(BIT(data, 6));
+	centronics->strobe_w(BIT(data, 7));
 }
 
 const z80pio_interface mz800_z80pio_config =
@@ -599,7 +593,7 @@ const z80pio_interface mz800_z80pio_config =
 	DEVCB_DEVICE_HANDLER("z80pio", mz800_z80pio_port_a_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("z80pio", mz800_printer_data_w),
+	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
 	DEVCB_NULL,
 };
 

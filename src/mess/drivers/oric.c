@@ -355,7 +355,6 @@ static const cassette_interface oric_cassette_interface =
 
 static const centronics_interface oric_centronics_config =
 {
-	FALSE,
 	DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, write_ca1),
 	DEVCB_NULL,
 	DEVCB_NULL

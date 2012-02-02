@@ -720,7 +720,6 @@ static WRITE_LINE_DEVICE_HANDLER(bbcb_ack_w)
 
 static const centronics_interface bbcb_centronics_config =
 {
-	FALSE,
 	DEVCB_DEVICE_LINE("via6522_1",bbcb_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL

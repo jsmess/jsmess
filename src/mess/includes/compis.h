@@ -135,7 +135,7 @@ public:
 	m_8259m(*this, "pic8259_master"),
 	m_8259s(*this, "pic8259_slave"),
 	m_8255(*this, "ppi8255"),
-	m_cent(*this, "centronics"),
+	m_centronics(*this, "centronics"),
 	m_uart(*this, "uart"),
 	m_rtc(*this, "mm58274c"),
 	m_fdc(*this, "upd765"),
@@ -148,7 +148,7 @@ public:
 	required_device<device_t> m_8259m;
 	required_device<device_t> m_8259s;
 	required_device<i8255_device> m_8255;
-	required_device<device_t> m_cent;
+	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
 	required_device<device_t> m_rtc;
 	required_device<device_t> m_fdc;

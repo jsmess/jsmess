@@ -94,7 +94,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1772_t> m_fdc;
 	required_device<mc68901_device> m_mfp;
-	required_device<device_t> m_centronics;
+	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_rs232;
 	required_device<ram_device> m_ram;
 

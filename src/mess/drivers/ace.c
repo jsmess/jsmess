@@ -565,7 +565,7 @@ WRITE8_MEMBER( ace_state::pio_pa_w )
     */
 
 	// centronics strobe
-	centronics_strobe_w(m_centronics, !BIT(data, 6));
+	m_centronics->strobe_w(!BIT(data, 6));
 };
 
 static Z80PIO_INTERFACE( pio_intf )
@@ -575,7 +575,7 @@ static Z80PIO_INTERFACE( pio_intf )
 	DEVCB_DRIVER_MEMBER(ace_state, pio_pa_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
 	DEVCB_NULL
 };
 

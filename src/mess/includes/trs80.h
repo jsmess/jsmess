@@ -36,7 +36,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_printer;
+	optional_device<centronics_device> m_printer;
 	optional_device<device_t> m_ay31015;
 	optional_device<device_t> m_fdc;
 	required_device<device_t> m_speaker;

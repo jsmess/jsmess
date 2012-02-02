@@ -89,7 +89,7 @@ public:
 	{ }
 
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_centronics;
+	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_floppy0;
 
 	virtual void machine_start();

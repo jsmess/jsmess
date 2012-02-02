@@ -2155,7 +2155,7 @@ static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8 )
      AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE_MODERN( "pia_1", pia6821_device, read_alt, write_alt)
      AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE ( mo5nr_net_r, mo5nr_net_w )
      AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE ( mo6_vreg_r, mo6_vreg_w )
-     AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREADWRITE("centronics", centronics_data_r, centronics_data_w)
+     AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREADWRITE_MODERN("centronics", centronics_device, read, write)
      AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE ( mo5nr_prn_r, mo5nr_prn_w )
      AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE ( mo6_gatearray_r,
 						mo6_gatearray_w )

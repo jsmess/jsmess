@@ -71,7 +71,7 @@ READ8_MEMBER( m5_state::sts_r )
 	data |= (m_cassette)->input() >= 0 ? 1 : 0;
 
 	// centronics busy
-	data |= centronics_busy_r(m_centronics) << 1;
+	data |= m_centronics->busy_r() << 1;
 
 	// RESET key
 	data |= input_port_read(machine(), "RESET");
@@ -105,7 +105,7 @@ WRITE8_MEMBER( m5_state::com_w )
 	m_cassette->output( BIT(data, 0) ? -1.0 : 1.0);
 
 	// centronics strobe
-	centronics_strobe_w(m_centronics, BIT(data, 0));
+	m_centronics->strobe_w(BIT(data, 0));
 
 	// cassette remote
 	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( m5_io, AS_IO, 8, m5_state )
 	AM_RANGE(0x35, 0x35) AM_READ_PORT("Y5")
 	AM_RANGE(0x36, 0x36) AM_READ_PORT("Y6")
 	AM_RANGE(0x37, 0x37) AM_READ_PORT("JOY")
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READWRITE(sts_r, com_w)
 //  AM_RANGE(0x60, 0x63) SIO
 //  AM_RANGE(0x6c, 0x6c) EM-64/64KBI bank select

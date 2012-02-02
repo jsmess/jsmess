@@ -1273,11 +1273,11 @@ const via6522_interface bbcb_user_via =
 	DEVCB_NULL,	//via_user_read_cb1,
 	DEVCB_NULL,	//via_user_read_ca2,
 	DEVCB_NULL,	//via_user_read_cb2,
-	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
+	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
 	DEVCB_HANDLER(bbcb_via_user_write_portb),
 	DEVCB_NULL, //via_user_write_ca1
 	DEVCB_NULL, //via_user_write_cb1
-	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),
+	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),
 	DEVCB_NULL,	//via_user_write_cb2,
 	DEVCB_LINE(bbcb_via_user_irq_w)
 };

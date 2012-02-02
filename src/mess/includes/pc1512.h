@@ -88,7 +88,7 @@ public:
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_uart;
 	required_device<ams40041_device> m_vdu;
-	required_device<device_t> m_centronics;
+	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_speaker;
 	required_device<pc1512_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;

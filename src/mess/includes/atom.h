@@ -54,7 +54,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_centronics;
+	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_speaker;
 
 	virtual void machine_start();

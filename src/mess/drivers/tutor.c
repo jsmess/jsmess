@@ -185,12 +185,12 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, CASSETTE_TAG),
-	m_printer(*this, "printer")
+	m_centronics(*this, "printer")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cassette_image_device> m_cass;
-	optional_device<device_t> m_printer;
+	optional_device<centronics_device> m_centronics;
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(tutor_mapper_r);
 	DECLARE_WRITE8_MEMBER(tutor_mapper_w);
@@ -464,7 +464,7 @@ READ8_MEMBER( tutor_state::tutor_printer_r )
 	{
 	case 0x20:
 		/* busy */
-		reply = centronics_busy_r(m_printer) ? 0x00 : 0xff;
+		reply = m_centronics->busy_r() ? 0x00 : 0xff;
 		break;
 
 	default:
@@ -483,12 +483,12 @@ WRITE8_MEMBER( tutor_state::tutor_printer_w )
 	{
 	case 0x10:
 		/* data */
-		centronics_data_w(m_printer, 0, data);
+		m_centronics->write(space, 0, data);
 		break;
 
 	case 0x40:
 		/* strobe */
-		centronics_strobe_w(m_printer, BIT(data, 7));
+		m_centronics->strobe_w(BIT(data, 7));
 		break;
 
 	default:

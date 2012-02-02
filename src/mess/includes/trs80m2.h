@@ -52,7 +52,7 @@ public:
 	required_device<device_t> m_pio;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_centronics;
+	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_floppy;
 	required_device<ram_device> m_ram;
 

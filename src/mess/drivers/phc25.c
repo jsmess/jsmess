@@ -71,7 +71,7 @@ READ8_MEMBER( phc25_state::port40_r )
 	data |= ((m_cassette)->input() < +0.3) << 5;
 
 	/* centronics busy */
-	data |= centronics_busy_r(m_centronics) << 6;
+	data |= m_centronics->busy_r() << 6;
 
 	/* horizontal sync */
 	data |= !m_vdg->hs_r() << 7;
@@ -103,7 +103,7 @@ WRITE8_MEMBER( phc25_state::port40_w )
 	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* centronics strobe */
-	centronics_strobe_w(m_centronics, BIT(data, 3));
+	m_centronics->strobe_w(BIT(data, 3));
 
 	/* MC6847 */
 	m_vdg->intext_w(BIT(data, 2));
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( phc25_io, AS_IO, 8, phc25_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(port40_r, port40_w)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY0")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("KEY1")

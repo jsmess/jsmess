@@ -139,10 +139,10 @@ READ8_MEMBER( fp_state::prtr_snd_r )
 
 	UINT8 data = 0;
 
-	data |= centronics_busy_r(m_centronics);
-	data |= centronics_vcc_r(m_centronics) << 1;
-	data |= centronics_fault_r(m_centronics) << 2;
-	data |= centronics_pe_r(m_centronics) << 3;
+	data |= m_centronics->busy_r();
+	data |= m_centronics->vcc_r() << 1;
+	data |= m_centronics->fault_r() << 2;
+	data |= m_centronics->pe_r() << 3;
 
 	return data;
 }
@@ -155,7 +155,7 @@ WRITE8_MEMBER( fp_state::pint_clr_w )
 
 WRITE8_MEMBER( fp_state::ls_w )
 {
-	centronics_strobe_w(m_centronics, !BIT(data, 0));
+	m_centronics->strobe_w(!BIT(data, 0));
 }
 
 
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
 	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w, 0x00ff)
 	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8_LEGACY(I8253A5_TAG, pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8_LEGACY(Z80SIO0_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w, 0x00ff)
-	AM_RANGE(0x020, 0x021) AM_DEVWRITE8_LEGACY(CENTRONICS_TAG, centronics_data_w, 0x00ff)
+	AM_RANGE(0x020, 0x021) AM_DEVWRITE8(CENTRONICS_TAG, centronics_device, write, 0x00ff)
 	AM_RANGE(0x022, 0x023) AM_WRITE8(pint_clr_w, 0x00ff)
 	AM_RANGE(0x024, 0x025) AM_READ8(prtr_snd_r, 0x00ff)
 	AM_RANGE(0x026, 0x027) AM_DEVWRITE8_LEGACY(SN76489AN_TAG, sn76496_w, 0x00ff)
@@ -523,7 +523,6 @@ WRITE_LINE_MEMBER( fp_state::busy_w )
 
 static const centronics_interface centronics_intf =
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(fp_state, busy_w),
 	DEVCB_NULL

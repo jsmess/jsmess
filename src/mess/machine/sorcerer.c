@@ -223,15 +223,15 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 
 		case 2: /* Centronics 7-bit printer */
 			/* bit 7 = strobe, bit 6..0 = data */
-			centronics_strobe_w(m_printer, (~data>>7) & 0x01);
-			centronics_data_w(m_printer, 0, data & 0x7f);
+			m_centronics->strobe_w((~data>>7) & 0x01);
+			m_centronics->write(space, 0, data & 0x7f);
 			break;
 
 		case 4: /* 8-bit parallel output */
 			/* hardware strobe driven from port select, bit 7..0 = data */
-			centronics_strobe_w(m_printer, 1);
-			centronics_data_w(m_printer, 0, data);
-			centronics_strobe_w(m_printer, 0);
+			m_centronics->strobe_w(1);
+			m_centronics->write(space, 0, data);
+			m_centronics->strobe_w(0);
 			break;
 	}
 }
@@ -293,7 +293,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
 
 	/* bit 7 = printer busy   0 = printer is not busy */
 
-	data |= centronics_busy_r(m_printer) << 7;
+	data |= m_centronics->busy_r() << 7;
 
 	return data;
 }

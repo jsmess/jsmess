@@ -75,12 +75,12 @@ void mc1000_state::bankswitch()
 
 READ8_MEMBER( mc1000_state::printer_r )
 {
-	return centronics_busy_r(m_centronics);
+	return m_centronics->busy_r();
 }
 
 WRITE8_MEMBER( mc1000_state::printer_w )
 {
-	centronics_strobe_w(m_centronics, BIT(data, 0));
+	m_centronics->strobe_w(BIT(data, 0));
 }
 
 WRITE8_MEMBER( mc1000_state::mc6845_ctrl_w )
@@ -134,7 +134,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mc1000_io, AS_IO, 8, mc1000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(printer_r, printer_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 //  AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_address_w)
 //  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE_LEGACY(MC6845_TAG, mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(mc6845_ctrl_w)

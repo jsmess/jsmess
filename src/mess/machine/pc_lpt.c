@@ -23,7 +23,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w );
 typedef struct _pc_lpt_state pc_lpt_state;
 struct _pc_lpt_state
 {
-	device_t *centronics;
+	centronics_device *centronics;
 
 	devcb_resolved_write_line out_irq_func;
 
@@ -44,7 +44,6 @@ struct _pc_lpt_state
 
 static const centronics_interface pc_centronics_config =
 {
-	TRUE,
 	DEVCB_LINE(pc_lpt_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -80,7 +79,7 @@ static DEVICE_START( pc_lpt )
 	assert(device->static_config() != NULL);
 
 	/* get centronics device */
-	lpt->centronics = device->subdevice("centronics");
+	lpt->centronics = device->subdevice<centronics_device>("centronics");
 	assert(lpt->centronics != NULL);
 
 	/* resolve callbacks */
@@ -154,14 +153,14 @@ static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w )
 READ8_DEVICE_HANDLER( pc_lpt_data_r )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
-	return centronics_data_r(lpt->centronics, 0);
+	return lpt->centronics->read(*memory_nonspecific_space(device->machine()) , 0);
 }
 
 
 WRITE8_DEVICE_HANDLER( pc_lpt_data_w )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
-	centronics_data_w(lpt->centronics, 0, data);
+	lpt->centronics->write(*memory_nonspecific_space(device->machine()), 0, data);
 }
 
 
@@ -170,11 +169,11 @@ READ8_DEVICE_HANDLER( pc_lpt_status_r )
 	pc_lpt_state *lpt = get_safe_token(device);
 	UINT8 result = 0;
 
-	result |= centronics_fault_r(lpt->centronics) << 3;
-	result |= centronics_vcc_r(lpt->centronics) << 4; /* SELECT is connected to VCC */
-	result |= !centronics_pe_r(lpt->centronics) << 5;
-	result |= centronics_ack_r(lpt->centronics) << 6;
-	result |= !centronics_busy_r(lpt->centronics) << 7;
+	result |= lpt->centronics->fault_r() << 3;
+	result |= lpt->centronics->vcc_r() << 4; /* SELECT is connected to VCC */
+	result |= !lpt->centronics->pe_r() << 5;
+	result |= lpt->centronics->ack_r() << 6;
+	result |= !lpt->centronics->busy_r() << 7;
 
 	return result;
 }
@@ -210,9 +209,9 @@ WRITE8_DEVICE_HANDLER( pc_lpt_control_w )
 	lpt->irq_enabled = BIT(data, 4);
 
 	/* output to centronics */
-	centronics_strobe_w(lpt->centronics, lpt->strobe);
-	centronics_autofeed_w(lpt->centronics, lpt->autofd);
-	centronics_init_w(lpt->centronics, lpt->init);
+	lpt->centronics->strobe_w(lpt->strobe);
+	lpt->centronics->autofeed_w(lpt->autofd);
+	lpt->centronics->init_prime_w(lpt->init);
 }
 
 

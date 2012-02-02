@@ -1738,7 +1738,7 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	rs232_dtr_w(m_rs232, BIT(data, 4));
 
 	// centronics strobe
-	centronics_strobe_w(m_centronics, BIT(data, 5));
+	m_centronics->strobe_w(BIT(data, 5));
 }
 
 static const ay8910_interface psg_intf =
@@ -1748,7 +1748,7 @@ static const ay8910_interface psg_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(st_state, psg_pa_w),
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w)
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write)
 };
 
 
@@ -1793,7 +1793,7 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	rs232_dtr_w(m_rs232, BIT(data, 4));
 
 	// centronics strobe
-	centronics_strobe_w(m_centronics, BIT(data, 5));
+	m_centronics->strobe_w(BIT(data, 5));
 
 	// density select
 	m_fdc->dden_w(BIT(data, 7));
@@ -1806,7 +1806,7 @@ static const ay8910_interface stbook_psg_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(stbook_state, psg_pa_w),
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w)
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write)
 };
 
 
@@ -1909,7 +1909,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	UINT8 data = 0;
 
 	// centronics busy
-	data |= centronics_busy_r(m_centronics);
+	data |= m_centronics->busy_r();
 
 	// data carrier detect
 	data |= rs232_dcd_r(m_rs232) << 1;
@@ -1987,7 +1987,7 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	UINT8 data = 0;
 
 	// centronics busy
-	data |= centronics_busy_r(m_centronics);
+	data |= m_centronics->busy_r();
 
 	// data carrier detect
 	data |= rs232_dcd_r(m_rs232) << 1;
@@ -2054,7 +2054,7 @@ READ8_MEMBER( stbook_state::mfp_gpio_r )
 	UINT8 data = 0;
 
 	// centronics busy
-	data |= centronics_busy_r(m_centronics);
+	data |= m_centronics->busy_r();
 
 	// data carrier detect
 	data |= rs232_dcd_r(m_rs232) << 1;
@@ -2135,7 +2135,6 @@ static RP5C15_INTERFACE( rtc_intf )
 
 static const centronics_interface centronics_intf =
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, i0_w),
 	DEVCB_NULL
