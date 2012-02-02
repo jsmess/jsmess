@@ -3495,8 +3495,8 @@
 		</part>
 	</software>
 
-	<software name="bpproyaka" cloneof="bpproyak">
-		<description>Best Play Pro Yakyuu (Jpn)</description>
+	<software name="proyakyua" cloneof="proyakyu">
+		<description>The Best Play Pro Yakyuu (Jpn)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="HSP-11"/>
@@ -3518,8 +3518,8 @@
 		</part>
 	</software>
 
-	<software name="bpproyak">
-		<description>Best Play Pro Yakyuu - Shin Data (Jpn, Rev. A)</description>
+	<software name="proyakyu">
+		<description>The Best Play Pro Yakyuu - Shin Data (Jpn, Rev. A)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="HSP-11"/>
@@ -16103,7 +16103,7 @@
 	<software name="indora">
 		<description>Indora no Hikari (Jpn)</description>
 		<year>1987</year>
-		<publisher>Kotobuki System</publisher>
+		<publisher>Kemco</publisher>
 		<info name="serial" value="KSC-IN"/>
 		<info name="release" value="19871020"/>
 		<info name="alt_title" value="インドラの光"/>
@@ -21716,7 +21716,7 @@
 		</part>
 	</software>
 
-	<software name="pachipro">
+	<software name="pachikun">
 		<description>Mezase Pachi Pro: Pachio-kun (Jpn)</description>
 		<year>1987</year>
 		<publisher>Coconuts Japan</publisher>
@@ -22572,7 +22572,7 @@
 		</part>
 	</software>
 
-	<software name="proyakyuc" cloneof="basload">
+	<software name="moeproyc" cloneof="basload">
 		<description>Moero!! Pro Yakyuu (Jpn, v1.0)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
@@ -22594,7 +22594,7 @@
 		</part>
 	</software>
 
-	<software name="proyakyub" cloneof="basload">
+	<software name="moeproyb" cloneof="basload">
 		<description>Moero!! Pro Yakyuu (Jpn, v1.1)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
@@ -22616,7 +22616,7 @@
 		</part>
 	</software>
 
-	<software name="proyakyua" cloneof="basload">
+	<software name="moeproya" cloneof="basload">
 		<description>Moero!! Pro Yakyuu (Jpn, v1.2)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
@@ -22638,7 +22638,7 @@
 		</part>
 	</software>
 
-	<software name="proyakyu" cloneof="basload">
+	<software name="moeproy" cloneof="basload">
 		<description>Moero!! Pro Yakyuu (Jpn, v1.3)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
@@ -22660,7 +22660,7 @@
 		</part>
 	</software>
 
-	<software name="proyak88" cloneof="basload2">
+	<software name="moeproy88" cloneof="basload2">
 		<description>Moero!! Pro Yakyuu '88: Kettei Ban (Jpn)</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
@@ -24989,7 +24989,7 @@
 		</part>
 	</software>
 
-	<software name="pachiok2">
+	<software name="pachikn2">
 		<description>Pachio-kun 2 (Jpn)</description>
 		<year>1989</year>
 		<publisher>Coconuts Japan</publisher>
@@ -25008,7 +25008,7 @@
 		</part>
 	</software>
 
-	<software name="pachiok3">
+	<software name="pachikn3">
 		<description>Pachio-kun 3 (Jpn)</description>
 		<year>1990</year>
 		<publisher>Coconuts Japan</publisher>
@@ -29913,7 +29913,7 @@
 		</part>
 	</software>
 
-	<software name="shinmoep">
+	<software name="smoeproy">
 		<description>Shin Moero!! Pro Yakyuu (Jpn)</description>
 		<year>1989</year>
 		<publisher>Jaleco</publisher>
@@ -40044,7 +40044,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="proyaksp1" cloneof="proyaksp">
-		<description>Best Play Pro Yakyuu Special (Jpn)</description>
+		<description>The Best Play Pro Yakyuu Special (Jpn)</description>
 		<year>1992</year>
 		<publisher>ASCII</publisher>
 		<info name="serial" value="HSP-BS"/>
@@ -42578,7 +42578,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	<software name="juuouki">
 		<description>Juuouki (Jpn)</description>
 		<year>1990</year>
-		<publisher>Amsik</publisher>
+		<publisher>Asmik</publisher>
 		<info name="release" value="19900720"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
@@ -43573,8 +43573,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 	<software name="moetwinb" cloneof="stinger">
 		<description>Moero Twinbee - Cinnamon Hakase O Sukue! (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -46104,6 +46104,36 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="utsurun desu (japan).prg" size="131072" crc="6bbd9f11" sha1="5fb6a8e8d49f1e92310b73c3c600851bfa01b1e0" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicep" cloneof="vice">
+		<description>Vice: Project Doom (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>American Sammy</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="nes-9g-0 chr" size="131072" crc="02997f14" sha1="8bfb25fa3a699f84a8afe554f8f8035b054120da" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="vice - project doom (usa) (proto).prg" size="131072" crc="a1b4dd39" sha1="d239b3797f9c49bd8033e1b009a2b0ab8b356b79" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingtank">
+		<description>Taan Hak Fung Wan - King Tank</description>
+		<year>1993</year>
+		<publisher>Gamtec</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-CNROM" />
+			<dataarea name="chr" size="32768">
+				<rom name="taan hak fung wan king tank (c).chr" size="32768" crc="2ff1fca4" sha1="4380c37b8caff7b178e2bbfadb87a5ca64eefe98" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="taan hak fung wan king tank (c).prg" size="32768" crc="c62aabb9" sha1="f7c1986cf3b44d27c3132a37c133dd6031b77902" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -54001,6 +54031,21 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="contraspd" cloneof="contrasp" supported="no">
+		<description>Contra Spirits (Asia, Alt 2)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="JYCOMPANY-A" />
+			<dataarea name="chr" size="262144">
+				<rom name="contra spirits (unl).chr" size="262144" crc="91726a50" sha1="24f497fdc6666ff8aef08b85b66c0f98bdc687a5" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="contra spirits (unl).prg" size="262144" crc="bf7666e9" sha1="2f7d455f8a5703033ebb2ef6d63ebad8f9d7588b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- FIXME: which board should use this game?? -->
 	<software name="dancekar" supported="no">
 		<description>Dance and Karaoke (Chi)</description>
@@ -56250,6 +56295,30 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="[waixing] happy biqi iii (c) (wxn decrypted).prg" size="262144" crc="ac5c3a2a" sha1="a751a848653849a69bda304baa8de99c6af9869d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+From the dumper:
+Multicart screen is broken. Games can only be loaded by codes:
+Code to access Dragon Running:
+045B 00
+Code to access Dance Y2K:
+045B 01
+All musics were removed in this game.
+-->
+	<software name="hotd3in1" supported="partial">
+		<description>Hot Dance 3 in 1 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="hot dance 3 in 1 (unl).chr" size="131072" crc="f209d515" sha1="f555bf63d4efb5156c146d631d1aac79140bb978" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="hot dance 3 in 1 (unl).prg" size="131072" crc="09841f07" sha1="2c4aadfbfada2379a23d3ba48c5112b3b650a9c0" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -68791,5 +68860,21 @@ that the real dumps might surface -->
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="mc_gx121" supported="no">
+		<description>Games Xplosion 121 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<dataarea name="chr" size="4194304">
+				<rom name="gamesxplosion.chr" size="4194304" crc="788ae9fe" sha1="c0081db29f62c51cff7943682493c4d17fc1419d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="4194304">
+				<rom name="gamesxplosion.prg" size="4194304" crc="0282d975" sha1="9ead7505b99a60834724a5818ee120e03c8bf975" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>
