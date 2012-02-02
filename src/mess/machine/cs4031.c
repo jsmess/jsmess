@@ -181,7 +181,7 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 			logerror("ISA read from %x to %x\n", start, end);
 
 		m_space->install_read_bank(start, end, region);
-		memory_set_bankptr(m_space->machine(), region, m_isa + start);
+		memory_set_bankptr(m_space->machine(), region, m_isa + start - 0xc0000);
 	}
 	else if (BIT(m_registers[SHADOW_READ], index))
 	{
@@ -216,7 +216,7 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 			logerror("ISA write from %x to %x\n", start, end);
 
 		m_space->install_write_bank(start, end, region);
-		memory_set_bankptr(m_space->machine(), region, m_isa + start);
+		memory_set_bankptr(m_space->machine(), region, m_isa + start - 0xc0000);
 	}
 	else if (BIT(m_registers[SHADOW_WRITE], index))
 	{
