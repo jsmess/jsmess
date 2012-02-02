@@ -2384,7 +2384,7 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
 
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -2434,7 +2434,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
 	// cartridge
@@ -2492,7 +2492,7 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// cartridge
@@ -2561,7 +2561,7 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_WD1772x_ADD(WD1772_TAG, U517/2)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// cartridge

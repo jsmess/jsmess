@@ -651,7 +651,7 @@ static MACHINE_CONFIG_START( basic, jtc_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, jtc_cassette_interface)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jtc, basic )

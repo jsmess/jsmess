@@ -660,7 +660,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", super80, "bin", 3)
@@ -729,7 +729,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", super80, "bin", 3)

@@ -969,7 +969,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	// devices
 	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_interface)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1030,7 +1030,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_PIA6821_ADD(PIA6821_TAG, lasr2001_pia_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, lasr2001_cassette_interface)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_interface)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	// video hardware
 	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929A, crvision_tms9928a_interface )

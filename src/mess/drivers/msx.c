@@ -1093,7 +1093,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, msx_cassette_interface )
 
@@ -1187,7 +1187,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, msx_cassette_interface )

@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_Z80DART_ADD(Z80SIO0_TAG, 2500000, sio_intf)
 	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(act_floppy_interface)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -1385,7 +1385,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	/* centronics printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* external cassette */
 	MCFG_CASSETTE_ADD("extcas", px4_cassette_interface)

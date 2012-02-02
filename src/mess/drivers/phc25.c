@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 
 	/* devices */
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, phc25_cassette_interface)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

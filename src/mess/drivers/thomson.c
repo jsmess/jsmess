@@ -648,7 +648,7 @@ static MACHINE_CONFIG_START( to7, driver_device )
      MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 /* printer */
-     MCFG_CENTRONICS_ADD("centronics", to7_centronics_config)
+     MCFG_CENTRONICS_PRINTER_ADD("centronics", to7_centronics_config)
 
 /* cassette */
      MCFG_CASSETTE_ADD( CASSETTE_TAG, to7_cassette_interface )
@@ -1392,7 +1392,7 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
 	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
      MCFG_MC6846_MODIFY( "mc6846", to9_timer )
 
@@ -1610,7 +1610,7 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
 	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
      MCFG_MC6846_MODIFY( "mc6846", to8_timer )
 
@@ -1759,7 +1759,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
 	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
      MCFG_MC6846_MODIFY( "mc6846", to9p_timer )
 
@@ -2093,7 +2093,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_PIA6821_MODIFY( THOM_PIA_GAME, mo6_pia6821_game )
 
 	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_ADD("centronics", mo6_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", mo6_centronics_config)
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
@@ -2319,7 +2319,7 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_PIA6821_MODIFY( THOM_PIA_GAME, mo5nr_pia6821_game )
 
 	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")

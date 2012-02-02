@@ -2242,7 +2242,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
-	//MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	//MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	//MCFG_CASSETTE_ADD(CASSETTE_TAG, pc88_cassette_interface)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(pc88_floppy_interface)

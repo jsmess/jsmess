@@ -981,7 +981,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", vtech1, "vz", 1.5)

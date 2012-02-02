@@ -621,7 +621,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )		// model I, level II
 	MCFG_QUICKLOAD_ADD("quickload", trs80_cmd, "cmd", 0.5)
 	MCFG_FD1793_ADD("wd179x", trs80_wd17xx_interface ) // should be FD1771 or FD1791 but inverted data lines are too tricky to fix now
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(trs80_floppy_interface)
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_CONFIG_END
 

@@ -448,7 +448,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_AY31015_ADD( "uart", sorcerer_ay31015_config )
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", sorcerer, "snp", 2)

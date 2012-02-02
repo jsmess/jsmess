@@ -2098,7 +2098,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
@@ -2143,7 +2143,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
@@ -2188,7 +2188,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
@@ -2238,7 +2238,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
@@ -2282,7 +2282,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 

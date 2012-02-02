@@ -986,7 +986,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_interface)
 
 	MCFG_TIMER_ADD_PERIODIC("keyboard", trs80m2_keyboard_tick,attotime::from_hz(60))

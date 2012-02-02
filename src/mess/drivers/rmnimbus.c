@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
     MCFG_ER59256_ADD(ER59256_TAG)
 
 	MCFG_VIA6522_ADD(VIA_TAG, 1000000, nimbus_via)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, nimbus_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, nimbus_centronics_config)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)

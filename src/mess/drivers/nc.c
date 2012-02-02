@@ -1643,7 +1643,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", nc100_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", nc100_centronics_config)
 
 	/* uart */
 	MCFG_I8251_ADD("uart", nc100_uart_interface)
@@ -1696,7 +1696,7 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 
 	/* printer */
 	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_ADD("centronics", nc200_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", nc200_centronics_config)
 
 	/* uart */
 	MCFG_DEVICE_REMOVE("uart")

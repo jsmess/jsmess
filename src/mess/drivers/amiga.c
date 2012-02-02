@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 
 	/* devices */
 	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
-	MCFG_CENTRONICS_ADD("centronics", amiga_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", amiga_centronics_config)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
