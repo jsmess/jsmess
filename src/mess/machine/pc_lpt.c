@@ -55,6 +55,7 @@ static const centronics_interface pc_centronics_config =
 static SLOT_INTERFACE_START(pc_centronics)
 	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
 	SLOT_INTERFACE("covox", CENTRONICS_COVOX)
+	SLOT_INTERFACE("covox_stereo", CENTRONICS_COVOX_STEREO)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( pc_lpt )
@@ -210,7 +211,7 @@ WRITE8_DEVICE_HANDLER( pc_lpt_control_w )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
 
-	logerror("pc_lpt_control_w: 0x%02x\n", data);
+//	logerror("pc_lpt_control_w: 0x%02x\n", data);
 
 	/* save to latch */
 	lpt->strobe = BIT(data, 0);
