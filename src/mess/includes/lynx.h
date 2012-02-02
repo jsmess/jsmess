@@ -41,8 +41,10 @@ typedef struct
 	UINT8 spr_ctl1;
 	UINT16 scb;
 	UINT16 scb_next;
+	UINT8 sprite_collide;
 
 	int everon;
+	UINT8 fred;
 	int memory_accesses;
 	attotime time;
 
@@ -56,7 +58,6 @@ typedef struct
 {
 	UINT8 serctl;
 	UINT8 data_received, data_to_send, buffer;
-
 	int received;
 	int sending;
 	int buffer_loaded;
@@ -116,7 +117,6 @@ public:
 	SUZY m_suzy;
 	BLITTER m_blitter;
 	UINT8 m_memory_config;
-	UINT8 m_sprite_collide;
 	MIKEY m_mikey;
 	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
 	UART m_uart;
