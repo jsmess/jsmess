@@ -763,7 +763,7 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CENTRONICS_ADD("printer", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("printer", standard_centronics)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 

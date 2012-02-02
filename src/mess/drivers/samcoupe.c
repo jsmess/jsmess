@@ -555,8 +555,8 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_PALETTE_INIT(samcoupe)
 
 	/* devices */
-	MCFG_CENTRONICS_ADD("lpt1", standard_centronics)
-	MCFG_CENTRONICS_ADD("lpt2", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("lpt1", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("lpt2", standard_centronics)
 	MCFG_MSM6242_ADD("sambus_clock", samcoupe_rtc_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, samcoupe_cassette_interface)
 	MCFG_WD1772x_ADD("wd1772", SAMCOUPE_XTAL_X1/3)

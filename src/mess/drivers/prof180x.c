@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( prof180x, prof180x_state )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(prof180x_floppy_interface)
 	MCFG_UPD765A_ADD(FDC9268_TAG, fdc_intf)
 	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

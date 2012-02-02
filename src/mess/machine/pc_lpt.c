@@ -50,7 +50,7 @@ static const centronics_interface pc_centronics_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( pc_lpt )
-	MCFG_CENTRONICS_ADD("centronics", pc_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", pc_centronics_config)
 MACHINE_CONFIG_END
 
 
@@ -91,7 +91,7 @@ static DEVICE_START( pc_lpt )
 	device->save_item(NAME(lpt->autofd));
 	device->save_item(NAME(lpt->init));
 	device->save_item(NAME(lpt->select));
-	device->save_item(NAME(lpt->irq_enabled));
+	device->save_item(NAME(lpt->irq_enabled));	
 }
 
 static DEVICE_RESET( pc_lpt )

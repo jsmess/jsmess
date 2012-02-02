@@ -913,7 +913,7 @@ static MACHINE_CONFIG_START( amstrad, amstrad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
@@ -979,7 +979,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)

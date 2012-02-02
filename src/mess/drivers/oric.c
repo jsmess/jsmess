@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", oric_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", oric_centronics_config)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, oric_cassette_interface )

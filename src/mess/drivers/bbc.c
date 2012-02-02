@@ -846,7 +846,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	/* devices */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
 
 	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
@@ -867,7 +867,7 @@ static MACHINE_CONFIG_DERIVED( bbcbp, bbca )
 	/* devices */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
 
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_DERIVED( bbcbp128, bbca )
 	/* devices */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
-	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
 
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
@@ -933,7 +933,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", bbcb_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, bbc_cassette_interface )

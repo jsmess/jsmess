@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	/* devices */
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_4MHz, ctc_intf )
 	MCFG_TIMER_ADD_PERIODIC("z80ctc_timer", ctc_tick, attotime::from_hz(XTAL_4MHz/13))
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SNAPSHOT_ADD("snapshot", mtx, "mtb", 0.5)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, mtx_cassette_interface)
 	MCFG_TIMER_ADD_PERIODIC("cassette_timer", cassette_tick, attotime::from_hz(44100))

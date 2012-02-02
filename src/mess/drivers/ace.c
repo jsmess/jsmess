@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SNAPSHOT_ADD("snapshot", ace, "ace", 1)
 	MCFG_I8255A_ADD(I8255_TAG, ppi_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_6_5MHz/2, pio_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

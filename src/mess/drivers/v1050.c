@@ -1131,7 +1131,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","v1050")
 
 	// printer
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

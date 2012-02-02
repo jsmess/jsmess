@@ -820,7 +820,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", einstein_centronics_config)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", einstein_centronics_config)
 
 	/* uart */
 	MCFG_I8251_ADD(IC_I060, default_i8251_interface)

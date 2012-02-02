@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", elwro800jr_centronics_interface)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", elwro800jr_centronics_interface)
 
 	MCFG_I8251_ADD("i8251", default_i8251_interface)
 
