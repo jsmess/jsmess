@@ -233,7 +233,7 @@ VIDEO_START( x1 )
 	state->m_pal_4096 = auto_alloc_array_clear(machine, UINT8, 0x1000*3);
 }
 
-static void x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16	pen,UINT8 width,UINT8 height)
+static void x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
 {
 	if(!machine.primary_screen->visible_area().contains(x, y))
 		return;
@@ -565,20 +565,20 @@ SCREEN_UPDATE_RGB32( x1 )
  *************************************/
 
 
-static UINT16 check_keyboard_press(running_machine &machine)
+UINT16 x1_state::check_keyboard_press()
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
-	UINT32 pad = input_port_read(machine,"tenkey");
-	UINT32 f_key = input_port_read(machine, "f_keys");
+	UINT8 keymod = input_port_read(machine(),"key_modifiers") & 0x1f;
+	UINT32 pad = input_port_read(machine(),"tenkey");
+	UINT32 f_key = input_port_read(machine(), "f_keys");
 	scancode = 0;
 
 	for(port_i=0;port_i<3;port_i++)
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(machine,portnames[port_i])>>i) & 1)
+			if((input_port_read(machine(), portnames[port_i])>>i) & 1)
 			{
 				//key_flag = 1;
 				if(keymod & 0x02)  // shift not pressed
@@ -629,7 +629,7 @@ static UINT16 check_keyboard_press(running_machine &machine)
 	return 0;
 }
 
-static UINT8 check_keyboard_shift(running_machine &machine)
+UINT8 x1_state::check_keyboard_shift()
 {
 	UINT8 val = 0xe0;
 	/*
@@ -644,18 +644,18 @@ static UINT8 check_keyboard_shift(running_machine &machine)
     ---- ---x CTRL ON
     */
 
-	val |= input_port_read(machine,"key_modifiers") & 0x1f;
+	val |= input_port_read(machine(), "key_modifiers") & 0x1f;
 
-	if(check_keyboard_press(machine) != 0)
+	if(check_keyboard_press() != 0)
 		val &= ~0x40;
 
-	if(check_keyboard_press(machine) & 0x100) //function keys
+	if(check_keyboard_press() & 0x100) //function keys
 		val &= ~0x80;
 
 	return val;
 }
 
-static UINT8 get_game_key(running_machine &machine, int port)
+UINT8 x1_state::get_game_key(UINT8 port)
 {
 	// key status returned by sub CPU function 0xE3.
 	// in order from bit 7 to 0:
@@ -664,43 +664,46 @@ static UINT8 get_game_key(running_machine &machine, int port)
 	// port 2: ESC,1,[-],[+],[*],TAB,SPC,RET ([] = numpad)
 	// bits are active high
 	UINT8 ret = 0;
-	UINT32 key1 = input_port_read(machine,"key1");
-	UINT32 key2 = input_port_read(machine,"key2");
-	UINT32 key3 = input_port_read(machine,"key3");
-	UINT32 pad = input_port_read(machine,"tenkey");
 
-	switch(port)
+	if (port == 0)
 	{
-		case 0:
-			if(key3 & 0x00020000) ret |= 0x80;  // Q
-			if(key3 & 0x00800000) ret |= 0x40;  // W
-			if(key3 & 0x00000020) ret |= 0x20;  // E
-			if(key3 & 0x00000002) ret |= 0x10;  // A
-			if(key3 & 0x00000010) ret |= 0x08;  // D
-			if(key3 & 0x04000000) ret |= 0x04;  // Z
-			if(key3 & 0x01000000) ret |= 0x02;  // X
-			if(key3 & 0x00000008) ret |= 0x01;  // C
-			break;
-		case 1:
-			if(pad & 0x00000080) ret |= 0x80;  // Tenkey 7
-			if(pad & 0x00000010) ret |= 0x40;  // Tenkey 4
-			if(pad & 0x00000002) ret |= 0x20;  // Tenkey 1
-			if(pad & 0x00000100) ret |= 0x10;  // Tenkey 8
-			if(pad & 0x00000004) ret |= 0x08;  // Tenkey 2
-			if(pad & 0x00000200) ret |= 0x04;  // Tenkey 9
-			if(pad & 0x00000040) ret |= 0x02;  // Tenkey 6
-			if(pad & 0x00000008) ret |= 0x01;  // Tenkey 3
-			break;
-		case 2:
-			if(key1 & 0x08000000) ret |= 0x80;  // ESC
-			if(key2 & 0x00020000) ret |= 0x40;  // 1
-			if(pad & 0x00000400) ret |= 0x20;  // Tenkey -
-			if(pad & 0x00000800) ret |= 0x10;  // Tenkey +
-			if(pad & 0x00001000) ret |= 0x08;  // Tenkey *
-			if(key1 & 0x00000200) ret |= 0x04;  // TAB
-			if(key2 & 0x00000001) ret |= 0x02;  // SPC
-			if(key1 & 0x00002000) ret |= 0x01;  // RET
-			break;
+		UINT32 key3 = input_port_read(machine(), "key3");
+		if(key3 & 0x00020000) ret |= 0x80;  // Q
+		if(key3 & 0x00800000) ret |= 0x40;  // W
+		if(key3 & 0x00000020) ret |= 0x20;  // E
+		if(key3 & 0x00000002) ret |= 0x10;  // A
+		if(key3 & 0x00000010) ret |= 0x08;  // D
+		if(key3 & 0x04000000) ret |= 0x04;  // Z
+		if(key3 & 0x01000000) ret |= 0x02;  // X
+		if(key3 & 0x00000008) ret |= 0x01;  // C
+	}
+	else
+	if (port == 1)
+	{
+		UINT32 pad = input_port_read(machine(), "tenkey");
+		if(pad & 0x00000080) ret |= 0x80;  // Tenkey 7
+		if(pad & 0x00000010) ret |= 0x40;  // Tenkey 4
+		if(pad & 0x00000002) ret |= 0x20;  // Tenkey 1
+		if(pad & 0x00000100) ret |= 0x10;  // Tenkey 8
+		if(pad & 0x00000004) ret |= 0x08;  // Tenkey 2
+		if(pad & 0x00000200) ret |= 0x04;  // Tenkey 9
+		if(pad & 0x00000040) ret |= 0x02;  // Tenkey 6
+		if(pad & 0x00000008) ret |= 0x01;  // Tenkey 3
+	}
+	else
+	if (port == 2)
+	{
+		UINT32 key1 = input_port_read(machine(), "key1");
+		UINT32 key2 = input_port_read(machine(), "key2");
+		UINT32 pad = input_port_read(machine(), "tenkey");
+		if(key1 & 0x08000000) ret |= 0x80;  // ESC
+		if(key2 & 0x00020000) ret |= 0x40;  // 1
+		if(pad & 0x00000400) ret |= 0x20;  // Tenkey -
+		if(pad & 0x00000800) ret |= 0x10;  // Tenkey +
+		if(pad & 0x00001000) ret |= 0x08;  // Tenkey *
+		if(key1 & 0x00000200) ret |= 0x04;  // TAB
+		if(key2 & 0x00000001) ret |= 0x02;  // SPC
+		if(key1 & 0x00002000) ret |= 0x01;  // RET
 	}
 
 	return ret;
@@ -716,7 +719,8 @@ READ8_MEMBER( x1_state::x1_sub_io_r )
 		bus_res = m_sub_val[m_key_i];
 		/* FIXME: likely to be different here. */
 		m_key_i++;
-		if(m_key_i >= 2) { m_key_i = 0; }
+		if(m_key_i >= 2)
+			m_key_i = 0;
 
 		return bus_res;
 	}
@@ -891,17 +895,17 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
 	{
 		case 0xe3: //game key obtaining
 			m_sub_cmd_length = 3;
-			m_sub_val[0] = get_game_key(machine(),0);
-			m_sub_val[1] = get_game_key(machine(),1);
-			m_sub_val[2] = get_game_key(machine(),2);
+			m_sub_val[0] = get_game_key(0);
+			m_sub_val[1] = get_game_key(1);
+			m_sub_val[2] = get_game_key(2);
 			break;
 		case 0xe4: //irq vector setting
 			break;
 		//case 0xe5: //timer irq clear
 		//  break;
 		case 0xe6: //key data readout
-			m_sub_val[0] = check_keyboard_shift(machine()) & 0xff;
-			m_sub_val[1] = check_keyboard_press(machine()) & 0xff;
+			m_sub_val[0] = check_keyboard_shift() & 0xff;
+			m_sub_val[1] = check_keyboard_press() & 0xff;
 			m_sub_cmd_length = 2;
 			break;
 //      case 0xe7: // TV Control
@@ -989,11 +993,6 @@ WRITE8_MEMBER( x1_state::x1_rom_bank_1_w )
  *  MB8877A FDC (wd17XX compatible)
  *
  *************************************/
-
-//static UINT8 fdc_irq_flag;
-//static UINT8 fdc_drq_flag;
-//static UINT8 fdc_side;
-//static UINT8 fdc_drive;
 
 READ8_MEMBER( x1_state::x1_fdc_r )
 {
@@ -1083,34 +1082,31 @@ static const wd17xx_interface x1turbo_mb8877a_interface =
  *
  *************************************/
 
-static UINT16 check_pcg_addr(running_machine &machine)
+UINT16 x1_state::check_pcg_addr()
 {
-	x1_state *state = machine.driver_data<x1_state>();
-	if(state->m_avram[0x7ff] & 0x20) return 0x7ff;
-	if(state->m_avram[0x3ff] & 0x20) return 0x3ff;
-	if(state->m_avram[0x5ff] & 0x20) return 0x5ff;
-	if(state->m_avram[0x1ff] & 0x20) return 0x1ff;
+	if(m_avram[0x7ff] & 0x20) return 0x7ff;
+	if(m_avram[0x3ff] & 0x20) return 0x3ff;
+	if(m_avram[0x5ff] & 0x20) return 0x5ff;
+	if(m_avram[0x1ff] & 0x20) return 0x1ff;
 
 	return 0x3ff;
 }
 
-static UINT16 check_chr_addr(running_machine &machine)
+UINT16 x1_state::check_chr_addr()
 {
-	x1_state *state = machine.driver_data<x1_state>();
-	if(!(state->m_avram[0x7ff] & 0x20)) return 0x7ff;
-	if(!(state->m_avram[0x3ff] & 0x20)) return 0x3ff;
-	if(!(state->m_avram[0x5ff] & 0x20)) return 0x5ff;
-	if(!(state->m_avram[0x1ff] & 0x20)) return 0x1ff;
+	if(!(m_avram[0x7ff] & 0x20)) return 0x7ff;
+	if(!(m_avram[0x3ff] & 0x20)) return 0x3ff;
+	if(!(m_avram[0x5ff] & 0x20)) return 0x5ff;
+	if(!(m_avram[0x1ff] & 0x20)) return 0x1ff;
 
 	return 0x3ff;
 }
 
-static UINT16 get_pcg_addr(running_machine &machine,UINT16 width,UINT8 y_char_size)
+UINT16 x1_state::get_pcg_addr( UINT16 width, UINT8 y_char_size )
 {
-	x1_state *state = machine.driver_data<x1_state>();
-	int hbeam = machine.primary_screen->hpos() >> 3;
-	int vbeam = machine.primary_screen->vpos() / y_char_size;
-	UINT16 pcg_offset = ((hbeam + vbeam*width) + mc6845_start_addr) & 0x7ff;
+	int hbeam = machine().primary_screen->hpos() >> 3;
+	int vbeam = machine().primary_screen->vpos() / y_char_size;
+	UINT16 pcg_offset = ((hbeam + vbeam*width) + (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))) & 0x7ff;
 
 	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.primary_screen->vpos() & 7,width);
 
@@ -1129,10 +1125,10 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 	if(addr == 0 && m_scrn_reg.pcg_mode) // Kanji ROM read, X1Turbo only
 	{
 		gfx_data = machine().region("kanji")->base();
-		pcg_offset = (m_tvram[check_chr_addr(machine())]+(m_kvram[check_chr_addr(machine())]<<8)) & 0xfff;
+		pcg_offset = (m_tvram[check_chr_addr()]+(m_kvram[check_chr_addr()]<<8)) & 0xfff;
 		pcg_offset*=0x20;
 		pcg_offset+=(offset & 0x0f);
-		pcg_offset+=(m_kvram[check_chr_addr(machine())] & 0x40) >> 2; //left-right check
+		pcg_offset+=(m_kvram[check_chr_addr()] & 0x40) >> 2; //left-right check
 
 		res = gfx_data[pcg_offset];
 	}
@@ -1144,7 +1140,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 		gfx_data = machine().region((addr == 0) ? "cgrom" : "pcg")->base();
 		y_char_size = ((m_crtc_vreg[9]+1) > 8) ? 8 : m_crtc_vreg[9]+1;
 		if(y_char_size == 0) { y_char_size = 1; }
-		pcg_offset = m_tvram[get_pcg_addr(machine(),m_crtc_vreg[1],y_char_size)]*8;
+		pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
 		pcg_offset+= machine().primary_screen->vpos() & (y_char_size-1);
 		if(addr) { pcg_offset+= ((addr-1)*0x800); }
 		res = gfx_data[pcg_offset];
@@ -1169,7 +1165,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 	{
 		if(m_scrn_reg.pcg_mode) // Hi-Speed Mode, X1Turbo only
 		{
-			pcg_offset = m_tvram[check_pcg_addr(machine())]*8;
+			pcg_offset = m_tvram[check_pcg_addr()]*8;
 			pcg_offset+= (offset & 0xe) >> 1;
 			pcg_offset+=((addr-1)*0x800);
 			PCG_RAM[pcg_offset] = data;
@@ -1185,7 +1181,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 			/* TODO: Brain Breaker doesn't work with this arrangement in high resolution mode, check out why */
 			y_char_size = (m_crtc_vreg[9]+1) > 8 ? (m_crtc_vreg[9]+1)-8 : m_crtc_vreg[9]+1;
 			if(y_char_size == 0) { y_char_size = 1; }
-			pcg_offset = m_tvram[get_pcg_addr(machine(),m_crtc_vreg[1],y_char_size)]*8;
+			pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
 			pcg_offset+= machine().primary_screen->vpos() & (y_char_size-1);
 			pcg_offset+= ((addr-1)*0x800);
 
@@ -1205,18 +1201,17 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
  *************************************/
 
 /* for bitmap mode */
-static void set_current_palette(running_machine &machine)
+void x1_state::set_current_palette()
 {
-	x1_state *state = machine.driver_data<x1_state>();
 	UINT8 addr,r,g,b;
 
 	for(addr=0;addr<8;addr++)
 	{
-		r = ((state->m_x_r)>>(addr)) & 1;
-		g = ((state->m_x_g)>>(addr)) & 1;
-		b = ((state->m_x_b)>>(addr)) & 1;
+		r = ((m_x_r)>>(addr)) & 1;
+		g = ((m_x_g)>>(addr)) & 1;
+		b = ((m_x_b)>>(addr)) & 1;
 
-		palette_set_color_rgb(machine, addr|8, pal1bit(r), pal1bit(g), pal1bit(b));
+		palette_set_color_rgb(machine(), addr|8, pal1bit(r), pal1bit(g), pal1bit(b));
 	}
 }
 
@@ -1248,7 +1243,7 @@ WRITE8_MEMBER( x1_state::x1_pal_r_w )
 	else //compatible mode
 	{
 		m_x_r = data;
-		set_current_palette(machine());
+		set_current_palette();
 		//if(m_old_vpos != machine().primary_screen->vpos())
 		//{
 		//  machine().primary_screen->update_partial(machine().primary_screen->vpos());
@@ -1267,7 +1262,7 @@ WRITE8_MEMBER( x1_state::x1_pal_g_w )
 	else
 	{
 		m_x_g = data;
-		set_current_palette(machine());
+		set_current_palette();
 		//if(m_old_vpos != machine().primary_screen->vpos())
 		//{
 			machine().primary_screen->update_partial(machine().primary_screen->vpos());
@@ -1286,7 +1281,7 @@ WRITE8_MEMBER( x1_state::x1_pal_b_w )
 	else
 	{
 		m_x_b = data;
-		set_current_palette(machine());
+		set_current_palette();
 		//if(m_old_vpos != machine().primary_screen->vpos())
 		//{
 		//  machine().primary_screen->update_partial(machine().primary_screen->vpos());
@@ -1620,7 +1615,7 @@ READ8_MEMBER( x1_state::x1_io_r )
 	if(offset == 0x0e03)                    		{ return x1_rom_r(space, 0); }
 	// TODO: user could install ym2151 on plain X1 too
 	//0x700, 0x701
-	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(machine().device("ctc"), offset-0x0704); }
+	//if(offset >= 0x0704 && offset <= 0x0707)      { return z80ctc_r(m_ctc, offset-0x0704); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)	{ return x1_sub_io_r(space, 0); }
@@ -1629,8 +1624,8 @@ READ8_MEMBER( x1_state::x1_io_r )
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(machine().device("dma"), 0); }
 //  else if(offset >= 0x1f90 && offset <= 0x1f91)   { return z80sio_c_r(machine().device("sio"), (offset-0x1f90) & 1); }
 //  else if(offset >= 0x1f92 && offset <= 0x1f93)   { return z80sio_d_r(machine().device("sio"), (offset-0x1f92) & 1); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(machine().device("ctc"), offset-0x1fa0); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(machine().device("ctc"), offset-0x1fa8); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(m_ctc, offset-0x1fa0); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(m_ctc, offset-0x1fa8); }
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); }
 //  else if(offset == 0x1fe0)                       { return x1turboz_blackclip_r(space,0); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return m_avram[offset & 0x7ff]; }
@@ -1648,7 +1643,7 @@ WRITE8_MEMBER( x1_state::x1_io_w )
 	if(m_io_bank_mode == 1)                  	{ x1_ex_gfxram_w(space, offset, data); }
 	// TODO: user could install ym2151 on plain X1 too
 	//0x700, 0x701
-//  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(machine().device("ctc"), offset-0x0704,data); }
+//  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(m_ctc, offset-0x0704,data); }
 //  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(machine(), 0, data); }
 	else if(offset >= 0x0e00 && offset <= 0x0e02)	{ x1_rom_w(space, offset-0xe00,data); }
 //  else if(offset >= 0x0e80 && offset <= 0x0e82)   { x1_kanji_w(machine(), offset-0xe80,data); }
@@ -1668,8 +1663,8 @@ WRITE8_MEMBER( x1_state::x1_io_w )
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(machine().device("dma"), 0,data); }
 //  else if(offset >= 0x1f90 && offset <= 0x1f91)   { z80sio_c_w(machine().device("sio"), (offset-0x1f90) & 1,data); }
 //  else if(offset >= 0x1f92 && offset <= 0x1f93)   { z80sio_d_w(machine().device("sio"), (offset-0x1f92) & 1,data); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(machine().device("ctc"), offset-0x1fa0,data); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(machine().device("ctc"), offset-0x1fa8,data); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(m_ctc, offset-0x1fa0,data); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(m_ctc, offset-0x1fa8,data); }
 //  else if(offset == 0x1fb0)                       { x1turbo_pal_w(space,0,data); }
 //  else if(offset >= 0x1fb9 && offset <= 0x1fbf)   { x1turbo_txpal_w(space,offset-0x1fb9,data); }
 //  else if(offset == 0x1fc0)                       { x1turbo_txdisp_w(space,0,data); }
@@ -1694,7 +1689,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	if(offset == 0x0700)							{ return (ym2151_r(machine().device("ym"), offset-0x0700) & 0x7f) | (input_port_read(machine(), "SOUND_SW") & 0x80); }
 	else if(offset == 0x0701)		                { return ym2151_r(machine().device("ym"), offset-0x0700); }
 	//0x704 is FM sound detection port on X1 turboZ
-	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(machine().device("ctc"), offset-0x0704); }
+	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(m_ctc, offset-0x0704); }
 	else if(offset == 0x0801)						{ printf("Color image board read\n"); return 0xff; } // *
 	else if(offset == 0x0803)						{ printf("Color image board 2 read\n"); return 0xff; } // *
 	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board read %04x\n",offset); return 0xff; } // *
@@ -1713,8 +1708,8 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ return z80dma_r(machine().device("dma"), 0); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ return z80dart_ba_cd_r(machine().device("sio"), (offset-0x1f90) & 3); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC read %04x\n",offset); return 0xff; }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(machine().device("ctc"), offset-0x1fa0); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(machine().device("ctc"), offset-0x1fa8); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ return z80ctc_r(m_ctc, offset-0x1fa0); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ return z80ctc_r(m_ctc, offset-0x1fa8); }
 	else if(offset == 0x1fb0)						{ return x1turbo_pal_r(space,0); } // Z only!
 	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ return x1turbo_txpal_r(space,offset-0x1fb8); } //Z only!
 	else if(offset == 0x1fc0)						{ return x1turbo_txdisp_r(space,0); } // Z only!
@@ -1739,7 +1734,7 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	if(m_io_bank_mode == 1)                    { x1_ex_gfxram_w(space, offset, data); }
 	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(machine().device("ym"), offset-0x0700,data); }
 	//0x704 is FM sound detection port on X1 turboZ
-	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(machine().device("ctc"), offset-0x0704,data); }
+	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(m_ctc, offset-0x0704,data); }
 	else if(offset == 0x0800)						{ printf("Color image board write %02x\n",data); } // *
 	else if(offset == 0x0802)						{ printf("Color image board 2 write %02x\n",data); } // *
 	else if(offset >= 0x0a00 && offset <= 0x0a07)	{ printf("Stereoscopic board write %04x %02x\n",offset,data); } // *
@@ -1766,8 +1761,8 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)	{ z80dma_w(machine().device("dma"), 0,data); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)	{ z80dart_ba_cd_w(machine().device("sio"), (offset-0x1f90) & 3,data); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)	{ printf("Extended SIO/CTC write %04x %02x\n",offset,data); }
-	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(machine().device("ctc"), offset-0x1fa0,data); }
-	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(machine().device("ctc"), offset-0x1fa8,data); }
+	else if(offset >= 0x1fa0 && offset <= 0x1fa3)	{ z80ctc_w(m_ctc, offset-0x1fa0,data); }
+	else if(offset >= 0x1fa8 && offset <= 0x1fab)	{ z80ctc_w(m_ctc, offset-0x1fa8,data); }
 	else if(offset == 0x1fb0)						{ x1turbo_pal_w(space,0,data); } // Z only!
 	else if(offset >= 0x1fb8 && offset <= 0x1fbf)	{ x1turbo_txpal_w(space,offset-0x1fb8,data); } //Z only!
 	else if(offset == 0x1fc0)						{ x1turbo_txdisp_w(space,0,data); } //Z only!
@@ -2152,7 +2147,7 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT(0x00000008,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x00000010,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
 
-	#if 0
+#if 0
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
 	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
@@ -2194,7 +2189,7 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF9") PORT_CODE(KEYCODE_F9)
 	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF10") PORT_CODE(KEYCODE_F10)
 
-	#endif
+#endif
 INPUT_PORTS_END
 
 INPUT_PORTS_START( x1turbo )
@@ -2336,14 +2331,14 @@ static Z80DART_INTERFACE( sio_intf )
 
 static const z80_daisy_config x1_daisy[] =
 {
-    { "x1kb" },
+	{ "x1kb" },
 	{ "ctc" },
 	{ NULL }
 };
 
 static const z80_daisy_config x1turbo_daisy[] =
 {
-    { "x1kb" },
+	{ "x1kb" },
 	{ "ctc" },
 	{ "dma" },
 	{ "sio" },
@@ -2585,7 +2580,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_CPU_CONFIG(x1_daisy)
 
-	MCFG_Z80CTC_ADD( "ctc", MAIN_CLOCK/4 , ctc_intf )
+	MCFG_Z80CTC_ADD( "ctc", MAIN_CLOCK/4, ctc_intf )
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
