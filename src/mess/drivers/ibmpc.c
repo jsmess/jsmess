@@ -366,6 +366,9 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5140")
 MACHINE_CONFIG_END
 
 
