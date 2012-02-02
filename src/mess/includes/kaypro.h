@@ -22,7 +22,7 @@ public:
 	m_pio_s(*this, "z80pio_s"),
 	m_sio(*this, "z80sio"),
 	m_sio2x(*this, "z80sio_2x"),
-	m_printer(*this, "centronics"),
+	m_centronics(*this, "centronics"),
 	m_fdc(*this, "wd1793"),
 	m_crtc(*this, "crtc"),
 	m_beep(*this, BEEPER_TAG)
@@ -33,7 +33,7 @@ public:
 	optional_device<device_t> m_pio_s;
 	required_device<device_t> m_sio;
 	optional_device<device_t> m_sio2x;
-	required_device<device_t> m_printer;
+	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_fdc;
 	optional_device<mc6845_device> m_crtc;
 	required_device<device_t> m_beep;

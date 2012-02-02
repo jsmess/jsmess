@@ -23,7 +23,7 @@ READ8_MEMBER( kaypro_state::pio_system_r )
 	UINT8 data = 0;
 
 	/* centronics busy */
-	data |= centronics_not_busy_r(m_printer) << 3;
+	data |= m_centronics->not_busy_r() << 3;
 
 	/* PA7 is pulled high */
 	data |= 0x80;
@@ -62,7 +62,7 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 
 	wd17xx_dden_w(m_fdc, BIT(data, 5));
 
-	centronics_strobe_w(m_printer, BIT(data, 4));
+	m_centronics->strobe_w(BIT(data, 4));
 
 	if (BIT(data, 0))
 		wd17xx_set_drive(m_fdc, 0);
@@ -100,7 +100,7 @@ const z80pio_interface kayproii_pio_g_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
+	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
 	DEVCB_NULL,			/* portA ready active callback */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -139,7 +139,7 @@ const z80pio_interface kaypro4_pio_s_intf =
 
 READ8_MEMBER( kaypro_state::kaypro2x_system_port_r )
 {
-	UINT8 data = centronics_busy_r(m_printer) << 6;
+	UINT8 data = m_centronics->busy_r() << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
@@ -174,7 +174,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 	wd17xx_dden_w(m_fdc, BIT(data, 5));
 
-	centronics_strobe_w(m_printer, BIT(data, 3));
+	m_centronics->strobe_w(BIT(data, 3));
 
 	if (BIT(data, 0))
 		wd17xx_set_drive(m_fdc, 0);

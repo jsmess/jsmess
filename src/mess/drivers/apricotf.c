@@ -118,7 +118,7 @@ WRITE8_MEMBER( f1_state::system_w )
 	switch(offset)
 	{
 	case 0: // centronics data port
-		centronics_data_w(m_centronics, 0, data);
+		m_centronics->write(space, 0, data);
 		break;
 
 	case 1: // drive select
@@ -147,7 +147,7 @@ WRITE8_MEMBER( f1_state::system_w )
 		break;
 
 	case 0x0f: // centronics strobe output
-		centronics_strobe_w(m_centronics, !BIT(data, 0));
+		m_centronics->strobe_w(!BIT(data, 0));
 		break;
 	}
 }
@@ -321,7 +321,6 @@ static const wd17xx_interface fdc_intf =
 
 static const centronics_interface centronics_intf =
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z80SIO2_TAG, z80dart_ctsa_w),
 	DEVCB_NULL

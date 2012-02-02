@@ -686,10 +686,10 @@ typedef enum
 */
 static to7_io_dev to7_io_mode( running_machine &machine )
 {
-	device_t *centronics = machine.device("centronics");
+	centronics_device *centronics = machine.device<centronics_device>("centronics");
 	device_image_interface *serial = dynamic_cast<device_image_interface *>(machine.device("cc90232"));
 
-	if (centronics_pe_r(centronics) == TRUE)
+	if (centronics->pe_r() == TRUE)
 		return TO7_IO_CENTRONICS;
 	else if ( serial->exists())
 		return TO7_IO_RS232;
@@ -741,7 +741,7 @@ WRITE8_MEMBER( to7_io_line_device::porta_out )
 
 READ8_MEMBER( to7_io_line_device::porta_in )
 {
-	device_t *printer = machine().device("centronics");
+	centronics_device *printer = machine().device<centronics_device>("centronics");
 	int cts = 1;
 	int dsr = ( m_input_state & SERIAL_STATE_DSR ) ? 0 : 1;
 	int rd  = get_in_data_bit();
@@ -749,7 +749,7 @@ READ8_MEMBER( to7_io_line_device::porta_in )
 	if ( to7_io_mode(machine()) == TO7_IO_RS232 )
 		cts = m_input_state & SERIAL_STATE_CTS ? 0 : 1;
 	else
-		cts = !centronics_busy_r(printer);
+		cts = !printer->busy_r();
 
 	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", cpu_get_previouspc(machine().device("maincpu")), machine().time().as_double(), to7_io_mode(machine()), cts, dsr, rd ));
 
@@ -760,24 +760,24 @@ READ8_MEMBER( to7_io_line_device::porta_in )
 
 static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
 
 	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), data ));
 
 	/* set 8-bit data */
-	centronics_data_w(printer, 0, data);
+	printer->write( *memory_nonspecific_space(device->machine()), 0, data);
 }
 
 
 
 static WRITE8_DEVICE_HANDLER( to7_io_cb2_out )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
 
 	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), data ));
 
 	/* send STROBE to printer */
-	centronics_strobe_w(printer, data);
+	printer->strobe_w(data);
 }
 
 
@@ -809,7 +809,6 @@ const pia6821_interface to7_pia6821_io =
 
 const centronics_interface to7_centronics_config =
 {
-	FALSE,
 	DEVCB_LINE(to7_io_ack),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -2961,18 +2960,18 @@ static READ8_DEVICE_HANDLER ( to9_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( to9_sys_porta_out )
 {
-	device_t *printer = device->machine().device("centronics");
-	centronics_data_w(printer, 0, data & 0xfe);
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
+	printer->write(*memory_nonspecific_space(device->machine()), 0, data & 0xfe);
 }
 
 
 
 static WRITE8_DEVICE_HANDLER ( to9_sys_portb_out )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
 
-	centronics_d0_w(printer, BIT(data, 0));
-	centronics_strobe_w(printer, BIT(data, 1));
+	printer->d0_w(BIT(data, 0));
+	printer->strobe_w(BIT(data, 1));
 
 	to9_update_ram_bank(device->machine());
 
@@ -3911,10 +3910,10 @@ static READ8_DEVICE_HANDLER ( to8_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( to8_sys_portb_out )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
 
-	centronics_d0_w(printer, BIT(data, 0));
-	centronics_strobe_w(printer, BIT(data, 1));
+	printer->d0_w(BIT(data, 0));
+	printer->strobe_w(BIT(data, 1));
 
 	to8_update_ram_bank(device->machine());
 
@@ -3948,10 +3947,10 @@ const pia6821_interface to8_pia6821_sys =
 
 static READ8_DEVICE_HANDLER ( to8_timer_port_in )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
 	int lightpen = (input_port_read(device->machine(), "lightpen_button") & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine()) ? 0x80 : 0;
-	int dtr = centronics_busy_r(printer) << 6;
+	int dtr = printer->busy_r() << 6;
 	int lock = to8_kbd_caps ? 0 : 8; /* undocumented! */
 	return lightpen | cass | dtr | lock;
 }
@@ -4148,10 +4147,10 @@ const pia6821_interface to9p_pia6821_sys =
 
 static READ8_DEVICE_HANDLER ( to9p_timer_port_in )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
 	int lightpen = (input_port_read(device->machine(), "lightpen_button") & 1) ? 2 : 0;
 	int cass = to7_get_cassette(device->machine()) ? 0x80 : 0;
-	int dtr = centronics_busy_r(printer) << 6;
+	int dtr = printer->busy_r() << 6;
 	return lightpen | cass | dtr;
 }
 
@@ -4460,7 +4459,6 @@ static WRITE_LINE_DEVICE_HANDLER( mo6_centronics_busy )
 
 const centronics_interface mo6_centronics_config =
 {
-	FALSE,
 	DEVCB_NULL,
 	DEVCB_LINE(mo6_centronics_busy),
 	DEVCB_NULL
@@ -4469,24 +4467,24 @@ const centronics_interface mo6_centronics_config =
 
 static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
 
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), data ));
 
 	/* centronics data */
-	centronics_data_w(printer, 0, data);
+	printer->write( *memory_nonspecific_space(device->machine()), 0, data);
 }
 
 
 
 static WRITE8_DEVICE_HANDLER ( mo6_game_cb2_out )
 {
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *printer = device->machine().device<centronics_device>("centronics");
 
 	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), data ));
 
 	/* centronics strobe */
-	centronics_strobe_w(printer, data);
+	printer->strobe_w(data);
 }
 
 
@@ -4950,10 +4948,10 @@ WRITE8_HANDLER ( mo5nr_net_w )
 
 READ8_HANDLER( mo5nr_prn_r )
 {
-	device_t *printer = space->machine().device("centronics");
+	centronics_device *printer = space->machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
-	result |= !centronics_busy_r(printer) << 7;
+	result |= !printer->busy_r() << 7;
 
 	return result;
 }
@@ -4961,10 +4959,10 @@ READ8_HANDLER( mo5nr_prn_r )
 
 WRITE8_HANDLER( mo5nr_prn_w )
 {
-	device_t *printer = space->machine().device("centronics");
+	centronics_device *printer = space->machine().device<centronics_device>("centronics");
 
 	/* TODO: understand other bits */
-	centronics_strobe_w(printer, BIT(data, 3));
+	printer->strobe_w(BIT(data, 3));
 }
 
 

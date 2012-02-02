@@ -811,8 +811,8 @@ static WRITE8_HANDLER(nc_uart_control_w)
 /* same for nc100 and nc200 */
 static void nc_printer_update(running_machine &machine, UINT8 data)
 {
-	device_t *printer = machine.device("centronics");
-	centronics_strobe_w(printer, BIT(data, 6));
+	centronics_device *printer = machine.device<centronics_device>("centronics");
+	printer->strobe_w(BIT(data, 6));
 }
 
 /********************************************************************************************************/
@@ -923,7 +923,6 @@ static WRITE_LINE_DEVICE_HANDLER( nc100_centronics_ack_w )
 
 static const centronics_interface nc100_centronics_config =
 {
-	FALSE,
 	DEVCB_LINE(nc100_centronics_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -987,12 +986,12 @@ static WRITE8_HANDLER(nc100_poweroff_control_w)
 static  READ8_HANDLER(nc100_card_battery_status_r)
 {
 	nc_state *state = space->machine().driver_data<nc_state>();
-	device_t *printer = space->machine().device("centronics");
+	centronics_device *printer = space->machine().device<centronics_device>("centronics");
 	int nc_card_battery_status = 0x0fc;
 
 	/* printer */
-	nc_card_battery_status |= centronics_ack_r(printer);
-	nc_card_battery_status |= centronics_busy_r(printer) << 1;
+	nc_card_battery_status |= printer->ack_r();
+	nc_card_battery_status |= printer->busy_r() << 1;
 
 	if (state->m_card_status)
 	{
@@ -1028,7 +1027,7 @@ static ADDRESS_MAP_START(nc100_io, AS_IO, 8)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(nc100_memory_card_wait_state_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(nc100_uart_control_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_MODERN("centronics", centronics_device, write)
 	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nc100_poweroff_control_w)
@@ -1215,7 +1214,6 @@ static WRITE_LINE_DEVICE_HANDLER( nc200_centronics_ack_w )
 
 static const centronics_interface nc200_centronics_config =
 {
-	FALSE,
 	DEVCB_LINE(nc200_centronics_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1419,10 +1417,10 @@ static  READ8_HANDLER(nc200_card_battery_status_r)
 
 static READ8_HANDLER(nc200_printer_status_r)
 {
-	device_t *printer = space->machine().device("centronics");
+	centronics_device *printer = space->machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
-	result |= centronics_busy_r(printer);
+	result |= printer->busy_r();
 
 	return result;
 }
@@ -1486,7 +1484,7 @@ static ADDRESS_MAP_START(nc200_io, AS_IO, 8)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(nc200_memory_card_wait_state_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(nc200_uart_control_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_MODERN("centronics", centronics_device, write)
 	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nc200_poweroff_control_w)

@@ -71,7 +71,7 @@ public:
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<crt9021_device> m_vac;
-	required_device<device_t> m_centronics;
+	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;

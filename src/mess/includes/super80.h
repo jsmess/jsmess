@@ -27,7 +27,7 @@ public:
 		  m_cass(*this, CASSETTE_TAG),
 		  m_wave(*this, WAVE_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_printer(*this, "centronics"),
+		  m_centronics(*this, "centronics"),
 		  m_6845(*this, "crtc")
 	{ }
 
@@ -36,7 +36,7 @@ public:
 	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_wave;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_printer;
+	required_device<centronics_device> m_centronics;
 	optional_device<mc6845_device> m_6845;
 	READ8_MEMBER( super80v_low_r );
 	READ8_MEMBER( super80v_high_r );

@@ -139,7 +139,7 @@ READ8_MEMBER( crvision_state::centronics_status_r )
 {
 	UINT8 data = 0;
 
-	data |= centronics_busy_r(m_centronics) << 7;
+	data |= m_centronics->busy_r() << 7;
 
 	return 0;
 }
@@ -150,7 +150,7 @@ READ8_MEMBER( crvision_state::centronics_status_r )
 
 WRITE8_MEMBER( crvision_state::centronics_ctrl_w )
 {
-	centronics_strobe_w(m_centronics, BIT(data, 4));
+	m_centronics->strobe_w(BIT(data, 4));
 }
 
 /***************************************************************************
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( crvision_map, AS_PROGRAM, 8, crvision_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
 //  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE(0xe801, 0xe801) AM_READWRITE(centronics_status_r, centronics_ctrl_w)
 //  AM_RANGE(0xe802, 0xf7ff) AM_RAMBANK(4)
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
@@ -709,7 +709,7 @@ WRITE8_MEMBER( laser2001_state::pia_pb_w )
 	m_keylatch = data;
 
 	/* centronics data */
-	centronics_data_w(m_centronics, 0, data);
+	m_centronics->write(space, 0, data);
 }
 
 READ_LINE_MEMBER( laser2001_state::pia_ca1_r )
@@ -725,7 +725,7 @@ WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
 READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
 {
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if printer image is not mounted -> Manager won't boot */
-	return sn76496_ready_r(m_psg) & (centronics_not_busy_r(m_centronics) | m_pia->ca2_output_z());
+	return sn76496_ready_r(m_psg) & (m_centronics->not_busy_r() | m_pia->ca2_output_z());
 }
 
 WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
@@ -736,7 +736,7 @@ WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
 	}
 	else
 	{
-		centronics_strobe_w(m_centronics, state);
+		m_centronics->strobe_w(state);
 	}
 }
 
@@ -805,7 +805,6 @@ static const floppy_interface lasr2001_floppy_interface =
 
 static const centronics_interface lasr2001_centronics_intf =
 {
-	FALSE,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, cb1_w)

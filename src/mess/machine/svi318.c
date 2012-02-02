@@ -773,6 +773,7 @@ READ8_HANDLER( svi318_io_ext_r )
 	svi318_state *state = space->machine().driver_data<svi318_state>();
 	UINT8 data = 0xff;
 	device_t *device;
+	centronics_device *centronics = space->machine().device<centronics_device>("centronics");
 
 	if (state->m_svi.bankLow == SVI_CART)
 	{
@@ -781,9 +782,8 @@ READ8_HANDLER( svi318_io_ext_r )
 
 	switch( offset )
 	{
-	case 0x12:
-		device = space->machine().device("centronics");
-		data = 0xfe | centronics_busy_r(device);
+	case 0x12:		
+		data = 0xfe | centronics->busy_r();
 		break;
 
 	case 0x20:
@@ -842,6 +842,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 {
 	svi318_state *state = space->machine().driver_data<svi318_state>();
 	device_t *device;
+	centronics_device *centronics = space->machine().device<centronics_device>("centronics");
 
 	if (state->m_svi.bankLow == SVI_CART)
 	{
@@ -851,13 +852,11 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	switch( offset )
 	{
 	case 0x10:
-		device = space->machine().device("centronics");
-		centronics_data_w(device, 0, data);
+		centronics->write(*space, 0, data);
 		break;
 
 	case 0x11:
-		device = space->machine().device("centronics");
-		centronics_strobe_w(device, BIT(data, 0));
+		centronics->strobe_w(BIT(data, 0));
 		break;
 
 	case 0x20:

@@ -58,7 +58,7 @@ public:
 	required_device<z80dart_device> m_sio;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_floppy0;
-	required_device<device_t> m_centronics;
+	required_device<centronics_device> m_centronics;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

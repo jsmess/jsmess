@@ -152,7 +152,7 @@ READ8_MEMBER( super80_state::super80_dc_r )
 
 	/* bit 7 = printer busy    0 = printer is not busy */
 
-	data |= centronics_busy_r(m_printer) << 7;
+	data |= m_centronics->busy_r() << 7;
 
 	return data;
 }
@@ -168,9 +168,9 @@ READ8_MEMBER( super80_state::super80_f2_r )
 WRITE8_MEMBER( super80_state::super80_dc_w )
 {
 	/* hardware strobe driven from port select, bit 7..0 = data */
-	centronics_strobe_w(m_printer, 1);
-	centronics_data_w(m_printer, 0, data);
-	centronics_strobe_w(m_printer, 0);
+	m_centronics->strobe_w( 1);
+	m_centronics->write(space, 0, data);
+	m_centronics->strobe_w(0);
 }
 
 

@@ -336,7 +336,7 @@ READ8_MEMBER( wangpc_state::centronics_r )
 	m_dav = 1;
 	check_level1_interrupts();
 
-	return centronics_data_r(m_centronics, 0);
+	return m_centronics->read(space, 0);
 }
 
 
@@ -349,10 +349,10 @@ WRITE8_MEMBER( wangpc_state::centronics_w )
 	m_acknlg = 1;
 	check_level1_interrupts();
 
-	centronics_data_w(m_centronics, 0, data);
+	m_centronics->write(space, 0, data);
 
-	centronics_strobe_w(m_centronics, 0);
-	centronics_strobe_w(m_centronics, 1);
+	m_centronics->strobe_w(0);
+	m_centronics->strobe_w(1);
 }
 
 
@@ -695,9 +695,9 @@ READ8_MEMBER( wangpc_state::ppi_pa_r )
 	UINT8 data = 0x08 | 0x02 | 0x01;
 
 	data |= m_dav << 2;
-	data |= centronics_busy_r(m_centronics) << 4;
-	data |= centronics_fault_r(m_centronics) << 5;
-	data |= centronics_pe_r(m_centronics) << 6;
+	data |= m_centronics->busy_r() << 4;
+	data |= m_centronics->fault_r() << 5;
+	data |= m_centronics->pe_r() << 6;
 	data |= m_acknlg << 7;
 
 	return data;
@@ -784,8 +784,8 @@ WRITE8_MEMBER( wangpc_state::ppi_pc_w )
 
     */
 
-	centronics_autofeed_w(m_centronics, BIT(data, 0));
-	centronics_init_w(m_centronics, BIT(data, 2));
+	m_centronics->autofeed_w(BIT(data, 0));
+	m_centronics->init_prime_w(BIT(data, 2));
 }
 
 static I8255A_INTERFACE( ppi_intf )
@@ -940,7 +940,6 @@ WRITE_LINE_MEMBER( wangpc_state::busy_w )
 
 static const centronics_interface centronics_intf =
 {
-	1,
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, ack_w),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, busy_w),
 	DEVCB_NULL

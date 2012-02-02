@@ -50,7 +50,7 @@ public:
 	m_wave2(*this, WAVE2_TAG),
 	m_dac(*this, "dac"),
 	m_uart(*this, "uart"),
-	m_printer(*this, "centronics"),
+	m_centronics(*this, "centronics"),
 	m_ram(*this, RAM_TAG)
 	{ }
 
@@ -61,7 +61,7 @@ public:
 	required_device<device_t> m_wave2;
 	required_device<device_t> m_dac;
 	required_device<device_t> m_uart;
-	required_device<device_t> m_printer;
+	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	DECLARE_READ8_MEMBER(sorcerer_fc_r);
 	DECLARE_READ8_MEMBER(sorcerer_fd_r);

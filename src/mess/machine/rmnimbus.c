@@ -3056,11 +3056,11 @@ const via6522_interface nimbus_via =
 	DEVCB_NULL,	//via_user_read_cb1,
 	DEVCB_NULL,	//via_user_read_ca2,
 	DEVCB_NULL,	//via_user_read_cb2,
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
 	DEVCB_HANDLER(nimbus_via_write_portb),
 	DEVCB_NULL, //via_user_write_ca1
 	DEVCB_NULL, //via_user_write_cb1
-	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_strobe_w),
+	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
 	DEVCB_NULL,	//via_user_write_cb2,
 	DEVCB_LINE(nimbus_via_irq_w)
 };

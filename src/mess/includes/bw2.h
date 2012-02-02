@@ -59,7 +59,7 @@ public:
 	required_device<i8251_device> m_uart;
 	required_device<device_t> m_fdc;
 	required_device<msm6255_device> m_lcdc;
-	required_device<device_t> m_centronics;
+	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;

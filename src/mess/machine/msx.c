@@ -632,7 +632,7 @@ WRITE8_HANDLER ( msx_psg_port_b_w )
 
 WRITE8_DEVICE_HANDLER( msx_printer_strobe_w )
 {
-	centronics_strobe_w(device, BIT(data, 1));
+	device->machine().device<centronics_device>("centronics")->strobe_w(BIT(data, 1));
 }
 
 WRITE8_DEVICE_HANDLER( msx_printer_data_w )
@@ -641,7 +641,7 @@ WRITE8_DEVICE_HANDLER( msx_printer_data_w )
 		/* SIMPL emulation */
 		dac_signed_data_w(device->machine().device("dac"), data);
 	else
-		centronics_data_w(device, 0, data);
+		device->machine().device<centronics_device>("centronics")->write(*memory_nonspecific_space(device->machine()), 0, data);
 }
 
 READ8_DEVICE_HANDLER( msx_printer_status_r )
@@ -651,7 +651,7 @@ READ8_DEVICE_HANDLER( msx_printer_status_r )
 	if (input_port_read(device->machine(), "DSW") & 0x80)
 		return 0xff;
 
-	result |= centronics_busy_r(device) << 1;
+	result |= device->machine().device<centronics_device>("centronics")->busy_r() << 1;
 
 	return result;
 }

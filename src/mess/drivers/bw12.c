@@ -463,9 +463,9 @@ READ8_MEMBER( bw12_state::pia_pa_r )
 
 	UINT8 data = 0;
 
-	data |= centronics_busy_r(m_centronics);
-	data |= (centronics_fault_r(m_centronics) << 1);
-	data |= (centronics_pe_r(m_centronics) << 2);
+	data |= m_centronics->busy_r();
+	data |= (m_centronics->fault_r() << 1);
+	data |= (m_centronics->pe_r() << 2);
 	data |= (m_motor_on << 3);
 	data |= (m_pit_out2 << 4);
 	data |= (m_key_stb << 5);
@@ -498,13 +498,13 @@ static const pia6821_interface pia_intf =
 {
 	DEVCB_DRIVER_MEMBER(bw12_state, pia_pa_r),					/* port A input */
 	DEVCB_NULL,													/* port B input */
-	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_ack_r),		/* CA1 input */
+	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, ack_r),		/* CA1 input */
 	DEVCB_DRIVER_LINE_MEMBER(bw12_state, pia_cb1_r),			/* CB1 input */
 	DEVCB_NULL,													/* CA2 input */
 	DEVCB_NULL,													/* CB2 input */
 	DEVCB_NULL, 												/* port A output */
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	/* port B output */
-	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_strobe_w),		/* CA2 output */
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),	/* port B output */
+	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),		/* CA2 output */
 	DEVCB_DRIVER_LINE_MEMBER(bw12_state, pia_cb2_w),			/* CB2 output */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),				/* IRQA output */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)				/* IRQB output */
@@ -514,7 +514,6 @@ static const pia6821_interface pia_intf =
 
 static const centronics_interface bw12_centronics_intf =
 {
-	0,													/* is IBM PC? */
 	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, ca1_w),		/* ACK output */
 	DEVCB_NULL,											/* BUSY output */
 	DEVCB_NULL											/* NOT BUSY output */

@@ -832,7 +832,7 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 	UINT8 data = 0;
 
 	data |= m_fdc_irq;
-	data |= centronics_busy_r(m_centronics) << 1;
+	data |= m_centronics->busy_r() << 1;
 	data |= m_fdc_index << 2;
 
 	return data;
@@ -870,7 +870,7 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	memory_set_bank(machine(), "bank1", BIT(data, 6));
 
 	/* printer strobe */
-	centronics_strobe_w(m_centronics, BIT(data, 7));
+	m_centronics->strobe_w(BIT(data, 7));
 }
 
 static I8255_INTERFACE( sf7000_ppi_intf )
@@ -878,7 +878,7 @@ static I8255_INTERFACE( sf7000_ppi_intf )
 	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pa_r),				// Port A read
 	DEVCB_NULL,													// Port A write
 	DEVCB_NULL,													// Port B read
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port B write
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),	// Port B write
 	DEVCB_NULL,													// Port C read
 	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pc_w)					// Port C write
 };

@@ -330,7 +330,7 @@ static WRITE8_HANDLER( einstein_rom_w )
 
 static READ8_HANDLER( einstein_kybintmsk_r )
 {
-	device_t *printer = space->machine().device("centronics");
+	centronics_device *centronics = space->machine().device<centronics_device>("centronics");
 	einstein_state *einstein = space->machine().driver_data<einstein_state>();
 	UINT8 data = 0;
 
@@ -341,9 +341,9 @@ static READ8_HANDLER( einstein_kybintmsk_r )
 	data |= input_port_read(space->machine(), "BUTTONS");
 
 	/* bit 2 to 4: printer status */
-	data |= centronics_busy_r(printer) << 2;
-	data |= centronics_pe_r(printer) << 3;
-	data |= centronics_fault_r(printer) << 4;
+	data |= centronics->busy_r() << 2;
+	data |= centronics->pe_r() << 3;
+	data |= centronics->fault_r() << 4;
 
 	/* bit 5 to 7: graph, control and shift key */
 	data |= input_port_read(space->machine(), "EXTRA");
@@ -722,10 +722,10 @@ static Z80PIO_INTERFACE( einstein_pio_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
+	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),
+	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),
 	DEVCB_NULL
 };
 
@@ -741,7 +741,6 @@ static const ay8910_interface einstein_ay_interface =
 
 static const centronics_interface einstein_centronics_config =
 {
-	FALSE,
 	DEVCB_DEVICE_LINE(IC_I063, z80pio_astb_w),
 	DEVCB_NULL,
 	DEVCB_NULL

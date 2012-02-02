@@ -321,11 +321,11 @@ READ8_MEMBER( pc1512_state::printer_r )
 
 		data |= input_port_read(machine(), "LK") & 0x07;
 
-		data |= centronics_fault_r(m_centronics) << 3;
-		data |= centronics_vcc_r(m_centronics) << 4;
-		data |= centronics_pe_r(m_centronics) << 5;
-		data |= centronics_ack_r(m_centronics) << 6;
-		data |= centronics_busy_r(m_centronics) << 7;
+		data |= m_centronics->fault_r() << 3;
+		data |= m_centronics->vcc_r() << 4;
+		data |= m_centronics->pe_r() << 5;
+		data |= m_centronics->ack_r() << 6;
+		data |= m_centronics->busy_r() << 7;
 		break;
 
 	case 2:
@@ -426,7 +426,7 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 	{
 	case 0:
 		m_printer_data = data;
-		centronics_data_w(m_centronics, 0, data);
+		m_centronics->write(space, 0, data);
 		break;
 
 	case 2:
@@ -447,9 +447,9 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 
 		m_printer_control = data & 0x1f;
 
-		centronics_strobe_w(m_centronics, BIT(data, 0));
-		centronics_autofeed_w(m_centronics, BIT(data, 1));
-		centronics_init_w(m_centronics, BIT(data, 2));
+		m_centronics->strobe_w(BIT(data, 0));
+		m_centronics->autofeed_w(BIT(data, 1));
+		m_centronics->init_prime_w(BIT(data, 2));
 
 		m_ack_int_enable = BIT(data, 4);
 		update_ack();
@@ -1164,7 +1164,6 @@ WRITE_LINE_MEMBER( pc1512_state::ack_w )
 
 static const centronics_interface centronics_intf =
 {
-	1,
 	DEVCB_DRIVER_LINE_MEMBER(pc1512_state, ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL

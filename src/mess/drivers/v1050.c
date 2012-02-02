@@ -698,7 +698,8 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 
 static WRITE8_DEVICE_HANDLER( misc_ppi_pb_w )
 {
-	centronics_data_w(device, 0, ~data & 0xff);
+	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
+	centronics->write( *memory_nonspecific_space(device->machine()) , 0, ~data & 0xff);
 }
 
 static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
@@ -719,9 +720,9 @@ static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
     */
 
 	UINT8 data = 0;
-
-	data |= centronics_not_busy_r(device) << 4;
-	data |= centronics_pe_r(device) << 5;
+	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
+	data |= centronics->not_busy_r() << 4;
+	data |= centronics->pe_r() << 5;
 
 	return data;
 }
@@ -744,7 +745,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
     */
 
 	// printer strobe
-	centronics_strobe_w(m_centronics, BIT(data, 0));
+	m_centronics->strobe_w(BIT(data, 0));
 
 	// floppy interrupt enable
 	m_f_int_enb = BIT(data, 1);

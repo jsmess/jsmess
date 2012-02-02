@@ -305,10 +305,10 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	// RS-232 carrier detect
 
 	// centronics
-	data |= centronics_busy_r(m_centronics) << 4;
-	data |= centronics_pe_r(m_centronics) << 5;
-	data |= centronics_vcc_r(m_centronics) << 6;
-	data |= centronics_fault_r(m_centronics) << 7;
+	data |= m_centronics->busy_r() << 4;
+	data |= m_centronics->pe_r() << 5;
+	data |= m_centronics->vcc_r() << 6;
+	data |= m_centronics->fault_r() << 7;
 
 	return data;
 }
@@ -343,8 +343,8 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	output_set_led_value(0, BIT(data, 3));
 
 	// centronics
-	centronics_strobe_w(m_centronics, BIT(data, 4));
-	centronics_prime_w(m_centronics, BIT(data, 5));
+	m_centronics->strobe_w(BIT(data, 4));
+	m_centronics->init_prime_w(BIT(data, 5));
 
 	if (!BIT(data, 6))
 	{
@@ -362,7 +362,7 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 static I8255A_INTERFACE( ppi1_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
 	DEVCB_DRIVER_MEMBER(sage2_state, ppi1_pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -528,7 +528,6 @@ WRITE_LINE_MEMBER( sage2_state::ack_w )
 
 static const centronics_interface centronics_intf =
 {
-	0,
 	DEVCB_DRIVER_LINE_MEMBER(sage2_state, ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL

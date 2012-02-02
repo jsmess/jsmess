@@ -98,7 +98,6 @@ static const SCSIBus_interface scsibus_config =
 
 static const centronics_interface nimbus_centronics_config =
 {
-	FALSE,
 	DEVCB_DEVICE_LINE(VIA_TAG,nimbus_ack_w),
 	DEVCB_NULL,
 	DEVCB_NULL

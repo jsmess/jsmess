@@ -241,8 +241,8 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	if (state->m_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		device_t *printer = device->machine().device("centronics");
-		centronics_data_w(printer, 0, data);
+		centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+		centronics->write(*memory_nonspecific_space(device->machine()), 0, data);
 	}
 }
 
@@ -305,7 +305,7 @@ static TIMER_CALLBACK(oric_refresh_tape)
 static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 {
 	oric_state *state = device->machine().driver_data<oric_state>();
-	device_t *printer = device->machine().device("centronics");
+	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
 
 	/* KEYBOARD */
 	state->m_keyboard_line = data & 0x07;
@@ -329,7 +329,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_b_func )
 	cassette_device_image(device->machine())->output((data & (1<<7)) ? -1.0 : +1.0);
 
 	/* centronics STROBE is connected to PB4 */
-	centronics_strobe_w(printer, BIT(data, 4));
+	centronics->strobe_w(BIT(data, 4));
 
 	oric_psg_connection_refresh(device->machine());
 	state->m_previous_portb_data = data;

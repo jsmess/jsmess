@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 //  AM_RANGE( 0x30, 0x3f ) SLOT
 	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE( 0x41, 0x41 ) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-	AM_RANGE( 0x50, 0x50 ) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE( 0x50, 0x50 ) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE( 0x60, 0x63 ) AM_DEVREADWRITE_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w)
 //  AM_RANGE( 0x70, 0x7f ) MODEMSEL
 ADDRESS_MAP_END
@@ -431,7 +431,7 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 		wd17xx_set_drive(m_fdc, m_drive);
 	}
 
-	centronics_strobe_w(m_centronics, BIT(data, 7));
+	m_centronics->strobe_w(BIT(data, 7));
 }
 
 READ8_MEMBER( bw2_state::ppi_pb_r )
@@ -495,7 +495,7 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 
 	UINT8 data = 0;
 
-	data |= centronics_busy_r(m_centronics) << 4;
+	data |= m_centronics->busy_r() << 4;
 	data |= m_mfdbk << 5;
 
 	data |= floppy_wpt_r(m_drive ? m_floppy1 : m_floppy0) << 7;

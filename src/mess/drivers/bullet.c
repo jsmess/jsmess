@@ -527,7 +527,7 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 	UINT8 data = 0x10;
 
 	// centronics busy
-	data |= centronics_busy_r(m_centronics);
+	data |= m_centronics->busy_r();
 
 	// DIP switches
 	data |= input_port_read(machine(), "SW1") & 0x06;
@@ -878,16 +878,16 @@ READ8_MEMBER( bullet_state::pio_pb_r )
 	UINT8 data = 0;
 
 	// centronics busy
-	data |= centronics_busy_r(m_centronics);
+	data |= m_centronics->busy_r();
 
 	// centronics paper end
-	data |= centronics_pe_r(m_centronics) << 1;
+	data |= m_centronics->pe_r() << 1;
 
 	// centronics selected
-	data |= centronics_vcc_r(m_centronics) << 2;
+	data |= m_centronics->vcc_r() << 2;
 
 	// centronics fault
-	data |= centronics_fault_r(m_centronics) << 3;
+	data |= m_centronics->fault_r() << 3;
 
 	return data;
 }
@@ -896,7 +896,7 @@ static Z80PIO_INTERFACE( pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(bullet_state, pio_pb_r),
 	DEVCB_NULL,
@@ -960,7 +960,7 @@ WRITE8_MEMBER( bulletf_state::pio_pa_w )
 
 WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
 {
-	centronics_strobe_w(m_centronics, !state);
+	m_centronics->strobe_w(!state);
 }
 
 static Z80PIO_INTERFACE( bulletf_pio_intf )
@@ -968,7 +968,7 @@ static Z80PIO_INTERFACE( bulletf_pio_intf )
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_r),
 	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_w),
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(bulletf_state, cstrb_w)

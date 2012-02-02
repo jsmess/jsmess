@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE(0x05, 0x05) AM_WRITE(vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(vismac_register_w)

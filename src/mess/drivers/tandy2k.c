@@ -487,19 +487,19 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
 	{
 	case LPINEN:
 		// printer acknowledge
-		data |= centronics_ack_r(m_centronics) << 3;
+		data |= m_centronics->ack_r() << 3;
 
 		// printer fault
-		data |= centronics_fault_r(m_centronics) << 4;
+		data |= m_centronics->fault_r() << 4;
 
 		// printer select
-		data |= centronics_vcc_r(m_centronics) << 5;
+		data |= m_centronics->vcc_r() << 5;
 
 		// paper empty
-		data |= centronics_pe_r(m_centronics) << 6;
+		data |= m_centronics->pe_r() << 6;
 
 		// printer busy
-		data |= centronics_busy_r(m_centronics) << 7;
+		data |= m_centronics->busy_r() << 7;
 		break;
 
 	case KBDINEN:
@@ -540,13 +540,13 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
 	pic8259_ir3_w(m_pic1, BIT(data, 3));
 
 	// printer strobe
-	centronics_strobe_w(m_centronics, BIT(data, 7));
+	m_centronics->strobe_w(BIT(data, 7));
 }
 
 static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,													// Port A read
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	// Port A write
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),	// Port A write
 	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pb_r),				// Port B write
 	DEVCB_NULL,													// Port B write
 	DEVCB_NULL,													// Port C read
@@ -630,7 +630,6 @@ static const struct upd765_interface fdc_intf =
 
 static const centronics_interface centronics_intf =
 {
-	0,												// is IBM PC?
 	DEVCB_DEVICE_LINE_MEMBER(I8255A_TAG, i8255_device, pc6_w),	// ACK output
 	DEVCB_NULL,										// BUSY output
 	DEVCB_NULL										// NOT BUSY output

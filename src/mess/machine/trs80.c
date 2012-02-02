@@ -718,19 +718,19 @@ READ8_MEMBER( trs80_state::trs80_printer_r )
        Bits 3..0 - Not used */
 
 	UINT8 data = 0;
-	data |= centronics_busy_r(m_printer) << 7;
-	data |= centronics_pe_r(m_printer) << 6;
-	data |= centronics_vcc_r(m_printer) << 5;
-	data |= centronics_fault_r(m_printer) << 4;
+	data |= m_printer->busy_r() << 7;
+	data |= m_printer->pe_r() << 6;
+	data |= m_printer->vcc_r() << 5;
+	data |= m_printer->fault_r() << 4;
 
 	return data;
 }
 
 WRITE8_MEMBER( trs80_state::trs80_printer_w )
 {
-	centronics_strobe_w(m_printer, 1);
-	centronics_data_w(m_printer, 0, data);
-	centronics_strobe_w(m_printer, 0);
+	m_printer->strobe_w(1);
+	m_printer->write(space, 0, data);
+	m_printer->strobe_w(0);
 }
 
 WRITE8_MEMBER( trs80_state::trs80_cassunit_w )

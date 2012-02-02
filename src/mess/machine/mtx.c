@@ -29,8 +29,9 @@
 
 READ8_DEVICE_HANDLER( mtx_strobe_r )
 {
+	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
 	/* set STROBE low */
-	centronics_strobe_w(device, FALSE);
+	centronics->strobe_w(FALSE);
 
 	return 0xff;
 }
@@ -148,6 +149,8 @@ WRITE8_DEVICE_HANDLER( mtx_cst_w )
 
 READ8_DEVICE_HANDLER( mtx_prt_r )
 {
+	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
+
 	/*
 
         bit     description
@@ -166,19 +169,19 @@ READ8_DEVICE_HANDLER( mtx_prt_r )
 	UINT8 data = 0;
 
 	/* reset STROBE to high */
-	centronics_strobe_w(device, TRUE);
+	centronics->strobe_w( TRUE);
 
 	/* busy */
-	data |= centronics_busy_r(device) << 0;
+	data |= centronics->busy_r() << 0;
 
 	/* fault */
-	data |= centronics_fault_r(device) << 1;
+	data |= centronics->fault_r() << 1;
 
 	/* paper empty */
-	data |= !centronics_pe_r(device) << 2;
+	data |= !centronics->pe_r() << 2;
 
 	/* select */
-	data |= centronics_vcc_r(device) << 3;
+	data |= centronics->vcc_r() << 3;
 
 	return data;
 }

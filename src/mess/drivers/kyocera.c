@@ -205,7 +205,7 @@ WRITE8_MEMBER( pc8201_state::scp_w )
 	m_rtc->stb_w(BIT(data, 4));
 
 	/* printer strobe */
-	centronics_strobe_w(m_centronics, BIT(data, 5));
+	m_centronics->strobe_w(BIT(data, 5));
 
 	/* serial interface select */
 	m_iosel = data >> 5;
@@ -438,7 +438,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 	memory_set_bank(machine(), "bank1", BIT(data, 0));
 
 	/* printer strobe */
-	centronics_strobe_w(m_centronics, BIT(data, 1));
+	m_centronics->strobe_w(BIT(data, 1));
 
 	/* RTC strobe */
 	m_rtc->stb_w(BIT(data, 2));
@@ -518,7 +518,7 @@ WRITE8_MEMBER( tandy200_state::stbk_w )
     */
 
 	/* printer strobe */
-	centronics_strobe_w(m_centronics, BIT(data, 0));
+	m_centronics->strobe_w(BIT(data, 0));
 
 	/* cassette motor */
 	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -976,8 +976,8 @@ READ8_MEMBER( kc85_state::i8155_pc_r )
 	data |= m_rtc->data_out_r();
 
 	// centronics busy
-	data |= centronics_not_busy_r(m_centronics) << 1;
-	data |= centronics_busy_r(m_centronics) << 2;
+	data |= m_centronics->not_busy_r() << 1;
+	data |= m_centronics->busy_r() << 2;
 
 	return data;
 }
@@ -1021,7 +1021,7 @@ WRITE8_MEMBER( tandy200_state::i8155_pa_w )
 
     */
 
-	centronics_data_w(m_centronics, 0, data);
+	m_centronics->write(space, 0, data);
 
 	m_keylatch = (m_keylatch & 0x100) | data;
 }
@@ -1070,8 +1070,8 @@ READ8_MEMBER( tandy200_state::i8155_pc_r )
 
 	UINT8 data = 0x01;
 
-	data |= centronics_not_busy_r(m_centronics) << 1;
-	data |= centronics_busy_r(m_centronics) << 2;
+	data |= m_centronics->not_busy_r() << 1;
+	data |= m_centronics->busy_r() << 2;
 
 	return data;
 }

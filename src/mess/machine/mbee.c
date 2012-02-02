@@ -20,14 +20,14 @@
 
 WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 {
-	centronics_strobe_w(m_printer, (state) ? 0 : 1);
+	m_printer->strobe_w((state) ? 0 : 1);
 }
 
 WRITE8_MEMBER( mbee_state::pio_port_a_w )
 {
 	/* hardware strobe driven by PIO ARDY, bit 7..0 = data */
 	z80pio_astb_w( m_pio, 1);	/* needed - otherwise nothing prints */
-	centronics_data_w(m_printer, 0, data);
+	m_printer->write(space, 0, data);
 };
 
 WRITE8_MEMBER( mbee_state::pio_port_b_w )

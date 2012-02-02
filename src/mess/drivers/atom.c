@@ -489,12 +489,12 @@ static I8255_INTERFACE( ppi_intf )
 
 READ8_MEMBER( atom_state::printer_busy )
 {
-	return centronics_busy_r(m_centronics) << 7;
+	return m_centronics->busy_r() << 7;
 }
 
 WRITE8_MEMBER( atom_state::printer_data )
 {
-	centronics_data_w(m_centronics, 0, data & 0x7f);
+	m_centronics->write(space, 0, data & 0x7f);
 }
 
 static const via6522_interface via_intf =
@@ -509,7 +509,7 @@ static const via6522_interface via_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(CENTRONICS_TAG, centronics_strobe_w),
+	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(SY6502_TAG, INPUT_LINE_IRQ0)
 };
@@ -553,7 +553,6 @@ static const i8271_interface fdc_intf =
 
 static const centronics_interface atom_centronics_config =
 {
-	FALSE,
 	DEVCB_DEVICE_LINE_MEMBER(R6522_TAG, via6522_device, write_ca1),
 	DEVCB_NULL,
 	DEVCB_NULL

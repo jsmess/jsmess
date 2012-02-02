@@ -44,7 +44,7 @@ public:
 	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_wave;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_printer;
+	required_device<centronics_device> m_printer;
 	required_device<mc6845_device> m_crtc;
 	optional_device<device_t> m_fdc;
 	optional_device<device_t> m_rtc;

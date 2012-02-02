@@ -113,7 +113,7 @@ public:
 	UINT8 m_interrupt_status;
 
 	/* centronics printer */
-	device_t *m_printer;
+	centronics_device *m_centronics;
 
 	/* external ramdisk */
 	offs_t m_ramdisk_address;
@@ -817,8 +817,8 @@ static READ8_HANDLER( px4_iostr_r )
 	if (VERBOSE)
 		logerror("%s: px4_iostr_r\n", space->machine().describe_context());
 
-	result |= centronics_busy_r(px4->m_printer) << 0;
-	result |= !centronics_pe_r(px4->m_printer) << 1;
+	result |= px4->m_centronics->busy_r() << 0;
+	result |= !px4->m_centronics->pe_r() << 1;
 	result |= px4_sio_pin(px4->m_sio_device) << 2;
 	result |= px4_sio_rxd(px4->m_sio_device) << 3;
 	result |= px4_rs232c_dcd(px4->m_rs232c_device) << 4;
@@ -882,8 +882,8 @@ static WRITE8_HANDLER( px4_ioctlr_w )
 	if (VERBOSE)
 		logerror("%s: px4_ioctlr_w (0x%02x)\n", space->machine().describe_context(), data);
 
-	centronics_strobe_w(px4->m_printer, !BIT(data, 0));
-	centronics_prime_w(px4->m_printer, BIT(data, 1));
+	px4->m_centronics->strobe_w(!BIT(data, 0));
+	px4->m_centronics->init_prime_w(BIT(data, 1));
 
 	px4_sio_pout(px4->m_sio_device, BIT(data, 2));
 
@@ -1092,7 +1092,7 @@ static DRIVER_INIT( px4 )
 	px4->m_transmit_timer = machine.scheduler().timer_alloc(FUNC(transmit_data));
 
 	/* printer */
-	px4->m_printer = machine.device("centronics");
+	px4->m_centronics = machine.device<centronics_device>("centronics");
 
 	/* external cassette or barcode reader */
 	px4->m_ext_cas_timer = machine.scheduler().timer_alloc(FUNC(ext_cassette_read));
@@ -1158,7 +1158,7 @@ static ADDRESS_MAP_START( px4_io, AS_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_READWRITE(px4_artdir_r, px4_artdor_w)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(px4_artsr_r, px4_artmr_w)
 	AM_RANGE(0x16, 0x16) AM_READWRITE(px4_iostr_r, px4_artcr_w)
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x17, 0x17) AM_DEVWRITE_MODERN("centronics", centronics_device, write)
 	AM_RANGE(0x18, 0x18) AM_WRITE(px4_swr_w)
 	AM_RANGE(0x19, 0x19) AM_WRITE(px4_ioctlr_w)
 	AM_RANGE(0x1a, 0x1f) AM_NOP

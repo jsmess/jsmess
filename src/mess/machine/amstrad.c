@@ -2020,8 +2020,8 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 			/* printer port bit 8 */
 			if (state->m_printer_bit8_selected && state->m_system_type == SYSTEM_PLUS)
 			{
-				device_t *printer = space->machine().device("centronics");
-				centronics_d7_w(printer, BIT(data, 3));
+				centronics_device *printer = space->machine().device<centronics_device>("centronics");
+				printer->d7_w(BIT(data, 3));
 				state->m_printer_bit8_selected = FALSE;
 			}
 
@@ -2047,11 +2047,11 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		if ((offset & (1<<12)) == 0)
 		{
-			device_t *printer = space->machine().device("centronics");
+			centronics_device *printer = space->machine().device<centronics_device>("centronics");
 
 			/* CPC has a 7-bit data port, bit 8 is the STROBE signal */
-			centronics_data_w(printer, 0, data & 0x7f);
-			centronics_strobe_w(printer, BIT(data, 7));
+			printer->write(*space, 0, data & 0x7f);
+			printer->strobe_w(BIT(data, 7));
 		}
 	}
 
@@ -2534,8 +2534,8 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b6 with Parallel/Printer port ready */
 	if(state->m_system_type != SYSTEM_GX4000)
 	{
-		device_t *printer = device->machine().device("centronics");
-		data |= centronics_busy_r(printer) << 6;
+		centronics_device *printer = device->machine().device<centronics_device>("centronics");
+		data |= printer->busy_r() << 6;
 	}
 /* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
 	data |= (state->m_ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);

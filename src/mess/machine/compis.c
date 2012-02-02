@@ -274,8 +274,8 @@ READ8_MEMBER( compis_state::compis_ppi_port_b_r )
 	data = input_port_read(machine(), "DSW0");
 
 	/* Centronics busy */
-	data |= centronics_busy_r(m_cent) << 5;
-	data |= centronics_vcc_r(m_cent) << 6;
+	data |= m_centronics->busy_r() << 5;
+	data |= m_centronics->vcc_r() << 6;
 
 	return data;
 }
@@ -293,7 +293,7 @@ READ8_MEMBER( compis_state::compis_ppi_port_b_r )
 WRITE8_MEMBER( compis_state::compis_ppi_port_c_w )
 {
 	/* Centronics Strobe */
-	centronics_strobe_w(m_cent, BIT(data, 5));
+	m_centronics->strobe_w(BIT(data, 5));
 
 	/* FDC Reset */
 	if (BIT(data, 6))
@@ -306,7 +306,7 @@ WRITE8_MEMBER( compis_state::compis_ppi_port_c_w )
 I8255A_INTERFACE( compis_ppi_interface )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
+	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
 	DEVCB_DRIVER_MEMBER(compis_state, compis_ppi_port_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL,

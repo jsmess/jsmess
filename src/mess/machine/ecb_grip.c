@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( grip_io, AS_IO, 8, grip_device )
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x52, 0x52) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
 	AM_RANGE(0x53, 0x53) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY(CENTRONICS_TAG, centronics_data_w)
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 //  AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
 //  AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
@@ -447,7 +447,7 @@ READ8_MEMBER( grip_device::sti_gpio_r )
 	data |= m_crtc->cursor_r() << 2;
 
 	// centronics busy
-	data |= centronics_busy_r(m_centronics) << 3;
+	data |= m_centronics->busy_r() << 3;
 
 	// keyboard interrupt
 	data |= m_ib << 4;
@@ -895,7 +895,7 @@ READ8_MEMBER( grip_device::stat_r )
 	data |= js1 << 5;
 
 	// centronics fault
-	data |= centronics_fault_r(m_centronics) << 6;
+	data |= m_centronics->fault_r() << 6;
 
 	// light pen strobe
 	data |= m_lps << 7;
@@ -932,8 +932,8 @@ WRITE8_MEMBER( grip_device::lrs_w )
 
 READ8_MEMBER( grip_device::cxstb_r )
 {
-	centronics_strobe_w(m_centronics, 0);
-	centronics_strobe_w(m_centronics, 1);
+	m_centronics->strobe_w(0);
+	m_centronics->strobe_w(1);
 
 	return 0;
 }
@@ -945,8 +945,8 @@ READ8_MEMBER( grip_device::cxstb_r )
 
 WRITE8_MEMBER( grip_device::cxstb_w )
 {
-	centronics_strobe_w(m_centronics, 0);
-	centronics_strobe_w(m_centronics, 1);
+	m_centronics->strobe_w(0);
+	m_centronics->strobe_w(1);
 }
 
 /*

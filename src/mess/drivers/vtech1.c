@@ -472,14 +472,16 @@ static const floppy_interface vtech1_floppy_interface =
 
 static READ8_DEVICE_HANDLER( vtech1_printer_r )
 {
-	return 0xfe | centronics_busy_r(device);
+	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	return 0xfe | centronics->busy_r();
 }
 
 /* TODO: figure out how this really works */
 static WRITE8_DEVICE_HANDLER( vtech1_strobe_w )
 {
-	centronics_strobe_w(device, TRUE);
-	centronics_strobe_w(device, FALSE);
+	centronics_device *centronics = device->machine().device<centronics_device>("centronics");
+	centronics->strobe_w(TRUE);
+	centronics->strobe_w(FALSE);
 }
 
 
@@ -728,7 +730,7 @@ static ADDRESS_MAP_START( vtech1_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("centronics", vtech1_printer_r)
 	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE("centronics", vtech1_strobe_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("centronics", centronics_data_w)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE_MODERN("centronics", centronics_device, write)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(vtech1_fdc_r, vtech1_fdc_w)
 	AM_RANGE(0x20, 0x2f) AM_READ(vtech1_joystick_r)
 	AM_RANGE(0x30, 0x3f) AM_READWRITE(vtech1_serial_r, vtech1_serial_w)
