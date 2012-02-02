@@ -78,7 +78,8 @@ public:
 	m_x1_cpu(*this,"x1_cpu"),
 	m_cass(*this, CASSETTE_TAG),
 	m_fdc(*this, "fdc"),
-	m_crtc(*this, "crtc")
+	m_crtc(*this, "crtc"),
+	m_ctc(*this, "ctc")
 	{ }
 
 	DECLARE_READ8_MEMBER(x1_mem_r);
@@ -179,11 +180,19 @@ public:
 	UINT8 m_is_turbo;
 	UINT8 m_ex_bank;
 	UINT8 m_ram_bank;
+	void set_current_palette();
+	UINT16 get_pcg_addr(UINT16 width, UINT8 y_char_size);
+	UINT16 check_chr_addr();
+	UINT16 check_pcg_addr();
+	UINT8 get_game_key(UINT8 port);
+	UINT8 check_keyboard_shift();
+	UINT16 check_keyboard_press();
 
 	required_device<cpu_device> m_x1_cpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_fdc;
 	required_device<mc6845_device> m_crtc;
+	required_device<z80ctc_device> m_ctc;
 };
 
 
