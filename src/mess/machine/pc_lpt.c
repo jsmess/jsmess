@@ -28,6 +28,8 @@ struct _pc_lpt_state
 
 	devcb_resolved_write_line out_irq_func;
 
+	UINT8 data;
+	
 	int ack;
 
 	/* control latch */
@@ -109,6 +111,7 @@ static DEVICE_RESET( pc_lpt )
 	lpt->init = FALSE;
 	lpt->select = TRUE;
 	lpt->irq_enabled = FALSE;
+	lpt->data = 0xff;
 }
 
 DEVICE_GET_INFO( pc_lpt )
@@ -159,13 +162,15 @@ static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w )
 READ8_DEVICE_HANDLER( pc_lpt_data_r )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
-	return lpt->centronics->read(*memory_nonspecific_space(device->machine()) , 0);
+	// pull up mechanism for input lines, zeros are provided by pheripherial
+	return lpt->data & ~lpt->centronics->read(*memory_nonspecific_space(device->machine()), 0);
 }
 
 
 WRITE8_DEVICE_HANDLER( pc_lpt_data_w )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
+	lpt->data = data;
 	lpt->centronics->write(*memory_nonspecific_space(device->machine()), 0, data);
 }
 
