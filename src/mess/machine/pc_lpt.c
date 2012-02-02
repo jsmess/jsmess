@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "pc_lpt.h"
 #include "machine/ctronics.h"
+#include "cntr_covox.h"
 
 
 /***************************************************************************
@@ -49,8 +50,13 @@ static const centronics_interface pc_centronics_config =
 	DEVCB_NULL
 };
 
+static SLOT_INTERFACE_START(pc_centronics)
+	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
+	SLOT_INTERFACE("covox", CENTRONICS_COVOX)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_FRAGMENT( pc_lpt )
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", pc_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", pc_centronics_config, pc_centronics, "printer", NULL)
 MACHINE_CONFIG_END
 
 
