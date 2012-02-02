@@ -317,7 +317,7 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	UINT8 *src = machine().region(dev->subtag(tempstring, region))->base();
 	UINT8 *dest = machine().region("maincpu")->base() + start;
 	if (machine().region("isa")) {
-		dest = machine().region("isa")->base() + start;
+		dest = machine().region("isa")->base() + start - 0xc0000;
 	}
 	memcpy(dest,src, end - start + 1);	
 	/*address_space *space = m_maincpu->memory().space(AS_PROGRAM);
