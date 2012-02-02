@@ -26851,7 +26851,20 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="souledge">
+<!-- This is the original protected dump. Eke emulated the protection in his emu, so we have a reference to implement this -->
+	<software name="souledge" supported="no">
+		<description>Soul Edge vs Samurai Spirits (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="soul edge vs samurai spirits (unl).bin" size="2097152" crc="b11bd611" sha1="28cef4b6829a791c56d4764812d0b345595c8389" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This has been cracked to make the dump work in emus. It has to be removed as soon as we emulated the real dump -->
+	<software name="souledgea" cloneof="souledge">
 		<description>Soul Edge vs Samurai Spirits (Pirate, Cracked)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>

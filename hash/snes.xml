@@ -33273,7 +33273,7 @@ Alternate board (XL-1)
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SHVC-AJLJ"/>
 		<info name="release" value="19951027"/>
-		<info name="alt_title" value="ジャスティスリーク"/>
+		<info name="alt_title" value="ジャスティスリーグ"/>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2621440">
 				<rom name="justice league task force (japan).sfc" size="2621440" crc="bfa7f180" sha1="3ff24caba446b75076d0b7c49bb3b998a0af4d55" offset="0x000000" />
