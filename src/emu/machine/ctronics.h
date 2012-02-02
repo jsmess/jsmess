@@ -63,8 +63,8 @@ public:
 	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~centronics_device();
 		
-	DECLARE_WRITE8_MEMBER( write ) { if (m_dev) m_dev->write(data); m_data = data; }
-	DECLARE_READ8_MEMBER( read ) {  return (m_dev) ? m_dev->read() : m_data; }
+	DECLARE_WRITE8_MEMBER( write ) { if (m_dev) m_dev->write(data); }
+	DECLARE_READ8_MEMBER( read ) {  return (m_dev) ? m_dev->read() : 0x00; }
 
 	/* access to the individual bits */
 	DECLARE_WRITE_LINE_MEMBER( d0_w ) { if (m_dev) m_dev->set_line(0, state); }
@@ -101,8 +101,6 @@ private:
 	devcb_resolved_write_line m_out_ack_func;
 	devcb_resolved_write_line m_out_busy_func;
 	devcb_resolved_write_line m_out_not_busy_func;
-	
-	UINT8 m_data;
 };
 
 // device type definition
@@ -129,6 +127,7 @@ public:
 	// optional centronics overrides
 	virtual void strobe_w(UINT8 state);
 	virtual void init_prime_w(UINT8 state);	
+	virtual UINT8 read() {  return 0x00; }
 protected:
     // device-level overrides
     virtual void device_start();

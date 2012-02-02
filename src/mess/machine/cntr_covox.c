@@ -54,6 +54,5 @@ void centronics_covox_device::device_start()
 
 void centronics_covox_device::write(UINT8 data)
 {
-	m_data = data;
 	dac_w(m_dac, 0, data);
 }
