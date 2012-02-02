@@ -362,11 +362,11 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 		bounds.y1 = bounds.y0 + xml_get_attribute_float_with_subst(machine, *boundsnode, "height", 1.0f);
 	}
 	else
-		throw emu_fatalerror("Illegal bounds value in XML\n");
+		throw emu_fatalerror("Illegal bounds value in XML");
 
 	// check for errors
 	if (bounds.x0 > bounds.x1 || bounds.y0 > bounds.y1)
-		throw emu_fatalerror("Illegal bounds value in XML: (%f-%f)-(%f-%f)\n", bounds.x0, bounds.x1, bounds.y0, bounds.y1);
+		throw emu_fatalerror("Illegal bounds value in XML: (%f-%f)-(%f-%f)", bounds.x0, bounds.x1, bounds.y0, bounds.y1);
 }
 
 
@@ -392,7 +392,7 @@ void parse_color(running_machine &machine, xml_data_node *colornode, render_colo
 	// check for errors
 	if (color.r < 0.0 || color.r > 1.0 || color.g < 0.0 || color.g > 1.0 ||
 		color.b < 0.0 || color.b > 1.0 || color.a < 0.0 || color.a > 1.0)
-		throw emu_fatalerror("Illegal ARGB color value in XML: %f,%f,%f,%f\n", color.r, color.g, color.b, color.a);
+		throw emu_fatalerror("Illegal ARGB color value in XML: %f,%f,%f,%f", color.r, color.g, color.b, color.a);
 }
 
 
@@ -418,7 +418,7 @@ static void parse_orientation(running_machine &machine, xml_data_node *orientnod
 		case 90:	orientation = ROT90;	break;
 		case 180:	orientation = ROT180;	break;
 		case 270:	orientation = ROT270;	break;
-		default:	throw emu_fatalerror("Invalid rotation in XML orientation node: %d\n", rotate); break;
+		default:	throw emu_fatalerror("Invalid rotation in XML orientation node: %d", rotate); break;
 	}
 	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, *orientnode, "swapxy", "no")) == 0)
 		orientation ^= ORIENTATION_SWAP_XY;
@@ -662,7 +662,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 	// error otherwise
 	else
-		throw emu_fatalerror("Unknown element component: %s\n", compnode.name);
+		throw emu_fatalerror("Unknown element component: %s", compnode.name);
 }
 
 
@@ -730,7 +730,7 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 			break;
 
 		default:
-			throw emu_fatalerror("Unknown component type requested draw()\n");
+			throw emu_fatalerror("Unknown component type requested draw()");
 	}
 }
 
@@ -1857,7 +1857,7 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 
 		// error if not found
 		if (m_element == NULL)
-			throw emu_fatalerror("Unable to find layout element %s\n", name);
+			throw emu_fatalerror("Unable to find layout element %s", name);
 	}
 
 	// fetch common data
@@ -1878,12 +1878,12 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	if (strcmp(itemnode.name, "screen") == 0)
 	{
 		if (m_screen == NULL)
-			throw emu_fatalerror("Layout references invalid screen index %d\n", index);
+			throw emu_fatalerror("Layout references invalid screen index %d", index);
 	}
 	else
 	{
 		if (m_element == NULL)
-			throw emu_fatalerror("Layout item of type %s require an element tag\n", itemnode.name);
+			throw emu_fatalerror("Layout item of type %s require an element tag", itemnode.name);
 	}
 }
 
@@ -1939,12 +1939,12 @@ layout_file::layout_file(running_machine &machine, xml_data_node &rootnode, cons
 	// find the layout node
 	xml_data_node *mamelayoutnode = xml_get_sibling(rootnode.child, "mamelayout");
 	if (mamelayoutnode == NULL)
-		throw emu_fatalerror("Invalid XML file: missing mamelayout node\n");
+		throw emu_fatalerror("Invalid XML file: missing mamelayout node");
 
 	// validate the config data version
 	int version = xml_get_attribute_int(mamelayoutnode, "version", 0);
 	if (version != LAYOUT_VERSION)
-		throw emu_fatalerror("Invalid XML file: unsupported version\n");
+		throw emu_fatalerror("Invalid XML file: unsupported version");
 
 	// parse all the elements
 	for (xml_data_node *elemnode = xml_get_sibling(mamelayoutnode->child, "element"); elemnode != NULL; elemnode = xml_get_sibling(elemnode->next, "element"))
