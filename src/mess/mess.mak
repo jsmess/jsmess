@@ -607,6 +607,7 @@ $(MESSOBJ)/amstrad.a:			\
 	$(MESS_DRIVERS)/pcw.o		\
 	$(MESS_VIDEO)/pcw16.o		\
 	$(MESS_DRIVERS)/pda600.o	\
+	$(MESS_MACHINE)/hd64610.o	\
 	$(MESS_DRIVERS)/pcw16.o		\
 
 $(MESSOBJ)/apf.a:				\
