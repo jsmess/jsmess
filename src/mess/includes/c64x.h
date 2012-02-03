@@ -64,8 +64,8 @@ public:
 	required_device<c64_expansion_slot_device> m_exp;
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
-	required_device<cassette_image_device> m_cassette;
-	required_device<timer_device> m_cassette_timer;
+	optional_device<cassette_image_device> m_cassette;
+	optional_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -119,5 +119,19 @@ public:
 	int m_cass_rd;
 	int m_iec_srq;
 };
+
+
+class sx64_state : public c64_state
+{
+public:
+	sx64_state(const machine_config &mconfig, device_type type, const char *tag)
+		: c64_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_READ8_MEMBER( cpu_r );
+	DECLARE_WRITE8_MEMBER( cpu_w );
+};
+
+
 
 #endif

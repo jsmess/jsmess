@@ -821,6 +821,60 @@ static const m6502_interface cpu_intf =
 
 
 //-------------------------------------------------
+//  m6502_interface sx64_cpu_intf
+//-------------------------------------------------
+
+READ8_MEMBER( sx64_state::cpu_r )
+{
+	/*
+		
+		bit		description
+		
+		P0		1
+		P1		1
+		P2		1
+		P3		1
+		P4		1
+		P5		1
+		
+	*/
+
+	return 0x3f;
+}
+
+WRITE8_MEMBER( sx64_state::cpu_w )
+{
+	/*
+		
+		bit		description
+		
+		P0		LORAM
+		P1		HIRAM
+		P2		CHAREN
+		P3		
+		P4
+		P5		
+		
+	*/
+
+	// HACK apply pull-up resistors
+	data |= (offset ^ 0x07) & 0x07;
+	
+	m_loram = BIT(data, 0);
+	m_hiram = BIT(data, 1);
+	m_charen = BIT(data, 2);
+}
+
+static const m6502_interface sx64_cpu_intf =
+{
+	NULL,
+	NULL,
+	DEVCB_DRIVER_MEMBER(sx64_state, cpu_r),
+	DEVCB_DRIVER_MEMBER(sx64_state, cpu_w)
+};
+
+
+//-------------------------------------------------
 //  TIMER_DEVICE_CALLBACK( cassette_tick )
 //-------------------------------------------------
 
@@ -1003,6 +1057,122 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_CONFIG( ntsc_sx )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
+	// basic hardware
+	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6567_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(c64_mem)
+	MCFG_CPU_CONFIG(sx64_cpu_intf)
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	// video hardware
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
+	MCFG_SCREEN_UPDATE_DRIVER(sx64_state, screen_update)
+
+	MCFG_PALETTE_INIT(c64)
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
+
+	MCFG_VIC2_ADD(MOS6567_TAG, vic_ntsc_intf)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6567_CLOCK)
+	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
+	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_CBM_IEC_BUS_ADD(iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( ntsc_dx )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
+	// basic hardware
+	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6567_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(c64_mem)
+	MCFG_CPU_CONFIG(sx64_cpu_intf)
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	// video hardware
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
+	MCFG_SCREEN_UPDATE_DRIVER(sx64_state, screen_update)
+
+	MCFG_PALETTE_INIT(c64)
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
+
+	MCFG_VIC2_ADD(MOS6567_TAG, vic_ntsc_intf)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6567_CLOCK)
+	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
+	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_CBM_IEC_BUS_ADD(iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, sx1541_iec_devices, "sx1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
@@ -1042,6 +1212,64 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
+	MCFG_SOFTWARE_LIST_FILTER("disk_list", "PAL")
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( pal_sx )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_START( pal_sx, sx64_state )
+	// basic hardware
+	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(c64_mem)
+	MCFG_CPU_CONFIG(sx64_cpu_intf)
+	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c64_frame_interrupt)
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+
+	// video hardware
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
+	MCFG_SCREEN_UPDATE_DRIVER(sx64_state, screen_update)
+
+	MCFG_PALETTE_INIT(c64)
+	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
+
+	MCFG_VIC2_ADD(MOS6569_TAG, vic_pal_intf)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6569_CLOCK)
+	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
+	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_CBM_IEC_BUS_ADD(iec_intf)
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1163,6 +1391,64 @@ ROM_END
 #define rom_edu64	rom_c64n
 
 
+//-------------------------------------------------
+//  ROM( sx64n )
+//-------------------------------------------------
+
+ROM_START( sx64n )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "901226-01.ud4", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_SYSTEM_BIOS(0, "cbm", "Original" )
+	ROMX_LOAD( "251104-04.ud3", 0x0000, 0x2000, CRC(2c5965d4) SHA1(aa136e91ecf3c5ac64f696b3dbcbfc5ba0871c98), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "jiffydos", "JiffyDOS v6.01" )
+	ROMX_LOAD( "jiffydos sx64.ud3", 0x0000, 0x2000, CRC(2b5a88f5) SHA1(942c2150123dc30f40b3df6086132ef0a3c43948), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "1541flash", "1541 FLASH!" )
+	ROMX_LOAD( "1541 flash.ud3", 0x0000, 0x2000, CRC(0a1c9b85) SHA1(0bfcaab0ae453b663a6e01cd59a9764805419e00), ROM_BIOS(3) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901225-01.ud1", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
+
+	ROM_REGION( 0x100, "pla", 0 )
+	ROM_LOAD( "906114-01.ue4", 0x000, 0x100, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( rom_sx64p )
+//-------------------------------------------------
+
+#define rom_sx64p	rom_sx64n
+
+
+//-------------------------------------------------
+//  ROM( vip64 )
+//-------------------------------------------------
+
+ROM_START( vip64 )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "901226-01.ud4", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "kernelsx.ud3", 0x0000, 0x2000, CRC(7858d3d7) SHA1(097cda60469492a8916c2677b7cce4e12a944bc0) )
+	
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "charswe.ud1", 0x0000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a) )
+
+	ROM_REGION( 0x100, "pla", 0 )
+	ROM_LOAD( "906114-01.ue4", 0x000, 0x100, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( dx64 )
+//-------------------------------------------------
+
+// ROM_LOAD( "dx64kern.bin", 0x0000, 0x2000, CRC(58065128) ) TODO where is this illusive ROM?
+#define rom_dx64 	rom_sx64n
+
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
@@ -1175,3 +1461,9 @@ COMP( 1982,	c64p,	c64n,  	0,		pal,		c64,		0,		"Commodore Business Machines", "Co
 COMP( 1982,	c64sw,	c64n,	0,		pal,		c64sw,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)", 	0 )
 COMP( 1983, pet64,	c64n,  	0,    	pet64,   	c64,     	0,     	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)", 					0 )
 COMP( 1983, edu64,  c64n,  	0,    	pet64,   	c64,     	0,     	"Commodore Business Machines", "Educator 64 (NTSC)", 						0 )
+COMP( 1984, sx64n,	c64n,	0,		ntsc_sx,	c64,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)", 				0 )
+COMP( 1984, sx64p,	c64n,	0,		pal_sx,		c64,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)", 				0 )
+COMP( 1984, vip64,	c64n,	0,		pal_sx,		c64sw,		0,		"Commodore Business Machines", "VIP-64 (Sweden/Finland)",					0 )
+COMP( 1984, dx64,	c64n,	0,		ntsc_dx,	c64,		0,		"Commodore Business Machines", "DX-64 (NTSC)", 								0 )
+//COMP(1983, clipper,  c64,  0, c64pal,  clipper, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
+//COMP(1983, tesa6240, c64,  0, c64pal,  c64,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
