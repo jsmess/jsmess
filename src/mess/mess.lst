@@ -548,7 +548,6 @@ vic20p	// Commodore VIC 20 (PAL)
 vic20s	// Commodore VIC 20 (Swedish Expanson Kit)
 
 max	   // Commodore Max Machine (Japan)
-c64	   // Commodore 64 (NTSC)
 c64n
 c64p	// Commodore 64 (PAL)
 c64j	// Commodore 64 (Japan)
@@ -562,9 +561,9 @@ sx64p
 
 vip64	 // Commodore VIP64 (SX64, PAL, Swedish)
 dx64    // Commodore DX-64 - Prototype
-c64c	  // Commodore 64C (NTSC)
-c64cpal   // Commodore 64C (PAL)
-c64csfi
+c64cn	  // Commodore 64C (NTSC)
+c64cp   // Commodore 64C (PAL)
+c64csw
 c64g	  // Commodore 64G (PAL)
 c64gs	 // Commodore 64 Games System
 c64dtv	 // Commodore 64 Direct-to-TV
