@@ -3451,6 +3451,7 @@ pacapp2			// 1999.07 Paca Paca Passion 2 (Japan, PKS1/VER.A)
 				// 1999.07 Bust A Move 2 (Metro)
 tektagt			// 1999.?? Tekken Tag Tournament (US, TEG3/VER.C1)
 tektagtac		// 1999.?? Tekken Tag Tournament (Asia, TEG2/VER.C1)
+tektagtac1		// 1999.?? Tekken Tag Tournament (Asia, TEG2/VER.C1) - alt mainboard & rom board
 tektagtub		// 1999.?? Tekken Tag Tournament (US, TEG3/VER.B)
 tektagtjb		// 1999.07 Tekken Tag Tournament (Japan, TEG1/VER.B)
 tektagtja		// 1999.07 Tekken Tag Tournament (Japan, TEG1/VER.A)
@@ -4456,12 +4457,14 @@ puyosun			// 1996.12 Puyo Puyo SUN (Compile)
 colmns97		// 1997.01 Columns 97
 shienryu		// 1997.02 Shienryu (Warashi)
 vmahjong		// 1997.02 Virtual Mahjong (Micronet)
+pclub2fc		// 1997.04 Print Club 2 Felix The Cat
 groovef			// 1997.05 Groove on Fight (Atlus)
 nclubv3			// 1997.07 Name Club Ver. 3
 pclub2			// 1997.09 Print Club 2
 thunt			// 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License))
 thuntk
 winterht		// 1997.10 Winter Heat (Data East)
+pclub298		// 1997.10 Print Club 2 '98 Spring Ver
 cotton2			// 1997.11 Cotton 2 (Success)
 hanagumi		// 1997.11 Sakura Taisen Hanagumi Taisen Columns
 findlove		// 1997.12 Find Love (Daiki / FCF)
@@ -6239,6 +6242,7 @@ asteroid2		// 035127-035145    (c) 1979
 asteroid1		// 035127-035145    no copyright notice
 asteroidb		// (bootleg)
 asterock		// Sidam bootleg    (c) 1979
+hyperspc		// Rumiano bootleg  (c) 1979
 meteorts		// VCC bootleg      (c) 1979
 meteorho		// Hoei? bootleg    (c) 1980
 astdelux		// 0351xx           (c) 1980

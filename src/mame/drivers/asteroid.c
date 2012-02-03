@@ -264,12 +264,12 @@ static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
 	AM_RANGE(0x2c00, 0x2c0f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x2c40, 0x2c7f) AM_DEVREAD("earom", atari_vg_earom_r)
+	AM_RANGE(0x2c40, 0x2c7f) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
-	AM_RANGE(0x3200, 0x323f) AM_DEVWRITE("earom", atari_vg_earom_w)
+	AM_RANGE(0x3200, 0x323f) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3600, 0x3600) AM_DEVWRITE("discrete", asteroid_explode_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x3c00, 0x3c01) AM_WRITE(astdelux_led_w)
 	AM_RANGE(0x3c03, 0x3c03) AM_DEVWRITE("discrete", astdelux_sounds_w)
 	AM_RANGE(0x3c04, 0x3c04) AM_WRITE(astdelux_bank_switch_w)
@@ -792,6 +792,19 @@ ROM_START( meteorho )
 	ROM_LOAD( "prom.bin",	0x0000, 0x0100, CRC(9e237193) SHA1(f663e12d5db0fa50ea49d03591475ae0a7168bc0) )
 ROM_END
 
+ROM_START( hyperspc )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "035145-01.bin",   0x6800, 0x0800, CRC(e9bfda64) SHA1(291dc567ebb31b35df83d9fb87f4080f251ff9c8) )
+	ROM_LOAD( "035144-01.bin",   0x7000, 0x0800, CRC(e53c28a9) SHA1(d9f081e73511ec43377f0c6457747f15a470d4dc) )
+	ROM_LOAD( "035143-01.bin",   0x7800, 0x0800, CRC(7d4e3d05) SHA1(d88000e904e158efde50e453e2889ecd2cb95f24) )
+	/* Vector ROM */
+	ROM_LOAD( "035127-01.bin",   0x5000, 0x0800, CRC(7dec48bd) SHA1(8bc926a763ff80b101b2e1c24d45615c3daf67d5) )
+
+	/* DVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+ROM_END
+
 
 ROM_START( astdelux )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -943,9 +956,10 @@ GAME( 1979, asteroid, 0,        asteroid, asteroid, 0,        ROT0, "Atari",   "
 GAME( 1979, asteroid2,asteroid, asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 2)",        GAME_SUPPORTS_SAVE )
 GAME( 1979, asteroid1,asteroid, asteroid, asteroid, 0,        ROT0, "Atari",   "Asteroids (rev 1)",        GAME_SUPPORTS_SAVE )
 GAME( 1979, asteroidb,asteroid, asteroid, asteroidb,asteroidb,ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1979, asterock, asteroid, asterock, asterock, asterock, ROT0, "bootleg (Sidam)", "Asterock",         GAME_SUPPORTS_SAVE )
-GAME( 1979, meteorts, asteroid, asteroid, asteroid, 0,        ROT0, "bootleg (VGG)",   "Meteorites (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
-GAME( 1980, meteorho, asteroid, asteroid, asteroid, 0,        ROT0, "bootleg (Hoei)",  "Meteor (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
+GAME( 1979, asterock, asteroid, asterock, asterock, asterock, ROT0, "bootleg (Sidam)",   "Asterock (bootleg of Asteroids)",    GAME_SUPPORTS_SAVE )
+GAME( 1979, meteorts, asteroid, asteroid, asteroid, 0,        ROT0, "bootleg (VGG)",     "Meteorites (bootleg of Asteroids)",  GAME_SUPPORTS_SAVE )
+GAME( 1979, meteorho, asteroid, asteroid, asteroid, 0,        ROT0, "bootleg (Hoei)",    "Meteor (bootleg of Asteroids)",      GAME_SUPPORTS_SAVE )
+GAME( 1979, hyperspc, asteroid, asteroid, asteroid, 0,        ROT0, "bootleg (Rumiano)", "Hyperspace (bootleg of Asteroids)",  GAME_SUPPORTS_SAVE )
 GAMEL(1980, astdelux, 0,        astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
 GAMEL(1980, astdelux2,astdelux, astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
 GAMEL(1980, astdelux1,astdelux, astdelux, astdelux, 0,        ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_ho88ffff )
