@@ -57,7 +57,7 @@ typedef struct _tn_ide_state
 	int		select_mask;
 	int		select_value;
 
-	device_t		*rtc;
+	rtc65271_device		*rtc;
 	device_t		*ide;
 
 	int		ide_irq;
@@ -174,18 +174,18 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 			case 0:		/* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					reply = rtc65271_xram_r(card->rtc, (addr & 0x1f) | 0x20);
+					reply = card->rtc->xram_r(*memory_nonspecific_space(device->machine()),(addr & 0x1f) | 0x20);
 				else
 					/* RTC RAM read */
-					reply = rtc65271_xram_r(card->rtc, addr);
+					reply = card->rtc->xram_r(*memory_nonspecific_space(device->machine()),addr);
 				break;
 			case 1:		/* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					reply = rtc65271_rtc_r(card->rtc, 1);
+					reply = card->rtc->rtc_r(*memory_nonspecific_space(device->machine()),1);
 				else
 					/* register select */
-					reply = rtc65271_rtc_r(card->rtc, 0);
+					reply = card->rtc->rtc_r(*memory_nonspecific_space(device->machine()),0);
 				break;
 			case 2:		/* IDE registers set 1 (CS1Fx) */
 				if (card->tms9995_mode ? (!(addr & 1)) : (addr & 1))
@@ -245,18 +245,18 @@ static WRITE8_DEVICE_HANDLER( data_w )
 			case 0:		/* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					rtc65271_xram_w(card->rtc, (addr & 0x1f) | 0x20, data);
+					card->rtc->xram_w(*memory_nonspecific_space(device->machine()),(addr & 0x1f) | 0x20, data);
 				else
 					/* RTC RAM write */
-					rtc65271_xram_w(card->rtc, addr, data);
+					card->rtc->xram_w(*memory_nonspecific_space(device->machine()),addr, data);
 				break;
 			case 1:		/* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					rtc65271_rtc_w(card->rtc, 1, data);
+					card->rtc->rtc_w(*memory_nonspecific_space(device->machine()),1, data);
 				else
 					/* register select */
-					rtc65271_rtc_w(card->rtc, 0, data);
+					card->rtc->rtc_w(*memory_nonspecific_space(device->machine()),0, data);
 				break;
 			case 2:		/* IDE registers set 1 (CS1Fx) */
 /*
@@ -335,7 +335,7 @@ static void ide_interrupt_callback(device_t *device, int state)
     clk_interrupt_callback()
     clock interrupt callback
 */
-static void clock_interrupt_callback(device_t *device, int state)
+static WRITE_LINE_DEVICE_HANDLER(clock_interrupt_callback)
 {
 	tn_ide_state *card = get_safe_token(device->owner());
 	card->clk_irq = state;
@@ -346,7 +346,7 @@ static void clock_interrupt_callback(device_t *device, int state)
 static DEVICE_START( tn_ide )
 {
 	tn_ide_state *card = get_safe_token(device);
-	card->rtc = device->subdevice("ide_rtc");
+	card->rtc = device->subdevice<rtc65271_device>("ide_rtc");
 	card->ide = device->subdevice("ide");
 
 	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
@@ -388,8 +388,13 @@ static DEVICE_RESET( tn_ide )
 	}
 }
 
+static const rtc65271_interface ide_rtc_cfg =
+{
+	DEVCB_LINE(clock_interrupt_callback)
+};
+
 MACHINE_CONFIG_FRAGMENT( tn_ide )
-	MCFG_RTC65271_ADD( "ide_rtc", clock_interrupt_callback )
+	MCFG_RTC65271_ADD( "ide_rtc", ide_rtc_cfg )
 	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback )
 	MCFG_IDE_CONTROLLER_REGIONS(":peribox:idehd0:drive", NULL)
 MACHINE_CONFIG_END
