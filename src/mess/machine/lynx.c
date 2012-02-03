@@ -882,32 +882,6 @@ static void lynx_multiply( lynx_state *state )
     Accumulate  JKLM
     */
 	state->m_suzy.accumulate_overflow = FALSE;
-	
-	if (state->m_suzy.signed_math)
-	{
-		UINT16 factor, temp;
-		factor = state->m_suzy.data[MATH_B] | (state->m_suzy.data[MATH_A] << 8);
-		if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
-		{
-			temp = (factor ^ 0xffff) + 1;
-			state->m_sign_AB = - 1;
-			state->m_suzy.data[MATH_B] = temp & 0xff;
-			state->m_suzy.data[MATH_A] = temp >> 8;
-		}
-		else
-			state->m_sign_AB = 1;
-			
-		factor = state->m_suzy.data[MATH_D] | (state->m_suzy.data[MATH_C] << 8);
-		if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
-		{
-			temp = (factor ^ 0xffff) + 1;
-			state->m_sign_CD = - 1;
-			state->m_suzy.data[MATH_D] = temp & 0xff;
-			state->m_suzy.data[MATH_C] = temp >> 8;
-		}
-		else
-			state->m_sign_CD = 1;
-	}
 
 	left = state->m_suzy.data[MATH_B] | (state->m_suzy.data[MATH_A] << 8);
 	right = state->m_suzy.data[MATH_D] | (state->m_suzy.data[MATH_C] << 8);
@@ -1229,10 +1203,50 @@ static WRITE8_HANDLER( suzy_write )
 		case MATH_M:
 			state->m_suzy.accumulate_overflow = FALSE;
 			break;
+		case MATH_C:
+			/* If we are going to perform a signed multiplication, we store the sign and convert the number
+            to an unsigned one */
+			if (state->m_suzy.signed_math)
+			{
+				UINT16 factor, temp;
+				factor = state->m_suzy.data[MATH_D] | (state->m_suzy.data[MATH_C] << 8);
+				if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
+				{
+					temp = (factor ^ 0xffff) + 1;
+					state->m_sign_CD = - 1;
+					state->m_suzy.data[MATH_D] = temp & 0xff;
+					state->m_suzy.data[MATH_C] = temp >> 8;
+				}
+				else
+					state->m_sign_CD = 1;
+			}
+			break;
+		case MATH_D:
+		/* Documentation states that writing to the MATH_D will set MATH_C to zero but not update the sign flag.
+		Implementing the sign detection as described in the documentation causes Stun Runners to not work.
+		Either the sign error in the docs is not as described or writing to the lower byte does update the sign flag.
+		Here I assume the sign flag gets updated. */
+			if (data)
+				state->m_sign_CD = 1;
+			break;
 		/* Writing to A will start a 16 bit multiply */
 		/* If we are going to perform a signed multiplication, we also store the sign and convert the
         number to an unsigned one */
 		case MATH_A:
+			if (state->m_suzy.signed_math)
+			{
+				UINT16 factor, temp;
+				factor = state->m_suzy.data[MATH_B] | (state->m_suzy.data[MATH_A] << 8);
+				if ((factor - 1) & 0x8000)		/* here we use -1 to cover the math bugs on the sign of 0 and 0x8000 */
+				{
+					temp = (factor ^ 0xffff) + 1;
+					state->m_sign_AB = - 1;
+					state->m_suzy.data[MATH_B] = temp & 0xff;
+					state->m_suzy.data[MATH_A] = temp >> 8;
+				}
+				else
+					state->m_sign_AB = 1;
+			}
 			lynx_multiply(state);
 			break;
 		/* Writing to E will start a 16 bit divide */
@@ -1932,24 +1946,6 @@ static void lynx_reset(running_machine &machine)
 	state->m_mikey.data[0x90] = 0x00;
 	state->m_mikey.data[0x92] = 0x00;
 
-/*
-    state->m_suzy.data[MATH_A] = 0xff;
-    state->m_suzy.data[MATH_B] = 0xff;
-    state->m_suzy.data[MATH_C] = 0xff;
-    state->m_suzy.data[MATH_D] = 0xff;
-
-    state->m_suzy.data[MATH_E] = 0xff;
-    state->m_suzy.data[MATH_F] = 0xff;
-    state->m_suzy.data[MATH_G] = 0xff;
-    state->m_suzy.data[MATH_H] = 0xff;
-
-    state->m_suzy.data[MATH_J] = 0xff;
-    state->m_suzy.data[MATH_K] = 0xff;
-    state->m_suzy.data[MATH_L] = 0xff;
-    state->m_suzy.data[MATH_M] = 0xff;
-    state->m_suzy.data[MATH_P] = 0xff;
-*/
-
 	lynx_uart_reset(state);
 
 	// hack to allow current object loading to work
@@ -2131,7 +2127,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 MACHINE_CONFIG_FRAGMENT(lynx_cartslot)
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("lnx,lyx")
-	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("lynx_cart")
 	MCFG_CARTSLOT_LOAD(lynx_cart)
 	MCFG_CARTSLOT_PARTIALHASH(lynx_partialhash)
