@@ -57,6 +57,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
+#include "machine/hd64610.h"
 #include "rendlay.h"
 
 
@@ -91,9 +92,8 @@ static ADDRESS_MAP_START(pda600_io, AS_IO, 8, pda600_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
 	//AM_RANGE(0x40, 0x7f) AM_NOP   /* Z180 internal registers */
-	//AM_RANGE(0x80, 0x8f) AM_NOP   /* RTC */
+	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", hd64610_device, read, write)
 	//AM_RANGE(0xC0, 0xC1) AM_NOP   /* LCD */
-
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -193,6 +193,12 @@ static GFXDECODE_START( pda600 )
 	GFXDECODE_ENTRY( "maincpu", 0x61d3, pda600_charlayout_13a, 0, 1 )
 GFXDECODE_END
 
+static HD64610_INTERFACE( rtc_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( pda600, pda600_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
@@ -213,6 +219,8 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+
+	MCFG_HD64610_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
