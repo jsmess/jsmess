@@ -9,5 +9,5 @@
 #ifndef __EVPC__
 #define __EVPC__
 
-DECLARE_LEGACY_NVRAM_DEVICE( EVPC, ti99_evpc );
+DECLARE_LEGACY_DEVICE( EVPC, ti99_evpc );
 #endif

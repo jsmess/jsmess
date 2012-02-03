@@ -367,7 +367,7 @@ static DEVICE_RESET( ti99_evpc )
 
 	card->dsrrom = device->machine().region(region.cstr())->base();
 }
-
+/*
 static DEVICE_NVRAM( ti99_evpc )
 {
 	// Called between START and RESET
@@ -400,7 +400,7 @@ static DEVICE_NVRAM( ti99_evpc )
 		}
 	}
 }
-
+*/
 MACHINE_CONFIG_FRAGMENT( ti99_evpc )
 MACHINE_CONFIG_END
 
@@ -412,10 +412,10 @@ ROM_END
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)             p##ti99_evpc##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_ROM_REGION | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG | DT_HAS_NVRAM
+#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_ROM_REGION | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
 #define DEVTEMPLATE_NAME                "SNUG Enhanced Video Processor Card"
 #define DEVTEMPLATE_SHORTNAME           "snugvdc"
 #define DEVTEMPLATE_FAMILY              "Peripheral expansion"
 #include "devtempl.h"
 
-DEFINE_LEGACY_NVRAM_DEVICE(EVPC, ti99_evpc);
+DEFINE_LEGACY_DEVICE(EVPC, ti99_evpc);
