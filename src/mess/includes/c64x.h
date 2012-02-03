@@ -133,5 +133,30 @@ public:
 };
 
 
+class c64c_state : public c64_state
+{
+public:
+	c64c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: c64_state(mconfig, type, tag)
+	{ }
+
+	virtual void machine_start();
+};
+
+
+class c64gs_state : public c64c_state
+{
+public:
+	c64gs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: c64c_state(mconfig, type, tag)
+	{ }
+
+	virtual void machine_start();
+
+	DECLARE_READ8_MEMBER( cpu_r );
+	DECLARE_WRITE8_MEMBER( cpu_w );
+};
+
+
 
 #endif

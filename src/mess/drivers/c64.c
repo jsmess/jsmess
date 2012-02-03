@@ -432,32 +432,6 @@ static INPUT_PORTS_START( c64 )
 	PORT_INCLUDE( c64_controls )			/* CTRLSEL, JOY0, JOY1, PADDLE0 -> PADDLE3, TRACKX, TRACKY, LIGHTX, LIGHTY, OTHER */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START (c64gs)
-	PORT_INCLUDE( c64 )
-
-	/* 2008 FP: This has to be cleaned up later */
-	/* C64gs should simply not scan these inputs */
-	/* as a temporary solution, we keep PeT IPT_UNUSED shortcut */
-
-	PORT_MODIFY( "ROW0" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-	PORT_MODIFY( "ROW1" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-	PORT_MODIFY( "ROW2" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-	PORT_MODIFY( "ROW3" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-	PORT_MODIFY( "ROW4" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-	PORT_MODIFY( "ROW5" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-	PORT_MODIFY( "ROW6" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-	PORT_MODIFY( "ROW7" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-	PORT_MODIFY( "SPECIAL" ) /* no keyboard */
-	PORT_BIT (0xff, 0x00, IPT_UNUSED )
-INPUT_PORTS_END
 
 
 
@@ -739,99 +713,6 @@ static MACHINE_CONFIG_START( c64, legacy_c64_state )
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c64pal, legacy_c64_state )
-	MCFG_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG( c64_m6510_interface )
-	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
-	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
-
-	MCFG_MACHINE_START( c64 )
-	MCFG_MACHINE_RESET( c64 )
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_STATIC( c64 )
-
-	MCFG_PALETTE_INIT( c64 )
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
-
-	MCFG_VIC2_ADD("vic2", c64_vic2_pal_intf)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sid6581", SID6581, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(c64_sound_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-
-	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
-
-	/* cia */
-	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c64_pal_cia0)
-	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
-
-	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
-
-	MCFG_FRAGMENT_ADD(c64_cartslot)
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-
-	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( c64gs, legacy_c64_state )
-	MCFG_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG( c64_m6510_interface )
-	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
-	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
-
-	MCFG_MACHINE_START( c64 )
-	MCFG_MACHINE_RESET( c64 )
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_STATIC( c64 )
-
-	MCFG_PALETTE_INIT( c64 )
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
-
-	MCFG_VIC2_ADD("vic2", c64_vic2_pal_intf)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sid6581", SID6581, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(c64_sound_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	/* cia */
-	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c64_pal_cia0)
-	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
-
-	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
-
-	MCFG_FRAGMENT_ADD(c64_cartslot)
-
-	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
-MACHINE_CONFIG_END
-
-
 
 /*************************************
  *
@@ -844,62 +725,6 @@ ROM_START( max )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
 ROM_END
-
-ROM_START( c64 )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	ROM_DEFAULT_BIOS("r3")
-	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )	// BASIC
-	ROM_SYSTEM_BIOS(0, "r1", "Kernal rev. 1" )
-	ROMX_LOAD( "901227-01.bin", 0x12000, 0x2000, CRC(dce782fa) SHA1(87cc04d61fc748b82df09856847bb5c2754a2033), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "r2", "Kernal rev. 2" )
-	ROMX_LOAD( "901227-02.bin", 0x12000, 0x2000, CRC(a5c687b3) SHA1(0e2e4ee3f2d41f00bed72f9ab588b83e306fdb13), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS(2, "r3", "Kernal rev. 3" )
-	ROMX_LOAD( "901227-03.bin", 0x12000, 0x2000, CRC(dbe3e7c7) SHA1(1d503e56df85a62fee696e7618dc5b4e781df1bb), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos c64.bin", 0x12000, 0x2000, CRC(2f79984c) SHA1(31e73e66eccb28732daea8ec3ad1addd9b39a017), ROM_BIOS(4) )
-
-	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )	// Character
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( dx64 )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-    ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
-    ROM_LOAD( "dx64kern.bin",  0x12000, 0x2000, CRC(58065128) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( c64c )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	/* standard basic, modified kernel */
-	ROM_LOAD( "251913-01.bin", 0x10000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
-	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
-#define rom_c64cpal		rom_c64c
-#define rom_c64g		rom_c64c
-
-ROM_START( c64csfi )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	ROM_LOAD( "325182-01.ua4",		  0x10000, 0x4000, CRC(2aff27d3) SHA1(267654823c4fdf2167050f41faa118218d2569ce) ) // 128/64 FI
-	ROM_LOAD( "cbm 64 skand.gen.ua5", 0x14000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( c64gs )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	/* standard basic, modified kernel */
-	ROM_LOAD( "390852-01.bin", 0x10000, 0x4000, CRC(b0a9c2da) SHA1(21940ef5f1bfe67d7537164f7ca130a1095b067a) )
-	ROM_LOAD( "901225-01.bin", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
 
 // BASIC sits at 0xa000-0xc000, chargen-like chunks sit at 0x1000-0x2000, 0x9000-0xa000 and 0xd000-0xe000
 // kernel sits at 0xe000
@@ -924,13 +749,4 @@ ROM_END
 
 COMP(1982, max,		0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines", "Commodore Max Machine", 0)
 
-COMP(1982, c64,     0,    0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (NTSC) (Legacy)", 0)
-
-COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64C (NTSC)", 0)
-COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64C (PAL)", 0)
-COMP(1986, c64csfi, c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64C (Sweden/Finland)", 0)
-COMP(1986, c64g,    c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64G (PAL)", 0)
-
-CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   "Commodore Business Machines", "Commodore 64 Games System (PAL)", 0)
-
-CONS(2005, c64dtv,  c64,  0,    c64,     c64,     c64,     "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711)", GAME_NOT_WORKING)
+CONS(2005, c64dtv,  0,  0,    c64,     c64,     c64,     "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711)", GAME_NOT_WORKING)
