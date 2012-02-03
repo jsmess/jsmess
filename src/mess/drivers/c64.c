@@ -461,24 +461,6 @@ INPUT_PORTS_END
 
 
 
-static INPUT_PORTS_START (vip64)
-	PORT_INCLUDE( c64 )
-
-	PORT_MODIFY( "ROW5" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa5") PORT_CODE(KEYCODE_OPENBRACE)	PORT_CHAR('\xA5')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)								PORT_CHAR(';') PORT_CHAR(']')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)							PORT_CHAR('=')
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)								PORT_CHAR('-')
-
-	PORT_MODIFY( "ROW6" )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xa4") PORT_CODE(KEYCODE_BACKSLASH)	PORT_CHAR('\xA4')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xc3\xb6") PORT_CODE(KEYCODE_QUOTE)		PORT_CHAR('\xB6')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)						PORT_CHAR('@')
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)						PORT_CHAR(':') PORT_CHAR('*')
-INPUT_PORTS_END
-
-
-
 /*************************************
  *
  *  Graphics definitions
@@ -849,56 +831,6 @@ static MACHINE_CONFIG_START( c64gs, legacy_c64_state )
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sx64, legacy_c64_state )
-	MCFG_CPU_ADD( "maincpu", M6510, VIC6569_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG( c64_m6510_interface )
-	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
-	// MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6569_HRETRACERATE)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
-
-	MCFG_MACHINE_START( c64 )
-	MCFG_MACHINE_RESET( c64 )
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* 2500 not accurate */
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_STATIC( c64 )
-
-	MCFG_PALETTE_INIT( c64 )
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
-
-	MCFG_VIC2_ADD("vic2", c64_vic2_pal_intf)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sid6581", SID6581, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(c64_sound_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-
-	/* cia */
-	MCFG_MOS6526R1_ADD("cia_0", VIC6569_CLOCK, c64_pal_cia0)
-	MCFG_MOS6526R1_ADD("cia_1", VIC6569_CLOCK, c64_pal_cia1)
-
-	/* floppy from serial bus */
-	MCFG_CBM_IEC_BUS_ADD(cbm_iec_intf)
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, sx1541_iec_devices, "sx1541", NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-
-	MCFG_FRAGMENT_ADD(c64_cartslot)
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-
-	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
-MACHINE_CONFIG_END
 
 
 /*************************************
@@ -931,22 +863,6 @@ ROM_START( c64 )
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( sx64 )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	ROM_LOAD( "901226-01.ud4", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
-
-	ROM_SYSTEM_BIOS(0, "cbm", "Original" )
-	ROMX_LOAD( "251104-04.ud3", 0x12000, 0x2000, CRC(2c5965d4) SHA1(aa136e91ecf3c5ac64f696b3dbcbfc5ba0871c98), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos sx64.ud3", 0x12000, 0x2000, CRC(2b5a88f5) SHA1(942c2150123dc30f40b3df6086132ef0a3c43948), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS(2, "1541flash", "1541 FLASH!" )
-	ROMX_LOAD( "1541 flash.ud3", 0x12000, 0x2000, CRC(0a1c9b85) SHA1(0bfcaab0ae453b663a6e01cd59a9764805419e00), ROM_BIOS(3) )
-
-	ROM_LOAD( "901225-01.ud1", 0x14000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( dx64 )
 	ROM_REGION( 0x19400, "maincpu", 0 )
     ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
@@ -954,16 +870,6 @@ ROM_START( dx64 )
 
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
 ROM_END
-
-ROM_START( vip64 )
-	ROM_REGION( 0x19400, "maincpu", 0 )
-	ROM_LOAD( "901226-01.bin", 0x10000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
-	ROM_LOAD( "kernelsx.swe",   0x12000, 0x2000, CRC(7858d3d7) SHA1(097cda60469492a8916c2677b7cce4e12a944bc0) )
-	ROM_LOAD( "charswe.bin", 0x14000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a) )
-
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
-ROM_END
-
 
 ROM_START( c64c )
 	ROM_REGION( 0x19400, "maincpu", 0 )
@@ -1019,13 +925,6 @@ ROM_END
 COMP(1982, max,		0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (NTSC) (Legacy)", 0)
-
-//COMP(1983, clipper,  c64,  0, c64pal,  clipper, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
-//COMP(1983, tesa6240, c64,  0, c64pal,  c64,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
-
-COMP(1984, sx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
-COMP(1984, vip64,   c64,  0,    sx64,    vip64,   sx64,    "Commodore Business Machines", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
-//COMP(1983, dx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
 
 COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64C (NTSC)", 0)
 COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64C (PAL)", 0)

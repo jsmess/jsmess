@@ -557,9 +557,11 @@ pet64	 // Commodore PET 64
 edu64	 // Commodore Educator 64
 //  clipper  // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 //  tesa6240  //  modified SX64 with label printer
-sx64	  // Commodore SX-64 Executive Machine (PAL)
+sx64n
+sx64p
+
 vip64	 // Commodore VIP64 (SX64, PAL, Swedish)
-//  dx64    // Commodore DX-64 - Prototype
+dx64    // Commodore DX-64 - Prototype
 c64c	  // Commodore 64C (NTSC)
 c64cpal   // Commodore 64C (PAL)
 c64csfi
