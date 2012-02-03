@@ -10,6 +10,6 @@
 #ifndef __HSGPL__
 #define __HSGPL__
 
-DECLARE_LEGACY_NVRAM_DEVICE( HSGPL, hsgpl );
+DECLARE_LEGACY_DEVICE( HSGPL, hsgpl );
 #endif
 

@@ -629,7 +629,7 @@ static DEVICE_RESET( hsgpl )
 		}
 	}
 }
-
+/*
 static DEVICE_NVRAM( hsgpl )
 {
 	// Called between START and RESET
@@ -693,7 +693,7 @@ static DEVICE_NVRAM( hsgpl )
 		}
 	}
 }
-
+*/
 /*
     Get the pointer to the memory data from the HSGPL card. Called by the FEEPROM.
 */
@@ -713,9 +713,9 @@ MACHINE_CONFIG_END
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)             p##hsgpl##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG | DT_HAS_NVRAM
+#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
 #define DEVTEMPLATE_NAME                "SNUG High-Speed GPL card"
 #define DEVTEMPLATE_FAMILY              "Peripheral expansion"
 #include "devtempl.h"
 
-DEFINE_LEGACY_NVRAM_DEVICE( HSGPL, hsgpl );
+DEFINE_LEGACY_DEVICE( HSGPL, hsgpl );
