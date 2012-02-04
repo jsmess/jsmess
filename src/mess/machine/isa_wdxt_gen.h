@@ -70,7 +70,6 @@ protected:
 	// device_isa8_card_interface
 	virtual UINT8 dack_r(int line);
 	virtual void dack_w(int line, UINT8 data);
-	virtual bool have_dack(int line);
 
 private:
 	required_device<cpu_device> m_maincpu;

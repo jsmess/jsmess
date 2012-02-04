@@ -145,12 +145,29 @@ void isa8_device::device_config_complete()
 isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, ISA8, "ISA8", tag, owner, clock)
 {
+	for(int i=0;i<8;i++)
+	{
+		m_dma_device[i] = NULL;
+		m_dma_eop[i] = false;
+	}
 }
 
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
         device_t(mconfig, type, name, tag, owner, clock)
 {
+	for(int i=0;i<8;i++)
+	{
+		m_dma_device[i] = NULL;
+		m_dma_eop[i] = false;
+	}
 }
+
+void isa8_device::set_dma_channel(UINT8 channel, device_isa8_card_interface *dev, bool do_eop)
+{
+	m_dma_device[channel] = dev;
+	m_dma_eop[channel] = do_eop;
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -175,11 +192,6 @@ void isa8_device::device_start()
 
 void isa8_device::device_reset()
 {
-}
-
-void isa8_device::add_isa_card(device_isa8_card_interface *card)
-{
-	m_device_list.append(*card);
 }
 
 void isa8_device::install_memory(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name)
@@ -347,35 +359,22 @@ WRITE_LINE_MEMBER( isa8_device::drq3_w ) { m_out_drq3_func(state); }
 
 UINT8 isa8_device::dack_r(int line)
 {
-	UINT8 retVal = 0xff;
-	device_isa8_card_interface *entry = m_device_list.first();
-	while(entry) {
-		if (entry->have_dack(line)) {
-			retVal = entry->dack_r(line);
-			break;
-		}
-		entry = entry->next();
-	}
-	return retVal;
+	if (m_dma_device[line]) 
+		return m_dma_device[line]->dack_r(line);	
+	return 0xff;
 }
 
 void isa8_device::dack_w(int line,UINT8 data)
 {
-	device_isa8_card_interface *entry = m_device_list.first();
-	while(entry) {
-		if (entry->have_dack(line)) {
-			entry->dack_w(line,data);
-		}
-		entry = entry->next();
-	}
+	if (m_dma_device[line])
+		return m_dma_device[line]->dack_w(line,data);
 }
 
 void isa8_device::eop_w(int state)
 {
-	device_isa8_card_interface *entry = m_device_list.first();
-	while(entry) {
-		entry->eop_w(state);
-		entry = entry->next();
+	for (int i=0;i<8;i++) {
+		if (m_dma_eop[i]==TRUE && m_dma_device[i]) 
+			m_dma_device[i]->eop_w(state);
 	}
 }
 
@@ -420,11 +419,6 @@ void device_isa8_card_interface::eop_w(int state)
 {
 }
 
-bool device_isa8_card_interface::have_dack(int line)
-{
-	return FALSE;
-}
-
 void device_isa8_card_interface::static_set_isabus_tag(device_t &device, const char *tag)
 {
 	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
@@ -434,7 +428,6 @@ void device_isa8_card_interface::static_set_isabus_tag(device_t &device, const c
 void device_isa8_card_interface::set_isa_device()
 {
 	m_isa = dynamic_cast<isa8_device *>(device().machine().device(m_isa_tag));
-	m_isa->add_isa_card(this);
 }
 
 
@@ -590,5 +583,4 @@ device_isa16_card_interface::~device_isa16_card_interface()
 void device_isa16_card_interface::set_isa_device()
 {
 	m_isa = dynamic_cast<isa16_device *>(device().machine().device(m_isa_tag));
-	m_isa->add_isa_card(this);
 }

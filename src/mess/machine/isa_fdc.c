@@ -92,6 +92,7 @@ void isa8_fdc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_device(this, 0x03f0, 0x03f7, 0, 0, FUNC(pc_fdc_r), FUNC(pc_fdc_w) );
+	m_isa->set_dma_channel(2, this, TRUE);
 }
 
 //-------------------------------------------------
@@ -429,8 +430,3 @@ void isa8_fdc_device::eop_w(int state)
 	pc_fdc_set_tc_state( this, state);
 }
 
-bool isa8_fdc_device::have_dack(int line)
-{
-	if (line==2) return TRUE;
-	return FALSE;
-}

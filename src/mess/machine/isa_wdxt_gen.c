@@ -230,6 +230,7 @@ void wdxt_gen_device::device_start()
 	set_isa_device();
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate(FUNC(wd11c00_17_device::io_r), (wd11c00_17_device*)m_host), write8_delegate(FUNC(wd11c00_17_device::io_w), (wd11c00_17_device*)m_host));
+	m_isa->set_dma_channel(3, this, FALSE);
 }
 
 
@@ -262,17 +263,6 @@ void wdxt_gen_device::dack_w(int line, UINT8 data)
 {
 	m_host->dack_w(data);
 }
-
-
-//-------------------------------------------------
-//  have_dack -
-//-------------------------------------------------
-
-bool wdxt_gen_device::have_dack(int line)
-{
-	return (line == 3) ? TRUE : FALSE;
-}
-
 
 //-------------------------------------------------
 //  wd1015_t0_r -

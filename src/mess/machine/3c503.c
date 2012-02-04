@@ -38,6 +38,15 @@ void el2_3c503_device::device_start() {
 	set_isa_device();
 	m_isa->install_device(0x0300, 0x030f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
 	m_isa->install_device(0x0700, 0x070f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
+	
+	int chan = 0, idcfr = m_regs.idcfr & 0x0f;
+	if((m_regs.streg | 0x08)) {
+		while(idcfr) {
+			chan++;
+			idcfr >>= 1;
+		}
+		m_isa->set_dma_channel(chan, this, FALSE);
+	}
 }
 
 void el2_3c503_device::device_reset() {
@@ -88,17 +97,6 @@ void el2_3c503_device::eop_w(int state) {
 		m_regs.streg &= ~0x08;
 		if(!(m_regs.gacfr & 0x40)) set_irq(ASSERT_LINE);
 	}
-}
-
-bool el2_3c503_device::have_dack(int line) {
-	int chan = 0, idcfr = m_regs.idcfr & 0x0f;
-	if(!(m_regs.streg | 0x08)) return FALSE;
-	while(idcfr) {
-		chan++;
-		idcfr >>= 1;
-	}
-	if(chan && (chan == line)) return TRUE;
-	return FALSE;
 }
 
 UINT8 el2_3c503_device::dack_r(int line) {

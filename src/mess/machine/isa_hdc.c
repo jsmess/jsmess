@@ -172,6 +172,7 @@ void isa8_hdc_device::device_start()
 	set_isa_device();
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );
+	m_isa->set_dma_channel(3, this, FALSE);
 	buffer = auto_alloc_array(machine(), UINT8, 17*4*512);
 	timer = machine().scheduler().timer_alloc(FUNC(pc_hdc_command), this);
 }
@@ -823,9 +824,4 @@ UINT8 isa8_hdc_device::dack_r(int line)
 void isa8_hdc_device::dack_w(int line,UINT8 data)
 {
 	pc_hdc_dack_w(data);
-}
-bool isa8_hdc_device::have_dack(int line)
-{
-	if (line==3) return TRUE;
-	return FALSE;
 }

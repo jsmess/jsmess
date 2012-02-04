@@ -151,7 +151,6 @@ public:
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
-	void add_isa_card(device_isa8_card_interface *card);
 	void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name);
@@ -176,7 +175,8 @@ public:
 	UINT8 dack_r(int line);
 	void dack_w(int line,UINT8 data);
 	void eop_w(int state);
-
+	
+	void set_dma_channel(UINT8 channel, device_isa8_card_interface *dev, bool do_eop);
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -197,7 +197,8 @@ protected:
 	devcb_resolved_write_line	m_out_drq2_func;
 	devcb_resolved_write_line	m_out_drq3_func;
 
-	simple_list<device_isa8_card_interface> m_device_list;
+	device_isa8_card_interface *m_dma_device[8];
+	bool						m_dma_eop[8];
 	const char *m_cputag;
 };
 
@@ -223,7 +224,6 @@ public:
 	virtual UINT8 dack_r(int line);
 	virtual void dack_w(int line,UINT8 data);
 	virtual void eop_w(int state);
-	virtual bool have_dack(int line);
 
     // inline configuration
     static void static_set_isabus_tag(device_t &device, const char *tag);
