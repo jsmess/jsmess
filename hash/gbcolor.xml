@@ -13933,6 +13933,30 @@ Undumped Pirates:
 		</part>
 	</software>
 
+	<software name="revilgp1" cloneof="revilg">
+		<!-- Notes: GBC only -->
+		<description>Resident Evil Gaiden (Prototype)</description>
+		<year>2000?</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="regbc cart 1.bin" size="4194304" crc="53f7bba1" sha1="bda5a658631a5714e761ee1805baaa0008ee8cdf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revilgp2" cloneof="revilg">
+		<!-- Notes: GBC only -->
+		<description>Resident Evil Gaiden (Prototype Alt)</description>
+		<year>2000?</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="regbc cart 2.bin" size="4194304" crc="e6e722c8" sha1="87f8b1bad965bc9214ccd2932020163418a4e8f1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="retninja">
 		<!-- Notes: GBC only -->
 		<description>Return of the Ninja (Euro)</description>
