@@ -750,6 +750,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/pet.o		\
 	$(MESS_DRIVERS)/c64.o		\
 	$(MESS_DRIVERS)/c64x.o		\
+	$(MESS_DRIVERS)/c64dtv.o	\
 	$(MESS_MACHINE)/c64exp.o	\
 	$(MESS_MACHINE)/c64user.o	\
 	$(MESS_MACHINE)/c64_std.o	\

@@ -408,15 +408,6 @@ static ADDRESS_MAP_START(ultimax_mem , AS_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_MEMBER(legacy_c64_state, m_c64_romh)				/* ram or kernel rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(c64_mem, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(legacy_c64_state, m_memory)
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank1") AM_WRITE(c64_roml_w)		/* ram or external roml */
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3") AM_WRITEONLY				/* ram or basic rom or external romh */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(c64_ioarea_r, c64_ioarea_w)
-	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank5")	   /* ram or kernel rom or external romh */
-ADDRESS_MAP_END
-
 
 /*************************************
  *
@@ -661,58 +652,6 @@ static MACHINE_CONFIG_START( ultimax, legacy_c64_state )
 	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c64, legacy_c64_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6510, VIC6567_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG( c64_m6510_interface )
-	MCFG_CPU_VBLANK_INT("screen", c64_frame_interrupt)
-	//MCFG_CPU_PERIODIC_INT(vic2_raster_irq, VIC6567_HRETRACERATE)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START( c64 )
-	MCFG_MACHINE_RESET( c64 )
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) /* not accurate */
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_STATIC( c64 )
-
-	MCFG_PALETTE_INIT( c64 )
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(c64_palette) / 3)
-
-	MCFG_VIC2_ADD("vic2", c64_vic2_ntsc_intf)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sid6581", SID6581, VIC6567_CLOCK)
-	MCFG_SOUND_CONFIG(c64_sound_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
-
-	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
-
-	/* cia */
-	MCFG_MOS6526R1_ADD("cia_0", VIC6567_CLOCK, c64_ntsc_cia0)
-	MCFG_MOS6526R1_ADD("cia_1", VIC6567_CLOCK, c64_ntsc_cia1)
-
-	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
-
-	MCFG_FRAGMENT_ADD(c64_cartslot)
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-
-	MCFG_C64_EXPANSION_SLOT_ADD("exp", c64_expansion_intf, c64_expansion_cards, NULL, NULL)
-MACHINE_CONFIG_END
-
 
 /*************************************
  *
@@ -726,18 +665,6 @@ ROM_START( max )
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
 ROM_END
 
-// BASIC sits at 0xa000-0xc000, chargen-like chunks sit at 0x1000-0x2000, 0x9000-0xa000 and 0xd000-0xe000
-// kernel sits at 0xe000
-// from 0x10000 on there are the games
-ROM_START( c64dtv )
-	ROM_REGION( 0x220000, "maincpu", 0 )
-	ROM_LOAD( "flash.u2", 0x020000, 0x200000, CRC(b820375a) SHA1(b9f88919e2bed825eb2b2cb605977d55971b423b) )
-	// the code below is just for testing purpose... we should implement properly the rom banking!
-	ROM_COPY("maincpu", 0x2a000, 0x10000, 0x2000)
-	ROM_COPY("maincpu", 0x2e000, 0x12000, 0x2000)
-	ROM_COPY("maincpu", 0x2d000, 0x14000, 0x1000)
-ROM_END
-
 
 /***************************************************************************
 
@@ -748,5 +675,3 @@ ROM_END
 /*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT     COMPANY                            FULLNAME */
 
 COMP(1982, max,		0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines", "Commodore Max Machine", 0)
-
-CONS(2005, c64dtv,  0,  0,    c64,     c64,     c64,     "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711)", GAME_NOT_WORKING)
