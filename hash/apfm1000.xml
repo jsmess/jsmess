@@ -5,7 +5,7 @@
 		<description>Backgammon</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1008</serial> -->
+		<info name="serial" value="MG1008" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="backgmmn.bin" size="4096" crc="811c6269" sha1="f820334bb6df9b856f54f1957b60a5e70bdd6d7e" offset="0" />
@@ -17,7 +17,7 @@
 		<description>Baseball</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1006</serial> -->
+		<info name="serial" value="MG1006" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="baseball.bin" size="4096" crc="1fb354b7" sha1="2c93d8e764b1e1dfdc1bde7888b385cc28064f86" offset="0" />
@@ -29,7 +29,7 @@
 		<description>Blackjack</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1007</serial> -->
+		<info name="serial" value="MG1007" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="blackjck.bin" size="4096" crc="38faa709" sha1="1a99f4781ce4604a550f4ec9d8559e3456303464" offset="0" />
@@ -41,7 +41,7 @@
 		<description>Bowling / Micro Match</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1004</serial> -->
+		<info name="serial" value="MG1004" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bowling.bin" size="4096" crc="cca5836b" sha1="4ff1c4ffa46c543bbf48a519a4285b5d2c697ae3" offset="0" />
@@ -53,7 +53,7 @@
 		<description>Boxing</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1012</serial> -->
+		<info name="serial" value="MG1012" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="boxing.bin" size="4096" crc="7121f8b1" sha1="e7ae8571b496444ded77aaaa3c1d5f5ee97c651f" offset="0" />
@@ -65,7 +65,7 @@
 		<description>Brickdown / Shooting Gallery</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1005</serial> -->
+		<info name="serial" value="MG1005" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="brickdwn.bin" size="2048" crc="bc1f5b8b" sha1="3e2f1e93501cd0dd2c9b747c594b784360e5b175" offset="0" />
@@ -77,7 +77,7 @@
 		<description>Casino 1: Slots / Roulette / Keno</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1009</serial> -->
+		<info name="serial" value="MG1009" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="casino.bin" size="4096" crc="21d5f63f" sha1="fa34ebdb799ccd2bff9f63ce4189a4ee690706fa" offset="0" />
@@ -89,7 +89,7 @@
 		<description>Catena</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1001</serial> -->
+		<info name="serial" value="MG1001" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="catena.bin" size="2048" crc="6baad95f" sha1="b63ad3a60b59aad9b4605ff96f77839565144278" offset="0" />
@@ -101,7 +101,7 @@
 		<description>Catena (Alt)</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1002</serial> -->
+		<info name="serial" value="MG1002" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="catenaa.bin" size="2048" crc="5d03a812" sha1="29db4ca3c8b76c413b84b6d2bfd3499a70eccd3d" offset="0" />
@@ -113,7 +113,7 @@
 		<description>Hangman / Tic Tac Toe / Doodle</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1003</serial> -->
+		<info name="serial" value="MG1003" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="hangman.bin" size="4096" crc="e58a5d5b" sha1="205d659db0e0ab0292d33b5b4a9c2b46ca9d1dd5" offset="0" />
@@ -125,7 +125,7 @@
 		<description>Pinball / Dungeon Hunt / Blockout</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1011</serial> -->
+		<info name="serial" value="MG1011" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="pinball.bin" size="4096" crc="3f4b8c83" sha1="1f5bca6e96777ccbe830d1143a3549f51a3e386e" offset="0" />
@@ -137,7 +137,7 @@
 		<description>Space Destroyers</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1013</serial> -->
+		<info name="serial" value="MG1013" />
 <!--
 
 Space Destroyers has a 2K ROM, a 4K ROM, and 1K RAM.  Here's the memory address:
@@ -168,7 +168,7 @@ $9C00 to $9FFF 1k empty space (39936 to 40959)
 		<description>Ufo / Sea Monsters / Break It Down / Rebuild / Shoot</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
-		<!-- <serial>MG1010</serial> -->
+		<info name="serial" value="MG1010" />
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="ufo.bin" size="4096" crc="0504d667" sha1="6e33593f9e7a4551bc31b347741d9ff87ce618ca" offset="0" />
