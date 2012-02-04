@@ -58,7 +58,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "video/vic4567.h"
 #include "includes/cbm.h"
 #include "formats/cbm_snqk.h"
-#include "includes/c64.h"
+#include "includes/c64_legacy.h"
 #include "includes/c65.h"
 #include "machine/cbmiec.h"
 #include "machine/ram.h"

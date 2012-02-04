@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "includes/c128.h"
-#include "includes/c64.h"
+#include "includes/c64_legacy.h"
 #include "includes/cbm.h"
 #include "machine/cbmiec.h"
 #include "cpu/m6502/m6502.h"

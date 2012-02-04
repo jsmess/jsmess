@@ -14,7 +14,7 @@
 #ifndef __C128_H__
 #define __C128_H__
 
-#include "includes/c64.h"
+#include "includes/c64_legacy.h"
 #include "machine/6526cia.h"
 
 class c128_state : public legacy_c64_state
