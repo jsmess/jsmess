@@ -9,8 +9,21 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load at E000.EFFFR, enter at E000R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="6644780">
 				<rom name="apple1basic.wav" size="6644780" crc="cd5cf5a4" sha1="ef58e776683581ea6af869ee7775fc0d3ad577b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This version does seem to work better than the above, so we include it temporarily until we fix the subtle bug causing the parent not to be loaded properly -->
+	<software name="basica" cloneof="basic">
+		<description>Apple I Basic (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at E000.EFFFR, enter at E000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="3663918">
+				<rom name="apple1basic.wav" size="3663918" crc="1914635e" sha1="e5f112bec9236d42c3b5618df0d4607053b0078f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +34,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load at 300.0A00R, enter at 0300R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="3350056">
 				<rom name="lunar lander.wav" size="3350056" crc="3c87f6cd" sha1="de99cf33433e9b53b74920f3be258a4ce295ca2d" offset="0" />
 			</dataarea>
 		</part>
@@ -33,7 +46,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load at 300.03FFR, enter at 0300R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="1196032">
 				<rom name="mastermind.wav" size="1196032" crc="b44936a4" sha1="8acb9ee5fe7ee100620c2de5c95d50a7c69c881a" offset="0" />
 			</dataarea>
 		</part>
@@ -45,7 +58,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load at 1000.18FFR, enter at 1000R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="4052152">
 				<rom name="microchess.wav" size="4052152" crc="9b3ca487" sha1="2317cc4a7609ebaaf2ef9e23b5f11eda4d1fbf29" offset="0" />
 			</dataarea>
 		</part>
@@ -59,7 +72,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="5736772">
 				<rom name="aceyducey.wav" size="5736772" crc="793422b8" sha1="4e9c5610164efbae963e8b5988ff62f41a053020" offset="0" />
 			</dataarea>
 		</part>
@@ -71,7 +84,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="9179180">
 				<rom name="applei enhanced checkers.wav" size="9179180" crc="faed6233" sha1="a86f20520642ee9d3a174d6aad1a08080830284e" offset="0" />
 			</dataarea>
 		</part>
@@ -83,7 +96,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="5723176">
 				<rom name="blackjack.wav" size="5723176" crc="9486b37b" sha1="9de34b03c06a75f59bd5295ecc1a3c69858d61b9" offset="0" />
 			</dataarea>
 		</part>
@@ -95,7 +108,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="6837948">
 				<rom name="bowling.wav" size="6837948" crc="22383368" sha1="ef33153f66dc37f238c3fe646106742cdc86fa23" offset="0" />
 			</dataarea>
 		</part>
@@ -107,7 +120,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="6824368">
 				<rom name="buzzword.wav" size="6824368" crc="2c040f8e" sha1="5811e662672be7f3a0b757ec129e896c53da6d6d" offset="0" />
 			</dataarea>
 		</part>
@@ -119,7 +132,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="6867496">
 				<rom name="craps.wav" size="6867496" crc="d9675f54" sha1="f7d7f4b3672316b9b1a5bfb20e6209ffb65b8c3f" offset="0" />
 			</dataarea>
 		</part>
@@ -131,7 +144,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="18392504">
 				<rom name="deal or no deal.wav" size="18392504" crc="28ad3585" sha1="bf59a22794a755c711b429f6633135402cd12e36" offset="0" />
 			</dataarea>
 		</part>
@@ -143,7 +156,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="6953140">
 				<rom name="hamurabi.wav" size="6953140" crc="9760bd93" sha1="294b57fc0970ce0844dc615ff017ead11b1ebba1" offset="0" />
 			</dataarea>
 		</part>
@@ -155,7 +168,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="3067904">
 				<rom name="hilo.wav" size="3067904" crc="21024b5d" sha1="acc525e0a5cea33d1c4e77673045e94e2608c1ba" offset="0" />
 			</dataarea>
 		</part>
@@ -167,7 +180,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="6929500">
 				<rom name="slots.wav" size="6929500" crc="dd90caea" sha1="5b69702d45d7288f4d8b3e74fe39ed74235ad122" offset="0" />
 			</dataarea>
 		</part>
@@ -179,7 +192,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="11126828">
 				<rom name="startrek.wav" size="11126828" crc="42d7ff61" sha1="508d585d824e75f6ef77a818e238948187e3dc73" offset="0" />
 			</dataarea>
 		</part>
@@ -191,7 +204,7 @@
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="18338436">
 				<rom name="startrek2003.wav" size="18338436" crc="659d91a9" sha1="7754c0883a342f68023ebed198b27359dc602f56" offset="0" />
 			</dataarea>
 		</part>
@@ -203,7 +216,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="7294204">
 				<rom name="wordcross.wav" size="7294204" crc="1330687d" sha1="433587c369cc82dbc6ac6d4a35a36f9225df63aa" offset="0" />
 			</dataarea>
 		</part>
@@ -215,7 +228,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="4952">
+			<dataarea name="cass" size="3729408">
 				<rom name="wumpus.wav" size="3729408" crc="83cb19a5" sha1="cb3c98b1963a2688ccc8315d0f8866bf572743b9" offset="0" />
 			</dataarea>
 		</part>
