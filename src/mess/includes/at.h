@@ -29,6 +29,7 @@
 #include "video/isa_svga_s3.h"
 
 #include "machine/idectrl.h"
+#include "machine/isa_aha1542.h"
 #include "machine/at_keybc.h"
 #include "includes/ps2.h"
 
