@@ -71,7 +71,6 @@ private:
 public:
 		virtual UINT8 dack_r(int line);
 		virtual void dack_w(int line,UINT8 data);
-		virtual bool have_dack(int line);
 protected:
 		hard_disk_file *pc_hdc_file(int id);
 		void pc_hdc_result(int set_error_info);

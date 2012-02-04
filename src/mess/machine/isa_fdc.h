@@ -38,7 +38,6 @@ public:
 		virtual UINT8 dack_r(int line);
 		virtual void dack_w(int line,UINT8 data);
 		virtual void eop_w(int state);
-		virtual bool have_dack(int line);
 
 		int status_register_a;
 		int status_register_b;

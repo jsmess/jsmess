@@ -58,7 +58,6 @@ protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-        virtual bool have_dack(int line);
         virtual UINT8 dack_r(int line);
         virtual void dack_w(int line, UINT8 data);
         virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

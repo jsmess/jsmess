@@ -24,7 +24,6 @@ public:
 	void eop_w(int state);
 	UINT8 dack_r(int line);
 	void dack_w(int line, UINT8 data);
-	bool have_dack(int line);
 protected:
 	virtual void device_start();
 	virtual void device_reset();
