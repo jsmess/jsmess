@@ -7,7 +7,7 @@
 #ifndef C65_H_
 #define C65_H_
 
-#include "includes/c64.h"
+#include "includes/c64_legacy.h"
 #include "machine/6526cia.h"
 
 typedef struct

@@ -734,14 +734,14 @@ $(MESSOBJ)/cantab.a:			\
 	$(MESS_DRIVERS)/ace.o		\
 	$(MESS_FORMATS)/ace_ace.o	\
 
-$(MESSOBJ)/casio.a:			\
+$(MESSOBJ)/casio.a:				\
 	$(MESS_DRIVERS)/casloopy.o	\
 	$(MESS_DRIVERS)/cfx9850.o	\
-	$(MESS_DRIVERS)/fp1100.o        \
+	$(MESS_DRIVERS)/fp1100.o    \
 	$(MESS_DRIVERS)/pv1000.o	\
 	$(MESS_DRIVERS)/pv2000.o	\
 	$(MESS_DRIVERS)/pb1000.o	\
-	$(MESS_DRIVERS)/fp6000.o        \
+	$(MESS_DRIVERS)/fp6000.o    \
 	$(MESS_VIDEO)/hd44352.o		\
 
 $(MESSOBJ)/cbm.a:				\
@@ -749,13 +749,16 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/pet.o		\
 	$(MESS_MACHINE)/pet.o		\
 	$(MESS_DRIVERS)/c64.o		\
-	$(MESS_DRIVERS)/c64x.o		\
+	$(MESS_MACHINE)/c64.o		\
 	$(MESS_DRIVERS)/c64dtv.o	\
 	$(MESS_MACHINE)/c64exp.o	\
 	$(MESS_MACHINE)/c64user.o	\
 	$(MESS_MACHINE)/c64_std.o	\
 	$(MESS_MACHINE)/c64_xl80.o	\
 	$(MESS_MACHINE)/interpod.o	\
+	$(MESS_DRIVERS)/vic10.o		\
+	$(MESS_MACHINE)/vic10exp.o	\
+	$(MESS_MACHINE)/vic10std.o	\
 	$(MESS_DRIVERS)/vic20.o		\
 	$(MESS_MACHINE)/vic20exp.o	\
 	$(MESS_MACHINE)/vic20std.o	\
@@ -766,13 +769,15 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/vic1210.o	\
 	$(MESS_AUDIO)/ted7360.o		\
 	$(MESS_AUDIO)/t6721.o		\
-	$(MESS_MACHINE)/c16.o		\
 	$(MESS_DRIVERS)/c16.o		\
+	$(MESS_MACHINE)/c16.o		\
 	$(MESS_DRIVERS)/cbmb.o		\
 	$(MESS_MACHINE)/cbmb.o		\
 	$(MESS_VIDEO)/cbmb.o		\
 	$(MESS_DRIVERS)/c65.o		\
+	$(MESS_MACHINE)/c65.o		\
 	$(MESS_DRIVERS)/c128.o		\
+	$(MESS_MACHINE)/c128.o		\
 	$(MESS_MACHINE)/cbmiec.o	\
 	$(MESS_MACHINE)/c1541.o		\
 	$(MESS_MACHINE)/c1551.o		\
@@ -787,9 +792,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/clcd.o		\
 	$(MESS_MACHINE)/cbm.o		\
 	$(MESS_MACHINE)/cbmipt.o	\
-	$(MESS_MACHINE)/c64.o   	\
-	$(MESS_MACHINE)/c65.o		\
-	$(MESS_MACHINE)/c128.o		\
 	$(MESS_MACHINE)/64h156.o	\
 	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o		\

@@ -23,7 +23,7 @@
 #include "video/vic6567.h"
 
 #include "includes/cbm.h"
-#include "includes/c64.h"
+#include "includes/c64_legacy.h"
 
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"

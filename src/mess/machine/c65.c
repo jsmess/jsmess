@@ -9,7 +9,7 @@
 
 #include "includes/cbm.h"
 #include "includes/c65.h"
-#include "includes/c64.h"
+#include "includes/c64_legacy.h"
 #include "cpu/m6502/m4510.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"

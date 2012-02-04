@@ -188,7 +188,7 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 #include "machine/cbmiec.h"
 
 #include "includes/c128.h"
-#include "includes/c64.h"
+#include "includes/c64_legacy.h"
 
 
 /*************************************
