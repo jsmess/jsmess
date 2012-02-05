@@ -7,28 +7,28 @@
 
 **********************************************************************
 
-                    GND      1      A       GND
-                    +5V      2      B       _ROMH
-                    +5V      3      C       _RESET
-                    _IRQ     4      D       _NMI
-                    _CR/W    5      E       Sphi2
-                    DOTCLK   6      F       CA15
-                    _I/O1    7      H       CA14
-                    _GAME    8      J       CA13
-                    _EXROM   9      K       CA12
-                    _I/O2   10      L       CA11
-                    _ROML   11      M       CA10
-                    BA      12      N       CA9
-                    _DMA    13      P       CA8
-                    CD7     14      R       CA7
-                    CD6     15      S       CA6
-                    CD5     16      T       CA5
-                    CD4     17      U       CA4
-                    CD3     18      V       CA3
-                    CD2     19      W       CA2
-                    CD1     20      X       CA1
-                    CD0     21      Y       CA0
-                    GND     22      Z       GND
+                    GND       1      A       GND
+                    +5V       2      B       _ROMH
+                    +5V       3      C       _RESET
+                   _IRQ       4      D       _NMI
+                  _CR/W       5      E       Sphi2
+                 DOTCLK       6      F       CA15
+                  _I/O1       7      H       CA14
+                  _GAME       8      J       CA13
+                 _EXROM       9      K       CA12
+                  _I/O2      10      L       CA11
+                  _ROML      11      M       CA10
+                     BA      12      N       CA9
+                   _DMA      13      P       CA8
+                    CD7      14      R       CA7
+                    CD6      15      S       CA6
+                    CD5      16      T       CA5
+                    CD4      17      U       CA4
+                    CD3      18      V       CA3
+                    CD2      19      W       CA2
+                    CD1      20      X       CA1
+                    CD0      21      Y       CA0
+                    GND      22      Z       GND
 
 **********************************************************************/
 
