@@ -2,7 +2,7 @@
 
 	TODO:
 	
-	- PLA dump (http://www.zimmers.net/cbmpics/cbm/c64/pla.txt)
+	- 64C PLA dump
 	- cartridge loading
 
 */
@@ -57,66 +57,17 @@ void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, in
 	int game = m_exp->game_r();
 	int exrom = m_exp->exrom_r();
 
-	*romh = (m_hiram & A15 & !A14 & A13 & !aec & rw & !exrom & !game 
-			|| A15 & A14 & A13 & !aec & exrom & !game 
-			|| aec & exrom & !game & VA13 & VA12);
-
-	*roml = (m_loram & m_hiram & A15 & !A14 & !A13 & !aec & rw & !exrom 
-			|| A15 & !A14 & !A13 & !aec & exrom & !game);
-
-	*io = (m_hiram & m_charen & A15 & A14 & !A13 & A12 & ba & !aec & rw & game 
-			|| m_hiram & m_charen & A15 & A14 & !A13 & A12 & !aec & !rw & game 
-			|| m_loram & m_charen & A15 & A14 & !A13 & A12 & ba & !aec & rw & game 
-			|| m_loram & m_charen & A15 & A14 & !A13 & A12 & !aec & !rw & game 
-			|| m_hiram & m_charen & A15 & A14 & !A13 & A12 & ba & !aec & rw & !exrom & !game 
-			|| m_hiram & m_charen & A15 & A14 & !A13 & A12 & !aec & !rw & !exrom & !game 
-			|| m_loram & m_charen & A15 & A14 & !A13 & A12 & ba & !aec & rw & !exrom & !game 
-			|| m_loram & m_charen & A15 & A14 & !A13 & A12 & !aec & !rw & !exrom & !game 
-			|| A15 & A14 & !A13 & A12 & ba & !aec & rw & exrom & !game 
-			|| A15 & A14 & !A13 & A12 & !aec & !rw & exrom & !game);
-
-	*grw = (!cas & A15 & A14 & !A13 & A12 &	!aec & !rw);
+	UINT16 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 | A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
+	UINT8 data = m_pla->read(input);
 	
-	*charom = (m_hiram & !m_charen & A15 & A14 & !A13 & A12 & !aec & rw & game 
-			|| m_loram & !m_charen & A15 & A14 & !A13 & A12 & !aec & rw & game 
-			|| m_hiram & !m_charen & A15 & A14 & !A13 & A12 & !aec & rw & !exrom & !game 
-			|| m_va14 & aec & game & !VA13 & VA12 
-			|| m_va14 & aec & !exrom & !game & !VA13 & VA12);				   
-
-	*kernal = (m_hiram & A15 & A14 & A13 & !aec & rw & game 
-			|| m_hiram & A15 & A14 & A13 & !aec & rw & !exrom & !game);
-			   
-	*basic = (m_loram & m_hiram & A15 & !A14 & A13 & !aec & rw & game);
-
-	*casram = !(m_loram & m_hiram & A15 & !A14 & A13 & !aec & rw & game 
-			|| m_hiram & A15 & A14 & A13 & !aec & rw & game 
-			|| m_hiram & A15 & A14 & A13 & !aec & rw & !exrom & !game 
-			|| m_hiram & !m_charen & A15 & A14 & !A13 & A12 & !aec & rw & game 
-			|| m_loram & !m_charen & A15 & A14 & !A13 & A12 & !aec & rw & game 
-			|| m_hiram & !m_charen & A15 & A14 & !A13 & A12 & !aec & rw & !exrom & !game 
-			|| m_va14 & aec & game & !VA13 & VA12 
-			|| m_va14 & aec & !exrom & !game & !VA13 & VA12 
-			|| m_hiram & m_charen & A15 & A14 & !A13 & A12 & ba & !aec & rw & game 
-			|| m_hiram & m_charen & A15 & A14 & !A13 & A12 & !aec & !rw & game 
-			|| m_loram & m_charen & A15 & A14 & !A13 & A12 & ba & !aec & rw & game 
-			|| m_loram & m_charen & A15 & A14 & !A13 & A12 & !aec & !rw & game 
-			|| m_hiram & m_charen & A15 & A14 & !A13 & A12 & ba & !aec & rw & !exrom & !game 
-			|| m_hiram & m_charen & A15 & A14 & !A13 & A12 & !aec & !rw & !exrom & !game 
-			|| m_loram & m_charen & A15 & A14 & !A13 & A12 & ba & !aec & rw & !exrom & !game 
-			|| m_loram & m_charen & A15 & A14 & !A13 & A12 & !aec & !rw & !exrom & !game 
-			|| A15 & A14 & !A13 & A12 & ba & !aec & rw & exrom & !game 
-			|| A15 & A14 & !A13 & A12 & !aec & !rw & exrom & !game 
-			|| m_loram & m_hiram & A15 & !A14 & !A13 & !aec & rw & !exrom 
-			|| A15 & !A14 & !A13 & !aec & exrom & !game 
-			|| m_hiram & A15 & !A14 & A13 & !aec & rw & !exrom & !game 
-			|| A15 & A14 & A13 & !aec & exrom & !game 
-			|| aec & exrom & !game & VA13 & VA12 
-			|| !A15 & !A14 & A12 & exrom & !game 
-			|| !A15 & !A14 & A13 & exrom & !game 
-			|| !A15 & A14 & exrom & !game 
-			|| A15 & !A14 & A13 & exrom & !game 
-			|| A15 & A14 & !A13 & !A12 & exrom & !game 
-			|| cas);
+	*casram = BIT(data, 0);
+	*basic = BIT(data, 1);
+	*kernal = BIT(data, 2);
+	*charom = BIT(data, 3);
+	*grw = BIT(data, 4);
+	*io = BIT(data, 5);
+	*roml = BIT(data, 6);
+	*romh = BIT(data, 7);
 }
 
 
@@ -128,23 +79,23 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 {
 	UINT8 data = 0;
 	
-	if (casram)
+	if (!casram)
 	{
 		data = m_ram->pointer()[offset];
 	}
-	else if (basic)
+	else if (!basic)
 	{
 		data = m_basic[offset & 0x1fff];
 	}
-	else if (kernal)
+	else if (!kernal)
 	{
 		data = m_kernal[offset & 0x1fff];
 	}
-	else if (charom)
+	else if (!charom)
 	{
 		data = m_charom[offset & 0xfff];
 	}
-	else if (io)
+	else if (!io)
 	{
 		switch ((offset >> 10) & 0x03)
 		{
@@ -187,11 +138,11 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 			break;
 		}
 	}
-	else if (roml)
+	else if (!roml)
 	{
 		data = m_exp->roml_r(space, offset);
 	}
-	else if (romh)
+	else if (!romh)
 	{
 		data = m_exp->romh_r(space, offset);
 	}
@@ -224,11 +175,11 @@ WRITE8_MEMBER( c64_state::write )
 	
 	bankswitch(offset, 0, 0, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
-	if (casram)
+	if (!casram)
 	{
 		m_ram->pointer()[offset] = data;
 	}
-	else if (io)
+	else if (!io)
 	{
 		switch ((offset >> 10) & 0x03)
 		{
@@ -241,7 +192,7 @@ WRITE8_MEMBER( c64_state::write )
 			break;
 
 		case 2: // COLOR
-			if (grw) m_color_ram[offset & 0x3ff] = 0xf0 | data;
+			if (!grw) m_color_ram[offset & 0x3ff] = 0xf0 | data;
 			break;
 
 		case 3: // CIAS
@@ -1136,6 +1087,7 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1200,6 +1152,7 @@ static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1258,6 +1211,7 @@ static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1316,6 +1270,7 @@ static MACHINE_CONFIG_START( ntsc_c, c64c_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6567_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6567_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1371,6 +1326,7 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1426,6 +1382,7 @@ static MACHINE_CONFIG_START( pal_sx, sx64_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1484,6 +1441,7 @@ static MACHINE_CONFIG_START( pal_c, c64c_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -1539,6 +1497,7 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
 	MCFG_CBM_IEC_BUS_ADD(iec_intf)
@@ -1582,8 +1541,8 @@ ROM_START( c64n )
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
 	
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "906114-01.u17", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 
@@ -1601,8 +1560,8 @@ ROM_START( c64j )
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "906143-02.u5", 0x0000, 0x1000, CRC(1604f6c1) SHA1(0fad19dbcdb12461c99657b2979dbb5c2e47b527) )
 	
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "906114-01.u17", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 
@@ -1630,8 +1589,8 @@ ROM_START( c64sw )
 	ROM_SYSTEM_BIOS( 1, "alt", "Swedish Characters (Alt)" )
 	ROMX_LOAD( "charswe2.u5", 0x0000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac), ROM_BIOS(2) )
 	
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "906114-01.u17", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 
@@ -1649,8 +1608,8 @@ ROM_START( pet64 )
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
 	
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "906114-01.u17", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 
@@ -1680,8 +1639,8 @@ ROM_START( sx64n )
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.ud1", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
 
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "906114-01.ue4", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.ue4", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 
@@ -1706,8 +1665,8 @@ ROM_START( vip64 )
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "charswe.ud1", 0x0000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a) )
 
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "906114-01.ue4", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.ue4", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 
@@ -1730,8 +1689,8 @@ ROM_START( c64cn )
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
 
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "252715-01.u8", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "252715-01.u8", 0x00, 0xf5, BAD_DUMP CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 
@@ -1760,8 +1719,8 @@ ROM_START( c64csw )
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "cbm 64 skand.gen.u5", 0x0000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac) )
 
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "252715-01.u8", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "252715-01.u8", 0x00, 0xf5, BAD_DUMP CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 
@@ -1776,8 +1735,8 @@ ROM_START( c64gs )
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
 
-	ROM_REGION( 0x100, "pla", 0 )
-	ROM_LOAD( "252715-01.u8", 0x000, 0x100, NO_DUMP )
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "252715-01.u8", 0x00, 0xf5, BAD_DUMP CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
 
 

@@ -13,6 +13,7 @@
 #include "machine/c64user.h"
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
+#include "machine/pls100.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
 #include "sound/sid6581.h"
@@ -24,6 +25,7 @@
 #define MOS6851_TAG		"u18"
 #define MOS6526_1_TAG	"u1"
 #define MOS6526_2_TAG	"u2"
+#define PLA_TAG			"u17"
 #define SCREEN_TAG		"screen"
 #define TIMER_C1531_TAG	"c1531"
 
@@ -33,6 +35,7 @@ public:
 	c64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, M6510_TAG),
+		  m_pla(*this, PLA_TAG),
 		  m_vic(*this, MOS6569_TAG),
 		  m_sid(*this, MOS6851_TAG),
 		  m_cia1(*this, MOS6526_1_TAG),
@@ -56,6 +59,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<pls100_device> m_pla;
 	required_device<device_t> m_vic;
 	required_device<device_t> m_sid;
 	required_device<mos6526_device> m_cia1;
