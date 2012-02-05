@@ -62,8 +62,65 @@ $E000-$EFFF:    Extra RAM space available for a program in an 8 KB system
                 modified to use cassette BASIC
                 (The system simulated here always includes this RAM.)
 
+If you wanted to load the BASIC as rom, here are the details:
+ROM_LOAD("basic.bin", 0xE000, 0x1000, CRC(d5e86efc) SHA1(04269c1c66e7d5b4aa5035462c6e612bf2ae9b91) )
+
+
 $F000-$FFFF:    ROM address space
     $FF00-$FFFF:    Apple Monitor ROM
+
+
+How to use cassettes:
+The system has no error checking or checksums, and the cassette
+has no header.
+Therefore, you must know the details, and pass these to the
+interface yourself.
+BASIC has no cassette handling. You must enter the monitor
+with: CALL -151
+then when finished, re-enter BASIC with: E2B3R
+
+
+Examples:
+
+A machine-language program will typically be like this:
+C100R    (enter the interface)
+0300.0FFFR  (enter the load and end addresses, then load the tape)
+You start the tape.
+When the prompt returns you stop the tape.
+0300R  (run your program)
+
+
+To Load Tape Basic:
+C100R
+E000.EFFFR
+You start the tape.
+When the prompt returns you stop the tape.
+E000R  (It must say 4C - if not, your tape is no good).
+The BASIC prompt will appear
+>@
+
+
+A BASIC program is split into two areas, one for the scratch pad,
+and one for the program proper.
+In BASIC you may have to adjust the allowed memory area, such as
+LOMEM = 768
+Then, go to the monitor: CALL -151
+C100R    (enter the interface)
+00A4.00FFR 0300.0FFFR   (load the 2 parts)
+You start the tape.
+When the prompt returns you stop the tape.
+E2B3R    (back to BASIC)
+You can LIST or RUN now.
+
+
+Saving is almost the same, when you specify the address range, enter
+W instead of R. The difficulty is finding out how long your program is.
+
+Insert a blank tape
+C100R
+0300.0FFFW
+Quickly press Record.
+When the prompt returns, press Stop.
 
 **********************************************************************/
 

@@ -48,7 +48,6 @@
 #include "includes/apple1.h"
 #include "machine/6821pia.h"
 #include "cpu/m6502/m6502.h"
-#include "image.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 
