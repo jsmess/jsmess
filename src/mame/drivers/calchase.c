@@ -5,8 +5,10 @@ California Chase (c) 1999 The Game Room
 preliminary driver by Angelo Salese & Grull Osgo
 
 TODO:
-- Fix CPU core bugs;
 - get Win 98 to boot;
+- Various graphics bugs (title screen uses ROZ?);
+- fix 129 Hz refresh rate bug;
+- inputs (is there a service mode?)
 
 I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
 46E8    ----    8514/A and compatible video cards (e.g. ATI Graphics Ultra)
@@ -16,11 +18,6 @@ I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
 83C6-83C9 ----  Compaq Qvision EISA - DAC color registers
 
 43c4 is a 83c4 mirror?
-
-04D0-04D1 ---- EISA IRQ control
-00F0-00F5 ----  PCjr Disk Controller
-(or)
-00F0-00FF ----  coprocessor (8087..80387)
 
 =====================================================================================
 
@@ -124,14 +121,16 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
-
+#include "sound/dac.h"
 
 
 class calchase_state : public driver_device
 {
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+		  { }
 
 	UINT32 *m_bios_ram;
 	int m_dma_channel;
@@ -145,6 +144,9 @@ public:
 	device_t	*m_pic8259_2;
 	device_t	*m_dma8237_1;
 	device_t	*m_dma8237_2;
+
+	UINT32 m_idle_skip_ram;
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -377,6 +379,10 @@ static void intel82439tx_init(running_machine &machine)
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
+
+	if(reg == 0)
+		return 0x05851106; // VT82C585VPX, VIA
+
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= mxtc_config_r(busdevice, device, function, reg + 3) << 24;
@@ -436,6 +442,10 @@ static void piix4_config_w(device_t *busdevice, device_t *device, int function, 
 static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
+
+	if(reg == 0)
+		return 0x30401106; // VT82C586B, VIA
+
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
@@ -485,18 +495,62 @@ static WRITE32_HANDLER(bios_ram_w)
 	}
 }
 
+static READ16_HANDLER( calchase_iocard1_r )
+{
+	return input_port_read(space->machine(), "IOCARD1");
+}
+
+static READ16_HANDLER( calchase_iocard2_r )
+{
+	return input_port_read(space->machine(), "IOCARD2");
+}
+
+static READ16_HANDLER( calchase_iocard3_r )
+{
+	return input_port_read(space->machine(), "IOCARD3");
+}
+
+/* These two controls wheel pot or whatever this game uses ... */
+static READ16_HANDLER( calchase_iocard4_r )
+{
+	return input_port_read(space->machine(), "IOCARD4");
+}
+
+static READ16_HANDLER( calchase_iocard5_r )
+{
+	return input_port_read(space->machine(), "IOCARD5");
+}
+
+
+static WRITE16_DEVICE_HANDLER( calchase_dac_w )
+{
+	dac_data_16_w(device, ((data & 0xfff) << 4));
+}
+
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000c8000, 0x000dffff) AM_NOP
+	AM_RANGE(0x000c8000, 0x000cffff) AM_NOP
+	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
+	AM_RANGE(0x000d0004, 0x000d0007) AM_READ16(calchase_iocard1_r, 0x0000ffff)
+	AM_RANGE(0x000d000c, 0x000d000f) AM_READ16(calchase_iocard2_r, 0x0000ffff)
+	AM_RANGE(0x000d0030, 0x000d0033) AM_READ16(calchase_iocard3_r, 0xffff0000)
+	AM_RANGE(0x000d0030, 0x000d0033) AM_READ16(calchase_iocard4_r, 0x0000ffff)
+	AM_RANGE(0x000d0034, 0x000d0037) AM_READ16(calchase_iocard5_r, 0x0000ffff)
+	AM_RANGE(0x000d0008, 0x000d000b) AM_WRITENOP // ???
+	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("dac_l",calchase_dac_w,0x0000ffff)
+	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("dac_r",calchase_dac_w,0x0000ffff)
+	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
+	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM
-	AM_RANGE(0x04000000, 0x28ffffff) AM_NOP
+	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
+	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
 	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
 	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
 	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
@@ -552,23 +606,30 @@ ADDRESS_MAP_END
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
 
-#if 0
+
+
+#if 1
 static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
 	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 
 	PORT_START("pc_keyboard_1")
+	AT_KEYB_HELPER( 0x0010, "T",            KEYCODE_T           ) /* T                           14  94 */
 	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
+	AT_KEYB_HELPER( 0x0100, "O",            KEYCODE_O           ) /* O                           18  98 */
 	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
 
 	PORT_START("pc_keyboard_2")
 
 	PORT_START("pc_keyboard_3")
+	AT_KEYB_HELPER( 0x0001, "B",            KEYCODE_B           ) /* B                           30  B0 */
 	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
 	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
+//	AT_KEYB_HELPER( 0x8000, "F5",           KEYCODE_F5          )
 
 	PORT_START("pc_keyboard_4")
+//	AT_KEYB_HELPER( 0x0004, "F8",           KEYCODE_F8          )
 
 	PORT_START("pc_keyboard_5")
 
@@ -576,12 +637,151 @@ static INPUT_PORTS_START( calchase )
 	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
 	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
 	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",	KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",		KEYCODE_RIGHT       ) /* Right                       6a  ea */
 	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
 	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",      		    KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x4000, "Del",      		    	KEYCODE_A           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
+
+	PORT_START("IOCARD1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x0008, 0x0008, "1" )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Accelerator")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IOCARD2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // guess
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset SW")
+	PORT_DIPNAME( 0x0004, 0x0004, "2" )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Turbo")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // returns back to MS-DOS (likely to be unmapped and actually used as a lame protection check)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IOCARD3")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IOCARD4")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_START("IOCARD5")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 #endif
 
@@ -619,8 +819,7 @@ static WRITE_LINE_DEVICE_HANDLER( calchase_pic8259_1_set_int_line )
 static READ8_DEVICE_HANDLER( get_slave_ack )
 {
 	calchase_state *state = device->machine().driver_data<calchase_state>();
-	if (offset==2) { // IRQ = 2
-		logerror("pic8259_slave_ACK!\n");
+	if (offset==2) {
 		return pic8259_acknowledge(state->m_pic8259_2);
 	}
 	return 0x00;
@@ -708,7 +907,6 @@ static void calchase_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-
 static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
@@ -731,7 +929,34 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	MCFG_SOUND_ADD("dac_l", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
+
+	MCFG_SOUND_ADD("dac_r", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
+
 MACHINE_CONFIG_END
+
+
+static READ32_HANDLER( calchase_idle_skip_r )
+{
+	calchase_state *state = space->machine().driver_data<calchase_state>();
+
+	if(cpu_get_pc(&space->device())==0x1406f48)
+		device_spin_until_interrupt(state->m_maincpu);
+
+	return state->m_idle_skip_ram;
+}
+
+static WRITE32_HANDLER( calchase_idle_skip_w )
+{
+	calchase_state *state = space->machine().driver_data<calchase_state>();
+
+	COMBINE_DATA(&state->m_idle_skip_ram);
+}
 
 static DRIVER_INIT( calchase )
 {
@@ -740,14 +965,14 @@ static DRIVER_INIT( calchase )
 
 	pc_vga_init(machine, vga_setting, NULL);
 	pc_svga_trident_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
-
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);
 
 	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
-}
 
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x3f0b160, 0x3f0b163, FUNC(calchase_idle_skip_r), FUNC(calchase_idle_skip_w));
+}
 
 ROM_START( calchase )
 	ROM_REGION( 0x40000, "bios", 0 )
@@ -764,5 +989,4 @@ ROM_START( calchase )
 	DISK_IMAGE_READONLY( "calchase", 0,SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
-
-GAME( 1999, calchase,  0,    calchase, pc_keyboard,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, calchase,  0,    calchase, calchase,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
