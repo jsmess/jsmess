@@ -53,7 +53,7 @@
 
     All NC pins are unknown, maybe some are  "test" pins.
 
-    All non PCM writes are made through address 0x3600 on the upD7801
+    All writes are made through address 0x3600 on the upD7801
     Instead of using register=value, this chip require sending multiple
     bytes for each command, one after the other.
 
@@ -66,7 +66,6 @@
 #define LOG 0
 
 #define MAX_PACKET_SIZE 0x8000
-
 
 /*
   Each of the 8 waveforms have been sampled at 192Khz using period 0xFF,
@@ -87,9 +86,37 @@ const char WAVEFORMS[8][32]={
 { -84,-121,-128,-105, -51,   7,  38,  66,  93,  97,  93,   88,  89,  96, 102, 111, 116, 118, 118, 119, 118, 118, 117, 117, 118, 118, 117, 117, 117, 115,  85, -14}
 };
 
+
+
+#define NOISE_SIZE 255
+
+
+ static unsigned char noise_tbl[]=
+ {
+  0x1c,0x86,0x8a,0x8f,0x98,0xa1,0xad,0xbe,0xd9,0x8a,0x66,0x4d,0x40,0x33,0x2b,0x23,
+  0x1e,0x8a,0x90,0x97,0xa4,0xae,0xb8,0xd6,0xec,0xe9,0x69,0x4a,0x3e,0x34,0x2d,0x27,
+  0x24,0x24,0x89,0x8e,0x93,0x9c,0xa5,0xb0,0xc1,0xdd,0x40,0x36,0x30,0x29,0x27,0x24,
+  0x8b,0x90,0x96,0x9e,0xa7,0xb3,0xc4,0xe1,0x25,0x21,0x8a,0x8f,0x93,0x9d,0xa5,0xb2,
+  0xc2,0xdd,0xdd,0x98,0xa2,0xaf,0xbf,0xd8,0xfd,0x65,0x4a,0x3c,0x31,0x2b,0x24,0x22,
+  0x1e,0x87,0x8c,0x91,0x9a,0xa3,0xaf,0xc0,0xdb,0xbe,0xd9,0x8c,0x66,0x4d,0x40,0x34,
+  0x2c,0x24,0x1f,0x88,0x90,0x9a,0xa4,0xb2,0xc2,0xda,0xff,0x67,0x4d,0x3d,0x34,0x2d,
+  0x26,0x24,0x20,0x89,0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xde,0xc1,0xda,0xff,0x67,0x4d,
+  0x3d,0x33,0x2d,0x26,0x24,0x20,0x89,0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xdd,0xa3,0xb0,
+  0xc0,0xd9,0xfe,0x66,0x4b,0x3c,0x32,0x2b,0x24,0x23,0x1e,0x88,0x8d,0x92,0x9b,0xa4,
+  0xb0,0xc1,0xdc,0xad,0xbe,0xda,0x22,0x20,0x1c,0x85,0x8a,0x8f,0x98,0xa1,0xad,0xbe,
+  0xda,0x20,0x1b,0x85,0x8d,0x97,0xa1,0xaf,0xbf,0xd8,0xfd,0x64,0x49,0x3a,0x30,0x2a,
+  0x23,0x21,0x1d,0x86,0x8b,0x91,0x9a,0xa2,0xae,0xc0,0xdb,0x33,0x2b,0x24,0x1f,0x88,
+  0x90,0x9a,0xa4,0xb2,0xc2,0xda,0xff,0x67,0x4c,0x3e,0x33,0x2d,0x25,0x24,0x1f,0x89,
+  0x8e,0x93,0x9c,0xa5,0xb1,0xc2,0xde,0x85,0x8e,0x98,0xa2,0xb0,0xc0,0xd9,0xfe,0x64,
+  0x4b,0x3b,0x31,0x2a,0x23,0x22,0x1e,0x88,0x8c,0x91,0x9b,0xa3,0xaf,0xc1,0xdc,0xdc
+  };
+
+
+
 #define STATE_SILENCE 0
 #define STATE_NOISE   1
 #define STATE_TONE    2
+#define STATE_ADPCM   3
 
 typedef struct _upd1771_state upd1771_state;
 struct _upd1771_state
@@ -113,13 +140,18 @@ struct _upd1771_state
     UINT8    t_tpos;//timber pos
     UINT16   t_ppos;//period pos
 
-    //TODO noise wavetable LFSR
+    //noise wavetable LFSR
+    UINT8    nw_timbre; //[0;  7]
+    UINT8    nw_volume; //[0; 31]
+    UINT32   nw_period;
+    UINT32   nw_tpos;   //timber pos
+    UINT32   nw_ppos;   //period pos
 
+    //noise pulse components
     UINT8    n_value[3];  //[0;1]
     UINT16   n_volume[3]; //[0; 31]
     UINT32   n_period[3];
     UINT32   n_ppos[3];   //period pos
-
 };
 
 
@@ -159,7 +191,38 @@ Byte3: 0b???VVVVV
    of bit cropping/rounding.
 */
 
+/*
+*************NOISE*****************
+Noise consists on 4 different components
+A weird Wavetable LFSR (for lack of a better term),
+and three independent (but equal) low frequency
+50/50 pulse wavs.
 
+The 4 components are mixed in a mysterious way,
+a weird ORing with volume having a huge effect.
+
+Byte0: 0x01
+
+Byte1: 0bTTTOOOOO
+  MSB 3 bits of LFSR Timbre (8 wavetables)
+  LSB 5 bits ?????????
+
+Byte2: 0bPPPPPPPP
+  8bits of clock divider/period
+
+Byte3: 0b???VVVVV
+   MSB 3 bits unknown
+   LSB 5 bits of "Volume"
+
+
+Byte4: 0bPPPPPPPP  Low Freq0 period(if not 0 this peridically resets the  Wavetable LFSR)
+Byte5: 0bPPPPPPPP  Low Freq1 period(if not 0 this peridically resets the  Wavetable LFSR)
+Byte6: 0bPPPPPPPP  Low Freq2 period(if not 0 this peridically resets the  Wavetable LFSR)
+
+Byte7: 0b???VVVVV  Low Freq0 volume
+Byte8: 0b???VVVVV  Low Freq1 volume
+Byte9: 0b???VVVVV  Low Freq2 volume
+*/
 
 WRITE8_DEVICE_HANDLER( upd1771_w )
 {
@@ -192,10 +255,14 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
                 state->state = STATE_NOISE;
                 state->index = 0;
 
+                state->nw_timbre = (state->packet[1] & 0xE0) >> 5;
+                state->nw_period =  ((UINT32)state->packet[2]+1)<<7;
+                state->nw_volume =  state->packet[3] & 0x1f;
+
                 //very long clocked periods.. used for engine drones
-                state->n_period[0] = (((UINT32)state->packet[4])+1)*128;
-                state->n_period[1] = (((UINT32)state->packet[5])+1)*128;
-                state->n_period[2] = (((UINT32)state->packet[6])+1)*128;
+                state->n_period[0] = (((UINT32)state->packet[4])+1)<<7;
+                state->n_period[1] = (((UINT32)state->packet[5])+1)<<7;
+                state->n_period[2] = (((UINT32)state->packet[6])+1)<<7;
 
                 state->n_volume[0] = state->packet[7]& 0x1f;
                 state->n_volume[1] = state->packet[8]& 0x1f;
@@ -237,6 +304,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
                 //TODO play capture!
 				state->index = 0;
 				state->packet[0]=0;
+                state->state = STATE_ADPCM;
 			}
 			else
 				state->timer->adjust( attotime::from_ticks( 512, device->clock() ) );
@@ -245,6 +313,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 
         //garbage: wipe stack
         default:
+            state->state = STATE_SILENCE;
 			state->index = 0;
         break;
     }
@@ -298,12 +367,23 @@ static STREAM_UPDATE( upd1771c_update )
             while (--samples >= 0 ){
 
                 *buffer = 0;
-                //TODO implement "wavetable-LFSR" component
+
+                //"wavetable-LFSR" component
+                int wlfsr_val = ((int)noise_tbl[state->nw_tpos])-127;//data too wide
+
+                state->nw_ppos++;
+                if (state->nw_ppos >= state->nw_period){
+                    state->nw_tpos++;
+                    if (state->nw_tpos == NOISE_SIZE)
+                       state->nw_tpos = 0;
+                   state->nw_ppos = 0;
+                }
+
                 //mix in each of the noise's 3 pulse components
                 char res[3];
                 for (size_t i=0;i<3;++i){
 
-                      res[i] = state->n_value[i];
+                    res[i] = state->n_value[i]* 127;
                     state->n_ppos[i]++;
                     if (state->n_ppos[i] >= state->n_period[i]){
                         state->n_ppos[i] = 0;
@@ -311,7 +391,12 @@ static STREAM_UPDATE( upd1771c_update )
                     }
                 }
                 //not quite, but close.
-                *buffer+= ((res[0]*state->n_volume[0]) | (res[1]*state->n_volume[1]) | (res[2]*state->n_volume[2])) * 127;
+                *buffer+= (
+					       (wlfsr_val*state->nw_volume) |
+					       (res[0]*state->n_volume[0]) |
+                           (res[1]*state->n_volume[1]) |
+                           (res[2]*state->n_volume[2])
+                           ) ;
 
                 buffer++;
             }
@@ -396,3 +481,4 @@ DEVICE_GET_INFO( upd1771c )
 }
 
 DEFINE_LEGACY_SOUND_DEVICE(UPD1771C, upd1771c);
+
