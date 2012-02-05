@@ -881,7 +881,7 @@ ROM_START( nextnt ) // 68040 non-turbo
 	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(B815B6A4) SHA1(97D8B09D03616E1487E69D26609487486DB28090), ROM_BIOS(5)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
 
 	ROM_REGION( 0x20, "rtc", 0 )
-	ROM_LOAD( "nvram.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
+	ROM_LOAD( "nvram-nt.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
 ROM_END
 
 ROM_START( nexttrb ) // 68040 turbo
