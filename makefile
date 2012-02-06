@@ -494,6 +494,9 @@ CONLYFLAGS += \
 COBJFLAGS += \
 	-Wpointer-arith 
 
+# warnings only applicable to C++ compiles
+CPPONLYFLAGS += \
+	-Woverloaded-virtual
 
 
 #-------------------------------------------------
@@ -636,7 +639,8 @@ default: maketree buildtools emulator
 
 all: default tools
 
-FLAC_LIB = $(OBJ)/libflac.a $(OBJ)/libflac++.a
+FLAC_LIB = $(OBJ)/libflac.a 
+# $(OBJ)/libflac++.a
 
 
 #-------------------------------------------------
