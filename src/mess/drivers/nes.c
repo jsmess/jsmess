@@ -449,7 +449,7 @@ static const floppy_interface nes_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(nes_only),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -548,6 +548,7 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_CARTSLOT_PARTIALHASH(nes_partialhash)
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","famicom_flop")
 MACHINE_CONFIG_END
 
 
