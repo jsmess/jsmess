@@ -19,7 +19,7 @@
                     F7  10 |             | 19  _CE
                     F6  11 |             | 18  F0
                     F5  12 |             | 17  F1
-                    F4  13 |             | 16  F2
+                    F4  13 |             | PAL_OUTPUTS  F2
                    GND  14 |_____________| 15  F3
 
 **********************************************************************/
@@ -76,7 +76,7 @@ private:
 	inline void parse_fusemap();
 	inline int get_product(int term);
 	inline void update_outputs();
-	
+
 	UINT16 m_i;
 	UINT8 m_s;
 	UINT16 m_and_true[PAL_TERMS];
