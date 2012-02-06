@@ -109,7 +109,7 @@ static void cirrus_update_32bpp(running_machine &machine, bitmap_rgb32 &bitmap, 
 
 
 static void cirrus_choosevideomode(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *sequencer,
-	const UINT8 *crtc, const UINT8 *gc, int *width, int *height)
+	const UINT8 *crtc, int *width, int *height)
 {
 	if ((sequencer[0x06] == 0x12) && (sequencer[0x07] & 0x01))
 	{
