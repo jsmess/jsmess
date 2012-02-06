@@ -1570,7 +1570,13 @@ static READ8_HANDLER( nes_fds_r )
 			if (state->m_fds_data == NULL)
 				ret = 0;
 			else if (state->m_fds_current_side)
+			{
+				// a bunch of games (e.g. bshashsc and fairypin) keep reading beyond the last track
+				// what is the expected behavior?
+				if (state->m_fds_head_position > 65500)
+					state->m_fds_head_position = 0;
 				ret = state->m_fds_data[(state->m_fds_current_side - 1) * 65500 + state->m_fds_head_position++];
+			}
 			else
 				ret = 0;
 			break;

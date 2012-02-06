@@ -330,6 +330,18 @@
 		</part>
 	</software>
 
+	<software name="alibaba" supported="no">
+		<description>Alibaba and 40 Thieves (Kor)</description>
+		<year>1989</year>
+		<publisher>HiCom</publisher>
+        <info name="alt_title" value="아리바바"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="alibaba and 40 thieves (kr).sms" size="32768" crc="08bf3de3" sha1="bd177dd3bc7f3175bd89458535222ac87022a318" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alien3">
 		<description>Alien³ (Euro, Bra)</description>
 		<year>1992</year>
@@ -836,6 +848,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="blade eagle (world) (beta).bin" size="262144" crc="58d5fc48" sha1="9cdfda85b4fa4e689617d8bcbdd6478b19d215ca" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockhol" supported="no">
+		<description>Block Hole (Kor)</description>
+		<year>1990</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="사각의 비밀 (Sagak-ui Bimil)" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="block hole (kr).sms" size="32768" crc="643b6b76" sha1="8d85391d2e6291a2463af0b997c86512d4fc1024" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1705,6 +1729,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="dynamite headdy (brazil).bin" size="524288" crc="7db5b0fa" sha1="12877c1c9bfba6462606717cf0a94f700ac970e4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exainnov">
+		<description>E.I. - Exa Innova (Kor)</description>
+		<year>19??</year>
+		<publisher>HiCom</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="e.i. - exa innova (kr).sms" size="32768" crc="dd74bcf1" sha1="f2b00dc0c0e44d926d05cc62f2c64db2348a3358" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2628,6 +2663,17 @@
 		</part>
 	</software>
 
+	<software name="greatglk" cloneof="greatglj">
+		<description>Great Golf (Kor)</description>
+		<year>19??</year>
+		<publisher>Samsung?</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="great golf [jp] (kr).sms" size="131072" crc="5def1bf5" sha1="89fe28e6e4402a3e0bf0f05eada03c92cee5a5e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Notes: FM support, in Japan only 1000 copies were manufactured as a prize for a contest-->
 	<software name="greatice">
 		<description>Great Ice Hockey (Jpn, USA)</description>
@@ -3120,6 +3166,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="king's quest - quest for the crown (usa) (beta).bin" size="131072" crc="b7fe0a9d" sha1="1b6330199444e303aafb9a2fd3f2119cedab0712" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingball">
+		<description>King &amp; Balloon (Kor)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="왕과풍선 (Wang-gwa Pungseon)" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="king &amp; balloon (kr).sms" size="32768" crc="0ae470e5" sha1="592d60e50a63eb8fba055e85c6ec04298be76ab9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4060,6 +4118,17 @@
 		</part>
 	</software>
 
+	<software name="pooyan">
+		<description>Pooyan (Kor)</description>
+		<year>19??</year>
+		<publisher>HiCom</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pooyan (kr).sms" size="32768" crc="ca082218" sha1="d7c7a6b4e02ca6ca19e903d71f47855936109473" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="populous">
 		<description>Populous (Euro, Bra)</description>
 		<year>1989</year>
@@ -4287,6 +4356,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="putt &amp; putter (europe) (beta).bin" size="131072" crc="8167ccc4" sha1="c6d3f256f938827899807884253817f432379d7c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puznic">
+		<description>Puznic (Kor)</description>
+		<year>1990</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="puznic (kr).sms" size="32768" crc="76e8265f" sha1="d5ab2df76c5282245ee1c1f9add623e58bdd3b9d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6440,6 +6520,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="x-men - mojo world (brazil).bin" size="524288" crc="3e1387f6" sha1="6405a2f8b6f220b4349f8006c3d75dfcdcd6db6d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xyzolog">
+		<description>Xyzolog (Kor)</description>
+		<year>19??</year>
+		<publisher>Taito?</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="pcb" value="korean_nobank" />
+			<dataarea name="rom" size="49152">
+				<rom name="xyzolog (kr).sms" size="49152" crc="565c799f" sha1="202cc058ba46cc466387a67cce2ab7f5f55977d0" offset="0" />
 			</dataarea>
 		</part>
 	</software>

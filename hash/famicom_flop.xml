@@ -19,13 +19,16 @@ Re-releases (probably the same as the original release, but listed while waiting
     * Konamic Ice Hockey ~ コナミック アイスホッケー 書き換え版 (19880909, Konami, KDS-HOC)
 -->
 
-<!-- WARNING: These disks do not contain the 0x10 header some emulator expects!!!
-       To use them in such emulators, you have to open the image with an hex editor and add
-       at the beginning of the file the following string (in hex):
-       "46 44 53 1A XX 00 00 00 00 00 00 00 00 00 00 00"
-       where XX must be 01, 02 or 04 depending on the number of sides of the disk
-       (easy way to compute it: XX = size of the FDS file / 65500)
-  -->
+<!-- 
+    WARNING: These disks do not contain the 0x10 header some emulator expects!!!
+    To use them in such emulators, you have to open the image with an hex editor and add
+    at the beginning of the file the following string (in hex):
+      "46 44 53 1A XX 00 00 00 00 00 00 00 00 00 00 00"
+    where XX must be 01, 02 or 04 depending on the number of sides of the disk
+    (easy way to compute it: XX = size of the FDS file / 65500)
+-->
+
+<!-- Unsupported games showing Error 01/07 simply lack support of disk write! -->
 
 	<software name="adiantsu">
 		<description>Adian no Tsue</description>
@@ -202,7 +205,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="judosens">
+<!-- Save Disk Error -->
+	<software name="judosens" supported="no">
 		<description>Big Challenge! Juudou Senshuken</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
@@ -243,8 +247,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="bishohc1">
 		<description>Bishoujo Hanafuda Club Vol.1 - Oichokabu Hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="bishoujo hanafuda club vol.1 - oichokabu hen (japan) (unl).fds" size="131000" crc="ae8ea7e4" sha1="f55b8bf24cd752fe655b06991337837437256bc0" offset="0" />
@@ -263,7 +267,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="bishorgm">
+<!-- Disk Error 20! -->
+	<software name="bishorgm" supported="no">
 		<description>Bishoujo Kachinuki Renju - Gomoku Narabe</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -287,7 +292,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="bishosd">
 		<description>Bishoujo Sexy Derby</description>
-		<year>19??</year>
+		<year>1988</year>
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
@@ -298,8 +303,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="bishosp">
 		<description>Bishoujo Sexy Puzzle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="bishoujo sexy puzzle (japan) (unl).fds" size="131000" crc="ff74da58" sha1="72162f05e2a810867144584013da971fd6c1da23" offset="0" />
@@ -309,7 +314,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="bishoss">
 		<description>Bishoujo Sexy Slot</description>
-		<year>19??</year>
+		<year>1988</year>
 		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
@@ -340,7 +345,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="bshashsc">
+<!-- Heavily glitched -->
+	<software name="bshashsc" supported="no">
 		<description>Bishoujo Shashinkan - Studio Cut</description>
 		<year>19??</year>
 		<publisher>Phoenix?</publisher>
@@ -351,7 +357,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="bodyconq">
+	<software name="bodyconq" supported="no">
 		<description>Bodycon Quest I - Abakareshi Musume Tachi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -456,7 +462,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="deepdng">
+<!-- Save Disk Error -->
+	<software name="deepdng" supported="no">
 		<description>Deep Dungeon - Madou Senki</description>
 		<year>1986</year>
 		<publisher>Square</publisher>
@@ -470,7 +477,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="deepdng2a" cloneof="deepdng2">
+<!-- Save Disk Error -->
+	<software name="deepdng2a" cloneof="deepdng2" supported="no">
 		<description>Deep Dungeon II - Yuushi no Monshou (v1.0)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
@@ -484,7 +492,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="deepdng2">
+<!-- Save Disk Error -->
+	<software name="deepdng2" supported="no">
 		<description>Deep Dungeon II - Yuushi no Monshou (v1.1)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
@@ -498,7 +507,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="dirtpair">
+<!-- Save Disk Error -->
+	<software name="dirtpair" supported="no">
 		<description>Dirty Pair - Project Eden</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -596,7 +606,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="electric">
+<!-- Save Disk Error -->
+	<software name="electric" supported="no">
 		<description>Electrician</description>
 		<year>1986</year>
 		<publisher>Kemco</publisher>
@@ -610,7 +621,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="emichan">
+<!-- Does not recognize side B? -->
+	<software name="emichan" supported="no">
 		<description>Emi-chan no Moero Yakyuuken!</description>
 		<year>19??</year>
 		<publisher>SuperPIG?</publisher>
@@ -621,7 +633,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="esperdrma" cloneof="esperdrm">
+<!-- Save Disk Error -->
+	<software name="esperdrma" cloneof="esperdrm" supported="no">
 		<description>Esper Dream (v1.0)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
@@ -635,7 +648,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="esperdrm">
+<!-- Save Disk Error -->
+	<software name="esperdrm" supported="no">
 		<description>Esper Dream (v1.1)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
@@ -769,18 +783,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fcgolfj" cloneof="fcgolf">
-		<description>Family Computer Golf Tournament - Japan Course (Prize Card)</description>
-		<year>19??</year>
-		<publisher>Nintendo</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="131000">
-				<rom name="family computer golf tournament - japan course (japan) (prize card).fds" size="131000" crc="c1bd72f2" sha1="31eb8b7e7c867e8dd3996633ab703ca318220519" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fcgolfu" cloneof="fcgolf">
+	<software name="fcgolfu">
 		<description>Family Computer Golf U.S. Course</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -790,6 +793,17 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="family computer golf u.s. course (japan).fds" size="131000" crc="9944329a" sha1="b7726762eac903fa1450f7828ea8063e562e4689" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fcgolfuj" cloneof="fcgolfu">
+		<description>Family Computer Golf Tournament - Japan Course (Prize Card)</description>
+		<year>19??</year>
+		<publisher>Nintendo</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="131000">
+				<rom name="family computer golf tournament - japan course (japan) (prize card).fds" size="131000" crc="c1bd72f2" sha1="31eb8b7e7c867e8dd3996633ab703ca318220519" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -836,10 +850,11 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fruitmj1">
+<!-- Save Disk Error -->
+	<software name="fruitmj1" supported="no">
 		<description>Fruits Mahjong 1 Disk #1 - Dai H Taikai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="fruits mahjong 1 disk #1 - dai h taikai (japan) (unl).fds" size="262000" crc="da705136" sha1="1520405ab5b8f413f8bf763b186f61fda451945d" offset="0" />
@@ -847,10 +862,11 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fruitmj2">
+<!-- Save Disk Error -->
+	<software name="fruitmj2" supported="no">
 		<description>Fruits Mahjong 2 Disk #2 - Tokimeki Gals</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="fruits mahjong 2 disk #2 - tokimeki gals (japan) (unl).fds" size="262000" crc="fe258a9b" sha1="a2d458897fa9f1c0fab2983dadb754b3d347f5da" offset="0" />
@@ -858,10 +874,11 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fruitmj3">
+<!-- Save Disk Error -->
+	<software name="fruitmj3" supported="no">
 		<description>Fruits Mahjong 2 Disk #3 - Yonin to Dai H Taikai</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="fruits mahjong 2 disk #3 - yonin to dai h taikai (japan) (unl).fds" size="262000" crc="c1b1e573" sha1="b2ed81e1233810ba36391c8ea51f522fba4be94e" offset="0" />
@@ -869,10 +886,11 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fruitmj4">
+<!-- Save Disk Error -->
+	<software name="fruitmj4" supported="no">
 		<description>Fruits Mahjong 3 Disk #4 - Yonin no Tenshi Tachi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="fruits mahjong 3 disk #4 - yonin no tenshi tachi (japan) (unl).fds" size="262000" crc="314e69e8" sha1="f8d9cad20a85c57282e7cdc349f54a2369702c13" offset="0" />
@@ -880,10 +898,11 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fruitmj5">
+<!-- Save Disk Error -->
+	<software name="fruitmj5" supported="no">
 		<description>Fruits Mahjong 3 Disk #5 - Tottemo H na Gogo</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="fruits mahjong 3 disk #5 - tottemo h na gogo (japan) (unl).fds" size="262000" crc="53c56bb8" sha1="8184aa6d1e3dfd3db8478263838a00f0b85feed7" offset="0" />
@@ -891,10 +910,11 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fruitmj6">
+<!-- Save Disk Error -->
+	<software name="fruitmj6" supported="no">
 		<description>Fruits Mahjong 4 Disk #6 - Bishoujo Connection</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="fruits mahjong 4 disk #6 - bishoujo connection (japan) (unl).fds" size="262000" crc="db9edde5" sha1="b6df912bab17c6f44d1417a8ce91763bea16cb96" offset="0" />
@@ -902,10 +922,11 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fruitmj7">
+<!-- Save Disk Error -->
+	<software name="fruitmj7" supported="no">
 		<description>Fruits Mahjong 4 Disk #7 - Daitan H na Hirusagari</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="fruits mahjong 4 disk #7 - daitan h na hirusagari (japan) (unl).fds" size="262000" crc="64021329" sha1="6c37f5a03252e04f297aa811414bb7139f872779" offset="0" />
@@ -924,7 +945,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="galaxyod">
+<!-- Save Disk Error -->
+	<software name="galaxyod" supported="no">
 		<description>Ginga Denshou - Galaxy Odyssey</description>
 		<year>1986</year>
 		<publisher>Imagineer</publisher>
@@ -969,7 +991,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	<software name="golfbc">
 		<description>The Golf - Bishoujo Classic</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="golf, the - bishoujo classic (japan) (unl).fds" size="131000" crc="e60874b0" sha1="247a8f6c8c8d091bee87b00fcbb1d61265e21465" offset="0" />
@@ -977,7 +999,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="haokun">
+<!-- Save Disk Error -->
+	<software name="haokun" supported="no">
 		<description>Hao-kun no Fushigi na Tabi</description>
 		<year>1986</year>
 		<publisher>Square</publisher>
@@ -1002,7 +1025,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="hikaris">
+<!-- Save Disk Error? -->
+	<software name="hikaris" supported="no">
 		<description>Hikari Shinwa - Palthena no Kagami (v1.1)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
@@ -1030,7 +1054,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="idolhot">
+<!-- Save Disk Error -->
+	<software name="idolhot" supported="no">
 		<description>Idol Hotline - Nakayama Miho no Tokimeki High School</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -1055,7 +1080,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="kalin">
+<!-- Save Disk Error -->
+	<software name="kalin" supported="no">
 		<description>Kalin no Tsurugi</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
@@ -1111,7 +1137,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="kietapr">
+<!-- Save Disk Error -->
+	<software name="kietapr" supported="no">
 		<description>Kieta Princess</description>
 		<year>1986</year>
 		<publisher>Imagineer</publisher>
@@ -1125,10 +1152,11 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="kindgals">
+<!-- Save Disk Error? -->
+	<software name="kindgals" supported="no">
 		<description>Kind Gal's</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Wild</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="kind gal's (japan) (unl).fds" size="262000" crc="f6088296" sha1="028c901f7c7101b4ac11eb42feb7bc100239ef0f" offset="0" />
@@ -1164,7 +1192,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	<software name="shockten">
 		<description>Kobayashi Hitomi Shocking Tennis</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Hacker International</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="kobayashi hitomi shocking tennis (japan) (unl).fds" size="131000" crc="187ec24c" sha1="7389da745b2b2261c6708bbcb5f8a5700012f969" offset="0" />
@@ -1211,7 +1239,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="kosodate">
+<!-- Sits at the title screen -->
+	<software name="kosodate" supported="no">
 		<description>Kosodate Gokko</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1222,7 +1251,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="zelda2a" cloneof="zelda2">
+<!-- Save Disk Error -->
+	<software name="zelda2a" cloneof="zelda2" supported="no">
 		<description>Link no Bouken - The Legend of Zelda 2 (v1.0)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -1236,7 +1266,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="zelda2">
+<!-- Save Disk Error -->
+	<software name="zelda2" supported="no">
 		<description>Link no Bouken - The Legend of Zelda 2 (v1.1)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -1252,8 +1283,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="lipstic1">
 		<description>Lipstick #.1 - Lolita Hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="lipstick #.1 - lolita hen (japan) (unl).fds" size="131000" crc="30d9946c" sha1="7d362b988fd5357368f676b38c3ea932f2cf6d4b" offset="0" />
@@ -1263,8 +1294,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="lipstic2">
 		<description>Lipstick #.2 - Joshi Gakusei Hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="lipstick #.2 - joshi gakusei hen (japan) (unl).fds" size="131000" crc="784ee9c5" sha1="ba2f17dfaa36b69ac0a8a6610c59b07b5686424a" offset="0" />
@@ -1274,8 +1305,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="lipstic3">
 		<description>Lipstick #.3 - OL Hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="lipstick #.3 - ol hen (japan) (unl).fds" size="131000" crc="bf27d663" sha1="a461d612a6e4ec21447670a31337738d4e21405b" offset="0" />
@@ -1285,8 +1316,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="lipstic4">
 		<description>Lipstick #.4 - Hakui no Tenshi Hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="lipstick #.4 - hakui no tenshi hen (japan) (unl).fds" size="131000" crc="729e3cce" sha1="44b5bb765c7a90e8a624fcea694e09bdca7ca446" offset="0" />
@@ -1296,8 +1327,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="lipstic5">
 		<description>Lipstick #.5 - Stewardess Hen</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="lipstick #.5 - stewardess hen (japan) (unl).fds" size="131000" crc="7eba7b30" sha1="9e3f51f72e6d7b32824edca4bc739de7c249f80a" offset="0" />
@@ -1330,7 +1361,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="metroida" cloneof="metroid">
+<!-- Save Disk Error -->
+	<software name="metroida" cloneof="metroid" supported="no">
 		<description>Metroid (v1.1)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
@@ -1344,7 +1376,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="metroid">
+<!-- Save Disk Error -->
+	<software name="metroid" supported="no">
 		<description>Metroid (v1.2)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
@@ -1358,7 +1391,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="michael">
+<!-- Sits at the title screen -->
+	<software name="michael" supported="no">
 		<description>Michael English Daibouken (Sample)</description>
 		<year>1987</year>
 		<publisher>Scorpion Soft</publisher>
@@ -1554,7 +1588,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="mahjongg">
+<!-- Sits at the main menu -->
+	<software name="mahjongg" supported="no">
 		<description>Professional Mahjong Gokuu</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
@@ -1596,7 +1631,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="quickhun">
+<!-- Heavily glitched -->
+	<software name="quickhun" supported="no">
 		<description>Quick Hunter</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1634,8 +1670,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="sailorf1">
 		<description>Sailor Fuku Bishoujo Zukan Vol. 1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="sailor fuku bishoujo zukan vol. 1 (japan) (unl).fds" size="131000" crc="a6b85a58" sha1="187d16eec3150f6a0062690b39138c5a5204fb71" offset="0" />
@@ -1645,8 +1681,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="sailorf2">
 		<description>Sailor Fuku Bishoujo Zukan Vol. 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="sailor fuku bishoujo zukan vol. 2 (japan) (unl).fds" size="131000" crc="5ff683af" sha1="bee90e52a3b4a50bbc4b2a423dff86a581b54cba" offset="0" />
@@ -1656,8 +1692,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="sailorf3">
 		<description>Sailor Fuku Bishoujo Zukan Vol. 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="sailor fuku bishoujo zukan vol. 3 (japan) (unl).fds" size="131000" crc="da347669" sha1="ebaa942596296722e663b897405b3d39630fe357" offset="0" />
@@ -1667,8 +1703,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="sailorf4">
 		<description>Sailor Fuku Bishoujo Zukan Vol. 4</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="sailor fuku bishoujo zukan vol. 4 (japan) (unl).fds" size="131000" crc="a887bc15" sha1="708c62d029fbadd55650b7c0b0e8d408b1fbbe3d" offset="0" />
@@ -1678,8 +1714,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="sailorf5">
 		<description>Sailor Fuku Bishoujo Zukan Vol. 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="sailor fuku bishoujo zukan vol. 5 (japan) (unl).fds" size="131000" crc="c09721a9" sha1="397524fce303c741abc8e8b1cbe16049c2354322" offset="0" />
@@ -1689,8 +1725,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="sailorf6">
 		<description>Sailor Fuku Bishoujo Zukan Vol. 6</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="sailor fuku bishoujo zukan vol. 6 (japan) (unl).fds" size="131000" crc="69b6afed" sha1="1444a412b85a748da47df7fb00fef83eef159cf0" offset="0" />
@@ -1726,7 +1762,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="psychocl">
+<!-- Save Disk Error -->
+	<software name="psychocl" supported="no">
 		<description>Seiken Psychocalibur - Majuu no Mori Densetsu</description>
 		<year>1987</year>
 		<publisher>Imagineer</publisher>
@@ -1742,8 +1779,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="sexyinv">
 		<description>Sexy Invaders</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990</year>
+		<publisher>SuperPIG?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="sexy invaders (japan) (unl).fds" size="131000" crc="963b047c" sha1="e4b1fb93d4cb16f1b44e2987cc734e1a5e52c0a7" offset="0" />
@@ -1762,7 +1799,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="silviana">
+<!-- Black Screen -->
+	<software name="silviana" supported="no">
 		<description>Silviana - Ai Ippai no Boukensya</description>
 		<year>1988</year>
 		<publisher>Pack-In Video</publisher>
@@ -1818,7 +1856,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="sloderun">
+<!-- Does not recognize side B? -->
+	<software name="sloderun" supported="no">
 		<description>Super Lode Runner</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
@@ -1904,8 +1943,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="tenshita">
 		<description>Tenshi-tachi no Houkago</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="262000">
 				<rom name="tenshi tachi no houkago (japan) (unl).fds" size="262000" crc="45e541fe" sha1="2be8da261ac181ad19ec1283d804eca37c29c5e6" offset="0" />
@@ -1970,7 +2009,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="ultramna" cloneof="ultramn">
+	<software name="ultramnca" cloneof="ultramnc">
 		<description>Ultraman Club - Chikyuu Dakkan Sakusen (v1.0)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
@@ -1984,7 +2023,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="ultramn">
+	<software name="ultramnc">
 		<description>Ultraman Club - Chikyuu Dakkan Sakusen (v1.1)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
@@ -2095,7 +2134,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="zeldaa" cloneof="zelda">
+<!-- Save Disk Error -->
+	<software name="zeldaa" cloneof="zelda" supported="no">
 		<description>Zelda no Densetsu - The Hyrule Fantasy (v1.0)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
@@ -2109,7 +2149,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="zelda">
+<!-- Save Disk Error -->
+	<software name="zelda" supported="no">
 		<description>Zelda no Densetsu - The Hyrule Fantasy (v1.1)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
@@ -2322,7 +2363,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 <!-- These are not from NoIntro. To Do: verify which image to keep among alternates... -->
 
-	<software name="raijin">
+<!-- Save Disk Error -->
+	<software name="raijin" supported="no">
 		<description>Akara Senki Raijin</description>
 		<year>1988</year>
 		<publisher>Square</publisher>
@@ -2491,7 +2533,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="cluclu">
-		<description>Clu Clu Land - Welcome to New Clu Clu Land</description>
+		<description>Clu Clu Land</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FMC-CLD"/>
@@ -2504,8 +2546,9 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="dandy">
-		<description>Dandy - Zeuon no Fukkatsu (1988)(Pony Canyon)[PNF-DAN]</description>
+<!-- Save Disk Error -->
+	<software name="dandy" supported="no">
+		<description>Dandy - Zeuon no Fukkatsu</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-DAN (L30V5919)"/>
@@ -2518,7 +2561,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="deadzone">
+<!-- Save Disk Error -->
+	<software name="deadzone" supported="no">
 		<description>Dead Zone</description>
 		<year>1986</year>
 		<publisher>Sunsoft</publisher>
@@ -2617,7 +2661,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="f1race1" cloneof="f1race">
-		<description>Famicom Grand Prix - F1 Race (1987)(Nintendo)[FSC-FRGE][a]</description>
+		<description>Famicom Grand Prix - F1 Race (Alt)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="FSC-FRGE"/>
@@ -2661,7 +2705,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 <!-- The following should be made of two separate 2-sided disks, not one disk with 4 sides! -->
-	<software name="shoniga2" cloneof="shoniga">
+<!-- Is this a bad dump? -->
+	<software name="shoniga2" cloneof="shoniga" supported="no">
 		<description>Famicom Mukashi Banashi - Shin Onigashima (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
@@ -2706,7 +2751,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 <!-- The following should be made of two separate 2-sided disks, not one disk with 4 sides! -->
-	<software name="fctantcl1" cloneof="fctantcl">
+	<software name="fctantcla" cloneof="fctantcl">
 		<description>Famicom Tantei Club - Kieta Koukeisha (Alt)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -2751,7 +2796,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="famcompo">
-		<description>Family Composer (1987)(Tokyo Shoseki)[TKS-FCO]</description>
+		<description>Family Composer</description>
 		<year>1987</year>
 		<publisher>Tokyo Shoseki</publisher>
 		<info name="serial" value="TKS-FCO"/>
@@ -2890,8 +2935,9 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="fuunsham">
-		<description>Fuuun Shaolin Kyo - Ankoku no Maou (1988)(Jaleco)[JFD-SAM]</description>
+<!-- Does not recognize side B? -->
+	<software name="fuunsham" supported="no">
+		<description>Fuuun Shaolin Kyo - Ankoku no Maou</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JFD-SAM"/>
@@ -3046,7 +3092,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 
 	<software name="halleywa">
 		<description>Halley Wars</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFD-HAL"/>
 		<info name="release" value="19890114"/>
@@ -3086,7 +3132,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="rolpanic">
+<!-- Save Disk Error -->
+	<software name="rolpanic" supported="no">
 		<description>Hikaru Genji - Roller Panic</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
@@ -3100,8 +3147,9 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="teachsmb">
-		<description>I Am A Teacher - Super Mario no Sweater (1986)(Royal Kougyou)[ROY-ISM] [OK]</description>
+<!-- Save Disk Error -->
+	<software name="teachsmb" supported="no">
+		<description>I Am A Teacher - Super Mario no Sweater</description>
 		<year>1986</year>
 		<publisher>Royal Kougyou</publisher>
 		<info name="serial" value="ROY-ISM"/>
@@ -3115,7 +3163,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="teacher">
-		<description>I Am A Teacher - Teami no Kiso (1986)(Royal Kougyou)[ROY-ITK] [OK]</description>
+		<description>I Am A Teacher - Teami no Kiso</description>
 		<year>1986</year>
 		<publisher>Royal Kougyou</publisher>
 		<info name="serial" value="ROY-ITK"/>
@@ -3185,7 +3233,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="jtmk">
-		<description>Jaaman Tanteidan Marine Kumi - Maruhi Jigoma Sousa File (1988)(Bandai)[BAN-MAR]</description>
+		<description>Jaaman Tanteidan Marine Kumi - Maruhi Jigoma Sousa File</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BAN-MAR"/>
@@ -3198,7 +3246,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="mettomag">
+<!-- Save Disk Error -->
+	<software name="mettomag" supported="no">
 		<description>Jikai Shounen Metto Mag</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
@@ -3212,7 +3261,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="mettomag1" cloneof="mettomag">
+<!-- Save Disk Error -->
+	<software name="mettomag1" cloneof="mettomag" supported="no">
 		<description>Jikai Shounen Metto Mag (Alt)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
@@ -3310,7 +3360,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="kickandr">
+	<software name="kickrun">
 		<description>Kick and Run</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
@@ -3380,7 +3430,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="lutter">
+<!-- Freezes right after starting a game -->
+	<software name="lutter" supported="no">
 		<description>Lutter</description>
 		<year>1989</year>
 		<publisher>Athena</publisher>
@@ -3478,7 +3529,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="monitorp">
+	<software name="kinetic2">
 		<description>Kinetic Connection II</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
@@ -3590,7 +3641,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="progolfe">
+	<software name="progolfr">
 		<description>Pro Golfer Saru - Kage no Tournament</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -3604,7 +3655,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="puttputt">
+<!-- Freezes right after starting a game -->
+	<software name="puttputt" supported="no">
 		<description>Putt Putt Golf</description>
 		<year>1989</year>
 		<publisher>Pack-In Video</publisher>
@@ -3633,7 +3685,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="radicalb">
-		<description>Radical Bomber!! Jirai Kun (1988)(Jaleco)[JFD-GRK]</description>
+		<description>Radical Bomber!! Jirai Kun</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JFD-GRK"/>
@@ -3858,7 +3910,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="tjsshinj">
-		<description>Tantei Jinguuji Saburou - Shinjuku Chuuou Kouen Satsujin Jiken (1987)(Data East)[DFC-JUK]</description>
+		<description>Tantei Jinguuji Saburou - Shinjuku Chuuou Kouen Satsujin Jiken</description>
 		<year>1987</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="DFC-JUK"/>
@@ -3914,7 +3966,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="tobidais1" cloneof="tobidais">
-		<description>Tobidase Daisakusen (Alt 1)</description>
+		<description>Tobidase Daisakusen (Alt)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SQF-TDS"/>
@@ -3927,8 +3979,9 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
+<!-- This is an unprotected copy?? -->
 	<software name="tobidais2" cloneof="tobidais">
-		<description>Tobidase Daisakusen (Alt 2)</description>
+		<description>Tobidase Daisakusen (Hacked?)</description>
 		<year>1987</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SQF-TDS"/>
@@ -3955,7 +4008,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="transfr2">
+<!-- Save Disk Error? -->
+	<software name="transfr2" supported="no">
 		<description>Transformers II - The Headmasters</description>
 		<year>1987</year>
 		<publisher>Takara</publisher>
