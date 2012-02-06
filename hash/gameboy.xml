@@ -9266,7 +9266,7 @@
 	</software>
 
 	<software name="lweapon">
-		<description>Lethal Weapon (USA)</description>
+		<description>Lethal Weapon (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="DMG-LT-USA"/>
@@ -10110,7 +10110,7 @@
 		<info name="serial" value="DMG-R4-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="megaman iv (europe).bin" size="524288" crc="973fcf4c" sha1="f4f7baaaec4bfde95003ac52fdfe95eccdab569c" offset="000000" />
+				<rom name="megaman iv (europe).bin" size="524288" crc="060b89e6" sha1="a15a05593bf9bdddb5826b148e25182e7b90f268" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

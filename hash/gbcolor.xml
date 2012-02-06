@@ -7659,7 +7659,7 @@ Undumped Pirates:
 		<info name="alt_title" value="携帯電獣テレファング パワー・バージョン"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="keitai denjuu telefang - power version (japan).bin" size="2097152" crc="8f16393f" sha1="57ed95e2164b1edc3c2c4c38a67e033501094573" offset="000000" />
+				<rom name="keitai denjuu telefang - power version (japan).bin" size="2097152" crc="8b61cfcc" sha1="baaf7fb9f9958ca22982ba0600bc0cb8a7fc4764" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
