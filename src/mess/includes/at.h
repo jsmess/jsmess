@@ -56,6 +56,7 @@
 #include "machine/ne2000.h"
 #include "video/isa_mda.h"
 #include "machine/isa_mpu401.h"
+#include "machine/isa_ibm_mfc.h"
 
 #include "machine/isa_ide.h"
 

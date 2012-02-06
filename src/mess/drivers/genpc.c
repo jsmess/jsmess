@@ -33,6 +33,8 @@
 #include "machine/isa_mpu401.h"
 #include "machine/3c503.h"
 #include "machine/ne1000.h"
+#include "machine/isa_ibm_mfc.h"
+#include "machine/pc_lpt.h"
 
 #include "machine/kb_keytro.h"
 
@@ -126,6 +128,8 @@ static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("mpu401", ISA8_MPU401)
 	SLOT_INTERFACE("ne1000", NE1000)
 	SLOT_INTERFACE("3c503", EL2_3C503)
+	SLOT_INTERFACE("lpt", ISA8_LPT)
+	SLOT_INTERFACE("ibm_mfc", ISA8_IBM_MFC)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( pcmda, genpc_state )
