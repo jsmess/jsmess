@@ -15,6 +15,7 @@
 #include "imagedev/cassette.h"
 #include "machine/tf20.h"
 #include "machine/ram.h"
+#include "machine/nvram.h"
 #include "px4.lh"
 
 
@@ -1009,17 +1010,6 @@ static READ8_HANDLER( px4_ramdisk_control_r )
 	/* bit 7 determines the presence of a ram-disk */
 	return 0x7f;
 }
-
-static NVRAM_HANDLER( px4_ramdisk )
-{
-	px4_state *px4 = machine.driver_data<px4_state>();
-	if (read_or_write)
-		file->write();
-	else
-		if (file)
-			file->read(px4->m_ramdisk, 0x20000);
-}
-
 
 /***************************************************************************
     VIDEO EMULATION

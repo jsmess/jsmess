@@ -11,6 +11,7 @@
 #include "machine/rp5c01.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
+#include "machine/nvram.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
 #include "imagedev/snapquik.h"
@@ -41,7 +42,8 @@ public:
 	virtual void machine_reset();
 	void refresh_memory(UINT8 bank, UINT8 chip_select);
 	void refresh_ints();
-
+	void nvram_init(nvram_device &nvram, void *base, size_t size);
+	
 	DECLARE_WRITE_LINE_MEMBER( tc8521_alarm_int );
 	DECLARE_WRITE_LINE_MEMBER( com_interrupt );
 
