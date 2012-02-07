@@ -151,8 +151,8 @@ public:
 	virtual ~device_c64_expansion_card_interface();
 
 	// memory access
-	virtual UINT8 c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2) { return 0; };
-	virtual void c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2) { };
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2) { return 0; };
+	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2) { };
 
 	// memory banking
 	virtual int c64_game_r() { return m_game; }
@@ -167,11 +167,14 @@ public:
 	virtual UINT32 c64_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
 
 	// standard ROM cartridge
-	virtual UINT8* c64_roml_pointer(size_t size) { return NULL; }
-	virtual UINT8* c64_romh_pointer(size_t size) { return NULL; }
+	virtual UINT8* c64_roml_pointer(running_machine &machine, size_t size);
+	virtual UINT8* c64_romh_pointer(running_machine &machine, size_t size);
 
 protected:
 	c64_expansion_slot_device *m_slot;
+
+	UINT8 *m_roml;
+	UINT8 *m_romh;
 
 	int m_game;
 	int m_exrom;

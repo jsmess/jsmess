@@ -29,6 +29,8 @@ const device_type C64_EXPANSION_SLOT = &device_creator<c64_expansion_slot_device
 
 device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
+	  m_roml(NULL),
+	  m_romh(NULL),
 	  m_game(1),
 	  m_exrom(1)
 {
@@ -42,6 +44,36 @@ device_c64_expansion_card_interface::device_c64_expansion_card_interface(const m
 
 device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 {
+}
+
+
+//-------------------------------------------------
+//  c64_roml_pointer - get low ROM pointer
+//-------------------------------------------------
+
+UINT8* device_c64_expansion_card_interface::c64_roml_pointer(running_machine &machine, size_t size)
+{
+	if (m_roml == NULL)
+	{
+		m_roml = auto_alloc_array(machine, UINT8, size);
+	}
+
+	return m_roml;
+}
+
+
+//-------------------------------------------------
+//  c64_romh_pointer - get high ROM pointer
+//-------------------------------------------------
+
+UINT8* device_c64_expansion_card_interface::c64_romh_pointer(running_machine &machine, size_t size)
+{
+	if (m_romh == NULL)
+	{
+		m_romh = auto_alloc_array(machine, UINT8, size);
+	}
+
+	return m_romh;
 }
 
 
@@ -132,25 +164,25 @@ bool c64_expansion_slot_device::call_load()
 
 			if (!mame_stricmp(filetype(), "80"))
 			{
-				fread(m_cart->c64_roml_pointer(0x2000), 0x2000);
+				fread(m_cart->c64_roml_pointer(machine(), 0x2000), 0x2000);
 				m_cart->c64_exrom_w(0);
 
 				if (size == 0x4000)
 				{
-					fread(m_cart->c64_romh_pointer(0x2000), 0x2000);
+					fread(m_cart->c64_romh_pointer(machine(), 0x2000), 0x2000);
 					m_cart->c64_game_w(0);
 				}
 			}
 			else if (!mame_stricmp(filetype(), "a0"))
 			{
-				fread(m_cart->c64_romh_pointer(0x2000), size);
+				fread(m_cart->c64_romh_pointer(machine(), 0x2000), size);
 
 				m_cart->c64_game_w(0);
 				m_cart->c64_exrom_w(0);
 			}
 			else if (!mame_stricmp(filetype(), "e0"))
 			{
-				fread(m_cart->c64_romh_pointer(0x2000), size);
+				fread(m_cart->c64_romh_pointer(machine(), 0x2000), size);
 
 				m_cart->c64_game_w(0);
 			}
@@ -162,19 +194,19 @@ bool c64_expansion_slot_device::call_load()
 			switch (size)
 			{
 			case 0x2000:
-				memcpy(m_cart->c64_roml_pointer(0x2000), get_software_region("roml"), size);
+				memcpy(m_cart->c64_roml_pointer(machine(), 0x2000), get_software_region("roml"), size);
 
 				size = get_software_region_length("romh");
-				if (size) memcpy(m_cart->c64_romh_pointer(0x2000), get_software_region("romh"), size);
+				if (size) memcpy(m_cart->c64_romh_pointer(machine(), 0x2000), get_software_region("romh"), size);
 				break;
 
 			case 0x4000:
-				memcpy(m_cart->c64_roml_pointer(0x2000), get_software_region("roml"), 0x2000);
-				memcpy(m_cart->c64_romh_pointer(0x2000), get_software_region("roml") + 0x2000, 0x2000);
+				memcpy(m_cart->c64_roml_pointer(machine(), 0x2000), get_software_region("roml"), 0x2000);
+				memcpy(m_cart->c64_romh_pointer(machine(), 0x2000), get_software_region("roml") + 0x2000, 0x2000);
 				break;
 
 			default:
-				memcpy(m_cart->c64_roml_pointer(size), get_software_region("roml"), size);
+				memcpy(m_cart->c64_roml_pointer(machine(), size), get_software_region("roml"), size);
 				break;
 			}
 
@@ -219,7 +251,7 @@ READ8_MEMBER( c64_expansion_slot_device::roml_r )
 
 	if (m_cart != NULL)
 	{
-		data = m_cart->c64_cd_r(offset, 0, 1, 1, 1);
+		data = m_cart->c64_cd_r(space, offset, 0, 1, 1, 1);
 	}
 
 	return data;
@@ -236,7 +268,7 @@ READ8_MEMBER( c64_expansion_slot_device::romh_r )
 
 	if (m_cart != NULL)
 	{
-		data = m_cart->c64_cd_r(offset, 1, 0, 1, 1);
+		data = m_cart->c64_cd_r(space, offset, 1, 0, 1, 1);
 	}
 
 	return data;
@@ -253,7 +285,7 @@ READ8_MEMBER( c64_expansion_slot_device::io1_r )
 
 	if (m_cart != NULL)
 	{
-		data = m_cart->c64_cd_r(offset, 1, 1, 0, 1);
+		data = m_cart->c64_cd_r(space, offset, 1, 1, 0, 1);
 	}
 
 	return data;
@@ -268,7 +300,7 @@ WRITE8_MEMBER( c64_expansion_slot_device::io1_w )
 {
 	if (m_cart != NULL)
 	{
-		m_cart->c64_cd_w(offset, data, 1, 1, 0, 1);
+		m_cart->c64_cd_w(space, offset, data, 1, 1, 0, 1);
 	}
 }
 
@@ -283,7 +315,7 @@ READ8_MEMBER( c64_expansion_slot_device::io2_r )
 
 	if (m_cart != NULL)
 	{
-		data = m_cart->c64_cd_r(offset, 1, 1, 1, 0);
+		data = m_cart->c64_cd_r(space, offset, 1, 1, 1, 0);
 	}
 
 	return data;
@@ -298,7 +330,7 @@ WRITE8_MEMBER( c64_expansion_slot_device::io2_w )
 {
 	if (m_cart != NULL)
 	{
-		m_cart->c64_cd_w(offset, data, 1, 1, 1, 0);
+		m_cart->c64_cd_w(space, offset, data, 1, 1, 1, 0);
 	}
 }
 
