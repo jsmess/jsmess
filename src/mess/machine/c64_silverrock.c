@@ -66,8 +66,7 @@ const device_type C64_SILVERROCK = &device_creator<c64_silverrock_cartridge_devi
 
 c64_silverrock_cartridge_device::c64_silverrock_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_SILVERROCK, "C64 SilverRock cartridge", tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this),
-	m_roml(NULL)
+	device_c64_expansion_card_interface(mconfig, *this)
 {
 }
 
@@ -97,7 +96,7 @@ void c64_silverrock_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_silverrock_cartridge_device::c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_silverrock_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 	
@@ -116,7 +115,7 @@ UINT8 c64_silverrock_cartridge_device::c64_cd_r(offs_t offset, int roml, int rom
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_silverrock_cartridge_device::c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_silverrock_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -137,19 +136,4 @@ void c64_silverrock_cartridge_device::c64_cd_w(offs_t offset, UINT8 data, int ro
 
 		m_bank = ((data >> 3) & 0x0e) | BIT(data, 7);
 	}
-}
-
-
-//-------------------------------------------------
-//  c64_roml_pointer - get low ROM pointer
-//-------------------------------------------------
-
-UINT8* c64_silverrock_cartridge_device::c64_roml_pointer(size_t size)
-{
-	if (m_roml == NULL)
-	{
-		m_roml = auto_alloc_array(machine(), UINT8, size);
-	}
-
-	return m_roml;
 }

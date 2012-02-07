@@ -212,17 +212,15 @@ void c64_xl80_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_xl80_device::c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 
 	if (!io2 && BIT(offset, 1))
 	{
-		address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
-
 		if (offset & 0x01)
 		{
-			data = m_crtc->register_r(*space, 0);
+			data = m_crtc->register_r(space, 0);
 		}
 	}
 	else if (offset >= 0x8000 && offset < 0x9000)
@@ -242,19 +240,17 @@ UINT8 c64_xl80_device::c64_cd_r(offs_t offset, int roml, int romh, int io1, int 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_xl80_device::c64_cd_w(offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_xl80_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
 {
 	if (!io2 && BIT(offset, 1))
 	{
-		address_space *space = machine().firstcpu->memory().space(AS_PROGRAM);
-
 		if (offset & 0x01)
 		{
-			m_crtc->register_w(*space, 0, data);
+			m_crtc->register_w(space, 0, data);
 		}
 		else
 		{
-			m_crtc->address_w(*space, 0, data);
+			m_crtc->address_w(space, 0, data);
 		}
 	}
 	if (offset >= 0x9800 && offset < 0xa000)

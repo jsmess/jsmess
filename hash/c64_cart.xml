@@ -480,7 +480,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="rom" size="0x4000">
+			<dataarea name="roml" size="0x4000">
 				<rom name="4040.bin" size="0x2000" crc="bab8bb5f" sha1="e1b602f476bf7baddd3b7f6964a5db4b44e7c7c1" offset="0x0000" />
 				<rom name="hackem.bin" size="0x2000" crc="8edd53a5" sha1="ac1a159e27060aa1c95669eb510c3864032968e8" offset="0x2000" />
 			</dataarea>
