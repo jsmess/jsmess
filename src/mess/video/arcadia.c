@@ -374,6 +374,7 @@ READ8_MEMBER( arcadia_state::arcadia_video_r )
 
 WRITE8_MEMBER( arcadia_state::arcadia_video_w )
 {
+	arcadia_sound_device *sound = machine().device<arcadia_sound_device>("custom");
 	m_reg.data[offset]=data;
 	switch (offset)
 	{
@@ -381,11 +382,11 @@ WRITE8_MEMBER( arcadia_state::arcadia_video_w )
 			m_ypos=255-data+YPOS;
 			break;
 		case 0xfd:
-			arcadia_soundport_w(machine().device("custom"), offset&3, data);
+			sound->write(space, offset&3, data);
 			m_multicolor = data & 0x80;
 			break;
 		case 0xfe:
-			arcadia_soundport_w(machine().device("custom"), offset&3, data);
+			sound->write(space, offset&3, data);
 			m_shift = (data>>5);
 			break;
 		case 0xf0:

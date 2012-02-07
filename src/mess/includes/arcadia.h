@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cartslot.h"
+#include "audio/arcadia.h"
 
 
 // space vultures sprites above
@@ -84,13 +85,5 @@ public:
 extern INTERRUPT_GEN( arcadia_video_line );
 extern VIDEO_START( arcadia );
 extern SCREEN_UPDATE_IND16( arcadia );
-
-
-/*----------- defined in audio/arcadia.c -----------*/
-
-DECLARE_LEGACY_SOUND_DEVICE(ARCADIA, arcadia_sound);
-
-void arcadia_soundport_w (device_t *device, int mode, int data);
-
 
 #endif /* ARCADIA_H_ */
