@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( arcadia, arcadia_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", ARCADIA, 0)
+	MCFG_ARCADIA_SOUND_ADD("custom")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */

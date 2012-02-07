@@ -38,34 +38,101 @@
 //0x01bc
 
 
-typedef struct _arcadia_sound arcadia_sound;
-struct _arcadia_sound
+// device type definition
+const device_type ARCADIA_SOUND = &device_creator<arcadia_sound_device>;
+
+//-------------------------------------------------
+//  arcadia_sound_device - constructor
+//-------------------------------------------------
+
+arcadia_sound_device::arcadia_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ARCADIA_SOUND, "Arcadia Custom Sound", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
 {
-    sound_stream *channel;
-    UINT8 reg[3];
-    int size, pos,tval,nval;
-	unsigned mode, omode;
-	unsigned volume;
-	unsigned lfsr;
-};
+}
 
-
-
-INLINE arcadia_sound *get_token(device_t *device)
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void arcadia_sound_device::device_start()
 {
-	assert(device != NULL);
-	assert(device->type() == ARCADIA);
-	return (arcadia_sound *) downcast<legacy_device_base *>(device)->token();
+    m_channel = machine().sound().stream_alloc(*this, 0, 1, UVI_PAL*OSAMP, this);
+    m_lfsr    = LFSR_INIT;
+    m_tval    = 1;
+	logerror("arcadia_sound start\n");
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle update requests for
+//  our sound stream
+//-------------------------------------------------
+
+void arcadia_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	int i;
+	stream_sample_t *buffer = outputs[0];
+
+	for (i = 0; i < samples; i++, buffer++)
+	{
+		*buffer = 0;
+
+		//if minimal pitch ?
+		if (m_reg[1]){
+			switch (m_mode){
+				//dont play anything
+				case 0:break;
+
+				//tone only
+				case 1:
+					*buffer = m_volume * m_tval;
+				break;
+
+				//noise only
+				case 2:
+					*buffer = m_volume * m_nval;
+				break;
+
+				//tone AND noise (bitwise and)
+				case 3:
+					*buffer = m_volume * (m_tval & m_nval);
+				break;
+			}
+
+			//counter
+			m_pos++;
+
+			if (m_pos >= m_size){
+
+				//calculate new noise bit ( taps: 0000T000T)
+				unsigned char newBit = m_lfsr & 1;         //first tap
+				newBit = (newBit ^ ((m_lfsr & 0x10)?1:0) );//xor with second tap
+
+				m_nval = m_lfsr & 1; //taking new output from LSB
+				m_lfsr = m_lfsr >> 1;//shifting
+
+				//insert new bit at end position (size-1) (only if non null)
+				if (newBit)
+					m_lfsr |= LFSR_MASK;
+
+				//invert tone
+				m_tval = !m_tval;
+
+				m_pos = 0;
+			}
+		}
+	}
 }
 
 
 
-void arcadia_soundport_w (device_t *device, int offset, int data)
-{
-	arcadia_sound *token = get_token(device);
+//-------------------------------------------------
+//  soundport_w 
+//-------------------------------------------------
 
-	token->channel->update();
-	token->reg[offset] = data;
+WRITE8_MEMBER(arcadia_sound_device::write)
+{
+	m_channel->update();
+	m_reg[offset] = data;
 
 	//logerror("arcadia_sound write:%x=%x\n",offset,data);
 
@@ -74,124 +141,26 @@ void arcadia_soundport_w (device_t *device, int offset, int data)
 		case 1:
 			//as per Gobbler samples:
 			//the freq counter is only applied on the next change in the flip flop
-			token->size = (data & 0x7f)*OSAMP;
+			m_size = (data & 0x7f)*OSAMP;
 			//logerror("arcadia_sound write: frq:%d\n",data);
 
 			//reset LFSR
-			if(!token->size)
-				token->lfsr = LFSR_INIT;
+			if(!m_size)
+				m_lfsr = LFSR_INIT;
 		break;
 
 		case 2:
-			token->volume = (data & 0x07) * 0x800;
-			token->mode   = (data & 0x18) >> 3;
+			m_volume = (data & 0x07) * 0x800;
+			m_mode   = (data & 0x18) >> 3;
 
-			//logerror("arcadia_sound write: vol:%d mode:%d\n",token->volume,token->mode );
+			//logerror("arcadia_sound write: vol:%d mode:%d\n",m_volume,m_mode );
 
-			if (token->mode != token->omode){
+			if (m_mode != m_omode){
 				//not 100% sure about this, maybe we should not reset anything
-				//token->pos  = 0;
-				token->tval = 0;
+				//m_pos  = 0;
+				m_tval = 0;
 			}
-			token->omode = token->mode;
+			m_omode = m_mode;
 		break;
 	}
 }
-
-
-
-/************************************/
-/* Sound handler update             */
-/************************************/
-
-static STREAM_UPDATE( arcadia_update )
-{
-	int i;
-	arcadia_sound *token = get_token(device);
-	stream_sample_t *buffer = outputs[0];
-
-	for (i = 0; i < samples; i++, buffer++)
-	{
-		*buffer = 0;
-
-		//if minimal pitch ?
-		if (token->reg[1]){
-			switch (token->mode){
-				//dont play anything
-				case 0:break;
-
-				//tone only
-				case 1:
-					*buffer = token->volume * token->tval;
-				break;
-
-				//noise only
-				case 2:
-					*buffer = token->volume * token->nval;
-				break;
-
-				//tone AND noise (bitwise and)
-				case 3:
-					*buffer = token->volume * (token->tval & token->nval);
-				break;
-			}
-
-			//counter
-			token->pos++;
-
-			if (token->pos >= token->size){
-
-				//calculate new noise bit ( taps: 0000T000T)
-				unsigned char newBit = token->lfsr & 1;         //first tap
-				newBit = (newBit ^ ((token->lfsr & 0x10)?1:0) );//xor with second tap
-
-				token->nval = token->lfsr & 1; //taking new output from LSB
-				token->lfsr = token->lfsr >> 1;//shifting
-
-				//insert new bit at end position (size-1) (only if non null)
-				if (newBit)
-					token->lfsr |= LFSR_MASK;
-
-				//invert tone
-				token->tval = !token->tval;
-
-				token->pos = 0;
-			}
-		}
-	}
-}
-
-
-
-/************************************/
-/* Sound handler start              */
-/************************************/
-
-static DEVICE_START(arcadia_sound)
-{
-	arcadia_sound *token = get_token(device);
-    token->channel = device->machine().sound().stream_alloc(*device, 0, 1, UVI_PAL*OSAMP, 0, arcadia_update);
-    token->lfsr    = LFSR_INIT;
-    token->tval    = 1;
-	logerror("arcadia_sound start\n");
-}
-
-
-
-DEVICE_GET_INFO(arcadia_sound)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(arcadia_sound);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(arcadia_sound);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Arcadia Custom");					break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-	}
-}
-
-DEFINE_LEGACY_SOUND_DEVICE(ARCADIA, arcadia_sound);
