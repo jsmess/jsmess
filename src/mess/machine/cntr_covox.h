@@ -21,7 +21,7 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	virtual void write(UINT8 data);
 protected:
     // device-level overrides
@@ -44,7 +44,7 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	virtual void write(UINT8 data);
 protected:
     // device-level overrides

@@ -50,9 +50,9 @@ public:
 
 	virtual void machine_start();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	void check_interrupts();
-	
+
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );
@@ -67,10 +67,10 @@ public:
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
-	
+
 	// video state
 	UINT8 *m_color_ram;
-	
+
 	// interrupt state
 	int m_cia_irq;
 	int m_vic_irq;

@@ -156,7 +156,7 @@ public:
 	virtual UINT8* vic10_exram_pointer() { return NULL; }
 	virtual UINT8 vic10_exram_r(address_space &space, offs_t offset) { return 0; };
 	virtual void vic10_exram_w(address_space &space, offs_t offset, UINT8 data) { };
-	
+
 	// ROM
 	virtual UINT8* vic10_lorom_pointer() { return NULL; }
 	virtual UINT8 vic10_lorom_r(address_space &space, offs_t offset) { return 0; };

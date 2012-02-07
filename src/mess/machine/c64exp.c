@@ -96,7 +96,7 @@ void c64_expansion_slot_device::device_config_complete()
 	}
 
 	// set brief and instance name
-	update_names();	
+	update_names();
 }
 
 
@@ -134,7 +134,7 @@ bool c64_expansion_slot_device::call_load()
 			{
 				fread(m_cart->c64_roml_pointer(), 0x2000);
 				m_cart->c64_exrom_w(0);
-			
+
 				if (size == 0x4000)
 				{
 					fread(m_cart->c64_romh_pointer(), 0x2000);
@@ -151,7 +151,7 @@ bool c64_expansion_slot_device::call_load()
 			else if (!mame_stricmp(filetype(), "e0"))
 			{
 				fread(m_cart->c64_romh_pointer(), size);
-				
+
 				m_cart->c64_game_w(0);
 			}
 		}
@@ -167,12 +167,12 @@ bool c64_expansion_slot_device::call_load()
 				size = get_software_region_length("romh");
 				if (size) memcpy(m_cart->c64_romh_pointer(), get_software_region("romh"), size);
 				break;
-			
+
 			case 0x4000:
 				memcpy(m_cart->c64_roml_pointer(), get_software_region("roml"), 0x2000);
 				memcpy(m_cart->c64_romh_pointer(), get_software_region("roml") + 0x2000, 0x2000);
 				break;
-			
+
 			default:
 				return IMAGE_INIT_FAIL;
 			}

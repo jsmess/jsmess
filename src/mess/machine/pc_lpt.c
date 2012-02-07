@@ -29,7 +29,7 @@ struct _pc_lpt_state
 	devcb_resolved_write_line out_irq_func;
 
 	UINT8 data;
-	
+
 	int ack;
 
 	/* control latch */
@@ -100,7 +100,7 @@ static DEVICE_START( pc_lpt )
 	device->save_item(NAME(lpt->autofd));
 	device->save_item(NAME(lpt->init));
 	device->save_item(NAME(lpt->select));
-	device->save_item(NAME(lpt->irq_enabled));	
+	device->save_item(NAME(lpt->irq_enabled));
 }
 
 static DEVICE_RESET( pc_lpt )
@@ -211,7 +211,7 @@ WRITE8_DEVICE_HANDLER( pc_lpt_control_w )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
 
-//	logerror("pc_lpt_control_w: 0x%02x\n", data);
+//  logerror("pc_lpt_control_w: 0x%02x\n", data);
 
 	/* save to latch */
 	lpt->strobe = BIT(data, 0);
@@ -260,7 +260,7 @@ static WRITE_LINE_DEVICE_HANDLER(pc_cpu_line)
 	isa8_lpt_device	*lpt  = downcast<isa8_lpt_device *>(device->owner());
 	if (lpt->is_primary())
 		lpt->m_isa->irq7_w(state);
-	else 
+	else
 		lpt->m_isa->irq5_w(state);
 }
 static const pc_lpt_interface pc_lpt_config =

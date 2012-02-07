@@ -43,7 +43,7 @@ enum
 	PC_IRQ_TIMERA,
 	PC_IRQ_TIMERB,
 	PC_IRQ_RXRDY,
-	PC_IRQ_TXRDY,	
+	PC_IRQ_TXRDY,
 };
 
 enum
@@ -73,7 +73,7 @@ void isa8_ibm_mfc_device::set_pc_interrupt(int src, int state)
 		m_pc_irq_state |= 1 << src;
 	else
 		m_pc_irq_state &= ~(1 << src);
-		
+
 	update_pc_interrupts();
 }
 
@@ -85,7 +85,7 @@ void isa8_ibm_mfc_device::update_pc_interrupts(void)
 		// IRQs unmasked?
 		if (m_tcr & TCR_TMSK)
 		{
-			m_isa->irq3_w(m_pc_irq_state ? ASSERT_LINE : CLEAR_LINE);			
+			m_isa->irq3_w(m_pc_irq_state ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 }
@@ -96,7 +96,7 @@ void isa8_ibm_mfc_device::set_z80_interrupt(int src, int state)
 		m_z80_irq_state |= 1 << src;
 	else
 		m_z80_irq_state &= ~(1 << src);
-		
+
 	update_z80_interrupts();
 }
 
@@ -234,7 +234,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_c )
 
 	set_z80_interrupt(Z80_IRQ_TXRDY, BIT(data, 3));
 	set_z80_interrupt(Z80_IRQ_RXRDY, BIT(data, 0));
-	
+
 	m_z80_ppi_c = data;
 }
 
@@ -378,13 +378,13 @@ READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 			val = m_d71055c_0->read(space, offset);
 			break;
 		}
-		
+
 		case 0xc:
 		case 0xd:
 		case 0xe:
 		case 0xf:
 		{
-			val = (m_pc_irq_state ? 0x80 : 0) | (m_pc_irq_state & 3);	
+			val = (m_pc_irq_state ? 0x80 : 0) | (m_pc_irq_state & 3);
 			break;
 		}
 
@@ -393,7 +393,7 @@ READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 			fatalerror("Unhandled IBM MFC read from %d\n", offset);
 		}
 	}
-	
+
 	return val;
 }
 

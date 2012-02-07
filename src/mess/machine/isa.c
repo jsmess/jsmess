@@ -331,11 +331,11 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	if (machine().region("isa")) {
 		dest = machine().region("isa")->base() + start - 0xc0000;
 	}
-	memcpy(dest,src, end - start + 1);	
+	memcpy(dest,src, end - start + 1);
 	/*address_space *space = m_maincpu->memory().space(AS_PROGRAM);
-	space->install_read_bank(start, end, mask, mirror, tag);
-	space->unmap_write(start, end, mask, mirror);
-	memory_set_bankptr(machine(), tag, machine().region(dev->subtag(tempstring, region))->base());*/
+    space->install_read_bank(start, end, mask, mirror, tag);
+    space->unmap_write(start, end, mask, mirror);
+    memory_set_bankptr(machine(), tag, machine().region(dev->subtag(tempstring, region))->base());*/
 }
 
 void isa8_device::unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror)
@@ -359,8 +359,8 @@ WRITE_LINE_MEMBER( isa8_device::drq3_w ) { m_out_drq3_func(state); }
 
 UINT8 isa8_device::dack_r(int line)
 {
-	if (m_dma_device[line]) 
-		return m_dma_device[line]->dack_r(line);	
+	if (m_dma_device[line])
+		return m_dma_device[line]->dack_r(line);
 	return 0xff;
 }
 
@@ -373,7 +373,7 @@ void isa8_device::dack_w(int line,UINT8 data)
 void isa8_device::eop_w(int state)
 {
 	for (int i=0;i<8;i++) {
-		if (m_dma_eop[i]==TRUE && m_dma_device[i]) 
+		if (m_dma_eop[i]==TRUE && m_dma_device[i])
 			m_dma_device[i]->eop_w(state);
 	}
 }

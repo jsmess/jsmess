@@ -172,7 +172,7 @@ public:
 
 protected:
 	c64_expansion_slot_device *m_slot;
-	
+
 	int m_game;
 	int m_exrom;
 };

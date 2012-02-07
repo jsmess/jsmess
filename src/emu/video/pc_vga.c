@@ -1268,14 +1268,14 @@ static void gc_reg_write(running_machine &machine,UINT8 index,UINT8 data)
 			vga.gc.read_mode = (data & 8) >> 3;
 			vga.gc.write_mode = data & 3;
 			//if(data & 0x10 && vga.gc.alpha_dis)
-			//	popmessage("Host O/E enabled, contact MAMEdev");
+			//  popmessage("Host O/E enabled, contact MAMEdev");
 			break;
 		case 0x06:
 			vga.gc.memory_map_sel = (data & 0xc) >> 2;
 			vga.gc.chain_oe = (data & 2) >> 1;
 			vga.gc.alpha_dis = (data & 1);
 			//if(data & 2 && vga.gc.alpha_dis)
-			//	popmessage("Chain O/E enabled, contact MAMEdev");
+			//  popmessage("Chain O/E enabled, contact MAMEdev");
 			break;
 		case 0x07:
 			vga.gc.color_dont_care = data & 0xf;

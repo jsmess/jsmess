@@ -1640,7 +1640,7 @@ READ8_MEMBER( x1_state::x1_io_r )
 
 WRITE8_MEMBER( x1_state::x1_io_w )
 {
-	if(m_io_bank_mode == 1)                  	{ x1_ex_gfxram_w(space, offset, data); }
+	if(m_io_bank_mode == 1)                 	{ x1_ex_gfxram_w(space, offset, data); }
 	// TODO: user could install ym2151 on plain X1 too
 	//0x700, 0x701
 //  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(m_ctc, offset-0x0704,data); }

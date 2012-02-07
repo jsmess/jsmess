@@ -1,9 +1,9 @@
 /*
 
-	TODO:
-	
-	- 64C PLA dump
-	- cartridge loading
+    TODO:
+
+    - 64C PLA dump
+    - cartridge loading
 
 */
 
@@ -35,10 +35,10 @@
 void c64_state::check_interrupts()
 {
 	int restore = BIT(input_port_read(machine(), "SPECIAL"), 7);
-	
+
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_cia1_irq | m_vic_irq | m_exp_irq);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_cia2_irq | restore | m_exp_nmi);
-	
+
 	mos6526_flag_w(m_cia1, m_cass_rd & m_iec_srq);
 }
 
@@ -59,7 +59,7 @@ void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, in
 
 	UINT16 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 | A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
 	UINT8 data = m_pla->read(input);
-	
+
 	*casram = BIT(data, 0);
 	*basic = BIT(data, 1);
 	*kernal = BIT(data, 2);
@@ -78,7 +78,7 @@ void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, in
 UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, int basic, int kernal, int charom, int io, int roml, int romh)
 {
 	UINT8 data = 0;
-	
+
 	if (!casram)
 	{
 		data = m_ram->pointer()[offset];
@@ -119,18 +119,18 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 					cia_set_port_mask_value(m_cia1, 1, input_port_read(machine(), "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
 				else
 					cia_set_port_mask_value(m_cia1, 0, input_port_read(machine(), "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-					
+
 				data = mos6526_r(m_cia1, offset & 0x0f);
 				break;
-				
+
 			case 1: // CIA2
 				data = mos6526_r(m_cia2, offset & 0x0f);
 				break;
-				
+
 			case 2: // I/O1
 				data = m_exp->io1_r(space, offset);
 				break;
-				
+
 			case 3: // I/O2
 				data = m_exp->io2_r(space, offset);
 				break;
@@ -146,7 +146,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 	{
 		data = m_exp->romh_r(space, offset);
 	}
-	
+
 	return data;
 }
 
@@ -158,9 +158,9 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 READ8_MEMBER( c64_state::read )
 {
 	int casram, basic, kernal, charom, grw, io, roml, romh;
-	
+
 	bankswitch(offset, 0, 1, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
-	
+
 	return read_memory(space, offset, casram, basic, kernal, charom, io, roml, romh);
 }
 
@@ -172,7 +172,7 @@ READ8_MEMBER( c64_state::read )
 WRITE8_MEMBER( c64_state::write )
 {
 	int casram, basic, kernal, charom, grw, io, roml, romh;
-	
+
 	bankswitch(offset, 0, 0, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
 	if (!casram)
@@ -201,15 +201,15 @@ WRITE8_MEMBER( c64_state::write )
 			case 0: // CIA1
 				mos6526_w(m_cia1, offset & 0x0f, data);
 				break;
-				
+
 			case 1: // CIA2
 				mos6526_w(m_cia2, offset & 0x0f, data);
 				break;
-				
+
 			case 2: // I/O1
 				m_exp->io1_w(space, offset, data);
 				break;
-				
+
 			case 3: // I/O2
 				m_exp->io2_w(space, offset, data);
 				break;
@@ -354,7 +354,7 @@ UINT32 c64_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 static INTERRUPT_GEN( c64_frame_interrupt )
 {
 	c64_state *state = device->machine().driver_data<c64_state>();
-	
+
 	state->check_interrupts();
 	cbm_common_interrupt(device);
 }
@@ -377,11 +377,11 @@ READ8_MEMBER( c64_state::vic_lightpen_button_cb )
 READ8_MEMBER( c64_state::vic_dma_read )
 {
 	int casram, basic, kernal, charom, grw, io, roml, romh;
-	
+
 	offset = (!m_va15 << 15) | (!m_va14 << 14) | offset;
-	
+
 	bankswitch(0, offset, 1, 1, 0, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
-	
+
 	return read_memory(space, offset, casram, basic, kernal, charom, io, roml, romh);
 }
 
@@ -393,7 +393,7 @@ READ8_MEMBER( c64_state::vic_dma_read_color )
 WRITE_LINE_MEMBER( c64_state::vic_irq_w )
 {
 	m_vic_irq = state;
-	
+
 	check_interrupts();
 }
 
@@ -402,7 +402,7 @@ READ8_MEMBER( c64_state::vic_rdy_cb )
 	return input_port_read(machine(), "CYCLES") & 0x07;
 }
 
-static const vic2_interface vic_ntsc_intf = 
+static const vic2_interface vic_ntsc_intf =
 {
 	SCREEN_TAG,
 	M6510_TAG,
@@ -416,7 +416,7 @@ static const vic2_interface vic_ntsc_intf =
 	DEVCB_DRIVER_MEMBER(c64_state, vic_rdy_cb)
 };
 
-static const vic2_interface vic_pal_intf = 
+static const vic2_interface vic_pal_intf =
 {
 	SCREEN_TAG,
 	M6510_TAG,
@@ -439,7 +439,7 @@ static int paddle_read( device_t *device, int which )
 {
 	running_machine &machine = device->machine();
 	c64_state *state = device->machine().driver_data<c64_state>();
-	
+
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = mos6526_pa_r(state->m_cia1, 0);
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
@@ -564,26 +564,26 @@ static const sid6581_interface sid_intf =
 WRITE_LINE_MEMBER( c64_state::cia1_irq_w )
 {
 	m_cia1_irq = state;
-	
+
 	check_interrupts();
 }
 
 READ8_MEMBER( c64_state::cia1_pa_r )
 {
 	/*
-		
-		bit		description
-		
-		PA0		COL0, JOY B0
-		PA1		COL1, JOY B1
-		PA2		COL2, JOY B2
-		PA3		COL3, JOY B3
-		PA4		COL4, BTNB
-		PA5		COL5
-		PA6		COL6
-		PA7		COL7
-		
-	*/
+
+        bit     description
+
+        PA0     COL0, JOY B0
+        PA1     COL1, JOY B1
+        PA2     COL2, JOY B2
+        PA3     COL3, JOY B3
+        PA4     COL4, BTNB
+        PA5     COL5
+        PA6     COL6
+        PA7     COL7
+
+    */
 
 	UINT8 cia0portb = mos6526_pb_r(m_cia1, 0);
 
@@ -593,19 +593,19 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 READ8_MEMBER( c64_state::cia1_pb_r )
 {
 	/*
-		
-		bit		description
-		
-		PB0		JOY A0
-		PB1		JOY A1
-		PB2		JOY A2
-		PB3		JOY A3
-		PB4		BTNA/_LP
-		PB5
-		PB6
-		PB7
-		
-	*/
+
+        bit     description
+
+        PB0     JOY A0
+        PB1     JOY A1
+        PB2     JOY A2
+        PB3     JOY A3
+        PB4     BTNA/_LP
+        PB5
+        PB6
+        PB7
+
+    */
 
 	UINT8 cia0porta = mos6526_pa_r(m_cia1, 0);
 
@@ -615,20 +615,20 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 WRITE8_MEMBER( c64_state::cia1_pb_w )
 {
 	/*
-		
-		bit		description
-		
-		PB0		ROW0
-		PB1		ROW1
-		PB2		ROW2
-		PB3		ROW3
-		PB4		ROW4
-		PB5		ROW5
-		PB6		ROW6
-		PB7		ROW7
-		
-	*/
-	
+
+        bit     description
+
+        PB0     ROW0
+        PB1     ROW1
+        PB2     ROW2
+        PB3     ROW3
+        PB4     ROW4
+        PB5     ROW5
+        PB6     ROW6
+        PB7     ROW7
+
+    */
+
 	vic2_lightpen_write(m_vic, BIT(data, 4));
 }
 
@@ -653,63 +653,63 @@ static const mos6526_interface cia1_intf =
 WRITE_LINE_MEMBER( c64_state::cia2_irq_w )
 {
 	m_cia2_irq = state;
-	
+
 	check_interrupts();
 }
 
 READ8_MEMBER( c64_state::cia2_pa_r )
 {
 	/*
-		
-		bit		description
-		
-		PA0
-		PA1
-		PA2		USER PORT
-		PA3
-		PA4
-		PA5
-		PA6		CLK
-		PA7		DATA
-		
-	*/
-	
+
+        bit     description
+
+        PA0
+        PA1
+        PA2     USER PORT
+        PA3
+        PA4
+        PA5
+        PA6     CLK
+        PA7     DATA
+
+    */
+
 	UINT8 data = 0;
-	
+
 	// user port
 	data |= m_user->pa2_r() << 2;
-	
+
 	// IEC bus
 	data |= m_iec->clk_r() << 6;
 	data |= m_iec->data_r() << 7;
-	
+
 	return data;
 }
 
 WRITE8_MEMBER( c64_state::cia2_pa_w )
 {
 	/*
-		
-		bit		description
-		
-		PA0		_VA14
-		PA1		_VA15
-		PA2		USER PORT
-		PA3		ATN OUT
-		PA4		CLK OUT
-		PA5		DATA OUT
-		PA6
-		PA7
-		
-	*/
-	
+
+        bit     description
+
+        PA0     _VA14
+        PA1     _VA15
+        PA2     USER PORT
+        PA3     ATN OUT
+        PA4     CLK OUT
+        PA5     DATA OUT
+        PA6
+        PA7
+
+    */
+
 	// VIC banking
 	m_va14 = BIT(data, 0);
 	m_va15 = BIT(data, 1);
-	
+
 	// user port
 	m_user->pa2_w(BIT(data, 2));
-	
+
 	// IEC bus
 	m_iec->atn_w(!BIT(data, 3));
 	m_iec->clk_w(!BIT(data, 4));
@@ -737,50 +737,50 @@ static const mos6526_interface cia2_intf =
 READ8_MEMBER( c64_state::cpu_r )
 {
 	/*
-		
-		bit		description
-		
-		P0		1
-		P1		1
-		P2		1
-		P3
-		P4		CASS SENS
-		P5		
-		
-	*/
-	
+
+        bit     description
+
+        P0      1
+        P1      1
+        P2      1
+        P3
+        P4      CASS SENS
+        P5
+
+    */
+
 	UINT8 data = 0x07;
-	
+
 	data |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
-	
+
 	return data;
 }
 
 WRITE8_MEMBER( c64_state::cpu_w )
 {
 	/*
-		
-		bit		description
-		
-		P0		LORAM
-		P1		HIRAM
-		P2		CHAREN
-		P3		CASS WRT
-		P4
-		P5		CASS MOTOR
-		
-	*/
+
+        bit     description
+
+        P0      LORAM
+        P1      HIRAM
+        P2      CHAREN
+        P3      CASS WRT
+        P4
+        P5      CASS MOTOR
+
+    */
 
 	// HACK apply pull-up resistors
 	data |= (offset ^ 0x07) & 0x07;
-	
+
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
-	
+
 	// cassette write
 	m_cassette->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-	
+
 	// cassette motor
 	if (!BIT(data, 5))
 	{
@@ -810,17 +810,17 @@ static const m6502_interface cpu_intf =
 READ8_MEMBER( sx64_state::cpu_r )
 {
 	/*
-		
-		bit		description
-		
-		P0		1
-		P1		1
-		P2		1
-		P3		1
-		P4		1
-		P5		1
-		
-	*/
+
+        bit     description
+
+        P0      1
+        P1      1
+        P2      1
+        P3      1
+        P4      1
+        P5      1
+
+    */
 
 	return 0x3f;
 }
@@ -828,21 +828,21 @@ READ8_MEMBER( sx64_state::cpu_r )
 WRITE8_MEMBER( sx64_state::cpu_w )
 {
 	/*
-		
-		bit		description
-		
-		P0		LORAM
-		P1		HIRAM
-		P2		CHAREN
-		P3		
-		P4
-		P5		
-		
-	*/
+
+        bit     description
+
+        P0      LORAM
+        P1      HIRAM
+        P2      CHAREN
+        P3
+        P4
+        P5
+
+    */
 
 	// HACK apply pull-up resistors
 	data |= (offset ^ 0x07) & 0x07;
-	
+
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
@@ -864,17 +864,17 @@ static const m6502_interface sx64_cpu_intf =
 READ8_MEMBER( c64gs_state::cpu_r )
 {
 	/*
-		
-		bit		description
-		
-		P0		1
-		P1		1
-		P2		1
-		P3		1
-		P4		1
-		P5		1
-		
-	*/
+
+        bit     description
+
+        P0      1
+        P1      1
+        P2      1
+        P3      1
+        P4      1
+        P5      1
+
+    */
 
 	return 0x3f;
 }
@@ -882,21 +882,21 @@ READ8_MEMBER( c64gs_state::cpu_r )
 WRITE8_MEMBER( c64gs_state::cpu_w )
 {
 	/*
-		
-		bit		description
-		
-		P0		LORAM
-		P1		HIRAM
-		P2		CHAREN
-		P3		
-		P4
-		P5		
-		
-	*/
+
+        bit     description
+
+        P0      LORAM
+        P1      HIRAM
+        P2      CHAREN
+        P3
+        P4
+        P5
+
+    */
 
 	// HACK apply pull-up resistors
 	data |= (offset ^ 0x07) & 0x07;
-	
+
 	m_loram = BIT(data, 0);
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
@@ -920,7 +920,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 	c64_state *state = timer.machine().driver_data<c64_state>();
 
 	state->m_cass_rd = state->m_cassette->input() > +0.0;
-	
+
 	state->check_interrupts();
 }
 
@@ -932,7 +932,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 WRITE_LINE_MEMBER( c64_state::iec_srq_w )
 {
 	m_iec_srq = state;
-	
+
 	check_interrupts();
 }
 
@@ -953,14 +953,14 @@ static CBM_IEC_INTERFACE( iec_intf )
 WRITE_LINE_MEMBER( c64_state::exp_irq_w )
 {
 	m_exp_irq = state;
-	
+
 	check_interrupts();
 }
 
 WRITE_LINE_MEMBER( c64_state::exp_nmi_w )
 {
 	m_exp_nmi = state;
-	
+
 	check_interrupts();
 }
 
@@ -1003,10 +1003,10 @@ void c64_state::machine_start()
 	m_basic = machine().region("basic")->base();
 	m_kernal = machine().region("kernal")->base();
 	m_charom = machine().region("charom")->base();
-	
+
 	// allocate memory
 	m_color_ram = auto_alloc_array(machine(), UINT8, 0x400);
-	
+
 	// state saving
 	save_item(NAME(m_loram));
 	save_item(NAME(m_hiram));
@@ -1031,7 +1031,7 @@ void c64_state::machine_start()
 void c64c_state::machine_start()
 {
 	c64_state::machine_start();
-	
+
 	// find memory regions
 	m_basic = machine().region(M6510_TAG)->base();
 	m_kernal = machine().region(M6510_TAG)->base() + 0x2000;
@@ -1540,7 +1540,7 @@ ROM_START( c64n )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
-	
+
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
@@ -1559,7 +1559,7 @@ ROM_START( c64j )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "906143-02.u5", 0x0000, 0x1000, CRC(1604f6c1) SHA1(0fad19dbcdb12461c99657b2979dbb5c2e47b527) )
-	
+
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
@@ -1588,7 +1588,7 @@ ROM_START( c64sw )
 	ROMX_LOAD( "charswe.u5", 0x0000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "alt", "Swedish Characters (Alt)" )
 	ROMX_LOAD( "charswe2.u5", 0x0000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac), ROM_BIOS(2) )
-	
+
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
@@ -1607,7 +1607,7 @@ ROM_START( pet64 )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
-	
+
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
 ROM_END
@@ -1661,7 +1661,7 @@ ROM_START( vip64 )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_LOAD( "kernelsx.ud3", 0x0000, 0x2000, CRC(7858d3d7) SHA1(097cda60469492a8916c2677b7cce4e12a944bc0) )
-	
+
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "charswe.ud1", 0x0000, 0x1000, CRC(bee9b3fd) SHA1(446ae58f7110d74d434301491209299f66798d8a) )
 
@@ -1675,7 +1675,7 @@ ROM_END
 //-------------------------------------------------
 
 // ROM_LOAD( "dx64kern.bin", 0x0000, 0x2000, CRC(58065128) ) TODO where is this illusive ROM?
-#define rom_dx64 	rom_sx64n
+#define rom_dx64	rom_sx64n
 
 
 //-------------------------------------------------
@@ -1745,21 +1745,21 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE 	INPUT   	INIT    COMPANY                        FULLNAME    									FLAGS
-COMP( 1982,	c64n,	0,  	0,		ntsc,		c64,		0,		"Commodore Business Machines", "Commodore 64 (NTSC)",  						0 )
-COMP( 1982,	c64j,	c64n,  	0,		ntsc,		c64,		0,		"Commodore Business Machines", "Commodore 64 (Japan)", 						0 )
-COMP( 1982,	c64p,	c64n,  	0,		pal,		c64,		0,		"Commodore Business Machines", "Commodore 64 (PAL)",  						0 )
-COMP( 1982,	c64sw,	c64n,	0,		pal,		c64sw,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)", 	0 )
-COMP( 1983, pet64,	c64n,  	0,    	pet64,   	c64,     	0,     	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)", 					0 )
-COMP( 1983, edu64,  c64n,  	0,    	pet64,   	c64,     	0,     	"Commodore Business Machines", "Educator 64 (NTSC)", 						0 )
-COMP( 1984, sx64n,	c64n,	0,		ntsc_sx,	c64,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)", 				0 )
-COMP( 1984, sx64p,	c64n,	0,		pal_sx,		c64,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)", 				0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                        FULLNAME                                     FLAGS
+COMP( 1982,	c64n,	0,  	0,		ntsc,		c64,		0,		"Commodore Business Machines", "Commodore 64 (NTSC)",						0 )
+COMP( 1982,	c64j,	c64n,	0,		ntsc,		c64,		0,		"Commodore Business Machines", "Commodore 64 (Japan)",						0 )
+COMP( 1982,	c64p,	c64n,	0,		pal,		c64,		0,		"Commodore Business Machines", "Commodore 64 (PAL)",						0 )
+COMP( 1982,	c64sw,	c64n,	0,		pal,		c64sw,		0,		"Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)",	0 )
+COMP( 1983, pet64,	c64n,	0,  	pet64,  	c64,    	0,  	"Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",					0 )
+COMP( 1983, edu64,  c64n,	0,  	pet64,  	c64,    	0,  	"Commodore Business Machines", "Educator 64 (NTSC)",						0 )
+COMP( 1984, sx64n,	c64n,	0,		ntsc_sx,	c64,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",				0 )
+COMP( 1984, sx64p,	c64n,	0,		pal_sx,		c64,		0,		"Commodore Business Machines", "SX-64 / Executive 64 (PAL)",				0 )
 COMP( 1984, vip64,	c64n,	0,		pal_sx,		c64sw,		0,		"Commodore Business Machines", "VIP-64 (Sweden/Finland)",					0 )
-COMP( 1984, dx64,	c64n,	0,		ntsc_dx,	c64,		0,		"Commodore Business Machines", "DX-64 (NTSC)", 								0 )
+COMP( 1984, dx64,	c64n,	0,		ntsc_dx,	c64,		0,		"Commodore Business Machines", "DX-64 (NTSC)",								0 )
 //COMP(1983, clipper,  c64,  0, c64pal,  clipper, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 //COMP(1983, tesa6240, c64,  0, c64pal,  c64,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
-COMP( 1986, c64cn,	c64n,	0,    	ntsc_c,		c64,		0,		"Commodore Business Machines", "Commodore 64C (NTSC)", 						0 )
-COMP( 1986, c64cp,	c64n,	0,    	pal_c,		c64,		0,		"Commodore Business Machines", "Commodore 64C (PAL)", 						0 )
-COMP( 1986, c64csw,	c64n,	0,    	pal_c,		c64sw,		0,		"Commodore Business Machines", "Commodore 64C (Sweden/Finland)", 			0 )
-COMP( 1986, c64g,	c64n,	0,		pal_c,		c64,		0,		"Commodore Business Machines", "Commodore 64G (PAL)", 						0 )
-CONS( 1990, c64gs,	c64n,	0,		pal_gs,		c64gs,		0,		"Commodore Business Machines", "Commodore 64 Games System (PAL)", 			0 )
+COMP( 1986, c64cn,	c64n,	0,  	ntsc_c,		c64,		0,		"Commodore Business Machines", "Commodore 64C (NTSC)",						0 )
+COMP( 1986, c64cp,	c64n,	0,  	pal_c,		c64,		0,		"Commodore Business Machines", "Commodore 64C (PAL)",						0 )
+COMP( 1986, c64csw,	c64n,	0,  	pal_c,		c64sw,		0,		"Commodore Business Machines", "Commodore 64C (Sweden/Finland)",			0 )
+COMP( 1986, c64g,	c64n,	0,		pal_c,		c64,		0,		"Commodore Business Machines", "Commodore 64G (PAL)",						0 )
+CONS( 1990, c64gs,	c64n,	0,		pal_gs,		c64gs,		0,		"Commodore Business Machines", "Commodore 64 Games System (PAL)",			0 )

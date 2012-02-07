@@ -38,7 +38,7 @@ void el2_3c503_device::device_start() {
 	set_isa_device();
 	m_isa->install_device(0x0300, 0x030f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
 	m_isa->install_device(0x0700, 0x070f, 0, 0, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
-	
+
 	// TODO: This is wrong, fix if anything actually uses it
 	//  DMA can change in runtime
 	int chan = 0, idcfr = m_regs.idcfr & 0x0f;

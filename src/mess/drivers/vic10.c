@@ -1,9 +1,9 @@
 /*
 
-	TODO:
+    TODO:
 
-	- memory mapping with PLA
-	- PLA dump
+    - memory mapping with PLA
+    - PLA dump
 
 */
 
@@ -128,7 +128,7 @@ READ8_MEMBER( vic10_state::vic_lightpen_button_cb )
 READ8_MEMBER( vic10_state::vic_dma_read )
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	
+
 	if (offset < 0x3000)
 		return program->read_byte(offset);
 
@@ -143,7 +143,7 @@ READ8_MEMBER( vic10_state::vic_dma_read_color )
 WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
 {
 	m_vic_irq = state;
-	
+
 	check_interrupts();
 }
 
@@ -152,7 +152,7 @@ READ8_MEMBER( vic10_state::vic_rdy_cb )
 	return input_port_read(machine(), "CYCLES") & 0x07;
 }
 
-static const vic2_interface vic_intf = 
+static const vic2_interface vic_intf =
 {
 	SCREEN_TAG,
 	M6510_TAG,
@@ -175,7 +175,7 @@ static int vic10_paddle_read( device_t *device, int which )
 {
 	running_machine &machine = device->machine();
 	vic10_state *state = device->machine().driver_data<vic10_state>();
-	
+
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = mos6526_pa_r(state->m_cia, 0);
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
@@ -300,26 +300,26 @@ static const sid6581_interface sid_intf =
 WRITE_LINE_MEMBER( vic10_state::cia_irq_w )
 {
 	m_cia_irq = state;
-	
+
 	check_interrupts();
 }
 
 READ8_MEMBER( vic10_state::cia_pa_r )
 {
 	/*
-		
-		bit		description
-		
-		PA0		COL0, JOY B0
-		PA1		COL1, JOY B1
-		PA2		COL2, JOY B2
-		PA3		COL3, JOY B3
-		PA4		COL4, BTNB
-		PA5		COL5
-		PA6		COL6
-		PA7		COL7
-		
-	*/
+
+        bit     description
+
+        PA0     COL0, JOY B0
+        PA1     COL1, JOY B1
+        PA2     COL2, JOY B2
+        PA3     COL3, JOY B3
+        PA4     COL4, BTNB
+        PA5     COL5
+        PA6     COL6
+        PA7     COL7
+
+    */
 
 	UINT8 cia0portb = mos6526_pb_r(m_cia, 0);
 
@@ -329,19 +329,19 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 READ8_MEMBER( vic10_state::cia_pb_r )
 {
 	/*
-		
-		bit		description
-		
-		PB0		JOY A0
-		PB1		JOY A1
-		PB2		JOY A2
-		PB3		JOY A3
-		PB4		BTNA/_LP
-		PB5
-		PB6
-		PB7
-		
-	*/
+
+        bit     description
+
+        PB0     JOY A0
+        PB1     JOY A1
+        PB2     JOY A2
+        PB3     JOY A3
+        PB4     BTNA/_LP
+        PB5
+        PB6
+        PB7
+
+    */
 
 	UINT8 cia0porta = mos6526_pa_r(m_cia, 0);
 
@@ -351,20 +351,20 @@ READ8_MEMBER( vic10_state::cia_pb_r )
 WRITE8_MEMBER( vic10_state::cia_pb_w )
 {
 	/*
-		
-		bit		description
-		
-		PB0		ROW0
-		PB1		ROW1
-		PB2		ROW2
-		PB3		ROW3
-		PB4		ROW4
-		PB5		ROW5
-		PB6		ROW6
-		PB7		ROW7
-		
-	*/
-	
+
+        bit     description
+
+        PB0     ROW0
+        PB1     ROW1
+        PB2     ROW2
+        PB3     ROW3
+        PB4     ROW4
+        PB5     ROW5
+        PB6     ROW6
+        PB7     ROW7
+
+    */
+
 	vic2_lightpen_write(m_vic, BIT(data, 4));
 }
 
@@ -389,42 +389,42 @@ static const mos6526_interface cia_intf =
 READ8_MEMBER( vic10_state::cpu_r )
 {
 	/*
-		
-		bit		description
-		
-		P0		EXPANSION PORT
-		P1		1
-		P2		1
-		P3
-		P4		CASS SENS
-		P5		
-		
-	*/
-	
+
+        bit     description
+
+        P0      EXPANSION PORT
+        P1      1
+        P2      1
+        P3
+        P4      CASS SENS
+        P5
+
+    */
+
 	UINT8 data = 0x06;
-	
+
 	data |= m_exp->p0_r();
-	
+
 	data |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
-	
+
 	return data;
 }
 
 WRITE8_MEMBER( vic10_state::cpu_w )
 {
 	/*
-		
-		bit		description
-		
-		P0		EXPANSION PORT
-		P1		
-		P2		
-		P3		CASS WRT
-		P4
-		P5		CASS MOTOR
-		
-	*/
-	
+
+        bit     description
+
+        P0      EXPANSION PORT
+        P1
+        P2
+        P3      CASS WRT
+        P4
+        P5      CASS MOTOR
+
+    */
+
 	if (BIT(offset, 0))
 	{
 		m_exp->p0_w(BIT(data, 0));
@@ -432,7 +432,7 @@ WRITE8_MEMBER( vic10_state::cpu_w )
 
 	// cassette write
 	m_cassette->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-	
+
 	// cassette motor
 	if (!BIT(data, 5))
 	{
@@ -474,7 +474,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 WRITE_LINE_MEMBER( vic10_state::exp_irq_w )
 {
 	m_exp_irq = state;
-	
+
 	check_interrupts();
 }
 

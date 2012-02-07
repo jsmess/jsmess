@@ -131,7 +131,7 @@ bool vic10_expansion_slot_device::call_load()
 			if (!mame_stricmp(filetype(), "80"))
 			{
 				fread(m_cart->vic10_lorom_pointer(), 0x2000);
-				
+
 				if (size == 0x4000)
 				{
 					fread(m_cart->vic10_uprom_pointer(), 0x2000);
@@ -146,7 +146,7 @@ bool vic10_expansion_slot_device::call_load()
 
 			size = get_software_region_length("uprom");
 			if (size) memcpy(m_cart->vic10_uprom_pointer(), get_software_region("uprom"), size);
-			
+
 			size = get_software_region_length("exram");
 			if (size) m_cart->vic10_exram_pointer();
 		}

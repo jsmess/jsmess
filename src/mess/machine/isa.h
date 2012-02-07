@@ -175,7 +175,7 @@ public:
 	UINT8 dack_r(int line);
 	void dack_w(int line,UINT8 data);
 	void eop_w(int state);
-	
+
 	void set_dma_channel(UINT8 channel, device_isa8_card_interface *dev, bool do_eop);
 protected:
 	// device-level overrides
