@@ -11,6 +11,7 @@
 
 #include "cdrom.h"
 #include "sound/msm5205.h"
+#include "machine/nvram.h"
 
 #define C6280_TAG			"c6280"
 
@@ -123,7 +124,6 @@ public:
 /*----------- defined in machine/pce.c -----------*/
 
 DEVICE_IMAGE_LOAD(pce_cart);
-NVRAM_HANDLER( pce );
 WRITE8_HANDLER ( mess_pce_joystick_w );
  READ8_HANDLER ( mess_pce_joystick_r );
 
