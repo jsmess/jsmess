@@ -514,7 +514,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		latch is cleared to 0 on computer reset
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="hugo" />
+			<feature name="slot" value="silverrock" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 			<feature name="pcb" value="e9048" />

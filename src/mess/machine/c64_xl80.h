@@ -53,9 +53,6 @@ protected:
 	virtual int c64_exrom_r();
 
 private:
-	c64_expansion_slot_device *m_slot;
-
-	// internal state
 	required_device<h46505_device> m_crtc;
 
 	UINT8 *m_rom;

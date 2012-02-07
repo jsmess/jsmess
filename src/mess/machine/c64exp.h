@@ -167,8 +167,8 @@ public:
 	virtual UINT32 c64_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
 
 	// standard ROM cartridge
-	virtual UINT8* c64_roml_pointer() { return NULL; }
-	virtual UINT8* c64_romh_pointer() { return NULL; }
+	virtual UINT8* c64_roml_pointer(size_t size) { return NULL; }
+	virtual UINT8* c64_romh_pointer(size_t size) { return NULL; }
 
 protected:
 	c64_expansion_slot_device *m_slot;

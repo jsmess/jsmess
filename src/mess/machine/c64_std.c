@@ -70,11 +70,11 @@ UINT8 c64_standard_cartridge_device::c64_cd_r(offs_t offset, int roml, int romh,
 //  c64_roml_pointer - get low ROM pointer
 //-------------------------------------------------
 
-UINT8* c64_standard_cartridge_device::c64_roml_pointer()
+UINT8* c64_standard_cartridge_device::c64_roml_pointer(size_t size)
 {
 	if (m_roml == NULL)
 	{
-		m_roml = auto_alloc_array(machine(), UINT8, 0x2000);
+		m_roml = auto_alloc_array(machine(), UINT8, size);
 	}
 
 	return m_roml;
@@ -85,11 +85,11 @@ UINT8* c64_standard_cartridge_device::c64_roml_pointer()
 //  c64_romh_pointer - get high ROM pointer
 //-------------------------------------------------
 
-UINT8* c64_standard_cartridge_device::c64_romh_pointer()
+UINT8* c64_standard_cartridge_device::c64_romh_pointer(size_t size)
 {
 	if (m_romh == NULL)
 	{
-		m_romh = auto_alloc_array(machine(), UINT8, 0x2000);
+		m_romh = auto_alloc_array(machine(), UINT8, size);
 	}
 
 	return m_romh;
