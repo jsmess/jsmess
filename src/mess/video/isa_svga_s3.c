@@ -52,7 +52,7 @@ isa8_svga_s3_device::isa8_svga_s3_device(const machine_config &mconfig, const ch
         device_t(mconfig, ISA8_SVGA_S3, "ISA8_SVGA_S3", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this)
 {
-	m_shortname = "s3_864";
+	m_shortname = "s3_764";
 }
 
 //-------------------------------------------------
@@ -76,10 +76,10 @@ void isa8_svga_s3_device::device_start()
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "s3_764");
 
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(vga_port_03c0_r), FUNC(vga_port_03c0_w));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, FUNC(vga_port_03d0_r), FUNC(vga_port_03d0_w));
+	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(s3_port_03c0_r), FUNC(s3_port_03c0_w));
+	m_isa->install_device(0x3d0, 0x3df, 0, 0, FUNC(s3_port_03d0_r), FUNC(s3_port_03d0_w));
 
-	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, FUNC(vga_mem_r), FUNC(vga_mem_w));
+	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, FUNC(s3_mem_r), FUNC(s3_mem_w));
 }
 
 //-------------------------------------------------

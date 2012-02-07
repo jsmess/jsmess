@@ -22,7 +22,6 @@
     - fix video update.
     - rewrite video drawing functions (they are horrible)
     - add VESA etc.
-    - "System Information" UI currently crashes the emulation
     - (and many more ...)
 
     per-game issues:
@@ -30,8 +29,7 @@
     - MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
     - Bio Menace: jerky H scrolling (uses EGA mode)
     - Virtual Pool: ET4k unrecognized;
-    - California Chase (calchase): init bug causes messed up chars at POST
-      (gfxs works if you soft reset).
+    - California Chase (calchase): various gfx bugs, CPU related?
 
     ROM declarations:
 
@@ -1996,3 +1994,75 @@ WRITE8_HANDLER( trident_mem_w )
 
 	vga_mem_w(space,offset,data);
 }
+
+/******************************************
+
+S3 implementation
+
+******************************************/
+
+READ8_HANDLER(s3_port_03c0_r)
+{
+	UINT8 res;
+
+	switch(offset)
+	{
+		default:
+			res = vga_port_03c0_r(space,offset);
+			break;
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(s3_port_03c0_w)
+{
+	switch(offset)
+	{
+		default:
+			vga_port_03c0_w(space,offset,data);
+			break;
+	}
+}
+
+
+READ8_HANDLER(s3_port_03d0_r)
+{
+	UINT8 res = 0xff;
+
+	if (CRTC_PORT_ADDR == 0x3d0)
+	{
+		switch(offset)
+		{
+			default:
+				res = vga_port_03d0_r(space,offset);
+				break;
+		}
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(s3_port_03d0_w)
+{
+	if (CRTC_PORT_ADDR == 0x3d0)
+	{
+		switch(offset)
+		{
+			default:
+				vga_port_03d0_w(space,offset,data);
+				break;
+		}
+	}
+}
+
+READ8_HANDLER( s3_mem_r )
+{
+	return vga_mem_r(space,offset);
+}
+
+WRITE8_HANDLER( s3_mem_w )
+{
+	vga_mem_w(space,offset,data);
+}
+
