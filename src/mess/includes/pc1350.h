@@ -9,6 +9,8 @@
 #ifndef PC1350_H_
 #define PC1350_H_
 
+#include "machine/nvram.h"
+
 #define PC1350_CONTRAST (input_port_read(machine, "DSW0") & 0x07)
 
 
@@ -36,7 +38,6 @@ int pc1350_ina(device_t *device);
 int pc1350_inb(device_t *device);
 
 MACHINE_START( pc1350 );
-NVRAM_HANDLER( pc1350 );
 
 
 /*----------- defined in video/pc1350.c -----------*/

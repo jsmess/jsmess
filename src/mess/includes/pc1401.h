@@ -9,6 +9,8 @@
 #ifndef PC1401_H_
 #define PC1401_H_
 
+#include "machine/nvram.h"
+
 #define CONTRAST (input_port_read(machine, "DSW0") & 0x07)
 
 
@@ -37,7 +39,7 @@ int pc1401_ina(device_t *device);
 int pc1401_inb(device_t *device);
 
 DRIVER_INIT( pc1401 );
-NVRAM_HANDLER( pc1401 );
+MACHINE_START( pc1401 );
 
 
 /*----------- defined in video/pc1401.c -----------*/
