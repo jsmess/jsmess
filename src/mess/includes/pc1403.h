@@ -9,6 +9,8 @@
 #ifndef PC1403_H_
 #define PC1403_H_
 
+#include "machine/nvram.h"
+
 #define CONTRAST (input_port_read(machine, "DSW0") & 0x07)
 
 
@@ -39,7 +41,7 @@ int pc1403_ina(device_t *device);
 //int pc1403_inb(device_t *device);
 
 DRIVER_INIT( pc1403 );
-NVRAM_HANDLER( pc1403 );
+MACHINE_START( pc1403 );
 
 READ8_HANDLER(pc1403_asic_read);
 WRITE8_HANDLER(pc1403_asic_write);

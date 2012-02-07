@@ -90,30 +90,6 @@ int pc1350_brk(device_t *device)
 	return (input_port_read(device->machine(), "EXTRA") & 0x01);
 }
 
-/* currently enough to save the external ram */
-NVRAM_HANDLER( pc1350 )
-{
-	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.region("maincpu")->base() + 0x2000;
-	UINT8 *cpu = sc61860_internal_ram(main_cpu);
-
-	if (read_or_write)
-	{
-		file->write(cpu, 96);
-		file->write(ram, 0x5000);
-	}
-	else if (file)
-	{
-		file->read(cpu, 96);
-		file->read(ram, 0x5000);
-	}
-	else
-	{
-		memset(cpu, 0, 96);
-		memset(ram, 0, 0x5000);
-	}
-}
-
 static TIMER_CALLBACK(pc1350_power_up)
 {
 	pc1350_state *state = machine.driver_data<pc1350_state>();
@@ -150,4 +126,11 @@ MACHINE_START( pc1350 )
 	{
 		space->nop_readwrite(0x2000, 0x3fff);
 	}
+
+	device_t *main_cpu = machine.device("maincpu");
+	UINT8 *ram = machine.region("maincpu")->base() + 0x2000;
+	UINT8 *cpu = sc61860_internal_ram(main_cpu);
+
+	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);	
+	machine.device<nvram_device>("ram_nvram")->set_base(ram, 0x5000);	
 }

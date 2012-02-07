@@ -718,7 +718,8 @@ static const sc61860_cpu_core pc1401_config =
 static MACHINE_CONFIG_FRAGMENT( pocketc )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_NVRAM_HANDLER( pc1401 )
+	MCFG_NVRAM_ADD_0FILL("cpu_nvram")
+	MCFG_NVRAM_ADD_0FILL("ram_nvram")
 
 	/*
        aim: show sharp with keyboard
@@ -746,6 +747,8 @@ static MACHINE_CONFIG_START( pc1401, pc1401_state )
 	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
 	MCFG_CPU_CONFIG(pc1401_config)
 
+	MCFG_MACHINE_START( pc1401 )
+
 	MCFG_FRAGMENT_ADD(pocketc)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -772,7 +775,7 @@ static MACHINE_CONFIG_START( pc1250, pc1251_state )
 
 	MCFG_FRAGMENT_ADD(pocketc)
 
-	MCFG_NVRAM_HANDLER( pc1251 )
+	MCFG_MACHINE_START( pc1251 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -792,34 +795,21 @@ static MACHINE_CONFIG_DERIVED( pc1255, pc1250 )
 	MCFG_CPU_PROGRAM_MAP( pc1255_mem)
 MACHINE_CONFIG_END
 
-static NVRAM_HANDLER( pc1260 )
+static MACHINE_START( pc1260 )
 {
 	device_t *main_cpu = machine.device("maincpu");
 	UINT8 *ram = machine.region("maincpu")->base() + 0x4000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
-	if (read_or_write)
-	{
-		file->write(cpu, 96);
-		file->write(ram, 0x2800);
-	}
-	else if (file)
-	{
-		file->read(cpu, 96);
-		file->read(ram, 0x2800);
-	}
-	else
-	{
-		memset(cpu, 0, 96);
-		memset(ram, 0, 0x2800);
-	}
+	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);	
+	machine.device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
 }
 
 static MACHINE_CONFIG_DERIVED( pc1260, pc1250 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( pc1260_mem)
 
-	MCFG_NVRAM_HANDLER( pc1260 )
+	MCFG_MACHINE_START( pc1260 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1261, pc1260 )
@@ -843,7 +833,6 @@ static MACHINE_CONFIG_START( pc1350, pc1350_state )
 	MCFG_FRAGMENT_ADD( pocketc )
 
 	MCFG_MACHINE_START( pc1350 )
-	MCFG_NVRAM_HANDLER( pc1350 )
 
 	/*
        aim: show sharp with keyboard
@@ -880,7 +869,7 @@ static MACHINE_CONFIG_START( pc1403, pc1403_state )
 	MCFG_CPU_PROGRAM_MAP( pc1403_mem)
 	MCFG_CPU_CONFIG( pc1403_config )
 
-	MCFG_NVRAM_HANDLER( pc1403 )
+	MCFG_MACHINE_START( pc1403 )
 
 	/*
        aim: show sharp with keyboard

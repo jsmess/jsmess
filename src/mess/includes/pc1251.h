@@ -9,6 +9,7 @@
 #ifndef PC1251_H_
 #define PC1251_H_
 
+#include "machine/nvram.h"
 
 #define PC1251_CONTRAST (input_port_read(machine, "DSW0") & 0x07)
 
@@ -38,7 +39,7 @@ int pc1251_ina(device_t *device);
 int pc1251_inb(device_t *device);
 
 DRIVER_INIT( pc1251 );
-NVRAM_HANDLER( pc1251 );
+MACHINE_START( pc1251 );
 
 
 /*----------- defined in video/pc1251.c -----------*/

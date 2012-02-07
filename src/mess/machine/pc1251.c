@@ -90,28 +90,14 @@ int pc1251_reset(device_t *device)
 	return (input_port_read(device->machine(), "EXTRA") & 0x02);
 }
 
-/* currently enough to save the external ram */
-NVRAM_HANDLER( pc1251 )
+MACHINE_START( pc1251 )
 {
 	device_t *main_cpu = machine.device("maincpu");
 	UINT8 *ram = machine.region("maincpu")->base() + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
-	if (read_or_write)
-	{
-		file->write(cpu, 96);
-		file->write(ram, 0x4800);
-	}
-	else if (file)
-	{
-		file->read(cpu, 96);
-		file->read(ram, 0x4800);
-	}
-	else
-	{
-		memset(cpu, 0, 96);
-		memset(ram, 0, 0x4800);
-	}
+	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);	
+	machine.device<nvram_device>("ram_nvram")->set_base(ram, 0x4800);
 }
 
 static TIMER_CALLBACK(pc1251_power_up)
