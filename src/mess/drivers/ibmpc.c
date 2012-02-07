@@ -268,6 +268,7 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 #include "video/isa_cga.h"
 #include "video/isa_ega.h"
 #include "video/isa_mda.h"
+#include "video/isa_vga.h"
 #include "machine/ne1000.h"
 #include "machine/isa_mpu401.h"
 #include "machine/isa_ibm_mfc.h"
@@ -323,13 +324,15 @@ static DEVICE_INPUT_DEFAULTS_START(cga)
 DEVICE_INPUT_DEFAULTS_END
 
 //static DEVICE_INPUT_DEFAULTS_START(ega)
-//  DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x00)
+//	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x00)
 //DEVICE_INPUT_DEFAULTS_END
 
 static SLOT_INTERFACE_START(ibm_isa8_cards)
 	SLOT_INTERFACE("cga", ISA8_CGA)
-//  SLOT_INTERFACE("ega", ISA8_EGA)
+	SLOT_INTERFACE("ega", ISA8_EGA)
 	SLOT_INTERFACE("mda", ISA8_MDA)
+	SLOT_INTERFACE("hercules", ISA8_HERCULES)
+	SLOT_INTERFACE("vga", ISA8_VGA)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
 	SLOT_INTERFACE("finalchs", ISA8_FINALCHS)
@@ -360,12 +363,9 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ibm_isa8_cards, "fdc", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ibm_isa8_cards, "hdc", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ibm_isa8_cards, NULL, NULL)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ibm_isa8_cards, NULL, NULL)
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
-
-	//MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -392,6 +392,8 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ibm_isa8_cards, "hdc", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ibm_isa8_cards, NULL, NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ibm_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", ibm_isa8_cards, NULL, NULL)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa8", ibm_isa8_cards, NULL, NULL)
 
 	/* keyboard */
 	MCFG_KB_KEYTRONIC_ADD("keyboard", pc_keytronic_intf)
