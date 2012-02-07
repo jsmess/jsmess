@@ -137,7 +137,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_NVRAM_HANDLER( wswan )
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_MACHINE_START( wswan )
 	MCFG_MACHINE_RESET( wswan )

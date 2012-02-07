@@ -201,6 +201,8 @@ MACHINE_START( wswan )
 	/* Set up RTC timer */
 	if ( state->m_rtc.present )
 		machine.scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
+
+	machine.device<nvram_device>("nvram")->set_base(state->m_internal_eeprom, INTERNAL_EEPROM_SIZE);		
 }
 
 MACHINE_START( wscolor )
@@ -217,6 +219,8 @@ MACHINE_START( wscolor )
 	/* Set up RTC timer */
 	if ( state->m_rtc.present )
 		machine.scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
+
+	machine.device<nvram_device>("nvram")->set_base(state->m_internal_eeprom, INTERNAL_EEPROM_SIZE);		
 }
 
 MACHINE_RESET( wswan )
@@ -259,29 +263,6 @@ MACHINE_RESET( wswan )
 	state->m_bios_disabled = 0;
 	memory_set_bankptr( machine, "bank15", state->m_ws_bios_bank );
 //  memory_set_bankptr( machine, 15, state->m_ROMMap[(state->m_ROMBanks - 1) & (state->m_ROMBanks - 1)] );
-}
-
-NVRAM_HANDLER( wswan )
-{
-	wswan_state *state = machine.driver_data<wswan_state>();
-	if ( read_or_write )
-	{
-		/* Save the EEPROM data */
-		file->write(state->m_internal_eeprom, INTERNAL_EEPROM_SIZE );
-	}
-	else
-	{
-		/* Load the EEPROM data */
-		if ( file )
-		{
-			file->read(state->m_internal_eeprom, INTERNAL_EEPROM_SIZE );
-		}
-		else
-		{
-			/* Initialize the EEPROM data */
-			memset( state->m_internal_eeprom, 0xFF, sizeof( state->m_internal_eeprom ) );
-		}
-	}
 }
 
 READ8_MEMBER( wswan_state::wswan_sram_r )

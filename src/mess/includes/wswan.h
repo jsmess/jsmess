@@ -40,6 +40,7 @@
 #include "image.h"
 #include "cpu/v30mz/nec.h"
 #include "imagedev/cartslot.h"
+#include "machine/nvram.h"
 
 
 typedef struct
@@ -159,7 +160,6 @@ public:
 
 /*----------- defined in machine/wswan.c -----------*/
 
-NVRAM_HANDLER( wswan );
 MACHINE_START( wswan );
 MACHINE_START( wscolor );
 MACHINE_RESET( wswan );

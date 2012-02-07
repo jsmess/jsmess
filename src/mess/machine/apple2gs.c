@@ -245,27 +245,6 @@ static void process_clock(running_machine &machine)
 	}
 }
 
-
-
-NVRAM_HANDLER( apple2gs )
-{
-	apple2gs_state *state = machine.driver_data<apple2gs_state>();
-	if (read_or_write)
-	{
-		file->write(state->m_clock_bram, sizeof(state->m_clock_bram));
-	}
-	else if (file)
-	{
-		file->read(state->m_clock_bram, sizeof(state->m_clock_bram));
-	}
-	else
-	{
-		memset(state->m_clock_bram, 0x00, sizeof(state->m_clock_bram));
-	}
-}
-
-
-
 /* -----------------------------------------------------------------------
  * Interrupts
  * ----------------------------------------------------------------------- */
@@ -1871,6 +1850,8 @@ MACHINE_START( apple2gscommon )
 	state->m_sndglu_dummy_read = 0;
 
 	state->m_is_rom3 = true;
+	
+	machine.device<nvram_device>("nvram")->set_base(state->m_clock_bram, sizeof(state->m_clock_bram));
 
 	/* save state stuff.  note that the driver takes care of docram. */
 	UINT8* ram = machine.device<ram_device>(RAM_TAG)->pointer();
