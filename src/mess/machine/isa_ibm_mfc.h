@@ -43,18 +43,18 @@ public:
 
 		DECLARE_WRITE8_MEMBER( ppi1_o_a );
 		DECLARE_READ8_MEMBER( ppi1_i_b );
-			
+
 		DECLARE_WRITE8_MEMBER( ppi1_o_c );
-		
+
 		DECLARE_READ8_MEMBER( ibm_mfc_r );
 		DECLARE_WRITE8_MEMBER( ibm_mfc_w );
-		
+
 		DECLARE_READ_LINE_MEMBER( d70151_dsr_r );
-		                                                                                            
+
 		DECLARE_WRITE_LINE_MEMBER( d8253_clk0_out );
 		DECLARE_WRITE_LINE_MEMBER( d8253_clk1_out );
-		DECLARE_WRITE_LINE_MEMBER( d8253_clk2_out );		
-		
+		DECLARE_WRITE_LINE_MEMBER( d8253_clk2_out );
+
 		void							set_z80_interrupt(int src, int state);
 
 protected:

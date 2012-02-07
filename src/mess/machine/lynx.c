@@ -771,10 +771,10 @@ static void lynx_blitter(running_machine &machine)
 			state->m_blitter.sprite_collide = !(state->m_blitter.spr_coll & 0x20);
 			state->m_blitter.spritenr = state->m_blitter.spr_coll & 0x0f;
 			state->m_blitter.fred = 0;
-			
+
 			/* Draw Sprite */
 			lynx_blit_lines(state);
-			
+
 			if (state->m_blitter.sprite_collide && !(state->m_blitter.no_collide))
 			{
 				switch (state->m_blitter.mode)
@@ -788,7 +788,7 @@ static void lynx_blitter(running_machine &machine)
 						break;
 				}
 			}
-			
+
 			if (state->m_suzy.data[SPRGO] & 0x04) // Everon enabled
 			{
 				coldep = lynx_read_ram(state, state->m_blitter.colpos);
@@ -1223,9 +1223,9 @@ static WRITE8_HANDLER( suzy_write )
 			break;
 		case MATH_D:
 		/* Documentation states that writing to the MATH_D will set MATH_C to zero but not update the sign flag.
-		Implementing the sign detection as described in the documentation causes Stun Runners to not work.
-		Either the sign error in the docs is not as described or writing to the lower byte does update the sign flag.
-		Here I assume the sign flag gets updated. */
+        Implementing the sign detection as described in the documentation causes Stun Runners to not work.
+        Either the sign error in the docs is not as described or writing to the lower byte does update the sign flag.
+        Here I assume the sign flag gets updated. */
 			if (data)
 				state->m_sign_CD = 1;
 			break;
@@ -1644,7 +1644,7 @@ static TIMER_CALLBACK(lynx_uart_timer)
 			state->m_mikey.data[0x81] |= 0x10;
 			cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, ASSERT_LINE);
 		}
-	}	
+	}
 
 	if (state->m_uart.serctl & 0x80)
 	{

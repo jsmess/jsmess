@@ -23,7 +23,7 @@ class diskonchip_g3_device : public device_t,
 public:
 	// construction/destruction
 	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	void set_size(int _size) { m_size = _size; }
 protected:
     // device-level overrides
@@ -76,7 +76,7 @@ private:
 	void sec_2_write8(UINT32 offset, UINT8 data);
 
 	int m_size;
-	
+
 	UINT32 m_planes;
 	UINT32 m_blocks;
 	UINT32 m_pages;
@@ -94,10 +94,10 @@ private:
 	UINT32 m_plane;
 	UINT32 m_transfersize;
 	UINT8  m_test;
-	UINT32 m_address_count;	
+	UINT32 m_address_count;
 };
 
 // device type definition
-extern const device_type DISKONCHIP_G3;	
+extern const device_type DISKONCHIP_G3;
 
 #endif /* __DOCG3_H__ */

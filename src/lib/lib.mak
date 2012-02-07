@@ -307,5 +307,5 @@ $(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libflac/%.c | $(OSPREBUILD)
 # $(OBJ)/libflac++.a: $(LIBFLACPPOBJS)
 
 # $(LIBOBJ)/libflacpp/%.o: $(LIBSRC)/libflac/libflac++/%.cpp | $(OSPREBUILD)
-# 	@echo Compiling $<...
+#	@echo Compiling $<...
 #	$(CC) $(CDEFS) $(FLACOPTS) $(CPPONLYFLAGS) -I$(LIBSRC)/libflac/include -c $< -o $@

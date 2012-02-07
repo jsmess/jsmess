@@ -782,7 +782,7 @@ READ8_HANDLER( svi318_io_ext_r )
 
 	switch( offset )
 	{
-	case 0x12:		
+	case 0x12:
 		data = 0xfe | centronics->busy_r();
 		break;
 

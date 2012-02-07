@@ -73,11 +73,11 @@ public:
 
 	virtual void machine_start();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	void check_interrupts();
 	void bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh);
 	UINT8 read_memory(address_space &space, offs_t offset, int casram, int basic, int kernal, int charom, int io, int roml, int romh);
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -100,7 +100,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( iec_srq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
-	
+
 	// memory state
 	int m_loram;
 	int m_hiram;
@@ -108,12 +108,12 @@ public:
 	UINT8 *m_basic;
 	UINT8 *m_kernal;
 	UINT8 *m_charom;
-	
+
 	// video state
 	UINT8 *m_color_ram;
 	int m_va14;
 	int m_va15;
-	
+
 	// interrupt state
 	int m_cia1_irq;
 	int m_cia2_irq;

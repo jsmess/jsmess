@@ -7,11 +7,11 @@
  *
  **********************************************************************/
 
-/* 
+/*
  PCB layout
  ----------
            Floppy            SCSI
-       +-----------+ +------------------+  +- 
+       +-----------+ +------------------+  +-
  +-----+-----------+-+------------------+--+
  |                                         |
  | DIPSW DS1                               |\
@@ -28,49 +28,49 @@
  |||||||||  |||||||||||||||||||||||||      |
 
 
- DIPSW	sw1 - sw8
- U3	Intel chip labelled "AHA-1542CF/552800-01 D/9346", probably FDC (82077)
- U5	Z84C0010VEC
- U8	EEPROM(?) labelled 545120A
- U13	CXK5864CM-10LL (64kbit SRAM)
- U15	M27C256B labelled "ADAPTEC INC/553801-00 C/MCODE 563D/(C) 1993"
- U16	M27C256B labelled "ADAPTEC INC/553601-00 C/BIOS C38D/(C) 1993"
- U17	AIC-7970Q
- Y1	XTAL SRX4054 93-38
- Y2	XTAL SRX4053 93-40
- TRM	Dallas DS2107AS (SCSI termination)
- DS1	LED
+ DIPSW  sw1 - sw8
+ U3 Intel chip labelled "AHA-1542CF/552800-01 D/9346", probably FDC (82077)
+ U5 Z84C0010VEC
+ U8 EEPROM(?) labelled 545120A
+ U13    CXK5864CM-10LL (64kbit SRAM)
+ U15    M27C256B labelled "ADAPTEC INC/553801-00 C/MCODE 563D/(C) 1993"
+ U16    M27C256B labelled "ADAPTEC INC/553601-00 C/BIOS C38D/(C) 1993"
+ U17    AIC-7970Q
+ Y1 XTAL SRX4054 93-38
+ Y2 XTAL SRX4053 93-40
+ TRM    Dallas DS2107AS (SCSI termination)
+ DS1    LED
 
 */
 
 /*
  * The PCB has a couple of DIP switches:
  *
- * 	sw1	on	enable termination
- * 		off	software-controlled termination
+ *  sw1 on  enable termination
+ *      off software-controlled termination
  *
- * 	sw2	sw3	sw4	I/O Port
- * 	off	off	off	0x330 - 0x333 (default)
- * 	on	off	off	0x334 - 0x337
- * 	off	on	off	0x230 - 0x233
- * 	on	on	off	0x234 - 0x237
- * 	off	off	on	0x130 - 0x133
- * 	on	off	on	0x134 - 0x137
- * 	off	on	on	reserved
- * 	on	on	on	reserved
+ *  sw2 sw3 sw4 I/O Port
+ *  off off off 0x330 - 0x333 (default)
+ *  on  off off 0x334 - 0x337
+ *  off on  off 0x230 - 0x233
+ *  on  on  off 0x234 - 0x237
+ *  off off on  0x130 - 0x133
+ *  on  off on  0x134 - 0x137
+ *  off on  on  reserved
+ *  on  on  on  reserved
  *
- * 	sw5	on	disable floppy interface
- * 		off	enable floppy interface
+ *  sw5 on  disable floppy interface
+ *      off enable floppy interface
  *
- * 	sw6	sw7	sw8	BIOS base address
- *	off	off	off	0xdc000 (default)
- *	on	off	off	0xd8000
- *	off	on	off	0xd4000
- *	on	on	off	0xd0000
- *	off	off	on	0xcc000
- *	on	off	on	0xc8000
- *	off	on	on	reserved
- *	on	on	on	BIOS disabled
+ *  sw6 sw7 sw8 BIOS base address
+ *  off off off 0xdc000 (default)
+ *  on  off off 0xd8000
+ *  off on  off 0xd4000
+ *  on  on  off 0xd0000
+ *  off off on  0xcc000
+ *  on  off on  0xc8000
+ *  off on  on  reserved
+ *  on  on  on  BIOS disabled
  *
  * source: http://download.adaptec.com/pdfs/installation_guides/1540cfig.pdf
  */
@@ -152,7 +152,7 @@ WRITE8_MEMBER( aha1542_device::aha1542_w )
 //-------------------------------------------------
 //  ROM( aha1542 )
 //-------------------------------------------------
- 
+
 ROM_START( aha1542 )
     ROM_REGION( 0x8000, "aha1542", 0 )
 	ROM_LOAD( "553601-00.u16", 0x0000, 0x8000, CRC(AB22FC02) SHA1(f9f783e0272fc14ba3de32316997f1f6cadc67d0) ) /* Adaptec 1540CF/1542CF BIOS v2.01 */
@@ -190,16 +190,16 @@ aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void aha1542_device::device_config_complete() 
+void aha1542_device::device_config_complete()
 {
 	m_shortname = "aha1542";
 }
-		
+
 void aha1542_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xdc000, 0xdffff, 0, 0, "aha1542", "aha1542");
-	m_isa->install_device(0x330, 0x333, 0, 0, read8_delegate(FUNC( aha1542_device::aha1542_r ), this), 
+	m_isa->install_device(0x330, 0x333, 0, 0, read8_delegate(FUNC( aha1542_device::aha1542_r ), this),
 	write8_delegate(FUNC( aha1542_device::aha1542_w ), this) );
 }
 

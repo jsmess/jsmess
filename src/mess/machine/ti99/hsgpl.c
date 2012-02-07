@@ -632,66 +632,66 @@ static DEVICE_RESET( hsgpl )
 /*
 static DEVICE_NVRAM( hsgpl )
 {
-	// Called between START and RESET
-	hsgpl_state *card = get_safe_token(device);
-	astring hsname(device->machine().system().name, PATH_SEPARATOR, "hsgpl.nv");
-	file_error filerr;
+    // Called between START and RESET
+    hsgpl_state *card = get_safe_token(device);
+    astring hsname(device->machine().system().name, PATH_SEPARATOR, "hsgpl.nv");
+    file_error filerr;
 
-	if (read_or_write==0)
-	{
-		logerror("hsgpl: device nvram load %s\n", hsname.cstr());
+    if (read_or_write==0)
+    {
+        logerror("hsgpl: device nvram load %s\n", hsname.cstr());
 
-		emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_READ);
-		filerr = nvfile.open(hsname.cstr());
-		if (filerr != FILERR_NONE)
-		{
-			logerror("hsgpl: Could not restore NVRAM\n");
-			return;
-		}
+        emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_READ);
+        filerr = nvfile.open(hsname.cstr());
+        if (filerr != FILERR_NONE)
+        {
+            logerror("hsgpl: Could not restore NVRAM\n");
+            return;
+        }
 
-		if (nvfile.read(card->flashrom, FLROMSIZE) != FLROMSIZE)
-		{
-			logerror("hsgpl: Error loading NVRAM; unexpected EOF\n");
-			return;
-		}
+        if (nvfile.read(card->flashrom, FLROMSIZE) != FLROMSIZE)
+        {
+            logerror("hsgpl: Error loading NVRAM; unexpected EOF\n");
+            return;
+        }
 
-		if (card->flashrom[0] != NVVERSION)
-		{
-			logerror("hsgpl: Wrong NVRAM image version: %d\n", card->flashrom[0]);
-			return;
-		}
-	}
-	else
-	{
-		logerror("hsgpl: device nvram save %s\n", hsname.cstr());
-		// Check dirty flags
-		if (at29c040a_is_dirty(card->dsr) ||
-			at29c040a_is_dirty(card->rom6) ||
-			at29c040a_is_dirty(card->groma) ||
-			at29c040a_is_dirty(card->gromb))
-		{
-			card->flashrom[0] = NVVERSION;
+        if (card->flashrom[0] != NVVERSION)
+        {
+            logerror("hsgpl: Wrong NVRAM image version: %d\n", card->flashrom[0]);
+            return;
+        }
+    }
+    else
+    {
+        logerror("hsgpl: device nvram save %s\n", hsname.cstr());
+        // Check dirty flags
+        if (at29c040a_is_dirty(card->dsr) ||
+            at29c040a_is_dirty(card->rom6) ||
+            at29c040a_is_dirty(card->groma) ||
+            at29c040a_is_dirty(card->gromb))
+        {
+            card->flashrom[0] = NVVERSION;
 
-			emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			filerr = nvfile.open(hsname.cstr());
-			if (filerr != FILERR_NONE)
-			{
-				logerror("hsgpl: Could not save NVRAM\n");
-			}
-			else
-			{
-				if (nvfile.write(card->flashrom, FLROMSIZE) != FLROMSIZE)
-				{
-					logerror("hsgpl: Error while saving contents of NVRAM.\n");
-				}
-			}
-			return;
-		}
-		else
-		{
-			logerror("hsgpl: No changes on card, leaving nvram file unchanged.\n");
-		}
-	}
+            emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+            filerr = nvfile.open(hsname.cstr());
+            if (filerr != FILERR_NONE)
+            {
+                logerror("hsgpl: Could not save NVRAM\n");
+            }
+            else
+            {
+                if (nvfile.write(card->flashrom, FLROMSIZE) != FLROMSIZE)
+                {
+                    logerror("hsgpl: Error while saving contents of NVRAM.\n");
+                }
+            }
+            return;
+        }
+        else
+        {
+            logerror("hsgpl: No changes on card, leaving nvram file unchanged.\n");
+        }
+    }
 }
 */
 /*

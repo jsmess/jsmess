@@ -41,7 +41,7 @@ public:
 
 	DECLARE_READ8_MEMBER( aha1542_r );
 	DECLARE_WRITE8_MEMBER( aha1542_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -49,7 +49,7 @@ protected:
 	virtual void device_config_complete();
 
 	// device_isa16_card_interface
-	
+
 private:
 	// internal state
 };
