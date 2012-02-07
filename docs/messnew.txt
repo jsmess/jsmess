@@ -1,4 +1,52 @@
-﻿0.144u7
+﻿0.145
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Olympia People PC [Robert aka rfka01]
+
+System Driver Changes:
+----------------------
+-c64: Implemented memory mapping via a 82S100 device that uses the fusemap of the real C64 PLA.
+This enables full cartridge support, and more accurate emulation of the hardware in the future.
+Retired the old driver, and separated Ultimax (vic10) and C64DTV to their own drivers. [Curt Coder]
+-lynx: Added basic uart loopback emulation (loopz, malibu, bzone2k, awesomeg get past intro) [Huygens]
+  - Moved sign conversion code inside multiply function (fixes stunrun)
+  - cartslot changed to mandatory (real lynx will not power on without a game inserted)
+  - moved sign detection back outside multiply function.
+  - added sign flag updating on write to LSB of MATH_CD register.
+-n64: DMA / RSP / RDP Optimization and Documentation [MooglyGuy]
+  - Start of mass variable renaming / documentation in the RDP core
+  - RSP Opt: Shunt around the core memory system for RSP instruction / data fetches
+  - DMA Opt: Shunt around the core memory system for SP and PI DMA transfers
+  - RDP Opt: Replace 2D switch statement with function table for texel fetching
+  - RDP Opt: Replace 3x array lookup for 16-to-32 pixel expansion with 64K LUT
+  - RDP Opt: Remove setters / getters in favor of direct member access
+
+Software Lists:
+----------------
+-ibm5140.xml: added floppy disk softlist. [Kaylee]
+-apple1.xml: added tape software list [Anonymous01, Fabio Priuli]
+-famicom.xml: added a floppy disk softlist and updated the driver to use it. [Fabio Priuli]
+
+Source Changes:
+----------------
+-Added Covox DAC and Covox Stereo-On-1 [Miodrag Milanovic]
+-Added emulation of HD64610 RTC and hooked up to pda600 driver. [Sandro Ronco]
+-ISA card AHA1542 skeleton added [Darkstar]
+-Added noise support to UPD1771 [plgDavid]
+-Added ISA IBM PC Music Feature Card [Phil Bennett]
+-ioport.c: Made the key/paste buffer auto-expand when it becomes full. 
+ This makes it possible to paste larger BASIC programs for instance.  [Wilbert Pol]
+ 
+0.144u7
 
 New System Drivers Supported:
 -----------------------------
