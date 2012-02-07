@@ -1013,9 +1013,8 @@ static READ8_HANDLER( px4_ramdisk_control_r )
 static NVRAM_HANDLER( px4_ramdisk )
 {
 	px4_state *px4 = machine.driver_data<px4_state>();
-
 	if (read_or_write)
-		file->write(px4->m_ramdisk, 0x20000);
+		file->write();
 	else
 		if (file)
 			file->read(px4->m_ramdisk, 0x20000);
@@ -1125,6 +1124,11 @@ static MACHINE_RESET( px4 )
 	px4->m_artsr = ART_TXRDY | ART_TXEMPTY;
 }
 
+static MACHINE_START( px4_ramdisk )
+{
+	px4_state *px4 = machine.driver_data<px4_state>();
+	machine.device<nvram_device>("nvram")->set_base(px4->m_ramdisk, 0x20000);
+}
 
 /***************************************************************************
     ADDRESS MAPS
@@ -1405,7 +1409,8 @@ static MACHINE_CONFIG_DERIVED( px4p, px4 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 
-	MCFG_NVRAM_HANDLER(px4_ramdisk)
+	MCFG_MACHINE_START(px4_ramdisk)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_PALETTE_INIT(px4p)
 

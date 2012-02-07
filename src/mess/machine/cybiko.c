@@ -63,32 +63,6 @@ DRIVER_INIT( cybikoxt )
 	init_ram_handler(machine, 0x400000, machine.device<ram_device>(RAM_TAG)->size(), 0x200000);
 }
 
-////////////////////
-// NVRAM HANDLERS //
-////////////////////
-#if 0
-NVRAM_HANDLER( cybikov1 )
-{
-	_logerror( 0, ("nvram_handler_cybikov1 (%p/%d)\n", file, read_or_write));
-	nvram_handler_at45dbxx( machine, file, read_or_write);
-	nvram_handler_pcf8593( machine, file, read_or_write);
-}
-
-NVRAM_HANDLER( cybikov2 )
-{
-	_logerror( 0, ("nvram_handler_cybikov2 (%p/%d)\n", file, read_or_write));
-	nvram_handler_at45dbxx( machine, file, read_or_write);
-	nvram_handler_sst39vfx( machine, file, read_or_write);
-	nvram_handler_pcf8593( machine, file, read_or_write);
-}
-
-NVRAM_HANDLER( cybikoxt )
-{
-	_logerror( 0, ("nvram_handler_cybikoxt (%p/%d)\n", file, read_or_write));
-	nvram_handler_sst39vfx( machine, file, read_or_write);
-	nvram_handler_pcf8593( machine, file, read_or_write);
-}
-#endif
 ///////////////////
 // MACHINE START //
 ///////////////////
