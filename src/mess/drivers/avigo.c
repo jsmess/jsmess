@@ -267,6 +267,10 @@ void avigo_state::machine_start()
 	m_flashes[0] = machine().device<intelfsh8_device>("flash0");
 	m_flashes[1] = machine().device<intelfsh8_device>("flash1");
 	m_flashes[2] = machine().device<intelfsh8_device>("flash2");
+	
+	machine().device<nvram_device>("nvram")->set_base(m_ram_base, m_ram->size());
+	m_warm_start = 1;
+	
 }
 
 static ADDRESS_MAP_START( avigo_mem , AS_PROGRAM, 8, avigo_state)
@@ -788,31 +792,6 @@ static TIMER_DEVICE_CALLBACK( avigo_1hz_timer )
 	state->refresh_ints();
 }
 
-static NVRAM_HANDLER(avigo)
-{
-	avigo_state *state = machine.driver_data<avigo_state>();
-	UINT32 ram_size = state->m_ram->size();
-
-	if (read_or_write)
-	{
-		file->write(state->m_ram_base, ram_size);
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(state->m_ram_base, ram_size);
-			state->m_warm_start = 1;
-		}
-		else
-		{
-			memset(state->m_ram_base, 0, ram_size);
-			state->m_warm_start = 0;
-		}
-	}
-}
-
-
 static QUICKLOAD_LOAD(avigo)
 {
 	avigo_state *state = image.device().machine().driver_data<avigo_state>();
@@ -864,6 +843,11 @@ static QUICKLOAD_LOAD(avigo)
 	return IMAGE_INIT_FAIL;
 }
 
+void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
+{
+	m_warm_start = 0;
+	memset(base, 0x00, size);
+}
 
 static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* basic machine hardware */
@@ -904,7 +888,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 
-	MCFG_NVRAM_HANDLER(avigo)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", avigo_state, nvram_init)
 
 	// IRQ 1 is used for scan the pen and for cursor blinking
 	MCFG_TIMER_ADD_PERIODIC("scan_timer", avigo_scan_timer, attotime::from_hz(50))
