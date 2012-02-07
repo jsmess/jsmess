@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_interface)
 
-	MCFG_NVRAM_HANDLER( apple2gs )
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

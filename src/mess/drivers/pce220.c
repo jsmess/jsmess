@@ -28,6 +28,7 @@
 #include "machine/ram.h"
 #include "sound/beep.h"
 #include "machine/pce220_ser.h"
+#include "machine/nvram.h"
 #include "rendlay.h"
 
 // Interrupt flags
@@ -852,6 +853,8 @@ void pce220_state::machine_start()
 	memory_configure_bank(machine(), "bank4", 0, 8, rom, 0x4000);
 
 	m_vram = (UINT8*)machine().region("lcd_vram")->base();
+	
+	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());	
 }
 
 void pcg850v_state::machine_start()
@@ -865,6 +868,7 @@ void pcg850v_state::machine_start()
 	memory_configure_bank(machine(), "bank4", 0, 22, rom, 0x4000);
 
 	m_vram = (UINT8*)machine().region("lcd_vram")->base();
+	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());	
 }
 
 void pce220_state::machine_reset()
@@ -910,29 +914,6 @@ static TIMER_DEVICE_CALLBACK(pce220_timer_callback)
 	}
 }
 
-static NVRAM_HANDLER(pce220)
-{
-	pce220_state *state = machine.driver_data<pce220_state>();
-	UINT8 *ram_base = (UINT8*)state->m_ram->pointer();
-	UINT32 ram_size = state->m_ram->size();
-
-	if (read_or_write)
-	{
-		file->write(ram_base, ram_size);
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(ram_base, ram_size);
-		}
-		else
-		{
-			memset(ram_base, 0, ram_size);
-		}
-	}
-}
-
 static PALETTE_INIT(pce220)
 {
 	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
@@ -966,7 +947,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 
 	MCFG_TIMER_ADD_PERIODIC("pce220_timer", pce220_timer_callback, attotime::from_msec(468))
 
-	MCFG_NVRAM_HANDLER(pce220)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1001,7 +982,7 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 
 	MCFG_TIMER_ADD_PERIODIC("pce220_timer", pce220_timer_callback, attotime::from_msec(468))
 
-	MCFG_NVRAM_HANDLER(pce220)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

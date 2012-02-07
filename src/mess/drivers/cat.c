@@ -35,6 +35,7 @@ ToDo:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
+#include "machine/nvram.h"
 
 class cat_state : public driver_device
 {
@@ -304,6 +305,7 @@ static MACHINE_START(cat)
 
 	state->m_duart_inp = 0x0e;
 	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(keyboard_callback));
+	machine.device<nvram_device>("nvram")->set_base(state->m_p_sram, 0x4000);
 }
 
 static MACHINE_RESET(cat)
@@ -418,23 +420,6 @@ static const duart68681_config cat_duart68681_config =
 	NULL
 };
 
-static NVRAM_HANDLER( cat )
-{
-	cat_state *state = machine.driver_data<cat_state>();
-
-	if (read_or_write)
-	{
-		file->write(state->m_p_sram, 0x4000);
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(state->m_p_sram, 0x4000);
-		}
-	}
-}
-
 static MACHINE_CONFIG_START( cat, cat_state )
 
 	/* basic machine hardware */
@@ -459,7 +444,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_5MHz, cat_duart68681_config )
 
-	MCFG_NVRAM_HANDLER( cat )
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( swyft, cat_state )

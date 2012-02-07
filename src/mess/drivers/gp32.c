@@ -23,6 +23,7 @@
 #include "sound/dac.h"
 #include "video/generic.h"
 #include "rendlay.h"
+#include "machine/nvram.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -1748,6 +1749,7 @@ static void s3c240x_machine_start( running_machine &machine)
 	state->m_s3c240x_iis_timer = machine.scheduler().timer_alloc(FUNC(s3c240x_iis_timer_exp), (void *)(FPTR)0);
 	state->m_s3c240x_lcd_timer = machine.scheduler().timer_alloc(FUNC(s3c240x_lcd_timer_exp), (void *)(FPTR)0);
 	state->m_eeprom_data = auto_alloc_array( machine, UINT8, 0x2000);
+	machine.device<nvram_device>("nvram")->set_base(state->m_eeprom_data, 0x2000);
 	smc_init( machine);
 	i2s_init( machine);
 }
@@ -1759,29 +1761,6 @@ static void s3c240x_machine_reset( running_machine &machine)
 	i2s_reset( machine);
 	state->m_s3c240x_iis.fifo_index = 0;
 	state->m_s3c240x_iic.data_index = 0;
-}
-
-static NVRAM_HANDLER( gp32 )
-{
-	gp32_state *state = machine.driver_data<gp32_state>();
-	if (read_or_write)
-	{
-		if (file)
-		{
-			file->write(state->m_eeprom_data, 0x2000);
-		}
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(state->m_eeprom_data, 0x2000);
-		}
-		else
-		{
-			memset( state->m_eeprom_data, 0xFF, 0x2000);
-		}
-	}
 }
 
 static ADDRESS_MAP_START( gp32_map, AS_PROGRAM, 32 )
@@ -1858,7 +1837,7 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_SOUND_ADD("dac2", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_NVRAM_HANDLER(gp32)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SMARTMEDIA_ADD("smartmedia")
 MACHINE_CONFIG_END

@@ -11,6 +11,7 @@
 
 #include "includes/apple2.h"
 #include "sound/es5503.h"
+#include "machine/nvram.h"
 
 // IIgs clocks as marked on the schematics
 #define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock
@@ -108,8 +109,6 @@ public:
 MACHINE_START( apple2gs );
 MACHINE_START( apple2gsr1 );
 MACHINE_RESET( apple2gs );
-
-NVRAM_HANDLER( apple2gs );
 
 void apple2gs_doc_irq(device_t *device, int state);
 
