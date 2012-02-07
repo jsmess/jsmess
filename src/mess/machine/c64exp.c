@@ -132,25 +132,25 @@ bool c64_expansion_slot_device::call_load()
 
 			if (!mame_stricmp(filetype(), "80"))
 			{
-				fread(m_cart->c64_roml_pointer(), 0x2000);
+				fread(m_cart->c64_roml_pointer(0x2000), 0x2000);
 				m_cart->c64_exrom_w(0);
 
 				if (size == 0x4000)
 				{
-					fread(m_cart->c64_romh_pointer(), 0x2000);
+					fread(m_cart->c64_romh_pointer(0x2000), 0x2000);
 					m_cart->c64_game_w(0);
 				}
 			}
 			else if (!mame_stricmp(filetype(), "a0"))
 			{
-				fread(m_cart->c64_romh_pointer(), size);
+				fread(m_cart->c64_romh_pointer(0x2000), size);
 
 				m_cart->c64_game_w(0);
 				m_cart->c64_exrom_w(0);
 			}
 			else if (!mame_stricmp(filetype(), "e0"))
 			{
-				fread(m_cart->c64_romh_pointer(), size);
+				fread(m_cart->c64_romh_pointer(0x2000), size);
 
 				m_cart->c64_game_w(0);
 			}
@@ -162,19 +162,20 @@ bool c64_expansion_slot_device::call_load()
 			switch (size)
 			{
 			case 0x2000:
-				memcpy(m_cart->c64_roml_pointer(), get_software_region("roml"), size);
+				memcpy(m_cart->c64_roml_pointer(0x2000), get_software_region("roml"), size);
 
 				size = get_software_region_length("romh");
-				if (size) memcpy(m_cart->c64_romh_pointer(), get_software_region("romh"), size);
+				if (size) memcpy(m_cart->c64_romh_pointer(0x2000), get_software_region("romh"), size);
 				break;
 
 			case 0x4000:
-				memcpy(m_cart->c64_roml_pointer(), get_software_region("roml"), 0x2000);
-				memcpy(m_cart->c64_romh_pointer(), get_software_region("roml") + 0x2000, 0x2000);
+				memcpy(m_cart->c64_roml_pointer(0x2000), get_software_region("roml"), 0x2000);
+				memcpy(m_cart->c64_romh_pointer(0x2000), get_software_region("roml") + 0x2000, 0x2000);
 				break;
 
 			default:
-				return IMAGE_INIT_FAIL;
+				memcpy(m_cart->c64_roml_pointer(size), get_software_region("roml"), size);
+				break;
 			}
 
 			m_cart->c64_game_w(atol(get_feature("game")));

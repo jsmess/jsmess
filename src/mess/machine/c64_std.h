@@ -40,8 +40,8 @@ protected:
 
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(offs_t offset, int roml, int romh, int io1, int io2);
-	virtual UINT8* c64_roml_pointer();
-	virtual UINT8* c64_romh_pointer();
+	virtual UINT8* c64_roml_pointer(size_t size);
+	virtual UINT8* c64_romh_pointer(size_t size);
 
 private:
 	UINT8 *m_roml;

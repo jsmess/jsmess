@@ -3,6 +3,7 @@
 #ifndef CBMIPT_H_
 #define CBMIPT_H_
 
+#include "machine/c64_silverrock.h"
 #include "machine/c64_std.h"
 #include "machine/c64_xl80.h"
 #include "machine/c1541.h"
