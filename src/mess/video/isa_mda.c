@@ -488,9 +488,6 @@ READ8_MEMBER( isa8_mda_device::io_read)
 
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( hercules_r );
-static WRITE8_DEVICE_HANDLER( hercules_w );
-
 /*
 When the Hercules changes to graphics mode, the number of pixels per access and
 clock divider should be changed. The currect mc6845 implementation does not
@@ -583,7 +580,7 @@ void isa8_hercules_device::device_start()
 {
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
 	set_isa_device();
-	m_isa->install_device(this, 0x3b0, 0x3bf, 0, 0, FUNC(hercules_r), FUNC(hercules_w) );
+	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_hercules_device::io_read), this ), write8_delegate( FUNC(isa8_hercules_device::io_write), this ) );
 	m_isa->install_bank(0xb0000, 0xbffff, 0, 0, "bank_hercules", m_videoram);
 
 	/* Initialise the mda palette */
@@ -646,64 +643,53 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 }
 
 
-static WRITE8_DEVICE_HANDLER(hercules_mode_control_w)
+WRITE8_MEMBER( isa8_hercules_device::mode_control_w )
 {
-	isa8_hercules_device *herc  = downcast<isa8_hercules_device *>(device->owner());
+	mc6845_device *mc6845 = subdevice<mc6845_device>(HERCULES_MC6845_NAME);
 
-	MDA_LOG(1,"hercules_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
-		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
-	herc->m_mode_control = data;
+	m_mode_control = data;
 
-	switch( herc->m_mode_control & 0x2a )
+	switch( m_mode_control & 0x2a )
 	{
 	case 0x08:
-		herc->m_update_row = mda_text_inten_update_row;
+		m_update_row = mda_text_inten_update_row;
 		break;
 	case 0x28:
-		herc->m_update_row = mda_text_blink_update_row;
+		m_update_row = mda_text_blink_update_row;
 		break;
 	case 0x0A:          /* Hercules modes */
 	case 0x2A:
-		herc->m_update_row = hercules_gfx_update_row;
+		m_update_row = hercules_gfx_update_row;
 		break;
 	default:
-		herc->m_update_row = NULL;
+		m_update_row = NULL;
 	}
 
-	downcast<mc6845_device *>(device)->set_clock( herc->m_mode_control & 0x02 ? MDA_CLOCK / 16 : MDA_CLOCK / 9 );
-	downcast<mc6845_device *>(device)->set_hpixels_per_column( herc->m_mode_control & 0x02 ? 16 : 9 );
+	mc6845->set_clock( m_mode_control & 0x02 ? MDA_CLOCK / 16 : MDA_CLOCK / 9 );
+	mc6845->set_hpixels_per_column( m_mode_control & 0x02 ? 16 : 9 );
 }
 
 
-static WRITE8_DEVICE_HANDLER(hercules_config_w)
+WRITE8_MEMBER( isa8_hercules_device::io_write )
 {
-	isa8_hercules_device *herc  = downcast<isa8_hercules_device *>(device);
-	MDA_LOG(1,"HGC_config_w",("$%02x\n", data));
-	herc->m_configuration_switch = data;
-}
-
-
-static WRITE8_DEVICE_HANDLER ( hercules_w )
-{
-	mc6845_device *mc6845 = downcast<mc6845_device *>(device->subdevice(HERCULES_MC6845_NAME));
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *lpt = device->subdevice("lpt");
+	mc6845_device *mc6845 = subdevice<mc6845_device>(HERCULES_MC6845_NAME);
+	device_t *lpt = subdevice("lpt");
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
-		mc6845->address_w( *space, offset, data );
+		mc6845->address_w( space, offset, data );
 		break;
 	case 1: case 3: case 5: case 7:
-		mc6845->register_w( *space, offset, data );
+		mc6845->register_w( space, offset, data );
 		break;
 	case 8:
-		hercules_mode_control_w(mc6845, offset, data);
+		mode_control_w(space, offset, data);
 		break;
 	case 12: case 13:  case 14:
 		pc_lpt_w(lpt, offset - 12, data);
 		break;
 	case 15:
-		hercules_config_w(device, offset, data);
+		m_configuration_switch = data;
 		break;
 	}
 }
@@ -720,33 +706,30 @@ static WRITE8_DEVICE_HANDLER ( hercules_w )
  *      2-1  reserved
  *      0    horizontal drive enable
  */
-static READ8_DEVICE_HANDLER(hercules_status_r)
+READ8_MEMBER( isa8_hercules_device::status_r )
 {
-	isa8_hercules_device *herc  = downcast<isa8_hercules_device *>(device);
-
 	// Faking pixel stream here
-	herc->m_pixel++;
+	m_pixel++;
 
-	return herc->m_vsync | ( herc->m_pixel & 0x08 ) | herc->m_hsync;
+	return m_vsync | ( m_pixel & 0x08 ) | m_hsync;
 }
 
 
-static READ8_DEVICE_HANDLER ( hercules_r )
+READ8_MEMBER( isa8_hercules_device::io_read )
 {
 	int data = 0xff;
-	mc6845_device *mc6845 = downcast<mc6845_device *>(device->subdevice(HERCULES_MC6845_NAME));
-	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *lpt = device->subdevice("lpt");
+	mc6845_device *mc6845 = subdevice<mc6845_device>(HERCULES_MC6845_NAME);
+	device_t *lpt = subdevice("lpt");
 	switch( offset )
 	{
 	case 0: case 2: case 4: case 6:
 		/* return last written mc6845 address value here? */
 		break;
 	case 1: case 3: case 5: case 7:
-		data = mc6845->register_r( *space, offset );
+		data = mc6845->register_r( space, offset );
 		break;
 	case 10:
-		data = hercules_status_r(device, offset);
+		data = status_r(space, offset);
 		break;
 	/* 12, 13, 14  are the LPT ports */
 	case 12: case 13:  case 14:
