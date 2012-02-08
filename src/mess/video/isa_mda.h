@@ -30,10 +30,10 @@ public:
 
 		DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 		DECLARE_WRITE_LINE_MEMBER(vsync_changed);
-		DECLARE_READ8_MEMBER(io_read);
-		DECLARE_WRITE8_MEMBER(io_write);
-		DECLARE_READ8_MEMBER(status_r);
-		DECLARE_WRITE8_MEMBER(mode_control_w);
+		virtual DECLARE_READ8_MEMBER(io_read);
+		virtual DECLARE_WRITE8_MEMBER(io_write);
+		virtual DECLARE_READ8_MEMBER(status_r);
+		virtual DECLARE_WRITE8_MEMBER(mode_control_w);
 
 protected:
         // device-level overrides
@@ -67,6 +67,11 @@ public:
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
+
+		virtual DECLARE_READ8_MEMBER(io_read);
+		virtual DECLARE_WRITE8_MEMBER(io_write);
+		virtual DECLARE_READ8_MEMBER(status_r);
+		virtual DECLARE_WRITE8_MEMBER(mode_control_w);
 
 protected:
         // device-level overrides
