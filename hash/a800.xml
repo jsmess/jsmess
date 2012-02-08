@@ -1132,6 +1132,18 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="bombjake" supported="no">
+		<description>Bomb Jake</description>
+		<year>2009</year>
+		<publisher>GR8 Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="corina" />
+			<dataarea name="rom" size="532480">
+				<rom name="bomb jake.rom" size="532480" crc="8e89ca50" sha1="b3bca012eb2207e97dffcd5946b163b8a6f50d71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="bdash">
 		<description>Boulder Dash</description>
@@ -4825,6 +4837,18 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="viscopy3" supported="no">
+		<description>VisiCopy III</description>
+		<year>1993</year>
+		<publisher>JRC</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="phoenix 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="visicopy3.rom" size="8192" crc="0aa5ffdb" sha1="15b7e13446f4259a17bf911c7f9e34d622310dac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vpoker">
 		<description>Video Poker Card Game</description>
 		<year>1998</year>
@@ -4894,6 +4918,18 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="worm war 1.rom" size="8192" crc="d9b120f4" sha1="b7517334bdaf111a8afa8b2536db3c43e76b2b5c" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="yakungfu" supported="no">
+		<description>Yie Another Kung-Fu</description>
+		<year>2011</year>
+		<publisher>GR8 Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="corina" />
+			<dataarea name="rom" size="1056768">
+				<rom name="yie another kung-fu.rom" size="1056768" crc="8ed7da2d" sha1="5f315d358d9680eb1cc9531276d649ab1f599aab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
