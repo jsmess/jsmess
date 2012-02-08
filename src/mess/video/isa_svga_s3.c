@@ -75,9 +75,10 @@ void isa8_svga_s3_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "s3_764");
 
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(s3_port_03c0_r), FUNC(s3_port_03c0_w));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, FUNC(s3_port_03d0_r), FUNC(s3_port_03d0_w));
+	m_isa->install_device(0x03b0, 0x03bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
+	m_isa->install_device(0x03c0, 0x03cf, 0, 0, FUNC(s3_port_03c0_r), FUNC(s3_port_03c0_w));
+	m_isa->install_device(0x03d0, 0x03df, 0, 0, FUNC(s3_port_03d0_r), FUNC(s3_port_03d0_w));
+	m_isa->install_device(0x9ae8, 0x9aeb, 0, 0, FUNC(s3_port_9ae8_r), FUNC(s3_port_9ae8_w));
 
 	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, FUNC(s3_mem_r), FUNC(s3_mem_w));
 }
