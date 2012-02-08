@@ -49,6 +49,7 @@ public:
 		UINT8   vsync;
 		UINT8   hsync;
 		UINT8  *videoram;
+		UINT8	m_pixel;
 };
 
 
