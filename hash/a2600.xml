@@ -538,7 +538,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="aliencce" cloneof="alien">
+	<software name="alienc" cloneof="alien">
 		<description>Alien (CCE)</description>
 		<year>1982</year>
 		<publisher>CCE</publisher>
@@ -1221,7 +1221,7 @@ Info from Atariage and Atarimania
 	</software>
 
 
-	<software name="bckgmmn">
+	<software name="backgamm">
 		<description>Backgammon</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
@@ -1234,7 +1234,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="bckgmmne" cloneof="bckgmmn">
+	<software name="backgamme" cloneof="backgamm">
 		<description>Backgammon (PAL)</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
@@ -1364,7 +1364,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="scbasball" cloneof="scbasbal"><!-- cloneof="baseball" not so sure about it-->
+	<software name="scbasbalj" cloneof="scbasbal"><!-- cloneof="baseball" not so sure about it-->
 		<description>Super Challenge Baseball (JYTEC)</description>
 		<year>1978</year>
 		<publisher>Jone Yuan Telephonic Enterprise Co</publisher>
@@ -1432,7 +1432,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="baskball">
+	<software name="bsktball">
 		<description>Basketball</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
@@ -1446,7 +1446,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="baskballe" cloneof="baskball">
+	<software name="bsktballe" cloneof="bsktball">
 		<description>Basketball (PAL)</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
@@ -1460,7 +1460,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="batlzone">
+	<software name="bzone">
 		<description>Battlezone</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -1473,7 +1473,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="batlzonee" cloneof="batlzone">
+	<software name="bzonee" cloneof="bzone">
 		<description>Battlezone (PAL)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -1486,7 +1486,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="batlzonp1" cloneof="batlzone">
+	<software name="bzonep1" cloneof="bzone">
 		<description>Battlezone (Prototype 19830502)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -1499,7 +1499,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="batlzonp2" cloneof="batlzone">
+	<software name="bzonep2" cloneof="bzone">
 		<description>Battlezone (Prototype 19830512)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -1551,7 +1551,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="beanboppr" cloneof="beanbopp">
+	<software name="beanboppc" cloneof="beanbopp">
 		<description>Beany Bopper (CCE)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
@@ -1829,7 +1829,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="barnstor">
+	<software name="barnstrme1" cloneof="barnstrm">
 		<description>Barnstorming (PAL) (Unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1972,7 +1972,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="blackjac">
+	<software name="blckjack">
 		<description>Blackjack - Black Jack</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
@@ -1983,7 +1983,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="blackjace" cloneof="blackjac">
+	<software name="blckjacke" cloneof="blckjack">
 		<description>Blackjack (PAL)</description>
 		<year>1977</year>
 		<publisher>Atari</publisher>
@@ -1994,7 +1994,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="blackjace1" cloneof="blackjac">
+	<software name="blckjacke1" cloneof="blckjack">
 		<description>Blackjack (PAL) (Unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4183,7 +4183,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demonatt">
+	<software name="demonatk">
 		<description>Demon Attack</description>
 		<year>1982</year>
 		<publisher>Imagic</publisher>
@@ -4194,7 +4194,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demonattf" cloneof="demonatt">
+	<software name="demonatkf" cloneof="demonatk">
 		<description>Demon Attack (Fixed?)</description>
 		<year>1982</year>
 		<publisher>Imagic</publisher>
@@ -4205,7 +4205,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demonatte" cloneof="demonatt">
+	<software name="demonatke" cloneof="demonatk">
 		<description>Demon Attack (PAL)</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4216,7 +4216,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demonattc" cloneof="demonatt">
+	<software name="demonatkc" cloneof="demonatk">
 		<description>Demon Attack (CCE)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
@@ -4227,7 +4227,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demonattr" cloneof="demonatt">
+	<software name="demonatkr" cloneof="demonatk">
 		<description>Demon Attack (Robby)</description>
 		<year>19??</year>
 		<publisher>Robby</publisher>
@@ -4238,7 +4238,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demonatts" cloneof="demonatt">
+	<software name="demonatks" cloneof="demonatk">
 		<description>Demon Attack (Supergame)</description>
 		<year>19??</year>
 		<publisher>Supergame</publisher>
@@ -4249,7 +4249,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="demonatte1" cloneof="demonatt">
+	<software name="demonatke1" cloneof="demonatk">
 		<description>Demon Attack (PAL) (Unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4337,7 +4337,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="desfalcn">
+	<software name="dsrtflcn">
 		<description>Desert Falcon</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -4348,7 +4348,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="desfalcne" cloneof="desfalcn">
+	<software name="dsrtflcne" cloneof="dsrtflcn">
 		<description>Desert Falcon (PAL)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -4359,7 +4359,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="desfalcnep" cloneof="desfalcn">
+	<software name="dsrtflcnep" cloneof="dsrtflcn">
 		<description>Desert Falcon (PAL) (Prototype 19870527)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -4832,7 +4832,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="dukhazrd">
+	<software name="hazzard">
 		<description>Dukes of Hazzard</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -4843,7 +4843,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="dukhazrdp" cloneof="dukhazrd">
+	<software name="hazzardp" cloneof="hazzard">
 		<description>Dukes of Hazzard (Prototype)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
@@ -5261,7 +5261,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="fantastv">
+	<software name="fvoyage">
 		<description>Fantastic Voyage</description>
 		<year>1982</year>
 		<publisher>20th Century Fox Video Games</publisher>
@@ -7253,7 +7253,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="jhunt">
+	<software name="jungleh">
 		<description>Jungle Hunt</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -7264,7 +7264,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="jhuntec" cloneof="jhunt">
+	<software name="junglehc" cloneof="jungleh">
 		<description>Jungle Hunt (CCE)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
@@ -7275,7 +7275,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="jhuntec1" cloneof="jhunt">
+	<software name="junglehc1" cloneof="jungleh">
 		<description>Jungle Hunt (CCE, Alt)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
@@ -7286,7 +7286,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="jhunte" cloneof="jhunt">
+	<software name="junglehe" cloneof="jungleh">
 		<description>Jungle Hunt (PAL)</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7297,7 +7297,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="jhuntp2" cloneof="jhunt">
+	<software name="junglehp2" cloneof="jungleh">
 		<description>Jungle Hunt (Prototype 19830203)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -7308,7 +7308,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="jhuntp1" cloneof="jhunt">
+	<software name="junglehp1" cloneof="jungleh">
 		<description>Jungle Hunt (Prototype 19830225)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -7396,7 +7396,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="kangurua">
+	<software name="kanguru" cloneof="kangaroo">
 		<description>Kanguru</description>
 		<year>1983</year>
 		<publisher>Zirok</publisher>
@@ -8102,7 +8102,7 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="mash">
-		<description>M.A.S.H</description>
+		<description>M*A*S*H</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8135,7 +8135,7 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="mashe" cloneof="mash">
-		<description>M.A.S.H (PAL)</description>
+		<description>M*A*S*H (PAL)</description>
 		<year>1983</year>
 		<publisher>20th Century Fox Video Games</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -8463,7 +8463,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="megamani">
+	<software name="megmania">
 		<description>MegaMania - A Space Nightmare</description>
 		<year>1982</year>
 		<publisher>Activision</publisher>
@@ -8474,7 +8474,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="megamanidy" cloneof="megamani">
+	<software name="megmaniady" cloneof="megmania">
 		<description>Megamania (Dynacom)</description>
 		<year>1982</year>
 		<publisher>Dynacom</publisher>
@@ -8485,7 +8485,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="megamanic" cloneof="megamani">
+	<software name="megmaniac" cloneof="megmania">
 		<description>Megamania (CCE)</description>
 		<year>1983</year>
 		<publisher>CCE</publisher>
@@ -8496,7 +8496,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="megamanid" cloneof="megamani">
+	<software name="megmaniad" cloneof="megmania">
 		<description>Megamania (Digitel)</description>
 		<year>1983</year>
 		<publisher>Digitel</publisher>
@@ -8507,7 +8507,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="megamanie" cloneof="megamani">
+	<software name="megmaniae" cloneof="megmania">
 		<description>MegaMania - A Space Nightmare - Ein Alptraum im Weltall (PAL)</description>
 		<year>1982</year>
 		<publisher>Activision</publisher>
@@ -8519,7 +8519,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="megamanie1" cloneof="megamani">
+	<software name="megmaniae1" cloneof="megmania">
 		<description>MegaMania (PAL) (Unknown)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8689,7 +8689,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="minev2">
+	<software name="m2049v2">
 		<description>Miner 2049er Volume II</description>
 		<year>1983</year>
 		<publisher>Tigervision</publisher>
@@ -8700,7 +8700,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="minev2e" cloneof="minev2">
+	<software name="m2049v2e" cloneof="m2049v2">
 		<description>Miner 2049er Volume II (PAL)</description>
 		<year>1983</year>
 		<publisher>Tigervision</publisher>
@@ -8933,7 +8933,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="mogulman">
+	<software name="mogul">
 		<description>Mogul Maniac</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
@@ -11012,7 +11012,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="pygmyaka">
+	<software name="pygmy">
 		<description>Pygmy (PAL)</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11057,7 +11057,7 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="qbert">
-		<description>Q-bert</description>
+		<description>Q*bert</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11068,7 +11068,7 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="qberte" cloneof="qbert">
-		<description>Q-bert (PAL)</description>
+		<description>Q*bert (PAL)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11079,7 +11079,7 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="qbertea" cloneof="qbert">
-		<description>Q-bert (PAL) (Atari)</description>
+		<description>Q*bert (PAL) (Atari)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -11090,7 +11090,7 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="qbertq">
-		<description>Q-bert's Qubes</description>
+		<description>Q*bert's Qubes</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -13489,7 +13489,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="spacesht">
+	<software name="shuttle">
 		<description>Space Shuttle - A Journey Into Space</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -13500,7 +13500,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="spacesht1" cloneof="spacesht">
+	<software name="shuttle1" cloneof="shuttle">
 		<description>Space Shuttle - A Journey Into Space (Alt, FE bankswitching)</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -13511,7 +13511,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="spaceshte" cloneof="spacesht">
+	<software name="shuttlee" cloneof="shuttle">
 		<description>Space Shuttle - A Journey Into Space - Eine Reise ins All (PAL)</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -14754,7 +14754,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="sbreak">
+	<software name="sbrkout">
 		<description>Super Breakout</description>
 		<year>1981?</year>
 		<publisher>Atari</publisher>
@@ -14765,7 +14765,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="sbreak1" cloneof="sbreak">
+	<software name="sbrkout1" cloneof="sbrkout">
 		<description>Super Breakout (Alt)</description>
 		<year>1981?</year>
 		<publisher>Atari</publisher>
@@ -14776,7 +14776,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="sbreake" cloneof="sbreak">
+	<software name="sbrkoute" cloneof="sbrkout">
 		<description>Super Breakout (PAL)</description>
 		<year>1981?</year>
 		<publisher>Atari</publisher>
@@ -15854,7 +15854,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="trondead">
+	<software name="trondd">
 		<description>TRON - Deadly Discs</description>
 		<year>1982</year>
 		<publisher>M Network</publisher>

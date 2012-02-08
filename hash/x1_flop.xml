@@ -8,7 +8,7 @@ but the website only covers post 1985 titles...
 Games I haven't managed to start (possibly due to my mistakes):
 * zeliard: at the end of the intro it prints "read EMM address [00]" while waiting for something
 * ys2: after the Falcom screen it prints a message on-screen and waits for something to happen
-* suikoden, sangoku2, sangoku2a, nobunasg: sits to a jpn message waiting for who knows what
+* suikoden, sangoku2, sangoku2a, nobuseng: sits to a jpn message waiting for who knows what
 * revolty2: waits for something to happen
 * reviver: waits for something to happen
 * mule, mulea: waits for something to happen
@@ -109,7 +109,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="aresshik">
+	<software name="aressha">
 		<description>A-Ressha de Ikou</description>
 		<year>1986</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -166,7 +166,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="ametruck">
+	<software name="amtruck">
 		<description>American Truck</description>
 		<year>1985</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -320,7 +320,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="bokensha">
-		<description>Bokensha-tachi Kenja no Yuigon</description>
+		<description>Bokensha-tachi - Kenja no Yuigon</description>
 		<year>1987</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198701xx"/>
@@ -490,7 +490,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="daisenry">
+	<software name="daisenr">
 		<description>Daisenryaku X1</description>
 		<year>1987</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -508,7 +508,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="daisenrya" cloneof="daisenry">
+	<software name="daisenra" cloneof="daisenr">
 		<description>Daisenryaku X1 (Alt)</description>
 		<year>1987</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -770,8 +770,8 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="gaiframe">
-		<description>Gaiframe</description>
+	<software name="gaiflame">
+		<description>Gai Flame</description>
 		<year>1988</year>
 		<publisher>NCS</publisher>
 		<info name="release" value="198801xx"/>
@@ -788,7 +788,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="gallfrce">
+	<software name="galforce">
 		<description>Gall Force - Eternal Story</description>
 		<year>1987</year>
 		<publisher>スキャップトラスト (Scap Trust)</publisher>
@@ -1244,7 +1244,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="karuizaw">
-		<description>Karuizawa Yukai Annai</description>
+		<description>Karuizawa Yuukai Annai</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<info name="release" value="198511xx"/>
@@ -1388,7 +1388,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="lastarma">
+	<software name="lastarmg">
 		<description>Last Armageddon</description>
 		<year>1988</year>
 		<publisher>ブレイングレイ (Brain Gray)</publisher>
@@ -1431,7 +1431,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner</description>
 		<year>1985</year>
 		<publisher>ソフトプロ (Soft Pro)</publisher>
@@ -1444,7 +1444,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="lpower">
+	<software name="lostpow">
 		<description>Lost Power</description>
 		<year>1986</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
@@ -1664,7 +1664,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
     <!-- is this correct or is it "Makai-wo" by Bond Soft (198603) [disk is broken in current svn] -->
-	<software name="makai">
+	<software name="makaifuk">
 		<description>Makai Fukkatsu</description>
 		<year>1987</year>
 		<publisher>ソフトスタジオＷＩＮＧ (Soft Studio Wing)</publisher>
@@ -1856,8 +1856,8 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="nobunasg" supported="no">
-		<description>Nobunaga no Yabou - Sengoku Gunyou Den</description>
+	<software name="nobuseng" supported="no">
+		<description>Nobunaga no Yabou - Sengoku Gunyuuden</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- Turbo only -->
@@ -1880,8 +1880,8 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="nobunazb">
-		<description>Nobunaga no Yabou - Zenkoku Ban</description>
+	<software name="nobuzenk">
+		<description>Nobunaga no Yabou - Zenkokuban</description>
 		<year>1987</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="release" value="198701xx"/>
@@ -3048,8 +3048,8 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="tritorn">
-		<description>Tritorn</description>
+	<software name="triton">
+		<description>Triton</description>
 		<year>1985</year>
 		<publisher>ザインソフト (Sein Soft)</publisher>
 		<info name="release" value="198511xx"/>
@@ -3293,7 +3293,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="woodpoco">
+	<software name="woodypoc">
 		<description>Woody Poco</description>
 		<year>1986</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -3306,7 +3306,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="woodpocoa" cloneof="woodpoco">
+	<software name="woodypoca" cloneof="woodypoc">
 		<description>Woody Poco (Alt)</description>
 		<year>1986</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -3319,7 +3319,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="woodpocob" cloneof="woodpoco">
+	<software name="woodypocb" cloneof="woodypoc">
 		<description>Woody Poco (Alt 2)</description>
 		<year>1986</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
@@ -3755,7 +3755,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="iroha">
+	<software name="irohanih">
 		<description>Irohanihoheto</description>
 		<year>1988?</year>
 		<publisher>全流通 (Zenryutsu)? / Angel?</publisher>
@@ -4043,7 +4043,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="bshashsc">
-		<description>Bishojo Shashinkan Studio Cut</description>
+		<description>Bishoujo Shashinkan - Studio Cut</description>
 		<year>1987?</year>
 		<publisher>ハード (Hard)</publisher>
 		<info name="alt_title" value="美少女写真館 STUDIO CUT"/>
@@ -4054,7 +4054,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="thundfrc">
+	<software name="tforce">
 		<description>Thunder Force</description>
 		<year>1984?</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>

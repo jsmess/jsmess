@@ -78,7 +78,7 @@ guys
 		</part>
 	</software>
 
-	<software name="berzerkd" cloneof="berzerk">
+	<software name="berzerkp" cloneof="berzerk">
 		<description>Berzerk (Debugged Prototype)</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
@@ -133,7 +133,7 @@ guys
 		</part>
 	</software>
 
-	<software name="crzycstr">
+	<software name="ccoaster">
 		<description>Crazy Coaster</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
@@ -144,7 +144,7 @@ guys
 		</part>
 	</software>
 
-	<software name="darktwer">
+	<software name="darktowr">
 		<description>Dark Tower (Proto)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
@@ -188,7 +188,7 @@ guys
 		</part>
 	</software>
 
-	<software name="hyprchse">
+	<software name="hyprchas">
 		<description>Hyperchase</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
@@ -199,7 +199,7 @@ guys
 		</part>
 	</software>
 
-	<software name="mailplne">
+	<software name="mailplan">
 		<description>Mail Plane (Proto)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
@@ -210,7 +210,7 @@ guys
 		</part>
 	</software>
 
-	<software name="mldymstr">
+	<software name="melody">
 		<description>Melody Master</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
@@ -243,7 +243,7 @@ guys
 		</part>
 	</software>
 
-	<software name="nrrwescp">
+	<software name="narrowes">
 		<description>Narrow Escape</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
@@ -320,7 +320,7 @@ guys
 		</part>
 	</software>
 
-	<software name="rcktsldg">
+	<software name="rocksled">
 		<description>Rocket Sledge (Sample)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>

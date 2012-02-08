@@ -145,7 +145,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="astrchse">
+	<software name="achase">
 		<description>Astro Chase</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
@@ -158,7 +158,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="ballblze">
+	<software name="ballblaz">
 		<description>Ballblazer</description>
 		<year>1986</year>
 		<publisher>Atari / Lucasfilm</publisher>
@@ -194,7 +194,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="beamrid">
+	<software name="beamridr">
 		<description>Beamrider</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -253,7 +253,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="bbstrksb">
+	<software name="bbsb">
 		<description>Bounty Bob Strikes Back!</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
@@ -265,7 +265,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="buckrog">
-		<description>Buck Rogers : Planet of Zoom</description>
+		<description>Buck Rogers - Planet of Zoom</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="005-02" />
@@ -368,7 +368,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="dredfctr">
+	<software name="dfactor">
 		<description>The Dreadnaught Factor</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -380,7 +380,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="finalleg">
+	<software name="flegacy">
 		<description>Final Legacy (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
@@ -491,7 +491,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="jamesbnd">
+	<software name="jbond">
 		<description>James Bond</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
@@ -543,8 +543,8 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="krazysht">
-		<description>K-Razy Shootout</description>
+	<software name="kshoot">
+		<description>K-Razy Shoot Out</description>
 		<year>1982</year>
 		<publisher>CBS Electronics / Kay Enterprizes Co.</publisher>
 		<info name="serial" value="80503" />
@@ -581,7 +581,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="keystone">
+	<software name="keykaper">
 		<description>Keystone Kapers</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -605,7 +605,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="loontoon">
+	<software name="looneyh">
 		<description>Looney Tunes Hotel (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -640,7 +640,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="megamnia">
+	<software name="megmania">
 		<description>MegaMania</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
@@ -751,7 +751,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="mntnking">
+	<software name="mking">
 		<description>Mountain King</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
@@ -877,7 +877,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="questroo">
+	<software name="quintana">
 		<description>Quest for Quintana Roo</description>
 		<year>1984</year>
 		<publisher>Sunrise</publisher>
@@ -889,7 +889,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="rsbsebll">
+	<software name="rsbaseb">
 		<description>RealSports Baseball</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -902,7 +902,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="rsbktbll">
+	<software name="rsbasket">
 		<description>RealSports Basketball (19831216)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -914,7 +914,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="rsbktbll1" cloneof="rsbktbll">
+	<software name="rsbasket1" cloneof="rsbasket">
 		<description>RealSports Basketball (Prototype, 19831031)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -926,7 +926,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="rsbktbll2" cloneof="rsbktbll">
+	<software name="rsbasket2" cloneof="rsbasket">
 		<description>RealSports Basketball (Prototype, 19821105)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
@@ -938,7 +938,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="rsftball">
+	<software name="rsfootb">
 		<description>RealSports Football</description>
 		<!-- Originally released as "Football" -->
 		<year>1982</year>
@@ -981,7 +981,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="fractlus">
+	<software name="fractal">
 		<description>Rescue on Fractalus!</description>
 		<!-- Prototype called "Behind Jaggi Lines" -->
 		<year>1986</year>
@@ -989,24 +989,24 @@ Possible Undumped protos: -
 		<info name="serial" value="CX5254" />
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="fractlus.bin" size="32768" crc="762c591b" sha1="9253d7286cf87999474b37df242ba23b4358ef4a" offset="0" />
+				<rom name="fractal.bin" size="32768" crc="762c591b" sha1="9253d7286cf87999474b37df242ba23b4358ef4a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="rverraid">
+	<software name="riveraid">
 		<description>River Raid</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="FZ-002" />
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="rverraid.bin" size="8192" crc="09fc7648" sha1="ce9bd3b0847c5e187c3e8f667c8f5ea771c49965" offset="0" />
+				<rom name="riveraid.bin" size="8192" crc="09fc7648" sha1="ce9bd3b0847c5e187c3e8f667c8f5ea771c49965" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="roadrunn">
+	<software name="roadrun">
 		<description>Road Runner (Prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
@@ -1014,7 +1014,7 @@ Possible Undumped protos: -
 		<part name="cart" interface="a5200_cart">
 			<feature name="cart_type" value="A13MIRRORING" />
 			<dataarea name="rom" size="16384">
-				<rom name="roadrunn.bin" size="16384" crc="a97606ab" sha1="0a7aaef5b0ede927cea13e724906207e1db48068" offset="0" />
+				<rom name="roadrun.bin" size="16384" crc="a97606ab" sha1="0a7aaef5b0ede927cea13e724906207e1db48068" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1057,7 +1057,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="spceshut">
+	<software name="shuttle">
 		<description>Space Shuttle - A Journey Into Space</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -1119,7 +1119,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="starwars">
+	<software name="jedidsb">
 		<description>Star Wars - Return of the Jedi - Death Star Battle</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
@@ -1131,7 +1131,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="swa">
+	<software name="starwars">
 		<description>Star Wars - The Arcade Game</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
@@ -1156,7 +1156,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="sprbreak">
+	<software name="sbrkout">
 		<description>Super Breakout</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
@@ -1182,7 +1182,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="spacman">
-		<description>Super Pacman (Prototype)</description>
+		<description>Super Pac-Man (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1240,7 +1240,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="xariarna">
+	<software name="xari">
 		<description>Xari Arena (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -1299,7 +1299,7 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="znerangr">
+	<software name="zonerngr">
 		<description>Zone Ranger</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>

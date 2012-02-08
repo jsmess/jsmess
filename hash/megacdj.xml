@@ -92,7 +92,7 @@
 		</part>
 	</software>
 
-	<software name="cyb009">
+	<software name="cyborg9">
 		<description>Cyborg 009 (Jpn)</description>
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
@@ -232,8 +232,8 @@
 		</part>
 	</software>
 
-	<software name="gamjik2">
-		<description>Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Jpn)</description>
+	<software name="gambler2">
+		<description>Gambler Jikochuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Jpn)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45044"/>
@@ -246,7 +246,7 @@
 		</part>
 	</software>
 
-	<software name="gameno1">
+	<software name="gamenk1">
 		<description>Game no Kandume Vol.1 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -260,7 +260,7 @@
 		</part>
 	</software>
 
-	<software name="gameno2">
+	<software name="gamenk2">
 		<description>Game no Kandume Vol.2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -302,7 +302,7 @@
 		</part>
 	</software>
 
-	<software name="hvynova">
+	<software name="heavynov">
 		<description>Heavy Nova (Jpn)</description>
 		<year>1991</year>
 		<publisher>Micronet</publisher>
@@ -344,7 +344,7 @@
 		</part>
 	</software>
 
-	<software name="janguowc">
+	<software name="jangouwc">
 		<description>Jangou World Cup (Jpn)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
@@ -358,7 +358,7 @@
 		</part>
 	</software>
 
-	<software name="kamenrid">
+	<software name="kamenrzo">
 		<description>Kamen Rider ZO (Jpn)</description>
 		<year>1994</year>
 		<publisher>Toei Animation</publisher>
@@ -372,7 +372,7 @@
 		</part>
 	</software>
 
-	<software name="keiou">
+	<software name="keio">
 		<description>Keiou Yuugekitai (Jpn)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
@@ -428,7 +428,7 @@
 		</part>
 	</software>
 
-	<software name="micro">
+	<software name="microcos">
 		<description>Microcosm (Jpn)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
@@ -575,7 +575,7 @@
 		</part>
 	</software>
 
-	<software name="sangok3">
+	<software name="sangoku3">
 		<description>Sangokushi III (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -589,7 +589,7 @@
 		</part>
 	</software>
 
-	<software name="sac">
+	<software name="segaac">
 		<description>Sega Classic Arcade Collection (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -645,7 +645,7 @@
 		</part>
 	</software>
 
-	<software name="shmegamt">
+	<software name="shinmt">
 		<description>Shin Megami Tensei (Jpn)</description>
 		<year>1994</year>
 		<publisher>SIMS</publisher>
@@ -827,7 +827,7 @@
 		</part>
 	</software>
 
-	<software name="dearfrnd">
+	<software name="uruseiya">
 		<description>Urusei Yatsura - Dear My Friends (Jpn)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
@@ -883,7 +883,7 @@
 		</part>
 	</software>
 
-	<software name="winningp">
+	<software name="winpost">
 		<description>Winning Post (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -1039,7 +1039,7 @@
 		</part>
 	</software>
 
-	<software name="aokiooka">
+	<software name="genchohi">
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -1067,8 +1067,8 @@
 		</part>
 	</software>
 
-	<software name="arislan">
-		<description>Arislan Senki - The Heroic Legend of Arslan (Jpn)</description>
+	<software name="arslan">
+		<description>Arslan Senki - The Heroic Legend of Arslan (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6028"/>
@@ -1149,7 +1149,7 @@
 		</part>
 	</software>
 
-	<software name="blackh">
+	<software name="blckhole">
 		<description>Black Hole Assault (Jpn)</description>
 		<year>1992</year>
 		<publisher>Micronet</publisher>
@@ -1189,7 +1189,7 @@
 	</software>
 -->
 
-	<software name="ctsubasa">
+	<software name="ctsuba">
 		<description>Captain Tsubasa (Jpn)</description>
 		<year>1994</year>
 		<publisher>Tecmo</publisher>
@@ -1257,7 +1257,7 @@
 		</part>
 	</software>
 
-	<software name="deathbri">
+	<software name="deathbrn">
 		<description>Death Bringer - Himerata Monshou - The Knight of Darkness (Jpn)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
@@ -1352,7 +1352,7 @@
 	</software>
 -->
 
-	<software name="dmaster2">
+	<software name="dngmstr2">
 		<description>Dungeon Master II - Skullkeep (Jpn, v1.0)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
@@ -1823,7 +1823,7 @@
 	</software>
 
 <!--
-	<software name="micro">
+	<software name="microcos">
 		<description>Microcosm (Jpn)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
@@ -1835,7 +1835,7 @@
 	</software>
 -->
 
-	<software name="mmagic3">
+	<software name="mightmg3">
 		<description>Might and Magic III - Isles of Terra (Jpn)</description>
 		<year>1993</year>
 		<publisher>CRI</publisher>
@@ -1909,7 +1909,7 @@
 	</software>
 -->
 
-	<software name="ninjaw">
+	<software name="ninjawar">
 		<description>The Ninjawarriors (Jpn)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
@@ -1923,7 +1923,7 @@
 		</part>
 	</software>
 
-	<software name="nobunaga">
+	<software name="nobuhao">
 		<description>Nobunaga no Yabou - Haouden (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
@@ -2137,7 +2137,7 @@
 	</software>
 
 	<!-- one of these probably matches the REDUMP image -->
-	<software name="saca" cloneof="sac">
+	<software name="segaaca" cloneof="segaac">
 		<description>Sega Classic Arcade Collection - Limited Edition (Jpn, R1M)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -2151,7 +2151,7 @@
 		</part>
 	</software>
 
-	<software name="sacb" cloneof="sac">
+	<software name="segaacb" cloneof="segaac">
 		<description>Sega Classic Arcade Collection - Limited Edition (Jpn, R2M)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>

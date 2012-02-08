@@ -263,7 +263,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="airforcej" cloneof="deadlysk">
+	<software name="airforcdj" cloneof="deadlysk">
 		<!-- Notes: GBC only -->
 		<description>AirForce Delta (Jpn)</description>
 		<year>2000</year>
@@ -278,7 +278,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="airforce" cloneof="deadlysk">
+	<software name="airforcd" cloneof="deadlysk">
 		<!-- Notes: GBC only -->
 		<description>AirForce Delta (USA)</description>
 		<year>2000</year>
@@ -541,7 +541,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="antzrac">
+	<software name="antzracn">
 		<!-- Notes: GBC only -->
 		<description>Antz Racing (Euro)</description>
 		<year>2001</year>
@@ -554,7 +554,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="antzracu" cloneof="antzrac">
+	<software name="antzracnu" cloneof="antzracn">
 		<!-- Notes: GBC only -->
 		<description>Antz Racing (USA)</description>
 		<year>2001</year>
@@ -970,7 +970,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="bdaman5">
+	<software name="bdamanv">
 		<!-- Notes: GBC only -->
 		<description>B-Daman Bakugaiden V - Final Mega Tune (Jpn)</description>
 		<year>2000</year>
@@ -1077,7 +1077,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="bakusudd">
+	<software name="bakusodd">
 		<!-- Notes: GBC only -->
 		<description>Bakusou Dekotora Densetsu GB Special - Otoko Dokyou no Tenka Touitsu (Jpn)</description>
 		<year>2000</year>
@@ -1133,7 +1133,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="balloonf">
+	<software name="balonfgt">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-08 -->
 		<description>Balloon Fight GB (Jpn, NP)</description>
 		<year>2000</year>
@@ -1296,7 +1296,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="barca2k" cloneof="totalsoc">
+	<software name="barca2k" cloneof="totalscr">
 		<!-- Notes: GBC only -->
 		<description>Barça Total 2000 (Euro)</description>
 		<year>2000</year>
@@ -1592,7 +1592,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="bikkur2k">
+	<software name="bikkuri">
 		<!-- Notes: SGB enhanced -->
 		<description>Bikkuriman 2000 - Charging Card GB (Jpn)</description>
 		<year>2000</year>
@@ -1660,7 +1660,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="blackony">
+	<software name="blckonyx">
 		<!-- Notes: GBC only -->
 		<description>The Black Onyx (Jpn)</description>
 		<year>2001</year>
@@ -1688,7 +1688,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="blasterm">
+	<software name="bmaster">
 		<description>Blaster Master - Enemy Below (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Sunsoft</publisher>
@@ -2236,7 +2236,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="caesar2">
+	<software name="caesars2">
 		<!-- Notes: GBC only -->
 		<description>Caesars Palace II (Euro, USA)</description>
 		<year>1999</year>
@@ -2603,7 +2603,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="chibimar">
+	<software name="chibim">
 		<!-- Notes: GBC only -->
 		<description>Chibi Maruko-chan - Go Chounai Minna de Game dayo! (Jpn)</description>
 		<year>2001</year>
@@ -2631,7 +2631,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="chikichi" cloneof="wackyrac">
+	<software name="chikirac" cloneof="wackyrac">
 		<!-- Notes: GBC only -->
 		<description>Chiki Chiki Machine Mou Race (Jpn)</description>
 		<year>2001</year>
@@ -2887,7 +2887,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="crystali">
+	<software name="crystal">
 		<!-- Notes: GBC only -->
 		<description>Crystalis (USA)</description>
 		<year>2000</year>
@@ -2913,7 +2913,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="cybertig">
+	<software name="cybertgr">
 		<!-- Notes: GBC only -->
 		<description>CyberTiger (Euro, USA)</description>
 		<year>2000</year>
@@ -3336,7 +3336,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="denkiblc">
+	<software name="denkiblk">
 		<!-- Notes: GBC only -->
 		<description>Denki Blocks! (Euro)</description>
 		<year>2001</year>
@@ -3594,7 +3594,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="donaldds" cloneof="donaldqa">
+	<software name="donalddj" cloneof="donaldd">
 		<!-- Notes: GBC only -->
 		<description>Disney's Donald Duck - Daisy o Sukue! (Jpn)</description>
 		<year>2000</year>
@@ -3609,7 +3609,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="donaldgq" cloneof="donaldqa">
+	<software name="donalddu" cloneof="donaldd">
 		<!-- Alt. Title: Donald Duck - Goin' "Qu@ckers" (Box) - Notes: GBC only -->
 		<description>Disney's "Donald" @#Duck?*! (USA)</description>
 		<year>2000</year>
@@ -3622,7 +3622,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="donaldqa">
+	<software name="donaldd">
 		<!-- Alt Title: Disney's Donald Duck - "Qu@ck "Att@ck"?*! (Box)- Notes: GBC only -->
 		<description>Disney's "Donald" @#Duck?*! (Euro)</description>
 		<year>2000</year>
@@ -4607,7 +4607,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="espnnhn">
+	<software name="espnhn">
 		<!-- Notes: GBC only -->
 		<description>ESPN National Hockey Night (USA)</description>
 		<year>2001</year>
@@ -4635,7 +4635,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="esleague">
+	<software name="euroleag">
 		<!-- Notes: GBC only -->
 		<description>European Super League (Euro)</description>
 		<year>2001</year>
@@ -5598,7 +5598,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="hexcitej" cloneof="hexcite">
+	<software name="glochex" cloneof="hexcite">
 		<!-- Notes: SGB enhanced -->
 		<description>Glocal Hexcite (Jpn)</description>
 		<year>1998</year>
@@ -6768,7 +6768,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="hugoevil">
+	<software name="hugoevmr">
 		<!-- Notes: GBC only -->
 		<description>Hugo - The Evil Mirror (Euro)</description>
 		<year>2001</year>
@@ -6851,7 +6851,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="hyprolym" cloneof="itf">
+	<software name="hyperol" cloneof="itf">
 		<!-- Notes: SGB enhanced -->
 		<description>Hyper Olympic Series - Track &amp; Field GB (Jpn)</description>
 		<year>1999</year>
@@ -7478,7 +7478,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="kanzumem">
+	<software name="kanzumep">
 		<!-- Notes: Also released by NP in 2000-06 -->
 		<description>Kanzume Monsters Parfait (Jpn)</description>
 		<year>1999</year>
@@ -7917,7 +7917,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="kokings">
+	<software name="kkings">
 		<!-- Notes: GBC only -->
 		<description>Knockout Kings (Euro, USA)</description>
 		<year>1999</year>
@@ -8096,7 +8096,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="landbt">
+	<software name="landbtim">
 		<!-- Notes: GBC only -->
 		<description>The Land Before Time (Euro)</description>
 		<year>2001</year>
@@ -8109,7 +8109,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="landbtu" cloneof="landbt">
+	<software name="landbtimu" cloneof="landbtim">
 		<!-- Notes: GBC only -->
 		<description>The Land Before Time (USA)</description>
 		<year>2001</year>
@@ -8552,7 +8552,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="litlmer2">
+	<software name="mermaid2">
 		<!-- Notes: GBC only -->
 		<description>Disney's The Little Mermaid II - Pinball Frenzy (Euro)</description>
 		<year>2000</year>
@@ -8565,7 +8565,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="litlmer2u" cloneof="litlmer2">
+	<software name="mermaid2u" cloneof="mermaid2">
 		<!-- Notes: GBC only, Rumble support -->
 		<description>Disney's The Little Mermaid II - Pinball Frenzy (USA)</description>
 		<year>2000</year>
@@ -8604,7 +8604,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner - Domudomu Dan no Yabou (Jpn)</description>
 		<year>2000</year>
 		<publisher>Xing Entertainment</publisher>
@@ -9014,7 +9014,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="luckyl">
+	<software name="luckyluk">
 		<!-- Notes: GBC only -->
 		<description>Lucky Luke (Euro)</description>
 		<year>1999</year>
@@ -9027,7 +9027,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="luckylu" cloneof="luckyl">
+	<software name="luckyluku" cloneof="luckyluk">
 		<!-- Notes: GBC only -->
 		<description>Lucky Luke (USA)</description>
 		<year>1999</year>
@@ -9182,7 +9182,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="maginat">
+	<software name="maginatn">
 		<!-- Notes: GBC only -->
 		<description>Magi Nation (USA)</description>
 		<year>2001</year>
@@ -10081,7 +10081,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="mickeysp">
+	<software name="micksped">
 		<!-- Notes: GBC only -->
 		<description>Mickey's Speedway USA (USA)</description>
 		<year>2001</year>
@@ -10334,7 +10334,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="momotaro">
+	<software name="momo">
 		<!-- Notes: GBC only -->
 		<description>Momotarou Densetsu 1-2 (Jpn)</description>
 		<year>2001</year>
@@ -10460,7 +10460,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="monsters">
+	<software name="monstinc">
 		<!-- Notes: GBC only -->
 		<description>Monsters, Inc. (Euro, Rev. A)</description>
 		<year>2001</year>
@@ -10473,7 +10473,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="monstersa" cloneof="monsters">
+	<software name="monstinca" cloneof="monstinc">
 		<!-- Notes: GBC only -->
 		<description>Monsters, Inc. (Euro, English / Spanish / Dutch)</description>
 		<year>2001</year>
@@ -10486,7 +10486,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="monstersb" cloneof="monsters">
+	<software name="monstincb" cloneof="monstinc">
 		<!-- Notes: GBC only -->
 		<description>Monsters, Inc. (Euro, English / French / Italian)</description>
 		<year>2001</year>
@@ -10499,7 +10499,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="monstersg" cloneof="monsters">
+	<software name="monstincg" cloneof="monstinc">
 		<!-- Notes: GBC only -->
 		<description>Die Monster AG (Ger)</description>
 		<year>2001</year>
@@ -10512,7 +10512,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="monstersu" cloneof="monsters">
+	<software name="monstincu" cloneof="monstinc">
 		<!-- Notes: GBC only -->
 		<description>Monsters, Inc. (Euro, USA)</description>
 		<year>2000</year>
@@ -10525,7 +10525,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="montezmr">
+	<software name="montezum">
 		<description>Montezuma's Return! (Euro)</description>
 		<year>1998</year>
 		<publisher>Take-Two Interactive</publisher>
@@ -10537,7 +10537,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="montezmru" cloneof="montezmr">
+	<software name="montezumu" cloneof="montezum">
 		<description>Montezuma's Return! (USA)</description>
 		<year>1998</year>
 		<publisher>Take-Two Interactive</publisher>
@@ -10666,7 +10666,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="mrdrill">
+	<software name="mrdrillr">
 		<!-- Notes: GBC only -->
 		<description>Mr. Driller (Euro)</description>
 		<year>2000</year>
@@ -10679,7 +10679,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="mrdrillj" cloneof="mrdrill">
+	<software name="mrdrillrj" cloneof="mrdrillr">
 		<!-- Notes: GBC only, also released by NP in 2001-06 -->
 		<description>Mr. Driller (Jpn)</description>
 		<year>2000</year>
@@ -10694,7 +10694,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="mrdrillu" cloneof="mrdrill">
+	<software name="mrdrillru" cloneof="mrdrillr">
 		<!-- Notes: GBC only -->
 		<description>Mr. Driller (USA)</description>
 		<year>2000</year>
@@ -10966,7 +10966,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="npet1">
+	<software name="nakapet1">
 		<description>Nakayoshi Pet Series 1 - Kawaii Hamster (Jpn)</description>
 		<year>2000</year>
 		<publisher>MTO</publisher>
@@ -10980,7 +10980,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="npet2">
+	<software name="nakapet2">
 		<description>Nakayoshi Pet Series 2 - Kawaii Usagi (Jpn)</description>
 		<year>2000</year>
 		<publisher>MTO</publisher>
@@ -10994,7 +10994,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="npet3">
+	<software name="nakapet3">
 		<!-- Notes: GBC only -->
 		<description>Nakayoshi Pet Series 3 - Kawaii Koinu (Jpn)</description>
 		<year>2000</year>
@@ -11009,7 +11009,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="npet4">
+	<software name="nakapet4">
 		<!-- Notes: GBC only -->
 		<description>Nakayoshi Pet Series 4 - Kawaii Koneko (Jpn)</description>
 		<year>2001</year>
@@ -11024,7 +11024,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="npet5">
+	<software name="nakapet5">
 		<!-- Notes: GBC only -->
 		<description>Nakayoshi Pet Series 5 - Kawaii Hamster 2 (Jpn)</description>
 		<year>2001</year>
@@ -11390,7 +11390,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="nhlblds">
+	<software name="bladestl">
 		<!-- Notes: GBC only -->
 		<description>NHL Blades of Steel (USA)</description>
 		<year>1999</year>
@@ -11403,7 +11403,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="nhlbl2k">
+	<software name="blades2k">
 		<!-- Notes: GBC only -->
 		<description>NHL Blades of Steel 2000 (USA)</description>
 		<year>2000</year>
@@ -11472,7 +11472,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="nobunaga">
+	<software name="nobugb2">
 		<description>Nobunaga no Yabou - Game Boy Ban 2 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
@@ -11515,7 +11515,7 @@ Undumped Pirates:
 	<software name="nushiadv">
 		<!-- Notes: GBC only, Rumble support -->
 		<description>Nushi Tsuri Adventure - Kite no Bouken (Jpn)</description>
-		<year>19??</year>
+		<year>2000</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="CGB-VVJJ-JPN"/>
 		<info name="release" value="20000804"/>
@@ -12349,7 +12349,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="pockpuys">
+	<software name="poktpuys">
 		<!-- Notes: SGB enhanced -->
 		<description>Pocket Puyo Puyo Sun (Jpn)</description>
 		<year>1998</year>
@@ -12364,7 +12364,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="pockpuyn">
+	<software name="poktpuyn">
 		<!-- Notes: GBC only -->
 		<description>Pocket Puyo Puyo-n (Jpn)</description>
 		<year>2000</year>
@@ -12775,7 +12775,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="polarisx" cloneof="snowcros">
+	<software name="polarsno" cloneof="snowcros">
 		<!-- Notes: GBC only, Rumble support -->
 		<description>Polaris SnoCross (USA)</description>
 		<year>2000</year>
@@ -13477,7 +13477,7 @@ Undumped Pirates:
 
 	<software name="qbert">
 		<!-- Notes: GBC only -->
-		<description>Q-bert (USA)</description>
+		<description>Q*bert (USA)</description>
 		<year>2000</year>
 		<publisher>Hasbro Interactive</publisher>
 		<info name="serial" value="CGB-BQTE-USA"/>
@@ -13642,7 +13642,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="rainbow">
+	<software name="rbisland">
 		<!-- Notes: GBC only -->
 		<description>Rainbow Islands (Euro)</description>
 		<year>2001</year>
@@ -13826,7 +13826,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="ready2r">
+	<software name="r2rumble">
 		<!-- Notes: GBC only -->
 		<description>Ready 2 Rumble Boxing (Euro)</description>
 		<year>1999</year>
@@ -13839,7 +13839,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="ready2ru" cloneof="ready2r">
+	<software name="r2rumbleu" cloneof="r2rumble">
 		<!-- Notes: GBC only, Rumble support -->
 		<description>Ready 2 Rumble Boxing (USA)</description>
 		<year>1999</year>
@@ -13882,7 +13882,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="rescue">
+	<software name="rescuehr">
 		<!-- Notes: GBC only -->
 		<description>Rescue Heroes - Fire Frenzy (USA)</description>
 		<year>2001</year>
@@ -14604,7 +14604,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sangoku2">
+	<software name="sangogb2">
 		<!-- Notes: SGB enhanced -->
 		<description>Sangokushi - Game Boy Ban 2 (Jpn)</description>
 		<year>1999</year>
@@ -14787,7 +14787,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="shadowg">
+	<software name="shadgate">
 		<description>Shadowgate Classic (Euro, USA, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -14799,7 +14799,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="shadowga" cloneof="shadowg">
+	<software name="shadgatea" cloneof="shadgate">
 		<description>Shadowgate Classic (Aus, USA)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -14811,7 +14811,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="shadowgj" cloneof="shadowg">
+	<software name="shadgatej" cloneof="shadgate">
 		<description>Shadowgate Return (Jpn)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
@@ -14919,7 +14919,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="shaun">
+	<software name="shaunsnw">
 		<!-- Notes: GBC only -->
 		<description>Shaun Palmer's Pro Snowboarder (USA)</description>
 		<year>2001</year>
@@ -15090,7 +15090,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="smurfsni">
+	<software name="smurfnig">
 		<!-- Notes: GBC only -->
 		<description>The Smurfs Nightmare (Euro)</description>
 		<year>1999</year>
@@ -15103,7 +15103,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="smurfsniu" cloneof="smurfsni">
+	<software name="smurfnigu" cloneof="smurfnig">
 		<!-- Notes: GBC only -->
 		<description>The Smurfs Nightmare (USA)</description>
 		<year>1999</year>
@@ -15211,7 +15211,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="soccerma">
+	<software name="socmanag">
 		<!-- Notes: GBC only -->
 		<description>Soccer Manager (Euro)</description>
 		<year>2000</year>
@@ -15297,7 +15297,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sinv">
+	<software name="spaceinv">
 		<description>Space Invaders (USA)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
@@ -15309,7 +15309,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sinvx" cloneof="sinv">
+	<software name="spaceinvx" cloneof="spaceinv">
 		<description>Space Invaders X (Jpn)</description>
 		<year>2000</year>
 		<publisher>Taito</publisher>
@@ -15574,7 +15574,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="swe1obi">
+	<software name="swep1obi">
 		<!-- Notes: GBC only -->
 		<description>Star Wars Episode I - Obi-Wan's Adventures (Euro)</description>
 		<year>2001</year>
@@ -15587,7 +15587,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="swe1obiu" cloneof="swe1obi">
+	<software name="swep1obiu" cloneof="swep1obi">
 		<!-- Notes: GBC only -->
 		<description>Star Wars Episode I - Obi-Wan's Adventures (USA)</description>
 		<year>2001</year>
@@ -15600,7 +15600,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="swe1racr">
+	<software name="swracer">
 		<!-- Notes: GBC only, Rumble support -->
 		<description>Star Wars Episode I - Racer (Euro, USA)</description>
 		<year>1999</year>
@@ -15692,7 +15692,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sbbass">
+	<software name="sblkbass">
 		<!-- Notes: GBC only, Rumble support -->
 		<description>Super Black Bass - Real Fight (Jpn)</description>
 		<year>1999</year>
@@ -15707,7 +15707,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sbbass3" cloneof="tnnofc">
+	<software name="sblkbap3" cloneof="tnnofc">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
 		<description>Super Black Bass Pocket 3 (Jpn)</description>
 		<year>1998</year>
@@ -15737,7 +15737,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sbreako">
+	<software name="sbrkout">
 		<description>Super Breakout! (Euro)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
@@ -15749,7 +15749,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sbreakou" cloneof="sbreako">
+	<software name="sbrkoutu" cloneof="sbrkout">
 		<description>Super Breakout! (USA)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
@@ -15761,7 +15761,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="schinese">
+	<software name="supchinf">
 		<!-- Notes: GBC only -->
 		<description>Super Chinese Fighter EX (Jpn)</description>
 		<year>1999</year>
@@ -15920,7 +15920,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="srobotai">
+	<software name="srobotlb">
 		<!-- Notes: SGB enhanced -->
 		<description>Super Robot Taisen - Link Battler (Jpn)</description>
 		<year>1999</year>
@@ -16057,7 +16057,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sylvfam">
+	<software name="sylvan">
 		<!-- Notes: SGB enhanced -->
 		<description>Sylvanian Families - Otogi no Kuni no Pendant (Jpn)</description>
 		<year>1999</year>
@@ -16072,7 +16072,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sylvfam2">
+	<software name="sylvan2">
 		<!-- Notes: GBC only -->
 		<description>Sylvanian Families 2 - Irozuku Mori no Fantasy (Jpn)</description>
 		<year>2000</year>
@@ -16087,7 +16087,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="sylvfam3">
+	<software name="sylvan3">
 		<!-- Notes: GBC only -->
 		<description>Sylvanian Families 3 - Hoshi Furu Yoru no Sunadokei (Jpn)</description>
 		<year>2001</year>
@@ -16474,7 +16474,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="thundbrd">
+	<software name="tbirds">
 		<!-- Notes: GBC only -->
 		<description>Thunderbirds (Euro, English / French / German / Italian / Spanish)</description>
 		<year>2000</year>
@@ -16487,7 +16487,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="thundbrda" cloneof="thundbrd">
+	<software name="tbirdsa" cloneof="tbirds">
 		<!-- Notes: GBC only -->
 		<description>Thunderbirds (Euro)</description>
 		<year>2000</year>
@@ -16500,7 +16500,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tiger2k">
+	<software name="twoods2k">
 		<description>Tiger Woods PGA Tour 2000 (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>THQ</publisher>
@@ -16761,7 +16761,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tombraidp" cloneof="tombraid">
+	<software name="traidp" cloneof="traid">
 		<description>Tomb Raider (Euro, USA, Prototype)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
@@ -16772,7 +16772,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tombraid">
+	<software name="traid">
 		<!-- Alt. Title: Tomb Raider Starring Lara Croft (US Box) - Notes: GBC only -->
 		<description>Tomb Raider (Euro, USA)</description>
 		<year>2000</year>
@@ -16785,7 +16785,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tombrai2">
+	<software name="traid2">
 		<!-- Alt. Title: Lara Croft - Tomb Raider - Curse of the Sword (Box) - Notes: GBC only -->
 		<description>Tomb Raider - Curse of the Sword (Euro, USA)</description>
 		<year>2001</year>
@@ -16798,7 +16798,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tonictro">
+	<software name="tonictr">
 		<!-- Notes: GBC only -->
 		<description>Tonic Trouble (Euro)</description>
 		<year>2000</year>
@@ -16863,7 +16863,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tonyhawk">
+	<software name="thps">
 		<!-- Notes: GBC only -->
 		<description>Tony Hawk's Pro Skater (Euro, USA)</description>
 		<year>2000</year>
@@ -16876,7 +16876,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tonyhwk2">
+	<software name="thps2">
 		<!-- Notes: GBC only -->
 		<description>Tony Hawk's Pro Skater 2 (USA)</description>
 		<year>2000</year>
@@ -16889,7 +16889,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tonyhwk3">
+	<software name="thps3">
 		<!-- Notes: GBC only -->
 		<description>Tony Hawk's Pro Skater 3 (USA)</description>
 		<year>2001</year>
@@ -17049,7 +17049,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="totalsoc">
+	<software name="totalscr">
 		<!-- Alt. Title: David O'Leary's Total Soccer 2000 (Box) - Notes: GBC only -->
 		<description>Total Soccer 2000 (Euro)</description>
 		<year>2000</year>
@@ -17077,7 +17077,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="totthamu">
+	<software name="tottokh">
 		<!-- Notes: GBC only -->
 		<description>Tottoko Hamutarou - Tomodachi Daisakusen Dechu (Jpn, Rev. A)</description>
 		<year>2000</year>
@@ -17092,7 +17092,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="totthamua" cloneof="totthamu">
+	<software name="tottokha" cloneof="tottokh">
 		<!-- Notes: GBC only -->
 		<description>Tottoko Hamutarou - Tomodachi Daisakusen Dechu (Jpn)</description>
 		<year>2000</year>
@@ -17107,7 +17107,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="tottham2" cloneof="hamtaro">
+	<software name="tottokh2" cloneof="hamtaro">
 		<!-- Notes: GBC only -->
 		<description>Tottoko Hamutarou 2 - Hamu-chan Zu Daishuugou Dechu (Jpn)</description>
 		<year>2001</year>
@@ -17626,7 +17626,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="vigilant">
+	<software name="vigilnt8">
 		<!-- Notes: GBC only, Rumble support -->
 		<description>Vigilante 8 (USA)</description>
 		<year>1999</year>
@@ -17761,7 +17761,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="warland2j" cloneof="warland2">
+	<software name="wario2j" cloneof="wario2">
 		<!-- Notes: SGB enhanced -->
 		<description>Wario Land 2 (Jpn)</description>
 		<year>1998</year>
@@ -17776,7 +17776,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="warland3">
+	<software name="wario3">
 		<!-- Notes: GBC only -->
 		<description>Wario Land 3 (World)</description>
 		<year>2000</year>
@@ -17791,7 +17791,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="warland2">
+	<software name="wario2">
 		<!-- Notes: GBC only -->
 		<description>Wario Land II (Euro, USA)</description>
 		<year>1999</year>
@@ -18048,7 +18048,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="wizrdemf">
+	<software name="wizarde2">
 		<!-- Notes: GBC only -->
 		<description>Wizardry Empire - Fukkatsu no Tsue (Jpn)</description>
 		<year>2000</year>
@@ -18218,7 +18218,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="wormsarm">
+	<software name="wormarmg">
 		<!-- Notes: GBC only -->
 		<description>Worms Armageddon (Euro)</description>
 		<year>2000</year>
@@ -18231,7 +18231,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="wormsarmu" cloneof="wormsarm">
+	<software name="wormarmgu" cloneof="wormarmg">
 		<!-- Notes: GBC only -->
 		<description>Worms Armageddon (USA)</description>
 		<year>2000</year>
@@ -18270,7 +18270,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="wwfwmani">
+	<software name="wmania2k">
 		<description>WWF WrestleMania 2000 (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>THQ</publisher>
@@ -19172,7 +19172,7 @@ Undumped Pirates:
 	</software>
 
 <!-- This is a title hack of an undumped 'Harry Potter 3: 神奇の光輪' -->
-	<software name="hpot3">
+	<software name="hpotter3">
 		<description>Harry Potter 3 2003 (Chi)</description>
 		<year>2003?</year>
 		<publisher>V.Fame?</publisher>
@@ -19304,7 +19304,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="3guoastj">
+	<software name="sanguoas">
 		<!-- Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box) -->
 		<description>San Guo Zhi - Ao Shi Tian Jia (Chi)</description>
 		<year>20??</year>
@@ -19316,7 +19316,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="3guoastja" cloneof="3guoastj">
+	<software name="sanguoasa" cloneof="sanguoas">
 		<!-- Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box) -->
 		<description>San Guo Zhi - Ao Shi Tian Jia (Chi, Alt)</description>
 		<year>20??</year>
@@ -19329,7 +19329,7 @@ Undumped Pirates:
 	</software>
 
 <!-- This has the 1st half identical to the second, but it's slightly different from the dumps above... -->
-	<software name="3guoastjb" cloneof="3guoastj">
+	<software name="sanguoasb" cloneof="sanguoas">
 		<!-- Alt. Title: 三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box) -->
 		<description>San Guo Zhi - Ao Shi Tian Jia (Chi, Alt Bad?)</description>
 		<year>20??</year>
@@ -19435,7 +19435,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="z3guows2">
+	<software name="ssangws2">
 		<description>Shin Sangoku Musou 2 - Zhen San Guo Wu Shuang 2 (Chi)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19475,7 +19475,7 @@ Undumped Pirates:
 	</software>
 
 
-	<software name="pikangtm" cloneof="smurfsni">
+	<software name="pikangtm" cloneof="smurfnig">
 		<description>The Pikachu Nightmare (Chi)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19486,7 +19486,7 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="pokegogo" cloneof="smurfsni">
+	<software name="pokegogo" cloneof="smurfnig">
 		<description>Pocket Monsters GO!GO! GO! (Chi)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>

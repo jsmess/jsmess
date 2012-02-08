@@ -50,7 +50,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="addamfam">
+	<software name="addfam">
 		<description>The Addams Family (World)</description>
 		<year>1993</year>
 		<publisher>Flying Edge / Acclaim Entertainment</publisher>
@@ -298,7 +298,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Developers: Sega / SIMS -->
-	<software name="asyndromj" cloneof="asyndrom">
+	<software name="aliensynj" cloneof="aliensyn">
 		<description>Alien Syndrome (Jpn)</description>
 		<year>1992</year>
 		<publisher>SIMS</publisher>
@@ -311,7 +311,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="asyndrom">
+	<software name="aliensyn">
 		<description>Alien Syndrome (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -323,7 +323,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="andreaga">
+	<software name="agassi">
 		<description>Andre Agassi Tennis (USA)</description>
 		<year>1993</year>
 		<publisher>TecMagik</publisher>
@@ -347,7 +347,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="archriv">
+	<software name="archrivl">
 		<description>Arch Rivals (USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -371,7 +371,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="arielmer">
+	<software name="ariel">
 		<description>Disney's Ariel the Little Mermaid (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -526,7 +526,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Developers: Sega -->
-	<software name="ayrtonj" cloneof="ayrton">
+	<software name="smgp2j" cloneof="smgp2">
 		<description>Ayrton Senna's Super Monaco GP II (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -539,7 +539,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ayrton">
+	<software name="smgp2">
 		<description>Ayrton Senna's Super Monaco GP II (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -551,7 +551,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ayrtonp" cloneof="ayrton">
+	<software name="smgp2p" cloneof="smgp2">
 		<description>Ayrton Senna's Super Monaco GP II (Euro, USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -614,7 +614,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="bartman">
-		<description>Bartman Meets Radioactive Man (USA)</description>
+		<description>The Simpsons - Bartman Meets Radioactive Man (USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -625,7 +625,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Developers: Probe -->
-	<software name="batmanfv">
+	<software name="batmanf">
 		<description>Batman Forever (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -663,7 +663,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="battlesh">
+	<software name="bship">
 		<description>Battleship (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
@@ -936,7 +936,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="bishou">
+	<software name="sailorms">
 		<description>Bishoujo Senshi Sailor Moon S (Jpn)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
@@ -1162,7 +1162,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="bustamov">
+	<software name="bam">
 		<description>Bust-A-Move (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1201,7 +1201,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="caesar">
+	<software name="caesars">
 		<description>Caesars Palace (USA)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
@@ -1235,7 +1235,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="casino">
+	<software name="casinofn">
 		<description>Casino Funpak (USA)</description>
 		<year>1995</year>
 		<publisher>Interplay</publisher>
@@ -1272,7 +1272,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="chmphcky">
+	<software name="champhck">
 		<description>Championship Hockey (Euro)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -1571,7 +1571,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="choplif3">
+	<software name="choplft3">
 		<description>Choplifter III (USA)</description>
 		<year>1993</year>
 		<publisher>Extreme Entertainment Group</publisher>
@@ -1714,7 +1714,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="cosmicsp">
+	<software name="cosmic">
 		<description>Cosmic Spacehead (Euro)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
@@ -1752,7 +1752,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="cutthrot">
+	<software name="cutthr">
 		<description>Cutthroat Island (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -2015,7 +2015,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="dragoncr">
+	<software name="dcrystal">
 		<description>Dragon Crystal (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -2027,7 +2027,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="dragoncrj" cloneof="dragoncr">
+	<software name="dcrystalj" cloneof="dcrystal">
 		<description>Dragon Crystal - Tsurani no Meikyuu (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -2063,7 +2063,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="dynaheadj" cloneof="dynahead">
+	<software name="dheadj" cloneof="dhead">
 		<description>Dynamite Headdy (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2075,7 +2075,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="dynahead">
+	<software name="dhead">
 		<description>Dynamite Headdy (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2087,7 +2087,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="dynaheadp2" cloneof="dynahead">
+	<software name="dheadp2" cloneof="dhead">
 		<description>Dynamite Headdy (Prototype, 19940701)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2098,7 +2098,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="dynaheadp1" cloneof="dynahead">
+	<software name="dheadp1" cloneof="dhead">
 		<description>Dynamite Headdy (Prototype, 19940705)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2109,7 +2109,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="dynaheadp3" cloneof="dynahead">
+	<software name="dheadp3" cloneof="dhead">
 		<description>Dynamite Headdy (Prototype, 19940615)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2255,7 +2255,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="f15strik">
+	<software name="f15se">
 		<description>F-15 Strike Eagle (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
@@ -2423,7 +2423,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="frankt">
+	<software name="bighurt">
 		<description>Frank Thomas Big Hurt Baseball (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -2494,7 +2494,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="glocairj" cloneof="glocair">
+	<software name="glocj" cloneof="gloc">
 		<description>G-LOC Air Battle (Jpn, v1)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -2506,7 +2506,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="glocairj1" cloneof="glocair">
+	<software name="glocj1" cloneof="gloc">
 		<description>G-LOC Air Battle (Jpn, v0)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -2517,7 +2517,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="glocair">
+	<software name="gloc">
 		<description>G-LOC Air Battle (Euro, USA, Bra)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -2577,7 +2577,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ganbare" cloneof="factoryp">
+	<software name="ggorby" cloneof="factoryp">
 		<description>Ganbare Gorby! (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -2601,7 +2601,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="garou" cloneof="fatfursp">
+	<software name="garousp" cloneof="fatfursp">
 		<description>Garou Densetsu Special (Jpn)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
@@ -2649,7 +2649,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="georgef">
+	<software name="georgeko">
 		<description>George Foreman's KO Boxing (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -2852,7 +2852,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="heavywc">
+	<software name="heavyw">
 		<description>Heavy Weight Champ (Jpn)</description>
 		<year>1991</year>
 		<publisher>SIMS</publisher>
@@ -2876,7 +2876,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="honoo">
+	<software name="ddanpei">
 		<description>Honoo no Toukyuuji - Dodge Danpei (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -2910,7 +2910,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="hurric">
+	<software name="hurrican">
 		<description>Hurricanes (Euro)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -2922,7 +2922,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="hyokkori">
+	<software name="hyokkohj">
 		<description>Hyokkori Hyoutan Jima - Hyoutan Jima no Daikoukai (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -2934,7 +2934,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="hypery92">
+	<software name="hypyak92">
 		<description>Hyper Pro Yakyuu '92 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -2959,7 +2959,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="wakevamp" cloneof="mstrdark">
+	<software name="wakevamp" cloneof="mastdark">
 		<description>In the Wake of Vampire (Jpn)</description>
 		<year>1992</year>
 		<publisher>SIMS</publisher>
@@ -2984,7 +2984,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="incrhulk">
+	<software name="hulk">
 		<description>The Incredible Hulk (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -3187,7 +3187,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="judged">
+	<software name="jdredd">
 		<description>Judge Dredd (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -3305,7 +3305,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="kenyuu">
+	<software name="yaiba">
 		<description>Kenyuu Densetsu Yaiba (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -3365,7 +3365,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="krusty">
+	<software name="krustyfh">
 		<description>Krusty's Fun House (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -3829,7 +3829,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="magical">
+	<software name="mtaruru">
 		<description>Magical Taruruuto-kun (Jpn)</description>
 		<year>1991</year>
 		<publisher>Tsukuda Original</publisher>
@@ -3890,7 +3890,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="mstrdark">
+	<software name="mastdark">
 		<description>Master of Darkness (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -4066,7 +4066,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="mlbpab">
+	<software name="mlbpa">
 		<description>MLBPA Baseball (USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -4090,7 +4090,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="monstert">
+	<software name="monstwar">
 		<description>Monster Truck Wars (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -4102,7 +4102,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="mnstwld2" cloneof="wboydtrp">
+	<software name="mworld2" cloneof="wboydtrp">
 		<description>Monster World II - Dragon no Wana (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -4173,7 +4173,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nazpuyo">
+	<software name="nazopuyo">
 		<description>Nazo Puyo (Jpn, v1)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -4185,7 +4185,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nazpuyo1" cloneof="nazpuyo">
+	<software name="nazopuyo1" cloneof="nazopuyo">
 		<description>Nazo Puyo (Jpn, v0)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -4231,7 +4231,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactn">
+	<software name="nbaact">
 		<description>NBA Action Starring David Robinson (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4243,7 +4243,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp08" cloneof="nbaactn">
+	<software name="nbaactp08" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Final A,  19940228)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4254,7 +4254,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp07" cloneof="nbaactn">
+	<software name="nbaactp07" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Final B,  19940301)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4265,7 +4265,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp06" cloneof="nbaactn">
+	<software name="nbaactp06" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Final C,  19940302)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4276,7 +4276,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp05" cloneof="nbaactn">
+	<software name="nbaactp05" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Final D,  19940303)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4287,7 +4287,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp04" cloneof="nbaactn">
+	<software name="nbaactp04" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Final E,  19940304)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4298,7 +4298,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp03" cloneof="nbaactn">
+	<software name="nbaactp03" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Final F,  19940304)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4309,7 +4309,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp02" cloneof="nbaactn">
+	<software name="nbaactp02" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Final G,  19940305)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4320,7 +4320,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp01" cloneof="nbaactn">
+	<software name="nbaactp01" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Final H,  19940308)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4331,7 +4331,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp23" cloneof="nbaactn">
+	<software name="nbaactp23" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940202)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4342,7 +4342,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp22" cloneof="nbaactn">
+	<software name="nbaactp22" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940203)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4353,7 +4353,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp21" cloneof="nbaactn">
+	<software name="nbaactp21" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940206)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4364,7 +4364,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp20" cloneof="nbaactn">
+	<software name="nbaactp20" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4375,7 +4375,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp19" cloneof="nbaactn">
+	<software name="nbaactp19" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940212)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4386,7 +4386,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp18" cloneof="nbaactn">
+	<software name="nbaactp18" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19941215)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4397,7 +4397,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp17" cloneof="nbaactn">
+	<software name="nbaactp17" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940217)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4408,7 +4408,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp16" cloneof="nbaactn">
+	<software name="nbaactp16" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940220)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4419,7 +4419,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp15" cloneof="nbaactn">
+	<software name="nbaactp15" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940221)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4430,7 +4430,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp14" cloneof="nbaactn">
+	<software name="nbaactp14" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940224)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4441,7 +4441,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp13" cloneof="nbaactn">
+	<software name="nbaactp13" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940225-B)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4452,7 +4452,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp12" cloneof="nbaactn">
+	<software name="nbaactp12" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940225)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4463,7 +4463,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp11" cloneof="nbaactn">
+	<software name="nbaactp11" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940226)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4474,7 +4474,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp10" cloneof="nbaactn">
+	<software name="nbaactp10" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940227)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4485,7 +4485,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp09" cloneof="nbaactn">
+	<software name="nbaactp09" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940228)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4496,7 +4496,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp28" cloneof="nbaactn">
+	<software name="nbaactp28" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940104)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4507,7 +4507,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp27" cloneof="nbaactn">
+	<software name="nbaactp27" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940106)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4518,7 +4518,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp26" cloneof="nbaactn">
+	<software name="nbaactp26" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940110)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4529,7 +4529,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp25" cloneof="nbaactn">
+	<software name="nbaactp25" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940124)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4540,7 +4540,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp24" cloneof="nbaactn">
+	<software name="nbaactp24" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19940129)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4551,7 +4551,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp29" cloneof="nbaactn">
+	<software name="nbaactp29" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19931201)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -4562,7 +4562,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nbaactnp30" cloneof="nbaactn">
+	<software name="nbaactp30" cloneof="nbaact">
 		<description>NBA Action Starring David Robinson (Prototype, 19931128)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -4799,7 +4799,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nflqrt96">
+	<software name="nflqb96">
 		<description>NFL Quarterback Club '96 (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -4810,7 +4810,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nflquart">
+	<software name="nflqb">
 		<description>NFL Quarterback Club (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -4823,7 +4823,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- 2534 -->
-	<software name="nhlallst">
+	<software name="nhlas">
 		<description>NHL All-Star Hockey (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4834,7 +4834,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp17" cloneof="nhlallst">
+	<software name="nhlasp17" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19941215)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4845,7 +4845,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp16" cloneof="nhlallst">
+	<software name="nhlasp16" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19941222)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4856,7 +4856,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp15" cloneof="nhlallst">
+	<software name="nhlasp15" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19941229)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4867,7 +4867,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp14" cloneof="nhlallst">
+	<software name="nhlasp14" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19941231)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -4878,7 +4878,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp13" cloneof="nhlallst">
+	<software name="nhlasp13" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950102)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4889,7 +4889,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp12" cloneof="nhlallst">
+	<software name="nhlasp12" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950103)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4900,7 +4900,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp11" cloneof="nhlallst">
+	<software name="nhlasp11" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950107)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4911,7 +4911,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp10" cloneof="nhlallst">
+	<software name="nhlasp10" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950111)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4922,7 +4922,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp09" cloneof="nhlallst">
+	<software name="nhlasp09" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950113)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4933,7 +4933,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp08" cloneof="nhlallst">
+	<software name="nhlasp08" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950116)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4944,7 +4944,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp07" cloneof="nhlallst">
+	<software name="nhlasp07" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950120)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4955,7 +4955,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp06" cloneof="nhlallst">
+	<software name="nhlasp06" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950121)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4966,7 +4966,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp05" cloneof="nhlallst">
+	<software name="nhlasp05" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950124-A)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4977,7 +4977,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp04" cloneof="nhlallst">
+	<software name="nhlasp04" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950124-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4988,7 +4988,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp03" cloneof="nhlallst">
+	<software name="nhlasp03" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950124-C)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -4999,7 +4999,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp02" cloneof="nhlallst">
+	<software name="nhlasp02" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950124)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -5010,7 +5010,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlallstp01" cloneof="nhlallst">
+	<software name="nhlasp01" cloneof="nhlas">
 		<description>NHL All-Star Hockey (Prototype, 19950125)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -5021,7 +5021,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nhlhocky">
+	<software name="nhl">
 		<description>NHL Hockey (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -5033,7 +5033,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ninjagj" cloneof="ninjag">
+	<software name="ngaidenj" cloneof="ngaiden">
 		<description>Ninja Gaiden (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -5045,7 +5045,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ninjag">
+	<software name="ngaiden">
 		<description>Ninja Gaiden (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -5094,7 +5094,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Alt. Title: Nomo Hideo no World Series Baseball (Box?) -->
-	<software name="nomowsb" cloneof="worlds95">
+	<software name="nomowsb" cloneof="wsb95">
 		<description>Nomo's World Series Baseball (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -5195,7 +5195,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="pacattck">
+	<software name="pacattak">
 		<description>Pac-Attack (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
@@ -5265,7 +5265,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="paperby2">
+	<software name="paperbo2">
 		<description>Paperboy II (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
@@ -5523,7 +5523,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="predator">
+	<software name="predatr2">
 		<description>Predator 2 (Euro, USA, SMS Mode)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
@@ -5672,7 +5672,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="puyopyo2">
+	<software name="puyopuy2">
 		<description>Puyo Puyo 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Compile</publisher>
@@ -5695,7 +5695,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="pbobble" cloneof="bustamov">
+	<software name="pbobble" cloneof="bam">
 		<description>Puzzle Bobble (Jpn)</description>
 		<year>1996</year>
 		<publisher>Taito</publisher>
@@ -5755,7 +5755,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="rastansg">
+	<software name="rastan">
 		<description>Rastan Saga (Jpn, SMS Mode)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -5980,7 +5980,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="samspi" cloneof="samsho">
+	<software name="samspir" cloneof="samsho">
 		<description>Samurai Spirits (Jpn)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
@@ -6499,7 +6499,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonics">
+	<software name="sspin">
 		<description>Sonic Spinball (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -6511,7 +6511,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp20" cloneof="sonics">
+	<software name="sspinp20" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0307, 19940307, 05.24)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6522,7 +6522,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp19" cloneof="sonics">
+	<software name="sspinp19" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 031094, 19940310, 17.41)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6533,7 +6533,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp18" cloneof="sonics">
+	<software name="sspinp18" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 031194, 19940311, 12.09)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6544,7 +6544,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp17" cloneof="sonics">
+	<software name="sspinp17" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 032194, 19940321, 07.12)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6555,7 +6555,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp16" cloneof="sonics">
+	<software name="sspinp16" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0328, 19940328, 06.54)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6566,7 +6566,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp15" cloneof="sonics">
+	<software name="sspinp15" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0329, 19940329, 07.35)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6577,7 +6577,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp14" cloneof="sonics">
+	<software name="sspinp14" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0330, 19940330, 06.54)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6588,7 +6588,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp13" cloneof="sonics">
+	<software name="sspinp13" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0405, 19940405, 18.07)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6599,7 +6599,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp12" cloneof="sonics">
+	<software name="sspinp12" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0412, 19940412, 07.26)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6610,7 +6610,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp11" cloneof="sonics">
+	<software name="sspinp11" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0413, 19940413, 02.54)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6621,7 +6621,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp10" cloneof="sonics">
+	<software name="sspinp10" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0415, 19940415, 17.33)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6632,7 +6632,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp09" cloneof="sonics">
+	<software name="sspinp09" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0421, 19940421, 05.30)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6643,7 +6643,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp08" cloneof="sonics">
+	<software name="sspinp08" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0427, 19940427, 04.51)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6654,7 +6654,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp07" cloneof="sonics">
+	<software name="sspinp07" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0429, 19940429, 06.01)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6665,7 +6665,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp06" cloneof="sonics">
+	<software name="sspinp06" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0430, 19940429, 21.48)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6676,7 +6676,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp05" cloneof="sonics">
+	<software name="sspinp05" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 503B, 19940503, 19.27)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6687,7 +6687,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp04" cloneof="sonics">
+	<software name="sspinp04" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0505, 19940505, 04.47)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6698,7 +6698,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp03" cloneof="sonics">
+	<software name="sspinp03" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0506, 19940506, 13.04)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6709,7 +6709,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp02" cloneof="sonics">
+	<software name="sspinp02" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0525, 19940525, 13.24)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6720,7 +6720,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonicsp01" cloneof="sonics">
+	<software name="sspinp01" cloneof="sspin">
 		<description>Sonic Spinball (Prototype 0530, 19940530, 23.25)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6801,7 +6801,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="soukoban">
+	<software name="sokoban">
 		<description>Soukoban (Jpn)</description>
 		<year>1990</year>
 		<publisher>Riverhill Software</publisher>
@@ -6813,7 +6813,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sharr">
+	<software name="sharrier">
 		<description>Space Harrier (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -6838,7 +6838,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="spidsin6">
+	<software name="spidermn">
 		<description>Spider-Man - Return of the Sinister Six (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
@@ -7414,7 +7414,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="suprbtnk">
+	<software name="sbtank">
 		<description>Super Battletank (USA)</description>
 		<year>1992</year>
 		<publisher>Majesco</publisher>
@@ -7527,7 +7527,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="superglf">
+	<software name="supgolf">
 		<description>Super Golf (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sigma Enterprises</publisher>
@@ -7539,7 +7539,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="suprkick">
+	<software name="skickoff">
 		<description>Super Kick Off (Euro, SMS Mode)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -7552,7 +7552,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="supermd3">
+	<software name="smomo3">
 		<description>Super Momotarou Dentetsu III (Jpn)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -7768,7 +7768,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="taisendg">
+	<software name="daisenrg">
 		<description>Taisen-gata Daisenryaku G (Jpn)</description>
 		<year>1991</year>
 		<publisher>SystemSoft</publisher>
@@ -7854,7 +7854,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="tatakae">
+	<software name="proyaktl">
 		<description>Tatakae! Pro Yakyuu Twin League (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -8179,7 +8179,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="t2jd">
+	<software name="term2">
 		<description>Terminator 2 - Judgment Day (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
@@ -8276,7 +8276,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ultimate">
+	<software name="ultsoccr">
 		<description>Ultimate Soccer (Euro, Jpn, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -8299,7 +8299,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="vampire" cloneof="mstrdark">
+	<software name="vampire" cloneof="mastdark">
 		<description>Vampire - Master of Darkness (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -8347,8 +8347,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="waganlnd">
-		<description>Wagan Land (Jpn)</description>
+	<software name="wagyan">
+		<description>Wagyan Land (Jpn)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8358,8 +8358,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="waganlnd1" cloneof="waganlnd">
-		<description>Wagan Land (Jpn, Alt)</description>
+	<software name="wagyana" cloneof="wagyan">
+		<description>Wagyan Land (Jpn, Alt)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8381,7 +8381,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="wimbledn">
+	<software name="wimbled">
 		<description>Wimbledon (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -8393,7 +8393,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="winterolj" cloneof="winterol">
+	<software name="wintolj" cloneof="wintol">
 		<description>Winter Olympics - Lillehammer '94 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8405,7 +8405,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="winterol">
+	<software name="wintol">
 		<description>Winter Olympics - Lillehammer '94 (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
@@ -8428,7 +8428,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="wolfch">
+	<software name="wolfchld">
 		<description>Wolfchild (Euro)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
@@ -8542,7 +8542,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worlds95">
+	<software name="wsb95">
 		<description>World Series Baseball '95 (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8554,7 +8554,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worlds95p5" cloneof="worlds95">
+	<software name="wsb95p5" cloneof="wsb95">
 		<description>World Series Baseball '95 (Prototype, 19940709)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8565,7 +8565,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worlds95p4" cloneof="worlds95">
+	<software name="wsb95p4" cloneof="wsb95">
 		<description>World Series Baseball '95 (Prototype, 19940719)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8576,7 +8576,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worlds95p3" cloneof="worlds95">
+	<software name="wsb95p3" cloneof="wsb95">
 		<description>World Series Baseball '95 (Prototype, 19940722)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8587,7 +8587,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worlds95p2" cloneof="worlds95">
+	<software name="wsb95p2" cloneof="wsb95">
 		<description>World Series Baseball '95 (Prototype, 19940728)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8598,7 +8598,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worlds95p1" cloneof="worlds95">
+	<software name="wsb95p1" cloneof="wsb95">
 		<description>World Series Baseball '95 (Prototype, 19940729)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8609,7 +8609,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worlds95p6" cloneof="worlds95">
+	<software name="wsb95p6" cloneof="wsb95">
 		<description>World Series Baseball '95 (Prototype, 19940629)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -8620,7 +8620,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worldsb">
+	<software name="wsb">
 		<description>World Series Baseball (USA, v1)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -8632,7 +8632,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="worldsb1" cloneof="worldsb">
+	<software name="wsb1" cloneof="wsb">
 		<description>World Series Baseball (USA, v0)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -8656,7 +8656,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="wwfwre">
+	<software name="wwfsteel">
 		<description>WWF Wrestlemania Steel Cage Challenge (Euro, SMS Mode)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>

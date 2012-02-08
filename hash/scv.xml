@@ -103,7 +103,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="bouldash">
+	<software name="bdash">
 		<description>Boulder Dash</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
@@ -149,7 +149,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
     </software>
 
 	<software name="dslayer">
-		<description>Dragonslayer</description>
+		<description>Dragon Slayer</description>
 		<year>1986</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
@@ -218,7 +218,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="minr2049">
+	<software name="mine2049">
 		<description>Miner 2049er</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>

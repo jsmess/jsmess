@@ -358,7 +358,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="bodyconq" supported="no">
-		<description>Bodycon Quest I - Abakareshi Musume Tachi</description>
+		<description>Body Conquest I - Abakareshi Musume Tachi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1589,7 +1589,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 <!-- Sits at the main menu -->
-	<software name="mahjongg" supported="no">
+	<software name="profmjg" supported="no">
 		<description>Professional Mahjong Gokuu</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
@@ -1669,7 +1669,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sailorf1">
-		<description>Sailor Fuku Bishoujo Zukan Vol. 1</description>
+		<description>Sailor-fuku Bishoujo Zukan Vol. 1</description>
 		<year>1989</year>
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1680,7 +1680,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sailorf2">
-		<description>Sailor Fuku Bishoujo Zukan Vol. 2</description>
+		<description>Sailor-fuku Bishoujo Zukan Vol. 2</description>
 		<year>1989</year>
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1691,7 +1691,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sailorf3">
-		<description>Sailor Fuku Bishoujo Zukan Vol. 3</description>
+		<description>Sailor-fuku Bishoujo Zukan Vol. 3</description>
 		<year>1989</year>
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1702,7 +1702,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sailorf4">
-		<description>Sailor Fuku Bishoujo Zukan Vol. 4</description>
+		<description>Sailor-fuku Bishoujo Zukan Vol. 4</description>
 		<year>1989</year>
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1713,7 +1713,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sailorf5">
-		<description>Sailor Fuku Bishoujo Zukan Vol. 5</description>
+		<description>Sailor-fuku Bishoujo Zukan Vol. 5</description>
 		<year>1989</year>
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1724,7 +1724,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="sailorf6">
-		<description>Sailor Fuku Bishoujo Zukan Vol. 6</description>
+		<description>Sailor-fuku Bishoujo Zukan Vol. 6</description>
 		<year>1989</year>
 		<publisher>Mimi?</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2009,7 +2009,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="ultramnca" cloneof="ultramnc">
+	<software name="ultraclba" cloneof="ultraclb">
 		<description>Ultraman Club - Chikyuu Dakkan Sakusen (v1.0)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
@@ -2023,7 +2023,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="ultramnc">
+	<software name="ultraclb">
 		<description>Ultraman Club - Chikyuu Dakkan Sakusen (v1.1)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
@@ -2304,7 +2304,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="shangha2">
+	<software name="shangh2">
 		<description>Shanghai 2 (Prototype, Dragon Layout)</description>
 		<year>19??</year>
 		<publisher>Sunsoft</publisher>
@@ -2315,7 +2315,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="shangha2a" cloneof="shangha2">
+	<software name="shangh2a" cloneof="shangh2">
 		<description>Shanghai 2 (Prototype, Scorpion Layout)</description>
 		<year>19??</year>
 		<publisher>Sunsoft</publisher>
@@ -2978,7 +2978,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="gallfrce">
+	<software name="galforce">
 		<description>Gall Force - Eternal Story</description>
 		<year>1986</year>
 		<publisher>HAL Kenkyuujo</publisher>
@@ -3020,7 +3020,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="goonies1" cloneof="goonies">
+	<software name="gooniesa" cloneof="goonies">
 		<description>The Goonies (Alt)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
@@ -3488,7 +3488,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 	<software name="marchen">
-		<description>Märchen Veil</description>
+		<description>Märchen Veil I</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SSD-MVL"/>

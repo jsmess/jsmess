@@ -59,7 +59,7 @@
 
 	<!-- Chase HQ II -->
 
-	<software name="dicktrcy">
+	<software name="dicktr">
 		<description>Dick Tracy</description>
 		<year>1990</year>
 		<publisher>Titus Software</publisher>
@@ -72,7 +72,7 @@
 
 	<!-- Duck Tales -->
 
-	<software name="fandf2">
+	<software name="firefor2">
 		<description>Fire &amp; Forget II</description>
 		<year>1990</year>
 		<publisher>Titus Software</publisher>
@@ -105,7 +105,7 @@
 		</part>
 	</software>
 
-	<software name="nvyseals">
+	<software name="navyseal">
 		<description>Navy Seals</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
@@ -152,7 +152,7 @@
 		</part>
 	</software>
 
-	<software name="pkckbox">
+	<software name="panzakb">
 		<description>Panza Kick Boxing</description>
 		<year>1991</year>
 		<publisher>Loriciel Software</publisher>
@@ -164,7 +164,7 @@
 	</software>
 
 	<!-- glitched title screen -->
-	<software name="pbmagic">
+	<software name="pinmagic">
 		<description>Pinball Magic</description>
 		<year>1991</year>
 		<publisher>Loriciel Software</publisher>
@@ -186,7 +186,7 @@
 		</part>
 	</software>
 
-	<software name="prtnnstr">
+	<software name="protennt">
 		<description>Pro Tennis Tour</description>
 		<year>1989</year>
 		<publisher>Ubisoft</publisher>
@@ -210,7 +210,7 @@
 	</software>
 
 	<!-- needs light phazer -->
-	<software name="sktshoot">
+	<software name="skeetsh">
 		<description>Skeet Shoot</description>
 		<year>1990</year>
 		<publisher>Trojan</publisher>
@@ -232,7 +232,7 @@
 		</part>
 	</software>
 
-	<software name="tnnscup2">
+	<software name="tennisc2">
 		<description>Tennis Cup II</description>
 		<year>1990</year>
 		<publisher>Loriciel Software</publisher>
@@ -279,7 +279,7 @@
 	</software>
 
 	<!-- glitched title screen -->
-	<software name="wrldsprt">
+	<software name="worldspt">
 		<description>World of Sports</description>
 		<year>1990</year>
 		<publisher>EPYX</publisher>

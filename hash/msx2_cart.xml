@@ -14,10 +14,10 @@ LZ93A13 (32 pin) - 8KB banks
 -->
 
 	<software name="eidolon">
-		<!-- アイドロン -->
 		<description>The Eidolon</description>
 		<year>1985</year>
 		<publisher>Lucasfilm</publisher>
+		<info name="alt_title" value="アイドロン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -28,11 +28,11 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 <!--
-	<software name="">
-		<!- 蒼き狼と白き牝鹿 元朝秘史 ->
+	<software name="genchohi">
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi</description>
 		<year>19??</year>
 		<publisher>Sakai Mitsuru</publisher>
+		<info name="alt_title" value="蒼き狼と白き牝鹿 元朝秘史" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -46,10 +46,10 @@ LZ93A13 (32 pin) - 8KB banks
 -->
 
 	<software name="genghis">
-		<!-- 蒼き狼と白き牝鹿 ジンギスカン -->
 		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
 		<year>1988</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-02A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -61,10 +61,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin2">
-		<!-- PANA-010 - アシュギーネ 虚空の牙城 -->
 		<description>Ashguine 2: Kokuu no Gajou</description>
 		<year>1987</year>
 		<publisher>Panasoft / T&amp;E Soft</publisher>
+		<info name="alt_title" value="PANA-010 - アシュギーネ 虚空の牙城" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -75,10 +75,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3">
-		<!-- アシュギーネ 復讐の炎 -->
 		<description>Ashguine: Fukushuu no Honoo</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
+		<info name="alt_title" value="アシュギーネ 復讐の炎" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -89,10 +89,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3a" cloneof="ashguin3">
-		<!-- アシュギーネ 復讐の炎 -->
 		<description>Ashguine: Fukushuu no Honoo (Alt)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
+		<info name="alt_title" value="アシュギーネ 復讐の炎" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -104,10 +104,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="arkanoi2">
-		<!-- アルカノイドII -->
 		<description>Arkanoid 2</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
+		<info name="alt_title" value="アルカノイドII" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="mapper" value="LZ93A13" />
@@ -131,10 +131,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="androgyn">
-		<!-- アンドロギュヌス -->
 		<description>Androgynus</description>
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
+		<info name="alt_title" value="アンドロギュヌス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<!-- LZ93A13 with 16KB banks?? -->
@@ -146,10 +146,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="rtishtar">
-		<!-- イシターの復活 -->
 		<description>The Return of Ishtar</description>
 		<year>1988</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="イシターの復活" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<!-- LZ93A13 with 16KB banks?? -->
@@ -161,10 +161,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ishinara">
-		<!-- 維新の嵐 -->
 		<description>Ishin no Arashi</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="維新の嵐" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -175,11 +175,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="idemjong">
-		<!-- 井出洋介名人の実戦麻雀 -->
+	<software name="ideyumj">
 		<description>Ide Yousuke Meijin no Jissen Mahjong</description>
 		<year>1988</year>
 		<publisher>Pack in Video</publisher>
+		<info name="alt_title" value="井出洋介名人の実戦麻雀" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<feature name="mapper" value="NEOS MR6401" />
@@ -189,11 +189,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="inindou">
-		<!-- 伊忍道 打倒信長 -->
+	<software name="inindo">
 		<description>Inindou Datou Nobunaga</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="伊忍道 打倒信長" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-64" />
 			<feature name="mapper" value="LZ93A13" />
@@ -205,10 +205,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="aclassmj">
-		<!-- 居眠り流 阿佐田哲也のA級麻雀 -->
 		<description>Inemuri-ryuu Asada Tetsuya no A-kyuu Mahjong</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="居眠り流 阿佐田哲也のA級麻雀" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<!-- LZ93A13 with 16KB banks?? -->
@@ -221,10 +221,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="woodypoc">
-		<!-- うっでぃぽこ -->
 		<description>Woody Poco</description>
 		<year>1987</year>
 		<publisher>dB-Soft</publisher>
+		<info name="alt_title" value="うっでぃぽこ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<!-- 16KB banks -->
@@ -236,11 +236,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="urusei">
-		<!-- うる星やつら -->
+	<software name="uruseiya">
 		<description>Urusei Yatsura</description>
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="うる星やつら" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -251,10 +251,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ultima">
-		<!-- ウルティマ 恐怖のエクソダス -->
 		<description>Ultima Exodus</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="ウルティマ 恐怖のエクソダス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -265,11 +265,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="atrain">
-		<!-- A列車で行こう -->
+	<software name="aressha">
 		<description>A Ressha de Ikou - Take the A Train.</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="A列車で行こう" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M216A" />
 			<feature name="mapper" value="LZ93A13-16" />
@@ -281,11 +281,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="f15">
-		<!-- F-15ストライクイーグル -->
+	<software name="f15se">
 		<description>F-15 Strike Eagle</description>
 		<year>1987</year>
 		<publisher>System Soft</publisher>
+		<info name="alt_title" value="F-15ストライクイーグル" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<feature name="mapper" value="NEOS MR6401" />
@@ -296,10 +296,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="garakuta">
-		<!-- お絵描きソフト 画楽多 -->
 		<description>Garakuta</description>
 		<year>1988</year>
 		<publisher>Wachi Software</publisher>
+		<info name="alt_title" value="お絵描きソフト 画楽多" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<!-- 16KB banks -->
@@ -327,10 +327,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="grlyblok">
-		<!-- ガーリーブロック -->
 		<description>Girly Block</description>
 		<year>1988</year>
 		<publisher>Telenet</publisher>
+		<info name="alt_title" value="ガーリーブロック" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -342,10 +342,10 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- Game doesn't boot on regular msx2 driver. Reported to work on hbf700p driver. -->
 	<software name="kikikai">
-		<!-- 奇々怪界 -->
 		<description>KiKi KaiKai</description>
 		<year>1986</year>
 		<publisher>Sony</publisher>
+		<info name="alt_title" value="奇々怪界" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-02-030-0" />
 			<feature name="mapper" value="BS6202" />
@@ -357,10 +357,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kisei">
-		<!-- 棋聖 -->
 		<description>Kisei</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
+		<info name="alt_title" value="棋聖" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621-8K" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -371,11 +371,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="jikochu2">
-		<!-- ぎゅわんぶらあ自己中心派2 自称! 強豪雀士編 -->
+	<software name="gambler2">
 		<description>Gambler Jikochuushinha 2 - Jishou! Kyougou Janshi Hen</description>
 		<year>1988</year>
 		<publisher>Gamearts</publisher>
+		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 自称! 強豪雀士編" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="2M-8KB" />
 			<feature name="mapper" value="NEOS MR6401" />
@@ -386,10 +386,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="quinpl">
-		<!-- クインプル -->
 		<description>Quinpl</description>
 		<year>1988</year>
 		<publisher>Bit2</publisher>
+		<info name="alt_title" value="クインプル" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M008-E2M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -401,10 +401,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="crimson">
-		<!-- クリムゾン -->
 		<description>Crimson</description>
 		<year>1987</year>
 		<publisher>Xtal Soft</publisher>
+		<info name="alt_title" value="クリムゾン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -415,10 +415,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="cockpit">
-		<!-- ザ・コックピット -->
 		<description>The Cockpit</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
+		<info name="alt_title" value="ザ・コックピット" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-16KB" />
 			<!-- NEOS MR6401 -->
@@ -430,11 +430,11 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<!-- doesn't seem to boot in msx2 driver -->
-	<software name="sjclub" supported="no">
-		<!-- 殺人倶楽部 -->
-		<description>Satsujin Club</description>
+	<software name="murdclub" supported="no">
+		<description>Final Mystery Murder Club - Satsujin Club</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="殺人倶楽部" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -445,10 +445,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zanacex">
-		<!-- ザナック EX -->
 		<description>Zanac EX</description>
 		<year>1986</year>
 		<publisher>Pony</publisher>
+		<info name="alt_title" value="ザナック EX" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -459,10 +459,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="sangoku2">
-		<!-- 三国志II -->
 		<description>Sangokushi 2</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="三国志II" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -475,10 +475,10 @@ LZ93A13 (32 pin) - 8KB banks
 
 <!--
 	<software name="jrmate">
-		<!- ジュニアメイト ->
 		<description>Jr. Mate</description>
 		<year></year>
 		<publisher>Panasoft</publisher>
+		<info name="alt_title" value="ジュニアメイト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="JCI-N1S" />
 			<feature name="mapper" value="M60002-0115FP" />
@@ -493,11 +493,11 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 -->
 
-	<software name="shiryous">
-		<!-- 死霊戦線 -->
+	<software name="shiryo">
 		<description>Shiryou Sensen - War of the Dead</description>
 		<year>1987</year>
 		<publisher>Victor</publisher>
+		<info name="alt_title" value="死霊戦線" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -509,10 +509,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="suikoden">
-		<!-- 水滸伝 天命の誓い -->
 		<description>Suikoden - Tenmei no Chikai</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="水滸伝 天命の誓い" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -524,10 +524,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="scramble">
-		<!-- スクランブルフォーメーション -->
 		<description>Scramble Formation</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
+		<info name="alt_title" value="スクランブルフォーメーション" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -538,10 +538,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zukkoke">
-		<!-- ずっこけやじきた隠密道中 -->
 		<description>Zukkoke Yajikita Onmitsu Douchuu</description>
 		<year>1987</year>
 		<publisher>HAL</publisher>
+		<info name="alt_title" value="ずっこけやじきた隠密道中" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -551,11 +551,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="sdaisenr">
-		<!-- SUPER大戦略 -->
+	<software name="supdaisn">
 		<description>Super Daisenryaku</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="SUPER大戦略" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M116-03A" />
 			<feature name="mapper" value="LZ93A13-16" />
@@ -567,10 +567,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="striton">
-		<!-- スーパートリトーン -->
 		<description>Super Triton</description>
 		<year>1986</year>
 		<publisher>Xain soft</publisher>
+		<info name="alt_title" value="スーパートリトーン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -581,10 +581,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="srunner">
-		<!-- スーパーランナー -->
 		<description>Super Runner</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="スーパーランナー" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<feature name="mapper" value="NEOS MR6401" />	<!-- MR6401 -->
@@ -595,10 +595,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="seikima2">
-		<!-- 聖飢魔IIスペシャル 悪魔の逆襲 -->
 		<description>Seikima II Special - Akuma no Gyakushuu</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
+		<info name="alt_title" value="聖飢魔IIスペシャル 悪魔の逆襲" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -609,11 +609,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="xeviousf">
-		<!-- ゼビウス ファードラウト伝説 -->
+	<software name="xevious">
 		<description>Xevious - Fardraut Saga</description>
 		<year>1989</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="ゼビウス ファードラウト伝説" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="mapper" value="LZ93A13-16" />
@@ -625,10 +625,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zoids">
-		<!-- ゾイド 中央大陸の戦い -->
 		<description>Zoids - Chuuou Tairiku no Tatakai</description>
 		<year>1988</year>
 		<publisher>Toshiba EMI</publisher>
+		<info name="alt_title" value="ゾイド 中央大陸の戦い" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<feature name="mapper" value="LZ93A13-16" />
@@ -638,11 +638,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="daikouka">
-		<!-- 大航海時代 -->
+	<software name="daikokai">
 		<description>Daikoukai Jidai</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="大航海時代" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -653,11 +653,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="daisenry">
-		<!-- 大戦略 -->
+	<software name="daisenr">
 		<description>Daisenryaku</description>
 		<year>1986</year>
 		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="大戦略" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621N" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -670,10 +670,10 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- doesn't seem to work -->
 	<software name="dynabowl" supported="no">
-		<!-- ダイナマイトボウル -->
 		<description>Dynamite Bowl</description>
 		<year>1987</year>
 		<publisher>Toshiba EMI</publisher>
+		<info name="alt_title" value="ダイナマイトボウル" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -684,10 +684,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="asteka2">
-		<!-- 太陽の神殿 アステカII -->
 		<description>Taiyou no Shinden - Asteka II</description>
 		<year>1987</year>
 		<publisher>Falcom</publisher>
+		<info name="alt_title" value="太陽の神殿 アステカII" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -714,10 +714,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="drwn4078">
-		<!-- ダーウィン4078 -->
 		<description>Darwin 4078</description>
 		<year>1987</year>
-		<publisher>Hudsonsoft</publisher>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="ダーウィン4078" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -727,11 +727,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="doublevi">
-		<!-- ダブル・ヴィジョン -->
+	<software name="doublvis">
 		<description>Double Vision</description>
 		<year>1988</year>
 		<publisher>Hard</publisher>
+		<info name="alt_title" value="ダブル・ヴィジョン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -741,11 +741,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="teitoku">
-		<!-- 提督の決断 -->
+	<software name="teiketsu">
 		<description>Teitoku no Ketsudan</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="提督の決断" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -757,10 +757,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="tetris">
-		<!-- テトリス -->
 		<description>Tetris</description>
 		<year>1988</year>
 		<publisher>BPS</publisher>
+		<info name="alt_title" value="テトリス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M-008S" />
 			<feature name="mapper" value="LZ93A13" />
@@ -772,10 +772,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="tengoku">
-		<!-- 天国よいとこ -->
 		<description>Tengoku Yoitoko</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
+		<info name="alt_title" value="天国よいとこ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />	<!-- Also seen with TAS-1M016S with 16KB mapper? -->
 			<feature name="mapper" value="LZ93A13" />
@@ -786,10 +786,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguine">
-		<!-- 伝説の聖戦士 アシュギーネ -->
 		<description>Densetsu no Seisenshi Ashguine</description>
 		<year>1987</year>
 		<publisher>Bit2</publisher>
+		<info name="alt_title" value="伝説の聖戦士 アシュギーネ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -799,10 +799,10 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="topplezp">
+	<software name="topzip">
 		<description>Topple Zip</description>
 		<year>1988</year>
-		<publisher>Bothtec8</publisher>
+		<publisher>Bothtec</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -812,11 +812,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="dragonqu">
-		<!-- ドラゴンクエスト -->
+	<software name="dquest">
 		<description>Dragon Quest</description>
 		<year>1986</year>
 		<publisher>enix</publisher>
+		<info name="alt_title" value="ドラゴンクエスト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -826,11 +826,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="dragonq2">
-		<!-- ドラゴンクエストII 悪霊の神々 -->
+	<software name="dquest2">
 		<description>Dragon Quest II - Akuryou no Kamigami</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
+		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -841,11 +841,11 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<!-- Doesnt boot in msx2 driver -->
-	<software name="dragons4" supported="no">
-		<!-- ドラゴンスレイヤーIV -->
-		<description>Dragon Slayer 4</description>
+	<software name="dslayer4" supported="no">
+		<description>Dragon Slayer IV - Drasle Family</description>
 		<year>1987</year>
 		<publisher>Falcom</publisher>
+		<info name="alt_title" value="ドラゴンスレイヤーIV" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -855,11 +855,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="dragonbu">
-		<!-- ドラゴンバスター -->
+	<software name="dbuster">
 		<description>Dragon Buster</description>
 		<year>1987</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="ドラゴンバスター" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -870,10 +870,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ninjakun">
-		<!-- 忍者くん 阿修羅の章 -->
 		<description>Ninja Kun - Ashura no Shou</description>
 		<year>1987</year>
 		<publisher>HAL</publisher>
+		<info name="alt_title" value="忍者くん 阿修羅の章" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="mapper" value="LZ93A13" />
@@ -884,10 +884,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="nobuseng">
-		<!-- 信長の野望　戦国群雄伝 -->
 		<description>Nobunaga no Yabou - Sengoku Gun'yuu Den</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="信長の野望　戦国群雄伝" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -899,10 +899,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="nobuzenk">
-		<!-- 信長の野望 全国版 -->
 		<description>Nobunaga no Yabou - Zenkokuban</description>
 		<year>1987</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="信長の野望 全国版" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -913,11 +913,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="nobubush">
-		<!-- 信長の野望 武将風雲録 -->
+	<software name="nobubufu">
 		<description>Nobunaga no Yabou - Bushou Fuuunroku</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="信長の野望 武将風雲録" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -944,10 +944,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hydlide3">
-		<!-- ハイドライド3 -->
 		<description>Hydlide 3</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="ハイドライド3" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -973,10 +973,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="bublbobl">
-		<!-- バブルボブル -->
 		<description>Bubble Bobble</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
+		<info name="alt_title" value="バブルボブル" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -988,10 +988,10 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- Does not work in the generic msx2 driver -->
 	<software name="victnin2" supported="no">
-		<!-- ビクトリアス・ナインII 高校野球編 -->
 		<description>Victorious Nine II - Koukou Yakyuu Hen</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
+		<info name="alt_title" value="ビクトリアス・ナインII 高校野球編" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-!M016S" />
 			<feature name="mapper" value="LZ93A13-16" />
@@ -1002,10 +1002,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="fireball">
-		<!-- ファイア・ボール -->
 		<description>Fire Ball</description>
 		<year>1987</year>
 		<publisher>Hummingbird Soft</publisher>
+		<info name="alt_title" value="ファイア・ボール" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M-008S" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1016,10 +1016,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="famiparo">
-		<!-- ファミクルパロディック -->
 		<description>Famicle Parodic</description>
 		<year>1988</year>
 		<publisher>Bit2</publisher>
+		<info name="alt_title" value="ファミクルパロディック" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1030,10 +1030,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="famibill">
-		<!-- ファミリービリヤード -->
 		<description>Family Billiards</description>
 		<year>1987</year>
 		<publisher>Pack-in-Video</publisher>
+		<info name="alt_title" value="ファミリービリヤード" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8K" />
 			<feature name="mapper" value="NEOS MR6401" />
@@ -1045,10 +1045,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="famiboxi">
-		<!-- ファミリーボクシング -->
 		<description>Family Boxing</description>
 		<year>1988</year>
 		<publisher>Sony</publisher>
+		<info name="alt_title" value="ファミリーボクシング" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-03-001-0" />
 			<feature name="mapper" value="BS6202" />
@@ -1060,10 +1060,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="fantzon2">
-		<!-- ファンタジーゾーンII ～オパオパの涙～ -->
 		<description>Fantasy Zone II - The Tears of OPA-OPA</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="ファンタジーゾーンII ～オパオパの涙～" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-2M" />
 			<feature name="mapper" value="LZ93A13-16" />
@@ -1074,10 +1074,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="fleetco2">
-		<!-- フリートコマンダーII 黄昏の海域 -->
 		<description>Fleet Commander II - Tasogare no Kaiiki</description>
 		<year>1990</year>
-		<publisher>Ascii</publisher>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="フリートコマンダーII 黄昏の海域" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="FLEET COMMANDER II" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1088,10 +1088,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="projcta2">
-		<!-- プロジェクトA2 史上最大の標的 -->
 		<description>Project A2 - Shijou Saidai no Hyouteki</description>
 		<year>1987</year>
 		<publisher>Pony</publisher>
+		<info name="alt_title" value="プロジェクトA2 史上最大の標的" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1103,11 +1103,11 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<!-- Does not work in generic msx2 driver -->
-	<software name="profmahj" supported="no">
-		<!-- プロフェッショナル麻雀悟空 -->
+	<software name="profmjg" supported="no">
 		<description>Professional Mahjong Gokuu</description>
 		<year>1988</year>
-		<publisher>Ascii</publisher>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="プロフェッショナル麻雀悟空" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621N" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1118,11 +1118,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="famistad">
-		<!-- プロ野球ファミリースタジアム ペナントレース -->
+	<software name="famista">
 		<description>Pro Yakyuu Family Stadium - Pennant Race</description>
 		<year>1989</year>
 		<publisher>Namco</publisher>
+		<info name="alt_title" value="プロ野球ファミリースタジアム ペナントレース" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="mapper" value="LZ93A13-16" />
@@ -1132,11 +1132,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="bballfan">
-		<!-- プロ野球FAN -->
+	<software name="proyakyu">
 		<description>Pro Yakyuu Fan</description>
 		<year>1987</year>
 		<publisher>Telenet</publisher>
+		<info name="alt_title" value="プロ野球FAN" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1147,10 +1147,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="holein1s">
-		<!-- ホール・イン・ワン スペシャル -->
 		<description>Hole in One Special</description>
 		<year>1987</year>
 		<publisher>Hal</publisher>
+		<info name="alt_title" value="ホール・イン・ワン スペシャル" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1161,10 +1161,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="borfesu">
-		<!-- ボルフェスと5人の悪魔 -->
 		<description>Borfesu to Gonin no Akuma - An Adventure Story</description>
 		<year>1987</year>
 		<publisher>Xtal Soft</publisher>
+		<info name="alt_title" value="ボルフェスと5人の悪魔" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1175,10 +1175,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kitahei">
-		<!-- 本格将棋 棋太平 -->
 		<description>Honkaku Shougi Kitahei</description>
 		<year>1986</year>
 		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="本格将棋 棋太平" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1204,10 +1204,10 @@ LZ93A13 (32 pin) - 8KB banks
 <!--
 	<!- see http://msx.jpn.org/tagoo/s_check.cgi?LINE=1026 (disk version of this software?) ->
 	<software name="">
-		<!- ミケランジェロⅡ ->
 		<description>Michelangelo 2</description>
 		<year>1987</year>
 		<publisher></publisher>
+		<info name="alt_title" value="ミケランジェロⅡ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<feature name="mapper" value="NEOS MR6401" />
@@ -1218,11 +1218,11 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 -->
 
-	<software name="mississi">
-		<!-- ミシシッピー殺人事件 -->
+	<software name="mississp">
 		<description>Mississippi Satsujin Jiken</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="ミシシッピー殺人事件" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1232,11 +1232,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="ikkoku">
-		<!-- めぞん一刻 -->
+	<software name="mikkoku">
 		<description>Maison Ikkoku</description>
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="めぞん一刻" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1246,11 +1246,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="ikkokuf">
-		<!-- めぞん一刻 完結篇 -->
+	<software name="mikkokuk">
 		<description>Maison Ikkoku Kanketsu Hen</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="めぞん一刻 完結篇" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1261,10 +1261,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="moeronet">
-		<!-- 燃えろ！！熱闘野球’８８ -->
 		<description>Moero! Nettou Yakyuu'88</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="燃えろ！！熱闘野球’８８" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="JX-16" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1275,10 +1275,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="monmonmo">
-		<!-- ンモンモンスター -->
 		<description>Mon Mon Monster</description>
 		<year>1989</year>
 		<publisher>Hot-B</publisher>
+		<info name="alt_title" value="ンモンモンスター" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-02-030-0" />
 			<feature name="mapper" value="BS6202" />
@@ -1302,10 +1302,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kyuotory">
-		<!-- 京都龍の寺殺人事件 -->
 		<description>Kyouto Ryuu no Tera Satsujin Jiken</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
+		<info name="alt_title" value="京都龍の寺殺人事件" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1316,10 +1316,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="yuureikn">
-		<!-- 幽霊君 -->
 		<description>Yuurei-kun</description>
 		<year>1988</year>
 		<publisher>system Sacom</publisher>
+		<info name="alt_title" value="幽霊君" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1329,11 +1329,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="europewr">
-		<!-- ヨーロッパ戦線 -->
-		<description>Europe Sensen</description>
+	<software name="eurosens">
+		<description>Europa Sensen</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="ヨーロッパ戦線" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1344,11 +1344,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="rastansa">
-		<!-- ラスタン・サーガ -->
+	<software name="rastan">
 		<description>Rastan Saga</description>
 		<year>1988</year>
 		<publisher>Tatio</publisher>
+		<info name="alt_title" value="ラスタン・サーガ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1358,11 +1358,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="empereur">
-		<!-- ランペルール -->
+	<software name="emperor">
 		<description>L'Empereur</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="ランペルール" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1374,10 +1374,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="retjelda">
-		<!-- リターン・オブ・ジェルダ -->
 		<description>Return of Jelda</description>
 		<year>1987</year>
 		<publisher>Carry Lab</publisher>
+		<info name="alt_title" value="リターン・オブ・ジェルダ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1387,11 +1387,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="lupin3ca">
-		<!-- ルパン三世 カリオストロの城 -->
-		<description>Arsene Lupin 3rd - Cariostoro No Siro</description>
+	<software name="lupin">
+		<description>Lupin the Third - Cagliostro no Shiro</description>
 		<year>1987</year>
 		<publisher>toho</publisher>
+		<info name="alt_title" value="ルパン三世 カリオストロの城" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1401,11 +1401,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="replicar">
-		<!-- レプリカート -->
+	<software name="replicrt">
 		<description>Replicart</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
+		<info name="alt_title" value="レプリカート" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-2MX" />
 			<feature name="mapper" value="BS6101" />
@@ -1417,10 +1417,10 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- does not seem to work in the generic msx2 driver -->
 	<software name="relics" supported="no">
-		<!-- レリクス -->
 		<description>Relics</description>
 		<year>1986</year>
 		<publisher>Bothtec</publisher>
+		<info name="alt_title" value="レリクス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1431,10 +1431,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="royalbld">
-		<!-- ロイヤルブラッド -->
 		<description>Royal Blood</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="ロイヤルブラッド" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-64" />
 			<feature name="mapper" value="LZ93A13" />
@@ -1446,10 +1446,10 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="romancia">
-		<!-- ロマンシア -->
 		<description>Romancia</description>
 		<year>1986</year>
 		<publisher>Falcom</publisher>
+		<info name="alt_title" value="ロマンシア" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-2MX" />
 			<feature name="mapper" value="BS6101-16" />

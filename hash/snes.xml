@@ -491,7 +491,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="addamfam">
+	<software name="addfam">
 		<description>The Addams Family (Euro)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
@@ -1078,7 +1078,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="assaults" cloneof="cybernat">
+	<software name="valken" cloneof="cybernat">
 		<description>Assault Suits Valken (Jpn)</description>
 		<year>1992</year>
 		<publisher>Masaya</publisher>
@@ -1114,7 +1114,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="asterxob">
+	<software name="astobelx">
 		<description>Astérix &amp; Obélix (Euro)</description>
 		<year>1995</year>
 		<publisher>Infogrames</publisher>
@@ -1405,7 +1405,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="batldodg">
+	<software name="bdodge">
 		<description>Battle Dodge Ball - Toukyuu Daigekitotsu! (Jpn)</description>
 		<year>1991</year>
 		<publisher>Banpresto</publisher>
@@ -1429,7 +1429,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="batldod2">
+	<software name="bdodge2">
 		<description>Battle Dodge Ball II (Jpn)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
@@ -1667,7 +1667,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="bijoyaju" cloneof="beauty">
+	<software name="beautyj" cloneof="beauty">
 		<description>Disney's Beauty and the Beast (Jpn)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -1766,7 +1766,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="sailorr">
+	<software name="sailormr">
 		<description>Bishoujo Senshi Sailormoon R (Jpn)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
@@ -2913,7 +2913,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="daikjid2" cloneof="newhoriz">
+	<software name="daikok2" cloneof="newhoriz">
 		<description>Daikoukai Jidai II (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
@@ -2937,7 +2937,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="daisenex">
+	<software name="daisenx">
 		<description>Daisenryaku Expert (Jpn)</description>
 		<year>1992</year>
 		<publisher>ASCII Entertainment</publisher>
@@ -2998,7 +2998,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="davidcu" cloneof="davidc">
+	<software name="amazntenu" cloneof="amaznten">
 		<description>David Crane's Amazing Tennis (USA)</description>
 		<year>1992</year>
 		<publisher>Absolute Entertainment</publisher>
@@ -3033,7 +3033,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="langriss1" cloneof="langriss">
+	<software name="langrissa" cloneof="langriss">
 		<description>Der Langrisser (Jpn)</description>
 		<year>1995</year>
 		<publisher>Masaya</publisher>
@@ -3988,7 +3988,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dslayer">
+	<software name="dslayed">
 		<!-- Notes: Also re-released through Nintendo Power -->
 		<description>Dragon Slayer - Eiyuu Densetsu (Jpn)</description>
 		<year>1992</year>
@@ -4113,7 +4113,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="dungmstr">
+	<software name="dngmster">
 		<description>Dungeon Master (Euro)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -4517,7 +4517,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="familfeua" cloneof="familfeu">
+	<software name="famfeuda" cloneof="famfeud">
 		<description>Family Feud (USA)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
@@ -4535,7 +4535,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="fatfur2">
+	<software name="fatfury2">
 		<description>Fatal Fury 2 (Euro)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
@@ -4555,7 +4555,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="fatfur2u" cloneof="fatfur2">
+	<software name="fatfury2u" cloneof="fatfury2">
 		<description>Fatal Fury 2 (USA)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
@@ -4677,7 +4677,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="fighth">
+	<software name="fghthist">
 		<description>Fighter's History (USA, Rev. A)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
@@ -5283,7 +5283,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="frontmsa" cloneof="frontms">
+	<software name="frontmisa" cloneof="frontmis">
 		<description>Front Mission (Jpn)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
@@ -5309,7 +5309,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="frontmss">
+	<software name="gunhazrd">
 		<description>Front Mission Series - Gun Hazard (Jpn)</description>
 		<year>1996</year>
 		<publisher>Square</publisher>
@@ -5333,7 +5333,7 @@ The software list will be divided in four categories:
 		</part>
 	</software>
 
-	<software name="frontmss1" cloneof="frontmss">
+	<software name="gunhazrd1" cloneof="gunhazrd">
 		<description>Front Mission Series - Gun Hazard (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>Square</publisher>
@@ -5658,7 +5658,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="garoua" cloneof="fatfur">
+	<software name="garoua" cloneof="fatfury">
 		<description>Garou Densetsu - Shukumei no Tatakai (Jpn)</description>
 		<year>1992</year>
 		<publisher>Takara</publisher>
@@ -5680,7 +5680,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="garou2a" cloneof="fatfur2">
+	<software name="garou2a" cloneof="fatfury2">
 		<description>Garou Densetsu 2 - Aratanaru Tatakai (Jpn)</description>
 		<year>1993</year>
 		<publisher>Takara</publisher>
@@ -5928,7 +5928,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="powerinsj" cloneof="powerins">
+	<software name="gouketsu" cloneof="powerins">
 		<description>Gouketsuji Ichizoku (Jpn)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -6094,7 +6094,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="hanjhero">
+	<software name="hanjuher">
 		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Square</publisher>
@@ -6156,7 +6156,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="hayashog">
+	<software name="moritash">
 		<description>Hayazashi Nidan Morita Shougi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Seta</publisher>
@@ -6180,7 +6180,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="hayasho2" supported="no">
+	<software name="moritas2" supported="no">
 		<description>Hayazashi Nidan Morita Shougi 2 (Jpn)</description>
 		<year>1995</year>
 		<publisher>Seta</publisher>
@@ -6294,7 +6294,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="honododg">
+	<software name="ddanpei">
 		<description>Honoo no Toukyuuji - Dodge Danpei (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
@@ -6583,7 +6583,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="incrhulk">
+	<software name="hulk">
 		<description>The Incredible Hulk (Euro)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -6600,7 +6600,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="incrhulku" cloneof="incrhulk">
+	<software name="hulku" cloneof="hulk">
 		<description>The Incredible Hulk (USA)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -7280,7 +7280,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="jwsoccer">
+	<software name="jikksocr">
 		<description>Jikkyou World Soccer - Perfect Eleven (Jpn, Rev. A)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -7305,7 +7305,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="jwsoccera" cloneof="jwsoccer">
+	<software name="jikksocra" cloneof="jikksocr">
 		<description>Jikkyou World Soccer - Perfect Eleven (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -7329,7 +7329,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="jwsoccr2">
+	<software name="jikkscr2">
 		<description>Jikkyou World Soccer 2 - Fighting Eleven (Jpn)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
@@ -7355,7 +7355,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="jimmycong" cloneof="jimmycon">
+	<software name="connorsg" cloneof="connors">
 		<description>Jimmy Connors Pro Tennis Tour (Ger)</description>
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
@@ -7445,7 +7445,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="judged">
+	<software name="jdredd">
 		<description>Judge Dredd (Euro)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -8185,7 +8185,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="krustyu" cloneof="krusty"> <!-- doesn't work on snes-ntsc, works on snespal -->
+	<software name="krustyfhu" cloneof="krustyfh"> <!-- doesn't work on snes-ntsc, works on snespal -->
 		<description>Krusty's Super Fun House (USA, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -8806,7 +8806,7 @@ The revision A of the cartridge has the same ROM as the initial release.
 		</part>
 	</software>
 
-	<software name="magicalt">
+	<software name="mtaruru">
 		<description>Magical Taruruuto-kun - Magic Adventure (Jpn)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
@@ -9186,7 +9186,7 @@ Japanese cart
 	</software>
 
 	<software name="megaloj" cloneof="megalo">
-		<description>Mega lo Mania - Jikuu Daisenryaku (Jpn)</description>
+		<description>Mega-Lo-Mania - Jikuu Daisenryaku (Jpn)</description>
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="SHVC-MZ"/>
@@ -9230,7 +9230,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="mickeymnj" cloneof="mickeymn">
+	<software name="mmaniaj" cloneof="mmania">
 		<description>Mickey Mania - The Timeless Adventures of Mickey Mouse (Jpn)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
@@ -9249,7 +9249,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="mickeymnu" cloneof="mickeymn">
+	<software name="mmaniau" cloneof="mmania">
 		<description>Mickey Mania - The Timeless Adventures of Mickey Mouse (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -9267,7 +9267,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="mickeyma" cloneof="mickeymq">
+	<software name="mickeym1" cloneof="mickeymq">
 		<description>Mickey no Magical Adventure (Jpn, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
@@ -9287,7 +9287,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="mickeyma1" cloneof="mickeymq">
+	<software name="mickeym1a" cloneof="mickeymq">
 		<description>Mickey no Magical Adventure (Jpn)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
@@ -9375,7 +9375,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="miniynk" supported="no">
+	<software name="miniyonk" supported="no">
 		<description>Mini Yonku Shining Scorpion - Let's &amp; Go!! (Jpn)</description>
 		<year>1996</year>
 		<publisher>ASCII Entertainment</publisher>
@@ -9417,7 +9417,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="momotaro">
+	<software name="momodhap">
 		<description>Momotarou Dentetsu Happy (Jpn)</description>
 		<year>1996</year>
 		<publisher>Hudson</publisher>
@@ -10248,7 +10248,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="nigelmu" cloneof="nigelm">
+	<software name="mansellu" cloneof="mansell">
 		<description>Nigel Mansell's World Championship Racing (USA)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
@@ -10266,7 +10266,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="gaidentr">
+	<software name="ngaidntr">
 		<description>Ninja Gaiden Trilogy (USA)</description>
 		<year>1995</year>
 		<publisher>Tecmo</publisher>
@@ -10346,7 +10346,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="nobuyabh">
+	<software name="nobuhao">
 		<description>Nobunaga no Yabou - Haouden (Jpn, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -10371,7 +10371,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="nobuyabh1" cloneof="nobuyabh">
+	<software name="nobuhao1" cloneof="nobuhao">
 		<description>Nobunaga no Yabou - Haouden (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -10395,7 +10395,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="nobuyabt">
+	<software name="nobutens">
 		<description>Nobunaga no Yabou - Tenshouki (Jpn)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
@@ -11344,7 +11344,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="powermonj" cloneof="powermon">
+	<software name="pmongerj" cloneof="pmonger">
 		<description>PowerMonger - Mashou no Bouryaku (Jpn)</description>
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
@@ -12408,7 +12408,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="scoobydo">
+	<software name="scooby">
 		<description>Scooby-Doo Mystery (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -12452,7 +12452,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="sdgunga" cloneof="sdgung">
+	<software name="kgundama" cloneof="kgundam">
 		<description>SD Gundam Gaiden - Knight Gundam Monogatari - Ooinaru Isan (Jpn)</description>
 		<year>1991</year>
 		<publisher>Angel</publisher>
@@ -12819,7 +12819,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="shangha3">
+	<software name="shangh3">
 		<description>Shanghai III (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -12897,7 +12897,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="shmegamta" cloneof="shmegamt">
+	<software name="shinmta" cloneof="shinmt">
 		<!-- Notes: Also re-released through Nintendo Power -->
 		<description>Shin Megami Tensei (Jpn)</description>
 		<year>1992</year>
@@ -12924,7 +12924,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="shmegmifra" cloneof="shmegmif">
+	<software name="shinmtifa" cloneof="shinmtif">
 		<description>Shin Megami Tensei if... (Jpn)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -12947,7 +12947,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="shmegmt2a" cloneof="shmegmt2">
+	<software name="shinmt2a" cloneof="shinmt2">
 		<description>Shin Megami Tensei II (Jpn)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -14225,7 +14225,7 @@ Japanese cart
 		</part>
 	</software>
 <!-- wip-sup -->
-	<software name="super3db" cloneof="baselod2">
+	<software name="super3db" cloneof="basload2">
 		<description>Super 3D Baseball (Jpn)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
@@ -14323,7 +14323,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="supraoki" cloneof="genghis">
+	<software name="genchohi" cloneof="genghis2">
 		<description>Super Aoki Ookami to Shiroki Mejika - Genchou Hishi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -14350,7 +14350,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="batlshipu" cloneof="batlship" supported="no">
+	<software name="sbshipu" cloneof="sbship" supported="no">
 		<description>Super Battleship (USA)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
@@ -14642,7 +14642,7 @@ Japanese cart
 		</part>
 	</software>
 
-	<software name="sdaikouj" cloneof="unchartd">
+	<software name="daikokai" cloneof="unchartd">
 		<!-- Notes: Also re-released through Nintendo Power -->
 		<description>Super Daikoukai Jidai (Jpn)</description>
 		<year>1992</year>
@@ -16844,7 +16844,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="snobua" cloneof="nobunaga">
+	<software name="nobubufu1" cloneof="nobuamb">
 		<description>Super Nobunaga no Yabou - Bushou Fuuunroku (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -16868,7 +16868,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="snobuzb">
+	<software name="nobuzenk">
 		<description>Super Nobunaga no Yabou - Zenkoku Ban (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -17138,7 +17138,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="spbaseb" cloneof="baselod">
+	<software name="spbaseb" cloneof="basload">
 		<description>Super Professional Baseball (Jpn)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -17179,7 +17179,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="spuyopuya" cloneof="spuyopuy">
+	<software name="spuyopa" cloneof="spuyop">
 		<description>Super Puyo Puyo (Jpn, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
@@ -17199,7 +17199,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="spuyopuy">
+	<software name="spuyop">
 		<description>Super Puyo Puyo (Jpn, Rev. B)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
@@ -17219,7 +17219,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="spuyopuyb" cloneof="spuyopuy">
+	<software name="spuyopb" cloneof="spuyop">
 		<description>Super Puyo Puyo (Jpn)</description>
 		<year>1993</year>
 		<publisher>Banpresto</publisher>
@@ -17327,7 +17327,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="ssango">
+	<software name="sangoku">
 		<description>Super Sangokushi (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
@@ -17351,7 +17351,7 @@ verify how it affects the SNES unit and decide if the sets have to be separately
 		</part>
 	</software>
 
-	<software name="ssango2" cloneof="roman3k2">
+	<software name="sangoku2" cloneof="roman3k2">
 		<description>Super Sangokushi II (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -17384,7 +17384,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="ssango2a" cloneof="roman3k2">
+	<software name="sangoku2a" cloneof="roman3k2">
 		<description>Super Sangokushi II (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -17494,7 +17494,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="suprjediua" cloneof="suprjedi">
+	<software name="jediua" cloneof="jedi">
 		<description>Super Star Wars - Return of the Jedi (USA)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -17512,7 +17512,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="suprjediu" cloneof="suprjedi">
+	<software name="jediu" cloneof="jedi">
 		<description>Super Star Wars - Return of the Jedi (USA, Rev. A)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -17531,7 +17531,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superesb">
+	<software name="esb">
 		<description>Super Star Wars - The Empire Strikes Back (Euro, Rev. A)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
@@ -17549,7 +17549,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superesbua" cloneof="superesb">
+	<software name="esbua" cloneof="esb">
 		<description>Super Star Wars - The Empire Strikes Back (USA)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
@@ -17570,7 +17570,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="supersw">
+	<software name="starwars">
 		<description>Super Star Wars (Euro, Rev. A)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -17588,7 +17588,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superswa" cloneof="supersw">
+	<software name="starwarsa" cloneof="starwars">
 		<description>Super Star Wars (Euro)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -17605,7 +17605,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superswu" cloneof="supersw">
+	<software name="starwarsu" cloneof="starwars">
 		<description>Super Star Wars (USA, Rev. A)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -17624,7 +17624,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superswua" cloneof="supersw">
+	<software name="starwarsua" cloneof="starwars">
 		<description>Super Star Wars (USA)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -18242,7 +18242,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tecmobwl">
+	<software name="tecmosbw">
 		<description>Tecmo Super Bowl (USA)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
@@ -18267,7 +18267,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tecmobw3j" cloneof="tecmobw3">
+	<software name="tecmosb3j" cloneof="tecmosb3">
 		<description>Tecmo Super Bowl III - Final Edition (Jpn)</description>
 		<year>1995</year>
 		<publisher>Tecmo</publisher>
@@ -18578,7 +18578,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tengaimz" supported="no">
+	<software name="tengaim0" supported="no">
 		<description>Tengai Makyou Zero (Jpn)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -18624,8 +18624,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="t2judge">
-		<description>Terminator 2 - Judgment Day (Euro)</description>
+	<software name="term2">
+		<description>T2 - Terminator 2 - Judgment Day (Euro)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="SNSP-TP-FAH"/>
@@ -19669,7 +19669,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wheelfod">
+	<software name="wheelfdx">
 		<description>Wheel of Fortune - Deluxe Edition (USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
@@ -19687,7 +19687,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wwrld">
+	<software name="wworld">
 		<description>Where in the World is Carmen Sandiego? (Euro)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -19842,7 +19842,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wgold" supported="no">
+	<software name="wintgold" supported="no">
 		<description>Winter Gold (Euro)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -19891,7 +19891,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wizard5j" cloneof="wizard5">
+	<software name="wizardr5j" cloneof="wizardr5">
 		<description>Wizardry V - Saika no Chuushin (Jpn)</description>
 		<year>1992</year>
 		<publisher>ASCII Entertainment</publisher>
@@ -19915,7 +19915,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wizard6">
+	<software name="wizardr6">
 		<description>Wizardry VI - Kindan no Mahitsu (Jpn)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
@@ -20169,7 +20169,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wwfwrestu" cloneof="wwfwrest">
+	<software name="wwfagu" cloneof="wwfag">
 		<description>WWF WrestleMania - The Arcade Game (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -20413,8 +20413,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yuu">
-		<description>Yuu Yuu Hakusho (Jpn)</description>
+	<software name="yuyu">
+		<description>Yu Yu Hakusho (Jpn)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-YY"/>
@@ -20432,8 +20432,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yuua">
-		<description>Yuu Yuu Hakusho (Jpn, Alt)</description>
+	<software name="yuyua">
+		<description>Yu Yu Hakusho (Jpn, Alt)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-YY"/>
@@ -20454,8 +20454,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yuutoku">
-		<description>Yuu Yuu Hakusho - Tokubetsu Hen (Jpn)</description>
+	<software name="yuyutoku">
+		<description>Yu Yu Hakusho - Tokubetsu Hen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-AYYJ-JPN"/>
@@ -20473,8 +20473,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yuu2">
-		<description>Yuu Yuu Hakusho 2 - Kakutou no Shou (Jpn)</description>
+	<software name="yuyu2">
+		<description>Yu Yu Hakusho 2 - Kakutou no Shou (Jpn)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-Y2"/>
@@ -20588,7 +20588,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="zenprowr">
+	<software name="zenprow">
 		<description>Zen-Nihon Pro Wrestling (Jpn)</description>
 		<year>1993</year>
 		<publisher>Masaya</publisher>
@@ -20650,7 +20650,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="garou" cloneof="fatfur">
+	<software name="garou" cloneof="fatfury">
 		<!-- single cartridge source: Yakushi~Kabuto -->
 		<description>Garou Densetsu - Shukumei no Tatakai (Jpn, Rev. A)</description>
 		<year>1992</year>
@@ -21189,7 +21189,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="snobu" cloneof="nobunaga">
+	<software name="nobubufu" cloneof="nobuamb">
 		<!-- single cartridge source: Yakushi~Kabuto -->
 		<description>Super Nobunaga no Yabou - Bushou Fuuunroku (Jpn, Rev. A)</description>
 		<year>1991</year>
@@ -21461,7 +21461,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shmegmt2ra" cloneof="shmegmt2">
+	<software name="shinmt2a" cloneof="shinmt2">
 		<description>Shin Megami Tensei II (Jpn, Rev. A)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -21584,7 +21584,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yoshicoup" cloneof="yoshico">
+	<software name="yoshicokup" cloneof="yoshicok">
 		<!-- owned by legrospixel.com -->
 		<description>Yoshi's Cookie (USA, Prototype 19930119)</description>
 		<year>1993</year>
@@ -21875,7 +21875,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="baselod3">
+	<software name="basload3">
 		<description>Super Bases Loaded 3 - License to Steal (USA, Rev. A)</description>
 		<year>1995</year>
 		<publisher>Jaleco</publisher>
@@ -22207,7 +22207,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="addamfamj" cloneof="addamfam">
+	<software name="addfamj" cloneof="addfam">
 		<description>The Addams Family (Jpn)</description>
 		<year>1992</year>
 		<publisher>Misawa Entertainment</publisher>
@@ -22221,7 +22221,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="addamfamu" cloneof="addamfam">
+	<software name="addfamu" cloneof="addfam">
 		<description>The Addams Family (USA)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
@@ -22301,7 +22301,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="adverb">
+	<software name="rockybw">
 		<description>The Adventures of Rocky and Bullwinkle and Friends (USA)</description>
 		<year>1993</year>
 		<publisher>T*HQ</publisher>
@@ -22691,7 +22691,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="aoudanqz">
+	<software name="amoudan">
 		<description>America Oudan Ultra Quiz (Jpn)</description>
 		<year>1992</year>
 		<publisher>Tomy</publisher>
@@ -22719,7 +22719,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="americ">
+	<software name="amerglad">
 		<description>American Gladiators (USA)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
@@ -22743,7 +22743,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="andreagaj" cloneof="andreaga">
+	<software name="agassij" cloneof="agassi">
 		<description>Andre Agassi Tennis (Jpn)</description>
 		<year>1994</year>
 		<publisher>Nichibutsu</publisher>
@@ -22757,7 +22757,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="andreaga">
+	<software name="agassi">
 		<description>Andre Agassi Tennis (USA)</description>
 		<year>1994</year>
 		<publisher>TecMagik</publisher>
@@ -22945,7 +22945,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="arcusody">
+	<software name="arcus">
 		<description>Arcus Odyssey (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Renovation</publisher>
@@ -23599,7 +23599,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="batltech" cloneof="mechwarr">
+	<software name="btech" cloneof="mechwarr">
 		<description>BattleTech (Jpn)</description>
 		<year>1993</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -23615,7 +23615,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="batl3050" cloneof="mech3050">
+	<software name="btec3050" cloneof="mech3050">
 		<description>BattleTech 3050 (Jpn)</description>
 		<year>1996</year>
 		<publisher>ASK Kodansha</publisher>
@@ -23774,7 +23774,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="benkeig">
+	<software name="benkei">
 		<description>Benkei Gaiden - Suna no Shou (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
@@ -24150,7 +24150,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="blackthop" cloneof="blackhwk">
+	<software name="blackthrp" cloneof="blackhwk">
 		<description>Blackthorne (USA, Prototype CES Version)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
@@ -24161,7 +24161,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="blacktho" cloneof="blackhwk">
+	<software name="blackthr" cloneof="blackhwk">
 		<description>Blackthorne (USA)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
@@ -24173,7 +24173,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="blackthoj" cloneof="blackhwk">
+	<software name="blackthrj" cloneof="blackhwk">
 		<description>Blackthorne - Fukushuu no Kuroki Toge (Jpn)</description>
 		<year>1995</year>
 		<publisher>Kemco</publisher>
@@ -24328,7 +24328,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="boogermn">
+	<software name="booger">
 		<description>Boogerman - A Pick and Flick Adventure (Euro)</description>
 		<year>1995</year>
 		<publisher>Interplay</publisher>
@@ -24339,7 +24339,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="boogermnu" cloneof="boogermn">
+	<software name="boogeru" cloneof="booger">
 		<description>Boogerman - A Pick and Flick Adventure (USA)</description>
 		<year>1995</year>
 		<publisher>Interplay</publisher>
@@ -24783,7 +24783,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="bullsvsb">
+	<software name="bullvsbl">
 		<description>Bulls vs Blazers and the NBA Playoffs (Euro, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -24794,7 +24794,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="bullsvsb1" cloneof="bullsvsb">
+	<software name="bullvsbl1" cloneof="bullvsbl">
 		<description>Bulls vs Blazers and the NBA Playoffs (Euro)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -24805,7 +24805,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="bullsvsbu" cloneof="bullsvsb">
+	<software name="bullvsblu" cloneof="bullvsbl">
 		<description>Bulls vs Blazers and the NBA Playoffs (USA, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -24817,7 +24817,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="bullsvsbu1" cloneof="bullsvsb">
+	<software name="bullvsblu1" cloneof="bullvsbl">
 		<description>Bulls vs Blazers and the NBA Playoffs (USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -25240,7 +25240,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="champl">
+	<software name="champool">
 		<description>Championship Pool (Euro)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
@@ -25251,7 +25251,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="champlu" cloneof="champl">
+	<software name="champoolu" cloneof="champool">
 		<description>Championship Pool (USA)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
@@ -25277,7 +25277,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="chaose">
+	<software name="chaoseng">
 		<description>The Chaos Engine (Euro)</description>
 		<year>1993</year>
 		<publisher>Spectrum Holobyte</publisher>
@@ -25304,7 +25304,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="chavezb">
+	<software name="chavezp" cloneof="chavez">
 		<description>Chavez (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>ASC Games</publisher>
@@ -25837,7 +25837,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="combatrij" cloneof="combatri">
+	<software name="ctribej" cloneof="ctribe">
 		<description>The Combatribes (Jpn)</description>
 		<year>1992</year>
 		<publisher>Technos Japan</publisher>
@@ -25851,7 +25851,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="combatri">
+	<software name="ctribe">
 		<description>The Combatribes (USA)</description>
 		<year>1993</year>
 		<publisher>American Technos</publisher>
@@ -26100,7 +26100,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="cutthroa">
+	<software name="cutthr">
 		<description>Cutthroat Island (Euro)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -26111,7 +26111,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="cutthroau" cloneof="cutthroa">
+	<software name="cutthru" cloneof="cutthr">
 		<description>Cutthroat Island (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -26380,7 +26380,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="davidc">
+	<software name="amaznten">
 		<description>David Crane's Amazing Tennis (Euro)</description>
 		<year>1992</year>
 		<publisher>Absolute Entertainment</publisher>
@@ -26391,7 +26391,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="davidcj" cloneof="davidc">
+	<software name="amazntenj" cloneof="amaznten">
 		<description>David Crane's Amazing Tennis (Jpn)</description>
 		<year>1992</year>
 		<publisher>Pack-In-Video</publisher>
@@ -26917,7 +26917,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="donaldck">
+	<software name="donaldd">
 		<description>Donald Duck no Mahou no Boushi (Jpn)</description>
 		<year>1995</year>
 		<publisher>Epoch</publisher>
@@ -27116,7 +27116,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="doukyus2">
+	<software name="dokyuse2">
 		<description>Doukyuusei 2 (Jpn, NP)</description>
 		<year>1997</year>
 		<publisher>Banpresto</publisher>
@@ -27335,7 +27335,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="dslayernp" cloneof="dslayer">
+	<software name="dslayednp" cloneof="dslayed">
 		<description>Dragon Slayer - Eiyuu Densetsu (Jpn, Rev. A, NP)</description>
 		<year>1992?</year>
 		<publisher>Epoch</publisher>
@@ -27348,7 +27348,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="dslayer2">
+	<software name="dslayed2">
 		<!-- Notes: Also re-released through Nintendo Power -->
 		<description>Dragon Slayer - Eiyuu Densetsu II (Jpn)</description>
 		<year>1993</year>
@@ -27565,7 +27565,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="td2duel">
+	<software name="td2">
 		<description>The Duel - Test Drive II (Euro)</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
@@ -27576,7 +27576,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="td2duelu" cloneof="td2duel">
+	<software name="td2u" cloneof="td2">
 		<description>The Duel - Test Drive II (USA)</description>
 		<year>1992</year>
 		<publisher>Accolade</publisher>
@@ -27604,7 +27604,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="dungmstrj" cloneof="dungmstr">
+	<software name="dngmsterj" cloneof="dngmster">
 		<description>Dungeon Master (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -27621,7 +27621,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="dungmstrj1" cloneof="dungmstr">
+	<software name="dngmsterj1" cloneof="dngmster">
 		<description>Dungeon Master (Jpn)</description>
 		<year>1991</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -27638,7 +27638,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="dungmstru" cloneof="dungmstr">
+	<software name="dngmsteru" cloneof="dngmster">
 		<description>Dungeon Master (USA)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
@@ -27839,7 +27839,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="elitescr">
+	<software name="elitesoc">
 		<description>Elite Soccer (USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
@@ -28021,7 +28021,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="espnnhn">
+	<software name="espnhn">
 		<description>ESPN National Hockey Night (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -28098,7 +28098,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="europas">
+	<software name="eurosens" cloneof="opeurope">
 		<description>Europa Sensen (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -28311,7 +28311,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="f1world">
+	<software name="f1wce">
 		<description>F1 World Championship Edition (Euro)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
@@ -28405,7 +28405,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="familfeu">
+	<software name="famfeud">
 		<description>Family Feud (USA, Rev. A)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
@@ -28449,7 +28449,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="fatfur">
+	<software name="fatfury">
 		<description>Fatal Fury (Euro)</description>
 		<year>1993</year>
 		<publisher>Takara</publisher>
@@ -28460,7 +28460,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="fatfuru" cloneof="fatfur">
+	<software name="fatfuryu" cloneof="fatfury">
 		<description>Fatal Fury (USA)</description>
 		<year>1993</year>
 		<publisher>Takara</publisher>
@@ -28512,7 +28512,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="feverpp" cloneof="feverp">
+	<software name="feverpitp" cloneof="feverpit">
 		<description>Fever Pitch Soccer (Euro, Prototype)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
@@ -28523,7 +28523,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="feverp">
+	<software name="feverpit">
 		<description>Fever Pitch Soccer (Euro)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
@@ -28599,7 +28599,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="fighthj" cloneof="fighth">
+	<software name="fghthistj" cloneof="fghthist">
 		<description>Fighter's History (Jpn)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
@@ -28613,7 +28613,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="fighthp" cloneof="fighth">
+	<software name="fghthistp" cloneof="fghthist">
 		<description>Fighter's History (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
@@ -29146,7 +29146,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="flyinher">
+	<software name="flyhero">
 		<description>Flying Hero - Bugyuru no Daibouken (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sofel</publisher>
@@ -29340,7 +29340,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="frontms">
+	<software name="frontmis">
 		<description>Front Mission (Jpn, Rev. A)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
@@ -29698,7 +29698,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="garou2" cloneof="fatfur2">
+	<software name="garou2" cloneof="fatfury2">
 		<description>Garou Densetsu 2 - Aratanaru Tatakai (Jpn, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Takara</publisher>
@@ -29802,7 +29802,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="genghis">
+	<software name="genghis2">
 		<description>Genghis Khan II - Clan of the Gray Wolf (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -29843,7 +29843,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="foremnko">
+	<software name="georgeko">
 		<description>George Foreman's KO Boxing (Euro)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -29854,7 +29854,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="foremnkous" cloneof="foremnko">
+	<software name="georgekous" cloneof="georgeko">
 		<description>George Foreman's KO Boxing (USA, Doritos Promo)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -29865,7 +29865,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="foremnkou" cloneof="foremnko">
+	<software name="georgekou" cloneof="georgeko">
 		<description>George Foreman's KO Boxing (USA, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -29877,7 +29877,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="foremnkou1" cloneof="foremnko">
+	<software name="georgekou1" cloneof="georgeko">
 		<description>George Foreman's KO Boxing (USA)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -30353,7 +30353,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="greatwal">
+	<software name="waldo">
 		<description>The Great Waldo Search (USA)</description>
 		<year>1993</year>
 		<publisher>T*HQ</publisher>
@@ -30800,7 +30800,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="headon" cloneof="feverp">
+	<software name="headon" cloneof="feverpit">
 		<description>Head-On Soccer (USA)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
@@ -31078,7 +31078,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="higastad">
+	<software name="sproyak">
 		<description>Higashio Osamu Kanshuu Super Pro Yakyuu Stadium (Jpn)</description>
 		<year>1993</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -32305,7 +32305,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jacknick">
+	<software name="nicklaus">
 		<description>Jack Nicklaus Golf (Euro)</description>
 		<year>1992</year>
 		<publisher>Tradewest</publisher>
@@ -32316,7 +32316,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jacknickf" cloneof="jacknick">
+	<software name="nicklausf" cloneof="nicklaus">
 		<description>Jack Nicklaus Golf (Fra)</description>
 		<year>1992</year>
 		<publisher>Tradewest</publisher>
@@ -32327,7 +32327,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jacknicku" cloneof="jacknick">
+	<software name="nicklausu" cloneof="nicklaus">
 		<description>Jack Nicklaus Golf (USA)</description>
 		<year>1992</year>
 		<publisher>Tradewest</publisher>
@@ -32560,7 +32560,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jwsoccr2p" cloneof="jwsoccr2">
+	<software name="jikkscr2p" cloneof="jikkscr2">
 		<description>Jikkyou World Soccer 2 - Fighting Eleven (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
@@ -32606,7 +32606,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jimmycon">
+	<software name="connors">
 		<description>Jimmy Connors Pro Tennis Tour (Euro)</description>
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
@@ -32617,7 +32617,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jimmyconf" cloneof="jimmycon">
+	<software name="connorsf" cloneof="connors">
 		<description>Jimmy Connors Pro Tennis Tour (Fra)</description>
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
@@ -32628,7 +32628,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jimmyconj" cloneof="jimmycon">
+	<software name="connorsj" cloneof="connors">
 		<description>Jimmy Connors Pro Tennis Tour (Jpn)</description>
 		<year>1993</year>
 		<publisher>Misawa Entertainment</publisher>
@@ -32642,7 +32642,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jimmyconu" cloneof="jimmycon">
+	<software name="connorsu" cloneof="connors">
 		<description>Jimmy Connors Pro Tennis Tour (USA)</description>
 		<year>1992</year>
 		<publisher>Ubi Soft</publisher>
@@ -32996,7 +32996,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="judgedj" cloneof="judged">
+	<software name="jdreddj" cloneof="jdredd">
 		<description>Judge Dredd (Jpn)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -33010,7 +33010,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="judgedus" cloneof="judged">
+	<software name="jdreddus" cloneof="jdredd">
 		<description>Judge Dredd (USA, Sample)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -33021,7 +33021,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="judgedu" cloneof="judged">
+	<software name="jdreddu" cloneof="jdredd">
 		<description>Judge Dredd (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -33033,7 +33033,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="jumbo" cloneof="holein1">
+	<software name="holein1j" cloneof="holein1">
 		<description>Jumbo Ozaki no Hole in One (Jpn)</description>
 		<year>1991</year>
 		<publisher>HAL Laboratory</publisher>
@@ -33256,7 +33256,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="justicel">
+	<software name="jleague">
 		<description>Justice League Task Force (Euro)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -33267,7 +33267,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="justicelj" cloneof="justicel">
+	<software name="jleaguej" cloneof="jleague">
 		<description>Justice League Task Force (Jpn)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -33281,7 +33281,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="justicelup" cloneof="justicel">
+	<software name="jleagueup" cloneof="jleague">
 		<description>Justice League Task Force (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -33292,7 +33292,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="justicelu" cloneof="justicel">
+	<software name="jleagueu" cloneof="jleague">
 		<description>Justice League Task Force (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -33449,7 +33449,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="kamensd">
+	<software name="kamenrsd">
 		<description>Kamen Rider SD - Shutsugeki!! Rider Machine (Jpn)</description>
 		<year>1993</year>
 		<publisher>Yutaka</publisher>
@@ -33505,7 +33505,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="katouhif">
+	<software name="katohifu">
 		<description>Katou Hifumi Kudan - Shougi Club (Jpn)</description>
 		<year>1997</year>
 		<publisher>Hect</publisher>
@@ -33531,7 +33531,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="kawasbik">
+	<software name="kawasaki">
 		<description>Kawasaki Superbike Challenge (Euro)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
@@ -33542,7 +33542,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="kawasbiku" cloneof="kawasbik">
+	<software name="kawasakiu" cloneof="kawasaki">
 		<description>Kawasaki Superbike Challenge (USA)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
@@ -33788,7 +33788,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="patlabor">
-		<description>Kidoukeisatsu Patlabor (Jpn)</description>
+		<description>Kidou Keisatsu Patlabor (Jpn)</description>
 		<year>1994</year>
 		<publisher>BEC</publisher>
 		<info name="serial" value="SHVC-PX"/>
@@ -34034,7 +34034,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="kingyo">
+	<software name="kingchu">
 		<description>Kingyo Chuuihou! - Tobidase! Game Gakuen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
@@ -34367,7 +34367,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="krustyj" cloneof="krusty">
+	<software name="krustywj" cloneof="krustyfh">
 		<description>Krusty World (Jpn)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -34381,7 +34381,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="krusty">
+	<software name="krustyfh">
 		<description>Krusty's Super Fun House (Euro, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -34392,7 +34392,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="krusty1" cloneof="krusty">
+	<software name="krustyfh1" cloneof="krustyfh">
 		<description>Krusty's Super Fun House (Euro)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -34403,7 +34403,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="krustyu1" cloneof="krusty">
+	<software name="krustyfhu1" cloneof="krustyfh">
 		<description>Krusty's Super Fun House (USA)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -35024,7 +35024,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="litlemag">
+	<software name="lilmagic">
 		<description>Little Magic (Euro, Prototype)</description>
 		<year>1993</year>
 		<publisher>Altron</publisher>
@@ -35035,7 +35035,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="litlemagjp" cloneof="litlemag">
+	<software name="lilmagicjp" cloneof="lilmagic">
 		<description>Little Magic (Jpn, Prototype)</description>
 		<year>1993</year>
 		<publisher>Altron</publisher>
@@ -35046,7 +35046,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="litlemagj" cloneof="litlemag">
+	<software name="lilmagicj" cloneof="lilmagic">
 		<description>Little Magic (Jpn)</description>
 		<year>1993</year>
 		<publisher>Altron</publisher>
@@ -35089,7 +35089,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="loderunt">
+	<software name="ldruntw">
 		<description>Lode Runner Twin - Justy to Liberty no Daibouken (Jpn)</description>
 		<year>1994</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -36058,7 +36058,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="maryshp" cloneof="marysh">
+	<software name="frankenp" cloneof="franken">
 		<description>Mary Shelley's Frankenstein (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -36069,7 +36069,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="marysh">
+	<software name="franken">
 		<description>Mary Shelley's Frankenstein (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -36287,7 +36287,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="megalop" cloneof="megalo">
-		<description>Mega lo Mania (Euro, Prototype)</description>
+		<description>Mega-Lo-Mania (Euro, Prototype)</description>
 		<year>1991</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36298,7 +36298,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="megalo">
-		<description>Mega lo Mania (Euro)</description>
+		<description>Mega-Lo-Mania (Euro)</description>
 		<year>1991</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36578,7 +36578,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="mickeymn">
+	<software name="mmania">
 		<description>Mickey Mania - The Timeless Adventures of Mickey Mouse (Euro)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -36685,7 +36685,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="mightm2j" cloneof="mightm2">
+	<software name="mightmg2j" cloneof="mightmg2">
 		<description>Might and Magic - Book II (Jpn)</description>
 		<year>1993</year>
 		<publisher>LOZC</publisher>
@@ -36701,7 +36701,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="mightm2">
+	<software name="mightmg2">
 		<description>Might and Magic II - Gates to Another World (Euro)</description>
 		<year>1993</year>
 		<publisher>Elite System</publisher>
@@ -36714,7 +36714,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="mightm2g" cloneof="mightm2">
+	<software name="mightmg2g" cloneof="mightmg2">
 		<description>Might and Magic II - Gates to Another World (Ger)</description>
 		<year>1993</year>
 		<publisher>Elite System</publisher>
@@ -36727,7 +36727,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="mightm3p" cloneof="mightm3">
+	<software name="mightmg3p" cloneof="mightmg3">
 		<description>Might and Magic III - Isles of Terra (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>FCI</publisher>
@@ -36740,7 +36740,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="mightm3">
+	<software name="mightmg3">
 		<description>Might and Magic III - Isles of Terra (USA)</description>
 		<year>1995</year>
 		<publisher>FCI</publisher>
@@ -36931,7 +36931,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="mizukish">
+	<software name="mizuki">
 		<description>Mizuki Shigeru no Youkai Hyakkiyakou (Jpn)</description>
 		<year>1995</year>
 		<publisher>KSS</publisher>
@@ -37413,7 +37413,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="nakaf194">
+	<software name="f1hero94">
 		<description>Nakajima Satoru Kanshuu F-1 Hero '94 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Varie</publisher>
@@ -37429,7 +37429,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="nakaf1h">
+	<software name="f1hero">
 		<description>Nakajima Satoru Kanshuu Super F-1 Hero (Jpn)</description>
 		<year>1992</year>
 		<publisher>Varie</publisher>
@@ -37778,7 +37778,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="nbapro" cloneof="bullsvsb">
+	<software name="nbapro" cloneof="bullvsbl">
 		<description>NBA Pro Basketball - Bulls vs Blazers (Jpn)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -38346,7 +38346,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="nigelmj" cloneof="nigelm">
+	<software name="mansellj" cloneof="mansell">
 		<description>Nigel Mansell F-1 Challenge (Jpn)</description>
 		<year>1993</year>
 		<publisher>Infocom</publisher>
@@ -38360,7 +38360,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="nigelmb" cloneof="nigelm">
+	<software name="mansellb" cloneof="mansell">
 		<description>Nigel Mansell's World Championship Racing (Euro, Alt)</description>
 		<year>1993</year>
 		<publisher>Gremlin Interactive</publisher>
@@ -38371,7 +38371,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="nigelm">
+	<software name="mansell">
 		<description>Nigel Mansell's World Championship Racing (Euro, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Gremlin Interactive</publisher>
@@ -38382,7 +38382,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="nigelma" cloneof="nigelm">
+	<software name="mansella" cloneof="mansell">
 		<description>Nigel Mansell's World Championship Racing (Euro)</description>
 		<year>1993</year>
 		<publisher>Gremlin Interactive</publisher>
@@ -38404,7 +38404,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="gaidentrj" cloneof="gaidentr">
+	<software name="nryukent" cloneof="ngaidntr">
 		<description>Ninja Ryuukenden Tomoe (Jpn)</description>
 		<year>1995</year>
 		<publisher>Tecmo</publisher>
@@ -38553,7 +38553,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="nobunaga">
+	<software name="nobuamb">
 		<description>Nobunaga's Ambition (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -38757,7 +38757,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="okamoto">
+	<software name="matchpg">
 		<description>Okamoto Ayako to Match Play Golf - Ko Olina Golf Club in Hawaii (Jpn)</description>
 		<year>1994</year>
 		<publisher>Tsukuda Original</publisher>
@@ -38787,7 +38787,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="olympic">
+	<software name="olympsum">
 		<description>Olympic Summer Games (Euro)</description>
 		<year>1996</year>
 		<publisher>U.S. Gold</publisher>
@@ -38798,7 +38798,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="olympicu" cloneof="olympic">
+	<software name="olympsumu" cloneof="olympsum">
 		<description>Olympic Summer Games (USA)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
@@ -39085,7 +39085,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="pman" cloneof="prehiman">
+	<software name="pmanj" cloneof="pman">
 		<description>P-Man (Jpn)</description>
 		<year>1995</year>
 		<publisher>Kemco</publisher>
@@ -40413,7 +40413,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="popful">
+	<software name="popmail">
 		<description>Popful Mail (Jpn)</description>
 		<year>1994</year>
 		<publisher>Nihon Falcom</publisher>
@@ -40525,7 +40525,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="powerdri">
+	<software name="pdrive">
 		<description>Power Drive (Euro)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -40649,7 +40649,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="powermon">
+	<software name="pmonger">
 		<description>PowerMonger (Euro)</description>
 		<year>1993</year>
 		<publisher>Imagineer</publisher>
@@ -40660,7 +40660,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="prehiman">
+	<software name="pman">
 		<description>Prehistorik Man (Euro)</description>
 		<year>1996</year>
 		<publisher>Titus</publisher>
@@ -40671,7 +40671,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="prehimanu" cloneof="prehiman">
+	<software name="pmanu" cloneof="pman">
 		<description>Prehistorik Man (USA)</description>
 		<year>1996</year>
 		<publisher>Titus</publisher>
@@ -40888,7 +40888,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="prosport">
+	<software name="prohocky">
 		<description>Pro Sport Hockey (USA)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
@@ -42263,8 +42263,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sangoku">
-		<description>Sangokushi Eiketsuden (Jpn)</description>
+	<software name="sangoeik">
+		<description>Sangokushi - Eiketsuden (Jpn)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SHVC-A3AJ"/>
@@ -42324,7 +42324,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sangokus">
+	<software name="sangosei">
 		<description>Sangokushi Seishi - Tenbu Spirits (Jpn)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
@@ -42340,7 +42340,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sshangai">
+	<software name="sanriosh">
 		<description>Sanrio Shanghai (Jpn)</description>
 		<year>1994</year>
 		<publisher>Character Soft</publisher>
@@ -42427,7 +42427,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sdgung">
+	<software name="kgundam">
 		<description>SD Gundam Gaiden - Knight Gundam Monogatari - Ooinaru Isan (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Angel</publisher>
@@ -42443,7 +42443,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sdgung2">
+	<software name="sdgundg2">
 		<description>SD Gundam Gaiden 2 - Entaku no Kishi (Jpn)</description>
 		<year>1992</year>
 		<publisher>Yutaka</publisher>
@@ -42724,7 +42724,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sengokud">
+	<software name="sengoku">
 		<description>Sengoku Denshou (Jpn)</description>
 		<year>1993</year>
 		<publisher>Data East</publisher>
@@ -42738,7 +42738,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sengokuh">
+	<software name="sengohas">
 		<description>Sengoku no Hasha - Tenkafubu e no Michi (Jpn)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
@@ -42944,7 +42944,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shangha2">
+	<software name="shangh2">
 		<description>Shanghai II - Dragon's Eye (Euro)</description>
 		<year>1993</year>
 		<publisher>Activision</publisher>
@@ -42955,7 +42955,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shangha2u" cloneof="shangha2">
+	<software name="shangh2u" cloneof="shangh2">
 		<description>Shanghai II - Dragon's Eye (USA)</description>
 		<year>1993</year>
 		<publisher>Activision</publisher>
@@ -43121,7 +43121,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shmegamt">
+	<software name="shinmt">
 		<!-- Notes: Also re-released through Nintendo Power -->
 		<description>Shin Megami Tensei (Jpn, Rev. A)</description>
 		<year>1992</year>
@@ -43138,7 +43138,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shmegmt2">
+	<software name="shinmt2">
 		<description>Shin Megami Tensei II (Jpn, Rev. B)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -43154,7 +43154,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shmegmif">
+	<software name="shinmtif">
 		<description>Shin Megami Tensei if... (Jpn, Rev. A)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
@@ -43184,7 +43184,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shinprow">
+	<software name="sprowres">
 		<description>Shin Nihon Pro Wrestling - Chou Senshi in Tokyo Dome - Fantastic Story (Jpn)</description>
 		<year>1993</year>
 		<publisher>Varie</publisher>
@@ -43198,7 +43198,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shinpw94">
+	<software name="sprowr94">
 		<description>Shin Nihon Pro Wrestling Kounin - '94 Battlefield in Tokyo Dome (Jpn)</description>
 		<year>1994</year>
 		<publisher>Varie</publisher>
@@ -43211,7 +43211,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shinpw95">
+	<software name="sprowr95">
 		<description>Shin Nihon Pro Wrestling Kounin - '95 Tokyo Dome Battle 7 (Jpn)</description>
 		<year>1995</year>
 		<publisher>Varie</publisher>
@@ -43917,7 +43917,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="soldfort" cloneof="chaose">
+	<software name="soldfort" cloneof="chaoseng">
 		<description>Soldiers of Fortune (USA)</description>
 		<year>1993</year>
 		<publisher>Spectrum Holobyte</publisher>
@@ -44067,7 +44067,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="soreyuke">
+	<software name="ebisumar">
 		<description>Soreyuke Ebisumaru Karakuri Meiro - Kieta Goemon no Nazo!! (Jpn)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
@@ -44332,7 +44332,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="spankyq">
+	<software name="spanky">
 		<description>Spanky's Quest (Euro)</description>
 		<year>1992</year>
 		<publisher>Natsume</publisher>
@@ -44343,7 +44343,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="spankyqu" cloneof="spankyq">
+	<software name="spankyu" cloneof="spanky">
 		<description>Spanky's Quest (USA)</description>
 		<year>1992</year>
 		<publisher>Natsume</publisher>
@@ -44640,7 +44640,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sillcfbp" cloneof="sillcfb">
+	<software name="spillfbp" cloneof="spillfb">
 		<description>Sports Illustrated Championship Football &amp; Baseball (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Malibu Interactive</publisher>
@@ -44651,7 +44651,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sillcfb">
+	<software name="spillfb">
 		<description>Sports Illustrated Championship Football &amp; Baseball (USA)</description>
 		<year>1994</year>
 		<publisher>Malibu Interactive</publisher>
@@ -44736,7 +44736,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="stdsn">
+	<software name="stds9">
 		<description>Star Trek - Deep Space Nine - Crossroads of Time (Euro)</description>
 		<year>1995</year>
 		<publisher>Playmates Interactive</publisher>
@@ -44747,7 +44747,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="stdsnup" cloneof="stdsn">
+	<software name="stds9up" cloneof="stds9">
 		<description>Star Trek - Deep Space Nine - Crossroads of Time (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Playmates Interactive</publisher>
@@ -44758,7 +44758,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="stdsnu" cloneof="stdsn">
+	<software name="stds9u" cloneof="stds9">
 		<description>Star Trek - Deep Space Nine - Crossroads of Time (USA)</description>
 		<year>1995</year>
 		<publisher>Playmates Interactive</publisher>
@@ -45159,7 +45159,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sriders">
+	<software name="ssriders">
 		<description>Sunset Riders (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -45170,7 +45170,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sridersu" cloneof="sriders">
+	<software name="ssridersu" cloneof="ssriders">
 		<description>Sunset Riders (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -45400,7 +45400,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="baselod">
+	<software name="basload">
 		<description>Super Bases Loaded (USA)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -45412,7 +45412,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="baselod3a" cloneof="baselod3">
+	<software name="basload3a" cloneof="basload3">
 		<description>Super Bases Loaded 3 - License to Steal (USA)</description>
 		<year>1995</year>
 		<publisher>Jaleco</publisher>
@@ -45426,7 +45426,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="baselod2">
+	<software name="basload2">
 		<description>Super Bases Loaded II (USA)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
@@ -45453,7 +45453,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="batlship">
+	<software name="sbship">
 		<description>Super Battleship (Euro)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
@@ -45586,7 +45586,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sbillard" cloneof="champl">
+	<software name="sbillard" cloneof="champool">
 		<description>Super Billiard - Championship Pool (Jpn)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
@@ -45836,7 +45836,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="scaesarp" cloneof="scaesar">
+	<software name="scaesarsp" cloneof="scaesars">
 		<description>Super Caesars Palace (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
@@ -45847,7 +45847,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="scaesar">
+	<software name="scaesars">
 		<description>Super Caesars Palace (USA)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
@@ -45859,7 +45859,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="scaesarj" cloneof="scaesar">
+	<software name="scaesarsj" cloneof="scaesars">
 		<description>Super Casino - Caesars Palace (Jpn, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
@@ -45873,7 +45873,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="scaesarja" cloneof="scaesar">
+	<software name="scaesarsja" cloneof="scaesars">
 		<description>Super Casino - Caesars Palace (Jpn)</description>
 		<year>1993</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
@@ -45940,7 +45940,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="schinfgt">
+	<software name="supchinf">
 		<description>Super Chinese Fighter (Jpn)</description>
 		<year>1995</year>
 		<publisher>Culture Brain</publisher>
@@ -46138,7 +46138,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="sdropzon">
-		<description>Archer McLean's Super Dropzone (Euro)</description>
+		<description>Archer MacLean's Super Dropzone (Euro)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="snes_cart">
@@ -46556,7 +46556,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="schasehqj" cloneof="schasehq">
+	<software name="superhq" cloneof="schasehq">
 		<description>Super H.Q. - Criminal Chaser (Jpn)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
@@ -47519,7 +47519,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="sshangha" cloneof="shangha2">
+	<software name="sshangh" cloneof="shangh2">
 		<description>Super Shanghai - Dragon's Eye (Jpn)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
@@ -47701,7 +47701,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superswj" cloneof="supersw">
+	<software name="starwarsj" cloneof="starwars">
 		<description>Super Star Wars (Jpn)</description>
 		<year>1992</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -47715,7 +47715,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superswup" cloneof="supersw">
+	<software name="starwarsp" cloneof="starwars">
 		<description>Super Star Wars (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
@@ -47726,7 +47726,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="suprjedij" cloneof="suprjedi">
+	<software name="jedij" cloneof="jedi">
 		<description>Super Star Wars - Jedi no Fukushuu (Jpn)</description>
 		<year>1995</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -47740,7 +47740,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="suprjedi">
+	<software name="jedi">
 		<description>Super Star Wars - Return of the Jedi (Euro, Rev. A)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -47751,7 +47751,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="suprjedia" cloneof="suprjedi">
+	<software name="jedia" cloneof="jedi">
 		<description>Super Star Wars - Return of the Jedi (Euro)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -47762,7 +47762,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superesbj" cloneof="superesb">
+	<software name="esbj" cloneof="esb">
 		<description>Super Star Wars - Teikoku no Gyakushuu (Jpn)</description>
 		<year>1993</year>
 		<publisher>Victor Musical Industries</publisher>
@@ -47776,7 +47776,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superesbp" cloneof="superesb">
+	<software name="esbp" cloneof="esb">
 		<description>Super Star Wars - The Empire Strikes Back (Euro, Prototype)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
@@ -47787,7 +47787,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superesba" cloneof="superesb">
+	<software name="esba" cloneof="esb">
 		<description>Super Star Wars - The Empire Strikes Back (Euro)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
@@ -47798,7 +47798,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superesbu" cloneof="superesb">
+	<software name="esbu" cloneof="esb">
 		<description>Super Star Wars - The Empire Strikes Back (USA, Rev. A)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
@@ -48814,7 +48814,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tecmobwlj" cloneof="tecmobwl">
+	<software name="tecmosbwj" cloneof="tecmosbw">
 		<description>Tecmo Super Bowl (Jpn)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
@@ -48830,7 +48830,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tecmobwlp" cloneof="tecmobwl">
+	<software name="tecmosbwp" cloneof="tecmosbw">
 		<description>Tecmo Super Bowl (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
@@ -48841,7 +48841,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tecmobw2j" cloneof="tecmobw2">
+	<software name="tecmosb2j" cloneof="tecmosb2">
 		<description>Tecmo Super Bowl II - Special Edition (Jpn)</description>
 		<year>1994</year>
 		<publisher>Tecmo</publisher>
@@ -48857,7 +48857,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tecmobw2">
+	<software name="tecmosb2">
 		<description>Tecmo Super Bowl II - Special Edition (USA)</description>
 		<year>1995</year>
 		<publisher>Tecmo</publisher>
@@ -48871,7 +48871,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tecmobw3">
+	<software name="tecmosb3">
 		<description>Tecmo Super Bowl III - Final Edition (USA)</description>
 		<year>1995</year>
 		<publisher>Tecmo</publisher>
@@ -49027,7 +49027,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tengaimzsj" cloneof="tengaimz" supported="no">
+	<software name="tengaim0sj" cloneof="tengaim0" supported="no">
 		<description>Tengai Makyou Zero (Jpn, Shounen Jump no Shou)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -49071,8 +49071,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="t2judgep" cloneof="t2judge">
-		<description>Terminator 2 - Judgment Day (Euro, Prototype)</description>
+	<software name="term2p" cloneof="term2">
+		<description>T2 - Terminator 2 - Judgment Day (Euro, Prototype)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49082,8 +49082,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="t2judgeu" cloneof="t2judge">
-		<description>Terminator 2 - Judgment Day (USA)</description>
+	<software name="term2u" cloneof="term2">
+		<description>T2 - Terminator 2 - Judgment Day (USA)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<info name="release" value="199311xx"/>
@@ -50423,7 +50423,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tekkamnp" cloneof="tekkamn">
+	<software name="tekkamanp" cloneof="tekkaman">
 		<description>Uchuu no Kishi Tekkaman Blade (Jpn, Prototype)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
@@ -50434,7 +50434,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="tekkamn">
+	<software name="tekkaman">
 		<description>Uchuu no Kishi Tekkaman Blade (Jpn)</description>
 		<year>1993</year>
 		<publisher>Interbec</publisher>
@@ -50819,7 +50819,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="usaiceh" cloneof="prosport">
+	<software name="usaiceh" cloneof="prohocky">
 		<description>USA Ice Hockey (Jpn, Rev. A)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
@@ -50835,7 +50835,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="usaiceha" cloneof="prosport">
+	<software name="usaiceha" cloneof="prohocky">
 		<description>USA Ice Hockey (Jpn)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
@@ -51279,7 +51279,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wgnhlpap" cloneof="wgnhlpa">
+	<software name="waynegp" cloneof="wayneg">
 		<description>Wayne Gretzky and the NHLPA All-Stars (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
@@ -51292,7 +51292,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wgnhlpa">
+	<software name="wayneg">
 		<description>Wayne Gretzky and the NHLPA All-Stars (USA)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
@@ -51388,7 +51388,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wwrldu" cloneof="wwrld">
+	<software name="wworldu" cloneof="wworld">
 		<description>Where in the World is Carmen Sandiego? (USA)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -51736,7 +51736,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wizard5">
+	<software name="wizardr5">
 		<description>Wizardry V - Heart of the Maelstrom (USA)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
@@ -51750,7 +51750,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wolfch">
+	<software name="wolfchld">
 		<description>Wolfchild (USA)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
@@ -51855,7 +51855,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wproject">
+	<software name="wprojj">
 		<description>Wonder Project J - Kikai no Shounen Pino (Jpn)</description>
 		<year>1994</year>
 		<publisher>Enix</publisher>
@@ -52175,7 +52175,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wwfwrest">
+	<software name="wwfag">
 		<description>WWF WrestleMania - The Arcade Game (Euro)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -52186,7 +52186,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="wwfwrestj" cloneof="wwfwrest">
+	<software name="wwfagj" cloneof="wwfag">
 		<description>WWF WrestleMania - The Arcade Game (Jpn)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -52425,7 +52425,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yoshicoj" cloneof="yoshico">
+	<software name="yoshicokj" cloneof="yoshicok">
 		<description>Yoshi no Cookie (Jpn)</description>
 		<year>1993</year>
 		<publisher>Bullet-Proof Software</publisher>
@@ -52450,7 +52450,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yoshico">
+	<software name="yoshicok">
 		<description>Yoshi's Cookie (Euro)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
@@ -52461,7 +52461,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yoshicou" cloneof="yoshico">
+	<software name="yoshicoku" cloneof="yoshicok">
 		<description>Yoshi's Cookie (USA)</description>
 		<year>1993</year>
 		<publisher>Bullet-Proof Software</publisher>
@@ -52597,8 +52597,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="yuufinal">
-		<description>Yuu Yuu Hakusho Final - Makai Saikyou Retsuden (Jpn)</description>
+	<software name="yuyufin">
+		<description>Yu Yu Hakusho Final - Makai Saikyou Retsuden (Jpn)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-AY3J"/>
@@ -54141,8 +54141,8 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shubibin" supported="no">
-		<description>Kaizou Chounin Shubibinman Zero (Jpn)</description>
+	<software name="shubibi0" supported="no">
+		<description>Kaizou Choujin Shubibinman Zero (Jpn)</description>
 		<!-- BS -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -55394,7 +55394,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="shubibina" cloneof="shubibin" supported="no">
+	<software name="shubibi0a" cloneof="shubibi0" supported="no">
 		<description>Kaizou Choujin Shubibinman Zero (Jpn, Locked)</description>
 		<!-- BS -->
 		<year>19??</year>
@@ -56281,7 +56281,7 @@ Alternate board (XL-1)
 	</software>
 
 <!-- This is cracked but we don't have the original dump! -->
-	<software name="souledsh">
+	<software name="souledge">
 		<description>Soul Edge Vs Samurai (Cracked)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>

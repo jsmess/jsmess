@@ -186,9 +186,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 -->
 	</software>
 
-	<software name="jpond2">
+	<software name="robocod">
 		<!-- James Pond 2 - Robocod (Euro, USA), Cart manufactured by Electronic Arts, (c)1991 on board -->
-		<description>James Pond II - Codename Robocod (Euro, USA)</description>
+		<description>James Pond II - Codename RoboCod (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -270,7 +270,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 -->
 	</software>
 
-	<software name="riserbot">
+	<software name="riserobo">
 		<!-- Rise of the Robots (Euro), Cart manufactured by Acclaim, Board type 670121 REV 3 -->
 		<description>Rise of the Robots (Euro)</description>
 		<year>1994</year>
@@ -298,7 +298,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 -->
 	</software>
 
-	<software name="splatt2j" cloneof="splatt2">
+	<software name="splatth2j" cloneof="splatth2">
 		<description>Splatterhouse Part 2 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -528,7 +528,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 <!-- Only Europe is confirmed -->
 	<software name="ghouls">
-		<description>Ghouls 'n Ghosts (Euro, USA, Kor, Rev. A)</description>
+		<description>Ghouls'n Ghosts (Euro, USA, Kor, Rev. A)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -545,7 +545,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 <!-- Only USA is confirmed -->
 	<software name="ghouls1" cloneof="ghouls">
-		<description>Ghouls 'n Ghosts (Euro, USA)</description>
+		<description>Ghouls'n Ghosts (Euro, USA)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -619,7 +619,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mvlndj" cloneof="talmit">
+	<software name="marvlandj" cloneof="talmit">
 		<!-- Namcot PCB (blob epoxy chip) -->
 		<description>Marvel Land (Jpn)</description>
 		<year>1991</year>
@@ -663,7 +663,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="microm2">
+	<software name="micromc2">
 		<description>Micro Machines 2 - Turbo Tournament (Euro, J-Cart)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
@@ -676,7 +676,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="micro96">
+	<software name="microm96">
 		<description>Micro Machines Turbo Tournament 96 (Euro, v1.1, J-Cart)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
@@ -875,7 +875,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 <!-- Only Europe is confirmed -->
-	<software name="sharr">
+	<software name="sharrier">
 		<description>Space Harrier II (World)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -966,8 +966,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 <!-- This board contains no SRAM, despite the header reporting 16k of battery -->
-	<software name="espnspp" cloneof="espnsp">
-		<description>ESPN Speed World (USA, Prototype)</description>
+	<software name="espnspedp" cloneof="espnsped">
+		<description>ESPN Speedworld (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -1083,7 +1083,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 <!-- Only Europe is confirmed -->
-	<software name="mutantlf">
+	<software name="mlfootb">
 		<description>Mutant League Football (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -1295,7 +1295,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="aresshik">
+	<software name="aresshmd">
 		<!-- Alt. Title: A Ressha de Ikou MD (Box) -->
 		<description>A Ressha de Ikou MD - Take the "A" Train (Jpn)</description>
 		<year>1992</year>
@@ -1404,7 +1404,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="advdai">
+	<software name="advdaisn">
 		<description>Advanced Daisenryaku - Deutsch Dengeki Sakusen (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -1917,7 +1917,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="aliens">
+	<software name="aliensol">
 		<description>Alien Soldier (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1928,7 +1928,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="aliensj" cloneof="aliens">
+	<software name="aliensolj" cloneof="aliensol">
 		<description>Alien Soldier (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -1942,7 +1942,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="alienstm">
+	<software name="astorm">
 		<description>Alien Storm (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -2050,7 +2050,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="animan">
+	<software name="animania">
 		<description>Animaniacs (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -2061,7 +2061,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="animanu" cloneof="animan">
+	<software name="animaniau" cloneof="animania">
 		<description>Animaniacs (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -2105,7 +2105,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="aquaticg">
+	<software name="aquagame">
 		<description>The Aquatic Games Starring James Pond and the Aquabats (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -2250,7 +2250,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ryuuko" cloneof="aof">
+	<software name="ryukoken" cloneof="aof">
 		<description>Ryuuko no Ken (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2264,7 +2264,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="asterix">
+	<software name="astergre">
 		<description>Astérix and the Great Rescue (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -2275,7 +2275,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="asterixu" cloneof="asterix">
+	<software name="astergreu" cloneof="astergre">
 		<description>Astérix and the Great Rescue (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2617,7 +2617,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="spacefb" cloneof="bob">
+	<software name="spacebob" cloneof="bob">
 		<description>Space Funky B.O.B. (Jpn)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -2832,8 +2832,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bassma">
-		<description>Bass Masters Classic (USA)</description>
+	<software name="bassmc">
+		<description>BASS Masters Classic (USA)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -2843,8 +2843,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bassmp">
-		<description>Bass Masters Classic - Pro Edition (USA)</description>
+	<software name="bassmpro">
+		<description>BASS Masters Classic - Pro Edition (USA)</description>
 		<year>1996</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -2890,7 +2890,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="batmanfr">
+	<software name="batmanf">
 		<description>Batman Forever (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -2904,7 +2904,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="batmanrt">
+	<software name="batmanrn">
 		<description>Batman Returns (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -2968,7 +2968,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="battletc">
+	<software name="btech">
 		<!-- Alt. Title: BattleTech - A Game of Armored Combat (Box) -->
 		<description>BattleTech (USA)</description>
 		<year>1994</year>
@@ -3472,7 +3472,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="blast">
+	<software name="bmaster2">
 		<description>Blaster Master 2 (USA)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
@@ -3483,7 +3483,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="blastp" cloneof="blast">
+	<software name="bmaster2p" cloneof="bmaster2">
 		<description>Blaster Master 2 (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
@@ -3505,7 +3505,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="blocko">
+	<software name="blockout">
 		<description>Blockout (World)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher> <!-- This is published by Sega in Jpn -->
@@ -3773,7 +3773,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="boxlgnd">
+	<software name="boxinglg">
 		<description>Boxing Legends of the Ring (USA)</description>
 		<year>1993</year>
 		<publisher>Electro Brain</publisher>
@@ -3784,7 +3784,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="chavez" cloneof="boxlgnd">
+	<software name="chavez2" cloneof="boxinglg">
 		<description>Chavez II (USA)</description>
 		<year>1993</year>
 		<publisher>American Softworks</publisher>
@@ -3817,7 +3817,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bretthul">
+	<software name="bretth">
 		<description>Brett Hull Hockey '95 (USA)</description>
 		<year>1994</year>
 		<publisher>Accolade</publisher>
@@ -4102,7 +4102,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="calrip">
+	<software name="calripkn">
 		<description>Cal Ripken Jr. Baseball (USA)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
@@ -4136,7 +4136,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="cannon">
+	<software name="cfodder">
 		<description>Cannon Fodder (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
@@ -4260,7 +4260,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="akumajou" cloneof="cvania">
+	<software name="akumajo" cloneof="cvania">
 		<description>Akumajou Dracula - Vampire Killer (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -4310,7 +4310,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="champbow">
+	<software name="champbwl">
 		<description>Championship Bowling (USA)</description>
 		<year>1993</year>
 		<publisher>Mentrix Software</publisher>
@@ -4321,7 +4321,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="boogie" cloneof="champbow">
+	<software name="boogie" cloneof="champbwl">
 		<description>Boogie Woogie Bowling (Jpn)</description>
 		<year>1993</year>
 		<publisher>Visco</publisher>
@@ -4335,7 +4335,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="champl">
+	<software name="champool">
 		<description>Championship Pool (USA)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
@@ -4470,7 +4470,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="chibimar">
+	<software name="chibim">
 		<description>Chibi Maruko-chan - Wakuwaku Shopping (Jpn)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -4611,7 +4611,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="clay">
+	<software name="clayfght">
 		<description>Clay Fighter (Euro)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
@@ -4622,7 +4622,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="clayu" cloneof="clay">
+	<software name="clayfghtu" cloneof="clayfght">
 		<description>Clay Fighter (USA)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
@@ -4633,7 +4633,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="cliff">
+	<software name="cliffh">
 		<description>Cliffhanger (Euro)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -4644,7 +4644,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="cliffp" cloneof="cliff">
+	<software name="cliffhp" cloneof="cliffh">
 		<description>Cliffhanger (Prototype)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -4655,7 +4655,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="cliffu" cloneof="cliff">
+	<software name="cliffhu" cloneof="cliffh">
 		<description>Cliffhanger (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -5310,7 +5310,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="coolsp">
+	<software name="coolspot">
 		<description>Cool Spot (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Games</publisher>
@@ -5321,7 +5321,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="coolspj" cloneof="coolsp">
+	<software name="coolspotj" cloneof="coolspot">
 		<description>Cool Spot (Jpn, Kor)</description>
 		<year>1994</year>
 		<publisher>Virgin Games</publisher>
@@ -5335,7 +5335,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="coolspu" cloneof="coolsp">
+	<software name="coolspotu" cloneof="coolspot">
 		<description>Cool Spot (USA)</description>
 		<year>1994</year>
 		<publisher>Virgin Games</publisher>
@@ -5346,7 +5346,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="coolspup" cloneof="coolsp">
+	<software name="coolspotup" cloneof="coolspot">
 		<description>Cool Spot (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Virgin Games</publisher>
@@ -5440,7 +5440,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="crossf">
+	<software name="xfire">
 		<description>Cross Fire (USA)</description>
 		<year>1991</year>
 		<publisher>Kyugo Boueki</publisher>
@@ -5451,7 +5451,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="superair" cloneof="crossf">
+	<software name="superair" cloneof="xfire">
 		<description>Super Airwolf (Jpn)</description>
 		<year>1991</year>
 		<publisher>Kyugo Boueki</publisher>
@@ -5800,7 +5800,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="hercul" cloneof="dahnam">
+	<software name="hercules" cloneof="dahnam">
 		<description>Hercules</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -5850,7 +5850,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="dash">
+	<software name="dashdes">
 		<description>Dashin' Desperadoes (USA)</description>
 		<year>1993</year>
 		<publisher>Data East</publisher>
@@ -5861,7 +5861,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="dashp1" cloneof="dash">
+	<software name="dashdesp1" cloneof="dashdes">
 		<description>Dashin' Desperadoes (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Data East</publisher>
@@ -5872,7 +5872,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="dashp2" cloneof="dash">
+	<software name="dashdesp2" cloneof="dashdes">
 		<description>Dashin' Desperadoes (USA, Prototype, Alt)</description>
 		<year>1993</year>
 		<publisher>Data East</publisher>
@@ -5883,7 +5883,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="davidc">
+	<software name="amaznten">
 		<description>David Crane's Amazing Tennis (USA)</description>
 		<year>1992</year>
 		<publisher>Absolute Entertainment</publisher>
@@ -5963,7 +5963,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="daze">
+	<software name="dazexmas">
 		<description>Daze Before Christmas (Oceania)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -5974,7 +5974,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="dazep" cloneof="daze">
+	<software name="dazexmasp" cloneof="dazexmas">
 		<description>Daze Before Christmas (Oceania, Prototype)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -6458,7 +6458,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="doomtr">
+	<software name="doomtrop">
 		<description>Doom Troopers - The Mutant Chronicles (USA)</description>
 		<year>1995</year>
 		<publisher>Playmates</publisher>
@@ -6632,7 +6632,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="dslayer">
+	<software name="dslayed">
 		<description>Dragon Slayer - Eiyuu Densetsu (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6649,7 +6649,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="dslayer2">
+	<software name="dslayed2">
 		<description>Dragon Slayer - Eiyuu Densetsu II (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -6666,7 +6666,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shangai3">
+	<software name="shangh3">
 		<description>Dragon's Eye Plus - Shanghai III (Jpn)</description>
 		<year>1991</year>
 		<publisher>Home Data</publisher>
@@ -6978,7 +6978,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nhlhoc">
+	<software name="nhl">
 		<description>NHL Hockey (USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
@@ -7296,7 +7296,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="koutetsu" cloneof="empirest">
+	<software name="koteteik" cloneof="empirest">
 		<description>Koutetsu Teikoku (Jpn)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
@@ -7310,7 +7310,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazem">
+	<software name="tazmars">
 		<description>Taz in Escape from Mars (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7321,7 +7321,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp10" cloneof="tazem">
+	<software name="tazmarsp10" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940418)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7332,7 +7332,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp06" cloneof="tazem">
+	<software name="tazmarsp06" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940602)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7343,7 +7343,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp05" cloneof="tazem">
+	<software name="tazmarsp05" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940607)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7354,7 +7354,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp04" cloneof="tazem">
+	<software name="tazmarsp04" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940610)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7365,7 +7365,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp03" cloneof="tazem">
+	<software name="tazmarsp03" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940614)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7376,7 +7376,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp02" cloneof="tazem">
+	<software name="tazmarsp02" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940618-A)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7387,7 +7387,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp01" cloneof="tazem">
+	<software name="tazmarsp01" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7398,7 +7398,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp11" cloneof="tazem">
+	<software name="tazmarsp11" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940309)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7409,7 +7409,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp09" cloneof="tazem">
+	<software name="tazmarsp09" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940509)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7420,7 +7420,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp08" cloneof="tazem">
+	<software name="tazmarsp08" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940518)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7431,7 +7431,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemp07" cloneof="tazem">
+	<software name="tazmarsp07" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940523)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7442,7 +7442,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tazemu" cloneof="tazem">
+	<software name="tazmarsu" cloneof="tazmars">
 		<description>Taz in Escape from Mars (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -7492,8 +7492,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="espnsp">
-		<description>ESPN Speed World (USA)</description>
+	<software name="espnsped">
+		<description>ESPN Speedworld (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -7659,7 +7659,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="exosq">
+	<software name="exosquad">
 		<description>Exo Squad (Euro)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
@@ -7670,7 +7670,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="exosqu" cloneof="exosq">
+	<software name="exosquadu" cloneof="exosquad">
 		<description>Exo Squad (USA)</description>
 		<year>1995</year>
 		<publisher>Playmates</publisher>
@@ -7681,7 +7681,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="exosqup" cloneof="exosq">
+	<software name="exosquadup" cloneof="exosquad">
 		<description>Exo Squad (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Playmates</publisher>
@@ -7728,7 +7728,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="f15str">
+	<software name="f15se2">
 		<description>F-15 Strike Eagle II (Euro)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
@@ -7739,7 +7739,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="f15stru" cloneof="f15str">
+	<software name="f15se2u" cloneof="f15se2">
 		<description>F-15 Strike Eagle II (USA)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
@@ -7750,7 +7750,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="f15strup" cloneof="f15str">
+	<software name="f15se2up" cloneof="f15se2">
 		<description>F-15 Strike Eagle II (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
@@ -7908,7 +7908,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fantdiz">
+	<software name="fantdizz">
 		<description>Fantastic Dizzy (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
@@ -7919,7 +7919,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fantdiz1" cloneof="fantdiz">
+	<software name="fantdizz1" cloneof="fantdizz">
 		<description>Fantastic Dizzy (Euro, USA, Alt)</description>
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
@@ -8066,7 +8066,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fengku">
+	<software name="fengkuan">
 		<description>Feng Kuang Tao Hua Yuan (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -8077,7 +8077,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fengsh">
+	<software name="fengshen">
 		<description>Feng Shen Ying Jie Chuan (Chi)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
@@ -8088,7 +8088,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="fengsha" cloneof="fengsh">
+	<software name="fengshena" cloneof="fengshen">
 		<description>Feng Shen Ying Jie Zhuan (Chi, Alt?)</description>
 		<year>1996</year>
 		<publisher>Chuanpu Technologies</publisher>
@@ -8135,7 +8135,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="feverp">
+	<software name="feverpit">
 		<description>Fever Pitch Soccer (Euro)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
@@ -8146,7 +8146,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="headon" cloneof="feverp">
+	<software name="headon" cloneof="feverpit">
 		<description>Head-On Soccer (USA)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
@@ -8285,7 +8285,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="finalzon">
+	<software name="fzone">
 		<description>Final Zone (USA) ~ FZ Senki Axis (Jpn)</description>
 		<year>1990</year>
 		<publisher>Wolf Team</publisher>
@@ -8452,7 +8452,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="flintj" cloneof="flint">
-		<description>Flintstone (Jpn)</description>
+		<description>The Flintstones (Jpn)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11173"/>
@@ -8526,7 +8526,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="frankt">
+	<software name="bighurt">
 		<description>Frank Thomas Big Hurt Baseball (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -8632,7 +8632,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="gaingrnd">
+	<software name="gground">
 		<description>Gain Ground (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher> <!-- This was published by Renovation in the USA, in fact -->
@@ -8646,7 +8646,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="gaingrnd1" cloneof="gaingrnd">
+	<software name="gground1" cloneof="gground">
 		<description>Gain Ground (World, Alt)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -8672,7 +8672,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="gamblerj">
-		<description>Gambler Jiko Chuushinha - Katayama Masayuki no Mahjong Doujou (Jpn)</description>
+		<description>Gambler Jikochuushinha - Katayama Masayuki no Mahjong Doujou (Jpn)</description>
 		<year>1990</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45013"/>
@@ -8719,7 +8719,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="gauntl4">
+	<software name="gauntlt4">
 		<description>Gauntlet IV (Euro, USA, 199309)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
@@ -8730,7 +8730,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="gauntl4a" cloneof="gauntl4">
+	<software name="gauntlt4a" cloneof="gauntlt4">
 		<description>Gauntlet IV (Euro, USA, 199308)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
@@ -8741,7 +8741,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="gauntlj" cloneof="gauntl4">
+	<software name="gauntlt4j" cloneof="gauntlt4">
 		<description>Gauntlet (Jpn)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
@@ -8822,7 +8822,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="genghis">
+	<software name="genghis2">
 		<description>Genghis Khan II - Clan of the Gray Wolf (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -8836,7 +8836,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="aokioo" cloneof="genghis">
+	<software name="genchohi" cloneof="genghis2">
 		<description>Aoki Ookami to Shiroki Meshika - Genchou Hishi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -9183,7 +9183,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="greatcirj" cloneof="greatcir">
+	<software name="greatcirj" cloneof="mickeycm">
 		<description>Great Circus Mystery - Mickey to Minnie Magical Adventure 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
@@ -9197,7 +9197,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="greatcir">
+	<software name="mickeycm">
 		<description>The Great Circus Mystery Starring Mickey &amp; Minnie (USA)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
@@ -9208,7 +9208,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="greatws">
+	<software name="waldo">
 		<description>The Great Waldo Search (USA)</description>
 		<year>1992</year>
 		<publisher>THQ</publisher>
@@ -9626,8 +9626,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="dodgedan">
-		<description>Honoo no Toukyuuji Dodge Danpei (Jpn)</description>
+	<software name="ddanpei">
+		<description>Honoo no Toukyuuji - Dodge Danpei (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4076"/>
@@ -9704,8 +9704,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="hyokko">
-		<description>Hyokkori Hyoutanjima - Daitouryou o Mezase! (Jpn)</description>
+	<software name="hyokkohj">
+		<description>Hyokkori Hyoutan Jima - Daitouryou o Mezase! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4075"/>
@@ -9718,7 +9718,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="hyperd">
+	<software name="hyperdnk">
 		<description>Hyper Dunk (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -9729,7 +9729,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="hyperdj" cloneof="hyperd">
+	<software name="hyperdnkj" cloneof="hyperdnk">
 		<description>Hyper Dunk - The Playoff Edition (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -9743,7 +9743,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="hyperdjp" cloneof="hyperd">
+	<software name="hyperdnkjp" cloneof="hyperdnk">
 		<description>Hyper Dunk - The Playoff Edition (Jpn, Prototype)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -9754,7 +9754,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ddribble" cloneof="hyperd">
+	<software name="ddribble" cloneof="hyperdnk">
 		<description>Double Dribble - The Playoff Edition (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -9837,7 +9837,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="incrhulk">
+	<software name="hulk">
 		<description>The Incredible Hulk (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -10027,7 +10027,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ronald" cloneof="issdx">
+	<software name="dinho98" cloneof="issdx">
 		<description>Ronaldinho 98 (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -10170,7 +10170,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jacknick">
+	<software name="nicklaus">
 		<description>Jack Nicklaus' Power Challenge Golf (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
@@ -10235,8 +10235,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpond2j" cloneof="jpond2">
-		<description>James Pond II - Codename Robocod (Jpn, Kor)</description>
+	<software name="robocodj" cloneof="robocod">
+		<description>James Pond II - Codename RoboCod (Jpn, Kor)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="EM20015"/>
@@ -10383,7 +10383,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<!-- // BAD DUMP -->
-	<software name="jimpow">
+	<software name="jimpower">
 		<description>Jim Power - The Arcade Game (USA, Prototype)</description>
 		<year>199?</year>
 		<publisher>Loriciel</publisher>
@@ -10715,7 +10715,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpram">
+	<software name="jparkre">
 		<description>Jurassic Park - Rampage Edition (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10726,7 +10726,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp6" cloneof="jpram">
+	<software name="jparkrep6" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940708)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10737,7 +10737,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp5" cloneof="jpram">
+	<software name="jparkrep5" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940713)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10748,7 +10748,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp4" cloneof="jpram">
+	<software name="jparkrep4" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940714)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10759,7 +10759,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp3" cloneof="jpram">
+	<software name="jparkrep3" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940715)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10770,7 +10770,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp2" cloneof="jpram">
+	<software name="jparkrep2" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940717)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10781,7 +10781,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp1" cloneof="jpram">
+	<software name="jparkrep1" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940718)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10792,7 +10792,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp9" cloneof="jpram">
+	<software name="jparkrep9" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940620)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10803,7 +10803,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp8" cloneof="jpram">
+	<software name="jparkrep8" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940622)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10814,7 +10814,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jpramp7" cloneof="jpram">
+	<software name="jparkrep7" cloneof="jparkre">
 		<description>Jurassic Park - Rampage Edition (Prototype, 19940630)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -10825,7 +10825,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="jleagtf">
+	<software name="jleague">
 		<description>Justice League Task Force (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -11775,7 +11775,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="madoum">
+	<software name="madoumon">
 		<description>Madou Monogatari I (Jpn)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
@@ -11949,7 +11949,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="magtaru">
+	<software name="mtaruru">
 		<description>Magical Taruruuto-kun (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -12003,8 +12003,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mansell">
-		<description>Newman Haas Indy Car Featuring Nigel Mansell ~ Nigel Mansell Indy Car (World)</description>
+	<software name="newmanh">
+		<description>Newman Haas IndyCar Featuring Nigel Mansell ~ Nigel Mansell Indy Car (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81113 (JPN)"/>
@@ -12028,7 +12028,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="marioand">
+	<software name="andretti">
 		<description>Mario Andretti Racing (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -12670,7 +12670,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	<software name="mickeyuc">
 		<description>Mickey's Ultimate Challenge (USA)</description>
 		<year>1994</year>
-		<publisher>High Tech Expressions</publisher>
+		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mickey's ultimate challenge (usa).bin" size="1048576" crc="30b512ee" sha1="def06da570df4ff73df36591ef05cce6d409b950" offset="000000" loadflag="load16_word_swap" />
@@ -12678,7 +12678,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="microm">
+	<software name="micromac">
 		<description>Micro Machines (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
@@ -12689,7 +12689,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="microma" cloneof="microm">
+	<software name="micromaca" cloneof="micromac">
 		<description>Micro Machines (Euro, USA, Alt)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
@@ -12700,7 +12700,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="micromb" cloneof="microm">
+	<software name="micromacb" cloneof="micromac">
 		<description>Micro Machines (Euro, USA, Alt 2)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
@@ -12711,7 +12711,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="micromcn" cloneof="microm">
+	<software name="micromacc" cloneof="micromac">
 		<description>Micro Machines (Can)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
@@ -12722,7 +12722,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="micro96a" cloneof="micro96">
+	<software name="microm96a" cloneof="microm96">
 		<description>Micro Machines Turbo Tournament 96 (Euro, J-Cart)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
@@ -12734,7 +12734,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="microm2a" cloneof="microm2">
+	<software name="micromc2a" cloneof="micromc2">
 		<description>Micro Machines 2 - Turbo Tournament (Euro, J-Cart, Alt)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
@@ -12783,7 +12783,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="midway">
+	<software name="midwaygh">
 		<description>Midway Presents Arcade's Greatest Hits (Euro)</description>
 		<year>1996</year>
 		<publisher>Midway</publisher>
@@ -12841,10 +12841,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mmagic3p">
+	<software name="mightmg3">
 		<description>Might and Magic III - Isles of Terra (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>FCI?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="might and magic iii - isles of terra (usa) (prototype).bin" size="2097152" crc="6ef7104a" sha1="d366d05644eb59a14baf3c2e7281c1584630c021" offset="000000" loadflag="load16_word_swap" />
@@ -13006,7 +13006,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mikedi">
+	<software name="ditkapf">
 		<description>Mike Ditka Power Football (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Ballistic</publisher>
@@ -13017,7 +13017,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mikedi1" cloneof="mikedi">
+	<software name="ditkapf1" cloneof="ditkapf">
 		<description>Mike Ditka Power Football (Euro, USA, Alt)</description>
 		<year>1991</year>
 		<publisher>Ballistic</publisher>
@@ -13056,7 +13056,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mpiano">
+	<software name="miraclep">
 		<description>The Miracle Piano Teaching System (USA)</description>
 		<year>1992</year>
 		<publisher>Software Toolworks</publisher>
@@ -13089,7 +13089,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mlbpab">
+	<software name="mlbpa">
 		<description>MLBPA Baseball (USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -13240,7 +13240,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="muhamm">
+	<software name="muhammad">
 		<description>Muhammad Ali Heavyweight Boxing (Euro)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
@@ -13251,7 +13251,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="muhammu" cloneof="muhamm">
+	<software name="muhammadu" cloneof="muhammad">
 		<description>Muhammad Ali Heavyweight Boxing (USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
@@ -13262,7 +13262,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="muhammup" cloneof="muhamm">
+	<software name="muhammadup" cloneof="muhammad">
 		<description>Muhammad Ali Heavyweight Boxing (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
@@ -13298,7 +13298,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mutantlfj" cloneof="mutantlf">
+	<software name="mlfootbj" cloneof="mlfootb">
 		<description>Mutant League Football (Jpn)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -13426,7 +13426,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nakaf1he">
+	<software name="f1heromd">
 		<description>Nakajima Satoru Kanshuu F1 Hero MD (Jpn)</description>
 		<year>1992</year>
 		<publisher>Varie</publisher>
@@ -14155,7 +14155,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nekketsu">
+	<software name="neksoccr">
 		<description>Nekketsu Koukou Dodgeball Bu - Soccer Hen MD (Jpn)</description>
 		<year>1992</year>
 		<publisher>Palsoft</publisher>
@@ -14170,7 +14170,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="n3dgdevi">
-		<description>New 3D Golf Simulation Devil's Course (Jpn)</description>
+		<description>New 3D Golf Simulation - Devil's Course (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5527"/>
@@ -14187,7 +14187,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="n3dgaugu">
-		<description>New 3D Golf Simulation Harukanaru Augusta (Jpn)</description>
+		<description>New 3D Golf Simulation - Harukanaru Augusta (Jpn)</description>
 		<year>1993</year>
 		<publisher>T &amp; E Soft</publisher>
 		<info name="serial" value="T-114033"/>
@@ -14204,7 +14204,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="n3dgwaia">
-		<description>New 3D Golf Simulation Waialae no Kiseki (Jpn)</description>
+		<description>New 3D Golf Simulation - Waialae no Kiseki (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5529"/>
@@ -14578,7 +14578,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nhktaiga">
+	<software name="nhktaidr">
 		<description>NHK Taiga Drama - Taiheiki (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -14856,7 +14856,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nhlpah">
+	<software name="nhlpa93">
 		<description>NHLPA Hockey 93 (Euro, USA, v1.1)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -14868,7 +14868,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nhlpah1" cloneof="nhlpah">
+	<software name="nhlpa93a" cloneof="nhlpa93">
 		<description>NHLPA Hockey 93 (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -14880,7 +14880,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nigelm">
+	<software name="mansell">
 		<description>Nigel Mansell's World Championship Racing (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -14891,7 +14891,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nigelmu" cloneof="nigelm">
+	<software name="mansellu" cloneof="mansell">
 		<description>Nigel Mansell's World Championship Racing (USA)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
@@ -14994,7 +14994,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nobubus">
+	<software name="nobubufu">
 		<description>Nobunaga no Yabou - Bushou Fuuunroku (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -15042,8 +15042,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="nobuzen" cloneof="nobuamb">
-		<description>Nobunaga no Yabou - Zenkoku Ban (Jpn)</description>
+	<software name="nobuzenk" cloneof="nobuamb">
+		<description>Nobunaga no Yabou - Zenkokuban (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76133"/>
@@ -15070,7 +15070,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="olympg">
+	<software name="olympgld">
 		<description>Olympic Gold (Euro)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -15081,7 +15081,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="olympgj" cloneof="olympg">
+	<software name="olympgldj" cloneof="olympgld">
 		<description>Olympic Gold (Jpn, Kor)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -15095,7 +15095,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="olympgu" cloneof="olympg">
+	<software name="olympgldu" cloneof="olympgld">
 		<description>Olympic Gold (USA)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -15106,7 +15106,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="olympgu1" cloneof="olympg">
+	<software name="olympgldu1" cloneof="olympgld">
 		<description>Olympic Gold (USA, Alt)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -15255,7 +15255,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="europa" cloneof="opeurope">
+	<software name="eurosens" cloneof="opeurope">
 		<description>Europa Sensen (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -15286,7 +15286,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ottifa">
+	<software name="ottifant">
 		<description>The Ottifants (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -15297,7 +15297,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ottifag" cloneof="ottifa">
+	<software name="ottifantg" cloneof="ottifant">
 		<description>The Ottifants (Ger, Prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -15441,7 +15441,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pacattck">
+	<software name="pacattak">
 		<description>Pac-Attack (USA)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
@@ -15488,8 +15488,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pacific">
-		<description>Pacific Theater of Operations (USA)</description>
+	<software name="pto">
+		<description>P.T.O. - Pacific Theater of Operations (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -15502,7 +15502,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="teitoku" cloneof="pacific">
+	<software name="teiketsu" cloneof="pto">
 		<description>Teitoku no Ketsudan (Jpn)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -15541,7 +15541,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pagemast">
+	<software name="pagemstr">
 		<description>The Pagemaster (Euro)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
@@ -15552,7 +15552,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pagemastu" cloneof="pagemast">
+	<software name="pagemstru" cloneof="pagemstr">
 		<description>The Pagemaster (USA)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
@@ -15563,7 +15563,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pagemastup" cloneof="pagemast">
+	<software name="pagemstrup" cloneof="pagemstr">
 		<description>The Pagemaster (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
@@ -15613,7 +15613,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="paperby2">
+	<software name="paperbo2">
 		<description>Paperboy 2 (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
@@ -15667,7 +15667,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="n3dgpebb" cloneof="pebble">
-		<description>New 3D Golf Simulation Pebble Beach no Hatou (Jpn)</description>
+		<description>New 3D Golf Simulation - Pebble Beach no Hatou (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5525"/>
@@ -16193,7 +16193,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pinocc">
+	<software name="pinoc">
 		<description>Pinocchio (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -16204,7 +16204,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pinoccu" cloneof="pinocc">
+	<software name="pinocu" cloneof="pinoc">
 		<description>Pinocchio (USA)</description>
 		<year>1996</year>
 		<publisher>THQ</publisher>
@@ -16215,7 +16215,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pirate">
+	<software name="piratedw">
 		<description>The Pirates of Dark Water (USA, January 1994)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -16226,7 +16226,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pirate1" cloneof="pirate">
+	<software name="piratedw1" cloneof="piratedw">
 		<description>The Pirates of Dark Water (Euro, USA, May 1994)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -16237,7 +16237,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pgold">
+	<software name="pirates">
 		<description>Pirates! Gold (USA)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
@@ -16251,7 +16251,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pgoldp" cloneof="pgold">
+	<software name="piratesp" cloneof="pirates">
 		<description>Pirates! Gold (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Microprose</publisher>
@@ -16381,7 +16381,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="powerdrv">
+	<software name="pdrive">
 		<description>Power Drive (Euro)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
@@ -16564,7 +16564,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="proquart">
+	<software name="proqb">
 		<description>Pro Quarterback (USA)</description>
 		<year>1992</year>
 		<publisher>Tradewest</publisher>
@@ -16752,7 +16752,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="puyo">
+	<software name="puyopuyo">
 		<description>Puyo Puyo (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -16766,7 +16766,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="puyo2">
+	<software name="puyopuy2">
 		<description>Puyo Puyo 2 (Jpn, v1.1)</description>
 		<year>1994</year>
 		<publisher>Compile</publisher>
@@ -16780,7 +16780,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="puyo2a" cloneof="puyo2">
+	<software name="puyopuy2a" cloneof="puyopuy2">
 		<description>Puyo Puyo 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Compile</publisher>
@@ -16950,7 +16950,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rbi93">
+	<software name="rbibb93">
 		<description>R.B.I. Baseball '93 (USA)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
@@ -16961,7 +16961,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rbi94">
+	<software name="rbibb94">
 		<description>R.B.I. Baseball '94 (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Tengen</publisher>
@@ -16972,7 +16972,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rbi3">
+	<software name="rbibb3">
 		<description>R.B.I. Baseball 3 (USA)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
@@ -16983,7 +16983,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rbi4">
+	<software name="rbibb4">
 		<description>R.B.I. Baseball 4 (USA)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
@@ -16994,7 +16994,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rbi4p" cloneof="rbi4">
+	<software name="rbibb4p" cloneof="rbibb4">
 		<description>R.B.I. Baseball 4 (Prototype)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
@@ -17005,7 +17005,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rbi4j" cloneof="rbi4">
+	<software name="rbibb4j" cloneof="rbibb4">
 		<description>R.B.I. Baseball 4 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
@@ -17066,7 +17066,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rainbow">
+	<software name="rbisland">
 		<description>Rainbow Islands Extra (Jpn)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
@@ -17198,7 +17198,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rastans2">
+	<software name="rastan2">
 		<description>Rastan Saga II (USA)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
@@ -17209,7 +17209,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rastans2j" cloneof="rastans2">
+	<software name="rastan2j" cloneof="rastan2">
 		<description>Rastan Saga II (Jpn)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
@@ -17650,7 +17650,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="roadb">
+	<software name="roadblst">
 		<description>RoadBlasters (USA)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
@@ -17661,7 +17661,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="roadbj" cloneof="roadb">
+	<software name="roadblstj" cloneof="roadblst">
 		<description>RoadBlasters (Jpn)</description>
 		<year>1992</year>
 		<publisher>Tengen</publisher>
@@ -17768,7 +17768,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rocknr">
+	<software name="rnrracin">
 		<description>Rock n' Roll Racing (Euro)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
@@ -17779,7 +17779,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rocknru" cloneof="rocknr">
+	<software name="rnrracinu" cloneof="rnrracin">
 		<description>Rock n' Roll Racing (USA)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
@@ -17826,7 +17826,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rogerc">
+	<software name="mvpbb">
 		<description>Roger Clements MVP Baseball (USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -17909,7 +17909,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="r3k2">
+	<software name="roman3k2">
 		<description>Romance of the Three Kingdoms II (USA)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -17923,7 +17923,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sangok2" cloneof="r3k2">
+	<software name="sangoku2" cloneof="roman3k2">
 		<description>Sangokushi II (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -17940,7 +17940,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="r3k3">
+	<software name="roman3k3">
 		<description>Romance of the Three Kingdoms III - Dragon of Destiny (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -17954,7 +17954,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sangok3" cloneof="r3k3">
+	<software name="sangoku3" cloneof="roman3k3">
 		<description>Sangokushi III (Jpn)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -18007,7 +18007,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sailorm">
+	<software name="sailormn">
 		<description>Bishoujo Senshi Sailor Moon (Jpn)</description>
 		<year>1994</year>
 		<publisher>Ma-Ba</publisher>
@@ -18132,7 +18132,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sangokr">
+	<software name="sangoret">
 		<description>Sangokushi Retsuden - Ransei no Eiyuutachi (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -18172,7 +18172,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="scooby">
-		<description>Scooby Doo Mystery (USA)</description>
+		<description>Scooby-Doo Mystery (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -18215,7 +18215,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="second">
+	<software name="seconds">
 		<description>Second Samurai (Euro)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
@@ -18327,7 +18327,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shdanc">
+	<software name="shdancer">
 		<description>Shadow Dancer - The Secret of Shinobi (World)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -18472,7 +18472,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shangha2">
+	<software name="shangh2">
 		<description>Shanghai II - Dragon's Eye (USA)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
@@ -18483,7 +18483,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shangha2p" cloneof="shangha2">
+	<software name="shangh2p" cloneof="shangh2">
 		<description>Shanghai II - Dragon's Eye (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
@@ -18494,7 +18494,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shangha2p1" cloneof="shangha2">
+	<software name="shangh2p1" cloneof="shangh2">
 		<description>Shanghai II - Dragon's Eye (USA, Prototype, Alt)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
@@ -18786,7 +18786,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="soukoban" cloneof="shoveit">
+	<software name="sokoban" cloneof="shoveit">
 		<description>Shijou Saidai no Soukoban (Jpn)</description>
 		<year>1990</year>
 		<publisher>NCS</publisher>
@@ -18927,7 +18927,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="bartnigt">
+	<software name="bartnigh">
 		<description>The Simpsons - Bart's Nightmare (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
@@ -19035,7 +19035,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="smurfs2">
+	<software name="smurfstw">
 		<description>The Smurfs Travel the World (Euro)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
@@ -19396,7 +19396,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3d">
+	<software name="sonic3d">
 		<description>Sonic 3D - Flickies' Island (Euro) ~ Sonic 3D Blast (USA, Kor)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19407,7 +19407,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3dp8" cloneof="s3d">
+	<software name="sonic3dp8" cloneof="sonic3d">
 		<description>Sonic 3D Blast (Prototype 73, 19960703, 13.58)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19418,7 +19418,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3dp7" cloneof="s3d">
+	<software name="sonic3dp7" cloneof="sonic3d">
 		<description>Sonic 3D Blast (Prototype 814, 19960815, 07.55)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19429,7 +19429,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3dp6" cloneof="s3d">
+	<software name="sonic3dp6" cloneof="sonic3d">
 		<description>Sonic 3D Blast (Prototype 819, 19960819, 19.49)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19440,7 +19440,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3dp5" cloneof="s3d">
+	<software name="sonic3dp5" cloneof="sonic3d">
 		<description>Sonic 3D Blast (Prototype 825, 19960826, 15.46)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19451,7 +19451,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3dp4" cloneof="s3d">
+	<software name="sonic3dp4" cloneof="sonic3d">
 		<description>Sonic 3D Blast (Prototype 830, 19960831, 08.19)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19462,7 +19462,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3dp3" cloneof="s3d">
+	<software name="sonic3dp3" cloneof="sonic3d">
 		<description>Sonic 3D Blast (Prototype 831, 19960903, 10.07)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19473,7 +19473,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3dp2" cloneof="s3d">
+	<software name="sonic3dp2" cloneof="sonic3d">
 		<description>Sonic 3D Blast (Prototype 94, 19960904, 12.01)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19484,7 +19484,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="s3dp1" cloneof="s3d">
+	<software name="sonic3dp1" cloneof="sonic3d">
 		<description>Sonic 3D Blast (USA, Prototype)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -19850,7 +19850,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sorcern">
+	<software name="sorcer">
 		<description>Sorcerian (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -19867,7 +19867,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sharrj" cloneof="sharr">
+	<software name="sharrierj" cloneof="sharrier">
 		<description>Space Harrier II (Jpn, Launch Cart)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
@@ -19906,7 +19906,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sparks">
+	<software name="sparkstr">
 		<description>Sparkster (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -19917,7 +19917,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sparksu" cloneof="sparks">
+	<software name="sparkstru" cloneof="sparkstr">
 		<description>Sparkster (USA)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -19928,7 +19928,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sparksj" cloneof="sparks">
+	<software name="sparkstrj" cloneof="sparkstr">
 		<description>Sparkster - Rocket Knight Adventures 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -20011,7 +20011,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="spidvskp">
+	<software name="spidking">
 		<!-- Alt. Title: Spiderman (Box) -->
 		<description>Spider-Man vs. the Kingpin (World)</description>
 		<year>1991</year>
@@ -20051,7 +20051,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="spirit">
+	<software name="spiritwf">
 		<description>Spiritual Warfare (USA)</description>
 		<year>1994</year>
 		<publisher>Wisdom Tree</publisher>
@@ -20073,7 +20073,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="splatt2">
+	<software name="splatth2">
 		<description>Splatterhouse 2 (Euro)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -20084,7 +20084,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="splatt2u" cloneof="splatt2">
+	<software name="splatth2u" cloneof="splatth2">
 		<description>Splatterhouse 2 (USA)</description>
 		<year>1992</year>
 		<publisher>Namco</publisher>
@@ -20095,7 +20095,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="splatt3">
+	<software name="splatth3">
 		<description>Splatterhouse 3 (USA)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
@@ -20106,7 +20106,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="splatt3j" cloneof="splatt3">
+	<software name="splatth3j" cloneof="splatth3">
 		<description>Splatterhouse Part 3 (Jpn, Kor)</description>
 		<year>1993</year>
 		<publisher>Namcot</publisher>
@@ -20407,7 +20407,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="stonepro">
+	<software name="stonprot">
 		<description>Stone Protectors (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
@@ -21104,7 +21104,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sb2020">
+	<software name="2020bb">
 		<description>Super Baseball 2020 (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -21115,7 +21115,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="sb2020j" cloneof="sb2020">
+	<software name="2020bbj" cloneof="2020bb">
 		<description>2020 Toshi Super Baseball (Jpn)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -21151,7 +21151,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="suprdais">
+	<software name="supdaisn">
 		<description>Super Daisenryaku (Jpn)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -21221,7 +21221,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shi">
+	<software name="shimpact">
 		<description>Super High Impact (USA)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
@@ -21274,7 +21274,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="suprkick">
+	<software name="skickoff">
 		<description>Super Kick Off (Euro)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -21557,7 +21557,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="supman">
+	<software name="superman">
 		<description>Superman - The Man of Steel (Euro)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
@@ -21568,7 +21568,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="supmanp" cloneof="supman">
+	<software name="supermanp" cloneof="superman">
 		<description>Superman (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
@@ -21579,7 +21579,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="supmanu" cloneof="supman">
+	<software name="supermanu" cloneof="superman">
 		<description>Superman (USA)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
@@ -21607,7 +21607,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="swamptng">
+	<software name="swamp">
 		<description>Swamp Thing (USA, Prototype)</description>
 		<year>1991</year>
 		<publisher>NuVision</publisher>
@@ -21721,7 +21721,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="syndic">
+	<software name="syndicat">
 		<description>Syndicate (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -21732,7 +21732,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="t2term">
+	<software name="term2">
 		<description>T2 - Terminator 2 - Judgment Day (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Flying Edge</publisher>
@@ -21779,7 +21779,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="taikou">
+	<software name="taikoris">
 		<description>Taikou Risshiden (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -21819,7 +21819,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="mvlnd" cloneof="talmit">
+	<software name="marvland" cloneof="talmit">
 		<description>Marvel Land (USA)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
@@ -21994,7 +21994,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tecmobwl">
+	<software name="tecmosbw">
 		<description>Tecmo Super Bowl (USA, 199310)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
@@ -22008,7 +22008,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tecmobwla" cloneof="tecmobwl">
+	<software name="tecmosbwa" cloneof="tecmosbw">
 		<description>Tecmo Super Bowl (USA, 199309)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
@@ -22022,7 +22022,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tecmobwlj" cloneof="tecmobwl">
+	<software name="tecmosbwj" cloneof="tecmosbw">
 		<description>Tecmo Super Bowl (Jpn)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
@@ -22039,7 +22039,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tecmobw2">
+	<software name="tecmosb2">
 		<!-- Alt. Title: Tecmo Super Bowl II - Special Edition (Box) -->
 		<description>Tecmo Super Bowl II (USA)</description>
 		<year>1994</year>
@@ -22054,7 +22054,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tecmobw2j" cloneof="tecmobw2">
+	<software name="tecmosb2j" cloneof="tecmosb2">
 		<description>Tecmo Super Bowl II - Special Edition (Jpn)</description>
 		<year>1994</year>
 		<publisher>Tecmo</publisher>
@@ -22071,7 +22071,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tecmobw3">
+	<software name="tecmosb3">
 		<description>Tecmo Super Bowl III - Final Edition (USA)</description>
 		<year>1995</year>
 		<publisher>Tecmo</publisher>
@@ -22313,7 +22313,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="testdrv2">
+	<software name="td2">
 		<description>Test Drive II - The Duel (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Ballistic</publisher>
@@ -22562,7 +22562,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ttoonbbl">
+	<software name="ttoonbht">
 		<description>Tiny Toon Adventures - Buster's Hidden Treasure (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -22573,7 +22573,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ttoonbblk" cloneof="ttoonbbl">
+	<software name="ttoonbhtk" cloneof="ttoonbht">
 		<description>Tiny Toon Adventures (Kor)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -22584,7 +22584,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ttoonbblu" cloneof="ttoonbbl">
+	<software name="ttoonbhtu" cloneof="ttoonbht">
 		<description>Tiny Toon Adventures - Buster's Hidden Treasure (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -22933,7 +22933,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="triple96">
+	<software name="tplay96">
 		<description>Triple Play '96 (USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -22947,7 +22947,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tpgold">
+	<software name="tplaygld">
 		<description>Triple Play Gold (USA)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
@@ -22961,7 +22961,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="tpgolda" cloneof="tpgold">
+	<software name="tplayglda" cloneof="tplaygld">
 		<description>Triple Play Gold (USA, Alt)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -23086,7 +23086,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="kyuukyok" cloneof="twincobr">
+	<software name="ktiger" cloneof="twincobr">
 		<description>Kyuukyoku Tiger (Jpn)</description>
 		<year>1991</year>
 		<publisher>Treco</publisher>
@@ -23261,7 +23261,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="daikouka" cloneof="unchartd">
+	<software name="daikokai" cloneof="unchartd">
 		<description>Daikoukai Jidai (Jpn)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -23292,7 +23292,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="daikouk2" cloneof="newhoriz">
+	<software name="daikok2" cloneof="newhoriz">
 		<description>Daikoukai Jidai II (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
@@ -23323,7 +23323,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="universs">
+	<software name="univsold">
 		<description>Universal Soldier (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Ballistic</publisher>
@@ -23349,7 +23349,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="urbanstr">
+	<software name="ustrike">
 		<description>Urban Strike (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
@@ -23581,7 +23581,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="viewp">
+	<software name="viewpoin">
 		<description>Viewpoint (USA)</description>
 		<year>1994</year>
 		<publisher>American Sammy</publisher>
@@ -23592,7 +23592,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="viewpp" cloneof="viewp">
+	<software name="viewpoinp" cloneof="viewpoin">
 		<description>Viewpoint (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>American Sammy</publisher>
@@ -23705,7 +23705,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="virtpb">
+	<software name="vpinball">
 		<description>Virtual Pinball (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -23747,7 +23747,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wackyr">
+	<software name="wackyrac">
 		<description>Wacky Races (USA, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23984,7 +23984,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="weapnlrd">
+	<software name="weaponld">
 		<description>Weaponlord (USA)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
@@ -24017,7 +24017,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wworldbr" cloneof="wworld">
+	<software name="wworldb" cloneof="wworld">
 		<description>Where in the World Is Carmen Sandiego? (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
@@ -24039,7 +24039,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wtimebr" cloneof="wtime">
+	<software name="wtimeb" cloneof="wtime">
 		<description>Where in Time Is Carmen Sandiego? (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
@@ -24271,7 +24271,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wbmw">
+	<software name="wboymw">
 		<description>Wonder Boy in Monster World (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
@@ -24283,7 +24283,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wboy5" cloneof="wbmw">
+	<software name="wboy5" cloneof="wboymw">
 		<description>Wonder Boy V - Monster World III (Jpn, Kor)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -24298,7 +24298,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="turmad" cloneof="wbmw">
+	<software name="turmamon" cloneof="wboymw">
 		<description>Turma da Mônica na Terra dos Monstros (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
@@ -24587,7 +24587,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wc90">
+	<software name="wcup90">
 		<description>World Cup Italia '90 (Euro)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
@@ -24598,7 +24598,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wcs" cloneof="wc90">
+	<software name="wcs" cloneof="wcup90">
 		<description>World Championship Soccer (USA, Rev. B) ~ World Cup Soccer (Jpn, Rev. B)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -24612,7 +24612,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wcsa" cloneof="wc90">
+	<software name="wcsa" cloneof="wcup90">
 		<description>World Championship Soccer (USA, v1.2) ~ World Cup Soccer (Jpn, v1.2)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -24626,7 +24626,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="wcsb" cloneof="wc90">
+	<software name="wcsb" cloneof="wcup90">
 		<description>World Championship Soccer (USA) ~ World Cup Soccer (Jpn)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -25522,7 +25522,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="swmania">
+	<software name="wwfsup">
 		<description>WWF Super WrestleMania (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -25833,8 +25833,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="xenon2m">
-		<description>Xenon 2 Megablast (Euro)</description>
+	<software name="xenon2">
+		<description>Xenon 2 - Megablast (Euro)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25954,8 +25954,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="yuusf">
-		<description>Yuu Yuu Hakusho - Makyou Toitsusen (Jpn)</description>
+	<software name="yuyusf">
+		<description>Yu Yu Hakusho - Makyou Toitsusen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4122"/>
@@ -25968,8 +25968,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="yuusfbr" cloneof="yuusf">
-		<description>Yuu Yuu Hakusho - Sunset Fighters (Bra)</description>
+	<software name="yuyusfb" cloneof="yuyusf">
+		<description>Yu Yu Hakusho - Sunset Fighters (Bra)</description>
 		<year>199?</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -25979,8 +25979,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="yuugai">
-		<description>Yuu Yuu Hakusho Gaiden (Jpn)</description>
+	<software name="yuyug">
+		<description>Yu Yu Hakusho Gaiden (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5523"/>
@@ -26024,7 +26024,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="zerokami">
+	<software name="zero">
 		<description>Zero the Kamikaze Squirrel (Euro)</description>
 		<year>1994</year>
 		<publisher>SunSoft</publisher>
@@ -26035,7 +26035,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="zerokamiu" cloneof="zerokami">
+	<software name="zerou" cloneof="zero">
 		<description>Zero the Kamikaze Squirrel (USA)</description>
 		<year>1994</year>
 		<publisher>SunSoft</publisher>
@@ -26531,7 +26531,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="supbub">
+	<software name="suprbubl">
 		<description>Super Bubble Bobble (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -26922,7 +26922,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="avatar" cloneof="jimpow">
+	<software name="avatar" cloneof="jimpower">
 		<description>Avatar (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26945,7 +26945,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="comnconq">
+	<software name="commconq">
 		<description>Command &amp; Conquer (Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26978,7 +26978,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="crash" cloneof="zerokami">
+	<software name="crash" cloneof="zero">
 		<description>Crash Bandicoot (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27124,7 +27124,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="herc2">
+	<software name="herculs2">
 		<description>Hercules 2</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -27397,7 +27397,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pircarib" cloneof="unchartd">
+	<software name="pcarib" cloneof="unchartd">
 		<description>Pirates of the Caribbean (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27408,7 +27408,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="pircari2">
+	<software name="pcarib2">
 		<description>Piraty Karibskogo Morya - Na Strannyh Beregah ~ Pirates of the Caribbean - On Stranger Tides (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27419,7 +27419,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="rhl2k7" cloneof="nhlpah">
+	<software name="rhl2k7" cloneof="nhlpa93">
 		<description>RHL 2007 (Rus)</description>
 		<year>199?</year>
 		<publisher>NewGame</publisher>
@@ -27442,7 +27442,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="shrek2" cloneof="ottifa">
+	<software name="shrek2" cloneof="ottifant">
 		<description>Shrek 2 (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -22,7 +22,7 @@ Undumped carts:
 		</part>
 	</software>
 
-	<software name="frntline">
+	<software name="frontlin">
 		<description>Front Line</description>
 		<year>1983</year>
 		<publisher>Casio / Taito</publisher>
@@ -99,7 +99,7 @@ Undumped carts:
 		</part>
 	</software>
 
-	<software name="skicmmnd">
+	<software name="skicomm">
 		<description>Ski Command</description>
 		<year>198?</year>
 		<publisher>Casio</publisher>
@@ -110,7 +110,7 @@ Undumped carts:
 		</part>
 	</software>
 
-	<software name="suprcobr">
+	<software name="scobra">
 		<description>Super Cobra</description>
 		<year>1981</year>
 		<publisher>Casio</publisher>

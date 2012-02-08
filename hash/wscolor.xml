@@ -382,14 +382,13 @@
 		</part>
 	</software>
 
-	<software name="gaxe">
+	<software name="goldnaxe">
 		<!-- WSC only -->
 		<description>Golden Axe</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC2B"/>
 		<info name="release" value="20020228"/>
-		<info name="alt_title" value="ゴールデンアックス"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-banc2b.bin" size="4194304" crc="bc944a98" sha1="87661841ca63e99b04c0f6dc4ba3454c897e0c6d" offset="000000" />
@@ -397,14 +396,14 @@
 		</part>
 	</software>
 
-	<software name="gensouma">
-		<!-- Alt title 幻想魔伝最遊記 Retribution ～陽のあたる場所で～: -->
+	<software name="gmsayuki">
 		<!-- WSC only -->
 		<description>Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de</description>
 		<year>2001</year>
 		<publisher>Movic ~ Soeishinsha</publisher>
 		<info name="serial" value="SWJ-SESC01"/>
 		<info name="release" value="20010607"/>
+		<info name="alt_title" value="幻想魔伝最遊記 Retribution ～陽のあたる場所で～"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-sesc01.bin" size="2097152" crc="446e2581" sha1="adbe6e38a0bc6a2d19da64a444071977b771f14f" offset="000000" />
@@ -757,7 +756,7 @@
 		</part>
 	</software>
 
-	<software name="makaitou">
+	<software name="saga">
 		<!-- WSC only -->
 		<description>Makai Toushi Sa-Ga</description>
 		<year>2002</year>
@@ -1046,7 +1045,7 @@
 		</part>
 	</software>
 
-	<software name="romnsaga">
+	<software name="romsaga">
 		<!-- WSC only -->
 		<description>Romancing Sa-Ga</description>
 		<year>2001</year>
@@ -1273,13 +1272,13 @@
 	</software>
 
 	<software name="terrors2">
-		<!-- Alt title: テラーズ2 -->
         <!-- WSC -->
 		<description>Terrors 2</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC05"/>
 		<info name="release" value="20001221"/>
+		<info name="alt_title" value="テラーズ2"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-banc05.bin" size="4194304" crc="9bd8f08c" sha1="9532113e14b03c95f034c015168e21273d42eff1" offset="000000" />
@@ -1288,13 +1287,13 @@
 	</software>
 
 	<software name="tetris">
-		<!-- Alt title: テトリス -->
         <!-- WSC -->
 		<description>Tetris</description>
 		<year>2002</year>
 		<publisher>Vanguard</publisher>
 		<info name="serial" value="SWJ-VGDC01"/>
 		<info name="release" value="20020418"/>
+		<info name="alt_title" value="テトリス"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-vgdc01.bin" size="1048576" crc="7b0caea9" sha1="1a86403d7896d60fcb7a4c09367f5a976c7ea5a5" offset="000000" />
@@ -1303,13 +1302,13 @@
 	</software>
 
 	<software name="tonpuuso" supported="no">   <!-- it freezes -->
-		<!-- Alt title: 東風荘 -->
         <!-- WSC -->
 		<description>Tonpuusou</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC13"/>
 		<info name="release" value="20010628"/>
+		<info name="alt_title" value="東風荘"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-banc13.bin" size="1048576" crc="47659b2c" sha1="fb53c28bd48174d3829467f1ab81d3f87f9a7f5b" offset="000000" />
@@ -1318,13 +1317,13 @@
 	</software>
 
 	<software name="yamato">
-		<!-- Alt title: 宇宙戦艦ヤマト -->
         <!-- WSC -->
 		<description>Uchuu Senkan Yamato</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC09"/>
 		<info name="release" value="20010208"/>
+		<info name="alt_title" value="宇宙戦艦ヤマト"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-banc09.bin" size="4194304" crc="5793bdda" sha1="dd1878279a6667fb66dd1ac44a2cdb9a5acbe415" offset="000000" />
@@ -1333,13 +1332,13 @@
 	</software>
 
 	<software name="ultraman">
-		<!-- Alt title: ウルトラマン 光の国の使者 -->
         <!-- WSC only -->
 		<description>Ultraman - Hikari no Kuni no Shisha</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC11"/>
 		<info name="release" value="20010621"/>
+		<info name="alt_title" value="ウルトラマン 光の国の使者"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-banc11.bin" size="2097152" crc="de2208ab" sha1="bd107befe5ce6c5508d2da8be351b9984166ae1d" offset="000000" />
@@ -1348,13 +1347,13 @@
 	</software>
 
 	<software name="wclassic">
-		<!-- Alt title: ナムコワンダークラシック -->
         <!-- WSC -->
 		<description>Wonder Classic</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC06"/>
 		<info name="release" value="20010118"/>
+		<info name="alt_title" value="ナムコワンダークラシック"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1364,13 +1363,13 @@
 	</software>
 
 	<software name="wildcard">
-		<!-- Alt title: ワイルドカード -->
         <!-- WSC only -->
 		<description>Wild Card</description>
 		<year>2001</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SWJ-SQRC04"/>
 		<info name="release" value="20010329"/>
+		<info name="alt_title" value="ワイルドカード"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1380,13 +1379,13 @@
 	</software>
 
 	<software name="withyou">
-		<!-- Alt title: ウィズ・ユー ～みつめていたい～ -->
         <!-- WSC only -->
 		<description>With You - Mitsumete Itai</description>
 		<year>2001</year>
 		<publisher>Cocktail Soft / F&amp;C Co.</publisher>
 		<info name="serial" value="SWJ-SHLC01"/>
 		<info name="release" value="20010125"/>
+		<info name="alt_title" value="ウィズ・ユー ～みつめていたい～"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-shlc01.bin" size="4194304" crc="e14e9d36" sha1="6a4f4a03c367ccf00aa7462191c929a2736eb44b" offset="000000" />
@@ -1395,13 +1394,13 @@
 	</software>
 
 	<software name="wizardry">
-		<!-- Alt title: ウィザードリィ シナリオ1 狂王の試練場 -->
         <!-- WSC -->
 		<description>Wizardry Scenario 1 - Proving Grounds of the Mad Overlord</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC0C"/>
 		<info name="release" value="20010301"/>
+		<info name="alt_title" value="ウィザードリィ シナリオ1 狂王の試練場"/>
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1411,13 +1410,13 @@
 	</software>
 
 	<software name="xcard">
-		<!-- Alt title: エックス カード オブ フェイト -->
         <!-- WSC only -->
 		<description>X - Card of Fate</description>
 		<year>2002</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC2C"/>
 		<info name="release" value="200206??"/>
+		<info name="alt_title" value="エックス カード オブ フェイト"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-banc2c.bin" size="4194304" crc="66b617d5" sha1="c1ab4e24f261615ca59f937b866fcf7047b67796" offset="000000" />
@@ -1426,13 +1425,13 @@
 	</software>
 
 	<software name="xilittle">
-		<!-- Alt title: サイ リトル -->
         <!-- WSC only -->
 		<description>XI[sai] Little</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SWJ-BANC1F"/>
 		<info name="release" value="20011220"/>
+		<info name="alt_title" value="サイ リトル"/>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-banc1f.bin" size="2097152" crc="25e2ba75" sha1="97c29917a78918a6905fd61a1466971cfd2a33c6" offset="000000" />

@@ -251,7 +251,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="flashbck" supported="no">
+	<software name="flashb" supported="no">
 		<description>Flashback - The Quest for Identity</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
@@ -287,7 +287,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="hyperfor" supported="no">
+	<software name="hyperfrc" supported="no">
 		<description>Hyper Force</description>
 		<year>2000</year>
 		<publisher>Songboard Productions</publisher>
@@ -347,7 +347,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="missilec" supported="no">
+	<software name="missil3d" supported="no">
 		<description>Missile Command 3D</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>

@@ -832,7 +832,7 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<software name="aresshik">
+	<software name="aressha">
 		<description>A-Ressha de Ikou</description>
 		<year>1986</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -857,7 +857,7 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<software name="aresshika" cloneof="aresshik">
+	<software name="aresshaa" cloneof="aressha">
 		<description>A-Ressha de Ikou (Alt Map Disk)</description>
 		<year>1986</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -880,7 +880,7 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<software name="aresshikb" cloneof="aresshik">
+	<software name="aresshab" cloneof="aressha">
 		<description>A-Ressha de Ikou (Alt Map Disk 2)</description>
 		<year>1986</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2755,7 +2755,7 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<software name="aokiogh">
+	<software name="genchohi">
 		<description>Aoki Ookami to Shiroki Mejika - Gencho Hisshi</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -2801,8 +2801,8 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<software name="aokiogk">
-		<description>Aoki Ookami to Shiroki Mejika Genghis Khan</description>
+	<software name="genghis">
+		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -2840,8 +2840,8 @@ ExtractDisk  [02]"SAGA#1		  " -> "adventure land_02.d88"
 		</part>
 	</software>
 
-	<software name="aokiogha" cloneof="aokiogh">
-		<description>Aoki Ookami to Shiroki Mejika Genghis Khan(soundware maybe)</description>
+	<software name="genghisa" cloneof="genghis">
+		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan(soundware maybe)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!--combined image-->
@@ -3429,7 +3429,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<software name="arcush">
+	<software name="arcusyu">
 		<description>Arcusyu - Kagerou no Jidai wo Koete</description>
 		<year>1989</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
@@ -3461,7 +3461,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<software name="arcusha" cloneof="arcush">
+	<software name="arcusyu1" cloneof="arcusyu">
 		<description>Arcusyu - Kagerou no Jidai wo Koete (Alt)</description>
 		<year>1989</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
@@ -4341,7 +4341,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bishojbg">
-		<description>Bishojo Baseball Gakuen</description>
+		<description>Bishoujo Baseball Gakuen</description>
 		<year>1989</year>
 		<publisher>パソケット (Pasoket)</publisher>
 		<!-- PC8801mk2SR -->
@@ -4355,7 +4355,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bshashms">
-		<description>Bishojo Shashinkan - Moving School</description>
+		<description>Bishoujo Shashinkan - Moving School</description>
 		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
 		<!-- PC8801mk2SR -->
@@ -4369,7 +4369,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bshash3">
-		<description>Bishojo Shashinkan III - Photo Club Kyofu no Yakata hen</description>
+		<description>Bishoujo Shashinkan III - Photo Club Kyofu no Yakata hen</description>
 		<year>1988</year>
 		<publisher>ハード (Hard)</publisher>
 		<!-- PC8801mk2SR -->
@@ -4395,7 +4395,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 
 <!-- is this a 番外編 (Bangai-hen = extra edition)? -->
 	<software name="bshashos">
-		<description>Bishojo Shashinkan Outside Story</description>
+		<description>Bishoujo Shashinkan - Outside Story</description>
 		<year>1990</year>
 		<publisher>ハード (Hard)</publisher>
 		<!-- PC8801mk2SR -->
@@ -4427,7 +4427,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bshashbh">
-		<description>Bishojo Shashinkan Bangaihen</description>
+		<description>Bishoujo Shashinkan - Bangaihen</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="美少女写真館 番外編"/>
@@ -4457,7 +4457,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bshashsc">
-		<description>Bishojo Shashinkan Studio Cut</description>
+		<description>Bishoujo Shashinkan - Studio Cut</description>
 		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
 		<!-- PC8801 -->
@@ -4471,7 +4471,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bshashk">
-		<description>Bishojo Shashinkan Kyofu</description>
+		<description>Bishoujo Shashinkan - Kyofu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="美少女写真館 恐怖"/>
@@ -4493,8 +4493,8 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 		</part>
 	</software>
 
-	<software name="bshashs">
-		<description>Bishojo Shashinkan School</description>
+	<software name="bshashms1" cloneof="bshashms">
+		<description>Bishoujo Shashinkan  - Moving School (Alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="美少女写真館 ｽｸｰﾙ"/>
@@ -4505,8 +4505,8 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 		</part>
 	</software>
 
-	<software name="bshashst">
-		<description>Bishojo Shashinkan Studio</description>
+	<software name="bshashsc1" cloneof="bshashsc">
+		<description>Bishoujo Shashinkan - Studio Cut (Alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="美少女写真館 ｽﾀｼﾞｵ"/>
@@ -4518,7 +4518,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bishoco">
-		<description>Bishojo wa Check ga Osuki</description>
+		<description>Bishoujo wa Check ga Osuki</description>
 		<year>1988</year>
 		<publisher>パスカル２ (Pascal2)</publisher>
 		<!-- PC8801mk2SR -->
@@ -4730,7 +4730,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bokensha">
-		<description>Bokensha-tachi Kenja no Yuigon</description>
+		<description>Bokensha-tachi - Kenja no Yuigon</description>
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -6963,7 +6963,7 @@ ExtractDisk  [02]"Disk 2		  " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<software name="crisism">
+	<software name="crisismt">
 		<description>Crisis Mountain</description>
 		<year>1984</year>
 		<publisher>コンプティーク (Comptiq)</publisher>
@@ -7619,7 +7619,7 @@ ExtractDisk  [02]"Disk 2		  " -> "cranston_manor_v80_02.d88"
 		</part>
 	</software>
 
-	<software name="daisenry">
+	<software name="daisenr">
 		<description>Daisenryaku 88</description>
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -8159,7 +8159,7 @@ ExtractDisk  [02]"DAIVA_B		 " -> "daiva_02.d88"
 		</part>
 	</software>
 
-	<software name="demcryst">
+	<software name="dcrystal">
 		<description>Demon Crystal</description>
 		<year>1985</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -8767,7 +8767,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<software name="dezeniln">
+	<software name="dezeni">
 		<description>Dezeni Land</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -9797,7 +9797,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<software name="dragonkn">
+	<software name="dknight">
 		<description>Dragon Knight</description>
 		<year>1989</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -9843,7 +9843,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<software name="dragonk2">
+	<software name="dknight2">
 		<description>Dragon Knight II</description>
 		<year>1990</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -9964,7 +9964,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 	</software>
 
 	<software name="dslayed">
-		<description>Dragon Slayer Eiyu Densetsu</description>
+		<description>Dragon Slayer - Eiyu Densetsu</description>
 		<year>1989</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10031,7 +10031,7 @@ ExtractDisk  [06]"SCENARIO DISK 2 " -> "dragon slayer eiyu densetsu 2_06.d88"
 ExtractDisk  [07]"SCENARIO DISK 3 " -> "dragon slayer eiyu densetsu 2_07.d88"
 ExtractDisk  [08]"SCENARIO DISK 4 " -> "dragon slayer eiyu densetsu 2_08.d88"
 -->
-		<description>Dragon Slayer Eiyu Densetsu 2</description>
+		<description>Dragon Slayer - Eiyu Densetsu 2</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10099,7 +10099,7 @@ ExtractDisk  [08]"SCENARIO DISK 4 " -> "dragon slayer eiyu densetsu 2_08.d88"
 	</software>
 
 	<software name="dslayed2a" cloneof="dslayed2">
-		<description>Dragon Slayer Eiyu Densetsu 2 (Alt Program Disk)</description>
+		<description>Dragon Slayer - Eiyu Densetsu 2 (Alt Program Disk)</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10178,7 +10178,7 @@ ExtractDisk  [08]"START DISK	  " -> "eiyu densetsu ii_08.d88"
 all but the program disks are the same as in the above sets (up to the d88 header)
 but in different order
 -->
-		<description>Dragon Slayer Eiyu Densetsu 2 (Alt Program Disk 2)</description>
+		<description>Dragon Slayer - Eiyu Densetsu 2 (Alt Program Disk 2)</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10884,7 +10884,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="emeraldr">
+	<software name="emeraldd">
 		<description>Emerald Dragon</description>
 		<year>1989</year>
 		<publisher>バショウハウス (Bashou House)</publisher>
@@ -10937,7 +10937,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="emeraldra" cloneof="emeraldr">
+	<software name="emeraldda" cloneof="emeraldd">
 		<description>Emerald Dragon (Alt)</description>
 		<year>1989</year>
 		<publisher>バショウハウス (Bashou House)</publisher>
@@ -10987,7 +10987,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="emeraldrd" cloneof="emeraldr">
+	<software name="emeralddd" cloneof="emeraldd">
 		<description>Emerald Dragon Demo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10998,7 +10998,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="emeraldrvu" cloneof="emeraldr">
+	<software name="emeralddvu" cloneof="emeraldd">
 		<description>Emerald Dragon Visual User Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11009,7 +11009,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="emeraldrmd" cloneof="emeraldr">
+	<software name="emeralddmd" cloneof="emeraldd">
 		<description>Emerald Dragon Music Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11153,8 +11153,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="europese">
-		<description>Europe Sensen</description>
+	<software name="eurosens">
+		<description>Europa Sensen</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -11192,8 +11192,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ		" -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="europesea" cloneof="europese">
-		<description>Europe Sensen (Alt?)</description>
+	<software name="eurosensa" cloneof="eurosens">
+		<description>Europa Sensen (Alt?)</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -11878,7 +11878,7 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 		</part>
 	</software>
 
-	<software name="finalzon">
+	<software name="fzone">
 		<description>Final Zone</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -11903,7 +11903,7 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 		</part>
 	</software>
 
-	<software name="finalzond" cloneof="finalzon">
+	<software name="fzoned" cloneof="fzone">
 		<description>Final Zone Demo</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -12567,8 +12567,8 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<software name="gaiframe">
-		<description>Gaiframe</description>
+	<software name="gaiflame">
+		<description>Gai Flame</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
 		<!-- PC8801mk2SR -->
@@ -12801,7 +12801,7 @@ ExtractDisk  [04]"Data Disk	   " -> "formula cms_04.d88"
 		</part>
 	</software>
 
-	<software name="gallforc">
+	<software name="galforce">
 		<description>Gall Force - Eternal Story</description>
 		<year>1987</year>
 		<publisher>スキャップトラスト (Scap Trust)</publisher>
@@ -14177,7 +14177,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="gutchbnk">
+	<software name="gbank">
 		<description>Gutchan Bank</description>
 		<year>1985</year>
 		<publisher>日本ソフトバンク (Nihon SoftBank)</publisher>
@@ -14384,7 +14384,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="hajanofu">
+	<software name="hajafuin">
 		<description>Haja no Fuuin</description>
 		<year>1986</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
@@ -15261,7 +15261,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="holein1">
-		<description>Hole In One</description>
+		<description>Hole in One</description>
 		<year>1985</year>
 		<publisher>ＨＡＬ研究所 (HAL Kenkyuujo)</publisher>
 		<!-- PC8801 -->
@@ -15546,7 +15546,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="hoverat">
+	<software name="hoveratk">
 		<description>Hover Attack</description>
 		<year>1985</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -15597,7 +15597,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="hurryfox">
+	<software name="hfox">
 		<description>Hurry Fox</description>
 		<year>1984</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -15611,7 +15611,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="hurryfx2">
+	<software name="hfox2">
 		<description>Hurry Fox - Yuki no Maou hen</description>
 		<year>1986</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
@@ -16328,7 +16328,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="ishinnoa">
+	<software name="ishinara">
 		<description>Ishin no Arashi</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -16367,7 +16367,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="ishinnoaa" cloneof="ishinnoa">
+	<software name="ishinaraa" cloneof="ishinara">
 		<description>Ishin no Arashi (Alt?)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -16406,7 +16406,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="ishinnoab" cloneof="ishinnoa">
+	<software name="ishinarab" cloneof="ishinara">
 		<description>Ishin no Arashi (Alt User Disk)</description>
 		<year>1989</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -16552,7 +16552,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="jacknick">
+	<software name="nicklaus">
 		<description>Jack Nicklaus Championship Golf</description>
 		<year>1990</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
@@ -17090,7 +17090,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="jugstone">
-		<description>Juggler Stone></description>
+		<description>Juggler Stone</description>
 		<year>1985</year>
 		<publisher>ユニオンプランニング (Union Planning)</publisher>
 		<!-- PC8801 -->
@@ -17520,7 +17520,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="karuizaw">
-		<description>Karuizawa Yukai Annai</description>
+		<description>Karuizawa Yuukai Annai</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -17534,7 +17534,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="karuizawa" cloneof="karuizaw">
-		<description>Karuizawa Yukai Annai (Alt)</description>
+		<description>Karuizawa Yuukai Annai (Alt)</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -18053,7 +18053,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="kingkns">
+	<software name="kingkngt">
 		<description>King's Knight Special</description>
 		<year>1987</year>
 		<publisher>スクウェア (Square)</publisher>
@@ -18078,7 +18078,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ			" -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="kingknsa" cloneof="kingkns">
+	<software name="kingkngta" cloneof="kingkngt">
 		<description>King's Knight Special (Alt Disk 2)</description>
 		<year>1987</year>
 		<publisher>スクウェア (Square)</publisher>
@@ -18954,7 +18954,7 @@ ExtractDisk  [04]"D_USER		  " -> "kon'yamo asamade powerful mahjong 2_04.d88"
 		</part>
 	</software>
 
-	<software name="lemper">
+	<software name="emperor">
 		<description>L'Empereur</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -19246,7 +19246,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="lastarma">
+	<software name="lastarmg">
 		<description>Last Armageddon</description>
 		<year>1988</year>
 		<publisher>ブレイングレイ (Brain Gray)</publisher>
@@ -19306,7 +19306,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="lastarmaa" cloneof="lastarma">
+	<software name="lastarmga" cloneof="lastarmg">
 		<description>Last Armageddon (Alt?)</description>
 		<year>1988</year>
 		<publisher>ブレイングレイ (Brain Gray)</publisher>
@@ -19899,7 +19899,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner</description>
 		<year>1983</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -19913,7 +19913,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="loderuna" cloneof="loderun">
+	<software name="ldruna" cloneof="ldrun">
 		<description>Lode Runner (Alt 1)</description>
 		<year>1983</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -19927,7 +19927,7 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="loderunb" cloneof="loderun">
+	<software name="ldrunb" cloneof="ldrun">
 		<description>Lode Runner (Alt 2)</description>
 		<year>1983</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -20551,8 +20551,8 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="marchenv">
-		<description>Märchen Veil</description>
+	<software name="marchen">
+		<description>Märchen Veil I</description>
 		<year>1985</year>
 		<publisher>システムサコム (System Sacom)</publisher>
 		<!-- PC8801 -->
@@ -20565,8 +20565,8 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="marchenva" cloneof="marchenv">
-		<description>Maerchen Veil mkII (Alt)</description>
+	<software name="marchena" cloneof="marchen">
+		<description>Märchen Veil mkII (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="メルヘンヴェールmkII"/>
@@ -20577,8 +20577,8 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="marchenvb" cloneof="marchenv">
-		<description>Maerchen Veil SR (Alt)</description>
+	<software name="marchenb" cloneof="marchen">
+		<description>Märchen Veil SR (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="メルヘンヴェールSR"/>
@@ -20589,8 +20589,8 @@ ExtractDisk  [02]"LAGRANGE		" -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="marchenvc" cloneof="marchenv">
-		<description>Maerchen Veil(SR Ver - VA compatibility patch applied)</description>
+	<software name="marchenc" cloneof="marchen">
+		<description>Märchen Veil(SR Ver - VA compatibility patch applied)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -20724,8 +20724,8 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mahjongg">
-		<description>Professional Mahjong Goku</description>
+	<software name="profmjg">
+		<description>Professional Mahjong Gokuu</description>
 		<year>1988</year>
 		<publisher>シャノアール (Chat Noir)</publisher>
 		<!-- PC8801mk2SR -->
@@ -23073,7 +23073,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mugensnz">
+	<software name="mugen">
 		<description>Mugen no Shinzo</description>
 		<year>1984</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
@@ -23087,7 +23087,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mugensn2">
+	<software name="mugen2">
 		<description>Mugen no Shinzo II</description>
 		<year>1985</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
@@ -23119,7 +23119,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mugensn3">
+	<software name="mugen3">
 		<description>Mugen no Shinzo III</description>
 		<year>1990</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
@@ -23172,7 +23172,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mugensn3a" cloneof="mugensn3">
+	<software name="mugen3a" cloneof="mugen3">
 		<description>Mugen no Shinzo III (Alt)</description>
 		<year>1990</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
@@ -23452,7 +23452,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="nankaino">
+	<software name="nankaih">
 		<description>Nankai no Hyoteki</description>
 		<year>1986</year>
 		<publisher>ベアーズ (Bear's)</publisher>
@@ -23466,7 +23466,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="nankainoa" cloneof="nankaino">
+	<software name="nankaiha" cloneof="nankaih">
 		<description>Nankai no Hyoteki (Alt)</description>
 		<year>1986</year>
 		<publisher>ベアーズ (Bear's)</publisher>
@@ -23773,8 +23773,8 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="nobunabf">
-		<description>Nobunaga no Yabou - Busho Fuunroku</description>
+	<software name="nobubufu">
+		<description>Nobunaga no Yabou - Bushou Fuunroku</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -23812,8 +23812,8 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="nobunabfa" cloneof="nobunabf">
-		<description>Nobunaga no Yabou - Busho Fuunroku (Alt)</description>
+	<software name="nobubufua" cloneof="nobubufu">
+		<description>Nobunaga no Yabou - Bushou Fuunroku (Alt)</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -23851,8 +23851,8 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="nobunasg">
-		<description>Nobunaga no Yabou - Sengoku Gunyou Den</description>
+	<software name="nobuseng">
+		<description>Nobunaga no Yabou - Sengoku Gunyuuden</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -23883,8 +23883,8 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="nobunasga" cloneof="nobunasg">
-		<description>Nobunaga no Yabou - Sengoku Gunyou Den (Alt)</description>
+	<software name="nobusenga" cloneof="nobuseng">
+		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Alt)</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -23929,8 +23929,8 @@ ExtractDisk  [03]"Ｃディスク	  " -> "Nobunaga no Yabo Sengokugun'yuden 03.d
 ExtractDisk  [04]"DATAディスク	" -> "Nobunaga no Yabo Sengokugun'yuden 04.d88"
 
 -->
-	<software name="nobunasgb" cloneof="nobunasg">
-		<description>Nobunaga no Yabou - Sengoku Gunyou Den (Alt 2)</description>
+	<software name="nobusengb" cloneof="nobuseng">
+		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Alt 2)</description>
 		<year>1988</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -23964,8 +23964,8 @@ ExtractDisk  [04]"DATAディスク	" -> "Nobunaga no Yabo Sengokugun'yuden 04.d8
 		</part>
 	</software>
 
-	<software name="nobunazb">
-		<description>Nobunaga no Yabou - Zenkoku Ban</description>
+	<software name="nobuzenk">
+		<description>Nobunaga no Yabou - Zenkokuban</description>
 		<year>1986</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -24724,7 +24724,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<software name="outlande">
+	<software name="outlandr">
 		<description>Outlanders</description>
 		<year>1988</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
@@ -24980,7 +24980,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<software name="penguink">
+	<software name="penguinw">
 		<description>Penguin-kun Wars</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -24994,7 +24994,7 @@ ExtractDisk  [02]"DISK_2		  " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<software name="penguinka" cloneof="penguink">
+	<software name="penguinwa" cloneof="penguinw">
 		<description>Penguin-kun Wars (Alt)</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -27151,7 +27151,7 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
-	<software name="replicar">
+	<software name="replicrt">
 		<description>Replicart</description>
 		<year>1988</year>
 		<publisher>タイトー (Taito)</publisher>
@@ -27165,7 +27165,7 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
-	<software name="retishtr">
+	<software name="rtishtar">
 		<description>The Return of Ishtar</description>
 		<year>1987</year>
 		<publisher>Ｓ・Ｐ・Ｓ</publisher>
@@ -27331,8 +27331,8 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
-	<software name="roadwar2">
-		<description>Road War 2000</description>
+	<software name="roadwr2k">
+		<description>Roadwar 2000</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27356,8 +27356,8 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
-	<software name="roadwar2a" cloneof="roadwar2">
-		<description>Road War 2000 (Alt)</description>
+	<software name="roadwr2ka" cloneof="roadwr2k">
+		<description>Roadwar 2000 (Alt)</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27381,8 +27381,8 @@ ExtractDisk  [07]"DiskD		   " -> "psy-o-blade_07.d88"
 		</part>
 	</software>
 
-	<software name="roadwar2b" cloneof="roadwar2">
-		<description>Road War 2000 (Alt 2)</description>
+	<software name="roadwr2kb" cloneof="roadwr2k">
+		<description>Roadwar 2000 (Alt 2)</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27909,7 +27909,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="sailorf1">
-		<description>Sailor-fuku Bishojo Zukan 1</description>
+		<description>Sailor-fuku Bishoujo Zukan 1</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27923,7 +27923,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="sailorf2">
-		<description>Sailor-fuku Bishojo Zukan 2</description>
+		<description>Sailor-fuku Bishoujo Zukan 2</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27937,7 +27937,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="sailorf3">
-		<description>Sailor-fuku Bishojo Zukan 3</description>
+		<description>Sailor-fuku Bishoujo Zukan 3</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27951,7 +27951,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="sailorf4">
-		<description>Sailor-fuku Bishojo Zukan 4</description>
+		<description>Sailor-fuku Bishoujo Zukan 4</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27965,7 +27965,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="sailorf5">
-		<description>Sailor-fuku Bishojo Zukan 5</description>
+		<description>Sailor-fuku Bishoujo Zukan 5</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27979,7 +27979,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="sailorf5a" cloneof="sailorf5">
-		<description>Sailor-fuku Bishojo Zukan 5 (Alt)</description>
+		<description>Sailor-fuku Bishoujo Zukan 5 (Alt)</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -27993,7 +27993,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="sailorf6">
-		<description>Sailor-fuku Bishojo Zukan 6</description>
+		<description>Sailor-fuku Bishoujo Zukan 6</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -28045,7 +28045,7 @@ ExtractDisk  [04]"シナリオ２	  " -> "rogue alliance_04.d88"
 		</part>
 	</software>
 
-	<software name="saladnok">
+	<software name="tomathim">
 		<description>Salad no Kuni no Tomato-hime</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -28610,7 +28610,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 		</part>
 	</software>
 
-	<software name="schwarz1">
+	<software name="schwarz2">
 		<description>Schwarzschild 2</description>
 		<year>1989</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
@@ -28649,7 +28649,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 		</part>
 	</software>
 
-	<software name="schwarz1a" cloneof="schwarz1">
+	<software name="schwarz2a" cloneof="schwarz2">
 		<description>Schwarzschild 2 (Alt)</description>
 		<year>1989</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
@@ -29124,7 +29124,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 	</software>
 
 	<software name="senjokam">
-		<description>Senjo no Ookami</description>
+		<description>Senjou no Ookami</description>
 		<year>1983</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -29138,7 +29138,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 	</software>
 
 	<software name="senjokama" cloneof="senjokam">
-		<description>Senjo no Ookami (Alt)</description>
+		<description>Senjou no Ookami (Alt)</description>
 		<year>1983</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -29280,7 +29280,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 		</part>
 	</software>
 
-	<software name="shanghas">
+	<software name="shanghsc">
 		<description>Shanghai (Starcraft)</description>
 		<year>1985</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -29294,7 +29294,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 		</part>
 	</software>
 
-	<software name="shanghaia" cloneof="shanghai">
+	<software name="shanghsca" cloneof="shanghsc">
 		<description>Shanghai (Starcraft, Alt)</description>
 		<year>1985</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -29320,7 +29320,7 @@ ExtractDisk  [02]"MUSIC2		  " -> "scheme music disk_02.d88"
 		</part>
 	</software>
 
-	<software name="shangha2">
+	<software name="shangh2">
 		<description>Shanghai II</description>
 		<year>1990</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -29857,7 +29857,7 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 		</part>
 	</software>
 
-	<software name="shiryose">
+	<software name="shiryo">
 		<description>Shiryou Sensen - War of the Dead</description>
 		<year>1989</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
@@ -29885,7 +29885,7 @@ ExtractDisk  [04]"DATA DISK	   " -> "shin kugyokuden(with patch)_04.d88"
 ExtractDisk  [01]"DISK A		  " -> "shiryo sensen_01.d88"
 ExtractDisk  [02]"DISK A		  " -> "shiryo sensen_02.d88"
 -->
-	<software name="shiryosea" cloneof="shiryose">
+	<software name="shiryoa" cloneof="shiryo">
 		<description>Shiryou Sensen - War of the Dead (Alt)</description>
 		<year>1989</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
@@ -29911,7 +29911,7 @@ ExtractDisk  [02]"DISK A		  " -> "shiryo sensen_02.d88"
 		</part>
 	</software>
 
-	<software name="shiryos2">
+	<software name="shiryo2">
 		<description>Shiryou Sensen 2 - War of the Dead Part 2</description>
 		<year>1989</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
@@ -29956,7 +29956,7 @@ ExtractDisk  [02]"disk 2		  " -> "shiryo sensen 2_02.d88"
 ExtractDisk  [03]"disk 3		  " -> "shiryo sensen 2_03.d88"
 ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 -->
-	<software name="shiryos2a" cloneof="shiryos2">
+	<software name="shiryo2a" cloneof="shiryo2">
 		<description>Shiryou Sensen 2 - War of the Dead Part 2 (Alt Disk 1)</description>
 		<year>1989</year>
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
@@ -32103,7 +32103,7 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 		</part>
 	</software>
 
-	<software name="summerga">
+	<software name="sumgames">
 		<description>Summer Games</description>
 		<year>1986</year>
 		<publisher>ポニカ (PonyCa)</publisher>
@@ -32117,7 +32117,7 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 		</part>
 	</software>
 
-	<software name="superdai">
+	<software name="supdaisn">
 		<description>Super Daisenryaku</description>
 		<year>1988</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -32149,7 +32149,7 @@ ExtractDisk  [02]"A DISK		  " -> "sorcerian music library_02.d88"
 		</part>
 	</software>
 
-	<software name="superdaia" cloneof="superdai">
+	<software name="supdaisna" cloneof="supdaisn">
 		<description>Super Daisenryaku (Alt?)</description>
 		<year>1988</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -32177,7 +32177,7 @@ ExtractDisk  [01]"ｹﾞｰﾑﾃﾞｨｽｸ	   " -> "super daisenryaku_01.d88"
 ExtractDisk  [02]"ﾏｯﾌﾟﾃﾞｨｽｸ	   " -> "super daisenryaku_02.d88"
 ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 -->
-	<software name="superdaib" cloneof="superdai">
+	<software name="supdaisnb" cloneof="supdaisn">
 		<description>Super Daisenryaku (Alt 2)</description>
 		<year>1988</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -32206,7 +32206,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 		</part>
 	</software>
 
-	<software name="superdaip" cloneof="superdai">
+	<software name="supdaisnp" cloneof="supdaisn">
 		<description>Super Daisenryaku Power-up Kit</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32529,8 +32529,8 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 		</part>
 	</software>
 
-	<software name="tanigawa">
-		<description>Tanigawa Koji no Shogi Shinan 2</description>
+	<software name="shogish2">
+		<description>Tanigawa Kouji no Shougi Shinan 2</description>
 		<year>1987</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801 -->
@@ -32628,7 +32628,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 		</part>
 	</software>
 
-	<software name="teitokun">
+	<software name="teiketsu">
 		<description>Teitoku no Ketsudan</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -32667,7 +32667,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ	   " -> "super daisenryaku_03.d88"
 		</part>
 	</software>
 
-	<software name="teitokuna" cloneof="teitokun">
+	<software name="teiketsua" cloneof="teiketsu">
 		<description>Teitoku no Ketsudan (Alt)</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -34237,7 +34237,7 @@ ExtractDisk  [02]"DISK B		  " -> "telenet music box (b)_02.d88"
 		</part>
 	</software>
 
-	<software name="touchdow">
+	<software name="tdown">
 		<description>Touchdown</description>
 		<year>1984</year>
 		<publisher>ウィンキーソフト (Winky Soft)</publisher>
@@ -36682,7 +36682,7 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<software name="winterga">
+	<software name="wingames">
 		<description>Winter Games</description>
 		<year>1987</year>
 		<publisher>ポニカ (PonyCa)</publisher>
@@ -38561,7 +38561,7 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<software name="yellowlm">
+	<software name="ylemon">
 		<description>Yellow Lemon</description>
 		<year>1985</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
@@ -40271,7 +40271,7 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<software name="dragonks">
+	<software name="dragks3">
 		<description>Dragon Knights ~Spirit 3~</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -40337,7 +40337,7 @@ ExtractDisk  [05]"DISK D		  " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<software name="dragonksa" cloneof="dragonks">
+	<software name="dragks3a" cloneof="dragks3">
 		<description>Dragon Knights ~Spirit 3~ (Alt)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -43243,7 +43243,7 @@ ExtractDisk  [02]"				" -> "sound on-ten vol.1(a)_02.d88"
 		<description>Tatakae Kangofu-san</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="美少女倶楽部 (Bishojo Club)" />
+		<info name="developer" value="美少女倶楽部 (Bishoujo Club)" />
 		<info name="alt_title" value="戦え看護婦さん"/>
 		<!--combined image-->
 		<!--rom name="tatakae kangofu-san.d88" size="697664" crc="045181c4" sha1="76b793dd95446f9ce1f1b76204e72c187816ca65" offset="0" /-->
@@ -43753,7 +43753,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 
 -->
 
-	<software name="loderunc" cloneof="loderun">
+	<software name="ldrunc" cloneof="ldrun">
 		<description>Lode Runner with Level Disks</description>
 		<year>19??</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -44472,7 +44472,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<software name="bishojoj">
-		<description>Bishojo Jackal 2 - Ore no Shima</description>
+		<description>Bishoujo Jackal 2 - Ore no Shima</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -44493,7 +44493,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="bosconia">
+	<software name="bosco">
 		<description>Bosconian</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -45273,7 +45273,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="holine2d" cloneof="holines2">
+	<software name="holines2d" cloneof="holines2">
 		<description>Holiness Story 2 Demo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -46924,7 +46924,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="thesword">
+	<software name="swordleg">
 		<description>The Sword of Legend</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -48492,7 +48492,7 @@ loderuna - pc8801		Device Floppy Disk load failed: Invalid image
 	</software>
 
 
-	<software name="druagano">
+	<software name="druaga">
 		<description>Druaga no To Kanko Tour</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -49402,8 +49402,8 @@ ExtractDisk  [04]"game_2		  " -> "loginsoft game create system - mamirin_04.d88"
 		</part>
 	</software>
 
-	<software name="momotaro">
-		<description>Momotaro 88</description>
+	<software name="momo">
+		<description>Momotarou 88</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!--combined image-->
@@ -49618,7 +49618,7 @@ ExtractDisk  [04]"game_2		  " -> "loginsoft game create system - mamirin_04.d88"
 		</part>
 	</software>
 
-	<software name="outerwor">
+	<software name="outerw">
 		<description>Outer World</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -54687,7 +54687,7 @@ ExtractDisk  [03]"DISK_1(MAS-SYS) " -> "personal musician pc88_03.d88"
 	</software>
 
 	<software name="ratsstar">
-		<description>Rats &amp; </description>
+		<description>Rats &amp; Star</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

@@ -10,10 +10,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 -->
 
 	<software name="genghis">
-		<!-- 蒼き狼と白き牝鹿 ジンギスカン -->
 		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
 		<year>19??</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
 			<feature name="mapper" value="M60002-0125SP" /> <!-- 42 pin -->
@@ -26,10 +26,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="animllnd">
-		<!-- アニマルランド殺人事件 -->
 		<description>Animal Land: Satsujin Jiken</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
+		<info name="alt_title" value="アニマルランド殺人事件" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -57,7 +57,7 @@ Unless otherwise noted, the information in this list has not been verified by op
 	<software name="1942">
 		<description>1942</description>
 		<year>1986</year>
-		<publisher>Ascii</publisher>
+		<publisher>ASCII</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -68,10 +68,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="wingman2">
-		<!-- ウイングマン2 キータクラーの復活 -->
 		<description>Wing Man 2 - Kitakura no Fukkatsu</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
+		<info name="alt_title" value="ウイングマン2 キータクラーの復活" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -83,10 +83,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="eiwajite">
-		<!-- MSX英和辞典 -->
 		<description>MSX Eiwa Jiten</description>
 		<year>1989</year>
 		<publisher>Hi-Score Software</publisher>
+		<info name="alt_title" value="MSX英和辞典" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="mapper" value="LZ93A13" />
@@ -97,10 +97,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="fandom1">
-		<!-- MSXプログラムコレクション ファンダムライブラリ1 -->
 		<description>MSX-FAN Fandom Library 1</description>
 		<year>1988</year>
 		<publisher>Tecnopolis</publisher>
+		<info name="alt_title" value="MSXプログラムコレクション ファンダムライブラリ1" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -111,10 +111,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="fandom2">
-		<!-- MSXプログラムコレクション ファンダムライブラリ2 -->
 		<description>MSX-FAN Fandom Library 2</description>
 		<year>1988</year>
 		<publisher>Tecnopolis</publisher>
+		<info name="alt_title" value="MSXプログラムコレクション ファンダムライブラリ2" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -125,10 +125,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="fandom3">
-		<!-- MSXプログラムコレクション ファンダムライブラリ3 -->
 		<description>MSX-FAN Fandom Library 3</description>
 		<year>1988</year>
 		<publisher>Tecnopolis</publisher>
+		<info name="alt_title" value="MSXプログラムコレクション ファンダムライブラリ3" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -139,10 +139,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="karuizaw">
-		<!-- 軽井沢誘拐案内 -->
 		<description>Karuizawa Yuukai Annai</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
+		<info name="alt_title" value="軽井沢誘拐案内" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -153,10 +153,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="galforce">
-		<!-- ガルフォース カオスの攻防 -->
 		<description>Gall Force - Defense of Chaos</description>
 		<year>1986</year>
 		<publisher>Sony</publisher>
+		<info name="alt_title" value="ガルフォース カオスの攻防" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -166,11 +166,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="jikochuu">
-		<!-- ぎゅわんぶらあ自己中心派 -->
+	<software name="gambler">
 		<description>Gambler Jikochuushinha</description>
 		<year>1988</year>
 		<publisher>Game Arts</publisher>
+		<info name="alt_title" value="ぎゅわんぶらあ自己中心派" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="2M-8KB" />
 			<feature name="mapper" value="NEOS MR6401" />
@@ -180,11 +180,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="kngknght">
-		<!-- キングスナイト -->
+	<software name="kingkngt">
 		<description>King's Knight</description>
 		<year>1986</year>
 		<publisher>Square</publisher>
+		<info name="alt_title" value="キングスナイト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -195,10 +195,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="xanadu">
-		<!-- ザナドゥ -->
 		<description>Xanadu</description>
 		<year>1987</year>
 		<publisher>Falcom</publisher>
+		<info name="alt_title" value="ザナドゥ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -209,11 +209,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="blackon2">
-		<!-- ザ・ブラックオニキスII -->
+	<software name="blckony2">
 		<description>The Black Onyx 2</description>
 		<year>1986</year>
-		<publisher>Ascii</publisher>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ザ・ブラックオニキスII" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -223,11 +223,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="sangokus">
-		<!-- 三國志 -->
+	<software name="sangoku">
 		<description>Sangokushi</description>
 		<year>1986</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="三國志" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -237,11 +237,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="sangokusa" cloneof="sangokus">
-		<!-- 三國志 -->
+	<software name="sangokua" cloneof="sangoku">
 		<description>Sangokushi (alt)</description>
 		<year>1986</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="三國志" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-2M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -254,10 +254,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="jagur5">
-		<!-- ジャガー5 -->
 		<description>Jagur 5</description>
 		<year>1987</year>
 		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="ジャガー5" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -269,10 +269,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 <!--
 	<software name="shougun">
-		<!- 将軍 ->
 		<description>Shougun</description>
 		<year></year>
 		<publisher>Dexter Nippon</publisher>
+		<info name="alt_title" value="将軍" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-621-64K" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -286,10 +286,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 <!--
 	<software name="synthsau">
-		<!- シンセサウルス ->
 		<description>Synth Saurus</description>
 		<year></year>
 		<publisher>Bit2</publisher>
+		<info name="alt_title" value="シンセサウルス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M-008S" />
 			<feature name="mapper" value="LZ93A13" />
@@ -302,10 +302,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 <!--
 	<software name="synthsaua">
-		<!- シンセサウルス ->
 		<description>Synth Saurus (alt)</description>
 		<year></year>
 		<publisher>Bit2</publisher>
+		<info name="alt_title" value="シンセサウルス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M008-E2M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -318,10 +318,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 -->
 
 	<software name="spierrot">
-		<!-- スーパーピエロ -->
 		<description>Super Pierrot</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
+		<info name="alt_title" value="スーパーピエロ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-16KB" />
 			<feature name="mapper" value="MR6401" />
@@ -332,10 +332,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="slaydock">
-		<!-- スーパーレイドック -->
 		<description>Super Laydock</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="スーパーレイドック" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -347,10 +347,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 <!--
 	<software name="slaydckl">
-		<!- スーパーレイドック(THE LINKS NETWORK VERSION) ->
 		<description>Super Laydock (The Links Network Version)</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -362,10 +362,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 -->
 
 	<software name="senjokam">
-		<!-- 戦場の狼 -->
 		<description>Senjou no Ookami</description>
 		<year>1987</year>
-		<publisher>Ascii</publisher>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="戦場の狼" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -376,10 +376,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="dngnhntr">
-		<!-- ダンジョンハンター -->
 		<description>Dungeon Hunter</description>
 		<year>1989</year>
-		<publisher>Ascii</publisher>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ダンジョンハンター" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M016S" />
 			<feature name="mapper" value="LZ93A13-16" />
@@ -390,10 +390,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="tsumego">
-		<!-- 詰碁120 -->
 		<description>Tsumego 120</description>
 		<year>1987</year>
 		<publisher>Champion Soft</publisher>
+		<info name="alt_title" value="詰碁120" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -404,10 +404,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="daiva4">
-		<!-- ディーヴァ アスラの血流 -->
 		<description>Daiva Story 4 - Asura's Bloodfeud</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="ディーヴァ アスラの血流" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -417,11 +417,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="megaten">
-		<!-- デジタルデビル物語 女神転生 -->
+	<software name="megamit">
 		<description>Digital Devil Monogatari - Megami Tensei</description>
 		<year>1987</year>
 		<publisher>Telenet</publisher>
+		<info name="alt_title" value="デジタルデビル物語 女神転生" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -431,11 +431,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="dragonqu">
-		<!-- ドラゴンクエスト -->
+	<software name="dquest">
 		<description>Dragon Quest</description>
 		<year>1986</year>
 		<publisher>Enix</publisher>
+		<info name="alt_title" value="ドラゴンクエスト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -445,11 +445,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="dragonq2">
-		<!-- ドラゴンクエストII 悪霊の神々 -->
+	<software name="dquest2">
 		<description>Dragon Quest II - Akuryou no Kamigami</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
+		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -459,11 +459,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="dragons4">
-		<!-- ドラゴンスレイヤーIV -->
-		<description>Dragon Slayer 4 - Drasle Family</description>
+	<software name="dslayer4">
+		<description>Dragon Slayer IV - Drasle Family</description>
 		<year>1987</year>
 		<publisher>Falcom</publisher>
+		<info name="alt_title" value="ドラゴンスレイヤーIV" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -475,10 +475,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 
 	<!-- Does not seem to work at the moment -->
 	<software name="msxwritj" supported="no">
-		<!-- 日本語MSX-Write -->
 		<description>Japanese MSX-Write</description>
 		<year>1986</year>
-		<publisher>Ascii</publisher>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="日本語MSX-Write" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX WRITE 900178B" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -490,10 +490,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="nobuzenk">
-		<!-- 信長の野望 全国版 -->
 		<description>Nobunaga no Yabou - Zenkokuban</description>
 		<year>1987</year>
 		<publisher>Koei</publisher>
+		<info name="alt_title" value="信長の野望 全国版" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621 KAGA" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -505,10 +505,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="vaxol">
-		<!-- ヴァクソル -->
 		<description>Vaxol</description>
 		<year>1987</year>
 		<publisher>Heart Soft</publisher>
+		<info name="alt_title" value="ヴァクソル" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -519,10 +519,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="hydlide2">
-		<!-- ハイドライドII -->
 		<description>Hydlide II</description>
 		<year>1986</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="ハイドライドII" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -534,10 +534,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="hydlide3">
-		<!-- ハイドライド3 -->
 		<description>Hydlide 3</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
+		<info name="alt_title" value="ハイドライド3" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M008M" />
 			<feature name="mapper" value="LZ93A13" />
@@ -548,10 +548,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="hajafuin">
-		<!-- 覇邪の封印 -->
 		<description>Haja no Fuuin</description>
 		<year>1987</year>
 		<publisher>Kagado</publisher>
+		<info name="alt_title" value="覇邪の封印" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -561,11 +561,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="finalzon">
-		<!-- ファイナル・ゾーン -->
+	<software name="fzone">
 		<description>Final Zone</description>
 		<year>1986</year>
 		<publisher>Telenet</publisher>
+		<info name="alt_title" value="ファイナル・ゾーン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -576,10 +576,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="fantzone">
-		<!-- ファンタジーゾーン -->
 		<description>Fantasy Zone</description>
 		<year>1986</year>
 		<publisher>Pony</publisher>
+		<info name="alt_title" value="ファンタジーゾーン" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -589,11 +589,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="flightsi">
-	    <!-- Flight Simulator 魚雷攻撃 -->
-		<description>Flight Simulator - Gyorai Kougeki</description>
+	<software name="flighsim">
+	    <description>Flight Simulator - Gyorai Kougeki</description>
 		<year>1988</year>
 		<publisher>subLOGIC</publisher>
+		<info name="alt_title" value="Flight Simulator 魚雷攻撃" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<feature name="mapper" value="NEOS MR6401" />	<!-- MR6401 -->
@@ -603,11 +603,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="golvelli">
-		<!-- 魔王ゴルベリアス -->
+	<software name="golvell">
 		<description>Golvellius</description>
 		<year>1987</year>
 		<publisher>Compile</publisher>
+		<info name="alt_title" value="魔王ゴルベリアス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -619,10 +619,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="mirai">
-		<!-- 未来 -->
 		<description>Mirai</description>
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
+		<info name="alt_title" value="未来" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -633,10 +633,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="valis">
-		<!-- 夢幻戦士ヴァリス -->
 		<description>Mugen Senshi Valis</description>
 		<year>1986</year>
 		<publisher>Telenet</publisher>
+		<info name="alt_title" value="夢幻戦士ヴァリス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -648,10 +648,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="meikyuu">
-		<!-- 迷宮への扉 -->
 		<description>Meikyuu e no Tobira</description>
 		<year>1987</year>
 		<publisher>Dempa Publications</publisher>
+		<info name="alt_title" value="迷宮への扉" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-16KB" />
 			<feature name="mapper" value="MR6401" />	<!-- NEOS MR6401 -->
@@ -661,11 +661,11 @@ Unless otherwise noted, the information in this list has not been verified by op
 		</part>
 	</software>
 
-	<software name="marcveil">
-		<!-- メルヘン・ヴェール I -->
-		<description>Maerchen Veil I</description>
+	<software name="marchen">
+		<description>Märchen Veil I</description>
 		<year>1987</year>
 		<publisher>System Sacom</publisher>
+		<info name="alt_title" value="メルヘン・ヴェール I" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -676,10 +676,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="ysherlck">
-		<!-- ヤングシャーロック・ドイルの遺産 -->
 		<description>Young Sherlock - Doyle no Isan</description>
 		<year>1985</year>
 		<publisher>Pack-in-Video</publisher>
+		<info name="alt_title" value="ヤングシャーロック・ドイルの遺産" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-2MX" />
 			<feature name="mapper" value="BS6101" />
@@ -690,10 +690,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="relics">
-		<!-- レリクス -->
 		<description>Relics</description>
 		<year>1986</year>
 		<publisher>Bothtec</publisher>
+		<info name="alt_title" value="レリクス" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -704,10 +704,10 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 	<software name="romancia">
-		<!-- ロマンシア -->
 		<description>Romancia</description>
 		<year>1987</year>
 		<publisher>Falcom</publisher>
+		<info name="alt_title" value="ロマンシア" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="" />
 			<feature name="mapper" value="BS6101-16" />

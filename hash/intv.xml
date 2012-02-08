@@ -13,7 +13,7 @@
 
 <softwarelist name="intv" description="Intellivision cartridges">
 
-	<software name="backgamn">
+	<software name="backgamm">
 		<description>ABPA Backgammon</description>
 		<year>1978</year>
 		<publisher>Mattel Electronics</publisher>
@@ -149,7 +149,7 @@
 		</part>
 	</software>
 
-	<software name="beutyatb">
+	<software name="beauty">
 		<description>Beauty &amp; the Beast</description>
 		<year>1978</year>
 		<publisher>Imagic</publisher>
@@ -659,7 +659,7 @@
 		</part>
 	</software>
 
-	<software name="hracing">
+	<software name="horserac">
 		<description>Horse Racing</description>
 		<year>1981</year>
 		<publisher>Mattel Electronics</publisher>
@@ -701,7 +701,7 @@
 		</part>
 	</software>
 
-	<software name="koolaid">
+	<software name="koolaidm">
 		<description>Kool-Aid Man</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
@@ -785,7 +785,7 @@
 		</part>
 	</software>
 
-	<software name="heman">
+	<software name="masters">
 		<description>Masters of the Universe: The Power of He-Man</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
@@ -828,7 +828,7 @@
 		</part>
 	</software>
 
-	<software name="motocros">
+	<software name="motox">
 		<description>Motocross</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
@@ -852,7 +852,7 @@
 		</part>
 	</software>
 
-	<software name="mousetrp">
+	<software name="mtrap">
 		<description>Mouse Trap</description>
 		<year>1982</year>
 		<publisher>Coleco</publisher>
@@ -1111,7 +1111,7 @@
 		</part>
 	</software>
 
-	<software name="sdspbb">
+	<software name="slamdunk">
 		<description>Slam Dunk Super Pro Basketball</description>
 		<year>1987</year>
 		<publisher>INTV</publisher>
@@ -1126,7 +1126,7 @@
 		</part>
 	</software>
 
-	<software name="sphockey">
+	<software name="slapshot">
 		<description>Slap Shot Super Pro Hockey</description>
 		<year>1987</year>
 		<publisher>INTV</publisher>
@@ -1265,7 +1265,7 @@
 		</part>
 	</software>
 
-	<software name="swtesb">
+	<software name="esb">
 		<description>Star Wars: The Empire Strikes Back</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
@@ -1301,7 +1301,7 @@
 		</part>
 	</software>
 
-	<software name="dcathlon">
+	<software name="decathln">
 		<description>Super Pro Decathlon</description>
 		<year>1988</year>
 		<publisher>INTV</publisher>
@@ -1810,7 +1810,7 @@
 		</part>
 	</software>
 
-	<software name="motuii">
+	<software name="masters2">
 		<description>Masters of the Universe II (Prototype)</description>
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>

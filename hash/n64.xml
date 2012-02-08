@@ -360,7 +360,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="astarb">
+	<software name="asbase99">
 		<description>All-Star Baseball '99 (Euro)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -371,7 +371,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="astarbu" cloneof="astarb">
+	<software name="asbase99u" cloneof="asbase99">
 		<description>All-Star Baseball '99 (USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -382,7 +382,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="astarb2k">
+	<software name="asbase2k">
 		<description>All-Star Baseball 2000 (Euro)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -393,7 +393,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="astarb2ku" cloneof="astarb2k">
+	<software name="asbase2ku" cloneof="asbase2k">
 		<description>All-Star Baseball 2000 (USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -404,7 +404,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="astrb2k1">
+	<software name="asbas2k1">
 		<description>All-Star Baseball 2001 (USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -525,7 +525,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="bakubomb" cloneof="bomber64">
+	<software name="bakubomb" cloneof="bombmn64">
 		<description>Baku Bomberman (Jpn)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
@@ -722,7 +722,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="battltnx">
+	<software name="btanx">
 		<description>BattleTanx (USA)</description>
 		<year>1998</year>
 		<publisher>3DO Company</publisher>
@@ -755,7 +755,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="battlezo">
+	<software name="bzone">
 		<description>Battlezone - Rise of the Black Dogs (USA)</description>
 		<year>2000</year>
 		<publisher>Crave Entertainment</publisher>
@@ -835,8 +835,8 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="biohaz2" cloneof="re2">
-		<description>Biohazard 2 (Jpn)</description>
+	<software name="biohaz2" cloneof="revil2">
+		<description>BioHazard 2 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NUS-NB5J"/>
@@ -982,7 +982,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="bomber64">
+	<software name="bombmn64">
 		<description>Bomberman 64 (Euro)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
@@ -1007,7 +1007,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="bomber64u" cloneof="bomber64">
+	<software name="bombmn64u" cloneof="bombmn64">
 		<description>Bomberman 64 (USA)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
@@ -1827,7 +1827,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="mtetrisf" cloneof="mtetris">
+	<software name="mtetriscf" cloneof="mtetrisc">
 		<description>Defi au Tetris Magique (Fra)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
@@ -1852,7 +1852,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="derbystap" cloneof="derbysta">
+	<software name="dstall64p" cloneof="dstall64">
 		<description>Derby Stallion 64 (Jpn, Prototype)</description>
 		<year>2001</year>
 		<publisher>Media Factory</publisher>
@@ -1863,7 +1863,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="derbysta">
+	<software name="dstall64">
 		<description>Derby Stallion 64 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Media Factory</publisher>
@@ -2927,8 +2927,8 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="fushid2">
-		<description>Fushigi no Dungeon Fuurai no Shiren 2 - Oni Shuurai! Shiren Jou! (Jpn)</description>
+	<software name="furaish2">
+		<description>Fushigi no Dungeon - Fuurai no Shiren 2 - Oni Shuurai! Shiren Jou! (Jpn)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NUS-NSIJ"/>
@@ -2994,7 +2994,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="ganbolym" cloneof="itf">
+	<software name="olymp2k" cloneof="itf">
 		<description>Ganbare! Nippon! Olympics 2000 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
@@ -3204,7 +3204,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="hamster">
+	<software name="hamstmon">
 		<description>Hamster Monogatari 64 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Culture Brain</publisher>
@@ -3243,7 +3243,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="heiwapac">
+	<software name="heiwapw">
 		<description>Heiwa Pachinko World 64 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Shouei System</publisher>
@@ -3582,7 +3582,7 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="ideyosuk">
-		<description>Ide Yosuke no Mahjong Juku (Jpn)</description>
+		<description>Ide Yousuke no Mahjong Juku (Jpn)</description>
 		<year>2000</year>
 		<publisher>Seta Corporation</publisher>
 		<info name="serial" value="NUS-NIMJ"/>
@@ -4036,7 +4036,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="jikkpwr4">
+	<software name="jikkpw4">
 		<description>Jikkyou Powerful Pro Yakyuu 4 (Jpn, Rev. A)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
@@ -4050,7 +4050,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="jikkpwr4a" cloneof="jikkpwr4">
+	<software name="jikkpw4a" cloneof="jikkpw4">
 		<description>Jikkyou Powerful Pro Yakyuu 4 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
@@ -4064,7 +4064,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="jikkpwr5">
+	<software name="jikkpw5">
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Jpn, Rev. B)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -4078,7 +4078,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="jikkpwr5a" cloneof="jikkpwr5">
+	<software name="jikkpw5a" cloneof="jikkpw5">
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Jpn, Rev. A)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -4092,7 +4092,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="jikkpwr5b" cloneof="jikkpwr5">
+	<software name="jikkpw5b" cloneof="jikkpw5">
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -4106,7 +4106,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="jikkpwr6">
+	<software name="jikkpw6">
 		<description>Jikkyou Powerful Pro Yakyuu 6 (Jpn, Rev. B)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -4120,7 +4120,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="jikkpwr6a" cloneof="jikkpwr6">
+	<software name="jikkpw6a" cloneof="jikkpw6">
 		<description>Jikkyou Powerful Pro Yakyuu 6 (Jpn, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -4134,7 +4134,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="jikkpwr6b" cloneof="jikkpwr6">
+	<software name="jikkpw6b" cloneof="jikkpw6">
 		<description>Jikkyou Powerful Pro Yakyuu 6 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -4622,7 +4622,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="legorace">
+	<software name="legoracr">
 		<description>LEGO Racers (Euro)</description>
 		<year>1999</year>
 		<publisher>LEGO Media</publisher>
@@ -4633,7 +4633,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="legoraceu" cloneof="legorace">
+	<software name="legoracru" cloneof="legoracr">
 		<description>LEGO Racers (USA)</description>
 		<year>1999</year>
 		<publisher>LEGO Media</publisher>
@@ -4658,7 +4658,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun3d">
 		<description>Lode Runner 3-D (Euro)</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
@@ -4669,7 +4669,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="loderunj" cloneof="loderun">
+	<software name="ldrun3dj" cloneof="ldrun3d">
 		<description>Lode Runner 3-D (Jpn)</description>
 		<year>1999</year>
 		<publisher>Banpresto</publisher>
@@ -4683,7 +4683,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="loderunu" cloneof="loderun">
+	<software name="ldrun3du" cloneof="ldrun3d">
 		<description>Lode Runner 3-D (USA)</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
@@ -4815,7 +4815,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="mtetris">
+	<software name="mtetrisc">
 		<description>Magical Tetris Challenge (Euro)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
@@ -4826,7 +4826,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="mtetrisg" cloneof="mtetris">
+	<software name="mtetriscg" cloneof="mtetrisc">
 		<description>Magical Tetris Challenge (Ger)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
@@ -4837,7 +4837,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="mtetrisu" cloneof="mtetris">
+	<software name="mtetriscu" cloneof="mtetrisc">
 		<description>Magical Tetris Challenge (USA)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
@@ -4848,7 +4848,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="mtetrisj" cloneof="mtetris">
+	<software name="mtetriscj" cloneof="mtetrisc">
 		<description>Magical Tetris Challenge featuring Mickey (Jpn)</description>
 		<year>1998</year>
 		<publisher>Capcom</publisher>
@@ -6228,7 +6228,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="nintamar">
+	<software name="nintama">
 		<description>Nintama Rantarou 64 Game Gallery (Jpn)</description>
 		<year>2000</year>
 		<publisher>Culture Brain</publisher>
@@ -7052,7 +7052,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="pwleague">
+	<software name="pleague">
 		<description>Power League 64 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Hudson Soft</publisher>
@@ -7409,7 +7409,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="razor">
+	<software name="razorfs">
 		<description>Razor Freestyle Scooter (USA)</description>
 		<year>2001</year>
 		<publisher>Crave Entertainment</publisher>
@@ -7475,7 +7475,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="re2">
+	<software name="revil2">
 		<description>Resident Evil 2 (Euro)</description>
 		<year>1999</year>
 		<publisher>Virgin Interactive</publisher>
@@ -7486,7 +7486,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="re2u" cloneof="re2">
+	<software name="revil2u" cloneof="revil2">
 		<description>Resident Evil 2 (USA, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Capcom USA</publisher>
@@ -7497,7 +7497,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="re2u1" cloneof="re2">
+	<software name="revil2u1" cloneof="revil2">
 		<description>Resident Evil 2 (USA)</description>
 		<year>1999</year>
 		<publisher>Capcom USA</publisher>
@@ -7825,7 +7825,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="scoobydo">
+	<software name="scooby">
 		<description>Scooby-Doo! - Classic Creep Capers (Euro)</description>
 		<year>2000</year>
 		<publisher>T*HQ</publisher>
@@ -7836,7 +7836,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="scoobydou" cloneof="scoobydo">
+	<software name="scoobyu" cloneof="scooby">
 		<description>Scooby-Doo! - Classic Creep Capers (USA)</description>
 		<year>2000</year>
 		<publisher>T*HQ</publisher>
@@ -7847,7 +7847,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="sdhiryuu">
+	<software name="sdhiryu">
 		<description>SD Hiryuu no Ken Densetsu (Jpn)</description>
 		<year>1999</year>
 		<publisher>Culture Brain</publisher>
@@ -7974,7 +7974,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="shinprow">
+	<software name="sprowres">
 		<description>Shin Nihon Pro Wrestling Toukon Road - Brave Spirits (Jpn)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -7988,7 +7988,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="shinprw2">
+	<software name="sprowrs2">
 		<description>Shin Nihon Pro Wrestling Toukon Road 2 - The Next Generation (Jpn)</description>
 		<year>1998</year>
 		<publisher>Hudson Soft</publisher>
@@ -8248,7 +8248,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="spidman">
+	<software name="spidermn">
 		<description>Spider-Man (USA)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
@@ -8599,7 +8599,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="supbowlj" cloneof="supbowl">
+	<software name="sbowlingj" cloneof="sbowling">
 		<description>Super Bowling (Jpn)</description>
 		<year>1999</year>
 		<publisher>Athena</publisher>
@@ -8613,7 +8613,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="supbowl">
+	<software name="sbowling">
 		<description>Super Bowling (USA)</description>
 		<year>2000</year>
 		<publisher>UFO Interactive</publisher>
@@ -9063,7 +9063,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="tonyhawku" cloneof="tonyhawk">
+	<software name="thpsu" cloneof="thps">
 		<description>Tony Hawk's Pro Skater (USA, Rev. A)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
@@ -9074,7 +9074,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="tonyhawku1" cloneof="tonyhawk">
+	<software name="thpsu1" cloneof="thps">
 		<description>Tony Hawk's Pro Skater (USA)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
@@ -9085,7 +9085,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="tonyhwk2">
+	<software name="thps2">
 		<description>Tony Hawk's Pro Skater 2 (Euro)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
@@ -9096,7 +9096,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="tonyhwk2u" cloneof="tonyhwk2">
+	<software name="thps2u" cloneof="thps2">
 		<description>Tony Hawk's Pro Skater 2 (USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
@@ -9107,7 +9107,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="tonyhwk3">
+	<software name="thps3">
 		<description>Tony Hawk's Pro Skater 3 (USA)</description>
 		<year>2002</year>
 		<publisher>Activision</publisher>
@@ -9118,7 +9118,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="tonyhawk">
+	<software name="thps">
 		<description>Tony Hawk's Skateboarding (Euro)</description>
 		<year>2002</year>
 		<publisher>Activision</publisher>
@@ -9375,7 +9375,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="triplepl">
+	<software name="tplay2k">
 		<description>Triple Play 2000 (USA)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
@@ -10319,7 +10319,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="wondproj">
+	<software name="wprojj2">
 		<description>Wonder Project J2 - Koruro no Mori no Jozet (Jpn)</description>
 		<year>1996</year>
 		<publisher>Enix</publisher>
