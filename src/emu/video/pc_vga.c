@@ -170,6 +170,7 @@ static struct
 	UINT8 bank_r,bank_w;
 	UINT8 rgb8_en;
 	UINT8 rgb15_en;
+	UINT8 rgb16_en;
 	UINT8 id;
 }svga;
 
@@ -570,22 +571,76 @@ static void svga_vh_rgb15(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	yi=0;
 	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
 	{
-		if(line>500) return;
 		bitmapline = &bitmap.pix32(line);
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
 		{
-			if(pos + 0x10 > vga.svga_intf.vram_size)
+			if(pos + 0x10 > 0x100000)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=2)
 			{
+				int r,g,b;
+
 				if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 					continue;
-				bitmapline[c+xi] = IV|(MV(pos+xm)&0x7c00)<<9 |(MV(pos+xm)&0x3e0)<<6|(MV(pos+xm)&0x1f)<<3;
+
+				r = (MV(pos+xm)&0x7c00)>>10;
+				g = (MV(pos+xm)&0x03e0)>>5;
+				b = (MV(pos+xm)&0x001f)>>0;
+				r = (r << 3) | (r & 0x7);
+				g = (g << 3) | (g & 0x7);
+				b = (b << 3) | (b & 0x7);
+				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
 			}
 		}
 	}
 }
+
+static void svga_vh_rgb16(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	#define MV(x) (vga.memory[x]+(vga.memory[x+1]<<8))
+	#define IV 0xff000000
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int xi;
+	int yi;
+	int xm;
+
+	int pos, line, column, c, addr, curr_addr;
+
+	UINT32 *bitmapline;
+//  UINT16 mask_comp;
+
+	/* line compare is screen sensitive */
+//  mask_comp = 0xff | (TLINES & 0x300);
+	curr_addr = 0;
+	yi=0;
+	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
+	{
+		bitmapline = &bitmap.pix32(line);
+		addr %= vga.svga_intf.vram_size;
+		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
+		{
+			if(pos + 0x10 > 0x100000)
+				return;
+			for(xi=0,xm=0;xi<8;xi++,xm+=2)
+			{
+				int r,g,b;
+
+				if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+					continue;
+
+				r = (MV(pos+xm)&0xf800)>>11;
+				g = (MV(pos+xm)&0x07e0)>>5;
+				b = (MV(pos+xm)&0x001f)>>0;
+				r = (r << 3) | (r & 0x7);
+				g = (g << 2) | (g & 0x3);
+				b = (b << 3) | (b & 0x7);
+				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
+			}
+		}
+	}
+}
+
 
 enum
 {
@@ -597,6 +652,7 @@ enum
 	MONO_MODE,
 	RGB8_MODE,
 	RGB15_MODE,
+	RGB16_MODE,
 	SVGA_HACK
 };
 
@@ -639,13 +695,17 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 		{
 			return SVGA_HACK;
 		}
+		else if (svga.rgb16_en)
+		{
+			return RGB16_MODE;
+		}
+		else if (svga.rgb15_en)
+		{
+			return RGB15_MODE;
+		}
 		else if (svga.rgb8_en)
 		{
 			return RGB8_MODE;
-		}
-		else if (svga.rgb15_en&0x30)
-		{
-			return RGB15_MODE;
 		}
 		else if (!GRAPHIC_MODE)
 		{
@@ -703,6 +763,7 @@ SCREEN_UPDATE_RGB32( pc_video )
 		case MONO_MODE:    vga_vh_mono(screen.machine(), bitmap, cliprect); break;
 		case RGB8_MODE:    svga_vh_rgb8(screen.machine(), bitmap, cliprect); break;
 		case RGB15_MODE:   svga_vh_rgb15(screen.machine(), bitmap, cliprect); break;
+		case RGB16_MODE:   svga_vh_rgb16(screen.machine(), bitmap, cliprect); break;
 		case SVGA_HACK:    vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, &w, &h); break;
 	}
 
@@ -2086,11 +2147,19 @@ static void s3_define_video_mode(void)
 {
 	if((s3.ext_misc_ctrl_2) >> 4)
 	{
-		fatalerror("TODO: s3 video mode not implemented %02x",((s3.ext_misc_ctrl_2) >> 4));
+		svga.rgb8_en = 0;
+		svga.rgb15_en = 0;
+		svga.rgb16_en = 0;
+		switch((s3.ext_misc_ctrl_2) >> 4)
+		{
+			case 5: svga.rgb16_en = 1; break;
+			default: fatalerror("TODO: s3 video mode not implemented %02x",((s3.ext_misc_ctrl_2) >> 4)); break;
+		}
 	}
 	else
 	{
 		svga.rgb8_en = (s3.memory_config & 8) >> 3;
+		svga.rgb15_en = 0;
 	}
 }
 
@@ -2192,7 +2261,7 @@ WRITE8_HANDLER(s3_port_9ae8_w)
 
 READ8_HANDLER( s3_mem_r )
 {
-	if (svga.rgb8_en)
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en)
 	{
 		int data;
 		if(offset & 0x10000)
@@ -2217,7 +2286,7 @@ READ8_HANDLER( s3_mem_r )
 
 WRITE8_HANDLER( s3_mem_w )
 {
-	if (svga.rgb8_en)
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en)
 	{
 		//printf("%08x %02x (%02x %02x) %02X\n",offset,data,vga.sequencer.map_mask,svga.bank_w,(vga.sequencer.data[4] & 0x08));
 		if(offset & 0x10000)
