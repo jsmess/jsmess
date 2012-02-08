@@ -755,6 +755,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64user.o	\
 	$(MESS_MACHINE)/c64_std.o	\
 	$(MESS_MACHINE)/c64_silverrock.o	\
+	$(MESS_MACHINE)/c64_vw64.o	\
 	$(MESS_MACHINE)/c64_xl80.o	\
 	$(MESS_MACHINE)/interpod.o	\
 	$(MESS_DRIVERS)/vic10.o		\

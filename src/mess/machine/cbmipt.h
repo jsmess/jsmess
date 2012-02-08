@@ -5,6 +5,7 @@
 
 #include "machine/c64_silverrock.h"
 #include "machine/c64_std.h"
+#include "machine/c64_vw64.h"
 #include "machine/c64_xl80.h"
 #include "machine/c1541.h"
 #include "machine/c1571.h"
