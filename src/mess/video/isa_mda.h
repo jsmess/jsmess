@@ -40,15 +40,15 @@ protected:
         virtual void device_start();
         virtual void device_reset();
 public:
-		int  framecnt;
+		int	m_framecnt;
 
-		UINT8 mode_control;
+		UINT8	m_mode_control;
 
-		mc6845_update_row_func  update_row;
-		UINT8   *chr_gen;
-		UINT8   vsync;
-		UINT8   hsync;
-		UINT8  *videoram;
+		mc6845_update_row_func  m_update_row;
+		UINT8   *m_chr_gen;
+		UINT8   m_vsync;
+		UINT8   m_hsync;
+		UINT8	*m_videoram;
 		UINT8	m_pixel;
 };
 
@@ -76,7 +76,7 @@ protected:
 private:
         // internal state
 public:
-		UINT8 configuration_switch; //hercules
+		UINT8 m_configuration_switch; //hercules
 };
 
 
