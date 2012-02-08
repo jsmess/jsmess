@@ -145,6 +145,7 @@ static struct
 	{
 		UINT8 index, data[0x15]; int state;
 		UINT8 prot_bit;
+		UINT8 pel_shift;
 	} attribute;
 
 
@@ -278,7 +279,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 		{
 			ch   = vga.memory[(pos<<1) + 0];
 			attr = vga.memory[(pos<<1) + 1];
-			font_base = 0x40000+(ch<<5);
+			font_base = 0x20000+(ch<<5);
 			font_base += ((attr & 8) ? vga.sequencer.char_sel.B : vga.sequencer.char_sel.A)*0x2000;
 			blink_en = (vga.attribute.data[0x10]&8&&machine.primary_screen->frame_number() & 0x20) ? attr & 0x80 : 0;
 
@@ -339,6 +340,7 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 	UINT32 *bitmapline;
 	pen_t pen;
 
+	/**/
 	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
 		 line += height, addr += EGA_LINE_LENGTH)
 	{
@@ -351,9 +353,9 @@ static void vga_vh_ega(running_machine &machine, bitmap_rgb32 &bitmap,  const re
 				int data[4];
 
 				data[0]=vga.memory[(pos & 0xffff)];
-				data[1]=vga.memory[(pos & 0xffff)+0x20000]<<1;
-				data[2]=vga.memory[(pos & 0xffff)+0x40000]<<2;
-				data[3]=vga.memory[(pos & 0xffff)+0x60000]<<3;
+				data[1]=vga.memory[(pos & 0xffff)+0x10000]<<1;
+				data[2]=vga.memory[(pos & 0xffff)+0x20000]<<2;
+				data[3]=vga.memory[(pos & 0xffff)+0x30000]<<3;
 
 				for (i = 7; i >= 0; i--)
 				{
@@ -383,7 +385,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	int xi;
 
 	/* line compare is screen sensitive */
-	mask_comp = 0x0ff | (LINES & 0x300);
+	mask_comp = 0x3ff; //| (LINES & 0x300);
 
 	curr_addr = 0;
 	if(!(vga.sequencer.data[4] & 0x08))
@@ -397,7 +399,6 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 				if((line + yi) == (vga.crtc.line_compare & mask_comp))
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
-				addr %= vga.svga_intf.vram_size;
 				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos++)
 				{
 					if(pos > 0x80000/4)
@@ -407,7 +408,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					{
 						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 							continue;
-						bitmapline[c+xi] = machine.pens[vga.memory[pos+((xi >> 1)*0x20000)]];
+						bitmapline[c+xi] = machine.pens[vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]];
 					}
 				}
 			}
@@ -424,7 +425,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 				if((line + yi) == (vga.crtc.line_compare & mask_comp))
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
-				addr %= vga.svga_intf.vram_size;
+				//addr %= 0x80000;
 				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x8)
 				{
 					if(pos + 0x08 > 0x80000)
@@ -434,7 +435,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 					{
 						if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
 							continue;
-						bitmapline[c+xi] = machine.pens[vga.memory[pos+(xi >> 1)]];
+						bitmapline[c+xi] = machine.pens[vga.memory[(pos+(xi >> 1)) & 0xffff]];
 					}
 				}
 			}
@@ -801,17 +802,18 @@ SCREEN_UPDATE_RGB32( pc_video )
 
 	cur_mode = pc_vga_choosevideomode(screen.machine());
 
-	//popmessage("%02x",cur_mode);
+	//popmessage("%02x %02x",cur_mode,vga.attribute.data[0x13]);
+	//popmessage("%d",vga.attribute.pel_shift);
 
 	switch(cur_mode)
 	{
-		case SCREEN_OFF:   bitmap.fill(get_black_pen(screen.machine()), cliprect);break;
-		case TEXT_MODE:    vga_vh_text(screen.machine(), bitmap, cliprect); break;
-		case VGA_MODE:     vga_vh_vga (screen.machine(), bitmap, cliprect); break;
-		case EGA_MODE:     vga_vh_ega (screen.machine(), bitmap, cliprect); break;
-		case CGA_MODE:     vga_vh_cga (screen.machine(), bitmap, cliprect); break;
-		case MONO_MODE:    vga_vh_mono(screen.machine(), bitmap, cliprect); break;
-		case RGB8_MODE:    svga_vh_rgb8(screen.machine(), bitmap, cliprect); break;
+		case SCREEN_OFF:   bitmap.fill  (get_black_pen(screen.machine()), cliprect);break;
+		case TEXT_MODE:    vga_vh_text  (screen.machine(), bitmap, cliprect); break;
+		case VGA_MODE:     vga_vh_vga   (screen.machine(), bitmap, cliprect); break;
+		case EGA_MODE:     vga_vh_ega   (screen.machine(), bitmap, cliprect); break;
+		case CGA_MODE:     vga_vh_cga   (screen.machine(), bitmap, cliprect); break;
+		case MONO_MODE:    vga_vh_mono  (screen.machine(), bitmap, cliprect); break;
+		case RGB8_MODE:    svga_vh_rgb8 (screen.machine(), bitmap, cliprect); break;
 		case RGB15_MODE:   svga_vh_rgb15(screen.machine(), bitmap, cliprect); break;
 		case RGB16_MODE:   svga_vh_rgb16(screen.machine(), bitmap, cliprect); break;
 		case RGB32_MODE:   svga_vh_rgb32(screen.machine(), bitmap, cliprect); break;
@@ -1224,10 +1226,10 @@ READ8_HANDLER( vga_port_03c0_r )
 			data = vga.attribute.index;
 			break;
 		case 1:
-			if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
+			if(vga.attribute.index&0x20)
+				data = vga.attribute.index; // TODO: open bus
+			else if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
 				data=vga.attribute.data[vga.attribute.index&0x1f];
-			else
-				data = 0; // TODO: open bus
 			break;
 
 		case 2:
@@ -1349,8 +1351,8 @@ static void attribute_reg_write(UINT8 index, UINT8 data)
 {
 	if((index & 0x30) == 0)
 	{
-		if(vga.sequencer.data[1]&0x20) // ok?
-			vga.attribute.data[index & 0x1f] = data & 0x3f;
+		//if(vga.sequencer.data[1]&0x20) // ok?
+		vga.attribute.data[index & 0x1f] = data & 0x3f;
 	}
 	else
 	{
@@ -1360,7 +1362,7 @@ static void attribute_reg_write(UINT8 index, UINT8 data)
 			case 0x10: vga.attribute.data[0x10] = data; break;
 			case 0x11: vga.attribute.data[0x11] = data; break;
 			case 0x12: vga.attribute.data[0x12] = data; break;
-			case 0x13: vga.attribute.data[0x13] = data; break;
+			case 0x13: vga.attribute.pel_shift = vga.attribute.data[0x13] = data; break;
 			case 0x14: vga.attribute.data[0x14] = data; break;
 		}
 	}
@@ -1551,9 +1553,9 @@ READ8_HANDLER(vga_mem_r)
 		if (!space->debugger_access())
 		{
 			vga.gc.latch[0]=vga.memory[(offset)];
-			vga.gc.latch[1]=vga.memory[(offset)+0x20000];
-			vga.gc.latch[2]=vga.memory[(offset)+0x40000];
-			vga.gc.latch[3]=vga.memory[(offset)+0x60000];
+			vga.gc.latch[1]=vga.memory[(offset)+0x10000];
+			vga.gc.latch[2]=vga.memory[(offset)+0x20000];
+			vga.gc.latch[3]=vga.memory[(offset)+0x30000];
 		}
 
 		if (vga.gc.read_mode)
@@ -1591,7 +1593,7 @@ READ8_HANDLER(vga_mem_r)
 		for(i=0;i<4;i++)
 		{
 			if(vga.sequencer.map_mask & 1 << i)
-				data |= vga.memory[offset+i*0x20000];
+				data |= vga.memory[offset+i*0x10000];
 		}
 
 		return data;
@@ -1632,7 +1634,7 @@ WRITE8_HANDLER(vga_mem_w)
 		for(i=0;i<4;i++)
 		{
 			if(vga.sequencer.map_mask & 1 << i)
-				vga.memory[offset+i*0x20000] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
+				vga.memory[offset+i*0x10000] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
 		}
 		return;
 	}
