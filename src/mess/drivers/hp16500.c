@@ -21,7 +21,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/generic.h"
 
 
 class hp16500_state : public driver_device

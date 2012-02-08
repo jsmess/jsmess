@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "cpu/lr35902/lr35902.h"
-#include "profiler.h"
 #include "includes/gb.h"
 
 #define LCDCONT		state->m_lcd.gb_vid_regs[0x00]	/* LCD control register                       */

@@ -78,7 +78,6 @@
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "devcpu.h"
 #include "video/gime.h"
 #include "machine/6883sam.h"
 #include "machine/cococart.h"

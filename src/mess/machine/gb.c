@@ -39,7 +39,6 @@
 #include "cpu/lr35902/lr35902.h"
 #include "imagedev/cartslot.h"
 #include "machine/ram.h"
-#include "image.h"
 #include "audio/gb.h"
 #include "includes/gb.h"
 

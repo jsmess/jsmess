@@ -29,9 +29,8 @@
 */
 
 #include "emu.h"
-
 #include "990_tap.h"
-#include "image.h"
+
 
 static void update_interrupt(device_t *device);
 

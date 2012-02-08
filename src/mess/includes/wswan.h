@@ -7,8 +7,6 @@
 #ifndef WSWAN_H_
 #define WSWAN_H_
 
-
-
 #define WSWAN_TYPE_MONO 0
 #define WSWAN_TYPE_COLOR 1
 
@@ -37,7 +35,6 @@
 #define INTERNAL_EEPROM_SIZE	1024
 
 #include "emu.h"
-#include "image.h"
 #include "cpu/v30mz/nec.h"
 #include "imagedev/cartslot.h"
 #include "machine/nvram.h"

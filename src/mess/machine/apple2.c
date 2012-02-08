@@ -20,11 +20,9 @@
 #include "devices/sonydriv.h"
 #include "devices/appldriv.h"
 #include "imagedev/flopdrv.h"
-#include "image.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/speaker.h"
-#include "profiler.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1

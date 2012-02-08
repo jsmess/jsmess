@@ -7,7 +7,6 @@
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "devcb.h"
 #include "cpu/upd7810/upd7810.h"
 #include "imagedev/cartslot.h"
 #include "audio/upd1771.h"

@@ -4,10 +4,7 @@
 
 #include <math.h>
 #include "emu.h"
-#include "emu.h"
-#include "timer.h"
 #include "cpu/upd7810/upd7810.h"
-
 #include "includes/gmaster.h"
 
 typedef struct _gmaster_sound gmaster_sound;

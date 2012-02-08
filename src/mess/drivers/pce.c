@@ -63,7 +63,6 @@ Super System Card:
 #include "sound/c6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
-#include "hash.h"
 
 
 static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)

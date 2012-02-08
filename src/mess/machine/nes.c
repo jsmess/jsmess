@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "crsshair.h"
-#include "hash.h"
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"

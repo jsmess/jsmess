@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "crsshair.h"
-#include "image.h"
 #include "video/315_5124.h"
 #include "sound/2413intf.h"
 #include "imagedev/cartslot.h"

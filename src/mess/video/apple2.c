@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "includes/apple2.h"
-#include "profiler.h"
 #include "machine/ram.h"
 
 /***************************************************************************/

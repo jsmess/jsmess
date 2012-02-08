@@ -6,7 +6,6 @@
 #include "includes/lynx.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cartslot.h"
-#include "hash.h"
 
 
 #define PAD_UP		0x80
