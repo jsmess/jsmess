@@ -194,6 +194,7 @@ void isa8_mda_device::device_reset()
 	mode_control = 0;
 	vsync = 0;
 	hsync = 0;
+	m_pixel = 0;
 
 	astring tempstring;
 	chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();
@@ -422,7 +423,10 @@ WRITE8_MEMBER( isa8_mda_device::mode_control_w )
  */
 READ8_MEMBER( isa8_mda_device::status_r)
 {
-	return 0x08 | hsync;
+	// Faking pixel stream here
+	m_pixel++;
+
+	return 0xF0 | (m_pixel & 0x08) | hsync;
 }
 
 
