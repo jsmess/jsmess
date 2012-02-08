@@ -18,10 +18,9 @@
 
     TODO:
     - modernize
-    - add emulated mc6845 hook-up
-    - fix video update.
+    - fix video update, still need to get that choosevideomode() out of it.
     - rewrite video drawing functions (they are horrible)
-    - add VESA etc.
+    - add per-gfx card VESA functions;
     - (and many more ...)
 
     per-game issues:
@@ -171,6 +170,7 @@ static struct
 	UINT8 rgb8_en;
 	UINT8 rgb15_en;
 	UINT8 rgb16_en;
+	UINT8 rgb32_en;
 	UINT8 id;
 }svga;
 
@@ -186,6 +186,7 @@ static struct
 	UINT8 ext_misc_ctrl_2;
 	UINT8 crt_reg_lock;
 	UINT8 reg_lock1;
+	UINT8 reg_lock2;
 }s3;
 
 #define REG(x) vga.crtc.data[x]
@@ -565,7 +566,6 @@ static void svga_vh_rgb15(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	int xi;
 	int yi;
 	int xm;
-
 	int pos, line, column, c, addr, curr_addr;
 
 	UINT32 *bitmapline;
@@ -610,7 +610,6 @@ static void svga_vh_rgb16(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	int xi;
 	int yi;
 	int xm;
-
 	int pos, line, column, c, addr, curr_addr;
 
 	UINT32 *bitmapline;
@@ -647,6 +646,46 @@ static void svga_vh_rgb16(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	}
 }
 
+static void svga_vh_rgb32(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	#define MD(x) (vga.memory[x]+(vga.memory[x+1]<<8)+(vga.memory[x+2]<<16))
+	#define ID 0xff000000
+	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
+	int xi;
+	int yi;
+	int xm;
+	int pos, line, column, c, addr, curr_addr;
+	UINT32 *bitmapline;
+
+//  UINT16 mask_comp;
+
+	/* line compare is screen sensitive */
+//  mask_comp = 0xff | (TLINES & 0x300);
+	curr_addr = 0;
+	yi=0;
+	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(vga.crtc.offset * 4), curr_addr+=(vga.crtc.offset * 4))
+	{
+		bitmapline = &bitmap.pix32(line);
+		addr %= vga.svga_intf.vram_size;
+		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x20)
+		{
+			if(pos + 0x20 > 0x100000)
+				return;
+			for(xi=0,xm=0;xi<8;xi++,xm+=4)
+			{
+				int r,g,b;
+
+				if(!machine.primary_screen->visible_area().contains(c+xi, line + yi))
+					continue;
+
+				r = (MD(pos+xm)&0xff0000)>>16;
+				g = (MD(pos+xm)&0x00ff00)>>8;
+				b = (MD(pos+xm)&0x0000ff)>>0;
+				bitmapline[c+xi] = IV|(r<<16)|(g<<8)|(b<<0);
+			}
+		}
+	}
+}
 
 enum
 {
@@ -659,6 +698,7 @@ enum
 	RGB8_MODE,
 	RGB15_MODE,
 	RGB16_MODE,
+	RGB32_MODE,
 	SVGA_HACK
 };
 
@@ -700,6 +740,10 @@ static UINT8 pc_vga_choosevideomode(running_machine &machine)
 		if (vga.svga_intf.choosevideomode) // TODO: remove this hack
 		{
 			return SVGA_HACK;
+		}
+		else if (svga.rgb32_en)
+		{
+			return RGB32_MODE;
 		}
 		else if (svga.rgb16_en)
 		{
@@ -770,6 +814,7 @@ SCREEN_UPDATE_RGB32( pc_video )
 		case RGB8_MODE:    svga_vh_rgb8(screen.machine(), bitmap, cliprect); break;
 		case RGB15_MODE:   svga_vh_rgb15(screen.machine(), bitmap, cliprect); break;
 		case RGB16_MODE:   svga_vh_rgb16(screen.machine(), bitmap, cliprect); break;
+		case RGB32_MODE:   svga_vh_rgb32(screen.machine(), bitmap, cliprect); break;
 		case SVGA_HACK:    vga.svga_intf.choosevideomode(screen.machine(), bitmap, cliprect, vga.sequencer.data, vga.crtc.data, &w, &h); break;
 	}
 
@@ -880,8 +925,8 @@ static void recompute_params(running_machine &machine)
 static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 {
 	/* Doom does this */
-//  if(vga.crtc.protect_enable && index <= 0x07)
-//      printf("write to protected address %02x\n",index);
+// 	if(vga.crtc.protect_enable && index <= 0x07)
+// 		printf("write to protected address %02x\n",index);
 
 	switch(index)
 	{
@@ -1179,10 +1224,10 @@ READ8_HANDLER( vga_port_03c0_r )
 			data = vga.attribute.index;
 			break;
 		case 1:
-			if( vga.attribute.index & 0x20) // protection bit
-				data = vga.attribute.index;
-			else if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
+			if ((vga.attribute.index&0x1f)<sizeof(vga.attribute.data))
 				data=vga.attribute.data[vga.attribute.index&0x1f];
+			else
+				data = 0; // TODO: open bus
 			break;
 
 		case 2:
@@ -1304,7 +1349,8 @@ static void attribute_reg_write(UINT8 index, UINT8 data)
 {
 	if((index & 0x30) == 0)
 	{
-		vga.attribute.data[index & 0x1f] = data & 0x3f;
+		if(vga.sequencer.data[1]&0x20) // ok?
+			vga.attribute.data[index & 0x1f] = data & 0x3f;
 	}
 	else
 	{
@@ -2137,6 +2183,9 @@ static UINT8 s3_crtc_reg_read(running_machine &machine, UINT8 index)
 			case 0x38:
 				res = s3.reg_lock1;
 				break;
+			case 0x39:
+				res = s3.reg_lock2;
+				break;
 			case 0x42: // CR42 Mode Control
 				res = 0x0d; // hardcode to non-interlace
 				break;
@@ -2164,9 +2213,12 @@ static void s3_define_video_mode(void)
 		svga.rgb8_en = 0;
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
+		svga.rgb32_en = 0;
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
-			case 5: svga.rgb16_en = 1; break;
+			case 0x03: svga.rgb15_en = 1; break;
+			case 0x05: svga.rgb16_en = 1; break;
+			case 0x0d: svga.rgb32_en = 1; break;
 			default: fatalerror("TODO: s3 video mode not implemented %02x",((s3.ext_misc_ctrl_2) >> 4)); break;
 		}
 	}
@@ -2174,6 +2226,8 @@ static void s3_define_video_mode(void)
 	{
 		svga.rgb8_en = (s3.memory_config & 8) >> 3;
 		svga.rgb15_en = 0;
+		svga.rgb16_en = 0;
+		svga.rgb32_en = 0;
 	}
 }
 
@@ -2201,6 +2255,10 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 				break;
 			case 0x38:
 				s3.reg_lock1 = data;
+				break;
+			case 0x39:
+				/* TODO: reg lock mechanism */
+				s3.reg_lock2 = data;
 				break;
 			case 0x51:
 				vga.crtc.start_addr &= ~0xc0000;
@@ -2275,7 +2333,7 @@ WRITE8_HANDLER(s3_port_9ae8_w)
 
 READ8_HANDLER( s3_mem_r )
 {
-	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en)
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
 		int data;
 		if(offset & 0x10000)
@@ -2300,7 +2358,7 @@ READ8_HANDLER( s3_mem_r )
 
 WRITE8_HANDLER( s3_mem_w )
 {
-	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en)
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
 		//printf("%08x %02x (%02x %02x) %02X\n",offset,data,vga.sequencer.map_mask,svga.bank_w,(vga.sequencer.data[4] & 0x08));
 		if(offset & 0x10000)
