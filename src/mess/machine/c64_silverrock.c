@@ -9,6 +9,9 @@
 
 /*
 
+	PCB Layout
+	----------
+	
 	e9048
 	|=============|
 	|=| LS00      |
@@ -22,13 +25,6 @@
 	|=============|
 
 	ROM     - Atmel AT27C010-25PC 128Kx8 OTP EPROM "HUGO 2012"
-
-	data and address lines are scrambled:
-	data = BITSWAP8(7,6,5,4,0,1,2,3)
-	address = BITSWAP17(D6,D5,D4,D7,12,7,6,5,4,3,2,1,0,8,9,11,10)
-
-	bankswitching latch at I/O1 ($DE00..$DEFF): D6=A16, D5=A15, D4=A14, D7=A13
-	latch is cleared to 0 on computer reset
 
 */
 
