@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="apfm1000" description="APF M-1000 cartridges">
-	<software name="backgmmn">
+	<software name="backgamm">
 		<description>Backgammon</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
@@ -25,7 +25,7 @@
 		</part>
 	</software>
 
-	<software name="blackjck">
+	<software name="blckjack">
 		<description>Blackjack</description>
 		<year>1979</year>
 		<publisher>APF</publisher>

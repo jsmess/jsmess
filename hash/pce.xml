@@ -155,7 +155,7 @@
 		</part>
 	</software>
 
-	<software name="robokids">
+	<software name="atomrobo">
 		<description>Atomic Robo-kid Special</description>
 		<year>1990</year>
 		<publisher>UPL</publisher>
@@ -521,7 +521,7 @@
 		</part>
 	</software>
 
-	<software name="chibi">
+	<software name="chibim">
 		<description>Chibi Maruko Chan - Quiz de Piihyara</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -689,7 +689,7 @@
 		</part>
 	</software>
 
-	<software name="cybrkngt">
+	<software name="cyknight">
 		<description>Cyber Knight</description>
 		<year>1990</year>
 		<publisher>Tonkin House</publisher>
@@ -1228,7 +1228,7 @@
 		</part>
 	</software>
 
-	<software name="fpwrest">
+	<software name="fireprow">
 		<description>Fire Pro Wrestling - Combination Tag</description>
 		<year>1989</year>
 		<publisher>Human</publisher>
@@ -1242,7 +1242,7 @@
 		</part>
 	</software>
 
-	<software name="fpwrest2">
+	<software name="fireprw2">
 		<description>Fire Pro Wrestling 2 - 2nd Bout</description>
 		<year>1991</year>
 		<publisher>Human</publisher>
@@ -1256,7 +1256,7 @@
 		</part>
 	</software>
 
-	<software name="fpwrest3">
+	<software name="fireprw3">
 		<description>Fire Pro Wrestling 3 - Legend Bout</description>
 		<year>1992</year>
 		<publisher>Human</publisher>
@@ -1326,7 +1326,7 @@
 		</part>
 	</software>
 
-	<software name="gaiamon">
+	<software name="gaiamons">
 		<description>Gaia no Monshou</description>
 		<year>1988</year>
 		<publisher>NCS</publisher>
@@ -1396,7 +1396,7 @@
 		</part>
 	</software>
 
-	<software name="genpeito">
+	<software name="genpei">
 		<description>Genpei Toumaden</description>
 		<year>1990</year>
 		<publisher>Namcot</publisher>
@@ -1410,7 +1410,7 @@
 		</part>
 	</software>
 
-	<software name="gentomak">
+	<software name="genpemak">
 		<description>Genpei Toumaden ni no Maki</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -1425,7 +1425,7 @@
 	</software>
 
 	<software name="chukatai">
-		<description>Gokuraku! Chuuka Taisen</description>
+		<description>Gokuraku! Chuka Taisen</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TP03021"/>
@@ -1467,7 +1467,7 @@
 	</software>
 
 	<software name="gunhed">
-		<description>Gunhed</description>
+		<description>GunHed</description>
 		<year>1989</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC89019"/>
@@ -1481,7 +1481,7 @@
 	</software>
 
 	<software name="gunhedht">
-		<description>Gunhed - Hudson Gunhed Taikai</description>
+		<description>GunHed - Hudson GunHed Taikai</description>
 		<year>1989</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
@@ -1589,8 +1589,8 @@
 		</part>
 	</software>
 
-	<software name="dodgedan">
-		<description>Honoo no Toukyuuji Dodge Danpei</description>
+	<software name="ddanpei">
+		<description>Honoo no Toukyuuji - Dodge Danpei</description>
 		<year>1992</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC92059"/>
@@ -1642,7 +1642,7 @@
 		</part>
 	</software>
 
-	<software name="jn18hole">
+	<software name="nicklaus">
 		<description>Jack Nicklaus' Greatest 18 Holes of Major Championship Golf</description>
 		<year>1989</year>
 		<publisher>Victor Interactive Software</publisher>
@@ -1712,7 +1712,7 @@
 		</part>
 	</software>
 
-	<software name="juouki">
+	<software name="juuouki">
 		<description>Juuouki</description>
 		<year>1989</year>
 		<publisher>NEC</publisher>
@@ -1726,7 +1726,7 @@
 		</part>
 	</software>
 
-	<software name="juouki1" cloneof="juouki">
+	<software name="juuouki1" cloneof="juuouki">
 		<description>Juuouki (Alt)</description>
 		<year>1989</year>
 		<publisher>NEC</publisher>
@@ -1930,7 +1930,7 @@
 		</part>
 	</software>
 
-	<software name="kyutiger">
+	<software name="ktiger">
 		<description>Kyuukyoku Tiger</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -1980,7 +1980,7 @@
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner - Lost Labyrinth</description>
 		<year>1990</year>
 		<publisher>Pack-In-Video</publisher>
@@ -2120,7 +2120,7 @@
 		</part>
 	</software>
 
-	<software name="majinew">
+	<software name="wataru">
 		<description>Majin Eiyuu Den Wataru</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
@@ -2176,7 +2176,7 @@
 		</part>
 	</software>
 
-	<software name="maniac">
+	<software name="maniacpw">
 		<description>Maniac Pro Wres - Asu Heno Tatakai</description>
 		<year>1990</year>
 		<publisher>Hudson</publisher>
@@ -2428,7 +2428,7 @@
 		</part>
 	</software>
 
-	<software name="nazomasc">
+	<software name="nazomasq">
 		<description>Nazo no Masquerade</description>
 		<year>1990</year>
 		<publisher>Masiya</publisher>
@@ -2484,7 +2484,7 @@
 		</part>
 	</software>
 
-	<software name="dodgeban">
+	<software name="nekdodge">
 		<description>Nekketsu Koukou Dodgeball Bu - PC Bangai Hen</description>
 		<year>1990</year>
 		<publisher>Naxat</publisher>
@@ -2498,7 +2498,7 @@
 		</part>
 	</software>
 
-	<software name="dodgesoc">
+	<software name="neksoccr">
 		<description>Nekketsu Koukou Dodgeball Bu - Soccer PC Hen</description>
 		<year>1992</year>
 		<publisher>Naxat</publisher>
@@ -2582,7 +2582,7 @@
 		</part>
 	</software>
 
-	<software name="ninjaryu">
+	<software name="nryukend">
 		<description>Ninja Ryukenden</description>
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -2611,7 +2611,7 @@
 	</software>
 
 	<software name="oboccha">
-		<description>Obocchama Kun</description>
+		<description>Obocchama-kun</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NC91001"/>
@@ -2968,7 +2968,7 @@
 		</part>
 	</software>
 
-	<software name="powerglf">
+	<software name="pgolf">
 		<description>Power Golf</description>
 		<year>1989</year>
 		<publisher>Hudson</publisher>
@@ -3161,7 +3161,7 @@
 		</part>
 	</software>
 
-	<software name="puzzleb">
+	<software name="puzzlboy">
 		<description>Puzzle Boy</description>
 		<year>1991</year>
 		<publisher>Nippon Telenet</publisher>
@@ -3242,7 +3242,7 @@
 		</part>
 	</software>
 
-	<software name="racingd">
+	<software name="racindam">
 		<description>Racing Damashii</description>
 		<year>1991</year>
 		<publisher>Irem</publisher>
@@ -3299,7 +3299,7 @@
 	</software>
 
 	<software name="ryukyu">
-		<description>Ryukyu</description>
+		<description>Ryuukyuu</description>
 		<year>1990</year>
 		<publisher>Face</publisher>
 		<info name="serial" value="FA02-005"/>
@@ -3326,7 +3326,7 @@
 		</part>
 	</software>
 
-	<software name="nspirit">
+	<software name="saigonin">
 		<description>Saigo no Nindou - Ninja Spirit</description>
 		<year>1990</year>
 		<publisher>Irem</publisher>
@@ -3575,7 +3575,7 @@
 		</part>
 	</software>
 
-	<software name="sinv">
+	<software name="spaceinv">
 		<description>Space Invaders - Fukkatsu no Hi</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
@@ -3698,7 +3698,7 @@
 	</software>
 
 	<software name="smomo">
-		<description>Super Momotaro Dentetsu</description>
+		<description>Super Momotarou Dentetsu</description>
 		<year>1989</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC89021"/>
@@ -3712,7 +3712,7 @@
 	</software>
 
 	<software name="smomo2">
-		<description>Super Momotaro Dentetsu II</description>
+		<description>Super Momotarou Dentetsu II</description>
 		<year>1991</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC91050"/>
@@ -3795,7 +3795,7 @@
 		</part>
 	</software>
 
-	<software name="takeda">
+	<software name="shingen">
 		<description>Takeda Shingen</description>
 		<year>1989</year>
 		<publisher>Aicom</publisher>
@@ -3809,7 +3809,7 @@
 		</part>
 	</software>
 
-	<software name="takeda1" cloneof="takeda">
+	<software name="shingen1" cloneof="shingen">
 		<description>Takeda Shingen (Alt)</description>
 		<year>1989</year>
 		<publisher>Aicom</publisher>
@@ -3888,7 +3888,7 @@
 		</part>
 	</software>
 
-	<software name="tcresta2">
+	<software name="terracr2">
 		<description>Terra Cresta II - Mandoraa no Gyakushuu</description>
 		<year>1992</year>
 		<publisher>Nihon Bussan</publisher>
@@ -4028,7 +4028,7 @@
 		</part>
 	</software>
 
-	<software name="tsupozum">
+	<software name="tsuppari">
 		<description>Tsuppari Oozumou - Heisei Ban</description>
 		<year>1993</year>
 		<publisher>Naxat</publisher>
@@ -4322,7 +4322,7 @@
 		</part>
 	</software>
 
-	<software name="yukaido">
+	<software name="youkaid">
 		<description>Youkai Douchuuki</description>
 		<year>1988</year>
 		<publisher>Namcot</publisher>

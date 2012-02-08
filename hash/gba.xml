@@ -2476,7 +2476,7 @@
 		</part>
 	</software>
 
-	<software name="asbb2k3">
+	<software name="asbas2k3">
 		<description>All-Star Baseball 2003 - Featuring Derek Jeter (USA)</description>
 		<year>2002</year>
 		<publisher>Acclaim</publisher>
@@ -2489,7 +2489,7 @@
 		</part>
 	</software>
 
-	<software name="asbb2k4pa" cloneof="asbb2k4">
+	<software name="asbas2k4pa" cloneof="asbas2k4">
 		<description>All-Star Baseball 2004 (USA, Prototype Earlier)</description>
 		<year>2003</year>
 		<publisher>Acclaim</publisher>
@@ -2501,7 +2501,7 @@
 		</part>
 	</software>
 
-	<software name="asbb2k4p" cloneof="asbb2k4">
+	<software name="asbas2k4p" cloneof="asbas2k4">
 		<description>All-Star Baseball 2004 (USA, Prototype)</description>
 		<year>2003</year>
 		<publisher>Acclaim</publisher>
@@ -2513,7 +2513,7 @@
 		</part>
 	</software>
 
-	<software name="asbb2k4">
+	<software name="asbas2k4">
 		<description>All-Star Baseball 2004 - Featuring Derek Jeter (USA)</description>
 		<year>2003</year>
 		<publisher>Acclaim</publisher>
@@ -2552,7 +2552,7 @@
 		</part>
 	</software>
 
-	<software name="abasschl" cloneof="suprbbas">
+	<software name="abasschl" cloneof="sblkbass">
 		<description>American Bass Challenge (USA)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
@@ -2659,7 +2659,7 @@
 		</part>
 	</software>
 
-	<software name="animania">
+	<software name="animalma">
 		<description>Animal Mania - Dokidoki Aishou Check (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -2728,7 +2728,7 @@
 		</part>
 	</software>
 
-	<software name="amaniacs">
+	<software name="animania">
 		<description>Animaniacs - Lights, Camera, Action! (Euro)</description>
 		<year>2005</year>
 		<publisher>Ignition Entertainment</publisher>
@@ -3390,7 +3390,7 @@
 		</part>
 	</software>
 
-	<software name="bdodgebf" cloneof="suprdbal">
+	<software name="bdodgebf" cloneof="sdodgeb">
 		<description>Bakunetsu Dodge Ball Fighters (Jpn)</description>
 		<year>2001</year>
 		<publisher>Atlus</publisher>
@@ -4505,7 +4505,7 @@
 		</part>
 	</software>
 
-	<software name="blackt">
+	<software name="blackthr">
 		<description>Blackthorne (Euro)</description>
 		<year>2003</year>
 		<publisher>Blizzard Entertainment</publisher>
@@ -4518,7 +4518,7 @@
 		</part>
 	</software>
 
-	<software name="blacktu" cloneof="blackt">
+	<software name="blackthru" cloneof="blackthr">
 		<description>Blackthorne (USA)</description>
 		<year>2003</year>
 		<publisher>Blizzard Entertainment</publisher>
@@ -5020,7 +5020,7 @@
 		</part>
 	</software>
 
-	<software name="bouldex">
+	<software name="bdashex">
 		<description>Boulder Dash EX (Euro)</description>
 		<year>2002</year>
 		<publisher>First Star Software</publisher>
@@ -5033,7 +5033,7 @@
 		</part>
 	</software>
 
-	<software name="bouldexj" cloneof="bouldex">
+	<software name="bdashexj" cloneof="bdashex">
 		<description>Boulder Dash EX (Jpn)</description>
 		<year>2002</year>
 		<publisher>First Star Software</publisher>
@@ -5048,7 +5048,7 @@
 		</part>
 	</software>
 
-	<software name="bouldexu" cloneof="bouldex">
+	<software name="bdashexu" cloneof="bdashex">
 		<description>Boulder Dash EX (USA)</description>
 		<year>2002</year>
 		<publisher>First Star Software</publisher>
@@ -5728,7 +5728,7 @@
 		</part>
 	</software>
 
-	<software name="ctsubasa">
+	<software name="ctsuba">
 		<description>Captain Tsubasa - Eikou no Kiseki (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -6459,8 +6459,8 @@
 		</part>
 	</software>
 
-	<software name="chomakai" cloneof="supergng">
-		<description>Chou Makai Mura R (Jpn)</description>
+	<software name="chomakai" cloneof="sgng">
+		<description>Chou Makaimura R (Jpn)</description>
 		<year>2002</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="AGB-ACJJ-JPN"/>
@@ -6886,7 +6886,7 @@
 		</part>
 	</software>
 
-	<software name="comixzon">
+	<software name="comix">
 		<description>Comix Zone (Euro)</description>
 		<year>2002</year>
 		<publisher>Sega</publisher>
@@ -7515,7 +7515,7 @@
 
 	<software name="curiousg">
 		<description>Curious George (Euro)</description>
-		<year>19??</year>
+		<year>2006</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="AGB-B3JP"/>
 		<part name="cart" interface="gba_cart">
@@ -7528,7 +7528,7 @@
 
 	<software name="curiousgu" cloneof="curiousg">
 		<description>Curious George (USA)</description>
-		<year>19??</year>
+		<year>2006</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="AGB-B3JE-USA"/>
 		<part name="cart" interface="gba_cart">
@@ -7539,10 +7539,10 @@
 		</part>
 	</software>
 
-	<software name="custmrob">
+	<software name="custrobo">
 		<description>Custom Robo GX (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Nintendo</publisher>
 		<info name="serial" value="AGB-ARJJ-JPN"/>
 		<info name="release" value="20020726"/>
 		<info name="alt_title" value="カスタムロボGX"/>
@@ -7584,7 +7584,7 @@
 		</part>
 	</software>
 
-	<software name="daisenry">
+	<software name="daisenr">
 		<description>Daisenryaku for Game Boy Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>MediaKite</publisher>
@@ -8139,7 +8139,7 @@
 		</part>
 	</software>
 
-	<software name="derbysta">
+	<software name="dstall">
 		<description>Derby Stallion Advance (Jpn)</description>
 		<year>2002</year>
 		<publisher>Enterbrain</publisher>
@@ -8257,7 +8257,7 @@
 		</part>
 	</software>
 
-	<software name="diddypil">
+	<software name="dkpilot">
 		<description>Diddy Kong Pilot (Prototype)</description>
 		<year>200?</year>
 		<publisher>Nintendo</publisher>
@@ -8986,7 +8986,7 @@
 		</part>
 	</software>
 
-	<software name="donald">
+	<software name="donaldd">
 		<description>Disney's Donald Duck "Adv@nce"!*# (Euro)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
@@ -8998,7 +8998,7 @@
 		</part>
 	</software>
 
-	<software name="donaldj" cloneof="donald">
+	<software name="donalddj" cloneof="donaldd">
 		<description>Disney's Donald Duck Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
@@ -9012,7 +9012,7 @@
 		</part>
 	</software>
 
-	<software name="donaldu" cloneof="donald">
+	<software name="donalddu" cloneof="donaldd">
 		<description>Disney's Donald Duck "Adv@nce"!*# (USA)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
@@ -9313,7 +9313,7 @@
 		</part>
 	</software>
 
-	<software name="rcransomj" cloneof="rcransom">
+	<software name="rcrj" cloneof="rcr">
 		<description>Downtown Nekketsu Monogatari EX (Jpn)</description>
 		<year>2004</year>
 		<publisher>Atlus</publisher>
@@ -9690,7 +9690,7 @@
 		</part>
 	</software>
 
-	<software name="dtales">
+	<software name="dtalesda">
 		<description>Dragon Tales - Dragon Adventures (USA)</description>
 		<year>2004</year>
 		<publisher>Global Star Software</publisher>
@@ -10624,7 +10624,7 @@
 		</part>
 	</software>
 
-	<software name="euroslge">
+	<software name="euroleag">
 		<description>European Super League (Euro)</description>
 		<year>2001</year>
 		<publisher>Virgin Interactive</publisher>
@@ -10679,7 +10679,7 @@
 		</part>
 	</software>
 
-	<software name="extghstb">
+	<software name="exghostb">
 		<description>Extreme Ghostbusters - Code Ecto-1 (Euro)</description>
 		<year>2002</year>
 		<publisher>L.S.P.</publisher>
@@ -10691,7 +10691,7 @@
 		</part>
 	</software>
 
-	<software name="extghstbu" cloneof="extghstb">
+	<software name="exghostbu" cloneof="exghostb">
 		<!-- Alt. Title: Extreme Ghostbusters (Box) -->
 		<description>Extreme Ghostbusters - Code Ecto-1 (USA)</description>
 		<year>2002</year>
@@ -12085,7 +12085,7 @@
 		</part>
 	</software>
 
-	<software name="firepro2j" cloneof="firepro2">
+	<software name="fireprw2j" cloneof="fireprw2">
 		<description>Final Fire Pro Wrestling - Yume no Dantai Unei! (Jpn)</description>
 		<year>2002</year>
 		<publisher>Spike</publisher>
@@ -12230,7 +12230,7 @@
 		</part>
 	</software>
 
-	<software name="firemblm">
+	<software name="firemb">
 		<description>Fire Emblem (Euro, English / French / German)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -12242,7 +12242,7 @@
 		</part>
 	</software>
 
-	<software name="firemblma" cloneof="firemblm">
+	<software name="firemba" cloneof="firemb">
 		<description>Fire Emblem (Euro, English / Italian / Spanish)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -12254,7 +12254,7 @@
 		</part>
 	</software>
 
-	<software name="firemblmj" cloneof="firemblm">
+	<software name="firembj" cloneof="firemb">
 		<description>Fire Emblem - Rekka no Ken (Jpn)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
@@ -12269,7 +12269,7 @@
 		</part>
 	</software>
 
-	<software name="firemblmjp1" cloneof="firemblm">
+	<software name="firembjp1" cloneof="firemb">
 		<description>Fire Emblem - Rekka no Ken (Jpn, Prototype 0219)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
@@ -12282,7 +12282,7 @@
 		</part>
 	</software>
 
-	<software name="firemblmjp2" cloneof="firemblm">
+	<software name="firembjp2" cloneof="firemb">
 		<description>Fire Emblem - Rekka no Ken (Jpn, Prototype 0206)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
@@ -12295,7 +12295,7 @@
 		</part>
 	</software>
 
-	<software name="firemblmu" cloneof="firemblm">
+	<software name="firembu" cloneof="firemb">
 		<description>Fire Emblem (USA, Aus)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
@@ -12392,7 +12392,7 @@
 		</part>
 	</software>
 
-	<software name="firepro2">
+	<software name="fireprw2">
 		<description>Fire Pro Wrestling 2 (USA)</description>
 		<year>2002</year>
 		<publisher>BAM! Entertainment</publisher>
@@ -13086,7 +13086,7 @@
 		</part>
 	</software>
 
-	<software name="gambler">
+	<software name="gamblert">
 		<description>Gambler Densetsu Tetsuya - Yomigaeru Densetsu (Jpn)</description>
 		<year>2002</year>
 		<publisher>Athena</publisher>
@@ -13743,7 +13743,7 @@
 		</part>
 	</software>
 
-	<software name="gensomdn">
+	<software name="gmsayuki">
 		<description>Gensou Maden Saiyuuki - Hangyaku no Toushin-taishi (Jpn)</description>
 		<year>2003</year>
 		<publisher>Digital Kids</publisher>
@@ -16569,7 +16569,7 @@
 	</software>
 
 	<software name="robocod">
-		<description>James Pond - Codename Robocod (Euro)</description>
+		<description>James Pond - Codename RoboCod (Euro)</description>
 		<year>2005</year>
 		<publisher>Play It</publisher>
 		<info name="serial" value="AGB-AJDP"/>
@@ -16581,7 +16581,7 @@
 	</software>
 
 	<software name="robocodu" cloneof="robocod">
-		<description>James Pond - Codename Robocod (USA)</description>
+		<description>James Pond - Codename RoboCod (USA)</description>
 		<year>2005</year>
 		<publisher>Valcon Games</publisher>
 		<info name="serial" value="AGB-AJDE-USA"/>
@@ -16661,7 +16661,7 @@
 		</part>
 	</software>
 
-	<software name="jikkwsp" cloneof="iss">
+	<software name="jikksocp" cloneof="iss">
 		<description>Jikkyou World Soccer Pocket (Jpn)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
@@ -16676,7 +16676,7 @@
 		</part>
 	</software>
 
-	<software name="jikkwsp2" cloneof="issadv">
+	<software name="jikkscp2" cloneof="issadv">
 		<description>Jikkyou World Soccer Pocket 2 (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -16691,7 +16691,7 @@
 		</part>
 	</software>
 
-	<software name="jneutr">
+	<software name="jimneutr">
 		<description>Jimmy Neutron Boy Genius (Euro)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
@@ -16703,7 +16703,7 @@
 		</part>
 	</software>
 
-	<software name="jneutru" cloneof="jneutr">
+	<software name="jimneutru" cloneof="jimneutr">
 		<description>Jimmy Neutron Boy Genius (USA)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
@@ -17106,7 +17106,7 @@
 		</part>
 	</software>
 
-	<software name="kamaitac">
+	<software name="kamaita">
 		<description>Kamaitachi no Yoru Advance (Jpn)</description>
 		<year>2002</year>
 		<publisher>Chun Soft</publisher>
@@ -17263,7 +17263,7 @@
 		</part>
 	</software>
 
-	<software name="kawaips3">
+	<software name="kawaipt3">
 		<description>Kawaii Pet Shop Monogatari 3 (Jpn)</description>
 		<year>2002</year>
 		<publisher>PCCW Japan</publisher>
@@ -17492,7 +17492,7 @@
 		</part>
 	</software>
 
-	<software name="kikikai" cloneof="pockyroc">
+	<software name="kikikai" cloneof="pocky">
 		<description>Kiki KaiKai Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Altron</publisher>
@@ -17808,7 +17808,7 @@
 		</part>
 	</software>
 
-	<software name="knkbzkkk">
+	<software name="kinnibkk">
 		<description>Kinniku Banzuke - Kimero! Kiseki no Kanzen Seiha (Jpn)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
@@ -17823,7 +17823,7 @@
 		</part>
 	</software>
 
-	<software name="knkbzkkd">
+	<software name="kinnibkd">
 		<description>Kinniku Banzuke - Kongou-kun no Daibouken! (Jpn)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
@@ -19366,7 +19366,7 @@
 		</part>
 	</software>
 
-	<software name="litlmerm">
+	<software name="mermaid">
 		<description>Disney's The Little Mermaid - Magic in Two Kingdoms (Euro, USA)</description>
 		<year>2006</year>
 		<publisher>Buena Vista Games</publisher>
@@ -19459,7 +19459,7 @@
 		</part>
 	</software>
 
-	<software name="loderunn">
+	<software name="ldrun">
 		<description>Lode Runner (Jpn)</description>
 		<year>2003</year>
 		<publisher>Success</publisher>
@@ -20359,7 +20359,7 @@
 		</part>
 	</software>
 
-	<software name="meaatelr">
+	<software name="atelmea">
 		<description>Marie, Elie &amp; Anis no Atelier - Soyokaze kara no Dengon (Jpn)</description>
 		<year>2003</year>
 		<publisher>Banpresto</publisher>
@@ -20569,7 +20569,7 @@
 		</part>
 	</software>
 
-	<software name="mariopty">
+	<software name="mariopar">
 		<description>Mario Party Advance (Euro)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
@@ -20582,7 +20582,7 @@
 		</part>
 	</software>
 
-	<software name="marioptyj" cloneof="mariopty">
+	<software name="marioparj" cloneof="mariopar">
 		<description>Mario Party Advance (Jpn)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
@@ -20597,7 +20597,7 @@
 		</part>
 	</software>
 
-	<software name="marioptyu" cloneof="mariopty">
+	<software name="marioparu" cloneof="mariopar">
 		<description>Mario Party Advance (USA)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
@@ -22120,7 +22120,7 @@
 		</part>
 	</software>
 
-	<software name="miktyson">
+	<software name="tyson">
 		<description>Mike Tyson Boxing (Euro)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -22133,7 +22133,7 @@
 		</part>
 	</software>
 
-	<software name="miktysonu" cloneof="miktyson">
+	<software name="tysonu" cloneof="tyson">
 		<description>Mike Tyson Boxing (USA)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -22519,7 +22519,7 @@
 		</part>
 	</software>
 
-	<software name="momotggd">
+	<software name="momoggd">
 		<description>Momotarou Dentetsu G Gold Deck o Tsukure! (Jpn)</description>
 		<year>2005</year>
 		<publisher>Hudson</publisher>
@@ -22534,7 +22534,7 @@
 		</part>
 	</software>
 
-	<software name="momotmat">
+	<software name="momomats">
 		<description>Momotarou Matsuri (Jpn, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Hudson</publisher>
@@ -22822,7 +22822,7 @@
 		</part>
 	</software>
 
-	<software name="mnstrck">
+	<software name="monstrck">
 		<description>Monster Trucks (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Majesco</publisher>
@@ -22953,7 +22953,7 @@
 		</part>
 	</software>
 
-	<software name="moritshg">
+	<software name="moritash">
 		<description>Morita Shougi Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Hudson</publisher>
@@ -23889,7 +23889,7 @@
 		</part>
 	</software>
 
-	<software name="nflbl2k2">
+	<software name="blitz2k2">
 		<description>NFL Blitz 20-02 (USA)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
@@ -23901,7 +23901,7 @@
 		</part>
 	</software>
 
-	<software name="nflbl2k3">
+	<software name="blitz2k3">
 		<description>NFL Blitz 20-03 (USA)</description>
 		<year>2002</year>
 		<publisher>Midway</publisher>
@@ -23926,7 +23926,7 @@
 		</part>
 	</software>
 
-	<software name="nhlh2k3">
+	<software name="hitz2k3">
 		<description>NHL Hitz 20-03 (USA)</description>
 		<year>2002</year>
 		<publisher>Midway</publisher>
@@ -24026,7 +24026,7 @@
 		</part>
 	</software>
 
-	<software name="promjren">
+	<software name="mjtetsu">
 		<description>Nihon Pro Mahjong Renmei Kounin Tetsuman Advance - Menkyo Kaiden Series (Jpn)</description>
 		<year>2002</year>
 		<publisher>Naxat (Kaga Tech)</publisher>
@@ -25482,7 +25482,7 @@
 		</part>
 	</software>
 
-	<software name="pitfalma">
+	<software name="pitfall">
 		<description>Pitfall - The Mayan Adventure (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Majesco</publisher>
@@ -25713,7 +25713,7 @@
 		</part>
 	</software>
 
-	<software name="pockyroc">
+	<software name="pocky">
 		<description>Pocky &amp; Rocky with Becky (USA)</description>
 		<year>2002</year>
 		<publisher>Natsume</publisher>
@@ -26460,7 +26460,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkund" cloneof="powrpkun">
+	<software name="powrpkpd" cloneof="powrpkp">
 		<description>Power Pro Kun Pocket 1, 2 (Jpn, Promo)</description>
 		<year>2004</year>
 		<publisher>Konami</publisher>
@@ -26472,7 +26472,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkun">
+	<software name="powrpkp">
 		<description>Power Pro Kun Pocket 1, 2 (Jpn)</description>
 		<year>2004</year>
 		<publisher>Konami</publisher>
@@ -26487,7 +26487,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkn3">
+	<software name="powrpkp3">
 		<description>Power Pro Kun Pocket 3 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
@@ -26502,7 +26502,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkn4">
+	<software name="powrpkp4">
 		<description>Power Pro Kun Pocket 4 (Jpn)</description>
 		<year>2002</year>
 		<publisher>Konami</publisher>
@@ -26517,7 +26517,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkn5d" cloneof="powrpkn5">
+	<software name="powrpkp5d" cloneof="powrpkp5">
 		<description>Power Pro Kun Pocket 5 (Jpn, Promo)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -26529,7 +26529,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkn5">
+	<software name="powrpkp5">
 		<description>Power Pro Kun Pocket 5 (Jpn)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -26544,7 +26544,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkn6d" cloneof="powrpkn6">
+	<software name="powrpkp6d" cloneof="powrpkp6">
 		<description>Power Pro Kun Pocket 6 (Jpn, Promo)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -26556,7 +26556,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkn6">
+	<software name="powrpkp6">
 		<description>Power Pro Kun Pocket 6 (Jpn)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
@@ -26571,7 +26571,7 @@
 		</part>
 	</software>
 
-	<software name="powrpkn7">
+	<software name="powrpkp7">
 		<description>Power Pro Kun Pocket 7 (Jpn)</description>
 		<year>2004</year>
 		<publisher>Konami</publisher>
@@ -26765,7 +26765,7 @@
 		</part>
 	</software>
 
-	<software name="prehimanp" cloneof="prehiman">
+	<software name="pmanp" cloneof="pman">
 		<description>Prehistorik Man (USA, Prototype)</description>
 		<year>2001</year>
 		<publisher>Titus</publisher>
@@ -26776,7 +26776,7 @@
 		</part>
 	</software>
 
-	<software name="prehiman">
+	<software name="pman">
 		<description>Prehistorik Man (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Titus</publisher>
@@ -26903,7 +26903,7 @@
 		</part>
 	</software>
 
-	<software name="promjtsu">
+	<software name="mjtsuwa">
 		<description>Pro Mahjong Tsuwamono GBA (Jpn)</description>
 		<year>2005</year>
 		<publisher>Culture Brain</publisher>
@@ -27632,7 +27632,7 @@
 		</part>
 	</software>
 
-	<software name="rvshinobp" cloneof="rvshinob">
+	<software name="revshinp" cloneof="revshin">
 		<description>The Revenge of Shinobi (Euro, Prototype)</description>
 		<year>2003</year>
 		<publisher>Sega</publisher>
@@ -27643,7 +27643,7 @@
 		</part>
 	</software>
 
-	<software name="rvshinob">
+	<software name="revshin">
 		<description>The Revenge of Shinobi (Euro)</description>
 		<year>2003</year>
 		<publisher>Sega</publisher>
@@ -27655,7 +27655,7 @@
 		</part>
 	</software>
 
-	<software name="rvshinobu" cloneof="rvshinob">
+	<software name="revshinu" cloneof="revshin">
 		<description>The Revenge of Shinobi (USA)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
@@ -27709,7 +27709,7 @@
 		</part>
 	</software>
 
-	<software name="rcransom">
+	<software name="rcr">
 		<description>River City Ransom EX (USA)</description>
 		<year>2004</year>
 		<publisher>Atlus</publisher>
@@ -28391,7 +28391,7 @@
 		</part>
 	</software>
 
-	<software name="saibarar">
+	<software name="saibarmj">
 		<description>Saibara Rieko no Dendou Mahjong (Jpn)</description>
 		<year>2001</year>
 		<publisher>Media Rings</publisher>
@@ -28503,7 +28503,7 @@
 		</part>
 	</software>
 
-	<software name="3goku">
+	<software name="sangoku">
 		<description>Sangokushi (Jpn)</description>
 		<year>2001</year>
 		<publisher>Koei</publisher>
@@ -28518,7 +28518,7 @@
 		</part>
 	</software>
 
-	<software name="3gokueik">
+	<software name="sangoeik">
 		<description>Sangokushi - Eiketsuden (Jpn)</description>
 		<year>2005</year>
 		<publisher>Koei</publisher>
@@ -28533,7 +28533,7 @@
 		</part>
 	</software>
 
-	<software name="3gokukou">
+	<software name="sangokou">
 		<description>Sangokushi - Koumeiden (Jpn)</description>
 		<year>2005</year>
 		<publisher>Koei</publisher>
@@ -29645,7 +29645,7 @@
 		</part>
 	</software>
 
-	<software name="sh3gokum" cloneof="dynwarr">
+	<software name="ssangomu" cloneof="dynwarr">
 		<description>Shin Sangoku Musou Advance (Jpn)</description>
 		<year>2005</year>
 		<publisher>Koei</publisher>
@@ -30939,7 +30939,7 @@
 		</part>
 	</software>
 
-	<software name="spidrbny">
+	<software name="spidbny">
 		<description>Spider-Man - Battle for New York (Euro)</description>
 		<year>2007</year>
 		<publisher>Activision</publisher>
@@ -30952,7 +30952,7 @@
 		</part>
 	</software>
 
-	<software name="spidrbnyu" cloneof="spidrbny">
+	<software name="spidbnyu" cloneof="spidbny">
 		<description>Spider-Man - Battle for New York (USA)</description>
 		<year>2006</year>
 		<publisher>Activision</publisher>
@@ -31680,7 +31680,7 @@
 		</part>
 	</software>
 
-	<software name="starwep2">
+	<software name="swep2">
 		<description>Star Wars - Episode II - Attack of the Clones (Euro)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
@@ -31692,7 +31692,7 @@
 		</part>
 	</software>
 
-	<software name="starwep2u" cloneof="starwep2">
+	<software name="swep2u" cloneof="swep2">
 		<description>Star Wars - Episode II - Attack of the Clones (USA)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
@@ -31704,7 +31704,7 @@
 		</part>
 	</software>
 
-	<software name="starwep3">
+	<software name="swep3">
 		<description>Star Wars - Episode III - Revenge of the Sith (Euro)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
@@ -31717,7 +31717,7 @@
 		</part>
 	</software>
 
-	<software name="starwep3u" cloneof="starwep3">
+	<software name="swep3u" cloneof="swep3">
 		<description>Star Wars - Episode III - Revenge of the Sith (USA)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
@@ -32006,7 +32006,7 @@
 		</part>
 	</software>
 
-	<software name="streetrs">
+	<software name="srs">
 		<description>Street Racing Syndicate (Euro)</description>
 		<year>2005</year>
 		<publisher>Zoo Digital Publishing</publisher>
@@ -32019,7 +32019,7 @@
 		</part>
 	</software>
 
-	<software name="streetrsu" cloneof="streetrs">
+	<software name="srsu" cloneof="srs">
 		<description>Street Racing Syndicate (USA)</description>
 		<year>2005</year>
 		<publisher>DSI Games</publisher>
@@ -32242,7 +32242,7 @@
 		</part>
 	</software>
 
-	<software name="suprbbas">
+	<software name="sblkbass">
 		<description>Super Black Bass Advance (Euro)</description>
 		<year>2002</year>
 		<publisher>Ubi Soft</publisher>
@@ -32254,7 +32254,7 @@
 		</part>
 	</software>
 
-	<software name="suprbbasj" cloneof="suprbbas">
+	<software name="sblkbassj" cloneof="sblkbass">
 		<description>Super Black Bass Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Starfish</publisher>
@@ -32319,7 +32319,7 @@
 		</part>
 	</software>
 
-	<software name="superchn">
+	<software name="supchin">
 		<description>Super Chinese 1, 2 Advance (Jpn)</description>
 		<year>2004</year>
 		<publisher>Culture Brain</publisher>
@@ -32346,7 +32346,7 @@
 		</part>
 	</software>
 
-	<software name="suprdbal">
+	<software name="sdodgeb">
 		<description>Super Dodge Ball Advance (Euro)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
@@ -32359,7 +32359,7 @@
 		</part>
 	</software>
 
-	<software name="suprdbalup" cloneof="suprdbal">
+	<software name="sdodgebup" cloneof="sdodgeb">
 		<description>Super Dodge Ball Advance (USA, Prototype)</description>
 		<year>2001</year>
 		<publisher>Atlus</publisher>
@@ -32371,7 +32371,7 @@
 		</part>
 	</software>
 
-	<software name="suprdbalu" cloneof="suprdbal">
+	<software name="sdodgebu" cloneof="sdodgeb">
 		<description>Super Dodge Ball Advance (USA)</description>
 		<year>2001</year>
 		<publisher>Atlus</publisher>
@@ -32429,7 +32429,7 @@
 		</part>
 	</software>
 
-	<software name="suprdrop">
+	<software name="sdropzon">
 		<!-- Alt. Title: Super Dropzone - Intergalactic Rescue Mission (Box) -->
 		<description>Archer Maclean's Super Dropzone (Euro)</description>
 		<year>2003</year>
@@ -32442,7 +32442,7 @@
 		</part>
 	</software>
 
-	<software name="suprdropu" cloneof="suprdrop">
+	<software name="sdropzonu" cloneof="sdropzon">
 		<!-- Alt. Title: Super Dropzone - Intergalactic Rescue Mission (Box) -->
 		<description>Archer Maclean's Super Dropzone (USA)</description>
 		<year>2003</year>
@@ -32468,7 +32468,7 @@
 		</part>
 	</software>
 
-	<software name="supergng">
+	<software name="sgng">
 		<description>Super Ghouls'n Ghosts (Euro, USA)</description>
 		<year>2002</year>
 		<publisher>Capcom</publisher>
@@ -33227,7 +33227,7 @@
 		</part>
 	</software>
 
-	<software name="taikuher">
+	<software name="ultraher">
 		<description>Taiketsu! Ultra Hero (Jpn)</description>
 		<year>2004</year>
 		<publisher>Jorudan</publisher>
@@ -33487,7 +33487,7 @@
 		</part>
 	</software>
 
-	<software name="tanteiji">
+	<software name="tantjssk">
 		<description>Tantei Jinguuji Saburou - Shiroi Kage no Shoujo (Jpn)</description>
 		<year>2005</year>
 		<publisher>Marvelous Interactive</publisher>
@@ -33965,7 +33965,7 @@
 		</part>
 	</software>
 
-	<software name="thunderb">
+	<software name="tbirds">
 		<description>Thunderbirds (Euro, USA)</description>
 		<year>2004</year>
 		<publisher>Vivendi Universal</publisher>
@@ -33977,7 +33977,7 @@
 		</part>
 	</software>
 
-	<software name="thundrir">
+	<software name="tbirdsir">
 		<description>Thunderbirds - International Rescue (Euro)</description>
 		<year>2001</year>
 		<publisher>SCI</publisher>
@@ -34002,7 +34002,7 @@
 		</part>
 	</software>
 
-	<software name="twood">
+	<software name="twoods">
 		<description>Tiger Woods PGA Tour Golf (Euro,  English / French / German / Italian / Spanish)</description>
 		<year>2002</year>
 		<publisher>Digital Worldwide</publisher>
@@ -34014,7 +34014,7 @@
 		</part>
 	</software>
 
-	<software name="twoodu" cloneof="twood">
+	<software name="twoodsu" cloneof="twoods">
 		<description>Tiger Woods PGA Tour Golf (Euro, USA)</description>
 		<year>2002</year>
 		<publisher>Destination Software</publisher>
@@ -34213,7 +34213,7 @@
 		</part>
 	</software>
 
-	<software name="tokyomgk">
+	<software name="tokyomg">
 		<description>Tokyo Majin Gakuen - Fuju Houroku (Jpn)</description>
 		<year>2004</year>
 		<publisher>Marvelous Interactive</publisher>
@@ -36413,7 +36413,7 @@
 		</part>
 	</software>
 
-	<software name="winnpost">
+	<software name="winpost">
 		<description>Winning Post for Game Boy Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Koei</publisher>
@@ -36508,7 +36508,7 @@
 		</part>
 	</software>
 
-	<software name="wolfen3d">
+	<software name="wolfn3d">
 		<description>Wolfenstein 3D (Euro, USA)</description>
 		<year>2002</year>
 		<publisher>BAM! Entertainment</publisher>
@@ -37617,7 +37617,7 @@
 		</part>
 	</software>
 
-	<software name="zennihgt" cloneof="topgergt">
+	<software name="zengt" cloneof="topgergt">
 		<description>Zen-Nihon GT Senshuken (Jpn)</description>
 		<year>2001</year>
 		<publisher>Kemco</publisher>
@@ -37632,7 +37632,7 @@
 		</part>
 	</software>
 
-	<software name="zennihs2">
+	<software name="znsst2">
 		<description>Zen-Nihon Shounen Soccer Taikai 2 - Mezase Nihon-ichi! (Jpn)</description>
 		<year>2002</year>
 		<publisher>Success</publisher>

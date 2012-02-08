@@ -1198,7 +1198,7 @@
 		</part>
 	</software>
 
-	<software name="dotc">
+	<software name="defcrown">
 		<description>Defender of the Crown</description>
 		<year>1989</year>
 		<publisher>Cinemaware</publisher>
@@ -2459,7 +2459,7 @@
 		</part>
 	</software>
 
-	<software name="impmisn2">
+	<software name="impmiss2">
 		<description>Impossible Mission II</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
@@ -2587,7 +2587,7 @@
 		</part>
 	</software>
 
-	<software name="jn18golf">
+	<software name="nicklaus">
 		<description>Jack Nicklaus Greatest 18 Holes of Major Championship Golf</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
@@ -2771,7 +2771,7 @@
 		</part>
 	</software>
 
-	<software name="kngquest">
+	<software name="kingqst">
 		<description>King's Quest</description>
 		<year>1987</year>
 		<publisher>Sierra</publisher>
@@ -2788,7 +2788,7 @@
 		</part>
 	</software>
 
-	<software name="kngsqst2">
+	<software name="kingqst2">
 		<description>King's Quest II - Romancing The Throne</description>
 		<year>1988</year>
 		<publisher>Sierra</publisher>
@@ -2805,7 +2805,7 @@
 		</part>
 	</software>
 
-	<software name="kngsqst3">
+	<software name="kingqst3">
 		<description>King's Quest III</description>
 		<year>1988</year>
 		<publisher>Sierra</publisher>
@@ -2822,7 +2822,7 @@
 		</part>
 	</software>
 
-	<software name="kngsqst4">
+	<software name="kingqst4">
 		<description>King's Quest IV </description>
 		<year>1989</year>
 		<publisher>Sierra</publisher>
@@ -4035,7 +4035,7 @@
 		</part>
 	</software>
 
-	<software name="pipedrm">
+	<software name="pipedrem">
 		<description>Pipe Dream</description>
 		<year>1990</year>
 		<publisher>Lucasfilm Games</publisher>
@@ -4836,7 +4836,7 @@
 		</part>
 	</software>
 
-	<software name="shnghai2">
+	<software name="shangh2">
 		<description>Shanghai II - Dragon's Eye</description>
 		<year>1993</year>
 		<publisher>Big Red Computer Club</publisher>
@@ -6540,7 +6540,7 @@
 		</part>
 	</software>
 
-	<software name="trnsylv3">
+	<software name="transyl3">
 		<description>Transylvania III</description>
 		<year>1990</year>
 		<publisher>Polarware</publisher>
@@ -6557,7 +6557,7 @@
 		</part>
 	</software>
 
-	<software name="trnvania">
+	<software name="transyl">
 		<description>Transylvania</description>
 		<year>1987</year>
 		<publisher>Polarware</publisher>
@@ -6890,7 +6890,7 @@
 		</part>
 	</software>
 
-	<software name="wntgames">
+	<software name="wingames">
 		<description>Winter Games</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>

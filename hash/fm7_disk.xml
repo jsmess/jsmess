@@ -77,7 +77,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="atrain">
+	<software name="aressha">
 		<description>A列車で行こう</description>
 		<year>1985</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -102,7 +102,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="castleex">
+	<software name="castlex">
 		<description>Castle Excellent</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -179,7 +179,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="cristine">
+	<software name="christin">
 		<description>Christine</description>
 		<year>1986</year>
 		<publisher>パソコンショップ高知 (PSK)</publisher>
@@ -191,7 +191,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="daisenry">
+	<software name="daisenr">
 		<description>Daisenryaku FM</description>
 		<year>1987</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -451,7 +451,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="ishtar">
+	<software name="rtishtar">
 		<description>The Return of Ishtar</description>
 		<year>1989?</year>
 		<publisher>SPS</publisher>
@@ -589,8 +589,8 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="mschool">
-		<description>Bishojo Shashinkan - Moving School</description>
+	<software name="bshashms">
+		<description>Bishoujo Shashinkan - Moving School</description>
 		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
 		<info name="alt_title" value="美少女写真館 -ムービング・スクール-"/>

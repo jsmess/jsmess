@@ -38,7 +38,7 @@ Compiled by K1W1
     - Telelink I (Atari)
     - Telelink II (Atari)
 
-  * Cartridge Types : -
+  * Cartridge Types :
 
 	- Standard 8k map to address area $A000-$BFFF.
 	- Standard 16k cartridges map to address area $8000-$BFFF.
@@ -102,7 +102,7 @@ Compiled by K1W1
   * In 1983, Romox released some games on EEPROM cartridges. Customers could purchase a blank ECPC (Edge Connector Programmable Cartridge), and
     then have a game of their choice burned into its EEPROM at a Romox Programming Terminal. These are marked by "ECPC" in the cart "Serial: " number area below.
 
-  * Missing Cartridges (Publisher, Cart #, Rarity, Year, Title) : -
+  * Missing Cartridges (Publisher, Cart #, Rarity, Year, Title) :
 
    - Hacked/Pirate/Homemeade        	      Blue Max: 2001
    - Hacked/Pirate/Homemeade        	      Cavernia
@@ -401,7 +401,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="3dtictac">
-		<description>3D Tic-Tac-Toe</description>
+		<description>3-D Tic-Tac-Toe</description>
 		<year>1979</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL4010" />
@@ -1027,10 +1027,11 @@ Compiled by K1W1
 	</software>
 
 	<software name="beefdrop">
-		<description>Beef Drop (Homebrew)</description>
+		<description>Beef Drop</description>
 		<!-- This is the last WIP version by Ken Siders, dated 2005-02-16. It is here as a placeholder until the dump of the final release version by Atari Age becomes avaialable. -->
 		<year>2005</year>
-		<publisher>Ken Siders</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+        <info name="developer" value="Ken Siders" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="xegs 32k" />
 			<dataarea name="rom" size="32768">
@@ -1157,7 +1158,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bntybobs">
+	<software name="bbsb">
 		<description>Bounty Bob Strikes Back!</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
@@ -1194,7 +1195,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="buckrog">
-		<description>Buck Rogers : Planet of Zoom</description>
+		<description>Buck Rogers - Planet of Zoom</description>
 		<year>1983</year>
 		<publisher>SEGA</publisher>
 		<info name="serial" value="005-03" />
@@ -1233,7 +1234,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="carnmasa" cloneof="carnmass">
+	<software name="carnmassa" cloneof="carnmass">
 		<description>Carnival Massacre (Earlier Version)</description>
 		<!-- Original release version without copy protection. -->
 		<year>1983</year>
@@ -1403,7 +1404,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="cldburst">
+	<software name="cloudbst">
 		<description>Cloudburst</description>
 		<year>1982</year>
 		<publisher>DANA</publisher>
@@ -1506,7 +1507,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="cosmclfe">
+	<software name="cosmiclf">
 		<description>Cosmic Life</description>
 		<year>1983</year>
 		<publisher>Spinnaker</publisher>
@@ -1531,7 +1532,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="crssfire">
+	<software name="xfire">
 		<description>CrossFire</description>
 		<year>1981</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1647,7 +1648,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="dlxinvdr">
+	<software name="dxinvadr">
 		<description>Deluxe Invaders</description>
 		<year>1983</year>
 		<publisher>Roklan</publisher>
@@ -1660,7 +1661,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="dmnattk">
+	<software name="demonatk">
 		<description>Demon Attack</description>
 		<year>1982</year>
 		<publisher>Imagic</publisher>
@@ -1858,7 +1859,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="eastfrnt">
-		<description>Eastern Front : 1941</description>
+		<description>Eastern Front - 1941</description>
 		<!-- Re-released in 1988 for the XEGS -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
@@ -2090,7 +2091,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fnlorbit">
+	<software name="finalorb">
 		<description>Final Orbit</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
@@ -2191,7 +2192,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="frogger2">
-		<description>Frogger II : Threedeep!</description>
+		<description>Frogger II - Threedeep!</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="1290" />
@@ -2420,7 +2421,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="jamsbond">
+	<software name="jbond">
 		<description>James Bond 007</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
@@ -2433,7 +2434,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="jawbrkr2">
+	<software name="jawbrek2">
 		<description>Jawbreaker II</description>
 		<!-- The title screen says “Jawbreaker (c) 1980”, however this actually is Jawbreaker II from 1982, as seen on the box (not in all releases though). -->
 		<year>1982</year>
@@ -2513,7 +2514,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="jnglhunt">
+	<software name="jungleh">
 		<description>Jungle Hunt</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -2632,7 +2633,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="keystone">
+	<software name="keykaper">
 		<description>Keystone Kapers</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
@@ -2802,7 +2803,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="logclvls">
+	<software name="logiclvl">
 		<description>Logic Levels</description>
 		<year>1984</year>
 		<publisher>Fisher-Price</publisher>
@@ -2829,7 +2830,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="lgcmstrf" cloneof="logcmstr">
+	<software name="logcmstrf" cloneof="logcmstr">
 		<description>LogicMaster (Fixed)</description>
 		<!-- This ROM has been fixed to load on the A800 but will not play without device attached. -->
 		<year>1983</year>
@@ -3029,7 +3030,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="manor">
+	<software name="memmanor">
 		<description>Memory Manor</description>
 		<year>1984</year>
 		<publisher>Fisher-Price</publisher>
@@ -3188,7 +3189,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mnstrmaz">
+	<software name="monstrmz">
 		<description>Monster Maze</description>
 		<year>1982</year>
 		<publisher>Epyx</publisher>
@@ -3202,7 +3203,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mntezuma">
+	<software name="montezum">
 		<description>Montezuma's Revenge (Prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
@@ -3226,7 +3227,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="moonptrl">
+	<software name="mpatrol">
 		<description>Moon Patrol</description>
 		<!-- Re-released in 1987 -->
 		<year>1983</year>
@@ -3240,7 +3241,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mntnking">
+	<software name="mking">
 		<description>Mountain King</description>
 		<year>1983</year>
 		<publisher>CBS Software</publisher>
@@ -3267,7 +3268,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="docastle">
-		<description>Mr Do!'s Castle (Prototype)</description>
+		<description>Mr. Do!'s Castle (Prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a800_cart">
@@ -3279,7 +3280,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="mrcool">
-		<description>Mr Cool</description>
+		<description>Mr. Cool</description>
 		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="serial" value="MCL-201" />
@@ -3292,7 +3293,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="mrtnt">
-		<description>Mr TNT</description>
+		<description>Mr. TNT</description>
 		<year>1983</year>
 		<publisher>HES</publisher>
 		<info name="serial" value="C730" />
@@ -3684,7 +3685,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="pronto">
-		<description>Pronto : The Home Information System</description>
+		<description>Pronto - The Home Information System</description>
 		<year>1985</year>
 		<publisher>Pronto</publisher>
 		<info name="serial" value="22680" />
@@ -3748,9 +3749,9 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="football">
+	<software name="rsfootb">
 		<description>RealSports Football</description>
-		<!-- Re-released in 1987) -->
+		<!-- Re-released in 1987 -->
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8029" />
@@ -3776,7 +3777,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="rivrraid">
+	<software name="riveraid">
 		<description>River Raid</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -3789,7 +3790,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="rivrrscu">
+	<software name="rivrresc">
 		<description>River Rescue</description>
 		<year>1983</year>
 		<publisher>Thorn EMI</publisher>
@@ -3802,7 +3803,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="robo2084">
+	<software name="robotron">
 		<description>Robotron 2084</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -3981,7 +3982,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="invaders">
+	<software name="spaceinv">
 		<description>Space Invaders</description>
 		<!-- Re-released in 1986 (RX8008) -->
 		<year>1980</year>
@@ -4179,7 +4180,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="spidrcty">
+	<software name="spidcity">
 		<description>Spider City</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
@@ -4205,7 +4206,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="spyhuntr">
+	<software name="spyhunt">
 		<description>Spy Hunter</description>
 		<year>1984</year>
 		<publisher>SEGA</publisher>
@@ -4270,8 +4271,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="swrotj">
-		<description>Star Wars : Return of the Jedi - Death Star Battle</description>
+	<software name="jedidsb">
+		<description>Star Wars - Return of the Jedi - Death Star Battle</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="1260" />
@@ -4283,8 +4284,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="swarcade">
-		<description>Star Wars : The Arcade Game</description>
+	<software name="starwars">
+		<description>Star Wars - The Arcade Game</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="1340" />
@@ -4360,7 +4361,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="sprcobra">
+	<software name="scobra">
 		<description>Super Cobra</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
@@ -4373,7 +4374,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="sprebrnr">
+	<software name="eburner">
 		<description>Super E-Burner</description>
 		<year>1992</year>
 		<publisher>CSS</publisher>
@@ -4397,7 +4398,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="sketch">
+	<software name="ssketch">
 		<description>Super Sketch Graphics Master</description>
 		<year>1984</year>
 		<publisher>PPI</publisher>
@@ -4424,7 +4425,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="suprman3">
+	<software name="supermn3">
 		<description>Superman III (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -4527,7 +4528,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="dreadngt">
+	<software name="dfactor">
 		<description>The Dreadnaught Factor</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
@@ -4552,9 +4553,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="starfgtr">
+	<software name="laststar">
 		<description>The Last Starfighter (Prototype)</description>
-
 		<year>1984</year>
 		<publisher>Atari</publisher>
 
@@ -4566,7 +4566,8 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="starftr1" cloneof="starfgtr">
+<!-- why is this here?? -->
+	<software name="laststar1" cloneof="laststar">
 		<description>The Last Starfighter (Prototype)(Czech Translation)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>

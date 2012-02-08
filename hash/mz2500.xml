@@ -37,7 +37,7 @@
 		</part>
 	</software>
 
-	<software name="backtoft">
+	<software name="backtof">
 		<description>Back to the Future</description>
 		<year>1986</year>
 		<publisher>Pony / Data West</publisher>
@@ -61,7 +61,7 @@
 		</part>
 	</software>
 
-	<software name="eiyuuden">
+	<software name="eiyuden">
 		<description>Eiyuu Densetsu Saga</description>
 		<year>198?</year>
 		<publisher>Arrow Soft</publisher>
@@ -129,7 +129,7 @@
 		</part>
 	</software>
 
-	<software name="hurryfox">
+	<software name="hfox">
 		<description>Hurry Fox</description>
 		<year>198?</year>
 		<publisher>Arrow Soft</publisher>
@@ -196,7 +196,7 @@
 		</part>
 	</software>
 
-	<software name="marchenv">
+	<software name="marchen">
 		<description>Märchen Veil I</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -220,7 +220,7 @@
 		</part>
 	</software>
 
-	<software name="mrdrclub">
+	<software name="murdclub">
 		<description>Murder Club</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -294,8 +294,8 @@
 		</part>
 	</software>
 
-	<software name="pengkunw">
-		<description>Penguin Kun Wars</description>
+	<software name="penguinw">
+		<description>Penguin-kun Wars</description>
 		<year>198?</year>
 		<publisher>アスキー (ASCII)</publisher>
 
@@ -306,7 +306,7 @@
 		</part>
 	</software>
 
-	<software name="promj">
+	<software name="profmj">
 		<description>Professional Mahjong (v2.1)</description>
 		<year>198?</year>
 		<publisher>シャノアール (Chat Noir)</publisher>
@@ -319,7 +319,7 @@
 		</part>
 	</software>
 
-	<software name="promja" cloneof="promj">
+	<software name="profmja" cloneof="profmj">
 		<description>Professional Mahjong (v2.1, Alt)</description>
 		<year>198?</year>
 		<publisher>シャノアール (Chat Noir)</publisher>
@@ -368,8 +368,8 @@
 		</part>
 	</software>
 
-	<software name="tritorn">
-		<description>Tritorn</description>
+	<software name="triton">
+		<description>Triton</description>
 		<year>198?</year>
 		<publisher>ザインソフト (Sein Soft)</publisher>
 
@@ -413,7 +413,7 @@
 
     <!-- Demo disks &amp; Diskmag disks -->
 
-	<software name="kaleidsc">
+	<software name="kaleidos">
 		<description>Kaleidoscope Demo</description>
 		<year>198?</year>
 		<publisher>Hot-B</publisher>

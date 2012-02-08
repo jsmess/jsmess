@@ -27,7 +27,7 @@
 		</part>
 	</software>
 
-	<software name="supcobra">
+	<software name="scobra">
 		<description>Super Cobra</description>
 		<year>1982</year>
 		<publisher>Entex Industries</publisher>
@@ -40,7 +40,7 @@
 		</part>
 	</software>
 
-	<software name="spcforce">
+	<software name="spacefrc">
 		<description>Space Force</description>
 		<year>1982</year>
 		<publisher>Entex Industries</publisher>

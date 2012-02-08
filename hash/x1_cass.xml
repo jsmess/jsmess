@@ -25,8 +25,8 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="bokusuka">
-		<description>Bokusuka Wars</description>
+	<software name="bokosuka">
+		<description>Bokosuka Wars</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="release" value="198508xx"/>
@@ -181,7 +181,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="fcrystal">
+	<software name="firecrys">
 		<description>The Fire Crystal</description>
 		<year>1986</year>
 		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
@@ -194,7 +194,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="fcrystala" cloneof="fcrystal" supported="no">
+	<software name="firecrysa" cloneof="firecrys" supported="no">
 		<description>The Fire Crystal (Alt)</description>
 		<year>1986</year>
 		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
@@ -488,8 +488,8 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="tritorn">
-		<description>Tritorn</description>
+	<software name="triton">
+		<description>Triton</description>
 		<year>1985</year>
 		<publisher>ザインソフト (Sein Soft)</publisher>
 		<info name="release" value="198511xx"/>
@@ -501,8 +501,8 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="tritorna" cloneof="tritorn">
-		<description>Tritorn (Alt)</description>
+	<software name="tritona" cloneof="triton">
+		<description>Triton (Alt)</description>
 		<year>1985</year>
 		<publisher>ザインソフト (Sein Soft)</publisher>
 		<info name="release" value="198511xx"/>
@@ -865,7 +865,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="hovattck">
+	<software name="hoveratk">
 		<description>Hover Attack</description>
 		<year>1985?</year>
 		<publisher>コムパック (Compaq)</publisher>
@@ -878,7 +878,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="hovattcka" cloneof="hovattck">
+	<software name="hoveratka" cloneof="hoveratk">
 		<description>Hover Attack (Alt)</description>
 		<year>1985?</year>
 		<publisher>コムパック (Compaq)</publisher>

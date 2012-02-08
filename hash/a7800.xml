@@ -286,10 +286,11 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="astrodlx" cloneof="asteroid">
-		<description>Asteroids Deluxe (NTSC, Homebrew)</description>
+	<software name="astdelux" cloneof="asteroid">
+		<description>Asteroids Deluxe (NTSC)</description>
 		<year>2007</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-0" />
@@ -299,10 +300,11 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="astrodlxp" cloneof="asteroid">
-		<description>Asteroids Deluxe (PAL, Homebrew)</description>
+	<software name="astdeluxp" cloneof="asteroid">
+		<description>Asteroids Deluxe (PAL)</description>
 		<year>2007</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-0" />
@@ -390,9 +392,10 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="beefdrop">
-		<description>Beef Drop (NTSC, Homebrew, Added Pokey Chip)</description>
+		<description>Beef Drop (NTSC, Added Pokey Chip)</description>
 		<year>2006</year>
-		<publisher>Ken Siders</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ken Siders" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-1" />
@@ -403,9 +406,10 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="bonq">
-		<description>b*nQ (NTSC, Homebrew)</description>
+		<description>b*nQ (NTSC)</description>
 		<year>2007</year>
-		<publisher>Ken Siders</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Ken Siders" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="pcb_type" value="TYPE-0" />
@@ -1027,10 +1031,11 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="hanglymn">
-		<description>Hangly-Man (NTSC, Homebrew)</description>
+	<software name="hangly">
+		<description>Hangly-Man (NTSC)</description>
 		<year>2006</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="16384">
@@ -1168,9 +1173,10 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="jrpacman">
-		<description>Jr. Pac-Man (NTSC, Homebrew)</description>
+		<description>Jr. Pac-Man (NTSC)</description>
 		<year>2009</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="32768">
@@ -1478,9 +1484,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="mspacatk" cloneof="mspacman">
-		<description>Ms. Pac-Attack (NTSC, Homebrew)</description>
+		<description>Ms. Pac-Attack (NTSC)</description>
 		<year>2006</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="16384">
@@ -1590,9 +1597,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="pacman">
-		<description>Pac-Man (NTSC, Homebrew)</description>
+		<description>Pac-Man (NTSC)</description>
 		<year>2006</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="16384">
@@ -1602,9 +1610,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="ultrapac" cloneof="pacman">
-		<description>Ultra Pac-Man (NTSC, Homebrew)</description>
+		<description>Ultra Pac-Man (NTSC)</description>
 		<year>2006</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="32768">
@@ -1614,9 +1623,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="paccollu" cloneof="pacman">
-		<description>Pac-Man Collection! (NTSC, Homebrew)</description>
+		<description>Pac-Man Collection! (NTSC)</description>
 		<year>2006</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="32768">
@@ -1626,9 +1636,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="paccoll" cloneof="pacman">
-		<description>Pac-Man Collection! (PAL, Homebrew)</description>
+		<description>Pac-Man Collection! (PAL)</description>
 		<year>2006</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="32768">
@@ -1638,9 +1649,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="pacplus" cloneof="pacman">
-		<description>Pac-Man Plus (NTSC, Homebrew)</description>
+		<description>Pac-Man Plus (NTSC)</description>
 		<year>2006</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="16384">
@@ -1650,9 +1662,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="pacpolux" cloneof="pacman">
-		<description>Pac-Pollux (NTSC, Homebrew)</description>
+		<description>Pac-Pollux (NTSC)</description>
 		<year>2006</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="16384">
@@ -1799,8 +1812,8 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-	<software name="rsbase">
-		<description>Realsports Baseball (NTSC)</description>
+	<software name="rsbaseb">
+		<description>RealSports Baseball (NTSC)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7834"/>
@@ -1814,9 +1827,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="santasim">
-		<description>Santa Simon (NTSC, Homebrew)</description>
+		<description>Santa Simon (NTSC)</description>
 		<year>2006</year>
-		<publisher>Matthias Luedtke</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Matthias Luedtke" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="49152">
@@ -1908,9 +1922,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="spacduel">
-		<description>Space Duel (PAL, Homebrew)</description>
+		<description>Space Duel (PAL)</description>
 		<year>2007</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="32768">
@@ -1920,9 +1935,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="spaceinvu" cloneof="spaceinv">
-		<description>Space Invader (NTSC, Homebrew)</description>
+		<description>Space Invader (NTSC)</description>
 		<year>2008</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="16384">
@@ -1932,9 +1948,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="spaceinv">
-		<description>Space Invader (PAL, Homebrew)</description>
+		<description>Space Invader (PAL)</description>
 		<year>2008</year>
-		<publisher>Bob DeCrescenzo</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="16384">
@@ -1944,9 +1961,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="starwarsu" cloneof="starwars">
-		<description>Star Wars 7800 (NTSC, Homebrew, Hack)</description>
+		<description>Star Wars 7800 (NTSC, Hack)</description>
 		<year>2007</year>
-		<publisher>Gambler172</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Gambler172" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="32768">
@@ -1956,9 +1974,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars 7800 (PAL, Homebrew, Hack)</description>
+		<description>Star Wars 7800 (PAL, Hack)</description>
 		<year>2007</year>
-		<publisher>Gambler172</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Gambler172" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="32768">
@@ -1967,7 +1986,7 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-	<software name="summerg">
+	<software name="sumgames">
 		<description>Summer Games (NTSC)</description>
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
@@ -2149,9 +2168,10 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="wasp">
-		<description>Wasp (NTSC, Homebrew)</description>
+		<description>Wasp (NTSC)</description>
 		<year>2009</year>
-		<publisher>Mark Ball</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Mark Ball" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<dataarea name="rom" size="32768">
@@ -2174,7 +2194,7 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-	<software name="winterg">
+	<software name="wingames">
 		<description>Winter Games (NTSC)</description>
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>

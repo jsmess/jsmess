@@ -79,7 +79,7 @@
 		</part>
 	</software>
 
-	<software name="jupiter">
+	<software name="jlander">
 		<description>Jupiter Lander (World, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
@@ -156,7 +156,7 @@
 		</part>
 	</software>
 
-	<software name="moleatck">
+	<software name="moleattk">
 		<description>Mole Attack (Jpn, v.01)</description>
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
@@ -215,7 +215,7 @@
 		</part>
 	</software>
 
-	<software name="omegar">
+	<software name="omegrace">
 		<description>Omega Race (Jpn, v.02)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -230,7 +230,7 @@
 		</part>
 	</software>
 
-	<software name="pinball">
+	<software name="pinspec">
 		<description>Pinball Spectacular (World)</description>
 		<year>1983</year>
 		<publisher>Commodore / HAL Laboratory</publisher>

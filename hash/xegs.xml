@@ -25,7 +25,7 @@ Compiled by K1W1
 
 <!-- ROM's that have been dumped from at least 2 independant sources and have the same CRC's, have been marked as "Verified". -->
 
-	<software name="aceaces">
+	<software name="ace">
 		<description>Ace of Aces</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -61,7 +61,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="ballblzr">
+	<software name="ballblaz">
 		<description>Ballblazer</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -73,7 +73,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="brnblstr">
+	<software name="barnblst">
 		<description>Barnyard Blaster</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -184,7 +184,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="drkchmbr">
+	<software name="darkcham">
 		<description>Dark Chambers</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -196,7 +196,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="midntmgc">
+	<software name="midmagic">
 		<description>David's Midnight Magic</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -231,7 +231,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fightnit">
+	<software name="fightn">
 		<description>Fight Night</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -255,7 +255,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fltsim2d" cloneof="flgtsim2">
+	<software name="flgtsim2d" cloneof="flgtsim2">
 		<description>Flight Simulator 2 (Demo Cartridge)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -339,7 +339,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mariobro">
+	<software name="mario">
 		<description>Mario Bros.</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -397,7 +397,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fractlus">
+	<software name="fractal">
 		<description>Rescue on Fractalus!</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -409,7 +409,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="raiders2">
+	<software name="starrai2">
 		<description>Star Raiders II</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -421,7 +421,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="sumrgams">
+	<software name="sumgames">
 		<description>Summer Games</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -445,7 +445,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="ttoppler">
+	<software name="towertop">
 		<description>Tower Toppler (Prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -456,7 +456,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-		<software name="xeno">
+		<software name="xenophob">
 		<description>Xenophobe (Reproduction)</description>
 		<year>2010</year>
 		<publisher>Video 61 / Atari</publisher>

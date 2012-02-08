@@ -8,17 +8,17 @@
 	advbatr - too slow, heavy corruption
 	ah3ts - corruption on select operation, too slow ingame
 	ax101 - reboots over and over
-	batmanrt - hits ram expander?
+	batmanrn - hits ram expander?
 	bcracers - too slow
 	billwlsh - doesn't boot (mode set 0?)
 	bouncers - bad tiles
 	brutal - PCM DMA
 	btlcorps - too slow, bad zooming
 	changer - zoom problem in menu
-	cliff - duplicate?
+	cliffh - duplicate?
 	combracom - doesn't boot (mode set 0)
 	corpse - hits ram expander (but looks fine, then goes wrong? - illegal writes)
-	dexplore - never boots
+	dungexpl - never boots
 	dracula - doesn't boot (but md version is broke too)
 
 
@@ -39,7 +39,7 @@
 	lunar- gfx corruption
 	stellarf - interesting stuff
 	swra - doesn't boot
-	wfortune - same as jeopardy
+	wheelfor - same as jeopardy
 	term - doesn't boot
 	wingcomm - zooming glitches
 	risedrg - hangs mode 0
@@ -138,7 +138,7 @@
 		</part>
 	</software>
 
-	<software name="cliff">
+	<software name="cliffh">
 		<description>Cliffhanger (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -644,7 +644,7 @@
 		</part>
 	</software>
 
-	<software name="wfortune">
+	<software name="wheelfor">
 		<description>Wheel of Fortune (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -738,7 +738,7 @@
 	</software>
 -->
 
-	<software name="spidvskp">
+	<software name="spidking">
 		<!-- Ringcode: CDAC-047100 6 -->
 		<description>The Amazing Spider-Man vs. The Kingpin (USA)</description>
 		<year>1993</year>
@@ -751,7 +751,7 @@
 		</part>
 	</software>
 
-	<software name="batmanrt">
+	<software name="batmanrn">
 		<!-- Ringcode: CDAC-040500 1 -->
 		<description>Batman Returns (USA)</description>
 		<year>1993</year>
@@ -917,7 +917,7 @@
 	</software>
 
 <!--
-	<software name="cliff">
+	<software name="cliffh">
 		<description>Cliffhanger (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -1037,7 +1037,7 @@
 		</part>
 	</software>
 
-	<software name="dmaster2">
+	<software name="dngmstr2">
 		<description>Dungeon Master II - Skullkeep (USA, v1.0)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
@@ -1534,7 +1534,7 @@
 		</part>
 	</software>
 
-	<software name="kamenrid">
+	<software name="kamenrzo">
 		<description>The Masked Rider - Kamen Rider ZO (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1836,7 +1836,7 @@
 		</part>
 	</software>
 
-	<software name="sac4">
+	<software name="segaac4">
 		<!-- Ringcode: SEGA-4126RE2 R1C -->
 		<description>Sega Classics Arcade Collection (USA, 4 in 1)</description>
 		<year>1992</year>
@@ -1848,7 +1848,7 @@
 		</part>
 	</software>
 
-	<software name="sac4a" cloneof="sac4">
+	<software name="segaac4a" cloneof="segaac4">
 		<!-- Ringcode: SEGA4126RE R1D -->
 		<description>Sega Classics Arcade Collection (USA, 4 in 1, Alt)</description>
 		<year>1992</year>
@@ -1860,7 +1860,7 @@
 		</part>
 	</software>
 
-	<software name="sac5">
+	<software name="segaac5">
 		<!-- Ringcode: CDAC-056800 2 -->
 		<description>Sega Classics Arcade Collection (USA, 5 in 1)</description>
 		<year>1992</year>
@@ -2306,7 +2306,7 @@
 		</part>
 	</software>
 <!--
-	<software name="wfortune">
+	<software name="wheelfor">
 		<description>Wheel of Fortune (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -2379,7 +2379,7 @@
 		</part>
 	</software>
 
-	<software name="wc94">
+	<software name="wcup94">
 		<description>World Cup USA 94 (USA)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
@@ -2600,7 +2600,7 @@
 	</software>
 
 	<software name="blackhp" cloneof="blackh">
-		<description>Black Hole Assault (USA, Prototype 1002) [MP3-sourced]</description>
+		<description>Blackhole Assault (USA, Prototype 1002) [MP3-sourced]</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -2633,7 +2633,7 @@
 		</part>
 	</software>
 
-	<software name="csoc94">
+	<software name="champs94">
 		<!-- Ringcode: CDAC-068200 1 -->
 		<description>Championship Soccer '94 (USA)</description>
 		<year>1994</year>
@@ -2681,7 +2681,7 @@
 		</part>
 	</software>
 
-	<software name="dexplore">
+	<software name="dungexpl">
 		<description>Dungeon Explorer (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -2797,7 +2797,7 @@
 
 	<!-- is this different to the 'eu-ntsc' copy -->
 	<software name="lawnmowra" cloneof="lawnmowr">
-		<description>Lawnmower Man (USA)</description>
+		<description>The Lawnmower Man (USA, Alt)</description>
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="T-160015"/>

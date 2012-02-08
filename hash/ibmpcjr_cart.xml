@@ -60,7 +60,7 @@ Fraction Fever (Spinaker)
 		</part>
 	</software>
 
-	<software name="crosfire">
+	<software name="xfire">
 		<description>CrossFire</description>
 		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
@@ -146,7 +146,7 @@ Fraction Fever (Spinaker)
 		</part>
 	</software>
 
-	<software name="rivrraid">
+	<software name="riveraid">
 		<description>River Raid</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>

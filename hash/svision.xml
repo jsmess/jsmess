@@ -54,7 +54,7 @@
 		</part>
 	</software>
 
-	<software name="balloonf">
+	<software name="balonfgt">
 		<description>Balloon Fight (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
@@ -152,7 +152,7 @@
 		</part>
 	</software>
 
-	<software name="chinchkr">
+	<software name="chinesch">
 		<description>Chinese Checkers</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
@@ -294,7 +294,7 @@
 		</part>
 	</software>
 
-	<software name="galactic">
+	<software name="galcrus">
 		<description>Galactic Crusader (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>
@@ -729,7 +729,7 @@
 		</part>
 	</software>
 
-	<software name="suprpang">
+	<software name="spang">
 		<description>Super Pang</description>
 		<year>1992</year>
 		<publisher>Sachen</publisher>
@@ -768,7 +768,7 @@
 		</part>
 	</software>
 
-	<software name="thundrsh">
+	<software name="tshoot">
 		<description>Thunder Shooting</description>
 		<year>1992</year>
 		<publisher>Thin Chen Enterprise</publisher>
@@ -779,7 +779,7 @@
 		</part>
 	</software>
 
-	<software name="treasure">
+	<software name="thunter">
 		<description>Treasure Hunter (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>Watara</publisher>

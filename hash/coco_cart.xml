@@ -498,7 +498,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="doodbug1" cloneof="doodlbug">
+	<software name="doodlbug1" cloneof="doodlbug">
 		<description>Doodle Bug (Alt)</description>
 		<year>1982</year>
 		<publisher>Computerware</publisher>
@@ -509,7 +509,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="doodbug2" cloneof="doodlbug">
+	<software name="doodlbug2" cloneof="doodlbug">
 		<description>Doodle Bug (Alt 1)</description>
 		<year>1982</year>
 		<publisher>Computerware</publisher>
@@ -547,7 +547,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="downlnd1" cloneof="downland">
+	<software name="downland1" cloneof="downland">
 		<description>Down Land v1.0</description>
 		<year>1983</year>
 		<publisher>Tandy</publisher>
@@ -613,7 +613,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="fraction">
+	<software name="fracfevr">
 		<description>Fraction Fever</description>
 		<year>1984</year>
 		<publisher>Tandy</publisher>
@@ -834,7 +834,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="mnstrmaz">
+	<software name="monstrmz">
 		<description>Monster Maze</description>
 		<year>1983</year>
 		<publisher>Tandy</publisher>
@@ -1074,7 +1074,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="silphed1" cloneof="silpheed">
+	<software name="silpheed1" cloneof="silpheed">
 		<description>Silpheed (CoCo 1/2 Version)</description>
 		<year>1988</year>
 		<publisher>Tandy</publisher>
@@ -1448,7 +1448,7 @@ Compiled by K1W1
 	</software>
 
 	<software name="berserk">
-		<description>Beserk</description>
+		<description>Berserk</description>
 		<year>1982</year>
 		<publisher>Dragon Data</publisher>
 		<info name="developer" value="Mark Data Products" />

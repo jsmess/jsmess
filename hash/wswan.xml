@@ -32,7 +32,7 @@
 		</part>
 	</software>
 
-	<software name="bakusoud">
+	<software name="bakusodd">
 		<description>Bakusou Dekotora Densetsu for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Kaga Tech</publisher>
@@ -136,7 +136,7 @@
 		</part>
 	</software>
 
-	<software name="chouanik">
+	<software name="choaniki">
 		<description>Chou Aniki - Otoko no Tamafuda</description>
 		<year>2000</year>
 		<publisher>Bandai</publisher>
@@ -180,7 +180,7 @@
 		</part>
 	</software>
 
-	<software name="denshad2">
+	<software name="dendego2">
 		<description>Densha de Go! 2</description>
 		<year>1999</year>
 		<publisher>CyberFront</publisher>
@@ -194,7 +194,7 @@
 		</part>
 	</software>
 
-	<software name="denshadg">
+	<software name="dendego">
 		<description>Densha de Go!</description>
 		<year>1999</year>
 		<publisher>Taito</publisher>
@@ -399,7 +399,7 @@
 		</part>
 	</software>
 
-	<software name="fprowres">
+	<software name="fireprow">
 		<description>Fire Pro Wrestling for WonderSwan</description>
 		<year>2000</year>
 		<publisher>Kaga Tech</publisher>
@@ -442,7 +442,7 @@
 		</part>
 	</software>
 
-	<software name="gomokuna">
+	<software name="gomokunr">
 		<description>Gomoku Narabe &amp; Reversi - Touryuumon</description>
 		<year>2000</year>
 		<publisher>Sammy</publisher>
@@ -573,7 +573,7 @@
 		</part>
 	</software>
 
-	<software name="kakutobr">
+	<software name="bistrowb">
 		<description>Kakutou Ryouri Densetsu Bistro Recipe - Wonder Battle Hen</description>
 		<year>1999</year>
 		<publisher>Banpresto</publisher>
@@ -688,7 +688,7 @@
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner for WonderSwan</description>
 		<year>2000</year>
 		<publisher>Banpresto</publisher>
@@ -744,7 +744,7 @@
 		</part>
 	</software>
 
-	<software name="makai">
+	<software name="makaimur">
 		<description>Makaimura for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
@@ -870,7 +870,7 @@
 		</part>
 	</software>
 
-	<software name="proyakyu">
+	<software name="moeproyr">
 		<description>Moero!! Pro Yakyuu Rookies</description>
 		<year>2000</year>
 		<publisher>Jaleco</publisher>
@@ -1017,7 +1017,7 @@
 		</part>
 	</software>
 
-	<software name="puyopuyo">
+	<software name="puyopuy2">
 		<description>Puyo Puyo Tsuu</description>
 		<year>1999</year>
 		<publisher>Bandai</publisher>
@@ -1031,7 +1031,7 @@
 		</part>
 	</software>
 
-	<software name="rainbow">
+	<software name="rbisland">
 		<description>Rainbow Islands - Putty's Party</description>
 		<year>2000</year>
 		<publisher>MegaHouse</publisher>
@@ -1105,7 +1105,7 @@
 		</part>
 	</software>
 
-	<software name="srobotws" supported="no"> <!-- freezes -->
+	<software name="srobotc" supported="no"> <!-- freezes -->
 		<description>Super Robot Taisen Compact</description>
 		<year>1999</year>
 		<publisher>Banpresto</publisher>
@@ -1164,7 +1164,7 @@
 	</software>
 
 	<software name="sangoku">
-		<description>San Goku Shi for WonderSwan</description>
+		<description>Sangokushi for WonderSwan</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SWJ-KEX002"/>
@@ -1179,7 +1179,7 @@
 	</software>
 
 	<software name="sangoku2">
-		<description>San Goku Shi II for WonderSwan</description>
+		<description>Sangokushi II for WonderSwan</description>
 		<year>2000</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="SWJ-KEX004"/>
@@ -1294,7 +1294,7 @@
 		</part>
 	</software>
 
-	<software name="shougito">
+	<software name="shogitor">
 		<description>Shougi Touryuumon</description>
 		<year>1999</year>
 		<publisher>Sammy</publisher>
@@ -1420,7 +1420,7 @@
 		</part>
 	</software-->
 
-	<software name="tanjoude">
+	<software name="tanjodeb">
 		<description>Tanjou Debut for WonderSwan</description>
 		<year>2000</year>
 		<publisher>Bandai Visual</publisher>

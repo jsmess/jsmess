@@ -103,7 +103,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
-	<software name="bustamove" cloneof="pbobble">
+	<software name="bam" cloneof="pbobble">
 		<description>Bust-A-Move Pocket (USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
@@ -115,7 +115,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
-	<software name="bustamovep" cloneof="pbobble">
+	<software name="bamp" cloneof="pbobble">
 		<description>Bust-A-Move Pocket (Prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
@@ -1017,7 +1017,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Developer: KID -->
-	<software name="pocklove">
+	<software name="poktlove">
 		<description>Pocket Love if (Jpn)</description>
 		<year>1999</year>
 		<publisher>KID</publisher>
@@ -1449,7 +1449,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Developer: Dyna -->
-	<software name="soreike">
+	<software name="hanadojo">
 		<description>Soreike!! Hanafuda Doujou (Jpn)</description>
 		<year>1999</year>
 		<publisher>Dyna</publisher>

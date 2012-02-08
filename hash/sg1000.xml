@@ -700,7 +700,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="ccharlie">
+	<software name="circusc">
 		<description>Maxi Tuan ~ Circus Charlie (Tw)</description>
 		<year>198?</year>
 		<publisher>Aaronix</publisher>
@@ -713,7 +713,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="ccharliek" cloneof="ccharlie">
+	<software name="circusck" cloneof="circusc">
 		<description>Circus Charlie (Kor)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1261,7 +1261,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="hypersp">
+	<software name="hyperspt">
 		<description>Hyper Sports (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Konami</publisher>
@@ -1274,7 +1274,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="hyperspt" cloneof="hypersp">
+	<software name="hypersptt" cloneof="hyperspt">
 		<description>Hyper Sports (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -1287,7 +1287,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="hyperspk" cloneof="hypersp">
+	<software name="hypersptk" cloneof="hyperspt">
 		<description>Hyper Sports (Kor)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
@@ -1349,7 +1349,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner (Euro, Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega / Brøderbund Software</publisher>
@@ -1362,7 +1362,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="loderunk" cloneof="loderun">
+	<software name="ldrunk" cloneof="ldrun">
 		<!-- Alt Title: Lode Runner I (cart label) -->
 		<description>Lode Runner (Kor)</description>
 		<year>1984?</year>
@@ -1374,7 +1374,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="loderunt" cloneof="loderun">
+	<software name="ldrunt" cloneof="ldrun">
 		<description>Lode Runner (Tw)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
@@ -1502,7 +1502,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="ninjap">
+	<software name="ninjapri">
 		<description>Ninja Princess (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -1515,7 +1515,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="ninjapt" cloneof="ninjap">
+	<software name="ninjaprit" cloneof="ninjapri">
 		<description>Renzhe Gongzhu (Tw)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2041,7 +2041,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="soukoban">
+	<software name="sokoban">
 		<description>Soukoban (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Thinking Rabbit</publisher>
@@ -2054,7 +2054,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="soukobant" cloneof="soukoban">
+	<software name="sokobant" cloneof="sokoban">
 		<description>Soukoban (Tw)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2067,7 +2067,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="soukobank" cloneof="soukoban">
+	<software name="sokobank" cloneof="sokoban">
 		<description>Soukoban (Kor)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2079,7 +2079,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="iq" cloneof="soukoban">
+	<software name="iq" cloneof="sokoban">
 		<description>I.Q. (Kor)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2181,7 +2181,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="starforc">
+	<software name="starfrce">
 		<description>Star Force (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Tehkan</publisher>
@@ -2194,7 +2194,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="starforct" cloneof="starforc">
+	<software name="starfrcet" cloneof="starfrce">
 		 <description>Star Force (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -2207,7 +2207,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="starforcta" cloneof="starforc">
+	<software name="starfrceta" cloneof="starfrce">
 		<description>Star Force (Tw, Alt)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>

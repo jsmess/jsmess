@@ -47,7 +47,7 @@
 	</software>
 
 	<software name="3x3eyes">
-		<description>3 x 3 Eyes - Sanjiyan Hensei (ACD, SCD)(Jpn)</description>
+		<description>3x3 Eyes - Sanjiyan Hensei (ACD, SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<info name="serial" value="HECD4010"/>
@@ -329,8 +329,8 @@
 		</part>
 	</software>
 
-	<software name="battle94">
-		<description>Battlefield '94 in Tokyo Dome (ACD)(Jpn)</description>
+	<software name="sprowr94">
+		<description>Shin Nihon Pro Wrestling Kounin - '94 Battlefield in Tokyo Dome (ACD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Fujicom</publisher>
 		<info name="serial" value="FCCD4001"/>
@@ -359,7 +359,7 @@
 		</part>
 	</software>
 
-	<software name="bikkurim">
+	<software name="bikkurid">
 		<description>Bikkuriman Daijikai (CD)(Jpn)</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
@@ -404,7 +404,7 @@
 		</part>
 	</software>
 
-	<software name="blckhole">
+	<software name="blackh">
 		<description>Black Hole Assault (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>Micronet</publisher>
@@ -898,7 +898,7 @@
 		</part>
 	</software>
 
-	<software name="daisenry">
+	<software name="daisenr2">
 		<description>Daisenryaku II - Campaign Version (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
@@ -1183,7 +1183,7 @@
 		</part>
 	</software>
 
-	<software name="dslayerj" cloneof="dslayer">
+	<software name="dslayedj" cloneof="dslaylh">
 		<description>Dragon Slayer - Eiyuu Densetsu (SCD)(Jpn)</description>
 		<year>1991</year>
 		<publisher>Hudson</publisher>
@@ -1198,7 +1198,7 @@
 		</part>
 	</software>
 
-	<software name="dslayer2">
+	<software name="dslayed2">
 		<description>Dragon Slayer - Eiyuu Densetsu II (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Hudson</publisher>
@@ -1214,7 +1214,7 @@
 	</software>
 
 	<software name="dbz">
-		<description>Dragonball Z - Idainaru Son Gokuu Densetsu (SCD)(Jpn)</description>
+		<description>Dragon Ball Z - Idainaru Son Gokuu Densetsu (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BNCD4001"/>
@@ -1243,7 +1243,7 @@
 		</part>
 	</software>
 
-	<software name="dungmstrj" cloneof="dungmstr">
+	<software name="dngmsterj" cloneof="dngmster">
 		<description>Dungeon Master - Theron's Quest (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -1303,7 +1303,7 @@
 		</part>
 	</software>
 
-	<software name="emerdrgn">
+	<software name="emeraldd">
 		<description>Emerald Dragon (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1318,7 +1318,7 @@
 		</part>
 	</software>
 
-	<software name="emerdrgnt" cloneof="emerdrgn">
+	<software name="emeralddt" cloneof="emeraldd">
 		<description>Emerald Dragon Taikenban (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -1733,8 +1733,8 @@
 		</part>
 	</software>
 
-	<software name="ganchouh">
-		<description>Ganchouhishi - Aoki Ookami to Shiroki Mejika (SCD)(Jpn)</description>
+	<software name="genchohi">
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher> Koei</publisher>
 		<info name="serial" value="KOCD3004"/>
@@ -1748,7 +1748,7 @@
 		</part>
 	</software>
 
-	<software name="garoud2s" cloneof="garoud2">
+	<software name="garou2s" cloneof="garou2">
 		<description>Garou Densetsu II - Aratanaru Tatakai - Sample Disc (ACD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -1761,7 +1761,7 @@
 		</part>
 	</software>
 
-	<software name="garoud2">
+	<software name="garou2">
 		<description>Garou Densetsu II - Aratanaru Tatakai [Imperfect] (ACD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -1776,7 +1776,7 @@
 		</part>
 	</software>
 
-	<software name="garoudsp">
+	<software name="garousp">
 		<description>Garou Densetsu Special (ACD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -2254,7 +2254,7 @@
 		</part>
 	</software>
 
-	<software name="jacknickj" cloneof="jacknick">
+	<software name="nicklausj" cloneof="nicklaus">
 		<description>Jack Nicklaus World Tour Golf (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Victor Entertainment</publisher>
@@ -2389,7 +2389,7 @@
 		</part>
 	</software>
 
-	<software name="shubimn3">
+	<software name="shubibi3">
 		<description>Kaizou Choujin Shubibinman III - Ikai no Princess (CD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>NCS</publisher>
@@ -2419,7 +2419,7 @@
 		</part>
 	</software>
 
-	<software name="kawatsur">
+	<software name="kawanus">
 		<description>Kawa no Nushi Tsuri - Shizenha (CD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Pack-In-Video</publisher>
@@ -2690,7 +2690,7 @@
 		</part>
 	</software>
 
-	<software name="lastarma">
+	<software name="lastarmg">
 		<description>Last Armageddon {BRCD0001-6-0625-R1F} (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Brain Gray</publisher>
@@ -2707,7 +2707,7 @@
 
 	<!-- This is exactly the same as lastarma ?!-->
 	<!--
-	<software name="lastarma1" cloneof="lastarma">
+	<software name="lastarmg1" cloneof="lastarmg">
 		<description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Brain Gray</publisher>
@@ -2723,7 +2723,7 @@
 	</software>
 	-->
 
-	<software name="lastarm2" cloneof="lastarma">
+	<software name="lastarmg2" cloneof="lastarmg">
 		<description>Last Armageddon {BRCD0001-7-0904-R1D} (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Brain Gray</publisher>
@@ -3123,7 +3123,7 @@
 		</part>
 	</software>
 
-	<software name="mastrmon">
+	<software name="masterm">
 		<description>Master of Monsters (CD)(Jpn)</description>
 		<year>1991</year>
 		<publisher>Micro Cabin</publisher>
@@ -3213,7 +3213,7 @@
 		</part>
 	</software>
 
-	<software name="mmagic">
+	<software name="mightmag">
 		<description>Might and Magic (CD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>NEC Avenue</publisher>
@@ -3228,7 +3228,7 @@
 		</part>
 	</software>
 
-	<software name="mmagic3j" cloneof="mmagic3">
+	<software name="mightmg3j" cloneof="mightmg3">
 		<description>Might and Magic III - Isles of Terra (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
@@ -3288,7 +3288,7 @@
 		</part>
 	</software>
 
-	<software name="wboy3j" cloneof="mlair">
+	<software name="mlairj" cloneof="mlair">
 		<description>Monster Lair - Wonderboy III (CD)(Jpn)</description>
 		<year>1989</year>
 		<publisher>Hudson</publisher>
@@ -3303,7 +3303,7 @@
 		</part>
 	</software>
 
-	<software name="monsterm">
+	<software name="monstmkr">
 		<description>Monster Maker - Yami no Ryuukishi (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>NEC Avenue</publisher>
@@ -3393,8 +3393,8 @@
 		</part>
 	</software>
 
-	<software name="dodgebal">
-		<description>Nekketsu Koukou Dodgeballbu Soccer Hen (SCD)(Jpn)</description>
+	<software name="neksoccr">
+		<description>Nekketsu Koukou Dodgeball Bu - Soccer Hen (SCD)(Jpn)</description>
 		<year>1991</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD1005"/>
@@ -3423,7 +3423,7 @@
 		</part>
 	</software>
 
-	<software name="nekketlb">
+	<software name="neklegbb">
 		<description>Nekketsu Legend Baseball (SCD)(Jpn)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
@@ -3483,7 +3483,7 @@
 		</part>
 	</software>
 
-	<software name="nishimur">
+	<software name="nkhokuon">
 		<description>Nishimura Kyoutarou Mystery - Hokutosei no Onna (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Naxat Soft</publisher>
@@ -3513,7 +3513,7 @@
 		</part>
 	</software>
 
-	<software name="nobubf">
+	<software name="nobubufu">
 		<description>Nobunaga no Yabou - Bushou Fuuunroku (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
@@ -3529,7 +3529,7 @@
 	</software>
 
 	<software name="nobuzenk">
-		<description>Nobunaga no Yabou Zenkokuban (SCD)(Jpn)</description>
+		<description>Nobunaga no Yabou - Zenkokuban (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="KOCD3005"/>
@@ -3543,8 +3543,8 @@
 		</part>
 	</software>
 
-	<software name="pachio3">
-		<description>Pachiokun III - Pachisuro Pachinko (SCD)(Jpn)</description>
+	<software name="pachikn3">
+		<description>Pachio-kun III - Pachisuro Pachinko (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CJCD4004"/>
@@ -3558,8 +3558,8 @@
 		</part>
 	</software>
 
-	<software name="pachio">
-		<description>Pachiokun Maboroshi no Densetsu (CD)(Jpn)</description>
+	<software name="pachikun">
+		<description>Pachio-kun Maboroshi no Densetsu (CD)(Jpn)</description>
 		<year>1991</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CJCD1001"/>
@@ -3573,8 +3573,8 @@
 		</part>
 	</software>
 
-	<software name="pachiowu">
-		<description>Pachiokun Warau Uchuu (SCD)(Jpn)</description>
+	<software name="pachikn2">
+		<description>Pachio-kun Warau Uchuu (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="serial" value="CJCD2003"/>
@@ -4147,7 +4147,7 @@
 		</part>
 	</software>
 
-	<software name="rainbow">
+	<software name="rbisland">
 		<description>Rainbow Islands (CD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>NEC Avenue</publisher>
@@ -4687,7 +4687,7 @@
 		</part>
 	</software>
 
-	<software name="shangha2">
+	<software name="shangh2">
 		<description>Shanghai II (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Hudson</publisher>
@@ -4702,7 +4702,7 @@
 		</part>
 	</software>
 
-	<software name="shangha3">
+	<software name="shangh3">
 		<description>Shanghai III - Dragon's Eye (CD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>ASK Kodansha</publisher>
@@ -4788,7 +4788,7 @@
 		</part>
 	</software>
 
-	<software name="shmegamt">
+	<software name="shinmt">
 		<description>Shin Megami Tensei (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>Atlus</publisher>
@@ -4835,9 +4835,9 @@
 
 	<software name="shinsets">
 		<description>Shinsetsu Shiawase Usagi (SCD)(Jpn)</description>
-		<!-- Release Date: 1995-09-30	-->
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="release" value="19950930"/>
 		<info name="usage" value="CD-Rom System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4849,10 +4849,10 @@
 
 	<software name="shinsetf">
 		<description>Shinsetsu Shiawase Usagi F - Yuujiyou Yorimo Aiyoku (SCD)(Jpn)</description>
-		<!-- Release Date: 1997-09-10	-->
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
+		<info name="release" value="19970910"/>
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4863,10 +4863,10 @@
 
 	<software name="shinset2">
 		<description>Shinsetsu Shiawase Usagi II (SCD)(Jpn)</description>
-		<!-- Release Date: 1996-02-25	-->
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="CD-Rom System Card required" />
+		<info name="release" value="19960225"/>
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -4905,7 +4905,7 @@
 		</part>
 	</software>
 
-	<software name="slimewor">
+	<software name="slimew">
 		<description>Slime World (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Micro World</publisher>
@@ -5010,7 +5010,7 @@
 		</part>
 	</software>
 
-	<software name="sorcern">
+	<software name="sorcer">
 		<description>Sorcerian (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
@@ -5070,7 +5070,7 @@
 		</part>
 	</software>
 
-	<software name="spacefan">
+	<software name="spcfzone">
 		<description>Space Fantasy Zone [Prototype][Backup] (CD, SCD)(Jpn)</description>
 		<year>19??</year>
 		<publisher>NEC Avenue</publisher>
@@ -5308,7 +5308,7 @@
 		</part>
 	</software>
 
-	<software name="suprdais">
+	<software name="supdaisn">
 		<description>Super Daisenryaku (CD)(Jpn)</description>
 		<year>1990</year>
 		<publisher>Micro Cabin</publisher>
@@ -5353,7 +5353,7 @@
 		</part>
 	</software>
 
-	<software name="supermj">
+	<software name="supermjt">
 		<description>Super Mahjong Taikai (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -5473,7 +5473,7 @@
 		</part>
 	</software>
 
-	<software name="swordmas">
+	<software name="swordmst">
 		<description>Sword Master (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>Right Stuff</publisher>
@@ -6002,7 +6002,7 @@
 		</part>
 	</software>
 
-	<software name="usyamato">
+	<software name="yamato">
 		<description>Uchuu Senkan Yamato (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Human Entertainment</publisher>
@@ -6280,7 +6280,7 @@
 		</part>
 	</software>
 
-	<software name="wizard5">
+	<software name="wizardr5">
 		<description>Wizardry V - Heart of the Maelstrom (SCD)(Jpn)</description>
 		<year>1992</year>
 		<publisher>Naxat Soft</publisher>
@@ -6518,7 +6518,7 @@
 		</part>
 	</software>
 
-	<software name="zero4cha">
+	<software name="zero4c2">
 		<description>Zero 4 Champ II (SCD)(Jpn)</description>
 		<year>1993</year>
 		<publisher>Media Rings</publisher>
@@ -6593,7 +6593,7 @@
 		</part>
 	</software>
 
-	<software name="beyondsg">
+	<software name="beyshadg">
 		<description>Beyond Shadowgate (SCD)(USA)</description>
 		<year>1993</year>
 		<publisher>ICOM Simulations</publisher>
@@ -6677,7 +6677,7 @@
 		</part>
 	</software>
 
-	<software name="dslayer">
+	<software name="dslaylh">
 		<description>Dragon Slayer - The Legend of Heroes (SCD)(USA)</description>
 		<year>1992</year>
 		<publisher>Falcom</publisher>
@@ -6705,7 +6705,7 @@
 		</part>
 	</software>
 
-	<software name="dungmstr">
+	<software name="dngmster">
 		<description>Dungeon Master - Theron's Quest (SCD)(USA)</description>
 		<year>1993</year>
 		<publisher>FTL Games</publisher>
@@ -6860,7 +6860,7 @@
 		</part>
 	</software>
 
-	<software name="jacknick">
+	<software name="nicklaus">
 		<description>Jack Nicklaus Turbo Golf (CD)(USA)</description>
 		<year>1990</year>
 		<publisher>Accolade</publisher>
@@ -6958,7 +6958,7 @@
 		</part>
 	</software>
 
-	<software name="mmagic3">
+	<software name="mightmg3">
 		<description>Might and Magic III - Isles of Terra (SCD)(USA)</description>
 		<year>1993</year>
 		<publisher>New World Computing</publisher>

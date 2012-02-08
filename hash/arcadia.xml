@@ -770,19 +770,19 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		</part>
 	</software>
 
-	<software name="msgundam">
-		<description>KiDou SenShi Gundamu</description>
+	<software name="gundam">
+		<description>Kidou Senshi Gundam</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="Mobile Soldier Gundam" />
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="msgundam.bin" size="8192" crc="1241f128" sha1="4b07a88b06008ddfc3676983e826e107caf3ba0f" offset="0000" />
+				<rom name="gundam.bin" size="8192" crc="1241f128" sha1="4b07a88b06008ddfc3676983e826e107caf3ba0f" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="msslewar">
+	<software name="misslwar">
 		<description>Missile War</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
@@ -794,7 +794,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		</part>
 	</software>
 
-	<software name="nbblemen">
+	<software name="nibblem">
 		<description>Nibblemen</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
@@ -806,7 +806,7 @@ Rumoured or Unreleased files: - 3D Raceway, Centipede, Fun with Math, Galaga, Ho
 		</part>
 	</software>
 
-	<software name="nbblemena" cloneof="nbblemen">
+	<software name="nibblema" cloneof="nibblem">
 		<description>Nibblemen (Alt)</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>

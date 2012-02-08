@@ -240,7 +240,7 @@
 		</part>
 	</software>
 
-    <software name="amazmaze">
+    <software name="amaze">
 		<description>Amazing Maze</description>
 		<year>198?</year>
 		<publisher>Machine Language Games</publisher>
@@ -335,7 +335,7 @@
 		</part>
 	</software>
 
-    <software name="artilery">
+    <software name="artduel">
 		<description>Artillery Duel (NTSC)</description>
 		<!-- This double ended cartridge also included "Chuck Norris Superkicks". -->
 		<year>1983</year>
@@ -845,7 +845,7 @@
 		</part>
 	</software>
 
-    <software name="suprkick">
+    <software name="chucknor">
 		<description>Chuck Norris Superkicks</description>
 		<!-- This double ended cartridge also included "Artillery". -->
 		<year>1983</year>
@@ -1059,7 +1059,7 @@
 		</part>
 	</software>
 
-    <software name="crossfir">
+    <software name="xfire">
 		<description>Crossfire (NTSC)</description>
 		<year>1981</year>
 		<publisher>Sierra</publisher>
@@ -1072,7 +1072,7 @@
 		</part>
 	</software>
 
-    <software name="crossfirp" cloneof="crossfir">
+    <software name="xfirep" cloneof="xfire">
 		<description>Crossfire (PAL)</description>
 		<year>1981</year>
 		<publisher>Sierra</publisher>
@@ -1180,7 +1180,7 @@
 		</part>
 	</software>
 
-    <software name="demonatp" cloneof="demonatk">
+    <software name="demonatkp" cloneof="demonatk">
 		<description>Demon Attack (PAL)</description>
 		<year>1983</year>
 		<publisher>Tronix</publisher>
@@ -1415,7 +1415,7 @@
 		</part>
 	</software>
 
-	<software name="grdnwars">
+	<software name="gardnwar">
 		<description>Garden Wars (NTSC)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -1428,7 +1428,7 @@
 		</part>
 	</software>
 
-	<software name="gstmanor">
+	<software name="ghostman">
 		<description>Ghost Manor (NTSC)</description>
 		<!-- This double ended cartridge also included "Spikes Peak". -->
 		<year>1983</year>
@@ -1480,7 +1480,7 @@
 		</part>
 	</software>
 
-	<software name="gridrunp" cloneof="gridrunr">
+	<software name="gridrunrp" cloneof="gridrunr">
 		<description>Gridrunner (PAL)</description>
 		<year>1982</year>
 		<publisher>HES</publisher>
@@ -1628,7 +1628,7 @@
 		</part>
 	</software>
 
-	<software name="jawbrk2">
+	<software name="jawbrek2">
 		<description>Jawbreaker II (NTSC)</description>
 		<year>1981</year>
 		<publisher>Sierra</publisher>
@@ -1641,7 +1641,7 @@
 		</part>
 	</software>
 
-	<software name="jawbrk2p" cloneof="jawbrk2">
+	<software name="jawbrek2p" cloneof="jawbrek2">
 		<description>Jawbreaker II (PAL)</description>
 		<year>1981</year>
 		<publisher>Sierra</publisher>
@@ -1680,7 +1680,7 @@
 		</part>
 	</software>
 
-	<software name="jnglhunt">
+	<software name="jungleh">
 		<description>Jungle Hunt (NTSC)</description>
 		<year>1984</year>
 		<publisher>Atarisoft</publisher>
@@ -1798,7 +1798,7 @@
 		</part>
 	</software>
 
-	<software name="loderunr">
+	<software name="ldrun">
 		<description>Lode Runner</description>
 		<year>1983</year>
 		<publisher>Brøderbund</publisher>
@@ -1928,7 +1928,7 @@
 	</software>
 
 	<software name="mine2049">
-		<description>Miner 2049'er (PAL)</description>
+		<description>Miner 2049er (PAL)</description>
 		<year>1983</year>
 		<publisher>Reston</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1939,8 +1939,8 @@
 		</part>
 	</software>
 
-	<software name="min2049a" cloneof="mine2049">
-		<description>Miner 2049'er (PAL, Alt)</description>
+	<software name="mine2049a" cloneof="mine2049">
+		<description>Miner 2049er (PAL, Alt)</description>
 		<year>1983</year>
 		<publisher>Reston</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1965,7 +1965,7 @@
 		</part>
 	</software>
 
-	<software name="moleatak">
+	<software name="moleattk">
 		<description>Mole Attack (NTSC)</description>
 		<year>1981</year>
 		<publisher>Commodore</publisher>
@@ -1991,7 +1991,7 @@
 		</part>
 	</software>
 
-	<software name="monywar1" cloneof="moneywar">
+	<software name="moneywar1" cloneof="moneywar">
 		<description>Money Wars (NTSC, Alt)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -2006,7 +2006,7 @@
 		</part>
 	</software>
 
-	<software name="monywar2" cloneof="moneywar">
+	<software name="moneywar2" cloneof="moneywar">
 		<description>Money Wars (NTSC, Alt 2)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -2034,7 +2034,7 @@
 		</part>
 	</software>
 
-	<software name="moonptrl">
+	<software name="mpatrol">
 		<description>Moon Patrol (NTSC)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
@@ -2063,7 +2063,7 @@
 		</part>
 	</software>
 
-	<software name="motoracr">
+	<software name="mtcracer">
 		<description>Motocross Racer (NTSC)</description>
 		<!-- This double ended cartridge also included "Tomarc the Barbarian". -->
 		<year>1984</year>
@@ -2077,7 +2077,7 @@
 		</part>
 	</software>
 
-	<software name="mntnking">
+	<software name="mking">
 		<description>Mountain King (NTSC)</description>
 		<year>1983</year>
 		<publisher>Beyond</publisher>
@@ -2121,7 +2121,7 @@
 		</part>
 	</software>
 
-	<software name="nmbrcrnc">
+	<software name="numbrcrn">
 		<description>Number Crunch (NTSC)</description>
 		<year>1982</year>
 		<publisher>Spectravideo</publisher>
@@ -2134,7 +2134,7 @@
 		</part>
 	</software>
 
-	<software name="nmbrnab">
+	<software name="numbrnab">
 		<description>Number Nabber &amp; Shape Grabber (NTSC)</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -2214,7 +2214,7 @@
 		</part>
 	</software>
 
-	<software name="persfin">
+	<software name="finance">
 		<description>Personal Finance</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -2339,7 +2339,7 @@
 		</part>
 	</software>
 
-	<software name="poleposn">
+	<software name="polepos">
 		<description>Pole Position</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
@@ -2500,7 +2500,7 @@
 		</part>
 	</software>
 
-	<software name="robnhood">
+	<software name="robinh">
 		<description>Robin Hood (NTSC)</description>
 		<!-- This double ended cartridge also included "Sir Lancelot". -->
 		<year>1983</year>
@@ -2675,7 +2675,7 @@
 		</part>
 	</software>
 
-	<software name="serpent">
+	<software name="serptine">
 		<description>Serpentine (NTSC)</description>
 		<year>1982</year>
 		<publisher>Creative</publisher>
@@ -2688,7 +2688,7 @@
 		</part>
 	</software>
 
-	<software name="serpentp" cloneof="serpent">
+	<software name="serptinep" cloneof="serptine">
 		<description>Serpentine (PAL)</description>
 		<year>1982</year>
 		<publisher>Creative</publisher>
@@ -2715,7 +2715,7 @@
 		</part>
 	</software>
 
-	<software name="sirlance">
+	<software name="lancelot">
 		<description>Sir Lancelot (NTSC)</description>
 		<!-- This double ended cartridge also included "Robin Hood". -->
 		<year>1983</year>
@@ -2850,7 +2850,7 @@
 		</part>
 	</software>
 
-	<software name="spider">
+	<software name="spidcity">
 		<description>Spider City (NTSC)</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
@@ -2863,7 +2863,7 @@
 		</part>
 	</software>
 
-	<software name="spider1" cloneof="spider">
+	<software name="spidcity1" cloneof="spidcity">
 		<description>Spider City (NTSC, Alt)</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
@@ -2878,7 +2878,7 @@
 		</part>
 	</software>
 
-	<software name="spidrmrs">
+	<software name="spidmars">
 		<description>Spider of Mars (NTSC)</description>
 		<year>1982</year>
 		<publisher>UMI</publisher>
@@ -2891,7 +2891,7 @@
 		</part>
 	</software>
 
-	<software name="spidrmrsp" cloneof="spidrmrs">
+	<software name="spidmarsp" cloneof="spidmars">
 		<description>Spider of Mars (PAL)</description>
 		<year>1982</year>
 		<publisher>UMI</publisher>
@@ -2950,7 +2950,7 @@
 		</part>
 	</software>
 
-	<software name="squish">
+	<software name="squishem">
 		<description>Squish 'em (NTSC)</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
@@ -3034,7 +3034,7 @@
 		</part>
 	</software>
 
-	<software name="subcmndr">
+	<software name="subcomm">
 		<description>Sub Commander</description>
 		<year>1982</year>
 		<publisher>Thorn EMI</publisher>
@@ -3213,7 +3213,7 @@
 		</part>
 	</software>
 
-	<software name="thresh">
+	<software name="threshld">
 		<description>Threshold (NTSC)</description>
 		<year>1981</year>
 		<publisher>Sierra</publisher>
@@ -3345,7 +3345,7 @@
 		</part>
 	</software>
 
-	<software name="tutank">
+	<software name="tutankhm">
 		<description>Tutankham</description>
 		<year>198?</year>
 		<publisher>Parker Brothers</publisher>

@@ -445,7 +445,7 @@
 		</part>
 	</software>
 
-	<software name="pugsleyu" cloneof="pugsley">
+	<software name="pugshuntu" cloneof="pugshunt">
 		<description>The Addams Family - Pugsley's Scavenger Hunt (USA)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
@@ -463,7 +463,7 @@
 		</part>
 	</software>
 
-	<software name="pugsley">
+	<software name="pugshunt">
 		<description>The Addams Family - Pugsley's Scavenger Hunt (Euro)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
@@ -861,7 +861,7 @@
 		</part>
 	</software>
 
-	<software name="rockbull">
+	<software name="rockybw">
 		<description>The Adventures of Rocky and Bullwinkle and Friends (USA)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
@@ -1048,7 +1048,7 @@
 		</part>
 	</software>
 
-	<software name="akagawaj">
+	<software name="akagawa">
 		<description>Akagawa Jirou no Yuurei Ressha (Jpn)</description>
 		<year>1991</year>
 		<publisher>King Records</publisher>
@@ -1089,7 +1089,7 @@
 		</part>
 	</software>
 
-	<software name="akumasho" cloneof="uninvitd">
+	<software name="akumasho" cloneof="uninvite">
 		<description>Akuma no Shoutaijou (Jpn)</description>
 		<year>1989</year>
 		<publisher>Kemco</publisher>
@@ -1149,7 +1149,7 @@
 		</part>
 	</software>
 
-	<software name="akumadra" cloneof="cvania">
+	<software name="akumajo" cloneof="cvania">
 		<description>Akumajou Dracula (Jpn)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -1245,7 +1245,7 @@
 		</part>
 	</software>
 
-	<software name="asyndrom" supported="no">
+	<software name="aliensyn" supported="no">
 		<description>Alien Syndrome (USA)</description>
 		<year>1989</year>
 		<publisher>Tengen</publisher>
@@ -1390,7 +1390,7 @@
 		</part>
 	</software>
 
-	<software name="amerquiz">
+	<software name="amoudan">
 		<description>America Oudan Ultra Quiz - Shijou Saidai no Tatakai (Jpn)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
@@ -1447,7 +1447,7 @@
 		</part>
 	</software>
 
-	<software name="amgladtr">
+	<software name="amerglad">
 		<description>American Gladiators (USA)</description>
 		<year>1991</year>
 		<publisher>GameTek</publisher>
@@ -1604,7 +1604,7 @@
 		</part>
 	</software>
 
-	<software name="archrvlsu" cloneof="archrvls">
+	<software name="archrivlu" cloneof="archrivl">
 		<description>Arch Rivals - A Basketbrawl! (USA)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -1621,7 +1621,7 @@
 		</part>
 	</software>
 
-	<software name="archrvls">
+	<software name="archrivl">
 		<description>Arch Rivals - A Basketbrawl! (Euro)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -2616,7 +2616,7 @@
 		</part>
 	</software>
 
-	<software name="bardtalej" cloneof="bardtale">
+	<software name="brdtalej" cloneof="brdtale">
 		<description>The Bard's Tale - Tales of the Unknown (Jpn)</description>
 		<year>1990</year>
 		<publisher>Pony Canyon</publisher>
@@ -2638,7 +2638,7 @@
 		</part>
 	</software>
 
-	<software name="bardtale">
+	<software name="brdtale">
 		<description>The Bard's Tale (USA)</description>
 		<year>1991</year>
 		<publisher>FCI</publisher>
@@ -2659,7 +2659,7 @@
 		</part>
 	</software>
 
-	<software name="bardtal2">
+	<software name="brdtale2">
 		<description>The Bard's Tale II - The Destiny Knight (Jpn)</description>
 		<year>1992</year>
 		<publisher>Pony Canyon</publisher>
@@ -3473,7 +3473,7 @@
 		</part>
 	</software>
 
-	<software name="derbstal">
+	<software name="dstall">
 		<description>Best Keiba - Derby Stallion (Jpn, Rev. A)</description>
 		<year>1991</year>
 		<publisher>ASCII</publisher>
@@ -3644,7 +3644,7 @@
 		</part>
 	</software>
 
-	<software name="bibladvd" cloneof="bibladv">
+	<software name="bibleadvd" cloneof="bibleadv">
 		<description>Bible Adventures (USA)</description>
 		<year>1991</year>
 		<publisher>Wisdom Tree</publisher>
@@ -3661,7 +3661,7 @@
 		</part>
 	</software>
 
-	<software name="bibladvc" cloneof="bibladv">
+	<software name="bibleadvc" cloneof="bibleadv">
 		<description>Bible Adventures (USA, v1.1)</description>
 		<year>1991</year>
 		<publisher>Wisdom Tree</publisher>
@@ -3678,7 +3678,7 @@
 		</part>
 	</software>
 
-	<software name="bibladvb" cloneof="bibladv">
+	<software name="bibleadvb" cloneof="bibleadv">
 		<description>Bible Adventures (USA, v1.2)</description>
 		<year>1991</year>
 		<publisher>Wisdom Tree</publisher>
@@ -3695,7 +3695,7 @@
 		</part>
 	</software>
 
-	<software name="bibladva" cloneof="bibladv">
+	<software name="bibleadva" cloneof="bibleadv">
 		<description>Bible Adventures (USA, v1.3)</description>
 		<year>1991</year>
 		<publisher>Wisdom Tree</publisher>
@@ -3712,7 +3712,7 @@
 		</part>
 	</software>
 
-	<software name="bibladv">
+	<software name="bibleadv">
 		<description>Bible Adventures (USA, v1.4)</description>
 		<year>1991</year>
 		<publisher>Wisdom Tree</publisher>
@@ -3858,7 +3858,7 @@
 		</part>
 	</software>
 
-	<software name="btexcadv">
+	<software name="billted">
 		<description>Bill &amp; Ted's Excellent Video Game Adventure (USA)</description>
 		<year>1991</year>
 		<publisher>LJN</publisher>
@@ -4337,7 +4337,7 @@
 		</part>
 	</software>
 
-	<software name="bombrmanj" cloneof="bombrman">
+	<software name="bombmanj" cloneof="bombman">
 		<description>Bomberman (Jpn)</description>
 		<year>1985</year>
 		<publisher>Hudson Soft</publisher>
@@ -4357,7 +4357,7 @@
 		</part>
 	</software>
 
-	<software name="bombrman">
+	<software name="bombman">
 		<description>Bomberman (USA)</description>
 		<year>1989</year>
 		<publisher>Hudson Soft</publisher>
@@ -4376,7 +4376,7 @@
 		</part>
 	</software>
 
-	<software name="bombrmn2j" cloneof="dynabl">
+	<software name="bombman2j" cloneof="dynablas">
 		<description>Bomberman II (Jpn)</description>
 		<year>1991</year>
 		<publisher>Hudson Soft</publisher>
@@ -4398,7 +4398,7 @@
 		</part>
 	</software>
 
-	<software name="bombrmn2" cloneof="dynabl">
+	<software name="bombman2" cloneof="dynablas">
 		<description>Bomberman II (USA)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
@@ -4419,7 +4419,7 @@
 		</part>
 	</software>
 
-	<software name="bonkadv">
+	<software name="bonk">
 		<description>Bonk's Adventure (USA)</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
@@ -4622,7 +4622,7 @@
 		</part>
 	</software>
 
-	<software name="brekthru">
+	<software name="breaktru">
 		<description>BreakThru (USA)</description>
 		<year>1987</year>
 		<publisher>Data East</publisher>
@@ -5331,7 +5331,7 @@
 		</part>
 	</software>
 
-	<software name="castlexc" cloneof="castlqst">
+	<software name="castlex" cloneof="castlqst">
 		<description>Castle Excellent (Jpn)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
@@ -5689,7 +5689,7 @@
 		</part>
 	</software>
 
-	<software name="champral">
+	<software name="chrally">
 		<description>Championship Rally (Euro)</description>
 		<year>1991</year>
 		<publisher>HAL Laboratory</publisher>
@@ -6262,7 +6262,7 @@
 		</part>
 	</software>
 
-	<software name="cliffhgr">
+	<software name="cliffh">
 		<description>Cliffhanger (USA)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -6939,7 +6939,7 @@
 		</part>
 	</software>
 
-	<software name="daikojid" cloneof="unchartd" supported="no">
+	<software name="daikokai" cloneof="unchartd" supported="no">
 		<description>Daikoukai Jidai (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -6966,7 +6966,7 @@
 		</part>
 	</software>
 
-	<software name="daigensn" cloneof="hammerh">
+	<software name="daigensn" cloneof="hharry">
 		<description>Daiku no Gen-san (Jpn)</description>
 		<year>1991</year>
 		<publisher>Irem</publisher>
@@ -7506,7 +7506,7 @@
 		</part>
 	</software>
 
-	<software name="derbstlz">
+	<software name="dstallz">
 		<description>Derby Stallion - Zenkokuban (Jpn)</description>
 		<year>1992</year>
 		<publisher>ASCII</publisher>
@@ -7929,7 +7929,7 @@
 		</part>
 	</software>
 
-	<software name="donaldck" cloneof="snoopy">
+	<software name="donaldd" cloneof="snoopy">
 		<description>Donald Duck (Jpn)</description>
 		<year>1988</year>
 		<publisher>Kemco</publisher>
@@ -8630,7 +8630,7 @@
 		</part>
 	</software>
 
-	<software name="dball1" cloneof="dball">
+	<software name="dballa" cloneof="dball">
 		<description>Dragon Ball - Le Secret du Dragon (Euro)</description>
 		<year>1990</year>
 		<publisher>Bandai</publisher>
@@ -8774,7 +8774,7 @@
 		</part>
 	</software>
 
-	<software name="dballdmf">
+	<software name="dball2">
 		<description>Dragon Ball - Dai Maou Fukkatsu (Jpn)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
@@ -9444,7 +9444,7 @@
 	</software>
 
 	<software name="ducktaleu" cloneof="ducktale">
-		<description>Disney's DuckTales (USA)</description>
+		<description>DuckTales (USA)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-UK-USA"/>
@@ -9469,7 +9469,7 @@
 	</software>
 
 	<software name="ducktale">
-		<description>Disney's DuckTales (Euro)</description>
+		<description>DuckTales (Euro)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-UK (EEC/FRG/SCN/NOE)"/>
@@ -9582,7 +9582,7 @@
 		</part>
 	</software>
 
-	<software name="dynabl">
+	<software name="dynablas">
 		<description>Dynablaster (Euro)</description>
 		<year>1991</year>
 		<publisher>Hudson Soft</publisher>
@@ -11891,7 +11891,7 @@
 		</part>
 	</software>
 
-	<software name="flydragn">
+	<software name="flyindrg">
 		<description>Flying Dragon - The Secret Scroll (USA)</description>
 		<year>1989</year>
 		<publisher>Culture Brain</publisher>
@@ -12799,7 +12799,7 @@
 		</part>
 	</software>
 
-	<software name="foremanu" cloneof="foreman">
+	<software name="georgekou" cloneof="georgeko">
 		<description>George Foreman's KO Boxing (USA)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -12816,7 +12816,7 @@
 		</part>
 	</software>
 
-	<software name="foreman">
+	<software name="georgeko">
 		<description>George Foreman's KO Boxing (Euro)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -12935,7 +12935,7 @@
 	</software>
 
 	<software name="gngu" cloneof="gng">
-		<description>Ghosts 'n Goblins (USA)</description>
+		<description>Ghosts'n Goblins (USA)</description>
 		<year>1986</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-GG-USA"/>
@@ -12961,11 +12961,12 @@
 	</software>
 
 	<software name="gng">
-		<description>Ghost 'n Goblins (Euro)</description>
+		<description>Ghosts'n Goblins (Euro)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-GG (FRG/EEC)"/>
 		<info name="release" value="19910425"/>
+		<info name="alt_title" value="Ghost 'n Goblins (box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
@@ -13957,7 +13958,7 @@
 	</software>
 
 	<software name="gunhed">
-		<description>Gun Hed - Arutanaru Tatakai (Jpn)</description>
+		<description>GunHed - Arutanaru Tatakai (Jpn)</description>
 		<year>1990</year>
 		<publisher>Varie</publisher>
 		<info name="serial" value="VRE-R3"/>
@@ -14149,7 +14150,7 @@
 		</part>
 	</software>
 
-	<software name="hammerh">
+	<software name="hharry">
 		<description>Hammerin' Harry (Euro)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
@@ -14185,7 +14186,7 @@
 		</part>
 	</software>
 
-	<software name="hanjukuh">
+	<software name="hanjuher">
 		<description>Hanjuku Hero (Jpn)</description>
 		<year>1988</year>
 		<publisher>Square</publisher>
@@ -14745,7 +14746,7 @@
 		</part>
 	</software>
 
-	<software name="hiryuken" cloneof="flydragn">
+	<software name="hiryuken" cloneof="flyindrg">
 		<description>Hiryuu no Ken - Ougi no Sho (Jpn)</description>
 		<year>1987</year>
 		<publisher>Culture Brain</publisher>
@@ -15318,7 +15319,7 @@
 		</part>
 	</software>
 
-	<software name="hudsonu" cloneof="hudson" supported="no">
+	<software name="hudsonhu" cloneof="hudsonh" supported="no">
 		<description>Hudson Hawk (USA)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -15336,7 +15337,7 @@
 		</part>
 	</software>
 
-	<software name="hudson">
+	<software name="hudsonh">
 		<description>Hudson Hawk (Euro)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
@@ -15941,7 +15942,7 @@
 		</part>
 	</software>
 
-	<software name="incredu" cloneof="incred">
+	<software name="crashdumu" cloneof="crashdum">
 		<description>The Incredible Crash Dummies (USA)</description>
 		<year>1994</year>
 		<publisher>LJN</publisher>
@@ -15958,7 +15959,7 @@
 		</part>
 	</software>
 
-	<software name="incred">
+	<software name="crashdum">
 		<description>The Incredible Crash Dummies (Euro)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
@@ -15976,7 +15977,7 @@
 		</part>
 	</software>
 
-	<software name="indylct">
+	<software name="indycrst">
 		<description>Indiana Jones and the Last Crusade (USA, Taito)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -15994,7 +15995,7 @@
 		</part>
 	</software>
 
-	<software name="indylcu" cloneof="indylc">
+	<software name="indycrusu" cloneof="indycrus">
 		<description>Indiana Jones and the Last Crusade (USA, UBI Soft)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
@@ -16081,7 +16082,7 @@
 		</part>
 	</software>
 
-	<software name="indylc">
+	<software name="indycrus">
 		<description>Indiana Jones and the Last Crusade (Euro)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
@@ -16382,7 +16383,7 @@
 		</part>
 	</software>
 
-	<software name="jlwinnin">
+	<software name="jlwingol">
 		<description>J.League Winning Goal (Jpn)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -16758,7 +16759,7 @@
 		</part>
 	</software>
 
-	<software name="jetsonu" cloneof="jetson">
+	<software name="jetsonsu" cloneof="jetsons">
 		<description>The Jetsons - Cogswell's Caper (USA)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -16776,7 +16777,7 @@
 		</part>
 	</software>
 
-	<software name="jetson">
+	<software name="jetsons">
 		<description>The Jetsons - Cogswell's Caper (Euro)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
@@ -16884,7 +16885,7 @@
 		</part>
 	</software>
 
-	<software name="elwayqb">
+	<software name="jelwayqb">
 		<description>John Elway's Quarterback (USA)</description>
 		<year>1989</year>
 		<publisher>Tradewest</publisher>
@@ -16921,7 +16922,7 @@
 		</part>
 	</software>
 
-	<software name="jordbird" supported="partial">
+	<software name="jordanb" supported="partial">
 		<description>Jordan vs. Bird - One on One (USA)</description>
 		<year>1989</year>
 		<publisher>Milton Bradley</publisher>
@@ -17904,7 +17905,7 @@
 		</part>
 	</software>
 
-	<software name="kszgundm">
+	<software name="zgundam">
 		<description>Kidou Senshi Z Gundam - Hot Scramble (Jpn)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -18448,7 +18449,7 @@
 		</part>
 	</software>
 
-	<software name="ksseul" cloneof="trackfl2">
+	<software name="konseul" cloneof="trackfl2">
 		<description>Konamic Sports in Seoul (Jpn)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
@@ -18467,7 +18468,7 @@
 		</part>
 	</software>
 
-	<software name="koushien">
+	<software name="koshien">
 		<description>Koushien (Jpn)</description>
 		<year>1989</year>
 		<publisher>KAC</publisher>
@@ -19039,7 +19040,7 @@
 		</part>
 	</software>
 
-	<software name="lastsfgt" supported="no">
+	<software name="laststar" supported="no">
 		<description>The Last Starfighter (USA)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
@@ -19626,7 +19627,7 @@
 		</part>
 	</software>
 
-	<software name="loderunj" cloneof="loderun">
+	<software name="ldrunj" cloneof="ldrun">
 		<description>Lode Runner (Jpn)</description>
 		<year>1984</year>
 		<publisher>Hudson Soft</publisher>
@@ -19646,7 +19647,7 @@
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner (USA)</description>
 		<year>1987</year>
 		<publisher>Brøderbund</publisher>
@@ -20060,7 +20061,7 @@
 	</software>
 
 	<software name="magmaxj" cloneof="magmax">
-		<description>Mag Max (Jpn)</description>
+		<description>MagMax (Jpn)</description>
 		<year>1986</year>
 		<publisher>Nihon Bussan</publisher>
 		<info name="serial" value="NBF-MM (01)"/>
@@ -20170,7 +20171,7 @@
 		</part>
 	</software>
 
-	<software name="mtaruto2">
+	<software name="mtaruru2">
 		<description>Magical Taruruuto-kun 2 - Mahou Daibouken (Jpn)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
@@ -20188,7 +20189,7 @@
 		</part>
 	</software>
 
-	<software name="mtarutoa" cloneof="mtaruto">
+	<software name="mtarurua" cloneof="mtaruru">
 		<description>Magical Taruruuto-kun - Fantastic World!! (Jpn)</description>
 		<year>1991</year>
 		<publisher>Bandai</publisher>
@@ -20206,7 +20207,7 @@
 		</part>
 	</software>
 
-	<software name="mtaruto">
+	<software name="mtaruru">
 		<description>Magical Taruruuto-kun - Fantastic World!! (Jpn, v2.0)</description>
 		<year>1991</year>
 		<publisher>Bandai</publisher>
@@ -20267,7 +20268,7 @@
 	</software>
 
 	<software name="magmax">
-		<description>Magmax (USA)</description>
+		<description>MagMax (USA)</description>
 		<year>1988</year>
 		<publisher>FCI</publisher>
 		<info name="serial" value="NES-MM-USA"/>
@@ -20865,7 +20866,7 @@
 	</software>
 
 	<software name="mariomisu" cloneof="mariomis">
-		<description>Mario Is Missing! (USA)</description>
+		<description>Mario is Missing! (USA)</description>
 		<year>1993</year>
 		<publisher>The Software Toolworks</publisher>
 		<info name="serial" value="NES-MQ-USA"/>
@@ -21930,7 +21931,7 @@
 		</part>
 	</software>
 
-	<software name="innersanj" cloneof="innersan">
+	<software name="mightmagj" cloneof="mightmag">
 		<description>Might and Magic - Book One - Secret of the Inner Sanctum (Jpn)</description>
 		<year>1990</year>
 		<publisher>Gakken</publisher>
@@ -21952,7 +21953,7 @@
 		</part>
 	</software>
 
-	<software name="innersan">
+	<software name="mightmag">
 		<description>Might and Magic - Secret of the Inner Sanctum (USA)</description>
 		<year>1992</year>
 		<publisher>American Sammy</publisher>
@@ -22361,7 +22362,7 @@
 		</part>
 	</software>
 
-	<software name="misimposu" cloneof="misimpos">
+	<software name="missimpu" cloneof="missimp">
 		<description>Mission - Impossible (USA)</description>
 		<year>1990</year>
 		<publisher>Ultra Games</publisher>
@@ -22379,7 +22380,7 @@
 		</part>
 	</software>
 
-	<software name="misimposf" cloneof="misimpos">
+	<software name="missimpf" cloneof="missimp">
 		<description>Mission - Impossible (Fra)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
@@ -22397,7 +22398,7 @@
 		</part>
 	</software>
 
-	<software name="misimpos">
+	<software name="missimp">
 		<description>Mission - Impossible (Euro)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
@@ -22682,7 +22683,7 @@
 		</part>
 	</software>
 
-	<software name="momodens">
+	<software name="momo">
 		<description>Momotarou Densetsu - Peach Boy Legend (Jpn)</description>
 		<year>1987</year>
 		<publisher>Hudson Soft</publisher>
@@ -23486,8 +23487,8 @@
 		</part>
 	</software>
 
-	<software name="nkdodge" cloneof="superdbl">
-		<description>Nekketsu Koukou Dodgeball-bu (Jpn)</description>
+	<software name="nekdodge" cloneof="sdodgeb">
+		<description>Nekketsu Koukou Dodgeball Bu (Jpn)</description>
 		<year>1988</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="TJC-ND"/>
@@ -23505,8 +23506,8 @@
 		</part>
 	</software>
 
-	<software name="nksoccer" cloneof="nintenwc">
-		<description>Nekketsu Koukou Dodgeball-bu - Soccer-hen (Jpn)</description>
+	<software name="neksoccr" cloneof="nintenwc">
+		<description>Nekketsu Koukou Dodgeball Bu - Soccer-hen (Jpn)</description>
 		<year>1990</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="TJC-N3"/>
@@ -24132,7 +24133,7 @@
 		</part>
 	</software>
 
-	<software name="nobubf" supported="no">
+	<software name="nobubufu" supported="no">
 		<description>Nobunaga no Yabou - Bushou Fuuunroku (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -24156,7 +24157,7 @@
 		</part>
 	</software>
 
-	<software name="nobusg" cloneof="nobunag2" supported="no">
+	<software name="nobuseng" cloneof="nobuamb2" supported="no">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Jpn)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
@@ -24183,7 +24184,7 @@
 		</part>
 	</software>
 
-	<software name="nobuzenka" cloneof="nobunaga">
+	<software name="nobuzenka" cloneof="nobuamb">
 		<description>Nobunaga no Yabou - Zenkokuban (Jpn)</description>
 		<year>1988</year>
 		<publisher>Koei</publisher>
@@ -24208,7 +24209,7 @@
 		</part>
 	</software>
 
-	<software name="nobunaga">
+	<software name="nobuamb">
 		<description>Nobunaga's Ambition (USA)</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
@@ -24232,7 +24233,7 @@
 		</part>
 	</software>
 
-	<software name="nobunag2" supported="no">
+	<software name="nobuamb2" supported="no">
 		<description>Nobunaga's Ambition II (USA)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -25199,7 +25200,7 @@
 		</part>
 	</software>
 
-	<software name="paperb2u" cloneof="paperb2">
+	<software name="paperbo2u" cloneof="paperbo2">
 		<description>Paperboy 2 (USA)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
@@ -25217,7 +25218,7 @@
 		</part>
 	</software>
 
-	<software name="paperb2">
+	<software name="paperbo2">
 		<description>Paperboy 2 (Euro)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
@@ -25586,7 +25587,7 @@
 		</part>
 	</software>
 
-	<software name="pipedrm">
+	<software name="pipedrem">
 		<description>Pipe Dream (USA)</description>
 		<year>1990</year>
 		<publisher>Bullet-Proof Software</publisher>
@@ -27478,7 +27479,7 @@
 		</part>
 	</software>
 
-	<software name="roadrunr" supported="partial">
+	<software name="roadrunn" supported="partial">
 		<description>Road Runner (USA)</description>
 		<year>1989</year>
 		<publisher>Tengen</publisher>
@@ -27495,7 +27496,7 @@
 	</software>
 
 	<software name="roadblst">
-		<description>Roadblasters (Euro)</description>
+		<description>RoadBlasters (Euro)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-VE-NOE"/>
@@ -27529,7 +27530,7 @@
 		</part>
 	</software>
 
-	<software name="robhoodua" cloneof="robhood">
+	<software name="robinhua" cloneof="robinh">
 		<description>Robin Hood - Prince of Thieves (USA)</description>
 		<year>1991</year>
 		<publisher>Virgin Interactive</publisher>
@@ -27547,7 +27548,7 @@
 		</part>
 	</software>
 
-	<software name="robhoodu" cloneof="robhood">
+	<software name="robinhu" cloneof="robinh">
 		<description>Robin Hood - Prince of Thieves (USA, Rev. A)</description>
 		<year>1991</year>
 		<publisher>Virgin Interactive</publisher>
@@ -27565,7 +27566,7 @@
 		</part>
 	</software>
 
-	<software name="robhoodg" cloneof="robhood">
+	<software name="robinhg" cloneof="robinh">
 		<description>Robin Hood - Prince of Thieves (Ger)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
@@ -27583,7 +27584,7 @@
 		</part>
 	</software>
 
-	<software name="robhood">
+	<software name="robinh">
 		<description>Robin Hood - Prince of Thieves (Euro)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
@@ -27601,7 +27602,7 @@
 		</part>
 	</software>
 
-	<software name="robhoods" cloneof="robhood">
+	<software name="robinhs" cloneof="robinh">
 		<description>Robin Hood - Prince of Thieves (Spa)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
@@ -28039,7 +28040,7 @@
 		</part>
 	</software>
 
-	<software name="rclemens">
+	<software name="mvpbb">
 		<description>Roger Clemens' MVP Baseball (USA)</description>
 		<year>1991</year>
 		<publisher>LJN</publisher>
@@ -28567,7 +28568,7 @@
 		</part>
 	</software>
 
-	<software name="sdgndkma" cloneof="sdgndkm">
+	<software name="kgundama" cloneof="kgundam">
 		<description>SD Gundam Gaiden - Knight Gundam Monogatari (Jpn)</description>
 		<year>1990</year>
 		<publisher>Bandai</publisher>
@@ -28585,7 +28586,7 @@
 		</part>
 	</software>
 
-	<software name="sdgndkm">
+	<software name="kgundam">
 		<description>SD Gundam Gaiden - Knight Gundam Monogatari (Jpn, v2.0)</description>
 		<year>1990</year>
 		<publisher>Bandai</publisher>
@@ -28603,7 +28604,7 @@
 		</part>
 	</software>
 
-	<software name="sdgndkm2">
+	<software name="kgundam2">
 		<description>SD Gundam Gaiden - Knight Gundam Monogatari 2 - Hikari no Kishi (Jpn)</description>
 		<year>1991</year>
 		<publisher>Bandai</publisher>
@@ -28621,7 +28622,7 @@
 		</part>
 	</software>
 
-	<software name="sdgndkm3">
+	<software name="kgundam3">
 		<description>SD Gundam Gaiden - Knight Gundam Monogatari 3 - Densetsu no Kishi Dan (Jpn)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
@@ -28994,7 +28995,7 @@
 		</part>
 	</software>
 
-	<software name="sangok2h" supported="no">
+	<software name="sango2ht" supported="no">
 		<description>Sangokushi II - Haou no Tairiku (Jpn)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -29061,7 +29062,7 @@
 		</part>
 	</software>
 
-	<software name="sanrio">
+	<software name="sanrioc">
 		<description>Sanrio Carnival (Jpn)</description>
 		<year>1990</year>
 		<publisher>Character Soft</publisher>
@@ -29080,7 +29081,7 @@
 		</part>
 	</software>
 
-	<software name="sanrio2">
+	<software name="sanrioc2">
 		<description>Sanrio Carnival 2 (Jpn)</description>
 		<year>1993</year>
 		<publisher>Character Soft</publisher>
@@ -29469,7 +29470,7 @@
 		</part>
 	</software>
 
-	<software name="commandoj" cloneof="commando">
+	<software name="senjokam" cloneof="commando">
 		<description>Senjou no Ookami (Jpn)</description>
 		<year>1986</year>
 		<publisher>Capcom</publisher>
@@ -29653,7 +29654,7 @@
 		</part>
 	</software>
 
-	<software name="shadowgtu" cloneof="shadowgt">
+	<software name="shadgateu" cloneof="shadgate">
 		<description>Shadowgate (USA)</description>
 		<year>1989</year>
 		<publisher>Kemco</publisher>
@@ -29674,7 +29675,7 @@
 		</part>
 	</software>
 
-	<software name="shadowgt">
+	<software name="shadgate">
 		<description>Shadowgate (Euro)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
@@ -29695,7 +29696,7 @@
 		</part>
 	</software>
 
-	<software name="shadowgtf" cloneof="shadowgt">
+	<software name="shadgatef" cloneof="shadgate">
 		<description>Shadowgate (Fra)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
@@ -29716,7 +29717,7 @@
 		</part>
 	</software>
 
-	<software name="shadowgtg" cloneof="shadowgt">
+	<software name="shadgateg" cloneof="shadgate">
 		<description>Shadowgate (Ger)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
@@ -29737,7 +29738,7 @@
 		</part>
 	</software>
 
-	<software name="shadowgtsw" cloneof="shadowgt">
+	<software name="shadgatesw" cloneof="shadgate">
 		<description>Shadowgate (Swe)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
@@ -29777,7 +29778,7 @@
 		</part>
 	</software>
 
-	<software name="shangha2">
+	<software name="shangh2">
 		<description>Shanghai II (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
@@ -30136,7 +30137,7 @@
 		</part>
 	</software>
 
-	<software name="shufflep">
+	<software name="shflpuck">
 		<description>Shufflepuck Cafe (Jpn)</description>
 		<year>1990</year>
 		<publisher>Pony Canyon</publisher>
@@ -31382,7 +31383,7 @@
 		</part>
 	</software>
 
-	<software name="splatter">
+	<software name="splatth">
 		<description>Splatterhouse - Wanpaku Graffiti (Jpn)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
@@ -31752,7 +31753,7 @@
 		</part>
 	</software>
 
-	<software name="starsldrj" cloneof="starsldr">
+	<software name="starsoldj" cloneof="starsold">
 		<description>Star Soldier (Jpn)</description>
 		<year>1986</year>
 		<publisher>Hudson Soft</publisher>
@@ -31771,7 +31772,7 @@
 		</part>
 	</software>
 
-	<software name="starsldr">
+	<software name="starsold">
 		<description>Star Soldier (USA)</description>
 		<year>1989</year>
 		<publisher>Taxan</publisher>
@@ -32412,7 +32413,7 @@
 		</part>
 	</software>
 
-	<software name="superdbl">
+	<software name="sdodgeb">
 		<description>Super Dodge Ball (USA)</description>
 		<year>1989</year>
 		<publisher>CSG Imagesoft</publisher>
@@ -33133,7 +33134,7 @@
 		</part>
 	</software>
 
-	<software name="turrican">
+	<software name="sturric">
 		<description>Super Turrican (Euro)</description>
 		<year>1993</year>
 		<publisher>Imagineering</publisher>
@@ -33413,7 +33414,7 @@
 		</part>
 	</software>
 
-	<software name="t2judgeu" cloneof="t2judge">
+	<software name="term2u" cloneof="term2">
 		<description>T2 - Terminator 2 - Judgment Day (USA)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
@@ -33430,7 +33431,7 @@
 		</part>
 	</software>
 
-	<software name="t2judge">
+	<software name="term2">
 		<description>T2 - Terminator 2 - Judgment Day (Euro)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
@@ -33601,7 +33602,7 @@
 		</part>
 	</software>
 
-	<software name="asteca2" cloneof="tombtres">
+	<software name="asteka2" cloneof="tombtres">
 		<description>Taiyou no Shinden - Asteka II (Jpn)</description>
 		<year>1988</year>
 		<publisher>Tokyo Shoseki</publisher>
@@ -33620,8 +33621,8 @@
 		</part>
 	</software>
 
-	<software name="yuushfig">
-		<description>Taiyou no Yuusha Fighbird (Jpn)</description>
+	<software name="fighbird">
+		<description>Taiyou no Yuusha - Fighbird (Jpn)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
 		<info name="serial" value="TIX-6Q (IF-26)"/>
@@ -33794,11 +33795,12 @@
 	</software>
 
 	<software name="talespinu" cloneof="talespin">
-		<description>Disney's TaleSpin (USA)</description>
+		<description>TaleSpin (USA)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-68-USA"/>
 		<info name="release" value="199112xx"/>
+		<info name="alt_title" value="Disney's TaleSpin (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -33812,11 +33814,12 @@
 	</software>
 
 	<software name="talespin">
-		<description>Disney's TaleSpin (Euro)</description>
+		<description>TaleSpin (Euro)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-68 (FRA/SCN/ESP)"/>
 		<info name="release" value="19920924"/>
+		<info name="alt_title" value="Disney's TaleSpin (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -34223,7 +34226,7 @@
 		</part>
 	</software>
 
-	<software name="tecmowcsj" cloneof="tecmowcs">
+	<software name="tecmowcj" cloneof="tecmowc">
 		<description>Tecmo World Cup Soccer (Jpn)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
@@ -34242,7 +34245,7 @@
 		</part>
 	</software>
 
-	<software name="tecmowcs">
+	<software name="tecmowc">
 		<description>Tecmo World Cup Soccer (Euro)</description>
 		<year>1991</year>
 		<publisher>Tecmo</publisher>
@@ -34950,7 +34953,7 @@
 		</part>
 	</software>
 
-	<software name="thndbirdj" cloneof="thndbird">
+	<software name="tbirdsj" cloneof="tbirds">
 		<description>Thunderbirds (Jpn)</description>
 		<year>1989</year>
 		<publisher>Pack-In-Video</publisher>
@@ -34968,7 +34971,7 @@
 		</part>
 	</software>
 
-	<software name="thndbird">
+	<software name="tbirds">
 		<description>Thunderbirds (USA)</description>
 		<year>1990</year>
 		<publisher>Activision</publisher>
@@ -35227,7 +35230,7 @@
 		</part>
 	</software>
 
-	<software name="ttoonad2j" cloneof="ttoonad2">
+	<software name="ttoon2j" cloneof="ttoon2">
 		<description>Tiny Toon Adventures 2 - Montana Land e Youkoso (Jpn)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
@@ -35246,7 +35249,7 @@
 		</part>
 	</software>
 
-	<software name="ttoonad2u" cloneof="ttoonad2">
+	<software name="ttoon2u" cloneof="ttoon2">
 		<description>Tiny Toon Adventures 2 - Trouble in Wackyland (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -35264,7 +35267,7 @@
 		</part>
 	</software>
 
-	<software name="ttoonad2">
+	<software name="ttoon2">
 		<description>Tiny Toon Adventures 2 - Trouble in Wackyland (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -35846,7 +35849,7 @@
 		</part>
 	</software>
 
-	<software name="tokoclub">
+	<software name="toukoncl">
 		<description>Toukon Club (Jpn)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
@@ -35883,7 +35886,7 @@
 		</part>
 	</software>
 
-	<software name="toxiccrs">
+	<software name="toxicc">
 		<description>Toxic Crusaders (USA)</description>
 		<year>1992</year>
 		<publisher>Bandai</publisher>
@@ -36513,7 +36516,7 @@
 		</part>
 	</software>
 
-	<software name="ultramn2">
+	<software name="ultracl2">
 		<description>Ultraman Club 2 - Kaettekita Ultraman Club (Jpn)</description>
 		<year>1990</year>
 		<publisher>Yutaka</publisher>
@@ -36532,7 +36535,7 @@
 		</part>
 	</software>
 
-	<software name="ultramn3">
+	<software name="ultracl3">
 		<description>Ultraman Club 3 (Jpn)</description>
 		<year>1991</year>
 		<publisher>Yutaka</publisher>
@@ -36554,7 +36557,7 @@
 		</part>
 	</software>
 
-	<software name="ultramn">
+	<software name="ultraclb">
 		<description>Ultraman Club - Kaijuu Dai Kessen!! (Jpn)</description>
 		<year>1992</year>
 		<publisher>Angel</publisher>
@@ -36617,7 +36620,7 @@
 		</part>
 	</software>
 
-	<software name="uninvitd">
+	<software name="uninvite">
 		<description>Uninvited (USA)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
@@ -37171,7 +37174,7 @@
 		</part>
 	</software>
 
-	<software name="wacky">
+	<software name="wackyrac">
 		<description>Wacky Races (USA)</description>
 		<year>1992</year>
 		<publisher>Atlus</publisher>
@@ -37429,7 +37432,7 @@
 		</part>
 	</software>
 
-	<software name="wghockey">
+	<software name="wayneg">
 		<description>Wayne Gretzky Hockey (USA)</description>
 		<year>1991</year>
 		<publisher>T*HQ</publisher>
@@ -37839,7 +37842,7 @@
 		</part>
 	</software>
 
-	<software name="wintrgmsa" cloneof="wintrgms">
+	<software name="wingamesa" cloneof="wingames">
 		<description>Winter Games (USA)</description>
 		<year>1987</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -37857,7 +37860,7 @@
 		</part>
 	</software>
 
-	<software name="wintrgms">
+	<software name="wingames">
 		<description>Winter Games (USA, Rev. A)</description>
 		<year>1987</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -38878,7 +38881,7 @@
 		</part>
 	</software>
 
-	<software name="zenninja">
+	<software name="zen">
 		<description>Zen - Intergalactic Ninja (Euro)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -38895,7 +38898,7 @@
 		</part>
 	</software>
 
-	<software name="zenninjau" cloneof="zenninja">
+	<software name="zenu" cloneof="zen">
 		<description>Zen - Intergalactic Ninja (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
@@ -39498,7 +39501,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="pugsleyp" cloneof="pugsley">
+	<software name="pugshuntp" cloneof="pugshunt">
 		<description>The Addams Family - Pugsley's Scavenger Hunt (Euro, Prototype)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
@@ -39544,7 +39547,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="magickdmup" cloneof="magickdm">
-		<description>Adventures In The Magic Kingdom (USA, Prototype)</description>
+		<description>Disney's Adventures In The Magic Kingdom (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -39559,7 +39562,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="magickdmupo" cloneof="magickdm">
-		<description>Adventures In The Magic Kingdom (USA, Prototype Earlier)</description>
+		<description>Disney's Adventures In The Magic Kingdom (USA, Prototype Earlier)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -39673,7 +39676,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="asyndromj" cloneof="asyndrom">
+	<software name="aliensynj" cloneof="aliensyn">
 		<description>Alien Syndrome (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sunsoft</publisher>
@@ -39692,7 +39695,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="genchohi" supported="no">
-		<description>Aoki Ookami To Shiroki Mejika - Genchou Hishi (Jpn)</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="KOE-G2"/>
@@ -39881,7 +39884,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="bardtalep" cloneof="bardtale">
+	<software name="brdtalep" cloneof="brdtale">
 		<description>The Bard's Tale - Tales of the Unknown (USA, Prototype)</description>
 		<year>1991</year>
 		<publisher>FCI</publisher>
@@ -39896,7 +39899,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="bardtalepa" cloneof="bardtale">
+	<software name="brdtalepa" cloneof="brdtale">
 		<description>The Bard's Tale - Tales of the Unknown (USA, Prototype Alt)</description>
 		<year>1991</year>
 		<publisher>FCI</publisher>
@@ -40038,7 +40041,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="derbstala" cloneof="derbstal">
+	<software name="dstalla" cloneof="dstall">
 		<description>Best Keiba - Derby Stallion (Jpn)</description>
 		<year>1991</year>
 		<publisher>ASCII</publisher>
@@ -40395,7 +40398,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="capsilvr">
+	<software name="captsilv">
 		<description>Captain Silver (Jpn)</description>
 		<year>1988</year>
 		<publisher>Tokuma Shoten</publisher>
@@ -40480,7 +40483,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="chikirac" cloneof="wacky">
+	<software name="chikirac" cloneof="wackyrac">
 		<description>Chiki Chiki Machine Mou Race (Jpn)</description>
 		<year>1991</year>
 		<publisher>Atlus</publisher>
@@ -40529,7 +40532,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="chipndalj" cloneof="chipndal">
-		<description>Chip To Dale no Daisakusen (Jpn)</description>
+		<description>Chip to Dale no Daisakusen (Jpn)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-JD"/>
@@ -40547,7 +40550,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="chipndl2j" cloneof="chipndl2">
-		<description>Chip To Dale no Daisakusen 2 (Jpn)</description>
+		<description>Chip to Dale no Daisakusen 2 (Jpn)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-2D"/>
@@ -40725,7 +40728,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="crossfirj" cloneof="crossfir">
+	<software name="xfirej" cloneof="xfire">
 		<description>Cross Fire (Jpn)</description>
 		<year>1990</year>
 		<publisher>Kyugo Boueki</publisher>
@@ -40743,7 +40746,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="crossfir">
+	<software name="xfire">
 		<description>Cross Fire (USA, Prototype)</description>
 		<year>1990</year>
 		<publisher>Kyugo</publisher>
@@ -40862,7 +40865,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="dtc_cray" supported="partial">
-		<description>Datach - Crayon Shin-Chan - Ora To Poi Poi (Jpn)</description>
+		<description>Datach - Crayon Shin-Chan - Ora to Poi Poi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-CSOPP"/>
@@ -40952,7 +40955,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="dtc_yuyu" supported="partial">
-		<description>Datach - Yuu Yuu Hakusho - Bakutou Ankoku Bujutsu Kai (Jpn)</description>
+		<description>Datach - Yu Yu Hakusho - Bakutou Ankoku Bujutsu Kai (Jpn)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="DATACH-BABK"/>
@@ -41299,7 +41302,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="ducktaleup" cloneof="ducktale">
-		<description>Disney's DuckTales (USA, Prototype)</description>
+		<description>DuckTales (USA, Prototype)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -41450,7 +41453,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="escatlnta" cloneof="escatlnt">
-		<description>The Escape From Atlantis (USA, Prototype Alt)</description>
+		<description>The Escape from Atlantis (USA, Prototype Alt)</description>
 		<year>1990</year>
 		<publisher>Color Dreams</publisher>
 		<part name="cart" interface="nes_cart">
@@ -41482,7 +41485,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="exrally" cloneof="champral">
+	<software name="exrally" cloneof="chrally">
 		<description>Exciting Rally - World Rally Championship (Jpn)</description>
 		<year>1992</year>
 		<publisher>Kakenhi</publisher>
@@ -41712,7 +41715,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="fcgenjin" cloneof="bonkadv">
+	<software name="fcgenjin" cloneof="bonk">
 		<description>FC Genjin - Freakthoropus Computerus (Jpn)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
@@ -42349,7 +42352,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="hudsonj" cloneof="hudson">
+	<software name="hudsonhj" cloneof="hudsonh">
 		<description>Hudson Hawk (Jpn)</description>
 		<year>1991</year>
 		<publisher>Epic / Sony Records</publisher>
@@ -42645,7 +42648,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="jlfgtsoc">
+	<software name="jlfight">
 		<description>J.League Fighting Soccer - The King of Ace Strikers (Jpn)</description>
 		<year>1993</year>
 		<publisher>IGS</publisher>
@@ -42698,7 +42701,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="jetsonj" cloneof="jetson">
+	<software name="jetsonsj" cloneof="jetsons">
 		<description>The Jetsons - Cogswell's Caper! (Jpn)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
@@ -42974,7 +42977,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="kerosplb">
-		<description>Keroppi To Keroriinu no Splash Bomb! (Jpn)</description>
+		<description>Keroppi to Keroriinu no Splash Bomb! (Jpn)</description>
 		<year>1993</year>
 		<publisher>Character Soft</publisher>
 		<info name="serial" value="CTS-SY"/>
@@ -42991,7 +42994,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="kszgundmfv" cloneof="kszgundm">
+	<software name="zgundamfv" cloneof="zgundam">
 		<description>Kidou Senshi Z Gundam - Hot Scramble (Jpn, Final Version release)</description>
 		<year>1986?</year>
 		<publisher>Bandai</publisher>
@@ -43107,8 +43110,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="kyorochn" cloneof="casteln">
-		<description>Kyoro-Chan Land (Jpn)</description>
+	<software name="kyorolnd" cloneof="casteln">
+		<description>Kyoro-chan Land (Jpn)</description>
 		<year>1992</year>
 		<publisher>Hiro</publisher>
 		<info name="serial" value="HIR-KC"/>
@@ -43464,7 +43467,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="mariomis">
-		<description>Mario Is Missing! (Euro)</description>
+		<description>Mario is Missing! (Euro)</description>
 		<year>1993</year>
 		<publisher>The Software Toolworks</publisher>
 		<part name="cart" interface="nes_cart">
@@ -43651,7 +43654,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="metlslad" supported="no">
+	<software name="msladerg" supported="no">
 		<description>Metal Slader Glory (Jpn)</description>
 		<year>1991</year>
 		<publisher>HAL Kenkyuujo</publisher>
@@ -43871,7 +43874,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="proyakyup" cloneof="basload">
+	<software name="moeproyp" cloneof="basload">
 		<description>Moero!! Pro Yakyuu (Jpn, Prototype)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
@@ -43909,7 +43912,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="momodeng">
+	<software name="momogdn">
 		<description>Momotarou Densetsu Gaiden (Jpn)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
@@ -44038,7 +44041,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="nakayois">
-		<description>Nakayoshi To Issho (Jpn)</description>
+		<description>Nakayoshi to Issho (Jpn)</description>
 		<year>1993</year>
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-MN"/>
@@ -44261,7 +44264,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="nobuzenk" cloneof="nobunaga">
+	<software name="nobuzenk" cloneof="nobuamb">
 		<description>Nobunaga no Yabou - Zenkokuban (Jpn, Rev. A)</description>
 		<year>1988</year>
 		<publisher>Koei</publisher>
@@ -44750,7 +44753,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="redarmr2" cloneof="gargoyl2">
+	<software name="redarrm2" cloneof="gargoyl2">
 		<description>Red Arremar 2 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
@@ -45118,7 +45121,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="shadowgtj" cloneof="shadowgt">
+	<software name="shadgatej" cloneof="shadgate">
 		<description>Shadowgate (Jpn)</description>
 		<year>1989</year>
 		<publisher>Kemco</publisher>
@@ -45428,7 +45431,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="starsldrsp" cloneof="starsldr">
+	<software name="starsoldsp" cloneof="starsold">
 		<description>Star Soldier Special Version (Jpn, Competition Version?)</description>
 		<year>1986</year>
 		<publisher>Hudson Soft</publisher>
@@ -45565,7 +45568,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="recca">
+	<software name="summer92">
 		<description>Summer Carnival '92 - Recca (Jpn)</description>
 		<year>1992</year>
 		<publisher>Naxat</publisher>
@@ -46019,8 +46022,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="t2judgej" cloneof="t2judge">
-		<description>Terminator 2 - Judgment Day (Jpn)</description>
+	<software name="term2j" cloneof="term2">
+		<description>T2 - Terminator 2 - Judgment Day (Jpn)</description>
 		<year>1992</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="PAC-TJ"/>
@@ -46037,7 +46040,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="t2judgeup" cloneof="t2judge">
+	<software name="term2up" cloneof="term2">
 		<description>T2 - Terminator 2 - Judgment Day (USA, Prototype)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
@@ -46471,7 +46474,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="ushio">
-		<description>Ushio To Tora - Shinen no Daiyou (Jpn)</description>
+		<description>Ushio to Tora - Shinen no Daiyou (Jpn)</description>
 		<year>1993</year>
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-RA"/>
@@ -47482,7 +47485,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-012"/>
-		<info name="alt_title" value="The World Of Card Game"/>
+		<info name="alt_title" value="The World of Card Game"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -47501,7 +47504,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-012"/>
-		<info name="alt_title" value="The World Of Card Game"/>
+		<info name="alt_title" value="The World of Card Game"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="vertical" />
@@ -47518,7 +47521,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<description>Boku Koku Shuu Kin (Tw, Pirate?)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
-		<info name="alt_title" value="The World Of Card Game"/>
+		<info name="alt_title" value="The World of Card Game"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
 			<feature name="mirroring" value="vertical" />
@@ -47651,7 +47654,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="chinesch">
+	<software name="chinchkr">
 		<description>Chinese Checkers (Tw, FC cart)</description>
 		<year>1991</year>
 		<publisher>Sachen</publisher>
@@ -47668,7 +47671,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="chinescha" cloneof="chinesch">
+	<software name="chinchkra" cloneof="chinchkr">
 		<description>Chinese Checkers (Tw, NES cart)</description>
 		<year>1991</year>
 		<publisher>Sachen</publisher>
@@ -48408,8 +48411,8 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="danceblc">
-		<description>Dancing Blocks (Tw, NES cart)</description>
+	<software name="danceblk">
+		<description>Dancing Block (Tw, NES cart)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-013"/>
@@ -50263,7 +50266,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="sanguo2" cloneof="sangok2h" supported="no">
+	<software name="sanguo2" cloneof="sango2ht" supported="no">
 		<description>San Guo Zhi II - Zhong Wen (Chi, Hacked)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50507,7 +50510,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="rongyu" cloneof="akagawaj">
+	<software name="rongyu" cloneof="akagawa">
 		<description>Rong Yu Xun Zhang (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50524,7 +50527,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="youlinlc" cloneof="akagawaj">
+	<software name="youlinlc" cloneof="akagawa">
 		<description>You Ling Lie Che (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -51080,7 +51083,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ036"/>
-		<info name="alt_title" value="哪吒传奇 (Legend Of Nezha)"/>
+		<info name="alt_title" value="哪吒传奇 (Legend of Nezha)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-NANJING" />
 			<feature name="mirroring" value="vertical" />
@@ -51258,7 +51261,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ056"/>
-		<info name="alt_title" value="塞尔达-神奇的帽子 ~ The Legend Of Zelda: The Minish Cap"/>
+		<info name="alt_title" value="塞尔达-神奇的帽子 ~ The Legend of Zelda: The Minish Cap"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-NANJING" />
 			<feature name="mirroring" value="vertical" />
@@ -52067,7 +52070,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<!-- same as Mermaid of Atlantis, but with Nudity -->
-	<software name="magicb">
+	<software name="mbubble">
 		<description>Magic Bubble (Asia)</description>
 		<year>1991</year>
 		<publisher>Computer &amp; Entertainment</publisher>
@@ -52476,7 +52479,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="lzyx" cloneof="hanjukuh" supported="no">
+	<software name="lzyx" cloneof="hanjuher" supported="no">
 		<description>Long Zhu Ying Xiong (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -52523,7 +52526,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="mmaker" cloneof="monstmkr">
+	<software name="mmaker1" cloneof="monstmkr">
 		<description>Monster Maker 1 (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -52555,7 +52558,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="sanguo2a" cloneof="sangok2h">
+	<software name="sanguo2a" cloneof="sango2ht">
 		<description>San Guo Zhi 2 - Ba Wang Da Lu - Zhong Wen Jia Qiang Ban (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -52958,7 +52961,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- REVIEW -->
 
-	<software name="shentkn" cloneof="akagawaj">
+	<software name="shentkn" cloneof="akagawa">
 		<description>Shentan Conan (Chi)</description>
 		<year>19??</year>
 		<publisher>XingXing</publisher>
@@ -53959,7 +53962,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- FIXME: which board should use this game?? -->
 	<software name="2yudb" supported="no">
-		<description>2 in 1 - Yuu Yuu + Dragonball Z</description>
+		<description>2 in 1 - Yu Yu + Dragonball Z</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -54382,7 +54385,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="chinarb" cloneof="mickeym7" supported="no">
+	<software name="chinarb" cloneof="mmania7" supported="no">
 		<description>China Rabbit Baby (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -54664,7 +54667,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- FIXME: which board should use this game?? -->
 	<software name="ejim2d" cloneof="ejim2" supported="no">
-		<description>Earth Worm Jim 2 (Asia, Hacked?)</description>
+		<description>Earthworm Jim 2 (Asia, Hacked?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -55315,7 +55318,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="mickeym7" supported="no">
+	<software name="mmania7" supported="no">
 		<description>Mickey Mania 7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -55501,7 +55504,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="powrngr2">
+	<software name="pr2">
 		<description>Power Rangers 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -55897,7 +55900,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="sshinobi">
+	<software name="supshin">
 		<description>The Super Shinobi (Asia)</description>
 		<year>19??</year>
 		<publisher>Super Game</publisher>
@@ -56311,8 +56314,8 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="biohazrd">
-		<description>Bio Hazard (Chi)</description>
+	<software name="biohaz">
+		<description>BioHazard (Chi)</description>
 		<year>2003?</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="生化危机"/>
@@ -56327,8 +56330,8 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="biohazrda" cloneof="biohazrd" supported="partial">
-		<description>Bio Hazard (Chi, Decrypted WXN)</description>
+	<software name="biohaza" cloneof="biohaz" supported="partial">
+		<description>BioHazard (Chi, Decrypted WXN)</description>
 		<year>2003?</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="生化危机"/>
@@ -56546,8 +56549,8 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="dbzsb2" supported="partial">
-		<description>Dragon Ball Z - Super Butoden 2 (Asia)</description>
+	<software name="dbzbuto2" supported="partial">
+		<description>Dragon Ball Z - Super Butouden 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -56595,7 +56598,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="eurosens">
-		<description>Europe Sensen (Chi)</description>
+		<description>Europa Sensen (Chi)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="欧陆之战"/>
@@ -58025,7 +58028,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="fuuunfds" supported="no">
+	<software name="fuunsfds" supported="no">
 		<description>Fuuun Shaolin Kyo (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
@@ -58638,7 +58641,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="bombrmanh" cloneof="bombrman">
+	<software name="bombmanh" cloneof="bombman">
 		<description>Bomberman (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -59628,7 +59631,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="loderunh" cloneof="loderun">
+	<software name="ldrunh" cloneof="ldrun">
 		<description>Lode Runner (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -59678,7 +59681,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<software name="magmaxh" cloneof="magmax">
-		<description>Mag Max (FMG pirate)</description>
+		<description>MagMax (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">
@@ -59792,7 +59795,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="kszgundmh" cloneof="kszgundm">
+	<software name="zgundamh" cloneof="zgundam">
 		<description>Kidou Senshi Z Gundam - Hot Scramble (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -60283,7 +60286,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="starsldrh" cloneof="starsldr">
+	<software name="starsoldh" cloneof="starsold">
 		<description>Star Soldier (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -61346,7 +61349,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<software name="ducktal3r" cloneof="ducktale">
-		<description>Duck Tales III (Rus)</description>
+		<description>DuckTales III (Rus)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -62041,7 +62044,7 @@ Other
 		</part>
 	</software>
 
-	<software name="bombcoll" cloneof="bombrman">
+	<software name="bombcoll" cloneof="bombman">
 		<description>Bomberman Collection</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62226,7 +62229,7 @@ Other
 	</software>
 
 	<software name="ducktal3" cloneof="ducktale">
-		<description>Duck Tales III (Duck Tales pirate)</description>
+		<description>DuckTales III (DuckTales pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -62306,7 +62309,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="fifa97" cloneof="tecmowcs">
+	<software name="fifa97" cloneof="tecmowc">
 		<description>FIFA 97 International Soccer (Tecmo World Cup Soccer pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62368,7 +62371,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="france98" cloneof="jlwinnin">
+	<software name="france98" cloneof="jlwingol">
 		<description>France 98 (J.League Winning Goal pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62383,7 +62386,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="ghostbst3" cloneof="ghostbs2">
+	<software name="ghostbs3" cloneof="ghostbs2">
 		<description>Ghostbusters III (Ghostbusters II pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62413,7 +62416,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="gaxe4" cloneof="astyanax">
+	<software name="goldnax4" cloneof="astyanax">
 		<description>Golden Axe IV (The Lord of King pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62429,7 +62432,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="grandcmb" cloneof="chipndal">
-		<description>Grand Combat (Chip To Dale no Daisakusen pirate)</description>
+		<description>Grand Combat (Chip to Dale no Daisakusen pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -62458,7 +62461,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="harrystr" cloneof="wacky">
+	<software name="harrystr" cloneof="wackyrac">
 		<description>Harry Story (Chiki Chiki Machine Mou Race pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62730,7 +62733,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="misimposh" cloneof="misimpos">
+	<software name="missimph" cloneof="missimp">
 		<description>Mission - Impossible (Pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62745,7 +62748,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="monstinc" cloneof="wacky">
+	<software name="monstinc" cloneof="wackyrac">
 		<description>Monster Inc. (Chiki Chiki Machine Mou Race pirate, Ripped from multicart)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62900,7 +62903,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="pokeblue" cloneof="wacky">
+	<software name="pokeblue" cloneof="wackyrac">
 		<description>Pokemon Blue (Chiki Chiki Machine Mou Race pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -62992,7 +62995,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="powrangr" cloneof="jetman">
+	<software name="pr" cloneof="jetman">
 		<description>Power Rangers (Choujin Sentai Jetman pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63009,7 +63012,7 @@ resulting in tons of glitches? -->
 
 <!-- is the following also hacked?!? -->
 	<software name="ppersiah" cloneof="ppersia">
-		<description>Prince Of Persia (Pirate)</description>
+		<description>Prince of Persia (Pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -63054,7 +63057,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="jedi" cloneof="zenninja">
+	<software name="jedi" cloneof="zen">
 		<description>Return of the Jedi (Zen Intergalactic Ninja pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63443,7 +63446,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="sbros8" cloneof="dondoko2" supported="no">
+	<software name="smb8" cloneof="dondoko2" supported="no">
 		<description>Super Mario Bros. 8 (Don Doko Don 2 pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63458,7 +63461,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="sbros8a" cloneof="dondoko2" supported="partial">
+	<software name="smb8a" cloneof="dondoko2" supported="partial">
 		<description>Super Bros 8 (Don Doko Don 2 pirate, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63518,7 +63521,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="smb14" cloneof="ttoonad2">
+	<software name="smb14" cloneof="ttoon2">
 		<description>Super Mario Bros. 14 (Tiny Toon Adventures 2 pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63550,7 +63553,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="smb17" cloneof="chipndal">
-		<description>Super Mario Bros. 17 (Chip To Dale no Daisakusen pirate)</description>
+		<description>Super Mario Bros. 17 (Chip to Dale no Daisakusen pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -63594,7 +63597,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="smbmalib" cloneof="hammerh">
+	<software name="smbmalib" cloneof="hharry">
 		<description>Super Mario Bros. Mali Boss (Daiku no Gen-san pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63857,7 +63860,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="t2judgeh" cloneof="t2judge">
+	<software name="term2h" cloneof="term2">
 		<description>T2 - Terminator 2 - Judgment Day (Pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63963,7 +63966,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="turtlen5" cloneof="toxiccrs">
+	<software name="turtlen5" cloneof="toxicc">
 		<description>Turtle Ninja 5 (Toxic Crusaders pirate)</description>
 		<year>199?</year>
 		<publisher>Kaiser</publisher>
@@ -63994,7 +63997,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="wariolnd" cloneof="kirby">
+	<software name="wario2" cloneof="kirby">
 		<description>Warioland II (Hoshi no Kirby pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64264,7 +64267,7 @@ We include them here as reference if they should coincide with later revisions o
 		</part>
 	</software>
 
-	<software name="bombrmangba" cloneof="bombrman">
+	<software name="bombmangba" cloneof="bombman">
 		<description>Bomberman (Ripped from GBA Famicom Mini version)</description>
 		<year>200?</year>
 		<publisher>Nintendo</publisher>
@@ -64541,7 +64544,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="zeldagc" cloneof="zelda">
-		<description>The Legend Of Zelda (Ripped from GC Zelda)</description>
+		<description>The Legend of Zelda (Ripped from GC Zelda)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64556,7 +64559,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="zelda2gc" cloneof="zelda2">
-		<description>Zelda II - The Adventure Of Link (Ripped from GC Zelda)</description>
+		<description>Zelda II - The Adventure of Link (Ripped from GC Zelda)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64877,7 +64880,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="garou2" cloneof="fatfur2" supported="partial">
+	<software name="garou2" cloneof="fatfury2" supported="partial">
 		<description>Garou Densetsu 2 (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
@@ -64892,7 +64895,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="fatfur2" supported="partial">
+	<software name="fatfury2" supported="partial">
 		<description>Fatal Fury 2 (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
@@ -64911,7 +64914,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="fatfur2a" cloneof="fatfur2" supported="partial">
+	<software name="fatfury2a" cloneof="fatfury2" supported="partial">
 		<description>Fatal Fury 2' (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
@@ -65401,7 +65404,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mktrlgy">
+	<software name="mktrilgy">
 		<description>Mortal Kombat Trilogy - MK5 (Asia, 16 characters)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -65416,7 +65419,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mktrlgya" cloneof="mktrlgy" supported="no">
+	<software name="mktrilgya" cloneof="mktrilgy" supported="no">
 		<description>Mortal Kombat Trilogy - MK5 (Asia, 8 characters)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -65461,7 +65464,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="powrngr3" supported="no">
+	<software name="pr3" supported="no">
 		<description>Power Rangers III (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -65476,7 +65479,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="powrngr4" supported="no">
+	<software name="pr4" supported="no">
 		<description>Power Rangers IV (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -66214,7 +66217,7 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="yuyu97">
-		<description>Yuu Yuu Hakusho 97 V (Asia)</description>
+		<description>Yu Yu Hakusho 97 V (Asia)</description>
 		<year>1997</year>
 		<publisher>N.T</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66231,8 +66234,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="yuyufc" cloneof="yuyuf">
-		<description>Yuu Yuu Hakusho Final - Makai Saikyou Retsuden (Asia, Chinese, Hacked)</description>
+	<software name="yuyufinc" cloneof="yuyufin">
+		<description>Yu Yu Hakusho Final - Makai Saikyou Retsuden (Asia, Chinese, Hacked)</description>
 		<year>1996</year>
 		<publisher>N.T</publisher>
 		<info name="alt_title" value="幽游白书 魔界最强列传"/>
@@ -66247,8 +66250,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="yuyuf">
-		<description>Yuu Yuu Hakusho Final - Makai Saikyou Retsuden (Asia, English)</description>
+	<software name="yuyufin">
+		<description>Yu Yu Hakusho Final - Makai Saikyou Retsuden (Asia, English)</description>
 		<year>1996</year>
 		<publisher>N.T</publisher>
 		<info name="alt_title" value="幽游白书 魔界最强列传"/>

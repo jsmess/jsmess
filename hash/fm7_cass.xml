@@ -60,7 +60,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="american">
+	<software name="amtruck">
 		<description>American Truck</description>
 		<year>1985</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -120,7 +120,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="bgammon">
+	<software name="backgamm">
 		<description>Backgammon</description>
 		<year>1985</year>
 		<publisher>新企画社 (Shinkikakusha)</publisher>
@@ -557,7 +557,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="f2">
+	<software name="f2gp">
 		<description>F2 Grand Prix</description>
 		<year>1985</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -584,7 +584,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="fighter">
+	<software name="sfighter">
 		<description>Space Fighter</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -630,7 +630,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="flsim">
+	<software name="flighsim">
 		<description>Flight Simulator</description>
 		<year>1983</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
@@ -1107,7 +1107,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner</description>
 		<year>1984</year>
 		<publisher>ソフトプロ (Soft Pro)</publisher>
@@ -1269,7 +1269,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="nampa">
+	<software name="tokyons">
 		<description>Tokyo Nampa Street</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -1320,7 +1320,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="nobu">
+	<software name="nobunaga">
 		<description>信長の野望</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>

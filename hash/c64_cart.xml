@@ -847,7 +847,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 	</software>
 
 	<software name="turboroma" cloneof="turborom">
-		<description>Turbo ROM v.2 (Pol) (Alt)</description>
+		<description>Turbo ROM v.2 (Pol, Alt)</description>
 		<year>1983</year>
 		<publisher>Turbo Software</publisher>
 		<part name="cart" interface="c64_cart">
@@ -859,7 +859,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="gamekilr" supported="no">
+	<software name="gamekill" supported="no">
 		<description>Game Killer</description>
 		<year>1986</year>
 		<publisher>Robtek</publisher>
@@ -1437,7 +1437,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="aliensid">
+	<software name="alienss">
 		<description>Alien Sidestep</description>
 		<year>19??</year>
 		<publisher>Mr. Computer</publisher>
@@ -1518,7 +1518,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="aotmc">
+	<software name="mtntcmls">
 		<description>Gridrunner II: Attack of the Mutant Camels</description>
 		<year>1983</year>
 		<publisher>HesWare</publisher>
@@ -1671,7 +1671,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="bugcrshr">
+	<software name="bugcrush">
 		<description>Bug Crusher</description>
 		<year>1983</year>
 		<publisher>Mr. Computer</publisher>
@@ -1927,7 +1927,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="dnkykong">
+	<software name="dkong">
 		<description>Donkey Kong</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
@@ -1940,7 +1940,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="dotgblr2">
+	<software name="dgobblr2">
 		<description>Dot Gobbler v.2</description>
 		<year>1983</year>
 		<publisher>Mr. Computer</publisher>
@@ -1953,7 +1953,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="dotgoblr" cloneof="dotgblr2">
+	<software name="dgobbler" cloneof="dgobblr2">
 		<description>Dot Gobbler</description>
 		<year>1983</year>
 		<publisher>Mr. Computer</publisher>
@@ -1966,7 +1966,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="drgnsden">
+	<software name="dragnden">
 		<description>Dragon's Den</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
@@ -2328,7 +2328,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="jamsbond">
+	<software name="jbond">
 		<description>James Bond</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
@@ -2395,7 +2395,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="jnglhunt">
+	<software name="jungleh">
 		<description>Jungle Hunt</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
@@ -2492,7 +2492,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="loderunr">
+	<software name="ldrun">
 		<description>Lode Runner</description>
 		<year>1983</year>
 		<publisher>Brøderbund</publisher>
@@ -2506,7 +2506,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="logclvls">
+	<software name="logiclvl">
 		<description>Logic Levels</description>
 		<year>1984</year>
 		<publisher>Fisher-Price</publisher>
@@ -2652,7 +2652,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="moonptrl">
+	<software name="mpatrol">
 		<description>Moon Patrol</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
@@ -2679,7 +2679,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="mntnking">
+	<software name="mking">
 		<description>Mountain King</description>
 		<year>1983</year>
 		<publisher>Beyond Software</publisher>
@@ -2795,7 +2795,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="nmbrnabr">
+	<software name="numbrnab">
 		<description>Number Nabber + Shape Grabber</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
@@ -2809,7 +2809,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="nbrtmblr">
+	<software name="numbrtmb">
 		<description>Number Tumblers</description>
 		<year>1984</year>
 		<publisher>Fisher-Price</publisher>
@@ -2838,7 +2838,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="omegarce">
+	<software name="omegrace">
 		<description>Omega Race</description>
 		<year>1982</year>
 		<publisher>Commodore</publisher>
@@ -2893,7 +2893,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="pastfndr">
+	<software name="pastfind">
 		<description>Pastfinder</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
@@ -3015,7 +3015,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="polepstn">
+	<software name="polepos">
 		<description>Pole Position</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
@@ -3251,7 +3251,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="rivrraid">
+	<software name="riveraid">
 		<description>River Raid</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
@@ -3264,7 +3264,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="robo2084">
+	<software name="robotron">
 		<description>Robotron 2084</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
@@ -3303,7 +3303,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="sammyl">
+	<software name="sammylf">
 		<description>Sammy Lightfoot</description>
 		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
@@ -3479,7 +3479,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="spyhuntr">
+	<software name="spyhunt">
 		<description>Spy Hunter</description>
 		<year>1983</year>
 		<publisher>U.S. Gold</publisher>
@@ -3534,7 +3534,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="swarcade">
+	<software name="starwars">
 		<description>Star Wars: The Arcade Game</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
@@ -3998,7 +3998,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="cybrball">
+	<software name="cyberbal">
 		<description>Cyberball: Football in the 21st Century</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
@@ -4012,7 +4012,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="dbldrgn">
+	<software name="ddragon">
 		<description>Double Dragon (Ocean)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
@@ -4026,7 +4026,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="dbldrgm" cloneof="dbldrgn">
+	<software name="ddragonm" cloneof="ddragon">
 		<description>Double Dragon (Melbourne House)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
@@ -4082,7 +4082,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="kungfu">
+	<software name="kungfum">
 		<description>Kung-Fu Master</description>
 		<year>1985</year>
 		<publisher>Data East</publisher>
@@ -4096,7 +4096,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="lstninja">
+	<software name="lastninj">
 		<description>The Last Ninja Remix</description>
 		<year>1990</year>
 		<publisher>System 3</publisher>
@@ -4110,7 +4110,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="ldrboard">
+	<software name="leadbg">
 		<description>Leaderboard Golf</description>
 		<year>1986</year>
 		<publisher>Access</publisher>
@@ -4334,7 +4334,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="tennis">
+	<software name="ttennis">
 		<description>Tournament Tennis</description>
 		<year>1984</year>
 		<publisher>Imagic</publisher>
@@ -4362,7 +4362,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="wondrboy">
+	<software name="wboy">
 		<description>Wonderboy</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
@@ -5048,7 +5048,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="sprsktch">
+	<software name="ssketch">
 		<description>Super Sketch</description>
 		<year>1984</year>
 		<publisher>Personal Peripherals</publisher>
@@ -5700,7 +5700,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="sprsnp5p" cloneof="sprsnap5">
+	<software name="sprsnap5p" cloneof="sprsnap5">
 		<description>Super Snapshot 5 (PAL)</description>
 		<year>1989</year>
 		<publisher>LMS Tech</publisher>
@@ -5714,8 +5714,8 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="sprsn5pa" cloneof="sprsnap5">
-		<description>Super Snapshot 5 (PAL) (Alt)</description>
+	<software name="sprsnap5pa" cloneof="sprsnap5">
+		<description>Super Snapshot 5 (PAL, Alt)</description>
 		<year>1989</year>
 		<publisher>LMS Tech</publisher>
 		<part name="cart" interface="c64_cart">

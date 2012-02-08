@@ -23,7 +23,7 @@
 		<info name="usage" value="Load at E000.EFFFR, enter at E000R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="3663918">
-				<rom name="apple1basic.wav" size="3663918" crc="1914635e" sha1="e5f112bec9236d42c3b5618df0d4607053b0078f" offset="0" />
+				<rom name="apple1bas.wav" size="3663918" crc="1914635e" sha1="e5f112bec9236d42c3b5618df0d4607053b0078f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -90,7 +90,7 @@
 		</part>
 	</software>
 
-	<software name="bjack">
+	<software name="blckjack">
 		<description>Blackjack</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
