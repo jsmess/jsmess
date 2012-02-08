@@ -8,7 +8,6 @@
 */
 
 #include "emu.h"
-#include "image.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs51/mcs51.h"
 #include "imagedev/flopdrv.h"

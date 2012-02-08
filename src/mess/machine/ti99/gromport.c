@@ -11,7 +11,6 @@
 #include "unzip.h"
 #include "corestr.h"
 #include "xmlfile.h"
-#include "hash.h"
 #include "machine/ram.h"
 
 /* start of multicart */

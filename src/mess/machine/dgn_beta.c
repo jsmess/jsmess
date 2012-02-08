@@ -64,7 +64,6 @@
 #include "machine/6821pia.h"
 #include "includes/dgn_beta.h"
 #include "machine/6551acia.h"
-#include "image.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 

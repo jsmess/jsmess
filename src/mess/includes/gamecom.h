@@ -15,7 +15,6 @@
 #include "cpu/sm8500/sm8500.h"
 #include "imagedev/cartslot.h"
 #include "rendlay.h"
-#include "image.h"
 
 /* SM8521 register addresses */
 enum

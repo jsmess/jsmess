@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/generic.h"
 #include "includes/gba.h"
 
 #define VERBOSE_LEVEL	(0)

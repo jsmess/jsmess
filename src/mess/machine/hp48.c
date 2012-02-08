@@ -7,7 +7,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "timer.h"
 #include "sound/dac.h"
 #include "cpu/saturn/saturn.h"
 

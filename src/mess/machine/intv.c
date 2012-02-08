@@ -2,7 +2,6 @@
 #include "video/stic.h"
 #include "includes/intv.h"
 #include "cpu/cp1610/cp1610.h"
-#include "image.h"
 #include "hashfile.h"
 
 #define INTELLIVOICE_MASK	0x02

@@ -22,14 +22,9 @@
 */
 
 #include "emu.h"
-#include "memory.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 #include "includes/rmnimbus.h"
-#include "mame.h"
-
-#include "debug/debugcpu.h"
-#include "debug/debugcon.h"
 
 
 #define WIDTH_MASK      0x07

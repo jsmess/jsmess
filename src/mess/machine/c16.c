@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "image.h"
 #include "audio/ted7360.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"

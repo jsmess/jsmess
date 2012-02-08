@@ -50,7 +50,6 @@ even if you have to use unusual geometry to do so !
 
 
 #include "emu.h"
-#include "memory.h"
 #include "debugger.h"
 #include "cpu/i86/i86.h"
 #include "debug/debugcpu.h"
