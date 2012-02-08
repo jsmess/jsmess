@@ -45,6 +45,10 @@
 #define UNSCRAMBLE_DATA(_data) \
 	BITSWAP8(_data,7,6,0,5,1,4,2,3)
 
+	
+// 74LS122 tW=0.45*R*C = 1.1844s
+#define TIMER_PERIOD	1184	
+
 
 
 //**************************************************************************
@@ -76,6 +80,7 @@ c64_vizawrite_cartridge_device::c64_vizawrite_cartridge_device(const machine_con
 
 void c64_vizawrite_cartridge_device::device_start()
 {
+	// allocate timer
 	m_game_timer = timer_alloc();
 }
 
@@ -88,8 +93,8 @@ void c64_vizawrite_cartridge_device::device_reset()
 {
 	m_game = 0;
 	
-	// 74LS122 tW=0.45*R*C = 1.1844s
-	m_game_timer->adjust(attotime::from_msec(1184), 0);
+
+	m_game_timer->adjust(attotime::from_msec(TIMER_PERIOD), 0);
 }
 
 
