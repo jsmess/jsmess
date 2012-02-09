@@ -21,6 +21,8 @@
 #include "includes/next.h"
 #include "formats/pc_dsk.h"
 #include "formats/mfi_dsk.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
 
 UINT32 next_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -133,13 +135,13 @@ READ32_MEMBER( next_state::scr1_r )
         ---- ---- ---- ---- ---- xxxx ---- ---- board revision
         ---- ---- ---- ---- ---- ---- -xx- ---- video mem speed
         ---- ---- ---- ---- ---- ---- ---x x--- mem speed
-        ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed
+        ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed 16/20/25/33/40/50/66/80
 
         68040-25: 00011102
         68040-25: 00013002 (non-turbo, color)
     */
 
-	return 0x00012002; // TODO
+	return scr1;
 }
 
 // Interrupt subsystem
@@ -241,6 +243,13 @@ const int next_state::dma_irqs[0x20] = {
 	-1, 28, -1, -1, -1, 27, -1, -1, -2, -1, -1, -1, 18, 19, -1, -1
 };
 
+const bool next_state::dma_has_saved[0x20] = {
+	false, false, false, false, false, false, false, false,
+	false, false, false, false, false, false, false, false,
+	false, true,  false, false, false, true,  false, false,
+	false, false, false, false, false, false, false, false,
+};
+
 const char *next_state::dma_name(int slot)
 {
 	static char buf[32];
@@ -259,6 +268,7 @@ void next_state::dma_drq_w(int slot, bool state)
 		address_space *space = maincpu->memory().space(AS_PROGRAM);
 		if(ds.state & DMA_READ) {
 			while(ds.drq) {
+				dma_check_update(slot);
 				UINT8 val;
 				bool eof;
 				bool err;
@@ -277,6 +287,7 @@ void next_state::dma_drq_w(int slot, bool state)
 			}
 		} else {
 			while(ds.drq) {
+				dma_check_update(slot);
 				UINT8 val = space->read_byte(ds.current++);
 				bool eof = ds.current == (ds.limit & 0x7fffffff) && (ds.limit & 0x80000000);
 				bool err;
@@ -300,7 +311,10 @@ void next_state::dma_read(int slot, UINT8 &val, bool &eof, bool &err)
 	eof = false;
 	switch(slot) {
 	case 1:
-		val = fdc->dma_r();
+		if(fdc && fdc->get_drq())
+			val = fdc->dma_r();
+		else
+			val = scsi->dma_r();
 		break;
 
 	case 5:
@@ -322,6 +336,10 @@ void next_state::dma_write(int slot, UINT8 data, bool eof, bool &err)
 {
 	err = false;
 	switch(slot) {
+	case 1:
+		scsi->dma_w(data);
+		break;
+
 	case 4:
 		break;
 
@@ -339,19 +357,32 @@ void next_state::dma_write(int slot, UINT8 data, bool eof, bool &err)
 	}
 }
 
+void next_state::dma_check_update(int slot)
+{
+	dma_slot &ds = dma_slots[slot];
+	if(ds.restart) {
+		ds.current = ds.start;
+		ds.restart = false;
+	}
+}
+
 void next_state::dma_end(int slot)
 {
 	dma_slot &ds = dma_slots[slot];
-	if(ds.supdate) {
+	if(dma_has_saved[slot]) {
 		dma_slot &ds1 = dma_slots[(slot-1) & 31];
-		ds1.start = ds.start;
+		ds1.current = ds.start;
 		ds1.limit = ds.current;
+	}
+
+	if(!ds.supdate)
+		ds.state &= ~DMA_ENABLE;
+	else {
 		ds.start = ds.chain_start;
 		ds.limit = ds.chain_limit;
-		ds.current = ds.start;
+		ds.restart = true;
 		ds.supdate = false;
-	} else
-		ds.state &= ~DMA_ENABLE;
+	}
 	ds.state |= DMA_COMPLETE;
 	if(dma_irqs[slot] >= 0)
 		irq_set(dma_irqs[slot], true);
@@ -369,19 +400,27 @@ READ32_MEMBER( next_state::dma_regs_r)
 	int slot = offset >> 2;
 	int reg = offset & 3;
 
-	const char *name = dma_name(slot);
+	UINT32 res;
 
-	fprintf(stderr, "dma_regs_r %s:%d (%08x)\n", name, reg, cpu_get_pc(&space.device()));
 	switch(reg) {
 	case 0:
-		return dma_slots[slot].start;
+		res = dma_slots[slot].current;
+		break;
 	case 1:
-		return dma_slots[slot].limit;
+		res = dma_slots[slot].limit;
+		break;
 	case 2:
-		return dma_slots[slot].chain_start;
+		res = dma_slots[slot].chain_start;
+		break;
 	case 3: default:
-		return dma_slots[slot].chain_limit;
+		res = dma_slots[slot].chain_limit;
+		break;
 	}
+
+	const char *name = dma_name(slot);
+	fprintf(stderr, "dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, cpu_get_pc(&space.device()));
+
+	return res;
 }
 
 WRITE32_MEMBER( next_state::dma_regs_w)
@@ -416,7 +455,8 @@ READ32_MEMBER( next_state::dma_ctrl_r)
 
 	const char *name = dma_name(slot);
 
-	fprintf(stderr, "dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, cpu_get_pc(&space.device()));
+	if(cpu_get_pc(&space.device()) != 0x409bb4e)
+		fprintf(stderr, "dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, cpu_get_pc(&space.device()));
 
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
@@ -490,8 +530,9 @@ const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 
 
 READ32_MEMBER( next_state::scsictrl_r )
 {
-	fprintf(stderr, "read %08x\n", cpu_get_pc(&space.device()));
-	return (scsictrl << 24) | (scsistat << 16);
+	UINT32 res = (scsictrl << 24) | (scsistat << 16);
+	fprintf(stderr, "scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, cpu_get_pc(&space.device()));
+	return res;
 }
 
 WRITE32_MEMBER( next_state::scsictrl_w )
@@ -547,6 +588,13 @@ READ32_MEMBER( next_state::fdc_control_r )
 	// Zero means no floppy
 
 	fprintf(stderr, "FDC read (%08x)\n", cpu_get_pc(&space.device()));
+	
+	if(fdc) {
+		floppy_image_device *fdev = machine().device<floppy_connector>(":fd0")->get_device();
+		if(fdev->exists())
+			return 1 << 24;
+	}
+
 	return 0 << 24;
 }
 
@@ -676,7 +724,7 @@ void next_state::scsi_irq(bool state)
 
 void next_state::scsi_drq(bool state)
 {
-	dma_drq_w(26, state);
+	dma_drq_w(1, state);
 }
 
 void next_state::machine_start()
@@ -735,7 +783,7 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 //  AM_RANGE(0x0200f000, 0x0200f003) AM_MIRROR(0x300000) printer
 //  AM_RANGE(0x02010000, 0x02010003) AM_MIRROR(0x300000) brightness
 	AM_RANGE(0x02012000, 0x0201201f) AM_MIRROR(0x300000) AM_DEVICE8("mo", nextmo_device, map, 0xffffffff)
-	AM_RANGE(0x02014000, 0x0201400f) AM_MIRROR(0x300000) AM_DEVICE8("scsi", ncr5390_device, map, 0xffffffff)
+	AM_RANGE(0x02014000, 0x0201400f) AM_MIRROR(0x300000) AM_DEVICE8("scsibus:7:ncr5390", ncr5390_device, map, 0xffffffff)
 	AM_RANGE(0x02114020, 0x02114023) AM_MIRROR(0x300000) AM_READWRITE(scsictrl_r, scsictrl_w)
 	AM_RANGE(0x02016000, 0x02016003) AM_MIRROR(0x300000) AM_READWRITE(timer_data_r, timer_data_w)
 	AM_RANGE(0x02016004, 0x02016007) AM_MIRROR(0x300000) AM_READWRITE(timer_ctrl_r, timer_ctrl_w)
@@ -790,19 +838,13 @@ const floppy_format_type next_state::floppy_formats[] = {
 };
 
 static SLOT_INTERFACE_START( next_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
+	SLOT_INTERFACE( "35ed", FLOPPY_35_ED )
 SLOT_INTERFACE_END
 
-const SCSIConfigTable next_state::scsi_devices = {
-	2,
-	{
-		{ SCSI_ID_0, "harddisk0", SCSI_DEVICE_HARDDISK },
-		{ SCSI_ID_1, "cdrom",     SCSI_DEVICE_CDROM }
-	}
-};
-
-const cdrom_interface next_state::cdrom_intf = { NULL, NULL };
-const harddisk_interface next_state::harddisk_intf = { NULL, NULL, "next_hdd", NULL };
+static SLOT_INTERFACE_START( next_scsi_devices )
+	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
+	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( next, next_state )
     /* basic machine hardware */
@@ -821,14 +863,21 @@ static MACHINE_CONFIG_START( next, next_state )
     MCFG_PALETTE_INIT(next)
 
 	// devices
+	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz,
 					  mccs1850_device::cb_t(), mccs1850_device::cb_t(), mccs1850_device::cb_t())
 	MCFG_SCC8530_ADD("scc", XTAL_25MHz, scc8530_t::intrq_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
 	MCFG_NEXTKBD_ADD("keyboard", nextkbd_device::int_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)))
-	MCFG_NCR5390_ADD("scsi", 10000000,
+	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", 0)
+	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", 0)
+	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, 0)
+	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, 0, 0)
+	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, 0, 0)
+	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, 0, 0)
+	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, 0, 0)
+	MCFG_NCR5390_ADD("scsibus:7", "ncr5390", 10000000,
 					 line_cb_t(FUNC(next_state::scsi_irq), static_cast<next_state *>(owner)),
-					 line_cb_t(FUNC(next_state::scsi_drq), static_cast<next_state *>(owner)),
-					 next_state::scsi_devices)
+					 line_cb_t(FUNC(next_state::scsi_drq), static_cast<next_state *>(owner)))
 	MCFG_MB8795_ADD("net",
 					line_cb_t(FUNC(next_state::net_tx_irq), static_cast<next_state *>(owner)),
 					line_cb_t(FUNC(next_state::net_rx_irq), static_cast<next_state *>(owner)),
@@ -838,8 +887,8 @@ static MACHINE_CONFIG_START( next, next_state )
 					nextmo_device::cb_t(FUNC(next_state::mo_irq), static_cast<next_state *>(owner)),
 					nextmo_device::cb_t(FUNC(next_state::mo_drq), static_cast<next_state *>(owner)))
 
-	MCFG_CDROM_ADD("cdrom", next_state::cdrom_intf)
-	MCFG_HARDDISK_CONFIG_ADD("harddisk0", next_state::harddisk_intf)
+//	MCFG_CDROM_ADD("cdrom", next_state::cdrom_intf)
+//	MCFG_HARDDISK_CONFIG_ADD("harddisk0", next_state::harddisk_intf)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
@@ -850,7 +899,7 @@ static MACHINE_CONFIG_DERIVED( next040, next )
 	MCFG_CPU_PROGRAM_MAP(next_040_mem)
 
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", next_floppies, "35hd", 0, next_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", next_floppies, "35ed", 0, next_state::floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -899,6 +948,9 @@ ROM_END
 
 static DRIVER_INIT(nexttrb)
 {
+	next_state *state = machine.driver_data<next_state>();
+	state->scr1 = 0x00011102;
+
 	UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
 	rom[0x329c/4] = 0x70004e71; // memory test funcall
 	rom[0x32a0/4] = 0x4e712400;
@@ -906,8 +958,17 @@ static DRIVER_INIT(nexttrb)
 	rom[0x03fc/4] = 0x4e714e71;
 }
 
+static DRIVER_INIT(nextnt)
+{
+	next_state *state = machine.driver_data<next_state>();
+	state->scr1 = 0x00011102;
+}
+
 static DRIVER_INIT(next)
 {
+	next_state *state = machine.driver_data<next_state>();
+	state->scr1 = 0x00010002;
+
 	UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
 	rom[0x3f48/4] = 0x2f017000; // memory test funcall
 	rom[0x3f4c/4] = 0x4e712400;
@@ -918,6 +979,6 @@ static DRIVER_INIT(next)
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME               FLAGS */
-COMP( 1987, next,   0,          0,   next,      next,    next,      "Next Software Inc",   "NeXT Computer",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, nextnt, next,       0,   next040,   next,    0,      "Next Software Inc",   "NeXT (Non Turbo)",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, next,   0,          0,   next,      next,    next,    "Next Software Inc",   "NeXT Computer",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nextnt, next,       0,   next040,   next,    nextnt,  "Next Software Inc",   "NeXT (Non Turbo)",		GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1992, nexttrb,next,       0,   next040,   next,    nexttrb, "Next Software Inc",   "NeXT (Turbo)",			GAME_NOT_WORKING | GAME_NO_SOUND)
