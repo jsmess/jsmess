@@ -93,6 +93,8 @@ public:
 	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~c64_expansion_slot_device();
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( roml_r );
 	DECLARE_READ8_MEMBER( romh_r );
 	DECLARE_READ8_MEMBER( io1_r );
@@ -169,12 +171,14 @@ public:
 	// standard ROM cartridge
 	virtual UINT8* c64_roml_pointer(running_machine &machine, size_t size);
 	virtual UINT8* c64_romh_pointer(running_machine &machine, size_t size);
+	virtual UINT8* c64_ram_pointer(running_machine &machine, size_t size);
 
 protected:
 	c64_expansion_slot_device *m_slot;
 
 	UINT8 *m_roml;
 	UINT8 *m_romh;
+	UINT8 *m_ram;
 
 	int m_game;
 	int m_exrom;

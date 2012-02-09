@@ -103,7 +103,7 @@ UINT8 c64_super_explode_cartridge_device::c64_cd_r(address_space &space, offs_t 
 	}
 	else if (!io2)
 	{
-		data = m_roml[offset & 0x1fff];
+		data = m_roml[(m_bank << 13) | (offset & 0x1fff)];
 	}
 
 	return data;

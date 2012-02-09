@@ -12,11 +12,13 @@
 #include "machine/c64exp.h"
 
 
+
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
 const device_type C64_EXPANSION_SLOT = &device_creator<c64_expansion_slot_device>;
+
 
 
 //**************************************************************************
@@ -31,6 +33,7 @@ device_c64_expansion_card_interface::device_c64_expansion_card_interface(const m
 	: device_slot_card_interface(mconfig, device),
 	  m_roml(NULL),
 	  m_romh(NULL),
+	  m_ram(NULL),
 	  m_game(1),
 	  m_exrom(1)
 {
@@ -74,6 +77,21 @@ UINT8* device_c64_expansion_card_interface::c64_romh_pointer(running_machine &ma
 	}
 
 	return m_romh;
+}
+
+
+//-------------------------------------------------
+//  c64_ram_pointer - get RAM pointer
+//-------------------------------------------------
+
+UINT8* device_c64_expansion_card_interface::c64_ram_pointer(running_machine &machine, size_t size)
+{
+	if (m_ram == NULL)
+	{
+		m_ram = auto_alloc_array(machine, UINT8, size);
+	}
+
+	return m_ram;
 }
 
 
@@ -219,6 +237,9 @@ bool c64_expansion_slot_device::call_load()
 				
 				size = get_software_region_length("romh");
 				if (size) memcpy(m_cart->c64_romh_pointer(machine(), size), get_software_region("romh"), size);
+
+				size = get_software_region_length("ram");
+				if (size) memset(m_cart->c64_ram_pointer(machine(), size), 0, size);
 			}
 
 			m_cart->c64_game_w(atol(get_feature("game")));
@@ -249,6 +270,36 @@ bool c64_expansion_slot_device::call_softlist_load(char *swlist, char *swname, r
 const char * c64_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options) const
 {
 	return software_get_default_slot(config, options, this, "standard");
+}
+
+
+//-------------------------------------------------
+//  read - 
+//-------------------------------------------------
+
+READ8_MEMBER( c64_expansion_slot_device::read )
+{
+	UINT8 data = 0;
+
+	if (m_cart != NULL)
+	{
+		data = m_cart->c64_cd_r(space, offset, 1, 1, 1, 1);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( c64_expansion_slot_device::write )
+{
+	if (m_cart != NULL)
+	{
+		m_cart->c64_cd_w(space, offset, data, 1, 1, 1, 1);
+	}
 }
 
 

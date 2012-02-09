@@ -266,7 +266,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="rom" size="0x10000">
+			<dataarea name="roml" size="0x10000">
 				<rom name="u1.bin" size="0x8000" crc="dd6c545a" sha1="d32005405cb944f77932901916608232e3c05a42" offset="0x0000" />
 				<rom name="u2.bin" size="0x8000" crc="3dc43ab1" sha1="1a21771e7bf61ca1771de450c8230bd5ac46b1c6" offset="0x8000" />
 			</dataarea>
@@ -295,7 +295,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		ROM1  - Hitachi HN613128P 16Kx8 EPROM "CR3001"
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="easy_calc_result" />
+			<feature name="slot" value="easycalcres" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
@@ -316,7 +316,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<!--
 		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="easy_calc_result" />
+			<feature name="slot" value="easycalcres" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
@@ -422,14 +422,11 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="exrom" value="0" />
 			<feature name="battery" value="CR2325" />
 
-			<dataarea name="roml" size="0x4000">
-				<rom name="cart-1.bin" size="0x4000" crc="a0dc670c" sha1="bbee117340477a7416bba2e9abc2b8debd940cd4" offset="0x0000" />
-			</dataarea>
-
-			<dataarea name="rom" size="0x30000">
-				<rom name="cart-2.bin" size="0x8000" crc="2abaad8e" sha1="897f98e954418e2e9313f219cd64b100c60c68b1" offset="0x0000" />
-				<rom name="cart-3.bin" size="0x8000" crc="ecddbbfc" sha1="70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd" offset="0x4000" />
-				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x8000" />
+			<dataarea name="roml" size="0x34000">
+				<rom name="cart-1.bin" size="0x4000" crc="a0dc670c" sha1="bbee117340477a7416bba2e9abc2b8debd940cd4" offset="0x00000" />
+				<rom name="cart-2.bin" size="0x8000" crc="2abaad8e" sha1="897f98e954418e2e9313f219cd64b100c60c68b1" offset="0x04000" />
+				<rom name="cart-3.bin" size="0x8000" crc="ecddbbfc" sha1="70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd" offset="0x0c000" />
+				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x14000" />
 			</dataarea>
 
 			<dataarea name="ram" size="0x2000" />
@@ -5014,10 +5011,10 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="simons' basic (198x)(commodore).80" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d" offset="0x0000" />
+				<rom name="317008-02" size="0x2000" crc="3117d4ee" sha1="9a67cc6d01939eae6f9fd141a6d963259820335d" offset="0x0000" />
 			</dataarea>
 			<dataarea name="romh" size="0x2000">
-				<rom name="simons' basic (198x)(commodore).a0" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9" offset="0x0000" />
+				<rom name="317009-02" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

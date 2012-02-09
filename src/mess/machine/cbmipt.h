@@ -3,7 +3,11 @@
 #ifndef CBMIPT_H_
 #define CBMIPT_H_
 
+#include "machine/c64_easy_calc_result.h"
+#include "machine/c64_multiscreen.h"
+#include "machine/c64_pagefox.h"
 #include "machine/c64_silverrock.h"
+#include "machine/c64_simons_basic.h"
 #include "machine/c64_std.h"
 #include "machine/c64_super_explode.h"
 #include "machine/c64_vw64.h"
