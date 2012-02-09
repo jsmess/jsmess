@@ -185,7 +185,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, CASSETTE_TAG),
-	m_centronics(*this, "printer")
+	m_centronics(*this, "centronics")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -763,7 +763,7 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CENTRONICS_PRINTER_ADD("printer", standard_centronics)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
@@ -781,7 +781,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pyuutajr, tutor )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
-	//MCFG_DEVICE_REMOVE("printer")
+	//MCFG_DEVICE_REMOVE("centronics")
 	//MCFG_DEVICE_REMOVE(CASSETTE_TAG)
 MACHINE_CONFIG_END
 
