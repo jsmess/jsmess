@@ -3,7 +3,20 @@
     TODO:
 
     - 64C PLA dump
-    - cartridge loading
+	- clean up inputs
+	- Pagefox boots to BASIC because it thinks the C= key is depressed
+	
+		8035: lda  $DC01
+		8038: and  #$10
+		803A: beq  $8042
+		8042: jmp  ($A000) <-- boot to BASIC
+	
+	- Multiscreen crashes on boot
+	
+		805A: lda  $01
+		805C: and  #$FE
+		805E: sta  $01
+		8060: m6502_brk#$00 <-- BOOM!
 
 */
 
@@ -178,6 +191,11 @@ WRITE8_MEMBER( c64_state::write )
 	if (!casram)
 	{
 		m_ram->pointer()[offset] = data;
+		
+		if (offset >= 0x8000 && offset < 0xc000)
+		{
+			m_exp->write(space, offset, data);
+		}
 	}
 	else if (!io)
 	{
