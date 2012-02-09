@@ -31,11 +31,7 @@ static void ide_interrupt(device_t *device, int state)
 
 
 static MACHINE_CONFIG_FRAGMENT( ide )
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_ADD("harddisk2")
-
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-	MCFG_IDE_CONTROLLER_REGIONS("harddisk1", "harddisk2")
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt, ide_image_devices, "hdd", "hdd")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide )

@@ -395,8 +395,8 @@ static const rtc65271_interface ide_rtc_cfg =
 
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_RTC65271_ADD( "ide_rtc", ide_rtc_cfg )
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback )
-	MCFG_IDE_CONTROLLER_REGIONS(":peribox:idehd0:drive", NULL)
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback, ide_image_devices, "hdd", NULL )
+//	MCFG_IDE_CONTROLLER_REGIONS(":peribox:idehd0:drive", NULL)
 MACHINE_CONFIG_END
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
