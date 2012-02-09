@@ -51,6 +51,7 @@
 #include "machine/isa_gblaster.h"
 #include "machine/isa_hdc.h"
 #include "machine/isa_sblaster.h"
+#include "machine/isa_gus.h"
 #include "machine/3c503.h"
 #include "machine/ne1000.h"
 #include "machine/ne2000.h"
