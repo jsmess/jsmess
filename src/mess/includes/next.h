@@ -6,6 +6,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "imagedev/flopdrv.h"
+#include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
 #include "machine/8530scc.h"
 #include "machine/nextkbd.h"
@@ -25,7 +26,8 @@ public:
 		  rtc(*this, "rtc"),
 		  scc(*this, "scc"),
 		  keyboard(*this, "keyboard"),
-		  scsi(*this, "scsi"),
+		  scsibus(*this, "scsibus"),
+		  scsi(*this, "scsibus:7:ncr5390"),
 		  net(*this, "net"),
 		  mo(*this, "mo"),
 		  fdc(*this, "fdc")
@@ -35,6 +37,7 @@ public:
 	required_device<mccs1850_device> rtc;
 	required_device<scc8530_t> scc;
 	required_device<nextkbd_device> keyboard;
+	required_device<nscsi_bus_device> scsibus;
 	required_device<ncr5390_device> scsi;
 	required_device<mb8795_device> net;
 	required_device<nextmo_device> mo;
@@ -71,6 +74,7 @@ public:
 	READ32_MEMBER( timer_ctrl_r );
 	WRITE32_MEMBER( timer_ctrl_w );
 
+	UINT32 scr1;
 	UINT32 scr2;
 	UINT32 irq_status;
 	UINT32 irq_mask;
@@ -105,7 +109,7 @@ public:
 	void mo_irq(bool state);
 	void mo_drq(bool state);
 
-	static const SCSIConfigTable scsi_devices;
+	//	static const SCSIConfigTable scsi_devices;
 	static const floppy_format_type floppy_formats[];
 	static const cdrom_interface cdrom_intf;
 	static const harddisk_interface harddisk_intf;
@@ -114,7 +118,7 @@ protected:
 	struct dma_slot {
 		UINT32 start, limit, chain_start, chain_limit, current;
 		UINT8 state;
-		bool supdate, drq;
+		bool supdate, restart, drq;
 	};
 
 	enum {
@@ -137,6 +141,7 @@ protected:
 
 	static const char *dma_targets[0x20];
 	static const int dma_irqs[0x20];
+	static const bool dma_has_saved[0x20];
 	static const int scsi_clocks[4];
 
 	dma_slot dma_slots[0x20];
@@ -156,6 +161,7 @@ protected:
 	void dma_drq_w(int slot, bool state);
 	void dma_read(int slot, UINT8 &val, bool &eof, bool &err);
 	void dma_write(int slot, UINT8 val, bool eof, bool &err);
+	void dma_check_update(int slot);
 	void dma_check_end(int slot, bool eof);
 	void dma_done(int slot);
 	void dma_end(int slot);

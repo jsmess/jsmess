@@ -180,13 +180,13 @@ READ8_MEMBER(n82077aa_device::fifo_r)
 		//      exit(1);
 	}
 
-	fprintf(stderr, "fifo_r %02x (%08x)\n", r, cpu_get_pc(&space.device()));
+	logerror("%s: fifo_r %02x (%08x)\n", tag(), r, cpu_get_pc(&space.device()));
 	return r;
 }
 
 WRITE8_MEMBER(n82077aa_device::fifo_w)
 {
-	fprintf(stderr, "fifo_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("%s fifo_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
 	switch(main_phase) {
 	case PHASE_CMD: {
 		command[command_pos++] = data;
@@ -613,14 +613,16 @@ void n82077aa_device::start_command(int cmd)
 	main_phase = PHASE_EXEC;
 	switch(cmd) {
 	case C_CONFIGURE:
-		fprintf(stderr, "Configure %02x %02x %02x\n",
-				command[1], command[2], command[3]);
+		logerror("%s: command configure %02x %02x %02x\n",
+				 tag(),
+				 command[1], command[2], command[3]);
 		// byte 1 is ignored, byte 3 is precompensation-related
 		fifocfg = command[2];
 		main_phase = PHASE_CMD;
 		break;
 
 	case C_PERPENDICULAR:
+		logerror("%s: command perpendicular\n", tag());
 		main_phase = PHASE_CMD;
 		break;
 
@@ -634,8 +636,9 @@ void n82077aa_device::start_command(int cmd)
 		break;
 
 	case C_SENSE_INTERRUPT_STATUS: {
+		logerror("%s: command sense interrupt status\n", tag());
 		main_phase = PHASE_RESULT;
-
+		
 		int fid;
 		for(fid=0; fid<4 && !flopi[fid].irq; fid++);
 		if(fid == 4) {
@@ -653,8 +656,9 @@ void n82077aa_device::start_command(int cmd)
 	}
 
 	case C_SPECIFY:
-		fprintf(stderr, "Specify %02x %02x\n",
-				command[1], command[2]);
+		logerror("%s command specify %02x %02x\n",
+				 tag(),
+				 command[1], command[2]);
 		spec = (command[1] << 8) | command[2];
 		main_phase = PHASE_CMD;
 		break;
@@ -675,6 +679,7 @@ void n82077aa_device::command_end(floppy_info &fi, int status)
 
 void n82077aa_device::recalibrate_start(floppy_info &fi)
 {
+	logerror("%s: command recalibrate\n", tag());
 	fi.main_state = RECALIBRATE;
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = 1;
@@ -738,22 +743,23 @@ void n82077aa_device::read_data_start(floppy_info &fi)
 {
 	fi.main_state = READ_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
+	
+	logerror("%s: command read data%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+			 tag(),
+			 command[0] & 0x80 ? " mt" : "",
+			 command[0] & 0x40 ? " mfm" : "",
+			 command[0] & 0x20 ? " sk" : "",
+			 command[0],
+			 command[1],
+			 command[2],
+			 command[3],
+			 command[4],
+			 128 << (command[5] & 7),
+			 command[6],
+			 command[7],
+			 command[8],
+			 rates[dsr & 3]);
 
-	fprintf(stderr, "Read data%s%s%s\n",
-			command[0] & 0x80 ? " mt" : "",
-			command[0] & 0x40 ? " mfm" : "",
-			command[0] & 0x20 ? " sk" : "");
-	fprintf(stderr, "  cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x\n",
-			command[0],
-			command[1],
-			command[2],
-			command[3],
-			command[4],
-			128 << (command[5] & 7),
-			command[6],
-			command[7],
-			command[8]);
-	fprintf(stderr, "  rate=%d\n", rates[dsr & 3]);
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 8);
 	read_data_continue(fi);
@@ -880,6 +886,14 @@ void n82077aa_device::index_callback(floppy_image_device *floppy, int state)
 
 	switch(fi.sub_state) {
 	case IDLE:
+	case SEEK_MOVE:
+	case SEEK_WAIT_STEP_SIGNAL_TIME:
+	case SEEK_WAIT_STEP_SIGNAL_TIME_DONE:
+	case SEEK_WAIT_STEP_TIME:
+	case SEEK_WAIT_STEP_TIME_DONE:
+	case HEAD_LOAD_DONE:
+	case SCAN_ID_FAILED:
+	case SECTOR_READ:
 		break;
 
 	case SCAN_ID:
