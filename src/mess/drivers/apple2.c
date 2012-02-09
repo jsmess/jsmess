@@ -707,9 +707,7 @@ static MACHINE_CONFIG_DERIVED( apple2ee, apple2e )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
 
 	/* CFFA stuff */
-	MCFG_HARDDISK_ADD("harddisk")
-	MCFG_IDE_CONTROLLER_ADD("ide", NULL)
-	MCFG_IDE_CONTROLLER_REGIONS("harddisk", NULL)
+	MCFG_IDE_CONTROLLER_ADD("ide", NULL, ide_image_devices, "hdd", NULL)
 	MCFG_A2CFFA_ADD("cffa")
 	MCFG_APPLE2_SLOT_ADD(7, "cffa", a2cffa_r, a2cffa_w, a2cffa_c800_r, a2cffa_c800_w, a2cffa_cnxx_r, a2cffa_cnxx_w)
 MACHINE_CONFIG_END

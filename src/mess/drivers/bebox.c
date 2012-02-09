@@ -161,10 +161,8 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_FUJITSU_29F016A_ADD("flash")
 
 	MCFG_CDROM_ADD( "cdrom",bebox_cdrom )
-	MCFG_HARDDISK_ADD( "harddisk1" )
 
-	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt )	/* FIXME */
-	MCFG_IDE_CONTROLLER_REGIONS("harddisk1", NULL)
+	MCFG_IDE_CONTROLLER_ADD( "ide", bebox_ide_interrupt, ide_image_devices, "hdd", NULL )	/* FIXME */
 
 	MCFG_MPC105_ADD("mpc105","ppc1",0)
 	MCFG_CIRRUS_ADD("cirrus")
