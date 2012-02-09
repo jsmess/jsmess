@@ -620,7 +620,7 @@ void ncr5390_device::start_command()
 
 	bool msg;
 	int extra;
-	int total_len;
+//	int total_len;
 	command_params_size(msg, extra);
 	if(fifo_pos < extra) {
 		logerror("%s: cmd without extra bytes (fp=%d, extra=%d)\n", tag(), fifo_pos, extra);
@@ -636,9 +636,9 @@ void ncr5390_device::start_command()
 			logerror("%s: cmd without complete msg (fp=%d, extra=%d, len=%d)\n", tag(), fifo_pos, extra, len);
 			exit(0);
 		}
-		total_len = len+extra;
-	} else
-		total_len = extra;
+//		total_len = len+extra;
+	}// else
+//		total_len = extra;
 
 	switch(c) {
 	case CM_NOP:
