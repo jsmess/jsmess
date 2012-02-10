@@ -1387,6 +1387,20 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
+	<software name="supergam">
+		<description>Super Games</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="super_games" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="super games (1988)(commodore).80" size="0x10000" crc="85b3c883" sha1="aadf2ac2840edd2a814f3d0d8d4a932b4c430898" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Games Added by k1w1 -->
 
 	<software name="advcrtor">
