@@ -40,6 +40,7 @@ public:
 	// defined in drivers/avigo.c
 	virtual void machine_start();
 	virtual void machine_reset();
+	void postload();
 	void refresh_memory(UINT8 bank, UINT8 chip_select);
 	void refresh_ints();
 	void nvram_init(nvram_device &nvram, void *base, size_t size);

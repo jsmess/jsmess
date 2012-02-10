@@ -271,6 +271,35 @@ void avigo_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(m_ram_base, m_ram->size());
 	m_warm_start = 1;
 	
+	// register for state saving
+	save_item(NAME(m_key_line));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_port2));
+	save_item(NAME(m_bank2_l));
+	save_item(NAME(m_bank2_h));
+	save_item(NAME(m_bank1_l));
+	save_item(NAME(m_bank1_h));
+	save_item(NAME(m_ad_control_status));
+	save_item(NAME(m_flash_at_0x4000));
+	save_item(NAME(m_flash_at_0x8000));
+	save_item(NAME(m_ad_value));
+	save_item(NAME(m_screen_column));
+	save_item(NAME(m_warm_start));
+
+	// save all flash contents
+	save_pointer(NAME((UINT8*)m_flashes[0]->space()->get_read_ptr(0)), 0x100000);
+	save_pointer(NAME((UINT8*)m_flashes[1]->space()->get_read_ptr(0)), 0x100000);
+	save_pointer(NAME((UINT8*)m_flashes[2]->space()->get_read_ptr(0)), 0x100000);
+
+	// register postload callback
+	machine().save().register_postload(save_prepost_delegate(FUNC(avigo_state::postload), this));
+}
+
+void avigo_state::postload()
+{
+	// refresh the bankswitch
+	refresh_memory(1, m_bank1_h & 0x07);
+	refresh_memory(2, m_bank2_h & 0x07);
 }
 
 static ADDRESS_MAP_START( avigo_mem , AS_PROGRAM, 8, avigo_state)
@@ -991,9 +1020,9 @@ ROM_START(avigo_it)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
-COMP(1997,	avigo,  	0,  		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA",         	0)
-COMP(1997,	avigo_de,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (German)",	0)
-COMP(1997,	avigo_fr,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (French)",	0)
-COMP(1997,	avigo_es,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Spanish)",	0)
-COMP(1997,	avigo_it,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Italian)",	0)
+COMP(1997,	avigo,  	0,  		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA",         	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo_de,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (German)",	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo_fr,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (French)",	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo_es,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Spanish)",	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo_it,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Italian)",	GAME_SUPPORTS_SAVE)
 
