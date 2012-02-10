@@ -34,6 +34,9 @@ device_c64_expansion_card_interface::device_c64_expansion_card_interface(const m
 	  m_roml(NULL),
 	  m_romh(NULL),
 	  m_ram(NULL),
+	  m_roml_mask(0),
+	  m_romh_mask(0),
+	  m_ram_mask(0),
 	  m_game(1),
 	  m_exrom(1)
 {
@@ -59,6 +62,7 @@ UINT8* device_c64_expansion_card_interface::c64_roml_pointer(running_machine &ma
 	if (m_roml == NULL)
 	{
 		m_roml = auto_alloc_array(machine, UINT8, size);
+		m_roml_mask = size - 1;
 	}
 
 	return m_roml;
@@ -74,6 +78,7 @@ UINT8* device_c64_expansion_card_interface::c64_romh_pointer(running_machine &ma
 	if (m_romh == NULL)
 	{
 		m_romh = auto_alloc_array(machine, UINT8, size);
+		m_romh_mask = size - 1;
 	}
 
 	return m_romh;
@@ -89,6 +94,7 @@ UINT8* device_c64_expansion_card_interface::c64_ram_pointer(running_machine &mac
 	if (m_ram == NULL)
 	{
 		m_ram = auto_alloc_array(machine, UINT8, size);
+		m_ram_mask = size - 1;
 	}
 
 	return m_ram;

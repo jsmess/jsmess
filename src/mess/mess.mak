@@ -753,15 +753,26 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/c64dtv.o	\
 	$(MESS_MACHINE)/c64exp.o	\
 	$(MESS_MACHINE)/c64user.o	\
+	$(MESS_MACHINE)/c64_comal80.o	\
+	$(MESS_MACHINE)/c64_dinamic.o	\
 	$(MESS_MACHINE)/c64_easy_calc_result.o	\
+	$(MESS_MACHINE)/c64_fun_play.o	\
+	$(MESS_MACHINE)/c64_georam.o	\
+	$(MESS_MACHINE)/c64_magic_desk.o	\
+	$(MESS_MACHINE)/c64_mikro_assembler.o	\
 	$(MESS_MACHINE)/c64_multiscreen.o	\
+	$(MESS_MACHINE)/c64_ocean.o	\
 	$(MESS_MACHINE)/c64_pagefox.o	\
+	$(MESS_MACHINE)/c64_rex.o	\
 	$(MESS_MACHINE)/c64_silverrock.o	\
 	$(MESS_MACHINE)/c64_simons_basic.o	\
 	$(MESS_MACHINE)/c64_std.o	\
 	$(MESS_MACHINE)/c64_super_explode.o	\
+	$(MESS_MACHINE)/c64_system3.o	\
 	$(MESS_MACHINE)/c64_vw64.o	\
+	$(MESS_MACHINE)/c64_westermann.o	\
 	$(MESS_MACHINE)/c64_xl80.o	\
+	$(MESS_MACHINE)/c64_zaxxon.o	\
 	$(MESS_MACHINE)/interpod.o	\
 	$(MESS_DRIVERS)/vic10.o		\
 	$(MESS_MACHINE)/vic10exp.o	\

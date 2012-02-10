@@ -522,11 +522,10 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-    <!-- commented out until dumped -->
-	<!--software name="chasehq2" supported="no">
+    <software name="chasehq2" supported="no">
 		<description>Chase H.Q. 2: Special Criminal Investigation</description>
 		<year>1990</year>
-		<publisher>Ocean</publisher-->
+		<publisher>Ocean</publisher>
 		<!--
 		|===========================|
 		|=|                   LS02  |
@@ -542,12 +541,15 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		ROM0,1 - 28-pin ROM (Toshiba TC531000 pinout, markings scratched off)
 		bankswitch latch @ I/O1: D3-D0 = A16-A13
 		-->
-		<!--part name="cart" interface="c64_cart">
+		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<feature name="pcb" value="T-40" />
-
+			<dataarea name="roml" size="0x40000">
+				<rom name="chase hq 2 (1990)(ocean).80" size="0x40000" status="baddump" crc="fed59f99" sha1="7740e7c97c5d4babb77daa57b3929149dfd12714" offset="0x0000" />
+			</dataarea>
+			<!--
 			<dataarea name="roml" size="0x20000">
 				<rom name="l.u3" size="0x20000" status="nodump" offset="0x0000" />
 			</dataarea>
@@ -555,8 +557,9 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<dataarea name="romh" size="0x20000">
 				<rom name="h.u2" size="0x20000" status="nodump" offset="0x0000" />
 			</dataarea>
+			-->
 		</part>
-	</software-->
+	</software>
 
 	<software name="xl80" supported="no">
 		<description>XL 80</description>
@@ -1039,7 +1042,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<publisher>Rex Datentechnik</publisher>
 		<info name="serial" value="REX 9505" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1054,7 +1057,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<publisher>Rex Datentechnik</publisher>
 		<info name="serial" value="REX 9510" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1069,7 +1072,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<publisher>Rex Datentechnik</publisher>
 		<info name="serial" value="REX 9513" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1078,13 +1081,13 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="ppm" supported="no">
+	<software name="ppm">
 		<description>Picture-Printer Modul (Ger)</description>
 		<year>1986</year>
 		<publisher>Rex Datentechnik</publisher>
 		<info name="serial" value="REX 9545" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1099,7 +1102,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<publisher>Rex Datentechnik</publisher>
 		<info name="serial" value="REX 9583" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1159,7 +1162,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<publisher>Rex Datentechnik</publisher>
 		<info name="serial" value="REX 9629" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1314,7 +1317,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="c64anblt" supported="no">
+	<software name="c64anblt">
 		<description>C64anabalt (Encore)</description>
 		<year>2012</year>
 		<publisher>RGCD</publisher>
@@ -1328,7 +1331,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="c64anbltg" cloneof="c64anblt" supported="no">
+	<software name="c64anbltg" cloneof="c64anblt">
 		<description>C64anabalt (Gharmak)</description>
 		<year>2012</year>
 		<publisher>RGCD</publisher>
@@ -1342,7 +1345,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="blokcopy" supported="no">
+	<software name="blokcopy">
 		<description>Blok Copy</description>
 		<year>2011</year>
 		<publisher>RGCD</publisher>
@@ -1356,7 +1359,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="edgegrnd" supported="no">
+	<software name="edgegrnd">
 		<description>Edge Grinder</description>
 		<year>2011</year>
 		<publisher>RGCD</publisher>
@@ -1366,6 +1369,20 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 
 			<dataarea name="roml" size="0x4000">
 				<rom name="edge_grinder.bin" size="0x4000" crc="e5a73b59" sha1="febd424843c19d862dd9d31469a4225da160d097" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="mikroasm">
+		<description>Mikro Assembler</description>
+		<year>198?</year>
+		<publisher>Supersoft</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mikroasm" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="mikro assembler.80" size="0x2000" crc="fb6092a3" sha1="833545f69cdfd22ab188658b9a1ab5d4cb96504f" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1654,7 +1671,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="buckrog" supported="no">
+	<software name="buckrog">
 		<description>Buck Rogers: Planet of Zoom</description>
 		<year>1983</year>
 		<publisher>SEGA</publisher>
@@ -2636,7 +2653,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="moondust" supported="no">
+	<software name="moondust">
 		<description>Moon Dust</description>
 		<year>1983</year>
 		<publisher>Creative Software</publisher>
@@ -3121,12 +3138,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="addsub23" supported="no">
+	<software name="addsub23">
 		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2.-3. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="westermann_learning" />
+			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -3135,12 +3152,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="addsub34" supported="no">
+	<software name="addsub34">
 		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="westermann_learning" />
+			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -3149,12 +3166,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="geomet34" supported="no">
+	<software name="geomet34">
 		<description>Der Rechenlöwe: Fit in Geometrie - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="westermann_learning" />
+			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -3163,12 +3180,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="math1" supported="no">
+	<software name="math1">
 		<description>Der Rechenlöwe: Fit in Mathematik - 1. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="westermann_learning" />
+			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -3177,12 +3194,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="muldiv23" supported="no">
+	<software name="muldiv23">
 		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2.-3. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="westermann_learning" />
+			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -3191,12 +3208,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="muldiv34" supported="no">
+	<software name="muldiv34">
 		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="westermann_learning" />
+			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -3205,12 +3222,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="recht34" supported="no">
+	<software name="recht34">
 		<description>Der Rechtschreiblöwe: Fit in Rechtschreibung - 3.-4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="westermann_learning" />
+			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
@@ -3369,7 +3386,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="serptine" supported="no">
+	<software name="serptine">
 		<description>Serpentine</description>
 		<year>1982</year>
 		<publisher>Brøderbund</publisher>
@@ -3943,7 +3960,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1990</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ocean" />
+			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -3980,13 +3997,13 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="c64gscrt">
+	<software name="c64gs">
 		<description>Commodore 64 Game System Cartridge</description>
 		<!-- This cartridge came packaged with the C64 Game System. -->
 		<year>1990</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="c64gs" />
+			<feature name="slot" value="system3" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x80000">
@@ -4000,7 +4017,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1990</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ocean" />
+			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
@@ -4042,7 +4059,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1982</year>
 		<publisher>Synapse</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ocean" />
+			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -4070,7 +4087,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ocean" />
+			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -4084,7 +4101,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1985</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ocean" />
+			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -4098,7 +4115,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1990</year>
 		<publisher>System 3</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="c64gs" />
+			<feature name="slot" value="system3" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
@@ -4112,7 +4129,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1986</year>
 		<publisher>Access</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ocean" />
+			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -4135,12 +4152,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="myth">
+	<software name="myth" supported="no">
 		<description>Myth: History in the Making</description>
 		<year>1990</year>
 		<publisher>System 3</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="c64gs" />
+			<feature name="slot" value="system3" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
@@ -4163,14 +4180,14 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="navyseal">
+	<software name="navyseal" supported="no">
 		<description>Navy SEALs</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
 				<rom name="navy seals (1990)(ocean).80" size="0x20000" crc="e9b35896" sha1="0ccab1900df683d7f467fed49f92e98f03c3e393" offset="0x0000" />
 			</dataarea>
@@ -4219,16 +4236,16 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="robocop2">
+	<software name="robocop2" supported="no">
 		<description>Robocop 2</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x40000">
-				<rom name="robocop 2 (1990)(ocean).80" size="0x40000" crc="e1e8b732" sha1="0f356283b8e4372e0e81474ba658ca229a18d99e" offset="0x0000" />
+				<rom name="robocop 2 (1990)(ocean).80" size="0x40000" status="baddump" crc="e1e8b732" sha1="0f356283b8e4372e0e81474ba658ca229a18d99e" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4240,7 +4257,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
 				<rom name="robocop 3 (1992)(ocean software).80" size="0x20000" crc="ed9a36df" sha1="a15178958bd8c0503edd6caa631feb7b4b386fda" offset="0x0000" />
 			</dataarea>
@@ -4261,16 +4278,16 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="beast">
+	<software name="beast" supported="no">
 		<description>Shadow of the Beast</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x40000">
-				<rom name="shadow of the beast (1990)(ocean).80" size="0x40000" crc="a68dff98" sha1="86eb8c113adc2a13d236c738c4ac44d9a2f1de68" offset="0x0000" />
+				<rom name="shadow of the beast (1990)(ocean).80" size="0x40000" status="baddump" crc="a68dff98" sha1="86eb8c113adc2a13d236c738c4ac44d9a2f1de68" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4282,9 +4299,9 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x40000">
-				<rom name="space gun (1992)(ocean).80" size="0x40000" crc="1a815540" sha1="b9d41f4d2b0d94f53a809d4177a1dbb662a25aac" offset="0x0000" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="space gun (1992)(ocean).80" size="0x20000" crc="3eeddf3f" sha1="afe673ead1eaa947b94942b420f87960e0db4641" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4297,8 +4314,11 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="slot" value="zaxxon" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x5000">
-				<rom name="super zaxxon (1984)(hesware).80" size="0x5000" crc="376296d6" sha1="6435bca29b333ed90b0a2a6b7d92b6bc565863f1" offset="0x0000" />
+			<dataarea name="roml" size="0x1000">
+				<rom name="super zaxxon (1984)(hesware).80" size="0x1000" crc="bf888d1c" sha1="49d639e18b0a18978a7718c8e0cc5a8ba562c561" offset="0x0000" />
+			</dataarea>
+			<dataarea name="romh" size="0x4000">
+				<rom name="super zaxxon (1984)(hesware).a0" size="0x4000" crc="85c3e5b7" sha1="dfb582dd3beeb56a1298a3a800a4d13905104b7b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4324,7 +4344,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x20000">
 				<rom name="toki (1991)(ocean).80" size="0x20000" crc="1f148c97" sha1="123cd6768de4c4406e1026c41c9ba441d42fe966" offset="0x0000" />
 			</dataarea>
@@ -4350,7 +4370,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1990</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ocean" />
+			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4364,7 +4384,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ocean" />
+			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -4381,8 +4401,11 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="slot" value="zaxxon" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x5000">
-				<rom name="zaxxon (1984)(synapse).80" size="0x5000" crc="bf43637f" sha1="1685d49a535e3f9f38a2a769b9cfd3aff98d6cfa" offset="0x0000" />
+			<dataarea name="roml" size="0x1000">
+				<rom name="zaxxon (1984)(synapse).80" size="0x1000" crc="499ea478" sha1="da15b8a9f92e26b5650a1950abafc498cc6f78fb" offset="0x0000" />
+			</dataarea>
+			<dataarea name="romh" size="0x4000">
+				<rom name="zaxxon (1984)(synapse).a0" size="0x4000" crc="9890c4e1" sha1="0beda1c7d08b797a76cbb7d7c92bbcc137633715" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4669,7 +4692,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1988</year>
 		<publisher>Puma-Sharks</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -4707,7 +4730,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="delta323" supported="no">
+	<software name="delta323">
 		<description>Delta Drawing v3.23</description>
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
@@ -4777,7 +4800,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1988</year>
 		<publisher>CIA</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -4804,7 +4827,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -4826,12 +4849,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="formatm" supported="no">
+	<software name="formatm">
 		<description>Format- und Hardcopymodul (Ger)</description>
 		<year>19??</year>
 		<publisher>Rex Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -4853,12 +4876,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="happypac" supported="no">
+	<software name="happypac">
 		<description>Happy-Packer (Ger)</description>
 		<year>1987</year>
 		<publisher>Peter Arndt</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -4937,7 +4960,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -5084,12 +5107,12 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="tfgmodul" supported="no">
+	<software name="tfgmodul">
 		<description>TFG Module</description>
 		<year>1986</year>
 		<publisher>T.F.G. Software</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -5116,7 +5139,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex_utility" />
+			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -5350,7 +5373,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="comal_80" />
+			<feature name="slot" value="comal80" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
@@ -5364,7 +5387,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>1985</year>
 		<publisher>UniComal</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="comal_80" />
+			<feature name="slot" value="comal80" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
