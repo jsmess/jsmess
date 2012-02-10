@@ -85,8 +85,8 @@ public:
 	required_device<zx8301_device> m_zx8301;
 	required_device<zx8302_device> m_zx8302;
 	required_device<device_t> m_speaker;
-	required_device<device_t> m_mdv1;
-	required_device<device_t> m_mdv2;
+	required_device<microdrive_image_device> m_mdv1;
+	required_device<microdrive_image_device> m_mdv2;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_fdc;
 	required_device<printer_image_device> m_printer;
