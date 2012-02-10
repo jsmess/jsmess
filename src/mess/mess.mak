@@ -768,6 +768,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_simons_basic.o	\
 	$(MESS_MACHINE)/c64_std.o	\
 	$(MESS_MACHINE)/c64_super_explode.o	\
+	$(MESS_MACHINE)/c64_super_games.o	\
 	$(MESS_MACHINE)/c64_system3.o	\
 	$(MESS_MACHINE)/c64_vw64.o	\
 	$(MESS_MACHINE)/c64_westermann.o	\

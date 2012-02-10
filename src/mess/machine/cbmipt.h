@@ -18,6 +18,7 @@
 #include "machine/c64_simons_basic.h"
 #include "machine/c64_std.h"
 #include "machine/c64_super_explode.h"
+#include "machine/c64_super_games.h"
 #include "machine/c64_system3.h"
 #include "machine/c64_vw64.h"
 #include "machine/c64_westermann.h"
