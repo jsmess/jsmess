@@ -267,15 +267,15 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 				}
 				if(m_voice[x].voice_ctrl & 0x20)
 				{  // 16-bit PCM
-					m_voice[x].sample = (INT8)((m_wave_ram[(current & 0xffffe)+1]) | ((m_wave_ram[current & 0xffffe])<<8)>>8);
+					m_voice[x].sample = (INT16)((m_wave_ram[current & 0xffffe]) | ((m_wave_ram[(current & 0xffffe)+1])<<8));
 				}
 				else
 				{  // 8-bit PCM
-					m_voice[x].sample = (INT8)m_wave_ram[current & 0xfffff];
+					m_voice[x].sample = (INT16)(m_wave_ram[current & 0xfffff] << 8);
 				}
 				// TODO: implement proper panning
-				(*left) += ((m_voice[x].sample) * (vol/256));
-				(*right) += ((m_voice[x].sample) * (vol/256));
+				(*left) += ((m_voice[x].sample) * (vol/65536.0));
+				(*right) += ((m_voice[x].sample) * (vol/65536.0));
 				left++;
 				right++;
 				if(m_voice[x].voice_ctrl & 0x40)  // voice direction
@@ -283,7 +283,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 				else
 					m_voice[x].current_addr += (m_voice[x].freq_ctrl >> 1);
 #ifdef LOG_SOUND
-				INT32 smp = (m_voice[x].sample) * (vol / 256);
+				INT32 smp = (m_voice[x].sample) * (vol / 65536.0);
 				fwrite(&smp,4,1,f);
 #endif
 			}
