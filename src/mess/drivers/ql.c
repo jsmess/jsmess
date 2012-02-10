@@ -768,42 +768,42 @@ WRITE_LINE_MEMBER( ql_state::ql_comdata_w )
 
 WRITE_LINE_MEMBER( ql_state::zx8302_mdselck_w )
 {
-	microdrive_clk_w(m_mdv2, state);
-	microdrive_clk_w(m_mdv1, state);
+	m_mdv2->clk_w(state);
+	m_mdv1->clk_w(state);
 }
 
 WRITE_LINE_MEMBER( ql_state::zx8302_mdrdw_w )
 {
-	microdrive_read_write_w(m_mdv1, state);
-	microdrive_read_write_w(m_mdv2, state);
+	m_mdv1->read_write_w(state);
+	m_mdv2->read_write_w(state);
 }
 
 WRITE_LINE_MEMBER( ql_state::zx8302_erase_w )
 {
-	microdrive_erase_w(m_mdv1, state);
-	microdrive_erase_w(m_mdv2, state);
+	m_mdv1->erase_w(state);
+	m_mdv2->erase_w(state);
 }
 
 WRITE_LINE_MEMBER( ql_state::zx8302_raw1_w )
 {
-	microdrive_data1_w(m_mdv1, state);
-	microdrive_data1_w(m_mdv2, state);
+	m_mdv1->data1_w(state);
+	m_mdv2->data1_w(state);
 }
 
 READ_LINE_MEMBER( ql_state::zx8302_raw1_r )
 {
-	return microdrive_data1_r(m_mdv1) | microdrive_data1_r(m_mdv2);
+	return m_mdv1->data1_r() | m_mdv2->data1_r();
 }
 
 WRITE_LINE_MEMBER( ql_state::zx8302_raw2_w )
 {
-	microdrive_data2_w(m_mdv1, state);
-	microdrive_data2_w(m_mdv2, state);
+	m_mdv1->data2_w(state);
+	m_mdv2->data2_w(state);
 }
 
 READ_LINE_MEMBER( ql_state::zx8302_raw2_r )
 {
-	return microdrive_data2_r(m_mdv1) | microdrive_data2_r(m_mdv2);
+	return m_mdv1->data2_r() | m_mdv2->data2_r();
 }
 
 static ZX8302_INTERFACE( ql_zx8302_intf )
@@ -819,7 +819,7 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 	DEVCB_NULL, // NETOUT
 	DEVCB_NULL, // NETIN
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdselck_w),
-	DEVCB_DEVICE_LINE(MDV_1, microdrive_comms_in_w),
+	DEVCB_DEVICE_LINE_MEMBER(MDV_1, microdrive_image_device, comms_in_w),
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdrdw_w),
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_erase_w),
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw1_w),
@@ -894,7 +894,9 @@ wd17xx_interface ql_wd17xx_interface =
 
 static MICRODRIVE_CONFIG( mdv1_config )
 {
-	DEVCB_DEVICE_LINE(MDV_2, microdrive_comms_in_w)
+	DEVCB_DEVICE_LINE_MEMBER(MDV_2, microdrive_image_device, comms_in_w),
+	NULL,
+	NULL,
 };
 
 
@@ -904,7 +906,9 @@ static MICRODRIVE_CONFIG( mdv1_config )
 
 static MICRODRIVE_CONFIG( mdv2_config )
 {
-	DEVCB_NULL
+	DEVCB_NULL,
+	NULL,
+	NULL
 };
 
 

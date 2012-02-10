@@ -34,229 +34,171 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _microdrive_t microdrive_t;
-struct _microdrive_t
+// device type definition
+const device_type MICRODRIVE = &device_creator<microdrive_image_device>;
+
+//-------------------------------------------------
+//  microdrive_image_device - constructor
+//-------------------------------------------------
+
+microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
 {
-	devcb_resolved_write_line out_comms_out_func;
 
-	int clk;
-	int comms_in;
-	int comms_out;
-	int erase;
-	int read_write;
-
-	UINT8 *left;
-	UINT8 *right;
-
-	int bit_offset;
-	int byte_offset;
-
-	emu_timer *bit_timer;
-};
-
-/***************************************************************************
-    INLINE HELPERS
-***************************************************************************/
-
-INLINE microdrive_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == MICRODRIVE);
-	return (microdrive_t *) downcast<legacy_device_base *>(device)->token();
 }
 
-/***************************************************************************
-    LIVE DEVICE
-***************************************************************************/
+//-------------------------------------------------
+//  microdrive_image_device - destructor
+//-------------------------------------------------
 
-static TIMER_CALLBACK( bit_timer_tick )
+microdrive_image_device::~microdrive_image_device()
 {
-	device_t *device = (device_t *) ptr;
-	microdrive_t *mdv = get_safe_token(device);
-
-	mdv->bit_offset++;
-
-	if (mdv->bit_offset == 8)
-	{
-		mdv->bit_offset = 0;
-		mdv->byte_offset++;
-
-		if (mdv->byte_offset == MDV_IMAGE_LENGTH)
-		{
-			mdv->byte_offset = 0;
-		}
-	}
 }
 
-WRITE_LINE_DEVICE_HANDLER( microdrive_clk_w )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void microdrive_image_device::device_config_complete()
 {
-	microdrive_t *mdv = get_safe_token(device);
+	// inherit a copy of the static data
+	const microdrive_interface *intf = reinterpret_cast<const microdrive_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<microdrive_interface *>(this) = *intf;
 
-	if (LOG) logerror("Microdrive '%s' CLK: %u\n", device->tag(), state);
-
-	if (!mdv->clk && state)
+	// or initialize to defaults if none provided
+	else
 	{
-		mdv->comms_out = mdv->comms_in;
-
-		if (LOG) logerror("Microdrive '%s' COMMS OUT: %u\n", device->tag(), mdv->comms_out);
-
-		mdv->out_comms_out_func(mdv->comms_out);
-
-		mdv->bit_timer->enable(mdv->comms_out);
+		memset(&m_out_comms_out_cb, 0, sizeof(m_out_comms_out_cb));
+		memset(&m_interface, 0, sizeof(m_interface));
+		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
 	}
 
-	mdv->clk = state;
+	// set brief and instance name
+	update_names();
 }
 
-WRITE_LINE_DEVICE_HANDLER( microdrive_comms_in_w )
+
+void microdrive_image_device::device_start()
 {
-	microdrive_t *mdv = get_safe_token(device);
-
-	if (LOG) logerror("Microdrive '%s' COMMS IN: %u\n", device->tag(), state);
-
-	mdv->comms_in = state;
-}
-
-WRITE_LINE_DEVICE_HANDLER( microdrive_erase_w )
-{
-	microdrive_t *mdv = get_safe_token(device);
-
-	if (LOG) logerror("Microdrive '%s' ERASE: %u\n", device->tag(), state);
-
-	mdv->erase = state;
-}
-
-WRITE_LINE_DEVICE_HANDLER( microdrive_read_write_w )
-{
-	microdrive_t *mdv = get_safe_token(device);
-
-	if (LOG) logerror("Microdrive '%s' READ/WRITE: %u\n", device->tag(), state);
-
-	mdv->read_write = state;
-}
-
-WRITE_LINE_DEVICE_HANDLER( microdrive_data1_w )
-{
-	microdrive_t *mdv = get_safe_token(device);
-
-	if (mdv->comms_out && !mdv->read_write)
-	{
-		// TODO
-	}
-}
-
-WRITE_LINE_DEVICE_HANDLER( microdrive_data2_w )
-{
-	microdrive_t *mdv = get_safe_token(device);
-
-	if (mdv->comms_out && !mdv->read_write)
-	{
-		// TODO
-	}
-}
-
-READ_LINE_DEVICE_HANDLER( microdrive_data1_r )
-{
-	microdrive_t *mdv = get_safe_token(device);
-
-	int data = 0;
-
-	if (mdv->comms_out && mdv->read_write)
-	{
-		data = BIT(mdv->left[mdv->byte_offset], 7 - mdv->bit_offset);
-	}
-
-	return data;
-}
-
-READ_LINE_DEVICE_HANDLER( microdrive_data2_r )
-{
-	microdrive_t *mdv = get_safe_token(device);
-
-	int data = 0;
-
-	if (mdv->comms_out && mdv->read_write)
-	{
-		data = BIT(mdv->right[mdv->byte_offset], 7 - mdv->bit_offset);
-	}
-
-	return data;
-}
-
-/***************************************************************************
-    DEVICE CONFIGURATION
-***************************************************************************/
-
-static DEVICE_START( microdrive )
-{
-	microdrive_t *mdv = get_safe_token(device);
-	const microdrive_config *config = (const microdrive_config*) device->static_config();
-
 	// resolve callbacks
-	mdv->out_comms_out_func.resolve(config->out_comms_out_func, *device);
+	m_out_comms_out_func.resolve(m_out_comms_out_cb, *this);
 
 	// allocate track buffers
-	mdv->left = auto_alloc_array(device->machine(), UINT8, MDV_IMAGE_LENGTH / 2);
-	mdv->right = auto_alloc_array(device->machine(), UINT8, MDV_IMAGE_LENGTH / 2);
+	m_left = auto_alloc_array(machine(), UINT8, MDV_IMAGE_LENGTH / 2);
+	m_right = auto_alloc_array(machine(), UINT8, MDV_IMAGE_LENGTH / 2);
 
 	// allocate timers
-	mdv->bit_timer = device->machine().scheduler().timer_alloc(FUNC(bit_timer_tick), (void *) device);
-	mdv->bit_timer->adjust(attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
-	mdv->bit_timer->enable(0);
+	m_bit_timer = timer_alloc();
+	m_bit_timer->adjust(attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
+	m_bit_timer->enable(0);
 }
 
-static DEVICE_IMAGE_LOAD( microdrive )
+bool microdrive_image_device::call_load()
 {
-	device_t *device = &image.device();
-	microdrive_t *mdv = get_safe_token(device);
-
-	if (image.length() != MDV_IMAGE_LENGTH)
+	if (length() != MDV_IMAGE_LENGTH)
 		return IMAGE_INIT_FAIL;
 
 	for (int i = 0; i < MDV_IMAGE_LENGTH / 2; i++)
 	{
-		image.fread(mdv->left, 1);
-		image.fread(mdv->right, 1);
+		fread(m_left, 1);
+		fread(m_right, 1);
 	}
 
-	mdv->bit_offset = 0;
-	mdv->byte_offset = 0;
+	m_bit_offset = 0;
+	m_byte_offset = 0;
 
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_UNLOAD( microdrive )
+void microdrive_image_device::call_unload()
 {
-	device_t *device = &image.device();
-	microdrive_t *mdv = get_safe_token(device);
-
-	memset(mdv->left, 0, MDV_IMAGE_LENGTH / 2);
-	memset(mdv->right, 0, MDV_IMAGE_LENGTH / 2);
+	memset(m_left, 0, MDV_IMAGE_LENGTH / 2);
+	memset(m_right, 0, MDV_IMAGE_LENGTH / 2);
 }
 
-DEVICE_GET_INFO( microdrive )
+void microdrive_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch (state)
+	m_bit_offset++;
+
+	if (m_bit_offset == 8)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(microdrive_t); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0; break;
-		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_CASSETTE; break;
-		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 0; break;
+		m_bit_offset = 0;
+		m_byte_offset++;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(microdrive); break;
-		case DEVINFO_FCT_IMAGE_LOAD:					info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(microdrive); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:					info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(microdrive); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Microdrive"); break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Microdrive"); break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__); break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "mdv"); break;
+		if (m_byte_offset == MDV_IMAGE_LENGTH)
+		{
+			m_byte_offset = 0;
+		}
 	}
 }
 
-DEFINE_LEGACY_IMAGE_DEVICE(MICRODRIVE, microdrive);
+WRITE_LINE_MEMBER( microdrive_image_device::clk_w )
+{
+	if (LOG) logerror("Microdrive '%s' CLK: %u\n", tag(), state);
+	if (!m_clk && state)
+	{
+		m_comms_out = m_comms_in;
+		if (LOG) logerror("Microdrive '%s' COMMS OUT: %u\n", tag(), m_comms_out);
+		m_out_comms_out_func(m_comms_out);
+		m_bit_timer->enable(m_comms_out);
+	}
+	m_clk = state;
+}
+
+WRITE_LINE_MEMBER( microdrive_image_device::comms_in_w )
+{
+	if (LOG) logerror("Microdrive '%s' COMMS IN: %u\n", tag(), state);
+	m_comms_in = state;
+}
+
+WRITE_LINE_MEMBER( microdrive_image_device::erase_w )
+{
+	if (LOG) logerror("Microdrive '%s' ERASE: %u\n", tag(), state);
+	m_erase = state;
+}
+
+WRITE_LINE_MEMBER( microdrive_image_device::read_write_w )
+{
+	if (LOG) logerror("Microdrive '%s' READ/WRITE: %u\n", tag(), state);
+	m_read_write = state;
+}
+
+WRITE_LINE_MEMBER( microdrive_image_device::data1_w )
+{
+	if (m_comms_out && !m_read_write)
+	{
+		// TODO
+	}
+}
+
+WRITE_LINE_MEMBER( microdrive_image_device::data2_w )
+{
+	if (m_comms_out && !m_read_write)
+	{
+		// TODO
+	}
+}
+
+READ_LINE_MEMBER( microdrive_image_device::data1_r )
+{
+	int data = 0;
+	if (m_comms_out && m_read_write)
+	{
+		data = BIT(m_left[m_byte_offset], 7 - m_bit_offset);
+	}
+	return data;
+}
+
+READ_LINE_MEMBER( microdrive_image_device::data2_r )
+{
+	int data = 0;
+	if (m_comms_out && m_read_write)
+	{
+		data = BIT(m_right[m_byte_offset], 7 - m_bit_offset);
+	}
+	return data;
+}
