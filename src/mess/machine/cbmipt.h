@@ -6,6 +6,7 @@
 #include "machine/c64_comal80.h"
 #include "machine/c64_dinamic.h"
 #include "machine/c64_easy_calc_result.h"
+#include "machine/c64_epyx_fast_load.h"
 #include "machine/c64_fun_play.h"
 #include "machine/c64_georam.h"
 #include "machine/c64_magic_desk.h"

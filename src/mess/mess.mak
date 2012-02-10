@@ -756,6 +756,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_comal80.o	\
 	$(MESS_MACHINE)/c64_dinamic.o	\
 	$(MESS_MACHINE)/c64_easy_calc_result.o	\
+	$(MESS_MACHINE)/c64_epyx_fast_load.o	\
 	$(MESS_MACHINE)/c64_fun_play.o	\
 	$(MESS_MACHINE)/c64_georam.o	\
 	$(MESS_MACHINE)/c64_magic_desk.o	\
