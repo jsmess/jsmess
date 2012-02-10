@@ -421,7 +421,7 @@ static void lynx_blit_rle_do_work( lynx_state *state, const INT16 y, const int x
 	int literal_data, count, color;
 	UINT16 width_accum;
 
-	width_accum = (xdir == 1) ? 0 : state->m_blitter.width_offset;
+	width_accum = (xdir == 1) ? state->m_blitter.width_offset : 0;
 	for( bits = 0, j = 0, buffer = 0, xi = state->m_blitter.x_pos - state->m_blitter.xoff; ; )		/* through the rle entries */
 	{
 		if (bits < 5 + bits_per_pixel) /* under 7 bits no complete entry */
@@ -715,7 +715,7 @@ static void lynx_blitter(running_machine &machine)
 		state->m_blitter.spr_ctl0 = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRCTL0);
 		state->m_blitter.spr_ctl1 = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRCTL1);
 		state->m_blitter.spr_coll = lynx_read_ram(state, state->m_blitter.scb + SCB_SPRCOLL);
-		state->m_blitter.memory_accesses += 8;
+		state->m_blitter.memory_accesses += 5;
 
 		if(!(state->m_blitter.spr_ctl1 & 0x04)) // sprite will be processed (if sprite is skipped first 5 bytes are still copied to suzy)
 		{
@@ -969,9 +969,9 @@ static READ8_HANDLER( suzy_read )
 		case STRETCHH:
 			return state->m_blitter.stretch>>8;
 		case TILTL:
-			return state->m_blitter.stretch & 0xff;
+			return state->m_blitter.tilt & 0xff;
 		case TILTH:
-			return state->m_blitter.stretch>>8;
+			return state->m_blitter.tilt>>8;
 		// case SPRDOFFL:
 		// case SPRVPOSL:
 		// case COLLOFFL:
@@ -1159,11 +1159,11 @@ static WRITE8_HANDLER( suzy_write )
 			state->m_blitter.stretch |= data<<8;
 			break;
 		case TILTL:
-			state->m_blitter.stretch = data;
+			state->m_blitter.tilt = data;
 			break;
 		case TILTH:
-			state->m_blitter.stretch &= 0xff;
-			state->m_blitter.stretch |= data<<8;
+			state->m_blitter.tilt &= 0xff;
+			state->m_blitter.tilt |= data<<8;
 			break;
 		// case SPRDOFFL:
 		// case SPRVPOSL:
@@ -1421,7 +1421,7 @@ static void lynx_timer_signal_irq(running_machine &machine, int which)
 			case 104:
 				break;
 			case 103:
-				state->m_mikey.vb_rest = 1;
+				state->m_mikey.vb_rest = 1; // Not sure about rest timing (note rest is inverted)
 				break;
 			case 102:
 				state->m_mikey.disp_addr = state->m_mikey.data[0x94] | (state->m_mikey.data[0x95] << 8);
@@ -1761,7 +1761,7 @@ static READ8_HANDLER( mikey_read )
 		value |= (direction & 0x02) ? (state->m_mikey.data[offset] & 0x02) : 0x00;	// Cart Address Data output (0 turns cart power on)
 		value |= (direction & 0x04) ? (state->m_mikey.data[offset] & 0x04) : 0x04;	// noexp input
 		// REST read returns actual rest state anded with rest output bit
-		value |= (direction & 0x08) ? (state->m_mikey.data[offset] & 0x08) & (state->m_mikey.vb_rest<<3) : 0x00;	// rest output
+		value |= (direction & 0x08) ? (((state->m_mikey.data[offset] & 0x08) && (state->m_mikey.vb_rest)) ? 0x00 : 0x08) : 0x00;	// rest output (inverted)
 		value |= (direction & 0x10) ? (state->m_mikey.data[offset] & 0x10) : 0x10;	// audin input
 		/* Hack: we disable COMLynx  */
 		value |= 0x04;
