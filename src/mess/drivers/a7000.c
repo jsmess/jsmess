@@ -577,7 +577,7 @@ static TIMER_CALLBACK( IOMD_timer0_callback )
 	state->m_IRQ_status_A|=0x20;
 	if(state->m_IRQ_mask_A&0x20)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE,1);
 	}
 }
 
@@ -587,7 +587,7 @@ static TIMER_CALLBACK( IOMD_timer1_callback )
 	state->m_IRQ_status_A|=0x40;
 	if(state->m_IRQ_mask_A&0x40)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE,1);
 	}
 }
 
@@ -597,7 +597,7 @@ static TIMER_CALLBACK( flyback_timer_callback )
 	state->m_IRQ_status_A|=0x08;
 	if(state->m_IRQ_mask_A&0x08)
 	{
-		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE);
+		generic_pulse_irq_line(machine.device("maincpu"), ARM7_IRQ_LINE,1);
 	}
 
 	state->m_flyback_timer->adjust(machine.primary_screen->time_until_pos(state->m_vidc20_vert_reg[VDER]));
