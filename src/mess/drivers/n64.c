@@ -151,7 +151,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	return IMAGE_INIT_PASS;
 }
 
-static MACHINE_CONFIG_START( n64, _n64_state )
+static MACHINE_CONFIG_START( n64, n64_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
@@ -165,6 +165,7 @@ static MACHINE_CONFIG_START( n64, _n64_state )
 
 	MCFG_MACHINE_START( n64 )
 	MCFG_MACHINE_RESET( n64 )
+	//MCFG_QUANTUM_TIME(attotime::from_hz(9700000))
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
