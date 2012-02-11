@@ -510,6 +510,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mpc105.o	\
 	$(MESS_MACHINE)/mos6530.o	\
 	$(MESS_MACHINE)/s100.o		\
+	$(MESS_MACHINE)/serial.o	\
 	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
 	$(MESS_MACHINE)/ncr5390.o	\
@@ -1332,6 +1333,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/pc_joy.o	\
 	$(MESS_MACHINE)/kb_keytro.o	\
 	$(MESS_MACHINE)/isa_adlib.o	\
+	$(MESS_MACHINE)/ser_mouse.o	\
 	$(MESS_MACHINE)/isa_com.o	\
 	$(MESS_MACHINE)/isa_fdc.o	\
 	$(MESS_MACHINE)/isa_finalchs.o	\

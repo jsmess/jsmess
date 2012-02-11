@@ -247,7 +247,6 @@ static INPUT_PORTS_START( atcga )
 
 	PORT_INCLUDE( kb_keytronic_at )		/* IN4 - IN11 */
 	PORT_INCLUDE( pcvideo_cga )
-	PORT_INCLUDE( pc_mouse_microsoft )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( atvga )
@@ -289,7 +288,6 @@ static INPUT_PORTS_START( atvga )
 	PORT_DIPSETTING(	0x01, DEF_STR( Yes ) )
 
 	PORT_INCLUDE( kb_keytronic_at )
-	PORT_INCLUDE( pc_mouse_microsoft )
 INPUT_PORTS_END
 
 static const unsigned i286_address_mask = 0x00ffffff;
