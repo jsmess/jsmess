@@ -46,7 +46,8 @@ READ8_MEMBER( gf1_device::adlib_r )
 	{
 		case 0:
 			return m_adlib_status;
-			break;
+		case 1:
+			return m_adlib_data;
 	}
 	return retVal;
 }
@@ -59,9 +60,8 @@ WRITE8_MEMBER( gf1_device::adlib_w )
 			m_adlib_cmd = data;
 			break;
 		case 1:
-			switch(m_adlib_cmd)
+			if(m_adlib_cmd == 0x04 && !(m_timer_ctrl & 0x01))
 			{
-			case 0x04:
 				if(data & 0x80)
 				{
 					m_timer1_irq_func(0);
@@ -94,9 +94,17 @@ WRITE8_MEMBER( gf1_device::adlib_w )
 					logerror("GUS: Timer enable - %02x\n",data);
 				}
 				m_adlib_timer_cmd = data;
-				break;
-			default:
-				logerror("GUS: Invalid Adlib register write %02x\n",m_adlib_cmd);
+			}
+			else
+			{
+				m_adlib_data = data;
+				if(m_timer_ctrl & 0x02)
+				{
+					m_irq_source |= 0x10;
+					//m_adlib_status |= 0x01;
+					m_timer1_irq_func(1);
+					logerror("GUS: 2X9 Timer triggered!\n");
+				}
 			}
 			break;
 	}
@@ -405,7 +413,7 @@ READ8_MEMBER(gf1_device::global_reg_select_r)
 	if(offset == 0)
 		return m_current_voice;
 	else
-		return m_current_reg;
+		return m_current_reg | 0xc0;
 }
 
 WRITE8_MEMBER(gf1_device::global_reg_select_w)
@@ -950,6 +958,11 @@ WRITE8_MEMBER(gf1_device::adlib_cmd_w)
 			logerror("GUS: DMA channels set: DMA%i, DMA%i\n",m_dma_channel1,m_dma_channel2);
 		}
 	}
+	else
+	{
+		m_adlib_status = data;
+		logerror("GUS: Adlib status set to %02x\n",data);
+	}
 }
 
 /* port 0x2X0 - Mix control register
@@ -1081,6 +1094,21 @@ static MACHINE_CONFIG_FRAGMENT( gus_config )
 //	MCFG_ACIA6850_ADD("midi",gus_midi_interface)
 MACHINE_CONFIG_END
 
+static INPUT_PORTS_START( gus_joy )
+	PORT_START("gus_joy")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW,	 IPT_UNUSED ) // x/y ad stick to digital converters
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,   IPT_BUTTON1) PORT_NAME("GUS Joystick Button 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,   IPT_BUTTON2) PORT_NAME("GUS Joystick Button 2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,   IPT_BUTTON3) PORT_NAME("GUS Joystick Button 3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,   IPT_BUTTON4) PORT_NAME("GUS Joystick Button 4")
+
+	PORT_START("gus_joy_1")
+	PORT_BIT(0xff,0x80,IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
+
+	PORT_START("gus_joy_2")
+	PORT_BIT(0xff,0x80,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
+INPUT_PORTS_END
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -1089,6 +1117,11 @@ MACHINE_CONFIG_END
 machine_config_constructor isa16_gus_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( gus_config );
+}
+
+ioport_constructor isa16_gus_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( gus_joy );
 }
 
 
@@ -1103,8 +1136,9 @@ void isa16_gus_device::device_start()
 	m_gf1 = subdevice<gf1_device>("gf1");
 	//m_midi = subdevice<acia6850_device>("midi");
 	set_isa_device();
+	m_isa->install_device(0x0200, 0x0201, 0, 0, read8_delegate(FUNC(isa16_gus_device::joy_r),this), write8_delegate(FUNC(isa16_gus_device::joy_w),this) );
 	m_isa->install_device(0x0220, 0x022f, 0, 0, read8_delegate(FUNC(isa16_gus_device::board_r),this), write8_delegate(FUNC(isa16_gus_device::board_w),this) );
-	m_isa->install_device(0x0320, 0x032f, 0, 0, read8_delegate(FUNC(isa16_gus_device::synth_r),this), write8_delegate(FUNC(isa16_gus_device::synth_w),this) );
+	m_isa->install_device(0x0320, 0x0327, 0, 0, read8_delegate(FUNC(isa16_gus_device::synth_r),this), write8_delegate(FUNC(isa16_gus_device::synth_w),this) );
 	m_isa->install_device(0x0388, 0x0389, 0, 0, read8_delegate(FUNC(isa16_gus_device::adlib_r),this), write8_delegate(FUNC(isa16_gus_device::adlib_w),this) );
 }
 
@@ -1163,6 +1197,7 @@ WRITE8_MEMBER(isa16_gus_device::board_w)
 	case 0x0a:
 	case 0x0b:
 		m_gf1->adlib_cmd_w(space,offset-10,data);
+		break;
 	default:
 		logerror("GUS: Invalid or unimplemented register write %02x of port 0x2X%01x\n",data,offset);
 	}
@@ -1227,6 +1262,34 @@ READ8_MEMBER(isa16_gus_device::adlib_r)
 WRITE8_MEMBER(isa16_gus_device::adlib_w)
 {
 	m_gf1->adlib_w(space,offset,data);
+}
+
+READ8_MEMBER(isa16_gus_device::joy_r)
+{
+	if(offset == 1)
+	{
+		UINT8 data = 0;
+		int delta;
+		attotime new_time = machine().time();
+
+		{
+			data = input_port_read(*this, "gus_joy") | 0x0f;
+
+			{
+				delta = ((new_time - m_joy_time) * 256 * 1000).seconds;
+
+				if (input_port_read(*this, "gus_joy_1") < delta) data &= ~0x01;
+				if (input_port_read(*this, "gus_joy_2") < delta) data &= ~0x02;
+			}
+		}
+		return data;
+	}
+	return 0xff;
+}
+
+WRITE8_MEMBER(isa16_gus_device::joy_w)
+{
+	m_joy_time = machine().time();
 }
 
 WRITE_LINE_MEMBER(isa16_gus_device::wavetable_irq)

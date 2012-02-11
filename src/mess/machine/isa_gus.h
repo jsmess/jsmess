@@ -194,6 +194,7 @@ private:
         UINT8 m_adlib_timer1_enable;
         UINT8 m_adlib_timer2_enable;
         UINT8 m_adlib_status;
+        UINT8 m_adlib_data;
         UINT8 m_voice_irq_fifo[32];
         UINT8 m_voice_irq_ptr;
         UINT8 m_voice_irq_current;
@@ -222,6 +223,8 @@ public:
 		DECLARE_WRITE8_MEMBER(synth_w);
 		DECLARE_READ8_MEMBER(adlib_r);
 		DECLARE_WRITE8_MEMBER(adlib_w);
+        DECLARE_READ8_MEMBER(joy_r);
+        DECLARE_WRITE8_MEMBER(joy_w);
         DECLARE_WRITE_LINE_MEMBER(midi_irq);
         DECLARE_WRITE_LINE_MEMBER(wavetable_irq);
         DECLARE_WRITE_LINE_MEMBER(volumeramp_irq);
@@ -237,6 +240,7 @@ public:
 
         // optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
+		virtual ioport_constructor device_input_ports() const;
 protected:
         // device-level overrides
         virtual void device_start();
@@ -248,6 +252,7 @@ private:
         acia6850_device* m_midi;
 
         UINT8 m_irq_status;
+        attotime m_joy_time;
 };
 
 // device type definition
