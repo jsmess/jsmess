@@ -430,7 +430,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/n64.o		\
 	$(MAME_VIDEO)/n64.o			\
 	$(MAME_VIDEO)/rdpblend.o	\
-	$(MAME_VIDEO)/rdpfb.o		\
 	$(MAME_VIDEO)/rdptpipe.o	\
 	$(MAME_VIDEO)/rdpspn16.o	\
 	$(MAME_MACHINE)/pcshare.o	\
