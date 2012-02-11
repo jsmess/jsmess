@@ -29640,7 +29640,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="ganbared">
+	<software name="daigensn">
 		<description>Ganbare! Daiku no Gen-san (Jpn)</description>
 		<year>1993</year>
 		<publisher>Irem</publisher>
@@ -46176,7 +46176,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="superedf">
+	<software name="superedf" cloneof="earthdef">
 		<description>Super E.D.F. (Jpn)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -46849,7 +46849,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="slinearp" cloneof="spacefoo">
+	<software name="slinearb" cloneof="spacefoo">
 		<description>Super Linearball (Jpn)</description>
 		<year>1992</year>
 		<publisher>Hiro</publisher>
