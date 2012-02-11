@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "isa_com.h"
 #include "machine/ins8250.h"
-#include "machine/pc_mouse.h"
+#include "machine/ser_mouse.h"
 
 /* called when a interrupt is set/cleared from com hardware */
 static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_1 )
@@ -22,13 +22,14 @@ static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_2 )
 	com->m_isa->irq3_w(state);
 }
 
-/* called when com registers read/written - used to update peripherals that
-are connected */
-static void pc_com_refresh_connected_common(device_t *device, int n, int data)
+static void pc_com_refresh_connected_common(device_t *uart, int n, int data)
 {
-	/* mouse connected to this port? */
-	if (input_port_read(*device->owner(), "DSW") & (0x80>>n))
-		pc_mouse_handshake_in(device,data);
+	isa8_com_device	*com  = downcast<isa8_com_device *>(uart->owner());
+	rs232_port_device *port = com->get_port(n);
+	
+	port->dtr_w(data & 1);
+	port->rts_w((data & 2) && 1);
+	ins8250_handshake_in(uart, (port->cts_r() << 4)|(port->dsr_r() << 5)|(port->ri_r() << 6)|(port->dcd_r() << 7));
 }
 
 static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_0 ) { pc_com_refresh_connected_common( device, 0, data ); }
@@ -36,55 +37,104 @@ static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_1 ) { pc_com_refresh_connecte
 static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_2 ) { pc_com_refresh_connected_common( device, 2, data ); }
 static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_3 ) { pc_com_refresh_connected_common( device, 3, data ); }
 
+static void pc_com_tx(device_t *uart, UINT8 data, int n)
+{
+	isa8_com_device	*com  = downcast<isa8_com_device *>(uart->owner());
+	com->get_port(n)->tx8(*memory_nonspecific_space(uart->machine()), 0, data);
+}
+
+static INS8250_TRANSMIT( pc_com_tx_0 ) { pc_com_tx(device, data, 0); }
+static INS8250_TRANSMIT( pc_com_tx_1 ) { pc_com_tx(device, data, 1); }
+static INS8250_TRANSMIT( pc_com_tx_2 ) { pc_com_tx(device, data, 2); }
+static INS8250_TRANSMIT( pc_com_tx_3 ) { pc_com_tx(device, data, 3); }
+
+WRITE8_DEVICE_HANDLER( pc_com_rx_0 ) { ins8250_receive(downcast<isa8_com_device *>(device->owner())->get_uart(0), data); }
+WRITE8_DEVICE_HANDLER( pc_com_rx_1 ) { ins8250_receive(downcast<isa8_com_device *>(device->owner())->get_uart(1), data); }
+WRITE8_DEVICE_HANDLER( pc_com_rx_2 ) { ins8250_receive(downcast<isa8_com_device *>(device->owner())->get_uart(2), data); }
+WRITE8_DEVICE_HANDLER( pc_com_rx_3 ) { ins8250_receive(downcast<isa8_com_device *>(device->owner())->get_uart(3), data); }
+
 static const ins8250_interface genpc_com_interface[4]=
 {
 	{
 		1843200,
 		DEVCB_LINE(pc_com_interrupt_1),
-		NULL,
+		pc_com_tx_0,
 		pc_com_handshake_out_0,
 		NULL
 	},
 	{
 		1843200,
 		DEVCB_LINE(pc_com_interrupt_2),
-		NULL,
+		pc_com_tx_1,
 		pc_com_handshake_out_1,
 		NULL
 	},
 	{
 		1843200,
 		DEVCB_LINE(pc_com_interrupt_1),
-		NULL,
+		pc_com_tx_2,
 		pc_com_handshake_out_2,
 		NULL
 	},
 	{
 		1843200,
 		DEVCB_LINE(pc_com_interrupt_2),
-		NULL,
+		pc_com_tx_3,
 		pc_com_handshake_out_3,
 		NULL
 	}
 };
+
+static const rs232_port_interface serport_config[4] =
+{
+	{
+		DEVCB_HANDLER( pc_com_rx_0 ),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	{
+		DEVCB_HANDLER( pc_com_rx_1 ),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	{
+		DEVCB_HANDLER( pc_com_rx_2 ),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	{
+		DEVCB_HANDLER( pc_com_rx_3 ),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	}
+};
+
+static SLOT_INTERFACE_START(isa_com)
+	SLOT_INTERFACE("mouse", SERIAL_MOUSE)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( com_config )
 	MCFG_INS8250_ADD( "uart_0", genpc_com_interface[0] )
 	MCFG_INS8250_ADD( "uart_1", genpc_com_interface[1] )
 	MCFG_INS8250_ADD( "uart_2", genpc_com_interface[2] )
 	MCFG_INS8250_ADD( "uart_3", genpc_com_interface[3] )
+	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "mouse", NULL )
+	MCFG_RS232_PORT_ADD( "serport1", serport_config[1], isa_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", serport_config[3], isa_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", serport_config[4], isa_com, NULL, NULL )
 MACHINE_CONFIG_END
-
-static INPUT_PORTS_START( com )
-	PORT_START("DSW")
-	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
-	PORT_DIPSETTING(	0x80, "COM1" )
-	PORT_DIPSETTING(	0x40, "COM2" )
-	PORT_DIPSETTING(	0x20, "COM3" )
-	PORT_DIPSETTING(	0x10, "COM4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_BIT( 0x0f, 0x0f,	IPT_UNUSED )
-INPUT_PORTS_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -100,15 +150,6 @@ const device_type ISA8_COM = &device_creator<isa8_com_device>;
 machine_config_constructor isa8_com_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( com_config );
-}
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-ioport_constructor isa8_com_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( com );
 }
 
 //**************************************************************************
@@ -139,10 +180,19 @@ isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type
 void isa8_com_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(subdevice("uart_0"), 0x03f8, 0x03ff, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
-	m_isa->install_device(subdevice("uart_1"), 0x02f8, 0x02ff, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
-	m_isa->install_device(subdevice("uart_2"), 0x03e8, 0x03ef, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
-	m_isa->install_device(subdevice("uart_3"), 0x02e8, 0x02ef, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
+	m_uart[0] = subdevice("uart_0");
+	m_uart[1] = subdevice("uart_1");
+	m_uart[2] = subdevice("uart_2");
+	m_uart[3] = subdevice("uart_3");
+	m_isa->install_device(m_uart[0], 0x03f8, 0x03ff, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
+	m_isa->install_device(m_uart[1], 0x02f8, 0x02ff, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
+	m_isa->install_device(m_uart[2], 0x03e8, 0x03ef, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
+	m_isa->install_device(m_uart[3], 0x02e8, 0x02ef, 0, 0, FUNC(ins8250_r), FUNC(ins8250_w) );
+
+	m_serport[0] = subdevice<rs232_port_device>("serport0");
+	m_serport[1] = subdevice<rs232_port_device>("serport1");
+	m_serport[2] = subdevice<rs232_port_device>("serport2");
+	m_serport[3] = subdevice<rs232_port_device>("serport3");
 }
 
 //-------------------------------------------------
@@ -151,8 +201,6 @@ void isa8_com_device::device_start()
 
 void isa8_com_device::device_reset()
 {
-	pc_mouse_initialise(machine());
-	pc_mouse_set_serial_port(subdevice("uart_0"));
 }
 
 static MACHINE_CONFIG_FRAGMENT( com_at_config )
@@ -160,6 +208,10 @@ static MACHINE_CONFIG_FRAGMENT( com_at_config )
 	MCFG_NS16450_ADD( "uart_1", genpc_com_interface[1] )
 	MCFG_NS16450_ADD( "uart_2", genpc_com_interface[2] )
 	MCFG_NS16450_ADD( "uart_3", genpc_com_interface[3] )
+	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "mouse", NULL )
+	MCFG_RS232_PORT_ADD( "serport1", serport_config[1], isa_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", serport_config[3], isa_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", serport_config[4], isa_com, NULL, NULL )
 MACHINE_CONFIG_END
 
 //**************************************************************************

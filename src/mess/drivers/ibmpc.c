@@ -301,7 +301,6 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ibm5150 )
 	PORT_INCLUDE( kb_keytronic_pc )		/* IN4 - IN11 */
-//  PORT_INCLUDE( pc_mouse_microsoft )  /* IN12 - IN14 */
 //  PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 INPUT_PORTS_END
 
