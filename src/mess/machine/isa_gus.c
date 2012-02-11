@@ -228,6 +228,11 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 			for(y=samples-1; y>=0; y--)
 			{
 				UINT32 current = m_voice[x].current_addr >> 9;
+				// TODO: implement proper panning
+				(*left) += ((m_voice[x].sample) * (vol/65536.0));
+				(*right) += ((m_voice[x].sample) * (vol/65536.0));
+				left++;
+				right++;
 				if((!(m_voice[x].voice_ctrl & 0x40)) && (m_voice[x].current_addr >= m_voice[x].end_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
 				{
 					if(m_voice[x].vol_ramp_ctrl & 0x04)
@@ -240,6 +245,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					{
 						if(!(m_voice[x].voice_ctrl & 0x08))
 							m_voice[x].voice_ctrl |= 0x01;
+						else
 						{
 							if(m_voice[x].voice_ctrl & 0x10)
 								m_voice[x].voice_ctrl |= 0x40; // change direction
@@ -263,6 +269,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 						// end voice, unless looping
 						if(!(m_voice[x].voice_ctrl & 0x08))
 							m_voice[x].voice_ctrl |= 0x01;
+						else
 						{
 							if(m_voice[x].voice_ctrl & 0x10)
 								m_voice[x].voice_ctrl &= ~0x40; // change direction
@@ -281,11 +288,6 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 				{  // 8-bit PCM
 					m_voice[x].sample = (INT16)(m_wave_ram[current & 0xfffff] << 8);
 				}
-				// TODO: implement proper panning
-				(*left) += ((m_voice[x].sample) * (vol/65536.0));
-				(*right) += ((m_voice[x].sample) * (vol/65536.0));
-				left++;
-				right++;
 				if(m_voice[x].voice_ctrl & 0x40)  // voice direction
 					m_voice[x].current_addr -= (m_voice[x].freq_ctrl >> 1);
 				else
@@ -688,7 +690,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 			m_dma_dram_ctrl = data & 0xbf;
 			m_dma_16bit = data & 0x40;
 			if(data & 0x01)
-				m_dmatimer->adjust(attotime::zero,0,attotime::from_nsec(500));  // a guess for now
+				m_dmatimer->adjust(attotime::zero,0,attotime::from_nsec(11489));  // based on 680Kb/sec mentioned in UltraMID docs
 			else
 				m_dmatimer->adjust(attotime::zero,0,attotime::never);  // stop transfer
 		}
