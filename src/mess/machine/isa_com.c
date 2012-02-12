@@ -122,7 +122,8 @@ static const rs232_port_interface serport_config[4] =
 };
 
 static SLOT_INTERFACE_START(isa_com)
-	SLOT_INTERFACE("mouse", SERIAL_MOUSE)
+	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
+	SLOT_INTERFACE("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( com_config )
@@ -130,7 +131,7 @@ static MACHINE_CONFIG_FRAGMENT( com_config )
 	MCFG_INS8250_ADD( "uart_1", genpc_com_interface[1] )
 	MCFG_INS8250_ADD( "uart_2", genpc_com_interface[2] )
 	MCFG_INS8250_ADD( "uart_3", genpc_com_interface[3] )
-	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "mouse", NULL )
+	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "microsoft_mouse", NULL )
 	MCFG_RS232_PORT_ADD( "serport1", serport_config[1], isa_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport2", serport_config[3], isa_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport3", serport_config[4], isa_com, NULL, NULL )
@@ -208,7 +209,7 @@ static MACHINE_CONFIG_FRAGMENT( com_at_config )
 	MCFG_NS16450_ADD( "uart_1", genpc_com_interface[1] )
 	MCFG_NS16450_ADD( "uart_2", genpc_com_interface[2] )
 	MCFG_NS16450_ADD( "uart_3", genpc_com_interface[3] )
-	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "mouse", NULL )
+	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "microsoft_mouse", NULL )
 	MCFG_RS232_PORT_ADD( "serport1", serport_config[1], isa_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport2", serport_config[3], isa_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport3", serport_config[4], isa_com, NULL, NULL )
