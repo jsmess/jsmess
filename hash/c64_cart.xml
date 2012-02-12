@@ -781,12 +781,11 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="superexp" supported="no">
+	<software name="superexp">
 		<description>Super Expander 64</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="super_expander_64" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -1229,20 +1228,6 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="stack ieee cartridge.bin" size="0x1000" crc="7457922c" sha1="4c1a22121a6af76ed4d2f45dd4e417bc7682c0e0" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cbmieee" supported="no">
-		<description>Commodore IEEE-488</description>
-		<year>19??</year>
-		<publisher>Commodore</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="cbm_ieee488" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x2000">
-				<rom name="commodore ieee-488 cartridge.bin" size="0x1000" crc="e894e448" sha1="c62b88b73d79b485ebb250d56065dfa54b8baf4c" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
