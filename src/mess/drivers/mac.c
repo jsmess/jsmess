@@ -925,7 +925,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
 	/* internal ram */
@@ -1009,7 +1009,7 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_intf)
 
 	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", mac_harddisk_config )
@@ -1055,7 +1055,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
@@ -1107,7 +1107,7 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 
@@ -1305,7 +1305,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
@@ -1356,7 +1356,7 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
@@ -1427,7 +1427,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
@@ -1598,7 +1598,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
 	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
@@ -1648,7 +1648,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC8530_ADD("scc", C7M, scc8530_t::intrq_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
 	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)

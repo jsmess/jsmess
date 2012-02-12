@@ -194,7 +194,7 @@ public:
 	inline UINT16 get_crtca(UINT16 ma, UINT8 ra, UINT8 column);
 	void crtc_update_row(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
-	void scc_irq(int status);
+	void scc_irq(bool status);
 
 	// memory access controller
 	int m_ifc2;

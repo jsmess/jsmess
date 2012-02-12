@@ -28,10 +28,8 @@ public:
 		IRQ_B_EXT,
 	};
 
-	typedef delegate<void (int state)> intrq_cb_t;
-
 	scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void set_intrq_cb(intrq_cb_t cb);
+	void set_intrq_cb(line_cb_t cb);
 
 	UINT8 get_reg_a(int reg);
 	UINT8 get_reg_b(int reg);
@@ -83,7 +81,7 @@ private:
 
 	Chan channel[2];
 
-	intrq_cb_t intrq_cb;
+	line_cb_t intrq_cb;
 
 	void updateirqs();
 	void initchannel(int ch);

@@ -4,12 +4,30 @@
 
     TODO:
 
-    - SCC
-    - mouse
-    - network
-    - optical drive
-    - floppy
-    - hdd
+	- Find out why the pager doesn't work on the mach_init loading
+	  task (yes, that's the big one)
+
+	- Make command-~ work (NMI perhaps?)
+
+	- Hook up the mouse (not before the system boots though, see the first problem)
+
+	- Fix the kernel bitching at boot (non-volatile memory readback error)
+
+	- Hook up the sound output, it seems to be shared with the keyboard port somehow
+
+	- Implement more of the scc and its dma interactions so that the
+	  start up test passes, but not before sound out is done (if the scc
+	  test passes all the otehr test pass up to sound out which
+	  infloops)
+
+	- Find out how the fdc is supposed to down its irq line after the
+	  first read data when using bfd (no sense interrupt command seems
+	  to be called).  Right now it stays up and that breaks the command
+	  completion detector on the 68k.
+
+	- Really implement the MO, it's only faking it for the startup test right now
+
+	- Find out why netbsd goes to hell even before loading the kernel
 
     Memory map and other bits can be found here:
     http://fxr.watson.org/fxr/source/arch/next68k/include/cpu.h?v=NETBSD5#L366
@@ -24,28 +42,44 @@
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 
-UINT32 next_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 count;
-	int x,y,xi;
+	// We don't handle partial updates, but we don't generate them either :-)
+	if(cliprect.min_x || cliprect.min_y || cliprect.max_x+1 != screen_sx || cliprect.max_y+1 != screen_sy)
+		return 0;
 
-	count = 0;
-
-	for(y=0;y<832;y++)
-	{
-		for(x=0;x<1152;x+=16)
-		{
-			for(xi=0;xi<16;xi++)
-			{
-				UINT8 pen = (vram[count] >> (30-(xi*2))) & 0x3;
-
-				pen ^= 3;
-
-				if(cliprect.contains(x+xi, y))
-					bitmap.pix16(y, x+xi) = screen.machine().pens[pen];
+	// 0,1,2,4=0b000000, 3=2c000000, 5,8,9=0c000000
+	// 1152x832 (0,1,2,3c,4)
+	// 1120x832 (8)
+	// 832x624 (5c,9c)
+	if(screen_color) {
+		const UINT32 *vr = vram;
+		for(int y=0; y<screen_sy; y++) {
+			UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
+			for(int x=0; x<screen_sx; x+=2) {
+				UINT32 v = *vr++;
+				for(int xi=0; xi<2; xi++) {
+					UINT16 pen = (v >> (16-(xi*16))) & 0xffff;
+					UINT32 r = (pen & 0xf000) >> 12;
+					UINT32 g = (pen & 0x0f00) >> 8;
+					UINT32 b = (pen & 0x00f0) >> 4;
+					UINT32 col = (r << 20) | (r << 16) | (g << 12) | (g << 8) | (b << 4) | b;
+					*pix++ = col;
+				}
 			}
-
-			count++;
+			vr += screen_skip;
+		}
+	} else {
+		static UINT32 colors[4] = { 0xffffff, 0xaaaaaa, 0x555555, 0x000000 };
+		const UINT32 *vr = vram;
+		for(int y=0; y<screen_sy; y++) {
+			UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
+			for(int x=0; x<screen_sx; x+=16) {
+				UINT32 v = *vr++;
+				for(int xi=0; xi<16; xi++)
+					*pix++ = colors[(v >> (30-(xi*2))) & 0x3];
+			}
+			vr += screen_skip;
 		}
 	}
 
@@ -131,11 +165,23 @@ READ32_MEMBER( next_state::scr1_r )
 	/*
         xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
         ---- ---- xxxx xxxx ---- ---- ---- ---- DMA type
-        ---- ---- ---- ---- xxxx ---- ---- ---- cpu type
+        ---- ---- ---- ---- xxxx ---- ---- ---- machine type
         ---- ---- ---- ---- ---- xxxx ---- ---- board revision
         ---- ---- ---- ---- ---- ---- -xx- ---- video mem speed
         ---- ---- ---- ---- ---- ---- ---x x--- mem speed
         ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed 16/20/25/33/40/50/66/80
+
+	machine types:
+	0 NeXT_CUBE
+	1 NeXT_WARP9
+	2 NeXT_X15
+	3 NeXT_WARP9C
+	4 NeXT_Turbo
+	5 NeXT_TurboC
+	6 Unknown
+	7 Unknown
+	8 NeXT_TurboCube
+	9 NeXT_TurboCubeC
 
         68040-25: 00011102
         68040-25: 00013002 (non-turbo, color)
@@ -475,14 +521,6 @@ WRITE32_MEMBER( next_state::dma_ctrl_w)
 	}
 }
 
-WRITE32_MEMBER( next_state::dma_040_ctrl_w)
-{
-	int slot = offset >> 2;
-	int reg = offset & 3;
-	if(!reg && ACCESSING_BITS_16_23)
-		dma_do_ctrl_w(slot, data >> 16);
-}
-
 void next_state::dma_do_ctrl_w(int slot, UINT8 data)
 {
 	const char *name = dma_name(slot);
@@ -667,7 +705,7 @@ void next_state::timer_start()
 	timer_tm->adjust(attotime::from_usec(timer_vbase));
 }
 
-void next_state::scc_irq(int state)
+void next_state::scc_irq(bool state)
 {
 	irq_set(17, state);
 }
@@ -725,6 +763,15 @@ void next_state::scsi_irq(bool state)
 void next_state::scsi_drq(bool state)
 {
 	dma_drq_w(1, state);
+}
+
+void next_state::setup(UINT32 _scr1, int size_x, int size_y, int skip, bool color)
+{
+	scr1 = _scr1;
+	screen_sx = size_x;
+	screen_sy = size_y;
+	screen_skip = skip;
+	screen_color = color;
 }
 
 void next_state::machine_start()
@@ -796,9 +843,7 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x0201a000, 0x0201a003) AM_MIRROR(0x300000) AM_READ(event_counter_r) // EVENTC
 //  AM_RANGE(0x020c0000, 0x020c0004) AM_MIRROR(0x300000) BMAP
 	AM_RANGE(0x020c0030, 0x020c0037) AM_MIRROR(0x300000) AM_READWRITE(phy_r, phy_w)
-//  AM_RANGE(0x02000000, 0x0201ffff) AM_MIRROR(0x300000) AM_READWRITE8(io_r,io_w,0xffffffff) //intentional fall-through
 	AM_RANGE(0x04000000, 0x07ffffff) AM_RAM //work ram
-	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram) //vram
 //  AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
 //  AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
 //  AM_RANGE(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
@@ -807,29 +852,43 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 //  AM_RANGE(0x14000000, 0x1403ffff) main RAM w (1-A)B function
 //  AM_RANGE(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
 //  AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
-//  AM_RANGE(0x2c000000, 0x2c1fffff) Color VRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( next_040_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x02000000, 0x020001ff) AM_MIRROR(0x300000) AM_READWRITE(dma_ctrl_r, dma_040_ctrl_w)
+static ADDRESS_MAP_START( next_0b_nofdc_mem, AS_PROGRAM, 32, next_state )
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram)
+
+	AM_IMPORT_FROM(next_mem)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( next_fdc_mem, AS_PROGRAM, 32, next_state )
 	AM_RANGE(0x02014100, 0x02014107) AM_MIRROR(0x300000) AM_DEVICE8("fdc", n82077aa_device, amap, 0xffffffff)
 	AM_RANGE(0x02014108, 0x0201410b) AM_MIRROR(0x300000) AM_READWRITE(fdc_control_r, fdc_control_w)
 
 	AM_IMPORT_FROM(next_mem)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( next_0b_mem, AS_PROGRAM, 32, next_state )
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram)
+
+	AM_IMPORT_FROM(next_fdc_mem)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( next_0c_mem, AS_PROGRAM, 32, next_state )
+	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_BASE(vram)
+
+	AM_IMPORT_FROM(next_fdc_mem)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( next_2c_mem, AS_PROGRAM, 32, next_state )
+	AM_RANGE(0x2c000000, 0x2c1fffff) AM_RAM AM_BASE(vram)
+
+	AM_IMPORT_FROM(next_fdc_mem)
+ADDRESS_MAP_END
+
+
 /* Input ports */
 static INPUT_PORTS_START( next )
 INPUT_PORTS_END
-
-static PALETTE_INIT(next)
-{
-	/* TODO: simplify this*/
-	palette_set_color(machine, 0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine, 1,MAKE_RGB(0x55,0x55,0x55));
-	palette_set_color(machine, 2,MAKE_RGB(0xaa,0xaa,0xaa));
-	palette_set_color(machine, 3,MAKE_RGB(0xff,0xff,0xff));
-}
 
 const floppy_format_type next_state::floppy_formats[] = {
 	FLOPPY_PC_FORMAT,
@@ -846,28 +905,22 @@ static SLOT_INTERFACE_START( next_scsi_devices )
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( next, next_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu",M68030, XTAL_25MHz)
-    MCFG_CPU_PROGRAM_MAP(next_mem)
+static MACHINE_CONFIG_START( next_base, next_state )
 
     /* video hardware */
     MCFG_SCREEN_ADD("screen", RASTER)
     MCFG_SCREEN_REFRESH_RATE(60)
     MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
-    MCFG_SCREEN_SIZE(1120, 832)
+    MCFG_SCREEN_SIZE(1120, 900)
     MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-
-    MCFG_PALETTE_LENGTH(4)
-    MCFG_PALETTE_INIT(next)
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz,
-					  mccs1850_device::cb_t(), mccs1850_device::cb_t(), mccs1850_device::cb_t())
-	MCFG_SCC8530_ADD("scc", XTAL_25MHz, scc8530_t::intrq_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
-	MCFG_NEXTKBD_ADD("keyboard", nextkbd_device::int_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)))
+					  line_cb_t(), line_cb_t(), line_cb_t())
+	MCFG_SCC8530_ADD("scc", XTAL_25MHz, line_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
+	MCFG_NEXTKBD_ADD("keyboard", line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)))
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", 0)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", 0)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, 0)
@@ -884,101 +937,199 @@ static MACHINE_CONFIG_START( next, next_state )
 					line_cb_t(FUNC(next_state::net_tx_drq), static_cast<next_state *>(owner)),
 					line_cb_t(FUNC(next_state::net_rx_drq), static_cast<next_state *>(owner)))
 	MCFG_NEXTMO_ADD("mo",
-					nextmo_device::cb_t(FUNC(next_state::mo_irq), static_cast<next_state *>(owner)),
-					nextmo_device::cb_t(FUNC(next_state::mo_drq), static_cast<next_state *>(owner)))
-
-//	MCFG_CDROM_ADD("cdrom", next_state::cdrom_intf)
-//	MCFG_HARDDISK_CONFIG_ADD("harddisk0", next_state::harddisk_intf)
+					line_cb_t(FUNC(next_state::mo_irq), static_cast<next_state *>(owner)),
+					line_cb_t(FUNC(next_state::mo_drq), static_cast<next_state *>(owner)))
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( next040, next )
-	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
-	MCFG_CPU_PROGRAM_MAP(next_040_mem)
+static MACHINE_CONFIG_DERIVED( next, next_base )
+    MCFG_CPU_ADD("maincpu",M68030, XTAL_25MHz)
+    MCFG_CPU_PROGRAM_MAP(next_0b_nofdc_mem)
+MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", next_floppies, "35ed", 0, next_state::floppy_formats)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( nexts, next_fdc_base )
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
+	MCFG_CPU_PROGRAM_MAP(next_0b_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nexts2, next_fdc_base )
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
+	MCFG_CPU_PROGRAM_MAP(next_0b_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nextsc, next_fdc_base )
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
+	MCFG_CPU_PROGRAM_MAP(next_2c_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nextst, next_fdc_base )
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
+	MCFG_CPU_PROGRAM_MAP(next_0b_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nextstc, next_fdc_base )
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
+	MCFG_CPU_PROGRAM_MAP(next_0c_mem)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nextct, next_fdc_base )
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
+	MCFG_CPU_PROGRAM_MAP(next_0c_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nextctc, next_fdc_base )
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
+	MCFG_CPU_PROGRAM_MAP(next_0c_mem)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
+MACHINE_CONFIG_END
+
 /* ROM definition */
-ROM_START( next ) // 68030
-    ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v12", "v1.2" ) // version? word at 0xC: 5AD0
-	ROMX_LOAD( "rev_1.2.bin",     0x0000, 0x10000, CRC(7070bd78) SHA1(e34418423da61545157e36b084e2068ad41c9e24), ROM_BIOS(1)) /* Label: "(C) 1990 NeXT, Inc. // All Rights Reserved. // Release 1.2 // 1142.02", underlabel exists but unknown */
-	ROM_SYSTEM_BIOS( 1, "v10", "v1.0 v41" ) // version? word at 0xC: 3090
-	ROMX_LOAD( "rev_1.0_v41.bin", 0x0000, 0x10000, CRC(54df32b9) SHA1(06e3ecf09ab67a571186efd870e6b44028612371), ROM_BIOS(2)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", underlabel: "MYF // 1.0.41 // 0D5C" */
-	ROM_SYSTEM_BIOS( 2, "v10p", "v1.0 prototype?" ) // version? word at 0xC: 23D9
+#define ROM_NEXT_V1 \
+    ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
+	ROM_SYSTEM_BIOS( 0, "v12", "v1.2" ) /* version? word at 0xC: 5AD0 */ \
+	ROMX_LOAD( "rev_1.2.bin",     0x0000, 0x10000, CRC(7070bd78) SHA1(e34418423da61545157e36b084e2068ad41c9e24), ROM_BIOS(1)) /* Label: "(C) 1990 NeXT, Inc. // All Rights Reserved. // Release 1.2 // 1142.02", underlabel exists but unknown */ \
+	ROM_SYSTEM_BIOS( 1, "v10", "v1.0 v41" ) /* version? word at 0xC: 3090 */ \
+	ROMX_LOAD( "rev_1.0_v41.bin", 0x0000, 0x10000, CRC(54df32b9) SHA1(06e3ecf09ab67a571186efd870e6b44028612371), ROM_BIOS(2)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", underlabel: "MYF // 1.0.41 // 0D5C" */ \
+	ROM_SYSTEM_BIOS( 2, "v10p", "v1.0 prototype?" ) /* version? word at 0xC: 23D9 */ \
 	ROMX_LOAD( "rev_1.0_proto.bin", 0x0000, 0x10000, CRC(F44974F9) SHA1(09EAF9F5D47E379CFA0E4DC377758A97D2869DDC), ROM_BIOS(3)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", no underlabel */
 
-	ROM_REGION( 0x20, "rtc", 0 )
-	ROM_LOAD( "nvram.bin", 0x00, 0x20, CRC(52162469) SHA1(f49888af63d2d2658db4f41b3345cae153f42884) )
-ROM_END
-
-ROM_START( nextnt ) // 68040 non-turbo
-	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v25", "v2.5 v66" ) // version? word at 0xC: F302
-	ROMX_LOAD( "rev_2.5_v66.bin", 0x0000, 0x20000, CRC(f47e0bfe) SHA1(b3534796abae238a0111299fc406a9349f7fee24), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v24", "v2.4 v65" ) // version? word at 0xC: A634
-	ROMX_LOAD( "rev_2.4_v65.bin", 0x0000, 0x20000, CRC(74e9e541) SHA1(67d195351288e90818336c3a84d55e6a070960d2), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "v21a", "v2.1a? v60?" ) // version? word at 0xC: 894C; NOT SURE about correct rom major and v versions of this one!
-	ROMX_LOAD( "rev_2.1a_v60.bin", 0x0000, 0x20000, CRC(739D7C07) SHA1(48FFE54CF2038782A92A0850337C5C6213C98571), ROM_BIOS(3)) /* Label: "(C) 1990 NeXT Computer, Inc. // All Rights Reserved. // Release 2.1 // 2918.AB" */
-	ROM_SYSTEM_BIOS( 3, "v21", "v2.1 v59" ) // version? word at 0xC: 72FE
-	ROMX_LOAD( "rev_2.1_v59.bin", 0x0000, 0x20000, CRC(f20ef956) SHA1(09586c6de1ca73995f8c9b99870ee3cc9990933a), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS( 4, "v12", "v1.2 v58" ) // version? word at 0xC: 6372
+#define ROM_NEXT_V2 \
+	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
+	ROM_SYSTEM_BIOS( 0, "v25", "v2.5 v66" ) /* version? word at 0xC: F302 */ \
+	ROMX_LOAD( "rev_2.5_v66.bin", 0x0000, 0x20000, CRC(f47e0bfe) SHA1(b3534796abae238a0111299fc406a9349f7fee24), ROM_BIOS(1)) \
+	ROM_SYSTEM_BIOS( 1, "v24", "v2.4 v65" ) /* version? word at 0xC: A634 */ \
+	ROMX_LOAD( "rev_2.4_v65.bin", 0x0000, 0x20000, CRC(74e9e541) SHA1(67d195351288e90818336c3a84d55e6a070960d2), ROM_BIOS(2)) \
+	ROM_SYSTEM_BIOS( 2, "v21a", "v2.1a? v60?" ) /* version? word at 0xC: 894C; NOT SURE about correct rom major and v versions of this one! */ \
+	ROMX_LOAD( "rev_2.1a_v60.bin", 0x0000, 0x20000, CRC(739D7C07) SHA1(48FFE54CF2038782A92A0850337C5C6213C98571), ROM_BIOS(3)) /* Label: "(C) 1990 NeXT Computer, Inc. // All Rights Reserved. // Release 2.1 // 2918.AB" */ \
+	ROM_SYSTEM_BIOS( 3, "v21", "v2.1 v59" ) /* version? word at 0xC: 72FE */ \
+	ROMX_LOAD( "rev_2.1_v59.bin", 0x0000, 0x20000, CRC(f20ef956) SHA1(09586c6de1ca73995f8c9b99870ee3cc9990933a), ROM_BIOS(4)) \
+	ROM_SYSTEM_BIOS( 4, "v12", "v1.2 v58" ) /* version? word at 0xC: 6372 */ \
 	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(B815B6A4) SHA1(97D8B09D03616E1487E69D26609487486DB28090), ROM_BIOS(5)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
 
-	ROM_REGION( 0x20, "rtc", 0 )
-	ROM_LOAD( "nvram-nt.bin", 0x00, 0x20, BAD_DUMP CRC(7cb74196) SHA1(faa2177c2a08a6b76a6242761a9c0a8b64c4da6e) )
-ROM_END
-
-ROM_START( nexttrb ) // 68040 turbo
-	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v33", "v3.3 v74" ) // version? word at 0xC: (12)3456
-	ROMX_LOAD( "rev_3.3_v74.bin", 0x0000, 0x20000, CRC(fbc3a2cd) SHA1(a9bef655f26f97562de366e4a33bb462e764c929), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v32", "v3.2 v72" ) // version? word at 0xC: (01)2f31
-	ROMX_LOAD( "rev_3.2_v72.bin", 0x0000, 0x20000, CRC(e750184f) SHA1(ccebf03ed090a79c36f761265ead6cd66fb04329), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "v30", "v3.0 v70" ) // version? word at 0xC: (01)06e8
+#define ROM_NEXT_V3 \
+	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
+	ROM_SYSTEM_BIOS( 0, "v33", "v3.3 v74" ) /* version? word at 0xC: (12)3456 */ \
+	ROMX_LOAD( "rev_3.3_v74.bin", 0x0000, 0x20000, CRC(fbc3a2cd) SHA1(a9bef655f26f97562de366e4a33bb462e764c929), ROM_BIOS(1)) \
+	ROM_SYSTEM_BIOS( 1, "v32", "v3.2 v72" ) /* version? word at 0xC: (01)2f31 */ \
+	ROMX_LOAD( "rev_3.2_v72.bin", 0x0000, 0x20000, CRC(e750184f) SHA1(ccebf03ed090a79c36f761265ead6cd66fb04329), ROM_BIOS(2)) \
+	ROM_SYSTEM_BIOS( 2, "v30", "v3.0 v70" ) /* version? word at 0xC: (01)06e8 */ \
 	ROMX_LOAD( "rev_3.0_v70.bin", 0x0000, 0x20000, CRC(37250453) SHA1(a7e42bd6a25c61903c8ca113d0b9a624325ee6cf), ROM_BIOS(3))
 
-	ROM_REGION( 0x20, "rtc", 0 )
-	ROM_LOAD( "nvram-trb.bin", 0x00, 0x20, CRC(2516dd08) SHA1(b20afe82efee5b625fb8afda14a1d14aabc8e07e) )
+
+ROM_START(next)
+	ROM_NEXT_V1
 ROM_END
 
-static DRIVER_INIT(nexttrb)
-{
-	next_state *state = machine.driver_data<next_state>();
-	state->scr1 = 0x00011102;
+ROM_START(nexts)
+	ROM_NEXT_V2
+ROM_END
 
-	UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
-	rom[0x329c/4] = 0x70004e71; // memory test funcall
-	rom[0x32a0/4] = 0x4e712400;
-	rom[0x03f8/4] = 0x001a4e71; // rom checksum
-	rom[0x03fc/4] = 0x4e714e71;
-}
+ROM_START(nexts2)
+	ROM_NEXT_V2
+ROM_END
 
-static DRIVER_INIT(nextnt)
-{
-	next_state *state = machine.driver_data<next_state>();
-	state->scr1 = 0x00011102;
-}
+ROM_START(nextsc)
+	ROM_NEXT_V2
+ROM_END
+
+ROM_START(nextst)
+	ROM_NEXT_V3
+ROM_END
+
+ROM_START(nextstc)
+	ROM_NEXT_V3
+ROM_END
+
+ROM_START(nextct)
+	ROM_NEXT_V3
+ROM_END
+
+ROM_START(nextctc)
+	ROM_NEXT_V3
+ROM_END
 
 static DRIVER_INIT(next)
 {
 	next_state *state = machine.driver_data<next_state>();
-	state->scr1 = 0x00010002;
+	state->setup(0x00010002, 1120, 832, 2, false);
+}
+
+static DRIVER_INIT(nexts)
+{
+	next_state *state = machine.driver_data<next_state>();
+	state->setup(0x00011002, 1120, 832, 2, false);
+}
+
+static DRIVER_INIT(nexts2)
+{
+	next_state *state = machine.driver_data<next_state>();
+	state->setup(0x00012102, 1120, 832, 2, false);
+}
+
+static DRIVER_INIT(nextsc)
+{
+	next_state *state = machine.driver_data<next_state>();
+	state->setup(0x00013102, 1120, 832, 16, true);
+}
+
+static DRIVER_INIT(nextst)
+{
+	next_state *state = machine.driver_data<next_state>();
+	state->setup(0x00014103, 1120, 832, 2, false);
+}
+
+static DRIVER_INIT(nextstc)
+{
+	next_state *state = machine.driver_data<next_state>();
+	state->setup(0x00015103,  832, 624, 0, true);
+}
+
+static DRIVER_INIT(nextct)
+{
+	next_state *state = machine.driver_data<next_state>();
+	state->setup(0x00018103, 1120, 832, 0, false);
+}
+
+static DRIVER_INIT(nextctc)
+{
+	next_state *state = machine.driver_data<next_state>();
+	state->setup(0x00019103,  832, 624, 0, true);
+}
+
+/* Driver */
+
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME               		FLAGS */
+COMP( 1987, next,    0,      0,       next,      next,    next,    "Next Software Inc",   "NeXT Cube",					GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nexts,   0,      0,       nexts,     next,    nexts,   "Next Software Inc",   "NeXTstation",				GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nexts2,  nexts,  0,       nexts2,    next,    nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nextsc,  nexts,  0,       nextsc,    next,    nextsc,  "Next Software Inc",   "NeXTstation color",			GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nextst,  0,      0,       nextst,    next,    nextst,  "Next Software Inc",   "NeXTstation turbo",			GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, nextstc, nextst, 0,       nextstc,   next,    nextstc, "Next Software Inc",   "NeXTstation turbo color",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, nextct,  nextst, 0,       nextct,    next,    nextct,  "Next Software Inc",   "NeXT Cube turbo",			GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, nextctc, nextst, 0,       nextctc,   next,    nextctc, "Next Software Inc",   "NeXT Cube turbo color",		GAME_NOT_WORKING | GAME_NO_SOUND)
+
+		/*
 
 	UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
 	rom[0x3f48/4] = 0x2f017000; // memory test funcall
 	rom[0x3f4c/4] = 0x4e712400;
 	rom[0x00b8/4] = 0x001a4e71; // rom checksum
 	rom[0x00bc/4] = 0x4e714e71;
-}
 
-/* Driver */
-
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME               FLAGS */
-COMP( 1987, next,   0,          0,   next,      next,    next,    "Next Software Inc",   "NeXT Computer",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1990, nextnt, next,       0,   next040,   next,    nextnt,  "Next Software Inc",   "NeXT (Non Turbo)",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1992, nexttrb,next,       0,   next040,   next,    nexttrb, "Next Software Inc",   "NeXT (Turbo)",			GAME_NOT_WORKING | GAME_NO_SOUND)
+v74
+	UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
+	rom[0x329c/4] = 0x70004e71; // memory test funcall
+	rom[0x32a0/4] = 0x4e712400;
+	rom[0x03f8/4] = 0x001a4e71; // rom checksum
+	rom[0x03fc/4] = 0x4e714e71;
+		*/

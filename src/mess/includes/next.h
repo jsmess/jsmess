@@ -43,7 +43,9 @@ public:
 	required_device<nextmo_device> mo;
 	optional_device<n82077aa_device> fdc; // 040 only
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void setup(UINT32 scr1, int size_x, int size_y, int skip, bool color);
 
 	READ8_MEMBER( io_r );
 	WRITE8_MEMBER( io_w );
@@ -92,7 +94,7 @@ public:
 
 	UINT32 eventc_latch;
 
-	void scc_irq(int state);
+	void scc_irq(bool state);
 	void keyboard_irq(bool state);
 
 	void scsi_irq(bool state);
@@ -146,6 +148,9 @@ protected:
 
 	dma_slot dma_slots[0x20];
 	UINT32 esp;
+
+	int screen_sx, screen_sy, screen_skip;
+	bool screen_color;
 
 	virtual void machine_start();
 	virtual void machine_reset();

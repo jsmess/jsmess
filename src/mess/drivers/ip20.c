@@ -623,7 +623,7 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SCC8530_ADD("scc", 7000000, scc8530_t::intrq_cb_t())
+	MCFG_SCC8530_ADD("scc", 7000000, line_cb_t())
 
 	MCFG_CDROM_ADD( "cdrom",ip20_cdrom )
 

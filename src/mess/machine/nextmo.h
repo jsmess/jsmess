@@ -8,11 +8,9 @@
 class nextmo_device : public device_t
 {
 public:
-	typedef delegate<void (bool state)> cb_t;
-
 	nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void set_cb(cb_t irq_cb, cb_t drq_cb);
+	void set_cb(line_cb_t irq_cb, line_cb_t drq_cb);
 
 	DECLARE_ADDRESS_MAP(map, 32);
 
@@ -45,7 +43,7 @@ protected:
 private:
 	UINT8 sector[0x510];
 	UINT8 r4, r5, r6, r7;
-	cb_t irq_cb, drq_cb;
+	line_cb_t irq_cb, drq_cb;
 	int sector_pos;
 
 	void check_dma_end();
