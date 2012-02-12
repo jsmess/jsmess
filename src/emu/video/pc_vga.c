@@ -1816,7 +1816,7 @@ Tseng ET4000k implementation
 static void tseng_define_video_mode(running_machine &machine)
 {
 	int divisor;
-	int xtal;
+	int xtal = 0;
 	svga.rgb8_en = 0;
 	svga.rgb15_en = 0;
 	svga.rgb16_en = 0;
