@@ -96,6 +96,8 @@ public:
 
 	void scc_irq(bool state);
 	void keyboard_irq(bool state);
+	void power_irq(bool state);
+	void nmi_irq(bool state);
 
 	void scsi_irq(bool state);
 	void scsi_drq(bool state);

@@ -254,7 +254,7 @@ WRITE32_MEMBER( next_state::irq_mask_w )
 
 void next_state::irq_check()
 {
-	UINT32 act = irq_status & irq_mask;
+	UINT32 act = irq_status & (irq_mask | 0x80000000);
 	int bit;
 	for(bit=31; bit >= 0 && !(act & (1U << bit)); bit--);
 
@@ -715,6 +715,16 @@ void next_state::keyboard_irq(bool state)
 	irq_set(3, state);
 }
 
+void next_state::power_irq(bool state)
+{
+	irq_set(2, state);
+}
+
+void next_state::nmi_irq(bool state)
+{
+	irq_set(31, state);
+}
+
 void next_state::fdc_irq(bool state)
 {
 	irq_set(7, state);
@@ -920,7 +930,10 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz,
 					  line_cb_t(), line_cb_t(), line_cb_t())
 	MCFG_SCC8530_ADD("scc", XTAL_25MHz, line_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
-	MCFG_NEXTKBD_ADD("keyboard", line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)))
+	MCFG_NEXTKBD_ADD("keyboard",
+					 line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
+					 line_cb_t(FUNC(next_state::power_irq), static_cast<next_state *>(owner)),
+					 line_cb_t(FUNC(next_state::nmi_irq), static_cast<next_state *>(owner)))
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", 0)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", 0)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, 0)
@@ -945,7 +958,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next, next_base )
-    MCFG_CPU_ADD("maincpu",M68030, XTAL_25MHz)
+    MCFG_CPU_ADD("maincpu", M68030, XTAL_25MHz)
     MCFG_CPU_PROGRAM_MAP(next_0b_nofdc_mem)
 MACHINE_CONFIG_END
 

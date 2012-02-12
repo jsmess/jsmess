@@ -14,9 +14,11 @@ nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void nextkbd_device::set_int_change_cb(line_cb_t _int_change_cb)
+void nextkbd_device::setup(line_cb_t _int_change_cb, line_cb_t _int_power_cb, line_cb_t _int_nmi_cb)
 {
 	int_change_cb = _int_change_cb;
+	int_power_cb = _int_power_cb;
+	int_nmi_cb = _int_nmi_cb;
 }
 
 void nextkbd_device::device_start()
@@ -31,6 +33,7 @@ void nextkbd_device::device_start()
 	save_item(NAME(fifo_size));
 	save_item(NAME(fifo));
 	save_item(NAME(modifiers_state));
+	save_item(NAME(nmi_active));
 }
 
 void nextkbd_device::device_reset()
@@ -43,6 +46,7 @@ void nextkbd_device::device_reset()
 	fifo_size = 0;
 	memset(fifo, 0, sizeof(fifo));
 	modifiers_state = 0;
+	nmi_active = false;
 }
 
 void nextkbd_device::send()
@@ -146,13 +150,8 @@ WRITE32_MEMBER( nextkbd_device::data_w )
 INPUT_CHANGED_MEMBER( nextkbd_device::update )
 {
 	int bank = (int)(FPTR)param;
-	if(bank == 3) {
-		if(newval)
-			modifiers_state |= field.mask;
-		else
-			modifiers_state &= ~field.mask;
-		fifo_push(modifiers_state | (1<<28));
-	} else {
+	switch(bank) {
+	case 0: case 1: case 2: {
 		int index;
 		for(index=0; index < 32; index++)
 			if(field.mask & (1 << index))
@@ -162,9 +161,32 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 		UINT16 val = index | modifiers_state | KEYVALID;
 		if(newval)
 			val |= KEYUP;
+		if(val == 0x88a6 || val == 0x88ca) {
+			nmi_active = true;
+			int_nmi_cb(true);
+		} else if(nmi_active) {
+			nmi_active = false;
+			int_nmi_cb(false);
+		}
 		fifo_push(val | (1<<28));
+		send();
+		break;
 	}
-	send();
+
+	case 3:
+		if(newval)
+			modifiers_state |= field.mask;
+		else
+			modifiers_state &= ~field.mask;
+		fifo_push(modifiers_state | (1<<28));
+		send();
+		break;
+
+	case 4:
+		if(field.mask & 1)
+			int_power_cb(newval & 1);
+		break;
+	}
 }
 
 static INPUT_PORTS_START(nextkbd_keymap)
@@ -265,6 +287,10 @@ static INPUT_PORTS_START(nextkbd_keymap)
 	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, nextkbd_device, update, 3) PORT_CODE(KEYCODE_LALT)       PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_NAME("Alt (Left)")
 	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, nextkbd_device, update, 3) PORT_CODE(KEYCODE_RALT)       PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_NAME("Alt (Right)")
 	PORT_BIT(0xffff80ff, IP_ACTIVE_HIGH, IPT_UNUSED)   PORT_CHANGED_MEMBER(DEVICE_SELF, nextkbd_device, update, 3)
+
+	PORT_START("special")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, nextkbd_device, update, 4) PORT_CODE(KEYCODE_HOME)       PORT_NAME("Power")
+	PORT_BIT(0xfffffffe, IP_ACTIVE_HIGH, IPT_UNUSED)   PORT_CHANGED_MEMBER(DEVICE_SELF, nextkbd_device, update, 4)
 INPUT_PORTS_END
 
 ioport_constructor nextkbd_device::device_input_ports() const
