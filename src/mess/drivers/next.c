@@ -7,8 +7,6 @@
 	- Find out why the pager doesn't work on the mach_init loading
 	  task (yes, that's the big one)
 
-	- Make command-~ work (NMI perhaps?)
-
 	- Hook up the mouse (not before the system boots though, see the first problem)
 
 	- Fix the kernel bitching at boot (non-volatile memory readback error)
