@@ -884,7 +884,7 @@ INLINE UINT8 rotate_right(UINT8 val)
 
 INLINE UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask)
 {
-	UINT8 res;
+	UINT8 res = 0;
 
 	switch(vga.gc.logical_op & 3)
 	{
@@ -907,7 +907,7 @@ INLINE UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask)
 
 INLINE UINT8 vga_latch_write(int offs, UINT8 data)
 {
-	UINT8 res;
+	UINT8 res = 0;
 
 	switch (vga.gc.write_mode & 3) {
 	case 0:
