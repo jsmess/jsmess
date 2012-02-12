@@ -1144,6 +1144,7 @@ SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( c64_expansion_cards )
 	SLOT_INTERFACE("georam", C64_GEORAM)
+	SLOT_INTERFACE("ieee488", C64_IEEE488)
 	SLOT_INTERFACE("xl80", C64_XL80)
 	
 	// the following should not be visible in the UI

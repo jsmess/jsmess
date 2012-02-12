@@ -759,6 +759,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_epyx_fast_load.o	\
 	$(MESS_MACHINE)/c64_fun_play.o	\
 	$(MESS_MACHINE)/c64_georam.o	\
+	$(MESS_MACHINE)/c64_ieee488.o	\
 	$(MESS_MACHINE)/c64_magic_desk.o	\
 	$(MESS_MACHINE)/c64_mikro_assembler.o	\
 	$(MESS_MACHINE)/c64_multiscreen.o	\
