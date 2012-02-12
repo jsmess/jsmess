@@ -302,7 +302,7 @@ void mac_state::field_interrupts()
 	}
 }
 
-void mac_state::set_scc_interrupt(int value)
+void mac_state::set_scc_interrupt(bool value)
 {
 	m_scc_interrupt = value;
 	this->field_interrupts();

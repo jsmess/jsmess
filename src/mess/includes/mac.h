@@ -350,7 +350,7 @@ public:
 	void set_memory_overlay(int overlay);
 	void scc_mouse_irq( int x, int y );
 	void nubus_slot_interrupt(UINT8 slot, UINT32 state);
-	void set_scc_interrupt(int value);
+	void set_scc_interrupt(bool value);
 	void set_via_interrupt(int value);
 	void set_via2_interrupt(int value);
 	void field_interrupts();

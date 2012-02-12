@@ -27,7 +27,7 @@ scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *o
 {
 }
 
-void scc8530_t::set_intrq_cb(intrq_cb_t cb)
+void scc8530_t::set_intrq_cb(line_cb_t cb)
 {
 	intrq_cb = cb;
 }

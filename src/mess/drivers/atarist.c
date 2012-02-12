@@ -2517,7 +2517,7 @@ static MACHINE_CONFIG_DERIVED( megaste, ste )
 	MCFG_CPU_MODIFY(M68000_TAG)
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
-	MCFG_SCC8530_ADD(Z8530_TAG, Y2/4, scc8530_t::intrq_cb_t())
+	MCFG_SCC8530_ADD(Z8530_TAG, Y2/4, line_cb_t())
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

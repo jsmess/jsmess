@@ -22,7 +22,7 @@ nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void nextmo_device::set_cb(cb_t _irq_cb, cb_t _drq_cb)
+void nextmo_device::set_cb(line_cb_t _irq_cb, line_cb_t _drq_cb)
 {
 	irq_cb = _irq_cb;
 	drq_cb = _drq_cb;

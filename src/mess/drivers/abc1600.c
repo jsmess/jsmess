@@ -1549,7 +1549,7 @@ static Z80DART_INTERFACE( dart_intf )
 //  SCC8530_INTERFACE( sc_intf )
 //-------------------------------------------------
 
-void abc1600_state::scc_irq(int status)
+void abc1600_state::scc_irq(bool status)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, status);
 }
@@ -1927,7 +1927,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, XTAL_64MHz/16, dma1_intf)
 	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, XTAL_64MHz/16, dma2_intf)
 	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
-	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16, scc8530_t::intrq_cb_t(FUNC(abc1600_state::scc_irq), static_cast<abc1600_state *>(owner)))
+	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16, line_cb_t(FUNC(abc1600_state::scc_irq), static_cast<abc1600_state *>(owner)))
 	MCFG_Z8536_ADD(Z8536B1_TAG, XTAL_64MHz/16, cio_intf)
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)

@@ -14,7 +14,7 @@ nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void nextkbd_device::set_int_change_cb(int_cb_t _int_change_cb)
+void nextkbd_device::set_int_change_cb(line_cb_t _int_change_cb)
 {
 	int_change_cb = _int_change_cb;
 }

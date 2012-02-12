@@ -2773,7 +2773,7 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 
 	MCFG_HD63450_ADD( "hd63450", dmac_interface )
 
-	MCFG_SCC8530_ADD( "scc", 5000000, scc8530_t::intrq_cb_t() )
+	MCFG_SCC8530_ADD( "scc", 5000000, line_cb_t() )
 
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
