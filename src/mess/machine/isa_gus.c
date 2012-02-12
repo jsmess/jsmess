@@ -367,7 +367,7 @@ void gf1_device::device_start()
 	m_voice_irq_ptr = 0;
 
     for (int i = 0; i<4096; i++)
-    	m_volume_table[i] = 65536 / ((4096-i)*(log(2)/256));
+    	m_volume_table[i] = 65536 / ((4096-i)*(log(2.0)/256));
 
 #ifdef LOG_SOUND
 	f = fopen("soundlog.bin","wb");
