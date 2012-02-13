@@ -15,13 +15,8 @@
 
 	- Implement more of the scc and its dma interactions so that the
 	  start up test passes, but not before sound out is done (if the scc
-	  test passes all the otehr test pass up to sound out which
+	  test passes all the other test pass up to sound out which
 	  infloops)
-
-	- Find out how the fdc is supposed to down its irq line after the
-	  first read data when using bfd (no sense interrupt command seems
-	  to be called).  Right now it stays up and that breaks the command
-	  completion detector on the 68k.
 
 	- Really implement the MO, it's only faking it for the startup test right now
 
@@ -619,16 +614,33 @@ WRITE32_MEMBER( next_state::fdc_control_w )
 
 READ32_MEMBER( next_state::fdc_control_r )
 {
-	// Type of floppy present?
-	// Seems to behave identically as long as b24-25 is non-zero
-	// Zero means no floppy
+	// Type of floppy present
+	// 0 = no floppy in drive
+	// 1 = ed
+	// 2 = hd
+	// 3 = dd
 
-	fprintf(stderr, "FDC read (%08x)\n", cpu_get_pc(&space.device()));
+	// The rom strangely can't boot on anything else than ED, it has
+	// code for the other densities but forces ED for some mysterious
+	// reason.  The kernel otoh behaves as expected.
 	
 	if(fdc) {
 		floppy_image_device *fdev = machine().device<floppy_connector>(":fd0")->get_device();
-		if(fdev->exists())
-			return 1 << 24;
+		if(fdev->exists()) {
+			UINT32 variant = fdev->get_variant();
+			switch(variant) {
+			case floppy_image::SSSD:
+			case floppy_image::SSDD:
+			case floppy_image::DSDD:
+				return 3 << 24;
+
+			case floppy_image::DSHD:
+				return 2 << 24;
+
+			case floppy_image::DSED:
+				return 1 << 24;
+			}
+		}
 	}
 
 	return 0 << 24;
