@@ -2,18 +2,18 @@
 <mamelayout version="2">
 	<view name="Standard">
 		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds left="0" top="0" right="36" bottom="23" />
 		</screen>
 	</view>
 	<view name="Rotated Right">
 		<screen index="0">
-			<bounds left="0" top="0" right="3" bottom="4" />
+			<bounds left="0" top="0" right="23" bottom="36" />
 			<orientation rotate="90" />
 		</screen>
 	</view>
 	<view name="Rotated Left">
 		<screen index="0">
-			<bounds left="0" top="0" right="3" bottom="4" />
+			<bounds left="0" top="0" right="23" bottom="36" />
 			<orientation rotate="270" />
 		</screen>
 	</view>
