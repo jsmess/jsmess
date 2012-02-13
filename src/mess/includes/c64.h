@@ -49,6 +49,8 @@ public:
 		  m_loram(1),
 		  m_hiram(1),
 		  m_charen(1),
+		  m_va14(1),
+		  m_va15(1),
 		  m_cia1_irq(CLEAR_LINE),
 		  m_cia2_irq(CLEAR_LINE),
 		  m_vic_irq(CLEAR_LINE),

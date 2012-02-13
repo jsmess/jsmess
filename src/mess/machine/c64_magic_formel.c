@@ -48,6 +48,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
 
     */
 	
+	logerror("PA %02x\n",data);
 	m_rom_bank = data & 0x0f;
 
 	m_rom_oe = BIT(data, 3);
@@ -71,7 +72,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
         PB7		ROMH enable
 
     */
-	
+	logerror("PB %02x\n",data);
 	m_ram_bank = data & 0x1f;
 	
 	m_pb7 = BIT(data, 7);
@@ -175,7 +176,14 @@ ioport_constructor c64_magic_formel_cartridge_device::device_input_ports() const
 c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_MAGIC_FORMEL, "C64 Magic Formel cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_pia(*this, MC6821_TAG)
+	m_pia(*this, MC6821_TAG),
+	m_rom_bank(0),
+	m_ram_bank(0),
+	m_pb7_ff(0),
+	m_cb2_ff(0),
+	m_rom_oe(0),
+	m_ram_oe(0),
+	m_pb7(1)	
 {
 }
 
@@ -209,6 +217,7 @@ void c64_magic_formel_cartridge_device::device_reset()
 	m_cb2_ff = 0;
 	m_rom_oe = 0;
 	m_ram_oe = 0;
+	m_pb7 = 1;
 }
 
 
