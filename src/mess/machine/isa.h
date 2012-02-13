@@ -175,6 +175,9 @@ public:
 	UINT8 dack_r(int line);
 	void dack_w(int line,UINT8 data);
 	void eop_w(int state);
+	
+	void nmi();
+	void set_nmi_state(bool enabled) { m_nmi_enabled = enabled; }
 
 	void set_dma_channel(UINT8 channel, device_isa8_card_interface *dev, bool do_eop);
 protected:
@@ -199,7 +202,8 @@ protected:
 
 	device_isa8_card_interface *m_dma_device[8];
 	bool						m_dma_eop[8];
-	const char *m_cputag;
+	const char 				   *m_cputag;
+	bool						m_nmi_enabled;
 };
 
 
