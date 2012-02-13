@@ -150,6 +150,7 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 		m_dma_device[i] = NULL;
 		m_dma_eop[i] = false;
 	}
+	m_nmi_enabled = false;
 }
 
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
@@ -160,6 +161,7 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 		m_dma_device[i] = NULL;
 		m_dma_eop[i] = false;
 	}
+	m_nmi_enabled = false;
 }
 
 void isa8_device::set_dma_channel(UINT8 channel, device_isa8_card_interface *dev, bool do_eop)
@@ -378,7 +380,13 @@ void isa8_device::eop_w(int state)
 	}
 }
 
-
+void isa8_device::nmi()
+{
+	if (m_nmi_enabled)
+	{
+		device_set_input_line( m_maincpu, INPUT_LINE_NMI, PULSE_LINE );
+	}
+}
 //**************************************************************************
 //  DEVICE CONFIG ISA8 CARD INTERFACE
 //**************************************************************************

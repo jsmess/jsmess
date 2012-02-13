@@ -89,6 +89,19 @@ WRITE8_MEMBER( at_state::at_keybc_w )
 	}
 }
 
+
+WRITE8_MEMBER( at_state::write_rtc )
+{
+	if (offset==0) {
+		m_nmi_enabled = BIT(data,7);
+		m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+		m_mc146818->write(space,0,data);
+	}
+	else {
+		m_mc146818->write(space,offset,data);
+	}
+}
+
 static ADDRESS_MAP_START( at16_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffff)
@@ -96,7 +109,7 @@ static ADDRESS_MAP_START( at16_io, AS_IO, 16, at_state )
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
 	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffff)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREAD8("rtc", mc146818_device, read, 0xffff) AM_WRITE8(write_rtc , 0xffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffff)
