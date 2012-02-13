@@ -351,7 +351,7 @@ void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, UINT8 dat
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_ieee488_device::c64_game_r()
+int c64_ieee488_device::c64_game_r(offs_t offset, int ba, int rw)
 {
-	return m_exp->game_r();
+	return m_exp->game_r(offset, ba, rw);
 }

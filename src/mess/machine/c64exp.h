@@ -101,7 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER( io1_w );
 	DECLARE_READ8_MEMBER( io2_r );
 	DECLARE_WRITE8_MEMBER( io2_w );
-	DECLARE_READ_LINE_MEMBER( game_r );
+	int game_r(offs_t offset, int ba, int rw);
 	DECLARE_READ_LINE_MEMBER( exrom_r );
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
@@ -157,7 +157,7 @@ public:
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2) { };
 
 	// memory banking
-	virtual int c64_game_r() { return m_game; }
+	virtual int c64_game_r(offs_t offset, int ba, int rw) { return m_game; }
 	virtual int c64_exrom_r() { return m_exrom; }
 	virtual void c64_game_w(int state) { m_game = state; }
 	virtual void c64_exrom_w(int state) { m_exrom = state; }

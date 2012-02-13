@@ -4,6 +4,7 @@
 #define CBMIPT_H_
 
 #include "machine/c64_comal80.h"
+#include "machine/c64_dela_ep7x8.h"
 #include "machine/c64_dinamic.h"
 #include "machine/c64_easy_calc_result.h"
 #include "machine/c64_epyx_fast_load.h"
@@ -11,6 +12,7 @@
 #include "machine/c64_georam.h"
 #include "machine/c64_ieee488.h"
 #include "machine/c64_magic_desk.h"
+#include "machine/c64_magic_formel.h"
 #include "machine/c64_mikro_assembler.h"
 #include "machine/c64_multiscreen.h"
 #include "machine/c64_ocean.h"

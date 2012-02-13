@@ -754,6 +754,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64exp.o	\
 	$(MESS_MACHINE)/c64user.o	\
 	$(MESS_MACHINE)/c64_comal80.o	\
+	$(MESS_MACHINE)/c64_dela_ep7x8.o	\
 	$(MESS_MACHINE)/c64_dinamic.o	\
 	$(MESS_MACHINE)/c64_easy_calc_result.o	\
 	$(MESS_MACHINE)/c64_epyx_fast_load.o	\
@@ -761,6 +762,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_georam.o	\
 	$(MESS_MACHINE)/c64_ieee488.o	\
 	$(MESS_MACHINE)/c64_magic_desk.o	\
+	$(MESS_MACHINE)/c64_magic_formel.o	\
 	$(MESS_MACHINE)/c64_mikro_assembler.o	\
 	$(MESS_MACHINE)/c64_multiscreen.o	\
 	$(MESS_MACHINE)/c64_ocean.o	\

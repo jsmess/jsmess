@@ -407,13 +407,13 @@ WRITE8_MEMBER( c64_expansion_slot_device::io2_w )
 //  game_r - GAME read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( c64_expansion_slot_device::game_r )
+int c64_expansion_slot_device::game_r(offs_t offset, int ba, int rw)
 {
 	int state = 1;
 
 	if (m_cart != NULL)
 	{
-		state = m_cart->c64_game_r();
+		state = m_cart->c64_game_r(offset, ba, rw);
 	}
 
 	return state;
