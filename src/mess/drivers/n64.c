@@ -28,7 +28,7 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
 	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
 	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
-	//AM_RANGE(0x08000000, 0x08007fff) AM_RAM                                   // Cartridge SRAM
+	AM_RANGE(0x08000000, 0x08007fff) AM_RAM AM_BASE(&n64_sram)		// Cartridge SRAM
 	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)	// Cartridge
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)	// PIF ROM
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pif_ram_r, pif_ram_w)
@@ -98,11 +98,6 @@ static const mips3_config config =
 	62500000			/* system clock */
 };
 
-static INTERRUPT_GEN( n64_vblank )
-{
-	signal_rcp_interrupt(device->machine(), VI_INTERRUPT);
-}
-
 static DEVICE_IMAGE_LOAD(n64_cart)
 {
 	int i, length;
@@ -157,7 +152,6 @@ static MACHINE_CONFIG_START( n64, n64_state )
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
 	MCFG_CPU_CONFIG(config)
 	MCFG_CPU_PROGRAM_MAP(n64_map)
-	MCFG_CPU_VBLANK_INT("screen", n64_vblank)
 
 	MCFG_CPU_ADD("rsp", RSP, 62500000)
 	MCFG_CPU_CONFIG(n64_rsp_config)
