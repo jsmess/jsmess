@@ -54,7 +54,9 @@ private:
 
 		// Main states
 		RECALIBRATE,
+		SEEK,
 		READ_DATA,
+		READ_ID,
 
 		// Sub-states
 		SEEK_MOVE,
@@ -62,6 +64,7 @@ private:
 		SEEK_WAIT_STEP_SIGNAL_TIME_DONE,
 		SEEK_WAIT_STEP_TIME,
 		SEEK_WAIT_STEP_TIME_DONE,
+		SEEK_DONE,
 
 		HEAD_LOAD_DONE,
 
@@ -132,7 +135,7 @@ private:
 
 	live_info cur_live, checkpoint_live;
 	line_cb intrq_cb, drq_cb;
-	bool cur_irq, drq;
+	bool cur_irq, data_irq, drq;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos;
@@ -149,7 +152,9 @@ private:
 		C_CONFIGURE,
 		C_PERPENDICULAR,
 		C_READ_DATA,
+		C_READ_ID,
 		C_RECALIBRATE,
+		C_SEEK,
 		C_SENSE_INTERRUPT_STATUS,
 		C_SPECIFY,
 
@@ -165,13 +170,17 @@ private:
 
 	int check_command();
 	void start_command(int cmd);
-	void command_end(floppy_info &fi, int status);
+	void command_end(floppy_info &fi, bool data_completion, int status);
 
 	void recalibrate_start(floppy_info &fi);
+	void seek_start(floppy_info &fi);
 	void seek_continue(floppy_info &fi);
 
 	void read_data_start(floppy_info &fi);
 	void read_data_continue(floppy_info &fi);
+
+	void read_id_start(floppy_info &fi);
+	void read_id_continue(floppy_info &fi);
 
 	void general_continue(floppy_info &fi);
 	void index_callback(floppy_image_device *floppy, int state);
