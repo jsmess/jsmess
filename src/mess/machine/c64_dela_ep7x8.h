@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Commodore IEEE-488 cartridge emulation
+    Dela 7x8K EPROM cartridge emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -9,17 +9,14 @@
 
 #pragma once
 
-#ifndef __C64_IEEE488__
-#define __C64_IEEE488__
+#ifndef __DELA_EP7X8__
+#define __DELA_EP7X8__
 
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "machine/6525tpi.h"
+#include "imagedev/cartslot.h"
 #include "machine/c64exp.h"
-#include "machine/cbmipt.h"
-#include "machine/ieee488.h"
-#include "video/mc6845.h"
 
 
 
@@ -27,52 +24,37 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c64_ieee488_device
+// ======================> c64_dela_ep7x8_cartridge_device
 
-class c64_ieee488_device : public device_t,
-					    public device_c64_expansion_card_interface
+class c64_dela_ep7x8_cartridge_device : public device_t,
+										public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
-	c64_ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	// not really public
-	DECLARE_READ8_MEMBER( tpi_pa_r );
-	DECLARE_WRITE8_MEMBER( tpi_pa_w );
-	DECLARE_READ8_MEMBER( tpi_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	
 protected:
 	// device-level overrides
-    virtual void device_config_complete() { m_shortname = "c64_ieee"; }
+    virtual void device_config_complete() { m_shortname = "ep7x8"; }
 	virtual void device_start();
 	virtual void device_reset();
 
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
-	virtual int c64_game_r(offs_t offset, int ba, int rw);
-
-private:
-	required_device<device_t> m_tpi;
-	required_device<ieee488_device> m_bus;
-	required_device<c64_expansion_slot_device> m_exp;
 	
-	int m_roml_sel;
+private:
+	UINT8 m_bank;
 };
 
 
-
 // device type definition
-extern const device_type C64_IEEE488;
+extern const device_type C64_DELA_EP7X8;
+
 
 
 #endif

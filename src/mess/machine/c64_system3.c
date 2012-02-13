@@ -81,6 +81,6 @@ void c64_system3_cartridge_device::c64_cd_w(address_space &space, offs_t offset,
 {
 	if (!io1)
 	{
-		m_bank = offset & 0x0f;
+		m_bank = offset & 0x3f;
 	}
 }

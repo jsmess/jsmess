@@ -1071,7 +1071,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<publisher>Rex Datentechnik</publisher>
 		<info name="serial" value="REX 9513" />
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="rex" />
+			<feature name="slot" value="rex_ep256" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -1256,20 +1256,6 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="hobbi elektronika.bin" size="0x4000" crc="a4ab3bdc" sha1="884cacee1b1a7f811db97fb11c59c797d16b3602" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dela7x8k" supported="no">
-		<description>7x8K-EPROM-Bank (Ger)</description>
-		<year>19??</year>
-		<publisher>Dela Elektronik</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="dela_7x8k" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x2000">
-				<rom name="dela_7x8k-eprom-bank.bin" size="0x2000" crc="546d7ea8" sha1="6ab7a279144bcaaa20e7b2d12d67d3ed5cc3f6b6" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4429,6 +4415,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<year>19??</year>
 		<publisher>Dela Elektronik</publisher>
 		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="dela_ep256" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
@@ -5649,17 +5636,49 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="magicf">
-		<description>Magic Formel</description>
-		<year>1984</year>
-		<publisher>LS</publisher>
+	<software name="formel64">
+		<description>Formel 64</description>
+		<year>1986</year>
+		<publisher>Grewe Computertechnik</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="magic_formel" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x10000">
-				<rom name="magic formel (1984)(ls).80" size="0x10000" crc="dfc8b7f3" sha1="7c2e12ee2836157af9f811e1c9017bff542c8cfa" offset="0x0000" />
+			<dataarea name="romh" size="0x10000">
+				<rom name="magic_formel_v1.1_1986_ori.bin" size="0x10000" crc="71dc4e30" sha1="329c4e73150e4520cc11924e220210cec3bf78f6" offset="0x0000" />
 			</dataarea>
+			<dataarea name="ram" size="0x2000"/>
+		</part>
+	</software>
+
+	<software name="magicfor" cloneof="formel64">
+		<description>Magic Formel</description>
+		<year>1986</year>
+		<publisher>Grewe Computertechnik</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="magic_formel" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="romh" size="0x10000">
+				<rom name="magic_formel_v1.2_1986_ori.bin" size="0x10000" crc="dfc8b7f3" sha1="7c2e12ee2836157af9f811e1c9017bff542c8cfa" offset="0x0000" />
+			</dataarea>
+			<dataarea name="ram" size="0x2000"/>
+		</part>
+	</software>
+
+	<software name="magicf20" cloneof="formel64">
+		<description>Magic Formel 2.0</description>
+		<year>1987</year>
+		<publisher>Grewe Computertechnik</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="magic_formel" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="romh" size="0x20000">
+				<rom name="magic_formel_v2.0_1987_1st_eprom.bin" size="0x10000" crc="030e0031" sha1="a78323a25fc9e93f6008669948c93afe2b14a63f" offset="0x00000" />
+				<rom name="magic_formel_v2.0_1987_2nd_eprom.bin" size="0x8000" crc="5d5ce3e8" sha1="80db6efd099c66fccd0d6337226c3f786bed5b71" offset="0x18000" />
+			</dataarea>
+			<dataarea name="ram" size="0x2000"/>
 		</part>
 	</software>
 

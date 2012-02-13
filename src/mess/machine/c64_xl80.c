@@ -258,23 +258,3 @@ void c64_xl80_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, 
 		m_video_ram[offset & 0x7ff] = data;
 	}
 }
-
-
-//-------------------------------------------------
-//  c64_game_r - GAME read
-//-------------------------------------------------
-
-int c64_xl80_device::c64_game_r()
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  c64_exrom_r - EXROM read
-//-------------------------------------------------
-
-int c64_xl80_device::c64_exrom_r()
-{
-	return 0;
-}
