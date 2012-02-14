@@ -52,10 +52,12 @@
 
 #define GF1_CLOCK 9878400
 
+#define IRQ_2XF           0x00
 #define IRQ_MIDI_TRANSMIT 0x01
 #define IRQ_MIDI_RECEIVE  0x02
 #define IRQ_TIMER1        0x04
 #define IRQ_TIMER2        0x08
+#define IRQ_SB            0x10
 #define IRQ_WAVETABLE     0x20
 #define IRQ_VOLUME_RAMP   0x40
 #define IRQ_DRAM_TC_DMA   0x80
@@ -85,9 +87,11 @@ struct _gf1_interface
 	devcb_write_line ramp_irq_cb;
 	devcb_write_line timer1_irq_cb;
 	devcb_write_line timer2_irq_cb;
+	devcb_write_line sb_irq_cb;
 	devcb_write_line dma_irq_cb;
 	devcb_write_line drq1_cb;
 	devcb_write_line drq2_cb;
+	devcb_write_line nmi_cb;
 };
 typedef struct _gf1_interface gf1_interface;
 
@@ -102,9 +106,9 @@ public:
 
         // current IRQ/DMA channel getters
         UINT8 gf1_irq() { return m_gf1_irq; }
-        UINT8 midi_irq() { return m_midi_irq; }
+        UINT8 midi_irq() { if(m_irq_combine == 0) return m_midi_irq; else return m_gf1_irq; }
         UINT8 dma_channel1() { return m_dma_channel1; }
-        UINT8 dma_channel2() { return m_dma_channel2; }
+        UINT8 dma_channel2() { if(m_dma_combine == 0) return m_dma_channel2; else return m_dma_channel1; }
 
         DECLARE_READ8_MEMBER(global_reg_select_r);
         DECLARE_WRITE8_MEMBER(global_reg_select_w);
@@ -118,6 +122,11 @@ public:
         DECLARE_WRITE8_MEMBER(adlib_cmd_w);
         DECLARE_READ8_MEMBER(mix_ctrl_r);
         DECLARE_WRITE8_MEMBER(mix_ctrl_w);
+        DECLARE_READ8_MEMBER(stat_r);
+        DECLARE_WRITE8_MEMBER(stat_w);
+        DECLARE_READ8_MEMBER(sb_r);
+        DECLARE_WRITE8_MEMBER(sb_w);
+        DECLARE_WRITE8_MEMBER(sb2x6_w);
 
         // DMA signals
     	UINT8 dack_r(int line);
@@ -163,9 +172,11 @@ protected:
         devcb_resolved_write_line m_ramp_irq_func;
         devcb_resolved_write_line m_timer1_irq_func;
         devcb_resolved_write_line m_timer2_irq_func;
+        devcb_resolved_write_line m_sb_irq_func;
         devcb_resolved_write_line m_dma_irq_func;
         devcb_resolved_write_line m_drq1;
         devcb_resolved_write_line m_drq2;
+        devcb_resolved_write_line m_nmi_func;
 
 private:
         // internal state
@@ -199,6 +210,11 @@ private:
         UINT8 m_voice_irq_ptr;
         UINT8 m_voice_irq_current;
         UINT8 m_dma_16bit;  // set by bit 6 of the DMA DRAM control reg
+        UINT8 m_statread;
+        UINT8 m_sb_data_2xc;
+        UINT8 m_sb_data_2xe;
+        UINT8 m_reg_ctrl;
+        UINT8 m_fake_adlib_status;
         UINT32 m_dma_current;
         UINT32 m_volume_table[4096];
 
@@ -216,6 +232,8 @@ public:
 		isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		void set_irq(UINT8 source);
         void reset_irq(UINT8 source);
+		void set_midi_irq(UINT8 source);
+        void reset_midi_irq(UINT8 source);
 
 		DECLARE_READ8_MEMBER(board_r);
 		DECLARE_READ8_MEMBER(synth_r);
@@ -230,8 +248,11 @@ public:
         DECLARE_WRITE_LINE_MEMBER(volumeramp_irq);
         DECLARE_WRITE_LINE_MEMBER(timer1_irq);
         DECLARE_WRITE_LINE_MEMBER(timer2_irq);
+        DECLARE_WRITE_LINE_MEMBER(sb_irq);
         DECLARE_WRITE_LINE_MEMBER(dma_irq);
         DECLARE_WRITE_LINE_MEMBER(drq1_w);
+        DECLARE_WRITE_LINE_MEMBER(drq2_w);
+        DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
         // DMA overrides
     	virtual UINT8 dack_r(int line);

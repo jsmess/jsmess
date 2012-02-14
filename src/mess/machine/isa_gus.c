@@ -45,7 +45,9 @@ READ8_MEMBER( gf1_device::adlib_r )
 	switch(offset)
 	{
 		case 0:
-			return m_adlib_status;
+			if(m_timer_ctrl & 0x01)
+				return m_adlib_status;
+			return m_fake_adlib_status;
 		case 1:
 			return m_adlib_data;
 	}
@@ -100,9 +102,8 @@ WRITE8_MEMBER( gf1_device::adlib_w )
 				m_adlib_data = data;
 				if(m_timer_ctrl & 0x02)
 				{
-					m_irq_source |= 0x10;
-					//m_adlib_status |= 0x01;
-					m_timer1_irq_func(1);
+					m_adlib_status |= 0x01;
+					m_sb_irq_func(1);
 					logerror("GUS: 2X9 Timer triggered!\n");
 				}
 			}
@@ -329,9 +330,11 @@ void gf1_device::device_config_complete()
 		memset(&ramp_irq_cb, 0, sizeof(ramp_irq_cb));
 		memset(&timer1_irq_cb, 0, sizeof(timer1_irq_cb));
 		memset(&timer2_irq_cb, 0, sizeof(timer2_irq_cb));
+		memset(&sb_irq_cb, 0, sizeof(sb_irq_cb));
 		memset(&dma_irq_cb, 0, sizeof(dma_irq_cb));
 		memset(&drq1_cb, 0, sizeof(drq1_cb));
 		memset(&drq2_cb, 0, sizeof(drq2_cb));
+		memset(&nmi_cb, 0, sizeof(nmi_cb));
 	}
 }
 
@@ -359,12 +362,18 @@ void gf1_device::device_start()
 	m_ramp_irq_func.resolve(ramp_irq_cb, *this);
 	m_timer1_irq_func.resolve(timer1_irq_cb, *this);
 	m_timer2_irq_func.resolve(timer2_irq_cb, *this);
+	m_sb_irq_func.resolve(sb_irq_cb, *this);
 	m_dma_irq_func.resolve(dma_irq_cb, *this);
 	m_drq1.resolve(drq1_cb,*this);
 	m_drq2.resolve(drq2_cb,*this);
+	m_nmi_func.resolve(nmi_cb, *this);
 
 	m_voice_irq_current = 0;
 	m_voice_irq_ptr = 0;
+	m_dma_channel1 = 0;
+	m_dma_channel2 = 0;
+	m_gf1_irq = 0;
+	m_midi_irq = 0;
 
     for (int i = 0; i<4096; i++)
     	m_volume_table[i] = 65536 / ((4096-i)*(log(2.0)/256));
@@ -389,6 +398,7 @@ void gf1_device::device_reset()
 		m_voice[x].vol_ramp_ctrl = 0x01; // stop all volume ramps
 	}
 	m_irq_source = 0xe0;
+	m_reg_ctrl = 0;
 	m_active_voices = 14;
 	m_stream->set_sample_rate(44100);
 	m_voltimer->adjust(attotime::zero,0,attotime::from_usec(1000/(1.6*m_active_voices)));
@@ -722,6 +732,12 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 		if(offset == 1)
 		{
 			m_timer_ctrl = data;
+			if(!(data & 0x20))
+				m_adlib_status &= ~0x18;
+			if(!(data & 0x02))
+				m_adlib_status &= ~0x01;
+			if(!(m_adlib_status & 0x19))
+				m_sb_irq_func(0);
 			if(!(data & 0x04))
 			{
 				m_adlib_status &= ~0x40;
@@ -781,7 +797,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 		{
 			if(!(data & 0x01))
 				device_reset();
-			m_reset = data;
+			m_reset = data & 0xf9;
 		}
 		logerror("GUS: Reset write %02x\n",data);
 		break;
@@ -842,127 +858,139 @@ WRITE8_MEMBER(gf1_device::adlib_cmd_w)
 {
 	if(offset == 1)
 	{
-		if(m_mix_ctrl & 0x40)
+		switch(m_reg_ctrl & 0x07)
 		{
-			switch(data & 0x07)
+		case 0x00:
+			if(m_mix_ctrl & 0x40)
 			{
-			case 1:
-				m_gf1_irq = 2;
-				break;
-			case 2:
-				m_gf1_irq = 5;
-				break;
-			case 3:
-				m_gf1_irq = 3;
-				break;
-			case 4:
-				m_gf1_irq = 7;
-				break;
-			case 5:
-				m_gf1_irq = 11;
-				break;
-			case 6:
-				m_gf1_irq = 12;
-				break;
-			case 7:
-				m_gf1_irq = 15;
-				break;
-			default:
-				logerror("GUS: Invalid GF1 IRQ set! [%02x]\n",data);
+				switch(data & 0x07)
+				{
+				case 1:
+					m_gf1_irq = 2;
+					break;
+				case 2:
+					m_gf1_irq = 5;
+					break;
+				case 3:
+					m_gf1_irq = 3;
+					break;
+				case 4:
+					m_gf1_irq = 7;
+					break;
+				case 5:
+					m_gf1_irq = 11;
+					break;
+				case 6:
+					m_gf1_irq = 12;
+					break;
+				case 7:
+					m_gf1_irq = 15;
+					break;
+				default:
+					logerror("GUS: Invalid GF1 IRQ set! [%02x]\n",data);
+				}
+				switch((data >> 3) & 0x07)
+				{
+				case 0:
+					m_midi_irq = 0;
+					break;
+				case 1:
+					m_midi_irq = 2;
+					break;
+				case 2:
+					m_midi_irq = 5;
+					break;
+				case 3:
+					m_midi_irq = 3;
+					break;
+				case 4:
+					m_midi_irq = 7;
+					break;
+				case 5:
+					m_midi_irq = 11;
+					break;
+				case 6:
+					m_midi_irq = 12;
+					break;
+				case 7:
+					m_midi_irq = 15;
+					break;
+				default:
+					logerror("GUS: Invalid MIDI IRQ set! [%02x]\n",data);
+				}
+				if(data & 0x40)
+					m_irq_combine = 1;
+				else
+					m_irq_combine = 0;
+				logerror("GUS: IRQs set: GF1 = IRQ%i, MIDI = IRQ%i\n",m_gf1_irq,m_midi_irq);
 			}
-			switch((data >> 3) & 0x07)
-			{
-			case 0:
-				m_midi_irq = 0;
-				break;
-			case 1:
-				m_midi_irq = 2;
-				break;
-			case 2:
-				m_midi_irq = 5;
-				break;
-			case 3:
-				m_midi_irq = 3;
-				break;
-			case 4:
-				m_midi_irq = 7;
-				break;
-			case 5:
-				m_midi_irq = 11;
-				break;
-			case 6:
-				m_midi_irq = 12;
-				break;
-			case 7:
-				m_midi_irq = 15;
-				break;
-			default:
-				logerror("GUS: Invalid MIDI IRQ set! [%02x]\n",data);
-			}
-			if(data & 0x40)
-				m_irq_combine = 1;
 			else
-				m_irq_combine = 0;
-			logerror("GUS: IRQs set: GF1 = IRQ%i, MIDI = IRQ%i\n",m_gf1_irq,m_midi_irq);
-		}
-		else
-		{
-			switch(data & 0x07)
 			{
-			case 0:
-				m_dma_channel1 = 0;
-				break;
-			case 1:
-				m_dma_channel1 = 1;
-				break;
-			case 2:
-				m_dma_channel1 = 3;
-				break;
-			case 3:
-				m_dma_channel1 = 5;
-				break;
-			case 4:
-				m_dma_channel1 = 6;
-				break;
-			case 5:
-				m_dma_channel1 = 7;
-				break;
-			default:
-				logerror("GUS: Invalid DMA channel #1 set! [%02x]\n",data);
+				switch(data & 0x07)
+				{
+				case 0:
+					m_dma_channel1 = 0;
+					break;
+				case 1:
+					m_dma_channel1 = 1;
+					break;
+				case 2:
+					m_dma_channel1 = 3;
+					break;
+				case 3:
+					m_dma_channel1 = 5;
+					break;
+				case 4:
+					m_dma_channel1 = 6;
+					break;
+				case 5:
+					m_dma_channel1 = 7;
+					break;
+				default:
+					logerror("GUS: Invalid DMA channel #1 set! [%02x]\n",data);
+				}
+				switch((data >> 3) & 0x07)
+				{
+				case 0:
+					m_dma_channel2 = 0;
+					break;
+				case 1:
+					m_dma_channel2 = 1;
+					break;
+				case 2:
+					m_dma_channel2 = 3;
+					break;
+				case 3:
+					m_dma_channel2 = 5;
+					break;
+				case 4:
+					m_dma_channel2 = 6;
+					break;
+				case 5:
+					m_dma_channel2 = 7;
+					break;
+				default:
+					logerror("GUS: Invalid DMA channel #2 set! [%02x]\n",data);
+				}
+				if(data & 0x40)
+					m_dma_combine = 1;
+				else
+					m_dma_combine = 0;
+				logerror("GUS: DMA channels set: DMA%i, DMA%i\n",m_dma_channel1,m_dma_channel2);
 			}
-			switch((data >> 3) & 0x07)
-			{
-			case 0:
-				m_dma_channel2 = 0;
-				break;
-			case 1:
-				m_dma_channel2 = 1;
-				break;
-			case 2:
-				m_dma_channel2 = 3;
-				break;
-			case 3:
-				m_dma_channel2 = 5;
-				break;
-			case 4:
-				m_dma_channel2 = 6;
-				break;
-			case 5:
-				m_dma_channel2 = 7;
-				break;
-			default:
-				logerror("GUS: Invalid DMA channel #2 set! [%02x]\n",data);
-			}
-			if(data & 0x40)
-				m_dma_combine = 1;
-			else
-				m_dma_combine = 0;
-			logerror("GUS: DMA channels set: DMA%i, DMA%i\n",m_dma_channel1,m_dma_channel2);
+			break;
+		case 0x05:
+			m_statread = 0;
+			//m_other_irq_func(0);
+			break;
+		case 0x06:
+			// TODO: Jumper register (joy/MIDI enable)
+			break;
 		}
 	}
 	else
 	{
-		m_adlib_status = data;
+		m_fake_adlib_status = data;
 		logerror("GUS: Adlib status set to %02x\n",data);
 	}
 }
@@ -984,6 +1012,76 @@ WRITE8_MEMBER(gf1_device::mix_ctrl_w)
 {
 	if(offset == 0)
 		m_mix_ctrl = data;
+}
+
+READ8_MEMBER(gf1_device::sb_r)
+{
+	UINT8 val;
+
+	switch(offset)
+	{
+	case 0x00:
+		val = m_sb_data_2xc;
+		if(m_statread & 0x20)
+			m_sb_data_2xc ^= 0x80;  // flip MSB on read
+		return val;
+	// port 0x2XD is write-only
+	case 0x02:
+		if(m_reg_ctrl & 0x80)
+		{
+//			m_statread |= 0x80;
+//			m_other_irq_func(1);
+		}
+		return m_sb_data_2xe;
+	}
+	return 0xff;
+}
+
+WRITE8_MEMBER(gf1_device::sb_w)
+{
+	switch(offset)
+	{
+	case 0x00:
+		if(m_timer_ctrl & 0x20)
+		{
+			m_adlib_status |= 0x10;
+			m_nmi_func(1);
+			logerror("GUS: SB 0x2XC IRQ active\n");
+		}
+		break;
+	case 0x01:
+		m_sb_data_2xc = data;
+		break;
+	case 0x02:
+		m_sb_data_2xe = data;
+		break;
+	}
+}
+
+WRITE8_MEMBER(gf1_device::sb2x6_w)
+{
+	if(offset==0)
+	{
+		if(m_timer_ctrl & 0x20)
+		{
+			m_adlib_status |= 0x08;
+			m_nmi_func(1);
+			logerror("GUS: SB 0x2X6 IRQ active\n");
+		}
+	}
+}
+
+READ8_MEMBER(gf1_device::stat_r)
+{
+	UINT8 val = m_statread & 0xf9;
+	if(m_mix_ctrl & 0x08)
+		val |= 0x02;
+	return val;
+}
+
+WRITE8_MEMBER(gf1_device::stat_w)
+{
+	m_reg_ctrl = data;
 }
 
 void gf1_device::set_irq(UINT8 source, UINT8 voice)
@@ -1023,7 +1121,6 @@ void gf1_device::reset_irq(UINT8 source)
 // TODO: support 16-bit transfers
 UINT8 gf1_device::dack_r(int line)
 {
-	m_drq1(0);
 	return m_wave_ram[m_dma_current++ & 0xfffff];
 }
 
@@ -1049,9 +1146,9 @@ void gf1_device::dack_w(int line,UINT8 data)
 void gf1_device::eop_w(int state)
 {
 	// end of transfer
+	m_dmatimer->adjust(attotime::zero,0,attotime::never);
 	if(m_dma_dram_ctrl & 0x20)
 	{
-		m_dmatimer->adjust(attotime::zero,0,attotime::never);
 		m_dma_dram_ctrl |= 0x40;
 		m_dma_irq_func(1);
 	}
@@ -1082,9 +1179,11 @@ static const gf1_interface gus_gf1_config =
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,volumeramp_irq),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,timer1_irq),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,timer2_irq),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,sb_irq),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,dma_irq),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,drq1_w),
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,drq2_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,nmi_w)
 };
 
 static MACHINE_CONFIG_FRAGMENT( gus_config )
@@ -1177,6 +1276,12 @@ READ8_MEMBER(isa16_gus_device::board_r)
 	case 0x0a:
 	case 0x0b:
 		return m_gf1->adlib_cmd_r(space,offset-10);
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+		return m_gf1->sb_r(space,offset-12);
+	case 0x0f:
+		return m_gf1->stat_r(space,offset-15);
 	default:
 		logerror("GUS: Invalid or unimplemented read of port 0x2X%01x\n",offset);
 		return 0xff;
@@ -1192,6 +1297,9 @@ WRITE8_MEMBER(isa16_gus_device::board_w)
 	case 0x01:
 		m_gf1->mix_ctrl_w(space,offset,data);
 		break;
+	case 0x06:
+		m_gf1->sb2x6_w(space,offset-6,data);
+		break;
 	case 0x08:
 	case 0x09:
 		m_gf1->adlib_w(space,offset-8,data);
@@ -1200,6 +1308,13 @@ WRITE8_MEMBER(isa16_gus_device::board_w)
 	case 0x0b:
 		m_gf1->adlib_cmd_w(space,offset-10,data);
 		break;
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+		m_gf1->sb_w(space,offset-12,data);
+		break;
+	case 0x0f:
+		m_gf1->stat_w(space,offset-15,data);
 	default:
 		logerror("GUS: Invalid or unimplemented register write %02x of port 0x2X%01x\n",data,offset);
 	}
@@ -1334,6 +1449,14 @@ WRITE_LINE_MEMBER(isa16_gus_device::dma_irq)
 		reset_irq(IRQ_DRAM_TC_DMA);
 }
 
+WRITE_LINE_MEMBER(isa16_gus_device::sb_irq)
+{
+	if(state)
+		set_midi_irq(IRQ_SB);
+	else
+		reset_midi_irq(IRQ_SB);
+}
+
 WRITE_LINE_MEMBER(isa16_gus_device::drq1_w)
 {
 	m_isa->set_dma_channel(m_gf1->dma_channel1(), this, TRUE);
@@ -1356,6 +1479,31 @@ WRITE_LINE_MEMBER(isa16_gus_device::drq1_w)
 		break;
 	default:
 		logerror("GUS: Invalid DMA channel %i, ignoring.\n",m_gf1->dma_channel1());
+	}
+}
+
+WRITE_LINE_MEMBER(isa16_gus_device::drq2_w)
+{
+	m_isa->set_dma_channel(m_gf1->dma_channel2(), this, TRUE);
+	switch(m_gf1->dma_channel2())
+	{
+	case 1:
+		m_isa->drq1_w(state);
+		break;
+	case 3:
+		m_isa->drq3_w(state);
+		break;
+	case 5:
+		m_isa->drq5_w(state);
+		break;
+	case 6:
+		m_isa->drq6_w(state);
+		break;
+	case 7:
+		m_isa->drq7_w(state);
+		break;
+	default:
+		logerror("GUS: Invalid DMA channel %i, ignoring.\n",m_gf1->dma_channel2());
 	}
 }
 
@@ -1421,6 +1569,68 @@ void isa16_gus_device::reset_irq(UINT8 source)
 	logerror("GUS: Reset IRQ %02x\n",source);
 }
 
+void isa16_gus_device::set_midi_irq(UINT8 source)
+{
+	m_irq_status |= source;
+
+	switch(m_gf1->midi_irq())
+	{
+	case 2:
+		m_isa->irq2_w(1);
+		break;
+	case 3:
+		m_isa->irq3_w(1);
+		break;
+	case 5:
+		m_isa->irq5_w(1);
+		break;
+	case 7:
+		m_isa->irq7_w(1);
+		break;
+	case 11:
+		m_isa->irq11_w(1);
+		break;
+	case 12:
+		m_isa->irq12_w(1);
+		break;
+	case 15:
+		m_isa->irq15_w(1);
+		break;
+	}
+	logerror("GUS: Set MIDI IRQ %02x\n",source);
+}
+
+void isa16_gus_device::reset_midi_irq(UINT8 source)
+{
+	m_irq_status &= ~source;
+
+	switch(m_gf1->midi_irq())
+	{
+	case 2:
+		m_isa->irq2_w(0);
+		break;
+	case 3:
+		m_isa->irq3_w(0);
+		break;
+	case 5:
+		m_isa->irq5_w(0);
+		break;
+	case 7:
+		m_isa->irq7_w(0);
+		break;
+	case 11:
+		m_isa->irq11_w(0);
+		break;
+	case 12:
+		m_isa->irq12_w(0);
+		break;
+	case 15:
+		m_isa->irq15_w(0);
+		break;
+	}
+	logerror("GUS: Reset MIDI IRQ %02x\n",source);
+}
+
 WRITE_LINE_MEMBER( isa16_gus_device::midi_irq )
 {
 	if(state)
@@ -1429,12 +1639,18 @@ WRITE_LINE_MEMBER( isa16_gus_device::midi_irq )
 		reset_irq(IRQ_MIDI_TRANSMIT);
 }
 
+WRITE_LINE_MEMBER( isa16_gus_device::nmi_w)
+{
+	m_irq_status |= IRQ_SB;
+	m_isa->nmi();
+}
+
 UINT8 isa16_gus_device::dack_r(int line)
 {
-	if(line == m_gf1->dma_channel1())
+//	if(line == m_gf1->dma_channel1())
 		return m_gf1->dack_r(line);
-	else
-		return 0;
+//	else
+//		return 0;
 }
 
 void isa16_gus_device::dack_w(int line,UINT8 data)
