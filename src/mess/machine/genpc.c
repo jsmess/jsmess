@@ -442,7 +442,7 @@ static WRITE8_DEVICE_HANDLER( nmi_enable_w )
 	ibm5160_mb_device *board  = downcast<ibm5160_mb_device *>(device);
 
 	board->m_nmi_enabled = BIT(data,7);
-	board->m_isabus->set_nmi_state((board->m_nmi_enabled==0) && (board->m_ppi_portc_switch_high==0));
+	board->m_isabus->set_nmi_state(board->m_nmi_enabled);
 
 }
 //**************************************************************************
