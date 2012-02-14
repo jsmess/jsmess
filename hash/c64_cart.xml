@@ -522,7 +522,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-    <software name="chasehq2" supported="no">
+    <software name="chasehq2">
 		<description>Chase H.Q. 2: Special Criminal Investigation</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
@@ -4193,7 +4193,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="navyseal" supported="no">
+	<software name="navyseal">
 		<description>Navy SEALs</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
