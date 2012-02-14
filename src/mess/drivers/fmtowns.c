@@ -2525,7 +2525,7 @@ static const struct pit8253_config towns_pit8253_config =
 		{
 			307200,
 			DEVCB_NULL,
-			DEVCB_LINE_MEMBER(towns_state,pit_out2_changed)
+			DEVCB_DRIVER_LINE_MEMBER(towns_state,pit_out2_changed)
 		}
 	}
 };
