@@ -144,8 +144,7 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		}
 		break;
 	case DMA_TIMER:
-		if(!(m_dma_dram_ctrl & 0x02))  // transfer direction (1=read from DRAM, 0=write to DRAM)
-			m_drq1(1);
+		m_drq1(1);
 		break;
 	case VOL_RAMP_TIMER:
 		for(x=0;x<32;x++)
@@ -1147,11 +1146,13 @@ void gf1_device::eop_w(int state)
 {
 	// end of transfer
 	m_dmatimer->adjust(attotime::zero,0,attotime::never);
+	m_drq1(0);
 	if(m_dma_dram_ctrl & 0x20)
 	{
 		m_dma_dram_ctrl |= 0x40;
 		m_dma_irq_func(1);
 	}
+	logerror("GUS: End of transfer. (%05x)\n",m_dma_current);
 }
 
 
@@ -1647,10 +1648,10 @@ WRITE_LINE_MEMBER( isa16_gus_device::nmi_w)
 
 UINT8 isa16_gus_device::dack_r(int line)
 {
-//	if(line == m_gf1->dma_channel1())
+	if(line == m_gf1->dma_channel1())
 		return m_gf1->dack_r(line);
-//	else
-//		return 0;
+	else
+		return 0;
 }
 
 void isa16_gus_device::dack_w(int line,UINT8 data)
