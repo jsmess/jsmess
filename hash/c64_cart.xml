@@ -1065,7 +1065,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="epbnk256" supported="no">
+	<software name="rexep256">
 		<description>Eprom Bank 256k (Ger)</description>
 		<year>198?</year>
 		<publisher>Rex Datentechnik</publisher>
@@ -1232,6 +1232,20 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
+	<software name="cbmieee">
+		<description>Commodore IEEE-488</description>
+		<year>19??</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ieee488" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="commodore ieee-488 cartridge.bin" size="0x1000" crc="e894e448" sha1="c62b88b73d79b485ebb250d56065dfa54b8baf4c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tforieee" supported="no">
 		<description>Technofor IEEE Interface</description>
 		<year>1984</year>
@@ -1256,6 +1270,20 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="hobbi elektronika.bin" size="0x4000" crc="a4ab3bdc" sha1="884cacee1b1a7f811db97fb11c59c797d16b3602" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ep7x8">
+		<description>7x8K-EPROM-Bank (Ger)</description>
+		<year>19??</year>
+		<publisher>Dela Elektronik</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ep7x8" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="dela_7x8k-eprom-bank.bin" size="0x2000" crc="546d7ea8" sha1="6ab7a279144bcaaa20e7b2d12d67d3ed5cc3f6b6" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4410,9 +4438,9 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="256eprom">
+	<software name="delep256">
 		<description>256k Eprom System r.5</description>
-		<year>19??</year>
+		<year>198?</year>
 		<publisher>Dela Elektronik</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="dela_ep256" />
@@ -4420,6 +4448,20 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="256k eprom system rev 5 (19xx)(dela elektronik)(ger).80" size="0x2000" crc="0a3c1ab6" sha1="4f7c10b284f78a3af502460a84b3fcfbe7ef92fe" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ep64">
+		<description>64k Eprom System</description>
+		<year>198?</year>
+		<publisher>Dela Elektronik</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ep64" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="dela-ep64.bin" size="0x2000" crc="9c431173" sha1="a28a4d902f7e03bc7e3ee638620d5467c0dd2ddd" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5024,6 +5066,19 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 			<dataarea name="romh" size="0x2000">
 				<rom name="317009-02" size="0x2000" crc="23f1bd02" sha1="2a103fb2f5f2895af79e235c75393e96d213eaa9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="subasram">
+		<description>Super Basic Ram</description>
+		<year>1983</year>
+		<publisher>MadMax</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="super_basic_ram.bin" size="0x2000" crc="f92fe027" sha1="b0fd39d030244a1932031f1bb8f67cbf375b0b15" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5636,7 +5691,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="formel64">
+	<software name="formel64" supported="no">
 		<description>Formel 64</description>
 		<year>1986</year>
 		<publisher>Grewe Computertechnik</publisher>
@@ -5651,7 +5706,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="magicfor" cloneof="formel64">
+	<software name="magicfor" cloneof="formel64" supported="no">
 		<description>Magic Formel</description>
 		<year>1986</year>
 		<publisher>Grewe Computertechnik</publisher>
@@ -5666,7 +5721,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="magicf20" cloneof="formel64">
+	<software name="magicf20" cloneof="formel64" supported="no">
 		<description>Magic Formel 2.0</description>
 		<year>1987</year>
 		<publisher>Grewe Computertechnik</publisher>

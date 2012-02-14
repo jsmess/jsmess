@@ -4,6 +4,8 @@
 #define CBMIPT_H_
 
 #include "machine/c64_comal80.h"
+#include "machine/c64_dela_ep256.h"
+#include "machine/c64_dela_ep64.h"
 #include "machine/c64_dela_ep7x8.h"
 #include "machine/c64_dinamic.h"
 #include "machine/c64_easy_calc_result.h"
@@ -18,9 +20,12 @@
 #include "machine/c64_ocean.h"
 #include "machine/c64_pagefox.h"
 #include "machine/c64_rex.h"
+#include "machine/c64_rex_ep256.h"
+#include "machine/c64_ross.h"
 #include "machine/c64_silverrock.h"
 #include "machine/c64_simons_basic.h"
 #include "machine/c64_std.h"
+#include "machine/c64_structured_basic.h"
 #include "machine/c64_super_explode.h"
 #include "machine/c64_super_games.h"
 #include "machine/c64_system3.h"

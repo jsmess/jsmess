@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Dela 7x8K EPROM cartridge emulation
+    Ross cartridge emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef __DELA_EP7X8__
-#define __DELA_EP7X8__
+#ifndef __ROSS__
+#define __ROSS__
 
 #define ADDRESS_MAP_MODERN
 
@@ -24,22 +24,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c64_dela_ep7x8_cartridge_device
+// ======================> c64_ross_cartridge_device
 
-class c64_dela_ep7x8_cartridge_device : public device_t,
-										public device_c64_expansion_card_interface
+class c64_ross_cartridge_device : public device_t,
+								  public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
-	c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
+	c64_ross_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
-    virtual void device_config_complete() { m_shortname = "ep7x8"; }
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -48,14 +43,12 @@ protected:
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
 	
 private:
-	UINT8 *m_rom;
-	
 	UINT8 m_bank;
 };
 
 
 // device type definition
-extern const device_type C64_DELA_EP7X8;
+extern const device_type C64_ROSS;
 
 
 

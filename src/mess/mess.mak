@@ -754,6 +754,8 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64exp.o	\
 	$(MESS_MACHINE)/c64user.o	\
 	$(MESS_MACHINE)/c64_comal80.o	\
+	$(MESS_MACHINE)/c64_dela_ep256.o	\
+	$(MESS_MACHINE)/c64_dela_ep64.o	\
 	$(MESS_MACHINE)/c64_dela_ep7x8.o	\
 	$(MESS_MACHINE)/c64_dinamic.o	\
 	$(MESS_MACHINE)/c64_easy_calc_result.o	\
@@ -768,9 +770,12 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_ocean.o	\
 	$(MESS_MACHINE)/c64_pagefox.o	\
 	$(MESS_MACHINE)/c64_rex.o	\
+	$(MESS_MACHINE)/c64_rex_ep256.o	\
+	$(MESS_MACHINE)/c64_ross.o	\
 	$(MESS_MACHINE)/c64_silverrock.o	\
 	$(MESS_MACHINE)/c64_simons_basic.o	\
 	$(MESS_MACHINE)/c64_std.o	\
+	$(MESS_MACHINE)/c64_structured_basic.o	\
 	$(MESS_MACHINE)/c64_super_explode.o	\
 	$(MESS_MACHINE)/c64_super_games.o	\
 	$(MESS_MACHINE)/c64_system3.o	\

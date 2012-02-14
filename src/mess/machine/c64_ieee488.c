@@ -27,26 +27,6 @@ const device_type C64_IEEE488 = &device_creator<c64_ieee488_device>;
 
 
 //-------------------------------------------------
-//  ROM( c64_ieee488 )
-//-------------------------------------------------
-
-ROM_START( c64_ieee488 )
-	ROM_REGION( 0x1000, "roml", 0 )
-	ROM_LOAD( "commodore ieee-488 cartridge.u3", 0x0000, 0x1000, CRC(e894e448) SHA1(c62b88b73d79b485ebb250d56065dfa54b8baf4c) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *c64_ieee488_device::device_rom_region() const
-{
-	return ROM_NAME( c64_ieee488 );
-}
-
-
-//-------------------------------------------------
 //  tpi6525_interface tpi_intf
 //-------------------------------------------------
 
@@ -268,7 +248,6 @@ c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char
 
 void c64_ieee488_device::device_start()
 {
-	m_roml = subregion("roml")->base();
 }
 
 
