@@ -1998,6 +1998,13 @@ ROM_START( olypeopl )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+ROM_START( sx16 )
+    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD( "tmm27128ad.bin",0xfc000, 0x4000, CRC(f8543362) SHA1(fef625e260ca89ba02174584bdc12db609f0780e))
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
 
 /***************************************************************************
 
@@ -2045,3 +2052,4 @@ COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga,      pccga,  
 
 COMP( 198?, pcd,        ibm5150,    0,          pccga,      pccga,      pccga,      "Siemens", "PC-D", GAME_NOT_WORKING)
 COMP( 198?, olypeopl,   ibm5150,    0,          pccga,      pccga,      pccga,      "Olympia", "People PC", GAME_NOT_WORKING)
+COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga,      pccga,      "Sanyo", "SX-16", GAME_NOT_WORKING)
