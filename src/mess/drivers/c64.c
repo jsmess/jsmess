@@ -4,13 +4,6 @@
 
     - 64C PLA dump
 	- clean up inputs
-	- Pagefox boots to BASIC because it thinks the C= key is depressed
-	
-		8035: lda  $DC01
-		8038: and  #$10
-		803A: beq  $8042
-		8042: jmp  ($A000) <-- boot to BASIC
-	
 	- Multiscreen crashes on boot
 	
 		805A: lda  $01
@@ -1017,6 +1010,8 @@ static C64_USER_PORT_INTERFACE( user_intf )
 
 void c64_state::machine_start()
 {
+	cbm_common_init();
+
 	// find memory regions
 	m_basic = machine().region("basic")->base();
 	m_kernal = machine().region("kernal")->base();
