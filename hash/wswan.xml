@@ -987,7 +987,7 @@
 		</part>
 	</software>
 
-	<software name="pbobble" supported="partial">
+	<software name="pbobble">
 		<description>Puzzle Bobble</description>
 		<year>1999</year>
 		<publisher>Sunsoft</publisher>

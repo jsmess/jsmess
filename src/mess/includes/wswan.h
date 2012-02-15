@@ -83,6 +83,7 @@ typedef struct
 	UINT8 current_line;			/* Current scanline : 0-158 (159?) */
 	UINT8 line_compare;			/* Line to trigger line interrupt on */
 	UINT32 sprite_table_address;		/* Address of the sprite table */
+	UINT8 sprite_table_buffer[512];
 	UINT8 sprite_first;			/* First sprite to draw */
 	UINT8 sprite_count;			/* Number of sprites to draw */
 	UINT16 layer_bg_address;		/* Address of the background screen map */
@@ -115,8 +116,6 @@ typedef struct
 	UINT8 *vram;				/* pointer to start of ram/vram (set by MACHINE_RESET) */
 	UINT8 *palette_vram;			/* pointer to start of palette area in ram/vram (set by MACHINE_RESET), WSC only */
 	int main_palette[8];
-	UINT8 display_vertical;			/* Should the wonderswan be held vertically? */
-	UINT8 new_display_vertical;		/* New value for the display_vertical bit (to prevent mid frame changes) */
 	emu_timer *timer;
 } VDP;
 
@@ -151,6 +150,7 @@ public:
 	UINT8 m_bios_disabled;
 	int m_pal[16][16];
 	bitmap_ind16 m_bitmap;
+	UINT8 m_rotate;
 	void wswan_clear_irq_line(int irq);
 };
 

@@ -237,11 +237,12 @@ MACHINE_RESET( wswan )
 	state->m_vdp.vram = (UINT8*)space->get_read_ptr(0);
 	state->m_vdp.palette_vram = (UINT8*)space->get_read_ptr(( state->m_system_type == TYPE_WSC ) ? 0xFE00 : 0 );
 	state->m_vdp.current_line = 145;  /* Randomly chosen, beginning of VBlank period to give cart some time to boot up */
-	state->m_vdp.new_display_vertical = state->m_ROMMap[state->m_ROMBanks-1][0xfffc] & 0x01;
-	state->m_vdp.display_vertical = ~state->m_vdp.new_display_vertical;
 	state->m_vdp.color_mode = 0;
 	state->m_vdp.colors_16 = 0;
 	state->m_vdp.tile_packed = 0;
+	
+	render_target *target = machine.render().first_target();
+	target->set_view(state->m_rotate);
 
 	/* Initialize sound DMA */
 	memset( &state->m_sound_dma, 0, sizeof( state->m_sound_dma ) );
@@ -357,6 +358,8 @@ READ8_MEMBER( wswan_state::wswan_port_r )
 WRITE8_MEMBER( wswan_state::wswan_port_w )
 {
 	address_space *mem = m_maincpu->memory().space(AS_PROGRAM);
+	wswan_state *state = machine().driver_data<wswan_state>();
+	UINT8 input;
 	logerror( "PC=%X: port write %02X <- %02X\n", cpu_get_pc( &mem->device() ), offset, data );
 	switch( offset )
 	{
@@ -398,6 +401,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
                    Bit 0-7 - Line compare
                 */
 			m_vdp.line_compare = data;
+			logerror( "Write to line compare: %d\n", data );
 			break;
 		case 0x04:	/* Sprite table base address
                    Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
@@ -408,12 +412,13 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 		case 0x05:	/* Number of sprite to start drawing with
                    Bit 0-7 - First sprite number
                 */
-			m_vdp.sprite_first = data;
+			//m_vdp.sprite_first = data;
+			if (data) logerror("non-zero first sprite %d\n", m_vdp.sprite_first);
 			break;
 		case 0x06:	/* Number of sprites to draw
                    Bit 0-7 - Number of sprites to draw
                 */
-			m_vdp.sprite_count = data;
+			//m_vdp.sprite_count = data;
 			break;
 		case 0x07:	/* Background/Foreground table base addresses
                    Bit 0-2 - Determine background table base address 00xxx000 00000000
@@ -951,14 +956,32 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 			data = data & 0xF0;
 			switch( data )
 			{
-			case 0x10:	/* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
-				data = data | input_port_read(machine(), "CURSY");
+				case 0x10:	/* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
+					input = input_port_read(machine(), "CURSY");
+					if (state->m_rotate) // reorient controls if the console is rotated
+					{
+						if (input & 0x01) data |= 0x02;
+						if (input & 0x02) data |= 0x04;
+						if (input & 0x04) data |= 0x08;
+						if (input & 0x08) data |= 0x01;
+					}
+					else
+						data = data | input;
 				break;
-			case 0x20:	/* Read X cursors: X1 - X2 - X3 - X4 */
-				data = data | input_port_read(machine(), "CURSX");
+				case 0x20:	/* Read X cursors: X1 - X2 - X3 - X4 */
+					input = input_port_read(machine(), "CURSX");
+					if (state->m_rotate) // reorient controls if the console is rotated
+					{
+						if (input & 0x01) data |= 0x02;
+						if (input & 0x02) data |= 0x04;
+						if (input & 0x04) data |= 0x08;
+						if (input & 0x08) data |= 0x01;
+					}
+					else
+						data = data | input;
 				break;
-			case 0x40:	/* Read buttons: START - A - B */
-				data = data | input_port_read(machine(), "BUTTONS");
+				case 0x40:	/* Read buttons: START - A - B */
+					data = data | input_port_read(machine(), "BUTTONS");
 				break;
 			}
 			break;
@@ -1363,6 +1386,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	sram_str = wswan_determine_sram(state, state->m_ROMMap[state->m_ROMBanks - 1][0xfffb]);
 
 	state->m_rtc.present = state->m_ROMMap[state->m_ROMBanks - 1][0xfffd] ? 1 : 0;
+	state->m_rotate = state->m_ROMMap[state->m_ROMBanks-1][0xfffc] & 0x01;
 
 	{
 		int sum = 0;
@@ -1451,6 +1475,13 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 
 //  state->m_vdp.current_line = (state->m_vdp.current_line + 1) % 159;
 
+	if( state->m_vdp.current_line == 144 ) // buffer sprite table
+	{
+		memcpy(state->m_vdp.sprite_table_buffer, &state->m_vdp.vram[state->m_vdp.sprite_table_address], 512);
+		state->m_vdp.sprite_count = state->m_ws_portram[0x06];
+		state->m_vdp.sprite_first = state->m_ws_portram[0x05]; // always zero?
+	}
+	
 	if( state->m_vdp.current_line == 144 )
 	{
 		wswan_set_irq_line( machine, WSWAN_IFLAG_VBL );
@@ -1483,21 +1514,5 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 	}
 
 	state->m_vdp.current_line = (state->m_vdp.current_line + 1) % 159;
-
-	if ( state->m_vdp.current_line == 0 )
-	{
-		if ( state->m_vdp.display_vertical != state->m_vdp.new_display_vertical )
-		{
-			state->m_vdp.display_vertical = state->m_vdp.new_display_vertical;
-			if ( state->m_vdp.display_vertical )
-			{
-				machine.primary_screen->set_visible_area(5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
-			}
-			else
-			{
-				machine.primary_screen->set_visible_area(0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
-			}
-		}
-	}
 }
 
