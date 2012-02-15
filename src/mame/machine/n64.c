@@ -118,7 +118,7 @@ void n64_periphs::device_reset()
     if (boot_checksum == U64(0x000000d057e84864))
     {
         // CIC-NUS-6101
-        printf("CIC-NUS-6102 detected\n");
+        //printf("CIC-NUS-6102 detected\n");
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x02;
         pif_ram[0x26] = 0x3f;
@@ -128,7 +128,7 @@ void n64_periphs::device_reset()
     else if (boot_checksum == U64(0x000000cffb830843) || boot_checksum == U64(0x000000d0027fdf31))
     {
         // CIC-NUS-6103
-        printf("CIC-NUS-6101 detected\n");
+        //printf("CIC-NUS-6101 detected\n");
         // crc_seed = 0x78;
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x06;
@@ -138,7 +138,7 @@ void n64_periphs::device_reset()
     else if (boot_checksum == U64(0x000000d6499e376b))
     {
         // CIC-NUS-6103
-        printf("CIC-NUS-6103 detected\n");
+        //printf("CIC-NUS-6103 detected\n");
         // crc_seed = 0x78;
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x02;
@@ -148,7 +148,7 @@ void n64_periphs::device_reset()
     else if (boot_checksum == U64(0x0000011a4a1604b6))
     {
         // CIC-NUS-6105
-        printf("CIC-NUS-6105 detected\n");
+        //printf("CIC-NUS-6105 detected\n");
         // crc_seed = 0x91;
 
         // first_rsp = 0;
@@ -160,7 +160,7 @@ void n64_periphs::device_reset()
     else if (boot_checksum == U64(0x000000d6d5de4ba0))
     {
         // CIC-NUS-6106
-        printf("CIC-NUS-6106 detected\n");
+        //printf("CIC-NUS-6106 detected\n");
         // crc_seed = 0x85;
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x02;
@@ -169,7 +169,7 @@ void n64_periphs::device_reset()
     }
     else
     {
-        printf("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
+        //printf("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
     }
 }
 
@@ -350,10 +350,10 @@ WRITE32_MEMBER( n64_periphs::is64_w )
         case 0x0014/4:
             for(i = 0x20; i < (0x20 + data); i++)
             {
-                printf( "%c", is64_buffer[i] );
+                //printf( "%c", is64_buffer[i] );
                 if(is64_buffer[i] == 0x0a)
                 {
-                    printf( "%c", 0x0d );
+                    //printf( "%c", 0x0d );
                 }
                 is64_buffer[i] = 0;
             }
@@ -436,7 +436,7 @@ void n64_periphs::sp_dma(int direction)
 
 	if ((sp_mem_addr & 0xfff) + (sp_dma_length) > 0x1000)
 	{
-		printf("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
+		//printf("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
 		//fatalerror("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
 		sp_dma_length = 0x1000 - (sp_mem_addr & 0xfff);
 	}
@@ -1516,7 +1516,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 0:
 				case 1:
 				{
-					printf("Read controller %d status\n", channel + 1);
+					//printf("Read controller %d status\n", channel + 1);
 					rdata[0] = 0x05;
 					rdata[1] = 0x00;
 					rdata[2] = 0x01;
@@ -1525,13 +1525,13 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 2:
 				case 3:
 				{
-					printf("Read controller %d status (NC)\n", channel + 1);
+					//printf("Read controller %d status (NC)\n", channel + 1);
 					// not connected
 					return 1;
 				}
 				case 4:
 				{
-					printf("Read EEPROM status\n");
+					//printf("Read EEPROM status\n");
 					rdata[0] = 0x00;
 					rdata[1] = 0xc0;
 					rdata[2] = 0x00;
@@ -1565,7 +1565,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 0: //p1 inputs
 				case 1: //p2 inputs
 				{
-					printf("Read p%d inputs\n", channel + 1);
+					//printf("Read p%d inputs\n", channel + 1);
                     buttons = input_port_read(machine(), portnames[(channel*3) + 0]);
                     x = input_port_read(machine(), portnames[(channel*3) + 1]) - 128;
                     y = input_port_read(machine(), portnames[(channel*3) + 2]) - 128;
@@ -1579,7 +1579,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 2:
 				case 3:
 				{
-					printf("Controller %d not connected\n", channel + 1);
+					//printf("Controller %d not connected\n", channel + 1);
 					// not connected
 					return 1;
 				}
@@ -1595,7 +1595,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			address = (sdata[1] << 8) | (sdata[2]);
 			address &= ~0x1f;
 
-			printf("Read mempak at %04x\n", address);
+			//printf("Read mempak at %04x\n", address);
 
 			if(address == 0x8000)
 			{
@@ -1625,7 +1625,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			UINT32 address = (sdata[1] << 8) | (sdata[2]);
 			address &= ~0x1f;
 
-			printf("Write mempak at %04x\n", address);
+			//printf("Write mempak at %04x\n", address);
 			if (address >= 0x8000)
 			{
 
@@ -1657,7 +1657,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 			UINT16 block_offset = sdata[1] * 8;
 
-			printf("Read EEPROM at %04x\n", block_offset);
+			//printf("Read EEPROM at %04x\n", block_offset);
 
 			for(int i=0; i < 8; i++)
 			{
@@ -1681,7 +1681,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 			UINT16 block_offset = sdata[1] * 8;
 
-			printf("Write EEPROM at %04x\n", block_offset);
+			//printf("Write EEPROM at %04x\n", block_offset);
 
 			for(int i = 0; i < 8; i++)
 			{
@@ -1693,7 +1693,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 		case 0x06:		// Read RTC Status
 		{
-			printf("Read RTC Status\n");
+			//printf("Read RTC Status\n");
 			rdata[0] = 0x00;
 			rdata[1] = 0x10;
 			rdata[2] = 0x00;
@@ -1705,7 +1705,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			switch(sdata[1])
 			{
 				case 0:
-					printf("Read RTC Block Header\n");
+					//printf("Read RTC Block Header\n");
 					rdata[0] = 0x00;
 					rdata[1] = 0x02;
 					rdata[8] = 0x00;
@@ -1726,7 +1726,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 					rdata[6] = convert_to_bcd(systime.local_time.year % 100); // Year
 					rdata[7] = convert_to_bcd(systime.local_time.year / 100); // Century
 					rdata[8] = 0x00;
-					printf("Read RTC Time\n");
+					//printf("Read RTC Time\n");
 					return 0;
 			}
 			return 1;
@@ -1734,7 +1734,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 		case 0xff:		// reset
 		{
-			printf("Reset\n");
+			//printf("Reset\n");
 			rdata[0] = 0xff;
 			rdata[1] = 0xff;
 			rdata[2] = 0xff;
@@ -1753,15 +1753,15 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 void n64_periphs::handle_pif()
 {
-	printf("Before:\n");
-	for(int i = 0; i < 0x40; i++)
+	//printf("Before:\n");
+	/*for(int i = 0; i < 0x40; i++)
 	{
 		printf("%02x ", pif_cmd[i]);
 		if((i & 0xf) == 0xf)
 		{
 			printf("\n");
 		}
-	}
+	}*/
 	if(pif_cmd[0x3f] == 0x1)		// only handle the command if the last byte is 1
 	{
 		int channel = 0;
@@ -1771,16 +1771,16 @@ void n64_periphs::handle_pif()
 		while(cmd_ptr < 0x3f && !end)
 		{
 			INT8 bytes_to_send = (INT8)pif_cmd[cmd_ptr++];
-			printf("bytes to send: 0x%02x\n", bytes_to_send);
+			//printf("bytes to send: 0x%02x\n", bytes_to_send);
 
 			if (bytes_to_send == -2)
 			{
 				end = 1;
-				printf("end\n");
+				//printf("end\n");
 			}
 			else if (bytes_to_send < 0)
 			{
-				printf("do nothing\n");
+				//printf("do nothing\n");
 				// do nothing
 			}
 			else
@@ -1791,7 +1791,7 @@ void n64_periphs::handle_pif()
 					UINT8 send_buffer[0x40];
 
 					INT8 bytes_to_recv = pif_cmd[cmd_ptr++];
-					printf("bytes to receive: 0x%02x\n", bytes_to_recv);
+					//printf("bytes to receive: 0x%02x\n", bytes_to_recv);
 
 					if (bytes_to_recv == -2)
 					{
@@ -1804,11 +1804,11 @@ void n64_periphs::handle_pif()
 					}
 
                     int res = pif_channel_handle_command(channel, bytes_to_send, send_buffer, bytes_to_recv, recv_buffer);
-					printf("result: %d\n", res);
+					//printf("result: %d\n", res);
 
 					if (res == 0)
 					{
-						printf("cmd_ptr (%d) + bytes_to_recv (%d) = %d\n", cmd_ptr, bytes_to_recv, cmd_ptr + bytes_to_recv);
+						//printf("cmd_ptr (%d) + bytes_to_recv (%d) = %d\n", cmd_ptr, bytes_to_recv, cmd_ptr + bytes_to_recv);
 						if (cmd_ptr + bytes_to_recv > 0x3f)
 						{
 							fatalerror("cmd_ptr overflow\n");
@@ -1832,7 +1832,7 @@ void n64_periphs::handle_pif()
 		pif_ram[0x3f] = 0;
 	}
 
-	printf("After:\n");
+	/*printf("After:\n");
 	for(int i = 0; i < 0x40; i++)
 	{
 		printf("%02x ", pif_ram[i]);
@@ -1840,7 +1840,7 @@ void n64_periphs::handle_pif()
 		{
 			printf("\n");
 		}
-	}
+	}*/
 }
 
 void n64_periphs::pif_dma(int direction)
@@ -1891,7 +1891,7 @@ void n64_periphs::pif_dma(int direction)
 
 READ32_MEMBER( n64_periphs::si_reg_r )
 {
-	printf("si_reg_r %08x\n", offset * 4);
+	//printf("si_reg_r %08x\n", offset * 4);
 	switch (offset)
 	{
 		//case 0x00/4:      // SI_DRAM_ADDR_REG
@@ -1905,7 +1905,7 @@ READ32_MEMBER( n64_periphs::si_reg_r )
 
 WRITE32_MEMBER( n64_periphs::si_reg_w )
 {
-	printf("si_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
+	//printf("si_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
 	switch (offset)
 	{
 		case 0x00/4:		// SI_DRAM_ADDR_REG
