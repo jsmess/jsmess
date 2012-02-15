@@ -1145,6 +1145,7 @@ SLOT_INTERFACE_END
 SLOT_INTERFACE_START( c64_expansion_cards )
 	SLOT_INTERFACE("georam", C64_GEORAM)
 	SLOT_INTERFACE("xl80", C64_XL80)
+	SLOT_INTERFACE("easyflash", C64_EASYFLASH)
 	
 	// the following need ROMs from the software list
 	SLOT_INTERFACE("ieee488", C64_IEEE488)

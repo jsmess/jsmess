@@ -83,6 +83,9 @@ void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, in
 
 UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, int basic, int kernal, int charom, int io, int roml, int romh)
 {
+	int io1 = 1;
+	int io2 = 1;
+	
 	UINT8 data = 0;
 
 	if (!casram)
@@ -134,24 +137,18 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 				break;
 
 			case 2: // I/O1
-				data = m_exp->io1_r(space, offset);
+				io1 = 0;
 				break;
-
+				
 			case 3: // I/O2
-				data = m_exp->io2_r(space, offset);
+				io2 = 0;
 				break;
 			}
 			break;
 		}
 	}
-	else if (!roml)
-	{
-		data = m_exp->roml_r(space, offset);
-	}
-	else if (!romh)
-	{
-		data = m_exp->romh_r(space, offset);
-	}
+	
+	data |= m_exp->cd_r(space, offset, roml, romh, io1, io2);
 
 	return data;
 }
@@ -177,18 +174,16 @@ READ8_MEMBER( c64_state::read )
 
 WRITE8_MEMBER( c64_state::write )
 {
+	int io1 = 1;
+	int io2 = 1;
+
 	int casram, basic, kernal, charom, grw, io, roml, romh;
 
 	bankswitch(offset, 0, 0, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
-
+		
 	if (!casram)
 	{
 		m_ram->pointer()[offset] = data;
-		
-		if (offset == 0x0001 || (offset >= 0x8000 && offset < 0xc000))
-		{
-			m_exp->write(space, offset, data);
-		}
 	}
 	else if (!io)
 	{
@@ -218,16 +213,18 @@ WRITE8_MEMBER( c64_state::write )
 				break;
 
 			case 2: // I/O1
-				m_exp->io1_w(space, offset, data);
+				io1 = 0;
 				break;
 
 			case 3: // I/O2
-				m_exp->io2_w(space, offset, data);
+				io2 = 0;
 				break;
 			}
 			break;
 		}
 	}
+	
+	m_exp->cd_w(space, offset, data, roml, romh, io1, io2);
 }
 
 

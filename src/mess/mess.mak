@@ -759,6 +759,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_dela_ep7x8.o	\
 	$(MESS_MACHINE)/c64_dinamic.o	\
 	$(MESS_MACHINE)/c64_easy_calc_result.o	\
+	$(MESS_MACHINE)/c64_easyflash.o	\
 	$(MESS_MACHINE)/c64_epyx_fast_load.o	\
 	$(MESS_MACHINE)/c64_fun_play.o	\
 	$(MESS_MACHINE)/c64_georam.o	\

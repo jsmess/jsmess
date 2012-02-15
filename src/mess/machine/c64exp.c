@@ -280,16 +280,16 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 
 
 //-------------------------------------------------
-//  read - 
+//  cd_r - 
 //-------------------------------------------------
 
-READ8_MEMBER( c64_expansion_slot_device::read )
+UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 
 	if (m_cart != NULL)
 	{
-		data = m_cart->c64_cd_r(space, offset, 1, 1, 1, 1);
+		data = m_cart->c64_cd_r(space, offset, roml, romh, io1, io2);
 	}
 
 	return data;
@@ -297,108 +297,14 @@ READ8_MEMBER( c64_expansion_slot_device::read )
 
 
 //-------------------------------------------------
-//  write - 
+//  cd_w - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( c64_expansion_slot_device::write )
+void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
 {
 	if (m_cart != NULL)
 	{
-		m_cart->c64_cd_w(space, offset, data, 1, 1, 1, 1);
-	}
-}
-
-
-//-------------------------------------------------
-//  roml_r - low ROM read
-//-------------------------------------------------
-
-READ8_MEMBER( c64_expansion_slot_device::roml_r )
-{
-	UINT8 data = 0;
-
-	if (m_cart != NULL)
-	{
-		data = m_cart->c64_cd_r(space, offset, 0, 1, 1, 1);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  romh_r - high ROM read
-//-------------------------------------------------
-
-READ8_MEMBER( c64_expansion_slot_device::romh_r )
-{
-	UINT8 data = 0;
-
-	if (m_cart != NULL)
-	{
-		data = m_cart->c64_cd_r(space, offset, 1, 0, 1, 1);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  io1_r - I/O 1 read
-//-------------------------------------------------
-
-READ8_MEMBER( c64_expansion_slot_device::io1_r )
-{
-	UINT8 data = 0;
-
-	if (m_cart != NULL)
-	{
-		data = m_cart->c64_cd_r(space, offset, 1, 1, 0, 1);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  io1_w - low ROM write
-//-------------------------------------------------
-
-WRITE8_MEMBER( c64_expansion_slot_device::io1_w )
-{
-	if (m_cart != NULL)
-	{
-		m_cart->c64_cd_w(space, offset, data, 1, 1, 0, 1);
-	}
-}
-
-
-//-------------------------------------------------
-//  io2_r - I/O 2 read
-//-------------------------------------------------
-
-READ8_MEMBER( c64_expansion_slot_device::io2_r )
-{
-	UINT8 data = 0;
-
-	if (m_cart != NULL)
-	{
-		data = m_cart->c64_cd_r(space, offset, 1, 1, 1, 0);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  io2_w - low ROM write
-//-------------------------------------------------
-
-WRITE8_MEMBER( c64_expansion_slot_device::io2_w )
-{
-	if (m_cart != NULL)
-	{
-		m_cart->c64_cd_w(space, offset, data, 1, 1, 1, 0);
+		m_cart->c64_cd_w(space, offset, data, roml, romh, io1, io2);
 	}
 }
 

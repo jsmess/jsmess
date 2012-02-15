@@ -267,36 +267,18 @@ void c64_ieee488_device::device_reset()
 
 UINT8 c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
-	UINT8 data = 0;
-
+	UINT8 data = m_exp->cd_r(space, offset, roml, romh, io1, io2);
+	
 	if (!roml)
 	{
 		if (m_roml_sel)
 		{
 			data = m_roml[offset & 0xfff];
 		}
-		else
-		{
-			data = m_exp->roml_r(space, offset);
-		}
-	}
-	else if (!romh)
-	{
-		data = m_exp->romh_r(space, offset);
-	}
-	else if (!io1)
-	{
-		data = m_exp->io1_r(space, offset);
 	}
 	else if (!io2)
 	{
-		data = m_exp->io2_r(space, offset);
-		
 		data |= tpi6525_r(m_tpi, offset & 0x07);
-	}
-	else
-	{
-		data = m_exp->read(space, offset);
 	}
 
 	return data;
@@ -309,20 +291,12 @@ UINT8 c64_ieee488_device::c64_cd_r(address_space &space, offs_t offset, int roml
 
 void c64_ieee488_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
 {
-	if (!io1)
+	if (!io2)
 	{
-		m_exp->io1_w(space, offset, data);
-	}
-	else if (!io2)
-	{
-		m_exp->io2_w(space, offset, data);
-		
 		tpi6525_w(m_tpi, offset & 0x07, data);
 	}
-	else
-	{
-		m_exp->write(space, offset, data);
-	}
+	
+	m_exp->cd_w(space, offset, data, roml, romh, io1, io2);
 }
 
 
