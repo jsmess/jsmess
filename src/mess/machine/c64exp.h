@@ -93,14 +93,8 @@ public:
 	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~c64_expansion_slot_device();
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( roml_r );
-	DECLARE_READ8_MEMBER( romh_r );
-	DECLARE_READ8_MEMBER( io1_r );
-	DECLARE_WRITE8_MEMBER( io1_w );
-	DECLARE_READ8_MEMBER( io2_r );
-	DECLARE_WRITE8_MEMBER( io2_w );
+	UINT8 cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
+	void cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
 	int game_r(offs_t offset, int ba, int rw);
 	DECLARE_READ_LINE_MEMBER( exrom_r );
 

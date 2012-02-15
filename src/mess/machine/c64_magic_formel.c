@@ -270,7 +270,7 @@ void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t of
 
 
 //-------------------------------------------------
-//  c64_cd_w - GAME read
+//  c64_game_r - GAME read
 //-------------------------------------------------
 
 int c64_magic_formel_cartridge_device::c64_game_r(offs_t offset, int ba, int rw)
