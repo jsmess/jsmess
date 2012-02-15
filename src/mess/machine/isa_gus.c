@@ -45,9 +45,9 @@ READ8_MEMBER( gf1_device::adlib_r )
 	switch(offset)
 	{
 		case 0:
-			if(m_timer_ctrl & 0x01)
+//			if(m_timer_ctrl & 0x01)
 				return m_adlib_status;
-			return m_fake_adlib_status;
+//			return m_fake_adlib_status;
 		case 1:
 			return m_adlib_data;
 	}
@@ -103,7 +103,7 @@ WRITE8_MEMBER( gf1_device::adlib_w )
 				if(m_timer_ctrl & 0x02)
 				{
 					m_adlib_status |= 0x01;
-					m_sb_irq_func(1);
+					m_nmi_func(1);
 					logerror("GUS: 2X9 Timer triggered!\n");
 				}
 			}
@@ -120,7 +120,6 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	case ADLIB_TIMER1:
 		if(m_adlib_timer1_enable != 0)
 		{
-			m_timer1_count++;
 			if(m_timer1_count == 0xff)
 			{
 				m_adlib_status |= 0xc0;
@@ -128,12 +127,12 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 				if(m_timer_ctrl & 0x04)
 					m_timer1_irq_func(1);
 			}
+			m_timer1_count++;
 		}
 		break;
 	case ADLIB_TIMER2:
 		if(m_adlib_timer2_enable != 0)
 		{
-			m_timer2_count++;
 			if(m_timer2_count == 0xff)
 			{
 				m_adlib_status |= 0xa0;
@@ -141,6 +140,7 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 				if(m_timer_ctrl & 0x08)
 					m_timer2_irq_func(1);
 			}
+			m_timer2_count++;
 		}
 		break;
 	case DMA_TIMER:
@@ -1028,8 +1028,8 @@ READ8_MEMBER(gf1_device::sb_r)
 	case 0x02:
 		if(m_reg_ctrl & 0x80)
 		{
-//			m_statread |= 0x80;
-//			m_other_irq_func(1);
+			m_statread |= 0x80;
+			m_nmi_func(1);
 		}
 		return m_sb_data_2xe;
 	}
