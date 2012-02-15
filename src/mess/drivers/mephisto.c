@@ -57,8 +57,6 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 
     -- Cowering (2011)
 
-'rebel5' driver broke somewhere between 0.141 and 0.142 and is now marked as NOT_WORKING
-
 ***********************************************************************************************/
 
 #define ADDRESS_MAP_MODERN
@@ -341,6 +339,13 @@ static TIMER_DEVICE_CALLBACK( update_nmi )
 	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
 }
 
+static TIMER_DEVICE_CALLBACK( update_nmi_r5 )
+{
+	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
+	cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI,PULSE_LINE);
+	beep_set_state(state->m_beep, state->m_led_status&64?1:0);
+}
+
 static TIMER_DEVICE_CALLBACK( update_irq )		//only mm2
 {
 	mephisto_state *state = timer.machine().driver_data<mephisto_state>();
@@ -416,6 +421,9 @@ static MACHINE_CONFIG_DERIVED( rebel5, mephisto )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rebel5_mem)
+	MCFG_DEVICE_REMOVE("nmi_timer")
+	MCFG_TIMER_ADD_PERIODIC("nmi_timer_r5", update_nmi_r5, attotime::from_hz(600))
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mm2, mephisto )
@@ -500,7 +508,7 @@ static DRIVER_INIT( mephisto )
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME                            FLAGS */
 
 CONS( 1984, mm2,        mm4,	0,      mm2,        mephisto,   mephisto,   "Hegener & Glaser", "Mephisto MM2 Schachcomputer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schachcomputer", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING )
+CONS( 1986, rebel5,     mm4,	0,      rebel5,     mephisto,   mephisto,   "Hegener & Glaser", "Mephisto Rebel 5 Schachcomputer", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1987, mm4,        0,      0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1987, mm4tk,      mm4,    0,      mm4tk,      mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 4 Schachcomputer Turbo Kit + HG440",       GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
 CONS( 1990, mm5,        mm4,	0,      mephisto,   mephisto,   mephisto,   "Hegener & Glaser", "Mephisto 5.1 Schachcomputer",     GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
