@@ -173,9 +173,8 @@ static STREAM_UPDATE( wswan_sh_update )
 
 		if ( state->audio2.on ) {
 			if ( state->audio2_voice ) {
-				sample = (INT8)state->voice_data;
-				left += sample;
-				right += sample;
+				left += (state->voice_data - 128)*(state->master_volume & 0x0f);
+				right += (state->voice_data - 128)*(state->master_volume & 0x0f);
 			} else {
 				sample = state->audio2.signal;
 				state->audio2.pos++;

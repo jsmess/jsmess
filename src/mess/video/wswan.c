@@ -11,40 +11,6 @@
 
 #include "includes/wswan.h"
 
-
-INLINE void wswan_plot_pixel(running_machine &machine,int x, int y, int pen) {
-	wswan_state *state = machine.driver_data<wswan_state>();
-	y += 5*8;
-	if ( state->m_vdp.display_vertical ) {
-		state->m_bitmap.pix16(28*8 - 1 - x, y) = pen;
-	} else {
-		state->m_bitmap.pix16(y, x) = pen;
-	}
-}
-
-INLINE void wswan_fillbitmap( running_machine &machine,int pen, rectangle *rec ) {
-	wswan_state *state = machine.driver_data<wswan_state>();
-	/* Fill empty area above line 0 when filling line 0 */
-	if ( state->m_vdp.current_line != 0 ) {
-		rec->min_y = rec->min_y + 5*8;
-	}
-
-	/* Fill empty area below line 143 when filling line 143 */
-	if ( state->m_vdp.current_line != 143 ) {
-		rec->max_y = rec->max_y + 5*8;
-	} else {
-		rec->max_y = 28*8;
-	}
-
-	if ( state->m_vdp.display_vertical ) {
-		rectangle rec2(rec->min_y, rec->max_y, 28*8 - 1 - rec->max_x, 28*8 - 1 - rec->min_x);
-		state->m_bitmap.fill(pen, rec2 );
-	} else {
-		state->m_bitmap.fill(pen, *rec );
-	}
-}
-
-
 static void wswan_setup_palettes(wswan_state *state) {
 	int i,j;
 
@@ -135,18 +101,18 @@ static void wswan_draw_background( running_machine &machine ) {
 				if ( state->m_vdp.colors_16 ) {
 					if ( col ) {
 						if ( state->m_vdp.color_mode ) {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						} else {
 							/* Hmmmm, what should we do here... Is this correct?? */
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						}
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
 						if ( state->m_vdp.color_mode ) {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						} else {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_vdp.main_palette[state->m_pal[tile_palette][col]] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_vdp.main_palette[state->m_pal[tile_palette][col]];
 						}
 					}
 				}
@@ -223,18 +189,18 @@ static void wswan_draw_foreground_0( running_machine &machine ) {
 				if ( state->m_vdp.colors_16 ) {
 					if ( col ) {
 //                      if ( state->m_vdp.color_mode ) {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 //                      } else {
 //                          /* Hmmmm, what should we do here... Is this correct?? */
-//                          wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+//                          state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 //                      }
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
 						if ( state->m_vdp.color_mode ) {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						} else {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_vdp.main_palette[state->m_pal[tile_palette][col]] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_vdp.main_palette[state->m_pal[tile_palette][col]];
 						}
 					}
 				}
@@ -311,18 +277,18 @@ static void wswan_draw_foreground_2( running_machine &machine ) {
 				if ( state->m_vdp.colors_16 ) {
 					if ( col ) {
 						if ( state->m_vdp.color_mode ) {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						} else {
 							/* Hmmmm, what should we do here... Is this correct?? */
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						}
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
 						if ( state->m_vdp.color_mode ) {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						} else {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_vdp.main_palette[state->m_pal[tile_palette][col]] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_vdp.main_palette[state->m_pal[tile_palette][col]];
 						}
 					}
 				}
@@ -347,7 +313,7 @@ static void wswan_draw_foreground_3( running_machine &machine ) {
 		int	tile_palette = ( tile_data >> 9 ) & 0x0F;
 
 		tile_line = ( state->m_vdp.current_line + state->m_vdp.layer_fg_scroll_y ) & 0x07;
-		if ( tile_data & 0x8000 ) {
+		if ( tile_data & 0x8000 ) { // vflip
 			tile_line = 7 - tile_line;
 		}
 
@@ -399,18 +365,18 @@ static void wswan_draw_foreground_3( running_machine &machine ) {
 				if ( state->m_vdp.colors_16 ) {
 					if ( col ) {
 						if ( state->m_vdp.color_mode ) {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						} else {
 							/* Hmmmm, what should we do here... Is this correct?? */
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						}
 					}
 				} else {
 					if ( col || !(tile_palette & 4 ) ) {
 						if ( state->m_vdp.color_mode ) {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 						} else {
-							wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_vdp.main_palette[state->m_pal[tile_palette][col]] );
+							state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_vdp.main_palette[state->m_pal[tile_palette][col]];
 						}
 					}
 				}
@@ -429,13 +395,12 @@ static void wswan_handle_sprites( running_machine &machine, int mask ) {
 		UINT16	tile_data;
 		int	tile_line;
 
-		tile_data = ( state->m_vdp.vram[ state->m_vdp.sprite_table_address + i * 4 + 1 ] << 8 )
-		            | state->m_vdp.vram[ state->m_vdp.sprite_table_address + i * 4 ];
-		y = state->m_vdp.vram[ state->m_vdp.sprite_table_address + i * 4 + 2 ];
-		x = state->m_vdp.vram[ state->m_vdp.sprite_table_address + i * 4 + 3 ];
+		tile_data = ( state->m_vdp.sprite_table_buffer[ i * 4 + 1 ] << 8 ) | state->m_vdp.sprite_table_buffer[ i * 4 ];
+		y = state->m_vdp.sprite_table_buffer[ i * 4 + 2 ];
+		x = state->m_vdp.sprite_table_buffer[ i * 4 + 3 ];
 		tile_line = state->m_vdp.current_line - y;
 		tile_line = tile_line & 0xFF;
-		if ( ( tile_line >= 0 ) && ( tile_line < 8 ) && ( ( tile_data & mask ) == mask ) ) {
+		if ( ( tile_line >= 0 ) && ( tile_line < 8 ) && ( ( tile_data & 0x2000 ) == mask ) ) {
 			UINT32	plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 			int	j, x_offset, tile_address;
 			int	tile_number = tile_data & 0x01FF;
@@ -517,18 +482,18 @@ static void wswan_handle_sprites( running_machine &machine, int mask ) {
 					if ( state->m_vdp.colors_16 ) {
 						if ( col ) {
 							if ( state->m_vdp.color_mode ) {
-								wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+								state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 							} else {
 								/* Hmmmm, what should we do here... Is this correct?? */
-								wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+								state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 							}
 						}
 					} else {
 						if ( col || !(tile_palette & 4 ) ) {
 							if ( state->m_vdp.color_mode ) {
-								wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_pal[tile_palette][col] );
+								state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_pal[tile_palette][col];
 							} else {
-								wswan_plot_pixel( machine, x_offset, state->m_vdp.current_line, state->m_vdp.main_palette[state->m_pal[tile_palette][col]] );
+								state->m_bitmap.pix16(state->m_vdp.current_line, x_offset) = state->m_vdp.main_palette[state->m_pal[tile_palette][col]];
 							}
 						}
 					}
@@ -548,12 +513,12 @@ void wswan_refresh_scanline( running_machine &machine )
 	if ( state->m_ws_portram[0x14] ) {
 		/* Not sure if these background color checks and settings are correct */
 		if ( state->m_vdp.color_mode && state->m_vdp.colors_16 ) {
-			wswan_fillbitmap( machine, state->m_pal[state->m_ws_portram[0x01]>>4][state->m_ws_portram[0x01]&0x0F], &rec );
+			state->m_bitmap.fill( state->m_pal[state->m_ws_portram[0x01]>>4][state->m_ws_portram[0x01]&0x0F], rec );
 		} else {
-			wswan_fillbitmap( machine, state->m_vdp.main_palette[state->m_ws_portram[0x01]&0x07], &rec );
+			state->m_bitmap.fill( state->m_vdp.main_palette[state->m_ws_portram[0x01]&0x07], rec );
 		}
 	} else {
-		wswan_fillbitmap( machine, 0, &rec );
+		state->m_bitmap.fill( 0, rec );
 		return;
 	}
 
