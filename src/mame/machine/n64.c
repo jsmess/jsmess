@@ -1980,7 +1980,7 @@ static void n64_machine_stop(running_machine &machine)
 	n64_periphs *periphs = machine.device<n64_periphs>("rcp");
 
 	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
-.	//printf("Saving stuff\n");
+	//printf("Saving stuff\n");
 	UINT8 data[0x30800];
 	memcpy(data, n64_sram, 0x20000);
 	memcpy(data + 0x20000, periphs->m_save_data.eeprom, 0x800);
