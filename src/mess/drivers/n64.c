@@ -181,7 +181,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	device_image_interface *battery_image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
 	if(battery_image)
 	{
-		printf("Loading\n");
+		//printf("Loading\n");
 		UINT8 data[0x30800];
 		battery_image->battery_load(data, 0x30800, 0x00);
 		memcpy(n64_sram, data, 0x20000);
