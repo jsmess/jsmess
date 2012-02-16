@@ -48,11 +48,12 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	UINT8 *cache = NULL;
-	chd_file *chd = NULL;
+	chd_file chd;
 	chd_error rc;
 	UINT64 logicalbytes;
 	int hunknum, totalhunks;
-	char metadata[256];
+	astring metadata;
+	chd_codec_type compression[4] = { CHD_CODEC_NONE };
 
 	/* sanity check args */
 	if (hunksize >= 2048)
@@ -74,7 +75,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	logicalbytes = (UINT64)cylinders * heads * sectors * seclen;
 
 	/* create the new hard drive */
-	rc = chd_create_file(stream_core_file(stream), logicalbytes, hunksize, CHDCOMPRESSION_NONE, NULL);
+	rc = chd.create(*stream_core_file(stream), logicalbytes, hunksize, seclen, compression);
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
@@ -82,7 +83,8 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* open the new hard drive */
-	rc = chd_open_file(stream_core_file(stream), CHD_OPEN_READWRITE, NULL, &chd);
+	rc = chd.open(*stream_core_file(stream));
+
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
@@ -90,8 +92,8 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* write the metadata */
-	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
-	err = (imgtoolerr_t)chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
+	metadata.format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, seclen);
+	err = (imgtoolerr_t)chd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 	if (rc != CHDERR_NONE)
 	{
 		err = map_chd_error(rc);
@@ -111,7 +113,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	totalhunks = (logicalbytes + hunksize - 1) / hunksize;
 	for (hunknum = 0; hunknum < totalhunks; hunknum++)
 	{
-		rc = chd_write(chd, hunknum, cache);
+		rc = chd.write_units(hunknum, cache);
 		if (rc)
 		{
 			err = IMGTOOLERR_WRITEERROR;
@@ -123,8 +125,6 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 done:
 	if (cache)
 		free(cache);
-	if (chd)
-		chd_close(chd);
 	return err;
 }
 
@@ -143,7 +143,7 @@ imgtoolerr_t imghd_open(imgtool_stream *stream, struct mess_hard_disk_file *hard
 	hard_disk->hard_disk = NULL;
 	hard_disk->chd = NULL;
 
-	chderr = chd_open_file(stream_core_file(stream), stream_isreadonly(stream) ? CHD_OPEN_READ : CHD_OPEN_READWRITE, NULL, &hard_disk->chd);
+	chderr = hard_disk->chd->open(*stream_core_file(stream), stream_isreadonly(stream));
 	if (chderr)
 	{
 		err = map_chd_error(chderr);
@@ -177,11 +177,6 @@ void imghd_close(struct mess_hard_disk_file *disk)
 	{
 		hard_disk_close(disk->hard_disk);
 		disk->hard_disk = NULL;
-	}
-	if (disk->chd)
-	{
-		chd_close(disk->chd);
-		disk->chd = NULL;
 	}
 	if (disk->stream)
 		stream_close(disk->stream);
