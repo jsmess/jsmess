@@ -118,7 +118,7 @@ void n64_periphs::device_reset()
     if (boot_checksum == U64(0x000000d057e84864))
     {
         // CIC-NUS-6101
-        //printf("CIC-NUS-6102 detected\n");
+        printf("CIC-NUS-6102 detected\n");
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x02;
         pif_ram[0x26] = 0x3f;
@@ -128,7 +128,7 @@ void n64_periphs::device_reset()
     else if (boot_checksum == U64(0x000000cffb830843) || boot_checksum == U64(0x000000d0027fdf31))
     {
         // CIC-NUS-6103
-        //printf("CIC-NUS-6101 detected\n");
+        printf("CIC-NUS-6101 detected\n");
         // crc_seed = 0x78;
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x06;
@@ -138,7 +138,7 @@ void n64_periphs::device_reset()
     else if (boot_checksum == U64(0x000000d6499e376b))
     {
         // CIC-NUS-6103
-        //printf("CIC-NUS-6103 detected\n");
+        printf("CIC-NUS-6103 detected\n");
         // crc_seed = 0x78;
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x02;
@@ -148,7 +148,7 @@ void n64_periphs::device_reset()
     else if (boot_checksum == U64(0x0000011a4a1604b6))
     {
         // CIC-NUS-6105
-        //printf("CIC-NUS-6105 detected\n");
+        printf("CIC-NUS-6105 detected\n");
         // crc_seed = 0x91;
 
         // first_rsp = 0;
@@ -160,7 +160,7 @@ void n64_periphs::device_reset()
     else if (boot_checksum == U64(0x000000d6d5de4ba0))
     {
         // CIC-NUS-6106
-        //printf("CIC-NUS-6106 detected\n");
+        printf("CIC-NUS-6106 detected\n");
         // crc_seed = 0x85;
         pif_ram[0x24] = 0x00;
         pif_ram[0x25] = 0x02;
@@ -169,7 +169,7 @@ void n64_periphs::device_reset()
     }
     else
     {
-        //printf("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
+        printf("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
     }
 }
 
@@ -350,10 +350,10 @@ WRITE32_MEMBER( n64_periphs::is64_w )
         case 0x0014/4:
             for(i = 0x20; i < (0x20 + data); i++)
             {
-                //printf( "%c", is64_buffer[i] );
+                printf( "%c", is64_buffer[i] );
                 if(is64_buffer[i] == 0x0a)
                 {
-                    //printf( "%c", 0x0d );
+                    printf( "%c", 0x0d );
                 }
                 is64_buffer[i] = 0;
             }
@@ -436,7 +436,7 @@ void n64_periphs::sp_dma(int direction)
 
 	if ((sp_mem_addr & 0xfff) + (sp_dma_length) > 0x1000)
 	{
-		//printf("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
+		printf("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
 		//fatalerror("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
 		sp_dma_length = 0x1000 - (sp_mem_addr & 0xfff);
 	}
@@ -1980,7 +1980,7 @@ static void n64_machine_stop(running_machine &machine)
 	n64_periphs *periphs = machine.device<n64_periphs>("rcp");
 
 	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
-	//printf("Saving stuff\n");
+	//printf("Saving\n");
 	UINT8 data[0x30800];
 	memcpy(data, n64_sram, 0x20000);
 	memcpy(data + 0x20000, periphs->m_save_data.eeprom, 0x800);

@@ -3229,7 +3229,8 @@ sfiii3			// 08/06/1999 (c) 1999 (Euro)
 sfiii3a			// 12/05/1999 (c) 1999 (Euro)
 sfiii3u			// 08/06/1999 (c) 1999 (USA)
 sfiii3au		// 12/05/1999 (c) 1999 (USA)
-jojoba			// 13/09/1999 (c) 1999 (Japan)
+jojoba			// 27/09/1999 (c) 1999 (Japan)
+jojobaa			// 13/09/1999 (c) 1999 (Japan)
 
 sfiiin			// 04/02/1997 (c) 1997 (Asia)
 sfiii2n			// 30/09/1997 (c) 1997 (Asia)
@@ -3237,8 +3238,10 @@ jojon			// 08/01/1999 (c) 1998 (Asia)
 jojoan			// 02/12/1998 (c) 1998 (Asia)
 sfiii3n			// 08/06/1999 (c) 1999 (Japan)
 sfiii3an		// 12/05/1999 (c) 1999 (Japan)
-jojoban			// 13/09/1999 (c) 1999 (Japan)
-jojobane		// 13/09/1999 (c) 1999 (Euro)
+jojoban			// 27/09/1999 (c) 1999 (Japan)
+jojobaan		// 13/09/1999 (c) 1999 (Japan)
+jojobane		// 27/09/1999 (c) 1999 (Euro)
+jojobaane		// 13/09/1999 (c) 1999 (Euro)
 
 // Capcom ZN1
 cpzn1
@@ -4520,11 +4523,9 @@ srallyc			// 1995.02 Sega Rally Championship - Rev C
 srallycb		// 1995.02 Sega Rally Championship - Rev B
 vcop2			// 1995.09 Virtua Cop 2
 vf2			// 1995.09 Virtua Fighter 2.1
-				// 1995.10 Sky Target
+skytargt		// 1995.10 Sky Target
 manxtt			// 1995.11 Manx T.T.
-				// 1996.08 Dynamite Baseball
 doaa			// 1996.11 Dead or Alive
-				// 1997.04 Dynamite Baseball '97
 motoraid		// 1997.10 Motor Raid
 zeroguna		// 1997.12 Zero Gunner
 zerogunaj		// 1997.12 Zero Gunner (Japan)
@@ -4533,13 +4534,12 @@ dynamcop		// 1998.09 Dynamic Cop
 pltkidsa		// 1999.03 Pilot Kids
 
 // Model 2B-CRX (SHARC, SCSP sound board)
-vstriker		// 1995.05 virtua Striker
-vstrikero		// 1995.05 virtua Striker
+vstriker		// 1995.05 Virtua Striker
+vstrikero		// 1995.05 Virtua Striker
 rchase2			// 1995.06 Rail Chase 2 (Arcade TV Game List - P.104, Left, 12 from top)
 indy500			// 1995.07 Indy 500
 indy500d		// 1995.07 Indy 500
 indy500to		// 1995.07 Indy 500
-skytargt		// 1995.10 Sky Target
 fvipers			// 1995.11 Fighting Vipers
 von			// 1996.01 Dennou Senki Virtual-On (USA)
 vonj			// 1996.01 Dennou Senki Virtual-On (Japan)
@@ -4552,7 +4552,7 @@ lastbrnxj		// 1996.06 Last Bronx (Japan)
 sgt24h			// 1996.07 Super GT 24h
 dynabb			// 1996.08 Dynamite Baseball
 doa			// 1996.11 Dead or Alive
-				// 1997.04 Dynamite Baseball '97
+dynabb97		// 1997.04 Dynamite Baseball 97
 zerogun			// 1997.12 Zero Gunner
 zerogunj		// 1997.12 Zero Gunner (Japan)
 dyndeka2b		// 1998.05 Dynamite Deka 2
@@ -4569,7 +4569,7 @@ hotd			// 1997.03 The House of the Dead
 topskatr		// 1997.05 Top Skater
 topskatru		// 1997.05 Top Skater (USA)
 topskatrj		// 1997.05 Top Skater (Japan)
-overrev			// 1997.09 Overrev
+overrev			// 1997.09 Over Rev
 segawski		// 1997.09 Sega Water Ski
 dynamcopc		// 1998.09 Dynamite Cop
 bel			// 1998.12 Behind Enemy Lines
@@ -5219,7 +5219,7 @@ cscrtry2		// 38
 cppicf			// 39 1984.02 Peter Pepper's Ice Cream Factory
 cppicf2			// 39
 cfghtice		// 40 1984.04 Fighting Ice Hockey
-				// 41 1984.05 Oozumou/The Grand Sumo
+cgsumo			// 41 1984.05 Oozumou/The Grand Sumo
 				// 42 1984.08 Hellow Gateball // not a typo, this is official spelling
 				// 43 1984.08 Yellow Cab
 cbdash			// 44 1985.08 Boulder Dash
@@ -10438,6 +10438,7 @@ mosaicf2		// (c) 1999 F2 System
 finalgdr		// (c) 2001 Semicom
 mrkicker		// (c) 2001 Semicom
 wyvernwg		// (c) 2001 Semicom / Game Vision
+wyvernwga		// (c) 2001 Semicom / Game Vision
 rbmk			// (c) 1995 GMS
 go2000			// (c) 2000 SA
 mirax			// (c) 1985 Current Technologies
@@ -18700,6 +18701,7 @@ pr_jumpj		// Jumping Jacks (Project)
 pr_medl			// Medalist (Project)
 pr_megmn		// Mega Money (Project)
 pr_nudxs		// Nudge XS (Project)
+pr_qksht		// Quickshot (Maygay)
 pr_rags			// Rags To Riches (Project)
 pr_reflx		// Reflex (Project)
 pr_roadr		// Road Riot (Project)
