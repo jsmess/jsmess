@@ -195,16 +195,6 @@ static struct
 	UINT8 reg_lock2;
 }s3;
 
-#define REG(x) vga.crtc.data[x]
-
-#define CRTC_CHAR_HEIGHT ((REG(9)&0x1f)+1)
-#define CRTC_CURSOR_MODE (REG(0xa)&0x60)
-#define CRTC_CURSOR_OFF 0x20
-#define CRTC_SKEW	(REG(8)&15)
-#define CRTC_CURSOR_POS ((REG(0xe)<<8)|REG(0xf))
-#define CRTC_CURSOR_TOP	(REG(0xa)&0x1f)
-#define CRTC_CURSOR_BOTTOM REG(0xb)
-
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
 //#define TEXT_LINES (LINES_HELPER)
@@ -267,7 +257,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	UINT8 bits;
 	UINT32 font_base;
 	UINT32 *bitmapline;
-	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT * (vga.crtc.scan_doubling + 1);
+	int width=CHAR_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
 	int pos, line, column, mask, w, h, addr;
 	UINT8 blink_en,fore_col,back_col;
 	pen_t pen;
@@ -277,7 +267,7 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 	else
 		vga.cursor.visible = 0;
 
-	for (addr = vga.crtc.start_addr, line = -CRTC_SKEW; line < TEXT_LINES;
+	for (addr = vga.crtc.start_addr, line = -vga.crtc.preset_row_scan; line < TEXT_LINES;
 		 line += height, addr += TEXT_LINE_LENGTH)
 	{
 		for (pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
@@ -322,11 +312,10 @@ static void vga_vh_text(running_machine &machine, bitmap_rgb32 &bitmap, const re
 					bitmapline[column*width+w] = pen;
 				}
 			}
-			if ((CRTC_CURSOR_MODE!=CRTC_CURSOR_OFF)
-				&&vga.cursor.visible&&(pos==CRTC_CURSOR_POS))
+			if (vga.cursor.visible&&(pos==vga.crtc.cursor_addr))
 			{
-				for (h=CRTC_CURSOR_TOP;
-					 (h<=CRTC_CURSOR_BOTTOM)&&(h<height)&&(line+h<TEXT_LINES);
+				for (h=vga.crtc.cursor_scan_start;
+					 (h<=vga.crtc.cursor_scan_end)&&(h<height)&&(line+h<TEXT_LINES);
 					 h++)
 				{
 					if(!machine.primary_screen->visible_area().contains(column*width, line+h))
@@ -1312,9 +1301,6 @@ static WRITE8_HANDLER(vga_crtc_w)
 					(vga.crtc.index < vga.svga_intf.crtc_regcount) ? "" : "?",
 					data);
 			}
-
-			if (vga.crtc.index < vga.svga_intf.crtc_regcount)
-				vga.crtc.data[vga.crtc.index] = data;
 
 			crtc_reg_write(space->machine(),vga.crtc.index,data);
 			//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
