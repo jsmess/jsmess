@@ -988,44 +988,62 @@ static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 	switch(index)
 	{
 		case 0x00:
+			if(vga.crtc.protect_enable)
+				break;
 			vga.crtc.horz_total = (vga.crtc.horz_total & ~0xff) | (data & 0xff);
 			recompute_params(machine);
 			break;
 		case 0x01:
+			if(vga.crtc.protect_enable)
+				break;
 			vga.crtc.horz_disp_end = (data & 0xff);
 			recompute_params(machine);
 			break;
-		case 0x02: vga.crtc.horz_blank_start = (data & 0xff); break;
+		case 0x02:
+			if(vga.crtc.protect_enable)
+				break;
+			vga.crtc.horz_blank_start = (data & 0xff);
+			break;
 		case 0x03:
+			if(vga.crtc.protect_enable)
+				break;
 			vga.crtc.horz_blank_end &= ~0x1f;
 			vga.crtc.horz_blank_end |= data & 0x1f;
 			vga.crtc.disp_enable_skew = (data & 0x60) >> 5;
 			vga.crtc.evra = (data & 0x80) >> 7;
 			break;
 		case 0x04:
+			if(vga.crtc.protect_enable)
+				break;
 			vga.crtc.horz_retrace_start = data & 0xff;
 			break;
 		case 0x05:
+			if(vga.crtc.protect_enable)
+				break;
 			vga.crtc.horz_blank_end &= ~0x20;
 			vga.crtc.horz_blank_end |= ((data & 0x80) >> 2);
 			vga.crtc.horz_retrace_skew = ((data & 0x60) >> 5);
 			vga.crtc.horz_retrace_end = data & 0x1f;
 			break;
 		case 0x06:
+			if(vga.crtc.protect_enable)
+				break;
 			vga.crtc.vert_total &= ~0xff;
 			vga.crtc.vert_total |= data & 0xff;
 			recompute_params(machine);
 			break;
 		case 0x07: // Overflow Register
+			vga.crtc.line_compare       &= ~0x100;
+			vga.crtc.line_compare       |= ((data & 0x10) << (8-4));
+			if(vga.crtc.protect_enable)
+				break;
 			vga.crtc.vert_total         &= ~0x300;
 			vga.crtc.vert_retrace_start &= ~0x300;
 			vga.crtc.vert_disp_end      &= ~0x300;
-			vga.crtc.line_compare       &= ~0x100;
 			vga.crtc.vert_blank_start   &= ~0x100;
 			vga.crtc.vert_retrace_start |= ((data & 0x80) << (9-7));
 			vga.crtc.vert_disp_end      |= ((data & 0x40) << (9-6));
 			vga.crtc.vert_total         |= ((data & 0x20) << (9-5));
-			vga.crtc.line_compare       |= ((data & 0x10) << (8-4));
 			vga.crtc.vert_blank_start   |= ((data & 0x08) << (8-3));
 			vga.crtc.vert_retrace_start |= ((data & 0x04) << (8-2));
 			vga.crtc.vert_disp_end      |= ((data & 0x02) << (8-1));
