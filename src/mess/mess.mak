@@ -775,12 +775,14 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_ross.o	\
 	$(MESS_MACHINE)/c64_silverrock.o	\
 	$(MESS_MACHINE)/c64_simons_basic.o	\
+	$(MESS_MACHINE)/c64_stardos.o	\
 	$(MESS_MACHINE)/c64_std.o	\
 	$(MESS_MACHINE)/c64_structured_basic.o	\
 	$(MESS_MACHINE)/c64_super_explode.o	\
 	$(MESS_MACHINE)/c64_super_games.o	\
 	$(MESS_MACHINE)/c64_system3.o	\
 	$(MESS_MACHINE)/c64_vw64.o	\
+	$(MESS_MACHINE)/c64_warp_speed.o	\
 	$(MESS_MACHINE)/c64_westermann.o	\
 	$(MESS_MACHINE)/c64_xl80.o	\
 	$(MESS_MACHINE)/c64_zaxxon.o	\
@@ -826,6 +828,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_VIDEO)/vic6567.o		\
 	$(MESS_VIDEO)/vic4567.o		\
 	$(MESS_FORMATS)/cbm_snqk.o	\
+	$(MESS_FORMATS)/cbm_crt.o	\
 
 $(MESSOBJ)/cccp.a:				\
 	$(MESS_DRIVERS)/argo.o		\
