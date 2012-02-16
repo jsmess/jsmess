@@ -28,9 +28,30 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
 	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
 	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
-	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_BASE(&n64_sram)		// Cartridge SRAM
-	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)	// Cartridge
-	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)	// PIF ROM
+	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_BASE(&n64_sram)										// Cartridge SRAM
+	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)									// Cartridge
+	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)									// PIF ROM
+	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pif_ram_r, pif_ram_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(&rdram)				// RDRAM
+	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
+	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("dmem")					// RSP DMEM
+	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("imem")					// RSP IMEM
+	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
+	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
+	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
+	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, vi_reg_r, vi_reg_w)	// Video Interface
+	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ai_reg_r, ai_reg_w)	// Audio Interface
+	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
+	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
+	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
+	AM_RANGE(0x05000000, 0x05ffffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, dd_reg_r, dd_reg_w) // 64DD Interface
+	AM_RANGE(0x06000000, 0x063fffff) AM_ROM AM_REGION("ddipl", 0)									// 64DD IPL ROM
+	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_BASE(&n64_sram)										// Cartridge SRAM
+	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)									// Cartridge
+	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)									// PIF ROM
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
@@ -144,6 +165,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 		length = image.get_software_region_length("rom");
 		memcpy(cart, image.get_software_region("rom"), length);
 	}
+	periphs->cart_length = length;
 
 	if (cart[0] == 0x37 && cart[1] == 0x80)
 	{
@@ -198,6 +220,25 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	return IMAGE_INIT_PASS;
 }
 
+MACHINE_START( n64dd )
+{
+	MACHINE_START_CALL( n64 );
+
+	UINT8 *ipl = machine.region("ddipl")->base();
+
+	for (int i = 0; i < 0x400000; i += 4)
+	{
+		UINT8 b1 = ipl[i + 0];
+		UINT8 b2 = ipl[i + 1];
+		UINT8 b3 = ipl[i + 2];
+		UINT8 b4 = ipl[i + 3];
+		ipl[i + 0] = b1;
+		ipl[i + 1] = b2;
+		ipl[i + 2] = b3;
+		ipl[i + 3] = b4;
+	}
+}
+
 static MACHINE_CONFIG_START( n64, n64_state )
 
 	/* basic machine hardware */
@@ -246,6 +287,16 @@ static MACHINE_CONFIG_START( n64, n64_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","n64")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( n64dd, n64 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(n64dd_map)
+
+	MCFG_MACHINE_START( n64dd )
+
+	MCFG_CARTSLOT_MODIFY("cart")
+	MCFG_CARTSLOT_NOT_MANDATORY
+MACHINE_CONFIG_END
+
 ROM_START( n64 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
 
@@ -261,4 +312,23 @@ ROM_START( n64 )
 	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
+ROM_START( n64dd )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for R4300 */
+
+	ROM_REGION32_BE( 0x800, "user1", 0 )
+	ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
+
+	ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASEFF)
+
+	ROM_REGION32_BE( 0x400000, "ddipl", ROMREGION_ERASEFF)
+	ROM_LOAD( "64ddipl.bin", 0x000000, 0x400000, CRC(7f933ce2) SHA1(bf861922dcb78c316360e3e742f4f70ff63c9bc3) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+	ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
+ROM_END
+
 CONS(1996, n64, 	0,		0,		n64,	n64,	0,	"Nintendo", "Nintendo 64", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+CONS(1996, n64dd, 	n64,	0,		n64dd,	n64,	0,	"Nintendo", "Nintendo 64DD", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
