@@ -941,6 +941,105 @@ static UINT8 crtc_reg_read(UINT8 index)
 
 	switch(index)
 	{
+		case 0x00:
+			res  = vga.crtc.horz_total & 0xff;
+			break;
+		case 0x01:
+			res  = vga.crtc.horz_disp_end & 0xff;
+			break;
+		case 0x02:
+			res  = vga.crtc.horz_blank_start & 0xff;
+			break;
+		case 0x03:
+			res  = vga.crtc.horz_blank_end & 0x1f;
+			res |= (vga.crtc.disp_enable_skew & 3) << 5;
+			res |= (vga.crtc.evra & 1) << 7;
+			break;
+		case 0x04:
+			res  = vga.crtc.horz_retrace_start & 0xff;
+			break;
+		case 0x05:
+			res  = (vga.crtc.horz_blank_end & 0x20) << 2;
+			res |= (vga.crtc.horz_retrace_skew & 3) << 5;
+			res |= (vga.crtc.horz_retrace_end & 0x1f);
+			break;
+		case 0x06:
+			res  = vga.crtc.vert_total & 0xff;
+			break;
+		case 0x07: // Overflow Register
+			res  = (vga.crtc.line_compare & 0x100) >> 4;
+			res |= (vga.crtc.vert_retrace_start & 0x200) >> 2;
+			res |= (vga.crtc.vert_disp_end & 0x200) >> 3;
+			res |= (vga.crtc.vert_retrace_start & 0x200) >> 6;
+			res |= (vga.crtc.vert_total & 0x200) >> 4;
+			res |= (vga.crtc.vert_blank_start & 0x100) >> 5;
+			res |= (vga.crtc.vert_retrace_start & 0x100) >> 6;
+			res |= (vga.crtc.vert_disp_end & 0x100) >> 7;
+			res |= (vga.crtc.vert_total & 0x100) >> 8;
+			break;
+		case 0x08: // Preset Row Scan Register
+			res  = (vga.crtc.byte_panning & 3) << 5;
+			res |= (vga.crtc.preset_row_scan & 0x1f);
+			break;
+		case 0x09: // Maximum Scan Line Register
+			res  = (vga.crtc.maximum_scan_line & 0x1f) - 1;
+			res |= (vga.crtc.scan_doubling & 1) << 7;
+			res |= (vga.crtc.line_compare & 0x200) >> 3;
+			res |= (vga.crtc.vert_blank_start & 0x200) >> 4;
+			break;
+		case 0x0a:
+			res  = (vga.crtc.cursor_scan_start & 0x1f;
+			res |= ((vga.crtc.cursor_enable & 1) ^ 1) << 5;
+			break;
+		case 0x0b:
+			res  = (vga.crtc.cursor_skew & 3) << 5;
+			res |= (vga.crtc.cursor_scan_end & 0x1f);
+			break;
+		case 0x0c:
+		case 0x0d:
+			res  = (vga.crtc.start_addr >> ((index & 1) ^ 1)*8) & 0xff;
+			break;
+		case 0x0e:
+		case 0x0f:
+			res  = (vga.crtc.cursor_addr >> ((index & 1) ^ 1)*8) & 0xff;
+			break;
+		case 0x10:
+			res  = vga.crtc.vert_retrace_start & 0xff;
+			break;
+		case 0x11:
+			res  = (vga.crtc.protect_enable & 1) << 7;
+			res |= (vga.crtc.bandwidth & 1) << 6;
+			res |= (vga.crtc.vert_retrace_end & 0xf);
+			break;
+		case 0x12:
+			res  = vga.crtc.vert_disp_end & 0xff;
+			break;
+		case 0x13:
+			res  = vga.crtc.offset & 0xff;
+			break;
+		case 0x14:
+			res  = (vga.crtc.dw & 1) << 6;
+			res |= (vga.crtc.div4 & 1) << 5;
+			res |= (vga.crtc.underline_loc & 0x1f);
+			break;
+		case 0x15:
+			res  = vga.crtc.vert_blank_start & 0xff;
+			break;
+		case 0x16:
+			res  = vga.crtc.vert_blank_end & 0x7f;
+			break;
+		case 0x17:
+			res  = (vga.crtc.sync_en & 1) << 7;
+			res |= (vga.crtc.word_mode & 1) << 6;
+			res |= (vga.crtc.aw & 1) << 5;
+			res |= (vga.crtc.div2 & 1) << 3;
+			res |= (vga.crtc.sldiv & 1) << 2;
+			res |= (vga.crtc.map14 & 1) << 1;
+			res |= (vga.crtc.map13 & 1) << 0;
+			break;
+		case 0x18:
+			res = vga.crtc.line_compare & 0xff;
+			break;
 		default:
 			printf("Unhandled CRTC reg r %02x\n",index);
 	}
