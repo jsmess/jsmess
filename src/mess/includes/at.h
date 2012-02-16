@@ -27,6 +27,7 @@
 #include "video/isa_ega.h"
 #include "video/isa_vga.h"
 #include "video/isa_svga_s3.h"
+#include "video/isa_svga_cirrus.h"
 
 #include "machine/idectrl.h"
 #include "machine/isa_aha1542.h"
@@ -153,7 +154,7 @@ public:
 	UINT8 m_at_offset1;
 	void at_speaker_set_spkrdata(UINT8 data);
 	void at_speaker_set_input(UINT8 data);
-	
+
 	UINT8 m_channel_check;
 	UINT8 m_nmi_enabled;
 };
