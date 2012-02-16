@@ -377,7 +377,7 @@ static void vga_vh_vga(running_machine &machine, bitmap_rgb32 &bitmap, const rec
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int yi;
 	int xi;
-	int pel_shift = vga.attribute.pel_shift;
+	int pel_shift = 0;//vga.attribute.pel_shift; /* TODO: timing bug with this */
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff; //| (LINES & 0x300);
@@ -845,6 +845,7 @@ SCREEN_UPDATE_RGB32( pc_video )
 
 	//popmessage("%02x %02x",cur_mode,vga.attribute.data[0x13]);
 	//popmessage("%d",vga.attribute.pel_shift);
+	//popmessage("%d %d %d",vga.crtc.vert_blank_start,vga.crtc.vert_blank_end,vga.crtc.vert_total);
 
 	switch(cur_mode)
 	{
@@ -1235,6 +1236,35 @@ static void seq_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 	}
 }
 
+static UINT8 vga_vblank(running_machine &machine)
+{
+	UINT8 res;
+	UINT16 vblank_start,vblank_end,vpos;
+
+	/* calculate vblank start / end positions */
+	res = 0;
+	vblank_start = vga.crtc.vert_blank_start;
+	vblank_end = vga.crtc.vert_blank_start + vga.crtc.vert_blank_end;
+	vpos = machine.primary_screen->vpos();
+
+	/* check if we are under vblank period */
+	if(vblank_end > vga.crtc.vert_total)
+	{
+		vblank_end -= vga.crtc.vert_total;
+		if(vpos >= vblank_start || vpos < vblank_end)
+			res = 1;
+	}
+	else
+	{
+		if(vpos >= vblank_start && vpos < vblank_end)
+			res = 1;
+	}
+
+//	popmessage("%d %d %d",vblank_start,vblank_end,vga.crtc.vert_total);
+
+	return res;
+}
+
 static READ8_HANDLER(vga_crtc_r)
 {
 	UINT8 data = 0xff;
@@ -1252,7 +1282,7 @@ static READ8_HANDLER(vga_crtc_r)
 		data = 0;
 
 		hsync = space->machine().primary_screen->hblank() & 1;
-		vsync = space->machine().primary_screen->vblank() & 1;
+		vsync = vga_vblank(space->machine()); //space->machine().primary_screen->vblank() & 1;
 
 		data |= (hsync | vsync) & 1; // DD - display disable register
 		data |= (vsync & 1) << 3; // VRetrace register
@@ -2203,6 +2233,8 @@ WRITE8_HANDLER(tseng_et4k_03d0_w)
 			case 5:
 				vga.crtc.data[vga.crtc.index] = data;
 				tseng_crtc_reg_write(space->machine(),vga.crtc.index,data);
+				//if((vga.crtc.index & 0xfe) != 0x0e)
+				//	printf("%02x %02x %d\n",vga.crtc.index,data,space->machine().primary_screen->vpos());
 				break;
 			case 8:
 				et4k.reg_3d8 = data;
