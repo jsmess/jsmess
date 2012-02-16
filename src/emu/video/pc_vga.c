@@ -932,7 +932,6 @@ INLINE UINT8 vga_latch_write(int offs, UINT8 data)
 	return res;
 }
 
-#if 0
 static UINT8 crtc_reg_read(UINT8 index)
 {
 	UINT8 res;
@@ -988,7 +987,7 @@ static UINT8 crtc_reg_read(UINT8 index)
 			res |= (vga.crtc.vert_blank_start & 0x200) >> 4;
 			break;
 		case 0x0a:
-			res  = (vga.crtc.cursor_scan_start & 0x1f;
+			res  = (vga.crtc.cursor_scan_start & 0x1f);
 			res |= ((vga.crtc.cursor_enable & 1) ^ 1) << 5;
 			break;
 		case 0x0b:
@@ -1042,11 +1041,11 @@ static UINT8 crtc_reg_read(UINT8 index)
 			break;
 		default:
 			printf("Unhandled CRTC reg r %02x\n",index);
+			break;
 	}
 
 	return res;
 }
-#endif
 
 static void recompute_params_clock(running_machine &machine, int divisor, int xtal)
 {
@@ -1076,6 +1075,8 @@ static void recompute_params_clock(running_machine &machine, int divisor, int xt
 static void recompute_params(running_machine &machine)
 {
 	recompute_params_clock(machine, 1, (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz);
+	if(vga.miscellaneous_output & 8)
+		logerror("Warning: VGA external clock latch selected\n");
 }
 
 static void crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
@@ -1254,8 +1255,7 @@ static READ8_HANDLER(vga_crtc_r)
 		data = vga.crtc.index;
 		break;
 	case 5:
-		if (vga.crtc.index < vga.svga_intf.crtc_regcount)
-			data = vga.crtc.data[vga.crtc.index];
+		data = crtc_reg_read(vga.crtc.index);
 		break;
 	case 0xa:
 		UINT8 hsync,vsync;
@@ -1994,7 +1994,7 @@ static UINT8 tseng_crtc_reg_read(running_machine &machine, UINT8 index)
 
 	res = 0;
 	if(index <= 0x18)
-		res = vga.crtc.data[index];
+		res = crtc_reg_read(index);
 	else
 	{
 		switch(index)
@@ -2014,7 +2014,6 @@ static UINT8 tseng_crtc_reg_read(running_machine &machine, UINT8 index)
 
 	return res;
 }
-
 
 static void tseng_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 {
@@ -2078,6 +2077,55 @@ static void tseng_seq_reg_write(running_machine &machine, UINT8 index, UINT8 dat
 		}
 	}
 }
+
+READ8_HANDLER(tseng_et4k_03b0_r)
+{
+	UINT8 res = 0xff;
+
+	if (CRTC_PORT_ADDR == 0x3b0)
+	{
+		switch(offset)
+		{
+			case 5:
+				res = tseng_crtc_reg_read(space->machine(),vga.crtc.index);
+				break;
+			case 8:
+				res = et4k.reg_3d8;
+				break;
+			default:
+				res = vga_port_03b0_r(space,offset);
+				break;
+		}
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(tseng_et4k_03b0_w)
+{
+	if (CRTC_PORT_ADDR == 0x3b0)
+	{
+		switch(offset)
+		{
+			case 5:
+				vga.crtc.data[vga.crtc.index] = data;
+				tseng_crtc_reg_write(space->machine(),vga.crtc.index,data);
+				break;
+			case 8:
+				et4k.reg_3d8 = data;
+				if(data == 0xa0)
+					et4k.ext_reg_ena = true;
+				else if(data == 0x29)
+					et4k.ext_reg_ena = false;
+				break;
+			default:
+				vga_port_03b0_w(space,offset,data);
+				break;
+		}
+	}
+	tseng_define_video_mode(space->machine());
+}
+
 
 READ8_HANDLER(tseng_et4k_03c0_r)
 {
@@ -2399,37 +2447,13 @@ S3 implementation
 
 ******************************************/
 
-READ8_HANDLER(s3_port_03c0_r)
-{
-	UINT8 res;
-
-	switch(offset)
-	{
-		default:
-			res = vga_port_03c0_r(space,offset);
-			break;
-	}
-
-	return res;
-}
-
-WRITE8_HANDLER(s3_port_03c0_w)
-{
-	switch(offset)
-	{
-		default:
-			vga_port_03c0_w(space,offset,data);
-			break;
-	}
-}
-
 static UINT8 s3_crtc_reg_read(running_machine &machine, UINT8 index)
 {
 	UINT8 res;
 
 	res = 0;
 	if(index <= 0x18)
-		res = vga.crtc.data[index];
+		res = crtc_reg_read(index);
 	else
 	{
 		switch(index)
@@ -2543,6 +2567,68 @@ static void s3_crtc_reg_write(running_machine &machine, UINT8 index, UINT8 data)
 				//printf("%02x %02x\n",index,data);
 				break;
 		}
+	}
+}
+
+
+READ8_HANDLER(s3_port_03b0_r)
+{
+	UINT8 res = 0xff;
+
+	if (CRTC_PORT_ADDR == 0x3b0)
+	{
+		switch(offset)
+		{
+			case 5:
+				res = s3_crtc_reg_read(space->machine(),vga.crtc.index);
+				break;
+			default:
+				res = vga_port_03b0_r(space,offset);
+				break;
+		}
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(s3_port_03b0_w)
+{
+	if (CRTC_PORT_ADDR == 0x3b0)
+	{
+		switch(offset)
+		{
+			case 5:
+				vga.crtc.data[vga.crtc.index] = data;
+				s3_crtc_reg_write(space->machine(),vga.crtc.index,data);
+				break;
+			default:
+				vga_port_03b0_w(space,offset,data);
+				break;
+		}
+	}
+}
+
+READ8_HANDLER(s3_port_03c0_r)
+{
+	UINT8 res;
+
+	switch(offset)
+	{
+		default:
+			res = vga_port_03c0_r(space,offset);
+			break;
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(s3_port_03c0_w)
+{
+	switch(offset)
+	{
+		default:
+			vga_port_03c0_w(space,offset,data);
+			break;
 	}
 }
 

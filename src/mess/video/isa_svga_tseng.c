@@ -1,11 +1,11 @@
 /***************************************************************************
 
-  ISA VGA wrapper
+  ISA SVGA Tseng wrapper
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "isa_vga.h"
+#include "isa_svga_tseng.h"
 #include "video/pc_vga.h"
 
 ROM_START( et4000 )
@@ -17,7 +17,7 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_VGA = &device_creator<isa8_vga_device>;
+const device_type ISA8_SVGA_ET4K = &device_creator<isa8_svga_et4k_device>;
 
 
 //-------------------------------------------------
@@ -25,7 +25,7 @@ const device_type ISA8_VGA = &device_creator<isa8_vga_device>;
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_vga_device::device_mconfig_additions() const
+machine_config_constructor isa8_svga_et4k_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( pcvideo_vga_isa );
 }
@@ -34,7 +34,7 @@ machine_config_constructor isa8_vga_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_vga_device::device_rom_region() const
+const rom_entry *isa8_svga_et4k_device::device_rom_region() const
 {
 	return ROM_NAME( et4000 );
 }
@@ -47,8 +47,8 @@ const rom_entry *isa8_vga_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa8_vga_device::isa8_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_VGA, "ISA8_VGA", tag, owner, clock),
+isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+        device_t(mconfig, ISA8_SVGA_ET4K, "ISA8_SVGA_ET4K", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this)
 {
 	m_shortname = "et4000";
@@ -59,7 +59,7 @@ isa8_vga_device::isa8_vga_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 static READ8_HANDLER( input_port_0_r ) { return 0xff; } //return input_port_read(space->machine(), "IN0"); }
 
-void isa8_vga_device::device_start()
+void isa8_svga_et4k_device::device_start()
 {
 	set_isa_device();
 
@@ -74,7 +74,7 @@ void isa8_vga_device::device_start()
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "et4000", "et4000");
 
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, FUNC(vga_port_03b0_r), FUNC(vga_port_03b0_w));
+	m_isa->install_device(0x3b0, 0x3bf, 0, 0, FUNC(tseng_et4k_03b0_r), FUNC(tseng_et4k_03b0_w));
 	m_isa->install_device(0x3c0, 0x3cf, 0, 0, FUNC(tseng_et4k_03c0_r), FUNC(tseng_et4k_03c0_w));
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, FUNC(tseng_et4k_03d0_r), FUNC(tseng_et4k_03d0_w));
 
@@ -85,7 +85,7 @@ void isa8_vga_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void isa8_vga_device::device_reset()
+void isa8_svga_et4k_device::device_reset()
 {
 	pc_vga_reset(machine());
 }

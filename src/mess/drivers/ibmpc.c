@@ -268,7 +268,7 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 #include "video/isa_cga.h"
 #include "video/isa_ega.h"
 #include "video/isa_mda.h"
-#include "video/isa_vga.h"
+#include "video/isa_svga_tseng.h"
 #include "machine/ne1000.h"
 #include "machine/isa_mpu401.h"
 #include "machine/isa_ibm_mfc.h"
@@ -331,7 +331,7 @@ static SLOT_INTERFACE_START(ibm_isa8_cards)
 	SLOT_INTERFACE("ega", ISA8_EGA)
 	SLOT_INTERFACE("mda", ISA8_MDA)
 	SLOT_INTERFACE("hercules", ISA8_HERCULES)
-	SLOT_INTERFACE("vga", ISA8_VGA)
+	SLOT_INTERFACE("svga_et4k", ISA8_SVGA_ET4K)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
 	SLOT_INTERFACE("finalchs", ISA8_FINALCHS)
