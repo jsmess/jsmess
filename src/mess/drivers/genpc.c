@@ -17,7 +17,7 @@
 #include "video/pc_cga.h"
 #include "video/isa_ega.h"
 #include "video/isa_mda.h"
-#include "video/isa_vga.h"
+#include "video/isa_svga_tseng.h"
 #include "video/isa_svga_s3.h"
 
 #include "machine/ram.h"
@@ -110,8 +110,8 @@ DEVICE_INPUT_DEFAULTS_END
 static SLOT_INTERFACE_START(pc_isa8_cards)
 	SLOT_INTERFACE("mda", ISA8_MDA)
 	SLOT_INTERFACE("ega", ISA8_EGA)
-	SLOT_INTERFACE("vga", ISA8_VGA)
-	SLOT_INTERFACE("svga",ISA8_SVGA_S3)
+	SLOT_INTERFACE("svga_et4k", ISA8_SVGA_ET4K)
+	SLOT_INTERFACE("svga_s3",ISA8_SVGA_S3)
 	SLOT_INTERFACE("com", ISA8_COM)
 	SLOT_INTERFACE("fdc", ISA8_FDC)
 	SLOT_INTERFACE("finalchs", ISA8_FINALCHS)
@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa2", pc_isa8_cards, "fdc", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa3", pc_isa8_cards, "hdc", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa4", pc_isa8_cards, "sblaster1_0", NULL)
-	MCFG_ISA8_SLOT_ADD("mb:isa","isa5", pc_isa8_cards, "vga", NULL)
+	MCFG_ISA8_SLOT_ADD("mb:isa","isa5", pc_isa8_cards, "svga_et4k", NULL)
 	MCFG_ISA8_SLOT_ADD("mb:isa","isa6", pc_isa8_cards, NULL, NULL)
 
 	/* video hardware */

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef __ISA_VGA_H__
-#define __ISA_VGA_H__
+#ifndef __ISA_SVGA_ET4K_H__
+#define __ISA_SVGA_ET4K_H__
 
 #include "emu.h"
 #include "machine/isa.h"
@@ -12,13 +12,13 @@
 
 // ======================> isa8_vga_device
 
-class isa8_vga_device :
+class isa8_svga_et4k_device :
 		public device_t,
 		public device_isa8_card_interface
 {
 public:
         // construction/destruction
-        isa8_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+        isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -31,6 +31,6 @@ protected:
 
 
 // device type definition
-extern const device_type ISA8_VGA;
+extern const device_type ISA8_SVGA_ET4K;
 
-#endif  /* __ISA_VGA_H__ */
+#endif  /* __ISA_SVGA_ET4K_H__ */
