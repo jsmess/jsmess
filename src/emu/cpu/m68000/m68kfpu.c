@@ -1783,8 +1783,16 @@ static int perform_fsave(m68ki_cpu_core *m68k, UINT32 addr, int inc)
 {
 	if(m68k->cpu_type & CPU_TYPE_040)
 	{
-		m68ki_write_32(m68k, addr, 0x41000000);
-		return inc ? 4 : -4;
+		if(inc)
+		{
+			m68ki_write_32(m68k, addr, 0x41000000);
+			return 4;
+		}
+		else
+		{
+			m68ki_write_32(m68k, addr-4, 0x41000000);
+			return -4;
+		}
 	}
 
 	if (inc)
@@ -1848,6 +1856,7 @@ static void m68040_do_fsave(m68ki_cpu_core *m68k, UINT32 addr, int reg, int inc)
 
 static void m68040_do_frestore(m68ki_cpu_core *m68k, UINT32 addr, int reg)
 {
+	bool m40 = m68k->cpu_type & CPU_TYPE_040;
 	UINT32 temp = m68ki_read_32(m68k, addr);
 
 	// check for NULL frame
@@ -1859,9 +1868,13 @@ static void m68040_do_frestore(m68ki_cpu_core *m68k, UINT32 addr, int reg)
 		if (reg != -1)
 		{
 			// how about an IDLE frame?
-			if ((temp & 0x00ff0000) == 0x00180000)
+			if (!m40 && ((temp & 0x00ff0000) == 0x00180000))
 			{
-				REG_A(m68k)[reg] += (m68k->cpu_type & CPU_TYPE_040) ? 4 : 7*4;
+				REG_A(m68k)[reg] += 7*4;
+			}
+			else if (m40 && ((temp & 0xffff0000) == 0x41000000))
+			{
+				REG_A(m68k)[reg] += 4;
 			} // check UNIMP
 			else if ((temp & 0x00ff0000) == 0x00380000)
 			{
