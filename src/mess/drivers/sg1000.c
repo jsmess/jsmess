@@ -701,6 +701,8 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	sg1000_state *state = machine.driver_data<sg1000_state>();
 	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 	UINT8 *ptr = machine.region(Z80_TAG)->base();
+	UINT32 ram_size = 0x400;
+	bool install_2000_ram = false;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -713,13 +715,39 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	{
 		size = image.get_software_region_length("rom");
 		memcpy(ptr, image.get_software_region("rom"), size);
+
+		const char *needs_addon = image.get_feature("needs_addon");
+
+		//
+		// The Dahjee (Type A) RAM cartridge had 9KB of RAM. 1KB replaces
+		// the main unit's system ram (0xC000-0xC3FF) and 8K which appears
+		// at 0x2000-0x3FFF in the memory map.
+		//
+		if ( ! strcmp( needs_addon, "dahjee_type_a" ) )
+		{
+			install_2000_ram = true;
+		}
+
+		//
+		// The Dahjee (Type B) RAM cartridge had 8KB of RAM which
+		// replaces the main unit RAM in the memory map. (0xC000-0xDFFF area)
+		//
+		if ( ! strcmp( needs_addon, "dahjee_type_b" ) )
+		{
+			ram_size = 0x2000;
+		}
 	}
 
 	/* cartridge ROM banking */
 	state->install_cartridge(ptr, size);
 
+	if ( install_2000_ram )
+	{
+		program->install_ram(0x2000, 0x3FFF);
+	}
+
 	/* work RAM banking */
-	program->install_readwrite_bank(0xc000, 0xc3ff, 0, 0x3c00, "bank2");
+	program->install_readwrite_bank(0xc000, 0xc000 + ram_size - 1, 0, 0x4000 - ram_size, "bank2");
 
 	return IMAGE_INIT_PASS;
 }
