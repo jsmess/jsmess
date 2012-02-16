@@ -969,9 +969,9 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="stardos" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 
-			<dataarea name="rom" size="0x4000">
+			<dataarea name="roml" size="0x4000">
 				<rom name="stardos.bin" size="0x4000" crc="feda3c5d" sha1="8a6851ae17f99d2b76f7548119c20eb7f68326da" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -4570,51 +4570,32 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="warpspd" supported="no">
+	<software name="warpspd">
 		<description>Warp Speed v2.0</description>
 		<year>1988</year>
 		<publisher>Cinemaware</publisher>
 		<info name="developer" value="Alien Technology" />
-		<!--
-		|===================|
-		|=|             SW1 |
-		|=|                 |
-		|=|             SW2 |
-		|=|                 |
-		|=|                 |
-		|=|    ROM          |
-		|=|            LS109|
-		|=|                 |
-		|===================|
-
-		ROM     - "DEI-356NR-WRPIIDA1 (C) NCR A8847 609-2415038 F833071" 16Kx8 ROM
-		SW1     - mode switch (C64/C128)
-		SW2     - reset button
-
-		data = BITSWAP8(data,7,6,5,2,0,1,3,4)
-		address = BITSWAP14(address,12,13,5,2,7,9,11,10,8,6,4,3,1,0)
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="warp_speed" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="dei-356nr-wrpiida1.u2" size="0x4000" crc="c5dd7720" sha1="062ea091bf085b09ce8ea85a9a498734b9138906" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="warpspd1" cloneof="warpspd" supported="no">
+	<software name="warpspd1" cloneof="warpspd">
 		<description>Warp Speed v1.0</description>
 		<year>1987</year>
 		<publisher>Cinemaware</publisher>
 		<info name="developer" value="Alien Technology" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="warp_speed" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="c-64 warpspeed! v1.0 (1987)(alien technology).80" size="0x4000" crc="632aa2d7" sha1="8f4b9954bce6d739cf5dd2fbd402e0ececefd3b5" offset="0x0000" />
+				<rom name="c-64 warpspeed! v1.0 (1987)(alien technology).80" size="0x4000" crc="986f61b8" sha1="31d7b7f864904deb947db3658d7da691b4db4fc2" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

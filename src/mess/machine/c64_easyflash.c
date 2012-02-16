@@ -227,7 +227,7 @@ int c64_easyflash_cartridge_device::c64_exrom_r()
 //  c64_game_r - GAME read
 //-------------------------------------------------
 
-int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int ba, int rw)
+int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hiram)
 {
 	return !(BIT(m_mode, 0) | !(BIT(m_mode, 2) | input_port_read(device(), "JP1")));
 }

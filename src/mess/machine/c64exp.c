@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "machine/c64exp.h"
+#include "formats/cbm_crt.h"
 
 
 
@@ -313,13 +314,13 @@ void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 
 //  game_r - GAME read
 //-------------------------------------------------
 
-int c64_expansion_slot_device::game_r(offs_t offset, int ba, int rw)
+int c64_expansion_slot_device::game_r(offs_t offset, int ba, int rw, int hiram)
 {
 	int state = 1;
 
 	if (m_cart != NULL)
 	{
-		state = m_cart->c64_game_r(offset, ba, rw);
+		state = m_cart->c64_game_r(offset, ba, rw, hiram);
 	}
 
 	return state;
