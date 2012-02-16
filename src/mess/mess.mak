@@ -1359,6 +1359,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_VIDEO)/isa_ega.o		\
 	$(MESS_VIDEO)/isa_vga.o		\
 	$(MESS_VIDEO)/isa_svga_s3.o	\
+	$(MESS_VIDEO)/isa_svga_cirrus.o	\
 	$(MESS_VIDEO)/ibm_vga.o		\
 
 $(MESSOBJ)/pdp1.a:				\
