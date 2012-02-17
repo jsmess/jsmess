@@ -289,7 +289,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					if(m_voice[x].voice_ctrl & 0x20)
 						set_irq(IRQ_WAVETABLE,x);
 				}
-				if(m_voice[x].voice_ctrl & 0x20)
+				if(m_voice[x].voice_ctrl & 0x04)
 				{  // 16-bit PCM
 					m_voice[x].sample = (INT16)((m_wave_ram[current & 0xffffe]) | ((m_wave_ram[(current & 0xffffe)+1])<<8));
 				}
