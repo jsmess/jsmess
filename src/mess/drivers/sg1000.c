@@ -779,10 +779,12 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 			{
 				if ( xd000_e000_f000 > x2000_3000 )
 				{
+					// Type B
 					ram_size = 0x2000;
 				}
 				else
 				{
+					// Type A
 					install_2000_ram = true;
 				}
 			}
