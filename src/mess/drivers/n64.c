@@ -109,6 +109,10 @@ static INPUT_PORTS_START( n64 )
 	PORT_START("P2_ANALOG_Y")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2) PORT_REVERSE
 
+	PORT_START("RESET")
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OTHER )        PORT_NAME("Warm Reset") PORT_CODE(KEYCODE_3)
+
 INPUT_PORTS_END
 
 /* ?? */
@@ -239,12 +243,19 @@ MACHINE_START( n64dd )
 	}
 }
 
+static INTERRUPT_GEN( n64_reset_poll )
+{
+	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
+	periphs->poll_reset_button((input_port_read(device->machine(), "RESET") & 1) ? true : false);
+}
+
 static MACHINE_CONFIG_START( n64, n64_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
 	MCFG_CPU_CONFIG(config)
 	MCFG_CPU_PROGRAM_MAP(n64_map)
+	MCFG_CPU_VBLANK_INT("screen", n64_reset_poll)
 
 	MCFG_CPU_ADD("rsp", RSP, 62500000)
 	MCFG_CPU_CONFIG(n64_rsp_config)
