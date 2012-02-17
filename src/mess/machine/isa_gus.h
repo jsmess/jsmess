@@ -77,7 +77,7 @@ struct _gus_voice
 	UINT8 vol_ramp_ctrl;
 	UINT32 vol_count;
 	bool rollover;
-    INT32 sample;  // current sample data
+    INT16 sample;  // current sample data
 };
 typedef struct _gus_voice gus_voice;
 
@@ -159,6 +159,7 @@ public:
 
         void set_irq(UINT8 source, UINT8 voice);
         void reset_irq(UINT8 source);
+        void update_volume_ramps();
 
         UINT8* m_wave_ram;
 
@@ -216,7 +217,7 @@ private:
         UINT8 m_reg_ctrl;
         UINT8 m_fake_adlib_status;
         UINT32 m_dma_current;
-        UINT32 m_volume_table[4096];
+        UINT16 m_volume_table[4096];
 
     	static const device_timer_id ADLIB_TIMER1 = 0;
     	static const device_timer_id ADLIB_TIMER2 = 1;

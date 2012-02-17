@@ -86,12 +86,12 @@ WRITE8_MEMBER( gf1_device::adlib_w )
 					if(!(data & 0x01) && !(data & 0x40))
 					{
 						m_adlib_timer1_enable = 0;
-						m_timer1->adjust(attotime::zero,0,attotime::never);
+						m_timer1->reset();
 					}
 					if(!(data & 0x02) && !(data & 0x20))
 					{
 						m_adlib_timer2_enable = 0;
-						m_timer2->adjust(attotime::zero,0,attotime::never);
+						m_timer2->reset();
 					}
 					logerror("GUS: Timer enable - %02x\n",data);
 				}
@@ -111,10 +111,75 @@ WRITE8_MEMBER( gf1_device::adlib_w )
 	}
 }
 
-void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void gf1_device::update_volume_ramps()
 {
 	int x;
 
+	for(x=0;x<32;x++)
+	{
+		if(!(m_voice[x].vol_ramp_ctrl & 0x01))  // if ramping is enabled
+		{
+			m_voice[x].vol_count++;
+			if(m_voice[x].vol_count % volume_ramp_table[(m_voice[x].vol_ramp_rate & 0xc0)>>6] == 0)
+			{
+				// increase/decrease volume
+				if(m_voice[x].vol_ramp_ctrl & 0x40)
+				{
+					//m_voice[x].current_vol = (m_voice[x].current_vol & 0xf000) | ((m_voice[x].current_vol & 0x0ff0) + ((m_voice[x].vol_ramp_rate & 0x0f)<<8));
+					m_voice[x].current_vol -= ((m_voice[x].vol_ramp_rate & 0x3f) << 4);
+					if(m_voice[x].current_vol <= (m_voice[x].vol_ramp_start << 8))  // end of ramp?
+					{
+						if(m_voice[x].vol_ramp_ctrl & 0x08)
+						{
+							if(m_voice[x].vol_ramp_ctrl & 0x10)
+							{
+								m_voice[x].vol_ramp_ctrl &= ~0x40; // change direction and continue
+								m_voice[x].current_vol = (m_voice[x].vol_ramp_start << 8);
+							}
+							else
+								m_voice[x].current_vol = (m_voice[x].vol_ramp_end << 8);
+						}
+						else
+						{
+							m_voice[x].vol_ramp_ctrl |= 0x01;  // stop volume ramp
+							m_voice[x].current_vol = (m_voice[x].vol_ramp_start << 8);
+						}
+						if(m_voice[x].vol_ramp_ctrl & 0x20)
+							set_irq(IRQ_VOLUME_RAMP,x);
+					}
+				}
+				else
+				{
+					//m_voice[x].current_vol = (m_voice[x].current_vol & 0xf000) | ((m_voice[x].current_vol & 0x0ff0) - ((m_voice[x].vol_ramp_rate & 0x0f)<<8));
+					m_voice[x].current_vol += ((m_voice[x].vol_ramp_rate & 0x3f) << 4);
+					if(m_voice[x].current_vol >= (m_voice[x].vol_ramp_end << 8))  // end of ramp?
+					{
+						if(m_voice[x].vol_ramp_ctrl & 0x08)
+						{
+							if(m_voice[x].vol_ramp_ctrl & 0x10)
+							{
+								m_voice[x].vol_ramp_ctrl |= 0x40; // change direction and continue
+								m_voice[x].current_vol = (m_voice[x].vol_ramp_end << 8);
+							}
+							else
+								m_voice[x].current_vol = (m_voice[x].vol_ramp_start << 8);
+						}
+						else
+						{
+							m_voice[x].vol_ramp_ctrl |= 0x01;  // stop volume ramp
+							m_voice[x].current_vol = (m_voice[x].vol_ramp_end << 8);
+						}
+						if(m_voice[x].vol_ramp_ctrl & 0x20)
+							set_irq(IRQ_VOLUME_RAMP,x);
+					}
+				}
+			}
+		}
+	}
+}
+
+void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
 	switch(id)
 	{
 	case ADLIB_TIMER1:
@@ -147,63 +212,7 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_drq1(1);
 		break;
 	case VOL_RAMP_TIMER:
-		for(x=0;x<32;x++)
-		{
-			if(!(m_voice[x].vol_ramp_ctrl & 0x01))  // if ramping is enabled
-			{
-				m_voice[x].vol_count++;
-				if(m_voice[x].vol_count % volume_ramp_table[(m_voice[x].vol_ramp_rate & 0xc0)>>6] == 0)
-				{
-					// increase/decrease volume
-					if(m_voice[x].vol_ramp_ctrl & 0x40)
-					{
-						//m_voice[x].current_vol = (m_voice[x].current_vol & 0xf000) | ((m_voice[x].current_vol & 0x0ff0) + ((m_voice[x].vol_ramp_rate & 0x0f)<<8));
-						m_voice[x].current_vol -= ((m_voice[x].vol_ramp_rate & 0x3f) << 6);
-						if(m_voice[x].current_vol <= (m_voice[x].vol_ramp_start << 8))  // end of ramp?
-						{
-							if(m_voice[x].vol_ramp_ctrl & 0x08)
-							{
-								if(m_voice[x].vol_ramp_ctrl & 0x10)
-									m_voice[x].vol_ramp_ctrl &= ~0x40; // change direction and continue
-								else
-									m_voice[x].current_vol = (m_voice[x].vol_ramp_end << 8);
-							}
-							else
-							{
-								m_voice[x].vol_ramp_ctrl |= 0x01;  // stop volume ramp
-								if(!(m_voice[x].vol_ramp_ctrl & 0x10))
-									m_voice[x].current_vol = (m_voice[x].vol_ramp_end << 8);
-							}
-							if(m_voice[x].vol_ramp_ctrl & 0x20)
-								set_irq(IRQ_VOLUME_RAMP,x);
-						}
-					}
-					else
-					{
-						//m_voice[x].current_vol = (m_voice[x].current_vol & 0xf000) | ((m_voice[x].current_vol & 0x0ff0) - ((m_voice[x].vol_ramp_rate & 0x0f)<<8));
-						m_voice[x].current_vol += ((m_voice[x].vol_ramp_rate & 0x3f) << 6);
-						if(m_voice[x].current_vol >= (m_voice[x].vol_ramp_end << 8))  // end of ramp?
-						{
-							if(m_voice[x].vol_ramp_ctrl & 0x08)
-							{
-								if(m_voice[x].vol_ramp_ctrl & 0x10)
-									m_voice[x].vol_ramp_ctrl |= 0x40; // change direction and continue
-								else
-									m_voice[x].current_vol = (m_voice[x].vol_ramp_start << 8);
-							}
-							else
-							{
-								m_voice[x].vol_ramp_ctrl |= 0x01;  // stop volume ramp
-								if(!(m_voice[x].vol_ramp_ctrl & 0x10))
-									m_voice[x].current_vol = (m_voice[x].vol_ramp_start << 8);
-							}
-							if(m_voice[x].vol_ramp_ctrl & 0x20)
-								set_irq(IRQ_VOLUME_RAMP,x);
-						}
-					}
-				}
-			}
-		}
+		update_volume_ramps();
 		break;
 	}
 }
@@ -224,13 +233,13 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 		{
 			stream_sample_t* left = outputl;
 			stream_sample_t* right = outputr;
-			UINT32 vol = (m_volume_table[(m_voice[x].current_vol & 0xfff0) >> 4]);
+			UINT16 vol = (m_volume_table[(m_voice[x].current_vol & 0xfff0) >> 4]);
 			for(y=samples-1; y>=0; y--)
 			{
 				UINT32 current = m_voice[x].current_addr >> 9;
 				// TODO: implement proper panning
-				(*left) += ((m_voice[x].sample) * (vol/65536.0));
-				(*right) += ((m_voice[x].sample) * (vol/65536.0));
+				(*left) += ((m_voice[x].sample) * (vol/8192.0));
+				(*right) += ((m_voice[x].sample) * (vol/8192.0));
 				left++;
 				right++;
 				if((!(m_voice[x].voice_ctrl & 0x40)) && (m_voice[x].current_addr >= m_voice[x].end_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
@@ -293,7 +302,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 				else
 					m_voice[x].current_addr += (m_voice[x].freq_ctrl >> 1);
 #ifdef LOG_SOUND
-				INT32 smp = (m_voice[x].sample) * (vol / 65536.0);
+				INT16 smp = (m_voice[x].sample) * (vol / 8192.0);
 				fwrite(&smp,4,1,f);
 #endif
 			}
@@ -343,6 +352,9 @@ void gf1_device::device_config_complete()
 
 void gf1_device::device_start()
 {
+	int i;
+	double out = (double)(1 << 13);
+
 	// TODO: make DRAM size configurable.  Can be 256k, 512k, 768k, or 1024k
 	m_wave_ram = auto_alloc_array(machine(),UINT8,1024*1024);
 	memset(m_wave_ram,0,1024*1024);
@@ -374,8 +386,11 @@ void gf1_device::device_start()
 	m_gf1_irq = 0;
 	m_midi_irq = 0;
 
-    for (int i = 0; i<4096; i++)
-    	m_volume_table[i] = 65536 / ((4096-i)*(log(2.0)/256));
+	for (i=4095;i>=0;i--)
+	{
+		m_volume_table[i] = (INT16)out;
+		out /= 1.002709201; /* 0.0235 dB Steps */
+	}
 
 #ifdef LOG_SOUND
 	f = fopen("soundlog.bin","wb");
@@ -664,7 +679,13 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 		{
 			m_voice[m_current_voice].vol_ramp_ctrl = data & 0x7f;
 			if(!(data & 0x01))
+			{
 				m_voice[m_current_voice].vol_count = 0;
+				if(m_voice[m_current_voice].vol_ramp_ctrl & 0x40)
+					m_voice[m_current_voice].current_vol = (m_voice[m_current_voice].vol_ramp_end << 8);
+				else
+					m_voice[m_current_voice].current_vol = (m_voice[m_current_voice].vol_ramp_start << 8);
+			}
 			if(data & 0x02)
 			{
 				m_voice[m_current_voice].vol_ramp_ctrl |= 0x01;
@@ -701,7 +722,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 			if(data & 0x01)
 				m_dmatimer->adjust(attotime::zero,0,attotime::from_nsec(11489));  // based on 680Kb/sec mentioned in UltraMID docs
 			else
-				m_dmatimer->adjust(attotime::zero,0,attotime::never);  // stop transfer
+				m_dmatimer->reset();  // stop transfer
 		}
 		logerror("GUS: DMA DRAM control write %02x\n",data);
 		break;
@@ -1145,8 +1166,8 @@ void gf1_device::dack_w(int line,UINT8 data)
 void gf1_device::eop_w(int state)
 {
 	// end of transfer
-	m_dmatimer->adjust(attotime::zero,0,attotime::never);
-	m_drq1(0);
+	m_dmatimer->reset();
+	//m_drq1(0);
 	if(m_dma_dram_ctrl & 0x20)
 	{
 		m_dma_dram_ctrl |= 0x40;
