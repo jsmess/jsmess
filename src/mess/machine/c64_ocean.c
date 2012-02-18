@@ -90,7 +90,6 @@ void c64_ocean_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 {
 	if (!io1)
 	{
-	logerror("bank %02x\n", data);
 		m_bank = data & 0x3f;
 	}
 }

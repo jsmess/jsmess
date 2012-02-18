@@ -522,7 +522,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-    <software name="chasehq2">
+    <software name="chasehq2" supported="no">
 		<description>Chase H.Q. 2: Special Criminal Investigation</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
@@ -543,21 +543,18 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
-			<feature name="game" value="1" />
+			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 			<feature name="pcb" value="T-40" />
-			<dataarea name="roml" size="0x40000">
+			<dataarea name="rom" size="0x40000">
 				<rom name="chase hq 2 (1990)(ocean).80" size="0x40000" status="baddump" crc="fed59f99" sha1="7740e7c97c5d4babb77daa57b3929149dfd12714" offset="0x0000" />
 			</dataarea>
-			<!--
 			<dataarea name="roml" size="0x20000">
-				<rom name="l.u3" size="0x20000" status="nodump" offset="0x0000" />
+				<rom name="l.u3" size="0x20000" crc="03765554" sha1="c87bd2ba565177a6668c49ae2b2a373924d2414b" offset="0x0000" />
 			</dataarea>
-
 			<dataarea name="romh" size="0x20000">
-				<rom name="h.u2" size="0x20000" status="nodump" offset="0x0000" />
+				<rom name="h.u2" size="0x20000" crc="257d1d05" sha1="41d7e05d6210408b358196f220e4b6f438f5d11f" offset="0x0000" />
 			</dataarea>
-			-->
 		</part>
 	</software>
 
@@ -4292,16 +4289,19 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="robocop2" supported="no">
+	<software name="robocop2">
 		<description>Robocop 2</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x40000">
-				<rom name="robocop 2 (1990)(ocean).80" size="0x40000" status="baddump" crc="e1e8b732" sha1="0f356283b8e4372e0e81474ba658ca229a18d99e" offset="0x0000" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="robocop 2 (1990)(ocean).80" size="0x20000" crc="30185781" sha1="6a57a9a796a63fc572ab69fdc566d7ba767f1507" offset="0x0000" />
+			</dataarea>
+			<dataarea name="romh" size="0x20000">
+				<rom name="robocop 2 (1990)(ocean).a0" size="0x20000" crc="a0c2d4dc" sha1="d7980460855d77edaf6ceb05e0bdc04a12caf551" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4334,16 +4334,19 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="beast" supported="no">
+	<software name="beast">
 		<description>Shadow of the Beast</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x40000">
-				<rom name="shadow of the beast (1990)(ocean).80" size="0x40000" status="baddump" crc="a68dff98" sha1="86eb8c113adc2a13d236c738c4ac44d9a2f1de68" offset="0x0000" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x20000">
+				<rom name="shadow of the beast (1990)(ocean).80" size="0x20000" crc="ed86ca65" sha1="8bfc1099b47636828dfe6377128fef00ec377a6d" offset="0x0000" />
+			</dataarea>
+			<dataarea name="romh" size="0x20000">
+				<rom name="shadow of the beast (1990)(ocean).a0" size="0x20000" crc="ac9c5ea0" sha1="861939c5d0859b85f9569b6533d37f427c7ca9ab" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
