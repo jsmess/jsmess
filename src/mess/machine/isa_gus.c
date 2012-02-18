@@ -229,66 +229,74 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 
 	for(x=0;x<32;x++)  // for each voice
 	{
-		if(!(m_voice[x].voice_ctrl & 0x01))
+		stream_sample_t* left = outputl;
+		stream_sample_t* right = outputr;
+		UINT16 vol = (m_volume_table[(m_voice[x].current_vol & 0xfff0) >> 4]);
+		for(y=samples-1; y>=0; y--)
 		{
-			stream_sample_t* left = outputl;
-			stream_sample_t* right = outputr;
-			UINT16 vol = (m_volume_table[(m_voice[x].current_vol & 0xfff0) >> 4]);
-			for(y=samples-1; y>=0; y--)
+			UINT32 current = m_voice[x].current_addr >> 9;
+			// TODO: implement proper panning
+			(*left) += ((m_voice[x].sample) * (vol/8192.0));
+			(*right) += ((m_voice[x].sample) * (vol/8192.0));
+			left++;
+			right++;
+			if((!(m_voice[x].voice_ctrl & 0x40)) && (m_voice[x].current_addr >= m_voice[x].end_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
 			{
-				UINT32 current = m_voice[x].current_addr >> 9;
-				// TODO: implement proper panning
-				(*left) += ((m_voice[x].sample) * (vol/8192.0));
-				(*right) += ((m_voice[x].sample) * (vol/8192.0));
-				left++;
-				right++;
-				if((!(m_voice[x].voice_ctrl & 0x40)) && (m_voice[x].current_addr >= m_voice[x].end_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
+				if(m_voice[x].vol_ramp_ctrl & 0x04)
 				{
-					if(m_voice[x].vol_ramp_ctrl & 0x04)
-					{
-						m_voice[x].rollover = true;  // set roll over condition - generate IRQ, but keep voice playing
-					}
-
-					// end voice, unless looping, or rollover is active, which disables looping
-					if(!m_voice[x].rollover)
-					{
-						if(!(m_voice[x].voice_ctrl & 0x08))
-							m_voice[x].voice_ctrl |= 0x01;
-						else
-						{
-							if(m_voice[x].voice_ctrl & 0x10)
-								m_voice[x].voice_ctrl |= 0x40; // change direction
-							else
-								m_voice[x].current_addr = m_voice[x].start_addr; // start sample again
-						}
-					}
-					if(m_voice[x].voice_ctrl & 0x20)
-						set_irq(IRQ_WAVETABLE,x);
+					m_voice[x].rollover = true;  // set roll over condition - generate IRQ, but keep voice playing
 				}
-				if((m_voice[x].voice_ctrl & 0x40) && (m_voice[x].current_addr <= m_voice[x].start_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
+
+				if(m_voice[x].voice_ctrl & 0x20)
+					set_irq(IRQ_WAVETABLE,x);
+
+				// end voice, unless looping, or rollover is active, which disables looping
+				if(!m_voice[x].rollover)
 				{
-					if(m_voice[x].vol_ramp_ctrl & 0x04)
+					if(!(m_voice[x].voice_ctrl & 0x08))
 					{
-						m_voice[x].rollover = true;  // set roll over condition - generate IRQ, but keep voice playing
+						m_voice[x].voice_ctrl |= 0x01;
+//							m_voice[x].current_addr = m_voice[x].end_addr;
 					}
-
-					// end voice, unless looping, or rollover is active, which disables looping
-					if(!m_voice[x].rollover)
+					else
 					{
-						// end voice, unless looping
-						if(!(m_voice[x].voice_ctrl & 0x08))
-							m_voice[x].voice_ctrl |= 0x01;
+						if(m_voice[x].voice_ctrl & 0x10)
+							m_voice[x].voice_ctrl |= 0x40; // change direction
 						else
-						{
-							if(m_voice[x].voice_ctrl & 0x10)
-								m_voice[x].voice_ctrl &= ~0x40; // change direction
-							else
-								m_voice[x].current_addr = m_voice[x].end_addr; // start sample again
-						}
+							m_voice[x].current_addr = m_voice[x].start_addr; // start sample again
 					}
-					if(m_voice[x].voice_ctrl & 0x20)
-						set_irq(IRQ_WAVETABLE,x);
 				}
+			}
+			if((m_voice[x].voice_ctrl & 0x40) && (m_voice[x].current_addr <= m_voice[x].start_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
+			{
+				if(m_voice[x].vol_ramp_ctrl & 0x04)
+				{
+					m_voice[x].rollover = true;  // set roll over condition - generate IRQ, but keep voice playing
+				}
+
+				if(m_voice[x].voice_ctrl & 0x20)
+					set_irq(IRQ_WAVETABLE,x);
+
+				// end voice, unless looping, or rollover is active, which disables looping
+				if(!m_voice[x].rollover)
+				{
+					// end voice, unless looping
+					if(!(m_voice[x].voice_ctrl & 0x08))
+					{
+						m_voice[x].voice_ctrl |= 0x01;
+//							m_voice[x].current_addr = m_voice[x].start_addr;
+					}
+					else
+					{
+						if(m_voice[x].voice_ctrl & 0x10)
+							m_voice[x].voice_ctrl &= ~0x40; // change direction
+						else
+							m_voice[x].current_addr = m_voice[x].end_addr; // start sample again
+					}
+				}
+			}
+			if(!(m_voice[x].voice_ctrl & 0x01))
+			{
 				if(m_voice[x].voice_ctrl & 0x04)
 				{  // 16-bit PCM
 					current = ((m_voice[x].current_addr >> 9) & 0xc0000) + (((m_voice[x].current_addr >> 9) & 0x1ffff) << 1);
@@ -302,11 +310,11 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					m_voice[x].current_addr -= (m_voice[x].freq_ctrl >> 1);
 				else
 					m_voice[x].current_addr += (m_voice[x].freq_ctrl >> 1);
-#ifdef LOG_SOUND
-				INT16 smp = (m_voice[x].sample) * (vol / 8192.0);
-				fwrite(&smp,4,1,f);
-#endif
 			}
+#ifdef LOG_SOUND
+			INT16 smp = (m_voice[x].sample) * (vol / 8192.0);
+			fwrite(&smp,4,1,f);
+#endif
 		}
 	}
 }
@@ -411,6 +419,7 @@ void gf1_device::device_reset()
 	{
 		m_voice[x].voice_ctrl = 0x01;  // stop all voices
 		m_voice[x].vol_ramp_ctrl = 0x01; // stop all volume ramps
+		m_voice[x].current_vol = 0;  // silence all voices
 	}
 	m_irq_source = 0xe0;
 	m_reg_ctrl = 0;
