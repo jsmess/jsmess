@@ -1,173 +1,251 @@
+/****************************************************************************
+
+    Peripheral expansion box
+    See peribox.c for documentation
+
+    Michael Zapf
+
+    February 2012: Rewritten as class
+
+*****************************************************************************/
+
 #ifndef __PBOX__
 #define __PBOX__
-/*
-    header file for ti99_peb
-*/
-#include "p_code.h"
-#include "ti32kmem.h"
-#include "samsmem.h"
-#include "myarcmem.h"
+
 #include "ti99defs.h"
 
-/*
-    inta: callback called when the state of INTA changes (may be NULL)
-    intb: callback called when the state of INTB changes (may be NULL)
-    ready: callback called when the state of INTB changes (may be NULL)
-    amx: Determines whether the AMA, AMB, and AMC address bus extension lines
-         must be preset to some value. The standard TI Flex Cable Interface
-         locks these valuies to 1. The Geneve, however, can drive these lines.
-*/
+extern const device_type PERIBOX;
+extern const device_type PERIBOX_SLOT;
 
-typedef struct _ti99_peb_config
-{
-	write_line_device_func	inta;
-	write_line_device_func	intb;
-	write_line_device_func	ready;
-	int						amx;
-} ti99_peb_config;
+extern const device_type PERIBOX_EV;
+extern const device_type PERIBOX_SG;
+extern const device_type PERIBOX_GEN;
 
-/*
-    Callback interface. The callback functions are in the console and are
-    accessed from the PEB.
-*/
+#define DSRROM "dsrrom"
 
-#define MAXSLOTS 16
-
-/*
-    This interface is used by the PEB to communicate with the expansion cards.
-    It actually forwards the accesses from the main system.
-*/
-typedef struct _ti99_peb_card_interface
-{
-	void			(*card_read_data)(device_t *card, offs_t offset, UINT8 *value);
-	void			(*card_write_data)(device_t *card, offs_t offset, UINT8 value);
-
-	void			(*card_read_cru)(device_t *card, offs_t offset, UINT8 *value);
-	void			(*card_write_cru)(device_t *card, offs_t offset, UINT8 value);
-
-	void			(*senila)(device_t *card, int value);
-	void			(*senilb)(device_t *card, int value);
-
-	/* For SGCPU only ("expansion bus") */
-	void			(*card_read_data16)(device_t *card, offs_t offset, UINT16 *value);
-	void			(*card_write_data16)(device_t *card, offs_t offset, UINT16 value);
-
-} ti99_peb_card;
-
-/*
-    Called from the expansion cards. These are the callbacks from the cards to
-    the PEB (which forwards them to the main system).
-*/
-typedef struct _peb_callback_if
+typedef struct _peribox_config
 {
 	devcb_write_line	inta;
 	devcb_write_line	intb;
 	devcb_write_line	ready;
+	int					prefix;
+} peribox_config;
 
-} peb_callback_if;
+#define PERIBOX_CONFIG(name) \
+	const peribox_config(name) =
 
-/*
-    Used to call back the main system. Also imported by the cards.
-    This structure holds the resolved callbacks within the PEB and the cards.
-*/
-typedef struct _peb_connect
+class ti_expansion_card_device;
+class peribox_slot_device;
+
+/*****************************************************************************
+    The overall Peripheral Expansion Box.
+    See ti99defs.h for bus8z_device
+******************************************************************************/
+
+class peribox_device : public bus8z_device
 {
-	devcb_resolved_write_line inta;
-	devcb_resolved_write_line intb;
-	devcb_resolved_write_line ready;
+	friend class peribox_slot_device;
+public:
+	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-} ti99_peb_connect;
+	// Next six methods are called from the console
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
+	void crureadz(offs_t offset, UINT8 *value);
+	void cruwrite(offs_t offset, UINT8 value);
+	DECLARE_WRITE_LINE_MEMBER(senila);
+	DECLARE_WRITE_LINE_MEMBER(senilb);
 
+	// Floppy interface
+	DECLARE_WRITE_LINE_MEMBER( indexhole );
+
+	// Genmod support
+	DECLARE_INPUT_CHANGED_MEMBER( genmod_changed );
+	void set_genmod(bool set);
+
+protected:
+	void device_start(void);
+	void device_config_complete(void);
+
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	// Next three methods call back the console
+	devcb_resolved_write_line m_console_inta;	// INTA line (Box to console)
+	devcb_resolved_write_line m_console_intb;	// INTB line
+	devcb_resolved_write_line m_console_ready;	// READY line
+
+	void set_slot_loaded(int slot, peribox_slot_device* slotdev);
+	peribox_slot_device *m_slot[9];		// for the sake of simplicity we donate the first two positions (0,1)
+
+	// Propagators for the slot signals. All signals are active low, and
+	// if any one slot asserts the line, the joint line is asserted.
+	void inta_join(int slot, int state);
+	void intb_join(int slot, int state);
+	void ready_join(int slot, int state);
+
+	int m_inta_flag;
+	int m_intb_flag;
+	int m_ready_flag;
+
+	int m_address_prefix;
+};
+
+/************************************************************************
+    Specific Box compositions
+************************************************************************/
 /*
-    Accessor functions from the console. Note that we make use of the enhanced
-    read handler.
+    Variation for EVPC. We'd like to offer the EVPC slot device only if
+    we started the ti99_4ev driver.
 */
-READ8Z_DEVICE_HANDLER( ti99_peb_data_rz );
-WRITE8_DEVICE_HANDLER( ti99_peb_data_w );
-
-READ8Z_DEVICE_HANDLER( ti99_peb_cru_rz );
-WRITE8_DEVICE_HANDLER( ti99_peb_cru_w );
-
-WRITE_LINE_DEVICE_HANDLER( ti99_peb_senila );
-WRITE_LINE_DEVICE_HANDLER( ti99_peb_senilb );
-
-
-/*
-    For SGCPU only. Actually the SGCPU uses an external cable to add the
-    8 data lines that are not included in the PEB
-*/
-READ16Z_DEVICE_HANDLER( ti99_peb_data16_rz );
-WRITE16_DEVICE_HANDLER( ti99_peb_data16_w );
-
-/*
-    Value passed to the cards
-*/
-typedef struct _ti99_pebcard_config
+class peribox_ev_device : public peribox_device
 {
-	int slot;
-} ti99_pebcard_config;
+public:
+	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-INLINE const ti99_pebcard_config *get_pebcard_config(device_t *device)
-{
-	assert(device != NULL);
-	return (const ti99_pebcard_config *) downcast<const legacy_device_base *>(device)->inline_config();
-}
+protected:
+	machine_config_constructor device_mconfig_additions() const;
+};
 
 /*
-    Management functions
+    Variation for SGCPU (TI-99/4P). We put the EVPC and the HSGPL in slots 2 and 3.
 */
-int mount_card(device_t *device, device_t *cardptr, const ti99_peb_card *card, int slotindex);
-void unmount_card(device_t *device, int slotindex);
+class peribox_sg_device : public peribox_device
+{
+public:
+	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	machine_config_constructor device_mconfig_additions() const;
+};
+
+/*
+    Variation for Geneve.
+*/
+class peribox_gen_device : public peribox_device
+{
+public:
+	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	machine_config_constructor device_mconfig_additions() const;
+};
+
+/*****************************************************************************
+    A single slot in the box.
+******************************************************************************/
+
+class peribox_slot_device : public bus8z_device, public device_slot_interface
+{
+public:
+	peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// Called from the box (direction to card)
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_WRITE_LINE_MEMBER(senila);
+	DECLARE_WRITE_LINE_MEMBER(senilb);
+
+	// Called from the card (direction to box)
+	DECLARE_WRITE_LINE_MEMBER( set_inta );
+	DECLARE_WRITE_LINE_MEMBER( set_intb );
+	DECLARE_WRITE_LINE_MEMBER( set_ready );
+
+	void crureadz(offs_t offset, UINT8 *value);
+	void cruwrite(offs_t offset, UINT8 value);
+
+	// called from the box itself
+	void set_genmod(bool set);
+
+	device_t*	get_drive(const char* name);
+
+protected:
+	void device_start(void);
+	void device_config_complete(void);
+
+private:
+	int get_index_from_tagname();
+	ti_expansion_card_device *m_card;
+	int m_slotnumber;
+};
 
 
-/* device interface */
-DECLARE_LEGACY_DEVICE( PBOX4, ti99_peb );
-DECLARE_LEGACY_DEVICE( PBOX4A, ti994a_peb );
-DECLARE_LEGACY_DEVICE( PBOXEV, ti99ev_peb );
-DECLARE_LEGACY_DEVICE( PBOX8, ti998_peb );
-DECLARE_LEGACY_DEVICE( PBOXSG, ti99sg_peb );
-DECLARE_LEGACY_DEVICE( PBOXGEN, geneve_peb );
+/*****************************************************************************
+    The parent class for all expansion cards.
+******************************************************************************/
 
-#define MCFG_PBOX4_ADD(_tag, _inta, _intb, _ready)			\
-	MCFG_DEVICE_ADD(_tag, PBOX4, 0)							\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)		\
-	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
+class ti_expansion_card_device : public bus8z_device, public device_slot_card_interface
+{
+	friend class peribox_slot_device;
 
-#define MCFG_PBOX4A_ADD(_tag, _inta, _intb, _ready)			\
-	MCFG_DEVICE_ADD(_tag, PBOX4A, 0)							\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)		\
-	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
+public:
+	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: bus8z_device(mconfig, type, name, tag, owner, clock),
+	device_slot_card_interface(mconfig, *this)
+	{
+		m_slot = static_cast<peribox_slot_device*>(owner);
+		m_senila = CLEAR_LINE;
+		m_senilb = CLEAR_LINE;
+		m_genmod = false;
+	}
 
-#define MCFG_PBOXEV_ADD(_tag, _inta, _intb, _ready)			\
-	MCFG_DEVICE_ADD(_tag, PBOXEV, 0)							\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)		\
-	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
+	virtual void crureadz(offs_t offset, UINT8 *value) =0;
+	virtual void cruwrite(offs_t offset, UINT8 data) =0;
 
-#define MCFG_PBOX8_ADD(_tag, _inta, _intb, _ready)			\
-	MCFG_DEVICE_ADD(_tag, PBOX8, 0)							\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)		\
-	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
+	void	set_senila(int state) { m_senila = state; }
+	void	set_senilb(int state) { m_senilb = state; }
 
-#define MCFG_PBOXSG_ADD(_tag, _inta, _intb, _ready)			\
-	MCFG_DEVICE_ADD(_tag, PBOXSG, 0)							\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	\
-	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x07)
+protected:
+	peribox_slot_device *m_slot;		// using a link to the slot for callbacks
+	int	m_senila;
+	int	m_senilb;
 
-#define MCFG_PBOXGEN_ADD(_tag, _inta, _intb, _ready)			\
-	MCFG_DEVICE_ADD(_tag, PBOXGEN, 0)							\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, inta, _inta)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, intb, _intb)		\
-	MCFG_DEVICE_CONFIG_DATAPTR(ti99_peb_config, ready, _ready)	\
-	MCFG_DEVICE_CONFIG_DATA32(ti99_peb_config, amx, 0x00)
+	// When TRUE, card is accessible. Indicated by a LED.
+	bool	m_selected;
+
+	// When TRUE, GenMod is selected.
+	bool	m_genmod;
+
+	// CRU base. Used to configure the address by which a card is selected.
+	int 	m_cru_base;
+
+	// Used to decide whether this card has been selected.
+	int		m_select_mask;
+	int		m_select_value;
+};
+
+#define MCFG_PERIBOX_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX, 0) \
+	MCFG_DEVICE_CONFIG( _config )
+
+#define MCFG_PERIBOX_EV_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_EV, 0) \
+	MCFG_DEVICE_CONFIG( _config )
+
+#define MCFG_PERIBOX_SG_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_SG, 0) \
+	MCFG_DEVICE_CONFIG( _config )
+
+#define MCFG_PERIBOX_GEN_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_GEN, 0) \
+	MCFG_DEVICE_CONFIG( _config )
+
+#define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, NULL)
+
+#define MCFG_PERIBOX_SLOT_ADD_DEF(_tag, _slot_intf, _default) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, NULL)
+
+/*
+    The following defines are required because the WD17xx DEVICE_START implementation
+    assumes that the floppy devices are either at root level or at the parent
+    level. Our floppy devices, however, are at the grandparent level as seen from
+    the controller.
+*/
+#define PFLOPPY_0 ":peb:floppy0"
+#define PFLOPPY_1 ":peb:floppy1"
+#define PFLOPPY_2 ":peb:floppy2"
+#define PFLOPPY_3 ":peb:floppy3"
 
 #endif /* __PBOX__ */

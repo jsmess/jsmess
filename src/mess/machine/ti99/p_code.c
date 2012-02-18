@@ -1,6 +1,6 @@
-/*
+/****************************************************************************
+
     TI-99 P-Code Card emulation.
-    Michael Zapf, July 2009
 
     The P-Code card is part of the UCSD p-System support for the TI-99
     computer family. This system is a comprehensive development system for
@@ -62,228 +62,264 @@
     rest of the ROM space the ports become invisible when the card is
     deactivated.
 
-    Emulation information:
+    Michael Zapf
 
-    The P-Code card switch is mapped to a DIP switch in the configuration
-    menu. If the switch is turned on, the system assumes that ROM dumps are
-    present called "pcode_r0.bin" (4 KiB), "pcode_r1.bin" (8KiB),
-    "pcode_g0.bin" (64 KiB). The switch is turned off by default. Check the
-    switch position if the Master Title Screen does not appear as expected.
-
+    July 2009: First version
     September 2010: Rewritten as device
-*/
-#include "emu.h"
-#include "peribox.h"
+    February 2012: Rewritten as class
+
+*****************************************************************************/
+
 #include "p_code.h"
-#include "grom.h"
 
-#define GROMBASE 0x5bfc
-#define PCODE_CRU_BASE 0x1f00
+#define PCODE_GROM_TAG "pcode_grom"
+#define PCODE_ROM_TAG "pcode_rom"
 
-#define pcode_region "pcode_region"
-#define grom_offset 0x3000
+#define PGROM0_TAG "grom0"
+#define PGROM1_TAG "grom1"
+#define PGROM2_TAG "grom2"
+#define PGROM3_TAG "grom3"
+#define PGROM4_TAG "grom4"
+#define PGROM5_TAG "grom5"
+#define PGROM6_TAG "grom6"
+#define PGROM7_TAG "grom7"
 
-typedef ti99_pebcard_config ti99_pcoden_config;
+#define GROMMASK 0x1ffd
+#define GROMREAD 0x1bfc
+#define GROMWRITE 0x1ffc
 
-typedef struct _ti99_pcoden_state
+#define ACTIVE_TAG "ACTIVE"
+
+#define LOG logerror
+#define VERBOSE 1
+
+ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI99_P_CODE, "TI-99 P-Code Card", tag, owner, clock)
 {
-	int selected;
-
-	int bank_select; // 0 or 1
-
-	// Pointer to the pcode ROM data. We have three sections of the ROM code:
-	// 4K from one chip, 2 banks with 4K each from the second chip.
-	UINT8 *rom0;
-	UINT8 *rom1;
-	UINT8 *rom2;
-	UINT8 *grom;
-
-	device_t *gromdev[8];
-
-	ti99_peb_connect		lines;
-
-} ti99_pcoden_state;
-
-INLINE ti99_pcoden_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == PCODEN);
-
-	return (ti99_pcoden_state *)downcast<legacy_device_base *>(device)->token();
+	m_shortname = "ti99_pcode";
 }
 
-/*************************************************************************/
+READ8Z_MEMBER( ti_pcode_card_device::readz )
+{
+	if (m_switch && m_selected && ((offset & m_select_mask)==m_select_value))
+	{
+		// GROM access
+		if ((offset & GROMMASK)==GROMREAD)
+		{
+			for (int i=0; i < 8; i++) m_grom[i]->readz(space, offset, value, mem_mask);
+			if (VERBOSE>5) LOG("ti99_pcode: read from grom %04x: %02x\n", offset&0xffff, *value);
+		}
+		else
+		{
+			if ((offset & 0x1000) == 0x0000)
+			{
+				/* Accesses ROM 4732 (4K) */
+				// 0000 xxxx xxxx xxxx
+				*value = m_rom[offset & 0x0fff];
+				if (VERBOSE>5) LOG("ti99_pcode: read from rom %04x: %02x\n", offset&0xffff, *value);
+			}
+			else
+			{
+				// Accesses ROM 4764 (2*4K)
+				// We have two banks here which are activated according
+				// to the setting of CRU bit 4
+				// Bank 0 is the ROM above
+				// 0001 xxxx xxxx xxxx   Bank 1
+				// 0010 xxxx xxxx xxxx   Bank 2
+				*value = m_rom[(m_bank_select<<12) | (offset & 0x0fff)];
+				if (VERBOSE>5) LOG("ti99_pcode: read from rom %04x (%02x): %02x\n", offset&0xffff, m_bank_select, *value);
+			}
+		}
+	}
+}
 
 /*
-    The CRU write handler. The CRU is a serial interface in the console.
-    Using the CRU we can switch the banks in the p-code card
+    Write a byte in P-Code ROM space. This is only used for setting the
+    GROM address.
+*/
+WRITE8_MEMBER( ti_pcode_card_device::write )
+{
+	if (m_switch && m_selected)
+	{
+		if ((offset & m_select_mask)==m_select_value)
+		{
+			if (VERBOSE>5) LOG("ti99_pcode: write to address %04x: %02x\n", offset & 0xffff, data);
+			// 0101 1111 1111 11x0
+			if ((offset & GROMMASK) == GROMWRITE)
+			{
+				for (int i=0; i < 8; i++) m_grom[i]->write(space, offset, data, mem_mask);
+			}
+		}
+	}
+}
+
+/*
+    Common READY* line from the GROMs.
+    At this time we do not emulate GROM READY* since the CPU emulation does
+    not yet process READY*. If it did, however, we would have to do a similar
+    handling as in peribox (with INTA*): The common READY* line is a logical
+    AND of all single READY lines. If any GROM pulls it down, the line goes
+    down, and only if all GROMs release it, it pulls up again. We should think
+    about a general solution.
+*/
+WRITE_LINE_MEMBER( ti_pcode_card_device::ready_line )
+{
+	m_slot->set_ready(state);
+}
+
+/*
+    CRU read handler. The P-Code card does not offer CRU read lines, so
+    we just ignore any request. (Note that CRU lines are not like memory; you
+    may be able to write to them, but not necessarily read them again.)
+*/
+void ti_pcode_card_device::crureadz(offs_t offset, UINT8 *value)
+{
+	// Nothing here.
+	return;
+}
+
+/*
+    The CRU write handler.
     Bit 0 = activate card
     Bit 4 = select second bank of high ROM.
-    Note that the CRU address is created from address lines A8, A13, and A14
-    so bit 0 is at 0x1f00, but bit 4 is at 0x1f80 (bit 7 would be 0x1f86
-    but it is not used)
-*/
-static WRITE8_DEVICE_HANDLER( cru_w )
-{
-	ti99_pcoden_state *card = get_safe_token(device);
 
-	if ((offset & 0xff00)==PCODE_CRU_BASE)
+    Somewhat uncommon, the CRU address is created from address lines
+    A8, A13, and A14 so bit 0 is at 0x1f00, but bit 4 is at 0x1f80. Accordingly,
+    bit 7 would be 0x1f86 but it is not used.
+*/
+void ti_pcode_card_device::cruwrite(offs_t offset, UINT8 data)
+{
+	if ((offset & 0xff00)==m_cru_base)
 	{
 		int addr = offset & 0x00ff;
 
 		if (addr==0)
-			card->selected = data;
+			m_selected = (data != 0);
 
 		if (addr==0x80) // Bit 4 is on address line 8
-			card->bank_select = data;
-	}
-}
-
-/*
-    Read a byte in pcode DSR space
-*/
-static READ8Z_DEVICE_HANDLER( data_r )
-{
-	ti99_pcoden_state *card = get_safe_token(device);
-
-	if (card->selected)
-	{
-		if ((offset & 0x7e000)==0x74000)
 		{
-			if ((offset & 0xfffd)==GROMBASE)
-			{
-				for (int i=0; i < 8; i++)
-					ti99grom_rz(card->gromdev[i], offset, value);
-				return;
-			}
-
-			if ((offset & 0x1000) == 0x0000)
-			{
-				/* Accesses ROM 4732 (4K) */
-				*value = card->rom0[offset & 0x0fff];
-			}
-			else
-				// Accesses ROM 4764 (2*4K)
-			// We have two banks here which are activated according
-			// to the setting of CRU bit 4
-			*value = (card->bank_select==0)? card->rom1[offset & 0x0fff] : card->rom2[offset & 0x0fff];
+			m_bank_select = (data+1);   // we're calling this bank 1 and bank 2
+			if (VERBOSE>5) LOG("ti99_pcode: select rom bank %d\n", m_bank_select);
 		}
 	}
 }
 
-/*
-    Write a byte in P-Code ROM space. This is only useful for setting the
-    GROM address.
-*/
-static WRITE8_DEVICE_HANDLER( data_w )
+static GROM_CONFIG(pgrom0_config)
 {
-	ti99_pcoden_state *card = get_safe_token(device);
-	if (card->selected)
-	{
-		if ((offset & 0x7fffd)==(GROMBASE|0x70400))
-		{
-			for (int i=0; i < 8; i++)
-				ti99grom_w(card->gromdev[i], offset, data);
-		}
-	}
-}
-
-static const ti99_peb_card pcode_ncard =
+	false, 0, PCODE_GROM_TAG, 0x0000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+};
+static GROM_CONFIG(pgrom1_config)
 {
-	data_r,
-	data_w,
-	NULL,
-	cru_w,
-
-	NULL, NULL,	NULL, NULL
+	false, 1, PCODE_GROM_TAG, 0x2000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+};
+static GROM_CONFIG(pgrom2_config)
+{
+	false, 2, PCODE_GROM_TAG, 0x4000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+};
+static GROM_CONFIG(pgrom3_config)
+{
+	false, 3, PCODE_GROM_TAG, 0x6000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+};
+static GROM_CONFIG(pgrom4_config)
+{
+	false, 4, PCODE_GROM_TAG, 0x8000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+};
+static GROM_CONFIG(pgrom5_config)
+{
+	false, 5, PCODE_GROM_TAG, 0xa000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+};
+static GROM_CONFIG(pgrom6_config)
+{
+	false, 6, PCODE_GROM_TAG, 0xc000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
+};
+static GROM_CONFIG(pgrom7_config)
+{
+	false, 7, PCODE_GROM_TAG, 0xe000, 0x1800, false, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line)
 };
 
-static DEVICE_START( ti99_pcoden )
+void ti_pcode_card_device::device_start()
 {
-	ti99_pcoden_state *pcode = get_safe_token(device);
-
-	/* Resolve the callbacks to the PEB */
-	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	pcode->lines.ready.resolve(topeb->ready, *device);
+	m_cru_base = 0x1f00;
+	m_grom[0] = static_cast<ti99_grom_device*>(subdevice(PGROM0_TAG));
+	m_grom[1] = static_cast<ti99_grom_device*>(subdevice(PGROM1_TAG));
+	m_grom[2] = static_cast<ti99_grom_device*>(subdevice(PGROM2_TAG));
+	m_grom[3] = static_cast<ti99_grom_device*>(subdevice(PGROM3_TAG));
+	m_grom[4] = static_cast<ti99_grom_device*>(subdevice(PGROM4_TAG));
+	m_grom[5] = static_cast<ti99_grom_device*>(subdevice(PGROM5_TAG));
+	m_grom[6] = static_cast<ti99_grom_device*>(subdevice(PGROM6_TAG));
+	m_grom[7] = static_cast<ti99_grom_device*>(subdevice(PGROM7_TAG));
+	m_rom = subregion(PCODE_ROM_TAG)->base();
 }
 
-static DEVICE_STOP( ti99_pcoden )
+void ti_pcode_card_device::device_reset()
 {
-	logerror("ti99_pcode: stop\n");
-}
-
-static DEVICE_RESET( ti99_pcoden )
-{
-	logerror("ti99_pcode: reset\n");
-	ti99_pcoden_state *pcode = get_safe_token(device);
-
-	/* If the card is selected in the menu, register the card */
-	if (input_port_read(device->machine(), "EXTCARD") & EXT_PCODE)
+	if (m_genmod)
 	{
-		device_t *peb = device->owner();
-		int success = mount_card(peb, device, &pcode_ncard, get_pebcard_config(device)->slot);
-		if (!success) return;
-
-		astring region(device->tag(), ":", pcode_region);
-
-		pcode->rom0 = device->machine().region(region.cstr())->base();
-		pcode->rom1 = pcode->rom0 + 0x1000;
-		pcode->rom2 = pcode->rom0 + 0x2000;
-		pcode->grom = pcode->rom0 + 0x3000;
-		pcode->bank_select = 0;
-		pcode->selected = 0;
-
-		astring gromname;
-		for (int i=0; i < 8; i++)
-		{
-			gromname.printf("grom_%d", i);
-			pcode->gromdev[i] = device->subdevice(gromname.cstr());
-		}
+		m_select_mask = 0x1fe000;
+		m_select_value = 0x174000;
 	}
+	else
+	{
+		m_select_mask = 0x7e000;
+		m_select_value = 0x74000;
+	}
+	m_bank_select = 1;
+	m_selected = false;
+
+	m_switch = input_port_read(*this, ACTIVE_TAG);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pcode_ready )
+void ti_pcode_card_device::device_config_complete()
 {
-	// Caution: The device pointer passed to this function is the calling
-	// device. That is, if we want *this* device, we need to take the owner.
-	ti99_pcoden_state *pcode = get_safe_token(device->owner());
-	pcode->lines.ready(state);
 }
 
-/*
-    Get the pointer to the GROM data from the P-Code card. Called by the GROM.
-*/
-static UINT8 *get_grom_ptr(device_t *device)
+INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 {
-	ti99_pcoden_state *pcode = get_safe_token(device);
-	return pcode->grom;
+	if (VERBOSE>7) LOG("ti_pcode_card_device: switch changed to %d\n", newval);
+	m_switch = (newval != 0);
 }
 
-MACHINE_CONFIG_FRAGMENT( ti99_pcoden )
-	MCFG_GROM_ADD_P( "grom_0", 0, get_grom_ptr, 0x0000, 0x1800, pcode_ready )
-	MCFG_GROM_ADD_P( "grom_1", 1, get_grom_ptr, 0x2000, 0x1800, pcode_ready )
-	MCFG_GROM_ADD_P( "grom_2", 2, get_grom_ptr, 0x4000, 0x1800, pcode_ready )
-	MCFG_GROM_ADD_P( "grom_3", 3, get_grom_ptr, 0x6000, 0x1800, pcode_ready )
-	MCFG_GROM_ADD_P( "grom_4", 4, get_grom_ptr, 0x8000, 0x1800, pcode_ready )
-	MCFG_GROM_ADD_P( "grom_5", 5, get_grom_ptr, 0xa000, 0x1800, pcode_ready )
-	MCFG_GROM_ADD_P( "grom_6", 6, get_grom_ptr, 0xc000, 0x1800, pcode_ready )
-	MCFG_GROM_ADD_P( "grom_7", 7, get_grom_ptr, 0xe000, 0x1800, pcode_ready )
+
+MACHINE_CONFIG_FRAGMENT( ti99_pcode )
+	MCFG_GROM_ADD( PGROM0_TAG, pgrom0_config )
+	MCFG_GROM_ADD( PGROM1_TAG, pgrom1_config )
+	MCFG_GROM_ADD( PGROM2_TAG, pgrom2_config )
+	MCFG_GROM_ADD( PGROM3_TAG, pgrom3_config )
+	MCFG_GROM_ADD( PGROM4_TAG, pgrom4_config )
+	MCFG_GROM_ADD( PGROM5_TAG, pgrom5_config )
+	MCFG_GROM_ADD( PGROM6_TAG, pgrom6_config )
+	MCFG_GROM_ADD( PGROM7_TAG, pgrom7_config )
 MACHINE_CONFIG_END
 
-ROM_START( ti99_pcoden )
-	ROM_REGION(0x13000, pcode_region, 0)
-	ROM_LOAD_OPTIONAL("pcode_r0.bin", 0x0000, 0x1000, CRC(3881d5b0) SHA1(a60e0468bb15ff72f97cf6e80979ca8c11ed0426)) /* TI P-Code card rom4732 */
-	ROM_LOAD_OPTIONAL("pcode_r1.bin", 0x1000, 0x2000, CRC(46a06b8b) SHA1(24e2608179921aef312cdee6f455e3f46deb30d0)) /* TI P-Code card rom4764 */
-	ROM_LOAD_OPTIONAL("pcode_g0.bin", 0x3000, 0x10000, CRC(541b3860) SHA1(7be77c216737334ae997753a6a85136f117affb7)) /* TI P-Code card groms */
+INPUT_PORTS_START( ti99_pcode )
+	PORT_START( ACTIVE_TAG )
+	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, 0)
+		PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+ROM_START( ti99_pcode )
+	ROM_REGION(0x10000, PCODE_GROM_TAG, 0)
+	ROM_LOAD("pcode_g0.bin", 0x0000, 0x10000, CRC(541b3860) SHA1(7be77c216737334ae997753a6a85136f117affb7)) /* TI P-Code card groms */
+	ROM_REGION(0x3000, PCODE_ROM_TAG, 0)
+	ROM_LOAD("pcode_r0.bin", 0x0000, 0x1000, CRC(3881d5b0) SHA1(a60e0468bb15ff72f97cf6e80979ca8c11ed0426)) /* TI P-Code card rom4732 */
+	ROM_LOAD("pcode_r1.bin", 0x1000, 0x2000, CRC(46a06b8b) SHA1(24e2608179921aef312cdee6f455e3f46deb30d0)) /* TI P-Code card rom4764 */
 ROM_END
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+machine_config_constructor ti_pcode_card_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( ti99_pcode );
+}
 
-#define DEVTEMPLATE_ID(p,s)             p##ti99_pcoden##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_ROM_REGION | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
-#define DEVTEMPLATE_NAME                "TI99 P-Code Card"
-#define DEVTEMPLATE_SHORTNAME           "ti99pcode"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
+const rom_entry *ti_pcode_card_device::device_rom_region() const
+{
+	return ROM_NAME( ti99_pcode );
+}
 
-DEFINE_LEGACY_DEVICE(PCODEN, ti99_pcoden);
+ioport_constructor ti_pcode_card_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ti99_pcode );
+}
+
+const device_type TI99_P_CODE = &device_creator<ti_pcode_card_device>;
+

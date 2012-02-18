@@ -1,5 +1,6 @@
-/*
-    SNUG SGCPU (a.k.a. 99/4p) system (preliminary)
+/****************************************************************************
+
+    SNUG SGCPU (a.k.a. 99/4p) system
 
     This system is a reimplementation of the old ti99/4a console.  It is known
     both as the 99/4p ("peripheral box", since the system is a card to be
@@ -21,28 +22,20 @@
     GROMs, video or sound: instead, it relies on the HSGPL and EVPC cards to
     do the job.
 
-    TODO:
-    * Test the system? Call Debug, Call XB16.
-    * Implement MEM8 timings.
-
-    2009-11-15
-    This driver found to be hopelessly broken.
-    1. Fixed crash in DRIVER_INIT - was trying to set up GROM when this model doesn't have any.
-    2. Fixed crash in MACHINE_RESET - new cart system depends on GROM.
-    3. Fixed crash when drawing the lower border - screen size changed to the same as ti99_4ev.
-    Now, it produces a black screen.
-    If you use memory view in the debugger, it crashes at 6000 and some higher addresses. This is
-    because the memory map has references to GROM handlers.
-
-    2010-06-19
-    MZ: Driver fixed
-    Important: The SGCPU card relies on a properly set up HSGPL flash memory
+    IMPORTANT: The SGCPU card relies on a properly set up HSGPL flash memory
     card; without, it will immediately lock up. It is impossible to set it up
     from here (a bootstrap problem; you cannot start without the HSGPL).
-    The best chance is to start a ti99_4ev, activate the
-    HSGPL, and go through the setup process there. Copy the hsgpl.nv into this
+    The best chance is to start a ti99_4ev with a plugged-in HSGPL
+    and go through the setup process there. Copy the nvram files of the hsgpl into this
     driver's nvram subdirectory. The contents will be directly usable for the SGCPU.
-*/
+
+    Michael Zapf
+
+    February 2012: Rewritten as class
+
+*****************************************************************************/
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
@@ -55,29 +48,114 @@
 
 #include "imagedev/cassette.h"
 #include "machine/ti99/videowrp.h"
-#include "machine/ti99/sgcpu.h"
 #include "machine/ti99/peribox.h"
 
+#define TMS9901_TAG "tms9901"
+#define SGCPU_TAG "sgcpu"
 
-class ti99_4p_state : public driver_device
+#define SAMSMEM_TAG "samsmem"
+#define PADMEM_TAG "padmem"
+
+#define VERBOSE 1
+#define LOG logerror
+
+class ti99_4p : public driver_device
 {
 public:
-	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti99_4p(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE_LINE_MEMBER( console_ready );
+	DECLARE_WRITE_LINE_MEMBER( extint );
+	DECLARE_WRITE_LINE_MEMBER( notconnected );
+
+	DECLARE_READ16_MEMBER( memread );
+	DECLARE_WRITE16_MEMBER( memwrite );
+
+	DECLARE_READ16_MEMBER( samsmem_read );
+	DECLARE_WRITE16_MEMBER( samsmem_write );
+
+	// CRU (Communication Register Unit) handling
+	DECLARE_READ8_MEMBER( cruread );
+	DECLARE_WRITE8_MEMBER( cruwrite );
+	DECLARE_READ8_MEMBER( read_by_9901 );
+	DECLARE_WRITE_LINE_MEMBER(keyC0);
+	DECLARE_WRITE_LINE_MEMBER(keyC1);
+	DECLARE_WRITE_LINE_MEMBER(keyC2);
+	DECLARE_WRITE_LINE_MEMBER(cs_motor);
+	DECLARE_WRITE_LINE_MEMBER(audio_gate);
+	DECLARE_WRITE_LINE_MEMBER(cassette_output);
+	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(handset_ack);
+	DECLARE_WRITE_LINE_MEMBER(alphaW);
+
+	void set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
+
+	device_t*				m_cpu;
+	ti_sound_system_device*	m_sound;
+	ti_exp_video_device*	m_video;
+	cassette_image_device*	m_cassette;
+	peribox_device*			m_peribox;
+	tms9901_device*			m_tms9901;
+
+	// Pointer to ROM0
+	UINT16 *m_rom0;
+
+	// Pointer to DSR ROM
+	UINT16 *m_dsr;
+
+	// Pointer to ROM6, first bank
+	UINT16 *m_rom6a;
+
+	// Pointer to ROM6, second bank
+	UINT16 *m_rom6b;
+
+	// AMS RAM (1 Mib)
+	UINT16 *m_ram;
+
+	// Scratch pad ram (1 KiB)
+	UINT16 *m_scratchpad;
+
+private:
+	DECLARE_READ16_MEMBER( datamux_read );
+	DECLARE_WRITE16_MEMBER( datamux_write );
+	void	set_key(int number, int data);
+	int		m_keyboard_column;
+	int		m_alphalock_line;
+
+	// True if SGCPU DSR is enabled
+	bool m_internal_dsr;
+
+	// True if SGCPU rom6 is enabled
+	bool m_internal_rom6;
+
+	// Offset to the ROM6 bank.
+	int m_rom6_bank;
+
+	// TRUE when mapper is active
+	bool m_map_mode;
+
+	// TRUE when mapper registers are accessible
+	bool m_access_mapper;
+
+	UINT8	m_lowbyte;
+	UINT8	m_highbyte;
+	UINT8	m_latch;
+
+	/* Mapper registers */
+	UINT8 m_mapper[16];
 };
 
-
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("sgcpu_board", sgcpu_r, sgcpu_w )
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE( memread, memwrite )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cru_map, AS_IO, 8)
-	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0080, 0x01ff) AM_DEVREAD("sgcpu_board", sgcpu_cru_r )
+static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p)
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
+	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
 
-	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0400, 0x0fff) AM_DEVWRITE("sgcpu_board", sgcpu_cru_w )
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
 ADDRESS_MAP_END
 
 /*
@@ -88,104 +166,6 @@ ADDRESS_MAP_END
 */
 
 static INPUT_PORTS_START(ti99_4p)
-
-	PORT_START( "SPEECH" )
-	PORT_CONFNAME( 0x01, 0x01, "Speech synthesizer" )
-		PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
-
-	PORT_START( "DISKCTRL" )
-	PORT_CONFNAME( 0x07, 0x03, "Disk controller" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
-		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
-		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
-//      PORT_CONFSETTING(    0x04, "Corcomp" )
-
-	PORT_START( "HDCTRL" )
-	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-//      PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
-//      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
-	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x08, DEF_STR( On ) )
-
-	PORT_START( "SERIAL" )
-	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
-
-	PORT_START( "SERIALMAP" )
-	PORT_CONFNAME( 0x03, 0x00, "Serial cable pin mapping" ) PORT_CONDITION( "SERIAL", 0x03, PORTCOND_NOTEQUALS, 0x00 )
-		PORT_CONFSETTING(    0x00, "6-20" )
-		PORT_CONFSETTING(    0x01, "8-20" )
-		PORT_CONFSETTING(    0x02, "5-20" )
-
-	PORT_START( "EXTCARD" )
-	PORT_CONFNAME( 0x03, 0x02, "HSGPL extension" )
-		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-
-	// We do not want to show this setting; makes only sense for Geneve
-	PORT_START( "MODE" )
-	PORT_CONFNAME( 0x01, 0x00, "Ext. cards modification" ) PORT_CONDITION( "HFDCDIP", 0xff, PORTCOND_EQUALS, GM_NEVER )
-		PORT_CONFSETTING(    0x00, "Standard" )
-		PORT_CONFSETTING(    GENMOD, "GenMod" )
-
-	PORT_START( "BWGDIP1" )
-	PORT_DIPNAME( 0x01, 0x00, "BwG step rate" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "6 ms")
-		PORT_DIPSETTING( 0x01, "20 ms")
-
-	PORT_START( "BWGDIP2" )
-	PORT_DIPNAME( 0x01, 0x00, "BwG date/time display" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "Hide")
-		PORT_DIPSETTING( 0x01, "Show")
-
-	PORT_START( "BWGDIP34" )
-	PORT_DIPNAME( 0x03, 0x00, "BwG drives" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "DSK1 only")
-		PORT_DIPSETTING( 0x01, "DSK1-DSK2")
-		PORT_DIPSETTING( 0x02, "DSK1-DSK3")
-		PORT_DIPSETTING( 0x03, "DSK1-DSK4")
-
-	PORT_START( "HFDCDIP" )
-	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
-		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
-		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
-		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
-		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
-
-	PORT_START( "V9938-MEM" )
-	PORT_CONFNAME( 0x01, 0x00, "V9938 RAM size" )
-		PORT_CONFSETTING(	0x00, "128 KiB" )
-		PORT_CONFSETTING(	0x01, "192 KiB" )
-
-	PORT_START( "DRVSPD" )
-	PORT_CONFNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
-		PORT_CONFSETTING( 0x00, "No delay")
-		PORT_CONFSETTING( 0x01, "Realistic")
-
-	PORT_START( "EVPC-SW1" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC video mode" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
-		PORT_DIPSETTING(    0x00, "PAL" )
-		PORT_DIPSETTING(    0x01, "NTSC" )
-
-	PORT_START( "EVPC-SW3" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC charset" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
-		PORT_DIPSETTING(    0x00, DEF_STR( International ))
-		PORT_DIPSETTING(    0x01, DEF_STR( German ))
-
-	PORT_START( "EVPC-SW4" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC VDP RAM" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
-		PORT_DIPSETTING(    0x00, "shifted" )
-		PORT_DIPSETTING(    0x01, "not shifted" )
-
-	PORT_START( "EVPC-SW8" )
-	PORT_DIPNAME( 0x01, 0x00, "EVPC Configuration" )
-		PORT_DIPSETTING(    0x00, "DIP" )
-		PORT_DIPSETTING(    0x01, "NOVRAM" )
-
 	/* 3 ports for mouse */
 	PORT_START("MOUSEX") /* Mouse - X AXIS */
 		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
@@ -277,12 +257,518 @@ static INPUT_PORTS_START(ti99_4p)
 
 INPUT_PORTS_END
 
+/*
+    Memory access
+*/
+READ16_MEMBER( ti99_4p::memread )
+{
+	int addroff = offset << 1;
+	if (m_rom0 == NULL) return 0;	// premature access
+
+	UINT16 zone = addroff & 0xe000;
+	UINT16 value = 0;
+
+	if (zone==0x0000)
+	{
+		// ROM0
+		value = m_rom0[(addroff & 0x1fff)>>1];
+		return value;
+	}
+	if (zone==0x2000 || zone==0xa000 || zone==0xc000 || zone==0xe000)
+	{
+		value = samsmem_read(space, offset, mem_mask);
+		return value;
+	}
+
+	if (zone==0x4000)
+	{
+		if (m_internal_dsr)
+		{
+			value = m_dsr[(addroff & 0x1fff)>>1];
+			return value;
+		}
+		else
+		{
+			if (m_access_mapper && ((addroff & 0xffe0)==0x4000))
+			{
+				value = m_mapper[offset & 0x000f]<<8;
+				return value;
+			}
+		}
+	}
+
+	if (zone==0x6000 && m_internal_rom6)
+	{
+		if (m_rom6_bank==0)
+			value = m_rom6a[(addroff & 0x1fff)>>1];
+		else
+			value = m_rom6b[(addroff & 0x1fff)>>1];
+
+		return value;
+	}
+
+	// Scratch pad RAM and sound
+	// speech is in peribox
+	// groms are in hsgpl in peribox
+	if (zone==0x8000)
+	{
+		if ((addroff & 0xfff0)==0x8400)	// cannot read from sound
+		{
+			value = 0;
+			return value;
+		}
+		if ((addroff & 0xfc00)==0x8000)
+		{
+			value = m_scratchpad[(addroff & 0x03ff)>>1];
+			return value;
+		}
+		// Video: 8800, 8802
+		if ((addroff & 0xfffd)==0x8800)
+		{
+			value = m_video->read16(space, offset, mem_mask);
+			return value;
+		}
+	}
+
+	// If we are here, check the peribox via the datamux
+	// catch-all for unmapped zones
+	value = datamux_read(space, offset, mem_mask);
+	return value;
+}
+
+WRITE16_MEMBER( ti99_4p::memwrite )
+{
+//  device_adjust_icount(m_cpu, -4);
+
+	int addroff = offset << 1;
+	UINT16 zone = addroff & 0xe000;
+
+	if (zone==0x0000)
+	{
+		// ROM0
+		if (VERBOSE>4) LOG("sgcpu: ignoring ROM write access at %04x\n", addroff);
+		return;
+	}
+
+	if (zone==0x2000 || zone==0xa000 || zone==0xc000 || zone==0xe000)
+	{
+		samsmem_write(space, offset, data, mem_mask);
+		return;
+	}
+
+	if (zone==0x4000)
+	{
+		if (m_internal_dsr)
+		{
+			if (VERBOSE>4) LOG("sgcpu: ignoring DSR write access at %04x\n", addroff);
+			return;
+		}
+		else
+		{
+			if (m_access_mapper && ((addroff & 0xffe0)==0x4000))
+			{
+				COMBINE_DATA(&m_mapper[offset & 0x000f]);
+				return;
+			}
+		}
+	}
+
+	if (zone==0x6000 && m_internal_rom6)
+	{
+		m_rom6_bank = offset & 0x0001;
+		return;
+	}
+
+	// Scratch pad RAM and sound
+	// speech is in peribox
+	// groms are in hsgpl in peribox
+	if (zone==0x8000)
+	{
+		if ((addroff & 0xfff0)==0x8400)		//sound write
+		{
+			m_sound->write(space, 0, (data >> 8) & 0xff);
+			return;
+		}
+		if ((addroff & 0xfc00)==0x8000)
+		{
+			COMBINE_DATA(&m_scratchpad[(addroff & 0x03ff)>>1]);
+			return;
+		}
+		// Video: 8C00, 8C02
+		if ((addroff & 0xfffd)==0x8c00)
+		{
+			m_video->write16(space, offset, data, mem_mask);
+			return;
+		}
+	}
+
+	// If we are here, check the peribox via the datamux
+	// catch-all for unmapped zones
+	datamux_write(space, offset, data, mem_mask);
+}
+
+/***************************************************************************
+    Internal datamux; similar to TI-99/4A. However, here we have just
+    one device, the peripheral box, so it is much simpler.
+***************************************************************************/
+
+READ16_MEMBER( ti99_4p::datamux_read )
+{
+	UINT8 hbyte = 0;
+	UINT16 addroff = (offset << 1);
+
+	m_peribox->readz(space, addroff+1, &m_latch, mem_mask);
+	m_lowbyte = m_latch;
+
+	// Takes three cycles
+	device_adjust_icount(m_cpu, -3);
+
+	m_peribox->readz(space, addroff, &hbyte, mem_mask);
+	m_highbyte = hbyte;
+
+	// Takes three cycles
+	device_adjust_icount(m_cpu, -3);
+
+	// use the latch and the currently read byte and put it on the 16bit bus
+//  printf("read  address = %04x, value = %04x, memmask = %4x\n", addroff,  (hbyte<<8) | sgcpu->latch, mem_mask);
+	return (hbyte<<8) | m_latch ;
+}
+
+/*
+    Write access.
+    TODO: use the 16-bit expansion in the box for suitable cards
+*/
+WRITE16_MEMBER( ti99_4p::datamux_write )
+{
+	UINT16 addroff = (offset << 1);
+//  printf("write address = %04x, value = %04x, memmask = %4x\n", addroff, data, mem_mask);
+
+	// read more about the datamux in datamux.c
+
+	// byte-only transfer, high byte
+	// we use the previously read low byte to complete
+	if (mem_mask == 0xff00)
+		data = data | m_lowbyte;
+
+	// byte-only transfer, low byte
+	// we use the previously read high byte to complete
+	if (mem_mask == 0x00ff)
+		data = data | (m_highbyte << 8);
+
+	// Write to the PEB
+	m_peribox->write(space, addroff+1, data & 0xff);
+
+	// Takes three cycles
+	device_adjust_icount(m_cpu,-3);
+
+	// Write to the PEB
+	m_peribox->write(space, addroff, (data>>8) & 0xff);
+
+	// Takes three cycles
+	device_adjust_icount(m_cpu,-3);
+}
+
+/***************************************************************************
+   CRU interface
+***************************************************************************/
+
+#define MAP_CRU_BASE 0x0f00
+#define SAMS_CRU_BASE 0x1e00
+
+/*
+    CRU write
+*/
+WRITE8_MEMBER( ti99_4p::cruwrite )
+{
+	int addroff = offset<<1;
+
+	if ((addroff & 0xff00)==MAP_CRU_BASE)
+	{
+		if ((addroff & 0x000e)==0)	m_internal_dsr = data;
+		if ((addroff & 0x000e)==2)	m_internal_rom6 = data;
+		if ((addroff & 0x000e)==4)	m_peribox->senila((data!=0)? ASSERT_LINE : CLEAR_LINE);
+		if ((addroff & 0x000e)==6)	m_peribox->senilb((data!=0)? ASSERT_LINE : CLEAR_LINE);
+		// TODO: more CRU bits? 8=Fast timing / a=KBENA
+		return;
+	}
+	if ((addroff & 0xff00)==SAMS_CRU_BASE)
+	{
+		if ((addroff & 0x000e)==0) m_access_mapper = data;
+		if ((addroff & 0x000e)==2) m_map_mode = data;
+		return;
+	}
+
+	// No match - pass to peribox
+	m_peribox->cruwrite(addroff, data);
+}
+
+READ8_MEMBER( ti99_4p::cruread )
+{
+	UINT8 value = 0;
+	m_peribox->crureadz(offset<<4, &value);
+	return value;
+}
+
+/***************************************************************************
+   AMS Memory implementation
+***************************************************************************/
+
+/*
+    Memory read. The SAMS card has two address areas: The memory is at locations
+    0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
+    (only even addresses).
+*/
+READ16_MEMBER( ti99_4p::samsmem_read )
+{
+	UINT32 address = 0;
+	int addroff = offset << 1;
+
+	// select memory expansion
+	if (m_map_mode)
+		address = (m_mapper[(addroff>>12) & 0x000f] << 12) + (addroff & 0x0fff);
+	else // transparent mode
+		address = addroff;
+
+	return m_ram[address>>1];
+}
+
+/*
+    Memory write
+*/
+WRITE16_MEMBER( ti99_4p::samsmem_write )
+{
+	UINT32 address = 0;
+	int addroff = offset << 1;
+
+	// select memory expansion
+	if (m_map_mode)
+		address = (m_mapper[(addroff>>12) & 0x000f] << 12) + (addroff & 0x0fff);
+	else // transparent mode
+		address = addroff;
+
+	COMBINE_DATA(&m_ram[address>>1]);
+}
+
+/***************************************************************************
+    Keyboard/tape control
+****************************************************************************/
+static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+
+READ8_MEMBER( ti99_4p::read_by_9901 )
+{
+	int answer=0;
+
+	switch (offset & 0x03)
+	{
+	case TMS9901_CB_INT7:
+		// Read pins INT3*-INT7* of TI99's 9901.
+		//
+		// signification:
+		// (bit 1: INT1 status)
+		// (bit 2: INT2 status)
+		// bit 3-7: keyboard status bits 0 to 4
+		answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
+		if (m_alphalock_line==false)
+			answer &= ~(input_port_read(*this, "ALPHA") << 3);
+		break;
+
+	case TMS9901_INT8_INT15:
+		// Read pins INT8*-INT15* of TI99's 9901.
+		// bit 0-2: keyboard status bits 5 to 7
+		// bit 3: tape input mirror
+		// bit 5-7: weird, not emulated
+		if (m_keyboard_column == 7)	answer = 0x07;
+		else				answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) >> 5) & 0x07;
+		break;
+
+	case TMS9901_P0_P7:
+		break;
+
+	case TMS9901_P8_P15:
+		// Read pins P8-P15 of TI99's 9901.
+		// bit 26: high
+		// bit 27: tape input
+		answer = 4;
+		if (m_cassette->input() > 0) answer |= 8;
+		break;
+	}
+	return answer;
+}
+
+/*
+    WRITE key column select (P2-P4)
+*/
+void ti99_4p::set_key(int number, int data)
+{
+	if (data!=0)	m_keyboard_column |= 1 << number;
+	else			m_keyboard_column &= ~(1 << number);
+}
+
+WRITE_LINE_MEMBER( ti99_4p::keyC0 )
+{
+	set_key(0, state);
+}
+
+WRITE_LINE_MEMBER( ti99_4p::keyC1 )
+{
+	set_key(1, state);
+}
+
+WRITE_LINE_MEMBER( ti99_4p::keyC2 )
+{
+	set_key(2, state);
+}
+
+/*
+    WRITE alpha lock line (P5)
+*/
+WRITE_LINE_MEMBER( ti99_4p::alphaW )
+{
+	m_alphalock_line = state;
+}
+
+/*
+    command CS1 (only) tape unit motor (P6)
+*/
+WRITE_LINE_MEMBER( ti99_4p::cs_motor )
+{
+	m_cassette->change_state((state!=0)? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+}
+
+/*
+    audio gate (P8)
+
+    Set to 1 before using tape: this enables the mixing of tape input sound
+    with computer sound.
+
+    We do not really need to emulate this as the tape recorder generates sound
+    on its own.
+*/
+WRITE_LINE_MEMBER( ti99_4p::audio_gate )
+{
+}
+
+/*
+    tape output (P9)
+*/
+WRITE_LINE_MEMBER( ti99_4p::cassette_output )
+{
+	m_cassette->output((state!=0)? +1 : -1);
+}
+
+WRITE8_MEMBER( ti99_4p::tms9901_interrupt )
+{
+	// offset contains the interrupt level (0-15)
+	if (data==ASSERT_LINE)
+	{
+		// The TMS9901 should normally be connected with the CPU by 5 wires:
+		// INTREQ* and IC0-IC3. The last four lines deliver the interrupt level.
+		// On the TI-99 systems these IC lines are not used; the input lines
+		// at the CPU are hardwired to level 1.
+		device_execute(m_cpu)->set_input_line_and_vector(0, ASSERT_LINE, 1);
+	}
+	else
+	{
+		device_execute(m_cpu)->set_input_line(0, CLEAR_LINE);
+	}
+}
+
+/* TMS9901 setup. The callback functions pass a reference to the TMS9901 as device. */
+const tms9901_interface tms9901_wiring_ti99_4p =
+{
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
+
+	// read handler
+	DEVCB_DRIVER_MEMBER(ti99_4p, read_by_9901),
+
+	{	// write handlers
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, keyC0),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, keyC1),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, keyC2),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, alphaW),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, cs_motor),
+		DEVCB_NULL,
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, audio_gate),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_4p, cassette_output),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+
+	/* interrupt handler */
+	DEVCB_DRIVER_MEMBER(ti99_4p, tms9901_interrupt)
+};
+
+/***************************************************************************
+    Control lines
+****************************************************************************/
+
+WRITE_LINE_MEMBER( ti99_4p::console_ready )
+{
+	if (VERBOSE>6) LOG("READY line set ... not yet connected, level=%02x\n", state);
+}
+
+WRITE_LINE_MEMBER( ti99_4p::extint )
+{
+	if (VERBOSE>6) LOG("EXTINT level = %02x\n", state);
+	if (m_tms9901 != NULL)
+		m_tms9901->set_single_int(1, state);
+}
+
+WRITE_LINE_MEMBER( ti99_4p::notconnected )
+{
+	if (VERBOSE>6) LOG("Setting a not connected line ... ignored\n");
+}
+
+/*****************************************************************************/
+
+static PERIBOX_CONFIG( peribox_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, extint),			// INTA
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, notconnected),	// INTB
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4p, console_ready),	// READY
+	0x70000												// Address bus prefix (AMA/AMB/AMC)
+};
+
 DRIVER_INIT( ti99_4p )
 {
 }
 
 MACHINE_START( ti99_4p )
 {
+	ti99_4p *driver = machine.driver_data<ti99_4p>();
+
+	driver->m_cpu = machine.device("maincpu");
+	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
+	driver->m_sound = static_cast<ti_sound_system_device*>(machine.device(TISOUND_TAG));
+	driver->m_video = static_cast<ti_exp_video_device*>(machine.device(VIDEO_SYSTEM_TAG));
+	driver->m_cassette = static_cast<cassette_image_device*>(machine.device(CASSETTE_TAG));
+	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
+
+	driver->m_ram = (UINT16*)machine.region(SAMSMEM_TAG)->base();
+	driver->m_scratchpad = (UINT16*)machine.region(PADMEM_TAG)->base();
+
+	driver->m_peribox->senila(CLEAR_LINE);
+	driver->m_peribox->senilb(CLEAR_LINE);
+
+	UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
+	driver->m_rom0  = rom + 0x2000;
+	driver->m_dsr   = rom + 0x6000;
+	driver->m_rom6a = rom + 0x3000;
+	driver->m_rom6b = rom + 0x7000;
+}
+
+/*
+    set the state of int2 (called by the v9938)
+*/
+void ti99_4p::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
+{
+	m_tms9901->set_single_int(2, state);
 }
 
 /*
@@ -290,50 +776,50 @@ MACHINE_START( ti99_4p )
 */
 MACHINE_RESET( ti99_4p )
 {
-	tms9901_set_single_int(machine.device("tms9901"), 12, 0);
+	ti99_4p *driver = machine.driver_data<ti99_4p>();
+	driver->m_tms9901->set_single_int(12, 0);
 }
 
 TIMER_DEVICE_CALLBACK( ti99_4p_hblank_interrupt )
 {
-	timer.machine().device<v9938_device>("video_v9938")->interrupt();
+	timer.machine().device<v9938_device>(V9938_TAG)->interrupt();
 }
 
 /*
     Machine description.
 */
-static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
+static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
 	MCFG_CPU_ADD("maincpu", TMS9900, 3000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(cru_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", ti99_4p_hblank_interrupt, "screen", 0, 1)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_MACHINE_START( ti99_4p )
 
 	/* video hardware */
 	/* FIXME: (MZ) Lowered the screen rate to 30 Hz. This is a quick hack to
     restore normal video speed for V9938-based systems until the V9938 implementation
     is properly fixed. */
-	MCFG_TI_V9938_ADD("video", 30, "screen", 2500, 512+32, (212+28)*2, tms9901_sg_set_int2)
+	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, ti99_4p, set_tms9901_INT2_from_v9938)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ti99_4p_hblank_interrupt, SCREEN_TAG, 0, 1)
 
-	MCFG_MACHINE_START( ti99_4p )
-	MCFG_MACHINE_RESET( ti99_4p )
+	/* tms9901 */
+	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4p, 3000000)
+
+	/* Peripheral expansion box (SGCPU composition) */
+	MCFG_PERIBOX_SG_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+
+	/* Cassette drives */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-	/* tms9901 */
-	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_ti99_4p)
-
-	/* devices */
-	MCFG_PBOXSG_ADD( "peribox", card_extint, card_notconnected, card_ready )
-	MCFG_SGCPUB_ADD( "sgcpu_board" )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -342,6 +828,10 @@ ROM_START(ti99_4p)
 	ROM_REGION16_BE(0x10000, "maincpu", 0)
 	ROM_LOAD16_BYTE("sgcpu_hb.bin", 0x0000, 0x8000, CRC(aa100730) SHA1(35e585b2dcd3f2a0005bebb15ede6c5b8c787366) ) /* system ROMs */
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
+	ROM_REGION16_BE(0x080000, SAMSMEM_TAG, 0)
+	ROM_FILL(0x000000, 0x080000, 0x0000)
+	ROM_REGION16_BE(0x0400, PADMEM_TAG, 0)
+	ROM_FILL(0x000000, 0x0400, 0x0000)
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY     FULLNAME */

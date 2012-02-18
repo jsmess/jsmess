@@ -1,9 +1,13 @@
-/*
-    MESS Driver for TI-99/8 Computer.
-    Raphael Nabet, 2003.
-*/
-/*
-    TI-99/8 preliminary info:
+/****************************************************************************
+
+    The MESS TI-99/8 emulation driver
+
+    The TI-99/8 was the envisaged successor to the TI-99/4A but never passed
+    its prototype state. Only a few consoles were built. The ROMs were not
+    even finalized, so the few available consoles may have different
+    operating system versions.
+
+    There is some preliminary info:
 
 Name: Texas Instruments Computer TI-99/8 (no "Home")
 
@@ -186,19 +190,22 @@ Known Issues (MZ, 2010-11-07)
 - SAVE and OLD MINIMEM do not work properly in XB II. It seems as if the
   mapper shadows the NVRAM of the cartridge. You will lose the contents when
   you turn off the machine.
-===========================================================================
 
-*/
+    Raphael Nabet, 2003.
+    Michael Zapf
+
+    February 2012: Rewritten as class
+
+*****************************************************************************/
+
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
 #include "sound/sn76496.h"
-//#include "video/tms9928a.h"
 #include "sound/wave.h"
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
-
-#include "machine/ti99/tiboard.h"
 
 #include "machine/ti99/videowrp.h"
 #include "machine/ti99/speech8.h"
@@ -210,24 +217,61 @@ Known Issues (MZ, 2010-11-07)
 #include "machine/ti99/gromport.h"
 #include "machine/ti99/mecmouse.h"
 
+#define VERBOSE 1
+#define LOG logerror
 
-class ti99_8_state : public driver_device
+class ti99_8 : public driver_device
 {
 public:
-	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
+	ti99_8(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	// CRU (Communication Register Unit) handling
+	DECLARE_READ8_MEMBER(cruread);
+	DECLARE_WRITE8_MEMBER(cruwrite);
+
+	// Forwarding interrupts to the CPU or CRU
+	DECLARE_WRITE_LINE_MEMBER( console_ready );
+	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2 );
+	DECLARE_WRITE_LINE_MEMBER( extint );
+	DECLARE_WRITE_LINE_MEMBER( notconnected );
+
+	// Connections with the system interface TMS9901
+	DECLARE_READ8_MEMBER(read_by_9901);
+	DECLARE_WRITE_LINE_MEMBER(keyC0);
+	DECLARE_WRITE_LINE_MEMBER(keyC1);
+	DECLARE_WRITE_LINE_MEMBER(keyC2);
+	DECLARE_WRITE_LINE_MEMBER(keyC3);
+	DECLARE_WRITE_LINE_MEMBER(CRUS);
+	DECLARE_WRITE_LINE_MEMBER(PTGEN);
+	DECLARE_WRITE_LINE_MEMBER(audio_gate);
+	DECLARE_WRITE_LINE_MEMBER(cassette_output);
+	DECLARE_WRITE_LINE_MEMBER(cassette_motor);
+	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+
+	// Some values to keep
+	device_t			*m_cpu;
+	tms9901_device		*m_tms9901;
+	gromport_device		*m_gromport;
+	peribox_device		*m_peribox;
+	mecmouse_device 	*m_mecmouse;
+	ti998_mapper_device	*m_mapper;
+
+private:
+	/* Keyboard support */
+	void			set_key(int number, int data);
+	int				m_keyboard_column;
+	int				m_alphalock_line;
 };
 
 
 /*
-    Memory map - see description above
+    Memory map. We have a configurable mapper, so we need to delegate the
+    job to the mapper completely.
 */
-
-static ADDRESS_MAP_START(ti99_8_memmap, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("mapper", ti99_mapper8_r, ti99_mapper8_w )
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, ti99_8)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(MAPPER_TAG, ti998_mapper_device, readm, writem )
 ADDRESS_MAP_END
-
 
 /*
     CRU map - see description above
@@ -237,90 +281,20 @@ ADDRESS_MAP_END
     TODO: Check whether the CRU address space goes up to 7fff (15 bit)
 */
 
-static ADDRESS_MAP_START(ti99_8_cru_map, AS_IO, 8)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0000, 0x02ff) AM_DEVREAD("crubus", ti99_crubus_r )
+static ADDRESS_MAP_START(crumap, AS_IO, 8, ti99_8)
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
+	AM_RANGE(0x0000, 0x02ff) AM_READ(cruread)
 
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0000, 0x17ff) AM_DEVWRITE("crubus", ti99_crubus_w )
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
+	AM_RANGE(0x0000, 0x17ff) AM_WRITE(cruwrite)
 ADDRESS_MAP_END
 
 /* ti99/8 : 54-key keyboard */
 static INPUT_PORTS_START(ti99_8)
-	PORT_START( "DISKCTRL" )
-	PORT_CONFNAME( 0x07, 0x00, "Disk controller" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
-		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
-		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
-
-	PORT_START( "HDCTRL" )
-	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
-//      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
-	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
+	PORT_START( "MECMOUSE" )
+	PORT_CONFNAME( 0x01, 0x00, "Mechatronics Mouse" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x08, DEF_STR( On ) )
-
-	PORT_START( "SERIAL" )
-	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
-
-	PORT_START( "SERIALMAP" )
-	PORT_CONFNAME( 0x03, 0x00, "Serial cable pin mapping" ) PORT_CONDITION( "SERIAL", 0x03, PORTCOND_NOTEQUALS, 0x00 )
-		PORT_CONFSETTING(    0x00, "6-20" )
-		PORT_CONFSETTING(    0x01, "8-20" )
-		PORT_CONFSETTING(    0x02, "5-20" )
-
-	PORT_START( "HCI" )
-	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
-
-	PORT_START( "CARTSLOT" )
-	PORT_DIPNAME( 0x0f, 0x00, "Cartridge slot" )
-		PORT_DIPSETTING(    0x00, "Auto" )
-		PORT_DIPSETTING(    0x01, "Slot 1" )
-		PORT_DIPSETTING(    0x02, "Slot 2" )
-		PORT_DIPSETTING(    0x03, "Slot 3" )
-		PORT_DIPSETTING(    0x04, "Slot 4" )
-
-	PORT_START( "BWGDIP1" )
-	PORT_DIPNAME( 0x01, 0x00, "BwG step rate" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "6 ms")
-		PORT_DIPSETTING( 0x01, "20 ms")
-
-	PORT_START( "BWGDIP2" )
-	PORT_DIPNAME( 0x01, 0x00, "BwG date/time display" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "Hide")
-		PORT_DIPSETTING( 0x01, "Show")
-
-	PORT_START( "BWGDIP34" )
-	PORT_DIPNAME( 0x03, 0x00, "BwG drives" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "DSK1 only")
-		PORT_DIPSETTING( 0x01, "DSK1-DSK2")
-		PORT_DIPSETTING( 0x02, "DSK1-DSK3")
-		PORT_DIPSETTING( 0x03, "DSK1-DSK4")
-
-	PORT_START( "HFDCDIP" )
-	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
-		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
-		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
-		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
-		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
-
-	PORT_START( "DRVSPD" )
-	PORT_CONFNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
-		PORT_CONFSETTING( 0x00, "No delay")
-		PORT_CONFSETTING( 0x01, "Realistic")
-
-	// We do not want to show this setting; makes only sense for Geneve
-	PORT_START( "MODE" )
-	PORT_CONFNAME( 0x01, 0x00, "Ext. cards modification" ) PORT_CONDITION( "HFDCDIP", 0xff, PORTCOND_EQUALS, GM_NEVER )
-		PORT_CONFSETTING(    0x00, "Standard" )
-		PORT_CONFSETTING(    GENMOD, "GenMod" )
+		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	/* 3 ports for mouse */
 	PORT_START("MOUSEX") /* Mouse - X AXIS */
@@ -445,79 +419,300 @@ static INPUT_PORTS_START(ti99_8)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+/*****************************************************************************
+    Components
+******************************************************************************/
 
-/* F4 Character Displayer */
-static const gfx_layout ti99_7_charlayout =
+static GROM_CONFIG(grom0_config)
 {
-	8, 7,					/* 8 x 7 characters */
-	96,					/* 96 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8 },
-	8*7					/* every char takes 7 bytes */
+	false, 0, region_grom, 0x0000, 0x1800, false, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready)
 };
 
-static const gfx_layout ti99_8_charlayout =
+static GROM_CONFIG(grom1_config)
 {
-	8, 8,					/* 8 x 8 characters */
-	64,					/* 64 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	false, 1, region_grom, 0x2000, 0x1800, false, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready)
 };
 
-static const gfx_layout ti99_c_charlayout =
+static GROM_CONFIG(grom2_config)
 {
-	8, 8,					/* 8 x 8 characters */
-	1,					/* 1 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	false, 2, region_grom, 0x4000, 0x1800, false, DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready)
 };
 
-static const gfx_layout ti99_24_charlayout =
+static GROMPORT_CONFIG(console_cartslot)
 {
-	24, 24,					/* 24 x 24 characters */
-	1,					/* 1 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 64, 65, 66, 67, 68, 69, 70, 71, 128, 129, 130, 131, 132, 133, 134, 135 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 24*8, 25*8, 26*8, 27*8, 28*8, 29*8, 30*8, 31*8, 48*8, 49*8, 50*8, 51*8, 52*8, 53*8, 54*8, 55*8 },
-	24*24					/* every char takes 72 bytes */
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready)
 };
 
-static GFXDECODE_START( ti99_8 )
-	GFXDECODE_ENTRY( region_grom, 0x050d, ti99_8_charlayout, 0, 8 )	// large
-	GFXDECODE_ENTRY( region_grom, 0x070d, ti99_7_charlayout, 0, 8 ) // small
-	GFXDECODE_ENTRY( region_grom, 0x09b4, ti99_24_charlayout, 0, 8 )// TI logo
-	GFXDECODE_ENTRY( region_grom, 0x09fc, ti99_c_charlayout, 0, 8 )	// (c)
-GFXDECODE_END
-
-
-static WRITE_LINE_DEVICE_HANDLER(set_int2)
+static PERIBOX_CONFIG( peribox_conf )
 {
-	tms9901_set_int2(device->machine().device("ti_board"), state );
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8, extint),			// INTA
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8, notconnected),		// INTB
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8, console_ready),	// READY
+	0x70000												// Address bus prefix (AMA/AMB/AMC)
+};
+
+READ8_MEMBER( ti99_8::cruread )
+{
+//  if (VERBOSE>6) LOG("read access to CRU address %04x\n", offset << 4);
+	UINT8 value = 0;
+
+	// Similar to the bus8z_devices, just let the mapper, the gromport, and the p-box
+	// decide whether they want to change the value at the CRU address
+	// Also, we translate the bit addresses to base addresses
+	m_mapper->crureadz(offset<<4, &value);
+	m_gromport->crureadz(offset<<4, &value);
+	m_peribox->crureadz(offset<<4, &value);
+
+	if (VERBOSE>8) LOG("ti99_8: CRU %04x -> %02x\n", offset<<4, value);
+	return value;
 }
 
-static TMS9928A_INTERFACE(ti99_8_tms9928a_interface)
+WRITE8_MEMBER( ti99_8::cruwrite )
+{
+	if (VERBOSE>8) LOG("ti99_8: CRU %04x <- %x\n", offset<<1, data);
+	m_mapper->cruwrite(offset<<1, data);
+	m_gromport->cruwrite(offset<<1, data);
+	m_peribox->cruwrite(offset<<1, data);
+}
+
+/***************************************************************************
+    TI99/8-specific tms9901 I/O handlers
+    These methods are callbacks from the TMS9901 system interface. That is,
+    they deliver the values queried via the TMS9901, and they represent
+    console functions which are under control of the TMS9901 (like the
+    keyboard column selection.)
+***************************************************************************/
+
+static const char *const keynames8[] = {
+	"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+	"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
+};
+
+READ8_MEMBER( ti99_8::read_by_9901 )
+{
+	int answer=0;
+
+	switch (offset & 0x03)
+	{
+	case TMS9901_CB_INT7:
+		// Read pins INT3*-INT7* of TI99's 9901.
+		//
+		// (bit 1: INT1 status)
+		// (bit 2: INT2 status)
+		// bits 3-4: unused?
+		// bit 5: ???
+		// bit 6-7: keyboard status bits 0 through 1
+		if (m_mecmouse != NULL && (m_keyboard_column == 15))
+		{
+			answer = m_mecmouse->get_values8(0);
+		}
+		else
+		{
+			answer = (input_port_read(machine(), keynames8[m_keyboard_column]) << 6) & 0xC0;
+		}
+		break;
+
+	case TMS9901_INT8_INT15:
+		// Read pins INT8*-INT15* of TI99's 9901.
+		//
+		// bit 0-2: keyboard status bits 2 to 4
+		// bit 3: tape input mirror
+		// (bit 4: IR remote handset interrupt)
+		// bit 5-7: weird, not emulated
+		if (m_mecmouse != NULL && (m_keyboard_column == 15))
+		{
+			answer = m_mecmouse->get_values8(1);
+		}
+		else
+		{
+			answer = (input_port_read(machine(), keynames8[m_keyboard_column]) >> 2) & 0x07;
+		}
+		break;
+
+	case TMS9901_P0_P7:
+		// Read pins P0-P7 of TI99's 9901. None here.
+		break;
+
+	case TMS9901_P8_P15:
+		// Read pins P8-P15 of TI99's 9901. (TI-99/8)
+		//
+		// bit 26: high
+		// bit 27: tape input
+		int answer = 4;
+		if ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0)
+			answer |= 8;
+		break;
+	}
+	return answer;
+}
+
+/*
+    WRITE key column select (P2-P4), TI-99/8
+*/
+void ti99_8::set_key(int number, int data)
+{
+	if (data!=0)	m_keyboard_column |=  1 << number;
+	else			m_keyboard_column &= ~(1 << number);
+
+	if (m_mecmouse != NULL)
+		m_mecmouse->select(m_keyboard_column, 14, 15);
+}
+
+WRITE_LINE_MEMBER( ti99_8::keyC0 )
+{
+	set_key(0, state);
+}
+
+WRITE_LINE_MEMBER( ti99_8::keyC1 )
+{
+	set_key(1, state);
+}
+
+WRITE_LINE_MEMBER( ti99_8::keyC2 )
+{
+	set_key(2, state);
+}
+
+WRITE_LINE_MEMBER( ti99_8::keyC3 )
+{
+	set_key(3, state);
+}
+
+/*
+    Set 99/4A compatibility mode (CRUS=1)
+*/
+WRITE_LINE_MEMBER( ti99_8::CRUS )
+{
+	m_mapper->CRUS_set(state==ASSERT_LINE);
+}
+
+/*
+    Set mapper /PTGEN. This is negative logic; we use PTGE as the positive logic signal.
+*/
+WRITE_LINE_MEMBER( ti99_8::PTGEN )
+{
+	m_mapper->PTGE_set(state==CLEAR_LINE);
+}
+
+/*
+    Control cassette tape unit motor (P6)
+*/
+WRITE_LINE_MEMBER( ti99_8::cassette_motor )
+{
+	cassette_image_device *img = machine().device<cassette_image_device>(CASSETTE_TAG);
+	img->change_state(state==ASSERT_LINE? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+}
+
+/*
+    Audio gate (P8)
+    Set to 1 before using tape: this enables the mixing of tape input sound
+    with computer sound.
+    We do not really need to emulate this as the tape recorder generates sound
+    on its own.
+*/
+WRITE_LINE_MEMBER( ti99_8::audio_gate )
+{
+}
+
+/*
+    Tape output (P9)
+    I think polarity is correct, but don't take my word for it.
+*/
+WRITE_LINE_MEMBER( ti99_8::cassette_output )
+{
+	machine().device<cassette_image_device>(CASSETTE_TAG)->output(state==ASSERT_LINE? +1 : -1);
+}
+
+WRITE8_MEMBER( ti99_8::tms9901_interrupt )
+{
+	// offset contains the interrupt level (0-15)
+	if (data==ASSERT_LINE)
+	{
+		// The TMS9901 should normally be connected with the CPU by 5 wires:
+		// INTREQ* and IC0-IC3. The last four lines deliver the interrupt level.
+		// On the TI-99 systems these IC lines are not used; the input lines
+		// at the CPU are hardwired to level 1.
+		if (VERBOSE>8) LOG("mapper8: tms9901 asserts interrupt\n");
+		device_execute(m_cpu)->set_input_line_and_vector(0, ASSERT_LINE, 1);
+	}
+	else
+	{
+		if (VERBOSE>8) LOG("mapper8: tms9901 clears interrupt\n");
+		device_execute(m_cpu)->set_input_line(0, CLEAR_LINE);
+	}
+}
+
+const tms9901_interface tms9901_wiring_ti99_8 =
+{
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,
+
+	// read handler
+	DEVCB_DRIVER_MEMBER(ti99_8, read_by_9901),
+
+	// write handlers
+	{
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, keyC0),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, keyC1),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, keyC2),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, keyC3),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, CRUS),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, PTGEN),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, cassette_motor),
+		DEVCB_NULL,
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, audio_gate),
+		DEVCB_DRIVER_LINE_MEMBER(ti99_8, cassette_output),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+
+	DEVCB_DRIVER_MEMBER(ti99_8, tms9901_interrupt)
+};
+
+/*****************************************************************************/
+
+/*
+    set the state of TMS9901's INT2 (called by the tms9928 core)
+*/
+WRITE_LINE_MEMBER( ti99_8::set_tms9901_INT2 )
+{
+	if (VERBOSE>6) LOG("ti99_8: VDP int 2 on tms9901, level=%02x\n", state);
+	m_tms9901->set_single_int(2, state);
+}
+
+/***********************************************************
+    Links to external devices
+***********************************************************/
+
+
+WRITE_LINE_MEMBER( ti99_8::console_ready )
+{
+	if (VERBOSE>6) LOG("ti99_8: READY line set ... not yet connected, level=%02x\n", state);
+}
+
+WRITE_LINE_MEMBER( ti99_8::extint )
+{
+	if (VERBOSE>6) LOG("ti99_8: EXTINT level = %02x\n", state);
+	if (m_tms9901 != NULL)
+		m_tms9901->set_single_int(1, state);
+}
+
+WRITE_LINE_MEMBER( ti99_8::notconnected )
+{
+	if (VERBOSE>6) LOG("ti99_8: Setting a not connected line ... ignored\n");
+}
+
+static TMS9928A_INTERFACE(ti99_8_tms9118a_interface)
 {
 	SCREEN_TAG,
 	0x4000,
-	DEVCB_LINE(set_int2)
+	DEVCB_DRIVER_LINE_MEMBER(ti99_8, set_tms9901_INT2)
 };
+
+/*****************************************************************************/
 
 static const struct tms9995reset_param ti99_8_processor_config =
 {
@@ -537,149 +732,175 @@ static const struct tms9995reset_param ti99_8_processor_config =
     care must be taken that only one device actually responds. In the case of
     GROMs, each chip has an internal address counter and an ID, and the chip
     only responds when the ID and the most significant 3 bits match.
+
+    NATIVE <-> CRUS=0
+    TI99EM <-> CRUS=1
+
+    PATGEN <-> PTGEN=1
+
+    CONT: Mapper continues iterating through devices
+    STOP: Mapper stops iterating when found
+
+    Access to the mapper registers is done directly in the mapper, not via
+    this list.
 */
-static const mapper8_dev_config mapper_devices[] =
+static const mapper8_list_entry mapper_devices[] =
 {
 	// TI-99/8 mode
-	{ SRAMNAME,			0, 1, 0xf800, 0xf000, 0x0000, NULL, 			NULL },
-	{ "soundgen",   	0, 1, 0xfff0, 0xf800, 0x0000, NULL,         	sn76496_w },
-	{ "video",			0, 1, 0xfffd, 0xf810, 0x0000, ti8_tms991x_rz,	ti8_tms991x_w },
-	{ "speech", 		0, 1, 0xfff0, 0xf820, 0x0000, ti998spch_rz, 	ti998spch_w },
-	{ "grom_0", 	    0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,		ti99grom_w },
-	{ "grom_1", 		0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,		ti99grom_w },
-	{ "grom_2",			0, 0, 0xfff1, 0xf830, 0x0000, ti99grom_rz,  	ti99grom_w },
-	{ "gromport",   	0, 0, 0xfff1, 0xf830, 0x0400, gromportg_rz,		gromportg_w, },
-//  { "grom_tts_0",     2, 0, 0xfff1, 0xf840, 0x0000, 0, 0, ti99grom_rz,    ti99grom_w },  // up to 6 GROMs; no good dumps known
-//  { "grom_pcode1_0",  2, 0, 0xfff1, 0xf850, 0x0000, 0, 0, ti99grom_rz,    ti99grom_w },  // up to 6 GROMs; no good dumps known
-//  { "grom_pcode2_0",  2, 0, 0xfff1, 0xf860, 0x0000, 0, 0, ti99grom_rz,    ti99grom_w },  // up to 6 GROMs; no good dumps known
-	{ "mapper", 		0, 1, 0xfff0, 0xf870, 0x0000, NULL,			ti99_mapreg_w },
+	{ SRAMNAME,			NATIVE, STOP, 0xf000, 0xf800, 0x0000	},	// f000-f7ff
+	{ TISOUND_TAG,  	NATIVE, STOP, 0xf800, 0xfff0, 0x0000	},	// f800-f80f
+	{ VIDEO_SYSTEM_TAG,	NATIVE, STOP, 0xf810, 0xfffd, 0x0000	},	// f810,2 (unlike 99/4A, no different read/write ports)
+	{ SPEECH_TAG,		NATIVE, STOP, 0xf820, 0xfff0, 0x0000	},	// f820-f82f
 
-	// TI-99/4A mode
-	// GROM: 1001 1000 0000 xxa0
-	{ ROM0NAME,			1, 1, 0xe000, 0x0000, 0x0000, NULL, 			NULL },
-	{ "grom_0",     	1, 0, 0xfff1, 0x9800, 0x0400, ti99grom_rz,  	ti99grom_w },
-	{ "grom_1",     	1, 0, 0xfff1, 0x9800, 0x0400, ti99grom_rz,  	ti99grom_w },
-	{ "grom_2",     	1, 0, 0xfff1, 0x9800, 0x0400, ti99grom_rz,  	ti99grom_w },
-	{ "gromport",   	1, 0, 0xfff1, 0x9800, 0x0400, gromportg_rz,		gromportg_w, },
+	{ GROM0_TAG,	    NATIVE, CONT, 0xf830, 0xfff1, 0x0000	},	// f830-f83e (4 banks), no different read/write ports
+	{ GROM1_TAG,		NATIVE, CONT, 0xf830, 0xfff1, 0x0000	},
+	{ GROM2_TAG,		NATIVE, CONT, 0xf830, 0xfff1, 0x0000	},
+	{ GROMPORT_TAG, 	NATIVE, CONT, 0xf830, 0xfff1, 0x0000	},
 
-	{ "mapper", 		1, 1, 0xfff0, 0x8810, 0x0000, NULL,				ti99_mapreg_w },
-	{ "soundgen",   	1, 1, 0xfff0, 0x8400, 0x0000, NULL,     		sn76496_w },
-	{ "video",			1, 1, 0xfffd, 0x8800, 0x0400, ti8_tms991x_rz,	ti8_tms991x_w },
-	{ "speech", 		1, 1, 0xfff0, 0x9000, 0x0400, ti998spch_rz, 	ti998spch_w },
-	{ SRAMNAME,			1, 1, 0xf800, 0x8000, 0x0000, NULL,				NULL }, // write at the end; soundgen must be found earlier
+//  { GROMTTS0_TAG,     PATGEN, CONT, 0xf840, 0xfff1, 0x0000    },  // up to 6 GROMs; no good dumps known
+//  { GROMPC10_TAG,     PATGEN, CONT, 0xf850, 0xfff1, 0x0000    },  // up to 6 GROMs; no good dumps known
+//  { GROMPC20_TAG,     PATGEN, CONT, 0xf860, 0xfff1, 0x0000    },  // up to 6 GROMs; no good dumps known
+	{ MAPPER_TAG,		NATIVE, STOP, 0xf870, 0xfff0, 0x0000	},
 
-	// Physical (need to pack this into here as well)
-	{ DRAMNAME, 		3, 1, 0xff0000, 0x000000, 0x000000, NULL, NULL },
-	{ "mapper",			3, 0, 0xffe000, 0xff4000, 0x000000, ti998dsr_rz, NULL },   // DSR
-	{ "gromport",		3, 1, 0xffe000, 0xff6000, 0x000000, gromportr_rz, gromportr_w  },
-	{ "gromport",		3, 1, 0xffe000, 0xff8000, 0x000000, gromportr_rz, gromportr_w  },
-	{ ROM1NAME, 		3, 1, 0xffe000, 0xffa000, 0x000000, NULL, NULL },
-	{ ROM1ANAME,		3, 1, 0xffe000, 0xffc000, 0x000000, NULL, NULL },
-	{ INTSNAME, 		3, 1, 0xfffff0, 0xffe000, 0x000000, NULL, NULL },
-	{ "peribox",		3, 1, 0x000000, 0x000000, 0x000000, ti99_peb_data_rz, ti99_peb_data_w },
+	// TI-99/4A mode (CRUS=1)
+	// GROMs: According to the spec, the 99/8 supports up to 4 GROM libraries
+	// (99/4A supports 256 libraries)
+	// at 9800, 9804, 9808, 980c. Address counter access is at 9802,6,a,e. Write access +0400.
+	{ ROM0NAME,			TI99EM, STOP, 0x0000, 0xe000, 0x0000	},	// 0000-1fff
 
-	{ NULL, 0, 0, 0, 0, 0, NULL, NULL  }
+	{ GROM0_TAG,    	TI99EM, CONT, 0x9800, 0xfff1, 0x0400	},	// 9800,2,4,...e/9c00,2,4,...e
+	{ GROM1_TAG,    	TI99EM, CONT, 0x9800, 0xfff1, 0x0400	},	// dto.
+	{ GROM2_TAG,    	TI99EM, CONT, 0x9800, 0xfff1, 0x0400	},	// dto. (GROMs are connected in parallel,
+	{ GROMPORT_TAG, 	TI99EM, CONT, 0x9800, 0xfff1, 0x0400	},	// dto.  use internal address counter and id)
+
+	{ TISOUND_TAG,  	TI99EM, STOP, 0x8400, 0xfff0, 0x0000	},	// 8400-840f
+	{ VIDEO_SYSTEM_TAG,	TI99EM, STOP, 0x8800, 0xfffd, 0x0400	},	// 8800,8802 / 8c00,8c02
+	{ SPEECH_TAG,		TI99EM, STOP, 0x9000, 0xfff0, 0x0400	},	// 9000-900f / 9400-940f
+	{ SRAMNAME,			TI99EM, STOP, 0x8000, 0xf800, 0x0000	},	// 8000-87ff; must follow the sound generator
+	{ MAPPER_TAG,		TI99EM, STOP, 0x8810, 0xfff0, 0x0000	},
+
+	// Physical (need to pack this in here as well to keep config simple)
+	{ DRAMNAME, 		PHYSIC, STOP, 0x000000, 0xff0000, 0x000000	},	// 000000-00ffff 64 KiB DRAM
+	{ MAPPER_TAG,		PHYSIC, CONT, 0xff4000, 0xffe000, 0x000000	},	// ff4000-ff5fff Internal DSR
+	{ GROMPORT_TAG,		PHYSIC, STOP, 0xff6000, 0xffe000, 0x000000	},	// ff6000-ff7fff Cartridge ROM space
+	{ GROMPORT_TAG,		PHYSIC, STOP, 0xff8000, 0xffe000, 0x000000	},	// ff8000-ff9fff Cartridge ROM space
+	{ ROM1NAME, 		PHYSIC, STOP, 0xffa000, 0xffe000, 0x000000	},	// ffa000-ffbfff ROM1
+	{ ROM1ANAME,		PHYSIC, STOP, 0xffc000, 0xffe000, 0x000000	},	// ffc000-ffdfff ROM1
+	{ INTSNAME, 		PHYSIC, STOP, 0xffe000, 0xfffff0, 0x000000	},	// ffe000-ffe00f Interrupt level sense
+	{ PERIBOX_TAG,		PHYSIC, STOP, 0x000000, 0x000000, 0x000000	},	// Peripheral Expansion Box
+
+	{ NULL, 0, 0, 0, 0, 0  }
 };
 
-static const cruconf_device cru_devices[] =
+MACHINE_START( ti99_8 )
 {
-	{ "mapper", 	0xfff0, 0x2700, NULL, mapper8c_w },
-	{ "gromport",	0xf800, 0x0800, gromportc_rz, gromportc_w },				// Check: Is this really limited?
-	{ "peribox",	0x0000, 0x0000, ti99_peb_cru_rz, ti99_peb_cru_w },    // Peribox needs all addresses
-	{ NULL, 		0, 0, NULL, NULL }
-};
+	ti99_8 *driver = machine.driver_data<ti99_8>();
+	driver->m_cpu = machine.device("maincpu");
+	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
+	driver->m_gromport = static_cast<gromport_device*>(machine.device(GROMPORT_TAG));
+	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
+	driver->m_mapper = static_cast<ti998_mapper_device*>(machine.device(MAPPER_TAG));
+	driver->m_peribox->senila(CLEAR_LINE);
+	driver->m_peribox->senilb(CLEAR_LINE);
+}
 
 MACHINE_RESET( ti99_8 )
 {
+	ti99_8 *driver = machine.driver_data<ti99_8>();
+
+	if (input_port_read(machine, "MECMOUSE")==0x01)
+		driver->m_mecmouse = static_cast<mecmouse_device*>(machine.device(MECMOUSE_TAG));
+	else
+		driver->m_mecmouse = NULL;
 }
 
-static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
+static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8 )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MCFG_CPU_ADD("maincpu", TMS9995, 10738635)
 	MCFG_CPU_CONFIG(ti99_8_processor_config)
-	MCFG_CPU_PROGRAM_MAP(ti99_8_memmap)
-	MCFG_CPU_IO_MAP(ti99_8_cru_map)
-	MCFG_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
-
+	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_IO_MAP(crumap)
+	MCFG_MACHINE_START( ti99_8 )
 	MCFG_MACHINE_RESET( ti99_8 )
 
-	/* video hardware */
-	MCFG_TI_TMS991x_ADD_NTSC("video", TMS9118, ti99_8_tms9928a_interface)
+	/* Video hardware */
+	MCFG_TI998_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, ti99_8_tms9118a_interface)
 
-	MCFG_GFXDECODE(ti99_8)
+	/* Main board */
+	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, 2684658.75 )
+	MCFG_MAPPER8_ADD( MAPPER_TAG, mapper_devices )
+	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
-	/* sound hardware */
+	/* Peripheral expansion box */
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+
+	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+
+	/* Cassette drives */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_TISPEECH_ADD("speech")
+	/* Console GROMs */
+	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
 
-	MCFG_TI998_BOARD_ADD( "ti_board" )
-	MCFG_MAPPER8_ADD( "mapper", mapper_devices )
+	/* Devices */
+	MCFG_TISPEECH8_ADD(SPEECH_TAG)
 
-	/* tms9901 */
-	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_ti99_8)
-
-	MCFG_CRUBUS_ADD( "crubus", cru_devices)
-
-	MCFG_GROM_ADD( "grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
-	MCFG_GROM_ADD( "grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
-	MCFG_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
-
-	MCFG_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
-
-	MCFG_TI99_GROMPORT_ADD( "gromport", console_ready )
-	MCFG_MECMOUSE_ADD( "mecmouse" )
+	/* Optional user controller */
+	MCFG_MECMOUSE_ADD( MECMOUSE_TAG, 60 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
+static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8 )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
 	MCFG_CPU_ADD("maincpu", TMS9995, 10738635)
 	MCFG_CPU_CONFIG(ti99_8_processor_config)
-	MCFG_CPU_PROGRAM_MAP(ti99_8_memmap)
-	MCFG_CPU_IO_MAP(ti99_8_cru_map)
-	MCFG_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
-
+	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_IO_MAP(crumap)
+	MCFG_MACHINE_START( ti99_8 )
 	MCFG_MACHINE_RESET( ti99_8 )
 
-	/* video hardware */
-	MCFG_TI_TMS991x_ADD_PAL("video", TMS9129, ti99_8, ti99_8_tms9928a_interface)
+	/* Video hardware */
+	MCFG_TI998_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9129, ti99_8_tms9118a_interface)
 
-	MCFG_GFXDECODE(ti99_8)
+	/* Main board */
+	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, 2684658.75 )
+	MCFG_MAPPER8_ADD( MAPPER_TAG, mapper_devices )
+	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
-	/* sound hardware */
+	/* Peripheral expansion box */
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+
+	/* Sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_TI_SOUND_ADD( TISOUND_TAG )
+
+	/* Cassette drives */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_TISPEECH_ADD("speech")
+	/* Console GROMs */
+	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
 
-	MCFG_TI998_BOARD_ADD( "ti_board" )
-	MCFG_MAPPER8_ADD( "mapper", mapper_devices )
+	/* Devices */
+	MCFG_TISPEECH8_ADD(SPEECH_TAG)
 
-	/* tms9901 */
-	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_ti99_8)
-
-	MCFG_CRUBUS_ADD( "crubus", cru_devices)
-
-	MCFG_GROM_ADD( "grom_0", 0, region_grom, 0x0000, 0x1800, console_ready )
-	MCFG_GROM_ADD( "grom_1", 1, region_grom, 0x2000, 0x1800, console_ready )
-	MCFG_GROM_ADD( "grom_2", 2, region_grom, 0x4000, 0x1800, console_ready )
-
-	MCFG_PBOX8_ADD( "peribox", console_extint, console_notconnected, console_ready )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
-
-	MCFG_TI99_GROMPORT_ADD( "gromport", console_ready )
-	MCFG_MECMOUSE_ADD( "mecmouse" )
+	/* Optional user controller */
+	MCFG_MECMOUSE_ADD( MECMOUSE_TAG, 50 )
 MACHINE_CONFIG_END
 
 /*
@@ -694,6 +915,12 @@ ROM_START(ti99_8)
 	ROM_REGION(0x10000, region_grom, 0)
 	ROM_LOAD("998grom.bin", 0x0000, 0x6000, CRC(c63806bc) SHA1(cbfa8b04b4aefbbd9a713c54267ad4dd179c13a3))	/* system GROMs */
 
+	/* Built-in RAM */
+	ROM_REGION(SRAM_SIZE, SRAM_TAG, 0)
+	ROM_FILL(0x0000, SRAM_SIZE, 0x00)
+
+	ROM_REGION(DRAM_SIZE, DRAM_TAG, 0)
+	ROM_FILL(0x0000, DRAM_SIZE, 0x00)
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8

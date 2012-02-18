@@ -1,19 +1,28 @@
-/*
+/****************************************************************************
+
     SNUG HSGPL card emulation.
-    Raphael Nabet, 2003.
 
-    Rewritten as device
-    Michael Zapf, October 2010
-*/
+    The HSGPL card is a card for the peripheral expansion box which simulates
+    16 banks of 64 KiB GROM space, using flash memory to keep data persistent.
 
-#include "emu.h"
-#include "emuopts.h"
-#include "peribox.h"
-#include "hsgpl.h"
-#include "machine/at29040a.h"
-#include "ti99defs.h"
+    Main usage:
+    - store cartridges in the card for quick selection
+    - replace the console GROMs, thus making it possible to patch or enhance the
+      console operating system
+    - provide necessary ROMs for the SGCPU (aka TI-99/4P)
 
-/*
+    (So for using the ti99_4p emulation, you MUST have a properly set up HSGPL
+    card. The best way to get this done is to prepare this card within the
+    ti99_4ev emulation, then copy the contents to the ti99_4p nvram directory.)
+
+    The card does not contain real GROM circuits, and accordingly, we do not
+    use the grom emulation. The logic on the board, mainly contained in the
+    MACH chip, simulates GROM behavior. With the possibility to upload data
+    into the simulated GROMs, we can also enjoy GRAM behavior, although real
+    GRAMs are not known to have become available ever.
+
+    Contents:
+
     Supports 16 banks of 8 GROMs (8kbytes each) with 16 associated banks of
     32kbytes (8kbytes*4) of module ROM, 2 banks of 8 GRAMs with 2 associated
     banks of 32 kbytes of RAM, and 512kbytes of DSR.  Roms are implemented with
@@ -41,8 +50,8 @@
     >F RAMENA  RAMENA  Enable RAM6000 instead of ROM6000 in banks 0 and 1
 
 
-    Direct access ports for all memory areas (the original manual gives
-    >9880->989C and >9C80->9C9C for ROM6000, but this is incorrect):
+    Direct access ports for all memory areas (the original manual says
+    >9880->989C and >9C80->9C9C for ROM6000, but this is clearly incorrect):
 
     Module bank Read    Write   Read ROM6000        Write ROM6000
                 GROM    GROM
@@ -90,80 +99,69 @@
     console will not start up at all. At least GROMs 0, 1, and 2 must remain
     active.
     The technical specifications are not clear enough at this point.
-*/
+
+    FIXME: Re-flashing the at29040 chips is only possible when they are deleted
+    before. The files must be removed from the nvram directory. May also be a bug
+    of the loader program DSRLDR3.
+
+    Raphael Nabet, 2003.
+
+    Michael Zapf
+    October 2010: Rewritten as device
+    February 2012: Rewritten as class
+
+*****************************************************************************/
+
+#include "hsgpl.h"
 
 #define CRU_BASE 0x1B00
 
+#define VERBOSE 1
+#define LOG logerror
+
 #define RAMSIZE 		0x020000
 #define GRAMSIZE		0x020000
-#define FEEPROM_SIZE	0x80000
-#define FLROMSIZE	4*(FEEPROM_SIZE+2) + 1
 
-#define NVVERSION 0
+#define DSR_EEPROM "u9_dsr"
+#define GROM_B_EEPROM "u4_grom"
+#define	GROM_A_EEPROM "u1_grom"
+#define ROM6_EEPROM "u6_rom6"
 
-typedef ti99_pebcard_config hsgpl_config;
-
-typedef struct _hsgpl_state
+snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI99_HSGPL, "SNUG High-speed GPL card", tag, owner, clock)
 {
-	device_t	*dsr, *rom6, *groma, *gromb;
-	UINT8	*ram6;
-	UINT8	*gram;
-	UINT8	*flashrom;
+	m_shortname = "ti99_hsgpl";
+}
 
-	int 	current_grom_port;
-
-	int		dsr_enabled;
-	int		gram_enabled;
-	int		bank_enabled;
-	int		dsr_page;
-	int		card_enabled;
-	int		write_enabled;
-	int		supercart_enabled;
-	int		led_on;
-	int		mbx_enabled;
-	int		ram_enabled;
-
-	int		flash_mode;
-
-	int		current_bank;
-
-	/* GROM emulation */
-	int		raddr_LSB, waddr_LSB;
-	int		grom_address;
-
-} hsgpl_state;
-
-INLINE hsgpl_state *get_safe_token(device_t *device)
+/*
+   Read hsgpl CRU interface. None here.
+*/
+void snug_high_speed_gpl_device::crureadz(offs_t offset, UINT8 *value)
 {
-	assert(device != NULL);
-	assert(device->type() == HSGPL);
-
-	return (hsgpl_state *)downcast<legacy_device_base *>(device)->token();
+	return;
 }
 
 /*
     Write hsgpl CRU interface
 */
-static WRITE8_DEVICE_HANDLER( cru_w )
+void snug_high_speed_gpl_device::cruwrite(offs_t offset, UINT8 data)
 {
-	hsgpl_state *card = get_safe_token(device);
-
 	if ((offset & 0xff00)==CRU_BASE)
 	{
 		int bit = (offset >> 1) & 0x0f;
 		switch (bit)
 		{
 		case 0:
-			card->dsr_enabled = data;
-			logerror("hsgpl: Set dsr_enabled=%x\n", data);
+			m_dsr_enabled = (data != 0);
+			if (VERBOSE>5) LOG("hsgpl: Set dsr_enabled=%x\n", data);
 			break;
 		case 1:
-			card->gram_enabled = data;
-			logerror("hsgpl: Set gram_enabled=%x\n", data);
+			m_gram_enabled = (data != 0);
+			if (VERBOSE>5) LOG("hsgpl: Set gram_enabled=%x\n", data);
 			break;
 		case 2:
-			card->bank_enabled = data;
-			logerror("hsgpl: Set bank_enabled=%x\n", data);
+			m_bank_enabled = (data != 0);
+			if (VERBOSE>5) LOG("hsgpl: Set bank_enabled=%x\n", data);
 			break;
 		case 3:
 		case 4:
@@ -172,124 +170,217 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		case 7:
 		case 8:
 			if (data)
-				card->dsr_page |= (1 << (bit-3));
+				m_dsr_page |= (1 << (bit-3));
 			else
-				card->dsr_page &= ~(1 << (bit-3));
-			logerror("hsgpl: Set dsr_page=%d\n", card->dsr_page);
+				m_dsr_page &= ~(1 << (bit-3));
+			if (VERBOSE>5) LOG("hsgpl: Set dsr_page=%d\n", m_dsr_page);
 			break;
 		case 9:
-			card->card_enabled = data;
-			logerror("hsgpl: Set card_enabled=%x\n", data);
+			m_card_enabled = data;
+			if (VERBOSE>5) LOG("hsgpl: Set card_enabled=%x\n", data);
 			break;
 		case 10:
-			card->write_enabled = data;
-			logerror("hsgpl: Set write_enabled=%x\n", data);
+			m_write_enabled = data;
+			if (VERBOSE>5) LOG("hsgpl: Set write_enabled=%x\n", data);
 			break;
 		case 11:
-			card->supercart_enabled = data;
-			logerror("hsgpl: Set supercart_enabled=%x\n", data);
+			m_supercart_enabled = data;
+			if (VERBOSE>5) LOG("hsgpl: Set supercart_enabled=%x\n", data);
 			break;
 		case 12:
-			card->led_on = data;
-			logerror("hsgpl: Set led_on=%x\n", data);
+			m_led_on = data;
+			if (VERBOSE>5) LOG("hsgpl: Set led_on=%x\n", data);
 			break;
 		case 13:
 			break;
 		case 14:
-			card->mbx_enabled = data;
-			logerror("hsgpl: Set mbx_enabled=%x\n", data);
+			m_mbx_enabled = data;
+			if (VERBOSE>5) LOG("hsgpl: Set mbx_enabled=%x\n", data);
 			break;
 		case 15:
-			card->ram_enabled = data;
-			logerror("hsgpl: Set ram_enabled=%x\n", data);
+			m_ram_enabled = data;
+			if (VERBOSE>5) LOG("hsgpl: Set ram_enabled=%x\n", data);
 			break;
 		}
 	}
 }
 
 /*
-    GROM read. This is somewhat different to the original TI GROMs, so we
-    partly reimplement it here. Anyway, the card does not use GROMs but makes
-    use of a special decoder chip (MACH) which emulates the GROM functions.
+    Memory read
 */
-static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
+READ8Z_MEMBER(snug_high_speed_gpl_device::readz)
+{
+	if ((offset & 0x7e000)==0x74000)
+	{
+		dsrspace_readz(space, offset & 0xffff, value, mem_mask);
+	}
+
+	if ((offset & 0x7e000)==0x76000)
+	{
+		cartspace_readz(space, offset & 0xffff, value, mem_mask);
+	}
+
+	// 1001 1wbb bbbb bba0
+	if ((offset & 0x7fc01)==0x79800)
+	{
+		grom_readz(space, offset & 0xffff, value, mem_mask);
+	}
+}
+
+/*
+    Memory write
+*/
+WRITE8_MEMBER(snug_high_speed_gpl_device::write)
+{
+	if ((offset & 0x7e000)==0x76000)
+	{
+		cartspace_write(space, offset & 0xffff, data, mem_mask);
+	}
+
+	// 1001 1wbb bbbb bba0
+	if ((offset & 0x7fc01)==0x79c00)
+	{
+		grom_write(space, offset & 0xffff, data, mem_mask);
+	}
+}
+
+/*
+    Specific read access: dsrspace
+*/
+void snug_high_speed_gpl_device::dsrspace_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask)
+{
+	if (m_dsr_enabled)
+	{
+		*value = m_dsr_eeprom->read(space, (offset & 0x1fff) | (m_dsr_page<<13), mem_mask);
+		if (VERBOSE>7) LOG("hsgpl: read dsr %04x[%02x] -> %02x\n", offset, m_dsr_page, *value);
+	}
+}
+
+/*
+    Specific read access: cartspace
+*/
+void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask)
+{
+	if (!m_card_enabled || m_flash_mode)
+	{
+		if (VERBOSE>6) LOG("hsgpl cart read ignored (enable=%02x)\n", m_card_enabled);
+		return;
+	}
+
+	if ((m_current_grom_port < 2) && (m_ram_enabled))
+	{
+		*value = m_ram6_memory[(offset & 0x1fff) | (m_current_bank<<13) | (m_current_grom_port<<15)];
+		if (VERBOSE>7) LOG("hsgpl cart ram read %04x -> %02x\n", offset, *value);
+		return;
+	}
+
+	if (m_current_grom_port < 16)
+	{
+		*value = m_rom6_eeprom->read(space, (offset & 0x1fff) | (m_current_bank<<13) | (m_current_grom_port<<15), mem_mask);
+		if (VERBOSE>7) LOG("hsgpl cart read %04x -> %02x\n", offset, *value);
+	}
+	else
+	{
+		if (m_current_grom_port==32 || m_current_grom_port==33)
+		{
+			*value = m_ram6_memory[(offset & 0x1fff) | (m_current_bank<<13) | ((m_current_grom_port-32)<<15)];
+		}
+		else
+		{
+			if (VERBOSE>1) LOG("unknown 0x6000 port\n");
+		}
+	}
+}
+
+/*
+    Specific read access: grom
+    Although we have a complete emulation of a GROM circuit, we need to re-implement
+    it here - which is indeed closer to reality, since the real HSGPL also
+    emulates GROM instead of using proper ones.
+*/
+void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset, UINT8* value, UINT8 mem_mask)
 {
 	int port;
-	hsgpl_state *card = get_safe_token(device);
 	//activedevice_adjust_icount(-4);
 
 	// 1001 10bb bbbb bba0
-	port = card->current_grom_port = (offset & 0x3fc) >> 2;
+	port = m_current_grom_port = (offset & 0x3fc) >> 2;
 
 	if (offset & 2)
 	{	// Read GPL address. This must be available even when the rest
 		// of the card is offline (card_enabled=0).
-		card->waddr_LSB = FALSE;
+		m_waddr_LSB = false;
 
-		if (card->raddr_LSB)
+		if (m_raddr_LSB)
 		{
-			*value = ((card->grom_address + 1) & 0xff);
-			card->raddr_LSB = FALSE;
+			*value = ((m_grom_address + 1) & 0xff);
+			m_raddr_LSB = false;
 		}
 		else
 		{
-			*value = ((card->grom_address + 1) >> 8) & 0xff;
-			card->raddr_LSB = TRUE;
+			*value = ((m_grom_address + 1) >> 8) & 0xff;
+			m_raddr_LSB = true;
 		}
 	}
 	else
 	{	/* read GPL data */
 		// It is not clear what effect a CRDENA=0 really has.
 		// At least GROMs 0-2 must remain visible, or the console will lock up.
-		if (card->card_enabled || card->grom_address < 0x6000)
+		if (m_card_enabled || m_grom_address < 0x6000)
 		{
-			if ((port < 2) && (card->gram_enabled))
+			if ((port < 2) && (m_gram_enabled))
 			{
-				*value = card->gram[card->grom_address + 0x10000*port];
+				*value = m_gram_memory[m_grom_address | (port<<16)];
 			}
 			else
 			{
 				if (port < 8)
 				{
-					if (!card->flash_mode)
+					if (!m_flash_mode)
 					{
-						*value = at29c040a_r(card->groma, card->grom_address + 0x10000*port);
+						*value = m_grom_a_eeprom->read(space, m_grom_address | (port<<16), mem_mask);
 					}
 				}
 				else
 				{
 					if (port < 16)
 					{
-						*value = at29c040a_r(card->gromb, card->grom_address + 0x10000*(port-8));
+						*value = m_grom_b_eeprom->read(space, m_grom_address | ((port-8)<<16), mem_mask);
 					}
 					else
 					{
 						if (port < 24)
 						{
-							*value = at29c040a_r(card->dsr, card->grom_address + 0x10000*(port-16));
+							// 9840-985c
+							// DSR banks 0-63 (8 KiB per bank, 8 banks per port)
+							*value = m_dsr_eeprom->read(space, m_grom_address | ((port-16)<<16), mem_mask);
 						}
 						else
 						{
 							if (port < 32)
 							{
-								/* The HSGPL manual says 32-47, but this is incorrect */
-								*value = at29c040a_r(card->rom6, card->grom_address + 0x10000*(port-24));
+								// 9860-987c (ports 24-31)
+								// Each ROM6 is available as 4 (sub)banks (switchable via 6000, 6002, 6004, 6006)
+								// Accordingly, each port has two complete sets
+								*value = m_rom6_eeprom->read(space, m_grom_address | ((port-24)<<16), mem_mask);
 							}
 							else
 							{
+								// 9880, 9884
 								if (port==32 || port==33)
 								{
-									*value = card->gram[card->grom_address + 0x10000*(port-32)];
+									*value = m_gram_memory[m_grom_address | ((port-32)<<16)];
 								}
 								else
 								{
 									if (port==48 || port==49)
 									{
-										*value = card->ram6[card->grom_address];
+//                                      *value = m_ram6_memory[m_grom_address];
+										*value = m_ram6_memory[m_grom_address | ((port-48)<<16)];
 									}
 									else
 									{
-										logerror("hsgpl: Attempt to read from undefined port 0x%0x; ignored.\n", port);
+										if (VERBOSE>2) LOG("hsgpl: Attempt to read from undefined port 0x%0x; ignored.\n", port);
 									}
 								}
 							}
@@ -300,195 +391,50 @@ static READ8Z_DEVICE_HANDLER ( hsgpl_grom_rz )
 		}
 		// The address auto-increment should be done even when the card is
 		// offline
-		card->grom_address++;
-		card->raddr_LSB = card->waddr_LSB = FALSE;
+		m_grom_address++;
+		m_raddr_LSB = m_waddr_LSB = false;
 	}
 }
 
 /*
-    GROM write
+    Specific write access: cartspace
 */
-static WRITE8_DEVICE_HANDLER ( hsgpl_grom_w )
+void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask)
 {
-	int port;
-	hsgpl_state *card = get_safe_token(device);
-
-	//activedevice_adjust_icount(-4);
-
-	// 1001 11bb bbbb bba0
-	port = card->current_grom_port = (offset & 0x3fc) >> 2;
-
-	if (offset & 2)
-	{	// Write GPL address. This must be available even when the rest
-		// of the card is offline (card_enabled=0).
-		card->raddr_LSB = FALSE;
-
-		if (card->waddr_LSB)
-		{
-			card->grom_address = (card->grom_address & 0xFF00) | data;
-			card->waddr_LSB = FALSE;
-		}
-		else
-		{
-			card->grom_address = (data << 8) | (card->grom_address & 0xFF);
-			card->waddr_LSB = TRUE;
-		}
-	}
-	else
+	if (m_card_enabled || m_flash_mode)
 	{
-		// It is not clear what effect a CRDENA=0 really has.
-		// At least GROMs 0-2 must remain visible, or the console will lock up.
-		if (card->card_enabled || card->grom_address < 0x6000)
-		{
-			/* write GPL data */
-			if (card->write_enabled)
-			{
-				if ((port < 2) && (card->gram_enabled))
-				{
-					card->gram[card->grom_address + 0x10000*port] = data;
-				}
-				else
-				{
-					if (port < 8)
-					{
-						at29c040a_w(card->groma, card->grom_address + 0x10000*port, data);
-					}
-					else
-					{
-						if (port < 16)
-						{
-							at29c040a_w(card->gromb, card->grom_address + 0x10000*(port-8), data);
-						}
-						else
-						{
-							if (port < 24)
-							{
-								at29c040a_w(card->dsr, card->grom_address + 0x10000*(port-16), data);
-							}
-							else
-							{
-								if (port < 32)
-								{
-									/* The HSGPL manual says 32-47, but this is incorrect */
-									at29c040a_w(card->rom6, card->grom_address + 0x10000*(port-24), data);
-								}
-								else
-								{
-									if (port==32 || port==33)
-									{
-										card->gram[card->grom_address + 0x10000*(port-32)] = data;
-									}
-									else
-									{
-										if (port==48 || port==49)
-										{
-											card->ram6[card->grom_address] = data;
-										}
-										else
-										{
-											logerror("hsgpl: Attempt to write to undefined port; ignored.\n");
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		// The address auto-increment should be done even when the card is
-		// offline
-		card->grom_address++;
-		card->raddr_LSB = card->waddr_LSB = FALSE;
-	}
-}
-
-static READ8Z_DEVICE_HANDLER ( hsgpl_dsrspace_rz )
-{
-	hsgpl_state *card = get_safe_token(device);
-	if (card->dsr_enabled)
-	{
-		*value = at29c040a_r(card->dsr, (offset & 0x1fff) + 0x2000 * card->dsr_page);
-//      logerror("hsgpl: read dsr %04x[%02x] -> %02x\n", offset, card->dsr_page, *value);
-	}
-}
-
-static READ8Z_DEVICE_HANDLER ( hsgpl_cartspace_rz )
-{
-	hsgpl_state *card = get_safe_token(device);
-
-	if (!card->card_enabled || card->flash_mode)
-	{
-//      logerror("hsgpl cart read ignored (enable=%02x)\n", card->card_enabled);
+		if (VERBOSE>2) LOG("hsgpl cart write ignored: card_enabled=%02x\n", m_card_enabled);
 		return;
 	}
 
-	int port = card->current_grom_port;
+	if (VERBOSE>7) LOG("hsgpl cart write %04x -> %02x\n", offset, data);
 
-	if ((port < 2) && (card->ram_enabled))
+	if (m_bank_enabled)
 	{
-		*value = card->ram6[(offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*port];
-//      logerror("hsgpl cart ram read %04x -> %02x\n", offset, *value);
-		return;
-	}
-
-	if (port < 16)
-	{
-		*value = at29c040a_r(card->rom6, (offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*port);
-//      logerror("hsgpl cart read %04x -> %02x\n", offset, *value);
-	}
-	else
-	{
-		if (port==32 || port==33)
-		{
-			*value = card->ram6[(offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*(port-32)];
-		}
-		else
-		{
-			logerror("unknown 0x6000 port\n");
-		}
-	}
-}
-
-static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
-{
-	hsgpl_state *card = get_safe_token(device);
-
-	if (!card->card_enabled || card->flash_mode)
-	{
-		logerror("hsgpl cart write ignored: card_enabled=%02x\n", card->card_enabled);
-		return;
-	}
-
-	int port = card->current_grom_port;
-//  logerror("hsgpl cart write %04x -> %02x\n", offset, data);
-
-	if (card->bank_enabled)
-	{
-		card->current_bank = (offset>>1) & 3;
-//      logerror("hsgpl cart select bank %02x\n", card->current_bank);
+		m_current_bank = (offset>>1) & 3;
+		if (VERBOSE>7) LOG("hsgpl cart select bank %02x\n", m_current_bank);
 		return;		/* right??? */
 	}
 
-	if ((card->mbx_enabled) && (offset==0x6ffe))
+	if ((m_mbx_enabled) && (offset==0x6ffe))
 	{	/* MBX: mapper at 0x6ffe */
-		card->current_bank = data & 0x03;
+		m_current_bank = data & 0x03;
 		return;
 	}
 
 	// MBX: RAM in 0x6c00-0x6ffd (it is unclear whether the MBX RAM area is
 	// enabled/disabled by the wriena bit).  I guess RAM is unpaged, but it is
 	// not implemented
-	if ((card->write_enabled) || ((card->mbx_enabled) && ((offset & 0xfc00)==0x6c00)))
+	if ((m_write_enabled) || ((m_mbx_enabled) && ((offset & 0xfc00)==0x6c00)))
 	{
-		if ((port < 2) && (card->ram_enabled))
+		if ((m_current_grom_port < 2) && (m_ram_enabled))
 		{
-			card->ram6[(offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*port ] = data;
+			m_ram6_memory[(offset & 0x1fff) | (m_current_bank<<13) | (m_current_grom_port<<15) ] = data;
 		}
 		else
 		{	// keep in mind that these lines are also reached for port < 2
 			// and !ram_enabled
-			if (port < 16)
+			if (m_current_grom_port < 16)
 			{
 			// feeprom is normally written to using GPL ports, and I don't know
 			// writing through >6000 page is enabled
@@ -499,13 +445,13 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
 			}
 			else
 			{
-				if (port==32 || port==33)
+				if (m_current_grom_port==32 || m_current_grom_port==33)
 				{
-					card->ram6[(offset & 0x1fff) + 0x2000*card->current_bank + 0x8000*(port-32)] = data;
+					m_ram6_memory[(offset & 0x1fff) | (m_current_bank<<13) | ((m_current_grom_port-32)<<15)] = data;
 				}
 				else
 				{
-					logerror("unknown 0x6000 port\n");
+					if (VERBOSE>1) LOG("unknown 0x6000 port\n");
 				}
 			}
 		}
@@ -513,209 +459,169 @@ static WRITE8_DEVICE_HANDLER ( hsgpl_cartspace_w )
 }
 
 /*
-    Memory read
+    Specific write access: grom_write
 */
-static READ8Z_DEVICE_HANDLER ( data_rz )
+void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask)
 {
-	if ((offset & 0x7e000)==0x74000)
-	{
-		hsgpl_dsrspace_rz(device, offset & 0xffff, value);
-	}
+	int port;
 
-	if ((offset & 0x7e000)==0x76000)
-	{
-		hsgpl_cartspace_rz(device, offset & 0xffff, value);
-	}
+	//activedevice_adjust_icount(-4);
 
-	// 1001 1wbb bbbb bba0
-	if ((offset & 0x7fc01)==0x79800)
-	{
-		hsgpl_grom_rz(device, offset & 0xffff, value);
-	}
-}
+	// 1001 11bb bbbb bba0
+	port = m_current_grom_port = (offset & 0x3fc) >> 2;
 
-/*
-    Memory write
-*/
-static WRITE8_DEVICE_HANDLER ( data_w )
-{
-	if ((offset & 0x7e000)==0x76000)
-	{
-		hsgpl_cartspace_w(device, offset & 0xffff, data);
-	}
+	if (offset & 2)
+	{	// Write GPL address. This must be available even when the rest
+		// of the card is offline (card_enabled=0).
+		m_raddr_LSB = false;
 
-	// 1001 1wbb bbbb bba0
-	if ((offset & 0x7fc01)==0x79c00)
-	{
-		hsgpl_grom_w(device, offset & 0xffff, data);
-	}
-}
-
-static const ti99_peb_card hsgpl_card =
-{
-	data_rz,
-	data_w,
-	NULL,
-	cru_w,
-	NULL, NULL,	NULL, NULL
-};
-
-static DEVICE_START( hsgpl )
-{
-	logerror("HSGPL start\n");
-	hsgpl_state *card = get_safe_token(device);
-	card->dsr = device->subdevice("u9_dsr");
-	card->rom6 = device->subdevice("u6_rom6");
-	card->groma = device->subdevice("u4_grom");
-	card->gromb = device->subdevice("u1_grom");
-
-	/* We need this for the NVRAM; at this point we cannot query the settings yet. */
-	card->flashrom = (UINT8*)malloc(FLROMSIZE);
-}
-
-static DEVICE_STOP( hsgpl )
-{
-	hsgpl_state *card = get_safe_token(device);
-	logerror("hsgpl: stop\n");
-	free(card->flashrom);
-	if (card->ram6)
-	{
-		free(card->ram6);
-		free(card->gram);
-	}
-}
-
-static DEVICE_RESET( hsgpl )
-{
-	logerror("hsgpl: reset\n");
-	hsgpl_state *card = get_safe_token(device);
-
-	/* If the card is selected in the menu, register the card */
-	if (input_port_read(device->machine(), "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH))
-	{
-		device_t *peb = device->owner();
-		int success = mount_card(peb, device, &hsgpl_card, get_pebcard_config(device)->slot);
-		if (!success)
+		if (m_waddr_LSB)
 		{
-			logerror("hsgpl: Failed to mount.\n");
-			return;
+			m_grom_address = (m_grom_address & 0xFF00) | data;
+			m_waddr_LSB = false;
 		}
-
-		card->grom_address = 0;
-		card->raddr_LSB = 0;
-		card->waddr_LSB = 0;
-		card->current_grom_port = 0;
-		card->current_bank = 0;
-
-		card->dsr_enabled = FALSE;
-		card->gram_enabled = FALSE;
-		card->bank_enabled = TRUE;		// important, assumed to be enabled by default
-		card->dsr_page = 0;
-		card->card_enabled = TRUE;		// important, assumed to be enabled by default
-		card->write_enabled = FALSE;
-		card->supercart_enabled = FALSE;
-		card->led_on = FALSE;
-		card->mbx_enabled = FALSE;
-		card->ram_enabled = FALSE;
-
-		card->flash_mode = (input_port_read(device->machine(), "EXTCARD") & EXT_HSGPL_FLASH);
-		if (card->flash_mode) logerror("hsgpl: flash mode\n");
-		else logerror("hsgpl: full mode\n");
-
-		if (card->ram6==NULL)
+		else
 		{
-			card->ram6 = (UINT8*)malloc(RAMSIZE);
-			card->gram = (UINT8*)malloc(GRAMSIZE);
+			m_grom_address = (data << 8) | (m_grom_address & 0xFF);
+			m_waddr_LSB = true;
 		}
 	}
+	else
+	{
+		// It is not clear what effect a CRDENA=0 really has.
+		// At least GROMs 0-2 must remain visible, or the console will lock up.
+		if (m_card_enabled || m_grom_address < 0x6000)
+		{
+			/* write GPL data */
+			if (m_write_enabled)
+			{
+				if ((port < 2) && (m_gram_enabled))
+				{
+					m_gram_memory[m_grom_address | (port<<16)] = data;
+				}
+				else
+				{
+					if (port < 8)
+					{
+						m_grom_a_eeprom->write(space, m_grom_address | (port<<16), data, mem_mask);
+					}
+					else
+					{
+						if (port < 16)
+						{
+							m_grom_b_eeprom->write(space, m_grom_address | ((port-8)<<16), data, mem_mask);
+						}
+						else
+						{
+							if (port < 24)
+							{
+								m_dsr_eeprom->write(space, m_grom_address | ((port-16)<<16), data, mem_mask);
+							}
+							else
+							{
+								if (port < 32)
+								{
+									m_rom6_eeprom->write(space, m_grom_address | ((port-24)<<16), data, mem_mask);
+								}
+								else
+								{
+									if (port==32 || port==33)
+									{
+										m_gram_memory[m_grom_address | ((port-32)<<16)] = data;
+									}
+									else
+									{
+										if (port==48 || port==49)
+										{
+//                                          m_ram6_memory[m_grom_address] = data;
+											m_ram6_memory[m_grom_address | ((port-48)<<16)] = data;
+										}
+										else
+										{
+											if (VERBOSE>1) LOG("hsgpl: Attempt to write to undefined port; ignored.\n");
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		// The address auto-increment should be done even when the card is
+		// offline
+		m_grom_address++;
+		m_raddr_LSB = m_waddr_LSB = false;
+	}
 }
-/*
-static DEVICE_NVRAM( hsgpl )
+
+
+void snug_high_speed_gpl_device::device_start()
 {
-    // Called between START and RESET
-    hsgpl_state *card = get_safe_token(device);
-    astring hsname(device->machine().system().name, PATH_SEPARATOR, "hsgpl.nv");
-    file_error filerr;
-
-    if (read_or_write==0)
-    {
-        logerror("hsgpl: device nvram load %s\n", hsname.cstr());
-
-        emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_READ);
-        filerr = nvfile.open(hsname.cstr());
-        if (filerr != FILERR_NONE)
-        {
-            logerror("hsgpl: Could not restore NVRAM\n");
-            return;
-        }
-
-        if (nvfile.read(card->flashrom, FLROMSIZE) != FLROMSIZE)
-        {
-            logerror("hsgpl: Error loading NVRAM; unexpected EOF\n");
-            return;
-        }
-
-        if (card->flashrom[0] != NVVERSION)
-        {
-            logerror("hsgpl: Wrong NVRAM image version: %d\n", card->flashrom[0]);
-            return;
-        }
-    }
-    else
-    {
-        logerror("hsgpl: device nvram save %s\n", hsname.cstr());
-        // Check dirty flags
-        if (at29c040a_is_dirty(card->dsr) ||
-            at29c040a_is_dirty(card->rom6) ||
-            at29c040a_is_dirty(card->groma) ||
-            at29c040a_is_dirty(card->gromb))
-        {
-            card->flashrom[0] = NVVERSION;
-
-            emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-            filerr = nvfile.open(hsname.cstr());
-            if (filerr != FILERR_NONE)
-            {
-                logerror("hsgpl: Could not save NVRAM\n");
-            }
-            else
-            {
-                if (nvfile.write(card->flashrom, FLROMSIZE) != FLROMSIZE)
-                {
-                    logerror("hsgpl: Error while saving contents of NVRAM.\n");
-                }
-            }
-            return;
-        }
-        else
-        {
-            logerror("hsgpl: No changes on card, leaving nvram file unchanged.\n");
-        }
-    }
+	m_ram6_memory = (UINT8*)malloc(RAMSIZE);
+	m_gram_memory = (UINT8*)malloc(GRAMSIZE);
 }
-*/
-/*
-    Get the pointer to the memory data from the HSGPL card. Called by the FEEPROM.
-*/
-static UINT8 *get_mem_ptr(device_t *device)
+
+void snug_high_speed_gpl_device::device_reset()
 {
-	hsgpl_state *card = get_safe_token(device);
-	return card->flashrom;
+	if (VERBOSE>5) LOG("hsgpl: reset\n");
+	m_dsr_enabled = false;
+	m_gram_enabled = false;
+	m_bank_enabled = true;	// important, assumed to be enabled by default (won't start up otherwise!)
+	m_dsr_page = 0;
+	m_card_enabled = true;	// important, assumed to be enabled by default
+	m_write_enabled = false;
+	m_supercart_enabled = false;
+	m_led_on = false;
+	m_mbx_enabled = false;
+	m_ram_enabled = false;
+	m_flash_mode = (input_port_read(*this, "HSGPLMODE")==0);
+
+	m_current_grom_port = 0;
+	m_current_bank = 0;
+
+	m_waddr_LSB = false;
+	m_raddr_LSB = false;
+	m_grom_address = 0;
 }
 
-MACHINE_CONFIG_FRAGMENT( hsgpl )
-	MCFG_AT29C040_ADD_P( "u9_dsr",  get_mem_ptr, 0x000001)
-	MCFG_AT29C040_ADD_P( "u4_grom", get_mem_ptr, 0x080003)
-	MCFG_AT29C040_ADD_P( "u1_grom", get_mem_ptr, 0x100005)
-	MCFG_AT29C040_ADD_P( "u6_rom6", get_mem_ptr, 0x180007)
+void snug_high_speed_gpl_device::device_config_complete(void)
+{
+	m_dsr_eeprom = subdevice<at29040a_device>(DSR_EEPROM);
+	m_rom6_eeprom = subdevice<at29040a_device>(ROM6_EEPROM);
+	m_grom_a_eeprom = subdevice<at29040a_device>(GROM_A_EEPROM);
+	m_grom_b_eeprom = subdevice<at29040a_device>(GROM_B_EEPROM);
+}
+
+void snug_high_speed_gpl_device::device_stop()
+{
+	free(m_ram6_memory);
+	free(m_gram_memory);
+}
+
+// Flash setting is used to flash an empty HSGPL DSR ROM
+INPUT_PORTS_START( ti99_hsgpl)
+	PORT_START( "HSGPLMODE" )
+	PORT_DIPNAME( 0x01, 0x01, "HSGPL mode" )
+		PORT_DIPSETTING(    0x00, "Flash" )
+		PORT_DIPSETTING(    0x01, "Normal" )
+INPUT_PORTS_END
+
+MACHINE_CONFIG_FRAGMENT( ti99_hsgpl )
+	MCFG_AT29040A_ADD( DSR_EEPROM )
+	MCFG_AT29040A_ADD( GROM_B_EEPROM )
+	MCFG_AT29040A_ADD( GROM_A_EEPROM )
+	MCFG_AT29040A_ADD( ROM6_EEPROM )
 MACHINE_CONFIG_END
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+machine_config_constructor snug_high_speed_gpl_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( ti99_hsgpl );
+}
 
-#define DEVTEMPLATE_ID(p,s)             p##hsgpl##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
-#define DEVTEMPLATE_NAME                "SNUG High-Speed GPL card"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
+ioport_constructor snug_high_speed_gpl_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ti99_hsgpl);
+}
 
-DEFINE_LEGACY_DEVICE( HSGPL, hsgpl );
+const device_type TI99_HSGPL = &device_creator<snug_high_speed_gpl_device>;

@@ -8,12 +8,14 @@
 
     Raphael Nabet 2003
 
-    Rewritten as device
-    Michael Zapf, September 2010
+    September 2010: Rewritten as device
+    February 2012: Rewritten as class
 */
 
-#include "emu.h"
 #include "at29040a.h"
+
+#define VERBOSE 2
+#define LOG logerror
 
 #define FEEPROM_SIZE        0x80000
 #define SECTOR_SIZE         0x00100
@@ -23,185 +25,154 @@
 #define SECTOR_ADDRESS_MASK 0x7ff00
 #define BYTE_ADDRESS_MASK   0x000ff
 
+#define PRG_TIMER 1
+
+#define VERSION 0
+
 /*
-    at29c40a state
-
-    Command states (s_cmd_0 is the initial state):
-    s_cmd_0: default state
-    s_cmd_1: state after writing aa to 5555
-    s_cmd_2: state after writing 55 to 2aaa
-
-    Programming states (s_programming_0 is the initial state):
-    s_programming_0: default state
-    s_programming_1: a program and enable/disable lock command  has been
-        executed, but programming has not actually started.
-    s_programming_2: the programming buffer is being written to
-    s_programming_3: the programming buffer is being burnt to flash ROM
+    Constructor.
 */
-enum  s_cmd_t
+at29040a_device::at29040a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: device_t(mconfig, AT29040A, "ATMEL 29040A 512K*8 FEEPROM", tag, owner, clock),
+  device_nvram_interface(mconfig, *this)
 {
-	s_cmd_0 = 0x0,
-	s_cmd_1 = 0x1,
-	s_cmd_2 = 0x2
-};
-
-enum  s_pgm_t
-{
-	s_pgm_0 = 0x0,
-	s_pgm_1 = 0x1,
-	s_pgm_2 = 0x2,
-	s_pgm_3 = 0x3
-};
-
-
-typedef struct _at29c040a_state
-{
-	UINT8		*memptr;
-
-	int 		s_lower_bbl;		/* set when lower boot block lockout is enabled */
-	int 		s_higher_bbl;		/* set when upper boot block lockout is enabled */
-	int 		s_sdp;				/* set when in software data protect mode */
-
-	int 		s_id_mode;			/* set when in chip id mode */
-	s_cmd_t		s_cmd;				/* command state */
-	int 		s_enabling_bbl;		/* set when a boot block lockout command is expecting its parameter */
-	int 		s_cmd_0x80_flag;	/* set if 0x80 command has just been executed (some command require this prefix) */
-	s_pgm_t 	s_pgm;				/* programming state */
-	int 		s_enabling_sdb;		/* set when a sdp enable command is in progress */
-	int 		s_disabling_sdb;	/* set when a sdp disable command is in progress */
-	int 		s_dirty;			/* set when the memory contents should be set */
-	UINT8		toggle_bit;
-	UINT8		programming_buffer[SECTOR_SIZE];
-	int 		programming_last_offset;
-	emu_timer	*programming_timer;
-} at29c040a_state;
-
-INLINE at29c040a_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == AT29C040A);
-
-	return (at29c040a_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const at29c040a_config *get_config(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == AT29C040A);
+//-------------------------------------------------
+//  nvram_default - called to initialize NVRAM to
+//  its default state
+//-------------------------------------------------
 
-	return (const at29c040a_config *) downcast<const legacy_device_base *>(device)->inline_config();
+void at29040a_device::nvram_default()
+{
+	memset(m_eememory, 0, FEEPROM_SIZE+2);
+}
+
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
+
+void at29040a_device::nvram_read(emu_file &file)
+{
+	file.read(m_eememory, FEEPROM_SIZE+2);
+}
+
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+void at29040a_device::nvram_write(emu_file &file)
+{
+	m_eememory[0] = VERSION;
+	file.write(m_eememory, FEEPROM_SIZE+2);
 }
 
 /*
     programming timer callback
 */
-static TIMER_CALLBACK(at29c040a_programming_timer_callback)
+void at29040a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	device_t *device = (device_t *)ptr;
-	at29c040a_state *feeprom = get_safe_token(device);
-
-	switch (feeprom->s_pgm)
+	switch (m_pgm)
 	{
-	case s_pgm_1:
+	case PGM_1:
 		/* programming cycle timeout */
-		feeprom->s_pgm = s_pgm_0;
+		if (VERBOSE>7) LOG("at29040a: Programming cycle timeout\n");
+		m_pgm = PGM_0;
 		break;
 
-	case s_pgm_2:
+	case PGM_2:
 		/* programming cycle start */
-		feeprom->s_pgm = s_pgm_3;
+		if (VERBOSE>7) LOG("at29040a: Sector write start\n");
+		m_pgm = PGM_3;
 		/* max delay 10ms, typical delay 5 to 7 ms */
-		feeprom->programming_timer->adjust(attotime::from_msec(5));
+		m_programming_timer->adjust(attotime::from_msec(5));
 		break;
 
-	case s_pgm_3:
+	case PGM_3:
 		/* programming cycle end */
-		memcpy(feeprom->memptr + 2 + (feeprom->programming_last_offset & ~0xff), feeprom->programming_buffer, SECTOR_SIZE);
+		memcpy(m_eememory + 2 + (m_programming_last_offset & ~0xff), m_programming_buffer, SECTOR_SIZE);
+		if (VERBOSE>7) LOG("at29040a: Sector write completed at location %04x + 2\n", (m_programming_last_offset & ~0xff));
+		if (m_enabling_sdb)
+		{
+			m_sdp = true;
+		}
+		if (m_disabling_sdb)
+		{
+			m_sdp = false;
+		}
+		if (VERBOSE>7) LOG("at29040a: Software data protection = %d\n", m_sdp);
 
-		if (feeprom->s_enabling_sdb)
-			feeprom->s_sdp = TRUE;
+		m_pgm = PGM_0;
+		m_enabling_sdb = false;
+		m_disabling_sdb = false;
 
-		if (feeprom->s_disabling_sdb)
-			feeprom->s_sdp = FALSE;
-
-		feeprom->s_pgm = s_pgm_0;
-		feeprom->s_enabling_sdb = FALSE;
-		feeprom->s_disabling_sdb = FALSE;
-
-		feeprom->s_dirty = TRUE;
 		break;
 
 	default:
-		logerror("internal error in %s %d\n", __FILE__, __LINE__);
+		if (VERBOSE>1) LOG("internal error in %s %d\n", __FILE__, __LINE__);
 		break;
 	}
 }
 
-int at29c040a_is_dirty(device_t *device)
+void at29040a_device::sync_flags()
 {
-	at29c040a_state *feeprom = get_safe_token(device);
-	return feeprom->s_dirty;
-}
+	if (m_lower_bbl) m_eememory[1] |= 0x04;
+	else m_eememory[1] &= ~0x04;
 
-static void sync_flags(device_t *device)
-{
-	at29c040a_state *feeprom = get_safe_token(device);
-	if (feeprom->s_lower_bbl) feeprom->memptr[1] |= 0x04;
-	else feeprom->memptr[1] &= ~0x04;
+	if (m_higher_bbl) m_eememory[1] |= 0x02;
+	else m_eememory[1] &= ~0x02;
 
-	if (feeprom->s_higher_bbl) feeprom->memptr[1] |= 0x02;
-	else feeprom->memptr[1] &= ~0x02;
-
-	if (feeprom->s_sdp) feeprom->memptr[1] |= 0x01;
-	else feeprom->memptr[1] &= ~0x01;
+	if (m_sdp) m_eememory[1] |= 0x01;
+	else m_eememory[1] &= ~0x01;
 }
 
 /*
     read a byte from FEEPROM
 */
-READ8_DEVICE_HANDLER( at29c040a_r )
+READ8_MEMBER( at29040a_device::read )
 {
-	at29c040a_state *feeprom = get_safe_token(device);
 	int reply;
 
 	offset &= ADDRESS_MASK;
 
 	/* reading in the midst of any command sequence cancels it (right???) */
-	feeprom->s_cmd = s_cmd_0;
-	feeprom->s_cmd_0x80_flag = FALSE;
-	feeprom->s_higher_bbl = TRUE;
-	sync_flags(device);
+	m_cmd = CMD_0;
+	m_long_sequence = false;
+	// m_higher_bbl = true;         // who says that?
+
+	sync_flags();
 
 	/* reading before the start of a programming cycle cancels it (right???) */
-	if (feeprom->s_pgm == s_pgm_1)
+	if (m_pgm == PGM_1)
 	{
-		// attempty to access a locked out boot block: cancel programming
+		// attempt to access a locked out boot block: cancel programming
 		// command if necessary
-		feeprom->s_pgm = s_pgm_0;
-		feeprom->s_enabling_sdb = FALSE;
-		feeprom->s_disabling_sdb = FALSE;
-		feeprom->programming_timer->adjust(attotime::never);
+		m_pgm = PGM_0;
+		m_enabling_sdb = false;
+		m_disabling_sdb = false;
+		m_programming_timer->adjust(attotime::never);
 	}
 
-
-	if (feeprom->s_id_mode)
+	if (m_id_mode)
 	{
 		switch (offset)
 		{
-		case 0:
-			reply = 0x1f;
+		case 0x00000:
+			reply = 0x1f;		// Manufacturer code
 			break;
 
-		case 1:
-			reply = 0xa4;
+		case 0x00001:
+			reply = 0xa4;		// Device code
 			break;
 
-		case 2:
-			reply = feeprom->s_lower_bbl ? 0xff : 0xfe;
+		case 0x00002:
+			reply = m_lower_bbl? 0xff : 0xfe;
 			break;
 
 		case 0x7fff2:
-			reply = feeprom->s_higher_bbl ? 0xff : 0xfe;
+			reply = m_higher_bbl? 0xff : 0xfe;
 			break;
 
 		default:
@@ -209,227 +180,265 @@ READ8_DEVICE_HANDLER( at29c040a_r )
 			break;
 		}
 	}
-	else if ((feeprom->s_pgm == s_pgm_2) || (feeprom->s_pgm == s_pgm_3))
+	else if ((m_pgm == PGM_2) || (m_pgm == PGM_3))
 	{
-		if (feeprom->s_pgm == s_pgm_2)
-		{	/* data polling starts the programming cycle (right???) */
-			feeprom->s_pgm = s_pgm_3;
+		if (m_pgm == PGM_2)
+		{	// DATA* polling starts the programming cycle (right???)
+			m_pgm = PGM_3;
 			/* max delay 10ms, typical delay 5 to 7 ms */
-			feeprom->programming_timer->adjust(attotime::from_msec(5));
+			m_programming_timer->adjust(attotime::from_msec(5));
 		}
 
-		reply = feeprom->toggle_bit;
-		feeprom->toggle_bit ^= 0x02;
-		if ((offset == feeprom->programming_last_offset) && (! (feeprom->programming_buffer[feeprom->programming_last_offset & 0xff] & 0x01)))
+		reply = m_toggle_bit? 0x02 : 0x00;
+		m_toggle_bit = !m_toggle_bit;
+
+		if ((offset == m_programming_last_offset) && (! (m_programming_buffer[m_programming_last_offset & 0xff] & 0x01)))
 			reply |= 0x01;
 	}
 	else
-		reply = feeprom->memptr[offset+2];
+		reply = m_eememory[offset+2];
+
+	if (VERBOSE>7) LOG("at29040a: %05x -> %02x\n", offset, reply);
+
 	return reply;
 }
 
 /*
     Write a byte to FEEPROM
 */
-WRITE8_DEVICE_HANDLER( at29c040a_w )
+WRITE8_MEMBER( at29040a_device::write )
 {
-	at29c040a_state *feeprom = get_safe_token(device);
-
 	offset &= ADDRESS_MASK;
+	if (VERBOSE>7) LOG("at29040a: %05x <- %02x\n", offset, data);
 
 	/* The special CFI commands assume a smaller address space according */
 	/* to the specification ("address format A14-A0") */
 	offs_t cfi_offset = offset & 0x7fff;
 
-	if (feeprom->s_enabling_bbl)
+	if (m_enabling_bbl)
 	{
-		feeprom->s_enabling_bbl = FALSE;
+		if (VERBOSE>7) LOG("at29040a: Enabling boot block lockout\n");
+		m_enabling_bbl = false;
 
 		if ((offset == 0x00000) && (data == 0x00))
 		{
-			feeprom->s_lower_bbl = TRUE;
-			feeprom->s_dirty = TRUE;
-			sync_flags(device);
+			if (VERBOSE>7) LOG("at29040a: Enabling lower boot block lockout\n");
+			m_lower_bbl = true;
+			sync_flags();
 			return;
 		}
-		else if ((offset == 0x7ffff) && (data == 0xff))
+		else
 		{
-			feeprom->s_higher_bbl = TRUE;
-			feeprom->s_dirty = TRUE;
-			sync_flags(device);
-			return;
+			if ((offset == 0x7ffff) && (data == 0xff))
+			{
+				if (VERBOSE>7) LOG("at29040a: Enabling higher boot block lockout\n");
+				m_higher_bbl = true;
+				sync_flags();
+				return;
+			}
+			else
+			{
+				if (VERBOSE>1) LOG("at29040a: Invalid boot block specification: %05x/%02x\n", offset, data);
+			}
 		}
 	}
 
-	switch (feeprom->s_cmd)
+	switch (m_cmd)
 	{
-	case s_cmd_0:
+	case CMD_0:
 		if ((cfi_offset == 0x5555) && (data == 0xaa))
-			feeprom->s_cmd = s_cmd_1;
+		{
+			if (VERBOSE>7) LOG("at29040a: Command sequence started\n");
+			m_cmd = CMD_1;
+		}
 		else
 		{
-			feeprom->s_cmd = s_cmd_0;
-			feeprom->s_cmd_0x80_flag = FALSE;
+			m_cmd = CMD_0;
+			m_long_sequence = false;
 		}
 		break;
 
-	case s_cmd_1:
+	case CMD_1:
 		if ((cfi_offset == 0x2aaa) && (data == 0x55))
-			feeprom->s_cmd = s_cmd_2;
+		{
+			m_cmd = CMD_2;
+		}
 		else
 		{
-			feeprom->s_cmd = s_cmd_0;
-			feeprom->s_cmd_0x80_flag = FALSE;
+			m_cmd = CMD_0;
+			m_long_sequence = false;
+			if (VERBOSE>7) LOG("at29040a: Command sequence aborted\n");
 		}
 		break;
 
-	case s_cmd_2:
+	case CMD_2:
 		if (cfi_offset == 0x5555)
 		{
-			/* exit programming mode */
-			feeprom->s_pgm = s_pgm_0;
-			feeprom->s_enabling_sdb = FALSE;
-			feeprom->s_disabling_sdb = FALSE;
-			feeprom->programming_timer->adjust(attotime::never);
+			if (!m_long_sequence)
+				if (VERBOSE>7) LOG("at29040a: Command sequence completed\n");
+
+			m_pgm = PGM_0;
+			m_enabling_sdb = false;
+			m_disabling_sdb = false;
+			m_programming_timer->adjust(attotime::never);
 
 			/* process command */
 			switch (data)
 			{
 			case 0x10:
 				/*  Software chip erase */
-				if (feeprom->s_cmd_0x80_flag)
+				if (m_long_sequence)
 				{
-					if (feeprom->s_lower_bbl || feeprom->s_higher_bbl)
-						logerror("If the boot block lockout feature has been enabled, the 6-byte software chip erase algorithm will not function.\n");
+					if (m_lower_bbl || m_higher_bbl)
+					{
+						if (VERBOSE>1) LOG("at29040a: Chip erase sequence deactivated due to previous boot block lockout.\n");
+					}
 					else
 					{
-						memset(feeprom->memptr+2, 0xff, 524288);
-						feeprom->s_dirty = TRUE;
+						if (VERBOSE>7) LOG("at29040a: Erase chip\n");
+						memset(m_eememory+2, 0xff, FEEPROM_SIZE);
 					}
 				}
 				break;
 
 			case 0x20:
 				/* Software data protection disable */
-				if (feeprom->s_cmd_0x80_flag)
+				if (VERBOSE>7) LOG("at29040a: Software data protection disable\n");
+				// The complete sequence is aa-55-80-aa-55-20
+				// so we need a 80 before, else the sequence is invalid
+				if (m_long_sequence)
 				{
-					feeprom->s_pgm = s_pgm_1;
-					feeprom->s_disabling_sdb = TRUE;
+					m_pgm = PGM_1;
+					m_disabling_sdb = true;
 					/* set command timeout (right???) */
-					//feeprom->programming_timer->adjust(attotime::from_usec(150), id, 0.);
+					//m_programming_timer->adjust(attotime::from_usec(150), id, 0.);
 				}
 				break;
 
 			case 0x40:
 				/* Boot block lockout enable */
-				if (feeprom->s_cmd_0x80_flag)
-					feeprom->s_enabling_bbl = TRUE;
+				// Complete sequence is aa-55-80-aa-55-40
+				if (VERBOSE>7) LOG("at29040a: Boot block lockout enable\n");
+				if (m_long_sequence) m_enabling_bbl = true;
+				break;
+
+			case 0x80:
+				m_long_sequence = true;
 				break;
 
 			case 0x90:
 				/* Software product identification entry */
-				feeprom->s_id_mode = TRUE;
+				if (VERBOSE>7) LOG("at29040a: Identification mode (start)\n");
+				m_id_mode = true;
 				break;
 
 			case 0xa0:
 				/* Software data protection enable */
-				feeprom->s_pgm = s_pgm_1;
-				feeprom->s_enabling_sdb = TRUE;
+				if (VERBOSE>7) LOG("at29040a: Software data protection enable\n");
+				m_pgm = PGM_1;
+				m_enabling_sdb = true;
 				/* set command timeout (right???) */
-				//feeprom->programming_timer->adjust(attotime::from_usec(150), id, 0.);
+				//m_programming_timer->adjust(attotime::from_usec(150), id, 0.);
 				break;
 
 			case 0xf0:
 				/* Software product identification exit */
-				feeprom->s_id_mode = FALSE;
+				if (VERBOSE>7) LOG("at29040a: Identification mode (end)\n");
+				m_id_mode = false;
 				break;
 			}
-			feeprom->s_cmd = s_cmd_0;
-			feeprom->s_cmd_0x80_flag = FALSE;
-			if (data == 0x80)
-				feeprom->s_cmd_0x80_flag = TRUE;
+			m_cmd = CMD_0;
+			if (data != 0x80) m_long_sequence = false;
 
 			/* return, because we don't want to write the EEPROM with the command byte */
 			return;
 		}
 		else
 		{
-			feeprom->s_cmd = s_cmd_0;
-			feeprom->s_cmd_0x80_flag = FALSE;
+			m_cmd = CMD_0;
+			m_long_sequence = false;
 		}
 	}
-	if ((feeprom->s_pgm == s_pgm_2)
-			&& ((offset & ~0xff) != (feeprom->programming_last_offset & ~0xff)))
+	if ((m_pgm == PGM_2)
+			&& ((offset & ~0xff) != (m_programming_last_offset & ~0xff)))
 	{
 		/* cancel current programming cycle */
-		feeprom->s_pgm = s_pgm_0;
-		feeprom->s_enabling_sdb = FALSE;
-		feeprom->s_disabling_sdb = FALSE;
-		feeprom->programming_timer->adjust(attotime::never);
+		if (VERBOSE>7) LOG("at29040a: invalid sector change (from %05x to %05x); cancel programming cycle\n",(offset & ~0xff), (m_programming_last_offset & ~0xff));
+		m_pgm = PGM_0;
+		m_enabling_sdb = false;
+		m_disabling_sdb = false;
+		m_programming_timer->adjust(attotime::never);
 	}
 
-	if (((feeprom->s_pgm == s_pgm_0) && !feeprom->s_sdp)
-			|| (feeprom->s_pgm == s_pgm_1))
+	if (((m_pgm == PGM_0) && !m_sdp)  // write directly
+		|| (m_pgm == PGM_1))		  // write after unlocking
 	{
-		if (((offset < BOOT_BLOCK_SIZE) && feeprom->s_lower_bbl)
-			|| ((offset >= FEEPROM_SIZE-BOOT_BLOCK_SIZE) && feeprom->s_higher_bbl))
+		if (((offset < BOOT_BLOCK_SIZE) && m_lower_bbl)
+			|| ((offset >= FEEPROM_SIZE-BOOT_BLOCK_SIZE) && m_higher_bbl))
 		{
-			// attempty to access a locked out boot block: cancel programming
+			// attempt to access a locked out boot block: cancel programming
 			// command if necessary
-			feeprom->s_pgm = s_pgm_0;
-			feeprom->s_enabling_sdb = FALSE;
-			feeprom->s_disabling_sdb = FALSE;
+			if (VERBOSE>7) LOG("at29040a: attempt to access a locked out boot block: offset = %05x, lowblock=%d, highblock=%d\n", offset, m_lower_bbl, m_higher_bbl);
+
+			m_pgm = PGM_0;
+			m_enabling_sdb = false;
+			m_disabling_sdb = false;
 		}
 		else
 		{	/* enter programming mode */
-			memset(feeprom->programming_buffer, 0xff, SECTOR_SIZE);
-			feeprom->s_pgm = s_pgm_2;
+			if (VERBOSE>7) LOG("at29040a: enter programming mode (m_pgm=%d)\n", m_pgm);
+			memset(m_programming_buffer, 0xff, SECTOR_SIZE);
+			m_pgm = PGM_2;
 		}
 	}
-	if (feeprom->s_pgm == s_pgm_2)
+	if (m_pgm == PGM_2)
 	{
 		/* write data to programming buffer */
-		feeprom->programming_buffer[offset & 0xff] = data;
-		feeprom->programming_last_offset = offset;
-		feeprom->programming_timer->adjust(attotime::from_usec(150));
+		if (VERBOSE>7) LOG("at29040a: Write data to programming buffer\n");
+		m_programming_buffer[offset & 0xff] = data;
+		m_programming_last_offset = offset;
+		m_programming_timer->adjust(attotime::from_usec(150));	// next byte must be written before the timer expires
 	}
 }
 
-static DEVICE_START( at29c040a )
+void at29040a_device::device_start(void)
 {
-	at29c040a_state *feeprom = get_safe_token(device);
-	feeprom->programming_timer = device->machine().scheduler().timer_alloc(FUNC(at29c040a_programming_timer_callback), (void *)device);
+	m_programming_buffer = (UINT8*)malloc(SECTOR_SIZE);
+	m_programming_timer = timer_alloc(PRG_TIMER);
+
+	m_eememory = (UINT8*)malloc(FEEPROM_SIZE+2);
 }
 
-static DEVICE_STOP( at29c040a )
+void at29040a_device::device_stop(void)
 {
-
+	free(m_programming_buffer);
+	free(m_eememory);
 }
 
-static DEVICE_RESET( at29c040a )
+void at29040a_device::device_reset(void)
 {
-	at29c040a_state *feeprom = get_safe_token(device);
-	const at29c040a_config* atconf = (const at29c040a_config*)get_config(device);
-	feeprom->memptr = (*atconf->get_memory)(device->owner()) + atconf->offset;
-
-	if (feeprom->memptr[0] != 0)
+	if (m_eememory[0] != VERSION)
 	{
-		logerror("AT29040A: Version mismatch; expected 0 but found %x for %s\n", feeprom->memptr[0], device->tag());
-		return;
+		if (VERBOSE>1) LOG("AT29040A: Warning: Version mismatch; expected %d but found %d for %s. Resetting.\n", VERSION, m_eememory[0], tag());
+		m_eememory[0] = 0;
+		m_eememory[1] = 0;
 	}
 
-	feeprom->s_lower_bbl = (feeprom->memptr[1] >> 2) & 1;
-	feeprom->s_higher_bbl = (feeprom->memptr[1] >> 1) & 1;
-	feeprom->s_sdp = feeprom->memptr[1] & 1;
-	feeprom->s_dirty = FALSE;
+	m_lower_bbl =	((m_eememory[1] & 0x04)!=0);
+	m_higher_bbl =	((m_eememory[1] & 0x02)!=0);
+	m_sdp = 		((m_eememory[1] & 0x01)!=0);
+
+	if (VERBOSE>7) LOG("at29040a (%s): LowerBBL = %d, HigherBBL = %d, SoftDataProt = %d\n", tag(), m_lower_bbl, m_higher_bbl, m_sdp);
+
+	m_id_mode = false;
+	m_cmd = CMD_0;
+	m_enabling_bbl = false;
+	m_long_sequence = false;
+	m_pgm = PGM_0;
+	m_enabling_sdb = false;
+	m_disabling_sdb = false;
+	m_toggle_bit = false;
+	m_programming_last_offset = 0;
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)             p##at29c040a##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME                "ATMEL 29c040a"
-#define DEVTEMPLATE_FAMILY              "Flash Memory"
-#include "devtempl.h"
-
-DEFINE_LEGACY_DEVICE( AT29C040A, at29c040a );
+const device_type AT29040A = &device_creator<at29040a_device>;

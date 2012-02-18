@@ -1,5 +1,5 @@
 /*
-    HDC9224 and HDC9234 Hard and Floppy Disk Controller (HFDC)
+    HDC9224 and HDC9234 Hard and Floppy Disk Controller
 
     This controller handles MFM and FM encoded floppy disks and hard disks.
     The SMC9224 is used in some DEC systems.  The HDC9234 is used in the
@@ -16,11 +16,6 @@
 */
 
 #include "emu.h"
-#include "formats/imageutl.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/harddriv.h"
-#include "harddisk.h"
-
 #include "smc92x4.h"
 
 /***************************************************************************
@@ -134,71 +129,21 @@
 
 #define MAX_SECTOR_LEN 256
 
-#define FORMAT_LONG FALSE
+#define FORMAT_LONG false
 
 #define ERROR	0
 #define DONE	1
 #define AGAIN	2
 #define UNDEF	3
 
-typedef struct _smc92x4_state
+enum
 {
-	devcb_resolved_write_line	out_intrq_func;		/* INT line */
-	devcb_resolved_write_line	out_dip_func;		/* DMA in progress line */
-	devcb_resolved_write8		out_auxbus_func;	/* AB0-7 lines (using S0,S1 as address) */
-	devcb_resolved_read_line	in_auxbus_func;		/* AB0-7 lines (only single case) */
-
-	UINT8 output1;		/* UDC-internal register "output1" */
-	UINT8 output2;		/* UDC-internal register "output2" */
-
-	int	selected_drive_type;
-	// We need to store the types, although this is not the case in the
-	// real hardware. The reason is that poll_drives wants to select the
-	// drives without knowing their kinds. In reality this does not matter,
-	// since we only check for the seek_complete line, but in our case,
-	// floppy and harddrive are pretty different, and we need to know which
-	// one to check.
-	int	types[4];
-	int	head_load_delay_enable;
-	int	register_pointer;
-
-	UINT8 register_r[12];
-	UINT8 register_w[12];
-
-	/* timers to delay execution/completion of commands */
-	emu_timer *timer_data, *timer_rs, *timer_ws, *timer_seek, *timer_track;
-
-	/* Flag which determines whether to use realistic timing. */
-	int use_real_timing;
-
-	/* Required to store the current iteration within restore. */
-	int seek_count;
-
-	/* Recent command. */
-	UINT8 command;
-
-	/* Stores the step direction. */
-	int step_direction;
-
-	/* Stores the buffered flag. */
-	int buffered;
-
-	/* Stores the recent id field. */
-	chrn_id_hd recent_id;
-
-	/* Indicates whether an ID has been found. */
-	int found_id;
-
-	/* Indicates whether we are already past the seek_id phase in read/write sector. */
-	int after_seek;
-
-	/* Determines whether the command will be continued. */
-	int to_be_continued;
-
-	/* Pointer to interface */
-	const smc92x4_interface *intf;
-
-} smc92x4_state;
+	DATA_TIMER,
+	READ_TIMER,
+	WRITE_TIMER,
+	SEEK_TIMER,
+	TRACK_TIMER
+};
 
 /*
     Step rates in microseconds for MFM. This is set in the mode register,
@@ -242,48 +187,23 @@ enum
 #define VERBOSE 1
 #define LOG logerror
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-static void smc92x4_process_after_callback(device_t *device);
-static void data_transfer_read(device_t *device, chrn_id_hd id, int transfer_enable);
-static void data_transfer_write(device_t *device, chrn_id_hd id, int deldata, int redcur, int precomp, int write_long);
-
-#if 0
-static void dump_contents(UINT8 *buffer, int length)
+smc92x4_device::smc92x4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: device_t(mconfig, SMC92X4, "SMC 9224/9234 Hard/Floppy Disk Controller", tag, owner, clock)
 {
-	for (int i=0; i < length; i+=16)
-	{
-		for (int j=0; j < 16; j+=2)
-		{
-			printf("%02x%02x ", buffer[i+j], buffer[i+j+1]);
-		}
-		printf("\n");
-	}
-}
-#endif
-
-INLINE smc92x4_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	return (smc92x4_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-
-static int image_is_single_density(device_t *current_floppy)
+int smc92x4_device::image_is_single_density()
 {
-	floppy_image_legacy *image = flopimg_get_image(current_floppy);
+	floppy_image_legacy *image = flopimg_get_image(m_drive);
 	return (floppy_get_track_size(image, 0, 0)<4000);
 }
 
-static int controller_set_to_single_density(device_t *device)
+bool smc92x4_device::in_single_density_mode()
 {
-	smc92x4_state *w = get_safe_token(device);
-	return ((w->register_w[MODE]&MO_DENSITY)!=0);
+	return ((m_register_w[MODE]&MO_DENSITY)!=0);
 }
 
-static void copyid(chrn_id id1, chrn_id_hd *id2)
+void smc92x4_device::copyid(chrn_id id1, chrn_id_hd *id2)
 {
 	id2->C = id1.C & 0xff;
 	id2->H = id1.H;
@@ -296,92 +216,75 @@ static void copyid(chrn_id id1, chrn_id_hd *id2)
 /*
     Set IRQ
 */
-static void smc92x4_set_interrupt(device_t *device)
+void smc92x4_device::set_interrupt()
 {
-	smc92x4_state *w = get_safe_token(device);
-	if ((w->register_r[INT_STATUS] & ST_INTPEND) == 0)
+	if ((m_register_r[INT_STATUS] & ST_INTPEND) == 0)
 	{
-		w->register_r[INT_STATUS] |= ST_INTPEND;
-		w->out_intrq_func(ASSERT_LINE);
+		m_register_r[INT_STATUS] |= ST_INTPEND;
+		m_out_intrq(ASSERT_LINE);
 	}
-}
-
-/*
-    Set DMA in progress
-*/
-static void smc92x4_set_dip(device_t *device, int value)
-{
-	smc92x4_state *w = get_safe_token(device);
-	w->out_dip_func(value);
 }
 
 /*
     Assert Command Done status bit, triggering interrupts as needed
 */
-static void set_command_done(device_t *device, int flags)
+void smc92x4_device::set_command_done(int flags)
 {
-	//assert(! (w->status & ST_DONE))
-	smc92x4_state *w = get_safe_token(device);
-	if (VERBOSE>7) LOG("smc92x4 command %02x done, flags=%02x\n", w->command, flags);
+	//assert(! (m_status & ST_DONE))
+	if (VERBOSE>7) LOG("smc92x4 command %02x done, flags=%02x\n", m_command, flags);
 
-	w->register_r[INT_STATUS] |= ST_DONE;
-	w->register_r[INT_STATUS] &= ~ST_TERMCOD; /* clear the previously set flags */
-	w->register_r[INT_STATUS] |= flags;
+	m_register_r[INT_STATUS] |= ST_DONE;
+	m_register_r[INT_STATUS] &= ~ST_TERMCOD; /* clear the previously set flags */
+	m_register_r[INT_STATUS] |= flags;
 
 	/* sm92x4 spec, p. 6 */
-	if (w->register_w[INT_COMM_TERM] & TC_INTDONE)
-		smc92x4_set_interrupt(device);
+	if (m_register_w[INT_COMM_TERM] & TC_INTDONE)
+		set_interrupt();
 }
 
 /*
     Preserve previously set termination code
 */
-static void set_command_done(device_t *device)
+void smc92x4_device::set_command_done()
 {
-	//assert(! (w->status & ST_DONE))
-	smc92x4_state *w = get_safe_token(device);
-	if (VERBOSE>7) LOG("smc92x4 command %02x done\n", w->command);
+	//assert(! (m_status & ST_DONE))
+	if (VERBOSE>7) LOG("smc92x4 command %02x done\n", m_command);
 
-	w->register_r[INT_STATUS] |= ST_DONE;
+	m_register_r[INT_STATUS] |= ST_DONE;
 
 	/* sm92x4 spec, p. 6 */
-	if (w->register_w[INT_COMM_TERM] & TC_INTDONE)
-		smc92x4_set_interrupt(device);
+	if (m_register_w[INT_COMM_TERM] & TC_INTDONE)
+		set_interrupt();
 }
 
 /*
     Clear IRQ
 */
-static void smc92x4_clear_interrupt(device_t *device)
+void smc92x4_device::clear_interrupt()
 {
-	smc92x4_state *w = get_safe_token(device);
-	if ((w->register_r[INT_STATUS] & ST_INTPEND) != 0)
-	{
-		w->out_intrq_func(CLEAR_LINE);
-	}
+	if ((m_register_r[INT_STATUS] & ST_INTPEND) != 0)
+		m_out_intrq(CLEAR_LINE);
 }
 
 /*
     Sets the DMA address on the external counter. This counter is attached
     to the auxiliary bus on the PCB.
 */
-static void set_dma_address(device_t *device, int pos2316, int pos1508, int pos0700)
+void smc92x4_device::set_dma_address(int pos2316, int pos1508, int pos0700)
 {
-	smc92x4_state *w = get_safe_token(device);
-	w->out_auxbus_func(OUTPUT_DMA_ADDR, w->register_r[pos2316]);
-	w->out_auxbus_func(OUTPUT_DMA_ADDR, w->register_r[pos1508]);
-	w->out_auxbus_func(OUTPUT_DMA_ADDR, w->register_r[pos0700]);
+	m_out_auxbus(OUTPUT_DMA_ADDR, m_register_r[pos2316]);
+	m_out_auxbus(OUTPUT_DMA_ADDR, m_register_r[pos1508]);
+	m_out_auxbus(OUTPUT_DMA_ADDR, m_register_r[pos0700]);
 }
 
-static void dma_add_offset(device_t *device, int offset)
+void smc92x4_device::dma_add_offset(int offset)
 {
-	smc92x4_state *w = get_safe_token(device);
-	int dma_address = (w->register_w[DMA23_16]<<16) + (w->register_w[DMA15_8]<<8) + w->register_w[DMA7_0];
+	int dma_address = (m_register_w[DMA23_16]<<16) + (m_register_w[DMA15_8]<<8) + m_register_w[DMA7_0];
 	dma_address += offset;
 
-	w->register_w[DMA23_16] = w->register_r[DMA23_16] = (dma_address & 0xff0000)>>16;
-	w->register_w[DMA15_8]  = w->register_r[DMA15_8]  = (dma_address & 0x00ff00)>>8;
-	w->register_w[DMA7_0]   = w->register_r[DMA7_0]   = (dma_address & 0x0000ff);
+	m_register_w[DMA23_16] = m_register_r[DMA23_16] = (dma_address & 0xff0000)>>16;
+	m_register_w[DMA15_8]  = m_register_r[DMA15_8]  = (dma_address & 0x00ff00)>>8;
+	m_register_w[DMA7_0]   = m_register_r[DMA7_0]   = (dma_address & 0x0000ff);
 }
 
 /*
@@ -390,19 +293,17 @@ static void dma_add_offset(device_t *device, int offset)
     both the hard and floppy drives during S0=S1=0 and STB*=0 times via the
     auxiliary bus.
 */
-static void sync_status_in(device_t *device)
+void smc92x4_device::sync_status_in()
 {
 	UINT8 prev;
-	smc92x4_state *w = get_safe_token(device);
-
-	prev = w->register_r[DRIVE_STATUS];
-	w->register_r[DRIVE_STATUS] = w->in_auxbus_func();
+	prev = m_register_r[DRIVE_STATUS];
+	m_register_r[DRIVE_STATUS] = m_in_auxbus(0);
 
 	/* Raise interrupt if ready changes. TODO: Check this more closely. */
-	if (((w->register_r[DRIVE_STATUS] & DS_READY) != (prev & DS_READY))
-		& (w->register_r[INT_STATUS] & ST_RDYCHNG))
+	if (((m_register_r[DRIVE_STATUS] & DS_READY) != (prev & DS_READY))
+		& (m_register_r[INT_STATUS] & ST_RDYCHNG))
 	{
-		smc92x4_set_interrupt(device);
+		set_interrupt();
 	}
 }
 
@@ -410,13 +311,11 @@ static void sync_status_in(device_t *device)
     Push the output registers over the auxiliary bus. It is expected that
     the PCB contains latches to store the values.
 */
-static void sync_latches_out(device_t *device)
+void smc92x4_device::sync_latches_out()
 {
-	smc92x4_state *w = get_safe_token(device);
-	w->output1 = (w->output1 & 0xf0) | (w->register_w[RETRY_COUNT]&0x0f);
-
-	w->out_auxbus_func(OUTPUT_OUTPUT1, w->output1);
-	w->out_auxbus_func(OUTPUT_OUTPUT2, w->output2);
+	m_output1 = (m_output1 & 0xf0) | (m_register_w[RETRY_COUNT]&0x0f);
+	m_out_auxbus(OUTPUT_OUTPUT1, m_output1);
+	m_out_auxbus(OUTPUT_OUTPUT2, m_output2);
 }
 
 /*************************************************************
@@ -424,95 +323,90 @@ static void sync_latches_out(device_t *device)
 *************************************************************/
 #if 0
 /* setup a timed data request - data request will be triggered in a few usecs time */
-static void smc92x4_timed_data_request(device_t *device)
+void smc92x4_device::timed_data_request()
 {
-	smc92x4_state *w = get_safe_token(device);
-	int time = controller_set_to_single_density(device)? 128 : 32;
+	int time = in_single_density_mode()? 128 : 32;
 
-	if (!w->use_real_timing)
+	if (!m_use_real_timing)
 		time = 1;
 
 	/* set new timer */
-	w->timer_data->adjust(attotime::from_usec(time));
+	m_timer_data->adjust(attotime::from_usec(time));
 }
 #endif
 
 /* setup a timed read sector - read sector will be triggered in a few usecs time */
-static void smc92x4_timed_sector_read_request(device_t *device)
+void smc92x4_device::timed_sector_read_request()
 {
-	smc92x4_state *w = get_safe_token(device);
 	int time=0;
 
-	/* set new timer */
-	/* Average time from sector to sector. */
-	if (w->selected_drive_type & TYPE_FLOPPY)
-		time = (controller_set_to_single_density(device))? 30000 : 15000;
+	// set new timer
+	// Average time from sector to sector.
+	if (m_selected_drive_type & TYPE_FLOPPY)
+		time = (in_single_density_mode())? 30000 : 15000;
 	else
 		time = 1000;
 
-	if (!w->use_real_timing)
+	if (!m_use_real_timing)
 		time = 1;
 
-	w->timer_rs->adjust(attotime::from_usec(time));
-	w->to_be_continued = TRUE;
+	m_timer_rs->adjust(attotime::from_usec(time));
+	m_to_be_continued = true;
 }
 
 /* setup a timed write sector - write sector will be triggered in a few usecs time */
-static void smc92x4_timed_sector_write_request(device_t *device)
+void smc92x4_device::timed_sector_write_request()
 {
-	smc92x4_state *w = get_safe_token(device);
 	int time=0;
 
 	/* Average time from sector to sector. */
-	if (w->selected_drive_type & TYPE_FLOPPY)
-		time = (controller_set_to_single_density(device))? 30000 : 15000;
+	if (m_selected_drive_type & TYPE_FLOPPY)
+		time = (in_single_density_mode())? 30000 : 15000;
 	else
 		time = 1000;
 
-	if (!w->use_real_timing)
+	if (!m_use_real_timing)
 		time = 1;
 
-	w->timer_ws->adjust(attotime::from_usec(time));
-	w->to_be_continued = TRUE;
+	m_timer_ws->adjust(attotime::from_usec(time));
+	m_to_be_continued = true;
 }
 
 /*
     Set up a timed track read/write
 */
-static void smc92x4_timed_track_request(device_t *device)
+void smc92x4_device::timed_track_request()
 {
-	smc92x4_state *w = get_safe_token(device);
 	int time = 0;
 
-	if (w->selected_drive_type & TYPE_FLOPPY)
+	if (m_selected_drive_type & TYPE_FLOPPY)
 		time = TRACKTIME_FLOPPY;
 	else
 		time = TRACKTIME_HD;
 
-	if (!w->use_real_timing)
+	if (!m_use_real_timing)
 		time = 1;
 
-	w->timer_track->adjust(attotime::from_usec(time));
+	m_timer_track->adjust(attotime::from_usec(time));
 
-	w->to_be_continued = TRUE;
+	m_to_be_continued = true;
 }
 
 /*
     Set up a timed track seek
 */
-static void smc92x4_timed_seek_request(device_t *device)
+void smc92x4_device::timed_seek_request()
 {
-	smc92x4_state *w = get_safe_token(device);
 	int time = 0;
 
-	int index = w->register_w[MODE] & MO_STEPRATE;
-	int fm = controller_set_to_single_density(device);
+	int index = m_register_w[MODE] & MO_STEPRATE;
+	int fm = in_single_density_mode();
 
 	/* Get seek time. */
-	if ((w->selected_drive_type & DRIVE_TYPE) == TYPE_FLOPPY8)
+	if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_FLOPPY8)
 		time = step_flop8[index];
 
-	else if ((w->selected_drive_type & DRIVE_TYPE) == TYPE_FLOPPY5)
+	else if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_FLOPPY5)
 		time = step_flop5[index];
 	else
 		time = step_hd[index];
@@ -520,99 +414,82 @@ static void smc92x4_timed_seek_request(device_t *device)
 	if (fm)
 		time = time * 2;
 
-	if (!w->use_real_timing)
+	if (!m_use_real_timing)
 	{
 		if (VERBOSE>5) LOG("smc92x4 info: Disk access without delays\n");
 		time = 1;
 	}
-
-	w->timer_seek->adjust(attotime::from_usec(time));
-	w->to_be_continued = TRUE;
+	m_timer_seek->adjust(attotime::from_usec(time));
+	m_to_be_continued = true;
 }
 
-#if 0
-static TIMER_CALLBACK(smc92x4_data_callback)
+void smc92x4_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-/*  device_t *device = (device_t *)ptr;
-    smc92x4_state *w = get_safe_token(device); */
-}
-#endif
+	int transfer_enabled;
+	int deldata;
+	int redcur;
+	int precomp;
+	int write_long;
+	mfm_harddisk_device *harddisk;
 
-static TIMER_CALLBACK(smc92x4_read_sector_callback)
-{
-	device_t *device = (device_t *)ptr;
-	smc92x4_state *w = get_safe_token(device);
-	int transfer_enabled = w->command & 0x01;
-
-	/* Now read the sector. */
-	data_transfer_read(device, w->recent_id, transfer_enabled);
-	sync_status_in(device);
-	smc92x4_process_after_callback(device);
-}
-
-static TIMER_CALLBACK(smc92x4_write_sector_callback)
-{
-	device_t *device = (device_t *)ptr;
-	smc92x4_state *w = get_safe_token(device);
-	int deldata = w->command & 0x10;
-	int redcur =  w->command & 0x08;
-	int precomp = w->command & 0x07;
-	int write_long = ((w->register_w[MODE]& MO_CRCECC)==0x40);
-
-	if (deldata)
-		if (VERBOSE>0) LOG("smc92x4 warn: Write deleted data mark not supported. Writing normal mark.\n");
-
-	/* Now write the sector. */
-	data_transfer_write(device, w->recent_id, deldata, redcur, precomp, write_long);
-	sync_status_in(device);
-	smc92x4_process_after_callback(device);
-}
-
-/*
-    Callback for track access. Nothing interesting here, just used for
-    delaying.
-*/
-static TIMER_CALLBACK(smc92x4_track_callback)
-{
-	device_t *device = (device_t *)ptr;
-	sync_status_in(device);
-	smc92x4_process_after_callback(device);
-}
-
-/*
-    Callback for seek request.
-*/
-static TIMER_CALLBACK(smc92x4_seek_callback)
-{
-	device_t *device = (device_t *)ptr;
-	smc92x4_state *w = get_safe_token(device);
-	device_t *current_floppy = NULL;
-/*  int buffered = ((w->register_w[MODE] & MO_STEPRATE)==0); */
-/*  int buffered = (w->command & 0x01); */
-
-	if (w->selected_drive_type & TYPE_FLOPPY)
+	switch (id)
 	{
-		current_floppy = (*w->intf->current_floppy)(device);
-		if (current_floppy==NULL)
+	case DATA_TIMER:
+		// Not implemented yet
+		break;
+	case READ_TIMER:
+		transfer_enabled = m_command & 0x01;
+		// Now read the sector.
+		data_transfer_read(m_recent_id, transfer_enabled);
+		sync_status_in();
+		break;
+	case WRITE_TIMER:
+		deldata = m_command & 0x10;
+		redcur =  m_command & 0x08;
+		precomp = m_command & 0x07;
+		write_long = ((m_register_w[MODE]& MO_CRCECC)==0x40);
+
+		if (deldata)
+			if (VERBOSE>0) LOG("smc92x4 warn: Write deleted data mark not supported. Writing normal mark.\n");
+
+		// Now write the sector.
+		data_transfer_write(m_recent_id, deldata, redcur, precomp, write_long);
+		sync_status_in();
+		break;
+	case SEEK_TIMER:
+		// Callback for seek request.
+		/*  int buffered = ((m_register_w[MODE] & MO_STEPRATE)==0); */
+		/*  int buffered = (m_command & 0x01); */
+
+		if (m_selected_drive_type & TYPE_FLOPPY)
 		{
-			if (VERBOSE>0) LOG("smc92x4 error: seek callback: no floppy\n");
-			w->register_r[INT_STATUS] |= ST_TC_SEEKERR;
+			if (m_drive==NULL)
+			{
+				if (VERBOSE>0) LOG("smc92x4 error: seek callback: no floppy\n");
+				m_register_r[INT_STATUS] |= ST_TC_SEEKERR;
+			}
+			else
+			{
+				if (VERBOSE>5) LOG("smc92x4 step %s direction %d\n", m_drive->tag(), m_step_direction);
+				floppy_drive_seek(m_drive, m_step_direction);
+			}
 		}
 		else
 		{
-			if (VERBOSE>5) LOG("smc92x4 step %s direction %d\n", current_floppy->tag(), w->step_direction);
-			floppy_drive_seek(current_floppy, w->step_direction);
+			if (VERBOSE>6) LOG("smc92x4 step harddisk direction %d\n", m_step_direction);
+			harddisk = static_cast<mfm_harddisk_device *>(m_drive);
+			harddisk->seek(m_step_direction);
 		}
+		sync_status_in();
+		break;
+	case TRACK_TIMER:
+		// Callback for track access. Nothing interesting here, just used for
+		// delaying.
+		break;
 	}
-	else
-	{
-		if (VERBOSE>6) LOG("smc92x4 step harddisk direction %d\n", w->step_direction);
-		(*w->intf->mfmhd_seek)(device, w->step_direction);
-	}
-	sync_status_in(device);
-
-	smc92x4_process_after_callback(device);
+	process_after_callback();
 }
+
 
 /*********************************************************************
     Common functions
@@ -623,7 +500,7 @@ static TIMER_CALLBACK(smc92x4_seek_callback)
     define idents beyond cylinder 1023, but formatting programs seem to
     continue with 0xfd for cylinders between 1024 and 2047.
 */
-UINT8 cylinder_to_ident(int cylinder)
+UINT8 smc92x4_device::cylinder_to_ident(int cylinder)
 {
 	if (cylinder < 256) return 0xfe;
 	if (cylinder < 512) return 0xff;
@@ -636,7 +513,7 @@ UINT8 cylinder_to_ident(int cylinder)
     Calculate the offset from the ident. This is only useful for AT drives;
     these drives cannot have more than 1024 cylinders.
 */
-static int ident_to_cylinder(UINT8 ident)
+int smc92x4_device::ident_to_cylinder(UINT8 ident)
 {
 	switch (ident)
 	{
@@ -651,111 +528,110 @@ static int ident_to_cylinder(UINT8 ident)
 /*
     Common function to set the read registers from the recently read id.
 */
-static void update_id_regs(device_t *device, chrn_id_hd id)
+void smc92x4_device::update_id_regs(chrn_id_hd id)
 {
 	// Flags for current head register. Note that the sizes are not in
 	// sequence (128, 256, 512, 1024). This is only interesting for AT
 	// mode.
 	static const UINT8 sizeflag[] = { 0x60, 0x00, 0x20, 0x40 };
-	smc92x4_state *w = get_safe_token(device);
 
-	w->register_r[CURRENT_CYLINDER] = id.C & 0xff;
-
-	w->register_r[CURRENT_HEAD] = id.H & 0x0f;
+	m_register_r[CURRENT_CYLINDER] = id.C & 0xff;
+	m_register_r[CURRENT_HEAD] = id.H & 0x0f;
 
 	if (id.flags & BAD_SECTOR)
-		w->register_r[CURRENT_HEAD] |= 0x80;
+		m_register_r[CURRENT_HEAD] |= 0x80;
 
-	if ((w->selected_drive_type & DRIVE_TYPE) == TYPE_AT)
-		w->register_r[CURRENT_HEAD] |= sizeflag[id.N];
+	if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_AT)
+		m_register_r[CURRENT_HEAD] |= sizeflag[id.N];
 	else
-		w->register_r[CURRENT_HEAD] |= ((id.C & 0x700)>>4);
+		m_register_r[CURRENT_HEAD] |= ((id.C & 0x700)>>4);
 
-	w->register_r[CURRENT_IDENT] = cylinder_to_ident(id.C);
+	m_register_r[CURRENT_IDENT] = cylinder_to_ident(id.C);
 }
 
 /*
     Common procedure: read_id_field (as described in the specification)
 */
-static void read_id_field(device_t *device, int *steps, int *direction, chrn_id_hd *id)
+void smc92x4_device::read_id_field(int *steps, int *direction, chrn_id_hd *id)
 {
-	smc92x4_state *w = get_safe_token(device);
 	int des_cylinder, cur_cylinder;
-	int found = FALSE;
-	sync_latches_out(device);
-	sync_status_in(device);
+	bool found = false;
+	mfm_harddisk_device *harddisk;
+
+	sync_latches_out();
+	sync_status_in();
 
 	// Set command termination code. The error code is set first, and
 	// on success, it is cleared.
-	w->register_r[INT_STATUS] |= ST_TC_RDIDERR;
+	m_register_r[INT_STATUS] |= ST_TC_RDIDERR;
 
 	/* Try to find an ID field. */
-	if (w->selected_drive_type & TYPE_FLOPPY)
+	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
 		chrn_id idflop;
-		device_t *disk_img = (*w->intf->current_floppy)(device);
-		if (flopimg_get_image(disk_img) == NULL)
+		if (flopimg_get_image(m_drive) == NULL)
 		{
 			if (VERBOSE>2) LOG("smc92x4 warn: No disk in drive\n");
-			w->register_r[CHIP_STATUS] |= CS_SYNCERR;
+			m_register_r[CHIP_STATUS] |= CS_SYNCERR;
 			return;
 		}
 
 		/* Check whether image and controller are set to the same density. */
-		if ((image_is_single_density(disk_img) && controller_set_to_single_density(device))
-			|| (!image_is_single_density(disk_img) && !controller_set_to_single_density(device))
-			)
+		if ((image_is_single_density() && in_single_density_mode())
+			|| (!image_is_single_density() && !in_single_density_mode()))
 		{
-			found = floppy_drive_get_next_id(disk_img, w->register_w[DESIRED_HEAD]&0x0f, &idflop);
+			found = floppy_drive_get_next_id(m_drive, m_register_w[DESIRED_HEAD]&0x0f, &idflop);
 			copyid(idflop, id); /* Need to use bigger values for HD, but we don't use separate variables here */
 		}
 		else
 		{
 			if (VERBOSE>2) LOG("smc92x4 warn: Controller and medium density do not match.\n");
 		}
-		sync_status_in(device);
+		sync_status_in();
 
 		if (!found)
 		{
 			if (VERBOSE>1) LOG("smc92x4 error: read_id_field (floppy): sync error\n");
-			w->register_r[CHIP_STATUS] |= CS_SYNCERR;
+			m_register_r[CHIP_STATUS] |= CS_SYNCERR;
 			return;
 		}
 	}
 	else
 	{
-		(*w->intf->mfmhd_get_next_id)(device, w->register_w[DESIRED_HEAD]&0x0f, id);
-		sync_status_in(device);
-		if (!(w->register_r[DRIVE_STATUS]& DS_READY))
+		harddisk = static_cast<mfm_harddisk_device *>(m_drive);
+
+		harddisk->get_next_id(m_register_w[DESIRED_HEAD]&0x0f, id);
+		sync_status_in();
+		if (!(m_register_r[DRIVE_STATUS]& DS_READY))
 		{
 			if (VERBOSE>1) LOG("smc92x4 error: read_id_field (harddisk): sync error\n");
-			w->register_r[CHIP_STATUS] |= CS_SYNCERR;
+			m_register_r[CHIP_STATUS] |= CS_SYNCERR;
 			return;
 		}
 	}
 
-	w->register_r[CHIP_STATUS] &= ~CS_SYNCERR;
+	m_register_r[CHIP_STATUS] &= ~CS_SYNCERR;
 
 	/* Update the registers. */
-	update_id_regs(device, *id);
+	update_id_regs(*id);
 
 	if (id->flags & BAD_CRC)
 	{
-		w->register_r[CHIP_STATUS] |= CS_CRCERR;
+		m_register_r[CHIP_STATUS] |= CS_CRCERR;
 		return;
 	}
 
 	/* Calculate the steps. */
-	if ((w->selected_drive_type & DRIVE_TYPE) == TYPE_AT)
+	if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_AT)
 	{
 		/* Note: the spec says CURRENT_REGISTER, but that seems wrong. */
-		des_cylinder = ((w->register_r[DATA] & 0x03)<<8) | w->register_w[DESIRED_CYLINDER];
-		cur_cylinder = ident_to_cylinder(w->register_r[CURRENT_IDENT]) + w->register_r[CURRENT_CYLINDER];
+		des_cylinder = ((m_register_r[DATA] & 0x03)<<8) | m_register_w[DESIRED_CYLINDER];
+		cur_cylinder = ident_to_cylinder(m_register_r[CURRENT_IDENT]) + m_register_r[CURRENT_CYLINDER];
 	}
 	else
 	{
-		des_cylinder = ((w->register_w[DESIRED_HEAD] & 0x70)<<4) | w->register_w[DESIRED_CYLINDER];
-		cur_cylinder = ((w->register_r[CURRENT_HEAD] & 0x70)<<4) | w->register_r[CURRENT_CYLINDER];
+		des_cylinder = ((m_register_w[DESIRED_HEAD] & 0x70)<<4) | m_register_w[DESIRED_CYLINDER];
+		cur_cylinder = ((m_register_r[CURRENT_HEAD] & 0x70)<<4) | m_register_r[CURRENT_CYLINDER];
 	}
 
 	if (des_cylinder >= cur_cylinder)
@@ -771,210 +647,202 @@ static void read_id_field(device_t *device, int *steps, int *direction, chrn_id_
 
 	if (VERBOSE>6) LOG("smc92x4 seek required: %d steps\n", *steps);
 
-	w->register_r[INT_STATUS] &= ~ST_TC_RDIDERR;
-	return;
+	m_register_r[INT_STATUS] &= ~ST_TC_RDIDERR;
 }
 
 /*
     Common procedure: verify (as described in the specification)
 */
-static int verify(device_t *device, chrn_id_hd *id, int check_sector)
+int smc92x4_device::verify(chrn_id_hd *id, bool check_sector)
 {
-	smc92x4_state *w = get_safe_token(device);
 	int maxtry = 132;  /* approx. 33792/(256*32) */
 	int pass = 0;
-	int found = FALSE;
-	int foundsect = FALSE;
+	int found = false;
+	int foundsect = false;
 	int des_cylinder = 0;
+	mfm_harddisk_device *harddisk;
 
 	// Set command termination code. The error code is set first, and
 	// on success, it is cleared.
-	w->register_r[INT_STATUS] |= ST_TC_SEEKERR;
+	m_register_r[INT_STATUS] |= ST_TC_SEEKERR;
 
 	while (pass < maxtry && !foundsect)
 	{
 		pass++;
 		/* Try to find an ID field. */
-		if (w->selected_drive_type & TYPE_FLOPPY)
+		if (m_selected_drive_type & TYPE_FLOPPY)
 		{
 			chrn_id idflop;
-			device_t *disk_img = (*w->intf->current_floppy)(device);
-			found = floppy_drive_get_next_id(disk_img, w->register_w[DESIRED_HEAD]&0x0f, &idflop);
+			found = floppy_drive_get_next_id(m_drive, m_register_w[DESIRED_HEAD]&0x0f, &idflop);
 			copyid(idflop, id);
 			if (/* pass==1 && */!found)
 			{
-				w->register_r[CHIP_STATUS] |= CS_SYNCERR;
+				m_register_r[CHIP_STATUS] |= CS_SYNCERR;
 				if (VERBOSE>1) LOG("smc92x4 error: verify (floppy): sync error\n");
 				return ERROR;
 			}
 		}
 		else
 		{
-			(*w->intf->mfmhd_get_next_id)(device, w->register_w[DESIRED_HEAD]&0x0f, id);
-			sync_status_in(device);
-			if (!(w->register_r[DRIVE_STATUS]& DS_READY))
+			harddisk = static_cast<mfm_harddisk_device *>(m_drive);
+			harddisk->get_next_id(m_register_w[DESIRED_HEAD]&0x0f, id);
+			sync_status_in();
+			if (!(m_register_r[DRIVE_STATUS]& DS_READY))
 			{
 				if (VERBOSE>1) LOG("smc92x4 error: verify (harddisk): sync error\n");
-				w->register_r[CHIP_STATUS] |= CS_SYNCERR;
+				m_register_r[CHIP_STATUS] |= CS_SYNCERR;
 				return ERROR;
 			}
 		}
 
-		w->register_r[CHIP_STATUS] &= ~CS_SYNCERR;
+		m_register_r[CHIP_STATUS] &= ~CS_SYNCERR;
 
 		/* Compare with the desired sector ID. */
-		if ((w->selected_drive_type & DRIVE_TYPE) == TYPE_AT)
+		if ((m_selected_drive_type & DRIVE_TYPE) == TYPE_AT)
 		{
 			/* Note: the spec says CURRENT_CYLINDER, but that seems wrong. */
-			des_cylinder = ((w->register_r[DATA] & 0x03)<<8) | w->register_w[DESIRED_CYLINDER];
+			des_cylinder = ((m_register_r[DATA] & 0x03)<<8) | m_register_w[DESIRED_CYLINDER];
 		}
 		else
 		{
-			des_cylinder = ((w->register_w[DESIRED_HEAD] & 0x70)<<4) | w->register_w[DESIRED_CYLINDER];
+			des_cylinder = ((m_register_w[DESIRED_HEAD] & 0x70)<<4) | m_register_w[DESIRED_CYLINDER];
 		}
-		if (VERBOSE>6) LOG("smc92x4 check id: current = (%d,%d,%d), required = (%d,%d,%d)\n", id->C, id->H, id->R, des_cylinder, w->register_w[DESIRED_HEAD] & 0x0f, w->register_w[DESIRED_SECTOR]);
+		if (VERBOSE>6) LOG("smc92x4 check id: current = (%d,%d,%d), required = (%d,%d,%d)\n", id->C, id->H, id->R, des_cylinder, m_register_w[DESIRED_HEAD] & 0x0f, m_register_w[DESIRED_SECTOR]);
 		if ((des_cylinder == id->C)
-			&& ((w->register_w[DESIRED_HEAD] & 0x0f) == id->H))
+			&& ((m_register_w[DESIRED_HEAD] & 0x0f) == id->H))
 		{
-			if (!check_sector ||  (w->register_w[DESIRED_SECTOR] == id->R))
-				foundsect = TRUE;
+			if (!check_sector ||  (m_register_w[DESIRED_SECTOR] == id->R))
+				foundsect = true;
 		}
 	}
 	if (!foundsect)
 	{
-		w->register_r[CHIP_STATUS] |= CS_COMPERR;
-		if (VERBOSE>1) LOG("smc92x4 error: verify: sector not found, seek error (desired cyl=%d/sec=%d, current cyl=%d/sec=%d)\n", des_cylinder, w->register_w[DESIRED_SECTOR], id->C, id->R);
+		m_register_r[CHIP_STATUS] |= CS_COMPERR;
+		if (VERBOSE>1) LOG("smc92x4 error: verify: sector not found, seek error (desired cyl=%d/sec=%d, current cyl=%d/sec=%d)\n", des_cylinder, m_register_w[DESIRED_SECTOR], id->C, id->R);
 		return ERROR;
 	}
 
-	w->register_r[INT_STATUS] &= ~ST_TC_SEEKERR;
+	m_register_r[INT_STATUS] &= ~ST_TC_SEEKERR;
 	return DONE;
 }
 
 /*
     Common procedure: data_transfer(read) (as described in the specification)
 */
-static void data_transfer_read(device_t *device, chrn_id_hd id, int transfer_enable)
+void smc92x4_device::data_transfer_read(chrn_id_hd id, int transfer_enable)
 {
 	int i, retry, sector_len;
-	smc92x4_state *w = get_safe_token(device);
-	device_t *current_floppy = NULL;
+	mfm_harddisk_device *harddisk;
 
 	int sector_data_id;
 	UINT8 *buf;
 
-	sync_latches_out(device);
-	sync_status_in(device);
-
-	current_floppy = (*w->intf->current_floppy)(device);
+	sync_latches_out();
+	sync_status_in();
 
 	// Set command termination code. The error code is set first, and
 	// on success, it is cleared.
-	w->register_r[INT_STATUS] |= ST_TC_DATAERR;
+	m_register_r[INT_STATUS] |= ST_TC_DATAERR;
 
 	// Save the value. Note that the retry count is only in the first four
 	// bits, and it is stored in one's complement. In this implementation
 	// we don't work with it.
-	retry = w->register_w[RETRY_COUNT];
+	retry = m_register_w[RETRY_COUNT];
 
 	/* We are already at the correct sector (found by the verify sequence) */
 
 	/* Find the data sync mark. Easy, we assume it has been found. */
 
 	if (id.flags & ID_FLAG_DELETED_DATA)
-		w->register_r[CHIP_STATUS] |= CS_DELDATA;
+		m_register_r[CHIP_STATUS] |= CS_DELDATA;
 	else
-		w->register_r[CHIP_STATUS] &= ~CS_DELDATA;
+		m_register_r[CHIP_STATUS] &= ~CS_DELDATA;
 
 	/* Found. Now update the current cylinder/head registers. */
-	update_id_regs(device, id);
+	update_id_regs(id);
 
 	/* Initiate the DMA. We assume the DMARQ is positive. */
-	w->register_r[INT_STATUS] &= ~ST_OVRUN;
+	m_register_r[INT_STATUS] &= ~ST_OVRUN;
 
 	sector_len = 1 << (id.N+7);
 	sector_data_id = id.data_id;
+	buf = (UINT8 *)malloc(sector_len);
 
-	if (w->selected_drive_type & TYPE_FLOPPY)
+	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
-		buf = (UINT8 *)malloc(sector_len);
-		floppy_drive_read_sector_data(current_floppy, id.H, sector_data_id, buf, sector_len);
+		floppy_drive_read_sector_data(m_drive, id.H, sector_data_id, buf, sector_len);
 	}
 	else
 	{
-		/* buf is allocated within the function, and sector_len is also set */
-		(*w->intf->mfmhd_read_sector)(device, id.C, id.H, id.R, &buf, &sector_len);
+		// TODO: Should we get the sector length from the harddisk?
+		harddisk = static_cast<mfm_harddisk_device *>(m_drive);
+		harddisk->read_sector(id.C, id.H, id.R, buf);
 	}
-	sync_status_in(device);
+	sync_status_in();
 
 	if (transfer_enable)
 	{
 		/* Copy via DMA into controller RAM. */
-		set_dma_address(device, DMA23_16, DMA15_8, DMA7_0);
+		set_dma_address(DMA23_16, DMA15_8, DMA7_0);
 
-		smc92x4_set_dip(device, TRUE);
+		m_out_dip(ASSERT_LINE);
 		for (i=0; i < sector_len; i++)
 		{
-			(*w->intf->dma_write_callback)(device, buf[i]);
+			m_out_dma(0, buf[i]);
 		}
-		smc92x4_set_dip(device, FALSE);
+		m_out_dip(CLEAR_LINE);
 	}
 	free(buf);
 
 	/* Check CRC. We assume everything is OK, no retry required. */
-	w->register_r[CHIP_STATUS] &= ~CS_RETREQ;
-	w->register_r[CHIP_STATUS] &= ~CS_CRCERR;
-	w->register_r[CHIP_STATUS] &= ~CS_ECCATT;
+	m_register_r[CHIP_STATUS] &= ~CS_RETREQ;
+	m_register_r[CHIP_STATUS] &= ~CS_CRCERR;
+	m_register_r[CHIP_STATUS] &= ~CS_ECCATT;
 
 	/* Update the DMA registers. */
-	if (transfer_enable)
-		dma_add_offset(device, sector_len);
+	if (transfer_enable) dma_add_offset(sector_len);
 
 	/* Decrement sector count. */
-	w->register_w[SECTOR_COUNT] = (w->register_w[SECTOR_COUNT]-1)&0xff;
+	m_register_w[SECTOR_COUNT] = (m_register_w[SECTOR_COUNT]-1)&0xff;
 
 	/* Clear the error bits. */
-	w->register_r[INT_STATUS] &= ~ST_TC_DATAERR;
+	m_register_r[INT_STATUS] &= ~ST_TC_DATAERR;
 
-	if (w->register_w[SECTOR_COUNT] == 0)
+	if (m_register_w[SECTOR_COUNT] == 0)
 		return;
 
 	/* Else this is a multi-sector operation. */
-	w->register_w[DESIRED_SECTOR] =
-	w->register_r[DESIRED_SECTOR] =
-		(w->register_w[DESIRED_SECTOR]+1) & 0xff;
+	m_register_w[DESIRED_SECTOR] =
+	m_register_r[DESIRED_SECTOR] =
+		(m_register_w[DESIRED_SECTOR]+1) & 0xff;
 
 	/* Reinitialize retry count. */
-	w->register_w[RETRY_COUNT] = retry;
+	m_register_w[RETRY_COUNT] = retry;
 }
 
 /*
     Common procedure: data_transfer(write) (as described in the specification)
 */
-static void data_transfer_write(device_t *device, chrn_id_hd id, int deldata, int redcur, int precomp, int write_long)
+void smc92x4_device::data_transfer_write(chrn_id_hd id, int deldata, int redcur, int precomp, bool write_long)
 {
 	int retry, i, sector_len;
-	smc92x4_state *w = get_safe_token(device);
-	device_t *current_floppy = NULL;
 	UINT8 *buf;
 	int sector_data_id;
-
-	sync_latches_out(device);
-	sync_status_in(device);
-
-	current_floppy = (*w->intf->current_floppy)(device);
+	mfm_harddisk_device *harddisk;
+	sync_latches_out();
+	sync_status_in();
 
 	// Set command termination code. The error code is set first, and
 	// on success, it is cleared.
-	w->register_r[INT_STATUS] |= ST_TC_DATAERR;
+	m_register_r[INT_STATUS] |= ST_TC_DATAERR;
 
 	// Save the value. Note that the retry count is only in the first four
 	// bits, and it is stored in one's complement. In this implementation
 	// we don't work with it.
-	retry = w->register_w[RETRY_COUNT];
+	retry = m_register_w[RETRY_COUNT];
 
 	/* Initiate the DMA. We assume the DMARQ is positive. */
-	w->register_r[INT_STATUS] &= ~ST_OVRUN;
+	m_register_r[INT_STATUS] &= ~ST_OVRUN;
 
 	sector_len = 1 << (id.N+7);
 	sector_data_id = id.data_id;
@@ -982,58 +850,53 @@ static void data_transfer_write(device_t *device, chrn_id_hd id, int deldata, in
 	buf = (UINT8 *)malloc(sector_len);
 
 	/* Copy via DMA from controller RAM. */
-	set_dma_address(device, DMA23_16, DMA15_8, DMA7_0);
+	set_dma_address(DMA23_16, DMA15_8, DMA7_0);
 
-	smc92x4_set_dip(device, TRUE);
+	m_out_dip(ASSERT_LINE);
 	for (i=0; i<sector_len; i++)
 	{
-		buf[i] = (*w->intf->dma_read_callback)(device);
+		buf[i] = m_in_dma(0);
 	}
-	smc92x4_set_dip(device, FALSE);
+	m_out_dip(CLEAR_LINE);
 
 	if (write_long)
 	{
 		if (VERBOSE>1) LOG("smc92x4 warn: write sector: Write_long not supported. Performing a normal write.\n");
 	}
 
-	if (w->selected_drive_type & TYPE_FLOPPY)
+	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
-		floppy_drive_write_sector_data(current_floppy, id.H, sector_data_id, (char *) buf, sector_len, FALSE);
+		floppy_drive_write_sector_data(m_drive, id.H, sector_data_id, (char *) buf, sector_len, false);
 	}
 	else
 	{
-		(*w->intf->mfmhd_write_sector)(device, id.C, id.H, id.R, buf, sector_len);
+		harddisk = static_cast<mfm_harddisk_device *>(m_drive);
+		harddisk->write_sector(id.C, id.H, id.R, buf);
 	}
 	free(buf);
-	sync_status_in(device);
+	sync_status_in();
 
-	w->register_r[CHIP_STATUS] &= ~CS_RETREQ;
-	w->register_r[CHIP_STATUS] &= ~CS_CRCERR;
-	w->register_r[CHIP_STATUS] &= ~CS_ECCATT;
+	m_register_r[CHIP_STATUS] &= ~CS_RETREQ;
+	m_register_r[CHIP_STATUS] &= ~CS_CRCERR;
+	m_register_r[CHIP_STATUS] &= ~CS_ECCATT;
 
 	/* Update the DMA registers. */
-	dma_add_offset(device, sector_len);
+	dma_add_offset(sector_len);
 
 	/* Decrement sector count. */
-	w->register_w[SECTOR_COUNT] = (w->register_w[SECTOR_COUNT]-1)&0xff;
+	m_register_w[SECTOR_COUNT] = (m_register_w[SECTOR_COUNT]-1)&0xff;
 
 	/* Clear the error bits. */
-	w->register_r[INT_STATUS] &= ~ST_TC_DATAERR;
+	m_register_r[INT_STATUS] &= ~ST_TC_DATAERR;
 
-	if (w->register_w[SECTOR_COUNT] == 0)
-		return;
+	if (m_register_w[SECTOR_COUNT] == 0) return;
 
 	/* Else this is a multi-sector operation. */
-	w->register_w[DESIRED_SECTOR] =
-	w->register_r[DESIRED_SECTOR] =
-		(w->register_w[DESIRED_SECTOR]+1) & 0xff;
+	m_register_w[DESIRED_SECTOR] =	m_register_r[DESIRED_SECTOR] = (m_register_w[DESIRED_SECTOR]+1) & 0xff;
 
 	/* Reinitialize retry count. */
-	w->register_w[RETRY_COUNT] = retry;
+	m_register_w[RETRY_COUNT] = retry;
 }
-
-static void read_sectors_continue(device_t *device);
-static void write_sectors_continue(device_t *device);
 
 /*
     Read sectors physical / logical. Physical means that the first, the
@@ -1041,97 +904,90 @@ static void write_sectors_continue(device_t *device);
     sectors are usually not in logical sequence. The ordering depends on
     the interleave pattern.
 */
-static void read_write_sectors(device_t *device)
+void smc92x4_device::read_write_sectors()
 {
-	smc92x4_state *w = get_safe_token(device);
+	int logical = m_command & 0x04;
+	int implied_seek_disabled = m_command & 0x02; /* for read */
+	int write = (m_command & 0x80);
 
-	int logical = w->command & 0x04;
-	int implied_seek_disabled = w->command & 0x02; /* for read */
-	int write = (w->command & 0x80);
+	m_after_seek = false;
 
-	w->after_seek = FALSE;
-
-	w->to_be_continued = FALSE;
+	m_to_be_continued = false;
 
 	if (write) /* write sectors */
 	{
-		logical = w->command & 0x20;
-		implied_seek_disabled = w->command & 0x40;
+		logical = m_command & 0x20;
+		implied_seek_disabled = m_command & 0x40;
 	}
 
 	if (!logical)
-		implied_seek_disabled = FALSE;
+		implied_seek_disabled = false;
 
-	if (!w->found_id)
+	if (!m_found_id)
 	{
 		/* First start. */
-		read_id_field(device, &w->seek_count, &w->step_direction, &w->recent_id);
+		read_id_field(&m_seek_count, &m_step_direction, &m_recent_id);
 	}
 
-	if ((w->register_r[INT_STATUS] & ST_TC_DATAERR) == ST_TC_SUCCESS)
+	if ((m_register_r[INT_STATUS] & ST_TC_DATAERR) == ST_TC_SUCCESS)
 	{
-		w->found_id = TRUE;
+		m_found_id = true;
 		/* Perform the seek for the cylinder. */
-		if (!implied_seek_disabled && w->seek_count > 0)
+		if (!implied_seek_disabled && m_seek_count > 0)
 		{
-			smc92x4_timed_seek_request(device);
+			timed_seek_request();
 		}
 		else
 		{
-			if (write)
-				write_sectors_continue(device);
-			else
-				read_sectors_continue(device);
+			if (write) write_sectors_continue();
+			else read_sectors_continue();
 		}
-
 	}
 	else
 	{
-		set_command_done(device, ST_TC_RDIDERR);
+		set_command_done(ST_TC_RDIDERR);
 	}
 }
 
 
-static void read_sectors_continue(device_t *device)
+void smc92x4_device::read_sectors_continue()
 {
-	smc92x4_state *w = get_safe_token(device);
-
-	int check_sector = TRUE; /* always check the first sector */
+	bool check_sector = true; /* always check the first sector */
 	int state = AGAIN;
-	int logical = w->command & 0x04;
+	int logical = m_command & 0x04;
 
 	/* Needed for the two ways of re-entry: during the seek process, and during sector read */
-	if (!w->after_seek)
+	if (!m_after_seek)
 	{
 		if (VERBOSE>7) LOG("smc92x4 continue with sector read\n");
-		w->seek_count--;
-		if (w->seek_count > 0)
+		m_seek_count--;
+		if (m_seek_count > 0)
 		{
-			read_write_sectors(device);
+			read_write_sectors();
 			return;
 		}
-		w->after_seek = TRUE;
+		m_after_seek = true;
 	}
 	else
 	{
 		/* we are here after the sector read. */
-		w->to_be_continued = FALSE;
-		if (w->register_r[INT_STATUS] & ST_TERMCOD)
+		m_to_be_continued = false;
+		if (m_register_r[INT_STATUS] & ST_TERMCOD)
 		{
-			if (VERBOSE>1) LOG("smc92x4 error: data error during sector read: INTSTATUS=%02x\n", w->register_r[INT_STATUS]);
-			set_command_done(device, ST_TC_DATAERR);
+			if (VERBOSE>1) LOG("smc92x4 error: data error during sector read: INTSTATUS=%02x\n", m_register_r[INT_STATUS]);
+			set_command_done(ST_TC_DATAERR);
 			return;
 		}
 	}
 
-	w->to_be_continued = FALSE;
+	m_to_be_continued = false;
 
 	/* Wait for SEEK_COMPLETE. We assume the signal has appeared. */
 
-	if (w->register_w[SECTOR_COUNT] > 0 /* && !(w->register_r[DRIVE_STATUS] & DS_INDEX) */)
+	if (m_register_w[SECTOR_COUNT] > 0 /* && !(m_register_r[DRIVE_STATUS] & DS_INDEX) */)
 	{
 		/* Call the verify sequence. */
-		state = verify(device, &w->recent_id, check_sector);
+		state = verify(&m_recent_id, check_sector);
 		if (state==ERROR)
 		{
 			// TODO: set command done?
@@ -1141,66 +997,64 @@ static void read_sectors_continue(device_t *device)
 
 		/* For read physical, only verify the first sector. */
 		if (!logical)
-			check_sector = FALSE;
+			check_sector = false;
 
-		if (w->recent_id.flags & BAD_SECTOR)
+		if (m_recent_id.flags & BAD_SECTOR)
 		{
 			if (VERBOSE>0) LOG("smc92x4 error: Bad sector, seek error\n");
-			set_command_done(device, ST_TC_SEEKERR);
+			set_command_done(ST_TC_SEEKERR);
 		}
 		else
 		{
-			smc92x4_timed_sector_read_request(device);
+			timed_sector_read_request();
 		}
 	}
 	else
 	{
-		set_command_done(device, ST_TC_SUCCESS);
+		set_command_done(ST_TC_SUCCESS);
 		if (VERBOSE>7) LOG("smc92x4 read sector command done\n");
 	}
 }
 
-static void write_sectors_continue(device_t *device)
+void smc92x4_device::write_sectors_continue()
 {
-	smc92x4_state *w = get_safe_token(device);
-
-	int check_sector = TRUE; /* always check the first sector */
+	bool check_sector = true; /* always check the first sector */
 	int state = AGAIN;
-	int logical = w->command & 0x20;
+	int logical = m_command & 0x20;
 
 	/* Needed for the two ways of re-entry: during the seek process, and during sector write */
-	if (!w->after_seek)
+	if (!m_after_seek)
 	{
-		w->seek_count--;
-		if (w->seek_count > 0)
+		m_seek_count--;
+		if (m_seek_count > 0)
 		{
-			read_write_sectors(device);
+			read_write_sectors();
 			return;
 		}
-		w->after_seek = TRUE;
+		m_after_seek = true;
 	}
 	else
 	{
 		/* we are here after the sector write. */
-		w->to_be_continued = FALSE;
-		if (w->register_r[INT_STATUS] & ST_TERMCOD)
+		m_to_be_continued = false;
+		if (m_register_r[INT_STATUS] & ST_TERMCOD)
 		{
 			if (VERBOSE>0) LOG("smc92x4 error: data error during sector write\n");
-			set_command_done(device, ST_TC_DATAERR);
+			set_command_done(ST_TC_DATAERR);
 			return;
 		}
 	}
 
-	w->to_be_continued = FALSE;
+	m_to_be_continued = false;
 
-	if ((w->register_w[RETRY_COUNT] & 0xf0)!= 0xf0)
+	if ((m_register_w[RETRY_COUNT] & 0xf0)!= 0xf0)
 		if (VERBOSE>1) LOG("smc92x4 warn: RETRY_COUNT in write sector should be set to 0. Ignored.\n");
 
 	/* Wait for SEEK_COMPLETE. We assume the signal has appeared. */
-	if (w->register_w[SECTOR_COUNT] > 0)
+	if (m_register_w[SECTOR_COUNT] > 0)
 	{
 		/* Call the verify sequence. */
-		state = verify(device, &w->recent_id, check_sector);
+		state = verify(&m_recent_id, check_sector);
 		if (state==ERROR)
 		{
 			if (VERBOSE>0) LOG("smc92x4 error: verify error during sector write\n");
@@ -1209,20 +1063,20 @@ static void write_sectors_continue(device_t *device)
 
 		/* For write physical, only verify the first sector. */
 		if (!logical)
-			check_sector = FALSE;
+			check_sector = false;
 
 /*      printf("smc92x4 write sectors CYL=%02x, HEA=%02x, SEC=%02x, MOD=%02x, CNT=%02x, TRY=%02x\n",
-            w->register_w[DESIRED_CYLINDER],
-            w->register_w[DESIRED_HEAD],
-            w->register_w[DESIRED_SECTOR],
-            w->register_w[MODE],
-            w->register_w[SECTOR_COUNT],
-            w->register_w[RETRY_COUNT]); */
-		smc92x4_timed_sector_write_request(device);
+            m_register_w[DESIRED_CYLINDER],
+            m_register_w[DESIRED_HEAD],
+            m_register_w[DESIRED_SECTOR],
+            m_register_w[MODE],
+            m_register_w[SECTOR_COUNT],
+            m_register_w[RETRY_COUNT]); */
+		timed_sector_write_request();
 	}
 	else
 	{
-		set_command_done(device, ST_TC_SUCCESS);
+		set_command_done(ST_TC_SUCCESS);
 		if (VERBOSE>7) LOG("smc92x4 write sector command done\n");
 	}
 }
@@ -1234,85 +1088,75 @@ static void write_sectors_continue(device_t *device)
 /*
     Handle the restore command
 */
-static void restore_drive(device_t *device)
+void smc92x4_device::restore_drive()
 {
-	smc92x4_state *w = get_safe_token(device);
-
 	/* TODO: int_after_seek_complete required for buffered seeks */
-	sync_status_in(device);
+	sync_status_in();
 
-	if (w->seek_count>=4096 || !(w->register_r[DRIVE_STATUS] & DS_READY))
+	if (m_seek_count>=4096 || !(m_register_r[DRIVE_STATUS] & DS_READY))
 	{
 		if (VERBOSE>0) LOG("smc92x4 error: seek error in restore\n");
-		w->register_r[INT_STATUS] |= ST_TC_SEEKERR;
+		m_register_r[INT_STATUS] |= ST_TC_SEEKERR;
 		return;
 	}
 
-	if (w->register_r[DRIVE_STATUS] & DS_TRK00)
+	if (m_register_r[DRIVE_STATUS] & DS_TRK00)
 	{
-		w->register_r[INT_STATUS] |= ST_TC_SUCCESS;
+		m_register_r[INT_STATUS] |= ST_TC_SUCCESS;
 		/* Issue interrupt */
-		smc92x4_set_interrupt(device);
+		set_interrupt();
 		return;
 	}
 
-	w->step_direction = -1;
-	smc92x4_timed_seek_request(device);
+	m_step_direction = -1;
+	timed_seek_request();
 }
 
-static void restore_continue(device_t *device)
+void smc92x4_device::restore_continue()
 {
-	smc92x4_state *w = get_safe_token(device);
-
-	w->seek_count++;
+	m_seek_count++;
 
 	/* Next iteration */
-	restore_drive(device);
+	restore_drive();
 
-	w->to_be_continued = FALSE;
+	m_to_be_continued = false;
 }
 
 /*
     Handle the step command. Note that the CURRENT_CYLINDER register is not
     updated (this would break the format procedure).
 */
-static void step_in_out(device_t *device)
+void smc92x4_device::step_in_out()
 {
-	smc92x4_state *w = get_safe_token(device);
-	int direction = (w->command & 0x02)? -1 : +1;
+	int direction = (m_command & 0x02)? -1 : +1;
 	// bit 0: 0 -> command ends after last seek pulse, 1 -> command
 	// ends when the drive asserts the seek complete pin
-	int buffered = w->command & 0x01;
+	int buffered = m_command & 0x01;
 
-	w->step_direction = direction;
-	w->buffered = buffered;
+	m_step_direction = direction;
+	m_buffered = (buffered!=0);
 
-	smc92x4_timed_seek_request(device);
+	timed_seek_request();
 	if (VERBOSE>6) LOG("smc92x4 waiting for drive step\n");
 }
 
-static void step_continue(device_t *device)
+void smc92x4_device::step_continue()
 {
-	smc92x4_state *w = get_safe_token(device);
 	if (VERBOSE>7) LOG("smc92x4 step continue\n");
-	w->to_be_continued = FALSE;
-	set_command_done(device,  ST_TC_SUCCESS);
+	m_to_be_continued = false;
+	set_command_done(ST_TC_SUCCESS);
 }
-
-
-static void drive_select(device_t *device, int drive);
 
 /*
     Poll drives
     This command is used to find out which drive has complete a buffered
     seek (RESTORE, SEEK IN/OUT with BUFFERED set to one)
 */
-static void poll_drives(device_t *device)
+void smc92x4_device::poll_drives()
 {
 	int mask = 0x08;
-	smc92x4_state *w = get_safe_token(device);
 	int i;
-	int flags = w->command & 0x0f;
+	int flags = m_command & 0x0f;
 
 /* Spec is unclear: Do we continue to poll the drives after we have checked each
 one for the first time? We are not interested in locking up the emulator, so
@@ -1322,63 +1166,58 @@ we decide to poll only once. */
 		if (flags & mask)
 		{
 			/* Poll drive */
-			drive_select(device, i|((w->types[i])<<2));
-			sync_latches_out(device);
-			sync_status_in(device);
-			if (w->register_r[DRIVE_STATUS] & DS_SKCOM) return;
+			drive_select(i|((m_types[i])<<2));
+			if (m_register_r[DRIVE_STATUS] & DS_SKCOM) return;
 		}
 		mask = mask>>1;
 	}
 }
 
-static void drive_select(device_t *device, int driveparm)
+void smc92x4_device::drive_select(int driveparm)
 {
-	smc92x4_state *w = get_safe_token(device);
-
-	w->output1 = (0x10 << (driveparm & 0x03)) | (w->register_w[RETRY_COUNT]&0x0f);
-	w->selected_drive_type = (driveparm>>2) & 0x03;
-	w->head_load_delay_enable = (driveparm>>4)&0x01;
+	m_output1 = (0x10 << (driveparm & 0x03)) | (m_register_w[RETRY_COUNT]&0x0f);
+	m_selected_drive_type = (driveparm>>2) & 0x03;
+	m_head_load_delay_enable = (driveparm>>4)&0x01;
 
 	// We need to store the type of the drive for the poll_drives command
 	// to be able to correctly select the device (floppy or hard disk).
-	w->types[driveparm&0x03] = w->selected_drive_type;
+	m_types[driveparm&0x03] = m_selected_drive_type;
 
 	// Copy the DMA registers to registers CURRENT_HEAD, CURRENT_CYLINDER,
 	// and CURRENT_IDENT. This is required during formatting (p. 14) as the
 	// format command reuses the registers for formatting parameters.
-	w->register_r[CURRENT_HEAD] = w->register_r[DMA7_0];
-	w->register_r[CURRENT_CYLINDER] = w->register_r[DMA15_8];
-	w->register_r[CURRENT_IDENT] = w->register_r[DMA23_16];
+	m_register_r[CURRENT_HEAD] = m_register_r[DMA7_0];
+	m_register_r[CURRENT_CYLINDER] = m_register_r[DMA15_8];
+	m_register_r[CURRENT_IDENT] = m_register_r[DMA23_16];
 
-	sync_latches_out(device);
-	sync_status_in(device);
+	sync_latches_out();
+	sync_status_in();
 }
 
 /*
     Command SEEK/READID
 */
-static void seek_read_id(device_t *device)
+void smc92x4_device::seek_read_id()
 {
-	smc92x4_state *w = get_safe_token(device);
-	int step_enable = (w->command & 0x04);
-	int verify_id = (w->command & 0x01);
-	int wait = (w->command & 0x02);
+	int step_enable = (m_command & 0x04);
+	int verify_id = (m_command & 0x01);
+	int wait = (m_command & 0x02);
 
-	w->to_be_continued = FALSE;
+	m_to_be_continued = false;
 
-	if (!w->found_id)
+	if (!m_found_id)
 	{
 		/* First start. */
-		read_id_field(device, &w->seek_count, &w->step_direction, &w->recent_id);
-		w->found_id = TRUE;
+		read_id_field(&m_seek_count, &m_step_direction, &m_recent_id);
+		m_found_id = true;
 	}
 
-	if ((w->register_r[INT_STATUS] & ST_TC_DATAERR) == ST_TC_SUCCESS)
+	if ((m_register_r[INT_STATUS] & ST_TC_DATAERR) == ST_TC_SUCCESS)
 	{
 		/* Perform the seek for the cylinder. */
-		if (step_enable && w->seek_count > 0)
+		if (step_enable && m_seek_count > 0)
 		{
-			smc92x4_timed_seek_request(device);
+			timed_seek_request();
 		}
 		else
 		{
@@ -1387,22 +1226,21 @@ static void seek_read_id(device_t *device)
 
 			if (verify_id)
 			{
-				verify(device, &w->recent_id, TRUE);
+				verify(&m_recent_id, true);
 			}
 		}
 	}
 	else
 	{
-		set_command_done(device, ST_TC_RDIDERR);
+		set_command_done(ST_TC_RDIDERR);
 	}
 }
 
-static void seek_read_id_continue(device_t *device)
+void smc92x4_device::seek_read_id_continue()
 {
-	smc92x4_state *w = get_safe_token(device);
-	w->seek_count--;
-	seek_read_id(device);
-	w->to_be_continued = FALSE;
+	m_seek_count--;
+	seek_read_id();
+	m_to_be_continued = false;
 }
 
 /*
@@ -1480,11 +1318,8 @@ static void seek_read_id_continue(device_t *device)
     The formats are determined by setting the flag in the smc92x4
     interface structure.
 */
-static void format_floppy_track(device_t *device, int flags)
+void smc92x4_device::format_floppy_track(int flags)
 {
-	smc92x4_state *w = get_safe_token(device);
-	device_t *current_floppy = NULL;
-
 	floppy_image_legacy *floppy;
 	int i,index,j, exp_size;
 	int gap0, gap1, gap2, gap3, gap4, sync1, sync2, count, size, fm;
@@ -1498,17 +1333,16 @@ static void format_floppy_track(device_t *device, int flags)
 	/* Determine the track size. We cannot allow different sizes in this design. */
 	int data_count = 0;
 
-	sync_status_in(device);
+	sync_status_in();
 
-	current_floppy = (*w->intf->current_floppy)(device);
-	floppy = flopimg_get_image(current_floppy);
+	floppy = flopimg_get_image(m_drive);
 
 	if (floppy != NULL)
 		data_count = floppy_get_track_size(floppy, 0, 0);
 
 	if (data_count==0)
 	{
-		if (controller_set_to_single_density(device))
+		if (in_single_density_mode())
 			data_count = TRKSIZE_SD;
 		else
 			data_count = TRKSIZE_DD;
@@ -1517,20 +1351,20 @@ static void format_floppy_track(device_t *device, int flags)
 	/* Build buffer */
 	buffer = (UINT8*)malloc(data_count);
 
-	fm = controller_set_to_single_density(device);
+	fm = in_single_density_mode();
 
-	sync2 = (~w->register_w[DESIRED_CYLINDER])&0xff;
-	gap2 = (-w->register_w[DMA23_16])&0xff;
-	count = (~w->register_w[SECTOR_COUNT])&0xff;
-	size = (~w->register_w[RETRY_COUNT])&0xff;
+	sync2 = (~m_register_w[DESIRED_CYLINDER])&0xff;
+	gap2 = (-m_register_w[DMA23_16])&0xff;
+	count = (~m_register_w[SECTOR_COUNT])&0xff;
+	size = (~m_register_w[RETRY_COUNT])&0xff;
 	gap_byte = (fm)? 0xff : 0x4e;
 
-	if (w->intf->full_track_layout)
+	if (m_full_track_layout)
 	{
 		/* Including the index AM. */
-		gap0 = (-w->register_w[DMA7_0])&0xff;
-		gap1 = (-w->register_w[DMA15_8])&0xff;
-		gap3 = (-w->register_w[DESIRED_SECTOR])&0xff;
+		gap0 = (-m_register_w[DMA7_0])&0xff;
+		gap1 = (-m_register_w[DMA15_8])&0xff;
+		gap3 = (-m_register_w[DESIRED_SECTOR])&0xff;
 		gap4 = (fm)? 247 : 598;
 		pre_gap = gap_byte;
 		sync1 = sync2;
@@ -1558,12 +1392,12 @@ static void format_floppy_track(device_t *device, int flags)
 		if (VERBOSE>0) LOG("smc92x4 warn: The current track length in the image (%d) does not match the new track length (%d). Keeping the old length. This will break the image (sorry).\n", data_count, exp_size);
 
 	/* use the backup registers set up during drive_select */
-	set_dma_address(device, CURRENT_IDENT, CURRENT_CYLINDER, CURRENT_HEAD);
+	set_dma_address(CURRENT_IDENT, CURRENT_CYLINDER, CURRENT_HEAD);
 
 	memset(&buffer[index], pre_gap, gap0);
 	index += gap0;
 
-	if (w->intf->full_track_layout)
+	if (m_full_track_layout)
 	{
 		/* Create the Index AM */
 		memset(&buffer[index], 0x00, sync1);
@@ -1591,14 +1425,14 @@ static void format_floppy_track(device_t *device, int flags)
 
 		buffer[index++] = 0xfe;
 
-		smc92x4_set_dip(device, TRUE);
-//      if (!fm) curr_ident = (*w->intf->dma_read_callback)(device);
-		if (!fm) (*w->intf->dma_read_callback)(device);
-		curr_cyl = (*w->intf->dma_read_callback)(device);
-		curr_head = (*w->intf->dma_read_callback)(device);
-		curr_sect = (*w->intf->dma_read_callback)(device);
-		curr_size = (*w->intf->dma_read_callback)(device);
-		smc92x4_set_dip(device, FALSE);
+		m_out_dip(ASSERT_LINE);
+//      if (!fm) curr_ident = m_in_dma();
+		if (!fm) m_in_dma(0);
+		curr_cyl = m_in_dma(0);
+		curr_head = m_in_dma(0);
+		curr_sect = m_in_dma(0);
+		curr_size = m_in_dma(0);
+		m_out_dip(CLEAR_LINE);
 
 		buffer[index++] = curr_cyl;
 		buffer[index++] = curr_head;
@@ -1606,7 +1440,7 @@ static void format_floppy_track(device_t *device, int flags)
 		buffer[index++] = curr_size;
 
 		if (j==0)
-			if (VERBOSE>6) LOG("current_floppy=%s, format track %d, head %d\n",  current_floppy->tag(), curr_cyl, curr_head);
+			if (VERBOSE>6) LOG("current_floppy=%s, format track %d, head %d\n",  m_drive->tag(), curr_cyl, curr_head);
 
 		/* Calculate CRC16 (5 bytes for ID) */
 		crc = ccitt_crc16(0xffff, &buffer[index-5], 5);
@@ -1643,9 +1477,9 @@ static void format_floppy_track(device_t *device, int flags)
 	memset(&buffer[index], gap_byte, gap4);
 	index += gap4;
 
-	floppy_drive_write_track_data_info_buffer(current_floppy, w->register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
+	floppy_drive_write_track_data_info_buffer(m_drive, m_register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
 	free(buffer);
-	sync_status_in(device);
+	sync_status_in();
 }
 
 /*
@@ -1655,9 +1489,8 @@ static void format_floppy_track(device_t *device, int flags)
 
     For more explanations see the comments to format_floppy_track.
 */
-static void format_harddisk_track(device_t *device, int flags)
+void smc92x4_device::format_harddisk_track(int flags)
 {
-	smc92x4_state *w = get_safe_token(device);
 	int i,index,j;
 	int gap1, gap2, gap3, gap4, sync, count, size, gap_byte, crc;
 	UINT8 curr_ident, curr_cyl, curr_head, curr_sect, curr_size;
@@ -1665,32 +1498,32 @@ static void format_harddisk_track(device_t *device, int flags)
 	int normal_data_mark = flags & 0x10;
 	int data_count=0;
 
+	mfm_harddisk_device *harddisk = static_cast<mfm_harddisk_device *>(m_drive);
+
 	UINT8 *buffer;
 
-	sync_status_in(device);
+	sync_status_in();
 
 	/* Build buffer */
-//  gap0 = (-w->register_w[DMA7_0])&0xff;
-	gap1 = (-w->register_w[DMA15_8])&0xff;
-	gap2 = (-w->register_w[DMA23_16])&0xff;
-	gap3 = (-w->register_w[DESIRED_SECTOR])&0xff;
+//  gap0 = (-m_register_w[DMA7_0])&0xff;
+	gap1 = (-m_register_w[DMA15_8])&0xff;
+	gap2 = (-m_register_w[DMA23_16])&0xff;
+	gap3 = (-m_register_w[DESIRED_SECTOR])&0xff;
 	gap4 = 340;
 
-	sync = (~w->register_w[DESIRED_CYLINDER])&0xff;
-	count = (~w->register_w[SECTOR_COUNT])&0xff;
-	size = (~w->register_w[RETRY_COUNT])&0xff;
+	sync = (~m_register_w[DESIRED_CYLINDER])&0xff;
+	count = (~m_register_w[SECTOR_COUNT])&0xff;
+	size = (~m_register_w[RETRY_COUNT])&0xff;
 
 	data_count = gap1 + count*(sync+12+gap2+sync+size*128+gap3)+gap4;
 
 	buffer = (UINT8*)malloc(data_count);
 
 	index = 0;
-//  fm = controller_set_to_single_density(device);
-	controller_set_to_single_density(device);
 	gap_byte = 0x4e;
 
 	/* use the backup registers set up during drive_select */
-	set_dma_address(device, CURRENT_IDENT, CURRENT_CYLINDER, CURRENT_HEAD);
+	set_dma_address(CURRENT_IDENT, CURRENT_CYLINDER, CURRENT_HEAD);
 
 	for (i=0; i < gap1; i++) buffer[index++] = gap_byte;
 
@@ -1700,13 +1533,13 @@ static void format_harddisk_track(device_t *device, int flags)
 		for (i=0; i < sync; i++) buffer[index++] = 0x00;
 		buffer[index++] = 0xa1;
 
-		smc92x4_set_dip(device, TRUE);
-		curr_ident = (*w->intf->dma_read_callback)(device);
-		curr_cyl = (*w->intf->dma_read_callback)(device);
-		curr_head = (*w->intf->dma_read_callback)(device);
-		curr_sect = (*w->intf->dma_read_callback)(device);
-		curr_size = (*w->intf->dma_read_callback)(device);
-		smc92x4_set_dip(device, FALSE);
+		m_out_dip(ASSERT_LINE);
+		curr_ident = m_in_dma(0);
+		curr_cyl = m_in_dma(0);
+		curr_head = m_in_dma(0);
+		curr_sect = m_in_dma(0);
+		curr_size = m_in_dma(0);
+		m_out_dip(CLEAR_LINE);
 
 		buffer[index++] = curr_ident;
 		buffer[index++] = curr_cyl;
@@ -1743,9 +1576,11 @@ static void format_harddisk_track(device_t *device, int flags)
 	/* GAP 4 */
 	for (i=0; i < gap4; i++) buffer[index++] = gap_byte;
 
-	(*w->intf->mfmhd_write_track)(device, w->register_w[DESIRED_HEAD]&0x0f, buffer, data_count);
+	// Now write the whole track
+	harddisk->write_track(m_register_w[DESIRED_HEAD]&0x0f, buffer, data_count);
+
 	free(buffer);
-	sync_status_in(device);
+	sync_status_in();
 }
 
 /*
@@ -1766,20 +1601,17 @@ static void format_harddisk_track(device_t *device, int flags)
     format or generally to the PC99 format between controller and format.
     Format is the image is always PC99.)
 */
-static void read_floppy_track(device_t *device, int transfer_only_ids)
+void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 {
-	smc92x4_state *w = get_safe_token(device);
-	device_t *current_floppy = (*w->intf->current_floppy)(device);
-
 	floppy_image_legacy *floppy;
 	/* Determine the track size. We cannot allow different sizes in this design. */
 	int data_count = 0;
 	int i;
 	UINT8 *buffer;
 
-	sync_latches_out(device);
+	sync_latches_out();
 
-	floppy = flopimg_get_image(current_floppy);
+	floppy = flopimg_get_image(m_drive);
 
 	/* Determine the track size. We cannot allow different sizes in this design. */
 	if (floppy != NULL)
@@ -1787,7 +1619,7 @@ static void read_floppy_track(device_t *device, int transfer_only_ids)
 
 	if (data_count==0)
 	{
-		if (controller_set_to_single_density(device))
+		if (in_single_density_mode())
 			data_count = TRKSIZE_SD;
 		else
 			data_count = TRKSIZE_DD;
@@ -1795,147 +1627,142 @@ static void read_floppy_track(device_t *device, int transfer_only_ids)
 
 	buffer = (UINT8*)malloc(data_count);
 
-	floppy_drive_read_track_data_info_buffer( current_floppy, w->register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
-	sync_status_in(device);
+	floppy_drive_read_track_data_info_buffer(m_drive, m_register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
+	sync_status_in();
 
 	// Transfer the buffer to the external memory. We assume the memory
 	// pointer has been set appropriately in the registers.
-	set_dma_address(device, DMA23_16, DMA15_8, DMA7_0);
+	set_dma_address(DMA23_16, DMA15_8, DMA7_0);
 
 	if (transfer_only_ids)
 	{
 		if (VERBOSE>1) LOG("smc92x4 warn: read track: Ignoring transfer-only-ids. Reading complete track.\n");
 	}
 
-	smc92x4_set_dip(device, TRUE);
+	m_out_dip(ASSERT_LINE);
 	for (i=0; i < data_count; i++)
 	{
-		(*w->intf->dma_write_callback)(device, buffer[i]);
+		m_out_dma(0, buffer[i]);
 	}
-	smc92x4_set_dip(device, FALSE);
+	m_out_dip(CLEAR_LINE);
 
 	free(buffer);
 }
 
-static void read_harddisk_track(device_t *device, int transfer_only_ids)
+void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
 {
-	smc92x4_state *w = get_safe_token(device);
-
 	/* Determine the track size. We cannot allow different sizes in this design. */
 	int i;
 	UINT8 *buffer;
 	int data_count=0;
+	mfm_harddisk_device *harddisk = static_cast<mfm_harddisk_device *>(m_drive);
 
-	sync_latches_out(device);
+	sync_latches_out();
+
+	data_count = harddisk->get_track_length();
+	buffer = (UINT8*)malloc(data_count);
 
 	/* buffer and data_count are allocated and set by the function. */
-	(*w->intf->mfmhd_read_track)(device, w->register_w[DESIRED_HEAD]&0x0f, &buffer, &data_count);
-	sync_status_in(device);
+	harddisk->read_track(m_register_w[DESIRED_HEAD]&0x0f, buffer);
+	sync_status_in();
 
-	if (!(w->register_r[DRIVE_STATUS] & DS_READY))
+	if (!(m_register_r[DRIVE_STATUS] & DS_READY))
 	{
 		if (VERBOSE>0) LOG("smc92x4 error: read harddisk track failed.\n");
-		/* no buffer was allocated */
 	}
 
 	// Transfer the buffer to the external memory. We assume the memory
 	// pointer has been set appropriately in the registers.
-	set_dma_address(device, DMA23_16, DMA15_8, DMA7_0);
+	set_dma_address(DMA23_16, DMA15_8, DMA7_0);
 
 	if (transfer_only_ids)
 	{
 		if (VERBOSE>1) LOG("smc92x4 warn: read track: Ignoring transfer-only-ids. Reading complete track.\n");
 	}
 
-	smc92x4_set_dip(device, TRUE);
+	m_out_dip(ASSERT_LINE);
 	for (i=0; i < data_count; i++)
 	{
-		(*w->intf->dma_write_callback)(device, buffer[i]);
+		m_out_dma(0, buffer[i]);
 	}
-	smc92x4_set_dip(device, FALSE);
+	m_out_dip(CLEAR_LINE);
 
 	free(buffer);
 }
 
 
-static void read_track(device_t *device)
+void smc92x4_device::read_track()
 {
-	smc92x4_state *w = get_safe_token(device);
-	int transfer_only_ids = w->command & 0x01;
+	int transfer_only_ids = m_command & 0x01;
 
-	if (w->selected_drive_type & TYPE_FLOPPY)
+	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
-		read_floppy_track(device, transfer_only_ids);
+		read_floppy_track(transfer_only_ids);
 	}
 	else
 	{
-		read_harddisk_track(device, transfer_only_ids);
+		read_harddisk_track(transfer_only_ids);
 	}
-
-	smc92x4_timed_track_request(device);
+	timed_track_request();
 }
 
-static void read_track_continue(device_t *device)
+void smc92x4_device::read_track_continue()
 {
-	smc92x4_state *w = get_safe_token(device);
-	w->to_be_continued = FALSE;
-	set_command_done(device,  ST_TC_SUCCESS);
+	m_to_be_continued = false;
+	set_command_done(ST_TC_SUCCESS);
 }
 
-static void format_track(device_t *device)
+void smc92x4_device::format_track()
 {
-	smc92x4_state *w = get_safe_token(device);
-	int flags = w->command & 0x1f;
+	int flags = m_command & 0x1f;
 
-	if (w->selected_drive_type & TYPE_FLOPPY)
-		format_floppy_track(device, flags);
+	if (m_selected_drive_type & TYPE_FLOPPY)
+		format_floppy_track(flags);
 	else
-		format_harddisk_track(device, flags);
+		format_harddisk_track(flags);
 
-	smc92x4_timed_track_request(device);
+	timed_track_request();
 }
 
-static void format_track_continue(device_t *device)
+void smc92x4_device::format_track_continue()
 {
-	smc92x4_state *w = get_safe_token(device);
-	w->to_be_continued = FALSE;
-	set_command_done(device,  ST_TC_SUCCESS);
+	m_to_be_continued = false;
+	set_command_done(ST_TC_SUCCESS);
 }
 
 /*
     Continue to process after callback
 */
-static void smc92x4_process_after_callback(device_t *device)
+void smc92x4_device::process_after_callback()
 {
-	smc92x4_state *w = get_safe_token(device);
-	UINT8 opcode = w->command;
+	UINT8 opcode = m_command;
 	if (opcode >= 0x02 && opcode <= 0x03)
 	{
-		restore_continue(device);
+		restore_continue();
 	}
 	else if (opcode >= 0x04 && opcode <= 0x07)
 	{
-		step_continue(device);
+		step_continue();
 	}
 	else if (opcode >= 0x50 && opcode <= 0x57)
 	{
-		seek_read_id_continue(device);
+		seek_read_id_continue();
 	}
 	else if ((opcode >= 0x58 && opcode <= 0x59)||(opcode >= 0x5C && opcode <= 0x5f))
 	{
-		read_sectors_continue(device);
+		read_sectors_continue();
 	}
 	else if (opcode >= 0x5a && opcode <= 0x5b)
 	{
-		read_track_continue(device);
+		read_track_continue();
 	}
 	else if (opcode >= 0x60 && opcode <= 0x7f)
 	{
-		format_track_continue(device);
+		format_track_continue();
 	}
 	else if (opcode >= 0x80)
 	{
-		write_sectors_continue(device);
+		write_sectors_continue();
 	}
 	else
 	{
@@ -1946,45 +1773,42 @@ static void smc92x4_process_after_callback(device_t *device)
 /*
     Process a command
 */
-static void smc92x4_process_command(device_t *device, UINT8 opcode)
+void smc92x4_device::process_command(UINT8 opcode)
 {
-	smc92x4_state *w = get_safe_token(device);
-
 	if (VERBOSE>6) LOG("smc92x4 process command %02x\n", opcode);
-	if (w->to_be_continued)
+	if (m_to_be_continued)
 	{
-		if (VERBOSE>1) LOG("smc92x4 warn: previous command %02x not complete\n", w->command);
+		if (VERBOSE>1) LOG("smc92x4 warn: previous command %02x not complete\n", m_command);
 	}
 
 	/* Reset DONE and BAD_SECTOR. */
-	w->register_r[INT_STATUS] &= ~(ST_DONE | ST_BADSECT);
+	m_register_r[INT_STATUS] &= ~(ST_DONE | ST_BADSECT);
 
-	/* Reset interrupt line (not explicitly mentioned in spec, but seems
-    reasonable) */
-	smc92x4_clear_interrupt(device);
-	w->register_r[INT_STATUS] &= ~(ST_INTPEND | ST_RDYCHNG);
+	// Reset interrupt line (not explicitly mentioned in spec, but seems reasonable
+	clear_interrupt();
+	m_register_r[INT_STATUS] &= ~(ST_INTPEND | ST_RDYCHNG);
 
-	w->command = opcode;
-	w->found_id = FALSE;
-	w->seek_count = 0;
+	m_command = opcode;
+	m_found_id = false;
+	m_seek_count = 0;
 
 	if (opcode == 0x00)
 	{
 		/* RESET */
 		/* same effect as the RST* pin being active */
 		if (VERBOSE>0) LOG("smc92x4 info: reset command\n");
-		smc92x4_reset(device);
+		reset();
 	}
 	else if (opcode == 0x01)
 	{
 		/* DESELECT DRIVE */
 		/* done when no drive is in use */
 		if (VERBOSE>2) LOG("smc92x4 info: drdeselect command\n");
-		w->output1 &= ~(OUT1_DRVSEL3|OUT1_DRVSEL2|OUT1_DRVSEL1|OUT1_DRVSEL0);
-		w->output2 |= OUT2_DRVSEL3_;
+		m_output1 &= ~(OUT1_DRVSEL3|OUT1_DRVSEL2|OUT1_DRVSEL1|OUT1_DRVSEL0);
+		m_output2 |= OUT2_DRVSEL3_;
 		/* sync the latches on the PCB */
-		sync_latches_out(device);
-		sync_status_in(device);
+		sync_latches_out();
+		sync_status_in();
 	}
 	else if (opcode >= 0x02 && opcode <= 0x03)
 	{
@@ -1992,13 +1816,13 @@ static void smc92x4_process_command(device_t *device, UINT8 opcode)
 		// bit 0: 0 -> command ends after last seek pulse, 1 -> command
 		// ends when the drive asserts the seek complete pin
 		if (VERBOSE>2) LOG("smc92x4 info: restore command %X\n", opcode);
-		restore_drive(device);
+		restore_drive();
 	}
 	else if (opcode >= 0x04 && opcode <= 0x07)
 	{
 		/* STEP IN/OUT ONE CYLINDER */
 		if (VERBOSE>2) LOG("smc92x4 info: step in/out command %X\n", opcode);
-		step_in_out(device);
+		step_in_out();
 	}
 	else if (opcode >= 0x08 && opcode <= 0x0f)
 	{
@@ -2009,32 +1833,32 @@ static void smc92x4_process_command(device_t *device, UINT8 opcode)
 	{
 		/* POLLDRIVE */
 		if (VERBOSE>2) LOG("smc92x4 info: polldrive command %X\n", opcode);
-		poll_drives(device);
+		poll_drives();
 	}
 	else if (opcode >= 0x20 && opcode <= 0x3f)
 	{
 		/* DRIVE SELECT */
 		if (VERBOSE>2) LOG("smc92x4 info: drselect command %X\n", opcode);
-		drive_select(device, opcode&0x1f);
+		drive_select(opcode&0x1f);
 	}
 	else if (opcode >= 0x40 && opcode <= 0x4f)
 	{
 		/* SETREGPTR */
 		if (VERBOSE>2) LOG("smc92x4 info: setregptr command %X\n", opcode);
-		w->register_pointer = opcode & 0xf;
+		m_register_pointer = opcode & 0xf;
 		// Spec does not say anything about the effect of setting an
 		// invalid value (only "care should be taken")
-		if (w->register_pointer > 10)
+		if (m_register_pointer > 10)
 		{
-			if (VERBOSE>1) LOG("smc92x4 error: set register pointer: Invalid register number: %d. Setting to 10.\n", w->register_pointer);
-			w->register_pointer = 10;
+			if (VERBOSE>1) LOG("smc92x4 error: set register pointer: Invalid register number: %d. Setting to 10.\n", m_register_pointer);
+			m_register_pointer = 10;
 		}
 	}
 	else if (opcode >= 0x50 && opcode <= 0x57)
 	{
 		/* SEEK/READ ID */
 		if (VERBOSE>2) LOG("smc92x4 seekreadid command %X\n", opcode);
-		seek_read_id(device);
+		seek_read_id();
 	}
 	else if ((opcode >= 0x58 && opcode <= 0x59)
 		|| (opcode >= 0x5C && opcode <= 0x5f)
@@ -2042,27 +1866,27 @@ static void smc92x4_process_command(device_t *device, UINT8 opcode)
 	{
 		/* READ/WRITE SECTORS PHYSICAL/LOGICAL */
 		if (VERBOSE>2) LOG("smc92x4 info: read/write sector command %X\n", opcode);
-		read_write_sectors(device);
+		read_write_sectors();
 	}
 	else if (opcode >= 0x5A && opcode <= 0x5b)
 	{
 		/* READ TRACK */
 		if (VERBOSE>2) LOG("smc92x4 info: read track command %X\n", opcode);
-		read_track(device);
+		read_track();
 	}
 	else if (opcode >= 0x60 && opcode <= 0x7f)
 	{
 		/* FORMAT TRACK */
 		if (VERBOSE>2) LOG("smc92x4 info: format track command %X\n", opcode);
-		format_track(device);
+		format_track();
 	}
 	else
 	{
 		if (VERBOSE>0) LOG("smc92x4 error: Invalid command %x, ignored\n", opcode);
 	}
 
-	if (!w->to_be_continued)
-		set_command_done(device);
+	if (!m_to_be_continued)
+		set_command_done();
 }
 
 /***************************************************************************
@@ -2073,30 +1897,29 @@ static void smc92x4_process_command(device_t *device, UINT8 opcode)
     Read a byte of data from a smc92x4 controller
     The address (offset) encodes the C/D* line (command and /data)
 */
-READ8_DEVICE_HANDLER( smc92x4_r )
+READ8_MEMBER( smc92x4_device::read )
 {
 	UINT8 reply = 0;
-	smc92x4_state *w = get_safe_token(device);
 
 	if ((offset & 1) == 0)
 	{
 		/* data register */
-		reply = w->register_r[w->register_pointer];
-		if (VERBOSE>6) LOG("smc92x4 register_r[%d] -> %02x\n", w->register_pointer, reply);
+		reply = m_register_r[m_register_pointer];
+		if (VERBOSE>6) LOG("smc92x4 register_r[%d] -> %02x\n", m_register_pointer, reply);
 		/* Autoincrement until DATA is reached. */
-		if (w->register_pointer < DATA)
-			w->register_pointer++;
+		if (m_register_pointer < DATA)
+			m_register_pointer++;
 	}
 	else
 	{
 		/* status register */
-		reply = w->register_r[INT_STATUS];
+		reply = m_register_r[INT_STATUS];
 		// Spec (p.3) : The interrupt pin is reset to its inactive state
 		// when the UDC interrupt status register is read.
 		if (VERBOSE>6) LOG("smc92x4 interrupt status read = %02x\n", reply);
-		smc92x4_clear_interrupt(device);
+		clear_interrupt();
 		/* Clear the bits due to int status register read. */
-		w->register_r[INT_STATUS] &= ~(ST_INTPEND | ST_RDYCHNG);
+		m_register_r[INT_STATUS] &= ~(ST_INTPEND | ST_RDYCHNG);
 	}
 	return reply;
 }
@@ -2105,31 +1928,27 @@ READ8_DEVICE_HANDLER( smc92x4_r )
     Write a byte to a smc99x4 controller
     The address (offset) encodes the C/D* line (command and /data)
 */
-WRITE8_DEVICE_HANDLER( smc92x4_w )
+WRITE8_MEMBER( smc92x4_device::write )
 {
-	smc92x4_state *w = get_safe_token(device);
 	data &= 0xff;
 
 	if ((offset & 1) == 0)
 	{
 		/* data register */
-		if (VERBOSE>6) LOG("smc92x4 register_w[%d] <- %X\n", w->register_pointer, data);
-		w->register_w[w->register_pointer] = data;
+		if (VERBOSE>6) LOG("smc92x4 register_w[%d] <- %X\n", m_register_pointer, data);
+		m_register_w[m_register_pointer] = data;
 
 		// The DMA registers and the sector register for read and
 		// write are identical.
-		if (w->register_pointer < DESIRED_HEAD)
-			w->register_r[w->register_pointer] = data;
+		if (m_register_pointer < DESIRED_HEAD)
+			m_register_r[m_register_pointer] = data;
 
 		/* Autoincrement until DATA is reached. */
-		if (w->register_pointer < DATA)
-			w->register_pointer++;
+		if (m_register_pointer < DATA)
+			m_register_pointer++;
 	}
 	else
-	{
-		/* command register */
-		smc92x4_process_command(device, data);
-	}
+		process_command(data);	// command register
 }
 
 
@@ -2138,61 +1957,59 @@ WRITE8_DEVICE_HANDLER( smc92x4_w )
     DEVICE FUNCTIONS
 ***************************************************************************/
 
-static DEVICE_START( smc92x4 )
+void smc92x4_device::device_start()
 {
-	smc92x4_state *w = get_safe_token(device);
-	assert(device->static_config() != NULL);
+	const smc92x4_interface *intf = reinterpret_cast<const smc92x4_interface *>(static_config());
 
-	w->intf = (const smc92x4_interface*)device->static_config();
-	w->out_intrq_func.resolve(w->intf->out_intrq_func, *device);
-	w->out_dip_func.resolve(w->intf->out_dip_func, *device);
-	w->out_auxbus_func.resolve(w->intf->out_auxbus_func, *device);
-	w->in_auxbus_func.resolve(w->intf->in_auxbus_func, *device);
+	m_out_intrq.resolve(intf->out_intrq, *this);
+	m_out_dip.resolve(intf->out_dip, *this);
+	m_out_auxbus.resolve(intf->out_auxbus, *this);
+	m_in_auxbus.resolve(intf->in_auxbus, *this);
+	m_out_dma.resolve(intf->dma_write, *this);
+	m_in_dma.resolve(intf->dma_read, *this);
 
-	/* allocate timers */
-	/* w->timer_data = device->machine().scheduler().timer_alloc(FUNC(smc92x4_data_callback), (void *)device); */
-	w->timer_rs = device->machine().scheduler().timer_alloc(FUNC(smc92x4_read_sector_callback), (void *)device);
-	w->timer_ws = device->machine().scheduler().timer_alloc(FUNC(smc92x4_write_sector_callback), (void *)device);
-	w->timer_track = device->machine().scheduler().timer_alloc(FUNC(smc92x4_track_callback), (void *)device);
-	w->timer_seek = device->machine().scheduler().timer_alloc(FUNC(smc92x4_seek_callback), (void *)device);
+	m_full_track_layout = intf->full_track_layout;
 
-	w->use_real_timing = TRUE;
+	// allocate timers
+	// m_timer_data = timer_alloc(DATA_TIMER);
+	m_timer_rs = timer_alloc(READ_TIMER);
+	m_timer_ws = timer_alloc(WRITE_TIMER);
+	m_timer_track = timer_alloc(TRACK_TIMER);
+	m_timer_seek = timer_alloc(SEEK_TIMER);
+
+	m_use_real_timing = true;
 }
 
-static DEVICE_RESET( smc92x4 )
+void smc92x4_device::device_reset()
 {
-	smc92x4_state *w = get_safe_token(device);
-	smc92x4_clear_interrupt(device);
-	smc92x4_set_dip(device, FALSE);
+	clear_interrupt();
+	m_out_dip(CLEAR_LINE);
 
-	for (int i=0; i<11; i++)
-		w->register_r[i] = w->register_w[i] = 0;
+	for (int i=0; i<=11; i++)
+		m_register_r[i] = m_register_w[i] = 0;
+
+	m_to_be_continued = false;
 }
 
-void smc92x4_reset(device_t *device)
+void smc92x4_device::set_timing(bool realistic)
 {
-	DEVICE_RESET_CALL( smc92x4 );
-}
-
-void smc92x4_set_timing(device_t *device, int realistic)
-{
-	smc92x4_state *w = get_safe_token(device);
-	w->use_real_timing = realistic;
+	m_use_real_timing = realistic;
 	if (VERBOSE>0) LOG("smc92x4: use realistic timing: %02x\n", realistic);
 }
 
-/***************************************************************************
-    DEVICE GETINFO
-***************************************************************************/
+void smc92x4_device::connect_drive(device_t *drive)
+{
+	m_drive = drive;
+	if (VERBOSE>3)
+	{
+		if (drive==NULL) LOG("smc92x4: Unselect all drives\n");
+		else LOG("smc92x4: Connect drive %s\n", drive->tag());
+	}
+}
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+void smc92x4_device::reset()
+{
+	device_reset();
+}
 
-#define DEVTEMPLATE_ID(p,s)				p##smc92x4##s
-#define DEVTEMPLATE_FEATURES				DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"SMC92x4"
-#define DEVTEMPLATE_FAMILY				"SMC92x4"
-#define DEVTEMPLATE_VERSION				"1.0"
-#define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
-#include "devtempl.h"
-
-DEFINE_LEGACY_DEVICE(SMC92X4, smc92x4);
+const device_type SMC92X4 = &device_creator<smc92x4_device>;

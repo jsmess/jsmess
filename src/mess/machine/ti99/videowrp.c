@@ -1,4 +1,5 @@
-/*
+/****************************************************************************
+
     TI-99/4(A) and /8 Video subsystem
     This device actually wraps the naked video chip implementation
 
@@ -6,279 +7,252 @@
     based on v9938 (may also be equipped with v9958)
     Can be used with TI-99/4A as an add-on card; internal VDP must be removed
 
-    The SGCPU ("TI-99/4P") only runs with EVPC.
+    The SGCPU ("TI-99/4P") only runs with EVPC
 
-    Michael Zapf, October 2010
-*/
+    We also include a class wrapper for the sound chip here.
+
+    Michael Zapf
+
+    October 2010
+    February 2012: Rewritten as class
+
+*****************************************************************************/
 
 #include "emu.h"
 #include "videowrp.h"
+#include "sound/sn76496.h"
 
-typedef struct _ti99_video_state
+/*
+    Constructors
+*/
+ti_video_device::ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+: bus8z_device(mconfig, type, name, tag, owner, clock)
 {
-	address_space	*space;
-	device_t	*cpu;
-	int				chip;
-	v9938_device *v9938;
-} ti99_video_state;
-
-INLINE ti99_video_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TIVIDEO);
-
-	return (ti99_video_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE const ti99_video_config *get_config(device_t *device)
+ti_std_video_device::ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ti_video_device(mconfig, TI994AVIDEO, "Video subsystem", tag, owner, clock)
 {
-	assert(device != NULL);
-	assert(device->type() == TIVIDEO);
-
-	return (const ti99_video_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
+ti_std8_video_device::ti_std8_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ti_video_device(mconfig, TI998VIDEO, "Video subsystem", tag, owner, clock)
+{
+}
+
+ti_exp_video_device::ti_exp_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ti_video_device(mconfig, V9938VIDEO, "Video subsystem", tag, owner, clock)
+{
+}
+
+/*****************************************************************************/
+/*
+    Illegal accesses; just take a wait state. Used by TI-99/4A standard or with EVPC
+*/
+
+READ16_MEMBER( ti_video_device::noread )
+{
+	device_adjust_icount(m_cpu, -4);
+	return 0;
+}
+
+WRITE16_MEMBER( ti_video_device::nowrite )
+{
+	device_adjust_icount(m_cpu, -4);
+}
+
+/*****************************************************************************/
+
+// TODO: device_adjust_icount(video->cpu, -4);
+
+/*
+    Memory access (TI-99/4(A))
+*/
+READ16_MEMBER( ti_std_video_device::read16 )
+{
+	if (offset & 1)
+	{	/* read VDP status */
+		return ((int) m_tms9928a->register_read(*(this->m_space), 0)) << 8;
+	}
+	else
+	{	/* read VDP RAM */
+		return ((int) m_tms9928a->vram_read(*(this->m_space), 0)) << 8;
+	}
+}
+
+WRITE16_MEMBER( ti_std_video_device::write16 )
+{
+	if (offset & 1)
+	{	/* write VDP address */
+		m_tms9928a->register_write(*(this->m_space), 0, (data >> 8) & 0xff);
+	}
+	else
+	{	/* write VDP data */
+		m_tms9928a->vram_write(*(this->m_space), 0, (data >> 8) & 0xff);
+	}
+}
+
+/******************************************************************************/
+
+/*
+    Memory access (TI-99/8)
+    Makes use of the Z memory handler.
+*/
+READ8Z_MEMBER( ti_std8_video_device::readz )
+{
+	if (offset & 2)
+	{       /* read VDP status */
+		*value = m_tms9928a->register_read(*(this->m_space), 0);
+	}
+	else
+	{       /* read VDP RAM */
+		*value = m_tms9928a->vram_read(*(this->m_space), 0);
+	}
+}
+
+WRITE8_MEMBER( ti_std8_video_device::write )
+{
+	if (offset & 2)
+	{	/* write VDP address */
+		m_tms9928a->register_write(*(this->m_space), 0, data);
+	}
+	else
+	{	/* write VDP data */
+		m_tms9928a->vram_write(*(this->m_space), 0, data);
+	}
+}
 
 /*****************************************************************************/
 
 /*
-    Memory read (TI-99/4(A))
+    Memory access (EVPC) via 16 bit bus
 */
-READ16_DEVICE_HANDLER( ti_tms991x_r16 )
+READ16_MEMBER( ti_exp_video_device::read16 )
 {
-	ti99_video_state *video = get_safe_token(device);
-	tms9928a_device *tms9928a = device->machine().device<tms9928a_device>( TMS9928A_TAG );
-//  device_adjust_icount(video->cpu, -4);
-
 	if (offset & 1)
 	{	/* read VDP status */
-		return ((int) tms9928a->register_read(*(video->space), 0)) << 8;
+		return ((int) m_v9938->status_r()) << 8;
 	}
 	else
 	{	/* read VDP RAM */
-		return ((int) tms9928a->vram_read(*(video->space), 0)) << 8;
+		return ((int) m_v9938->vram_r()) << 8;
 	}
 }
 
-/*
-    Memory read (TI-99/8). Makes use of the Z memory handler.
-*/
-READ8Z_DEVICE_HANDLER( ti8_tms991x_rz )
+WRITE16_MEMBER( ti_exp_video_device::write16 )
 {
-	ti99_video_state *video = get_safe_token(device);
-	tms9928a_device *tms9928a = device->machine().device<tms9928a_device>( TMS9928A_TAG );
-//  device_adjust_icount(video->cpu, -4);
-
-	if (offset & 2)
-	{	/* read VDP status */
-		*value = tms9928a->register_read(*(video->space), 0);
-	}
-	else
-	{	/* read VDP RAM */
-		*value = tms9928a->vram_read(*(video->space), 0);
-	}
-}
-
-/*
-    Memory read (EVPC)
-*/
-READ16_DEVICE_HANDLER( ti_v9938_r16 )
-{
-	ti99_video_state *video = get_safe_token(device);
-//  device_adjust_icount(video->cpu, -4);
-
-	if (offset & 1)
-	{	/* read VDP status */
-		return ((int) video->v9938->status_r()) << 8;
-	}
-	else
-	{	/* read VDP RAM */
-		return ((int) video->v9938->vram_r()) << 8;
-	}
-}
-
-/*
-    Memory write
-*/
-WRITE16_DEVICE_HANDLER( ti_tms991x_w16 )
-{
-	ti99_video_state *video = get_safe_token(device);
-	tms9928a_device *tms9928a = device->machine().device<tms9928a_device>( TMS9928A_TAG );
-//  device_adjust_icount(video->cpu, -4);
-
-	if (offset & 1)
-	{	/* write VDP address */
-		tms9928a->register_write(*(video->space), 0, (data >> 8) & 0xff);
-	}
-	else
-	{	/* write VDP data */
-		tms9928a->vram_write(*(video->space), 0, (data >> 8) & 0xff);
-	}
-}
-
-/*
-    Memory write (TI-99/8)
-*/
-WRITE8_DEVICE_HANDLER( ti8_tms991x_w )
-{
-	ti99_video_state *video = get_safe_token(device);
-	tms9928a_device *tms9928a = device->machine().device<tms9928a_device>( TMS9928A_TAG );
-//  device_adjust_icount(video->cpu, -4);
-
-	if (offset & 2)
-	{	/* write VDP address */
-		tms9928a->register_write(*(video->space), 0, data);
-	}
-	else
-	{	/* write VDP data */
-		tms9928a->vram_write(*(video->space), 0, data);
-	}
-}
-
-/*
-    Memory write (EVPC)
-*/
-WRITE16_DEVICE_HANDLER ( ti_v9938_w16 )
-{
-	ti99_video_state *video = get_safe_token(device);
-//  device_adjust_icount(video->cpu, -4);
-
 	switch (offset & 3)
 	{
 	case 0:
 		/* write VDP data */
-		video->v9938->vram_w((data >> 8) & 0xff);
+		m_v9938->vram_w((data >> 8) & 0xff);
 		break;
 	case 1:
 		/* write VDP address */
-		video->v9938->command_w((data >> 8) & 0xff);
+		m_v9938->command_w((data >> 8) & 0xff);
 		break;
 	case 2:
 		/* write VDP palette */
-		video->v9938->palette_w((data >> 8) & 0xff);
+		m_v9938->palette_w((data >> 8) & 0xff);
 		break;
 	case 3:
 		/* write VDP register pointer (indirect access) */
-		video->v9938->register_w((data >> 8) & 0xff);
+		m_v9938->register_w((data >> 8) & 0xff);
 		break;
+	}
+}
+
+/******************************************************************************/
+
+/*
+    Video read (Geneve) via 8 bit bus
+*/
+READ8Z_MEMBER( ti_exp_video_device::readz )
+{
+	if (offset & 2)
+	{	/* read VDP status */
+		*value = m_v9938->status_r();
+	}
+	else
+	{	/* read VDP RAM */
+		*value = m_v9938->vram_r();
 	}
 }
 
 /*
     Video write (Geneve)
 */
-WRITE8_DEVICE_HANDLER ( gen_v9938_w )
+WRITE8_MEMBER( ti_exp_video_device::write )
 {
-	ti99_video_state *video = get_safe_token(device);
-//  device_adjust_icount(video->cpu, -4);
-
 	switch (offset & 6)
 	{
 	case 0:
 		/* write VDP data */
-		video->v9938->vram_w(data);
+		m_v9938->vram_w(data);
 		break;
 	case 2:
 		/* write VDP address */
-		video->v9938->command_w(data);
+		m_v9938->command_w(data);
 		break;
 	case 4:
 		/* write VDP palette */
-		video->v9938->palette_w(data);
+		m_v9938->palette_w(data);
 		break;
 	case 6:
 		/* write VDP register pointer (indirect access) */
-		video->v9938->register_w(data);
+		m_v9938->register_w(data);
 		break;
 	}
 }
 
-/*
-    Video read (Geneve).
-*/
-READ8Z_DEVICE_HANDLER( gen_v9938_rz )
-{
-	ti99_video_state *video = get_safe_token(device);
-//  device_adjust_icount(video->cpu, -4);
-
-	if (offset & 2)
-	{	/* read VDP status */
-		*value = video->v9938->status_r();
-	}
-	else
-	{	/* read VDP RAM */
-		*value = video->v9938->vram_r();
-	}
-}
-
-READ16_DEVICE_HANDLER ( ti_video_rnop )
-{
-	ti99_video_state *video = get_safe_token(device);
-	device_adjust_icount(video->cpu, -4);
-	return 0;
-}
-
-WRITE16_DEVICE_HANDLER ( ti_video_wnop )
-{
-	ti99_video_state *video = get_safe_token(device);
-	device_adjust_icount(video->cpu, -4);
-}
 /**************************************************************************/
 // Interfacing to mouse attached to v9938
 
-void video_update_mouse( device_t *device, int delta_x, int delta_y, int buttons)
+void ti_exp_video_device::video_update_mouse(int delta_x, int delta_y, int buttons)
 {
-	ti99_video_state *video = get_safe_token(device);
-	// TODO: V9938 to be devicified
-	if (video->chip==TI_V9938)
-		video->v9938->update_mouse_state(delta_x, delta_y, buttons & 3);
+	m_v9938->update_mouse_state(delta_x, delta_y, buttons & 3);
 }
-
 
 /**************************************************************************/
 
-static DEVICE_START( ti99_video )
+void ti_video_device::device_start(void)
 {
-	ti99_video_state *video = get_safe_token(device);
-	const ti99_video_config* conf = (const ti99_video_config*)get_config(device);
-
-	video->cpu = device->machine().device("maincpu");
-	video->space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	video->chip = conf->chip;
-
-	if (video->chip == TI_V9938)
-	{
-		astring temp(device->tag(), "_v9938");
-		video->v9938 = device->machine().device<v9938_device>(temp);
-		assert(video->v9938 != NULL);
-	}
+	m_cpu = machine().device("maincpu");
+	m_space = m_cpu->memory().space(AS_PROGRAM);
+	m_tms9928a = static_cast<tms9928a_device*>(machine().device(TMS9928A_TAG));
 }
 
-static DEVICE_STOP( ti99_video )
+void ti_exp_video_device::device_start(void)
+{
+	m_cpu = machine().device("maincpu");
+	m_space = m_cpu->memory().space(AS_PROGRAM);
+	m_v9938 = static_cast<v9938_device*>(machine().device(V9938_TAG));
+}
+
+void ti_video_device::device_reset(void)
 {
 }
 
-static DEVICE_RESET( ti99_video )
+/**************************************************************************/
+
+ti_sound_system_device::ti_sound_system_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: bus8z_device(mconfig, TISOUND, "TI sound chip wrapper", tag, owner, clock)
 {
-	const ti99_video_config* conf = (const ti99_video_config*)get_config(device);
-	if (conf->chip!=TI_TMS991X)
-	{
-//      running_machine &machine = device->machine();
-//      int memsize = (input_port_read(machine, "V9938-MEM")==0)? 0x20000 : 0x30000;
-//
-//      v9938_init(machine, 0, *machine.primary_screen, machine.primary_screen->default_bitmap(),
-//          MODEL_V9938, memsize, conf->callback);
-//      v9938_reset(0);
-	}
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+WRITE8_MEMBER( ti_sound_system_device::write )
+{
+	sn76496_w(m_sound_chip, offset, data);
+}
 
-#define DEVTEMPLATE_ID(p,s)             p##ti99_video##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME                "TI-99/x Video subsystem"
-#define DEVTEMPLATE_FAMILY              "Internal device"
-#include "devtempl.h"
+void ti_sound_system_device::device_start(void)
+{
+	m_sound_chip = machine().device(TISOUNDCHIP_TAG);
+}
 
-DEFINE_LEGACY_DEVICE( TIVIDEO, ti99_video );
+/**************************************************************************/
 
+const device_type TI994AVIDEO = &device_creator<ti_std_video_device>;
+const device_type TI998VIDEO = &device_creator<ti_std8_video_device>;
+const device_type V9938VIDEO = &device_creator<ti_exp_video_device>;
+const device_type TISOUND = &device_creator<ti_sound_system_device>;

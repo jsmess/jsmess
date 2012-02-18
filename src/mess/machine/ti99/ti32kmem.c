@@ -1,100 +1,110 @@
-/*
+/****************************************************************************
+
     TI-99 32 KiB Memory Expansion Card
-*/
+    This is a fairly simple memory expansion for the TI-99/4A, adding
+    unbuffered 32 KiB. Yet it was a very popular card since it was
+    required for any kind of advanced programming beyond the console BASIC.
+
+    As a peripheral box card, it is connected via the 8-bit mutiplexed data bus.
+    Later, modifications of the console became increasingly popular which
+    avoided the bus multiplex so that the full 16bit access was possible.
+    This helped to noticeably speed up the system.
+
+    The memory is available on the addresses
+
+    0x2000 - 0x3fff ("low memory")
+    0xa000 - 0xffff ("high memory")
+
+    The console TI BASIC is not able to access the memory expansion, but
+    Extended Basic (available as a cartridge) makes use of it.
+
+    Michael Zapf
+    February 2012: Rewritten as class
+
+*****************************************************************************/
+
 #include "emu.h"
 #include "peribox.h"
 #include "ti32kmem.h"
 
-typedef ti99_pebcard_config ti99_mem32k_config;
+#define RAMREGION "ram"
 
-typedef struct _ti99_mem32k_state
+ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI_32KMEM, "TI-99 32KiB memory expansion card", tag, owner, clock)
 {
-	UINT8 *memory;
-
-} ti99_mem32k_state;
-
-INLINE ti99_mem32k_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TI32KMEM);
-
-	return (ti99_mem32k_state *)downcast<legacy_device_base *>(device)->token();
+	m_shortname = "ti99_32k";
 }
 
-/*
-    Memory read
-*/
-static READ8Z_DEVICE_HANDLER( mem32k_rz )
+READ8Z_MEMBER(ti_32k_expcard_device::readz)
 {
-	ti99_mem32k_state *card = get_safe_token(device);
-	if (((offset & 0x7e000)==0x72000) || ((offset & 0x7e000)==0x7a000) || ((offset & 0x7c000)==0x7c000))
+	switch((offset & 0xe000)>>13)
 	{
-		if ((offset & 0xffff) < 0xa000)
-			*value = card->memory[offset & 0x1fff];
-		else
-			*value = card->memory[offset & 0x7fff];
+	case 1:
+		*value = m_ram_ptr[offset & 0x1fff];
+		break;
+	case 5:
+		*value = m_ram_ptr[(offset & 0x1fff) | 0x2000];
+		break;
+	case 6:
+		*value = m_ram_ptr[(offset & 0x1fff) | 0x4000];
+		break;
+	case 7:
+		*value = m_ram_ptr[(offset & 0x1fff) | 0x6000];
+		break;
+	default:
+		break;
+	}
+}
+
+WRITE8_MEMBER(ti_32k_expcard_device::write)
+{
+	switch((offset & 0xe000)>>13)
+	{
+	case 1:
+		m_ram_ptr[offset & 0x1fff] = data;
+		break;
+	case 5:
+		m_ram_ptr[(offset & 0x1fff) | 0x2000] = data;
+		break;
+	case 6:
+		m_ram_ptr[(offset & 0x1fff) | 0x4000] = data;
+		break;
+	case 7:
+		m_ram_ptr[(offset & 0x1fff) | 0x6000] = data;
+		break;
+	default:
+		break;
 	}
 }
 
 /*
-    Memory write
+    32K memory expansion does not have a CRU interface
 */
-static WRITE8_DEVICE_HANDLER( mem32k_w )
+void ti_32k_expcard_device::crureadz(offs_t offset, UINT8 *value)
 {
-	ti99_mem32k_state *card = get_safe_token(device);
-	if (((offset & 0x7e000)==0x72000) || ((offset & 0x7e000)==0x7a000) || ((offset & 0x7c000)==0x7c000))
-	{
-		if ((offset & 0xffff) < 0xa000)
-			card->memory[offset & 0x1fff] = data;
-		else
-			card->memory[offset & 0x7fff] = data;
-	}
+	return;
 }
 
-/**************************************************************************/
-
-static const ti99_peb_card ti32k_card =
+void ti_32k_expcard_device::cruwrite(offs_t offset, UINT8 value)
 {
-	mem32k_rz, mem32k_w,			// memory access read/write
-	NULL, NULL,						// CRU access (none here)
-	NULL, NULL,						// SENILA/B access (none here)
-	NULL, NULL						// 16 bit access (none here)
-};
-
-static DEVICE_START( ti99_mem32k )
-{
-	ti99_mem32k_state *card = get_safe_token(device);
-	card->memory = NULL;
+	return;
 }
 
-static DEVICE_STOP( ti99_mem32k )
+void ti_32k_expcard_device::device_start(void)
 {
-	ti99_mem32k_state *card = get_safe_token(device);
-	if (card->memory) free(card->memory);
+	m_ram_ptr = subregion(RAMREGION)->base();
+	m_cru_base = 0;
 }
 
-static DEVICE_RESET( ti99_mem32k )
+ROM_START( ti_exp_32k )
+	ROM_REGION(0x8000, RAMREGION, 0)
+	ROM_FILL(0x0000, 0x8000, 0x00)
+ROM_END
+
+const rom_entry *ti_32k_expcard_device::device_rom_region() const
 {
-	ti99_mem32k_state *card = get_safe_token(device);
-	/* Register the card */
-	device_t *peb = device->owner();
-
-	if (input_port_read(device->machine(), "RAM")==RAM_TI32_EXT)
-	{
-		int success = mount_card(peb, device, &ti32k_card, get_pebcard_config(device)->slot);
-		if (!success) return;
-
-		if (card->memory==NULL) card->memory = (UINT8*)malloc(32768);
-	}
+	return ROM_NAME( ti_exp_32k );
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)             p##ti99_mem32k##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME                "TI99 32KiB Memory Expansion Card"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
-
-DEFINE_LEGACY_DEVICE( TI32KMEM, ti99_mem32k );
+const device_type TI_32KMEM = &device_creator<ti_32k_expcard_device>;
 

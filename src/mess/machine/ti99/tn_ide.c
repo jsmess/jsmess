@@ -1,4 +1,5 @@
-/*
+/****************************************************************************
+
     Thierry Nouspikel's IDE card emulation
 
     This card is just a prototype.  It has been designed by Thierry Nouspikel,
@@ -16,28 +17,25 @@
 
     Raphael Nabet, 2002-2004.
 
-    Rewritten as device
-    Michael Zapf, September 2010
+    Michael Zapf
+    September 2010: Rewritten as device
+    February 2012: Rewritten as class
 
-    FIXME: idecont assumes that there is only one drive that is called
-    "harddisk" at the root level
-*/
+    FIXME: Completely untested and likely to be broken
+
+*****************************************************************************/
+
 #include "emu.h"
 #include "peribox.h"
 #include "machine/idectrl.h"
-#include "machine/rtc65271.h"
-#include "machine/idectrl.h"
-#include "cpu/tms9900/tms9900.h"
 #include "tn_ide.h"
 
 #define CRU_BASE 0x1000
 
-typedef ti99_pebcard_config tn_ide_config;
+#define BUFFER_TAG "ram"
 
-enum
-{	/* 0xff for 2 mbytes, 0x3f for 512kbytes, 0x03 for 32 kbytes */
-	page_mask = /*0xff*/0x3f
-};
+/* previously 0xff */
+#define PAGE_MASK 0x3f
 
 enum
 {
@@ -49,65 +47,31 @@ enum
 	cru_reg_reset = 0x80
 };
 
-typedef struct _tn_ide_state
+nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI99_IDE, "Nouspikel IDE interface card", tag, owner, clock)
 {
-	int 	selected;
-
-	/* Used for GenMod */
-	int		select_mask;
-	int		select_value;
-
-	rtc65271_device		*rtc;
-	device_t		*ide;
-
-	int		ide_irq;
-	int		clk_irq;
-	int 	sram_enable;
-	int 	sram_enable_dip;
-	int 	cru_register;
-	int		cur_page;
-
-	int		tms9995_mode;
-
-	UINT16	input_latch;
-	UINT16	output_latch;
-
-	UINT8	*ram;
-
-	/* Callback lines to the main system. */
-	ti99_peb_connect	lines;
-
-} tn_ide_state;
-
-INLINE tn_ide_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TNIDE);
-
-	return (tn_ide_state *)downcast<legacy_device_base *>(device)->token();
+	m_shortname = "ti99_ide";
 }
-
 
 /*
     CRU read
 */
-static READ8Z_DEVICE_HANDLER( cru_rz )
+void nouspikel_ide_interface_device::crureadz(offs_t offset, UINT8 *value)
 {
-	tn_ide_state *card = get_safe_token(device);
 	UINT8 reply = 0;
-	if ((offset & 0xff00)==CRU_BASE)
+	if ((offset & 0xff00)==m_cru_base)
 	{
 		int bit = (offset >> 4) & 7;
 
 		if (bit==0)
 		{
-			reply = card->cru_register & 0x30;
+			reply = m_cru_register & 0x30;
 			reply |= 8;	/* IDE bus IORDY always set */
-			if (!card->clk_irq)
+			if (!m_clk_irq)
 				reply |= 4;
-			if (card->sram_enable_dip)
+			if (m_sram_enable_dip)
 				reply |= 2;
-			if (!card->ide_irq)
+			if (!m_ide_irq)
 				reply |= 1;
 		}
 		*value = reply;
@@ -117,39 +81,37 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 /*
     CRU write
 */
-static WRITE8_DEVICE_HANDLER( cru_w )
+void nouspikel_ide_interface_device::cruwrite(offs_t offset, UINT8 data)
 {
-	tn_ide_state *card = get_safe_token(device);
-
-	if ((offset & 0xff00)==CRU_BASE)
+	if ((offset & 0xff00)==m_cru_base)
 	{
 		int bit = (offset >>1) & 7;
 		switch (bit)
 		{
-		case 0:			/* turn card on: handled by core */
-			card->selected = data;
+		case 0:
+			m_selected = (data!=0);
 
-		case 1:			/* enable SRAM or registers in 0x4000-0x40ff */
-			card->sram_enable = data;
+		case 1:			// enable SRAM or registers in 0x4000-0x40ff
+			m_sram_enable = (data!=0);
 			break;
 
-		case 2:			/* enable SRAM page switching */
-		case 3:			/* force SRAM page 0 */
-		case 4:			/* enable SRAM in 0x6000-0x7000 ("RAMBO" mode) */
-		case 5:			/* write-protect RAM */
-		case 6:			/* irq and reset enable */
-		case 7:			/* reset drive */
-			if (data)
-				card->cru_register |= 1 << bit;
+		case 2:			// enable SRAM page switching
+		case 3:			// force SRAM page 0
+		case 4:			// enable SRAM in 0x6000-0x7000 ("RAMBO" mode)
+		case 5:			// write-protect RAM
+		case 6:			// irq and reset enable
+		case 7:			// reset drive
+			if (data!=0)
+				m_cru_register |= 1 << bit;
 			else
-				card->cru_register &= ~(1 << bit);
+				m_cru_register &= ~(1 << bit);
 
 			if (bit == 6)
-				card->lines.inta((card->cru_register & cru_reg_int_en) && card->ide_irq);
+				m_slot->set_inta((m_cru_register & cru_reg_int_en) && m_ide_irq);
 
 			if ((bit == 6) || (bit == 7))
-				if ((card->cru_register & cru_reg_int_en) && !(card->cru_register & cru_reg_reset))
-					card->ide->reset();
+				if ((m_cru_register & cru_reg_int_en) && !(m_cru_register & cru_reg_reset))
+					m_ide->reset();
 			break;
 		}
 	}
@@ -158,65 +120,64 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 /*
     Memory read
 */
-static READ8Z_DEVICE_HANDLER( data_rz )
+READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 {
-	tn_ide_state *card = get_safe_token(device);
 	UINT8 reply = 0;
 
-	if (((offset & card->select_mask)==card->select_value) && card->selected)
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		int addr = offset & 0x1fff;
 
-		if ((addr <= 0xff) && (card->sram_enable == card->sram_enable_dip))
+		if ((addr <= 0xff) && (m_sram_enable == m_sram_enable_dip))
 		{	/* registers */
 			switch ((addr >> 5) & 0x3)
 			{
 			case 0:		/* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					reply = card->rtc->xram_r(*memory_nonspecific_space(device->machine()),(addr & 0x1f) | 0x20);
+					reply = m_rtc->xram_r(*memory_nonspecific_space(machine()),(addr & 0x1f) | 0x20);
 				else
 					/* RTC RAM read */
-					reply = card->rtc->xram_r(*memory_nonspecific_space(device->machine()),addr);
+					reply = m_rtc->xram_r(*memory_nonspecific_space(machine()),addr);
 				break;
 			case 1:		/* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					reply = card->rtc->rtc_r(*memory_nonspecific_space(device->machine()),1);
+					reply = m_rtc->rtc_r(*memory_nonspecific_space(machine()),1);
 				else
 					/* register select */
-					reply = card->rtc->rtc_r(*memory_nonspecific_space(device->machine()),0);
+					reply = m_rtc->rtc_r(*memory_nonspecific_space(machine()),0);
 				break;
 			case 2:		/* IDE registers set 1 (CS1Fx) */
-				if (card->tms9995_mode ? (!(addr & 1)) : (addr & 1))
+				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
 				{	/* first read triggers 16-bit read cycle */
-					card->input_latch = (! (addr & 0x10)) ? ide_bus_r(card->ide, 0, (addr >> 1) & 0x7) : 0;
+					m_input_latch = (! (addr & 0x10)) ? ide_bus_r(m_ide, 0, (addr >> 1) & 0x7) : 0;
 				}
 
 				/* return latched input */
 				/*reply = (addr & 1) ? input_latch : (input_latch >> 8);*/
 				/* return latched input - bytes are swapped in 2004 IDE card */
-				reply = ((addr & 1) ? (card->input_latch >> 8) : card->input_latch) & 0xff;
+				reply = ((addr & 1) ? (m_input_latch >> 8) : m_input_latch) & 0xff;
 				break;
 			case 3:		/* IDE registers set 2 (CS3Fx) */
-				if (card->tms9995_mode ? (!(addr & 1)) : (addr & 1))
+				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
 				{	/* first read triggers 16-bit read cycle */
-					card->input_latch = (! (addr & 0x10)) ? ide_bus_r(card->ide, 1, (addr >> 1) & 0x7) : 0;
+					m_input_latch = (! (addr & 0x10)) ? ide_bus_r(m_ide, 1, (addr >> 1) & 0x7) : 0;
 				}
 
 				/* return latched input */
 				/*reply = (addr & 1) ? input_latch : (input_latch >> 8);*/
 				/* return latched input - bytes are swapped in 2004 IDE card */
-				reply = ((addr & 1) ? (card->input_latch >> 8) : card->input_latch) & 0xff;
+				reply = ((addr & 1) ? (m_input_latch >> 8) : m_input_latch) & 0xff;
 				break;
 			}
 		}
 		else
 		{	/* sram */
-			if ((card->cru_register & cru_reg_page_0) || (addr >= 0x1000))
-				reply = card->ram[addr+0x2000 * card->cur_page];
+			if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
+				reply = m_ram[addr+0x2000 * m_cur_page];
 			else
-				reply = card->ram[addr];
+				reply = m_ram[addr];
 		}
 		*value = reply;
 	}
@@ -225,99 +186,92 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 /*
     Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
-static WRITE8_DEVICE_HANDLER( data_w )
+WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 {
-	tn_ide_state *card = get_safe_token(device);
-
-	if (((offset & card->select_mask)==card->select_value) && card->selected)
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
-		if (card->cru_register & cru_reg_page_switching)
+		if (m_cru_register & cru_reg_page_switching)
 		{
-			card->cur_page = (offset >> 1) & page_mask;
+			m_cur_page = (offset >> 1) & PAGE_MASK;
 		}
 
 		int addr = offset & 0x1fff;
 
-		if ((addr <= 0xff) && (card->sram_enable == card->sram_enable_dip))
+		if ((addr <= 0xff) && (m_sram_enable == m_sram_enable_dip))
 		{	/* registers */
 			switch ((addr >> 5) & 0x3)
 			{
 			case 0:		/* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					card->rtc->xram_w(*memory_nonspecific_space(device->machine()),(addr & 0x1f) | 0x20, data);
+					m_rtc->xram_w(*memory_nonspecific_space(machine()),(addr & 0x1f) | 0x20, data);
 				else
 					/* RTC RAM write */
-					card->rtc->xram_w(*memory_nonspecific_space(device->machine()),addr, data);
+					m_rtc->xram_w(*memory_nonspecific_space(machine()),addr, data);
 				break;
 			case 1:		/* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					card->rtc->rtc_w(*memory_nonspecific_space(device->machine()),1, data);
+					m_rtc->rtc_w(*memory_nonspecific_space(machine()),1, data);
 				else
 					/* register select */
-					card->rtc->rtc_w(*memory_nonspecific_space(device->machine()),0, data);
+					m_rtc->rtc_w(*memory_nonspecific_space(machine()),0, data);
 				break;
 			case 2:		/* IDE registers set 1 (CS1Fx) */
 /*
                 if (addr & 1)
-                    card->output_latch = (card->output_latch & 0xff00) | data;
+                    m_output_latch = (m_output_latch & 0xff00) | data;
                 else
-                    card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
+                    m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
 */
 				/* latch write - bytes are swapped in 2004 IDE card */
 				if (addr & 1)
-					card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
+					m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
 				else
-					card->output_latch = (card->output_latch & 0xff00) | data;
+					m_output_latch = (m_output_latch & 0xff00) | data;
 
-				if (card->tms9995_mode ? (addr & 1) : (!(addr & 1)))
+				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
 				{	/* second write triggers 16-bit write cycle */
-					ide_bus_w(card->ide, 0, (addr >> 1) & 0x7, card->output_latch);
+					ide_bus_w(m_ide, 0, (addr >> 1) & 0x7, m_output_latch);
 				}
 				break;
 			case 3:		/* IDE registers set 2 (CS3Fx) */
 /*
                 if (addr & 1)
-                    card->output_latch = (card->output_latch & 0xff00) | data;
+                    m_output_latch = (m_output_latch & 0xff00) | data;
                 else
-                    card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
+                    m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
 */
 				/* latch write - bytes are swapped in 2004 IDE card */
 				if (addr & 1)
-					card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
+					m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
 				else
-					card->output_latch = (card->output_latch & 0xff00) | data;
+					m_output_latch = (m_output_latch & 0xff00) | data;
 
-				if (card->tms9995_mode ? (addr & 1) : (!(addr & 1)))
+				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
 				{	/* second write triggers 16-bit write cycle */
-					ide_bus_w(card->ide, 1, (addr >> 1) & 0x7, card->output_latch);
+					ide_bus_w(m_ide, 1, (addr >> 1) & 0x7, m_output_latch);
 				}
 				break;
 			}
 		}
 		else
 		{	/* sram */
-			if (! (card->cru_register & cru_reg_wp))
+			if (! (m_cru_register & cru_reg_wp))
 			{
-				if ((card->cru_register & cru_reg_page_0) || (addr >= 0x1000))
-					card->ram[addr+0x2000 * card->cur_page] = data;
+				if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
+					m_ram[addr+0x2000 * m_cur_page] = data;
 				else
-					card->ram[addr] = data;
+					m_ram[addr] = data;
 			}
 		}
 	}
 }
 
-/**************************************************************************/
-
-static const ti99_peb_card tn_ide_card =
+void nouspikel_ide_interface_device::do_inta(int state)
 {
-	data_rz, data_w,				// memory access read/write
-	cru_rz, cru_w,					// CRU access
-	NULL, NULL,						// SENILA/B access
-	NULL, NULL						// 16 bit access (none here)
-};
+	m_slot->set_inta(state);
+}
 
 /*
     ti99_ide_interrupt()
@@ -325,87 +279,105 @@ static const ti99_peb_card tn_ide_card =
 */
 static void ide_interrupt_callback(device_t *device, int state)
 {
-	tn_ide_state *card = get_safe_token(device->owner());
-	card->ide_irq = state;
-	if (card->cru_register & cru_reg_int_en)
-		card->lines.inta(state);
+	nouspikel_ide_interface_device *card  = downcast<nouspikel_ide_interface_device *>(device->owner());
+	card->m_ide_irq = state;
+	if (card->m_cru_register & cru_reg_int_en)
+		card->do_inta(state);
 }
 
 /*
     clk_interrupt_callback()
     clock interrupt callback
 */
-static WRITE_LINE_DEVICE_HANDLER(clock_interrupt_callback)
+WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
 {
-	tn_ide_state *card = get_safe_token(device->owner());
-	card->clk_irq = state;
-	card->lines.inta(state);
+	m_clk_irq = (state!=0);
+	m_slot->set_inta(state);
 }
 
-
-static DEVICE_START( tn_ide )
+void nouspikel_ide_interface_device::device_start()
 {
-	tn_ide_state *card = get_safe_token(device);
-	card->rtc = device->subdevice<rtc65271_device>("ide_rtc");
-	card->ide = device->subdevice("ide");
+	m_rtc = subdevice<rtc65271_device>("ide_rtc");
+	m_ide = subdevice("ide");
 
-	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	card->lines.inta.resolve(topeb->inta, *device);
-
-	card->ram = auto_alloc_array(device->machine(), UINT8, 0x080000);
-	card->sram_enable_dip = 0;
+	m_ram = subregion(BUFFER_TAG)->base();
+	m_sram_enable_dip = false; // TODO: what is this?
 }
 
-static DEVICE_STOP( tn_ide )
+void nouspikel_ide_interface_device::device_reset()
 {
-}
+	m_cur_page = 0;
+	m_sram_enable = false;
+	m_cru_register = 0;
 
-static DEVICE_RESET( tn_ide )
-{
-	tn_ide_state *card = get_safe_token(device);
-	device_t *peb = device->owner();
-
-	if (input_port_read(device->machine(), "HDCTRL") & HD_IDE)
+	if (m_genmod)
 	{
-		int success = mount_card(peb, device, &tn_ide_card, get_pebcard_config(device)->slot);
-		if (!success) return;
-
-		card->cur_page = 0;
-		card->sram_enable = 0;
-		card->cru_register = 0;
-
-		card->select_mask = 0x7e000;
-		card->select_value = 0x74000;
-
-		if (input_port_read(device->machine(), "MODE")==GENMOD)
-		{
-			// GenMod card modification
-			card->select_mask = 0x1fe000;
-			card->select_value = 0x174000;
-		}
-
-		card->tms9995_mode =  (device->type()==TMS9995);
+		m_select_mask = 0x1fe000;
+		m_select_value = 0x174000;
 	}
+	else
+	{
+		m_select_mask = 0x7e000;
+		m_select_value = 0x74000;
+	}
+	m_selected = false;
+
+	m_cru_base = input_port_read(*this, "CRUIDE");
+
+	// m_tms9995_mode =  (device->type()==TMS9995);
 }
 
 static const rtc65271_interface ide_rtc_cfg =
 {
-	DEVCB_LINE(clock_interrupt_callback)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, nouspikel_ide_interface_device, clock_interrupt_callback)
 };
 
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_RTC65271_ADD( "ide_rtc", ide_rtc_cfg )
 	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback, ide_image_devices, "hdd", NULL )
-//	MCFG_IDE_CONTROLLER_REGIONS(":peribox:idehd0:drive", NULL)
+//  MCFG_IDE_CONTROLLER_REGIONS(":peribox:idehd0:drive", NULL)
 MACHINE_CONFIG_END
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+ROM_START( tn_ide )
+	ROM_REGION(0x80000, BUFFER_TAG, 0)  /* RAM buffer 512 KiB */
+	ROM_FILL(0x0000, 0x80000, 0x00)
+ROM_END
 
-#define DEVTEMPLATE_ID(p,s)             p##tn_ide##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
-#define DEVTEMPLATE_NAME                "Nouspikel IDE controller card"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
+INPUT_PORTS_START( tn_ide )
+	PORT_START( "CRUIDE" )
+	PORT_DIPNAME( 0x1f00, 0x1000, "IDE CRU base" )
+		PORT_DIPSETTING( 0x1000, "1000" )
+		PORT_DIPSETTING( 0x1100, "1100" )
+		PORT_DIPSETTING( 0x1200, "1200" )
+		PORT_DIPSETTING( 0x1300, "1300" )
+		PORT_DIPSETTING( 0x1400, "1400" )
+		PORT_DIPSETTING( 0x1500, "1500" )
+		PORT_DIPSETTING( 0x1600, "1600" )
+		PORT_DIPSETTING( 0x1700, "1700" )
+		PORT_DIPSETTING( 0x1800, "1800" )
+		PORT_DIPSETTING( 0x1900, "1900" )
+		PORT_DIPSETTING( 0x1a00, "1A00" )
+		PORT_DIPSETTING( 0x1b00, "1B00" )
+		PORT_DIPSETTING( 0x1c00, "1C00" )
+		PORT_DIPSETTING( 0x1d00, "1D00" )
+		PORT_DIPSETTING( 0x1e00, "1E00" )
+		PORT_DIPSETTING( 0x1f00, "1F00" )
+INPUT_PORTS_END
 
-DEFINE_LEGACY_DEVICE( TNIDE, tn_ide );
+machine_config_constructor nouspikel_ide_interface_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( tn_ide );
+}
+
+const rom_entry *nouspikel_ide_interface_device::device_rom_region() const
+{
+	return ROM_NAME( tn_ide );
+}
+
+ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tn_ide);
+}
+
+const device_type TI99_IDE = &device_creator<nouspikel_ide_interface_device>;
 

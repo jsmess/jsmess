@@ -1,132 +1,98 @@
-/*
-    TI Standard Floppy Disk Controller
-    September 2010
+/****************************************************************************
+
+    TI-99 Standard Floppy Disk Controller Card
+    Based on WD1771
+    Single Density, Double-sided
 
     Michael Zapf
-*/
+    September 2010
+    January 2012: rewritten as class (MZ)
+
+****************************************************************************/
+
 #include "emu.h"
 #include "peribox.h"
 #include "ti_fdc.h"
 #include "machine/wd17xx.h"
 #include "formats/ti99_dsk.h"
-#include "imagedev/flopdrv.h"
 
-#define CRU_BASE 0x1100
+#define LOG logerror
+#define VERBOSE 1
 
 #define fdc_IRQ 1
 #define fdc_DRQ 2
 
-#define fdc_region "fdc_region"
+#define TI_FDC_TAG "ti_dssd_controller"
 
-typedef ti99_pebcard_config ti99_fdc_config;
+#define FDC_TAG "wd1771"
 
-typedef struct _ti99_fdc_state
+#define MOTOR_TIMER 1
+
+const wd17xx_interface ti_wd17xx_interface =
 {
-	/* Holds the status of the DRQ and IRQ lines. */
-	int					DRQ_IRQ_status;
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_fdc_device, intrq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_fdc_device, drq_w),
+	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, NULL }
+};
 
-	/* When TRUE, card is accessible. Indicated by a LED. */
-	int					selected;
-
-	/* Used for GenMod. */
-	int					select_mask;
-	int					select_value;
-
-	/* When TRUE, keeps DVENA high. */
-	int					strobe_motor;
-
-	/* Signal DVENA. When TRUE, makes some drive turning. */
-	line_state			DVENA;
-
-	/* When TRUE the CPU is halted while DRQ/IRQ are true. */
-	int					hold;
-
-	/* Indicates which drive has been selected. Values are 0, 1, 2, and 4. */
-	// 000 = no drive
-	// 001 = drive 1
-	// 010 = drive 2
-	// 100 = drive 3
-	int					DSEL;
-
-	/* Signal SIDSEL. 0 or 1, indicates the selected head. */
-	int					SIDSEL;
-
-	/* count 4.23s from rising edge of motor_on */
-	emu_timer			*motor_on_timer;
-
-	/* Link to the FDC1771 controller on the board. */
-	device_t		*controller;
-
-	/* DSR ROM */
-	UINT8				*rom;
-
-	/* Callback lines to the main system. */
-	ti99_peb_connect	lines;
-
-} ti99_fdc_state;
-
-/* Those defines are required because the WD17xx DEVICE_START implementation
-assumes that the floppy devices are either at root level or at the parent
-level. Our floppy devices, however, are at the grandparent level as seen from
-the controller. */
-
-#define PFLOPPY_0 ":peribox:floppy0"
-#define PFLOPPY_1 ":peribox:floppy1"
-#define PFLOPPY_2 ":peribox:floppy2"
-
-INLINE ti99_fdc_state *get_safe_token(device_t *device)
+ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock)
 {
-	assert(device != NULL);
-	assert(device->type() == TIFDC);
-
-	return (ti99_fdc_state *)downcast<legacy_device_base *>(device)->token();
+	m_shortname = "ti99_fdc";
 }
 
 /*
-    Call this when the state of DSKhold or DRQ/IRQ or DVENA change
-
-    Emulation is faulty because the CPU is actually stopped in the midst of
-    instruction, at the end of the memory access
-
-    TODO: This has to be replaced by the proper READY handling that is already
-    prepared here. (Requires READY handling by the CPU.)
+    callback called at the end of DVENA pulse
 */
-static void fdc_handle_hold(device_t *device)
+void ti_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	ti99_fdc_state *card = get_safe_token(device);
-	line_state state;
-
-	if (card->hold && (!card->DRQ_IRQ_status) && (card->DVENA==ASSERT_LINE))
-		state = ASSERT_LINE;
-	else
-		state = CLEAR_LINE;
-
-	// TODO: use READY
-	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_HALT, state);
+	m_DVENA = CLEAR_LINE;
+	handle_hold();
 }
 
-/*
-    Resets the drive geometry. This is required because the heuristic of
-    the default implementation sets the drive geometry to the geometry
-    of the medium.
-*/
-static void set_geometry(device_t *drive, floppy_type_t type)
+READ8Z_MEMBER(ti_fdc_device::readz)
 {
-	if (drive!=NULL)
-		floppy_drive_set_geometry(drive, type);
-	else
-		logerror("ti99/FDC: Drive not found\n");
+	if (m_selected)
+	{
+		if ((offset & m_select_mask)==m_select_value)
+		{
+			// only use the even addresses from 1ff0 to 1ff6.
+			// Note that data is inverted.
+			// 0101 1111 1111 0xx0
+			UINT8 reply = 0;
+
+			if ((offset & 0x1ff9)==0x1ff0)
+			{
+				reply = wd17xx_r(m_controller, (offset >> 1)&0x03);
+			}
+			else
+			{
+				reply = m_dsrrom[offset & 0x1fff];
+			}
+			*value = reply;
+			if (VERBOSE>5) LOG("ti_fdc: %04x -> %02x\n", offset & 0xffff, *value);
+		}
+	}
 }
 
-static void set_all_geometries(device_t *device, floppy_type_t type)
+WRITE8_MEMBER(ti_fdc_device::write)
 {
-	set_geometry(device->machine().device(PFLOPPY_0), type);
-	set_geometry(device->machine().device(PFLOPPY_1), type);
-	set_geometry(device->machine().device(PFLOPPY_2), type);
+	if (m_selected)
+	{
+		if ((offset & m_select_mask)==m_select_value)
+		{
+			if (VERBOSE>5) LOG("ti_fdc: %04x <- %02x\n", offset & 0xffff, data);
+			// only use the even addresses from 1ff8 to 1ffe.
+			// Note that data is inverted.
+			// 0101 1111 1111 1xx0
+			if ((offset & 0x1ff9)==0x1ff8)
+			{
+				wd17xx_w(m_controller, (offset >> 1)&0x03, data);
+			}
+		}
+	}
 }
-
-
-/*************************************************************************/
 
 /*
     The CRU read handler.
@@ -137,11 +103,9 @@ static void set_all_geometries(device_t *device, floppy_type_t type)
     bit 6: always 1
     bit 7: selected side
 */
-static READ8Z_DEVICE_HANDLER( cru_r )
+void ti_fdc_device::crureadz(offs_t offset, UINT8 *value)
 {
-	ti99_fdc_state *card = get_safe_token(device);
-
-	if ((offset & 0xff00)==CRU_BASE)
+	if ((offset & 0xff00)==m_cru_base)
 	{
 		int addr = offset & 0x07;
 		UINT8 reply = 0;
@@ -150,38 +114,38 @@ static READ8Z_DEVICE_HANDLER( cru_r )
 			// deliver bits 0-7
 			// TODO: HLD pin
 			// The DVENA state is returned inverted
-			if (card->DVENA==ASSERT_LINE) reply |= ((card->DSEL)<<1);
+			if (m_DVENA==ASSERT_LINE) reply |= ((m_DSEL)<<1);
 			else reply |= 0x10;
 			reply |= 0x40;
-			if (card->SIDSEL) reply |= 0x80;
+			if (m_SIDSEL) reply |= 0x80;
 		}
 		*value = reply;
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( cru_w )
+void ti_fdc_device::cruwrite(offs_t offset, UINT8 data)
 {
-	ti99_fdc_state *card = get_safe_token(device);
 	int drive, drivebit;
 
-	if ((offset & 0xff00)==CRU_BASE)
+	if ((offset & 0xff00)==m_cru_base)
 	{
 		int bit = (offset >> 1) & 0x07;
 		switch (bit)
 		{
 		case 0:
 			/* (De)select the card. Indicated by a LED on the board. */
-			card->selected = data;
+			m_selected = (data!=0);
+			if (VERBOSE>4) LOG("ti_fdc: Map DSR = %d\n", m_selected);
 			break;
 		case 1:
 			/* Activate motor */
-			if (data && !card->strobe_motor)
+			if (data && !m_strobe_motor)
 			{	/* on rising edge, set motor_running for 4.23s */
-				card->DVENA = ASSERT_LINE;
-				fdc_handle_hold(device);
-				card->motor_on_timer->adjust(attotime::from_msec(4230));
+				m_DVENA = ASSERT_LINE;
+				handle_hold();
+				m_motor_on_timer->adjust(attotime::from_msec(4230));
 			}
-			card->strobe_motor = data;
+			m_strobe_motor = (data!=0);
 			break;
 
 		case 2:
@@ -191,8 +155,8 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 			// OR the motor stops rotating - rotates for 4.23s after write
 			// to CRU bit 1
 			// This is not emulated and could cause the TI99 to lock up
-			card->hold = data;
-			fdc_handle_hold(device);
+			m_hold = (data != 0);
+			handle_hold();
 			break;
 
 		case 3:
@@ -208,220 +172,148 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 
 			if (data)
 			{
-				if (!(card->DSEL & drivebit))			/* select drive */
+				if ((m_DSEL & drivebit)!=0)			/* select drive */
 				{
-					if (card->DSEL != 0)
-						logerror("ti_fdc: Multiple drives selected, %02x\n", card->DSEL);
-					card->DSEL |= drivebit;
-					wd17xx_set_drive(card->controller, drive);
+					if (m_DSEL != 0)
+						LOG("ti_fdc: Multiple drives selected, %02x\n", m_DSEL);
+					m_DSEL |= drivebit;
+					wd17xx_set_drive(m_controller, drive);
 					/*wd17xx_set_side(DSKside);*/
 				}
 			}
 			else
-				card->DSEL &= ~drivebit;
+				m_DSEL &= ~drivebit;
 			break;
 
 		case 7:
 			/* Select side of disk (bit 7) */
-			card->SIDSEL = data;
-			wd17xx_set_side(card->controller, data);
+			m_SIDSEL = data;
+			wd17xx_set_side(m_controller, data);
 			break;
 		}
 	}
 }
 
 /*
-    Read a byte from the ROM or from the controller
+    Call this when the state of DSKhold or DRQ/IRQ or DVENA change
+
+    Emulation is faulty because the CPU is actually stopped in the midst of
+    instruction, at the end of the memory access
+
+    TODO: This has to be replaced by the proper READY handling that is already
+    prepared here. (Requires READY handling by the CPU.)
 */
-static READ8Z_DEVICE_HANDLER( data_r )
+void ti_fdc_device::handle_hold()
 {
-	ti99_fdc_state *card = get_safe_token(device);
+	line_state state;
 
-	if (card->selected)
-	{
-		if ((offset & card->select_mask)==card->select_value)
-		{
-			// only use the even addresses from 1ff0 to 1ff6.
-			// Note that data is inverted.
-			// 0101 1111 1111 0xx0
-			UINT8 reply = 0;
+	if (m_hold && !m_DRQ && !m_IRQ && (m_DVENA==ASSERT_LINE))
+		state = ASSERT_LINE;
+	else
+		state = CLEAR_LINE;
 
-			if ((offset & 0x1ff9)==0x1ff0)
-				reply = wd17xx_r(card->controller, (offset >> 1)&0x03);
-			else
-				reply = card->rom[offset & 0x1fff];
-
-			*value = reply;
-		}
-	}
+	// TODO: use READY
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_HALT, state);
 }
 
 /*
-    Write a byte to the controller.
+    Resets the drive geometry. This is required because the heuristic of
+    the default implementation sets the drive geometry to the geometry
+    of the medium.
 */
-static WRITE8_DEVICE_HANDLER( data_w )
+void ti_fdc_device::set_geometry(device_t *drive, floppy_type_t type)
 {
-	ti99_fdc_state *card = get_safe_token(device);
-	if (card->selected)
-	{
-		if ((offset & card->select_mask)==card->select_value)
-		{
-			// only use the even addresses from 1ff8 to 1ffe.
-			// Note that data is inverted.
-			// 0101 1111 1111 1xx0
-			if ((offset & 0x1ff9)==0x1ff8)
-				wd17xx_w(card->controller, (offset >> 1)&0x03, data);
-		}
-	}
+	// This assertion may fail when the names of the floppy devices change.
+	// Unfortunately, the wd17xx device assumes the floppy drives at root
+	// level, so we use an explicitly qualified tag. See peribox.h.
+	assert (drive!=NULL);
+	floppy_drive_set_geometry(drive, type);
+}
+
+void ti_fdc_device::set_all_geometries(floppy_type_t type)
+{
+	set_geometry(machine().device(PFLOPPY_0), type);
+	set_geometry(machine().device(PFLOPPY_1), type);
+	set_geometry(machine().device(PFLOPPY_2), type);
 }
 
 /*
     Callback, called from the controller chip whenever DRQ/IRQ state change
 */
-static WRITE_LINE_DEVICE_HANDLER( ti_fdc_intrq_w )
+WRITE_LINE_MEMBER( ti_fdc_device::intrq_w )
 {
-	device_t *carddev = device->owner();
-	ti99_fdc_state *card = get_safe_token(carddev);
+	if (VERBOSE>8) LOG("ti_fdc: set irq = %02x\n", state);
+	m_IRQ = (state==ASSERT_LINE);
+	// Note that INTB is actually not used in the TI-99 family. But the
+	// controller asserts the line nevertheless, probably intended for
+	// use in another planned TI system
+	m_slot->set_intb(state);
 
-	if (state==ASSERT_LINE)
+	handle_hold();
+}
+
+WRITE_LINE_MEMBER( ti_fdc_device::drq_w )
+{
+	if (VERBOSE>8) LOG("ti_fdc: set drq = %02x\n", state);
+	m_DRQ = (state == ASSERT_LINE);
+	handle_hold();
+}
+
+void ti_fdc_device::device_start(void)
+{
+	if (VERBOSE>5) LOG("ti_fdc: TI FDC start\n");
+	m_dsrrom = subregion(DSRROM)->base();
+	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
+	m_controller = subdevice(FDC_TAG);
+
+	m_cru_base = 0x1100;
+}
+
+void ti_fdc_device::device_reset(void)
+{
+	if (VERBOSE>5) LOG("ti_fdc: TI FDC reset\n");
+	m_DSEL = 0;
+	m_SIDSEL = 0;
+	m_DVENA = CLEAR_LINE;
+	m_strobe_motor = false;
+	if (m_genmod)
 	{
-		// Note that INTB is actually not used in the TI-99 family. But the
-		// controller asserts the line nevertheless
-		card->DRQ_IRQ_status |= fdc_IRQ;
+		m_select_mask = 0x1fe000;
+		m_select_value = 0x174000;
 	}
 	else
 	{
-		card->DRQ_IRQ_status &= ~fdc_IRQ;
+		m_select_mask = 0x7e000;
+		m_select_value = 0x74000;
 	}
-	// INTB* is active low; gets inverted on the board
-	card->lines.intb(state);
-	fdc_handle_hold(carddev);
+	m_DRQ = false;
+	m_IRQ = false;
+	m_hold = false;
+	m_selected = false;
+
+	ti99_set_80_track_drives(FALSE);
+	floppy_type_t type = FLOPPY_STANDARD_5_25_DSDD_40;
+	set_all_geometries(type);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( ti_fdc_drq_w )
-{
-	device_t *carddev = device->owner();
-	ti99_fdc_state *card = get_safe_token(carddev);
-
-	if (state)
-		card->DRQ_IRQ_status |= fdc_DRQ;
-	else
-		card->DRQ_IRQ_status &= ~fdc_DRQ;
-
-	fdc_handle_hold(carddev);
-}
-
-/*
-    callback called at the end of DVENA pulse
-*/
-static TIMER_CALLBACK(motor_on_timer_callback)
-{
-	device_t *device = (device_t *)ptr;
-	ti99_fdc_state *card = get_safe_token(device);
-	card->DVENA = CLEAR_LINE;
-	fdc_handle_hold(device);
-}
-
-const wd17xx_interface ti_wd17xx_interface =
-{
-	DEVCB_NULL,
-	DEVCB_LINE(ti_fdc_intrq_w),
-	DEVCB_LINE(ti_fdc_drq_w),
-	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, NULL }
-};
-
-static const ti99_peb_card fdc_card =
-{
-	data_r,
-	data_w,
-	cru_r,
-	cru_w,
-
-	NULL, NULL,	NULL, NULL
-};
-
-static DEVICE_START( ti99_fdc )
-{
-	ti99_fdc_state *card = get_safe_token(device);
-
-	/* Resolve the callbacks to the PEB */
-	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	card->lines.ready.resolve(topeb->ready, *device);
-	card->lines.intb.resolve(topeb->intb, *device);
-
-	card->motor_on_timer = device->machine().scheduler().timer_alloc(FUNC(motor_on_timer_callback), (void *)device);
-
-	astring region(device->tag(), ":", fdc_region);
-	card->rom = device->machine().region(region.cstr())->base();
-	card->controller = device->subdevice("fd1771");
-}
-
-static DEVICE_STOP( ti99_fdc )
-{
-	logerror("ti99_fdc: stop\n");
-}
-
-static DEVICE_RESET( ti99_fdc )
-{
-	ti99_fdc_state *card = get_safe_token(device);
-
-	/* If the card is selected in the menu, register the card */
-	if (input_port_read(device->machine(), "DISKCTRL") == DISK_TIFDC)
-	{
-		device_t *peb = device->owner();
-		int success = mount_card(peb, device, &fdc_card, get_pebcard_config(device)->slot);
-		if (!success) return;
-
-		card->DSEL = 0;
-		card->SIDSEL = 0;
-		card->DVENA = CLEAR_LINE;
-		card->strobe_motor = 0;
-
-		card->select_mask = 0x7e000;
-		card->select_value = 0x74000;
-
-		if (input_port_read(device->machine(), "MODE")==GENMOD)
-		{
-			// GenMod card modification
-			card->select_mask = 0x1fe000;
-			card->select_value = 0x174000;
-		}
-
-		ti99_set_80_track_drives(FALSE);
-
-		floppy_type_t type = FLOPPY_STANDARD_5_25_DSDD_40;
-		set_all_geometries(device, type);
-	}
-	// TODO: Check that:    floppy_mon_w(w->drive, CLEAR_LINE);
-}
-
-#if 0
-static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_ready )
-{
-	// Caution: The device pointer passed to this function is the calling
-	// device. That is, if we want *this* device, we need to take the owner.
-	ti99_fdc_state *card = get_safe_token(device->owner());
-	card->lines.ready(state);
-}
-#endif
-
-MACHINE_CONFIG_FRAGMENT( ti99_fdc )
-	MCFG_FD1771_ADD("fd1771", ti_wd17xx_interface )
+MACHINE_CONFIG_FRAGMENT( ti_fdc )
+	MCFG_FD1771_ADD(FDC_TAG, ti_wd17xx_interface )
 MACHINE_CONFIG_END
 
-ROM_START( ti99_fdc )
-	ROM_REGION(0x2000, fdc_region, 0)
-	ROM_LOAD_OPTIONAL("disk.bin", 0x0000, 0x2000, CRC(8f7df93f) SHA1(ed91d48c1eaa8ca37d5055bcf67127ea51c4cad5)) /* TI disk DSR ROM */
+ROM_START( ti_fdc )
+	ROM_REGION(0x2000, DSRROM, 0)
+	ROM_LOAD("disk.bin", 0x0000, 0x2000, CRC(8f7df93f) SHA1(ed91d48c1eaa8ca37d5055bcf67127ea51c4cad5)) /* TI disk DSR ROM */
 ROM_END
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+machine_config_constructor ti_fdc_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( ti_fdc );
+}
 
-#define DEVTEMPLATE_ID(p,s)             p##ti99_fdc##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_ROM_REGION | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
-#define DEVTEMPLATE_NAME                "TI Floppy Disk Controller Card"
-#define DEVTEMPLATE_SHORTNAME           "tifdc"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
+const rom_entry *ti_fdc_device::device_rom_region() const
+{
+	return ROM_NAME( ti_fdc );
+}
 
-DEFINE_LEGACY_DEVICE( TIFDC, ti99_fdc );
+const device_type TI99_FDC = &device_creator<ti_fdc_device>;
 

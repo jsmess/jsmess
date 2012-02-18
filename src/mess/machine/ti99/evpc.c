@@ -1,149 +1,64 @@
-/*
+/****************************************************************************
     SNUG Enhanced Video Processor Card (evpc)
     based on v9938 (may also be equipped with v9958)
     Can be used with TI-99/4A as an add-on card; internal VDP must be removed
 
     The SGCPU ("TI-99/4P") only runs with EVPC.
     Michael Zapf
-    Rewritten as device
-    October 2010
-*/
-#include "emu.h"
-#include "peribox.h"
-#include "evpc.h"
-#include "emuopts.h"
 
-#define evpc_region "evpc_region"
+    October 2010: Rewritten as device
+    February 2012: Rewritten as class
+
+    FIXME: Locks up on startup when HFDC is present. This can be avoided
+    by using another controller (like bwg) or doing a soft reset.
+
+*****************************************************************************/
+
+#include "evpc.h"
 
 #define EVPC_CRU_BASE 0x1400
+#define VERBOSE 1
+#define LOG logerror
 
-typedef ti99_pebcard_config ti99_evpc_config;
+#define NOVRAM_SIZE 256
 
-typedef struct _evpc_palette
+snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI99_EVPC, "SNUG Enhanced Video Processor Card", tag, owner, clock),
+  device_nvram_interface(mconfig, *this)
 {
-	UINT8		read_index, write_index, mask;
-	int 		read;
-	int 		state;
-	struct { UINT8 red, green, blue; } color[0x100];
-	//int dirty;
-} evpc_palette;
-
-typedef struct _ti99_evpc_state
-{
-	int 					selected;
-	UINT8					*dsrrom;
-	int 					RAMEN;
-	int 					dsr_page;
-	UINT8					*novram;	/* NOVRAM area */
-	evpc_palette			palette;
-	ti99_peb_connect		lines;
-
-} ti99_evpc_state;
-
-INLINE ti99_evpc_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == EVPC);
-
-	return (ti99_evpc_state *)downcast<legacy_device_base *>(device)->token();
+	m_shortname = "ti99_evpc";
 }
 
-static int get_evpc_switch(device_t *device, int number)
+//-------------------------------------------------
+//  nvram_default - called to initialize NVRAM to
+//  its default state
+//-------------------------------------------------
+
+void snug_enhanced_video_device::nvram_default()
 {
-	switch (number)
-	{
-	case 0:
-		return input_port_read(device->machine(), "EVPC-SW1");
-	case 1:
-		return input_port_read(device->machine(), "EVPC-SW3");
-	case 2:
-		return input_port_read(device->machine(), "EVPC-SW4");
-	case 3:
-		return input_port_read(device->machine(), "EVPC-SW8");
-	default:
-		logerror("evpc: Invalid switch index %02x\n", number);
-		return 0;
-	}
+	memset(m_novram, 0, NOVRAM_SIZE);
 }
 
-/*************************************************************************/
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
 
-/*
-    The CRU read handler. The CRU is a serial interface in the console.
-
-    Read EVPC CRU interface (dip switches)
-    0: Video timing (PAL/NTSC)
-    1: -
-    2: charset
-    3: RAM shift
-    4: -
-    5: -
-    6: -
-    7: DIP or NOVRAM
-    Logic is inverted
-*/
-static READ8Z_DEVICE_HANDLER( cru_rz )
+void snug_enhanced_video_device::nvram_read(emu_file &file)
 {
-	if ((offset & 0xff00)==EVPC_CRU_BASE)
-	{
-		int bit = (offset >> 1) & 0x0f;
-		if (bit == 0)
-			*value = ~(get_evpc_switch(device, 0) | (get_evpc_switch(device, 1)<<2) | (get_evpc_switch(device, 2)<<3) | (get_evpc_switch(device, 3)<<7));
-	}
+	file.read(m_novram, NOVRAM_SIZE);
 }
 
-/*
-    The CRU write handler. The CRU is a serial interface in the console.
-*/
-static WRITE8_DEVICE_HANDLER( cru_w )
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+void snug_enhanced_video_device::nvram_write(emu_file &file)
 {
-	ti99_evpc_state *card = get_safe_token(device);
-
-	if ((offset & 0xff00)==EVPC_CRU_BASE)
-	{
-		int bit = (offset >> 1) & 0x0f;
-		switch (bit)
-		{
-		case 0:
-			card->selected = data;
-			break;
-
-		case 1:
-			if (data)
-				card->dsr_page |= 1;
-			else
-				card->dsr_page &= ~1;
-			break;
-
-		case 2:
-			break;
-
-		case 3:
-			card->RAMEN = data;
-			break;
-
-		case 4:
-			if (data)
-				card->dsr_page |= 4;
-			else
-				card->dsr_page &= ~4;
-			break;
-
-		case 5:
-			if (data)
-				card->dsr_page |= 2;
-			else
-				card->dsr_page &= ~2;
-			break;
-
-		case 6:
-			break;
-
-		case 7:
-			break;
-		}
-	}
+	file.write(m_novram, NOVRAM_SIZE);
 }
+
 
 /*
     Read a byte in evpc DSR space
@@ -151,62 +66,53 @@ static WRITE8_DEVICE_HANDLER( cru_w )
     0x5f00 - 0x5fef   NOVRAM
     0x5ff0 - 0x5fff   Palette
 */
-static READ8Z_DEVICE_HANDLER( data_rz )
+READ8Z_MEMBER(snug_enhanced_video_device::readz)
 {
-	ti99_evpc_state *card = get_safe_token(device);
-
-	if (card->selected)
+	if (m_selected)
 	{
-		if (card->dsrrom==NULL)
+		if ((offset & m_select_mask)==m_select_value)
 		{
-			logerror("evpc: no dsrrom\n");
-			return;
-		}
-
-		if ((offset & 0x7e000)==0x74000)
-		{
-			if ((offset & 0x1ff0)==0x1ff0)
+			if ((offset & 0x1ff0)==0x1ff0)				// Palette control
 			{
-				/* PALETTE */
 				switch (offset & 0x000f)
 				{
 				case 0:
 					/* Palette Read Address Register */
-					*value = card->palette.write_index;
+					*value = m_palette.write_index;
 					break;
 
 				case 2:
 					/* Palette Read Color Value */
-					if (card->palette.read)
+					if (m_palette.read)
 					{
-						switch (card->palette.state)
+						switch (m_palette.state)
 						{
 						case 0:
-							*value = card->palette.color[card->palette.read_index].red;
+							*value = m_palette.color[m_palette.read_index].red;
 							break;
 						case 1:
-							*value = card->palette.color[card->palette.read_index].green;
+							*value = m_palette.color[m_palette.read_index].green;
 							break;
 						case 2:
-							*value = card->palette.color[card->palette.read_index].blue;
+							*value = m_palette.color[m_palette.read_index].blue;
 							break;
 						}
-						card->palette.state++;
-						if (card->palette.state == 3)
+						m_palette.state++;
+						if (m_palette.state == 3)
 						{
-							card->palette.state = 0;
-							card->palette.read_index++;
+							m_palette.state = 0;
+							m_palette.read_index++;
 						}
 					}
 					break;
 
 				case 4:
 					/* Palette Read Pixel Mask */
-					*value = card->palette.mask;
+					*value = m_palette.mask;
 					break;
 				case 6:
 					/* Palette Read Address Register for Color Value */
-					if (card->palette.read)
+					if (m_palette.read)
 						*value = 0;
 					else
 						*value = 3;
@@ -217,19 +123,18 @@ static READ8Z_DEVICE_HANDLER( data_rz )
 			{
 				if ((offset & 0x1f00)==0x1f00)
 				{
-					/* NOVRAM */
-					if (card->RAMEN)
+					if (m_RAMEN)  // NOVRAM hides DSR
 					{
-						*value = card->novram[offset & 0x00ff];
+						*value = m_novram[offset & 0x00ff];
 					}
-					else
+					else  // DSR
 					{
-						*value = card->dsrrom[(offset&0x1fff) + card->dsr_page*0x2000];
+						*value = m_dsrrom[(offset&0x1fff) | (m_dsr_page<<13)];
 					}
 				}
 				else
 				{
-					*value = card->dsrrom[(offset&0x1fff) + card->dsr_page*0x2000];
+					*value = m_dsrrom[(offset&0x1fff) | (m_dsr_page<<13)];
 				}
 			}
 		}
@@ -242,66 +147,65 @@ static READ8Z_DEVICE_HANDLER( data_rz )
     0x5f00 - 0x5fef   NOVRAM
     0x5ff0 - 0x5fff   Palette
 */
-static WRITE8_DEVICE_HANDLER( data_w )
+WRITE8_MEMBER(snug_enhanced_video_device::write)
 {
-	ti99_evpc_state *card = get_safe_token(device);
-	if (card->selected)
+	if (m_selected)
 	{
-		if ((offset & 0x7e000)==0x74000)
+		if ((offset & m_select_mask)==m_select_value)
 		{
 			if ((offset & 0x1ff0)==0x1ff0)
 			{
 				/* PALETTE */
-				logerror("palette write, offset=%d\n, data=%d", offset-0x5ff0, data);
+				if (VERBOSE>5) LOG("palette write %04x <- %02x\n", offset&0xffff, data);
 				switch (offset & 0x000f)
 				{
-				case 8:
+				case 0x08:
 					/* Palette Write Address Register */
-					logerror("EVPC palette address write (for write access)\n");
-					card->palette.write_index = data;
-					card->palette.state = 0;
-					card->palette.read = 0;
+					if (VERBOSE>5) LOG("EVPC palette address write (for write access)\n");
+					m_palette.write_index = data;
+					m_palette.state = 0;
+					m_palette.read = 0;
 					break;
 
-				case 10:
+				case 0x0a:
 					/* Palette Write Color Value */
-					logerror("EVPC palette color write\n");
-					if (!card->palette.read)
+					if (VERBOSE>5) LOG("EVPC palette color write\n");
+					if (!m_palette.read)
 					{
-						switch (card->palette.state)
+						switch (m_palette.state)
 						{
 						case 0:
-							card->palette.color[card->palette.write_index].red = data;
+							m_palette.color[m_palette.write_index].red = data;
 							break;
 						case 1:
-							card->palette.color[card->palette.write_index].green = data;
+							m_palette.color[m_palette.write_index].green = data;
 							break;
 						case 2:
-							card->palette.color[card->palette.write_index].blue = data;
+							m_palette.color[m_palette.write_index].blue = data;
 							break;
 						}
-						card->palette.state++;
-						if (card->palette.state == 3)
+						m_palette.state++;
+						if (m_palette.state == 3)
 						{
-							card->palette.state = 0;
-							card->palette.write_index++;
+							m_palette.state = 0;
+							m_palette.write_index++;
 						}
 						//evpc_palette.dirty = 1;
 					}
 					break;
 
-				case 12:
+				case 0x0c:
 					/* Palette Write Pixel Mask */
-					logerror("EVPC palette mask write\n");
-					card->palette.mask = data;
+					if (VERBOSE>5) LOG("EVPC palette mask write\n");
+					m_palette.mask = data;
 					break;
 
-				case 14:
+				case 0x0e:
 					/* Palette Write Address Register for Color Value */
-					logerror("EVPC palette address write (for read access)\n");
-					card->palette.read_index = data;
-					card->palette.state = 0;
-					card->palette.read = 1;
+					if (VERBOSE>5) LOG("EVPC palette address write (for read access)\n");
+					m_palette.read_index = data;
+					m_palette.state = 0;
+					m_palette.read = 1;
 					break;
 				}
 			}
@@ -309,10 +213,10 @@ static WRITE8_DEVICE_HANDLER( data_w )
 			{
 				if ((offset & 0x1f00)==0x1f00)
 				{
-					if (card->RAMEN)
+					if (m_RAMEN)
 					{
 						// NOVRAM
-						card->novram[offset & 0x00ff] = data;
+						m_novram[offset & 0x00ff] = data;
 					}
 				}
 			}
@@ -320,102 +224,145 @@ static WRITE8_DEVICE_HANDLER( data_w )
 	}
 }
 
-static const ti99_peb_card evpc_card =
-{
-	data_rz,
-	data_w,
-	cru_rz,
-	cru_w,
-
-	NULL, NULL,	NULL, NULL
-};
-
-static DEVICE_START( ti99_evpc )
-{
-	ti99_evpc_state *card = get_safe_token(device);
-	card->novram = (UINT8*)malloc(256); // need that already now for NVRAM handling
-
-	/* Resolve the callbacks to the PEB */
-	peb_callback_if *topeb = (peb_callback_if *)device->static_config();
-	card->lines.ready.resolve(topeb->ready, *device);
-}
-
-static DEVICE_STOP( ti99_evpc )
-{
-	logerror("ti99_evpc: stop\n");
-	ti99_evpc_state *card = get_safe_token(device);
-	free(card->novram);
-}
-
-static DEVICE_RESET( ti99_evpc )
-{
-	logerror("ti99_evpc: reset\n");
-	ti99_evpc_state *card = get_safe_token(device);
-
-	/* If the card is selected in the menu, register the card */
-	device_t *peb = device->owner();
-	int success = mount_card(peb, device, &evpc_card, get_pebcard_config(device)->slot);
-	if (!success)
-	{
-		logerror("evpc: Could not mount card.\n");
-		return;
-	}
-	card->RAMEN = 0;
-	card->dsr_page = 0;
-
-	astring region(device->tag(), ":", evpc_region);
-
-	card->dsrrom = device->machine().region(region.cstr())->base();
-}
 /*
-static DEVICE_NVRAM( ti99_evpc )
-{
-    // Called between START and RESET
-    ti99_evpc_state *card = get_safe_token(device);
-    astring hsname(device->machine().system().name, PATH_SEPARATOR, "evpc.nv");
-    file_error filerr;
-
-    if (read_or_write==0)
-    {
-        logerror("evpc: device nvram load %s\n", hsname.cstr());
-
-        emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_READ);
-        filerr = nvfile.open(hsname.cstr());
-        if (filerr == FILERR_NONE)
-        {
-            if (nvfile.read(card->novram, 256) != 256)
-                logerror("evpc: NOVRAM load error\n");
-        }
-    }
-    else
-    {
-        logerror("evpc: device nvram save %s\n", hsname.cstr());
-        emu_file nvfile(device->machine().options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-        filerr = nvfile.open(hsname.cstr());
-
-        if (filerr == FILERR_NONE)
-        {
-            if (nvfile.write(card->novram, 256) != 256)
-                logerror("evpc: NOVRAM save error\n");
-        }
-    }
-}
+    The CRU read handler. Read EVPC DIP switches
+    0: Video timing (PAL/NTSC)
+    1: -
+    2: charset
+    3: RAM shift
+    4: -
+    5: -
+    6: -
+    7: DIP or NOVRAM
+    Logic is inverted
 */
-MACHINE_CONFIG_FRAGMENT( ti99_evpc )
-MACHINE_CONFIG_END
+void snug_enhanced_video_device::crureadz(offs_t offset, UINT8 *value)
+{
+	if ((offset & 0xff00)==EVPC_CRU_BASE)
+	{
+		if ((offset & 0x00f0)==0) // offset 0 delivers bits 0-7 (address 00-0f)
+		{
+			*value = ~(input_port_read(*this, "EVPC-SW1") | (input_port_read(*this, "EVPC-SW3")<<2)
+				| (input_port_read(*this, "EVPC-SW4")<<3) | (input_port_read(*this, "EVPC-SW8")<<7));
+		}
+	}
+}
+
+/*
+    The CRU write handler.
+    Bit 0: Turn on DSR ROM
+    Bit 1: DSR page select (bit 0)
+    Bit 2: -
+    Bit 3: RAM enable
+    Bit 4: DSR page select (bit 2)
+    Bit 5: DSR page select (bit 1)
+    Bit 6: -
+    Bit 7: -
+*/
+void snug_enhanced_video_device::cruwrite(offs_t offset, UINT8 data)
+{
+	if ((offset & 0xff00)==EVPC_CRU_BASE)
+	{
+		int bit = (offset >> 1) & 0x0f;
+		switch (bit)
+		{
+		case 0:
+			m_selected = (data!=0);
+			if (VERBOSE>4) LOG("evpc: Map DSR = %d\n", m_selected);
+			break;
+
+		case 1:
+			if (data!=0)
+				m_dsr_page |= 1;
+			else
+				m_dsr_page &= ~1;
+			break;
+
+		case 3:
+			m_RAMEN = (data!=0);
+			break;
+
+		case 4:
+			if (data!=0)
+				m_dsr_page |= 4;
+			else
+				m_dsr_page &= ~4;
+			break;
+
+		case 5:
+			if (data!=0)
+				m_dsr_page |= 2;
+			else
+				m_dsr_page &= ~2;
+			break;
+
+		case 2:
+		case 6:
+		case 7:
+			break;
+		}
+	}
+}
+
+void snug_enhanced_video_device::device_start()
+{
+	m_dsrrom = subregion(DSRROM)->base();
+	m_novram = (UINT8*)malloc(NOVRAM_SIZE);
+}
+
+void snug_enhanced_video_device::device_reset()
+{
+	if (VERBOSE>5) LOG("evpc: reset\n");
+	m_select_mask = 0x7e000;
+	m_select_value = 0x74000;
+	m_dsr_page = 0;
+	m_RAMEN = false;
+}
+
+void snug_enhanced_video_device::device_stop()
+{
+	free(m_novram);
+}
 
 ROM_START( ti99_evpc )
-	ROM_REGION(0x10000, evpc_region, 0)
-	ROM_LOAD_OPTIONAL("evpcdsr.bin", 0, 0x10000, CRC(a062b75d) SHA1(6e8060f86e3bb9c36f244d88825e3fe237bfe9a9)) /* evpc DSR ROM */
+	ROM_REGION(0x10000, DSRROM, 0)
+	ROM_LOAD("evpcdsr.bin", 0, 0x10000, CRC(a062b75d) SHA1(6e8060f86e3bb9c36f244d88825e3fe237bfe9a9)) /* evpc DSR ROM */
 ROM_END
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+/*
+    Input ports for the EPVC
+*/
+INPUT_PORTS_START( ti99_evpc )
+	PORT_START( "EVPC-SW1" )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC video mode" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
+		PORT_DIPSETTING(    0x00, "PAL" )
+		PORT_DIPSETTING(    0x01, "NTSC" )
 
-#define DEVTEMPLATE_ID(p,s)             p##ti99_evpc##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_ROM_REGION | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
-#define DEVTEMPLATE_NAME                "SNUG Enhanced Video Processor Card"
-#define DEVTEMPLATE_SHORTNAME           "snugvdc"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
+	PORT_START( "EVPC-SW3" )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC charset" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
+		PORT_DIPSETTING(    0x00, DEF_STR( International ))
+		PORT_DIPSETTING(    0x01, DEF_STR( German ))
 
-DEFINE_LEGACY_DEVICE(EVPC, ti99_evpc);
+	PORT_START( "EVPC-SW4" )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC VDP RAM" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 )
+		PORT_DIPSETTING(    0x00, "shifted" )
+		PORT_DIPSETTING(    0x01, "not shifted" )
+
+	PORT_START( "EVPC-SW8" )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC Configuration" )
+		PORT_DIPSETTING(    0x00, "DIP" )
+		PORT_DIPSETTING(    0x01, "NOVRAM" )
+INPUT_PORTS_END
+
+const rom_entry *snug_enhanced_video_device::device_rom_region() const
+{
+	return ROM_NAME( ti99_evpc );
+}
+
+ioport_constructor snug_enhanced_video_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ti99_evpc);
+}
+
+const device_type TI99_EVPC = &device_creator<snug_enhanced_video_device>;
+

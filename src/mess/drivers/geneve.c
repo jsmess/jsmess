@@ -197,30 +197,75 @@
     keyboard will be cleared as soon as it is buffered by the gate array.
 */
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
-#include "machine/ti99/genboard.h"
 #include "machine/tms9901.h"
-#include "machine/ti99/videowrp.h"
+#include "machine/mm58274c.h"
 #include "sound/sn76496.h"
+
+#include "machine/ti99/genboard.h"
 #include "machine/ti99/peribox.h"
+#include "machine/ti99/videowrp.h"
 
+#define VERBOSE 1
+#define LOG logerror
 
-class geneve_state : public driver_device
+#define SRAM_SIZE 384*1024   // maximum SRAM expansion on-board
+#define DRAM_SIZE 512*1024
+
+class geneve : public driver_device
 {
 public:
-	geneve_state(const machine_config &mconfig, device_type type, const char *tag)
+	geneve(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	// CRU (Communication Register Unit) handling
+	DECLARE_READ8_MEMBER(cruread);
+	DECLARE_WRITE8_MEMBER(cruwrite);
+
+	// Connections with the system interface TMS9901
+	DECLARE_READ8_MEMBER(read_by_9901);
+	DECLARE_WRITE_LINE_MEMBER(peripheral_bus_reset);
+	DECLARE_WRITE_LINE_MEMBER(VDP_reset);
+	DECLARE_WRITE_LINE_MEMBER(joystick_select);
+	DECLARE_WRITE_LINE_MEMBER(extbus_wait_states);
+	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
+	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+
+	WRITE_LINE_MEMBER( keyboard_interrupt );
+
+	geneve_keyboard_device*	m_keyboard;
+	geneve_mouse_device*	m_mouse;
+	tms9901_device*			m_tms9901;
+	geneve_mapper_device*	m_mapper;
+	peribox_device*			m_peribox;
+	device_t*				m_cpu;
+
+	WRITE_LINE_MEMBER( inta );
+	WRITE_LINE_MEMBER( intb );
+	WRITE_LINE_MEMBER( ready );
+
+	void	set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
+
+	line_state	m_inta;
+	line_state	m_intb;
+	line_state	m_int2;
+	line_state	m_keyint;
+	line_state	m_video_wait; // reflects the line to the mapper for CRU query
+private:
+	int		m_joystick_select;
+	// Some values to keep. Rest is on the geneve_mapper.
 };
 
 
 /*
-    memory map
+    Memory map
 */
 
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("geneve_board", geneve_r, geneve_w)
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 8, geneve)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GMAPPER_TAG, geneve_mapper_device, readm, writem)
 ADDRESS_MAP_END
 
 /*
@@ -231,19 +276,13 @@ ADDRESS_MAP_END
     TODO: Check whether A0-A2 are available for CRU addressing since those
     bits are usually routed through the mapper first.
 */
-static ADDRESS_MAP_START(cru_map, AS_IO, 8)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREAD("geneve_board", geneve_cru_r)
+static ADDRESS_MAP_START(crumap, AS_IO, 8, geneve)
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TMS9901_TAG, tms9901_device, read)
+	AM_RANGE(0x0000, 0x0fff) AM_READ( cruread )
 
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0000, 0x7fff) AM_DEVWRITE("geneve_board", geneve_cru_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TMS9901_TAG, tms9901_device, write)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE( cruwrite )
 ADDRESS_MAP_END
-
-static INPUT_CHANGED( gm_changed )
-{
-	device_t *board = field.machine().device("geneve_board");
-	set_gm_switches(board, (UINT8)((UINT64)param&0x03), newval);
-}
 
 /*
     Input ports, used by machine code for keyboard and joystick emulation.
@@ -253,19 +292,14 @@ static INPUT_CHANGED( gm_changed )
 static INPUT_PORTS_START(geneve)
 
 	PORT_START( "MODE" )
-	PORT_CONFNAME( 0x01, 0x00, "Operating mode" )
+	PORT_CONFNAME( 0x01, 0x00, "Operating mode" ) PORT_CHANGED_MEMBER(PERIBOX_TAG, peribox_device, genmod_changed, 0)
 		PORT_CONFSETTING(    0x00, "Standard" )
 		PORT_CONFSETTING(    GENMOD, "GenMod" )
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x01, 0x00, "Boot ROM" ) PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, 0x00 )
-		PORT_CONFSETTING(    0x00, "Version 0.98" )
-		PORT_CONFSETTING(    0x01, "Version 1.00" )
-
-	PORT_START( "SPEECH" )
-	PORT_CONFNAME( 0x01, 0x00, "Speech synthesizer" )
-		PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x01, GENEVE_098, "Boot ROM" ) PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, 0x00 )
+		PORT_CONFSETTING( GENEVE_098, "Version 0.98" )
+		PORT_CONFSETTING( GENEVE_100, "Version 1.00" )
 
 	PORT_START( "SRAM" )
 	PORT_CONFNAME( 0x03, 0x01, "Onboard SRAM" ) PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, 0x00 )
@@ -273,107 +307,13 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x01, "64 KiB" )
 		PORT_CONFSETTING( 0x02, "384 KiB" )
 
-	PORT_START( "EXTRAM" )
-	PORT_CONFNAME( 0x01, 0x01, "Memory expansion" )
-		PORT_CONFSETTING( 0x00, DEF_STR( None ) )
-		PORT_CONFSETTING( 0x01, "Memex 2 MiB" )
-
-// The BwG controller fails to boot on the Geneve. To be checked.
-	PORT_START( "DISKCTRL" )
-	PORT_CONFNAME( 0x07, 0x03, "Disk controller" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
-//      PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
-		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
-//      PORT_CONFSETTING(    0x04, "Corcomp" )
-
-	PORT_START( "BWGDIP1" )
-	PORT_DIPNAME( 0x01, 0x00, "BwG step rate" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "6 ms")
-		PORT_DIPSETTING( 0x01, "20 ms")
-
-	PORT_START( "BWGDIP2" )
-	PORT_DIPNAME( 0x01, 0x00, "BwG date/time display" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "Hide")
-		PORT_DIPSETTING( 0x01, "Show")
-
-	PORT_START( "BWGDIP34" )
-	PORT_DIPNAME( 0x03, 0x00, "BwG drives" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x02 )
-		PORT_DIPSETTING( 0x00, "DSK1 only")
-		PORT_DIPSETTING( 0x01, "DSK1-DSK2")
-		PORT_DIPSETTING( 0x02, "DSK1-DSK3")
-		PORT_DIPSETTING( 0x03, "DSK1-DSK4")
-
-	PORT_START( "HDCTRL" )
-	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-//      PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
-//      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
-	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x08, DEF_STR( On ) )
-
-	PORT_START( "SERIAL" )
-	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
-		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
-
-	PORT_START( "SERIALMAP" )
-	PORT_CONFNAME( 0x03, 0x00, "Serial cable pin mapping" ) PORT_CONDITION( "SERIAL", 0x03, PORTCOND_NOTEQUALS, 0x00 )
-		PORT_CONFSETTING(    0x00, "6-20" )
-		PORT_CONFSETTING(    0x01, "8-20" )
-		PORT_CONFSETTING(    0x02, "5-20" )
-
-	PORT_START( "MEMEXDIPS" )
-	PORT_DIPNAME( MDIP1, MDIP1, "MEMEX SW1" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
-		PORT_DIPSETTING( 0x00, "LED half-bright for 0 WS")
-		PORT_DIPSETTING( MDIP1, "LED full-bright")
-	PORT_DIPNAME( MDIP2, 0x00, "MEMEX SW2" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
-		PORT_DIPSETTING( 0x00, "Lock out all BA mirrors")
-		PORT_DIPSETTING( MDIP2, "Lock out page BA only")
-	PORT_DIPNAME( MDIP3, 0x00, "MEMEX SW3" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
-		PORT_DIPSETTING( 0x00, "Enable pages E8-EB")
-		PORT_DIPSETTING( MDIP3, "Lock out pages E8-EB")
-	PORT_DIPNAME( MDIP4, 0x00, "MEMEX SW4" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
-		PORT_DIPSETTING( 0x00, "Enable pages EC-EF")
-		PORT_DIPSETTING( MDIP4, "Lock out pages EC-EF")
-	PORT_DIPNAME( MDIP5, 0x00, "MEMEX SW5" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
-		PORT_DIPSETTING( 0x00, "Enable pages F0-F3")
-		PORT_DIPSETTING( MDIP5, "Lock out pages F0-F3")
-	PORT_DIPNAME( MDIP6, 0x00, "MEMEX SW6" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
-		PORT_DIPSETTING( 0x00, "Enable pages F4-F7")
-		PORT_DIPSETTING( MDIP6, "Lock out pages F4-F7")
-	PORT_DIPNAME( MDIP7, 0x00, "MEMEX SW7" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
-		PORT_DIPSETTING( 0x00, "Enable pages F8-FB")
-		PORT_DIPSETTING( MDIP7, "Lock out pages F8-FB")
-	PORT_DIPNAME( MDIP8, 0x00, "MEMEX SW8" ) PORT_CONDITION( "EXTRAM", 0x01, PORTCOND_EQUALS, 0x01 )
-		PORT_DIPSETTING( 0x00, "Enable pages FC-FF")
-		PORT_DIPSETTING( MDIP8, "Lock out pages FC-FF")
-
-	PORT_START( "HFDCDIP" )
-	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
-		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
-		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
-		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
-		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
-
-	PORT_START( "V9938-MEM" )
-	PORT_CONFNAME( 0x01, 0x00, "V9938 RAM size" )
-		PORT_CONFSETTING(	0x00, "128 KiB" )
-		PORT_CONFSETTING(	0x01, "192 KiB" )
-
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, GENMOD ) PORT_CHANGED( gm_changed, (void *)1)
+	PORT_DIPNAME( GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, gm_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, GENMOD ) PORT_CHANGED( gm_changed, (void *)2)
+	PORT_DIPNAME( GM_TIM, GM_TIM, "Genmod TI mode") PORT_CONDITION( "MODE", 0x01, PORTCOND_EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GMAPPER_TAG, geneve_mapper_device, gm_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GM_TIM, DEF_STR( On ))
-
-	PORT_START( "DRVSPD" )
-	PORT_CONFNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
-		PORT_CONFSETTING( 0x00, "No delay")
-		PORT_CONFSETTING( 0x01, "Realistic")
 
 	PORT_START("JOY")	/* col 1: "wired handset 1" (= joystick 1) */
 		PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(1UP)", CODE_NONE, OSD_JOY_UP*/) PORT_PLAYER(1)
@@ -389,150 +329,319 @@ static INPUT_PORTS_START(geneve)
 		PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT/*, "(2LEFT)", CODE_NONE, OSD_JOY2_LEFT, 0*/) PORT_PLAYER(2)
 		PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_BUTTON1/*, "(2FIRE)", CODE_NONE, OSD_JOY2_FIRE, 0*/) PORT_PLAYER(2)
 		PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("MOUSEX") /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
-
-	PORT_START("MOUSE0") /* mouse buttons */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("mouse button 1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("mouse button 2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("mouse button 3")
-
-	PORT_START("KEY0")	/* IN3 */
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) /* Esc                       01  81 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) /* 1                           02  82 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) /* 2                           03  83 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) /* 3                           04  84 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) /* 4                           05  85 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) /* 5                           06  86 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 ^") PORT_CODE(KEYCODE_6) /* 6                           07  87 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) /* 7                           08  88 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 *") PORT_CODE(KEYCODE_8) /* 8                           09  89 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) /* 9                           0A  8A */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) /* 0                           0B  8B */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) /* -                           0C  8C */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) /* =                          0D  8D */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) /* Backspace                 0E  8E */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) /* Tab                       0F  8F */
-
-	PORT_START("KEY1")	/* IN4 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) /* Q                         10  90 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) /* W                         11  91 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) /* E                         12  92 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) /* R                         13  93 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) /* T                         14  94 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) /* Y                         15  95 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) /* U                         16  96 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) /* I                         17  97 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) /* O                         18  98 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) /* P                         19  99 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) /* [                           1A  9A */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) /* ]                          1B  9B */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) /* Enter                     1C  9C */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L-Ctrl") PORT_CODE(KEYCODE_LCONTROL) /* Left Ctrl                 1D  9D */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) /* A                         1E  9E */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) /* S                         1F  9F */
-
-	PORT_START("KEY2")	/* IN5 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) /* D                         20  A0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) /* F                         21  A1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) /* G                         22  A2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) /* H                         23  A3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) /* J                         24  A4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) /* K                         25  A5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) /* L                         26  A6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) /* ;                           27  A7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE) /* '                          28  A8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) /* `                           29  A9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L-Shift") PORT_CODE(KEYCODE_LSHIFT) /* Left Shift                 2A  AA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) /* \                          2B  AB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) /* Z                         2C  AC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) /* X                         2D  AD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) /* C                         2E  AE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) /* V                         2F  AF */
-
-	PORT_START("KEY3")	/* IN6 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) /* B                         30  B0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) /* N                         31  B1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) /* M                         32  B2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) /* ,                           33  B3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) /* .                            34  B4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) /* /                           35  B5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-Shift") PORT_CODE(KEYCODE_RSHIFT) /* Right Shift                36  B6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP * (PrtScr)") PORT_CODE(KEYCODE_ASTERISK	) /* Keypad *  (PrtSc)          37  B7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT) /* Left Alt                 38  B8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) /* Space                     39  B9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) /* Caps Lock                   3A  BA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) /* F1                          3B  BB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) /* F2                          3C  BC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) /* F3                          3D  BD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) /* F4                          3E  BE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) /* F5                          3F  BF */
-
-	PORT_START("KEY4")	/* IN7 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) /* F6                          40  C0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) /* F7                          41  C1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) /* F8                          42  C2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F9") PORT_CODE(KEYCODE_F9) /* F9                          43  C3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) /* F10                       44  C4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) /* Num Lock                  45  C5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ScrLock (F14)") PORT_CODE(KEYCODE_SCRLOCK) /* Scroll Lock             46  C6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 (Home)") PORT_CODE(KEYCODE_7_PAD		) /* Keypad 7  (Home)           47  C7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 (Up)") PORT_CODE(KEYCODE_8_PAD		) /* Keypad 8  (Up arrow)       48  C8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD		) /* Keypad 9  (PgUp)           49  C9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP -") PORT_CODE(KEYCODE_MINUS_PAD) /* Keypad -                   4A  CA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 (Left)") PORT_CODE(KEYCODE_4_PAD		) /* Keypad 4  (Left arrow)     4B  CB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 5") PORT_CODE(KEYCODE_5_PAD) /* Keypad 5                   4C  CC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6 (Right)") PORT_CODE(KEYCODE_6_PAD		) /* Keypad 6  (Right arrow)    4D  CD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP +") PORT_CODE(KEYCODE_PLUS_PAD) /* Keypad +                    4E  CE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD		) /* Keypad 1  (End)            4F  CF */
-
-	PORT_START("KEY5")	/* IN8 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 (Down)") PORT_CODE(KEYCODE_2_PAD		) /* Keypad 2  (Down arrow)     50  D0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD		) /* Keypad 3  (PgDn)           51  D1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0 (Ins)") PORT_CODE(KEYCODE_0_PAD		) /* Keypad 0  (Ins)            52  D2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP . (Del)") PORT_CODE(KEYCODE_DEL_PAD		) /* Keypad .  (Del)            53  D3 */
-	PORT_BIT ( 0x0030, 0x0000, IPT_UNUSED )
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(84/102)\\") PORT_CODE(KEYCODE_BACKSLASH2) /* Backslash 2             56  D6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)F11") PORT_CODE(KEYCODE_F11) /* F11                      57  D7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)F12") PORT_CODE(KEYCODE_F12) /* F12                      58  D8 */
-	PORT_BIT ( 0xfe00, 0x0000, IPT_UNUSED )
-
-	PORT_START("KEY6")	/* IN9 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)KP Enter") PORT_CODE(KEYCODE_ENTER_PAD) /* PAD Enter                 60  e0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)R-Control") PORT_CODE(KEYCODE_RCONTROL) /* Right Control             61  e1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)ALTGR") PORT_CODE(KEYCODE_RALT) /* ALTGR                     64  e4 */
-
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)KP /") PORT_CODE(KEYCODE_SLASH_PAD) /* PAD Slash                 62  e2 */
-
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Home") PORT_CODE(KEYCODE_HOME) /* Home                       66  e6 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Up") PORT_CODE(KEYCODE_UP) /* Up                          67  e7 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Page Up") PORT_CODE(KEYCODE_PGUP) /* Page Up                 68  e8 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Left") PORT_CODE(KEYCODE_LEFT) /* Left                        69  e9 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Right") PORT_CODE(KEYCODE_RIGHT) /* Right                     6a  ea */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)End") PORT_CODE(KEYCODE_END) /* End                      6b  eb */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Down") PORT_CODE(KEYCODE_DOWN) /* Down                        6c  ec */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Page Down") PORT_CODE(KEYCODE_PGDN) /* Page Down                 6d  ed */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Insert") PORT_CODE(KEYCODE_INSERT) /* Insert                     6e  ee */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Delete") PORT_CODE(KEYCODE_DEL) /* Delete                        6f  ef */
-
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)PrtScr (F13)") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen             63  e3 */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Pause (F15)") PORT_CODE(KEYCODE_PAUSE) /* Pause                      65  e5 */
-
-	PORT_START("KEY7")	/* IN10 */
-	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
-#if 0
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Print Screen") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen alternate        77  f7 */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Win") /* Left Win                    7d  fd */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Win") /* Right Win                  7e  fe */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Menu") /* Menu                        7f  ff */
-#endif
-
 INPUT_PORTS_END
+
+/****************************************************************************
+    CRU handling
+*****************************************************************************/
+
+#define CRU_CONTROL_BASE 0x1ee0
+#define CRU_SSTEP_BASE 0x13c0
+
+WRITE8_MEMBER ( geneve::cruwrite )
+{
+	int addroff = offset << 1;
+
+	// Single step
+	// 13c0 - 13fe: 0001 0011 11xx xxx0
+	if ((addroff & 0xffc0) == CRU_SSTEP_BASE)
+	{
+		int bit = (addroff & 0x003e)>>1;
+		if (VERBOSE>0) LOG("geneve: Single step not implemented; bit %d set to %d\n", bit, data);
+		return;
+	}
+
+	if ((addroff & 0xffe0) == CRU_CONTROL_BASE)
+	{
+		int bit = (addroff & 0x001e)>>1;
+		switch (bit)
+		{
+		case 5:
+			// No one really cares...
+			// m_palvideo = (data!=0);
+			break;
+		case 7:
+			// m_capslock = (data!=0);
+			break;
+		case 8:
+			m_keyboard->clock_control((data!=0)? ASSERT_LINE : CLEAR_LINE);
+			break;
+		case 9:
+			m_keyboard->send_scancodes((data!=0)? ASSERT_LINE : CLEAR_LINE);
+			break;
+		case 10:
+			m_mapper->set_geneve_mode(data!=0);
+			break;
+		case 11:
+			m_mapper->set_direct_mode(data!=0);
+			break;
+		case 12:
+			m_mapper->set_cartridge_size((data!=0)? 0x2000 : 0x4000);
+			break;
+		case 13:
+			m_mapper->set_cartridge_writable(0x6000, (data!=0));
+			break;
+		case 14:
+			m_mapper->set_cartridge_writable(0x7000, (data!=0));
+			break;
+		case 15:
+			m_mapper->set_extra_waitstates(data==0);  // let's use the inverse semantics
+			break;
+		default:
+			if (VERBOSE>0) LOG("geneve: set CRU address %04x=%02x ignored\n", addroff, data);
+			break;
+		}
+	}
+	else
+	{
+		m_peribox->cruwrite(addroff, data);
+	}
+}
+
+READ8_MEMBER( geneve::cruread )
+{
+	UINT8 value = 0;
+	int addroff = offset << 4;
+
+	// Single step
+	// 13c0 - 13fe: 0001 0011 11xx xxx0
+	if ((addroff & 0xffc0) == CRU_SSTEP_BASE)
+	{
+		int bit = (addroff & 0x003e)>>1;
+		if (VERBOSE>0) LOG("geneve: Single step not implemented; attempting to read bit %d\n", bit);
+		return value;
+	}
+
+	// TMS9995-internal CRU locations (1ee0-1efe) are handled within the 99xxcore
+	// implementation (read_single_cru), so we don't arrive here
+
+	// Propagate the CRU access to external devices
+	m_peribox->crureadz(addroff, &value);
+	return value;
+}
+
+/***********************************************************************
+    CRU callbacks
+***********************************************************************/
+
+READ8_MEMBER( geneve::read_by_9901 )
+{
+	int answer = 0;
+	int joy = 0;
+	switch (offset & 0x03)
+	{
+	case TMS9901_CB_INT7:
+		// Read pins INT3*-INT7* of Geneve 9901.
+		//
+		// bit 1: INTA status
+		// bit 2: INT2 status
+		// bit 3-7: joystick status
+
+		// negative logic
+		if (m_inta==CLEAR_LINE) answer |= 0x02;
+		if (m_int2==CLEAR_LINE) answer |= 0x04;
+
+		joy = input_port_read(machine(), "JOY");
+		if (m_joystick_select==0) joy = joy & 0xff;
+		else joy = (joy>>8) & 0xff;
+		answer |= joy;
+
+		break;
+
+	case TMS9901_INT8_INT15:
+		// Read pins INT8*-INT15* of Geneve 9901.
+		//
+		// bit 0: keyboard interrupt
+		// bit 1: unused
+		// bit 2: mouse left button
+		// (bit 3: clock interrupt)
+		// bit 4: INTB from PE-bus
+		// bit 5 & 7: used as output
+		// bit 6: unused
+		if (m_keyint==CLEAR_LINE) answer |= 0x01;
+		if (m_mouse->left_button()==CLEAR_LINE) answer |= 0x04;
+		// TODO: add clock interrupt
+		if (m_intb==CLEAR_LINE) answer |= 0x10;
+		if (m_video_wait==ASSERT_LINE) answer |= 0x20;
+		// TODO: PAL pin 5
+		if (VERBOSE>8) LOG("geneve: INT15-8 = %02x\n", answer);
+		break;
+
+	case TMS9901_P0_P7:
+		// Read pins P0-P7 of TMS9901. All pins are configured as outputs, so nothing here.
+		break;
+
+	case TMS9901_P8_P15:
+		// Read pins P8-P15 of TMS 9901.
+		// bit 4: mouse left button
+		// video wait is an output; no input possible here
+		if (m_intb==CLEAR_LINE) answer |= 0x04;		// mirror from above
+		// TODO: 0x08 = real-time clock int
+		if (m_mouse->left_button()==CLEAR_LINE) answer |= 0x10;	// mirror from above
+		if (m_keyint==CLEAR_LINE) answer |= 0x40;
+
+		// Joystick up (mirror of bit 7)
+		joy = input_port_read(machine(), "JOY");
+		if (m_joystick_select==0) joy = joy & 0xff;
+		else joy = (joy>>8) & 0xff;
+		if ((joy & 0x80)==0x00) answer |= 0x80;
+
+		break;
+	}
+	return answer;
+}
+
+/*
+    Write PE bus reset line
+*/
+WRITE_LINE_MEMBER( geneve::peripheral_bus_reset )
+{
+	if (VERBOSE>0) LOG("geneve: peripheral bus reset request; not implemented yet.\n");
+}
+
+/*
+    Write VDP reset line
+*/
+WRITE_LINE_MEMBER( geneve::VDP_reset )
+{
+	if (VERBOSE>0) LOG("geneve: Video reset request; not implemented yet.\n");
+}
+
+/*
+    Write joystick select line
+*/
+WRITE_LINE_MEMBER( geneve::joystick_select )
+{
+	m_joystick_select = (state==ASSERT_LINE)? 1:0;
+}
+
+/*
+    Write external mem cycles (0=long, 1=short)
+*/
+WRITE_LINE_MEMBER( geneve::extbus_wait_states )
+{
+	if (VERBOSE>0) LOG("geneve: external bus wait states set to %d, not implemented yet.\n", state);
+}
+
+/*
+    Write vdp wait cycles (1=add 14 cycles, 0=add none)
+    see above for waitstate handling
+*/
+WRITE_LINE_MEMBER( geneve::video_wait_states )
+{
+	if (VERBOSE>1) LOG("geneve: vdp wait states set to %d\n", state);
+	m_mapper->set_video_waitstates(state==ASSERT_LINE);
+	m_video_wait = (state!=0)? ASSERT_LINE : CLEAR_LINE;
+}
+
+/*
+    Called by the 9901 core whenever the state of INTREQ and IC0-3 changes.
+    As with the TI-99/4A, the interrupt level is delivered as the offset,
+    but again it is ignored.
+*/
+WRITE8_MEMBER( geneve::tms9901_interrupt )
+{
+	/* INTREQ is connected to INT1 (IC0-3 are not connected) */
+	device_execute(m_cpu)->set_input_line(0, data);
+}
+
+/* tms9901 setup */
+const tms9901_interface tms9901_wiring_geneve =
+{
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT8 | TMS9901_INTB | TMS9901_INTC,	/* only input pins whose state is always known */
+
+	// read handler
+	DEVCB_DRIVER_MEMBER(geneve, read_by_9901),
+
+	{	/* write handlers */
+		DEVCB_DRIVER_LINE_MEMBER(geneve, peripheral_bus_reset),
+		DEVCB_DRIVER_LINE_MEMBER(geneve, VDP_reset),
+		DEVCB_DRIVER_LINE_MEMBER(geneve, joystick_select),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_DEVICE_LINE_MEMBER(GKEYBOARD_TAG, geneve_keyboard_device, reset_line),
+		DEVCB_DRIVER_LINE_MEMBER(geneve, extbus_wait_states),
+		DEVCB_NULL,
+		DEVCB_DRIVER_LINE_MEMBER(geneve, video_wait_states),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+
+	/* interrupt handler */
+	DEVCB_DRIVER_MEMBER(geneve, tms9901_interrupt)
+};
+
+/*******************************************************************
+    Signal lines
+*******************************************************************/
+/*
+    inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
+*/
+WRITE_LINE_MEMBER( geneve::inta )
+{
+	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
+	m_tms9901->set_single_int(1, state);
+	device_execute(m_cpu)->set_input_line(1, state);
+}
+
+/*
+    intb is connected to tms9901 IRQ12 line.
+*/
+WRITE_LINE_MEMBER( geneve::intb )
+{
+	m_intb = (state!=0)? ASSERT_LINE : CLEAR_LINE;
+	m_tms9901->set_single_int(12, state);
+}
+
+WRITE_LINE_MEMBER( geneve::ready )
+{
+	if (VERBOSE>0) LOG("geneve: READY line set ... not yet connected, level=%02x\n", state);
+}
+
+/*
+    set the state of int2 (called by the v9938 core)
+*/
+void geneve::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
+{
+	m_int2 = (state!=0)? ASSERT_LINE : CLEAR_LINE;
+	m_tms9901->set_single_int(2, state);
+}
+
+/*
+    Interrupt from the keyboard.
+*/
+WRITE_LINE_MEMBER( geneve::keyboard_interrupt )
+{
+	m_keyint = (state!=0)? ASSERT_LINE : CLEAR_LINE;
+	m_tms9901->set_single_int(8, state);
+}
+
+/*
+    scanline interrupt
+*/
+TIMER_DEVICE_CALLBACK( geneve_hblank_interrupt )
+{
+	int scanline = param;
+	geneve *driver = timer.machine().driver_data<geneve>();
+
+	timer.machine().device<v9938_device>(V9938_TAG)->interrupt();
+
+	if (scanline == 0) // was 262
+	{
+		// TODO
+		// The technical docs do not say anything about the way the mouse
+		// is queried. It sounds plausible that the mouse is sampled once
+		// per vertical interrupt; however, the mouse sometimes shows jerky
+		// behaviour. Maybe we should use an autonomous timer with a higher
+		// rate? -> to be checked
+		driver->m_mouse->poll();
+	}
+}
 
 static const struct tms9995reset_param geneve_processor_config =
 {
@@ -541,6 +650,24 @@ static const struct tms9995reset_param geneve_processor_config =
 	0	/* no MP9537 mask */
 };
 
+static const mm58274c_interface geneve_mm58274c_interface =
+{
+	1,	/*  mode 24*/
+	0   /*  first day of week */
+};
+
+static GENEVE_KEYBOARD_CONFIG( geneve_keyb_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(geneve, keyboard_interrupt)
+};
+
+static PERIBOX_CONFIG( peribox_conf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(geneve, inta),			// INTA
+	DEVCB_DRIVER_LINE_MEMBER(geneve, intb),			// INTB
+	DEVCB_DRIVER_LINE_MEMBER(geneve, ready),		// READY
+	0x00000											// Address bus prefix (Mapper will produce prefixes)
+};
 
 static DRIVER_INIT( geneve )
 {
@@ -548,6 +675,13 @@ static DRIVER_INIT( geneve )
 
 static MACHINE_START( geneve )
 {
+	geneve *driver = machine.driver_data<geneve>();
+	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
+	driver->m_mapper = static_cast<geneve_mapper_device*>(machine.device(GMAPPER_TAG));
+	driver->m_keyboard = static_cast<geneve_keyboard_device*>(machine.device(GKEYBOARD_TAG));
+	driver->m_peribox = static_cast<peribox_device*>(machine.device(PERIBOX_TAG));
+	driver->m_mouse =  static_cast<geneve_mouse_device*>(machine.device(GMOUSE_TAG));
+	driver->m_cpu = machine.device("maincpu");
 }
 
 /*
@@ -555,16 +689,22 @@ static MACHINE_START( geneve )
 */
 static MACHINE_RESET( geneve )
 {
+	geneve *driver = machine.driver_data<geneve>();
+	driver->m_inta = CLEAR_LINE;	// flag reflecting the INTA line
+	driver->m_intb = CLEAR_LINE;	// flag reflecting the INTB line
+	driver->m_int2 = CLEAR_LINE;	// flag reflecting the INT2 line
+	driver->m_keyint = CLEAR_LINE;
+
+	driver->m_peribox->set_genmod(input_port_read(machine, "MODE")==GENMOD);
 }
 
-static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
+static MACHINE_CONFIG_START( geneve_60hz, geneve )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	MCFG_CPU_ADD("maincpu", TMS9995, 12000000)
 	MCFG_CPU_CONFIG(geneve_processor_config)
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(cru_map)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", geneve_hblank_interrupt, "screen", 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
+	MCFG_CPU_IO_MAP(crumap)
 
 	MCFG_MACHINE_START( geneve )
 	MCFG_MACHINE_RESET( geneve )
@@ -573,44 +713,45 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	/* FIXME: (MZ) Lowered the screen rate to 30 Hz. This is a quick hack to
     restore normal video speed for V9938-based systems until the V9938 implementation
     is properly fixed. */
-	MCFG_TI_V9938_ADD("video", 30, "screen", 2500, 512+32, (212+28)*2, tms9901_gen_set_int2)
+	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, geneve, set_tms9901_INT2_from_v9938)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
+
+	/* Main board components */
+	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_geneve, 3000000)
+	MCFG_GENEVE_MAPPER_ADD( GMAPPER_TAG )
+	MCFG_MM58274C_ADD(GCLOCK_TAG, geneve_mm58274c_interface)
+
+	/* Peripheral expansion box (Geneve composition) */
+	MCFG_PERIBOX_GEN_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soundgen", SN76496, 3579545)	/* 3.579545 MHz */
+	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)	/* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_TI_SOUND_ADD( TISOUND_TAG )
 
-	/* Peripheral Box. Take the Geneve combo. */
-	MCFG_PBOXGEN_ADD( "peribox", board_inta, board_intb, board_ready )
-
-	/* tms9901 */
-	MCFG_TMS9901_ADD("tms9901", tms9901_wiring_geneve)
-
-	/* Main board. Slight mods for the GenMod system. */
-	MCFG_GENEVE_BOARD_ADD("geneve_board")
+	/* User interface devices */
+	MCFG_GENEVE_KEYBOARD_ADD( GKEYBOARD_TAG, geneve_keyb_conf )
+	MCFG_GENEVE_MOUSE_ADD( GMOUSE_TAG )
 MACHINE_CONFIG_END
 
 /*
     ROM loading
-
-    Note that we use the same ROMset for 50Hz and 60Hz versions.
 */
 
 ROM_START(geneve)
 	/*CPU memory space*/
 	ROM_REGION(0xc000, "maincpu", 0)
-	ROM_LOAD("genbt100.bin", 0x0000, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs */
-	ROM_LOAD_OPTIONAL("genbt098.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs */
-	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs */
+	ROM_LOAD("genbt100.bin", 0x0000, 0x4000, CRC(8001e386) SHA1(b44618b54dabac3882543e18555d482b299e0109)) /* CPU ROMs v1.0 */
+	ROM_LOAD_OPTIONAL("genbt098.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7)) /* CPU ROMs v0.98 */
+	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs GenMod */
+
+	ROM_REGION(SRAM_SIZE, SRAM_TAG, 0)
+	ROM_FILL(0x0000, SRAM_SIZE, 0)
+
+	ROM_REGION(DRAM_SIZE, DRAM_TAG, 0)
+	ROM_FILL(0x0000, DRAM_SIZE, 0)
 ROM_END
 
-/*ROM_START(genmod)
-    ROM_REGION(0x8000, "maincpu", 0)
-    ROM_LOAD("gnmbt100.bin", 0x0000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47))
-    ROM_LOAD_OPTIONAL("genbt090.bin", 0x4000, 0x4000, CRC(b2e20df9) SHA1(2d5d09177afe97d63ceb3ad59b498b1c9e2153f7))
-ROM_END
-*/
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */
 COMP( 1987,geneve,   0,		0,		geneve_60hz,  geneve,  geneve,		"Myarc",	"Geneve 9640" , 0)
-//COMP( 1990,genmod,   geneve,  0,      genmod_60hz,  geneve,  geneve,  "Myarc",    "Geneve 9640 (with Genmod modification)" , 0)
-

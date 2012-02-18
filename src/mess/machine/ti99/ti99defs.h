@@ -1,97 +1,97 @@
-/*
+/****************************************************************************
+
     Common definitions for TI family
-*/
+	Should be included in each component.	
+
+	Michael Zapf
+	
+*****************************************************************************/
 
 #ifndef __TI99DEFS__
 #define __TI99DEFS__
 
-#define region_grom "cons_grom"
-#define READ8Z_DEVICE_HANDLER(name)		void name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, UINT8 *value)
-#define READ16Z_DEVICE_HANDLER(name)		void name(ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset, UINT16 *value)
+// TI-99/4(A)
+#define region_grom 	"cons_grom"
+#define region_grom_cart 	"cart_grom"
+#define TMS9901_TAG 	"tms9901"
+#define TIBOARD_TAG 	"ti_board"
+#define DATAMUX_TAG 	"datamux_16_8"
+#define VIDEO_SYSTEM_TAG "video"
+#define TMS9928A_TAG	"tms9928a"
+#define V9938_TAG 		"v9938"
+#define SCREEN_TAG		"screen"
+#define TISOUNDCHIP_TAG "soundchip"
+#define TISOUND_TAG 	"tisound"
+#define GROMPORT_TAG	"gromport"
+#define GROM0_TAG		"console_grom_0"
+#define GROM1_TAG		"console_grom_1"
+#define GROM2_TAG		"console_grom_2"
+#define PERIBOX_TAG		"peb"
+#define MECMOUSE_TAG	"mecmouse"
+#define HANDSET_TAG		"handset"
+
+// TI-99/8
+#define SRAM_TAG		"sram8"
+#define DRAM_TAG		"dram8"
+#define MAPPER_TAG 		"mapper"
+#define SPEECH_TAG		"speech"
+
+// Geneve
+#define	GKEYBOARD_TAG	"gkeyboard"
+#define GMAPPER_TAG		"gmapper"
+#define GMOUSE_TAG		"gmouse"
+#define GCLOCK_TAG		"mm58274c"
+
+#define READ16Z_MEMBER(name)			void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset,  ATTR_UNUSED UINT16 *value, ATTR_UNUSED UINT16 mem_mask)
+#define DECLARE_READ16Z_MEMBER(name) 	void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 *value, ATTR_UNUSED UINT16 mem_mask = 0xffff)
+#define READ8Z_MEMBER(name)				void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask)
+#define DECLARE_READ8Z_MEMBER(name)		void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 *value, ATTR_UNUSED UINT8 mem_mask = 0xff)
 
 #define GENMOD 0x01
+
+/*
+	Base class for all devices that have a special read method. This read
+	methods differs from the standard READ8/16 by allowing for a "high-impedance"
+	state "Z" which means that the bus lines are not changed. That way, we can
+	built busses with parallel devices as in the real machine, and only the
+	active device changes the bus lines.
+*/
+class bus8z_device : public device_t
+{
+public:
+	bus8z_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock) { }
+	virtual DECLARE_READ8Z_MEMBER(readz) =0;
+	virtual DECLARE_WRITE8_MEMBER(write) =0;
+};
+
+class bus16z_device : device_t
+{
+public:
+	virtual DECLARE_READ16Z_MEMBER(read16z) =0;
+	virtual DECLARE_WRITE16_MEMBER(write16) =0;
+};
+
+/****************************************************************************
+	Constants
+****************************************************************************/
+
+enum
+{
+	TI994,
+	TI994A
+};
 
 enum
 {
 	GM_TURBO = 1,
-	GM_TIM = 2,
-	GM_NEVER = 42
+	GM_TIM = 2
 };
 
 enum
 {
-	RAM_NONE = 0,
-	RAM_TI32_INT,
-	RAM_TI32_EXT,
-	RAM_SUPERAMS1024,
-	RAM_FOUNDATION128,
-	RAM_FOUNDATION512,
-	RAM_MYARC128,
-	RAM_MYARC512,
-	RAM_99_4P,
-	RAM_99_8
-};
-
-enum
-{
-	DISK_NONE = 0,
-	DISK_TIFDC,
-	DISK_BWG,
-	DISK_HFDC
-};
-
-enum
-{
-	HD_NONE = 0,
-	HD_IDE,
-	HD_WHTECH,
-	HD_USB = 4
-};
-
-enum
-{
-	SERIAL_NONE = 0,
-	SERIAL_TI
-};
-
-enum
-{
-	EXT_NONE = 0,
-	EXT_HSGPL_FLASH = 1,
-	EXT_HSGPL_ON = 2,
-	EXT_PCODE = 4
-};
-
-enum
-{
-	HCI_NONE = 0,
-	HCI_MECMOUSE = 1,
-	HCI_IR = 4
-};
-
-enum
-{
-	CART_AUTO = 0,
-	CART_1,
-	CART_2,
-	CART_3,
-	CART_4,
-	CART_GK = 15
-};
-
-enum
-{
-	GK_OFF = 0,
-	GK_NORMAL = 1,
-	GK_GRAM0 = 0,
-	GK_OPSYS = 1,
-	GK_GRAM12 = 0,
-	GK_TIBASIC = 1,
-	GK_BANK1 = 0,
-	GK_WP = 1,
-	GK_BANK2 = 2,
-	GK_LDON = 0,
-	GK_LDOFF = 1
+	GENEVE_098 = 0,
+	GENEVE_100 = 1
 };
 
 #endif
