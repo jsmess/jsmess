@@ -720,9 +720,15 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 			m_dma_dram_ctrl = data & 0xbf;
 			m_dma_16bit = data & 0x40;
 			if(data & 0x01)
+			{
 				m_dmatimer->adjust(attotime::zero,0,attotime::from_nsec(11489));  // based on 680Kb/sec mentioned in UltraMID docs
+				logerror("GUS: DMA start from DRAM address 0x%05x\n",m_dma_start_addr<<4);
+			}
 			else
+			{
 				m_dmatimer->reset();  // stop transfer
+				logerror("GUS: DMA aborted.\n");
+			}
 		}
 		logerror("GUS: DMA DRAM control write %02x\n",data);
 		break;
@@ -1150,7 +1156,7 @@ void gf1_device::dack_w(int line,UINT8 data)
 	{
 		if(m_dma_16bit != 0) // if data is 16-bit
 		{
-			if(!(m_dma_current & 1))
+			if((m_dma_current & 1))
 				data ^= 0x80;
 		}
 		else  // data is 8-bit
