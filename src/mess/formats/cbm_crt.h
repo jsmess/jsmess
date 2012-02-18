@@ -19,6 +19,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
+#define CRT_SIGNATURE		"C64 CARTRIDGE   "
+
 #define CRT_HEADER_LENGTH	0x40
 #define CRT_CHIP_LENGTH		0x10
 
@@ -145,6 +147,15 @@ const char *CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 	"ieee488",
 	UNSUPPORTED,
 	UNSUPPORTED
+};
+
+
+// chip types
+enum
+{
+	CRT_CHIP_TYPE_ROM = 0,
+	CRT_CHIP_TYPE_RAM,
+	CRT_CHIP_TYPE_FLASH_ROM
 };
 
 

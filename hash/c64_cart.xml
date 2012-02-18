@@ -1399,7 +1399,50 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="mmcr">
+		<description>MMC Replay v0.55</description>
+		<year>2008</year>
+		<publisher>Protovision</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mmc_replay" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="mmcrbios.bin" size="0x10000" crc="63E35CA8" sha1="165934CEE24FE6BCDDEFD370288B58E01AC985D8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmc64">
+		<description>MMC64 v1.10</description>
+		<year>2007</year>
+		<publisher>Protovision</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mmc64" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="mmc64v1b.bin" size="0x2000" crc="c6255ad9" sha1="0fc4516ae9fc24da1a4e008ccdb876e765aaf640" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>	
 	
+	<software name="rr">
+		<description>Retro Replay v3.8P</description>
+		<year>2006</year>
+		<publisher>CyberpunX</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="retro_replay" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x10000">
+				<rom name="rr38ppal.bin" size="0x10000" crc="fa52afac" sha1="48381d924a20978319ead8de7c904c91f270cc65" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>	
+
 	<!-- Games Added by k1w1 -->
 
 	<software name="advcrtor">
