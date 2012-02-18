@@ -106,9 +106,42 @@ public:
 	UINT8 m_rs232_rts;
 	emu_timer *m_rs232_input_timer;
 	UINT8 m_bogus_read_save;
+
+	DECLARE_WRITE_LINE_MEMBER(usr9901_led0_w);
+	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
+	DECLARE_WRITE_LINE_MEMBER(usr9901_led2_w);
+	DECLARE_WRITE_LINE_MEMBER(usr9901_led3_w);
+	DECLARE_WRITE8_MEMBER(usr9901_interrupt_callback);
+
+	DECLARE_WRITE8_MEMBER(sys9901_interrupt_callback);
+	DECLARE_READ8_MEMBER(sys9901_r);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel0_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel1_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel2_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel3_w);
+
+	DECLARE_WRITE_LINE_MEMBER(sys9901_segment0_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_segment1_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_segment2_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_segment3_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_segment4_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_segment5_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_segment6_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_segment7_w);
+
+	DECLARE_WRITE_LINE_MEMBER(sys9901_dsplytrgr_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_shiftlight_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_spkrdrive_w);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
+
+	DECLARE_WRITE8_MEMBER( xmit_callback );
+
+private:
+	void draw_digit(void);
+	void led_set(int number, bool state);
+	void segment_set(int offset, bool state);
+	void digitsel(int offset, bool state);
 };
-
-
 
 
 #define displayena_duration attotime::from_usec(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
@@ -194,9 +227,9 @@ static void hold_load(running_machine &machine)
     Supports EIA and TTY terminals, and an optional 9918 controller.
 */
 
-INLINE void draw_digit(tm990189_state *state)
+void tm990189_state::draw_digit()
 {
-	state->m_segment_state[state->m_digitsel] |= ~state->m_segment;
+	m_segment_state[m_digitsel] |= ~m_segment;
 }
 
 
@@ -225,103 +258,166 @@ static TIMER_DEVICE_CALLBACK( display_callback )
 	}
 }
 
-
 /*
     tms9901 code
 */
 
-static TMS9901_INT_CALLBACK ( usr9901_interrupt_callback )
+WRITE8_MEMBER( tm990189_state::usr9901_interrupt_callback )
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	state->m_ic_state = ic & 7;
-
-	if (!state->m_load_state)
-		field_interrupts(device->machine());
+	m_ic_state = offset & 7;  // offset = IC0..IC3 (interrupt level)
+	if (!m_load_state)
+		field_interrupts(machine());
 }
 
-static WRITE8_DEVICE_HANDLER( usr9901_led_w )
+void tm990189_state::led_set(int offset, bool state)
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	if (data)
-		state->m_LED_state |= (1 << offset);
+	if (state)
+		m_LED_state |= (1 << offset);
 	else
-		state->m_LED_state &= ~(1 << offset);
+		m_LED_state &= ~(1 << offset);
 }
 
-static TMS9901_INT_CALLBACK( sys9901_interrupt_callback )
+WRITE_LINE_MEMBER( tm990189_state::usr9901_led0_w )
 {
-	(void)ic;
-
-	tms9901_set_single_int(device->machine().device("tms9901_0"), 5, intreq);
+	led_set(0, state);
 }
 
-static READ8_DEVICE_HANDLER( sys9901_r0 )
+WRITE_LINE_MEMBER( tm990189_state::usr9901_led1_w )
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
+	led_set(1, state);
+}
+
+WRITE_LINE_MEMBER( tm990189_state::usr9901_led2_w )
+{
+	led_set(2, state);
+}
+
+WRITE_LINE_MEMBER( tm990189_state::usr9901_led3_w )
+{
+	led_set(3, state);
+}
+
+WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
+{
+	machine().device<tms9901_device>("tms9901_0")->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
+}
+
+READ8_MEMBER( tm990189_state::sys9901_r )
+{
 	UINT8 data = 0;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
+	if (offset == TMS9901_CB_INT7)
+	{
+		static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
 
-	/* keyboard read */
-	if (state->m_digitsel < 9)
-		data |= input_port_read(device->machine(), keynames[state->m_digitsel]) << 1;
+		/* keyboard read */
+		if (m_digitsel < 9)
+			data |= input_port_read(machine(), keynames[m_digitsel]) << 1;
 
-	/* tape input */
-	if (state->m_cass->input() > 0.0)
-		data |= 0x40;
+		/* tape input */
+		if (m_cass->input() > 0.0)
+			data |= 0x40;
+	}
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( sys9901_digitsel_w )
+void tm990189_state::digitsel(int offset, bool state)
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	if (data)
-		state->m_digitsel |= 1 << offset;
+	if (state)
+		m_digitsel |= 1 << offset;
 	else
-		state->m_digitsel &= ~ (1 << offset);
+		m_digitsel &= ~ (1 << offset);
 }
 
-static WRITE8_DEVICE_HANDLER( sys9901_segment_w )
+WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel0_w )
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	if (data)
-		state->m_segment |= 1 << (offset-4);
+	digitsel(0, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel1_w )
+{
+	digitsel(1, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel2_w )
+{
+	digitsel(2, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel3_w )
+{
+	digitsel(3, state);
+}
+
+
+void tm990189_state::segment_set(int offset, bool state)
+{
+	if (state)
+		m_segment |= 1 << offset;
 	else
 	{
-		state->m_segment &= ~ (1 << (offset-4));
-		if ((state->m_displayena_timer->remaining() > attotime::zero)  && (state->m_digitsel < 10))
-			draw_digit(state);
+		m_segment &= ~ (1 << offset);
+		if ((m_displayena_timer->remaining() > attotime::zero)  && (m_digitsel < 10))
+			draw_digit();
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( sys9901_dsplytrgr_w )
+WRITE_LINE_MEMBER( tm990189_state::sys9901_segment0_w )
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	if ((!data) && (state->m_digitsel < 10))
+	segment_set(0, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_segment1_w )
+{
+	segment_set(1, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_segment2_w )
+{
+	segment_set(2, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_segment3_w )
+{
+	segment_set(3, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_segment4_w )
+{
+	segment_set(4, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_segment5_w )
+{
+	segment_set(5, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_segment6_w )
+{
+	segment_set(6, state);
+}
+WRITE_LINE_MEMBER( tm990189_state::sys9901_segment7_w )
+{
+	segment_set(7, state);
+}
+
+WRITE_LINE_MEMBER( tm990189_state::sys9901_dsplytrgr_w )
+{
+	if ((!state) && (m_digitsel < 10))
 	{
-		state->m_displayena_timer->reset(displayena_duration);
-		draw_digit(state);
+		m_displayena_timer->reset(displayena_duration);
+		draw_digit();
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( sys9901_shiftlight_w )
+WRITE_LINE_MEMBER( tm990189_state::sys9901_shiftlight_w )
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
-	if (data)
-		state->m_LED_state |= 0x10;
+	if (state)
+		m_LED_state |= 0x10;
 	else
-		state->m_LED_state &= ~0x10;
+		m_LED_state &= ~0x10;
 }
 
-static WRITE8_DEVICE_HANDLER( sys9901_spkrdrive_w )
+WRITE_LINE_MEMBER( tm990189_state::sys9901_spkrdrive_w )
 {
-	device_t *speaker = device->machine().device(SPEAKER_TAG);
-	speaker_level_w(speaker, data);
+	device_t *speaker = machine().device(SPEAKER_TAG);
+	speaker_level_w(speaker, state);
 }
 
-static WRITE8_DEVICE_HANDLER( sys9901_tapewdata_w )
+WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )
 {
-	device->machine().device<cassette_image_device>(CASSETTE_TAG)->output(data ? +1.0 : -1.0);
+	machine().device<cassette_image_device>(CASSETTE_TAG)->output(state ? +1.0 : -1.0);
 }
 
 /*
@@ -335,8 +431,9 @@ static TIMER_CALLBACK(rs232_input_callback)
 	device_image_interface *image = (device_image_interface *)(ptr);
 	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)
 	{
+		tms9902_device* tms9902 = static_cast<tms9902_device*>(machine.device("tms9902"));
 		if (image->fread(&buf, 1) == 1)
-			tms9902_rcv_data(machine.device("tms9902"), buf);
+			tms9902->rcv_data(buf);
 	}
 }
 
@@ -346,7 +443,8 @@ static TIMER_CALLBACK(rs232_input_callback)
 static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 {
 	tm990189_state *state = image.device().machine().driver_data<tm990189_state>();
-	tms9902_rcv_dsr(image.device().machine().device("tms9902"), ASSERT_LINE);
+	tms9902_device* tms9902 = static_cast<tms9902_device*>(image.device().machine().device("tms9902"));
+	tms9902->rcv_dsr(ASSERT_LINE);
 	state->m_rs232_input_timer = image.device().machine().scheduler().timer_alloc(FUNC(rs232_input_callback), (void*)image);
 	state->m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
 	return IMAGE_INIT_PASS;
@@ -358,7 +456,8 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 {
 	tm990189_state *state = image.device().machine().driver_data<tm990189_state>();
-	tms9902_rcv_dsr(image.device().machine().device("tms9902"), CLEAR_LINE);
+	tms9902_device* tms9902 = static_cast<tms9902_device*>(image.device().machine().device("tms9902"));
+	tms9902->rcv_dsr(CLEAR_LINE);
 
 	state->m_rs232_input_timer->reset();	/* FIXME - timers should only be allocated once */
 }
@@ -406,22 +505,18 @@ DEFINE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
 {
     tm990189_state *state = device->machine().driver_data<tm990189_state>();
     state->m_rs232_rts = RTS;
-    tms9902_set_cts(device, RTS);
+    tms9902->set_cts(RTS);
 } */
 
-static TMS9902_XMIT_CALLBACK( xmit_callback )
+WRITE8_MEMBER( tm990189_state::xmit_callback )
 {
-	tm990189_state *state = device->machine().driver_data<tm990189_state>();
 	UINT8 buf = data;
-
-	if (state->m_rs232_fp)
-		state->m_rs232_fp->fwrite(&buf, 1);
+	if (m_rs232_fp)	m_rs232_fp->fwrite(&buf, 1);
 }
 
 /*
     External instruction decoding
 */
-
 WRITE8_MEMBER( tm990189_state::ext_instr_decode )
 {
 	int ext_op_ID;
@@ -540,38 +635,31 @@ static const tms9901_interface usr9901reset_param =
 {
 	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,	/* only input pins whose state is always known */
 
-	{	/* read handlers */
-		NULL
-		/*usr9901_r0,
-        usr9901_r1,
-        usr9901_r2,
-        usr9901_r3*/
-	},
+	/* Read handler. Covers all input lines (see tms9901.h) */
+	DEVCB_NULL,
 
-	{	/* write handlers */
-		usr9901_led_w,
-		usr9901_led_w,
-		usr9901_led_w,
-		usr9901_led_w/*,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w,
-        usr9901_w*/
+	/* write handlers */
+	{
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led0_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led1_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led2_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led3_w),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 
 	/* interrupt handler */
-	usr9901_interrupt_callback,
-
-	/* clock rate = 2MHz */
-	2000000.
+	DEVCB_DRIVER_MEMBER(tm990189_state, usr9901_interrupt_callback)
 };
 
 /* system tms9901 setup */
@@ -579,37 +667,31 @@ static const tms9901_interface sys9901reset_param =
 {
 	0,	/* only input pins whose state is always known */
 
-	{	/* read handlers */
-		sys9901_r0,
-		NULL,
-		NULL,
-		NULL
-	},
+	/* Read handler. Covers all input lines (see tms9901.h) */
+	DEVCB_DRIVER_MEMBER(tm990189_state, sys9901_r),
 
-	{	/* write handlers */
-		sys9901_digitsel_w,
-		sys9901_digitsel_w,
-		sys9901_digitsel_w,
-		sys9901_digitsel_w,
-		sys9901_segment_w,
-		sys9901_segment_w,
-		sys9901_segment_w,
-		sys9901_segment_w,
-		sys9901_segment_w,
-		sys9901_segment_w,
-		sys9901_segment_w,
-		sys9901_segment_w,
-		sys9901_dsplytrgr_w,
-		sys9901_shiftlight_w,
-		sys9901_spkrdrive_w,
-		sys9901_tapewdata_w
+	/* write handlers */
+	{
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel0_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel1_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel2_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel3_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment0_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment1_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment2_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment3_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment4_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment5_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment6_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment7_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_dsplytrgr_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_shiftlight_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_spkrdrive_w),
+		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_tapewdata_w)
 	},
 
 	/* interrupt handler */
-	sys9901_interrupt_callback,
-
-	/* clock rate = 2MHz */
-	2000000.
+	DEVCB_DRIVER_MEMBER(tm990189_state, sys9901_interrupt_callback)
 };
 
 /*
@@ -642,11 +724,10 @@ static const tms9901_interface sys9901reset_param =
 // MZ: needs to be fixed once the RS232 support is complete
 static const tms9902_interface tms9902_params =
 {
-	2000000.,				/* clock rate (2MHz) */
-	NULL,/*int_callback,*/	/* called when interrupt pin state changes */
-	NULL,/*rcv_callback,*/	/* called when a character shall be received  */
-	xmit_callback,			/* called when a character is transmitted */
-	NULL					/* called for setting interface parameters and line states */
+	DEVCB_NULL,				/*int_callback,*/	/* called when interrupt pin state changes */
+	DEVCB_NULL,				/*rcv_callback,*/	/* called when a character shall be received  */
+	DEVCB_DRIVER_MEMBER(tm990189_state, xmit_callback),			/* called when a character is transmitted */
+	DEVCB_NULL				/* called for setting interface parameters and line states */
 };
 
 static ADDRESS_MAP_START( tm990_189_memmap, AS_PROGRAM, 8, tm990189_state )
@@ -723,13 +804,13 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD_LEGACY("tms9901_0", tms9901_cru_r)		/* user I/O tms9901 */
-	AM_RANGE(0x0040, 0x006f) AM_DEVREAD_LEGACY("tms9901_1", tms9901_cru_r)		/* system I/O tms9901 */
-	AM_RANGE(0x0080, 0x00cf) AM_DEVREAD_LEGACY("tms9902", tms9902_cru_r)		/* optional tms9902 */
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD("tms9901_0", tms9901_device, read)		/* user I/O tms9901 */
+	AM_RANGE(0x0040, 0x006f) AM_DEVREAD("tms9901_1", tms9901_device, read)		/* system I/O tms9901 */
+	AM_RANGE(0x0080, 0x00cf) AM_DEVREAD("tms9902", tms9902_device, cruread)		/* optional tms9902 */
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE_LEGACY("tms9901_0", tms9901_cru_w)	/* user I/O tms9901 */
-	AM_RANGE(0x0200, 0x03ff) AM_DEVWRITE_LEGACY("tms9901_1", tms9901_cru_w)	/* system I/O tms9901 */
-	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE_LEGACY("tms9902", tms9902_cru_w)	/* optional tms9902 */
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901_0", tms9901_device, write)	/* user I/O tms9901 */
+	AM_RANGE(0x0200, 0x03ff) AM_DEVWRITE("tms9901_1", tms9901_device, write)	/* system I/O tms9901 */
+	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)	/* optional tms9902 */
 
 	AM_RANGE(0x0800, 0x1fff) AM_WRITE(ext_instr_decode)	/* external instruction decoding (IDLE, RSET, CKON, CKOF, LREX) */
 ADDRESS_MAP_END
@@ -762,9 +843,9 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
-	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param)
-	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param)
-	MCFG_TMS9902_ADD("tms9902", tms9902_params)
+	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param, 2000000)
+	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param, 2000000)
+	MCFG_TMS9902_ADD("tms9902", tms9902_params, 2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_ADD_PERIODIC("display_timer", display_callback, attotime::from_hz(30))
 MACHINE_CONFIG_END
@@ -794,9 +875,9 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
-	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param)
-	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param)
-	MCFG_TMS9902_ADD("tms9902", tms9902_params)
+	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param, 2000000)
+	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param, 2000000)
+	MCFG_TMS9902_ADD("tms9902", tms9902_params,	2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_ADD_PERIODIC("display_timer", display_callback, attotime::from_hz(30))
 MACHINE_CONFIG_END

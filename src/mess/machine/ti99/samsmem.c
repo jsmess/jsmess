@@ -1,45 +1,32 @@
-/*
+/****************************************************************************
+
     TI-99 SuperAMS Memory Expansion Card. Uses a 74LS612 memory mapper.
+    The card can be equipped with up to 1 MiB of static CMOS memory; it is
+    not buffered, however.
 
-    TODO: Test this device with some emulated program!
-*/
-#include "emu.h"
-#include "peribox.h"
+    SAMS organizes memory in 4 KiB blocks which are mapped into the address
+    space by a memory mapper. The mapper can be configured via a sequence of
+    addresses at 4000, 4002, ..., 401e, which correspond to memory locations
+    0000-0fff, 1000-1fff, ..., f000-ffff.
+
+    Michael Zapf
+
+    February 2012: Rewritten as class
+
+*****************************************************************************/
+
 #include "samsmem.h"
-
-typedef ti99_pebcard_config ti99_samsmem_config;
-
-typedef struct _ti99_samsmem_state
-{
-	UINT8	mapper[16];
-	int 	map_mode;
-	int		access_mapper;
-	UINT8	*memory;
-
-} ti99_samsmem_state;
-
-INLINE ti99_samsmem_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == SAMSMEM);
-
-	return (ti99_samsmem_state *)downcast<legacy_device_base *>(device)->token();
-}
+#define RAMREGION "ram"
 
 #define SAMS_CRU_BASE 0x1e00
 
-/*
-    CRU write (there is no read here)
-*/
-static WRITE8_DEVICE_HANDLER( samsmem_cru_w )
+#define VERBOSE 1
+#define LOG logerror
+
+sams_memory_expansion_device::sams_memory_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI99_SAMSMEM, "SuperAMS memory expansion card", tag, owner, clock)
 {
-	ti99_samsmem_state *card = get_safe_token(device);
-	if ((offset & 0xff00)==SAMS_CRU_BASE)
-	{
-//      printf("cru address %04x = %02x\n", offset&0xffff, data);
-		if ((offset & 0x000e)==0) card->access_mapper = data;
-		if ((offset & 0x000e)==2) card->map_mode = data;
-	}
+	m_shortname = "ti99_sams";
 }
 
 /*
@@ -47,110 +34,100 @@ static WRITE8_DEVICE_HANDLER( samsmem_cru_w )
     0x2000-0x3fff and 0xa000-0xffff, and the mapper area is at 0x4000-0x401e
     (only even addresses).
 */
-static READ8Z_DEVICE_HANDLER( samsmem_rz )
+READ8Z_MEMBER(sams_memory_expansion_device::readz)
 {
-	ti99_samsmem_state *card = get_safe_token(device);
-	UINT32 address = 0;
+	int base = 0;
 
-	if (card->access_mapper && ((offset & 0xe000)==0x4000))
+	if (m_access_mapper && ((offset & 0xe000)==0x4000))
 	{
-		// select the mapper circuit
-		*value = card->mapper[(offset>>1)&0x000f];
+		*value = m_mapper[(offset>>1)&0x000f];
 	}
 
-	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xc000)==0xc000))
+	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xe000)==0xc000) || ((offset & 0xe000)==0xe000))
 	{
-		// select memory expansion
-		if (card->map_mode)
-			address = (card->mapper[(offset & 0xf000)>>12] << 12) + (offset & 0x0fff);
-		else // transparent mode
-			address = offset & 0xffff;
-		*value = card->memory[address];
+		if (!m_map_mode)
+		{
+			// transparent mode
+			*value = m_ram[offset & 0xffff];
+		}
+		else
+		{
+			base = (m_mapper[(offset & 0xf000)>>12] << 12);
+			*value = m_ram[base | (offset & 0x0fff)];
+		}
+	}
+}
+
+WRITE8_MEMBER(sams_memory_expansion_device::write)
+{
+	int base = 0;
+
+	if (m_access_mapper && ((offset & 0xe000)==0x4000))
+	{
+		m_mapper[(offset>>1)&0x000f] = data;
+	}
+
+	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xe000)==0xc000) || ((offset & 0xe000)==0xe000))
+	{
+		if (!m_map_mode)
+		{
+			// transparent mode
+			m_ram[offset & 0xffff] = data;
+		}
+		else
+		{
+			base = (m_mapper[(offset & 0xf000)>>12] << 12);
+			m_ram[base | (offset & 0x0fff)] = data;
+		}
 	}
 }
 
 /*
-    Memory write
+    CRU read. None here.
 */
-static WRITE8_DEVICE_HANDLER( samsmem_w )
+void sams_memory_expansion_device::crureadz(offs_t offset, UINT8 *value)
 {
-	ti99_samsmem_state *card = get_safe_token(device);
-	UINT32 address = 0;
+	return;
+}
 
-	if (card->access_mapper && ((offset & 0xe000)==0x4000))
+/*
+    CRU write. Turns on the mapper and allows to change it.
+*/
+void sams_memory_expansion_device::cruwrite(offs_t offset, UINT8 data)
+{
+	if ((offset & 0xff00)==SAMS_CRU_BASE)
 	{
-		// select the mapper circuit
-		card->mapper[(offset>>1)&0x000f] = data;
-//      printf("mapper %d = %02x\n", (offset >> 1)&0xf, data);
-	}
-	if (((offset & 0xe000)==0x2000) || ((offset & 0xe000)==0xa000) || ((offset & 0xc000)==0xc000))
-	{
-		// select memory expansion
-		if (card->map_mode)
-		{
-			address = (card->mapper[(offset & 0xf000)>>12] << 12) + (offset & 0x0fff);
-//          printf("map mode, address = %04x\n", address);
-		}
-		else // transparent mode
-		{
-			address = offset & 0xffff;
-//          printf("direct mode, address = %04x\n", address);
-		}
-		card->memory[address] = data;
+		if (VERBOSE>7) LOG("cru address %04x = %02x\n", offset&0xffff, data);
+
+		if ((offset & 0x000e)==0) m_access_mapper = (data!=0);
+		if ((offset & 0x000e)==2) m_map_mode = (data!=0);
 	}
 }
 
-/**************************************************************************/
 
-static const ti99_peb_card samsmem_card =
-{
-	samsmem_rz, samsmem_w,			// memory access read/write
-	NULL, samsmem_cru_w,			// CRU access (no read here)
-	NULL, NULL,						// SENILA/B access (none here)
-	NULL, NULL						// 16 bit access (none here)
-};
+ROM_START( sams_card )
+	ROM_REGION(0x100000, RAMREGION, 0)
+	ROM_FILL(0x0000, 0x100000, 0x00)
+ROM_END
 
-static DEVICE_START( ti99_samsmem )
+void sams_memory_expansion_device::device_start()
 {
-	ti99_samsmem_state *card = get_safe_token(device);
-	card->memory=NULL;
+	if (VERBOSE>5) LOG("SuperAMS: start\n");
+	m_ram = subregion(RAMREGION)->base();
 }
 
-static DEVICE_STOP( ti99_samsmem )
+void sams_memory_expansion_device::device_reset()
 {
-	ti99_samsmem_state *card = get_safe_token(device);
-	if (card->memory) free(card->memory);
+	if (VERBOSE>5) LOG("SuperAMS: reset\n");
+	// Resetting values
+	m_map_mode = false;
+	m_access_mapper = false;
+	for (int i=0; i < 16; i++) m_mapper[i] = 0;
 }
 
-static DEVICE_RESET( ti99_samsmem )
+const rom_entry *sams_memory_expansion_device::device_rom_region() const
 {
-	ti99_samsmem_state *card = get_safe_token(device);
-	/* Register the card */
-	device_t *peb = device->owner();
-
-	if (input_port_read(device->machine(), "RAM")==RAM_SUPERAMS1024)
-	{
-		int success = mount_card(peb, device, &samsmem_card, get_pebcard_config(device)->slot);
-		if (!success) return;
-
-		if (card->memory==NULL)
-		{
-			// Allocate 1 MiB (check whether we want to allocate this on demand)
-			card->memory = (UINT8*)malloc(0x100000);
-		}
-		card->map_mode = FALSE;
-		card->access_mapper = FALSE;
-		for (int i=0; i < 16; i++) card->mapper[i]=0;
-	}
+	return ROM_NAME( sams_card );
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)             p##ti99_samsmem##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME                "TI99 SuperAMS Memory Expansion Card"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
-
-DEFINE_LEGACY_DEVICE( SAMSMEM, ti99_samsmem );
-
+const device_type TI99_SAMSMEM = &device_creator<sams_memory_expansion_device>;

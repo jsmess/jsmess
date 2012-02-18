@@ -1,8 +1,19 @@
+/****************************************************************************
+
+    Hard disk support
+    See ti99_hd.c for documentation
+
+    Michael Zapf
+
+    February 2012: Rewritten as class
+
+*****************************************************************************/
+
 #ifndef __TI99_HD__
 #define __TI99_HD__
 
 #include "emu.h"
-#include "machine/smc92x4.h"
+#include "imagedev/harddriv.h"
 
 #define MFMHD_0 "mfmhd0"
 #define MFMHD_1 "mfmhd1"
@@ -10,37 +21,73 @@
 
 #define IDEHD_0 "idehd0"
 
-/* typedef struct _mfmhd_config mfmhd_config;
-struct _mfmhd_config
-{
-    device_start_func           device_start;
-    device_image_load_func          device_load;
-    device_image_unload_func        device_unload;
-}; */
-
-/* Accessor functions */
-void ti99_mfm_harddisk_read_sector(device_t *harddisk, int cylinder, int head, int sector, UINT8 **buf, int *sector_length);
-void ti99_mfm_harddisk_write_sector(device_t *harddisk, int cylinder, int head, int sector, UINT8 *buf, int sector_length);
-void ti99_mfm_harddisk_read_track(device_t *harddisk, int head, UINT8 **buffer, int *data_count);
-void ti99_mfm_harddisk_write_track(device_t *harddisk, int head, UINT8 *buffer, int data_count);
-UINT8 ti99_mfm_harddisk_status(device_t *harddisk);
-void ti99_mfm_harddisk_seek(device_t *harddisk, int direction);
-void ti99_mfm_harddisk_get_next_id(device_t *harddisk, int head, chrn_id_hd *id);
-
-DECLARE_LEGACY_DEVICE(MFMHD, mfmhd);
-
-DECLARE_LEGACY_DEVICE(IDEHD, idehd);
-
-#define MCFG_MFMHD_3_DRIVES_ADD()			\
-	MCFG_DEVICE_ADD(MFMHD_0, MFMHD, 0)		\
-	MCFG_DEVICE_ADD(MFMHD_1, MFMHD, 0)		\
-	MCFG_DEVICE_ADD(MFMHD_2, MFMHD, 0)		\
-	MCFG_DEVICE_ADD(IDEHD_0, IDEHD, 0)
-#endif
-
+extern const device_type TI99_MFMHD;
+extern const device_type TI99_IDEHD;
 
 /*
-    MCFG_MFMHD_START(mfmhd)             \
-    MCFG_MFMHD_LOAD(mfmhd)              \
-    MCFG_MFMHD_UNLOAD(mfmhd)
+    Needed to adapt to higher cylinder numbers. Floppies do not have such
+    high numbers.
 */
+typedef struct chrn_id_hd
+{
+	UINT16 C;
+	UINT8 H;
+	UINT8 R;
+	UINT8 N;
+	int data_id;			// id for read/write data command
+	unsigned long flags;
+} chrn_id_hd;
+
+class mfm_harddisk_device : public device_t
+{
+public:
+	mfm_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	void	read_sector(int cylinder, int head, int sector, UINT8 *buf);
+	void	write_sector(int cylinder, int head, int sector, UINT8 *buf);
+	void	read_track(int head, UINT8 *buffer);
+	void	write_track(int head, UINT8 *buffer, int data_count);
+	UINT8	get_status();
+	void	seek(int direction);
+	void	get_next_id(int head, chrn_id_hd *id);
+	int		get_track_length();
+
+protected:
+	void	device_start();
+	void	device_reset();
+	machine_config_constructor device_mconfig_additions() const;
+
+private:
+	int 	find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size_t number);
+	UINT8	cylinder_to_ident(int cylinder);
+	bool	harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, int sector, UINT32 *lba);
+
+	int 	m_current_cylinder;
+	int 	m_current_head;
+	bool	m_seeking;
+	int 	m_status;
+	int 	m_id_index; /* position in track for seeking the sector; counts the sector number */
+
+	harddisk_image_device *m_drive;
+};
+
+class ide_harddisk_device : public device_t
+{
+public:
+	ide_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	void	device_start() { };
+	void	device_reset() { };
+	machine_config_constructor device_mconfig_additions() const;
+};
+
+#define MCFG_MFMHD_3_DRIVES_ADD()			\
+	MCFG_DEVICE_ADD(MFMHD_0, TI99_MFMHD, 0)		\
+	MCFG_DEVICE_ADD(MFMHD_1, TI99_MFMHD, 0)		\
+	MCFG_DEVICE_ADD(MFMHD_2, TI99_MFMHD, 0)
+
+#define MCFG_IDEHD_DRIVE_ADD()			\
+	MCFG_DEVICE_ADD(MFMHD_0, TI99_IDEHD, 0)
+
+#endif
+

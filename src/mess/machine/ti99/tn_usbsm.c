@@ -1,4 +1,5 @@
-/*
+/****************************************************************************
+
     Thierry Nouspikel's USB-SmartMedia card emulation
 
     This card features three USB ports (two host and one device) and a
@@ -28,91 +29,62 @@
 
     Raphael Nabet, 2004.
 
-    Rewritten as device
-    Michael Zapf, September 2010
-*/
-#include "emu.h"
-#include "peribox.h"
+    Michael Zapf
+    September 2010: Rewritten as device
+    February 2012: Rewritten as class
+
+    FIXME: Completely untested and likely to be broken
+
+*****************************************************************************/
+
 #include "tn_usbsm.h"
-#include "cpu/tms9900/tms9900.h"
-#include "machine/strata.h"
 #include "machine/smartmed.h"
+#include "machine/strata.h"
 
-#define CRU_BASE 0x1600
-
-typedef ti99_pebcard_config tn_usbsm_config;
-
-typedef struct _tn_usbsm_state
-{
-	device_t *smartmedia;
-	device_t *strata;
-
-	int 	selected;
-
-	/* Used for GenMod */
-	int 	select_mask;
-	int		select_value;
-
-	int		feeprom_page;
-	int		sram_page;
-	int		cru_register;
-	int		tms9995_mode;
-
-	UINT16	input_latch;
-
-	UINT16	output_latch;
-	UINT16	*ram;
-
-	/* Callback lines to the main system. */
-	ti99_peb_connect	lines;
-
-} tn_usbsm_state;
+#define BUFFER_TAG "ram"
 
 enum
 {
-	cru_reg_io_regs_enable = 0x02,
-	cru_reg_int_enable = 0x04,
-	cru_reg_sm_enable = 0x08,
-	cru_reg_feeprom_write_enable = 0x10
+	IO_REGS_ENABLE = 0x02,
+	INT_ENABLE = 0x04,
+	SM_ENABLE = 0x08,
+	FEEPROM_WRITE_ENABLE = 0x10
 };
 
-INLINE tn_usbsm_state *get_safe_token(device_t *device)
+nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI99_USBSM, "Nouspikel USB/Smartmedia card", tag, owner, clock)
 {
-	assert(device != NULL);
-	assert(device->type() == USBSMART);
-
-	return (tn_usbsm_state *)downcast<legacy_device_base *>(device)->token();
+	m_shortname = "ti99_usbsm";
 }
 
 /*
     demultiplexed read in USB-SmartMedia DSR space
 */
-static UINT16 usbsm_mem_16_r(device_t *device, offs_t offset)
+UINT16 nouspikel_usb_smartmedia_device::usbsm_mem_16_r(offs_t offset)
 {
 	UINT16 reply = 0;
-	tn_usbsm_state *card = get_safe_token(device);
 
 	if (offset < 0x2800)
 	{	/* 0x4000-0x4fff range */
-		if ((card->cru_register & cru_reg_io_regs_enable) && (offset >= 0x27f8))
+		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x27f8))
 		{	/* SmartMedia interface */
 			if (offset == 0)
-				reply = smartmedia_data_r(card->smartmedia) << 8;
+				reply = smartmedia_data_r(m_smartmedia) << 8;
 		}
 		else
 		{	/* FEEPROM */
-			if (!(card->cru_register & cru_reg_feeprom_write_enable))
-				reply = strataflash_16_r(card->strata, offset);
+			if (!(m_cru_register & FEEPROM_WRITE_ENABLE))
+				reply = strataflash_16_r(m_strata, offset);
 		}
 	}
 	else
 	{	/* 0x5000-0x5fff range */
-		if ((card->cru_register & cru_reg_io_regs_enable) && (offset >= 0x2ff8))
+		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x2ff8))
 		{	/* USB controller */
 		}
 		else
 		{	/* SRAM */
-			reply = card->ram[card->sram_page*0x800+(offset-0x2800)];
+			reply = m_ram[m_sram_page*0x800+(offset-0x2800)];
 		}
 	}
 	return reply;
@@ -121,24 +93,22 @@ static UINT16 usbsm_mem_16_r(device_t *device, offs_t offset)
 /*
     demultiplexed write in USB-SmartMedia DSR space
 */
-static void usbsm_mem_16_w(device_t *device, offs_t offset, UINT16 data)
+void nouspikel_usb_smartmedia_device::usbsm_mem_16_w(offs_t offset, UINT16 data)
 {
-	tn_usbsm_state *card = get_safe_token(device);
-
 	if (offset < 0x2800)
 	{	/* 0x4000-0x4fff range */
-		if ((card->cru_register & cru_reg_io_regs_enable) && (offset >= 0x27f8))
+		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x27f8))
 		{	/* SmartMedia interface */
 			switch (offset & 3)
 			{
 			case 0:
-				smartmedia_data_w(card->smartmedia, data >> 8);
+				smartmedia_data_w(m_smartmedia, data >> 8);
 				break;
 			case 1:
-				smartmedia_address_w(card->smartmedia, data >> 8);
+				smartmedia_address_w(m_smartmedia, data >> 8);
 				break;
 			case 2:
-				smartmedia_command_w(card->smartmedia, data >> 8);
+				smartmedia_command_w(m_smartmedia, data >> 8);
 				break;
 			case 3:
 				/* bogus, don't use(?) */
@@ -147,18 +117,18 @@ static void usbsm_mem_16_w(device_t *device, offs_t offset, UINT16 data)
 		}
 		else
 		{	/* FEEPROM */
-			if (card->cru_register & cru_reg_feeprom_write_enable)
-				strataflash_16_w(card->strata, offset, data);
+			if (m_cru_register & FEEPROM_WRITE_ENABLE)
+				strataflash_16_w(m_strata, offset, data);
 		}
 	}
 	else
 	{	/* 0x5000-0x5fff range */
-		if ((card->cru_register & cru_reg_io_regs_enable) && (offset >= 0x2ff8))
+		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x2ff8))
 		{	/* USB controller */
 		}
 		else
 		{	/* SRAM */
-			card->ram[card->sram_page*0x800+(offset-0x2800)] = data;
+			m_ram[m_sram_page*0x800+(offset-0x2800)] = data;
 		}
 	}
 }
@@ -166,14 +136,11 @@ static void usbsm_mem_16_w(device_t *device, offs_t offset, UINT16 data)
 /*
     CRU read
 */
-static READ8Z_DEVICE_HANDLER( cru_rz )
+void nouspikel_usb_smartmedia_device::crureadz(offs_t offset, UINT8 *value)
 {
-	tn_usbsm_state *card = get_safe_token(device);
-
-	if ((offset & 0xff00)==CRU_BASE)
+	if ((offset & 0xff00)==m_cru_base)
 	{
 		UINT8 reply = 0;
-		device_t *smartmedia = card->smartmedia;
 		offset &= 3;
 
 		if (offset == 0)
@@ -193,9 +160,9 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 			//             1: Card absent or not protected.
 
 			reply = 0x33;
-			if (!smartmedia_present(smartmedia))
+			if (!smartmedia_present(m_smartmedia))
 				reply |= 0xc0;
-			else if (!smartmedia_protected(smartmedia))
+			else if (!smartmedia_protected(m_smartmedia))
 				reply |= 0x80;
 		}
 		*value = reply;
@@ -205,18 +172,16 @@ static READ8Z_DEVICE_HANDLER( cru_rz )
 /*
     CRU write
 */
-static WRITE8_DEVICE_HANDLER( cru_w )
+void nouspikel_usb_smartmedia_device::cruwrite(offs_t offset, UINT8 data)
 {
-	tn_usbsm_state *card = get_safe_token(device);
-
-	if ((offset & 0xff00)==CRU_BASE)
+	if ((offset & 0xff00)==m_cru_base)
 	{
 		int bit = (offset >> 1) & 0x1f;
 
 		switch (bit)
 		{
 		case 0:
-			card->selected = data;
+			m_selected = data;
 			break;
 
 		case 1:			/* enable I/O registers */
@@ -224,9 +189,9 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		case 3:			/* enable SmartMedia card */
 		case 4:			/* enable FEEPROM writes (and disable reads) */
 			if (data)
-				card->cru_register |= 1 << bit;
+				m_cru_register |= 1 << bit;
 			else
-				card->cru_register &= ~ (1 << bit);
+				m_cru_register &= ~ (1 << bit);
 			break;
 		case 5:			/* FEEPROM page */
 		case 6:
@@ -240,9 +205,9 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		case 14:
 		case 15:
 			if (data)
-				card->feeprom_page |= 1 << (bit-5);
+				m_feeprom_page |= 1 << (bit-5);
 			else
-				card->feeprom_page &= ~ (1 << (bit-5));
+				m_feeprom_page &= ~ (1 << (bit-5));
 			break;
 
 		case 16:		/* SRAM page */
@@ -254,9 +219,9 @@ static WRITE8_DEVICE_HANDLER( cru_w )
 		case 22:
 		case 23:
 			if (data)
-				card->sram_page |= 1 << (bit-16);
+				m_sram_page |= 1 << (bit-16);
 			else
-				card->sram_page &= ~ (1 << (bit-16));
+				m_sram_page &= ~ (1 << (bit-16));
 			break;
 		}
 	}
@@ -266,106 +231,115 @@ static WRITE8_DEVICE_HANDLER( cru_w )
     Memory read
     TODO: Check whether AMA/B/C is actually checked
 */
-static READ8Z_DEVICE_HANDLER( data_rz )
+READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 {
-	tn_usbsm_state *card = get_safe_token(device);
-
-	if (((offset & card->select_mask)==card->select_value) && card->selected)
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
-		if (card->tms9995_mode ? (!(offset & 1)) : (offset & 1))
+		if (m_tms9995_mode ? (!(offset & 1)) : (offset & 1))
 		{	/* first read triggers 16-bit read cycle */
-			card->input_latch = usbsm_mem_16_r(device, (offset >> 1)&0xffff);
+			m_input_latch = usbsm_mem_16_r((offset >> 1)&0xffff);
 		}
 
 		/* return latched input */
-		*value = ((offset & 1) ? (card->input_latch) : (card->input_latch >> 8)) & 0xff;
+		*value = ((offset & 1) ? (m_input_latch) : (m_input_latch >> 8)) & 0xff;
 	}
 }
 
 /*
     Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
-static WRITE8_DEVICE_HANDLER( data_w )
+WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 {
-	tn_usbsm_state *card = get_safe_token(device);
-
-	if (((offset & card->select_mask)==card->select_value) && card->selected)
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		/* latch write */
 		if (offset & 1)
-			card->output_latch = (card->output_latch & 0xff00) | data;
+			m_output_latch = (m_output_latch & 0xff00) | data;
 		else
-			card->output_latch = (card->output_latch & 0x00ff) | (data << 8);
+			m_output_latch = (m_output_latch & 0x00ff) | (data << 8);
 
-		if ((card->tms9995_mode)? (offset & 1) : (!(offset & 1)))
+		if ((m_tms9995_mode)? (offset & 1) : (!(offset & 1)))
 		{	/* second write triggers 16-bit write cycle */
-			usbsm_mem_16_w(device, (offset >> 1)&0xffff, card->output_latch);
+			usbsm_mem_16_w((offset >> 1)&0xffff, m_output_latch);
 		}
 	}
 }
 
-/**************************************************************************/
-
-static const ti99_peb_card tn_usbsm_card =
+void nouspikel_usb_smartmedia_device::device_start()
 {
-	data_rz, data_w,				// memory access read/write
-	cru_rz, cru_w,					// CRU access
-	NULL, NULL,						// SENILA/B access
-	NULL, NULL						// 16 bit access (none here)
-};
-
-static DEVICE_START( tn_usbsm )
-{
-	tn_usbsm_state *card = get_safe_token(device);
-	card->ram = auto_alloc_array(device->machine(), UINT16, 0x100000/2);
-	card->smartmedia = device->subdevice("smartmedia");
-	card->strata = device->subdevice("strata");
+	m_ram = (UINT16*)subregion(BUFFER_TAG)->base();
+	/* auto_alloc_array(device->machine(), UINT16, 0x100000/2); */
+	m_smartmedia = subdevice("smartmedia");
+	m_strata = subdevice("strata");
 }
 
-static DEVICE_STOP( tn_usbsm )
+void nouspikel_usb_smartmedia_device::device_reset()
 {
-}
+	m_feeprom_page = 0;
+	m_sram_page = 0;
+	m_cru_register = 0;
+	// m_tms9995_mode = (device->type()==TMS9995);
 
-static DEVICE_RESET( tn_usbsm )
-{
-	tn_usbsm_state *card = get_safe_token(device);
-	/* Register the card */
-	device_t *peb = device->owner();
-
-	if (input_port_read(device->machine(), "HDCTRL") & HD_USB)
+	if (m_genmod)
 	{
-		int success = mount_card(peb, device, &tn_usbsm_card, get_pebcard_config(device)->slot);
-		if (!success) return;
-
-		card->feeprom_page = 0;
-		card->sram_page = 0;
-		card->cru_register = 0;
-		card->tms9995_mode = (device->type()==TMS9995);
-
-		card->select_mask = 0x7e000;
-		card->select_value = 0x74000;
-
-		if (input_port_read(device->machine(), "MODE")==GENMOD)
-		{
-			// GenMod card modification
-			card->select_mask = 0x1fe000;
-			card->select_value = 0x174000;
-		}
+		m_select_mask = 0x1fe000;
+		m_select_value = 0x174000;
 	}
+	else
+	{
+		m_select_mask = 0x7e000;
+		m_select_value = 0x74000;
+	}
+	m_selected = false;
+
+	m_cru_base = input_port_read(*this, "CRUUSBSM");
 }
+
+ROM_START( tn_usbsm )
+	ROM_REGION16_BE(0x80000, BUFFER_TAG, 0)  /* RAM buffer 512 KiB */
+	ROM_FILL(0x0000, 0x80000, 0x0000)
+ROM_END
+
+INPUT_PORTS_START( tn_usbsm )
+	PORT_START( "CRUUSBSM" )
+	PORT_DIPNAME( 0x1f00, 0x1600, "USB/Smartmedia CRU base" )
+		PORT_DIPSETTING( 0x1000, "1000" )
+		PORT_DIPSETTING( 0x1100, "1100" )
+		PORT_DIPSETTING( 0x1200, "1200" )
+		PORT_DIPSETTING( 0x1300, "1300" )
+		PORT_DIPSETTING( 0x1400, "1400" )
+		PORT_DIPSETTING( 0x1500, "1500" )
+		PORT_DIPSETTING( 0x1600, "1600" )
+		PORT_DIPSETTING( 0x1700, "1700" )
+		PORT_DIPSETTING( 0x1800, "1800" )
+		PORT_DIPSETTING( 0x1900, "1900" )
+		PORT_DIPSETTING( 0x1a00, "1A00" )
+		PORT_DIPSETTING( 0x1b00, "1B00" )
+		PORT_DIPSETTING( 0x1c00, "1C00" )
+		PORT_DIPSETTING( 0x1d00, "1D00" )
+		PORT_DIPSETTING( 0x1e00, "1E00" )
+		PORT_DIPSETTING( 0x1f00, "1F00" )
+INPUT_PORTS_END
 
 MACHINE_CONFIG_FRAGMENT( tn_usbsm )
 	MCFG_SMARTMEDIA_ADD( "smartmedia" )
 	MCFG_STRATAFLASH_ADD( "strata" )
 MACHINE_CONFIG_END
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+machine_config_constructor nouspikel_usb_smartmedia_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( tn_usbsm );
+}
 
-#define DEVTEMPLATE_ID(p,s)             p##tn_usbsm##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG | DT_HAS_MACHINE_CONFIG
-#define DEVTEMPLATE_NAME                "Nouspikel USB/Smartmedia card"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
+const rom_entry *nouspikel_usb_smartmedia_device::device_rom_region() const
+{
+	return ROM_NAME( tn_usbsm );
+}
 
-DEFINE_LEGACY_DEVICE( USBSMART, tn_usbsm );
+ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tn_usbsm);
+}
+
+const device_type TI99_USBSM = &device_creator<nouspikel_usb_smartmedia_device>;
 

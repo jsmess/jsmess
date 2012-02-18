@@ -1,30 +1,42 @@
-/*
-    Geneve "Memex" memory expansion
-    Michael Zapf, February 2011
-*/
+/***************************************************************************
 
-#include "emu.h"
-#include "peribox.h"
+    Geneve "Memex" memory expansion
+    may be used together with the GenMod feature to expand the memory to the
+    full 2 MiB range.
+
+    Michael Zapf
+    February 2011
+    February 2012: rewritten as class
+
+****************************************************************************/
+
 #include "memex.h"
 
-typedef ti99_pebcard_config gen_memex_config;
+#define MEMEX_SIZE 0x200000
+#define RAMREGION "ram"
 
-typedef struct _gen_memex_state
+#define VERBOSE 1
+#define LOG logerror
+
+enum
 {
-	UINT8	*memory;
-	UINT8	dip_switch[8];
-	int		genmod;
-} gen_memex_state;
+	MDIP1 = 0x01,
+	MDIP2 = 0x02,
+	MDIP3 = 0x04,
+	MDIP4 = 0x08,
+	MDIP5 = 0x10,
+	MDIP6 = 0x20,
+	MDIP7 = 0x40,
+	MDIP8 = 0x80
+};
 
-INLINE gen_memex_state *get_safe_token(device_t *device)
+geneve_memex_device::geneve_memex_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: ti_expansion_card_device(mconfig, TI99_MEMEX, "Geneve memory expansion card", tag, owner, clock)
 {
-	assert(device != NULL);
-	assert(device->type() == GENMEMEX);
-
-	return (gen_memex_state *)downcast<legacy_device_base *>(device)->token();
+	m_shortname = "ti99_memex";
 }
 
-static int access_enabled(gen_memex_state *card, offs_t offset)
+bool geneve_memex_device::access_enabled(offs_t offset)
 {
 	// 1 0111 .... .... .... .... p-box address block 0xxx ... fxxx
 	// first two bits are AME, AMD bits available on Genmod only
@@ -38,9 +50,12 @@ static int access_enabled(gen_memex_state *card, offs_t offset)
 	// SW2: "off" locks
 	//      10xxx010
 	//      10111010   also locked when "on"
-	if (page == 0xba) return FALSE;
-	if ((page & 0xc7)==0x82 && card->dip_switch[1]==FALSE)
-		return FALSE;
+	if (page == 0xba) return false;
+	if ((page & 0xc7)==0x82 && m_dip_switch[1]==false)
+	{
+		if (VERBOSE>8) LOG("geneve: memex blocks page %02x; dip1=%d\n", page,  m_dip_switch[1]);
+		return false;
+	}
 
 	// SW3: 111010xx    0=enabled 1=locked out
 	// SW4: 111011xx
@@ -52,13 +67,13 @@ static int access_enabled(gen_memex_state *card, offs_t offset)
 	index = ((page >> 2)&0x3f);
 	if (index >= 0x3a && index <= 0x3f)
 	{
-		if (card->dip_switch[index - 0x38]==0) return TRUE;
+		if (m_dip_switch[index - 0x38]==0) return true;
 		else
 		{
-			return FALSE;
+			return false;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 /*
@@ -69,94 +84,92 @@ static int access_enabled(gen_memex_state *card, offs_t offset)
     Note that the incomplete decoding of the standard Geneve must be
     considered.
 */
-static READ8Z_DEVICE_HANDLER( memex_rz )
+READ8Z_MEMBER( geneve_memex_device::readz )
 {
-	gen_memex_state *card = get_safe_token(device);
-
 	/* If not Genmod, add the upper two address bits 10 */
-	if (!card->genmod) offset |= 0x100000;
+	if (!m_genmod) offset |= 0x100000;
 
 	// The card is accessed for all addresses in the address space
-	if (access_enabled(card, offset))
+	if (access_enabled(offset))
 	{
-		*value = card->memory[offset];
+		*value = m_ram[offset];
 	}
 }
 
 /*
     Memory write
 */
-static WRITE8_DEVICE_HANDLER( memex_w )
+WRITE8_MEMBER( geneve_memex_device::write )
 {
-	gen_memex_state *card = get_safe_token(device);
-
 	/* If not Genmod, add the upper two address bits 10 */
-	if (!card->genmod) offset |= 0x100000;
+	if (!m_genmod) offset |= 0x100000;
 
 	// The card is accessed for all addresses in the address space
-	if (access_enabled(card, offset))
+	if (access_enabled(offset))
 	{
-		card->memory[offset] = data;
+		m_ram[offset] = data;
 	}
 }
 
 /**************************************************************************/
 
-static const ti99_peb_card memex_card =
+void geneve_memex_device::device_start()
 {
-	memex_rz, memex_w,				// memory access read/write
-	NULL, NULL,						// CRU access (none here)
-	NULL, NULL,						// SENILA/B access (none here)
-	NULL, NULL						// 16 bit access (none here)
-};
-
-static DEVICE_START( gen_memex )
-{
-	gen_memex_state *card = get_safe_token(device);
-	card->memory=NULL;
+	m_ram = subregion(RAMREGION)->base();
 }
 
-static DEVICE_STOP( gen_memex )
+void geneve_memex_device::device_reset()
 {
-	gen_memex_state *card = get_safe_token(device);
-	if (card->memory) free(card->memory);
-}
-
-static DEVICE_RESET( gen_memex )
-{
-	gen_memex_state *card = get_safe_token(device);
-	/* Register the card */
-	device_t *peb = device->owner();
-
-	if (input_port_read(device->machine(), "EXTRAM")==1)
+	UINT8 dips = input_port_read(*this, "MEMEXDIPS");
+	if (VERBOSE>5) LOG("geneve: memex dips = %02x\n", dips);
+	for (int i=0; i < 8; i++)
 	{
-		int success = mount_card(peb, device, &memex_card, get_pebcard_config(device)->slot);
-		if (!success) return;
-
-		if (card->memory==NULL)
-		{
-			// Allocate 2 MiB
-			card->memory = (UINT8*)malloc(0x200000);
-		}
-
-		UINT8 dips = input_port_read(device->machine(), "MEMEXDIPS");
-		for (int i=0; i < 8; i++)
-		{
-			card->dip_switch[i] = ((dips & 0x01)!=0x00);
-			dips = dips >> 1;
-		}
-
-		card->genmod = input_port_read(device->machine(), "MODE");
+		m_dip_switch[i] = ((dips & 0x01)!=0x00);
+		dips = dips >> 1;
 	}
 }
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+INPUT_PORTS_START( memex )
+	PORT_START( "MEMEXDIPS" )
+	PORT_DIPNAME( MDIP1, MDIP1, "MEMEX SW1" )
+		PORT_DIPSETTING( 0x00, "LED half-bright for 0 WS")
+		PORT_DIPSETTING( MDIP1, "LED full-bright")
+	PORT_DIPNAME( MDIP2, 0x00, "MEMEX SW2" )
+		PORT_DIPSETTING( 0x00, "Lock out all BA mirrors")
+		PORT_DIPSETTING( MDIP2, "Lock out page BA only")
+	PORT_DIPNAME( MDIP3, 0x00, "MEMEX SW3" )
+		PORT_DIPSETTING( 0x00, "Enable pages E8-EB")
+		PORT_DIPSETTING( MDIP3, "Lock out pages E8-EB")
+	PORT_DIPNAME( MDIP4, 0x00, "MEMEX SW4" )
+		PORT_DIPSETTING( 0x00, "Enable pages EC-EF")
+		PORT_DIPSETTING( MDIP4, "Lock out pages EC-EF")
+	PORT_DIPNAME( MDIP5, 0x00, "MEMEX SW5" )
+		PORT_DIPSETTING( 0x00, "Enable pages F0-F3")
+		PORT_DIPSETTING( MDIP5, "Lock out pages F0-F3")
+	PORT_DIPNAME( MDIP6, 0x00, "MEMEX SW6" )
+		PORT_DIPSETTING( 0x00, "Enable pages F4-F7")
+		PORT_DIPSETTING( MDIP6, "Lock out pages F4-F7")
+	PORT_DIPNAME( MDIP7, 0x00, "MEMEX SW7" )
+		PORT_DIPSETTING( 0x00, "Enable pages F8-FB")
+		PORT_DIPSETTING( MDIP7, "Lock out pages F8-FB")
+	PORT_DIPNAME( MDIP8, 0x00, "MEMEX SW8" )
+		PORT_DIPSETTING( 0x00, "Enable pages FC-FF")
+		PORT_DIPSETTING( MDIP8, "Lock out pages FC-FF")
+INPUT_PORTS_END
 
-#define DEVTEMPLATE_ID(p,s)             p##gen_memex##s
-#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME                "Geneve Memex Memory Expansion Card"
-#define DEVTEMPLATE_FAMILY              "Peripheral expansion"
-#include "devtempl.h"
+ROM_START( memex )
+	ROM_REGION(MEMEX_SIZE, RAMREGION, 0)
+	ROM_FILL(0x000000, MEMEX_SIZE, 0x00)
+ROM_END
 
-DEFINE_LEGACY_DEVICE( GENMEMEX, gen_memex );
+ioport_constructor geneve_memex_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( memex );
+}
 
+const rom_entry *geneve_memex_device::device_rom_region() const
+{
+	return ROM_NAME( memex );
+}
+
+const device_type TI99_MEMEX = &device_creator<geneve_memex_device>;
