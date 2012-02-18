@@ -1334,7 +1334,7 @@
 			<dataarea name="rom" size="0x80000">
 				<rom name="fe3vice-r020.bin" size="0x80000" crc="c12d844a" sha1="3946b6595f4ac0469a9fd97e4cd156618e868deb" offset="0x0000" />
 			</dataarea>
-			<dataarea name="ram" size="0x80000">
+			<dataarea name="ram" size="0x80000"/>
 		</part>
 	</software>
 
@@ -1923,7 +1923,7 @@
 			<dataarea name="rom" size="0x200000">
 				<rom name="megacart.rom" size="0x200000" crc="787551d4" sha1="c4854de023c25dc827af3bebed76d2ff86eaf0ce" offset="0x0000" />
 			</dataarea>
-			<dataarea name="ram" size="0x8000">
+			<dataarea name="ram" size="0x8000"/>
 		</part>
 	</software>
 
