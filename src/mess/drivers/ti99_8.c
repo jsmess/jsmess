@@ -211,7 +211,6 @@ Known Issues (MZ, 2010-11-07)
 #include "machine/ti99/speech8.h"
 
 #include "machine/ti99/peribox.h"
-#include "machine/ti99/crubus.h"
 #include "machine/ti99/mapper8.h"
 #include "machine/ti99/grom.h"
 #include "machine/ti99/gromport.h"
