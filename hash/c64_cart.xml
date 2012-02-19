@@ -1439,7 +1439,36 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			</dataarea>
 		</part>
 	</software>	
-
+	
+	<software name="exos">
+		<description>ExOS v.3</description>
+		<year>198?</year>
+		<publisher>Rex Datentechnik</publisher>
+		<info name="serial" value="REX-9805" />
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="exos" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="romh" size="0x2000">
+				<rom name="exos_v3.bin" size="0x2000" crc="4e54d020" sha1="f8931b7c0b26807f4de0cc241f0b1e2c8f5271e9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="exosv4" cloneof="exos">
+		<description>ExOS v.4</description>
+		<year>198?</year>
+		<publisher>Rex Datentechnik</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="exos" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			<dataarea name="romh" size="0x2000">
+				<rom name="exos_v4.bin" size="0x2000" crc="d5cf83a9" sha1="d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<!-- Games Added by k1w1 -->
 
 	<software name="advcrtor">
