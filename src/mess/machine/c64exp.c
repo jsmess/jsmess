@@ -402,7 +402,7 @@ bool c64_expansion_slot_device::call_softlist_load(char *swlist, char *swname, r
 //  get_default_card_software -
 //-------------------------------------------------
 
-const char * c64_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options) const
+const char * c64_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
 	return software_get_default_slot(config, options, this, "standard");
 }

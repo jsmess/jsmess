@@ -370,7 +370,7 @@ bool vic20_expansion_slot_device::call_softlist_load(char *swlist, char *swname,
 //  get_default_card_software -
 //-------------------------------------------------
 
-const char * vic20_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options) const
+const char * vic20_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
 	return software_get_default_slot(config, options, this, "standard");
 }
