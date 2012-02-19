@@ -97,7 +97,6 @@ TODO:
 #include "machine/pckeybrd.h"	/* PC-AT keyboard */
 #include "machine/pc_fdc.h"		/* change to superio later */
 #include "machine/ins8250.h"	/* pc com port */
-#include "machine/pc_mouse.h"	/* pc serial mouse */
 #include "sound/beep.h"			/* pcw/pcw16 beeper */
 #include "machine/intelfsh.h"
 
@@ -801,6 +800,8 @@ static TIMER_DEVICE_CALLBACK(pcw16_keyboard_timer_callback)
 			pcw16_keyboard_signal_byte_received(timer.machine(), data);
 		}
 	}
+	// TODO: fix
+	state->subdevice<ns16550_device>("ns16550_2")->ri_w(input_port_read(timer.machine(), "EXTRA") & 0x040);
 }
 
 
@@ -1258,44 +1259,31 @@ static WRITE_LINE_DEVICE_HANDLER( pcw16_com_interrupt_2 )
 	pcw16_refresh_ints(device->machine());
 }
 
+static WRITE_LINE_DEVICE_HANDLER( pcw16_com_tx_0 ) { }
+static WRITE_LINE_DEVICE_HANDLER( pcw16_com_dtr_0 ) { }
+static WRITE_LINE_DEVICE_HANDLER( pcw16_com_rts_0 ) { }
 
-static INS8250_REFRESH_CONNECT( pcw16_com_refresh_connected_1 ) {
-#if 0
-	pc_mouse_poll(0);
-#endif
-}
-
-
-static INS8250_REFRESH_CONNECT( pcw16_com_refresh_connected_2 )
-{
-	int new_inputs;
-
-	new_inputs = 0;
-
-	/* Power switch is connected to Ring indicator */
-	if (input_port_read(device->machine(), "EXTRA") & 0x040)
-	{
-		new_inputs = UART8250_INPUTS_RING_INDICATOR;
-	}
-
-	ins8250_handshake_in(device, new_inputs);
-}
+static WRITE_LINE_DEVICE_HANDLER( pcw16_com_tx_1 ) { }
+static WRITE_LINE_DEVICE_HANDLER( pcw16_com_dtr_1 ) { }
+static WRITE_LINE_DEVICE_HANDLER( pcw16_com_rts_1 ) { }
 
 static const ins8250_interface pcw16_com_interface[2]=
 {
 	{
-		1843200,
+		DEVCB_LINE(pcw16_com_tx_0),
+		DEVCB_LINE(pcw16_com_dtr_0),
+		DEVCB_LINE(pcw16_com_rts_0),
 		DEVCB_LINE(pcw16_com_interrupt_1),
-		NULL,
-		pc_mouse_handshake_in,
-		pcw16_com_refresh_connected_1
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	{
-		1843200,
+		DEVCB_LINE(pcw16_com_tx_1),
+		DEVCB_LINE(pcw16_com_dtr_1),
+		DEVCB_LINE(pcw16_com_rts_1),
 		DEVCB_LINE(pcw16_com_interrupt_2),
-		NULL,
-		NULL,
-		pcw16_com_refresh_connected_2
+		DEVCB_NULL,
+		DEVCB_NULL
 	}
 };
 
@@ -1308,8 +1296,8 @@ static ADDRESS_MAP_START(pcw16_io, AS_IO, 8)
     AM_RANGE(0x01c, 0x01c) AM_READ(pcw16_superio_fdc_main_status_register_r)
 	AM_RANGE(0x01d, 0x01d) AM_READWRITE(pcw16_superio_fdc_data_r, pcw16_superio_fdc_data_w)
 	AM_RANGE(0x01f, 0x01f) AM_READWRITE(pcw16_superio_fdc_digital_input_register_r, pcw16_superio_fdc_datarate_w)
-	AM_RANGE(0x020, 0x027) AM_DEVREADWRITE("ns16550_1", ins8250_r, ins8250_w)
-	AM_RANGE(0x028, 0x02f) AM_DEVREADWRITE("ns16550_2", ins8250_r, ins8250_w)
+	AM_RANGE(0x020, 0x027) AM_DEVREADWRITE_MODERN("ns16550_1", ns16550_device, ins8250_r, ins8250_w)
+	AM_RANGE(0x028, 0x02f) AM_DEVREADWRITE_MODERN("ns16550_2", ns16550_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x038, 0x03a) AM_DEVREADWRITE("lpt", pc_lpt_r, pc_lpt_w)
 	/* anne asic */
 	AM_RANGE(0x0e0, 0x0ef) AM_WRITE(pcw16_palette_w)
@@ -1363,10 +1351,6 @@ static MACHINE_START( pcw16 )
 
 	pc_fdc_init(machine, &pcw16_fdc_interface);
 
-	/* initialise mouse */
-	//pc_mouse_initialise(machine);
-	//pc_mouse_set_serial_port( machine.device("ns16550_0") );
-
 	/* initialise keyboard */
 	at_keyboard_init(machine, AT_KEYBOARD_TYPE_AT);
 	at_keyboard_set_scan_code_set(3);
@@ -1385,8 +1369,6 @@ static INPUT_PORTS_START(pcw16)
 	PORT_DIPNAME(0x40, 0x40, "Power Switch/Suspend")
 	PORT_DIPSETTING(0x0, DEF_STR( Off) )
 	PORT_DIPSETTING(0x40, DEF_STR( On) )
-
-	PORT_INCLUDE( pc_mouse_mousesystems )	/* IN12 - IN14 */
 
 	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
 INPUT_PORTS_END
@@ -1419,9 +1401,9 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 
 	MCFG_MACHINE_START( pcw16 )
 
-	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0] )				/* TODO: Verify uart model */
+	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0], XTAL_1_8432MHz )		/* TODO: Verify uart model */
 
-	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1] )				/* TODO: Verify uart model */
+	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1], XTAL_1_8432MHz )		/* TODO: Verify uart model */
 
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

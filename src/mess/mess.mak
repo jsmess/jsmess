@@ -515,7 +515,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/ncr5390.o	\
 	$(MESS_MACHINE)/pc_lpt.o	\
 	$(MESS_MACHINE)/cntr_covox.o \
-	$(MESS_MACHINE)/pc_mouse.o	\
 	$(MESS_MACHINE)/pcf8593.o	\
 	$(MESS_MACHINE)/rs232.o		\
 	$(MESS_MACHINE)/scsibus.o	\
@@ -545,6 +544,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/z80bin.o	\
 	$(MESS_MACHINE)/n82077aa.o	\
 	$(MESS_MACHINE)/mb8795.o	\
+	$(MESS_MACHINE)/null_modem.o	\
 
 
 

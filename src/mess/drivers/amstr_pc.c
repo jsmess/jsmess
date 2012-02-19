@@ -44,7 +44,6 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
-#include "machine/pc_mouse.h"
 
 #include "includes/amstr_pc.h"
 
@@ -92,13 +91,13 @@ static ADDRESS_MAP_START(ppc512_io, AS_IO, 16)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,					pc_page_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,					pc16le_JOY_w)
 	AM_RANGE(0x0278, 0x027b) AM_READ(pc200_16le_port278_r) AM_DEVWRITE8("lpt_2", pc_lpt_w, 0x00ff)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8_MODERN("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037b) AM_READ(pc200_16le_port378_r) AM_DEVWRITE8("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8_MODERN("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc200_map, AS_PROGRAM, 16 )
@@ -120,13 +119,13 @@ static ADDRESS_MAP_START(pc200_io, AS_IO, 16)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,					pc_page_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,					pc16le_JOY_w)
 	AM_RANGE(0x0278, 0x027b) AM_READ(pc200_16le_port278_r) AM_DEVWRITE8("lpt_2", pc_lpt_w, 0x00ff)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8_MODERN("ins8250_3", ins8250_device, ins8250_r,  ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037b) AM_READ(pc200_16le_port378_r) AM_DEVWRITE8("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8_MODERN("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -188,12 +187,6 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_START("DSW2") /* IN3 */
-	PORT_DIPNAME( 0xf0, 0x00, "Serial mouse")
-	PORT_DIPSETTING(	0x80, "COM1" )
-	PORT_DIPSETTING(	0x40, "COM2" )
-	PORT_DIPSETTING(	0x20, "COM3" )
-	PORT_DIPSETTING(	0x10, "COM4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
@@ -204,7 +197,6 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
 	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
-	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 
 	PORT_START("VIDEO") /* IN20 */
@@ -241,6 +233,10 @@ static const floppy_interface ibmpc_floppy_interface =
 	NULL
 };
 
+SLOT_INTERFACE_START(amstr_com)
+	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
+	SLOT_INTERFACE("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
+SLOT_INTERFACE_END
 
 #define MCFG_CPU_PC(mem, port, type, clock, vblankfunc)	\
 	MCFG_CPU_ADD("maincpu", type, clock)				\
@@ -282,10 +278,14 @@ static MACHINE_CONFIG_START( pc200, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[3], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[4], amstr_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
@@ -348,10 +348,14 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[3], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[4], amstr_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pc200 )

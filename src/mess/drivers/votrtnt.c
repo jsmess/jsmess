@@ -174,7 +174,6 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 	MCFG_SOUND_ADD("votrax", VOTRAX, 1700000) /* 1.70 MHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, votrtnt_terminal_intf)
 	MCFG_TIMER_ADD_PERIODIC("votrtnt_timer", votrtnt_poll_votrax, attotime::from_hz(70) )
 MACHINE_CONFIG_END

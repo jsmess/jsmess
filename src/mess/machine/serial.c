@@ -6,8 +6,6 @@ const device_type SERIAL_PORT = &device_creator<serial_port_device>;
 device_serial_port_interface::device_serial_port_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
-	m_rdata = 0;
-	m_tdata = 0;
 	m_rbit = FALSE;
 	m_tbit = FALSE;
 }
@@ -18,6 +16,13 @@ device_serial_port_interface::~device_serial_port_interface()
 
 serial_port_device::serial_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SERIAL_PORT, "Serial Port", tag, owner, clock),
+	  device_slot_interface(mconfig, *this),
+	  m_dev(NULL)
+{
+}
+
+serial_port_device::serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
 	  device_slot_interface(mconfig, *this),
 	  m_dev(NULL)
 {
@@ -36,7 +41,6 @@ void serial_port_device::device_config_complete()
 	}
 	else
 	{
-		memset(&m_out_rx8_cb, 0, sizeof(m_out_rx8_cb));
 		memset(&m_out_rx_cb, 0, sizeof(m_out_rx_cb));
 	}
 	m_dev = dynamic_cast<device_serial_port_interface *>(get_card_device());
@@ -44,7 +48,6 @@ void serial_port_device::device_config_complete()
 
 void serial_port_device::device_start()
 {
-	m_out_rx8_func.resolve(m_out_rx8_cb, *this);
 	m_out_rx_func.resolve(m_out_rx_cb, *this);
 }
 
@@ -66,7 +69,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 }
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: serial_port_device(mconfig, tag, owner, clock)
+	: serial_port_device(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock)
 {
 }
 
@@ -80,12 +83,10 @@ void rs232_port_device::device_config_complete()
 	if (intf != NULL)
 	{
 		*static_cast<rs232_port_interface *>(this) = *intf;
-		memcpy(&(serial_port_interface::m_out_rx8_cb), &(rs232_port_interface::m_out_rx8_cb), sizeof(rs232_port_interface::m_out_rx8_cb));
 		memcpy(&(serial_port_interface::m_out_rx_cb), &(rs232_port_interface::m_out_rx_cb), sizeof(rs232_port_interface::m_out_rx_cb));
 	}
 	else
 	{
-		memset(&(serial_port_interface::m_out_rx8_cb), 0, sizeof(serial_port_interface::m_out_rx8_cb));
 		memset(&(serial_port_interface::m_out_rx_cb), 0, sizeof(serial_port_interface::m_out_rx_cb));
 		memset(&m_out_dcd_cb, 0, sizeof(m_out_dcd_cb));
 		memset(&m_out_dsr_cb, 0, sizeof(m_out_dsr_cb));
@@ -93,6 +94,9 @@ void rs232_port_device::device_config_complete()
 		memset(&m_out_cts_cb, 0, sizeof(m_out_cts_cb));
 	}
 	m_dev = dynamic_cast<device_rs232_port_interface *>(get_card_device());
+	serial_port_device::m_dev = dynamic_cast<device_serial_port_interface *>(get_card_device());
+	loopdtr = 0;
+	looprts = 0;
 }
 
 void rs232_port_device::device_start()
@@ -103,3 +107,30 @@ void rs232_port_device::device_start()
 	m_out_ri_func.resolve(m_out_ri_cb, *this);
 	m_out_cts_func.resolve(m_out_cts_cb, *this);
 }
+
+// XXX:make loopback handshaking optional if needed
+WRITE_LINE_MEMBER( rs232_port_device::dtr_w )
+{
+	if(m_dev)
+		return m_dev->dtr_w(state);
+	
+	if(serial_port_device::m_dev)
+	{
+		loopdtr = state;
+		out_dcd(state);
+		out_dsr(state);
+	}
+}
+
+WRITE_LINE_MEMBER( rs232_port_device::rts_w )
+{
+	if(m_dev)
+		return m_dev->rts_w(state);
+	
+	if(serial_port_device::m_dev)
+	{
+		looprts = state;
+		out_cts(state);
+	}
+}
+

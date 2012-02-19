@@ -43,7 +43,6 @@
 #include "sound/cdda.h"
 #include "machine/sgi.h"
 #include "machine/pckeybrd.h"
-#include "machine/pc_mouse.h"
 #include "machine/pc_lpt.h"
 #include "includes/at.h"
 #include "machine/8042kbdc.h"
@@ -1550,7 +1549,6 @@ static INPUT_PORTS_START( ip225015 )
 	PORT_START("DSW1")	// unused IN2
 	PORT_START("DSW2")	// unused IN3
 	PORT_INCLUDE( at_keyboard )		/* IN4 - IN11 */
-	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 INPUT_PORTS_END
 
 static void rtc_update(ip22_state *state)

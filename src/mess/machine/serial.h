@@ -15,7 +15,6 @@
 
 struct serial_port_interface
 {
-	devcb_write8		m_out_rx8_cb;
 	devcb_write_line	m_out_rx_cb;
 };
 
@@ -25,14 +24,10 @@ public:
 	device_serial_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_serial_port_interface();
 
-	virtual void tx8(UINT8 data) { m_tdata = data; }
-	virtual UINT8 rx8() { return m_rdata; }
 	virtual void tx(UINT8 state) { m_tbit = state; }
-	virtual int rx() { return m_rbit; }
+	virtual UINT8 rx() { return m_rbit; }
 protected:
-	UINT8 m_rdata;
 	UINT8 m_rbit;
-	UINT8 m_tdata;
 	UINT8 m_tbit;
 };
 
@@ -42,32 +37,25 @@ class serial_port_device : public device_t,
 {
 public:
 	serial_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~serial_port_device();
 
-	DECLARE_WRITE8_MEMBER( tx8 ) { if(m_dev) m_dev->tx8(data); }
-	DECLARE_READ8_MEMBER( rx8 )  { return (m_dev) ? m_dev->rx8() : 0; }
-	
 	DECLARE_WRITE_LINE_MEMBER( tx ) { if(m_dev) m_dev->tx(state); }
 	DECLARE_READ_LINE_MEMBER( rx )  { return (m_dev) ? m_dev->rx() : 0; }
 	
-	void out_rx8(UINT8 data) { m_out_rx8_func(0, data); }
 	void out_rx(UINT8 param)  { m_out_rx_func(param); }
 protected:
 	virtual void device_start();
 	virtual void device_config_complete();
-
-private:
-	devcb_resolved_write8 m_out_rx8_func;
-	devcb_resolved_write_line m_out_rx_func;
-
 	device_serial_port_interface *m_dev;
+private:
+	devcb_resolved_write_line m_out_rx_func;
 };
 
 extern const device_type SERIAL_PORT;
 
 struct rs232_port_interface
 {
-	devcb_write8		m_out_rx8_cb;
 	devcb_write_line	m_out_rx_cb;
 	devcb_write_line	m_out_dcd_cb;
 	devcb_write_line	m_out_dsr_cb;
@@ -104,13 +92,13 @@ public:
 	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~rs232_port_device();
 
-	DECLARE_WRITE_LINE_MEMBER( dtr_w ) { if (m_dev) m_dev->dtr_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rts_w ) { if (m_dev) m_dev->rts_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( dtr_w );
+	DECLARE_WRITE_LINE_MEMBER( rts_w );
 
-	DECLARE_READ_LINE_MEMBER( dcd_r ) { return (m_dev) ? m_dev->dcd_r() : 0; }
-	DECLARE_READ_LINE_MEMBER( dsr_r ) { return (m_dev) ? m_dev->dsr_r() : 0; }
+	DECLARE_READ_LINE_MEMBER( dcd_r ) { return (m_dev) ? m_dev->dcd_r() : loopdtr; }
+	DECLARE_READ_LINE_MEMBER( dsr_r ) { return (m_dev) ? m_dev->dsr_r() : loopdtr; }
 	DECLARE_READ_LINE_MEMBER( ri_r )  { return (m_dev) ? m_dev->ri_r() : 0; }
-	DECLARE_READ_LINE_MEMBER( cts_r ) { return (m_dev) ? m_dev->cts_r() : 0; }
+	DECLARE_READ_LINE_MEMBER( cts_r ) { return (m_dev) ? m_dev->cts_r() : looprts; }
 
 	void out_dcd(UINT8 param) { m_out_dcd_func(param); }
 	void out_dsr(UINT8 param) { m_out_dsr_func(param); }
@@ -120,14 +108,14 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_config_complete();
-
-private:
 	device_rs232_port_interface *m_dev;
-
+private:
 	devcb_resolved_write_line m_out_dcd_func;
 	devcb_resolved_write_line m_out_dsr_func;
 	devcb_resolved_write_line m_out_ri_func;
 	devcb_resolved_write_line m_out_cts_func;
+	UINT8 loopdtr;
+	UINT8 looprts;
 };
 
 extern const device_type RS232_PORT;

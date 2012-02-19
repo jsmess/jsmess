@@ -98,7 +98,6 @@ static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
 	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
 
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

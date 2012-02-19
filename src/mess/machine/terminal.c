@@ -7,7 +7,8 @@
 enum
 {
 	START = 0,
-	STOP = 9
+	STOP = 9,
+	DONE = 10
 };
 
 #define TERMINAL_WIDTH 80
@@ -223,8 +224,11 @@ READ_LINE_DEVICE_HANDLER( terminal_serial_r )
 
 	switch (term->tx_state)
 	{
+	case DONE:
+		break;
 	case STOP:
 		data = 1;
+		term->tx_state++;
 		break;
 
 	case START:
@@ -313,13 +317,26 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-static void generic_terminal_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
+static void generic_terminal_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	terminal_state *term = get_safe_token(device);
 	UINT8 options = input_port_read(*device, "TERM_CONF");
 	UINT16 cursor = term->y_pos * TERMINAL_WIDTH + term->x_pos;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
+	UINT32 font_color;
+	switch (options & 0x30)
+	{
+	case 0x10:
+		font_color = 0x00ff7e00;
+		break;
+	case 0x20:
+		font_color = 0x00ffffff;
+		break;
+	default:
+		font_color = 0x0000ff00;
+		break;
+	}
 
 	term->framecnt++;
 
@@ -327,7 +344,7 @@ static void generic_terminal_update(device_t *device, bitmap_ind16 &bitmap, cons
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16  *p = &bitmap.pix16(sy++);
+			UINT32  *p = &bitmap.pix32(sy++);
 
 			for (x = ma; x < ma + TERMINAL_WIDTH; x++)
 			{
@@ -352,14 +369,14 @@ static void generic_terminal_update(device_t *device, bitmap_ind16 &bitmap, cons
 				}
 
 				/* Display a scanline of a character */
-				*p++ = BIT( gfx, 7 );
-				*p++ = BIT( gfx, 6 );
-				*p++ = BIT( gfx, 5 );
-				*p++ = BIT( gfx, 4 );
-				*p++ = BIT( gfx, 3 );
-				*p++ = BIT( gfx, 2 );
-				*p++ = BIT( gfx, 1 );
-				*p++ = BIT( gfx, 0 );
+				*p++ = (BIT( gfx, 7 ))?font_color:0;
+				*p++ = (BIT( gfx, 6 ))?font_color:0;
+				*p++ = (BIT( gfx, 5 ))?font_color:0;
+				*p++ = (BIT( gfx, 4 ))?font_color:0;
+				*p++ = (BIT( gfx, 3 ))?font_color:0;
+				*p++ = (BIT( gfx, 2 ))?font_color:0;
+				*p++ = (BIT( gfx, 1 ))?font_color:0;
+				*p++ = (BIT( gfx, 0 ))?font_color:0;
 			}
 		}
 		ma+=TERMINAL_WIDTH;
@@ -378,7 +395,7 @@ static UINT8 row_number(UINT8 code) {
 	return 0;
 }
 
-UINT8 terminal_keyboard_handler(running_machine &machine, devcb_resolved_write8 &callback, UINT8 last_code, UINT8 *scan_line, UINT8 *tx_shift, int *tx_state, device_t *device)
+UINT8 terminal_keyboard_handler(running_machine &machine, UINT8 last_code, UINT8 *scan_line, UINT8 *tx_shift, int *tx_state, device_t *device)
 {
 	static const char *const keynames[] = { "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3", "TERM_LINE4", "TERM_LINE5", "TERM_LINE6", "TERM_LINE7" };
 	int i;
@@ -468,7 +485,6 @@ UINT8 terminal_keyboard_handler(running_machine &machine, devcb_resolved_write8 
 				}
 			}
 			if (last_code != key_code ) {
-				callback(0, key_code);
 				if (tx_shift) *tx_shift = key_code;
 				if (tx_state) *tx_state = START;
 			}
@@ -485,37 +501,45 @@ UINT8 terminal_keyboard_handler(running_machine &machine, devcb_resolved_write8 
 
 static TIMER_CALLBACK(keyboard_callback)
 {
+	UINT8 new_code;
 	terminal_state *term = get_safe_token((device_t *)ptr);
-	term->last_code = terminal_keyboard_handler(machine, term->terminal_keyboard_func, term->last_code, &term->scan_line, &term->tx_shift, &term->tx_state, (device_t *)ptr);
+	new_code = terminal_keyboard_handler(machine, term->last_code, &term->scan_line, &term->tx_shift, &term->tx_state, (device_t *)ptr);
+	if(term->last_code != new_code)
+		term->terminal_keyboard_func(0, new_code);
+	term->last_code = new_code;
+}
+
+static TIMER_CALLBACK(serial_callback)
+{
+	static int count = 0;
+	terminal_state *term = get_safe_token((device_t *)ptr);
+	if(term->tx_state == DONE) {
+		if(count == 0) {
+			term->last_code = terminal_keyboard_handler(machine, term->last_code, &term->scan_line, &term->tx_shift, &term->tx_state, (device_t *)ptr);
+		} else
+			++count %= 8;
+	} else
+		term->terminal_keyboard_func(0, terminal_serial_r((device_t *)ptr));
 }
 
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-static VIDEO_START( terminal )
-{
 
-}
-
-static SCREEN_UPDATE_IND16(terminal )
+static SCREEN_UPDATE_RGB32(terminal )
 {
-	device_t *devconf = screen.machine().device(TERMINAL_TAG);
+	device_t *devconf = screen.owner();
 	generic_terminal_update( devconf, bitmap, cliprect);
 	return 0;
 }
 
-MACHINE_CONFIG_FRAGMENT( generic_terminal )
+static MACHINE_CONFIG_FRAGMENT( generic_terminal )
 	MCFG_SCREEN_ADD(TERMINAL_SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
 	MCFG_SCREEN_UPDATE_STATIC(terminal)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
-
-	MCFG_VIDEO_START(terminal)
 MACHINE_CONFIG_END
 
 
@@ -527,10 +551,14 @@ static DEVICE_START( terminal )
 {
 	terminal_state *term = get_safe_token(device);
 	const terminal_interface *intf = get_interface(device);
+	if(dynamic_cast<serial_terminal_device *>(device->owner()))
+		term->terminal_keyboard_func.resolve(intf->terminal_keyboard_func, *device->owner());
+	else
+		term->terminal_keyboard_func.resolve(intf->terminal_keyboard_func, *device);
 
-	term->terminal_keyboard_func.resolve(intf->terminal_keyboard_func, *device);
-
-	if (!term->terminal_keyboard_func.isnull())
+	if (device->clock())
+		device->machine().scheduler().timer_pulse(attotime::from_hz(device->clock()), FUNC(serial_callback), 0, (void*)device);
+	else if (!term->terminal_keyboard_func.isnull())
 		device->machine().scheduler().timer_pulse(attotime::from_hz(2400), FUNC(keyboard_callback), 0, (void*)device);
 }
 
@@ -682,6 +710,10 @@ INPUT_PORTS_START( generic_terminal )
 	PORT_CONFNAME( 0x08, 0x08, "Invert")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x08, DEF_STR(Yes))
+	PORT_CONFNAME( 0x30, 0x00, "Color")
+	PORT_CONFSETTING(    0x00, "Green")
+	PORT_CONFSETTING(    0x10, "Amber")
+	PORT_CONFSETTING(    0x20, "White")
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -702,6 +734,7 @@ DEVICE_GET_INFO( terminal )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(terminal);					break;
 
 		case DEVINFO_PTR_INPUT_PORTS:					info->ipt = INPUT_PORTS_NAME(generic_terminal);				break;
+		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_CONFIG_NAME(generic_terminal); break;
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Generic Terminal");						break;
 		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Terminal");								break;
@@ -712,3 +745,26 @@ DEVICE_GET_INFO( terminal )
 }
 
 DEFINE_LEGACY_DEVICE(GENERIC_TERMINAL, terminal);
+
+serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+      : device_t(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock),
+        device_serial_port_interface(mconfig, *this),
+        m_terminal(*this, TERMINAL_TAG)
+{
+}
+
+static const terminal_interface serial_terminal_terminal_interface = {
+      DEVCB_MEMBER(serial_terminal_device, serial_keyboard_func)
+};
+
+static MACHINE_CONFIG_FRAGMENT(serial_terminal_config)
+      MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, serial_terminal_terminal_interface, 9600)
+MACHINE_CONFIG_END
+
+const device_type SERIAL_TERMINAL = &device_creator<serial_terminal_device>;
+
+machine_config_constructor serial_terminal_device::device_mconfig_additions() const
+{
+      return MACHINE_CONFIG_NAME(serial_terminal_config);
+}
+

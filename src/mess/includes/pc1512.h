@@ -86,7 +86,7 @@ public:
 	required_device<device_t> m_pit;
 	required_device<mc146818_device> m_rtc;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_uart;
+	required_device<ins8250_device> m_uart;
 	required_device<ams40041_device> m_vdu;
 	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_speaker;

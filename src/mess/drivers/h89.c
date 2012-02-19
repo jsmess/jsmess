@@ -34,9 +34,10 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_uart;
+	required_device<ins8250_device> m_uart;
 
-	DECLARE_WRITE8_MEMBER( h89_kbd_put );
+	DECLARE_WRITE_LINE_MEMBER( h89_terminal_out );
+	DECLARE_WRITE8_MEMBER( h89_terminal_in );
 	DECLARE_WRITE8_MEMBER( port_f2_w );
 
 	UINT8 m_port_f2;
@@ -57,7 +58,7 @@ static ADDRESS_MAP_START( h89_io, AS_IO, 8, h89_state)
 //  AM_RANGE(0xd0, 0xd7)    8250 UART DCE
 //  AM_RANGE(0xd8, 0xdf)    8250 UART DTE
 //  AM_RANGE(0xe0, 0xe7)    8250 UART LP
-	AM_RANGE(0xe8, 0xef)	AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w) // 8250 UART console
+	AM_RANGE(0xe8, 0xef)	AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w) // 8250 UART console
 //  AM_RANGE(0xf0, 0xf1)    front panel
 	AM_RANGE(0xf2, 0xf2)	AM_WRITE(port_f2_w) AM_READ_PORT("SW501")
 //  AM_RANGE(0xf8, 0xf9)    cassette
@@ -109,28 +110,30 @@ WRITE8_MEMBER( h89_state::port_f2_w )
 	m_port_f2 = data;
 }
 
-WRITE8_MEMBER( h89_state::h89_kbd_put )
+WRITE_LINE_MEMBER( h89_state::h89_terminal_out )
 {
-	ins8250_receive(m_uart, data);
+	device_t *terminal = machine().device(TERMINAL_TAG);
+	terminal_serial_w(terminal, state);
 }
 
-static INS8250_TRANSMIT(h89_terminal_w)
+WRITE8_MEMBER( h89_state::h89_terminal_in )
 {
-	terminal_write(device->machine().device(TERMINAL_TAG), 0, data);
+	m_uart->rx_w(data&&1);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(h89_state, h89_kbd_put)
+	DEVCB_DRIVER_MEMBER(h89_state, h89_terminal_in)
 };
 
 static const ins8250_interface h89_ins8250_interface =
 {
-	XTAL_12_288MHz / 4,			// clock
-	DEVCB_NULL,					// interrupt
-	h89_terminal_w,				// transmit func
-	NULL,						// handshake out
-	NULL						// refresh func
+	DEVCB_DRIVER_LINE_MEMBER(h89_state, h89_terminal_out),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( h89, h89_state )
@@ -154,10 +157,9 @@ static MACHINE_CONFIG_START( h89, h89_state )
 	MCFG_PALETTE_INIT(black_and_white)
 #endif
 
-	MCFG_INS8250_ADD( "ins8250", h89_ins8250_interface )
+	MCFG_INS8250_ADD( "ins8250", h89_ins8250_interface, XTAL_1_8432MHz )
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_FRAGMENT_ADD( generic_terminal )
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
 
 	MCFG_TIMER_ADD_PERIODIC("irq_timer", h89_irq_timer, attotime::from_hz(100))
 MACHINE_CONFIG_END

@@ -41,9 +41,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 	DECLARE_WRITE_LINE_MEMBER( rtc_tp_w );
 	required_device<device_t> m_pic;
-	required_device<device_t> m_ace1;
-	required_device<device_t> m_ace2;
-	required_device<device_t> m_ace3;
+	required_device<ins8250_device> m_ace1;
+	required_device<ins8250_device> m_ace2;
+	required_device<ins8250_device> m_ace3;
 	required_device<upd1990a_device> m_rtc;
 
 protected:

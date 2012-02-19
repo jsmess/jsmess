@@ -478,7 +478,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( okean240t, okean240 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240t_io)
-	MCFG_FRAGMENT_ADD( generic_terminal )
 MACHINE_CONFIG_END
 
 /* ROM definition */

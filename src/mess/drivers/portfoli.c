@@ -721,11 +721,12 @@ WRITE_LINE_MEMBER( portfolio_state::i8250_intrpt_w )
 
 static const ins8250_interface i8250_intf =
 {
-	XTAL_1_8432MHz,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(portfolio_state, i8250_intrpt_w),
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 //-------------------------------------------------
@@ -811,7 +812,7 @@ void portfolio_state::machine_reset()
 	switch (m_pid)
 	{
 	case PID_SERIAL:
-		io->install_legacy_readwrite_handler(*m_uart, 0x8070, 0x8077, FUNC(ins8250_r), FUNC(ins8250_w));
+		io->install_readwrite_handler(0x8070, 0x8077, read8_delegate(FUNC(ins8250_device::ins8250_r), (ins8250_device*)m_uart), write8_delegate(FUNC(ins8250_device::ins8250_w), (ins8250_device*)m_uart));
 		break;
 
 	case PID_PARALLEL:
@@ -858,7 +859,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	/* devices */
 	MCFG_I8255A_ADD(M82C55A_TAG, ppi_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_INS8250_ADD(M82C50A_TAG, i8250_intf) // should be MCFG_INS8250A_ADD
+	MCFG_INS8250_ADD(M82C50A_TAG, i8250_intf, XTAL_1_8432MHz) // should be MCFG_INS8250A_ADD
 	MCFG_TIMER_ADD_PERIODIC("counter", counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
 	MCFG_TIMER_ADD_PERIODIC(TIMER_TICK_TAG, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
 

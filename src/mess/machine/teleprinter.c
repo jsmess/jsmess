@@ -244,8 +244,13 @@ static void generic_teleprinter_update(device_t *device, bitmap_ind16 &bitmap, c
 
 static TIMER_CALLBACK(keyboard_callback)
 {
+	UINT8 new_code;
 	teleprinter_state *term = get_safe_token((device_t *)ptr);
-	term->last_code = terminal_keyboard_handler(machine, term->teleprinter_keyboard_func, term->last_code, &term->scan_line, NULL, NULL, (device_t *)ptr);
+	new_code = terminal_keyboard_handler(machine, term->last_code, &term->scan_line, NULL, NULL, (device_t *)ptr);
+
+	if(new_code != term->last_code)
+		term->teleprinter_keyboard_func(0, new_code);
+	term->last_code = new_code;
 }
 
 /***************************************************************************

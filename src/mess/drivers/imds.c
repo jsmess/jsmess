@@ -101,7 +101,6 @@ static MACHINE_CONFIG_START( imds, imds_state )
 //  MCFG_INS8250_ADD( "ins8250", imds_com_interface )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

@@ -10,6 +10,8 @@
 #include "machine/ins8250.h"
 #include "machine/i8255.h"
 #include "machine/8237dma.h"
+#include "machine/serial.h"
+#include "machine/ser_mouse.h"
 
 class pc_state : public driver_device
 {
@@ -49,6 +51,7 @@ extern const struct pit8253_config pcjr_pit8253_config;
 extern const struct pic8259_interface ibm5150_pic8259_config;
 extern const struct pic8259_interface pcjr_pic8259_config;
 extern const ins8250_interface ibm5150_com_interface[4];
+extern const rs232_port_interface ibm5150_serport_config[4];
 extern const i8255_interface ibm5150_ppi8255_interface;
 extern const i8255_interface ibm5160_ppi8255_interface;
 extern const i8255_interface pc_ppi8255_interface;

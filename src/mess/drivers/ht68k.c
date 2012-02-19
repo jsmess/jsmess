@@ -166,7 +166,6 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_MACHINE_RESET(ht68k)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )

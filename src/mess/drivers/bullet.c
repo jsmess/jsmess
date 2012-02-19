@@ -1182,9 +1182,6 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
     MCFG_CPU_IO_MAP(bullet_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
-    // video hardware
-	MCFG_FRAGMENT_ADD( generic_terminal )
-
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
@@ -1212,9 +1209,6 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
     MCFG_CPU_PROGRAM_MAP(bulletf_mem)
     MCFG_CPU_IO_MAP(bulletf_io)
 	MCFG_CPU_CONFIG(daisy_chain)
-
-    // video hardware
-	MCFG_FRAGMENT_ADD( generic_terminal )
 
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)

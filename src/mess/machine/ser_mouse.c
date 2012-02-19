@@ -14,7 +14,8 @@ const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_dev
 
 serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-		device_rs232_port_interface(mconfig, *this)
+	  device_rs232_port_interface(mconfig, *this),
+	  device_serial_interface(mconfig, *this)
 {
 }
 
@@ -33,11 +34,21 @@ void serial_mouse_device::device_start()
 	m_owner = dynamic_cast<rs232_port_device *>(owner());
 	m_timer = timer_alloc();
 	m_enabled = false;
+	set_frame();
 }
 
 void serial_mouse_device::device_reset()
 {
-	m_head = m_tail = 0;
+	m_head = m_tail = m_count = 0;
+	tx(0);
+	m_dcd = 0;
+	m_owner->out_dcd(0);
+	m_dsr = 0;
+	m_owner->out_dsr(0);
+	m_ri = 0;
+	m_owner->out_ri(0);
+	m_cts = 0;
+	m_owner->out_cts(0);
 }
 
 /**************************************************************************
@@ -51,7 +62,7 @@ void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int
 	int mbc;
 
 	/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
-	if (m_head==m_tail)
+	if ((m_head==m_tail) && (m_count == 0))
 	{
 		nx = input_port_read(*this, "ser_mouse_x");
 
@@ -76,11 +87,17 @@ void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int
 			mouse_trans(dx, dy, nb, mbc);
 	}
 
-	if( m_tail != m_head )
+	++m_count %= 8;
+
+	if(is_transmit_register_empty())
 	{
-		UINT8 data = unqueue_data();
-		m_rdata = data;
-		m_owner->out_rx8(data);
+		if(m_tail != m_head)
+			transmit_register_setup(unqueue_data());
+	}
+	else
+	{
+		m_rbit = transmit_register_get_data_bit();
+		m_owner->out_rx(m_rbit);
 	}
 }
 	
@@ -164,10 +181,10 @@ void mouse_systems_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)
 void serial_mouse_device::set_mouse_enable(bool state)
 {
 	if(state && !m_enabled)
-		m_timer->adjust(attotime::zero, 0, attotime::from_hz(240));
+		m_timer->adjust(attotime::zero, 0, attotime::from_hz(1200));
 	else if(!state && m_enabled)
 	{
-		m_timer->adjust(attotime::zero);
+		m_timer->adjust(attotime::never);
 		m_head = m_tail = 0;
 	}
 	m_enabled = state;

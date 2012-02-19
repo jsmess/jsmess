@@ -596,7 +596,6 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_CPU_PROGRAM_MAP(sage2_mem)
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(generic_terminal)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// devices

@@ -758,9 +758,6 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_CPU_PROGRAM_MAP(mpz80_mem)
 	MCFG_CPU_IO_MAP(mpz80_io)
 
-	// video hardware
-	MCFG_FRAGMENT_ADD( generic_terminal )
-
 	// S-100
 	MCFG_S100_BUS_ADD(Z80_TAG, s100_intf)
 	MCFG_S100_SLOT_ADD("s100_1", mpz80_s100_cards, "mm65k16s", NULL)

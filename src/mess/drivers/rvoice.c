@@ -373,7 +373,6 @@ static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
 	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 
 MACHINE_CONFIG_END

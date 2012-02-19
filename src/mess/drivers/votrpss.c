@@ -204,7 +204,6 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	/* printer */
 	//MCFG_PRINTER_ADD("printer")
 
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, votrpss_terminal_intf)
 MACHINE_CONFIG_END
 

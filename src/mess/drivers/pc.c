@@ -78,7 +78,7 @@ video HW too.
 #include "machine/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
-#include "machine/pc_mouse.h"
+#include "machine/serial.h"
 
 #include "includes/europc.h"
 #include "includes/tandy1t.h"
@@ -162,14 +162,14 @@ static ADDRESS_MAP_START(pc8_io, AS_IO, 8)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,				pc_JOY_w)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc_rtc_r,				pc_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE("lpt_2", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_r, ins8250_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE_MODERN("ins8250_3", ins8250_device, ins8250_r, ins8250_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE("lpt_1", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_r, ins8250_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE_MODERN("ins8250_2", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(oliv_io, AS_IO, 8)
@@ -189,14 +189,14 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc16le_rtc_r,				pc16le_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02b0, 0x02bf) AM_RAM // needed for EC-18xx
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8_MODERN("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8_MODERN("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -225,14 +225,14 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc16le_rtc_r,				pc16le_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02b0, 0x02bf) AM_RAM // needed for EC-18xx
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8_MODERN("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8_MODERN("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,				pc_fdc_w, 0xffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -257,13 +257,13 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r,			europc_jim_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE("lpt_2", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ     (europc_jim2_r)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_r, ins8250_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
+	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE_MODERN("ins8250_3", ins8250_device, ins8250_r, ins8250_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE("lpt_1", pc_lpt_r, pc_lpt_w)
 //  AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_r, ins8250_w)
+	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE_MODERN("ins8250_2", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 
@@ -289,11 +289,11 @@ static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,				pc_page_w)
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", 	sn76496_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,			pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,					pc_fdc_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 
@@ -319,11 +319,11 @@ static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496",	sn76496_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,					pc_JOY_w, 0xffff)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,			pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,					pc_fdc_w, 0xffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -350,11 +350,11 @@ static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496",    sn76496_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,                    pc_JOY_w, 0xffff)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,                    pc_fdc_w, 0xffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -381,10 +381,10 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8)
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", 	sn76496_w)
 	AM_RANGE(0x00f0, 0x00f7) AM_READWRITE(pc_fdc_r,					pcjr_fdc_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc_JOY_r,					pc_JOY_w)
-	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_r, ins8250_w)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE_MODERN("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,			pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_r, ins8250_w)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8 )
@@ -453,12 +453,6 @@ static INPUT_PORTS_START( pccga )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_START("DSW2") /* IN3 */
-	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
-	PORT_DIPSETTING(	0x80, "COM1" )
-	PORT_DIPSETTING(	0x40, "COM2" )
-	PORT_DIPSETTING(	0x20, "COM3" )
-	PORT_DIPSETTING(	0x10, "COM4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
@@ -469,7 +463,6 @@ static INPUT_PORTS_START( pccga )
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
 	PORT_INCLUDE( kb_keytronic_pc )
-	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -530,12 +523,6 @@ static INPUT_PORTS_START( pcega )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_START("DSW2") /* IN3 */
-	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
-	PORT_DIPSETTING(	0x80, "COM1" )
-	PORT_DIPSETTING(	0x40, "COM2" )
-	PORT_DIPSETTING(	0x20, "COM3" )
-	PORT_DIPSETTING(	0x10, "COM4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
@@ -546,7 +533,6 @@ static INPUT_PORTS_START( pcega )
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
 	PORT_INCLUDE( kb_keytronic_pc )
-	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -587,12 +573,6 @@ static INPUT_PORTS_START( europc )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_START("DSW2") /* IN3 */
-	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
-	PORT_DIPSETTING(	0x80, "COM1" )
-	PORT_DIPSETTING(	0x40, "COM2" )
-	PORT_DIPSETTING(	0x20, "COM3" )
-	PORT_DIPSETTING(	0x10, "COM4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
@@ -604,7 +584,6 @@ static INPUT_PORTS_START( europc )
 
 	EUROPC_KEYBOARD
 
-	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -665,12 +644,6 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_START("DSW2") /* IN3 */
-	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
-	PORT_DIPSETTING(	0x80, "COM1" )
-	PORT_DIPSETTING(	0x40, "COM2" )
-	PORT_DIPSETTING(	0x20, "COM3" )
-	PORT_DIPSETTING(	0x10, "COM4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
@@ -684,7 +657,6 @@ static INPUT_PORTS_START( bondwell )
 
 //  PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
     PORT_INCLUDE( kb_keytronic_pc )
-	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
@@ -715,12 +687,6 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
 	PORT_START("DSW2") /* IN3 */
-	PORT_DIPNAME( 0xf0, 0x80, "Serial mouse")
-	PORT_DIPSETTING(	0x80, "COM1" )
-	PORT_DIPSETTING(	0x40, "COM2" )
-	PORT_DIPSETTING(	0x20, "COM3" )
-	PORT_DIPSETTING(	0x10, "COM4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, "HDC1 (C800:0 port 320-323)")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
@@ -731,7 +697,6 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_BIT( 0x01, 0x01,	IPT_UNUSED )
 
 	PORT_INCLUDE( t1000_keyboard )
-	PORT_INCLUDE( pc_mouse_microsoft )	/* IN12 - IN14 */
 	PORT_INCLUDE( pc_joystick )			/* IN15 - IN19 */
 INPUT_PORTS_END
 
@@ -755,6 +720,11 @@ static const floppy_interface ibmpc_floppy_interface =
 	"floppy_5_25",
 	NULL
 };
+
+SLOT_INTERFACE_START(ibm5150_com)
+	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
+	SLOT_INTERFACE("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
+SLOT_INTERFACE_END
 
 static const kb_keytronic_interface pc_keytronic_intf =
 {
@@ -834,10 +804,14 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -882,10 +856,14 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga32k )
@@ -959,10 +937,14 @@ static MACHINE_CONFIG_START( europc, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_aga )
@@ -1005,8 +987,10 @@ static MACHINE_CONFIG_START( t1000hx, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
@@ -1051,8 +1035,10 @@ static MACHINE_CONFIG_START( t1000_16, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
@@ -1097,8 +1083,10 @@ static MACHINE_CONFIG_START( t1000_286, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
@@ -1154,8 +1142,10 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pcjr_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pcjr )
@@ -1235,10 +1225,14 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1284,10 +1278,14 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 //  MCFG_FRAGMENT_ADD( pcvideo_ega ) // Put this back after ISA are added to this driver
@@ -1332,10 +1330,14 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_poisk2 )
@@ -1380,10 +1382,14 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1428,10 +1434,14 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1476,10 +1486,13 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2] )			/* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3] )			/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )	/* TODO: Verify model */
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )

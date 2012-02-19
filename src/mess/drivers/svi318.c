@@ -319,8 +319,8 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 
 	MCFG_I8255_ADD( "ppi8255", svi318_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0] )
-	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )
+	MCFG_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0], 1000000 )
+	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1], 3072000 )
 
 	/* Video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, svi318_tms9928a_interface )
@@ -430,8 +430,8 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 
 	MCFG_I8255A_ADD( "ppi8255", svi318_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0] )
-	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1] )
+	MCFG_INS8250_ADD( "ins8250_0", svi318_ins8250_interface[0], 1000000 )
+	MCFG_INS8250_ADD( "ins8250_1", svi318_ins8250_interface[1], 3072000 )
 
 	/* Video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_dualhsxs )

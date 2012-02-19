@@ -119,11 +119,12 @@ MACHINE_RESET_MEMBER(ccs2810_state)
 
 static const ins8250_interface ccs2810_com_interface =
 {
-	1843200,
 	DEVCB_NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( ccs2810, ccs2810_state )
@@ -132,10 +133,9 @@ static MACHINE_CONFIG_START( ccs2810, ccs2810_state )
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
 	MCFG_CPU_IO_MAP(ccs2810_io)
 
-	MCFG_INS8250_ADD( "ins8250", ccs2810_com_interface )
+	MCFG_INS8250_ADD( "ins8250", ccs2810_com_interface, XTAL_1_8432MHz )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

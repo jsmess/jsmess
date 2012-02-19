@@ -208,9 +208,6 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
     MCFG_CPU_IO_MAP(exp85_io)
 	MCFG_CPU_CONFIG(exp85_i8085_config)
 
-    /* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)

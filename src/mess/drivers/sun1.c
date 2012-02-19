@@ -138,7 +138,6 @@ static MACHINE_CONFIG_START( sun1, sun1_state )
 	MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
