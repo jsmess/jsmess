@@ -237,6 +237,7 @@ DRVLIBS += \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apf.a \
+	$(MESSOBJ)/apollo.a \
 	$(MESSOBJ)/apple.a \
 	$(MESSOBJ)/applied.a \
 	$(MESSOBJ)/arcadia.a \
@@ -612,6 +613,18 @@ $(MESSOBJ)/amstrad.a:			\
 
 $(MESSOBJ)/apf.a:				\
 	$(MESS_DRIVERS)/apf.o		\
+
+$(MESSOBJ)/apollo.a:	  		\
+	$(MESS_DRIVERS)/apollo.o   	\
+	$(MESS_VIDEO)/apollo.o   	\
+	$(MESS_MACHINE)/sc499.o   	\
+	$(MESS_MACHINE)/omti8621.o  \
+	$(MESS_MACHINE)/apollo_dbg.o  \
+	$(MESS_MACHINE)/apollo_eth.o  \
+	$(MESS_MACHINE)/apollo_net.o  \
+	$(MESS_MACHINE)/apollo_kbd.o  \
+	$(MESS_MACHINE)/3c505.o  \
+	$(MESS_MACHINE)/apollo.o  \
 
 $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/apple2.o		\
@@ -1941,6 +1954,19 @@ $(MESS_DRIVERS)/mac.o:		$(MESSSRC)/drivers/mac.c \
 $(MESS_MACHINE)/egret.o:	$(MESSSRC)/machine/egret.c\
                         	$(MESSSRC)/machine/egret.h
 
+# $(MESSSRC)/drivers/apollo.c includes m68kcpu.h and m68kcpu.h now includes m68kops.h
+$(MESS_DRIVERS)/apollo.o:	$(EMUSRC)/cpu/m68000/m68kcpu.h
+$(MESS_MACHINE)/apollo_dbg.o:	$(EMUSRC)/cpu/m68000/m68kcpu.h
+
+# when we compile source files we need to include generated files from the OBJ directory
+$(MESS_DRIVERS)/apollo.o:	$(MESSSRC)/drivers/apollo.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -I$(CPUOBJ)/m68000 -c $< -o $@
+
+$(MESS_MACHINE)/apollo_dbg.o: $(MESSSRC)/machine/apollo_dbg.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -I$(CPUOBJ)/m68000 -c $< -o $@
+
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
@@ -1951,6 +1977,9 @@ $(MESS_DRIVERS)/acrnsys1.o:	$(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/aim65_40.o:	$(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
+$(MESS_VIDEO)/apollo.o:		$(MESS_LAYOUT)/apollo.lh
+$(MESS_VIDEO)/apollo.o:		$(MESS_LAYOUT)/apollo_15i.lh
+$(MESS_DRIVERS)/apollo.o:	$(MESS_LAYOUT)/apollo_dsp.lh
 $(MESS_DRIVERS)/apricotp.o:	$(MESS_LAYOUT)/apricotp.lh
 $(MESS_DRIVERS)/avigo.o:	$(MESS_LAYOUT)/avigo.lh
 $(MESS_DRIVERS)/babbage.o:	$(MESS_LAYOUT)/babbage.lh
