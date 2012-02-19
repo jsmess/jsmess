@@ -20,7 +20,7 @@
 
 #include "includes/apollo.h"
 
-#if 0
+#if 1
 
 int apollo_eth_transmit(device_t *device, const UINT8 data[], int length)
 {
