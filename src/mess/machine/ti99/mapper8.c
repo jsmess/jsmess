@@ -510,6 +510,13 @@ void ti998_mapper_device::device_start()
 	}
 	if (VERBOSE>4) LOG("Mapper logical device count = %d\n", m_logcomp.count());
 	if (VERBOSE>4) LOG("Mapper physical device count = %d\n", m_physcomp.count());
+
+	m_dsr_selected = false;
+	m_CRUS = true;
+	m_PTGE = false;
+
+	// Clean mapper
+	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;
 }
 
 void ti998_mapper_device::device_reset()
