@@ -219,7 +219,7 @@ void tms9901_device::timer_reload(void)
 */
 READ8_MEMBER( tms9901_device::read )
 {
-	int answer;
+	int answer = 0;
 
 	offset &= 0x003;
 
