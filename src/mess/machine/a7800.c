@@ -17,7 +17,7 @@
                             cart not needed when in PAL mode
                             added F18 Hornet bank select type
                             added Activision bank select type
-
+	19-Feb-2010 DanB	 	Added return values for TIA collision registers
 ***************************************************************************/
 
 #include "emu.h"
@@ -462,6 +462,17 @@ READ8_HANDLER( a7800_TIA_r )
 {
 	switch(offset)
 	{
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07:
+		/* Even though the 7800 doesn't use the TIA graphics the collision registers should
+		   still return a reasonable value */
+			return 0x00;
 		case 0x08:
 			  return((input_port_read(space->machine(), "buttons") & 0x02) << 6);
 		case 0x09:
