@@ -63,7 +63,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
 	//required_device<device_t> m_acia;
-	required_device<device_t> m_votrax;
+	required_device<votrax_device> m_votrax;
 	DECLARE_READ8_MEMBER( votrtnt_acia_status_r );
 	DECLARE_READ8_MEMBER( votrtnt_acia_data_r );
 	DECLARE_WRITE8_MEMBER( votrtnt_votrax_w );
@@ -87,7 +87,7 @@ WRITE8_MEMBER( votrtnt_state::votrtnt_votrax_w )
 {
 	data &= 0x3f;  // intonation bits are grounded
 	//printf("%X ",data);
-	votrax_w(m_votrax, 0, data);
+	m_votrax->write(space, 0, data);
 }
 
 
@@ -147,7 +147,7 @@ static GENERIC_TERMINAL_INTERFACE( votrtnt_terminal_intf )
 static TIMER_DEVICE_CALLBACK( votrtnt_poll_votrax )
 {
 	votrtnt_state *state = timer.machine().driver_data<votrtnt_state>();
-	UINT8 status = votrax_status_r(state->m_votrax);
+	UINT8 status = state->m_votrax->status();
 	//printf("%X ",status);
 	device_set_input_line(timer.machine().device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
 }
