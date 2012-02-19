@@ -98,7 +98,6 @@ static MACHINE_CONFIG_START( czk80, czk80_state )
 	MCFG_CPU_PROGRAM_MAP(czk80_mem)
 	MCFG_CPU_IO_MAP(czk80_io)
 
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

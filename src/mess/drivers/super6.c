@@ -569,9 +569,6 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_CPU_IO_MAP(super6_io)
 	MCFG_CPU_CONFIG(super6_daisy_chain)
 
-	// video hardware
-	MCFG_FRAGMENT_ADD(generic_terminal)
-
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_24MHz/4, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(XTAL_24MHz/16))

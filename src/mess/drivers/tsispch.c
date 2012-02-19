@@ -431,7 +431,6 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
     //MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up */
     //MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    MCFG_FRAGMENT_ADD( generic_terminal )
     MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,tsispch_terminal_intf)
 MACHINE_CONFIG_END
 

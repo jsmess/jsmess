@@ -160,6 +160,7 @@ public:
 
 	void unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror);
 	void unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror);
+	bool is_option_rom_space_available(offs_t start, int size);
 
 	DECLARE_WRITE_LINE_MEMBER( irq2_w );
 	DECLARE_WRITE_LINE_MEMBER( irq3_w );

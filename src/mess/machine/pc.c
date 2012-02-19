@@ -26,7 +26,6 @@
 
 #include "machine/pit8253.h"
 
-#include "machine/pc_mouse.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
 #include "machine/pc_fdc.h"
@@ -357,54 +356,163 @@ static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_2 )
 	pic8259_ir3_w(st->m_pic8259, state);
 }
 
-/* called when com registers read/written - used to update peripherals that
-are connected */
-static void pc_com_refresh_connected_common(device_t *device, int n, int data)
+static void pc_com_tx(device_t *uart, UINT8 state, const char *portn)
 {
-	/* mouse connected to this port? */
-	//if (input_port_read(device->machine(), "DSW2") & (0x80>>n))
-//      pc_mouse_handshake_in(device,data);
+	rs232_port_device *port = uart->owner()->subdevice<rs232_port_device>(portn);
+	port->tx(state);
 }
 
-static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_0 ) { pc_com_refresh_connected_common( device, 0, data ); }
-static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_1 ) { pc_com_refresh_connected_common( device, 1, data ); }
-static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_2 ) { pc_com_refresh_connected_common( device, 2, data ); }
-static INS8250_HANDSHAKE_OUT( pc_com_handshake_out_3 ) { pc_com_refresh_connected_common( device, 3, data ); }
+static void pc_com_dtr(device_t *uart, UINT8 state, const char *portn)
+{
+	rs232_port_device *port = uart->owner()->subdevice<rs232_port_device>(portn);
+	port->dtr_w(state);
+}
+
+static void pc_com_rts(device_t *uart, UINT8 state, const char *portn)
+{
+	rs232_port_device *port = uart->owner()->subdevice<rs232_port_device>(portn);
+	port->rts_w(state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc_com_tx_0 ) { pc_com_tx(device, state, "serport0"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dtr_0 ) { pc_com_dtr(device, state, "serport0"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_rts_0 ) { pc_com_rts(device, state, "serport0"); }
+
+static WRITE_LINE_DEVICE_HANDLER( pc_com_tx_1 ) { pc_com_tx(device, state, "serport1"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dtr_1 ) { pc_com_dtr(device, state, "serport1"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_rts_1 ) { pc_com_rts(device, state, "serport1"); }
+
+static WRITE_LINE_DEVICE_HANDLER( pc_com_tx_2 ) { pc_com_tx(device, state, "serport2"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dtr_2 ) { pc_com_dtr(device, state, "serport2"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_rts_2 ) { pc_com_rts(device, state, "serport2"); }
+
+static WRITE_LINE_DEVICE_HANDLER( pc_com_tx_3 ) { pc_com_tx(device, state, "serport3"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dtr_3 ) { pc_com_dtr(device, state, "serport3"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_rts_3 ) { pc_com_rts(device, state, "serport3"); }
+
+static void pc_com_rx(device_t *port, UINT8 state, const char *uartn)
+{
+	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
+	uart->rx_w(state);
+}
+
+static void pc_com_dcd(device_t *port, UINT8 state, const char *uartn)
+{
+	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
+	uart->dcd_w(state);
+}
+
+static void pc_com_dsr(device_t *port, UINT8 state, const char *uartn)
+{
+	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
+	uart->dsr_w(state);
+}
+
+static void pc_com_ri(device_t *port, UINT8 state, const char *uartn)
+{
+	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
+	uart->ri_w(state);
+}
+
+static void pc_com_cts(device_t *port, UINT8 state, const char *uartn)
+{
+	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
+	uart->cts_w(state);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pc_com_rx_0 ) { pc_com_rx(device, state, "ins8250_0"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dcd_0 ) { pc_com_dcd(device, state, "ins8250_0"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dsr_0 ) { pc_com_dsr(device, state, "ins8250_0"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_ri_0 ) { pc_com_ri(device, state, "ins8250_0"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_cts_0 ) { pc_com_cts(device, state, "ins8250_0"); }
+
+static WRITE_LINE_DEVICE_HANDLER( pc_com_rx_1 ) { pc_com_rx(device, state, "ins8250_1"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dcd_1 ) { pc_com_dcd(device, state, "ins8250_1"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dsr_1 ) { pc_com_dsr(device, state, "ins8250_1"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_ri_1 ) { pc_com_ri(device, state, "ins8250_1"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_cts_1 ) { pc_com_cts(device, state, "ins8250_1"); }
+
+static WRITE_LINE_DEVICE_HANDLER( pc_com_rx_2 ) { pc_com_rx(device, state, "ins8250_2"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dcd_2 ) { pc_com_dcd(device, state, "ins8250_2"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dsr_2 ) { pc_com_dsr(device, state, "ins8250_2"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_ri_2 ) { pc_com_ri(device, state, "ins8250_2"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_cts_2 ) { pc_com_cts(device, state, "ins8250_2"); }
+
+static WRITE_LINE_DEVICE_HANDLER( pc_com_rx_3 ) { pc_com_rx(device, state, "ins8250_3"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dcd_3 ) { pc_com_dcd(device, state, "ins8250_3"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_dsr_3 ) { pc_com_dsr(device, state, "ins8250_3"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_ri_3 ) { pc_com_ri(device, state, "ins8250_3"); }
+static WRITE_LINE_DEVICE_HANDLER( pc_com_cts_3 ) { pc_com_cts(device, state, "ins8250_3"); }
 
 /* PC interface to PC-com hardware. Done this way because PCW16 also
 uses PC-com hardware and doesn't have the same setup! */
 const ins8250_interface ibm5150_com_interface[4]=
 {
 	{
-		1843200,
+		DEVCB_LINE(pc_com_tx_0),
+		DEVCB_LINE(pc_com_dtr_0),
+		DEVCB_LINE(pc_com_rts_0),
 		DEVCB_LINE(pc_com_interrupt_1),
-		NULL,
-		pc_com_handshake_out_0,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	{
-		1843200,
+		DEVCB_LINE(pc_com_tx_1),
+		DEVCB_LINE(pc_com_dtr_1),
+		DEVCB_LINE(pc_com_rts_1),
 		DEVCB_LINE(pc_com_interrupt_2),
-		NULL,
-		pc_com_handshake_out_1,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	{
-		1843200,
+		DEVCB_LINE(pc_com_tx_2),
+		DEVCB_LINE(pc_com_dtr_2),
+		DEVCB_LINE(pc_com_rts_2),
 		DEVCB_LINE(pc_com_interrupt_1),
-		NULL,
-		pc_com_handshake_out_2,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	{
-		1843200,
+		DEVCB_LINE(pc_com_tx_3),
+		DEVCB_LINE(pc_com_dtr_3),
+		DEVCB_LINE(pc_com_rts_3),
 		DEVCB_LINE(pc_com_interrupt_2),
-		NULL,
-		pc_com_handshake_out_3,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL
 	}
 };
 
+const rs232_port_interface ibm5150_serport_config[4] =
+{
+	{
+		DEVCB_LINE( pc_com_rx_0 ),
+		DEVCB_LINE( pc_com_dcd_0 ),
+		DEVCB_LINE( pc_com_dsr_0 ),
+		DEVCB_LINE( pc_com_ri_0 ),
+		DEVCB_LINE( pc_com_cts_0 )
+	},
+	{
+		DEVCB_LINE( pc_com_rx_1 ),
+		DEVCB_LINE( pc_com_dcd_1 ),
+		DEVCB_LINE( pc_com_dsr_1 ),
+		DEVCB_LINE( pc_com_ri_1 ),
+		DEVCB_LINE( pc_com_cts_1 )
+	},
+	{
+		DEVCB_LINE( pc_com_rx_2 ),
+		DEVCB_LINE( pc_com_dcd_2 ),
+		DEVCB_LINE( pc_com_dsr_2 ),
+		DEVCB_LINE( pc_com_ri_2 ),
+		DEVCB_LINE( pc_com_cts_2 )
+	},
+	{
+		DEVCB_LINE( pc_com_rx_3 ),
+		DEVCB_LINE( pc_com_dcd_3 ),
+		DEVCB_LINE( pc_com_dsr_3 ),
+		DEVCB_LINE( pc_com_ri_3 ),
+		DEVCB_LINE( pc_com_cts_3 )
+	}
+};
 
 /**********************************************************
  *
@@ -973,9 +1081,6 @@ void mess_init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb
 	/* MESS managed RAM */
 	if ( machine.device<ram_device>(RAM_TAG)->pointer() )
 		memory_set_bankptr( machine, "bank10", machine.device<ram_device>(RAM_TAG)->pointer() );
-
-	/* serial mouse */
-	//pc_mouse_initialise(machine);
 }
 
 
@@ -1139,7 +1244,6 @@ MACHINE_RESET( pc )
 	st->m_ppi_shift_register = 0;
 	st->m_ppi_shift_enable = 0;
 
-	//pc_mouse_set_serial_port( machine.device("ins8250_0") );
 	speaker_level_w( speaker, 0 );
 }
 
@@ -1178,7 +1282,6 @@ MACHINE_RESET( pcjr )
 	st->m_ppi_data_signal = 0;
 	st->m_ppi_shift_register = 0;
 	st->m_ppi_shift_enable = 0;
-	//pc_mouse_set_serial_port( machine.device("ins8250_0") );
 	speaker_level_w( speaker, 0 );
 
 	pcjr_keyb_init(machine);

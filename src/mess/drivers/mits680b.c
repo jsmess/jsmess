@@ -101,7 +101,6 @@ static MACHINE_CONFIG_START( mits680b, mits680b_state )
 	MCFG_CPU_PROGRAM_MAP(mits680b_mem)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* acia */

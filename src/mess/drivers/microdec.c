@@ -111,7 +111,6 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 	MCFG_MACHINE_RESET(microdec)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_UPD765A_ADD("upd765", microdec_upd765_interface)

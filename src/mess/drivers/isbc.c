@@ -119,7 +119,6 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_CPU_IO_MAP(isbc86_io)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
@@ -130,7 +129,6 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_CPU_IO_MAP(rpc86_io)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
@@ -144,7 +142,6 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_CPU_CONFIG(i286_address_mask)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
@@ -156,7 +153,6 @@ static MACHINE_CONFIG_START( isbc2861, isbc_state )
 	MCFG_CPU_CONFIG(i286_address_mask)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

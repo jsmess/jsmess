@@ -346,6 +346,15 @@ void isa8_device::unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror
 	space->unmap_read(start, end, mask, mirror);
 }
 
+bool isa8_device::is_option_rom_space_available(offs_t start, int size)
+{
+	m_maincpu = machine().device(m_cputag);
+	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
+	for(int i = 0; i < size; i += 4096) // 4KB granularity should be enough
+		if(space->get_read_ptr(start + i)) return false;
+	return true;
+}
+
 // interrupt request from isa card
 WRITE_LINE_MEMBER( isa8_device::irq2_w ) { m_out_irq2_func(state); }
 WRITE_LINE_MEMBER( isa8_device::irq3_w ) { m_out_irq3_func(state); }

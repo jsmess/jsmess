@@ -90,7 +90,6 @@ static MACHINE_CONFIG_START( basic31, basic52_state )
 	MCFG_MACHINE_RESET(basic52)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
@@ -105,7 +104,6 @@ static MACHINE_CONFIG_START( basic52, basic52_state )
 	MCFG_MACHINE_RESET(basic52)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_I8255_ADD("ppi8255", ppi8255_intf )

@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1F) AM_READ_PORT("S401")
 	AM_RANGE(0x20, 0x3F) AM_READ_PORT("S402")
-	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )
+	AM_RANGE(0x40, 0x47) AM_MIRROR(0x18) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x80, 0x9F) AM_READ(h19_80_r)
@@ -346,11 +346,12 @@ static WRITE_LINE_DEVICE_HANDLER(h19_ace_irq)
 
 static const ins8250_interface h19_ace_interface =
 {
-	XTAL_12_288MHz / 4, // 3.072mhz clock which gets divided down for the various baud rates
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_LINE(h19_ace_irq), // interrupt
-	NULL, // transmit func
-	NULL, // handshake out
-	NULL // refresh func
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const mc6845_interface h19_crtc6845_interface =
@@ -415,7 +416,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
-	MCFG_INS8250_ADD( "ins8250", h19_ace_interface )
+	MCFG_INS8250_ADD( "ins8250", h19_ace_interface, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, h19_terminal_intf) // keyboard only
 
 	/* sound hardware */

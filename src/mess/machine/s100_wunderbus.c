@@ -65,21 +65,31 @@ static struct pic8259_interface pic_intf =
 //-------------------------------------------------
 //  ins8250_interface ace1_intf
 //-------------------------------------------------
-
+/*
 static INS8250_TRANSMIT( ace1_transmit )
 {
 	s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
 
 	wunderbus->m_s100->terminal_transmit_w(data);
 }
+*/
+//-------------------------------------------------
+//  s100_terminal_w - terminal write
+//-------------------------------------------------
+
+void s100_wunderbus_device::s100_terminal_w(UINT8 data)
+{
+//	ins8250_receive(m_ace1, data);
+}
 
 static ins8250_interface ace1_intf =
 {
-	XTAL_18_432MHz/10,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir3_w),
-	ace1_transmit,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -89,11 +99,12 @@ static ins8250_interface ace1_intf =
 
 static ins8250_interface ace2_intf =
 {
-	XTAL_18_432MHz/10,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir4_w),
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -103,11 +114,12 @@ static ins8250_interface ace2_intf =
 
 static ins8250_interface ace3_intf =
 {
-	XTAL_18_432MHz/10,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir5_w),
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -137,9 +149,9 @@ static UPD1990A_INTERFACE( rtc_intf )
 
 static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
 	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
-	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf)
-	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf)
-	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf)
+	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf, XTAL_18_432MHz/10)
+	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf, XTAL_18_432MHz/10)
+	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf, XTAL_18_432MHz/10)
 	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, rtc_intf)
 MACHINE_CONFIG_END
 
@@ -403,15 +415,15 @@ UINT8 s100_wunderbus_device::s100_sinp_r(offs_t offset)
 			break;
 
 		case 1:
-			data = ins8250_r(m_ace1, offset & 0x07);
+			data = m_ace1->ins8250_r(*memory_nonspecific_space(machine()), offset & 0x07);
 			break;
 
 		case 2:
-			data = ins8250_r(m_ace2, offset & 0x07);
+			data = m_ace2->ins8250_r(*memory_nonspecific_space(machine()), offset & 0x07);
 			break;
 
 		case 3:
-			data = ins8250_r(m_ace3, offset & 0x07);
+			data = m_ace3->ins8250_r(*memory_nonspecific_space(machine()), offset & 0x07);
 			break;
 		}
 	}
@@ -526,26 +538,17 @@ void s100_wunderbus_device::s100_sout_w(offs_t offset, UINT8 data)
 			break;
 
 		case 1:
-			ins8250_w(m_ace1, offset & 0x07, data);
+			m_ace1->ins8250_w(*memory_nonspecific_space(machine()), offset & 0x07, data);
 			break;
 
 		case 2:
-			ins8250_w(m_ace2, offset & 0x07, data);
+			m_ace2->ins8250_w(*memory_nonspecific_space(machine()), offset & 0x07, data);
 			break;
 
 		case 3:
-			ins8250_w(m_ace3, offset & 0x07, data);
+			m_ace3->ins8250_w(*memory_nonspecific_space(machine()), offset & 0x07, data);
 			break;
 		}
 	}
 }
 
-
-//-------------------------------------------------
-//  s100_terminal_w - terminal write
-//-------------------------------------------------
-
-void s100_wunderbus_device::s100_terminal_w(UINT8 data)
-{
-	ins8250_receive(m_ace1, data);
-}

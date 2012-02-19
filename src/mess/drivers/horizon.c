@@ -89,7 +89,6 @@ static MACHINE_CONFIG_START( horizon, horizon_state )
 	MCFG_MACHINE_RESET(horizon)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

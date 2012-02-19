@@ -42,28 +42,30 @@ static WRITE_LINE_DEVICE_HANDLER( svi318_ins8250_interrupt )
 		cputag_set_input_line(device->machine(), "maincpu", 0, (state ? HOLD_LINE : CLEAR_LINE));
 	}
 }
-
+#if 0
 static INS8250_REFRESH_CONNECT( svi318_com_refresh_connected )
 {
 	/* Motorola MC14412 modem */
 	ins8250_handshake_in(device, UART8250_HANDSHAKE_IN_CTS|UART8250_HANDSHAKE_IN_DSR|UART8250_INPUTS_RING_INDICATOR|UART8250_INPUTS_DATA_CARRIER_DETECT);
 }
-
+#endif
 const ins8250_interface svi318_ins8250_interface[2]=
 {
 	{
-		1000000,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
 		DEVCB_LINE(svi318_ins8250_interrupt),
-		NULL,
-		NULL,
-		svi318_com_refresh_connected
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	{
-		3072000,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
 		DEVCB_LINE(svi318_ins8250_interrupt),
-		NULL,
-		NULL,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL
 	}
 };
 
@@ -773,6 +775,7 @@ READ8_HANDLER( svi318_io_ext_r )
 	svi318_state *state = space->machine().driver_data<svi318_state>();
 	UINT8 data = 0xff;
 	device_t *device;
+	ins8250_device *uart;
 	centronics_device *centronics = space->machine().device<centronics_device>("centronics");
 
 	if (state->m_svi.bankLow == SVI_CART)
@@ -794,8 +797,8 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x25:
 	case 0x26:
 	case 0x27:
-		device = space->machine().device("ins8250_0");
-		data = ins8250_r(device, offset & 7);
+		uart = space->machine().device<ins8250_device>("ins8250_0");
+		data = uart->ins8250_r(*space, offset & 7);
 		break;
 
 	case 0x28:
@@ -806,8 +809,8 @@ READ8_HANDLER( svi318_io_ext_r )
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-		device = space->machine().device("ins8250_1");
-		data = ins8250_r(device, offset & 7);
+		uart = space->machine().device<ins8250_device>("ins8250_1");
+		data = uart->ins8250_r(*space, offset & 7);
 		break;
 
 	case 0x30:
@@ -842,6 +845,7 @@ WRITE8_HANDLER( svi318_io_ext_w )
 {
 	svi318_state *state = space->machine().driver_data<svi318_state>();
 	device_t *device;
+	ins8250_device *uart;
 	centronics_device *centronics = space->machine().device<centronics_device>("centronics");
 
 	if (state->m_svi.bankLow == SVI_CART)
@@ -867,8 +871,8 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x25:
 	case 0x26:
 	case 0x27:
-		device = space->machine().device("ins8250_0");
-		ins8250_w(device, offset & 7, data);
+		uart = space->machine().device<ins8250_device>("ins8250_0");
+		uart->ins8250_w(*space, offset & 7, data);
 		break;
 
 	case 0x28:
@@ -879,8 +883,8 @@ WRITE8_HANDLER( svi318_io_ext_w )
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-		device = space->machine().device("ins8250_1");
-		ins8250_w(device, offset & 7, data);
+		uart = space->machine().device<ins8250_device>("ins8250_1");
+		uart->ins8250_w(*space, offset & 7, data);
 		break;
 
 	case 0x30:

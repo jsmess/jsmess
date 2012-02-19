@@ -343,9 +343,6 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
     MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
     MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
 
-    // video hardware
-	MCFG_FRAGMENT_ADD( generic_terminal )
-
 	// devices
 	MCFG_PIA6821_ADD(MC6821_0_TAG, pia0_intf)
 	MCFG_PIA6821_ADD(MC6821_1_TAG, pia1_intf)

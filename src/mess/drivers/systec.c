@@ -108,7 +108,6 @@ static MACHINE_CONFIG_START( systec, systec_state )
 	MCFG_MACHINE_RESET(systec)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

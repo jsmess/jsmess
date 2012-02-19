@@ -150,7 +150,6 @@ static MACHINE_CONFIG_START( zexall, zexall_state )
 	MCFG_MACHINE_RESET(zexall)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, zexall_terminal_intf)
 MACHINE_CONFIG_END
 

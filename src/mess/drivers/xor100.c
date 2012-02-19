@@ -582,9 +582,6 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_CPU_PROGRAM_MAP(xor100_mem)
 	MCFG_CPU_IO_MAP(xor100_io)
 
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
-
 	/* devices */
 	MCFG_I8251_ADD(I8251_A_TAG, /*XTAL_8MHz/2,*/ printer_8251_intf)
 	MCFG_I8251_ADD(I8251_B_TAG, /*XTAL_8MHz/2,*/ terminal_8251_intf)

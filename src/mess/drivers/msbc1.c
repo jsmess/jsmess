@@ -84,9 +84,6 @@ static MACHINE_CONFIG_START( msbc1, msbc1_state )
 	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL_12_5MHz)
 	MCFG_CPU_PROGRAM_MAP(msbc1_mem)
 
-	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
-
 	// devices
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END

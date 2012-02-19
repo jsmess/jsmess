@@ -40,7 +40,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_8250;
+	required_device<ins8250_device> m_8250;
 	required_device<device_t> m_beep;
 	DECLARE_READ8_MEMBER( zrt80_10_r );
 	DECLARE_WRITE8_MEMBER( zrt80_30_w );
@@ -91,7 +91,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( zrt80_io, AS_IO, 8, zrt80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE_LEGACY("ins8250", ins8250_r, ins8250_w )
+	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x10, 0x17) AM_READ(zrt80_10_r)
@@ -247,11 +247,12 @@ static const mc6845_interface zrt80_crtc6845_interface =
 
 static const ins8250_interface zrt80_com_interface =
 {
-	2457600,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 WRITE8_MEMBER( zrt80_state::kbd_put )
@@ -308,7 +309,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
-	MCFG_INS8250_ADD( "ins8250", zrt80_com_interface )
+	MCFG_INS8250_ADD( "ins8250", zrt80_com_interface, 2457600 )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 

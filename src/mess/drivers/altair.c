@@ -129,7 +129,6 @@ static MACHINE_CONFIG_START( altair, altair_state )
 	MCFG_MACHINE_RESET(altair)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* quickload */

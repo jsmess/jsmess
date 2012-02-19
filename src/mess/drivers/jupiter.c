@@ -260,9 +260,6 @@ static MACHINE_CONFIG_START( jupiter, jupiter2_state )
 	MCFG_CPU_PROGRAM_MAP(jupiter_m6800_mem)
 	MCFG_CPU_IO_MAP(jupiter_m6800_io)
 
-	// video hardware
-	MCFG_FRAGMENT_ADD( generic_terminal )
-
 	// devices
 	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, jupiter2_terminal_intf)

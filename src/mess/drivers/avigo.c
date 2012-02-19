@@ -227,11 +227,12 @@ WRITE_LINE_MEMBER( avigo_state::com_interrupt )
 
 static const ins8250_interface avigo_com_interface =
 {
-	1843200,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(avigo_state, com_interrupt),
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -635,7 +636,7 @@ static ADDRESS_MAP_START( avigo_io, AS_IO, 8, avigo_state)
 	AM_RANGE(0x010, 0x01f) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
 	AM_RANGE(0x028, 0x028) AM_WRITE( speaker_w )
 	AM_RANGE(0x02d, 0x02d) AM_READ( ad_data_r )
-	AM_RANGE(0x030, 0x037) AM_DEVREADWRITE_LEGACY("ns16550", ins8250_r, ins8250_w )
+	AM_RANGE(0x030, 0x037) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
 ADDRESS_MAP_END
 
 
@@ -885,7 +886,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_CPU_IO_MAP(avigo_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_NS16550_ADD( "ns16550", avigo_com_interface )
+	MCFG_NS16550_ADD( "ns16550", avigo_com_interface, XTAL_1_8432MHz )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

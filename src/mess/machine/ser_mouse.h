@@ -12,7 +12,8 @@
 
 class serial_mouse_device :
 		public device_t,
-		public device_rs232_port_interface
+		public device_rs232_port_interface,
+		public device_serial_interface
 {
 public:
 	serial_mouse_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
@@ -24,9 +25,11 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc) = 0;
+	virtual void set_frame() = 0;
 	void set_mouse_enable(bool state);
 	void queue_data(UINT8 data) {m_queue[m_head] = data; ++m_head %= 256;}
 	UINT8 unqueue_data() {UINT8 ret = m_queue[m_tail]; ++m_tail %= 256; return ret;}
+	virtual void input_callback(UINT8 state) { m_input_state = state; }
 private:
 	UINT8 m_queue[256];
 	UINT8 m_head, m_tail, m_mb;
@@ -34,6 +37,7 @@ private:
 	emu_timer *m_timer;
 	rs232_port_device *m_owner;
 	bool m_enabled;
+	int m_count;
 };
 
 class microsoft_mouse_device : public serial_mouse_device
@@ -43,6 +47,7 @@ public:
 	virtual void dtr_w(UINT8 state) { m_dtr = state; check_state(); }
 	virtual void rts_w(UINT8 state) { m_rts = state; check_state(); m_old_rts = state; }
 protected:
+	virtual void set_frame() { set_data_frame(7, 1, SERIAL_PARITY_NONE); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
 	virtual void device_reset() {m_old_rts = 0; serial_mouse_device::device_reset();} 
 private:
@@ -58,6 +63,7 @@ public:
 	virtual void dtr_w(UINT8 state) { m_dtr = state; check_state(); }
 	virtual void rts_w(UINT8 state) { m_rts = state; check_state(); }
 protected:
+	virtual void set_frame() { set_data_frame(8, 1, SERIAL_PARITY_NONE); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
 private:
 	void check_state() { set_mouse_enable((m_dtr && m_rts)?true:false); }

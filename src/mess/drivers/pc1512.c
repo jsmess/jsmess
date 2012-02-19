@@ -559,7 +559,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
 	else if (addr >= 0x3b0 && addr <= 0x3df) { data = iga_r(space, addr - 0x3b0); decoded = true; }
 	else if (addr >= 0x3f0 && addr <= 0x3f7) { data = fdc_r(space, offset & 0x07); decoded = true; }
-	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = ins8250_r(m_uart, offset & 0x07); decoded = true; }
+	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = m_uart->ins8250_r(space, offset & 0x07); decoded = true; }
 
 	if (decoded)
 	{
@@ -622,7 +622,7 @@ static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
 	AM_RANGE(0x378, 0x37b) AM_READWRITE8(printer_r, printer_w, 0xffff)
 	AM_RANGE(0x3d0, 0x3df) AM_READWRITE8(vdu_r, vdu_w, 0xffff)
 	AM_RANGE(0x3f0, 0x3f7) AM_READWRITE8(fdc_r, fdc_w, 0xffff)
-	AM_RANGE(0x3f8, 0x3ff) AM_DEVREADWRITE8_LEGACY(INS8250_TAG, ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x3f8, 0x3ff) AM_DEVREADWRITE8(INS8250_TAG, ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -656,7 +656,7 @@ static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
 	AM_RANGE(0x378, 0x37b) AM_WRITE8(printer_w, 0xffff)
 	AM_RANGE(0x3b0, 0x3df) AM_WRITE8(iga_w, 0xffff)
 	AM_RANGE(0x3f0, 0x3f7) AM_WRITE8(fdc_w, 0xffff)
-	AM_RANGE(0x3f8, 0x3ff) AM_DEVWRITE8_LEGACY(INS8250_TAG, ins8250_w, 0xffff)
+	AM_RANGE(0x3f8, 0x3ff) AM_DEVWRITE8(INS8250_TAG, ins8250_device, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -1136,11 +1136,12 @@ static const upd765_interface fdc_intf =
 
 static const ins8250_interface uart_intf =
 {
-	XTAL_1_8432MHz,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir4_w),
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -1365,7 +1366,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, rtc_intf)
 	MCFG_UPD765A_ADD(UPD765AC2_TAG, fdc_intf)
-	MCFG_INS8250_ADD(INS8250_TAG, uart_intf)
+	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 
@@ -1409,7 +1410,7 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, rtc_intf)
 	MCFG_UPD765A_ADD(UPD765AC2_TAG, fdc_intf)
-	MCFG_INS8250_ADD(INS8250_TAG, uart_intf)
+	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 

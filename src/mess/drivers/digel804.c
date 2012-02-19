@@ -550,7 +550,6 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_MACHINE_RESET(digel804)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
 
 	/* acia */
@@ -572,7 +571,6 @@ static MACHINE_CONFIG_START( ep804, digel804_state )
 	MCFG_MACHINE_RESET(digel804)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
 
 	/* acia */

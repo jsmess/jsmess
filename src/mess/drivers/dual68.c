@@ -92,7 +92,6 @@ static MACHINE_CONFIG_START( dual68, dual68_state )
 	MCFG_MACHINE_RESET(dual68)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,terminal_intf)
 MACHINE_CONFIG_END
 

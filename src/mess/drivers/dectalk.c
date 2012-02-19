@@ -753,7 +753,6 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 
     /* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
 MACHINE_CONFIG_END
 

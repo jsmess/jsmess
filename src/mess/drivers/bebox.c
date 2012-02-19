@@ -67,11 +67,11 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64 )
 	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8( "pic8259_slave", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE( bebox_dma8237_1_r, bebox_dma8237_1_w)
 	AM_RANGE(0x800001F0, 0x800001F7) AM_READWRITE( bebox_800001F0_r, bebox_800001F0_w )
-	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( "ns16550_2", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( "ns16550_3", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8_MODERN( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8_MODERN( "ns16550_2", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8_MODERN( "ns16550_3", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003F0, 0x800003F7) AM_READWRITE( bebox_800003F0_r, bebox_800003F0_w )
-	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0", ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8_MODERN( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE( bebox_80000480_r, bebox_80000480_w )
 	AM_RANGE(0x80000CF8, 0x80000CFF) AM_DEVREADWRITE("pcibus", pci_64be_r, pci_64be_w )
 	AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8( "cirrus", cirrus_42E8_w, U64(0xffffffffffffffff) )
@@ -143,10 +143,10 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", bebox_pic8259_slave_config )
 
-	MCFG_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0 )			/* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1 )			/* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2 )			/* TODO: Verify model */
-	MCFG_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3 )			/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0, 0 )	/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1, 0 )	/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_2", bebox_uart_inteface_2, 0 )	/* TODO: Verify model */
+	MCFG_NS16550_ADD( "ns16550_3", bebox_uart_inteface_3, 0 )	/* TODO: Verify model */
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

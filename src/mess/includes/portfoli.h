@@ -41,7 +41,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<i8255_device> m_ppi;
-	required_device<device_t> m_uart;
+	required_device<ins8250_device> m_uart;
 	required_device<device_t> m_speaker;
 	required_device<timer_device> m_timer_tick;
 

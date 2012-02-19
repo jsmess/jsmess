@@ -357,54 +357,44 @@ static void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_b
  *
  *************************************/
 
-static INS8250_TRANSMIT( bebox_uart_transmit )
-{
-	if (LOG_UART)
-		logerror("bebox_uart_transmit(): data=0x%02X\n", data);
-}
-
-
-static INS8250_HANDSHAKE_OUT( bebox_uart_handshake )
-{
-	if (LOG_UART)
-		logerror("bebox_uart_handshake(): data=0x%02X\n", data);
-}
-
-
 const ins8250_interface bebox_uart_inteface_0 =
 {
-	0,
 	DEVCB_NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 const ins8250_interface bebox_uart_inteface_1 =
 {
-	0,
 	DEVCB_NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 const ins8250_interface bebox_uart_inteface_2 =
 {
-	0,
 	DEVCB_NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 const ins8250_interface bebox_uart_inteface_3 =
 {
-	0,
 	DEVCB_NULL,
-	bebox_uart_transmit,
-	bebox_uart_handshake,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

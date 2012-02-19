@@ -153,7 +153,6 @@ static MACHINE_CONFIG_START( d6809, d6809_state )
 	MCFG_MACHINE_RESET(d6809)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
