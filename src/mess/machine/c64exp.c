@@ -76,7 +76,7 @@ const char *CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 	"super_explode",
 	UNSUPPORTED,
 	UNSUPPORTED,
-	UNSUPPORTED
+	"mach5"
 };
 
 
