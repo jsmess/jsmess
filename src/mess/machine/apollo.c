@@ -1067,7 +1067,7 @@ WRITE8_DEVICE_HANDLER(apollo_sio_w)
 static TIMER_CALLBACK(kbd_timer_callback)
 {
 
-#if defined(__linux__)
+#if 0 //defined(__linux__)
 	device_t *device = (device_t *) ptr;
 	UINT8 data;
 
@@ -1125,7 +1125,7 @@ static DEVICE_RESET(apollo_sio)
 	sio_input_data = apollo_get_ram_config_byte();
 	sio_output_data = 0xff;
 
-#if defined(__linux__)
+#if 0 //defined(__linux__)
 	// FIXME: unavailable in mingw
 	// set stdin to nonblocking to allow polling in sio_poll_rxb
 	fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
