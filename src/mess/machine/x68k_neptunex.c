@@ -14,10 +14,10 @@
 const device_type X68K_NEPTUNEX = &device_creator<x68k_neptune_device>;
 
 static const dp8390_interface neptune_dp8390_interface = {
-	DEVCB_LINE_MEMBER(x68k_neptune_device, x68k_neptune_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, x68k_neptune_device, x68k_neptune_irq_w),
 	DEVCB_NULL,
-	DEVCB_MEMBER(x68k_neptune_device, x68k_neptune_mem_read),
-	DEVCB_MEMBER(x68k_neptune_device, x68k_neptune_mem_write)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, x68k_neptune_device, x68k_neptune_mem_read),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, x68k_neptune_device, x68k_neptune_mem_write)
 };
 
 

@@ -5,10 +5,10 @@
 #define SADDR 0xcc000
 
 static const dp8390_interface el2_3c503_dp8390_interface = {
-	DEVCB_LINE_MEMBER(el2_3c503_device, el2_3c503_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, el2_3c503_device, el2_3c503_irq_w),
 	DEVCB_NULL,
-	DEVCB_MEMBER(el2_3c503_device, el2_3c503_mem_read),
-	DEVCB_MEMBER(el2_3c503_device, el2_3c503_mem_write)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, el2_3c503_device, el2_3c503_mem_read),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, el2_3c503_device, el2_3c503_mem_write)
 };
 
 static MACHINE_CONFIG_FRAGMENT(el2_3c503_config)
