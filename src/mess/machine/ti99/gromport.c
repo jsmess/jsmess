@@ -82,8 +82,8 @@
 #include "gromport.h"
 #include "ti99defs.h"
 
-#define VERBOSE 1
-#define LOG logerror
+#define VERBOSE 5
+#define LOG printf
 
 #define GROM_AREA 0x9800
 #define GROM_MASK 0xf800
@@ -1063,7 +1063,7 @@ bool cartridge_device::call_load()
 
 	try
 	{
-		m_rpk = reader->open(machine().options(), m_basename, machine().system().name);
+		m_rpk = reader->open(machine().options(), filename(), machine().system().name);
 		m_type = m_rpk->get_type();
 		switch (m_type)
 		{
