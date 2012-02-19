@@ -181,10 +181,11 @@ public:
 	virtual UINT8 vic20_blk5_r(address_space &space, offs_t offset) { return 0; };
 	virtual void vic20_blk5_w(address_space &space, offs_t offset, UINT8 data) { };
 
-	virtual UINT8* vic20_blk1_pointer() { return NULL; }
-	virtual UINT8* vic20_blk2_pointer() { return NULL; }
-	virtual UINT8* vic20_blk3_pointer() { return NULL; }
-	virtual UINT8* vic20_blk5_pointer() { return NULL; }
+	virtual UINT8* vic20_blk1_pointer(running_machine &machine, size_t size);
+	virtual UINT8* vic20_blk2_pointer(running_machine &machine, size_t size);
+	virtual UINT8* vic20_blk3_pointer(running_machine &machine, size_t size);
+	virtual UINT8* vic20_blk5_pointer(running_machine &machine, size_t size);
+	virtual UINT8* vic20_ram_pointer(running_machine &machine, size_t size);
 
 	// I/O
 	virtual UINT8 vic20_io2_r(address_space &space, offs_t offset) { return 0; };
@@ -200,6 +201,12 @@ public:
 
 protected:
 	vic20_expansion_slot_device *m_slot;
+
+	UINT8 *m_blk1;
+	UINT8 *m_blk2;
+	UINT8 *m_blk3;
+	UINT8 *m_blk5;
+	UINT8 *m_ram;
 };
 
 

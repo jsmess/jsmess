@@ -41,9 +41,6 @@ protected:
 	virtual void vic20_blk1_w(address_space &space, offs_t offset, UINT8 data);
 	virtual UINT8 vic20_blk2_r(address_space &space, offs_t offset);
 	virtual void vic20_blk2_w(address_space &space, offs_t offset, UINT8 data);
-
-private:
-	UINT8 *m_ram;
 };
 
 

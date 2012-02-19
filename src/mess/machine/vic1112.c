@@ -45,26 +45,6 @@ static IEEE488_INTERFACE( ieee488_intf )
 
 
 //-------------------------------------------------
-//  ROM( vic1112 )
-//-------------------------------------------------
-
-ROM_START( vic1112 )
-	ROM_REGION( 0x800, "blk5", 0 )
-	ROM_LOAD( "325329-03.u2", 0x000, 0x800, CRC(d37b6335) SHA1(828c965829d21c60e8c2d083caee045c639a270f) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *vic1112_device::device_rom_region() const
-{
-	return ROM_NAME( vic1112 );
-}
-
-
-//-------------------------------------------------
 //  via6522_interface via0_intf
 //-------------------------------------------------
 
@@ -224,9 +204,6 @@ vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, d
 
 void vic1112_device::device_start()
 {
-	// find memory regions
-	m_rom = subregion("blk5")->base();
-
 	// state saving
 	save_item(NAME(m_via0_irq));
 	save_item(NAME(m_via1_irq));
@@ -292,7 +269,7 @@ UINT8 vic1112_device::vic20_blk5_r(address_space &space, offs_t offset)
 
 	if (offset & 0x1000)
 	{
-		data = m_rom[offset & 0x7ff];
+		data = m_blk5[offset & 0x17ff];
 	}
 
 	return data;

@@ -38,17 +38,6 @@ enum
 };
 
 
-// slot names for the VIC-20 cartridge types
-const char *CRT_VIC20_SLOT_NAMES[_CRT_VIC20_COUNT] = 
-{
-	UNSUPPORTED,
-	"standard",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED
-};
-
-
 // C64 cartridge types
 enum
 {
@@ -97,56 +86,6 @@ enum
 	CRT_C64_GAME_KILLER,
 	CRT_C64_P64,
 	_CRT_C64_COUNT
-};
-
-
-// slot names for the C64 cartridge types
-const char *CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] = 
-{
-	"standard",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"simons_basic",
-	"ocean",
-	UNSUPPORTED,
-	"fun_play",
-	"super_games",
-	UNSUPPORTED,
-	"epyxfastload",
-	"westermann",
-	"rex",
-	UNSUPPORTED,
-	"magic_formel",
-	"system3",
-	"warp_speed",
-	"dinamic",
-	"zaxxon",
-	"magic desk",
-	UNSUPPORTED,
-	"comal80",
-	"struct_basic",
-	"ross",
-	"ep64",
-	"ep7x8",
-	"dela_ep256",
-	"rex_ep256",
-	"mikroasm",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"stardos",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"ieee488",
-	UNSUPPORTED,
-	UNSUPPORTED
 };
 
 

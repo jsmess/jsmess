@@ -41,16 +41,6 @@ protected:
 	virtual UINT8 vic20_blk2_r(address_space &space, offs_t offset);
 	virtual UINT8 vic20_blk3_r(address_space &space, offs_t offset);
 	virtual UINT8 vic20_blk5_r(address_space &space, offs_t offset);
-	virtual UINT8* vic20_blk1_pointer();
-	virtual UINT8* vic20_blk2_pointer();
-	virtual UINT8* vic20_blk3_pointer();
-	virtual UINT8* vic20_blk5_pointer();
-
-private:
-	UINT8 *m_blk1;
-	UINT8 *m_blk2;
-	UINT8 *m_blk3;
-	UINT8 *m_blk5;
 };
 
 
