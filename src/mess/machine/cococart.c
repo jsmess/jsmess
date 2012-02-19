@@ -390,7 +390,7 @@ bool cococart_slot_device::call_softlist_load(char *swlist, char *swname, rom_en
 //  get_default_card_software
 //-------------------------------------------------
 
-const char * cococart_slot_device::get_default_card_software(const machine_config &devlist, emu_options &options) const
+const char * cococart_slot_device::get_default_card_software(const machine_config &devlist, emu_options &options)
 {
 	return software_get_default_slot(devlist, options, this, "pak");
 }

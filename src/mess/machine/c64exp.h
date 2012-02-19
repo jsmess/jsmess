@@ -126,7 +126,7 @@ protected:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) const;
+	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;

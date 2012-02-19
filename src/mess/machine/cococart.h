@@ -101,7 +101,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) const;
+	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
 	/* reading and writing to $FF40-$FF7F */
 	DECLARE_READ8_MEMBER(read);
