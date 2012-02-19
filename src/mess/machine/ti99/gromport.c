@@ -82,8 +82,8 @@
 #include "gromport.h"
 #include "ti99defs.h"
 
-#define VERBOSE 5
-#define LOG printf
+#define VERBOSE 1
+#define LOG logerror
 
 #define GROM_AREA 0x9800
 #define GROM_MASK 0xf800
