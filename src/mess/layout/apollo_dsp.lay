@@ -1,0 +1,47 @@
+<!-- terminal display for the Apollo DSP3x00 -->
+
+<mamelayout version="2">
+
+	<element name="internal_led"> <disk> <color red="1.0" green="1.0" blue="1.0" /> </disk> </element>
+	<element name="external_led"> <disk> <color red="0.666" green="0.555" blue="0.0" /> </disk> </element>
+	<element name="power_led">    <disk> <color red="0.0" green="1.0" blue="0.0" /> </disk> </element>
+	<element name="label_a">      <text string="A"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_b">      <text string="B"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_c">      <text string="C"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_d">      <text string="D"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="power_label">  <text string="PWR"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<view name="Apollo DSP Terminal">
+		<bezel element="background">
+			<bounds left="0" right="639" top="480" bottom="502" />
+		</bezel>
+
+		<bezel name="internal_led_1" element="internal_led"> <bounds left="5"  right="17" top="485" bottom="497" /> </bezel>
+		<bezel name="internal_led_2" element="internal_led"> <bounds left="25" right="37" top="485" bottom="497" /> </bezel>
+		<bezel name="internal_led_3" element="internal_led"> <bounds left="45" right="57" top="485" bottom="497" /> </bezel>
+		<bezel name="internal_led_4" element="internal_led"> <bounds left="65" right="77" top="485" bottom="497" /> </bezel>
+
+		<bezel name="label_a" element="label_a">             <bounds left="428" right="442" top="482" bottom="500" /> </bezel>
+		<bezel name="external_led_a" element="external_led"> <bounds left="446" right="458" top="485" bottom="497" /> </bezel>
+		<bezel name="label_b" element="label_b">             <bounds left="466" right="478" top="482" bottom="500" /> </bezel>
+		<bezel name="external_led_b" element="external_led"> <bounds left="484" right="496" top="485" bottom="497" /> </bezel>
+		<bezel name="label_c" element="label_c">             <bounds left="504" right="516" top="482" bottom="500" /> </bezel>
+		<bezel name="external_led_c" element="external_led"> <bounds left="522" right="534" top="485" bottom="497" /> </bezel>
+		<bezel name="label_d" element="label_d">             <bounds left="542" right="554" top="482" bottom="500" /> </bezel>
+		<bezel name="external_led_d" element="external_led"> <bounds left="560" right="572" top="485" bottom="497" /> </bezel>
+		<bezel name="power_label" element="power_label">     <bounds left="580" right="612" top="482" bottom="500" /> </bezel>
+		<bezel name="power_led" element="power_led">         <bounds left="618" right="630" top="485" bottom="497" /> </bezel>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+	</view>
+
+</mamelayout>
