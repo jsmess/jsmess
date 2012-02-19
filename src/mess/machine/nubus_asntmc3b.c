@@ -18,10 +18,10 @@
 
 static const dp8390_interface dp8390_interface =
 {
-	DEVCB_LINE_MEMBER(nubus_mac8390_device, dp_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, nubus_mac8390_device, dp_irq_w),
 	DEVCB_NULL,
-	DEVCB_MEMBER(nubus_mac8390_device, dp_mem_read),
-	DEVCB_MEMBER(nubus_mac8390_device, dp_mem_write)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, nubus_mac8390_device, dp_mem_read),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, nubus_mac8390_device, dp_mem_write)
 };
 
 MACHINE_CONFIG_FRAGMENT( asntm3b )

@@ -3,10 +3,10 @@
 #include "machine/devhelpr.h"
 
 static const dp8390_interface ne2000_dp8390_interface = {
-	DEVCB_LINE_MEMBER(ne2000_device, ne2000_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ne2000_device, ne2000_irq_w),
 	DEVCB_NULL,
-	DEVCB_MEMBER(ne2000_device, ne2000_mem_read),
-	DEVCB_MEMBER(ne2000_device, ne2000_mem_write)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ne2000_device, ne2000_mem_read),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ne2000_device, ne2000_mem_write)
 };
 
 static MACHINE_CONFIG_FRAGMENT(ne2000_config)
