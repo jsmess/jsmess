@@ -2,7 +2,15 @@
 
 New System Drivers Supported:
 -----------------------------
-(none)
+Apollo DN3000 15" Monochrome [Hans Ostermeyer]
+Apollo DN3000 19" Monochrome [Hans Ostermeyer]
+Apollo DSP3000 Server [Hans Ostermeyer]
+Apollo DN3500 15" Monochrome [Hans Ostermeyer]
+Apollo DN3500 19" Monochrome [Hans Ostermeyer]
+Apollo DSP3500 Server [Hans Ostermeyer]
+Apollo DN5500 15" Monochrome [Hans Ostermeyer]
+Apollo DN5500 19" Monochrome [Hans Ostermeyer]
+Apollo DSP5500 Server [Hans Ostermeyer]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
