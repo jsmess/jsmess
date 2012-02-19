@@ -870,7 +870,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="mach5" supported="no">
+	<software name="mach5">
 		<description>MACH 5 v.1A</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
@@ -879,13 +879,13 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="rom" size="0x2000">
+			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v1a.bin" size="0x2000" crc="46c0a547" sha1="fb30893f80abb0e7463adbda979e0ebe386022e8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mach5_v1b1" cloneof="mach5" supported="no">
+	<software name="mach5_v1b1" cloneof="mach5">
 		<description>MACH 5 v.1B</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
@@ -894,13 +894,13 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="rom" size="0x2000">
+			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v1b_v1.bin" size="0x1000" crc="f1444e48" sha1="4236ad371a5df7046e770b858291b42fe14b8a18" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mach5_v1b2" cloneof="mach5" supported="no">
+	<software name="mach5_v1b2" cloneof="mach5">
 		<description>MACH 5 v.1B (Alt)</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
@@ -909,13 +909,13 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="rom" size="0x2000">
+			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v1b_v2.bin" size="0x2000" crc="c320e154" sha1="59de7347b61d39cfd0b89306e9e898b1452d3a20" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mach5_v2a" cloneof="mach5" supported="no">
+	<software name="mach5_v2a" cloneof="mach5">
 		<description>MACH 5 v.2A</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
@@ -924,13 +924,13 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="rom" size="0x2000">
+			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v2a.bin" size="0x2000" crc="8d5b2d06" sha1="2b53dd5d6cf46fd7c90f4e2c4300d5d5bb970014" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mach5_v3" cloneof="mach5" supported="no">
+	<software name="mach5_v3" cloneof="mach5">
 		<description>MACH 5 v3.A</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
@@ -939,13 +939,13 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="rom" size="0x2000">
+			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v3a.bin" size="0x2000" crc="c2449aea" sha1="99b702275373480269cde747e774d54ca5d2e1dd" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="stardos" supported="no">
+	<software name="stardos">
 		<description>Stardos</description>
 		<year>1986</year>
 		<publisher>Starpoint Software</publisher>
