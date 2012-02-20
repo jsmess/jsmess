@@ -39,7 +39,6 @@ private:
 	emu_timer *m_timer;
 	rs232_port_device *m_owner;
 	bool m_enabled;
-	int m_count;
 };
 
 class microsoft_mouse_device : public serial_mouse_device

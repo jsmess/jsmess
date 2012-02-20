@@ -40,7 +40,7 @@ void serial_mouse_device::device_start()
 
 void serial_mouse_device::device_reset()
 {
-	m_head = m_tail = m_count = 0;
+	m_head = m_tail = 0;
 	tx(0);
 	m_dcd = 0;
 	m_owner->out_dcd(0);
