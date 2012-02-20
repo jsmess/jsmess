@@ -30,6 +30,8 @@ protected:
 	void queue_data(UINT8 data) {m_queue[m_head] = data; ++m_head %= 256;}
 	UINT8 unqueue_data() {UINT8 ret = m_queue[m_tail]; ++m_tail %= 256; return ret;}
 	virtual void input_callback(UINT8 state) { m_input_state = state; }
+	virtual void tra_complete();
+	virtual void tra_callback();
 private:
 	UINT8 m_queue[256];
 	UINT8 m_head, m_tail, m_mb;

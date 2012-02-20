@@ -35,6 +35,7 @@ void serial_mouse_device::device_start()
 	m_timer = timer_alloc();
 	m_enabled = false;
 	set_frame();
+	set_tra_rate(1200);
 }
 
 void serial_mouse_device::device_reset()
@@ -51,6 +52,18 @@ void serial_mouse_device::device_reset()
 	m_owner->out_cts(0);
 }
 
+void serial_mouse_device::tra_complete()
+{
+	if(m_tail != m_head)
+		transmit_register_setup(unqueue_data());
+}
+
+void serial_mouse_device::tra_callback()
+{
+	m_rbit = transmit_register_get_data_bit();
+	m_owner->out_rx(m_rbit);
+}
+
 /**************************************************************************
  *  Check for mouse moves and buttons. Build delta x/y packets
  **************************************************************************/
@@ -62,7 +75,7 @@ void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int
 	int mbc;
 
 	/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
-	if ((m_head==m_tail) && (m_count == 0))
+	if (m_head==m_tail)
 	{
 		nx = input_port_read(*this, "ser_mouse_x");
 
@@ -87,18 +100,9 @@ void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int
 			mouse_trans(dx, dy, nb, mbc);
 	}
 
-	++m_count %= 8;
 
-	if(is_transmit_register_empty())
-	{
-		if(m_tail != m_head)
-			transmit_register_setup(unqueue_data());
-	}
-	else
-	{
-		m_rbit = transmit_register_get_data_bit();
-		m_owner->out_rx(m_rbit);
-	}
+	if(m_tail != m_head && is_transmit_register_empty())
+		transmit_register_setup(unqueue_data());
 }
 	
 void microsoft_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)
@@ -181,11 +185,17 @@ void mouse_systems_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)
 void serial_mouse_device::set_mouse_enable(bool state)
 {
 	if(state && !m_enabled)
-		m_timer->adjust(attotime::zero, 0, attotime::from_hz(1200));
+	{
+		m_timer->adjust(attotime::zero, 0, attotime::from_hz(240));
+		m_rbit = 1;
+		m_owner->out_rx(1);
+	}
 	else if(!state && m_enabled)
 	{
 		m_timer->adjust(attotime::never);
 		m_head = m_tail = 0;
+		m_rbit = 0;
+		m_owner->out_rx(0);
 	}
 	m_enabled = state;
 

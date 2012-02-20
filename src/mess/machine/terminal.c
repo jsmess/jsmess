@@ -551,10 +551,7 @@ static DEVICE_START( terminal )
 {
 	terminal_state *term = get_safe_token(device);
 	const terminal_interface *intf = get_interface(device);
-	if(dynamic_cast<serial_terminal_device *>(device->owner()))
-		term->terminal_keyboard_func.resolve(intf->terminal_keyboard_func, *device->owner());
-	else
-		term->terminal_keyboard_func.resolve(intf->terminal_keyboard_func, *device);
+	term->terminal_keyboard_func.resolve(intf->terminal_keyboard_func, *device);
 
 	if (device->clock())
 		device->machine().scheduler().timer_pulse(attotime::from_hz(device->clock()), FUNC(serial_callback), 0, (void*)device);
@@ -573,7 +570,7 @@ static DEVICE_RESET( terminal )
 	term->last_code = 0;
 	term->scan_line = 0;
 	term->rx_state = START;
-	term->tx_state = STOP;
+	term->tx_state = DONE;
 }
 
 /*
@@ -754,7 +751,7 @@ serial_terminal_device::serial_terminal_device(const machine_config &mconfig, co
 }
 
 static const terminal_interface serial_terminal_terminal_interface = {
-      DEVCB_MEMBER(serial_terminal_device, serial_keyboard_func)
+      DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, serial_terminal_device, serial_keyboard_func)
 };
 
 static MACHINE_CONFIG_FRAGMENT(serial_terminal_config)
@@ -767,4 +764,3 @@ machine_config_constructor serial_terminal_device::device_mconfig_additions() co
 {
       return MACHINE_CONFIG_NAME(serial_terminal_config);
 }
-
