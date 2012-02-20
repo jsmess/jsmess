@@ -120,7 +120,7 @@ static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8)
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
-//  AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
+	AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
 	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  /* Color c2/c3*/
 	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  /* Sound*/
@@ -256,7 +256,7 @@ static INPUT_PORTS_START( hec2hrp )
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)			PORT_CHAR('P')
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)			PORT_CHAR('O')
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)			PORT_CHAR('N')
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)
+		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)		PORT_CHAR('M')
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)			PORT_CHAR('L')
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)			PORT_CHAR('K')
 
@@ -399,7 +399,7 @@ static const cassette_interface hector_cassette_interface =
 {
 	hector_cassette_formats,
 	&hector_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL
 };
@@ -597,7 +597,6 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_SCREEN_UPDATE_STATIC(hec2hrp)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_VIDEO_START(hec2hrp)
 
 	/* sound hardware */

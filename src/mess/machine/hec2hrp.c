@@ -29,7 +29,8 @@
                 => Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
         20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
         11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
-
+		19/02/2012 : few adjustment for the hrp and hr machine - JJStacino
+		
     don't forget to keep some information about these machines, see DChector project : http://dchector.free.fr/ made by DanielCoulom
         (and thank's to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
 
@@ -71,23 +72,31 @@ hec2mx40
 /* Helper function*/
 static int isHectorWithDisc2(running_machine &machine)
 {
-return ((strncmp(machine.system().name , "hec2hrx"  	, 7)==0) ||
-		(strncmp(machine.system().name , "hec2hmx40"	, 9)==0) ||
-		(strncmp(machine.system().name , "hec2hmx80"	, 9)==0));
+return ((strncmp(machine.system().name , "hec2hrx" 	, 7)==0) ||
+		(strncmp(machine.system().name , "hec2mx40"	, 8)==0) ||
+		(strncmp(machine.system().name , "hec2mx80"	, 8)==0));
 }
 
 static int isHectorWithMiniDisc(running_machine &machine)
 {
-return ((strncmp(machine.system().name , "hec2mdhrx"	, 9)==0));
+return ((strncmp(machine.system().name , "hec2mdhrx", 9)==0));
 }
 
 static int isHectorHR(running_machine &machine)
 {
-return ((strncmp(machine.system().name , "hec2hr"		, 6)==0) ||
-		(strncmp(machine.system().name , "hec2mdhrx"	, 9)==0) ||
-		(strncmp(machine.system().name , "victor"		, 6)==0) ||
-		(strncmp(machine.system().name , "hec2hmx40"	, 9)==0) ||
-		(strncmp(machine.system().name , "hec2hmx80"	, 9)==0));
+return ((strncmp(machine.system().name , "hec2hr"	, 6)==0) ||  //Aviable for hr & hrp
+		(strncmp(machine.system().name , "hec2mdhrx", 9)==0) ||
+		(strncmp(machine.system().name , "victor"	, 6)==0) ||
+		(strncmp(machine.system().name , "hec2mx40"	, 8)==0) ||
+		(strncmp(machine.system().name , "hec2mx80"	, 8)==0));
+}
+
+static int isHectoreXtend(running_machine &machine)
+{
+return ((strncmp(machine.system().name , "hec2mdhrx", 9)==0) ||
+		(strncmp(machine.system().name , "hec2hrx"	, 7)==0) ||
+		(strncmp(machine.system().name , "hec2mx40"	, 8)==0) ||
+		(strncmp(machine.system().name , "hec2mx80"	, 8)==0));
 }
 
 /* Cassette timer*/
@@ -181,38 +190,42 @@ WRITE8_HANDLER( hector_switch_bank_w )
 {
 	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	if (offset==0x00)	{	/* 0x800 et 0x000=> video page, HR*/
-							memory_set_bank(space->machine(), "bank1", HECTOR_BANK_VIDEO);
+							if (isHectoreXtend(space->machine()))
+								memory_set_bank(space->machine(), "bank1", HECTOR_BANK_VIDEO);
 							if (state->m_flag_clk ==1)
 							{
 								state->m_flag_clk=0;
-								space->machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* Augmentation CPU*/
+								space->machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
 							}
 						}
 	if (offset==0x04)	{	/* 0x804 => video page, BR*/
 							state->m_hector_flag_hr=0;
-							memory_set_bank(space->machine(), "bank1", HECTOR_BANK_VIDEO);
+							if (isHectoreXtend(space->machine()))
+								memory_set_bank(space->machine(), "bank1", HECTOR_BANK_VIDEO);
 							if (state->m_flag_clk ==0)
 							{
 								state->m_flag_clk=1;
-								space->machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* Ralentissement CPU*/
+								space->machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
 							}
 						}
 	if (offset==0x08)	{	/* 0x808 => base page, HR*/
-							memory_set_bank(space->machine(), "bank1", HECTOR_BANK_PROG);
+							if (isHectoreXtend(space->machine()))
+								memory_set_bank(space->machine(), "bank1", HECTOR_BANK_PROG);
 							if (state->m_flag_clk ==1)
 							{
 								state->m_flag_clk=0;
-								space->machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* Augmentation CPU*/
+								space->machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
 							}
 
 						}
 	if (offset==0x0c)	{	/* 0x80c => base page, BR*/
 							state->m_hector_flag_hr=0;
-							memory_set_bank(space->machine(), "bank1", HECTOR_BANK_PROG);
+							if (isHectoreXtend(space->machine()))
+								memory_set_bank(space->machine(), "bank1", HECTOR_BANK_PROG);
 							if (state->m_flag_clk ==0)
 							{
 								state->m_flag_clk=1;
-								space->machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* Ralentissement CPU*/
+								space->machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
 							}
 						}
 }
@@ -238,17 +251,19 @@ READ8_HANDLER( hector_keyboard_r )
 		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
 		  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-		  state->m_hector_flag_hr=1;
-		  if (isHectorHR(machine)) /* aviable for HRX and up */
+		  if (isHectorHR(machine)) /* aviable for HR and up */
 			{
-				memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-				memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
-
+				state->m_hector_flag_hr=1;
+				if (isHectoreXtend(machine))
+					{
+						memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+						memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+					}
 				//RESET DISC II unit
 				if (isHectorWithDisc2(machine) )
 					hector_disc2_reset(machine);
 
-				/* floppy master reset */
+				/* floppy md master reset */
 				if (isHectorWithMiniDisc(machine))
 					wd17xx_mr_w(machine.device("wd179x"), 1);
 
@@ -369,7 +384,12 @@ WRITE8_HANDLER( hector_color_a_w )
 	{
 		/* Bit 6 => motor ON/OFF => for cassette state!*/
 		if (state->m_write_cassette==0)
-			 cassette_device_image(space->machine())->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED));
+		{
+			 	cassette_device_image(space->machine())->change_state(
+						CASSETTE_MOTOR_ENABLED ,
+						CASSETTE_MASK_MOTOR);
+			// cassette_device_image(space->machine())->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED ));
+		}
 	}
 	else
 	{	/* stop motor*/
@@ -388,6 +408,9 @@ WRITE8_HANDLER( hector_color_a_w )
 			state->m_counter_write = 6;
 			if (state->m_write_cassette==0)
 			{	/* C'est la 1er fois => record*/
+						 	cassette_device_image(space->machine())->change_state(
+						CASSETTE_MOTOR_ENABLED ,
+						CASSETTE_MASK_MOTOR);
 				cassette_device_image(space->machine())->set_state(CASSETTE_RECORD);
 				state->m_write_cassette=1;
 			}
