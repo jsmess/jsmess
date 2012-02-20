@@ -1,9 +1,19 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-List of mostly undumped cartridges:
-http://www.retroport.de/C64_C128_Hardware.html
-http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
+
+	Missing dumps that exist as .crt but are missing from this list:
+
+	- Prophet-64
+	- MSSIAH
+	- Rex Diashow-Maker
+	
+	If you have any of these, please forward them to messdev :)
+
+	List of mostly undumped cartridges:
+	http://www.retroport.de/C64_C128_Hardware.html
+	http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
+
 -->
 <softwarelist name="c64_cart" description="Commodore 64 cartridges">
 
@@ -4229,7 +4239,7 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x80000">
-				<rom name="megafun (2004)(entertainment software).80" size="32768" crc="51836cca" sha1="3d763d4a9bd4b366a411ec797bfda1bb77214147" offset="0x0000" />
+				<rom name="megafun (2004)(entertainment software).80" size="0x8000" crc="51836cca" sha1="3d763d4a9bd4b366a411ec797bfda1bb77214147" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5311,160 +5321,426 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 		</part>
 	</software>
 
-	<software name="ar42pro">
-		<description>Action Replay v4.2 Professional</description>
+	<software name="ar2">
+		<description>Action Replay MK2</description>
+		<year>1986</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar2" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="action_replay_mk2_1986_pal_v1.bin" size="0x4000" crc="3e4e14b3" sha1="72db456a8ef95c7e8d161c57438f210265910826" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar2v2" cloneof="ar2">
+		<description>Action Replay MK2 (v2)</description>
+		<year>1986</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar2" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="action_replay_mk2_1986_pal_v2.bin" size="0x4000" crc="35e6fdf7" sha1="4bfa05e4036dc40e37f8b8e6fe089b3d5faacf5f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ar3">
+		<description>Action Replay MK3 (v1)</description>
+		<year>1987</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar2" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="action_replay_mk3_1987_pal_v1.bin" size="0x4000" crc="a34ae7b4" sha1="9b1d88b4023f0b4d747e492dd691f934b7f02802" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar3v2" cloneof="ar3">
+		<description>Action Replay MK3 (v2)</description>
+		<year>1987</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar3" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="action_replay_mk3_1987_pal_v2.bin" size="0x4000" crc="bc06a876" sha1="480847ac10ff5389ebfc0bcfdef2bdf53ee6fca9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ar3dm" cloneof="ar3">
+		<description>Action Replay MK3 (Diskmate)</description>
+		<year>1987</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar3" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="action_replay_mk3_1987_pal_v2_diskmate.bin" size="0x4000" crc="af1044f5" sha1="4125421688ed431072c30adf04676f2c63eef77b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="niki" cloneof="ar3">
+		<description>Niki Cartridge Fast-Disktool</description>
+		<year>1987</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar3" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x4000">
+				<rom name="niki_cartridge_fast-disktool.bin" size="0x4000" crc="b61a5f2d" sha1="c109a82744ad549293672875449e16db3c5c055b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ar4">
+		<description>Action Replay MK4</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v4.2 professional (1988)(datel electronics).80" size="0x8000" crc="8a314329" sha1="5cd20a8cd30074da68d29df4a04ddd3add16a17a" offset="0x0000" />
+				<rom name="action_replay_mk4_1988_pal.bin" size="0x8000" crc="6bb818c3" sha1="1d7d781e2ee5d07b9c5401b930d3a932ec910eee" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="ar42proa" cloneof="ar42pro">
-		<description>Action Replay v4.2 Professional (Alt)</description>
+	
+	<software name="cmiky2" cloneof="ar4">
+		<description>Captain Miky II</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v4.2 professional (1988)(datel electronics)[a].80" size="0x8000" crc="4b2e7d3a" sha1="6c384308290febf5ca4eedaf326d646f15a13c51" offset="0x0000" />
+				<rom name="captain_miky_ii.bin" size="0x8000" crc="f1d41ce5" sha1="85463a016193759c08b293d169dd06114aa6e4aa" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="ar42prob" cloneof="ar42pro">
-		<description>Action Replay v4.2 Professional (Alt 2)</description>
+	
+	<software name="cmiky2a" cloneof="ar4">
+		<description>Captain Miky II (Alt)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v4.2 professional (1988)(datel electronics)[a2].80" size="0x8000" crc="befdaf75" sha1="477f5eebe4f3313256649bfc20c5cd52e5c6b059" offset="0x0000" />
+				<rom name="captain_miky_ii_niki2_rename.bin" size="0x8000" crc="79221d63" sha1="958936df5f252cc47c4571a9b6fc2892fdac0b58" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="ar50pro">
-		<description>Action Replay v5.0 Professional</description>
+	
+	<software name="ar41">
+		<description>Action Replay v4.1</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v5.0 professional (1988)(datel electronics).80" size="0x8000" crc="b08bed2a" sha1="894ab49f13e70203987e54b87f60b047ef910845" offset="0x0000" />
+				<rom name="action_replay_v4.1_4.1_1988_pal.bin" size="0x8000" crc="9da71744" sha1="4fe322fb280333e009be146383b1d13c21536f58" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="ar50proa" cloneof="ar50pro">
-		<description>Action Replay v5.0 Professional (Alt)</description>
+	
+	<software name="ar42" cloneof="ar41">
+		<description>Action Replay v4.2 (v1)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v5.0 professional (1988)(datel electronics)[a].80" size="0x8000" crc="6c916f80" sha1="7ef39f320987d4bfddb499708795dfe8aebbce3b" offset="0x0000" />
+				<rom name="action_replay_v4.2_4.0_1988_pal_v1.bin" size="0x8000" crc="befdaf75" sha1="477f5eebe4f3313256649bfc20c5cd52e5c6b059" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="ar60plus">
-		<description>Action Replay v6.0 Plus (Ger)</description>
+	
+	<software name="ar42v2" cloneof="ar41">
+		<description>Action Replay v4.2 (v2)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v6.0 plus (1988)(datel electronics)(de).80" size="0x8000" crc="5a0d146d" sha1="c9c037f630b7ec74f2b36c1e23396b0e1e14ecd4" offset="0x0000" />
+				<rom name="action_replay_v4.2_4.0_1988_pal_v2.bin" size="0x8000" crc="27c242f4" sha1="e05a57850f4031e0a0dc17e56bbb75573980d38a" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="arpro60">
-		<description>Action Replay Professional v6.0</description>
-		<year>1989</year>
+	
+	<software name="ar4250" cloneof="ar41">
+		<description>Action Replay v4.2 (v5.0 v1)</description>
+		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay professional v6.0 (1989)(datel electronics).80" size="0x8000" crc="44a30413" sha1="fca6f0c4c164c67a01abc4a58fc83814a9b15e96" offset="0x0000" />
+				<rom name="action_replay_v4.2_5.0_1988_pal_v1.bin" size="0x8000" crc="4b2e7d3a" sha1="6c384308290febf5ca4eedaf326d646f15a13c51" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="arpro60a" cloneof="arpro60">
-		<description>Action Replay Professional v6.0 (Alt)</description>
-		<year>1989</year>
+	
+	<software name="ar4250v2" cloneof="ar41">
+		<description>Action Replay v4.2 (v5.0 v2)</description>
+		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v6.0 professional (1989)(datel electronics)[a].80" size="0x8000" crc="ef954e54" sha1="912dd6102d320f0b55589aead594554a80e7ae99" offset="0x0000" />
+				<rom name="action_replay_v4.2_5.0_1988_pal_v2.bin" size="0x8000" crc="8a314329" sha1="5cd20a8cd30074da68d29df4a04ddd3add16a17a" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="acplus70">
-		<description>Action Cartridge Plus MK v7.0</description>
-		<year>1990</year>
+	
+	<software name="acp53" cloneof="ar41">
+		<description>Action Cartridge Plus 5 (Ger)</description>
+		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action cartridge plus mk v7.0 (1990-04)(datel electronics).80" size="0x8000" crc="2939b479" sha1="81a939c6e26e07fc6dd65080415d91fb9017bc6e" offset="0x0000" />
+				<rom name="action_cartridge_plus_5___5.3_german_1988_pal.bin" size="0x8000" crc="746b3f5a" sha1="68a5f7d5c8d68b574cdb48c718836e604949cee8" offset="0x0000"/>
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="ar73pro">
-		<description>Action Replay v7.3 Professional</description>
+	
+	<software name="acp6" cloneof="ar41">
+		<description>Action Cartridge Plus 6.0</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_cartridge_plus_6.0_tkit25_german_pal.bin" size="0x8000" crc="5a0d146d" sha1="c9c037f630b7ec74f2b36c1e23396b0e1e14ecd4" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="acp6g" cloneof="ar41">
+		<description>Action Cartridge Plus 6.0 (Ger)</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_cartridge_plus_6.0_tkit25_german_pal_aus.bin" size="0x8000" crc="080278e7" sha1="c57ce1d3d5bf13c8adad5dc803cdf163fdddaf6a" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ar73" cloneof="ar41">
+		<description>Action Replay v7.3</description>
 		<year>1991</year>
-		<publisher>Datel Electronics, Atrax</publisher>
+		<publisher>Atrax</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v7.3 (1991)(datel)[h atrax].80" size="0x8000" crc="4d59d964" sha1="662c4d579907b0ebc4123910537be600ad50dc08" offset="0x0000" />
+				<rom name="action_replay_v7.3_20x_atrax_1991_pal.bin" size="0x8000" crc="4d59d964" sha1="662c4d579907b0ebc4123910537be600ad50dc08" offset="0x0000"/>
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="ar75pro">
-		<description>Action Replay v7.5 Professional</description>
+	
+	<software name="ar5">
+		<description>Action Replay v5.0</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_replay_v5.0_5.0_1988_pal.bin" size="0x8000" crc="55efec24" sha1="7ed920b9fa3865e2dc72ab1aac233e88a9dac439" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ar5n" cloneof="ar5">
+		<description>Action Replay v5.0 (NTSC)</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_replay_v5.0_5.0_1988_ntsc.bin" size="0x8000" crc="b08bed2a" sha1="894ab49f13e70203987e54b87f60b047ef910845" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ar51" cloneof="ar5">
+		<description>Action Replay v5.1a</description>
+		<year>1988</year>
+		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_replay_v5.0_5.1a_pal_1988.bin" size="0x8000" crc="6c916f80" sha1="7ef39f320987d4bfddb499708795dfe8aebbce3b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="acp7" cloneof="ar5">
+		<description>Action Cartridge Plus v7.0 (Derko)</description>
+		<year>1991</year>
+		<publisher>Derko</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_cartridge_plus_v7.0_tkit90-derko_1991_pal.bin" size="0x8000" crc="2939b479" sha1="81a939c6e26e07fc6dd65080415d91fb9017bc6e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="acp7t" cloneof="ar5">
+		<description>Action Cartridge Plus v7.0 (Triumwyrat)</description>
+		<year>1990</year>
+		<publisher>Triumwyrat</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_cartridge_plus_v7.0_tkit90-triumwyrat_1990_pal.bin" size="0x8000" crc="9103b894" sha1="3a778f256197cc0450357e2c5c11f90854515572" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+		
+	<software name="ar75" cloneof="ar5">
+		<description>Action Replay v7.5</description>
+		<year>1989</year>
+		<publisher>Triumwyrat</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_replay_v7.5_7.5_1989_pal.bin" size="0x8000" crc="2fdc011f" sha1="564952475b92f0a452c5b58acd6a03ae85342297" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+			
+	<software name="ar84" cloneof="ar5">
+		<description>Action Replay v8.4</description>
+		<year>1990</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_replay_v8.4_8.4_1990_pal.bin" size="0x8000" crc="ddc38bfc" sha1="431b46bd6303b3dc75714eb539a346bc25906cb5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+			
+	<software name="ar5flt" cloneof="ar5">
+		<description>The Fairlight Cracking Cartridge</description>
+		<year>1990</year>
+		<publisher>Fairlight</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_replay_v5.0_bacchus_flt_1989_pal.bin" size="0x8000" crc="c37e1781" sha1="6b8b02eef0cfca2b1b470355b5614cceb9632cff" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ar6t" cloneof="ar5">
+		<description>Action Replay v6.0 (Triad)</description>
+		<year>1993</year>
+		<publisher>Triad</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ar4x" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="0" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="action_replay_v6.0_triad_1993_pal.bin" size="0x8000" crc="795b50c4" sha1="4541bc60c04930c9de53ffb99e355c5cf0dbc5cb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ar6">
+		<description>Action Replay v6.0</description>
 		<year>1989</year>
 		<publisher>Datel Electronics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
+			<feature name="slot" value="ar4x" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="action replay v7.5 professional (1989)(datel).80" size="0x8000" crc="2fdc011f" sha1="564952475b92f0a452c5b58acd6a03ae85342297" offset="0x0000" />
+				<rom name="action_replay_v6.0_6.0_1989_pal.bin" size="0x8000" crc="44a30413" sha1="fca6f0c4c164c67a01abc4a58fc83814a9b15e96" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-
+	
 	<software name="comal80">
 		<description>COMAL 80 (Commodore)</description>
 		<year>1985</year>
@@ -5489,20 +5765,6 @@ http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
 				<rom name="comal 80 (1985)(commodore)[a].80" size="0x10000" crc="5b198f00" sha1="afb9ee78bb07444cdfd58eef75a33ec4026e3be1" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fairlite">
-		<description>The Fairlight Cracking Cartridge</description>
-		<year>198?</year>
-		<publisher>Fairlight</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="action_replay" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x8000">
-				<rom name="fairlight cracking cartridge, the (198x)(fairlight).80" size="0x8000" crc="c37e1781" sha1="6b8b02eef0cfca2b1b470355b5614cceb9632cff" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
