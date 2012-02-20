@@ -16,6 +16,7 @@ public:
 	virtual void tx(UINT8 state) { m_tbit = state; m_bitbanger->output(state); }
 protected:
 	virtual void device_start() { m_owner = dynamic_cast<serial_port_device *>(owner()); }
+	virtual void device_reset() { m_owner->out_rx(1); m_rbit = 1; }
 private:
 	serial_port_device *m_owner;
 	required_device<bitbanger_device> m_bitbanger;
