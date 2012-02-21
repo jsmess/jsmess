@@ -399,7 +399,7 @@ bool c64_expansion_slot_device::call_softlist_load(char *swlist, char *swname, r
 
 const char * c64_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
-	if (load_for_slot(options))
+	if (open_image_file(options))
 	{
 		if (!mame_stricmp(filetype(), "crt"))
 		{
@@ -413,6 +413,7 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 				return CRT_C64_SLOT_NAMES[hardware];
 			}
 		}
+		clear();
 	}
 	return software_get_default_slot(config, options, this, "standard");
 }
