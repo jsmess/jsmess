@@ -8,7 +8,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "machine/c64exp.h"
 #include "formats/cbm_crt.h"
 #include "formats/imageutl.h"
@@ -289,10 +288,6 @@ bool c64_expansion_slot_device::call_load()
 
 				UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
 
-				// TODO support other cartridge hardware
-				if (hardware != CRT_C64_STANDARD)
-					return IMAGE_INIT_FAIL;
-
 				if (LOG)
 				{
 					logerror("Name: %s\n", header.name);
@@ -404,6 +399,21 @@ bool c64_expansion_slot_device::call_softlist_load(char *swlist, char *swname, r
 
 const char * c64_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
+	if (load_for_slot(options))
+	{
+		if (!mame_stricmp(filetype(), "crt"))
+		{
+			// read the header
+			cbm_crt_header header;
+			fread(&header, CRT_HEADER_LENGTH);
+
+			if (memcmp(header.signature, CRT_SIGNATURE, 16) == 0)
+			{
+				UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
+				return CRT_C64_SLOT_NAMES[hardware];
+			}
+		}
+	}
 	return software_get_default_slot(config, options, this, "standard");
 }
 
