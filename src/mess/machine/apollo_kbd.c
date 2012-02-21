@@ -16,11 +16,10 @@
 #include "machine/apollo_kbd.h"
 #include "sound/beep.h"
 
+#if defined(__linux__)
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-
-#if defined(__linux__)
 // on linux we may attach a real Apollo keyboard at /dev/ttyS0
 #include <termios.h>
 #include <sys/ioctl.h>
@@ -494,6 +493,7 @@ int apollo_kbd_device::keyboard_tty::isConnected()
 
 int apollo_kbd_device::keyboard_tty::getchar()
 {
+#if defined(KBD_TTY_NAME)
 	UINT8 data;
 	if (m_tty_fd < 0 || read(m_tty_fd, &data, 1) != 1) {
 		return -1;
@@ -502,16 +502,21 @@ int apollo_kbd_device::keyboard_tty::getchar()
 		m_connected = 1;
 		return data;
 	}
+#else
+	return -1;
+#endif
 }
 
 void apollo_kbd_device::keyboard_tty::putchar(UINT8 data)
 {
+#if defined(KBD_TTY_NAME)
 	if (isConnected() && m_tty_fd >= 0 ) {
 		while (write(m_tty_fd, &data, 1) != 1) {
 			LOG(("keyboard_tty::putchar data=%02x errno=%d", data, errno ));
 		}
 		LOG2(("keyboard_tty::putchar -> %02x", data));
 	}
+#endif
 }
 
 /*-------------------------------------------------

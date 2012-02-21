@@ -44,8 +44,10 @@
 
 #include "emuopts.h"
 
+#if 0 //defined(__linux__)
 #include <fcntl.h>
 #include <unistd.h>
+#endif
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0
