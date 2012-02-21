@@ -62,7 +62,7 @@ void c64_super_games_cartridge_device::device_reset()
 UINT8 c64_super_games_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml || !romh)
 	{
 		offs_t addr = (m_bank << 14) | (offset & 0x3fff);
@@ -82,7 +82,7 @@ void c64_super_games_cartridge_device::c64_cd_w(address_space &space, offs_t off
 	if (!io2)
 	{
 		m_bank = data & 0x03;
-		
+
 		m_game = BIT(data, 2);
 		m_exrom = BIT(data, 3);
 	}

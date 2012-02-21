@@ -9,23 +9,23 @@
 
 /*
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	|===========================|
-	|=|                         |
-	|=|     RAM         LS11    |
-	|=|                         |
-	|=|                 LS139   |
-	|=|     ROM0                |
-	|=|                 LS273   |
-	|=|                         |
-	|=|     ROM1        LS00    |
-	|===========================|
+    |===========================|
+    |=|                         |
+    |=|     RAM         LS11    |
+    |=|                         |
+    |=|                 LS139   |
+    |=|     ROM0                |
+    |=|                 LS273   |
+    |=|                         |
+    |=|     ROM1        LS00    |
+    |===========================|
 
-	RAM   - NEC D43256-12L 32Kx8 RAM
-	ROM0  - SGS M27256-2FI 32Kx8 EPROM
-	ROM1  - National Instruments NMC27C256Q 32Kx8 EPROM
+    RAM   - NEC D43256-12L 32Kx8 RAM
+    ROM0  - SGS M27256-2FI 32Kx8 EPROM
+    ROM1  - National Instruments NMC27C256Q 32Kx8 EPROM
 
 */
 
@@ -84,7 +84,7 @@ void c64_pagefox_cartridge_device::device_reset()
 UINT8 c64_pagefox_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml || !romh)
 	{
 		if (BIT(m_bank, 3))
@@ -130,7 +130,7 @@ void c64_pagefox_cartridge_device::c64_cd_w(address_space &space, offs_t offset,
 			m_game = 0;
 			m_exrom = 0;
 		}
-		
+
 		m_bank = data;
 	}
 }

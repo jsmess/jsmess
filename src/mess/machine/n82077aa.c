@@ -590,7 +590,7 @@ int n82077aa_device::check_command()
 
 	case 0x0f:
 		return command_pos == 3 ? C_SEEK        : C_INCOMPLETE;
-		
+
 	case 0x12:
 		return command_pos == 2 ? C_PERPENDICULAR : C_INCOMPLETE;
 
@@ -643,7 +643,7 @@ void n82077aa_device::start_command(int cmd)
 	case C_SENSE_INTERRUPT_STATUS: {
 		logerror("%s: command sense interrupt status\n", tag());
 		main_phase = PHASE_RESULT;
-		
+
 		int fid;
 		for(fid=0; fid<4 && !flopi[fid].irq; fid++);
 		if(fid == 4) {
@@ -768,7 +768,7 @@ void n82077aa_device::read_data_start(floppy_info &fi)
 {
 	fi.main_state = READ_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
-	
+
 	logerror("%s: command read data%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 			 tag(),
 			 command[0] & 0x80 ? " mt" : "",
@@ -828,7 +828,7 @@ void n82077aa_device::read_data_continue(floppy_info &fi)
 				fi.pcn++;
 			fi.sub_state = HEAD_LOAD_DONE;
 			break;
-			
+
 		case SEEK_DONE:
 			counter = 0;
 			fi.sub_state = SCAN_ID;
@@ -889,7 +889,7 @@ void n82077aa_device::read_id_start(floppy_info &fi)
 {
 	fi.main_state = READ_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
-	
+
 	logerror("%s: command read id%s, rate=%d\n",
 			 tag(),
 			 command[0] & 0x40 ? " mfm" : "",

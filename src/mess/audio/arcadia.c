@@ -126,7 +126,7 @@ void arcadia_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 //-------------------------------------------------
-//  soundport_w 
+//  soundport_w
 //-------------------------------------------------
 
 WRITE8_MEMBER(arcadia_sound_device::write)

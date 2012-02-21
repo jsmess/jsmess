@@ -273,7 +273,7 @@ MACHINE_START( pce )
 {
 	pce_state *state = machine.driver_data<pce_state>();
 	pce_cd_init( machine );
-	machine.device<nvram_device>("nvram")->set_base(state->m_cd.bram, PCE_BRAM_SIZE);	
+	machine.device<nvram_device>("nvram")->set_base(state->m_cd.bram, PCE_BRAM_SIZE);
 }
 
 MACHINE_RESET( mess_pce )

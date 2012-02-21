@@ -162,7 +162,7 @@ private:
 		int m_connected;
 	};
 
-//	const apollo_kbd_interface &m_config;
+//  const apollo_kbd_interface &m_config;
 
 	beeper	m_beeper;
 	mouse	m_mouse;

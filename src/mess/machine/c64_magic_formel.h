@@ -38,7 +38,7 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	static INPUT_CHANGED( freeze );
-	
+
 	// not really public
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_WRITE8_MEMBER( pia_pb_w );
@@ -53,10 +53,10 @@ protected:
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
 	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram);
-	
+
 private:
 	required_device<pia6821_device> m_pia;
-	
+
 	UINT8 m_rom_bank;
 	UINT8 m_ram_bank;
 	int m_pb7_ff;

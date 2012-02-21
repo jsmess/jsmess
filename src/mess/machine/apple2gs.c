@@ -1850,7 +1850,7 @@ MACHINE_START( apple2gscommon )
 	state->m_sndglu_dummy_read = 0;
 
 	state->m_is_rom3 = true;
-	
+
 	machine.device<nvram_device>("nvram")->set_base(state->m_clock_bram, sizeof(state->m_clock_bram));
 
 	/* save state stuff.  note that the driver takes care of docram. */

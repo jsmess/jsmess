@@ -113,11 +113,11 @@ void vic1210_device::vic20_ram3_w(address_space &space, offs_t offset, UINT8 dat
 UINT8 vic1210_device::vic20_blk5_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	if (m_blk5)
 	{
 		data = m_blk5[offset & 0xfff];
 	}
-	
+
 	return data;
 }

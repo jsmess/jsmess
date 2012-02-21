@@ -14,7 +14,7 @@
 
 // ======================> arcadia_sound_device
 
-class arcadia_sound_device : public device_t, 
+class arcadia_sound_device : public device_t,
 							 public device_sound_interface
 {
 public:
@@ -26,7 +26,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 	sound_stream *m_channel;
     UINT8 m_reg[3];
     int m_size, m_pos,m_tval,m_nval;

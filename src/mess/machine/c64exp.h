@@ -173,7 +173,7 @@ protected:
 	UINT8 *m_roml;
 	UINT8 *m_romh;
 	UINT8 *m_ram;
-	
+
 	int m_roml_mask;
 	int m_romh_mask;
 	int m_ram_mask;

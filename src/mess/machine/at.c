@@ -288,7 +288,7 @@ WRITE8_MEMBER( at_state::at_portb_w )
 	pit8253_gate2_w(m_pit8254, BIT(data, 0));
 	at_speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
-	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));	
+	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
 }
 
 

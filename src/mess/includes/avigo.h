@@ -44,7 +44,7 @@ public:
 	void refresh_memory(UINT8 bank, UINT8 chip_select);
 	void refresh_ints();
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
-	
+
 	DECLARE_WRITE_LINE_MEMBER( tc8521_alarm_int );
 	DECLARE_WRITE_LINE_MEMBER( com_interrupt );
 

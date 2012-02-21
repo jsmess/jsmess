@@ -268,10 +268,10 @@ void avigo_state::machine_start()
 	m_flashes[0] = machine().device<intelfsh8_device>("flash0");
 	m_flashes[1] = machine().device<intelfsh8_device>("flash1");
 	m_flashes[2] = machine().device<intelfsh8_device>("flash2");
-	
+
 	machine().device<nvram_device>("nvram")->set_base(m_ram_base, m_ram->size());
 	m_warm_start = 1;
-	
+
 	// register for state saving
 	save_item(NAME(m_key_line));
 	save_item(NAME(m_irq));

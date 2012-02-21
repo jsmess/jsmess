@@ -202,7 +202,7 @@ MACHINE_START( wswan )
 	if ( state->m_rtc.present )
 		machine.scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
 
-	machine.device<nvram_device>("nvram")->set_base(state->m_internal_eeprom, INTERNAL_EEPROM_SIZE);		
+	machine.device<nvram_device>("nvram")->set_base(state->m_internal_eeprom, INTERNAL_EEPROM_SIZE);
 }
 
 MACHINE_START( wscolor )
@@ -220,7 +220,7 @@ MACHINE_START( wscolor )
 	if ( state->m_rtc.present )
 		machine.scheduler().timer_pulse(attotime::from_seconds(1), FUNC(wswan_rtc_callback));
 
-	machine.device<nvram_device>("nvram")->set_base(state->m_internal_eeprom, INTERNAL_EEPROM_SIZE);		
+	machine.device<nvram_device>("nvram")->set_base(state->m_internal_eeprom, INTERNAL_EEPROM_SIZE);
 }
 
 MACHINE_RESET( wswan )
@@ -240,7 +240,7 @@ MACHINE_RESET( wswan )
 	state->m_vdp.color_mode = 0;
 	state->m_vdp.colors_16 = 0;
 	state->m_vdp.tile_packed = 0;
-	
+
 	render_target *target = machine.render().first_target();
 	target->set_view(state->m_rotate);
 
@@ -1481,7 +1481,7 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 		state->m_vdp.sprite_count = state->m_ws_portram[0x06];
 		state->m_vdp.sprite_first = state->m_ws_portram[0x05]; // always zero?
 	}
-	
+
 	if( state->m_vdp.current_line == 144 )
 	{
 		wswan_set_irq_line( machine, WSWAN_IFLAG_VBL );

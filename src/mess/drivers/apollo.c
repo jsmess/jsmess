@@ -6,14 +6,14 @@
  *
  *  Released for general non-commercial use under the MAME license
  *  Visit http://mamedev.org for licensing and usage restrictions.
- * 
+ *
  *  Adapted February 19, 2012 for general MAME/MESS standards by R. Belmont
- * 
+ *
  *  TODO: use MESS ram device and MCFG_RAM_* to handle RAM sizing.
  *        AT bus stuff indicates ISA compatibility?  If so, convert to use MESS ISA bus infrastructure, including 3c505?
  *        Remove need for instruction hook.
  *        Convert to modern address map.
- * 
+ *
  *  see also:
  *  - Domain Series 3000/Series 4000 Hardware Architecture Handbook (Order No. 007861 Rev. 02)
  *  - Domain Personal Workstations and Servers Technical Reference (Apollo Order No. 008778-A01)
@@ -153,16 +153,16 @@ const char *apollo_cpu_context(device_t *cpu) {
 
 /*void apollo_set_cpu_has_fpu(device_t *device, int onoff)
 {
-	if (device == NULL || (device->type() != M68020PMMU && device->type() != M68030))
-	{
-		DLOG1(("set_cpu_has_fpu: unexpected CPU device"));
-	}
-	else
-	{
-		m68ki_cpu_core *cpu = (m68ki_cpu_core *) downcast<legacy_cpu_device *> (device)->token();
-		cpu->has_fpu = onoff;
-		DLOG1(("set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
-	}
+    if (device == NULL || (device->type() != M68020PMMU && device->type() != M68030))
+    {
+        DLOG1(("set_cpu_has_fpu: unexpected CPU device"));
+    }
+    else
+    {
+        m68ki_cpu_core *cpu = (m68ki_cpu_core *) downcast<legacy_cpu_device *> (device)->token();
+        cpu->has_fpu = onoff;
+        DLOG1(("set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
+    }
 }*/
 
 /***************************************************************************
@@ -240,7 +240,7 @@ int apollo_instruction_hook(device_t *device, offs_t curpc)
 
 	// check for NULLPROC:
 	// 027C F8FF AND.W #F8FF,SR
-	// 60FA	     BRA *-4
+	// 60FA      BRA *-4
 
 	if ((next_ir == 0x60fa && last_ir == 0x027c) || (next_ir == 0x027c	&& last_ir == 0x60fa))
 	{
@@ -465,7 +465,7 @@ static READ32_HANDLER( ram_with_parity_r ) {
 
 		if (apollo_csr_get_control_register() & APOLLO_CSR_CR_INTERRUPT_ENABLE) {
 			// force parity error (if NMI is enabled)
-//			cpu_set_input_line_and_vector(&space->device(), 7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+//          cpu_set_input_line_and_vector(&space->device(), 7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 			cputag_set_input_line_and_vector(space->machine(), MAINCPU, 7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 
 		}
@@ -487,8 +487,8 @@ static WRITE32_HANDLER( ram_with_parity_w ) {
 
 		parity_error_offset = offset;
 
-//		SLOG1(("memory dword write with parity to %08x = %08x & %08x parity_byte=%04x",
-//				ram_base_address +offset * 4, data, mem_mask, parity_error_byte_mask));
+//      SLOG1(("memory dword write with parity to %08x = %08x & %08x parity_byte=%04x",
+//              ram_base_address +offset * 4, data, mem_mask, parity_error_byte_mask));
 
 		if (parity_error_handler_is_installed == 0) {
 			// no more than 192 read/write handlers may be used
@@ -518,7 +518,7 @@ static WRITE32_HANDLER( ram_with_parity_w ) {
  DN3000/DN3500 unmapped memory
  ***************************************************************************/
 
-static READ32_HANDLER( apollo_unmapped_r ) 
+static READ32_HANDLER( apollo_unmapped_r )
 {
 	offs_t address = offset * 4;
 
@@ -542,17 +542,17 @@ static READ32_HANDLER( apollo_unmapped_r )
 		SLOG1(("unmapped memory dword read from %08x with mask %08x (ir=%04x)", address , mem_mask, m68k->ir));
 	}
 
-//	if (address == 0xfffffffc) {
-//		// temporary hack for disp7d.dex @ 010456D8
-//		return 	0xffffffff;
-//	}
+//  if (address == 0xfffffffc) {
+//      // temporary hack for disp7d.dex @ 010456D8
+//      return  0xffffffff;
+//  }
 	/* unmapped; access causes a bus error */
 	apollo_bus_error(space->machine());
 
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( apollo_unmapped_w ) 
+static WRITE32_HANDLER( apollo_unmapped_w )
 {
 	SLOG(("unmapped memory dword write to %08x = %08x & %08x", offset * 4, data, mem_mask));
 
@@ -564,7 +564,7 @@ static WRITE32_HANDLER( apollo_unmapped_w )
  DN3000/DN3500 ROM write
  ***************************************************************************/
 
-static WRITE32_HANDLER( apollo_rom_w ) 
+static WRITE32_HANDLER( apollo_rom_w )
 {
 	offs_t address =  offset * 4;
 	offs_t pc = cpu_get_previouspc(&space->device());
@@ -609,7 +609,7 @@ static READ16_HANDLER( apollo_atbus_io_r ) {
 
 	// set bit AT-Compatible I/O Timeout in CPU Status Register
 	// Note: should be set for broken hardware only
-	// apollo_csr_set_status_register(APOLLO_CSR_SR_ATBUS_IO_TIMEOUT,	APOLLO_CSR_SR_ATBUS_IO_TIMEOUT);
+	// apollo_csr_set_status_register(APOLLO_CSR_SR_ATBUS_IO_TIMEOUT,   APOLLO_CSR_SR_ATBUS_IO_TIMEOUT);
 	return data;
 }
 
@@ -641,7 +641,7 @@ static WRITE16_HANDLER( apollo_atbus_io_w ) {
 
 	// set bit AT-Compatible I/O Timeout in CPU Status Register
 	// Note: should be set for broken hardware only
-	// apollo_csr_set_status_register(APOLLO_CSR_SR_ATBUS_IO_TIMEOUT,	APOLLO_CSR_SR_ATBUS_IO_TIMEOUT);
+	// apollo_csr_set_status_register(APOLLO_CSR_SR_ATBUS_IO_TIMEOUT,   APOLLO_CSR_SR_ATBUS_IO_TIMEOUT);
 }
 
 /***************************************************************************
@@ -782,11 +782,11 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32)
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
 
-//		AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//		AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
-//		AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
+//      AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//      AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//      AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
 
-//		AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
 		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
@@ -817,8 +817,8 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8( APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8( apollo_fdc_r, apollo_fdc_w, 0xffffffff)
 
-//		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
-//		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+//      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -830,7 +830,7 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32)
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
 
-//		AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
 		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
@@ -894,8 +894,8 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8( APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8( apollo_fdc_r, apollo_fdc_w, 0xffffffff)
 
-//		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
-//		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+//      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -953,12 +953,12 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32)
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
 
-//		AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//		AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//      AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//      AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
 		AM_RANGE(0x07000000, 0x0700FFFF) AM_READWRITE8( dn5500_io_protection_map_r, dn5500_io_protection_map_w, 0xffffffff )
-//		AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
+//      AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
 
-//		AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
 		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
@@ -992,8 +992,8 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8( APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_READWRITE8( apollo_fdc_r, apollo_fdc_w, 0xffffffff)
 
-//		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
-//		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+//      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16( APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -1005,7 +1005,7 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32)
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
 
 		AM_RANGE(0x07000000, 0x0700FFFF) AM_READWRITE8( dn5500_io_protection_map_r, dn5500_io_protection_map_w, 0xffffffff )
-//		AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
 		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
@@ -1013,7 +1013,7 @@ ADDRESS_MAP_END
  Machine Reset
  ***************************************************************************/
 
-static MACHINE_RESET( dn3500 ) 
+static MACHINE_RESET( dn3500 )
 {
 	device_t *cpu = machine.device(MAINCPU);
 
@@ -1048,11 +1048,11 @@ static MACHINE_RESET( dn3500 )
     m68k_set_instruction_hook(cpu, apollo_instruction_hook);
 }
 
-static void apollo_reset_instr_callback(device_t *device) 
+static void apollo_reset_instr_callback(device_t *device)
 {
 	DLOG1(("apollo_reset_instr_callback"));
 	// FIXME: this will reset the CPU too
-//	device->machine().schedule_soft_reset();    // needs to call reset on the devices other than the CPU
+//  device->machine().schedule_soft_reset();    // needs to call reset on the devices other than the CPU
 }
 
 /***************************************************************************
@@ -1147,7 +1147,7 @@ INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER( apollo_kbd_putchar ) {
 	// put keyboard character to the keyboard sio
-//	DLOG1(("apollo_kbd_putchar: 0x%02x", data));
+//  DLOG1(("apollo_kbd_putchar: 0x%02x", data));
 	apollo_sio_rx_data(device->machine().device(APOLLO_SIO_TAG), 0, data);
 }
 
@@ -1212,7 +1212,7 @@ static MACHINE_CONFIG_DERIVED( dsp3500, dn3500 )
 	MCFG_CPU_PROGRAM_MAP(dsp3500_map)
 	/* terminal hardware */
 	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
-//	MCFG_FRAGMENT_ADD( generic_terminal )
+//  MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, apollo_terminal_config)
 MACHINE_CONFIG_END
 
@@ -1247,7 +1247,7 @@ static MACHINE_CONFIG_DERIVED( dsp3000, dn3000 )
 	MCFG_CPU_PROGRAM_MAP(dsp3000_map)
 	/* terminal hardware */
 	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
-//	MCFG_FRAGMENT_ADD( generic_terminal )
+//  MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, apollo_terminal_config)
 MACHINE_CONFIG_END
 
@@ -1277,7 +1277,7 @@ static MACHINE_CONFIG_DERIVED( dsp5500, dn5500 )
 	MCFG_CPU_PROGRAM_MAP(dsp5500_map)
 	/* terminal hardware */
 	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
-//	MCFG_FRAGMENT_ADD( generic_terminal )
+//  MCFG_FRAGMENT_ADD( generic_terminal )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, apollo_terminal_config)
 MACHINE_CONFIG_END
 

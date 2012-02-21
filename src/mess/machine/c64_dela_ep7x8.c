@@ -99,7 +99,7 @@ c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_c
 void c64_dela_ep7x8_cartridge_device::device_start()
 {
 	m_rom = subregion("rom")->base();
-	
+
 	// state saving
 	save_item(NAME(m_bank));
 }
@@ -123,11 +123,11 @@ void c64_dela_ep7x8_cartridge_device::device_reset()
 UINT8 c64_dela_ep7x8_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		offs_t addr = offset & 0x1fff;
-		
+
 		if (!BIT(m_bank, 0)) data |= m_roml[addr];
 		if (!BIT(m_bank, 1)) data |= m_rom[0x2000 + addr];
 		if (!BIT(m_bank, 2)) data |= m_rom[0x4000 + addr];
@@ -151,7 +151,7 @@ void c64_dela_ep7x8_cartridge_device::c64_cd_w(address_space &space, offs_t offs
 	if (!io1)
 	{
 		m_bank = data;
-		
+
 		m_exrom = (data == 0xff);
 	}
 }

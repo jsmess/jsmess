@@ -41,7 +41,7 @@ protected:
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
 	virtual int c64_exrom_r() { return 0; }
-	
+
 private:
 	emu_timer *m_game_timer;
 };

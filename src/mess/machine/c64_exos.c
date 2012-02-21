@@ -50,7 +50,7 @@ void c64_exos_cartridge_device::device_start()
 UINT8 c64_exos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!romh)
 	{
 		data = m_romh[offset & 0x1fff];

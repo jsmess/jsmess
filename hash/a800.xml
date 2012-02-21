@@ -1132,7 +1132,7 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bombjake" supported="no">
 		<description>Bomb Jake</description>
 		<year>2009</year>
@@ -4921,7 +4921,7 @@ Compiled by K1W1
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="yakungfu" supported="no">
 		<description>Yie Another Kung-Fu</description>
 		<year>2011</year>

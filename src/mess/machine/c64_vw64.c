@@ -9,25 +9,25 @@
 
 /*
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	|===========================|
-	|=|      LS10    LS122  C   |
-	|=|                  R      |
-	|=|                         |
-	|=|                         |
-	|=|      ROM0  ROM2  ROM1   |
-	|=|                         |
-	|=|                         |
-	|=|                         |
-	|===========================|
+    |===========================|
+    |=|      LS10    LS122  C   |
+    |=|                  R      |
+    |=|                         |
+    |=|                         |
+    |=|      ROM0  ROM2  ROM1   |
+    |=|                         |
+    |=|                         |
+    |=|                         |
+    |===========================|
 
-	ROM0    - Mitsubishi M5L2764K 8Kx8 EPROM "U"
-	ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM "3"
-	ROM2    - Mitsubishi M5L2764K 8Kx8 EPROM "2" (located on solder side)
-	R       - 56K
-	C       - 47uF
+    ROM0    - Mitsubishi M5L2764K 8Kx8 EPROM "U"
+    ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM "3"
+    ROM2    - Mitsubishi M5L2764K 8Kx8 EPROM "2" (located on solder side)
+    R       - 56K
+    C       - 47uF
 
 */
 
@@ -45,9 +45,9 @@
 #define UNSCRAMBLE_DATA(_data) \
 	BITSWAP8(_data,7,6,0,5,1,4,2,3)
 
-	
+
 // 74LS122 tW=0.45*R*C = 1.1844s
-#define TIMER_PERIOD	1184	
+#define TIMER_PERIOD	1184
 
 
 
@@ -92,7 +92,7 @@ void c64_vizawrite_cartridge_device::device_start()
 void c64_vizawrite_cartridge_device::device_reset()
 {
 	m_game = 0;
-	
+
 
 	m_game_timer->adjust(attotime::from_msec(TIMER_PERIOD), 0);
 }
@@ -126,6 +126,6 @@ UINT8 c64_vizawrite_cartridge_device::c64_cd_r(address_space &space, offs_t offs
 		offs_t addr = offset & 0x1fff;
 		data = UNSCRAMBLE_DATA(m_romh[UNSCRAMBLE_ADDRESS(addr)]);
 	}
-	
+
 	return data;
 }

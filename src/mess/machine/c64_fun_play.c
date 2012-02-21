@@ -62,7 +62,7 @@ void c64_fun_play_cartridge_device::device_reset()
 UINT8 c64_fun_play_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
@@ -83,19 +83,19 @@ void c64_fun_play_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 	{
 		/*
 
-			bit     description
+            bit     description
 
-			0		A16
-			1
-			2
-			3		A13
-			4       A14
-			5       A15
-			6       
-			7       
+            0       A16
+            1
+            2
+            3       A13
+            4       A14
+            5       A15
+            6
+            7
 
-		*/
-		
+        */
+
 		m_bank = ((data & 0x01) << 3) | ((data >> 3) & 0x07);
 	}
 }

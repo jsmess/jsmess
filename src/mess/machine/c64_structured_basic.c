@@ -64,11 +64,11 @@ void c64_structured_basic_cartridge_device::device_reset()
 UINT8 c64_structured_basic_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-		
+
 		data = m_roml[addr];
 	}
 
@@ -91,7 +91,7 @@ void c64_structured_basic_cartridge_device::c64_cd_w(address_space &space, offs_
 			m_exrom = 0;
 			m_bank = 0;
 			break;
-		
+
 		case 2:
 			m_exrom = 0;
 			m_bank = 1;

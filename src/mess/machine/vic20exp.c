@@ -23,7 +23,7 @@
 
 
 // slot names for the VIC-20 cartridge types
-const char *CRT_VIC20_SLOT_NAMES[_CRT_VIC20_COUNT] = 
+const char *CRT_VIC20_SLOT_NAMES[_CRT_VIC20_COUNT] =
 {
 	UNSUPPORTED,
 	"standard",
@@ -239,45 +239,45 @@ bool vic20_expansion_slot_device::call_load()
 				// read the header
 				cbm_crt_header header;
 				fread(&header, CRT_HEADER_LENGTH);
-				
+
 				if (memcmp(header.signature, CRT_SIGNATURE, 16) != 0)
 					return IMAGE_INIT_FAIL;
-				
+
 				UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
-				
+
 				// TODO support other cartridge hardware
 				if (hardware != CRT_VIC20_STANDARD)
 					return IMAGE_INIT_FAIL;
-				
+
 				if (LOG)
 				{
 					logerror("Name: %s\n", header.name);
 					logerror("Hardware: %04x\n", hardware);
 					logerror("Slot device: %s\n", CRT_VIC20_SLOT_NAMES[hardware]);
 				}
-			
+
 				// determine ROM region lengths
 				size_t blk1_size = 0;
 				size_t blk2_size = 0;
 				size_t blk3_size = 0;
 				size_t blk5_size = 0;
-				
+
 				while (!image_feof())
 				{
 					cbm_crt_chip chip;
 					fread(&chip, CRT_CHIP_LENGTH);
-					
+
 					UINT16 address = pick_integer_be(chip.start_address, 0, 2);
 					UINT16 size = pick_integer_be(chip.image_size, 0, 2);
 					UINT16 type = pick_integer_be(chip.chip_type, 0, 2);
-					
+
 					if (LOG)
 					{
 						logerror("CHIP Address: %04x\n", address);
 						logerror("CHIP Size: %04x\n", size);
 						logerror("CHIP Type: %04x\n", type);
 					}
-					
+
 					switch (address)
 					{
 					case 0x2000: blk1_size += size; break;
@@ -288,7 +288,7 @@ bool vic20_expansion_slot_device::call_load()
 					case 0xb000: blk5_size += 0x2000; break;
 					default: logerror("Invalid CHIP loading address!\n"); break;
 					}
-					
+
 					fseek(size, SEEK_CUR);
 				}
 
@@ -297,25 +297,25 @@ bool vic20_expansion_slot_device::call_load()
 				UINT8 *blk2 = NULL;
 				UINT8 *blk3 = NULL;
 				UINT8 *blk5 = NULL;
-				
+
 				if (blk1_size) blk1 = m_cart->vic20_blk1_pointer(machine(), blk1_size);
 				if (blk2_size) blk2 = m_cart->vic20_blk2_pointer(machine(), blk2_size);
 				if (blk3_size) blk3 = m_cart->vic20_blk3_pointer(machine(), blk3_size);
 				if (blk5_size) blk5 = m_cart->vic20_blk5_pointer(machine(), blk5_size);
-				
+
 				// read the data
 				offs_t blk1_offset = 0;
 				offs_t blk2_offset = 0;
 				offs_t blk3_offset = 0;
 				offs_t blk5_offset = 0;
-				
+
 				fseek(CRT_HEADER_LENGTH, SEEK_SET);
-				
+
 				while (!image_feof())
 				{
 					cbm_crt_chip chip;
 					fread(&chip, CRT_CHIP_LENGTH);
-					
+
 					UINT16 address = pick_integer_be(chip.start_address, 0, 2);
 					UINT16 size = pick_integer_be(chip.image_size, 0, 2);
 

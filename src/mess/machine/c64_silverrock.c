@@ -9,22 +9,22 @@
 
 /*
 
-	PCB Layout
-	----------
-	
-	e9048
-	|=============|
-	|=| LS00      |
-	|=|      LS273|
-	|=|           |
-	|=|           |
-	|=| ROM       |
-	|=|           |
-	|=|           |
-	|=|           |
-	|=============|
+    PCB Layout
+    ----------
 
-	ROM     - Atmel AT27C010-25PC 128Kx8 OTP EPROM "HUGO 2012"
+    e9048
+    |=============|
+    |=| LS00      |
+    |=|      LS273|
+    |=|           |
+    |=|           |
+    |=| ROM       |
+    |=|           |
+    |=|           |
+    |=|           |
+    |=============|
+
+    ROM     - Atmel AT27C010-25PC 128Kx8 OTP EPROM "HUGO 2012"
 
 */
 
@@ -35,14 +35,14 @@
 //**************************************************************************
 //  MACROS/CONSTANTS
 //**************************************************************************
-	
+
 #define UNSCRAMBLE_ADDRESS(_offset) \
 	BITSWAP16(_offset,15,14,13,12,1,0,2,3,11,10,9,8,7,6,5,4)
 
 #define UNSCRAMBLE_DATA(_data) \
 	BITSWAP8(_data,7,6,5,4,0,1,2,3)
-	
-	
+
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -95,7 +95,7 @@ void c64_silverrock_cartridge_device::device_reset()
 UINT8 c64_silverrock_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
@@ -117,18 +117,18 @@ void c64_silverrock_cartridge_device::c64_cd_w(address_space &space, offs_t offs
 	{
 		/*
 
-			bit     description
+            bit     description
 
-			0
-			1
-			2
-			3
-			4       A14
-			5       A15
-			6       A16
-			7       A13
+            0
+            1
+            2
+            3
+            4       A14
+            5       A15
+            6       A16
+            7       A13
 
-		*/
+        */
 
 		m_bank = ((data >> 3) & 0x0e) | BIT(data, 7);
 	}

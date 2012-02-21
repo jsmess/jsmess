@@ -853,8 +853,8 @@ void pce220_state::machine_start()
 	memory_configure_bank(machine(), "bank4", 0, 8, rom, 0x4000);
 
 	m_vram = (UINT8*)machine().region("lcd_vram")->base();
-	
-	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());	
+
+	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
 void pcg850v_state::machine_start()
@@ -868,7 +868,7 @@ void pcg850v_state::machine_start()
 	memory_configure_bank(machine(), "bank4", 0, 22, rom, 0x4000);
 
 	m_vram = (UINT8*)machine().region("lcd_vram")->base();
-	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());	
+	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
 void pce220_state::machine_reset()

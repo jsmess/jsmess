@@ -201,11 +201,11 @@ void sc499_device::device_start()
 
 	if (m_image->image_core_file() == NULL)
 	{
- 		LOG2(("start sc499: no cartridge tape"));
+		LOG2(("start sc499: no cartridge tape"));
 	}
 	else
 	{
- 		LOG2(("start sc499: cartridge tape image is %s",m_image->filename()));
+		LOG2(("start sc499: cartridge tape image is %s",m_image->filename()));
 	}
 
 	m_ctape_block_buffer = auto_alloc_array(machine(), UINT8, SC499_CTAPE_BLOCK_SIZE);
@@ -334,7 +334,7 @@ void sc499_device::check_tape()
 		m_image_length = 0;
 		m_ctape_block_count = 0;
 
- 		LOG1(("check_tape: no cartridge tape"));
+		LOG1(("check_tape: no cartridge tape"));
 	}
 }
 
@@ -768,7 +768,7 @@ void sc499_device::write_control_port( UINT8 data)
 			}
 			else if (m_command == SC499_CMD_READ_STATUS)
 			{
-//				if (m_data_index > 0)
+//              if (m_data_index > 0)
 				{
 					m_timer->adjust( attotime::from_usec(20), SC499_TIMER_4);
 				}
@@ -812,30 +812,30 @@ void sc499_device::write_dma_go( UINT8 data)
 		m_timer->adjust( attotime::from_msec(1), SC499_TIMER_3);
 
 // Note: proper sequence is:
-//		pc=3c4ad714 - ctape: write_dma_go: 00
-//		pc=3c4ad718 - ctape: write_control_port: 30
-//		pc=3c40ebda: apollo_dma_1_w: writing DMA Controller 1 at offset 02 = 00
-//		pc=3c40ebe8: apollo_dma_1_w: writing DMA Controller 1 at offset 02 = 22
-//		pc=3c40ebf4: apollo_dma_1_w: writing DMA Controller 1 at offset 0c = 00
-//		pc=3c40ec04: apollo_dma_1_w: writing DMA Controller 1 at offset 03 = ff
-//		pc=3c40ec12: apollo_dma_1_w: writing DMA Controller 1 at offset 03 = 01
-//		pc=3c40ec1e: apollo_dma_1_w: writing DMA Controller 1 at offset 0b = 45
-//		pc=3c40ec2e: apollo_dma_1_w: writing DMA Controller 1 at offset 0a = 01
-//		pc=3c41a154 - ctape: timer_func param=3 status=2f
-//		pc=3c41a154 - ctape: set_dma_drq(1)
-//		pc=3c41a154 - maincpu: apollo_dma_ctape_drq: state=1
-//		pc=3c41a154 - ctape: dack_read: data[0]=55 status=6f
-//		pc=3c41a154: dma write byte at offset 17f9c00+200 = 55
-//		pc=3c41a154: dma write byte at offset 17f9c00+2ff = 6d
-//		pc=3c41a154: dma write byte at offset 17f9c00+300 = 65
-//		pc=3c41a154 - ctape: dack_read: data[511]=60 status=6f
-//		pc=3c41a154: dma write byte at offset 17f9c00+3ff = 60
-//		pc=3c41a154 - dma8237_1: dma out eop state 00
-//		pc=3c41a154 - ctape: set_tc_state: block=21 state=0
-//		pc=3c41a154 - ctape: set_dma_drq(0)
-//		pc=3c41a154 - maincpu: apollo_dma_ctape_drq: state=0
-//		pc=3c41a154 - dma8237_1: dma out eop state 01
-//		pc=3c41a154 - ctape: set_tc_state: block=21 state=1
+//      pc=3c4ad714 - ctape: write_dma_go: 00
+//      pc=3c4ad718 - ctape: write_control_port: 30
+//      pc=3c40ebda: apollo_dma_1_w: writing DMA Controller 1 at offset 02 = 00
+//      pc=3c40ebe8: apollo_dma_1_w: writing DMA Controller 1 at offset 02 = 22
+//      pc=3c40ebf4: apollo_dma_1_w: writing DMA Controller 1 at offset 0c = 00
+//      pc=3c40ec04: apollo_dma_1_w: writing DMA Controller 1 at offset 03 = ff
+//      pc=3c40ec12: apollo_dma_1_w: writing DMA Controller 1 at offset 03 = 01
+//      pc=3c40ec1e: apollo_dma_1_w: writing DMA Controller 1 at offset 0b = 45
+//      pc=3c40ec2e: apollo_dma_1_w: writing DMA Controller 1 at offset 0a = 01
+//      pc=3c41a154 - ctape: timer_func param=3 status=2f
+//      pc=3c41a154 - ctape: set_dma_drq(1)
+//      pc=3c41a154 - maincpu: apollo_dma_ctape_drq: state=1
+//      pc=3c41a154 - ctape: dack_read: data[0]=55 status=6f
+//      pc=3c41a154: dma write byte at offset 17f9c00+200 = 55
+//      pc=3c41a154: dma write byte at offset 17f9c00+2ff = 6d
+//      pc=3c41a154: dma write byte at offset 17f9c00+300 = 65
+//      pc=3c41a154 - ctape: dack_read: data[511]=60 status=6f
+//      pc=3c41a154: dma write byte at offset 17f9c00+3ff = 60
+//      pc=3c41a154 - dma8237_1: dma out eop state 00
+//      pc=3c41a154 - ctape: set_tc_state: block=21 state=0
+//      pc=3c41a154 - ctape: set_dma_drq(0)
+//      pc=3c41a154 - maincpu: apollo_dma_ctape_drq: state=0
+//      pc=3c41a154 - dma8237_1: dma out eop state 01
+//      pc=3c41a154 - ctape: set_tc_state: block=21 state=1
 
 		break;
 	}
@@ -885,7 +885,7 @@ UINT8 sc499_device::read_port(offs_t offset)
 		break;
 	case SC499_PORT_STATUS: // read status
 		data=read_status_port();
-//		set_interrupt(CLEAR_LINE);
+//      set_interrupt(CLEAR_LINE);
 		break;
 	default:
 		LOG(("reading sc499 Register at offset %02x = %02x", offset, data));
@@ -924,7 +924,7 @@ void sc499_device::set_tc_state(int state)
 UINT8 sc499_device::dack_read() {
 	UINT8 data = 0xff;
 
-//	set_dma_drq(CLEAR_LINE);
+//  set_dma_drq(CLEAR_LINE);
 
 	if (m_ctape_block_index >= SC499_CTAPE_BLOCK_SIZE)
 	{
@@ -946,10 +946,10 @@ UINT8 sc499_device::dack_read() {
 		LOG2(("dack_read: data[%d]=%x status=%x",  m_ctape_block_index-1, data, m_status));
 	}
 
-//	if (m_ctape_block_index < SC499_CTAPE_BLOCK_SIZE)
-//	{
-//		set_dma_drq(ASSERT_LINE);
-//	}
+//  if (m_ctape_block_index < SC499_CTAPE_BLOCK_SIZE)
+//  {
+//      set_dma_drq(ASSERT_LINE);
+//  }
 
 	return data;
 }
@@ -1023,7 +1023,7 @@ void sc499_device::read_block()
 	{
 		m_image->fread(m_ctape_block_buffer, SC499_CTAPE_BLOCK_SIZE);
 
-		//	if (verbose > 1 || m_tape_pos % 100 == 0)
+		//  if (verbose > 1 || m_tape_pos % 100 == 0)
 		{
 			log_block("read_block");
 		}
@@ -1055,7 +1055,7 @@ void sc499_device::read_block()
 			tape_status_clear(SC499_ST0_FM);
 		}
 	}
-	//	if (m_tape_pos == 69400) verbose = 2;
+	//  if (m_tape_pos == 69400) verbose = 2;
 }
 
 /*-------------------------------------------------

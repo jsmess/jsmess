@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER( rs232_port_device::dtr_w )
 {
 	if(m_dev)
 		return m_dev->dtr_w(state);
-	
+
 	if(serial_port_device::m_dev)
 	{
 		loopdtr = state;
@@ -126,7 +126,7 @@ WRITE_LINE_MEMBER( rs232_port_device::rts_w )
 {
 	if(m_dev)
 		return m_dev->rts_w(state);
-	
+
 	if(serial_port_device::m_dev)
 	{
 		looprts = state;

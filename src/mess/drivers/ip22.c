@@ -1522,9 +1522,9 @@ static MACHINE_START( ip225015 )
 	// SCSI init
 	wd33c93_init(machine, &scsi_intf);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ip225015_exit),&machine));
-	
-	machine.device<nvram_device>("nvram_user")->set_base(state->m_RTC.nUserRAM, 0x200);	
-	machine.device<nvram_device>("nvram")->set_base(state->m_RTC.nRAM, 0x200);	
+
+	machine.device<nvram_device>("nvram_user")->set_base(state->m_RTC.nUserRAM, 0x200);
+	machine.device<nvram_device>("nvram")->set_base(state->m_RTC.nRAM, 0x200);
 }
 
 static DRIVER_INIT( ip225015 )
@@ -1665,7 +1665,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 
 	MCFG_MACHINE_START( ip225015 )
 	MCFG_MACHINE_RESET( ip225015 )
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_NVRAM_ADD_0FILL("nvram_user")
 
