@@ -359,9 +359,9 @@ static UINT8 check_disk_address(omti8621_state *state, const UINT8 *cdb)
 
 	if (lun > OMTI_MAX_LUN) {
 		sense_code = OMTI_SENSE_CODE_DRIVE_NOT_READY;
-	} else 	if (!disk->image->exists()) {
+	} else	if (!disk->image->exists()) {
 		sense_code = OMTI_SENSE_CODE_DRIVE_NOT_READY;
-	} else 	if (sector >= OMTI_MAX_BLOCK_COUNT) {
+	} else	if (sector >= OMTI_MAX_BLOCK_COUNT) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
 	} else if (head >= disk->heads) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
@@ -627,7 +627,7 @@ static void log_command(const omti8621_state *state,
 		default:
 			logerror("!!! Unexpected Command !!!");
 		}
-//		logerror(" (%02x, length=%02x)", cdb[0], cdb_length);
+//      logerror(" (%02x, length=%02x)", cdb[0], cdb_length);
 		for (i = 0; i < cdb_length; i++) {
 			logerror(" %02x", cdb[i]);
 		}
@@ -823,9 +823,9 @@ static void do_command(omti8621_state *state,
 	}
 
 	if (state->mask_port & OMTI_MASK_INTE) {
-//		if (state->omti_state != OMTI_STATE_STATUS) {
-//			LOG(("do_command: UNEXPECTED omti_state %02x",state->omti_state));
-//		}
+//      if (state->omti_state != OMTI_STATE_STATUS) {
+//          LOG(("do_command: UNEXPECTED omti_state %02x",state->omti_state));
+//      }
 		state->status_port |= OMTI_STATUS_IREQ;
 		if (command_duration == 0) {
 			set_interrupt(state, ASSERT_LINE);
@@ -1011,7 +1011,7 @@ static READ8_DEVICE_HANDLER( omti8621_r8 ) {
 		// omit excessive logging
 		if (data != last_data) {
 			LOG2(("reading OMTI 8621 Status Register at offset %02x = %02x", offset, data));
-//			last_data = data;
+//          last_data = data;
 		}
 		break;
 
@@ -1256,11 +1256,11 @@ static DEVICE_START( omti_disk )
 
 	if (disk->image->image_core_file() == NULL)
 	{
- 		DLOG1(("device_start_omti_disk: no disk"));
+		DLOG1(("device_start_omti_disk: no disk"));
 	}
 	else
 	{
- 		DLOG1(("device_start_omti_disk: with disk image %s",disk->image->basename() ));
+		DLOG1(("device_start_omti_disk: with disk image %s",disk->image->basename() ));
 	}
 
 	// default disk type
@@ -1322,7 +1322,7 @@ DEVICE_GET_INFO( omti_disk0 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(disk_data);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; 			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;			break;
 		case DEVINFO_INT_IMAGE_TYPE:			info->i = IO_HARDDISK;	break;
 		case DEVINFO_INT_IMAGE_READABLE:		info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = 1; break;
@@ -1332,8 +1332,8 @@ DEVICE_GET_INFO( omti_disk0 )
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(omti_disk); break;
 		case DEVINFO_FCT_STOP:					/* Nothing */								break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(omti_disk); break;
-//		case DEVINFO_FCT_IMAGE_LOAD:			info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(omti_disk); break;
-//		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(omti_disk); break;
+//      case DEVINFO_FCT_IMAGE_LOAD:            info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(omti_disk); break;
+//      case DEVINFO_FCT_IMAGE_UNLOAD:          info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(omti_disk); break;
 		case DEVINFO_FCT_IMAGE_CREATE:			info->f = (genf *)DEVICE_IMAGE_CREATE_NAME(omti_disk);	break;
 
 

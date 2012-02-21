@@ -51,20 +51,20 @@ typedef struct
 } icmp_header;
 
 //typedef struct {
-//	UINT16 version;
-//	UINT16 checksum;
-//	UINT16 packet_type;
-//	UINT16 control_header;
-//	UINT16 header_length;
-//	UINT16 header_data_length;
-//	UINT16 transaction_id;
+//  UINT16 version;
+//  UINT16 checksum;
+//  UINT16 packet_type;
+//  UINT16 control_header;
+//  UINT16 header_length;
+//  UINT16 header_data_length;
+//  UINT16 transaction_id;
 //} control_header;
 //
 //typedef struct {
-//	UINT16 length;
-//	UINT16 current;
-//	UINT16 source_socket;
-//	UINT16 new_route;
+//  UINT16 length;
+//  UINT16 current;
+//  UINT16 source_socket;
+//  UINT16 new_route;
 //} packet_address;
 
 #define ETHERNET_HEADER_SIZE sizeof(ethernet_header)
@@ -77,8 +77,8 @@ typedef struct
 #define ETHERNET_APOLLO_PREFIX 0x08001e
 #define ETHERNET_APOLLO_DOMAIN_PREFIX 0x09001e
 
-#define ICMP_ECHOREPLY		0	/* Echo Reply			*/
-#define ICMP_ECHO		    8	/* Echo Request			*/
+#define ICMP_ECHOREPLY		0	/* Echo Reply           */
+#define ICMP_ECHO		    8	/* Echo Request         */
 
 #define PACKET_HEADER_SIZE 64
 
@@ -295,39 +295,39 @@ static int set_ethernet_header(UINT8 *data, UINT8 client_ethernet_address[6]) {
 }
 
 //static int set_packet_header1(UINT8 *packet_buffer, UINT32 dest_node_id,
-//		UINT32 source_node_id) {
+//      UINT32 source_node_id) {
 //
-//	//0000  08 00 1e 02 61 6d 08 00  1e 04 20 e8 80 19 ff ff
-//	//0010  00 20 00 be 00 00 47 11  08 00 1e 02 61 6d 06 20
-//	//0020  00 00 00 00 08 00 1e 04  20 e8 00 01 00 02 61 6d
-//	//0030  20 00 00 00 00 04 20 e8  02 00 20 00 00 4e 00 02
-//	//0040  00 00 00 00 2e 04 00 01  20 e8 00 01 00 04 20 e8
+//  //0000  08 00 1e 02 61 6d 08 00  1e 04 20 e8 80 19 ff ff
+//  //0010  00 20 00 be 00 00 47 11  08 00 1e 02 61 6d 06 20
+//  //0020  00 00 00 00 08 00 1e 04  20 e8 00 01 00 02 61 6d
+//  //0030  20 00 00 00 00 04 20 e8  02 00 20 00 00 4e 00 02
+//  //0040  00 00 00 00 2e 04 00 01  20 e8 00 01 00 04 20 e8
 //
-//	//0050  61 6d 06 20 ff ff 00 20  00 04 00 00 47 11 00 00
-//	//0060  00 02 61 6d 06 20 00 00  00 00 00 00 00 04 20 e8
-//	//0070  00 01 00 00 00 00 80 31  00 01
+//  //0050  61 6d 06 20 ff ff 00 20  00 04 00 00 47 11 00 00
+//  //0060  00 02 61 6d 06 20 00 00  00 00 00 00 00 04 20 e8
+//  //0070  00 01 00 00 00 00 80 31  00 01
 //
-//	set_packet_header(packet_buffer, dest_node_id, source_node_id);
-//	set_word(packet_buffer + 8, 0x4711); // Apollo network number
-//	set_word(packet_buffer + 16, 0x0620); // ? was 0x0000
-//	set_word(packet_buffer + 28, 0x0001); // ? was 0x0003
+//  set_packet_header(packet_buffer, dest_node_id, source_node_id);
+//  set_word(packet_buffer + 8, 0x4711); // Apollo network number
+//  set_word(packet_buffer + 16, 0x0620); // ? was 0x0000
+//  set_word(packet_buffer + 28, 0x0001); // ? was 0x0003
 
-//	set_long(packet_buffer + 34, 0x20000000L); // ? was 0x24000000L
-//	set_long(packet_buffer + 42, 0x02002000L); // ? was 0x01002400L
-//	set_word(packet_buffer + 46, 0x004e); // ? data_size + 0x22
-//	set_word(packet_buffer + 48, 0x0002); // ? data_size
-//	set_word(packet_buffer + 54, 0x2e04); // ? 0x0401
-//	set_word(packet_buffer + 56, 0x0001); // ? 0x0003
-//	set_word(packet_buffer + 60, 0x616d);
-//	set_word(packet_buffer + 62, 0x0000);
-//	return PACKET_HEADER_SIZE;
+//  set_long(packet_buffer + 34, 0x20000000L); // ? was 0x24000000L
+//  set_long(packet_buffer + 42, 0x02002000L); // ? was 0x01002400L
+//  set_word(packet_buffer + 46, 0x004e); // ? data_size + 0x22
+//  set_word(packet_buffer + 48, 0x0002); // ? data_size
+//  set_word(packet_buffer + 54, 0x2e04); // ? 0x0401
+//  set_word(packet_buffer + 56, 0x0001); // ? 0x0003
+//  set_word(packet_buffer + 60, 0x616d);
+//  set_word(packet_buffer + 62, 0x0000);
+//  return PACKET_HEADER_SIZE;
 //}
 
 static int set_packet_header(UINT8 *packet_buffer, UINT32 dest_node_id,
 		UINT32 source_node_id) {
 	// --------- apollo header --------------
 	set_word(packet_buffer, 0xffff);
-	//	set_word(packet_buffer + 2, data_size + PACKET_HEADER_SIZE);
+	//  set_word(packet_buffer + 2, data_size + PACKET_HEADER_SIZE);
 	set_word(packet_buffer + 4, 0x00be);
 	set_word(packet_buffer + 6, 0x0000);
 	set_word(packet_buffer + 8, 0x0000); // Apollo network number
@@ -344,8 +344,8 @@ static int set_packet_header(UINT8 *packet_buffer, UINT32 dest_node_id,
 	set_long(packet_buffer + 34, 0x24000000L);
 	set_long(packet_buffer + 38, source_node_id);
 	set_long(packet_buffer + 42, 0x01002400L);
-	//	set_word(packet_buffer + 46, data_size + 0x22);
-	//	set_word(packet_buffer + 48, data_size);
+	//  set_word(packet_buffer + 46, data_size + 0x22);
+	//  set_word(packet_buffer + 48, data_size);
 	set_word(packet_buffer + 50, 0x0000);
 	set_word(packet_buffer + 52, 0x0000);
 	// --------- data --------------
@@ -575,7 +575,7 @@ static int netman_server(const device_t *device,
 	service = (rx_data_length > 0x45) ? get_word(rx_data_buffer + 0x44) : 0xffff;
 	first_sector = (rx_data_length > 0x6b) ? get_word(rx_data_buffer + 0x6a) : 0;
 	// FIXME: hack
-//	last_sector = (rx_data_length > 0x6d) ? get_word(rx_data_buffer + 0x6c) : 0;
+//  last_sector = (rx_data_length > 0x6d) ? get_word(rx_data_buffer + 0x6c) : 0;
 	last_sector = (rx_data_length > 0x6d) ? get_word(rx_data_buffer + 0x6c) : 0x0f;
 
 	set_ethernet_header(tx_data_buffer, client_ethernet_address);
@@ -593,7 +593,7 @@ static int netman_server(const device_t *device,
 		get_file_data(APOLLO_NETBOOT_PATH, packet_buffer, first_sector, last_sector);
 		DLOG1(("Net Server service=%04x (boot_$sysboot - sector %x of %x-%x)", service, current_sector, first_sector, last_sector));
 		break;
-	case 0x0a: // boot_$get_uids 	(get UIDs for OS paging file, network root and the node entry directory)
+	case 0x0a: // boot_$get_uids    (get UIDs for OS paging file, network root and the node entry directory)
 		set_packet(packet_buffer, response_070a, sizeof(response_070a));
 		DLOG1(("Net Server service=%04x (boot_$get_uids)", service));
 		break;
@@ -601,7 +601,7 @@ static int netman_server(const device_t *device,
 		get_dir_data( node_type == 7 ? APOLLO_SAU7_PATH : node_type == 8 ? APOLLO_SAU8_PATH : APOLLO_SAU14_PATH, packet_buffer);
 		DLOG1(("Net Server service=%04x (boot_$mult_ld)", service));
 		break;
-	case 0x12: // boot_$load 	(ex /sau7/self_test, domain_os, ...)
+	case 0x12: // boot_$load    (ex /sau7/self_test, domain_os, ...)
 		strcpy(pathname, node_type == 7 ? APOLLO_SAU7_PATH : node_type == 8 ? APOLLO_SAU8_PATH : APOLLO_SAU14_PATH);
 		strcat(pathname, "/");
 		strcat(pathname, get_file_name(rx_data_buffer + 0x48));
@@ -702,8 +702,8 @@ static int is_ip_arp_request(const UINT8 ethernet_header[], const int data_lengt
 static int is_ip_echo_request(const UINT8 ethernet_header[], const int data_length) {
 	return data_length >= 0x30 && //
 			get_word(ethernet_header + 0x0c) == ETHERNET_PACKET_TYPE_IP && //
-         	get_byte(ethernet_header + 0x22) == ICMP_ECHO && //
-         	is_my_ethernet_address(ethernet_header);
+        	get_byte(ethernet_header + 0x22) == ICMP_ECHO && //
+        	is_my_ethernet_address(ethernet_header);
 }
 
 static UINT16 in_checksum(UINT8 *ptr, UINT32 nbytes)
@@ -734,21 +734,21 @@ static int arp_server(const device_t *device,
 		const UINT8 rx_data[], int rx_data_length,
 		UINT8 tx_data[]) {
 
-//	static UINT8 arp_response[] = {
-//		0x08,0x00,0x1e,0x02,0x61,0x6d, // 0x00: Ethernet address of destination
-//		0x08,0x00,0x1e,0x04,0x20,0xe8, // 0x06: Ethernet address of sender
-//		0x08,0x06,                     // 0x0c: Protocol type
-//		0x00,0x01,                     // 0x0e: Hardware address space
-//		0x80,0x19,                     // 0x10: Protocol address space
-//		0x06,                          // 0x12: byte length of each hardware address
-//		0x04,                          // 0x13: byte length of each protocol address
-//		0x00,0x02,                     // 0x14: opcode (ares_op$REQUEST | ares_op$REPLY)
-//		0x08,0x00,0x1e,0x04,0x20,0xe8, // 0x16: Hardware address of sender of this packet
-//		0x00,0x04,0x20,0xe8,           // 0x1c: Protocol address of sender of this packet
-//		0x08,0x00,0x1e,0x02,0x61,0x6d, // 0x20: Hardware address of target of this packet (if known)
-//		0x00,0x02,0x61,0x6d,           // 0x26: Protocol address of target
-//		...
-//	};
+//  static UINT8 arp_response[] = {
+//      0x08,0x00,0x1e,0x02,0x61,0x6d, // 0x00: Ethernet address of destination
+//      0x08,0x00,0x1e,0x04,0x20,0xe8, // 0x06: Ethernet address of sender
+//      0x08,0x06,                     // 0x0c: Protocol type
+//      0x00,0x01,                     // 0x0e: Hardware address space
+//      0x80,0x19,                     // 0x10: Protocol address space
+//      0x06,                          // 0x12: byte length of each hardware address
+//      0x04,                          // 0x13: byte length of each protocol address
+//      0x00,0x02,                     // 0x14: opcode (ares_op$REQUEST | ares_op$REPLY)
+//      0x08,0x00,0x1e,0x04,0x20,0xe8, // 0x16: Hardware address of sender of this packet
+//      0x00,0x04,0x20,0xe8,           // 0x1c: Protocol address of sender of this packet
+//      0x08,0x00,0x1e,0x02,0x61,0x6d, // 0x20: Hardware address of target of this packet (if known)
+//      0x00,0x02,0x61,0x6d,           // 0x26: Protocol address of target
+//      ...
+//  };
 
 	UINT16 tx_data_length = rx_data_length;
 	memcpy(tx_data, rx_data, tx_data_length);
@@ -830,7 +830,7 @@ static int netserver(const device_t *device,
 		case 1: // Paging socket
 			break;
 		case 2: // File socket
-//			return file_server(device, rx_data, rx_data_length, tx_data);
+//          return file_server(device, rx_data, rx_data_length, tx_data);
 			break;
 		case 3: // NETMAN socket
 			return netman_server(device, rx_data, rx_data_length, tx_data);

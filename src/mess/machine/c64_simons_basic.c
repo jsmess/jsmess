@@ -69,7 +69,7 @@ UINT8 c64_simons_basic_cartridge_device::c64_cd_r(address_space &space, offs_t o
 	{
 		data = m_romh[offset & 0x1fff];
 	}
-	
+
 	return data;
 }
 

@@ -12,7 +12,7 @@ class ncr5390_device : public nscsi_device
 public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void set_cb(line_cb_t irq_cb, line_cb_t drq_cb);
-	
+
 	DECLARE_ADDRESS_MAP(map, 8);
 
 	DECLARE_READ8_MEMBER(tcount_lo_r);

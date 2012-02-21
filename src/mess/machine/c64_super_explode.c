@@ -88,12 +88,12 @@ void c64_super_explode_cartridge_device::device_timer(emu_timer &timer, device_t
 UINT8 c64_super_explode_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		m_exrom = 0;
 		m_exrom_timer->adjust(attotime::from_usec(TIMER_PERIOD), 0);
-		
+
 		data = m_roml[(m_bank << 13) | (offset & 0x1fff)];
 	}
 	else if (!io1)

@@ -36,9 +36,9 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
-	
+
 	static INPUT_CHANGED( reset );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -53,7 +53,7 @@ protected:
 private:
 	required_device<amd_29f040_device> m_flash_roml;
 	required_device<amd_29f040_device> m_flash_romh;
-	
+
 	UINT8 m_bank;
 	UINT8 m_mode;
 };

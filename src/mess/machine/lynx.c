@@ -116,9 +116,9 @@ INLINE void lynx_plot_pixel(lynx_state *state, const int mode, const INT16 x, co
 	colbuf = state->m_blitter.colbuf + y * 80 + x / 2;
 
 	/* a note on timing: The hardware packs the pixel data and updates the screen and collision buffer a byte at a time.
-	Thus the buffer update for two pixels takes 3 memory accesses for a normal sprite (write to screen buffer, read/write to collision buffer).
-	+1 memory access for palette fetch?
-	*/
+    Thus the buffer update for two pixels takes 3 memory accesses for a normal sprite (write to screen buffer, read/write to collision buffer).
+    +1 memory access for palette fetch?
+    */
 
 	switch (mode&0x7)
 	{

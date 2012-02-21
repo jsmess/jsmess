@@ -104,7 +104,7 @@ void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int
 	if(m_tail != m_head && is_transmit_register_empty())
 		transmit_register_setup(unqueue_data());
 }
-	
+
 void microsoft_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)
 {
 	/* split deltas into packets of -128..+127 max */
@@ -154,7 +154,7 @@ void microsoft_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)
    Y7'-Y0' movement in Y direction since sending of Y7-Y0 in signed byte
    format (-128..+127), positive direction up
 
-   The last two bytes in the packet (bytes 4 and 5) contains information 
+   The last two bytes in the packet (bytes 4 and 5) contains information
    about movement data changes which have occurred after data bytes 2 and 3 have been sent. */
 
 void mouse_systems_mouse_device::mouse_trans(int dx, int dy, int nb, int mbc)

@@ -68,9 +68,9 @@ static struct pic8259_interface pic_intf =
 /*
 static INS8250_TRANSMIT( ace1_transmit )
 {
-	s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
+    s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
 
-	wunderbus->m_s100->terminal_transmit_w(data);
+    wunderbus->m_s100->terminal_transmit_w(data);
 }
 */
 //-------------------------------------------------
@@ -79,7 +79,7 @@ static INS8250_TRANSMIT( ace1_transmit )
 
 void s100_wunderbus_device::s100_terminal_w(UINT8 data)
 {
-//	ins8250_receive(m_ace1, data);
+//  ins8250_receive(m_ace1, data);
 }
 
 static ins8250_interface ace1_intf =

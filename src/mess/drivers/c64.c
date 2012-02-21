@@ -3,13 +3,13 @@
     TODO:
 
     - 64C PLA dump
-	- clean up inputs
-	- Multiscreen crashes on boot
-	
-		805A: lda  $01
-		805C: and  #$FE
-		805E: sta  $01
-		8060: m6502_brk#$00 <-- BOOM!
+    - clean up inputs
+    - Multiscreen crashes on boot
+
+        805A: lda  $01
+        805C: and  #$FE
+        805E: sta  $01
+        8060: m6502_brk#$00 <-- BOOM!
 
 */
 
@@ -85,7 +85,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 {
 	int io1 = 1;
 	int io2 = 1;
-	
+
 	UINT8 data = 0;
 
 	if (!casram)
@@ -139,7 +139,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 			case 2: // I/O1
 				io1 = 0;
 				break;
-				
+
 			case 3: // I/O2
 				io2 = 0;
 				break;
@@ -147,7 +147,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 			break;
 		}
 	}
-	
+
 	data |= m_exp->cd_r(space, offset, roml, romh, io1, io2);
 
 	return data;
@@ -180,7 +180,7 @@ WRITE8_MEMBER( c64_state::write )
 	int casram, basic, kernal, charom, grw, io, roml, romh;
 
 	bankswitch(offset, 0, 0, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
-		
+
 	if (!casram)
 	{
 		m_ram->pointer()[offset] = data;
@@ -223,7 +223,7 @@ WRITE8_MEMBER( c64_state::write )
 			break;
 		}
 	}
-	
+
 	m_exp->cd_w(space, offset, data, roml, romh, io1, io2);
 }
 

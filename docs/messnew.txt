@@ -1,16 +1,105 @@
-﻿0.145
+﻿0.145u1
 
 New System Drivers Supported:
 -----------------------------
-Apollo DN3000 15" Monochrome [Hans Ostermeyer]
-Apollo DN3000 19" Monochrome [Hans Ostermeyer]
-Apollo DSP3000 Server [Hans Ostermeyer]
-Apollo DN3500 15" Monochrome [Hans Ostermeyer]
-Apollo DN3500 19" Monochrome [Hans Ostermeyer]
-Apollo DSP3500 Server [Hans Ostermeyer]
-Apollo DN5500 15" Monochrome [Hans Ostermeyer]
-Apollo DN5500 19" Monochrome [Hans Ostermeyer]
-Apollo DSP5500 Server [Hans Ostermeyer]
+- Apollo DN3000 15" Monochrome [Hans Ostermeyer]
+- Apollo DN3000 19" Monochrome [Hans Ostermeyer]
+- Apollo DSP3000 Server [Hans Ostermeyer]
+- Apollo DN3500 15" Monochrome [Hans Ostermeyer]
+- Apollo DN3500 19" Monochrome [Hans Ostermeyer]
+- Apollo DSP3500 Server [Hans Ostermeyer]
+- Apollo DN5500 15" Monochrome [Hans Ostermeyer]
+- Apollo DN5500 19" Monochrome [Hans Ostermeyer]
+- Apollo DSP5500 Server [Hans Ostermeyer]
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Sanyo SX-16 [minataku]
+
+System Driver Changes:
+----------------------
+-c64: Added support for the following cartridge types:  [Curt Coder]
+  COMAL 80, Dinamic, Fun Play, GeoRAM, Magic Desk, Mikro Assembler, Ocean,
+  Rex, System 3, Westermann, Zaxxon, Super Games, Epyx Fast Load,
+  Dela EP7x8, Dela EP256, Dela EP64, Rex EP256, Ross, Structured Basic,
+  EasyFlash, StarDOS, Warp Speed, ExOS, MACH5, Magic Formel.
+ - Added support for the Commodore IEEE-488 cartridge. You can now connect any 
+   IEEE-488 disk drive to C64 and even another cartridge using the passthru. 
+   (e.g. mess c64p -exp ieee488 -exp:ieee488:ieee9 sfd1001 -cart2 congo)
+ - Added support for .CRT cartridge image files. Only standard cartridges 
+  (8/16KB) are supported for the moment, soon all will be assimilated.
+
+-lynx: removed game_not_working and game_imperfect_sound flags  [Huygens]
+ fixed sprite scaling bug (fixed blue lightning).
+ Implemented mikey sleep register (viking child, dinolympics timing corrected)
+ Fixed timer value reading bug (used for pseudo random number generation in blockout)
+ Update of layout screen measures approximately 72x46mm (not 4:3) 
+
+-next: Normalize the delegates, split the different NeXT variants [O. Galibert]
+ - Handle command-~
+ - Make the floppy work
+-n64: Multithreaded RDP. Speedups of 1.6x to 2.8x have been observed. [Ryan Holtz]
+  - Modified VI_V_INTR_REG and VI_V_CURRENT_LINE_REG actually be treated as half-lines, 
+    not full lines. Fixes Rampage: World Tour video.
+  - Modified code to interrupt at the line specified by VI_V_INTR_REG, rather than a
+    fixed 60Hz vblank interrupt.
+  - Doubled the number of available span structs on the stack, fixes crashing in
+    Mario Kart 64, Star Fox 64, and probably others.
+  - Partially fix PIF access, several more games recognize cart SRAM, cart FlashROM, 
+    cart EEPROM, and controller paks
+  - Fixed missing text in Super Mario 64 and other games.
+  - Added skeleton 64DD driver. Boots the 64DD IPL, but does not emulate the hardware yet.
+     - User Note: You will need an unmodified 64DD IPL dump. NOT one that has had the 
+	   first 4K replaced with a CIC-6102 or other game's boot block.
+  - Tweaked MI interrupt handling to guard against interrupts getting "lost"
+  - Hook up 64DD RTC and interrupts. Please insert disc.
+  - Warm reset support.
+  - Get Jet Force Gemini to boot and Ocarina of Time to boot without crashing.
+    - Use bitmap.fill instead of a manual fill when blanking to avoid trashing memory.
+    - Return DP start/end/current/status/clock registers at correct window for RSP to see.
+    - Clear DP clock when requested by writing the right bit in DP_STATUS_REG.
+    - Avoid modifying SP DMA length register during DMA, to return correct reads
+   	  on SP_RD_LEN and SP_WR_LEN.
+  - Fix Super Smash Bros. booting.
+     - Don't try to call render_triangle_custom if a DrawTriangle command generated no spans.
+  - Include the delay slot when checksumming single-instruction blocks in the MIPS3 and RSP DRCs.
+    Fixes Sim City 2000 (Japan).
+  - Various PIF fixes, gets Command & Conquer to boot and games to recognize and save to controller paks.
+  - Added a trivial Y reject to N64 triangle draw commands. Fixes crashes in both Castlevania games, 
+    Virtual Pool, and maybe others.
+-ti99: The Grand TI-99 Family Rewrite, using class structures and modern address maps [Michael Zapf]
+-wswan: converted rotation to core method used by lynx [Huygens]
+ controls are rotated with the console for vertical games
+ buffered sprite table data (fixes pbobble etc.)
+ corrected voice audio mode (voice volume is unsigned not signed)
+-vic20: Cleaned up cartridge interface, and added preliminary .CRT image support. [Curt Coder]
+-next: Add information and correct some about the various next roms [Lord Nightmare]
+-a7800: Added reasonable return values for the TIA collision registers [Dan Boris]
+-hec2hp: Fixed regressions [JJ Stacino]
+
+Software Lists:
+----------------
+-mbc55x.xml: added software list for the Sanyo MBC-550 and MBC-555 systems [Kaylee]
+
+Source Changes:
+----------------
+- ISA Gravis Ultrasound device [Barry Rodewald]
+- Work on et4000 16bbp and 24bbp video modes [Carl]
+- Made generic serial port and RS232 port as slot devices, implemented pc mouse as example device [Carl]
+- 68040 CPU: FSAVE fix, Add correct idle frames, Show the correct virtual map  [O. Galibert]
+- Added basic wrapper for Diamond Multimedia (Cirrus Logic based) ISA SVGA [Kaylee]
+- Added null_modem and serial_terminal as slot devices [Carl]
+- i386: Fix cmpsb (dir /s and edit works now) [Carl]
+
+0.145
+
+New System Drivers Supported:
+-----------------------------
+(none)
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------

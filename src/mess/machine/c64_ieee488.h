@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -63,7 +63,7 @@ private:
 	required_device<device_t> m_tpi;
 	required_device<ieee488_device> m_bus;
 	required_device<c64_expansion_slot_device> m_exp;
-	
+
 	int m_roml_sel;
 };
 

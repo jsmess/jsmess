@@ -23,7 +23,7 @@
 
 
 // slot names for the C64 cartridge types
-const char *CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] = 
+const char *CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 {
 	"standard",
 	UNSUPPORTED,
@@ -283,16 +283,16 @@ bool c64_expansion_slot_device::call_load()
 				// read the header
 				cbm_crt_header header;
 				fread(&header, CRT_HEADER_LENGTH);
-				
+
 				if (memcmp(header.signature, CRT_SIGNATURE, 16) != 0)
 					return IMAGE_INIT_FAIL;
-				
+
 				UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
-				
+
 				// TODO support other cartridge hardware
 				if (hardware != CRT_C64_STANDARD)
 					return IMAGE_INIT_FAIL;
-				
+
 				if (LOG)
 				{
 					logerror("Name: %s\n", header.name);
@@ -301,27 +301,27 @@ bool c64_expansion_slot_device::call_load()
 					logerror("EXROM: %u\n", header.exrom);
 					logerror("GAME: %u\n", header.game);
 				}
-			
+
 				// determine ROM region lengths
 				size_t roml_size = 0;
 				size_t romh_size = 0;
-				
+
 				while (!image_feof())
 				{
 					cbm_crt_chip chip;
 					fread(&chip, CRT_CHIP_LENGTH);
-					
+
 					UINT16 address = pick_integer_be(chip.start_address, 0, 2);
 					UINT16 size = pick_integer_be(chip.image_size, 0, 2);
 					UINT16 type = pick_integer_be(chip.chip_type, 0, 2);
-					
+
 					if (LOG)
 					{
 						logerror("CHIP Address: %04x\n", address);
 						logerror("CHIP Size: %04x\n", size);
 						logerror("CHIP Type: %04x\n", type);
 					}
-					
+
 					switch (address)
 					{
 					case 0x8000: roml_size += size; break;
@@ -329,28 +329,28 @@ bool c64_expansion_slot_device::call_load()
 					case 0xe000: romh_size += size; break;
 					default: logerror("Invalid CHIP loading address!\n"); break;
 					}
-					
+
 					fseek(size, SEEK_CUR);
 				}
 
 				// allocate cartridge memory
 				UINT8 *roml = NULL;
 				UINT8 *romh = NULL;
-				
+
 				if (roml_size) roml = m_cart->c64_roml_pointer(machine(), roml_size);
 				if (romh_size) romh = m_cart->c64_romh_pointer(machine(), romh_size);
-				
+
 				// read the data
 				offs_t roml_offset = 0;
 				offs_t romh_offset = 0;
-				
+
 				fseek(CRT_HEADER_LENGTH, SEEK_SET);
-				
+
 				while (!image_feof())
 				{
 					cbm_crt_chip chip;
 					fread(&chip, CRT_CHIP_LENGTH);
-					
+
 					UINT16 address = pick_integer_be(chip.start_address, 0, 2);
 					UINT16 size = pick_integer_be(chip.image_size, 0, 2);
 
@@ -361,7 +361,7 @@ bool c64_expansion_slot_device::call_load()
 					case 0xe000: fread(romh + romh_offset, size); romh_offset += size; break;
 					}
 				}
-				
+
 				m_cart->c64_exrom_w(header.exrom);
 				m_cart->c64_game_w(header.game);
 			}
@@ -370,7 +370,7 @@ bool c64_expansion_slot_device::call_load()
 		{
 			size = get_software_region_length("roml");
 			if (size) memcpy(m_cart->c64_roml_pointer(machine(), size), get_software_region("roml"), size);
-			
+
 			size = get_software_region_length("romh");
 			if (size) memcpy(m_cart->c64_romh_pointer(machine(), size), get_software_region("romh"), size);
 
@@ -409,7 +409,7 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 
 
 //-------------------------------------------------
-//  cd_r - 
+//  cd_r -
 //-------------------------------------------------
 
 UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
@@ -426,7 +426,7 @@ UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int r
 
 
 //-------------------------------------------------
-//  cd_w - 
+//  cd_w -
 //-------------------------------------------------
 
 void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)

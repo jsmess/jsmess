@@ -29,8 +29,8 @@
                 => Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
         20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
         11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
-		19/02/2012 : few adjustment for the hrp and hr machine - JJStacino
-		
+        19/02/2012 : few adjustment for the hrp and hr machine - JJStacino
+
     don't forget to keep some information about these machines, see DChector project : http://dchector.free.fr/ made by DanielCoulom
         (and thank's to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
 
@@ -72,7 +72,7 @@ hec2mx40
 /* Helper function*/
 static int isHectorWithDisc2(running_machine &machine)
 {
-return ((strncmp(machine.system().name , "hec2hrx" 	, 7)==0) ||
+return ((strncmp(machine.system().name , "hec2hrx"	, 7)==0) ||
 		(strncmp(machine.system().name , "hec2mx40"	, 8)==0) ||
 		(strncmp(machine.system().name , "hec2mx80"	, 8)==0));
 }
@@ -385,7 +385,7 @@ WRITE8_HANDLER( hector_color_a_w )
 		/* Bit 6 => motor ON/OFF => for cassette state!*/
 		if (state->m_write_cassette==0)
 		{
-			 	cassette_device_image(space->machine())->change_state(
+				cassette_device_image(space->machine())->change_state(
 						CASSETTE_MOTOR_ENABLED ,
 						CASSETTE_MASK_MOTOR);
 			// cassette_device_image(space->machine())->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED ));
@@ -408,7 +408,7 @@ WRITE8_HANDLER( hector_color_a_w )
 			state->m_counter_write = 6;
 			if (state->m_write_cassette==0)
 			{	/* C'est la 1er fois => record*/
-						 	cassette_device_image(space->machine())->change_state(
+							cassette_device_image(space->machine())->change_state(
 						CASSETTE_MOTOR_ENABLED ,
 						CASSETTE_MASK_MOTOR);
 				cassette_device_image(space->machine())->set_state(CASSETTE_RECORD);

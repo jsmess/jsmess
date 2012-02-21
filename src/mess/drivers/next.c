@@ -4,23 +4,23 @@
 
     TODO:
 
-	- Find out why the pager doesn't work on the mach_init loading
-	  task (yes, that's the big one)
+    - Find out why the pager doesn't work on the mach_init loading
+      task (yes, that's the big one)
 
-	- Hook up the mouse (not before the system boots though, see the first problem)
+    - Hook up the mouse (not before the system boots though, see the first problem)
 
-	- Fix the kernel bitching at boot (non-volatile memory readback error)
+    - Fix the kernel bitching at boot (non-volatile memory readback error)
 
-	- Hook up the sound output, it seems to be shared with the keyboard port somehow
+    - Hook up the sound output, it seems to be shared with the keyboard port somehow
 
-	- Implement more of the scc and its dma interactions so that the
-	  start up test passes, but not before sound out is done (if the scc
-	  test passes all the other test pass up to sound out which
-	  infloops)
+    - Implement more of the scc and its dma interactions so that the
+      start up test passes, but not before sound out is done (if the scc
+      test passes all the other test pass up to sound out which
+      infloops)
 
-	- Really implement the MO, it's only faking it for the startup test right now
+    - Really implement the MO, it's only faking it for the startup test right now
 
-	- Find out why netbsd goes to hell even before loading the kernel
+    - Find out why netbsd goes to hell even before loading the kernel
 
     Memory map and other bits can be found here:
     http://fxr.watson.org/fxr/source/arch/next68k/include/cpu.h?v=NETBSD5#L366
@@ -164,17 +164,17 @@ READ32_MEMBER( next_state::scr1_r )
         ---- ---- ---- ---- ---- ---- ---x x--- mem speed
         ---- ---- ---- ---- ---- ---- ---- -xxx cpu speed 16/20/25/33/40/50/66/80
 
-	machine types:
-	0 NeXT_CUBE
-	1 NeXT_WARP9
-	2 NeXT_X15
-	3 NeXT_WARP9C
-	4 NeXT_Turbo
-	5 NeXT_TurboC
-	6 Unknown
-	7 Unknown
-	8 NeXT_TurboCube
-	9 NeXT_TurboCubeC
+    machine types:
+    0 NeXT_CUBE
+    1 NeXT_WARP9
+    2 NeXT_X15
+    3 NeXT_WARP9C
+    4 NeXT_Turbo
+    5 NeXT_TurboC
+    6 Unknown
+    7 Unknown
+    8 NeXT_TurboCube
+    9 NeXT_TurboCubeC
 
         68040-25: 00011102
         68040-25: 00013002 (non-turbo, color)
@@ -623,7 +623,7 @@ READ32_MEMBER( next_state::fdc_control_r )
 	// The rom strangely can't boot on anything else than ED, it has
 	// code for the other densities but forces ED for some mysterious
 	// reason.  The kernel otoh behaves as expected.
-	
+
 	if(fdc) {
 		floppy_image_device *fdev = machine().device<floppy_connector>(":fd0")->get_device();
 		if(fdev->exists()) {
@@ -1131,7 +1131,7 @@ static DRIVER_INIT(nextctc)
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME               		FLAGS */
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME                      FLAGS */
 COMP( 1987, next,    0,      0,       next,      next,    next,    "Next Software Inc",   "NeXT Cube",					GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1990, nexts,   0,      0,       nexts,     next,    nexts,   "Next Software Inc",   "NeXTstation",				GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1990, nexts2,  nexts,  0,       nexts2,    next,    nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",	GAME_NOT_WORKING | GAME_NO_SOUND)
@@ -1143,16 +1143,16 @@ COMP( ????, nextctc, nextst, 0,       nextctc,   next,    nextctc, "Next Softwar
 
 		/*
 
-	UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
-	rom[0x3f48/4] = 0x2f017000; // memory test funcall
-	rom[0x3f4c/4] = 0x4e712400;
-	rom[0x00b8/4] = 0x001a4e71; // rom checksum
-	rom[0x00bc/4] = 0x4e714e71;
+    UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
+    rom[0x3f48/4] = 0x2f017000; // memory test funcall
+    rom[0x3f4c/4] = 0x4e712400;
+    rom[0x00b8/4] = 0x001a4e71; // rom checksum
+    rom[0x00bc/4] = 0x4e714e71;
 
 v74
-	UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
-	rom[0x329c/4] = 0x70004e71; // memory test funcall
-	rom[0x32a0/4] = 0x4e712400;
-	rom[0x03f8/4] = 0x001a4e71; // rom checksum
-	rom[0x03fc/4] = 0x4e714e71;
-		*/
+    UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
+    rom[0x329c/4] = 0x70004e71; // memory test funcall
+    rom[0x32a0/4] = 0x4e712400;
+    rom[0x03f8/4] = 0x001a4e71; // rom checksum
+    rom[0x03fc/4] = 0x4e714e71;
+        */

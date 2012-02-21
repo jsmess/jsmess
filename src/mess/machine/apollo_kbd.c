@@ -404,7 +404,7 @@ void apollo_kbd_device::tx_fifo::flush()
 	else
 	{
 		m_tx_pending = 0;
-//		m_timer->adjust(attotime::never, 0);
+//      m_timer->adjust(attotime::never, 0);
 	}
 }
 
@@ -890,8 +890,8 @@ UINT16 apollo_kbd_device::m_code_table[] = {
         /* C9      I           */ 0x34, 0xB4, 0x69,     0x49,   0x09,   0x49,     NOP,     No,
         /* C10     O           */ 0x35, 0xB5, 0x6F,     0x4F,   0x0F,   0x4F,     NOP,     No,
         /* C11     P           */ 0x36, 0xB6, 0x70,     0x50,   0x10,   0x50,     NOP,     No,
-        /* C12     { [ / Ü     */ 0x37, 0xB7, 0x7B,     0x5B,   0x1B,   0x7B,     NOP,     No,
-        /* C13     } ] / Ö     */ 0x38, 0xB8, 0x7D,     0x5D,   0x1D,   0x7D,     NOP,     No,
+        /* C12     { [ / ?     */ 0x37, 0xB7, 0x7B,     0x5B,   0x1B,   0x7B,     NOP,     No,
+        /* C13     } ] / ?     */ 0x38, 0xB8, 0x7D,     0x5D,   0x1D,   0x7D,     NOP,     No,
         /* D13     RETURN      */ 0x52, 0xD2, 0xCB,     0xDB,   NOP,    0xCB,     NOP,     No,
 
         /* D2      A           */ 0x46, 0xC6, 0x61,     0x41,   0x01,   0x41,     NOP,     No,
@@ -904,7 +904,7 @@ UINT16 apollo_kbd_device::m_code_table[] = {
         /* D9      K           */ 0x4D, 0xCD, 0x6B,     0x4B,   0x0B,   0x4B,     NOP,     No,
         /* D10     L           */ 0x4E, 0xCE, 0x6C,     0x4C,   0x0C,   0x4C,     NOP,     No,
         /* D11     : ;         */ 0x4F, 0xCF, 0x3B,     0x3A,   0xFB,   0x3B,     NOP,     No,
-        /* D12     " ' / Ä     */ 0x50, 0xD0, 0x27,     0x22,   0xF8,   0x27,     NOP,     No,
+        /* D12     " ' / ?     */ 0x50, 0xD0, 0x27,     0x22,   0xF8,   0x27,     NOP,     No,
         /* D14     ! \         */ 0x53, 0xD3, 0xC8,     0xC9,   NOP,    0xC8,     NOP,     No,
 
         /* E2      Z           */ 0x60, 0xE0, 0x7A,     0x5A,   0x1A,   0x5A,     NOP,     No,
@@ -1114,7 +1114,7 @@ INPUT_PORTS_START( apollo_kbd )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Up")  PORT_CODE(KEYCODE_UP) /* Up */
 	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Right")  PORT_CODE(KEYCODE_RIGHT) /* Right */
 	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Down")  PORT_CODE(KEYCODE_DOWN) /* Down */
-//	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Numpad CLR")  PORT_CODE(KEYCODE_NUMLOCK) /* CLR */
+//  PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Numpad CLR")  PORT_CODE(KEYCODE_NUMLOCK) /* CLR */
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("MENU")  PORT_CODE(KEYCODE_MENU) /* Menu = POP */
 
 	PORT_START( "keyboard3" )
@@ -1150,7 +1150,7 @@ INPUT_PORTS_START( apollo_kbd )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F11") PORT_CODE(KEYCODE_F11) /* F11 */
 	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12 */
 	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Insert") PORT_CODE(KEYCODE_INSERT) /* Insert */
-//	PORT_BIT( 0x80000000, 0x0000, IPT_UNUSED )
+//  PORT_BIT( 0x80000000, 0x0000, IPT_UNUSED )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("WIN_R")  PORT_CODE(KEYCODE_RWIN) /* Windows Right = Next Window */
 
 	PORT_START( "keyboard4" )

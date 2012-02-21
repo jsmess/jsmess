@@ -45,9 +45,9 @@ READ8_MEMBER( gf1_device::adlib_r )
 	switch(offset)
 	{
 		case 0:
-//			if(m_timer_ctrl & 0x01)
+//          if(m_timer_ctrl & 0x01)
 				return m_adlib_status;
-//			return m_fake_adlib_status;
+//          return m_fake_adlib_status;
 		case 1:
 			return m_adlib_data;
 	}
@@ -256,7 +256,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					if(!(m_voice[x].voice_ctrl & 0x08))
 					{
 						m_voice[x].voice_ctrl |= 0x01;
-//							m_voice[x].current_addr = m_voice[x].end_addr;
+//                          m_voice[x].current_addr = m_voice[x].end_addr;
 					}
 					else
 					{
@@ -284,7 +284,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					if(!(m_voice[x].voice_ctrl & 0x08))
 					{
 						m_voice[x].voice_ctrl |= 0x01;
-//							m_voice[x].current_addr = m_voice[x].start_addr;
+//                          m_voice[x].current_addr = m_voice[x].start_addr;
 					}
 					else
 					{
@@ -1230,7 +1230,7 @@ static MACHINE_CONFIG_FRAGMENT( gus_config )
 	MCFG_SOUND_CONFIG(gus_gf1_config)
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
 	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
-//	MCFG_ACIA6850_ADD("midi",gus_midi_interface)
+//  MCFG_ACIA6850_ADD("midi",gus_midi_interface)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( gus_joy )
@@ -1297,15 +1297,15 @@ READ8_MEMBER(isa16_gus_device::board_r)
 	case 0x01:
 		return m_gf1->mix_ctrl_r(space,offset);
 		/* port 0x2X6 - IRQ status (active high)
-		 * bit 0 - MIDI transmit IRQ
-		 * bit 1 - MIDI receive IRQ
-		 * bit 2 - Timer 1 IRQ
-		 * bit 3 - Timer 2 IRQ
-		 * bit 4 - reserved (always 0)
-		 * bit 5 - wavetable IRQ
-		 * bit 6 - volume ramp IRQ
-		 * bit 7 - DRAM TC DMA IRQ
-		 */
+         * bit 0 - MIDI transmit IRQ
+         * bit 1 - MIDI receive IRQ
+         * bit 2 - Timer 1 IRQ
+         * bit 3 - Timer 2 IRQ
+         * bit 4 - reserved (always 0)
+         * bit 5 - wavetable IRQ
+         * bit 6 - volume ramp IRQ
+         * bit 7 - DRAM TC DMA IRQ
+         */
 	case 0x06:
 		return m_irq_status;
 	case 0x08:
@@ -1362,10 +1362,10 @@ READ8_MEMBER(isa16_gus_device::synth_r)
 {
 	switch(offset)
 	{
-//	case 0x00:
-//		return m_midi->status_read(space,0);
-//	case 0x01:
-//		return m_midi->data_read(space,0);
+//  case 0x00:
+//      return m_midi->status_read(space,0);
+//  case 0x01:
+//      return m_midi->data_read(space,0);
 	case 0x02:
 	case 0x03:
 		return m_gf1->global_reg_select_r(space,offset-2);
@@ -1387,10 +1387,10 @@ WRITE8_MEMBER(isa16_gus_device::synth_w)
 	switch(offset)
 	{
 	case 0x00:
-//		m_midi->control_write(space,0,data);
+//      m_midi->control_write(space,0,data);
 		break;
 	case 0x01:
-//		m_midi->data_write(space,0,data);
+//      m_midi->data_write(space,0,data);
 		break;
 	case 0x02:
 	case 0x03:

@@ -9,23 +9,23 @@
 
 /*
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	|===================|
-	|=|             SW1 |
-	|=|                 |
-	|=|             SW2 |
-	|=|                 |
-	|=|                 |
-	|=|    ROM          |
-	|=|            LS109|
-	|=|                 |
-	|===================|
+    |===================|
+    |=|             SW1 |
+    |=|                 |
+    |=|             SW2 |
+    |=|                 |
+    |=|                 |
+    |=|    ROM          |
+    |=|            LS109|
+    |=|                 |
+    |===================|
 
-	ROM     - "DEI-356NR-WRPIIDA1 (C) NCR A8847 609-2415038 F833071" 16Kx8 ROM
-	SW1     - mode switch (C64/C128)
-	SW2     - reset button
+    ROM     - "DEI-356NR-WRPIIDA1 (C) NCR A8847 609-2415038 F833071" 16Kx8 ROM
+    SW1     - mode switch (C64/C128)
+    SW2     - reset button
 
 */
 
@@ -36,14 +36,14 @@
 //**************************************************************************
 //  MACROS/CONSTANTS
 //**************************************************************************
-	
+
 #define UNSCRAMBLE_ADDRESS(_offset) \
 	BITSWAP16(_offset,15,14,12,13,5,2,7,9,11,10,8,6,4,3,1,0)
 
 #define UNSCRAMBLE_DATA(_data) \
 	BITSWAP8(_data,7,6,5,0,1,4,2,3)
-	
-	
+
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -125,7 +125,7 @@ void c64_warp_speed_cartridge_device::device_reset()
 UINT8 c64_warp_speed_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml || !romh || !io1 || !io2)
 	{
 		offs_t addr = UNSCRAMBLE_ADDRESS(offset & 0x3fff);

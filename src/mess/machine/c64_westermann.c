@@ -60,7 +60,7 @@ void c64_westermann_cartridge_device::device_reset()
 UINT8 c64_westermann_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml || !romh)
 	{
 		data = m_roml[offset & 0x3fff];

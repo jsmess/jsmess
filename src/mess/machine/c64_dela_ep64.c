@@ -84,7 +84,7 @@ c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_con
 void c64_dela_ep64_cartridge_device::device_start()
 {
 	m_rom = subregion("rom")->base();
-	
+
 	// state saving
 	save_item(NAME(m_bank));
 	save_item(NAME(m_reset));
@@ -113,7 +113,7 @@ void c64_dela_ep64_cartridge_device::device_reset()
 UINT8 c64_dela_ep64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		if (m_reset)
@@ -123,7 +123,7 @@ UINT8 c64_dela_ep64_cartridge_device::c64_cd_r(address_space &space, offs_t offs
 		else
 		{
 			offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-			
+
 			if (!m_rom0_ce) data |= m_roml[offset & 0x1fff];
 			if (!m_rom1_ce) data |= m_rom[0x0000 + addr];
 			if (!m_rom2_ce) data |= m_rom[0x8000 + addr];
@@ -143,28 +143,28 @@ void c64_dela_ep64_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 	if (!io1)
 	{
 		/*
-		
-			bit		description
-			
-			0		IC6 _CE
-			1		IC5 _CE
-			2		
-			3		IC4 _CE
-			4		A13
-			5		A14
-			6		
-			7		EXROM
-		
-		*/
-		
+
+            bit     description
+
+            0       IC6 _CE
+            1       IC5 _CE
+            2
+            3       IC4 _CE
+            4       A13
+            5       A14
+            6
+            7       EXROM
+
+        */
+
 		m_reset = 0;
-		
+
 		m_rom0_ce = BIT(data, 3);
 		m_rom1_ce = BIT(data, 1);
 		m_rom2_ce = BIT(data, 0);
 
 		m_bank = (data >> 4) & 0x03;
-		
+
 		m_exrom = BIT(data, 7);
 	}
 }

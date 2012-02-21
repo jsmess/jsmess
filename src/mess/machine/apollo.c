@@ -253,12 +253,12 @@ WRITE16_HANDLER( apollo_csr_control_register_w )
 	else if ((data & APOLLO_CSR_CR_FPU_TRAP_ENABLE) == 0)
 	{
 		// enable FPU (i.e. FPU opcodes in CPU)
-//		apollo_set_cpu_has_fpu(&space->device(), 1);
+//      apollo_set_cpu_has_fpu(&space->device(), 1);
 	}
 	else
 	{
 		// disable FPU (i.e. FPU opcodes in CPU)
-//		apollo_set_cpu_has_fpu(&space->device(), 0);
+//      apollo_set_cpu_has_fpu(&space->device(), 0);
 
 		if (!apollo_is_dn3000())
 		{
@@ -497,7 +497,7 @@ static WRITE8_DEVICE_HANDLER( apollo_dma8237_ctape_dack_w ) {
 
 static READ8_DEVICE_HANDLER( apollo_dma8237_fdc_dack_r ) {
 	UINT8 data = pc_fdc_dack_r(device->machine());
-	//	DLOG2(("dma fdc dack read %02x",data));
+	//  DLOG2(("dma fdc dack read %02x",data));
 
 	// hack for DN3000: select appropriate DMA channel No.
 	dn3000_dma_channel1 = 2; // 1 = ctape, 2 = floppy dma channel
@@ -522,7 +522,7 @@ static READ8_DEVICE_HANDLER( apollo_dma8237_wdc_dack_r ) {
 
 static WRITE8_DEVICE_HANDLER( apollo_dma8237_wdc_dack_w ) {
 	DLOG1(("dma wdc dack write %02x (not used, not emulated!)", data));
-//	omti8621_dack_w(device->machine, data);
+//  omti8621_dack_w(device->machine, data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apollo_dma8237_out_eop ) {
@@ -734,15 +734,15 @@ static TIMER_CALLBACK(apollo_ptm_timer_callback)
 static WRITE_LINE_DEVICE_HANDLER( apollo_ptm_irq_function ) {
 	DLOG1(("apollo_ptm_irq_function: state=%d", state ));
 
-//	ptm6840_device *ptm = device->machine().device<ptm6840_device>(APOLLO_PTM_TAG);
+//  ptm6840_device *ptm = device->machine().device<ptm6840_device>(APOLLO_PTM_TAG);
 
 	apollo_pic_set_irq_line(device, APOLLO_IRQ_PTM, state);
 }
 
-//	Timer 1's input is a 250-kHz (4-microsecond period) signal.
-//	Timer 2's input is a 125-kHz (8-microsecond period) signal.
-//	Timer 3's input is a 62.5-kHz (16-microsecond period) signal.
-//	The Timer 3 input may be prescaled to make the effective input signal have a 128-microsecond period.
+//  Timer 1's input is a 250-kHz (4-microsecond period) signal.
+//  Timer 2's input is a 125-kHz (8-microsecond period) signal.
+//  Timer 3's input is a 62.5-kHz (16-microsecond period) signal.
+//  The Timer 3 input may be prescaled to make the effective input signal have a 128-microsecond period.
 
 static const ptm6840_interface apollo_ptm_config = {
 		0,
@@ -1095,7 +1095,7 @@ static TIMER_CALLBACK(kbd_timer_callback)
 #endif
 
 	// The counter/timer on the SIO chip is used for the refresh count.
-	// This is set up in the timer mode to	produce a square wave output on output OP3.
+	// This is set up in the timer mode to  produce a square wave output on output OP3.
 	// The period of the output is 15 microseconds.
 
 	// toggle memory refresh counter
@@ -1305,8 +1305,8 @@ static DEVICE_START( apollo_fdc ) {
 
 	// hack to make upd765.c work again for apollo with MESS version >= 0.142u6
 	// 2011-07-23 Hans Ostermyer
-//	extern void upd765_hack_for_apollo();
-//	upd765_hack_for_apollo();
+//  extern void upd765_hack_for_apollo();
+//  upd765_hack_for_apollo();
 }
 
 WRITE8_HANDLER(apollo_fdc_w ) {
@@ -1371,8 +1371,8 @@ static THREECOM3C505_INTERFACE(apollo_3c505_config) = {
  ***************************************************************************/
 
 static void apollo_wdc_set_irq(const running_machine *machine, int state) {
-//	FIXME:
-//	MLOG2(("apollo_wdc_set_irq: state=%x", state ));
+//  FIXME:
+//  MLOG2(("apollo_wdc_set_irq: state=%x", state ));
 	apollo_pic_set_irq_line(machine->firstcpu, APOLLO_IRQ_WIN1, state);
 }
 

@@ -120,7 +120,7 @@ MACHINE_START( pc1401 )
 	UINT8 *ram = machine.region("maincpu")->base() + 0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
-	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);	
+	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
 	machine.device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
 }
 

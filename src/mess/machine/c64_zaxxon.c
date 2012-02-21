@@ -52,11 +52,11 @@ void c64_zaxxon_cartridge_device::device_start()
 UINT8 c64_zaxxon_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		data = m_roml[offset & 0xfff];
-		
+
 		m_bank = BIT(offset, 12);
 	}
 	else if (!romh)

@@ -145,9 +145,9 @@ static void set_cr1(device_t *device, screen_data_t *screen_data,
 	UINT8 diffs = screen_data->cr1 ^ data;
 	screen_data->cr1 = data;
 
-//	if (screen_data->cr1 & CR1_SYNC_EN) {
-//		// normal mode
-//	} else
+//  if (screen_data->cr1 & CR1_SYNC_EN) {
+//      // normal mode
+//  } else
 
 	if ((screen_data->cr1 & CR1_RESET) == 0) {
 		if (diffs & CR1_RESET) {
@@ -272,7 +272,7 @@ static void set_cr1(device_t *device, screen_data_t *screen_data,
 
 			if ((screen_data->cr1 & CR1_DISP_EN) == 0) {
 				screen_data->status_register &= ~SR_V_DATA;
-			}else 			{
+			}else			{
 				UINT16 pixel = screen_data->image_memory[screen_data->data_clock / 16]
 								& (0x8000 >> (screen_data->data_clock % 16));
 				pixel = (pixel ? 1 : 0)	^ ((screen_data->cr1 & CR1_INV) ? 0 : 1);
@@ -734,7 +734,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_mono19i )
 		MCFG_DEFAULT_LAYOUT( layout_apollo )
 		MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 		MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-//		MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+//      MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 		MCFG_PALETTE_LENGTH(2)
 		MCFG_PALETTE_INIT(black_and_white)
 		// dot clock, htotal, hstart, hend, vtotal, vstart, vend
@@ -751,7 +751,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_mono15i )
 		MCFG_DEFAULT_LAYOUT( layout_apollo_15i )
 		MCFG_SCREEN_ADD(VIDEO_SCREEN_TAG, RASTER)
 		MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-//		MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+//      MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 		MCFG_PALETTE_LENGTH(2)
 		MCFG_PALETTE_INIT(black_and_white)
 		// dot clock, htotal, hstart, hend, vtotal, vstart, vend
@@ -778,7 +778,7 @@ static DEVICE_START( apollo_mono ) {
 	/* allocate the memory image */
 	screen_data->image_memory_size = screen_data->buffer_height
 			* screen_data->buffer_width / 16;
-//	screen_data->image_memory = (UINT16 *) malloc(screen_data->image_memory_size * 2);
+//  screen_data->image_memory = (UINT16 *) malloc(screen_data->image_memory_size * 2);
 	screen_data->image_memory = auto_alloc_array(device->machine(), UINT16, screen_data->image_memory_size);
 	assert(screen_data->image_memory != NULL);
 

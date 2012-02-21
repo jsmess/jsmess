@@ -64,7 +64,7 @@ ioport_constructor c64_stardos_cartridge_device::device_input_ports() const
 inline void c64_stardos_cartridge_device::charge_io1_capacitor()
 {
 	m_io1_charge++;
-	
+
 	if (m_io1_charge >= IO1_FULL_CHARGE)
 	{
 		m_exrom = 0;
@@ -80,7 +80,7 @@ inline void c64_stardos_cartridge_device::charge_io1_capacitor()
 void c64_stardos_cartridge_device::charge_io2_capacitor()
 {
 	m_io2_charge++;
-	
+
 	if (m_io2_charge >= IO2_FULL_CHARGE)
 	{
 		m_exrom = 1;
@@ -126,7 +126,7 @@ void c64_stardos_cartridge_device::device_start()
 UINT8 c64_stardos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml || !romh)
 	{
 		// TODO BITSWAP8(7,6,5,4,3,1,2,0) ?

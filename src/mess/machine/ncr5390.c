@@ -200,7 +200,7 @@ void ncr5390_device::step(bool timeout)
 		state &= STATE_MASK;
 		step(true);
 		break;
-	
+
 	case ARB_TIMEOUT_BUSY << SUB_SHIFT:
 		if(timeout) {
 			scsi_bus->data_w(scsi_refid, 0);
@@ -333,7 +333,7 @@ void ncr5390_device::step(bool timeout)
 			if(!command_length)
 				seq = 4;
 		}
-		   
+
 		state = DISC_SEL_WAIT_REQ;
 		break;
 
@@ -470,7 +470,7 @@ void ncr5390_device::send_byte()
 	else
 		scsi_bus->data_w(scsi_refid, 0);
 
-	scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);	
+	scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
 	scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 	delay_cycles(sync_period);
 }
@@ -586,7 +586,7 @@ READ8_MEMBER(ncr5390_device::command_r)
 
 WRITE8_MEMBER(ncr5390_device::command_w)
 {
-	//	fprintf(stderr, "%s: command_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
+	//  fprintf(stderr, "%s: command_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
 	if(command_pos == 2) {
 		status |= S_GROSS_ERROR;
 		check_irq();
@@ -620,7 +620,7 @@ void ncr5390_device::start_command()
 
 	bool msg;
 	int extra;
-//	int total_len;
+//  int total_len;
 	command_params_size(msg, extra);
 	if(fifo_pos < extra) {
 		logerror("%s: cmd without extra bytes (fp=%d, extra=%d)\n", tag(), fifo_pos, extra);
@@ -636,9 +636,9 @@ void ncr5390_device::start_command()
 			logerror("%s: cmd without complete msg (fp=%d, extra=%d, len=%d)\n", tag(), fifo_pos, extra, len);
 			exit(0);
 		}
-//		total_len = len+extra;
+//      total_len = len+extra;
 	}// else
-//		total_len = extra;
+//      total_len = extra;
 
 	switch(c) {
 	case CM_NOP:
@@ -680,7 +680,7 @@ void ncr5390_device::start_command()
 		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 		step(false);
 		break;
-		
+
 	case CI_COMPLETE:
 		state = INIT_CPT_RECV_BYTE_ACK;
 		recv_byte();
@@ -701,7 +701,7 @@ void ncr5390_device::start_command()
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		step(false);
 		break;
-		
+
 	default:
 		logerror("%s: start unimplemented command %02x\n", tag(), c);
 		exit(0);

@@ -61,7 +61,7 @@ static INPUT_PORTS_START( c64_easyflash )
 	PORT_DIPNAME( 0x01, 0x00, "Boot" )
 	PORT_DIPSETTING(    0x00, "Disable" )
 	PORT_DIPSETTING(    0x01, "Boot" )
-	
+
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Reset") PORT_CHANGED(c64_easyflash_cartridge_device::reset, 0)
 INPUT_PORTS_END
@@ -129,7 +129,7 @@ void c64_easyflash_cartridge_device::device_reset()
 UINT8 c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		offs_t addr = (m_bank << 13) | (offset & 0x1fff);
@@ -170,39 +170,39 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 		if (!BIT(offset, 1))
 		{
 			/*
-			
-				bit		description
-				
-				0		BA13
-				1		BA14
-				2		BA15
-				3		BA16
-				4		BA17
-				5		BA18
-				6		
-				7		
-			
-			*/
-			
+
+                bit     description
+
+                0       BA13
+                1       BA14
+                2       BA15
+                3       BA16
+                4       BA17
+                5       BA18
+                6
+                7
+
+            */
+
 			m_bank = data & 0x3f;
 		}
 		else
 		{
 			/*
-			
-				bit		description
-				
-				0		GAME
-				1		EXROM
-				2		MODE
-				3		
-				4		
-				5		
-				6		
-				7		LED
-			
-			*/
-			
+
+                bit     description
+
+                0       GAME
+                1       EXROM
+                2       MODE
+                3
+                4
+                5
+                6
+                7       LED
+
+            */
+
 			m_mode = data;
 		}
 	}

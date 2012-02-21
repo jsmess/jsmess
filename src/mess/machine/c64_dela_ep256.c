@@ -103,7 +103,7 @@ c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_c
 void c64_dela_ep256_cartridge_device::device_start()
 {
 	m_rom = subregion("rom")->base();
-	
+
 	// state saving
 	save_item(NAME(m_bank));
 	save_item(NAME(m_reset));
@@ -129,7 +129,7 @@ void c64_dela_ep256_cartridge_device::device_reset()
 UINT8 c64_dela_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
-	
+
 	if (!roml)
 	{
 		if (m_reset)
@@ -156,24 +156,24 @@ void c64_dela_ep256_cartridge_device::c64_cd_w(address_space &space, offs_t offs
 	if (!io2 && ((offset & 0xf0) == 0xa0))
 	{
 		/*
-		
-			bit		description
-			
-			0		socket selection bit 0
-			1		socket selection bit 1
-			2		socket selection bit 2
-			3
-			4		bank selection bit 0
-			5		bank selection bit 1
-			6		
-			7		EXROM
-		
-		*/
-		
+
+            bit     description
+
+            0       socket selection bit 0
+            1       socket selection bit 1
+            2       socket selection bit 2
+            3
+            4       bank selection bit 0
+            5       bank selection bit 1
+            6
+            7       EXROM
+
+        */
+
 		m_reset = 0;
-		
+
 		m_bank = ((data & 0x07) << 2) | ((data >> 4) & 0x03);
-		
+
 		m_exrom = BIT(data, 7);
 	}
 }
