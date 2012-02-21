@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16000000)
 	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
-	MCFG_CPU_VBLANK_INT(TERMINAL_SCREEN_TAG, sgi_ip2_vbl)
+	MCFG_CPU_VBLANK_INT(TERMINAL_TAG ":" TERMINAL_SCREEN_TAG, sgi_ip2_vbl)
 
 	MCFG_MACHINE_START(sgi_ip2)
 	MCFG_MACHINE_RESET(sgi_ip2)
