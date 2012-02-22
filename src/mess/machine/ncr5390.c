@@ -521,7 +521,7 @@ void ncr5390_device::delay_cycles(int cycles)
 
 READ8_MEMBER(ncr5390_device::tcount_lo_r)
 {
-	fprintf(stderr, "%s: tcount_lo_r %02x (%08x)\n", tag(), tcount & 0xff, cpu_get_pc(&space.device()));
+	logerror("%s: tcount_lo_r %02x (%08x)\n", tag(), tcount & 0xff, cpu_get_pc(&space.device()));
 	return tcount;
 }
 
@@ -529,12 +529,12 @@ WRITE8_MEMBER(ncr5390_device::tcount_lo_w)
 {
 	tcount = (tcount & 0xff00) | data;
 	status &= ~S_TC0;
-	fprintf(stderr, "%s: tcount_lo_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
+	logerror("%s: tcount_lo_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
 }
 
 READ8_MEMBER(ncr5390_device::tcount_hi_r)
 {
-	fprintf(stderr, "%s: tcount_hi_r %02x (%08x)\n", tag(), tcount >> 8, cpu_get_pc(&space.device()));
+	logerror("%s: tcount_hi_r %02x (%08x)\n", tag(), tcount >> 8, cpu_get_pc(&space.device()));
 	return tcount >> 8;
 }
 
@@ -542,7 +542,7 @@ WRITE8_MEMBER(ncr5390_device::tcount_hi_w)
 {
 	tcount = (tcount & 0x00ff) | (data << 8);
 	status &= ~S_TC0;
-	fprintf(stderr, "%s: tcount_hi_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
+	logerror("%s: tcount_hi_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
 }
 
 UINT8 ncr5390_device::fifo_pop()
@@ -580,13 +580,13 @@ WRITE8_MEMBER(ncr5390_device::fifo_w)
 
 READ8_MEMBER(ncr5390_device::command_r)
 {
-	fprintf(stderr, "%s: command_r (%08x)\n", tag(), cpu_get_pc(&space.device()));
+	logerror("%s: command_r (%08x)\n", tag(), cpu_get_pc(&space.device()));
 	return command[0];
 }
 
 WRITE8_MEMBER(ncr5390_device::command_w)
 {
-	//  fprintf(stderr, "%s: command_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
+	//	logerror("%s: command_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
 	if(command_pos == 2) {
 		status |= S_GROSS_ERROR;
 		check_irq();
@@ -771,7 +771,7 @@ READ8_MEMBER(ncr5390_device::status_r)
 {
 	UINT32 ctrl = scsi_bus->ctrl_r();
 	UINT8 res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
-	fprintf(stderr, "%s: status_r %02x (%08x)\n", tag(), res, cpu_get_pc(&space.device()));
+	logerror("%s: status_r %02x (%08x)\n", tag(), res, cpu_get_pc(&space.device()));
 	if(irq)
 		status &= ~(S_GROSS_ERROR|S_PARITY|S_TCC);
 	return res;
@@ -792,7 +792,7 @@ READ8_MEMBER(ncr5390_device::istatus_r)
 	if(res)
 		command_pop_and_chain();
 
-	fprintf(stderr, "%s: istatus_r %02x (%08x)\n", tag(), res, cpu_get_pc(&space.device()));
+	logerror("%s: istatus_r %02x (%08x)\n", tag(), res, cpu_get_pc(&space.device()));
 	return res;
 }
 
@@ -803,7 +803,7 @@ WRITE8_MEMBER(ncr5390_device::timeout_w)
 
 READ8_MEMBER(ncr5390_device::seq_step_r)
 {
-	fprintf(stderr, "%s: seq_step_r %d (%08x)\n", tag(), seq, cpu_get_pc(&space.device()));
+	logerror("%s: seq_step_r %d (%08x)\n", tag(), seq, cpu_get_pc(&space.device()));
 	return seq;
 }
 

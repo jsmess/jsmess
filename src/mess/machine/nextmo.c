@@ -38,7 +38,7 @@ void nextmo_device::device_reset()
 
 READ8_MEMBER(nextmo_device::r4_r)
 {
-	fprintf(stderr, "nextmo: r4_r %02x (%08x)\n", r4, cpu_get_pc(&space.device()));
+	logerror("nextmo: r4_r %02x (%08x)\n", r4, cpu_get_pc(&space.device()));
 	return r4;
 }
 
@@ -47,45 +47,45 @@ WRITE8_MEMBER(nextmo_device::r4_w)
 	if(r4 & 1)
 		device_reset();
 	r4 = (r4 & (~data & 0xfc)) | (data & 3);
-	fprintf(stderr, "nextmo: r4_w %02x (%08x)\n", r4, cpu_get_pc(&space.device()));
+	logerror("nextmo: r4_w %02x (%08x)\n", r4, cpu_get_pc(&space.device()));
 }
 
 READ8_MEMBER(nextmo_device::r5_r)
 {
-	fprintf(stderr, "nextmo: r5_r %02x (%08x)\n", r5, cpu_get_pc(&space.device()));
+	logerror("nextmo: r5_r %02x (%08x)\n", r5, cpu_get_pc(&space.device()));
 	return r5;
 }
 
 WRITE8_MEMBER(nextmo_device::r5_w)
 {
 	r5 = data;
-	fprintf(stderr, "nextmo: r5_w %02x (%08x)\n", r5, cpu_get_pc(&space.device()));
+	logerror("nextmo: r5_w %02x (%08x)\n", r5, cpu_get_pc(&space.device()));
 }
 
 READ8_MEMBER(nextmo_device::r6_r)
 {
-	fprintf(stderr, "nextmo: r6_r %02x (%08x)\n", r6, cpu_get_pc(&space.device()));
+	logerror("nextmo: r6_r %02x (%08x)\n", r6, cpu_get_pc(&space.device()));
 	return r6;
 }
 
 WRITE8_MEMBER(nextmo_device::r6_w)
 {
 	r6 = data;
-	fprintf(stderr, "nextmo: r6_w %02x (%08x)\n", r6, cpu_get_pc(&space.device()));
+	logerror("nextmo: r6_w %02x (%08x)\n", r6, cpu_get_pc(&space.device()));
 }
 
 READ8_MEMBER(nextmo_device::r7_r)
 {
-	fprintf(stderr, "nextmo: r7_r %02x (%08x)\n", r7, cpu_get_pc(&space.device()));
+	logerror("nextmo: r7_r %02x (%08x)\n", r7, cpu_get_pc(&space.device()));
 	return r7;
 }
 
 WRITE8_MEMBER(nextmo_device::r7_w)
 {
 	r7 = data;
-	fprintf(stderr, "nextmo: r7_w %02x (%08x)\n", r7, cpu_get_pc(&space.device()));
+	logerror("nextmo: r7_w %02x (%08x)\n", r7, cpu_get_pc(&space.device()));
 	if(r7 & 0xc0) {
-		fprintf(stderr, "nextmo: start dma %02x %02x\n", r6, r7);
+		logerror("nextmo: start dma %02x %02x\n", r6, r7);
 		sector_pos = 0;
 		if(!drq_cb.isnull())
 			drq_cb(true);
@@ -131,68 +131,68 @@ void nextmo_device::check_dma_end()
 
 READ8_MEMBER(nextmo_device::r8_r)
 {
-	fprintf(stderr, "nextmo: r8_r (%08x)\n", cpu_get_pc(&space.device()));
+	logerror("nextmo: r8_r (%08x)\n", cpu_get_pc(&space.device()));
 	return 0x00;
 }
 
 WRITE8_MEMBER(nextmo_device::r8_w)
 {
-	fprintf(stderr, "nextmo: r8_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("nextmo: r8_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
 }
 
 READ8_MEMBER(nextmo_device::r9_r)
 {
-	fprintf(stderr, "nextmo: r9_r (%08x)\n", cpu_get_pc(&space.device()));
+	logerror("nextmo: r9_r (%08x)\n", cpu_get_pc(&space.device()));
 	return 0x00;
 }
 
 WRITE8_MEMBER(nextmo_device::r9_w)
 {
-	fprintf(stderr, "nextmo: r9_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("nextmo: r9_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
 }
 
 READ8_MEMBER(nextmo_device::ra_r)
 {
-	fprintf(stderr, "nextmo: ra_r (%08x)\n", cpu_get_pc(&space.device()));
+	logerror("nextmo: ra_r (%08x)\n", cpu_get_pc(&space.device()));
 	return 0x00;
 }
 
 WRITE8_MEMBER(nextmo_device::ra_w)
 {
-	fprintf(stderr, "nextmo: ra_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("nextmo: ra_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
 }
 
 READ8_MEMBER(nextmo_device::rb_r)
 {
-	fprintf(stderr, "nextmo: rb_r (%08x)\n", cpu_get_pc(&space.device()));
+	logerror("nextmo: rb_r (%08x)\n", cpu_get_pc(&space.device()));
 	return 0x24;
 }
 
 WRITE8_MEMBER(nextmo_device::rb_w)
 {
-	fprintf(stderr, "nextmo: rb_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
+	logerror("nextmo: rb_w %02x (%08x)\n", data, cpu_get_pc(&space.device()));
 }
 
 READ8_MEMBER(nextmo_device::r10_r)
 {
-	fprintf(stderr, "nextmo: r10_r %d (%08x)\n", offset, cpu_get_pc(&space.device()));
+	logerror("nextmo: r10_r %d (%08x)\n", offset, cpu_get_pc(&space.device()));
 	return 0x00;
 }
 
 WRITE8_MEMBER(nextmo_device::r10_w)
 {
-	fprintf(stderr, "nextmo: r10_w %d, %02x (%08x)\n", offset, data, cpu_get_pc(&space.device()));
+	logerror("nextmo: r10_w %d, %02x (%08x)\n", offset, data, cpu_get_pc(&space.device()));
 }
 
 void nextmo_device::check_ecc()
 {
-	fprintf(stderr, "nextmo: check_ecc\n");
+	logerror("nextmo: check_ecc\n");
 	for(int i=0; i<0x400; i++)
 		sector[i] = i;
 }
 
 void nextmo_device::compute_ecc()
 {
-	fprintf(stderr, "nextmo: compute_ecc\n");
+	logerror("nextmo: compute_ecc\n");
 	memset(sector+0x400, 0, 0x110);
 }
