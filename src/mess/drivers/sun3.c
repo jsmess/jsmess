@@ -235,6 +235,11 @@ static ADDRESS_MAP_START(sun3_mem, AS_PROGRAM, 32, sun3_state)
 	AM_RANGE(0x0fef0000, 0x0fefffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(sun3x_mem, AS_PROGRAM, 32, sun3_state)
+	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE(m_p_ram) // 16MB
+	AM_RANGE(0xfefe0000, 0xfefeffff) AM_ROM AM_REGION("user1",0)
+ADDRESS_MAP_END
+
 /* Input ports */
 static INPUT_PORTS_START( sun3 )
 INPUT_PORTS_END
@@ -254,6 +259,12 @@ static MACHINE_CONFIG_START( sun3, sun3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16670000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( sun3x, sun3_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68030, 16670000)
+	MCFG_CPU_PROGRAM_MAP(sun3x_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -421,5 +432,5 @@ COMP( 198?, sun3_150,  0,       0,       sun3,      sun3,     0,  "Sun Microsyst
 COMP( 198?, sun3_260,  0,       0,       sun3,      sun3,     0,  "Sun Microsystems", "Sun 3/260/280", GAME_NOT_WORKING | GAME_NO_SOUND) // Prism
 COMP( 198?, sun3_e,    0,       0,       sun3,      sun3,     0,  "Sun Microsystems", "Sun 3/E", GAME_NOT_WORKING | GAME_NO_SOUND) // Polaris
 
-COMP( 198?, sun3_80,   0,       0,       sun3,      sun3,     0,  "Sun Microsystems", "Sun 3x/80", GAME_NOT_WORKING | GAME_NO_SOUND) // Hydra
-COMP( 198?, sun3_460,  0,       0,       sun3,      sun3,     0,  "Sun Microsystems", "Sun 3x/460/470/480", GAME_NOT_WORKING | GAME_NO_SOUND) // Pegasus
+COMP( 198?, sun3_80,   0,       0,       sun3x,     sun3,     0,  "Sun Microsystems", "Sun 3x/80", GAME_NOT_WORKING | GAME_NO_SOUND) // Hydra
+COMP( 198?, sun3_460,  0,       0,       sun3x,     sun3,     0,  "Sun Microsystems", "Sun 3x/460/470/480", GAME_NOT_WORKING | GAME_NO_SOUND) // Pegasus
