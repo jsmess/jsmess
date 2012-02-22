@@ -126,7 +126,7 @@
 	<software name="win31">
 		<description>Microsoft Windows Version 3.1</description>
 		<year>1992</year>
-		<publisher>Microsoft Corporation</publisher>
+		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws31.img" size="1474560" crc="a7439136" sha1="b243a849227b8df3c4a180b25203e6c2bfce66c4" offset="0" />
@@ -167,7 +167,7 @@
 	<software name="win95b">
 		<description>Microsoft Windows 95 (Bootdisk)</description>
 		<year>1995</year>
-		<publisher>Microsoft Corporation</publisher>
+		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws95b.img" size="1474560" crc="f2c099fa" sha1="f167b7193f0e62f4f7b27255fdc70ac7d6278c47" offset="0" />
@@ -178,7 +178,7 @@
 	<software name="wndws98b">
 		<description>Microsoft Windows 98 (Bootdisk)</description>
 		<year>1998</year>
-		<publisher>Microsoft Corporation</publisher>
+		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws98b.img" size="1474560" crc="955fc373" sha1="9f5d64261c7f51de704d6d1486dced51b45cbec3" offset="0" />
@@ -189,7 +189,7 @@
 	<software name="winmeb">
 		<description>Microsoft Windows ME (Bootdisk)</description>
 		<year>2000</year>
-		<publisher>Microsoft Corporation</publisher>
+		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndwsmeb.img" size="1474560" crc="5a17894f" sha1="724e02eac97046e6c92b73f7707b57707ab76f5a" offset="0" />
@@ -202,7 +202,7 @@
 	    <!-- extracted from C:\Windows\system32\diskcopy.dll version 6.0.2900.5512 -->
 		<description>Microsoft Windows XP MS-DOS startup disk</description>
 		<year>2005</year>
-		<publisher>Microsoft Corporation</publisher>
+		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="winxpb.img" size="1474560" crc="10e3084d" sha1="3812f09e46c4bdd1c802f8540cc643366d9a1e0f" offset="0" />
@@ -214,7 +214,7 @@
 		<!-- Make Original Disks images from an Acer recovery CD, dated 07-13-1994 -->
 		<description>MS-DOS 6.22</description>
 		<year>1994</year>
-		<publisher>Microsoft Corporation</publisher>
+		<publisher>Microsoft</publisher>
 		<part name="disk1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="69d8cfdd" sha1="30b4b2e99b26b0e5e7dbe61b9892e45fe751a3e8" offset="0" />
@@ -240,7 +240,7 @@
 	<software name="msdos5">
 		<description>MS-Dos 5.0</description>
 		<year>1991</year>
-		<publisher>Microsoft Corporation</publisher>
+		<publisher>Microsoft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
@@ -329,7 +329,7 @@
 	<software name="win104">
 		<description>Microsoft Windows Version 1.04</description>
 		<year>1987</year>
-		<publisher>Microsoft Corporation</publisher>
+		<publisher>Microsoft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -518,7 +518,7 @@
 	<software name="swxwing">
 		<description>Star Wars: X-Wing - Space Combat Simulator</description>
 		<year>1993</year>
-		<publisher>LucasArts Entertainment Company LLC</publisher>
+		<publisher>LucasArts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="8e8f9d0b" sha1="c98d3d8560f9d6ef9f8052f75928b4e2a93164e7" offset="0" />
@@ -549,7 +549,7 @@
 	<software name="swxwingbw" cloneof="swxwing">
 		<description>Star Wars: X-Wing B-Wing Expansion</description>
 		<year>1993</year>
-		<publisher>LucasArts Entertainment Company LLC</publisher>
+		<publisher>LucasArts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="bwing.img" size="1474560" crc="91d0f97a" sha1="edb745afa6376808314364e08c3000594edf2c3b" offset="0" />
@@ -560,7 +560,7 @@
 	<software name="swxwingip" cloneof="swxwing">
 		<description>Star Wars: X-Wing Imperial Pursuit</description>
 		<year>1993</year>
-		<publisher>LucasArts Entertainment Company LLC</publisher>
+		<publisher>LucasArts</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="xwing.img" size="1474560" crc="34eebdb6" sha1="fcee862c9b2460aed9cbf3b46657ad4e4eff5dcd" offset="0" status="baddump" />
@@ -595,7 +595,7 @@
 	<software name="ibmdos2">
 		<description>IBM Personal Computer DOS Version 2.0</description>
 		<year>1983</year>
-		<publisher>IBM Corp.</publisher>
+		<publisher>IBM</publisher>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">

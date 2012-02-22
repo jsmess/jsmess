@@ -43,7 +43,7 @@
 	<software name="explore">
 		<description>Exploring The IBM PCjr</description>
 		<year>1983</year>
-		<publisher>IBM Corp.</publisher>
+		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="exploring the ibm pcjr.ima" size="163840" crc="409ff73f" sha1="453ae5f3fa7781ece7d421dd973ce54204b9c99d" offset="0x00000" />
@@ -116,10 +116,10 @@
 	</software>
 
 	<!-- Games -->
-	<software name="kngquest">
+	<software name="kingqst">
 		<description>King's Quest</description>
 		<year>1984</year>
-		<publisher>Sierra On-Line Inc</publisher>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="king's quest.ima" size="368640" crc="524c1991" sha1="f6159d955959bf421774ed85df09b50026fa5a81" offset="0x00000" />
