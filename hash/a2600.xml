@@ -265,6 +265,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26133" />
 		<info name="programmer" value="Howard Scott Warshaw"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="a-team, the (prototype) (3-30-84).bin" size="8192" crc="74ea91dd" sha1="53413577afe7def1d390e3892c45822405513c07" offset="0" />
@@ -278,6 +279,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26133" />
 		<info name="programmer" value="Howard Scott Warshaw"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="a-team, the (prototype) (05-08-84).bin" size="8192" crc="389bd695" sha1="bcbd36389c56e9b408e8fc4bc595dc731aaf0e02" offset="0" />
@@ -291,6 +293,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26133" />
 		<info name="programmer" value="Howard Scott Warshaw"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="a-team, the (prototype) (pal).bin" size="8192" crc="b2fd509a" sha1="a65f487740069640952803218b70580b2fb724b7" offset="0" />
@@ -303,6 +306,7 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>CCE</publisher>
 		<info name="serial" value="C-804" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="abre-te, sesamo.bin" size="4096" crc="8cf511a4" sha1="cc00c5138fd1a3b723c5f1acc90ff8e6e87942c1" offset="0" />
@@ -313,8 +317,9 @@ Info from Atariage and Atarimania
 	<software name="opsesame">
 		<description>Open, Sesame!</description>
 		<year>1983</year>
-		<publisher>Goliath</publisher>
+		<publisher>Puzzy / Bit Corporation</publisher>
 		<info name="serial" value="PG204" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="open sesame.bin" size="4096" crc="d01b5a1f" sha1="cc4d66da0182819a8067dbc6b73ff1bc33fc165b" offset="0" />
@@ -327,6 +332,7 @@ Info from Atariage and Atarimania
 		<year>1992</year>
 		<publisher>Salu</publisher>
 		<info name="programmer" value="Dennis M. Kiss"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="acid drop.bin" size="16384" crc="14cddac7" sha1="d7c62df8300a68b21ce672cfaa4d0f2f4b3d0ce1" offset="0" />
@@ -340,15 +346,16 @@ Info from Atariage and Atarimania
 		<publisher>Parker Bros</publisher>
 		<info name="serial" value="931511" />
 		<info name="alt_title" value="Action Man - Action Force" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
-			<!--feature name="controller_type" value="Paddles"/-->
+			<feature name="peripheral" value="paddles" />
 			<dataarea name="rom" size="4096">
 				<rom name="action force.bin" size="4096" crc="896446cf" sha1="9e6fb047ee9fa0a454ca23673ed9693430032dc6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="decathln">
+	<software name="decathln" supported="no">
 		<description>The Activision Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -367,6 +374,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2613" />
 		<info name="programmer" value="Warren Robinett"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="adventure.bin" size="4096" crc="a6db4b3a" sha1="e07e48d463d30321239a8acc00c490f27f1f7422" offset="0" />
@@ -380,6 +388,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2613P" />
 		<info name="programmer" value="Warren Robinett"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="adventure (pal).bin" size="4096" crc="18dc23f9" sha1="ec23bbea83cf47277482e775ad58ac8e6d1483fe" offset="0" />
@@ -393,6 +402,7 @@ Info from Atariage and Atarimania
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4317" />
 		<info name="programmer" value="Hal Finney, Glenn Hightower"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="adventures of tron.bin" size="4096" crc="1b8019d6" sha1="03a495c7bfa0671e24aa4d9460d232731f68cb43" offset="0" />
@@ -406,6 +416,7 @@ Info from Atariage and Atarimania
 		<publisher>Telegames</publisher>
 		<info name="serial" value="4317 A009" />
 		<info name="programmer" value="Hal Finney, Glenn Hightower"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="adventures on gx-12 (pal).bin" size="4096" crc="4264eb6a" sha1="6e420544bf91f603639188824a2b570738bb7e02" offset="0" />
@@ -419,6 +430,7 @@ Info from Atariage and Atarimania
 		<publisher>Men-A-Vision</publisher>
 		<info name="serial" value="M707" />
 		<info name="programmer" value="Garry Kitchen"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="air raid (pal).bin" size="4096" crc="b0e53814" sha1="3b02e7dacb418c44d0d3dc77d60a9663b90b0fbc" offset="0" />
@@ -432,6 +444,7 @@ Info from Atariage and Atarimania
 		<publisher>Mattel</publisher>
 		<info name="serial" value="5861" />
 		<info name="programmer" value="Larry Zwick"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="air raiders.bin" size="4096" crc="bb16539d" sha1="29f5c73d1fe806a4284547274dd73f9972a7ed70" offset="0" />
@@ -444,6 +457,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Telegames</publisher>
 		<info name="programmer" value="Larry Zwick"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="air raiders (pal).bin" size="4096" crc="5d61b833" sha1="6e3af361bbf70a4a85d6c8d4ed4070e8fed963cb" offset="0" />
@@ -457,6 +471,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2602" />
 		<info name="programmer" value="Larry Kaplan"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="air-sea battle.bin" size="2048" crc="1fc6c0f1" sha1="a746fdc82b336a9d499bf17f50b41e0193ba595e" offset="0" />
@@ -470,6 +485,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2602P" />
 		<info name="programmer" value="Larry Kaplan"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="air-sea battle (pal).bin" size="2048" crc="cf7f8944" sha1="b96c7a509bf610f61f82377bfd506db3dba2b423" offset="0" />
@@ -482,6 +498,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Data Age</publisher>
 		<info name="serial" value="DA1004" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="airlock.bin" size="4096" crc="25c90ce7" sha1="0376c242819b785310b8af43c03b1d1156bd5f02" offset="0" />
@@ -494,21 +511,10 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Data Age</publisher>
 		<info name="serial" value="DA1004" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="airlock (proto).bin" size="4096" crc="b6ae31c6" sha1="09ae3715873a88386b3bc11e429f82919b91fa1a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aliceabn" cloneof="lilyadv">
-		<description>Alices Abenteuer</description>
-		<year>1983</year>
-		<publisher>Starsoft</publisher>
-		<info name="serial" value="732.273 8" />
-		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="alice abenteuer.bin" size="4096" crc="f5feaa7b" sha1="7be2899d776cc28f1ca81584a02e5c228a4f603e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -518,6 +524,7 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>Home Vision</publisher>
 		<info name="serial" value="VCS 83117" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="lilly adventure.bin" size="4096" crc="3544c6d6" sha1="63f4776aa4c35d124001918b733cdb4d46dfbe9b" offset="0" />
@@ -531,6 +538,7 @@ Info from Atariage and Atarimania
 		<publisher>20th Century Fox</publisher>
 		<info name="serial" value="11006" />
 		<info name="programmer" value="Douglas Neubauer"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="alien (20th century fox).bin" size="4096" crc="6d61059f" sha1="01d99bf307262825db58631e8002dd008a42cb1e" offset="0" />
@@ -542,6 +550,7 @@ Info from Atariage and Atarimania
 		<description>Alien (CCE)</description>
 		<year>1982</year>
 		<publisher>CCE</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="alien (cce).bin" size="4096" crc="e61021ec" sha1="abf186c0108791d998f7738324d0e49a977b015b" offset="0" />
@@ -549,15 +558,28 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="alienret">
-		<description>Alien's Return</description>
+	<software name="gogohome">
+		<description>Go Go Home Monster</description>
 		<year>1983</year>
-		<publisher>ITT Family Games</publisher>
-		<info name="serial" value="554-33 391" />
-		<info name="alt_title" value="Go Go Home Monster" />
+		<publisher>Home Vision</publisher>
+		<info name="serial" value="VCS 83103" />
+		<info name="alt_title" value="Alien's Return, Col 'N', E.T. Will nach Hause" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="aliens return.bin" size="4096" crc="c161f53b" sha1="4c41379f0dd9880384fcbb46bad9fbaaf109a477" offset="0" />
+				<rom name="go go home monster.bin" size="4096" crc="c161f53b" sha1="4c41379f0dd9880384fcbb46bad9fbaaf109a477" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="alienret" cloneof="gogohome">
+		<description>Alien's Return</description>
+		<year>19??</year>
+		<publisher>ITT Family Games</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="aliens return.bin" size="4096" crc="6e493f49" sha1="f78c478aacf6536522e8d37a3888a975e1a383cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -567,6 +589,7 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>20th Century Fox</publisher>
 		<info name="programmer" value="John Russell"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="alligator people (prototype).bin" size="4096" crc="b3f6d395" sha1="a1795d6371ddb0bc93ba6df70299cc548dc88b99" offset="0" />
@@ -574,13 +597,14 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwerniee" cloneof="abwernie">
+	<software name="abwerniee" cloneof="abwernie" supported="no"> 
+	<!-- controller not emulated -->
 		<description>Alpha Beam with Ernie (PAL)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
-		<info name="programmer" value="Michael Callahan"/>
-		<info name="Graphics" value="Preston Stuart"/>
+		<info name="programmer" value="Michael Callahan &amp; Preston Stuart"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="peripheral" value="kidscontroller" />
 			<dataarea name="rom" size="8192">
@@ -589,13 +613,13 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwernie">
+	<software name="abwernie" supported="no">
 		<description>Alpha Beam with Ernie</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
-		<info name="programmer" value="Michael Callahan"/>
-		<info name="Graphics" value="Preston Stuart"/>
+		<info name="programmer" value="Michael Callahan &amp; Preston Stuart"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="peripheral" value="kidscontroller" />
 			<dataarea name="rom" size="8192">
@@ -604,13 +628,13 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwerniep" cloneof="abwernie">
+	<software name="abwerniep" cloneof="abwernie" supported="no">
 		<description>Alpha Beam with Ernie (Prototype 19831222)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
-		<info name="programmer" value="Michael Callahan"/>
-		<info name="Graphics" value="Preston Stuart"/>
+		<info name="programmer" value="Michael Callahan &amp; Preston Stuart"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="peripheral" value="kidscontroller" />
 			<dataarea name="rom" size="8192">
@@ -619,13 +643,13 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwernieep" cloneof="abwernie">
+	<software name="abwernieep" cloneof="abwernie" supported="no">
 		<description>Alpha Beam with Ernie (PAL) (Prototype 19830603)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
-		<info name="programmer" value="Michael Callahan"/>
-		<info name="Graphics" value="Preston Stuart"/>
+		<info name="programmer" value="Michael Callahan &amp; Preston Stuart"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="peripheral" value="kidscontroller" />
 			<dataarea name="rom" size="8192">
@@ -640,6 +664,7 @@ Info from Atariage and Atarimania
 		<publisher>Parker Bros</publisher>
 		<info name="serial" value="PB5310" />
 		<info name="programmer" value="Ed Temple"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="amidar.bin" size="4096" crc="8eb5bd72" sha1="b89a5ac6593e83fbebee1fe7d4cec81a7032c544" offset="0" />
@@ -653,6 +678,7 @@ Info from Atariage and Atarimania
 		<publisher>Parker Bros</publisher>
 		<info name="serial" value="931504" />
 		<info name="programmer" value="Ed Temple"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="amidar (pal).bin" size="4096" crc="e9b05565" sha1="fb9bba6556fc45904dac8750fa18155e6196b2c0" offset="0" />
@@ -660,7 +686,8 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="andrmanp">
+	<software name="andrmanp" supported="no">
+	<!-- No display-->
 		<description>AndroMan on the Moon (Prototype)</description>
 		<year>1984</year>
 		<publisher>Western Technologies</publisher>
@@ -672,10 +699,12 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="angling">
-		<description>Angling</description>
+	<software name="anglngi">
+		<description>Angeln I</description>
 		<year>198?</year>
 		<publisher>Ariola</publisher>
+		<info name="programmer" value="David Crane"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="angling.bin" size="2048" crc="214f0076" sha1="a7638a2e79524b068038f0be035b46d0ce65f7ea" offset="0" />
@@ -688,6 +717,7 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>Starsoft</publisher>
 		<info name="serial" value="495.463 2" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="angriff der luftflotten.bin" size="4096" crc="74fe8262" sha1="ac58ac94ceab78725a1182cc7b907376c011b0c8" offset="0" />
@@ -700,6 +730,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>US Games</publisher>
 		<info name="serial" value="VC1012" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="mad.bin" size="4096" crc="5cb68fe5" sha1="d6e2b7765a9d30f91c9b2b8d0adf61ec5dc2b30a" offset="0" />
@@ -712,6 +743,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Carrere Video</publisher>
 		<info name="serial" value="USC1012" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="mad (pal).bin" size="4096" crc="a3ef9032" sha1="86df578e913485089d9b3b3e7384076b53a98450" offset="0" />
@@ -723,6 +755,7 @@ Info from Atariage and Atarimania
 		<description>Apples and Dolls</description>
 		<year>198?</year>
 		<publisher>CCE</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="apples and dolls.bin" size="4096" crc="e7514705" sha1="62e92508cf43acc28bff8b03a197137d56a5df79" offset="0" />
@@ -734,6 +767,7 @@ Info from Atariage and Atarimania
 		<description>Aquaventure (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="aquaventure (prototype).bin" size="8192" crc="87a8cb8b" sha1="7d132ab776ff755b86bf4f204165aa54e9e1f1cf" offset="0" />
@@ -747,6 +781,7 @@ Info from Atariage and Atarimania
 		<year>198?</year>
 		<publisher>CCE</publisher>
 		<info name="programmer" value="Gary Shannon"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="aquaventure.bin" size="8192" crc="7fa61fa0" sha1="cb400de2653e125e704abd8b0fe5dddb43e3438b" offset="0" />
@@ -760,6 +795,7 @@ Info from Atariage and Atarimania
 		<publisher>Mattel</publisher>
 		<info name="serial" value="5661, MT5661" />
 		<info name="programmer" value="Hal Finney"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="armor ambush.bin" size="4096" crc="fc35704b" sha1="9b6a54969240baf64928118741c3affee148d721" offset="0" />
@@ -773,6 +809,7 @@ Info from Atariage and Atarimania
 		<publisher>Telegames</publisher>
 		<info name="serial" value="5661" />
 		<info name="programmer" value="Hal Finney"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="armor ambush (pal).bin" size="4096" crc="c974c21a" sha1="6122220c8fbf42fdf0437073ebe2407d6f875a40" offset="0" />
@@ -785,7 +822,8 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="2-99004-8-4" />
-		<info name="programmer" value="John	Perkins"/>
+		<info name="programmer" value="John Perkins"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="artillery duel.bin" size="8192" crc="1d0f7e8d" sha1="8c249e9eaa83fc6be16039f05ec304efdf987beb" offset="0" />
@@ -799,7 +837,8 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="6230" />
-		<info name="programmer" value="John	Perkins"/>
+		<info name="programmer" value="John Perkins"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="artillery duel (pal).bin" size="8192" crc="1708647c" sha1="013142aa1338d132724876c1d55a322a1d049380" offset="0" />
@@ -812,6 +851,7 @@ Info from Atariage and Atarimania
 		<year>198?</year>
 		<publisher>Dismac</publisher>
 		<info name="programmer" value="Bob Whitehead"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="ases do ar.bin" size="2048" crc="931fb27e" sha1="4d0689a98008bf89caab949249ff0f543abf5e0c" offset="0" />
@@ -825,6 +865,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<info name="serial" value="AG-019" />
 		<info name="programmer" value="Bob Whitehead"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="sky jinks.bin" size="2048" crc="96f8cf59" sha1="105f722dcf9a89b683c10ddd7f684c5966c8e1db" offset="0" />
@@ -838,6 +879,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<info name="serial" value="EAG-019" />
 		<info name="programmer" value="Bob Whitehead"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="sky jinks (pal).bin" size="2048" crc="12b0056d" sha1="dccde9899bdc063e77a99105131e3914181d72ad" offset="0" />
@@ -849,6 +891,7 @@ Info from Atariage and Atarimania
 		<description>Sky Jinks (CCE)</description>
 		<year>198?</year>
 		<publisher>CCE</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="sky jinks (cce).bin" size="2048" crc="fe6a0630" sha1="8e16d60d700fc7a2a021ae2b0e26438e61c3dd0c" offset="0" />
@@ -862,6 +905,7 @@ Info from Atariage and Atarimania
 		<publisher>Bomb</publisher>
 		<info name="serial" value="CA281" />
 		<info name="programmer" value="Bob Whitehead"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="assault.bin" size="4096" crc="ab3a2b77" sha1="0c03eba97df5178eec5d4d0aea4a6fe2f961c88f" offset="0" />
@@ -869,12 +913,13 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="asterixe" cloneof="taz">
+	<software name="asterix" cloneof="taz">
 		<description>Asterix (PAL)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2696" />
 		<info name="programmer" value="Steve Woita"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="asterix (pal).bin" size="8192" crc="2e3deb79" sha1="ff31d885ea3d96850547fdb8978d12d0965a2c1f" offset="0" />
@@ -882,7 +927,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="asterix" cloneof="taz">
+	<software name="asterixp" cloneof="taz">
 		<description>Asterix (NTSC, Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
@@ -901,6 +946,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2699" />
 		<info name="programmer" value="Steve Woita"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="taz.bin" size="8192" crc="c9d7ec9b" sha1="fa4aee79487036656aabb432d7c6e13ec21e3a3c" offset="0" />
@@ -914,9 +960,10 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2649" />
 		<info name="programmer" value="Brad Stewart"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="asteroids.bin" size="8192" crc="0a2f8288" sha1="1cb8f057acad6dc65fef07d3202088ff4ae355cd" offset="0" />
+				<rom name="asteroids.bin" size="8192" crc="c7d64c94" sha1="d68937e57a367e61eaa4b44550ae8b9d69456661" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -927,9 +974,10 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2649P" />
 		<info name="programmer" value="Brad Stewart"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="asteroids (pal).bin" size="8192" crc="c7d64c94" sha1="d68937e57a367e61eaa4b44550ae8b9d69456661" offset="0" />
+				<rom name="asteroids (pal).bin" size="8192" crc="0a2f8288" sha1="1cb8f057acad6dc65fef07d3202088ff4ae355cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -941,6 +989,7 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2649P" />
 		<info name="programmer" value="Brad Stewart"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="asteroids (pal) (older).bin" size="8192" crc="ffcb5e99" sha1="7c0f522d5796c4f307dccf9ce515ab022778b3c7" offset="0" />
@@ -953,6 +1002,7 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>Goliath</publisher>
 		<info name="serial" value="83-214" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="astro attack (pal).bin" size="4096" crc="32f16d22" sha1="90041b76b873d214276a567cca3af53bfa3222ac" offset="0" />
@@ -965,6 +1015,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Funvision - Fund. International Co.</publisher>
 		<info name="serial" value="83-214" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="time warp (pal).bin" size="4096" crc="551e2144" sha1="594db913e27509fe244c5c900b5dbf5991d19a3e" offset="0" />
@@ -978,6 +1029,7 @@ Info from Atariage and Atarimania
 		<publisher>Mattel</publisher>
 		<info name="serial" value="5666" />
 		<info name="programmer" value="Hal Finney"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="astroblast.bin" size="4096" crc="1de25331" sha1="8e83fd77e198b27eb5b02a6dc02a5ab37b5a76bd" offset="0" />
@@ -1003,6 +1055,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Mattel</publisher>
 		<info name="programmer" value="Hal Finney"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="astroblast (pal).bin" size="4096" crc="a1df435e" sha1="ab8af3c4e0d8858481f3e52b59b5040b18ceb4d7" offset="0" />
@@ -1014,6 +1067,7 @@ Info from Atariage and Atarimania
 		<description>Astrowar</description>
 		<year>1983</year>
 		<publisher>Starsoft</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="astrowar.bin" size="4096" crc="7b4b7eaf" sha1="b6f01797e3e8d80f4e33da73e64aa2935af96038" offset="0" status="baddump" />
@@ -1050,6 +1104,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<info name="serial" value="IX-010-04 / AIX-010" />
 		<info name="programmer" value="Dennis Koble"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atlantis.bin" size="4096" crc="c22e6a25" sha1="87b234b3893d4e8e9f27ec2f2bb83e985e72b4b3" offset="0" />
@@ -1063,6 +1118,7 @@ Info from Atariage and Atarimania
 		<publisher>CCE</publisher>
 		<info name="serial" value="C-832" />
 		<info name="programmer" value="Dennis Koble"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atlantis (cce).bin" size="4096" crc="f3ec0baf" sha1="e9d6ac3fd807cc71de6d9144177c18f3a7881b5b" offset="0" />
@@ -1076,6 +1132,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720103-1B / IA3203" />
 		<info name="programmer" value="Dennis Koble"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atlantis (imagic).bin" size="4096" crc="92560498" sha1="c6b1dcdb2f024ab682316db45763bacc6949c33c" offset="0" />
@@ -1089,6 +1146,7 @@ Info from Atariage and Atarimania
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720103-2A / IA3203P" />
 		<info name="programmer" value="Dennis Koble"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atlantis (imagic) (pal).bin" size="4096" crc="85706802" sha1="7b9975dc1aabc34def2d19854b39f237e4afe088" offset="0" />
@@ -1101,6 +1159,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Digitel</publisher>
 		<info name="programmer" value="Dennis Koble"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atlantis (digitel).bin" size="4096" crc="e40f6c0f" sha1="086ca9c0bab692104590338ce8aaa061dfa2dde4" offset="0" />
@@ -1113,6 +1172,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Dynacom</publisher>
 		<info name="programmer" value="Dennis Koble"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atlantis (dynacom).bin" size="4096" crc="78c57e9f" sha1="cbdace660923e0b2c6d97c24877b0dc16521d913" offset="0" />
@@ -1125,6 +1185,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Dactari - Milmar</publisher>
 		<info name="programmer" value="Dennis Koble"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atlantis (dactari - milmar).bin" size="4096" crc="5e5e95bd" sha1="c22fde31c885b3b6f531bbee96f916907e5e3daf" offset="0" />
@@ -1137,6 +1198,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720103-1A / IA3203" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atlantis ii.bin" size="4096" crc="ba5566aa" sha1="f4e838de9159c149ac080ab85e4f830d5b299963" offset="0" />
@@ -1149,6 +1211,7 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>Starsoft</publisher>
 		<info name="serial" value="719.694 2" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="aufruhr im zoo.bin" size="4096" crc="99ce60e6" sha1="f14d270d429fc3ecf5dd04d71e87e79daf52fd5f" offset="0" />
@@ -1156,11 +1219,12 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="zoofun">
+	<software name="zoofun" supported="no">
 		<description>Zoo Fun</description>
 		<year>1983</year>
 		<publisher>HomeVision</publisher>
 		<info name="serial" value="VCS 831??" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="zoo fun.bin" size="4096" crc="c1da05f6" sha1="feb6bd37e5d722bd080433587972b980afff5fa5" offset="0" />
@@ -1174,6 +1238,7 @@ Info from Atariage and Atarimania
 		<publisher>Ariola</publisher>
 		<info name="serial" value="PGP232" />
 		<info name="programmer" value="David Crane"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="autorennen.bin" size="4096" crc="e5afda35" sha1="04359079d6960d0abc2f49330873fac10c9d9e21" offset="0" />
@@ -1187,6 +1252,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<info name="serial" value="AX-014" />
 		<info name="programmer" value="David Crane"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="grand prix.bin" size="4096" crc="e855273d" sha1="24fab817728216582b6d95558c361ace66abf96f" offset="0" />
@@ -1200,6 +1266,7 @@ Info from Atariage and Atarimania
 		<publisher>Mystique</publisher>
 		<info name="serial" value="1002" />
 		<info name="programmer" value="Joel H. Martin"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bachelor party.bin" size="4096" crc="d9cd6c95" sha1="75e7efa861f7e7d8e367c09bf7c0cc351b472f03" offset="0" />
@@ -1210,9 +1277,10 @@ Info from Atariage and Atarimania
 	<software name="bchtprty" cloneof="btcprty">
 		<description>Bachelorette Party</description>
 		<year>1982</year>
-		<publisher>Mystique</publisher>
+		<publisher>PlayAround / JHM</publisher>
 		<info name="serial" value="1002" />
 		<info name="programmer" value="Joel H. Martin"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bachelorette party.bin" size="4096" crc="e8189eeb" sha1="b88ca823aaa10a7a4a3d325023881b2de969c156" offset="0" />
@@ -1227,9 +1295,10 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2617" />
 		<info name="programmer" value="Craig Nelson"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="backgammon.bin" size="4096" crc="a3d119c6" sha1="bda9fbd4c75c2c70ab0a6a639a0a839d0397b536" offset="0" />
+				<rom name="backgammon.bin" size="4096" crc="e2a7ffa6" sha1="9b1da7fbd0bf6fcadf1b60c11eeb31b6a61a03c3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1240,9 +1309,10 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2617P" />
 		<info name="programmer" value="Craig Nelson"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="backgammon (pal).bin" size="4096" crc="e2a7ffa6" sha1="9b1da7fbd0bf6fcadf1b60c11eeb31b6a61a03c3" offset="0" />
+				<rom name="backgammon (pal).bin" size="4096" crc="a3d119c6" sha1="bda9fbd4c75c2c70ab0a6a639a0a839d0397b536" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1253,6 +1323,7 @@ Info from Atariage and Atarimania
 		<publisher>20th Century Fox</publisher>
 		<info name="serial" value="11012 " />
 		<info name="programmer" value="Bill Aspromonte"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bank heist.bin" size="4096" crc="7aa79d1e" sha1="80d4020575b14e130f28146bf45921e001f9f649" offset="0" />
@@ -1267,6 +1338,7 @@ Info from Atariage and Atarimania
 		<publisher>Hi-Score</publisher>
 		<info name="programmer" value="Bill Aspromonte"/>
 		<info name="alt_title" value="Skull Island" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bank heist (pal).bin" size="4096" crc="47d4b652" sha1="07a6adc78299d981cfdf2d96e708b1f8e4f7fb4b" offset="0" />
@@ -1280,6 +1352,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<info name="serial" value="EAX-013" />
 		<info name="programmer" value="Steve Cartwright"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="barnstorming (pal).bin" size="4096" crc="f866dbf7" sha1="0e146b4081ae08d7a527bd0e7abd23bb1d42dffb" offset="0" />
@@ -1293,6 +1366,7 @@ Info from Atariage and Atarimania
 		<publisher>Activision</publisher>
 		<info name="serial" value="AX-013" />
 		<info name="programmer" value="Steve Cartwright"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="barnstorming.bin" size="4096" crc="4a005181" sha1="372663097b419ced64f44ef743fe8d0af4317f46" offset="0" />
@@ -1305,6 +1379,7 @@ Info from Atariage and Atarimania
 		<year>1982</year>
 		<publisher>CCE</publisher>
 		<info name="programmer" value="Steve Cartwright"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="barnstorming (cce).bin" size="4096" crc="281736d6" sha1="72f0bd35b49e4a35f6e51df6ec8ea579b5a673eb" offset="0" />
@@ -1317,6 +1392,7 @@ Info from Atariage and Atarimania
 		<year>1983</year>
 		<publisher>HomeVision</publisher>
 		<info name="serial" value="VCS 83113" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="base attack.bin" size="4096" crc="81f1e5dd" sha1="4e2ccb0afe236a76193ad500bab57abb82632a5a" offset="0" />
@@ -1324,27 +1400,13 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="baseball">
-		<description>Baseball</description>
-		<year>1978</year>
-		<publisher>Atari</publisher>
-		<info name="serial" value="CX2623" />
-		<info name="programmer" value="Bob Whitehead"/>
-		<info name="alt_title" value="Home Run" />
-		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="baseball.bin" size="4096" crc="1195a6fd" sha1="ef4dbf9d84eb1fff3c8ceef10ace8bf1f305354f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="baseballe" cloneof="baseball">
+	<software name="baseball" cloneof="scbasbal">
 		<description>Baseball (PAL)</description>
 		<year>1978</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="CX2623" />
-		<info name="alt_title" value="Super Challenge Baseball" />
 		<info name="programmer" value="Bob Whitehead"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="baseball (pal).bin" size="4096" crc="b248547e" sha1="2ae3bf2295020192aca587aa5a4f2426543fbf80" offset="0" />
@@ -1352,11 +1414,12 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="scbasbal"><!-- cloneof="baseball" not so sure about it-->
+	<software name="scbasbal">
 		<description>Super Challenge Baseball (Mattel)</description>
 		<year>1978</year>
 		<publisher>Mattel</publisher>
 		<info name="programmer" value="David Rolfe"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="super challenge baseball (mattel).bin" size="4096" crc="f7e88ec2" sha1="dfce4d6436f91d8d385f8b01f0d8e3488400407b" offset="0" />
@@ -1364,11 +1427,12 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="scbasbalj" cloneof="scbasbal"><!-- cloneof="baseball" not so sure about it-->
+	<software name="scbasbalj" cloneof="scbasbal">
 		<description>Super Challenge Baseball (JYTEC)</description>
 		<year>1978</year>
 		<publisher>Jone Yuan Telephonic Enterprise Co</publisher>
 		<info name="programmer" value="David Rolfe"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="super challenge baseball (jytec).bin" size="4096" crc="4c3a91f1" sha1="68b31e9cf626f0291dbcf038447fbf878bb7b37e" offset="0" />
@@ -1376,35 +1440,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="basmath">
-		<description>Basic Math</description>
-		<year>1977</year>
-		<publisher>Atari</publisher>
-		<info name="serial" value="CX2661" />
-		<info name="alt_title" value="Fun with Numbers" />
-		<info name="programmer" value="Gary Palmer"/>
-		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="2048">
-				<rom name="basic math.bin" size="2048" crc="d48ebac0" sha1="5cc4010eb2858afe8ce77f53a89d37c7584e15b4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="basmathe" cloneof="basmath">
-		<description>Basic Math (PAL)</description>
-		<year>1978</year>
-		<publisher>Atari</publisher>
-		<info name="serial" value="CX2661" />
-		<info name="alt_title" value="Fun with Numbers" />
-		<info name="programmer" value="Gary Palmer"/>
-		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="2048">
-				<rom name="basic math (pal).bin" size="2048" crc="5456cdca" sha1="ebdc9fc929a6ef47daea8ab539b769a244243a1a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="basprog">
+	<software name="basprog" supported="no">
 		<description>BASIC Programming</description>
 		<year>1978</year>
 		<publisher>Atari</publisher>
@@ -6295,17 +6331,6 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="gogohome">
-		<description>Go Go Home Monster (Unknown)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="go go home monster (unknown).bin" size="4096" crc="6e493f49" sha1="f78c478aacf6536522e8d37a3888a975e1a383cd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="golf">
 		<description>Golf</description>
 		<year>1980</year>
@@ -6787,6 +6812,20 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="home run (unknown) (pal).bin" size="2048" crc="ebc26875" sha1="7bdab234762d498b7c6517eed8a2f292f5fdd129" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homerun4k" cloneof="homerun">
+		<description>Home Run (4k)</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2623" />
+		<info name="programmer" value="Bob Whitehead"/>
+		<info name="alt_title" value="Home Run" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="baseball.bin" size="4096" crc="1195a6fd" sha1="ef4dbf9d84eb1fff3c8ceef10ace8bf1f305354f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
