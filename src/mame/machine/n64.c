@@ -76,7 +76,7 @@ void n64_periphs::device_reset()
 	rspcpu = machine().device("rsp");
 	mem_map = maincpu->memory().space(AS_PROGRAM);
 
-	mi_version = 0x02020102;
+	mi_version = 0x01010101;
 	mi_interrupt = 0;
 	mi_intr_mask = 0;
 	mi_mode = 0;
@@ -144,6 +144,9 @@ void n64_periphs::device_reset()
 	dd_seq_ctrl_reg = 0;
 	dd_int = 0;
 
+	memset(ri_regs, 0, sizeof(ri_regs));
+
+	//ri_regs[3] = 1;
 	memset(pif_ram, 0, sizeof(pif_ram));
 	memset(pif_cmd, 0, sizeof(pif_cmd));
 	si_dram_addr = 0;
@@ -514,6 +517,7 @@ void n64_periphs::sp_dma(int direction)
 
 	if(direction == 0)// RDRAM -> I/DMEM
 	{
+		UINT32 imem_touched = 0;
         for(int c = 0; c <= sp_dma_count; c++)
         {
             UINT32 src = (sp_dram_addr & 0x007fffff) >> 2;
@@ -522,6 +526,7 @@ void n64_periphs::sp_dma(int direction)
             for(int i = 0; i < length / 4; i++)
             {
 				sp_mem[(dst + i) >> 10][(dst + i) & 0x3ff] = rdram[src + i];
+				imem_touched |= (dst + i) >> 10;
             }
 
             sp_mem_addr += length;
@@ -529,6 +534,10 @@ void n64_periphs::sp_dma(int direction)
 
             sp_mem_addr += sp_dma_skip;
         }
+        if(imem_touched)
+        {
+			rspdrc_flush_drc_cache(machine().device("rsp"));
+		}
 	}
 	else					// I/DMEM -> RDRAM
 	{
@@ -608,12 +617,14 @@ UINT32 n64_periphs::sp_reg_r(UINT32 offset)
 
 		case 0x1c/4:		// SP_SEMAPHORE_REG
 			//machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(1));
+			device_yield(machine().device("maincpu"));
             if( sp_semaphore )
             {
                 ret = 1;
             }
             else
             {
+				//printf("Semaphore is now acquired, returning 0\n");
                 sp_semaphore = 1;
                 ret = 0;
             }
@@ -720,108 +731,133 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
                 {
 					device_set_input_line(rspcpu, INPUT_LINE_HALT, CLEAR_LINE);
 					newstatus &= ~RSP_STATUS_HALT;
+					//printf("***SP HALT CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000002)      // set halt
                 {
                     device_set_input_line(rspcpu, INPUT_LINE_HALT, ASSERT_LINE);
                     newstatus |= RSP_STATUS_HALT;
+					//printf("***SP HALT SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00000004)
                 {
                     newstatus &= ~RSP_STATUS_BROKE;
+					//printf("***SP BROKE CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000008)      // clear interrupt
                 {
+					//printf("***SP INT CLR***\n"); fflush(stdout);
                     clear_rcp_interrupt(SP_INTERRUPT);
                 }
                 if (data & 0x00000010)      // set interrupt
                 {
+					//printf("***SP INT SET***\n"); fflush(stdout);
                     signal_rcp_interrupt(SP_INTERRUPT);
                 }
                 if (data & 0x00000020)
                 {
                     newstatus &= ~RSP_STATUS_SSTEP;
+					//printf("***SP SSTEP CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000040)
                 {
                     newstatus |= RSP_STATUS_SSTEP;	// set single step
+					//printf("***SP SSTEP SET***\n"); fflush(stdout);
                     if(!(oldstatus & (RSP_STATUS_BROKE | RSP_STATUS_HALT)))
                     {
                         cpu_set_reg(rspcpu, RSP_STEPCNT, 1 );
-                        device_yield(machine().device("maincpu"));
+                        device_yield(machine().device("rsp"));
                     }
                 }
                 if (data & 0x00000080)
                 {
                     newstatus &= ~RSP_STATUS_INTR_BREAK;	// clear interrupt on break
+					//printf("***SP INTRBRK CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000100)
                 {
                     newstatus |= RSP_STATUS_INTR_BREAK;		// set interrupt on break
+					//printf("***SP INTRBRK SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00000200)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL0;		// clear signal 0
+					//printf("***SP YIELD CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00000400)
                 {
                     newstatus |= RSP_STATUS_SIGNAL0;		// set signal 0
+					//printf("***SP YIELD SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00000800)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL1;		// clear signal 1
+					//printf("***SP YIELDED CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00001000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL1;		// set signal 1
+					//printf("***SP YIELDED SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00002000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL2 ;		// clear signal 2
+					//printf("***SP TASKDONE CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00004000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL2;		// set signal 2
+					//printf("***SP TASKDONE SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00008000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL3;		// clear signal 3
+					//printf("***SP SIG3 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00010000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL3;		// set signal 3
+					//printf("***SP SIG3 SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00020000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL4;		// clear signal 4
+					//printf("***SP SIG4 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00040000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL4;		// set signal 4
+					//printf("***SP SIG4 SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00080000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL5;		// clear signal 5
+					//printf("***SP SIG5 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00100000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL5;		// set signal 5
+					//printf("***SP SIG5 SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00200000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL6;		// clear signal 6
+					//printf("***SP SIG6 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x00400000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL6;		// set signal 6
+					//printf("***SP SIG6 SET***\n"); fflush(stdout);
                 }
                 if (data & 0x00800000)
                 {
                     newstatus &= ~RSP_STATUS_SIGNAL7;		// clear signal 7
+					//printf("***SP SIG7 CLR***\n"); fflush(stdout);
                 }
                 if (data & 0x01000000)
                 {
                     newstatus |= RSP_STATUS_SIGNAL7;		// set signal 7
+					//printf("***SP SIG7 SET***\n"); fflush(stdout);
                 }
                 cpu_set_reg(rspcpu, RSP_SR, newstatus);
                 break;
@@ -829,6 +865,7 @@ void n64_periphs::sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask)
 
 			case 0x1c/4:		// SP_SEMAPHORE_REG
 				//machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(1));
+				//printf("Semaphore is being released\n");
 				if(data == 0)
 				{
                 	sp_semaphore = 0;
@@ -1336,7 +1373,7 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
     switch (offset)
     {
         case 0x00/4:        // AI_DRAM_ADDR_REG
-            ai_dram_addr = data & 0xffffff;
+            ai_dram_addr = data & 0xfffff8;
             break;
 
         case 0x04/4:        // AI_LEN_REG
@@ -1375,6 +1412,7 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 static TIMER_CALLBACK(pi_dma_callback)
 {
 	machine.device<n64_periphs>("rcp")->pi_dma_tick();
+	device_yield(machine.device("rsp"));
 }
 
 void n64_periphs::pi_dma_tick()
@@ -1419,14 +1457,6 @@ void n64_periphs::pi_dma_tick()
 
 			pi_cart_addr += dma_length;
 			pi_dram_addr += dma_length;
-		}
-
-		if (pi_first_dma)
-		{
-			// TODO: CIC-6105 has different address...
-			mem_map->write_dword(0x00000318, 0x400000);
-			mem_map->write_dword(0x000003f0, 0x800000);
-			pi_first_dma = 0;
 		}
 	}
 	else
@@ -1538,7 +1568,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 0;
 			pi_status |= 1;
 
-			attotime dma_period = attotime::from_hz(93750000) * (pi_rd_len + 1) * 3;
+			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 10.2f);
 			//printf("want read dma in %d\n", (pi_rd_len + 1));
 			pi_dma_timer->adjust(dma_period);
 			//pi_dma_tick();
@@ -1551,9 +1581,18 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 1;
 			pi_status |= 1;
 
-			attotime dma_period = attotime::from_hz(93750000) * (pi_wr_len + 1) * 3;
+			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 10.2f);
 			//printf("want write dma in %d\n", (pi_wr_len + 1));
 			pi_dma_timer->adjust(dma_period);
+
+			if (pi_first_dma)
+			{
+				// TODO: CIC-6105 has different address...
+				//mem_map->write_dword(0x00000318, 0x800000);
+				mem_map->write_dword(0x000003f0, 0x800000);
+				pi_first_dma = 0;
+			}
+
 			//pi_dma_tick();
 			break;
 		}
