@@ -14,6 +14,10 @@
 #include "imagedev/cartslot.h"
 #include "includes/n64.h"
 
+static READ32_HANDLER( dd_null_r )
+{
+	return 0xffffffff;
+}
 
 static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(&rdram)				// RDRAM
@@ -28,6 +32,7 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
 	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
 	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
+	AM_RANGE(0x05000508, 0x0500050b) AM_READ(dd_null_r);
 	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_BASE(&n64_sram)										// Cartridge SRAM
 	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)									// Cartridge
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)									// PIF ROM
@@ -215,12 +220,14 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 		memcpy(periphs->m_save_data.mempak[0], data + 0x20800, 0x8000);
 		memcpy(periphs->m_save_data.mempak[1], data + 0x28800, 0x8000);
 	}
-	else
+
+	if(periphs->m_save_data.mempak[0][0] == 0) // Init if new
 	{
 		memset(periphs->m_save_data.eeprom, 0, 0x800);
 		mempak_format(periphs->m_save_data.mempak[0]);
 		mempak_format(periphs->m_save_data.mempak[1]);
 	}
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -263,8 +270,8 @@ static MACHINE_CONFIG_START( n64, n64_state )
 
 	MCFG_MACHINE_START( n64 )
 	MCFG_MACHINE_RESET( n64 )
-	//MCFG_QUANTUM_TIME(attotime::from_hz(9700000))
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	//MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
