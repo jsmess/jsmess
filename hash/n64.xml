@@ -5184,7 +5184,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="mariotenj" cloneof="marioten">
+	<software name="mariotenu" cloneof="marioten">
 		<description>Mario Tennis (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
@@ -5195,7 +5195,7 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="mariotenu" cloneof="marioten">
+	<software name="mariotenj" cloneof="marioten">
 		<description>Mario Tennis 64 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>

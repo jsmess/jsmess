@@ -1214,7 +1214,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="konekod" cloneof="koneko">
+	<software name="konekod" cloneof="koneko" supported="no">
 		<description>Koneko Monogatari - The Adventures of Chatran (Sample)</description>
 		<year>1986</year>
 		<publisher>Pony Canyon</publisher>
@@ -1225,7 +1225,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="koneko">
+	<software name="koneko" supported="no">
 		<description>Koneko Monogatari - The Adventures of Chatran</description>
 		<year>1986</year>
 		<publisher>Pony Canyon</publisher>
