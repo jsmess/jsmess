@@ -228,106 +228,30 @@ bool vic20_expansion_slot_device::call_load()
 		{
 			size = length();
 
-			if (!mame_stricmp(filetype(), "20")) fread(m_cart->vic20_blk1_pointer(machine(), size), size);
-			else if (!mame_stricmp(filetype(), "40")) fread(m_cart->vic20_blk2_pointer(machine(), size), size);
-			else if (!mame_stricmp(filetype(), "60")) fread(m_cart->vic20_blk3_pointer(machine(), size), size);
-			else if (!mame_stricmp(filetype(), "70")) fread(m_cart->vic20_blk3_pointer(machine(), size + 0x1000) + 0x1000, size);
-			else if (!mame_stricmp(filetype(), "a0")) fread(m_cart->vic20_blk5_pointer(machine(), size), size);
-			else if (!mame_stricmp(filetype(), "b0")) fread(m_cart->vic20_blk5_pointer(machine(), size + 0x1000) + 0x1000, size);
+			if (!mame_stricmp(filetype(), "20")) fread(m_cart->vic20_blk1_pointer(machine(), 0x2000), 0x2000);
+			else if (!mame_stricmp(filetype(), "40")) fread(m_cart->vic20_blk2_pointer(machine(), 0x2000), 0x2000);
+			else if (!mame_stricmp(filetype(), "60")) fread(m_cart->vic20_blk3_pointer(machine(), 0x2000), 0x2000);
+			else if (!mame_stricmp(filetype(), "70")) fread(m_cart->vic20_blk3_pointer(machine(), 0x2000) + 0x1000, 0x1000);
+			else if (!mame_stricmp(filetype(), "a0")) fread(m_cart->vic20_blk5_pointer(machine(), 0x2000), 0x2000);
+			else if (!mame_stricmp(filetype(), "b0")) fread(m_cart->vic20_blk5_pointer(machine(), 0x2000) + 0x1000, 0x1000);
 			else if (!mame_stricmp(filetype(), "crt"))
 			{
 				// read the header
-				cbm_crt_header header;
-				fread(&header, CRT_HEADER_LENGTH);
-
-				if (memcmp(header.signature, CRT_SIGNATURE, 16) != 0)
-					return IMAGE_INIT_FAIL;
-
-				UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
-
-				// TODO support other cartridge hardware
-				if (hardware != CRT_VIC20_STANDARD)
-					return IMAGE_INIT_FAIL;
-
-				if (LOG)
+				UINT8 header[2];
+				fread(&header, 2);
+				UINT16 address = pick_integer_le(header, 0, 2);
+				
+				if (LOG) logerror("Address %04x\n", address);
+				
+				switch (address)
 				{
-					logerror("Name: %s\n", header.name);
-					logerror("Hardware: %04x\n", hardware);
-					logerror("Slot device: %s\n", CRT_VIC20_SLOT_NAMES[hardware]);
-				}
-
-				// determine ROM region lengths
-				size_t blk1_size = 0;
-				size_t blk2_size = 0;
-				size_t blk3_size = 0;
-				size_t blk5_size = 0;
-
-				while (!image_feof())
-				{
-					cbm_crt_chip chip;
-					fread(&chip, CRT_CHIP_LENGTH);
-
-					UINT16 address = pick_integer_be(chip.start_address, 0, 2);
-					UINT16 size = pick_integer_be(chip.image_size, 0, 2);
-					UINT16 type = pick_integer_be(chip.chip_type, 0, 2);
-
-					if (LOG)
-					{
-						logerror("CHIP Address: %04x\n", address);
-						logerror("CHIP Size: %04x\n", size);
-						logerror("CHIP Type: %04x\n", type);
-					}
-
-					switch (address)
-					{
-					case 0x2000: blk1_size += size; break;
-					case 0x4000: blk2_size += size; break;
-					case 0x6000: blk3_size += size; break;
-					case 0x7000: blk3_size += 0x2000; break;
-					case 0xa000: blk5_size += size; break;
-					case 0xb000: blk5_size += 0x2000; break;
-					default: logerror("Invalid CHIP loading address!\n"); break;
-					}
-
-					fseek(size, SEEK_CUR);
-				}
-
-				// allocate cartridge memory
-				UINT8 *blk1 = NULL;
-				UINT8 *blk2 = NULL;
-				UINT8 *blk3 = NULL;
-				UINT8 *blk5 = NULL;
-
-				if (blk1_size) blk1 = m_cart->vic20_blk1_pointer(machine(), blk1_size);
-				if (blk2_size) blk2 = m_cart->vic20_blk2_pointer(machine(), blk2_size);
-				if (blk3_size) blk3 = m_cart->vic20_blk3_pointer(machine(), blk3_size);
-				if (blk5_size) blk5 = m_cart->vic20_blk5_pointer(machine(), blk5_size);
-
-				// read the data
-				offs_t blk1_offset = 0;
-				offs_t blk2_offset = 0;
-				offs_t blk3_offset = 0;
-				offs_t blk5_offset = 0;
-
-				fseek(CRT_HEADER_LENGTH, SEEK_SET);
-
-				while (!image_feof())
-				{
-					cbm_crt_chip chip;
-					fread(&chip, CRT_CHIP_LENGTH);
-
-					UINT16 address = pick_integer_be(chip.start_address, 0, 2);
-					UINT16 size = pick_integer_be(chip.image_size, 0, 2);
-
-					switch (address)
-					{
-					case 0x2000: fread(blk1 + blk1_offset, size); blk1_offset += size; break;
-					case 0x4000: fread(blk2 + blk2_offset, size); blk2_offset += size; break;
-					case 0x6000: fread(blk3 + blk3_offset, size); blk3_offset += size; break;
-					case 0x7000: fread(blk3 + blk3_offset + 0x1000, size); blk3_offset += 0x2000; break;
-					case 0xa000: fread(blk5 + blk5_offset, size); blk5_offset += size; break;
-					case 0xb000: fread(blk5 + blk5_offset + 0x1000, size); blk5_offset += 0x2000; break;
-					}
+				case 0x2000: fread(m_cart->vic20_blk1_pointer(machine(), 0x2000), 0x2000); break;
+				case 0x4000: fread(m_cart->vic20_blk2_pointer(machine(), 0x2000), 0x2000); break;
+				case 0x6000: fread(m_cart->vic20_blk3_pointer(machine(), 0x2000), 0x2000); break;
+				case 0x7000: fread(m_cart->vic20_blk3_pointer(machine(), 0x2000) + 0x1000, 0x1000); break;
+				case 0xa000: fread(m_cart->vic20_blk5_pointer(machine(), 0x2000), 0x2000); break;
+				case 0xb000: fread(m_cart->vic20_blk5_pointer(machine(), 0x2000) + 0x1000, 0x1000); break;
+				default: return IMAGE_INIT_FAIL;
 				}
 			}
 		}
