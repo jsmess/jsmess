@@ -231,7 +231,7 @@ bool n82077aa_device::get_drq() const
 void n82077aa_device::fifo_push(UINT8 data)
 {
 	if(fifo_pos == 16) {
-		fprintf(stderr, "Overflow\n");
+		logerror("%s: Overflow\n", tag());
 		return;
 	}
 	fifo[fifo_pos++] = data;

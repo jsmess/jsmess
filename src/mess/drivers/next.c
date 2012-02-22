@@ -261,7 +261,7 @@ void next_state::irq_check()
 	else if(bit < 30) level = 6;
 	else              level = 7;
 
-	fprintf(stderr, "IRQ info %08x/%08x - %d\n", irq_status, irq_mask, level);
+	logerror("IRQ info %08x/%08x - %d\n", irq_status, irq_mask, level);
 
 	if(level != irq_level) {
 		maincpu->set_input_line(irq_level, CLEAR_LINE);
@@ -314,11 +314,9 @@ void next_state::dma_drq_w(int slot, bool state)
 				dma_read(slot, val, eof, err);
 				if(err) {
 					ds.state = (ds.state & ~DMA_ENABLE) | DMA_BUSEXC;
-					fprintf(stderr, "DMA: bus error on read slot %d\n", slot);
+					logerror("DMA: bus error on read slot %d\n", slot);
 					return;
 				}
-				if(0)
-					fprintf(stderr, "DMA [%08x] = %02x\n", ds.current, val);
 				space->write_byte(ds.current++, val);
 				dma_check_end(slot, eof);
 				if(!(ds.state & DMA_ENABLE))
@@ -333,7 +331,7 @@ void next_state::dma_drq_w(int slot, bool state)
 				dma_write(slot, val, eof, err);
 				if(err) {
 					ds.state = (ds.state & ~DMA_ENABLE) | DMA_BUSEXC;
-					fprintf(stderr, "DMA: bus error on write slot %d\n", slot);
+					logerror("DMA: bus error on write slot %d\n", slot);
 					return;
 				}
 				dma_check_end(slot, false);
@@ -457,7 +455,7 @@ READ32_MEMBER( next_state::dma_regs_r)
 	}
 
 	const char *name = dma_name(slot);
-	fprintf(stderr, "dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, cpu_get_pc(&space.device()));
+	logerror("dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, cpu_get_pc(&space.device()));
 
 	return res;
 }
@@ -469,7 +467,7 @@ WRITE32_MEMBER( next_state::dma_regs_w)
 
 	const char *name = dma_name(slot);
 
-	fprintf(stderr, "dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, cpu_get_pc(&space.device()));
+	logerror("dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, cpu_get_pc(&space.device()));
 	switch(reg) {
 	case 0:
 		dma_slots[slot].start = data;
@@ -495,7 +493,7 @@ READ32_MEMBER( next_state::dma_ctrl_r)
 	const char *name = dma_name(slot);
 
 	if(cpu_get_pc(&space.device()) != 0x409bb4e)
-		fprintf(stderr, "dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, cpu_get_pc(&space.device()));
+		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, cpu_get_pc(&space.device()));
 
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
@@ -505,7 +503,7 @@ WRITE32_MEMBER( next_state::dma_ctrl_w)
 	int slot = offset >> 2;
 	int reg = offset & 3;
 	const char *name = dma_name(slot);
-	fprintf(stderr, "dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, cpu_get_pc(&space.device()));
+	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, cpu_get_pc(&space.device()));
 	if(!reg) {
 		if(ACCESSING_BITS_16_23)
 			dma_do_ctrl_w(slot, data >> 16);
@@ -530,7 +528,7 @@ void next_state::dma_do_ctrl_w(int slot, UINT8 data)
 			data & DMA_INITBUFTURBO ? " initbufturbo" : "");
 #endif
 	if(data & DMA_SETENABLE)
-		fprintf(stderr, "dma enable %s %s %08x (%08x)\n", name, data & DMA_SETREAD ? "read" : "write", (dma_slots[slot].limit-dma_slots[slot].start) & 0x7fffffff, cpu_get_pc(maincpu));
+		logerror("dma enable %s %s %08x (%08x)\n", name, data & DMA_SETREAD ? "read" : "write", (dma_slots[slot].limit-dma_slots[slot].start) & 0x7fffffff, cpu_get_pc(maincpu));
 
 	dma_slot &ds = dma_slots[slot];
 	if(data & (DMA_RESET|DMA_INITBUF|DMA_INITBUFTURBO)) {
@@ -562,7 +560,7 @@ const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 
 READ32_MEMBER( next_state::scsictrl_r )
 {
 	UINT32 res = (scsictrl << 24) | (scsistat << 16);
-	fprintf(stderr, "scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, cpu_get_pc(&space.device()));
+	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, cpu_get_pc(&space.device()));
 	return res;
 }
 
@@ -574,7 +572,7 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 			scsi->reset();
 		device_t::static_set_clock(*scsi, scsi_clocks[scsictrl >> 6]);
 
-		fprintf(stderr, "SCSIctrl %dMHz int=%s dma=%s dmadir=%s%s%s dest=%s (%08x)\n",
+		logerror("SCSIctrl %dMHz int=%s dma=%s dmadir=%s%s%s dest=%s (%08x)\n",
 				scsi_clocks[scsictrl >> 6]/1000000,
 				scsictrl & 0x20 ? "on" : "off",
 				scsictrl & 0x10 ? "on" : "off",
@@ -586,7 +584,7 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 	}
 	if(ACCESSING_BITS_16_23) {
 		scsistat = data >> 16;
-		fprintf(stderr, "SCSIstat %02x (%08x)\n", data, cpu_get_pc(&space.device()));
+		logerror("SCSIstat %02x (%08x)\n", data, cpu_get_pc(&space.device()));
 	}
 }
 
@@ -595,7 +593,7 @@ READ32_MEMBER( next_state::event_counter_r)
 	// Event counters, around that time, are usually fixed-frequency counters.
 	// This one being 1MHz seems to make sense
 
-	// The nexttrb rom seems pretty convinced that it's 20 bits only.
+	// The v74 rom seems pretty convinced that it's 20 bits only.
 
 	if(ACCESSING_BITS_24_31)
 		eventc_latch = machine().time().as_ticks(1000000) & 0xfffff;
@@ -609,7 +607,7 @@ READ32_MEMBER( next_state::dsp_r)
 
 WRITE32_MEMBER( next_state::fdc_control_w )
 {
-	fprintf(stderr, "FDC write %02x (%08x)\n", data >> 24, cpu_get_pc(&space.device()));
+	logerror("FDC write %02x (%08x)\n", data >> 24, cpu_get_pc(&space.device()));
 }
 
 READ32_MEMBER( next_state::fdc_control_r )
