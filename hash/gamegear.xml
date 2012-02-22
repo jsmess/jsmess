@@ -5512,7 +5512,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="pstrike2">
-		<description>Power Strike II (Euro) ~ GG Aletste II (Jpn)</description>
+		<description>Power Strike II (Euro) ~ GG Aleste II (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3330, 2443"/>
@@ -7374,6 +7374,31 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="shero">
+		<description>Street Hero (USA, Prototype, SMS Mode)</description>
+		<year>1993</year>
+		<publisher>Innovation Tech</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="mapper" value="codemasters" />
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="524288">
+				<rom name="street hero [proto 0] (us).bin" size="524288" crc="9fa727a0" sha1="94f1113a6b19b7fa080114c65e8d0bd67f9117d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sheroa" cloneof="shero">
+		<description>Street Hero (USA, Prototype Alt, SMS Mode)</description>
+		<year>1993</year>
+		<publisher>Innovation Tech</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="524288">
+				<rom name="street hero [proto 1] (us).bin" size="524288" crc="fb481971" sha1="7218b455819dd965ffcb720ad11458270bd7f3c6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Developers: Sega AM7 (CS2) / JSH -->
 	<software name="sor">
 		<description>Streets of Rage (World) ~ Bare Knuckle (Jpn)</description>
@@ -8894,6 +8919,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+<!-- SMSPower list this as a US proto... investigate! -->
 	<software name="zoop">
 		<description>Zoop (Euro)</description>
 		<year>1995</year>
