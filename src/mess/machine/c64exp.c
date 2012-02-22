@@ -255,12 +255,11 @@ bool c64_expansion_slot_device::call_load()
 
 			if (!mame_stricmp(filetype(), "80"))
 			{
-				fread(m_cart->c64_roml_pointer(machine(), 0x2000), 0x2000);
+				fread(m_cart->c64_roml_pointer(machine(), size), size);
 				m_cart->c64_exrom_w(0);
 
 				if (size == 0x4000)
 				{
-					fread(m_cart->c64_romh_pointer(machine(), 0x2000), 0x2000);
 					m_cart->c64_game_w(0);
 				}
 			}
