@@ -4,12 +4,11 @@
 
     TODO:
 
-    - Find out why the pager doesn't work on the mach_init loading
-      task (yes, that's the big one)
+    - Find what the sleeping threads are waiting for
 
     - Hook up the mouse (not before the system boots though, see the first problem)
 
-    - Fix the kernel bitching at boot (non-volatile memory readback error)
+    - Find why the kernel doesn't manage to change the nvram at boot (readback error)
 
     - Hook up the sound output, it seems to be shared with the keyboard port somehow
 
@@ -185,47 +184,49 @@ READ32_MEMBER( next_state::scr1_r )
 
 // Interrupt subsystem
 // source    bit   level
-// nmi       31    7
+// nmi       31    7 *
 // pfail     30    7
-// timer     29    6
-// enetxdma  28    6
-// enetrdma  27    6
-// scsidma   26    6
-// diskdma   25    6
-// prndma    24    6
-// sndoutdma 23    6
-// sndindma  22    6
+// timer     29    6 *
+// enetxdma  28    6 *
+// enetrdma  27    6 *
+// scsidma   26    6 *
+// diskdma   25    6 
+// prndma    24    6 *
+// sndoutdma 23    6  
+// sndindma  22    6  
 // sccdma    21    6
-// dspdma    20    6
+// dspdma    20    6  
 // m2rdma    19    6
 // r2mdma    18    6
 // scc       17    5
-// remote    16    5
-// bus       15    5
+// remote    16    5 *
+// bus       15    5 *
 // dsp4      14    4
 // disk      13    3
-// scsi      12    3
+// scsi      12    3 *
 // printer   11    3
-// enetx     10    3
+// enetx     10    3 *
 // enetr      9    3
-// soundovr   8    3
-// phone      7    3 -- floppy
+// soundovr   8    3 *
+// phone      7    3 * -- floppy
 // dsp3       6    3
 // video      5    3
 // monitor    4    3
-// kbdmouse   3    3
-// power      2    3
-// softint1   1    2
-// softint0   0    1
+// kbdmouse   3    3 *
+// power      2    3 *
+// softint1   1    2 *
+// softint0   0    1 *
 
 void next_state::irq_set(int id, bool raise)
 {
 	UINT32 mask = 1U << id;
+	UINT32 old_status = irq_status;
 	if(raise)
 		irq_status |= mask;
 	else
 		irq_status &= ~mask;
-	irq_check();
+	if(old_status != irq_status)
+		irq_check();
 }
 
 
@@ -659,6 +660,10 @@ WRITE32_MEMBER( next_state::phy_w )
 void next_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	irq_set(29, true);
+	if(timer_ctrl & 0x40000000) {
+		timer_data = 0xffff0000; // Old value instead?  Hard to know, since the kernel uses 0xffff
+		timer_start();
+	}
 }
 
 READ32_MEMBER( next_state::timer_data_r )
