@@ -26,6 +26,7 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "covox"; }
 private:
 	device_t *m_dac;
 };
@@ -49,6 +50,7 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "covox_stereo"; }
 private:
 	device_t *m_dac_left;
 	device_t *m_dac_right;

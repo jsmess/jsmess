@@ -51,6 +51,7 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "vic1112"; }
 
 	// device_vic20_expansion_card_interface overrides
 	virtual UINT8 vic20_io2_r(address_space &space, offs_t offset);

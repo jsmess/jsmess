@@ -39,6 +39,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "comx_joy"; }
 
 	// device_comx_expansion_card_interface overrides
 	virtual UINT8 comx_io_r(offs_t offset);
