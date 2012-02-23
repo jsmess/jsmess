@@ -1238,13 +1238,13 @@ MACHINE_CONFIG_END
 //  ROM( bullet )
 //-------------------------------------------------
 
-ROM_START( bullet )
+ROM_START( wmbullet )
     ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "sr70x.u8", 0x00, 0x20, CRC(d54b8a30) SHA1(65ff8753dd63c9dd1899bc9364a016225585d050) )
 ROM_END
 
 
-#define rom_bulletf rom_bullet
+#define rom_wmbulletf rom_wmbullet
 
 
 
@@ -1253,5 +1253,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME                FLAGS
-COMP( 1982, bullet,		0,			0,		bullet,		bullet,		0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1984, bulletf,	bullet,		0,		bulletf,	bulletf,	0,		"Wave Mate",	"Bullet (Revision F)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+// the setname 'bullet' is used by Sega's Bullet in MAME.
+COMP( 1982, wmbullet,		0,			0,		bullet,		bullet,		0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1984, wmbulletf,	wmbullet,		0,		bulletf,	bulletf,	0,		"Wave Mate",	"Bullet (Revision F)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
