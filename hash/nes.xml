@@ -51251,7 +51251,24 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 <!-- [NJ050] 红楼梦 ~ Hong Lou Meng (Dream of Red House?) -->
-<!-- [NJ051] 乱世三国 ~ Luan Shi San Guo -->
+
+	<software name="luanshi">
+		<description>Luan Shi San Guo (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ051"/>
+		<info name="alt_title" value="乱世三国"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="[nj051] luan shi san guo (c).chr" size="262144" crc="6301602d" sha1="a82f16629cccddee9f6c67826f5611ce04289c04" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="[nj051] luan shi san guo (c).prg" size="262144" crc="df0fb362" sha1="c1486198e454a53b43eea1046fd9f2d96024172d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- [NJ052] 宠物宝宝 ~ Chong Wu Bao Bao (Pet Baby?)-->
 <!-- [NJ053] 换装人 ~ Huan Zhuang Ren [or NJ040?] -->
 <!-- [NJ054] 原始人 ~ Yuan Shi Ren [or NJ038?] -->
