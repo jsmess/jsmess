@@ -9,8 +9,7 @@
   BEEP! magazine contest in 1987, to celebrate the release of Phantasy Star)
   - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or
   131 games)
-  - a few other pirate multigame carts (4 Pak All Action + two versions of
-  4 in 1 carts)
+  - a few other pirate multigame carts (two versions of 4 in 1 carts)
 
 -->
 <!--
@@ -1327,7 +1326,7 @@
 		</part>
 	</software>
 
-	<software name="comicbak" supported="no">
+	<software name="comicbak">
 		<description>Comic Bakery (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
