@@ -53,6 +53,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "c64_ieee488"; }
 
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);

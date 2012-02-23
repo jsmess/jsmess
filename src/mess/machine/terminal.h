@@ -61,6 +61,7 @@ public:
 protected:
 	virtual void device_start() { m_owner = dynamic_cast<serial_port_device *>(owner()); }
 	virtual void device_reset() { m_owner->out_rx(1); m_rbit = 1; }
+	virtual void device_config_complete() { m_shortname = "serial_terminal"; }
 private:
 	required_device<device_t> m_terminal;
 	serial_port_device *m_owner;

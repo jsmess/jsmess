@@ -139,6 +139,17 @@ coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, co
 {
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void coco_pak_banked_device::device_config_complete()
+{
+	m_shortname = "cocopak_banked";
+}
+
 /*-------------------------------------------------
     device_reset - device-specific startup
 -------------------------------------------------*/

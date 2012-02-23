@@ -49,6 +49,7 @@ public:
 protected:
     // device-level overrides
     virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "vic1010"; }
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;

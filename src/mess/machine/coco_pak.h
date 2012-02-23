@@ -53,6 +53,7 @@ public:
 protected:
         // device-level overrides
 		virtual void device_reset();
+		virtual void device_config_complete();
 		virtual DECLARE_WRITE8_MEMBER(write);
 private:
 		void banked_pak_set_bank(UINT32 bank);

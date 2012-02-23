@@ -81,7 +81,7 @@ public:
 protected:
         // device-level overrides
         virtual void device_start();
-
+		virtual void device_config_complete() { m_shortname = "isa_sblaster1_0"; }
 private:
         // internal state
 };
@@ -97,7 +97,7 @@ public:
 protected:
         // device-level overrides
         virtual void device_start();
-
+		virtual void device_config_complete() { m_shortname = "isa_sblaster1_5"; }
 private:
         // internal state
 };
