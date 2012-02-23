@@ -1676,6 +1676,7 @@ $(MESSOBJ)/ti.a:				\
 	$(MESS_MACHINE)/ti99/mapper8.o	\
 	$(MESS_MACHINE)/ti99/genboard.o	\
 	$(MESS_MACHINE)/ti99/memex.o	\
+	$(MESS_MACHINE)/ti99/horizon.o	\
 	$(MESS_MACHINE)/strata.o	\
 	$(MESS_MACHINE)/990_dk.o	\
 	$(MESS_DRIVERS)/ti990_4.o	\

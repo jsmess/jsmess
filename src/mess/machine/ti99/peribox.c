@@ -192,6 +192,7 @@ CRUCLK*  51||52  DBIN
 #include "ti_rs232.h"
 #include "spchsyn.h"
 #include "memex.h"
+#include "horizon.h"
 
 #include "formats/ti99_dsk.h"
 
@@ -379,6 +380,7 @@ SLOT_INTERFACE_START( peribox_slot )
 	SLOT_INTERFACE("hsgpl", TI99_HSGPL)
 	SLOT_INTERFACE("tirs232", TI99_RS232)
 	SLOT_INTERFACE("speech", TI99_SPEECH)
+	SLOT_INTERFACE("horizon", TI99_HORIZON)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_slot6 )
@@ -435,6 +437,7 @@ SLOT_INTERFACE_START( peribox_slotg )
 	SLOT_INTERFACE("pcode", TI99_P_CODE)
 	SLOT_INTERFACE("tirs232", TI99_RS232)
 	SLOT_INTERFACE("speech", TI99_SPEECH)
+	SLOT_INTERFACE("horizon", TI99_HORIZON)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
@@ -468,6 +471,7 @@ SLOT_INTERFACE_START( peribox_slotp )
 	SLOT_INTERFACE("pcode", TI99_P_CODE)
 	SLOT_INTERFACE("tirs232", TI99_RS232)
 	SLOT_INTERFACE("speech", TI99_SPEECH)
+	SLOT_INTERFACE("horizon", TI99_HORIZON)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_ev_slot )
