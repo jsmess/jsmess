@@ -200,7 +200,7 @@ ioport_constructor c64_sfx_sound_expander_cartridge_device::device_input_ports()
 //-------------------------------------------------
 
 c64_sfx_sound_expander_cartridge_device::c64_sfx_sound_expander_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_SFX_SOUND_EXPANDER, "C64 Magic Formel cartridge", tag, owner, clock),
+	device_t(mconfig, C64_SFX_SOUND_EXPANDER, "C64 SFX Sound Expander cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_opl(*this, YM3526_TAG),
     m_exp(*this, C64_EXPANSION_SLOT_TAG)
