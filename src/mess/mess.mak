@@ -132,7 +132,7 @@ SOUNDS += YM2610B
 SOUNDS += YM2612
 #SOUNDS += YM3438
 SOUNDS += YM3812
-#SOUNDS += YM3526
+SOUNDS += YM3526
 #SOUNDS += Y8950
 #SOUNDS += YMF262
 #SOUNDS += YMF271
@@ -771,10 +771,12 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_dela_ep64.o	\
 	$(MESS_MACHINE)/c64_dela_ep7x8.o	\
 	$(MESS_MACHINE)/c64_dinamic.o	\
+	$(MESS_MACHINE)/c64_dqbb.o	\
 	$(MESS_MACHINE)/c64_easy_calc_result.o	\
 	$(MESS_MACHINE)/c64_easyflash.o	\
 	$(MESS_MACHINE)/c64_epyx_fast_load.o	\
 	$(MESS_MACHINE)/c64_exos.o	\
+	$(MESS_MACHINE)/c64_final.o	\
 	$(MESS_MACHINE)/c64_fun_play.o	\
 	$(MESS_MACHINE)/c64_georam.o	\
 	$(MESS_MACHINE)/c64_ieee488.o	\
@@ -785,9 +787,11 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_multiscreen.o	\
 	$(MESS_MACHINE)/c64_ocean.o	\
 	$(MESS_MACHINE)/c64_pagefox.o	\
+	$(MESS_MACHINE)/c64_prophet64.o	\
 	$(MESS_MACHINE)/c64_rex.o	\
 	$(MESS_MACHINE)/c64_rex_ep256.o	\
 	$(MESS_MACHINE)/c64_ross.o	\
+	$(MESS_MACHINE)/c64_sfx_sound_expander.o	\
 	$(MESS_MACHINE)/c64_silverrock.o	\
 	$(MESS_MACHINE)/c64_simons_basic.o	\
 	$(MESS_MACHINE)/c64_stardos.o	\

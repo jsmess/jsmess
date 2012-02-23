@@ -5774,7 +5774,7 @@
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -5788,7 +5788,7 @@
 		<year>198?</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final_proto" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="rom" size="0x6000">
@@ -5803,7 +5803,7 @@
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -5817,7 +5817,7 @@
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -5831,7 +5831,7 @@
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -5845,7 +5845,7 @@
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -5859,7 +5859,7 @@
 		<year>1986</year>
 		<publisher>Eurosystems</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -5873,7 +5873,7 @@
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final_plus" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -5887,7 +5887,7 @@
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final_plus" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -5901,7 +5901,7 @@
 		<year>1986</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge" />
+			<feature name="slot" value="final_plus" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
@@ -5915,7 +5915,7 @@
 		<year>1987</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge_2" />
+			<feature name="slot" value="final" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -5929,7 +5929,7 @@
 		<year>1986</year>
 		<publisher>Micro-Luc</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge_2" />
+			<feature name="slot" value="final" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x4000">
@@ -5943,7 +5943,7 @@
 		<year>1988</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge_3" />
+			<feature name="slot" value="final3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -5957,7 +5957,7 @@
 		<year>1988</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge_3" />
+			<feature name="slot" value="final3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -5971,7 +5971,7 @@
 		<year>1987</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge_3" />
+			<feature name="slot" value="final3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
@@ -5985,7 +5985,7 @@
 		<year>1987</year>
 		<publisher>Riska H&amp;P</publisher>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="final_cartridge_3" />
+			<feature name="slot" value="final3" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x10000">
