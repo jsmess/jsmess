@@ -1562,7 +1562,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 0;
 			pi_status |= 1;
 
-			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 3.0f);
+			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 6.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			//printf("want read dma in %d\n", (pi_rd_len + 1));
 			pi_dma_timer->adjust(dma_period);
 			//pi_dma_tick();
@@ -1575,7 +1575,7 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_dma_dir = 1;
 			pi_status |= 1;
 
-			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 3.0f);
+			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 6.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			//printf("want write dma in %d\n", (pi_wr_len + 1));
 			pi_dma_timer->adjust(dma_period);
 
