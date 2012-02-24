@@ -43,7 +43,7 @@ protected:
 
 private:
 	void	setbit(int& page, int pattern, bool set);
-
+	int 	get_size();
 	UINT8*	m_ram;
 	UINT8*	m_nvram;
 	UINT8*	m_ros;
