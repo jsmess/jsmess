@@ -28,10 +28,12 @@ class altair_state : public driver_device
 public:
 	altair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(sio_status_r);
 	DECLARE_READ8_MEMBER(sio_data_r);
 	DECLARE_READ8_MEMBER(sio_key_status_r);
@@ -76,7 +78,7 @@ static ADDRESS_MAP_START(altair_io, AS_IO, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_READ(sio_key_status_r)
-	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_READ(sio_data_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_READ(sio_data_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE( 0x10, 0x10 ) AM_READWRITE(sio_status_r,sio_command_w)
 ADDRESS_MAP_END
 

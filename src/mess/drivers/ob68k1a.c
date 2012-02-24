@@ -214,7 +214,6 @@ static const ptm6840_interface ptm_intf =
 	DEVCB_NULL
 };
 
-
 //-------------------------------------------------
 //  ACIA6850_INTERFACE( acia0_intf )
 //-------------------------------------------------
@@ -223,8 +222,8 @@ static ACIA6850_INTERFACE( acia0_intf )
 {
 	9600*16, // HACK for terminal
 	9600*16, // HACK for terminal
-	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
-	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, tx_r),
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
 	DEVCB_LINE_GND, // HACK for terminal
 	DEVCB_NULL,
 	DEVCB_LINE_GND, // HACK for terminal
@@ -273,14 +272,9 @@ static COM8116_INTERFACE( dbrg_intf )
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
-static WRITE8_DEVICE_HANDLER( dummy_w )
+static serial_terminal_interface terminal_intf =
 {
-	// this is here only so that terminal.c will initialize the keyboard scan timer
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_HANDLER(dummy_w)
+	DEVCB_NULL
 };
 
 
@@ -350,7 +344,7 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia0_intf)
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia1_intf)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, dbrg_intf)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

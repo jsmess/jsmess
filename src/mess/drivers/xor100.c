@@ -169,7 +169,7 @@ WRITE8_MEMBER( xor100_state::baud_w )
 WRITE8_MEMBER( xor100_state::i8251_b_data_w )
 {
 	m_uart_b->data_w(space, 0, data);
-	terminal_write(m_terminal, 0, data);
+	m_terminal->write(space, 0, data);
 }
 
 READ8_MEMBER( xor100_state::fdc_wait_r )

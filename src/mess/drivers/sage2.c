@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	AM_RANGE(0xffc050, 0xffc051) AM_DEVREAD8_LEGACY(UPD765_TAG, upd765_status_r, 0x00ff)
 	AM_RANGE(0xffc052, 0xffc053) AM_DEVREADWRITE8_LEGACY(UPD765_TAG, upd765_data_r, upd765_data_w, 0x00ff)
 	AM_RANGE(0xffc060, 0xffc067) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, Printer
-	AM_RANGE(0xffc070, 0xffc071) AM_DEVREAD8(I8251_0_TAG, i8251_device, data_r, 0x00ff) AM_DEVWRITE8_LEGACY(TERMINAL_TAG, terminal_write, 0x00ff)
+	AM_RANGE(0xffc070, 0xffc071) AM_DEVREAD8(I8251_0_TAG, i8251_device, data_r, 0x00ff) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0x00ff)
 //  AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xffc072, 0xffc073) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xffc080, 0xffc087) AM_MIRROR(0x78) AM_DEVREADWRITE8_LEGACY(I8253_0_TAG, pit8253_r, pit8253_w, 0x00ff)

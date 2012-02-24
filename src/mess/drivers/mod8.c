@@ -28,7 +28,7 @@ public:
 	m_teleprinter(*this, TELEPRINTER_TAG)
 	{ }
 
-	required_device<device_t> m_teleprinter;
+	required_device<teleprinter_device> m_teleprinter;
 	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_WRITE8_MEMBER(tty_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -46,7 +46,7 @@ WRITE8_MEMBER( mod8_state::out_w )
 
 	if (m_tty_cnt == 10)
 	{
-		teleprinter_write(m_teleprinter, 0, (m_tty_data >> 7) & 0x7f);
+		m_teleprinter->write(space, 0, (m_tty_data >> 7) & 0x7f);
 		m_tty_cnt = 0;
 	}
 }
@@ -112,7 +112,6 @@ static MACHINE_CONFIG_START( mod8, mod8_state )
 	MCFG_MACHINE_RESET(mod8)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( generic_teleprinter )
 	MCFG_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG, teleprinter_intf)
 MACHINE_CONFIG_END
 

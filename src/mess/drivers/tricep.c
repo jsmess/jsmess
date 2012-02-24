@@ -22,7 +22,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER(tricep_terminal_r);
 	DECLARE_WRITE16_MEMBER(tricep_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -38,7 +38,7 @@ READ16_MEMBER( tricep_state::tricep_terminal_r )
 
 WRITE16_MEMBER( tricep_state::tricep_terminal_w )
 {
-	terminal_write(m_terminal, 0, data >> 8);
+	m_terminal->write(space, 0, data >> 8);
 }
 
 static ADDRESS_MAP_START(tricep_mem, AS_PROGRAM, 16, tricep_state)

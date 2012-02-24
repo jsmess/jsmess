@@ -62,7 +62,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_term_data(0),
 	m_j(0),
-	m_scroll(0)
+	m_scroll(0),
+	m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
@@ -80,6 +81,8 @@ public:
 	UINT8 m_scroll;
 	virtual void machine_reset();
 	virtual void video_start();
+
+	required_device<generic_terminal_device> m_terminal;
 };
 
 // okean240 requires bit 4 to change
@@ -227,7 +230,7 @@ static ADDRESS_MAP_START(okean240t_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x42) AM_READWRITE(okean240_keyboard_r,okean240_keyboard_w)
 	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0xa0, 0xa0) AM_READ(term_r)
 	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(scroll_w)

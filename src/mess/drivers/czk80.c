@@ -30,7 +30,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER( czk80_80_r );
 	DECLARE_READ8_MEMBER( czk80_81_r );
 	DECLARE_READ8_MEMBER( czk80_c0_r );
@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(czk80_io, AS_IO, 8, czk80_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ(czk80_80_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0x80, 0x80) AM_READ(czk80_80_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0x81, 0x81) AM_READ(czk80_81_r)
 	AM_RANGE(0xc0, 0xc0) AM_READ(czk80_c0_r)
 ADDRESS_MAP_END

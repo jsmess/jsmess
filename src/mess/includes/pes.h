@@ -22,7 +22,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	required_device<device_t> m_speech;
 
 	UINT8 m_wsstate;			// /WS

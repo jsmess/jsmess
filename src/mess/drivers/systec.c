@@ -47,7 +47,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(systec_c4_r);
 	DECLARE_READ8_MEMBER(systec_c6_r);
 	DECLARE_WRITE8_MEMBER( kbd_put );
@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(systec_io, AS_IO, 8, systec_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc4, 0xc4) AM_READ(systec_c4_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xc4, 0xc4) AM_READ(systec_c4_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0xc6, 0xc6) AM_READ(systec_c6_r)
 ADDRESS_MAP_END
 

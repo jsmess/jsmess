@@ -65,7 +65,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER(sun1_upd7201_r);
 	DECLARE_WRITE16_MEMBER(sun1_upd7201_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -95,7 +95,7 @@ READ16_MEMBER( sun1_state::sun1_upd7201_r )
 WRITE16_MEMBER( sun1_state::sun1_upd7201_w )
 {
 	if (offset == 0)
-		terminal_write(m_terminal, 0, data >> 8);
+		m_terminal->write(space, 0, data >> 8);
 }
 
 static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16, sun1_state)

@@ -719,8 +719,8 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
-	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, tx_r),
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dartardy_w),
@@ -1059,18 +1059,9 @@ static const SCSIBus_interface scsi_intf =
 };
 
 
-//-------------------------------------------------
-//  GENERIC_TERMINAL_INTERFACE( terminal_intf )
-//-------------------------------------------------
-
-static WRITE8_DEVICE_HANDLER( dummy_w )
+static serial_terminal_interface terminal_intf = 
 {
-	// handled in Z80DART_INTERFACE
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_HANDLER(dummy_w)
+	DEVCB_NULL
 };
 
 
@@ -1191,7 +1182,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_MB8877_ADD(MB8877_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bullet_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1219,7 +1210,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_MB8877_ADD(MB8877_TAG, bulletf_fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bullet_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
     MCFG_SCSIBUS_ADD(SCSIBUS_TAG, scsi_intf)
 	MCFG_HARDDISK_ADD("harddisk0")
 

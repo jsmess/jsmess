@@ -40,6 +40,7 @@ public:
 		  m_floppy1(*this, FLOPPY_1),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ieee488(*this, IEEE488_TAG),
+		  m_terminal(*this, TERMINAL_TAG),
 		  m_reset(1),
 		  m_fdc_int(0),
 		  m_fdie(0),
@@ -57,6 +58,7 @@ public:
 	required_device<device_t> m_floppy1;
 	required_device<centronics_device> m_centronics;
 	required_device<ieee488_device> m_ieee488;
+	required_device<generic_terminal_device> m_terminal;
 
 	virtual void machine_reset();
 

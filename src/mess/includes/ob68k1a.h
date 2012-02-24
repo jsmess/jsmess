@@ -32,7 +32,7 @@ public:
 	required_device<device_t> m_acia0;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
-	required_device<device_t> m_terminal;
+	required_device<serial_terminal_device> m_terminal;
 	required_device<ram_device> m_ram;
 
 	virtual void machine_start();

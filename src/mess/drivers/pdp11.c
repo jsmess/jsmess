@@ -81,7 +81,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( term_r );
 	DECLARE_READ16_MEMBER( term_tx_status_r );
 	DECLARE_READ16_MEMBER( term_rx_status_r );
@@ -93,7 +93,7 @@ public:
 
 WRITE16_MEMBER(pdp11_state::term_w)
 {
-	terminal_write(m_terminal, 0, data);
+	m_terminal->write(space, 0, data);
 }
 
 READ16_MEMBER(pdp11_state::term_r)

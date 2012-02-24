@@ -44,7 +44,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	required_device<device_t> m_duart;
 	required_device<device_t> m_fdc;
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -87,7 +87,7 @@ static void duart_irq_handler(device_t *device, UINT8 vector)
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
 	ht68k_state *state = device->machine().driver_data<ht68k_state>();
-	terminal_write(state->m_terminal, 0, data);
+	state->m_terminal->write(*memory_nonspecific_space(device->machine()), 0, data);
 }
 
 static UINT8 duart_input(device_t *device)

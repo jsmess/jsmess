@@ -22,7 +22,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(vector4_02_r);
 	DECLARE_READ8_MEMBER(vector4_03_r);
 	DECLARE_WRITE8_MEMBER(vector4_02_w);
@@ -35,7 +35,7 @@ public:
 WRITE8_MEMBER( vector4_state::vector4_02_w )
 {
 	if (data < 0xff)
-		terminal_write(m_terminal, 0, data);
+		m_terminal->write(space, 0, data);
 }
 
 READ8_MEMBER( vector4_state::vector4_03_r )

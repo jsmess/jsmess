@@ -39,7 +39,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(swtpc_status_r);
 	DECLARE_READ8_MEMBER(swtpc_terminal_r);
 	DECLARE_READ8_MEMBER(swtpc_tricky_r);
@@ -71,7 +71,7 @@ READ8_MEMBER( swtpc_state::swtpc_tricky_r )
 WRITE8_MEMBER(swtpc_state::swtpc_terminal_w)
 {
 	if (data)
-		terminal_write(m_terminal, 0, data);
+		m_terminal->write(space, 0, data);
 }
 
 

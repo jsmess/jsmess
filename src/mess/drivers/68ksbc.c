@@ -42,7 +42,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( c68ksbc_status_r );
 	DECLARE_READ16_MEMBER( c68ksbc_terminal_r );
 	DECLARE_WRITE8_MEMBER( kbd_put );
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START(c68ksbc_mem, AS_PROGRAM, 16, c68ksbc_state)
 	AM_RANGE(0x000000, 0x002fff) AM_ROM
 	AM_RANGE(0x003000, 0x5fffff) AM_RAM
 	AM_RANGE(0x600000, 0x600001) AM_READ(c68ksbc_status_r)
-	AM_RANGE(0x600002, 0x600003) AM_READ(c68ksbc_terminal_r) AM_DEVWRITE8_LEGACY(TERMINAL_TAG, terminal_write, 0xff)
+	AM_RANGE(0x600002, 0x600003) AM_READ(c68ksbc_terminal_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0xff)
 ADDRESS_MAP_END
 
 
