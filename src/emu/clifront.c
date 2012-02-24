@@ -881,7 +881,7 @@ void cli_frontend::verifyroms(const char *gamename)
 								notfound++;
 
 							// else display information about what we discovered
-							else
+							else if(summary != media_auditor::NONE_NEEDED)
 							{
 								// output the summary of the audit
 								astring summary_string;
