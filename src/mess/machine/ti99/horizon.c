@@ -43,7 +43,8 @@
     of 16 MiB memory space. Unfortunately, a bug causes the configuration
     program to crash when used with more than 2 MiB. Although the card was
     quite popular, this bug was not found because most cards were sold with
-    less than 2 MiB onboard.
+    less than 2 MiB onboard. As the community is still alive we can hope for
+    a fix for this problem; so we make the size configurable.
 
     Michael Zapf
     February 2012
@@ -56,8 +57,8 @@
 #define NVRAMREGION "nvram"
 #define ROSREGION "ros"
 
-// Paged RAM is 2 MiB; behind we add the 8 KiB for the buffered RAM for the ROS
-#define BUFFRAM_SIZE 2097152+8192
+// Paged RAM is max 16 MiB; behind we add the 8 KiB for the buffered RAM for the ROS
+#define MAXRAM_SIZE 16777216+8192
 
 #define VERBOSE 1
 #define LOG logerror
@@ -73,9 +74,16 @@ horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, co
 //  its default state
 //-------------------------------------------------
 
+int horizon_ramdisk_device::get_size()
+{
+	int size = 8192 + 2097152*(1 << input_port_read(*this, "HORIZONSIZE"));
+	if (VERBOSE>2) LOG("horizon: size = %d\n", size);
+	return size;
+}
+
 void horizon_ramdisk_device::nvram_default()
 {
-	memset(m_nvram, 0, BUFFRAM_SIZE);
+	memset(m_nvram, 0, get_size());
 }
 
 //-------------------------------------------------
@@ -85,7 +93,13 @@ void horizon_ramdisk_device::nvram_default()
 
 void horizon_ramdisk_device::nvram_read(emu_file &file)
 {
-	file.read(m_nvram, BUFFRAM_SIZE);
+	int size = get_size();
+	int readsize = file.read(m_nvram, size);
+	// If we increased the size, fill the remaining parts with 0
+	if (readsize < size)
+	{
+		memset(m_nvram + readsize, 0, size-readsize);
+	}
 }
 
 //-------------------------------------------------
@@ -95,7 +109,8 @@ void horizon_ramdisk_device::nvram_read(emu_file &file)
 
 void horizon_ramdisk_device::nvram_write(emu_file &file)
 {
-	file.write(m_nvram, BUFFRAM_SIZE);
+	int size = get_size();
+	file.write(m_nvram, size);
 }
 
 READ8Z_MEMBER(horizon_ramdisk_device::readz)
@@ -248,6 +263,10 @@ void horizon_ramdisk_device::setbit(int& page, int pattern, bool set)
 
 void horizon_ramdisk_device::cruwrite(offs_t offset, UINT8 data)
 {
+	int size = input_port_read(*this, "HORIZONSIZE");
+	int split_bit = size + 10;
+	int splitpagebit = 0x0200 << size;
+
 	if (((offset & 0xff00)==m_cru_horizon)||((offset & 0xff00)==m_cru_phoenix))
 	{
 		int bit = (offset >> 1) & 0x0f;
@@ -267,41 +286,13 @@ void horizon_ramdisk_device::cruwrite(offs_t offset, UINT8 data)
 			if (!m_rambo_mode) setbit(m_page, 0x0001, data!=0);
 			break;
 		case 3:
-			setbit(m_page, 0x0004, data!=0);
-			break;
 		case 4:
-			setbit(m_page, 0x0008, data!=0);
-			break;
 		case 5:
-			setbit(m_page, 0x0010, data!=0);
-			break;
 		case 6:
-			setbit(m_page, 0x0020, data!=0);
-			break;
 		case 7:
-			setbit(m_page, 0x0040, data!=0);
-			break;
 		case 8:
-			setbit(m_page, 0x0080, data!=0);
-			break;
 		case 9:
-			setbit(m_page, 0x0100, data!=0);
-			break;
-		case 10:
-			// Remove "if" for 512K SRAMs
-			if (!m_split_mode) setbit(m_page, 0x0200, data!=0);
-			break;
-		case 11:
-			// We nee to limit this to 2 MiB because of a formatting too bug!
-			// setbit(m_page, 0x0400, data!=0);
-			break;
-		case 12:
-			// Uncomment for 512k SRAMs
-			//if (!m_split_mode) setbit(m_page, 0x0800, data!=0);
-			break;
-		case 13:
-			// Uncomment for 512k SRAMs
-			//setbit(m_page, 0x1000, data!=0);
+			setbit(m_page, 0x0001 << (bit-1), data!=0);
 			break;
 		case 14:
 			break;
@@ -312,6 +303,13 @@ void horizon_ramdisk_device::cruwrite(offs_t offset, UINT8 data)
 				if (VERBOSE>4) LOG("horizon: RAMBO = %d\n", m_rambo_mode);
 			}
 			break;
+
+		default:   // bits 10-13
+			if (bit != split_bit || !m_split_mode)
+			{
+				if (bit <= split_bit) setbit(m_page, 0x0200<<(bit-10), data!=0);
+			}
+			break;
 		}
 
 		if (m_split_mode)
@@ -319,15 +317,13 @@ void horizon_ramdisk_device::cruwrite(offs_t offset, UINT8 data)
 			if (m_timode)
 			{
 				// In TI mode, switch between both RAMDisks using the CRU address
-				//setbit(m_page, 0x0800, ((offset & 0xff00)==m_cru_phoenix));
-				setbit(m_page, 0x0200, ((offset & 0xff00)==m_cru_phoenix));
+				setbit(m_page, splitpagebit, ((offset & 0xff00)==m_cru_phoenix));
 			}
 			else
 			{
 				// In Geneve mode, switch between both RAMdisks by
 				// using the bit number of the last CRU access
-				// setbit(m_page, 0x0800, (bit>7));
-				setbit(m_page, 0x0200, (bit>7));
+				setbit(m_page, splitpagebit, (bit>7));
 			}
 		}
 	}
@@ -337,7 +333,7 @@ void horizon_ramdisk_device::device_start(void)
 {
 	m_nvram = subregion(NVRAMREGION)->base();
 	m_ram = subregion(RAMREGION)->base();
-	m_ros = m_nvram + BUFFRAM_SIZE-8192;
+	m_ros = m_nvram + MAXRAM_SIZE - 8192;
 	m_cru_horizon = 0;
 	m_cru_phoenix = 0;
 }
@@ -359,6 +355,7 @@ void horizon_ramdisk_device::device_reset(void)
 		m_select_all = 0x70000;
 	}
 
+	m_ros = m_nvram + get_size()-8192;
 	m_cru_horizon = input_port_read(*this, "CRUHOR");
 	m_cru_phoenix = input_port_read(*this, "CRUPHOE");
 
@@ -421,11 +418,18 @@ INPUT_PORTS_START( horizon )
 	PORT_CONFNAME( 0x01, 0x01, "Horizon RAMBO" )
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( 0x01, DEF_STR( On ))
+
+	PORT_START( "HORIZONSIZE" )
+	PORT_CONFNAME( 0x03, 0x00, "Horizon size" )
+		PORT_CONFSETTING( 0x00, "2 MiB")
+		PORT_CONFSETTING( 0x01, "4 MiB")
+		PORT_CONFSETTING( 0x03, "16 MiB")
+
 INPUT_PORTS_END
 
 ROM_START( horizon )
-	ROM_REGION(BUFFRAM_SIZE, NVRAMREGION, 0)
-	ROM_FILL(0x0000, BUFFRAM_SIZE, 0x00)
+	ROM_REGION(MAXRAM_SIZE, NVRAMREGION, 0)
+	ROM_FILL(0x0000, MAXRAM_SIZE, 0x00)
 	ROM_REGION(0x8000, RAMREGION, 0)
 	ROM_FILL(0x0000, 0x8000, 0x00)
 ROM_END
