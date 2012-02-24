@@ -804,8 +804,11 @@ READ8_MEMBER(towns_state::towns_sound_ctrl_r)
 			ret = m_towns_pcm_channel_flag;
 			m_towns_pcm_channel_flag = 0;
 			m_towns_pcm_irq_flag = 0;
-			pic8259_ir5_w(m_pic_slave, 0);
-			if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set low\n");
+			if(m_towns_fm_irq_flag == 0)
+			{
+				pic8259_ir5_w(m_pic_slave, 0);
+				if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set low\n");
+			}
 			break;
 //      default:
 			//logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8);
@@ -1983,8 +1986,11 @@ static void towns_fm_irq(device_t* device, int irq)
 	else
 	{
 		state->m_towns_fm_irq_flag = 0;
-		pic8259_ir5_w(pic, 0);
-		if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set low\n");
+		if(state->m_towns_pcm_irq_flag == 0)
+		{
+			pic8259_ir5_w(pic, 0);
+			if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set low\n");
+		}
 	}
 }
 
