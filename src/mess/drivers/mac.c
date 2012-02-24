@@ -928,6 +928,8 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
+	MCFG_MACKBD_ADD()
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
