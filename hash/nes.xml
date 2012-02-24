@@ -44806,7 +44806,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="robocopj" cloneof="robocop">
-		<description>RoboCop (Jpn, Bad Dump)</description>
+		<description>RoboCop (Jpn)</description>
 		<year>1989</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="DFC-CP"/>
@@ -44815,10 +44815,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="robocop (japan) [b].chr" size="131072" crc="029ac47f" sha1="a8f2aae2d6edfb978159b38a0ec80f8a10a6c888" offset="00000" status="baddump" />
+				<rom name="robocop (japan).chr" size="131072" crc="029ac47f" sha1="a8f2aae2d6edfb978159b38a0ec80f8a10a6c888" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="robocop (japan) [b].prg" size="131072" crc="c382120c" sha1="37a07b61507783b7268f02748fbdc7269b476579" offset="00000" status="baddump" />
+				<rom name="robocop (japan).prg" size="131072" crc="b9ce6883" sha1="40f5d86a747978feafa94606e37eccf76b101bfc" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
