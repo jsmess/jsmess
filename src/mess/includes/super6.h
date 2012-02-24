@@ -43,7 +43,8 @@ public:
 		  m_brg(*this, BR1945_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1)
+		  m_floppy1(*this, FLOPPY_1),
+		  m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -56,6 +57,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
+	required_device<serial_terminal_device> m_terminal;
 
 	virtual void machine_start();
 	virtual void machine_reset();

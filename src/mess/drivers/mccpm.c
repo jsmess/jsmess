@@ -68,7 +68,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(mccpm_f0_r);
 	DECLARE_READ8_MEMBER(mccpm_f1_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mccpm_io, AS_IO, 8, mccpm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_READ(mccpm_f0_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xf0, 0xf0) AM_READ(mccpm_f0_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0xf1, 0xf1) AM_READ(mccpm_f1_r)
 ADDRESS_MAP_END
 

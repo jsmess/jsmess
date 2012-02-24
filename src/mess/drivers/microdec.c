@@ -18,13 +18,16 @@ class microdec_state : public driver_device
 {
 public:
 	microdec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_terminal(*this, TERMINAL_TAG) { }
 
 	DECLARE_READ8_MEMBER(terminal_status_r);
 	DECLARE_READ8_MEMBER(terminal_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE_LINE_MEMBER(microdec_irq_w);
 	UINT8 m_term_data;
+
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
@@ -51,7 +54,7 @@ static ADDRESS_MAP_START(microdec_io, AS_IO, 8, microdec_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
-	AM_RANGE(0xfc, 0xfc) AM_READ(terminal_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xfc, 0xfc) AM_READ(terminal_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0xfd, 0xfd) AM_READ(terminal_status_r)
 ADDRESS_MAP_END
 

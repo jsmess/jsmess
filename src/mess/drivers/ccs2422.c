@@ -25,7 +25,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER( ccs2422_10_r );
 	DECLARE_READ8_MEMBER( ccs2422_11_r );
 	DECLARE_WRITE8_MEMBER( ccs2422_10_w );
@@ -50,7 +50,7 @@ READ8_MEMBER( ccs2422_state::ccs2422_11_r )
 
 WRITE8_MEMBER( ccs2422_state::ccs2422_10_w )
 {
-	terminal_write(m_terminal, 0, data & 0x7f);
+	m_terminal->write(space, 0, data & 0x7f);
 }
 
 static ADDRESS_MAP_START(ccs2422_mem, AS_PROGRAM, 8, ccs2422_state)

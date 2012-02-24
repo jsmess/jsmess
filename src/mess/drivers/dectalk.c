@@ -152,7 +152,8 @@ class dectalk_state : public driver_device
 {
 public:
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_terminal(*this, TERMINAL_TAG) { }
 
 	UINT8 m_data[8]; // hack to prevent gcc bitching about struct pointers. not used.
 	UINT8 m_x2214_sram[256]; // NVRAM chip's temp sram space
@@ -176,6 +177,8 @@ public:
 	UINT8 m_duart_inport; // low 4 bits of duart input
 	UINT8 m_duart_outport; // most recent duart output
 	UINT8 m_hack_self_test; // temp variable for hack below
+
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
@@ -210,7 +213,7 @@ static void duart_output(device_t *device, UINT8 data)
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
 	device_t *devconf = device->machine().device(TERMINAL_TAG);
-	terminal_write(devconf,0,data);
+	dynamic_cast<generic_terminal_device *>(devconf)->write(*memory_nonspecific_space(devconf->machine()), 0, data);
 #ifdef SERIAL_TO_STDERR
 	fprintf(stderr, "%02X ",data);
 #endif

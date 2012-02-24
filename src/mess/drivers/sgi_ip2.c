@@ -53,7 +53,8 @@ class sgi_ip2_state : public driver_device
 {
 public:
 	sgi_ip2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_terminal(*this, TERMINAL_TAG) { }
 
 	UINT8 m_mbut;
 	UINT16 m_mquad;
@@ -66,6 +67,8 @@ public:
 	UINT32 *m_bss;
 	UINT8 m_parctl;
 	UINT8 m_mbp;
+
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
@@ -414,7 +417,7 @@ static void duarta_tx(device_t *device, int channel, UINT8 data)
 {
 	device_t *devconf = device->machine().device(TERMINAL_TAG);
 	verboselog(device->machine(), 0, "duarta_tx: %02x\n", data);
-	terminal_write(devconf,0,data);
+	dynamic_cast<generic_terminal_device *>(devconf)->write(*memory_nonspecific_space(devconf->machine()), 0, data);
 }
 
 static const duart68681_config sgi_ip2_duart68681a_config =

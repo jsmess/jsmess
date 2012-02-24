@@ -375,8 +375,8 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
-	DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, tx_r),
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
 	MCFG_COM8116_ADD(BR1945_TAG, XTAL_5_0688MHz, brg_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(super6_floppy_interface)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

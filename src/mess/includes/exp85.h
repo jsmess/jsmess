@@ -18,7 +18,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<serial_terminal_device> m_terminal;
 	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_speaker;
 
@@ -28,6 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER( i8355_a_w );
 	DECLARE_READ_LINE_MEMBER( sid_r );
 	DECLARE_WRITE_LINE_MEMBER( sod_w );
+	DECLARE_WRITE_LINE_MEMBER( terminal_w );
 
 	/* cassette state */
 	int m_tape_control;

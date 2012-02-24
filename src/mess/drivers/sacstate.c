@@ -27,7 +27,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(tty_r);
 	DECLARE_READ8_MEMBER(unknown_r);
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START(sacstate_io, AS_IO, 8, sacstate_state)
 	AM_RANGE(0x00,0x00) AM_READ(tty_r)
 	AM_RANGE(0x01,0x01) AM_READ(status_r)
 	AM_RANGE(0x04,0x04) AM_READ(unknown_r)
-	AM_RANGE(0x16,0x16) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0x16,0x16) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 ADDRESS_MAP_END
 
 /* Input ports */

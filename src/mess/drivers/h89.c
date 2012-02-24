@@ -30,14 +30,14 @@ public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_uart(*this, "ins8250")
+		  m_uart(*this, "ins8250"),
+		  m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ins8250_device> m_uart;
+	required_device<serial_terminal_device> m_terminal;
 
-	DECLARE_WRITE_LINE_MEMBER( h89_terminal_out );
-	DECLARE_WRITE8_MEMBER( h89_terminal_in );
 	DECLARE_WRITE8_MEMBER( port_f2_w );
 
 	UINT8 m_port_f2;
@@ -110,25 +110,14 @@ WRITE8_MEMBER( h89_state::port_f2_w )
 	m_port_f2 = data;
 }
 
-WRITE_LINE_MEMBER( h89_state::h89_terminal_out )
+static const serial_terminal_interface terminal_intf =
 {
-	device_t *terminal = machine().device(TERMINAL_TAG);
-	terminal_serial_w(terminal, state);
-}
-
-WRITE8_MEMBER( h89_state::h89_terminal_in )
-{
-	m_uart->rx_w(data&&1);
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(h89_state, h89_terminal_in)
+	DEVCB_DEVICE_LINE_MEMBER("ins8250", ins8250_uart_device, rx_w)
 };
 
 static const ins8250_interface h89_ins8250_interface =
 {
-	DEVCB_DRIVER_LINE_MEMBER(h89_state, h89_terminal_out),
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

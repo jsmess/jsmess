@@ -23,7 +23,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
 	//UINT8 m_term_data;
@@ -34,7 +34,7 @@ public:
 
 WRITE16_MEMBER( dual68_state::dual68_terminal_w )
 {
-	terminal_write(m_terminal, 0, data >> 8);
+	m_terminal->write(space, 0, data >> 8);
 }
 
 static ADDRESS_MAP_START(dual68_mem, AS_PROGRAM, 16, dual68_state)

@@ -35,7 +35,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER( zexall_output_ack_r );
 	DECLARE_READ8_MEMBER( zexall_output_req_r );
 	DECLARE_READ8_MEMBER( zexall_output_data_r );
@@ -74,7 +74,7 @@ READ8_MEMBER( zexall_state::zexall_output_ack_r )
 // spit out the byte in out_byte if out_req is not equal to out_req_last
 	if (m_out_req != m_out_req_last)
 	{
-		terminal_write(m_terminal,0,m_out_data);
+		m_terminal->write(space,0,m_out_data);
 		fprintf(stderr,"%c",m_out_data);
 		m_out_req_last = m_out_req;
 		m_out_ack++;

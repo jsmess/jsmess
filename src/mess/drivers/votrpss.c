@@ -83,7 +83,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(votrpss_00_r);
 	DECLARE_READ8_MEMBER(votrpss_02_r);
 	DECLARE_READ8_MEMBER(votrpss_41_r);
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(votrpss_io, AS_IO, 8, votrpss_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(votrpss_00_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0x02, 0x02) AM_READ(votrpss_02_r)
 	AM_RANGE(0x41, 0x41) AM_READ(votrpss_41_r)
 	//AM_RANGE(0x00, 0xff) AM_NOP /* temporary */

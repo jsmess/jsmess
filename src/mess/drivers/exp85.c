@@ -143,7 +143,7 @@ READ_LINE_MEMBER( exp85_state::sid_r )
 	}
 	else
 	{
-		data = terminal_serial_r(m_terminal);
+		data = m_terminal->tx_r();
 	}
 
 	return data;
@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER( exp85_state::sod_w )
 	}
 	else
 	{
-		terminal_serial_w(m_terminal, state);
+		m_terminal->rx_w(state);
 	}
 }
 
@@ -171,7 +171,7 @@ static I8085_CONFIG( exp85_i8085_config )
 
 /* Terminal Interface */
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static const serial_terminal_interface terminal_intf =
 {
 	DEVCB_NULL
 };
@@ -217,7 +217,7 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
 	MCFG_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_interface)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf,9600)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

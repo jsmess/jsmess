@@ -31,13 +31,16 @@ class pimps_state : public driver_device
 {
 public:
 	pimps_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_terminal(*this, TERMINAL_TAG) { }
 
 	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_READ8_MEMBER(term_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
 	virtual void machine_reset();
+
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
@@ -64,7 +67,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pimps_io, AS_IO, 8, pimps_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0, 0xf0) AM_READ(term_r) AM_DEVWRITE_LEGACY(TERMINAL_TAG, terminal_write)
+	AM_RANGE(0xf0, 0xf0) AM_READ(term_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0xf1, 0xf1) AM_READ(term_status_r)
 ADDRESS_MAP_END
 
