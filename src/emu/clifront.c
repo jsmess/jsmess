@@ -756,7 +756,7 @@ void cli_frontend::verifyroms(const char *gamename)
 			notfound++;
 
 		// else display information about what we discovered
-		else if (summary != media_auditor::NONE_NEEDED)
+		else
 		{
 			// output the summary of the audit
 			astring summary_string;
@@ -783,6 +783,7 @@ void cli_frontend::verifyroms(const char *gamename)
 					break;
 
 				case media_auditor::BEST_AVAILABLE:
+				case media_auditor::NONE_NEEDED:
 					mame_printf_info("is best available\n");
 					correct++;
 					break;
@@ -814,7 +815,7 @@ void cli_frontend::verifyroms(const char *gamename)
 					if (summary == media_auditor::NOTFOUND)
 						notfound++;
 					// else display information about what we discovered
-					else
+					else if (summary != media_auditor::NONE_NEEDED)
 					{
 						// output the summary of the audit
 						astring summary_string;
@@ -909,8 +910,6 @@ void cli_frontend::verifyroms(const char *gamename)
 										break;
 
 									default:
-										mame_printf_info("has no roms!\n");
-										correct++;
 										break;
 								}
 							}
