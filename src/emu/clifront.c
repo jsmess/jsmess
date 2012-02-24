@@ -931,7 +931,7 @@ void cli_frontend::verifyroms(const char *gamename)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
-	if (matched == 1 && correct == 0 && incorrect == 0)
+	if (matched > 0 && correct == 0 && incorrect == 0)
 	{
 		if (notfound > 0)
 			throw emu_fatalerror(MAMERR_MISSING_FILES, "romset \"%s\" not found!\n", gamename);
@@ -1023,7 +1023,7 @@ void cli_frontend::verifysamples(const char *gamename)
 		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
-	if (matched == 1 && correct == 0 && incorrect == 0)
+	if (matched > 0 && correct == 0 && incorrect == 0)
 	{
 		if (notfound > 0)
 			throw emu_fatalerror(MAMERR_MISSING_FILES, "sampleset \"%s\" not found!\n", gamename);
