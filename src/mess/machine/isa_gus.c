@@ -1265,7 +1265,7 @@ ioport_constructor isa16_gus_device::device_input_ports() const
 
 
 isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-      : device_t(mconfig, ISA16_GUS, "Ultrasound", tag, owner, clock),
+      : device_t(mconfig, ISA16_GUS, "Gravis Ultrasound", tag, owner, clock),
         device_isa16_card_interface( mconfig, *this )
 {
 }

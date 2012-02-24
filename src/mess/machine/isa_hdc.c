@@ -158,7 +158,7 @@ const rom_entry *isa8_hdc_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_HDC, "ISA8_HDC", tag, owner, clock),
+        device_t(mconfig, ISA8_HDC, "Fixed Disk Controller Card", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this)
 {
 	m_shortname = "hdc";

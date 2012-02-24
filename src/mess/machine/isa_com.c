@@ -221,7 +221,7 @@ machine_config_constructor isa8_com_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_COM, "ISA8_COM", tag, owner, clock),
+        device_t(mconfig, ISA8_COM, "Communications Adapter PC/XT", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this)
 {
 }
@@ -295,6 +295,6 @@ machine_config_constructor isa8_com_at_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        isa8_com_device(mconfig, ISA8_COM_AT, "ISA8_COM_AT", tag, owner, clock)
+        isa8_com_device(mconfig, ISA8_COM_AT, "Communications Adapter", tag, owner, clock)
 {
 }
