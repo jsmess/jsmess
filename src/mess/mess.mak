@@ -1382,7 +1382,6 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_VIDEO)/isa_svga_tseng.o		\
 	$(MESS_VIDEO)/isa_svga_s3.o	\
 	$(MESS_VIDEO)/isa_svga_cirrus.o	\
-	$(MESS_VIDEO)/ibm_vga.o		\
 
 $(MESSOBJ)/pdp1.a:				\
 	$(MESS_VIDEO)/pdp1.o		\
