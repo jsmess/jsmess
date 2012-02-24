@@ -78,7 +78,7 @@ machine_config_constructor isa8_fdc_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, ISA8_FDC, "ISA8_FDC", tag, owner, clock),
+        device_t(mconfig, ISA8_FDC, "Diskette Drive Adapter", tag, owner, clock),
 		device_isa8_card_interface(mconfig, *this),
 		m_upd765(*this, "upd765")
 {
