@@ -930,6 +930,14 @@ static const pcb_type pcbdefs[] =
 	{ 0, NULL}
 };
 
+// Softlists do not support the cartridges with RAM yet
+static const pcb_type sw_pcbdefs[] =
+{
+	{ PCB_STANDARD, "standard" },
+	{ PCB_PAGED, "paged" },
+	{ 0, NULL}
+};
+
 cartridge_device::cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : bus8z_device(mconfig, TICARTRIDGE, "TI-99 cartridge", tag, owner, clock),
   device_image_interface(mconfig, *this),
@@ -965,6 +973,7 @@ void cartridge_device::device_config_complete()
 {
 	if (VERBOSE>8) LOG("cartridge_device: device_config_complete\n");
 	update_names();
+	m_softlist = false;
 }
 
 void cartridge_device::prepare_cartridge()
@@ -977,12 +986,13 @@ void cartridge_device::prepare_cartridge()
 	const memory_region *regr;
 	const memory_region *regr2;
 
-	m_pcb->m_grom_size = m_rpk->get_resource_length("grom_socket");
+	m_pcb->m_grom_size = m_softlist? get_software_region_length("grom_socket") : m_rpk->get_resource_length("grom_socket");
+	if (VERBOSE>6) LOG("gromport: grom_socket.size=0x%04x\n", m_pcb->m_grom_size);
 
 	if (m_pcb->m_grom_size > 0)
 	{
 		regg = subregion("grom_contents");
-		grom_ptr = (UINT8*)m_rpk->get_contents_of_socket("grom_socket");
+		grom_ptr = m_softlist? get_software_region("grom_socket") : (UINT8*)m_rpk->get_contents_of_socket("grom_socket");
 		memcpy(regg->base(), grom_ptr, m_pcb->m_grom_size);
 
 		if (m_type==PCB_GKRACKER)
@@ -999,28 +1009,32 @@ void cartridge_device::prepare_cartridge()
 		if (m_pcb->m_grom_size > 0x8000) m_pcb->m_grom[4] = static_cast<ti99_grom_device*>(subdevice(GROM7_TAG));
 	}
 
-	m_pcb->m_rom_size = m_rpk->get_resource_length("rom_socket");
+	m_pcb->m_rom_size = m_softlist? get_software_region_length("rom_socket") : m_rpk->get_resource_length("rom_socket");
 	if (m_pcb->m_rom_size > 0)
 	{
 		regr = subregion("rom_contents");
-		m_pcb->m_rom_ptr = (UINT8*)m_rpk->get_contents_of_socket("rom_socket");
+		m_pcb->m_rom_ptr = m_softlist? get_software_region("rom_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), m_pcb->m_rom_ptr, m_pcb->m_rom_size);
 	}
 
-	rom2_length = m_rpk->get_resource_length("rom2_socket");
+	rom2_length = m_softlist? get_software_region_length("rom2_socket") : m_rpk->get_resource_length("rom2_socket");
 	if (rom2_length > 0)
 	{
 		// sizes do not differ between rom and rom2
 		regr2 = subregion("rom2_contents");
-		m_pcb->m_rom2_ptr = (UINT8*)m_rpk->get_contents_of_socket("rom2_socket");
+		m_pcb->m_rom2_ptr = m_softlist? get_software_region("rom2_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom2_socket");
 		memcpy(regr2->base(), m_pcb->m_rom2_ptr, rom2_length);
 	}
 
-	m_pcb->m_ram_size = m_rpk->get_resource_length("ram_socket");
-	if (m_pcb->m_ram_size > 0)
+	// NVRAM cartridges are not supported by softlists (we need to find a way to load the nvram contents first)
+	if (!m_softlist)
 	{
-		// TODO: Consider to use a region as well. If so, do not forget to memcpy.
-		m_pcb->m_ram_ptr = (UINT8*)m_rpk->get_contents_of_socket("ram_socket");
+		m_pcb->m_ram_size = m_rpk->get_resource_length("ram_socket");
+		if (m_pcb->m_ram_size > 0)
+		{
+			// TODO: Consider to use a region as well. If so, do not forget to memcpy.
+			m_pcb->m_ram_ptr = (UINT8*)m_rpk->get_contents_of_socket("ram_socket");
+		}
 	}
 }
 
@@ -1047,80 +1061,108 @@ void cartridge_device::set_switch(int swtch, int val)
 	pcb->m_gk_switch[swtch] = val;
 }
 
+bool cartridge_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+{
+	if (VERBOSE>8) LOG("gromport.cartridge_device: swlist = %s, swname = %s\n", swlist, swname);
+	load_software_part_region(this, swlist, swname, start_entry);
+	m_softlist = true;
+	m_rpk = NULL;
+	return true;
+}
 
 bool cartridge_device::call_load()
 {
 	// File name is in m_basename
 	// return true = error
 	if (VERBOSE>8) LOG("cartridge_device: loading\n");
-	rpk_reader *reader = new rpk_reader(pcbdefs);
 
 	astring ntag(tag(), ":PCB");
 	const char* mytag = ntag.cstr();
-
 	gromport_device *gp = static_cast<gromport_device*>(owner());
 	int slot = get_index_from_tagname();
 
-	try
+	if (m_softlist)
 	{
-		m_rpk = reader->open(machine().options(), filename(), machine().system().name);
-		m_type = m_rpk->get_type();
-		switch (m_type)
+		LOG("using softlists\n");
+		int i;
+		const char* pcb = get_feature("pcb");
+		do
 		{
-		case PCB_STANDARD:
-			if (VERBOSE>6) LOG("cartridge_device: standard PCB\n");
-			m_pcb = static_cast<cartridge_pcb_standard_device*>(&machine().add_dynamic_device(*this, TICARTPCBSTD, mytag, 0));
-			break;
-		case PCB_PAGED:
-			if (VERBOSE>6) LOG("cartridge_device: paged PCB\n");
-			m_pcb = static_cast<cartridge_pcb_paged_device*>(&machine().add_dynamic_device(*this, TICARTPCBPAG, mytag, 0));
-			break;
-		case PCB_MINIMEM:
-			if (VERBOSE>6) LOG("cartridge_device: minimem PCB\n");
-			m_pcb = static_cast<cartridge_pcb_minimem_device*>(&machine().add_dynamic_device(*this, TICARTPCBMIN, mytag, 0));
-			break;
-		case PCB_SUPER:
-			if (VERBOSE>6) LOG("cartridge_device: superspace PCB\n");
-			m_pcb = static_cast<cartridge_pcb_superspace_device*>(&machine().add_dynamic_device(*this, TICARTPCBSUP, mytag, 0));
-			break;
-		case PCB_MBX:
-			if (VERBOSE>6) LOG("cartridge_device: MBX PCB\n");
-			m_pcb = static_cast<cartridge_pcb_mbx_device*>(&machine().add_dynamic_device(*this, TICARTPCBMBX, mytag, 0));
-			break;
-		case PCB_PAGED379I:
-			if (VERBOSE>6) LOG("cartridge_device: Paged379i PCB\n");
-			m_pcb = static_cast<cartridge_pcb_paged379i_device*>(&machine().add_dynamic_device(*this, TICARTPCBPGI, mytag, 0));
-			break;
-		case PCB_PAGEDCRU:
-			if (VERBOSE>6) LOG("cartridge_device: PagedCRU PCB\n");
-			m_pcb = static_cast<cartridge_pcb_pagedcru_device*>(&machine().add_dynamic_device(*this, TICARTPCBPGC, mytag, 0));
-			break;
-		case PCB_GKRACKER:
-			if (VERBOSE>6) LOG("cartridge_device: GRAMKracker PCB\n");
-			m_pcb = static_cast<cartridge_pcb_gramkracker_device*>(&machine().add_dynamic_device(*this, TICARTPCBGRK, mytag, 0));
-			gp->set_gk_slot(slot);
-			break;
-		}
-
-		prepare_cartridge();
-		m_pcb->set_machine(machine()); // TODO: Feels like a hack.
-		gp->change_slot(true, slot);
-
-		machine().schedule_hard_reset();  // could be configurable by DIP switch, simulating taping the RESET line
+			if (strcmp(pcb, sw_pcbdefs[i].name)==0)
+			{
+				m_type = sw_pcbdefs[i].id;
+				break;
+			}
+			i++;
+		} while (sw_pcbdefs[i].id != 0);
+		if (VERBOSE>5) LOG("gromport.cartridge_device: Cartridge type is %s (%d)\n", pcb, m_type);
 	}
-	catch (rpk_exception& err)
+	else
 	{
-		LOG("Failed to load cartridge '%s': %s\n", basename(), err.to_string());
-		m_rpk = NULL;
-		m_err = IMAGE_ERROR_INVALIDIMAGE;
-		return true;
+		rpk_reader *reader = new rpk_reader(pcbdefs);
+		try
+		{
+			m_rpk = reader->open(machine().options(), filename(), machine().system().name);
+			m_type = m_rpk->get_type();
+		}
+		catch (rpk_exception& err)
+		{
+			LOG("gromport.cartridge_device: Failed to load cartridge '%s': %s\n", basename(), err.to_string());
+			m_rpk = NULL;
+			m_err = IMAGE_ERROR_INVALIDIMAGE;
+			return true;
+		}
 	}
+
+	switch (m_type)
+	{
+	case PCB_STANDARD:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: standard PCB\n");
+		m_pcb = static_cast<cartridge_pcb_standard_device*>(&machine().add_dynamic_device(*this, TICARTPCBSTD, mytag, 0));
+		break;
+	case PCB_PAGED:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: paged PCB\n");
+		m_pcb = static_cast<cartridge_pcb_paged_device*>(&machine().add_dynamic_device(*this, TICARTPCBPAG, mytag, 0));
+		break;
+	case PCB_MINIMEM:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: minimem PCB\n");
+		m_pcb = static_cast<cartridge_pcb_minimem_device*>(&machine().add_dynamic_device(*this, TICARTPCBMIN, mytag, 0));
+		break;
+	case PCB_SUPER:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: superspace PCB\n");
+		m_pcb = static_cast<cartridge_pcb_superspace_device*>(&machine().add_dynamic_device(*this, TICARTPCBSUP, mytag, 0));
+		break;
+	case PCB_MBX:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: MBX PCB\n");
+		m_pcb = static_cast<cartridge_pcb_mbx_device*>(&machine().add_dynamic_device(*this, TICARTPCBMBX, mytag, 0));
+		break;
+	case PCB_PAGED379I:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: Paged379i PCB\n");
+		m_pcb = static_cast<cartridge_pcb_paged379i_device*>(&machine().add_dynamic_device(*this, TICARTPCBPGI, mytag, 0));
+		break;
+	case PCB_PAGEDCRU:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: PagedCRU PCB\n");
+		m_pcb = static_cast<cartridge_pcb_pagedcru_device*>(&machine().add_dynamic_device(*this, TICARTPCBPGC, mytag, 0));
+		break;
+	case PCB_GKRACKER:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: GRAMKracker PCB\n");
+		m_pcb = static_cast<cartridge_pcb_gramkracker_device*>(&machine().add_dynamic_device(*this, TICARTPCBGRK, mytag, 0));
+		gp->set_gk_slot(slot);
+		break;
+	}
+
+	prepare_cartridge();
+	m_pcb->set_machine(machine()); // TODO: Feels like a hack.
+	gp->change_slot(true, slot);
+
+	machine().schedule_hard_reset();  // could be configurable by DIP switch, simulating taping the RESET line
+
 	return false;
 }
 
 void cartridge_device::call_unload()
 {
-	if (VERBOSE>6) LOG("cartridge_device: unloading from %s\n", tag());
+	if (VERBOSE>6) LOG("gromport.cartridge_device: unloading from %s\n", tag());
 
 	gromport_device *gp = static_cast<gromport_device*>(owner());
 	int slot = get_index_from_tagname();

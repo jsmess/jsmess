@@ -72,6 +72,7 @@ public:
 	// Image handling: implementation of methods which are abstract in the parent
 	bool call_load();
 	void call_unload();
+	bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
 
 	iodevice_t image_type() const { return IO_CARTSLOT; }
 	bool is_readable()  const			{ return true; }
@@ -79,7 +80,7 @@ public:
 	bool is_creatable() const			{ return false; }
 	bool must_be_loaded() const 		{ return false; }
 	bool is_reset_on_load() const		{ return false; }
-	const char *image_interface() const { return "ti99_cart"; }	// what is this about?
+	const char *image_interface() const { return "ti99_cart"; }
 	const char *file_extensions() const { return "rpk"; }
 	const option_guide *create_option_guide() const { return NULL; }
 	machine_config_constructor device_mconfig_additions() const;
@@ -92,6 +93,7 @@ protected:
 	const rom_entry *device_rom_region() const;
 
 private:
+	bool has_extension(const char* name);
 	void prepare_cartridge();
 	int get_index_from_tagname();
 	UINT8* get_grom_ptr();
@@ -104,6 +106,9 @@ private:
 
 	// RPK which is associated to this cartridge
 	rpk	*m_rpk;
+
+	// If we are using softlists
+	bool m_softlist;
 };
 
 /*****************************************************************************

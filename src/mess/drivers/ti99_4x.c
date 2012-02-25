@@ -970,6 +970,9 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x )
 	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
+
 	/* Peripheral expansion box */
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
 
@@ -1012,6 +1015,9 @@ static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x )
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4, 3000000)
 	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
+
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
@@ -1083,6 +1089,9 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x )
 	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
+
 	/* Peripheral expansion box */
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
 
@@ -1122,6 +1131,9 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x )
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4a, 3000000)
 	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
+
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
 	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
@@ -1175,6 +1187,9 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x )
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4a, 3000000)
 	MCFG_DMUX_ADD( DATAMUX_TAG, dmux_devices )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
+
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
 	MCFG_PERIBOX_EV_ADD( PERIBOX_TAG, peribox_conf )
