@@ -1493,6 +1493,7 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
