@@ -152,6 +152,16 @@ static TIMER_DEVICE_CALLBACK( votrtnt_poll_votrax )
 	device_set_input_line(timer.machine().device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
 }
 
+static struct votrax_map dummy =
+{
+	NULL,
+	NULL
+};
+
+static struct votrax_interface votrtnt_votrax_interface =
+{
+	&dummy
+};
 
 /******************************************************************************
  Machine Drivers
@@ -171,7 +181,7 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("votrax", VOTRAX, 1700000) /* 1.70 MHz? needs verify */
+	MCFG_VOTRAX_ADD("votrax", 1700000, votrtnt_votrax_interface ) /* 1.70 MHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, votrtnt_terminal_intf)
