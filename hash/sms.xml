@@ -563,7 +563,7 @@
 		</part>
 	</software>
 
-	<software name="astrof" cloneof="transbot">
+	<software name="astrofl" cloneof="transbot">
 		<description>Astro Flash (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -577,7 +577,7 @@
 	</software>
 
     <!-- This has been found in unlicensed GG compilation too (or has it been ripped from such a compilation only?) -->
-	<software name="astrof1" cloneof="transbot">
+	<software name="astrofl1" cloneof="transbot">
 		<description>Astro Flash (Jpn, Pirate)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -600,7 +600,7 @@
 		</part>
 	</software>
 
-	<software name="astrowj" cloneof="astrow">
+	<software name="astrowju" cloneof="astrow">
 		<description>Astro Warrior (Jpn, USA, Bra)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -703,12 +703,12 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Baku Baku (Box) -->
 	<software name="bakubaku">
 		<description>Baku Baku Animal (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="025.470"/>
+		<info name="alt_title" value="Baku Baku (Box)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="baku baku animal (brazil).bin" size="262144" crc="35d84dc2" sha1="07d8f300b3a3542734fcd24fa8312fe99fbfef0e" offset="000000" />
@@ -716,7 +716,7 @@
 		</part>
 	</software>
 
-	<software name="bankpani">
+	<software name="bankp">
 		<description>Bank Panic (Euro)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
@@ -752,12 +752,12 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Basketball Nightmare (Box) -->
-	<software name="basketni">
+	<software name="basketn">
 		<description>Basket Ball Nightmare (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7025"/>
+		<info name="alt_title" value="Basketball Nightmare (Box)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="basket ball nightmare (europe).bin" size="262144" crc="0df8597f" sha1="0fa1156931c83763bc6906efce75045327cdd7aa" offset="000000" />
@@ -777,7 +777,7 @@
 		</part>
 	</software>
 
-	<software name="batmania">
+	<software name="bmaniacs">
 		<description>Battlemaniacs (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
@@ -1355,7 +1355,7 @@
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="K-317"/>
-		<info name="alt_title" value="Dàzhàn hēishǒu dǎng ~ 大戰黑手黨" />
+		<info name="alt_title" value="大戰黑手黨 (Dàzhàn hēishǒu dǎng)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="comical machine gun joe (tw).bin" size="32768" crc="84ad5ae4" sha1="b39b09f86b275612f6444247ff253f2620a36ef3" offset="000000" />
@@ -1363,11 +1363,11 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Komedi Gwonchongsa Jyo - 코메디권총사죠 -->
 	<software name="comicalk" cloneof="comical">
 		<description>Comical Machine Gun Joe (Kor)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
+		<info name="alt_title" value="코메디권총사죠" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="comical machine gun joe (kr).bin" size="32768" crc="643f6bfc" sha1="0180c9b26c5a211bea8b85ac4ad21c52a09c7972" offset="000000" />
@@ -1758,7 +1758,7 @@
 		<description>Eagles 5 (Kor)</description>
 		<year>1990</year>
 		<publisher>Zemina</publisher>
-		<info name="alt_title" value="독수리5형제 ~ Doksuri 5 Hyeongjae" />
+		<info name="alt_title" value="독수리5형제 (Doksuri 5 Hyeongjae)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="eagles 5 (kr).bin" size="32768" crc="f06f2ccb" sha1="f0f128b25e5557e660d936995e6bf25c8ebd17e5" offset="000000" />
@@ -1778,7 +1778,7 @@
 		</part>
 	</software>
 
-	<software name="eccotide">
+	<software name="ecco2">
 		<description>Ecco - The Tides of Time (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
@@ -2042,11 +2042,11 @@
 		</part>
 	</software>
 
-	<!-- Alt Title: Kuàilè xiǎo fēidié ~ 快樂小飛碟 -->
 	<software name="fantzonetw" cloneof="fantzone">
 		<description>Fantasy Zone (Tw)</description>
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
+		<info name="alt_title" value="快樂小飛碟 (Kuàilè xiǎo fēidié)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="fantasy zone (tw).bin" size="131072" crc="5fd48352" sha1="5162cd4923cdcad66fee0aa18d5e63fcf5259c00" offset="000000" />
@@ -2066,7 +2066,7 @@
 		</part>
 	</software>
 
-	<software name="fbubbobl" cloneof="bublbobl">
+	<software name="finalbb" cloneof="bublbobl">
 		<description>Final Bubble Bobble (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega </publisher>
@@ -2286,7 +2286,7 @@
 		</part>
 	</software>
 
-	<software name="galaxyf">
+	<software name="gforce">
 		<description>Galaxy Force (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -2298,7 +2298,7 @@
 		</part>
 	</software>
 
-	<software name="galaxyfu">
+	<software name="gforceu">
 		<description>Galaxy Force (USA)</description>
 		<year>1989</year>
 		<publisher>Activision</publisher>
@@ -2441,11 +2441,11 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Yuyryeong-ui Jip - 유령의 집 -->
 	<software name="ghosthk" cloneof="ghosth">
 		<description>Ghost House (Kor)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
+		<info name="alt_title" value="유령의 집 (Yuyryeong-ui Jip)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="ghost house (kr).bin" size="32768" crc="1203afc9" sha1="8d286d46312171608d6a769a7181cb7f73acb728" offset="000000" />
@@ -2476,7 +2476,7 @@
 		</part>
 	</software>
 
-	<software name="global">
+	<software name="globald">
 		<description>Global Defense (Euro, USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
@@ -2488,7 +2488,7 @@
 		</part>
 	</software>
 
-	<software name="globalp" cloneof="global">
+	<software name="globaldp" cloneof="globald">
 		<description>Global Defense (Euro, USA, Prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
@@ -2727,7 +2727,7 @@
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="K-307"/>
-		<info name="alt_title" value="Shìjiè bēi zúqiú sài ~ 世界杯足球賽" />
+		<info name="alt_title" value="世界杯足球賽 (Shìjiè bēi zúqiú sài)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="great soccer (tw).bin" size="32768" crc="84665648" sha1="88611c50fcaa307bfd70b2bd5effeb39c2c4f3ae" offset="000000" />
@@ -2849,11 +2849,11 @@
 		</part>
 	</software>
 
-	<!-- Id:7063 -->
 	<software name="heavyw">
 		<description>Heavyweight Champ (Euro)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="7063"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="heavyweight champ (europe).bin" size="262144" crc="fdab876a" sha1="7e2523061df0c08b7df7b446b5504c4eb0fea163" offset="000000" />
@@ -2902,11 +2902,11 @@
 		</part>
 	</software>
 
-	<!-- Alt Title: Běidǒu shén quán ~ 北斗神拳 -->
 	<software name="hokutotw" cloneof="blackblt">
 		<description>Hokuto no Ken (Tw)</description>
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
+		<info name="alt_title" value="北斗神拳 (Běidǒu shén quán)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="hokuto no ken (tw).bin" size="131072" crc="c4ab363d" sha1="a66f9373f75355855aac52fdc11d9ad887fd5556" offset="000000" />
@@ -3216,11 +3216,11 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: 마성전설 II ~ Maseong Jeonseol II -->
 	<software name="knightm2">
 		<description>Knightmare II: The Maze of Galious (Kor)</description>
 		<year>199?</year>
 		<publisher>Zemina?</publisher>
+		<info name="alt_title" value="마성전설 II (Maseong Jeonseol II)" />
 		<part name="cart" interface="sms_cart">
 			<feature name="mapper" value="zemina" />
 			<dataarea name="rom" size="131072">
@@ -3280,7 +3280,7 @@
 		</part>
 	</software>
 
-	<software name="laserg">
+	<software name="lghost">
 		<description>Laser Ghost (Euro)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -3327,7 +3327,7 @@
 		</part>
 	</software>
 
-	<software name="linefire">
+	<software name="loffire">
 		<description>Line of Fire (Euro, Bra, Kor)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -3620,7 +3620,7 @@
 		</part>
 	</software>
 
-	<software name="microm">
+	<software name="micromac">
 		<description>Micro Machines (Euro)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
@@ -3692,7 +3692,7 @@
 		</part>
 	</software>
 
-	<software name="mk3b">
+	<software name="mk3">
 		<description>Mortal Kombat 3 (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
@@ -4080,10 +4080,10 @@
 	</software>
 
 	<software name="pengadv">
-		<!-- Alt Title: Kkum Ui Dai Ryuk ~ 꿈의대륙 -->
 		<description>Penguin Adventure (Kor)</description>
 		<year>199?</year>
 		<publisher>Zemina</publisher>
+		<info name="alt_title" value="꿈의대륙 (Kkum Ui Dai Ryuk)" />
 		<part name="cart" interface="sms_cart">
 			<feature name="mapper" value="zemina" />
 			<dataarea name="rom" size="131072">
@@ -4584,7 +4584,7 @@
 		</part>
 	</software>
 
-	<software name="robocop">
+	<software name="robocop3">
 		<description>RoboCop 3 (Euro, Bra)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
@@ -4696,12 +4696,12 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Sapo Xulé - S.O.S Lagoa Poluida (Box) -->
 	<software name="saposos" cloneof="astrow">
 		<description>S.O.S Lagoa Poluida (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="023.510"/>
+		<info name="alt_title" value="Sapo Xulé - S.O.S Lagoa Poluida (Box)"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sapo xule - s.o.s lagoa poluida (brazil).bin" size="131072" crc="7ab2946a" sha1="2583b9027fd2a4d84ed324ed03fc82b9eedd1ff4" offset="000000" />
@@ -4709,7 +4709,7 @@
 		</part>
 	</software>
 
-	<software name="sapoxu" cloneof="psychof">
+	<software name="sapoxule" cloneof="psychof">
 		<description>Sapo Xulé vs. Os Invasores do Brejo (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
@@ -4745,12 +4745,12 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Les Schtroumpfs Autour du Monde (Box) -->
 	<software name="smurfs2">
 		<description>The Smurfs 2 (Euro)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="27085-50"/>
+		<info name="alt_title" value="Les Schtroumpfs Autour du Monde (Box)"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="schtroumpfs autour du monde, les (europe) (en,fr,de,es).bin" size="262144" crc="97e5bb7d" sha1="16f756e00314781e07af84c871e82ec8e0a68a57" offset="000000" />
@@ -4758,7 +4758,6 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Les Schtroumpfs Autour du Monde (Box) -->
 	<software name="smurfs2p" cloneof="smurfs2">
 		<description>The Smurfs 2 (Euro, Prototype)</description>
 		<year>1996</year>
@@ -4793,7 +4792,7 @@
 		</part>
 	</software>
 
-	<software name="scrambsp">
+	<software name="sspirits">
 		<description>Scramble Spirits (Euro, Bra)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -4977,7 +4976,7 @@
 		</part>
 	</software>
 
-	<software name="sharrierj" cloneof="sharrier">
+	<software name="sharrierju" cloneof="sharrier">
 		<description>Space Harrier (Jpn, USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -5132,12 +5131,12 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Les Schtroumpfs (Cart)  -->
 	<software name="smurfs">
 		<description>The Smurfs (Euro, Bra)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="MK-27082-50, 027.380"/>
+		<info name="alt_title" value="Les Schtroumpfs (Box)"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="smurfs, the (europe) (en,fr,de,es).bin" size="262144" crc="3e63768a" sha1="82f75232e195b8bdcd9c0d852076d999899cc92e" offset="000000" />
@@ -5145,11 +5144,13 @@
 		</part>
 	</software>
 
-	<!-- 002 - Releases: 1988-04-17 (JPN) - Notes: FM support -->
+	<!-- Notes: FM support -->
 	<software name="solomon">
 		<description>Solomon no Kagi - Oujo Rihita no Namida (Jpn)</description>
 		<year>1988</year>
 		<publisher>Salio</publisher>
+		<info name="serial" value="002"/>
+		<info name="release" value="19880417"/>
 		<info name="alt_title" value="ソロモンの鍵 －王女リヒタの涙－" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
@@ -5417,7 +5418,7 @@
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="K-321"/>
-		<info name="alt_title" value="Dié duì dié ~ 諜對諜" />
+		<info name="alt_title" value="諜對諜 (Dié duì dié)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="spy vs spy (tw).bin" size="32768" crc="689f58a2" sha1="9f715b67ffddc432299c9bbae6b7e088ddbd4679" offset="000000" />
@@ -5448,12 +5449,12 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: Super Smash T.V.  -->
 	<software name="smashtv">
 		<description>Smash T.V. (Euro)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="27044-50"/>
+		<info name="alt_title" value="Super Smash T.V. (Box)" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="super smash t.v. (europe).bin" size="262144" crc="e0b1aff8" sha1="b4515aad1cad31980d041632e23d3be82aa31828" offset="000000" />
@@ -5582,12 +5583,12 @@
 		</part>
 	</software>
 
-	<!-- Alt. Title: 슈퍼알카노이드 -->
 	<software name="superark" cloneof="woodypop">
 		<description>Super Arkanoid (Kor)</description>
 		<year>1989</year>
 		<publisher>HiCom</publisher>
 		<info name="serial" value="G-2101"/>
+		<info name="alt_title" value="슈퍼알카노이드" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="woody pop (super arkanoid) (kr).bin" size="32768" crc="c9dd4e5f" sha1="704d263fa53f152b34c6d01fdc11d17a5f17d78b" offset="000000"/>
@@ -6196,11 +6197,11 @@
 		</part>
 	</software>
 
-	<!--  Id: 7007 -->
 	<software name="wboymlnd">
 		<description>Wonder Boy in Monster Land (Euro, USA)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="7007"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="wonder boy in monster land (usa, europe).bin" size="262144" crc="8cbef0c1" sha1="51715db7a49a18452292dadb2bba0108aa6d6402" offset="000000" />
