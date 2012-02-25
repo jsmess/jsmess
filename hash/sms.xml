@@ -4805,7 +4805,7 @@
 	</software>
 
 	<!-- Notes: FM support -->
-	<software name="sdi" cloneof="global">
+	<software name="sdi" cloneof="globald">
 		<description>SDI (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
