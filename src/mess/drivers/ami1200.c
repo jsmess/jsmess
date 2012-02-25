@@ -27,15 +27,15 @@
 
 
 
-class ami1200_state : public cd32_state
+class ami1200_state : public amiga_state
 {
 public:
 	ami1200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cd32_state(mconfig, type, tag) { }
+		: amiga_state(mconfig, type, tag) { }
 
-	UINT16 potgo_value;
-	int cd32_shifter[2];
-	int oldstate[2];
+	UINT16 m_potgo_value;
+	int m_cd32_shifter[2];
+	int m_oldstate[2];
 };
 
 
