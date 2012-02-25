@@ -1084,7 +1084,7 @@ bool cartridge_device::call_load()
 	if (m_softlist)
 	{
 		LOG("using softlists\n");
-		int i;
+		int i = 0;
 		const char* pcb = get_feature("pcb");
 		do
 		{
