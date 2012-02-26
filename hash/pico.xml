@@ -1,6 +1,97 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pico" description="Sega Pico cartridges">
+
+<!-- Releases -->
+	<software name="eccojr">
+		<description>Ecco Jr. und die große Schatzsuche im Ozean! (Ger)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ecco jr. und die grosse schatzsuche im ozean! (germany).bin" size="524288" crc="470af94e" sha1="f57b18e13d44eb1a1dc85701757e5cdafcf43faa" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorng" cloneof="poohcorn" supported="no">
+		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ein jahr in winnie puuhs leben (germany).bin" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblstg" cloneof="mickblst" supported="no">
+		<description>Mickey - Ausflug in die Vergangenheit (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey - ausflug in die vergangenheit (germany).bin" size="524288" crc="627ea96c" sha1="eab3c41aef6c30adc82e92e143ffc0360118b99e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pocahont">
+		<description>Pocahontas (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pocahontas (europe).bin" size="1048576" crc="deefbfd9" sha1="8376f01619def050fa7a2f53d48aa32ab0e860cd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profpico" supported="no">
+		<description>Professor Pico und das Malkasten Puzzle (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="professor pico und das malkasten puzzle (germany).bin" size="524288" crc="d2b063ed" sha1="429777d4b1204e3341bb83d72e0eb361a9f3623e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmg" cloneof="tailsmm">
+		<description>Tails und der Musikant (Ger)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails und der musikant (germany).bin" size="524288" crc="8edf7d4c" sha1="0b477e485a143b5bab7d26925bd587b0f3da2695" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking" supported="no">
+		<description>The Lion King - Adventures at Pride Rock (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="the lion king - adventures at pride rock (europe).bin" size="1048576" crc="a7b92dc1" sha1="7f20cd3bec73624f93c8235887ad82f33a78077e"  offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccrag" cloneof="magiccra">
+		<description>Zauberbuntstifte (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="zauberbuntstifte (germany).bin" size="524288" crc="3218ba97" sha1="40f6585ea1a79ce96097388115c639cf8c4ccdc3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Prototypes -->
 	<software name="101dalma">
 		<description>101 Dalmatians (Prototype, 19960817-U)</description>
 		<year>1996</year>
@@ -532,7 +623,7 @@
 		</part>
 	</software>
 
-	<software name="lionking">
+	<software name="lionkingp8" cloneof="lionking">
 		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950419)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -543,7 +634,7 @@
 		</part>
 	</software>
 
-	<software name="lionking1" cloneof="lionking">
+	<software name="lionkingp7" cloneof="lionking">
 		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950425)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -554,7 +645,7 @@
 		</part>
 	</software>
 
-	<software name="lionking2" cloneof="lionking">
+	<software name="lionkingp6" cloneof="lionking">
 		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950501)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -565,7 +656,7 @@
 		</part>
 	</software>
 
-	<software name="lionking3" cloneof="lionking">
+	<software name="lionkingp5" cloneof="lionking">
 		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950516)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -576,7 +667,7 @@
 		</part>
 	</software>
 
-	<software name="lionking4" cloneof="lionking">
+	<software name="lionkingp4" cloneof="lionking">
 		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950517)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -587,7 +678,7 @@
 		</part>
 	</software>
 
-	<software name="lionking5" cloneof="lionking">
+	<software name="lionkingp3" cloneof="lionking">
 		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950522)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -598,7 +689,7 @@
 		</part>
 	</software>
 
-	<software name="lionking6" cloneof="lionking">
+	<software name="lionkingp2" cloneof="lionking">
 		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950615)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -609,7 +700,7 @@
 		</part>
 	</software>
 
-	<software name="lionking7" cloneof="lionking">
+	<software name="lionkingp1" cloneof="lionking">
 		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950616)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
