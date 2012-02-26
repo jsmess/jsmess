@@ -571,7 +571,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="alienret" cloneof="gogohome">
 		<description>Alien's Return</description>
 		<year>19??</year>
@@ -597,7 +597,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="abwerniee" cloneof="abwernie" supported="no"> 
+	<software name="abwerniee" cloneof="abwernie" supported="no">
 	<!-- controller not emulated -->
 		<description>Alpha Beam with Ernie (PAL)</description>
 		<year>1983</year>

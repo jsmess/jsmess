@@ -441,7 +441,7 @@ void generic_terminal_device::device_config_complete()
 		*static_cast<_terminal_interface *>(this) = *intf;
 	}
 	else
-	{		
+	{
 		memset(&m_keyboard_cb, 0, sizeof(m_keyboard_cb));
 	}
 }
@@ -643,13 +643,13 @@ void serial_terminal_device::device_config_complete()
 		*static_cast<serial_terminal_interface *>(this) = *intf;
 	}
 	else
-	{		
+	{
 		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
 	}
 	m_shortname = "serial_terminal";
 }
 
-static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200}; 
+static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200};
 
 void serial_terminal_device::device_start()
 {

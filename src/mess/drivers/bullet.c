@@ -1059,7 +1059,7 @@ static const SCSIBus_interface scsi_intf =
 };
 
 
-static serial_terminal_interface terminal_intf = 
+static serial_terminal_interface terminal_intf =
 {
 	DEVCB_NULL
 };

@@ -431,7 +431,7 @@ void mac_state::v8_resize()
 
 			if ((simm_amt > 0) && (simm_size > 0))
 			{
-//				mac_install_memory(machine(), 0x000000, simm_sizes[simm_amt]-1, simm_sizes[simm_amt], memory_data + onboard_amt, is_rom, "bank1");
+//              mac_install_memory(machine(), 0x000000, simm_sizes[simm_amt]-1, simm_sizes[simm_amt], memory_data + onboard_amt, is_rom, "bank1");
 				mac_install_memory(machine(), 0x000000, simm_size-1, simm_size, memory_data + onboard_amt, is_rom, "bank1");
 			}
 

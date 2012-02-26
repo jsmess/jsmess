@@ -190,12 +190,12 @@ READ32_MEMBER( next_state::scr1_r )
 // enetxdma  28    6 *
 // enetrdma  27    6 *
 // scsidma   26    6 *
-// diskdma   25    6 
+// diskdma   25    6
 // prndma    24    6 *
-// sndoutdma 23    6  
-// sndindma  22    6  
+// sndoutdma 23    6
+// sndindma  22    6
 // sccdma    21    6
-// dspdma    20    6  
+// dspdma    20    6
 // m2rdma    19    6
 // r2mdma    18    6
 // scc       17    5
