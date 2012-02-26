@@ -427,11 +427,12 @@ void mac_state::v8_resize()
 		// installing SIMM RAM?
 		if (simm_amt != 0)
 		{
-//          printf("mac_v8_resize: SIMM region size is %x, SIMM size is %x, onboard size is %x\n", simm_sizes[simm_amt], simm_size, onboard_amt);
+//            printf("mac_v8_resize: SIMM region size is %x, SIMM size is %x, onboard size is %x\n", simm_sizes[simm_amt], simm_size, onboard_amt);
 
 			if ((simm_amt > 0) && (simm_size > 0))
 			{
-				mac_install_memory(machine(), 0x000000, simm_sizes[simm_amt]-1, simm_sizes[simm_amt], memory_data + onboard_amt, is_rom, "bank1");
+//				mac_install_memory(machine(), 0x000000, simm_sizes[simm_amt]-1, simm_sizes[simm_amt], memory_data + onboard_amt, is_rom, "bank1");
+				mac_install_memory(machine(), 0x000000, simm_size-1, simm_size, memory_data + onboard_amt, is_rom, "bank1");
 			}
 
 			// onboard RAM sits immediately above the SIMM, if any
