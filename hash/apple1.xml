@@ -28,6 +28,42 @@
 		</part>
 	</software>
 
+
+	<software name="apple30">
+		<description>Apple 30th</description> <!-- Graphics demo -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 300.BFFR, enter at 300R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="5279280">
+				<rom name="apple30th.wav" size="5279280" crc="eec88347" sha1="bf9000c304510322c968e4e42a1d0d0276ae352f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asmchess">
+		<description>ASMmchess</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="4117948">
+				<rom name="asmmchess.wav" size="4117948" crc="72a2127c" sha1="6abb19063981426efebe9a6ea048146808cb0be4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="life">
+		<description>Life</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 2000.21FFR, enter at 2000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="2283920">
+				<rom name="life.wav" size="2283920" crc="06af2136" sha1="b6ffbd59af44f0e82ea91ca3cb6c4d319f221b33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="llander">
 		<description>Lunar Lander</description>
 		<year>19??</year>
@@ -64,6 +100,18 @@
 		</part>
 	</software>
 
+	<software name="pasart">
+		<description>Pasart</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 300.5FFR, enter at 300R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="2471520">
+				<rom name="pasart.wav" size="2471520" crc="84c241ce" sha1="c122719952e9acb77891e078366cacd47e77688d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Other games require BASIC to be loaded first -->
 
 	<software name="aceyduc">
@@ -96,8 +144,8 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
-			<dataarea name="cass" size="5723176">
-				<rom name="blackjack.wav" size="5723176" crc="9486b37b" sha1="9de34b03c06a75f59bd5295ecc1a3c69858d61b9" offset="0" />
+			<dataarea name="cass" size="5751412">
+				<rom name="blackjack.wav" size="5751412" crc="7e230c17" sha1="1268ee558f8b745c765df714e245c7f7f56002ed" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -170,6 +218,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="3067904">
 				<rom name="hilo.wav" size="3067904" crc="21024b5d" sha1="acc525e0a5cea33d1c4e77673045e94e2608c1ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llandera" cloneof="llander">
+		<description>Lunar Lander (ASCII Graphics)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR0300.0FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="9205804">
+				<rom name="lunarlander (ascii graphics).wav" size="9205804" crc="becc6aff" sha1="2204b5002e17b8cbf79c232334cc4502680cbf29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
