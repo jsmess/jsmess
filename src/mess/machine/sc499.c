@@ -914,7 +914,7 @@ void sc499_device::set_tc_state(int state)
 			if ((m_control & SC499_CTR_IEN) && (m_control & SC499_CTR_DNI))
 			{
 				set_interrupt(ASSERT_LINE);
-				m_status | SC499_STAT_IRQ;
+				m_status |= SC499_STAT_IRQ;
 			}
 			break;
 		}
