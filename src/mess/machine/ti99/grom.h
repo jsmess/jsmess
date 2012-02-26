@@ -22,7 +22,7 @@ typedef struct _ti99grom_config
 	// If the GROM has only 6 KiB, the remaining 2 KiB are filled with a
 	// specific byte pattern which is created by a logical OR of lower
 	// regions
-	bool				m_extended;
+	int					m_size;
 	bool				m_rollover;	// some GRAM simulations do not implement rollover
 	devcb_write_line	m_ready;
 } ti99grom_config;

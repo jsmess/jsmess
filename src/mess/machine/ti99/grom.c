@@ -176,7 +176,7 @@ READ8Z_MEMBER( ti99_grom_device::readz )
 			// wraps at 8K boundaries.
 			UINT16 addr = m_address-(m_ident<<13);
 
-			if (!m_extended && ((m_address&0x1fff)>=0x1800))
+			if (m_size == 0x1800 && ((m_address&0x1fff)>=0x1800))
 				m_buffer = m_memptr[addr-0x1000] | m_memptr[addr-0x0800];
 			else
 				m_buffer = m_memptr[addr];
@@ -241,7 +241,7 @@ WRITE8_MEMBER( ti99_grom_device::write )
 				write_addr = (m_address - 1) & 0xFFFF;
 
 			// UINT16 addr = m_address-(m_ident<<13);
-			if (m_extended || ((m_address&0x1fff)<0x1800))
+			if (m_size > 0x1800 || ((m_address&0x1fff)<0x1800))
 				m_memptr[write_addr-(m_ident<<13)] = data;
 		}
 		m_raddr_LSB = m_waddr_LSB = false;
