@@ -864,7 +864,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
-		cpu_set_reg( space->machine().device("maincpu"), LR35902_IF, data );
+		space->machine().device<lr35902_cpu_device>(":maincpu")->set_if( data );
 		break;
 	}
 
@@ -1417,12 +1417,12 @@ WRITE8_HANDLER ( sgb_io_w )
 /* Interrupt Enable register */
 READ8_HANDLER( gb_ie_r )
 {
-	return cpu_get_reg( space->machine().device("maincpu"), LR35902_IE );
+	return space->machine().device<lr35902_cpu_device>(":maincpu")->get_ie();
 }
 
 WRITE8_HANDLER ( gb_ie_w )
 {
-	cpu_set_reg( space->machine().device("maincpu"), LR35902_IE, data & 0x1F );
+	space->machine().device<lr35902_cpu_device>(":maincpu")->set_ie( data & 0x1F );
 }
 
 /* IO read */
@@ -1443,7 +1443,7 @@ READ8_HANDLER ( gb_io_r )
 			return state->m_gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			return 0xE0 | cpu_get_reg( space->machine().device("maincpu"), LR35902_IF );
+			return 0xE0 | space->machine().device<lr35902_cpu_device>(":maincpu")->get_if();
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
@@ -1967,7 +1967,7 @@ static void gb_timer_increment( running_machine &machine )
 	}
 }
 
-void gb_timer_callback(device_t *device, int cycles)
+void gb_timer_callback(lr35902_cpu_device *device, int cycles)
 {
 	gb_state *state = device->machine().driver_data<gb_state>();
 	UINT16 old_gb_divcount = state->m_divcount;
@@ -2001,7 +2001,7 @@ WRITE8_HANDLER ( gbc_io2_w )
 	switch( offset )
 	{
 		case 0x0D:	/* KEY1 - Prepare speed switch */
-			cpu_set_reg( space->machine().device("maincpu"), LR35902_SPEED, data );
+			space->machine().device<lr35902_cpu_device>(":maincpu")->set_speed( data );
 			return;
 		case 0x10:	/* BFF - Bios disable */
 			gb_rom16_0000( space->machine(), state->m_ROMMap[state->m_ROMBank00] );
@@ -2026,7 +2026,7 @@ READ8_HANDLER( gbc_io2_r )
 	switch( offset )
 	{
 	case 0x0D:	/* KEY1 */
-		return cpu_get_reg( space->machine().device("maincpu"), LR35902_SPEED );
+		space->machine().device<lr35902_cpu_device>(":maincpu")->get_speed();
 	case 0x16:	/* RP - Infrared port */
 		break;
 	case 0x30:	/* SVBK - RAM bank select */
