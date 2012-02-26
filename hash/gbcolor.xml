@@ -45,8 +45,6 @@ Undumped:
 - Shaun Palmer's Pro Snowboarder CGB-B3SP-AUS
 - Space Invaders DMG-AIVP-(EUR/NOE)
 - Spider-Man 2 - The Sinister Six CGB-B2SP-EUR
-- Las Super Nenas - Lucha Con Ese CGB-BBHS-ESP
-- Las Super Nenas - Panico en Townsville CGB-BPTS-ESP
 - TOCA Touring Car Championship CGB-BTCP-EUR
 - Tony Hawk's Pro Skater 2 CGB-BTGP-EUR
 - Tony Hawk's Pro Skater 3 CGB-B3TE-EUR
@@ -60,7 +58,6 @@ nointro guys also list the following
 - Moon Patrol &amp; Spy Hunter (Euro)
 - The New Adventures of Mary-Kate &amp; Ashley (Euro)
 - Razor Freestyle Scooter (Euro)
-- Las Super Nenas - Malvado Mojo (Spain)
 
 Undumped GBC protos:
   - Jet Force Gemini
@@ -13047,6 +13044,19 @@ Undumped Pirates:
 		</part>
 	</software>
 
+	<software name="powrpfbms" cloneof="powrpfbm">
+		<!-- Notes: GBC only -->
+		<description>Las Super Nenas - El Malvado Mojo Jojo (Spa)</description>
+		<year>2000</year>
+		<publisher>BAM! Entertainment</publisher>
+		<info name="serial" value="CGB-BJJS-ESP"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super nenas, las - el malvado mojo jojo (spain).bin" size="2097152" crc="efe652bf" sha1="286cabc9ea92d1866e59748a788658c5e3d32a35" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="powrpfbmu" cloneof="powrpfbm">
 		<!-- Notes: GBC only -->
 		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, Rev. B)</description>
@@ -13112,6 +13122,19 @@ Undumped Pirates:
 		</part>
 	</software>
 
+	<software name="powrpfbhs" cloneof="powrpfbh">
+		<!-- Notes: GBC only -->
+		<description>Las Super Nenas - Lucha con Ese (Spa)</description>
+		<year>2001</year>
+		<publisher>BAM! Entertainment</publisher>
+		<info name="serial" value="CGB-BBHS-ESP"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super nenas, las - lucha con ese (spain).bin" size="2097152" crc="7ba87c11" sha1="06b0835c40d4f27ad45833d54f606a0964e09de0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="powrpfbhu" cloneof="powrpfbh">
 		<!-- Notes: GBC only -->
 		<description>The Powerpuff Girls - Battle Him (USA, Rev. A)</description>
@@ -13160,6 +13183,19 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="powerpuff girls, the - panique a townsville (france).bin" size="2097152" crc="79a417db" sha1="978d68300b625d8e375571475b4f2c2c1a65fd60" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrpfpns" cloneof="powrpfpn">
+		<!-- Notes: GBC only -->
+		<description>Las Super Nenas - Panico en Townsville (Spa)</description>
+		<year>2000</year>
+		<publisher>BAM! Entertainment</publisher>
+		<info name="serial" value="CGB-BPTS-ESP"/>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super nenas, las - panico en townsville (spain).bin" size="2097152" crc="03edb574" sha1="34463c99193e4cf99aa1833242fa2b30db9fe522" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
