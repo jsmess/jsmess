@@ -24746,13 +24746,24 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="bubsyup" cloneof="bubsy">
+	<software name="bubsyup1" cloneof="bubsy">
 		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Prototype)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="bubsy in claws encounters of the furred kind (usa) (beta).sfc" size="2097152" crc="3f3a7180" sha1="6354cc73672d6c8ada94218c873d10844f616465" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubsyup2" cloneof="bubsy">
+		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Prototype Older?)</description>
+		<year>1993</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="bubsy (prototype).sfc" size="2097152" crc="49da572f" sha1="ffd0d78ce7e7489cb8a3870d64662e8f51debabd" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
