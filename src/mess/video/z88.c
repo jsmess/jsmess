@@ -117,7 +117,7 @@ static void z88_vh_render_line(bitmap_ind16 &bitmap, int x, int y,int pen)
 /* convert absolute offset into correct address to get data from */
 static unsigned char *z88_convert_address(running_machine &machine, unsigned long offset)
 {
-	return machine.region("maincpu")->base() + 0x010000 + offset;
+	return machine.region("maincpu")->base() + offset;
 }
 
 
@@ -137,17 +137,10 @@ SCREEN_VBLANK( z88 )
 }
 
 
-
-/***************************************************************************
-  Draw the game screen in the given bitmap_ind16.
-  Do NOT call osd_update_display() from this fuz88tion,
-  it will be called by the main emulation engine.
-***************************************************************************/
-SCREEN_UPDATE_IND16( z88 )
+UPD65031_SCREEN_UPDATE(z88_screen_update)
 {
-	z88_state *state = screen.machine().driver_data<z88_state>();
 	int x,y;
-	unsigned char *ptr = z88_convert_address(screen.machine(), state->m_blink.sbf);
+	unsigned char *ptr = z88_convert_address(device.machine(), sbf<<11);
 	unsigned char *stored_ptr = ptr;
 	int pen0, pen1;
 
@@ -212,12 +205,12 @@ SCREEN_UPDATE_IND16( z88 )
 					if (ch & 0x0100)
 					{
 						ch_index =ch & 0x0ff;	//(~0x0100);
-						pCharGfx = z88_convert_address(screen.machine(), state->m_blink.hires1);
+						pCharGfx = z88_convert_address(device.machine(), hires1<<11);
 					}
 					else
 					{
 						ch_index = ch & 0x0ff;
-						pCharGfx = z88_convert_address(screen.machine(), state->m_blink.hires0);
+						pCharGfx = z88_convert_address(device.machine(), hires0<<13);
 					}
 
 					pCharGfx += (ch_index<<3);
@@ -235,13 +228,13 @@ SCREEN_UPDATE_IND16( z88 )
 				{
 				   ch_index = ch & (~0x01c0);
 
-				   pCharGfx = z88_convert_address(screen.machine(), state->m_blink.lores0);
+				   pCharGfx = z88_convert_address(device.machine(), lores0<<9);
 				}
 				else
 				{
 				   ch_index = ch;
 
-				   pCharGfx = z88_convert_address(screen.machine(), state->m_blink.lores1);
+				   pCharGfx = z88_convert_address(device.machine(), lores1<<12);
 				}
 
 				pCharGfx += (ch_index<<3);
@@ -261,5 +254,4 @@ SCREEN_UPDATE_IND16( z88 )
 
 		stored_ptr+=256;
 	}
-	return 0;
 }
