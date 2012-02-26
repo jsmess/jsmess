@@ -240,9 +240,9 @@ bool vic20_expansion_slot_device::call_load()
 				UINT8 header[2];
 				fread(&header, 2);
 				UINT16 address = pick_integer_le(header, 0, 2);
-				
+
 				if (LOG) logerror("Address %04x\n", address);
-				
+
 				switch (address)
 				{
 				case 0x2000: fread(m_cart->vic20_blk1_pointer(machine(), 0x2000), 0x2000); break;

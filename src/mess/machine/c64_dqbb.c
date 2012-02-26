@@ -9,11 +9,11 @@
 
 /*
 
-	TODO:
-	
-	- NVRAM
-	- 64/128 mode switch
-	- dump of the initial NVRAM contents
+    TODO:
+
+    - NVRAM
+    - 64/128 mode switch
+    - dump of the initial NVRAM contents
 
 */
 
@@ -102,20 +102,20 @@ void c64_dqbb_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UI
 	else if (!io1)
 	{
 		/*
-		
-			bit		description
-			
-			0
-			1
-			2		GAME
-			3
-			4		WE
-			5
-			6		EXROM
-			7		_CS
-		
-		*/
-		
+
+            bit     description
+
+            0
+            1
+            2       GAME
+            3
+            4       WE
+            5
+            6       EXROM
+            7       _CS
+
+        */
+
 		m_exrom = !BIT(data, 6);
 		m_game = !BIT(data, 2);
 		m_we = BIT(data, 4);

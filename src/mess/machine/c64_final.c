@@ -66,7 +66,7 @@ UINT8 c64_final_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 	{
 		data = m_roml[offset & 0x3fff];
 	}
-	
+
 	if (!io1)
 	{
 		m_game = 1;

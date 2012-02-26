@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

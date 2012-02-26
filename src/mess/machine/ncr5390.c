@@ -586,7 +586,7 @@ READ8_MEMBER(ncr5390_device::command_r)
 
 WRITE8_MEMBER(ncr5390_device::command_w)
 {
-	//	logerror("%s: command_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
+	//  logerror("%s: command_w %02x (%08x)\n", tag(), data, cpu_get_pc(&space.device()));
 	if(command_pos == 2) {
 		status |= S_GROSS_ERROR;
 		check_irq();
