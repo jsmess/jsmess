@@ -1738,6 +1738,7 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_FORMATS)/trs_cmd.o	\
 	$(MESS_DRIVERS)/trs80.o		\
 	$(MESS_DRIVERS)/trs80m2.o	\
+	$(MESS_MACHINE)/trs80m2kb.o	\
 	$(MESS_DRIVERS)/tandy2k.o	\
 	$(MESS_MACHINE)/tandy2kb.o	\
 
