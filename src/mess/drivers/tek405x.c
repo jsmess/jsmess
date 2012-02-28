@@ -30,7 +30,6 @@
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/ieee488.h"
-#include "machine/rs232.h"
 #include "sound/speaker.h"
 #include "video/vector.h"
 #include "includes/tek405x.h"
@@ -1047,10 +1046,8 @@ READ8_MEMBER( tek4051_state::com_pia_pb_r )
 	UINT8 data = 0;
 
 	// data terminal ready
-	//data |= rs232_dtr_r(m_rs232) << 1;
 
 	// request to send
-	//data |= rs232_rts_r(m_rs232) << 2;
 
 	return data;
 }
@@ -1073,7 +1070,6 @@ WRITE8_MEMBER( tek4051_state::com_pia_pb_w )
     */
 
 	// clear to send
-	//rs232_cts_w(m_rs232, BIT(data, 3));
 
 	// baud rate select
 	int osc = BIT(data, 7) ? 28160 : 38400;
@@ -1108,9 +1104,9 @@ static const pia6821_interface com_pia_intf =
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pb_r),
 	DEVCB_NULL, // SRX (RS-232 pin 12)
-	DEVCB_NULL,//DEVCB_DEVICE_LINE(RS232_TAG, rs232_dtr_r),
 	DEVCB_NULL,
-	DEVCB_NULL,//DEVCB_DEVICE_LINE(RS232_TAG, rs232_rts_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pa_w),
 	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pb_w),
 	DEVCB_NULL,
@@ -1134,8 +1130,8 @@ static ACIA6850_INTERFACE( acia_intf )
 {
 	0,
 	0,
-	DEVCB_NULL,//DEVCB_DEVICE_LINE(RS232_TAG, rs232_td_r),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE(RS232_TAG, rs232_rd_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_LINE_GND,
 	DEVCB_NULL,
 	DEVCB_LINE_GND,
@@ -1244,7 +1240,6 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_PIA6821_ADD(MC6820_COM_TAG, com_pia_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 	MCFG_IEEE488_BUS_ADD(ieee488_intf)
-	//MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

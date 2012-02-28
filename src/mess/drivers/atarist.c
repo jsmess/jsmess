@@ -1732,10 +1732,8 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	m_fdc->set_floppy(floppy);
 
 	// request to send
-	rs232_rts_w(m_rs232, BIT(data, 3));
 
 	// data terminal ready
-	rs232_dtr_w(m_rs232, BIT(data, 4));
 
 	// centronics strobe
 	m_centronics->strobe_w(BIT(data, 5));
@@ -1787,10 +1785,8 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	m_fdc->set_floppy(floppy);
 
 	// request to send
-	rs232_rts_w(m_rs232, BIT(data, 3));
 
 	// data terminal ready
-	rs232_dtr_w(m_rs232, BIT(data, 4));
 
 	// centronics strobe
 	m_centronics->strobe_w(BIT(data, 5));
@@ -1912,10 +1908,8 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	data |= m_centronics->busy_r();
 
 	// data carrier detect
-	data |= rs232_dcd_r(m_rs232) << 1;
 
 	// clear to send
-	data |= rs232_cts_r(m_rs232) << 2;
 
 	// blitter done
 	data |= m_blitter_done << 3;
@@ -1927,7 +1921,6 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
-	data |= rs232_ri_r(m_rs232) << 6;
 
 	// monochrome monitor detect
 	data |= input_port_read(machine(), "config") & 0x80;
@@ -1939,11 +1932,6 @@ WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
 {
 	m_mfp->rc_w(state);
 	m_mfp->tc_w(state);
-}
-
-WRITE_LINE_MEMBER( st_state::mfp_so_w )
-{
-	rs232_td_w(m_rs232, m_mfp, state);
 }
 
 static MC68901_INTERFACE( mfp_intf )
@@ -1958,8 +1946,8 @@ static MC68901_INTERFACE( mfp_intf )
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),		/* TDO */
-	DEVCB_DEVICE_LINE(RS232_TAG, rs232_rd_r),			/* serial input */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_so_w)		/* serial output */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL											/* serial output */
 };
 
 
@@ -1990,10 +1978,8 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	data |= m_centronics->busy_r();
 
 	// data carrier detect
-	data |= rs232_dcd_r(m_rs232) << 1;
 
 	// clear to send
-	data |= rs232_cts_r(m_rs232) << 2;
 
 	// blitter done
 	data |= m_blitter_done << 3;
@@ -2005,7 +1991,6 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
-	data |= rs232_ri_r(m_rs232) << 6;
 
 	// monochrome monitor detect, DMA sound active
 	data |= (input_port_read(machine(), "config") & 0x80) ^ (m_dmasnd_active << 7);
@@ -2025,8 +2010,8 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),		/* TDO */
-	DEVCB_DEVICE_LINE(RS232_TAG, rs232_rd_r),			/* serial input */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_so_w)		/* serial output */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL											/* serial output */
 };
 
 
@@ -2057,10 +2042,8 @@ READ8_MEMBER( stbook_state::mfp_gpio_r )
 	data |= m_centronics->busy_r();
 
 	// data carrier detect
-	data |= rs232_dcd_r(m_rs232) << 1;
 
 	// clear to send
-	data |= rs232_cts_r(m_rs232) << 2;
 
 	// blitter done
 	data |= m_blitter_done << 3;
@@ -2072,7 +2055,6 @@ READ8_MEMBER( stbook_state::mfp_gpio_r )
 	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
-	data |= rs232_ri_r(m_rs232) << 6;
 
 	// TODO power alarms
 
@@ -2091,8 +2073,8 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),		/* TDO */
-	DEVCB_DEVICE_LINE(RS232_TAG, rs232_rd_r),			/* serial input */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_so_w)		/* serial output */
+	DEVCB_NULL,											/* serial input */
+	DEVCB_NULL											/* serial output */
 };
 
 void st_state::fdc_intrq_w(bool state)
@@ -2105,17 +2087,6 @@ void st_state::fdc_drq_w(bool state)
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
 		fdc_dma_transfer();
 }
-
-
-//-------------------------------------------------
-//  RS232_INTERFACE( rs232_intf )
-//-------------------------------------------------
-
-static RS232_INTERFACE( rs232_intf )
-{
-	{ MC68901_TAG },
-	{ NULL }
-};
 
 
 //-------------------------------------------------
@@ -2383,7 +2354,6 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
 
-	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 
 	// cartridge
@@ -2433,7 +2403,6 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
-	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
@@ -2493,7 +2462,6 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -2562,7 +2530,6 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
