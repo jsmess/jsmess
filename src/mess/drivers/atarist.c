@@ -3080,12 +3080,17 @@ ROM_END
 ROM_START( megaste_uk )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos206")
+#if 0
 	ROM_SYSTEM_BIOS( 0, "tos202", "TOS 2.02 (Mega STE TOS)" )
 	ROMX_LOAD( "tos202uk.bin", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos205", "TOS 2.05 (Mega STE TOS)" )
 	ROMX_LOAD( "tos205uk.bin", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
 	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(3) )
+#else
+	ROM_SYSTEM_BIOS( 0, "tos206", "TOS 2.06 (ST/STE TOS)" )
+	ROMX_LOAD( "tos206uk.bin", 0x00000, 0x40000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(1) )
+#endif
 
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
@@ -3336,6 +3341,7 @@ ROM_END
 ROM_START( falcon30 )
 	ROM_REGION32_BE( 0x80000, M68000_TAG, 0 )
 	ROM_DEFAULT_BIOS("tos404")
+#if 0
 	ROM_SYSTEM_BIOS( 0, "tos400", "TOS 4.00" )
 	ROMX_LOAD( "tos400.bin", 0x00000, 0x7ffff, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos401", "TOS 4.01" )
@@ -3344,6 +3350,14 @@ ROM_START( falcon30 )
 	ROMX_LOAD( "tos402.bin", 0x00000, 0x80000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "tos404", "TOS 4.04" )
 	ROMX_LOAD( "tos404.bin", 0x00000, 0x80000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(4) )
+#else
+	ROM_SYSTEM_BIOS( 0, "tos400", "TOS 4.00" )
+	ROMX_LOAD( "tos400.bin", 0x00000, 0x7ffff, BAD_DUMP CRC(1fbc5396) SHA1(d74d09f11a0bf37a86ccb50c6e7f91aac4d4b11b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "tos402", "TOS 4.02" )
+	ROMX_LOAD( "tos402.bin", 0x00000, 0x80000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "tos404", "TOS 4.04" )
+	ROMX_LOAD( "tos404.bin", 0x00000, 0x80000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(3) )
+#endif
 
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
@@ -3398,7 +3412,7 @@ COMP( 1989, ste_fr,		ste,		0,		ste,		ste,		0,		"Atari",	"STE (France)",			GAME_N
 COMP( 1989, ste_it,		ste,		0,		ste,		ste,		0,		"Atari",	"STE (Italy)",			GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1989, ste_se,		ste,		0,		ste,		ste,		0,		"Atari",	"STE (Sweden)",			GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1989, ste_sg,		ste,		0,		ste,		ste,		0,		"Atari",	"STE (Switzerland)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1990, stbook,		ste,		0,		stbook,		stbook,		0,		"Atari",	"STBook",				GAME_NOT_WORKING )
+//COMP( 1990, stbook,		ste,		0,		stbook,		stbook,		0,		"Atari",	"STBook",				GAME_NOT_WORKING )
 COMP( 1990,	tt030,		0,			0,		tt030,		tt030,		0,		"Atari",	"TT030 (USA)",			GAME_NOT_WORKING )
 COMP( 1990,	tt030_uk,	tt030,		0,		tt030,		tt030,		0,		"Atari",	"TT030 (UK)",			GAME_NOT_WORKING )
 COMP( 1990,	tt030_de,	tt030,		0,		tt030,		tt030,		0,		"Atari",	"TT030 (Germany)",		GAME_NOT_WORKING )
