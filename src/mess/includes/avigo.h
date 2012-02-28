@@ -10,6 +10,8 @@
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
 #include "machine/ins8250.h"
+#include "machine/serial.h"
+#include "machine/null_modem.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "sound/speaker.h"
@@ -30,12 +32,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_ram(*this, RAM_TAG),
-		  m_speaker(*this, SPEAKER_TAG)
+		  m_speaker(*this, SPEAKER_TAG),
+		  m_uart(*this, "ns16550"),
+		  m_serport(*this, "serport")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_speaker;
+	required_device<ns16550_device> m_uart;
+	required_device<rs232_port_device> m_serport;
 
 	// defined in drivers/avigo.c
 	virtual void machine_start();

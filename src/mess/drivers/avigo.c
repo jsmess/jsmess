@@ -223,18 +223,24 @@ WRITE_LINE_MEMBER( avigo_state::com_interrupt )
 	refresh_ints();
 }
 
-
-
 static const ins8250_interface avigo_com_interface =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("serport", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(avigo_state, com_interrupt),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
+static const rs232_port_interface avigo_serport_config = 
+{
+	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, rx_w),
+	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, dcd_w),
+	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, dsr_w),
+	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, ri_w),
+	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, cts_w)
+};
 
 void avigo_state::machine_reset()
 {
@@ -879,6 +885,10 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memset(base, 0x00, size);
 }
 
+static SLOT_INTERFACE_START( avigo_com )
+	SLOT_INTERFACE("null_modem", NULL_MODEM)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -887,6 +897,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_NS16550_ADD( "ns16550", avigo_com_interface, XTAL_1_8432MHz )
+	MCFG_RS232_PORT_ADD( "serport", avigo_serport_config, avigo_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
