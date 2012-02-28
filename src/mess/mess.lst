@@ -333,6 +333,8 @@ bbcm	   // 198? BBC Master
 bbcbc	 // 1985 BBC Bridge Companion
 electron  // 1983 Acorn Electron
 a310	  // 1988 Acorn Archimedes 310
+a3010	  // 1988 Acorn Archimedes 3010
+a3020	  // 1988 Acorn Archimedes 3020
 a7000	  // 1995 Acorn Archimedes 7000
 a7000p	  // 1997 Acorn Archimedes 7000+
 a6809
