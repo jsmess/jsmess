@@ -71,7 +71,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( trs80m2_keyboard )
-	MCFG_CPU_ADD(I8021_TAG, I8021, 100000) // TODO 10K resistor connected across the XTAL inputs
+	MCFG_CPU_ADD(I8021_TAG, I8021, 3000000) // 1000uH inductor connected across the XTAL inputs
 	MCFG_CPU_IO_MAP(trs80m2_keyboard_io)
 	MCFG_DEVICE_DISABLE() // TODO
 MACHINE_CONFIG_END
