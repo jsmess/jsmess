@@ -192,7 +192,7 @@ MACHINE_CONFIG_END
 
 #if 0
 #define NTSC_BIOS \
-	ROM_REGION32_BE( 0x100000, "user1", 0 ) \
+	ROM_REGION32_BE( 0x200000, "user1", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" ) \
@@ -205,7 +205,7 @@ MACHINE_CONFIG_END
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(5) )
 #else
 #define NTSC_BIOS \
-	ROM_REGION32_BE( 0x100000, "user1", 0 ) \
+	ROM_REGION32_BE( 0x200000, "user1", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" ) \
@@ -222,7 +222,7 @@ ROM_END
 
 
 ROM_START(3do_pal)
-    ROM_REGION32_BE( 0x100000, "user1", 0 )
+    ROM_REGION32_BE( 0x200000, "user1", 0 )
     ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
     ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) )
     ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
