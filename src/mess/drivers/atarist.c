@@ -1368,7 +1368,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 //  ADDRESS_MAP( stbook_map )
 //-------------------------------------------------
-
+#if 0
 static ADDRESS_MAP_START( stbook_map, AS_PROGRAM, 16, stbook_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
@@ -1414,7 +1414,7 @@ static ADDRESS_MAP_START( stbook_map, AS_PROGRAM, 16, stbook_state )
     AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(power_r, power_w)
     AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(reference_r, reference_w)*/
 ADDRESS_MAP_END
-
+#endif
 
 
 //**************************************************************************
@@ -1659,6 +1659,7 @@ INPUT_PORTS_END
 //  INPUT_PORTS( stbook )
 //-------------------------------------------------
 
+#if 0
 static INPUT_PORTS_START( stbook )
 	PORT_START("SW400")
 	PORT_DIPNAME( 0x80, 0x80, "DMA sound hardware")
@@ -1672,6 +1673,7 @@ static INPUT_PORTS_START( stbook )
 	PORT_DIPSETTING( 0x20, DEF_STR( Yes ) )
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+#endif
 
 
 //-------------------------------------------------
@@ -2497,7 +2499,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 //  MACHINE_CONFIG( stbook )
 //-------------------------------------------------
-
+#if 0
 static MACHINE_CONFIG_START( stbook, stbook_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, U517/2)
@@ -2543,7 +2545,7 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M")
 MACHINE_CONFIG_END
-
+#endif
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( tt030 )
