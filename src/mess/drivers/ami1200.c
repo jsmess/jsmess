@@ -121,10 +121,10 @@ static WRITE8_DEVICE_HANDLER( ami1200_cia_0_portb_w )
 
 static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cd32_state, m_chip_ram, m_chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(ami1200_state, m_chip_ram, m_chip_ram_size)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cd32_state, m_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(ami1200_state, m_custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
 ADDRESS_MAP_END
@@ -382,7 +382,7 @@ ROM_END
 
 static DRIVER_INIT( a1200 )
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
+	ami1200_state *state = machine.driver_data<ami1200_state>();
 	static const amiga_machine_interface cd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
