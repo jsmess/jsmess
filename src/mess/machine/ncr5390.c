@@ -137,7 +137,7 @@ void ncr5390_device::step(bool timeout)
 		if(win != scsi_id) {
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-			abort(); // need to wait for bus free
+			fatalerror("need to wait for bus free");
 			break;
 		}
 		state = (state & STATE_MASK) | (ARB_ASSERT_SEL << SUB_SHIFT);
@@ -460,7 +460,7 @@ void ncr5390_device::step(bool timeout)
 void ncr5390_device::send_byte()
 {
 	if(!fifo_pos)
-		abort();
+		fatalerror("ncr5390_device::send_byte - !fifo_pos");
 
 	state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
 	if((state & STATE_MASK) != INIT_XFR_SEND_PAD &&
