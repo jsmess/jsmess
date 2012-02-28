@@ -17,7 +17,6 @@
 #include "machine/mc68901.h"
 #include "machine/rescap.h"
 #include "machine/rp5c15.h"
-#include "machine/rs232.h"
 #include "machine/wd1772.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
@@ -185,7 +184,6 @@ public:
 
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
-	DECLARE_WRITE_LINE_MEMBER( mfp_so_w );
 
 	void toggle_dma_fifo();
 	void flush_dma_fifo();
