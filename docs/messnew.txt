@@ -1,4 +1,86 @@
-﻿0.145u1
+﻿0.145u3 (u2 was not released)
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+-n64: Force mtc0 opcodes that initiate to-RSP DMAs to end recompile 
+ sequences to force a code check. Fixes certain microcodes from executing 
+ garbage code after DMA. [Ryan Holtz]
+ - Miscellaneous machine fixes, gets Conker's Bad Fur Day to boot through 
+   its legal screens with interpreter MIPS.
+   - Increase the amount of time consumed by PI DMA, makes certain RSP 
+     microcodes that test DMA speed land in the correct window.
+   - Force the main CPU to yield when the RSP reads its atomic semaphore.
+   - Force the RSP to yield when PI DMA completes.
+   - Flush the RSP DRC cache when touching IMEM with SP DMA.
+ - Increase CPU/RSP interleave from 600Hz to 1200Hz, seems to be just 
+   enough for RSP-side PI DMA tests to land correctly.
+ - Don't flush the RSP DRC cache on DMA. Fixes Mario 64 and others.
+ - Fix audio sync issues in Super Mario 64 and probably others, and 
+   also bring PI DMA speed into the realm of reality.
+ - Change PI DMA speed from 3 cycles/word to 5.08 cycles, as average
+   PI speed is between 2.53 and 2.55 cycles/byte.
+
+-vic20: Added support for loading .crt files. Note: this will only 
+ work if the first 2 bytes of the file contain the loading address, 
+ and only for single part cartridges. Please use the MESS software 
+ list instead of loose files. [Curt Coder]
+
+-next: Timer free running mode [O. Galibert]
+-c64: Added support for the Final Cartridge and Prophet-64 cartridges. [Curt Coder]
+-ti99: Horizon Ramdisk expansion card added [Michael Zapf]
+-z88: moved uPD65031 emulation into a device and fixed keyboard input. [Sandro Ronco]
+
+Software Lists:
+----------------
+-c64.xml/c128.xml Added Buddy System 64/128 v10 floppies. [Quantum Leaper]
+-ti99.xml: Added softlist support to ti99. XML file is still preliminary,
+  must be filled with more entries. Only two cartridge PCB types
+  supported (standard/paged) at this time. RPK will continue to be
+  available. [Michael Zapf]
+-apple1.xml: added a few more tapes [Anon01]
+-pico.xml: 8 new Euro dumps! [Team Europe]
+
+Source Changes:
+----------------
+- 680x0: Ensure fc/rw and fault address are consistant [O. Galibert]
+- i386: Prevent page faults when returning to same privilege and unmapped 
+  pages are above the stack.  Windows 95 boots now. [Carl]
+- Modernized terminal device and added possibility to change comm parameters [Carl]
+- i386: LOCK prefix should depend on IOPL on 386.  Windows NT beta boots. [Carl]
+- info.c: several fixes and additions to listxml output [Fabio Priuli]
+  - appended to xml info about devices which can be optionally mounted to slots
+  - added a description attribute to slotoption to show which devices can be mounted
+    in each slot
+  - added to xml info of cpus/inputs/image/slots which are relative to devices (e.g. CPUs
+    or Dipswitches in the device itself)
+  - tags of elements directly attached to the root_device do not display anymore the
+    root colon (slot tags were already behaving in this way); elements attached to optional
+    devices use tags starting with colon (to be interpreted as a relative tags which gets
+    appended to the device tag, when such a device is selected in a slot)
+  - modified when necessary output routines to pass a root_device and a root_tag as
+    parameters, in order to simplify output of relative devices and avoid duplicated code
+  - updated DTD according to the new elements and attributes
+  These changes allow frontends to know in advance how drivers can be configured
+  through the various slot options (by matching option descriptions with device
+  descriptions), without the need to run -lx with the various slot combinations. This is
+  especially of use if a device adds e.g. dipswitches or image devices (like additional
+  floppy drives or additional slot expansions), but also if one wants to know e.g. how many
+  sound channels a soundcard would add to a pc driver, or which kind of screen parameters
+  would be added by a specific choice of video card.
+ 
+0.145u1
 
 New System Drivers Supported:
 -----------------------------
