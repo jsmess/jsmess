@@ -159,9 +159,9 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 		assert(index != 32);
 		index += bank*32;
 		UINT16 val = index | modifiers_state | KEYVALID;
-		if(newval)
-			val |= KEYUP;
-		if(val == 0x88a6 || val == 0x88ca) {
+		if(!newval)
+			val |= KEYDOWN;
+		if(val == 0x8826 || val == 0x884a) {
 			nmi_active = true;
 			int_nmi_cb(true);
 		} else if(nmi_active) {

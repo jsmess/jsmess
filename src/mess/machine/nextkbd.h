@@ -35,7 +35,7 @@ protected:
 private:
 	enum { FLAG_INT = 0x800000, FLAG_DATA = 0x400000, FLAG_RESET = 0x000200 };
 	enum { FIFO_SIZE = 32 };
-	enum { KEYUP = 0x0080, KEYVALID = 0x8000 };
+	enum { KEYDOWN = 0x0080, KEYVALID = 0x8000 };
 
 	line_cb_t int_change_cb, int_power_cb, int_nmi_cb;
 	emu_timer *kbd_timer;
