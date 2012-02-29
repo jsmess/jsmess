@@ -88,7 +88,7 @@ public:
 
 	attotime timer_tbase;
 	UINT16 timer_vbase;
-	UINT32 timer_data;
+	UINT32 timer_data, timer_next_data;
 	UINT32 timer_ctrl;
 	emu_timer *timer_tm;
 
