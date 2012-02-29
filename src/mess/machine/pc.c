@@ -356,126 +356,36 @@ static WRITE_LINE_DEVICE_HANDLER( pc_com_interrupt_2 )
 	pic8259_ir3_w(st->m_pic8259, state);
 }
 
-static void pc_com_tx(device_t *uart, UINT8 state, const char *portn)
-{
-	rs232_port_device *port = uart->owner()->subdevice<rs232_port_device>(portn);
-	port->tx(state);
-}
-
-static void pc_com_dtr(device_t *uart, UINT8 state, const char *portn)
-{
-	rs232_port_device *port = uart->owner()->subdevice<rs232_port_device>(portn);
-	port->dtr_w(state);
-}
-
-static void pc_com_rts(device_t *uart, UINT8 state, const char *portn)
-{
-	rs232_port_device *port = uart->owner()->subdevice<rs232_port_device>(portn);
-	port->rts_w(state);
-}
-
-static WRITE_LINE_DEVICE_HANDLER( pc_com_tx_0 ) { pc_com_tx(device, state, "serport0"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dtr_0 ) { pc_com_dtr(device, state, "serport0"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_rts_0 ) { pc_com_rts(device, state, "serport0"); }
-
-static WRITE_LINE_DEVICE_HANDLER( pc_com_tx_1 ) { pc_com_tx(device, state, "serport1"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dtr_1 ) { pc_com_dtr(device, state, "serport1"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_rts_1 ) { pc_com_rts(device, state, "serport1"); }
-
-static WRITE_LINE_DEVICE_HANDLER( pc_com_tx_2 ) { pc_com_tx(device, state, "serport2"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dtr_2 ) { pc_com_dtr(device, state, "serport2"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_rts_2 ) { pc_com_rts(device, state, "serport2"); }
-
-static WRITE_LINE_DEVICE_HANDLER( pc_com_tx_3 ) { pc_com_tx(device, state, "serport3"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dtr_3 ) { pc_com_dtr(device, state, "serport3"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_rts_3 ) { pc_com_rts(device, state, "serport3"); }
-
-static void pc_com_rx(device_t *port, UINT8 state, const char *uartn)
-{
-	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
-	uart->rx_w(state);
-}
-
-static void pc_com_dcd(device_t *port, UINT8 state, const char *uartn)
-{
-	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
-	uart->dcd_w(state);
-}
-
-static void pc_com_dsr(device_t *port, UINT8 state, const char *uartn)
-{
-	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
-	uart->dsr_w(state);
-}
-
-static void pc_com_ri(device_t *port, UINT8 state, const char *uartn)
-{
-	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
-	uart->ri_w(state);
-}
-
-static void pc_com_cts(device_t *port, UINT8 state, const char *uartn)
-{
-	ins8250_uart_device *uart = port->owner()->subdevice<ins8250_uart_device>(uartn);
-	uart->cts_w(state);
-}
-
-static WRITE_LINE_DEVICE_HANDLER( pc_com_rx_0 ) { pc_com_rx(device, state, "ins8250_0"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dcd_0 ) { pc_com_dcd(device, state, "ins8250_0"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dsr_0 ) { pc_com_dsr(device, state, "ins8250_0"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_ri_0 ) { pc_com_ri(device, state, "ins8250_0"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_cts_0 ) { pc_com_cts(device, state, "ins8250_0"); }
-
-static WRITE_LINE_DEVICE_HANDLER( pc_com_rx_1 ) { pc_com_rx(device, state, "ins8250_1"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dcd_1 ) { pc_com_dcd(device, state, "ins8250_1"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dsr_1 ) { pc_com_dsr(device, state, "ins8250_1"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_ri_1 ) { pc_com_ri(device, state, "ins8250_1"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_cts_1 ) { pc_com_cts(device, state, "ins8250_1"); }
-
-static WRITE_LINE_DEVICE_HANDLER( pc_com_rx_2 ) { pc_com_rx(device, state, "ins8250_2"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dcd_2 ) { pc_com_dcd(device, state, "ins8250_2"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dsr_2 ) { pc_com_dsr(device, state, "ins8250_2"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_ri_2 ) { pc_com_ri(device, state, "ins8250_2"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_cts_2 ) { pc_com_cts(device, state, "ins8250_2"); }
-
-static WRITE_LINE_DEVICE_HANDLER( pc_com_rx_3 ) { pc_com_rx(device, state, "ins8250_3"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dcd_3 ) { pc_com_dcd(device, state, "ins8250_3"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_dsr_3 ) { pc_com_dsr(device, state, "ins8250_3"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_ri_3 ) { pc_com_ri(device, state, "ins8250_3"); }
-static WRITE_LINE_DEVICE_HANDLER( pc_com_cts_3 ) { pc_com_cts(device, state, "ins8250_3"); }
-
-/* PC interface to PC-com hardware. Done this way because PCW16 also
-uses PC-com hardware and doesn't have the same setup! */
 const ins8250_interface ibm5150_com_interface[4]=
 {
 	{
-		DEVCB_LINE(pc_com_tx_0),
-		DEVCB_LINE(pc_com_dtr_0),
-		DEVCB_LINE(pc_com_rts_0),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", serial_port_device, tx),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, dtr_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, rts_w),
 		DEVCB_LINE(pc_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_LINE(pc_com_tx_1),
-		DEVCB_LINE(pc_com_dtr_1),
-		DEVCB_LINE(pc_com_rts_1),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", serial_port_device, tx),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, dtr_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, rts_w),
 		DEVCB_LINE(pc_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_LINE(pc_com_tx_2),
-		DEVCB_LINE(pc_com_dtr_2),
-		DEVCB_LINE(pc_com_rts_2),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", serial_port_device, tx),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, dtr_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, rts_w),
 		DEVCB_LINE(pc_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_LINE(pc_com_tx_3),
-		DEVCB_LINE(pc_com_dtr_3),
-		DEVCB_LINE(pc_com_rts_3),
+		DEVCB_DEVICE_LINE_MEMBER("serport3", serial_port_device, tx),
+		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, dtr_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, rts_w),
 		DEVCB_LINE(pc_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
@@ -485,32 +395,32 @@ const ins8250_interface ibm5150_com_interface[4]=
 const rs232_port_interface ibm5150_serport_config[4] =
 {
 	{
-		DEVCB_LINE( pc_com_rx_0 ),
-		DEVCB_LINE( pc_com_dcd_0 ),
-		DEVCB_LINE( pc_com_dsr_0 ),
-		DEVCB_LINE( pc_com_ri_0 ),
-		DEVCB_LINE( pc_com_cts_0 )
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, rx_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, dcd_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, dsr_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, ri_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, cts_w)
 	},
 	{
-		DEVCB_LINE( pc_com_rx_1 ),
-		DEVCB_LINE( pc_com_dcd_1 ),
-		DEVCB_LINE( pc_com_dsr_1 ),
-		DEVCB_LINE( pc_com_ri_1 ),
-		DEVCB_LINE( pc_com_cts_1 )
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, rx_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, dcd_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, dsr_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, ri_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, cts_w)
 	},
 	{
-		DEVCB_LINE( pc_com_rx_2 ),
-		DEVCB_LINE( pc_com_dcd_2 ),
-		DEVCB_LINE( pc_com_dsr_2 ),
-		DEVCB_LINE( pc_com_ri_2 ),
-		DEVCB_LINE( pc_com_cts_2 )
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, rx_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, dcd_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, dsr_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, ri_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, cts_w)
 	},
 	{
-		DEVCB_LINE( pc_com_rx_3 ),
-		DEVCB_LINE( pc_com_dcd_3 ),
-		DEVCB_LINE( pc_com_dsr_3 ),
-		DEVCB_LINE( pc_com_ri_3 ),
-		DEVCB_LINE( pc_com_cts_3 )
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, rx_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, dcd_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, dsr_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, ri_w),
+		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, cts_w)
 	}
 };
 

@@ -5,8 +5,7 @@
 
 #include "emu.h"
 #include "machine/isa.h"
-#include "machine/serial.h"
-#include "machine/ins8250.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,22 +20,17 @@ class isa8_com_device :
 public:
         // construction/destruction
         isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-
-		rs232_port_device *get_port(int port) { return m_serport[port]; }
-		ins8250_uart_device *get_uart(int dev) { return m_uart[dev]; }
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1) { m_isa->irq4_w(state); }
+	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2) { m_isa->irq3_w(state); }
 protected:
         // device-level overrides
         virtual void device_start();
         virtual void device_reset();
-		virtual void device_config_complete() { m_shortname = "isa_com"; }
-private:
-        // internal state
-	ins8250_uart_device *m_uart[4];
-	rs232_port_device *m_serport[4];
+	virtual void device_config_complete() { m_shortname = "isa_com"; }
 };
 
 
@@ -52,9 +46,9 @@ public:
         // construction/destruction
         isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual void device_config_complete() { m_shortname = "isa_com_at"; }
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_config_complete() { m_shortname = "isa_com_at"; }
 };
 
 
