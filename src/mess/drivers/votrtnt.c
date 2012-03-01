@@ -63,7 +63,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	//required_device<device_t> m_acia;
-	required_device<votrax_device> m_votrax;
+	required_device<votrax_sc01_device> m_votrax;
 	DECLARE_READ8_MEMBER( votrtnt_acia_status_r );
 	DECLARE_READ8_MEMBER( votrtnt_acia_data_r );
 	DECLARE_WRITE8_MEMBER( votrtnt_votrax_w );
@@ -147,20 +147,14 @@ static GENERIC_TERMINAL_INTERFACE( votrtnt_terminal_intf )
 static TIMER_DEVICE_CALLBACK( votrtnt_poll_votrax )
 {
 	votrtnt_state *state = timer.machine().driver_data<votrtnt_state>();
-	UINT8 status = state->m_votrax->status();
+	UINT8 status = state->m_votrax->request();
 	//printf("%X ",status);
 	device_set_input_line(timer.machine().device("maincpu"), INPUT_LINE_IRQ0, status ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct votrax_map dummy =
+static struct votrax_sc01_interface votrtnt_votrax_interface =
 {
-	NULL,
-	NULL
-};
-
-static struct votrax_interface votrtnt_votrax_interface =
-{
-	&dummy
+	DEVCB_NULL
 };
 
 /******************************************************************************
@@ -181,7 +175,7 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_VOTRAX_ADD("votrax", 1700000, votrtnt_votrax_interface ) /* 1.70 MHz? needs verify */
+	MCFG_VOTRAX_SC01_ADD("votrax", 1700000, votrtnt_votrax_interface ) /* 1.70 MHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, votrtnt_terminal_intf)
