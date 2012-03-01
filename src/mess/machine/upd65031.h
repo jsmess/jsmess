@@ -29,8 +29,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef void (*upd65031_screen_update_func)(device_t &device, bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1);
-#define UPD65031_SCREEN_UPDATE(name) void name(device_t &device, bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1)
+typedef void (*upd65031_screen_update_func)(device_t &device, bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash);
+#define UPD65031_SCREEN_UPDATE(name) void name(device_t &device, bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash)
 
 typedef void (*upd65031_memory_update_func)(device_t &device, int bank, UINT16 page, int rams);
 #define UPD65031_MEMORY_UPDATE(name) void name(device_t &device, int bank, UINT16 page, int rams)
@@ -74,6 +74,7 @@ private:
 	inline void update_rtc_interrupt();
 	inline void set_mode(int mode);
 	static const device_timer_id TIMER_RTC = 0;
+	static const device_timer_id TIMER_FLASH = 1;
 
 	devcb_resolved_write_line	m_out_int_func;
 	devcb_resolved_write_line	m_out_nmi_func;
@@ -91,9 +92,11 @@ private:
 	UINT8	m_tmk;				// timer interrupt mask
 	UINT8	m_tack;				// timer interrupts acknowledge
 	UINT8	m_com;				// command register
+	int		m_flash;			// cursor flash
 
 	// timers
 	emu_timer *m_rtc_timer;
+	emu_timer *m_flash_timer;
 };
 
 

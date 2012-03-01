@@ -238,7 +238,9 @@ void upd65031_device::device_start()
 
 	// allocate timers
 	m_rtc_timer = timer_alloc(TIMER_RTC);
+	m_flash_timer = timer_alloc(TIMER_FLASH);
 	m_rtc_timer->adjust(attotime::from_msec(5), 0, attotime::from_msec(5));
+	m_flash_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 
 	// state saving
 	save_item(NAME(m_mode));
@@ -252,6 +254,7 @@ void upd65031_device::device_start()
 	save_item(NAME(m_tmk));
 	save_item(NAME(m_tack));
 	save_item(NAME(m_com));
+	save_item(NAME(m_flash));
 }
 
 
@@ -271,6 +274,7 @@ void upd65031_device::device_reset()
 	m_tmk = TSTA_TICK | TSTA_SEC | TSTA_MIN;
 	m_tack = 0;
 	m_com = 0;
+	m_flash = 0;
 	set_mode(STATE_AWAKE);
 
 	if (m_out_mem_cb)
@@ -379,6 +383,9 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			interrupt_refresh();
 		}
 		break;
+	case TIMER_FLASH:
+		m_flash = !m_flash;
+		break;
 	}
 }
 
@@ -390,7 +397,7 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 UINT32 upd65031_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_screen_update_cb)
-		(m_screen_update_cb)(*this, bitmap, m_lcd_regs[4], m_lcd_regs[2], m_lcd_regs[3], m_lcd_regs[0], m_lcd_regs[1]);
+		(m_screen_update_cb)(*this, bitmap, m_lcd_regs[4], m_lcd_regs[2], m_lcd_regs[3], m_lcd_regs[0], m_lcd_regs[1], m_flash);
 
 	return 0;
 }
