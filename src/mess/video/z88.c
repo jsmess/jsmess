@@ -9,249 +9,165 @@
 #include "includes/z88.h"
 
 
-INLINE void z88_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void z88_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT16 color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	if (x<Z88_SCREEN_WIDTH)
+		bitmap.pix16(y, x) = color;
+}
+
+// convert absolute offset into correct address to get data from
+inline UINT8* z88_state::convert_address(UINT32 offset)
+{
+	return machine().region("maincpu")->base() + offset;
 }
 
 /***************************************************************************
   Start the video hardware emulation.
 ***************************************************************************/
 
-/* two colours */
-static const unsigned short z88_colour_table[Z88_NUM_COLOURS] =
-{
-	0, 1, 2
-};
-
-/* black/white */
-static const rgb_t z88_palette[Z88_NUM_COLOURS] =
-{
-	MAKE_RGB(0x000, 0x000, 0x000),
-	MAKE_RGB(0x0ff, 0x0ff, 0x0ff),
-	MAKE_RGB(0x080, 0x080, 0x080)
-};
-
-
-/* Initialise the palette */
+// Initialise the palette
 PALETTE_INIT( z88 )
 {
-	palette_set_colors(machine, 0, z88_palette, ARRAY_LENGTH(z88_palette));
+	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
+	palette_set_color(machine, 1, MAKE_RGB(92,  83,  88));
+	palette_set_color(machine, 2, MAKE_RGB(122, 126, 129));
 }
 
 /* temp - change to gfxelement structure */
 
-static void z88_vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)
+void z88_state::vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx)
 {
-	int h,b;
-
-	for (h=0; h<8; h++)
+	for (int h=0; h<8; h++)
 	{
-		UINT8 data;
+		UINT8 data = gfx[h];
 
-		data = pData[h];
-		for (b=0; b<8; b++)
+		for (int b=0; b<8; b++)
 		{
-			int pen;
-
-			if (data & 0x080)
-			{
-				pen = pen1;
-			}
-			else
-			{
-				pen = pen0;
-			}
-
-			z88_plot_pixel(bitmap, x+b, y+h, pen);
+			plot_pixel(bitmap, x+b, y+h, (data & 0x80) ? pen1 : pen0);
 
 			data = data<<1;
 		}
 	}
 }
 
-static void z88_vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, int pen0, int pen1, unsigned char *pData)
+void z88_state::vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx)
 {
-	int h,b;
-
-	for (h=0; h<8; h++)
+	for (int h=0; h<8; h++)
 	{
-		UINT8 data;
+		UINT8 data = gfx[h]<<2;
 
-		data = pData[h];
-		data = data<<2;
-
-		for (b=0; b<6; b++)
+		for (int b=0; b<6; b++)
 		{
-			int pen;
-			if (data & 0x080)
-			{
-				pen = pen1;
-			}
-			else
-			{
-				pen = pen0;
-			}
-
-			z88_plot_pixel(bitmap, x+1+b, y+h, pen);
+			plot_pixel(bitmap, x+1+b, y+h, (data & 0x80) ? pen1 : pen0);
 			data = data<<1;
 		}
-
-		z88_plot_pixel(bitmap,x,y+h, pen0);
-		z88_plot_pixel(bitmap,x+7,y+h, pen0);
 	}
 }
 
-static void z88_vh_render_line(bitmap_ind16 &bitmap, int x, int y,int pen)
+void z88_state::vh_render_line(bitmap_ind16 &bitmap, int x, int y, UINT16 pen)
 {
-	z88_plot_pixel(bitmap, x, y+7, pen);
-	z88_plot_pixel(bitmap, x+1, y+7, pen);
-	z88_plot_pixel(bitmap, x+2, y+7, pen);
-	z88_plot_pixel(bitmap, x+3, y+7, pen);
-	z88_plot_pixel(bitmap, x+4, y+7, pen);
-	z88_plot_pixel(bitmap, x+5, y+7, pen);
-	z88_plot_pixel(bitmap, x+6, y+7, pen);
-	z88_plot_pixel(bitmap, x+7, y+7, pen);
+	for (int i=0; i<8; i++)
+		plot_pixel(bitmap, x + i, y + 7, pen);
 }
 
-/* convert absolute offset into correct address to get data from */
-static unsigned char *z88_convert_address(running_machine &machine, unsigned long offset)
+void z88_state::lcd_update(bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash)
 {
-	return machine.region("maincpu")->base() + offset;
-}
-
-
-SCREEN_VBLANK( z88 )
-{
-	// rising edge
-	if (vblank_on)
+	if (sbf == 0)
 	{
-		z88_state *state = screen.machine().driver_data<z88_state>();
-		state->m_frame_number++;
-		if (state->m_frame_number >= 50)
-		{
-			state->m_frame_number = 0;
-			state->m_flash_invert = !state->m_flash_invert;
-		}
+		// LCD disabled
+		bitmap.fill(0);
 	}
-}
-
-
-UPD65031_SCREEN_UPDATE(z88_screen_update)
-{
-	int x,y;
-	unsigned char *ptr = z88_convert_address(device.machine(), sbf<<11);
-	unsigned char *stored_ptr = ptr;
-	int pen0, pen1;
-
-	for (y=0; y<(Z88_SCREEN_HEIGHT>>3); y++)
+	else
 	{
-		ptr = stored_ptr;
+		UINT8 *vram = convert_address(sbf<<11);
 
-		for (x=0; x<(Z88_SCREEN_WIDTH>>3); x++)
+		for (int y=0; y<(Z88_SCREEN_HEIGHT>>3); y++)
 		{
-			int ch;
+			int x = 0, c = 0;
 
-			UINT8 byte0, byte1;
-
-			byte0 = ptr[0];
-			byte1 = ptr[1];
-			ptr+=2;
-
-			/* inverted graphics? */
-			if (byte1 & Z88_SCR_HW_REV)
+			while (x < Z88_SCREEN_WIDTH)
 			{
-				pen1 = 0;
+				UINT16 pen0, pen1;
+				UINT8 *char_gfx;
+				UINT8 byte0 = vram[(y * 0x100) + c];
+				UINT8 byte1 = vram[(y * 0x100) + c + 1];
 
-				if (byte1 & Z88_SCR_HW_GRY)
+				// inverted graphics?
+				if (byte1 & Z88_SCR_HW_REV)
 				{
-					pen0 = 2;
+					pen0 = (byte1 & Z88_SCR_HW_GRY) ? 2 : 1;
+					pen1 = 0;
 				}
 				else
 				{
-					pen0 = 1;
+					pen0 = 0;
+					pen1 = (byte1 & Z88_SCR_HW_GRY) ? 2 : 1;
 				}
-			}
-			else
-			{
-				pen0 = 0;
-				if (byte1 & Z88_SCR_HW_GRY)
+
+				if ((byte1 & Z88_SCR_HW_NULL) == Z88_SCR_HW_NULL)
 				{
-					pen1 = 2;
+					// hidden
 				}
-				else
+				else if (!(byte1 & Z88_SCR_HW_HRS) || (((byte1 & Z88_SCR_HW_CURS) == Z88_SCR_HW_CURS)))
 				{
-					pen1 = 1;
-				}
-			}
+					// low-res 6x8
+					UINT16 ch = (byte0 | (byte1<<8)) & 0x1ff;
 
-//          if (byte1 & Z88_SCR_HW_FLS)
-//          {
-//              if (state->m_flash_invert)
-//              {
-//                  pen1 = pen0;
-//              }
-//          }
-
-
-			/* hi-res? */
-			if (byte1 & Z88_SCR_HW_HRS)
-			{
-					int ch_index;
-					unsigned char *pCharGfx;
-
-					ch = (byte0 & 0x0ff) | ((byte1 & 0x01)<<8);
-
-					if (ch & 0x0100)
+					if ((ch & 0x01c0) == 0x01c0)
 					{
-						ch_index =ch & 0x0ff;	//(~0x0100);
-						pCharGfx = z88_convert_address(device.machine(), hires1<<11);
+					   ch &= 0x3f;
+
+					   char_gfx = convert_address(lores0<<9);
 					}
 					else
 					{
-						ch_index = ch & 0x0ff;
-						pCharGfx = z88_convert_address(device.machine(), hires0<<13);
+					   char_gfx = convert_address(lores1<<12);
 					}
 
-					pCharGfx += (ch_index<<3);
+					char_gfx += (ch<<3);
 
-				z88_vh_render_8x8(bitmap, (x<<3),(y<<3), pen0, pen1, pCharGfx);
+					// cursor flash
+					if (flash && (byte1 & Z88_SCR_HW_CURS) == Z88_SCR_HW_CURS)
+						vh_render_6x8(bitmap, x,(y<<3), pen1, pen0, char_gfx);
+					else
+						vh_render_6x8(bitmap, x,(y<<3), pen0, pen1, char_gfx);
+
+					// underline?
+					if (byte1 & Z88_SCR_HW_UND)
+						vh_render_line(bitmap, x, (y<<3), pen1);
+
+					x += 6;
+				}
+				else if ((byte1 & Z88_SCR_HW_HRS) && !(byte1 & Z88_SCR_HW_REV))
+				{
+					// high-res 8x8
+					UINT16 ch = (byte0 | (byte1<<8)) & 0x3ff;
+
+					if (ch & 0x0100)
+					{
+						ch &= 0xff;
+						char_gfx = convert_address(hires1<<11);
+					}
+					else
+					{
+						ch &= 0x7f;
+						char_gfx = convert_address(hires0<<13);
+					}
+
+					char_gfx += (ch<<3);
+
+					// flash
+					if ((byte1 & Z88_SCR_HW_FLS) && flash)
+						pen0 = pen1 = 0;
+
+					vh_render_8x8(bitmap, x,(y<<3), pen0, pen1, char_gfx);
+
+					x += 8;
+				}
+
+				// every char takes 2 bytes
+				c += 2;
 			}
-			else
-			{
-				unsigned char *pCharGfx;
-				int ch_index;
-
-				ch = (byte0 & 0x0ff) | ((byte1 & 0x01)<<8);
-
-				if ((ch & 0x01c0)==0x01c0)
-				{
-				   ch_index = ch & (~0x01c0);
-
-				   pCharGfx = z88_convert_address(device.machine(), lores0<<9);
-				}
-				else
-				{
-				   ch_index = ch;
-
-				   pCharGfx = z88_convert_address(device.machine(), lores1<<12);
-				}
-
-				pCharGfx += (ch_index<<3);
-
-				z88_vh_render_6x8(bitmap, (x<<3),(y<<3), pen0,pen1,pCharGfx);
-
-				/* underline? */
-				if (byte1 & Z88_SCR_HW_UND)
-				{
-					z88_vh_render_line(bitmap, (x<<3), (y<<3), pen1);
-				}
-			}
-
-
-
 		}
-
-		stored_ptr+=256;
 	}
 }

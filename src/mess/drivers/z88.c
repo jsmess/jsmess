@@ -7,7 +7,6 @@
         system driver
 
         TODO:
-        - screen should be 640x64
         - speaker controlled by constant tone or txd
         - Facility to load games
         - expansion interface
@@ -259,6 +258,11 @@ static UPD65031_MEMORY_UPDATE(z88_bankswitch_update)
 	state->bankswitch_update(bank, page, rams);
 }
 
+static UPD65031_SCREEN_UPDATE(z88_screen_update)
+{
+	z88_state *state = device.machine().driver_data<z88_state>();
+	state->lcd_update(bitmap, sbf, hires0, hires1, lores0, lores1, flash);
+}
 
 static UPD65031_INTERFACE( z88_blink_intf )
 {
@@ -285,7 +289,6 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_SCREEN_SIZE(Z88_SCREEN_WIDTH, Z88_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, (Z88_SCREEN_WIDTH - 1), 0, (Z88_SCREEN_HEIGHT - 1))
 	MCFG_SCREEN_UPDATE_DEVICE("blink", upd65031_device, screen_update)
-	MCFG_SCREEN_VBLANK_STATIC( z88 )
 
 	MCFG_PALETTE_LENGTH(Z88_NUM_COLOURS)
 	MCFG_PALETTE_INIT( z88 )
@@ -308,7 +311,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START(z88)
-	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION(0x100000, "maincpu", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("ver4")
 	ROM_SYSTEM_BIOS( 0, "ver3", "Version 3.0 UK")
 	ROMX_LOAD("z88v300.rom" ,  0x00000, 0x20000, CRC(802cb9aa) SHA1(ceb688025b79454cf229cae4dbd0449df2747f79), ROM_BIOS(1) )
