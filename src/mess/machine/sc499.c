@@ -917,7 +917,7 @@ void sc499_device::set_tc_state(int state)
 				m_status |= SC499_STAT_IRQ;
 			}
 			break;
-		}
+		}                                                    
 	}
 }
 

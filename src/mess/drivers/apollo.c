@@ -29,18 +29,10 @@
 
 #include "includes/apollo.h"
 #include "machine/apollo_kbd.h"
-#include "machine/omti8621.h"
-#include "machine/sc499.h"
-#include "machine/3c505.h"
-#include "machine/68681.h"
 
 #include "debugger.h"
 
-#include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68kcpu.h"
-
-#include "machine/terminal.h"
-#include "machine/ram.h"
 
 #include "sound/beep.h"
 
@@ -1050,9 +1042,12 @@ static MACHINE_RESET( dn3500 )
 
 static void apollo_reset_instr_callback(device_t *device)
 {
+	apollo_state *apollo = device->machine().driver_data<apollo_state>();
+
 	DLOG1(("apollo_reset_instr_callback"));
-	// FIXME: this will reset the CPU too
-//  device->machine().schedule_soft_reset();    // needs to call reset on the devices other than the CPU
+
+    // reset non-CPU devices here
+    apollo->m_ctape->device_reset();
 }
 
 /***************************************************************************
