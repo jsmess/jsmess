@@ -13,6 +13,17 @@
 		</part>
 	</software>
 
+	<software name="lsdos631">
+		<description>LS-DOS v6.3.1A</description>
+		<year>1990</year>
+		<publisher>Misosys</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="813136">
+				<rom name="l2-631a.dmk" size="813136" crc="1e17cd43" sha1="58369a29043513e62098ee1a8bdfd820ebf8a95b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="tdos12">
 		<description>TRSDOS v1.2</description>
 		<year>1979</year>
