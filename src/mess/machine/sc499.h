@@ -77,10 +77,11 @@ public:
 	// static pointer to myself (nasty: used for logging and dma ...)
 	static sc499_device *m_device;
 
+	virtual void device_reset();
+
 private:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 	const char *cpu_context();
 

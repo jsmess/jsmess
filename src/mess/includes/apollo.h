@@ -16,6 +16,14 @@
 
 #include "emu.h"
 
+#include "cpu/m68000/m68000.h"
+#include "machine/terminal.h"
+#include "machine/ram.h"
+#include "machine/omti8621.h"
+#include "machine/sc499.h"
+#include "machine/3c505.h"
+#include "machine/68681.h"
+
 #ifndef VERBOSE
 #define VERBOSE 0
 #endif
@@ -93,12 +101,17 @@ public:
 //      : driver_device(machine, config) { }
 
 	apollo_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag) { }
+			: driver_device(mconfig, type, tag),
+            m_ctape(*this, APOLLO_CTAPE_TAG)
+            { }
+
+    required_device<sc499_device> m_ctape;
 
 	device_t *dma8237_1;
 	device_t *dma8237_2;
 	device_t *pic8259_master;
 	device_t *pic8259_slave;
+    
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
