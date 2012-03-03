@@ -587,15 +587,10 @@ WRITE8_MEMBER( ti99_4x::cruwrite )
 
 
 static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
-static const char *const keynames8[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-		"KEY4", "KEY5", "KEY6", "KEY7",	"KEY8", "KEY9", "KEY10", "KEY11",
-		"KEY12", "KEY13", "KEY14", "KEY15"
-};
 
 READ8_MEMBER( ti99_4x::read_by_9901 )
 {
 	int answer=0;
-	int col =0;
 
 	switch (offset & 0x03)
 	{
@@ -608,29 +603,41 @@ READ8_MEMBER( ti99_4x::read_by_9901 )
 		//
 		if (m_mode==TI994)
 		{
-			col = 6;
-			if ((m_handset != NULL) && (m_keyboard_column == 7))
+			if (m_keyboard_column == 7)
 			{
-				answer = (m_handset->poll_bus() << 3);
-				answer |= 0x80;
+				if (m_handset != NULL)
+				{
+					answer = (m_handset->poll_bus() << 3);
+					answer |= 0x80;
+				}
+			}
+			else
+			{
+				if ((m_mecmouse != NULL) && (m_keyboard_column == 6))
+				{
+					answer = m_mecmouse->get_values();
+				}
+				else
+				{
+					answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
+				}
 			}
 		}
 		else
 		{
-			col = 7;
-			if (m_alphalock_line==false)
+			if ((m_mecmouse != NULL) && (m_keyboard_column == 7))
+			{
+				answer = m_mecmouse->get_values();
+			}
+			else
+			{
+				answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
+			}
+
+			if ((m_mode != TI994) && (m_alphalock_line==false))
 			{
 				answer &= ~(input_port_read(machine(), "ALPHA") << 3);
 			}
-		}
-
-		if ((m_mecmouse != NULL) && (m_keyboard_column == col))
-		{
-			answer = m_mecmouse->get_values();
-		}
-		else
-		{
-			answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
 		}
 
 		break;
