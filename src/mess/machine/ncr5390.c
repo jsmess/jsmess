@@ -368,6 +368,14 @@ void ncr5390_device::step(bool timeout)
 
 	case INIT_XFR:
 		switch(xfr_phase) {
+		case S_PHASE_DATA_OUT:
+			dma_set(DMA_OUT);
+			if(tcount == 1)
+				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+			state = INIT_XFR_SEND_BYTE;
+			send_byte();
+			break;
+
 		case S_PHASE_DATA_IN:
 			dma_set(DMA_IN);
 			state = tcount == fifo_pos+1 ?
@@ -393,6 +401,13 @@ void ncr5390_device::step(bool timeout)
 			state = INIT_XFR;
 			step(false);
 		}
+		break;
+
+	case INIT_XFR_SEND_BYTE:
+		if(tcount == 0)
+			bus_complete();
+		else
+			state = INIT_XFR_WAIT_REQ;
 		break;
 
 	case INIT_XFR_RECV_BYTE_ACK:
@@ -550,6 +565,8 @@ UINT8 ncr5390_device::fifo_pop()
 	UINT8 r = fifo[0];
 	fifo_pos--;
 	memmove(fifo, fifo+1, fifo_pos);
+	if((!fifo_pos) && tcount && dma_dir == DMA_OUT)
+		drq_set();
 	return r;
 }
 
@@ -617,28 +634,6 @@ void ncr5390_device::start_command()
 		check_irq();
 		return;
 	}
-
-	bool msg;
-	int extra;
-//  int total_len;
-	command_params_size(msg, extra);
-	if(fifo_pos < extra) {
-		logerror("%s: cmd without extra bytes (fp=%d, extra=%d)\n", tag(), fifo_pos, extra);
-		exit(0);
-	}
-	if(msg) {
-		if(fifo_pos < extra+1) {
-			logerror("%s: cmd without msg header (fp=%d, extra=%d)\n", tag(), fifo_pos, extra);
-			exit(0);
-		}
-		int len = derive_msg_size(fifo[extra]);
-		if(fifo_pos < extra+len) {
-			logerror("%s: cmd without complete msg (fp=%d, extra=%d, len=%d)\n", tag(), fifo_pos, extra, len);
-			exit(0);
-		}
-//      total_len = len+extra;
-	}// else
-//      total_len = extra;
 
 	switch(c) {
 	case CM_NOP:
@@ -718,30 +713,6 @@ bool ncr5390_device::check_valid_command(UINT8 cmd)
 	case 1: return mode == MODE_I && (subcmd <= 2 || subcmd == 8 || subcmd == 10);
 	}
 	return false;
-}
-
-void ncr5390_device::command_params_size(bool &msg, int &extra)
-{
-	msg = false;
-	extra = 0;
-	int subcmd = command[0] & 15;
-	switch((command[0] >> 4) & 7) {
-	case 0:
-		break;
-
-	case 4:
-		extra = subcmd == 0 || subcmd == 2 || subcmd == 3 ? 1 : 0;
-		msg = subcmd == 1 || subcmd == 2;
-		break;
-
-	case 2:
-		extra =	subcmd >= 3 && subcmd <= 5 ? 2 : 0;
-		msg = subcmd <= 2;
-		break;
-
-	case 1:
-		break;
-	}
 }
 
 int ncr5390_device::derive_msg_size(UINT8 msg_id)
@@ -841,12 +812,16 @@ WRITE8_MEMBER(ncr5390_device::clock_w)
 void ncr5390_device::dma_set(int dir)
 {
 	dma_dir = dir;
+	if(dma_dir == DMA_OUT && fifo_pos != 16)
+		drq_set();
 }
 
 void ncr5390_device::dma_w(UINT8 val)
 {
-	logerror("%s: dma_w %02x\n", tag(), val);
-	exit(0);
+	fifo_push(val);
+	tcount--;
+	if(fifo_pos == 16 || tcount == 0)
+		drq_clear();
 }
 
 UINT8 ncr5390_device::dma_r()
