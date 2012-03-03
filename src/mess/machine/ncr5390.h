@@ -198,7 +198,6 @@ private:
 	void start_command();
 	void step(bool timeout);
 	bool check_valid_command(UINT8 cmd);
-	void command_params_size(bool &msg, int &extra);
 	int derive_msg_size(UINT8 msg_id);
 	void function_complete();
 	void function_bus_complete();
