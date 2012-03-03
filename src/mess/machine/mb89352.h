@@ -39,6 +39,15 @@
 #define SSTS_TARG_CONNECTED   0x40
 #define SSTS_INIT_CONNECTED   0x80
 
+// SERR error status bits
+#define SERR_OFFSET     0x01
+#define SERR_SHORT_XFR  0x02
+#define SERR_PHASE_ERR  0x04
+#define SERR_TC_PAR     0x08
+#define SERR_SPC_PAR    0x40
+#define SERR_SCSI_PAR   0x80
+
+
 // these aren't defined in scsi.h
 #define SCSI_PHASE_BUS_FREE 8
 #define SCSI_PHASE_SELECT   9
