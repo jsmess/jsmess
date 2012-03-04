@@ -29,6 +29,7 @@
 #include "peribox.h"
 #include "machine/idectrl.h"
 #include "tn_ide.h"
+#include "ti99_hd.h"
 
 #define CRU_BASE 0x1000
 
@@ -323,8 +324,9 @@ void nouspikel_ide_interface_device::device_reset()
 	m_selected = false;
 
 	m_cru_base = input_port_read(*this, "CRUIDE");
+	m_clk_irq = false;
 
-	// m_tms9995_mode =  (device->type()==TMS9995);
+	m_tms9995_mode =  false; // (device->type()==TMS9995);
 }
 
 static const rtc65271_interface ide_rtc_cfg =
@@ -334,7 +336,7 @@ static const rtc65271_interface ide_rtc_cfg =
 
 MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_RTC65271_ADD( "ide_rtc", ide_rtc_cfg )
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback, ide_image_devices, "hdd", NULL )
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_interrupt_callback, ide_image_devices, "hdd", NULL )  // see idectrl.c
 //  MCFG_IDE_CONTROLLER_REGIONS(":peribox:idehd0:drive", NULL)
 MACHINE_CONFIG_END
 
