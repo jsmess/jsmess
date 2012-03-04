@@ -2,6 +2,12 @@
 
   video/odyssey2.c
 
+  2012-02-04 DanBoris
+  	- Changed color of background grid color 0 to match sprite color 0 (Fixes KTAA title screen)
+  	- Fixed Odyssey2_video_w so that m_o2_vdc.reg[] is always updated (Fixes Blockout)
+  	- Changed quad character generation so character height is always taken from 4th character (KTAA level 2)
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -47,7 +53,7 @@ const UINT8 odyssey2_colors[] =
 	0xFF,0xFF,0xFF,
 
 	/* Character,Sprite colors */
-	0x71,0x71,0x71,   /* Dark Grey */
+	0x80,0x80,0x80,   /* Dark Grey */
 	0xFF,0x80,0x80,   /* Red */
 	0x00,0xC0,0x00,   /* Green */
 	0xff,0x9b,0x60,   /* Orange */
@@ -204,8 +210,9 @@ WRITE8_HANDLER( odyssey2_video_w )
 	if( offset >= 0xa7 && offset <= 0xaa )
 		state->m_sh_channel->update();
 
-    if (offset == 0xa0)
-    {
+    if (offset == 0xa0) {
+
+
         if (    state->m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY
              && !(data & VDC_CONTROL_REG_STROBE_XY))
         {
@@ -221,14 +228,6 @@ WRITE8_HANDLER( odyssey2_video_w )
 			}
 
             state->m_y_beam_pos = space->machine().primary_screen->vpos() - state->m_start_vpos;
-
-            /* This is wrong but more games work with it, TODO: Figure
-             * out correct change.  Maybe update the screen here??
-             * It seems what happens is 0x0 is written to $A0 just before
-             * VLBANK (video update) so no screen updates happen.
-             */
-
-            return;
         }
     }
 
@@ -398,14 +397,31 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 					int	x = state->m_o2_vdc.s.quad[i].single[0].x;
 					int j;
 
+					// Charaecter height is always determined by the height of the 4th character
+					int		char_height = 8 - ( ( ( y >> 1 ) + state->m_o2_vdc.s.quad[i].single[3].ptr ) & 7 );
+
 					for ( j = 0; j < ARRAY_LENGTH( state->m_o2_vdc.s.quad[0].single ); j++, x += 8 )
 					{
-						int		char_height = 8 - ( ( ( y >> 1 ) + state->m_o2_vdc.s.quad[i].single[j].ptr ) & 7 );
+
+
+						/* char_height = 8; */
+
+						logerror("char_height: %d, y: %d, m_start_vpos: %d\n",char_height,y, state->m_start_vpos);
+
+
 						if ( y <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y + char_height * 2 )
 						{
-							UINT16 color = 16 + ( ( state->m_o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 );
+
+						UINT16 color = 16 + ( ( state->m_o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 );
+
+
 							int	offset = ( state->m_o2_vdc.s.quad[i].single[j].ptr | ( ( state->m_o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - state->m_start_vpos - y ) >> 1 );
+
 							UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
+
+
+						    logerror("vpos: %d, object: %d, Inst: %d, offset: %d, chr: %x \n",vpos,i,j,offset,chr);
+
 							UINT8	m;
 							for ( m = 0x80; m > 0; m >>= 1, x++ )
 							{
