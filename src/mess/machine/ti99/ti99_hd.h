@@ -19,10 +19,7 @@
 #define MFMHD_1 "mfmhd1"
 #define MFMHD_2 "mfmhd2"
 
-#define IDEHD_0 "idehd0"
-
 extern const device_type TI99_MFMHD;
-extern const device_type TI99_IDEHD;
 
 /*
     Needed to adapt to higher cylinder numbers. Floppies do not have such
@@ -85,9 +82,6 @@ protected:
 	MCFG_DEVICE_ADD(MFMHD_0, TI99_MFMHD, 0)		\
 	MCFG_DEVICE_ADD(MFMHD_1, TI99_MFMHD, 0)		\
 	MCFG_DEVICE_ADD(MFMHD_2, TI99_MFMHD, 0)
-
-#define MCFG_IDEHD_DRIVE_ADD()			\
-	MCFG_DEVICE_ADD(MFMHD_0, TI99_IDEHD, 0)
 
 #endif
 

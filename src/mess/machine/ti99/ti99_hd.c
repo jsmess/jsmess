@@ -36,11 +36,6 @@ mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, const ch
 {
 }
 
-ide_harddisk_device::ide_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TI99_MFMHD, "IDE Harddisk", tag, owner, clock)
-{
-}
-
 /*
     Calculate the ident byte from the cylinder. The specification does not
     define idents beyond cylinder 1023, but formatting programs seem to
@@ -500,20 +495,10 @@ MACHINE_CONFIG_FRAGMENT( mfmhd )
 	MCFG_HARDDISK_ADD("drive")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( idehd )
-	MCFG_HARDDISK_ADD("drive")
-MACHINE_CONFIG_END
-
-
 machine_config_constructor mfm_harddisk_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( mfmhd );
 }
 
-machine_config_constructor ide_harddisk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( idehd );
-}
-
 const device_type TI99_MFMHD = &device_creator<mfm_harddisk_device>;
-const device_type TI99_IDEHD = &device_creator<ide_harddisk_device>;
+
