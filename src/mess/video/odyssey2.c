@@ -398,15 +398,10 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 					int j;
 
 					// Charaecter height is always determined by the height of the 4th character
-					int		char_height = 8 - ( ( ( y >> 1 ) + state->m_o2_vdc.s.quad[i].single[3].ptr ) & 7 );
+					int char_height = 8 - ( ( ( y >> 1 ) + state->m_o2_vdc.s.quad[i].single[3].ptr ) & 7 );
 
 					for ( j = 0; j < ARRAY_LENGTH( state->m_o2_vdc.s.quad[0].single ); j++, x += 8 )
 					{
-
-
-						/* char_height = 8; */
-
-						logerror("char_height: %d, y: %d, m_start_vpos: %d\n",char_height,y, state->m_start_vpos);
 
 
 						if ( y <= ( vpos - state->m_start_vpos ) && ( vpos - state->m_start_vpos ) < y + char_height * 2 )
@@ -418,9 +413,6 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 							int	offset = ( state->m_o2_vdc.s.quad[i].single[j].ptr | ( ( state->m_o2_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( vpos - state->m_start_vpos - y ) >> 1 );
 
 							UINT8	chr = ((char*)o2_shape)[ offset & 0x1FF ];
-
-
-						    logerror("vpos: %d, object: %d, Inst: %d, offset: %d, chr: %x \n",vpos,i,j,offset,chr);
 
 							UINT8	m;
 							for ( m = 0x80; m > 0; m >>= 1, x++ )
