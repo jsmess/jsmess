@@ -523,10 +523,26 @@ void sony_set_speed(int speed)
 	sony.rotation_speed = speed;
 }
 
-static DEVICE_START( sonydriv_floppy )
+// device type definition
+const device_type FLOPPY_SONY = &device_creator<sonydriv_floppy_image_device>;
+
+//-------------------------------------------------
+//  sonydriv_floppy_image_device - constructor
+//-------------------------------------------------
+
+sonydriv_floppy_image_device::sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : legacy_floppy_image_device(mconfig, FLOPPY_SONY, "Floppy Disk [Sony]", tag, owner, clock)
 {
-	DEVICE_START_CALL(floppy);
-	floppy_set_type(device, FLOPPY_TYPE_SONY);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sonydriv_floppy_image_device::device_start()
+{
+	legacy_floppy_image_device::device_start();
+	floppy_set_type(this, FLOPPY_TYPE_SONY);
 
 	sony.floppy[0].is_fdhd = 0;
 	sony.floppy[1].is_fdhd = 0;
@@ -534,31 +550,18 @@ static DEVICE_START( sonydriv_floppy )
 	sony.floppy[1].loadedtrack_data = NULL;
 }
 
-static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
+void sonydriv_floppy_image_device::call_unload()
 {
 	int id;
 	device_t *fdc;
 
 	/* locate the FDC */
-	fdc = image.device().machine().device("fdc");
+	fdc = machine().device("fdc");
 
-	id = floppy_get_drive_by_type(&image.device(),FLOPPY_TYPE_SONY);
+	id = floppy_get_drive_by_type(this,FLOPPY_TYPE_SONY);
 	save_track_data(fdc, id);
 	memset(&sony.floppy[id], 0, sizeof(sony.floppy[id]));
 
-	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);
+	legacy_floppy_image_device::call_unload();
 }
 
-DEVICE_GET_INFO( sonydriv )
-{
-	switch (state)
-	{
-		case DEVINFO_STR_NAME:						strcpy(info->s, "Floppy Disk [Sony]"); break;
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(sonydriv_floppy); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(sonydriv_floppy); break;
-
-		default:									DEVICE_GET_INFO_CALL(floppy);				break;
-	}
-}
-
-DEFINE_LEGACY_IMAGE_DEVICE(FLOPPY_SONY, sonydriv);
