@@ -16,6 +16,9 @@ The following games existed according to VGRebirth
   - Terminator 2 - Judgement Day (Jpn) by Acclaim
   - Zool (Euro) by Gremlin Interactive
 
+Other undumped games:
+  - Woody Pop (Jpn) by Sega
+
 A few games have been listed as rumored, but they might very well be fake (please let us know if you have any info):
   - "Outrunners",
   - "Sports Illustrated Golf",
@@ -43,6 +46,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3327"/>
 		<info name="release" value="19930702"/>
+		<info name="alt_title" value="ああ播磨灘"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="aa harimanada (japan).bin" size="524288" crc="1d17d2a0" sha1="0fa7111fcd98670d4bef725d11e670e14eaaa7eb" offset="000000" />
@@ -54,7 +58,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>The Addams Family (World)</description>
 		<year>1993</year>
 		<publisher>Flying Edge / Acclaim Entertainment</publisher>
-		<info name="serial" value="T-81188, T-81188-50, T-81087"/>
+		<info name="serial" value="T-81188, T-81188-50, T-81087 (JPN)"/>
+		<info name="release" value="19940624 (JPN)"/>
+		<info name="alt_title" value="アダムス・ファミリー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="addams family, the (world).bin" size="262144" crc="1d01f999" sha1="3231d574e5eb0ac3a77b1d65d74f3a581819a9c7" offset="000000" />
@@ -167,8 +173,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Aerial Assault (Jpn, v1)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="release" value="19920605"/>
 		<info name="serial" value="G-3219"/>
+		<info name="release" value="19920605"/>
+		<info name="alt_title" value="エアリアルアサルト"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="aerial assault (japan) (v1.1).bin" size="131072" crc="04fe6dde" sha1="2a91ab5817938dddf2724df2dfd95a3bc6f5156d" offset="000000" />
@@ -180,7 +187,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Aerial Assault (World, v0)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3219, 2320"/>
+		<info name="serial" value="G-3219 (JPN), 2320"/>
+		<info name="release" value="19920605 (JPN)"/>
+		<info name="alt_title" value="エアリアルアサルト"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="aerial assault (world).bin" size="131072" crc="3e549b7a" sha1="cbdbaaeb62a8483d9d5a8757b0f19233dfb9b416" offset="000000" />
@@ -195,6 +204,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3336"/>
 		<info name="release" value="19940325"/>
+		<info name="alt_title" value="アラジン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="aladdin (japan).bin" size="524288" crc="770e95e1" sha1="7ddfd53e91d8220e4238d3994921bf18fe383717" offset="000000" />
@@ -290,6 +300,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81047"/>
+		<info name="release" value="19940527"/>
+		<info name="alt_title" value="エイリアン3"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="alien 3 (jp).bin" size="262144" crc="06f6eebb" sha1="f09885d76ea7af75fb605261a08143d3ccdc4ca8" offset="000000" />
@@ -304,6 +316,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44037"/>
 		<info name="release" value="19920319"/>
+		<info name="alt_title" value="エイリアンシンドローム"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="alien syndrome (japan).bin" size="131072" crc="ffe4ed47" sha1="b72e54493bfa7f13883a608bcf8c9f315dd490ca" offset="000000" />
@@ -390,6 +403,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3403"/>
 		<info name="release" value="19911213"/>
+		<info name="alt_title" value="アーリエル クリスタル伝説"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="arliel - crystal densetsu (japan).bin" size="262144" crc="35fa3f68" sha1="75a04fa483fccd12a52aa18e494d542f4486577f" offset="000000" />
@@ -518,6 +532,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3306"/>
 		<info name="release" value="19911101"/>
+		<info name="alt_title" value="アックス＝バトラー ゴールデンアックス伝説"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ax battler - golden axe densetsu (japan) (v1.5).bin" size="262144" crc="dfcf555f" sha1="ff7931d3461c69ffc3a82d892ae3bb3bb00788b3" offset="000000" />
@@ -530,8 +545,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Ayrton Senna's Super Monaco GP II (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3312, G-3337"/>
-		<info name="release" value="19920828"/>
+		<info name="serial" value="G-3312, G-3337 (Meisaku Collection)"/>
+		<info name="release" value="19920828, 19931210 (Meisaku Collection)"/>
+		<info name="alt_title" value="アイルトン・セナ スーパーモナコGP II"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ayrton senna's super monaco gp ii (japan).bin" size="262144" crc="661faeff" sha1="44f2c2bfa6ab57c1fd533996a5e404ebaa07264b" offset="000000" />
@@ -595,6 +611,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3378"/>
 		<info name="release" value="19960126"/>
+		<info name="alt_title" value="ばくばくアニマル 世界飼育係選手権"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="baku baku animal - sekai shiikugakari senshu-ken (japan).bin" size="262144" crc="7174b802" sha1="270e071342adb41406568e171df4959656ed02bf" offset="000000" />
@@ -629,8 +646,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Batman Forever (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="T-81268, T-81268-50, T-81187"/>
+		<info name="serial" value="T-81268, T-81268-50, T-81187 (JPN)"/>
 		<info name="release" value="19951027 (JPN)"/>
+		<info name="alt_title" value="バットマンフォーエヴァー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="batman forever (world).bin" size="524288" crc="618b19e2" sha1="775ecf7ba87345c2f89f0e9d6e55544db8878786" offset="000000" />
@@ -643,8 +661,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Batman Returns (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3314, 2416, 2416-50"/>
+		<info name="serial" value="G-3314 (JPN), 2416, 2416-50"/>
 		<info name="release" value="19921023 (JPN)"/>
+		<info name="alt_title" value="バットマン・リターンズ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="batman returns (world).bin" size="262144" crc="7ac4a3ca" sha1="85994b2f506c7bded0b02a59d96b1d949e48d518" offset="000000" />
@@ -679,8 +698,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Battletoads (Euro, Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3311, T-97018, 2436"/>
-		<info name="release" value="19940114"/>
+		<info name="serial" value="G-3311 (JPN), T-97018, 2436"/>
+		<info name="release" value="19940114 (JPN)"/>
+		<info name="alt_title" value="バトルトード"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="battletoads (japan, europe).bin" size="262144" crc="cb3cd075" sha1="77a284b993c6f60652d88468b836d7a2ee7b4600" offset="000000" />
@@ -929,6 +949,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Kaneko</publisher>
 		<info name="serial" value="T-33017"/>
 		<info name="release" value="19911129"/>
+		<info name="alt_title" value="ベルリンの壁"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="berlin no kabe (japan).bin" size="262144" crc="325b1797" sha1="1d58d3d8b957d33bab8b50ae60dc0c31eafc08af" offset="000000" />
@@ -941,6 +962,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133017"/>
+		<info name="release" value="19950127"/>
+		<info name="alt_title" value="美少女戦士セーラームーンS"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="bishoujo senshi sailor moon s (japan).bin" size="524288" crc="fe7374d2" sha1="824e463d0be5c0e81205a475b5ad7e55c366e486" offset="000000" />
@@ -1180,6 +1203,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-53027"/>
 		<info name="release" value="19920320"/>
+		<info name="alt_title" value="バスターボール"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="buster ball (japan).bin" size="131072" crc="7cb079d0" sha1="5d67f38ec0c2e577a7ad88915849da696ad162aa" offset="000000" />
@@ -1194,6 +1218,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3341"/>
 		<info name="release" value="19940211"/>
+		<info name="alt_title" value="バスターファイト"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="buster fight (japan).bin" size="262144" crc="a72a1753" sha1="5c87048082a95acd6bc27b98f85bda731617c739" offset="000000" />
@@ -1587,8 +1612,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Chuck Rock (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-2430, G-3320, 016.740"/>
+		<info name="serial" value="G-2430, G-3320 (JPN), 016.740"/>
 		<info name="release" value="19921030 (JPN)"/>
+		<info name="alt_title" value="チャックロック"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="chuck rock (world).bin" size="262144" crc="191b1ed8" sha1="2b08a3231c0504d86caca74c8508d85c8ef6a86a" offset="000000" />
@@ -1657,6 +1683,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3350"/>
+		<info name="release" value="19940805"/>
+		<info name="alt_title" value="颯爽少年英雄伝 コカ・コーラキッド"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="coca cola kid (japan).bin" size="524288" crc="c7598b81" sha1="e0a6caba7d8433175a3b7f1dfb593f9ca2c67cd1" offset="000000" />
@@ -1669,8 +1697,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Columns (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3101, G-3104"/>
-		<info name="release" value="19901006"/>
+		<info name="serial" value="G-3101, G-3104 (Meisaku Collection)"/>
+		<info name="release" value="19901006, 19930723 (Meisaku Collection)"/>
+		<info name="alt_title" value="コラムス"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="columns (japan).bin" size="32768" crc="f3ca6676" sha1="8b39ba23132af102b8dc313c5c1c211f4a4f27e1" offset="000000" />
@@ -1733,6 +1762,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133047"/>
 		<info name="release" value="19950224"/>
+		<info name="alt_title" value="クレヨンしんちゃん 対決！カンタムパニック！！"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="crayon shin-chan - taiketsu! kantam panic!! (japan).bin" size="524288" crc="03d28eab" sha1="65bcbd89637b8e6837cf36c7f1241eacf85abaa9" offset="000000" />
@@ -1875,6 +1905,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Genki</publisher>
 		<info name="serial" value="T-28017"/>
 		<info name="release" value="19910329"/>
+		<info name="alt_title" value="デビリッシュ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="devilish (japan).bin" size="131072" crc="25db174f" sha1="5b1d4295920ebe4d6d9b9610764939b2aaa6c598" offset="000000" />
@@ -1900,6 +1931,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3332"/>
 		<info name="release" value="19931217"/>
+		<info name="alt_title" value="ドナルドダックの4つの秘宝"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="donald duck no 4-tsu no hihou (japan).bin" size="524288" crc="4457e7c0" sha1="d5e278b5c68864da7ddfd1f9cfa5b25e462496b0" offset="000000" />
@@ -1914,6 +1946,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3309"/>
 		<info name="release" value="19911220"/>
+		<info name="alt_title" value="ドナルドダックのラッキーダイム"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="donald duck no lucky dime (japan).bin" size="262144" crc="2d98bd87" sha1="ee70ac64973775adc2063a8cdff203965f2e7e1d" offset="000000" />
@@ -1926,7 +1959,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3340"/>
-		<part name="cart" interface="gamegear_cart">
+		<info name="release" value="19940304"/>
+		<info name="alt_title" value="マクドナルド ドナルドのマジカルワールド"/>
+        <part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="donald no magical world (japan) (en,ja).bin" size="524288" crc="87b8b612" sha1="5f9afdd5720f88f7cc18715f8e50fc5635b15323" offset="000000" />
 			</dataarea>
@@ -1938,6 +1973,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3383"/>
+		<info name="release" value="19960429"/>
+		<info name="alt_title" value="ドラえもん ワクワクポケットパラダイス"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="doraemon - waku waku pocket paradise (japan).bin" size="524288" crc="733292a6" sha1="495816dbd49560cf02e841b53bd996456078c36b" offset="000000" />
@@ -2032,6 +2069,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3206"/>
+		<info name="release" value="19901222"/>
+		<info name="alt_title" value="ドラゴンクリスタル －ツラニの迷宮－"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="dragon crystal - tsurani no meikyuu (japan).bin" size="131072" crc="89f12e1e" sha1="ea323c4ac28d7762277039450c341d0f025093d8" offset="000000" />
@@ -2056,6 +2095,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3352"/>
+		<info name="release" value="19940916"/>
+		<info name="alt_title" value="ダンクキッズ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="dunk kids (japan).bin" size="524288" crc="77ed48f5" sha1="7525923ba2531d5079d66b2b1156cb5e7d44c66a" offset="000000" />
@@ -2068,6 +2109,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3355"/>
+		<info name="release" value="19940805"/>
+		<info name="alt_title" value="ダイナマイトヘッディー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="dynamite headdy (japan).bin" size="524288" crc="f6af4b6b" sha1="a8e3f447089537b52e40958c07610bfead82442d" offset="000000" />
@@ -2149,6 +2192,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3344"/>
+		<info name="release" value="19940311"/>
+		<info name="alt_title" value="エコー・ザ・ドルフィン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ecco the dolphin (japan).bin" size="524288" crc="a32eb9d5" sha1="5f0de698e8e0d4323b36bd78e2bd1af1c3370f3e" offset="000000" />
@@ -2173,6 +2218,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3362"/>
+		<info name="release" value="19950203"/>
+		<info name="alt_title" value="エコー・ザ・ドルフィン2"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ecco the dolphin ii (japan).bin" size="524288" crc="ba9cef4f" sha1="36095f4c92f6f66ed6bc20d9b96227d6fb0dae5b" offset="000000" />
@@ -2209,7 +2256,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Eternal Legend - Eien no Densetsu (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3402, G-3412"/>
+		<info name="serial" value="G-3402, G-3412 (Meisaku Collection)"/>
+		<info name="release" value="19910809, 19931210 (Meisaku Collection)"/>
+		<info name="alt_title" value="エターナルレジェンド 永遠の伝説"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="eternal legend - eien no densetsu (japan).bin" size="262144" crc="04302bbd" sha1="717b4e33cf3956e4194b912533bf1b7bf9d20725" offset="000000" />
@@ -2295,6 +2344,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-53037"/>
+		<info name="release" value="19931217"/>
+		<info name="alt_title" value="フェイスボール2000"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="faceball 2000 (japan).bin" size="262144" crc="aaf6f87d" sha1="967c50a5b64adc6da7bc730900c267e45c90053a" offset="000000" />
@@ -2330,8 +2381,10 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="fantzone">
 		<description>Fantasy Zone Gear (Euro, Jpn)</description>
 		<year>1991</year>
-		<publisher>Sega / Sanritsu</publisher>
-		<info name="serial" value="T-44017, G-3225, 2319"/>
+		<publisher>Sanritsu</publisher>
+		<info name="serial" value="T-44017 (JPN), G-3225 (JPN, Meisaku Collection)"/>
+		<info name="release" value="19910719 (JPN), 19930723 (JPN, Meisaku Collection)"/>
+		<info name="alt_title" value="ファンタジーゾーンGear オパオパJr.の冒険 (JPN)"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="fantasy zone gear (japan, europe).bin" size="131072" crc="d69097e8" sha1="5951d500d6f53b0537f045adb85d94068a838f32" offset="000000" />
@@ -2380,6 +2433,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="T-106017"/>
+		<info name="release" value="19950914"/>
+		<info name="alt_title" value="FIFAインターナショナル・サッカー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="fifa international soccer (japan).bin" size="524288" crc="78159325" sha1="70385b99320f91fef54ea88123761af9d7ff54c5" offset="000000" />
@@ -2415,7 +2470,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Foreman for Real (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="T-81348, T-81197"/>
+		<info name="serial" value="T-81348, T-81197 (JPN)"/>
+		<info name="release" value="19951027 (JPN)"/>
+		<info name="alt_title" value="フォアマンフォーリアル"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="foreman for real (world).bin" size="524288" crc="d46d5685" sha1="d7109dc1db52bb4828a01b433a4b2993ac2e59e1" offset="000000" />
@@ -2440,6 +2497,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-52037"/>
+		<info name="release" value="19911227"/>
+		<info name="alt_title" value="フレイ ～修行編～"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="fray - shugyou hen (japan).bin" size="262144" crc="e123d9b8" sha1="0dc770773f651718881ce17a87f145e2f0b02fb1" offset="000000" />
@@ -2452,6 +2511,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3358"/>
+		<info name="release" value="19941223"/>
+		<info name="alt_title" value="フレッド・カプルスズ ゴルフ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="fred couples' golf (japan).bin" size="524288" crc="b1196cd7" sha1="fb7b3c6652c3105497b8254daf063d25519fea61" offset="000000" />
@@ -2487,6 +2548,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133037"/>
+		<info name="release" value="19941216"/>
+		<info name="alt_title" value="テレビアニメ スラムダンク 勝利へのスターティング5"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="from tv animation - slam dunk - shouri e no starting 5 (japan).bin" size="524288" crc="751dad4c" sha1="bee62a373655d0ef931d8b9a4ed88fb0f4d1a8bc" offset="000000" />
@@ -2499,6 +2562,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3204"/>
+		<info name="release" value="19901215"/>
+		<info name="alt_title" value="ジーロック"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="g-loc air battle (japanv1.1).bin" size="131072" crc="33237f50" sha1="033c65e52011fd6b9be86ecb0f5d8209dbbdbbca" offset="000000" />
@@ -2510,6 +2575,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>G-LOC Air Battle (Jpn, v0)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="G-3204"/>
+		<info name="release" value="19901215"/>
+		<info name="alt_title" value="ジーロック"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="g-loc air battle (japan).bin" size="131072" crc="2333f615" sha1="ed32016476e40fde06d8a1a9777875b75d49adf6" offset="000000" />
@@ -2534,6 +2602,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14057"/>
+		<info name="release" value="19911025"/>
+		<info name="alt_title" value="ギャラガ'91"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="galaga '91 (japan).bin" size="131072" crc="0593ba24" sha1="7cd59fc473b9b1a1fdd659fdec2ae6cb1d3f471a" offset="000000" />
@@ -2558,6 +2628,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3364"/>
+		<info name="release" value="19950127"/>
+		<info name="alt_title" value="ぎゃんぶる ぱにっく"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gamble panic (japan).bin" size="524288" crc="09534742" sha1="d33cd19676fdb0e6180a24ed406a61cdf30f0065" offset="000000" />
@@ -2570,6 +2642,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3339"/>
+		<info name="release" value="19920612, 19931210 (Meisaku Collection)"/>
+		<info name="alt_title" value="ぎゅわんぶらあ自己中心派"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="gambler jikochuushinha (japan).bin" size="262144" crc="423803a7" sha1="ec26aa5f41f8abf1c0fa911c2031ac422f6280a6" offset="000000" />
@@ -2582,6 +2656,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3210"/>
+		<info name="release" value="19910621"/>
+		<info name="alt_title" value="がんばれゴルビー！"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="ganbare gorby! (japan).bin" size="131072" crc="a1f2f4a1" sha1="cd3e8910a99bf6717e63aed3aa212ead0597e5cd" offset="000000" />
@@ -2618,6 +2694,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14037"/>
+		<info name="release" value="19910405"/>
+		<info name="alt_title" value="ギアスタジアム"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="gear stadium (japan).bin" size="131072" crc="0e300223" sha1="10124c1ca517fa933ca0488f288d205b0cc80d9c" offset="000000" />
@@ -2630,6 +2708,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14077"/>
+		<info name="release" value="19951020"/>
+		<info name="alt_title" value="ギアスタジアム 平成版"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="gear stadium heiseiban (japan).bin" size="131072" crc="a0530664" sha1="210fef406c4fe8e0ed995f92ea7597e8f1b7f91c" offset="000000" />
@@ -2666,6 +2746,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66017"/>
+		<info name="release" value="19911229"/>
+		<info name="alt_title" value="GGアレスタ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="gg aleste (japan).bin" size="262144" crc="1b80a75b" sha1="4c13dc3601a1702692c35eb6c89f0e09ab966f69" offset="000000" />
@@ -2678,6 +2760,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3326"/>
+		<info name="release" value="19930429"/>
+		<info name="alt_title" value="ドラえもん ノラのすけの野望"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="gg doraemon - noranosuke no yabou (japan).bin" size="262144" crc="9a8b2c16" sha1="6976b170879767889994b1e763a52726aa62ed98" offset="000000" />
@@ -2690,6 +2774,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3387"/>
+		<info name="release" value="19961122"/>
+		<info name="alt_title" value="GGポートレート パイ・チェン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gg portrait - pai chen (japan).bin" size="524288" crc="695cc120" sha1="cf752897523814951401994c95de299cd42fdb50" offset="000000" />
@@ -2702,6 +2788,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3386"/>
+		<info name="release" value="19961101"/>
+		<info name="alt_title" value="GGポートレート ゆうきあきら"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gg portrait - yuuki akira (japan).bin" size="524288" crc="51159f8f" sha1="4cbb453663665a06e986a6ab015a041463b48373" offset="000000" />
@@ -2714,6 +2802,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3302"/>
+		<info name="release" value="19910426"/>
+		<info name="alt_title" value="ザ・GG シノビ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="gg shinobi, the (japan).bin" size="262144" crc="83926bd1" sha1="c5e1c2329f94f0804140792a3e3d5be2ac0d5d0d" offset="000000" />
@@ -2739,6 +2829,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3430"/>
+		<info name="release" value="19951208"/>
+		<info name="alt_title" value="ゴジラ 怪獣大進撃"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="godzilla - kaijuu daishingeki (japan).bin" size="524288" crc="4cf97801" sha1="ff3e8905635a02eb85556146225020b52506424c" offset="000000" />
@@ -2751,6 +2843,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3347"/>
+		<info name="release" value="19940422"/>
+		<info name="alt_title" value="GPライダー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gp rider (japan).bin" size="524288" crc="7a26ec6a" sha1="b1c4315dc4afe58256f3834cff8e94c6b02bc1b6" offset="000000" />
@@ -2797,6 +2891,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Riot</publisher>
 		<info name="serial" value="T-49017"/>
+		<info name="release" value="19910726"/>
+		<info name="alt_title" value="グリフォン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="griffin (japan).bin" size="131072" crc="a93e8b0f" sha1="b479d977533398cef21ef9ff7cd8fc81bdbfa488" offset="000000" />
@@ -2809,6 +2905,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3349"/>
+		<info name="release" value="19950324"/>
+		<info name="alt_title" value="ガンスターヒーローズ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="gunstar heroes (japan).bin" size="524288" crc="c3c52767" sha1="c373d3876659095bb869ff0e4bb7ffc68123cf3e" offset="000000" />
@@ -2821,6 +2919,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11027"/>
+		<info name="release" value="19910621"/>
+		<info name="alt_title" value="ハレーウォーズ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="halley wars (japan).bin" size="131072" crc="def5a5d0" sha1="1c9932f592bb12e61acf597985e0bd5041e45da5" offset="000000" />
@@ -2845,6 +2945,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Masaya</publisher>
 		<info name="serial" value="T-25017"/>
+		<info name="release" value="19910315"/>
+		<info name="alt_title" value="ヘッドバスター"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="head buster (japan).bin" size="131072" crc="7e689995" sha1="51432c7892d87b31f5f3216d3ef01eadc591b768" offset="000000" />
@@ -2857,6 +2959,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44027"/>
+		<info name="release" value="19911227"/>
+		<info name="alt_title" value="ヘビーウェイトチャンプ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="heavy weight champ (japan).bin" size="131072" crc="beed9150" sha1="7cfd703ebdab4b2665f402adeac0060740615b6c" offset="000000" />
@@ -2881,6 +2985,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3220"/>
+		<info name="release" value="19920807"/>
+		<info name="alt_title" value="炎の闘球児 ドッジ弾平"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="honoo no toukyuuji - dodge danpei (japan).bin" size="131072" crc="dfa805a0" sha1="66032cc214d728b2f1c59ad2934277e378b36865" offset="000000" />
@@ -2927,6 +3033,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3218"/>
+		<info name="release" value="19920522"/>
+		<info name="alt_title" value="ひょっこりひょうたん島 ひょうたん島の大航海"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="hyokkori hyoutan jima - hyoutan jima no daikoukai (japan).bin" size="131072" crc="42389270" sha1="0b0270060342f4e79d58104a85a7be04426683bd" offset="000000" />
@@ -2939,6 +3047,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3217"/>
+		<info name="release" value="19920424"/>
+		<info name="alt_title" value="超プロ野球'92"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="hyper pro yakyuu '92 (japan).bin" size="131072" crc="056cae74" sha1="245699bff66440b1e4483e8d68e468bbc3ba6ab3" offset="000000" />
@@ -2952,6 +3062,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3359"/>
+		<info name="release" value="19941125"/>
+		<info name="alt_title" value="PUZZLE＆ACTION イチダントア～ルGG"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ichidant~r gg (japan).bin" size="524288" crc="9f64c2bb" sha1="34f95713ae3fbd91452eb71ce1721ead153517e5" offset="000000" />
@@ -2964,6 +3076,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44047"/>
+		<info name="release" value="19921023"/>
+		<info name="alt_title" value="インザ ウエイク オブ バンパイア"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="in the wake of vampire (japan).bin" size="262144" crc="dab0f265" sha1="da5116b7ed890f35506c5b33c5c9716f528169b1" offset="000000" />
@@ -2976,7 +3090,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>The Incredible Crash Dummies (World)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment / Flying Edge</publisher>
-		<info name="serial" value="T-81138, T-81138-50, T-81127"/>
+		<info name="serial" value="T-81138, T-81138-50, T-81127 (JPN)"/>
+		<info name="release" value="19940930 (JPN)"/>
+		<info name="alt_title" value="クラッシュ・ダミー スリック坊やの大挑戦"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="incredible crash dummies, the (usa, europe).bin" size="262144" crc="087fc247" sha1="6858554fc26f2382a262736854496e11f0925d40" offset="000000" />
@@ -3047,6 +3163,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3417"/>
+		<info name="release" value="19940722"/>
+		<info name="alt_title" value="Jリーグ GGプロストライカー'94"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="j.league gg pro striker '94 (japan).bin" size="524288" crc="a12a28a0" sha1="04248e53ce54c9f17daae9885fed87d39f0117b6" offset="000000" />
@@ -3059,6 +3177,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3431"/>
+		<info name="release" value="19951124"/>
+		<info name="alt_title" value="Jリーグサッカー ドリームイレブン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="j.league soccer - dream eleven (japan).bin" size="524288" crc="abddf0eb" sha1="bed727b732712f115ddc4dc5fd873e6cd3787b62" offset="000000" />
@@ -3156,6 +3276,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3305"/>
+		<info name="release" value="19920522"/>
+		<info name="alt_title" value="ジョー・モンタナ フットボール"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="joe montana's football (japan).bin" size="262144" crc="4a98678b" sha1="253196b98d83b910c289b0211b6de025c66c916c" offset="000000" />
@@ -3203,6 +3325,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Junction (Jpn)</description>
 		<year>1991</year>
 		<publisher>Micronet</publisher>
+		<info name="serial" value="T-22017"/>
+		<info name="release" value="19910224"/>
+		<info name="alt_title" value="ジャンクション"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="junction (japan).bin" size="131072" crc="a8ef36a7" sha1="70cac7959d29903ad22316e9f5edf60834381d27" offset="000000" />
@@ -3262,6 +3387,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3229"/>
+		<info name="release" value="19930730"/>
+		<info name="alt_title" value="ジュラシック・パーク"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="jurassic park (japan).bin" size="524288" crc="2f536ae3" sha1="89486678a6a065c56102296eebc7b25c5ef32d21" offset="000000" />
@@ -3286,6 +3413,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3382"/>
+		<info name="release" value="19960329"/>
+		<info name="alt_title" value="怪盗セイント・テール"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="kaitou saint tale (japan).bin" size="524288" crc="937fd52b" sha1="3e4e7ec4a4ce5d48baed7d583ede8bb9f92a44a6" offset="000000" />
@@ -3310,6 +3439,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3346"/>
+		<info name="release" value="19940909"/>
+		<info name="alt_title" value="剣勇伝説 ヤイバ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="kenyuu densetsu yaiba (japan).bin" size="524288" crc="d9ce3f4c" sha1="21b08c5c4b086e169d5f780cafc22c041e19807b" offset="000000" />
@@ -3322,6 +3453,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44057"/>
+		<info name="release" value="19930528"/>
+		<info name="alt_title" value="キック アンド ラッシュ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="kick &amp; rush (japan).bin" size="262144" crc="fd14ce00" sha1="d1c04a94a21684be2e83fbd0e0677bbc8ef86f57" offset="000000" />
@@ -3334,6 +3467,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3401"/>
+		<info name="release" value="19910329"/>
+		<info name="alt_title" value="キネティック コネクション"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="kinetic connection (japan).bin" size="131072" crc="4af7f2aa" sha1="7447e0ad5e8e14c3ae05a274d393ca34de044855" offset="000000" />
@@ -3346,6 +3481,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3373"/>
+		<info name="release" value="19950901"/>
+		<info name="alt_title" value="鬼神童子ゼンキ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="kishin douji zenki (japan).bin" size="524288" crc="7d622bdd" sha1="0fb3530633070551f3d5a04839fc42babc092fbd" offset="000000" />
@@ -3382,6 +3519,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3303"/>
+		<info name="release" value="19911122"/>
+		<info name="alt_title" value="クニちゃんのゲーム天国"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="kuni-chan no game tengoku (japan).bin" size="262144" crc="398f2358" sha1="497f137e0f33b45a1560f51ca06b2bfaef51484a" offset="000000" />
@@ -3394,6 +3533,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3322"/>
+		<info name="release" value="19921218"/>
+		<info name="alt_title" value="クニちゃんのゲーム天国 Part2"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="kuni-chan no game tengoku part 2 (japan).bin" size="262144" crc="f3774c65" sha1="f11af70a52cfd96ad4d03da8ca9227ddd5bcc382" offset="000000" />
@@ -3518,7 +3659,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Lemmings (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3317, 2431"/>
+		<info name="serial" value="G-3317 (JPN), 2431"/>
+		<info name="release" value="19930205 (JPN)"/>
+		<info name="alt_title" value="レミングス"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="lemmings (world).bin" size="262144" crc="0fde7baa" sha1="5a79b6fa15b7085fc7062945f0e6d469d49871e1" offset="000000" />
@@ -3545,6 +3688,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3363"/>
 		<info name="release" value="19950113"/>
+		<info name="alt_title" value="ライオンキング"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="lion king, the (disney's) (jp).bin" size="524288" crc="c78b8637" sha1="20e01958c3e3de905622c90838cd485a3338d7a4" offset="000000" />
@@ -3704,6 +3848,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45017"/>
+		<info name="release" value="19960112"/>
+		<info name="alt_title" value="ルナ さんぽする学園"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="lunar - sanposuru gakuen (japan).bin" size="524288" crc="58459edd" sha1="1b0cc847d31956d843cadab7d86a2f434220301e" offset="000000" />
@@ -3740,6 +3886,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66047"/>
+		<info name="release" value="19951124"/>
+		<info name="alt_title" value="魔導物語A ドキドキばけ～しょん"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari a - dokidoki vacation (japan).bin" size="524288" crc="7ec95282" sha1="c027aa76fe0e09a2d1b982eea0df2c8b687aadf7" offset="000000" />
@@ -3752,6 +3900,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3410"/>
+		<info name="release" value="19931203"/>
+		<info name="alt_title" value="魔導物語I 3つの魔導球"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari i - 3-tsu no madoukyuu (japan).bin" size="524288" crc="00c34d94" sha1="5ccd474cefcb8e086e2e1f77c0fdd5c1d2bf82e7" offset="000000" />
@@ -3764,6 +3914,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3419"/>
+		<info name="release" value="19940520"/>
+		<info name="alt_title" value="魔導物語II アルル16才"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari ii - arle 16-sai (japan).bin" size="524288" crc="12eb2287" sha1="deead79fa4cb2e87652a9c8a76f2a7174f48f37a" offset="000000" />
@@ -3776,6 +3928,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3424"/>
+		<info name="release" value="19941125"/>
+		<info name="alt_title" value="魔導物語III 究極女王様"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari iii - kyuukyoku joou-sama (japan) (v1.1).bin" size="524288" crc="568f4825" sha1="673670f954176ffab28a0280aa49856a457f36b1" offset="000000" />
@@ -3787,6 +3941,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Jpn, v0)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="G-3424"/>
+		<info name="release" value="19941125"/>
+		<info name="alt_title" value="魔導物語III 究極女王様"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari iii - kyuukyoku joou-sama (japan).bin" size="524288" crc="0a634d79" sha1="dd590c9086161b1f97573c48720c32cc5506dabc" offset="000000" />
@@ -3799,6 +3956,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3423"/>
+		<info name="release" value="19941216"/>
+		<info name="alt_title" value="魔法騎士レイアース"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="magic knight rayearth (japan).bin" size="524288" crc="8f82a6b9" sha1="6c13e3b9bb24eafc1186c5ffa322b1f40c676b3d" offset="000000" />
@@ -3811,6 +3970,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3429"/>
+		<info name="release" value="19950804"/>
+		<info name="alt_title" value="魔法騎士レイアース2"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="magic knight rayearth 2 - making of magic knight (japan).bin" size="524288" crc="1c2c2b04" sha1="29615d86057f3323ecda75d47102e77d364f6499" offset="000000" />
@@ -3822,6 +3983,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Magical Puzzle Popils (World)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
+		<info name="serial" value="T-48017 (JPN)"/>
+		<info name="release" value="19910712 (JPN)"/>
+		<info name="alt_title" value="マジカルパズル ポピルズ (JPN)"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="magical puzzle popils (world) (en,ja).bin" size="131072" crc="cf6d7bc5" sha1="fb939f0810d0763b9abaeec1a2bfbabacaad5441" offset="000000" />
@@ -3834,6 +3998,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="T-65017"/>
+		<info name="release" value="19910705"/>
+		<info name="alt_title" value="まじかる☆タルるートくん"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="magical taruruuto-kun (japan).bin" size="131072" crc="6e1cc23c" sha1="40fae12f1d565849158ff87700e25d6967038867" offset="000000" />
@@ -3859,6 +4025,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14027"/>
+		<info name="release" value="19910524"/>
+		<info name="alt_title" value="マッピー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="mappy (japan).bin" size="131072" crc="01d2dd2a" sha1="44d0b857d88a293da47dc161115422d830d81302" offset="000000" />
@@ -3918,6 +4086,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3418"/>
+		<info name="release" value="19940422"/>
+		<info name="alt_title" value="女神転生外伝 ラストバイブル"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="megami tensei gaiden - last bible (japan).bin" size="524288" crc="2e4ec17b" sha1="d98332eba27fd4a0db82d551a54bee4fdccf41a2" offset="000000" />
@@ -3930,6 +4100,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3427"/>
+		<info name="release" value="19950324"/>
+		<info name="alt_title" value="女神転生外伝 ラストバイブル スペシャル"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="megami tensei gaiden - last bible s (japan).bin" size="524288" crc="4ec30806" sha1="ca597064a8f0dd8221e89655584ec0cc67dbe026" offset="000000" />
@@ -3954,6 +4126,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3360"/>
+		<info name="release" value="19950113"/>
+		<info name="alt_title" value="ミッキーマウス 伝説の王国"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mickey mouse densetsu no oukoku - legend of illusion (japan).bin" size="524288" crc="fe12a92f" sha1="cdcde96fe2a86fc2c404e7746c8670c44f8e169c" offset="000000" />
@@ -3966,6 +4140,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3301"/>
+		<info name="release" value="19910321"/>
+		<info name="alt_title" value="ミッキーマウスのキャッスル・イリュージョン"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -3979,6 +4155,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3323"/>
+		<info name="release" value="19930326"/>
+		<info name="alt_title" value="ミッキーマウスの魔法のクリスタル"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mickey mouse no mahou no crystal (japan).bin" size="524288" crc="0117c3df" sha1="5cc1a27f801491971e20551b9b9b4388245c0478" offset="000000" />
@@ -4083,6 +4261,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3422"/>
+		<info name="release" value="19941030"/>
+		<info name="alt_title" value="モルドリアン ～光と闇の姉妹～"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="moldorian - hikari to yami no sister (japan).bin" size="524288" crc="4d5d15fb" sha1="0dad260b5357b2f61d1452bb73d8321ca53d7262" offset="000000" />
@@ -4107,6 +4287,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3308"/>
+		<info name="release" value="19920327"/>
+		<info name="alt_title" value="モンスターワールドII ドラゴンの罠"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="monster world ii - dragon no wana (japan).bin" size="262144" crc="ea89e0e7" sha1="5c4d25432512852f48f22280544bd7d034aab744" offset="000000" />
@@ -4119,6 +4301,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81017"/>
+		<info name="release" value="19931217"/>
+		<info name="alt_title" value="モータルコンバット 神拳降臨伝説"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mortal kombat (japan) (v3.3).bin" size="524288" crc="dbff0461" sha1="f28e50f1283d7a2516267a13a16a3e6914ae0a18" offset="000000" />
@@ -4153,7 +4337,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Mortal Kombat II (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="T-81107, T-81278, T-81278-50"/>
+		<info name="serial" value="T-81107 (JPN), T-81278, T-81278-50"/>
+		<info name="release" value="19940909 (JPN)"/>
+		<info name="alt_title" value="モータルコンバットII 究極神拳"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mortal kombat ii (world).bin" size="524288" crc="4b304e0f" sha1="320d2b8b62ef0109621bbe609b02bd8b0769a0b9" offset="000000" />
@@ -4201,6 +4387,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3413"/>
+		<info name="release" value="19931210"/>
+		<info name="alt_title" value="なぞぷよ2"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="nazo puyo 2 (japan).bin" size="262144" crc="73939de4" sha1="dbd511aff622c618eac0c21de36965b869362dbd" offset="000000" />
@@ -4224,6 +4412,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3357"/>
+		<info name="release" value="19940729"/>
+		<info name="alt_title" value="なぞぷよ アルルのルー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="nazo puyo arle no roux (japan).bin" size="262144" crc="54ab42a4" sha1="20308b7389a9e860697a66510d4925d1af3b769a" offset="000000" />
@@ -4578,6 +4768,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81037"/>
+		<info name="release" value="19940429"/>
+		<info name="alt_title" value="NBA ジャム"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="nba jam (japan).bin" size="524288" crc="a49e9033" sha1="e7c040a58c8d35bf5b5b556b2d3c55e7a5eb0550" offset="000000" />
@@ -4612,7 +4804,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>NBA Jam Tournament Edition (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="T-81308, T-81308-50, T-81137"/>
+		<info name="serial" value="T-81308, T-81308-50, T-81137 (JPN)"/>
+		<info name="release" value="19950224 (JPN)"/>
+		<info name="alt_title" value="NBA ジャム トーナメントエディション"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="nba jam tournament edition (usa, europe).bin" size="524288" crc="86c32e5b" sha1="c34e318852ca6f52e980c7a63721a145cd167843" offset="000000" />
@@ -4625,6 +4819,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3434"/>
+		<info name="release" value="19960719"/>
+		<info name="alt_title" value="ねこ大すき！"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="neko daisuki! (japan).bin" size="524288" crc="3679be80" sha1="c83fd440895ceb50e4da2ab9db2a29ac21555e9d" offset="000000" />
@@ -4814,7 +5010,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>NFL Quarterback Club (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="T-81208, T-81208-50, T-81147"/>
+		<info name="serial" value="T-81208, T-81208-50, T-81147 (JPN)"/>
+		<info name="release" value="19950224 (JPN)"/>
+		<info name="alt_title" value="NFLクォーターバッククラブ'95"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="nfl quarterback club (world).bin" size="524288" crc="61785ed5" sha1="ea42bb90eea90a159f8c662743aa59d6dd6f7250" offset="000000" />
@@ -5038,6 +5236,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3215"/>
+		<info name="release" value="19911101"/>
+		<info name="alt_title" value="忍者外伝"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="ninja gaiden (japan).bin" size="131072" crc="20ef017a" sha1="acedddaa928a96085544440c2bec2685a6cdf501" offset="000000" />
@@ -5062,6 +5262,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3370"/>
+		<info name="release" value="19950721"/>
+		<info name="alt_title" value="－忍空－"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ninku (japan).bin" size="524288" crc="c3056e15" sha1="d22bfa865b34866568f3dd7fccec886170071c81" offset="000000" />
@@ -5074,6 +5276,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3376"/>
+		<info name="release" value="19951222"/>
+		<info name="alt_title" value="－忍空－2 ～天空龍への道～"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ninku 2 - tenkuuryuu e no michi (japan).bin" size="524288" crc="06247dd2" sha1="fd6452974da734fcd4292cb0cd728a0ac9aef714" offset="000000" />
@@ -5086,6 +5290,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3377"/>
+		<info name="release" value="19951103"/>
+		<info name="alt_title" value="－忍空－ 外伝 ヒロユキ大活劇"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ninku gaiden - hiroyuki daikatsugeki (japan).bin" size="524288" crc="9140f239" sha1="23003e39918f855bd37f58b7b8840960cc82196a" offset="000000" />
@@ -5099,6 +5305,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3442"/>
+		<info name="release" value="19951201"/>
+		<info name="alt_title" value="野茂英雄のワールドシリーズベースボール"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="524288">
@@ -5124,7 +5332,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Olympic Gold (Jpn, USA, v0, SMS Mode)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="serial" value="G-3316, T-79018"/>
+		<info name="serial" value="G-3316 (JPN), T-79018"/>
+		<info name="release" value="19920724 (JPN)"/>
+		<info name="alt_title" value="オリンピックゴールド"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -5149,7 +5359,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Out Run (Jpn)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3213, G-3222"/>
+		<info name="serial" value="G-3213, G-3222 (Meisaku Collection)"/>
+		<info name="release" value="19910809, 19930723 (Meisaku Collection)"/>
+		<info name="alt_title" value="アウトラン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="out run (japan).bin" size="131072" crc="d58cb27c" sha1="284a68102eb71958a3553626ea3dd56485453300" offset="000000" />
@@ -5222,6 +5434,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14017"/>
+		<info name="release" value="19910129"/>
+		<info name="alt_title" value="パックマン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="pac-man (japan).bin" size="131072" crc="a16c5e58" sha1="d78b6aac927692f1b67e6a4b7494e2c7e709ae17" offset="000000" />
@@ -5246,6 +5460,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3384"/>
+		<info name="release" value="19961122"/>
+		<info name="alt_title" value="パンツァードラグーン ミニ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="panzer dragoon mini (japan).bin" size="524288" crc="e9783cea" sha1="c1498f68acb234f46ab6f443f484a48ebd183f0f" offset="000000" />
@@ -5280,6 +5496,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Pengo (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="G-3102"/>
+		<info name="release" value="19901006"/>
+		<info name="alt_title" value="ペンゴ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="pengo (japan).bin" size="32768" crc="ce863dba" sha1="5883e2d19ab7126d52abc177a97d44bc88c319de" offset="000000" />
@@ -5304,6 +5523,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3436"/>
+		<info name="release" value="19961206"/>
+		<info name="alt_title" value="ペット倶楽部 いぬ大すき！"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="pet club inu daisuki! (japan).bin" size="524288" crc="b42d8430" sha1="0c0bcfd06084419e7c5921f92ccb0f977058c5a3" offset="000000" />
@@ -5373,6 +5594,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3216"/>
+		<info name="release" value="19920313"/>
+		<info name="alt_title" value="ファンタシースター アドベンチャー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="phantasy star adventure (japan).bin" size="131072" crc="1a51579d" sha1="fdd940556f7d3af14979dbf057809d5a22e46d8e" offset="000000" />
@@ -5385,6 +5608,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3405"/>
+		<info name="release" value="19920918"/>
+		<info name="alt_title" value="ファンタシースター外伝"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="phantasy star gaiden (japan).bin" size="262144" crc="a942514a" sha1="914f1e693f396794a37b5d99acaf5db54fe529c2" offset="000000" />
@@ -5421,6 +5646,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14067"/>
+		<info name="release" value="19920207"/>
+		<info name="alt_title" value="ポケット雀荘"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="pocket jansou (japan).bin" size="131072" crc="cc90c723" sha1="5949695ae82b796d4cc141fcb57d01463e1b0ec6" offset="000000" />
@@ -5481,6 +5708,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-52017"/>
+		<info name="release" value="19910223"/>
+		<info name="alt_title" value="ポップブレイカー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="pop breaker (japan).bin" size="131072" crc="71deba5a" sha1="9c358504d3c106dd62bd8981132b47cdb95903de" offset="000000" />
@@ -5493,6 +5722,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Technos Japan</publisher>
 		<info name="serial" value="T-154017"/>
+		<info name="release" value="19940812"/>
+		<info name="alt_title" value="ポパイのビーチバレーボール"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="popeye no beach volleyball (japan).bin" size="524288" crc="3ef66810" sha1="921e3922e1b550b6914fb06ba74d4661ef25a89e" offset="000000" />
@@ -5515,7 +5746,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Power Strike II (Euro) ~ GG Aleste II (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3330, 2443"/>
+		<info name="serial" value="G-3330 (JPN), 2443"/>
+		<info name="release" value="19931001 (JPN)"/>
+		<info name="alt_title" value="GGアレスタII"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="power strike ii (japan, europe).bin" size="262144" crc="09de1528" sha1="e4db2140761b43426024bd08c4372bb9b8979d3d" offset="000000" />
@@ -5579,6 +5812,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3207"/>
+		<info name="release" value="19910126"/>
+		<info name="alt_title" value="THEプロ野球'91"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="pro yakyuu '91, the (japan).bin" size="131072" crc="6d3a10d3" sha1="804cfac0a7578c3fd625f0084a24afa26a2dc015" offset="000000" />
@@ -5591,6 +5826,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3353"/>
+		<info name="release" value="19940930"/>
+		<info name="alt_title" value="プロ野球GGリーグ '94"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="524288">
@@ -5604,6 +5841,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3407"/>
+		<info name="release" value="19930429"/>
+		<info name="alt_title" value="プロ野球GGリーグ"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="262144">
@@ -5617,6 +5856,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3203"/>
+		<info name="release" value="19910202"/>
+		<info name="alt_title" value="サイキックワールド"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="psychic world (japan).bin" size="131072" crc="afcc7828" sha1="1c0074c811ed4eb369be31c1bc7d851e40ae8797" offset="000000" />
@@ -5641,6 +5882,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3209"/>
+		<info name="release" value="19910927"/>
+		<info name="alt_title" value="パット＆パター"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="putt &amp; putter (japan).bin" size="131072" crc="407ac070" sha1="2d4a72e6f5db344240c2a65141b08e57a4b52416" offset="000000" />
@@ -5662,9 +5905,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<software name="puyopuyo">
 		<description>Puyo Puyo (Jpn)</description>
-		<year>1991</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3324"/>
+		<info name="release" value="19930319"/>
+		<info name="alt_title" value="ぷよぷよ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="puyo puyo (japan).bin" size="262144" crc="d173a06f" sha1="8ea2e623858221c5d39eb1e0f6532a0b23b00305" offset="000000" />
@@ -5677,6 +5922,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66037"/>
+		<info name="release" value="19941216"/>
+		<info name="alt_title" value="ぷよぷよ通"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="puyo puyo 2 (japan).bin" size="524288" crc="3ab2393b" sha1="04ea9ff57faeeccd1bbb17490d22313ae94c86d6" offset="000000" />
@@ -5688,6 +5935,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Puzzle &amp; Action Tant~R (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="G-3345"/>
+		<info name="release" value="19940422"/>
+		<info name="alt_title" value="PUZZLE＆ACTION タントア～ル"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="puzzle and action tanto-r (japan).bin" size="524288" crc="09151743" sha1="75f54793ac09e22e0be1864ea16e68b2fb4610ff" offset="000000" />
@@ -5700,6 +5950,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11047"/>
+		<info name="release" value="19960802"/>
+		<info name="alt_title" value="パズルボブル"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="puzzle bobble (japan).bin" size="262144" crc="8e54ee04" sha1="15568554cf6474e1ad64401217b702a048113a2d" offset="000000" />
@@ -5724,6 +5976,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3367"/>
+		<info name="release" value="19950407"/>
+		<info name="alt_title" value="ザクイズ ギアファイト！"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="quiz gear fight!!, the (japan).bin" size="524288" crc="736cdb76" sha1="6ce8ff78d96a1a0e13997489d1a53b5a57a619c2" offset="000000" />
@@ -5760,6 +6014,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11037"/>
+		<info name="release" value="19910809"/>
+		<info name="alt_title" value="ラスタン・サーガ"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -5786,6 +6042,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22027"/>
+		<info name="release" value="19940121"/>
+		<info name="alt_title" value="リディック・ボウ ボクシング"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="riddick bowe boxing (japan).bin" size="262144" crc="a45fffb7" sha1="af32ad098a1bf872d5a2cef38105704d3507ed75" offset="000000" />
@@ -5822,7 +6080,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Ristar (World)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3365, 2543"/>
+		<info name="serial" value="G-3365 (JPN), 2543"/>
+		<info name="release" value="19950217 (JPN)"/>
+		<info name="alt_title" value="リスター ザ・シューティングスター"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ristar - the shooting star (world).bin" size="524288" crc="efe65b3b" sha1="d0d950097471553b6a96dc9cf0fb14ddb3a7dda2" offset="000000" />
@@ -5913,7 +6173,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>RoboCop 3 (World)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
-		<info name="serial" value="T-81097"/>
+		<info name="serial" value="T-81097 (JPN)"/>
+		<info name="release" value="19940624 (JPN)"/>
+		<info name="alt_title" value="ロボコップ3"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="robocop 3 (usa, europe).bin" size="262144" crc="069a0704" sha1="8de7c9ac95b734af9e3fbe5700ac4c6599799702" offset="000000" />
@@ -5938,6 +6200,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3425"/>
+		<info name="release" value="19950224"/>
+		<info name="alt_title" value="ロイアル・ストーン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="royal stone - hirakareshi toki no tobira (japan).bin" size="524288" crc="445d7cd2" sha1="c1afca3ac30cb9852f508f5dded7e50e08000f86" offset="000000" />
@@ -5950,6 +6214,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Face</publisher>
 		<info name="serial" value="T-54017"/>
+		<info name="release" value="19910531"/>
+		<info name="alt_title" value="琉球"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="ryuukyuu (japan).bin" size="131072" crc="95efd52b" sha1="ffaa1c97c64aec30176254f1ef655c06c63e1b53" offset="000000" />
@@ -5984,7 +6250,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Samurai Spirits (Jpn)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
-		<info name="serial" value="T-103027"/>
+		<info name="serial" value="T-146027"/>
+		<info name="release" value="19941209"/>
+		<info name="alt_title" value="サムライスピリッツ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="samurai spirits (japan).bin" size="524288" crc="93fd73dc" sha1="2aaf7b6f9d37275995d4a62bb8a465333d8b0bf4" offset="000000" />
@@ -5997,6 +6265,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="T-23017"/>
+		<info name="release" value="19940325"/>
+		<info name="alt_title" value="スクラッチゴルフ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="scratch golf (japan).bin" size="262144" crc="ec0f2c72" sha1="4c1d3b5057702341b5646d0a2fe65a9bda966211" offset="000000" />
@@ -6009,6 +6279,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133027"/>
+		<info name="release" value="19950324"/>
+		<info name="alt_title" value="SDガンダム ウィナーズ ヒストリー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sd gundam - winner's history (japan).bin" size="524288" crc="5e2b39b8" sha1="24e217098845ab5a0eb29e9dc6af2e86be1b0a84" offset="000000" />
@@ -6055,6 +6327,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3404"/>
+		<info name="release" value="19920918"/>
+		<info name="alt_title" value="シャダム・クルセイダー ～遙かなる王国～"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="shadam crusader - harukanaru oukoku (japan).bin" size="524288" crc="09f9ed60" sha1="de4b546f61dd32106247d38643849f6aaeeedb07" offset="000000" />
@@ -6067,6 +6341,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-15017"/>
+		<info name="release" value="19901227"/>
+		<info name="alt_title" value="上海II"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="shanghai ii (japan).bin" size="131072" crc="2ae8c75f" sha1="5180891ec0ae08d784dd89222d9ffd7f88a59691" offset="000000" />
@@ -6079,6 +6355,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-15037 (Meisaku Collection)"/>
+		<info name="release" value="19940305"/>
+		<info name="alt_title" value="上海II"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="shanghai ii [v1] (jp).bin" size="131072" crc="81314249" sha1="82210b387344aaebae8cf03029967cd0c906beff" offset="000000" />
@@ -6102,6 +6380,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="T-15027"/>
+		<info name="release" value="19910426"/>
+		<info name="alt_title" value="紫禁城"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="shikinjou (japan).bin" size="131072" crc="9c5c7f53" sha1="bf36130b1be4bce6c6eb7b87db00d420797c3611" offset="000000" />
@@ -6113,7 +6393,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Shining Force Gaiden - Ensei, Jashin no Kuni e (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3406, G-3411"/>
+		<info name="serial" value="G-3406, G-3411 (Meisaku Collection)"/>
+		<info name="release" value="19921225, 19930723 (Meisaku Collection)"/>
+		<info name="alt_title" value="シャイニング・フォース外伝 ～遠征・邪神の国へ～"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="shining force gaiden - ensei, jashin no kuni e (japan).bin" size="524288" crc="4d1f4699" sha1="bea1bea94ea745691ad944eaadc8a5576057ed53" offset="000000" />
@@ -6126,6 +6408,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3428"/>
+		<info name="release" value="19950630"/>
+		<info name="alt_title" value="シャイニング・フォース外伝 -ファイナル コンフリクト-"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="shining force gaiden - final conflict (japan).bin" size="524288" crc="6019fe5e" sha1="0d4bc152e7ae70457fa74f593e064403cd24ab72" offset="000000" />
@@ -6150,6 +6434,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3409"/>
+		<info name="release" value="19930625"/>
+		<info name="alt_title" value="シャイニング・フォース外伝II ～邪神の覚醒～"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="shining force gaiden ii - jashin no kakusei (japan).bin" size="524288" crc="30374681" sha1="2dd374db661315e51e9eedebf346a5a4ded0c3be" offset="000000" />
@@ -6206,7 +6492,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>The GG Shinobi II (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="2402, G-3315"/>
+		<info name="serial" value="2402, G-3315 (JPN)"/>
+		<info name="release" value="19921211 (JPN)"/>
+		<info name="alt_title" value="ザ・GG シノビ II"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="shinobi ii - the silent fury (world).bin" size="262144" crc="6201c694" sha1="cd57301d16202ea02d9f97bd8b17d71772782c94" offset="000000" />
@@ -6242,7 +6530,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>The Simpsons - Bart vs. The World (World)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
-		<info name="serial" value="T-81077, T-81098, 075.410"/>
+		<info name="serial" value="T-81077 (JPN), T-81098, 075.410"/>
+		<info name="release" value="19940729 (JPN)"/>
+		<info name="alt_title" value="シンプソンズ バートワールド"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="simpsons, the - bart vs. the world (usa, europe).bin" size="262144" crc="da7bd5c7" sha1="256672261c9a2d35e10eb06e990e8ebc46fb35c1" offset="000000" />
@@ -6331,6 +6621,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3331"/>
+		<info name="release" value="19931119"/>
+		<info name="alt_title" value="ソニック＆テイルス"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sonic &amp; tails (japan).bin" size="524288" crc="8ac0dade" sha1="e70228cbde1b54f1520804c6e3c28b4130a68c84" offset="000000" />
@@ -6355,6 +6647,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3356"/>
+		<info name="release" value="19941111"/>
+		<info name="alt_title" value="ソニック＆テイルス2"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sonic &amp; tails 2 (japan).bin" size="524288" crc="496bce64" sha1="bb14ed43cf815e82f55e79753d0a7c8a24e24e7f" offset="000000" />
@@ -6366,7 +6660,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Sonic Blast (Euro, USA) ~ G Sonic (Jpn)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3385, 2573, 2573-50"/>
+		<info name="serial" value="G-3385 (JPN), 2573, 2573-50"/>
+		<info name="release" value="19961213 (JPN)"/>
+		<info name="alt_title" value="G・ソニック"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="sonic blast (world).bin" size="1048576" crc="031b9da9" sha1="11241be4082f6f9d057488ae75ccdd482f623f8c" offset="000000" />
@@ -6468,6 +6764,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3415"/>
+		<info name="release" value="19940318"/>
+		<info name="alt_title" value="ソニックドリフト"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sonic drift (japan).bin" size="524288" crc="68f0a776" sha1="fef5d69093df2d774ed274a4079790f8778577fc" offset="000000" />
@@ -6479,7 +6777,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Sonic Drift 2 (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3366 2562"/>
+		<info name="serial" value="G-3366 (JPN), 2562"/>
+		<info name="release" value="19950317 (JPN)"/>
+		<info name="alt_title" value="ソニックドリフト2"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sonic drift 2 (japan, usa).bin" size="524288" crc="d6e8a305" sha1="fe597c5cfbbc31e54f2484eb5b33c21c66cf0290" offset="000000" />
@@ -6491,7 +6791,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Sonic Labyrinth (World)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3374, 2584"/>
+		<info name="serial" value="G-3374 (JPN), 2584"/>
+		<info name="release" value="19951117 (JPN)"/>
+		<info name="alt_title" value="ソニックラビリンス"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sonic labyrinth (world).bin" size="524288" crc="5550173b" sha1="e24bf33d8d5a79f371485f20f207b6b26f5b341e" offset="000000" />
@@ -6735,7 +7037,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Sonic The Hedgehog (Jpn, USA, v0)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3307, 2408"/>
+		<info name="serial" value="G-3307 (JPN), 2408"/>
+		<info name="release" value="19911228 (JPN)"/>
+		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="sonic the hedgehog (japan).bin" size="262144" crc="3e31cb8c" sha1="8923295c96b2e05da0a83a827fd709b033fc7332" offset="000000" />
@@ -6747,7 +7051,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Sonic The Hedgehog (Euro, Jpn, v1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3307, G-3334, 2408"/>
+		<info name="serial" value="G-3307 (JPN), G-3334 (JPN, Meisaku Collection), 2408"/>
+		<info name="release" value="19911228 (JPN), 19931210 (JPN, Meisaku Collection)"/>
+		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="sonic the hedgehog (world) (v1.1).bin" size="262144" crc="d163356e" sha1="7dbbbca2229e74fcb8f90ec794aa6e5cb168e489" offset="000000" />
@@ -6770,7 +7076,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Sonic The Hedgehog 2 (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3321, G-3338, 2507"/>
+		<info name="serial" value="G-3321 (JPN), G-3338 (JPN, Meisaku Collection), 2507"/>
+		<info name="release" value="19921121 (JPN), 19931210 (JPN, Meisaku Collection)"/>
+		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ2"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sonic the hedgehog 2 (world).bin" size="524288" crc="95a18ec7" sha1="dabb452e416b4fa9cb83d8ddd307c2a32c3a1a7f" offset="000000" />
@@ -6806,6 +7114,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1990</year>
 		<publisher>Riverhill Software</publisher>
 		<info name="serial" value="T-53017"/>
+		<info name="release" value="19901215"/>
+		<info name="alt_title" value="倉庫番"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="soukoban (japan).bin" size="131072" crc="0f3e3840" sha1="e5865a22dc3a9714160ef14bc59d510502d39b97" offset="000000" />
@@ -6817,7 +7127,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Space Harrier (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3212, 2314"/>
+		<info name="serial" value="G-3212 (JPN), 2314"/>
+		<info name="release" value="19911228 (JPN)"/>
+		<info name="alt_title" value="スペースハリアー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="space harrier (world).bin" size="131072" crc="600c15b3" sha1="d00b8ff195d4423f2a344490eb34156017f4ee64" offset="000000" />
@@ -7366,7 +7678,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Stargate (World)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="T-81298, T-81298-50, T-81157"/>
+		<info name="serial" value="T-81298, T-81298-50, T-81157 (JPN)"/>
+		<info name="release" value="19950526 (JPN)"/>
+		<info name="alt_title" value="スターゲイト"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="stargate (world).bin" size="262144" crc="fc7c64e4" sha1="011fd49600eaef8be7cbe35ab6eeb4e1554d836c" offset="000000" />
@@ -7404,8 +7718,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Streets of Rage (World) ~ Bare Knuckle (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3313, 2417"/>
-		<info name="release" value="19921127"/>
+		<info name="serial" value="G-3313 (JPN), 2417"/>
+		<info name="release" value="19921127 (JPN)"/>
+		<info name="alt_title" value="ベア・ナックル 怒りの鉄拳"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="streets of rage (world).bin" size="262144" crc="3d8bcf1d" sha1="ca8c8a00ee838e994b2fa17e595ddd40d898cf42" offset="000000" />
@@ -7418,8 +7733,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Streets of Rage II (World) ~ Bare Knuckle II - Shitou e no Chingonka (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3328, 2517"/>
-		<info name="release" value="19930723"/>
+		<info name="serial" value="G-3328 (JPN), 2517"/>
+		<info name="release" value="19930723 (JPN)"/>
+		<info name="alt_title" value="ベア・ナックルII 死闘への鎮魂歌"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="streets of rage ii (world).bin" size="524288" crc="0b618409" sha1="2804b355347bda6e2903078ba30ed6b3a289ebba" offset="000000" />
@@ -7456,6 +7772,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3226"/>
+		<info name="release" value="19950526"/>
+		<info name="alt_title" value="スーパーコラムス"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super columns (japan).bin" size="131072" crc="2a100717" sha1="a1de915b0f10894bedc6ee8f0fd1f2da65bcfa68" offset="000000" />
@@ -7557,6 +7875,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sigma Enterprises</publisher>
 		<info name="serial" value="T-26017, T-26027"/>
+		<info name="release" value="19910419"/>
+		<info name="alt_title" value="スーパーゴルフ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super golf (japan).bin" size="131072" crc="528cbbce" sha1="9ecb48513621086ec6d5bffa1375914f21f393e4" offset="000000" />
@@ -7582,6 +7902,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="T-143017"/>
+		<info name="release" value="19951215"/>
+		<info name="alt_title" value="スーパー 桃太郎電鉄III"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="super momotarou dentetsu iii (japan).bin" size="524288" crc="b731bb80" sha1="f62e0e433987f97143282d2526490cd45f3e7185" offset="000000" />
@@ -7594,6 +7916,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3201"/>
+		<info name="release" value="19901006"/>
+		<info name="alt_title" value="スーパーモナコGP"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="super monaco gp (japan).bin" size="131072" crc="4f686c4a" sha1="2a61491785ad56f5bdc504c994f36ee8ea9dcf68" offset="000000" />
@@ -7642,7 +7966,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Smash T.V. (World)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
-		<info name="serial" value="T-81058, T-81058-50, T-81057"/>
+		<info name="serial" value="T-81058, T-81058-50, T-81057 (JPN)"/>
+		<info name="release" value="19940729 (JPN)"/>
+		<info name="alt_title" value="スマッシュTV"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="super smash t.v. (world).bin" size="262144" crc="1006e4e3" sha1="85189e29f3f6b94f95723bc75571e9424df119f9" offset="000000" />
@@ -7714,6 +8040,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3426"/>
+		<info name="release" value="19950127"/>
+		<info name="alt_title" value="シルヴァンテイル"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sylvan tale (japan).bin" size="524288" crc="45ef2062" sha1="bec44ab675bcd6b081590d4d52b6af4076c342e6" offset="000000" />
@@ -7738,6 +8066,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Acclaim</publisher>
 		<info name="serial" value="T-81027"/>
+		<info name="release" value="19940225"/>
+		<info name="alt_title" value="T2 ザ・アーケードゲーム"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="t2 - the arcade game (jp).bin" size="524288" crc="0b1ba87f" sha1="a56fc1154709cae443efeed6e6310cc059396605" offset="000000" />
@@ -7749,7 +8079,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Tails Adventures (World)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3372, 2583"/>
+		<info name="serial" value="G-3372 (JPN), 2583"/>
+		<info name="release" value="19950922 (JPN)"/>
+		<info name="alt_title" value="テイルスアドベンチャー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tails adventures (world) (en,ja).bin" size="524288" crc="5bb6e5d6" sha1="da3df145b8e9f2a2e680d2c92939084d4530ed90" offset="000000" />
@@ -7762,6 +8094,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3368"/>
+		<info name="release" value="19950428"/>
+		<info name="alt_title" value="テイルスのスカイパトロール"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="tails no skypatrol (japan).bin" size="262144" crc="88618afa" sha1="9cb440611e9e3a7957438698fede0978d568a807" offset="000000" />
@@ -7773,7 +8107,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Taisen Mahjong HaoPai (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3202, G-3223"/>
+		<info name="serial" value="G-3202, G-3223 (Meisaku Collection)"/>
+		<info name="release" value="19901110, 19930723 (Meisaku Collection)"/>
+		<info name="alt_title" value="対戦麻雀ハオパイ 好牌"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="taisen mahjong haopai (japan).bin" size="131072" crc="cf9c607c" sha1="9cd50acaab1c2452e5a231e1a5646c3c38b50d9c" offset="000000" />
@@ -7786,6 +8122,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3335"/>
+		<info name="release" value="19931217"/>
+		<info name="alt_title" value="対戦麻雀 好牌2"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="taisen mahjong haopai 2 (japan).bin" size="524288" crc="20527530" sha1="8dfd49a2e740a232efc52ceefc85f51cf292d75e" offset="000000" />
@@ -7797,7 +8135,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Taisen-gata Daisenryaku G (Jpn)</description>
 		<year>1991</year>
 		<publisher>SystemSoft</publisher>
-		<info name="serial" value="T-51017, T-51027"/>
+		<info name="serial" value="T-51017, T-51027 (Meisaku Collection)"/>
+		<info name="release" value="19910928, 19930723 (Meisaku Collection)"/>
+		<info name="alt_title" value="対戦型 大戦略G"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="taisen-gata daisenryaku g (japan).bin" size="262144" crc="7b7717b8" sha1="d290bba12f4b7341c3ce2a00be8b8d7e548327e1" offset="000000" />
@@ -7810,6 +8150,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11017"/>
+		<info name="release" value="19910308"/>
+		<info name="alt_title" value="タイトーチェイスH.Q."/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -7848,6 +8190,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3361"/>
+		<info name="release" value="19950303"/>
+		<info name="alt_title" value="タマ＆フレンズ 3丁目公園タマリンピック"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="tama &amp; friends sanchoume kouen - tamalympic (japan).bin" size="262144" crc="dd1d2ebf" sha1="c8bf11726a152a88f2b1d900bbd974775a8e608b" offset="000000" />
@@ -7860,6 +8204,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3208"/>
+		<info name="release" value="19910308"/>
+		<info name="alt_title" value="タロットの館"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="tarot no yakata (japan).bin" size="131072" crc="57834c03" sha1="b8b45b2e59f5d3239984205c120421923d833505" offset="000000" />
@@ -7884,6 +8230,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3371"/>
+		<info name="release" value="19950714"/>
+		<info name="alt_title" value="闘え！ プロ野球ツインリーグ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tatakae! pro yakyuu twin league (japan).bin" size="524288" crc="bec57602" sha1="8c629941ae7077862dd516283c656b5212920936" offset="000000" />
@@ -8085,7 +8433,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Tempo Jr. (World)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3369, 2563, 2562-50"/>
+		<info name="serial" value="G-3369 (JPN), 2563, 2562-50"/>
+		<info name="release" value="19950428 (JPN)"/>
+		<info name="alt_title" value="テンポJR."/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tempo jr. (world).bin" size="524288" crc="de466796" sha1="a2d800d2836a03f81dd8f3dda23cd2d8bfff18a5" offset="000000" />
@@ -8258,6 +8608,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3319"/>
 		<info name="release" value="19930625"/>
+		<info name="alt_title" value="トム＆ジェリー ［ザ ムービー］"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="tom and jerry - the movie (jp).bin" size="262144" crc="a1453efa" sha1="25f7e0d4b4416e4f879d289eed638d4018bedb51" offset="000000" />
@@ -8278,10 +8629,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="torarete">
-		<description>Torarete Tamaruka (Jpn)</description>
+		<description>Torarete Tamaruka!? (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3348"/>
+		<info name="release" value="19940603"/>
+		<info name="alt_title" value="とられてたまるか！？"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="torarete tamaruka (japan).bin" size="524288" crc="5bcf9b97" sha1="fa87ac6b14c4b9eaa91fa8e4550b3c9049dd8ef2" offset="000000" />
@@ -8293,7 +8646,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>True Lies (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="T-81318, T-81318-50, T-81167"/>
+		<info name="serial" value="T-81318, T-81318-50, T-81167 (JPN)"/>
+		<info name="release" value="19950512 (JPN)"/>
+		<info name="alt_title" value="トゥルーライズ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="true lies (world).bin" size="524288" crc="5173b02a" sha1="7ee525e68b9f3bca2a5bdd6de14711108dcbc288" offset="000000" />
@@ -8305,7 +8660,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Ultimate Soccer (Euro, Jpn, Bra)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3333, 075.300"/>
+		<info name="serial" value="G-3333 (JPN), 075.300"/>
+		<info name="release" value="19931029 (JPN)"/>
+		<info name="alt_title" value="アルティメイト サッカー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ultimate soccer (japan, europe) (en,fr,de,es,it).bin" size="262144" crc="820965a3" sha1="7994621926628d2376a75e8d90cd066d48a4d502" offset="000000" />
@@ -8353,6 +8710,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3380"/>
+		<info name="release" value="19960329"/>
+		<info name="alt_title" value="バーチャファイターミニ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="virtua fighter mini (japan).bin" size="1048576" crc="c05657f8" sha1="b0622ef2e58fc38af35ead0a632babc4bfe49e86" offset="000000" />
@@ -8376,6 +8735,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Wagyan Land (Jpn)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
+		<info name="serial" value="T-14047"/>
+		<info name="release" value="19910726"/>
+		<info name="alt_title" value="ワギャンランド"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="wagan land (japan).bin" size="262144" crc="29e697b2" sha1="6b74f3fddabd52ac6bb1b812043537154f8a43c5" offset="000000" />
@@ -8387,6 +8749,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Wagyan Land (Jpn, Alt)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
+		<info name="serial" value="T-14047"/>
+		<info name="release" value="19910726"/>
+		<info name="alt_title" value="ワギャンランド"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="wagan land (j) [a1].bin" size="262144" crc="d5369192" sha1="1f5e511f6230797ef163b587f1988f097e795a61" offset="000000" />
@@ -8410,7 +8775,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Wimbledon (World)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-3221, 2323"/>
+		<info name="serial" value="G-3221 (JPN), 2323"/>
+		<info name="release" value="19930226 (JPN)"/>
+		<info name="alt_title" value="ウィンブルドン"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="wimbledon (world).bin" size="131072" crc="ce1108fd" sha1="6aa588e0aa93c5c74c80f7044de49933291af4e9" offset="000000" />
@@ -8423,6 +8790,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3342"/>
+		<info name="release" value="19940211"/>
+		<info name="alt_title" value="ウインターオリンピック"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="winter olympics - lillehammer '94 (japan) (en,fr,de,es,it,pt,sv,no).bin" size="524288" crc="d5195a39" sha1="578fc35fe155dca2c9adf17464d23aaf8205148f" offset="000000" />
@@ -8480,6 +8849,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Wonder Boy (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="G-3205"/>
+		<info name="release" value="19901208"/>
+		<info name="alt_title" value="ワンダーボーイ"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="wonder boy (japan).bin" size="131072" crc="9977fcb3" sha1="7ff0f0757c7b2e84d99a4291656d74a20ec2651d" offset="000000" />
@@ -8560,6 +8932,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-68017"/>
+		<info name="release" value="19940527"/>
+		<info name="alt_title" value="ワールドダービー"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="world derby (japan).bin" size="524288" crc="1e81861f" sha1="af96e8d9470df941c7c356cc9b6e143a3c44dd86" offset="000000" />
@@ -8866,6 +9240,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3343"/>
+		<info name="release" value="19940318"/>
+		<info name="alt_title" value="幽☆遊☆白書 滅びし者の逆襲"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="yu yu hakusho - horobishimono no gyakushuu (japan).bin" size="524288" crc="88ebbf9e" sha1="e75803c9241094f7cfe251b99cd370228cc0923c" offset="000000" />
@@ -8878,6 +9254,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3354"/>
+		<info name="release" value="19940930"/>
+		<info name="alt_title" value="幽☆遊☆白書II 激闘！七強の戦い"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="yu yu hakusho 2 - gekitou! nanakyou no tatakai (japan).bin" size="524288" crc="46ae9159" sha1="140efe67e886f52aeda2089a73599f7680c89f24" offset="000000" />
@@ -8890,6 +9268,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1990</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32017"/>
+		<info name="release" value="19901023"/>
+		<info name="alt_title" value="[ZAN]ギア"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="zan gear (japan).bin" size="131072" crc="141aaf96" sha1="115074a58606720755364eaf0a4bc60aabf18f94" offset="000000" />
@@ -8912,6 +9292,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Zool no Yume Bouken (Jpn)</description>
 		<year>1994</year>
 		<publisher>Infocom</publisher>
+		<info name="serial" value="T-149017"/>
+		<info name="release" value="19940729"/>
+		<info name="alt_title" value="ズールのゆめぼうけん"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="zool no yume bouken (japan).bin" size="262144" crc="e35ef7ed" sha1="2c799ee084b858cb71cfaa7a3f6d3a4f364b6c43" offset="000000" />

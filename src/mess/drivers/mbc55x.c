@@ -40,7 +40,7 @@ static const floppy_interface mbc55x_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSSD_35,
 	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -272,6 +272,9 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	/* Backing storage */
 	MCFG_FD1793_ADD(FDC_TAG, mbc55x_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mbc55x_floppy_interface)
+
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")
 MACHINE_CONFIG_END
 
 

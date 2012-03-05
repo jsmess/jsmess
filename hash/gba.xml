@@ -15493,6 +15493,18 @@
 		</part>
 	</software>
 
+	<software name="hischoolp" cloneof="hischool">
+		<description>High School Musical (USA, Prototype)</description>
+		<year>2007</year>
+		<publisher>Disney Interactive Studios</publisher>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="16777216">
+				<rom name="high school musical beta.bin" size="16777216" crc="c340d5f7" sha1="163701c68771e2108202a3cfd8effe69cc48aeb7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hikarugod" cloneof="hikarugo">
 		<description>Hikaru no Go (Jpn, Promotional Demo)</description>
 		<year>2001?</year>
