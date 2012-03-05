@@ -281,7 +281,25 @@ $(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c | $(OSPREBUILD)
 # libflac library objects
 #-------------------------------------------------
 
-FLACOPTS=-DFLAC__NO_ASM -DHAVE_INTTYPES_H -DHAVE_ICONV -DHAVE_LANGINFO_CODESET -DHAVE_SOCKLEN_T -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+ifeq ($(TARGETOS),macosx)
+ifdef BIGENDIAN
+ifeq ($(PTR64),1)
+ARCHFLAGS = -arch ppc64 -DWORDS_BIGENDIAN=1
+else
+ARCHFLAGS = -arch ppc -DWORDS_BIGENDIAN=1
+endif
+else	# BIGENDIAN
+ifeq ($(PTR64),1)
+ARCHFLAGS = -arch x86_64 -DWORDS_BIGENDIAN=0
+else
+ARCHFLAGS = -m32 -arch i386 -DWORDS_BIGENDIAN=0
+endif
+endif	# BIGENDIAN
+else    # ifeq ($(TARGETOS),macosx) 
+ARCHFLAGS = -DWORDS_BIGENDIAN=0
+endif   # ifeq ($(TARGETOS),macosx)
+
+FLACOPTS=-DFLAC__NO_ASM -DHAVE_INTTYPES_H -DHAVE_ICONV -DHAVE_LANGINFO_CODESET -DHAVE_SOCKLEN_T -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 $(ARCHFLAGS)
 
 LIBFLACOBJS = \
 	$(LIBOBJ)/libflac/bitmath.o \
