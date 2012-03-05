@@ -1216,11 +1216,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
                 size = 2352;
                 break;
         }
-		#ifdef WIN32
-		core_fprintf(file, "%d %d %d %d %s %I64d\n", tracknum+1, frameoffs, mode, size, filename, discoffs);
-		#else
-		core_fprintf(file, "%d %d %d %d %s %lld\n", tracknum+1, frameoffs, mode, size, filename, discoffs);
-		#endif
+		core_fprintf(file, "%d %d %d %d %s %" I64FMT "d\n", tracknum+1, frameoffs, mode, size, filename, discoffs);
 	}
 	else if (mode == MODE_CUEBIN)
     {
