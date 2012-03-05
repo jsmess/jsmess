@@ -33,7 +33,19 @@ UINT8 sony_read_data(device_t *device);
 void sony_write_data(device_t *device,UINT8 data);
 int sony_read_status(device_t *device);
 
-DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_SONY, sonydriv);
+class sonydriv_floppy_image_device :	public legacy_floppy_image_device
+{
+public:
+	// construction/destruction
+	sonydriv_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void call_unload();
+protected:
+	virtual void device_start();
+};
+
+// device type definition
+extern const device_type FLOPPY_SONY;
 
 #define MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(_config)	\
 	MCFG_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)		\

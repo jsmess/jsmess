@@ -21,12 +21,12 @@ struct apple525_disk
 	UINT8 track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
 };
 
-INLINE const appledriv_config *get_config(device_t *device)
+INLINE apple525_floppy_image_device *get_device(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == FLOPPY_APPLE);
 
-	return (const appledriv_config *) downcast<const legacy_device_base *>(device)->inline_config();
+	return (apple525_floppy_image_device *) downcast<apple525_floppy_image_device *>(device);
 }
 
 static int apple525_enable_mask = 1;
@@ -168,12 +168,12 @@ static UINT8 apple525_process_byte(device_t *img, int write_value)
 	struct apple525_disk *disk;
 	int spinfract_divisor;
 	int spinfract_dividend;
-	const appledriv_config *config = get_config(img);
+	apple525_floppy_image_device *config = get_device(img);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 
 	disk = (struct apple525_disk *)  flopimg_get_custom_data(img);
-	spinfract_dividend = config->dividend;
-	spinfract_divisor = config->divisor;
+	spinfract_dividend = config->get_dividend();
+	spinfract_divisor = config->get_divisor();
 
 	/* no image initialized for that drive ? */
 	if (!image->exists())
@@ -260,43 +260,40 @@ int apple525_read_status(device_t *device)
 	return result;
 }
 
-/* ----------------------------------------------------------------------- */
+// device type definition
+const device_type FLOPPY_APPLE = &device_creator<apple525_floppy_image_device>;
 
-static DEVICE_START( apple525_floppy )
+//-------------------------------------------------
+//  apple525_floppy_image_device - constructor
+//-------------------------------------------------
+
+apple525_floppy_image_device::apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : legacy_floppy_image_device(mconfig, FLOPPY_APPLE, "Floppy Disk [Apple]", tag, owner, clock)
 {
-
-	DEVICE_START_CALL(floppy);
-	flopimg_alloc_custom_data(device,auto_alloc_clear(device->machine(),struct apple525_disk));
-	floppy_set_type(device,FLOPPY_TYPE_APPLE);
 }
 
-static DEVICE_IMAGE_LOAD( apple525_floppy )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void apple525_floppy_image_device::device_start()
 {
-	int result = DEVICE_IMAGE_LOAD_NAME(floppy)(image);
-	floppy_drive_seek(&image.device(), -999);
-	floppy_drive_seek(&image.device(), +35/2);
+	legacy_floppy_image_device::device_start();
+	flopimg_alloc_custom_data(this,auto_alloc_clear(machine(),struct apple525_disk));
+	floppy_set_type(this,FLOPPY_TYPE_APPLE);
+}
+
+bool apple525_floppy_image_device::call_load()
+{
+	int result = legacy_floppy_image_device::call_load();
+	floppy_drive_seek(*this, -999);
+	floppy_drive_seek(*this, +35/2);
 	return result;
 }
 
-static DEVICE_IMAGE_UNLOAD( apple525_floppy )
+void apple525_floppy_image_device::call_unload()
 {
-	apple525_save_current_track(image, TRUE);
+	apple525_save_current_track(this, TRUE);
 
-	DEVICE_IMAGE_UNLOAD_NAME(floppy)(image);
+	legacy_floppy_image_device::call_unload();
 }
-
-DEVICE_GET_INFO( apple525 )
-{
-	switch (state)
-	{
-		case DEVINFO_STR_NAME:						strcpy(info->s, "Floppy Disk [Apple]"); break;
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(apple525_floppy); break;
-		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(apple525_floppy); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(apple525_floppy); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = sizeof(appledriv_config); break;
-
-		default:									DEVICE_GET_INFO_CALL(floppy);				break;
-	}
-}
-
-DEFINE_LEGACY_IMAGE_DEVICE(FLOPPY_APPLE, apple525);
