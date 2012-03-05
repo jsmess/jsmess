@@ -2600,7 +2600,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="galaga91" cloneof="galaga2">
 		<description>Galaga '91 (Jpn)</description>
 		<year>1991</year>
-		<publisher>Namco</publisher>
+		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14057"/>
 		<info name="release" value="19911025"/>
 		<info name="alt_title" value="ギャラガ'91"/>
@@ -2692,7 +2692,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="gearstad" cloneof="batterup">
 		<description>Gear Stadium (Jpn)</description>
 		<year>1991</year>
-		<publisher>Namco</publisher>
+		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14037"/>
 		<info name="release" value="19910405"/>
 		<info name="alt_title" value="ギアスタジアム"/>
@@ -2706,7 +2706,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="gearstah">
 		<description>Gear Stadium Heiseiban (Jpn)</description>
 		<year>1995</year>
-		<publisher>Namco</publisher>
+		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14077"/>
 		<info name="release" value="19951020"/>
 		<info name="alt_title" value="ギアスタジアム 平成版"/>
@@ -4023,7 +4023,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="mappy">
 		<description>Mappy (Jpn)</description>
 		<year>1991</year>
-		<publisher>Namco</publisher>
+		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14027"/>
 		<info name="release" value="19910524"/>
 		<info name="alt_title" value="マッピー"/>
@@ -5432,7 +5432,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="pacmanj" cloneof="pacman">
 		<description>Pac-Man (Jpn)</description>
 		<year>1991</year>
-		<publisher>Namco</publisher>
+		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14017"/>
 		<info name="release" value="19910129"/>
 		<info name="alt_title" value="パックマン"/>
@@ -5644,7 +5644,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="pocketj">
 		<description>Pocket Jansou (Jpn)</description>
 		<year>1992</year>
-		<publisher>Namco</publisher>
+		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14067"/>
 		<info name="release" value="19920207"/>
 		<info name="alt_title" value="ポケット雀荘"/>
@@ -8734,7 +8734,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="wagyan">
 		<description>Wagyan Land (Jpn)</description>
 		<year>1991</year>
-		<publisher>Namco</publisher>
+		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14047"/>
 		<info name="release" value="19910726"/>
 		<info name="alt_title" value="ワギャンランド"/>
@@ -8748,7 +8748,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	<software name="wagyana" cloneof="wagyan">
 		<description>Wagyan Land (Jpn, Alt)</description>
 		<year>1991</year>
-		<publisher>Namco</publisher>
+		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14047"/>
 		<info name="release" value="19910726"/>
 		<info name="alt_title" value="ワギャンランド"/>
