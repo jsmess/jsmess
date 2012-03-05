@@ -142,7 +142,7 @@
 		<description>Blackjack</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.FFFR, enter at E2B3R" />
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.0FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="5751412">
 				<rom name="blackjack.wav" size="5751412" crc="7e230c17" sha1="1268ee558f8b745c765df714e245c7f7f56002ed" offset="0" />
@@ -194,6 +194,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="18392504">
 				<rom name="deal or no deal.wav" size="18392504" crc="28ad3585" sha1="bf59a22794a755c711b429f6633135402cd12e36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football">
+		<description>Football</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR400.2FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="14613756">
+				<rom name="football.wav" size="14613756" crc="12613822" sha1="6f062f02cc9250427a5d94e593983353ab1ed272" offset="0" />
 			</dataarea>
 		</part>
 	</software>
