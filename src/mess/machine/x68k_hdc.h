@@ -75,35 +75,55 @@ enum
 	SASI_CMD_SPECIFY = 0xc2
 };
 
-typedef struct _sasi_ctrl_t sasi_ctrl_t;
-struct _sasi_ctrl_t
+class x68k_hdc_image_device :	public device_t,
+								public device_image_interface
 {
-	int phase;
-	unsigned char status_port;  // read at 0xe96003
-	unsigned char status;       // status phase output
-	unsigned char message;
-	unsigned char command[10];
-	unsigned char sense[4];
-	int command_byte_count;
-	int command_byte_total;
-	int current_command;
-	int transfer_byte_count;
-	int transfer_byte_total;
-	int msg;  // MSG
-	int cd;   // C/D (Command/Data)
-	int bsy;  // BSY
-	int io;   // I/O
-	int req;  // REQ
+public:
+	// construction/destruction
+	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_HARDDISK; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "hdf"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual bool call_create(int format_type, option_resolution *format_options);	
+
+	DECLARE_WRITE16_MEMBER( hdc_w );
+	DECLARE_READ16_MEMBER( hdc_r );
+protected:
+	// device-level overrides
+    virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+private:	
+	int m_phase;
+	unsigned char m_status_port;  // read at 0xe96003
+	unsigned char m_status;       // status phase output
+	unsigned char m_message;
+	unsigned char m_command[10];
+	unsigned char m_sense[4];
+	int m_command_byte_count;
+	int m_command_byte_total;
+	int m_current_command;
+	int m_transfer_byte_count;
+	int m_transfer_byte_total;
+	int m_msg;  // MSG
+	int m_cd;   // C/D (Command/Data)
+	int m_bsy;  // BSY
+	int m_io;   // I/O
+	int m_req;  // REQ
 };
 
-DEVICE_START( x68k_hdc );
-
-DEVICE_IMAGE_CREATE( sasihd );
-
-DECLARE_LEGACY_IMAGE_DEVICE(X68KHDC, x68k_hdc);
+// device type definition
+extern const device_type X68KHDC;
 
 #define MCFG_X68KHDC_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, X68KHDC, 0)
 
-WRITE16_DEVICE_HANDLER( x68k_hdc_w );
-READ16_DEVICE_HANDLER( x68k_hdc_r );
