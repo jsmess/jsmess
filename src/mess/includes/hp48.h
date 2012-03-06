@@ -123,14 +123,53 @@ extern void hp48_rs232_start_recv_byte( running_machine &machine, UINT8 data );
 
 /****************************** cards ********************************/
 
-struct hp48_port_config;
+/* port specification */
+struct hp48_port_interface
+{
+	int port;                 /* port index: 0 or 1 (for port 1 and 2) */
+	int module;               /* memory module where the port is visible */
+	int max_size;             /* maximum size, in bytes 128 KB or 4 GB */
+};
 
-extern const struct hp48_port_config hp48sx_port1_config;
-extern const struct hp48_port_config hp48sx_port2_config;
-extern const struct hp48_port_config hp48gx_port1_config;
-extern const struct hp48_port_config hp48gx_port2_config;
+class hp48_port_image_device :	public device_t,
+								public device_image_interface,
+								public hp48_port_interface
+{
+public:
+	// construction/destruction
+	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-DECLARE_LEGACY_IMAGE_DEVICE(HP48_PORT, hp48_port);
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_MEMCARD; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "crd"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	virtual bool call_load();
+	virtual void call_unload();
+	virtual bool call_create(int format_type, option_resolution *format_options);	
+protected:
+	// device-level overrides
+    virtual void device_config_complete();
+	virtual void device_start();
+private:
+	void hp48_fill_port();
+	void hp48_unfill_port();
+};
+
+extern const struct hp48_port_interface hp48sx_port1_config;
+extern const struct hp48_port_interface hp48sx_port2_config;
+extern const struct hp48_port_interface hp48gx_port1_config;
+extern const struct hp48_port_interface hp48gx_port2_config;
+
+// device type definition
+extern const device_type HP48_PORT;
 
 #define MCFG_HP48_PORT_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, HP48_PORT, 0) \
