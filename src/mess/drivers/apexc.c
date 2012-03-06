@@ -51,28 +51,58 @@ static MACHINE_START(apexc)
     the user to enter such a loader manually, but it would take hours...)
 */
 
-typedef struct _apexc_cylinder_t apexc_cylinder_t;
-struct _apexc_cylinder_t
+class apexc_cylinder_image_device :	public device_t,
+									public device_image_interface
 {
-	int writable;
+public:
+	// construction/destruction
+	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_CYLINDER; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 0; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 1; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "apc"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+		
+	virtual bool call_load();
+	virtual void call_unload();
+protected:
+	// device-level overrides
+    virtual void device_config_complete() { update_names(); }
+	virtual void device_start() { }
+private:	
+	int m_writable;
 };
+
+const device_type APEXC_CYLINDER = &device_creator<apexc_cylinder_image_device>;
+
+apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, APEXC_CYLINDER, "APEXC Cylinder", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+}
 
 /*
     Open cylinder image and read RAM
 */
-static DEVICE_IMAGE_LOAD( apexc_cylinder )
+bool apexc_cylinder_image_device::call_load()
 {
 	/* load RAM contents */
-	apexc_cylinder_t *cyl = (apexc_cylinder_t *)downcast<legacy_device_base *>(&image.device())->token();
-	cyl->writable = !image.is_readonly();
+	m_writable = !is_readonly();
 
-	image.fread( image.device().machine().region("maincpu")->base(), /*0x8000*/0x1000);
+	fread( machine().region("maincpu")->base(), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 	{	/* fix endianness */
 		UINT32 *RAM;
 		int i;
 
-		RAM = (UINT32 *) image.device().machine().region("maincpu")->base();
+		RAM = (UINT32 *) machine().region("maincpu")->base();
 
 		for (i=0; i < /*0x2000*/0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -85,65 +115,28 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 /*
     Save RAM to cylinder image and close it
 */
-static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
+void apexc_cylinder_image_device::call_unload()
 {
-	apexc_cylinder_t *cyl = (apexc_cylinder_t *)downcast<legacy_device_base *>(&image.device())->token();
-	if (cyl->writable)
+	if (m_writable)
 	{	/* save RAM contents */
 		/* rewind file */
-		image.fseek(0, SEEK_SET);
+		fseek(0, SEEK_SET);
 #ifdef LSB_FIRST
 		{	/* fix endianness */
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) image.device().machine().region("maincpu")->base();
+			RAM = (UINT32 *) machine().region("maincpu")->base();
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		image.fwrite(image.device().machine().region("maincpu")->base(), /*0x8000*/0x1000);
+		fwrite(machine().region("maincpu")->base(), /*0x8000*/0x1000);
 	}
 }
 
-static DEVICE_START(apexc_cylinder)
-{
-}
-
-static DEVICE_RESET(apexc_cylinder)
-{
-}
-
-DEVICE_GET_INFO( apexc_cylinder )
-{
-	switch ( state )
-	{
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_cylinder_t);						break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
-		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_CYLINDER;                              	break;
-		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:	    info->i = 1;                                        	break;
-
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( apexc_cylinder );          	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( apexc_cylinder );				break;
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( apexc_cylinder );	break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(apexc_cylinder );	break;
-		case DEVINFO_STR_NAME:		                strcpy( info->s, "APEXC Cylinder");	                    break;
-		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Cylinder");	                    	break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "apc");                                 break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);								break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MESS Team"); 			break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(APEXC_CYLINDER, apexc_cylinder);
-DEFINE_LEGACY_IMAGE_DEVICE(APEXC_CYLINDER, apexc_cylinder);
 
 #define MCFG_APEXC_CYLINDER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, APEXC_CYLINDER, 0)
@@ -194,61 +187,72 @@ DEFINE_LEGACY_IMAGE_DEVICE(APEXC_CYLINDER, apexc_cylinder);
     11111                   Letters
 */
 
-typedef struct _apexc_tape_t apexc_tape_t;
-struct _apexc_tape_t
+class apexc_tape_puncher_image_device :	public device_t,
+										public device_image_interface
 {
-	int dummy;
+public:
+	// construction/destruction
+	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_PUNCHTAPE; }
+
+	virtual bool is_readable()  const { return 0; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "tap"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+protected:
+	// device-level overrides
+    virtual void device_config_complete() { update_names(); }
+	virtual void device_start() { }
 };
-static DEVICE_START(apexc_tape_puncher)
+
+const device_type APEXC_TAPE_PUNCHER = &device_creator<apexc_tape_puncher_image_device>;
+
+apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, APEXC_TAPE_PUNCHER, "APEXC Tape Puncher", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
 {
 }
-
-static DEVICE_RESET(apexc_tape_puncher)
-{
-}
-static DEVICE_GET_INFO(apexc_tape_puncher)
-{
-	switch ( state )
-	{
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_tape_t);							break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
-		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_PUNCHTAPE;                             	break;
-		case DEVINFO_INT_IMAGE_READABLE:            info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                        	break;
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME(apexc_tape_puncher);        	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(apexc_tape_puncher);				break;
-
-		case DEVINFO_STR_NAME:		                strcpy( info->s, "APEXC Tape Puncher");                break;
-		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Punch tape");	                    	break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "tap");                                 break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);								break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MESS Team"); 			break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_PUNCHER, apexc_tape_puncher);
-DEFINE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_PUNCHER, apexc_tape_puncher);
 
 #define MCFG_APEXC_TAPE_PUNCHER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, APEXC_TAPE_PUNCHER, 0)
 
-static DEVICE_GET_INFO(apexc_tape_reader)
+class apexc_tape_reader_image_device :	public device_t,
+										public device_image_interface
 {
-	switch ( state )
-	{
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "APEXC Tape Reader");	                    break;
-		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
-		default:									DEVICE_GET_INFO_CALL(apexc_tape_puncher);	break;
-	}
-}
+public:
+	// construction/destruction
+	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-DECLARE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_READER, apexc_tape_reader);
-DEFINE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_READER, apexc_tape_reader);
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_PUNCHTAPE; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 0; }
+	virtual bool is_creatable() const { return 0; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "tap"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+protected:
+	// device-level overrides
+    virtual void device_config_complete() { update_names(); }
+	virtual void device_start() { }
+};
+
+const device_type APEXC_TAPE_READER = &device_creator<apexc_tape_reader_image_device>;
+
+apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, APEXC_TAPE_READER, "APEXC Tape Reader", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+}
 
 #define MCFG_APEXC_TAPE_READER_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, APEXC_TAPE_READER, 0)
