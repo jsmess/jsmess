@@ -19,13 +19,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_serial(*this, "tiserial"),
+//		  m_serial(*this, "tiserial"),
 		  m_nvram(*this, "nvram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<device_t> m_speaker;
-	optional_device<device_t> m_serial;
+	//optional_device<device_t> m_serial;
 	optional_shared_ptr<UINT8>	m_nvram;
 
 	UINT8 m_LCD_memory_base;

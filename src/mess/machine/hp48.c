@@ -10,8 +10,6 @@
 #include "sound/dac.h"
 #include "cpu/saturn/saturn.h"
 
-#include "devices/xmodem.h"
-#include "devices/kermit.h"
 #include "machine/nvram.h"
 
 #include "includes/hp48.h"
@@ -153,8 +151,8 @@ void hp48_rs232_start_recv_byte( running_machine &machine, UINT8 data )
 static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 {
 	hp48_state *state = machine.driver_data<hp48_state>();
-	device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine.device("rs232_x"));
-	device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine.device("rs232_k"));
+	//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine.device("rs232_x"));
+	//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine.device("rs232_k"));
 
 	LOG_SERIAL(( "%f hp48_rs232_byte_sent_cb: end of send, data=%02x\n",
 		     machine.time().as_double(), param ));
@@ -168,11 +166,11 @@ static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 	}
 
 	/* protocol action */
-	if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
-	else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
-#ifdef CHARDEV
-	else chardev_out( state->m_chardev, param );
-#endif
+	//if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
+	//else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
+//#ifdef CHARDEV
+//	else chardev_out( state->m_chardev, param );
+//#endif
 }
 
 /* CPU initiates a send event */
@@ -564,15 +562,15 @@ static READ8_HANDLER ( hp48_io_r )
 	{
 		/* second nibble of received data */
 
-		device_image_interface *xmodem = dynamic_cast<device_image_interface *>(space->machine().device("rs232_x"));
-		device_image_interface *kermit = dynamic_cast<device_image_interface *>(space->machine().device("rs232_k"));
+		//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(space->machine().device("rs232_x"));
+		//device_image_interface *kermit = dynamic_cast<device_image_interface *>(space->machine().device("rs232_k"));
 
 		state->m_io[0x11] &= ~1;  /* clear byte received */
 		data = state->m_io[offset];
 
 		/* protocol action */
-		if ( xmodem && xmodem->exists() ) xmodem_byte_transmitted( &xmodem->device() );
-		else if ( kermit && kermit->exists() ) kermit_byte_transmitted( &kermit->device() );
+		//if ( xmodem && xmodem->exists() ) xmodem_byte_transmitted( &xmodem->device() );
+		//else if ( kermit && kermit->exists() ) kermit_byte_transmitted( &kermit->device() );
 		break;
 	}
 
