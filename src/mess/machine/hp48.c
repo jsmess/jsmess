@@ -37,20 +37,6 @@
 #define	HP48_MODULE_MASK_KNOWN   1
 #define HP48_MODULE_CONFIGURED   2
 
-/* port specification */
-struct hp48_port_config
-{
-	int port;                 /* port index: 0 or 1 (for port 1 and 2) */
-	int module;               /* memory module where the port is visible */
-	int max_size;             /* maximum size, in bytes 128 KB or 4 GB */
-
-	/* device instance names */
-	const char* brief_name;
-	const char* name;
-
-};
-
-
 /***************************************************************************
     GLOBAL VARIABLES & CONSTANTS
 ***************************************************************************/
@@ -985,18 +971,20 @@ static void hp48_encode_nibble( UINT8* dst, UINT8* src, int size )
 /* ----- card images ------ */
 
 /* port information configurations */
-const struct hp48_port_config hp48sx_port1_config = { 0, 2,    128*1024, "p1", "port1" };
-const struct hp48_port_config hp48sx_port2_config = { 1, 3,    128*1024, "p2", "port2" };
-const struct hp48_port_config hp48gx_port1_config = { 0, 3,    128*1024, "p1", "port1" };
-const struct hp48_port_config hp48gx_port2_config = { 1, 4, 4*1024*1024, "p2", "port2" };
+const struct hp48_port_interface hp48sx_port1_config = { 0, 2,    128*1024 };
+const struct hp48_port_interface hp48sx_port2_config = { 1, 3,    128*1024 };
+const struct hp48_port_interface hp48gx_port1_config = { 0, 3,    128*1024 };
+const struct hp48_port_interface hp48gx_port2_config = { 1, 4, 4*1024*1024 };
+
+const device_type HP48_PORT = &device_creator<hp48_port_image_device>;
 
 /* helper for load and create */
-static void hp48_fill_port( device_t* image )
+void hp48_port_image_device::hp48_fill_port()
 {
-	hp48_state *state = image->machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->static_config();
+	hp48_state *state = machine().driver_data<hp48_state>();
+	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	int size = state->m_port_size[conf->port];
-	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", conf->name, conf->module, size, state->m_port_write[conf->port] ));
+	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", tag(), conf->module, size, state->m_port_write[conf->port] ));
 	state->m_port_data[conf->port] = (UINT8*)malloc( 2 * size );
 	memset( state->m_port_data[conf->port], 0, 2 * size );
 	state->m_modules[conf->module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
@@ -1011,10 +999,10 @@ static void hp48_fill_port( device_t* image )
 }
 
 /* helper for start and unload */
-static void hp48_unfill_port( device_t* image )
+void hp48_port_image_device::hp48_unfill_port()
 {
-	hp48_state *state = image->machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->static_config();
+	hp48_state *state = machine().driver_data<hp48_state>();
+	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	state->m_modules[conf->module].off_mask = 0x00fff;  /* 2 KB */
 	state->m_modules[conf->module].read     = NULL;
 	state->m_modules[conf->module].write    = NULL;
@@ -1022,32 +1010,32 @@ static void hp48_unfill_port( device_t* image )
 }
 
 
-static DEVICE_IMAGE_LOAD( hp48_port )
+bool hp48_port_image_device::call_load()
 {
-	hp48_state *state = image.device().machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().static_config();
-	int size = image.length();
+	hp48_state *state = machine().driver_data<hp48_state>();
+	struct hp48_port_interface* conf = (struct hp48_port_interface*)static_config();
+	int size = length();
 	if ( size == 0 ) size = conf->max_size; /* default size */
 
 	/* check size */
 	if ( (size < 32*1024) || (size > conf->max_size) || (size & (size-1)) )
 	{
-		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", conf->name, 32*1024, conf->max_size );
+		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, conf->max_size );
 		return IMAGE_INIT_FAIL;
 	}
 
 	state->m_port_size[conf->port] = size;
-	state->m_port_write[conf->port] = !image.is_readonly();
-	hp48_fill_port( image );
-	image.fread(state->m_port_data[conf->port], state->m_port_size[conf->port] );
+	state->m_port_write[conf->port] = !is_readonly();
+	hp48_fill_port( );
+	fread(state->m_port_data[conf->port], state->m_port_size[conf->port] );
 	hp48_decode_nibble( state->m_port_data[conf->port], state->m_port_data[conf->port], state->m_port_size[conf->port] );
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_CREATE( hp48_port )
+bool hp48_port_image_device::call_create(int format_type, option_resolution *format_options)
 {
-	hp48_state *state = image.device().machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().static_config();
+	hp48_state *state = machine().driver_data<hp48_state>();
+	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	int size = conf->max_size;
 	/* XXX defaults to max_size; get user-specified size instead */
 
@@ -1055,64 +1043,48 @@ static DEVICE_IMAGE_CREATE( hp48_port )
 	/* size must be a power of 2 between 32K and max_size */
 	if ( (size < 32*1024) || (size > conf->max_size) || (size & (size-1)) )
 	{
-		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", conf->name, 32*1024, conf->max_size );
+		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", tag(), 32*1024, conf->max_size );
 		return IMAGE_INIT_FAIL;
 	}
 
 	state->m_port_size[conf->port] = size;
 	state->m_port_write[conf->port] = 1;
-	hp48_fill_port( image );
+	hp48_fill_port();
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_UNLOAD( hp48_port )
+void hp48_port_image_device::call_unload()
 {
-	hp48_state *state = image.device().machine().driver_data<hp48_state>();
-	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().static_config();
+	hp48_state *state = machine().driver_data<hp48_state>();
+	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	LOG(( "hp48_port image unload: %s size=%i rw=%i\n",
-	      conf->name, state->m_port_size[conf->port] ,state->m_port_write[conf->port] ));
+	      tag(), state->m_port_size[conf->port] ,state->m_port_write[conf->port] ));
 	if ( state->m_port_write[conf->port] )
 	{
 		hp48_encode_nibble( state->m_port_data[conf->port], state->m_port_data[conf->port], state->m_port_size[conf->port] );
-		image.fseek( 0, SEEK_SET );
-		image.fwrite( state->m_port_data[conf->port], state->m_port_size[conf->port] );
+		fseek( 0, SEEK_SET );
+		fwrite( state->m_port_data[conf->port], state->m_port_size[conf->port] );
 	}
 	free( state->m_port_data[conf->port] );
-	hp48_unfill_port( image );
+	hp48_unfill_port();
 	hp48_apply_modules(state);
 }
 
-static DEVICE_START( hp48_port )
+void hp48_port_image_device::device_start()
 {
-	hp48_unfill_port( device );
+	hp48_unfill_port();
 }
 
-DEVICE_GET_INFO( hp48_port )
+hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
 {
-	struct hp48_port_config* conf = device ? (struct hp48_port_config*) device->static_config() : NULL;
-	switch ( state )
-	{
-	case DEVINFO_INT_TOKEN_BYTES:                 info->i = 1;                                               break;
-	case DEVINFO_INT_INLINE_CONFIG_BYTES:         info->i = 0;                                               break;
-	case DEVINFO_INT_IMAGE_TYPE:	              info->i = IO_MEMCARD;                                      break;
-	case DEVINFO_INT_IMAGE_READABLE:              info->i = 1;                                               break;
-	case DEVINFO_INT_IMAGE_WRITEABLE:	      info->i = 1;                                               break;
-	case DEVINFO_INT_IMAGE_CREATABLE:	      info->i = 1;                                               break;
-	case DEVINFO_FCT_START:		              info->start = DEVICE_START_NAME( hp48_port );              break;
-	case DEVINFO_FCT_IMAGE_LOAD:		      info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( hp48_port );    break;
-	case DEVINFO_FCT_IMAGE_UNLOAD:		      info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( hp48_port );  break;
-	case DEVINFO_FCT_IMAGE_CREATE:		      info->f = (genf *) DEVICE_IMAGE_CREATE_NAME( hp48_port );  break;
-	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:   strcpy(info->s, conf ? conf->brief_name : "");                    break;
-	case DEVINFO_STR_IMAGE_INSTANCE_NAME:         strcpy(info->s, conf ? conf->name : "");                          break;
-	case DEVINFO_STR_NAME:		             strcpy( info->s, "HP48 memory card");	                         break;
-	case DEVINFO_STR_FAMILY:                      strcpy(info->s, "HP48 memory card");	                         break;
-	case DEVINFO_STR_SOURCE_FILE:		      strcpy(info->s, __FILE__);                                        break;
-	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	      strcpy(info->s, "crd");                                           break;
-	}
 }
 
-
-
+void hp48_port_image_device::device_config_complete()
+{	
+	update_names(HP48_PORT, "port", "p");
+}
 
 /***************************************************************************
     MACHINES
@@ -1265,5 +1237,3 @@ MACHINE_START( hp48gp )
 {
 	hp48_machine_start( machine, HP48_GP );
 }
-
-DEFINE_LEGACY_IMAGE_DEVICE(HP48_PORT, hp48_port);
