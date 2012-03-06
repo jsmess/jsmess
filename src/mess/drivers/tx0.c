@@ -398,22 +398,158 @@ static MACHINE_START( tx0 )
     perforated tape handling
 */
 
-static DEVICE_START( tx0_readtape ) {}
-static DEVICE_START( tx0_punchtape ) {}
-static DEVICE_START( tx0_typewriter ) {}
+class tx0_readtape_image_device :	public device_t,
+									public device_image_interface
+{
+public:
+	// construction/destruction
+	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_PUNCHTAPE; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 0; }
+	virtual bool is_creatable() const { return 0; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "tap,rim"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	virtual bool call_load();
+	virtual void call_unload();
+protected:
+	// device-level overrides
+    virtual void device_config_complete() { update_names(); }
+	virtual void device_start() { }
+};
+
+const device_type TX0_READTAPE = &device_creator<tx0_readtape_image_device>;
+
+tx0_readtape_image_device::tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, TX0_READTAPE, "TX0 Tape Reader", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+}
+
+class tx0_punchtape_image_device :	public device_t,
+									public device_image_interface
+{
+public:
+	// construction/destruction
+	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_PUNCHTAPE; }
+
+	virtual bool is_readable()  const { return 0; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "tap,rim"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	virtual bool call_load();
+	virtual void call_unload();
+protected:
+	// device-level overrides
+    virtual void device_config_complete() { update_names(); }
+	virtual void device_start() { }
+};
+
+const device_type TX0_PUNCHTAPE = &device_creator<tx0_punchtape_image_device>;
+
+tx0_punchtape_image_device::tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, TX0_PUNCHTAPE, "TX0 Tape Puncher", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+}
+
+
+class tx0_printer_image_device :	public device_t,
+									public device_image_interface
+{
+public:
+	// construction/destruction
+	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_PRINTER; }
+
+	virtual bool is_readable()  const { return 0; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "typ"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	virtual bool call_load();
+	virtual void call_unload();
+protected:
+	// device-level overrides
+    virtual void device_config_complete() { update_names(); }
+	virtual void device_start() { }
+};
+
+const device_type TX0_PRINTER = &device_creator<tx0_printer_image_device>;
+
+tx0_printer_image_device::tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, TX0_PRINTER, "TX0 Typewriter", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+}
+
+class tx0_magtape_image_device :	public device_t,
+									public device_image_interface
+{
+public:
+	// construction/destruction
+	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "tap"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+		
+	virtual bool call_load();
+	virtual void call_unload();
+protected:
+	// device-level overrides
+    virtual void device_config_complete() { update_names(); }
+	virtual void device_start();	
+};
+
+const device_type TX0_MAGTAPE = &device_creator<tx0_magtape_image_device>;
+
+tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, TX0_MAGTAPE, "TX0 Magnetic Tape", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+}
 
 /*
     Open a perforated tape image
 
     unit 0 is reader (read-only), unit 1 is puncher (write-only)
 */
-static DEVICE_IMAGE_LOAD( tx0_readtape )
+bool tx0_readtape_image_device::call_load()
 {
-	tx0_state *state = image.device().machine().driver_data<tx0_state>();
+	tx0_state *state = machine().driver_data<tx0_state>();
 
 	/* reader unit */
-	state->m_tape_reader.fd = &image;
+	state->m_tape_reader.fd = this;
 
 	/* start motor */
 	state->m_tape_reader.motor_on = 1;
@@ -439,9 +575,9 @@ static DEVICE_IMAGE_LOAD( tx0_readtape )
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_UNLOAD( tx0_readtape )
+void tx0_readtape_image_device::call_unload()
 {
-	tx0_state *state = image.device().machine().driver_data<tx0_state>();
+	tx0_state *state = machine().driver_data<tx0_state>();
 
 	/* reader unit */
 	state->m_tape_reader.fd = NULL;
@@ -545,19 +681,19 @@ static TIMER_CALLBACK(reader_callback)
 /*
     timer callback to generate punch completion pulse
 */
-static DEVICE_IMAGE_LOAD( tx0_punchtape )
+bool tx0_punchtape_image_device::call_load()
 {
-	tx0_state *state = image.device().machine().driver_data<tx0_state>();
+	tx0_state *state = machine().driver_data<tx0_state>();
 
 	/* punch unit */
-	state->m_tape_puncher.fd = &image;
+	state->m_tape_puncher.fd = this;
 
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_UNLOAD( tx0_punchtape )
+void tx0_punchtape_image_device::call_unload()
 {
-	tx0_state *state = image.device().machine().driver_data<tx0_state>();
+	tx0_state *state = machine().driver_data<tx0_state>();
 
 	/* punch unit */
 	state->m_tape_puncher.fd = NULL;
@@ -629,18 +765,18 @@ static void tx0_io_p7h(device_t *device)
 /*
     Open a file for typewriter output
 */
-static DEVICE_IMAGE_LOAD(tx0_typewriter)
+bool tx0_printer_image_device::call_load()
 {
-	tx0_state *state = image.device().machine().driver_data<tx0_state>();
+	tx0_state *state = machine().driver_data<tx0_state>();
 	/* open file */
-	state->m_typewriter.fd = &image;
+	state->m_typewriter.fd = this;
 
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_UNLOAD(tx0_typewriter)
+void tx0_printer_image_device::call_unload()
 {
-	tx0_state *state = image.device().machine().driver_data<tx0_state>();
+	tx0_state *state = machine().driver_data<tx0_state>();
 	state->m_typewriter.fd = NULL;
 }
 
@@ -763,19 +899,19 @@ static void schedule_unselect(tx0_state *state)
 	state->m_magtape.timer->adjust(delay);
 }
 
-static DEVICE_START( tx0_magtape )
+void tx0_magtape_image_device::device_start()
 {
-	tx0_state *state = device->machine().driver_data<tx0_state>();
-	state->m_magtape.img = dynamic_cast<device_image_interface *>(device);
+	tx0_state *state = machine().driver_data<tx0_state>();
+	state->m_magtape.img = this;
 }
 
 /*
     Open a magnetic tape image
 */
-static DEVICE_IMAGE_LOAD( tx0_magtape )
+bool tx0_magtape_image_device::call_load()
 {
-	tx0_state *state = image.device().machine().driver_data<tx0_state>();
-	state->m_magtape.img = &image;
+	tx0_state *state = machine().driver_data<tx0_state>();
+	state->m_magtape.img = this;
 
 	state->m_magtape.irg_pos = MTIRGP_END;
 
@@ -792,9 +928,9 @@ static DEVICE_IMAGE_LOAD( tx0_magtape )
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_UNLOAD( tx0_magtape )
+void tx0_magtape_image_device::call_unload()
 {
-	tx0_state *state = image.device().machine().driver_data<tx0_state>();
+	tx0_state *state = machine().driver_data<tx0_state>();
 	state->m_magtape.img = NULL;
 
 	if (state->m_magtape.timer)
@@ -805,7 +941,7 @@ static DEVICE_IMAGE_UNLOAD( tx0_magtape )
 		if ((state->m_magtape.state == MTS_SELECTED) || ((state->m_magtape.state == MTS_SELECTING) && (state->m_magtape.command == 2)))
 		{	/* unit has become unavailable */
 			state->m_magtape.state = MTS_UNSELECTING;
-			cpu_set_reg(image.device().machine().device("maincpu"), TX0_PF, cpu_get_reg(image.device().machine().device("maincpu"), TX0_PF) | PF_RWC);
+			cpu_set_reg(machine().device("maincpu"), TX0_PF, cpu_get_reg(machine().device("maincpu"), TX0_PF) | PF_RWC);
 			schedule_unselect(state);
 		}
 	}
@@ -1464,96 +1600,6 @@ static INTERRUPT_GEN( tx0_interrupt )
 		tx0_keyboard(device->machine());
 	}
 }
-
-
-
-static DEVICE_GET_INFO(tx0_readtape)
-{
-	switch(state)
-	{
-		case DEVINFO_INT_IMAGE_TYPE:			info->i = IO_PUNCHTAPE; break;
-		case DEVINFO_INT_IMAGE_READABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = 0; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = 0; break;
-		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
-
-		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(tx0_readtape); break;
-		case DEVINFO_FCT_IMAGE_LOAD:			info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(tx0_readtape); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(tx0_readtape); break;
-
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "TX0 Tape Reader"); break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "tap,rim"); break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(TX0_READTAPE, tx0_readtape);
-DEFINE_LEGACY_IMAGE_DEVICE(TX0_READTAPE, tx0_readtape);
-
-static DEVICE_GET_INFO(tx0_punchtape)
-{
-	switch(state)
-	{
-		case DEVINFO_INT_IMAGE_TYPE:			info->i = IO_PUNCHTAPE; break;
-		case DEVINFO_INT_IMAGE_READABLE:		info->i = 0; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
-
-		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(tx0_punchtape); break;
-		case DEVINFO_FCT_IMAGE_LOAD:			info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(tx0_punchtape); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(tx0_punchtape); break;
-
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "TX0 Tape Puncher"); break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "tap,rim"); break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(TX0_PUNCHTAPE, tx0_punchtape);
-DEFINE_LEGACY_IMAGE_DEVICE(TX0_PUNCHTAPE, tx0_punchtape);
-
-static DEVICE_GET_INFO(tx0_printer)
-{
-	switch(state)
-	{
-		case DEVINFO_INT_IMAGE_TYPE:			info->i = IO_PRINTER; break;
-		case DEVINFO_INT_IMAGE_READABLE:		info->i = 0; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
-
-		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(tx0_typewriter); break;
-		case DEVINFO_FCT_IMAGE_LOAD:			info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(tx0_typewriter); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(tx0_typewriter); break;
-
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "TX0 Typewriter"); break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "typ"); break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(TX0_PRINTER, tx0_printer);
-DEFINE_LEGACY_IMAGE_DEVICE(TX0_PRINTER, tx0_printer);
-
-static DEVICE_GET_INFO(tx0_magtape)
-{
-	switch(state)
-	{
-		case DEVINFO_INT_IMAGE_TYPE:			info->i = IO_MAGTAPE; break;
-		case DEVINFO_INT_IMAGE_READABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:		info->i = 1; break;
-
-		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(tx0_magtape); break;
-		case DEVINFO_FCT_IMAGE_LOAD:			info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(tx0_magtape); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:			info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(tx0_magtape); break;
-
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "TX0 Magnetic Tape"); break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "tap"); break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(TX0_MAGTAPE, tx0_magtape);
-DEFINE_LEGACY_IMAGE_DEVICE(TX0_MAGTAPE, tx0_magtape);
 
 static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	/* basic machine hardware */

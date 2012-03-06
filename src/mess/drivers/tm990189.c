@@ -449,9 +449,6 @@ protected:
 	virtual void device_start();
 };
 
-// device type definition
-extern const device_type TM990_189_RS232;
-
 const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
 
 tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

@@ -971,9 +971,6 @@ protected:
 	virtual void device_start();
 };
 
-// device type definition
-extern const device_type TI990_TAPE;
-
 const device_type TI990_TAPE = &device_creator<ti990_tape_image_device>;
 
 ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
