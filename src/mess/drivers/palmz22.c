@@ -95,7 +95,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	device_t *m_s3c2410;
-	device_t *m_nand;
+	nand_device *m_nand;
 
 	UINT32 m_port[8];
 };
@@ -110,20 +110,20 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
 	palmz22_state *state = device->machine().driver_data<palmz22_state>();
 	verboselog( device->machine(), 9, "s3c2410_nand_command_w %02X\n", data);
-	nand_command_w( state->m_nand, data);
+	state->m_nand->command_w(data);
 }
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 {
 	palmz22_state *state = device->machine().driver_data<palmz22_state>();
 	verboselog( device->machine(), 9, "s3c2410_nand_address_w %02X\n", data);
-	nand_address_w( state->m_nand, data);
+	state->m_nand->address_w(data);
 }
 
 static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 {
 	palmz22_state *state = device->machine().driver_data<palmz22_state>();
-	UINT8 data = nand_data_r( state->m_nand);
+	UINT8 data = state->m_nand->data_r();
 	verboselog( device->machine(), 9, "s3c2410_nand_data_r %02X\n", data);
 	return data;
 }
@@ -132,13 +132,13 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
 {
 	palmz22_state *state = device->machine().driver_data<palmz22_state>();
 	verboselog( device->machine(), 9, "s3c2410_nand_data_w %02X\n", data);
-	nand_data_w( state->m_nand, data);
+	state->m_nand->data_w(data);
 }
 
 ATTR_UNUSED static READ8_DEVICE_HANDLER( s3c2410_nand_busy_r )
 {
 	palmz22_state *state = device->machine().driver_data<palmz22_state>();
-	UINT8 data = nand_busy( state->m_nand);
+	UINT8 data = state->m_nand->is_busy();
 	verboselog( device->machine(), 9, "s3c2410_nand_busy_r %02X\n", data);
 	return data;
 }
@@ -241,8 +241,8 @@ static MACHINE_START( palmz22 )
 {
 	palmz22_state *state = machine.driver_data<palmz22_state>();
 	state->m_s3c2410 = machine.device( "s3c2410");
-	state->m_nand = machine.device( "nand");
-	nand_set_data_ptr( state->m_nand, machine.region("nand")->base());
+	state->m_nand = machine.device<nand_device>("nand");
+	state->m_nand->set_data_ptr( machine.region("nand")->base());
 }
 
 static MACHINE_RESET( palmz22 )

@@ -79,11 +79,11 @@ static void smc_init( running_machine &machine)
 
 static UINT8 smc_read( running_machine &machine)
 {
-	device_t *smartmedia = machine.device( "smartmedia");
+	smartmedia_image_device *smartmedia = machine.device<smartmedia_image_device>( "smartmedia");
 	UINT8 data;
-	if (smartmedia_present( smartmedia))
+	if (smartmedia->is_present())
 	{
-		data = smartmedia_data_r( smartmedia);
+		data = smartmedia->data_r();
 	}
 	else
 	{
@@ -96,24 +96,24 @@ static UINT8 smc_read( running_machine &machine)
 static void smc_write( running_machine &machine, UINT8 data)
 {
 	juicebox_state *state = machine.driver_data<juicebox_state>();
-	device_t *smartmedia = machine.device( "smartmedia");
+	smartmedia_image_device *smartmedia = machine.device<smartmedia_image_device>( "smartmedia");
 	verboselog( machine, 5, "smc_write %08X\n", data);
-	if (smartmedia_present( smartmedia))
+	if (smartmedia->is_present())
 	{
 		if (state->smc.cmd_latch)
 		{
 			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
-			smartmedia_command_w( smartmedia, data);
+			smartmedia->command_w(data);
 		}
 		else if (state->smc.add_latch)
 		{
 			verboselog( machine, 5, "smartmedia_address_w %08X\n", data);
-			smartmedia_address_w( smartmedia, data);
+			smartmedia->address_w(data);
 		}
 		else
 		{
 			verboselog( machine, 5, "smartmedia_data_w %08X\n", data);
-			smartmedia_data_w( smartmedia, data);
+			smartmedia->data_w(data);
 		}
 	}
 }

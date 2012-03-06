@@ -38,7 +38,6 @@
 *****************************************************************************/
 
 #include "tn_usbsm.h"
-#include "machine/smartmed.h"
 #include "machine/strata.h"
 
 #define BUFFER_TAG "ram"
@@ -69,7 +68,7 @@ UINT16 nouspikel_usb_smartmedia_device::usbsm_mem_16_r(offs_t offset)
 		if ((m_cru_register & IO_REGS_ENABLE) && (offset >= 0x27f8))
 		{	/* SmartMedia interface */
 			if (offset == 0)
-				reply = smartmedia_data_r(m_smartmedia) << 8;
+				reply = m_smartmedia->data_r() << 8;
 		}
 		else
 		{	/* FEEPROM */
@@ -102,13 +101,13 @@ void nouspikel_usb_smartmedia_device::usbsm_mem_16_w(offs_t offset, UINT16 data)
 			switch (offset & 3)
 			{
 			case 0:
-				smartmedia_data_w(m_smartmedia, data >> 8);
+				m_smartmedia->data_w(data >> 8);
 				break;
 			case 1:
-				smartmedia_address_w(m_smartmedia, data >> 8);
+				m_smartmedia->address_w(data >> 8);
 				break;
 			case 2:
-				smartmedia_command_w(m_smartmedia, data >> 8);
+				m_smartmedia->command_w(data >> 8);
 				break;
 			case 3:
 				/* bogus, don't use(?) */
@@ -160,9 +159,9 @@ void nouspikel_usb_smartmedia_device::crureadz(offs_t offset, UINT8 *value)
 			//             1: Card absent or not protected.
 
 			reply = 0x33;
-			if (!smartmedia_present(m_smartmedia))
+			if (!m_smartmedia->is_present())
 				reply |= 0xc0;
-			else if (!smartmedia_protected(m_smartmedia))
+			else if (!m_smartmedia->is_protected())
 				reply |= 0x80;
 		}
 		*value = reply;
@@ -269,7 +268,7 @@ void nouspikel_usb_smartmedia_device::device_start()
 {
 	m_ram = (UINT16*)subregion(BUFFER_TAG)->base();
 	/* auto_alloc_array(device->machine(), UINT16, 0x100000/2); */
-	m_smartmedia = subdevice("smartmedia");
+	m_smartmedia = subdevice<smartmedia_image_device>("smartmedia");
 	m_strata = subdevice("strata");
 }
 
