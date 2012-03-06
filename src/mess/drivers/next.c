@@ -420,6 +420,7 @@ void next_state::dma_end(int slot)
 		ds.limit = ds.chain_limit;
 		ds.restart = true;
 		ds.supdate = false;
+		ds.state &= ~DMA_SUPDATE;
 	}
 	ds.state |= DMA_COMPLETE;
 	if(dma_irqs[slot] >= 0)
