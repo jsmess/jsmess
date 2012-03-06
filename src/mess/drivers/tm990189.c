@@ -420,82 +420,87 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )
 	machine().device<cassette_image_device>(CASSETTE_TAG)->output(state ? +1.0 : -1.0);
 }
 
-/*
-    serial interface
-*/
-
-static TIMER_CALLBACK(rs232_input_callback)
+class tm990_189_rs232_image_device :	public device_t,
+									public device_image_interface
 {
+public:
+	// construction/destruction
+	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_SERIAL; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return ""; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	
+	virtual bool call_load();
+	virtual void call_unload();
+protected:
+	// device-level overrides
+    virtual void device_config_complete();
+	virtual void device_start();
+};
+
+// device type definition
+extern const device_type TM990_189_RS232;
+
+const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
+
+tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+}
+
+void tm990_189_rs232_image_device::device_config_complete()
+{	
+	update_names();
+}
+
+void tm990_189_rs232_image_device::device_start()
+{
+
+}
+
+void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{	
 	//tm990189_state *state = machine.driver_data<tm990189_state>();
 	UINT8 buf;
-	device_image_interface *image = (device_image_interface *)(ptr);
 	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)
 	{
-		tms9902_device* tms9902 = static_cast<tms9902_device*>(machine.device("tms9902"));
-		if (image->fread(&buf, 1) == 1)
+		tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
+		if (fread(&buf, 1) == 1)
 			tms9902->rcv_data(buf);
 	}
 }
 
-/*
-    Initialize rs232 unit and open image
-*/
-static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
+bool tm990_189_rs232_image_device::call_load()
 {
-	tm990189_state *state = image.device().machine().driver_data<tm990189_state>();
-	tms9902_device* tms9902 = static_cast<tms9902_device*>(image.device().machine().device("tms9902"));
+	tm990189_state *state = machine().driver_data<tm990189_state>();
+	tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
 	tms9902->rcv_dsr(ASSERT_LINE);
-	state->m_rs232_input_timer = image.device().machine().scheduler().timer_alloc(FUNC(rs232_input_callback), (void*)image);
+	state->m_rs232_input_timer = timer_alloc();
 	state->m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
 	return IMAGE_INIT_PASS;
 }
 
-/*
-    close a rs232 image
-*/
-static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
+
+void tm990_189_rs232_image_device::call_unload()
 {
-	tm990189_state *state = image.device().machine().driver_data<tm990189_state>();
-	tms9902_device* tms9902 = static_cast<tms9902_device*>(image.device().machine().device("tms9902"));
+	tm990189_state *state = machine().driver_data<tm990189_state>();
+	tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
 	tms9902->rcv_dsr(CLEAR_LINE);
 
 	state->m_rs232_input_timer->reset();	/* FIXME - timers should only be allocated once */
 }
-
-static DEVICE_START(tm990_189_rs232)
-{
-}
-
-static DEVICE_RESET(tm990_189_rs232)
-{
-}
-
-DEVICE_GET_INFO( tm990_189_rs232 )
-{
-	switch ( state )
-	{
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = 0;											break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
-		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_SERIAL;                                	break;
-		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                        	break;
-
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( tm990_189_rs232 ); 	break;
-		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( tm990_189_rs232 );		break;
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( tm990_189_rs232 );    break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME( tm990_189_rs232 );    break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "TM990/189 RS232 port");	            break;
-		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Serial port");	                        break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                    break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");									break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);								break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MESS Team"); 			break;
-	}
-}
-
-DECLARE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
-DEFINE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
 
 #define MCFG_TM990_189_RS232_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TM990_189_RS232, 0)
