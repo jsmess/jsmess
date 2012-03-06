@@ -370,7 +370,7 @@ void ncr5390_device::step(bool timeout)
 		switch(xfr_phase) {
 		case S_PHASE_DATA_OUT:
 			dma_set(DMA_OUT);
-			if(tcount == 1)
+			if(tcount == 0 && fifo_pos == 1)
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
 			state = INIT_XFR_SEND_BYTE;
 			send_byte();
@@ -404,7 +404,7 @@ void ncr5390_device::step(bool timeout)
 		break;
 
 	case INIT_XFR_SEND_BYTE:
-		if(tcount == 0)
+		if(tcount == 0 && fifo_pos == 0)
 			bus_complete();
 		else
 			state = INIT_XFR_WAIT_REQ;
@@ -812,7 +812,7 @@ WRITE8_MEMBER(ncr5390_device::clock_w)
 void ncr5390_device::dma_set(int dir)
 {
 	dma_dir = dir;
-	if(dma_dir == DMA_OUT && fifo_pos != 16)
+	if(dma_dir == DMA_OUT && fifo_pos != 16 && tcount != 0)
 		drq_set();
 }
 
