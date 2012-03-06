@@ -100,9 +100,10 @@
     active.
     The technical specifications are not clear enough at this point.
 
-    FIXME: Re-flashing the at29040 chips is only possible when they are deleted
-    before. The files must be removed from the nvram directory. May also be a bug
-    of the loader program DSRLDR3.
+    FIXME: Re-flashing the at29040 chips is only possible when the DSR Flashrom
+    U9 is deleted before. The file must be removed from the nvram directory.
+    May also be a bug of the loader program DSRLDR3.
+    (Detail: The DSRLDR program fails to flash part 3/8 of the flash rom.)
 
     Raphael Nabet, 2003.
 
@@ -401,7 +402,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 */
 void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask)
 {
-	if (m_card_enabled || m_flash_mode)
+	if (!m_card_enabled || m_flash_mode)
 	{
 		if (VERBOSE>2) LOG("hsgpl cart write ignored: card_enabled=%02x\n", m_card_enabled);
 		return;
