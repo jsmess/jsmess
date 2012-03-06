@@ -9,7 +9,6 @@
 #include <stdarg.h>
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/ti85_ser.h"
 #include "includes/ti85.h"
 
 #define TI85_SNAPSHOT_SIZE	 32976
@@ -298,11 +297,11 @@ READ8_HANDLER ( ti8x_serial_r )
 {
 	ti85_state *state = space->machine().driver_data<ti85_state>();
 
-	ti85_update_serial(state->m_serial);
+	//ti85_update_serial(state->m_serial);
 	return (state->m_white_out<<3)
 		| (state->m_red_out<<2)
-		| ((ti85serial_white_in(state->m_serial,0)&(1-state->m_white_out))<<1)
-		| (ti85serial_red_in(state->m_serial,0)&(1-state->m_red_out))
+		//| ((ti85serial_white_in(state->m_serial,0)&(1-state->m_white_out))<<1)
+		//| (ti85serial_red_in(state->m_serial,0)&(1-state->m_red_out))
 		| state->m_PCR;
 }
 
@@ -356,11 +355,11 @@ READ8_HANDLER ( ti8x_plus_serial_r )
 {
 	ti85_state *state = space->machine().driver_data<ti85_state>();
 
-	ti85_update_serial(state->m_serial);
+	//ti85_update_serial(state->m_serial);
 	return (state->m_white_out<<3)
 		| (state->m_red_out<<2)
-		| ((ti85serial_white_in(state->m_serial,0)&(1-state->m_white_out))<<1)
-		| (ti85serial_red_in(state->m_serial,0)&(1-state->m_red_out))
+		//| ((ti85serial_white_in(state->m_serial,0)&(1-state->m_white_out))<<1)
+		//| (ti85serial_red_in(state->m_serial,0)&(1-state->m_red_out))
 		| state->m_PCR;
 }
 
@@ -432,9 +431,9 @@ WRITE8_HANDLER ( ti8x_serial_w )
 	speaker_level_w(state->m_speaker, ( (data>>2)|(data>>3) ) & 0x01);
 	state->m_red_out=(data>>2)&0x01;
 	state->m_white_out=(data>>3)&0x01;
-	ti85serial_red_out( state->m_serial, 0, state->m_red_out );
-	ti85serial_white_out( state->m_serial, 0, state->m_white_out );
-	ti85_update_serial(state->m_serial);
+	//ti85serial_red_out( state->m_serial, 0, state->m_red_out );
+	//ti85serial_white_out( state->m_serial, 0, state->m_white_out );
+	//ti85_update_serial(state->m_serial);
 	state->m_PCR = data&0xf0;
 }
 
@@ -492,9 +491,9 @@ WRITE8_HANDLER ( ti8x_plus_serial_w )
 	speaker_level_w(state->m_speaker,( (data>>0)|(data>>1) )&0x01 );
 	state->m_red_out=(data>>0)&0x01;
 	state->m_white_out=(data>>1)&0x01;
-	ti85serial_red_out( state->m_serial, 0, state->m_red_out );
-	ti85serial_white_out( state->m_serial, 0, state->m_white_out );
-	ti85_update_serial(state->m_serial);
+	//ti85serial_red_out( state->m_serial, 0, state->m_red_out );
+	//ti85serial_white_out( state->m_serial, 0, state->m_white_out );
+	//ti85_update_serial(state->m_serial);
 	state->m_PCR = data&0xf0;
 }
 

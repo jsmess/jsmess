@@ -1103,8 +1103,6 @@ $(MESSOBJ)/hp.a:				\
 	$(MESS_MACHINE)/hp48.o		\
 	$(MESS_VIDEO)/hp48.o		\
 	$(MESS_DRIVERS)/hp48.o		\
-	$(MESS_DEVICES)/xmodem.o	\
-	$(MESS_DEVICES)/kermit.o	\
 	$(MESS_DRIVERS)/hp16500.o	\
 	$(MESS_DRIVERS)/hp49gp.o	\
 	$(MESS_DRIVERS)/hp9k.o	\
@@ -1638,7 +1636,6 @@ $(MESSOBJ)/thomson.a:			\
 
 $(MESSOBJ)/ti.a:				\
 	$(MESS_DRIVERS)/ti85.o		\
-	$(MESS_MACHINE)/ti85_ser.o	\
 	$(MESS_VIDEO)/ti85.o		\
 	$(MESS_VIDEO)/t6a04.o		\
 	$(MESS_MACHINE)/ti85.o		\

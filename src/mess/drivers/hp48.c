@@ -7,8 +7,6 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "devices/xmodem.h"
-#include "devices/kermit.h"
 #include "cpu/saturn/saturn.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"
@@ -784,8 +782,8 @@ INPUT_PORTS_END
 
 /**************************** I/O **********************************/
 
-static const xmodem_config hp48_xmodem_rs232_conf = { &hp48_rs232_start_recv_byte };
-static const kermit_config hp48_kermit_rs232_conf = { &hp48_rs232_start_recv_byte };
+//static const xmodem_config hp48_xmodem_rs232_conf = { &hp48_rs232_start_recv_byte };
+//static const kermit_config hp48_kermit_rs232_conf = { &hp48_rs232_start_recv_byte };
 
 
 /**************************** ROMs *********************************/
@@ -976,8 +974,8 @@ static MACHINE_CONFIG_DERIVED( hp48gx, hp48_common )
 	MCFG_HP48_PORT_ADD ( "port2", hp48gx_port2_config )
 
 	/* serial I/O */
-	MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48g, hp48_common )
@@ -985,8 +983,8 @@ static MACHINE_CONFIG_DERIVED( hp48g, hp48_common )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48g )
 
 	/* serial I/O */
-	MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 
@@ -995,8 +993,8 @@ static MACHINE_CONFIG_DERIVED( hp48gp, hp48_common )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48gp )
 
 	/* serial I/O */
-	MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 
@@ -1011,7 +1009,7 @@ static MACHINE_CONFIG_DERIVED( hp48sx, hp48_common )
 	MCFG_HP48_PORT_ADD  ( "port2", hp48sx_port2_config )
 
 	/* serial I/O */
-	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48s, hp48_common )
@@ -1021,7 +1019,7 @@ static MACHINE_CONFIG_DERIVED( hp48s, hp48_common )
 	MCFG_DEFAULT_LAYOUT ( layout_hp48s )
 
 	/* serial I/O */
-	MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 
