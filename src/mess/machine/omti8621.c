@@ -1198,9 +1198,53 @@ DEVICE_GET_INFO( omti8621 )
 DEFINE_LEGACY_DEVICE(OMTI8621, omti8621);
 
 //##########################################################################
+class omti_disk_image_device :	public device_t,
+								public device_image_interface
+{
+public:
+	// construction/destruction
+	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-DECLARE_LEGACY_IMAGE_DEVICE(OMTI_DISK0, omti_disk0);
-DECLARE_LEGACY_IMAGE_DEVICE(OMTI_DISK1, omti_disk1);
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_HARDDISK; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "awd"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	virtual bool call_create(int format_type, option_resolution *format_options);
+	
+	disk_data *token() { return &m_token; }	
+protected:
+	// device-level overrides
+    virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	
+	disk_data m_token;
+};
+
+// device type definition
+extern const device_type OMTI_DISK;
+
+const device_type OMTI_DISK = &device_creator<omti_disk_image_device>;
+
+omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, OMTI_DISK, "Winchester", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
+}
+
+void omti_disk_image_device::device_config_complete()
+{	
+	update_names(OMTI_DISK, "disk", "disk");
+};
+
 
 /***************************************************************************
  get_safe_disk_token - makes sure that the passed in device is a OMTI disk
@@ -1208,8 +1252,8 @@ DECLARE_LEGACY_IMAGE_DEVICE(OMTI_DISK1, omti_disk1);
 
 INLINE disk_data *get_safe_disk_token(device_t *device) {
 	assert(device != NULL);
-	assert(device->type() == OMTI_DISK0 || device->type() == OMTI_DISK1);
-	return (disk_data *) downcast<legacy_device_base *>(device)->token();
+	assert(device->type() == OMTI_DISK);
+	return (disk_data *) downcast<omti_disk_image_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -1245,14 +1289,14 @@ static void omti_disk_config(disk_data *disk, UINT16 disk_type)
     device start callback
 -------------------------------------------------*/
 
-static DEVICE_START( omti_disk )
+void omti_disk_image_device::device_start()
 {
-	disk_data *disk = get_safe_disk_token(device);
+	disk_data *disk = get_safe_disk_token(this);
 
-	disk->device = device;
+	disk->device = this;
 	// note: we must have disk->device before we can log
 
-	disk->image = dynamic_cast<device_image_interface *> (disk->device);
+	disk->image = this;
 
 	if (disk->image->image_core_file() == NULL)
 	{
@@ -1271,14 +1315,14 @@ static DEVICE_START( omti_disk )
     device reset callback
 -------------------------------------------------*/
 
-static DEVICE_RESET( omti_disk )
+void omti_disk_image_device::device_reset()
 {
-	disk_data *disk = get_safe_disk_token(device);
+	disk_data *disk = get_safe_disk_token(this);
 	DLOG1(("device_reset_omti_disk"));
 
-	if (disk->image->exists() && disk->image->fseek(0, SEEK_END) == 0)
+	if (exists() && fseek(0, SEEK_END) == 0)
 	{
-		UINT32 disk_size = (UINT32)(disk->image->ftell() / OMTI_DISK_SECTOR_SIZE);
+		UINT32 disk_size = (UINT32)(ftell() / OMTI_DISK_SECTOR_SIZE);
 		UINT16 disk_type = disk_size >= 300000 ? OMTI_DISK_TYPE_348_MB : OMTI_DISK_TYPE_155_MB;
 		if (disk_type != disk->type) {
 			DLOG1(("device_reset_omti_disk: disk size=%d blocks, disk type=%x", disk_size, disk_type ));
@@ -1291,9 +1335,9 @@ static DEVICE_RESET( omti_disk )
    disk image create callback
 -------------------------------------------------*/
 
-DEVICE_IMAGE_CREATE( omti_disk )
+bool omti_disk_image_device::call_create(int format_type, option_resolution *format_options)
 {
-	disk_data *disk = get_safe_disk_token(&image.device());
+	disk_data *disk = get_safe_disk_token(this);
 	DLOG(("device_create_omti_disk: creating OMTI Disk with %d blocks", disk->sector_count));
 
 	int x;
@@ -1303,7 +1347,7 @@ DEVICE_IMAGE_CREATE( omti_disk )
 	memset(sectordata, 0x55, sizeof(sectordata));
 	for (x = 0; x < disk->sector_count; x++)
 	{
-		if (image.fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
+		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
 				< OMTI_DISK_SECTOR_SIZE)
 		{
 			return IMAGE_INIT_FAIL;
@@ -1312,62 +1356,8 @@ DEVICE_IMAGE_CREATE( omti_disk )
 	return IMAGE_INIT_PASS;
 }
 
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( omti_disk0 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(disk_data);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;			break;
-		case DEVINFO_INT_IMAGE_TYPE:			info->i = IO_HARDDISK;	break;
-		case DEVINFO_INT_IMAGE_READABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(omti_disk); break;
-		case DEVINFO_FCT_STOP:					/* Nothing */								break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(omti_disk); break;
-//      case DEVINFO_FCT_IMAGE_LOAD:            info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(omti_disk); break;
-//      case DEVINFO_FCT_IMAGE_UNLOAD:          info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(omti_disk); break;
-		case DEVINFO_FCT_IMAGE_CREATE:			info->f = (genf *)DEVICE_IMAGE_CREATE_NAME(omti_disk);	break;
-
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Winchester");	break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Winchester");	break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");			break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);		break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:		strcpy(info->s, "disk");	break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	strcpy(info->s, "disk");	break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "awd"); 	break;
-	}
-}
-
-DEVICE_GET_INFO( omti_disk1 )
-{
-	switch (state)
-	{
-	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case DEVINFO_STR_NAME:						strcpy(info->s, "Winchester 1");	break;
-	case DEVINFO_STR_IMAGE_INSTANCE_NAME:		strcpy(info->s, "disk1");			break;
-	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	strcpy(info->s, "disk1");			break;
-
-	default:									DEVICE_GET_INFO_CALL( omti_disk0 ); break;
-	}
-}
-
-DEFINE_LEGACY_IMAGE_DEVICE(OMTI_DISK0, omti_disk0);
-DEFINE_LEGACY_IMAGE_DEVICE(OMTI_DISK1, omti_disk1);
-
 MACHINE_CONFIG_FRAGMENT( omti_disk )
-	MCFG_DEVICE_ADD(OMTI_DISK0_TAG, OMTI_DISK0, 0)
-	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK1, 0)
+	MCFG_DEVICE_ADD(OMTI_DISK0_TAG, OMTI_DISK, 0)
+	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
 MACHINE_CONFIG_END
 

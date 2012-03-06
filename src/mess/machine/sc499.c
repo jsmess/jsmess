@@ -148,11 +148,6 @@ sc499_device *sc499_device::m_device;
 #define SC499_TIMER_6 6
 #define SC499_TIMER_7 7
 
-typedef struct _ctape_data ctape_data;
-struct _ctape_data
-{
-	device_image_interface *image;
-};
 
 /***************************************************************************
     IMPLEMENTATION
@@ -196,8 +191,7 @@ void sc499_device::device_start()
 	m_timer1 = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_func), this);
 
 	device_t *ctape_device = machine().device(SC499_CTAPE_TAG);
-	ctape_data *ctape = (ctape_data *) downcast<legacy_device_base *> (ctape_device)->token();
-	m_image = ctape->image;
+	m_image = dynamic_cast<device_image_interface *> (ctape_device);
 
 	if (m_image->image_core_file() == NULL)
 	{
@@ -1144,53 +1138,45 @@ void sc499_set_verbose(int on_off)
 }
 
 //##########################################################################
-
-DECLARE_LEGACY_IMAGE_DEVICE(SC499_CTAPE, sc499_ctape);
-
-/*-------------------------------------------------
-    ctape device start callback
--------------------------------------------------*/
-
-static DEVICE_START( sc499_ctape )
+class sc499_ctape_image_device :	public device_t,
+									public device_image_interface
 {
-	assert(device != NULL);
-	assert(device->type() == SC499_CTAPE);
-	ctape_data *ctape = (ctape_data *) downcast<legacy_device_base *>(device)->token();
+public:
+	// construction/destruction
+	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	ctape->image = dynamic_cast<device_image_interface *> (device);
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "act"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+protected:
+	// device-level overrides
+    virtual void device_config_complete();
+	virtual void device_start() { };
+};
+
+// device type definition
+extern const device_type SC499_CTAPE;
+
+const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
+
+sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
 }
 
-/*-------------------------------------------------
-    ctape device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( sc499_ctape )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ctape_data); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break;
-		case DEVINFO_INT_IMAGE_TYPE:			info->i = IO_MAGTAPE; break;
-		case DEVINFO_INT_IMAGE_READABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:		info->i = 1; break;
-		case DEVINFO_INT_IMAGE_CREATABLE:		info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(sc499_ctape); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Cartridge Tape");	break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Cartridge Tape");	break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");				break;
-
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:		strcpy(info->s, "ctape");		break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	strcpy(info->s, "ct");			break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:		strcpy(info->s, "act"); 		break;
-	}
-}
-
-DEFINE_LEGACY_IMAGE_DEVICE(SC499_CTAPE, sc499_ctape);
+void sc499_ctape_image_device::device_config_complete()
+{	
+	update_names(SC499_CTAPE, "ctape", "ct");
+};
 
 MACHINE_CONFIG_FRAGMENT( sc499_ctape )
 	MCFG_DEVICE_ADD(SC499_CTAPE_TAG, SC499_CTAPE, 0)
