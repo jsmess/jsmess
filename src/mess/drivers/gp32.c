@@ -966,9 +966,9 @@ static void smc_init( running_machine &machine)
 
 static UINT8 smc_read( running_machine &machine)
 {
-	device_t *smartmedia = machine.device( "smartmedia");
+	smartmedia_image_device *smartmedia = machine.device<smartmedia_image_device>( "smartmedia");
 	UINT8 data;
-	data = smartmedia_data_r( smartmedia);
+	data = smartmedia->data_r();
 	verboselog( machine, 5, "smc_read %08X\n", data);
 	return data;
 }
@@ -979,21 +979,21 @@ static void smc_write( running_machine &machine, UINT8 data)
 	verboselog( machine, 5, "smc_write %08X\n", data);
 	if ((state->m_smc.chip) && (!state->m_smc.read))
 	{
-		device_t *smartmedia = machine.device( "smartmedia");
+		smartmedia_image_device *smartmedia = machine.device<smartmedia_image_device>( "smartmedia");
 		if (state->m_smc.cmd_latch)
 		{
 			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
-			smartmedia_command_w( smartmedia, data);
+			smartmedia->command_w(data);
 		}
 		else if (state->m_smc.add_latch)
 		{
 			verboselog( machine, 5, "smartmedia_address_w %08X\n", data);
-			smartmedia_address_w( smartmedia, data);
+			smartmedia->address_w(data);
 		}
 		else
 		{
 			verboselog( machine, 5, "smartmedia_data_w %08X\n", data);
-			smartmedia_data_w( smartmedia, data);
+			smartmedia->data_w(data);
 		}
 	}
 }
@@ -1104,25 +1104,25 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PDDAT
 		case 0x24 / 4 :
 		{
-			device_t *smartmedia = machine.device( "smartmedia");
+			smartmedia_image_device *smartmedia = machine.device<smartmedia_image_device>( "smartmedia");
 			// smartmedia
 			data = (data & ~0x000003C0);
 			if (!state->m_smc.busy) data = data | 0x00000200;
 			if (!state->m_smc.do_read) data = data | 0x00000100;
 			if (!state->m_smc.chip) data = data | 0x00000080;
-			if (!smartmedia_protected( smartmedia)) data = data | 0x00000040;
+			if (!smartmedia->is_protected()) data = data | 0x00000040;
 		}
 		break;
 		// PEDAT
 		case 0x30 / 4 :
 		{
-			device_t *smartmedia = machine.device( "smartmedia");
+			smartmedia_image_device *smartmedia = machine.device<smartmedia_image_device>( "smartmedia");
 			// smartmedia
 			data = (data & ~0x0000003C);
 			if (state->m_smc.cmd_latch) data = data | 0x00000020;
 			if (state->m_smc.add_latch) data = data | 0x00000010;
 			if (!state->m_smc.do_write) data = data | 0x00000008;
-			if (!smartmedia_present( smartmedia)) data = data | 0x00000004;
+			if (!smartmedia->is_present()) data = data | 0x00000004;
 			// buttons
 			data = (data & ~0x000000C0) | (input_port_read( machine, "IN1") & 0x000000C0);
 		}

@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "ti99defs.h"
 #include "peribox.h"
+#include "machine/smartmed.h"
 
 extern const device_type TI99_USBSM;
 
@@ -38,7 +39,7 @@ protected:
 private:
 	UINT16		usbsm_mem_16_r(offs_t offset);
 	void		usbsm_mem_16_w(offs_t offset, UINT16 data);
-	device_t*	m_smartmedia;
+	smartmedia_image_device*	m_smartmedia;
 	device_t*	m_strata;
 
 	int			m_feeprom_page;

@@ -37,7 +37,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	device_t *m_s3c2440;
-	device_t *m_nand;
+	nand_device *m_nand;
 	device_t *m_dac[2];
 
 	UINT32 m_port[9];
@@ -110,25 +110,25 @@ static int s3c2440_core_pin_r( device_t *device, int pin)
 static WRITE8_DEVICE_HANDLER( s3c2440_nand_command_w )
 {
 	mini2440_state *state = device->machine().driver_data<mini2440_state>();
-	nand_command_w( state->m_nand, data);
+	state->m_nand->command_w(data);
 }
 
 static WRITE8_DEVICE_HANDLER( s3c2440_nand_address_w )
 {
 	mini2440_state *state = device->machine().driver_data<mini2440_state>();
-	nand_address_w( state->m_nand, data);
+	state->m_nand->address_w(data);
 }
 
 static READ8_DEVICE_HANDLER( s3c2440_nand_data_r )
 {
 	mini2440_state *state = device->machine().driver_data<mini2440_state>();
-	return nand_data_r( state->m_nand);
+	return state->m_nand->data_r();
 }
 
 static WRITE8_DEVICE_HANDLER( s3c2440_nand_data_w )
 {
 	mini2440_state *state = device->machine().driver_data<mini2440_state>();
-	nand_data_w( state->m_nand, data);
+	state->m_nand->data_w(data);
 }
 
 // I2S
@@ -167,10 +167,10 @@ static MACHINE_START( mini2440 )
 {
 	mini2440_state *state = machine.driver_data<mini2440_state>();
 	state->m_s3c2440 = machine.device( "s3c2440");
-	state->m_nand = machine.device( "nand");
+	state->m_nand = machine.device<nand_device>( "nand");
 	state->m_dac[0] = machine.device( "dac1");
 	state->m_dac[1] = machine.device( "dac2");
-	nand_set_data_ptr( state->m_nand, machine.region("nand")->base());
+	state->m_nand->set_data_ptr(machine.region("nand")->base());
 }
 
 static MACHINE_RESET( mini2440 )
