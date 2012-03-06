@@ -130,55 +130,6 @@ INLINE tap_990_t *get_safe_token(device_t *device)
 	return (tap_990_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-static DEVICE_START( ti990_tape )
-{
-	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(device->owner());
-	int id = tape_get_id(device);
-
-	t = &tpc->t[id];
-	memset(t, 0, sizeof(*t));
-
-	t->img = dynamic_cast<device_image_interface *>(device);
-	t->wp = 1;
-	t->bot = 0;
-	t->eot = 0;
-}
-
-/*
-    Open a tape image
-*/
-static DEVICE_IMAGE_LOAD( ti990_tape )
-{
-	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(image.device().owner());
-	int id = tape_get_id(&image.device());
-
-	t = &tpc->t[id];
-	memset(t, 0, sizeof(*t));
-
-	/* tell whether the image is writable */
-	t->wp = image.is_readonly();
-
-	t->bot = 1;
-
-	return IMAGE_INIT_PASS;
-}
-
-/*
-    Close a tape image
-*/
-static DEVICE_IMAGE_UNLOAD( ti990_tape )
-{
-	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(image.device().owner());
-	int id = tape_get_id(&image.device());
-
-	t = &tpc->t[id];
-	t->wp = 1;
-	t->bot = 0;
-	t->eot = 0;
-}
 
 /*
     Parse the tape select lines, and return the corresponding tape unit.
@@ -993,34 +944,98 @@ WRITE16_DEVICE_HANDLER(ti990_tpc_w)
 	}
 }
 
-DEVICE_GET_INFO( ti990_tape )
+class ti990_tape_image_device :	public device_t,
+									public device_image_interface
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ti990_tape_t);								break;
-		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_MAGTAPE;										break;
-		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1;												break;
-		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1;												break;
-		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 0;												break;
+public:
+	// construction/destruction
+	ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ti990_tape);					break;
-		case DEVINFO_FCT_IMAGE_LOAD:					info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(ti990_tape);		break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:					info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(ti990_tape);		break;
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
 
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "tap"); 									break;
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "TI990 Magnetic Tape");			break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Magnetic Tape");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);									break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
-	}
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "tap"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+	
+	virtual bool call_load();
+	virtual void call_unload();
+protected:
+	// device-level overrides
+    virtual void device_config_complete();
+	virtual void device_start();
+};
+
+// device type definition
+extern const device_type TI990_TAPE;
+
+const device_type TI990_TAPE = &device_creator<ti990_tape_image_device>;
+
+ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, TI990_TAPE, "TI990 Magnetic Tape", tag, owner, clock),
+	  device_image_interface(mconfig, *this)
+{
 }
-DECLARE_LEGACY_IMAGE_DEVICE(TI990_TAPE, ti990_tape);
-DEFINE_LEGACY_IMAGE_DEVICE(TI990_TAPE, ti990_tape);
+
+void ti990_tape_image_device::device_config_complete()
+{	
+	update_names();
+}
+
+void ti990_tape_image_device::device_start()
+{
+	tape_unit_t *t;
+	tap_990_t *tpc = get_safe_token(owner());
+	int id = tape_get_id(this);
+
+	t = &tpc->t[id];
+	memset(t, 0, sizeof(*t));
+
+	t->img = this;
+	t->wp = 1;
+	t->bot = 0;
+	t->eot = 0;
+}
+
+/*
+    Open a tape image
+*/
+bool ti990_tape_image_device::call_load()
+{
+	tape_unit_t *t;
+	tap_990_t *tpc = get_safe_token(owner());
+	int id = tape_get_id(this);
+
+	t = &tpc->t[id];
+	memset(t, 0, sizeof(*t));
+
+	/* tell whether the image is writable */
+	t->wp = is_readonly();
+
+	t->bot = 1;
+
+	return IMAGE_INIT_PASS;
+}
+
+/*
+    Close a tape image
+*/
+void ti990_tape_image_device::call_unload()
+{
+	tape_unit_t *t;
+	tap_990_t *tpc = get_safe_token(owner());
+	int id = tape_get_id(this);
+
+	t = &tpc->t[id];
+	t->wp = 1;
+	t->bot = 0;
+	t->eot = 0;
+}
 
 #define MCFG_TI990_TAPE_ADD(_tag)	\
 	MCFG_DEVICE_ADD((_tag),  TI990_TAPE, 0)
