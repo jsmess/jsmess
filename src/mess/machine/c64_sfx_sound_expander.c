@@ -22,16 +22,9 @@ const device_type C64_SFX_SOUND_EXPANDER = &device_creator<c64_sfx_sound_expande
 //  ym3526_interface ym3526_config
 //-------------------------------------------------
 
-static void irqhandler(device_t *device, int linestate)
-{
-/*  c64_sfx_sound_expander_cartridge_device *me = downcast<c64_sfx_sound_expander_cartridge_device*>(device->owner());
-
-    me->m_slot->irq_w(linestate);*/
-}
-
 static const ym3526_interface ym3526_config =
 {
-	irqhandler
+	DEVCB_LINE_MEMBER(c64_sfx_sound_expander_cartridge_device, irq_w)
 };
 
 
