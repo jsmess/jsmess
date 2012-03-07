@@ -31,7 +31,7 @@ const device_type UPD65031 = &device_creator<upd65031_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 // internal registers
 enum
@@ -154,7 +154,7 @@ inline void upd65031_device::interrupt_refresh()
 inline void upd65031_device::update_rtc_interrupt()
 {
 	// any ints occurred?
-	if ((m_int & INT_TIME) && (m_tsta & (TSTA_MIN | TSTA_SEC | TSTA_TICK)))
+	if ((m_int & INT_GINT) && (m_int & INT_TIME) && (m_tsta & (TSTA_MIN | TSTA_SEC | TSTA_TICK)))
 		m_sta |= STA_TIME;
 	else
 		m_sta &= ~STA_TIME;
@@ -372,7 +372,7 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				}
 			}
 
-			if (irq_change && !(m_sta & STA_FLAPOPEN))
+			if ((m_int & INT_GINT) && (m_int & INT_TIME) && irq_change && !(m_sta & STA_FLAPOPEN))
 			{
 				set_mode(STATE_AWAKE);
 
@@ -550,7 +550,7 @@ WRITE8_MEMBER( upd65031_device::write )
 			if (LOG) logerror("uPD65031 '%s': ack w: %02x\n", tag(), data);
 
 			m_ack = data;
-			m_sta &= ~(data & 0x7c);
+			m_sta &= ~data;
 
 			// refresh ints
 			interrupt_refresh();

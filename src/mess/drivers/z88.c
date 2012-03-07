@@ -34,7 +34,7 @@ explains why the extra checks are done
     bank 2      0x8000-0xBFFF
     bank 3      0xC000-0xFFFF
 
-    pages 0x00 - 0x1f   internal ROM (mirrored?)
+    pages 0x00 - 0x1f   internal ROM
     pages 0x20 - 0x3f   512KB internal RAM
     pages 0x40 - 0x7f   Slot 1
     pages 0x80 - 0xbf   Slot 2
@@ -46,6 +46,9 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 {
 	char bank_tag[6];
 	sprintf(bank_tag, "bank%d", bank + 2);
+
+	// bank 0 is always even
+	if (bank == 0)	page &= 0xfe;
 
 	if (page < 0x40)	// internal memory
 	{
@@ -61,7 +64,6 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		else
 		{
 			// internal ROM
-			page &= 7;
 			m_maincpu->memory().space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
 		}
 
