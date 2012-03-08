@@ -986,7 +986,7 @@ static READ8_DEVICE_HANDLER( omti8621_r8 ) {
 
 	switch (offset) {
 	case OMTI_PORT_DATA_IN: // 0x00
-		if (state->status_port && OMTI_STATUS_CD) {
+		if (state->status_port & OMTI_STATUS_CD) {
 			data = state->command_status;
 			switch (state->omti_state) {
 			case OMTI_STATE_COMMAND:
