@@ -1371,6 +1371,7 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/isa_mpu401.o	\
 	$(MESS_MACHINE)/isa_sblaster.o	\
 	$(MESS_MACHINE)/isa_ide.o	\
+	$(MESS_MACHINE)/isa_ide_cd.o	\
 	$(MESS_MACHINE)/isa_aha1542.o	\
 	$(MESS_VIDEO)/isa_cga.o		\
 	$(MESS_VIDEO)/isa_mda.o		\
