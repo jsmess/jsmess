@@ -194,12 +194,12 @@ READ8_MEMBER( babbage_state::pio2_a_r )
 WRITE8_MEMBER( babbage_state::pio2_b_w )
 {
 	if (BIT(data, 7))
-		m_step = 0;
+		m_step = false;
 	else
 	if (!m_step)
 	{
 		m_segment = data;
-		m_step++;
+		m_step = true;
 	}
 	else
 		output_set_digit_value(data, m_segment);
