@@ -18,6 +18,7 @@
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/i82371ab.h"
+#include "machine/i82371sb.h"
 #include "machine/i82439tx.h"
 #include "machine/cs4031.h"
 #include "machine/cs8221.h"
