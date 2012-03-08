@@ -668,12 +668,12 @@ static int is_my_node_id(const UINT8 node_id[]) {
 	return get_long(node_id) == my_node_id;
 }
 
-static int ethernet_packet_is_for_me(const UINT8 ethernet_pakcet_header[],
+static int ethernet_packet_is_for_me(const UINT8 ethernet_packet_header[],
 		const int data_length) {
 	return data_length >= ETHERNET_HEADER_SIZE && (
-			is_ethernet_broadcast_address(ethernet_pakcet_header) ||
-			is_apollo_multicast_address(ethernet_pakcet_header) ||
-			is_my_ethernet_address(ethernet_pakcet_header));
+			is_ethernet_broadcast_address(ethernet_packet_header) ||
+			is_apollo_multicast_address(ethernet_packet_header) ||
+			is_my_ethernet_address(ethernet_packet_header));
 }
 
 static int is_apollo_request(const UINT8 ethernet_header[],
