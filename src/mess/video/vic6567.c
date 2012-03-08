@@ -450,7 +450,7 @@ INLINE void vic2_matrix_access( running_machine &machine, vic2_state *vic2 )
 {
 //  if (vic2->device_suspended == 1)
 	{
-		if ((vic2->cycles_counter - vic2->first_ba_cycle) < 0)
+		if (vic2->cycles_counter < vic2->first_ba_cycle)
 			vic2->matrix_line[vic2->ml_index] = vic2->color_line[vic2->ml_index] = 0xff;
 		else
 		{
