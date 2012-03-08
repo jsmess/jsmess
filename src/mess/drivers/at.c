@@ -382,6 +382,7 @@ static SLOT_INTERFACE_START(pc_isa16_cards)
 	SLOT_INTERFACE("ibm_mfc", ISA8_IBM_MFC)
 	// ISA 16 bit
 	SLOT_INTERFACE("ide", ISA16_IDE)
+	SLOT_INTERFACE("ide_cd", ISA16_IDE_CD)
 	SLOT_INTERFACE("ne2000", NE2000)
 	SLOT_INTERFACE("aha1542", AHA1542)
 	SLOT_INTERFACE("gus",ISA16_GUS)
@@ -589,6 +590,13 @@ static MACHINE_CONFIG_DERIVED( at486, at386 )
 	MCFG_CPU_IO_MAP(at386_io)
 MACHINE_CONFIG_END
 
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( ide_2nd)
+//-------------------------------------------------
+
+static DEVICE_INPUT_DEFAULTS_START( ide_2nd )
+	DEVICE_INPUT_DEFAULTS("DSW", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_DERIVED( ct486, at386 )
 	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
@@ -597,19 +605,13 @@ static MACHINE_CONFIG_DERIVED( ct486, at386 )
 
 	MCFG_CS4031_ADD("cs4031", "maincpu", "isa", "bios")
 
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd) //2nd-ary IDE
+
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  DEVICE_INPUT_DEFAULTS( ide_2nd)
-//-------------------------------------------------
-
-static DEVICE_INPUT_DEFAULTS_START( ide_2nd )
-	DEVICE_INPUT_DEFAULTS("DSW", 0x01, 0x01)
-DEVICE_INPUT_DEFAULTS_END
 
 
 static MACHINE_CONFIG_DERIVED( at586, at386 )
@@ -623,8 +625,6 @@ static MACHINE_CONFIG_DERIVED( at586, at386 )
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
 	MCFG_PCI_BUS_DEVICE(1, "i82371ab", i82371ab_pci_read, i82371ab_pci_write)
-
-	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, "ide", ide_2nd) //2nd-ary IDE
 
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)

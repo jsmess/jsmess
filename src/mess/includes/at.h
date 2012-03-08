@@ -61,6 +61,7 @@
 #include "machine/isa_ibm_mfc.h"
 
 #include "machine/isa_ide.h"
+#include "machine/isa_ide_cd.h"
 
 #include "machine/pc_lpt.h"
 
