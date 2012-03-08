@@ -101,6 +101,9 @@ UINT32 i82439tx_pci_read(device_t *busdevice, device_t *device, int function, in
 		case 0x34:	/* reserved */
 		case 0x38:	/* reserved */
 		case 0x3C:	/* reserved */
+		case 0x40:	/* reserved */
+		case 0x44:	/* reserved */
+		case 0x48:	/* reserved */
 		case 0x4C:	/* reserved */
 		case 0x50:
 		case 0x54:
@@ -109,9 +112,43 @@ UINT32 i82439tx_pci_read(device_t *busdevice, device_t *device, int function, in
 		case 0x60:
 		case 0x64:
 		case 0x68:
+		case 0x6C:
+		case 0x70:
+		case 0x74:
 		case 0x78:
+		case 0x7C:
+		case 0x80:
+		case 0x84:
+		case 0x88:
+		case 0x8C:
+		case 0x90:
+		case 0x94:
+		case 0x98:
+		case 0x9C:
+		case 0xA0:
+		case 0xA4:
+		case 0xA8:
+		case 0xAC:
+		case 0xB0:
+		case 0xB4:
+		case 0xB8:
+		case 0xBC:
 		case 0xC0:
+		case 0xC4:
+		case 0xC8:
+		case 0xCC:
+		case 0xD0:
+		case 0xD4:
+		case 0xD8:
+		case 0xDC:
 		case 0xE0:
+		case 0xE4:
+		case 0xE8:
+		case 0xEC:
+		case 0xF0:
+		case 0xF4:
+		case 0xF8:
+		case 0xFC:
 			result = i82439tx->regs[(offset - 0x50) / 4];
 			break;
 
@@ -142,6 +179,9 @@ void i82439tx_pci_write(device_t *busdevice, device_t *device, int function, int
 		case 0x2C:	/* reserved */
 		case 0x30:	/* reserved */
 		case 0x3C:	/* reserved */
+		case 0x40:	/* reserved */
+		case 0x44:	/* reserved */
+		case 0x48:	/* reserved */
 		case 0x4C:	/* reserved */
 			/* read only */
 			break;
@@ -155,11 +195,43 @@ void i82439tx_pci_write(device_t *busdevice, device_t *device, int function, int
 		case 0x60:
 		case 0x64:
 		case 0x68:
+		case 0x6C:
 		case 0x70:
 		case 0x74:
 		case 0x78:
+		case 0x7C:
+		case 0x80:
+		case 0x84:
+		case 0x88:
+		case 0x8C:
+		case 0x90:
+		case 0x94:
+		case 0x98:
+		case 0x9C:
+		case 0xA0:
+		case 0xA4:
+		case 0xA8:
+		case 0xAC:
+		case 0xB0:
+		case 0xB4:
+		case 0xB8:
+		case 0xBC:
 		case 0xC0:
+		case 0xC4:
+		case 0xC8:
+		case 0xCC:
+		case 0xD0:
+		case 0xD4:
+		case 0xD8:
+		case 0xDC:
 		case 0xE0:
+		case 0xE4:
+		case 0xE8:
+		case 0xEC:
+		case 0xF0:
+		case 0xF4:
+		case 0xF8:
+		case 0xFC:
 			switch(offset)
 			{
 				case 0x58:

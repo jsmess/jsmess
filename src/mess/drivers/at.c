@@ -558,6 +558,14 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 MACHINE_CONFIG_END
 
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( ide_2nd)
+//-------------------------------------------------
+
+static DEVICE_INPUT_DEFAULTS_START( ide_2nd )
+	DEVICE_INPUT_DEFAULTS("DSW", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END
+
 static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_CPU_ADD("maincpu", I386, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
@@ -575,6 +583,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, NULL, NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, NULL, NULL)
 	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, NULL, NULL)
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd) //2nd-ary IDE
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -590,13 +599,6 @@ static MACHINE_CONFIG_DERIVED( at486, at386 )
 	MCFG_CPU_IO_MAP(at386_io)
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  DEVICE_INPUT_DEFAULTS( ide_2nd)
-//-------------------------------------------------
-
-static DEVICE_INPUT_DEFAULTS_START( ide_2nd )
-	DEVICE_INPUT_DEFAULTS("DSW", 0x01, 0x01)
-DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_DERIVED( ct486, at386 )
 	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
@@ -604,8 +606,6 @@ static MACHINE_CONFIG_DERIVED( ct486, at386 )
 	MCFG_CPU_IO_MAP(ct486_io)
 
 	MCFG_CS4031_ADD("cs4031", "maincpu", "isa", "bios")
-
-	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd) //2nd-ary IDE
 
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
@@ -623,8 +623,26 @@ static MACHINE_CONFIG_DERIVED( at586, at386 )
 	MCFG_I82439TX_ADD("i82439tx", "maincpu", "isa")
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
+	MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write) // Intel 82371AB PCI IDE ISA Xcelerator (PIIX4)
 	MCFG_PCI_BUS_DEVICE(1, "i82371ab", i82371ab_pci_read, i82371ab_pci_write)
+
+	MCFG_DEVICE_REMOVE(RAM_TAG)
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4M")
+	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( at586x3, at386 )
+	MCFG_CPU_REPLACE("maincpu", PENTIUM, 60000000)
+	MCFG_CPU_PROGRAM_MAP(at586_map)
+	MCFG_CPU_IO_MAP(at586_io)
+
+	MCFG_I82371SB_ADD("i82371sb")
+	MCFG_I82439TX_ADD("i82439tx", "maincpu", "isa")
+
+	MCFG_PCI_BUS_ADD("pcibus", 0)
+	MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write) // Intel 82371SB PCI IDE ISA Xcelerator (PIIX3)
+	MCFG_PCI_BUS_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
 
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1180,6 +1198,10 @@ ROM_START( at586 )
 	ROMX_LOAD("asus_txp4.bin",   0x20000, 0x20000, CRC(a1321bb1) SHA1(92e5f14d8505119f85b148a63510617ac12bcdf3), ROM_BIOS(5))
 ROM_END
 
+ROM_START( at586x3 )
+	ROM_REGION32_LE(0x40000, "isa", 0)
+	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
+ROM_END
 
 ROM_START( c386sx16 )
 	ROM_REGION(0x1000000,"maincpu", 0)
@@ -1375,7 +1397,8 @@ COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga,      atcga,  "<generi
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga,      atvga,  "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga,      atvga,  "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga,      atvga,  "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,      atvga,  "<generic>",  "PC/AT 586 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga,      atvga,  "<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
+COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga,      atvga,  "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      atcga,      atcga,  "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga,      atvga,  "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )

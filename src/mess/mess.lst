@@ -719,6 +719,7 @@ at486	 // 19?? IBM AT 486
 ct486		// 1993? 486 with CS4031
 ficpio2	// 1995 FIC 486-PIO-2
 at586	 // 19?? AT 586
+at586x3	 // 19?? AT 586
 c386sx16	// 1990 Commodore 386SX-16
 xb42663    // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
 qi600    // 1988 Apricot Qi 600 (Neptune Motherboard
