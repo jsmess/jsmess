@@ -83,6 +83,8 @@ private:
 		/* memory */
 		UINT8 m_atapi_regs[ATAPI_REG_MAX];
 		UINT8 m_atapi_data[ATAPI_DATA_SIZE];		
+		
+		int m_cur_drive;
 };
 
 

@@ -127,6 +127,7 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 			shift=8;
 			break;
 		}			
+		if (m_cur_drive==1) return 0x00;
 		data = atapi_regs[reg];
    		logerror("ATAPI: reg %d = %x (offset %x mask %x) [read]\n", reg, data, offset, mem_mask);		
       	data <<= shift;
@@ -270,7 +271,8 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 			data >>= 8;
 			break;
 		}			
-
+		if (reg==6) m_cur_drive = (data & 0x10) >> 4;
+		if (m_cur_drive==1) return;
 		atapi_regs[reg] = data;
       	logerror("ATAPI: reg %d = %x (offset %x mask %x)\n", reg, data, offset, mem_mask);
 
@@ -313,24 +315,29 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 					atapi_data[ 47 ^ 1 ] = '.';
 					atapi_data[ 48 ^ 1 ] = '0';
 					
-					
 					memset( &atapi_data[ 54 ], ' ', 40 );
-					atapi_data[ 54 ^ 1 ] = 'T';
-					atapi_data[ 55 ^ 1 ] = 'O';
-					atapi_data[ 56 ^ 1 ] = 'S';
-					atapi_data[ 57 ^ 1 ] = 'H';
-					atapi_data[ 58 ^ 1 ] = 'I';
-					atapi_data[ 59 ^ 1 ] = 'B';
-					atapi_data[ 60 ^ 1 ] = 'A';
-					atapi_data[ 61 ^ 1 ] = ' ';
-					atapi_data[ 62 ^ 1 ] = 'X';
-					atapi_data[ 63 ^ 1 ] = 'M';
-					atapi_data[ 64 ^ 1 ] = '-';
-					atapi_data[ 65 ^ 1 ] = '3';
-					atapi_data[ 66 ^ 1 ] = '3';
-					atapi_data[ 67 ^ 1 ] = '0';
-					atapi_data[ 68 ^ 1 ] = '1';
-					atapi_data[ 69 ^ 1 ] = ' ';
+					atapi_data[ 54 ^ 1 ] = 'M';
+					atapi_data[ 55 ^ 1 ] = 'A';
+					atapi_data[ 56 ^ 1 ] = 'M';
+					atapi_data[ 57 ^ 1 ] = 'E';
+					atapi_data[ 58 ^ 1 ] = ' ';
+					atapi_data[ 59 ^ 1 ] = 'C';
+					atapi_data[ 60 ^ 1 ] = 'o';
+					atapi_data[ 61 ^ 1 ] = 'm';
+					atapi_data[ 62 ^ 1 ] = 'p';
+					atapi_data[ 63 ^ 1 ] = 'r';
+					atapi_data[ 64 ^ 1 ] = 'e';
+					atapi_data[ 65 ^ 1 ] = 's';
+					atapi_data[ 66 ^ 1 ] = 's';
+					atapi_data[ 67 ^ 1 ] = 'e';
+					atapi_data[ 68 ^ 1 ] = 'd';
+					atapi_data[ 69 ^ 1 ] = ' ';					
+					atapi_data[ 70 ^ 1 ] = 'C';
+					atapi_data[ 71 ^ 1 ] = 'D';
+					atapi_data[ 72 ^ 1 ] = '-';
+					atapi_data[ 73 ^ 1 ] = 'R';
+					atapi_data[ 74 ^ 1 ] = 'O';
+					atapi_data[ 75 ^ 1 ] = 'M';
 
 					atapi_data[ 98 ^ 1 ] = 0x06; // Word 49=Capabilities, IORDY may be disabled (bit_10), LBA Supported mandatory (bit_9)
 					atapi_data[ 99 ^ 1 ] = 0x00;
@@ -471,4 +478,5 @@ void isa16_ide_cd_device::device_reset()
 		m_isa->install16_device(0x0170, 0x0177, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_w), this));		
 		m_isa->install16_device(0x0370, 0x0377, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_status_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_cmd_w), this));		
 	}
+	m_cur_drive = 0;
 }
