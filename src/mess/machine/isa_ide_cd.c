@@ -47,7 +47,7 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 	int reg, data;
 	if (mem_mask == 0x0000ffff)	// word-wide command read
 	{
-      logerror("ATAPI: packet read = %04x\n", m_atapi_data[m_atapi_data_ptr]);
+      //logerror("ATAPI: packet read = %02x%02x\n", m_atapi_data[m_atapi_data_ptr+1],m_atapi_data[m_atapi_data_ptr]);
 
 		// assert IRQ and drop DRQ
 		if (m_atapi_data_ptr == 0 && m_atapi_data_len == 0)
@@ -78,9 +78,9 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 			}
 			else
 			{
-				logerror("ATAPI: dropping DRQ\n");
+				//logerror("ATAPI: dropping DRQ\n");
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 			}
 
 			atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
@@ -102,7 +102,7 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 				if( m_atapi_xferlen == 0 )
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 					atapi_irq(this, ASSERT_LINE);
 				}
 			}
@@ -129,7 +129,7 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 		}			
 		if (m_cur_drive==1) return 0x00;
 		data = atapi_regs[reg];
-   		logerror("ATAPI: reg %d = %x (offset %x mask %x) [read]\n", reg, data, offset, mem_mask);		
+		//logerror("ATAPI: reg %d = %x (offset %x mask %x) [%08x][read]\n", reg, data, offset, mem_mask,cpu_get_pc(machine().device("maincpu")));		
       	data <<= shift;
 	}
 	return data;
@@ -147,7 +147,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 
 		if (m_atapi_cdata_wait)
 		{
-          	logerror("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
+          	//logerror("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
 			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
@@ -274,7 +274,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 		if (reg==6) m_cur_drive = (data & 0x10) >> 4;
 		if (m_cur_drive==1) return;
 		atapi_regs[reg] = data;
-      	logerror("ATAPI: reg %d = %x (offset %x mask %x)\n", reg, data, offset, mem_mask);
+      	//logerror("ATAPI: reg %d = %x (offset %x mask %x)\n", reg, data, offset, mem_mask);
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
