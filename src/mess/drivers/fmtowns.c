@@ -732,7 +732,9 @@ WRITE8_MEMBER(towns_state::towns_port60_w)
 
 	if(data & 0x80)
 	{
-		towns_pic_irq(dev,0);
+		//towns_pic_irq(dev,0);
+		m_timer0 = 0;
+		pic8259_ir0_w(dev, m_timer0 || m_timer1);
 	}
 	m_towns_timer_mask = data & 0x07;
 
@@ -2022,9 +2024,13 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 
 	if(tstate->m_towns_timer_mask & 0x01)
 	{
-		pic8259_ir0_w(dev, state);
+		tstate->m_timer0 = state;
 		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch0) set to %i\n",state);
 	}
+	else
+		tstate->m_timer0 = 0;
+
+	pic8259_ir0_w(dev, tstate->m_timer0 || tstate->m_timer1);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
@@ -2034,9 +2040,13 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
 
 	if(tstate->m_towns_timer_mask & 0x02)
 	{
-		pic8259_ir0_w(dev, state);
+		tstate->m_timer1 = state;
 		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch1) set to %i\n",state);
 	}
+	else
+		tstate->m_timer1 = 0;
+
+	pic8259_ir0_w(dev, tstate->m_timer0 || tstate->m_timer1);
 }
 
 WRITE_LINE_MEMBER( towns_state::pit_out2_changed )
