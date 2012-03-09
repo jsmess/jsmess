@@ -166,73 +166,95 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 			// reset data pointer for reading SCSI results
 			m_atapi_data_ptr = 0;
 			m_atapi_data_len = 0;
-
-			// send it to the SCSI device
-			SCSISetCommand( m_inserted_cdrom, m_atapi_data, 12 );
-			SCSIExecCommand( m_inserted_cdrom, &m_atapi_xferlen );
-			SCSIGetPhase( m_inserted_cdrom, &phase );
-
-			if (m_atapi_xferlen != -1)
+			cdrom_image_device *cdrom = subdevice<cdrom_image_device>("cdrom");
+			bool checkready = false;
+			switch(atapi_data[0]&0xff) {
+				case 0x00 :
+				case 0x25 :
+				case 0x28 :
+				case 0x2b :
+				case 0x43 :
+				case 0xa8 :
+				case 0xad :
+				case 0xbe :	
+							checkready = true;
+							break;
+			}
+	
+			if (checkready && cdrom_get_toc(cdrom->get_cdrom_file())==NULL) 
 			{
-              	logerror("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, m_atapi_xferlen);
-				// store the returned command length in the ATAPI regs, splitting into
-				// multiple transfers if necessary
-				m_atapi_xfermod = 0;
-				if (m_atapi_xferlen > MAX_TRANSFER_SIZE)
-				{
-					m_atapi_xfermod = m_atapi_xferlen - MAX_TRANSFER_SIZE;
-					m_atapi_xferlen = MAX_TRANSFER_SIZE;
-				}
- 
-				atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
+				logerror("ATAPI: SCSI command %02x returned not ready\n", atapi_data[0]&0xff);
+				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY | ATAPI_STAT_CHECK;
+				atapi_regs[ATAPI_REG_ERRFEAT] = (2 << 4) | ATAPI_ERRFEAT_ABRT;
+				// assert IRQ
+				atapi_irq(this, ASSERT_LINE);				
+			} else {
+				// send it to the SCSI device
+				SCSISetCommand( m_inserted_cdrom, m_atapi_data, 12 );
+				SCSIExecCommand( m_inserted_cdrom, &m_atapi_xferlen );
+				SCSIGetPhase( m_inserted_cdrom, &phase );
 
-				if (m_atapi_xferlen == 0)
+				if (m_atapi_xferlen != -1)
 				{
-					// if no data to return, set the registers properly
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO|ATAPI_INTREASON_COMMAND;
+					logerror("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, m_atapi_xferlen);
+					// store the returned command length in the ATAPI regs, splitting into
+					// multiple transfers if necessary
+					m_atapi_xfermod = 0;
+					if (m_atapi_xferlen > MAX_TRANSFER_SIZE)
+					{
+						m_atapi_xfermod = m_atapi_xferlen - MAX_TRANSFER_SIZE;
+						m_atapi_xferlen = MAX_TRANSFER_SIZE;
+					}
+	 
+					atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+					atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
+
+					if (m_atapi_xferlen == 0)
+					{
+						// if no data to return, set the registers properly
+						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
+						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO|ATAPI_INTREASON_COMMAND;
+					}
+					else
+					{
+						// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
+						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
+						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+					}
+
+					switch( phase )
+					{
+					case SCSI_PHASE_DATAOUT:
+						m_atapi_cdata_wait = m_atapi_xferlen;
+						break;
+					}
+
+					// perform special ATAPI processing of certain commands
+					switch (atapi_data[0]&0xff)
+					{
+						case 0x00: // BUS RESET / TEST UNIT READY
+						case 0xbb: // SET CDROM SPEED
+							atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+							break;
+
+						case 0x45: // PLAY
+							atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
+							//m_atapi_timer->adjust( downcast<cpu_device *>(this)->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
+							break;
+					}
+
+					// assert IRQ
+					atapi_irq(this, ASSERT_LINE);
 				}
 				else
 				{
-					// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+					logerror("ATAPI: SCSI device returned error!\n");
+
+					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
+					atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;	// sense key = ILLEGAL REQUEST
+					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
+					atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 				}
-
-				switch( phase )
-				{
-				case SCSI_PHASE_DATAOUT:
-					m_atapi_cdata_wait = m_atapi_xferlen;
-					break;
-				}
-
-				// perform special ATAPI processing of certain commands
-				switch (atapi_data[0]&0xff)
-				{
-					case 0x00: // BUS RESET / TEST UNIT READY
-					case 0xbb: // SET CDROM SPEED
-						atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-						break;
-
-					case 0x45: // PLAY
-						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						//m_atapi_timer->adjust( downcast<cpu_device *>(this)->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
-						break;
-				}
-
-				// assert IRQ
-				atapi_irq(this, ASSERT_LINE);
-				logerror("IRQ\n");
-			}
-			else
-			{
-              	logerror("ATAPI: SCSI device returned error!\n");
-
-				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;	// sense key = ILLEGAL REQUEST
-				atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 			}
 		}
 	}
