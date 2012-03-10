@@ -102,7 +102,7 @@ bool apexc_cylinder_image_device::call_load()
 		UINT32 *RAM;
 		int i;
 
-		RAM = (UINT32 *) machine().region("maincpu")->base();
+		RAM = (UINT32 *)machine().region("maincpu");
 
 		for (i=0; i < /*0x2000*/0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -126,7 +126,7 @@ void apexc_cylinder_image_device::call_unload()
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) machine().region("maincpu")->base();
+			RAM = (UINT32 *) machine().region("maincpu");
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);

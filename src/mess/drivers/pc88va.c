@@ -83,7 +83,7 @@ static VIDEO_START( pc88va )
 static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
-	UINT16 *tvram = (UINT16 *)machine.region("tvram")->base();
+	UINT16 *tvram = (UINT16 *)machine.region("tvram");
 	int offs,i;
 
 	offs = state->m_tsp.spr_offset;
@@ -437,7 +437,7 @@ static READ16_HANDLER( sys_mem_r )
 			return 0xffff;
 		case 1: // TVRAM
 		{
-			UINT16 *tvram = (UINT16 *)space->machine().region("tvram")->base();
+			UINT16 *tvram = (UINT16 *)space->machine().region("tvram");
 
 			if(((offset*2) & 0x30000) == 0)
 				return tvram[offset];
@@ -446,14 +446,14 @@ static READ16_HANDLER( sys_mem_r )
 		}
 		case 4:
 		{
-			UINT16 *gvram = (UINT16 *)space->machine().region("gvram")->base();
+			UINT16 *gvram = (UINT16 *)space->machine().region("gvram");
 
 			return gvram[offset];
 		}
 		case 8: // kanji ROM
 		case 9:
 		{
-			UINT16 *knj_ram = (UINT16 *)space->machine().region("kanji")->base();
+			UINT16 *knj_ram = (UINT16 *)space->machine().region("kanji");
 			UINT32 knj_offset;
 
 			knj_offset = (offset + (((state->m_bank_reg & 0x100) >> 8)*0x20000));
@@ -469,7 +469,7 @@ static READ16_HANDLER( sys_mem_r )
 		case 0xc: // Dictionary ROM
 		case 0xd:
 		{
-			UINT16 *dic_rom = (UINT16 *)space->machine().region("dictionary")->base();
+			UINT16 *dic_rom = (UINT16 *)space->machine().region("dictionary");
 			UINT32 dic_offset;
 
 			dic_offset = (offset + (((state->m_bank_reg & 0x100) >> 8)*0x20000));
@@ -490,7 +490,7 @@ static WRITE16_HANDLER( sys_mem_w )
 			break;
 		case 1: // TVRAM
 		{
-			UINT16 *tvram = (UINT16 *)space->machine().region("tvram")->base();
+			UINT16 *tvram = (UINT16 *)space->machine().region("tvram");
 
 			if(((offset*2) & 0x30000) == 0)
 				COMBINE_DATA(&tvram[offset]);
@@ -498,7 +498,7 @@ static WRITE16_HANDLER( sys_mem_w )
 		break;
 		case 4: // TVRAM
 		{
-			UINT16 *gvram = (UINT16 *)space->machine().region("gvram")->base();
+			UINT16 *gvram = (UINT16 *)space->machine().region("gvram");
 
 			COMBINE_DATA(&gvram[offset]);
 		}
@@ -506,7 +506,7 @@ static WRITE16_HANDLER( sys_mem_w )
 		case 8: // kanji ROM, backup RAM at 0xb0000 - 0xb3fff
 		case 9:
 		{
-			UINT16 *knj_ram = (UINT16 *)space->machine().region("kanji")->base();
+			UINT16 *knj_ram = (UINT16 *)space->machine().region("kanji");
 			UINT32 knj_offset;
 
 			knj_offset = ((offset) + (((state->m_bank_reg & 0x100) >> 8)*0x20000));
@@ -1052,7 +1052,7 @@ static WRITE16_HANDLER( video_pri_w )
 
 static READ8_HANDLER( backupram_dsw_r )
 {
-	UINT16 *knj_ram = (UINT16 *)space->machine().region("kanji")->base();
+	UINT16 *knj_ram = (UINT16 *)space->machine().region("kanji");
 
 	if(offset == 0)
 		return knj_ram[(0x50000 + 0x1fc2) / 2] & 0xff;

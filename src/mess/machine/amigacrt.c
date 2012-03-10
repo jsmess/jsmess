@@ -40,7 +40,7 @@ static amigacrt_t amigacrt;
 
 static int check_kickstart_12_13( running_machine &machine, const char *cart_name )
 {
-	UINT16 * ksmem = (UINT16 *)machine.region( "user1" )->base();
+	UINT16 * ksmem = (UINT16 *)machine.region( "user1" );
 
 	if ( ksmem[2] == 0x00FC )
 		return 1;
@@ -221,7 +221,7 @@ static WRITE16_HANDLER( amiga_ar23_mode_w )
 static READ16_HANDLER( amiga_ar23_mode_r )
 {
 	amiga_state *state = space->machine().driver_data<amiga_state>();
-	UINT16 *mem = (UINT16 *)space->machine().region( "user2" )->base();
+	UINT16 *mem = (UINT16 *)space->machine().region( "user2" );
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -401,7 +401,7 @@ static void amiga_ar23_init( running_machine &machine, int ar3 )
 void amiga_cart_init( running_machine &machine )
 {
 	/* see what is there */
-	UINT16 *mem = (UINT16 *)machine.region( "user2" )->base();
+	UINT16 *mem = (UINT16 *)machine.region( "user2" );
 
 	amigacrt.cart_type = -1;
 

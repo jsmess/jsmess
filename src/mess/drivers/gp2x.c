@@ -202,7 +202,7 @@ WRITE32_MEMBER( gp2x_state::gp2x_lcdc_w )
 
 READ32_MEMBER( gp2x_state::nand_r )
 {
-	UINT32 *ROM = (UINT32 *)machine().region("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)machine().region("maincpu");
 	UINT32 ret;
 
 	if (offset == 0)
