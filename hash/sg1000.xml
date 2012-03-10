@@ -1424,6 +1424,19 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="magkidwz">
+		<description>Magical Kid Wiz (Tw)</description>
+		<year>198?</year>
+		<publisher>Aaronix</publisher>
+		<info name="serial" value="Y-115"/>
+		<info name="alt_title" value="Mófǎ shī ~ 魔法師"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="49152">
+				<rom name="magical kid wiz (tw).bin" size="49152" crc="ffc4ee3f" sha1="fd24b501046cf811b04386129be0362a1eabf6b3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mahjong">
 		<description>Mahjong (Jpn)</description>
 		<!-- This version has smaller 1983 and Japanese instructions in the title screen -->
@@ -1544,8 +1557,6 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>N-Sub (Euro?)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-1003"/>
-		<info name="alt_title" value="N-サブ"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="n-sub (europe) (1988).bin" size="16384" crc="09196fc5" sha1="32a263110434288d3720e2370241d1e93b3f07a9" offset="000000" />
@@ -1557,6 +1568,8 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<description>N-Sub (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="G-1003"/>
+		<info name="alt_title" value="N-サブ"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="n-sub [16k].bin" size="16384" crc="652bbd1e" sha1="2640e267441bf25463a19273c46f3edb5e459496" offset="000000" />
@@ -1569,6 +1582,8 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<!-- only 16k out of 40k are the game data, also one between nsuba and nsubb has a gameover glitch (bg color is not reset properly in certain cases), the other is fixed -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="G-1003"/>
+		<info name="alt_title" value="N-サブ"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="40960">
 				<rom name="n-sub [40k].bin" size="40960" crc="b377d6e1" sha1="aa3eae849553a5a176762466b101f312b8b968e4" offset="000000" />
@@ -1887,6 +1902,17 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="safarirc">
+		<description>Safari Race (Euro?)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="safari race [1988].bin" size="32768" crc="619dd066" sha1="1d2ca62c894fc8aab97605e65078e834bbbe3d8b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="safarircj" cloneof="safarirc">
 		<description>Safari Race (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -1894,7 +1920,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="alt_title" value="サファリレース"/>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="safari race (japan).bin" size="32768" crc="619dd066" sha1="1d2ca62c894fc8aab97605e65078e834bbbe3d8b" offset="000000" />
+				<rom name="safari race.bin" size="32768" crc="08707fe3" sha1="ecbba909f2227786e7ba3360d2dd158f6513cfd4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
