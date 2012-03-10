@@ -784,11 +784,11 @@ static READ32_HANDLER(ps_rombank_r)
 			if(state->m_ftlb_regs.entry[index] == bank)
 			{
 				//printf( "Address %08x is assigned to %08x in entry %d\n", 0x02000000 + (offset << 2), index * 0x2000 + ((offset << 2) & 0x1fff), index );
-				return ((UINT32*)space->machine().region("flash")->base())[index * (0x2000/4) + (offset & (0x1fff/4))];
+				return space->machine().region("flash")->u32(index * (0x2000/4) + (offset & (0x1fff/4)));
 			}
 		}
 	}
-	return ((UINT32*)space->machine().region("flash")->base())[offset & 0x7fff];
+	return space->machine().region("flash")->u32(offset & 0x7fff);
 }
 
 
@@ -815,7 +815,7 @@ static WRITE32_HANDLER(ps_flash_w)
 	if(state->m_ps_flash_write_count)
 	{
 		state->m_ps_flash_write_count--;
-		COMBINE_DATA(&((UINT32*)space->machine().region("flash")->base())[offset]);
+		COMBINE_DATA(&((UINT32*)space->machine().region("flash"))[offset]);
 	}
 }
 

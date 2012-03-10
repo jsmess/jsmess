@@ -1962,7 +1962,7 @@ static READ32_HANDLER(gba_bios_r)
 {
 	running_machine &machine = space->machine();
 	gba_state *state = machine.driver_data<gba_state>();
-	UINT32 *rom = (UINT32 *)space->machine().region("maincpu")->base();
+	UINT32 *rom = (UINT32 *)space->machine().region("maincpu");
 	if (state->m_bios_protected != 0)
 	{
 		offset = (state->m_bios_last_address + 8) / 4;

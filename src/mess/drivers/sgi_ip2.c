@@ -531,7 +531,7 @@ INPUT_PORTS_END
 static DRIVER_INIT( sgi_ip2 )
 {
 	sgi_ip2_state *state = machine.driver_data<sgi_ip2_state>();
-	UINT32 *src = (UINT32*)machine.region("user1")->base();
+	UINT32 *src = (UINT32*)machine.region("user1");
 	UINT32 *dst = state->m_mainram;
 	memcpy(dst, src, 8);
 

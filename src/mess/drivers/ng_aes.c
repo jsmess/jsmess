@@ -992,7 +992,7 @@ static READ16_HANDLER(neocd_transfer_r)
 	UINT8* Z80 = space->machine().region("audiocpu")->base();
 	UINT8* PCM = space->machine().region("ymsnd")->base();
 	UINT8* FIX = space->machine().region("fixed")->base();
-	UINT16* SPR = (UINT16*)space->machine().region("sprites")->base();
+	UINT16* SPR = (UINT16*)space->machine().region("sprites");
 
 	switch(state->m_neocd_ctrl.area_sel)
 	{
@@ -1019,7 +1019,7 @@ static WRITE16_HANDLER(neocd_transfer_w)
 	UINT8* Z80 = space->machine().region("audiocpu")->base();
 	UINT8* PCM = space->machine().region("ymsnd")->base();
 	UINT8* FIX = space->machine().region("fixed")->base();
-	UINT16* SPR = (UINT16*)space->machine().region("sprites")->base();
+	UINT16* SPR = (UINT16*)space->machine().region("sprites");
 
 	switch(state->m_neocd_ctrl.area_sel)
 	{
