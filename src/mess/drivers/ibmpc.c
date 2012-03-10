@@ -371,6 +371,13 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 	MCFG_RAM_DEFAULT_SIZE("640K")
 
 	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( ibm5140, ibm5150 )
+	/* software lists */
+	MCFG_DEVICE_REMOVE( "disk_list" )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5140")
 MACHINE_CONFIG_END
 
@@ -606,7 +613,7 @@ ROM_END
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
 COMP(  1981,	ibm5150,    0,			0,		ibm5150,    ibm5150,	0,    "International Business Machines",  "IBM PC 5150" , GAME_NO_SOUND)
 COMP(  1982,	ibm5155,    ibm5150,	0,		ibm5150,    ibm5150,	0,    "International Business Machines",  "IBM PC 5155" , GAME_NO_SOUND)
-COMP(  1985,	ibm5140,    ibm5150,	0,		ibm5150,    ibm5150,	0,    "International Business Machines",  "IBM PC 5140 Convertible" , GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(  1985,	ibm5140,    ibm5150,	0,		ibm5140,    ibm5150,	0,    "International Business Machines",  "IBM PC 5140 Convertible" , GAME_NOT_WORKING | GAME_NO_SOUND)
 
 // xt class (pc but 8086)
 COMP(  1982,	ibm5160,    ibm5150,	0,		ibm5160,    ibm5150,	0,    "International Business Machines",  "IBM XT 5160" , GAME_NO_SOUND)
