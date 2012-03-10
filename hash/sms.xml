@@ -1013,6 +1013,18 @@
 		</part>
 	</software>
 
+	<software name="cso">
+		<description>C_So! (Kor)</description>
+		<year>198?</year>
+		<publisher>Joy Soft</publisher>
+		<info name="alt_title" value="시소" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="c_so! [msx] (kr).bin" size="32768" crc="0918fba0" sha1="e7fefabd7a920fd71e87509d065080855b5b233c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="calgame2">
 		<description>California Games II (Euro)</description>
 		<year>1993</year>
@@ -2770,6 +2782,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="great volleyball (japan).bin" size="131072" crc="6819b0c0" sha1="b9e3284c7b557eed84661c98bc733d32b46c7a07" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunsmoke">
+		<description>Gun.Smoke (Kor)</description>
+		<year>1990</year>
+		<publisher>ProSoft</publisher>
+		<info name="alt_title" value="건스모크" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="gun.smoke (kr).bin" size="32768" crc="3af7ccad" sha1="f50a3c25b436c9f4f2f0edb75ab0b7f62dbcc433" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5109,8 +5133,19 @@
 		</part>
 	</software>
 
-	<software name="smgpp" cloneof="smgp">
+	<software name="smgpp1" cloneof="smgp">
 		<description>Super Monaco GP (Euro, Prototype)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="super monaco gp [proto 1].bin" size="262144" crc="dd7adbcc" sha1="3d0174017de5e16c608b56a2a5680ae5dd314140" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smgpp2" cloneof="smgp">
+		<description>Super Monaco GP (Euro, Older Prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6582,6 +6617,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="ys - the vanished omens (usa, europe).bin" size="262144" crc="b33e2827" sha1="e73e836c353543e9f48315410b0d72278899ff59" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ysd" cloneof="ys">
+		<description>Ys (USA, Demo)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="ys - the vanished omens [demo].bin" size="262144" crc="e8b82066" sha1="b70757876e4ff592692eb0ee1c51c571b31541a9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
