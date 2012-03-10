@@ -779,7 +779,7 @@ static void Nick_DoDisplay(NICK_STATE *nick)
 		/* get display mode */
 		DisplayMode = NICK_GET_DISPLAY_MODE(pLPT->MB);
 
-		if ((nick->ScanLineCount == 0))	// ||
+		if (nick->ScanLineCount == 0)	// ||
 			//((pLPT->MB & NICK_MB_VRES)==0))
 		{
 			/* doing first line */
