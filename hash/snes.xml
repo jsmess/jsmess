@@ -54887,7 +54887,7 @@ Alternate board (XL-1)
 
 	<software name="bscasino" supported="no">
 	<!-- this was dumped from a memory pack containing data for both games. split dumps are also available, but they seem to have issues -->
-		<description>Kouryaku Casino Bar Roulette (Jpn) &amp; Game Tora no Ooana Special (Jpn, 0224)</description>
+		<description>Kouryaku Casino Bar Nichiyoubi (Jpn) &amp; Game Tora no Ooana Special (Jpn, 0224)</description>
 		<!-- BS -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -55545,6 +55545,31 @@ Alternate board (XL-1)
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="star soldier 2mins (b).bs" size="1048576" crc="c79c1b8d" sha1="fd81383fbf4fee2cb528e2336c346112f44933c9" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsswalk2" supported="no">
+		<description>BS Satellawalker 2 Dai-ichi-wa (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="satella2_1.bs" size="1048576" crc="5ea2b6bb" sha1="3a46898cdbbb414bc6462effd4419a2a471be807" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscasin2" supported="no">
+	<!-- this was dumped from a memory pack containing data for both games. -->
+		<description>Kouryaku Casino Bar - Suiyoubi &amp; Kinyoubi (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="kouryaku casino bar double pack.bs" size="1048576" crc="390c560f" sha1="ede3dfe2d30452644c75c8648a95b539def19fd2" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
