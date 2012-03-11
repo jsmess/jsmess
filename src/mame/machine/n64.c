@@ -2388,7 +2388,7 @@ WRITE32_MEMBER( n64_periphs::pif_ram_w )
 static void n64_machine_stop(running_machine &machine)
 {
 	n64_periphs *periphs = machine.device<n64_periphs>("rcp");
-	
+
 	if( periphs->m_nvram_image == NULL )
 		return;
 
