@@ -438,9 +438,9 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return ""; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
@@ -458,7 +458,7 @@ tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config 
 }
 
 void tm990_189_rs232_image_device::device_config_complete()
-{	
+{
 	update_names();
 }
 
@@ -468,7 +468,7 @@ void tm990_189_rs232_image_device::device_start()
 }
 
 void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{	
+{
 	//tm990189_state *state = machine.driver_data<tm990189_state>();
 	UINT8 buf;
 	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)

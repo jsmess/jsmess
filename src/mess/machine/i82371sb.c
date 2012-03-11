@@ -88,7 +88,7 @@ static UINT32 i82371sb_pci_ide_r(device_t *busdevice, device_t *device, int offs
 	i82371sb_state *i82371sb = get_safe_token(device);
 	UINT32 result = i82371sb->regs[1][offset];
 
-	
+
 
 	return result;
 }

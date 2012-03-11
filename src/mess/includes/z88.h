@@ -46,7 +46,7 @@ public:
 	virtual void machine_start();
 	void bankswitch_update(int bank, UINT16 page, int rams);
 	DECLARE_READ8_MEMBER(kb_r);
-	
+
 	// cartridges read/write
 	DECLARE_READ8_MEMBER(bank0_cart_r);
 	DECLARE_READ8_MEMBER(bank1_cart_r);

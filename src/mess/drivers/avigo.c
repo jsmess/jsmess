@@ -233,7 +233,7 @@ static const ins8250_interface avigo_com_interface =
 	DEVCB_NULL
 };
 
-static const rs232_port_interface avigo_serport_config = 
+static const rs232_port_interface avigo_serport_config =
 {
 	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, rx_w),
 	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, dcd_w),

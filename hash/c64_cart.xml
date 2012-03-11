@@ -1363,11 +1363,11 @@
 		<publisher></publisher>
 		<info name="serial" value="RGCD #10" />
 		<sharedfeat name="compatibility" value="PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="fortress of narzod.bin" size="0x4000" crc="3c00d620" sha1="7c859627ad4156da5eff4f5da0ec844655ba5747" offset="0" />
 			</dataarea>
@@ -1414,11 +1414,11 @@
 		<publisher>RGCD</publisher>
 		<info name="serial" value="RGCD #13" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="jars' revenge.bin" size="0x4000" crc="9f94df24" sha1="11455419d5bf18d0c2416a041cc7d1734424e0cf" offset="0" />
 			</dataarea>
@@ -1430,11 +1430,11 @@
 		<year>2012</year>
 		<publisher>RGCD</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="panic analogue.bin" size="0x4000" crc="e0a96952" sha1="b611bf196e799d918c1879e02a5b4c1e293bfdb0" offset="0" />
 			</dataarea>

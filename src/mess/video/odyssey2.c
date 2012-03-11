@@ -3,9 +3,9 @@
   video/odyssey2.c
 
   2012-02-04 DanBoris
-  	- Changed color of background grid color 0 to match sprite color 0 (Fixes KTAA title screen)
-  	- Fixed Odyssey2_video_w so that m_o2_vdc.reg[] is always updated (Fixes Blockout)
-  	- Changed quad character generation so character height is always taken from 4th character (KTAA level 2)
+    - Changed color of background grid color 0 to match sprite color 0 (Fixes KTAA title screen)
+    - Fixed Odyssey2_video_w so that m_o2_vdc.reg[] is always updated (Fixes Blockout)
+    - Changed quad character generation so character height is always taken from 4th character (KTAA level 2)
 
 
 ***************************************************************************/

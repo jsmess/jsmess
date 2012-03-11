@@ -93,7 +93,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "hdf"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	virtual bool call_create(int format_type, option_resolution *format_options);	
+	virtual bool call_create(int format_type, option_resolution *format_options);
 
 	DECLARE_WRITE16_MEMBER( hdc_w );
 	DECLARE_READ16_MEMBER( hdc_r );
@@ -102,7 +102,7 @@ protected:
     virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-private:	
+private:
 	int m_phase;
 	unsigned char m_status_port;  // read at 0xe96003
 	unsigned char m_status;       // status phase output

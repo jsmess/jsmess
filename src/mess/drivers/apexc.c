@@ -69,14 +69,14 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "apc"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-		
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
 	// device-level overrides
     virtual void device_config_complete() { update_names(); }
 	virtual void device_start() { }
-private:	
+private:
 	int m_writable;
 };
 

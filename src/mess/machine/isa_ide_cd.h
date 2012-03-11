@@ -56,8 +56,8 @@ public:
 		virtual ioport_constructor device_input_ports() const;
 
 		bool is_primary() { return m_is_primary; }
-		
-		
+
+
         DECLARE_READ16_MEMBER(atapi_r);
         DECLARE_WRITE16_MEMBER(atapi_w);
 		DECLARE_READ16_MEMBER(atapi_status_r);
@@ -71,7 +71,7 @@ protected:
 private:
         // internal state
 		bool m_is_primary;
-			
+
 		// CDROM
 		SCSIInstance *m_inserted_cdrom;
 
@@ -82,8 +82,8 @@ private:
 		int m_atapi_xfermod;
 		/* memory */
 		UINT8 m_atapi_regs[ATAPI_REG_MAX];
-		UINT8 m_atapi_data[ATAPI_DATA_SIZE];		
-		
+		UINT8 m_atapi_data[ATAPI_DATA_SIZE];
+
 		int m_cur_drive;
 };
 

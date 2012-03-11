@@ -28,12 +28,12 @@ public:
 
 	virtual bool call_load();
 	virtual void call_unload();
-	void set_params(int dividend, int divisor) { m_dividend = dividend; m_divisor = divisor;} 
-	
+	void set_params(int dividend, int divisor) { m_dividend = dividend; m_divisor = divisor;}
+
 	int get_dividend() { return m_dividend; }
 	int get_divisor() { return m_divisor; }
 protected:
-	virtual void device_start();	
+	virtual void device_start();
 private:
 	int	m_dividend;
 	int	m_divisor;

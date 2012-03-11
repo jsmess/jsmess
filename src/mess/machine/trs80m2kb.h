@@ -70,7 +70,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_READ_LINE_MEMBER( data_r );
-	
+
 	// not really public
 	DECLARE_READ8_MEMBER( kb_t1_r );
 	DECLARE_READ8_MEMBER( kb_p0_r );
@@ -91,7 +91,7 @@ private:
 	int m_busy;
 	int m_data;
 	int m_clk;
-	
+
 	UINT8 m_y;
 };
 

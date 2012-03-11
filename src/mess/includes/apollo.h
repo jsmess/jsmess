@@ -111,7 +111,7 @@ public:
 	device_t *dma8237_2;
 	device_t *pic8259_master;
 	device_t *pic8259_slave;
-    
+
 };
 
 MACHINE_CONFIG_EXTERN( apollo );

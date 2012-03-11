@@ -87,9 +87,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( strobe_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
-	
+
 	void scan_keyboard();
-	
+
 	// memory state
 	int m_boot_rom;
 	int m_bank;
@@ -129,7 +129,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( ual_w );
 	DECLARE_WRITE8_MEMBER( tcl_w );
-	
+
 	UINT16 m_ual;
 	UINT8 m_limit[2];
 	UINT8 m_offset[2];

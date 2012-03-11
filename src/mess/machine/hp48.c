@@ -155,7 +155,7 @@ static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 	//if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
 	//else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
 //#ifdef CHARDEV
-//	else chardev_out( state->m_chardev, param );
+//  else chardev_out( state->m_chardev, param );
 //#endif
 }
 
@@ -1082,7 +1082,7 @@ hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, co
 }
 
 void hp48_port_image_device::device_config_complete()
-{	
+{
 	update_names(HP48_PORT, "port", "p");
 }
 

@@ -29,12 +29,12 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_status_r )
 	switch(mem_mask)
 	{
 	case 0x000000ff:
-		break;	
+		break;
 	case 0x0000ff00:
 		reg+=1;
 		shift=8;
 		break;
-	}			
+	}
 	UINT32 data = atapi_regs[ATAPI_REG_CMDSTATUS];
 	data <<= shift;
 	return  data;
@@ -95,7 +95,7 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 			data |= ( m_atapi_data[m_atapi_data_ptr++] << 8 );
 			if( m_atapi_data_ptr >= m_atapi_data_len )
 			{
-              
+
 				m_atapi_data_ptr = 0;
 				m_atapi_data_len = 0;
 
@@ -121,16 +121,16 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 		switch(mem_mask)
 		{
 		case 0x000000ff:
-			break;	
+			break;
 		case 0x0000ff00:
 			reg+=1;
 			shift=8;
 			break;
-		}			
+		}
 		if (m_cur_drive==1) return 0x00;
 		data = atapi_regs[reg];
-		//logerror("ATAPI: reg %d = %x (offset %x mask %x) [%08x][read]\n", reg, data, offset, mem_mask,cpu_get_pc(machine().device("maincpu")));		
-      	data <<= shift;
+		//logerror("ATAPI: reg %d = %x (offset %x mask %x) [%08x][read]\n", reg, data, offset, mem_mask,cpu_get_pc(machine().device("maincpu")));
+    	data <<= shift;
 	}
 	return data;
 }
@@ -147,7 +147,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 
 		if (m_atapi_cdata_wait)
 		{
-          	//logerror("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
+        	//logerror("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
 			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
@@ -177,18 +177,18 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 				case 0x43 :
 				case 0xa8 :
 				case 0xad :
-				case 0xbe :	
+				case 0xbe :
 							checkready = true;
 							break;
 			}
-	
-			if (checkready && cdrom_get_toc(cdrom->get_cdrom_file())==NULL) 
+
+			if (checkready && cdrom_get_toc(cdrom->get_cdrom_file())==NULL)
 			{
 				logerror("ATAPI: SCSI command %02x returned not ready\n", atapi_data[0]&0xff);
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY | ATAPI_STAT_CHECK;
 				atapi_regs[ATAPI_REG_ERRFEAT] = (2 << 4) | ATAPI_ERRFEAT_ABRT;
 				// assert IRQ
-				atapi_irq(this, ASSERT_LINE);				
+				atapi_irq(this, ASSERT_LINE);
 			} else {
 				// send it to the SCSI device
 				SCSISetCommand( m_inserted_cdrom, m_atapi_data, 12 );
@@ -206,7 +206,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 						m_atapi_xfermod = m_atapi_xferlen - MAX_TRANSFER_SIZE;
 						m_atapi_xferlen = MAX_TRANSFER_SIZE;
 					}
-	 
+
 					atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
@@ -265,20 +265,20 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 		switch(mem_mask)
 		{
 		case 0x000000ff:
-			break;	
+			break;
 		case 0x0000ff00:
 			reg+=1;
 			data >>= 8;
 			break;
-		}			
+		}
 		if (reg==6) m_cur_drive = (data & 0x10) >> 4;
 		if (m_cur_drive==1) return;
 		atapi_regs[reg] = data;
-      	//logerror("ATAPI: reg %d = %x (offset %x mask %x)\n", reg, data, offset, mem_mask);
+    	//logerror("ATAPI: reg %d = %x (offset %x mask %x)\n", reg, data, offset, mem_mask);
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-          	logerror("ATAPI command %x issued!\n", data);
+        	logerror("ATAPI command %x issued!\n", data);
 			switch (data)
 			{
 				case 0xa0:	// PACKET
@@ -314,7 +314,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 					atapi_data[ 46 ^ 1 ] = '1';
 					atapi_data[ 47 ^ 1 ] = '.';
 					atapi_data[ 48 ^ 1 ] = '0';
-					
+
 					memset( &atapi_data[ 54 ], ' ', 40 );
 					atapi_data[ 54 ^ 1 ] = 'M';
 					atapi_data[ 55 ^ 1 ] = 'A';
@@ -331,7 +331,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 					atapi_data[ 66 ^ 1 ] = 's';
 					atapi_data[ 67 ^ 1 ] = 'e';
 					atapi_data[ 68 ^ 1 ] = 'd';
-					atapi_data[ 69 ^ 1 ] = ' ';					
+					atapi_data[ 69 ^ 1 ] = ' ';
 					atapi_data[ 70 ^ 1 ] = 'C';
 					atapi_data[ 71 ^ 1 ] = 'D';
 					atapi_data[ 72 ^ 1 ] = '-';
@@ -350,7 +350,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 				case 0xec:	//IDENTIFY DEVICE - Must abort here and set for packet data
 					atapi_regs[ATAPI_REG_ERRFEAT] = ATAPI_ERRFEAT_ABRT;
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_CHECK;
-					
+
 					atapi_irq(this, ASSERT_LINE);
 					break;
 				case 0xef:	// SET FEATURES
@@ -370,14 +370,14 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW]  = 0x14; // CYLINDER_LSB
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb; // CYLINDER_MSB
 					atapi_regs[ATAPI_REG_DRIVESEL]  &= 0xf0; // HEAD_NUMBER
-					
+
 					atapi_irq(this, ASSERT_LINE);
 					break;
 				default:
 					logerror("ATAPI: Unknown IDE command %x\n", data);
 					atapi_regs[ATAPI_REG_ERRFEAT] = ATAPI_ERRFEAT_ABRT;
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_CHECK;
-				
+
 					atapi_irq(this, ASSERT_LINE);
 					break;
 			}
@@ -391,7 +391,7 @@ static struct cdrom_interface ide_cdrom =
 	NULL
 };
 
-static MACHINE_CONFIG_FRAGMENT( ide )	
+static MACHINE_CONFIG_FRAGMENT( ide )
 	MCFG_CDROM_ADD( "cdrom", ide_cdrom )
 MACHINE_CONFIG_END
 
@@ -471,12 +471,12 @@ void isa16_ide_cd_device::device_reset()
 	if (m_inserted_cdrom) SCSIDeleteInstance(m_inserted_cdrom);
 	SCSIAllocInstance( machine(), &SCSIClassCr589, &m_inserted_cdrom, subtag(tempstring, "cdrom"));
 	m_is_primary = (input_port_read(*this, "DSW") & 1) ? false : true;
-	if (m_is_primary) {	
-		m_isa->install16_device(0x01f0, 0x01f7, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_w), this));		
-		//m_isa->install16_device(0x03f0, 0x03f7, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_status_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_cmd_w), this));		
+	if (m_is_primary) {
+		m_isa->install16_device(0x01f0, 0x01f7, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_w), this));
+		//m_isa->install16_device(0x03f0, 0x03f7, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_status_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_cmd_w), this));
 	} else {
-		m_isa->install16_device(0x0170, 0x0177, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_w), this));		
-		m_isa->install16_device(0x0370, 0x0377, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_status_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_cmd_w), this));		
+		m_isa->install16_device(0x0170, 0x0177, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_w), this));
+		m_isa->install16_device(0x0370, 0x0377, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_status_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_cmd_w), this));
 	}
 	m_cur_drive = 0;
 }

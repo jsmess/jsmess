@@ -1,13 +1,13 @@
 /***************************************************************************
-   
+
         Kosmos CP-1
 
         06/03/2012 Skeleton driver.
 
-		on board there is also 8155 
-		KEYBOARD Membrane keyboard, 57 keys
-		6 * 7 seg led display
-		
+        on board there is also 8155
+        KEYBOARD Membrane keyboard, 57 keys
+        6 * 7 seg led display
+
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
 #include "emu.h"
@@ -18,7 +18,7 @@ class cp1_state : public driver_device
 public:
 	cp1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-	
+
 	DECLARE_READ8_MEMBER(getp1);
 	DECLARE_READ8_MEMBER(getp2);
 	DECLARE_READ8_MEMBER(getbus);
@@ -26,7 +26,7 @@ public:
 	DECLARE_READ8_MEMBER(t1_r);
 	DECLARE_WRITE8_MEMBER(putp1);
 	DECLARE_WRITE8_MEMBER(putp2);
-	DECLARE_WRITE8_MEMBER(putbus);	
+	DECLARE_WRITE8_MEMBER(putbus);
 };
 
 READ8_MEMBER(cp1_state::getp1)
@@ -69,7 +69,7 @@ WRITE8_MEMBER(cp1_state::putbus)
 
 static ADDRESS_MAP_START(cp1_mem, AS_PROGRAM, 8, cp1_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff) AM_ROM	
+	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cp1_io , AS_IO, 8, cp1_state)
@@ -89,7 +89,7 @@ static MACHINE_CONFIG_START( cp1, cp1_state )
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",I8048, XTAL_6MHz)
     MCFG_CPU_PROGRAM_MAP(cp1_mem)
-    MCFG_CPU_IO_MAP(cp1_io)	
+    MCFG_CPU_IO_MAP(cp1_io)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -111,5 +111,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, cp1,  0,       0, 	cp1, 	cp1, 	 0,   "Kosmos",   "CP1 / Computer Praxis",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, cp1,  0,       0,	cp1,	cp1,	 0,   "Kosmos",   "CP1 / Computer Praxis",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

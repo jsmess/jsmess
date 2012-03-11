@@ -691,7 +691,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "tap,rim"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
@@ -726,7 +726,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "tap,rim"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
@@ -762,7 +762,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "typ"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
@@ -797,7 +797,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "drm"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-		
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
