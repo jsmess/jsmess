@@ -150,10 +150,10 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "crd"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
-	virtual bool call_create(int format_type, option_resolution *format_options);	
+	virtual bool call_create(int format_type, option_resolution *format_options);
 protected:
 	// device-level overrides
     virtual void device_config_complete();

@@ -28,12 +28,12 @@ x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, cons
 }
 
 void x68k_hdc_image_device::device_config_complete()
-{	
+{
 	update_names(X68KHDC, "sasihd", "sasi");
 }
 
 void x68k_hdc_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{	
+{
 	m_req = 1;
 	m_status_port |= 0x01;
 }
@@ -317,7 +317,7 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 }
 
 READ16_MEMBER( x68k_hdc_image_device::hdc_r )
-{	
+{
 	int retval = 0xff;
 
 	switch(offset)

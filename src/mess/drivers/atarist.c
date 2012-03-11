@@ -3414,7 +3414,7 @@ COMP( 1989, ste_fr,		ste,		0,		ste,		ste,		0,		"Atari",	"STE (France)",			GAME_N
 COMP( 1989, ste_it,		ste,		0,		ste,		ste,		0,		"Atari",	"STE (Italy)",			GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1989, ste_se,		ste,		0,		ste,		ste,		0,		"Atari",	"STE (Sweden)",			GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1989, ste_sg,		ste,		0,		ste,		ste,		0,		"Atari",	"STE (Switzerland)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-//COMP( 1990, stbook,		ste,		0,		stbook,		stbook,		0,		"Atari",	"STBook",				GAME_NOT_WORKING )
+//COMP( 1990, stbook,       ste,        0,      stbook,     stbook,     0,      "Atari",    "STBook",               GAME_NOT_WORKING )
 COMP( 1990,	tt030,		0,			0,		tt030,		tt030,		0,		"Atari",	"TT030 (USA)",			GAME_NOT_WORKING )
 COMP( 1990,	tt030_uk,	tt030,		0,		tt030,		tt030,		0,		"Atari",	"TT030 (UK)",			GAME_NOT_WORKING )
 COMP( 1990,	tt030_de,	tt030,		0,		tt030,		tt030,		0,		"Atari",	"TT030 (Germany)",		GAME_NOT_WORKING )

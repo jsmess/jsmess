@@ -125,7 +125,7 @@ static TIMER_DEVICE_CALLBACK( trs80m2_keyboard_tick )
 READ8_MEMBER( trs80m2_state::read )
 {
 	UINT8 data = 0;
-	
+
 	if (offset < 0x800)
 	{
 		if (m_boot_rom)
@@ -150,14 +150,14 @@ READ8_MEMBER( trs80m2_state::read )
 		else if (m_bank)
 		{
 			offs_t addr = (m_bank << 15) | (offset & 0x7fff);
-			
+
 			if (addr < m_ram->size())
 			{
 				data = m_ram->pointer()[addr];
 			}
 		}
 	}
-	
+
 	return data;
 }
 
@@ -176,7 +176,7 @@ WRITE8_MEMBER( trs80m2_state::write )
 		else if (m_bank)
 		{
 			offs_t addr = (m_bank << 15) | (offset & 0x7fff);
-			
+
 			if (addr < m_ram->size())
 			{
 				m_ram->pointer()[addr] = data;
@@ -200,7 +200,7 @@ WRITE8_MEMBER( trs80m2_state::rom_enable_w )
         6
         7
 
-	*/
+    */
 
 	m_boot_rom = BIT(data, 0);
 }
@@ -220,7 +220,7 @@ WRITE8_MEMBER( trs80m2_state::drvslt_w )
         6       SDSEL
         7       FM/MFM
 
-	*/
+    */
 
 	// drive select
 	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
@@ -273,7 +273,7 @@ READ8_MEMBER( trs80m2_state::nmi_r )
         6       DE                  display enabled
         7       KBIRQ               keyboard interrupt
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -307,7 +307,7 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
         6       BLNKVID             video display enable
         7                           video RAM enable
 
-	*/
+    */
 
 	// memory bank select
 	m_bank = data & 0x0f;
@@ -352,20 +352,20 @@ WRITE8_MEMBER( trs80m16_state::tcl_w )
         1       CONT1
         2       HALT
         3       RESET
-        4		CONT4
-        5		CONT5
-        6		CONT6
-        7		A14
+        4       CONT4
+        5       CONT5
+        6       CONT6
+        7       A14
 
-	*/
-	
+    */
+
 	m_subcpu->set_input_line(INPUT_LINE_HALT, BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	pic8259_ir0_w(m_pic, BIT(data, 4));
 	pic8259_ir1_w(m_pic, BIT(data, 5));
 	pic8259_ir2_w(m_pic, BIT(data, 6));
-	
+
 	m_ual = (m_ual & 0x1fe) | BIT(data, 7);
 }
 
@@ -379,13 +379,13 @@ WRITE8_MEMBER( trs80m16_state::ual_w )
         1       A16
         2       A17
         3       A18
-        4		A19
-        5		A20
-        6		A21
-        7		A22
+        4       A19
+        5       A20
+        6       A21
+        7       A22
 
-	*/
-	
+    */
+
 	m_ual = (data << 1) | BIT(m_ual, 0);
 }
 
@@ -440,10 +440,10 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( m68000_mem, AS_PROGRAM, 16, trs80m2_state )
-//	AM_RANGE(0x7800d0, 0x7800d1) PIC
-//	AM_RANGE(0x7800d2, 0x7800d3) limit/offset 2
-//	AM_RANGE(0x7800d4, 0x7800d5) limit/offset 1
-//	AM_RANGE(0x7800d6, 0x7800d7) Z80 IRQ
+//  AM_RANGE(0x7800d0, 0x7800d1) PIC
+//  AM_RANGE(0x7800d2, 0x7800d3) limit/offset 2
+//  AM_RANGE(0x7800d4, 0x7800d5) limit/offset 1
+//  AM_RANGE(0x7800d6, 0x7800d7) Z80 IRQ
 ADDRESS_MAP_END
 
 
@@ -626,7 +626,7 @@ void trs80m2_state::video_start()
 {
 	// find memory regions
 	m_char_rom = machine().region(MC6845_TAG)->base();
-	
+
 	// allocate memory
 	m_video_ram = auto_alloc_array(machine(), UINT8, 0x800);
 }
@@ -658,7 +658,7 @@ UINT32 trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 WRITE_LINE_MEMBER( trs80m2_state::kb_clock_w )
 {
 	int kbdata = m_kb->data_r();
-	
+
 	if (m_key_bit == 8)
 	{
 		if (!m_kbdata && kbdata)
@@ -679,7 +679,7 @@ WRITE_LINE_MEMBER( trs80m2_state::kb_clock_w )
 			m_key_bit++;
 		}
 	}
-	
+
 	m_kbdata = kbdata;
 	m_kbclk = state;
 }
@@ -728,7 +728,7 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
         6       PE          paper empty
         7       BUSY        printer busy
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -768,7 +768,7 @@ WRITE8_MEMBER( trs80m2_state::pio_pa_w )
         6       PE          paper empty
         7       BUSY        printer busy
 
-	*/
+    */
 
 	// prime
 	m_centronics->init_prime_w(BIT(data, 3));
@@ -955,7 +955,7 @@ void trs80m2_state::machine_start()
 void trs80m16_state::machine_start()
 {
 	trs80m2_state::machine_start();
-	
+
 	// register CPU IRQ callback
 	device_set_irq_callback(m_maincpu, trs80m16_irq_callback);
 
@@ -1051,7 +1051,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(m68000_mem)
 	MCFG_DEVICE_DISABLE()
-	
+
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

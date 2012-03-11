@@ -1216,16 +1216,16 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "awd"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_create(int format_type, option_resolution *format_options);
-	
-	disk_data *token() { return &m_token; }	
+
+	disk_data *token() { return &m_token; }
 protected:
 	// device-level overrides
     virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	disk_data m_token;
 };
 
@@ -1241,7 +1241,7 @@ omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, co
 }
 
 void omti_disk_image_device::device_config_complete()
-{	
+{
 	update_names(OMTI_DISK, "disk", "disk");
 };
 

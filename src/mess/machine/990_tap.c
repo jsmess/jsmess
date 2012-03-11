@@ -962,7 +962,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "tap"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
@@ -980,7 +980,7 @@ ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, 
 }
 
 void ti990_tape_image_device::device_config_complete()
-{	
+{
 	update_names();
 }
 

@@ -19,7 +19,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_speaker(*this, SPEAKER_TAG),
-//		  m_serial(*this, "tiserial"),
+//        m_serial(*this, "tiserial"),
 		  m_nvram(*this, "nvram")
 		{ }
 

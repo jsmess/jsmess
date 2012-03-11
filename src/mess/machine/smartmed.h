@@ -17,7 +17,7 @@ struct _smartmedia_cartslot_config
 	const char *					interface;
 };
 
-	
+
 enum sm_mode_t
 {
 	SM_M_INIT,		// initial state
@@ -89,7 +89,7 @@ public:
 
 	void read(int offset, void *data, int size);
 
-	void set_data_ptr(void *ptr);	
+	void set_data_ptr(void *ptr);
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -136,7 +136,7 @@ protected:
 
 	#ifdef SMARTMEDIA_IMAGE_SAVE
 	int m_image_format;
-	#endif	
+	#endif
 };
 
 // device type definition
@@ -160,11 +160,11 @@ public:
 	virtual const char *image_interface() const { return m_image_interface; }
 	virtual const char *file_extensions() const { return "smc"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
-	
+
 	void set_image_interface(const char *image_interface) { m_image_interface = image_interface; }
 protected:
 	// device-level overrides
@@ -172,8 +172,8 @@ protected:
 
 	bool smartmedia_format_1();
 	bool smartmedia_format_2();
-	int detect_geometry( UINT8 id1, UINT8 id2);	
-	
+	int detect_geometry( UINT8 id1, UINT8 id2);
+
 	const char *m_image_interface;
 };
 

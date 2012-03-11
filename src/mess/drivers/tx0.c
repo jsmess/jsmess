@@ -416,7 +416,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "tap,rim"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
@@ -451,7 +451,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "tap,rim"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
@@ -487,7 +487,7 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "typ"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
@@ -522,13 +522,13 @@ public:
 	virtual const char *image_interface() const { return NULL; }
 	virtual const char *file_extensions() const { return "tap"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-		
+
 	virtual bool call_load();
 	virtual void call_unload();
 protected:
 	// device-level overrides
     virtual void device_config_complete() { update_names(); }
-	virtual void device_start();	
+	virtual void device_start();
 };
 
 const device_type TX0_MAGTAPE = &device_creator<tx0_magtape_image_device>;

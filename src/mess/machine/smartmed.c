@@ -542,7 +542,7 @@ void nand_device::command_w(UINT8 data)
 			else
 			{
 				if (!m_devcb_write_line_rnb.isnull())
-				{				
+				{
 					m_devcb_write_line_rnb( 0);
 					m_devcb_write_line_rnb( 1);
 				}
@@ -800,7 +800,7 @@ smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, 
 }
 
 void smartmedia_image_device::device_config_complete()
-{	
+{
 	nand_device::device_config_complete();
 	update_names();
 }
