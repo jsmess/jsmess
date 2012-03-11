@@ -7,7 +7,7 @@
         system driver
 
         TODO:
-        - speaker controlled by constant tone or txd
+        - speaker controlled by txd
         - Facility to load games
         - expansion interface
 
@@ -316,7 +316,7 @@ static UPD65031_INTERFACE( z88_blink_intf )
 	DEVCB_DRIVER_MEMBER(z88_state, kb_r),       			// kb read input
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),         			// INT line out
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),        // NMI line out
-	DEVCB_NULL												// Speaker line out
+	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w)			// Speaker line out
 };
 
 static const z88cart_interface z88_cart_interface =

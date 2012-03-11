@@ -36,12 +36,10 @@ public:
 	z88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_speaker(*this, SPEAKER_TAG),
 		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
 	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
