@@ -29,7 +29,7 @@ protected:
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);
 	virtual UINT8* get_cart_base();
-	virtual int get_cart_size() { return 0x8000; }
+	virtual UINT32 get_cart_size() { return 0x8000; }
 
 protected:
 	// internal state
@@ -49,7 +49,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "z88_128k_ram"; }
 
 	// z88cart_interface overrides
-	virtual int get_cart_size() { return 0x20000; }
+	virtual UINT32 get_cart_size() { return 0x20000; }
 };
 
 // ======================> z88_512k_ram_device
@@ -65,7 +65,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "z88_512k_ram"; }
 
 	// z88cart_interface overrides
-	virtual int get_cart_size() { return 0x80000; }
+	virtual UINT32 get_cart_size() { return 0x80000; }
 };
 
 // ======================> z88_1024k_ram_device
@@ -81,7 +81,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "z88_1024k_ram"; }
 
 	// z88cart_interface overrides
-	virtual int get_cart_size() { return 0x100000; }
+	virtual UINT32 get_cart_size() { return 0x100000; }
 };
 
 // device type definition

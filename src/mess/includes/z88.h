@@ -12,6 +12,7 @@
 #include "machine/upd65031.h"
 #include "machine/ram.h"
 #include "machine/z88cart.h"
+#include "machine/z88_flash.h"
 #include "machine/z88_ram.h"
 #include "machine/z88_rom.h"
 #include "sound/speaker.h"

@@ -28,7 +28,7 @@ protected:
 	// z88cart_interface overrides
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual UINT8* get_cart_base();
-	virtual int get_cart_size() { return 0x8000; }
+	virtual UINT32 get_cart_size() { return 0x8000; }
 
 protected:
 	// internal state
@@ -48,7 +48,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "z88_128k_rom"; }
 
 	// z88cart_interface overrides
-	virtual int get_cart_size() { return 0x20000; }
+	virtual UINT32 get_cart_size() { return 0x20000; }
 };
 
 // ======================> z88_256k_rom_device
@@ -64,7 +64,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "z88_256k_rom"; }
 
 	// z88cart_interface overrides
-	virtual int get_cart_size() { return 0x200000; }
+	virtual UINT32 get_cart_size() { return 0x200000; }
 };
 
 // device type definition
