@@ -13,6 +13,7 @@
 #ifndef __EMINLINE__
 #define __EMINLINE__
 
+#ifndef SDLMAME_NOASM
 /* we come with implementations for GCC x86 and PPC */
 #if defined(__GNUC__) && !defined(SDLMAME_NOASM)
 
@@ -28,6 +29,7 @@
 
 #include "osinline.h"
 
+#endif
 #endif
 
 
