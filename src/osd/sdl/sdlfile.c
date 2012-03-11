@@ -282,7 +282,7 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, U
 #if defined(SDLMAME_DARWIN) || defined(SDLMAME_BSD)
          result = pread(file->handle, buffer, count, offset);
          if (result < 0)
-#elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
+#elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2) || defined(SDLMAME_EMSCRIPTEN)
          lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
          result = read(file->handle, buffer, count);
          if (result < 0)
@@ -328,7 +328,7 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 #if defined(SDLMAME_DARWIN) || defined(SDLMAME_BSD)
          result = pwrite(file->handle, buffer, count, offset);
          if (!result)
-#elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
+#elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2) || defined(SDLMAME_EMSCRIPTEN)
          lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
          result = write(file->handle, buffer, count);
          if (!result)
