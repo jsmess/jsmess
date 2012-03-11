@@ -77,6 +77,7 @@ private:
 	inline void set_mode(int mode);
 	static const device_timer_id TIMER_RTC = 0;
 	static const device_timer_id TIMER_FLASH = 1;
+	static const device_timer_id TIMER_SPEAKER = 2;
 
 	devcb_resolved_write_line	m_out_int_func;
 	devcb_resolved_write_line	m_out_nmi_func;
@@ -95,10 +96,12 @@ private:
 	UINT8	m_tack;				// timer interrupts acknowledge
 	UINT8	m_com;				// command register
 	int		m_flash;			// cursor flash
+	int		m_speaker_state;	// spkr line
 
 	// timers
 	emu_timer *m_rtc_timer;
 	emu_timer *m_flash_timer;
+	emu_timer *m_speaker_timer;
 };
 
 

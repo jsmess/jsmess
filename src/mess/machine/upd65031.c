@@ -13,7 +13,7 @@
 
     TODO:
     - coma and snooze mode
-    - speaker controlled by constant tone or txd
+    - speaker controlled by txd
     - EPROM programming
     - UART
 
@@ -32,6 +32,8 @@ const device_type UPD65031 = &device_creator<upd65031_device>;
 //**************************************************************************
 
 #define LOG 0
+
+#define SPEAKER_ALARM_FREQ	 attotime::from_hz(3200)
 
 // internal registers
 enum
@@ -239,8 +241,10 @@ void upd65031_device::device_start()
 	// allocate timers
 	m_rtc_timer = timer_alloc(TIMER_RTC);
 	m_flash_timer = timer_alloc(TIMER_FLASH);
+	m_speaker_timer = timer_alloc(TIMER_SPEAKER);
 	m_rtc_timer->adjust(attotime::from_msec(5), 0, attotime::from_msec(5));
 	m_flash_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+	m_speaker_timer->reset();
 
 	// state saving
 	save_item(NAME(m_mode));
@@ -386,6 +390,10 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	case TIMER_FLASH:
 		m_flash = !m_flash;
 		break;
+	case TIMER_SPEAKER:
+		m_speaker_state = !m_speaker_state;
+		m_out_spkr_func(m_speaker_state ? 1 : 0);
+		break;
 	}
 }
 
@@ -496,16 +504,26 @@ WRITE8_MEMBER( upd65031_device::write )
 			if (data & COM_RESTIM)
 				m_tim[0] = m_tim[1] = m_tim[2] = m_tim[3] = m_tim[4] = 0;
 
-			// SBIT controls speaker direct?
-			if (!(data & COM_SRUN))
+			if ((data & COM_SRUN) && !(data & COM_SBIT))
 			{
-				// speaker controlled by SBIT
-				m_out_spkr_func(BIT(data, 6));
+				// constant tone used for keyclick and alarm
+				m_speaker_timer->adjust(SPEAKER_ALARM_FREQ, 0, SPEAKER_ALARM_FREQ);
 			}
 			else
 			{
-				// speaker under control of continuous tone, or txd
-				// TODO
+				if (!(data & COM_SRUN))
+				{
+					// speaker controlled by SBIT
+					m_speaker_state = BIT(data, 6);
+					m_out_spkr_func(m_speaker_state);
+				}
+				else
+				{
+					// speaker controlled by txd line
+					// TODO
+				}
+
+				m_speaker_timer->reset();
 			}
 
 			// bit 2 controls the lower 8kb of memory
