@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_EMSCRIPTEN)
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -35,7 +35,7 @@ const char *sdlfile_socket_identifier  = "socket.";
 */
 bool sdl_check_socket_path(const char *path)
 {
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_EMSCRIPTEN)
 	if (strlen(sdlfile_socket_identifier) > 0 &&
 		strncmp(path, sdlfile_socket_identifier, strlen(sdlfile_socket_identifier)) == 0 &&
 		strchr(path, ':') != NULL) return true;
@@ -45,7 +45,7 @@ bool sdl_check_socket_path(const char *path)
 
 file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
 {
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_EMSCRIPTEN)
 	char hostname[256];
 	struct hostent *localhost;
 	struct sockaddr_in sai;
@@ -85,7 +85,7 @@ file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 
 file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_EMSCRIPTEN)
 	ssize_t result;
 	char line[80];
 	struct timeval timeout;
@@ -125,7 +125,7 @@ file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 
 file_error sdl_write_socket(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_EMSCRIPTEN)
 	ssize_t result;
 
 	result = write(file->handle, buffer, count);
@@ -145,7 +145,7 @@ file_error sdl_write_socket(osd_file *file, const void *buffer, UINT64 offset, U
 
 file_error sdl_close_socket(osd_file *file)
 {
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_EMSCRIPTEN)
 	close(file->handle);
 	osd_free(file);
 #endif

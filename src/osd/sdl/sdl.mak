@@ -126,6 +126,12 @@ endif
 
 # add SDLMAME BASE_TARGETOS definitions
 
+ifeq ($(TARGETOS),emscripten)
+DEFS += -DSDLMAME_EMSCRIPTEN
+BASE_TARGETOS = unix
+SYNC_IMPLEMENTATION = tc
+endif
+
 ifeq ($(TARGETOS),unix)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc

@@ -14,7 +14,7 @@
 #include <SDL/SDL_version.h>
 
 #ifdef SDLMAME_UNIX
-#ifndef SDLMAME_MACOSX
+#if !defined(SDLMAME_MACOSX) && !defined(SDLMAME_EMSCRIPTEN)
 #include <SDL/SDL_ttf.h>
 #include <fontconfig/fontconfig.h>
 #endif
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
 	#ifdef SDLMAME_UNIX
-	#ifndef SDLMAME_MACOSX
+	#if !defined(SDLMAME_MACOSX) && !defined(SDLMAME_EMSCRIPTEN)
 	if (TTF_Init() == -1)
 	{
 		printf("SDL_ttf failed: %s\n", TTF_GetError());
@@ -363,7 +363,7 @@ int main(int argc, char *argv[])
 	//SDL_Quit();
 
 	#ifdef SDLMAME_UNIX
-	#ifndef SDLMAME_MACOSX
+	#if !defined(SDLMAME_MACOSX) && !defined(SDLMAME_EMSCRIPTEN)
 	TTF_Quit();
 	FcFini();
 	#endif
@@ -671,7 +671,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #endif
 }
 
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_EMSCRIPTEN)
 #define POINT_SIZE 144.0
 
 #ifdef SDLMAME_MACOSX
