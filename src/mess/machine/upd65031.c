@@ -396,8 +396,10 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 UINT32 upd65031_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_screen_update_cb)
+	if (m_screen_update_cb && (m_com & COM_LCDON))
 		(m_screen_update_cb)(*this, bitmap, m_lcd_regs[4], m_lcd_regs[2], m_lcd_regs[3], m_lcd_regs[0], m_lcd_regs[1], m_flash);
+	else
+		bitmap.fill(0, cliprect);
 
 	return 0;
 }
@@ -550,7 +552,7 @@ WRITE8_MEMBER( upd65031_device::write )
 			if (LOG) logerror("uPD65031 '%s': ack w: %02x\n", tag(), data);
 
 			m_ack = data;
-			m_sta &= ~data;
+			m_sta &= ~(data & 0x7f);
 
 			// refresh ints
 			interrupt_refresh();
@@ -581,4 +583,37 @@ WRITE8_MEMBER( upd65031_device::write )
 			logerror("uPD65031 '%s': blink w: %04x %02x\n", tag(), offset, data);
 			break;
 	}
+}
+
+
+//-------------------------------------------------
+//  flp line
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( upd65031_device::flp_w )
+{
+	if (!(m_sta & STA_FLAPOPEN) && state)
+	{
+		// set interrupt on rising edge
+		m_sta |= STA_FLAP;
+
+		interrupt_refresh();
+	}
+
+	if (state)
+		m_sta |= STA_FLAPOPEN;
+	else
+		m_sta &= ~STA_FLAPOPEN;
+}
+
+//-------------------------------------------------
+//  battery low line
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( upd65031_device::btl_w )
+{
+	if (state)
+		m_sta |= STA_BTL;
+	else
+		m_sta &= ~STA_BTL;
 }

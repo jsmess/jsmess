@@ -18,7 +18,7 @@ inline void z88_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT16 col
 // convert absolute offset into correct address to get data from
 inline UINT8* z88_state::convert_address(UINT32 offset)
 {
-	return machine().region("maincpu")->base() + offset;
+	return (offset < 0x80000 ? m_bios : m_ram_base) + (offset & 0x7ffff);
 }
 
 /***************************************************************************
@@ -150,7 +150,7 @@ void z88_state::lcd_update(bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT
 					}
 					else
 					{
-						ch &= 0x7f;
+						ch &= 0xff;
 						char_gfx = convert_address(hires0<<13);
 					}
 

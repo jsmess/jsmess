@@ -570,6 +570,9 @@ $(MESSOBJ)/acorn.a:				\
 	$(MESS_DRIVERS)/electron.o	\
 	$(MESS_DRIVERS)/z88.o		\
 	$(MESS_VIDEO)/z88.o			\
+	$(MESS_MACHINE)/z88cart.o	\
+	$(MESS_MACHINE)/z88_ram.o	\
+	$(MESS_MACHINE)/z88_rom.o	\
 	$(MESS_MACHINE)/upd65031.o	\
 
 $(MESSOBJ)/act.a:				\

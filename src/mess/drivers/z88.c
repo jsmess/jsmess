@@ -42,6 +42,19 @@ explains why the extra checks are done
 
 */
 
+// cartridges read
+READ8_MEMBER(z88_state::bank0_cart_r) { return m_carts[m_bank[0].slot]->read(space, (m_bank[0].page<<14) + offset); }
+READ8_MEMBER(z88_state::bank1_cart_r) { return m_carts[m_bank[1].slot]->read(space, (m_bank[1].page<<14) + offset); }
+READ8_MEMBER(z88_state::bank2_cart_r) { return m_carts[m_bank[2].slot]->read(space, (m_bank[2].page<<14) + offset); }
+READ8_MEMBER(z88_state::bank3_cart_r) { return m_carts[m_bank[3].slot]->read(space, (m_bank[3].page<<14) + offset); }
+
+// cartridges write
+WRITE8_MEMBER(z88_state::bank0_cart_w) { m_carts[m_bank[0].slot]->write(space, (m_bank[0].page<<14) + offset, data); }
+WRITE8_MEMBER(z88_state::bank1_cart_w) { m_carts[m_bank[1].slot]->write(space, (m_bank[1].page<<14) + offset, data); }
+WRITE8_MEMBER(z88_state::bank2_cart_w) { m_carts[m_bank[2].slot]->write(space, (m_bank[2].page<<14) + offset, data); }
+WRITE8_MEMBER(z88_state::bank3_cart_w) { m_carts[m_bank[3].slot]->write(space, (m_bank[3].page<<14) + offset, data); }
+
+
 void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 {
 	char bank_tag[6];
@@ -50,30 +63,49 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 	// bank 0 is always even
 	if (bank == 0)	page &= 0xfe;
 
-	if (page < 0x40)	// internal memory
+	if (page < 0x20)	// internal ROM
 	{
 		// install read bank
 		m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+		m_maincpu->memory().space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
 
-		// install write bank
-		if (page > 0x1f)
+		memory_set_bank(machine(), bank_tag, page);
+	}
+	else if (page < 0x40)	// internal RAM
+	{
+		if((page & 0x1f) < (m_ram->size()>>14))
 		{
-			 // 512KB internal RAM
-			m_maincpu->memory().space(AS_PROGRAM)->install_write_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+			// install readwrite bank
+			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+
+			// set the bank
+			memory_set_bank(machine(), bank_tag, page);
 		}
 		else
 		{
-			// internal ROM
-			m_maincpu->memory().space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
+			m_maincpu->memory().space(AS_PROGRAM)->unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
 		}
-
-		// set the bank
-		memory_set_bank(machine(), bank_tag, page);
 	}
-	else
+	else	// cartridges
 	{
-		// TODO: expansion slots
-		m_maincpu->memory().space(AS_PROGRAM)->unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
+		m_bank[bank].slot = (page >> 6) & 3;
+		m_bank[bank].page = page & 0x3f;
+
+		switch (bank)
+		{
+			case 0:
+				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
+				break;
+			case 1:
+				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
+				break;
+			case 2:
+				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
+				break;
+			case 3:
+				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
+				break;
+		}
 	}
 
 
@@ -214,13 +246,24 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
+	m_bios = (UINT8*)machine().region("bios")->base();
+	m_ram_base = (UINT8*)m_ram->pointer();
+
 	// configure the memory banks
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region("maincpu")->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region("maincpu")->base() + (32<<14), 0);
-	memory_configure_bank(machine(), "bank2", 0, 64, machine().region("maincpu")->base(), 0x4000);
-	memory_configure_bank(machine(), "bank3", 0, 64, machine().region("maincpu")->base(), 0x4000);
-	memory_configure_bank(machine(), "bank4", 0, 64, machine().region("maincpu")->base(), 0x4000);
-	memory_configure_bank(machine(), "bank5", 0, 64, machine().region("maincpu")->base(), 0x4000);
+	memory_configure_bank(machine(), "bank1", 0, 1, m_bios, 0);
+	memory_configure_bank(machine(), "bank1", 1, 1, m_ram_base,  0);
+	memory_configure_bank(machine(), "bank2", 0, 32, m_bios, 0x4000);
+	memory_configure_bank(machine(), "bank3", 0, 32, m_bios, 0x4000);
+	memory_configure_bank(machine(), "bank4", 0, 32, m_bios, 0x4000);
+	memory_configure_bank(machine(), "bank5", 0, 32, m_bios, 0x4000);
+	memory_configure_bank(machine(), "bank2", 32, m_ram->size()>>14, m_ram_base, 0x4000);
+	memory_configure_bank(machine(), "bank3", 32, m_ram->size()>>14, m_ram_base, 0x4000);
+	memory_configure_bank(machine(), "bank4", 32, m_ram->size()>>14, m_ram_base, 0x4000);
+	memory_configure_bank(machine(), "bank5", 32, m_ram->size()>>14, m_ram_base, 0x4000);
+
+	m_carts[1] = machine().device<z88cart_slot_device>("slot1");
+	m_carts[2] = machine().device<z88cart_slot_device>("slot2");
+	m_carts[3] = machine().device<z88cart_slot_device>("slot3");
 }
 
 READ8_MEMBER(z88_state::kb_r)
@@ -276,13 +319,26 @@ static UPD65031_INTERFACE( z88_blink_intf )
 	DEVCB_NULL												// Speaker line out
 };
 
+static const z88cart_interface z88_cart_interface =
+{
+	DEVCB_DEVICE_LINE_MEMBER("blink", upd65031_device, flp_w)
+};
+
+static SLOT_INTERFACE_START(z88_cart)
+	SLOT_INTERFACE("32krom",  Z88_32K_ROM)			// 32KB ROM cart
+	SLOT_INTERFACE("128krom", Z88_128K_ROM)			// 128KB ROM cart
+	SLOT_INTERFACE("256krom", Z88_256K_ROM)			// 256KB ROM cart
+	SLOT_INTERFACE("32kram",  Z88_32K_RAM)			// 32KB RAM cart
+	SLOT_INTERFACE("128kram", Z88_128K_RAM)			// 128KB RAM cart
+	SLOT_INTERFACE("512kram", Z88_512K_RAM)			// 512KB RAM cart
+	SLOT_INTERFACE("1024kram",Z88_1024K_RAM)		// 1024KB RAM cart
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( z88, z88_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/3)	// divided by 3 through the uPD65031
 	MCFG_CPU_PROGRAM_MAP(z88_mem)
 	MCFG_CPU_IO_MAP(z88_io)
-	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -303,6 +359,16 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("32K,64K,256K,512k")
+
+	// cartridges
+	MCFG_Z88_CARTRIDGE_ADD("slot1", z88_cart_interface, z88_cart, NULL, NULL)
+	MCFG_Z88_CARTRIDGE_ADD("slot2", z88_cart_interface, z88_cart, NULL, NULL)
+	MCFG_Z88_CARTRIDGE_ADD("slot3", z88_cart_interface, z88_cart, NULL, NULL)
 MACHINE_CONFIG_END
 
 
@@ -313,7 +379,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START(z88)
-	ROM_REGION(0x100000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION(0x80000, "bios", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("v40uk")
 	ROM_SYSTEM_BIOS( 0, "v220uk", "Version 2.20 UK")
 	ROMX_LOAD("z88v220.rom", 0x00000, 0x20000, CRC(0ae7d0fc) SHA1(5d89e8d98d2cc0acb8cd42dbfca601b7bd09c51e), ROM_BIOS(1) )
