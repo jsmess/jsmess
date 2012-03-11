@@ -39,8 +39,6 @@
 ******************************************************************************/
 
 
-
-
 // "Pacman hardware" games
 puckman			// (c) 1980 Namco
 puckmana		// (c) 1980 Namco
@@ -229,6 +227,7 @@ eagle			// [1980] Centuri
 eagle2			// [1980] Centuri
 eagle3			// [1980] Centuri
 spctbird		// (c) Fortrek
+fantastc		// (c) Taito (Brazil)
 skybase			// (c) 1982 Omori Electric Co., Ltd.
 checkman		// (c) 1982 Zilec-Zenitone
 checkmanj		// (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
@@ -1014,6 +1013,7 @@ soulcl2b
 tekken4
 tekken4a
 tekken4b
+tekken4c
 timecrs3
 zgundm
 fghtjam
@@ -1021,6 +1021,7 @@ sukuinuf
 zgundmdx
 gundzaft
 soulclb3
+soulclb3a
 
 // Namco System 256
 sys256
@@ -1687,6 +1688,7 @@ matchit			// (c) 1989 Tamtex
 hasamu			// (c) 1991 Irem (Japan)
 dynablst		// (c) 1991 Irem (World)
 dynablstb		// bootleg
+dynablstb2		// bootleg (alt)
 bombrman		// (c) 1991 Irem (Japan)
 atompunk		// (c) 1991 Irem America (licensed from Hudson Soft)
 // M97
@@ -2034,6 +2036,7 @@ extrmatnj		// B06 (c) 1987 Taito Corporation (Japan)
 arknoid2		// B08 (c) 1987 Taito Corporation Japan (World)
 arknoid2u		// B08 (c) 1987 Taito America Corporation + Romstar license (US)
 arknoid2j		// B08 (c) 1987 Taito Corporation (Japan)
+arknoid2b		// B08 (c) 1987 (bootleg)
 drtoppel		// B19 (c) 1987 Taito Corporation Japan (World)
 drtoppelu		// B19 (c) 1987 Taito Corporation (US)
 drtoppelj		// B19 (c) 1987 Taito Corporation (Japan)
@@ -2350,8 +2353,10 @@ optiger			// 1998.09 E63 (c) 1998 Taito
 // Taito Type-Zero System
 taitotz
 batlgear		// E68 (c) 1999 Taito
+pwrshovl        // E74 (c) 1999 Taito
 landhigh		// E82 (c) 1999 Taito
-batlgr2			// E87 (c) 2000 Taito
+batlgr2			// E87 (c) 2000 Taito (2.04J)
+batlgr2a   		// E87 (c) 2000 Taito (2.01J)
 
 // Toaplan games
 perfrman		// (c) 1985 Data East Corporation (Japan)
@@ -2868,8 +2873,9 @@ sf2ceea			// 13/03/1992 (c) 1992 (World)
 sf2ceua			// 13/03/1992 (c) 1992 (USA)
 sf2ceub			// 13/05/1992 (c) 1992 (USA)
 sf2ceuc			// 03/08/1992 (c) 1992 (USA)
-sf2cej			// 13/05/1992 (c) 1992 (Japan)
 sf2ceja			// 22/03/1992 (c) 1992 (Japan)
+sf2cejb			// 13/05/1992 (c) 1992 (Japan)
+sf2cejc			// 03/08/1992 (c) 1992 (Japan)
 sf2rb			// hack
 sf2rb2			// hack
 sf2rb3			// hack
@@ -4914,7 +4920,7 @@ cleoftp			// 2002.05 Cleopatra Fortune Plus
 ggxx			// 2002.05 Guilty Gear XX
 mok				// 2002.05 The Maze of the Kings
 chocomk			// 2002.06 Musapey's Choco Marker (Rev A)
-				// 2002.07 Mazan : Flash of the Blade
+mazan			// 2002.07 Mazan : Flash of the Blade
 				// 2002.09 Yonin Uchi Mahjong MJ
 azumanga		// 2002.12 Azumanga Daiou Puzzle Bobble
 moeru			// 2002.12 Moeru Casinyo
@@ -5218,13 +5224,13 @@ cgraplop		// 28 1982.11 Cluster Buster / Graplop
 cgraplop2		// 28
 clapapa			// 29 1982.11 La-Pa-Pa
 clapapa2		// 29         Rootin' Tootin'  // this one doesn't display lapapa anywhere
-				// 30 1983.03 Skater
+cskater			// 30 1983.03 Skater
 cprobowl		// 31 1983.03 Pro Bowling
 cnightst		// 32 1983.04 Night Star
 cnightst2		// 32
 cpsoccer		// 33 1982.08 Pro Soccer
 cpsoccerj		// 33 1982.08 Pro Soccer (Japan)
-				// 34 1983.09 Super Doubles Tennis
+csdtenis		// 34 1983.09 Super Doubles Tennis
 cflyball		// 35 1983.?? Flying Ball/Bampoline
 				// 36 1984.04 Genesis/Boomer Rang'r
 czeroize		// 37 1983.10 Zeroize
@@ -5233,7 +5239,7 @@ cscrtry2		// 38
 cppicf			// 39 1984.02 Peter Pepper's Ice Cream Factory
 cppicf2			// 39
 cfghtice		// 40 1984.04 Fighting Ice Hockey
-cgsumo			// 41 1984.05 Oozumou/The Grand Sumo
+coozumou		// 41 1984.05 Oozumou/The Grand Sumo
 				// 42 1984.08 Hellow Gateball // not a typo, this is official spelling
 				// 43 1984.08 Yellow Cab
 cbdash			// 44 1985.08 Boulder Dash
@@ -5420,6 +5426,7 @@ deathbrd		// MAF (c) 1992 Data East Corporation (Japan)
 cninja			// MAG (c) 1991 Data East Corporation (World)
 cninja1			// MAG (c) 1991 Data East Corporation (World)
 cninjau			// MAG (c) 1991 Data East Corporation (US)
+cninjaa			// MAG (c) 1991 Data East Corporation (US)
 joemac			// MAG (c) 1991 Data East Corporation (Japan)
 cninjabl		// bootleg
 stoneage		// bootleg
@@ -7744,6 +7751,7 @@ rfjetu			// (c) 1998 Seibu Kaihatsu (Fabtek license)
 rfjeta			// (c) 1998 Seibu Kaihatsu (Dream Island license)
 rfjetj			// (c) 1998 Seibu Kaihatsu
 rfjets			// (c) 1998 Seibu Kaihatsu
+rfjett			// (c) 1998 Seibu Kaihatsu (Taiwan license)
 rfjet2kc		// (c) 2000 Seibu Kaihatsu
 
 ejsakura		// (c) 1999 Seibu Kaihatsu
@@ -8285,6 +8293,7 @@ deerhunt		// (c) 2000 Sammy USA Corporation
 deerhunta		// (c) 2000 Sammy USA Corporation
 deerhuntb		// (c) 2000 Sammy USA Corporation
 deerhuntc		// (c) 2000 Sammy USA Corporation
+deerhuntd		// (c) 2000 Sammy USA Corporation
 turkhunt		// (c) 2001 Sammy USA Corporation
 wschamp			// (c) 2001 Sammy USA Corporation
 wschampa		// (c) 2001 Sammy USA Corporation
