@@ -10,6 +10,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd65031.h"
+#include "machine/ram.h"
+#include "machine/z88cart.h"
+#include "machine/z88_ram.h"
+#include "machine/z88_rom.h"
 #include "sound/speaker.h"
 #include "rendlay.h"
 
@@ -32,15 +36,27 @@ public:
 	z88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_speaker(*this, SPEAKER_TAG)
+		  m_speaker(*this, SPEAKER_TAG),
+		  m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 	void bankswitch_update(int bank, UINT16 page, int rams);
 	DECLARE_READ8_MEMBER(kb_r);
+	
+	// cartridges read/write
+	DECLARE_READ8_MEMBER(bank0_cart_r);
+	DECLARE_READ8_MEMBER(bank1_cart_r);
+	DECLARE_READ8_MEMBER(bank2_cart_r);
+	DECLARE_READ8_MEMBER(bank3_cart_r);
+	DECLARE_WRITE8_MEMBER(bank0_cart_w);
+	DECLARE_WRITE8_MEMBER(bank1_cart_w);
+	DECLARE_WRITE8_MEMBER(bank2_cart_w);
+	DECLARE_WRITE8_MEMBER(bank3_cart_w);
 
 	// defined in video/z88.c
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT16 color);
@@ -49,6 +65,16 @@ public:
 	void vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx);
 	void vh_render_line(bitmap_ind16 &bitmap, int x, int y, UINT16 pen);
 	void lcd_update(bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash);
+
+	struct
+	{
+		UINT8 slot;
+		UINT8 page;
+	} m_bank[4];
+
+	UINT8 *				  m_bios;
+	UINT8 *				  m_ram_base;
+	z88cart_slot_device * m_carts[4];
 };
 
 
