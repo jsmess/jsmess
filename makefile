@@ -548,6 +548,9 @@ ifeq ($(COMMAND_MODE),"legacy")
 ARFLAGS = -crs
 endif
 endif
+ifeq ($(TARGETOS),emscripten)
+ARFLAGS = cr
+endif
 
 
 #-------------------------------------------------
