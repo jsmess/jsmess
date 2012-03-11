@@ -1,0 +1,2 @@
+#!/bin/sh
+make TARGET=mess SUBTARGET=tiny OSD=sdl TARGETOS=emscripten NOWERROR=1 NOASM=1 $*
