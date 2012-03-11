@@ -77,7 +77,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write) { }
 	virtual UINT8* get_cart_base() { return NULL; }
-	virtual int get_cart_size() { return 0; }
+	virtual UINT32 get_cart_size() { return 0; }
 };
 
 
