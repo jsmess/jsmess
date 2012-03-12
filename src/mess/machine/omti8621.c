@@ -1123,79 +1123,6 @@ static void omti_set_jumper(omti8621_state *state, UINT16 disk_type)
 	}
 }
 
-/*-------------------------------------------------
-    device start callback
--------------------------------------------------*/
-
-static DEVICE_START( omti8621 ) {
-	omti8621_state *state = get_safe_token(device);
-
-	const omti8621_config *config =
-			(const omti8621_config *) device->static_config();
-
-	/* validate basic stuff */
-	assert(device != NULL);
-	assert(device->type() == OMTI8621);
-
-	/* store a pointer back to the device */
-	state->device = device;
-
-	// note: we must have state->device before we can log
-	LOG2(("device_start_omti8621"));
-
-	state->irq_handler = config->set_irq;
-
-	state->sector_buffer = auto_alloc_array(device->machine(), UINT8,
-			OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
-	assert(state->sector_buffer != NULL);
-
-	device_t *device0 = device->machine().device(OMTI_DISK0_TAG);
-	state->disk[0] = (disk_data *) downcast<legacy_device_base *>(device0)->token();
-
-	device_t *device1 = device->machine().device(OMTI_DISK1_TAG);
-	state->disk[1] = (disk_data *) downcast<legacy_device_base *>(device1)->token();
-}
-
-/*-------------------------------------------------
-    device reset callback
--------------------------------------------------*/
-
-static DEVICE_RESET( omti8621 )
-{
-	omti8621_state *state = get_safe_token(device);
-	LOG2(("device_reset_omti8621"));
-
-	omti_set_jumper(state, state->disk[0]->type);
-	omti_reset(state);
-}
-
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
-
-DEVICE_GET_INFO( omti8621 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(omti8621_state);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(omti8621_config);		break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(omti8621); break;
-		case DEVINFO_FCT_STOP:					/* Nothing */							break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(omti8621); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "OMTI 8621");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Winchester Disk Controller");break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(OMTI8621, omti8621);
 
 //##########################################################################
 class omti_disk_image_device :	public device_t,
@@ -1361,3 +1288,76 @@ MACHINE_CONFIG_FRAGMENT( omti_disk )
 	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
 MACHINE_CONFIG_END
 
+/*-------------------------------------------------
+    device start callback
+-------------------------------------------------*/
+
+static DEVICE_START( omti8621 ) {
+	omti8621_state *state = get_safe_token(device);
+
+	const omti8621_config *config =
+			(const omti8621_config *) device->static_config();
+
+	/* validate basic stuff */
+	assert(device != NULL);
+	assert(device->type() == OMTI8621);
+
+	/* store a pointer back to the device */
+	state->device = device;
+
+	// note: we must have state->device before we can log
+	LOG2(("device_start_omti8621"));
+
+	state->irq_handler = config->set_irq;
+
+	state->sector_buffer = auto_alloc_array(device->machine(), UINT8,
+			OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
+	assert(state->sector_buffer != NULL);
+
+	device_t *device0 = device->machine().device(OMTI_DISK0_TAG);
+	state->disk[0] = (disk_data *) downcast<omti_disk_image_device *>(device0)->token();
+
+	device_t *device1 = device->machine().device(OMTI_DISK1_TAG);
+	state->disk[1] = (disk_data *) downcast<omti_disk_image_device *>(device1)->token();
+}
+
+/*-------------------------------------------------
+    device reset callback
+-------------------------------------------------*/
+
+static DEVICE_RESET( omti8621 )
+{
+	omti8621_state *state = get_safe_token(device);
+	LOG2(("device_reset_omti8621"));
+
+	omti_set_jumper(state, state->disk[0]->type);
+	omti_reset(state);
+}
+
+/*-------------------------------------------------
+    device get info callback
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( omti8621 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(omti8621_state);		break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(omti8621_config);		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(omti8621); break;
+		case DEVINFO_FCT_STOP:					/* Nothing */							break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(omti8621); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					strcpy(info->s, "OMTI 8621");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Winchester Disk Controller");break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+	}
+}
+
+DEFINE_LEGACY_DEVICE(OMTI8621, omti8621);
