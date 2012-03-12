@@ -250,9 +250,16 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	//for some reason the fstat approach does not work on emscripten, work around for now
 	FILE *fileptr;
 	fileptr = fdopen((*file)->handle,"rb");
-	fseek(fileptr, 0, SEEK_END);
-	*filesize = ftell(fileptr);
-	fseek(fileptr, 0, SEEK_SET);
+	if (fileptr == NULL)
+	{
+		*filesize = 0;
+	}
+	else
+	{
+		fseek(fileptr, 0, SEEK_END);
+		*filesize = ftell(fileptr);
+		fseek(fileptr, 0, SEEK_SET);
+	}
 	#else
 	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_EMSCRIPTEN)
 	fstat((*file)->handle, &st);
