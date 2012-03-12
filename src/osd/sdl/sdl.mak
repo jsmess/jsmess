@@ -150,7 +150,7 @@ endif
 ifeq ($(TARGETOS),emscripten)
 DEFS += -DSDLMAME_EMSCRIPTEN
 BASE_TARGETOS = unix
-SYNC_IMPLEMENTATION = tc
+SYNC_IMPLEMENTATION = mini
 endif
 
 ifeq ($(TARGETOS),unix)
