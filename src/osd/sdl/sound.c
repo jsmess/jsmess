@@ -453,8 +453,14 @@ static int sdl_init(running_machine &machine)
 	aspec.callback = sdl_callback;
 	aspec.userdata = 0;
 
+	#ifdef SDLMAME_EMSCRIPTEN
+	if (SDL_OpenAudio(&aspec, 0) < 0)
+		goto cant_start_audio;
+	obtained = aspec;
+	#else
 	if (SDL_OpenAudio(&aspec, &obtained) < 0)
 		goto cant_start_audio;
+	#endif
 
 	initialized_audio = 1;
 	snd_enabled = 1;
