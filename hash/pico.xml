@@ -3,6 +3,17 @@
 <softwarelist name="pico" description="Sega Pico cartridges">
 
 <!-- Releases -->
+	<software name="berenstbi" cloneof="berenstb">
+		<description>Un Giorno di Scuola degli Orsi Berenstain (Ita)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="un giorno di scuola degli orsi berenstain (italy).bin" size="1048576" crc="61b889a2" sha1="64b537616207b3e98dfb700f98b63e61284ced13" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eccojr">
 		<description>Ecco Jr. und die große Schatzsuche im Ozean! (Ger)</description>
 		<year>19??</year>
@@ -21,6 +32,17 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ein jahr in winnie puuhs leben (germany).bin" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlit" cloneof="hucklowl">
+		<description>Richard Scarry's - La Giornata Indaffaratissima di Sandrino e Zigo-Zago (Ita)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="richard scarry's - la giornata indaffaratissima di sandrino e zigo-zago (italy).bin" size="1048576" crc="2573131a" sha1="0e5c14fe1fd3360b9269fdf219decb7ef4480304" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -49,11 +71,22 @@
 
 	<software name="profpico" supported="no">
 		<description>Professor Pico und das Malkasten Puzzle (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="professor pico und das malkasten puzzle (germany).bin" size="524288" crc="d2b063ed" sha1="429777d4b1204e3341bb83d72e0eb361a9f3623e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profpicoi" cloneof="profpico" supported="no">
+		<description>Professor Pico e l'Enigma della Scatola di Pastelli (Ita)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="professor pico e l'enigma della scatola di pastelli (italy).bin" size="524288" crc="8aa99b73" sha1="831816248c39133f5251b0a4bf5d92515932d536" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1739,7 +1772,8 @@ Notice that most of these will become parent, when the dumps surface
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
-				<rom name="Richard Scarry's - Huckle and Lowly's Busiest Day Ever (F) [!p].bin" size="????" crc="126ca6f0" sha1="1e2898a56cf47576e68db772639c23a7efcaf026" offset="000000" loadflag="load16_word_swap" />			</dataarea>
+				<rom name="Richard Scarry's - Huckle and Lowly's Busiest Day Ever (F) [!p].bin" size="????" crc="126ca6f0" sha1="1e2898a56cf47576e68db772639c23a7efcaf026" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
 		</part>
 	</software>
 
