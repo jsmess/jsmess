@@ -1,5 +1,70 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Compiled by K1W1 and Telanus
+-->
+
+<!--
+
+Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went down.
+
+ - Aces High
+ - Amnesia
+ - Astro-Dodge
+ - Attack On Altair
+ - Beneath Apple Manor
+ - Borrowed Time / Time to Die
+ - Boulder Dash
+ - Bruce Lee
+ - BurgerTime*
+ - Chess88*
+ - Climber 5
+ - Crypto Cube
+ - Decision in the Desert
+ - Destroyer
+ - Dunjonquest: Morloc's Tower
+ - Earthly Delights
+ - Executive Suite
+ - Floppy Frenzy*
+ - Forbidden Castle
+ - Forbidden Quest
+ - Frederick Forsyth's The Fourth Protocol
+ - FriendlyWare PC Introductory Set
+ - Full Count Baseball
+ - Galactic Gladiators
+ - Harrier Combat Simulator
+ - High Stakes
+ - Holy Grail, The
+ - Ikari Warriors II: Victory Road
+ - Infidel*
+ - International Hockey
+ - James Bond 007: Goldfinger*
+ - Kindercomp
+ - Master Miner
+ - Math Maze
+ - MicroLeague Baseball*
+ - Miner 2049er*
+ - Moon Bugs*
+ - Night Stalker
+ - PC Pool*
+ - PSI-5 Trading Company
+ - Rasterscan
+ - Rescue at Rigel
+ - Sherlock Holmes: Another Bow
+ - Sidewinder
+ - Snack Attack II
+ - Solomon's Key
+ - Sorcerer*
+ - Starcross*
+ - Strategy Games
+ - Sub Mission
+ - Suspect*
+ - Voodoo Island*
+ - Wizard and the Princess
+ - Wizball*
+ - Word Spinner
+
+-->
 <softwarelist name="ibm5150" description="IBM PC/XT disk images">
 
 	<software name="3ktrivia">
@@ -41,14 +106,28 @@
 	</software>
 
 	<software name="alleycat">
-		<description>Alley Cat</description>
+		<description>Alley Cat [cr]</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Synapse Software" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="alley cat.img" size="184320" crc="23228e10" sha1="c4e1b163b14fbffe3bef97816d5b7db142c593f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplepanc">
+		<description>Apple Panic [cr]</description>
+		<year>1982</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="apple panic.img" size="163840" crc="5594040e" sha1="d865096cfdc42c964bf375725cfd2c5058a97217" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -109,11 +188,48 @@
 		</part>
 	</software>
 
+	<software name="backgamm">
+		<description>Backgammon v5.0</description>
+		<year>1983</year>
+		<publisher>Willie Chaplin</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="backgammon v5.0.img" size="163840" crc="f44a3fba" sha1="9186a739879c421777cb358a8049c4e33bfbc570" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="belowrot">
+		<description>Below the Root</description>
+		<year>1984</year>
+		<publisher>Windham Classics / Spinnaker Software Corp</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="238195">
+				<rom name="below the root.td0" size="238195" crc="896b6d1c" sha1="d08c84b88d19bb4315bb62a32e95f988f3622c4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcwolfen">
+		<description>Beyond Castle Wolfenstein</description>
+		<year>1984</year>
+		<publisher>Muse Software</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="beyond castle wolfenstein.img" size="368640" crc="703d0e2f" sha1="e29cb567adfe3836431dea111f95636112b43899" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bigtop">
-		<description>Big Top</description>
+		<description>Big Top [cr]</description>
 		<year>1983</year>
 		<publisher>Funtastic</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="big top.img" size="184320" crc="b5ed200c" sha1="3e9f581acb9022d97049124fa9e416d31d2efa68" offset="0" />
@@ -122,7 +238,7 @@
 	</software>
 
 	<software name="black">
-		<description>The Black Cauldron v1.1m</description>
+		<description>The Black Cauldron (v1.1m)</description>
 		<year>1986</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="PC Booter" />
@@ -139,7 +255,7 @@
 	</software>
 
 	<software name="blackk" cloneof="black">
-		<description>The Black Cauldron v1.1k</description>
+		<description>The Black Cauldron (v1.1k)</description>
 		<year>1986</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="PC Booter" />
@@ -151,6 +267,23 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="the black cauldron v1.1k (disk 2 of 2).img" size="368640" crc="1ebf83e2" sha1="42b47a978cb8cbbd3da9b964ea18fce0f4003458" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackj" cloneof="black">
+		<description>The Black Cauldron (v1.1)</description>
+		<year>1986</year>
+		<publisher>Sierra</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the black cauldron v1.1j (disk 1 of 2).img" size="368640" crc="34c07147" sha1="8298ac2ab01d4226452bf13770460b131de30d2f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the black cauldron v1.1j (disk 2 of 2).img" size="368640" crc="dca53928" sha1="b923b735037b4242571301f9ef598d309fbd5937" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -180,6 +313,18 @@
 		</part>
 	</software>
 
+	<software name="bugrangr">
+		<description>Buggy Ranger [cr]</description>
+		<year>1989</year>
+		<publisher>Iron Byte</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="buggy ranger.img" size="368640" crc="95b5a5c5" sha1="0ffb81bb2f3cbaccddb8b52f066a45f607639e2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="centiped">
 		<description>Centipede</description>
 		<year>1983</year>
@@ -188,6 +333,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="centipede.img" size="163840" crc="fed8d765" sha1="06fa7489e6cab340fc3af554f8f0f244e8833c3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cloderun">
+		<description>Championship Loderunner</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="championship loderunner.img" size="163840" crc="e260deca" sha1="1c9ff1639cc1a64426f84c43b3b08d73175b959c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -244,6 +401,7 @@
 		<description>Cosmic Crusader</description>
 		<year>1982</year>
 		<publisher>Funtastic</publisher>
+		<info name="developer" value="Michael Abrash" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
@@ -406,11 +564,12 @@
 	</software>
 
 	<software name="dunzhin">
-		<description>Dunzhin: Warrior of Ras Volume I</description>
+		<description>Dunzhin: Warrior of Ras Volume I [cr]</description>
 		<year>1982</year>
 		<publisher>Computer Applications Unlimited</publisher>
-		<info name="developer" value="Intelligent Statement Inc." />
+		<info name="developer" value="Intelligent Statement" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="dunzhin - warrior of ras volume i.img" size="163840" crc="b9262dc3" sha1="7e76c35d082debca67b06c9326a49b47db46463c" offset="0" />
@@ -454,6 +613,18 @@
 		</part>
 	</software>
 
+	<software name="facemakr">
+		<description>Facemaker</description>
+		<year>1982</year>
+		<publisher>Spinnaker Software Corporation</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="facemaker.img" size="163840" crc="34df556f" sha1="27a0ff628c2acefce3461c82d2f76104ad027bd1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="5soccer">
 		<description>Five-a-Side Indoor Soccer</description>
 		<year>1986</year>
@@ -490,6 +661,30 @@
 		</part>
 	</software>
 
+	<software name="fredhard">
+		<description>Freddy Hardest (Spa)</description>
+		<year>1988</year>
+		<publisher>Dinamic</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="freddy hardest.img" size="368640" crc="16d0e37a" sha1="fb6bed4ecf3ee34e697aa928a4f17ec994a439cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fpcarcad">
+		<description>Friendlyware PC Arcade (v1.1)</description>
+		<year>1983</year>
+		<publisher>FriendlySoft, Inc</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="friendlyware pc arcade.img" size="327680" crc="13e9dff4" sha1="b57da2ead9f2f41daf6fe43c349e88b6d517fffd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frogger">
 		<description>Frogger</description>
 		<year>1983</year>
@@ -503,7 +698,7 @@
 	</software>
 
 	<software name="frogger2">
-		<description>Frogger 2 - Three Deep</description>
+		<description>Frogger 2: Three Deep</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="usage" value="PC Booter" />
@@ -543,10 +738,35 @@
 		<year>1988</year>
 		<publisher>Infocom</publisher>
 		<info name="developer" value="Tom Snyder Productions" />
+		<info name="alt_title" value="Gamma Force: The Pit of a Thousand Screams" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="gamma force in pit of a thousand screams.img" size="368640" crc="fb1977f8" sha1="bf81d4eb177a5864a3755ddb5cb19372cf95d76c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gameover">
+		<description>Game Over + Phantis Spanish</description>
+		<year>1988</year>
+		<publisher>Dinamic</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="game over.img" size="368640" crc="91f134e6" sha1="e7ed799ae5951cbdf96a15e5c38b2fa5aec4c490" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gameovr2">
+		<description>Game Over II</description>
+		<year>198?</year>
+		<publisher>Dinamic</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="game over2.img" size="368640" crc="a675f8a2" sha1="facdacfe8a85bfb7de53d2eb2627c0087c81bc63" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -604,6 +824,43 @@
 		</part>
 	</software>
 
+	<software name="hacker">
+		<description>Hacker</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="185332">
+				<rom name="hacker.td0" size="185332" crc="f827c32d" sha1="6499c57f29a422da5324072ad491c59887387b8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacker2">
+		<description>Hacker II</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="hacker 2.img" size="368640" crc="bd8f124b" sha1="00d640edec8570b2ddb0d127290a83ba4edcfe11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhmack">
+	<!-- Might be Bad -->
+		<description>Hard Hat Mack</description>
+		<year>1984</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="hard hat mack.img" size="204800" crc="919b3aff" sha1="037aad77c610282aca5c77dffc4548c7c4ef8394" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hellcat">
 		<description>Hellcat Ace</description>
 		<year>1984</year>
@@ -624,6 +881,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="the hitchhiker's guide to the galaxy.img" size="368640" crc="83c27427" sha1="4b9a30f28e1505736139de839024b7d63713ec4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hobbit">
+		<description>The Hobbit</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="268056">
+				<rom name="the hobbit.td0" size="268056" crc="4166d044" sha1="267effe47e5ce0c7a6f26dcb2cbb7feb3c90d5c0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -666,6 +935,31 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="julius erving and larry bird go one-on-one [b].img" size="409600" crc="08977fce" sha1="ddbca53d23f22bff3f53edf646decd0531644677" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jbird">
+		<description>J-Bird [cr]</description>
+		<year>1983</year>
+		<publisher>Greg Kuperberg</publisher>
+		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="j-bird.img" size="163840" crc="d5b17630" sha1="485b19cf53898edba077c33dfaa68ef218ee9137" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jelwayqb">
+		<description>John Elway's Quarterback</description>
+		<year>1988</year>
+		<publisher>Melbourne House</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="john elway's quarterback.img" size="368640" crc="9c988a75" sha1="91a28744736e0e58659d5e05dc4bdd7739b933c6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -726,10 +1020,11 @@
 	</software>
 
 	<software name="kingqst2">
-		<description>King's Quest II: Romancing the Throne v1.1h</description>
+		<description>King's Quest II: Romancing the Throne (v1.1h) [cr]</description>
 		<year>1985</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="king's quest ii - romancing the throne v1.1h (disk 1 of 2).img" size="368640" crc="4107b044" sha1="874bc6ccffbd9a0e5faee8972b2eeedfb82aeb62" offset="0" />
@@ -743,7 +1038,7 @@
 	</software>
 
 	<software name="kingqst2a" cloneof="kingqst2">
-		<description>King's Quest II: Romancing the Throne v1.0w</description>
+		<description>King's Quest II: Romancing the Throne (v1.0w)</description>
 		<year>1985</year>
 		<publisher>Sierra</publisher>
 		<info name="usage" value="PC Booter" />
@@ -796,6 +1091,18 @@
 		</part>
 	</software>
 
+	<software name="livnstn2">
+		<description>Livingstone 2</description>
+		<year>198?</year>
+		<publisher>Opera Soft</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="livingstone 2.img" size="368640" crc="2d4e288c" sha1="c052168041ab7c01ab93993d498dfb74b8a5fc05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lockon">
 		<description>Lock On</description>
 		<year>1987</year>
@@ -816,7 +1123,7 @@
 	<software name="loderun">
 		<description>Lode Runner</description>
 		<year>1983</year>
-		<publisher>Brøderbund</publisher>
+		<publisher>Brøderbund Software</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -826,10 +1133,11 @@
 	</software>
 
 	<software name="marble">
-		<description>Marble Madness</description>
+		<description>Marble Madness [cr]</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="marble madness (disk 1 of 2).img" size="409600" crc="256bcd8c" sha1="e68e7c0e2c7d55a5fdcf96fa41d52a6de7ee73a8" offset="0" />
@@ -861,11 +1169,12 @@
 	</software>
 
 	<software name="msadvent">
-		<description>Microsoft Adventure</description>
+		<description>Microsoft Adventure [cr]</description>
 		<year>1981</year>
 		<publisher>IBM</publisher>
 		<info name="developer" value="Microsoft" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="microsoft adventure.img" size="184320" crc="7148422b" sha1="4d0704af33186890a7579a60f88e1576b718886d" offset="0" />
@@ -874,10 +1183,11 @@
 	</software>
 
 	<software name="decathln">
-		<description>Microsoft Decathlon</description>
+		<description>Microsoft Decathlon [cr]</description>
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
 				<rom name="microsoft decathlon.img" size="184320" crc="34435a3c" sha1="55bb5aa1b085c167e1f07ceb7cca845d6b18173e" offset="0" />
@@ -885,8 +1195,21 @@
 		</part>
 	</software>
 
-	<software name="msfsim1">
-		<description>Microsoft Flight Simulator v1.05</description>
+	<software name="msfsim1" cloneof="msfsim15">
+		<description>Microsoft Flight Simulator (v1.00)</description>
+		<year>1982</year>
+		<publisher>Microsoft</publisher>
+		<info name="developer" value="subLOGIC" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="microsoft flight simulator v1.00.img" size="327680" crc="b62c9181" sha1="6fa9eccb0b230175270aca70df3e19dace93f310" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfsim15">
+		<description>Microsoft Flight Simulator (v1.05)</description>
 		<year>1982</year>
 		<publisher>Microsoft</publisher>
 		<info name="developer" value="subLOGIC" />
@@ -898,8 +1221,8 @@
 		</part>
 	</software>
 
-	<software name="msfsim21" cloneof="msfsim23">
-		<description>Microsoft Flight Simulator v2.1</description>
+	<software name="msfsim21" cloneof="msfsim24">
+		<description>Microsoft Flight Simulator (v2.10)</description>
 		<year>1984</year>
 		<publisher>Microsoft</publisher>
 		<info name="developer" value="subLOGIC" />
@@ -911,8 +1234,8 @@
 		</part>
 	</software>
 
-	<software name="msfsim22" cloneof="msfsim23">
-		<description>Microsoft Flight Simulator v2.12</description>
+	<software name="msfsim22" cloneof="msfsim24">
+		<description>Microsoft Flight Simulator (v2.12)</description>
 		<year>1984</year>
 		<publisher>Microsoft</publisher>
 		<info name="developer" value="subLOGIC" />
@@ -924,8 +1247,8 @@
 		</part>
 	</software>
 
-	<software name="msfsim23">
-		<description>Microsoft Flight Simulator v2.13</description>
+	<software name="msfsim23" cloneof="msfsim24">
+		<description>Microsoft Flight Simulator (v2.13)</description>
 		<year>1984</year>
 		<publisher>Microsoft</publisher>
 		<info name="developer" value="subLOGIC" />
@@ -933,6 +1256,19 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="microsoft flight simulator v2.13.img" size="368640" crc="1af20e34" sha1="ab80189b551e4237be10861296a0b88c3f43b8fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfsim24">
+		<description>Microsoft Flight Simulator (v2.14)</description>
+		<year>1987</year>
+		<publisher>Microsoft</publisher>
+		<info name="developer" value="subLOGIC" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="167484">
+				<rom name="microsoft flight simulator v2.14.td0" size="167484" crc="514e8636" sha1="beca460f287f8777eeb7b071e9d17d39e66bb9b7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -977,11 +1313,11 @@
 	</software>
 
 	<software name="mpatrol">
-		<description>Moon Patrol</description>
+		<description>Moon Patrol [cr]</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
-		<info name="developer" value="Irem" />
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="moon patrol.img" size="368640" crc="abba0f4a" sha1="ec9304efec24d91e4ce584f977dd899bf22353d3" offset="0" />
@@ -1013,6 +1349,47 @@
 		</part>
 	</software>
 
+	<software name="zindrnef">
+		<description>Murder On The Zinderneuf</description>
+		<year>1984</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="133364">
+				<rom name="murder on the zinderneuf.td0" size="133364" crc="79eba810" sha1="84c2ed8e615feac1532ab3fb2c286447c54adf9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicset">
+		<description>Will Harvey's Music Construction Set</description>
+		<year>1984</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="music construction set.img" size="409600" crc="7eacaab4" sha1="b19c8c174ddd2990f6ffd02b9a8f769cb6bd82df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="narco">
+		<description>Narco Police</description>
+		<year>1989</year>
+		<publisher>Iron Byte</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="narco police disk 1.img" size="368640" crc="5a29b73e" sha1="c5127532e6dbf5b3e1261294762804c965bc8ca0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="narco police disk 2.img" size="368640" crc="0c9c1fdb" sha1="96775fafabaf29266baa23a1a27355f550f923e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oilswell">
 		<description>Oil's Well</description>
 		<year>1984</year>
@@ -1037,6 +1414,42 @@
 		</part>
 	</software>
 
+	<software name="packpc">
+		<description>Pack PC Opera Soft</description>
+		<year>198?</year>
+		<publisher>Opera Soft</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="pack pc opera soft.img" size="327680" crc="dd373eae" sha1="8f72f4f5ac5bda5800a801bce09dd512e1c600de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="partroop">
+		<description>Paratrooper</description>
+		<year>1982</year>
+		<publisher>Orion Software</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="paratrooper.img" size="184320" crc="28a72e6f" sha1="336eaf5c8990178959c7a49e1b9691166d7085d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcman">
+		<description>PC-MAN</description>
+		<year>1982</year>
+		<publisher>Orion Software</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="pcman.img" size="163840" crc="3039fdb8" sha1="f9dd6556554cf1921b6ef653310f9400ab9ea93d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poolchal">
 		<description>PC Pool challenges</description>
 		<year>1984</year>
@@ -1051,10 +1464,11 @@
 	</software>
 
 	<software name="pinball">
-		<description>Pinball Construction Set</description>
+		<description>Pinball Construction Set [cr]</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="pinball construction set.img" size="409600" crc="6460e995" sha1="4e20da455dcd482371fa55510ea5f4c440580cce" offset="0" />
@@ -1063,10 +1477,11 @@
 	</software>
 
 	<software name="pirates">
-		<description>Sid Meier's Pirates!</description>
+		<description>Sid Meier's Pirates! [cr]</description>
 		<year>1987</year>
 		<publisher>Microprose</publisher>
 		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="pirates! (disk 1 of 2).img" size="368640" crc="db732151" sha1="5e9c1d4866aa928fc8ac1d61779bd2971761c52b" offset="0" />
@@ -1156,6 +1571,7 @@
 		<description>Robotron 2084</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
+
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
@@ -1176,7 +1592,7 @@
 		</part>
 	</software>
 
-	<software name="satan">
+	<software name="satanc">
 		<description>Satan (CGA)</description>
 		<year>1990</year>
 		<publisher>Dinamic Software</publisher>
@@ -1188,7 +1604,7 @@
 		</part>
 	</software>
 
-	<software name="satane" cloneof="satan">
+	<software name="satane">
 		<description>Satan (EGA)</description>
 		<year>1990</year>
 		<publisher>Dinamic Software</publisher>
@@ -1208,6 +1624,48 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="seastalker.img" size="163840" crc="18190a62" sha1="9b43b63d0b0aaa55b98b91a9ef2f44a656ebe662" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="serptine">
+		<description>Serpentine [cr]</description>
+		<year>1984</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="usage" value="PC Booter" />
+		<info name="cracked" value="demonlord" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="serpentine.img" size="163840" crc="bcf96e44" sha1="e9fb3bf2e0d689ed7793e1b1426f20d76796c686" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="7citygld">
+		<description>Seven Cities Of Gold</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="152123">
+				<rom name="seven cities of gold (disk 1).td0" size="152123" crc="ab769135" sha1="8e226deb89b32eee926ee02510566e2d75c56916" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="49939">
+				<rom name="seven cities of gold (disk 2).td0" size="49939" crc="753da4dc" sha1="cec45f74a916b863843ffe14c79a6727af71f9f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cboxing">
+		<description>Sierra Championship Boxing</description>
+		<year>1985</year>
+		<publisher>Sierra</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="sierra championship boxing.img" size="368640" crc="5c79a2d6" sha1="660ca89722fbf80eacb78d2cf701185dfc0915f2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1297,6 +1755,18 @@
 		</part>
 	</software>
 
+	<software name="spyhunt">
+		<description>Spyhunter</description>
+		<year>1984</year>
+		<publisher>Bally Midway</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="spyhunter.img" size="163840" crc="317d40d4" sha1="a4c5d6808dd373a13ea9f72a2c472479857e70e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="storm">
 		<description>Storm</description>
 		<year>1986</year>
@@ -1333,6 +1803,30 @@
 		</part>
 	</software>
 
+	<software name="sfootbls">
+		<description>Super Football Sunday</description>
+		<year>1985</year>
+		<publisher>Avalon Hill</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="super football sunday.img" size="368640" crc="f50ecd51" sha1="2275e729e816bd5e14083e7559561e7a7e95df73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="szaxxon">
+		<description>Super Zaxxon</description>
+		<year>1982</year>
+		<publisher>Sega</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="super zaxxon.img" size="163840" crc="d7a7db8f" sha1="14634b7918e8b7d9d4102b1525dd0cfc6d9f6001" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suspend">
 		<description>Suspended</description>
 		<year>1983</year>
@@ -1357,7 +1851,19 @@
 		</part>
 	</software>
 
-	<software name="tapperc" cloneof="tapper">
+	<software name="tagteama" cloneof="tagteam">
+		<description>Tag Team Wrestling (Alt)</description>
+		<year>1986</year>
+		<publisher>US Gold</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="tag team wrestling (alt).img" size="327680" crc="b70d6af0" sha1="4e1c9a05c6d9f433e6c389aba9a4a5d7fd6c4e31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapperc">
 		<description>Tapper (Comp)</description>
 		<year>1983</year>
 		<publisher>Marvin Glass &amp; Associates</publisher>
@@ -1381,6 +1887,18 @@
 		</part>
 	</software>
 
+	<software name="tasstime">
+		<description>Tass Times in Tonetown</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="tass times in tonetown.img" size="368640" crc="b2128497" sha1="f92be5ff879bd8e29f370eaf0c3206a754292d21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mindmirr">
 		<description>Timothy Leary's Mind Mirror</description>
 		<year>1986</year>
@@ -1389,6 +1907,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="409600">
 				<rom name="timothy leary's mind mirror.img" size="409600" crc="50e33532" sha1="709c2f16919a07a205051405b38fe799e3aa1050" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdown">
+		<description>Touchdown Football</description>
+		<year>1984</year>
+		<publisher>Imagic</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="touchdown football.img" size="327680" crc="0fbaedb6" sha1="c42650559b2b4eb4b789fd2fa22bc5c8c0589e45" offset="0" />
 			</dataarea>
 		</part>
 	</software>
