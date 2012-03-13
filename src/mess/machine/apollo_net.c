@@ -41,32 +41,6 @@ typedef struct
 	UINT32 daddr;
 } ip_header;
 
-typedef struct
-{
-	UINT8 type;
-	UINT8 code;
-	UINT16 checksum;
-	UINT16 id;
-	UINT16 sequence;
-} icmp_header;
-
-//typedef struct {
-//  UINT16 version;
-//  UINT16 checksum;
-//  UINT16 packet_type;
-//  UINT16 control_header;
-//  UINT16 header_length;
-//  UINT16 header_data_length;
-//  UINT16 transaction_id;
-//} control_header;
-//
-//typedef struct {
-//  UINT16 length;
-//  UINT16 current;
-//  UINT16 source_socket;
-//  UINT16 new_route;
-//} packet_address;
-
 #define ETHERNET_HEADER_SIZE sizeof(ethernet_header)
 
 /* Ethernet protocol ID's */
@@ -293,35 +267,6 @@ static int set_ethernet_header(UINT8 *data, UINT8 client_ethernet_address[6]) {
 	set_word(data + 12, ETHERNET_PACKET_TYPE_APOLLO);
 	return ETHERNET_HEADER_SIZE;
 }
-
-//static int set_packet_header1(UINT8 *packet_buffer, UINT32 dest_node_id,
-//      UINT32 source_node_id) {
-//
-//  //0000  08 00 1e 02 61 6d 08 00  1e 04 20 e8 80 19 ff ff
-//  //0010  00 20 00 be 00 00 47 11  08 00 1e 02 61 6d 06 20
-//  //0020  00 00 00 00 08 00 1e 04  20 e8 00 01 00 02 61 6d
-//  //0030  20 00 00 00 00 04 20 e8  02 00 20 00 00 4e 00 02
-//  //0040  00 00 00 00 2e 04 00 01  20 e8 00 01 00 04 20 e8
-//
-//  //0050  61 6d 06 20 ff ff 00 20  00 04 00 00 47 11 00 00
-//  //0060  00 02 61 6d 06 20 00 00  00 00 00 00 00 04 20 e8
-//  //0070  00 01 00 00 00 00 80 31  00 01
-//
-//  set_packet_header(packet_buffer, dest_node_id, source_node_id);
-//  set_word(packet_buffer + 8, 0x4711); // Apollo network number
-//  set_word(packet_buffer + 16, 0x0620); // ? was 0x0000
-//  set_word(packet_buffer + 28, 0x0001); // ? was 0x0003
-
-//  set_long(packet_buffer + 34, 0x20000000L); // ? was 0x24000000L
-//  set_long(packet_buffer + 42, 0x02002000L); // ? was 0x01002400L
-//  set_word(packet_buffer + 46, 0x004e); // ? data_size + 0x22
-//  set_word(packet_buffer + 48, 0x0002); // ? data_size
-//  set_word(packet_buffer + 54, 0x2e04); // ? 0x0401
-//  set_word(packet_buffer + 56, 0x0001); // ? 0x0003
-//  set_word(packet_buffer + 60, 0x616d);
-//  set_word(packet_buffer + 62, 0x0000);
-//  return PACKET_HEADER_SIZE;
-//}
 
 static int set_packet_header(UINT8 *packet_buffer, UINT32 dest_node_id,
 		UINT32 source_node_id) {

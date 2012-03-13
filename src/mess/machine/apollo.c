@@ -44,7 +44,7 @@
 
 #include "emuopts.h"
 
-#if 0 //defined(__linux__)
+#if defined(APOLLO_FOR_LINUX)
 #include <fcntl.h>
 #include <unistd.h>
 #endif
@@ -255,12 +255,12 @@ WRITE16_HANDLER( apollo_csr_control_register_w )
 	else if ((data & APOLLO_CSR_CR_FPU_TRAP_ENABLE) == 0)
 	{
 		// enable FPU (i.e. FPU opcodes in CPU)
-//      apollo_set_cpu_has_fpu(&space->device(), 1);
+        apollo_set_cpu_has_fpu(&space->device(), 1);
 	}
 	else
 	{
 		// disable FPU (i.e. FPU opcodes in CPU)
-//      apollo_set_cpu_has_fpu(&space->device(), 0);
+        apollo_set_cpu_has_fpu(&space->device(), 0);
 
 		if (!apollo_is_dn3000())
 		{
@@ -1069,7 +1069,7 @@ WRITE8_DEVICE_HANDLER(apollo_sio_w)
 static TIMER_CALLBACK(kbd_timer_callback)
 {
 
-#if 0 //defined(__linux__)
+#if defined(APOLLO_FOR_LINUX)
 	device_t *device = (device_t *) ptr;
 	UINT8 data;
 
@@ -1127,7 +1127,7 @@ static DEVICE_RESET(apollo_sio)
 	sio_input_data = apollo_get_ram_config_byte();
 	sio_output_data = 0xff;
 
-#if 0 //defined(__linux__)
+#if defined(APOLLO_FOR_LINUX)
 	// FIXME: unavailable in mingw
 	// set stdin to nonblocking to allow polling in sio_poll_rxb
 	fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
