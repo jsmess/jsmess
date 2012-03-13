@@ -9,7 +9,9 @@
 	<element name="label_b">      <text string="B"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
 	<element name="label_c">      <text string="C"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
 	<element name="label_d">      <text string="D"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
-	<element name="power_label">  <text string="PWR"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="power_label">  <text string="Pwr"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="text_1">       <text string="DOMAIN"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="text_2">       <text string="SERIES 3000"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
 
 	<element name="background">
 		<rect>
@@ -18,7 +20,7 @@
 		</rect>
 	</element>
 
-	<view name="Apollo DSP Terminal">
+	<view name="Terminal">
 		<bezel element="background">
 			<bounds left="0" right="639" top="480" bottom="502" />
 		</bezel>
@@ -41,6 +43,31 @@
 
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+	</view>
+
+	<view name="Domain">
+		<bezel element="background">
+			<bounds left="0" right="49" top="0" bottom="49" />
+		</bezel>
+
+		<bezel name="text_1" element="text_1">               <bounds left=" 1" right="48" top=" 1" bottom="17" /> </bezel>
+		<bezel name="text_2" element="text_2">               <bounds left=" 1" right="48" top="18" bottom="27" /> </bezel>
+
+		<bezel name="label_a" element="label_a">             <bounds left=" 2" right=" 6" top="36" bottom="42" /> </bezel>
+		<bezel name="label_b" element="label_b">             <bounds left="12" right="16" top="36" bottom="42" /> </bezel>
+		<bezel name="label_c" element="label_c">             <bounds left="22" right="26" top="36" bottom="42" /> </bezel>
+		<bezel name="label_d" element="label_d">             <bounds left="32" right="36" top="36" bottom="42" /> </bezel>
+		<bezel name="power_label" element="power_label">     <bounds left="38" right="49" top="36" bottom="42" /> </bezel>
+
+		<bezel name="external_led_a" element="external_led"> <bounds left=" 2" right=" 6" top="43" bottom="47" /> </bezel>
+		<bezel name="external_led_b" element="external_led"> <bounds left="12" right="16" top="43" bottom="47" /> </bezel>
+		<bezel name="external_led_c" element="external_led"> <bounds left="22" right="26" top="43" bottom="47" /> </bezel>
+		<bezel name="external_led_d" element="external_led"> <bounds left="32" right="36" top="43" bottom="47" /> </bezel>
+		<bezel name="power_led" element="power_led">         <bounds left="42" right="46" top="43" bottom="47" /> </bezel>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="0" height="0" />
 		</screen>
 	</view>
 

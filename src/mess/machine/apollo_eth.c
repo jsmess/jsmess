@@ -20,7 +20,7 @@
 
 #include "includes/apollo.h"
 
-#if 1
+#if !defined(APOLLO_FOR_LINUX)
 
 int apollo_eth_transmit(device_t *device, const UINT8 data[], int length)
 {
@@ -36,7 +36,7 @@ void apollo_eth_init(device_t *device, apollo_eth_receive rx_data)
 {
 }
 
-#else  /* __linux__ */
+#else  /* defined(APOLLO_FOR_LINUX) */
 
 #include "machine/3c505.h"
 
@@ -347,4 +347,4 @@ void apollo_eth_init(device_t *device, apollo_eth_receive rx_data)
 		}
 	}
 }
-#endif /* __linux__ */
+#endif /* defined(APOLLO_FOR_LINUX) */

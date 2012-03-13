@@ -143,7 +143,7 @@ const char *apollo_cpu_context(device_t *cpu) {
  apollo_set_cpu_has_fpu - enable/disable the FPU
  -------------------------------------------------*/
 
-/*void apollo_set_cpu_has_fpu(device_t *device, int onoff)
+void apollo_set_cpu_has_fpu(device_t *device, int onoff)
 {
     if (device == NULL || (device->type() != M68020PMMU && device->type() != M68030))
     {
@@ -153,9 +153,9 @@ const char *apollo_cpu_context(device_t *cpu) {
     {
         m68ki_cpu_core *cpu = (m68ki_cpu_core *) downcast<legacy_cpu_device *> (device)->token();
         cpu->has_fpu = onoff;
-        DLOG1(("set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
+        DLOG1(("apollo_set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
     }
-}*/
+}
 
 /***************************************************************************
  apollo_check_log - check for excessive logging
@@ -534,13 +534,8 @@ static READ32_HANDLER( apollo_unmapped_r )
 		SLOG1(("unmapped memory dword read from %08x with mask %08x (ir=%04x)", address , mem_mask, m68k->ir));
 	}
 
-//  if (address == 0xfffffffc) {
-//      // temporary hack for disp7d.dex @ 010456D8
-//      return  0xffffffff;
-//  }
 	/* unmapped; access causes a bus error */
 	apollo_bus_error(space->machine());
-
 	return 0xffffffff;
 }
 
@@ -1048,6 +1043,9 @@ static void apollo_reset_instr_callback(device_t *device)
 
     // reset non-CPU devices here
     apollo->m_ctape->device_reset();
+
+    // HACK: should go through our devices and just reset those, not the entire machine object.
+	device->machine().schedule_soft_reset();
 }
 
 /***************************************************************************
@@ -1161,7 +1159,13 @@ static APOLLO_KBD_INTERFACE( apollo_kbd_config ) = {
 };
 
 static WRITE8_DEVICE_HANDLER( terminal_kbd_putchar ) {
-	apollo_sio_rx_data(device->machine().device(APOLLO_SIO_TAG), 1, data);
+	// put input character from terminal to the RS232 sio (i.e. sio1)
+	DLOG1(("terminal_kbd_putchar: 0x%02x", data));
+	// FIXME: as of mess0145u1, terminal.c will append a null character after each input character
+	if (data != 0)
+	{
+		apollo_sio_rx_data(device->machine().device(APOLLO_SIO_TAG), 1, data);
+	}
 }
 
 static GENERIC_TERMINAL_INTERFACE( apollo_terminal_config ) {
