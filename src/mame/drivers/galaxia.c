@@ -1,4 +1,4 @@
-/* Galxaia
+/* Galaxia
 
 Galaxia by Zaccaria (1979)
 
@@ -21,6 +21,8 @@ TS 2008.08.12:
 - fixed rom loading
 - added preliminary video emulation
 
+HW seems to have many similarities with quasar.c / cvs.c
+
 */
 
 #include "emu.h"
@@ -35,6 +37,7 @@ public:
 	galaxia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	UINT8 m_collision;
 	UINT8 *m_video;
 	UINT8 *m_color;
 };
@@ -66,7 +69,7 @@ static SCREEN_UPDATE_IND16( galaxia )
 	bitmap_ind16 &s2636_1_bitmap = s2636_update(s2636_1, cliprect);
 	bitmap_ind16 &s2636_2_bitmap = s2636_update(s2636_2, cliprect);
 
-	/* copy the S2636 images into the main bitmap */
+	/* copy the S2636 images into the main bitmap and check collision */
 	{
 		int y;
 
@@ -79,15 +82,26 @@ static SCREEN_UPDATE_IND16( galaxia )
 				int pixel0 = s2636_0_bitmap.pix16(y, x);
 				int pixel1 = s2636_1_bitmap.pix16(y, x);
 				int pixel2 = s2636_2_bitmap.pix16(y, x);
+				
+				int pixel = pixel0 | pixel1 | pixel2;
+				
+				if (S2636_IS_PIXEL_DRAWN(pixel))
+				{
+					/* S2636 vs. S2636 collision detection */
+					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x01;
+					if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x02;
+					if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x04;
 
-				if (S2636_IS_PIXEL_DRAWN(pixel0))
-					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel0);
+					/* S2636 vs. background collision detection */
+					if (bitmap.pix16(y, x))
+					{
+						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x10;
+						if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x20;
+						if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x40;
+					}
 
-				if (S2636_IS_PIXEL_DRAWN(pixel1))
-					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel1);
-
-				if (S2636_IS_PIXEL_DRAWN(pixel2))
-					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel2);
+					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
+				}
 			}
 		}
 	}
@@ -113,9 +127,29 @@ static READ8_HANDLER(galaxia_video_r)
 	return state->m_video[offset];
 }
 
+static WRITE8_HANDLER(galaxia_scroll_w)
+{
+	// TODO: scroll bg enemy swarm
+}
+
+static READ8_HANDLER(galaxia_collision_r)
+{
+	galaxia_state *state = space->machine().driver_data<galaxia_state>();
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	return state->m_collision;
+}
+
+static READ8_HANDLER(galaxia_collision_clear)
+{
+	galaxia_state *state = space->machine().driver_data<galaxia_state>();
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	state->m_collision = 0;
+	return 0;
+}
+
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM // bullet ram?
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
@@ -126,13 +160,14 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN7")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x00, 0x00) AM_WRITE(galaxia_scroll_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5")
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN6")
 	AM_RANGE(0xac, 0xac) AM_READ_PORT("IN3")
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(galaxia_collision_r)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(galaxia_collision_clear) // ?
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -202,6 +237,9 @@ static INPUT_PORTS_START( galaxia )
 
 	PORT_START("IN7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SENSE")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x1_layout =
@@ -273,9 +311,10 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_CPU_VBLANK_INT("screen", galaxia_interrupt)
 
 	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(galaxia)

@@ -1875,6 +1875,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/extrema.o \
 	$(DRIVERS)/tmspoker.o \
 	$(DRIVERS)/manohman.o \
+	$(DRIVERS)/jankenmn.o \
 
 
 #-------------------------------------------------
@@ -1985,7 +1986,8 @@ $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 			$(LAYOUT)/pulltabs.lh
 
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
-			$(LAYOUT)/pmpoker.lh
+			$(LAYOUT)/pmpoker.lh \
+			$(LAYOUT)/upndown.lh
 
 $(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh \
 			$(LAYOUT)/bingowng.lh
@@ -1995,6 +1997,8 @@ $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
+
+$(DRIVERS)/jankenmn.o:	$(LAYOUT)/jankenmn.lh
 
 $(DRIVERS)/kas89.o:	$(LAYOUT)/kas89.lh
 
