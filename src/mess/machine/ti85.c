@@ -302,6 +302,7 @@ READ8_HANDLER ( ti8x_serial_r )
 		| (state->m_red_out<<2)
 		//| ((ti85serial_white_in(state->m_serial,0)&(1-state->m_white_out))<<1)
 		//| (ti85serial_red_in(state->m_serial,0)&(1-state->m_red_out))
+		| 0x03	// no link cable
 		| state->m_PCR;
 }
 
@@ -360,6 +361,7 @@ READ8_HANDLER ( ti8x_plus_serial_r )
 		| (state->m_red_out<<2)
 		//| ((ti85serial_white_in(state->m_serial,0)&(1-state->m_white_out))<<1)
 		//| (ti85serial_red_in(state->m_serial,0)&(1-state->m_red_out))
+		| 0x03	// no link cable
 		| state->m_PCR;
 }
 
