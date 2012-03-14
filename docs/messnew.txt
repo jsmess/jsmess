@@ -1,4 +1,60 @@
-﻿0.145u3 (u2 was not released)
+﻿0.145u4
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Archimedes A3010 and A3020 [robcfg]
+- Kosmos CP1 [Sören Gust]
+
+System Driver Changes:
+----------------------
+-trs80m2: Fixed keyboard clock. [brouhaha]
+-next: timer fix, add the softints [O. Galibert]
+-n64: Restore previous AI DMA speed, theory was wrong and lag was caused 
+ due code cruft in a local file. [Ryan Holtz]
+-odyssey2: [Dan Boris]
+  - Changed color of background grid color 0 to match sprite color 0 (Fixes KTAA title screen)
+  - Fixed Odyssey2_video_w so that m_o2_vdc.reg[] is always updated (Fixes Blockout)
+  - Changed quad character generation so character height is always taken from 4th character (KTAA level 2)
+-next: Better handling of the supdate flag [O. Galibert]
+-cp1: Alternate rom for cp1 [Kaylee]
+-z88: Added cartridge slot interface. [Sandro Ronco]
+-ibmpcjr: fixed boot error [Carl]
+-apollo: various cleanups [Hans Ostermeyer, R. Belmont]
+-megacd: two new revision of the megacdj bios [El Barto]
+
+Software Lists:
+----------------
+-trs80m2: Added some floppies. [Damien Cymbal]
+-ibm5150: added a softlist for PC Booter disk [k1w1]
+-pico.xml: added new dumps [Team Europe] 
+-a800.xml: added new dumps and verified more carts [k1w1] 
+-ibm5150.xml: added new dumps [k1w1, Kaylee] 
+
+Source Changes:
+----------------
+-Support for the 16550 fifo and hook up for the avigo to 
+  the serial port (to test the 16550). [Carl]
+- nextkbd: Fix key up/down [O. Galibert]
+-nscsi_hd: Write and mode sense support [O. Galibert]
+-ncr5390: Fix dma/fifo interaction [O. Galibert]
+- nscsi_hd: Misc fixes [O. Galibert]
+- Preliminary ide cd support, based on work of R.Belmont and Grull Osgo, 
+ still need some work [Miodrag Milanovic]
+-i82371sb implementation and fixes for i82439tx [Grull Osgo]
+-i386,x87: Multiple fixes. [Carl]
+-pic8259,fmtowns: PIC/timers fix [Carl]
+-m68k: allow FPU instructions on '020 (it's possible to have an external 68881/882) 
+ and fix missing break; in the FPU [Hans Ostermeyer]
+
+0.145u3 (u2 was not released)
 
 New System Drivers Supported:
 -----------------------------
