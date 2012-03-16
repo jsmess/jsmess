@@ -9316,9 +9316,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-<!-- SMSPower list this as a US proto... investigate! -->
-	<software name="zoop">
-		<description>Zoop (Euro)</description>
+	<software name="zoopp" cloneof="zoop">
+		<description>Zoop (USA, Prototype)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9328,7 +9327,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="zoopu" cloneof="zoop">
+	<software name="zoop">
 		<description>Zoop (USA)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
