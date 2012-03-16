@@ -7837,6 +7837,17 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="scoobyu" cloneof="scooby">
+		<description>Scooby-Doo! - Classic Creep Capers (USA, Rev. A)</description>
+		<year>2000</year>
+		<publisher>T*HQ</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="scooby-doo! - classic creep capers (usa) (rev. a).bin" size="16777216" crc="91cc1ed6" sha1="bbc12b280c38de870a89877809cfd5bda009aa98" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobyu1" cloneof="scooby">
 		<description>Scooby-Doo! - Classic Creep Capers (USA)</description>
 		<year>2000</year>
 		<publisher>T*HQ</publisher>
@@ -9533,6 +9544,17 @@ There appear to exist some undumped N64 protos
 	</software>
 
 	<software name="turokragu" cloneof="turokrag">
+		<description>Turok - Rage Wars (USA, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="turok - rage wars (usa) (rev. a).bin" size="8388608" crc="282319a0" sha1="c94f093486f2ba2030f077254d0b6ce26372e684" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turokragu1" cloneof="turokrag">
 		<description>Turok - Rage Wars (USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
