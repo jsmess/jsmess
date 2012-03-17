@@ -1412,7 +1412,6 @@
 		<description>Jars' Revenge</description>
 		<year>2011</year>
 		<publisher>RGCD</publisher>
-		<info name="serial" value="RGCD #13" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
@@ -1429,6 +1428,7 @@
 		<description>Panic Analogue</description>
 		<year>2012</year>
 		<publisher>RGCD</publisher>
+		<info name="serial" value="RGCD #13" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
