@@ -1441,6 +1441,44 @@
 		</part>
 	</software>
 
+	<software name="chamelon" supported="no">
+		<description>Turbo Chameleon 64</description>
+		<year>2011</year>
+		<publisher>Peter Wendrich</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="chameleon" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0xa0000">
+				<rom name="rom-menu.bin" size="0xa0000" crc="a3842c0d" sha1="a147584a959034c8a5679e72c183c82f7e876fd6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="busbasic" supported="no">
+		<description>Business BASIC</description>
+		<year>1986</year>
+		<publisher>Kingsoft</publisher>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="kingsoft" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="1" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" offset="0" />
+			</dataarea>
+	
+			<dataarea name="romh" size="0x2000">
+				<rom name="2" size="0x2000" crc="ab55db10" sha1="c6f53801645e07d0413dc91bae71a79a636762c4" offset="0" />
+				<rom name="3" size="0x2000" crc="407a8273" sha1="971ca48cd6e80cc77f166709207e68b0b5d0d8c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mikroasm">
 		<description>Mikro Assembler</description>
 		<year>198?</year>
