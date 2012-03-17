@@ -1479,6 +1479,23 @@
 		</part>
 	</software>
 
+	<software name="samson" supported="no">
+		<description>Samson</description>
+		<year>198?</year>
+		<publisher>Roßmöller</publisher>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="samson" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x10000">
+				<rom name="samson1" size="0x8000" crc="373a0c2d" sha1="bfc523f5cd0c82042692a45dfb2d535da9284a20" offset="0" />
+				<rom name="samson2" size="0x8000" crc="068d62d6" sha1="fc38207f9c34152fd78b37080cfdb628d03cef69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mikroasm">
 		<description>Mikro Assembler</description>
 		<year>198?</year>
