@@ -771,6 +771,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/c64dtv.o	\
 	$(MESS_MACHINE)/c64exp.o	\
 	$(MESS_MACHINE)/c64user.o	\
+	$(MESS_MACHINE)/c64_4cga.o	\
 	$(MESS_MACHINE)/c64_comal80.o	\
 	$(MESS_MACHINE)/c64_dela_ep256.o	\
 	$(MESS_MACHINE)/c64_dela_ep64.o	\

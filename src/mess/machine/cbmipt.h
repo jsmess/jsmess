@@ -3,6 +3,7 @@
 #ifndef CBMIPT_H_
 #define CBMIPT_H_
 
+#include "machine/c64_4cga.h"
 #include "machine/c64_comal80.h"
 #include "machine/c64_dela_ep256.h"
 #include "machine/c64_dela_ep64.h"
