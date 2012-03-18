@@ -667,7 +667,22 @@
 		</part>
 	</software>
 
-	<software name="capture2" supported="no">
+	<software name="capture" supported="no">
+		<description>Capture</description>
+		<year>1985</year>
+		<publisher>J. Ranheim</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="capture2" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="romh" size="0x2000">
+				<rom name="capture (c)1985 j.ranheim" size="0x2000" crc="5063a31e" sha1="f7049545c657f7b8b302b84d71d2e8a0d6c37c53" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capture2" cloneof="capture" supported="no">
 		<description>Capture 2</description>
 		<year>1987</year>
 		<publisher>J. Ranheim</publisher>
@@ -676,7 +691,7 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="roml" size="0x2000">
+			<dataarea name="romh" size="0x2000">
 				<rom name="capture 2 (usa, europe) (program).bin" size="0x2000" crc="f25640c4" sha1="ebfa440401aebf3d09a43995dd87999d2982cb6a" offset="0x0000" />
 			</dataarea>
 		</part>
@@ -1458,11 +1473,11 @@
 		</part>
 	</software>
 
-	<software name="busbasic" supported="no">
-		<description>Business BASIC</description>
-		<year>1986</year>
+	<software name="busbasic">
+		<description>Business Basic</description>
+		<year>1985</year>
 		<publisher>Kingsoft</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="kingsoft" />
 			<feature name="game" value="0" />
@@ -1472,9 +1487,36 @@
 				<rom name="1" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" offset="0" />
 			</dataarea>
 	
-			<dataarea name="romh" size="0x2000">
-				<rom name="2" size="0x2000" crc="ab55db10" sha1="c6f53801645e07d0413dc91bae71a79a636762c4" offset="0" />
-				<rom name="3" size="0x2000" crc="407a8273" sha1="971ca48cd6e80cc77f166709207e68b0b5d0d8c1" offset="0" />
+			<dataarea name="romh" size="0x4000">
+				<rom name="2" size="0x2000" crc="ab55db10" sha1="c6f53801645e07d0413dc91bae71a79a636762c4" offset="0x0000" />
+				<rom name="3" size="0x2000" crc="407a8273" sha1="971ca48cd6e80cc77f166709207e68b0b5d0d8c1" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smore" cloneof="busbasic">
+		<description>S'more Basic</description>
+		<year>1985</year>
+		<publisher>Cardco</publisher>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="kingsoft" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="1121" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" offset="0" />
+			</dataarea>
+	
+			<dataarea name="romh" size="0x4000">
+				<rom name="2122" size="0x2000" crc="635407a5" sha1="b174c20153032307560707e4f73997fb3633deae" offset="0x0000" />
+				<rom name="3121" size="0x2000" crc="8de1d013" sha1="8052819719b0234b999ac8af18116bdbb0463013" offset="0x2000" />
+			</dataarea>
+		</part>
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="s'more.d64" size="174848" crc="268eb91b" sha1="c8672643441a6714093382fd018fc3ead722bc5a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1492,6 +1534,22 @@
 			<dataarea name="roml" size="0x10000">
 				<rom name="samson1" size="0x8000" crc="373a0c2d" sha1="bfc523f5cd0c82042692a45dfb2d535da9284a20" offset="0" />
 				<rom name="samson2" size="0x8000" crc="068d62d6" sha1="fc38207f9c34152fd78b37080cfdb628d03cef69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smarterm">
+		<description>SMART 64/C Intelligent Terminal v1.4</description>
+		<year>1985</year>
+		<publisher>Tom Wheeler</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="smart 64 c intelligent terminal commodore 654 cartridge.bin" size="0x2000" crc="f030b179" sha1="5521fa90fee29397c705eb91760df082b99c1414" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6116,12 +6174,16 @@
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64801" />
+		<info name="assy" value="326073" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x8000">
-				<rom name="magic desk i (1983)(commodore).80" size="0x8000" crc="a34d0f87" sha1="e9dd758c03c288a1cbfa6cadbcc6f2943c27ff20" offset="0x0000" />
+				<rom name="317004-01.u1" size="0x2000" crc="3b47e9f0" sha1="19fde6707a4c60fdc3bb9df07e2f3ddf28a94900" offset="0x0000" />
+				<rom name="317005-01.u2" size="0x2000" crc="9f3e210d" sha1="c78af8d162e19d09770d4df1c154c4e95418a7c0" offset="0x2000" />
+				<rom name="317006-01.u3" size="0x2000" crc="ef1323fa" sha1="a7238a85b9f65720164dcd9278b9550670e00394" offset="0x4000" />
+				<rom name="317007-01.u4" size="0x2000" crc="e5c87f9d" sha1="2df19a613646de7cc5c5545a5004ae7568dd5b50" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
