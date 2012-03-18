@@ -1572,12 +1572,16 @@
 		<description>Super Games</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
+		<info name="assy" value="311888" />
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="super_games" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
+
 			<dataarea name="roml" size="0x10000">
-				<rom name="super games (1988)(commodore).80" size="0x10000" crc="85b3c883" sha1="aadf2ac2840edd2a814f3d0d8d4a932b4c430898" offset="0x0000" />
+				<rom name="315102-01.u1" size="0x8000" crc="2fe1c208" sha1="d037d867244221ea8f5f05e3048d9e2af39e2cc9" offset="0x0000" />
+				<rom name="315103-01.u2" size="0x8000" crc="f8b7adf0" sha1="02a7640b69b09663df988ba0d1674d63d2f76616" offset="0x8000" />
 			</dataarea>
 		</part>
 	</software>

@@ -83,7 +83,23 @@ void c64_super_games_cartridge_device::c64_cd_w(address_space &space, offs_t off
 	{
 		m_bank = data & 0x03;
 
-		m_game = BIT(data, 2);
-		m_exrom = BIT(data, 3);
+		if (BIT(data, 2))
+		{
+			if (BIT(data, 3))
+			{
+				m_game = 1;
+				m_exrom = 1;
+			}
+			else
+			{
+				m_game = 1;
+				m_exrom = 0;
+			}
+		}
+		else
+		{
+			m_game = 0;
+			m_exrom = 0;
+		}
 	}
 }
