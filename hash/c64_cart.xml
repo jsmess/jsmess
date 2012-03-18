@@ -3410,21 +3410,28 @@
 	</software>
 
 	<software name="addsub23">
-		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2.-3. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 2./3. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
+		<info name="assy" value="OPC-1298A" />
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x4000">
-				<rom name="rechenlowe, der - fit in addition und subtraktion - 2.-3. schuljahr (1984)(commodore)(ger).80" size="0x4000" crc="4f1b5277" sha1="45aabd29bd7f8738e11206b1233659b6a94a3c11" offset="0x0000" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="324872-03.u1" size="0x2000" crc="d6f297b8" sha1="5df910498a3ac177ca72de56565655ce4133d315" offset="0" />
+			</dataarea>
+			
+			<dataarea name="romh" size="0x2000">
+				<rom name="324872-04.u2" size="0x2000" crc="857d801f" sha1="c7a058090513cfc4f22b7d0e459bc2788c393a87" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="addsub34">
-		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3.-4. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Addition und Subtraktion - 3./4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3438,7 +3445,7 @@
 	</software>
 
 	<software name="geomet34">
-		<description>Der Rechenlöwe: Fit in Geometrie - 3.-4. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Geometrie - 3./4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3455,18 +3462,25 @@
 		<description>Der Rechenlöwe: Fit in Mathematik - 1. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
+		<info name="assy" value="OPC-1298A" />
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="westermann" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x4000">
-				<rom name="rechenlowe, der - fit in mathematik - 1. schuljahr (1984)(commodore)(ger).80" size="0x4000" crc="86183d34" sha1="8ca82680efa8886e00e6f9d37e242b24b54e5215" offset="0x0000" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="324874-03.u1" size="0x2000" crc="ebf384be" sha1="d2761fdf092e2278187c46a4942d766f285f1cbd" offset="0" />
+			</dataarea>
+			
+			<dataarea name="romh" size="0x2000">
+				<rom name="324874-04.u2" size="0x2000" crc="bcfdb48d" sha1="96739f2d2a72669a0cd802ce90aa664a70cce09c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="muldiv23">
-		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2.-3. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 2./3. Schuljahr (Ger)</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3480,7 +3494,7 @@
 	</software>
 
 	<software name="muldiv34">
-		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3.-4. Schuljahr (Ger)</description>
+		<description>Der Rechenlöwe: Fit in Multiplikation und Division - 3./4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -3494,7 +3508,7 @@
 	</software>
 
 	<software name="recht34">
-		<description>Der Rechtschreiblöwe: Fit in Rechtschreibung - 3.-4. Schuljahr (Ger)</description>
+		<description>Der Rechtschreiblöwe: Fit in Rechtschreibung - 3./4. Schuljahr (Ger)</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
