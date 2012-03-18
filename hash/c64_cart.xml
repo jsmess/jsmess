@@ -3952,11 +3952,18 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64610" />
+		<info name="assy" value="250423" />
+
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x4000">
-				<rom name="tooth invaders (1982)(commodore).80" size="0x4000" crc="06d63bc2" sha1="75ece1d16cc635734739dafd4c836222c99ded03" offset="0x0000" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="325426-01.u1" size="0x2000" crc="06ae3f28" sha1="5f85f3b88bf686c917a1e529527a3f811841d496" offset="0x0000" />
+			</dataarea>
+
+			<dataarea name="romh" size="0x2000">
+				<rom name="325427-01.u2" size="0x2000" crc="31479d4a" sha1="fef92e461a8d2cc0be46e263d6d510bf197bc8f3" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
