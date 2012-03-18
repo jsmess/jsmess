@@ -576,10 +576,11 @@
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1907" />
+		<info name="assy" value="326173-01" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="jupiter lander (commodore)(1982)(vic-1907).a0" size="0x2000" crc="18e177f1" sha1="5b39a7ba5f3b401ca400411ce4229c7bd30c1d45" offset="0x0000" />
+				<rom name="325351-02.u1" size="0x2000" crc="18e177f1" sha1="5b39a7ba5f3b401ca400411ce4229c7bd30c1d45" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
