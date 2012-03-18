@@ -84,12 +84,14 @@
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<info name="serial" value="C-64601" />
+		<info name="assy" value="326173-01" />
+
 		<part name="cart" interface="vic10_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
 
 			<dataarea name="uprom" size="0x2000">
-				<rom name="jupiter.bin" size="0x2000" crc="a5af43e5" sha1="d6620a6f38a14e51ed98d26a0c721f5c80fcd8f3" offset="0x0000" />
+				<rom name="325351-02.u1" size="0x2000" crc="a5af43e5" sha1="d6620a6f38a14e51ed98d26a0c721f5c80fcd8f3" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -99,12 +101,14 @@
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<info name="serial" value="C-64602" />
+		<info name="assy" value="326173" />
+
 		<part name="cart" interface="vic10_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
 
 			<dataarea name="uprom" size="0x2000">
-				<rom name="kickman.bin" size="0x2000" crc="f15dcfe7" sha1="7d8091a2b560644f10d39449775e6a8447e772ca" offset="0x0000" />
+				<rom name="325362-02.u1" size="0x2000" crc="f15dcfe7" sha1="7d8091a2b560644f10d39449775e6a8447e772ca" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
