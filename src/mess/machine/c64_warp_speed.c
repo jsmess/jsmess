@@ -56,7 +56,7 @@ const device_type C64_WARP_SPEED = &device_creator<c64_warp_speed_cartridge_devi
 //  INPUT_PORTS( c64_warp_speed )
 //-------------------------------------------------
 
-INPUT_CHANGED( c64_warp_speed_cartridge_device::reset )
+INPUT_CHANGED_MEMBER( c64_warp_speed_cartridge_device::reset )
 {
 	// TODO
 }
@@ -68,7 +68,7 @@ static INPUT_PORTS_START( c64_warp_speed )
 	PORT_DIPSETTING(    0x00, "C128" )
 
 	PORT_START("SW2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Reset") PORT_CHANGED(c64_warp_speed_cartridge_device::reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, c64_warp_speed_cartridge_device, reset, 0)
 INPUT_PORTS_END
 
 

@@ -772,6 +772,9 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64exp.o	\
 	$(MESS_MACHINE)/c64user.o	\
 	$(MESS_MACHINE)/c64_4cga.o	\
+	$(MESS_MACHINE)/c64_4dxh.o	\
+	$(MESS_MACHINE)/c64_4ksa.o	\
+	$(MESS_MACHINE)/c64_4tba.o	\
 	$(MESS_MACHINE)/c64_comal80.o	\
 	$(MESS_MACHINE)/c64_dela_ep256.o	\
 	$(MESS_MACHINE)/c64_dela_ep64.o	\
@@ -783,6 +786,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_epyx_fast_load.o	\
 	$(MESS_MACHINE)/c64_exos.o	\
 	$(MESS_MACHINE)/c64_final.o	\
+	$(MESS_MACHINE)/c64_final3.o	\
 	$(MESS_MACHINE)/c64_fun_play.o	\
 	$(MESS_MACHINE)/c64_georam.o	\
 	$(MESS_MACHINE)/c64_ieee488.o	\
