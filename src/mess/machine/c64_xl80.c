@@ -28,8 +28,8 @@ Notes:
 
     CRTC    - Hitachi HD46505SP
     RAM     - Toshiba TMM2016AP-12 2Kx8 Static RAM
-    ROM0    - GI 9433CS-0090 8Kx8 ROM?
-    ROM1    - GI 9316CS-F67 2Kx8 ROM? "DTC"
+    ROM0    - GI 9433CS-0090 8Kx8 ROM
+    ROM1    - GI 9316CS-F67 2Kx8 ROM "DTC"
     CN1     - RCA video output
 
 */
@@ -87,7 +87,7 @@ void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
+		UINT8 code = m_ram[((ma + column) & 0x7ff)];
 		UINT16 addr = (code << 3) | (ra & 0x07);
 		UINT8 data = m_char_rom[addr & 0x7ff];
 
@@ -190,12 +190,13 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 
 void c64_xl80_device::device_start()
 {
+	// find memory regions
 	m_rom = subregion("roml")->base();
 	m_char_rom = subregion(HD46505SP_TAG)->base();
-	m_video_ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);
+	m_ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);
 
 	// state saving
-	save_pointer(NAME(m_video_ram), RAM_SIZE);
+	save_pointer(NAME(m_ram), RAM_SIZE);
 }
 
 
@@ -216,7 +217,7 @@ UINT8 c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, int roml, i
 {
 	UINT8 data = 0;
 
-	if (!io2 && BIT(offset, 1))
+	if (!io2 && BIT(offset, 2))
 	{
 		if (offset & 0x01)
 		{
@@ -229,7 +230,7 @@ UINT8 c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, int roml, i
 	}
 	else if (offset >= 0x9800 && offset < 0xa000)
 	{
-		data = m_video_ram[offset & 0x7ff];
+		data = m_ram[offset & 0x7ff];
 	}
 
 	return data;
@@ -242,7 +243,11 @@ UINT8 c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, int roml, i
 
 void c64_xl80_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
 {
-	if (!io2 && BIT(offset, 1))
+	if (offset >= 0x9800 && offset < 0xa000)
+	{
+		m_ram[offset & 0x7ff] = data;
+	}
+	else if (!io2 && BIT(offset, 2))
 	{
 		if (offset & 0x01)
 		{
@@ -252,9 +257,5 @@ void c64_xl80_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, 
 		{
 			m_crtc->address_w(space, 0, data);
 		}
-	}
-	if (offset >= 0x9800 && offset < 0xa000)
-	{
-		m_video_ram[offset & 0x7ff] = data;
 	}
 }

@@ -57,7 +57,6 @@ private:
 
 	UINT8 *m_rom;
 	UINT8 *m_char_rom;
-	UINT8 *m_video_ram;
 };
 
 

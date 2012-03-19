@@ -35,7 +35,7 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
-	INPUT_CHANGED_MEMBER( fire3 );
+	DECLARE_INPUT_CHANGED_MEMBER( fire3 );
 
 protected:
 	// device-level overrides

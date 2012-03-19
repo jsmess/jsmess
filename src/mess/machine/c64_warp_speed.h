@@ -35,7 +35,7 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
-	INPUT_CHANGED_MEMBER( reset );
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
 
 protected:
 	// device-level overrides
