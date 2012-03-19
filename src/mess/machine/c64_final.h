@@ -32,6 +32,12 @@ public:
 	// construction/destruction
 	c64_final_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
+
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
+	DECLARE_INPUT_CHANGED_MEMBER( freeze );
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
