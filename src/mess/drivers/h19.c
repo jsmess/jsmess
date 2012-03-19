@@ -418,6 +418,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
 	MCFG_INS8250_ADD( "ins8250", h19_ace_interface, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, h19_terminal_intf) // keyboard only
+	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

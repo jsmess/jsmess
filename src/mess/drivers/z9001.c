@@ -187,6 +187,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_GFXDECODE(z9001)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
 	MCFG_TIMER_ADD_PERIODIC("z9001_timer", timer_callback, attotime::from_msec(10))
 MACHINE_CONFIG_END
 

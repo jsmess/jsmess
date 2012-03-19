@@ -279,6 +279,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_16MHz / 8, v6809_crtc)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
 MACHINE_CONFIG_END
 
 /* ROM definition */

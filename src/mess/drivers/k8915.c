@@ -171,6 +171,7 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf) // keyboard only
+	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
 MACHINE_CONFIG_END
 
 
