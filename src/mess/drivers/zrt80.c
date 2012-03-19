@@ -311,6 +311,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
 	MCFG_INS8250_ADD( "ins8250", zrt80_com_interface, 2457600 )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
 MACHINE_CONFIG_END
 
 /* ROM definition */

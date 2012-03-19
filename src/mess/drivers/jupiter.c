@@ -293,6 +293,7 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	// devices
 	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, jupiter3_terminal_intf)
+	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

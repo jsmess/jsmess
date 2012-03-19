@@ -176,6 +176,7 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_I8275_ADD	( "i8275", ipds_i8275_interface)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
 MACHINE_CONFIG_END
 
 /* ROM definition */

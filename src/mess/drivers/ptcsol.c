@@ -734,6 +734,7 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
 	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
 MACHINE_CONFIG_END
 
 /* ROM definition */
