@@ -4,6 +4,9 @@
 #define CBMIPT_H_
 
 #include "machine/c64_4cga.h"
+#include "machine/c64_4dxh.h"
+#include "machine/c64_4ksa.h"
+#include "machine/c64_4tba.h"
 #include "machine/c64_comal80.h"
 #include "machine/c64_dela_ep256.h"
 #include "machine/c64_dela_ep64.h"
@@ -15,6 +18,7 @@
 #include "machine/c64_epyx_fast_load.h"
 #include "machine/c64_exos.h"
 #include "machine/c64_final.h"
+#include "machine/c64_final3.h"
 #include "machine/c64_fun_play.h"
 #include "machine/c64_georam.h"
 #include "machine/c64_ieee488.h"
