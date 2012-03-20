@@ -54,8 +54,6 @@ void c64_bn1541_device::device_start()
 			break;
 		}
 	}
-
-	assert(m_drive);
 }
 
 
@@ -78,7 +76,7 @@ void c64_bn1541_device::device_reset()
 
 void c64_bn1541_device::parallel_data_w(UINT8 data)
 {
-    logerror("1541 parallel data %02x\n", data);
+    //logerror("1541 parallel data %02x\n", data);
 	m_data = data;
 }
 
@@ -89,7 +87,7 @@ void c64_bn1541_device::parallel_data_w(UINT8 data)
 
 void c64_bn1541_device::parallel_strobe_w(int state)
 {
-    logerror("1541 parallel strobe %u\n", state);
+    //logerror("1541 parallel strobe %u\n", state);
 	m_slot->flag2_w(state);
 }
 
