@@ -170,7 +170,8 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( phunsy_state::kbd_put )
 {
-	m_keyboard_input = data;
+	if (data)
+		m_keyboard_input = data;
 }
 
 

@@ -9,7 +9,6 @@ RM 380Z machine
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"
-#include "machine/terminal.h"
 #include "machine/wd17xx.h"
 #include "includes/rm380z.h"
 
@@ -195,8 +194,11 @@ static TIMER_CALLBACK(static_vblank_timer)
 
 WRITE8_MEMBER( rm380z_state::keyboard_put )
 {
-	m_port0_kbd = data;
-	m_port1|=0x01;
+	if (data)
+	{
+		m_port0_kbd = data;
+		m_port1 |= 1;
+	}
 }
 
 //

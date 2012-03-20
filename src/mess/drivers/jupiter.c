@@ -123,7 +123,8 @@ READ8_MEMBER( jupiter3_state::status_r )
 
 WRITE8_MEMBER( jupiter3_state::kbd_put )
 {
-	m_term_data = data ^ 0x80;
+	if (data)
+		m_term_data = data ^ 0x80;
 }
 
 
