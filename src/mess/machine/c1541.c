@@ -242,7 +242,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( c1541 )
-	ROM_REGION( 0x6000, M6502_TAG, 0 )
+	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 	ROM_LOAD_OPTIONAL( "901229-01.uab5", 0x2000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77) )
 	ROM_LOAD_OPTIONAL( "901229-02.uab5", 0x2000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000) )
@@ -251,6 +251,7 @@ ROM_START( c1541 )
 	ROM_LOAD_OPTIONAL( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
 	ROM_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0) )
 	ROM_LOAD_OPTIONAL( "jiffydos 1541.uab5", 0x4000, 0x2000, CRC(bc7e4aeb) SHA1(db6cfaa6d9b78d58746c811de29f3b1f44d99ddf) )
+    ROM_LOAD_OPTIONAL( "speed-dosplus.uab5", 0x4000, 0x4000, CRC(f9db1eac) SHA1(95407e59a9c1d26a0e4bcf2c244cfe8942576e2c) )
 ROM_END
 
 
@@ -350,21 +351,21 @@ ADDRESS_MAP_END
 
 void c1541_device::parallel_connect(c64_bn1541_device *device)
 {
-    logerror("C64 parallel cable connected!\n");
+    //logerror("C64 parallel cable connected!\n");
     m_parallel_cable = device;
 }
 
 
 void c1541_device::parallel_data_w(UINT8 data)
 {
-    logerror("C64 parallel data %02x\n", data);
+    //logerror("C64 parallel data %02x\n", data);
     m_parallel_data = data;
 }
 
 
 void c1541_device::parallel_strobe_w(int state)
 {
-    logerror("C64 parallel strobe %u\n", state);
+    //logerror("C64 parallel strobe %u\n", state);
     m_via0->write_cb1(state);
 }
 
