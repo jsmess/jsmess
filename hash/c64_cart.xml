@@ -5943,6 +5943,108 @@
 		</part>
 	</software>
 
+	<software name="frzframe">
+		<description>Freeze Frame MK1 (v1)</description>
+		<year>1986</year>
+		<publisher>Evesham Micros</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="freeze_frame" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="freeze_frame_mk1_v1_1986.bin" size="0x2000" crc="0239c47b" sha1="62906c0d22dca6ba48aa4a4ead467c57d207ac75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frzframev2" cloneof="frzframe">
+		<description>Freeze Frame MK1 (v2)</description>
+		<year>1986</year>
+		<publisher>Evesham Micros</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="freeze_frame" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="freeze_frame_mk1_v2_1986.bin" size="0x2000" crc="58f11c8b" sha1="a04ce32caf23d29334d17a9cc0149749027b75c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frzframe4" cloneof="frzframe">
+		<description>Freeze Frame MK4</description>
+		<year>1987</year>
+		<publisher>Evesham Micros</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="freeze_frame4" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x4000">
+				<rom name="freeze_frame_mk4_1987.bin" size="0x4000" crc="6b4ac766" sha1="8d98d15ff38e184434edecf59242b028950bd8fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frzmach">
+		<description>Freeze Machine (Aus) (v1)</description>
+		<year>1987</year>
+		<publisher>Evesham Micros</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="freeze_machine" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x8000">
+				<rom name="freeze_machine_v1_1987_au.bin" size="0x8000" crc="a9995e50" sha1="cdc57d9759d2c5eb5b9c7e75bb3c82728cf30bfc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frzmachu" cloneof="frzmach">
+		<description>Freeze Machine (UK) (v1)</description>
+		<year>1987</year>
+		<publisher>Evesham Micros</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="freeze_machine" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x8000">
+				<rom name="freeze_machine_v1_1987_uk.bin" size="0x8000" crc="71329d4e" sha1="a9a3dbf7e9f69100e9e3955ab9d7eba8edbf9968" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frzmachu2" cloneof="frzmach">
+		<description>Freeze Machine (UK) (v2)</description>
+		<year>1987</year>
+		<publisher>Evesham Micros</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="freeze_machine" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x8000">
+				<rom name="freeze_machine_v2_1987_uk.bin" size="0x8000" crc="66b76d76" sha1="3be23e5278a31fab3d4c6b397d6d2c41b747e133" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="comal80">
 		<description>COMAL 80 (Commodore)</description>
 		<year>1985</year>
