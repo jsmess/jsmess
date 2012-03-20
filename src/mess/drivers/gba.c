@@ -1925,8 +1925,8 @@ INLINE UINT32 COMBINE_DATA32_16(UINT32 prev, UINT32 data, UINT32 mem_mask)
 			prev |= data << 8;
 			break;
 		case 0xff000000:
-			prev &= 0xffffffff;
-			prev |= data << 8;
+			prev &= 0xff00ffff;
+			prev |= data >> 8;
 			break;
 		default:
 			break;
@@ -1962,7 +1962,7 @@ static READ32_HANDLER(gba_bios_r)
 {
 	running_machine &machine = space->machine();
 	gba_state *state = machine.driver_data<gba_state>();
-	UINT32 *rom = (UINT32 *)space->machine().region("maincpu");
+	UINT32 *rom = (UINT32 *)(*space->machine().region("maincpu"));
 	if (state->m_bios_protected != 0)
 	{
 		offset = (state->m_bios_last_address + 8) / 4;
