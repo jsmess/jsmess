@@ -32,7 +32,7 @@
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "video/saa5050.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 
 class poly_state : public driver_device
@@ -169,7 +169,7 @@ WRITE8_MEMBER( poly_state::kbd_put )
 	mem->write_byte(0xebd0, 1); // any non-zero here
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(poly_state, kbd_put)
 };
@@ -199,8 +199,7 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_PTM6840_ADD("ptm", poly_ptm_intf)
 
 	// temporary hack
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "video/i8275.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 
@@ -20,13 +20,11 @@ public:
 	ipds_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "i8275"),
-	m_terminal(*this, TERMINAL_TAG)
+	m_crtc(*this, "i8275")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_crtc;
-	required_device<device_t> m_terminal;
 	DECLARE_READ8_MEMBER(ipds_b0_r);
 	DECLARE_READ8_MEMBER(ipds_b1_r);
 	DECLARE_READ8_MEMBER(ipds_c0_r);
@@ -108,7 +106,8 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 		bitmap.pix16(y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
 }
 
-const i8275_interface ipds_i8275_interface = {
+const i8275_interface ipds_i8275_interface =
+{
 	"screen",
 	6,
 	0,
@@ -150,7 +149,7 @@ WRITE8_MEMBER( ipds_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(ipds_state, kbd_put)
 };
@@ -174,9 +173,7 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_PALETTE_INIT(monochrome_green)
 
 	MCFG_I8275_ADD	( "i8275", ipds_i8275_interface)
-
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

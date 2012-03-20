@@ -30,7 +30,7 @@ Some other control keys:
 //#include "sound/speaker.h"
 
 // temporary
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 //#define MACHINE_START_MEMBER(name) void name::machine_start()
@@ -161,7 +161,7 @@ WRITE8_MEMBER( z9001_state::kbd_put )
 	m_maincpu->memory().space(AS_PROGRAM)->write_byte(0x0025, data);
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(z9001_state, kbd_put)
 };
@@ -186,8 +186,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SCREEN_UPDATE_STATIC(z9001)
 	MCFG_GFXDECODE(z9001)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 	MCFG_TIMER_ADD_PERIODIC("z9001_timer", timer_callback, attotime::from_msec(10))
 MACHINE_CONFIG_END
 

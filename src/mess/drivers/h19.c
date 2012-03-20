@@ -35,7 +35,7 @@
 #include "video/mc6845.h"
 #include "sound/beep.h"
 #include "machine/ins8250.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
@@ -52,14 +52,12 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "crtc"),
 	m_ace(*this, "ins8250"),
-	m_term(*this, TERMINAL_TAG),
 	m_beep(*this, BEEPER_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<device_t> m_ace;
-	required_device<device_t> m_term;
 	required_device<device_t> m_beep;
 	DECLARE_READ8_MEMBER(h19_80_r);
 	DECLARE_READ8_MEMBER(h19_a0_r);
@@ -289,7 +287,6 @@ static INPUT_PORTS_START( h19 )
 	PORT_DIPNAME( 0x80, 0x00, "Refresh")
 	PORT_DIPSETTING(    0x00, "50Hz")
 	PORT_DIPSETTING(    0x80, "60Hz")
-
 INPUT_PORTS_END
 
 
@@ -392,7 +389,7 @@ WRITE8_MEMBER( h19_state::h19_kbd_put )
 	cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
 }
 
-static GENERIC_TERMINAL_INTERFACE( h19_terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(h19_state, h19_kbd_put)
 };
@@ -417,8 +414,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
 	MCFG_INS8250_ADD( "ins8250", h19_ace_interface, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, h19_terminal_intf) // keyboard only
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -49,7 +49,7 @@ TODO:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 #include "tk80.lh"
 
 
@@ -59,12 +59,10 @@ public:
 	tk80bs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG),
 	m_ppi8255_2(*this, "ppi8255_2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_terminal;
 	optional_device<i8255_device> m_ppi8255_2;
 	DECLARE_READ8_MEMBER(ppi_custom_r);
 	DECLARE_WRITE8_MEMBER(ppi_custom_w);
@@ -368,7 +366,7 @@ WRITE8_MEMBER( tk80bs_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(tk80bs_state, kbd_put)
 };
@@ -413,8 +411,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 
 	/* Devices */
 	MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

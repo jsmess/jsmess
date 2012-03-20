@@ -50,6 +50,7 @@ Usage of terminal:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/keyboard.h"
 #include "machine/terminal.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -62,8 +63,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_term_data(0),
 	m_j(0),
-	m_scroll(0),
-	m_terminal(*this, TERMINAL_TAG)
+	m_scroll(0)
 	{ }
 
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
@@ -81,8 +81,6 @@ public:
 	UINT8 m_scroll;
 	virtual void machine_reset();
 	virtual void video_start();
-
-	required_device<generic_terminal_device> m_terminal;
 };
 
 // okean240 requires bit 4 to change
@@ -469,14 +467,16 @@ static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240a_io)
 	MCFG_GFXDECODE(okean240a)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_DEVICE_REMOVE(TERMINAL_TAG)
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( okean240, okean240t )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240_io)
 	MCFG_GFXDECODE(okean240)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_DEVICE_REMOVE(TERMINAL_TAG)
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
