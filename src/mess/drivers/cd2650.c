@@ -146,7 +146,8 @@ SCREEN_UPDATE16_MEMBER(cd2650_state)
 
 WRITE8_MEMBER( cd2650_state::kbd_put )
 {
-	m_term_data = data;
+	if (data)
+		m_term_data = data;
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )

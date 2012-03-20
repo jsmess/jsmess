@@ -693,8 +693,11 @@ GFXDECODE_END
 
 WRITE8_MEMBER( sol20_state::kbd_put )
 {
-	m_sol20_fa &= 0xfe;
-	m_sol20_fc = data;
+	if (data)
+	{
+		m_sol20_fa &= 0xfe;
+		m_sol20_fc = data;
+	}
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
