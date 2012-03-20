@@ -70,7 +70,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 #include "machine/wd17xx.h"
 #include "includes/rm380z.h"
 
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
 ADDRESS_MAP_END
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(rm380z_state, keyboard_put)
 };
@@ -157,9 +157,7 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rm380z_floppy_interface)
 
 	/* keyboard */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
-
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

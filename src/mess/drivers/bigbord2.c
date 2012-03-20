@@ -40,7 +40,7 @@ dc = 6845 ce
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 #define SCREEN_TAG		"screen"
 
@@ -54,14 +54,14 @@ class bigbord2_state : public driver_device
 public:
 	bigbord2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_6845(*this, "crtc"),
-		  m_ctc_84(*this, "ctc_84"),
-		  m_ctc_88(*this, "ctc_88"),
-		  m_fdc(*this, WD1771_TAG),
-		 // m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1)
+	m_maincpu(*this, Z80_TAG),
+	m_6845(*this, "crtc"),
+	m_ctc_84(*this, "ctc_84"),
+	m_ctc_88(*this, "ctc_88"),
+	m_fdc(*this, WD1771_TAG),
+	// m_ram(*this, RAM_TAG),
+	m_floppy0(*this, FLOPPY_0),
+	m_floppy1(*this, FLOPPY_1)
 	{ }
 
 	virtual void machine_start();
@@ -134,7 +134,7 @@ WRITE8_MEMBER( bigbord2_state::bigbord2_kbd_put )
 	m_term_status = 8;
 }
 
-static GENERIC_TERMINAL_INTERFACE( bigbord2_terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(bigbord2_state, bigbord2_kbd_put)
 };
@@ -635,8 +635,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_FD1793_ADD(WD1771_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bigbord2_floppy_interface)
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_16MHz / 8, bigbord2_crtc)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, bigbord2_terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 

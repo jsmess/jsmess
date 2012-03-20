@@ -56,7 +56,7 @@ ToDo:
 //#include "machine/6821pia.h"
 //#include "machine/6850acia.h"
 //#include "machine/wd17xx.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 
 
@@ -252,7 +252,7 @@ WRITE8_MEMBER( v6809_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(v6809_state, kbd_put)
 };
@@ -278,8 +278,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, XTAL_16MHz / 8, v6809_crtc)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

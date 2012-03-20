@@ -104,7 +104,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
@@ -136,8 +136,7 @@ public:
 	m_cass1(*this, CASSETTE_TAG),
 	m_cass2(*this, CASSETTE2_TAG),
 	m_uart(*this, "uart"),
-	m_uart_s(*this, "uart_s"),
-	m_terminal(*this, TERMINAL_TAG)
+	m_uart_s(*this, "uart_s")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -145,7 +144,6 @@ public:
 	required_device<cassette_image_device> m_cass2;
 	required_device<device_t> m_uart;
 	required_device<device_t> m_uart_s;
-	required_device<device_t> m_terminal;
 	DECLARE_READ8_MEMBER( sol20_f8_r );
 	DECLARE_READ8_MEMBER( sol20_f9_r );
 	DECLARE_READ8_MEMBER( sol20_fa_r );
@@ -699,7 +697,7 @@ WRITE8_MEMBER( sol20_state::kbd_put )
 	m_sol20_fc = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(sol20_state, kbd_put)
 };
@@ -733,8 +731,7 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_CASSETTE_ADD( CASSETTE2_TAG, sol20_cassette_interface )
 	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
 	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

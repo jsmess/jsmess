@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
@@ -22,12 +22,10 @@ class k8915_state : public driver_device
 public:
 	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG)
+	m_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
 	DECLARE_READ8_MEMBER( k8915_52_r );
 	DECLARE_READ8_MEMBER( k8915_53_r );
 	DECLARE_WRITE8_MEMBER( k8915_a8_w );
@@ -149,7 +147,7 @@ WRITE8_MEMBER( k8915_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(k8915_state, kbd_put)
 };
@@ -170,8 +168,7 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf) // keyboard only
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 

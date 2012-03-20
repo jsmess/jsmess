@@ -19,7 +19,7 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/ins8250.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 #include "sound/beep.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
@@ -31,14 +31,12 @@ public:
 	zrt80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG),
 	m_crtc(*this, "crtc"),
 	m_8250(*this, "ins8250"),
 	m_beep(*this, BEEPER_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
 	required_device<mc6845_device> m_crtc;
 	required_device<ins8250_device> m_8250;
 	required_device<device_t> m_beep;
@@ -261,7 +259,7 @@ WRITE8_MEMBER( zrt80_state::kbd_put )
 	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(zrt80_state, kbd_put)
 };
@@ -310,8 +308,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 8, zrt80_crtc6845_interface)
 	MCFG_INS8250_ADD( "ins8250", zrt80_com_interface, 2457600 )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */

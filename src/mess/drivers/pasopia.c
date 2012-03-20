@@ -17,7 +17,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "video/mc6845.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 class pasopia_state : public driver_device
 {
@@ -321,7 +321,7 @@ WRITE8_MEMBER( pasopia_state::kbd_put )
 	mem->write_byte(0xfe79, data);
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(pasopia_state, kbd_put)
 };
@@ -368,8 +368,7 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, z80pio_intf )
 
 	// temporary hack
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
