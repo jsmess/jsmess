@@ -750,13 +750,13 @@ MACHINE_START( ti99_4p )
 	driver->m_cassette = static_cast<cassette_image_device*>(machine.device(CASSETTE_TAG));
 	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
 
-	driver->m_ram = (UINT16*)machine.region(SAMSMEM_TAG);
-	driver->m_scratchpad = (UINT16*)machine.region(PADMEM_TAG);
+	driver->m_ram = (UINT16*)(*machine.region(SAMSMEM_TAG));
+	driver->m_scratchpad = (UINT16*)(*machine.region(PADMEM_TAG));
 
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
 
-	UINT16 *rom = (UINT16*)machine.region("maincpu");
+	UINT16 *rom = (UINT16*)(*machine.region("maincpu"));
 	driver->m_rom0  = rom + 0x2000;
 	driver->m_dsr   = rom + 0x6000;
 	driver->m_rom6a = rom + 0x3000;

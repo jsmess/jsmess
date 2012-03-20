@@ -642,9 +642,9 @@ static int snes_find_addon_chip( running_machine &machine )
 
 	if ((state->m_has_addon_chip >= HAS_DSP1) && (state->m_has_addon_chip <= HAS_DSP4))
 	{
-		UINT8 *dspsrc = (UINT8 *)machine.region("addons");
-		UINT32 *dspprg = (UINT32 *)machine.region("dspprg");
-		UINT16 *dspdata = (UINT16 *)machine.region("dspdata");
+		UINT8 *dspsrc = (UINT8 *)(*machine.region("addons"));
+		UINT32 *dspprg = (UINT32 *)(*machine.region("dspprg"));
+		UINT16 *dspdata = (UINT16 *)(*machine.region("dspdata"));
 
 		// copy DSP program
 		for (int i = 0; i < 0x2000; i+= 4)
@@ -662,9 +662,9 @@ static int snes_find_addon_chip( running_machine &machine )
 
 	if ((state->m_has_addon_chip == HAS_ST010) || (state->m_has_addon_chip == HAS_ST011))
 	{
-		UINT8 *dspsrc = (UINT8 *)machine.region("addons");
-		UINT32 *dspprg = (UINT32 *)machine.region("dspprg");
-		UINT16 *dspdata = (UINT16 *)machine.region("dspdata");
+		UINT8 *dspsrc = (UINT8 *)(*machine.region("addons"));
+		UINT32 *dspprg = (UINT32 *)(*machine.region("dspprg"));
+		UINT16 *dspdata = (UINT16 *)(*machine.region("dspdata"));
 
 		// copy DSP program
 		for (int i = 0; i < 0x10000; i+= 4)

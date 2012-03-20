@@ -815,7 +815,7 @@ static WRITE32_HANDLER(ps_flash_w)
 	if(state->m_ps_flash_write_count)
 	{
 		state->m_ps_flash_write_count--;
-		COMBINE_DATA(&((UINT32*)space->machine().region("flash"))[offset]);
+		COMBINE_DATA(&((UINT32*)(*space->machine().region("flash")))[offset]);
 	}
 }
 

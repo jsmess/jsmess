@@ -2640,7 +2640,7 @@ static MACHINE_START( x68000 )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->m_spriteram = (UINT16*)machine.region("user1");
+	state->m_spriteram = (UINT16*)(*machine.region("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_r));
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_w));
 	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
@@ -2671,7 +2671,7 @@ static MACHINE_START( x68030 )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->m_spriteram = (UINT16*)machine.region("user1");
+	state->m_spriteram = (UINT16*)(*machine.region("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_w),0xffffffff);
 	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
