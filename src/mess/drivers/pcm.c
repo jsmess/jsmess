@@ -62,7 +62,7 @@
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/terminal.h"
+#include "machine/keyboard.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
@@ -74,7 +74,7 @@ public:
 	pcm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG),
+	m_keyboard(*this, KEYBOARD_TAG),
 	m_pio_s(*this, "z80pio_s"),
 	m_pio_u(*this, "z80pio_u"),
 	m_sio(*this, "z80sio"),
@@ -85,7 +85,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<device_t> m_keyboard;
 	required_device<device_t> m_pio_s;
 	required_device<device_t> m_pio_u;
 	required_device<device_t> m_sio;
@@ -199,7 +199,7 @@ WRITE8_MEMBER( pcm_state::kbd_put )
 	m_step = 0;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(pcm_state, kbd_put)
 };
@@ -353,8 +353,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_DEVICE_REMOVE(":terminal:terminal_screen")
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )
