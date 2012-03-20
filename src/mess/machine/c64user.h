@@ -128,16 +128,16 @@ public:
 	virtual void c64_pb_w(address_space &space, offs_t offset, UINT8 data) { };
 
 	virtual int c64_pa2_r() { return 0; };
-	virtual void c64_pa2_w(int level) { };
-	virtual void c64_cnt1_w(int level) { };
-	virtual void c64_sp1_w(int level) { };
-	virtual void c64_pc2_w(int level) { };
-	virtual void c64_cnt2_w(int level) { };
-	virtual void c64_sp2_w(int level) { };
-	virtual void c64_atn_w(int level) { };
+	virtual void c64_pa2_w(int state) { };
+	virtual void c64_cnt1_w(int state) { };
+	virtual void c64_sp1_w(int state) { };
+	virtual void c64_pc2_w(int state) { };
+	virtual void c64_cnt2_w(int state) { };
+	virtual void c64_sp2_w(int state) { };
+	virtual void c64_atn_w(int state) { };
 
 	// reset
-	virtual void c64_reset_w(int level) { };
+	virtual void c64_reset_w(int state) { };
 
 protected:
 	c64_user_port_device *m_slot;
