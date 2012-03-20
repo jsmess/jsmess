@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    geoCable Centronics Cable emulation
+	Burst Nibbler 1541 Parallel Cable emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
