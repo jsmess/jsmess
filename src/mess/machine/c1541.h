@@ -22,6 +22,7 @@
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
+#include "machine/c64_bn1541.h"
 
 
 
@@ -38,6 +39,8 @@
 //**************************************************************************
 
 // ======================> c1541_device
+
+class c64_bn1541_device;
 
 class c1541_device :  public device_t,
 					  public device_cbm_iec_interface
@@ -57,6 +60,10 @@ public:
 		TYPE_OC118
 	};
 
+	void parallel_connect(c64_bn1541_device *device);
+	void parallel_data_w(UINT8 data);
+	void parallel_strobe_w(int state);
+
 	// not really public
 	static void on_disk_change(device_image_interface &image);
 
@@ -65,6 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER( via0_pa_w );
 	DECLARE_READ8_MEMBER( via0_pb_r );
 	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via0_ca2_w );
 	DECLARE_READ_LINE_MEMBER( atn_in_r );
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 	DECLARE_READ8_MEMBER( via1_pb_r );
@@ -93,9 +101,13 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
+	c64_bn1541_device *m_parallel_cable;
 
 	// IEC bus
 	int m_data_out;							// serial data out
+
+	// parallel cable
+	UINT8 m_parallel_data;
 
 	// interrupts
 	int m_via0_irq;							// VIA #0 interrupt request

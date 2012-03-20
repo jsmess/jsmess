@@ -348,6 +348,27 @@ ADDRESS_MAP_END
 //  via6522_interface via0_intf
 //-------------------------------------------------
 
+void c1541_device::parallel_connect(c64_bn1541_device *device)
+{
+    logerror("C64 parallel cable connected!\n");
+    m_parallel_cable = device;
+}
+
+
+void c1541_device::parallel_data_w(UINT8 data)
+{
+    logerror("C64 parallel data %02x\n", data);
+    m_parallel_data = data;
+}
+
+
+void c1541_device::parallel_strobe_w(int state)
+{
+    logerror("C64 parallel strobe %u\n", state);
+    m_via0->write_cb1(state);
+}
+
+
 WRITE_LINE_MEMBER( c1541_device::via0_irq_w )
 {
 	m_via0_irq = state;
@@ -359,7 +380,16 @@ WRITE_LINE_MEMBER( c1541_device::via0_irq_w )
 READ8_MEMBER( c1541_device::via0_pa_r )
 {
 	// dummy read to acknowledge ATN IN interrupt
-	return 0;
+	return m_parallel_data;
+}
+
+
+WRITE8_MEMBER( c1541_device::via0_pa_w )
+{
+    if (m_parallel_cable != NULL)
+    {
+        m_parallel_cable->parallel_data_w(data);
+    }
 }
 
 
@@ -432,6 +462,15 @@ READ_LINE_MEMBER( c1541_device::atn_in_r )
 }
 
 
+WRITE_LINE_MEMBER( c1541_device::via0_ca2_w )
+{
+    if (m_parallel_cable != NULL)
+    {
+        m_parallel_cable->parallel_strobe_w(state);
+    }
+}
+
+
 static const via6522_interface c1541_via0_intf =
 {
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_device, via0_pa_r),
@@ -441,11 +480,11 @@ static const via6522_interface c1541_via0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL,
+    DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_device, via0_pa_w),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_device, via0_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1541_device, via0_ca2_w),
 	DEVCB_NULL,
 
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1541_device, via0_irq_w)
@@ -727,6 +766,7 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
+      m_parallel_cable(NULL),
 	  m_data_out(1),
 	  m_via0_irq(0),
 	  m_via1_irq(0)
@@ -743,6 +783,7 @@ c1541_device::c1541_device(const machine_config &mconfig, device_type type, cons
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
+      m_parallel_cable(NULL),
 	  m_data_out(1),
 	  m_via0_irq(0),
 	  m_via1_irq(0)
