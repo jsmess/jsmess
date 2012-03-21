@@ -74,7 +74,6 @@ public:
 	pcm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_keyboard(*this, KEYBOARD_TAG),
 	m_pio_s(*this, "z80pio_s"),
 	m_pio_u(*this, "z80pio_u"),
 	m_sio(*this, "z80sio"),
@@ -85,7 +84,6 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_keyboard;
 	required_device<device_t> m_pio_s;
 	required_device<device_t> m_pio_u;
 	required_device<device_t> m_sio;

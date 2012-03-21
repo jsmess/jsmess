@@ -269,12 +269,12 @@ WRITE_LINE_MEMBER( pasopia_state::testb_w )
 static Z80PIO_INTERFACE( z80pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //doesn't work?
-	DEVCB_DRIVER_MEMBER(pasopia_state, testa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pasopia_state, testa_w),
-	DEVCB_DRIVER_MEMBER(pasopia_state, testb_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pasopia_state, testb_w)
+	DEVCB_DRIVER_MEMBER(pasopia_state, testa_r), // port A read
+	DEVCB_NULL, // port A write
+	DEVCB_DRIVER_LINE_MEMBER(pasopia_state, testa_w), // ready A
+	DEVCB_DRIVER_MEMBER(pasopia_state, testb_r), // port B read
+	DEVCB_NULL, // port B write
+	DEVCB_DRIVER_LINE_MEMBER(pasopia_state, testb_w) // ready B
 };
 
 static const mc6845_interface mc6845_intf =

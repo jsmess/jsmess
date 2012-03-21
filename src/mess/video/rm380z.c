@@ -5,12 +5,7 @@ RM 380Z video code
 
 */
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "imagedev/flopdrv.h"
-#include "machine/terminal.h"
-#include "machine/wd17xx.h"
+
 #include "includes/rm380z.h"
 
 
@@ -387,7 +382,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 
 void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 {
-	unsigned char* pChar=machine().region("gfx")->base();
+	unsigned char* pChar=machine().region("chargen")->base();
 
 	int lineWidth=0x80;
 	int ncols=80;
