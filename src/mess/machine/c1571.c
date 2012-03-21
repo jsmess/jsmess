@@ -459,6 +459,15 @@ WRITE_LINE_MEMBER( base_c1571_device::cia_irq_w )
 }
 
 
+WRITE_LINE_MEMBER( base_c1571_device::cia_pc_w )
+{
+	if (m_other != NULL)
+    {
+     	m_other->parallel_strobe_w(state);
+    }
+}
+
+
 WRITE_LINE_MEMBER( base_c1571_device::cia_cnt_w )
 {
 	// fast serial clock out
@@ -475,17 +484,32 @@ WRITE_LINE_MEMBER( base_c1571_device::cia_sp_w )
 }
 
 
+READ8_MEMBER( base_c1571_device::cia_pb_r )
+{
+	return m_parallel_data;
+}
+
+
+WRITE8_MEMBER( base_c1571_device::cia_pb_w )
+{
+	if (m_other != NULL)
+    {
+		m_other->parallel_data_w(data);
+	}
+}
+
+
 static MOS6526_INTERFACE( cia_intf )
 {
 	0,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, cia_irq_w),
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, cia_pc_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, cia_cnt_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, cia_sp_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, cia_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, cia_pb_w)
 };
 
 
@@ -585,7 +609,7 @@ static const floppy_interface c1570_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(c1570),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -691,6 +715,7 @@ inline void base_c1571_device::set_iec_srq()
 base_c1571_device::base_c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
     : device_t(mconfig, type, name, tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
+      device_c64_floppy_parallel_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
@@ -828,6 +853,26 @@ void base_c1571_device::cbm_iec_reset(int state)
 	{
 		device_reset();
 	}
+}
+
+
+//-------------------------------------------------
+//  parallel_data_w -
+//-------------------------------------------------
+
+void base_c1571_device::parallel_data_w(UINT8 data)
+{
+    m_parallel_data = data;
+}
+
+
+//-------------------------------------------------
+//  parallel_strobe_w -
+//-------------------------------------------------
+
+void base_c1571_device::parallel_strobe_w(int state)
+{
+    m_cia->flag_w(state);
 }
 
 

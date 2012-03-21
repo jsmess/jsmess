@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Burst Nibbler 1541 Parallel Cable emulation
+	SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation
 
     http://sta.c64.org/cbmparc2.html
 
@@ -14,10 +14,42 @@
 
 
 //**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
+
+
+//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 const device_type C64_BN1541 = &device_creator<c64_bn1541_device>;
+
+
+
+//**************************************************************************
+//  FLOPPY DRIVE INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_c64_floppy_parallel_interface - constructor
+//-------------------------------------------------
+
+device_c64_floppy_parallel_interface::device_c64_floppy_parallel_interface(const machine_config &mconfig, device_t &device) :
+	m_other(NULL)
+{
+}
+
+
+//-------------------------------------------------
+//  ~device_c64_floppy_parallel_interface - destructor
+//-------------------------------------------------
+
+device_c64_floppy_parallel_interface::~device_c64_floppy_parallel_interface()
+{
+}
 
 
 
@@ -30,9 +62,9 @@ const device_type C64_BN1541 = &device_creator<c64_bn1541_device>;
 //-------------------------------------------------
 
 c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_BN1541, "C64 Burst Nibbler 1541 Parallel Cable", tag, owner, clock),
+	device_t(mconfig, C64_BN1541, "C64 Burst Nibbler 1541/1571 Parallel Cable", tag, owner, clock),
 	device_c64_user_port_interface(mconfig, *this),
-	m_drive(NULL)
+	device_c64_floppy_parallel_interface(mconfig, *this)
 {
 }
 
@@ -47,25 +79,19 @@ void c64_bn1541_device::device_start()
 
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 	{
-		if (device->subdevice(C1541_TAG) != NULL)
+		device_iterator subiter(*device);
+
+		for (device_t *subdevice = subiter.first(); subdevice != NULL; subdevice = iter.next())
 		{
-			// grab the first 1541 and run to the hills
-			m_drive = device->subdevice<c1541_device>(C1541_TAG);
-			break;
+			if (subdevice->interface(m_other) && subdevice != this)
+			{
+				if (LOG) logerror("Parallel device %s\n", subdevice->tag());
+
+				// grab the first 1541/1571 and run to the hills
+				m_other->m_other = this;
+				return;
+			}
 		}
-	}
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void c64_bn1541_device::device_reset()
-{
-	if (m_drive != NULL)
-	{
-		m_drive->parallel_connect(downcast<c64_bn1541_device *>(this));
 	}
 }
 
@@ -76,8 +102,9 @@ void c64_bn1541_device::device_reset()
 
 void c64_bn1541_device::parallel_data_w(UINT8 data)
 {
-    //logerror("1541 parallel data %02x\n", data);
-	m_data = data;
+    if (LOG) logerror("1541 parallel data %02x\n", data);
+
+	m_parallel_data = data;
 }
 
 
@@ -87,7 +114,8 @@ void c64_bn1541_device::parallel_data_w(UINT8 data)
 
 void c64_bn1541_device::parallel_strobe_w(int state)
 {
-    //logerror("1541 parallel strobe %u\n", state);
+    if (LOG) logerror("1541 parallel strobe %u\n", state);
+
 	m_slot->flag2_w(state);
 }
 
@@ -98,7 +126,7 @@ void c64_bn1541_device::parallel_strobe_w(int state)
 
 UINT8 c64_bn1541_device::c64_pb_r(address_space &space, offs_t offset)
 {
-	return m_data;
+	return m_parallel_data;
 }
 
 
@@ -108,9 +136,11 @@ UINT8 c64_bn1541_device::c64_pb_r(address_space &space, offs_t offset)
 
 void c64_bn1541_device::c64_pb_w(address_space &space, offs_t offset, UINT8 data)
 {
-	if (m_drive != NULL)
+    if (LOG) logerror("C64 parallel data %02x\n", data);
+
+	if (m_other != NULL)
 	{
-		m_drive->parallel_data_w(data);
+		m_other->parallel_data_w(data);
 	}
 }
 
@@ -121,8 +151,10 @@ void c64_bn1541_device::c64_pb_w(address_space &space, offs_t offset, UINT8 data
 
 void c64_bn1541_device::c64_pc2_w(int state)
 {
-	if (m_drive != NULL)
+    if (LOG) logerror("C64 parallel strobe %u\n", state);
+
+	if (m_other != NULL)
 	{
-		m_drive->parallel_strobe_w(state);
+		m_other->parallel_strobe_w(state);
 	}
 }

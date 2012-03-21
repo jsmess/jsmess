@@ -40,10 +40,9 @@
 
 // ======================> c1541_device
 
-class c64_bn1541_device;
-
 class c1541_device :  public device_t,
-					  public device_cbm_iec_interface
+					  public device_cbm_iec_interface,
+					  public device_c64_floppy_parallel_interface
 {
 public:
     // construction/destruction
@@ -59,10 +58,6 @@ public:
 		TYPE_SX1541,
 		TYPE_OC118
 	};
-
-	void parallel_connect(c64_bn1541_device *device);
-	void parallel_data_w(UINT8 data);
-	void parallel_strobe_w(int state);
 
 	// not really public
 	static void on_disk_change(device_image_interface &image);
@@ -94,6 +89,10 @@ protected:
 	void cbm_iec_atn(int state);
 	void cbm_iec_reset(int state);
 
+	// device_c64_floppy_parallel_interface overrides
+	void parallel_data_w(UINT8 data);
+	void parallel_strobe_w(int state);
+
 	inline void set_iec_data();
 
 	required_device<cpu_device> m_maincpu;
@@ -101,13 +100,9 @@ protected:
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<device_t> m_image;
-	c64_bn1541_device *m_parallel_cable;
 
 	// IEC bus
 	int m_data_out;							// serial data out
-
-	// parallel cable
-	UINT8 m_parallel_data;
 
 	// interrupts
 	int m_via0_irq;							// VIA #0 interrupt request
