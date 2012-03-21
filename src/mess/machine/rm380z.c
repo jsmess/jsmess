@@ -5,11 +5,7 @@ RM 380Z machine
 
 */
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "imagedev/flopdrv.h"
-#include "machine/wd17xx.h"
+
 #include "includes/rm380z.h"
 
 
