@@ -349,27 +349,6 @@ ADDRESS_MAP_END
 //  via6522_interface via0_intf
 //-------------------------------------------------
 
-void c1541_device::parallel_connect(c64_bn1541_device *device)
-{
-    //logerror("C64 parallel cable connected!\n");
-    m_parallel_cable = device;
-}
-
-
-void c1541_device::parallel_data_w(UINT8 data)
-{
-    //logerror("C64 parallel data %02x\n", data);
-    m_parallel_data = data;
-}
-
-
-void c1541_device::parallel_strobe_w(int state)
-{
-    //logerror("C64 parallel strobe %u\n", state);
-    m_via0->write_cb1(state);
-}
-
-
 WRITE_LINE_MEMBER( c1541_device::via0_irq_w )
 {
 	m_via0_irq = state;
@@ -387,9 +366,9 @@ READ8_MEMBER( c1541_device::via0_pa_r )
 
 WRITE8_MEMBER( c1541_device::via0_pa_w )
 {
-    if (m_parallel_cable != NULL)
+    if (m_other != NULL)
     {
-        m_parallel_cable->parallel_data_w(data);
+        m_other->parallel_data_w(data);
     }
 }
 
@@ -465,9 +444,9 @@ READ_LINE_MEMBER( c1541_device::atn_in_r )
 
 WRITE_LINE_MEMBER( c1541_device::via0_ca2_w )
 {
-    if (m_parallel_cable != NULL)
+    if (m_other != NULL)
     {
-        m_parallel_cable->parallel_strobe_w(state);
+        m_other->parallel_strobe_w(state);
     }
 }
 
@@ -676,7 +655,7 @@ static const floppy_interface c1541_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
+	FLOPPY_STANDARD_5_25_SSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(c1541),
 	"floppy_5_25",
 	NULL
@@ -762,12 +741,12 @@ inline void c1541_device::set_iec_data()
 c1541_device::c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, C1541, "C1541", tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
+      device_c64_floppy_parallel_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-      m_parallel_cable(NULL),
 	  m_data_out(1),
 	  m_via0_irq(0),
 	  m_via1_irq(0)
@@ -779,12 +758,12 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 c1541_device::c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, type, name, tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
+      device_c64_floppy_parallel_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
 	  m_via0(*this, M6522_0_TAG),
 	  m_via1(*this, M6522_1_TAG),
 	  m_ga(*this, C64H156_TAG),
 	  m_image(*this, FLOPPY_0),
-      m_parallel_cable(NULL),
 	  m_data_out(1),
 	  m_via0_irq(0),
 	  m_via1_irq(0)
@@ -841,6 +820,26 @@ void c1541_device::cbm_iec_reset(int state)
 	{
 		device_reset();
 	}
+}
+
+
+//-------------------------------------------------
+//  parallel_data_w -
+//-------------------------------------------------
+
+void c1541_device::parallel_data_w(UINT8 data)
+{
+    m_parallel_data = data;
+}
+
+
+//-------------------------------------------------
+//  parallel_strobe_w -
+//-------------------------------------------------
+
+void c1541_device::parallel_strobe_w(int state)
+{
+    m_via0->write_cb1(state);
 }
 
 

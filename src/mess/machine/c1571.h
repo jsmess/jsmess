@@ -22,6 +22,7 @@
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/6526cia.h"
+#include "machine/c64_bn1541.h"
 #include "machine/cbmiec.h"
 #include "machine/wd17xx.h"
 
@@ -42,7 +43,8 @@
 // ======================> c1571_device
 
 class base_c1571_device :  public device_t,
-						   public device_cbm_iec_interface
+						   public device_cbm_iec_interface,
+						   public device_c64_floppy_parallel_interface
 {
 public:
 	enum
@@ -74,8 +76,11 @@ public:
 	DECLARE_READ8_MEMBER( via1_pb_r );
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( cia_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_sp_w );
+	DECLARE_READ8_MEMBER( cia_pb_r );
+	DECLARE_WRITE8_MEMBER( cia_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 	DECLARE_WRITE_LINE_MEMBER( wpt_w );
@@ -91,6 +96,10 @@ protected:
 	void cbm_iec_atn(int state);
 	void cbm_iec_data(int state);
 	void cbm_iec_reset(int state);
+
+	// device_c64_floppy_parallel_interface overrides
+	void parallel_data_w(UINT8 data);
+	void parallel_strobe_w(int state);
 
 	inline void set_iec_data();
 	inline void set_iec_srq();
