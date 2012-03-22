@@ -55319,6 +55319,23 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
+	<software name="meishao" supported="no">
+		<description>Mei Shao Nv Meng Gong Chang (Asia)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-SA-9602B" />
+			<dataarea name="prg" size="1572864">
+				<rom name="mei shao nv meng gong chang (princess maker)(sachen)(unl)[u].prg0" size="524288" crc="e0247d44" sha1="5ab243a6e4c3767eeeb07cd30d25a3d33b7667c9" offset="0x000000" status="baddump" />
+				<rom name="mei shao nv meng gong chang (princess maker)(sachen)(unl)[u].prg1" size="524288" crc="5275487a" sha1="5e48ee1845d29aac9dcd7088e30f5c31221f8e00" offset="0x080000" status="baddump" />
+				<rom name="mei shao nv meng gong chang (princess maker)(sachen)(unl)[u].prg2" size="524288" crc="8e6afee6" sha1="e239a2be92a0e843f8bf2756dfdebc244c6937ca" offset="0x100000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- nointro -->
 	<software name="menghuan" supported="partial">
 		<description>Meng Huan (Chi)</description>
@@ -55533,6 +55550,21 @@ We don't include these hacks because they were not burned into real carts nor so
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="power rangers 2 (unl).prg" size="131072" crc="07df9681" sha1="296b966c6886b34583a97e6c6147e3a84aa9a504" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="queenbee">
+		<description>Queen Bee V (Asia)</description>
+		<year>1994</year>
+		<publisher>Nitra</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-NITRA" />
+			<dataarea name="chr" size="131072">
+				<rom name="queen bee v (unl).chr" size="131072" crc="d1303f8d" sha1="1b3fa0b3670b8381a553f060dd5d2bfa3149659a" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="queen bee v (unl).prg" size="131072" crc="7992a04a" sha1="b21918e836d1a90f28dbc9a730f8b4d2908de946" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -61382,6 +61414,23 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<software name="f1racer" cloneof="f1race">
+		<description>F-1 Race (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="f-1 race (r).chr" size="8192" crc="26adca7e" sha1="fa67dc15adde66b6ce5eee0b613c5a739b73ec46" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="f-1 race (r).prg" size="16384" crc="c4fb0cf9" sha1="fac72ed10d302d3c3f7f1cdeefecf70c8090fde2" offset="00000" status="baddump" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="connorsr" cloneof="connors">
 		<description>Jimmy Connors Tennis (Rus)</description>
 		<year>199?</year>
@@ -61458,6 +61507,23 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rally" cloneof="zippyrac">
+		<description>Rally (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="rally (zippy race)(r).prg" size="16384" crc="5b428b0c" sha1="a246d6d9fb1585151f2a8cc5140556bebb967063" offset="00000" status="baddump" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="rally (zippy race)(r).chr" size="8192" crc="dc5c2bf6" sha1="692d150ceabccf5e83bd0b7ef18cc611f0e8c307" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -61838,6 +61904,21 @@ Other
 			<dataarea name="prg" size="32768">
 				<rom name="lines (r)[!].prg" size="16384" crc="27abc60f" sha1="477550350d15bf43f7024020cf534e40c9c8634b" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tvtest">
+		<description>Super TV Test ver. 4.12 (Rus)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-256" />
+			<dataarea name="prg" size="32768">
+				<rom name="super tv test ver. 4.12 (r)[!].prg" size="32768" crc="9f48d524" sha1="da864d0cdc825a03ffc44736348e6b3c5bfdea71" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>

@@ -435,6 +435,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-SACHEN-74LS374N", SACHEN_74LS374 },
 	{ "UNL-SACHEN-74LS374N-A", SACHEN_74LS374_A },	/* FIXME: Made up boards the different mirroring handling */
 	{ "UNL-TC-U01-1.5M",  SACHEN_TCU01 },
+	{ "UNL-SA-9602B",     UNSUPPORTED_BOARD },
 	{ "TENGEN-800032",    TENGEN_800032 },
 	{ "TENGEN-800037",    TENGEN_800037 },
 	{ "WAIXING-A",        WAIXING_TYPE_A },
