@@ -227,7 +227,8 @@ eagle			// [1980] Centuri
 eagle2			// [1980] Centuri
 eagle3			// [1980] Centuri
 spctbird		// (c) Fortrek
-fantastc		// (c) Taito (Brazil)
+fantastc		// (c) Taito (Brazil) - rewrite of Galaga
+kong			// (c) Taito (Brazil) - rewrite of Donkey Kong
 skybase			// (c) 1982 Omori Electric Co., Ltd.
 checkman		// (c) 1982 Zilec-Zenitone
 checkmanj		// (c) 1982 Jaleco (Zenitone/Zilec in ROM CM4, and the programmer names)
@@ -2490,6 +2491,7 @@ bgareggatw		// (c) 1996 Raizing/8ing
 bgaregganv		// (c) 1996 Raizing/8ing
 bgareggat2		// (c) 1996 Raizing/8ing
 bgareggacn		// (c) 1996 Raizing/8ing
+bgareggabl		// hack
 batrider		// (c) 1998 Raizing/8ing
 batrideru		// (c) 1998 Raizing/8ing
 batriderc		// (c) 1998 Raizing/8ing
@@ -2809,7 +2811,8 @@ ffightj			// 12/1989 (c) 1989 (Japan)
 ffightj1		// 12/01/1990 (c) 1989 (Japan)
 ffightj2		// 05/03/1990 (c) 1989 (Japan)
 ffightjh		// hack
-1941			//  2/1990 (c) 1990 (World)
+1941			// 27/02/1990 (c) 1990 (World)
+1941r1			//  2/1990 (c) 1990 (World)
 1941u			// 27/02/1990 (c) 1990 (USA)
 1941j			//  2/1990 (c) 1990 (Japan)
 mercs			// 02/03/1990 (c) 1990 (World)
@@ -4872,7 +4875,7 @@ deathcox		// 2000.10 Death Crimson OX
 cspike			// 2000.10 Gun Spike / Cannon Spike
 sstrkfgt		// 2000.10 Sega Strike Fighter (Rev A)
 confmiss		// 2000.11 Confidential Mission												// First GD-ROM game?
-				// 2000.11 Ninja Assault
+                // 2000.11 Ninja Assault
 				// 2000.11 Shakatto Tambourine
 wwfroyal		// 2000.11 WWF Royal Rumble
 pjustic			// 2000.12 Moero Justice Gakuen / Project Justice
@@ -6763,6 +6766,7 @@ legofair		// A7003 'KK' (c) 1988
 fsoccer			// A6006 'FS' (c) 1988
 fsoccerj		// A6006 'FS' (c) 1988
 fsoccerb		//            (c) 1988
+fsoccerba		//            (c) 1988
 tdfever			// A6006 'TD' (c) 1987
 tdfeverj		// A6006 'TD' (c) 1987
 tdfever2		// A6006 'TD'?(c) 1988
@@ -7884,6 +7888,7 @@ soldam			// (c) 1992
 soldamj			// (c) 1992 (Japan)
 bigstrik		// (c) 1992
 bigstrkb		// bootleg on different hardware
+bigstrkba       // alt set of 'bigstrkb' with Italian teams
 bestleag		// bootleg, by Playmark?
 bestleaw		// bootleg
 chimerab		// (c) 1993
@@ -7947,6 +7952,7 @@ pspikesk		// (c) 1991 Video System Co. (Korea)
 svolly91		// (c) 1991 Video System Co. (Japan)
 pspikesb		// bootleg
 spikes91		// bootleg
+spikes91a		// bootleg
 pspikesc		// bootleg
 karatblz		// (c) 1991 Video System Co.
 karatblzu		// (c) 1991 Video System Co. (US)
@@ -8922,8 +8928,8 @@ orlegend		// (c) 1997
 orlegende		// (c) 1997
 orlegendc		// (c) 1997
 orlegendca		// (c) 1997
-orlegend111c	// (c) 1997
-orlegend105k	// (c) 1997
+orlegend111c		// (c) 1997
+orlegend105k		// (c) 1997
 drgw2			// (c) 1997
 dw2v100x		// (c) 1997
 drgw2c			// (c) 1997
@@ -8934,7 +8940,7 @@ drgw3100		// (c) 1998
 dwex			// (c) 1998
 killbld			// (c) 1998
 killbld104		// (c) 1998
-kov				// (c) 1999
+kov			// (c) 1999
 kovplus			// (c) 1999
 kovplusa		// (c) 1999
 kovsgqyz		// bootleg
@@ -8970,18 +8976,21 @@ ddp2101			// (c) 2001
 puzzli2			// (c) 2001
 martmast		// (c) 2001
 martmastc		// (c) 2001
-martmastc102	// (c) 2001
+martmastc102		// (c) 2001
 theglad			// (c) 2001
 theglada		// (c) 2001
+thegladpcb
 dw2001			// (c) 2001
 py2k2			// (c) 2001
 dmnfrnt			// (c) 2002
 dmnfrnta		// (c) 2002
+dmnfrntpcb
 kovshp
 oldsplus
 killbldp
 happy6
 svg
+svgpcb
 ket			// (c) 2002 Cave
 keta			// (c) 2002 Cave
 ketb			// (c) 2002 Cave
@@ -10555,14 +10564,51 @@ witchcdi		// (c) 1994, TV Game Elektronik - Proma
 witchgme		// (c) 1991 Video Klein
 witchcdk		// (c) 1991, Video Klein
 witchjol		// 1994, Unknown
-wldwitch		// (c) 1994, Video Klein
-wupndown 		// (c) 1998, Video Klein
+wldwitch		// (c) 1992-2001, Video Klein
+wldwitcha		// (c) 1992-2001, Video Klein
+wldwitchb		// (c) 1992-2001, Video Klein
+wldwitchc		// (c) 1992-2001, Video Klein
+wldwitchd		// (c) 1992-2001, Video Klein
+wldwitche		// (c) 1992-2001, Video Klein
+wldwitchf		// (c) 1992-2001, Video Klein
+wldwitchg		// (c) 1992-2001, Video Klein
+wldwitchh		// (c) 1992-2001, Video Klein
+wldwitchi		// (c) 1992-2001, Video Klein
+wldwitchj		// (c) 1992-2001, Video Klein
+wldwitchk		// (c) 1992-2001, Video Klein
+wldwitchl		// (c) 1992-2001, Video Klein
+wldwitchm		// (c) 1992-2001, Video Klein
+wldwitchn		// (c) 1992-2001, Video Klein
+wldwitcho		// (c) 1992-2001, Video Klein
+wldwitchp		// (c) 1992-2001, Video Klein
+wldwitchq		// (c) 1992-2001, Video Klein
+wldwitchr		// (c) 1992-2001, Video Klein
+wldwitchs		// (c) 1992-2001, Video Klein
+wldwitcht		// (c) 1992-2001, Video Klein
+wldwitchu		// (c) 1992-2001, Video Klein
+wldwitchv		// (c) 1992-2001, Video Klein
+wupndown		// (c) 1998, Video Klein
 wupndowna		// (c) 1998, Video Klein
+wupndownb		// (c) 1998, Video Klein
+wupndownc		// (c) 1998, Video Klein
+wupndownd		// (c) 1998, Video Klein
 wstrike 		// (c) 1992, Video Klein
 wstrikea 		// (c) 1992, Video Klein
+wtchjack		// (c) 1992-1996, Video Klein
+wtchjacka		// (c) 1992-1996, Video Klein
+wtchjackb		// (c) 1992-1996, Video Klein
+wtchjackc		// (c) 1992-1996, Video Klein
+wtchjackd		// (c) 1992-1996, Video Klein
+wtchjacke		// (c) 1992-1996, Video Klein
+wtchjackf		// (c) 1992-1996, Video Klein
+wtchjackg		// (c) 1992-1996, Video Klein
+wtchjackh		// (c) 1992-1996, Video Klein
+wtchjacki		// (c) 1992-1996, Video Klein
+wtchjackj		// (c) 1992-1996, Video Klein
 falcnwld		// 1991, TVG
 falcnwlda		// (c) 1990, Video Klein
-falcnwldb		// (c) 1983, Falcon
+falcnwldb		// (c) 1990, Video Klein
+falcnwldc		// (c) 1983, Falcon
 bsuerte			// 1990, Unknown
 bsuertea		// 1991, Unknown
 bsuerteb		// 1991, Unknown
