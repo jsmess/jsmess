@@ -113,6 +113,11 @@ static int apollo_eth_receive_packet(device_t *device)
 			return -1;
 		}
 	}
+	else if (packet_len > sizeof(rx_buffer))
+	{
+		DLOG(("apollo_eth_receive_packet: data size (%d) exceeds rx buffer size (%d)!!!", packet_len, sizeof(rx_buffer)));
+		return -1;
+	}
 
 	log_data(device, "apollo_eth_receive_packet", rx_buffer, packet_len);
 

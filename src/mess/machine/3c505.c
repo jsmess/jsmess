@@ -382,6 +382,12 @@ int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[], const int le
 		// overflow, fifo full
 		return 0;
 	}
+	else if (length > ETH_BUFFER_SIZE)
+	{
+		// data size exceeds buffer size
+		LOG(("threecom3c505_device::data_buffer_fifo::put %d: data size (%d) exceeds buffer size (%d)!!!", m_count, length,ETH_BUFFER_SIZE));
+		return 0;
+	}
 	else
 	{
 		memcpy(m_db[m_put_index]->m_data, data, length);
