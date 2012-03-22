@@ -247,6 +247,11 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 	}
 }
 
+void rm380z_state::machine_start()
+{
+	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), FUNC(static_vblank_timer));
+}
+
 void rm380z_state::machine_reset()
 {
 	m_port0=0x00;
@@ -270,7 +275,6 @@ void rm380z_state::machine_reset()
 	memset(m_vram,0,RM380Z_SCREENSIZE);
 
 	config_memory_map();
-	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), FUNC(static_vblank_timer));
 	wd17xx_reset(machine().device("wd1771"));
 
 	init_graphic_chars();
