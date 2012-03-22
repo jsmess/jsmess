@@ -104,7 +104,7 @@ Undumped carts:
 		<year>198?</year>
 		<publisher>Casio</publisher>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="8192">
 				<rom name="naugtboy.bin" size="8192" crc="43a13e99" sha1="a72e8606b8b6c8d10050d6d7b1ff87455b623004" offset="0000" />
 			</dataarea>
 		</part>
