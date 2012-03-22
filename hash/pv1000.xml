@@ -9,7 +9,6 @@ Undumped carts:
  * GPA-108 - ??? [possibly no game used this ID]
  * GPA-110 - Fighting Bug ~ ファイティング バグ
  * GPA-111 - Space Panic ~ スペースパニック
- * GPA-112 - Naughty Boy ~ ノーティーボーイ
  * GPA-113 - ??? [possibly no game used this ID]
 
 -->
@@ -95,6 +94,18 @@ Undumped carts:
 		<part name="cart" interface="pv1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pchnkufo.bin" size="16384" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Serial: GPA-112 - Alt Title: ノーティーボーイ -->
+	<software name="naugtboy" supported="no">
+		<description>Naughty Boy</description>
+		<year>198?</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="naugtboy.bin" size="8192" crc="43a13e99" sha1="a72e8606b8b6c8d10050d6d7b1ff87455b623004" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
