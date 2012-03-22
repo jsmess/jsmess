@@ -59,6 +59,7 @@ private:
 
 protected:
 	virtual void machine_reset();
+	virtual void machine_start();
 
 public:
 
