@@ -85,6 +85,7 @@ static const unif unif_list[] =
 	{ "UNL-SA-72008",               0,    0, CHRRAM_0,  SACHEN_SA72008},
 	{ "UNL-SA-0037",                0,    0, CHRRAM_0,  SACHEN_SA0037},
 	{ "UNL-SA-0036",                0,    0, CHRRAM_0,  SACHEN_SA0036},
+	{ "UNL-SA-9602B",               0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "UNL-SACHEN-8259A",           0,    0, CHRRAM_0,  SACHEN_8259A},
 	{ "UNL-SACHEN-8259B",           0,    0, CHRRAM_0,  SACHEN_8259B},
 	{ "BMC-190IN1",                 0,    0, CHRRAM_0,  BMC_190IN1},
