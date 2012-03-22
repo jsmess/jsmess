@@ -25,6 +25,18 @@
 		</part>
 	</software>
 
+	<software name="eccojrf" cloneof="eccojr">
+		<description>Ecco Jr. et la Chasse au Trésor Sous-marine! (Fra)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49022-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ecco jr. et la chasse au tresor sous-marine! (france).bin" size="524288" crc="1b7b3825" sha1="64706b5f1240941a4989db96dab432aed6009e0a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poohcorng" cloneof="poohcorn" supported="no">
 		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
 		<year>19??</year>
@@ -32,6 +44,30 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ein jahr in winnie puuhs leben (germany).bin" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornf" cloneof="poohcorn" supported="no">
+		<description>Une Année en Compagnie de Winnie l'Ourson (Fra)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="49021-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="une annee en compagnie de winnie l'ourson (france).bin" size="524288" crc="4e4c17bc" sha1="e07a568f90a5db13bae314bfd310488320122439" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlfr" cloneof="hucklowl">
+		<description>Richard Scarry's - Une Journee Bien Remplie pour Cassis et Asticot (Fra)</description>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="49028-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="flop" size="1048576">
+				<rom name="richard scarry's une journee bien remplie pour cassis et asticot (france).bin" size="1048576" crc="53f94256" sha1="9d9cdd8281e7dadb6668f35692e42fbde74d6349" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,6 +94,18 @@
 		</part>
 	</software>
 
+	<software name="mickblstf" cloneof="mickblst" supported="no">
+		<description>Mickey - Fait un Voyage Eclair Dans Le Passé (Fra)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="49024-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey - fait un voyage eclair dans le passe (france).bin" size="524288" crc="fafee898" sha1="6cacd57339ad8dcdbc40f08abffb6fa0f00b5ae5" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pocahont">
 		<description>Pocahontas (Euro)</description>
 		<year>19??</year>
@@ -80,6 +128,18 @@
 		</part>
 	</software>
 
+	<software name="profpicof" cloneof="profpico" supported="no">
+		<description>Professeur Pico et la Machine a Couleurs (Fra)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49041-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="professeur pico et la machine a couleurs (france).bin" size="524288" crc="2870805c" sha1="cec40575c1ddbb9c73241346b9e6510820c28b7a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="profpicoi" cloneof="profpico" supported="no">
 		<description>Professor Pico e l'Enigma della Scatola di Pastelli (Ita)</description>
 		<year>1995</year>
@@ -98,6 +158,18 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tails und der musikant (germany).bin" size="524288" crc="8edf7d4c" sha1="0b477e485a143b5bab7d26925bd587b0f3da2695" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmmf" cloneof="tailsmm">
+		<description>Tails et le Faiseur de Musique (Fra)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49023-09" />
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails et le faiseur de musique (france).bin" size="524288" crc="8cec50fa" sha1="3f1ec0e7e55c7b1c1e4577f516c24ab1068d77ef" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
