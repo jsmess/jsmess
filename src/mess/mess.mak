@@ -860,6 +860,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o		\
 	$(MESS_VIDEO)/vic4567.o		\
+	$(MESS_DRIVERS)/c900.o		\
 	$(MESS_FORMATS)/cbm_snqk.o	\
 	$(MESS_FORMATS)/cbm_crt.o	\
 
