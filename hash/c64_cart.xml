@@ -253,7 +253,45 @@
 		</part>
 	</software>
 
-	<software name="pgfox_fi">
+	<software name="pagefox">
+		<description>Pagefox (Ger)</description>
+		<year>1987</year>
+		<publisher>Scanntronik</publisher>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="pagefox" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x10000">
+				<rom name="79" size="0x8000" crc="58f8aeeb" sha1="0450d8f999d89b284b08118da5c1b82a491292e7" offset="0x0000" />
+				<rom name="zs3" size="0x8000" crc="2967d75a" sha1="d11098168cbcb8b4260116ea723e6b9399153d29" offset="0x8000" />
+			</dataarea>
+
+			<dataarea name="ram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="pagefoxa" cloneof="pagefox">
+		<description>Pagefox (Alt)</description>
+		<year>1987</year>
+		<publisher>Scanntronik</publisher>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="pagefox" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x10000">
+				<rom name="1" size="0x8000" crc="6ae3976d" sha1="e704cb4ca1bfff2a9359a49dee8d89f12724980e" offset="0x0000" />
+				<rom name="2" size="0x8000" crc="cc3a012b" sha1="2afd7efb282f7a8e19aebd36214fd0bb1fe19cd2" offset="0x8000" />
+			</dataarea>
+
+			<dataarea name="ram" size="0x8000" />
+		</part>
+	</software>
+
+	<software name="pagefoxfi" cloneof="pagefox">
 		<description>Pagefox (Fin)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
