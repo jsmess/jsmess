@@ -15,6 +15,23 @@
 		</part>
 	</software>
 
+	<software name="comal80">
+		<description>COMAL 80</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="c128_comal80" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x10000">
+				<rom name="comal80.u1" size="0x8000" crc="65358f73" sha1="14b032b55d65b4c692ec4f0c0c5da07b28a5822d" offset="0x0000" />
+				<rom name="comal80.u2" size="0x8000" crc="2f9da033" sha1="8dcb465cb7b32af996d43c8a15d70e35e5c7d321" offset="0x8000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mach128">
 		<description>MACH 128 v.1A</description>
 		<year>1985</year>
