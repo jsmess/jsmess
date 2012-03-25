@@ -640,6 +640,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/apple2gs.o	\
 	$(MESS_DRIVERS)/apple2gs.o	\
 	$(MESS_MACHINE)/ay3600.o	\
+    $(MESS_MACHINE)/a2bus.o     \
 	$(MESS_MACHINE)/ap2_slot.o	\
 	$(MESS_MACHINE)/ap2_lang.o	\
 	$(MESS_MACHINE)/mockngbd.o	\
