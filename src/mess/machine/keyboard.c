@@ -12,18 +12,18 @@ keyboard.
 Example of usage in a driver.
 
 In MACHINE_CONFIG
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+    MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 In the code:
 
 WRITE8_MEMBER( xxx_state::kbd_put )
 {
-	(code to capture the key as it is pressed)
+    (code to capture the key as it is pressed)
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
-	DEVCB_DRIVER_MEMBER(xxx_state, kbd_put)
+    DEVCB_DRIVER_MEMBER(xxx_state, kbd_put)
 };
 
 ***************************************************************************/

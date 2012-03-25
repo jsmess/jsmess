@@ -62,7 +62,7 @@ INPUT_CHANGED_MEMBER( c64_warp_speed_cartridge_device::reset )
 	{
 		device_reset();
 	}
-	
+
 	m_slot->reset_w(newval ? CLEAR_LINE : ASSERT_LINE);
 }
 

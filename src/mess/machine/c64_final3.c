@@ -24,7 +24,7 @@ INPUT_CHANGED_MEMBER( c64_final3_cartridge_device::reset )
 	{
 		device_reset();
 	}
-	
+
 	m_slot->reset_w(newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -128,27 +128,27 @@ void c64_final3_cartridge_device::c64_cd_w(address_space &space, offs_t offset, 
 	if (!m_hidden && !io2 && ((offset & 0xff) == 0xff))
 	{
 		/*
-		
-		    bit     description
-		
-		    0       A14
-		    1       A15
-		    2       
-		    3       
-		    4       EXROM
-		    5       GAME
-		    6       NMI
-		    7       hide register
-		
-		*/
-	
+
+            bit     description
+
+            0       A14
+            1       A15
+            2
+            3
+            4       EXROM
+            5       GAME
+            6       NMI
+            7       hide register
+
+        */
+
 		m_bank = data & 0x03;
-		
+
 		m_exrom = BIT(data, 4);
 		m_game = BIT(data, 5);
 
 		m_slot->nmi_w(BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
-		
+
 		m_hidden = BIT(data, 7);
 	}
 }

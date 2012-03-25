@@ -97,7 +97,7 @@ Undumped carts:
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Serial: GPA-112 - Alt Title: ノーティーボーイ -->
 	<software name="naugtboy" supported="no">
 		<description>Naughty Boy</description>

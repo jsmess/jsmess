@@ -257,12 +257,12 @@
 		<description>Pagefox (Ger)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="pagefox" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x10000">
 				<rom name="79" size="0x8000" crc="58f8aeeb" sha1="0450d8f999d89b284b08118da5c1b82a491292e7" offset="0x0000" />
 				<rom name="zs3" size="0x8000" crc="2967d75a" sha1="d11098168cbcb8b4260116ea723e6b9399153d29" offset="0x8000" />
@@ -276,12 +276,12 @@
 		<description>Pagefox (Alt)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="pagefox" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x10000">
 				<rom name="1" size="0x8000" crc="6ae3976d" sha1="e704cb4ca1bfff2a9359a49dee8d89f12724980e" offset="0x0000" />
 				<rom name="2" size="0x8000" crc="cc3a012b" sha1="2afd7efb282f7a8e19aebd36214fd0bb1fe19cd2" offset="0x8000" />
@@ -1501,12 +1501,12 @@
 		<year>2011</year>
 		<publisher>Peter Wendrich</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="chameleon" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0xa0000">
 				<rom name="rom-menu.bin" size="0xa0000" crc="a3842c0d" sha1="a147584a959034c8a5679e72c183c82f7e876fd6" offset="0" />
 			</dataarea>
@@ -1522,11 +1522,11 @@
 			<feature name="slot" value="kingsoft" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="1" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" offset="0" />
 			</dataarea>
-	
+
 			<dataarea name="romh" size="0x4000">
 				<rom name="2" size="0x2000" crc="ab55db10" sha1="c6f53801645e07d0413dc91bae71a79a636762c4" offset="0x0000" />
 				<rom name="3" size="0x2000" crc="407a8273" sha1="971ca48cd6e80cc77f166709207e68b0b5d0d8c1" offset="0x2000" />
@@ -1538,16 +1538,16 @@
 		<description>S'more Basic</description>
 		<year>1985</year>
 		<publisher>Cardco</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="kingsoft" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="1121" size="0x2000" crc="a8bdbbcf" sha1="4758c7cd4b094b7894ddc5cfa8b5a925c6b01979" offset="0" />
 			</dataarea>
-	
+
 			<dataarea name="romh" size="0x4000">
 				<rom name="2122" size="0x2000" crc="635407a5" sha1="b174c20153032307560707e4f73997fb3633deae" offset="0x0000" />
 				<rom name="3121" size="0x2000" crc="8de1d013" sha1="8052819719b0234b999ac8af18116bdbb0463013" offset="0x2000" />
@@ -1565,12 +1565,12 @@
 		<description>Samson</description>
 		<year>198?</year>
 		<publisher>Roßmöller</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="samson" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x10000">
 				<rom name="samson1" size="0x8000" crc="373a0c2d" sha1="bfc523f5cd0c82042692a45dfb2d535da9284a20" offset="0" />
 				<rom name="samson2" size="0x8000" crc="068d62d6" sha1="fc38207f9c34152fd78b37080cfdb628d03cef69" offset="0" />
@@ -1583,11 +1583,11 @@
 		<year>1985</year>
 		<publisher>Tom Wheeler</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="smart 64 c intelligent terminal commodore 654 cartridge.bin" size="0x2000" crc="f030b179" sha1="5521fa90fee29397c705eb91760df082b99c1414" offset="0" />
 			</dataarea>
@@ -3463,7 +3463,7 @@
 			<dataarea name="roml" size="0x2000">
 				<rom name="324872-03.u1" size="0x2000" crc="d6f297b8" sha1="5df910498a3ac177ca72de56565655ce4133d315" offset="0" />
 			</dataarea>
-			
+
 			<dataarea name="romh" size="0x2000">
 				<rom name="324872-04.u2" size="0x2000" crc="857d801f" sha1="c7a058090513cfc4f22b7d0e459bc2788c393a87" offset="0" />
 			</dataarea>
@@ -3512,7 +3512,7 @@
 			<dataarea name="roml" size="0x2000">
 				<rom name="324874-03.u1" size="0x2000" crc="ebf384be" sha1="d2761fdf092e2278187c46a4942d766f285f1cbd" offset="0" />
 			</dataarea>
-			
+
 			<dataarea name="romh" size="0x2000">
 				<rom name="324874-04.u2" size="0x2000" crc="bcfdb48d" sha1="96739f2d2a72669a0cd802ce90aa664a70cce09c" offset="0" />
 			</dataarea>
@@ -5986,12 +5986,12 @@
 		<year>1986</year>
 		<publisher>Evesham Micros</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="freeze_frame" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="freeze_frame_mk1_v1_1986.bin" size="0x2000" crc="0239c47b" sha1="62906c0d22dca6ba48aa4a4ead467c57d207ac75" offset="0" />
 			</dataarea>
@@ -6003,12 +6003,12 @@
 		<year>1986</year>
 		<publisher>Evesham Micros</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="freeze_frame" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="freeze_frame_mk1_v2_1986.bin" size="0x2000" crc="58f11c8b" sha1="a04ce32caf23d29334d17a9cc0149749027b75c4" offset="0" />
 			</dataarea>
@@ -6020,12 +6020,12 @@
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="freeze_frame4" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="freeze_frame_mk4_1987.bin" size="0x4000" crc="6b4ac766" sha1="8d98d15ff38e184434edecf59242b028950bd8fe" offset="0" />
 			</dataarea>
@@ -6037,12 +6037,12 @@
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="freeze_machine" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x8000">
 				<rom name="freeze_machine_v1_1987_au.bin" size="0x8000" crc="a9995e50" sha1="cdc57d9759d2c5eb5b9c7e75bb3c82728cf30bfc" offset="0" />
 			</dataarea>
@@ -6054,12 +6054,12 @@
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="freeze_machine" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x8000">
 				<rom name="freeze_machine_v1_1987_uk.bin" size="0x8000" crc="71329d4e" sha1="a9a3dbf7e9f69100e9e3955ab9d7eba8edbf9968" offset="0" />
 			</dataarea>
@@ -6071,12 +6071,12 @@
 		<year>1987</year>
 		<publisher>Evesham Micros</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="freeze_machine" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x8000">
 				<rom name="freeze_machine_v2_1987_uk.bin" size="0x8000" crc="66b76d76" sha1="3be23e5278a31fab3d4c6b397d6d2c41b747e133" offset="0" />
 			</dataarea>
