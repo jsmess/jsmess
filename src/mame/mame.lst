@@ -174,6 +174,7 @@ uniwars			// (c) Irem
 gteikoku		// (c) Irem
 gteikokb		// bootleg
 gteikob2		// bootleg
+galemp			// (c) Taito do Brasil
 spacbatt		// bootleg
 spacbat2		// bootleg
 spacempr		// bootleg
@@ -1402,6 +1403,7 @@ spcewarl		// (c) 1979 Leijac Corporation (Konami)
 polaris			// PS  (c) 1980 Taito
 polarisa		// PS  (c) 1980 Taito
 polariso		// PS  (c) 1980 Taito
+polarisbr		// PS  (c) 1981 Taito do Brasil
 ballbomb		// TN  (c) 1980 Taito
 indianbt		// (c) 1980 Taito
 steelwkr		// (c) 1980 Taito
@@ -1903,6 +1905,7 @@ bublbobl1		// A78 (c) 1986 Taito Corporation
 bublboblr		// A78 (c) 1986 Taito America Corporation + Romstar license
 bublboblr1		// A78 (c) 1986 Taito America Corporation + Romstar license
 boblbobl		// bootleg
+boblbobl2		// bootleg
 sboblboa		// bootleg
 sboblbob		// bootleg
 bub68705		// bootleg
@@ -1919,6 +1922,7 @@ dariusj			// A96 (c) 1986 Taito Corporation (Japan)
 dariuso			// A96 (c) 1986 Taito Corporation (Japan)
 dariuse			// A96 (c) 1986 Taito Corporation (Japan)
 rastan			// B04 (c) 1987 Taito Corporation Japan (World)
+rastan2 		// B04 (c) 1987 Taito Corporation Japan (World)
 rastanu			// B04 (c) 1987 Taito America Corporation (US)
 rastanu2		// B04 (c) 1987 Taito America Corporation (US)
 rastsaga		// B04 (c) 1987 Taito Corporation (Japan)
@@ -4027,6 +4031,7 @@ wboy3			// 834-5984 (c) 1986 + Escape license (S1)
 wboy4			// 834-5984 (c) 1986 + Escape license (S1)
 wboy5			// 834-5984 (c) 1986 + Escape license (S1)
 wboyu			// 834-5753 (? maybe a conversion) (c) 1986 + Escape license (S1)
+wboyub			// bootleg of wboyu
 wbdeluxe		// (c) 1986 + Escape license (S1)
 wboysys2		// 834-5984  (c) 1986 + Escape license (S1)
 gardia			// 834-6119 (S2?)
@@ -5378,6 +5383,7 @@ hbarrel			// (c) 1987 Data East USA (US)
 hbarrelw		// (c) 1987 Data East Corporation (World)
 baddudes		// EI (c) 1988 Data East USA (US)
 drgninja		// EG (c) 1988 Data East Corporation (Japan)
+drgninjab		// bootleg
 birdtry			// (c) 1988 Data East Corporation (Japan)
 robocop			// EP? (c) 1988 Data East Corporation (World)
 robocopw		// EP? (c) 1988 Data East Corporation (World)
@@ -10055,6 +10061,7 @@ suprpkr1		// (c) 1986 Grayhound Electronics
 sshot			// (c) 1979 Model Racing
 dribling		// (c) 1983 Model Racing
 driblingo		// (c) 1983 Olympia
+driblingbr		// bootleg
 ace				// [1976 Allied Leisure]
 clayshoo		// [1979 Allied Leisure]
 pirates			// (c) 1994 NIX

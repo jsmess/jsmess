@@ -32,7 +32,7 @@ I8085 Sound Board
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "video/s2636.h"
-#include "includes/cvs.h"
+#include "includes/quasar.h"
 
 /************************************************************************
 
@@ -432,5 +432,5 @@ ROM_START( quasara )
 ROM_END
 
 
-GAME( 1980, quasar,   0,      quasar,   quasar,   0, ROT90, "Zelco / Zaccaria", "Quasar (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, quasara,  quasar, quasar,   quasar,   0, ROT90, "Zelco / Zaccaria", "Quasar (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, quasar,   0,      quasar,   quasar,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, quasara,  quasar, quasar,   quasar,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
