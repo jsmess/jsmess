@@ -56,9 +56,7 @@
 #include "machine/ap2_slot.h"
 #include "machine/ap2_lang.h"
 #include "machine/applefdc.h"
-#include "machine/mockngbd.h"
 #include "machine/8530scc.h"
-#include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
 
@@ -176,14 +174,6 @@ static ADDRESS_MAP_START( apple2gs_map, AS_PROGRAM, 8, apple2gs_state )
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 
-
-static const ay8910_interface apple2_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
@@ -212,12 +202,6 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ay8913.1", AY8913, 1022727)
-	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("ay8913.2", AY8913, 1022727)
-	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_ES5503_ADD("es5503", APPLE2GS_7M, apple2gs_doc_irq, apple2gs_adc_read)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -225,12 +209,10 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 
 	/* slot devices */
 	MCFG_APPLE2_LANGCARD_ADD("langcard")
-	MCFG_MOCKINGBOARD_ADD("mockingboard")
 	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
 	/* slots */
 	MCFG_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
-	MCFG_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0, 0)
 	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
 	/* SCC */

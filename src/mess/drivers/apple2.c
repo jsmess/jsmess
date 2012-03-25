@@ -194,9 +194,6 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/ap2_slot.h"
 #include "machine/ap2_lang.h"
 #include "machine/applefdc.h"
-#include "machine/mockngbd.h"
-//#include "machine/a2z80.h"
-#include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
 #include "machine/a2cffa.h"
@@ -557,13 +554,6 @@ PALETTE_INIT( apple2 )
 	palette_set_colors(machine, 0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }
 
-static const ay8910_interface apple2_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
-};
-
 static const floppy_interface apple2_floppy_interface =
 {
 	DEVCB_NULL,
@@ -611,21 +601,13 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("ay8913.1", AY8913, 1022727)
-	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("ay8913.2", AY8913, 1022727)
-	MCFG_SOUND_CONFIG(apple2_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* slot devices */
 	MCFG_APPLE2_LANGCARD_ADD("langcard")
-	MCFG_MOCKINGBOARD_ADD("mockingboard")
 	MCFG_APPLEFDC_ADD("fdc", apple2_fdc_interface)
 
 	/* slots */
 	MCFG_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
-	MCFG_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0, 0)
 	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_interface,15,16)
