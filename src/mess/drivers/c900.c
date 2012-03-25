@@ -1,10 +1,10 @@
 /*
 
-	Commodore C900
-	UNIX prototype
+    Commodore C900
+    UNIX prototype
 
-	http://www.zimmers.net/cbmpics/c900.html
-	http://www.zimmers.net/cbmpics/cbm/900/c900-chips.txt
+    http://www.zimmers.net/cbmpics/c900.html
+    http://www.zimmers.net/cbmpics/cbm/900/c900-chips.txt
 
 */
 

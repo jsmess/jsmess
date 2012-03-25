@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation
+    SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

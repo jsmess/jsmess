@@ -463,7 +463,7 @@ WRITE_LINE_MEMBER( base_c1571_device::cia_pc_w )
 {
 	if (m_other != NULL)
     {
-     	m_other->parallel_strobe_w(state);
+    	m_other->parallel_strobe_w(state);
     }
 }
 

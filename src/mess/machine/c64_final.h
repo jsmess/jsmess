@@ -37,7 +37,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( reset );
 	DECLARE_INPUT_CHANGED_MEMBER( freeze );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

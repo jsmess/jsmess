@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation
+    SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation
 
     http://sta.c64.org/cbmparc2.html
 

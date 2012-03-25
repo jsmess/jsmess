@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	The Digital Excess & Hitmen 4-Player Joystick adapter emulation
+    The Digital Excess & Hitmen 4-Player Joystick adapter emulation
 
     http://hitmen.c02.at/html/hardware.html
 
