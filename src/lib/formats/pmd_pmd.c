@@ -45,7 +45,7 @@ static INT16* pmd85_output_byte(INT16 *p, UINT8 byte)
 
 	/* data */
 	for (i=0; i<8; i++)
-		p = pmd85_output_bit(p,(byte>>(7-i)) & 0x01);
+		p = pmd85_output_bit(p,(byte>>i) & 0x01);
 
 	/* stop */
 	p = pmd85_output_bit (p, 1);
