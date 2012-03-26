@@ -49,7 +49,9 @@ public:
 	int m_maria_rm;
 	unsigned int m_maria_charbase;
 	bitmap_ind16 m_bitmap;
-
+	int m_p1_one_button;
+	int m_p2_one_button;
+	
 	required_device<cpu_device> m_maincpu;
 };
 
