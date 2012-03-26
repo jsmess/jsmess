@@ -48,11 +48,19 @@ static READ8_DEVICE_HANDLER( riot_console_button_r )
 	return input_port_read(device->machine(), "console_buttons");
 }
 
+static WRITE8_DEVICE_HANDLER( riot_button_pullup_w )
+{
+	a7800_state *state = device->machine().driver_data<a7800_state>();
+	state->m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic) 
+	state->m_p2_one_button = data & 0x10;
+}
+
 const riot6532_interface a7800_r6532_interface =
 {
 	DEVCB_HANDLER(riot_joystick_r),
 	DEVCB_HANDLER(riot_console_button_r),
 	DEVCB_NULL,
+	DEVCB_HANDLER(riot_button_pullup_w),
 	DEVCB_NULL
 };
 
@@ -68,6 +76,8 @@ static void a7800_driver_init(running_machine &machine, int ispal, int lines)
 	state->m_ROM = machine.region("maincpu")->base();
 	state->m_ispal = ispal;
 	state->m_lines = lines;
+	state->m_p1_one_button = 1;
+	state->m_p2_one_button = 1;
 
 	/* standard banks */
 	memory_set_bankptr(machine, "bank5", &state->m_ROM[0x2040]);		/* RAM0 */
@@ -460,7 +470,8 @@ WRITE8_HANDLER( a7800_cart_w )
 
 READ8_HANDLER( a7800_TIA_r )
 {
-	switch(offset)
+	a7800_state *state = space->machine().driver_data<a7800_state>();
+	switch(offset & 0x0f)
 	{
 		case 0x00:
 		case 0x01:
@@ -482,12 +493,12 @@ READ8_HANDLER( a7800_TIA_r )
 		case 0x0B:
 			  return((input_port_read(space->machine(), "buttons") & 0x04) << 5);
 		case 0x0c:
-			if((input_port_read(space->machine(), "buttons") & 0x08) ||(input_port_read(space->machine(), "buttons") & 0x02))
+			if(((input_port_read(space->machine(), "buttons") & 0x08) ||(input_port_read(space->machine(), "buttons") & 0x02)) && state->m_p1_one_button)
 				return 0x00;
 			else
 				return 0x80;
 		case 0x0d:
-			if((input_port_read(space->machine(), "buttons") & 0x01) ||(input_port_read(space->machine(), "buttons") & 0x04))
+			if(((input_port_read(space->machine(), "buttons") & 0x01) ||(input_port_read(space->machine(), "buttons") & 0x04)) && state->m_p2_one_button)
 				return 0x00;
 			else
 				return 0x80;
