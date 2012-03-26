@@ -6,9 +6,12 @@
 		<description>C128 Diagnostic v1.1</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
+
 		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="c128diag" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
+			
 			<dataarea name="roml" size="0x2000">
 				<rom name="c128diag.bin" size="0x2000" crc="584f6750" sha1="b3cfd8508b887e9c7e72ed2b0c44fe63e6b44ac4" offset="0x0000" />
 			</dataarea>
@@ -21,7 +24,7 @@
 		<publisher>Commodore</publisher>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="c128_comal80" />
+			<feature name="slot" value="comal80" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
@@ -36,15 +39,17 @@
 		<description>MACH 128 v.1A</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="mach5" />
-			<feature name="cart_type" value="mach128" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="mach_128_v1a.bin" size="0x2000" crc="f91ed380" sha1="6f04d73fcde8b28903075e3adcd2d7ff49d2518a" offset="0x0000" />
 			</dataarea>
 		</part>
+
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
@@ -56,15 +61,17 @@
 		<description>MACH 128 v.2A</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="mach5" />
-			<feature name="cart_type" value="mach128" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="mach_128_v2a.bin" size="0x2000" crc="fc60d92e" sha1="7f487134d314b4c5158954ad057e01c0da32a468" offset="0x0000" />
 			</dataarea>
 		</part>
+
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
