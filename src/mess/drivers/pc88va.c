@@ -1732,7 +1732,8 @@ ROM_START( pc88va )
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD( "vafont.rom", 0x0000, 0x50000, CRC(faf7c466) SHA1(196b3d5b7407cb4f286ffe5c1e34ebb1f6905a8c)) // should be splitted
+	ROM_LOAD( "vafont.rom", 0x0000, 0x50000, BAD_DUMP CRC(faf7c466) SHA1(196b3d5b7407cb4f286ffe5c1e34ebb1f6905a8c)) // should be splitted
+
 	ROM_REGION( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "vadic.rom",  0x0000, 0x80000, CRC(f913c605) SHA1(5ba1f3578d0aaacdaf7194a80e6d520c81ae55fb))
 
