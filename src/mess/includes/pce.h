@@ -47,6 +47,7 @@ typedef struct
 	UINT32	msm_half_addr;
 	UINT8	msm_nibble;
 	UINT8	msm_idle;
+	UINT8	msm_repeat;
 
 	/* SCSI signals */
 	int		scsi_BSY;	/* Busy. Bus in use */

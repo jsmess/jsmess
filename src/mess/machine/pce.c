@@ -1413,13 +1413,11 @@ WRITE8_HANDLER( pce_cd_intf_w )
 			msm5205_reset_w( space->machine().device( "msm5205"), 1 );
 		}
 
-		if(data & 0x20)
-			pce_cd.msm_half_addr = (pce_cd.adpcm_read_ptr + (pce_cd.adpcm_length / ((data & 0x40) ? 2 : 1))) & 0xffff;
-
 		if ( ( data & 0x40) && ((pce_cd.regs[0x0D] & 0x40) == 0) ) // ADPCM play
 		{
 			pce_cd.msm_start_addr = (pce_cd.adpcm_read_ptr);
 			pce_cd.msm_end_addr = (pce_cd.adpcm_read_ptr + pce_cd.adpcm_length) & 0xffff;
+			pce_cd.msm_half_addr = (pce_cd.adpcm_read_ptr + (pce_cd.adpcm_length / 2)) & 0xffff;
 			pce_cd.msm_nibble = 0;
 			adpcm_play(space->machine());
 			msm5205_reset_w( space->machine().device( "msm5205"), 0 );
@@ -1432,6 +1430,8 @@ WRITE8_HANDLER( pce_cd_intf_w )
 			adpcm_stop(space->machine(), 0);
 			msm5205_reset_w( space->machine().device( "msm5205"), 1 );
 		}
+
+		pce_cd.msm_repeat = (data & 0x20) >> 5;
 
 		if ( data & 0x10 ) //ADPCM set length
 		{
