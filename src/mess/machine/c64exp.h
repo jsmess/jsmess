@@ -72,6 +72,8 @@
 
 struct c64_expansion_slot_interface
 {
+	devcb_read8			m_in_dma_cd_cb;
+	devcb_write8		m_out_dma_cd_cb;
     devcb_write_line	m_out_irq_cb;
     devcb_write_line	m_out_nmi_cb;
     devcb_write_line	m_out_dma_cb;
@@ -93,17 +95,20 @@ public:
 	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~c64_expansion_slot_device();
 
+	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
 	void cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
 	int game_r(offs_t offset, int ba, int rw, int hiram);
 	DECLARE_READ_LINE_MEMBER( exrom_r );
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	// cartridge interface
+	UINT8 dma_cd_r(offs_t offset);
+	void dma_cd_w(offs_t offset, UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -128,6 +133,8 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
+	devcb_resolved_read8		m_in_dma_cd_func;
+	devcb_resolved_write8		m_out_dma_cd_func;
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;
 	devcb_resolved_write_line	m_out_dma_func;

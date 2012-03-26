@@ -958,6 +958,16 @@ static CBM_IEC_INTERFACE( iec_intf )
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( c64_state::exp_dma_r )
+{
+	return m_maincpu->memory().space(AS_PROGRAM)->read_byte(offset);
+}
+
+WRITE8_MEMBER( c64_state::exp_dma_w )
+{
+	m_maincpu->memory().space(AS_PROGRAM)->write_byte(offset, data);
+}
+
 WRITE_LINE_MEMBER( c64_state::exp_irq_w )
 {
 	m_exp_irq = state;
@@ -974,9 +984,11 @@ WRITE_LINE_MEMBER( c64_state::exp_nmi_w )
 
 static C64_EXPANSION_INTERFACE( expansion_intf )
 {
+	DEVCB_DRIVER_MEMBER(c64_state, exp_dma_r),
+	DEVCB_DRIVER_MEMBER(c64_state, exp_dma_w),
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_irq_w),
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_nmi_w),
-	DEVCB_NULL, // DMA
+	DEVCB_CPU_INPUT_LINE(M6510_TAG, INPUT_LINE_HALT),
 	DEVCB_CPU_INPUT_LINE(M6510_TAG, INPUT_LINE_RESET)
 };
 
