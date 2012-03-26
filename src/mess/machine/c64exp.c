@@ -216,6 +216,8 @@ void c64_expansion_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
+    	memset(&m_in_dma_cd_cb, 0, sizeof(m_in_dma_cd_cb));
+    	memset(&m_out_dma_cd_cb, 0, sizeof(m_out_dma_cd_cb));
     	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
     	memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
     	memset(&m_out_dma_cb, 0, sizeof(m_out_dma_cb));
@@ -236,6 +238,8 @@ void c64_expansion_slot_device::device_start()
 	m_cart = dynamic_cast<device_c64_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
+	m_in_dma_cd_func.resolve(m_in_dma_cd_cb, *this);
+	m_out_dma_cd_func.resolve(m_out_dma_cd_cb, *this);
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
 	m_out_dma_func.resolve(m_out_dma_cb, *this);
@@ -500,6 +504,26 @@ UINT32 c64_expansion_slot_device::screen_update(screen_device &screen, bitmap_in
 	}
 
 	return value;
+}
+
+
+//-------------------------------------------------
+//  dma_cd_r - DMA read
+//-------------------------------------------------
+
+UINT8 c64_expansion_slot_device::dma_cd_r(offs_t offset)
+{
+	return m_in_dma_cd_func(offset);
+}
+
+
+//-------------------------------------------------
+//  dma_cd_w - DMA write
+//-------------------------------------------------
+
+void c64_expansion_slot_device::dma_cd_w(offs_t offset, UINT8 data)
+{
+	m_out_dma_cd_func(offset, data);
 }
 
 

@@ -100,6 +100,8 @@ public:
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
 	DECLARE_WRITE_LINE_MEMBER( iec_srq_w );
+	DECLARE_READ8_MEMBER( exp_dma_r );
+	DECLARE_WRITE8_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
 
