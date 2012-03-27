@@ -177,7 +177,7 @@ I/O ports
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
-#include "formats/pmd_pmd.h"
+#include "formats/pmd_cas.h"
 #include "machine/ram.h"
 
 /* I/O ports */
@@ -535,7 +535,7 @@ static const struct CassetteOptions pmd85_cassette_options =
 
 static const cassette_interface pmd85_cassette_interface =
 {
-	pmd85_pmd_format,
+	pmd85_cassette_formats,
 	&pmd85_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
