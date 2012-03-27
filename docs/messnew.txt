@@ -1,4 +1,42 @@
-﻿0.145u4
+﻿0.145u5
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Commodore 900 [Curt Coder]
+
+System Driver Changes:
+----------------------
+-c64: Added support for Kingsoft cartridges. [Curt Coder]
+ - Classical Games/Protovision 4 player joystick interface
+ - Digital Excess/Hitmen, Kingsoft, and Starbyte 4 player joystick interfaces
+ - Final Cartridge III
+ - XL 80 column cartridge
+ - geoCable Centronics cable
+ - SpeedDOS/Burst Nibbler 1541 parallel cable. SpeedDOS kernal replacement 
+   and FCopy III are somewhat working. E.g. "mess c64p -user bn1541 -flop fcopy3.d64"
+ - several Kernal replacements, and extended the parallel cable support to 1571.
+-apollo: do bounds checking on Ethernet packets [Hans Ostermeyer]
+-a7800: Added controller line pullup signals from the riot chip. 
+ Fixes two-button behavior on asteroids etc. [Huygens]
+-dc: Fix the maple hookup and controllers and add the missing maple irq [O. Galibert]
+
+Software Lists:
+----------------
+-pv1000.xml : New Casio PV-1000 dump (anondumper)
+
+Source Changes:
+----------------
+(none)
+
+0.145u4
 
 New System Drivers Supported:
 -----------------------------
