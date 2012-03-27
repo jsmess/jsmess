@@ -33,7 +33,7 @@
 #include "formats/mz_cas.h"
 #include "formats/orao_cas.h"
 #include "formats/oric_tap.h"
-#include "formats/pmd_pmd.h"
+#include "formats/pmd_cas.h"
 #include "formats/primoptp.h"
 #include "formats/rk_cas.h"
 #include "formats/sord_cas.h"
@@ -70,7 +70,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"mz", mz700_cassette_formats              ,"Sharp MZ"},
 	{"orao", orao_cassette_formats             ,"Orao"},
 	{"oric", oric_cassette_formats             ,"Oric"},
-	{"pmd85", pmd85_pmd_format                 ,"PMD-85"},
+	{"pmd85", pmd85_cassette_formats           ,"PMD-85"},
 	{"primo", primo_ptp_format                 ,"Primo"},
 	{"rku", rku_cassette_formats               ,"UT-88"},
 	{"rk8", rk8_cassette_formats               ,"Mikro-80"},
