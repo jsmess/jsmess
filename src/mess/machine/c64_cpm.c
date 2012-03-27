@@ -2,6 +2,8 @@
 
     Commodore 64 CP/M cartridge emulation
 
+	http://www.baltissen.org/newhtm/c64_cpm.htm
+
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -68,6 +70,31 @@ machine_config_constructor c64_cpm_cartridge_device::device_mconfig_additions() 
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  update_signals - 
+//-------------------------------------------------
+
+inline void c64_cpm_cartridge_device::update_signals()
+{
+	// NOTE: none of this works until the Z80 core has been rewritten
+	
+	// C64 DMA
+	m_slot->dma_w(m_enabled ? ASSERT_LINE : CLEAR_LINE);
+	
+	// Z80 BUSRQ
+	int busrq = !(m_enabled & !m_ba) ? CLEAR_LINE : ASSERT_LINE;
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, busrq);
+
+	// Z80 WAIT
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, m_enabled ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -78,7 +105,9 @@ machine_config_constructor c64_cpm_cartridge_device::device_mconfig_additions() 
 c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_CPM, "C64 CP/M cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_maincpu(*this, Z80_TAG)
+	m_maincpu(*this, Z80_TAG),
+	m_enabled(0),
+	m_ba(1)
 {
 }
 
@@ -89,7 +118,9 @@ c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config &mconfig
 
 void c64_cpm_cartridge_device::device_start()
 {
-	// TODO stop the Z80 here before it gets any ideas
+	// state saving
+	save_item(NAME(m_enabled));
+	save_item(NAME(m_ba));
 }
 
 
@@ -99,8 +130,9 @@ void c64_cpm_cartridge_device::device_start()
 
 void c64_cpm_cartridge_device::device_reset()
 {
-	m_slot->dma_w(CLEAR_LINE);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_enabled = 0;
+
+	update_signals();
 }
 
 
@@ -112,10 +144,27 @@ void c64_cpm_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UIN
 {
 	if (!io1)
 	{
-		// HACK
-		m_slot->dma_w(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_HALT, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+		m_enabled = !BIT(data, 0);
+
+		update_signals();
 	}
+}
+
+
+//-------------------------------------------------
+//  c64_game_r - GAME read
+//-------------------------------------------------
+
+int c64_cpm_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hiram)
+{
+	if (m_ba != ba)
+	{
+		m_ba = ba;
+
+		update_signals();
+	}
+
+	return 1;
 }
 
 
@@ -125,7 +174,16 @@ void c64_cpm_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UIN
 
 READ8_MEMBER( c64_cpm_cartridge_device::dma_r )
 {
-	return m_slot->dma_cd_r(offset | 0x1000);
+	UINT8 data = 0xff;
+
+	if (m_enabled)
+	{
+		offs_t addr = (offset + 0x1000) & 0xffff;
+
+		data = m_slot->dma_cd_r(addr);
+	}
+
+	return data;
 }
 
 
@@ -135,5 +193,10 @@ READ8_MEMBER( c64_cpm_cartridge_device::dma_r )
 
 WRITE8_MEMBER( c64_cpm_cartridge_device::dma_w )
 {
-	m_slot->dma_cd_w(offset | 0x1000, data);
+	if (m_enabled)
+	{
+		offs_t addr = (offset + 0x1000) & 0xffff;
+
+		m_slot->dma_cd_w(addr, data);
+	}
 }
