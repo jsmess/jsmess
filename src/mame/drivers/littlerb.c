@@ -16,6 +16,13 @@ the list?
 maybe the vdp 'commands' can be used to store and get back
 write addresses?
 
+most graphics are stored as packed 4bpp in RAM, expanded before
+writing to the vdp device.  actual gfx are 8bpp.
+
+Sound pitch is directly correlated with irqs, scanline timings and pixel clock,
+so it's surely not 100% correct. Sound sample playbacks looks fine at current time tho.
+
+
 Dip sw.1
 --------
              | Coin 1 | Coin 2  |
@@ -60,24 +67,39 @@ Dip sw.2
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-
+#include "video/ramdac.h"
+#include "sound/dac.h"
 
 class littlerb_state : public driver_device
 {
 public:
 	littlerb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_dacl(*this, "dacl"),
+   	      m_dacr(*this, "dacr")
+		{ }
 
 	UINT16 m_vdp_address_low;
 	UINT16 m_vdp_address_high;
 	UINT16 m_vdp_writemode;
 	UINT32 m_write_address;
+
+	UINT32 m_write_address_laststart;
+	UINT32 m_write_address_lastend;
+
 	UINT16* m_region4;
-	UINT8 m_paldac[3][0x80];
+	UINT8 m_paldac[3][0x100];
 	int m_paldac_select;
 	int m_paldac_offset;
 	int m_type2_writes;
 	UINT32 m_lasttype2pc;
+	UINT8 m_sound_index_l,m_sound_index_r;
+	UINT16 m_sound_pointer_l,m_sound_pointer_r;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dacl;
+	required_device<dac_device> m_dacr;
 };
 
 
@@ -87,67 +109,29 @@ WRITE16_HANDLER( region4_w )
 	COMBINE_DATA(&state->m_region4[offset]);
 }
 
-WRITE16_HANDLER(palette_offset_w)
-{
-	littlerb_state *state = space->machine().driver_data<littlerb_state>();
-	//printf("palette offset set to %04x\n",data);
-	state->m_paldac_offset = data;
-	state->m_paldac_select = 0;
-	state->m_paldac_offset&=0x7f;
-
-}
-
-WRITE16_HANDLER( palette_data_w )
-{
-	littlerb_state *state = space->machine().driver_data<littlerb_state>();
-	//printf("palette write %04x\n",data);
-
-	state->m_paldac[state->m_paldac_select][state->m_paldac_offset] = data;
-	state->m_paldac_select++;
-	if (state->m_paldac_select==3)
-	{
-		int r,g,b;
-
-		r = state->m_paldac[0][state->m_paldac_offset];
-		g = state->m_paldac[1][state->m_paldac_offset];
-		b = state->m_paldac[2][state->m_paldac_offset];
-
-		palette_set_color(space->machine(),state->m_paldac_offset,MAKE_RGB(r,g,b));
-
-		state->m_paldac_select = 0;
-		state->m_paldac_offset++;
-		state->m_paldac_offset&=0x7f;
-	}
-}
-
-WRITE16_HANDLER( palette_reset_w )
-{
-	littlerb_state *state = space->machine().driver_data<littlerb_state>();
-//  printf("palette reset write %04x\n",data);
-
-	state->m_paldac_select = 0;
-	state->m_paldac_offset = 0;
-
-}
-
 /* this map is wrong because our VDP access is wrong! */
 static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM_WRITE(region4_w)
+	// it ends up writing some gfx here (the bubbles when you shoot an enemy)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
+	AM_RANGE(0x00080000, 0x003fffff) AM_RAM // temp so it doesn't fill the log
 
 	/* these are definitely written by a non-incrementing access to the VDP */
-	AM_RANGE(0x00800000, 0x00800001) AM_WRITE(palette_offset_w)
-	AM_RANGE(0x00800002 ,0x00800003) AM_WRITE(palette_data_w)
-	AM_RANGE(0x00800004 ,0x00800005) AM_WRITE(palette_reset_w)
+	AM_RANGE(0x00800000, 0x00800001) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x00800002 ,0x00800003) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, pal_w,   0x00ff)
+	AM_RANGE(0x00800004 ,0x00800005) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, mask_w,  0x00ff)
 
-
-
-	AM_RANGE(0x0ff80000, 0x0fffffff) AM_RAM_WRITE(region4_w)
-
-
-	AM_RANGE(0x1ff80000, 0x1fffffff)  AM_RAM_WRITE(region4_w) AM_BASE_MEMBER(littlerb_state, m_region4)
+	// most gfx end up here including the sprite list
+	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE(region4_w)  AM_BASE_MEMBER(littlerb_state, m_region4)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
+ADDRESS_MAP_END
 
+static RAMDAC_INTERFACE( ramdac_intf )
+{
+	0
+};
 
 /* VDP device to give us our own memory map */
 class littlerb_vdp_device;
@@ -198,13 +182,22 @@ static void littlerb_data_write(running_machine &machine, UINT16 data, UINT16 me
 	UINT32 addr = state->m_write_address>>4; // is this right? should we shift?
 	address_space *vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
 
+	int mode = state->m_vdp_writemode;
+	if ((mode!=0x3800) && (mode !=0x2000))
+	{
+		printf("mode %04x, data %04x, mem_mask %04x (address %08x)\n", mode,  data, mem_mask, state->m_write_address);
+	}
+	else
+	{
+		vdp_space->write_word(addr*2, data, mem_mask);
 
-	vdp_space->write_word(addr*2, data, mem_mask);
+		// 2000 is used for palette writes which appears to be a RAMDAC, no auto-inc.
+		if (mode!=0x2000) state->m_write_address+=0x10;
+		littlerb_recalc_regs(machine);
+	}
 
 
-	// e000 / 2000 are used for palette writes, which should go to a RAMDAC, so probably mean no auto inc.
-	if ((state->m_vdp_writemode!=0xe000) && (state->m_vdp_writemode!=0x2000)) state->m_write_address+=0x10;
-	littlerb_recalc_regs(machine);
+
 
 }
 
@@ -220,7 +213,7 @@ static void littlerb_recalc_address(running_machine &machine)
 static READ16_HANDLER( littlerb_vdp_r )
 {
 	littlerb_state *state = space->machine().driver_data<littlerb_state>();
-	logerror("%06x littlerb_vdp_r offs %04x mask %04x\n", cpu_get_pc(&space->device()), offset, mem_mask);
+	logerror("%06x littlerb_vdp_r offs %04x mask %04x (address %08x)\n", cpu_get_pc(&space->device()), offset, mem_mask, state->m_write_address);
 
 	switch (offset)
 	{
@@ -252,6 +245,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 			if (state->m_type2_writes>2)
 			{
 				if (LOG_VDP) logerror("******************************* BIG WRITE OCCURRED BEFORE THIS!!! ****************************\n");
+				printf("big write occured with start %08x end %08x\n", state->m_write_address_laststart, state->m_write_address_lastend);
 			}
 
 			if (LOG_VDP) logerror("~%06x previously wrote %08x data bytes\n", state->m_lasttype2pc, state->m_type2_writes*2);
@@ -268,7 +262,8 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 			{
 				if (LOG_VDP) logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(&space->device()), offset, data, mem_mask);
 			}
-
+			if (state->m_type2_writes==0) state->m_write_address_laststart = state->m_write_address;
+			state->m_write_address_lastend = state->m_write_address;
 			state->m_type2_writes++;
 			state->m_lasttype2pc = cpu_get_pc(&space->device());
 		}
@@ -282,13 +277,13 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 	switch (offset)
 	{
 		case 0:
-		state->m_vdp_address_low = data;
-		littlerb_recalc_address(space->machine());
+			COMBINE_DATA(&state->m_vdp_address_low);
+			littlerb_recalc_address(space->machine());
 		break;
 
 		case 1:
-		state->m_vdp_address_high = data;
-		littlerb_recalc_address(space->machine());
+			COMBINE_DATA(&state->m_vdp_address_high);
+			littlerb_recalc_address(space->machine());
 		break;
 
 
@@ -297,12 +292,36 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 		break;
 
 		case 3:
-		logerror("WRITE MODE CHANGED TO %04x\n",data);
-		state->m_vdp_writemode = data;
+			COMBINE_DATA(&state->m_vdp_writemode);
+			int mode = state->m_vdp_writemode;
+			if ((mode!=0x3800) && (mode !=0x2000)) printf("WRITE MODE CHANGED TO %04x\n",mode);
 		break;
 
 	}
 
+}
+
+/* could be slightly different (timing wise, directly related to the irqs), but certainly they smoked some bad pot for this messy way ... */
+static UINT8 sound_data_shift(running_machine &machine)
+{
+	return ((machine.primary_screen->frame_number() % 16) == 0) ? 8 : 0;
+}
+
+/* l is SFX, r is BGM (they doesn't seem to share the same data ROM) */
+static WRITE16_HANDLER( littlerb_l_sound_w )
+{
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
+	state->m_sound_index_l = (data >> sound_data_shift(space->machine())) & 0xff;
+	state->m_sound_pointer_l = 0;
+	//popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
+}
+
+static WRITE16_HANDLER( littlerb_r_sound_w )
+{
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
+	state->m_sound_index_r = (data >> sound_data_shift(space->machine())) & 0xff;
+	state->m_sound_pointer_r = 0;
+	//popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
 }
 
 static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16 )
@@ -312,13 +331,22 @@ static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x060004, 0x060007) AM_WRITENOP
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // main ram?
+	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
+	AM_RANGE(0x740000, 0x740001) AM_WRITE(littlerb_l_sound_w)
+	AM_RANGE(0x760000, 0x760001) AM_WRITE(littlerb_r_sound_w)
+	AM_RANGE(0x780000, 0x780001) AM_WRITENOP // generic outputs
 	AM_RANGE(0x7c0000, 0x7c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_PORT("P1")
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
-	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
-	AM_RANGE(0x780000, 0x780001) AM_WRITENOP
 ADDRESS_MAP_END
 
+/* guess according to DASM code and checking the gameplay speed, could be different */
+static CUSTOM_INPUT( littlerb_frame_step_r )
+{
+	UINT32 ret = field.machine().primary_screen->frame_number();
+
+	return (ret) & 7;
+}
 
 static INPUT_PORTS_START( littlerb )
 	PORT_START("DSW")	/* 16bit */
@@ -386,9 +414,7 @@ static INPUT_PORTS_START( littlerb )
 	PORT_DIPNAME( 0x1000, 0x1000, "???"  )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(littlerb_frame_step_r, NULL)
 
 	PORT_START("P2")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -403,40 +429,31 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
+static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, int xsize,int ysize, UINT32 fulloffs, int xpos, int ypos )
 {
-	littlerb_state *state = machine.driver_data<littlerb_state>();
-	UINT16* spritegfx = state->m_region4;
 	int x,y;
-	//int pal = 1;
+	fulloffs >>= 3;
+	address_space *vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
 
 	for (y=0;y<ysize;y++)
 	{
 		for (x=0;x<xsize;x++)
 		{
 			int drawxpos, drawypos;
-			UINT8 pix1 = spritegfx[offset]&0x0f;
-			UINT8 pix2 = (spritegfx[offset]>>8)&0x0f;
-			drawxpos = xpos+x*2;
+			// the addresses provided are the same as the offsets as the vdp writes
+			UINT16 pix = vdp_space->read_byte(fulloffs);
+
+			drawxpos = xpos+x;
 			drawypos = ypos+y;
 
-			pix1+=pal*0x10;
-			pix2+=pal*0x10;
-
-
 			if ((drawxpos < 320) && (drawypos < 256) && (drawxpos >= 0) && (drawypos >=0))
 			{
-				if(pix1&0xf) bitmap.pix16(drawypos, drawxpos) = pix1;
+				if(pix&0xff) bitmap.pix16(drawypos, drawxpos) = pix;
 			}
 			drawxpos++;
-			if ((drawxpos < 320) && (drawypos < 256) && (drawxpos >= 0) && (drawypos >=0))
-			{
-				if(pix2&0xf) bitmap.pix16(drawypos, drawxpos) = pix2;
-			}
 
-			offset++;
+			fulloffs++;
 
-			offset&=0x3ffff;
 		}
 	}
 }
@@ -445,9 +462,8 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, int xsiz
 static SCREEN_UPDATE_IND16(littlerb)
 {
 	littlerb_state *state = screen.machine().driver_data<littlerb_state>();
-	int x,y,offs, code;
+	int x,y,offs;
 	int xsize,ysize;
-	int pal;
 	UINT16* spriteregion = &state->m_region4[0x400];
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	//printf("frame\n");
@@ -457,47 +473,72 @@ static SCREEN_UPDATE_IND16(littlerb)
 		x = spriteregion[offs+2] & 0x01ff;
 		ysize = (spriteregion[offs+5] & 0x007f);
 		y = (spriteregion[offs+3] & 0x01ff); // 1?
-		xsize = (spriteregion[offs+4] & 0x00ff)/2;
+		xsize = (spriteregion[offs+4] & 0x00ff);
 
-		// the code seems to be the same address as the blitter writes
-		// e.g  ffc010000
-		code =  (spriteregion[offs+0] & 0xfff0)>>4;
-		code |=  (spriteregion[offs+1] & 0x003f)<<12;
+		UINT32 fullcode = ((spriteregion[offs+1])<<16)+ (spriteregion[offs+0]);
 
-		pal = 0;//(spriteregion[offs+4] & 0xf000)>>13; // where is the colour bit?!
+		//printf( "sprite %08x\n", fullcode);
 
 		//if (code!=0) printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
 
-		draw_sprite(screen.machine(),bitmap,xsize,ysize,code,x-8,y-16, pal);
+		draw_sprite(screen.machine(),bitmap,xsize,ysize,fullcode,x-8,y-16);
 	}
 
 	return 0;
 }
 
-static INTERRUPT_GEN( littlerb )
+static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 {
-	logerror("IRQ\n");
-	device_set_input_line(device, 4, HOLD_LINE);
+	littlerb_state *state = timer.machine().driver_data<littlerb_state>();
+	int scanline = param;
+
+	if((scanline % 2) == 0)
+	{
+		UINT8 res;
+		UINT8 *sample_rom = timer.machine().region("samples")->base();
+
+		res = sample_rom[state->m_sound_pointer_l|(state->m_sound_index_l<<10)|0x40000];
+		dac_signed_w(state->m_dacl, 0, res);
+		res = sample_rom[state->m_sound_pointer_r|(state->m_sound_index_r<<10)|0x00000];
+		dac_signed_w(state->m_dacr, 0, res);
+		state->m_sound_pointer_l++;
+		state->m_sound_pointer_l&=0x3ff;
+		state->m_sound_pointer_r++;
+		state->m_sound_pointer_r&=0x3ff;
+	}
+
+//	logerror("IRQ\n");
+	if(scanline == 256)
+	{
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+	}
 }
 
 static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(littlerb_main)
-	MCFG_CPU_VBLANK_INT("screen", littlerb)
-
+	MCFG_TIMER_ADD_SCANLINE("scantimer", littlerb_scanline, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(littlerb)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_DEVICE_ADD("littlerbvdp", LITTLERBVDP, 0)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 //  MCFG_PALETTE_INIT(littlerb)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+
+	MCFG_SOUND_ADD("dacl", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+
+	MCFG_SOUND_ADD("dacr", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( littlerb )
@@ -506,9 +547,9 @@ ROM_START( littlerb )
 	ROM_LOAD16_BYTE( "romb.u29", 0x00000, 0x80000, CRC(b2fb1d61) SHA1(9a9d7176c241928d07af651e5f7f21d4f019701d) )
 
 	ROM_REGION( 0x80000, "samples", 0 ) /* sound samples */
-	ROM_LOAD16_BYTE( "romc.u26", 0x00001, 0x40000, CRC(f193c5b6) SHA1(95548a40e2b5064c558b36cabbf507d23678b1b2) )
-	ROM_LOAD16_BYTE( "romd.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
+	ROM_LOAD( "romc.u26", 0x40000, 0x40000, CRC(f193c5b6) SHA1(95548a40e2b5064c558b36cabbf507d23678b1b2) )
+	ROM_LOAD( "romd.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
 ROM_END
 
 
-GAME( 1993, littlerb, 0, littlerb, littlerb, 0, ROT0, "TCH", "Little Robin", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, littlerb, 0, littlerb, littlerb, 0, ROT0, "TCH", "Little Robin", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
