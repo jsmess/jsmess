@@ -38,6 +38,7 @@
 #define __VIC10_EXPANSION_SLOT__
 
 #include "emu.h"
+#include "formats/cbm_crt.h"
 
 
 
@@ -153,16 +154,16 @@ public:
 	virtual ~device_vic10_expansion_card_interface();
 
 	// RAM
-	virtual UINT8* vic10_exram_pointer() { return NULL; }
+	virtual UINT8* vic10_exram_pointer(running_machine &machine, size_t size);
 	virtual UINT8 vic10_exram_r(address_space &space, offs_t offset) { return 0; };
 	virtual void vic10_exram_w(address_space &space, offs_t offset, UINT8 data) { };
 
 	// ROM
-	virtual UINT8* vic10_lorom_pointer() { return NULL; }
+	virtual UINT8* vic10_lorom_pointer(running_machine &machine, size_t size);
 	virtual UINT8 vic10_lorom_r(address_space &space, offs_t offset) { return 0; };
 	virtual void vic10_lorom_w(address_space &space, offs_t offset, UINT8 data) { };
 
-	virtual UINT8* vic10_uprom_pointer() { return NULL; }
+	virtual UINT8* vic10_uprom_pointer(running_machine &machine, size_t size);
 	virtual UINT8 vic10_uprom_r(address_space &space, offs_t offset) { return 0; };
 	virtual void vic10_uprom_w(address_space &space, offs_t offset, UINT8 data) { };
 
@@ -177,6 +178,10 @@ public:
 
 protected:
 	vic10_expansion_slot_device *m_slot;
+
+	UINT8 *m_exram;
+	UINT8 *m_lorom;
+	UINT8 *m_uprom;
 };
 
 

@@ -7,10 +7,7 @@
 
 **********************************************************************/
 
-#include "emu.h"
 #include "machine/c64exp.h"
-#include "formats/cbm_crt.h"
-#include "formats/imageutl.h"
 
 
 
@@ -19,68 +16,6 @@
 //**************************************************************************
 
 #define LOG 0
-
-
-// slot names for the C64 cartridge types
-const char *CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
-{
-	"standard",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"simons_basic",
-	"ocean",
-	UNSUPPORTED,
-	"fun_play",
-	"super_games",
-	UNSUPPORTED,
-	"epyxfastload",
-	"westermann",
-	"rex",
-	UNSUPPORTED,
-	"magic_formel",
-	"system3",
-	"warp_speed",
-	"dinamic",
-	"zaxxon",
-	"magic desk",
-	UNSUPPORTED,
-	"comal80",
-	"struct_basic",
-	"ross",
-	"ep64",
-	"ep7x8",
-	"dela_ep256",
-	"rex_ep256",
-	"mikroasm",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"stardos",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"ieee488",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"exos",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"super_explode",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"mach5",
-	UNSUPPORTED,
-	"pagefox",
-	UNSUPPORTED,
-	"silverrock"
-};
 
 
 
@@ -286,101 +221,56 @@ bool c64_expansion_slot_device::call_load()
 			}
 			else if (!mame_stricmp(filetype(), "crt"))
 			{
-				// read the header
-				cbm_crt_header header;
-				fread(&header, CRT_HEADER_LENGTH);
-
-				if (memcmp(header.signature, CRT_SIGNATURE, 16) != 0)
-					return IMAGE_INIT_FAIL;
-
-				UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
-
-				if (LOG)
-				{
-					logerror("Name: %s\n", header.name);
-					logerror("Hardware: %04x\n", hardware);
-					logerror("Slot device: %s\n", CRT_C64_SLOT_NAMES[hardware]);
-					logerror("EXROM: %u\n", header.exrom);
-					logerror("GAME: %u\n", header.game);
-				}
-
-				// determine ROM region lengths
 				size_t roml_size = 0;
 				size_t romh_size = 0;
+				int exrom = 1;
+				int game = 1;
 
-				while (!image_feof())
+				if (cbm_crt_read_header(m_file, &roml_size, &romh_size, &exrom, &game))
 				{
-					cbm_crt_chip chip;
-					fread(&chip, CRT_CHIP_LENGTH);
+					UINT8 *roml = NULL;
+					UINT8 *romh = NULL;
 
-					UINT16 address = pick_integer_be(chip.start_address, 0, 2);
-					UINT16 size = pick_integer_be(chip.image_size, 0, 2);
-					UINT16 type = pick_integer_be(chip.chip_type, 0, 2);
+					if (roml_size) roml = m_cart->c64_roml_pointer(machine(), roml_size);
+					if (romh_size) romh = m_cart->c64_romh_pointer(machine(), romh_size);
 
-					if (LOG)
-					{
-						logerror("CHIP Address: %04x\n", address);
-						logerror("CHIP Size: %04x\n", size);
-						logerror("CHIP Type: %04x\n", type);
-					}
-
-					switch (address)
-					{
-					case 0x8000: roml_size += size; break;
-					case 0xa000: romh_size += size; break;
-					case 0xe000: romh_size += size; break;
-					default: logerror("Invalid CHIP loading address!\n"); break;
-					}
-
-					fseek(size, SEEK_CUR);
+					cbm_crt_read_data(m_file, roml, romh);
 				}
 
-				// allocate cartridge memory
-				UINT8 *roml = NULL;
-				UINT8 *romh = NULL;
-
-				if (roml_size) roml = m_cart->c64_roml_pointer(machine(), roml_size);
-				if (romh_size) romh = m_cart->c64_romh_pointer(machine(), romh_size);
-
-				// read the data
-				offs_t roml_offset = 0;
-				offs_t romh_offset = 0;
-
-				fseek(CRT_HEADER_LENGTH, SEEK_SET);
-
-				while (!image_feof())
-				{
-					cbm_crt_chip chip;
-					fread(&chip, CRT_CHIP_LENGTH);
-
-					UINT16 address = pick_integer_be(chip.start_address, 0, 2);
-					UINT16 size = pick_integer_be(chip.image_size, 0, 2);
-
-					switch (address)
-					{
-					case 0x8000: fread(roml + roml_offset, size); roml_offset += size; break;
-					case 0xa000: fread(romh + romh_offset, size); romh_offset += size; break;
-					case 0xe000: fread(romh + romh_offset, size); romh_offset += size; break;
-					}
-				}
-
-				m_cart->c64_exrom_w(header.exrom);
-				m_cart->c64_game_w(header.game);
+				m_cart->c64_exrom_w(exrom);
+				m_cart->c64_game_w(game);
 			}
 		}
 		else
 		{
-			size = get_software_region_length("roml");
-			if (size) memcpy(m_cart->c64_roml_pointer(machine(), size), get_software_region("roml"), size);
+			size = get_software_region_length("uprom");
+		
+			if (size) 
+			{
+				// Ultimax (VIC-10) cartridge
+				memcpy(m_cart->c64_romh_pointer(machine(), size), get_software_region("uprom"), size);
 
-			size = get_software_region_length("romh");
-			if (size) memcpy(m_cart->c64_romh_pointer(machine(), size), get_software_region("romh"), size);
+				size = get_software_region_length("lorom");
+				if (size) memcpy(m_cart->c64_roml_pointer(machine(), size), get_software_region("lorom"), size);
 
-			size = get_software_region_length("ram");
-			if (size) memset(m_cart->c64_ram_pointer(machine(), size), 0, size);
+				m_cart->c64_exrom_w(1);
+				m_cart->c64_game_w(0);
+			}
+			else
+			{
+				// Commodore 64/128 cartridge
+				size = get_software_region_length("roml");
+				if (size) memcpy(m_cart->c64_roml_pointer(machine(), size), get_software_region("roml"), size);
 
-			m_cart->c64_exrom_w(atol(get_feature("exrom")));
-			m_cart->c64_game_w(atol(get_feature("game")));
+				size = get_software_region_length("romh");
+				if (size) memcpy(m_cart->c64_romh_pointer(machine(), size), get_software_region("romh"), size);
+
+				size = get_software_region_length("ram");
+				if (size) memset(m_cart->c64_ram_pointer(machine(), size), 0, size);
+
+				m_cart->c64_exrom_w(atol(get_feature("exrom")));
+				m_cart->c64_game_w(atol(get_feature("game")));
+			}
 		}
 	}
 
@@ -410,18 +300,12 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 	{
 		if (!mame_stricmp(filetype(), "crt"))
 		{
-			// read the header
-			cbm_crt_header header;
-			fread(&header, CRT_HEADER_LENGTH);
-
-			if (memcmp(header.signature, CRT_SIGNATURE, 16) == 0)
-			{
-				UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
-				return CRT_C64_SLOT_NAMES[hardware];
-			}
+			return cbm_crt_get_card(m_file);
 		}
+
 		clear();
 	}
+
 	return software_get_default_slot(config, options, this, "standard");
 }
 

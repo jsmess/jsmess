@@ -22,17 +22,6 @@
 #define LOG 0
 
 
-// slot names for the VIC-20 cartridge types
-const char *CRT_VIC20_SLOT_NAMES[_CRT_VIC20_COUNT] =
-{
-	UNSUPPORTED,
-	"standard",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED
-};
-
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES

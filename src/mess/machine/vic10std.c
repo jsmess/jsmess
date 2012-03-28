@@ -29,10 +29,7 @@ const device_type VIC10_STD = &device_creator<vic10_standard_cartridge_device>;
 
 vic10_standard_cartridge_device::vic10_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, VIC10_STD, "VIC-10 Standard Cartridge", tag, owner, clock),
-	  device_vic10_expansion_card_interface(mconfig, *this),
-	  m_exram(NULL),
-	  m_lorom(NULL),
-	  m_uprom(NULL)
+	  device_vic10_expansion_card_interface(mconfig, *this)
 {
 }
 
@@ -43,21 +40,6 @@ vic10_standard_cartridge_device::vic10_standard_cartridge_device(const machine_c
 
 void vic10_standard_cartridge_device::device_start()
 {
-}
-
-
-//-------------------------------------------------
-//  vic10_exram_pointer - get expanded RAM pointer
-//-------------------------------------------------
-
-UINT8* vic10_standard_cartridge_device::vic10_exram_pointer()
-{
-	if (m_exram == NULL)
-	{
-		m_exram = auto_alloc_array(machine(), UINT8, 0x800);
-	}
-
-	return m_exram;
 }
 
 
@@ -92,21 +74,6 @@ void vic10_standard_cartridge_device::vic10_exram_w(address_space &space, offs_t
 
 
 //-------------------------------------------------
-//  vic10_lorom_pointer - get lower ROM pointer
-//-------------------------------------------------
-
-UINT8* vic10_standard_cartridge_device::vic10_lorom_pointer()
-{
-	if (m_lorom == NULL)
-	{
-		m_lorom = auto_alloc_array(machine(), UINT8, 0x2000);
-	}
-
-	return m_lorom;
-}
-
-
-//-------------------------------------------------
 //  vic10_lorom_r - lower ROM read
 //-------------------------------------------------
 
@@ -120,21 +87,6 @@ UINT8 vic10_standard_cartridge_device::vic10_lorom_r(address_space &space, offs_
 	}
 
 	return data;
-}
-
-
-//-------------------------------------------------
-//  vic10_uprom_pointer - get upper ROM pointer
-//-------------------------------------------------
-
-UINT8* vic10_standard_cartridge_device::vic10_uprom_pointer()
-{
-	if (m_uprom == NULL)
-	{
-		m_uprom = auto_alloc_array(machine(), UINT8, 0x2000);
-	}
-
-	return m_uprom;
 }
 
 
