@@ -1098,10 +1098,6 @@
 			<dataarea name="rom" size="0x10000">
 				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f" offset="0x0000" />
 			</dataarea>
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dosv201.bin" size="0x10000" crc="9810f48d" sha1="aafb1c66ea6f7d131675f6c948461ca1dc56c1e7" offset="0x0000" />
-			</dataarea>
 		</part>
 
 		<part name="flop1" interface="floppy_5_25">
