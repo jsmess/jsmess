@@ -8,9 +8,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64621" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="avengera.bin" size="0x2000" crc="e80c1019" sha1="6c715fded043e339f2b897956ffde0fac2caf25a" offset="0x0000" />
 			</dataarea>
@@ -23,9 +20,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64621" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="avenger.bin" size="0x2000" crc="d4e52fd4" sha1="78e0b6f764668d8f551810bfd62332b6059053c2" offset="0x0000" />
 			</dataarea>
@@ -37,9 +31,6 @@
 		<year>1983</year>
 		<publisher>HAL Laboratory</publisher>
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="lorom" size="0x2000">
 				<rom name="bowling.80" size="0x2000" crc="95894739" sha1="6b7bf66b094286606a10ec0345d04f725c22920e" offset="0x0000" />
 			</dataarea>
@@ -55,9 +46,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64606" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="clownsa.bin" size="0x2000" crc="d50c1428" sha1="fb48b5a639e4235ce522d62c5f8713d66102c75e" offset="0x0000" />
 			</dataarea>
@@ -70,9 +58,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64606" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="clowns.bin" size="0x2000" crc="85aa080b" sha1="ffebfc19263dc50d3a808135dbe88567617af6b8" offset="0x0000" />
 			</dataarea>
@@ -87,9 +72,6 @@
 		<info name="assy" value="326173-01" />
 
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="325351-02.u1" size="0x2000" crc="a5af43e5" sha1="d6620a6f38a14e51ed98d26a0c721f5c80fcd8f3" offset="0x0000" />
 			</dataarea>
@@ -104,9 +86,6 @@
 		<info name="assy" value="326173" />
 
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="325362-02.u1" size="0x2000" crc="f15dcfe7" sha1="7d8091a2b560644f10d39449775e6a8447e772ca" offset="0x0000" />
 			</dataarea>
@@ -119,9 +98,6 @@
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<info name="serial" value="C-64616" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="lemans.bin" size="0x2000" crc="5cdba9a9" sha1="c6a3e317a09b7232878c892b61d9d0204e482439" offset="0x0000" />
 			</dataarea>
@@ -133,9 +109,6 @@
 		<year>19??</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="lorom" size="0x2000">
 				<rom name="901230-01" size="0x2000" crc="489aab86" sha1="448e0403baed7fcdc3be6ce8497958beaf3b4566" offset="0x0000" />
 			</dataarea>
@@ -151,9 +124,6 @@
 		<year>19??</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="minibas.bin" size="0x2000" crc="65ad75c8" sha1="dd77e7b59c44a40fc77b783818f71b5e49ea820d" offset="0x0000" />
 			</dataarea>
@@ -165,9 +135,6 @@
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="moleatck.bin" size="0x2000" crc="1a26d98b" sha1="49270fd55a9be51361673d4f4722ed3101bd0b27" offset="0x0000" />
 			</dataarea>
@@ -179,9 +146,6 @@
 		<year>1982</year>
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="moneywar.bin" size="0x2000" crc="909f78c1" sha1="2449fb3ee8e502eebd6b51109d58399a6e1ad783" offset="0x0000" />
 			</dataarea>
@@ -195,9 +159,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64403" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="musicmak.bin" size="0x2000" crc="95b82cf4" sha1="a8467cf175c4e1a5560042a60268dd4db7ac58c6" offset="0x0000" />
 			</dataarea>
@@ -210,9 +171,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64402" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="musicm.bin" size="0x1000" crc="f86946a9" sha1="2592d8716331804dbc07d406e10f009ec472b7b2" offset="0x1000" />
 			</dataarea>
@@ -225,9 +183,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64614" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="omegar.bin" size="0x2000" crc="dbb11bb4" sha1="1c1d4179dce0209664e611e6fdc96b195bcf7a55" offset="0x0000" />
 			</dataarea>
@@ -240,9 +195,6 @@
 		<publisher>Commodore / HAL Laboratory</publisher>
 		<info name="serial" value="C-64617" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="lorom" size="0x2000">
 				<rom name="pinball.80" size="0x1000" crc="1dd12488" sha1="dc725c526d9359437fbe37b0635173f83dd8bcfc" offset="0x0000" />
 			</dataarea>
@@ -258,9 +210,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64605" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="radarrr2.bin" size="0x2000" crc="1f7291f5" sha1="409d70bc29134494c44d03dde47357a265089d1a" offset="0x0000" />
 			</dataarea>
@@ -273,9 +222,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64605" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="radarrr1.bin" size="0x2000" crc="bfaebf6b" sha1="aa71572d16440734ed0ed9ee253a11237765ea22" offset="0x0000" />
 			</dataarea>
@@ -288,9 +234,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64605" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="radarrr.bin" size="0x2000" crc="cf74e0a0" sha1="c7190cb744fef2e7502cbbd4ccf8042c9bf89ae3" offset="0x0000" />
 			</dataarea>
@@ -314,9 +257,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64603" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="seawolf.bin" size="0x2000" crc="10daba85" sha1="90d5665bf22c7ebc10d6ebcc533fd2e8272ab7c7" offset="0x0000" />
 			</dataarea>
@@ -329,9 +269,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64604" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="spedmath.bin" size="0x2000" crc="c2fad208" sha1="9fd52d27d11e40a12fcad5e37e5e01d00961a794" offset="0x0000" />
 			</dataarea>
@@ -343,9 +280,6 @@
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="supalien.bin" size="0x2000" crc="8d5177a1" sha1="c38aad32bfcb9a90c110ddcafa5cb73dcaba8cdd" offset="0x0000" />
 			</dataarea>
@@ -358,9 +292,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64609" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="solarsys.bin" size="0x2000" crc="400f79c8" sha1="b6d20a2b8781838186a5ad8d1494df4124c8a326" offset="0x0000" />
 			</dataarea>
@@ -373,9 +304,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64615" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="wizard of wor (japan) (max).bin" size="0x2000" crc="4178f536" sha1="65162698ec8e658aa582a5a7a209b3bda704cbb9" offset="0x0000" />
 			</dataarea>
@@ -388,9 +316,6 @@
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64615" />
 		<part name="cart" interface="vic10_cart">
-			<feature name="game" value="0" />
-			<feature name="exrom" value="1" />
-
 			<dataarea name="uprom" size="0x2000">
 				<rom name="wizard of wor (japan) (v02) (max).bin" size="0x2000" crc="5cd2948e" sha1="f0f30868331d85e29b3adfaf71bc0abeb042ff42" offset="0x0000" />
 			</dataarea>
