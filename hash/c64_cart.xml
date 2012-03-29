@@ -2,6 +2,51 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 
+	Hardware to be emulated
+
+	CPU accelerators:
+	- Turbo Master CPU (R65C02P4 @ 4.09 MHz)
+	- Turbo Process Accelerator (65C816P-4  @ 50kHz-4MHz)
+	- Flash 8 (65816 @ 8 MHz, 4/8 MB RAM)
+	- CMD SuperCPU 64 (65C816S, 64 KB RAM)
+
+	Serial I/O:
+	- CMD SwiftLink (6551 @ 3.6864 MHz)
+	- CMD Turbo232
+	- HART (8251)
+
+	RAM expansions:
+	- CMD RAMLink
+	- CMD RAMDrive
+	- Commodore REU 1700/1750/1764
+	- Rex RAM-Floppt 256K
+	- Rex Goliath 1MB
+	- NeoRAM
+	- RAM-Cart
+
+	Hard disks:
+	- Lt. Kernal
+
+	Audio:
+	- Currah Speech 64
+	- SID Symphony
+	- MSSIAH
+	- Prophet-64
+	- Model 64 Sequencer
+	- Synthetiseur Vocal
+	- 64er MIDI
+	- FB-MIDI
+	- C-LAB MIDI
+	- JMS MIDI
+	- Datel MIDI
+	- Passport MIDI
+	- Speech Maker
+
+	EPROM burners:
+	- J-R Promenade C1
+	- Rex Quickbyte 2
+	- Rex Goliath Eprommer
+
 	Missing dumps that exist as .crt but are missing from this list:
 
 	- Ariolasoft Structured BASIC

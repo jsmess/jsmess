@@ -866,7 +866,7 @@ static const m6502_interface sx64_cpu_intf =
 
 
 //-------------------------------------------------
-//  m6502_interface c64g_cpu_intf
+//  m6502_interface c64gs_cpu_intf
 //-------------------------------------------------
 
 READ8_MEMBER( c64gs_state::cpu_r )
@@ -1120,6 +1120,8 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1188,6 +1190,8 @@ static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1247,6 +1251,8 @@ static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1303,6 +1309,8 @@ static MACHINE_CONFIG_START( ntsc_c, c64c_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1359,6 +1367,8 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1418,6 +1428,8 @@ static MACHINE_CONFIG_START( pal_sx, sx64_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1474,6 +1486,8 @@ static MACHINE_CONFIG_START( pal_c, c64c_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1527,6 +1541,8 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 
