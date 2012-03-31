@@ -927,11 +927,11 @@ static WRITE8_HANDLER( avr8_write )
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( craft_prg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( craft_prg_map, AS_PROGRAM, 8, craft_state )
     AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( craft_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( craft_io_map, AS_IO, 8, craft_state )
     AM_RANGE(0x0000, 0x00ff) AM_READWRITE(avr8_read, avr8_write)
     AM_RANGE(0x0100, 0x04ff) AM_RAM
 ADDRESS_MAP_END

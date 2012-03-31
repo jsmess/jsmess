@@ -233,7 +233,7 @@ static WRITE8_HANDLER(tvlink_w)
 	}
 }
 
-static ADDRESS_MAP_START( svision_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( svision_mem , AS_PROGRAM, 8, svision_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
 	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(svision_r, svision_w) AM_BASE_MEMBER(svision_state, m_reg)
 	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(svision_state, m_videoram)
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( svision_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0xc000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tvlink_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( tvlink_mem , AS_PROGRAM, 8, svision_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM
 	AM_RANGE( 0x2000, 0x3fff) AM_READWRITE(tvlink_r, tvlink_w) AM_BASE_MEMBER(svision_state, m_reg)
 	AM_RANGE( 0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(svision_state, m_videoram)

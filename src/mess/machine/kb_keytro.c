@@ -565,11 +565,11 @@ static WRITE8_HANDLER( kb_keytronic_internal_data_w )
     ADDRESS MAPS
 *****************************************************************************/
 
-static ADDRESS_MAP_START( keytronic_program, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( keytronic_program, AS_PROGRAM, 8, kb_keytr_device )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("kb_keytr", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keytronic_io, AS_IO, 8 )
+static ADDRESS_MAP_START( keytronic_io, AS_IO, 8, kb_keytr_device )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(kb_keytronic_internal_data_r, kb_keytronic_internal_data_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(kb_keytronic_p1_r, kb_keytronic_p1_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(kb_keytronic_p2_r, kb_keytronic_p2_w)

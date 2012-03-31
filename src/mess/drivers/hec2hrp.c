@@ -85,7 +85,7 @@
 #include "includes/hec2hrp.h"
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hecdisc2_io , AS_IO, 8)
+static ADDRESS_MAP_START( hecdisc2_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// ROM Page managing
@@ -116,7 +116,7 @@ AM_RANGE(0x070,0x07F) AM_READWRITE( hector_disc2_io70_port_r, hector_disc2_io70_
 ADDRESS_MAP_END
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
@@ -163,19 +163,19 @@ static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_BASE_MEMBER(hec2hrp_state, m_hector_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2hrp_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2hrp_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2hrx_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2hrx_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
@@ -184,14 +184,14 @@ static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8)
 	AM_RANGE(0x0f0,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mx40_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2mx40_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ef) AM_WRITE(     hector_mx40_io_port_w )
 	AM_RANGE(0x0f0,0x0f3) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mx80_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2mx80_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ef) AM_WRITE(     hector_mx80_io_port_w )

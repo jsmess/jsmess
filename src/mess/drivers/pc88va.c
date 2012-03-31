@@ -528,7 +528,7 @@ static WRITE16_HANDLER( sys_mem_w )
 	}
 }
 
-static ADDRESS_MAP_START( pc88va_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pc88va_map, AS_PROGRAM, 16, pc88va_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 //  AM_RANGE(0x80000, 0x9ffff) AM_RAM // EMM
 	AM_RANGE(0xa0000, 0xdffff) AM_READWRITE(sys_mem_r,sys_mem_w)
@@ -1065,7 +1065,7 @@ static WRITE8_HANDLER( sys_port1_w )
 	// ...
 }
 
-static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //  AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
 	AM_RANGE(0x0020, 0x0021) AM_NOP // RS-232C
@@ -1138,7 +1138,7 @@ ADDRESS_MAP_END
 // (*) are specific N88 V1 / V2 ports
 
 /* FDC subsytem CPU */
-static ADDRESS_MAP_START( pc88va_z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc88va_z80_map, AS_PROGRAM, 8, pc88va_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1149,7 +1149,7 @@ static WRITE8_HANDLER( fdc_irq_vector_w )
 	state->m_fdc_irq_opcode = data;
 }
 
-static ADDRESS_MAP_START( pc88va_z80_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pc88va_z80_io_map, AS_IO, 8, pc88va_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 //  AM_RANGE(0xf4, 0xf4) // Drive Control Port

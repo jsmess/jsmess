@@ -46,7 +46,7 @@ public:
 
 };
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, genpc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16, genpc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
@@ -67,11 +67,11 @@ static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8)
+static ADDRESS_MAP_START(pc8_io, AS_IO, 8, genpc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc16_io, AS_IO, 16)
+static ADDRESS_MAP_START(pc16_io, AS_IO, 16, genpc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

@@ -96,7 +96,7 @@ static WRITE8_DEVICE_HANDLER( tank8_motor_w )
 	discrete_sound_w(device, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
-static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x17ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -484,8 +484,8 @@ static DRIVER_INIT( decode )
 }
 
 
-GAME( 1976, tank8,    0,        tank8,    tank8,    0,	      ROT0, "Atari", "Tank 8 (set 1)", 0)
-GAME( 1976, tank8a,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari", "Tank 8 (set 2)",  GAME_NOT_WORKING )
-GAME( 1976, tank8b,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari", "Tank 8 (set 3)",  GAME_NOT_WORKING )
-GAME( 1976, tank8c,   tank8,    tank8,    tank8,    0,        ROT0, "Atari", "Tank 8 (set 4)",  GAME_NOT_WORKING )
-GAME( 1976, tank8d,   tank8,    tank8,    tank8,    0,        ROT0, "Atari", "Tank 8 (set 5)",  GAME_NOT_WORKING )
+GAME( 1976, tank8,    0,        tank8,    tank8,    0,	      ROT0, "Atari (Kee Games)", "Tank 8 (set 1)", 0)
+GAME( 1976, tank8a,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  GAME_NOT_WORKING )
+GAME( 1976, tank8b,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  GAME_NOT_WORKING )
+GAME( 1976, tank8c,   tank8,    tank8,    tank8,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  GAME_NOT_WORKING )
+GAME( 1976, tank8d,   tank8,    tank8,    tank8,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  GAME_NOT_WORKING )

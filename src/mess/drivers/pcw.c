@@ -203,7 +203,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcw_fdc_interrupt )
     block 3 could be paged into any bank, and this explains the
     setup of the memory below.
 */
-static ADDRESS_MAP_START(pcw_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(pcw_map, AS_PROGRAM, 8, pcw_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -1007,7 +1007,7 @@ static WRITE8_HANDLER(pcw9512_parallel_w)
 	logerror("pcw9512 parallel w: offs: %04x data: %02x\n",offset,data);
 }
 
-static ADDRESS_MAP_START(pcw_io, AS_IO, 8)
+static ADDRESS_MAP_START(pcw_io, AS_IO, 8, pcw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
@@ -1023,7 +1023,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8)
+static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8, pcw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000, 0x07f) AM_READWRITE(pcw_fdc_r,					pcw_fdc_w)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,			pcw_expansion_w)
@@ -1037,14 +1037,14 @@ static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8)
 ADDRESS_MAP_END
 
 /* i8041 MCU */
-static ADDRESS_MAP_START(pcw_printer_io, AS_IO, 8)
+static ADDRESS_MAP_START(pcw_printer_io, AS_IO, 8, pcw_state )
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_printer_p2_r,mcu_printer_p2_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_printer_p1_r, mcu_printer_p1_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_printer_t1_r)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mcu_printer_t0_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pcw_keyboard_io, AS_IO, 8)
+static ADDRESS_MAP_START(pcw_keyboard_io, AS_IO, 8, pcw_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mcu_kb_scan_r,mcu_kb_scan_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_kb_scan_high_r,mcu_kb_scan_high_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mcu_kb_t1_r)

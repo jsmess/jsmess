@@ -538,7 +538,7 @@ void ts2068_update_memory(running_machine &machine)
 	}
 }
 
-static ADDRESS_MAP_START(ts2068_io, AS_IO, 8)
+static ADDRESS_MAP_START(ts2068_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x1f, 0x1f) AM_READ( spectrum_port_1f_r ) AM_MIRROR(0xff00)
 	AM_RANGE(0x7f, 0x7f) AM_READ( spectrum_port_7f_r ) AM_MIRROR(0xff00)
 	AM_RANGE(0xdf, 0xdf) AM_READ( spectrum_port_df_r ) AM_MIRROR(0xff00)
@@ -549,7 +549,7 @@ static ADDRESS_MAP_START(ts2068_io, AS_IO, 8)
 	AM_RANGE(0xff, 0xff) AM_READWRITE( ts2068_port_ff_r,ts2068_port_ff_w ) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ts2068_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(ts2068_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
 	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
@@ -585,7 +585,7 @@ static WRITE8_HANDLER( tc2048_port_ff_w )
 	logerror("Port %04x write %02x\n", offset, data);
 }
 
-static ADDRESS_MAP_START(tc2048_io, AS_IO, 8)
+static ADDRESS_MAP_START(tc2048_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
@@ -593,7 +593,7 @@ static ADDRESS_MAP_START(tc2048_io, AS_IO, 8)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tc2048_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tc2048_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE( 0x0000, 0x3fff) AM_ROM
 	AM_RANGE( 0x4000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END

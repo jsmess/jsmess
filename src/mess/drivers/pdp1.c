@@ -57,7 +57,7 @@ and the java source).
  */
 
 
-static ADDRESS_MAP_START(pdp1_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(pdp1_map, AS_PROGRAM, 32, pdp1_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 

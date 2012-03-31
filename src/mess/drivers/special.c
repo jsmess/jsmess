@@ -25,7 +25,7 @@
 #include "machine/ram.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
     AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, m_specialist_video_ram) // Video RAM
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8)
     AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, m_specialist_video_ram) // Video RAM
@@ -43,7 +43,7 @@ static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8)
     AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(erik_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(erik_mem, AS_PROGRAM, 8, special_state )
     AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
     AM_RANGE( 0x4000, 0x8fff ) AM_RAMBANK("bank2")
     AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank3")
@@ -52,7 +52,7 @@ static ADDRESS_MAP_START(erik_mem, AS_PROGRAM, 8)
     AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank6")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( erik_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( erik_io_map, AS_IO, 8, special_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(erik_rr_reg_r, erik_rr_reg_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(erik_rc_reg_r, erik_rc_reg_w)
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( erik_io_map, AS_IO, 8 )
 	AM_RANGE(0xf7, 0xf7) AM_DEVREADWRITE("wd1793", wd17xx_data_r, wd17xx_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x8fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank2")

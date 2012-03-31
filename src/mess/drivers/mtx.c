@@ -42,7 +42,7 @@
     ADDRESS_MAP( mtx_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( mtx_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mtx_mem, AS_PROGRAM, 8, mtx_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
@@ -54,7 +54,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( mtx_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( mtx_io, AS_IO, 8 )
+static ADDRESS_MAP_START( mtx_io, AS_IO, 8, mtx_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD(CENTRONICS_TAG, mtx_strobe_r) AM_WRITE(mtx_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, vram_read, vram_write)
@@ -82,7 +82,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( rs128_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( rs128_io, AS_IO, 8 )
+static ADDRESS_MAP_START( rs128_io, AS_IO, 8, mtx_state )
 	AM_IMPORT_FROM(mtx_io)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
 ADDRESS_MAP_END

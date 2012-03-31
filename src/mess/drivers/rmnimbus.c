@@ -102,7 +102,7 @@ static const centronics_interface nimbus_centronics_config =
 	DEVCB_NULL
 };
 
-static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16, rmnimbus_state )
     AM_RANGE( 0x00000, 0x1FFFF ) AM_RAMBANK(RAM_BANK00_TAG)
     AM_RANGE( 0x20000, 0x3FFFF ) AM_RAMBANK(RAM_BANK01_TAG)
     AM_RANGE( 0x40000, 0x5FFFF ) AM_RAMBANK(RAM_BANK02_TAG)
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16)
     AM_RANGE( 0xF0000, 0xFFFFF ) AM_ROM AM_REGION(MAINCPU_TAG, 0x0f0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(nimbus_io, AS_IO, 16)
+static ADDRESS_MAP_START(nimbus_io, AS_IO, 16, rmnimbus_state )
     AM_RANGE( 0x0000, 0x0031) AM_READWRITE( nimbus_video_io_r, nimbus_video_io_w)
     AM_RANGE( 0x0032, 0x007f) AM_READWRITE( nimbus_io_r, nimbus_io_w)
     AM_RANGE( 0x0080, 0x0081) AM_READWRITE8( nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
@@ -271,13 +271,13 @@ static INPUT_PORTS_START( nimbus )
 
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(nimbus_iocpu_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(nimbus_iocpu_mem, AS_PROGRAM, 8, rmnimbus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8)
+static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x000FF) AM_READWRITE(nimbus_pc8031_iou_r, nimbus_pc8031_iou_w)
 	AM_RANGE(0x00010, 0x07fff) AM_RAM

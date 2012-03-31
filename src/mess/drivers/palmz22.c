@@ -256,7 +256,7 @@ static MACHINE_RESET( palmz22 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( palmz22_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( palmz22_map, AS_PROGRAM, 32, palmz22_state )
 	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM
 ADDRESS_MAP_END
 

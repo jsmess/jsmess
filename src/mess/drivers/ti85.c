@@ -193,7 +193,7 @@ TI-86 ports:
 
 /* port i/o functions */
 
-static ADDRESS_MAP_START( ti81_io, AS_IO, 8)
+static ADDRESS_MAP_START( ti81_io, AS_IO, 8, ti85_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti85_port_0000_r, ti85_port_0000_w )
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( ti81_io, AS_IO, 8)
 	AM_RANGE(0x0007, 0x0007) AM_WRITE( ti81_port_0007_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti85_io, AS_IO, 8)
+static ADDRESS_MAP_START( ti85_io, AS_IO, 8, ti85_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti85_port_0000_r, ti85_port_0000_w )
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( ti85_io, AS_IO, 8)
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE( ti8x_serial_r, ti8x_serial_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti82_io, AS_IO, 8)
+static ADDRESS_MAP_START( ti82_io, AS_IO, 8, ti85_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti8x_serial_r, ti8x_serial_w )
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( ti82_io, AS_IO, 8)
 	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti81v2_io, AS_IO, 8)
+static ADDRESS_MAP_START( ti81v2_io, AS_IO, 8, ti85_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE( ti82_port_0002_r, ti82_port_0002_w )
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( ti81v2_io, AS_IO, 8)
 	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti83_io, AS_IO, 8)
+static ADDRESS_MAP_START( ti83_io, AS_IO, 8, ti85_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti83_port_0000_r, ti83_port_0000_w )	//TODO
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( ti83_io, AS_IO, 8)
 	AM_RANGE(0x0014, 0x0014) AM_READ_PORT( "BATTERY" )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti83p_io, AS_IO, 8)
+static ADDRESS_MAP_START( ti83p_io, AS_IO, 8, ti85_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti8x_plus_serial_r, ti8x_plus_serial_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( ti83p_io, AS_IO, 8)
 	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE_MODERN("t6a04", t6a04_device, data_read, data_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti86_io, AS_IO, 8)
+static ADDRESS_MAP_START( ti86_io, AS_IO, 8, ti85_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE( ti85_port_0000_r, ti85_port_0000_w )
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE( ti8x_keypad_r, ti8x_keypad_w )
@@ -276,13 +276,13 @@ ADDRESS_MAP_END
 
 /* memory w/r functions */
 
-static ADDRESS_MAP_START( ti81_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( ti81_mem , AS_PROGRAM, 8, ti85_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ti86_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( ti86_mem , AS_PROGRAM, 8, ti85_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")

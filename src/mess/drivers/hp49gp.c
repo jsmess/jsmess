@@ -251,7 +251,7 @@ static MACHINE_RESET( hp49gp )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hp49gp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( hp49gp_map, AS_PROGRAM, 32, hp49gp_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM
 	AM_RANGE(0x08020000, 0x0803ffff) AM_RAM

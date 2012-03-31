@@ -46,7 +46,7 @@ static PALETTE_INIT( electron )
 	palette_set_colors(machine, 0, electron_palette, ARRAY_LENGTH(electron_palette));
 }
 
-static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8, electron_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_REGION("maincpu",  0x00000)	/* 32KB of RAM */
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")								/* Banked ROM pages */
 	AM_RANGE(0xc000, 0xfbff) AM_ROM AM_REGION("user1", 0x40000)	/* OS ROM */

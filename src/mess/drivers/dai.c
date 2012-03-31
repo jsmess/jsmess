@@ -69,11 +69,11 @@ Timings:
 #include "machine/ram.h"
 
 /* I/O ports */
-static ADDRESS_MAP_START( dai_io , AS_IO, 8)
+static ADDRESS_MAP_START( dai_io , AS_IO, 8, dai_state )
 ADDRESS_MAP_END
 
 /* memory w/r functions */
-static ADDRESS_MAP_START( dai_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( dai_mem , AS_PROGRAM, 8, dai_state )
 	AM_RANGE( 0x0000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff) AM_ROM
 	AM_RANGE( 0xe000, 0xefff) AM_ROMBANK("bank2")

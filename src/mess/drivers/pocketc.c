@@ -80,42 +80,42 @@
 /* special keys
    red c-ce and reset; warm boot, program NOT lost*/
 
-static ADDRESS_MAP_START( pc1401_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1401_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x3800, 0x47ff) AM_RAM
 	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE( pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1402_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1402_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x2000, 0x47ff) AM_RAM
 	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE( pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1250_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1250_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM
 	AM_RANGE( 0xc000, 0xc7ff) AM_RAM // 2KB RAM
 	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1251_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1251_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM
 	AM_RANGE( 0xb800, 0xc7ff) AM_RAM // 4KB RAM
 	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1255_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1255_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM
 	AM_RANGE( 0xa000, 0xc7ff) AM_RAM // 10KB RAM
 	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1260_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1260_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
 	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( pc1260_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1261_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1261_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
 	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE( pc1251_lcd_read, pc1251_lcd_write)
@@ -132,13 +132,13 @@ static ADDRESS_MAP_START( pc1261_mem , AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pc1350_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1350_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x7000, 0x7eff) AM_READWRITE( pc1350_lcd_read, pc1350_lcd_write )
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1403_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1403_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE( pc1403_lcd_read, pc1403_lcd_write )
 	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE( pc1403_asic_read, pc1403_asic_write )
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( pc1403_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1403h_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1403h_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE( pc1403_lcd_read, pc1403_lcd_write )
 	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE( pc1403_asic_read, pc1403_asic_write )
@@ -156,13 +156,13 @@ ADDRESS_MAP_END
 
 
 #if 0
-static ADDRESS_MAP_START( pc1421_readmem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1421_readmem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_READ( SMH_ROM )
 	AM_RANGE( 0x3800, 0x47ff) AM_READ( SMH_RAM )
 	AM_RANGE( 0x8000, 0xffff) AM_READ( SMH_ROM )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1421_writemem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pc1421_writemem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_WRITE( SMH_ROM )
 	AM_RANGE( 0x2000, 0x37ff) AM_WRITE( SMH_RAM )
 	AM_RANGE( 0x3800, 0x47ff) AM_WRITE( SMH_RAM )

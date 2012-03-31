@@ -62,7 +62,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "machine/kb_keytro.h"
 #include "machine/ram.h"
 
-static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x80000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ppc512_io, AS_IO, 16)
+static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START(ppc512_io, AS_IO, 16)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc200_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pc200_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( pc200_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc200_io, AS_IO, 16)
+static ADDRESS_MAP_START(pc200_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)

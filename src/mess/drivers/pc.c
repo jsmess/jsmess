@@ -98,7 +98,7 @@ video HW too.
 #include "machine/kb_keytro.h"
 #include "machine/ram.h"
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oliv_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( oliv_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( oliv_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8)
+static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", i8237_r, i8237_w)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
@@ -172,11 +172,11 @@ static ADDRESS_MAP_START(pc8_io, AS_IO, 8)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(oliv_io, AS_IO, 8)
+static ADDRESS_MAP_START(oliv_io, AS_IO, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc16_io, AS_IO, 16)
+static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ibm5550_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ibm5550_map, AS_PROGRAM, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xeffff) AM_RAM
@@ -212,7 +212,7 @@ static READ8_HANDLER( unk_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16)
+static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8, pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
@@ -247,7 +247,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(europc_io, AS_IO, 8)
+static ADDRESS_MAP_START(europc_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", i8237_r, i8237_w)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
@@ -268,7 +268,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(tandy1000_map, AS_PROGRAM, 8, pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
@@ -281,7 +281,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8)
+static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", i8237_r, i8237_w)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
@@ -298,7 +298,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_16_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START(tandy1000_16_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
@@ -311,7 +311,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16)
+static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
@@ -329,7 +329,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_286_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START(tandy1000_286_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
@@ -342,7 +342,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16)
+static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
@@ -358,7 +358,7 @@ static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
@@ -372,7 +372,7 @@ static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8)
+static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
@@ -387,12 +387,12 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE_MODERN("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pc_state )
 	AM_RANGE(0x80000, 0x9ffff) AM_ROM AM_REGION("kanji",0)
 	AM_IMPORT_FROM( ibmpcjr_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8 )
+static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pc_state )
 	AM_IMPORT_FROM( ibmpcjr_io )
 ADDRESS_MAP_END
 

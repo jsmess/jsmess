@@ -1065,7 +1065,7 @@ static GFXDECODE_START( chess_lcd )
     GFXDECODE_ENTRY( "hd44780", 0x0000, chess_charlayout, 0, 1 )
 GFXDECODE_END
 
-static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE ( mboard_write_LED_8 )		// Chessboard
 	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE ( mboard_write_board_8)		// Chessboard
@@ -1077,7 +1077,7 @@ static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sfortea_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(sfortea_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fef ) AM_RAM
 	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE ( write_latch_sfortea)	// IO control
 	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE ( write_lcd_IO_sfortea)	// LCD Char Reg.
@@ -1088,7 +1088,7 @@ static ADDRESS_MAP_START(sfortea_mem , AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0003ffff )  AM_ROM
 
@@ -1110,7 +1110,7 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32)
 
  ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
 	AM_RANGE( 0x800000 , 0x800003 )  AM_READ     ( read_keys_BPL32 )
@@ -1123,7 +1123,7 @@ static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32)
 
  ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0003ffff )  AM_ROM
 
@@ -1143,7 +1143,7 @@ static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32)
  ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_ROM
 
@@ -1162,7 +1162,7 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32)
 
  ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x02000000,  0x0201ffff )  AM_ROM AM_REGION("maincpu", 0) // AM_MIRROR(0x2000000)
 	AM_RANGE( 0x01000000,  0x01000003 )  AM_WRITE	( write_1000000 )
@@ -1171,7 +1171,7 @@ static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32)
 
  ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
 
@@ -1190,7 +1190,7 @@ static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16)
 
  ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, polgar_state )
 
 	AM_RANGE( 0x000000,  0x01ffff )  AM_ROM
 
@@ -1210,7 +1210,7 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1f9f ) AM_RAM
 	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE ( milano_write_board )		// Chessboard
 	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ ( milano_read_board )		// Chessboard
@@ -1222,7 +1222,7 @@ static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ ( read_keys_board_academy )
 	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE ( academy_write_board )		// Chessboard
@@ -1234,7 +1234,7 @@ static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(monteciv_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(monteciv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x2400, 0x2400 ) AM_READ ( read_keys_board_monteciv )
 	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE ( academy_write_board )		// Chessboard
@@ -1250,7 +1250,7 @@ static ADDRESS_MAP_START(monteciv_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 /// AM_RANGE( 0x2400, 0x2400 ) AM_READ ( read_keys_board_monteciv )
 	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE ( academy_write_board )	// 2800 // Chessboard
@@ -1268,7 +1268,7 @@ static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(diablo68_mem , AS_PROGRAM, 16)
+static ADDRESS_MAP_START(diablo68_mem , AS_PROGRAM, 16, polgar_state )
 	AM_RANGE( 0x00000000, 0x0000ffff ) AM_ROM // OS
 //  AM_RANGE( 0x00200000, 0x0020ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x00ff0000, 0x00ff7fff ) AM_ROM AM_REGION("maincpu",10000) // Opening Book

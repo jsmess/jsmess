@@ -19,7 +19,7 @@ static READ32_HANDLER( dd_null_r )
 	return 0xffffffff;
 }
 
-static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(&rdram)				// RDRAM
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("dmem")					// RSP DMEM
@@ -39,7 +39,7 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(&rdram)				// RDRAM
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("dmem")					// RSP DMEM
@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("dmem")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("imem")
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_BASE(&rsp_dmem) AM_SHARE("dmem")

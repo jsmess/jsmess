@@ -1136,7 +1136,7 @@ static  READ8_HANDLER(current_bank_r)
 	return state->m_current_bank;
 }
 
-static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_BASE_MEMBER(a2600_state, m_riot_ram)

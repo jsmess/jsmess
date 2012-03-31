@@ -450,7 +450,7 @@ static WRITE32_HANDLER( int_w )
 	mame_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
 }
 
-static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32, ip20_state )
 	AM_RANGE( 0x00000000, 0x001fffff ) AM_RAM AM_SHARE("share10")
 	AM_RANGE( 0x08000000, 0x08ffffff ) AM_RAM AM_SHARE("share5")
 	AM_RANGE( 0x09000000, 0x097fffff ) AM_RAM AM_SHARE("share6")

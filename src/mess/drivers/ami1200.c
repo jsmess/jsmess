@@ -119,7 +119,7 @@ static WRITE8_DEVICE_HANDLER( ami1200_cia_0_portb_w )
 	logerror("%s:CIA0_portb_w(%02x)\n", device->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, ami1200_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(ami1200_state, m_chip_ram, m_chip_ram_size)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)

@@ -136,7 +136,7 @@ When the prompt returns, press Stop.
 
 /* memory w/r functions */
 
-static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8, apple1_state )
 	AM_RANGE(0x0000, 0xbfff) AM_NOP
 
 	/* Cassette interface I/O space: */

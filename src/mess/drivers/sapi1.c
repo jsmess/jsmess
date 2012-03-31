@@ -43,7 +43,7 @@ static WRITE8_HANDLER( sapizps3_25_w )
 
 
 /* Address maps */
-static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
@@ -56,11 +56,11 @@ static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapi1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sapi1_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sapizps3_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(sapizps3_mem, AS_PROGRAM, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xe7ff) AM_RAM
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START(sapizps3_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sapizps3_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sapizps3_io, AS_IO, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sapizps3_00_w)

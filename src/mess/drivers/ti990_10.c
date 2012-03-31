@@ -161,7 +161,7 @@ static SCREEN_UPDATE_IND16( ti990_10 )
   Memory map - see description above
 */
 
-static ADDRESS_MAP_START(ti990_10_memmap, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(ti990_10_memmap, AS_PROGRAM, 16, ti990_10_state )
 
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM		/* let's say we have 1MB of RAM */
 	AM_RANGE(0x100000, 0x1ff7ff) AM_NOP		/* free TILINE space */
@@ -178,7 +178,7 @@ ADDRESS_MAP_END
   CRU map
 */
 
-static ADDRESS_MAP_START(ti990_10_io, AS_IO, 8)
+static ADDRESS_MAP_START(ti990_10_io, AS_IO, 8, ti990_10_state )
 	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_cru_r)
 	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_cru_w)
 	AM_RANGE(0x1fa, 0x1fb) AM_READ(ti990_10_mapper_cru_r)

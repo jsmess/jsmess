@@ -29,7 +29,7 @@
 const device_type EF9345 = &device_creator<ef9345_device>;
 
 // default address map
-static ADDRESS_MAP_START( ef9345, AS_0, 8 )
+static ADDRESS_MAP_START( ef9345, AS_0, 8, ef9345_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 

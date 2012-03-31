@@ -16,12 +16,12 @@
 #include "includes/irisha.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(irisha_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(irisha_mem, AS_PROGRAM, 8, irisha_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM  // ROM
 	AM_RANGE( 0x4000, 0xffff ) AM_RAM  // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( irisha_io , AS_IO, 8)
+static ADDRESS_MAP_START( irisha_io , AS_IO, 8, irisha_state )
 	AM_RANGE( 0x04, 0x05) AM_READ(irisha_keyboard_r)
 	AM_RANGE( 0x06, 0x06) AM_DEVREADWRITE_MODERN("uart",i8251_device, data_r, data_w)
 	AM_RANGE( 0x07, 0x07) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)

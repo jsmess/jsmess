@@ -913,7 +913,7 @@ static WRITE8_HANDLER( pc8801_mem_w )
 	}
 }
 
-static ADDRESS_MAP_START( pc8801_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8801_mem, AS_PROGRAM, 8, pc8801_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8801_mem_r,pc8801_mem_w)
 ADDRESS_MAP_END
 
@@ -1410,7 +1410,7 @@ static WRITE8_HANDLER( pc8801_rtc_w )
 	/* TODO: remaining bits */
 }
 
-static ADDRESS_MAP_START( pc8801_io, AS_IO, 8 )
+static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("KEY0")
@@ -1536,7 +1536,7 @@ static I8255A_INTERFACE( slave_fdd_intf )
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
-static ADDRESS_MAP_START( pc8801fdc_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pc8801fdc_mem, AS_PROGRAM, 8, pc8801_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
@@ -1580,7 +1580,7 @@ static WRITE8_HANDLER( fdc_drive_mode_w )
 		printf("drive 1 sets up %s floppy format\n",data & 2 ? "2hd" : "2dd");
 }
 
-static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8 )
+static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8, pc8801_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd

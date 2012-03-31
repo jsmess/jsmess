@@ -844,7 +844,7 @@ static GFXDECODE_START( apexc )
 GFXDECODE_END
 
 
-static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32, apexc_state )
 #if 0
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	/* 1024 32-bit words (expandable to 8192) */
 	AM_RANGE(0x0400, 0x1fff) AM_NOP
@@ -854,7 +854,7 @@ static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32)
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8)
+static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8, apexc_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("tape_reader",tape_read)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("tape_puncher",tape_write)
 ADDRESS_MAP_END

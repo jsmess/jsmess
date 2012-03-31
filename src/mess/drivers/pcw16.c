@@ -152,7 +152,7 @@ static TIMER_DEVICE_CALLBACK(pcw16_timer_callback)
 	}
 }
 
-static ADDRESS_MAP_START(pcw16_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(pcw16_map, AS_PROGRAM, 8, pcw16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -1289,7 +1289,7 @@ static const ins8250_interface pcw16_com_interface[2]=
 
 
 
-static ADDRESS_MAP_START(pcw16_io, AS_IO, 8)
+static ADDRESS_MAP_START(pcw16_io, AS_IO, 8, pcw16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* super i/o chip */
 	AM_RANGE(0x01a, 0x01a) AM_WRITE(pcw16_superio_fdc_digital_output_register_w)

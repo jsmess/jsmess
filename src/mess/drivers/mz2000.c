@@ -326,12 +326,12 @@ static WRITE8_HANDLER( mz2000_gvram_mask_w )
 	state->m_gvram_mask = data;
 }
 
-static ADDRESS_MAP_START(mz2000_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(mz2000_map, AS_PROGRAM, 8, mz2000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(mz2000_mem_r,mz2000_mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz2000_io, AS_IO, 8)
+static ADDRESS_MAP_START(mz2000_io, AS_IO, 8, mz2000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", mz2000_wd17xx_r, mz2000_wd17xx_w)

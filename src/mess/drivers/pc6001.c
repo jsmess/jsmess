@@ -772,7 +772,7 @@ static WRITE8_HANDLER(nec_ppi8255_w)
 	state->m_ppi->write(*space,offset,data);
 }
 
-static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("cart_img",0)
@@ -780,7 +780,7 @@ static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8)
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(pc6001_state, m_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc6001_io , AS_IO, 8)
+static ADDRESS_MAP_START( pc6001_io , AS_IO, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
@@ -1330,7 +1330,7 @@ static READ8_HANDLER( pc6001m2_bank_w0_r )
 	return state->m_bank_w;
 }
 
-static ADDRESS_MAP_START(pc6001m2_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(pc6001m2_map, AS_PROGRAM, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(work_ram0_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(work_ram1_w)
@@ -1342,7 +1342,7 @@ static ADDRESS_MAP_START(pc6001m2_map, AS_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(work_ram7_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8)
+static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
@@ -1385,7 +1385,7 @@ static WRITE8_HANDLER( pc6601_fdc_w )
 {
 }
 
-static ADDRESS_MAP_START( pc6601_io , AS_IO, 8)
+static ADDRESS_MAP_START( pc6601_io , AS_IO, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
@@ -1590,7 +1590,7 @@ static WRITE8_HANDLER(necsr_ppi8255_w)
 }
 
 
-static ADDRESS_MAP_START(pc6001sr_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(pc6001sr_map, AS_PROGRAM, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(sr_work_ram0_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(sr_work_ram1_w)
@@ -1602,7 +1602,7 @@ static ADDRESS_MAP_START(pc6001sr_map, AS_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(sr_work_ram7_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8)
+static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc6001sr_bank_rn_r,pc6001sr_bank_rn_w)

@@ -1155,7 +1155,7 @@ static const floppy_interface mz2500_floppy_interface =
 	NULL
 };
 
-static ADDRESS_MAP_START(mz2500_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(mz2500_map, AS_PROGRAM, 8, mz2500_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(bank0_r,bank0_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bank1_r,bank1_w)
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(bank2_r,bank2_w)
@@ -1470,7 +1470,7 @@ static WRITE8_HANDLER( mz2500_emm_data_w )
 		emm_ram[state->m_emm_offset] = data;
 }
 
-static ADDRESS_MAP_START(mz2500_io, AS_IO, 8)
+static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)

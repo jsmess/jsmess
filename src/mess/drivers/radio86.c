@@ -19,7 +19,7 @@
 #include "includes/radio86.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(radio86_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(radio86_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
@@ -29,17 +29,17 @@ static ADDRESS_MAP_START(radio86_mem, AS_PROGRAM, 8)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( radio86_io , AS_IO, 8)
+static ADDRESS_MAP_START( radio86_io , AS_IO, 8, radio86_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(radio_io_r,radio_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rk7007_io , AS_IO, 8)
+static ADDRESS_MAP_START( rk7007_io , AS_IO, 8, radio86_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x80, 0x83 ) AM_DEVREADWRITE_MODERN("ms7007", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(radio86rom_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(radio86rom_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
@@ -49,7 +49,7 @@ static ADDRESS_MAP_START(radio86rom_mem, AS_PROGRAM, 8)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(radio86ram_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(radio86ram_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0xdfff ) AM_RAM  // RAM
     AM_RANGE( 0xe000, 0xe7ff ) AM_ROM  // System ROM page 2
@@ -62,7 +62,7 @@ static ADDRESS_MAP_START(radio86ram_mem, AS_PROGRAM, 8)
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM page 1
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(radio86_16_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(radio86_16_mem, AS_PROGRAM, 8, radio86_state )
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x3fff ) AM_RAM  // RAM
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START(radio86_16_mem, AS_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(mikron2_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(mikron2_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START(mikron2_mem, AS_PROGRAM, 8)
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(impuls03_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(impuls03_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)

@@ -1116,7 +1116,7 @@ static WRITE8_HANDLER( pc9801_opn_w )
 }
 
 
-static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
 	AM_RANGE(0xa0000, 0xa3fff) AM_READWRITE8(pc9801_tvram_r,pc9801_tvram_w,0xffff) //TVRAM
 	AM_RANGE(0xa8000, 0xbffff) AM_READWRITE8(pc9801_gvram_r,pc9801_gvram_w,0xffff) //bitmap VRAM
@@ -1127,7 +1127,7 @@ static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* first device is even offsets, second one is odd offsets */
-static ADDRESS_MAP_START( pc9801_io, AS_IO, 16)
+static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,pc9801_00_w,0xffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,pc9801_20_w,0xffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801_30_r,pc9801_30_w,0xffff) //i8251 RS232c / i8255 system port
@@ -1458,11 +1458,11 @@ static WRITE8_HANDLER( pc9801rs_a0_w )
 	pc9801_a0_w(space,offset,data);
 }
 
-static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32)
+static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
@@ -1518,12 +1518,12 @@ static WRITE8_HANDLER( pc9801ux_memory_w )
 
 }
 
-static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
 	/* TODO! */
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE8(pc980ux_memory_r,pc9801ux_memory_w,0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16)
+static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffff) //i8251 RS232c / i8255 system port
@@ -1612,11 +1612,11 @@ static READ8_HANDLER( ide_status_r )
 	return 0x50; // status
 }
 
-static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc9821_io, AS_IO, 32)
+static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
@@ -1680,11 +1680,11 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32)
 //  AM_RANGE(0xfcd0, 0xfcd3) MIDI port, option F / <undefined>
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8 )
+static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, pc9801_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE_MEMBER(pc9801_state, m_video_ram_1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8 )
+static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, pc9801_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE_MEMBER(pc9801_state, m_video_ram_2)
 ADDRESS_MAP_END
 

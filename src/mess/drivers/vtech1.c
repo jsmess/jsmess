@@ -693,7 +693,7 @@ static DRIVER_INIT( vtech1h )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
@@ -704,7 +704,7 @@ static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
@@ -715,7 +715,7 @@ static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laser310_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( laser310_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
@@ -726,7 +726,7 @@ static ADDRESS_MAP_START( laser310_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xf8ff, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vtech1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( vtech1_io, AS_IO, 8, vtech1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("centronics", vtech1_printer_r)
 	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE("centronics", vtech1_strobe_w)
@@ -738,7 +738,7 @@ static ADDRESS_MAP_START( vtech1_io, AS_IO, 8 )
 	AM_RANGE(0x70, 0x7f) AM_WRITE(vtech1_memory_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vtech1_shrg_io, AS_IO, 8 )
+static ADDRESS_MAP_START( vtech1_shrg_io, AS_IO, 8, vtech1_state )
 	AM_IMPORT_FROM(vtech1_io)
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(vtech1_video_bank_w)
 ADDRESS_MAP_END

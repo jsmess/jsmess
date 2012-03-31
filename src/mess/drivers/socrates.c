@@ -655,7 +655,7 @@ static WRITE8_HANDLER(socrates_sound_w)
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, socrates_state )
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
     AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
@@ -663,7 +663,7 @@ static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8)
     AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3") /* banked ram 'window' 1 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io, AS_IO, 8)
+static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */

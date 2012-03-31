@@ -158,7 +158,7 @@ static WRITE64_HANDLER( dc_arm_w )
 	}
  }
 
-static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)	// flash
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
@@ -197,11 +197,11 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64 )
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_port, AS_IO, 64 )
+static ADDRESS_MAP_START( dc_port, AS_IO, 64, dc_state )
 	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE( dc_pdtra_r, dc_pdtra_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(dc_state, dc_sound_ram)		/* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE("aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END

@@ -12,7 +12,7 @@
 #include "sound/wave.h"
 #include "includes/poly88.h"
 
-static ADDRESS_MAP_START(poly88_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(poly88_mem, AS_PROGRAM, 8, poly88_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0400, 0x0bff) AM_ROM // ROM Expansion
@@ -23,7 +23,7 @@ static ADDRESS_MAP_START(poly88_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_BASE_MEMBER(poly88_state, m_video_ram) // Video RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poly88_io, AS_IO, 8)
+static ADDRESS_MAP_START( poly88_io, AS_IO, 8, poly88_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( poly88_io, AS_IO, 8)
 	AM_RANGE(0xf8, 0xf8) AM_READ(poly88_keyboard_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(poly8813_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(poly8813_mem, AS_PROGRAM, 8, poly88_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0400, 0x0bff) AM_ROM // Disk System ROM
@@ -42,7 +42,7 @@ static ADDRESS_MAP_START(poly8813_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poly8813_io, AS_IO, 8)
+static ADDRESS_MAP_START( poly8813_io, AS_IO, 8, poly88_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END

@@ -72,7 +72,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
 /*  AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)// Bank management not udsed in BR machine*/
