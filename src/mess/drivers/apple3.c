@@ -21,7 +21,7 @@
 #include "machine/ram.h"
 #include "devices/appldriv.h"
 
-static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0x00FF) AM_READWRITE(apple3_00xx_r, apple3_00xx_w)
 	AM_RANGE(0x0100, 0x01FF) AM_RAMBANK("bank2")
 	AM_RANGE(0x0200, 0x1FFF) AM_RAMBANK("bank3")

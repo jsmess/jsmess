@@ -73,7 +73,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #define MASTER_CLOCK_PAL	53203400	/* This might be a tiny bit too low */
 
 
-static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")					/* First 0x0400 part always points to first page */
 	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")					/* switchable rom bank */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")					/* switchable rom bank */
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")					/* First 0x0400 part always points to first page */
 	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")					/* switchable rom bank */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")					/* switchable rom bank */
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM						/* BIOS */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM						/* RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank10")					/* Cartridge/card peek area */
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdc00) AM_READ(sms_store_select2)			/* Game selector port #2 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_bios_w)
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( sms_io, AS_IO, 8 )
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_1_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gg_io, AS_IO, 8 )
+static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00)                 AM_READ(gg_input_port_2_r)

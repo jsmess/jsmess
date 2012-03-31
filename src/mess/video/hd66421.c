@@ -67,7 +67,7 @@ const device_type HD66421 = &device_creator<hd66421_device>;
 
 
 // default address map
-static ADDRESS_MAP_START( hd66421, AS_0, 8 )
+static ADDRESS_MAP_START( hd66421, AS_0, 8, hd66421_device )
 	AM_RANGE(0x0000, HD66421_RAM_SIZE) AM_RAM
 ADDRESS_MAP_END
 

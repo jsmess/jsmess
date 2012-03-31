@@ -42,13 +42,13 @@ INLINE pf10_state *get_safe_token(device_t *device)
     ADDRESS MAPS
 *****************************************************************************/
 
-static ADDRESS_MAP_START( pf10_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pf10_mem, AS_PROGRAM, 8, pf10_device )
 	AM_RANGE(0x0040, 0x013f) AM_RAM /* internal ram */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* external 2k ram */
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("pf10", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pf10_io, AS_IO, 8 )
+static ADDRESS_MAP_START( pf10_io, AS_IO, 8, pf10_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END

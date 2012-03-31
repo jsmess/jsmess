@@ -369,7 +369,7 @@ static MACHINE_RESET( sgi_ip2 )
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32, sgi_ip2_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE_MEMBER(sgi_ip2_state, m_mainram)
 	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_BASE_MEMBER(sgi_ip2_state, m_bss) // ??? I don't understand the need for this...
 	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("user1", 0)

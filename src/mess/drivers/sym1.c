@@ -32,7 +32,7 @@
 ******************************************************************************/
 
 
-static ADDRESS_MAP_START( sym1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sym1_map, AS_PROGRAM, 8, sym1_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM                              /* U12/U13 RAM */
 	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK("bank2") AM_BASE_MEMBER(sym1_state, m_ram_1k)
 	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_BASE_MEMBER(sym1_state, m_ram_2k)

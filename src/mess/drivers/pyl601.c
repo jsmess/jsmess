@@ -213,7 +213,7 @@ static const struct upd765_interface pyldin_upd765_interface =
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
-static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8, pyl601_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK("bank2")

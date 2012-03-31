@@ -135,14 +135,14 @@ static READ8_HANDLER( tvc_port59_r )
 static WRITE8_HANDLER( tvc_port0_w )
 {
 }
-static ADDRESS_MAP_START(tvc_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tvc_mem, AS_PROGRAM, 8, tvc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tvc_io , AS_IO, 8)
+static ADDRESS_MAP_START( tvc_io , AS_IO, 8, tvc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(tvc_port0_w)

@@ -243,7 +243,7 @@ static WRITE8_HANDLER( exdos_card_w )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( enterprise_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( enterprise_mem, AS_PROGRAM, 8, ep_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( enterprise_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( enterprise_io, AS_IO, 8 )
+static ADDRESS_MAP_START( enterprise_io, AS_IO, 8, ep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE("wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)

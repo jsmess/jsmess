@@ -157,7 +157,7 @@ static WRITE8_HANDLER( fp6000_6845_data_w )
 	state->m_mc6845->register_w(*space, offset, data);
 }
 
-static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16, fp6000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM
 	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_BASE_MEMBER(fp6000_state,m_gvram)//gvram
@@ -211,7 +211,7 @@ static READ16_HANDLER( pit_r )
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START(fp6000_io, AS_IO, 16 )
+static ADDRESS_MAP_START(fp6000_io, AS_IO, 16, fp6000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x08, 0x09) AM_READ(ex_board_r) // BIOS of some sort ...
 	AM_RANGE(0x0a, 0x0b) AM_READ_PORT("DSW") // installed RAM id?

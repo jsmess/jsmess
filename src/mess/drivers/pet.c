@@ -400,7 +400,7 @@ normal keyboards?
  *
  *************************************/
 
-static ADDRESS_MAP_START(pet_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(pet_mem , AS_PROGRAM, 8, pet_state )
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE_MEMBER(pet_state, m_videoram)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
@@ -410,7 +410,7 @@ static ADDRESS_MAP_START(pet_mem , AS_PROGRAM, 8)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pet40_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pet40_mem , AS_PROGRAM, 8, pet_state )
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM AM_BASE_MEMBER(pet_state, m_videoram)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
 	AM_RANGE(0xe810, 0xe813) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( pet40_mem , AS_PROGRAM, 8)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pet80_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pet80_mem , AS_PROGRAM, 8, pet_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank2")
 	AM_RANGE(0xa000, 0xafff) AM_RAMBANK("bank3")
@@ -457,7 +457,7 @@ ADDRESS_MAP_END
         bit 7    1=enable system latch
 
 */
-static ADDRESS_MAP_START( superpet_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( superpet_mem , AS_PROGRAM, 8, pet_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(pet_state, m_memory)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2") AM_BASE_MEMBER(pet_state, m_videoram)
 	AM_RANGE(0xa000, 0xe7ff) AM_ROM
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( superpet_mem , AS_PROGRAM, 8)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superpet_m6809_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( superpet_m6809_mem, AS_PROGRAM, 8, pet_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("share1")	/* same memory as m6502 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2")	/* same memory as m6502 */
     AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank1")	/* 64 kbyte ram turned in */

@@ -199,12 +199,12 @@ READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
     ADDRESS MAPS
 *****************************************************************************/
 
-static ADDRESS_MAP_START( tf20_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tf20_mem, AS_PROGRAM, 8, tf20_device )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank21")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank22")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tf20_io, AS_IO, 8 )
+static ADDRESS_MAP_START( tf20_io, AS_IO, 8, tf20_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_MODERN("3a", upd7201_device, ba_cd_r, ba_cd_w)

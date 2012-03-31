@@ -316,7 +316,7 @@ static WRITE8_HANDLER( mn1271_io_w )
 	}
 }
 
-static ADDRESS_MAP_START(jr200_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(jr200_mem, AS_PROGRAM, 8, jr200_state )
 /*
     0000-3fff RAM
     4000-4fff RAM ( 4k expansion)

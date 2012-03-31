@@ -42,7 +42,7 @@ WRITE8_HANDLER( pecom_cdp1869_w )
 	}
 }
 
-static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8 )
+static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, driver_device )
 	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM
 ADDRESS_MAP_END
 

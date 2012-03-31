@@ -72,7 +72,7 @@ Nascom Memory map
  *
  *************************************/
 
-static ADDRESS_MAP_START( nascom1_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nascom1_mem, AS_PROGRAM, 8, nascom1_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(nascom1_state, m_videoram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( nascom1_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nascom1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( nascom1_io, AS_IO, 8, nascom1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0F)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( nascom1_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nascom2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( nascom2_io, AS_IO, 8, nascom1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)

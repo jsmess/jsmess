@@ -37,7 +37,7 @@
 #include "machine/mm58274c.h"
 #include "machine/wd17xx.h"
 
-static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)	/* boot ROM mirror */
 	AM_RANGE(0x000008, 0x000fff) AM_RAM										/* static RAM */
 	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION("maincpu", 0x010000)	/* boot ROM */

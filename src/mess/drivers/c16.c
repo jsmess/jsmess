@@ -167,7 +167,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
  * at 0xfc00 till 0xfcff is ram or rom kernal readable
  */
 
-static ADDRESS_MAP_START(c16_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(c16_map, AS_PROGRAM, 8, c16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank9")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")	   /* only ram memory configuration */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START(c16_map, AS_PROGRAM, 8)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(plus4_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(plus4_map, AS_PROGRAM, 8, c16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank9")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank2")
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank3")
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START(plus4_map, AS_PROGRAM, 8)
 	AM_RANGE(0xff40, 0xffff) AM_WRITEONLY
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(c364_map , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(c364_map , AS_PROGRAM, 8, c16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank9")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank2")
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank3")

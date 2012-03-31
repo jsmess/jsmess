@@ -96,7 +96,7 @@ static READ8_HANDLER( bbc_fe_r )
 	return 0xfe;
 }
 
-static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH											    						/*  Hardware marked with a # is not present in a Model A        */
 
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)						/*    0000-3fff                 Regular Ram                     */
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)						/*    0000-3fff                 Regular Ram                     */
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)					/*    0000-2fff                 Regular Ram                     */
@@ -198,7 +198,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)					/*    0000-2fff                 Regular Ram                     */
@@ -258,7 +258,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 
-static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
 
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybm1_w)					/*    0000-2fff                 Regular Ram                     */
 

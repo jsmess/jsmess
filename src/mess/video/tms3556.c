@@ -29,7 +29,7 @@ const device_type TMS3556 = &device_creator<tms3556_device>;
 
 
 // default address map
-static ADDRESS_MAP_START( tms3556, AS_0, 8 )
+static ADDRESS_MAP_START( tms3556, AS_0, 8, tms3556_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -164,7 +164,7 @@ static SCREEN_UPDATE_IND16( ti990_4 )
     Memory map - see description above
 */
 
-static ADDRESS_MAP_START(ti990_4_memmap, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(ti990_4_memmap, AS_PROGRAM, 16, ti990_4_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM	/* dynamic RAM */
 	AM_RANGE(0x8000, 0xf7ff) AM_NOP	/* reserved for expansion */
 	AM_RANGE(0xf800, 0xfbff) AM_RAM	/* static RAM? */
@@ -194,7 +194,7 @@ ADDRESS_MAP_END
     0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
 */
 
-static ADDRESS_MAP_START(ti990_4_cru_map, AS_IO, 8)
+static ADDRESS_MAP_START(ti990_4_cru_map, AS_IO, 8, ti990_4_state )
 #if VIDEO_911
 	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_cru_r)
 	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_cru_w)

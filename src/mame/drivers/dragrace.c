@@ -166,7 +166,7 @@ static READ8_HANDLER( dragrace_scanline_r )
 }
 
 
-static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8, dragrace_state )
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0800, 0x083f) AM_READ(dragrace_input_r)
 	AM_RANGE(0x0900, 0x091f) AM_WRITE(dragrace_misc_w)
@@ -335,7 +335,7 @@ static MACHINE_RESET( dragrace )
 static MACHINE_CONFIG_START( dragrace, dragrace_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 12096000 / 12)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 12)
 	MCFG_CPU_PROGRAM_MAP(dragrace_map)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
@@ -386,4 +386,4 @@ ROM_START( dragrace )
 ROM_END
 
 
-GAME( 1977, dragrace, 0, dragrace, dragrace, 0, 0, "Atari", "Drag Race", GAME_SUPPORTS_SAVE )
+GAME( 1977, dragrace, 0, dragrace, dragrace, 0, 0, "Atari (Kee Games)", "Drag Race", GAME_SUPPORTS_SAVE )

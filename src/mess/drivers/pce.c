@@ -65,7 +65,7 @@ Super System Card:
 #include "sound/msm5205.h"
 
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, pce_state )
 	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
 	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
 	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
@@ -84,11 +84,11 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8)
+static ADDRESS_MAP_START( pce_io , AS_IO, 8, pce_state )
 	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, pce_state )
 	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
 	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
 	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgx_io , AS_IO, 8)
+static ADDRESS_MAP_START( sgx_io , AS_IO, 8, pce_state )
 	AM_RANGE( 0x00, 0x03) AM_READWRITE( sgx_vdc_r, sgx_vdc_w )
 ADDRESS_MAP_END
 

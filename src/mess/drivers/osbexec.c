@@ -189,7 +189,7 @@ static READ8_HANDLER( osbexec_rtc_r )
 }
 
 
-static ADDRESS_MAP_START( osbexec_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( osbexec_mem, AS_PROGRAM, 8, osbexec_state )
 	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE( osbexec_0000_w )	/* ROM and maybe also banked ram */
 	AM_RANGE( 0x2000, 0x3FFF ) AM_RAMBANK("2000")								/* Banked RAM */
 	AM_RANGE( 0x4000, 0xBFFF ) AM_RAMBANK("4000")								/* Banked RAM */
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( osbexec_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( osbexec_io, AS_IO, 8 )
+static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_MODERN( "pia_0", pia6821_device, read, write)				/* 6821 PIA @ UD12 */
 	/* 0x04 - 0x07 - 8253 @UD1 */

@@ -24,11 +24,11 @@
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START(lisa_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(lisa_map, AS_PROGRAM, 16, lisa_state )
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(lisa_r, lisa_w)			/* no fixed map, we use an MMU */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lisa_cop_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( lisa_cop_io_map, AS_IO, 8, lisa_state )
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G)
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D)
@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( lisa_cop_io_map, AS_IO, 8 )
 	AM_RANGE(COP400_PORT_CKO, COP400_PORT_CKO) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kb_cop_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kb_cop_io_map, AS_IO, 8, lisa_state )
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G)
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D)
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( kb_cop_io_map, AS_IO, 8 )
 	AM_RANGE(COP400_PORT_CKO, COP400_PORT_CKO) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8, lisa_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)	// only 8k of address space
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE_MEMBER(lisa_state, m_fdc_ram)				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w)	/* disk controller (IWM and TTL logic) */
@@ -57,7 +57,7 @@ static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8)
 	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)		/* handler for wrap-around */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8, lisa_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)	// only 8k of address space
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE_MEMBER(lisa_state, m_fdc_ram)				/* RAM (shared with 68000) */
 	AM_RANGE(0x0400, 0x07ff) AM_NOP										/* nothing, or RAM wrap-around ??? */

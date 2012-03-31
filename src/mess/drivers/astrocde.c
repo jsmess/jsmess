@@ -76,14 +76,14 @@ void get_ram_expansion_settings(address_space *space, int &ram_expansion_install
  *
  *************************************/
 
-static ADDRESS_MAP_START( astrocade_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( astrocade_mem, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Star Fortress writes in here?? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram) /* ASG */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astrocade_io, AS_IO, 8 )
+static ADDRESS_MAP_START( astrocade_io, AS_IO, 8, astrocde_state )
 	AM_RANGE(0x00, 0x1f) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 

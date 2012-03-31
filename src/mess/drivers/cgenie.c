@@ -38,7 +38,7 @@ NMI
 #include "formats/cgen_cas.h"
 #include "machine/ram.h"
 
-static ADDRESS_MAP_START (cgenie_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START (cgenie_mem, AS_PROGRAM, 8, cgenie_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in MACHINE_START
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // installed in cgenie_init_machine
@@ -58,7 +58,7 @@ static ADDRESS_MAP_START (cgenie_mem, AS_PROGRAM, 8)
 	AM_RANGE(0xfff0, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (cgenie_io, AS_IO, 8)
+static ADDRESS_MAP_START (cgenie_io, AS_IO, 8, cgenie_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE("ay8910", cgenie_sh_control_port_r, cgenie_sh_control_port_w )
 	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("ay8910", ay8910_r, ay8910_data_w )

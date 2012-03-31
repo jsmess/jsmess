@@ -835,7 +835,7 @@ static WRITE32_HANDLER( ps_dac_w )
 	dac_data_16_w(space->machine().device("dac"), (UINT16)((data + 0x8000) & 0x0000ffff));
 }
 
-static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32, pockstat_state )
 	AM_RANGE(0x00000000, 0x000007ff) AM_RAM
 	AM_RANGE(0x02000000, 0x02ffffff) AM_READ(ps_rombank_r)
 	AM_RANGE(0x04000000, 0x04003fff) AM_ROM AM_REGION("maincpu", 0)

@@ -87,7 +87,7 @@ static WRITE8_HANDLER(pentagon_port_7ffd_w)
 	pentagon_update_memory(space->machine());
 }
 
-static ADDRESS_MAP_START (pentagon_io, AS_IO, 8)
+static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, spectrum_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)

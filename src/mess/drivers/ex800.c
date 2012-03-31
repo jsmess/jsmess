@@ -313,7 +313,7 @@ static WRITE8_HANDLER(ex800_gate7a_w)
 ******************************************************************************/
 
 
-static ADDRESS_MAP_START( ex800_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ex800_mem, AS_PROGRAM, 8, ex800_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM /* external RAM */
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_READWRITE(ex800_devsel_r, ex800_devsel_w)
@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( ex800_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ex800_io, AS_IO, 8 )
+static ADDRESS_MAP_START( ex800_io, AS_IO, 8, ex800_state )
 	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READ(ex800_porta_r) AM_WRITE(ex800_porta_w)
 	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ(ex800_portb_r) AM_WRITE(ex800_portb_w)
 	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ(ex800_portc_r) AM_WRITE(ex800_portc_w)
