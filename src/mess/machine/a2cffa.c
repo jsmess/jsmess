@@ -12,6 +12,7 @@
 #include "a2cffa.h"
 #include "includes/apple2.h"
 #include "machine/idectrl.h"
+#include "imagedev/harddriv.h"
 
 
 /***************************************************************************
@@ -20,166 +21,165 @@
 
 #define LOG_A2CFFA	1
 
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+const device_type A2BUS_CFFA2 = &device_creator<a2bus_cffa2_device>;
+const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
 
-typedef struct _a2cffa_token a2cffa_token;
-struct _a2cffa_token
-{
-	UINT8 *ROM;		// card ROM
-	UINT16 lastdata;	// last data from IDE
-};
+#define CFFA2_ROM_REGION  "cffa2_rom"
+#define CFFA2_IDE_TAG     "cffa2_ide"
 
+MACHINE_CONFIG_FRAGMENT( cffa2 )
+    MCFG_IDE_CONTROLLER_ADD(CFFA2_IDE_TAG, NULL, ide_image_devices, "hdd", "hdd")
+MACHINE_CONFIG_END
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+ROM_START( cffa2 )
+	ROM_REGION(0x1000, CFFA2_ROM_REGION, 0)
+    ROM_LOAD( "cffa20eec02.bin", 0x000000, 0x001000, CRC(fb3726f8) SHA1(080ff88f19de22328e162954ee2b51ee65f9d5cd) )
+ROM_END
 
-INLINE a2cffa_token *get_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == A2CFFA);
-	return (a2cffa_token *)downcast<legacy_device_base *>(device)->token();
-}
-
-
+ROM_START( cffa2_6502 )
+	ROM_REGION(0x1000, CFFA2_ROM_REGION, 0)
+    ROM_LOAD( "cffa20ee02.bin", 0x000000, 0x001000, CRC(3ecafce5) SHA1(d600692ed9626668233a22a48236af639410cb7b) ) 
+ROM_END
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/*-------------------------------------------------
-    DEVICE_START(a2cffa) - device start
-    function
--------------------------------------------------*/
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
 
-static DEVICE_START(a2cffa)
+machine_config_constructor a2bus_cffa2000_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( cffa2 );
+}
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *a2bus_cffa2000_device::device_rom_region() const
+{
+	return ROM_NAME( cffa2 );
+}
+
+const rom_entry *a2bus_cffa2_6502_device::device_rom_region() const
+{
+	return ROM_NAME( cffa2_6502 );
+}
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+a2bus_cffa2000_device::a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+    device_t(mconfig, type, name, tag, owner, clock),
+    device_a2bus_card_interface(mconfig, *this),
+    m_ide(*this, CFFA2_IDE_TAG)
+{
+}
+
+a2bus_cffa2_device::a2bus_cffa2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)", tag, owner, clock)
+{
+	m_shortname = "a2cffa2";
+}
+
+a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)", tag, owner, clock)
+{
+	m_shortname = "a2cffa02";
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void a2bus_cffa2000_device::device_start()
+{
+	// set_a2bus_device makes m_slot valid
+	set_a2bus_device();
+
+	astring tempstring;
+	m_rom = device().machine().region(this->subtag(tempstring, CFFA2_ROM_REGION))->base();
+}
+
+void a2bus_cffa2000_device::device_reset()
 {
 }
 
 
-
 /*-------------------------------------------------
-    DEVICE_RESET(a2cffa) - device reset
-    function
+    read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-static DEVICE_RESET(a2cffa)
+UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 {
-	a2cffa_token *token = get_token(device);
-
-	// find card ROM
-	token->ROM = (UINT8 *)device->machine().region("cffa")->base();
-}
-
-
-
-/*-------------------------------------------------
-    a2cffa_r - device read function
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER(a2cffa_r)
-{
-	a2cffa_token *token = get_token(device);
-
 	if (offset == 0)
 	{
-		return token->lastdata>>8;
+		return m_lastdata>>8;
 	}
 	else if (offset == 8)
 	{
-		token->lastdata = ide_controller_r(device->machine().device("ide"), 0x1f0+offset-8, 2);
-		return token->lastdata & 0xff;
+		m_lastdata = ide_controller_r(m_ide, 0x1f0+offset-8, 2);
+		return m_lastdata & 0xff;
 	}
 	else if (offset > 8)
 	{
-		return ide_controller_r(device->machine().device("ide"), 0x1f0+offset-8, 1);
+		return ide_controller_r(m_ide, 0x1f0+offset-8, 1);
 	}
 
 	return 0xff;
 }
 
 
-
 /*-------------------------------------------------
-    a2cffa_w - device write function
+    write_c0nx - called for writes to this card's c0nx space 
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(a2cffa_w)
+void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-	a2cffa_token *token = get_token(device);
-
 	if (offset == 0)
 	{
-		token->lastdata &= 0x00ff;
-		token->lastdata |= data<<8;
+		m_lastdata &= 0x00ff;
+		m_lastdata |= data<<8;
 	}
 	else if (offset == 8)
 	{
-		token->lastdata &= 0xff00;
-		token->lastdata |= data;
-		ide_controller_w(device->machine().device("ide"), 0x1f0+offset-8, 2, token->lastdata);
+		m_lastdata &= 0xff00;
+		m_lastdata |= data;
+		ide_controller_w(m_ide, 0x1f0+offset-8, 2, m_lastdata);
 	}
 	else if (offset > 8)
 	{
-		ide_controller_w(device->machine().device("ide"), 0x1f0+offset-8, 1, data);
+		ide_controller_w(m_ide, 0x1f0+offset-8, 1, data);
 	}
 }
-
-
-/* slot ext. ROM (C800) read function */
-READ8_DEVICE_HANDLER(a2cffa_c800_r)
-{
-	a2cffa_token *token = get_token(device);
-
-	return token->ROM[offset+0x800];
-}
-
-/* slot ext. ROM (C800) write function */
-WRITE8_DEVICE_HANDLER(a2cffa_c800_w)
-{
-}
-
-/* slot ROM (CN00) read function */
-READ8_DEVICE_HANDLER(a2cffa_cnxx_r)
-{
-	a2cffa_token *token = get_token(device);
-
-	return token->ROM[offset+0x700];	// this needs to be = to the slot #, we assume 7 for now
-}
-
-/* slot ROM (CN00) write function */
-WRITE8_DEVICE_HANDLER(a2cffa_cnxx_w)
-{
-}
-
 
 /*-------------------------------------------------
-    DEVICE_GET_INFO(a2cffa) - device get info
-    function
+    read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-DEVICE_GET_INFO(a2cffa)
+UINT8 a2bus_cffa2000_device::read_cnxx(address_space &space, UINT8 offset)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(a2cffa_token);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+    int slotimg = m_slot * 0x100;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(a2cffa);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(a2cffa);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Apple II CFFA Card (www.dreher.net)");			break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Apple II CFFA Card (www.dreher.net)");			break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
-	}
+    // ROM contains a CnXX image for each of slots 1-7
+    return m_rom[offset+slotimg];
 }
 
-DEFINE_LEGACY_DEVICE(A2CFFA, a2cffa);
+/*-------------------------------------------------
+    read_c800 - called for reads from this card's c800 space
+-------------------------------------------------*/
+
+UINT8 a2bus_cffa2000_device::read_c800(address_space &space, UINT16 offset)
+{
+    return m_rom[offset+0x800];
+}
+

@@ -9,6 +9,7 @@
 #ifndef APPLE2_H_
 #define APPLE2_H_
 
+#include "machine/a2bus.h"
 #include "machine/applefdc.h"
 
 
@@ -108,7 +109,13 @@ class apple2_state : public driver_device
 {
 public:
 	apple2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+        m_maincpu(*this, "maincpu"),
+        m_a2bus(*this, "a2bus")
+    { }
+
+	required_device<cpu_device> m_maincpu;
+    required_device<a2bus_device> m_a2bus;
 
 	UINT32 m_flags;
 	INT32 m_a2_cnxx_slot;

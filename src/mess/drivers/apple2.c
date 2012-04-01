@@ -3,7 +3,7 @@
 Apple II
 
 This family of computers bank-switches everything up the wazoo.
-
+ 
 Remarkable features
 -------------------
 
@@ -185,21 +185,19 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
-#include "devices/appldriv.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
 #include "formats/ap2_dsk.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"
-#include "machine/ap2_slot.h"
-#include "machine/ap2_lang.h"
-#include "machine/applefdc.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
-#include "machine/a2cffa.h"
-#include "machine/idectrl.h"
-#include "imagedev/harddriv.h"
 
+#include "machine/a2bus.h"
+#include "machine/a2lang.h"
+#include "machine/a2diskii.h"
+#include "machine/a2mockingboard.h"
+#include "machine/a2cffa.h"
 
 /***************************************************************************
     PARAMETERS
@@ -212,7 +210,19 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #define PADDLE_SENSITIVITY      10
 #define PADDLE_AUTOCENTER       0
 
+WRITE8_DEVICE_HANDLER(a2bus_irq_w)
+{
+    apple2_state *a2 = device->machine().driver_data<apple2_state>();
 
+    device_set_input_line(a2->m_maincpu, M6502_IRQ_LINE, data);
+}
+
+WRITE8_DEVICE_HANDLER(a2bus_nmi_w)
+{
+    apple2_state *a2 = device->machine().driver_data<apple2_state>();
+
+    device_set_input_line(a2->m_maincpu, INPUT_LINE_NMI, data);
+}
 
 /***************************************************************************
     ADDRESS MAP
@@ -554,19 +564,6 @@ PALETTE_INIT( apple2 )
 	palette_set_colors(machine, 0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }
 
-static const floppy_interface apple2_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
-	"floppy_5_25",
-	NULL
-};
-
 static const cassette_interface apple2_cassette_interface =
 {
 	cassette_default_formats,
@@ -575,6 +572,24 @@ static const cassette_interface apple2_cassette_interface =
 	NULL,
 	NULL
 };
+
+static const struct a2bus_interface a2bus_intf =
+{
+	// interrupt lines
+	DEVCB_HANDLER(a2bus_irq_w),
+	DEVCB_HANDLER(a2bus_nmi_w)
+};
+
+static SLOT_INTERFACE_START(apple2_slot0_cards)
+    SLOT_INTERFACE("lang", A2BUS_LANG)      /* Apple II Language Card */
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(apple2_cards)
+    SLOT_INTERFACE("diskii", A2BUS_DISKII)  /* Disk II Controller Card */
+    SLOT_INTERFACE("mockingboard", A2BUS_MOCKINGBOARD)  /* Sweet Micro Systems Mockingboard */
+    SLOT_INTERFACE("cffa2", A2BUS_CFFA2)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
+    SLOT_INTERFACE("cffa202", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	/* basic machine hardware */
@@ -603,14 +618,15 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* slot devices */
-	MCFG_APPLE2_LANGCARD_ADD("langcard")
-	MCFG_APPLEFDC_ADD("fdc", apple2_fdc_interface)
-
-	/* slots */
-	MCFG_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
-	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
-
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_interface,15,16)
+    MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl0", apple2_slot0_cards, "lang", NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard", NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskii", NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
 MACHINE_CONFIG_END
@@ -651,33 +667,19 @@ ROM_START(las3000)
 ROM_END
 
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
-	MCFG_VIDEO_START(apple2e)
+    MCFG_VIDEO_START(apple2e)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_interface )
+
+    // IIe and later have no physical slot 0, the "language card" is built into the motherboard
+    MCFG_A2BUS_SLOT_REMOVE("sl0")
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
 MACHINE_CONFIG_END
-#if 0
-MACHINE_CONFIG_DERIVED( apple2e_z80, apple2_common )
-	MCFG_VIDEO_START(apple2e)
 
-	MCFG_CPU_ADD("softcard", Z80, 1021800*2)	// softcard Z80 runs at twice the 6502 clock
-	MCFG_CPU_PROGRAM_MAP(a2z80_map)
-
-	MCFG_A2Z80_ADD("a2z80")
-	MCFG_APPLE2_SLOT_ADD(7, "a2z80", 0, 0, 0, 0, 0, a2z80_cnxx_w)
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
-#endif
 static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
 
 	/* internal ram */
@@ -687,11 +689,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2ee, apple2e )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
-
-	/* CFFA stuff */
-	MCFG_IDE_CONTROLLER_ADD("ide", NULL, ide_image_devices, "hdd", NULL)
-	MCFG_A2CFFA_ADD("cffa")
-	MCFG_APPLE2_SLOT_ADD(7, "cffa", a2cffa_r, a2cffa_w, a2cffa_c800_r, a2cffa_c800_w, a2cffa_cnxx_r, a2cffa_cnxx_w)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
@@ -699,13 +696,22 @@ static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
+    MCFG_A2BUS_SLOT_REMOVE("sl1")   // IIc has no slots, of course :)
+    MCFG_A2BUS_SLOT_REMOVE("sl2")
+    MCFG_A2BUS_SLOT_REMOVE("sl3")
+    MCFG_A2BUS_SLOT_REMOVE("sl4")
+    MCFG_A2BUS_SLOT_REMOVE("sl5")
+    MCFG_A2BUS_SLOT_REMOVE("sl6")
+    MCFG_A2BUS_SLOT_REMOVE("sl7")
+
+    // TODO: populate the IIc's other virtual slots with ONBOARD_ADD
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKII, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
 
-	/* replace the old-style FDC with an IWM */
-	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
+    MCFG_A2BUS_SLOT_REMOVE("sl6")
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)
 MACHINE_CONFIG_END
 
 
@@ -729,7 +735,6 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROM_LOAD ( "341-0002-00.e8", 0x2800, 0x0800, CRC(a99c2cf6) SHA1(9767d92d04fc65c626223f25564cca31f5248980)) /* Needs verification. From eBay: Label: S7916E // C48078 // 3410002-00 // (C)APPLE78 E8 */
 	ROM_LOAD ( "341-0003-00.f0", 0x3000, 0x0800, CRC(62230d38) SHA1(f268022da555e4c809ca1ae9e5d2f00b388ff61c)) /* Needs verification. From eBay: Label: S7908E // C48709 // 3410003 // CAPPLE78 F0 */
 	ROM_LOAD ( "341-0004-00.f8", 0x3800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226))
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a: 16-sector disk drive (older version), PROM P5 */
 	/* For the following bits, I'm not sure how to do this properly, since the P5 and P6 roms came in pairs and are in different address spaces...
     Also the 3.5" 400k? disk control rom, 341-0438-a should probably be here as well, assuming it could be used with an apple2/2+/2e */
 	//ROMX_LOAD ( "341-0009.p5", 0x4500, 0x0100, CRC(d34eb2ff) SHA1(afd060e6f35faf3bb0146fa889fc787adf56330a), ROM_BIOS(1)) /* 341-0009: 13-sector disk drive, PROM P5 */
@@ -753,7 +758,6 @@ ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) ba
 	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
 	ROM_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Was sometimes mounted on Language card; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a "P5A" State machine PROM (Disk II ROM - DOS 3.3 version?) */
 ROM_END
 
 ROM_START(prav82)
@@ -767,7 +771,6 @@ ROM_START(prav82)
 	ROM_LOAD ( "pravetz82.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD ( "pravetz82.f0", 0x3000, 0x0800, CRC(e26d9d35) SHA1(ce6e42e6c9a6c98e92522af7a6090cd04c56c778))
 	ROM_LOAD ( "pravetz82.f8", 0x3800, 0x0800, CRC(57547818) SHA1(db30bedec98305e31a14acb9e2a92be1c4853807))
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a "P5A" State machine PROM (Disk II ROM - DOS 3.3 version?) */
 ROM_END
 
 ROM_START(prav8m)
@@ -780,7 +783,6 @@ ROM_START(prav8m)
 	ROM_LOAD ( "pravetz8m.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD ( "pravetz8m.f0", 0x3000, 0x0800, CRC(e26d9d35) SHA1(ce6e42e6c9a6c98e92522af7a6090cd04c56c778))
 	ROM_LOAD ( "pravetz8m.f8", 0x3800, 0x0800, CRC(5bab0a46) SHA1(f6c0817ce37d2e2c43f482c339acaede0a73359b))
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* 341-0027-a "P5A" State machine PROM (Disk II ROM - DOS 3.3 version?) */
 ROM_END
 
 ROM_START( agat7 )
@@ -822,7 +824,6 @@ ROM_START(apple2jp)
 	ROM_LOAD ( "a2p.e8", 0x2800, 0x0800, BAD_DUMP CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9)) // not confirmed as the actual rom on motherboard
 	ROM_LOAD ( "a2p.f0", 0x3000, 0x0800, BAD_DUMP CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581)) // not confirmed as the actual rom on motherboard
 	ROM_LOAD ( "a2jp.f8", 0x3800, 0x0800, CRC(6ea8379b) SHA1(00a75ae3b58e1917ad640249366f654608589cf4))
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(ace100)
@@ -831,7 +832,6 @@ ROM_START(ace100)
 
 	ROM_REGION(0x4700,"maincpu",0)
 	ROM_LOAD ( "ace100.rom", 0x1000, 0x3000, CRC(9d5ec94f) SHA1(8f2b3f2561788bebc7a805f620ec9e7ade973460))
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(apple2e)
@@ -842,7 +842,6 @@ ROM_START(apple2e)
 	ROM_REGION(0x4700,"maincpu",0)
 	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
 	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
 //  ROM_LOAD_OPTIONAL( "341-0132-a.e12", 0x000, 0x800, CRC(7ded1ac6) SHA1(69f45cd487e8210e37c839df78a0b8930a3a6ac1) ) // 1982 US-DE
@@ -860,7 +859,6 @@ ROM_START(apple2ez)
 	ROM_REGION(0x4700,"maincpu",0)
 	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
 	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(mprof3)
@@ -872,7 +870,6 @@ ROM_START(mprof3)
 	ROM_LOAD ( "mpf3-cd.rom", 0x0000, 0x2000, CRC(5b662e06) SHA1(aa0db775ca78986480829fcc10f00e57629e1a7c))
 	ROM_LOAD ( "mpf3-ef.rom", 0x2000, 0x2000, CRC(2c5e8b92) SHA1(befeb03e04b7c3ef36ef5829948a53880df85e92))
 
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(apple2ee)
@@ -883,10 +880,6 @@ ROM_START(apple2ee)
 	ROM_REGION(0x4700,"maincpu",0)
 	ROM_LOAD ( "342-0304-a.e10", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6)) /* PCB: "CD ROM // 342-0304", 2364 mask rom */
 	ROM_LOAD ( "342-0303-a.e8", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e)) /* PCB: "EF ROM // 342-0303", 2364 mask rom */
-	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
-
-	ROM_REGION(0x1000, "cffa", 0)
-    ROM_LOAD( "cffa20eec02.bin", 0x000000, 0x001000, CRC(fb3726f8) SHA1(080ff88f19de22328e162954ee2b51ee65f9d5cd) )
 
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
@@ -899,7 +892,6 @@ ROM_START(apple2ep)
 
 	ROM_REGION(0x4700,"maincpu",0)
 	ROM_LOAD ("32-0349-b.128", 0x0000, 0x4000, CRC(1d70b193) SHA1(b8ea90abe135a0031065e01697c4a3a20d51198b)) /* should rom name be 342-0349-b? */
-	ROM_LOAD ("341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 ROM_START(apple2c)
@@ -984,7 +976,6 @@ ROM_START(ivelultr)
 	ROM_LOAD ( "ultra1.002", 0x1000, 0x1000, CRC(392170ff) SHA1(f065104ab5a476321d56d802f1a174afabff9dbd))
 	ROM_LOAD ( "ultra1.001", 0x2000, 0x1000, CRC(671b8c2e) SHA1(c1e4b1477620c9292f2c2b25df55965eef445dee))
 	ROM_LOAD ( "ultra2.bin", 0x3000, 0x1000, CRC(1ac1e17e) SHA1(a5b8adec37da91970c303905b5e2c4d1b715ee4e))
-	ROM_LOAD ( "341-0027-a.rom", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
@@ -995,7 +986,6 @@ COMP( 1985, prav8m,   apple2,   0,        apple2p,	   apple2p,  0,        "Prave
 COMP( 1980, apple2jp, apple2,   0,        apple2p,	   apple2p,  0,        "Apple Computer",    "Apple ][j+", GAME_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2,   0,        apple2,	   apple2e,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
 COMP( 1983, apple2e,  0,        apple2,	  apple2e,	   apple2e,  0,        "Apple Computer",    "Apple //e", GAME_SUPPORTS_SAVE )
-//COMP( 1983, apple2ez, apple2e,  0,      apple2e_z80,     apple2e,  0,        "Apple Computer",    "Apple //e (with Z80 SoftCard)", GAME_SUPPORTS_SAVE )
 COMP( 1983, mprof3,   apple2e,  0,        mprof3,	   apple2e,  0,        "Multitech",         "Microprofessor III", GAME_SUPPORTS_SAVE )
 COMP( 1985, apple2ee, apple2e,  0,        apple2ee,	   apple2e,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
 COMP( 1987, apple2ep, apple2e,  0,        apple2ep,	   apple2ep, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
