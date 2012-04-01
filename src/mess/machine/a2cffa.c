@@ -92,7 +92,7 @@ a2bus_cffa2_device::a2bus_cffa2_device(const machine_config &mconfig, const char
 }
 
 a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)", tag, owner, clock)
+    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)", tag, owner, clock)
 {
 	m_shortname = "a2cffa02";
 }
