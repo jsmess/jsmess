@@ -301,13 +301,11 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( reset_w )
+INPUT_CHANGED_MEMBER( vip_state::reset_w )
 {
-	vip_state *state = field.machine().driver_data<vip_state>();
-
 	if (oldval && !newval)
 	{
-		state->machine_reset();
+		machine_reset();
 	}
 }
 
@@ -349,7 +347,7 @@ static INPUT_PORTS_START( vip )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("VP-580 F") PORT_CODE(KEYCODE_L)
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED(reset_w, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, vip_state, reset_w, 0)
 
 	PORT_START("KEYBOARD")
 	PORT_CONFNAME( 0x07, KEYBOARD_KEYPAD, "Keyboard")

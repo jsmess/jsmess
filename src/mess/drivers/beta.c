@@ -40,9 +40,9 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( trigger_reset )
+INPUT_CHANGED_MEMBER( beta_state::trigger_reset )
 {
-	cputag_set_input_line(field.machine(), M6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( beta )
@@ -79,7 +79,7 @@ static INPUT_PORTS_START( beta )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED(trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, beta_state, trigger_reset, 0)
 INPUT_PORTS_END
 
 /* M6532 Interface */

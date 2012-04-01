@@ -38,6 +38,8 @@ public:
 	DECLARE_WRITE8_MEMBER( pio1_pa_w );
 	DECLARE_READ8_MEMBER( pio1_pb_r );
 	DECLARE_WRITE8_MEMBER( pio1_pb_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	void update_display();
 

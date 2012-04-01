@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER( pio1_pa_w );
 	DECLARE_WRITE8_MEMBER( pio1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( pio1_brdy_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	/* keyboard state */
 	int m_keylatch;

@@ -110,6 +110,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
+	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
 
 	void bankswitch();
 
@@ -152,6 +153,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
+	DECLARE_INPUT_CHANGED_MEMBER( monitor_pressed );
 
 	/* keyboard state */
 	int m_keylatch;			/* key latch */

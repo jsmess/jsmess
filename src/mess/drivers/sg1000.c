@@ -268,9 +268,9 @@ ADDRESS_MAP_END
     INPUT_CHANGED( trigger_nmi )
 -------------------------------------------------*/
 
-static INPUT_CHANGED( trigger_nmi )
+INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
 {
-	cputag_set_input_line(field.machine(), Z80_TAG, INPUT_LINE_NMI, (input_port_read(field.machine(), "NMI") ? CLEAR_LINE : ASSERT_LINE));
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( sg1000 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_P) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_P) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
 
 	PORT_INCLUDE( tvdraw )
 INPUT_PORTS_END
@@ -494,7 +494,7 @@ INPUT_PORTS_START( sk1100 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------

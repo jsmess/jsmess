@@ -81,7 +81,16 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_READ8_MEMBER( dma_r );
-
+	DECLARE_INPUT_CHANGED_MEMBER( data );
+	DECLARE_INPUT_CHANGED_MEMBER( enter );
+	DECLARE_INPUT_CHANGED_MEMBER( single_step );
+	DECLARE_INPUT_CHANGED_MEMBER( run );
+	DECLARE_INPUT_CHANGED_MEMBER( load );
+	DECLARE_INPUT_CHANGED_MEMBER( cosmicos_pause );
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
+	DECLARE_INPUT_CHANGED_MEMBER( clear_data );
+	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
+	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
 	void set_cdp1802_mode(int mode);
 	void clear_input_data();
 	void set_ram_mode();

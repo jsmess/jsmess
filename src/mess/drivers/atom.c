@@ -208,9 +208,9 @@ ADDRESS_MAP_END
     INPUT_CHANGED( trigger_reset )
 -------------------------------------------------*/
 
-static INPUT_CHANGED( trigger_reset )
+INPUT_CHANGED_MEMBER( atom_state::trigger_reset )
 {
-	cputag_set_input_line(field.machine(), SY6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -332,7 +332,7 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPT")         PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 
 	PORT_START("BRK")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)   PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED(trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)   PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED_MEMBER(DEVICE_SELF, atom_state, trigger_reset, 0)
 
 	PORT_START("ECONET")
 	// station ID (0-255)

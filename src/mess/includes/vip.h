@@ -101,6 +101,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_WRITE8_MEMBER( dma_w );
+	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 
 	/* video state */
 	int m_a12;						/* latched address line 12 */
