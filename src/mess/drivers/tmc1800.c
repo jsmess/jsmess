@@ -435,7 +435,7 @@ INPUT_CHANGED_MEMBER( nano_state::monitor_pressed )
 	{
 		// TODO: what are the correct values?
 		int t = RES_K(27) * CAP_U(1) * 1000; // t = R26 * C1
-		m_ef4_timer->adjust(attotime::from_msec(t));
+		timer_set(attotime::from_msec(t), TIMER_ID_EF4);
 	}
 }
 
@@ -609,11 +609,6 @@ static COSMAC_INTERFACE( tmc2000_config )
 
 // OSCOM Nano
 
-static TIMER_CALLBACK( nano_ef4_tick )
-{
-	cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
-}
-
 READ_LINE_MEMBER( nano_state::clear_r )
 {
 	int run = BIT(input_port_read(machine(), "RUN"), 0);
@@ -725,11 +720,18 @@ void tmc2000_state::machine_reset()
 
 // OSCOM Nano
 
+void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ID_EF4:
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);	
+		break;
+	}
+}
+
 void nano_state::machine_start()
 {
-	/* allocate monitor timer */
-	m_ef4_timer = machine().scheduler().timer_alloc(FUNC(nano_ef4_tick));
-
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
