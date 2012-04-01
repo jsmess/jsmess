@@ -3,7 +3,6 @@
 #ifndef __ABC_FD2__
 #define __ABC_FD2__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

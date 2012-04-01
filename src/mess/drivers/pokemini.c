@@ -6,7 +6,6 @@ by Wilbert Pol.
 The LCD is likely to be a SSD1828 LCD.
 
 ********************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/pokemini.h"

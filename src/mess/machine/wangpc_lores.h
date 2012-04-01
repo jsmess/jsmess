@@ -12,7 +12,6 @@
 #ifndef __WANGPC_LORES_VIDEO__
 #define __WANGPC_LORES_VIDEO__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/wangpcbus.h"

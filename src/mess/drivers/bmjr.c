@@ -11,7 +11,6 @@
     - Break key is unemulated (tied with the NMI)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"

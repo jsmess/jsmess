@@ -52,7 +52,6 @@
         Two Z8 for power management and character recognition
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z180/z180.h"

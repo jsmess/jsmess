@@ -12,7 +12,6 @@
 #ifndef __SILVERROCK__
 #define __SILVERROCK__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

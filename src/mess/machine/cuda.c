@@ -33,7 +33,6 @@
     ---x      ?  IPL 0 for passive power, pull-up for soft power, file server switch for secure power
 */
 
-#define ADDRESS_MAP_MODERN
 
 //#define CUDA_SUPER_VERBOSE
 

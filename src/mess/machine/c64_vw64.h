@@ -12,7 +12,6 @@
 #ifndef __VW64__
 #define __VW64__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

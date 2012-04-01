@@ -3,7 +3,6 @@
 #ifndef __VICTOR9K_KEYBOARD__
 #define __VICTOR9K_KEYBOARD__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"

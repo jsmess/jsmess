@@ -27,7 +27,6 @@
     - MK-83 have 256K of RAM
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

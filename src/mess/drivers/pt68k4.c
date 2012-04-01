@@ -10,7 +10,6 @@ on a conventional pc-like motherboard and case.
 Some pics: http://www.wormfood.net/old_computers/
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

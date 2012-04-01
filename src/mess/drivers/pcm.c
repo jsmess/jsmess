@@ -51,7 +51,6 @@
         - Replace the terminal keyboard with an inbuilt one.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/z80ctc.h"

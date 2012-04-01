@@ -30,7 +30,6 @@ Notes:
    things. Perhaps it connected to discrete LEDs or output lines.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

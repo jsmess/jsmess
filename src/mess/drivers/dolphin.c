@@ -51,7 +51,6 @@
         should look like, but we DID NOT look at the source code.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"

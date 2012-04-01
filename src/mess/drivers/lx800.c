@@ -13,7 +13,6 @@
     - CPU disassembly doesn't seem to indicate conditional JR or RET.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"

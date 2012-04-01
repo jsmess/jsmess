@@ -3,7 +3,6 @@
 #ifndef __VICTOR9K__
 #define __VICTOR9K__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

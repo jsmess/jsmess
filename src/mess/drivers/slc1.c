@@ -45,7 +45,6 @@ Pasting doesn't work, but if it did...
 
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

@@ -12,7 +12,6 @@
 #ifndef __COMAL80__
 #define __COMAL80__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

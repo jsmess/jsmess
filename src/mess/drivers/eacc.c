@@ -27,7 +27,6 @@
 *      6821 emulation.
 *
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"

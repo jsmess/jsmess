@@ -10,7 +10,6 @@
 
 const device_type CPC_ROM = &device_creator<cpc_rom_device>;
 
-#define ADDRESS_MAP_MODERN
 
 //**************************************************************************
 //  DEVICE CONFIG INTERFACE

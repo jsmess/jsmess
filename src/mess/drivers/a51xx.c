@@ -8,7 +8,6 @@
     http://www.robotrontechnik.de/index.htm?/html/computer/a5130.htm
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

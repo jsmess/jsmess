@@ -3,7 +3,6 @@
 #ifndef __JTC__
 #define __JTC__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z8/z8.h"

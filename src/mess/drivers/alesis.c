@@ -8,7 +8,6 @@
     http://www.vintagesynth.com/misc/sr16.php
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"

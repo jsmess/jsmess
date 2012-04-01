@@ -197,7 +197,6 @@
     keyboard will be cleared as soon as it is buffered by the gate array.
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"

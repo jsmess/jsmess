@@ -12,7 +12,6 @@
 #ifndef __EPYX_FAST_LOAD__
 #define __EPYX_FAST_LOAD__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

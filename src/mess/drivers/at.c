@@ -9,7 +9,6 @@
 #undef i386
 #endif /* i386 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/at.h"
 

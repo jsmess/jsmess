@@ -16,7 +16,6 @@ The cassette used 2 bits for input, plus a D flipflop and a 74LS221 oneshot.
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

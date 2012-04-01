@@ -3,7 +3,6 @@
 #ifndef __ABC_UNI800__
 #define __ABC_UNI800__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "abcbus.h"

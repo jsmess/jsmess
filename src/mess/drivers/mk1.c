@@ -38,7 +38,6 @@ TODO:
 - Figure out exact clock frequency
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/f8/f8.h"

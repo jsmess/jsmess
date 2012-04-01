@@ -92,7 +92,6 @@ Test Paste:
         Now press up-arrow to confirm the data has been entered.
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

@@ -40,7 +40,6 @@ ToDo:
   needs to be tested with a real cassette dump.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

@@ -11,7 +11,6 @@
     - Needs video mods
 
 ************************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/x1.h"
 

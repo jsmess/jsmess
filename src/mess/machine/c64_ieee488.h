@@ -12,7 +12,6 @@
 #ifndef __C64_IEEE488__
 #define __C64_IEEE488__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/6525tpi.h"

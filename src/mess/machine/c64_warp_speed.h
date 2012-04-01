@@ -12,7 +12,6 @@
 #ifndef __WARP_SPEED__
 #define __WARP_SPEED__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

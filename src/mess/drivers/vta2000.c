@@ -13,7 +13,6 @@ It is a green-screen terminal, using RS232, and supposedly VT100 compatible.
 The top line is a status line.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

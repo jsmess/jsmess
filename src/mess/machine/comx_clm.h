@@ -12,7 +12,6 @@
 #ifndef __COMX_CLM__
 #define __COMX_CLM__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/comxexp.h"

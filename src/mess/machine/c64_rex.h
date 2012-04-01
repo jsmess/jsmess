@@ -12,7 +12,6 @@
 #ifndef __REX__
 #define __REX__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

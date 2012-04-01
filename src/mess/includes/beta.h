@@ -3,7 +3,6 @@
 #ifndef __BETA__
 #define __BETA__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

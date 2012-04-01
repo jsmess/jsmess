@@ -154,7 +154,6 @@ NOTES (2011-08-08)
                          goes wrong.
 
 ********************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/sorcerer.h"
 #include "formats/z80bin.h"

@@ -3,7 +3,6 @@
 #ifndef __VIC10__
 #define __VIC10__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/cbm.h"

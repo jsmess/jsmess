@@ -166,7 +166,6 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 
 *********************************************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"

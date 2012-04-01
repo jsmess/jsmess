@@ -26,7 +26,6 @@ http://www2.odn.ne.jp/~haf09260/Pv2000/EnrPV.htm
 For BIOS CRC confirmation
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

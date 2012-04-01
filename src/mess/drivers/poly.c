@@ -24,7 +24,6 @@
     - Find out how to make 2nd teletext screen to display
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"

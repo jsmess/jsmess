@@ -84,7 +84,6 @@ Module timer tag static_vblank_timer name m_expire.seconds
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/rm380z.h"
 

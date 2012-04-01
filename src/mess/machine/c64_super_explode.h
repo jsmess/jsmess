@@ -12,7 +12,6 @@
 #ifndef __SUPER_EXPLODE__
 #define __SUPER_EXPLODE__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

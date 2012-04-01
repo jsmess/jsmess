@@ -45,7 +45,6 @@ R.Schaefer Oct 2010
 4. Save states added.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

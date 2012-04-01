@@ -30,7 +30,6 @@
 
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/wswan.h"
 #include "wswan.lh"

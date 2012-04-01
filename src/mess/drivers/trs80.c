@@ -132,7 +132,6 @@ Virtual floppy disk formats are JV1, JV3, and DMK. Only the JV1 is emulated.
 There don't seem to be any JV1 boot disks for Model III/4.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/trs80.h"
 

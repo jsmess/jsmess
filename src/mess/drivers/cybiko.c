@@ -15,7 +15,6 @@ ToDo:
 
 **************************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/cybiko.h"
 #include "rendlay.h"

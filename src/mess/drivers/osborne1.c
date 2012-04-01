@@ -33,7 +33,6 @@ TODO:
   - Verify frequency of the beep/audio alarm.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/osborne1.h"
 

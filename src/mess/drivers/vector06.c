@@ -5,7 +5,6 @@
         10/07/2008 Preliminary driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/vector06.h"
 

@@ -12,7 +12,6 @@
     27/11/2010 Connected to a terminal
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

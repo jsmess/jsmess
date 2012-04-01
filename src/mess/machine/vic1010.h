@@ -12,7 +12,6 @@
 #ifndef __VIC1010__
 #define __VIC1010__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/cbmipt.h"

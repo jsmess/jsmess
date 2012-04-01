@@ -12,7 +12,6 @@
 #ifndef __MACH5__
 #define __MACH5__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

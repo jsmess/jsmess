@@ -13,7 +13,6 @@
 #ifndef __VIC1210__
 #define __VIC1210__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/vic20exp.h"

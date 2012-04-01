@@ -12,7 +12,6 @@
 #ifndef __DELA_EP64__
 #define __DELA_EP64__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "imagedev/cartslot.h"

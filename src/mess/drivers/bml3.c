@@ -27,7 +27,6 @@
         16-31: same as above plus shows the bar at the bottom
 
 **************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"

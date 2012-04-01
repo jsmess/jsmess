@@ -19,7 +19,6 @@ Command 3 does a test of the display, however the rest are a mystery.
 Paste facility was tested but doesn't work, so all code remnants removed.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/ut88.h"
 #include "formats/rk_cas.h"

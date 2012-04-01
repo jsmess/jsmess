@@ -35,7 +35,6 @@
                 1 x LAN 100Mbit/s
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"

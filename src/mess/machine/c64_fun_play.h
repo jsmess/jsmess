@@ -12,7 +12,6 @@
 #ifndef __FUN_PLAY__
 #define __FUN_PLAY__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

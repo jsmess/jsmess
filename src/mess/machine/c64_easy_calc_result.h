@@ -12,7 +12,6 @@
 #ifndef __EASY_CALC_RESULT__
 #define __EASY_CALC_RESULT__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

@@ -59,7 +59,6 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 
 ***********************************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

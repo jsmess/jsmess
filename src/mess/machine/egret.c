@@ -32,7 +32,6 @@
     --xx      ?  IPL 1/0 for hardware power switch, trickle sense (bit 1) and pulled up to +5v (bit 0) if Egret controls the PSU
 */
 
-#define ADDRESS_MAP_MODERN
 
 //#define EGRET_SUPER_VERBOSE
 

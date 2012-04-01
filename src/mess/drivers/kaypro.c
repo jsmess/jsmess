@@ -33,7 +33,6 @@
     - All models: Cannot read the floppy disk any more since someone modified the WD controller.
 
 **************************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/kaypro.h"
 

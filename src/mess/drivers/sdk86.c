@@ -24,7 +24,6 @@ ToDo:
 - Add terminal interface and option to enable it.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

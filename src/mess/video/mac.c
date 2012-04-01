@@ -50,7 +50,6 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "sound/asc.h"

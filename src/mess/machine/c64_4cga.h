@@ -12,7 +12,6 @@
 #ifndef __C64_4CGA__
 #define __C64_4CGA__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64user.h"

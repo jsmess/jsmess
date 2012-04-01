@@ -8,7 +8,6 @@ although it is very related to standard pc hardware, it is different enough
 to make the standard pc driver one level more complex, so own driver
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

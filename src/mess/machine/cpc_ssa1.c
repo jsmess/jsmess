@@ -5,7 +5,6 @@
  *
  */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpc_ssa1.h"

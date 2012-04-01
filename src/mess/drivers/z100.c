@@ -140,7 +140,6 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
   ZDIPSWHZ    EQU 10000000B   ; 1=50Hz(0=60HZ)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

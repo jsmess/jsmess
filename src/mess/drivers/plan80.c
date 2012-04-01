@@ -20,7 +20,6 @@
         - Picture of unit shows graphics, possibly a PCG
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

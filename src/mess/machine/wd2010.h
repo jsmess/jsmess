@@ -12,7 +12,6 @@
 #ifndef __WD2010__
 #define __WD2010__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 

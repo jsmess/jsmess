@@ -24,7 +24,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/vidbrain.h"

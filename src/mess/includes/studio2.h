@@ -3,7 +3,6 @@
 #ifndef __STUDIO2__
 #define __STUDIO2__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

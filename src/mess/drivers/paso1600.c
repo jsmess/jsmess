@@ -7,7 +7,6 @@
     - identify fdc type (needs a working floppy image)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

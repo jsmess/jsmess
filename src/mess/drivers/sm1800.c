@@ -12,7 +12,6 @@
             KR580VV79  programmable peripheral device, keyboard and display controller (i8279)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

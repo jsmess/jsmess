@@ -33,7 +33,6 @@
   NOTE 2: goes off into the weeds in the subroutine at fff05010
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/macpci.h"

@@ -94,7 +94,6 @@ the Neogeo Pocket.
 
 ******************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tlcs900/tlcs900.h"

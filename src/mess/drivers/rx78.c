@@ -41,7 +41,6 @@
                 memory and it appears that the operator is not provided any information of what happened.
 
 *************************************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

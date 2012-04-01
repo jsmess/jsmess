@@ -12,7 +12,6 @@
 #ifndef __S100_DJ2DB__
 #define __S100_DJ2DB__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "formats/basicdsk.h"
