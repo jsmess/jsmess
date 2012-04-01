@@ -56,26 +56,26 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mtx_io, AS_IO, 8, mtx_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD(CENTRONICS_TAG, mtx_strobe_r) AM_WRITE(mtx_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, vram_read, vram_write)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, register_read, register_write)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD(SN76489A_TAG, mtx_sound_strobe_r) AM_DEVWRITE(CASSETTE_TAG, mtx_cst_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD(CENTRONICS_TAG, mtx_prt_r)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_MODERN(CENTRONICS_TAG, centronics_device, write)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(mtx_key_hi_r, mtx_sound_latch_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY(CENTRONICS_TAG, mtx_strobe_r) AM_WRITE_LEGACY(mtx_bankswitch_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("tms9929a", tms9929a_device, vram_read, vram_write)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("tms9929a", tms9929a_device, register_read, register_write)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY(SN76489A_TAG, mtx_sound_strobe_r) AM_DEVWRITE_LEGACY(CASSETTE_TAG, mtx_cst_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY(CENTRONICS_TAG, mtx_prt_r)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
+	AM_RANGE(0x05, 0x05) AM_READWRITE_LEGACY(mtx_key_lo_r, mtx_sense_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE_LEGACY(mtx_key_hi_r, mtx_sound_latch_w)
 //  AM_RANGE(0x07, 0x07) PIO
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x30, 0x31) AM_WRITE(hrx_address_w)
-	AM_RANGE(0x32, 0x32) AM_READWRITE(hrx_data_r, hrx_data_w)
-	AM_RANGE(0x33, 0x33) AM_READWRITE(hrx_attr_r, hrx_attr_w)
-//  AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
-//  AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845_TAG, mc6845_register_r, mc6845_register_w)
-/*  AM_RANGE(0x40, 0x43) AM_DEVREADWRITE(FD1791_TAG, wd17xx_r, wd17xx_w)
-    AM_RANGE(0x44, 0x44) AM_READWRITE(fdx_status_r, fdx_control_w)
-    AM_RANGE(0x45, 0x45) AM_WRITE(fdx_drv_sel_w)
-    AM_RANGE(0x46, 0x46) AM_WRITE(fdx_dma_lo_w)
-    AM_RANGE(0x47, 0x47) AM_WRITE(fdx_dma_hi_w)*/
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x30, 0x31) AM_WRITE_LEGACY(hrx_address_w)
+	AM_RANGE(0x32, 0x32) AM_READWRITE_LEGACY(hrx_data_r, hrx_data_w)
+	AM_RANGE(0x33, 0x33) AM_READWRITE_LEGACY(hrx_attr_r, hrx_attr_w)
+//  AM_RANGE(0x38, 0x38) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_address_w)
+//  AM_RANGE(0x39, 0x39) AM_DEVWRITE_LEGACY(MC6845_TAG, mc6845_register_r, mc6845_register_w)
+/*  AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY(FD1791_TAG, wd17xx_r, wd17xx_w)
+    AM_RANGE(0x44, 0x44) AM_READWRITE_LEGACY(fdx_status_r, fdx_control_w)
+    AM_RANGE(0x45, 0x45) AM_WRITE_LEGACY(fdx_drv_sel_w)
+    AM_RANGE(0x46, 0x46) AM_WRITE_LEGACY(fdx_dma_lo_w)
+    AM_RANGE(0x47, 0x47) AM_WRITE_LEGACY(fdx_dma_hi_w)*/
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rs128_io, AS_IO, 8, mtx_state )
 	AM_IMPORT_FROM(mtx_io)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

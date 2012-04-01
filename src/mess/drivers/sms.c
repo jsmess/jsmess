@@ -79,12 +79,12 @@ static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")					/* switchable rom bank */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")					/* switchable rom bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* switchable rom bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(sms_cartram2_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE_LEGACY(sms_cartram_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE_LEGACY(sms_cartram2_w)	/* ROM bank / on-cart RAM */
 	AM_RANGE(0xc000, 0xdff7) AM_MIRROR(0x2000) AM_RAM			/* RAM (mirror at 0xE000) */
 	AM_RANGE(0xdff8, 0xdfff) AM_RAM						/* RAM "underneath" frame registers */
-	AM_RANGE(0xfff8, 0xfffb) AM_READWRITE(sms_sscope_r, sms_sscope_w)	/* 3-D glasses */
-	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
+	AM_RANGE(0xfff8, 0xfffb) AM_READWRITE_LEGACY(sms_sscope_r, sms_sscope_w)	/* 3-D glasses */
+	AM_RANGE(0xfffc, 0xffff) AM_READWRITE_LEGACY(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
@@ -93,63 +93,63 @@ static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")					/* switchable rom bank */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")					/* switchable rom bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* switchable rom bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)	/* ROM bank / on-cart RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(sms_cartram2_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE_LEGACY(sms_cartram_w)	/* ROM bank / on-cart RAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE_LEGACY(sms_cartram2_w)	/* ROM bank / on-cart RAM */
 	AM_RANGE(0xc000, 0xdffb) AM_MIRROR(0x2000) AM_RAM			/* RAM (mirror at 0xE000) */
 	AM_RANGE(0xdffc, 0xdfff) AM_RAM						/* RAM "underneath" frame registers */
-	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
+	AM_RANGE(0xfffc, 0xffff) AM_READWRITE_LEGACY(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM						/* BIOS */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM						/* RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank10")					/* Cartridge/card peek area */
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sms_store_control_r, sms_store_control_w)	/* Control */
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(sms_store_cart_select_r, sms_store_cart_select_w) 	/* cartridge/card slot selector */
-	AM_RANGE(0xd800, 0xd800) AM_READ(sms_store_select1)			/* Game selector port #1 */
-	AM_RANGE(0xdc00, 0xdc00) AM_READ(sms_store_select2)			/* Game selector port #2 */
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE_LEGACY(sms_store_control_r, sms_store_control_w)	/* Control */
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(sms_store_cart_select_r, sms_store_cart_select_w) 	/* cartridge/card slot selector */
+	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(sms_store_select1)			/* Game selector port #1 */
+	AM_RANGE(0xdc00, 0xdc00) AM_READ_LEGACY(sms_store_select2)			/* Game selector port #2 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_bios_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
-	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", sn76496_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE_MODERN("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE_MODERN("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_0_r, sms_ym2413_register_port_0_w)
-	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_1_r, sms_ym2413_data_port_0_w)
-	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE(sms_fm_detect_r, sms_fm_detect_w)
-	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_1_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE_LEGACY(sms_bios_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE_LEGACY(sms_io_control_w)
+	AM_RANGE(0x40, 0x7f)                 AM_READ_LEGACY(sms_count_r)
+	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE_LEGACY("segapsg", sn76496_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ_LEGACY(sms_input_port_0_r)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ_LEGACY(sms_input_port_1_r)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ_LEGACY(sms_input_port_0_r)
+	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ_LEGACY(sms_input_port_1_r)
+	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE_LEGACY(sms_input_port_0_r, sms_ym2413_register_port_0_w)
+	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE_LEGACY(sms_input_port_1_r, sms_ym2413_data_port_0_w)
+	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE_LEGACY(sms_fm_detect_r, sms_fm_detect_w)
+	AM_RANGE(0xf3, 0xf3)                 AM_READ_LEGACY(sms_input_port_1_r)
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ_LEGACY(sms_input_port_0_r)
+	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ_LEGACY(sms_input_port_1_r)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ_LEGACY(sms_input_port_0_r)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ_LEGACY(sms_input_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00)                 AM_READ(gg_input_port_2_r)
-	AM_RANGE(0x01, 0x05)                 AM_READWRITE(gg_sio_r, gg_sio_w)
-	AM_RANGE(0x06, 0x06)                 AM_DEVWRITE("gamegear", sn76496_stereo_w)
-	AM_RANGE(0x07, 0x07)                 AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x06) AM_WRITE(sms_bios_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0x06) AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_WRITE(sms_bios_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1e) AM_WRITE(sms_bios_w)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0x1e) AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
-	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("gamegear", sn76496_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE_MODERN("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE_MODERN("sms_vdp", sega315_5124_device, register_read, register_write)
+	AM_RANGE(0x00, 0x00)                 AM_READ_LEGACY(gg_input_port_2_r)
+	AM_RANGE(0x01, 0x05)                 AM_READWRITE_LEGACY(gg_sio_r, gg_sio_w)
+	AM_RANGE(0x06, 0x06)                 AM_DEVWRITE_LEGACY("gamegear", sn76496_stereo_w)
+	AM_RANGE(0x07, 0x07)                 AM_WRITE_LEGACY(sms_io_control_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0x06) AM_WRITE_LEGACY(sms_bios_w)
+	AM_RANGE(0x09, 0x09) AM_MIRROR(0x06) AM_WRITE_LEGACY(sms_io_control_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_WRITE_LEGACY(sms_bios_w)
+	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_WRITE_LEGACY(sms_io_control_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1e) AM_WRITE_LEGACY(sms_bios_w)
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0x1e) AM_WRITE_LEGACY(sms_io_control_w)
+	AM_RANGE(0x40, 0x7f)                 AM_READ_LEGACY(sms_count_r)
+	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE_LEGACY("gamegear", sn76496_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
 	AM_RANGE(0xc0, 0xc0)                 AM_READ_PORT("PORT_DC")
 	AM_RANGE(0xc1, 0xc1)                 AM_READ_PORT("PORT_DD")
 	AM_RANGE(0xdc, 0xdc)                 AM_READ_PORT("PORT_DC")

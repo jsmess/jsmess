@@ -207,9 +207,9 @@ static MACHINE_RESET( sgi_ip6 )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( sgi_ip6_map, AS_PROGRAM, 32, sgi_ip6_state )
-	AM_RANGE( 0x1f880000, 0x1f880003 ) AM_READWRITE(ip6_unk1_r, ip6_unk1_w)
-	AM_RANGE( 0x1fb00000, 0x1fb00003 ) AM_READWRITE(ip6_unk3_r, ip6_unk3_w)
-	AM_RANGE( 0x1fbc004c, 0x1fbc004f ) AM_READWRITE(ip6_unk2_r, ip6_unk2_w)
+	AM_RANGE( 0x1f880000, 0x1f880003 ) AM_READWRITE_LEGACY(ip6_unk1_r, ip6_unk1_w)
+	AM_RANGE( 0x1fb00000, 0x1fb00003 ) AM_READWRITE_LEGACY(ip6_unk3_r, ip6_unk3_w)
+	AM_RANGE( 0x1fbc004c, 0x1fbc004f ) AM_READWRITE_LEGACY(ip6_unk2_r, ip6_unk2_w)
 	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_REGION( "user1", 0 )
 ADDRESS_MAP_END
 

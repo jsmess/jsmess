@@ -44,14 +44,14 @@ static WRITE8_HANDLER(nes_vh_sprite_dma_w)
 
 static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8, nes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)					/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)		/* PPU registers */
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nessound", nes_psg_r, nes_psg_w)		/* PSG primary registers */
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(nes_vh_sprite_dma_w)				/* stupid address space hole */
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nessound", psg_4015_r, psg_4015_w)		/* PSG status / first control register */
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_IN0_r, nes_IN0_w)			/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(nes_IN1_r)							/* IN1 - input port 2 */
-	AM_RANGE(0x4017, 0x4017) AM_DEVWRITE("nessound", psg_4017_w)		/* PSG second control register */
-	AM_RANGE(0x4100, 0x5fff) AM_READWRITE(nes_low_mapper_r, nes_low_mapper_w)	/* Perform unholy acts on the machine */
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)		/* PPU registers */
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nessound", nes_psg_r, nes_psg_w)		/* PSG primary registers */
+	AM_RANGE(0x4014, 0x4014) AM_WRITE_LEGACY(nes_vh_sprite_dma_w)				/* stupid address space hole */
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nessound", psg_4015_r, psg_4015_w)		/* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE_LEGACY(nes_IN0_r, nes_IN0_w)			/* IN0 - input port 1 */
+	AM_RANGE(0x4017, 0x4017) AM_READ_LEGACY(nes_IN1_r)							/* IN1 - input port 2 */
+	AM_RANGE(0x4017, 0x4017) AM_DEVWRITE_LEGACY("nessound", psg_4017_w)		/* PSG second control register */
+	AM_RANGE(0x4100, 0x5fff) AM_READWRITE_LEGACY(nes_low_mapper_r, nes_low_mapper_w)	/* Perform unholy acts on the machine */
 ADDRESS_MAP_END
 
 

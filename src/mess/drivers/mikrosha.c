@@ -32,19 +32,19 @@ public:
 static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
-    AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r) // Not connected
-    AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
-    AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x07fc)
-    AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
-    AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
-    AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
-	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
+    AM_RANGE( 0x8000, 0xbfff ) AM_READ_LEGACY(radio_cpu_state_r) // Not connected
+    AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
+    AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x07fc)
+    AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
+    AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
+    AM_RANGE( 0xe000, 0xf7ff ) AM_READ_LEGACY(radio_cpu_state_r) // Not connected
+	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mikrosha_io , AS_IO, 8, mikrosha_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(radio_io_r,radio_io_w)
+	AM_RANGE( 0x00, 0xff ) AM_READWRITE_LEGACY(radio_io_r,radio_io_w)
 ADDRESS_MAP_END
 
 /* Input ports */

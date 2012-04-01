@@ -207,12 +207,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tf20_io, AS_IO, 8, tf20_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_MODERN("3a", upd7201_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0xf6, 0xf6) AM_READ(tf20_rom_disable)
-	AM_RANGE(0xf7, 0xf7) AM_READ(tf20_dip_r)
-	AM_RANGE(0xf8, 0xf8) AM_DEVREAD("5a", tf20_upd765_tc_r) AM_WRITE(tf20_fdc_control_w)
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("5a", upd765_status_r)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("5a", upd765_data_r, upd765_data_w)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("3a", upd7201_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0xf6, 0xf6) AM_READ_LEGACY(tf20_rom_disable)
+	AM_RANGE(0xf7, 0xf7) AM_READ_LEGACY(tf20_dip_r)
+	AM_RANGE(0xf8, 0xf8) AM_DEVREAD_LEGACY("5a", tf20_upd765_tc_r) AM_WRITE_LEGACY(tf20_fdc_control_w)
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("5a", upd765_status_r)
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("5a", upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
 
 

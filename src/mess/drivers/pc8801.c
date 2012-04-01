@@ -914,7 +914,7 @@ static WRITE8_HANDLER( pc8801_mem_w )
 }
 
 static ADDRESS_MAP_START( pc8801_mem, AS_PROGRAM, 8, pc8801_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8801_mem_r,pc8801_mem_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(pc8801_mem_r,pc8801_mem_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( pc8801_ctrl_r )
@@ -1429,33 +1429,33 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("KEY13")
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("KEY14")
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("KEY15")
-	AM_RANGE(0x00, 0x02) AM_WRITE(pc8801_pcg8100_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(pc8801_rtc_w)
-	AM_RANGE(0x21, 0x21) AM_READ(sio_status_r)                                /* RS-232C and cassette */
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc8801_txt_cmt_ctrl_w)
-	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
-	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
+	AM_RANGE(0x00, 0x02) AM_WRITE_LEGACY(pc8801_pcg8100_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(pc8801_rtc_w)
+	AM_RANGE(0x21, 0x21) AM_READ_LEGACY(sio_status_r)                                /* RS-232C and cassette */
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(pc8801_txt_cmt_ctrl_w)
+	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(pc8801_gfx_ctrl_w)
+	AM_RANGE(0x32, 0x32) AM_READWRITE_LEGACY(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
 	//0x33, 0x33 sets something kanji related
-	AM_RANGE(0x34, 0x34) AM_WRITE(pc8801_alu_ctrl1_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE(pc8801_alu_ctrl2_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(pc8801_ctrl_r, pc8801_ctrl_w)
-	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE("opn", ym2203_r,ym2203_w)
+	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(pc8801_alu_ctrl1_w)
+	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(pc8801_alu_ctrl2_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE_LEGACY(pc8801_ctrl_r, pc8801_ctrl_w)
+	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE_LEGACY("opn", ym2203_r,ym2203_w)
 //  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
-	AM_RANGE(0x50, 0x50) AM_READWRITE(pc8801_crtc_param_r, pc88_crtc_param_w)
-	AM_RANGE(0x51, 0x51) AM_READWRITE(pc8801_crtc_status_r, pc88_crtc_cmd_w)
-	AM_RANGE(0x52, 0x52) AM_WRITE(pc8801_bgpal_w)
-	AM_RANGE(0x53, 0x53) AM_WRITE(pc8801_layer_masking_w)
-	AM_RANGE(0x54, 0x5b) AM_WRITE(pc8801_palram_w)
-	AM_RANGE(0x5c, 0x5c) AM_READ(pc8801_vram_select_r)
-	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc8801_vram_select_w)
-	AM_RANGE(0x60, 0x67) AM_WRITE(pc8801_dmac_w)
-	AM_RANGE(0x68, 0x68) AM_WRITE(pc8801_dmac_mode_w)
-	AM_RANGE(0x6e, 0x6e) AM_READ(pc8801_cpuclock_r)
-	AM_RANGE(0x6f, 0x6f) AM_READWRITE(pc8801_baudrate_r,pc8801_baudrate_w)
-	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_window_bank_r, pc8801_window_bank_w)
-	AM_RANGE(0x71, 0x71) AM_READWRITE(pc8801_ext_rom_bank_r, pc8801_ext_rom_bank_w)
-	AM_RANGE(0x78, 0x78) AM_WRITE(pc8801_window_bank_inc_w)
-	AM_RANGE(0x90, 0x9f) AM_READWRITE(pc8801_cdrom_r,pc8801_cdrom_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE_LEGACY(pc8801_crtc_param_r, pc88_crtc_param_w)
+	AM_RANGE(0x51, 0x51) AM_READWRITE_LEGACY(pc8801_crtc_status_r, pc88_crtc_cmd_w)
+	AM_RANGE(0x52, 0x52) AM_WRITE_LEGACY(pc8801_bgpal_w)
+	AM_RANGE(0x53, 0x53) AM_WRITE_LEGACY(pc8801_layer_masking_w)
+	AM_RANGE(0x54, 0x5b) AM_WRITE_LEGACY(pc8801_palram_w)
+	AM_RANGE(0x5c, 0x5c) AM_READ_LEGACY(pc8801_vram_select_r)
+	AM_RANGE(0x5c, 0x5f) AM_WRITE_LEGACY(pc8801_vram_select_w)
+	AM_RANGE(0x60, 0x67) AM_WRITE_LEGACY(pc8801_dmac_w)
+	AM_RANGE(0x68, 0x68) AM_WRITE_LEGACY(pc8801_dmac_mode_w)
+	AM_RANGE(0x6e, 0x6e) AM_READ_LEGACY(pc8801_cpuclock_r)
+	AM_RANGE(0x6f, 0x6f) AM_READWRITE_LEGACY(pc8801_baudrate_r,pc8801_baudrate_w)
+	AM_RANGE(0x70, 0x70) AM_READWRITE_LEGACY(pc8801_window_bank_r, pc8801_window_bank_w)
+	AM_RANGE(0x71, 0x71) AM_READWRITE_LEGACY(pc8801_ext_rom_bank_r, pc8801_ext_rom_bank_w)
+	AM_RANGE(0x78, 0x78) AM_WRITE_LEGACY(pc8801_window_bank_inc_w)
+	AM_RANGE(0x90, 0x9f) AM_READWRITE_LEGACY(pc8801_cdrom_r,pc8801_cdrom_w)
 //  AM_RANGE(0xa0, 0xa3) AM_NOP                                     /* music & network */
 //  AM_RANGE(0xa8, 0xad) AM_NOP                                     /* second sound board */
 //  AM_RANGE(0xb4, 0xb5) AM_NOP                                     /* Video art board */
@@ -1464,24 +1464,24 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 //  AM_RANGE(0xd0, 0xd7) AM_NOP                                     /* music & GP-IB */
 //  AM_RANGE(0xd8, 0xd8) AM_NOP                                     /* GP-IB */
 //  AM_RANGE(0xdc, 0xdf) AM_NOP                                     /* MODEM */
-	AM_RANGE(0xe2, 0xe2) AM_READWRITE(pc8801_extram_mode_r,pc8801_extram_mode_w)			/* expand RAM mode */
-	AM_RANGE(0xe3, 0xe3) AM_READWRITE(pc8801_extram_bank_r,pc8801_extram_bank_w)			/* expand RAM bank */
+	AM_RANGE(0xe2, 0xe2) AM_READWRITE_LEGACY(pc8801_extram_mode_r,pc8801_extram_mode_w)			/* expand RAM mode */
+	AM_RANGE(0xe3, 0xe3) AM_READWRITE_LEGACY(pc8801_extram_bank_r,pc8801_extram_bank_w)			/* expand RAM bank */
 #ifdef USE_PROPER_I8214
-	AM_RANGE(0xe4, 0xe4) AM_WRITE(i8214_irq_level_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(i8214_irq_mask_w)
+	AM_RANGE(0xe4, 0xe4) AM_WRITE_LEGACY(i8214_irq_level_w)
+	AM_RANGE(0xe6, 0xe6) AM_WRITE_LEGACY(i8214_irq_mask_w)
 #else
-	AM_RANGE(0xe4, 0xe4) AM_WRITE(pc8801_irq_level_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(pc8801_irq_mask_w)
+	AM_RANGE(0xe4, 0xe4) AM_WRITE_LEGACY(pc8801_irq_level_w)
+	AM_RANGE(0xe6, 0xe6) AM_WRITE_LEGACY(pc8801_irq_mask_w)
 #endif
 //  AM_RANGE(0xe7, 0xe7) AM_NOP                                     /* Arcus writes here, almost likely to be a mirror of above */
-	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pc8801_kanji_r, pc8801_kanji_w)
-	AM_RANGE(0xec, 0xef) AM_READWRITE(pc8801_kanji_lv2_r, pc8801_kanji_lv2_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(pc8801_dic_bank_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(pc8801_dic_ctrl_w)
+	AM_RANGE(0xe8, 0xeb) AM_READWRITE_LEGACY(pc8801_kanji_r, pc8801_kanji_w)
+	AM_RANGE(0xec, 0xef) AM_READWRITE_LEGACY(pc8801_kanji_lv2_r, pc8801_kanji_lv2_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE_LEGACY(pc8801_dic_bank_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE_LEGACY(pc8801_dic_ctrl_w)
 //  AM_RANGE(0xf3, 0xf3) AM_NOP                                     /* DMA floppy (unknown) */
 //  AM_RANGE(0xf4, 0xf7) AM_NOP                                     /* DMA 5'floppy (may be not released) */
 //  AM_RANGE(0xf8, 0xfb) AM_NOP                                     /* DMA 8'floppy (unknown) */
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE_MODERN("d8255_master", i8255_device, read, write)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_master", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
@@ -1582,13 +1582,13 @@ static WRITE8_HANDLER( fdc_drive_mode_w )
 
 static ADDRESS_MAP_START( pc8801fdc_io, AS_IO, 8, pc8801_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd
+	AM_RANGE(0xf0, 0xf0) AM_WRITE_LEGACY(fdc_irq_vector_w) // Interrupt Opcode Port
+	AM_RANGE(0xf4, 0xf4) AM_WRITE_LEGACY(fdc_drive_mode_w) // Drive mode, 2d, 2dd, 2hd
 //  AM_RANGE(0xf7, 0xf7) AM_WRITENOP // printer port output
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("upd765", upd765_status_r )
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("upd765", upd765_data_r, upd765_data_w )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE_MODERN("d8255_slave", i8255_device, read, write)
+	AM_RANGE(0xf8, 0xf8) AM_READWRITE_LEGACY(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("upd765", upd765_status_r )
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w )
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_slave", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input Ports */

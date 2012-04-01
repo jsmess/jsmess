@@ -190,10 +190,10 @@ static READ8_HANDLER( osbexec_rtc_r )
 
 
 static ADDRESS_MAP_START( osbexec_mem, AS_PROGRAM, 8, osbexec_state )
-	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE( osbexec_0000_w )	/* ROM and maybe also banked ram */
+	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE_LEGACY( osbexec_0000_w )	/* ROM and maybe also banked ram */
 	AM_RANGE( 0x2000, 0x3FFF ) AM_RAMBANK("2000")								/* Banked RAM */
 	AM_RANGE( 0x4000, 0xBFFF ) AM_RAMBANK("4000")								/* Banked RAM */
-	AM_RANGE( 0xC000, 0xDFFF ) AM_READWRITE( osbexec_c000_r, osbexec_c000_w )	/* Video ram / Banked RAM */
+	AM_RANGE( 0xC000, 0xDFFF ) AM_READWRITE_LEGACY( osbexec_c000_r, osbexec_c000_w )	/* Video ram / Banked RAM */
 	AM_RANGE( 0xE000, 0xEFFF ) AM_RAMBANK("e000")								/* Banked RAM */
 	AM_RANGE( 0xF000, 0xFFFF ) AM_RAM											/* 4KB of non-banked RAM for system stack etc */
 ADDRESS_MAP_END
@@ -201,13 +201,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_MODERN( "pia_0", pia6821_device, read, write)				/* 6821 PIA @ UD12 */
+	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)				/* 6821 PIA @ UD12 */
 	/* 0x04 - 0x07 - 8253 @UD1 */
-	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "mb8877", wd17xx_r, wd17xx_w )				/* MB8877 @ UB17 input clock = 1MHz */
-	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "sio", z80dart_ba_cd_r, z80dart_ba_cd_w )	/* SIO @ UD4 */
-	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_MODERN( "pia_1", pia6821_device, read, write)				/* 6821 PIA @ UD8 */
-	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ( osbexec_kbd_r )					/* KBD */
-	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ( osbexec_rtc_r )										/* "RTC" @ UE13/UF13 */
+	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_LEGACY( "mb8877", wd17xx_r, wd17xx_w )				/* MB8877 @ UB17 input clock = 1MHz */
+	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_LEGACY( "sio", z80dart_ba_cd_r, z80dart_ba_cd_w )	/* SIO @ UD4 */
+	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)				/* 6821 PIA @ UD8 */
+	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ_LEGACY( osbexec_kbd_r )					/* KBD */
+	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ_LEGACY( osbexec_rtc_r )										/* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
 ADDRESS_MAP_END
 

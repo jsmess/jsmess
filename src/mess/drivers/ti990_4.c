@@ -196,24 +196,24 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ti990_4_cru_map, AS_IO, 8, ti990_4_state )
 #if VIDEO_911
-	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_cru_r)
-	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_cru_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREAD_LEGACY("vdt911", vdt911_cru_r)
+	AM_RANGE(0x80, 0x8f) AM_DEVWRITE_LEGACY("vdt911", vdt911_cru_w)
 #else
-	AM_RANGE(0x00, 0x01) AM_DEVREAD("asr733", asr733_cru_r)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("asr733", asr733_cru_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREAD_LEGACY("asr733", asr733_cru_r)
+	AM_RANGE(0x00, 0x0f) AM_DEVWRITE_LEGACY("asr733", asr733_cru_w)
 #endif
 
-	AM_RANGE(0x08, 0x0b) AM_READ(fd800_cru_r)
-	AM_RANGE(0x40, 0x5f) AM_WRITE(fd800_cru_w)
+	AM_RANGE(0x08, 0x0b) AM_READ_LEGACY(fd800_cru_r)
+	AM_RANGE(0x40, 0x5f) AM_WRITE_LEGACY(fd800_cru_w)
 
-	AM_RANGE(0x1fe, 0x1ff) AM_READ(ti990_panel_read)
-	AM_RANGE(0xff0, 0xfff) AM_WRITE(ti990_panel_write)
+	AM_RANGE(0x1fe, 0x1ff) AM_READ_LEGACY(ti990_panel_read)
+	AM_RANGE(0xff0, 0xfff) AM_WRITE_LEGACY(ti990_panel_write)
 
 	/* external instruction decoding */
-/*  AM_RANGE(0x2000, 0x2fff) AM_WRITE(idle_callback)*/
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(rset_callback)
-	AM_RANGE(0x5000, 0x6fff) AM_WRITE(ckon_ckof_callback)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(lrex_callback)
+/*  AM_RANGE(0x2000, 0x2fff) AM_WRITE_LEGACY(idle_callback)*/
+	AM_RANGE(0x3000, 0x3fff) AM_WRITE_LEGACY(rset_callback)
+	AM_RANGE(0x5000, 0x6fff) AM_WRITE_LEGACY(ckon_ckof_callback)
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE_LEGACY(lrex_callback)
 ADDRESS_MAP_END
 
 #if 0

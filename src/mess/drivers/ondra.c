@@ -24,9 +24,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ondra_io, AS_IO, 8, ondra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0b)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x03, 0x03) AM_WRITE(ondra_port_03_w)
-	//AM_RANGE(0x09, 0x09) AM_WRITE(ondra_port_09_w)
-	//AM_RANGE(0x0a, 0x0a) AM_WRITE(ondra_port_0a_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(ondra_port_03_w)
+	//AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(ondra_port_09_w)
+	//AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(ondra_port_0a_w)
 ADDRESS_MAP_END
 
 /* Input ports */

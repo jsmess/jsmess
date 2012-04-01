@@ -232,26 +232,26 @@ static DRIVER_INIT( aquarius )
 
 static ADDRESS_MAP_START( aquarius_mem, AS_PROGRAM, 8, aquarius_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(aquarius_videoram_w) AM_BASE_MEMBER(aquarius_state, m_videoram)
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(aquarius_colorram_w) AM_BASE_MEMBER(aquarius_state, m_colorram)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE_LEGACY(aquarius_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE_LEGACY(aquarius_colorram_w) AM_BASE( m_colorram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_NOP /* expansion ram */
-	AM_RANGE(0xc000, 0xffff) AM_READ(cartridge_r)
+	AM_RANGE(0xc000, 0xffff) AM_READ_LEGACY(cartridge_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquarius_io, AS_IO, 8, aquarius_state )
-//  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE("ay8910", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE("ay8910", ay8910_address_w)
-	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
-	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(keyboard_r, scrambler_w)
+//  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(modem_r, modem_w)
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(cassette_r, cassette_w)
+	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(vsync_r, mapper_w)
+	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(printer_r, printer_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE_LEGACY(keyboard_r, scrambler_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquarius_qd_io, AS_IO, 8, aquarius_state )
 	AM_IMPORT_FROM(aquarius_io)
-	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE(floppy_r, floppy_w)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(floppy_r, floppy_w)
 ADDRESS_MAP_END
 
 

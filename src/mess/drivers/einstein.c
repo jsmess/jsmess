@@ -527,38 +527,38 @@ ADDRESS_MAP_END
 /* The I/O ports are decoded into 8 blocks using address lines A3 to A7 */
 static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
 	/* block 0, ay8910 psg */
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I030, ay8910_r, ay8910_address_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff04) AM_DEVWRITE(IC_I030, ay8910_data_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0xff04) AM_DEVREADWRITE_LEGACY(IC_I030, ay8910_r, ay8910_address_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0xff04) AM_DEVWRITE_LEGACY(IC_I030, ay8910_data_w)
 	/* block 1, tms9928a vdp */
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, vram_read, vram_write)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN("tms9929a", tms9929a_device, register_read, register_write)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff06) AM_DEVREADWRITE("tms9929a", tms9929a_device, vram_read, vram_write)
+	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff06) AM_DEVREADWRITE("tms9929a", tms9929a_device, register_read, register_write)
 	/* block 2, i8251 uart */
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, data_r, data_w)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE_MODERN(IC_I060, i8251_device, status_r, control_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, i8251_device, data_r, data_w)
+	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff06) AM_DEVREADWRITE(IC_I060, i8251_device, status_r, control_w)
 	/* block 3, wd1770 floppy controller */
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE_MODERN(IC_I042, wd177x_t, read, write)
+	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I042, wd177x_t, read, write)
 	/* block 4, internal controls */
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(einstein_kybintmsk_r, einstein_kybintmsk_w)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE(einstein_adcintmsk_w)
-	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_DEVWRITE(IC_I042, einstein_drsel_w)
-	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITE(einstein_rom_w)
-	AM_RANGE(0x25, 0x25) AM_MIRROR(0xff00) AM_WRITE(einstein_fire_int_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(einstein_kybintmsk_r, einstein_kybintmsk_w)
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_WRITE_LEGACY(einstein_adcintmsk_w)
+	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY(IC_I042, einstein_drsel_w)
+	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITE_LEGACY(einstein_rom_w)
+	AM_RANGE(0x25, 0x25) AM_MIRROR(0xff00) AM_WRITE_LEGACY(einstein_fire_int_w)
 	/* block 5, z80ctc */
-	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I058, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE_LEGACY(IC_I058, z80ctc_r, z80ctc_w)
 	/* block 6, z80pio */
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I063, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE_LEGACY(IC_I063, z80pio_cd_ba_r, z80pio_cd_ba_w)
 #if 0
 	/* block 7, adc */
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff07) AM_DEVREADWRITE(IC_I050, adc0844_r, adc0844_w)
+	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff07) AM_DEVREADWRITE_LEGACY(IC_I050, adc0844_r, adc0844_w)
 #endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( einstein2_io, AS_IO, 8, einstein_state )
 	AM_IMPORT_FROM(einstein_io)
-	AM_RANGE(0x40, 0x47) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(einstein_80col_ram_r, einstein_80col_ram_w)
-	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x49, 0x49) AM_MIRROR(0xff00) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0x4c, 0x4c) AM_MIRROR(0xff00) AM_READ(einstein_80col_state_r)
+	AM_RANGE(0x40, 0x47) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE_LEGACY(einstein_80col_ram_r, einstein_80col_ram_w)
+	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x49, 0x49) AM_MIRROR(0xff00) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x4c, 0x4c) AM_MIRROR(0xff00) AM_READ_LEGACY(einstein_80col_state_r)
 ADDRESS_MAP_END
 
 

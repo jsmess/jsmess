@@ -74,7 +74,7 @@ Nascom Memory map
 
 static ADDRESS_MAP_START( nascom1_mem, AS_PROGRAM, 8, nascom1_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(nascom1_state, m_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM	/* 1Kb */
 	AM_RANGE(0x1400, 0x4fff) AM_RAM	/* 16Kb */
@@ -86,22 +86,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nascom1_io, AS_IO, 8, nascom1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x0F)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
-	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w )
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(nascom1_port_00_r, nascom1_port_00_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(nascom1_port_01_r, nascom1_port_01_w)
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(nascom1_port_02_r)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w )
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nascom2_io, AS_IO, 8, nascom1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
-	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w )
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("wd1793", wd17xx_r, wd17xx_w)
-	AM_RANGE(0xe4, 0xe4) AM_READWRITE(nascom2_fdc_select_r, nascom2_fdc_select_w)
-	AM_RANGE(0xe5, 0xe5) AM_READ(nascom2_fdc_status_r)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(nascom1_port_00_r, nascom1_port_00_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(nascom1_port_01_r, nascom1_port_01_w)
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(nascom1_port_02_r)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w )
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_r, wd17xx_w)
+	AM_RANGE(0xe4, 0xe4) AM_READWRITE_LEGACY(nascom2_fdc_select_r, nascom2_fdc_select_w)
+	AM_RANGE(0xe5, 0xe5) AM_READ_LEGACY(nascom2_fdc_status_r)
 ADDRESS_MAP_END
 
 

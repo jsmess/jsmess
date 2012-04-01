@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( ti99_2_memmap, AS_PROGRAM, 8, ti99_2_state )
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")	/* system ROM, banked on 32kb ROMs protos */
 	AM_RANGE(0x6000, 0xdfff) AM_NOP		    /* free for expansion */
 	AM_RANGE(0xe000, 0xebff) AM_RAM		    /* system RAM */
-	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE_MEMBER(ti99_2_state, m_videoram)
+	AM_RANGE(0xec00, 0xeeff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM		    /* system RAM */
 	AM_RANGE(0xf000, 0xffff) AM_NOP		    /* free for expansion (and internal processor RAM) */
 ADDRESS_MAP_END
@@ -279,10 +279,10 @@ static  READ8_HANDLER ( ti99_2_read_misc_cru )
 }
 
 static ADDRESS_MAP_START(ti99_2_io, AS_IO, 8, ti99_2_state )
-	AM_RANGE(0x0E00, 0x0E7f) AM_READ(ti99_2_read_kbd)
-	AM_RANGE(0x0E80, 0x0Eff) AM_READ(ti99_2_read_misc_cru)
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE(ti99_2_write_kbd)
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(ti99_2_write_misc_cru)
+	AM_RANGE(0x0E00, 0x0E7f) AM_READ_LEGACY(ti99_2_read_kbd)
+	AM_RANGE(0x0E80, 0x0Eff) AM_READ_LEGACY(ti99_2_read_misc_cru)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITE_LEGACY(ti99_2_write_kbd)
+	AM_RANGE(0x7400, 0x77ff) AM_WRITE_LEGACY(ti99_2_write_misc_cru)
 ADDRESS_MAP_END
 
 

@@ -126,24 +126,24 @@ static ADDRESS_MAP_START(cbmb_mem , AS_PROGRAM, 8, cbmb_state )
 	AM_RANGE(0x50002, 0x5ffff) AM_READONLY AM_WRITENOP
 	AM_RANGE(0x60000, 0xf07ff) AM_RAM
 #if 0
-	AM_RANGE(0xf0800, 0xf0fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf0800, 0xf0fff) AM_READ_LEGACY(SMH_ROM)
 #endif
 	AM_RANGE(0xf1000, 0xf1fff) AM_ROM	/* cartridges or ram */
 	AM_RANGE(0xf2000, 0xf3fff) AM_ROM	/* cartridges or ram */
 	AM_RANGE(0xf4000, 0xf5fff) AM_ROM
 	AM_RANGE(0xf6000, 0xf7fff) AM_ROM
-	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE_MEMBER(cbmb_state, m_basic)
-	AM_RANGE(0xfd000, 0xfd7ff) AM_RAM AM_BASE_MEMBER(cbmb_state, m_videoram) /* VIDEORAM */
-	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR(0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR(0xfe) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE( m_basic)
+	AM_RANGE(0xfd000, 0xfd7ff) AM_RAM AM_BASE( m_videoram) /* VIDEORAM */
+	AM_RANGE(0xfd800, 0xfd800) AM_MIRROR(0xfe) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xfd801, 0xfd801) AM_MIRROR(0xfe) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
+	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE_LEGACY("sid6581", sid6581_r, sid6581_w)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE("cia", mos6526_r, mos6526_w)
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE_LEGACY("cia", mos6526_r, mos6526_w)
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE("tpi6525_0", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE("tpi6525_1", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE_MEMBER(cbmb_state, m_kernal)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE_LEGACY("tpi6525_0", tpi6525_r, tpi6525_w)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE_LEGACY("tpi6525_1", tpi6525_r, tpi6525_w)
+	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE( m_kernal)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(p500_mem , AS_PROGRAM, 8, cbmb_state )
@@ -153,24 +153,24 @@ static ADDRESS_MAP_START(p500_mem , AS_PROGRAM, 8, cbmb_state )
 	AM_RANGE(0x80000, 0x8ffff) AM_READONLY AM_WRITENOP
 	AM_RANGE(0x90000, 0xf07ff) AM_RAM
 #if 0
-	AM_RANGE(0xf0800, 0xf0fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf0800, 0xf0fff) AM_READ_LEGACY(SMH_ROM)
 #endif
 	AM_RANGE(0xf1000, 0xf1fff) AM_ROM	/* cartridges or ram */
 	AM_RANGE(0xf2000, 0xf3fff) AM_ROM	/* cartridges or ram */
 	AM_RANGE(0xf4000, 0xf5fff) AM_ROM
 	AM_RANGE(0xf6000, 0xf7fff) AM_ROM
-	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE_MEMBER(cbmb_state, m_basic)
-	AM_RANGE(0xfd000, 0xfd3ff) AM_RAM AM_BASE_MEMBER(cbmb_state, m_videoram)		/* videoram */
-	AM_RANGE(0xfd400, 0xfd7ff) AM_RAM_WRITE(cbmb_colorram_w) AM_BASE_MEMBER(cbmb_state, m_colorram)		/* colorram */
-	AM_RANGE(0xfd800, 0xfd8ff) AM_DEVREADWRITE("vic6567", vic2_port_r, vic2_port_w)
+	AM_RANGE(0xf8000, 0xfbfff) AM_ROM AM_BASE( m_basic)
+	AM_RANGE(0xfd000, 0xfd3ff) AM_RAM AM_BASE( m_videoram)		/* videoram */
+	AM_RANGE(0xfd400, 0xfd7ff) AM_RAM_WRITE_LEGACY(cbmb_colorram_w) AM_BASE( m_colorram)		/* colorram */
+	AM_RANGE(0xfd800, 0xfd8ff) AM_DEVREADWRITE_LEGACY("vic6567", vic2_port_r, vic2_port_w)
 	/* disk units */
-	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
+	AM_RANGE(0xfda00, 0xfdaff) AM_DEVREADWRITE_LEGACY("sid6581", sid6581_r, sid6581_w)
 	/* db00 coprocessor */
-	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE("cia", mos6526_r, mos6526_w)
+	AM_RANGE(0xfdc00, 0xfdcff) AM_DEVREADWRITE_LEGACY("cia", mos6526_r, mos6526_w)
 	/* dd00 acia */
-	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE("tpi6525_0", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE("tpi6525_1", tpi6525_r, tpi6525_w)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE_MEMBER(cbmb_state, m_kernal)
+	AM_RANGE(0xfde00, 0xfdeff) AM_DEVREADWRITE_LEGACY("tpi6525_0", tpi6525_r, tpi6525_w)
+	AM_RANGE(0xfdf00, 0xfdfff) AM_DEVREADWRITE_LEGACY("tpi6525_1", tpi6525_r, tpi6525_w)
+	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_BASE( m_kernal)
 ADDRESS_MAP_END
 
 

@@ -1416,54 +1416,54 @@ static ADDRESS_MAP_START( fm7_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE_LEGACY(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
-	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE_LEGACY(fm7_psg_select_r,fm7_psg_select_w)
+	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE_LEGACY(fm7_psg_data_r, fm7_psg_data_w)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK("bank17")
 	AM_RANGE(0xffe0,0xffef) AM_RAM
-	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm8_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0x7fff) AM_RAM
 	AM_RANGE(0x8000,0xfbff) AM_ROMBANK("bank1") // also F-BASIC ROM, when enabled
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE_LEGACY(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
 	// Boot ROM
 	AM_RANGE(0xfe00,0xffdf) AM_ROMBANK("bank17")
 	AM_RANGE(0xffe0,0xffef) AM_RAM
-	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
 ADDRESS_MAP_END
 
 /*
@@ -1478,19 +1478,19 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x0000,0xbfff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE_MEMBER(fm7_state, m_shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE( m_shared_ram)
 	// I/O space (D400-D4FF)
-	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
-	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
-	AM_RANGE(0xd403,0xd403) AM_READ(fm7_sub_beeper_r)
-	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
-	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
-	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
-	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
-	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
+	AM_RANGE(0xd400,0xd401) AM_READ_LEGACY(fm7_sub_keyboard_r)
+	AM_RANGE(0xd402,0xd402) AM_READ_LEGACY(fm7_cancel_ack)
+	AM_RANGE(0xd403,0xd403) AM_READ_LEGACY(fm7_sub_beeper_r)
+	AM_RANGE(0xd404,0xd404) AM_READ_LEGACY(fm7_attn_irq_r)
+	AM_RANGE(0xd408,0xd408) AM_READWRITE_LEGACY(fm7_crt_r,fm7_crt_w)
+	AM_RANGE(0xd409,0xd409) AM_READWRITE_LEGACY(fm7_vram_access_r,fm7_vram_access_w)
+	AM_RANGE(0xd40a,0xd40a) AM_READWRITE_LEGACY(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xd40e,0xd40f) AM_WRITE_LEGACY(fm7_vram_offset_w)
 	AM_RANGE(0xd800,0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1512,46 +1512,46 @@ static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xe000,0xefff) AM_RAMBANK("bank15")
 	AM_RANGE(0xf000,0xfbff) AM_RAMBANK("bank16")
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE_LEGACY(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0a) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd0b,0xfd0b) AM_READ(fm77av_boot_mode_r)
-	AM_RANGE(0xfd0c,0xfd0c) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd10) AM_WRITE(fm7_init_en_w)
-	AM_RANGE(0xfd11,0xfd11) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd12,0xfd12) AM_READWRITE(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
-	AM_RANGE(0xfd13,0xfd13) AM_WRITE(fm77av_sub_bank_w)
-	AM_RANGE(0xfd14,0xfd14) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd2b) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
-	AM_RANGE(0xfd35,0xfd36) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfd7f) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
-	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE(fm77av_bootram_w) AM_BASE_MEMBER(fm7_state, m_boot_ram)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0a) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd0b,0xfd0b) AM_READ_LEGACY(fm77av_boot_mode_r)
+	AM_RANGE(0xfd0c,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd10) AM_WRITE_LEGACY(fm7_init_en_w)
+	AM_RANGE(0xfd11,0xfd11) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd12,0xfd12) AM_READWRITE_LEGACY(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
+	AM_RANGE(0xfd13,0xfd13) AM_WRITE_LEGACY(fm77av_sub_bank_w)
+	AM_RANGE(0xfd14,0xfd14) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd17,0xfd17) AM_READ_LEGACY(fm7_fmirq_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd2b) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd30,0xfd34) AM_WRITE_LEGACY(fm77av_analog_palette_w)
+	AM_RANGE(0xfd35,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfd7f) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd80,0xfd93) AM_READWRITE_LEGACY(fm7_mmr_r,fm7_mmr_w)
+	AM_RANGE(0xfd94,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE_LEGACY(fm77av_bootram_w) AM_BASE( m_boot_ram)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
-	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
 ADDRESS_MAP_END
 
 // Much of this is guesswork at the moment
 static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0x7fff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x0000,0x7fff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0x8000,0x8fff) AM_RAM // Console RAM(?)
 	AM_RANGE(0x9000,0x9f7f) AM_RAM // Work RAM(?)
-	AM_RANGE(0x9f80,0x9fff) AM_RAM AM_BASE_MEMBER(fm7_state, m_shared_ram)
-	AM_RANGE(0xafe4,0xafe4) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
-	AM_RANGE(0xafe6,0xafe6) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
+	AM_RANGE(0x9f80,0x9fff) AM_RAM AM_BASE( m_shared_ram)
+	AM_RANGE(0xafe4,0xafe4) AM_READWRITE_LEGACY(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xafe6,0xafe6) AM_READWRITE_LEGACY(fm77av_video_flags_r,fm77av_video_flags_w)
 	AM_RANGE(0xc000,0xffff) AM_ROM // sybsystem ROM
 ADDRESS_MAP_END
 
@@ -1562,20 +1562,20 @@ static ADDRESS_MAP_START( fm11_x86_mem, AS_PROGRAM, 8, fm7_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm11_x86_io, AS_IO, 8, fm7_state )
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0c) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd17) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd36) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfdff) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd17) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm16_mem, AS_PROGRAM, 16, fm7_state )
@@ -1584,24 +1584,24 @@ static ADDRESS_MAP_START( fm16_mem, AS_PROGRAM, 16, fm7_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm16_io, AS_IO, 16, fm7_state )
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE8(fm7_keyboard_r,fm7_cassette_printer_w,0xffff)
-	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_cassette_printer_r,fm7_irq_mask_w,0x00ff)  // IRQ mask
-	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8(fm7_irq_cause_r,fm7_beeper_w,0xff00)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd05) AM_READ8(fm7_fd04_r,0x00ff)
-	AM_RANGE(0xfd04,0xfd05) AM_READWRITE8(fm7_subintf_r,fm7_subintf_w,0xff00)
-//  AM_RANGE(0xfd06,0xfd0c) AM_READ8(fm7_unknown_r,0xffff)
-	AM_RANGE(0xfd0e,0xfd0f) AM_READWRITE8(fm7_rom_en_r,fm7_rom_en_w,0xff00)
-//  AM_RANGE(0xfd10,0xfd17) AM_READ8(fm7_unknown_r,0xffff)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE8(fm7_fdc_r,fm7_fdc_w,0xffff)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE8(fm7_kanji_r,fm7_kanji_w,0xffff)
-//  AM_RANGE(0xfd24,0xfd36) AM_READ8(fm7_unknown_r,0xffff)
-	AM_RANGE(0xfd36,0xfd37) AM_WRITE8(fm7_multipage_w,0xff00)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE8(fm7_palette_r,fm7_palette_w,0xffff)
-//  AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE8_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w,0xffff)
+	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w,0x00ff)  // IRQ mask
+	AM_RANGE(0xfd02,0xfd03) AM_READWRITE8_LEGACY(fm7_irq_cause_r,fm7_beeper_w,0xff00)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd05) AM_READ8_LEGACY(fm7_fd04_r,0x00ff)
+	AM_RANGE(0xfd04,0xfd05) AM_READWRITE8_LEGACY(fm7_subintf_r,fm7_subintf_w,0xff00)
+//  AM_RANGE(0xfd06,0xfd0c) AM_READ8_LEGACY(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd0e,0xfd0f) AM_READWRITE8_LEGACY(fm7_rom_en_r,fm7_rom_en_w,0xff00)
+//  AM_RANGE(0xfd10,0xfd17) AM_READ8_LEGACY(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE8_LEGACY(fm7_fdc_r,fm7_fdc_w,0xffff)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE8_LEGACY(fm7_kanji_r,fm7_kanji_w,0xffff)
+//  AM_RANGE(0xfd24,0xfd36) AM_READ8_LEGACY(fm7_unknown_r,0xffff)
+	AM_RANGE(0xfd36,0xfd37) AM_WRITE8_LEGACY(fm7_multipage_w,0xff00)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE8_LEGACY(fm7_palette_r,fm7_palette_w,0xffff)
+//  AM_RANGE(0xfd40,0xfdff) AM_READ8_LEGACY(fm7_unknown_r,0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm16_sub_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0xafff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x0000,0xafff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xb000,0xffff) AM_ROM // subsystem ROM
 ADDRESS_MAP_END
 
@@ -1623,60 +1623,60 @@ static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xe000,0xefff) AM_RAMBANK("bank15")
 	AM_RANGE(0xf000,0xfbff) AM_RAMBANK("bank16")
 	AM_RANGE(0xfc00,0xfc7f) AM_RAM
-	AM_RANGE(0xfc80,0xfcff) AM_READWRITE(fm7_main_shared_r,fm7_main_shared_w)
+	AM_RANGE(0xfc80,0xfcff) AM_READWRITE_LEGACY(fm7_main_shared_r,fm7_main_shared_w)
 	// I/O space (FD00-FDFF)
-	AM_RANGE(0xfd00,0xfd01) AM_READWRITE(fm7_keyboard_r,fm7_cassette_printer_w)
-	AM_RANGE(0xfd02,0xfd02) AM_READWRITE(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
-	AM_RANGE(0xfd03,0xfd03) AM_READWRITE(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
-	AM_RANGE(0xfd04,0xfd04) AM_READ(fm7_fd04_r)
-	AM_RANGE(0xfd05,0xfd05) AM_READWRITE(fm7_subintf_r,fm7_subintf_w)
-	AM_RANGE(0xfd06,0xfd0a) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd0b,0xfd0b) AM_READ(fm77av_boot_mode_r)
-	AM_RANGE(0xfd0c,0xfd0c) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE(fm7_psg_select_r,fm7_psg_select_w)
-	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE(fm7_psg_data_r, fm7_psg_data_w)
-	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE(fm7_rom_en_r,fm7_rom_en_w)
-	AM_RANGE(0xfd10,0xfd10) AM_WRITE(fm7_init_en_w)
-	AM_RANGE(0xfd11,0xfd11) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd12,0xfd12) AM_READWRITE(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
-	AM_RANGE(0xfd13,0xfd13) AM_WRITE(fm77av_sub_bank_w)
-	AM_RANGE(0xfd14,0xfd14) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd15,0xfd15) AM_READWRITE(fm7_psg_select_r,fm77av_ym_select_w)
-	AM_RANGE(0xfd16,0xfd16) AM_READWRITE(fm7_psg_data_r,fm7_psg_data_w)
-	AM_RANGE(0xfd17,0xfd17) AM_READ(fm7_fmirq_r)
-	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE(fm7_fdc_r,fm7_fdc_w)
-	AM_RANGE(0xfd20,0xfd23) AM_READWRITE(fm7_kanji_r,fm7_kanji_w)
-	AM_RANGE(0xfd24,0xfd2b) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd30,0xfd34) AM_WRITE(fm77av_analog_palette_w)
-	AM_RANGE(0xfd35,0xfd36) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd37,0xfd37) AM_WRITE(fm7_multipage_w)
-	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE(fm7_palette_r,fm7_palette_w)
-	AM_RANGE(0xfd40,0xfd7f) AM_READ(fm7_unknown_r)
-	AM_RANGE(0xfd80,0xfd93) AM_READWRITE(fm7_mmr_r,fm7_mmr_w)
-	AM_RANGE(0xfd94,0xfdff) AM_READ(fm7_unknown_r)
+	AM_RANGE(0xfd00,0xfd01) AM_READWRITE_LEGACY(fm7_keyboard_r,fm7_cassette_printer_w)
+	AM_RANGE(0xfd02,0xfd02) AM_READWRITE_LEGACY(fm7_cassette_printer_r,fm7_irq_mask_w)  // IRQ mask
+	AM_RANGE(0xfd03,0xfd03) AM_READWRITE_LEGACY(fm7_irq_cause_r,fm7_beeper_w)  // IRQ flags
+	AM_RANGE(0xfd04,0xfd04) AM_READ_LEGACY(fm7_fd04_r)
+	AM_RANGE(0xfd05,0xfd05) AM_READWRITE_LEGACY(fm7_subintf_r,fm7_subintf_w)
+	AM_RANGE(0xfd06,0xfd0a) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd0b,0xfd0b) AM_READ_LEGACY(fm77av_boot_mode_r)
+	AM_RANGE(0xfd0c,0xfd0c) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd0d,0xfd0d) AM_READWRITE_LEGACY(fm7_psg_select_r,fm7_psg_select_w)
+	AM_RANGE(0xfd0e,0xfd0e) AM_READWRITE_LEGACY(fm7_psg_data_r, fm7_psg_data_w)
+	AM_RANGE(0xfd0f,0xfd0f) AM_READWRITE_LEGACY(fm7_rom_en_r,fm7_rom_en_w)
+	AM_RANGE(0xfd10,0xfd10) AM_WRITE_LEGACY(fm7_init_en_w)
+	AM_RANGE(0xfd11,0xfd11) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd12,0xfd12) AM_READWRITE_LEGACY(fm77av_sub_modestatus_r,fm77av_sub_modestatus_w)
+	AM_RANGE(0xfd13,0xfd13) AM_WRITE_LEGACY(fm77av_sub_bank_w)
+	AM_RANGE(0xfd14,0xfd14) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd15,0xfd15) AM_READWRITE_LEGACY(fm7_psg_select_r,fm77av_ym_select_w)
+	AM_RANGE(0xfd16,0xfd16) AM_READWRITE_LEGACY(fm7_psg_data_r,fm7_psg_data_w)
+	AM_RANGE(0xfd17,0xfd17) AM_READ_LEGACY(fm7_fmirq_r)
+	AM_RANGE(0xfd18,0xfd1f) AM_READWRITE_LEGACY(fm7_fdc_r,fm7_fdc_w)
+	AM_RANGE(0xfd20,0xfd23) AM_READWRITE_LEGACY(fm7_kanji_r,fm7_kanji_w)
+	AM_RANGE(0xfd24,0xfd2b) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd30,0xfd34) AM_WRITE_LEGACY(fm77av_analog_palette_w)
+	AM_RANGE(0xfd35,0xfd36) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd37,0xfd37) AM_WRITE_LEGACY(fm7_multipage_w)
+	AM_RANGE(0xfd38,0xfd3f) AM_READWRITE_LEGACY(fm7_palette_r,fm7_palette_w)
+	AM_RANGE(0xfd40,0xfd7f) AM_READ_LEGACY(fm7_unknown_r)
+	AM_RANGE(0xfd80,0xfd93) AM_READWRITE_LEGACY(fm7_mmr_r,fm7_mmr_w)
+	AM_RANGE(0xfd94,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
 	// Boot ROM (RAM on FM77AV and later)
-	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE(fm77av_bootram_w) AM_BASE_MEMBER(fm7_state, m_boot_ram)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE_LEGACY(fm77av_bootram_w) AM_BASE( m_boot_ram)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
-	AM_RANGE(0xfff0,0xffff) AM_READWRITE(vector_r,vector_w)
+	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8, fm7_state )
-	AM_RANGE(0x0000,0xbfff) AM_READWRITE(fm7_vram_r,fm7_vram_w) // VRAM
+	AM_RANGE(0x0000,0xbfff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE_MEMBER(fm7_state, m_shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE( m_shared_ram)
 	// I/O space (D400-D4FF)
-	AM_RANGE(0xd400,0xd401) AM_READ(fm7_sub_keyboard_r)
-	AM_RANGE(0xd402,0xd402) AM_READ(fm7_cancel_ack)
-	AM_RANGE(0xd403,0xd403) AM_READ(fm7_sub_beeper_r)
-	AM_RANGE(0xd404,0xd404) AM_READ(fm7_attn_irq_r)
-	AM_RANGE(0xd408,0xd408) AM_READWRITE(fm7_crt_r,fm7_crt_w)
-	AM_RANGE(0xd409,0xd409) AM_READWRITE(fm7_vram_access_r,fm7_vram_access_w)
-	AM_RANGE(0xd40a,0xd40a) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
-	AM_RANGE(0xd40e,0xd40f) AM_WRITE(fm7_vram_offset_w)
-	AM_RANGE(0xd410,0xd42b) AM_READWRITE(fm77av_alu_r, fm77av_alu_w)
-	AM_RANGE(0xd430,0xd430) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
-	AM_RANGE(0xd431,0xd432) AM_READWRITE(fm77av_key_encoder_r,fm77av_key_encoder_w)
+	AM_RANGE(0xd400,0xd401) AM_READ_LEGACY(fm7_sub_keyboard_r)
+	AM_RANGE(0xd402,0xd402) AM_READ_LEGACY(fm7_cancel_ack)
+	AM_RANGE(0xd403,0xd403) AM_READ_LEGACY(fm7_sub_beeper_r)
+	AM_RANGE(0xd404,0xd404) AM_READ_LEGACY(fm7_attn_irq_r)
+	AM_RANGE(0xd408,0xd408) AM_READWRITE_LEGACY(fm7_crt_r,fm7_crt_w)
+	AM_RANGE(0xd409,0xd409) AM_READWRITE_LEGACY(fm7_vram_access_r,fm7_vram_access_w)
+	AM_RANGE(0xd40a,0xd40a) AM_READWRITE_LEGACY(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+	AM_RANGE(0xd40e,0xd40f) AM_WRITE_LEGACY(fm7_vram_offset_w)
+	AM_RANGE(0xd410,0xd42b) AM_READWRITE_LEGACY(fm77av_alu_r, fm77av_alu_w)
+	AM_RANGE(0xd430,0xd430) AM_READWRITE_LEGACY(fm77av_video_flags_r,fm77av_video_flags_w)
+	AM_RANGE(0xd431,0xd432) AM_READWRITE_LEGACY(fm77av_key_encoder_r,fm77av_key_encoder_w)
 	AM_RANGE(0xd500,0xd7ff) AM_RAM AM_REGION("maincpu",0x1d500) // Work RAM
 	AM_RANGE(0xd800,0xdfff) AM_ROMBANK("bank20")
 	AM_RANGE(0xe000,0xffff) AM_ROMBANK("bank21")

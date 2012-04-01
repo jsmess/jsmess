@@ -604,7 +604,7 @@ static WRITE8_HANDLER( smc777_irq_mask_w )
 
 static ADDRESS_MAP_START(smc777_mem, AS_PROGRAM, 8, smc777_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r,smc777_mem_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(smc777_mem_r,smc777_mem_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( smc777_io_r )
@@ -688,7 +688,7 @@ static WRITE8_HANDLER( smc777_io_w )
 
 static ADDRESS_MAP_START( smc777_io , AS_IO, 8, smc777_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_io_r,smc777_io_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(smc777_io_r,smc777_io_w)
 ADDRESS_MAP_END
 
 /* Input ports */

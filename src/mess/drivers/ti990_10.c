@@ -165,9 +165,9 @@ static ADDRESS_MAP_START(ti990_10_memmap, AS_PROGRAM, 16, ti990_10_state )
 
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM		/* let's say we have 1MB of RAM */
 	AM_RANGE(0x100000, 0x1ff7ff) AM_NOP		/* free TILINE space */
-	AM_RANGE(0x1ff800, 0x1ff81f) AM_READWRITE(ti990_hdc_r, ti990_hdc_w)	/* disk controller TPCS */
+	AM_RANGE(0x1ff800, 0x1ff81f) AM_READWRITE_LEGACY(ti990_hdc_r, ti990_hdc_w)	/* disk controller TPCS */
 	AM_RANGE(0x1ff820, 0x1ff87f) AM_NOP		/* free TPCS */
-	AM_RANGE(0x1ff880, 0x1ff89f) AM_DEVREADWRITE("tpc",ti990_tpc_r, ti990_tpc_w)	/* tape controller TPCS */
+	AM_RANGE(0x1ff880, 0x1ff89f) AM_DEVREADWRITE_LEGACY("tpc",ti990_tpc_r, ti990_tpc_w)	/* tape controller TPCS */
 	AM_RANGE(0x1ff8a0, 0x1ffbff) AM_NOP		/* free TPCS */
 	AM_RANGE(0x1ffc00, 0x1fffff) AM_ROM		/* LOAD ROM */
 
@@ -179,14 +179,14 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(ti990_10_io, AS_IO, 8, ti990_10_state )
-	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_cru_r)
-	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_cru_w)
-	AM_RANGE(0x1fa, 0x1fb) AM_READ(ti990_10_mapper_cru_r)
-	AM_RANGE(0x1fc, 0x1fd) AM_READ(ti990_10_eir_cru_r)
-	AM_RANGE(0x1fe, 0x1ff) AM_READ(ti990_panel_read)
-	AM_RANGE(0xfd0, 0xfdf) AM_WRITE(ti990_10_mapper_cru_w)
-	AM_RANGE(0xfe0, 0xfef) AM_WRITE(ti990_10_eir_cru_w)
-	AM_RANGE(0xff0, 0xfff) AM_WRITE(ti990_panel_write)
+	AM_RANGE(0x10, 0x11) AM_DEVREAD_LEGACY("vdt911", vdt911_cru_r)
+	AM_RANGE(0x80, 0x8f) AM_DEVWRITE_LEGACY("vdt911", vdt911_cru_w)
+	AM_RANGE(0x1fa, 0x1fb) AM_READ_LEGACY(ti990_10_mapper_cru_r)
+	AM_RANGE(0x1fc, 0x1fd) AM_READ_LEGACY(ti990_10_eir_cru_r)
+	AM_RANGE(0x1fe, 0x1ff) AM_READ_LEGACY(ti990_panel_read)
+	AM_RANGE(0xfd0, 0xfdf) AM_WRITE_LEGACY(ti990_10_mapper_cru_w)
+	AM_RANGE(0xfe0, 0xfef) AM_WRITE_LEGACY(ti990_10_eir_cru_w)
+	AM_RANGE(0xff0, 0xfff) AM_WRITE_LEGACY(ti990_panel_write)
 
 ADDRESS_MAP_END
 

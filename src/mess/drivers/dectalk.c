@@ -643,14 +643,14 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
     AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
-    //AM_RANGE(0x094000, 0x0943ff) AM_READWRITE(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
-    AM_RANGE(0x094000, 0x0943ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
-    AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
-    AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
-    AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
-    AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
-    AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
-    AM_RANGE(0x09C006, 0x09C007) AM_READ(m68k_tlc_dtmf_r) AM_MIRROR(0x763FF8) /* telephone dtmf read */
+    //AM_RANGE(0x094000, 0x0943ff) AM_READWRITE_LEGACY(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
+    AM_RANGE(0x094000, 0x0943ff) AM_WRITE8_LEGACY(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
+    AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8_LEGACY(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
+    AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8_LEGACY( "duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
+    AM_RANGE(0x09C000, 0x09C001) AM_READWRITE_LEGACY(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
+    AM_RANGE(0x09C002, 0x09C003) AM_WRITE_LEGACY(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
+    AM_RANGE(0x09C004, 0x09C005) AM_READWRITE_LEGACY(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
+    AM_RANGE(0x09C006, 0x09C007) AM_READ_LEGACY(m68k_tlc_dtmf_r) AM_MIRROR(0x763FF8) /* telephone dtmf read */
 ADDRESS_MAP_END
 
 // do we even need this below?
@@ -663,9 +663,9 @@ static ADDRESS_MAP_START(tms32010_mem, AS_PROGRAM, 16, dectalk_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms32010_io, AS_IO, 16, dectalk_state )
-    AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
-    AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
-    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read output fifo writable status
+    AM_RANGE(0, 0) AM_WRITE_LEGACY(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
+    AM_RANGE(1, 1) AM_READWRITE_LEGACY(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
+    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ_LEGACY(spc_semaphore_r) //read output fifo writable status
 ADDRESS_MAP_END
 
 /******************************************************************************

@@ -777,20 +777,20 @@ static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8, pc6001_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("cart_img",0)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(pc6001_state, m_ram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE( m_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc6001_io , AS_IO, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, nec_ppi8255_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE_LEGACY(nec_ppi8255_r, nec_ppi8255_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(pc6001_system_latch_w)
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE_LEGACY(pc6001_system_latch_w)
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
 ADDRESS_MAP_END
 
@@ -1332,47 +1332,47 @@ static READ8_HANDLER( pc6001m2_bank_w0_r )
 
 static ADDRESS_MAP_START(pc6001m2_map, AS_PROGRAM, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(work_ram0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(work_ram1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE(work_ram2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE(work_ram3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE(work_ram4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE(work_ram5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE(work_ram6_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(work_ram7_w)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(work_ram0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE_LEGACY(work_ram1_w)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE_LEGACY(work_ram2_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE_LEGACY(work_ram3_w)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE_LEGACY(work_ram4_w)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE_LEGACY(work_ram5_w)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE_LEGACY(work_ram6_w)
+	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE_LEGACY(work_ram7_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE_LEGACY(nec_ppi8255_r, necmk2_ppi8255_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
 
-	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(pc6001m2_system_latch_w)
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE_LEGACY(pc6001m2_system_latch_w)
 
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(pc6001m2_col_bank_w)
+	AM_RANGE(0xc1, 0xc1) AM_WRITE_LEGACY(pc6001m2_vram_bank_w)
+	AM_RANGE(0xc2, 0xc2) AM_WRITE_LEGACY(pc6001m2_opt_bank_w)
 
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE_LEGACY(upd7752_reg_r,upd7752_reg_w)
 
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
-	AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
+	AM_RANGE(0xf1, 0xf1) AM_READWRITE_LEGACY(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
+	AM_RANGE(0xf2, 0xf2) AM_READWRITE_LEGACY(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE_LEGACY(pc6001m2_0xf3_w)
 //  AM_RANGE(0xf4
 //  AM_RANGE(0xf5
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(pc6001m2_timer_adj_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(pc6001m2_timer_irqv_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE_LEGACY(pc6001m2_timer_adj_w)
+	AM_RANGE(0xf7, 0xf7) AM_WRITE_LEGACY(pc6001m2_timer_irqv_w)
 ADDRESS_MAP_END
 
 /* disk device placeholder (TODO: identify & hook-up this) */
@@ -1388,38 +1388,38 @@ static WRITE8_HANDLER( pc6601_fdc_w )
 static ADDRESS_MAP_START( pc6601_io , AS_IO, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE_LEGACY(nec_ppi8255_r, necmk2_ppi8255_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
 
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE_LEGACY(pc6001m2_system_latch_w)
 	/* these are disk related */
 //  AM_RANGE(0xb1
 //  AM_RANGE(0xb2
 //  AM_RANGE(0xb3
 
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(pc6001m2_col_bank_w)
+	AM_RANGE(0xc1, 0xc1) AM_WRITE_LEGACY(pc6001m2_vram_bank_w)
+	AM_RANGE(0xc2, 0xc2) AM_WRITE_LEGACY(pc6001m2_opt_bank_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6601_fdc_r,pc6601_fdc_w) // disk device
+	AM_RANGE(0xd0, 0xdf) AM_READWRITE_LEGACY(pc6601_fdc_r,pc6601_fdc_w) // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE_LEGACY(upd7752_reg_r,upd7752_reg_w)
 
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
-	AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
+	AM_RANGE(0xf1, 0xf1) AM_READWRITE_LEGACY(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
+	AM_RANGE(0xf2, 0xf2) AM_READWRITE_LEGACY(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE_LEGACY(pc6001m2_0xf3_w)
 //  AM_RANGE(0xf4
 //  AM_RANGE(0xf5
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(pc6001m2_timer_adj_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(pc6001m2_timer_irqv_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE_LEGACY(pc6001m2_timer_adj_w)
+	AM_RANGE(0xf7, 0xf7) AM_WRITE_LEGACY(pc6001m2_timer_irqv_w)
 ADDRESS_MAP_END
 
 /* PC-6001 SR */
@@ -1592,56 +1592,56 @@ static WRITE8_HANDLER(necsr_ppi8255_w)
 
 static ADDRESS_MAP_START(pc6001sr_map, AS_PROGRAM, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE(sr_work_ram0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE(sr_work_ram1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE(sr_work_ram2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE(sr_work_ram3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE(sr_work_ram4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE(sr_work_ram5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE(sr_work_ram6_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE(sr_work_ram7_w)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(sr_work_ram0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2") AM_WRITE_LEGACY(sr_work_ram1_w)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3") AM_WRITE_LEGACY(sr_work_ram2_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4") AM_WRITE_LEGACY(sr_work_ram3_w)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank5") AM_WRITE_LEGACY(sr_work_ram4_w)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank6") AM_WRITE_LEGACY(sr_work_ram5_w)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank7") AM_WRITE_LEGACY(sr_work_ram6_w)
+	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8") AM_WRITE_LEGACY(sr_work_ram7_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8, pc6001_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x67) AM_READWRITE(pc6001sr_bank_rn_r,pc6001sr_bank_rn_w)
-	AM_RANGE(0x68, 0x6f) AM_READWRITE(pc6001sr_bank_wn_r,pc6001sr_bank_wn_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
+	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc6001sr_bank_rn_r,pc6001sr_bank_rn_w)
+	AM_RANGE(0x68, 0x6f) AM_READWRITE_LEGACY(pc6001sr_bank_wn_r,pc6001sr_bank_wn_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necsr_ppi8255_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE_LEGACY(nec_ppi8255_r, necsr_ppi8255_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
 
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001sr_system_latch_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE_LEGACY(pc6001sr_system_latch_w)
 	/* these are disk related */
 //  AM_RANGE(0xb1
 //  AM_RANGE(0xb2
 //  AM_RANGE(0xb3
 
-//  AM_RANGE(0xc0, 0xc0) AM_WRITE(pc6001m2_col_bank_w)
-//  AM_RANGE(0xc1, 0xc1) AM_WRITE(pc6001m2_vram_bank_w)
-//  AM_RANGE(0xc2, 0xc2) AM_WRITE(pc6001m2_opt_bank_w)
+//  AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(pc6001m2_col_bank_w)
+//  AM_RANGE(0xc1, 0xc1) AM_WRITE_LEGACY(pc6001m2_vram_bank_w)
+//  AM_RANGE(0xc2, 0xc2) AM_WRITE_LEGACY(pc6001m2_opt_bank_w)
 
-	AM_RANGE(0xc8, 0xc8) AM_WRITE(pc6001sr_mode_w)
-	AM_RANGE(0xc9, 0xc9) AM_WRITE(pc6001sr_vram_bank_w)
+	AM_RANGE(0xc8, 0xc8) AM_WRITE_LEGACY(pc6001sr_mode_w)
+	AM_RANGE(0xc9, 0xc9) AM_WRITE_LEGACY(pc6001sr_vram_bank_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_READWRITE(pc6601_fdc_r,pc6601_fdc_w) // disk device
+	AM_RANGE(0xd0, 0xdf) AM_READWRITE_LEGACY(pc6601_fdc_r,pc6601_fdc_w) // disk device
 
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE(upd7752_reg_r,upd7752_reg_w)
+	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_READWRITE_LEGACY(upd7752_reg_r,upd7752_reg_w)
 
-//  AM_RANGE(0xf0, 0xf0) AM_READWRITE(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
-//  AM_RANGE(0xf1, 0xf1) AM_READWRITE(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
-//  AM_RANGE(0xf2, 0xf2) AM_READWRITE(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(pc6001m2_0xf3_w)
+//  AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(pc6001m2_bank_r0_r,pc6001m2_bank_r0_w)
+//  AM_RANGE(0xf1, 0xf1) AM_READWRITE_LEGACY(pc6001m2_bank_r1_r,pc6001m2_bank_r1_w)
+//  AM_RANGE(0xf2, 0xf2) AM_READWRITE_LEGACY(pc6001m2_bank_w0_r,pc6001m2_bank_w0_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE_LEGACY(pc6001m2_0xf3_w)
 //  AM_RANGE(0xf4
 //  AM_RANGE(0xf5
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(pc6001m2_timer_adj_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(pc6001m2_timer_irqv_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE_LEGACY(pc6001m2_timer_adj_w)
+	AM_RANGE(0xf7, 0xf7) AM_WRITE_LEGACY(pc6001m2_timer_irqv_w)
 ADDRESS_MAP_END
 
 /* Input ports */

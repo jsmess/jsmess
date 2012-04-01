@@ -112,11 +112,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( busicom_io , AS_IO, 8, busicom_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE(shifter_w) // ROM0 I/O
-	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r,printer_ctrl_w) // ROM1 I/O
-	AM_RANGE(0x02, 0x02) AM_READ(printer_r)  // ROM2 I/O
-	AM_RANGE(0x10, 0x10) AM_WRITE(printer_w) // RAM0 output
-	AM_RANGE(0x11, 0x11) AM_WRITE(status_w)  // RAM1 output
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(shifter_w) // ROM0 I/O
+	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(keyboard_r,printer_ctrl_w) // ROM1 I/O
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(printer_r)  // ROM2 I/O
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(printer_w) // RAM0 output
+	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(status_w)  // RAM1 output
 ADDRESS_MAP_END
 
 /* Input ports */
