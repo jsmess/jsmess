@@ -128,7 +128,7 @@
 #include "sound/es5503.h"
 #include "machine/ram.h"
 #include "debugger.h"
-#include "machine/ap2_slot.h"
+#include "machine/a2bus.h"
 
 #define LOG_C0XX			0
 #define LOG_ADB				0
@@ -1048,6 +1048,20 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 		case 0x21:	/* C021 - MONOCOLOR */
 		case 0x2C:	/* C02C - CHARROM */
 			result = 0x00;
+            break;
+
+        // slot 6 registers should go to applefdc if slot 6 not "Your Card"
+        case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: 
+        case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: 
+			if ((state->m_sltromsel & (1 << 6)) == 0)
+			{
+                result = applefdc_r(state->m_fdc, offset);
+            }
+            else
+            {
+                result = apple2_c0xx_r(space, offset);
+            }
+            break;
 
 		default:
 			result = apple2_c0xx_r(space, offset);
@@ -1185,6 +1199,19 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 				((data & 0x01) ? VAR_INTCXROM : 0),
 				VAR_ALTZP | VAR_PAGE2 | VAR_RAMRD | VAR_RAMWRT | VAR_LCRAM | VAR_LCRAM2 | VAR_INTCXROM);
 			break;
+
+        // slot 6 registers should go to applefdc if slot 6 not "Your Card"
+        case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: 
+        case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: 
+            if ((state->m_sltromsel & (1 << 6)) == 0)
+            {
+                applefdc_w(state->m_fdc, offset, data);
+            }
+            else
+            {
+                apple2_c0xx_w(space, offset, data);
+            }
+            break;
 
 		default:
 			apple2_c0xx_w(space, offset, data);
@@ -1511,7 +1538,7 @@ static UINT8 *apple2gs_getslotmem(running_machine &machine, offs_t address)
 
 
 
-static UINT8 apple2gs_xxCxxx_r(running_machine &machine, offs_t address)
+static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, offs_t address)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	UINT8 result;
@@ -1528,12 +1555,12 @@ static UINT8 apple2gs_xxCxxx_r(running_machine &machine, offs_t address)
 	}
 	else
 	{
-		device_t *slotdevice;
+		device_a2bus_card_interface *slotdevice;
 
 		slot = (address & 0x000F00) / 0x100;
 		if (slot <= 7)	// slots 1-7, it's the slot
 		{
-			slotdevice = apple2_slot(machine, slot);
+			slotdevice = state->m_a2bus->get_a2bus_card(slot); 
 
 			// is this slot internal or "Your Card"?
 			if ((state->m_sltromsel & (1 << slot)) == 0)
@@ -1552,7 +1579,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine &machine, offs_t address)
 
 				if (slotdevice != NULL)
 				{
-					result = apple2_slot_ROM_r(slotdevice, address&0xff);
+					result = slotdevice->read_cnxx(space, address&0xff);
 				}
 				else
 				{
@@ -1572,12 +1599,12 @@ static UINT8 apple2gs_xxCxxx_r(running_machine &machine, offs_t address)
 
 			if ( state->m_a2_cnxx_slot >= 0 && state->m_a2_cnxx_slot <= 7 )
 			{
-				slotdevice = apple2_slot(machine, state->m_a2_cnxx_slot);
+				slotdevice = state->m_a2bus->get_a2bus_card(state->m_a2_cnxx_slot);
 			}
 
 			if (slotdevice)
 			{
-				result = apple2_c800_slot_r(slotdevice, address&0x7ff);
+				result = slotdevice->read_c800(space, address&0x7ff);
 			}
 			else
 			{
@@ -1590,7 +1617,7 @@ static UINT8 apple2gs_xxCxxx_r(running_machine &machine, offs_t address)
 
 
 
-static void apple2gs_xxCxxx_w(running_machine &machine, offs_t address, UINT8 data)
+static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, offs_t address, UINT8 data)
 {
 	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	int slot;
@@ -1657,15 +1684,15 @@ DIRECT_UPDATE_HANDLER( apple2gs_opbase )
 
 
 
-static READ8_HANDLER( apple2gs_00Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine(), offset | 0x00C000); }
-static READ8_HANDLER( apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine(), offset | 0x01C000); }
-static READ8_HANDLER( apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine(), offset | 0xE0C000); }
-static READ8_HANDLER( apple2gs_E1Cxxx_r ) { return apple2gs_xxCxxx_r(space->machine(), offset | 0xE1C000); }
+static READ8_HANDLER( apple2gs_00Cxxx_r ) { return apple2gs_xxCxxx_r(*space, space->machine(), offset | 0x00C000); }
+static READ8_HANDLER( apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(*space, space->machine(), offset | 0x01C000); }
+static READ8_HANDLER( apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(*space, space->machine(), offset | 0xE0C000); }
+static READ8_HANDLER( apple2gs_E1Cxxx_r ) { return apple2gs_xxCxxx_r(*space, space->machine(), offset | 0xE1C000); }
 
-static WRITE8_HANDLER( apple2gs_00Cxxx_w ) { apple2gs_xxCxxx_w(space->machine(), offset | 0x00C000, data); }
-static WRITE8_HANDLER( apple2gs_01Cxxx_w ) { apple2gs_xxCxxx_w(space->machine(), offset | 0x01C000, data); }
-static WRITE8_HANDLER( apple2gs_E0Cxxx_w ) { apple2gs_xxCxxx_w(space->machine(), offset | 0xE0C000, data); }
-static WRITE8_HANDLER( apple2gs_E1Cxxx_w ) { apple2gs_xxCxxx_w(space->machine(), offset | 0xE1C000, data); }
+static WRITE8_HANDLER( apple2gs_00Cxxx_w ) { apple2gs_xxCxxx_w(*space, space->machine(), offset | 0x00C000, data); }
+static WRITE8_HANDLER( apple2gs_01Cxxx_w ) { apple2gs_xxCxxx_w(*space, space->machine(), offset | 0x01C000, data); }
+static WRITE8_HANDLER( apple2gs_E0Cxxx_w ) { apple2gs_xxCxxx_w(*space, space->machine(), offset | 0xE0C000, data); }
+static WRITE8_HANDLER( apple2gs_E1Cxxx_w ) { apple2gs_xxCxxx_w(*space, space->machine(), offset | 0xE1C000, data); }
 
 static WRITE8_HANDLER( apple2gs_Exxxxx_w )
 {

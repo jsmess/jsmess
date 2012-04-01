@@ -10,11 +10,11 @@
             - need to do double-read before write-enable RAM
 
 ***************************************************************************/
-
+              
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
-#include "machine/ap2_slot.h"
+#include "machine/a2bus.h"
 #include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "devices/sonydriv.h"
@@ -352,7 +352,7 @@ READ8_HANDLER(apple2_c0xx_r)
 		};
 		UINT8 result = 0x00;
 		int slotnum;
-		device_t *slotdevice;
+		device_a2bus_card_interface *slotdevice;
 
 		offset &= 0xFF;
 
@@ -374,11 +374,11 @@ READ8_HANDLER(apple2_c0xx_r)
 			slotnum = (offset - 0x80) / 0x10;
 
 			/* now identify the device */
-			slotdevice = apple2_slot(space->machine(), slotnum);
+			slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
 			/* and if we can, read from the slot */
 			if (slotdevice != NULL)
-				result = apple2_slot_r(slotdevice, offset % 0x10);
+				result = slotdevice->read_c0nx(*space, offset % 0x10);
 		}
 		return result;
 	}
@@ -403,7 +403,7 @@ WRITE8_HANDLER(apple2_c0xx_w)
 		apple2_c07x_w
 	};
 	int slotnum;
-	device_t *slotdevice;
+	device_a2bus_card_interface *slotdevice;
 
 	offset &= 0xFF;
 
@@ -425,11 +425,11 @@ WRITE8_HANDLER(apple2_c0xx_w)
 		slotnum = (offset - 0x80) / 0x10;
 
 		/* now identify the device */
-		slotdevice = apple2_slot(space->machine(), slotnum);
+        slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
 		/* and if we can, write to the slot */
 		if (slotdevice != NULL)
-			apple2_slot_w(slotdevice, offset % 0x10, data);
+			slotdevice->write_c0nx(*space, offset % 0x10, data);
 	}
 }
 
@@ -465,11 +465,11 @@ static READ8_HANDLER( apple2_c1xx_r )
 {
 	apple2_state *state = space->machine().driver_data<apple2_state>();
 	int slotnum;
-	device_t *slotdevice;
+	device_a2bus_card_interface *slotdevice;
 
 	slotnum = ((offset>>8) & 0xf) + 1;
-	slotdevice = apple2_slot(space->machine(), slotnum);
-
+    slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
+                                 
 	if (state->m_a2_cnxx_slot == -1)
 	{
 		state->m_a2_cnxx_slot = slotnum;
@@ -478,7 +478,7 @@ static READ8_HANDLER( apple2_c1xx_r )
 
 	if (slotdevice != NULL)
 	{
-		return apple2_slot_ROM_r(slotdevice, offset&0xff);
+		return slotdevice->read_cnxx(*space, offset&0xff);
 	}
 	else
 	{
@@ -492,7 +492,8 @@ static READ8_HANDLER( apple2_c1xx_r )
 static WRITE8_HANDLER ( apple2_c1xx_w )
 {
 	int slotnum;
-	device_t *slotdevice;
+	apple2_state *state = space->machine().driver_data<apple2_state>();
+	device_a2bus_card_interface *slotdevice;
 	UINT8 *rom, *slot_ram;
 	UINT32 rom_length, slot_length;
 
@@ -504,11 +505,11 @@ static WRITE8_HANDLER ( apple2_c1xx_w )
 
 	slotnum = ((offset>>8) & 0xf) + 1;
 
-	slotdevice = apple2_slot(space->machine(), slotnum);
+    slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
 	if (slotdevice != NULL)
 	{
-		apple2_slot_ROM_w(slotdevice, offset&0xff, data);
+		slotdevice->write_cnxx(*space, offset&0xff, data);
 	}
 	else
 	{
@@ -521,10 +522,10 @@ static READ8_HANDLER( apple2_c4xx_r )
 {
 	apple2_state *state = space->machine().driver_data<apple2_state>();
 	int slotnum;
-	device_t *slotdevice;
+	device_a2bus_card_interface *slotdevice;
 
 	slotnum = ((offset>>8) & 0xf) + 4;
-	slotdevice = apple2_slot(space->machine(), slotnum);
+    slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
 	if (state->m_a2_cnxx_slot == -1)
 	{
@@ -535,7 +536,7 @@ static READ8_HANDLER( apple2_c4xx_r )
 	// is a card installed in this slot?
 	if (slotdevice != NULL)
 	{
-		return apple2_slot_ROM_r(slotdevice, offset&0xff);
+		return slotdevice->read_cnxx(*space, offset&0xff);
 	}
 	else
 	{
@@ -550,7 +551,7 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 {
 	apple2_state *state = space->machine().driver_data<apple2_state>();
 	int slotnum;
-	device_t *slotdevice;
+	device_a2bus_card_interface *slotdevice;
 	UINT8 *rom, *slot_ram;
 	UINT32 rom_length, slot_length;
 
@@ -561,7 +562,7 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	slotnum = ((offset>>8) & 0xf) + 4;
-	slotdevice = apple2_slot(space->machine(), slotnum);
+    slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
 	if (state->m_a2_cnxx_slot == -1)
 	{
@@ -571,7 +572,7 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 
 	if (slotdevice != NULL)
 	{
-		apple2_slot_ROM_w(slotdevice, offset&0xff, data);
+		slotdevice->write_cnxx(*space, offset&0xff, data);
 	}
 	else
 	{
@@ -603,13 +604,13 @@ static WRITE8_HANDLER(apple2_cfff_w)
 static READ8_HANDLER ( apple2_c800_r )
 {
 	apple2_state *state = space->machine().driver_data<apple2_state>();
-	device_t *slotdevice;
+	device_a2bus_card_interface *slotdevice;
 
-	slotdevice = apple2_slot(space->machine(), state->m_a2_cnxx_slot);
+    slotdevice = state->m_a2bus->get_a2bus_card(state->m_a2_cnxx_slot);
 
 	if (slotdevice != NULL)
 	{
-		return apple2_c800_slot_r(slotdevice, offset&0xfff);
+		return slotdevice->read_c800(*space, offset&0xfff);
 	}
 
 	return apple2_getfloatingbusvalue(space->machine());
@@ -618,26 +619,26 @@ static READ8_HANDLER ( apple2_c800_r )
 static WRITE8_HANDLER ( apple2_c800_w )
 {
 	apple2_state *state = space->machine().driver_data<apple2_state>();
-	device_t *slotdevice;
+	device_a2bus_card_interface *slotdevice;
 
-	slotdevice = apple2_slot(space->machine(), state->m_a2_cnxx_slot);
+    slotdevice = state->m_a2bus->get_a2bus_card(state->m_a2_cnxx_slot);
 
 	if (slotdevice != NULL)
 	{
-		apple2_c800_slot_w(slotdevice, offset&0xfff, data);
+		slotdevice->write_c800(*space, offset&0xfff, data);
 	}
 }
 
 static READ8_HANDLER ( apple2_ce00_r )
 {
 	apple2_state *state = space->machine().driver_data<apple2_state>();
-	device_t *slotdevice;
+	device_a2bus_card_interface *slotdevice;
 
-	slotdevice = apple2_slot(space->machine(), state->m_a2_cnxx_slot);
+    slotdevice = state->m_a2bus->get_a2bus_card(state->m_a2_cnxx_slot);
 
 	if (slotdevice != NULL)
 	{
-		return apple2_c800_slot_r(slotdevice, (offset&0xfff) + 0x600);
+		return slotdevice->read_c800(*space, (offset&0xfff) + 0x600);
 	}
 
 	return apple2_getfloatingbusvalue(space->machine());
@@ -646,13 +647,13 @@ static READ8_HANDLER ( apple2_ce00_r )
 static WRITE8_HANDLER ( apple2_ce00_w )
 {
 	apple2_state *state = space->machine().driver_data<apple2_state>();
-	device_t *slotdevice;
+	device_a2bus_card_interface *slotdevice;
 
-	slotdevice = apple2_slot(space->machine(), state->m_a2_cnxx_slot);
+    slotdevice = state->m_a2bus->get_a2bus_card(state->m_a2_cnxx_slot);
 
 	if (slotdevice != NULL)
 	{
-		apple2_c800_slot_w(slotdevice, (offset&0xfff)+0x600, data);
+        slotdevice->write_c800(*space, (offset&0xfff)+0x600, data);
 	}
 }
 
@@ -1453,12 +1454,12 @@ WRITE8_HANDLER ( apple2_c07x_w )
 
 static int apple2_fdc_has_35(running_machine &machine)
 {
-	return (floppy_get_count(machine) - apple525_get_count(machine)) > 0;
+	return (floppy_get_count(machine)); // - apple525_get_count(machine)) > 0;
 }
 
 static int apple2_fdc_has_525(running_machine &machine)
 {
-	return apple525_get_count(machine) > 0;
+	return 1; //apple525_get_count(machine) > 0;
 }
 
 static void apple2_fdc_set_lines(device_t *device, UINT8 lines)

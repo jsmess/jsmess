@@ -642,7 +642,9 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/ay3600.o	\
     $(MESS_MACHINE)/a2bus.o     \
 	$(MESS_MACHINE)/ap2_slot.o	\
-	$(MESS_MACHINE)/ap2_lang.o	\
+	$(MESS_MACHINE)/a2lang.o	\
+	$(MESS_MACHINE)/a2diskii.o	\
+	$(MESS_MACHINE)/a2mockingboard.o	\
 	$(MESS_MACHINE)/a2cffa.o	\
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\

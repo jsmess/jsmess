@@ -86,7 +86,9 @@ public:
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 
-	void add_a2bus_card(device_a2bus_card_interface *card);
+	void add_a2bus_card(int slot, device_a2bus_card_interface *card);
+    device_a2bus_card_interface *get_a2bus_card(int slot);
+
     void set_irq_line(int state);
     void set_nmi_line(int state);
 
@@ -105,7 +107,7 @@ protected:
 	devcb_resolved_write_line	m_out_irq_func;
 	devcb_resolved_write_line	m_out_nmi_func;
 
-	simple_list<device_a2bus_card_interface> m_device_list;
+    device_a2bus_card_interface *m_device_list[8];
 	const char *m_cputag;
 };
 
@@ -123,6 +125,13 @@ public:
 	// construction/destruction
 	device_a2bus_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a2bus_card_interface();
+
+    virtual UINT8 read_c0nx(address_space &space, UINT8 offset) { return 0; }
+    virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) {}
+    virtual UINT8 read_cnxx(address_space &space, UINT8 offset) { return 0; }
+    virtual void write_cnxx(address_space &space, UINT8 offset, UINT8 data) {}
+    virtual UINT8 read_c800(address_space &space, UINT16 offset) { return 0; }
+    virtual void write_c800(address_space &space, UINT16 offset, UINT8 data) {}
 
 	device_a2bus_card_interface *next() const { return m_next; }
 

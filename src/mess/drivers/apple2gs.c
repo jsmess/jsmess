@@ -53,12 +53,16 @@
 #include "devices/sonydriv.h"
 #include "devices/appldriv.h"
 #include "sound/es5503.h"
-#include "machine/ap2_slot.h"
-#include "machine/ap2_lang.h"
 #include "machine/applefdc.h"
 #include "machine/8530scc.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
+
+#include "machine/a2bus.h"
+#include "machine/a2lang.h"
+#include "machine/a2diskii.h"
+#include "machine/a2mockingboard.h"
+#include "machine/a2cffa.h"
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -174,6 +178,15 @@ static ADDRESS_MAP_START( apple2gs_map, AS_PROGRAM, 8, apple2gs_state )
 	/* nothing in the address map - everything is added dynamically */
 ADDRESS_MAP_END
 
+static const struct a2bus_interface a2bus_intf =
+{
+	// interrupt lines
+//	DEVCB_HANDLER(a2bus_irq_w),
+//	DEVCB_HANDLER(a2bus_nmi_w)
+    DEVCB_NULL,
+    DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
@@ -208,12 +221,13 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* slot devices */
-	MCFG_APPLE2_LANGCARD_ADD("langcard")
-	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
+    MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
+    MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
+
+    MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
 	/* slots */
-	MCFG_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
-	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
+//	MCFG_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
 	/* SCC */
 	MCFG_SCC8530_ADD("scc", APPLE2GS_14M/2, line_cb_t())

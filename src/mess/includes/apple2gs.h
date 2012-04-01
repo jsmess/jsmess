@@ -48,11 +48,13 @@ public:
 	apple2gs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: apple2_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-        m_es5503(*this, "es5503")
+        m_es5503(*this, "es5503"),
+        m_fdc(*this, "fdc")
         { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<es5503_device> m_es5503;
+    required_device<device_t> m_fdc;
 
 	UINT8 *m_slowmem;
 	UINT8 m_newvideo;

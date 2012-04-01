@@ -25,7 +25,7 @@ const device_type A2BUS_SLOT = &device_creator<a2bus_slot_device>;
 //  a2bus_slot_device - constructor
 //-------------------------------------------------
 a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2BUS_SLOT, "A2BUS_SLOT", tag, owner, clock),
+        device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -98,7 +98,7 @@ void a2bus_device::device_config_complete()
 //-------------------------------------------------
 
 a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, A2BUS, "A2BUS", tag, owner, clock)
+        device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock)
 {
 }
 
@@ -113,9 +113,16 @@ a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, cons
 void a2bus_device::device_start()
 {
 	m_maincpu = machine().device(m_cputag);
-	// resolve callbacks
+
+    // resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_irq_func.resolve(m_out_nmi_cb, *this);
+	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
+
+    // clear slots
+    for (int i = 0; i < 8; i++)
+    {
+        m_device_list[i] = NULL;
+    }
 }
 
 //-------------------------------------------------
@@ -126,9 +133,14 @@ void a2bus_device::device_reset()
 {
 }
 
-void a2bus_device::add_a2bus_card(device_a2bus_card_interface *card)
+device_a2bus_card_interface *a2bus_device::get_a2bus_card(int slot)
 {
-	m_device_list.append(*card);
+    return m_device_list[slot];
+}
+
+void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)
+{
+	m_device_list[slot] = card;
 }
 
 void a2bus_device::set_irq_line(int state)
@@ -194,7 +206,7 @@ void device_a2bus_card_interface::set_a2bus_device()
 	}
 
 	m_a2bus = dynamic_cast<a2bus_device *>(device().machine().device(m_a2bus_tag));
-	m_a2bus->add_a2bus_card(this);
+	m_a2bus->add_a2bus_card(m_slot, this);
 }
 
 
