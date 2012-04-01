@@ -201,11 +201,9 @@ ADDRESS_MAP_END
     INPUT_CHANGED( trigger_nmi )
 -------------------------------------------------*/
 
-static INPUT_CHANGED( trigger_nmi )
+INPUT_CHANGED_MEMBER( crvision_state::trigger_nmi )
 {
-	crvision_state *state = field.machine().driver_data<crvision_state>();
-
-	state->m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -374,7 +372,7 @@ static INPUT_PORTS_START( crvision )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Button 1 / - =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=') PORT_PLAYER(2)
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, crvision_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------

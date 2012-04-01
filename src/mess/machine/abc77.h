@@ -62,7 +62,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	static INPUT_CHANGED( keyboard_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
 
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p2_w );

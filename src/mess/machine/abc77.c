@@ -179,13 +179,11 @@ machine_config_constructor abc77_device::device_mconfig_additions() const
 //  INPUT_CHANGED( keyboard_reset )
 //-------------------------------------------------
 
-INPUT_CHANGED( abc77_device::keyboard_reset )
+INPUT_CHANGED_MEMBER( abc77_device::keyboard_reset )
 {
-    abc77_device *keyboard = static_cast<abc77_device *>(field.machine().device(ABC77_TAG));
-
 	if (oldval && !newval)
 	{
-		keyboard->device_reset();
+		device_reset();
 	}
 }
 
@@ -333,7 +331,7 @@ INPUT_PORTS_START( abc77 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Keyboard Reset") PORT_CHANGED(abc77_device::keyboard_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, 0)
 INPUT_PORTS_END
 
 

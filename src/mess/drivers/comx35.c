@@ -138,13 +138,11 @@ ADDRESS_MAP_END
 //  INPUT_CHANGED( comx35_reset )
 //-------------------------------------------------
 
-static INPUT_CHANGED( comx35_reset )
+INPUT_CHANGED_MEMBER( comx35_state::trigger_reset )
 {
-	comx35_state *state = field.machine().driver_data<comx35_state>();
-
-	if (newval && BIT(input_port_read(field.machine(), "D6"), 7))
+	if (newval && BIT(input_port_read(machine(), "D6"), 7))
 	{
-		state->machine_reset();
+		machine_reset();
 	}
 }
 
@@ -242,7 +240,7 @@ static INPUT_PORTS_START( comx35 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RT") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED(comx35_reset, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RT") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED_MEMBER(DEVICE_SELF, comx35_state, trigger_reset, 0)
 INPUT_PORTS_END
 
 

@@ -39,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER( f3853_w );
 	DECLARE_READ8_MEMBER( vlsi_r );
 	DECLARE_WRITE8_MEMBER( vlsi_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	void interrupt_check();
 	int get_field_vpos();

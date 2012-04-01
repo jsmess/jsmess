@@ -669,11 +669,9 @@ ADDRESS_MAP_END
 //  INPUT_CHANGED( mouse_button_1_changed )
 //-------------------------------------------------
 
-static INPUT_CHANGED( mouse_button_1_changed )
+INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_1_changed )
 {
-	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-
-	state->m_kb->m1_w(newval);
+	m_kb->m1_w(newval);
 }
 
 
@@ -681,11 +679,9 @@ static INPUT_CHANGED( mouse_button_1_changed )
 //  INPUT_CHANGED( mouse_button_2_changed )
 //-------------------------------------------------
 
-static INPUT_CHANGED( mouse_button_2_changed )
+INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_2_changed )
 {
-	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-
-	state->m_kb->m2_w(newval);
+	m_kb->m2_w(newval);
 }
 
 
@@ -693,14 +689,12 @@ static INPUT_CHANGED( mouse_button_2_changed )
 //  INPUT_CHANGED( mouse_x_changed )
 //-------------------------------------------------
 
-static INPUT_CHANGED( mouse_x_changed )
+INPUT_CHANGED_MEMBER( pc1512_state::mouse_x_changed )
 {
-	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-
 	if (newval > oldval)
-		state->m_mouse_x++;
+		m_mouse_x++;
 	else
-		state->m_mouse_x--;
+		m_mouse_x--;
 }
 
 
@@ -708,14 +702,12 @@ static INPUT_CHANGED( mouse_x_changed )
 //  INPUT_CHANGED( mouse_y_changed )
 //-------------------------------------------------
 
-static INPUT_CHANGED( mouse_y_changed )
+INPUT_CHANGED_MEMBER( pc1512_state::mouse_y_changed )
 {
-	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-
 	if (newval > oldval)
-		state->m_mouse_y--;
+		m_mouse_y--;
 	else
-		state->m_mouse_y++;
+		m_mouse_y++;
 }
 
 
@@ -725,14 +717,14 @@ static INPUT_CHANGED( mouse_y_changed )
 
 static INPUT_PORTS_START( mouse )
 	PORT_START("MOUSEB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED(mouse_button_1_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED(mouse_button_2_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_button_1_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_button_2_changed, 0)
 
 	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED(mouse_x_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_x_changed, 0)
 
 	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED(mouse_y_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_y_changed, 0)
 INPUT_PORTS_END
 
 

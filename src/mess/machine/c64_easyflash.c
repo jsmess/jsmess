@@ -51,9 +51,14 @@ machine_config_constructor c64_easyflash_cartridge_device::device_mconfig_additi
 //  INPUT_PORTS( c64_easyflash )
 //-------------------------------------------------
 
-INPUT_CHANGED( c64_easyflash_cartridge_device::reset )
+INPUT_CHANGED_MEMBER( c64_easyflash_cartridge_device::reset )
 {
-	// TODO
+	if (!newval)
+	{
+		device_reset();
+	}
+
+	m_slot->reset_w(newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( c64_easyflash )
@@ -63,7 +68,7 @@ static INPUT_PORTS_START( c64_easyflash )
 	PORT_DIPSETTING(    0x01, "Boot" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Reset") PORT_CHANGED(c64_easyflash_cartridge_device::reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, c64_easyflash_cartridge_device, reset, 0)
 INPUT_PORTS_END
 
 
