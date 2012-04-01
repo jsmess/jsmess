@@ -12,7 +12,6 @@
 #ifndef __PROPHET64__
 #define __PROPHET64__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

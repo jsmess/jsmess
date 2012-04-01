@@ -16,7 +16,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

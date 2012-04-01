@@ -24,7 +24,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/next.h"
 #include "formats/pc_dsk.h"

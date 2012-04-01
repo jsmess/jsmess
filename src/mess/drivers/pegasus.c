@@ -35,7 +35,6 @@
     - Work on the other non-working programs
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"

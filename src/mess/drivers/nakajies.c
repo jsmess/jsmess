@@ -268,7 +268,6 @@ disabled). Perhaps power on/off related??
 
 ******************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/nec/nec.h"

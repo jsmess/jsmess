@@ -1,4 +1,3 @@
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/avr8/avr8.h"

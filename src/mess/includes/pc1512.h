@@ -3,7 +3,6 @@
 #ifndef __PC1512__
 #define __PC1512__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

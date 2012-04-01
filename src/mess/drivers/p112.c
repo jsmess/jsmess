@@ -30,7 +30,6 @@ Some of the parts:
  Z8018216               1       U1              (Zilog CPU chip)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z180/z180.h"

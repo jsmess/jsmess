@@ -11,7 +11,6 @@
 #ifndef __COCO__
 #define __COCO__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "imagedev/cassette.h"

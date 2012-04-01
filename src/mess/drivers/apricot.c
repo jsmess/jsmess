@@ -6,7 +6,6 @@
     - Dump of the keyboard MCU ROM needed (can be dumped using test mode)
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

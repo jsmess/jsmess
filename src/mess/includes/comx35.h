@@ -3,7 +3,6 @@
 #ifndef __COMX35__
 #define __COMX35__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

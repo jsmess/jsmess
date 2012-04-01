@@ -208,7 +208,6 @@
         25/08/2009 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

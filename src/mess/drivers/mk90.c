@@ -13,7 +13,6 @@ It has a LCD display. It cost about 1500 roubles, which is the wages for 6
 months for an average citizen.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/t11/t11.h"

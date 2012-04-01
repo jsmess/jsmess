@@ -10,7 +10,6 @@
  *    also spanning from $3000 to $FFFF. Added clones
  *
  ******************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/channelf.h"
 

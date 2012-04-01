@@ -137,7 +137,6 @@ PCB 'Z545-1 A240570-1'
 1x 3V coin battery (CR2032)
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/sh2/sh2.h"

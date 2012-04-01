@@ -12,7 +12,6 @@
 #ifndef __KINGSOFT__
 #define __KINGSOFT__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

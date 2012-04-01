@@ -33,7 +33,6 @@ Port 80 in - upper byte = 20 thru 26
 Port 82 in - upper byte = 0 thru 7
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

@@ -3,7 +3,6 @@
 #ifndef __COSMICOS__
 #define __COSMICOS__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

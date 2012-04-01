@@ -12,7 +12,6 @@
 #ifndef __EASYFLASH__
 #define __EASYFLASH__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

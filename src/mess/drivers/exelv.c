@@ -49,7 +49,6 @@ TODO:
     * everything
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tms7000/tms7000.h"

@@ -12,7 +12,6 @@
 #ifndef __FINAL__
 #define __FINAL__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

@@ -10,7 +10,6 @@
     0xfcc67 after the ROM checksum to zero (bp 0xfc153 -> SI = 0) -> system boots
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

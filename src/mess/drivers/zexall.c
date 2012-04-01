@@ -17,7 +17,6 @@ One i/o port is used:
 0001 - bit 0 controls whether interrupt timer is enabled (1) or not (0), this is a holdover from a project of kevtris' and can be ignored.
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"

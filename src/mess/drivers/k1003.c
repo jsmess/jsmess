@@ -38,7 +38,6 @@ The writes to ports 0A, 11 & 13 are continuous.
 - Need a keyboard
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8008/i8008.h"

@@ -9,7 +9,6 @@
 Real workings of keyboard need to be understood and implemented.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/mc80.h"
 

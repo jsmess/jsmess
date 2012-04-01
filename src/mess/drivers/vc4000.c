@@ -45,7 +45,6 @@ elektor TV Game Computer which is a kind of developer machine for the VC4000.
 
 Go to the bottom to see the game list and emulation status of each.
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/vc4000.h"
 

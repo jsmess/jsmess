@@ -1,5 +1,3 @@
-#define ADDRESS_MAP_MODERN
-
 #include "emu.h"
 #include "sound/cdp1869.h"
 #include "includes/tmc600.h"

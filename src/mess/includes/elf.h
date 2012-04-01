@@ -3,7 +3,6 @@
 #ifndef __INCLUDES_ELF__
 #define __INCLUDES_ELF__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

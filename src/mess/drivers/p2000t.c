@@ -25,7 +25,6 @@ Philips P2000 1 Memory map
     Display: SAA5050
 
 ************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/p2000t.h"
 

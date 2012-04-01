@@ -12,7 +12,6 @@
 #ifndef __STRUCTURED_BASIC__
 #define __STRUCTURED_BASIC__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "imagedev/cartslot.h"

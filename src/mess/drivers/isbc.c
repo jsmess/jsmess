@@ -9,7 +9,6 @@ Notes:
 isbc86 commands: BYTE WORD REAL EREAL ROMTEST. ROMTEST works, the others hang.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

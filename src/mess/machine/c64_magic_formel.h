@@ -12,7 +12,6 @@
 #ifndef __MAGIC_FORMEL__
 #define __MAGIC_FORMEL__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

@@ -14,7 +14,6 @@ Todo:
 
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/gamecom.h"
 

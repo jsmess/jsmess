@@ -17,7 +17,6 @@ There is a menu system, and with the right equipment, many secrets can
 be found!
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"

@@ -35,7 +35,6 @@ RO-3-9506 = 8k self decoding address mask rom with external address decoder & bu
  *
  ************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

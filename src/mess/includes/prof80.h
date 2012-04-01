@@ -3,7 +3,6 @@
 #ifndef __PROF80__
 #define __PROF80__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

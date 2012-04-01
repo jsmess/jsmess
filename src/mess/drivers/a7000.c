@@ -10,7 +10,6 @@
     do R13 = SR13
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"

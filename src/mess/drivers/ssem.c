@@ -4,7 +4,6 @@
     Driver by MooglyGuy
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/ssem/ssem.h"

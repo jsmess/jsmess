@@ -5,7 +5,6 @@
         04/09/2010 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z180/z180.h"

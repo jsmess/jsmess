@@ -11,8 +11,7 @@
 
  ******************************************************************************/
 
- #define ADDRESS_MAP_MODERN
-
+ 
 /* Core includes */
 #include "emu.h"
 #include "includes/kc.h"

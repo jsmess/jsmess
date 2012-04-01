@@ -13,7 +13,6 @@
     Also marketed under the Matra brand as MAX-20 ("M" for Matra ?)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

@@ -65,7 +65,6 @@ Detailed list of bugs:
 
 
 *******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/unsp/unsp.h"

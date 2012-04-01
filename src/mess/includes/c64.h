@@ -3,7 +3,6 @@
 #ifndef __C64__
 #define __C64__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "formats/cbm_snqk.h"

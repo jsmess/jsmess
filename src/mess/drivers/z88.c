@@ -14,7 +14,6 @@
         Kevin Thacker [MESS driver]
 
 *******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/z88.h"
 

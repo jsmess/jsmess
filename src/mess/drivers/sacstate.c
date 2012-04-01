@@ -8,7 +8,6 @@ How to use this is unknown, most commands either give an error (! symbol),
 or cause the cpu to halt.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8008/i8008.h"

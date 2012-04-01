@@ -572,7 +572,6 @@ expect that the software reads these once on startup only.
 
 ******************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"

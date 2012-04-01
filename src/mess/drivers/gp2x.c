@@ -16,7 +16,6 @@
  *    and more.
  *
  **************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"

@@ -3,7 +3,6 @@
 #ifndef __ABC830__
 #define __ABC830__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "formats/basicdsk.h"

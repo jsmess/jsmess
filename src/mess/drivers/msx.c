@@ -322,7 +322,6 @@ PCB Layouts missing
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/msx.h"
 

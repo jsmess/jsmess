@@ -24,7 +24,6 @@ MZ80B
 - D000-FFFF is banked ram
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/mz80.h"
 

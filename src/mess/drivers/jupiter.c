@@ -16,7 +16,6 @@ ToDo:
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 #define VIDEO_START_MEMBER(name) void name::video_start()
 #define SCREEN_UPDATE_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 

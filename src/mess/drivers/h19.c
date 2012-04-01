@@ -28,7 +28,6 @@
         - When the internal keyboard works, get rid of the generic_terminal.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

@@ -100,7 +100,6 @@
       - CA - List the files on a tape
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

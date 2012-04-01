@@ -5,7 +5,6 @@
         12/05/2009 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/t11/t11.h"

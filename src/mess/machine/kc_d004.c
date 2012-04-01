@@ -5,7 +5,6 @@
     KC85 D004 Floppy Disk Interface
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "kc_d004.h"

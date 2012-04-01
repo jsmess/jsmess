@@ -47,7 +47,6 @@ Status 19-09-2011
 -- Of the remainder, some freeze at start
 
 ******************************************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"

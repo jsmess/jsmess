@@ -43,7 +43,6 @@
     - Keyboard autorepeat
 
 *******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

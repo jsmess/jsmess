@@ -16,7 +16,6 @@ Debugging information:
 4. g 23108c to get a test pattern on the screen.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/hcd62121/hcd62121.h"

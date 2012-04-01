@@ -21,7 +21,6 @@ Bugs
     - The common factor is the 6522, maybe it has problems..
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/aim65.h"
 #include "aim65.lh"

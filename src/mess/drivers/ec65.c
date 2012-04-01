@@ -5,7 +5,6 @@
         16/07/2009 Initial driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

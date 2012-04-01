@@ -3,7 +3,6 @@
 #ifndef __MPF1__
 #define __MPF1__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "audio/spchroms.h"

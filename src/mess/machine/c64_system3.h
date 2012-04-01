@@ -12,7 +12,6 @@
 #ifndef __SYSTEM3__
 #define __SYSTEM3__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

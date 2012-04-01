@@ -41,7 +41,6 @@
 #ifndef CPC_SSA1_H_
 #define CPC_SSA1_H_
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/cpcexp.h"

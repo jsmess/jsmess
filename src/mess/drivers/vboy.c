@@ -12,7 +12,6 @@
     - understand irqs on this HW;
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/v810/v810.h"

@@ -25,7 +25,6 @@
         might possibly look like, but we DID NOT read the source code.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"

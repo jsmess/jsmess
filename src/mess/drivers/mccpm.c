@@ -50,7 +50,6 @@ PIO A-Data 0F4h, A-Command 0F5h, B-Data 0F6h, B-Command 0F7h
 'maincpu' (F14B): unmapped i/o memory write to 0030 = D0 & FF
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

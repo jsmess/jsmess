@@ -116,7 +116,6 @@ The Read/Write 2650 CPU Port-Commands do not appear to be connected to
 anything in hardware. No cartridge has been found which uses them.
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/arcadia.h"
 

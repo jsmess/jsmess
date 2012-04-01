@@ -3,7 +3,6 @@
 #ifndef __VIP__
 #define __VIP__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

@@ -51,7 +51,6 @@ unimplemented instruction: PER
   scroll (as can be seen in the 9000-97FF area).
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

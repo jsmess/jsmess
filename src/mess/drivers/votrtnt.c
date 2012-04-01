@@ -33,7 +33,6 @@
 *  - Reconnect the ACIA when serial coms become viable in MESS.
 *
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"

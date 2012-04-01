@@ -7,7 +7,6 @@
       that is used by the Boris Diplomat.
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/f8/f8.h"

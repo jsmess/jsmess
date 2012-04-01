@@ -3,7 +3,6 @@
 #ifndef __MPZ80__
 #define __MPZ80__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

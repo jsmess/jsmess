@@ -46,7 +46,6 @@ Usage:
     swap players (g enter)
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/mos6530.h"

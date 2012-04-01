@@ -12,7 +12,6 @@
 #ifndef __OCEAN__
 #define __OCEAN__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

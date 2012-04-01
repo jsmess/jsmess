@@ -3,7 +3,6 @@
 #ifndef __PORTFOLIO__
 #define __PORTFOLIO__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

@@ -12,7 +12,6 @@
 #ifndef __PAGEFOX__
 #define __PAGEFOX__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

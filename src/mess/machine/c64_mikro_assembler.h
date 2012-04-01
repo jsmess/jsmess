@@ -12,7 +12,6 @@
 #ifndef __MIKRO_ASSEMBLER__
 #define __MIKRO_ASSEMBLER__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

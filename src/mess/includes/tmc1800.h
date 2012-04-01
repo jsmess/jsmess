@@ -3,7 +3,6 @@
 #ifndef __TMC1800__
 #define __TMC1800__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

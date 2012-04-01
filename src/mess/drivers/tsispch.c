@@ -97,7 +97,6 @@
 *
 *  F44B4: general in-operation LED status write
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"

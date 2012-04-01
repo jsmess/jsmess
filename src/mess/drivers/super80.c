@@ -180,7 +180,6 @@ after 4 bytes are read, bank 0 is selected. The timer is as close as can be to r
 hardware.
 
 ***********************************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "super80.lh"

@@ -27,7 +27,6 @@ ToDo:
 'maincpu' (0122): unmapped i/o memory write to 0019 = 17 & FF
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

@@ -38,7 +38,6 @@ Example usage: Turn on. Press -. Mode letter will show 'A'. Type in an address
 Note that left-most digit is not wired up, and therefore will always be blank.
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

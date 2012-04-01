@@ -13,7 +13,6 @@ ToDo:
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/mbc55x.h"
 

@@ -27,7 +27,6 @@
 *
 ******************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 // port 40 read reads eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)
 
 // port 40 write writes eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)

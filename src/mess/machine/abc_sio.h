@@ -3,7 +3,6 @@
 #ifndef __ABC_SIO__
 #define __ABC_SIO__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "abcbus.h"

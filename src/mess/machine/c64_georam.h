@@ -12,7 +12,6 @@
 #ifndef __GEORAM__
 #define __GEORAM__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

@@ -180,7 +180,6 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

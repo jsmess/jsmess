@@ -12,7 +12,6 @@
 #ifndef __C64_STANDARD_CARTRIDGE__
 #define __C64_STANDARD_CARTRIDGE__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "imagedev/cartslot.h"

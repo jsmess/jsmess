@@ -4,7 +4,6 @@
 
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"

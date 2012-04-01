@@ -35,7 +35,6 @@ PORT A: 111xyzzz
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"

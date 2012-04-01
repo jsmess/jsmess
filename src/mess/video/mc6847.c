@@ -61,7 +61,6 @@
 
 **********************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "video/mc6847.h"

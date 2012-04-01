@@ -11,7 +11,6 @@
 #ifndef __DRAGON__
 #define __DRAGON__
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/coco12.h"
 #include "imagedev/printer.h"

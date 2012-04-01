@@ -12,7 +12,6 @@
 #ifndef __SFX_SOUND_EXPANDER__
 #define __SFX_SOUND_EXPANDER__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"

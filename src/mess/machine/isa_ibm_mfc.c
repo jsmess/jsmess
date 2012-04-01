@@ -13,7 +13,6 @@
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "isa_ibm_mfc.h"

@@ -12,7 +12,6 @@
 #ifndef __ROSS__
 #define __ROSS__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "imagedev/cartslot.h"

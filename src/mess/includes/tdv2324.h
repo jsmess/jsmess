@@ -3,7 +3,6 @@
 #ifndef __TDV2324__
 #define __TDV2324__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
