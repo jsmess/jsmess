@@ -1133,36 +1133,36 @@ static ADDRESS_MAP_START( px4_io, AS_IO, 8, px4_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* gapnit, 0x00-0x07 */
-	AM_RANGE(0x00, 0x00) AM_READWRITE(px4_icrlc_r, px4_ctrl1_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(px4_icrhc_r, px4_cmdr_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(px4_icrlb_r, px4_ctrl2_w)
-	AM_RANGE(0x03, 0x03) AM_READ(px4_icrhb_r)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(px4_isr_r, px4_ier_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(px4_str_r, px4_bankr_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(px4_sior_r, px4_sior_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(px4_icrlc_r, px4_ctrl1_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(px4_icrhc_r, px4_cmdr_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(px4_icrlb_r, px4_ctrl2_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(px4_icrhb_r)
+	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(px4_isr_r, px4_ier_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE_LEGACY(px4_str_r, px4_bankr_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE_LEGACY(px4_sior_r, px4_sior_w)
 	AM_RANGE(0x07, 0x07) AM_NOP
 	/* gapndl, 0x08-0x0f */
-	AM_RANGE(0x08, 0x08) AM_WRITE(px4_vadr_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(px4_yoff_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(px4_fr_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(px4_spur_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(px4_vadr_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(px4_yoff_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(px4_fr_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE_LEGACY(px4_spur_w)
 	AM_RANGE(0x0c, 0x0f) AM_NOP
 	/* gapnio, 0x10-0x1f */
-	AM_RANGE(0x10, 0x13) AM_READWRITE(px4_ctgif_r, px4_ctgif_w)
-	AM_RANGE(0x14, 0x14) AM_READWRITE(px4_artdir_r, px4_artdor_w)
-	AM_RANGE(0x15, 0x15) AM_READWRITE(px4_artsr_r, px4_artmr_w)
-	AM_RANGE(0x16, 0x16) AM_READWRITE(px4_iostr_r, px4_artcr_w)
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE_MODERN("centronics", centronics_device, write)
-	AM_RANGE(0x18, 0x18) AM_WRITE(px4_swr_w)
-	AM_RANGE(0x19, 0x19) AM_WRITE(px4_ioctlr_w)
+	AM_RANGE(0x10, 0x13) AM_READWRITE_LEGACY(px4_ctgif_r, px4_ctgif_w)
+	AM_RANGE(0x14, 0x14) AM_READWRITE_LEGACY(px4_artdir_r, px4_artdor_w)
+	AM_RANGE(0x15, 0x15) AM_READWRITE_LEGACY(px4_artsr_r, px4_artmr_w)
+	AM_RANGE(0x16, 0x16) AM_READWRITE_LEGACY(px4_iostr_r, px4_artcr_w)
+	AM_RANGE(0x17, 0x17) AM_DEVWRITE("centronics", centronics_device, write)
+	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(px4_swr_w)
+	AM_RANGE(0x19, 0x19) AM_WRITE_LEGACY(px4_ioctlr_w)
 	AM_RANGE(0x1a, 0x1f) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( px4p_io, AS_IO, 8, px4_state )
 	AM_IMPORT_FROM(px4_io)
-	AM_RANGE(0x90, 0x92) AM_WRITE(px4_ramdisk_address_w)
-	AM_RANGE(0x93, 0x93) AM_READWRITE(px4_ramdisk_data_r, px4_ramdisk_data_w)
-	AM_RANGE(0x94, 0x94) AM_READ(px4_ramdisk_control_r)
+	AM_RANGE(0x90, 0x92) AM_WRITE_LEGACY(px4_ramdisk_address_w)
+	AM_RANGE(0x93, 0x93) AM_READWRITE_LEGACY(px4_ramdisk_data_r, px4_ramdisk_data_w)
+	AM_RANGE(0x94, 0x94) AM_READ_LEGACY(px4_ramdisk_control_r)
 ADDRESS_MAP_END
 
 

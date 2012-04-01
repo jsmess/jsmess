@@ -1187,23 +1187,23 @@ static WRITE32_HANDLER( hpc3_unkpbus0_w )
 
 static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )	/* mirror of first 512k of main RAM */
-	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("share1") AM_BASE_MEMBER(ip22_state, m_mainram ) AM_RAM_WRITE(ip22_write_ram)		/* 128 MB of main RAM */
-	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE( newport_rex3_r, newport_rex3_w )
-	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE( sgi_mc_r, sgi_mc_w )
-	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE( hpc3_hd_enet_r, hpc3_hd_enet_w )
+	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("share1") AM_BASE( m_mainram ) AM_RAM_WRITE_LEGACY(ip22_write_ram)		/* 128 MB of main RAM */
+	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE_LEGACY( newport_rex3_r, newport_rex3_w )
+	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE_LEGACY( sgi_mc_r, sgi_mc_w )
+	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE_LEGACY( hpc3_hd_enet_r, hpc3_hd_enet_w )
 	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM	/* unknown, but read a lot and discarded */
-	AM_RANGE( 0x1fbc0000, 0x1fbc7fff ) AM_READWRITE( hpc3_hd0_r, hpc3_hd0_w )
-	AM_RANGE( 0x1fbc8000, 0x1fbcffff ) AM_READWRITE( hpc3_unkpbus0_r, hpc3_unkpbus0_w ) AM_BASE_MEMBER(ip22_state, m_unkpbus0)
-	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE( hpc3_pbusdma_r, hpc3_pbusdma_w )
-	AM_RANGE( 0x1fbd8000, 0x1fbd83ff ) AM_READWRITE( hal2_r, hal2_w )
+	AM_RANGE( 0x1fbc0000, 0x1fbc7fff ) AM_READWRITE_LEGACY( hpc3_hd0_r, hpc3_hd0_w )
+	AM_RANGE( 0x1fbc8000, 0x1fbcffff ) AM_READWRITE_LEGACY( hpc3_unkpbus0_r, hpc3_unkpbus0_w ) AM_BASE( m_unkpbus0)
+	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE_LEGACY( hpc3_pbusdma_r, hpc3_pbusdma_w )
+	AM_RANGE( 0x1fbd8000, 0x1fbd83ff ) AM_READWRITE_LEGACY( hal2_r, hal2_w )
 	AM_RANGE( 0x1fbd8400, 0x1fbd87ff ) AM_RAM /* hack */
-	AM_RANGE( 0x1fbd9000, 0x1fbd93ff ) AM_READWRITE( hpc3_pbus4_r, hpc3_pbus4_w )
-	AM_RANGE( 0x1fbd9800, 0x1fbd9bff ) AM_READWRITE( hpc3_pbus6_r, hpc3_pbus6_w )
+	AM_RANGE( 0x1fbd9000, 0x1fbd93ff ) AM_READWRITE_LEGACY( hpc3_pbus4_r, hpc3_pbus4_w )
+	AM_RANGE( 0x1fbd9800, 0x1fbd9bff ) AM_READWRITE_LEGACY( hpc3_pbus6_r, hpc3_pbus6_w )
 	AM_RANGE( 0x1fbdc000, 0x1fbdc7ff ) AM_RAM
 	AM_RANGE( 0x1fbdd000, 0x1fbdd3ff ) AM_RAM
-	AM_RANGE( 0x1fbe0000, 0x1fbe04ff ) AM_READWRITE( rtc_r, rtc_w )
+	AM_RANGE( 0x1fbe0000, 0x1fbe04ff ) AM_READWRITE_LEGACY( rtc_r, rtc_w )
 	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_REGION( "user1", 0 )
-	AM_RANGE( 0x20000000, 0x27ffffff ) AM_SHARE("share1") AM_RAM_WRITE(ip22_write_ram)
+	AM_RANGE( 0x20000000, 0x27ffffff ) AM_SHARE("share1") AM_RAM_WRITE_LEGACY(ip22_write_ram)
 ADDRESS_MAP_END
 
 

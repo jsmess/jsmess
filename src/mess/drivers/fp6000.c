@@ -160,9 +160,9 @@ static WRITE8_HANDLER( fp6000_6845_data_w )
 static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16, fp6000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM
-	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_BASE_MEMBER(fp6000_state,m_gvram)//gvram
-	AM_RANGE(0xe0000,0xe0fff) AM_RAM AM_BASE_MEMBER(fp6000_state,m_vram)
-	AM_RANGE(0xe7000,0xe7fff) AM_READWRITE8(fp6000_pcg_r,fp6000_pcg_w,0xffff)
+	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_BASE(m_gvram)//gvram
+	AM_RANGE(0xe0000,0xe0fff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0xe7000,0xe7fff) AM_READWRITE8_LEGACY(fp6000_pcg_r,fp6000_pcg_w,0xffff)
 	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -213,14 +213,14 @@ static READ16_HANDLER( pit_r )
 
 static ADDRESS_MAP_START(fp6000_io, AS_IO, 16, fp6000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x08, 0x09) AM_READ(ex_board_r) // BIOS of some sort ...
+	AM_RANGE(0x08, 0x09) AM_READ_LEGACY(ex_board_r) // BIOS of some sort ...
 	AM_RANGE(0x0a, 0x0b) AM_READ_PORT("DSW") // installed RAM id?
 	AM_RANGE(0x10, 0x11) AM_READNOP
-	AM_RANGE(0x20, 0x23) AM_READWRITE8(fp6000_key_r,fp6000_key_w,0x00ff)
-	AM_RANGE(0x38, 0x39) AM_READ(pit_r) // pit?
-	AM_RANGE(0x70, 0x71) AM_WRITE8(fp6000_6845_address_w,0x00ff)
-	AM_RANGE(0x72, 0x73) AM_WRITE8(fp6000_6845_data_w,0x00ff)
-	AM_RANGE(0x74, 0x75) AM_READ(unk_r) //bit 6 busy flag
+	AM_RANGE(0x20, 0x23) AM_READWRITE8_LEGACY(fp6000_key_r,fp6000_key_w,0x00ff)
+	AM_RANGE(0x38, 0x39) AM_READ_LEGACY(pit_r) // pit?
+	AM_RANGE(0x70, 0x71) AM_WRITE8_LEGACY(fp6000_6845_address_w,0x00ff)
+	AM_RANGE(0x72, 0x73) AM_WRITE8_LEGACY(fp6000_6845_data_w,0x00ff)
+	AM_RANGE(0x74, 0x75) AM_READ_LEGACY(unk_r) //bit 6 busy flag
 ADDRESS_MAP_END
 
 /* Input ports */

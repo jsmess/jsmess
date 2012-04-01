@@ -302,16 +302,16 @@ static WRITE8_HANDLER(scorpion_port_1ffd_w)
 
 static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, spectrum_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
-	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE_LEGACY(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
+	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(scorpion_port_1ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
 

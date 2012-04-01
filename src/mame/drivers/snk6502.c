@@ -124,9 +124,7 @@ original rom dump came from.  Both the dedicated cabinet boards and the
 conversion kit boards for Nibbler never came with nor do the manuals for them
 list a "iC51" in the parts list breakdown.  In fact, sound roms between different
 games using the snk6502 custom sound can largely be interchanged with another
-using the same.  Currently in MAME, this IC51 from Pioneer Balloon is set as
-as OPTIONAL rom, allowing you to still play Nibbler (with/without music if you
-wish) without needing to adjust the source and recompile.
+using the same.
 
 ****************************************************************************
 
@@ -342,16 +340,16 @@ static CUSTOM_INPUT( sasuke_count_r )
 
 static ADDRESS_MAP_START( sasuke_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE_LEGACY(snk6502_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(snk6502_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(snk6502_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(snk6502_charram_w) AM_BASE( m_charram)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x4000, 0x8fff) AM_ROM
-	AM_RANGE(0xb000, 0xb001) AM_WRITE(sasuke_sound_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)	/* flip screen & irq enable */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
+	AM_RANGE(0xb000, 0xb001) AM_WRITE_LEGACY(sasuke_sound_w)
+	AM_RANGE(0xb002, 0xb002) AM_WRITE_LEGACY(satansat_b002_w)	/* flip screen & irq enable */
+	AM_RANGE(0xb003, 0xb003) AM_WRITE_LEGACY(satansat_backcolor_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
 	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("IN1")
 	AM_RANGE(0xb006, 0xb006) AM_READ_PORT("DSW")
@@ -361,16 +359,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE_LEGACY(snk6502_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(snk6502_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(snk6502_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(snk6502_charram_w) AM_BASE( m_charram)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x4000, 0x97ff) AM_ROM
-	AM_RANGE(0xb000, 0xb001) AM_WRITE(satansat_sound_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)	/* flip screen & irq enable */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
+	AM_RANGE(0xb000, 0xb001) AM_WRITE_LEGACY(satansat_sound_w)
+	AM_RANGE(0xb002, 0xb002) AM_WRITE_LEGACY(satansat_b002_w)	/* flip screen & irq enable */
+	AM_RANGE(0xb003, 0xb003) AM_WRITE_LEGACY(satansat_backcolor_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
 	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("IN1")
 	AM_RANGE(0xb006, 0xb006) AM_READ_PORT("DSW")
@@ -380,61 +378,61 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0x3100, 0x3102) AM_WRITE(vanguard_sound_w)
-	AM_RANGE(0x3103, 0x3103) AM_WRITE(snk6502_flipscreen_w)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE_LEGACY(snk6502_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(snk6502_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(snk6502_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(snk6502_charram_w) AM_BASE( m_charram)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x3100, 0x3102) AM_WRITE_LEGACY(vanguard_sound_w)
+	AM_RANGE(0x3103, 0x3103) AM_WRITE_LEGACY(snk6502_flipscreen_w)
 	AM_RANGE(0x3104, 0x3104) AM_READ_PORT("IN0")
 	AM_RANGE(0x3105, 0x3105) AM_READ_PORT("IN1")
 	AM_RANGE(0x3106, 0x3106) AM_READ_PORT("DSW")
 	AM_RANGE(0x3107, 0x3107) AM_READ_PORT("IN2")
-	AM_RANGE(0x3200, 0x3200) AM_WRITE(snk6502_scrollx_w)
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(snk6502_scrolly_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(vanguard_speech_w)	// speech
+	AM_RANGE(0x3200, 0x3200) AM_WRITE_LEGACY(snk6502_scrollx_w)
+	AM_RANGE(0x3300, 0x3300) AM_WRITE_LEGACY(snk6502_scrolly_w)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(vanguard_speech_w)	// speech
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2100, 0x2103) AM_WRITE(fantasy_sound_w)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE_LEGACY(snk6502_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(snk6502_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(snk6502_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(snk6502_charram_w) AM_BASE( m_charram)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x2100, 0x2103) AM_WRITE_LEGACY(fantasy_sound_w)
 	AM_RANGE(0x2104, 0x2104) AM_READ_PORT("IN0")
 	AM_RANGE(0x2105, 0x2105) AM_READ_PORT("IN1")
 	AM_RANGE(0x2106, 0x2106) AM_READ_PORT("DSW")
 	AM_RANGE(0x2107, 0x2107) AM_READ_PORT("IN2")
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(snk6502_scrollx_w)
-	AM_RANGE(0x2300, 0x2300) AM_WRITE(snk6502_scrolly_w)
-	AM_RANGE(0x2400, 0x2400) AM_WRITE(fantasy_speech_w)	// speech
+	AM_RANGE(0x2200, 0x2200) AM_WRITE_LEGACY(snk6502_scrollx_w)
+	AM_RANGE(0x2300, 0x2300) AM_WRITE_LEGACY(snk6502_scrolly_w)
+	AM_RANGE(0x2400, 0x2400) AM_WRITE_LEGACY(fantasy_speech_w)	// speech
 	AM_RANGE(0x3000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pballoon_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE_LEGACY(snk6502_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(snk6502_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(snk6502_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(snk6502_charram_w) AM_BASE( m_charram)
 	AM_RANGE(0x3000, 0x9fff) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0xb100, 0xb103) AM_WRITE(fantasy_sound_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0xb100, 0xb103) AM_WRITE_LEGACY(fantasy_sound_w)
 	AM_RANGE(0xb104, 0xb104) AM_READ_PORT("IN0")
 	AM_RANGE(0xb105, 0xb105) AM_READ_PORT("IN1")
 	AM_RANGE(0xb106, 0xb106) AM_READ_PORT("DSW")
 	AM_RANGE(0xb107, 0xb107) AM_READ_PORT("IN2")
-	AM_RANGE(0xb200, 0xb200) AM_WRITE(snk6502_scrollx_w)
-	AM_RANGE(0xb300, 0xb300) AM_WRITE(snk6502_scrolly_w)
+	AM_RANGE(0xb200, 0xb200) AM_WRITE_LEGACY(snk6502_scrollx_w)
+	AM_RANGE(0xb300, 0xb300) AM_WRITE_LEGACY(snk6502_scrolly_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1352,7 +1350,6 @@ ROM_START( nibbler ) /* revision 9 - rom labels match manual part numbers/locati
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
 	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
-	ROM_LOAD_OPTIONAL( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1379,7 +1376,6 @@ ROM_START( nibbler8 ) /* revision 8 */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
 	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
-	ROM_LOAD_OPTIONAL( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1406,7 +1402,33 @@ ROM_START( nibbler6 ) /* revision 6 */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
 	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
-	ROM_LOAD_OPTIONAL( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
+	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
+	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
+ROM_END
+
+ROM_START( nibblerp ) /* revision 6 + extra soundrom */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic12",           0x3000, 0x1000, CRC(ac6a802b) SHA1(ac1072e30994f13097663dc24d9d1dc35a95d874) )
+	ROM_LOAD( "ic7",            0x4000, 0x1000, CRC(35971364) SHA1(6430c7be9e5f47d3f1f2cc157d949246e4085e8b) )
+	ROM_LOAD( "ic8",            0x5000, 0x1000, CRC(6b33b806) SHA1(29444e45bf5a6ab1d86e0aa19dc6c1bc64ba633f) )
+	ROM_LOAD( "ic9",            0x6000, 0x1000, CRC(91a4f98d) SHA1(678c7e8c91a7fdba8dc2faff4192eb0964abdb3f) )
+	ROM_LOAD( "ic10",           0x7000, 0x1000, CRC(a151d934) SHA1(6681bdcd84cf62b40b2430ff530cb3c9aa36656c) )
+	ROM_LOAD( "ic14",           0x8000, 0x1000, CRC(063f05cc) SHA1(039ac1b007cb817ae0902484ca611ae7076930d6) )
+	ROM_RELOAD(                 0xf000, 0x1000 )	/* for the reset and interrupt vectors */
+	ROM_LOAD( "g-0960-54.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
+	ROM_LOAD( "g-0960-55.ic16", 0xa000, 0x1000, CRC(4bb39815) SHA1(1755c28d7d300524ab839aedcc744254544e9c19) )
+	ROM_LOAD( "g-0960-56.ic17", 0xb000, 0x1000, CRC(ed680f19) SHA1(b44203585f32ebe2a3bf0597eac7c0faa7e81a92) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "g-0960-57.ic50", 0x0000, 0x1000, CRC(01d4d0c2) SHA1(5a8026210a872351ce4e39e27f6479d3ca0689e2) )
+	ROM_LOAD( "g-0960-58.ic51", 0x1000, 0x1000, CRC(feff7faf) SHA1(50005502578a4ea9b9c8f36998670b787d2d0b20) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
+	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
+
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_LOAD( "sk7_ic51.bin",   0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1433,7 +1455,6 @@ ROM_START( nibblero ) /* revision 8 */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
 	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
-	ROM_LOAD_OPTIONAL( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
@@ -1460,4 +1481,5 @@ GAME( 1982, pballoonr,pballoon, pballoon, pballoon, 0, ROT90, "SNK (Rock-Ola lic
 GAME( 1982, nibbler,  0,        nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (rev 9)", 0 )
 GAME( 1982, nibbler8, nibbler,  nibbler,  nibbler8, 0, ROT90, "Rock-Ola", "Nibbler (rev 8)", 0 )
 GAME( 1982, nibbler6, nibbler,  nibbler,  nibbler6, 0, ROT90, "Rock-Ola", "Nibbler (rev 6)", 0 )
+GAME( 1982, nibblerp, nibbler,  nibbler,  nibbler6, 0, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion)", 0 )
 GAME( 1983, nibblero, nibbler,  nibbler,  nibbler8, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", 0 )

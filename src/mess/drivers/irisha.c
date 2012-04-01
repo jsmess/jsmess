@@ -22,12 +22,12 @@ static ADDRESS_MAP_START(irisha_mem, AS_PROGRAM, 8, irisha_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( irisha_io , AS_IO, 8, irisha_state )
-	AM_RANGE( 0x04, 0x05) AM_READ(irisha_keyboard_r)
-	AM_RANGE( 0x06, 0x06) AM_DEVREADWRITE_MODERN("uart",i8251_device, data_r, data_w)
-	AM_RANGE( 0x07, 0x07) AM_DEVREADWRITE_MODERN("uart", i8251_device, status_r, control_w)
-	AM_RANGE( 0x08, 0x0B) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w )
-	AM_RANGE( 0x0C, 0x0F) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w ) AM_MASK( 0x01 )
-	AM_RANGE( 0x10, 0x13) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
+	AM_RANGE( 0x04, 0x05) AM_READ_LEGACY(irisha_keyboard_r)
+	AM_RANGE( 0x06, 0x06) AM_DEVREADWRITE("uart",i8251_device, data_r, data_w)
+	AM_RANGE( 0x07, 0x07) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	AM_RANGE( 0x08, 0x0B) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w )
+	AM_RANGE( 0x0C, 0x0F) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w ) AM_MASK( 0x01 )
+	AM_RANGE( 0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */

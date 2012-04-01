@@ -28,19 +28,19 @@
 static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
-    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, m_specialist_video_ram) // Video RAM
+    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE( m_specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
-    AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
+    AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
-    AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE_MEMBER(special_state, m_specialist_video_ram) // Video RAM
+    AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE( m_specialist_video_ram) // Video RAM
     AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
     AM_RANGE( 0xf000, 0xf700 ) AM_NOP
-    AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
+    AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(erik_mem, AS_PROGRAM, 8, special_state )
@@ -54,13 +54,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( erik_io_map, AS_IO, 8, special_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(erik_rr_reg_r, erik_rr_reg_w)
-	AM_RANGE(0xf2, 0xf2) AM_READWRITE(erik_rc_reg_r, erik_rc_reg_w)
-	AM_RANGE(0xf3, 0xf3) AM_READWRITE(erik_disk_reg_r, erik_disk_reg_w)
-	AM_RANGE(0xf4, 0xf4) AM_DEVREADWRITE("wd1793", wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0xf5, 0xf5) AM_DEVREADWRITE("wd1793", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("wd1793", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0xf7, 0xf7) AM_DEVREADWRITE("wd1793", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0xf1, 0xf1) AM_READWRITE_LEGACY(erik_rr_reg_r, erik_rr_reg_w)
+	AM_RANGE(0xf2, 0xf2) AM_READWRITE_LEGACY(erik_rc_reg_r, erik_rc_reg_w)
+	AM_RANGE(0xf3, 0xf3) AM_READWRITE_LEGACY(erik_disk_reg_r, erik_disk_reg_w)
+	AM_RANGE(0xf4, 0xf4) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r, wd17xx_command_w)
+	AM_RANGE(0xf5, 0xf5) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r, wd17xx_track_w)
+	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r, wd17xx_sector_w)
+	AM_RANGE(0xf7, 0xf7) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r, wd17xx_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
@@ -69,16 +69,16 @@ static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xc000, 0xffbf ) AM_RAMBANK("bank3")
     AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
-    AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
+    AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
     AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
-    AM_RANGE( 0xffe8, 0xffe8 ) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
-    AM_RANGE( 0xffe9, 0xffe9 ) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
-    AM_RANGE( 0xffea, 0xffea ) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w)
-    AM_RANGE( 0xffea, 0xffeb ) AM_DEVREADWRITE("wd1793", wd17xx_data_r,wd17xx_data_w)
-    AM_RANGE( 0xffec, 0xffef ) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)
-    AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
-    AM_RANGE( 0xfff8, 0xfff8 ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w)
-    AM_RANGE( 0xfffc, 0xfffe ) AM_WRITE(specimx_select_bank)
+    AM_RANGE( 0xffe8, 0xffe8 ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r,wd17xx_command_w)
+    AM_RANGE( 0xffe9, 0xffe9 ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r,wd17xx_track_w)
+    AM_RANGE( 0xffea, 0xffea ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r,wd17xx_sector_w)
+    AM_RANGE( 0xffea, 0xffeb ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r,wd17xx_data_w)
+    AM_RANGE( 0xffec, 0xffef ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
+    AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE_LEGACY(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
+    AM_RANGE( 0xfff8, 0xfff8 ) AM_READWRITE_LEGACY(specimx_video_color_r,specimx_video_color_w)
+    AM_RANGE( 0xfffc, 0xfffe ) AM_WRITE_LEGACY(specimx_select_bank)
 ADDRESS_MAP_END
 
 /* Input ports */

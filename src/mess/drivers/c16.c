@@ -174,13 +174,13 @@ static ADDRESS_MAP_START(c16_map, AS_PROGRAM, 8, c16_state )
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank3")
 	AM_RANGE(0xfc00, 0xfcff) AM_READ_BANK("bank4")
 	AM_RANGE(0xc000, 0xfcff) AM_WRITE_BANK("bank7")
-	AM_RANGE(0xfd10, 0xfd1f) AM_READ(c16_fd1x_r)
-	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w)		/* 6529 keyboard matrix */
-	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE(c16_select_roms) /* rom chips selection */
-	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE("ted7360", ted7360_port_r, ted7360_port_w)
+	AM_RANGE(0xfd10, 0xfd1f) AM_READ_LEGACY(c16_fd1x_r)
+	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE_LEGACY(c16_6529_port_r, c16_6529_port_w)		/* 6529 keyboard matrix */
+	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE_LEGACY(c16_select_roms) /* rom chips selection */
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE_LEGACY("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
-	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
-	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)
+	AM_RANGE(0xff3e, 0xff3e) AM_WRITE_LEGACY(c16_switch_to_rom)
+	AM_RANGE(0xff3f, 0xff3f) AM_WRITE_LEGACY(c16_switch_to_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(plus4_map, AS_PROGRAM, 8, c16_state )
@@ -189,15 +189,15 @@ static ADDRESS_MAP_START(plus4_map, AS_PROGRAM, 8, c16_state )
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank3")
 	AM_RANGE(0xfc00, 0xfcff) AM_READ_BANK("bank4")
 	AM_RANGE(0x0000, 0xfcff) AM_WRITE_BANK("bank9")
-	AM_RANGE(0xfd00, 0xfd0f) AM_READWRITE(c16_6551_port_r, c16_6551_port_w)
-	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE(plus4_6529_port_r, plus4_6529_port_w)
-	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
-	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE( c16_select_roms) /* rom chips selection */
-	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE("ted7360", ted7360_port_r, ted7360_port_w)
+	AM_RANGE(0xfd00, 0xfd0f) AM_READWRITE_LEGACY(c16_6551_port_r, c16_6551_port_w)
+	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE_LEGACY(plus4_6529_port_r, plus4_6529_port_w)
+	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE_LEGACY(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
+	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE_LEGACY( c16_select_roms) /* rom chips selection */
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE_LEGACY("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff20, 0xff3d) AM_WRITEONLY
-	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
-	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)
+	AM_RANGE(0xff3e, 0xff3e) AM_WRITE_LEGACY(c16_switch_to_rom)
+	AM_RANGE(0xff3f, 0xff3f) AM_WRITE_LEGACY(c16_switch_to_ram)
 	AM_RANGE(0xff40, 0xffff) AM_WRITEONLY
 ADDRESS_MAP_END
 
@@ -207,16 +207,16 @@ static ADDRESS_MAP_START(c364_map , AS_PROGRAM, 8, c16_state )
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank3")
 	AM_RANGE(0xfc00, 0xfcff) AM_READ_BANK("bank4")
 	AM_RANGE(0x0000, 0xfcff) AM_WRITE_BANK("bank9")
-	AM_RANGE(0xfd00, 0xfd0f) AM_READWRITE(c16_6551_port_r, c16_6551_port_w)
-	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE(plus4_6529_port_r, plus4_6529_port_w)
-	AM_RANGE(0xfd20, 0xfd2f) AM_DEVREADWRITE("t6721", t6721_speech_r, t6721_speech_w)
-	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
-	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE(c16_select_roms) /* rom chips selection */
-	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE("ted7360", ted7360_port_r, ted7360_port_w)
+	AM_RANGE(0xfd00, 0xfd0f) AM_READWRITE_LEGACY(c16_6551_port_r, c16_6551_port_w)
+	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE_LEGACY(plus4_6529_port_r, plus4_6529_port_w)
+	AM_RANGE(0xfd20, 0xfd2f) AM_DEVREADWRITE_LEGACY("t6721", t6721_speech_r, t6721_speech_w)
+	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE_LEGACY(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
+	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE_LEGACY(c16_select_roms) /* rom chips selection */
+	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE_LEGACY("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff20, 0xff3d) AM_WRITEONLY
-	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
-	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)
+	AM_RANGE(0xff3e, 0xff3e) AM_WRITE_LEGACY(c16_switch_to_rom)
+	AM_RANGE(0xff3f, 0xff3f) AM_WRITE_LEGACY(c16_switch_to_ram)
 	AM_RANGE(0xff40, 0xffff) AM_WRITEONLY
 ADDRESS_MAP_END
 

@@ -213,8 +213,8 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
  */
 static ADDRESS_MAP_START(c128_z80_mem , AS_PROGRAM, 8, c128_state )
 #if 1
-	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank10") AM_WRITE(c128_write_0000)
-	AM_RANGE(0x1000, 0xbfff) AM_READ_BANK("bank11") AM_WRITE(c128_write_1000)
+	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bank10") AM_WRITE_LEGACY(c128_write_0000)
+	AM_RANGE(0x1000, 0xbfff) AM_READ_BANK("bank11") AM_WRITE_LEGACY(c128_write_1000)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 #else
 	/* best to do reuse bankswitching numbers */
@@ -226,38 +226,38 @@ static ADDRESS_MAP_START(c128_z80_mem , AS_PROGRAM, 8, c128_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank6")
 	AM_RANGE(0xe000, 0xefff) AM_RAMBANK("bank7")
 	AM_RANGE(0xf000, 0xfeff) AM_RAMBANK("bank8")
-	AM_RANGE(0xff00, 0xff04) AM_READWRITE(c128_mmu8722_ff00_r, c128_mmu8722_ff00_w)
+	AM_RANGE(0xff00, 0xff04) AM_READWRITE_LEGACY(c128_mmu8722_ff00_r, c128_mmu8722_ff00_w)
 	AM_RANGE(0xff05, 0xffff) AM_RAMBANK("bank9")
 #endif
 
 #if 0
 	AM_RANGE(0x10000, 0x1ffff) AM_WRITEONLY
 	AM_RANGE(0x20000, 0xfffff) AM_WRITEONLY	   /* or nothing */
-	AM_RANGE(0x100000, 0x107fff) AM_BASE_MEMBER(c128_state, m_c128_basic)	/* maps to 0x4000 */
-	AM_RANGE(0x108000, 0x109fff) AM_BASE_MEMBER(c128_state, m_basic)	/* maps to 0xa000 */
-	AM_RANGE(0x10a000, 0x10bfff) AM_BASE_MEMBER(c128_state, m_kernal)	/* maps to 0xe000 */
-	AM_RANGE(0x10c000, 0x10cfff) AM_BASE_MEMBER(c128_state, m_editor)
-	AM_RANGE(0x10d000, 0x10dfff) AM_BASE_MEMBER(c128_state, m_z80)		/* maps to z80 0 */
-	AM_RANGE(0x10e000, 0x10ffff) AM_BASE_MEMBER(c128_state, m_c128_kernal)
-	AM_RANGE(0x110000, 0x117fff) AM_BASE_MEMBER(c128_state, m_internal_function)
-	AM_RANGE(0x118000, 0x11ffff) AM_BASE_MEMBER(c128_state, m_external_function)
-	AM_RANGE(0x120000, 0x120fff) AM_BASE_MEMBER(c128_state, m_chargen)
-	AM_RANGE(0x121000, 0x121fff) AM_BASE_MEMBER(c128_state, m_c128_chargen)
-	AM_RANGE(0x122000, 0x1227ff) AM_BASE_MEMBER(c128_state, m_colorram)
-	AM_RANGE(0x122800, 0x1327ff) AM_BASE_MEMBER(c128_state, m_vdcram)
+	AM_RANGE(0x100000, 0x107fff) AM_BASE( m_c128_basic)	/* maps to 0x4000 */
+	AM_RANGE(0x108000, 0x109fff) AM_BASE( m_basic)	/* maps to 0xa000 */
+	AM_RANGE(0x10a000, 0x10bfff) AM_BASE( m_kernal)	/* maps to 0xe000 */
+	AM_RANGE(0x10c000, 0x10cfff) AM_BASE( m_editor)
+	AM_RANGE(0x10d000, 0x10dfff) AM_BASE( m_z80)		/* maps to z80 0 */
+	AM_RANGE(0x10e000, 0x10ffff) AM_BASE( m_c128_kernal)
+	AM_RANGE(0x110000, 0x117fff) AM_BASE( m_internal_function)
+	AM_RANGE(0x118000, 0x11ffff) AM_BASE( m_external_function)
+	AM_RANGE(0x120000, 0x120fff) AM_BASE( m_chargen)
+	AM_RANGE(0x121000, 0x121fff) AM_BASE( m_c128_chargen)
+	AM_RANGE(0x122000, 0x1227ff) AM_BASE( m_colorram)
+	AM_RANGE(0x122800, 0x1327ff) AM_BASE( m_vdcram)
 	/* 2 kbyte by 8 bits, only 1 kbyte by 4 bits used) */
 #endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c128_z80_io , AS_IO, 8, c128_state )
-	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(c64_colorram_read, c64_colorram_write)
-	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2e", vic2_port_r, vic2_port_w)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
-	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(c128_mmu8722_port_r, c128_mmu8722_port_w)
-	AM_RANGE(0xd600, 0xd7ff) AM_DEVREADWRITE("vdc8563", vdc8563_port_r, vdc8563_port_w)
-	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", mos6526_r, mos6526_w)
-	AM_RANGE(0xdd00, 0xddff) AM_DEVREADWRITE("cia_1", mos6526_r, mos6526_w)
-/*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(dma_port_r, dma_port_w) */
+	AM_RANGE(0x1000, 0x13ff) AM_READWRITE_LEGACY(c64_colorram_read, c64_colorram_write)
+	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE_LEGACY("vic2e", vic2_port_r, vic2_port_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE_LEGACY("sid6581", sid6581_r, sid6581_w)
+	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE_LEGACY(c128_mmu8722_port_r, c128_mmu8722_port_w)
+	AM_RANGE(0xd600, 0xd7ff) AM_DEVREADWRITE_LEGACY("vdc8563", vdc8563_port_r, vdc8563_port_w)
+	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE_LEGACY("cia_0", mos6526_r, mos6526_w)
+	AM_RANGE(0xdd00, 0xddff) AM_DEVREADWRITE_LEGACY("cia_1", mos6526_r, mos6526_w)
+/*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE_LEGACY(dma_port_r, dma_port_w) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c128_mem, AS_PROGRAM, 8, c128_state )
@@ -268,15 +268,15 @@ static ADDRESS_MAP_START( c128_mem, AS_PROGRAM, 8, c128_state )
 	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank5")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank6")
 
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK( "bank7") AM_WRITE( c128_write_4000 )
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK( "bank8") AM_WRITE( c128_write_8000 )
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK( "bank9") AM_WRITE( c128_write_a000 )
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK( "bank7") AM_WRITE_LEGACY( c128_write_4000 )
+	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK( "bank8") AM_WRITE_LEGACY( c128_write_8000 )
+	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK( "bank9") AM_WRITE_LEGACY( c128_write_a000 )
 
-	AM_RANGE(0xc000, 0xcfff) AM_READ_BANK( "bank12") AM_WRITE( c128_write_c000 )
-	AM_RANGE(0xd000, 0xdfff) AM_READ_BANK( "bank13") AM_WRITE( c128_write_d000 )
-	AM_RANGE(0xe000, 0xfeff) AM_READ_BANK( "bank14") AM_WRITE( c128_write_e000 )
-	AM_RANGE(0xff00, 0xff04) AM_READ_BANK( "bank15") AM_WRITE( c128_write_ff00 )	   /* mmu c128 modus */
-	AM_RANGE(0xff05, 0xffff) AM_READ_BANK( "bank16") AM_WRITE( c128_write_ff05 )
+	AM_RANGE(0xc000, 0xcfff) AM_READ_BANK( "bank12") AM_WRITE_LEGACY( c128_write_c000 )
+	AM_RANGE(0xd000, 0xdfff) AM_READ_BANK( "bank13") AM_WRITE_LEGACY( c128_write_d000 )
+	AM_RANGE(0xe000, 0xfeff) AM_READ_BANK( "bank14") AM_WRITE_LEGACY( c128_write_e000 )
+	AM_RANGE(0xff00, 0xff04) AM_READ_BANK( "bank15") AM_WRITE_LEGACY( c128_write_ff00 )	   /* mmu c128 modus */
+	AM_RANGE(0xff05, 0xffff) AM_READ_BANK( "bank16") AM_WRITE_LEGACY( c128_write_ff05 )
 ADDRESS_MAP_END
 
 

@@ -22,21 +22,21 @@ static ADDRESS_MAP_START( odyssey2_mem , AS_PROGRAM, 8, odyssey2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( odyssey2_io , AS_IO, 8, odyssey2_state )
-	AM_RANGE( 0x00,		 0xff)		AM_READWRITE( odyssey2_bus_r, odyssey2_bus_w)
-	AM_RANGE( MCS48_PORT_P1,	MCS48_PORT_P1)	AM_READWRITE( odyssey2_getp1, odyssey2_putp1 )
-	AM_RANGE( MCS48_PORT_P2,	MCS48_PORT_P2)	AM_READWRITE( odyssey2_getp2, odyssey2_putp2 )
-	AM_RANGE( MCS48_PORT_BUS,	MCS48_PORT_BUS)	AM_READWRITE( odyssey2_getbus, odyssey2_putbus )
-	AM_RANGE( MCS48_PORT_T0,	MCS48_PORT_T0)  AM_READ( odyssey2_t0_r )
-	AM_RANGE( MCS48_PORT_T1,	MCS48_PORT_T1)	AM_READ( odyssey2_t1_r )
+	AM_RANGE( 0x00,		 0xff)		AM_READWRITE_LEGACY( odyssey2_bus_r, odyssey2_bus_w)
+	AM_RANGE( MCS48_PORT_P1,	MCS48_PORT_P1)	AM_READWRITE_LEGACY( odyssey2_getp1, odyssey2_putp1 )
+	AM_RANGE( MCS48_PORT_P2,	MCS48_PORT_P2)	AM_READWRITE_LEGACY( odyssey2_getp2, odyssey2_putp2 )
+	AM_RANGE( MCS48_PORT_BUS,	MCS48_PORT_BUS)	AM_READWRITE_LEGACY( odyssey2_getbus, odyssey2_putbus )
+	AM_RANGE( MCS48_PORT_T0,	MCS48_PORT_T0)  AM_READ_LEGACY( odyssey2_t0_r )
+	AM_RANGE( MCS48_PORT_T1,	MCS48_PORT_T1)	AM_READ_LEGACY( odyssey2_t1_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( g7400_io , AS_IO, 8, odyssey2_state )
-	AM_RANGE( 0x00,      0xff)      AM_READWRITE( g7400_bus_r, g7400_bus_w)
-	AM_RANGE( MCS48_PORT_P1,	MCS48_PORT_P1)  AM_READWRITE( odyssey2_getp1, odyssey2_putp1 )
-	AM_RANGE( MCS48_PORT_P2,	MCS48_PORT_P2)  AM_READWRITE( odyssey2_getp2, odyssey2_putp2 )
-	AM_RANGE( MCS48_PORT_BUS,	MCS48_PORT_BUS) AM_READWRITE( odyssey2_getbus, odyssey2_putbus )
-	AM_RANGE( MCS48_PORT_T0,	MCS48_PORT_T0)  AM_READ( odyssey2_t0_r )
-	AM_RANGE( MCS48_PORT_T1,	MCS48_PORT_T1)  AM_READ( odyssey2_t1_r )
+	AM_RANGE( 0x00,      0xff)      AM_READWRITE_LEGACY( g7400_bus_r, g7400_bus_w)
+	AM_RANGE( MCS48_PORT_P1,	MCS48_PORT_P1)  AM_READWRITE_LEGACY( odyssey2_getp1, odyssey2_putp1 )
+	AM_RANGE( MCS48_PORT_P2,	MCS48_PORT_P2)  AM_READWRITE_LEGACY( odyssey2_getp2, odyssey2_putp2 )
+	AM_RANGE( MCS48_PORT_BUS,	MCS48_PORT_BUS) AM_READWRITE_LEGACY( odyssey2_getbus, odyssey2_putbus )
+	AM_RANGE( MCS48_PORT_T0,	MCS48_PORT_T0)  AM_READ_LEGACY( odyssey2_t0_r )
+	AM_RANGE( MCS48_PORT_T1,	MCS48_PORT_T1)  AM_READ_LEGACY( odyssey2_t1_r )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( odyssey2 )

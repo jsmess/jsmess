@@ -1991,17 +1991,17 @@ static READ32_HANDLER(gba_10000000_r)
 
 static ADDRESS_MAP_START( gbadvance_map, AS_PROGRAM, 32, gba_state )
 	ADDRESS_MAP_UNMAP_HIGH // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ(gba_bios_r)
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_READ_LEGACY(gba_bios_r)
 	AM_RANGE(0x02000000, 0x0203ffff) AM_RAM AM_MIRROR(0xfc0000)
 	AM_RANGE(0x03000000, 0x03007fff) AM_RAM AM_MIRROR(0xff8000)
-	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE( gba_io_r, gba_io_w )
-	AM_RANGE(0x05000000, 0x050003ff) AM_RAM_WRITE(gba_pram_w) AM_BASE_MEMBER(gba_state, m_gba_pram)	// Palette RAM
-	AM_RANGE(0x06000000, 0x06017fff) AM_RAM_WRITE(gba_vram_w) AM_BASE_MEMBER(gba_state, m_gba_vram)	// VRAM
-	AM_RANGE(0x07000000, 0x070003ff) AM_RAM_WRITE(gba_oam_w) AM_BASE_MEMBER(gba_state, m_gba_oam)	// OAM
+	AM_RANGE(0x04000000, 0x040003ff) AM_READWRITE_LEGACY( gba_io_r, gba_io_w )
+	AM_RANGE(0x05000000, 0x050003ff) AM_RAM_WRITE_LEGACY(gba_pram_w) AM_BASE( m_gba_pram)	// Palette RAM
+	AM_RANGE(0x06000000, 0x06017fff) AM_RAM_WRITE_LEGACY(gba_vram_w) AM_BASE( m_gba_vram)	// VRAM
+	AM_RANGE(0x07000000, 0x070003ff) AM_RAM_WRITE_LEGACY(gba_oam_w) AM_BASE( m_gba_oam)	// OAM
 	AM_RANGE(0x08000000, 0x09ffffff) AM_ROM AM_REGION("cartridge", 0)	// cartridge ROM (mirror 0)
 	AM_RANGE(0x0a000000, 0x0bffffff) AM_ROM AM_REGION("cartridge", 0)	// cartridge ROM (mirror 1)
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_ROM AM_REGION("cartridge", 0)	// final mirror
-	AM_RANGE(0x10000000, 0xffffffff) AM_READ(gba_10000000_r) // for "Justice League Chronicles" (game bug)
+	AM_RANGE(0x10000000, 0xffffffff) AM_READ_LEGACY(gba_10000000_r) // for "Justice League Chronicles" (game bug)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gbadv )

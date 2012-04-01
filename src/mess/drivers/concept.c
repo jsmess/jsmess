@@ -42,9 +42,9 @@ static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
 	AM_RANGE(0x000008, 0x000fff) AM_RAM										/* static RAM */
 	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION("maincpu", 0x010000)	/* boot ROM */
 	AM_RANGE(0x020000, 0x021fff) AM_ROM										/* macsbugs ROM (optional) */
-	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE(concept_io_r,concept_io_w)	/* I/O space */
+	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE_LEGACY(concept_io_r,concept_io_w)	/* I/O space */
 
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_BASE_MEMBER(concept_state, m_videoram)/* AM_RAMBANK(2) */	/* DRAM */
+	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_BASE( m_videoram)/* AM_RAMBANK(2) */	/* DRAM */
 ADDRESS_MAP_END
 
 /* init with simple, fixed, B/W palette */

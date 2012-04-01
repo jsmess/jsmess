@@ -855,8 +855,8 @@ static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32, apexc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8, apexc_state )
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("tape_reader",tape_read)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("tape_puncher",tape_write)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("tape_reader",tape_read)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("tape_puncher",tape_write)
 ADDRESS_MAP_END
 
 

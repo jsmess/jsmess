@@ -145,17 +145,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tvc_io , AS_IO, 8, tvc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(tvc_port0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tvc_bank_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(tvc_keyboard_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(tvc_video_mode_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(tvc_flipflop_w)
-	AM_RANGE(0x58, 0x58) AM_READ(tvc_keyboard_r)
-	AM_RANGE(0x59, 0x59) AM_READ(tvc_flipflop_r)
-	AM_RANGE(0x5a, 0x5a) AM_READ(tvc_port59_r)
-	AM_RANGE(0x60, 0x64) AM_WRITE(tvc_palette_w)
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(tvc_port0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(tvc_bank_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(tvc_keyboard_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(tvc_video_mode_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(tvc_flipflop_w)
+	AM_RANGE(0x58, 0x58) AM_READ_LEGACY(tvc_keyboard_r)
+	AM_RANGE(0x59, 0x59) AM_READ_LEGACY(tvc_flipflop_r)
+	AM_RANGE(0x5a, 0x5a) AM_READ_LEGACY(tvc_port59_r)
+	AM_RANGE(0x60, 0x64) AM_WRITE_LEGACY(tvc_palette_w)
+	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
 /* Input ports */

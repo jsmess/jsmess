@@ -435,7 +435,7 @@ static READ8_HANDLER ( spectrum_port_ula_r )
 
 static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE_MEMBER(spectrum_state,m_video_ram)
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE(m_video_ram)
 //  AM_RANGE(0x5b00, 0x7fff) AM_RAM
 //  AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -443,11 +443,11 @@ ADDRESS_MAP_END
 /* ports are not decoded full.
 The function decodes the ports appropriately */
 static ADDRESS_MAP_START (spectrum_io, AS_IO, 8, spectrum_state )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
-	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x01, 0x01) AM_READ(spectrum_port_ula_r) AM_MIRROR(0xfffe)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
+	AM_RANGE(0x1f, 0x1f) AM_READ_LEGACY(spectrum_port_1f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x7f, 0x7f) AM_READ_LEGACY(spectrum_port_7f_r) AM_MIRROR(0xff00)
+	AM_RANGE(0xdf, 0xdf) AM_READ_LEGACY(spectrum_port_df_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(spectrum_port_ula_r) AM_MIRROR(0xfffe)
 ADDRESS_MAP_END
 
 /* Input ports */

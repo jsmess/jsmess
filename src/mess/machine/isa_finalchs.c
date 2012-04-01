@@ -39,10 +39,10 @@ static WRITE8_HANDLER( io6000_write )
 
 static ADDRESS_MAP_START(finalchs_mem , AS_PROGRAM, 8, isa8_finalchs_device)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_READ(io7ff8_read)
-	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_WRITE(io7ff8_write)
-	AM_RANGE( 0x6000, 0x6000 ) AM_READ(io6000_read)
-	AM_RANGE( 0x6000, 0x6000 ) AM_WRITE(io6000_write)
+	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_READ_LEGACY(io7ff8_read)
+	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_WRITE_LEGACY(io7ff8_write)
+	AM_RANGE( 0x6000, 0x6000 ) AM_READ_LEGACY(io6000_read)
+	AM_RANGE( 0x6000, 0x6000 ) AM_WRITE_LEGACY(io6000_write)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 

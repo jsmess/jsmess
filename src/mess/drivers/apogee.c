@@ -32,10 +32,10 @@ static ADDRESS_MAP_START(apogee_mem, AS_PROGRAM, 8, apogee_state )
     AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
     AM_RANGE( 0x1000, 0xebff ) AM_RAM  // RAM
     //AM_RANGE( 0xec00, 0xecff ) AM_RAM  // Timer
-    AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
-    //AM_RANGE( 0xee00, 0xee03 ) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x00fc)
-    AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x00fe) // video
-    AM_RANGE( 0xf000, 0xf0ff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
+    AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
+    //AM_RANGE( 0xee00, 0xee03 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x00fc)
+    AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) AM_MIRROR(0x00fe) // video
+    AM_RANGE( 0xf000, 0xf0ff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 

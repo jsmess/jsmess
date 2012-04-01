@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( dgnbeta_map, AS_PROGRAM, 8, dgn_beta_state )
 	AM_RANGE(0x3000, 0x3FFF)	AM_RAMBANK("bank4")
 	AM_RANGE(0x4000, 0x4FFF)	AM_RAMBANK("bank5")
 	AM_RANGE(0x5000, 0x5FFF)	AM_RAMBANK("bank6")
-	AM_RANGE(0x6000, 0x6FFF)	AM_RAMBANK("bank7") AM_BASE_MEMBER(dgn_beta_state, m_videoram)
+	AM_RANGE(0x6000, 0x6FFF)	AM_RAMBANK("bank7") AM_BASE( m_videoram)
 	AM_RANGE(0x7000, 0x7FFF)	AM_RAMBANK("bank8")
 	AM_RANGE(0x8000, 0x8FFF)	AM_RAMBANK("bank9")
 	AM_RANGE(0x9000, 0x9FFF)	AM_RAMBANK("bank10")
@@ -152,18 +152,18 @@ static ADDRESS_MAP_START( dgnbeta_map, AS_PROGRAM, 8, dgn_beta_state )
 	AM_RANGE(0xE000, 0xEFFF)	AM_RAMBANK("bank15")
 	AM_RANGE(0xF000, 0xFBFF)	AM_RAMBANK("bank16")
 	AM_RANGE(0xfC00, 0xfC1F)	AM_NOP
-	AM_RANGE(0xFC20, 0xFC23)	AM_DEVREADWRITE_MODERN(PIA_0_TAG, pia6821_device, read, write)
-	AM_RANGE(0xFC24, 0xFC27)	AM_DEVREADWRITE_MODERN(PIA_1_TAG, pia6821_device, read, write)
+	AM_RANGE(0xFC20, 0xFC23)	AM_DEVREADWRITE(PIA_0_TAG, pia6821_device, read, write)
+	AM_RANGE(0xFC24, 0xFC27)	AM_DEVREADWRITE(PIA_1_TAG, pia6821_device, read, write)
 	AM_RANGE(0xFC28, 0xfC7F)	AM_NOP
-	AM_RANGE(0xfc80, 0xfc80)    AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xfc81, 0xfc81)    AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0xfc80, 0xfc80)    AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xfc81, 0xfc81)    AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xfc82, 0xfC9F)	AM_NOP
-	AM_RANGE(0xFCA0, 0xFCA3)	AM_READNOP AM_WRITE(dgnbeta_colour_ram_w)		    /* 4x4bit colour ram for graphics modes */
-	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE_MODERN(PIA_2_TAG, pia6821_device, read, write)
+	AM_RANGE(0xFCA0, 0xFCA3)	AM_READNOP AM_WRITE_LEGACY(dgnbeta_colour_ram_w)		    /* 4x4bit colour ram for graphics modes */
+	AM_RANGE(0xFCC0, 0xFCC3)	AM_DEVREADWRITE(PIA_2_TAG, pia6821_device, read, write)
 	AM_RANGE(0xfcC4, 0xfcdf)	AM_NOP
-	AM_RANGE(0xfce0, 0xfce3)	AM_READWRITE(dgnbeta_wd2797_r	,dgnbeta_wd2797_w)	/* Onboard disk interface */
+	AM_RANGE(0xfce0, 0xfce3)	AM_READWRITE_LEGACY(dgnbeta_wd2797_r	,dgnbeta_wd2797_w)	/* Onboard disk interface */
 	AM_RANGE(0xfce4, 0xfdff)	AM_NOP
-	AM_RANGE(0xFE00, 0xFE0F)	AM_READWRITE(dgn_beta_page_r	,dgn_beta_page_w)
+	AM_RANGE(0xFE00, 0xFE0F)	AM_READWRITE_LEGACY(dgn_beta_page_r	,dgn_beta_page_w)
 	AM_RANGE(0xfe10, 0xfEff)	AM_NOP
 	AM_RANGE(0xFF00, 0xFFFF)	AM_RAMBANK("bank17")
 

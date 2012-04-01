@@ -240,11 +240,11 @@ static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, driver_device)
 	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -255,11 +255,11 @@ static ADDRESS_MAP_START(a800_mem, AS_PROGRAM, 8, driver_device)
 	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("8000")
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -270,11 +270,11 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, driver_device)
 	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)	/* self test */
 	AM_RANGE(0xa000, 0xbfff) AM_ROM	/* BASIC */
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
 ADDRESS_MAP_END
@@ -286,11 +286,11 @@ static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, driver_device)
 	AM_RANGE(0x5800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
@@ -302,11 +302,11 @@ static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, driver_device)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank0")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
@@ -315,9 +315,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, driver_device)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
-	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE(atari_antic_r, atari_antic_w)
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
