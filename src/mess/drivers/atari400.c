@@ -229,6 +229,14 @@
     E000-FFFF ROM     BIOS ROM
 ******************************************************************************/
 
+class a400_state : public driver_device
+{
+public:
+	a400_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
+
+};
+
 /**************************************************************
  *
  * Memory maps
@@ -236,7 +244,7 @@
  **************************************************************/
 
 
-static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, driver_device)
+static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
@@ -250,7 +258,7 @@ static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, driver_device)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a800_mem, AS_PROGRAM, 8, driver_device)
+static ADDRESS_MAP_START(a800_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("0000")
 	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("8000")
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
@@ -265,7 +273,7 @@ static ADDRESS_MAP_START(a800_mem, AS_PROGRAM, 8, driver_device)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, driver_device)
+static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)	/* self test */
 	AM_RANGE(0xa000, 0xbfff) AM_ROM	/* BASIC */
@@ -280,7 +288,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, driver_device)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, driver_device)
+static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_RAMBANK("bank2")
 	AM_RANGE(0x5800, 0x9fff) AM_RAM
@@ -295,7 +303,7 @@ static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, driver_device)
 	AM_RANGE(0xd800, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, driver_device)
+static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_RAMBANK("bank2")
 	AM_RANGE(0x5800, 0x7fff) AM_RAM
@@ -312,7 +320,7 @@ static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, driver_device)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, driver_device)
+static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
@@ -1072,7 +1080,7 @@ static MACHINE_CONFIG_FRAGMENT( a800_cartslot )
 	MCFG_CARTSLOT_INTERFACE("a800_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( atari_common_nodac, driver_device )
+static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 

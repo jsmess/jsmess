@@ -292,11 +292,18 @@ They can run the same software and accept the same devices and extensions.
 
 
 **********************************************************************/
+class thomson_state : public driver_device
+{
+public:
+	thomson_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
+
+};
 
 
 /* ------------ address maps ------------ */
 
-static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
 
      AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE_LEGACY(to7_cartridge_w ) /* 4 * 16 KB */
      AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to7_vram_w )
@@ -614,7 +621,7 @@ const serial_image_interface to7_modem_config =
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_START( to7, driver_device )
+static MACHINE_CONFIG_START( to7, thomson_state )
 
      MCFG_MACHINE_START ( to7 )
      MCFG_MACHINE_RESET ( to7 )
@@ -755,7 +762,7 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, thomson_state )
 
      AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to7_cartridge_w ) /* 4 * 16 KB */
      AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
@@ -943,7 +950,7 @@ Differences include:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
 
      AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to770_vram_w )
      AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
@@ -1141,7 +1148,7 @@ It was replaced quickly with the improved TO9+.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8, thomson_state )
 
      AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE_LEGACY(to9_cartridge_w )/* 4 * 16 KB */
      AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to770_vram_w )
@@ -1463,7 +1470,7 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8, thomson_state )
 
      AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to8_cartridge_w ) /* 4 * 16 KB */
      AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
@@ -1658,7 +1665,7 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8, thomson_state )
 
      AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to8_cartridge_w ) /* 4 * 16 KB */
      AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
@@ -1820,7 +1827,7 @@ a PC XT.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, thomson_state )
 
      AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
      AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
@@ -2131,7 +2138,7 @@ Here are the differences between the MO6 and MO5NR:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
 
      AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
      AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
