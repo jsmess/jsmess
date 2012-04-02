@@ -1129,7 +1129,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 	AM_RANGE(0x0220, 0x023f) AM_RAM // Frame buffer 1 control parameter
 	AM_RANGE(0x0240, 0x025f) AM_RAM // Frame buffer 2 control parameter
 	AM_RANGE(0x0260, 0x027f) AM_RAM // Frame buffer 3 control parameter
-	AM_RANGE(0x0300, 0x033f) AM_RAM_WRITE_LEGACY(palette_ram_w) AM_BASE( m_palram) // Palette RAM (xBBBBxRRRRxGGGG format)
+	AM_RANGE(0x0300, 0x033f) AM_RAM_WRITE_LEGACY(palette_ram_w) AM_BASE(m_palram) // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //  AM_RANGE(0x0500, 0x05ff) GVRAM
 //  AM_RANGE(0x1000, 0xfeff) user area (???)

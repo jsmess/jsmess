@@ -29,22 +29,22 @@
 #include "rendlay.h"
 
 static ADDRESS_MAP_START( svi318_mem, AS_PROGRAM, 8, svi318_state )
-	AM_RANGE( 0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY( svi318_writemem1 )
-	AM_RANGE( 0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE_LEGACY( svi318_writemem2 )
-	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_LEGACY( svi318_writemem3 )
+	AM_RANGE( 0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY(svi318_writemem1 )
+	AM_RANGE( 0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE_LEGACY(svi318_writemem2 )
+	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_LEGACY(svi318_writemem3 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi328_806_mem, AS_PROGRAM, 8, svi318_state )
-	AM_RANGE( 0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY( svi318_writemem1 )
-	AM_RANGE( 0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE_LEGACY( svi318_writemem2 )
-	AM_RANGE( 0xc000, 0xefff) AM_READ_BANK("bank3") AM_WRITE_LEGACY( svi318_writemem3 )
-	AM_RANGE( 0xf000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_LEGACY( svi318_writemem4 )
+	AM_RANGE( 0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY(svi318_writemem1 )
+	AM_RANGE( 0x8000, 0xbfff) AM_READ_BANK("bank2") AM_WRITE_LEGACY(svi318_writemem2 )
+	AM_RANGE( 0xc000, 0xefff) AM_READ_BANK("bank3") AM_WRITE_LEGACY(svi318_writemem3 )
+	AM_RANGE( 0xf000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_LEGACY(svi318_writemem4 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svi318_io, AS_IO, 8, svi318_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x38) AM_READWRITE_LEGACY( svi318_io_ext_r, svi318_io_ext_w )
+	AM_RANGE( 0x00, 0x38) AM_READWRITE_LEGACY(svi318_io_ext_r, svi318_io_ext_w )
 	AM_RANGE( 0x80, 0x80) AM_DEVWRITE( "tms9928a", tms9928a_device, vram_write )
 	AM_RANGE( 0x81, 0x81) AM_DEVWRITE( "tms9928a", tms9928a_device, register_write )
 	AM_RANGE( 0x84, 0x84) AM_DEVREAD( "tms9928a", tms9928a_device, vram_read )
@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( svi328_806_io, AS_IO, 8, svi318_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x58) AM_READWRITE_LEGACY( svi318_io_ext_r, svi318_io_ext_w )
+	AM_RANGE( 0x00, 0x58) AM_READWRITE_LEGACY(svi318_io_ext_r, svi318_io_ext_w )
 	AM_RANGE( 0x80, 0x80) AM_DEVWRITE( "tms9928a", tms9928a_device, vram_write )
 	AM_RANGE( 0x81, 0x81) AM_DEVWRITE( "tms9928a", tms9928a_device, register_write )
 	AM_RANGE( 0x84, 0x84) AM_DEVREAD( "tms9928a", tms9928a_device, vram_read )

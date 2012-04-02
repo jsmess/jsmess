@@ -32,9 +32,9 @@ static READ8_HANDLER( galeb_keyboard_r )
 /* Address maps */
 static ADDRESS_MAP_START(galeb_mem, AS_PROGRAM, 8, galeb_state )
     AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
-    AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ_LEGACY( galeb_keyboard_r )
+    AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ_LEGACY(galeb_keyboard_r )
     AM_RANGE( 0xbfe0, 0xbfe0 ) AM_DEVWRITE_LEGACY("dac", galeb_dac_data_w )
-    AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_BASE( m_video_ram) // video ram
+    AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_BASE(m_video_ram) // video ram
     AM_RANGE( 0xc000, 0xc7ff ) AM_ROM  // BASIC 01 ROM
     AM_RANGE( 0xc800, 0xcfff ) AM_ROM  // BASIC 02 ROM
     AM_RANGE( 0xd000, 0xd7ff ) AM_ROM  // BASIC 03 ROM

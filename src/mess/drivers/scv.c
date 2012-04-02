@@ -43,7 +43,7 @@ static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
 
 	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE(m_p_videoram )	/* VRAM + 4 registers */
 
-	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE_LEGACY( "upd1771c", upd1771_w )
+	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE_LEGACY("upd1771c", upd1771_w )
 
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank0")
 	AM_RANGE( 0xa000, 0xbfff ) AM_ROMBANK("bank1")

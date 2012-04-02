@@ -1067,23 +1067,23 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE_LEGACY( mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY( mboard_write_board_8)		// Chessboard
-	AM_RANGE( 0x3000, 0x3000 ) AM_READ_LEGACY( mboard_read_board_8 )		// Chessboard
-	AM_RANGE( 0x3400, 0x3405 ) AM_WRITE_LEGACY( polgar_write_LED)	// Function LEDs
-	AM_RANGE( 0x2c00, 0x2c07 ) AM_READ_LEGACY( read_keys)
-	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE_LEGACY( write_polgar_IO )	// LCD Instr. Reg + Beeper
-	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY( write_LCD_polgar )	        // LCD Char Reg.
+	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY(mboard_write_board_8)		// Chessboard
+	AM_RANGE( 0x3000, 0x3000 ) AM_READ_LEGACY(mboard_read_board_8 )		// Chessboard
+	AM_RANGE( 0x3400, 0x3405 ) AM_WRITE_LEGACY(polgar_write_LED)	// Function LEDs
+	AM_RANGE( 0x2c00, 0x2c07 ) AM_READ_LEGACY(read_keys)
+	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE_LEGACY(write_polgar_IO )	// LCD Instr. Reg + Beeper
+	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY(write_LCD_polgar )	        // LCD Char Reg.
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sfortea_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fef ) AM_RAM
-	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE_LEGACY( write_latch_sfortea)	// IO control
-	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE_LEGACY( write_lcd_IO_sfortea)	// LCD Char Reg.
+	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE_LEGACY(write_latch_sfortea)	// IO control
+	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE_LEGACY(write_lcd_IO_sfortea)	// LCD Char Reg.
 //  AM_RANGE( 0x1ffc, 0x1fff ) AM_DEVREADWRITE_LEGACY("acia65c51", acia_6551_r,acia_6551_w)
-	AM_RANGE( 0x1ff1, 0x1ff1 ) AM_READ_LEGACY( read_1ff1_sfortea )
-	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_READ_LEGACY( read_1ff0_sfortea )
+	AM_RANGE( 0x1ff1, 0x1ff1 ) AM_READ_LEGACY(read_1ff1_sfortea )
+	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_READ_LEGACY(read_1ff0_sfortea )
 	AM_RANGE( 0x2000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -1092,17 +1092,17 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0003ffff )  AM_ROM
 
-	AM_RANGE( 0xc0000000 , 0xc0000003 )  AM_READ_LEGACY( mboard_read_board_32 )
-	AM_RANGE( 0xc8000000 , 0xc8000003 )  AM_WRITE_LEGACY( mboard_write_board_32 )
-	AM_RANGE( 0xc8000004 , 0xc8000007 )  AM_WRITE_LEGACY( mboard_write_board_32 )
-	AM_RANGE( 0xd0000000 , 0xd0000003 )  AM_WRITE_LEGACY( mboard_write_LED_32 )
-	AM_RANGE( 0xd0000004 , 0xd0000007 )  AM_WRITE_LEGACY( mboard_write_LED_32 )
-	AM_RANGE( 0xf0000004 , 0xf0000013 )  AM_READ_LEGACY( read_buttons_gen32 )
-	AM_RANGE( 0xe0000000 , 0xe0000003 )  AM_WRITE_LEGACY( write_LCD_data_32 )
-	AM_RANGE( 0xe0000010 , 0xe0000013 )  AM_WRITE_LEGACY( write_IOenables_32 )
-	AM_RANGE( 0xd8000008 , 0xd800000b )  AM_WRITE_LEGACY( write_unknown2_32 )
-	AM_RANGE( 0xd8000004 , 0xd8000007 )  AM_READ_LEGACY( read_unknown1_32 )
-	AM_RANGE( 0xd800000c , 0xd800000f )  AM_READ_LEGACY( read_unknown3_32 )
+	AM_RANGE( 0xc0000000 , 0xc0000003 )  AM_READ_LEGACY(mboard_read_board_32 )
+	AM_RANGE( 0xc8000000 , 0xc8000003 )  AM_WRITE_LEGACY(mboard_write_board_32 )
+	AM_RANGE( 0xc8000004 , 0xc8000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
+	AM_RANGE( 0xd0000000 , 0xd0000003 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
+	AM_RANGE( 0xd0000004 , 0xd0000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
+	AM_RANGE( 0xf0000004 , 0xf0000013 )  AM_READ_LEGACY(read_buttons_gen32 )
+	AM_RANGE( 0xe0000000 , 0xe0000003 )  AM_WRITE_LEGACY(write_LCD_data_32 )
+	AM_RANGE( 0xe0000010 , 0xe0000013 )  AM_WRITE_LEGACY(write_IOenables_32 )
+	AM_RANGE( 0xd8000008 , 0xd800000b )  AM_WRITE_LEGACY(write_unknown2_32 )
+	AM_RANGE( 0xd8000004 , 0xd8000007 )  AM_READ_LEGACY(read_unknown1_32 )
+	AM_RANGE( 0xd800000c , 0xd800000f )  AM_READ_LEGACY(read_unknown3_32 )
 
 	AM_RANGE( 0x40000000, 0x4007ffff )  AM_RAM      /* 512KB */
 	AM_RANGE( 0x80000000, 0x8003ffff )  AM_RAM      /* 256KB */
@@ -1113,11 +1113,11 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
-	AM_RANGE( 0x800000 , 0x800003 )  AM_READ_LEGACY( read_keys_BPL32 )
-	AM_RANGE( 0x900000 , 0x900003 )  AM_WRITE_LEGACY( write_board_BPL32 )
-	AM_RANGE( 0xa00000 , 0xa00003 )  AM_WRITE_LEGACY( write_LED_BPL32 )
-	AM_RANGE( 0xc00000 , 0xc00003 )  AM_WRITE_LEGACY( write_LCD_data_32 )
-	AM_RANGE( 0xb00000 , 0xb00003 )  AM_WRITE_LEGACY( write_IOenables_32 )
+	AM_RANGE( 0x800000 , 0x800003 )  AM_READ_LEGACY(read_keys_BPL32 )
+	AM_RANGE( 0x900000 , 0x900003 )  AM_WRITE_LEGACY(write_board_BPL32 )
+	AM_RANGE( 0xa00000 , 0xa00003 )  AM_WRITE_LEGACY(write_LED_BPL32 )
+	AM_RANGE( 0xc00000 , 0xc00003 )  AM_WRITE_LEGACY(write_LCD_data_32 )
+	AM_RANGE( 0xb00000 , 0xb00003 )  AM_WRITE_LEGACY(write_IOenables_32 )
 	AM_RANGE( 0x400000 , 0x4fffff )  AM_RAM      /* 1024KB */
 	AM_RANGE( 0xd00000 , 0xd07fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
 
@@ -1127,15 +1127,15 @@ static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0003ffff )  AM_ROM
 
-	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ_LEGACY( mboard_read_board_32 )
-	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE_LEGACY( mboard_write_board_32 )
-	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE_LEGACY( mboard_write_LED_32 )
-	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ_LEGACY( read_buttons_van32 )
-	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE_LEGACY( write_LCD_data_32 )
-	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE_LEGACY( write_IOenables_32 )
-	AM_RANGE( 0x98000008 , 0x9800000b )  AM_WRITE_LEGACY( write_unknown2_32 )
-	AM_RANGE( 0x98000004 , 0x98000007 )  AM_READ_LEGACY( read_unknown1_32 )
-	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ_LEGACY( read_unknown3_32 )
+	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ_LEGACY(mboard_read_board_32 )
+	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
+	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
+	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ_LEGACY(read_buttons_van32 )
+	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE_LEGACY(write_LCD_data_32 )
+	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE_LEGACY(write_IOenables_32 )
+	AM_RANGE( 0x98000008 , 0x9800000b )  AM_WRITE_LEGACY(write_unknown2_32 )
+	AM_RANGE( 0x98000004 , 0x98000007 )  AM_READ_LEGACY(read_unknown1_32 )
+	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ_LEGACY(read_unknown3_32 )
 
 	AM_RANGE( 0x40000000, 0x400fffff )  AM_RAM      /* 1024KB */
 	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
@@ -1147,15 +1147,15 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_ROM
 
-	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ_LEGACY( mboard_read_board_32 )
-	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE_LEGACY( mboard_write_board_32 )
-	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE_LEGACY( mboard_write_LED_32 )
-	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ_LEGACY( read_buttons_van32 )
-	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE_LEGACY( write_LCD_data_32 )
-	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE_LEGACY( write_IOenables_32 )
-	AM_RANGE( 0x98000008 , 0x9800000b )  AM_WRITE_LEGACY( write_unknown2_32 )
-	AM_RANGE( 0x98000004 , 0x98000007 )  AM_READ_LEGACY( read_unknown1_32 )
-	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ_LEGACY( read_unknown3_32 )
+	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ_LEGACY(mboard_read_board_32 )
+	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
+	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
+	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ_LEGACY(read_buttons_van32 )
+	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE_LEGACY(write_LCD_data_32 )
+	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE_LEGACY(write_IOenables_32 )
+	AM_RANGE( 0x98000008 , 0x9800000b )  AM_WRITE_LEGACY(write_unknown2_32 )
+	AM_RANGE( 0x98000004 , 0x98000007 )  AM_READ_LEGACY(read_unknown1_32 )
+	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ_LEGACY(read_unknown3_32 )
 
 	AM_RANGE( 0x40000000, 0x400fffff )  AM_RAM
 	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
@@ -1165,8 +1165,8 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x02000000,  0x0201ffff )  AM_ROM AM_REGION("maincpu", 0) // AM_MIRROR(0x2000000)
-	AM_RANGE( 0x01000000,  0x01000003 )  AM_WRITE_LEGACY( write_1000000 )
-	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ_LEGACY( read_1800000 )
+	AM_RANGE( 0x01000000,  0x01000003 )  AM_WRITE_LEGACY(write_1000000 )
+	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ_LEGACY(read_1800000 )
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
 
  ADDRESS_MAP_END
@@ -1175,15 +1175,15 @@ static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
 
-	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ_LEGACY( mboard_read_board_16 )
-	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE_LEGACY( mboard_write_board_16 )
-	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE_LEGACY( mboard_write_LED_16 )
-	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ_LEGACY( read_buttons_van16 )
-	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE_LEGACY( write_LCD_data )
-	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE_LEGACY( write_IOenables )
-	AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE_LEGACY( write_unknown2 )
-	AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ_LEGACY( read_unknown1 )
-	AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ_LEGACY( read_unknown3 )
+	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ_LEGACY(mboard_read_board_16 )
+	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE_LEGACY(mboard_write_board_16 )
+	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE_LEGACY(mboard_write_LED_16 )
+	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ_LEGACY(read_buttons_van16 )
+	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE_LEGACY(write_LCD_data )
+	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE_LEGACY(write_IOenables )
+	AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE_LEGACY(write_unknown2 )
+	AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ_LEGACY(read_unknown1 )
+	AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ_LEGACY(read_unknown3 )
 
 	AM_RANGE( 0x400000, 0x47ffff )  AM_RAM      /* 512KB */
 	AM_RANGE( 0x800000, 0x803fff )  AM_RAM AM_BASE_LEGACY(&save_ram) AM_SHARE("nvram")
@@ -1194,15 +1194,15 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, polgar_state )
 
 	AM_RANGE( 0x000000,  0x01ffff )  AM_ROM
 
-	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ_LEGACY( mboard_read_board_16 )
-	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE_LEGACY( mboard_write_board_16 )
-	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE_LEGACY( mboard_write_LED_16 )
-	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ_LEGACY( read_buttons_van16 )
-	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE_LEGACY( write_LCD_data )
-	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE_LEGACY( write_IOenables )
-//  AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE_LEGACY( write_unknown2 )
-//  AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ_LEGACY( read_unknown1 )
-//  AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ_LEGACY( read_unknown3 )
+	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ_LEGACY(mboard_read_board_16 )
+	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE_LEGACY(mboard_write_board_16 )
+	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE_LEGACY(mboard_write_LED_16 )
+	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ_LEGACY(read_buttons_van16 )
+	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE_LEGACY(write_LCD_data )
+	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE_LEGACY(write_IOenables )
+//  AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE_LEGACY(write_unknown2 )
+//  AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ_LEGACY(read_unknown1 )
+//  AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ_LEGACY(read_unknown3 )
 
 
 	AM_RANGE( 0x400000, 0x47ffff )  AM_RAM      /* 512KB */
@@ -1212,59 +1212,59 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1f9f ) AM_RAM
-	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE_LEGACY( milano_write_board )		// Chessboard
-	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ_LEGACY( milano_read_board )		// Chessboard
-	AM_RANGE( 0x1fe8, 0x1fed ) AM_WRITE_LEGACY( milano_write_LED )	// Function LEDs
-	AM_RANGE( 0x1fd8, 0x1fdf ) AM_READ_LEGACY( read_keys)
-	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_WRITE_LEGACY( write_polgar_IO)	// IO control
-	AM_RANGE( 0x1fc0, 0x1fc0 ) AM_WRITE_LEGACY( write_LCD_polgar)	// LCD Char Reg. (latched)
+	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE_LEGACY(milano_write_board )		// Chessboard
+	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ_LEGACY(milano_read_board )		// Chessboard
+	AM_RANGE( 0x1fe8, 0x1fed ) AM_WRITE_LEGACY(milano_write_LED )	// Function LEDs
+	AM_RANGE( 0x1fd8, 0x1fdf ) AM_READ_LEGACY(read_keys)
+	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_WRITE_LEGACY(write_polgar_IO)	// IO control
+	AM_RANGE( 0x1fc0, 0x1fc0 ) AM_WRITE_LEGACY(write_LCD_polgar)	// LCD Char Reg. (latched)
 	AM_RANGE( 0x2000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY( read_keys_board_academy )
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY( academy_write_board )		// Chessboard
-	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY( mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY( beep_academy )
-	AM_RANGE( 0x3001, 0x3001 ) AM_WRITE_LEGACY( academy_inhibitNMI )
-	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY( academy_write_LED )
-	AM_RANGE( 0x3800, 0x3801 ) AM_WRITE_LEGACY( write_LCD_academy )
+	AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY(read_keys_board_academy )
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY(academy_write_board )		// Chessboard
+	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
+	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY(beep_academy )
+	AM_RANGE( 0x3001, 0x3001 ) AM_WRITE_LEGACY(academy_inhibitNMI )
+	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY(academy_write_LED )
+	AM_RANGE( 0x3800, 0x3801 ) AM_WRITE_LEGACY(write_LCD_academy )
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(monteciv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY( read_keys_board_monteciv )
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY( academy_write_board )		// Chessboard
-	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY( mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY( academy_write_LED )			// Status LEDs
-	AM_RANGE( 0x3000, 0x3001 ) AM_WRITE_LEGACY( monteciv_select_line )			// Select Keyline
-	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY( beep_academy )
-	AM_RANGE( 0x3004, 0x3004 ) AM_WRITE_LEGACY( monteciv_write_LCD )
-	AM_RANGE( 0x3005, 0x3005 ) AM_WRITE_LEGACY( monteciv_3005 )
-	AM_RANGE( 0x3007, 0x3007 ) AM_WRITE_LEGACY( monteciv_3007 )
-	AM_RANGE( 0x3006, 0x3006 ) AM_WRITE_LEGACY( monteciv_3006 )
-	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY( academy_inhibitNMI )
+	AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY(read_keys_board_monteciv )
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY(academy_write_board )		// Chessboard
+	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
+	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY(academy_write_LED )			// Status LEDs
+	AM_RANGE( 0x3000, 0x3001 ) AM_WRITE_LEGACY(monteciv_select_line )			// Select Keyline
+	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY(beep_academy )
+	AM_RANGE( 0x3004, 0x3004 ) AM_WRITE_LEGACY(monteciv_write_LCD )
+	AM_RANGE( 0x3005, 0x3005 ) AM_WRITE_LEGACY(monteciv_3005 )
+	AM_RANGE( 0x3007, 0x3007 ) AM_WRITE_LEGACY(monteciv_3007 )
+	AM_RANGE( 0x3006, 0x3006 ) AM_WRITE_LEGACY(monteciv_3006 )
+	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY(academy_inhibitNMI )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-/// AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY( read_keys_board_monteciv )
-	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE_LEGACY( academy_write_board )	// 2800 // Chessboard
-/// AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY( mboard_write_LED_8 )      // Chessboard
-/// AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY( academy_write_LED )           // Status LEDs
-	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE_LEGACY( megaiv_write_LED )	// 2400     // Select Keyline
-	AM_RANGE( 0x7000, 0x7001 ) AM_WRITE_LEGACY( megaiv_IO )			// Select Keyline
-/// AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY( beep_academy )
-	AM_RANGE( 0x4000, 0x4007 ) AM_READ_LEGACY( read_keys_megaiv ) // 3000-7 fixio
-	AM_RANGE( 0x2c04, 0x2c04 ) AM_WRITE_LEGACY( monteciv_write_LCD ) // 2c04
-	AM_RANGE( 0x2c05, 0x2c05 ) AM_WRITE_LEGACY( monteciv_3005 ) // 2c05
-	AM_RANGE( 0x2c07, 0x2c07 ) AM_WRITE_LEGACY( monteciv_3007 ) // 2c07
-	AM_RANGE( 0x2c06, 0x2c06 ) AM_WRITE_LEGACY( monteciv_3006 ) // 2c06
-/// AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY( academy_inhibitNMI )
+/// AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY(read_keys_board_monteciv )
+	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE_LEGACY(academy_write_board )	// 2800 // Chessboard
+/// AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )      // Chessboard
+/// AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY(academy_write_LED )           // Status LEDs
+	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE_LEGACY(megaiv_write_LED )	// 2400     // Select Keyline
+	AM_RANGE( 0x7000, 0x7001 ) AM_WRITE_LEGACY(megaiv_IO )			// Select Keyline
+/// AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY(beep_academy )
+	AM_RANGE( 0x4000, 0x4007 ) AM_READ_LEGACY(read_keys_megaiv ) // 3000-7 fixio
+	AM_RANGE( 0x2c04, 0x2c04 ) AM_WRITE_LEGACY(monteciv_write_LCD ) // 2c04
+	AM_RANGE( 0x2c05, 0x2c05 ) AM_WRITE_LEGACY(monteciv_3005 ) // 2c05
+	AM_RANGE( 0x2c07, 0x2c07 ) AM_WRITE_LEGACY(monteciv_3007 ) // 2c07
+	AM_RANGE( 0x2c06, 0x2c06 ) AM_WRITE_LEGACY(monteciv_3006 ) // 2c06
+/// AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY(academy_inhibitNMI )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 

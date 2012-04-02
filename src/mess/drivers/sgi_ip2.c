@@ -370,8 +370,8 @@ static MACHINE_RESET( sgi_ip2 )
 
 
 static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32, sgi_ip2_state )
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE( m_mainram)
-	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_BASE( m_bss) // ??? I don't understand the need for this...
+	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE(m_mainram)
+	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_BASE(m_bss) // ??? I don't understand the need for this...
 	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8_LEGACY(sgi_ip2_m_but_r, 		sgi_ip2_m_but_w,		0xffffffff)
 	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16_LEGACY(sgi_ip2_m_quad_r,		sgi_ip2_m_quad_w,		0xffffffff)
@@ -385,7 +385,7 @@ static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32, sgi_ip2_state )
 	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE16_LEGACY(sgi_ip2_status_r,		sgi_ip2_status_w,		0xffffffff)
 	AM_RANGE(0x39000000, 0x39000003) AM_READWRITE8_LEGACY(sgi_ip2_parctl_r,		sgi_ip2_parctl_w,		0xffffffff)
 	AM_RANGE(0x3a000000, 0x3a000003) AM_READWRITE8_LEGACY(sgi_ip2_mbp_r,			sgi_ip2_mbp_w,			0xffffffff)
-	AM_RANGE(0x3b000000, 0x3b003fff) AM_READWRITE_LEGACY(sgi_ip2_ptmap_r, sgi_ip2_ptmap_w) AM_BASE( m_ptmap)
+	AM_RANGE(0x3b000000, 0x3b003fff) AM_READWRITE_LEGACY(sgi_ip2_ptmap_r, sgi_ip2_ptmap_w) AM_BASE(m_ptmap)
 	AM_RANGE(0x3c000000, 0x3c000003) AM_READWRITE16_LEGACY(sgi_ip2_tdbase_r,		sgi_ip2_tdbase_w,		0xffffffff)
 	AM_RANGE(0x3d000000, 0x3d000003) AM_READWRITE16_LEGACY(sgi_ip2_tdlmt_r,		sgi_ip2_tdlmt_w,		0xffffffff)
 	AM_RANGE(0x3e000000, 0x3e000003) AM_READWRITE16_LEGACY(sgi_ip2_stkbase_r,		sgi_ip2_stkbase_w,		0xffffffff)

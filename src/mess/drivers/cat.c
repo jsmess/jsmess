@@ -163,7 +163,7 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	AM_RANGE(0x00800008, 0x00800009) AM_READ(cat_something_r)
 	AM_RANGE(0x0080000a, 0x0080000b) AM_READ(cat_keyboard_r)
 	AM_RANGE(0x0080000e, 0x0080000f) AM_READWRITE(cat_battery_r,cat_printer_w)
-	AM_RANGE(0x00810000, 0x0081001f) AM_DEVREADWRITE8_LEGACY( "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0x00810000, 0x0081001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0x00820000, 0x008200ff) AM_READWRITE(cat_modem_r, cat_modem_w)// modem
 	AM_RANGE(0x00840000, 0x00840001) AM_WRITE(cat_video_status_w) // Video status
 	AM_RANGE(0x00860000, 0x00860001) AM_WRITE(cat_test_mode_w) // Test mode

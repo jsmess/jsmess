@@ -79,9 +79,9 @@ static WRITE8_HANDLER( jr100_via_w )
 
 static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8, jr100_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE( m_ram)
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE( m_pcg)
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE( m_vram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(m_pcg)
+	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(m_vram)
 	AM_RANGE(0xc800, 0xc80f) AM_DEVREAD("via", via6522_device, read) AM_WRITE_LEGACY(jr100_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

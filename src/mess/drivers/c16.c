@@ -192,7 +192,7 @@ static ADDRESS_MAP_START(plus4_map, AS_PROGRAM, 8, c16_state )
 	AM_RANGE(0xfd00, 0xfd0f) AM_READWRITE_LEGACY(c16_6551_port_r, c16_6551_port_w)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE_LEGACY(plus4_6529_port_r, plus4_6529_port_w)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE_LEGACY(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
-	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE_LEGACY( c16_select_roms) /* rom chips selection */
+	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE_LEGACY(c16_select_roms) /* rom chips selection */
 	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE_LEGACY("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff20, 0xff3d) AM_WRITEONLY

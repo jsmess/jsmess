@@ -531,7 +531,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 
 static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, ngp_state )
 	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE("share1")								/* shared with tlcs900 */
-	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE_LEGACY( "t6w28", t6w28_w )					/* sound chip (right, left) */
+	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE_LEGACY("t6w28", t6w28_w )					/* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )	AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )	/* main-sound communication */
 	AM_RANGE( 0xc000, 0xc000 )	AM_WRITE( ngp_z80_signal_main_w )				/* signal irq to main cpu */
 ADDRESS_MAP_END

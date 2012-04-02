@@ -129,31 +129,31 @@ static ADDRESS_MAP_START( z80net_mem, AS_PROGRAM, 8, z80ne_state )
 	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK("bank2")
 	AM_RANGE( 0x8400, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE( m_videoram) /* (6847) */
+	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE(m_videoram) /* (6847) */
 	AM_RANGE( 0xee00, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80netb_mem, AS_PROGRAM, 8, z80ne_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE( m_videoram) /* (6847) */
+	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE(m_videoram) /* (6847) */
 	AM_RANGE( 0xee00, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80ne_io, AS_IO, 8, z80ne_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY( lx385_data_r, lx385_data_w )
-	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY( lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY( lx383_r, lx383_w )
+	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY(lx385_ctrl_r, lx385_ctrl_w )
+	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY(lx383_r, lx383_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80net_io, AS_IO, 8, z80ne_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xea, 0xea) AM_READ_LEGACY( lx388_data_r )
-	AM_RANGE(0xeb, 0xeb) AM_READ_LEGACY( lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY( lx385_data_r, lx385_data_w )
-	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY( lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY( lx383_r, lx383_w )
+	AM_RANGE(0xea, 0xea) AM_READ_LEGACY(lx388_data_r )
+	AM_RANGE(0xeb, 0xeb) AM_READ_LEGACY(lx388_read_field_sync )
+	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY(lx385_ctrl_r, lx385_ctrl_w )
+	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY(lx383_r, lx383_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80netf_mem, AS_PROGRAM, 8, z80ne_state )
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( z80netf_mem, AS_PROGRAM, 8, z80ne_state )
 	AM_RANGE( 0x8000, 0x83ff ) AM_RAMBANK("bank3")
 	AM_RANGE( 0x8400, 0xdfff ) AM_RAM
 	AM_RANGE( 0xe000, 0xebff ) AM_READNOP AM_WRITENOP
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE( m_videoram) /* (6847) */
+	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_BASE(m_videoram) /* (6847) */
 	AM_RANGE( 0xee00, 0xefff ) AM_READNOP AM_WRITENOP
 	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank4")
 	AM_RANGE( 0xf400, 0xffff ) AM_READNOP AM_WRITENOP
@@ -172,11 +172,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80netf_io, AS_IO, 8, z80ne_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xd0, 0xd7) AM_DEVREADWRITE_LEGACY("wd1771", lx390_fdc_r, lx390_fdc_w)
-	AM_RANGE(0xea, 0xea) AM_READ_LEGACY( lx388_data_r )
-	AM_RANGE(0xeb, 0xeb) AM_READ_LEGACY( lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY( lx385_data_r, lx385_data_w )
-	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY( lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY( lx383_r, lx383_w )
+	AM_RANGE(0xea, 0xea) AM_READ_LEGACY(lx388_data_r )
+	AM_RANGE(0xeb, 0xeb) AM_READ_LEGACY(lx388_read_field_sync )
+	AM_RANGE(0xee, 0xee) AM_READWRITE_LEGACY(lx385_data_r, lx385_data_w )
+	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY(lx385_ctrl_r, lx385_ctrl_w )
+	AM_RANGE(0xf0, 0xff) AM_READWRITE_LEGACY(lx383_r, lx383_w )
 ADDRESS_MAP_END
 
 
