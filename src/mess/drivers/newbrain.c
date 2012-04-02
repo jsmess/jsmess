@@ -1240,38 +1240,37 @@ inline int newbrain_state::get_reset_t()
 	return RES_K(220) * CAP_U(10) * 1000; // t = R128 * C125 = 2.2s
 }
 
-static TIMER_CALLBACK( reset_tick )
-{
-	newbrain_state *state = machine.driver_data<newbrain_state>();
-
-	state->m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	state->m_copcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-}
-
 inline int newbrain_state::get_pwrup_t()
 {
 	return RES_K(560) * CAP_U(10) * 1000; // t = R129 * C127 = 5.6s
 }
 
-static TIMER_CALLBACK( pwrup_tick )
-{
-	newbrain_state *state = machine.driver_data<newbrain_state>();
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
 
-	state->m_pwrup = 0;
-	state->bankswitch();
+void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ID_RESET:
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_copcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		break;
+
+	case TIMER_ID_PWRUP:
+		m_pwrup = 0;
+		bankswitch();
+		break;
+	}
 }
 
 void newbrain_state::machine_start()
 {
 	m_copregint = 1;
 
-	/* allocate reset timer */
-	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
-	m_reset_timer->adjust(attotime::from_usec(get_reset_t()));
-
-	/* allocate power up timer */
-	m_pwrup_timer = machine().scheduler().timer_alloc(FUNC(pwrup_tick));
-	m_pwrup_timer->adjust(attotime::from_usec(get_pwrup_t()));
+	/* set power up timer */
+	timer_set(attotime::from_usec(get_pwrup_t()), TIMER_ID_PWRUP);
 
 	/* initialize variables */
 	m_pwrup = 1;
@@ -1328,7 +1327,7 @@ void newbrain_eim_state::machine_start()
 
 void newbrain_state::machine_reset()
 {
-	m_reset_timer->adjust(attotime::from_msec(get_reset_t()));
+	timer_set(attotime::from_usec(get_reset_t()), TIMER_ID_RESET);
 }
 
 static INTERRUPT_GEN( newbrain_interrupt )

@@ -58,11 +58,17 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<comx_expansion_slot_device> m_expansion;
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	enum
+	{
+		TIMER_ID_RESET
+	};
 
 	void check_interrupt();
 
@@ -94,9 +100,6 @@ public:
 
 	// video state
 	UINT8 *m_charram;			// character memory
-
-	// timers
-	emu_timer *m_reset_timer;	// power on reset timer
 };
 
 // ---------- defined in video/comx35.c ----------

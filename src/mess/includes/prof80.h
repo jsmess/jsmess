@@ -51,9 +51,15 @@ public:
 	required_device<device_t> m_floppy1;
 	required_device<ecbbus_device> m_ecb;
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	enum
+	{
+		TIMER_ID_MOTOR
+	};
 
 	DECLARE_WRITE8_MEMBER( flr_w );
 	DECLARE_READ8_MEMBER( status_r );

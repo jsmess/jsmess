@@ -445,21 +445,26 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 //-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void comx35_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ID_RESET:
+		m_clear = 1;
+		break;
+	}
+}
+
+
+//-------------------------------------------------
 //  MACHINE_START( comx35 )
 //-------------------------------------------------
 
-static TIMER_CALLBACK( reset_tick )
-{
-	comx35_state *state = machine.driver_data<comx35_state>();
-
-	state->m_clear = 1;
-}
-
 void comx35_state::machine_start()
 {
-	// allocate reset timer
-	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
-
 	// clear the RAM since DOS card will go crazy if RAM is not all zeroes
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0, 0x8000);
@@ -491,7 +496,7 @@ void comx35_state::machine_reset()
 	m_int = CLEAR_LINE;
 	m_prd = CLEAR_LINE;
 
-	m_reset_timer->adjust(attotime::from_msec(t));
+	timer_set(attotime::from_msec(t), TIMER_ID_RESET);
 }
 
 
