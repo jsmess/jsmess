@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc8001mk2_io, AS_IO, 8, pc8001mk2_state )
 	AM_IMPORT_FROM(pc8001_io)
-	AM_RANGE(0x30, 0x30) AM_WRITE_BASE(pc8001_state, port30_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(port31_w)
 //  AM_RANGE(0x5c, 0x5c) AM_WRITE(gram_on_w)
 //  AM_RANGE(0x5f, 0x5f) AM_WRITE(gram_off_w)

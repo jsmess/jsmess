@@ -606,9 +606,9 @@ static ADDRESS_MAP_START( pc8201_io, AS_IO, 8, pc8201_state )
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(bank_r, bank_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_device, read, write)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READ(uart_status_r) AM_WRITE_BASE(kc85_state, uart_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ_BASE(kc85_state, keyboard_r)
-	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE_BASE(kc85_state, lcd_r, lcd_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READ(uart_status_r) AM_WRITE(uart_ctrl_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ(keyboard_r)
+	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy200_io, AS_IO, 8, tandy200_state )
