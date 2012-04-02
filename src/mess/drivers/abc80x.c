@@ -133,72 +133,12 @@ Notes:
     PROM0   - Philips 82S123 32x8 Bipolar PROM "HRU I"
     PROM1   - Philips 82S131 512x4 Bipolar PROM "HRU II"
 
-
-Keyboard PCB Layout
--------------------
-
-KTC A65-02201-201K
-
-    |---------------|
-|---|      CN1      |---------------------------------------------------|
-|                                                                       |
-|       LS193       LS374                       8048        22-008-03   |
-|   LS13    LS193               22-050-3B   5.9904MHz                   |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|-----------------------------------------------------------------------|
-
-Notes:
-    All IC's shown.
-
-    8048        - National Semiconductor INS8048 MCU "8048-132"
-    22-008-03   - Exar Semiconductor XR22-008-03 keyboard matrix capacitive readout latch
-    22-050-3B   - Exar Semiconductor XR22-050-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
-    CN1         - keyboard data connector
-
-
-XR22-008-03 Pinout
-------------------
-            _____   _____
-    D0   1 |*    \_/     | 20  Vcc
-    D1   2 |             | 19  _CLR
-    D2   3 |             | 18  Q0
-    D3   4 |             | 17  Q1
-   HYS   5 |  22-008-03  | 16  Q2
-    D4   6 |             | 15  Q3
-    D5   7 |             | 14  Q4
-    D6   8 |             | 13  Q5
-    D7   9 |             | 12  Q6
-   GND  10 |_____________| 11  Q7
-
-
-XR22-050-3B Pinout
-------------------
-            _____   _____
-    Y8   1 |*    \_/     | 20  Vcc
-    Y9   2 |             | 19  Y7
-   Y10   3 |             | 18  Y6
-   Y11   4 |             | 17  Y5
-  _STB   5 |  22-050-3B  | 16  Y4
-    A0   6 |             | 15  Y3
-    A1   7 |             | 14  Y2
-    A2   8 |             | 13  Y1
-    A3   9 |             | 12  Y0
-   GND  10 |_____________| 11  OE?
-
 */
 
 /*
 
     TODO:
 
-    - ABC800 keyboard: T1 clock frequency, caps lock led, keydown
     - hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
 
 */
@@ -476,134 +416,6 @@ WRITE8_MEMBER( abc806_state::mao_w )
 
 
 //**************************************************************************
-//  INTEGRATED KEYBOARD
-//**************************************************************************
-
-//-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( keyboard_t1_tick )
-//-------------------------------------------------
-
-static TIMER_DEVICE_CALLBACK( keyboard_t1_tick )
-{
-	abc800_state *state = timer.machine().driver_data<abc800_state>();
-
-	state->m_kb_clk = !state->m_kb_clk;
-
-	z80dart_rxtxcb_w(state->m_dart, state->m_kb_clk);
-}
-
-
-//-------------------------------------------------
-//  keyboard_txd_r - keyboard transmit data read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( abc800_state::keyboard_txd_r )
-{
-	return m_kb_txd;
-}
-
-
-//-------------------------------------------------
-//  keyboard_rxd_w - keyboard receive data write
-//-------------------------------------------------
-
-static WRITE_LINE_DEVICE_HANDLER( keyboard_rxd_w )
-{
-	device_set_input_line(device, MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
-//-------------------------------------------------
-//  keyboard_col_r - keyboard column data read
-//-------------------------------------------------
-
-READ8_MEMBER( abc800_state::keyboard_col_r )
-{
-	static const char *const ABC800_KEY_ROW[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11" };
-	UINT8 data = 0xff;
-
-	if (m_kb_stb && m_kb_row < 12)
-	{
-		data = input_port_read(machine(), ABC800_KEY_ROW[m_kb_row]);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  keyboard_row_w - keyboard row write
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc800_state::keyboard_row_w )
-{
-	/*
-
-        bit     description
-
-        0       A0
-        1       A1
-        2       A2
-        3       A3
-        4       ?
-        5       ?
-        6
-        7
-
-    */
-
-	// keyboard row
-	if (!m_kb_stb)
-	{
-		m_kb_row = data & 0x0f;
-	}
-}
-
-
-//-------------------------------------------------
-//  keyboard_ctrl_w - keyboard control write
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc800_state::keyboard_ctrl_w )
-{
-	/*
-
-        bit     description
-
-        0
-        1
-        2
-        3
-        4       TxD
-        5       ?
-        6       22-008-03 CLR, 22-050-3B STB
-        7       22-008-03 HYS
-
-    */
-
-	// TxD
-	m_kb_txd = !BIT(data, 4);
-
-	// keydown
-	m_dart->dcd_w(1, !BIT(data, 5));
-
-	// strobe
-	m_kb_stb = BIT(data, 6);
-}
-
-
-//-------------------------------------------------
-//  keyboard_t1_r - keyboard T1 timer read
-//-------------------------------------------------
-
-READ8_MEMBER( abc800_state::keyboard_t1_r )
-{
-	return m_kb_clk;
-}
-
-
-
-//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -639,17 +451,6 @@ static ADDRESS_MAP_START( abc800c_io, AS_IO, 8, abc800_state )
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( abc800_keyboard_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( abc800_keyboard_io, AS_IO, 8, abc800_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_col_r, keyboard_row_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_ctrl_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(keyboard_t1_r)
 ADDRESS_MAP_END
 
 
@@ -776,126 +577,6 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 INPUT_PORTS_START( abc800 )
-	PORT_START("Y0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Left SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // 80
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // 81
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // 82
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 83
-
-	PORT_START("Y1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad RETURN") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // 84
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 85
-
-	PORT_START("Y2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // 18
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 86
-
-	PORT_START("Y3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("4 \xC2\xA4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0x00A4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-
-	PORT_START("Y4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-
-	PORT_START("Y5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF6") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-
-	PORT_START("Y6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF8") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
-
-	PORT_START("Y7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF7") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7))
-
-	PORT_START("Y8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('<') PORT_CHAR('>')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u_UMLAUT " " U_UMLAUT) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00FC) PORT_CHAR(0x00DC)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\'') PORT_CHAR('*')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(TAB))
-
-	PORT_START("Y9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(e_ACUTE " " E_ACUTE) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(0x00E9) PORT_CHAR(0x00C9)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(a_RING " " A_RING) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00E5) PORT_CHAR(0x00C5)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(a_UMLAUT " " A_UMLAUT) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Right SHIFT") PORT_CODE(KEYCODE_RSHIFT)
-
-	PORT_START("Y10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(o_UMLAUT " " O_UMLAUT) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // 87
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // 88
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // 89
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 8a
-
-	PORT_START("Y11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // 03
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) // 23
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) // 96
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // 8b
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // 8c
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // 8d
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // 8e
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // 8f
-
 	PORT_START("SB")
 	PORT_DIPNAME( 0xff, 0xaa, "Serial Communications" ) PORT_DIPLOCATION("SB:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0xaa, "Asynchronous, Single Speed" )
@@ -1077,8 +758,8 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DRIVER_LINE_MEMBER(abc800_state, keyboard_txd_r),
-	DEVCB_DEVICE_LINE(I8048_TAG, keyboard_rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(ABC800_KEYBOARD_TAG, abc800_keyboard_device, txd_r),
+	DEVCB_DEVICE_LINE_MEMBER(ABC800_KEYBOARD_TAG, abc800_keyboard_device, rxd_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1160,6 +841,18 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 
 
 //-------------------------------------------------
+//  ABC800_KEYBOARD_INTERFACE( kb_intf )
+//-------------------------------------------------
+
+static ABC800_KEYBOARD_INTERFACE( kb_intf )
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
+	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
+};
+
+
+//-------------------------------------------------
 //  ABC77_INTERFACE( abc77_intf )
 //-------------------------------------------------
 
@@ -1229,15 +922,8 @@ static ABCBUS_INTERFACE( abcbus_intf )
 
 void abc800_state::machine_start()
 {
-	// initialize values
-	m_kb_txd = 1;
-
 	// register for state saving
 	save_item(NAME(m_fetch_charram));
-	save_item(NAME(m_kb_row));
-	save_item(NAME(m_kb_txd));
-	save_item(NAME(m_kb_clk));
-	save_item(NAME(m_kb_stb));
 	save_item(NAME(m_pling));
 	save_item(NAME(m_sio_rxcb));
 	save_item(NAME(m_sio_txcb));
@@ -1385,9 +1071,6 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_CPU_PROGRAM_MAP(abc800c_mem)
 	MCFG_CPU_IO_MAP(abc800c_io)
 
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
-	MCFG_CPU_IO_MAP(abc800_keyboard_io)
-
 	// video hardware
 	MCFG_FRAGMENT_ADD(abc800c_video)
 
@@ -1404,8 +1087,8 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
-	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 	MCFG_ABC832_ADD()
+	MCFG_ABC800_KEYBOARD_ADD(kb_intf)
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc800_abcbus_cards, "fast", abc830_fast)
@@ -1431,9 +1114,6 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_CPU_PROGRAM_MAP(abc800m_mem)
 	MCFG_CPU_IO_MAP(abc800m_io)
 
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
-	MCFG_CPU_IO_MAP(abc800_keyboard_io)
-
 	// video hardware
 	MCFG_FRAGMENT_ADD(abc800m_video)
 
@@ -1450,8 +1130,8 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
-	MCFG_TIMER_ADD_PERIODIC("keyboard_t1", keyboard_t1_tick, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)) // TODO correct frequency?
 	MCFG_ABC832_ADD()
+	MCFG_ABC800_KEYBOARD_ADD(kb_intf)
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc800_abcbus_cards, "fast", abc830_fast)
@@ -1591,9 +1271,6 @@ ROM_START( abc800c )
 	ROM_LOAD( "abc 6-1.2k", 0x6000, 0x1000, CRC(4bd5e808) SHA1(5ca0a60571de6cfa3d6d166e0cde3c78560569f3) ) // 1981-01-12
 	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
 
-	ROM_REGION( 0x400, I8048_TAG, 0 )
-	ROM_LOAD( "8048-132.z9", 0x0000, 0x0400, CRC(05c4dce5) SHA1(1824c5d304bbd09f97056cfa408e1b18b5219ba2) )
-
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "saa5052.5c", 0x0140, 0x08c0, BAD_DUMP CRC(cda3bf79) SHA1(cf5ea94459c09001d422dadc212bc970b4b4aa20) )
 
@@ -1622,9 +1299,6 @@ ROM_START( abc800m )
 	ROM_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485) ) // 1984-03-02
 	ROM_LOAD_OPTIONAL( "abc 7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
-
-	ROM_REGION( 0x400, I8048_TAG, 0 )
-	ROM_LOAD( "8048-132.z9", 0x0000, 0x0400, CRC(05c4dce5) SHA1(1824c5d304bbd09f97056cfa408e1b18b5219ba2) )
 
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
 	ROM_LOAD( "vum se.7c", 0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )

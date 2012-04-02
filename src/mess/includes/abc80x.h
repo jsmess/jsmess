@@ -11,6 +11,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "machine/abc77.h"
+#include "machine/abc800kb.h"
 #include "machine/abc830.h"
 #include "machine/abcbus.h"
 #include "machine/abc_uni800.h"
@@ -52,7 +53,6 @@
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
-#define I8048_TAG		"i8048"
 #define E0516_TAG		"j13"
 #define MC6845_TAG		"b12"
 #define SAA5052_TAG		"5c"
@@ -118,12 +118,6 @@ public:
 	const UINT8 *m_fgctl_prom;		// foreground control PROM
 	UINT8 m_hrs;					// HR picture start scanline
 	UINT8 m_fgctl;					// HR foreground control
-
-	// keyboard state
-	int m_kb_row;
-	int m_kb_txd;
-	int m_kb_clk;
-	int m_kb_stb;
 
 	// sound state
 	int m_pling;					// pling
