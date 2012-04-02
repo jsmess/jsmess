@@ -1468,15 +1468,15 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8_LEGACY(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8_LEGACY(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8_LEGACY(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0064, 0x0067) AM_WRITE8_LEGACY(                        pc9801_vrtc_mask_w, 0xffffffff)
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8_LEGACY(                        pc9801rs_video_ff_w,0xffffffff) //mode FF / <undefined>
+	AM_RANGE(0x0064, 0x0067) AM_WRITE8_LEGACY(pc9801_vrtc_mask_w, 0xffffffff)
+	AM_RANGE(0x0068, 0x006b) AM_WRITE8_LEGACY(pc9801rs_video_ff_w,0xffffffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8_LEGACY(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8_LEGACY(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8_LEGACY(pc9801_a0_r,        pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8_LEGACY(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8_LEGACY(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffffffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8_LEGACY(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8_LEGACY(                        pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8_LEGACY(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
 
 ADDRESS_MAP_END
 
@@ -1529,15 +1529,15 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8_LEGACY(pc9801rs_30_r,      pc9801_30_w,        0xffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8_LEGACY(pc9801_40_r,        pc9801_40_w,        0xffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8_LEGACY(pc9801_60_r,        pc9801_60_w,        0xffff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0064, 0x0067) AM_WRITE8_LEGACY(                        pc9801_vrtc_mask_w, 0xffff)
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8_LEGACY(                        pc9801rs_video_ff_w,0xffff) //mode FF / <undefined>
+	AM_RANGE(0x0064, 0x0067) AM_WRITE8_LEGACY(pc9801_vrtc_mask_w, 0xffff)
+	AM_RANGE(0x0068, 0x006b) AM_WRITE8_LEGACY(pc9801rs_video_ff_w,0xffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8_LEGACY(pc9801_70_r,        pc9801_70_w,        0xffff) //display registers "GRCG" / i8253 pit
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8_LEGACY(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8_LEGACY(pc9801_a0_r,        pc9801rs_a0_w,      0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8_LEGACY(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8_LEGACY(pc9801rs_2dd_r,     pc9801rs_2dd_w,     0xffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8_LEGACY(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffff)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8_LEGACY(                        pc9801rs_bank_w,    0xffff) //ROM/RAM bank
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8_LEGACY(pc9801rs_bank_w,    0xffff) //ROM/RAM bank
 
 ADDRESS_MAP_END
 
@@ -1623,8 +1623,8 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8_LEGACY(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x005c, 0x005f) AM_NOP //ARTIC (serial card?)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8_LEGACY(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0064, 0x0067) AM_WRITE8_LEGACY(                        pc9801_vrtc_mask_w, 0xffffffff)
-	AM_RANGE(0x0068, 0x006b) AM_WRITE8_LEGACY(                        pc9821_video_ff_w,  0xffffffff) //mode FF / <undefined>
+	AM_RANGE(0x0064, 0x0067) AM_WRITE8_LEGACY(pc9801_vrtc_mask_w, 0xffffffff)
+	AM_RANGE(0x0068, 0x006b) AM_WRITE8_LEGACY(pc9821_video_ff_w,  0xffffffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8_LEGACY(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
 //  AM_RANGE(0x0080, 0x0083) SASI interface / <undefined>
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8_LEGACY(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
@@ -1642,11 +1642,11 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x0432, 0x0432) IDE bank register (mirror)
 //  AM_RANGE(0x0439, 0x0439) ROM/RAM bank (NEC)
 //  AM_RANGE(0x043d, 0x043d) ROM/RAM bank (NEC)
-	AM_RANGE(0x043c, 0x043f) AM_WRITE8_LEGACY(                        pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank (EPSON)
+	AM_RANGE(0x043c, 0x043f) AM_WRITE8_LEGACY(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank (EPSON)
 //  AM_RANGE(0x04a0, 0x04af) EGC
 //  AM_RANGE(0x04be, 0x04be) FDC "RPM" register
 //  AM_RANGE(0x0642, 0x064f) IDE registers / <undefined>
-	AM_RANGE(0x074c, 0x074f) AM_READ8_LEGACY( ide_status_r, 0x000000ff) // IDE status (r) - IDE control registers (w) / <undefined>
+	AM_RANGE(0x074c, 0x074f) AM_READ8_LEGACY(ide_status_r, 0x000000ff) // IDE status (r) - IDE control registers (w) / <undefined>
 //  AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
 //  AM_RANGE(0x09a0, 0x09a0) GDC extended register r/w
 //  AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
@@ -1681,11 +1681,11 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, pc9801_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE( m_video_ram_1)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram_1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, pc9801_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE( m_video_ram_2)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram_2)
 ADDRESS_MAP_END
 
 /* keyboard code */

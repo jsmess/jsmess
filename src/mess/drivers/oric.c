@@ -57,7 +57,7 @@
 
 
 static ADDRESS_MAP_START(oric_mem, AS_PROGRAM, 8, oric_state )
-    AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_BASE( m_ram )
+    AM_RANGE( 0x0000, 0xbfff) AM_RAM AM_BASE(m_ram )
     AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE( 0xe000, 0xf7ff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE( 0xf800, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -69,7 +69,7 @@ Memory region &c000-&ffff can be ram or rom. */
 static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, oric_state )
 	AM_RANGE( 0x0000, 0x02ff) AM_RAM
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-	AM_RANGE( 0x0310, 0x031b) AM_READWRITE_LEGACY( oric_microdisc_r, oric_microdisc_w )
+	AM_RANGE( 0x0310, 0x031b) AM_READWRITE_LEGACY(oric_microdisc_r, oric_microdisc_w )
 	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia",  acia6551_device, read, write)
 	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
 	AM_RANGE( 0x0400, 0xbfff) AM_RAM

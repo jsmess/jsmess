@@ -1481,7 +1481,7 @@ static ADDRESS_MAP_START( fm7_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE( m_shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(m_shared_ram)
 	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ_LEGACY(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ_LEGACY(fm7_cancel_ack)
@@ -1539,7 +1539,7 @@ static ADDRESS_MAP_START( fm11_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xfd40,0xfd7f) AM_READ_LEGACY(fm7_unknown_r)
 	AM_RANGE(0xfd80,0xfd93) AM_READWRITE_LEGACY(fm7_mmr_r,fm7_mmr_w)
 	AM_RANGE(0xfd94,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
-	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE_LEGACY(fm77av_bootram_w) AM_BASE( m_boot_ram)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE_LEGACY(fm77av_bootram_w) AM_BASE(m_boot_ram)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
 ADDRESS_MAP_END
@@ -1549,7 +1549,7 @@ static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0x7fff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0x8000,0x8fff) AM_RAM // Console RAM(?)
 	AM_RANGE(0x9000,0x9f7f) AM_RAM // Work RAM(?)
-	AM_RANGE(0x9f80,0x9fff) AM_RAM AM_BASE( m_shared_ram)
+	AM_RANGE(0x9f80,0x9fff) AM_RAM AM_BASE(m_shared_ram)
 	AM_RANGE(0xafe4,0xafe4) AM_READWRITE_LEGACY(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xafe6,0xafe6) AM_READWRITE_LEGACY(fm77av_video_flags_r,fm77av_video_flags_w)
 	AM_RANGE(0xc000,0xffff) AM_ROM // sybsystem ROM
@@ -1655,7 +1655,7 @@ static ADDRESS_MAP_START( fm77av_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0xfd80,0xfd93) AM_READWRITE_LEGACY(fm7_mmr_r,fm7_mmr_w)
 	AM_RANGE(0xfd94,0xfdff) AM_READ_LEGACY(fm7_unknown_r)
 	// Boot ROM (RAM on FM77AV and later)
-	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE_LEGACY(fm77av_bootram_w) AM_BASE( m_boot_ram)
+	AM_RANGE(0xfe00,0xffdf) AM_RAM_WRITE_LEGACY(fm77av_bootram_w) AM_BASE(m_boot_ram)
 	AM_RANGE(0xffe0,0xffef) AM_RAM
 	AM_RANGE(0xfff0,0xffff) AM_READWRITE_LEGACY(vector_r,vector_w)
 ADDRESS_MAP_END
@@ -1664,7 +1664,7 @@ static ADDRESS_MAP_START( fm77av_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x0000,0xbfff) AM_READWRITE_LEGACY(fm7_vram_r,fm7_vram_w) // VRAM
 	AM_RANGE(0xc000,0xcfff) AM_RAM AM_REGION("maincpu",0x1c000) // Console RAM
 	AM_RANGE(0xd000,0xd37f) AM_RAM AM_REGION("maincpu",0x1d000) // Work RAM
-	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE( m_shared_ram)
+	AM_RANGE(0xd380,0xd3ff) AM_RAM AM_BASE(m_shared_ram)
 	// I/O space (D400-D4FF)
 	AM_RANGE(0xd400,0xd401) AM_READ_LEGACY(fm7_sub_keyboard_r)
 	AM_RANGE(0xd402,0xd402) AM_READ_LEGACY(fm7_cancel_ack)

@@ -698,7 +698,7 @@ static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE_LEGACY(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE( m_videoram) /* (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(m_videoram) /* (6847) */
 	AM_RANGE(0x7800, 0x7fff) AM_RAMBANK("bank1") /* 2k user ram */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xc000, 0xffff) AM_NOP
@@ -709,7 +709,7 @@ static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE_LEGACY(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE( m_videoram) /* U7 (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(m_videoram) /* U7 (6847) */
 	AM_RANGE(0x7800, 0x8fff) AM_RAMBANK("bank1") /* 6k user ram */
 	AM_RANGE(0x9000, 0xcfff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xd000, 0xffff) AM_NOP
@@ -720,7 +720,7 @@ static ADDRESS_MAP_START( laser310_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE_LEGACY(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE( m_videoram) /* (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(m_videoram) /* (6847) */
 	AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK("bank1") /* 16k user ram */
 	AM_RANGE(0xb800, 0xf7ff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xf8ff, 0xffff) AM_NOP

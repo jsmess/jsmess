@@ -115,17 +115,17 @@ static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16, rmnimbus_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nimbus_io, AS_IO, 16, rmnimbus_state )
-    AM_RANGE( 0x0000, 0x0031) AM_READWRITE_LEGACY( nimbus_video_io_r, nimbus_video_io_w)
-    AM_RANGE( 0x0032, 0x007f) AM_READWRITE_LEGACY( nimbus_io_r, nimbus_io_w)
-    AM_RANGE( 0x0080, 0x0081) AM_READWRITE8_LEGACY( nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
-    AM_RANGE( 0x0092, 0x0093) AM_READWRITE8_LEGACY( nimbus_iou_r, nimbus_iou_w, 0x00FF)
-    AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8_LEGACY( nimbus_mouse_js_r, nimbus_mouse_js_w, 0x00FF)
-    AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8_LEGACY( nimbus_pc8031_r, nimbus_pc8031_w, 0x00FF)
-    AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8_LEGACY( nimbus_sound_ay8910_r, nimbus_sound_ay8910_w, 0x00FF)
+    AM_RANGE( 0x0000, 0x0031) AM_READWRITE_LEGACY(nimbus_video_io_r, nimbus_video_io_w)
+    AM_RANGE( 0x0032, 0x007f) AM_READWRITE_LEGACY(nimbus_io_r, nimbus_io_w)
+    AM_RANGE( 0x0080, 0x0081) AM_READWRITE8_LEGACY(nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
+    AM_RANGE( 0x0092, 0x0093) AM_READWRITE8_LEGACY(nimbus_iou_r, nimbus_iou_w, 0x00FF)
+    AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8_LEGACY(nimbus_mouse_js_r, nimbus_mouse_js_w, 0x00FF)
+    AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8_LEGACY(nimbus_pc8031_r, nimbus_pc8031_w, 0x00FF)
+    AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8_LEGACY(nimbus_sound_ay8910_r, nimbus_sound_ay8910_w, 0x00FF)
     AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8_LEGACY(Z80SIO_TAG, z80sio_cd_ba_r, z80sio_cd_ba_w, 0x00ff)
-    AM_RANGE( 0x0400, 0x041f) AM_READWRITE8_LEGACY( nimbus_disk_r, nimbus_disk_w, 0x00FF)
+    AM_RANGE( 0x0400, 0x041f) AM_READWRITE8_LEGACY(nimbus_disk_r, nimbus_disk_w, 0x00FF)
 	AM_RANGE( 0x0480, 0x049f) AM_DEVREADWRITE8(VIA_TAG, via6522_device, read, write, 0x00FF)
-	AM_RANGE( 0xff00, 0xffff) AM_READWRITE_LEGACY( nimbus_i186_internal_port_r, nimbus_i186_internal_port_w)/* CPU 80186         */
+	AM_RANGE( 0xff00, 0xffff) AM_READWRITE_LEGACY(nimbus_i186_internal_port_r, nimbus_i186_internal_port_w)/* CPU 80186         */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nimbus )

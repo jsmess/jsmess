@@ -467,17 +467,17 @@ static ADDRESS_MAP_START(gb_map, AS_PROGRAM, 8, gb_state )
 	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK("bank11")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* 8KB/16KB switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY( gb_vram_r, gb_vram_w ) /* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY(gb_vram_r, gb_vram_w ) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank2")					/* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE_LEGACY( gb_oam_r, gb_oam_w )	/* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE_LEGACY( gb_io_r, gb_io_w )		/* I/O */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE_LEGACY(gb_oam_r, gb_oam_w )	/* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE_LEGACY(gb_io_r, gb_io_w )		/* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE_LEGACY("custom", gb_sound_r, gb_sound_w )		/* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE_LEGACY("custom", gb_wave_r, gb_wave_w )		/* Wave ram */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE_LEGACY( gb_video_r, gb_io2_w)		/* Video controller & BIOS flip-flop */
+	AM_RANGE(0xff40, 0xff7f) AM_READWRITE_LEGACY(gb_video_r, gb_io2_w)		/* Video controller & BIOS flip-flop */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM						/* High RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE_LEGACY( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE_LEGACY(gb_ie_r, gb_ie_w )		/* Interrupt enable register */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state )
@@ -488,17 +488,17 @@ static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state )
 	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK("bank11")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* 8KB/16KB switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY( gb_vram_r, gb_vram_w ) /* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY(gb_vram_r, gb_vram_w ) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank2")					/* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM						/* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE_LEGACY( gb_oam_r, gb_oam_w )	/* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE_LEGACY( gb_io_r, sgb_io_w )		/* I/O */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE_LEGACY(gb_oam_r, gb_oam_w )	/* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE_LEGACY(gb_io_r, sgb_io_w )		/* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE_LEGACY("custom", gb_sound_r, gb_sound_w )		/* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE_LEGACY("custom", gb_wave_r, gb_wave_w )		/* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE_LEGACY( gb_video_r, gb_io2_w )		/* Video controller & BIOS flip-flop */
+	AM_RANGE(0xff40, 0xff7f) AM_READWRITE_LEGACY(gb_video_r, gb_io2_w )		/* Video controller & BIOS flip-flop */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM						/* High RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE_LEGACY( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE_LEGACY(gb_ie_r, gb_ie_w )		/* Interrupt enable register */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state )
@@ -509,37 +509,37 @@ static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state )
 	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK("bank11")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* 8KB/16KB switched ROM bank */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")					/* 8KB/16KB switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY( gb_vram_r, gb_vram_w )		/* 8k switched VRAM bank */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY(gb_vram_r, gb_vram_w )		/* 8k switched VRAM bank */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank2")					/* 8k switched RAM bank (on cartridge) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM						/* 4k fixed RAM bank */
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank3")					/* 4k switched RAM bank */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM						/* echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE_LEGACY( gb_oam_r, gb_oam_w )	/* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE_LEGACY( gb_io_r, gb_io_w )		/* I/O */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE_LEGACY(gb_oam_r, gb_oam_w )	/* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE_LEGACY(gb_io_r, gb_io_w )		/* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE_LEGACY("custom", gb_sound_r, gb_sound_w )		/* sound controller */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP						/* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE_LEGACY("custom", gb_wave_r, gb_wave_w )		/* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE_LEGACY( gbc_io2_r, gbc_io2_w )		/* Other I/O and video controller */
+	AM_RANGE(0xff40, 0xff7f) AM_READWRITE_LEGACY(gbc_io2_r, gbc_io2_w )		/* Other I/O and video controller */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM						/* high RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE_LEGACY( gb_ie_r, gb_ie_w )		/* Interrupt enable register */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE_LEGACY(gb_ie_r, gb_ie_w )		/* Interrupt enable register */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank10")						/* 16k switched ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* 16k switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY( gb_vram_r, gb_vram_w )		/* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY(gb_vram_r, gb_vram_w )		/* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_NOP							/* unused? */
 	AM_RANGE(0xc000, 0xfe9f) AM_RAM							/* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE_LEGACY( gb_oam_r, gb_oam_w )		/* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE_LEGACY( gb_io_r, gb_io_w )			/* I/O */
-	AM_RANGE(0xff10, 0xff1f) AM_READWRITE_LEGACY( megaduck_video_r, megaduck_video_w )	/* video controller */
-	AM_RANGE(0xff20, 0xff2f) AM_READWRITE_LEGACY( megaduck_sound_r1, megaduck_sound_w1)	/* sound controller pt1 */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE_LEGACY(gb_oam_r, gb_oam_w )		/* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE_LEGACY(gb_io_r, gb_io_w )			/* I/O */
+	AM_RANGE(0xff10, 0xff1f) AM_READWRITE_LEGACY(megaduck_video_r, megaduck_video_w )	/* video controller */
+	AM_RANGE(0xff20, 0xff2f) AM_READWRITE_LEGACY(megaduck_sound_r1, megaduck_sound_w1)	/* sound controller pt1 */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE_LEGACY("custom", gb_wave_r, gb_wave_w )			/* wave ram */
-	AM_RANGE(0xff40, 0xff46) AM_READWRITE_LEGACY( megaduck_sound_r2, megaduck_sound_w2)	/* sound controller pt2 */
+	AM_RANGE(0xff40, 0xff46) AM_READWRITE_LEGACY(megaduck_sound_r2, megaduck_sound_w2)	/* sound controller pt2 */
 	AM_RANGE(0xff47, 0xff7f) AM_NOP							/* unused */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM							/* high RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE_LEGACY( gb_ie_r, gb_ie_w )			/* interrupt enable register */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE_LEGACY(gb_ie_r, gb_ie_w )			/* interrupt enable register */
 ADDRESS_MAP_END
 
 static GFXDECODE_START( gb )

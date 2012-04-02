@@ -121,10 +121,10 @@ static WRITE8_DEVICE_HANDLER( ami1200_cia_0_portb_w )
 
 static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, ami1200_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE( m_chip_ram, m_chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE(m_chip_ram, m_chip_ram_size)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE_LEGACY(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16_LEGACY(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE( m_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE(m_custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
 ADDRESS_MAP_END

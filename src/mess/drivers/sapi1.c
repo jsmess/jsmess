@@ -52,7 +52,7 @@ static ADDRESS_MAP_START(sapi1_mem, AS_PROGRAM, 8, sapi1_state )
 	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
 	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE( m_sapi_video_ram) // AND-1 (video RAM)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(m_sapi_video_ram) // AND-1 (video RAM)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
 ADDRESS_MAP_END
 
@@ -64,7 +64,7 @@ static ADDRESS_MAP_START(sapizps3_mem, AS_PROGRAM, 8, sapi1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0x0800, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE( m_sapi_video_ram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_sapi_video_ram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfdff) AM_ROM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM

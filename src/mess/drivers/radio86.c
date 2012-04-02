@@ -57,7 +57,7 @@ static ADDRESS_MAP_START(radio86ram_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0xf700, 0xf703 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
     AM_RANGE( 0xf780, 0xf7bf ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) // video
     AM_RANGE( 0xf684, 0xf687 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE( 0xf688, 0xf688 ) AM_WRITE_LEGACY( radio86_pagesel )
+	AM_RANGE( 0xf688, 0xf688 ) AM_WRITE_LEGACY(radio86_pagesel )
     AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM page 1
 ADDRESS_MAP_END

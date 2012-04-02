@@ -161,21 +161,21 @@ static WRITE64_HANDLER( dc_arm_w )
 static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)	// flash
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE_LEGACY( dc_mess_gdrom_r, dc_mess_gdrom_w )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE_LEGACY( dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE_LEGACY( dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE_LEGACY( pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY( pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE_LEGACY( dc_modem_r, dc_modem_w )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE_LEGACY(dc_mess_gdrom_r, dc_mess_gdrom_w )
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE_LEGACY(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE_LEGACY(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE_LEGACY("aica", dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE_LEGACY( dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE_LEGACY( dc_arm_r, dc_arm_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE_LEGACY(dc_arm_r, dc_arm_w )
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_BASE( dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE( dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_BASE(dc_texture_ram )      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE(dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 3 */
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("share4") AM_BASE_LEGACY(&dc_ram)
@@ -184,13 +184,13 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("share4")// mirror
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY( ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE_LEGACY( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE_LEGACY( ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 
-	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE_LEGACY( ta_fifo_poly_w )
-	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE_LEGACY( ta_fifo_yuv_w )
-	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE_LEGACY( ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
+	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
+	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("share4")	// another RAM mirror
 
@@ -198,11 +198,11 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_port, AS_IO, 64, dc_state )
-	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE_LEGACY( dc_pdtra_r, dc_pdtra_w )
+	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE_LEGACY(dc_pdtra_r, dc_pdtra_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE( dc_sound_ram)		/* shared with SH-4 */
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(dc_sound_ram)		/* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE_LEGACY("aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 

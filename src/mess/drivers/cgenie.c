@@ -43,18 +43,18 @@ static ADDRESS_MAP_START (cgenie_mem, AS_PROGRAM, 8, cgenie_state )
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in MACHINE_START
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // installed in cgenie_init_machine
 //  AM_RANGE(0xe000, 0xefff) AM_ROM // installed in cgenie_init_machine
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE_LEGACY( cgenie_colorram_r, cgenie_colorram_w ) AM_BASE( m_colorram )
-	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE_LEGACY( cgenie_fontram_r, cgenie_fontram_w) AM_BASE( m_fontram )
-	AM_RANGE(0xf800, 0xf8ff) AM_READ_LEGACY( cgenie_keyboard_r )
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE_LEGACY(cgenie_colorram_r, cgenie_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE_LEGACY(cgenie_fontram_r, cgenie_fontram_w) AM_BASE(m_fontram )
+	AM_RANGE(0xf800, 0xf8ff) AM_READ_LEGACY(cgenie_keyboard_r )
 	AM_RANGE(0xf900, 0xffdf) AM_NOP
-	AM_RANGE(0xffe0, 0xffe3) AM_READWRITE_LEGACY( cgenie_irq_status_r, cgenie_motor_w )
+	AM_RANGE(0xffe0, 0xffe3) AM_READWRITE_LEGACY(cgenie_irq_status_r, cgenie_motor_w )
 	AM_RANGE(0xffe4, 0xffeb) AM_NOP
-	AM_RANGE(0xffec, 0xffec) AM_READWRITE_LEGACY( cgenie_status_r, cgenie_command_w )
+	AM_RANGE(0xffec, 0xffec) AM_READWRITE_LEGACY(cgenie_status_r, cgenie_command_w )
 	AM_RANGE(0xffe4, 0xffeb) AM_NOP
-	AM_RANGE(0xffec, 0xffec) AM_WRITE_LEGACY( cgenie_command_w )
-	AM_RANGE(0xffed, 0xffed) AM_READWRITE_LEGACY( cgenie_track_r, cgenie_track_w )
-	AM_RANGE(0xffee, 0xffee) AM_READWRITE_LEGACY( cgenie_sector_r, cgenie_sector_w )
-	AM_RANGE(0xffef, 0xffef) AM_READWRITE_LEGACY( cgenie_data_r, cgenie_data_w )
+	AM_RANGE(0xffec, 0xffec) AM_WRITE_LEGACY(cgenie_command_w )
+	AM_RANGE(0xffed, 0xffed) AM_READWRITE_LEGACY(cgenie_track_r, cgenie_track_w )
+	AM_RANGE(0xffee, 0xffee) AM_READWRITE_LEGACY(cgenie_sector_r, cgenie_sector_w )
+	AM_RANGE(0xffef, 0xffef) AM_READWRITE_LEGACY(cgenie_data_r, cgenie_data_w )
 	AM_RANGE(0xfff0, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -62,9 +62,9 @@ static ADDRESS_MAP_START (cgenie_io, AS_IO, 8, cgenie_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE_LEGACY("ay8910", cgenie_sh_control_port_r, cgenie_sh_control_port_w )
 	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w )
-	AM_RANGE(0xfa, 0xfa) AM_READWRITE_LEGACY( cgenie_index_r, cgenie_index_w )
-	AM_RANGE(0xfb, 0xfb) AM_READWRITE_LEGACY( cgenie_register_r, cgenie_register_w )
-	AM_RANGE(0xff, 0xff) AM_READWRITE_LEGACY( cgenie_port_ff_r, cgenie_port_ff_w )
+	AM_RANGE(0xfa, 0xfa) AM_READWRITE_LEGACY(cgenie_index_r, cgenie_index_w )
+	AM_RANGE(0xfb, 0xfb) AM_READWRITE_LEGACY(cgenie_register_r, cgenie_register_w )
+	AM_RANGE(0xff, 0xff) AM_READWRITE_LEGACY(cgenie_port_ff_r, cgenie_port_ff_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cgenie )

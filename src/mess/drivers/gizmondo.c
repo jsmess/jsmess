@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( gizmondo_map, AS_PROGRAM, 32, gizmondo_state )
 	AM_RANGE(0x00001000, 0x000017ff) AM_DEVREADWRITE16( "diskonchip", diskonchip_g3_device, sec_2_r, sec_2_w, 0xffffffff)
 	AM_RANGE(0x00001800, 0x00001fff) AM_DEVREADWRITE16( "diskonchip", diskonchip_g3_device, sec_3_r, sec_3_w, 0xffffffff)
 	AM_RANGE(0x30000000, 0x33ffffff) AM_RAM
-	AM_RANGE(0x34000000, 0x3413ffff) AM_READWRITE_LEGACY( gf4500_r, gf4500_w)
+	AM_RANGE(0x34000000, 0x3413ffff) AM_READWRITE_LEGACY(gf4500_r, gf4500_w)
 ADDRESS_MAP_END
 
 /*******************************************************************************

@@ -118,15 +118,15 @@ Interrupts:
 
 static ADDRESS_MAP_START( primoa_port, AS_IO, 8, primo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x3f ) AM_READWRITE_LEGACY( primo_be_1_r, primo_ki_1_w )
-	AM_RANGE( 0xfd, 0xfd ) AM_WRITE_LEGACY( primo_FD_w )
+	AM_RANGE( 0x00, 0x3f ) AM_READWRITE_LEGACY(primo_be_1_r, primo_ki_1_w )
+	AM_RANGE( 0xfd, 0xfd ) AM_WRITE_LEGACY(primo_FD_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( primob_port, AS_IO, 8, primo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x3f ) AM_READWRITE_LEGACY( primo_be_1_r, primo_ki_1_w )
-	AM_RANGE( 0x40, 0x7f ) AM_READWRITE_LEGACY( primo_be_2_r, primo_ki_2_w )
-	AM_RANGE( 0xfd, 0xfd ) AM_WRITE_LEGACY( primo_FD_w )
+	AM_RANGE( 0x00, 0x3f ) AM_READWRITE_LEGACY(primo_be_1_r, primo_ki_1_w )
+	AM_RANGE( 0x40, 0x7f ) AM_READWRITE_LEGACY(primo_be_2_r, primo_ki_2_w )
+	AM_RANGE( 0xfd, 0xfd ) AM_WRITE_LEGACY(primo_FD_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( primo32_mem, AS_PROGRAM, 8, primo_state )

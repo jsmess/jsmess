@@ -646,7 +646,7 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
     //AM_RANGE(0x094000, 0x0943ff) AM_READWRITE_LEGACY(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
     AM_RANGE(0x094000, 0x0943ff) AM_WRITE8_LEGACY(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
     AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8_LEGACY(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
-    AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8_LEGACY( "duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
+    AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
     AM_RANGE(0x09C000, 0x09C001) AM_READWRITE_LEGACY(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
     AM_RANGE(0x09C002, 0x09C003) AM_WRITE_LEGACY(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
     AM_RANGE(0x09C004, 0x09C005) AM_READWRITE_LEGACY(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
