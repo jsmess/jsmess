@@ -111,18 +111,6 @@ void prof80_state::floppy_motor_off()
 
 
 //-------------------------------------------------
-//  TIMER_CALLBACK( floppy_motor_off_tick )
-//-------------------------------------------------
-
-static TIMER_CALLBACK( floppy_motor_off_tick )
-{
-	prof80_state *state = machine.driver_data<prof80_state>();
-
-	state->floppy_motor_off();
-}
-
-
-//-------------------------------------------------
 //  ls259_w -
 //-------------------------------------------------
 
@@ -164,7 +152,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 			// trigger floppy motor off NE555 timer
 			int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
 
-			m_floppy_motor_off_timer->adjust(attotime::from_msec(t));
+			timer_set(attotime::from_msec(t), TIMER_ID_MOTOR);
 		}
 		else
 		{
@@ -177,7 +165,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 			m_motor = 1;
 
 			// reset floppy motor off NE555 timer
-			m_floppy_motor_off_timer->enable(0);
+			timer_set(attotime::never, TIMER_ID_MOTOR);
 		}
 		break;
 
@@ -204,7 +192,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		if (!fb)
 		{
 			// immediately turn off floppy motor
-			m_floppy_motor_off_timer->adjust(attotime::zero);
+			synchronize(TIMER_ID_MOTOR);
 		}
 		break;
 
@@ -570,6 +558,21 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 //-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void prof80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ID_MOTOR:
+		floppy_motor_off();
+		break;
+	}
+}
+
+
+//-------------------------------------------------
 //  MACHINE_START( prof80 )
 //-------------------------------------------------
 
@@ -578,9 +581,6 @@ void prof80_state::machine_start()
 	// initialize RTC
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
-
-	// allocate floppy motor off timer
-	m_floppy_motor_off_timer = machine().scheduler().timer_alloc(FUNC(floppy_motor_off_tick));
 
 	// bank switch
 	bankswitch();
