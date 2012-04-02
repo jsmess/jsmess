@@ -238,8 +238,8 @@ static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, visicom_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_io_map, AS_IO, 8, visicom_state )
-	AM_RANGE(0x01, 0x01) AM_WRITE_BASE(studio2_state, dispon_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_BASE(studio2_state, keylatch_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(dispon_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_map, AS_PROGRAM, 8, mpt02_state )
@@ -251,7 +251,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_io_map, AS_IO, 8, mpt02_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_BASE(studio2_state, keylatch_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispoff_r, tone_latch_w)
 ADDRESS_MAP_END
 
