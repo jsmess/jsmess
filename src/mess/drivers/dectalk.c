@@ -179,6 +179,19 @@ public:
 	UINT8 m_hack_self_test; // temp variable for hack below
 
 	required_device<generic_terminal_device> m_terminal;
+	DECLARE_READ8_MEMBER(nvram_read);
+	DECLARE_WRITE8_MEMBER(led_write);
+	DECLARE_WRITE8_MEMBER(nvram_write);
+	DECLARE_WRITE16_MEMBER(m68k_infifo_w);
+	DECLARE_READ16_MEMBER(m68k_spcflags_r);
+	DECLARE_WRITE16_MEMBER(m68k_spcflags_w);
+	DECLARE_READ16_MEMBER(m68k_tlcflags_r);
+	DECLARE_WRITE16_MEMBER(m68k_tlcflags_w);
+	DECLARE_READ16_MEMBER(m68k_tlc_dtmf_r);
+	DECLARE_WRITE16_MEMBER(spc_latch_outfifo_error_stats);
+	DECLARE_READ16_MEMBER(spc_infifo_data_r);
+	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
+	DECLARE_READ16_MEMBER(spc_semaphore_r);
 };
 
 
@@ -337,23 +350,21 @@ static MACHINE_RESET( dectalk )
 }
 
 /* Begin 68k i/o handlers */
-static READ8_HANDLER( nvram_read ) // read from x2212 nvram chip and possibly do recall
+READ8_MEMBER(dectalk_state::nvram_read)// read from x2212 nvram chip and possibly do recall
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 	UINT8 data = 0xFF;
-	data = state->m_x2214_sram[offset&0xff]; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
+	data = m_x2214_sram[offset&0xff]; // TODO: should this be before or after a possible /RECALL? I'm guessing before.
 #ifdef NVRAM_LOG
 		logerror("m68k: nvram read at %08X: %02X\n", offset, data);
 #endif
 	if (offset&0x200) // if a9 is set, do a /RECALL
-	dectalk_x2212_recall(space->machine());
+	dectalk_x2212_recall(machine());
 	return data;
 }
 
-static WRITE8_HANDLER( led_write )
+WRITE8_MEMBER(dectalk_state::led_write)
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
-	state->m_statusLED = data&0xFF;
+	m_statusLED = data&0xFF;
 	popmessage("LED status: %02X\n", data&0xFF);
 #ifdef VERBOSE
 	logerror("m68k: LED status: %02X\n", data&0xFF);
@@ -361,80 +372,76 @@ static WRITE8_HANDLER( led_write )
 	//popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
-static WRITE8_HANDLER( nvram_write ) // write to X2212 NVRAM chip and possibly do store
+WRITE8_MEMBER(dectalk_state::nvram_write)// write to X2212 NVRAM chip and possibly do store
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 #ifdef NVRAM_LOG
 	logerror("m68k: nvram write at %08X: %02X\n", offset, data&0x0f);
 #endif
-	state->m_x2214_sram[offset&0xff] = (UINT8)data&0x0f; // TODO: should this be before or after a possible /STORE? I'm guessing before.
+	m_x2214_sram[offset&0xff] = (UINT8)data&0x0f; // TODO: should this be before or after a possible /STORE? I'm guessing before.
 	if (offset&0x200) // if a9 is set, do a /STORE
-	dectalk_x2212_store(space->machine());
+	dectalk_x2212_store(machine());
 }
 
-static WRITE16_HANDLER( m68k_infifo_w ) // 68k write to the speech input fifo
+WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fifo
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
-	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, state->m_infifo_head_ptr, state->m_infifo_tail_ptr);
+	logerror("m68k: SPC infifo written with data = %04X, fifo head was: %02X; fifo tail: %02X\n",data, m_infifo_head_ptr, m_infifo_tail_ptr);
 #endif
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
-	if (((state->m_infifo_tail_ptr-1)&0x1F) == state->m_infifo_head_ptr)
+	if (((m_infifo_tail_ptr-1)&0x1F) == m_infifo_head_ptr)
 	{
 #ifdef SPC_LOG_68K
 		logerror("infifo was full, write ignored!\n");
 #endif
 		return;
 	}
-	state->m_infifo[state->m_infifo_head_ptr] = data;
-	state->m_infifo_head_ptr++;
-	state->m_infifo_head_ptr&=0x1F;
+	m_infifo[m_infifo_head_ptr] = data;
+	m_infifo_head_ptr++;
+	m_infifo_head_ptr&=0x1F;
 }
 
-static READ16_HANDLER( m68k_spcflags_r ) // 68k read from the speech flags
+READ16_MEMBER(dectalk_state::m68k_spcflags_r)// 68k read from the speech flags
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 	UINT8 data = 0;
-	data |= state->m_m68k_spcflags_latch; // bits 0 and 6
-	data |= state->m_spc_error_latch<<5; // bit 5
-	data |= state->m_infifo_semaphore<<7; // bit 7
+	data |= m_m68k_spcflags_latch; // bits 0 and 6
+	data |= m_spc_error_latch<<5; // bit 5
+	data |= m_infifo_semaphore<<7; // bit 7
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags read, returning data = %04X\n",data);
 #endif
 	return data;
 }
 
-static WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only 3 bits do anything)
+WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (only 3 bits do anything)
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_68K
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
 #endif
-	state->m_m68k_spcflags_latch = data&0x41; // ONLY store bits 6 and 0!
+	m_m68k_spcflags_latch = data&0x41; // ONLY store bits 6 and 0!
 	// d0: initialize speech flag (reset tms32010 and clear infifo and outfifo if high)
 	if ((data&0x1) == 0x1) // bit 0
 	{
 #ifdef SPC_LOG_68K
 		logerror(" | 0x01: initialize speech: fifos reset, clear error+semaphore latches and dsp reset\n");
 #endif
-		dectalk_clear_all_fifos(space->machine());
-		cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+		dectalk_clear_all_fifos(machine());
+		cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 		// clear the two speech side latches
-		state->m_spc_error_latch = 0;
-		dectalk_semaphore_w(space->machine(), 0);
+		m_spc_error_latch = 0;
+		dectalk_semaphore_w(machine(), 0);
 	}
 	else // (data&0x1) == 0
 	{
 #ifdef SPC_LOG_68K
 		logerror(" | 0x01 = 0: initialize speech off, dsp running\n");
 #endif
-		cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
+		cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
 	}
 	if ((data&0x2) == 0x2) // bit 1 - clear error and semaphore latches
 	{
@@ -442,20 +449,20 @@ static WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only
 		logerror(" | 0x02: clear error+semaphore latches\n");
 #endif
 		// clear the two speech side latches
-		state->m_spc_error_latch = 0;
-		dectalk_semaphore_w(space->machine(), 0);
+		m_spc_error_latch = 0;
+		dectalk_semaphore_w(machine(), 0);
 	}
 	if ((data&0x40) == 0x40) // bit 6 - spc irq enable
 	{
 #ifdef SPC_LOG_68K
 		logerror(" | 0x40: speech int enabled\n");
 #endif
-		if (state->m_infifo_semaphore == 1)
+		if (m_infifo_semaphore == 1)
 		{
 #ifdef SPC_LOG_68K
 			logerror("    speech int fired!\n");
 #endif
-			cputag_set_input_line_and_vector(space->machine(), "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
+			cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
 		}
 	}
 	else // data&0x40 == 0
@@ -463,41 +470,39 @@ static WRITE16_HANDLER( m68k_spcflags_w ) // 68k write to the speech flags (only
 #ifdef SPC_LOG_68K
 		logerror(" | 0x40 = 0: speech int disabled\n");
 #endif
-		cputag_set_input_line_and_vector(space->machine(), "maincpu", M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
 }
 
-static READ16_HANDLER( m68k_tlcflags_r ) // dtmf flags read
+READ16_MEMBER(dectalk_state::m68k_tlcflags_r)// dtmf flags read
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 	UINT16 data = 0;
-	data |= state->m_m68k_tlcflags_latch; // bits 6, 8, 14;
-	data |= state->m_tlc_tonedetect<<7; // bit 7 is tone detect
-	data |= state->m_tlc_ringdetect<<14; // bit 15 is ring detect
+	data |= m_m68k_tlcflags_latch; // bits 6, 8, 14;
+	data |= m_tlc_tonedetect<<7; // bit 7 is tone detect
+	data |= m_tlc_ringdetect<<14; // bit 15 is ring detect
 #ifdef TLC_LOG
 	logerror("m68k: TLC flags read, returning data = %04X\n",data);
 #endif
 	return data;
 }
 
-static WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
+WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 #ifdef TLC_LOG
 	logerror("m68k: TLC flags written with %04X, only storing %04X\n",data, data&0x4140);
 #endif
-	state->m_m68k_tlcflags_latch = data&0x4140; // ONLY store bits 6 8 and 14!
+	m_m68k_tlcflags_latch = data&0x4140; // ONLY store bits 6 8 and 14!
 	if ((data&0x40) == 0x40) // bit 6: tone detect interrupt enable
 	{
 #ifdef TLC_LOG
 		logerror(" | 0x40: tone detect int enabled\n");
 #endif
-		if (state->m_tlc_tonedetect == 1)
+		if (m_tlc_tonedetect == 1)
 		{
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
-			cputag_set_input_line_and_vector(space->machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+			cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
 		}
 	}
 	else // data&0x40 == 0
@@ -505,8 +510,8 @@ static WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 #ifdef TLC_LOG
 		logerror(" | 0x40 = 0: tone detect int disabled\n");
 #endif
-	if (((data&0x4000)!=0x4000) || (state->m_tlc_ringdetect == 0)) // check to be sure we don't disable int if both ints fired at once
-		cputag_set_input_line_and_vector(space->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+	if (((data&0x4000)!=0x4000) || (m_tlc_ringdetect == 0)) // check to be sure we don't disable int if both ints fired at once
+		cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
 	if ((data&0x100) == 0x100) // bit 8: answer phone relay enable
 	{
@@ -525,12 +530,12 @@ static WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 #ifdef TLC_LOG
 		logerror(" | 0x4000: ring detect int enabled\n");
 #endif
-		if (state->m_tlc_ringdetect == 1)
+		if (m_tlc_ringdetect == 1)
 		{
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
-			cputag_set_input_line_and_vector(space->machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+			cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
 		}
 	}
 	else // data&0x4000 == 0
@@ -538,17 +543,16 @@ static WRITE16_HANDLER( m68k_tlcflags_w ) // dtmf flags write
 #ifdef TLC_LOG
 		logerror(" | 0x4000 = 0: ring detect int disabled\n");
 #endif
-	if (((data&0x40)!=0x40) || (state->m_tlc_tonedetect == 0)) // check to be sure we don't disable int if both ints fired at once
-		cputag_set_input_line_and_vector(space->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+	if (((data&0x40)!=0x40) || (m_tlc_tonedetect == 0)) // check to be sure we don't disable int if both ints fired at once
+		cputag_set_input_line_and_vector(machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
 	}
 }
 
-static READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
+READ16_MEMBER(dectalk_state::m68k_tlc_dtmf_r)// dtmf chip read
 {
 #ifdef TLC_LOG
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 	UINT16 data = 0xFFFF;
-	data = state->m_tlc_dtmf&0xF;
+	data = m_tlc_dtmf&0xF;
 	logerror("m68k: TLC dtmf detector read, returning data = %02X", data);
 #endif
 	return 0;
@@ -556,64 +560,60 @@ static READ16_HANDLER( m68k_tlc_dtmf_r ) // dtmf chip read
 /* End 68k i/o handlers */
 
 /* Begin tms32010 i/o handlers */
-static WRITE16_HANDLER( spc_latch_outfifo_error_stats ) // latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
+WRITE16_MEMBER(dectalk_state::spc_latch_outfifo_error_stats)// latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 #ifdef USE_LOOSE_TIMING
-	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(25));
 #endif
 #ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
 #endif
-	dectalk_semaphore_w(space->machine(), (~state->m_simulate_outfifo_error)&1); // always set to 1 here, unless outfifo error.
-	state->m_spc_error_latch = (data&1);
+	dectalk_semaphore_w(machine(), (~m_simulate_outfifo_error)&1); // always set to 1 here, unless outfifo error.
+	m_spc_error_latch = (data&1);
 }
 
-static READ16_HANDLER( spc_infifo_data_r )
+READ16_MEMBER(dectalk_state::spc_infifo_data_r)
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 	UINT16 data = 0xFFFF;
-	data = state->m_infifo[state->m_infifo_tail_ptr];
+	data = m_infifo[m_infifo_tail_ptr];
 #ifdef SPC_LOG_DSP
-	logerror("dsp: SPC infifo read with data = %04X, fifo head: %02X; fifo tail was: %02X\n",data, state->m_infifo_head_ptr, state->m_infifo_tail_ptr);
+	logerror("dsp: SPC infifo read with data = %04X, fifo head: %02X; fifo tail was: %02X\n",data, m_infifo_head_ptr, m_infifo_tail_ptr);
 #endif
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
-	if (state->m_infifo_tail_ptr != state->m_infifo_head_ptr) state->m_infifo_tail_ptr++; // technically correct but doesn't match sn74ls224 sheet
-	//if (((state->m_infifo_head_ptr-1)&0x1F) != state->m_infifo_tail_ptr) state->m_infifo_tail_ptr++; // matches sn74ls224 sheet
-	state->m_infifo_tail_ptr&=0x1F;
+	if (m_infifo_tail_ptr != m_infifo_head_ptr) m_infifo_tail_ptr++; // technically correct but doesn't match sn74ls224 sheet
+	//if (((m_infifo_head_ptr-1)&0x1F) != m_infifo_tail_ptr) m_infifo_tail_ptr++; // matches sn74ls224 sheet
+	m_infifo_tail_ptr&=0x1F;
 	return data;
 }
 
-static WRITE16_HANDLER( spc_outfifo_data_w )
+WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 	// the low 4 data bits are thrown out on the real unit due to use of a 12 bit dac (and to save use of another 16x4 fifo chip), though technically they're probably valid, and with suitable hacking a dtc-01 could probably output full 16 bit samples at 10khz.
 #ifdef SPC_LOG_DSP
-	logerror("dsp: SPC outfifo write, data = %04X, fifo head was: %02X; fifo tail: %02X\n", data, state->m_outfifo_head_ptr, state->m_outfifo_tail_ptr);
+	logerror("dsp: SPC outfifo write, data = %04X, fifo head was: %02X; fifo tail: %02X\n", data, m_outfifo_head_ptr, m_outfifo_tail_ptr);
 #endif
-	cputag_set_input_line(space->machine(), "dsp", 0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
+	cputag_set_input_line(machine(), "dsp", 0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
-	if (((state->m_outfifo_tail_ptr-1)&0xF) == state->m_outfifo_head_ptr)
+	if (((m_outfifo_tail_ptr-1)&0xF) == m_outfifo_head_ptr)
 	{
 #ifdef SPC_LOG_DSP
 		logerror("outfifo was full, write ignored!\n");
 #endif
 		return;
 	}
-	state->m_outfifo[state->m_outfifo_head_ptr] = data;
-	state->m_outfifo_head_ptr++;
-	state->m_outfifo_head_ptr&=0xF;
-	//dectalk_outfifo_check(space->machine()); // commented to allow int to clear
+	m_outfifo[m_outfifo_head_ptr] = data;
+	m_outfifo_head_ptr++;
+	m_outfifo_head_ptr&=0xF;
+	//dectalk_outfifo_check(machine()); // commented to allow int to clear
 }
 
-static READ16_HANDLER( spc_semaphore_r ) // Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
+READ16_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
 {
-	dectalk_state *state = space->machine().driver_data<dectalk_state>();
 #ifdef SPC_LOG_DSP
-	//logerror("dsp: read infifo semaphore, returned %d\n", state->m_infifo_semaphore); // commented due to extreme annoyance factor
-	if (!state->m_infifo_semaphore) logerror("dsp: read infifo semaphore, returned %d\n", state->m_infifo_semaphore);
+	//logerror("dsp: read infifo semaphore, returned %d\n", m_infifo_semaphore); // commented due to extreme annoyance factor
+	if (!m_infifo_semaphore) logerror("dsp: read infifo semaphore, returned %d\n", m_infifo_semaphore);
 #endif
-	return state->m_infifo_semaphore;
+	return m_infifo_semaphore;
 }
 /* end tms32010 i/o handlers */
 
@@ -644,13 +644,13 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
     AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x740000) /* ROM */
     AM_RANGE(0x080000, 0x093fff) AM_RAM AM_MIRROR(0x760000) /* RAM */
     //AM_RANGE(0x094000, 0x0943ff) AM_READWRITE_LEGACY(led_sw_nvr_read, led_sw_nv_write) AM_MIRROR(0x763C00) /* LED array and Xicor X2212 NVRAM */
-    AM_RANGE(0x094000, 0x0943ff) AM_WRITE8_LEGACY(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
-    AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8_LEGACY(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
+    AM_RANGE(0x094000, 0x0943ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
+    AM_RANGE(0x094000, 0x0943ff) AM_READWRITE8(nvram_read, nvram_write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
     AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff) AM_MIRROR(0x763FE0) /* DUART */
-    AM_RANGE(0x09C000, 0x09C001) AM_READWRITE_LEGACY(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
-    AM_RANGE(0x09C002, 0x09C003) AM_WRITE_LEGACY(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
-    AM_RANGE(0x09C004, 0x09C005) AM_READWRITE_LEGACY(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
-    AM_RANGE(0x09C006, 0x09C007) AM_READ_LEGACY(m68k_tlc_dtmf_r) AM_MIRROR(0x763FF8) /* telephone dtmf read */
+    AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
+    AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
+    AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
+    AM_RANGE(0x09C006, 0x09C007) AM_READ(m68k_tlc_dtmf_r) AM_MIRROR(0x763FF8) /* telephone dtmf read */
 ADDRESS_MAP_END
 
 // do we even need this below?
@@ -663,9 +663,9 @@ static ADDRESS_MAP_START(tms32010_mem, AS_PROGRAM, 16, dectalk_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms32010_io, AS_IO, 16, dectalk_state )
-    AM_RANGE(0, 0) AM_WRITE_LEGACY(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
-    AM_RANGE(1, 1) AM_READWRITE_LEGACY(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
-    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ_LEGACY(spc_semaphore_r) //read output fifo writable status
+    AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
+    AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
+    AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(spc_semaphore_r) //read output fifo writable status
 ADDRESS_MAP_END
 
 /******************************************************************************

@@ -54,6 +54,8 @@ public:
 	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
 	int port_g_read_count;
 	#endif
+	DECLARE_READ32_MEMBER(juicebox_nand_r);
+	DECLARE_WRITE32_MEMBER(juicebox_nand_w);
 };
 
 /***************************************************************************
@@ -203,26 +205,24 @@ static void s3c44b0_gpio_port_w( device_t *device, int port, UINT32 data)
 
 // ...
 
-static READ32_HANDLER( juicebox_nand_r )
+READ32_MEMBER(juicebox_state::juicebox_nand_r)
 {
-	running_machine &machine = space->machine();
 	UINT32 data = 0;
-	if (mem_mask & 0x000000FF) data = data | (smc_read( machine) <<  0);
-	if (mem_mask & 0x0000FF00) data = data | (smc_read( machine) <<  8);
-	if (mem_mask & 0x00FF0000) data = data | (smc_read( machine) << 16);
-	if (mem_mask & 0xFF000000) data = data | (smc_read( machine) << 24);
-	verboselog( machine, 5, "juicebox_nand_r %08X %08X %08X\n", offset, mem_mask, data);
+	if (mem_mask & 0x000000FF) data = data | (smc_read(machine()) <<  0);
+	if (mem_mask & 0x0000FF00) data = data | (smc_read(machine()) <<  8);
+	if (mem_mask & 0x00FF0000) data = data | (smc_read(machine()) << 16);
+	if (mem_mask & 0xFF000000) data = data | (smc_read(machine()) << 24);
+	verboselog( machine(), 5, "juicebox_nand_r %08X %08X %08X\n", offset, mem_mask, data);
 	return data;
 }
 
-static WRITE32_HANDLER( juicebox_nand_w )
+WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 {
-	running_machine &machine = space->machine();
-	verboselog( machine, 5, "juicebox_nand_w %08X %08X %08X\n", offset, mem_mask, data);
-	if (mem_mask & 0x000000FF) smc_write( machine, (data >>  0) & 0xFF);
-	if (mem_mask & 0x0000FF00) smc_write( machine, (data >>  8) & 0xFF);
-	if (mem_mask & 0x00FF0000) smc_write( machine, (data >> 16) & 0xFF);
-	if (mem_mask & 0xFF000000) smc_write( machine, (data >> 24) & 0xFF);
+	verboselog( machine(), 5, "juicebox_nand_w %08X %08X %08X\n", offset, mem_mask, data);
+	if (mem_mask & 0x000000FF) smc_write(machine(), (data >>  0) & 0xFF);
+	if (mem_mask & 0x0000FF00) smc_write(machine(), (data >>  8) & 0xFF);
+	if (mem_mask & 0x00FF0000) smc_write(machine(), (data >> 16) & 0xFF);
+	if (mem_mask & 0xFF000000) smc_write(machine(), (data >> 24) & 0xFF);
 }
 
 // I2S
@@ -264,7 +264,7 @@ static MACHINE_RESET( juicebox )
 
 static ADDRESS_MAP_START( juicebox_map, AS_PROGRAM, 32, juicebox_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_ROM
-	AM_RANGE(0x04000000, 0x04ffffff) AM_READWRITE_LEGACY(juicebox_nand_r, juicebox_nand_w )
+	AM_RANGE(0x04000000, 0x04ffffff) AM_READWRITE(juicebox_nand_r, juicebox_nand_w )
 	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_MIRROR(0x00600000)
 ADDRESS_MAP_END
 

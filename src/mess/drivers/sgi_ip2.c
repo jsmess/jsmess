@@ -69,6 +69,33 @@ public:
 	UINT8 m_mbp;
 
 	required_device<generic_terminal_device> m_terminal;
+	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
+	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);
+	DECLARE_READ16_MEMBER(sgi_ip2_m_quad_r);
+	DECLARE_WRITE16_MEMBER(sgi_ip2_m_quad_w);
+	DECLARE_READ16_MEMBER(sgi_ip2_swtch_r);
+	DECLARE_READ8_MEMBER(sgi_ip2_clock_ctl_r);
+	DECLARE_WRITE8_MEMBER(sgi_ip2_clock_ctl_w);
+	DECLARE_READ8_MEMBER(sgi_ip2_clock_data_r);
+	DECLARE_WRITE8_MEMBER(sgi_ip2_clock_data_w);
+	DECLARE_READ8_MEMBER(sgi_ip2_os_base_r);
+	DECLARE_WRITE8_MEMBER(sgi_ip2_os_base_w);
+	DECLARE_READ16_MEMBER(sgi_ip2_status_r);
+	DECLARE_WRITE16_MEMBER(sgi_ip2_status_w);
+	DECLARE_READ8_MEMBER(sgi_ip2_parctl_r);
+	DECLARE_WRITE8_MEMBER(sgi_ip2_parctl_w);
+	DECLARE_READ8_MEMBER(sgi_ip2_mbp_r);
+	DECLARE_WRITE8_MEMBER(sgi_ip2_mbp_w);
+	DECLARE_READ32_MEMBER(sgi_ip2_ptmap_r);
+	DECLARE_WRITE32_MEMBER(sgi_ip2_ptmap_w);
+	DECLARE_READ16_MEMBER(sgi_ip2_tdbase_r);
+	DECLARE_WRITE16_MEMBER(sgi_ip2_tdbase_w);
+	DECLARE_READ16_MEMBER(sgi_ip2_tdlmt_r);
+	DECLARE_WRITE16_MEMBER(sgi_ip2_tdlmt_w);
+	DECLARE_READ16_MEMBER(sgi_ip2_stkbase_r);
+	DECLARE_WRITE16_MEMBER(sgi_ip2_stkbase_w);
+	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
+	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
 };
 
 
@@ -104,18 +131,16 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 #define BOARD_REV2		0x50	/* Board revision - #2 */
 
 
-static READ8_HANDLER(sgi_ip2_m_but_r)
+READ8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_r)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_m_but_r: %02x\n", state->m_mbut | BOARD_REV1);
-	return state->m_mbut | BOARD_REV1;
+	verboselog(machine(), 0, "sgi_ip2_m_but_r: %02x\n", m_mbut | BOARD_REV1);
+	return m_mbut | BOARD_REV1;
 }
 
-static WRITE8_HANDLER(sgi_ip2_m_but_w)
+WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_w)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_m_but_w: %02x\n", data);
-	state->m_mbut = data;
+	verboselog(machine(), 0, "sgi_ip2_m_but_w: %02x\n", data);
+	m_mbut = data;
 }
 
 #define MOUSE_XFIRE		0x01	/* X Quadrature Fired, active low */
@@ -124,96 +149,94 @@ static WRITE8_HANDLER(sgi_ip2_m_but_w)
 #define MOUSE_YCHANGE	0x08	/* MOUSE_YCHANGE ? y-- : y++ */
 
 
-static READ16_HANDLER(sgi_ip2_m_quad_r)
+READ16_MEMBER(sgi_ip2_state::sgi_ip2_m_quad_r)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_m_quad_r: %04x\n", state->m_mquad);
-	return state->m_mquad;
+	verboselog(machine(), 0, "sgi_ip2_m_quad_r: %04x\n", m_mquad);
+	return m_mquad;
 }
 
-static WRITE16_HANDLER(sgi_ip2_m_quad_w)
+WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_m_quad_w)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_m_quad_w = %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&state->m_mquad);
+	verboselog(machine(), 0, "sgi_ip2_m_quad_w = %04x & %04x\n", data, mem_mask);
+	COMBINE_DATA(&m_mquad);
 }
 
-static READ16_HANDLER(sgi_ip2_swtch_r)
+READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
 {
-	verboselog(space->machine(), 0, "sgi_ip2_swtch_r: %04x\n", input_port_read(space->machine(), "SWTCH"));
-	return input_port_read(space->machine(), "SWTCH");
+	verboselog(machine(), 0, "sgi_ip2_swtch_r: %04x\n", input_port_read(machine(), "SWTCH"));
+	return input_port_read(machine(), "SWTCH");
 }
 
-static READ8_HANDLER(sgi_ip2_clock_ctl_r)
+READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
 {
-	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
-	UINT8 ret = rtc->read(*space, 1);
-	verboselog(space->machine(), 1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
+	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
+	UINT8 ret = rtc->read(*&space, 1);
+	verboselog(machine(), 1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
 	return ret;
 }
 
-static WRITE8_HANDLER(sgi_ip2_clock_ctl_w)
+WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_w)
 {
-	verboselog(space->machine(), 1, "sgi_ip2_clock_ctl_w: %02x\n", data);
-	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
-	rtc->write(*space, 1, data);
+	verboselog(machine(), 1, "sgi_ip2_clock_ctl_w: %02x\n", data);
+	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
+	rtc->write(*&space, 1, data);
 }
 
-static READ8_HANDLER(sgi_ip2_clock_data_r)
+READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
 {
-	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
-	UINT8 ret = rtc->read(*space, 0);
+	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
+	UINT8 ret = rtc->read(*&space, 0);
 
-	verboselog(space->machine(), 1, "sgi_ip2_clock_data_r: %02x\n", ret);
+	verboselog(machine(), 1, "sgi_ip2_clock_data_r: %02x\n", ret);
 	return ret;
 }
 
-static WRITE8_HANDLER(sgi_ip2_clock_data_w)
+WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_w)
 {
-	verboselog(space->machine(), 1, "sgi_ip2_clock_data_w: %02x\n", data);
-	mc146818_device *rtc = space->machine().device<mc146818_device>("rtc");
-	rtc->write(*space, 0, data);
+	verboselog(machine(), 1, "sgi_ip2_clock_data_w: %02x\n", data);
+	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
+	rtc->write(*&space, 0, data);
 }
 
 
-static READ8_HANDLER(sgi_ip2_os_base_r)
+READ8_MEMBER(sgi_ip2_state::sgi_ip2_os_base_r)
 {
 	switch(offset)
 	{
 		default:
-			verboselog(space->machine(), 0, "sgi_ip2_os_base_r: Unknown Register %08x\n", 0x36000000 + offset);
+			verboselog(machine(), 0, "sgi_ip2_os_base_r: Unknown Register %08x\n", 0x36000000 + offset);
 			break;
 	}
 	return 0;
 }
 
-static WRITE8_HANDLER(sgi_ip2_os_base_w)
+WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_os_base_w)
 {
 	switch(offset)
 	{
 		default:
-			verboselog(space->machine(), 0, "sgi_ip2_os_base_w: Unknown Register %08x = %02x\n", 0x36000000 + offset, data);
+			verboselog(machine(), 0, "sgi_ip2_os_base_w: Unknown Register %08x = %02x\n", 0x36000000 + offset, data);
 			break;
 	}
 }
 
-static READ16_HANDLER(sgi_ip2_status_r)
+READ16_MEMBER(sgi_ip2_state::sgi_ip2_status_r)
 {
 	switch(offset)
 	{
 		default:
-			verboselog(space->machine(), 0, "sgi_ip2_status_r: Unknown Register %08x & %04x\n", 0x38000000 + (offset << 1), mem_mask);
+			verboselog(machine(), 0, "sgi_ip2_status_r: Unknown Register %08x & %04x\n", 0x38000000 + (offset << 1), mem_mask);
 			break;
 	}
 	return 0;
 }
 
-static WRITE16_HANDLER(sgi_ip2_status_w)
+WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_status_w)
 {
 	switch(offset)
 	{
 		default:
-			verboselog(space->machine(), 0, "sgi_ip2_status_w: Unknown Register %08x = %04x & %04x\n", 0x38000000 + (offset << 1), data, mem_mask);
+			verboselog(machine(), 0, "sgi_ip2_status_w: Unknown Register %08x = %04x & %04x\n", 0x38000000 + (offset << 1), data, mem_mask);
 			break;
 	}
 }
@@ -228,18 +251,16 @@ static WRITE16_HANDLER(sgi_ip2_status_w)
 #define PAR_MBW		0x80	/* Check parity on multibus writes */
 
 
-static READ8_HANDLER(sgi_ip2_parctl_r)
+READ8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_r)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_parctl_r: %02x\n", state->m_parctl);
-	return state->m_parctl;
+	verboselog(machine(), 0, "sgi_ip2_parctl_r: %02x\n", m_parctl);
+	return m_parctl;
 }
 
-static WRITE8_HANDLER(sgi_ip2_parctl_w)
+WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_w)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_parctl_w: %02x\n", data);
-	state->m_parctl = data;
+	verboselog(machine(), 0, "sgi_ip2_parctl_w: %02x\n", data);
+	m_parctl = data;
 }
 
 #define MBP_DCACC	0x01	/* Display controller access (I/O page 4) */
@@ -252,93 +273,81 @@ static WRITE8_HANDLER(sgi_ip2_parctl_w)
 #define MBP_HMACC	0x80	/* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
 
 
-static READ8_HANDLER(sgi_ip2_mbp_r)
+READ8_MEMBER(sgi_ip2_state::sgi_ip2_mbp_r)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_mbp_r: %02x\n", state->m_mbp);
-	return state->m_mbp;
+	verboselog(machine(), 0, "sgi_ip2_mbp_r: %02x\n", m_mbp);
+	return m_mbp;
 }
 
-static WRITE8_HANDLER(sgi_ip2_mbp_w)
+WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_mbp_w)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_mbp_w: %02x\n", data);
-	state->m_mbp = data;
-}
-
-
-static READ32_HANDLER(sgi_ip2_ptmap_r)
-{
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_ptmap_r: %08x = %08x & %08x\n", 0x3b000000 + (offset << 2), state->m_ptmap[offset], mem_mask);
-	return state->m_ptmap[offset];
-}
-
-static WRITE32_HANDLER(sgi_ip2_ptmap_w)
-{
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_ptmap_w: %08x = %08x & %08x\n", 0x3b000000 + (offset << 2), data, mem_mask);
-	COMBINE_DATA(&state->m_ptmap[offset]);
+	verboselog(machine(), 0, "sgi_ip2_mbp_w: %02x\n", data);
+	m_mbp = data;
 }
 
 
-static READ16_HANDLER(sgi_ip2_tdbase_r)
+READ32_MEMBER(sgi_ip2_state::sgi_ip2_ptmap_r)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_tdbase_r: %04x\n", state->m_tdbase);
-	return state->m_tdbase;
+	verboselog(machine(), 0, "sgi_ip2_ptmap_r: %08x = %08x & %08x\n", 0x3b000000 + (offset << 2), m_ptmap[offset], mem_mask);
+	return m_ptmap[offset];
 }
 
-static WRITE16_HANDLER(sgi_ip2_tdbase_w)
+WRITE32_MEMBER(sgi_ip2_state::sgi_ip2_ptmap_w)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_tdbase_w: %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&state->m_tdbase);
-}
-
-
-static READ16_HANDLER(sgi_ip2_tdlmt_r)
-{
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_tdlmt_r: %04x\n", state->m_tdlmt);
-	return state->m_tdlmt;
-}
-
-static WRITE16_HANDLER(sgi_ip2_tdlmt_w)
-{
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_tdlmt_w: %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&state->m_tdlmt);
+	verboselog(machine(), 0, "sgi_ip2_ptmap_w: %08x = %08x & %08x\n", 0x3b000000 + (offset << 2), data, mem_mask);
+	COMBINE_DATA(&m_ptmap[offset]);
 }
 
 
-static READ16_HANDLER(sgi_ip2_stkbase_r)
+READ16_MEMBER(sgi_ip2_state::sgi_ip2_tdbase_r)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_stkbase_r: %04x\n", state->m_stkbase);
-	return state->m_stkbase;
+	verboselog(machine(), 0, "sgi_ip2_tdbase_r: %04x\n", m_tdbase);
+	return m_tdbase;
 }
 
-static WRITE16_HANDLER(sgi_ip2_stkbase_w)
+WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_tdbase_w)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_stkbase_w: %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&state->m_stkbase);
+	verboselog(machine(), 0, "sgi_ip2_tdbase_w: %04x & %04x\n", data, mem_mask);
+	COMBINE_DATA(&m_tdbase);
 }
 
 
-static READ16_HANDLER(sgi_ip2_stklmt_r)
+READ16_MEMBER(sgi_ip2_state::sgi_ip2_tdlmt_r)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_stklmt_r: %04x\n", state->m_stklmt);
-	return state->m_stklmt;
+	verboselog(machine(), 0, "sgi_ip2_tdlmt_r: %04x\n", m_tdlmt);
+	return m_tdlmt;
 }
 
-static WRITE16_HANDLER(sgi_ip2_stklmt_w)
+WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_tdlmt_w)
 {
-	sgi_ip2_state *state = space->machine().driver_data<sgi_ip2_state>();
-	verboselog(space->machine(), 0, "sgi_ip2_stklmt_w: %04x & %04x\n", data, mem_mask);
-	COMBINE_DATA(&state->m_stklmt);
+	verboselog(machine(), 0, "sgi_ip2_tdlmt_w: %04x & %04x\n", data, mem_mask);
+	COMBINE_DATA(&m_tdlmt);
+}
+
+
+READ16_MEMBER(sgi_ip2_state::sgi_ip2_stkbase_r)
+{
+	verboselog(machine(), 0, "sgi_ip2_stkbase_r: %04x\n", m_stkbase);
+	return m_stkbase;
+}
+
+WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stkbase_w)
+{
+	verboselog(machine(), 0, "sgi_ip2_stkbase_w: %04x & %04x\n", data, mem_mask);
+	COMBINE_DATA(&m_stkbase);
+}
+
+
+READ16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_r)
+{
+	verboselog(machine(), 0, "sgi_ip2_stklmt_r: %04x\n", m_stklmt);
+	return m_stklmt;
+}
+
+WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_w)
+{
+	verboselog(machine(), 0, "sgi_ip2_stklmt_w: %04x & %04x\n", data, mem_mask);
+	COMBINE_DATA(&m_stklmt);
 }
 
 static WRITE8_DEVICE_HANDLER( sgi_kbd_put )
@@ -373,23 +382,23 @@ static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32, sgi_ip2_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_BASE(m_bss) // ??? I don't understand the need for this...
 	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8_LEGACY(sgi_ip2_m_but_r, 		sgi_ip2_m_but_w,		0xffffffff)
-	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16_LEGACY(sgi_ip2_m_quad_r,		sgi_ip2_m_quad_w,		0xffffffff)
-	AM_RANGE(0x31800000, 0x31800003) AM_READ16_LEGACY(sgi_ip2_swtch_r,										0xffffffff)
+	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r, 		sgi_ip2_m_but_w,		0xffffffff)
+	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,		sgi_ip2_m_quad_w,		0xffffffff)
+	AM_RANGE(0x31800000, 0x31800003) AM_READ16(sgi_ip2_swtch_r,										0xffffffff)
 	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8_LEGACY("duart68681a",		duart68681_r,		duart68681_w, 0xffffffff)
 	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8_LEGACY("duart68681b",		duart68681_r,		duart68681_w, 0xffffffff)
 	AM_RANGE(0x33000000, 0x330007ff) AM_RAM
-	AM_RANGE(0x34000000, 0x34000003) AM_READWRITE8_LEGACY(sgi_ip2_clock_ctl_r, 	sgi_ip2_clock_ctl_w,	0xffffffff)
-	AM_RANGE(0x35000000, 0x35000003) AM_READWRITE8_LEGACY(sgi_ip2_clock_data_r,	sgi_ip2_clock_data_w,	0xffffffff)
-	AM_RANGE(0x36000000, 0x36000003) AM_READWRITE8_LEGACY(sgi_ip2_os_base_r,		sgi_ip2_os_base_w,		0xffffffff)
-	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE16_LEGACY(sgi_ip2_status_r,		sgi_ip2_status_w,		0xffffffff)
-	AM_RANGE(0x39000000, 0x39000003) AM_READWRITE8_LEGACY(sgi_ip2_parctl_r,		sgi_ip2_parctl_w,		0xffffffff)
-	AM_RANGE(0x3a000000, 0x3a000003) AM_READWRITE8_LEGACY(sgi_ip2_mbp_r,			sgi_ip2_mbp_w,			0xffffffff)
-	AM_RANGE(0x3b000000, 0x3b003fff) AM_READWRITE_LEGACY(sgi_ip2_ptmap_r, sgi_ip2_ptmap_w) AM_BASE(m_ptmap)
-	AM_RANGE(0x3c000000, 0x3c000003) AM_READWRITE16_LEGACY(sgi_ip2_tdbase_r,		sgi_ip2_tdbase_w,		0xffffffff)
-	AM_RANGE(0x3d000000, 0x3d000003) AM_READWRITE16_LEGACY(sgi_ip2_tdlmt_r,		sgi_ip2_tdlmt_w,		0xffffffff)
-	AM_RANGE(0x3e000000, 0x3e000003) AM_READWRITE16_LEGACY(sgi_ip2_stkbase_r,		sgi_ip2_stkbase_w,		0xffffffff)
-	AM_RANGE(0x3f000000, 0x3f000003) AM_READWRITE16_LEGACY(sgi_ip2_stklmt_r,		sgi_ip2_stklmt_w,		0xffffffff)
+	AM_RANGE(0x34000000, 0x34000003) AM_READWRITE8(sgi_ip2_clock_ctl_r, 	sgi_ip2_clock_ctl_w,	0xffffffff)
+	AM_RANGE(0x35000000, 0x35000003) AM_READWRITE8(sgi_ip2_clock_data_r,	sgi_ip2_clock_data_w,	0xffffffff)
+	AM_RANGE(0x36000000, 0x36000003) AM_READWRITE8(sgi_ip2_os_base_r,		sgi_ip2_os_base_w,		0xffffffff)
+	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE16(sgi_ip2_status_r,		sgi_ip2_status_w,		0xffffffff)
+	AM_RANGE(0x39000000, 0x39000003) AM_READWRITE8(sgi_ip2_parctl_r,		sgi_ip2_parctl_w,		0xffffffff)
+	AM_RANGE(0x3a000000, 0x3a000003) AM_READWRITE8(sgi_ip2_mbp_r,			sgi_ip2_mbp_w,			0xffffffff)
+	AM_RANGE(0x3b000000, 0x3b003fff) AM_READWRITE(sgi_ip2_ptmap_r, sgi_ip2_ptmap_w) AM_BASE(m_ptmap)
+	AM_RANGE(0x3c000000, 0x3c000003) AM_READWRITE16(sgi_ip2_tdbase_r,		sgi_ip2_tdbase_w,		0xffffffff)
+	AM_RANGE(0x3d000000, 0x3d000003) AM_READWRITE16(sgi_ip2_tdlmt_r,		sgi_ip2_tdlmt_w,		0xffffffff)
+	AM_RANGE(0x3e000000, 0x3e000003) AM_READWRITE16(sgi_ip2_stkbase_r,		sgi_ip2_stkbase_w,		0xffffffff)
+	AM_RANGE(0x3f000000, 0x3f000003) AM_READWRITE16(sgi_ip2_stklmt_r,		sgi_ip2_stklmt_w,		0xffffffff)
 ADDRESS_MAP_END
 
 /***************************************************************************

@@ -71,6 +71,8 @@ public:
 	a310_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ32_MEMBER(a310_psy_wram_r);
+	DECLARE_WRITE32_MEMBER(a310_psy_wram_w);
 };
 
 
@@ -90,12 +92,12 @@ static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_drq_w )
 		archimedes_clear_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
-static READ32_HANDLER( a310_psy_wram_r )
+READ32_MEMBER(a310_state::a310_psy_wram_r)
 {
 	return archimedes_memc_physmem[offset];
 }
 
-static WRITE32_HANDLER( a310_psy_wram_w )
+WRITE32_MEMBER(a310_state::a310_psy_wram_w)
 {
 	COMBINE_DATA(&archimedes_memc_physmem[offset]);
 }
@@ -104,10 +106,10 @@ static WRITE32_HANDLER( a310_psy_wram_w )
 static DRIVER_INIT(a310)
 {
 	UINT32 ram_size = machine.device<ram_device>(RAM_TAG)->size();
-
+	a310_state *state = machine.driver_data<a310_state>();
 	archimedes_memc_physmem = auto_alloc_array(machine, UINT32, 0x01000000);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), FUNC(a310_psy_wram_r), FUNC(a310_psy_wram_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(FUNC(a310_state::a310_psy_wram_r), state), write32_delegate(FUNC(a310_state::a310_psy_wram_w), state));
 
 	archimedes_driver_init(machine);
 }

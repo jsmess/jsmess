@@ -62,6 +62,8 @@ public:
 	UINT8 m_pen_clut[8];
 	UINT8 m_bw_mode;
 	UINT16 m_knj_addr;
+	DECLARE_READ8_MEMBER(ay8912_0_r);
+	DECLARE_READ8_MEMBER(ay8912_1_r);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -321,8 +323,8 @@ WRITE8_MEMBER( multi8_state::pal_w )
 	}
 }
 
-static READ8_HANDLER( ay8912_0_r ) { return ay8910_r(space->machine().device("aysnd"),0); }
-static READ8_HANDLER( ay8912_1_r ) { return ay8910_r(space->machine().device("aysnd"),1); }
+READ8_MEMBER(multi8_state::ay8912_0_r){ return ay8910_r(machine().device("aysnd"),0); }
+READ8_MEMBER(multi8_state::ay8912_1_r){ return ay8910_r(machine().device("aysnd"),1); }
 
 READ8_MEMBER( multi8_state::multi8_kanji_r )
 {
@@ -347,8 +349,8 @@ static ADDRESS_MAP_START(multi8_io, AS_IO, 8, multi8_state)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x18, 0x19) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x18, 0x18) AM_READ_LEGACY(ay8912_0_r)
-	AM_RANGE(0x1a, 0x1a) AM_READ_LEGACY(ay8912_1_r)
+	AM_RANGE(0x18, 0x18) AM_READ(ay8912_0_r)
+	AM_RANGE(0x1a, 0x1a) AM_READ(ay8912_1_r)
 	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)
 //  AM_RANGE(0x20, 0x21) //sio, cmt
 //  AM_RANGE(0x24, 0x27) //pit

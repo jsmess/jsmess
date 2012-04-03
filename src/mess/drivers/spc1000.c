@@ -33,6 +33,11 @@ public:
 		spc1000_state *state = machine.driver_data<spc1000_state>();
 		return state->m_video_ram[0x1000+(ch&0x7F)*16+line];
 	}
+	DECLARE_WRITE8_MEMBER(spc1000_iplk_w);
+	DECLARE_READ8_MEMBER(spc1000_iplk_r);
+	DECLARE_WRITE8_MEMBER(spc1000_video_ram_w);
+	DECLARE_READ8_MEMBER(spc1000_video_ram_r);
+	DECLARE_READ8_MEMBER(spc1000_keyboard_r);
 };
 
 
@@ -43,57 +48,53 @@ static ADDRESS_MAP_START(spc1000_mem, AS_PROGRAM, 8, spc1000_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER(spc1000_iplk_w)
+WRITE8_MEMBER(spc1000_state::spc1000_iplk_w)
 {
-	spc1000_state *state = space->machine().driver_data<spc1000_state>();
-	state->m_IPLK = state->m_IPLK ? 0 : 1;
-	if (state->m_IPLK == 1) {
-		UINT8 *mem = space->machine().region("maincpu")->base();
-		memory_set_bankptr(space->machine(), "bank1", mem);
-		memory_set_bankptr(space->machine(), "bank3", mem);
+	m_IPLK = m_IPLK ? 0 : 1;
+	if (m_IPLK == 1) {
+		UINT8 *mem = machine().region("maincpu")->base();
+		memory_set_bankptr(machine(), "bank1", mem);
+		memory_set_bankptr(machine(), "bank3", mem);
 	} else {
-		UINT8 *ram = space->machine().device<ram_device>(RAM_TAG)->pointer();
-		memory_set_bankptr(space->machine(), "bank1", ram);
-		memory_set_bankptr(space->machine(), "bank3", ram + 0x8000);
+		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+		memory_set_bankptr(machine(), "bank1", ram);
+		memory_set_bankptr(machine(), "bank3", ram + 0x8000);
 	}
 }
 
-static READ8_HANDLER(spc1000_iplk_r)
+READ8_MEMBER(spc1000_state::spc1000_iplk_r)
 {
-	spc1000_state *state = space->machine().driver_data<spc1000_state>();
-	state->m_IPLK = state->m_IPLK ? 0 : 1;
-	if (state->m_IPLK == 1) {
-		UINT8 *mem = space->machine().region("maincpu")->base();
-		memory_set_bankptr(space->machine(), "bank1", mem);
-		memory_set_bankptr(space->machine(), "bank3", mem);
+	m_IPLK = m_IPLK ? 0 : 1;
+	if (m_IPLK == 1) {
+		UINT8 *mem = machine().region("maincpu")->base();
+		memory_set_bankptr(machine(), "bank1", mem);
+		memory_set_bankptr(machine(), "bank3", mem);
 	} else {
-		UINT8 *ram = space->machine().device<ram_device>(RAM_TAG)->pointer();
-		memory_set_bankptr(space->machine(), "bank1", ram);
-		memory_set_bankptr(space->machine(), "bank3", ram + 0x8000);
+		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+		memory_set_bankptr(machine(), "bank1", ram);
+		memory_set_bankptr(machine(), "bank3", ram + 0x8000);
 	}
 	return 0;
 }
 
 
 
-static WRITE8_HANDLER(spc1000_video_ram_w)
+WRITE8_MEMBER(spc1000_state::spc1000_video_ram_w)
 {
-	spc1000_state *state = space->machine().driver_data<spc1000_state>();
-	state->m_video_ram[offset] = data;
+	m_video_ram[offset] = data;
 }
 
-static READ8_HANDLER(spc1000_video_ram_r)
+READ8_MEMBER(spc1000_state::spc1000_video_ram_r)
 {
-	spc1000_state *state = space->machine().driver_data<spc1000_state>();
-	return state->m_video_ram[offset];
+	return m_video_ram[offset];
 }
 
-static READ8_HANDLER(spc1000_keyboard_r) {
+READ8_MEMBER(spc1000_state::spc1000_keyboard_r){
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
 	};
-	return input_port_read(space->machine(), keynames[offset]);
+	return input_port_read(machine(), keynames[offset]);
 }
 
 static WRITE8_DEVICE_HANDLER(spc1000_gmode_w)
@@ -117,10 +118,10 @@ static READ8_DEVICE_HANDLER(spc1000_gmode_r)
 
 static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(spc1000_video_ram_r, spc1000_video_ram_w)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(spc1000_video_ram_r, spc1000_video_ram_w)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_LEGACY("mc6847", spc1000_gmode_r, spc1000_gmode_w)
-	AM_RANGE(0x8000, 0x8009) AM_READ_LEGACY(spc1000_keyboard_r)
-	AM_RANGE(0xA000, 0xA000) AM_READWRITE_LEGACY(spc1000_iplk_r, spc1000_iplk_w)
+	AM_RANGE(0x8000, 0x8009) AM_READ(spc1000_keyboard_r)
+	AM_RANGE(0xA000, 0xA000) AM_READWRITE(spc1000_iplk_r, spc1000_iplk_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END

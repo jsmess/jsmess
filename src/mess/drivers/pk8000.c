@@ -25,6 +25,8 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_keyboard_line;
+	DECLARE_READ8_MEMBER(pk8000_joy_1_r);
+	DECLARE_READ8_MEMBER(pk8000_joy_2_r);
 };
 
 
@@ -155,16 +157,16 @@ static I8255_INTERFACE( pk8000_ppi8255_interface_2 )
 	DEVCB_HANDLER(pk8000_84_portc_w)
 };
 
-static READ8_HANDLER(pk8000_joy_1_r)
+READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
 {
-	UINT8 retVal = (cassette_device_image(space->machine())->input() > 0.0038 ? 0x80 : 0);
-	retVal |= input_port_read(space->machine(), "JOY1") & 0x7f;
+	UINT8 retVal = (cassette_device_image(machine())->input() > 0.0038 ? 0x80 : 0);
+	retVal |= input_port_read(machine(), "JOY1") & 0x7f;
 	return retVal;
 }
-static READ8_HANDLER(pk8000_joy_2_r)
+READ8_MEMBER(pk8000_state::pk8000_joy_2_r)
 {
-	UINT8 retVal = (cassette_device_image(space->machine())->input() > 0.0038 ? 0x80 : 0);
-	retVal |= input_port_read(space->machine(), "JOY2") & 0x7f;
+	UINT8 retVal = (cassette_device_image(machine())->input() > 0.0038 ? 0x80 : 0);
+	retVal |= input_port_read(machine(), "JOY2") & 0x7f;
 	return retVal;
 }
 
@@ -181,8 +183,8 @@ static ADDRESS_MAP_START( pk8000_io , AS_IO, 8, pk8000_state )
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x88, 0x88) AM_READWRITE_LEGACY(pk8000_video_color_r,pk8000_video_color_w)
-	AM_RANGE(0x8c, 0x8c) AM_READ_LEGACY(pk8000_joy_1_r)
-	AM_RANGE(0x8d, 0x8d) AM_READ_LEGACY(pk8000_joy_2_r)
+	AM_RANGE(0x8c, 0x8c) AM_READ(pk8000_joy_1_r)
+	AM_RANGE(0x8d, 0x8d) AM_READ(pk8000_joy_2_r)
 	AM_RANGE(0x90, 0x90) AM_READWRITE_LEGACY(pk8000_text_start_r,pk8000_text_start_w)
 	AM_RANGE(0x91, 0x91) AM_READWRITE_LEGACY(pk8000_chargen_start_r,pk8000_chargen_start_w)
 	AM_RANGE(0x92, 0x92) AM_READWRITE_LEGACY(pk8000_video_start_r,pk8000_video_start_w)

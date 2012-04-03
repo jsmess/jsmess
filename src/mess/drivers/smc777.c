@@ -52,6 +52,33 @@ public:
 	UINT8 m_keyb_direct;
 	UINT8 m_pal_mode;
 	UINT8 m_keyb_cmd;
+	DECLARE_WRITE8_MEMBER(smc777_6845_w);
+	DECLARE_READ8_MEMBER(smc777_vram_r);
+	DECLARE_READ8_MEMBER(smc777_attr_r);
+	DECLARE_READ8_MEMBER(smc777_pcg_r);
+	DECLARE_WRITE8_MEMBER(smc777_vram_w);
+	DECLARE_WRITE8_MEMBER(smc777_attr_w);
+	DECLARE_WRITE8_MEMBER(smc777_pcg_w);
+	DECLARE_READ8_MEMBER(smc777_fbuf_r);
+	DECLARE_WRITE8_MEMBER(smc777_fbuf_w);
+	DECLARE_READ8_MEMBER(smc777_fdc1_r);
+	DECLARE_WRITE8_MEMBER(smc777_fdc1_w);
+	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_WRITE8_MEMBER(key_w);
+	DECLARE_WRITE8_MEMBER(border_col_w);
+	DECLARE_READ8_MEMBER(system_input_r);
+	DECLARE_WRITE8_MEMBER(system_output_w);
+	DECLARE_READ8_MEMBER(smc777_joystick_r);
+	DECLARE_WRITE8_MEMBER(smc777_color_mode_w);
+	DECLARE_WRITE8_MEMBER(smc777_ramdac_w);
+	DECLARE_READ8_MEMBER(display_reg_r);
+	DECLARE_WRITE8_MEMBER(display_reg_w);
+	DECLARE_READ8_MEMBER(smc777_mem_r);
+	DECLARE_WRITE8_MEMBER(smc777_mem_w);
+	DECLARE_READ8_MEMBER(smc777_irq_mask_r);
+	DECLARE_WRITE8_MEMBER(smc777_irq_mask_w);
+	DECLARE_READ8_MEMBER(smc777_io_r);
+	DECLARE_WRITE8_MEMBER(smc777_io_w);
 };
 
 
@@ -197,30 +224,29 @@ static SCREEN_UPDATE_IND16( smc777 )
     return 0;
 }
 
-static WRITE8_HANDLER( smc777_6845_w )
+WRITE8_MEMBER(smc777_state::smc777_6845_w)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 	if(offset == 0)
 	{
-		state->m_addr_latch = data;
-		//mc6845_address_w(space->machine().device("crtc"), 0,data);
+		m_addr_latch = data;
+		//mc6845_address_w(machine().device("crtc"), 0,data);
 	}
 	else
 	{
-		if(state->m_addr_latch == 0x0a)
-			state->m_cursor_raster = data;
-		else if(state->m_addr_latch == 0x0e)
-			state->m_cursor_addr = ((data<<8) & 0x3f00) | (state->m_cursor_addr & 0xff);
-		else if(state->m_addr_latch == 0x0f)
-			state->m_cursor_addr = (state->m_cursor_addr & 0x3f00) | (data & 0xff);
+		if(m_addr_latch == 0x0a)
+			m_cursor_raster = data;
+		else if(m_addr_latch == 0x0e)
+			m_cursor_addr = ((data<<8) & 0x3f00) | (m_cursor_addr & 0xff);
+		else if(m_addr_latch == 0x0f)
+			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		//mc6845_register_w(space->machine().device("crtc"), 0,data);
+		//mc6845_register_w(machine().device("crtc"), 0,data);
 	}
 }
 
-static READ8_HANDLER( smc777_vram_r )
+READ8_MEMBER(smc777_state::smc777_vram_r)
 {
-	UINT8 *vram = space->machine().region("vram")->base();
+	UINT8 *vram = machine().region("vram")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -229,9 +255,9 @@ static READ8_HANDLER( smc777_vram_r )
 	return vram[vram_index];
 }
 
-static READ8_HANDLER( smc777_attr_r )
+READ8_MEMBER(smc777_state::smc777_attr_r)
 {
-	UINT8 *attr = space->machine().region("attr")->base();
+	UINT8 *attr = machine().region("attr")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -240,9 +266,9 @@ static READ8_HANDLER( smc777_attr_r )
 	return attr[vram_index];
 }
 
-static READ8_HANDLER( smc777_pcg_r )
+READ8_MEMBER(smc777_state::smc777_pcg_r)
 {
-	UINT8 *pcg = space->machine().region("pcg")->base();
+	UINT8 *pcg = machine().region("pcg")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -251,9 +277,9 @@ static READ8_HANDLER( smc777_pcg_r )
 	return pcg[vram_index];
 }
 
-static WRITE8_HANDLER( smc777_vram_w )
+WRITE8_MEMBER(smc777_state::smc777_vram_w)
 {
-	UINT8 *vram = space->machine().region("vram")->base();
+	UINT8 *vram = machine().region("vram")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -262,9 +288,9 @@ static WRITE8_HANDLER( smc777_vram_w )
 	vram[vram_index] = data;
 }
 
-static WRITE8_HANDLER( smc777_attr_w )
+WRITE8_MEMBER(smc777_state::smc777_attr_w)
 {
-	UINT8 *attr = space->machine().region("attr")->base();
+	UINT8 *attr = machine().region("attr")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -273,9 +299,9 @@ static WRITE8_HANDLER( smc777_attr_w )
 	attr[vram_index] = data;
 }
 
-static WRITE8_HANDLER( smc777_pcg_w )
+WRITE8_MEMBER(smc777_state::smc777_pcg_w)
 {
-	UINT8 *pcg = space->machine().region("pcg")->base();
+	UINT8 *pcg = machine().region("pcg")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
@@ -283,12 +309,12 @@ static WRITE8_HANDLER( smc777_pcg_w )
 
 	pcg[vram_index] = data;
 
-    gfx_element_mark_dirty(space->machine().gfx[0], vram_index >> 3);
+    gfx_element_mark_dirty(machine().gfx[0], vram_index >> 3);
 }
 
-static READ8_HANDLER( smc777_fbuf_r )
+READ8_MEMBER(smc777_state::smc777_fbuf_r)
 {
-	UINT8 *fbuf = space->machine().region("fbuf")->base();
+	UINT8 *fbuf = machine().region("fbuf")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x007f) << 8);
@@ -297,9 +323,9 @@ static READ8_HANDLER( smc777_fbuf_r )
 	return fbuf[vram_index];
 }
 
-static WRITE8_HANDLER( smc777_fbuf_w )
+WRITE8_MEMBER(smc777_state::smc777_fbuf_w)
 {
-	UINT8 *fbuf = space->machine().region("fbuf")->base();
+	UINT8 *fbuf = machine().region("fbuf")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x00ff) << 8);
@@ -324,12 +350,11 @@ static void check_floppy_inserted(running_machine &machine)
 	}
 }
 
-static READ8_HANDLER( smc777_fdc1_r )
+READ8_MEMBER(smc777_state::smc777_fdc1_r)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
-	device_t* dev = space->machine().device("fdc");
+	device_t* dev = machine().device("fdc");
 
-	check_floppy_inserted(space->machine());
+	check_floppy_inserted(machine());
 
 	switch(offset)
 	{
@@ -342,19 +367,19 @@ static READ8_HANDLER( smc777_fdc1_r )
 		case 0x03:
 			return wd17xx_data_r(dev,offset) ^ 0xff;
 		case 0x04: //irq / drq status
-			//popmessage("%02x %02x\n",state->m_fdc_irq_flag,state->m_fdc_drq_flag);
+			//popmessage("%02x %02x\n",m_fdc_irq_flag,m_fdc_drq_flag);
 
-			return (state->m_fdc_irq_flag ? 0x80 : 0x00) | (state->m_fdc_drq_flag ? 0x00 : 0x40);
+			return (m_fdc_irq_flag ? 0x80 : 0x00) | (m_fdc_drq_flag ? 0x00 : 0x40);
 	}
 
 	return 0x00;
 }
 
-static WRITE8_HANDLER( smc777_fdc1_w )
+WRITE8_MEMBER(smc777_state::smc777_fdc1_w)
 {
-	device_t* dev = space->machine().device("fdc");
+	device_t* dev = machine().device("fdc");
 
-	check_floppy_inserted(space->machine());
+	check_floppy_inserted(machine());
 
 	switch(offset)
 	{
@@ -392,31 +417,30 @@ static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_drq_w )
 	drvstate->m_fdc_drq_flag = state;
 }
 
-static READ8_HANDLER( key_r )
+READ8_MEMBER(smc777_state::key_r)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 	/*
     -x-- ---- shift key
     ---- -x-- MCU data ready
     ---- ---x handshake bit?
     */
 
-	switch(state->m_keyb_cmd)
+	switch(m_keyb_cmd)
 	{
 		case 0x00: //poll keyboard input
 		{
 			if(offset == 0)
-				state->m_keyb_press_flag = 0;
+				m_keyb_press_flag = 0;
 
-			return (offset == 0) ? state->m_keyb_press : ((state->m_shift_press_flag << 6) | (state->m_keyb_press_flag << 2) | (state->m_keyb_press_flag));
+			return (offset == 0) ? m_keyb_press : ((m_shift_press_flag << 6) | (m_keyb_press_flag << 2) | (m_keyb_press_flag));
 		}
 		break;
 		default:
 		{
 			//if(offset == 1)
-			//  printf("Unknown keyboard command %02x read-back\n",state->m_keyb_cmd);
+			//  printf("Unknown keyboard command %02x read-back\n",m_keyb_cmd);
 
-			return (offset == 0) ? 0x00 : (space->machine().rand() & 0x5);
+			return (offset == 0) ? 0x00 : (machine().rand() & 0x5);
 		}
 	}
 
@@ -424,88 +448,81 @@ static READ8_HANDLER( key_r )
 }
 
 /* TODO: the packet commands strikes me as something I've already seen before, don't remember where however ... */
-static WRITE8_HANDLER( key_w )
+WRITE8_MEMBER(smc777_state::key_w)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 
 	if(offset == 1) //keyboard command
-		state->m_keyb_cmd = data;
+		m_keyb_cmd = data;
 	else
 	{
 		// keyboard command param
 	}
 }
 
-static WRITE8_HANDLER( border_col_w )
+WRITE8_MEMBER(smc777_state::border_col_w)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 	if(data & 0xf0)
 		printf("Special border color enabled %02x\n",data);
 
-	state->m_backdrop_pen = data & 0xf;
+	m_backdrop_pen = data & 0xf;
 }
 
 
-static READ8_HANDLER( system_input_r )
+READ8_MEMBER(smc777_state::system_input_r)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 
-	printf("System FF R %02x\n",state->m_system_data & 0x0f);
+	printf("System FF R %02x\n",m_system_data & 0x0f);
 
-	switch(state->m_system_data & 0x0f)
+	switch(m_system_data & 0x0f)
 	{
 		case 0x00:
-			return ((state->m_raminh & 1) << 4); //unknown bit, Dragon's Alphabet and Bird Crush relies on this for correct colors
+			return ((m_raminh & 1) << 4); //unknown bit, Dragon's Alphabet and Bird Crush relies on this for correct colors
 	}
 
-	return state->m_system_data;
+	return m_system_data;
 }
 
 
 
-static WRITE8_HANDLER( system_output_w )
+WRITE8_MEMBER(smc777_state::system_output_w)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 	/*
     ---x 0000 ram inibit signal
     ---x 1001 beep
     all the rest is unknown at current time
     */
-	state->m_system_data = data;
-	switch(state->m_system_data & 0x0f)
+	m_system_data = data;
+	switch(m_system_data & 0x0f)
 	{
 		case 0x00:
-			state->m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
-			state->m_raminh_prefetch = (UINT8)(cpu_get_reg(&space->device(), Z80_R)) & 0x7f;
+			m_raminh_pending_change = ((data & 0x10) >> 4) ^ 1;
+			m_raminh_prefetch = (UINT8)(cpu_get_reg(&space.device(), Z80_R)) & 0x7f;
 			break;
 		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
-		case 0x05: beep_set_state(space->machine().device(BEEPER_TAG),data & 0x10); break;
+		case 0x05: beep_set_state(machine().device(BEEPER_TAG),data & 0x10); break;
 		default: printf("System FF W %02x\n",data); break;
 	}
 }
 
 /* presumably SMC-777 specific */
-static READ8_HANDLER( smc777_joystick_r )
+READ8_MEMBER(smc777_state::smc777_joystick_r)
 {
-	//smc777_state *state = space->machine().driver_data<smc777_state>();
 
-	return input_port_read(space->machine(), "JOY_1P");
+	return input_port_read(machine(), "JOY_1P");
 }
 
-static WRITE8_HANDLER( smc777_color_mode_w )
+WRITE8_MEMBER(smc777_state::smc777_color_mode_w)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 
 	switch(data & 0x0f)
 	{
-		case 0x06: state->m_pal_mode = (data & 0x10) ^ 0x10; break;
+		case 0x06: m_pal_mode = (data & 0x10) ^ 0x10; break;
 		default: printf("Color FF %02x\n",data); break;
 	}
 }
 
-static WRITE8_HANDLER( smc777_ramdac_w )
+WRITE8_MEMBER(smc777_state::smc777_ramdac_w)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 	UINT8 pal_index;
 	pal_index = (offset & 0xf00) >> 8;
 
@@ -514,100 +531,94 @@ static WRITE8_HANDLER( smc777_ramdac_w )
 
 	switch((offset & 0x3000) >> 12)
 	{
-		case 0: state->m_pal.r = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->m_pal.r), pal4bit(state->m_pal.g), pal4bit(state->m_pal.b)); break;
-		case 1: state->m_pal.g = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->m_pal.r), pal4bit(state->m_pal.g), pal4bit(state->m_pal.b)); break;
-		case 2: state->m_pal.b = (data & 0xf0) >> 4; palette_set_color_rgb(space->machine(), pal_index, pal4bit(state->m_pal.r), pal4bit(state->m_pal.g), pal4bit(state->m_pal.b)); break;
+		case 0: m_pal.r = (data & 0xf0) >> 4; palette_set_color_rgb(machine(), pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
+		case 1: m_pal.g = (data & 0xf0) >> 4; palette_set_color_rgb(machine(), pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
+		case 2: m_pal.b = (data & 0xf0) >> 4; palette_set_color_rgb(machine(), pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
 		case 3: printf("RAMdac used with gradient index = 3! pal_index = %02x data = %02x\n",pal_index,data); break;
 	}
 }
 
-static READ8_HANDLER( display_reg_r )
+READ8_MEMBER(smc777_state::display_reg_r)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
-	return state->m_display_reg;
+	return m_display_reg;
 }
 
 /* x */
-static WRITE8_HANDLER( display_reg_w )
+WRITE8_MEMBER(smc777_state::display_reg_w)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 	/*
     x--- ---- width 80 / 40 switch (0 = 640 x 200 1 = 320 x 200)
     ---- -x-- mode select?
     */
 
 	{
-		if((state->m_display_reg & 0x80) != (data & 0x80))
+		if((m_display_reg & 0x80) != (data & 0x80))
 		{
-			rectangle visarea = space->machine().primary_screen->visible_area();
+			rectangle visarea = machine().primary_screen->visible_area();
 			int x_width;
 
 			x_width = (data & 0x80) ? 320 : 640;
 
 			visarea.set(0, (x_width+(CRTC_MIN_X*2)) - 1, 0, (200+(CRTC_MIN_Y*2)) - 1);
 
-			space->machine().primary_screen->configure(660, 220, visarea, space->machine().primary_screen->frame_period().attoseconds);
+			machine().primary_screen->configure(660, 220, visarea, machine().primary_screen->frame_period().attoseconds);
 		}
 	}
 
-	state->m_display_reg = data;
+	m_display_reg = data;
 }
 
-static READ8_HANDLER( smc777_mem_r )
+READ8_MEMBER(smc777_state::smc777_mem_r)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
-	UINT8 *wram = space->machine().region("wram")->base();
-	UINT8 *bios = space->machine().region("bios")->base();
+	UINT8 *wram = machine().region("wram")->base();
+	UINT8 *bios = machine().region("bios")->base();
 	UINT8 z80_r;
 
-	if(state->m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
+	if(m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
 	{
-		z80_r = (UINT8)cpu_get_reg(&space->device(), Z80_R);
+		z80_r = (UINT8)cpu_get_reg(&space.device(), Z80_R);
 
-		if(z80_r == ((state->m_raminh_prefetch+2) & 0x7f))
+		if(z80_r == ((m_raminh_prefetch+2) & 0x7f))
 		{
-			state->m_raminh = state->m_raminh_pending_change;
-			state->m_raminh_prefetch = 0xff;
+			m_raminh = m_raminh_pending_change;
+			m_raminh_prefetch = 0xff;
 		}
 	}
 
-	if(state->m_raminh == 1 && ((offset & 0xc000) == 0))
+	if(m_raminh == 1 && ((offset & 0xc000) == 0))
 		return bios[offset];
 
 	return wram[offset];
 }
 
-static WRITE8_HANDLER( smc777_mem_w )
+WRITE8_MEMBER(smc777_state::smc777_mem_w)
 {
-	//smc777_state *state = space->machine().driver_data<smc777_state>();
-	UINT8 *wram = space->machine().region("wram")->base();
+	UINT8 *wram = machine().region("wram")->base();
 
 	wram[offset] = data;
 }
 
-static READ8_HANDLER( smc777_irq_mask_r )
+READ8_MEMBER(smc777_state::smc777_irq_mask_r)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 
-	return state->m_irq_mask;
+	return m_irq_mask;
 }
 
-static WRITE8_HANDLER( smc777_irq_mask_w )
+WRITE8_MEMBER(smc777_state::smc777_irq_mask_w)
 {
-	smc777_state *state = space->machine().driver_data<smc777_state>();
 
 	if(data & 0xfe)
 		printf("Irq mask = %02x\n",data & 0xfe);
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START(smc777_mem, AS_PROGRAM, 8, smc777_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(smc777_mem_r,smc777_mem_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r,smc777_mem_w)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( smc777_io_r )
+READ8_MEMBER(smc777_state::smc777_io_r)
 {
 	UINT8 low_offs;
 
@@ -619,11 +630,11 @@ static READ8_HANDLER( smc777_io_r )
 	else if(low_offs >= 0x18 && low_offs <= 0x19) { logerror("6845 read %02x",low_offs & 1); }
 	else if(low_offs >= 0x1a && low_offs <= 0x1b) { return key_r(space,low_offs & 1); }
 	else if(low_offs == 0x1c)					  { return system_input_r(space,0); }
-	else if(low_offs == 0x1d)					  { logerror("System and control data R PC=%04x\n",cpu_get_pc(&space->device())); return 0xff; }
+	else if(low_offs == 0x1d)					  { logerror("System and control data R PC=%04x\n",cpu_get_pc(&space.device())); return 0xff; }
 	else if(low_offs == 0x20)					  { return display_reg_r(space,0); }
 	else if(low_offs == 0x21)					  { return smc777_irq_mask_r(space,0); }
-	else if(low_offs == 0x25)					  { logerror("RTC read PC=%04x\n",cpu_get_pc(&space->device())); return 0xff; }
-	else if(low_offs == 0x26)					  { logerror("RS-232c RX %04x\n",cpu_get_pc(&space->device())); return 0xff; }
+	else if(low_offs == 0x25)					  { logerror("RTC read PC=%04x\n",cpu_get_pc(&space.device())); return 0xff; }
+	else if(low_offs == 0x26)					  { logerror("RS-232c RX %04x\n",cpu_get_pc(&space.device())); return 0xff; }
 	else if(low_offs >= 0x28 && low_offs <= 0x2c) { logerror("FDC 2 read %02x\n",low_offs & 7); return 0xff; }
 	else if(low_offs >= 0x2d && low_offs <= 0x2f) { logerror("RS-232c no. 2 read %02x\n",low_offs & 3); return 0xff; }
 	else if(low_offs >= 0x30 && low_offs <= 0x34) { return smc777_fdc1_r(space,low_offs & 7); }
@@ -641,11 +652,11 @@ static READ8_HANDLER( smc777_io_r )
 	else if(low_offs == 0x7e || low_offs == 0x7f) { logerror("Kanji ROM read %02x\n",low_offs & 1); }
 	else if(low_offs >= 0x80)					  { return smc777_fbuf_r(space,offset & 0xff7f); }
 
-	logerror("Undefined read at %04x offset = %02x\n",cpu_get_pc(&space->device()),low_offs);
+	logerror("Undefined read at %04x offset = %02x\n",cpu_get_pc(&space.device()),low_offs);
 	return 0xff;
 }
 
-static WRITE8_HANDLER( smc777_io_w )
+WRITE8_MEMBER(smc777_state::smc777_io_w)
 {
 	UINT8 low_offs;
 
@@ -675,7 +686,7 @@ static WRITE8_HANDLER( smc777_io_w )
 	else if(low_offs >= 0x48 && low_offs <= 0x4f) { logerror("HDD (Winchester) write %02x %02x\n",low_offs & 1,data); } //might be 0x48 - 0x50
 	else if(low_offs == 0x51)					  { smc777_color_mode_w(space,0,data); }
 	else if(low_offs == 0x52)					  { smc777_ramdac_w(space,offset & 0xff00,data); }
-	else if(low_offs == 0x53)					  { sn76496_w(space->machine().device("sn1"),0,data); }
+	else if(low_offs == 0x53)					  { sn76496_w(machine().device("sn1"),0,data); }
 	else if(low_offs >= 0x54 && low_offs <= 0x59) { logerror("VTR Controller write [%02x] %02x\n",low_offs & 7,data); }
 	else if(low_offs == 0x5a || low_offs == 0x5b) { logerror("RAM Banking write [%02x] %02x\n",low_offs & 1,data); }
 	else if(low_offs == 0x70)					  { logerror("Auto-start ROM write %02x\n",data); }
@@ -683,12 +694,12 @@ static WRITE8_HANDLER( smc777_io_w )
 	else if(low_offs == 0x75)					  { logerror("VTR Controller ROM write %02x\n",data); }
 	else if(low_offs == 0x7e || low_offs == 0x7f) { logerror("Kanji ROM write [%02x] %02x\n",low_offs & 1,data); }
 	else if(low_offs >= 0x80)					  { smc777_fbuf_w(space,offset & 0xff7f,data); }
-	else										  { logerror("Undefined write at %04x offset = %02x data = %02x\n",cpu_get_pc(&space->device()),low_offs,data); }
+	else										  { logerror("Undefined write at %04x offset = %02x data = %02x\n",cpu_get_pc(&space.device()),low_offs,data); }
 }
 
 static ADDRESS_MAP_START( smc777_io , AS_IO, 8, smc777_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(smc777_io_r,smc777_io_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_io_r,smc777_io_w)
 ADDRESS_MAP_END
 
 /* Input ports */

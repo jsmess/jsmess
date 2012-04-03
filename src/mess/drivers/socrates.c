@@ -101,6 +101,20 @@ public:
 	UINT8 m_speech_dummy_read; // have we done a dummy read yet?
 	UINT8 m_speech_load_address_count; // number of times load address has happened
 	UINT8 m_speech_load_settings_count; // number of times load settings has happened
+	DECLARE_READ8_MEMBER(socrates_rom_bank_r);
+	DECLARE_WRITE8_MEMBER(socrates_rom_bank_w);
+	DECLARE_READ8_MEMBER(socrates_ram_bank_r);
+	DECLARE_WRITE8_MEMBER(socrates_ram_bank_w);
+	DECLARE_READ8_MEMBER(read_f3);
+	DECLARE_WRITE8_MEMBER(unknownlatch_30);
+	DECLARE_READ8_MEMBER(status_and_speech);
+	DECLARE_WRITE8_MEMBER(speech_command);
+	DECLARE_READ8_MEMBER(socrates_keyboard_low_r);
+	DECLARE_READ8_MEMBER(socrates_keyboard_high_r);
+	DECLARE_WRITE8_MEMBER(socrates_keyboard_clear);
+	DECLARE_WRITE8_MEMBER(reset_speech);
+	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
+	DECLARE_WRITE8_MEMBER(socrates_sound_w);
 };
 
 
@@ -215,49 +229,44 @@ static DRIVER_INIT( socrates )
     machine.device("maincpu")->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
-static READ8_HANDLER( socrates_rom_bank_r )
+READ8_MEMBER(socrates_state::socrates_rom_bank_r)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
  UINT8 data = 0xFF;
- data = state->m_rom_bank;
+ data = m_rom_bank;
  return data;
 }
 
-static WRITE8_HANDLER( socrates_rom_bank_w )
+WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- state->m_rom_bank = data;
- socrates_set_rom_bank(space->machine());
+ m_rom_bank = data;
+ socrates_set_rom_bank(machine());
 }
 
-static READ8_HANDLER( socrates_ram_bank_r )
+READ8_MEMBER(socrates_state::socrates_ram_bank_r)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
  UINT8 data = 0xFF;
- data = state->m_ram_bank;
+ data = m_ram_bank;
  return data;
 }
 
-static WRITE8_HANDLER( socrates_ram_bank_w )
+WRITE8_MEMBER(socrates_state::socrates_ram_bank_w)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- state->m_ram_bank = data&0xF;
- socrates_set_ram_bank(space->machine());
+ m_ram_bank = data&0xF;
+ socrates_set_ram_bank(machine());
 }
 
-static READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
+READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
 {
  return 0xF3;
 }
 
-static WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?) or involve status reg bit 6
+WRITE8_MEMBER(socrates_state::unknownlatch_30)// writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?) or involve status reg bit 6
 {
 //logerror("write to i/o 0x30, data %x\n", data); // too annoying to leave enabled
 }
 
-static READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
+READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status reg
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, may involve the writes to 0x30, possibly some sort of fixed-length timer?
 // bit 5 - vblank status, high when not in vblank
@@ -266,37 +275,37 @@ static READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
 // bit 2 - speech chip bit 2
 // bit 1 - speech chip bit 1
 // bit 0 - speech chip bit 0
-UINT8 *speechromint = space->machine().region("speechint")->base();
-UINT8 *speechromext = space->machine().region("speechext")->base();
+UINT8 *speechromint = machine().region("speechint")->base();
+UINT8 *speechromext = machine().region("speechext")->base();
 	int temp = 0;
-	temp |= (state->m_speech_running)?0x80:0;
+	temp |= (m_speech_running)?0x80:0;
 	temp |= 0x40; // unknown
-	temp |= (state->m_vblankstate)?0:0x20;
-	temp |= (state->m_hblankstate)?0:0x10;
-	switch(state->m_io40_latch&0xF0) // what was last opcode sent?
+	temp |= (m_vblankstate)?0:0x20;
+	temp |= (m_hblankstate)?0:0x10;
+	switch(m_io40_latch&0xF0) // what was last opcode sent?
 	{
 		case 0x60: case 0xE0:// speech status 'read' register
-			if(state->m_speech_settings&0x04) // external speech roms (outside of speech ic but still in cart) enabled
+			if(m_speech_settings&0x04) // external speech roms (outside of speech ic but still in cart) enabled
 			{
-			logerror("reading external speech rom nybble from nybble address %x (byte address %x)\n",state->m_speech_address, state->m_speech_address>>1);
-			temp |= ((speechromext[((state->m_speech_address>>1)&0xffff)]>>((state->m_speech_address&1)*4))&0xF);
+			logerror("reading external speech rom nybble from nybble address %x (byte address %x)\n",m_speech_address, m_speech_address>>1);
+			temp |= ((speechromext[((m_speech_address>>1)&0xffff)]>>((m_speech_address&1)*4))&0xF);
 			}
 			else
 			{
-			logerror("reading internal speech rom nybble from nybble address %x (byte address %x)\n",state->m_speech_address, state->m_speech_address>>1);
-			temp |= ((speechromint[((state->m_speech_address>>1)&0x1fff)]>>((state->m_speech_address&1)*4))&0xF);
+			logerror("reading internal speech rom nybble from nybble address %x (byte address %x)\n",m_speech_address, m_speech_address>>1);
+			temp |= ((speechromint[((m_speech_address>>1)&0x1fff)]>>((m_speech_address&1)*4))&0xF);
 			}
-			if (state->m_speech_dummy_read == 0) // if we havent done the dummy read yet, do so now
+			if (m_speech_dummy_read == 0) // if we havent done the dummy read yet, do so now
 			{
-				state->m_speech_dummy_read++;
+				m_speech_dummy_read++;
 			}
 			else
 			{
-				state->m_speech_address++;
+				m_speech_address++;
 			}
 			break;
 		default:
-			temp |= state->m_io40_latch&0xF; // read open bus
+			temp |= m_io40_latch&0xF; // read open bus
 			break;
 	}
 	logerror("read from i/o 0x4x of %x\n", temp);
@@ -310,9 +319,8 @@ static TIMER_CALLBACK( clear_speech_cb )
 	state->m_speech_load_settings_count = 0;
 }
 
-static WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
+WRITE8_MEMBER(socrates_state::speech_command)// write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
 	logerror("write to i/o 0x4x of %x\n", data);
 /*
 // the high 4 bits of the write control which 'register' is written to, the low 4 bits are data (this is based on a readback test)
@@ -370,8 +378,8 @@ end hd38880 info.*/
 			if (data==0x80)
 			{
 				/* write me: start talking */
-				state->m_speech_running = 1;
-				space->machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
+				m_speech_running = 1;
+				machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
 			}
 			break;
 		case 0x90: // unknown, one of these is probably read and branch
@@ -381,31 +389,31 @@ end hd38880 info.*/
 		case 0xB0: // unknown
 			break;
 		case 0xC0: // load address to vsm
-			state->m_speech_address |= (((int)data&0xF)<<(state->m_speech_load_address_count*4))<<1;
-			state->m_speech_load_address_count++;
-			logerror("loaded address nybble %X, byte address is currently %5X with %d nybbles loaded\n", data&0xF, state->m_speech_address>>1, state->m_speech_load_address_count);
+			m_speech_address |= (((int)data&0xF)<<(m_speech_load_address_count*4))<<1;
+			m_speech_load_address_count++;
+			logerror("loaded address nybble %X, byte address is currently %5X with %d nybbles loaded\n", data&0xF, m_speech_address>>1, m_speech_load_address_count);
 			break;
 		case 0xD0: // load settings
-			state->m_speech_settings |= ((data&0xF)<<(state->m_speech_load_settings_count*4));
-			state->m_speech_load_settings_count++;
+			m_speech_settings |= ((data&0xF)<<(m_speech_load_settings_count*4));
+			m_speech_load_settings_count++;
 			break;
 		case 0xE0: // read byte, handled elsewhere
 			break;
 		case 0xF0: // command: sub 0 is speak, sub 8 is reset
 			if ((data&0xF) == 0) // speak
 			{
-				state->m_speech_running = 1;
-				space->machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
+				m_speech_running = 1;
+				machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
 			}
 			else if ((data&0xF) == 8) // reset
 			{
-				state->m_speech_running = 0;
-				state->m_speech_address = 0;
-				state->m_speech_settings = 0;
-				state->m_speech_dummy_read = 0;
-				state->m_speech_load_address_count = 0;
-				state->m_speech_load_settings_count = 0;
-				state->m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
+				m_speech_running = 0;
+				m_speech_address = 0;
+				m_speech_settings = 0;
+				m_speech_dummy_read = 0;
+				m_speech_load_address_count = 0;
+				m_speech_load_settings_count = 0;
+				m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
 			}
 			else // other
 			{
@@ -415,56 +423,51 @@ end hd38880 info.*/
 		default: // 00 through 70 are packets without the write bit set, ignore them
 			break;
 	}
-	state->m_io40_latch = data;
+	m_io40_latch = data;
 }
 
-static READ8_HANDLER( socrates_keyboard_low_r ) // keyboard code low
+READ8_MEMBER(socrates_state::socrates_keyboard_low_r)// keyboard code low
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- socrates_update_kb(space->machine());
- socrates_check_kb_latch(space->machine());
- return state->m_kb_latch_low[0];
+ socrates_update_kb(machine());
+ socrates_check_kb_latch(machine());
+ return m_kb_latch_low[0];
 }
 
-static READ8_HANDLER( socrates_keyboard_high_r ) // keyboard code high
+READ8_MEMBER(socrates_state::socrates_keyboard_high_r)// keyboard code high
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- socrates_update_kb(space->machine());
- socrates_check_kb_latch(space->machine());
- return state->m_kb_latch_high[0];
+ socrates_update_kb(machine());
+ socrates_check_kb_latch(machine());
+ return m_kb_latch_high[0];
 }
 
-static WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch shift/clear
+WRITE8_MEMBER(socrates_state::socrates_keyboard_clear)// keyboard latch shift/clear
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
-	state->m_kb_latch_low[0] = state->m_kb_latch_low[1];
-	state->m_kb_latch_high[0] = state->m_kb_latch_high[1];
-	state->m_kb_latch_low[1] = 0;
-	state->m_kb_latch_high[1] = 1;
+	m_kb_latch_low[0] = m_kb_latch_low[1];
+	m_kb_latch_high[0] = m_kb_latch_high[1];
+	m_kb_latch_low[1] = 0;
+	m_kb_latch_high[1] = 1;
 }
 
-static WRITE8_HANDLER( reset_speech ) // i/o 60: reset speech synth
+WRITE8_MEMBER(socrates_state::reset_speech)// i/o 60: reset speech synth
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- state->m_speech_running = 0;
- state->m_speech_address = 0;
- state->m_speech_settings = 0;
- state->m_speech_dummy_read = 0;
- state->m_speech_load_address_count = 0;
- state->m_speech_load_settings_count = 0;
- state->m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
+ m_speech_running = 0;
+ m_speech_address = 0;
+ m_speech_settings = 0;
+ m_speech_dummy_read = 0;
+ m_speech_load_address_count = 0;
+ m_speech_load_settings_count = 0;
+ m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
 logerror("write to i/o 0x60 of %x\n",data);
 }
 
 /* stuff below belongs in video/nc.c */
 
-static WRITE8_HANDLER( socrates_scroll_w )
+WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
  if (offset == 0)
- state->m_scroll_offset = (state->m_scroll_offset&0x100) | data;
+ m_scroll_offset = (m_scroll_offset&0x100) | data;
  else
- state->m_scroll_offset = (state->m_scroll_offset&0xFF) | ((data&1)<<8);
+ m_scroll_offset = (m_scroll_offset&0xFF) | ((data&1)<<8);
 }
 
 /* NTSC-based Palette stuff */
@@ -628,9 +631,9 @@ static SCREEN_UPDATE_IND16( socrates )
 
 /* below belongs in sound/nc.c */
 
-static WRITE8_HANDLER(socrates_sound_w)
+WRITE8_MEMBER(socrates_state::socrates_sound_w)
 {
-	device_t *socr_snd = space->machine().device("soc_snd");
+	device_t *socr_snd = machine().device("soc_snd");
 	switch(offset)
 	{
 		case 0:
@@ -666,9 +669,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
-	AM_RANGE(0x08, 0x08) AM_READWRITE_LEGACY(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
-	AM_RANGE(0x10, 0x17) AM_READWRITE_LEGACY(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
+	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
+	AM_RANGE(0x08, 0x08) AM_READWRITE(socrates_ram_bank_r, socrates_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
+	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
         0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
     0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
     0x12 - W - 0b***EVVVV enable, volume control for channel 1
@@ -680,17 +683,17 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
     0xC0 produces a DMC wave read from an unknown address at around 342hz
     0x
     */
-	AM_RANGE(0x20, 0x21) AM_READWRITE_LEGACY(read_f3, socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
+	AM_RANGE(0x20, 0x21) AM_READWRITE(read_f3, socrates_scroll_w) AM_MIRROR (0xe) /* graphics section:
     0x20 - W - lsb offset of screen display
     0x21 - W - msb offset of screen display
     resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
     */
-	AM_RANGE(0x30, 0x30) AM_READWRITE_LEGACY(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only. may relate to waitstate timing? */
-	AM_RANGE(0x40, 0x40) AM_READWRITE_LEGACY(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
-	AM_RANGE(0x50, 0x50) AM_READWRITE_LEGACY(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
-	AM_RANGE(0x51, 0x51) AM_READWRITE_LEGACY(socrates_keyboard_high_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above, unlatches same as above */
-	AM_RANGE(0x60, 0x60) AM_READWRITE_LEGACY(read_f3, reset_speech) AM_MIRROR(0xF) /* reset the speech module, or perhaps fire an NMI?  */
-	AM_RANGE(0x70, 0xFF) AM_READ_LEGACY(read_f3) // nothing mapped here afaik
+	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only. may relate to waitstate timing? */
+	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
+	AM_RANGE(0x51, 0x51) AM_READWRITE(socrates_keyboard_high_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above, unlatches same as above */
+	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, reset_speech) AM_MIRROR(0xF) /* reset the speech module, or perhaps fire an NMI?  */
+	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
 
 

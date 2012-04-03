@@ -55,6 +55,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	device_t *m_terminal;
+	DECLARE_WRITE8_MEMBER(rset_callback);
+	DECLARE_WRITE8_MEMBER(ckon_ckof_callback);
+	DECLARE_WRITE8_MEMBER(lrex_callback);
 };
 
 
@@ -87,7 +90,7 @@ static void idle_callback(int state)
 }
 #endif
 
-static WRITE8_HANDLER ( rset_callback )
+WRITE8_MEMBER(ti990_4_state::rset_callback)
 {
 	ti990_cpuboard_reset();
 
@@ -96,16 +99,16 @@ static WRITE8_HANDLER ( rset_callback )
 	/* clear controller panel and smi fault LEDs */
 }
 
-static WRITE8_HANDLER ( ckon_ckof_callback )
+WRITE8_MEMBER(ti990_4_state::ckon_ckof_callback)
 {
-	device_t *maincpu = space->machine().device("maincpu");
+	device_t *maincpu = machine().device("maincpu");
 	ti990_ckon_ckof_callback(maincpu, (offset & 0x1000) ? 1 : 0);
 }
 
-static WRITE8_HANDLER ( lrex_callback )
+WRITE8_MEMBER(ti990_4_state::lrex_callback)
 {
 	/* right??? */
-	ti990_hold_load(space->machine());
+	ti990_hold_load(machine());
 }
 
 #if VIDEO_911
@@ -211,9 +214,9 @@ static ADDRESS_MAP_START(ti990_4_cru_map, AS_IO, 8, ti990_4_state )
 
 	/* external instruction decoding */
 /*  AM_RANGE(0x2000, 0x2fff) AM_WRITE_LEGACY(idle_callback)*/
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE_LEGACY(rset_callback)
-	AM_RANGE(0x5000, 0x6fff) AM_WRITE_LEGACY(ckon_ckof_callback)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE_LEGACY(lrex_callback)
+	AM_RANGE(0x3000, 0x3fff) AM_WRITE(rset_callback)
+	AM_RANGE(0x5000, 0x6fff) AM_WRITE(ckon_ckof_callback)
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(lrex_callback)
 ADDRESS_MAP_END
 
 #if 0

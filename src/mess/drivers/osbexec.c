@@ -102,98 +102,99 @@ public:
 		else
 			device_set_input_line( m_maincpu, 0, CLEAR_LINE );
 	}
+	DECLARE_WRITE8_MEMBER(osbexec_0000_w);
+	DECLARE_READ8_MEMBER(osbexec_c000_r);
+	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
+	DECLARE_READ8_MEMBER(osbexec_kbd_r);
+	DECLARE_READ8_MEMBER(osbexec_rtc_r);
 };
 
 
-static WRITE8_HANDLER( osbexec_0000_w )
+WRITE8_MEMBER(osbexec_state::osbexec_0000_w)
 {
-	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
 	/* Font RAM writing is enabled when ROM bank is enabled */
-	if ( state->m_pia0_porta & 0x80 )
+	if ( m_pia0_porta & 0x80 )
 	{
 		if ( offset < 0x1000 )
-			state->m_fontram[ offset ] = data;
+			m_fontram[ offset ] = data;
 	}
 	else
 	{
-		state->m_ram_0000[ offset ] = data;
+		m_ram_0000[ offset ] = data;
 	}
 }
 
 
-static READ8_HANDLER( osbexec_c000_r )
+READ8_MEMBER(osbexec_state::osbexec_c000_r)
 {
-	osbexec_state *state = space->machine().driver_data<osbexec_state>();
-	UINT8	data = state->m_ram_c000[offset];
+	UINT8	data = m_ram_c000[offset];
 
-	if ( ( state->m_pia0_porta & 0x40 ) && offset < 0x1000 )
+	if ( ( m_pia0_porta & 0x40 ) && offset < 0x1000 )
 	{
-		state->m_temp_attr = state->m_ram_c000[ 0x1000 + offset ];
+		m_temp_attr = m_ram_c000[ 0x1000 + offset ];
 	}
 
 	return data;
 }
 
 
-static WRITE8_HANDLER( osbexec_c000_w )
+WRITE8_MEMBER(osbexec_state::osbexec_c000_w)
 {
-	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
-	state->m_ram_c000[offset] = data;
+	m_ram_c000[offset] = data;
 
-	if ( ( state->m_pia0_porta & 0x40 ) && offset < 0x1000 )
+	if ( ( m_pia0_porta & 0x40 ) && offset < 0x1000 )
 	{
-		state->m_ram_c000[ 0x1000 + offset ] = state->m_temp_attr;
+		m_ram_c000[ 0x1000 + offset ] = m_temp_attr;
 	}
 }
 
 
-static READ8_HANDLER( osbexec_kbd_r )
+READ8_MEMBER(osbexec_state::osbexec_kbd_r)
 {
 	UINT8 data = 0xFF;
 
 	if ( offset & 0x0100 )
-		data &= input_port_read( space->machine(), "ROW0" );
+		data &= input_port_read( machine(), "ROW0" );
 
 	if ( offset & 0x0200 )
-		data &= input_port_read( space->machine(), "ROW1" );
+		data &= input_port_read( machine(), "ROW1" );
 
 	if ( offset & 0x0400 )
-		data &= input_port_read( space->machine(), "ROW2" );
+		data &= input_port_read( machine(), "ROW2" );
 
 	if ( offset & 0x0800 )
-		data &= input_port_read( space->machine(), "ROW3" );
+		data &= input_port_read( machine(), "ROW3" );
 
 	if ( offset & 0x1000 )
-		data &= input_port_read( space->machine(), "ROW4" );
+		data &= input_port_read( machine(), "ROW4" );
 
 	if ( offset & 0x2000 )
-		data &= input_port_read( space->machine(), "ROW5" );
+		data &= input_port_read( machine(), "ROW5" );
 
 	if ( offset & 0x4000 )
-		data &= input_port_read( space->machine(), "ROW6" );
+		data &= input_port_read( machine(), "ROW6" );
 
 	if ( offset & 0x8000 )
-		data &= input_port_read( space->machine(), "ROW7" );
+		data &= input_port_read( machine(), "ROW7" );
 
 	return data;
 }
 
 
-static READ8_HANDLER( osbexec_rtc_r )
+READ8_MEMBER(osbexec_state::osbexec_rtc_r)
 {
-	osbexec_state *state = space->machine().driver_data<osbexec_state>();
 
-	return state->m_rtc;
+	return m_rtc;
 }
 
 
 static ADDRESS_MAP_START( osbexec_mem, AS_PROGRAM, 8, osbexec_state )
-	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE_LEGACY(osbexec_0000_w )	/* ROM and maybe also banked ram */
+	AM_RANGE( 0x0000, 0x1FFF ) AM_READ_BANK("0000") AM_WRITE(osbexec_0000_w )	/* ROM and maybe also banked ram */
 	AM_RANGE( 0x2000, 0x3FFF ) AM_RAMBANK("2000")								/* Banked RAM */
 	AM_RANGE( 0x4000, 0xBFFF ) AM_RAMBANK("4000")								/* Banked RAM */
-	AM_RANGE( 0xC000, 0xDFFF ) AM_READWRITE_LEGACY(osbexec_c000_r, osbexec_c000_w )	/* Video ram / Banked RAM */
+	AM_RANGE( 0xC000, 0xDFFF ) AM_READWRITE(osbexec_c000_r, osbexec_c000_w )	/* Video ram / Banked RAM */
 	AM_RANGE( 0xE000, 0xEFFF ) AM_RAMBANK("e000")								/* Banked RAM */
 	AM_RANGE( 0xF000, 0xFFFF ) AM_RAM											/* 4KB of non-banked RAM for system stack etc */
 ADDRESS_MAP_END
@@ -206,8 +207,8 @@ static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_LEGACY("mb8877", wd17xx_r, wd17xx_w )				/* MB8877 @ UB17 input clock = 1MHz */
 	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_LEGACY("sio", z80dart_ba_cd_r, z80dart_ba_cd_w )	/* SIO @ UD4 */
 	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)				/* 6821 PIA @ UD8 */
-	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ_LEGACY(osbexec_kbd_r )					/* KBD */
-	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ_LEGACY(osbexec_rtc_r )										/* "RTC" @ UE13/UF13 */
+	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ(osbexec_kbd_r )					/* KBD */
+	AM_RANGE( 0x18, 0x1b ) AM_MIRROR( 0xff00 ) AM_READ(osbexec_rtc_r )										/* "RTC" @ UE13/UF13 */
 	/* ?? - vid ? */
 ADDRESS_MAP_END
 

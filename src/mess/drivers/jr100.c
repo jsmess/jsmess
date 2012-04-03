@@ -35,46 +35,46 @@ public:
 	UINT8 m_speaker;
 	UINT16 m_t1latch;
 	UINT8 m_beep_en;
+	DECLARE_WRITE8_MEMBER(jr100_via_w);
 };
 
 
 
 
-static WRITE8_HANDLER( jr100_via_w )
+WRITE8_MEMBER(jr100_state::jr100_via_w)
 {
-	jr100_state *state = space->machine().driver_data<jr100_state>();
 	/* ACR: beeper masking */
 	if(offset == 0x0b)
 	{
 		//printf("BEEP %s\n",((data & 0xe0) == 0xe0) ? "ON" : "OFF");
-		state->m_beep_en = ((data & 0xe0) == 0xe0);
+		m_beep_en = ((data & 0xe0) == 0xe0);
 
-		if(!state->m_beep_en)
-			beep_set_state(space->machine().device(BEEPER_TAG),0);
+		if(!m_beep_en)
+			beep_set_state(machine().device(BEEPER_TAG),0);
 	}
 
 	/* T1L-L */
 	if(offset == 0x04)
 	{
-		state->m_t1latch = (state->m_t1latch & 0xff00) | (data & 0xff);
+		m_t1latch = (m_t1latch & 0xff00) | (data & 0xff);
 		//printf("BEEP T1CL %02x\n",data);
 	}
 
 	/* T1L-H */
 	if(offset == 0x05)
 	{
-		state->m_t1latch = (state->m_t1latch & 0xff) | ((data & 0xff) << 8);
+		m_t1latch = (m_t1latch & 0xff) | ((data & 0xff) << 8);
 		//printf("BEEP T1CH %02x\n",data);
 
 		/* writing here actually enables the beeper, if above masking condition is satisfied */
-		if(state->m_beep_en)
+		if(m_beep_en)
 		{
-			beep_set_state(space->machine().device(BEEPER_TAG),1);
-			beep_set_frequency(space->machine().device(BEEPER_TAG),894886.25 / (double)(state->m_t1latch) / 2.0);
+			beep_set_state(machine().device(BEEPER_TAG),1);
+			beep_set_frequency(machine().device(BEEPER_TAG),894886.25 / (double)(m_t1latch) / 2.0);
 		}
 	}
-	via6522_device *via = space->machine().device<via6522_device>("via");
-	via->write(*space,offset,data);
+	via6522_device *via = machine().device<via6522_device>("via");
+	via->write(*&space,offset,data);
 }
 
 static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8, jr100_state )
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8, jr100_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_ram)
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(m_pcg)
 	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0xc800, 0xc80f) AM_DEVREAD("via", via6522_device, read) AM_WRITE_LEGACY(jr100_via_w)
+	AM_RANGE(0xc800, 0xc80f) AM_DEVREAD("via", via6522_device, read) AM_WRITE(jr100_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
