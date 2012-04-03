@@ -92,6 +92,8 @@ public:
 	int m_ROM_paged;
 	int m_irq_state;
 	int m_KeyRow;
+	DECLARE_WRITE8_MEMBER(ti99_2_write_kbd);
+	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
 };
 
 
@@ -110,8 +112,8 @@ static DRIVER_INIT( ti99_2_32 )
 	state->m_ROM_paged = 1;
 }
 
-#define TI99_2_32_ROMPAGE0 (space->machine().region("maincpu")->base()+0x4000)
-#define TI99_2_32_ROMPAGE1 (space->machine().region("maincpu")->base()+0x10000)
+#define TI99_2_32_ROMPAGE0 (machine().region("maincpu")->base()+0x4000)
+#define TI99_2_32_ROMPAGE1 (machine().region("maincpu")->base()+0x10000)
 
 static MACHINE_RESET( ti99_2 )
 {
@@ -217,27 +219,26 @@ ADDRESS_MAP_END
 /* current keyboard row */
 
 /* write the current keyboard row */
-static WRITE8_HANDLER ( ti99_2_write_kbd )
+WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
 {
-	ti99_2_state *state = space->machine().driver_data<ti99_2_state>();
 	offset &= 0x7;  /* other address lines are not decoded */
 
 	if (offset <= 2)
 	{
 		/* this implementation is just a guess */
 		if (data)
-			state->m_KeyRow |= 1 << offset;
+			m_KeyRow |= 1 << offset;
 		else
-			state->m_KeyRow &= ~ (1 << offset);
+			m_KeyRow &= ~ (1 << offset);
 	}
 	/* now, we handle ROM paging */
-	if (state->m_ROM_paged)
+	if (m_ROM_paged)
 	{	/* if we have paged ROMs, page according to S0 keyboard interface line */
-		memory_set_bankptr(space->machine(), "bank1", (state->m_KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		memory_set_bankptr(machine(), "bank1", (m_KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 
-static WRITE8_HANDLER ( ti99_2_write_misc_cru )
+WRITE8_MEMBER(ti99_2_state::ti99_2_write_misc_cru)
 {
 	offset &= 0x7;  /* other address lines are not decoded */
 
@@ -281,8 +282,8 @@ static  READ8_HANDLER ( ti99_2_read_misc_cru )
 static ADDRESS_MAP_START(ti99_2_io, AS_IO, 8, ti99_2_state )
 	AM_RANGE(0x0E00, 0x0E7f) AM_READ_LEGACY(ti99_2_read_kbd)
 	AM_RANGE(0x0E80, 0x0Eff) AM_READ_LEGACY(ti99_2_read_misc_cru)
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE_LEGACY(ti99_2_write_kbd)
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE_LEGACY(ti99_2_write_misc_cru)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITE(ti99_2_write_kbd)
+	AM_RANGE(0x7400, 0x77ff) AM_WRITE(ti99_2_write_misc_cru)
 ADDRESS_MAP_END
 
 

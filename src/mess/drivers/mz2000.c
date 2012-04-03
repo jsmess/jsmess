@@ -51,6 +51,20 @@ public:
 	UINT8 m_color_mode;
 	UINT8 m_has_fdc;
 	UINT8 m_hi_mode;
+	DECLARE_READ8_MEMBER(mz2000_ipl_r);
+	DECLARE_READ8_MEMBER(mz2000_wram_r);
+	DECLARE_WRITE8_MEMBER(mz2000_wram_w);
+	DECLARE_READ8_MEMBER(mz2000_tvram_r);
+	DECLARE_WRITE8_MEMBER(mz2000_tvram_w);
+	DECLARE_READ8_MEMBER(mz2000_gvram_r);
+	DECLARE_WRITE8_MEMBER(mz2000_gvram_w);
+	DECLARE_READ8_MEMBER(mz2000_mem_r);
+	DECLARE_WRITE8_MEMBER(mz2000_mem_w);
+	DECLARE_WRITE8_MEMBER(mz2000_gvram_bank_w);
+	DECLARE_WRITE8_MEMBER(mz2000_fdc_w);
+	DECLARE_WRITE8_MEMBER(timer_w);
+	DECLARE_WRITE8_MEMBER(mz2000_tvram_attr_w);
+	DECLARE_WRITE8_MEMBER(mz2000_gvram_mask_w);
 };
 
 static VIDEO_START( mz2000 )
@@ -154,80 +168,77 @@ static SCREEN_UPDATE_IND16( mz2000 )
     return 0;
 }
 
-static READ8_HANDLER( mz2000_ipl_r )
+READ8_MEMBER(mz2000_state::mz2000_ipl_r)
 {
-	UINT8 *ipl = space->machine().region("ipl")->base();
+	UINT8 *ipl = machine().region("ipl")->base();
 
 	return ipl[offset];
 }
 
-static READ8_HANDLER( mz2000_wram_r )
+READ8_MEMBER(mz2000_state::mz2000_wram_r)
 {
-	UINT8 *wram = space->machine().region("wram")->base();
+	UINT8 *wram = machine().region("wram")->base();
 
 	return wram[offset];
 }
 
-static WRITE8_HANDLER( mz2000_wram_w )
+WRITE8_MEMBER(mz2000_state::mz2000_wram_w)
 {
-	UINT8 *wram = space->machine().region("wram")->base();
+	UINT8 *wram = machine().region("wram")->base();
 
 	wram[offset] = data;
 }
 
-static READ8_HANDLER( mz2000_tvram_r )
+READ8_MEMBER(mz2000_state::mz2000_tvram_r)
 {
-	UINT8 *tvram = space->machine().region("tvram")->base();
+	UINT8 *tvram = machine().region("tvram")->base();
 
 	return tvram[offset];
 }
 
-static WRITE8_HANDLER( mz2000_tvram_w )
+WRITE8_MEMBER(mz2000_state::mz2000_tvram_w)
 {
-	UINT8 *tvram = space->machine().region("tvram")->base();
+	UINT8 *tvram = machine().region("tvram")->base();
 
 	tvram[offset] = data;
 }
 
-static READ8_HANDLER( mz2000_gvram_r )
+READ8_MEMBER(mz2000_state::mz2000_gvram_r)
 {
-	mz2000_state *state = space->machine().driver_data<mz2000_state>();
-	UINT8 *gvram = space->machine().region("gvram")->base();
+	UINT8 *gvram = machine().region("gvram")->base();
 
-	return gvram[offset+state->m_gvram_bank*0x4000];
+	return gvram[offset+m_gvram_bank*0x4000];
 }
 
-static WRITE8_HANDLER( mz2000_gvram_w )
+WRITE8_MEMBER(mz2000_state::mz2000_gvram_w)
 {
-	mz2000_state *state = space->machine().driver_data<mz2000_state>();
-	UINT8 *gvram = space->machine().region("gvram")->base();
+	UINT8 *gvram = machine().region("gvram")->base();
 
-	gvram[offset+state->m_gvram_bank*0x4000] = data;
+	gvram[offset+m_gvram_bank*0x4000] = data;
 }
 
 
-static READ8_HANDLER( mz2000_mem_r )
+READ8_MEMBER(mz2000_state::mz2000_mem_r)
 {
-	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 	UINT8 page_mem;
 
 	page_mem = (offset & 0xf000) >> 12;
 
-	if(page_mem == 0 && state->m_ipl_enable)
+	if(page_mem == 0 && m_ipl_enable)
 		return mz2000_ipl_r(space,offset & 0xfff);
 
-	if(((page_mem & 8) == 0) && state->m_ipl_enable == 0) // if ipl is enabled, 0x1000 - 0x7fff accesses to dummy region
+	if(((page_mem & 8) == 0) && m_ipl_enable == 0) // if ipl is enabled, 0x1000 - 0x7fff accesses to dummy region
 		return mz2000_wram_r(space,offset);
 
 	if(page_mem & 8)
 	{
-		if(page_mem == 0xd && state->m_tvram_enable)
+		if(page_mem == 0xd && m_tvram_enable)
 			return mz2000_tvram_r(space,offset & 0xfff);
-		else if(page_mem >= 0xc && state->m_gvram_enable)
+		else if(page_mem >= 0xc && m_gvram_enable)
 			return mz2000_gvram_r(space,offset & 0x3fff);
 		else
 		{
-			UINT16 wram_mask = (state->m_ipl_enable) ? 0x7fff : 0xffff;
+			UINT16 wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
 			return mz2000_wram_r(space,offset & wram_mask);
 		}
 	}
@@ -235,36 +246,34 @@ static READ8_HANDLER( mz2000_mem_r )
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mz2000_mem_w )
+WRITE8_MEMBER(mz2000_state::mz2000_mem_w)
 {
-	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 	UINT8 page_mem;
 
 	page_mem = (offset & 0xf000) >> 12;
 
-	if((page_mem & 8) == 0 && state->m_ipl_enable == 0)
+	if((page_mem & 8) == 0 && m_ipl_enable == 0)
 		mz2000_wram_w(space,offset,data);
 
 	if(page_mem & 8)
 	{
-		if(page_mem == 0xd && state->m_tvram_enable)
+		if(page_mem == 0xd && m_tvram_enable)
 			mz2000_tvram_w(space,offset & 0xfff,data);
-		else if(page_mem >= 0xc && state->m_gvram_enable)
+		else if(page_mem >= 0xc && m_gvram_enable)
 			mz2000_gvram_w(space,offset & 0x3fff,data);
 		else
 		{
-			UINT16 wram_mask = (state->m_ipl_enable) ? 0x7fff : 0xffff;
+			UINT16 wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
 
 			mz2000_wram_w(space,offset & wram_mask,data);
 		}
 	}
 }
 
-static WRITE8_HANDLER( mz2000_gvram_bank_w )
+WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
 {
-	mz2000_state *state = space->machine().driver_data<mz2000_state>();
 
-	state->m_gvram_bank = data & 3;
+	m_gvram_bank = data & 3;
 }
 
 static READ8_DEVICE_HANDLER( mz2000_wd17xx_r )
@@ -285,16 +294,16 @@ static WRITE8_DEVICE_HANDLER( mz2000_wd17xx_w )
 		wd17xx_w(device, offset, data ^ 0xff);
 }
 
-static WRITE8_HANDLER( mz2000_fdc_w )
+WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)
 {
-	device_t* dev = space->machine().device("mb8877a");
+	device_t* dev = machine().device("mb8877a");
 
 	switch(offset+0xdc)
 	{
 		case 0xdc:
 			wd17xx_set_drive(dev,data & 3);
-			floppy_mon_w(floppy_get_device(space->machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), data & 3), 1,0);
+			floppy_mon_w(floppy_get_device(machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), 1,0);
 			break;
 		case 0xdd:
 			wd17xx_set_side(dev,(data & 1));
@@ -302,9 +311,9 @@ static WRITE8_HANDLER( mz2000_fdc_w )
 	}
 }
 
-static WRITE8_HANDLER( timer_w )
+WRITE8_MEMBER(mz2000_state::timer_w)
 {
-	device_t *pit8253 = space->machine().device("pit");
+	device_t *pit8253 = machine().device("pit");
 
 	pit8253_gate0_w(pit8253, 1);
 	pit8253_gate1_w(pit8253, 1);
@@ -314,36 +323,34 @@ static WRITE8_HANDLER( timer_w )
 	pit8253_gate1_w(pit8253, 1);
 }
 
-static WRITE8_HANDLER( mz2000_tvram_attr_w )
+WRITE8_MEMBER(mz2000_state::mz2000_tvram_attr_w)
 {
-	mz2000_state *state = space->machine().driver_data<mz2000_state>();
-	state->m_tvram_attr = data;
+	m_tvram_attr = data;
 }
 
-static WRITE8_HANDLER( mz2000_gvram_mask_w )
+WRITE8_MEMBER(mz2000_state::mz2000_gvram_mask_w)
 {
-	mz2000_state *state = space->machine().driver_data<mz2000_state>();
-	state->m_gvram_mask = data;
+	m_gvram_mask = data;
 }
 
 static ADDRESS_MAP_START(mz2000_map, AS_PROGRAM, 8, mz2000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE_LEGACY(mz2000_mem_r,mz2000_mem_w)
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(mz2000_mem_r,mz2000_mem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mz2000_io, AS_IO, 8, mz2000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE_LEGACY("mb8877a", mz2000_wd17xx_r, mz2000_wd17xx_w)
-	AM_RANGE(0xdc, 0xdd) AM_WRITE_LEGACY(mz2000_fdc_w)
+	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2000_fdc_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
-    AM_RANGE(0xf0, 0xf3) AM_WRITE_LEGACY(timer_w)
+    AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 //  AM_RANGE(0xf4, 0xf7) CRTC
-	AM_RANGE(0xf5, 0xf5) AM_WRITE_LEGACY(mz2000_tvram_attr_w)
-	AM_RANGE(0xf6, 0xf6) AM_WRITE_LEGACY(mz2000_gvram_mask_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE_LEGACY(mz2000_gvram_bank_w)
+	AM_RANGE(0xf5, 0xf5) AM_WRITE(mz2000_tvram_attr_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(mz2000_gvram_mask_w)
+	AM_RANGE(0xf7, 0xf7) AM_WRITE(mz2000_gvram_bank_w)
 ADDRESS_MAP_END
 
 

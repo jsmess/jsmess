@@ -37,6 +37,15 @@ public:
 	struct {
 		UINT16 cmd;
 	}m_key;
+	DECLARE_READ8_MEMBER(fp6000_pcg_r);
+	DECLARE_WRITE8_MEMBER(fp6000_pcg_w);
+	DECLARE_WRITE8_MEMBER(fp6000_6845_address_w);
+	DECLARE_WRITE8_MEMBER(fp6000_6845_data_w);
+	DECLARE_READ8_MEMBER(fp6000_key_r);
+	DECLARE_WRITE8_MEMBER(fp6000_key_w);
+	DECLARE_READ16_MEMBER(unk_r);
+	DECLARE_READ16_MEMBER(ex_board_r);
+	DECLARE_READ16_MEMBER(pit_r);
 };
 
 static VIDEO_START( fp6000 )
@@ -126,35 +135,31 @@ static SCREEN_UPDATE_IND16( fp6000 )
 	return 0;
 }
 
-static READ8_HANDLER( fp6000_pcg_r )
+READ8_MEMBER(fp6000_state::fp6000_pcg_r)
 {
-	fp6000_state *state = space->machine().driver_data<fp6000_state>();
 
-	return state->m_char_rom[offset];
+	return m_char_rom[offset];
 }
 
-static WRITE8_HANDLER( fp6000_pcg_w )
+WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
 {
-	fp6000_state *state = space->machine().driver_data<fp6000_state>();
 
-	state->m_char_rom[offset] = data;
-	gfx_element_mark_dirty(space->machine().gfx[0], offset >> 4);
+	m_char_rom[offset] = data;
+	gfx_element_mark_dirty(machine().gfx[0], offset >> 4);
 }
 
-static WRITE8_HANDLER( fp6000_6845_address_w )
+WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
 {
-	fp6000_state *state = space->machine().driver_data<fp6000_state>();
 
-	state->m_crtc_index = data;
-	state->m_mc6845->address_w(*space, offset, data);
+	m_crtc_index = data;
+	m_mc6845->address_w(*&space, offset, data);
 }
 
-static WRITE8_HANDLER( fp6000_6845_data_w )
+WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 {
-	fp6000_state *state = space->machine().driver_data<fp6000_state>();
 
-	state->m_crtc_vreg[state->m_crtc_index] = data;
-	state->m_mc6845->register_w(*space, offset, data);
+	m_crtc_vreg[m_crtc_index] = data;
+	m_mc6845->register_w(*&space, offset, data);
 }
 
 static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16, fp6000_state )
@@ -162,23 +167,22 @@ static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16, fp6000_state )
 	AM_RANGE(0x00000,0xbffff) AM_RAM
 	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_BASE(m_gvram)//gvram
 	AM_RANGE(0xe0000,0xe0fff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0xe7000,0xe7fff) AM_READWRITE8_LEGACY(fp6000_pcg_r,fp6000_pcg_w,0xffff)
+	AM_RANGE(0xe7000,0xe7fff) AM_READWRITE8(fp6000_pcg_r,fp6000_pcg_w,0xffff)
 	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
 /* Hack until I understand what UART is this one ... */
-static READ8_HANDLER( fp6000_key_r )
+READ8_MEMBER(fp6000_state::fp6000_key_r)
 {
-	fp6000_state *state = space->machine().driver_data<fp6000_state>();
 
 	if(offset)
 	{
-		switch(state->m_key.cmd)
+		switch(m_key.cmd)
 		{
 			case 0x7e15: return 3;
 			case 0x1b15: return 1;
 			case 0x2415: return 0;
-			default: printf("%04x\n",state->m_key.cmd);
+			default: printf("%04x\n",m_key.cmd);
 		}
 		return 0;
 	}
@@ -186,41 +190,40 @@ static READ8_HANDLER( fp6000_key_r )
 	return 0x40;
 }
 
-static WRITE8_HANDLER( fp6000_key_w )
+WRITE8_MEMBER(fp6000_state::fp6000_key_w)
 {
-	fp6000_state *state = space->machine().driver_data<fp6000_state>();
 
 	if(offset)
-		state->m_key.cmd = (data & 0xff) | (state->m_key.cmd << 8);
+		m_key.cmd = (data & 0xff) | (m_key.cmd << 8);
 	else
-		state->m_key.cmd = (data << 8) | (state->m_key.cmd & 0xff);
+		m_key.cmd = (data << 8) | (m_key.cmd & 0xff);
 }
 
-static READ16_HANDLER( unk_r )
+READ16_MEMBER(fp6000_state::unk_r)
 {
 	return 0x40;
 }
 
-static READ16_HANDLER( ex_board_r )
+READ16_MEMBER(fp6000_state::ex_board_r)
 {
 	return 0xffff;
 }
 
-static READ16_HANDLER( pit_r )
+READ16_MEMBER(fp6000_state::pit_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START(fp6000_io, AS_IO, 16, fp6000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x08, 0x09) AM_READ_LEGACY(ex_board_r) // BIOS of some sort ...
+	AM_RANGE(0x08, 0x09) AM_READ(ex_board_r) // BIOS of some sort ...
 	AM_RANGE(0x0a, 0x0b) AM_READ_PORT("DSW") // installed RAM id?
 	AM_RANGE(0x10, 0x11) AM_READNOP
-	AM_RANGE(0x20, 0x23) AM_READWRITE8_LEGACY(fp6000_key_r,fp6000_key_w,0x00ff)
-	AM_RANGE(0x38, 0x39) AM_READ_LEGACY(pit_r) // pit?
-	AM_RANGE(0x70, 0x71) AM_WRITE8_LEGACY(fp6000_6845_address_w,0x00ff)
-	AM_RANGE(0x72, 0x73) AM_WRITE8_LEGACY(fp6000_6845_data_w,0x00ff)
-	AM_RANGE(0x74, 0x75) AM_READ_LEGACY(unk_r) //bit 6 busy flag
+	AM_RANGE(0x20, 0x23) AM_READWRITE8(fp6000_key_r,fp6000_key_w,0x00ff)
+	AM_RANGE(0x38, 0x39) AM_READ(pit_r) // pit?
+	AM_RANGE(0x70, 0x71) AM_WRITE8(fp6000_6845_address_w,0x00ff)
+	AM_RANGE(0x72, 0x73) AM_WRITE8(fp6000_6845_data_w,0x00ff)
+	AM_RANGE(0x74, 0x75) AM_READ(unk_r) //bit 6 busy flag
 ADDRESS_MAP_END
 
 /* Input ports */

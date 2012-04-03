@@ -48,6 +48,8 @@ public:
 	struct{
 		UINT8 portb;
 	}m_keyb;
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -296,31 +298,29 @@ static MACHINE_RESET(paso1600)
 {
 }
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(paso1600_state::pc_dma_read_byte)
 {
-//  paso1600_state *state = space->machine().driver_data<paso1600_state>();
-	//offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
 
-	return space->read_byte(offset);
+	return space.read_byte(offset);
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
 {
-//  paso1600_state *state = space->machine().driver_data<paso1600_state>();
-	//offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
 
-	space->write_byte(offset, data);
+	space.write_byte(offset, data);
 }
 
 static I8237_INTERFACE( paso1600_dma8237_interface )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(paso1600_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(paso1600_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }

@@ -111,6 +111,55 @@ public:
 	UINT8 m_prev_col_val;
 	UINT8 m_pio_latchb;
 	UINT8 m_ym_porta;
+	DECLARE_READ8_MEMBER(bank0_r);
+	DECLARE_READ8_MEMBER(bank1_r);
+	DECLARE_READ8_MEMBER(bank2_r);
+	DECLARE_READ8_MEMBER(bank3_r);
+	DECLARE_READ8_MEMBER(bank4_r);
+	DECLARE_READ8_MEMBER(bank5_r);
+	DECLARE_READ8_MEMBER(bank6_r);
+	DECLARE_READ8_MEMBER(bank7_r);
+	DECLARE_WRITE8_MEMBER(bank0_w);
+	DECLARE_WRITE8_MEMBER(bank1_w);
+	DECLARE_WRITE8_MEMBER(bank2_w);
+	DECLARE_WRITE8_MEMBER(bank3_w);
+	DECLARE_WRITE8_MEMBER(bank4_w);
+	DECLARE_WRITE8_MEMBER(bank5_w);
+	DECLARE_WRITE8_MEMBER(bank6_w);
+	DECLARE_WRITE8_MEMBER(bank7_w);
+	DECLARE_READ8_MEMBER(mz2500_bank_addr_r);
+	DECLARE_WRITE8_MEMBER(mz2500_bank_addr_w);
+	DECLARE_READ8_MEMBER(mz2500_bank_data_r);
+	DECLARE_WRITE8_MEMBER(mz2500_bank_data_w);
+	DECLARE_WRITE8_MEMBER(mz2500_kanji_bank_w);
+	DECLARE_WRITE8_MEMBER(mz2500_dictionary_bank_w);
+	DECLARE_READ8_MEMBER(mz2500_crtc_hvblank_r);
+	DECLARE_WRITE8_MEMBER(mz2500_tv_crtc_w);
+	DECLARE_WRITE8_MEMBER(mz2500_irq_sel_w);
+	DECLARE_WRITE8_MEMBER(mz2500_irq_data_w);
+	DECLARE_WRITE8_MEMBER(mz2500_fdc_w);
+	DECLARE_READ8_MEMBER(mz2500_rom_r);
+	DECLARE_WRITE8_MEMBER(mz2500_rom_w);
+	DECLARE_WRITE8_MEMBER(palette4096_io_w);
+	DECLARE_READ8_MEMBER(mz2500_bplane_latch_r);
+	DECLARE_READ8_MEMBER(mz2500_rplane_latch_r);
+	DECLARE_READ8_MEMBER(mz2500_gplane_latch_r);
+	DECLARE_READ8_MEMBER(mz2500_iplane_latch_r);
+	DECLARE_WRITE8_MEMBER(mz2500_cg_addr_w);
+	DECLARE_WRITE8_MEMBER(mz2500_cg_data_w);
+	DECLARE_WRITE8_MEMBER(timer_w);
+	DECLARE_READ8_MEMBER(mz2500_joystick_r);
+	DECLARE_WRITE8_MEMBER(mz2500_joystick_w);
+	DECLARE_READ8_MEMBER(mz2500_kanji_r);
+	DECLARE_WRITE8_MEMBER(mz2500_kanji_w);
+	DECLARE_READ8_MEMBER(rp5c15_8_r);
+	DECLARE_WRITE8_MEMBER(rp5c15_8_w);
+	DECLARE_READ8_MEMBER(mz2500_emm_data_r);
+	DECLARE_WRITE8_MEMBER(mz2500_emm_addr_w);
+	DECLARE_WRITE8_MEMBER(mz2500_emm_data_w);
+	UINT8 mz2500_cg_latch_compare();
+	UINT8 mz2500_ram_read(UINT16 offset, UINT8 bank_num);
+	void mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num);
 };
 
 
@@ -664,9 +713,9 @@ static void mz2500_reconfigure_screen(running_machine &machine)
 	}
 }
 
-static UINT8 mz2500_cg_latch_compare(mz2500_state *state)
+UINT8 mz2500_state::mz2500_cg_latch_compare()
 {
-	UINT8 compare_val = state->m_cg_reg[0x07] & 0xf;
+	UINT8 compare_val = m_cg_reg[0x07] & 0xf;
 	UINT8 pix_val;
 	UINT8 res;
 	UINT16 i;
@@ -674,7 +723,7 @@ static UINT8 mz2500_cg_latch_compare(mz2500_state *state)
 
 	for(i=1;i<0x100;i<<=1)
 	{
-		pix_val = ((state->m_cg_latch[0] & i) ? 1 : 0) | ((state->m_cg_latch[1] & i) ? 2 : 0) | ((state->m_cg_latch[2] & i) ? 4 : 0) | ((state->m_cg_latch[3] & i) ? 8 : 0);
+		pix_val = ((m_cg_latch[0] & i) ? 1 : 0) | ((m_cg_latch[1] & i) ? 2 : 0) | ((m_cg_latch[2] & i) ? 4 : 0) | ((m_cg_latch[3] & i) ? 8 : 0);
 		if(pix_val == compare_val)
 			res|=i;
 	}
@@ -682,11 +731,10 @@ static UINT8 mz2500_cg_latch_compare(mz2500_state *state)
 	return res;
 }
 
-static UINT8 mz2500_ram_read(running_machine &machine, UINT16 offset, UINT8 bank_num)
+UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
-	UINT8 *ram = machine.region("maincpu")->base();
-	UINT8 cur_bank = state->m_bank_val[bank_num];
+	UINT8 *ram = machine().region("maincpu")->base();
+	UINT8 cur_bank = m_bank_val[bank_num];
 
 	switch(cur_bank)
 	{
@@ -696,37 +744,37 @@ static UINT8 mz2500_ram_read(running_machine &machine, UINT16 offset, UINT8 bank
 		case 0x33:
 		{
 			// READ MODIFY WRITE
-			if(state->m_cg_reg[0x0e] == 0x3)
+			if(m_cg_reg[0x0e] == 0x3)
 			{
 				// ...
 			}
 			else
 			{
 				int plane;
-				state->m_cg_latch[0] = ram[offset+((cur_bank & 3)*0x2000)+0x40000]; //B
-				state->m_cg_latch[1] = ram[offset+((cur_bank & 3)*0x2000)+0x44000]; //R
-				state->m_cg_latch[2] = ram[offset+((cur_bank & 3)*0x2000)+0x48000]; //G
-				state->m_cg_latch[3] = ram[offset+((cur_bank & 3)*0x2000)+0x4c000]; //I
-				plane = state->m_cg_reg[0x07] & 3;
+				m_cg_latch[0] = ram[offset+((cur_bank & 3)*0x2000)+0x40000]; //B
+				m_cg_latch[1] = ram[offset+((cur_bank & 3)*0x2000)+0x44000]; //R
+				m_cg_latch[2] = ram[offset+((cur_bank & 3)*0x2000)+0x48000]; //G
+				m_cg_latch[3] = ram[offset+((cur_bank & 3)*0x2000)+0x4c000]; //I
+				plane = m_cg_reg[0x07] & 3;
 
-				if(state->m_cg_reg[0x07] & 0x10)
-					return mz2500_cg_latch_compare(state);
+				if(m_cg_reg[0x07] & 0x10)
+					return mz2500_cg_latch_compare();
 				else
-					return state->m_cg_latch[plane];
+					return m_cg_latch[plane];
 			}
 		}
 		break;
 		case 0x39:
 		{
-			if(state->m_kanji_bank & 0x80) //kanji ROM
+			if(m_kanji_bank & 0x80) //kanji ROM
 			{
-				UINT8 *knj_rom = machine.region("kanji")->base();
+				UINT8 *knj_rom = machine().region("kanji")->base();
 
-				return knj_rom[(offset & 0x7ff)+((state->m_kanji_bank & 0x7f)*0x800)];
+				return knj_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
 			}
 			else //PCG RAM
 			{
-				UINT8 *pcg_ram = machine.region("pcg")->base();
+				UINT8 *pcg_ram = machine().region("pcg")->base();
 
 				return pcg_ram[offset];
 			}
@@ -734,9 +782,9 @@ static UINT8 mz2500_ram_read(running_machine &machine, UINT16 offset, UINT8 bank
 		break;
 		case 0x3a:
 		{
-			UINT8 *dic_rom = machine.region("dictionary")->base();
+			UINT8 *dic_rom = machine().region("dictionary")->base();
 
-			return dic_rom[(offset & 0x1fff) + ((state->m_dic_bank & 0x1f)*0x2000)];
+			return dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 		}
 		break;
 		case 0x3c:
@@ -744,7 +792,7 @@ static UINT8 mz2500_ram_read(running_machine &machine, UINT16 offset, UINT8 bank
 		case 0x3e:
 		case 0x3f:
 		{
-			UINT8 *phone_rom = machine.region("phone")->base();
+			UINT8 *phone_rom = machine().region("phone")->base();
 
 			return phone_rom[offset+(cur_bank & 3)*0x2000];
 		}
@@ -755,14 +803,13 @@ static UINT8 mz2500_ram_read(running_machine &machine, UINT16 offset, UINT8 bank
 	return 0xff;
 }
 
-static void mz2500_ram_write(running_machine &machine, UINT16 offset, UINT8 data, UINT8 bank_num)
+void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
-	UINT8 *ram = machine.region("maincpu")->base();
-	UINT8 cur_bank = state->m_bank_val[bank_num];
+	UINT8 *ram = machine().region("maincpu")->base();
+	UINT8 cur_bank = m_bank_val[bank_num];
 
 //  if(cur_bank >= 0x30 && cur_bank <= 0x33)
-//      printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",state->m_cg_reg[0],state->m_cg_reg[1],state->m_cg_reg[2],state->m_cg_reg[3],offset,data);
+//      printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",m_cg_reg[0],m_cg_reg[1],m_cg_reg[2],m_cg_reg[3],offset,data);
 
 	switch(cur_bank)
 	{
@@ -772,56 +819,56 @@ static void mz2500_ram_write(running_machine &machine, UINT16 offset, UINT8 data
 		case 0x33:
 		{
 			// READ MODIFY WRITE
-			if(state->m_cg_reg[0x0e] == 0x3)
+			if(m_cg_reg[0x0e] == 0x3)
 			{
 				// ...
 			}
 			else
 			{
-				if((state->m_cg_reg[0x05] & 0xc0) == 0x00) //replace
+				if((m_cg_reg[0x05] & 0xc0) == 0x00) //replace
 				{
-					if(state->m_cg_reg[5] & 1) //B
+					if(m_cg_reg[5] & 1) //B
 					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~state->m_cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (state->m_cg_reg[4] & 1) ? (data & state->m_cg_reg[0] & state->m_cg_reg[6]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~m_cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (m_cg_reg[4] & 1) ? (data & m_cg_reg[0] & m_cg_reg[6]) : 0;
 					}
-					if(state->m_cg_reg[5] & 2) //R
+					if(m_cg_reg[5] & 2) //R
 					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~state->m_cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (state->m_cg_reg[4] & 2) ? (data & state->m_cg_reg[1] & state->m_cg_reg[6]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~m_cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (m_cg_reg[4] & 2) ? (data & m_cg_reg[1] & m_cg_reg[6]) : 0;
 					}
-					if(state->m_cg_reg[5] & 4) //G
+					if(m_cg_reg[5] & 4) //G
 					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~state->m_cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (state->m_cg_reg[4] & 4) ? (data & state->m_cg_reg[2] & state->m_cg_reg[6]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~m_cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (m_cg_reg[4] & 4) ? (data & m_cg_reg[2] & m_cg_reg[6]) : 0;
 					}
-					if(state->m_cg_reg[5] & 8) //I
+					if(m_cg_reg[5] & 8) //I
 					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~state->m_cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (state->m_cg_reg[4] & 8) ? (data & state->m_cg_reg[3] & state->m_cg_reg[6]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~m_cg_reg[6];
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (m_cg_reg[4] & 8) ? (data & m_cg_reg[3] & m_cg_reg[6]) : 0;
 					}
 				}
-				else if((state->m_cg_reg[0x05] & 0xc0) == 0x40) //pset
+				else if((m_cg_reg[0x05] & 0xc0) == 0x40) //pset
 				{
-					if(state->m_cg_reg[5] & 1) //B
+					if(m_cg_reg[5] & 1) //B
 					{
 						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (state->m_cg_reg[4] & 1) ? (data & state->m_cg_reg[0]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (m_cg_reg[4] & 1) ? (data & m_cg_reg[0]) : 0;
 					}
-					if(state->m_cg_reg[5] & 2) //R
+					if(m_cg_reg[5] & 2) //R
 					{
 						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (state->m_cg_reg[4] & 2) ? (data & state->m_cg_reg[1]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (m_cg_reg[4] & 2) ? (data & m_cg_reg[1]) : 0;
 					}
-					if(state->m_cg_reg[5] & 4) //G
+					if(m_cg_reg[5] & 4) //G
 					{
 						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (state->m_cg_reg[4] & 4) ? (data & state->m_cg_reg[2]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (m_cg_reg[4] & 4) ? (data & m_cg_reg[2]) : 0;
 					}
-					if(state->m_cg_reg[5] & 8) //I
+					if(m_cg_reg[5] & 8) //I
 					{
 						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (state->m_cg_reg[4] & 8) ? (data & state->m_cg_reg[3]) : 0;
+						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (m_cg_reg[4] & 8) ? (data & m_cg_reg[3]) : 0;
 					}
 				}
 			}
@@ -845,18 +892,18 @@ static void mz2500_ram_write(running_machine &machine, UINT16 offset, UINT8 data
 		case 0x39:
 		{
 			ram[offset+cur_bank*0x2000] = data;
-			if(state->m_kanji_bank & 0x80) //kanji ROM
+			if(m_kanji_bank & 0x80) //kanji ROM
 			{
 				//NOP
 			}
 			else //PCG RAM
 			{
-				UINT8 *pcg_ram = machine.region("pcg")->base();
+				UINT8 *pcg_ram = machine().region("pcg")->base();
 				pcg_ram[offset] = data;
 				if((offset & 0x1800) == 0x0000)
-					gfx_element_mark_dirty(machine.gfx[3], (offset) >> 3);
+					gfx_element_mark_dirty(machine().gfx[3], (offset) >> 3);
 				else
-					gfx_element_mark_dirty(machine.gfx[4], (offset & 0x7ff) >> 3);
+					gfx_element_mark_dirty(machine().gfx[4], (offset & 0x7ff) >> 3);
 			}
 			break;
 		}
@@ -877,86 +924,80 @@ static void mz2500_ram_write(running_machine &machine, UINT16 offset, UINT8 data
 	}
 }
 
-static READ8_HANDLER( bank0_r ) { return mz2500_ram_read(space->machine(), offset, 0); }
-static READ8_HANDLER( bank1_r ) { return mz2500_ram_read(space->machine(), offset, 1); }
-static READ8_HANDLER( bank2_r ) { return mz2500_ram_read(space->machine(), offset, 2); }
-static READ8_HANDLER( bank3_r ) { return mz2500_ram_read(space->machine(), offset, 3); }
-static READ8_HANDLER( bank4_r ) { return mz2500_ram_read(space->machine(), offset, 4); }
-static READ8_HANDLER( bank5_r ) { return mz2500_ram_read(space->machine(), offset, 5); }
-static READ8_HANDLER( bank6_r ) { return mz2500_ram_read(space->machine(), offset, 6); }
-static READ8_HANDLER( bank7_r ) { return mz2500_ram_read(space->machine(), offset, 7); }
-static WRITE8_HANDLER( bank0_w ) { mz2500_ram_write(space->machine(), offset, data, 0); }
-static WRITE8_HANDLER( bank1_w ) { mz2500_ram_write(space->machine(), offset, data, 1); }
-static WRITE8_HANDLER( bank2_w ) { mz2500_ram_write(space->machine(), offset, data, 2); }
-static WRITE8_HANDLER( bank3_w ) { mz2500_ram_write(space->machine(), offset, data, 3); }
-static WRITE8_HANDLER( bank4_w ) { mz2500_ram_write(space->machine(), offset, data, 4); }
-static WRITE8_HANDLER( bank5_w ) { mz2500_ram_write(space->machine(), offset, data, 5); }
-static WRITE8_HANDLER( bank6_w ) { mz2500_ram_write(space->machine(), offset, data, 6); }
-static WRITE8_HANDLER( bank7_w ) { mz2500_ram_write(space->machine(), offset, data, 7); }
+READ8_MEMBER(mz2500_state::bank0_r){ return mz2500_ram_read(offset, 0); }
+READ8_MEMBER(mz2500_state::bank1_r){ return mz2500_ram_read(offset, 1); }
+READ8_MEMBER(mz2500_state::bank2_r){ return mz2500_ram_read(offset, 2); }
+READ8_MEMBER(mz2500_state::bank3_r){ return mz2500_ram_read(offset, 3); }
+READ8_MEMBER(mz2500_state::bank4_r){ return mz2500_ram_read(offset, 4); }
+READ8_MEMBER(mz2500_state::bank5_r){ return mz2500_ram_read(offset, 5); }
+READ8_MEMBER(mz2500_state::bank6_r){ return mz2500_ram_read(offset, 6); }
+READ8_MEMBER(mz2500_state::bank7_r){ return mz2500_ram_read(offset, 7); }
+WRITE8_MEMBER(mz2500_state::bank0_w){ mz2500_ram_write(offset, data, 0); }
+WRITE8_MEMBER(mz2500_state::bank1_w){ mz2500_ram_write(offset, data, 1); }
+WRITE8_MEMBER(mz2500_state::bank2_w){ mz2500_ram_write(offset, data, 2); }
+WRITE8_MEMBER(mz2500_state::bank3_w){ mz2500_ram_write(offset, data, 3); }
+WRITE8_MEMBER(mz2500_state::bank4_w){ mz2500_ram_write(offset, data, 4); }
+WRITE8_MEMBER(mz2500_state::bank5_w){ mz2500_ram_write(offset, data, 5); }
+WRITE8_MEMBER(mz2500_state::bank6_w){ mz2500_ram_write(offset, data, 6); }
+WRITE8_MEMBER(mz2500_state::bank7_w){ mz2500_ram_write(offset, data, 7); }
 
 
-static READ8_HANDLER( mz2500_bank_addr_r )
+READ8_MEMBER(mz2500_state::mz2500_bank_addr_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	return state->m_bank_addr;
+	return m_bank_addr;
 }
 
-static WRITE8_HANDLER( mz2500_bank_addr_w )
+WRITE8_MEMBER(mz2500_state::mz2500_bank_addr_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
 //  printf("%02x\n",data);
-	state->m_bank_addr = data & 7;
+	m_bank_addr = data & 7;
 }
 
-static READ8_HANDLER( mz2500_bank_data_r )
+READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
 	UINT8 res;
 
-	res = state->m_bank_val[state->m_bank_addr];
+	res = m_bank_val[m_bank_addr];
 
-	state->m_bank_addr++;
-	state->m_bank_addr&=7;
+	m_bank_addr++;
+	m_bank_addr&=7;
 
 	return res;
 }
 
-static WRITE8_HANDLER( mz2500_bank_data_w )
+WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-//  UINT8 *ROM = space->machine().region("maincpu")->base();
+//  UINT8 *ROM = machine().region("maincpu")->base();
 //  static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
 
-	state->m_bank_val[state->m_bank_addr] = data & 0x3f;
+	m_bank_val[m_bank_addr] = data & 0x3f;
 
 //  if((data*2) >= 0x70)
-//  printf("%s %02x\n",bank_name[state->m_bank_addr],state->m_bank_val[state->m_bank_addr]*2);
+//  printf("%s %02x\n",bank_name[m_bank_addr],m_bank_val[m_bank_addr]*2);
 
-//  memory_set_bankptr(space->machine(), bank_name[state->m_bank_addr], &ROM[state->m_bank_val[state->m_bank_addr]*0x2000]);
+//  memory_set_bankptr(machine(), bank_name[m_bank_addr], &ROM[m_bank_val[m_bank_addr]*0x2000]);
 
-	state->m_bank_addr++;
-	state->m_bank_addr&=7;
+	m_bank_addr++;
+	m_bank_addr&=7;
 }
 
-static WRITE8_HANDLER( mz2500_kanji_bank_w )
+WRITE8_MEMBER(mz2500_state::mz2500_kanji_bank_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	state->m_kanji_bank = data;
+	m_kanji_bank = data;
 }
 
-static WRITE8_HANDLER( mz2500_dictionary_bank_w )
+WRITE8_MEMBER(mz2500_state::mz2500_dictionary_bank_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	state->m_dic_bank = data;
+	m_dic_bank = data;
 }
 
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
-static READ8_HANDLER( mz2500_crtc_hvblank_r )
+READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
 {
 	UINT8 vblank_bit, hblank_bit;
 
-	vblank_bit = space->machine().primary_screen->vblank() ? 0 : 1;
-	hblank_bit = space->machine().primary_screen->hblank() ? 0 : 2;
+	vblank_bit = machine().primary_screen->vblank() ? 0 : 1;
+	hblank_bit = machine().primary_screen->hblank() ? 0 : 2;
 
 	return vblank_bit | hblank_bit;
 }
@@ -1000,29 +1041,28 @@ static UINT8 pal_256_param(int index, int param)
 	return val;
 }
 
-static WRITE8_HANDLER( mz2500_tv_crtc_w )
+WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
 	switch(offset)
 	{
-		case 0: state->m_text_reg_index = data; break;
+		case 0: m_text_reg_index = data; break;
 		case 1:
-			state->m_text_reg[state->m_text_reg_index] = data;
+			m_text_reg[m_text_reg_index] = data;
 
 			#if 0
-			//printf("[%02x] <- %02x\n",state->m_text_reg_index,data);
+			//printf("[%02x] <- %02x\n",m_text_reg_index,data);
 			popmessage("(%02x %02x) (%02x %02x %02x %02x) (%02x %02x %02x) (%02x %02x %02x %02x)"
-			,state->m_text_reg[0] & ~0x1e,state->m_text_reg[3]
-			,state->m_text_reg[4],state->m_text_reg[5],state->m_text_reg[6],state->m_text_reg[7]
-			,state->m_text_reg[8],state->m_text_reg[10],state->m_text_reg[11]
-			,state->m_text_reg[12],state->m_text_reg[13],state->m_text_reg[14],state->m_text_reg[15]);
+			,m_text_reg[0] & ~0x1e,m_text_reg[3]
+			,m_text_reg[4],m_text_reg[5],m_text_reg[6],m_text_reg[7]
+			,m_text_reg[8],m_text_reg[10],m_text_reg[11]
+			,m_text_reg[12],m_text_reg[13],m_text_reg[14],m_text_reg[15]);
 
 			#endif
-			//popmessage("%d %02x %d %02x %d %d",state->m_text_reg[3],state->m_text_reg[4],state->m_text_reg[5],state->m_text_reg[6],state->m_text_reg[7]*8,state->m_text_reg[8]*8);
+			//popmessage("%d %02x %d %02x %d %d",m_text_reg[3],m_text_reg[4],m_text_reg[5],m_text_reg[6],m_text_reg[7]*8,m_text_reg[8]*8);
 
-			mz2500_reconfigure_screen(space->machine());
+			mz2500_reconfigure_screen(machine());
 
-			if(state->m_text_reg_index == 0x0a) // set 256 color palette
+			if(m_text_reg_index == 0x0a) // set 256 color palette
 			{
 				int i,r,g,b;
 				UINT8 b_param,r_param,g_param;
@@ -1048,76 +1088,74 @@ static WRITE8_HANDLER( mz2500_tv_crtc_w )
 					bit2 = i & 0x40 ? 4 : 0;
 					g = bit0|bit1|bit2;
 
-					palette_set_color_rgb(space->machine(), i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
+					palette_set_color_rgb(machine(), i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
 				}
 			}
-			if(state->m_text_reg_index >= 0x80 && state->m_text_reg_index <= 0x8f) //Bitmap 16 clut registers
+			if(m_text_reg_index >= 0x80 && m_text_reg_index <= 0x8f) //Bitmap 16 clut registers
 			{
 				/*
                 ---x ---- priority
                 ---- xxxx clut number
                 */
-				state->m_clut16[state->m_text_reg_index & 0xf] = data & 0x1f;
-				//printf("%02x -> [%02x]\n",state->m_text_reg[state->m_text_reg_index],state->m_text_reg_index);
+				m_clut16[m_text_reg_index & 0xf] = data & 0x1f;
+				//printf("%02x -> [%02x]\n",m_text_reg[m_text_reg_index],m_text_reg_index);
 
 				{
 					int i;
 
 					for(i=0;i<0x10;i++)
 					{
-						state->m_clut256[(state->m_text_reg_index & 0xf) | (i << 4)] = (((data & 0x1f) << 4) | i);
+						m_clut256[(m_text_reg_index & 0xf) | (i << 4)] = (((data & 0x1f) << 4) | i);
 					}
 				}
 			}
 			break;
 		case 2: /* CG Mask reg (priority mixer) */
-			state->m_cg_mask = data;
+			m_cg_mask = data;
 			break;
 		case 3:
 			/* Font size reg */
-			state->m_text_font_reg = data & 1;
-			mz2500_reconfigure_screen(space->machine());
+			m_text_font_reg = data & 1;
+			mz2500_reconfigure_screen(machine());
 			break;
 	}
 }
 
-static WRITE8_HANDLER( mz2500_irq_sel_w )
+WRITE8_MEMBER(mz2500_state::mz2500_irq_sel_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	state->m_irq_sel = data;
-	//printf("%02x\n",state->m_irq_sel);
+	m_irq_sel = data;
+	//printf("%02x\n",m_irq_sel);
 	// activeness is trusted, see Tower of Druaga
-	state->m_irq_mask[0] = (data & 0x08); //CRTC
-	state->m_irq_mask[1] = (data & 0x04); //i8253
-	state->m_irq_mask[2] = (data & 0x02); //printer
-	state->m_irq_mask[3] = (data & 0x01); //RP5c15
+	m_irq_mask[0] = (data & 0x08); //CRTC
+	m_irq_mask[1] = (data & 0x04); //i8253
+	m_irq_mask[2] = (data & 0x02); //printer
+	m_irq_mask[3] = (data & 0x01); //RP5c15
 }
 
-static WRITE8_HANDLER( mz2500_irq_data_w )
+WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	if(state->m_irq_sel & 0x80)
-		state->m_irq_vector[0] = data; //CRTC
-	if(state->m_irq_sel & 0x40)
-		state->m_irq_vector[1] = data; //i8253
-	if(state->m_irq_sel & 0x20)
-		state->m_irq_vector[2] = data; //printer
-	if(state->m_irq_sel & 0x10)
-		state->m_irq_vector[3] = data; //RP5c15
+	if(m_irq_sel & 0x80)
+		m_irq_vector[0] = data; //CRTC
+	if(m_irq_sel & 0x40)
+		m_irq_vector[1] = data; //i8253
+	if(m_irq_sel & 0x20)
+		m_irq_vector[2] = data; //printer
+	if(m_irq_sel & 0x10)
+		m_irq_vector[3] = data; //RP5c15
 
-//  popmessage("%02x %02x %02x %02x",state->m_irq_vector[0],state->m_irq_vector[1],state->m_irq_vector[2],state->m_irq_vector[3]);
+//  popmessage("%02x %02x %02x %02x",m_irq_vector[0],m_irq_vector[1],m_irq_vector[2],m_irq_vector[3]);
 }
 
-static WRITE8_HANDLER( mz2500_fdc_w )
+WRITE8_MEMBER(mz2500_state::mz2500_fdc_w)
 {
-	device_t* dev = space->machine().device("mb8877a");
+	device_t* dev = machine().device("mb8877a");
 
 	switch(offset+0xdc)
 	{
 		case 0xdc:
 			wd17xx_set_drive(dev,data & 3);
-			floppy_mon_w(floppy_get_device(space->machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine(), data & 3), 1,0);
+			floppy_mon_w(floppy_get_device(machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), 1,0);
 			break;
 		case 0xdd:
 			wd17xx_set_side(dev,(data & 1));
@@ -1156,60 +1194,57 @@ static const floppy_interface mz2500_floppy_interface =
 };
 
 static ADDRESS_MAP_START(mz2500_map, AS_PROGRAM, 8, mz2500_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(bank0_r,bank0_w)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(bank1_r,bank1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE_LEGACY(bank2_r,bank2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE_LEGACY(bank3_r,bank3_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY(bank4_r,bank4_w)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE_LEGACY(bank5_r,bank5_w)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(bank6_r,bank6_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(bank7_r,bank7_w)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(bank0_r,bank0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bank1_r,bank1_w)
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(bank2_r,bank2_w)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(bank3_r,bank3_w)
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(bank4_r,bank4_w)
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(bank5_r,bank5_w)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(bank6_r,bank6_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bank7_r,bank7_w)
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( mz2500_rom_r )
+READ8_MEMBER(mz2500_state::mz2500_rom_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	UINT8 *rom = space->machine().region("rom")->base();
+	UINT8 *rom = machine().region("rom")->base();
 	UINT8 res;
 
-	state->m_lrom_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
+	m_lrom_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
 
-	state->m_rom_index = (state->m_rom_index & 0xffff00) | (state->m_lrom_index & 0xff);
+	m_rom_index = (m_rom_index & 0xffff00) | (m_lrom_index & 0xff);
 
-	res = rom[state->m_rom_index];
+	res = rom[m_rom_index];
 
 	return res;
 }
 
-static WRITE8_HANDLER( mz2500_rom_w )
+WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	state->m_hrom_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
+	m_hrom_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
 
-	state->m_rom_index = (data << 8) | (state->m_rom_index & 0x0000ff) | ((state->m_hrom_index & 0xff)<<16);
+	m_rom_index = (data << 8) | (m_rom_index & 0x0000ff) | ((m_hrom_index & 0xff)<<16);
 	//printf("%02x\n",data);
 }
 
 /* sets 16 color entries out of 4096 possible combinations */
-static WRITE8_HANDLER( palette4096_io_w )
+WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
 	UINT8 pal_index;
 	UINT8 pal_entry;
 
-	pal_index = cpu_get_reg(space->machine().device("maincpu"), Z80_B);
+	pal_index = cpu_get_reg(machine().device("maincpu"), Z80_B);
 	pal_entry = (pal_index & 0x1e) >> 1;
 
 	if(pal_index & 1)
-		state->m_pal[pal_entry].g = (data & 0x0f);
+		m_pal[pal_entry].g = (data & 0x0f);
 	else
 	{
-		state->m_pal[pal_entry].r = (data & 0xf0) >> 4;
-		state->m_pal[pal_entry].b = data & 0x0f;
+		m_pal[pal_entry].r = (data & 0xf0) >> 4;
+		m_pal[pal_entry].b = data & 0x0f;
 	}
 
-	palette_set_color_rgb(space->machine(), pal_entry+0x10, pal4bit(state->m_pal[pal_entry].r), pal4bit(state->m_pal[pal_entry].g), pal4bit(state->m_pal[pal_entry].b));
+	palette_set_color_rgb(machine(), pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
 }
 
 static READ8_DEVICE_HANDLER( mz2500_wd17xx_r )
@@ -1224,41 +1259,37 @@ static WRITE8_DEVICE_HANDLER( mz2500_wd17xx_w )
 	wd17xx_w(device, offset, data ^ state->m_fdc_reverse);
 }
 
-static READ8_HANDLER( mz2500_bplane_latch_r )
+READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	if(state->m_cg_reg[7] & 0x10)
-		return mz2500_cg_latch_compare(state);
+	if(m_cg_reg[7] & 0x10)
+		return mz2500_cg_latch_compare();
 	else
-		return state->m_cg_latch[0];
+		return m_cg_latch[0];
 }
 
 
-static READ8_HANDLER( mz2500_rplane_latch_r )
+READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	if(state->m_cg_reg[0x07] & 0x10)
+	if(m_cg_reg[0x07] & 0x10)
 	{
 		UINT8 vblank_bit;
 
-		vblank_bit = space->machine().primary_screen->vblank() ? 0 : 0x80 | state->m_cg_clear_flag;
+		vblank_bit = machine().primary_screen->vblank() ? 0 : 0x80 | m_cg_clear_flag;
 
 		return vblank_bit;
 	}
 	else
-		return state->m_cg_latch[1];
+		return m_cg_latch[1];
 }
 
-static READ8_HANDLER( mz2500_gplane_latch_r )
+READ8_MEMBER(mz2500_state::mz2500_gplane_latch_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	return state->m_cg_latch[2];
+	return m_cg_latch[2];
 }
 
-static READ8_HANDLER( mz2500_iplane_latch_r )
+READ8_MEMBER(mz2500_state::mz2500_iplane_latch_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	return state->m_cg_latch[3];
+	return m_cg_latch[3];
 }
 
 /*
@@ -1291,66 +1322,64 @@ static READ8_HANDLER( mz2500_iplane_latch_r )
 0x18: CG color masking
 */
 
-static WRITE8_HANDLER( mz2500_cg_addr_w )
+WRITE8_MEMBER(mz2500_state::mz2500_cg_addr_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	state->m_cg_reg_index = data;
+	m_cg_reg_index = data;
 }
 
-static WRITE8_HANDLER( mz2500_cg_data_w )
+WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	state->m_cg_reg[state->m_cg_reg_index & 0x1f] = data;
+	m_cg_reg[m_cg_reg_index & 0x1f] = data;
 
-	if((state->m_cg_reg_index & 0x1f) == 0x08) //accessing VS LO reg clears VS HI reg
-		state->m_cg_reg[0x09] = 0;
+	if((m_cg_reg_index & 0x1f) == 0x08) //accessing VS LO reg clears VS HI reg
+		m_cg_reg[0x09] = 0;
 
-	if((state->m_cg_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
-		state->m_cg_reg[0x0b] = 0;
+	if((m_cg_reg_index & 0x1f) == 0x0a) //accessing VE LO reg clears VE HI reg
+		m_cg_reg[0x0b] = 0;
 
-	if((state->m_cg_reg_index & 0x1f) == 0x05 && (state->m_cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
+	if((m_cg_reg_index & 0x1f) == 0x05 && (m_cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		UINT32 i;
-		UINT8 *vram = space->machine().region("maincpu")->base();
+		UINT8 *vram = machine().region("maincpu")->base();
 		UINT32 layer_bank;
 
-		layer_bank = (state->m_cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
+		layer_bank = (m_cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
 
 		/* TODO: this isn't yet 100% accurate */
-		if(state->m_cg_reg[0x05] & 1)
+		if(m_cg_reg[0x05] & 1)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x40000+layer_bank] = 0x00; //clear B
 		}
-		if(state->m_cg_reg[0x05] & 2)
+		if(m_cg_reg[0x05] & 2)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x44000+layer_bank] = 0x00; //clear R
 		}
-		if(state->m_cg_reg[0x05] & 4)
+		if(m_cg_reg[0x05] & 4)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x48000+layer_bank] = 0x00; //clear G
 		}
-		if(state->m_cg_reg[0x05] & 8)
+		if(m_cg_reg[0x05] & 8)
 		{
 			for(i=0;i<0x4000;i++)
 				vram[i+0x4c000+layer_bank] = 0x00; //clear I
 		}
-		state->m_cg_clear_flag = 1;
+		m_cg_clear_flag = 1;
 	}
 
 	{
-		mz2500_reconfigure_screen(space->machine());
+		mz2500_reconfigure_screen(machine());
 	}
 
-	if(state->m_cg_reg_index & 0x80) //enable auto-inc
-		state->m_cg_reg_index = (state->m_cg_reg_index & 0xfc) | ((state->m_cg_reg_index + 1) & 0x03);
+	if(m_cg_reg_index & 0x80) //enable auto-inc
+		m_cg_reg_index = (m_cg_reg_index & 0xfc) | ((m_cg_reg_index + 1) & 0x03);
 }
 
-static WRITE8_HANDLER( timer_w )
+WRITE8_MEMBER(mz2500_state::timer_w)
 {
-	device_t *pit8253 = space->machine().device("pit");
+	device_t *pit8253 = machine().device("pit");
 
 	pit8253_gate0_w(pit8253, 1);
 	pit8253_gate1_w(pit8253, 1);
@@ -1361,25 +1390,24 @@ static WRITE8_HANDLER( timer_w )
 }
 
 
-static READ8_HANDLER( mz2500_joystick_r )
+READ8_MEMBER(mz2500_state::mz2500_joystick_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
 	UINT8 res,dir_en,in_r;
 
 	res = 0xff;
-	in_r = ~input_port_read(space->machine(), state->m_joy_mode & 0x40 ? "JOY_2P" : "JOY_1P");
+	in_r = ~input_port_read(machine(), m_joy_mode & 0x40 ? "JOY_2P" : "JOY_1P");
 
-	if(state->m_joy_mode & 0x40)
+	if(m_joy_mode & 0x40)
 	{
-		if(!(state->m_joy_mode & 0x04)) res &= ~0x20;
-		if(!(state->m_joy_mode & 0x08)) res &= ~0x10;
-		dir_en = (state->m_joy_mode & 0x20) ? 0 : 1;
+		if(!(m_joy_mode & 0x04)) res &= ~0x20;
+		if(!(m_joy_mode & 0x08)) res &= ~0x10;
+		dir_en = (m_joy_mode & 0x20) ? 0 : 1;
 	}
 	else
 	{
-		if(!(state->m_joy_mode & 0x01)) res &= ~0x20;
-		if(!(state->m_joy_mode & 0x02)) res &= ~0x10;
-		dir_en = (state->m_joy_mode & 0x10) ? 0 : 1;
+		if(!(m_joy_mode & 0x01)) res &= ~0x20;
+		if(!(m_joy_mode & 0x02)) res &= ~0x10;
+		dir_en = (m_joy_mode & 0x10) ? 0 : 1;
 	}
 
 	if(dir_en)
@@ -1390,84 +1418,76 @@ static READ8_HANDLER( mz2500_joystick_r )
 	return res;
 }
 
-static WRITE8_HANDLER( mz2500_joystick_w )
+WRITE8_MEMBER(mz2500_state::mz2500_joystick_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	state->m_joy_mode = data;
+	m_joy_mode = data;
 }
 
 
-static READ8_HANDLER( mz2500_kanji_r )
+READ8_MEMBER(mz2500_state::mz2500_kanji_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	UINT8 *knj2_rom = space->machine().region("kanji2")->base();
+	UINT8 *knj2_rom = machine().region("kanji2")->base();
 
 	printf("Read from kanji 2 ROM\n");
 
-	return knj2_rom[(state->m_kanji_index << 1) | (offset & 1)];
+	return knj2_rom[(m_kanji_index << 1) | (offset & 1)];
 }
 
-static WRITE8_HANDLER( mz2500_kanji_w )
+WRITE8_MEMBER(mz2500_state::mz2500_kanji_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	(offset & 1) ? (state->m_kanji_index = (data << 8) | (state->m_kanji_index & 0xff)) : (state->m_kanji_index = (data & 0xff) | (state->m_kanji_index & 0xff00));
+	(offset & 1) ? (m_kanji_index = (data << 8) | (m_kanji_index & 0xff)) : (m_kanji_index = (data & 0xff) | (m_kanji_index & 0xff00));
 }
 
-static READ8_HANDLER( rp5c15_8_r )
+READ8_MEMBER(mz2500_state::rp5c15_8_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	UINT8 rtc_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
+	UINT8 rtc_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
 
-	return state->m_rtc->read(*space, rtc_index);
+	return m_rtc->read(*&space, rtc_index);
 }
 
-static WRITE8_HANDLER( rp5c15_8_w )
+WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	UINT8 rtc_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
+	UINT8 rtc_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
 
-	state->m_rtc->write(*space, rtc_index, data);
+	m_rtc->write(*&space, rtc_index, data);
 }
 
 
-static READ8_HANDLER( mz2500_emm_data_r )
+READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	UINT8 *emm_ram = space->machine().region("emm")->base();
+	UINT8 *emm_ram = machine().region("emm")->base();
 	UINT8 emm_lo_index;
 
-	emm_lo_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
+	emm_lo_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
 
-	state->m_emm_offset = (state->m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
+	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
-	if(state->m_emm_offset < 0x100000) //emm max size
-		return emm_ram[state->m_emm_offset];
+	if(m_emm_offset < 0x100000) //emm max size
+		return emm_ram[m_emm_offset];
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mz2500_emm_addr_w )
+WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
 	UINT8 emm_hi_index;
 
-	emm_hi_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
+	emm_hi_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
 
-	state->m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (state->m_emm_offset & 0xff);
+	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
 }
 
-static WRITE8_HANDLER( mz2500_emm_data_w )
+WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
 {
-	mz2500_state *state = space->machine().driver_data<mz2500_state>();
-	UINT8 *emm_ram = space->machine().region("emm")->base();
+	UINT8 *emm_ram = machine().region("emm")->base();
 	UINT8 emm_lo_index;
 
-	emm_lo_index = (cpu_get_reg(space->machine().device("maincpu"), Z80_B));
+	emm_lo_index = (cpu_get_reg(machine().device("maincpu"), Z80_B));
 
-	state->m_emm_offset = (state->m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
+	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
-	if(state->m_emm_offset < 0x100000) //emm max size
-		emm_ram[state->m_emm_offset] = data;
+	if(m_emm_offset < 0x100000) //emm max size
+		emm_ram[m_emm_offset] = data;
 }
 
 static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
@@ -1477,36 +1497,36 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
 //  AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
 	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE_LEGACY("z80sio",z80sio_ba_cd_r,z80sio_ba_cd_w)
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE_LEGACY(sasi_r, sasi_w)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE_LEGACY(mz2500_rom_w)
-	AM_RANGE(0xa9, 0xa9) AM_READ_LEGACY(mz2500_rom_r)
-	AM_RANGE(0xac, 0xac) AM_WRITE_LEGACY(mz2500_emm_addr_w)
-	AM_RANGE(0xad, 0xad) AM_READ_LEGACY(mz2500_emm_data_r) AM_WRITE_LEGACY(mz2500_emm_data_w)
-	AM_RANGE(0xae, 0xae) AM_WRITE_LEGACY(palette4096_io_w)
+	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
+	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
+	AM_RANGE(0xac, 0xac) AM_WRITE(mz2500_emm_addr_w)
+	AM_RANGE(0xad, 0xad) AM_READ(mz2500_emm_data_r) AM_WRITE(mz2500_emm_data_w)
+	AM_RANGE(0xae, 0xae) AM_WRITE(palette4096_io_w)
 //  AM_RANGE(0xb0, 0xb3) AM_READWRITE_LEGACY(sio_r,sio_w)
-	AM_RANGE(0xb4, 0xb4) AM_READWRITE_LEGACY(mz2500_bank_addr_r,mz2500_bank_addr_w)
-	AM_RANGE(0xb5, 0xb5) AM_READWRITE_LEGACY(mz2500_bank_data_r,mz2500_bank_data_w)
+	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
+	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
 	AM_RANGE(0xb7, 0xb7) AM_WRITENOP
-	AM_RANGE(0xb8, 0xb9) AM_READWRITE_LEGACY(mz2500_kanji_r,mz2500_kanji_w)
-	AM_RANGE(0xbc, 0xbc) AM_READ_LEGACY(mz2500_bplane_latch_r) AM_WRITE_LEGACY(mz2500_cg_addr_w)
-	AM_RANGE(0xbd, 0xbd) AM_READ_LEGACY(mz2500_rplane_latch_r) AM_WRITE_LEGACY(mz2500_cg_data_w)
-	AM_RANGE(0xbe, 0xbe) AM_READ_LEGACY(mz2500_gplane_latch_r)
-	AM_RANGE(0xbf, 0xbf) AM_READ_LEGACY(mz2500_iplane_latch_r)
-	AM_RANGE(0xc6, 0xc6) AM_WRITE_LEGACY(mz2500_irq_sel_w)
-	AM_RANGE(0xc7, 0xc7) AM_WRITE_LEGACY(mz2500_irq_data_w)
+	AM_RANGE(0xb8, 0xb9) AM_READWRITE(mz2500_kanji_r,mz2500_kanji_w)
+	AM_RANGE(0xbc, 0xbc) AM_READ(mz2500_bplane_latch_r) AM_WRITE(mz2500_cg_addr_w)
+	AM_RANGE(0xbd, 0xbd) AM_READ(mz2500_rplane_latch_r) AM_WRITE(mz2500_cg_data_w)
+	AM_RANGE(0xbe, 0xbe) AM_READ(mz2500_gplane_latch_r)
+	AM_RANGE(0xbf, 0xbf) AM_READ(mz2500_iplane_latch_r)
+	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
+	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
 	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE_LEGACY("ym", ym2203_r, ym2203_w)
 //  AM_RANGE(0xca, 0xca) AM_READWRITE_LEGACY(voice_r,voice_w)
-	AM_RANGE(0xcc, 0xcc) AM_READWRITE_LEGACY(rp5c15_8_r, rp5c15_8_w)
-	AM_RANGE(0xce, 0xce) AM_WRITE_LEGACY(mz2500_dictionary_bank_w)
-	AM_RANGE(0xcf, 0xcf) AM_WRITE_LEGACY(mz2500_kanji_bank_w)
+	AM_RANGE(0xcc, 0xcc) AM_READWRITE(rp5c15_8_r, rp5c15_8_w)
+	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
+	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE_LEGACY("mb8877a", mz2500_wd17xx_r, mz2500_wd17xx_w)
-	AM_RANGE(0xdc, 0xdd) AM_WRITE_LEGACY(mz2500_fdc_w)
+	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
 	AM_RANGE(0xde, 0xde) AM_WRITENOP
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
     AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("pit", pit8253_r, pit8253_w)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0xef, 0xef) AM_READWRITE_LEGACY(mz2500_joystick_r,mz2500_joystick_w)
-    AM_RANGE(0xf0, 0xf3) AM_WRITE_LEGACY(timer_w)
-	AM_RANGE(0xf4, 0xf7) AM_READ_LEGACY(mz2500_crtc_hvblank_r) AM_WRITE_LEGACY(mz2500_tv_crtc_w)
+	AM_RANGE(0xef, 0xef) AM_READWRITE(mz2500_joystick_r,mz2500_joystick_w)
+    AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
+	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_hvblank_r) AM_WRITE(mz2500_tv_crtc_w)
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE_LEGACY(extrom_r,extrom_w)
 ADDRESS_MAP_END
 

@@ -28,65 +28,74 @@ public:
 	UINT8 m_video_mode;
 	UINT8 m_tick50_mark;
 	UINT8 m_floppy_ctrl;
+	DECLARE_READ8_MEMBER(rom_page_r);
+	DECLARE_WRITE8_MEMBER(rom_page_w);
+	DECLARE_WRITE8_MEMBER(vdisk_page_w);
+	DECLARE_WRITE8_MEMBER(vdisk_h_w);
+	DECLARE_WRITE8_MEMBER(vdisk_l_w);
+	DECLARE_WRITE8_MEMBER(vdisk_data_w);
+	DECLARE_READ8_MEMBER(vdisk_data_r);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_READ8_MEMBER(keycheck_r);
+	DECLARE_WRITE8_MEMBER(video_mode_w);
+	DECLARE_READ8_MEMBER(video_mode_r);
+	DECLARE_READ8_MEMBER(timer_r);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE8_MEMBER(floppy_w);
+	DECLARE_READ8_MEMBER(floppy_r);
 };
 
 
 
-static READ8_HANDLER (rom_page_r)
+READ8_MEMBER(pyl601_state::rom_page_r)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	return state->m_rom_page;
+	return m_rom_page;
 }
 
-static WRITE8_HANDLER (rom_page_w)
+WRITE8_MEMBER(pyl601_state::rom_page_w)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->m_rom_page =data;
+	m_rom_page =data;
 	if (data & 8)
 	{
 		int chip = (data >> 4) % 5;
 		int page = data & 7;
-		memory_set_bankptr(space->machine(), "bank2", space->machine().region("romdisk")->base() + chip*0x10000 + page * 0x2000);
+		memory_set_bankptr(machine(), "bank2", machine().region("romdisk")->base() + chip*0x10000 + page * 0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine(), "bank2", space->machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
+		memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
 	}
 }
 
 
-static WRITE8_HANDLER (vdisk_page_w)
+WRITE8_MEMBER(pyl601_state::vdisk_page_w)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->m_vdisk_addr = (state->m_vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16);
+	m_vdisk_addr = (m_vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16);
 }
 
-static WRITE8_HANDLER (vdisk_h_w)
+WRITE8_MEMBER(pyl601_state::vdisk_h_w)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->m_vdisk_addr = (state->m_vdisk_addr & 0xf00ff) | (data<<8);
+	m_vdisk_addr = (m_vdisk_addr & 0xf00ff) | (data<<8);
 }
 
-static WRITE8_HANDLER (vdisk_l_w)
+WRITE8_MEMBER(pyl601_state::vdisk_l_w)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->m_vdisk_addr = (state->m_vdisk_addr & 0xfff00) | data;
+	m_vdisk_addr = (m_vdisk_addr & 0xfff00) | data;
 }
 
-static WRITE8_HANDLER (vdisk_data_w)
+WRITE8_MEMBER(pyl601_state::vdisk_data_w)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	space->machine().device<ram_device>(RAM_TAG)->pointer()[0x10000 + (state->m_vdisk_addr & 0x7ffff)] = data;
-	state->m_vdisk_addr++;
-	state->m_vdisk_addr&=0x7ffff;
+	machine().device<ram_device>(RAM_TAG)->pointer()[0x10000 + (m_vdisk_addr & 0x7ffff)] = data;
+	m_vdisk_addr++;
+	m_vdisk_addr&=0x7ffff;
 }
 
-static READ8_HANDLER (vdisk_data_r)
+READ8_MEMBER(pyl601_state::vdisk_data_r)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	UINT8 retVal = space->machine().device<ram_device>(RAM_TAG)->pointer()[0x10000 + (state->m_vdisk_addr & 0x7ffff)];
-	state->m_vdisk_addr++;
-	state->m_vdisk_addr &= 0x7ffff;
+	UINT8 retVal = machine().device<ram_device>(RAM_TAG)->pointer()[0x10000 + (m_vdisk_addr & 0x7ffff)];
+	m_vdisk_addr++;
+	m_vdisk_addr &= 0x7ffff;
 	return retVal;
 }
 
@@ -103,24 +112,22 @@ static UINT8 selectedline(UINT16 data)
 	return 0;
 }
 
-static READ8_HANDLER ( keyboard_r )
+READ8_MEMBER(pyl601_state::keyboard_r)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	return state->m_key_code;
+	return m_key_code;
 }
 
-static READ8_HANDLER ( keycheck_r )
+READ8_MEMBER(pyl601_state::keycheck_r)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
 	UINT8 retVal = 0x3f;
-	UINT8 *keyboard = space->machine().region("keyboard")->base();
-	UINT16 row1 = input_port_read(space->machine(), "ROW1");
-	UINT16 row2 = input_port_read(space->machine(), "ROW2");
-	UINT16 row3 = input_port_read(space->machine(), "ROW3");
-	UINT16 row4 = input_port_read(space->machine(), "ROW4");
-	UINT16 row5 = input_port_read(space->machine(), "ROW5");
+	UINT8 *keyboard = machine().region("keyboard")->base();
+	UINT16 row1 = input_port_read(machine(), "ROW1");
+	UINT16 row2 = input_port_read(machine(), "ROW2");
+	UINT16 row3 = input_port_read(machine(), "ROW3");
+	UINT16 row4 = input_port_read(machine(), "ROW4");
+	UINT16 row5 = input_port_read(machine(), "ROW5");
 	UINT16 all = row1 | row2 | row3 | row4 | row5;
-	UINT16 addr = (input_port_read(space->machine(), "SHIFT") & 1) | (input_port_read(space->machine(), "CTRL") & 1) << 1;
+	UINT16 addr = (input_port_read(machine(), "SHIFT") & 1) | (input_port_read(machine(), "CTRL") & 1) << 1;
 	if (all != 0xff)
 	{
 		addr |= selectedline(all) << 2;
@@ -131,40 +138,37 @@ static READ8_HANDLER ( keycheck_r )
 		addr |=  ((row2 == 0x00) ? 1 : 0) << 9;
 		addr |=  ((row1 == 0x00) ? 1 : 0) << 10;
 
-		state->m_key_code = keyboard[addr];
-		state->m_keyboard_clk = ~state->m_keyboard_clk;
+		m_key_code = keyboard[addr];
+		m_keyboard_clk = ~m_keyboard_clk;
 
-		if (state->m_keyboard_clk)
+		if (m_keyboard_clk)
 			retVal |= 0x80;
 	}
 	return retVal;
 }
 
 
-static WRITE8_HANDLER (video_mode_w)
+WRITE8_MEMBER(pyl601_state::video_mode_w)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	state->m_video_mode = data;
+	m_video_mode = data;
 }
-static READ8_HANDLER (video_mode_r)
+READ8_MEMBER(pyl601_state::video_mode_r)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	return state->m_video_mode;
+	return m_video_mode;
 }
 
-static READ8_HANDLER (timer_r)
+READ8_MEMBER(pyl601_state::timer_r)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	UINT8 retVal= state->m_tick50_mark | 0x37;
-	state->m_tick50_mark = 0;
+	UINT8 retVal= m_tick50_mark | 0x37;
+	m_tick50_mark = 0;
 	return retVal;
 }
 
-static WRITE8_HANDLER (speaker_w)
+WRITE8_MEMBER(pyl601_state::speaker_w)
 {
 }
 
-static WRITE8_HANDLER (led_w)
+WRITE8_MEMBER(pyl601_state::led_w)
 {
 //  UINT8 caps_led = BIT(data,4);
 }
@@ -178,30 +182,28 @@ static UPD765_GET_IMAGE( pyldin_upd765_get_image )
 {
 	return get_floppy_image(device->machine(), (floppy_index & 1)^1);
 }
-static WRITE8_HANDLER( floppy_w )
+WRITE8_MEMBER(pyl601_state::floppy_w)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
 	// bit 0 is reset (if zero)
 	// bit 1 is TC state
 	// bit 2 is drive selected
 	// bit 3 is motor state
-	device_t *floppy = space->machine().device("upd765");
+	device_t *floppy = machine().device("upd765");
 	if (BIT(data,0)==0) {
 		//reset
 		upd765_reset(floppy,0);
 	}
-	floppy_mon_w(get_floppy_image(space->machine(), BIT(data,2)), !BIT(data, 3));
+	floppy_mon_w(get_floppy_image(machine(), BIT(data,2)), !BIT(data, 3));
 
-	floppy_drive_set_ready_state(get_floppy_image(space->machine(), 0), BIT(data,2), 0);
+	floppy_drive_set_ready_state(get_floppy_image(machine(), 0), BIT(data,2), 0);
 
 	upd765_tc_w(floppy, BIT(data,1));
 
-	state->m_floppy_ctrl = data;
+	m_floppy_ctrl = data;
 }
-static READ8_HANDLER (floppy_r)
+READ8_MEMBER(pyl601_state::floppy_r)
 {
-	pyl601_state *state = space->machine().driver_data<pyl601_state>();
-	return state->m_floppy_ctrl;
+	return m_floppy_ctrl;
 }
 
 static const struct upd765_interface pyldin_upd765_interface =
@@ -222,20 +224,20 @@ static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8, pyl601_state )
 	AM_RANGE( 0xe601, 0xe601 ) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE( 0xe604, 0xe604 ) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE( 0xe605, 0xe605 ) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE( 0xe628, 0xe628 ) AM_READ_LEGACY(keyboard_r)
-	AM_RANGE( 0xe629, 0xe629 ) AM_READWRITE_LEGACY(video_mode_r,video_mode_w)
-	AM_RANGE( 0xe62a, 0xe62a ) AM_READWRITE_LEGACY(keycheck_r,led_w)
-	AM_RANGE( 0xe62b, 0xe62b ) AM_READWRITE_LEGACY(timer_r,speaker_w)
-	AM_RANGE( 0xe62d, 0xe62d ) AM_READ_LEGACY(video_mode_r)
-	AM_RANGE( 0xe62e, 0xe62e ) AM_READWRITE_LEGACY(keycheck_r,led_w)
-	AM_RANGE( 0xe680, 0xe680 ) AM_WRITE_LEGACY(vdisk_page_w)
-	AM_RANGE( 0xe681, 0xe681 ) AM_WRITE_LEGACY(vdisk_h_w)
-	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE_LEGACY(vdisk_l_w)
-	AM_RANGE( 0xe683, 0xe683 ) AM_READWRITE_LEGACY(vdisk_data_r,vdisk_data_w)
-	AM_RANGE( 0xe6c0, 0xe6c0 ) AM_READWRITE_LEGACY(floppy_r, floppy_w)
+	AM_RANGE( 0xe628, 0xe628 ) AM_READ(keyboard_r)
+	AM_RANGE( 0xe629, 0xe629 ) AM_READWRITE(video_mode_r,video_mode_w)
+	AM_RANGE( 0xe62a, 0xe62a ) AM_READWRITE(keycheck_r,led_w)
+	AM_RANGE( 0xe62b, 0xe62b ) AM_READWRITE(timer_r,speaker_w)
+	AM_RANGE( 0xe62d, 0xe62d ) AM_READ(video_mode_r)
+	AM_RANGE( 0xe62e, 0xe62e ) AM_READWRITE(keycheck_r,led_w)
+	AM_RANGE( 0xe680, 0xe680 ) AM_WRITE(vdisk_page_w)
+	AM_RANGE( 0xe681, 0xe681 ) AM_WRITE(vdisk_h_w)
+	AM_RANGE( 0xe682, 0xe682 ) AM_WRITE(vdisk_l_w)
+	AM_RANGE( 0xe683, 0xe683 ) AM_READWRITE(vdisk_data_r,vdisk_data_w)
+	AM_RANGE( 0xe6c0, 0xe6c0 ) AM_READWRITE(floppy_r, floppy_w)
 	AM_RANGE( 0xe6d0, 0xe6d0 ) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
 	AM_RANGE( 0xe6d1, 0xe6d1 ) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
-	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE_LEGACY(rom_page_r, rom_page_w)
+	AM_RANGE( 0xe6f0, 0xe6f0 ) AM_READWRITE(rom_page_r, rom_page_w)
 	AM_RANGE( 0xe700, 0xefff ) AM_RAMBANK("bank4")
 	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bank5") AM_WRITE_BANK("bank6")
 ADDRESS_MAP_END

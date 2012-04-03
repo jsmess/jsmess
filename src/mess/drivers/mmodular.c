@@ -137,6 +137,54 @@ public:
 	UINT8 lcd_char;
 	//UINT8 led7;
 	UINT8 latch_data;
+	DECLARE_WRITE8_MEMBER(write_polgar_IO);
+	DECLARE_WRITE8_MEMBER(write_LCD_polgar);
+	DECLARE_READ8_MEMBER(read_1ff1_sfortea);
+	DECLARE_READ8_MEMBER(read_1ff0_sfortea);
+	DECLARE_WRITE8_MEMBER(write_latch_sfortea);
+	DECLARE_WRITE8_MEMBER(write_lcd_IO_sfortea);
+	DECLARE_WRITE8_MEMBER(write_LCD_academy);
+//	DECLARE_WRITE16_MEMBER(diablo68_aciawrite);
+//	DECLARE_READ16_MEMBER(diablo68_aciaread);
+	DECLARE_WRITE16_MEMBER(diablo68_reg_select);
+	DECLARE_WRITE16_MEMBER(diablo68_write_LCD);
+	DECLARE_WRITE8_MEMBER(milano_write_LED);
+	DECLARE_WRITE8_MEMBER(megaiv_write_LED);
+	DECLARE_WRITE8_MEMBER(academy_write_LED);
+	DECLARE_WRITE8_MEMBER(academy_inhibitNMI);
+	DECLARE_WRITE32_MEMBER(write_LED_BPL32);
+	DECLARE_WRITE8_MEMBER(polgar_write_LED);
+	DECLARE_WRITE8_MEMBER(monteciv_write_LCD);
+	DECLARE_WRITE8_MEMBER(monteciv_3007);
+	DECLARE_WRITE8_MEMBER(monteciv_3005);
+	DECLARE_WRITE8_MEMBER(monteciv_3006);
+	DECLARE_WRITE8_MEMBER(academy_write_board);
+	DECLARE_WRITE8_MEMBER(milano_write_board);
+	DECLARE_READ8_MEMBER(milano_read_board);
+	DECLARE_READ8_MEMBER(read_keys);
+	DECLARE_READ8_MEMBER(read_keys_megaiv);
+	DECLARE_READ32_MEMBER(read_keys_BPL32);
+	DECLARE_WRITE8_MEMBER(beep_academy);
+	DECLARE_WRITE8_MEMBER(megaiv_IO);
+	DECLARE_WRITE8_MEMBER(monteciv_select_line);
+	DECLARE_READ8_MEMBER(read_keys_board_monteciv);
+	DECLARE_READ8_MEMBER(read_keys_board_academy);
+	DECLARE_WRITE32_MEMBER(write_board_BPL32);
+	DECLARE_READ32_MEMBER(read_buttons_gen32);
+	DECLARE_READ32_MEMBER(read_buttons_van32);
+	DECLARE_READ16_MEMBER(read_buttons_van16);
+	DECLARE_WRITE32_MEMBER(write_LCD_data_32);
+	DECLARE_WRITE16_MEMBER(write_LCD_data);
+	DECLARE_WRITE32_MEMBER(write_IOenables_32);
+	DECLARE_WRITE16_MEMBER(write_IOenables);
+	DECLARE_READ32_MEMBER(read_unknown1_32);
+	DECLARE_READ16_MEMBER(read_unknown1);
+	DECLARE_WRITE32_MEMBER(write_unknown2_32);
+	DECLARE_WRITE16_MEMBER(write_unknown2);
+	DECLARE_READ32_MEMBER(read_unknown3_32);
+	DECLARE_READ16_MEMBER(read_unknown3);
+	DECLARE_READ32_MEMBER(read_1800000);
+	DECLARE_WRITE32_MEMBER(write_1000000);
 };
 
 static const hd44780_interface chess_display =
@@ -182,34 +230,33 @@ static int get_first_cleared_bit(UINT8 data)
 	return NOT_VALID;
 }
 
-static WRITE8_HANDLER ( write_polgar_IO )
+WRITE8_MEMBER(polgar_state::write_polgar_IO)
 {
-	polgar_state *state = space->machine().driver_data<polgar_state>();
 	int i;
 
 	if (BIT(data,1)) {
-		hd44780_device *hd44780 = space->machine().device<hd44780_device>("hd44780");
+		hd44780_device *hd44780 = machine().device<hd44780_device>("hd44780");
 		if (BIT(data,0)) {
-			hd44780->data_write(*space, 128, state->lcd_char);
+			hd44780->data_write(*&space, 128, lcd_char);
 		} else {
-			hd44780->control_write(*space, 128, state->lcd_char);
+			hd44780->control_write(*&space, 128, lcd_char);
 		}
 	}
 
-	if (BIT(data,2) || BIT(data,3)) beep_set_state(space->machine().device("beep"),1); else beep_set_state(space->machine().device("beep"),0);
+	if (BIT(data,2) || BIT(data,3)) beep_set_state(machine().device("beep"),1); else beep_set_state(machine().device("beep"),0);
 
 	if (BIT(data,7) && BIT(data, 4)) {
 		for (i = 0;i < 8;i++)
-		output_set_led_value(i,!BIT(state->latch_data,i));
+		output_set_led_value(i,!BIT(latch_data,i));
 	}
 	else if (BIT(data,6) && BIT(data,5)) {
 		for (i = 0;i < 8;i++)
-		output_set_led_value(10+i,!BIT(state->latch_data,7-i));
+		output_set_led_value(10+i,!BIT(latch_data,7-i));
 	}
-	else if (!data && (!strcmp(space->machine().system().name,"milano"))) {
+	else if (!data && (!strcmp(machine().system().name,"milano"))) {
 		for (i=0;i<8;i++) {
-			output_set_led_value(i,!BIT(state->latch_data,i));
-			output_set_led_value(10+i,!BIT(state->latch_data,7-i));
+			output_set_led_value(i,!BIT(latch_data,i));
+			output_set_led_value(10+i,!BIT(latch_data,7-i));
 		}
 	}
 
@@ -219,29 +266,28 @@ static WRITE8_HANDLER ( write_polgar_IO )
 }
 
 
-static WRITE8_HANDLER ( write_LCD_polgar )
+WRITE8_MEMBER(polgar_state::write_LCD_polgar)
 {
-	polgar_state *state = space->machine().driver_data<polgar_state>();
 
-	state->lcd_char = data;
+	lcd_char = data;
 
 	logerror("LCD Data = %d %02x [%c]\n",data,data,(data&0xff));
 
 }
 
-static READ8_HANDLER ( read_1ff1_sfortea )
+READ8_MEMBER(polgar_state::read_1ff1_sfortea)
 {
 	UINT8 data;
-	data = input_port_read(space->machine(),  "BUTTONS_SFOR1");
+	data = input_port_read(machine(),  "BUTTONS_SFOR1");
 	logerror("1ff0 data %02x\n",data);
 	return 0;
 //  return data;
 }
 
-static READ8_HANDLER ( read_1ff0_sfortea )
+READ8_MEMBER(polgar_state::read_1ff0_sfortea)
 {
 	UINT8 data;
-	data = input_port_read(space->machine(),  "BUTTONS_SFOR2");
+	data = input_port_read(machine(),  "BUTTONS_SFOR2");
 	logerror("1ff0 data %02x\n",data);
 	return 0;
 //  return data;
@@ -256,7 +302,7 @@ static READ8_HANDLER ( read_1ff0_sfortea )
 
 
 
-static WRITE8_HANDLER ( write_latch_sfortea )
+WRITE8_MEMBER(polgar_state::write_latch_sfortea)
 {
 	sfortea_latch = data;
 	logerror("latch data %02x\n",data);
@@ -264,7 +310,7 @@ static WRITE8_HANDLER ( write_latch_sfortea )
 
 }
 
-static WRITE8_HANDLER ( write_lcd_IO_sfortea )
+WRITE8_MEMBER(polgar_state::write_lcd_IO_sfortea)
 {
 /* bits
 7
@@ -280,45 +326,45 @@ static WRITE8_HANDLER ( write_lcd_IO_sfortea )
 
 	if (BIT(sfortea_latch,2))
 	{
-		hd44780_device *hd44780 = space->machine().device<hd44780_device>("hd44780");
+		hd44780_device *hd44780 = machine().device<hd44780_device>("hd44780");
 		if(BIT(sfortea_latch,0)) {
-			hd44780->data_write(*space, 128, data);
+			hd44780->data_write(*&space, 128, data);
 			logerror("LCD DTA = %02x\n",data);
 		} else {
 			if (BIT(data,7)) {
 				if ((data & 0x7f) >= 0x40) data -= 56;  // adjust for 16x1 display as 2 sets of 8
 			}
-			hd44780->control_write(*space, 128, data);
+			hd44780->control_write(*&space, 128, data);
 			logerror("LCD CMD = %02x\n",data);
 		}
 	}
 }
 
-static WRITE8_HANDLER ( write_LCD_academy )
+WRITE8_MEMBER(polgar_state::write_LCD_academy)
 {
-	hd44780_device *hd44780 = space->machine().device<hd44780_device>("hd44780");
+	hd44780_device *hd44780 = machine().device<hd44780_device>("hd44780");
 
 	if (offset) {
-		hd44780->data_write(*space, 128, data);
+		hd44780->data_write(*&space, 128, data);
 	} else {
-		hd44780->control_write(*space, 128, data);
+		hd44780->control_write(*&space, 128, data);
 	}
 }
 
-//  AM_RANGE( 0x3a0000,0x3a0000 ) AM_READ_LEGACY(diablo68_write_LCD)
-//  AM_RANGE( 0x3c0000,0x3c0000 ) AM_READ_LEGACY(diablo68_reg_select)
+//  AM_RANGE( 0x3a0000,0x3a0000 ) AM_READ(diablo68_write_LCD)
+//  AM_RANGE( 0x3c0000,0x3c0000 ) AM_READ(diablo68_reg_select)
 
-/*static WRITE16_HANDLER ( diablo68_aciawrite )
+/*WRITE16_MEMBER(polgar_state::diablo68_aciawrite)
 {
-//  device_t *acia = space->machine().device("acia65c51");
+//  device_t *acia = machine().device("acia65c51");
 //  acia_6551_w(acia, offset & 0x03, data >> 8);
 //  printf("ACIA write data %04x offset %02x\n",data,offset);
     logerror("ACIA write data %04x offset %02x\n",data,offset);
 }
 
-static READ16_HANDLER ( diablo68_aciaread )
+READ16_MEMBER(polgar_state::diablo68_aciaread)
 {
-//  device_t *acia = space->machine().device("acia65c51");
+//  device_t *acia = machine().device("acia65c51");
     UINT16 result;
 //  result = acia_6551_r(acia, offset & 0x03);
 //  logerror("ACIA read offset %02x\n",offset);
@@ -330,7 +376,7 @@ static READ16_HANDLER ( diablo68_aciaread )
 }
 */
 
-static WRITE16_HANDLER ( diablo68_reg_select )
+WRITE16_MEMBER(polgar_state::diablo68_reg_select)
 {
 	diablo68_3c0000 = data >> 8;
 	//printf("3c0000 = %04x\n",data>>8);
@@ -339,19 +385,19 @@ static WRITE16_HANDLER ( diablo68_reg_select )
 }
 
 
-static WRITE16_HANDLER ( diablo68_write_LCD )
+WRITE16_MEMBER(polgar_state::diablo68_write_LCD)
 {
-	hd44780_device *hd44780 = space->machine().device<hd44780_device>("hd44780");
+	hd44780_device *hd44780 = machine().device<hd44780_device>("hd44780");
 	data >>= 8;
 	if (!(diablo68_3c0000 & 0x02)) {
 		if (BIT(data,7)) {
 			if ((data & 0x7f) >= 0x40) data -= 56;  // adjust for 16x1 display as 2 sets of 8
 		}
-		hd44780->control_write(*space, 128, data);
+		hd44780->control_write(*&space, 128, data);
 //      logerror("Control %02x\n", data);
 //      printf("Control %02x\n", data);
 	} else {
-		hd44780->data_write(*space, 128, data);
+		hd44780->data_write(*&space, 128, data);
 //      printf("LCDdata %04x [%c]\n", data,data);
 //      logerror("LCDdata %04x [%c]\n", data,data);
 	}
@@ -360,7 +406,7 @@ static WRITE16_HANDLER ( diablo68_write_LCD )
 
 }
 
-static WRITE8_HANDLER ( milano_write_LED )
+WRITE8_MEMBER(polgar_state::milano_write_LED)
 {
 	UINT8 LED_offset = 100;
 	if (data == 0xff)	output_set_led_value(LED_offset+offset,1);
@@ -369,9 +415,9 @@ static WRITE8_HANDLER ( milano_write_LED )
 	//logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
-static WRITE8_HANDLER ( megaiv_write_LED )
+WRITE8_MEMBER(polgar_state::megaiv_write_LED)
 {
-if (BIT(data,7)) beep_set_state(space->machine().device("beep"),1); else beep_set_state(space->machine().device("beep"),0);
+if (BIT(data,7)) beep_set_state(machine().device("beep"),1); else beep_set_state(machine().device("beep"),0);
 output_set_led_value(102,BIT(data,1)?1:0);
 output_set_led_value(107,BIT(data,6)?1:0);
 
@@ -382,7 +428,7 @@ output_set_led_value(107,BIT(data,6)?1:0);
 }
 
 
-static WRITE8_HANDLER ( academy_write_LED )
+WRITE8_MEMBER(polgar_state::academy_write_LED)
 {
 int found = 0;
 
@@ -431,8 +477,8 @@ if ((data & 0xa1) == 0xa1) {
 	found = 1;
 }
 
-if (BIT(data,7)) beep_set_state(space->machine().device("beep"),1); else beep_set_state(space->machine().device("beep"),0);
-if (BIT(data,1)) beep_set_state(space->machine().device("beep"),1); else beep_set_state(space->machine().device("beep"),0);
+if (BIT(data,7)) beep_set_state(machine().device("beep"),1); else beep_set_state(machine().device("beep"),0);
+if (BIT(data,1)) beep_set_state(machine().device("beep"),1); else beep_set_state(machine().device("beep"),0);
 //  logerror("LEDs  FUNC = %02x found = %d\n",data,found);
 	if (!found) {
 		logerror("unknown LED mask %d\n",data);
@@ -441,14 +487,14 @@ if (BIT(data,1)) beep_set_state(space->machine().device("beep"),1); else beep_se
 }
 
 
-static WRITE8_HANDLER ( academy_inhibitNMI )
+WRITE8_MEMBER(polgar_state::academy_inhibitNMI)
 {
 	academyallowNMI = data;
 
 }
 
 
-static WRITE32_HANDLER ( write_LED_BPL32 )
+WRITE32_MEMBER(polgar_state::write_LED_BPL32)
 {
 	int i;
 
@@ -463,20 +509,19 @@ static WRITE32_HANDLER ( write_LED_BPL32 )
 }
 
 
-static WRITE8_HANDLER ( polgar_write_LED )
+WRITE8_MEMBER(polgar_state::polgar_write_LED)
 {
 #define LED_offset 100
-	polgar_state *state = space->machine().driver_data<polgar_state>();
 
 	data &= 0x80;
 
 	if (data == 0) {
-		state->led_status &= 255-(1<<offset);
+		led_status &= 255-(1<<offset);
 	} else {
-		state->led_status|=1<<offset;
+		led_status|=1<<offset;
 	}
 
-	if (offset < 6) output_set_led_value(LED_offset+offset, state->led_status&1<<offset?1:0);
+	if (offset < 6) output_set_led_value(LED_offset+offset, led_status&1<<offset?1:0);
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
@@ -494,7 +539,7 @@ static UINT8 convertMCIV2LED(UINT8 codedchar)
 	return data;
 }
 
-static WRITE8_HANDLER ( monteciv_write_LCD )
+WRITE8_MEMBER(polgar_state::monteciv_write_LCD)
 // first write == 00 (start) then 8 writes (to 74595) x 4 chars, then ff to finish
 {
 	static UINT8 charstodisplay[4] = { 0,0,0,0 };
@@ -561,7 +606,7 @@ static WRITE8_HANDLER ( monteciv_write_LCD )
 //    printf("$3004 %02x %02x \n",data,tempchar);
 }
 
-static WRITE8_HANDLER ( monteciv_3007 )
+WRITE8_MEMBER(polgar_state::monteciv_3007)
 {
 //    logerror("$3007 SELECTTOP %02x\n",data);
 //    printf("$3007 SELECTTOP %02x\n",data);
@@ -569,7 +614,7 @@ static WRITE8_HANDLER ( monteciv_3007 )
     montecivtopnew = 1;
 }
 
-static WRITE8_HANDLER ( monteciv_3005 )
+WRITE8_MEMBER(polgar_state::monteciv_3005)
 {
 //    logerror("$3005 SELECTBOT %02x\n",data);
 //    printf("$3005 SELECTBOT %02x\n",data);
@@ -577,43 +622,40 @@ static WRITE8_HANDLER ( monteciv_3005 )
     montecivbotnew = 1;
 }
 
-static WRITE8_HANDLER ( monteciv_3006 )
+WRITE8_MEMBER(polgar_state::monteciv_3006)
 {
     logerror("$3006 CLK %02x\n",data);
 //    printf("$3006 CLK %02x\n",data);
 }
 
 
-static WRITE8_HANDLER ( academy_write_board )
+WRITE8_MEMBER(polgar_state::academy_write_board)
 {
-	polgar_state *state = space->machine().driver_data<polgar_state>();
 
-	state->latch_data = data;
+	latch_data = data;
 //    logerror("acad_write_latch %02x\n",data);
-	if (data != 0xff) mboard_write_board_8(space,0, data);
+	if (data != 0xff) mboard_write_board_8(&space,0, data);
 }
 
-static WRITE8_HANDLER ( milano_write_board )
+WRITE8_MEMBER(polgar_state::milano_write_board)
 {
-	polgar_state *state = space->machine().driver_data<polgar_state>();
 
-	state->latch_data = data;
+	latch_data = data;
 }
 
-static READ8_HANDLER(milano_read_board)
+READ8_MEMBER(polgar_state::milano_read_board)
 {
 	int line;
-	polgar_state *state = space->machine().driver_data<polgar_state>();
 	static const char *const board_lines[8] =
 			{ "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 
 	UINT8 data = 0x00;
 	UINT8 tmp; // = 0xff;
 
-	if (state->latch_data)
+	if (latch_data)
 	{
-		line = get_first_cleared_bit(state->latch_data);
-		tmp = input_port_read(space->machine(),  board_lines[line]);
+		line = get_first_cleared_bit(latch_data);
+		tmp = input_port_read(machine(),  board_lines[line]);
 
 		if (tmp != 0xff)
 			data = convert_imputmask(tmp);
@@ -624,7 +666,7 @@ static READ8_HANDLER(milano_read_board)
 
 }
 
-static READ8_HANDLER(read_keys)
+READ8_MEMBER(polgar_state::read_keys)
 {
 	UINT8 data;
 	static const char *const keynames[1][8] =
@@ -632,12 +674,12 @@ static READ8_HANDLER(read_keys)
 		{ "KEY1_0", "KEY1_1", "KEY1_2", "KEY1_3", "KEY1_4", "KEY1_5", "KEY1_6", "KEY1_7" }
 	};
 
-	data = input_port_read(space->machine(), keynames[0][offset]);
+	data = input_port_read(machine(), keynames[0][offset]);
 	// logerror("Keyboard Port = %s Data = %d\n  ", ((led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
 	return data | 0x7f;
 }
 
-static READ8_HANDLER(read_keys_megaiv)
+READ8_MEMBER(polgar_state::read_keys_megaiv)
 {
 	UINT8 data;
 	static const char *const keynames[1][8] =
@@ -645,13 +687,13 @@ static READ8_HANDLER(read_keys_megaiv)
 		{ "KEY1_0", "KEY1_1", "KEY1_2", "KEY1_3", "KEY1_4", "KEY1_5", "KEY1_6", "KEY1_7" }
 	};
 
-	data = input_port_read(space->machine(), keynames[0][offset]);
+	data = input_port_read(machine(), keynames[0][offset]);
 	logerror("Keyboard Port = %s Data = %d\n  ", keynames[0][offset] , data);
 	return data | 0x7f;
 }
 
 
-static READ32_HANDLER(read_keys_BPL32)
+READ32_MEMBER(polgar_state::read_keys_BPL32)
 {
 	UINT32 data = 0;
 	UINT8 tmp = 0xff, line = 0;
@@ -659,7 +701,7 @@ static READ32_HANDLER(read_keys_BPL32)
 			{ "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 
 	if (BPL32latch_data == 0xff) {
-		tmp = input_port_read(space->machine(),  "BUTTONS_BPL");
+		tmp = input_port_read(machine(),  "BUTTONS_BPL");
 		logerror("Keyboard Port Offset = %d tmp %d\n", offset,tmp);
 
 		data = tmp << 24;
@@ -667,7 +709,7 @@ static READ32_HANDLER(read_keys_BPL32)
 		if (BPL32latch_data & 0x7f) {
 			logerror("ReadingBoard %02x\n",BPL32latch_data);
 			line = get_first_cleared_bit(BPL32latch_data);
-			tmp = input_port_read(space->machine(),  board_lines[line]);
+			tmp = input_port_read(machine(),  board_lines[line]);
 
 			if (tmp != 0xff)
 				data = convert_imputmask(tmp) << 24;
@@ -678,34 +720,34 @@ static READ32_HANDLER(read_keys_BPL32)
 	return data;
 }
 
-static WRITE8_HANDLER(beep_academy)
+WRITE8_MEMBER(polgar_state::beep_academy)
 {
-	if (!BIT(data,7)) beep_set_state(space->machine().device("beep"),1); else beep_set_state(space->machine().device("beep"),0);
+	if (!BIT(data,7)) beep_set_state(machine().device("beep"),1); else beep_set_state(machine().device("beep"),0);
 }
 
-static WRITE8_HANDLER(megaiv_IO)
+WRITE8_MEMBER(polgar_state::megaiv_IO)
 {
-//  if (BIT(data,0)) beep_set_state(space->machine->device("beep"),1); else beep_set_state(space->machine->device("beep"),0);
+//  if (BIT(data,0)) beep_set_state(machine->device("beep"),1); else beep_set_state(machine->device("beep"),0);
 	logerror("$2400 = %02x\n",data);
 	latch2400 = data;
 }
 
 
-static WRITE8_HANDLER( monteciv_select_line )
+WRITE8_MEMBER(polgar_state::monteciv_select_line)
 {
 	monteciv_select[offset] = data;
 }
 
 // FIXME : unlike polgar, academy shares port IO for keys and board, and i just can't seem to get the board latched right (H7 and H8 are always flashing) -- Cow
-static READ8_HANDLER(read_keys_board_monteciv)
+READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 {
 	UINT8 data = 0;
 
 	if (monteciv_select[0] == 0xff && monteciv_select[1] == 0xff) {
-			data = mboard_read_board_8(space,0);
+			data = mboard_read_board_8(&space,0);
 	} else {
 		if (monteciv_select[0] == 0x0) {
-			data = input_port_read(space->machine(),  "BUTTONS_MONTE2");
+			data = input_port_read(machine(),  "BUTTONS_MONTE2");
 #if 0
 			if (data) {
 				output_set_digit_value(0,64);
@@ -720,7 +762,7 @@ static READ8_HANDLER(read_keys_board_monteciv)
 			}
 #endif
 		} else {
-			data = input_port_read(space->machine(),  "BUTTONS_MONTE1");
+			data = input_port_read(machine(),  "BUTTONS_MONTE1");
 		}
 	}
 	return data;
@@ -728,34 +770,33 @@ static READ8_HANDLER(read_keys_board_monteciv)
 
 
 // FIXME : unlike polgar, academy shares port IO for keys and board, and I just can't seem to get the board latched right (H7 and H8 are always flashing) -- Cow
-static READ8_HANDLER(read_keys_board_academy)
+READ8_MEMBER(polgar_state::read_keys_board_academy)
 {
 //  static int startup = 0;
-	polgar_state *state = space->machine().driver_data<polgar_state>();
 	UINT8 data = 0;
 //  UINT8 tmp = 0xff, line = 0;
 //  static const char *const board_lines[8] =
 //          { "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 
-	if (state->latch_data == 0xff) {
-		data = input_port_read(space->machine(),  "BUTTONS_ACAD");
+	if (latch_data == 0xff) {
+		data = input_port_read(machine(),  "BUTTONS_ACAD");
 	} else {
-//      if (state->latch_data & 0x7f) {
-		data = mboard_read_board_8(space,0);
+//      if (latch_data & 0x7f) {
+		data = mboard_read_board_8(&space,0);
 //      data = milano_read_board(space,0);
 
-//          logerror("ReadingBoard %02x\n",state->latch_data);
-//          line = get_first_cleared_bit(state->latch_data);
-//          tmp = input_port_read(space->machine,  board_lines[line]);
-//          mboard_write_board_8(space,0, state->latch_data);
-//          data = mboard_read_board_8(space,0);
-//          logerror("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,state->latch_data);
-//          printf  ("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,state->latch_data);
+//          logerror("ReadingBoard %02x\n",latch_data);
+//          line = get_first_cleared_bit(latch_data);
+//          tmp = input_port_read(machine,  board_lines[line]);
+//          mboard_write_board_8(&space,0, latch_data);
+//          data = mboard_read_board_8(&space,0);
+//          logerror("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,latch_data);
+//          printf  ("BoardRead Port Offset = %d data %02x Latch %02x\n", offset,data,latch_data);
 //      } else {
 //          logerror("no keys or board\n");
 //      }
 	}
-//  logerror("Keyboard Port Offset = %d tmp %d Latch %d\n", offset,tmp,state->latch_data);
+//  logerror("Keyboard Port Offset = %d tmp %d Latch %d\n", offset,tmp,latch_data);
 //  logerror("Keyboard Port = %s Data = %d Offset = %d tmp %d line %02x\n", keynames[0][line], data, offset,tmp,line);
 	return data;
 }
@@ -773,61 +814,61 @@ static TIMER_DEVICE_CALLBACK( cause_M6502_irq )
 }
 
 
-static WRITE32_HANDLER( write_board_BPL32 )
+WRITE32_MEMBER(polgar_state::write_board_BPL32)
 {
 	BPL32latch_data = data >> 24;
 	logerror("Write BPL32 board Data Latch %08x Offset: %08x\n",BPL32latch_data,offset);
 
 }
 
-static READ32_HANDLER( read_buttons_gen32 )
+READ32_MEMBER(polgar_state::read_buttons_gen32)
 {
 	UINT32 data;
 	static const char *const keynames[4] = { "BUTTON_1", "BUTTON_2", "", "BUTTON_3" };
 
-	data = input_port_read(space->machine(), keynames[offset]);
+	data = input_port_read(machine(), keynames[offset]);
 
 	data = data|data<<8|data<<16|data<<24;  // this might not be needed if MAME does handle odd alignment over 32bit boundaries right
 	logerror("Read from Buttons: %08x %08x\n",offset,data);
 	return data;
 }
 
-static READ32_HANDLER( read_buttons_van32 )
+READ32_MEMBER(polgar_state::read_buttons_van32)
 {
 	UINT32 data;
 	static const char *const keynames[4] = { "BUTTON_1", "", "BUTTON_2", "BUTTON_3" };
 
 
-	data = input_port_read(space->machine(), keynames[offset]);
+	data = input_port_read(machine(), keynames[offset]);
 
 	data = data << 8;
 	logerror("Read from Buttons: %08x %08x\n",offset,data);
 	return data;
 }
 
-static READ16_HANDLER( read_buttons_van16 )
+READ16_MEMBER(polgar_state::read_buttons_van16)
 {
 	UINT16 data;
 	static const char *const keynames[3] = { "BUTTON_1", "BUTTON_2", "BUTTON_3" };
 
 
-	data = input_port_read(space->machine(), keynames[offset>>1]) << 8;
+	data = input_port_read(machine(), keynames[offset>>1]) << 8;
 
 	logerror("Read from %06x offset: %x %04x\n",0xf00000,offset,data);
 	return data;
 }
 
-static WRITE32_HANDLER( write_LCD_data_32 )
+WRITE32_MEMBER(polgar_state::write_LCD_data_32)
 {
 
 //  printf("Write LCD Data Latch %08x o: %08x\n",data,offset);
 	logerror("Write LCD Data Latch %08x o: %08x\n",data,offset);
 	lcd32_char = data>>24;
-//  cpu_adjust_icount(space->cpu,-5000);
+//  cpu_adjust_icount(cpu,-5000);
 
 }
 
-static WRITE16_HANDLER( write_LCD_data )
+WRITE16_MEMBER(polgar_state::write_LCD_data)
 {
 
 	lcd32_char = data>>8;
@@ -867,51 +908,51 @@ static void write_IOenable(unsigned char data,address_space *space) {
 
 }
 
-static WRITE32_HANDLER( write_IOenables_32 ) {
+WRITE32_MEMBER(polgar_state::write_IOenables_32){
 
-	write_IOenable(data>>24,space);
+	write_IOenable(data>>24,&space);
 }
 
-static WRITE16_HANDLER( write_IOenables )
+WRITE16_MEMBER(polgar_state::write_IOenables)
 {
-	write_IOenable(data>>8,space);
+	write_IOenable(data>>8,&space);
 }
 
 /* Unknown read/write */
 
-static READ32_HANDLER( read_unknown1_32 )
+READ32_MEMBER(polgar_state::read_unknown1_32)
 {
 	logerror("Read from unknown1 offset: %x\n",offset);
     return 0xff00ff00;
 }
 
-static READ16_HANDLER( read_unknown1 )
+READ16_MEMBER(polgar_state::read_unknown1)
 {
 	logerror("Read from %06x offset: %x\n",0xe80002,offset);
     return 0xff00;
 }
 
-static WRITE32_HANDLER( write_unknown2_32 )
+WRITE32_MEMBER(polgar_state::write_unknown2_32)
 {
 	//unknown2_data = data;
 	logerror("Write to   unknown2 data: %04x\n",data);
 }
 
-static WRITE16_HANDLER( write_unknown2 )
+WRITE16_MEMBER(polgar_state::write_unknown2)
 {
 	//unknown2_data = data;
 	logerror("Write from %06x data: %04x\n",0xe80004,data);
 }
 
-static READ32_HANDLER( read_unknown3_32 )
+READ32_MEMBER(polgar_state::read_unknown3_32)
 {
-	logerror("Read from unknown3 offset: %x %08x\n",offset,(unsigned int) cpu_get_reg(space->machine().device("maincpu"), M68K_PC));
+	logerror("Read from unknown3 offset: %x %08x\n",offset,(unsigned int) cpu_get_reg(machine().device("maincpu"), M68K_PC));
 	return 0xffffffff;
 	//return unknown2_data|unknown2_data<<24;
 
 }
 
-static READ16_HANDLER( read_unknown3 )
+READ16_MEMBER(polgar_state::read_unknown3)
 {
 	logerror("Read from %06x offset: %x\n",0xe80006,offset);
 	return 0xffff;
@@ -919,13 +960,13 @@ static READ16_HANDLER( read_unknown3 )
 
 }
 
-static READ32_HANDLER( read_1800000 )
+READ32_MEMBER(polgar_state::read_1800000)
 {
 	logerror("Read from RISC2500 1800000\n");
 	return 0;
 }
 
-static WRITE32_HANDLER( write_1000000 )
+WRITE32_MEMBER(polgar_state::write_1000000)
 {
 	logerror("Write to  RISC2500 1000000\n");
 }
@@ -1070,20 +1111,20 @@ static ADDRESS_MAP_START(polgar_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x2400, 0x2400 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
 	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY(mboard_write_board_8)		// Chessboard
 	AM_RANGE( 0x3000, 0x3000 ) AM_READ_LEGACY(mboard_read_board_8 )		// Chessboard
-	AM_RANGE( 0x3400, 0x3405 ) AM_WRITE_LEGACY(polgar_write_LED)	// Function LEDs
-	AM_RANGE( 0x2c00, 0x2c07 ) AM_READ_LEGACY(read_keys)
-	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE_LEGACY(write_polgar_IO )	// LCD Instr. Reg + Beeper
-	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY(write_LCD_polgar )	        // LCD Char Reg.
+	AM_RANGE( 0x3400, 0x3405 ) AM_WRITE(polgar_write_LED)	// Function LEDs
+	AM_RANGE( 0x2c00, 0x2c07 ) AM_READ(read_keys)
+	AM_RANGE( 0x2004, 0x2004 ) AM_WRITE(write_polgar_IO )	// LCD Instr. Reg + Beeper
+	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(write_LCD_polgar )	        // LCD Char Reg.
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sfortea_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fef ) AM_RAM
-	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE_LEGACY(write_latch_sfortea)	// IO control
-	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE_LEGACY(write_lcd_IO_sfortea)	// LCD Char Reg.
+	AM_RANGE( 0x1ff6, 0x1ff6 ) AM_WRITE(write_latch_sfortea)	// IO control
+	AM_RANGE( 0x1ff7, 0x1ff7 ) AM_WRITE(write_lcd_IO_sfortea)	// LCD Char Reg.
 //  AM_RANGE( 0x1ffc, 0x1fff ) AM_DEVREADWRITE_LEGACY("acia65c51", acia_6551_r,acia_6551_w)
-	AM_RANGE( 0x1ff1, 0x1ff1 ) AM_READ_LEGACY(read_1ff1_sfortea )
-	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_READ_LEGACY(read_1ff0_sfortea )
+	AM_RANGE( 0x1ff1, 0x1ff1 ) AM_READ(read_1ff1_sfortea )
+	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_READ(read_1ff0_sfortea )
 	AM_RANGE( 0x2000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -1097,12 +1138,12 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0xc8000004 , 0xc8000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
 	AM_RANGE( 0xd0000000 , 0xd0000003 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
 	AM_RANGE( 0xd0000004 , 0xd0000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
-	AM_RANGE( 0xf0000004 , 0xf0000013 )  AM_READ_LEGACY(read_buttons_gen32 )
-	AM_RANGE( 0xe0000000 , 0xe0000003 )  AM_WRITE_LEGACY(write_LCD_data_32 )
-	AM_RANGE( 0xe0000010 , 0xe0000013 )  AM_WRITE_LEGACY(write_IOenables_32 )
-	AM_RANGE( 0xd8000008 , 0xd800000b )  AM_WRITE_LEGACY(write_unknown2_32 )
-	AM_RANGE( 0xd8000004 , 0xd8000007 )  AM_READ_LEGACY(read_unknown1_32 )
-	AM_RANGE( 0xd800000c , 0xd800000f )  AM_READ_LEGACY(read_unknown3_32 )
+	AM_RANGE( 0xf0000004 , 0xf0000013 )  AM_READ(read_buttons_gen32 )
+	AM_RANGE( 0xe0000000 , 0xe0000003 )  AM_WRITE(write_LCD_data_32 )
+	AM_RANGE( 0xe0000010 , 0xe0000013 )  AM_WRITE(write_IOenables_32 )
+	AM_RANGE( 0xd8000008 , 0xd800000b )  AM_WRITE(write_unknown2_32 )
+	AM_RANGE( 0xd8000004 , 0xd8000007 )  AM_READ(read_unknown1_32 )
+	AM_RANGE( 0xd800000c , 0xd800000f )  AM_READ(read_unknown3_32 )
 
 	AM_RANGE( 0x40000000, 0x4007ffff )  AM_RAM      /* 512KB */
 	AM_RANGE( 0x80000000, 0x8003ffff )  AM_RAM      /* 256KB */
@@ -1113,11 +1154,11 @@ static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, polgar_state )
 static ADDRESS_MAP_START(bpl32_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x000000,  0x03ffff )  AM_ROM
-	AM_RANGE( 0x800000 , 0x800003 )  AM_READ_LEGACY(read_keys_BPL32 )
-	AM_RANGE( 0x900000 , 0x900003 )  AM_WRITE_LEGACY(write_board_BPL32 )
-	AM_RANGE( 0xa00000 , 0xa00003 )  AM_WRITE_LEGACY(write_LED_BPL32 )
-	AM_RANGE( 0xc00000 , 0xc00003 )  AM_WRITE_LEGACY(write_LCD_data_32 )
-	AM_RANGE( 0xb00000 , 0xb00003 )  AM_WRITE_LEGACY(write_IOenables_32 )
+	AM_RANGE( 0x800000 , 0x800003 )  AM_READ(read_keys_BPL32 )
+	AM_RANGE( 0x900000 , 0x900003 )  AM_WRITE(write_board_BPL32 )
+	AM_RANGE( 0xa00000 , 0xa00003 )  AM_WRITE(write_LED_BPL32 )
+	AM_RANGE( 0xc00000 , 0xc00003 )  AM_WRITE(write_LCD_data_32 )
+	AM_RANGE( 0xb00000 , 0xb00003 )  AM_WRITE(write_IOenables_32 )
 	AM_RANGE( 0x400000 , 0x4fffff )  AM_RAM      /* 1024KB */
 	AM_RANGE( 0xd00000 , 0xd07fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
 
@@ -1130,12 +1171,12 @@ static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ_LEGACY(mboard_read_board_32 )
 	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
 	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
-	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ_LEGACY(read_buttons_van32 )
-	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE_LEGACY(write_LCD_data_32 )
-	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE_LEGACY(write_IOenables_32 )
-	AM_RANGE( 0x98000008 , 0x9800000b )  AM_WRITE_LEGACY(write_unknown2_32 )
-	AM_RANGE( 0x98000004 , 0x98000007 )  AM_READ_LEGACY(read_unknown1_32 )
-	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ_LEGACY(read_unknown3_32 )
+	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ(read_buttons_van32 )
+	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE(write_LCD_data_32 )
+	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE(write_IOenables_32 )
+	AM_RANGE( 0x98000008 , 0x9800000b )  AM_WRITE(write_unknown2_32 )
+	AM_RANGE( 0x98000004 , 0x98000007 )  AM_READ(read_unknown1_32 )
+	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ(read_unknown3_32 )
 
 	AM_RANGE( 0x40000000, 0x400fffff )  AM_RAM      /* 1024KB */
 	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
@@ -1150,12 +1191,12 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 	AM_RANGE( 0x800000fc , 0x800000ff )  AM_READ_LEGACY(mboard_read_board_32 )
 	AM_RANGE( 0x88000000 , 0x88000007 )  AM_WRITE_LEGACY(mboard_write_board_32 )
 	AM_RANGE( 0x90000000 , 0x90000007 )  AM_WRITE_LEGACY(mboard_write_LED_32 )
-	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ_LEGACY(read_buttons_van32 )
-	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE_LEGACY(write_LCD_data_32 )
-	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE_LEGACY(write_IOenables_32 )
-	AM_RANGE( 0x98000008 , 0x9800000b )  AM_WRITE_LEGACY(write_unknown2_32 )
-	AM_RANGE( 0x98000004 , 0x98000007 )  AM_READ_LEGACY(read_unknown1_32 )
-	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ_LEGACY(read_unknown3_32 )
+	AM_RANGE( 0x800000ec , 0x800000ff )  AM_READ(read_buttons_van32 )
+	AM_RANGE( 0xa0000000 , 0xa0000003 )  AM_WRITE(write_LCD_data_32 )
+	AM_RANGE( 0xa0000010 , 0xa0000013 )  AM_WRITE(write_IOenables_32 )
+	AM_RANGE( 0x98000008 , 0x9800000b )  AM_WRITE(write_unknown2_32 )
+	AM_RANGE( 0x98000004 , 0x98000007 )  AM_READ(read_unknown1_32 )
+	AM_RANGE( 0x9800000c , 0x9800000f )  AM_READ(read_unknown3_32 )
 
 	AM_RANGE( 0x40000000, 0x400fffff )  AM_RAM
 	AM_RANGE( 0xa8000000, 0xa8007fff )  AM_RAM AM_BASE_LEGACY(&save_ram32) AM_SHARE("nvram")
@@ -1165,8 +1206,8 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32, polgar_state )
 
 	AM_RANGE( 0x02000000,  0x0201ffff )  AM_ROM AM_REGION("maincpu", 0) // AM_MIRROR(0x2000000)
-	AM_RANGE( 0x01000000,  0x01000003 )  AM_WRITE_LEGACY(write_1000000 )
-	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ_LEGACY(read_1800000 )
+	AM_RANGE( 0x01000000,  0x01000003 )  AM_WRITE(write_1000000 )
+	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ(read_1800000 )
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
 
  ADDRESS_MAP_END
@@ -1178,12 +1219,12 @@ static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ_LEGACY(mboard_read_board_16 )
 	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE_LEGACY(mboard_write_board_16 )
 	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE_LEGACY(mboard_write_LED_16 )
-	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ_LEGACY(read_buttons_van16 )
-	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE_LEGACY(write_LCD_data )
-	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE_LEGACY(write_IOenables )
-	AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE_LEGACY(write_unknown2 )
-	AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ_LEGACY(read_unknown1 )
-	AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ_LEGACY(read_unknown3 )
+	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ(read_buttons_van16 )
+	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE(write_LCD_data )
+	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE(write_IOenables )
+	AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE(write_unknown2 )
+	AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ(read_unknown1 )
+	AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ(read_unknown3 )
 
 	AM_RANGE( 0x400000, 0x47ffff )  AM_RAM      /* 512KB */
 	AM_RANGE( 0x800000, 0x803fff )  AM_RAM AM_BASE_LEGACY(&save_ram) AM_SHARE("nvram")
@@ -1197,12 +1238,12 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, polgar_state )
 	AM_RANGE( 0xc00000 , 0xc00001 )  AM_READ_LEGACY(mboard_read_board_16 )
 	AM_RANGE( 0xc80000 , 0xc80001 )  AM_WRITE_LEGACY(mboard_write_board_16 )
 	AM_RANGE( 0xd00000 , 0xd00001 )  AM_WRITE_LEGACY(mboard_write_LED_16 )
-	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ_LEGACY(read_buttons_van16 )
-	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE_LEGACY(write_LCD_data )
-	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE_LEGACY(write_IOenables )
-//  AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE_LEGACY(write_unknown2 )
-//  AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ_LEGACY(read_unknown1 )
-//  AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ_LEGACY(read_unknown3 )
+	AM_RANGE( 0xf00000 , 0xf00009 )  AM_READ(read_buttons_van16 )
+	AM_RANGE( 0xd80000 , 0xd80001 )  AM_WRITE(write_LCD_data )
+	AM_RANGE( 0xd80008 , 0xd80009 )  AM_WRITE(write_IOenables )
+//  AM_RANGE( 0xe80004 , 0xe80005 )  AM_WRITE(write_unknown2 )
+//  AM_RANGE( 0xe80002 , 0xe80003 )  AM_READ(read_unknown1 )
+//  AM_RANGE( 0xe80006 , 0xe80007 )  AM_READ(read_unknown3 )
 
 
 	AM_RANGE( 0x400000, 0x47ffff )  AM_RAM      /* 512KB */
@@ -1212,59 +1253,59 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(milano_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1f9f ) AM_RAM
-	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE_LEGACY(milano_write_board )		// Chessboard
-	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ_LEGACY(milano_read_board )		// Chessboard
-	AM_RANGE( 0x1fe8, 0x1fed ) AM_WRITE_LEGACY(milano_write_LED )	// Function LEDs
-	AM_RANGE( 0x1fd8, 0x1fdf ) AM_READ_LEGACY(read_keys)
-	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_WRITE_LEGACY(write_polgar_IO)	// IO control
-	AM_RANGE( 0x1fc0, 0x1fc0 ) AM_WRITE_LEGACY(write_LCD_polgar)	// LCD Char Reg. (latched)
+	AM_RANGE( 0x1fd0, 0x1fd0 ) AM_WRITE(milano_write_board )		// Chessboard
+	AM_RANGE( 0x1fe0, 0x1fe0 ) AM_READ(milano_read_board )		// Chessboard
+	AM_RANGE( 0x1fe8, 0x1fed ) AM_WRITE(milano_write_LED )	// Function LEDs
+	AM_RANGE( 0x1fd8, 0x1fdf ) AM_READ(read_keys)
+	AM_RANGE( 0x1ff0, 0x1ff0 ) AM_WRITE(write_polgar_IO)	// IO control
+	AM_RANGE( 0x1fc0, 0x1fc0 ) AM_WRITE(write_LCD_polgar)	// LCD Char Reg. (latched)
 	AM_RANGE( 0x2000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(academy_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY(read_keys_board_academy )
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY(academy_write_board )		// Chessboard
+	AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_academy )
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )		// Chessboard
 	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY(beep_academy )
-	AM_RANGE( 0x3001, 0x3001 ) AM_WRITE_LEGACY(academy_inhibitNMI )
-	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY(academy_write_LED )
-	AM_RANGE( 0x3800, 0x3801 ) AM_WRITE_LEGACY(write_LCD_academy )
+	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
+	AM_RANGE( 0x3001, 0x3001 ) AM_WRITE(academy_inhibitNMI )
+	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )
+	AM_RANGE( 0x3800, 0x3801 ) AM_WRITE(write_LCD_academy )
 	AM_RANGE( 0x4000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(monteciv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY(read_keys_board_monteciv )
-	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE_LEGACY(academy_write_board )		// Chessboard
+	AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_monteciv )
+	AM_RANGE( 0x2800, 0x2800 ) AM_WRITE(academy_write_board )		// Chessboard
 	AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )		// Chessboard
-	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY(academy_write_LED )			// Status LEDs
-	AM_RANGE( 0x3000, 0x3001 ) AM_WRITE_LEGACY(monteciv_select_line )			// Select Keyline
-	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY(beep_academy )
-	AM_RANGE( 0x3004, 0x3004 ) AM_WRITE_LEGACY(monteciv_write_LCD )
-	AM_RANGE( 0x3005, 0x3005 ) AM_WRITE_LEGACY(monteciv_3005 )
-	AM_RANGE( 0x3007, 0x3007 ) AM_WRITE_LEGACY(monteciv_3007 )
-	AM_RANGE( 0x3006, 0x3006 ) AM_WRITE_LEGACY(monteciv_3006 )
-	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY(academy_inhibitNMI )
+	AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )			// Status LEDs
+	AM_RANGE( 0x3000, 0x3001 ) AM_WRITE(monteciv_select_line )			// Select Keyline
+	AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
+	AM_RANGE( 0x3004, 0x3004 ) AM_WRITE(monteciv_write_LCD )
+	AM_RANGE( 0x3005, 0x3005 ) AM_WRITE(monteciv_3005 )
+	AM_RANGE( 0x3007, 0x3007 ) AM_WRITE(monteciv_3007 )
+	AM_RANGE( 0x3006, 0x3006 ) AM_WRITE(monteciv_3006 )
+	AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(academy_inhibitNMI )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(megaiv_mem , AS_PROGRAM, 8, polgar_state )
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-/// AM_RANGE( 0x2400, 0x2400 ) AM_READ_LEGACY(read_keys_board_monteciv )
-	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE_LEGACY(academy_write_board )	// 2800 // Chessboard
+/// AM_RANGE( 0x2400, 0x2400 ) AM_READ(read_keys_board_monteciv )
+	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE(academy_write_board )	// 2800 // Chessboard
 /// AM_RANGE( 0x2c00, 0x2c00 ) AM_WRITE_LEGACY(mboard_write_LED_8 )      // Chessboard
-/// AM_RANGE( 0x3400, 0x3400 ) AM_WRITE_LEGACY(academy_write_LED )           // Status LEDs
-	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE_LEGACY(megaiv_write_LED )	// 2400     // Select Keyline
-	AM_RANGE( 0x7000, 0x7001 ) AM_WRITE_LEGACY(megaiv_IO )			// Select Keyline
-/// AM_RANGE( 0x3002, 0x3002 ) AM_WRITE_LEGACY(beep_academy )
-	AM_RANGE( 0x4000, 0x4007 ) AM_READ_LEGACY(read_keys_megaiv ) // 3000-7 fixio
-	AM_RANGE( 0x2c04, 0x2c04 ) AM_WRITE_LEGACY(monteciv_write_LCD ) // 2c04
-	AM_RANGE( 0x2c05, 0x2c05 ) AM_WRITE_LEGACY(monteciv_3005 ) // 2c05
-	AM_RANGE( 0x2c07, 0x2c07 ) AM_WRITE_LEGACY(monteciv_3007 ) // 2c07
-	AM_RANGE( 0x2c06, 0x2c06 ) AM_WRITE_LEGACY(monteciv_3006 ) // 2c06
-/// AM_RANGE( 0x2000, 0x2000 ) AM_WRITE_LEGACY(academy_inhibitNMI )
+/// AM_RANGE( 0x3400, 0x3400 ) AM_WRITE(academy_write_LED )           // Status LEDs
+	AM_RANGE( 0x4400, 0x4400 ) AM_WRITE(megaiv_write_LED )	// 2400     // Select Keyline
+	AM_RANGE( 0x7000, 0x7001 ) AM_WRITE(megaiv_IO )			// Select Keyline
+/// AM_RANGE( 0x3002, 0x3002 ) AM_WRITE(beep_academy )
+	AM_RANGE( 0x4000, 0x4007 ) AM_READ(read_keys_megaiv ) // 3000-7 fixio
+	AM_RANGE( 0x2c04, 0x2c04 ) AM_WRITE(monteciv_write_LCD ) // 2c04
+	AM_RANGE( 0x2c05, 0x2c05 ) AM_WRITE(monteciv_3005 ) // 2c05
+	AM_RANGE( 0x2c07, 0x2c07 ) AM_WRITE(monteciv_3007 ) // 2c07
+	AM_RANGE( 0x2c06, 0x2c06 ) AM_WRITE(monteciv_3006 ) // 2c06
+/// AM_RANGE( 0x2000, 0x2000 ) AM_WRITE(academy_inhibitNMI )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -1272,11 +1313,11 @@ static ADDRESS_MAP_START(diablo68_mem , AS_PROGRAM, 16, polgar_state )
 	AM_RANGE( 0x00000000, 0x0000ffff ) AM_ROM // OS
 //  AM_RANGE( 0x00200000, 0x0020ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x00ff0000, 0x00ff7fff ) AM_ROM AM_REGION("maincpu",10000) // Opening Book
-//  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ_LEGACY(diablo68_aciaread)
-//  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ_LEGACY(diablo68_aciawrite)
+//  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciaread)
+//  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciawrite)
 //  AM_RANGE( 0x00300002, 0x00300003 ) AM_READ_LEGACY(diablo68_flags)
-	AM_RANGE( 0x003a0000, 0x003a0001 ) AM_WRITE_LEGACY(diablo68_write_LCD)
-	AM_RANGE( 0x003c0000, 0x003c0001 ) AM_WRITE_LEGACY(diablo68_reg_select)
+	AM_RANGE( 0x003a0000, 0x003a0001 ) AM_WRITE(diablo68_write_LCD)
+	AM_RANGE( 0x003c0000, 0x003c0001 ) AM_WRITE(diablo68_reg_select)
 	AM_RANGE( 0x00280000, 0x0028ffff ) AM_RAM  // hash tables
 	AM_RANGE( 0x00ff8000, 0x00ffffff ) AM_RAM
 ADDRESS_MAP_END

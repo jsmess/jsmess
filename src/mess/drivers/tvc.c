@@ -22,6 +22,15 @@ public:
 	UINT8 m_keyline;
 	UINT8 m_flipflop;
 	UINT8 m_col[4];
+	DECLARE_WRITE8_MEMBER(tvc_bank_w);
+	DECLARE_WRITE8_MEMBER(tvc_video_mode_w);
+	DECLARE_WRITE8_MEMBER(tvc_palette_w);
+	DECLARE_WRITE8_MEMBER(tvc_keyboard_w);
+	DECLARE_READ8_MEMBER(tvc_keyboard_r);
+	DECLARE_READ8_MEMBER(tvc_flipflop_r);
+	DECLARE_WRITE8_MEMBER(tvc_flipflop_w);
+	DECLARE_READ8_MEMBER(tvc_port59_r);
+	DECLARE_WRITE8_MEMBER(tvc_port0_w);
 };
 
 
@@ -78,61 +87,55 @@ static void tvc_set_mem_page(running_machine &machine, UINT8 data)
 	}
 }
 
-static WRITE8_HANDLER( tvc_bank_w )
+WRITE8_MEMBER(tvc_state::tvc_bank_w)
 {
-	tvc_set_mem_page(space->machine(), data);
+	tvc_set_mem_page(machine(), data);
 }
 
-static WRITE8_HANDLER( tvc_video_mode_w )
+WRITE8_MEMBER(tvc_state::tvc_video_mode_w)
 {
-	tvc_state *state = space->machine().driver_data<tvc_state>();
-	state->m_video_mode = data & 0x03;
+	m_video_mode = data & 0x03;
 }
 
 
-static WRITE8_HANDLER( tvc_palette_w )
+WRITE8_MEMBER(tvc_state::tvc_palette_w)
 {
-	tvc_state *state = space->machine().driver_data<tvc_state>();
 	//  0 I 0 R | 0 G 0 B
 	//  0 0 0 0 | I R G B
 	int i = ((data&0x40)>>3) | ((data&0x10)>>2) | ((data&0x04)>>1) | (data&0x01);
 
-	state->m_col[offset] = i;
+	m_col[offset] = i;
 }
 
-static WRITE8_HANDLER( tvc_keyboard_w )
+WRITE8_MEMBER(tvc_state::tvc_keyboard_w)
 {
-	tvc_state *state = space->machine().driver_data<tvc_state>();
-	state->m_keyline = data;
+	m_keyline = data;
 }
 
-static READ8_HANDLER( tvc_keyboard_r )
+READ8_MEMBER(tvc_state::tvc_keyboard_r)
 {
-	tvc_state *state = space->machine().driver_data<tvc_state>();
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
-	return input_port_read(space->machine(), keynames[state->m_keyline & 0x0f]);
+	return input_port_read(machine(), keynames[m_keyline & 0x0f]);
 }
 
-static READ8_HANDLER( tvc_flipflop_r )
+READ8_MEMBER(tvc_state::tvc_flipflop_r)
 {
-	tvc_state *state = space->machine().driver_data<tvc_state>();
-	return state->m_flipflop;
+	return m_flipflop;
 }
 
-static WRITE8_HANDLER( tvc_flipflop_w )
+WRITE8_MEMBER(tvc_state::tvc_flipflop_w)
 {
-	tvc_state *state = space->machine().driver_data<tvc_state>();
-	state->m_flipflop |= 0x10;
+	m_flipflop |= 0x10;
 }
-static READ8_HANDLER( tvc_port59_r )
+READ8_MEMBER(tvc_state::tvc_port59_r)
 {
 	return 0xff;
 }
 
-static WRITE8_HANDLER( tvc_port0_w )
+WRITE8_MEMBER(tvc_state::tvc_port0_w)
 {
 }
 static ADDRESS_MAP_START(tvc_mem, AS_PROGRAM, 8, tvc_state )
@@ -145,15 +148,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tvc_io , AS_IO, 8, tvc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(tvc_port0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(tvc_bank_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(tvc_keyboard_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(tvc_video_mode_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(tvc_flipflop_w)
-	AM_RANGE(0x58, 0x58) AM_READ_LEGACY(tvc_keyboard_r)
-	AM_RANGE(0x59, 0x59) AM_READ_LEGACY(tvc_flipflop_r)
-	AM_RANGE(0x5a, 0x5a) AM_READ_LEGACY(tvc_port59_r)
-	AM_RANGE(0x60, 0x64) AM_WRITE_LEGACY(tvc_palette_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(tvc_port0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(tvc_bank_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(tvc_keyboard_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(tvc_video_mode_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(tvc_flipflop_w)
+	AM_RANGE(0x58, 0x58) AM_READ(tvc_keyboard_r)
+	AM_RANGE(0x59, 0x59) AM_READ(tvc_flipflop_r)
+	AM_RANGE(0x5a, 0x5a) AM_READ(tvc_port59_r)
+	AM_RANGE(0x60, 0x64) AM_WRITE(tvc_palette_w)
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x71, 0x71) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END

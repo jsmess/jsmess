@@ -77,6 +77,8 @@ public:
 
 	hd63701y0_t m_hd63701y0;
 	rvoicepc_t m_rvoicepc;
+	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
+	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
 };
 
 
@@ -126,11 +128,10 @@ static MACHINE_RESET( rvoicepc )
 	state->m_hd63701y0.P6CSR = 0x00;
 }
 
-static READ8_HANDLER( main_hd63701_internal_registers_r )
+READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 {
-	rvoice_state *state = space->machine().driver_data<rvoice_state>();
 	UINT8 data = 0;
-	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", cpu_get_pc(&space->device()), offset);
+	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", cpu_get_pc(&space.device()), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
@@ -146,59 +147,59 @@ static READ8_HANDLER( main_hd63701_internal_registers_r )
 			return data;
 		case 0x02: // Port 1
 			logerror("Port 1\n");
-			data = state->m_hd63701y0.PORT1;
+			data = m_hd63701y0.PORT1;
 			break;
 		case 0x03: // Port 2
 			logerror("Port 2\n");
-			data = state->m_hd63701y0.PORT1;
+			data = m_hd63701y0.PORT1;
 			break;
 		case 0x06: // Port 3
 			logerror("Port 3\n");
-			data = state->m_hd63701y0.PORT3;
+			data = m_hd63701y0.PORT3;
 			break;
 		case 0x07: // Port 4
 			logerror("Port 4\n");
-			data = state->m_hd63701y0.PORT4;
+			data = m_hd63701y0.PORT4;
 			break;
 		case 0x08: // Timer Control/Status Register 1
 			logerror("Timer Control/Status Register 1\n");
-			data = state->m_hd63701y0.TCSR1;
+			data = m_hd63701y0.TCSR1;
 			break;
 		case 0x09: // Free Running Counter (MSB)
 			logerror("Free Running Counter (MSB)\n");
-			data = state->m_hd63701y0.FRCH;
+			data = m_hd63701y0.FRCH;
 			break;
 		case 0x0A: // Free Running Counter (LSB)
 			logerror("Free Running Counter (LSB)\n");
-			data = state->m_hd63701y0.FRCL;
+			data = m_hd63701y0.FRCL;
 			break;
 		// B C (D E)
 		case 0x0F: // Timer Control/Status Register 2
 			logerror("Timer Control/Status Register 2\n");
-			data = state->m_hd63701y0.TCSR2;
+			data = m_hd63701y0.TCSR2;
 			break;
 		// 10 11 (12)
 
 		case 0x14: // RAM/Port 5 Control Register
 			logerror("RAM/Port 5 Control Register\n");
-			data = state->m_hd63701y0.RP5CR;
+			data = m_hd63701y0.RP5CR;
 			break;
 		case 0x15: // Port 5
 			logerror("Port 5\n");
-			data = state->m_hd63701y0.PORT5;
+			data = m_hd63701y0.PORT5;
 			break;
 		case 0x17: // Port 6
 			logerror("Port 6\n");
-			data = state->m_hd63701y0.PORT6;
+			data = m_hd63701y0.PORT6;
 			break;
 		case 0x18: // Port 7
 			logerror("Port 7\n");
-			data = state->m_hd63701y0.PORT7;
+			data = m_hd63701y0.PORT7;
 			break;
 		// 19 1a 1b 1c 1d 1e 1f
 		case 0x21: // Port 6 Control/Status Register
 			logerror("Port 6 Control/Status Register\n");
-			data = state->m_hd63701y0.P6CSR;
+			data = m_hd63701y0.P6CSR;
 			break;
 		default:
 			logerror("\n");
@@ -210,107 +211,106 @@ static READ8_HANDLER( main_hd63701_internal_registers_r )
 }
 
 
-static WRITE8_HANDLER( main_hd63701_internal_registers_w )
+WRITE8_MEMBER(rvoice_state::main_hd63701_internal_registers_w)
 {
-	rvoice_state *state = space->machine().driver_data<rvoice_state>();
-	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", cpu_get_pc(&space->device()), offset);
+	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", cpu_get_pc(&space.device()), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
 			logerror("Port 1 DDR of %02X\n", data);
-			state->m_hd63701y0.P1DDR = data;
-			state->m_rvoicepc.port1 = (state->m_hd63701y0.PORT1 & state->m_hd63701y0.P1DDR);
+			m_hd63701y0.P1DDR = data;
+			m_rvoicepc.port1 = (m_hd63701y0.PORT1 & m_hd63701y0.P1DDR);
 			break;
 		case 0x01: // Port 2 DDR
 			logerror("Port 2 DDR of %02X\n", data);
-			state->m_hd63701y0.P2DDR = data;
-			state->m_rvoicepc.port2 = (state->m_hd63701y0.PORT2 & state->m_hd63701y0.P2DDR);
+			m_hd63701y0.P2DDR = data;
+			m_rvoicepc.port2 = (m_hd63701y0.PORT2 & m_hd63701y0.P2DDR);
 			break;
 		case 0x02: // Port 1
 			logerror("Port 1 of %02X\n", data);
-			state->m_hd63701y0.PORT1 = data;
-			state->m_rvoicepc.port1 = (state->m_hd63701y0.PORT1 & state->m_hd63701y0.P1DDR);
+			m_hd63701y0.PORT1 = data;
+			m_rvoicepc.port1 = (m_hd63701y0.PORT1 & m_hd63701y0.P1DDR);
 			break;
 		case 0x03: // Port 2
 			logerror("Port 2 of %02X\n", data);
-			state->m_hd63701y0.PORT2 = data;
-			state->m_rvoicepc.port2 = (state->m_hd63701y0.PORT2 & state->m_hd63701y0.P2DDR);
+			m_hd63701y0.PORT2 = data;
+			m_rvoicepc.port2 = (m_hd63701y0.PORT2 & m_hd63701y0.P2DDR);
 			break;
 		case 0x04: // Port 3 DDR
 			logerror("Port 3 DDR of %02X\n", data);
-			state->m_hd63701y0.P3DDR = data;
-			state->m_rvoicepc.port3 = (state->m_hd63701y0.PORT3 & state->m_hd63701y0.P3DDR);
+			m_hd63701y0.P3DDR = data;
+			m_rvoicepc.port3 = (m_hd63701y0.PORT3 & m_hd63701y0.P3DDR);
 			break;
 		case 0x05: // Port 4 DDR
 			logerror("Port 4 DDR of %02X\n", data);
-			state->m_hd63701y0.P4DDR = data;
-			state->m_rvoicepc.port4 = (state->m_hd63701y0.PORT4 & state->m_hd63701y0.P4DDR);
+			m_hd63701y0.P4DDR = data;
+			m_rvoicepc.port4 = (m_hd63701y0.PORT4 & m_hd63701y0.P4DDR);
 			break;
 		case 0x06: // Port 3
 			logerror("Port 3 of %02X\n", data);
-			state->m_hd63701y0.PORT3 = data;
-			state->m_rvoicepc.port3 = (state->m_hd63701y0.PORT3 & state->m_hd63701y0.P3DDR);
+			m_hd63701y0.PORT3 = data;
+			m_rvoicepc.port3 = (m_hd63701y0.PORT3 & m_hd63701y0.P3DDR);
 			break;
 		case 0x07: // Port 4
 			logerror("Port 4 of %02X\n", data);
-			state->m_hd63701y0.PORT4 = data;
-			state->m_rvoicepc.port4 = (state->m_hd63701y0.PORT4 & state->m_hd63701y0.P4DDR);
+			m_hd63701y0.PORT4 = data;
+			m_rvoicepc.port4 = (m_hd63701y0.PORT4 & m_hd63701y0.P4DDR);
 			break;
 		case 0x08: // Timer Control/Status Register 1
 			logerror("Timer Control/Status Register 1 of %02X\n", data);
-			state->m_hd63701y0.TCSR1 = data;
+			m_hd63701y0.TCSR1 = data;
 			break;
 		case 0x09: // Free Running Counter (MSB)
 			logerror("Free Running Counter (MSB) of %02X\n", data);
-			state->m_hd63701y0.FRCH = data;
+			m_hd63701y0.FRCH = data;
 			break;
 		case 0x0A: // Free Running Counter (LSB)
 			logerror("Free Running Counter (LSB) of %02X\n", data);
-			state->m_hd63701y0.FRCL = data;
+			m_hd63701y0.FRCL = data;
 			break;
 		// B C (D E)
 		case 0x0F: // Timer Control/Status Register 2
 			logerror("Timer Control/Status Register 2 of %02X\n", data);
-			state->m_hd63701y0.TCSR2 = data;
+			m_hd63701y0.TCSR2 = data;
 			break;
 		// 10 11 (12)
 		case 0x13: // TxD Register
 			logerror("TxD Register of %02X\n", data);
-			state->m_hd63701y0.TDR = data;
+			m_hd63701y0.TDR = data;
 			break;
 		case 0x14: // RAM/Port 5 Control Register
 			logerror("RAM/Port 5 Control Register of %02X\n", data);
-			state->m_hd63701y0.RP5CR = data;
+			m_hd63701y0.RP5CR = data;
 			break;
 		case 0x15: // Port 5
 			logerror("Port 5 of %02X\n", data);
-			state->m_hd63701y0.PORT5 = data;
-			state->m_rvoicepc.port5 = (state->m_hd63701y0.PORT5 & state->m_hd63701y0.P5DDR);
+			m_hd63701y0.PORT5 = data;
+			m_rvoicepc.port5 = (m_hd63701y0.PORT5 & m_hd63701y0.P5DDR);
 			break;
 		case 0x16: // Port 6 DDR
 			logerror("Port 6 DDR of %02X\n", data);
-			state->m_hd63701y0.P6DDR = data;
-			state->m_rvoicepc.port6 = (state->m_hd63701y0.PORT6 & state->m_hd63701y0.P6DDR);
+			m_hd63701y0.P6DDR = data;
+			m_rvoicepc.port6 = (m_hd63701y0.PORT6 & m_hd63701y0.P6DDR);
 			break;
 		case 0x17: // Port 6
 			logerror("Port 6 of %02X\n", data);
-			state->m_hd63701y0.PORT6 = data;
-			state->m_rvoicepc.port6 = (state->m_hd63701y0.PORT6 & state->m_hd63701y0.P6DDR);
+			m_hd63701y0.PORT6 = data;
+			m_rvoicepc.port6 = (m_hd63701y0.PORT6 & m_hd63701y0.P6DDR);
 			break;
 		case 0x18: // Port 7
 			logerror("Port 7 of %02X\n", data);
-			state->m_hd63701y0.PORT7 = data;
-			state->m_rvoicepc.port7 = data;
+			m_hd63701y0.PORT7 = data;
+			m_rvoicepc.port7 = data;
 			break;
 		// 19 1a 1b 1c 1d 1e 1f
 		case 0x20: // Port 5 DDR
 			logerror("Port 5 DDR of %02X\n", data);
-			state->m_hd63701y0.P5DDR = data;
-			state->m_rvoicepc.port5 = (state->m_hd63701y0.PORT5 & state->m_hd63701y0.P5DDR);
+			m_hd63701y0.P5DDR = data;
+			m_rvoicepc.port5 = (m_hd63701y0.PORT5 & m_hd63701y0.P5DDR);
 			break;
 		case 0x21: // Port 6 Control/Status Register
 			logerror("Port 6 Control/Status Register of %02X\n", data);
-			state->m_hd63701y0.P6CSR = data;
+			m_hd63701y0.P6CSR = data;
 			break;
 		default:
 			logerror("with data of %02X\n", data);
@@ -325,7 +325,7 @@ static WRITE8_HANDLER( main_hd63701_internal_registers_w )
 
 static ADDRESS_MAP_START(hd63701_main_mem, AS_PROGRAM, 8, rvoice_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0027) AM_READWRITE_LEGACY(main_hd63701_internal_registers_r, main_hd63701_internal_registers_w) // INTERNAL REGS
+	AM_RANGE(0x0000, 0x0027) AM_READWRITE(main_hd63701_internal_registers_r, main_hd63701_internal_registers_w) // INTERNAL REGS
 	AM_RANGE(0x0040, 0x013f) AM_RAM // INTERNAL RAM (overlaps acia)
 	AM_RANGE(0x0060, 0x007f) AM_DEVREADWRITE("acia65c51", acia6551_device, read, write) // ACIA 65C51
 	AM_RANGE(0x2000, 0x7fff) AM_RAM // EXTERNAL SRAM
