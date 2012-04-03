@@ -961,6 +961,41 @@ static DEVICE_IMAGE_UNLOAD( x07_cass )
 }
 
 
+static DEVICE_IMAGE_LOAD( x07_card )
+{
+	running_machine &machine = image.device().machine();
+	x07_state *state = machine.driver_data<x07_state>();
+	address_space *space = state->m_maincpu->memory().space( AS_PROGRAM );
+	UINT16 ram_size = state->m_ram->size();
+
+	if (image.software_entry() == NULL)
+	{
+		UINT8 *rom = machine.region_alloc( "card", image.length(), 1, ENDIANNESS_LITTLE )->base();
+		image.fread(rom, image.length());
+
+		space->install_ram(ram_size, ram_size + 0xfff);
+		space->install_rom(0x6000, 0x7fff, rom);
+	}
+	else
+	{
+		const char *card_type = image.get_feature("card_type");
+
+		if (!strcmp(card_type, "xp140"))
+		{
+			// 0x4000 - 0x4fff   4KB RAM
+			// 0x6000 - 0x7fff   8KB ROM
+			space->install_ram(ram_size, ram_size + 0xfff);
+			space->install_rom(0x6000, 0x7fff, image.get_software_region("rom"));
+		}
+		else
+		{
+			return IMAGE_INIT_FAIL;
+		}
+	}
+
+	return IMAGE_INIT_PASS;
+}
+
 static PALETTE_INIT( x07 )
 {
 	palette_set_color(machine, 0, MAKE_RGB(138, 146, 148));
@@ -1459,6 +1494,13 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,24k")
 
+	/* Memory Card */
+	MCFG_CARTSLOT_ADD("card")
+	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(x07_card)
+	MCFG_CARTSLOT_INTERFACE("x07_card")
+
 	/* cassette */
 	MCFG_CARTSLOT_ADD("cassette")
 	MCFG_CARTSLOT_EXTENSION_LIST("k7,cas,lst")
@@ -1466,6 +1508,9 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_CARTSLOT_LOAD(x07_cass)
 	MCFG_CARTSLOT_UNLOAD(x07_cass)
 	MCFG_CARTSLOT_INTERFACE("x07_cass")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("card_list", "x07_card")
 MACHINE_CONFIG_END
 
 /* ROM definition */
