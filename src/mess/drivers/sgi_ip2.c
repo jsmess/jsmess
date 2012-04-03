@@ -170,7 +170,7 @@ READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
 {
 	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
-	UINT8 ret = rtc->read(*&space, 1);
+	UINT8 ret = rtc->read(space, 1);
 	verboselog(machine(), 1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
 	return ret;
 }
@@ -179,13 +179,13 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_w)
 {
 	verboselog(machine(), 1, "sgi_ip2_clock_ctl_w: %02x\n", data);
 	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
-	rtc->write(*&space, 1, data);
+	rtc->write(space, 1, data);
 }
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
 {
 	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
-	UINT8 ret = rtc->read(*&space, 0);
+	UINT8 ret = rtc->read(space, 0);
 
 	verboselog(machine(), 1, "sgi_ip2_clock_data_r: %02x\n", ret);
 	return ret;
@@ -195,7 +195,7 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_w)
 {
 	verboselog(machine(), 1, "sgi_ip2_clock_data_w: %02x\n", data);
 	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
-	rtc->write(*&space, 0, data);
+	rtc->write(space, 0, data);
 }
 
 
