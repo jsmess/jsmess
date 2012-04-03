@@ -41,7 +41,7 @@
     T6834 IMPLEMENTATION
 ***************************************************************************/
 
-void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
+void x07_state::t6834_cmd (UINT8 cmd)
 {
 	switch (cmd)
 	{
@@ -51,7 +51,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 	case 0x01:	//DATA$ TIME$ read
 		{
 			system_time systime;
-			machine.current_datetime(systime);
+			machine().current_datetime(systime);
 			m_out.data[m_out.write++] = (systime.local_time.year>>8) & 0xff;
 			m_out.data[m_out.write++] = systime.local_time.year & 0xff;
 			m_out.data[m_out.write++] = systime.local_time.month + 1;
@@ -67,7 +67,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 		{
 			UINT8 data;
 
-			switch (input_port_read(machine, "S1") & 0x3c)
+			switch (input_port_read(machine(), "S1") & 0x3c)
 			{
 				case 0x04:		data = 0x33;	break;	//right
 				case 0x08:		data = 0x37;	break;	//left
@@ -81,13 +81,13 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 
 	case 0x03:	//STRIG(0)
 		{
-			m_out.data[m_out.write++] = (input_port_read(machine, "S6") & 0x20 ? 0x00 : 0xff);
+			m_out.data[m_out.write++] = (input_port_read(machine(), "S6") & 0x20 ? 0x00 : 0xff);
 		}
 		break;
 
 	case 0x04:	//STRIG(1)
 		{
-			m_out.data[m_out.write++] = (input_port_read(machine, "S1") & 0x40 ? 0x00 : 0xff);
+			m_out.data[m_out.write++] = (input_port_read(machine(), "S1") & 0x40 ? 0x00 : 0xff);
 		}
 		break;
 
@@ -101,7 +101,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 			if(address == 0xc00e)
 				data = 0x0a;
 			else if(address == 0xd000)
-				data = input_port_read(machine, "BATTERY");
+				data = input_port_read(machine(), "BATTERY");
 			else
 				data = m_t6834_ram[address & 0x7ff];
 
@@ -155,7 +155,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 	case 0x0b:	//calendar
 		{
 				system_time systime;
-				machine.current_datetime(systime);
+				machine().current_datetime(systime);
 				m_out.data[m_out.write++] = systime.local_time.weekday;
 		}
 		break;
@@ -194,7 +194,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 		{
 			UINT8 x = m_in.data[m_in.read++];
 			UINT8 y = m_in.data[m_in.read++];
-			draw_point(machine, x, y, 1);
+			draw_point(x, y, 1);
 		}
 		break;
 
@@ -202,7 +202,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 		{
 			UINT8 x = m_in.data[m_in.read++];
 			UINT8 y = m_in.data[m_in.read++];
-			draw_point(machine, x, y, 0);
+			draw_point(x, y, 0);
 		}
 		break;
 
@@ -240,7 +240,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 					}
 					next_x += step_x;
 					frac += delta_y;
-					draw_point(machine, next_x, next_y, 0x01);
+					draw_point(next_x, next_y, 0x01);
 				}
 			}
 			else {
@@ -254,11 +254,11 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 					}
 					next_y += step_y;
 					frac += delta_x;
-					draw_point(machine, next_x, next_y, 0x01);
+					draw_point(next_x, next_y, 0x01);
 				}
 			}
-			draw_point(machine, p1, p2, 0x01);
-			draw_point(machine, p3, p4, 0x01);
+			draw_point(p1, p2, 0x01);
+			draw_point(p3, p4, 0x01);
 		}
 		break;
 
@@ -274,14 +274,14 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 				UINT32 d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
 				if(abs((double)d1) > abs((double)d2))
 					y--;
-				draw_point(machine, x + p1, y + p2, 0x01);
-				draw_point(machine, x + p1, -y + p2, 0x01);
-				draw_point(machine, -x + p1, y + p2, 0x01);
-				draw_point(machine, -x + p1, -y + p2, 0x01);
-				draw_point(machine, y + p1, x + p2, 0x01);
-				draw_point(machine, y + p1, -x + p2, 0x01);
-				draw_point(machine, -y + p1, x + p2, 0x01);
-				draw_point(machine, -y + p1, -x + p2, 0x01);
+				draw_point(x + p1, y + p2, 0x01);
+				draw_point(x + p1, -y + p2, 0x01);
+				draw_point(-x + p1, y + p2, 0x01);
+				draw_point(-x + p1, -y + p2, 0x01);
+				draw_point(y + p1, x + p2, 0x01);
+				draw_point(y + p1, -x + p2, 0x01);
+				draw_point(-y + p1, x + p2, 0x01);
+				draw_point(-y + p1, -x + p2, 0x01);
 			}
 		}
 		break;
@@ -341,8 +341,8 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 		break;
 	case 0x1c:	//UDC Init
 		{
-			memcpy(m_t6834_ram + 0x200, (UINT8*)machine.region("gfx1")->base() + 0x400, 0x100);
-			memcpy(m_t6834_ram + 0x300, (UINT8*)machine.region("gfx1")->base() + 0x700, 0x100);
+			memcpy(m_t6834_ram + 0x200, (UINT8*)machine().region("gfx1")->base() + 0x400, 0x100);
+			memcpy(m_t6834_ram + 0x300, (UINT8*)machine().region("gfx1")->base() + 0x700, 0x100);
 		}
 		break;
 
@@ -404,7 +404,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 			m_locate.y = m_cursor.y = y;
 
 			if(char_code)
-				draw_char(machine, x, y, char_code);
+				draw_char(x, y, char_code);
 		}
 		break;
 
@@ -423,7 +423,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 
 			for (int i=0 ;i<10; i++)
 				if (matrix & (1<<i))
-					data |= input_port_read(machine, lines[i]);
+					data |= input_port_read(machine(), lines[i]);
 
 			m_out.data[m_out.write++] = data;
 		}
@@ -432,7 +432,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 	case 0x28:	//test chr
 		{
 			UINT8 idx = kb_get_index(m_in.data[m_in.read++]);
-			m_out.data[m_out.write++] = (input_port_read(machine, x07_keycodes[idx].tag) & x07_keycodes[idx].mask) ? 0x00 : 0xff;
+			m_out.data[m_out.write++] = (input_port_read(machine(), x07_keycodes[idx].tag) & x07_keycodes[idx].mask) ? 0x00 : 0xff;
 		}
 		break;
 
@@ -464,7 +464,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 			m_draw_udk = !BIT(cmd,0);
 
 			if (m_draw_udk)
-				draw_udk(machine);
+				draw_udk();
 			else
 				for(UINT8 l = 3 * 8; l < (3 + 1) * 8; l++)
 					memset(&m_lcd_map[l][0], 0, 120);
@@ -578,7 +578,7 @@ void x07_state::t6834_cmd (running_machine &machine, UINT8 cmd)
 }
 
 
-void x07_state::t6834_r (running_machine &machine)
+void x07_state::t6834_r ()
 {
 	m_out.read++;
 	m_regs_r[2] &= 0xfe;
@@ -593,14 +593,14 @@ void x07_state::t6834_r (running_machine &machine)
 }
 
 
-void x07_state::t6834_w (running_machine &machine)
+void x07_state::t6834_w ()
 {
 	if (!m_in.write)
 	{
 		if (m_locate.on && ((m_regs_w[1] & 0x7F) != 0x24) && ((m_regs_w[1]) >= 0x20) && ((m_regs_w[1]) < 0x80))
 		{
 			m_cursor.x++;
-			draw_char(machine, m_cursor.x, m_cursor.y, m_regs_w[1]);
+			draw_char(m_cursor.x, m_cursor.y, m_regs_w[1]);
 		}
 		else
 		{
@@ -648,7 +648,7 @@ void x07_state::t6834_w (running_machine &machine)
 		{
 			m_out.write = 0;
 			m_out.read = 0;
-			t6834_cmd(machine, m_in.data[m_in.read++]);
+			t6834_cmd(m_in.data[m_in.read++]);
 			m_in.write = 0;
 			m_in.read = 0;
 			if(m_out.write)
@@ -664,7 +664,7 @@ void x07_state::t6834_w (running_machine &machine)
 }
 
 
-void x07_state::cassette_r(running_machine &machine)
+void x07_state::cassette_r()
 {
 	if (m_k7size && m_k7on && (m_k7pos<m_k7size))
 	{
@@ -678,7 +678,7 @@ void x07_state::cassette_r(running_machine &machine)
 }
 
 
-void x07_state::cassette_w(running_machine &machine)
+void x07_state::cassette_w()
 {
 	//TODO
 }
@@ -688,7 +688,7 @@ void x07_state::cassette_w(running_machine &machine)
     this function emulate the color printer X-710
     only the text functions are emulated
 ****************************************************/
-void x07_state::printer_w(running_machine &machine)
+void x07_state::printer_w()
 {
 	UINT16 char_pos = 0;
 //  UINT16 text_color = 0;
@@ -776,13 +776,14 @@ inline UINT8 x07_state::get_char(UINT16 pos)
 	}
 }
 
-void x07_state::kb_fun_keys(running_machine &machine, UINT8 idx)
+INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 {
 	UINT8 data = 0;
+	UINT8 idx = (UINT8)(FPTR)param;
 
-	if (m_kb_on)
+	if (m_kb_on && newval)
 	{
-		UINT8 shift = (input_port_read(machine, "A1") & 0x01);
+		UINT8 shift = (input_port_read(machine(), "A1") & 0x01);
 		UINT16 udk_s = udk_offset[(shift*6) +  idx - 1];
 
 		/* First 3 chars are used for description */
@@ -796,17 +797,18 @@ void x07_state::kb_fun_keys(running_machine &machine, UINT8 idx)
 				m_t6834_ram[0x400 + m_kb_size++] = data;
 		} while(data != 0);
 
-		kb_irq(machine);
+		kb_irq();
 	}
 }
 
-void x07_state::kb_scan_keys(running_machine &machine, UINT8 keycode)
+INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 {
 	UINT8 modifier;
-	UINT8 a1 = input_port_read(machine, "A1");
-	UINT8 bz = input_port_read(machine, "BZ");
+	UINT8 a1 = input_port_read(field.machine(), "A1");
+	UINT8 bz = input_port_read(field.machine(), "BZ");
+	UINT8 keycode = (UINT8)(FPTR)param;
 
-	if (m_kb_on)
+	if (m_kb_on && !newval)
 	{
 		if (a1 == 0x01 && bz == 0x00)			//Shift
 			modifier = 1;
@@ -829,12 +831,37 @@ void x07_state::kb_scan_keys(running_machine &machine, UINT8 keycode)
 			m_t6834_ram[0x400 + m_kb_size++] = x07_keycodes[idx].codes[modifier];
 		}
 
-		kb_irq(machine);
+		kb_irq();
+	}
+}
+
+INPUT_CHANGED_MEMBER( x07_state::kb_update_udk )
+{
+	draw_udk();
+}
+
+INPUT_CHANGED_MEMBER( x07_state::kb_break )
+{
+	if (newval)
+	{
+		if (!m_lcd_on)
+		{
+			m_lcd_on = 1;
+			cpu_set_reg(m_maincpu, Z80_PC, 0xc3c3);
+		}
+		else
+		{
+			m_regs_r[0] = 0x80;
+			m_regs_r[1] = 0x05;
+			m_regs_r[2] |= 0x01;
+			device_set_input_line(m_maincpu, NSC800_RSTA, ASSERT_LINE );
+			m_rsta_clear->adjust(attotime::from_msec(50));
+		}
 	}
 }
 
 
-void x07_state::kb_irq(running_machine &machine)
+void x07_state::kb_irq()
 {
 	if (m_kb_size)
 	{
@@ -853,7 +880,7 @@ void x07_state::kb_irq(running_machine &machine)
     Video
 ***************************************************************************/
 
-inline void x07_state::draw_char(running_machine &machine, UINT8 x, UINT8 y, UINT8 char_pos)
+inline void x07_state::draw_char(UINT8 x, UINT8 y, UINT8 char_pos)
 {
 	if(x < 20 && y < 4)
 		for(int cy = 0; cy < 8; cy++)
@@ -862,24 +889,24 @@ inline void x07_state::draw_char(running_machine &machine, UINT8 x, UINT8 y, UIN
 }
 
 
-inline void x07_state::draw_point(running_machine &machine, UINT8 x, UINT8 y, UINT8 color)
+inline void x07_state::draw_point(UINT8 x, UINT8 y, UINT8 color)
 {
 	if(x < 120 && y < 32)
 		m_lcd_map[y][x] = color;
 }
 
 
-inline void x07_state::draw_udk(running_machine &machine)
+inline void x07_state::draw_udk()
 {
 	UINT8 i, x, j;
 
 	if (m_draw_udk)
 		for(i = 0, x = 0; i < 5; i++)
 		{
-			UINT16 ofs = udk_offset[i + ((input_port_read(machine, "A1")&0x01) ? 6 : 0)];
-			draw_char(machine, x++, 3, 0x83);
+			UINT16 ofs = udk_offset[i + ((input_port_read(machine(), "A1")&0x01) ? 6 : 0)];
+			draw_char(x++, 3, 0x83);
 			for(j = 0; j < 3; j++)
-				draw_char(machine, x++, 3, m_t6834_ram[ofs++]);
+				draw_char(x++, 3, m_t6834_ram[ofs++]);
 		}
 }
 
@@ -1114,15 +1141,15 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 
 	case 0xf5:
 		if(data & 0x01)
-			t6834_r(space.machine());
+			t6834_r();
 		if(data & 0x02)
-			t6834_w(space.machine());
+			t6834_w();
 		if(data & 0x04)
-			cassette_r(space.machine());
+			cassette_r();
 		if(data & 0x08)
-			cassette_w(space.machine());
+			cassette_w();
 		if(data & 0x20)
-			printer_w(space.machine());
+			printer_w();
 
 		m_regs_w[5] = data;
 		break;
@@ -1132,13 +1159,11 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 static ADDRESS_MAP_START(x07_mem, AS_PROGRAM, 8, x07_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x1fff) AM_NOP		//RAM installed at runtime
-	AM_RANGE(0x2000, 0x3fff) AM_NOP		//expansion RAM
-	AM_RANGE(0x4000, 0x5fff) AM_ROM		//external RAM/ROM
-	AM_RANGE(0x6000, 0x7fff) AM_ROM		//ROM Card
+	AM_RANGE(0x2000, 0x7fff) AM_NOP		//Memory Card RAM/ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM		//TV VRAM
 	AM_RANGE(0x9800, 0x9fff) AM_UNMAP	//unused/unknown
-	AM_RANGE(0xa000, 0xafff) AM_ROM		//TV ROM
-	AM_RANGE(0xb000, 0xffff) AM_ROM		//BASIC ROM
+	AM_RANGE(0xa000, 0xafff) AM_ROM		AM_REGION("x720", 0)		//TV ROM
+	AM_RANGE(0xb000, 0xffff) AM_ROM		AM_REGION("basic", 0)		//BASIC ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( x07_io , AS_IO, 8, x07_state)
@@ -1146,52 +1171,6 @@ static ADDRESS_MAP_START( x07_io , AS_IO, 8, x07_state)
 	ADDRESS_MAP_GLOBAL_MASK (0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(x07_io_r, x07_io_w)
 ADDRESS_MAP_END
-
-static INPUT_CHANGED( update_udk )
-{
-	x07_state *state = field.machine().driver_data<x07_state>();
-
-	state->draw_udk(field.machine());
-}
-
-static INPUT_CHANGED( kb_keys )
-{
-	x07_state *state = field.machine().driver_data<x07_state>();
-
-	if (!newval)
-		state->kb_scan_keys(field.machine(), (UINT8)(FPTR)param);
-}
-
-static INPUT_CHANGED( kb_func_keys )
-{
-	x07_state *state = field.machine().driver_data<x07_state>();
-
-	if (newval)
-		state->kb_fun_keys(field.machine(), (UINT8)(FPTR)param);
-}
-
-static INPUT_CHANGED( kb_break )
-{
-	x07_state *state = field.machine().driver_data<x07_state>();
-
-	if (newval)
-	{
-		if (!state->m_lcd_on)
-		{
-			state->m_lcd_on = 1;
-			cpu_set_reg(state->m_maincpu, Z80_PC, 0xc3c3);
-		}
-		else
-		{
-			state->m_regs_r[0] = 0x80;
-			state->m_regs_r[1] = 0x05;
-			state->m_regs_r[2] |= 0x01;
-			device_set_input_line(state->m_maincpu, NSC800_RSTA, ASSERT_LINE );
-			state->m_rsta_clear->adjust(attotime::from_msec(50));
-		}
-	}
-}
-
 
 /* Input ports */
 static INPUT_PORTS_START( x07 )
@@ -1205,83 +1184,83 @@ static INPUT_PORTS_START( x07 )
 		PORT_CONFSETTING( 0x10, "Low Battery" )
 
 	PORT_START("S1")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INS") 	PORT_CODE(KEYCODE_INSERT)			PORT_CHANGED(kb_keys, 0x12)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DEL") 	PORT_CODE(KEYCODE_DEL)				PORT_CHANGED(kb_keys, 0x16)
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT")	PORT_CODE(KEYCODE_RIGHT)			PORT_CHANGED(kb_keys, 0x1c)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT")	PORT_CODE(KEYCODE_LEFT)				PORT_CHANGED(kb_keys, 0x1d)
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP")		PORT_CODE(KEYCODE_UP)				PORT_CHANGED(kb_keys, 0x1e)
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DOWN")	PORT_CODE(KEYCODE_DOWN)				PORT_CHANGED(kb_keys, 0x1f)
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPC") 	PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')	PORT_CHANGED(kb_keys, 0x20)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INS") 	PORT_CODE(KEYCODE_INSERT)			PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x12)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DEL") 	PORT_CODE(KEYCODE_DEL)				PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x16)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT")	PORT_CODE(KEYCODE_RIGHT)			PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x1c)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LEFT")	PORT_CODE(KEYCODE_LEFT)				PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x1d)
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP")		PORT_CODE(KEYCODE_UP)				PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x1e)
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DOWN")	PORT_CODE(KEYCODE_DOWN)				PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x1f)
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPC") 	PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x20)
 	PORT_START("S2")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')		PORT_CHANGED(kb_keys, 0x5a)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')		PORT_CHANGED(kb_keys, 0x58)
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')		PORT_CHANGED(kb_keys, 0x43)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')		PORT_CHANGED(kb_keys, 0x56)
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')		PORT_CHANGED(kb_keys, 0x42)
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')		PORT_CHANGED(kb_keys, 0x4e)
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')		PORT_CHANGED(kb_keys, 0x4d)
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')	PORT_CHANGED(kb_keys, 0x2c)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x5a)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x58)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x43)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x56)
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x42)
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x4e)
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x4d)
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x2c)
 	PORT_START("S3")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')		PORT_CHANGED(kb_keys, 0x41)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')		PORT_CHANGED(kb_keys, 0x53)
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('d')		PORT_CHANGED(kb_keys, 0x44)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')		PORT_CHANGED(kb_keys, 0x46)
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')		PORT_CHANGED(kb_keys, 0x47)
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')		PORT_CHANGED(kb_keys, 0x48)
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')		PORT_CHANGED(kb_keys, 0x4a)
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('k')		PORT_CHANGED(kb_keys, 0x4b)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x41)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x53)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('d')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x44)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x46)
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x47)
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x48)
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x4a)
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('k')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x4b)
 	PORT_START("S4")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')		PORT_CHANGED(kb_keys, 0x51)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')		PORT_CHANGED(kb_keys, 0x57)
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e')		PORT_CHANGED(kb_keys, 0x45)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')		PORT_CHANGED(kb_keys, 0x52)
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR('t')		PORT_CHANGED(kb_keys, 0x54)
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')		PORT_CHANGED(kb_keys, 0x59)
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('u')		PORT_CHANGED(kb_keys, 0x55)
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')		PORT_CHANGED(kb_keys, 0x49)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x51)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x57)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x45)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x52)
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR('t')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x54)
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x59)
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('u')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x55)
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x49)
 	PORT_START("S5")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')		PORT_CHANGED(kb_keys, 0x31)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')		PORT_CHANGED(kb_keys, 0x32)
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')		PORT_CHANGED(kb_keys, 0x33)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')		PORT_CHANGED(kb_keys, 0x34)
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')		PORT_CHANGED(kb_keys, 0x35)
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')		PORT_CHANGED(kb_keys, 0x36)
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')		PORT_CHANGED(kb_keys, 0x37)
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')		PORT_CHANGED(kb_keys, 0x38)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x31)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x32)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x33)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x34)
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x35)
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x36)
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x37)
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x38)
 	PORT_START("S6")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)					PORT_CHANGED(kb_func_keys, 1)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)					PORT_CHANGED(kb_func_keys, 2)
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)					PORT_CHANGED(kb_func_keys, 3)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)					PORT_CHANGED(kb_func_keys, 4)
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)					PORT_CHANGED(kb_func_keys, 5)
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)					PORT_CHANGED(kb_func_keys, 6)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)					PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_func_keys, 1)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)					PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_func_keys, 2)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)					PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_func_keys, 3)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)					PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_func_keys, 4)
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)					PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_func_keys, 5)
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)					PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_func_keys, 6)
 	PORT_START("S7")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')	PORT_CHANGED(kb_keys, 0x2e)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')	PORT_CHANGED(kb_keys, 0x2f)
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CHAR('?')					PORT_CHANGED(kb_keys, 0x3f)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)  PORT_CHAR(13)	PORT_CHANGED(kb_keys, 0x0d)
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o')		PORT_CHANGED(kb_keys, 0x4f)
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p')		PORT_CHANGED(kb_keys, 0x50)
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR('@') PORT_CHAR('\'')	PORT_CHANGED(kb_keys, 0x40)
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')	PORT_CHANGED(kb_keys, 0x5b)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x2e)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x2f)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CHAR('?')					PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x3f)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)  PORT_CHAR(13)	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x0d)
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x4f)
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x50)
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR('@') PORT_CHAR('\'')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x40)
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x5b)
 	PORT_START("S8")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l')		PORT_CHANGED(kb_keys, 0x4c)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(';') PORT_CHAR('+')	PORT_CHANGED(kb_keys, 0x3b)
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')	PORT_CHANGED(kb_keys, 0x3a)
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')	PORT_CHANGED(kb_keys, 0x5d)
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')		PORT_CHANGED(kb_keys, 0x39)
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('|')		PORT_CHANGED(kb_keys, 0x30)
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')	PORT_CHANGED(kb_keys, 0x2d)
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('`')	PORT_CHANGED(kb_keys, 0x3d)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x4c)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(';') PORT_CHAR('+')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x3b)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x3a)
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x5d)
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x39)
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('|')		PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x30)
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x2d)
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^') PORT_CHAR('`')	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x3d)
 	PORT_START("BZ")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("HOME")	PORT_CODE(KEYCODE_HOME)				PORT_CHANGED(kb_keys, 0x0b)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("HOME")	PORT_CODE(KEYCODE_HOME)				PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_keys, 0x0b)
 		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA")	PORT_CODE(KEYCODE_RALT)
 		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("GRPH")	PORT_CODE(KEYCODE_RCONTROL)
 		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NUM")		PORT_CODE(KEYCODE_LALT)
 		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("OFF")		PORT_CODE(KEYCODE_RSHIFT)
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ON/BREAK") PORT_CODE(KEYCODE_F10)				PORT_CHANGED(kb_break, 0)
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ON/BREAK") PORT_CODE(KEYCODE_F10)				PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_break, 0)
 	PORT_START("A1")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) 			PORT_CHAR(UCHAR_SHIFT_1)	PORT_CHANGED(update_udk, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) 			PORT_CHAR(UCHAR_SHIFT_1)	PORT_CHANGED_MEMBER(DEVICE_SELF,x07_state,kb_update_udk, 0)
 		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
 INPUT_PORTS_END
 
@@ -1332,7 +1311,7 @@ static TIMER_CALLBACK( rsta_clear )
 	device_set_input_line(state->m_maincpu, NSC800_RSTA, CLEAR_LINE);
 
 	if (state->m_kb_size)
-		state->kb_irq(machine);
+		state->kb_irq();
 }
 
 static TIMER_CALLBACK( rstb_clear )
@@ -1491,8 +1470,13 @@ static MACHINE_CONFIG_START( x07, x07_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
+	// 8KB  no expansion
+	// 12KB XM-100
+	// 16KB XR-100 or XM-101
+	// 20KB XR-100 and XM-100
+	// 24KB XR-100 and XM-101
 	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,24k")
+	MCFG_RAM_EXTRA_OPTIONS("8K,12K,20K,24k")
 
 	/* Memory Card */
 	MCFG_CARTSLOT_ADD("card")
@@ -1515,9 +1499,11 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( x07 )
-	ROM_REGION( 0x11000, "maincpu", 0 )
-	ROM_LOAD( "x720.bin", 0xa000, 0x1000, NO_DUMP )
-	ROM_LOAD( "x07.bin",  0xb000, 0x5001, BAD_DUMP CRC(61a6e3cc) SHA1(c53c22d33085ac7d5e490c5d8f41207729e5f08a) )		//very strange size...
+	ROM_REGION( 0x6000, "basic", ROMREGION_ERASEFF )
+	ROM_LOAD( "x07.bin",  0x0000, 0x5001, BAD_DUMP CRC(61a6e3cc) SHA1(c53c22d33085ac7d5e490c5d8f41207729e5f08a) )		//very strange size...
+
+	ROM_REGION( 0x1000, "x720", ROMREGION_ERASEFF )
+	ROM_LOAD( "x720.bin", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x0800, BAD_DUMP CRC(b1e59a6e) SHA1(b0c06315a2d5c940a8f288fb6a3428d738696e69) )
