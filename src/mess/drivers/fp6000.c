@@ -152,14 +152,14 @@ WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
 {
 
 	m_crtc_index = data;
-	m_mc6845->address_w(*&space, offset, data);
+	m_mc6845->address_w(space, offset, data);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 {
 
 	m_crtc_vreg[m_crtc_index] = data;
-	m_mc6845->register_w(*&space, offset, data);
+	m_mc6845->register_w(space, offset, data);
 }
 
 static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16, fp6000_state )

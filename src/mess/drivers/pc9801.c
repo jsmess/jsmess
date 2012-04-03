@@ -651,7 +651,7 @@ READ8_MEMBER(pc9801_state::pc9801_30_r)
 	}
 	else // odd
 	{
-		return machine().device<i8255_device>("ppi8255_sys")->read(*&space, (offset & 6) >> 1);
+		return machine().device<i8255_device>("ppi8255_sys")->read(space, (offset & 6) >> 1);
 	}
 }
 
@@ -666,7 +666,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_30_w)
 	}
 	else // odd
 	{
-		machine().device<i8255_device>("ppi8255_sys")->write(*&space, (offset & 6) >> 1,data);
+		machine().device<i8255_device>("ppi8255_sys")->write(space, (offset & 6) >> 1,data);
 	}
 }
 
@@ -675,7 +675,7 @@ READ8_MEMBER(pc9801_state::pc9801_40_r)
 
 	if((offset & 1) == 0)
 	{
-		return machine().device<i8255_device>("ppi8255_prn")->read(*&space, (offset & 6) >> 1);
+		return machine().device<i8255_device>("ppi8255_prn")->read(space, (offset & 6) >> 1);
 	}
 	else // odd
 	{
@@ -704,7 +704,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_40_w)
 {
 	if((offset & 1) == 0)
 	{
-		machine().device<i8255_device>("ppi8255_prn")->write(*&space, (offset & 6) >> 1,data);
+		machine().device<i8255_device>("ppi8255_prn")->write(space, (offset & 6) >> 1,data);
 	}
 	else // odd
 	{
@@ -729,7 +729,7 @@ READ8_MEMBER(pc9801_state::pc9801_50_r)
 	}
 	else // odd
 	{
-		return machine().device<i8255_device>("ppi8255_fdd")->read(*&space, (offset & 6) >> 1);
+		return machine().device<i8255_device>("ppi8255_fdd")->read(space, (offset & 6) >> 1);
 	}
 }
 
@@ -746,7 +746,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_50_w)
 	}
 	else // odd
 	{
-		machine().device<i8255_device>("ppi8255_fdd")->write(*&space, (offset & 6) >> 1,data);
+		machine().device<i8255_device>("ppi8255_fdd")->write(space, (offset & 6) >> 1,data);
 	}
 }
 
@@ -755,7 +755,7 @@ READ8_MEMBER(pc9801_state::pc9801_60_r)
 
 	if((offset & 1) == 0)
 	{
-		return m_hgdc1->read(*&space, (offset & 2) >> 1); // upd7220 character port
+		return m_hgdc1->read(space, (offset & 2) >> 1); // upd7220 character port
 	}
 	else // odd
 	{
@@ -769,7 +769,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_60_w)
 
 	if((offset & 1) == 0)
 	{
-		m_hgdc1->write(*&space, (offset & 2) >> 1,data); // upd7220 character port
+		m_hgdc1->write(space, (offset & 2) >> 1,data); // upd7220 character port
 	}
 	else // odd
 	{
@@ -891,7 +891,7 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 		{
 			case 0x00:
 			case 0x02:
-				return m_hgdc2->read(*&space, (offset & 2) >> 1);
+				return m_hgdc2->read(space, (offset & 2) >> 1);
 			/* bitmap palette clut read */
 			case 0x04:
 				return m_vram_disp & 1;
@@ -932,12 +932,12 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 		{
 			case 0x00:
 			case 0x02:
-				m_hgdc2->write(*&space, (offset & 2) >> 1,data);
+				m_hgdc2->write(space, (offset & 2) >> 1,data);
 				return;
 			case 0x04: m_vram_disp = data & 1; return;
 			case 0x06:
 				m_vram_bank = data & 1;
-				//m_hgdc2->bank_w(*&space, 0,(data & 1) << 2); //TODO: check me
+				//m_hgdc2->bank_w(space, 0,(data & 1) << 2); //TODO: check me
 				return;
 			/* bitmap palette clut write */
 			case 0x08:
@@ -1005,8 +1005,8 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
 	{
 		switch((offset & 6) + 1)
 		{
-			case 1: return m_sio->data_r(*&space, 0);
-			case 3: return m_sio->status_r(*&space, 0);
+			case 1: return m_sio->data_r(space, 0);
+			case 3: return m_sio->status_r(space, 0);
 		}
 		printf("Read to undefined port [%02x]\n",offset+0x90);
 		return 0xff;
@@ -1043,8 +1043,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2hd_w)
 	{
 		switch((offset & 6) + 1)
 		{
-			case 1: m_sio->data_w(*&space, 0, data); return;
-			case 3: m_sio->control_w(*&space, 0, data); return;
+			case 1: m_sio->data_w(space, 0, data); return;
+			case 3: m_sio->control_w(space, 0, data); return;
 		}
 		printf("Write to undefined port [%02x] <- %02x\n",offset+0x90,data);
 	}

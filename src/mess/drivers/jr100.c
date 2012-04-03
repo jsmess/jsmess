@@ -74,7 +74,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 		}
 	}
 	via6522_device *via = machine().device<via6522_device>("via");
-	via->write(*&space,offset,data);
+	via->write(space,offset,data);
 }
 
 static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8, jr100_state )

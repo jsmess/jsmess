@@ -165,21 +165,21 @@ READ32_MEMBER(ip20_state::hpc_r)
 	case 0x0d00:
 		verboselog(machine(), 2, "HPC DUART0 Channel B Control Read\n" );
 //      return 0x00000004;
-		return 0x7c; //scc->reg_r(*&space, 0);
+		return 0x7c; //scc->reg_r(space, 0);
 	case 0x0d04:
 		verboselog(machine(), 2, "HPC DUART0 Channel B Data Read\n" );
 //      return 0;
 		scc = machine().device<scc8530_t>("scc");
-		return scc->reg_r(*&space, 2);
+		return scc->reg_r(space, 2);
 	case 0x0d08:
 		verboselog(machine(), 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask	 );
 //      return 0x40;
-		return 0x7c; //scc->reg_r(*&space, 1);
+		return 0x7c; //scc->reg_r(space, 1);
 	case 0x0d0c:
 		verboselog(machine(), 2, "HPC DUART0 Channel A Data Read\n" );
 //      return 0;
 		scc = machine().device<scc8530_t>("scc");
-		return scc->reg_r(*&space, 3);
+		return scc->reg_r(space, 3);
 	case 0x0d10:
 //      verboselog(machine, 2, "HPC DUART1 Channel B Control Read\n" );
 		return 0x00000004;
@@ -361,22 +361,22 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 	case 0x0d00:
 		verboselog(machine(), 2, "HPC DUART0 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
 		scc = machine().device<scc8530_t>("scc");
-		scc->reg_w(*&space, 0, data);
+		scc->reg_w(space, 0, data);
 		break;
 	case 0x0d04:
 		verboselog(machine(), 2, "HPC DUART0 Channel B Data Write: %08x (%08x)\n", data, mem_mask );
 		scc = machine().device<scc8530_t>("scc");
-		scc->reg_w(*&space, 2, data);
+		scc->reg_w(space, 2, data);
 		break;
 	case 0x0d08:
 		verboselog(machine(), 2, "HPC DUART0 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
 		scc = machine().device<scc8530_t>("scc");
-		scc->reg_w(*&space, 1, data);
+		scc->reg_w(space, 1, data);
 		break;
 	case 0x0d0c:
 		verboselog(machine(), 2, "HPC DUART0 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
 		scc = machine().device<scc8530_t>("scc");
-		scc->reg_w(*&space, 3, data);
+		scc->reg_w(space, 3, data);
 		break;
 	case 0x0d10:
 		if( ( data & 0x000000ff ) >= 0x00000020 )

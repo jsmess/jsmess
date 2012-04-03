@@ -237,9 +237,9 @@ WRITE8_MEMBER(polgar_state::write_polgar_IO)
 	if (BIT(data,1)) {
 		hd44780_device *hd44780 = machine().device<hd44780_device>("hd44780");
 		if (BIT(data,0)) {
-			hd44780->data_write(*&space, 128, lcd_char);
+			hd44780->data_write(space, 128, lcd_char);
 		} else {
-			hd44780->control_write(*&space, 128, lcd_char);
+			hd44780->control_write(space, 128, lcd_char);
 		}
 	}
 
@@ -328,13 +328,13 @@ WRITE8_MEMBER(polgar_state::write_lcd_IO_sfortea)
 	{
 		hd44780_device *hd44780 = machine().device<hd44780_device>("hd44780");
 		if(BIT(sfortea_latch,0)) {
-			hd44780->data_write(*&space, 128, data);
+			hd44780->data_write(space, 128, data);
 			logerror("LCD DTA = %02x\n",data);
 		} else {
 			if (BIT(data,7)) {
 				if ((data & 0x7f) >= 0x40) data -= 56;  // adjust for 16x1 display as 2 sets of 8
 			}
-			hd44780->control_write(*&space, 128, data);
+			hd44780->control_write(space, 128, data);
 			logerror("LCD CMD = %02x\n",data);
 		}
 	}
@@ -345,9 +345,9 @@ WRITE8_MEMBER(polgar_state::write_LCD_academy)
 	hd44780_device *hd44780 = machine().device<hd44780_device>("hd44780");
 
 	if (offset) {
-		hd44780->data_write(*&space, 128, data);
+		hd44780->data_write(space, 128, data);
 	} else {
-		hd44780->control_write(*&space, 128, data);
+		hd44780->control_write(space, 128, data);
 	}
 }
 
@@ -393,11 +393,11 @@ WRITE16_MEMBER(polgar_state::diablo68_write_LCD)
 		if (BIT(data,7)) {
 			if ((data & 0x7f) >= 0x40) data -= 56;  // adjust for 16x1 display as 2 sets of 8
 		}
-		hd44780->control_write(*&space, 128, data);
+		hd44780->control_write(space, 128, data);
 //      logerror("Control %02x\n", data);
 //      printf("Control %02x\n", data);
 	} else {
-		hd44780->data_write(*&space, 128, data);
+		hd44780->data_write(space, 128, data);
 //      printf("LCDdata %04x [%c]\n", data,data);
 //      logerror("LCDdata %04x [%c]\n", data,data);
 	}
