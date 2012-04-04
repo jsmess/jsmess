@@ -55323,6 +55323,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		<description>Mei Shao Nv Meng Gong Chang (Asia)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
+		<info name="alt_title" value="美少女梦工厂"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SA-9602B" />
 			<dataarea name="prg" size="1572864">

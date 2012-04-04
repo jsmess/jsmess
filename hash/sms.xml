@@ -1424,6 +1424,17 @@
 		</part>
 	</software>
 
+	<software name="cybersp" cloneof="cybers">
+		<description>The Cyber Shinobi (Prototype)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="cyber shinobi, the [proto].bin" size="131072" crc="dac00a3a" sha1="2ac3c0a9bc4028e5e2491e132b75652348308187" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cyborgh">
 		<description>Cyborg Hunter (Euro, USA, Bra)</description>
 		<year>1988</year>
@@ -3892,6 +3903,18 @@
 		</part>
 	</software>
 
+	<software name="nemesis">
+		<description>Nemesis (Kor)</description>
+		<year>1987</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="그라디우스 ~ Gradius (Box)"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="nemesis (kr).bin" size="131072" crc="e316c06d" sha1="fbee313aaa8d7acea4acbb763592f73466596113" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Alt. Title: I Ninja (Ita Box) -->
 	<software name="ninja">
 		<description>The Ninja (Euro, USA)</description>
@@ -4914,6 +4937,18 @@
 		</part>
 	</software>
 
+	<software name="skyjag">
+		<description>Sky Jaguar (Kor)</description>
+		<year>199?</year>
+		<publisher>Samsung</publisher>
+		<info name="alt_title" value="스카이쟈가"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sky jaguar (kr).bin" size="32768" crc="5b8e65e4" sha1="6ce290d59f14e9be5711d932095909abc0d681d1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf2">
 		<description>Street Fighter II (Bra)</description>
 		<year>1997</year>
@@ -5529,6 +5564,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="strider (usa, europe).bin" size="524288" crc="9802ed31" sha1="051e72c8ffec7606c04409ef38244cfdd592252f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="striderd" cloneof="strider">
+		<description>Strider (USA, Display Unit Sample)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="strider (demo).bin" size="131072" crc="b990269a" sha1="e8329904397b5389571f20aa1a3cac1ecc31d470" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
