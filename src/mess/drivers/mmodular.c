@@ -1560,7 +1560,7 @@ static MACHINE_CONFIG_START( polgar, polgar_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sfortea, driver_device )
+static MACHINE_CONFIG_START( sfortea, polgar_state )
 	MCFG_CPU_ADD("maincpu",M65C02,5000000)
 	MCFG_CPU_PROGRAM_MAP(sfortea_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1576,7 +1576,7 @@ static MACHINE_CONFIG_START( sfortea, driver_device )
 	MCFG_TIMER_ADD_PERIODIC("artwork_timer", mboard_update_artwork, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( alm32, driver_device )
+static MACHINE_CONFIG_START( alm32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(alm32_mem)
 	MCFG_MACHINE_START(van32)
@@ -1625,7 +1625,7 @@ static MACHINE_CONFIG_DERIVED( megaiv, monteciv )
 	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( diablo68, driver_device )
+static MACHINE_CONFIG_START( diablo68, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(diablo68_mem)
 	MCFG_MACHINE_START(diablo68)
@@ -1641,7 +1641,7 @@ static MACHINE_CONFIG_START( diablo68, driver_device )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( van16, driver_device )
+static MACHINE_CONFIG_START( van16, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(van16_mem)
 	MCFG_MACHINE_START(van16)
@@ -1659,7 +1659,7 @@ static MACHINE_CONFIG_DERIVED( alm16, van16 )
 	MCFG_CPU_PROGRAM_MAP(alm16_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( van32, driver_device )
+static MACHINE_CONFIG_START( van32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(van32_mem)
 	MCFG_MACHINE_START(van32)
@@ -1672,7 +1672,7 @@ static MACHINE_CONFIG_START( van32, driver_device )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( risc, driver_device )
+static MACHINE_CONFIG_START( risc, polgar_state )
 	MCFG_CPU_ADD("maincpu", ARM, 14000000)
 	MCFG_CPU_PROGRAM_MAP(risc_mem)
 	MCFG_MACHINE_START(risc)
@@ -1684,7 +1684,7 @@ static MACHINE_CONFIG_START( risc, driver_device )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gen32, driver_device )
+static MACHINE_CONFIG_START( gen32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
 	MCFG_CPU_PROGRAM_MAP(gen32_mem)
 	MCFG_MACHINE_START(van32)
@@ -1708,7 +1708,7 @@ static MACHINE_CONFIG_DERIVED( gen32_oc, gen32 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bpl32, driver_device )
+static MACHINE_CONFIG_START( bpl32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_24_576MHz)
 	MCFG_CPU_PROGRAM_MAP(bpl32_mem)
 	MCFG_MACHINE_START(van32)
