@@ -158,7 +158,7 @@ static GFXDECODE_START( atmtb2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_DERIVED( atm, spectrum_128 )
+static MACHINE_CONFIG_DERIVED_CLASS( atm, spectrum_128, atm_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(atm_io)
 	MCFG_MACHINE_RESET( atm )
