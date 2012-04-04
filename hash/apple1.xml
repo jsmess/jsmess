@@ -174,6 +174,18 @@
 		</part>
 	</software>
 
+	<software name="concentr">
+		<description>Concentration</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="10773674">
+				<rom name="concentration.wav" size="10773674" crc="30f252f4" sha1="4ded5cb6bfa074944fe7a4e56a7d01c3b30ce918" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="craps">
 		<description>Craps</description>
 		<year>19??</year>
@@ -222,6 +234,18 @@
 		</part>
 	</software>
 
+	<software name="hangman">
+		<description>Hangman</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="10573754">
+				<rom name="hangman.wav" size="10573754" crc="d2926fb9" sha1="42bcde5ac2e44f24f82dc781a33186e71d1d3ed4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hilo">
 		<description>HiLo</description>
 		<year>19??</year>
@@ -242,6 +266,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="9205804">
 				<rom name="lunarlander (ascii graphics).wav" size="9205804" crc="becc6aff" sha1="2204b5002e17b8cbf79c232334cc4502680cbf29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matrix">
+		<description>Matrix</description> <!-- Graphics demo -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="4098404">
+				<rom name="matrix.wav" size="4098404" crc="6d2221be" sha1="dc4497142f6c7704d1e0325263c087bcd805a5c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>

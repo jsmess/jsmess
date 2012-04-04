@@ -150,7 +150,6 @@ Compiled by K1W1
    - Atari                              1982  Paddle Jitter Test (REV C with games)
    - Atari                                    RAM Extension Module Test Rev 1.0
    - Atari Germany        RXG8036    ER 1982  AtariSchreiber
-   - Atari Mexico                    ER       MicroCalc XE version 2.2
    - Atari Mexico                    U        LOGO Computing Language
 
    - Atrax                           ER       Atrax (#01)
@@ -229,6 +228,11 @@ Compiled by K1W1
    - Radical Systems      22680         1983  Cartridge Maker
 
    - Rantom                          ER 1983  Trust
+
+   - Ravensburger                    ER 198?  Bilderregen
+   - Ravensburger                    ER 1984  Fratzenschneider (FaceMaker)
+   - Ravensburger                    ER 1984  KinderComp
+   - Ravensburger                    ER 1984  Springteufel (Fraction Fever)
 
    - Reevesoft                       ER 1989  Diamond GOS (2.0)
 
@@ -581,7 +585,7 @@ Compiled by K1W1
 		<description>Alien Garden</description>
 		<year>1982</year>
 		<publisher>Epyx</publisher>
-		<info name="serial" value="54" />
+		<info name="serial" value="544R" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -632,10 +636,24 @@ Compiled by K1W1
 		<description>Ant Eater</description>
 		<year>1982</year>
 		<publisher>Romox</publisher>
+		<info name="serial" value="05023" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="ant eater.rom" size="8192" crc="c7290722" sha1="8a8031ac9611c119d6b4c90303460556a3321fd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anteatra" cloneof="anteater">
+		<description>Ant Eater (Earlier Version)</description>
+		<year>1982</year>
+		<publisher>Romox</publisher>
+		<info name="serial" value="05023" />
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="ant eater (earlier version).rom" size="8192" crc="73a3a64c" sha1="5a00dde544d5f31b03e291c0889724c11a153375" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -945,7 +963,7 @@ Compiled by K1W1
 		<description>Atlantis</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
-		<info name="serial" value="720125" />
+		<info name="serial" value="720125-1A" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -998,6 +1016,7 @@ Compiled by K1W1
 		<description>Baseball</description>
 		<year>1983</year>
 		<publisher>InHome</publisher>
+		<info name="serial" value="BR1001" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -1105,7 +1124,7 @@ Compiled by K1W1
 		<description>Beamrider</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CA-009" />
+		<info name="serial" value="CA-009-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -1200,7 +1219,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="boulder dash.rom" size="16384" crc="af778329" sha1="151d12b58c30880a3640dffc5b1d67de790c0099" offset="0" />
+				<rom name="boulder dash.rom" size="16384" crc="af778329" sha1="151d12b58c30880a3640dffc5b1d67de790c0099" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1237,7 +1256,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="bristles.rom" size="16384" crc="4263d64d" sha1="80a041bceb499e1466516488013aa4439b3db6f2" offset="0" />
+				<rom name="bristles.rom" size="16384" crc="4263d64d" sha1="80a041bceb499e1466516488013aa4439b3db6f2" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1614,6 +1633,21 @@ Compiled by K1W1
 		</part>
 	</software>
 
+	<software name="comptrac">
+		<description>Computrac 4000-8000</description>
+		<!-- The cartridge was sold as a package that included a proprietary interface and a robotic device for aiming a satellite dish, as well as an -->
+		<!-- Atari 400 computer. It was meant to help point a satellite dish in the right direction to receive TV signals.                             -->
+		<year>1983</year>
+		<publisher>Computrac</publisher>
+		<info name="developer" value="IDSI" />
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 16k" />
+			<dataarea name="rom" size="16384">
+				<rom name="computrac 4000-8000.rom" size="16384" crc="e88a2ea3" sha1="11a17a51cd9be533debeddef8841effdfea8d591" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="compwar">
 		<description>Computer War</description>
 		<year>1983</year>
@@ -1681,7 +1715,7 @@ Compiled by K1W1
 		<description>CrossFire</description>
 		<year>1981</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="serial" value="ORM-001" />
+		<info name="serial" value="CFL-202" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -1757,7 +1791,7 @@ Compiled by K1W1
 		<description>Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CC-008" />
+		<info name="serial" value="CC-008-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -1810,7 +1844,7 @@ Compiled by K1W1
 		<description>Demon Attack</description>
 		<year>1982</year>
 		<publisher>Imagic</publisher>
-		<info name="serial" value="720149" />
+		<info name="serial" value="720149-1A" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
@@ -1971,7 +2005,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="droids.rom" size="8192" crc="5bb0c159" sha1="d9e67e21e777598c5e18587ba9d6f2beecec0f4f" offset="0" />
+				<rom name="droids.rom" size="8192" crc="5bb0c159" sha1="d9e67e21e777598c5e18587ba9d6f2beecec0f4f" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2200,7 +2234,7 @@ Compiled by K1W1
 		<description>Fast Eddie</description>
 		<year>1982</year>
 		<publisher>Sirius</publisher>
-		<info name="serial" value="33008" />
+		<info name="serial" value="33003" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2252,6 +2286,7 @@ Compiled by K1W1
 		<description>Final Orbit</description>
 		<year>1983</year>
 		<publisher>Sirius</publisher>
+			<info name="serial" value="3300?" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2292,7 +2327,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="flip and flop.rom" size="16384" crc="8ae057be" sha1="ba26d6a3790ebdb754c1192b2c28f0fe93aca377" offset="0" />
+				<rom name="flip and flop.rom" size="16384" crc="8ae057be" sha1="ba26d6a3790ebdb754c1192b2c28f0fe93aca377" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2404,7 +2439,7 @@ Compiled by K1W1
 		<description>Gold Mine</description>
 		<year>1983</year>
 		<publisher>SpectraVideo</publisher>
-		<info name="serial" value="SB214" />
+		<info name="serial" value="SB-214" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2458,7 +2493,7 @@ Compiled by K1W1
 		<description>H.E.R.O.</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CZ-007" />
+		<info name="serial" value="CZ-007-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -2524,7 +2559,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="hypnotic land.rom" size="16384" crc="4fb75909" sha1="38f92ba44a205bf3ba758e7e7439c057e7682f1e" offset="0" />
+				<rom name="hypnotic land.rom" size="16384" crc="4fb75909" sha1="38f92ba44a205bf3ba758e7e7439c057e7682f1e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2779,7 +2814,7 @@ Compiled by K1W1
 		<description>Kaboom!</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CZ-002" />
+		<info name="serial" value="CZ-002-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2805,7 +2840,7 @@ Compiled by K1W1
 		<description>Keystone Kapers</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CZ-006" />
+		<info name="serial" value="CZ-006-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -2857,7 +2892,7 @@ Compiled by K1W1
 		<description>Koala Painter</description>
 		<year>1983</year>
 		<publisher>Koala</publisher>
-		<info name="serial" value="AT00315-1" />
+		<info name="serial" value="AT00315-001" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<feature name="peripheral" value="koala_pad,koala_pen" /> <!-- Works with Koala pad &amp; Koala light pen devices -->
@@ -3096,6 +3131,7 @@ Compiled by K1W1
 		<description>Master Type</description>
 		<year>1983</year>
 		<publisher>Scarborough Systems</publisher>
+		<info name="serial" value="102" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3107,7 +3143,7 @@ Compiled by K1W1
 	<software name="mathenct">
 		<description>Math Encounter</description>
 		<year>1984</year>
-		<publisher>HSU Software</publisher>
+		<publisher>Hsu Software</publisher>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3120,7 +3156,7 @@ Compiled by K1W1
 		<description>Math Mileage</description>
 		<year>1984</year>
 		<publisher>CBS Software</publisher>
-		<info name="serial" value="4L-9103" />
+		<info name="serial" value="75010" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3206,7 +3242,7 @@ Compiled by K1W1
 		<description>MegaMania</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CZ-003" />
+		<info name="serial" value="CZ-003-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3236,6 +3272,18 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="microfiler.rom" size="8192" crc="c3b283e6" sha1="6017ce3f3f836ab0ee143e72401af1daa44b3a09" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microcal" supported="no">
+		<description>Microcalc XE v2.2 (Mexico)</description>
+		<year>19??</year>
+		<publisher>Grupo SITSA</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="Grupo SITSA" />
+			<dataarea name="rom" size="32768">
+				<rom name="microcalc v2.2.rom" size="32768" crc="44507065" sha1="ac2e0ddac58fba9d0f8a01c26ee857b769c62a98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3416,7 +3464,7 @@ Compiled by K1W1
 		<description>Monster Maze</description>
 		<year>1982</year>
 		<publisher>Epyx</publisher>
-		<info name="serial" value="56" />
+		<info name="serial" value="564R" />
 		<sharedfeat name="compatibility" value="OSb"/>
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
@@ -3610,7 +3658,7 @@ Compiled by K1W1
 		<description>Oil's Well</description>
 		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="serial" value="OWL-201" />
+		<info name="serial" value="OWL-801" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3674,7 +3722,7 @@ Compiled by K1W1
 		<description>Pastfinder</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CC-104" />
+		<info name="serial" value="CC-104-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -3739,7 +3787,7 @@ Compiled by K1W1
 		<description>Pitfall!</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CZ-004" />
+		<info name="serial" value="CZ-004-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -3752,7 +3800,7 @@ Compiled by K1W1
 		<description>Pitfall II - Lost Caverns</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CA-011" />
+		<info name="serial" value="CA-011-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -4025,7 +4073,7 @@ Compiled by K1W1
 		<description>River Raid</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CZ-001" />
+		<info name="serial" value="CZ-001-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -4132,7 +4180,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="sesame street letter-go-round.rom" size="16384" crc="f525b904" sha1="14851876e2bb843559dc9d13a8afc5595bf1646b" offset="0" />
+				<rom name="sesame street letter-go-round.rom" size="16384" crc="f525b904" sha1="14851876e2bb843559dc9d13a8afc5595bf1646b" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -4281,7 +4329,7 @@ Compiled by K1W1
 		<description>Space Shuttle - A Journey Into Space</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CA-012" />
+		<info name="serial" value="CA-012-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -4430,6 +4478,18 @@ Compiled by K1W1
 			<feature name="cart_type" value="spartados x" />
 			<dataarea name="rom" size="131072">
 				<rom name="spartados x v4.44.rom" size="131072" crc="337516b0" sha1="99518cab315b564b2f7621d6969709bf7ee7c5af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spart445" supported="no">
+		<description>Sparta DOS X v4.45</description>
+		<year>2011</year>
+		<publisher>DLT</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="spartados x" />
+			<dataarea name="rom" size="131072">
+				<rom name="spartados x v4.45.rom" size="131072" crc="df4520c1" sha1="d7ae9dc6c7a5dbf3890be0a6a66c5cc0501a6ca9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4812,7 +4872,7 @@ Compiled by K1W1
 		<description>The Designer's Pencil</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CC-102" />
+		<info name="serial" value="CC-102-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
@@ -4825,7 +4885,7 @@ Compiled by K1W1
 		<description>The Dreadnaught Factor</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CZ-005" />
+		<info name="serial" value="CZ-005-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -4986,6 +5046,18 @@ Compiled by K1W1
 			<feature name="peripheral" value="trackfld" /> <!-- Works with Track &amp; Field controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="track and field.rom" size="16384" crc="9e2484c8" sha1="899305b96e204e8091183733bec43fbd84c18d4a" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbosys">
+		<description>Turbo System</description>
+		<year>1993</year>
+		<publisher>Dadok</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="phoenix 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="turbo system.rom" size="8192" crc="da021439" sha1="14eaba8a6105d0ad9f8d05def5acc32fe89a2d76" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5181,6 +5253,7 @@ Compiled by K1W1
 		<description>Worm War 1</description>
 		<year>1982</year>
 		<publisher>Sirius</publisher>
+		<info name="serial" value="33002" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -5218,7 +5291,7 @@ Compiled by K1W1
 		<description>Zenji</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CZ-010" />
+		<info name="serial" value="CZ-010-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
@@ -5231,7 +5304,7 @@ Compiled by K1W1
 		<description>Zone Ranger</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CC-101" />
+		<info name="serial" value="CC-101-04" />
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
