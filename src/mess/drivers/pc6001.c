@@ -1119,10 +1119,14 @@ WRITE8_MEMBER(pc6001_state::work_ram5_w)
 
 WRITE8_MEMBER(pc6001_state::work_ram6_w)
 {
+	UINT8 *ROM = machine().region("maincpu")->base(); 
+	ROM[offset+((m_bank_w & 0x40) ? WRAM(6) : EXWRAM(6))] = data;
 }
 
 WRITE8_MEMBER(pc6001_state::work_ram7_w)
 {
+	UINT8 *ROM = machine().region("maincpu")->base(); 
+	ROM[offset+((m_bank_w & 0x40) ? WRAM(7) : EXWRAM(7))] = data;
 }
 
 
