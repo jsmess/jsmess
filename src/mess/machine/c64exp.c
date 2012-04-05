@@ -311,7 +311,7 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 
 
 //-------------------------------------------------
-//  cd_r -
+//  cd_r - cartridge data read
 //-------------------------------------------------
 
 UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
@@ -328,7 +328,7 @@ UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, int r
 
 
 //-------------------------------------------------
-//  cd_w -
+//  cd_w - cartridge data write
 //-------------------------------------------------
 
 void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)

@@ -1939,6 +1939,7 @@
 				<rom name="megacart.rom" size="0x200000" crc="787551d4" sha1="c4854de023c25dc827af3bebed76d2ff86eaf0ce" offset="0x0000" />
 			</dataarea>
 			<dataarea name="ram" size="0x8000"/>
+			<dataarea name="nvram" size="0x2000"/>
 		</part>
 	</software>
 

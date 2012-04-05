@@ -829,6 +829,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/vic20.o		\
 	$(MESS_MACHINE)/vic20exp.o	\
 	$(MESS_MACHINE)/vic20std.o	\
+	$(MESS_MACHINE)/vic20_megacart.o	\
 	$(MESS_MACHINE)/vic1010.o	\
 	$(MESS_MACHINE)/vic1110.o	\
 	$(MESS_MACHINE)/vic1111.o	\
@@ -845,6 +846,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c65.o		\
 	$(MESS_DRIVERS)/c128.o		\
 	$(MESS_MACHINE)/c128.o		\
+	$(MESS_MACHINE)/c128_comal80.o		\
 	$(MESS_MACHINE)/cbmiec.o	\
 	$(MESS_MACHINE)/c1541.o		\
 	$(MESS_MACHINE)/c1551.o		\

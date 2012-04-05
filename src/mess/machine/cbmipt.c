@@ -1136,7 +1136,10 @@ SLOT_INTERFACE_START( vic20_expansion_cards )
 	SLOT_INTERFACE("3k", VIC1210)
 	SLOT_INTERFACE("8k", VIC1110)
 	SLOT_INTERFACE("16k", VIC1111)
+
+	// the following need ROMs from the software list
 	SLOT_INTERFACE("ieee488", VIC1112)
+	SLOT_INTERFACE("megacart", VIC20_MEGACART)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( vic10_expansion_cards )
@@ -1197,4 +1200,9 @@ SLOT_INTERFACE_START( c64_user_port_cards )
 	SLOT_INTERFACE("4tba", C64_4TBA)
 	SLOT_INTERFACE("bn1541", C64_BN1541)
 	SLOT_INTERFACE("geocable", C64_GEOCABLE)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START( c128_expansion_cards )
+	// the following need ROMs from the software list
+	SLOT_INTERFACE("c128_comal80", C128_COMAL80)
 SLOT_INTERFACE_END

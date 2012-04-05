@@ -40,14 +40,8 @@ protected:
 	virtual void device_config_complete() { m_shortname = "vic1110"; }
 
 	// device_vic20_expansion_card_interface overrides
-	virtual UINT8 vic20_blk1_r(address_space &space, offs_t offset);
-	virtual void vic20_blk1_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT8 vic20_blk2_r(address_space &space, offs_t offset);
-	virtual void vic20_blk2_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT8 vic20_blk3_r(address_space &space, offs_t offset);
-	virtual void vic20_blk3_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT8 vic20_blk5_r(address_space &space, offs_t offset);
-	virtual void vic20_blk5_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
+	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
 };
 
 
