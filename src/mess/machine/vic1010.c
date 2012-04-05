@@ -103,16 +103,16 @@ void vic1010_device::device_start()
 
 
 //-------------------------------------------------
-//  vic20_ram1_r - RAM 1 read
+//  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1010_device::vic20_ram1_r(address_space &space, offs_t offset)
+UINT8 vic1010_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	UINT8 data = 0;
 
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
-		data |= m_expansion_slot[i]->ram1_r(space, offset);
+		data |= m_expansion_slot[i]->cd_r(space, offset, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 
 	return data;
@@ -120,193 +120,13 @@ UINT8 vic1010_device::vic20_ram1_r(address_space &space, offs_t offset)
 
 
 //-------------------------------------------------
-//  vic20_ram1_w - RAM 1 write
+//  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic1010_device::vic20_ram1_w(address_space &space, offs_t offset, UINT8 data)
+void vic1010_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
-		m_expansion_slot[i]->ram1_w(space, offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_ram2_r - RAM 2 read
-//-------------------------------------------------
-
-UINT8 vic1010_device::vic20_ram2_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		data |= m_expansion_slot[i]->ram2_r(space, offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_ram2_w - RAM 2 write
-//-------------------------------------------------
-
-void vic1010_device::vic20_ram2_w(address_space &space, offs_t offset, UINT8 data)
-{
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		m_expansion_slot[i]->ram2_w(space, offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_ram3_r - RAM 3 read
-//-------------------------------------------------
-
-UINT8 vic1010_device::vic20_ram3_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		data |= m_expansion_slot[i]->ram3_r(space, offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_ram3_w - RAM 3 write
-//-------------------------------------------------
-
-void vic1010_device::vic20_ram3_w(address_space &space, offs_t offset, UINT8 data)
-{
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		m_expansion_slot[i]->ram3_w(space, offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_blk1_r - block 1 read
-//-------------------------------------------------
-
-UINT8 vic1010_device::vic20_blk1_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		data |= m_expansion_slot[i]->blk1_r(space, offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk1_w - block 1 write
-//-------------------------------------------------
-
-void vic1010_device::vic20_blk1_w(address_space &space, offs_t offset, UINT8 data)
-{
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		m_expansion_slot[i]->blk1_w(space, offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_blk2_r - block 2 read
-//-------------------------------------------------
-
-UINT8 vic1010_device::vic20_blk2_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		data |= m_expansion_slot[i]->blk2_r(space, offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk2_w - block 2 write
-//-------------------------------------------------
-
-void vic1010_device::vic20_blk2_w(address_space &space, offs_t offset, UINT8 data)
-{
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		m_expansion_slot[i]->blk2_w(space, offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_blk3_r - block 3 read
-//-------------------------------------------------
-
-UINT8 vic1010_device::vic20_blk3_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		data |= m_expansion_slot[i]->blk3_r(space, offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk3_w - block 3 write
-//-------------------------------------------------
-
-void vic1010_device::vic20_blk3_w(address_space &space, offs_t offset, UINT8 data)
-{
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		m_expansion_slot[i]->blk3_w(space, offset, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_blk5_r - block 5 read
-//-------------------------------------------------
-
-UINT8 vic1010_device::vic20_blk5_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		data |= m_expansion_slot[i]->blk5_r(space, offset);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk5_w - block 5 write
-//-------------------------------------------------
-
-void vic1010_device::vic20_blk5_w(address_space &space, offs_t offset, UINT8 data)
-{
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		m_expansion_slot[i]->blk5_w(space, offset, data);
+		m_expansion_slot[i]->cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 }

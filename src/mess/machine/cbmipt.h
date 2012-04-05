@@ -51,6 +51,7 @@
 #include "machine/c64_westermann.h"
 #include "machine/c64_xl80.h"
 #include "machine/c64_zaxxon.h"
+#include "machine/c128_comal80.h"
 #include "machine/c1541.h"
 #include "machine/c1571.h"
 #include "machine/c1581.h"
@@ -70,6 +71,7 @@
 #include "machine/vic1210.h"
 #include "machine/vic10std.h"
 #include "machine/vic20std.h"
+#include "machine/vic20_megacart.h"
 
 
 #define MCFG_CBM_IEC_ADD(_intf, _default_drive) \
@@ -134,13 +136,14 @@ INPUT_PORTS_EXTERN( vic_controls );
 
 
 
-extern const slot_interface slot_interface_cbm_iec_devices[];
-extern const slot_interface slot_interface_sx1541_iec_devices[];
-extern const slot_interface slot_interface_cbm_ieee488_devices[];
-extern const slot_interface slot_interface_vic20_expansion_cards[];
-extern const slot_interface slot_interface_vic10_expansion_cards[];
-extern const slot_interface slot_interface_c64_expansion_cards[];
-extern const slot_interface slot_interface_c64_user_port_cards[];
+SLOT_INTERFACE_EXTERN( cbm_iec_devices );
+SLOT_INTERFACE_EXTERN( sx1541_iec_devices );
+SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
+SLOT_INTERFACE_EXTERN( vic20_expansion_cards );
+SLOT_INTERFACE_EXTERN( vic10_expansion_cards );
+SLOT_INTERFACE_EXTERN( c64_expansion_cards );
+SLOT_INTERFACE_EXTERN( c64_user_port_cards );
+SLOT_INTERFACE_EXTERN( c128_expansion_cards );
 
 
 

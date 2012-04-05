@@ -61,6 +61,7 @@ block of RAM instead of 8.
         * In the Chips (Japan, USA).60
         * K-Star Patrol (Europe).60
         * Seafox (Japan, USA).60
+    - mos6560_port_r/w should respond at 0x1000-0x100f
     - SHIFT LOCK
     - restore key
     - light pen
@@ -69,6 +70,201 @@ block of RAM instead of 8.
 */
 
 #include "includes/vic20.h"
+
+
+
+//**************************************************************************
+//  MACROS/CONSTANTS
+//**************************************************************************
+
+enum
+{
+	BLK0 = 0,
+	BLK1,
+	BLK2,
+	BLK3,
+	BLK4,
+	BLK5,
+	BLK6,
+	BLK7
+};
+
+
+enum
+{
+	RAM0 = 0,
+	RAM1,
+	RAM2,
+	RAM3,
+	RAM4,
+	RAM5,
+	RAM6,
+	RAM7
+};
+
+
+enum
+{
+	IO0 = 4,
+	COLOR = 5,
+	IO2 = 6,
+	IO3 = 7
+};
+
+
+
+//**************************************************************************
+//  MEMORY MANAGEMENT
+//**************************************************************************
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+READ8_MEMBER( vic20_state::read )
+{
+	UINT8 data = 0;
+
+	int ram1 = 1, ram2 = 1, ram3 = 1;
+	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
+	int io2 = 1, io3 = 1;
+
+	switch ((offset >> 13) & 0x07)
+	{
+	case BLK0:
+		switch ((offset >> 10) & 0x07)
+		{
+		case RAM0:
+			data = m_ram->pointer()[offset];
+			break;
+
+		case RAM1: ram1 = 0; break;
+		case RAM2: ram2 = 0; break;
+		case RAM3: ram3 = 0; break;
+
+		default:
+			data = m_ram->pointer()[0x400 + (offset & 0xfff)];
+			break;
+		}
+		break;
+
+	case BLK1: blk1 = 0; break;
+	case BLK2: blk2 = 0; break;
+	case BLK3: blk3 = 0; break;
+
+	case BLK4:
+		switch ((offset >> 10) & 0x07)
+		{
+		default:
+			data = m_charom[offset & 0xfff];
+			break;
+
+		case IO0:
+			if (BIT(offset, 4))
+			{
+				data = m_via0->read(space, offset & 0x0f);
+			}
+			else if (BIT(offset, 5))
+			{
+				data = m_via1->read(space, offset & 0x0f);
+			}
+			else if (offset >= 0x9000 && offset < 0x9010)
+			{
+				data = mos6560_port_r(m_vic, offset & 0x0f);
+			}
+			break;
+
+		case COLOR:
+			data = m_color_ram[offset & 0x3ff];
+			break;
+
+		case IO2: io2 = 0; break;
+		case IO3: io3 = 0; break;
+		}
+		break;
+
+	case BLK5: blk5 = 0; break;
+
+	case BLK6:
+		data = m_basic[offset & 0x1fff];
+		break;
+
+	case BLK7:
+		data = m_kernal[offset & 0x1fff];
+		break;
+	}
+
+	data |= m_exp->cd_r(space, offset & 0x1fff, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( vic20_state::write )
+{
+	int ram1 = 1, ram2 = 1, ram3 = 1;
+	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
+	int io2 = 1, io3 = 1;
+
+	switch ((offset >> 13) & 0x07)
+	{
+	case BLK0:
+		switch ((offset >> 10) & 0x07)
+		{
+		case RAM0:
+			m_ram->pointer()[offset] = data;
+			break;
+
+		case RAM1: ram1 = 0; break;
+		case RAM2: ram2 = 0; break;
+		case RAM3: ram3 = 0; break;
+
+		default:
+			m_ram->pointer()[0x400 + (offset & 0xfff)] = data;
+			break;
+		}
+		break;
+
+	case BLK1: blk1 = 0; break;
+	case BLK2: blk2 = 0; break;
+	case BLK3: blk3 = 0; break;
+
+	case BLK4:
+		switch ((offset >> 10) & 0x07)
+		{
+		case IO0:
+			if (BIT(offset, 4))
+			{
+				m_via0->write(space, offset & 0x0f, data);
+			}
+			else if (BIT(offset, 5))
+			{
+				m_via1->write(space, offset & 0x0f, data);
+			}
+			else if (offset >= 0x9000 && offset < 0x9010)
+			{
+				mos6560_port_w(m_vic, offset & 0x0f, data);
+			}
+			break;
+
+		case COLOR:
+			m_color_ram[offset & 0x3ff] = data;
+			break;
+
+		case IO2: io2 = 0; break;
+		case IO3: io3 = 0; break;
+		}
+		break;
+
+	case BLK5: blk5 = 0; break;
+	}
+
+	m_exp->cd_w(space, offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+}
 
 
 
@@ -123,23 +319,7 @@ static INTERRUPT_GEN( vic20_raster_interrupt )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vic20_mem, AS_PROGRAM, 8, vic20_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, ram1_r, ram1_w)
-	AM_RANGE(0x0800, 0x0bff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, ram2_r, ram2_w)
-	AM_RANGE(0x0c00, 0x0fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, ram3_r, ram3_w)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, blk1_r, blk1_w)
-	AM_RANGE(0x4000, 0x5fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, blk2_r, blk2_w)
-	AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, blk3_r, blk3_w)
-	AM_RANGE(0x8000, 0x8fff) AM_ROM
-	AM_RANGE(0x9000, 0x900f) AM_DEVREADWRITE_LEGACY(M6560_TAG, mos6560_port_r, mos6560_port_w)
-	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
-	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, io2_r, io2_w)
-	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, io3_r, io3_w)
-	AM_RANGE(0xa000, 0xbfff) AM_DEVREADWRITE(VIC20_EXPANSION_SLOT_TAG, vic20_expansion_slot_device, blk5_r, blk5_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
@@ -520,9 +700,9 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 
 static int vic20_dma_read_color( running_machine &machine, int offset )
 {
-	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
+	vic20_state *state = machine.driver_data<vic20_state>();
 
-	return program->read_byte(0x9400 | (offset & 0x3ff));
+	return state->m_color_ram[offset & 0x3ff];
 }
 
 static int vic20_dma_read( running_machine &machine, int offset )
@@ -604,6 +784,14 @@ static VIC20_EXPANSION_INTERFACE( expansion_intf )
 
 void vic20_state::machine_start()
 {
+	// find memory regions
+	m_basic = machine().region("basic")->base();
+	m_kernal = machine().region("kernal")->base();
+	m_charom = machine().region("charom")->base();
+
+	// allocate memory
+	m_color_ram = auto_alloc_array(machine(), UINT8, 0x400);
+
 	// state saving
 	save_item(NAME(m_key_col));
 }
@@ -720,10 +908,14 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( vic1001 )
-	ROM_REGION( 0x10000, M6502_TAG, 0 )
-	ROM_LOAD( "901460-02", 0x8000, 0x1000, CRC(fcfd8a4b) SHA1(dae61ac03065aa2904af5c123ce821855898c555) )
-	ROM_LOAD( "901486-01", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
-	ROM_LOAD( "901486-02", 0xe000, 0x2000, CRC(336900d7) SHA1(c9ead45e6674d1042ca6199160e8583c23aeac22) )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "901486-01", 0x0000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "901486-02", 0x0000, 0x2000, CRC(336900d7) SHA1(c9ead45e6674d1042ca6199160e8583c23aeac22) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901460-02", 0x0000, 0x1000, CRC(fcfd8a4b) SHA1(dae61ac03065aa2904af5c123ce821855898c555) )
 ROM_END
 
 
@@ -732,13 +924,17 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( vic20 )
-	ROM_REGION( 0x10000, M6502_TAG, 0 )
-	ROM_LOAD( "901460-03.ud7",  0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
-	ROM_LOAD( "901486-01.ue11", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "901486-01.ue11", 0x0000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_SYSTEM_BIOS( 0, "cbm", "Original" )
-	ROMX_LOAD( "901486-06.ue12", 0xe000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19), ROM_BIOS(1) )
+	ROMX_LOAD( "901486-06.ue12", 0x0000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS" )
-	ROMX_LOAD( "jiffydos vic-20 ntsc.ue12", 0xe000, 0x2000, CRC(683a757f) SHA1(83fb83e97b5a840311dbf7e1fe56fe828f41936d), ROM_BIOS(2) )
+	ROMX_LOAD( "jiffydos vic-20 ntsc.ue12", 0x0000, 0x2000, CRC(683a757f) SHA1(83fb83e97b5a840311dbf7e1fe56fe828f41936d), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901460-03.ud7", 0x0000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
 ROM_END
 
 
@@ -747,13 +943,17 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( vic20p )
-	ROM_REGION( 0x10000, M6502_TAG, 0 )
-	ROM_LOAD( "901460-03.ud7",  0x8000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
-	ROM_LOAD( "901486-01.ue11", 0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "901486-01.ue11", 0x0000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+	
+	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_SYSTEM_BIOS( 0, "cbm", "Original" )
-	ROMX_LOAD( "901486-07.ue12", 0xe000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e), ROM_BIOS(1) )
+	ROMX_LOAD( "901486-07.ue12", 0x0000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS" )
-	ROMX_LOAD( "jiffydos vic-20 pal.ue12", 0xe000, 0x2000, CRC(705e7810) SHA1(5a03623a4b855531b8bffd756f701306f128be2d), ROM_BIOS(2) )
+	ROMX_LOAD( "jiffydos vic-20 pal.ue12", 0x0000, 0x2000, CRC(705e7810) SHA1(5a03623a4b855531b8bffd756f701306f128be2d), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901460-03.ud7", 0x0000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
 ROM_END
 
 
@@ -762,10 +962,14 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( vic20s )
-	ROM_REGION( 0x10000, M6502_TAG, 0 )
-	ROM_LOAD( "nec22101.207",   0x8000, 0x1000, CRC(d808551d) SHA1(f403f0b0ce5922bd61bbd768bdd6f0b38e648c9f) )
-	ROM_LOAD( "901486-01.ue11",	0xc000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
-	ROM_LOAD( "nec22081.206",   0xe000, 0x2000, CRC(b2a60662) SHA1(cb3e2f6e661ea7f567977751846ce9ad524651a3) )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "901486-01.ue11",	0x0000, 0x2000, CRC(db4c43c1) SHA1(587d1e90950675ab6b12d91248a3f0d640d02e8d) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "nec22081.206", 0x0000, 0x2000, CRC(b2a60662) SHA1(cb3e2f6e661ea7f567977751846ce9ad524651a3) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "nec22101.207", 0x0000, 0x1000, CRC(d808551d) SHA1(f403f0b0ce5922bd61bbd768bdd6f0b38e648c9f) )
 ROM_END
 
 

@@ -46,40 +46,30 @@ void vic1111_device::device_start()
 
 
 //-------------------------------------------------
-//  vic20_blk1_r - block 1 read
+//  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1111_device::vic20_blk1_r(address_space &space, offs_t offset)
+UINT8 vic1111_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	return m_ram[offset & 0x1fff];
+	UINT8 data = 0;
+
+	if (!blk1 || !blk2)
+	{
+		data = m_ram[offset & 0x3fff];
+	}
+
+	return data;
 }
 
 
 //-------------------------------------------------
-//  vic20_blk1_w - block 1 write
+//  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic1111_device::vic20_blk1_w(address_space &space, offs_t offset, UINT8 data)
+void vic1111_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	m_ram[offset & 0x1fff] = data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk2_r - block 2 read
-//-------------------------------------------------
-
-UINT8 vic1111_device::vic20_blk2_r(address_space &space, offs_t offset)
-{
-	return m_ram[0x2000 | (offset & 0x1fff)];
-}
-
-
-//-------------------------------------------------
-//  vic20_blk2_w - block 2 write
-//-------------------------------------------------
-
-void vic1111_device::vic20_blk2_w(address_space &space, offs_t offset, UINT8 data)
-{
-	m_ram[0x2000 | (offset & 0x1fff)] = data;
+	if (!blk1 || !blk2)
+	{
+		m_ram[offset & 0x3fff] = data;
+	}
 }

@@ -44,7 +44,8 @@ device_vic20_expansion_card_interface::device_vic20_expansion_card_interface(con
 	  m_blk2(NULL),
 	  m_blk3(NULL),
 	  m_blk5(NULL),
-	  m_ram(NULL)
+	  m_ram(NULL),
+	  m_nvram(NULL)
 {
 	m_slot = dynamic_cast<vic20_expansion_slot_device *>(device.owner());
 }
@@ -122,6 +123,21 @@ UINT8* device_vic20_expansion_card_interface::vic20_ram_pointer(running_machine 
 	}
 
 	return m_ram;
+}
+
+
+//-------------------------------------------------
+//  vic20_nvram_pointer - get NVRAM pointer
+//-------------------------------------------------
+
+UINT8* device_vic20_expansion_card_interface::vic20_nvram_pointer(running_machine &machine, size_t size)
+{
+	if (m_nvram == NULL)
+	{
+		m_nvram = auto_alloc_array(machine, UINT8, size);
+	}
+
+	return m_nvram;
 }
 
 
@@ -260,6 +276,9 @@ bool vic20_expansion_slot_device::call_load()
 
 			size = get_software_region_length("ram");
 			if (size) memcpy(m_cart->vic20_ram_pointer(machine(), size), get_software_region("ram"), size);
+
+			size = get_software_region_length("nvram");
+			if (size) memcpy(m_cart->vic20_nvram_pointer(machine(), size), get_software_region("nvram"), size);
 		}
 	}
 
@@ -290,6 +309,36 @@ const char * vic20_expansion_slot_device::get_default_card_software(const machin
 
 
 //-------------------------------------------------
+//  cd_r - cartridge data read
+//-------------------------------------------------
+
+UINT8 vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+{
+	UINT8 data = 0; 
+
+	if (m_cart != NULL)
+	{
+		data = m_cart->vic20_cd_r(space, offset, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  cd_w - cartridge data write
+//-------------------------------------------------
+
+void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+{
+	if (m_cart != NULL)
+	{
+		m_cart->vic20_cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+	}
+}
+
+
+//-------------------------------------------------
 //  screen_update -
 //-------------------------------------------------
 
@@ -304,26 +353,6 @@ UINT32 vic20_expansion_slot_device::screen_update(screen_device &screen, bitmap_
 
 	return value;
 }
-
-
-READ8_MEMBER( vic20_expansion_slot_device::ram1_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_ram1_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::ram1_w ) { if (m_cart != NULL) m_cart->vic20_ram1_w(space, offset, data); }
-READ8_MEMBER( vic20_expansion_slot_device::ram2_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_ram2_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::ram2_w ) { if (m_cart != NULL) m_cart->vic20_ram2_w(space, offset, data); }
-READ8_MEMBER( vic20_expansion_slot_device::ram3_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_ram3_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::ram3_w ) { if (m_cart != NULL) m_cart->vic20_ram3_w(space, offset, data); }
-READ8_MEMBER( vic20_expansion_slot_device::blk1_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_blk1_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::blk1_w ) { if (m_cart != NULL) m_cart->vic20_blk1_w(space, offset, data); }
-READ8_MEMBER( vic20_expansion_slot_device::blk2_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_blk2_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::blk2_w ) { if (m_cart != NULL) m_cart->vic20_blk2_w(space, offset, data); }
-READ8_MEMBER( vic20_expansion_slot_device::blk3_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_blk3_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::blk3_w ) { if (m_cart != NULL) m_cart->vic20_blk3_w(space, offset, data); }
-READ8_MEMBER( vic20_expansion_slot_device::blk5_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_blk5_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::blk5_w ) { if (m_cart != NULL) m_cart->vic20_blk5_w(space, offset, data); }
-READ8_MEMBER( vic20_expansion_slot_device::io2_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_io2_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::io2_w ) { if (m_cart != NULL) m_cart->vic20_io2_w(space, offset, data); }
-READ8_MEMBER( vic20_expansion_slot_device::io3_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic20_io3_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_expansion_slot_device::io3_w ) { if (m_cart != NULL) m_cart->vic20_io3_w(space, offset, data); }
 
 WRITE_LINE_MEMBER( vic20_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
 WRITE_LINE_MEMBER( vic20_expansion_slot_device::nmi_w ) { m_out_nmi_func(state); }

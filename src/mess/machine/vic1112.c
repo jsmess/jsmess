@@ -222,20 +222,30 @@ void vic1112_device::device_reset()
 
 
 //-------------------------------------------------
-//  vic20_io2_r - I/O 2 read
+//  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1112_device::vic20_io2_r(address_space &space, offs_t offset)
+UINT8 vic1112_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	UINT8 data = 0;
 
-	if (offset & 0x10)
+	if (!io2)
 	{
-		data = m_via1->read(space, offset & 0x0f);
+		if (offset & 0x10)
+		{
+			data = m_via1->read(space, offset & 0x0f);
+		}
+		else
+		{
+			data = m_via0->read(space, offset & 0x0f);
+		}
 	}
-	else
+	else if (!blk5)
 	{
-		data = m_via0->read(space, offset & 0x0f);
+		if (offset & 0x1000)
+		{
+			data = m_blk5[offset & 0x17ff];
+		}		
 	}
 
 	return data;
@@ -243,34 +253,20 @@ UINT8 vic1112_device::vic20_io2_r(address_space &space, offs_t offset)
 
 
 //-------------------------------------------------
-//  vic20_io2_r - I/O 2 write
+//  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic1112_device::vic20_io2_w(address_space &space, offs_t offset, UINT8 data)
+void vic1112_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	if (offset & 0x10)
+	if (!io2)
 	{
-		m_via1->write(space, offset & 0x0f, data);
+		if (offset & 0x10)
+		{
+			m_via1->write(space, offset & 0x0f, data);
+		}
+		else
+		{
+			m_via0->write(space, offset & 0x0f, data);
+		}		
 	}
-	else
-	{
-		m_via0->write(space, offset & 0x0f, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_blk5_r - block 5 read
-//-------------------------------------------------
-
-UINT8 vic1112_device::vic20_blk5_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (offset & 0x1000)
-	{
-		data = m_blk5[offset & 0x17ff];
-	}
-
-	return data;
 }

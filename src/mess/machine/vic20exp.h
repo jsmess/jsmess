@@ -16,10 +16,10 @@
                     CD5       7      H       CA5
                     CD6       8      J       CA6
                     CD7       9      K       CA7
-                   BLK1      10      L       CA8
-                   BLK2      11      M       CA9
-                   BLK3      12      N       CA10
-                   BLK5      13      P       CA11
+                  _BLK1      10      L       CA8
+                  _BLK2      11      M       CA9
+                  _BLK3      12      N       CA10
+                  _BLK5      13      P       CA11
                   _RAM1      14      R       CA12
                   _RAM2      15      S       CA13
                   _RAM3      16      T       _I/O2
@@ -92,6 +92,9 @@ public:
 	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~vic20_expansion_slot_device();
 
+	UINT8 cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
+	void cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
+
 	DECLARE_READ8_MEMBER( ram1_r );
 	DECLARE_WRITE8_MEMBER( ram1_w );
 	DECLARE_READ8_MEMBER( ram2_r );
@@ -158,46 +161,18 @@ public:
 	device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic20_expansion_card_interface();
 
-	// RAM
-	virtual UINT8 vic20_ram1_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_ram1_w(address_space &space, offs_t offset, UINT8 data) { };
+	// memory access
+	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return 0; };
+	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { };
 
-	virtual UINT8 vic20_ram2_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_ram2_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	virtual UINT8 vic20_ram3_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_ram3_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	// ROM
-	virtual UINT8 vic20_blk1_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_blk1_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	virtual UINT8 vic20_blk2_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_blk2_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	virtual UINT8 vic20_blk3_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_blk3_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	virtual UINT8 vic20_blk5_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_blk5_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual UINT32 vic20_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
 
 	virtual UINT8* vic20_blk1_pointer(running_machine &machine, size_t size);
 	virtual UINT8* vic20_blk2_pointer(running_machine &machine, size_t size);
 	virtual UINT8* vic20_blk3_pointer(running_machine &machine, size_t size);
 	virtual UINT8* vic20_blk5_pointer(running_machine &machine, size_t size);
 	virtual UINT8* vic20_ram_pointer(running_machine &machine, size_t size);
-
-	// I/O
-	virtual UINT8 vic20_io2_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_io2_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	virtual UINT8 vic20_io3_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic20_io3_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	// video
-	virtual UINT32 vic20_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
-
-	virtual UINT8* get_cart_base() { return NULL; }
+	virtual UINT8* vic20_nvram_pointer(running_machine &machine, size_t size);
 
 protected:
 	vic20_expansion_slot_device *m_slot;
@@ -207,6 +182,7 @@ protected:
 	UINT8 *m_blk3;
 	UINT8 *m_blk5;
 	UINT8 *m_ram;
+	UINT8 *m_nvram;
 };
 
 

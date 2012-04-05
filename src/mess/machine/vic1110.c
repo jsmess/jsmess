@@ -85,14 +85,15 @@ void vic1110_device::device_start()
 
 
 //-------------------------------------------------
-//  vic20_blk1_r - block 1 read
+//  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1110_device::vic20_blk1_r(address_space &space, offs_t offset)
+UINT8 vic1110_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	UINT8 data = 0;
+	UINT8 sw = input_port_read(*this, "SW");
 
-	if (input_port_read(*this, "SW") == BLK1)
+	if ((!blk1 && (sw == BLK1)) || (!blk2 && (sw == BLK2)) || (!blk3 && (sw == BLK3)) || (!blk5 && (sw == BLK5)))
 	{
 		data = m_ram[offset & 0x1fff];
 	}
@@ -102,102 +103,14 @@ UINT8 vic1110_device::vic20_blk1_r(address_space &space, offs_t offset)
 
 
 //-------------------------------------------------
-//  vic20_blk1_w - block 1 write
+//  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic1110_device::vic20_blk1_w(address_space &space, offs_t offset, UINT8 data)
+void vic1110_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	if (input_port_read(*this, "SW") == BLK1)
-	{
-		m_ram[offset & 0x1fff] = data;
-	}
-}
+	UINT8 sw = input_port_read(*this, "SW");
 
-
-//-------------------------------------------------
-//  vic20_blk2_r - block 2 read
-//-------------------------------------------------
-
-UINT8 vic1110_device::vic20_blk2_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (input_port_read(*this, "SW") == BLK2)
-	{
-		data = m_ram[offset & 0x1fff];
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk2_w - block 2 write
-//-------------------------------------------------
-
-void vic1110_device::vic20_blk2_w(address_space &space, offs_t offset, UINT8 data)
-{
-	if (input_port_read(*this, "SW") == BLK2)
-	{
-		m_ram[offset & 0x1fff] = data;
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_blk3_r - block 3 read
-//-------------------------------------------------
-
-UINT8 vic1110_device::vic20_blk3_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (input_port_read(*this, "SW") == BLK3)
-	{
-		data = m_ram[offset & 0x1fff];
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk3_w - block 3 write
-//-------------------------------------------------
-
-void vic1110_device::vic20_blk3_w(address_space &space, offs_t offset, UINT8 data)
-{
-	if (input_port_read(*this, "SW") == BLK3)
-	{
-		m_ram[offset & 0x1fff] = data;
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_blk5_r - block 5 read
-//-------------------------------------------------
-
-UINT8 vic1110_device::vic20_blk5_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (input_port_read(*this, "SW") == BLK5)
-	{
-		data = m_ram[offset & 0x1fff];
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk5_w - block 5 write
-//-------------------------------------------------
-
-void vic1110_device::vic20_blk5_w(address_space &space, offs_t offset, UINT8 data)
-{
-	if (input_port_read(*this, "SW") == BLK5)
+	if ((!blk1 && (sw == BLK1)) || (!blk2 && (sw == BLK2)) || (!blk3 && (sw == BLK3)) || (!blk5 && (sw == BLK5)))
 	{
 		m_ram[offset & 0x1fff] = data;
 	}
