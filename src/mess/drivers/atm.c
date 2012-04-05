@@ -1,3 +1,14 @@
+/*******************************************************************************************
+
+MicroART ATM (clone of Spectrum)
+
+Not working because of banking issues.
+
+The direct_update_handler needs rewriting, because removing it allows the
+computer to boot up (with keyboard problems).
+
+*******************************************************************************************/
+
 #include "emu.h"
 #include "includes/spectrum.h"
 #include "imagedev/snapquik.h"
