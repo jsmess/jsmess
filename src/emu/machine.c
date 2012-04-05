@@ -119,6 +119,10 @@
 
 #include <time.h>
 
+#ifdef SDLMAME_EMSCRIPTEN
+void jsmess_set_main_loop(device_scheduler &sched);
+#endif
+
 
 
 //**************************************************************************
@@ -408,6 +412,10 @@ int running_machine::run(bool firstrun)
 		{
 			g_profiler.start(PROFILER_EXTRA);
 
+			#ifdef SDLMAME_EMSCRIPTEN
+			//break out to our async javascript loop and halt
+			jsmess_set_main_loop(m_scheduler);
+			#endif
 			// execute CPUs if not paused
 			if (!m_paused)
 				m_scheduler.timeslice();
