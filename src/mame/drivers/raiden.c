@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
 	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE_LEGACY(raiden_background_w) AM_BASE(m_back_data)
 	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE_LEGACY(raiden_foreground_w) AM_BASE(m_fore_data)
-	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x07ffe, 0x0afff) AM_WRITENOP
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( raidenu_sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE_LEGACY(raiden_background_w) AM_BASE(m_back_data)
 	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE_LEGACY(raiden_foreground_w) AM_BASE(m_fore_data)
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1")
 	//AM_RANGE(0x07ffe, 0x0afff) AM_WRITENOP
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
@@ -512,19 +512,18 @@ ROM_END
 //#define SYNC_HACK
 
 #ifdef SYNC_HACK
-static READ16_HANDLER( sub_cpu_spin_r )
+READ16_MEMBER(raiden_state::sub_cpu_spin_r)
 {
-	raiden_state *state = space->machine().driver_data<raiden_state>();
-	int pc=cpu_get_pc(&space->device());
-	int ret=state->m_shared_ram[0x4];
+	int pc=cpu_get_pc(&space.device());
+	int ret=m_shared_ram[0x4];
 
 	// main set
 	if (pc==0xfcde6 && ret!=0x40)
-		device_spin(&space->device());
+		device_spin(&space.device());
 
 	// alt sets
 	if (pc==0xfcde8 && ret!=0x40)
-		device_spin(&space->device());
+		device_spin(&space.device());
 
 	return ret;
 }

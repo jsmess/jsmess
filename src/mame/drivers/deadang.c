@@ -45,13 +45,13 @@ Dip locations and factory settings verified with US manual
 
 /* Read/Write Handlers */
 
-static READ16_HANDLER( ghunter_trackball_low_r )
+READ16_MEMBER(deadang_state::ghunter_trackball_low_r)
 {
-	return (input_port_read(space->machine(), "TRACKX") & 0xff) | ((input_port_read(space->machine(), "TRACKY") & 0xff) << 8);
+	return (input_port_read(machine(), "TRACKX") & 0xff) | ((input_port_read(machine(), "TRACKY") & 0xff) << 8);
 }
-static READ16_HANDLER( ghunter_trackball_high_r )
+READ16_MEMBER(deadang_state::ghunter_trackball_high_r)
 {
-	return ((input_port_read(space->machine(), "TRACKX") & 0x0f00) >> 4) | (input_port_read(space->machine(), "TRACKY") & 0x0f00);
+	return ((input_port_read(machine(), "TRACKX") & 0x0f00) >> 4) | (input_port_read(machine(), "TRACKY") & 0x0f00);
 }
 
 /* Memory Maps */
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
 	AM_RANGE(0x0a000, 0x0a001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0d000, 0x0dfff) AM_WRITEONLY
 	AM_RANGE(0x0e000, 0x0e0ff) AM_WRITEONLY AM_BASE(m_scroll_ram)
 	AM_RANGE(0x0e100, 0x0ffff) AM_WRITEONLY
@@ -423,8 +423,9 @@ static DRIVER_INIT( ghunter )
 	seibu_adpcm_decrypt(machine, "adpcm1");
 	seibu_adpcm_decrypt(machine, "adpcm2");
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80000, 0x80001, FUNC(ghunter_trackball_low_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb0000, 0xb0001, FUNC(ghunter_trackball_high_r));
+	deadang_state *state = machine.driver_data<deadang_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80000, 0x80001, read16_delegate(FUNC(deadang_state::ghunter_trackball_low_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xb0000, 0xb0001, read16_delegate(FUNC(deadang_state::ghunter_trackball_high_r),state));
 }
 
 /* Game Drivers */

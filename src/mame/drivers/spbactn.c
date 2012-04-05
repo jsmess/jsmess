@@ -131,12 +131,12 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "includes/spbactn.h"
 
 
-static WRITE16_HANDLER( soundcommand_w )
+WRITE16_MEMBER(spbactn_state::soundcommand_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE(m_spvideoram)
 	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_BASE(m_fgvideoram)
 	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_BASE(m_bgvideoram)
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
 	AM_RANGE(0x90020, 0x90021) AM_READ_PORT("SYSTEM")
@@ -155,8 +155,8 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 
 	/* this is an awful lot of unknowns */
 	AM_RANGE(0x90000, 0x90001) AM_WRITENOP
-	AM_RANGE(0x90010, 0x90011) AM_WRITE_LEGACY(soundcommand_w)
-//  AM_RANGE(0x90020, 0x90021) AM_WRITE_LEGACY(soundcommand_w)
+	AM_RANGE(0x90010, 0x90011) AM_WRITE(soundcommand_w)
+//  AM_RANGE(0x90020, 0x90021) AM_WRITE(soundcommand_w)
 	AM_RANGE(0x90030, 0x90031) AM_WRITENOP
 
 	AM_RANGE(0x90080, 0x90081) AM_WRITENOP

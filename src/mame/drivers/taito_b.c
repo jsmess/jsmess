@@ -191,9 +191,9 @@ TODO!
 #include "video/taitoic.h"
 #include "includes/taito_b.h"
 
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(taitob_state::bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", (data - 1) & 3);
+	memory_set_bank(machine(), "bank1", (data - 1) & 3);
 }
 
 static TIMER_CALLBACK( rsaga2_interrupt2 )
@@ -334,60 +334,59 @@ static INTERRUPT_GEN( realpunc_interrupt )//2
 
 
 
-static READ16_HANDLER( tracky1_hi_r )
+READ16_MEMBER(taitob_state::tracky1_hi_r)
 {
-	return input_port_read(space->machine(), "TRACKX1");
+	return input_port_read(machine(), "TRACKX1");
 }
 
-static READ16_HANDLER( tracky1_lo_r )
+READ16_MEMBER(taitob_state::tracky1_lo_r)
 {
-	return (input_port_read(space->machine(), "TRACKX1") & 0xff) << 8;
+	return (input_port_read(machine(), "TRACKX1") & 0xff) << 8;
 }
 
-static READ16_HANDLER( trackx1_hi_r )
+READ16_MEMBER(taitob_state::trackx1_hi_r)
 {
-	return input_port_read(space->machine(), "TRACKY1");
+	return input_port_read(machine(), "TRACKY1");
 }
 
-static READ16_HANDLER( trackx1_lo_r )
+READ16_MEMBER(taitob_state::trackx1_lo_r)
 {
-	return (input_port_read(space->machine(), "TRACKY1") & 0xff) << 8;
+	return (input_port_read(machine(), "TRACKY1") & 0xff) << 8;
 }
 
-static READ16_HANDLER( tracky2_hi_r )
+READ16_MEMBER(taitob_state::tracky2_hi_r)
 {
-	return input_port_read(space->machine(), "TRACKX2");
+	return input_port_read(machine(), "TRACKX2");
 }
 
-static READ16_HANDLER( tracky2_lo_r )
+READ16_MEMBER(taitob_state::tracky2_lo_r)
 {
-	return (input_port_read(space->machine(), "TRACKX2") & 0xff) << 8;
+	return (input_port_read(machine(), "TRACKX2") & 0xff) << 8;
 }
 
-static READ16_HANDLER( trackx2_hi_r )
+READ16_MEMBER(taitob_state::trackx2_hi_r)
 {
-	return input_port_read(space->machine(), "TRACKY2");
+	return input_port_read(machine(), "TRACKY2");
 }
 
-static READ16_HANDLER( trackx2_lo_r )
+READ16_MEMBER(taitob_state::trackx2_lo_r)
 {
-	return (input_port_read(space->machine(), "TRACKY2") & 0xff) << 8;
+	return (input_port_read(machine(), "TRACKY2") & 0xff) << 8;
 }
 
 
-static WRITE16_HANDLER( gain_control_w )
+WRITE16_MEMBER(taitob_state::gain_control_w)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		if (offset == 0)
 		{
-			mb87078_data_w(state->m_mb87078, data >> 8, 0);
+			mb87078_data_w(m_mb87078, data >> 8, 0);
     	      //logerror("MB87078 dsel=0 data=%4x\n", data);
 		}
 		else
 		{
-			mb87078_data_w(state->m_mb87078, data >> 8, 1);
+			mb87078_data_w(m_mb87078, data >> 8, 1);
 	           //logerror("MB87078 dsel=1 data=%4x\n", data);
 		}
 	}
@@ -416,17 +415,15 @@ static const eeprom_interface taitob_eeprom_intf =
 	"0100110000"	/* unlock command*/
 };
 
-static READ16_HANDLER( eep_latch_r )
+READ16_MEMBER(taitob_state::eep_latch_r)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
-	return state->m_eep_latch;
+	return m_eep_latch;
 }
 
-static WRITE16_HANDLER( eeprom_w )
+WRITE16_MEMBER(taitob_state::eeprom_w)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
 
-	COMBINE_DATA(&state->m_eep_latch);
+	COMBINE_DATA(&m_eep_latch);
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -442,7 +439,7 @@ static WRITE16_HANDLER( eeprom_w )
 		/* bit 7 - set all the time (Chip Select?) */
 
 		/* EEPROM */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -457,51 +454,47 @@ static WRITE16_HANDLER( eeprom_w )
 *************************************************************************/
 
 
-static READ16_HANDLER( player_34_coin_ctrl_r )
+READ16_MEMBER(taitob_state::player_34_coin_ctrl_r)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
-	return state->m_coin_word;
+	return m_coin_word;
 }
 
-static WRITE16_HANDLER( player_34_coin_ctrl_w )
+WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
 
-	COMBINE_DATA(&state->m_coin_word);
+	COMBINE_DATA(&m_coin_word);
 
 	/* coin counters and lockout */
-	coin_lockout_w(space->machine(), 2, ~data & 0x0100);
-	coin_lockout_w(space->machine(), 3, ~data & 0x0200);
-	coin_counter_w(space->machine(), 2,  data & 0x0400);
-	coin_counter_w(space->machine(), 3,  data & 0x0800);
+	coin_lockout_w(machine(), 2, ~data & 0x0100);
+	coin_lockout_w(machine(), 3, ~data & 0x0200);
+	coin_counter_w(machine(), 2,  data & 0x0400);
+	coin_counter_w(machine(), 3,  data & 0x0800);
 }
 
-static READ16_HANDLER( pbobble_input_bypass_r )
+READ16_MEMBER(taitob_state::pbobble_input_bypass_r)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
 	switch (offset)
 	{
 		case 0x01:
-			return input_port_read(space->machine(), "COIN") << 8;
+			return input_port_read(machine(), "COIN") << 8;
 
 		default:
-			return tc0640fio_r(state->m_tc0640fio, offset) << 8;
+			return tc0640fio_r(m_tc0640fio, offset) << 8;
 	}
 }
 
-static WRITE16_HANDLER( spacedxo_tc0220ioc_w )
+WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 {
-	taitob_state *state = space->machine().driver_data<taitob_state>();
 	if (ACCESSING_BITS_0_7)
-		tc0220ioc_w(state->m_tc0220ioc, offset, data & 0xff);
+		tc0220ioc_w(m_tc0220ioc, offset, data & 0xff);
 	else
 	{
-		/* spacedxo also writes here - bug? */
-		tc0220ioc_w(state->m_tc0220ioc, offset, (data >> 8) & 0xff);
+		/* &spacedxo also writes here - bug? */
+		tc0220ioc_w(m_tc0220ioc, offset, (data >> 8) & 0xff);
 	}
 }
 
-static WRITE16_HANDLER( realpunc_output_w )
+WRITE16_MEMBER(taitob_state::realpunc_output_w)
 {
 /*
    15 = Camera Enable?
@@ -522,7 +515,7 @@ static WRITE16_HANDLER( realpunc_output_w )
 
 static ADDRESS_MAP_START( rastsag2_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x607fff) AM_RAM	/* Main RAM */ /*ashura up to 603fff only*/
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
@@ -537,7 +530,7 @@ static ADDRESS_MAP_START( crimec_map, AS_PROGRAM, 16, taitob_state )
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM	/* Main RAM */
 ADDRESS_MAP_END
 
@@ -549,12 +542,12 @@ static ADDRESS_MAP_START( tetrist_map, AS_PROGRAM, 16, taitob_state )
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x800000, 0x807fff) AM_RAM	/* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetrista_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0xff00)
@@ -572,7 +565,7 @@ static ADDRESS_MAP_START( hitice_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	/* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE_LEGACY(hitice_pixelram_w) AM_BASE(m_pixelram)
 //  { 0xbffff0, 0xbffff1, ???
 	AM_RANGE(0xbffff2, 0xbffff5) AM_WRITE_LEGACY(hitice_pixel_scroll_w)
@@ -586,31 +579,31 @@ static ADDRESS_MAP_START( rambo3_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
-	AM_RANGE(0x600010, 0x600011) AM_READ_LEGACY(tracky1_lo_r) /*player 1*/
-	AM_RANGE(0x600012, 0x600013) AM_READ_LEGACY(tracky1_hi_r)
-	AM_RANGE(0x600014, 0x600015) AM_READ_LEGACY(trackx1_lo_r)
-	AM_RANGE(0x600016, 0x600017) AM_READ_LEGACY(trackx1_hi_r)
-	AM_RANGE(0x600018, 0x600019) AM_READ_LEGACY(tracky2_lo_r) /*player 2*/
-	AM_RANGE(0x60001a, 0x60001b) AM_READ_LEGACY(tracky2_hi_r)
-	AM_RANGE(0x60001c, 0x60001d) AM_READ_LEGACY(trackx2_lo_r)
-	AM_RANGE(0x60001e, 0x60001f) AM_READ_LEGACY(trackx2_hi_r)
+	AM_RANGE(0x600010, 0x600011) AM_READ(tracky1_lo_r) /*player 1*/
+	AM_RANGE(0x600012, 0x600013) AM_READ(tracky1_hi_r)
+	AM_RANGE(0x600014, 0x600015) AM_READ(trackx1_lo_r)
+	AM_RANGE(0x600016, 0x600017) AM_READ(trackx1_hi_r)
+	AM_RANGE(0x600018, 0x600019) AM_READ(tracky2_lo_r) /*player 2*/
+	AM_RANGE(0x60001a, 0x60001b) AM_READ(tracky2_hi_r)
+	AM_RANGE(0x60001c, 0x60001d) AM_READ(trackx2_lo_r)
+	AM_RANGE(0x60001e, 0x60001f) AM_READ(trackx2_hi_r)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	/* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pbobble_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_READ_LEGACY(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
 	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")		/* shown in service mode, game omits to read it */
-	AM_RANGE(0x500026, 0x500027) AM_READWRITE_LEGACY(eep_latch_r, eeprom_w)
-	AM_RANGE(0x500028, 0x500029) AM_WRITE_LEGACY(player_34_coin_ctrl_w)	/* simply locks coins 3&4 out */
+	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
+	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)	/* simply locks coins 3&4 out */
 	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("P3_P4_B")		/* shown in service mode, game omits to read it */
-	AM_RANGE(0x600000, 0x600003) AM_WRITE_LEGACY(gain_control_w)
+	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM	/* Main RAM */
 ADDRESS_MAP_END
 
@@ -618,15 +611,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spacedx_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_READ_LEGACY(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
 	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")
-	AM_RANGE(0x500026, 0x500027) AM_READWRITE_LEGACY(eep_latch_r, eeprom_w)
-	AM_RANGE(0x500028, 0x500029) AM_WRITE_LEGACY(player_34_coin_ctrl_w)	/* simply locks coins 3&4 out */
+	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
+	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)	/* simply locks coins 3&4 out */
 	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("P3_P4_B")
-	AM_RANGE(0x600000, 0x600003) AM_WRITE_LEGACY(gain_control_w)
+	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM	/* Main RAM */
 ADDRESS_MAP_END
 
@@ -634,11 +627,11 @@ static ADDRESS_MAP_START( spacedxo_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREAD8_LEGACY("tc0220ioc", tc0220ioc_r, 0x00ff) AM_WRITE_LEGACY(spacedxo_tc0220ioc_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREAD8_LEGACY("tc0220ioc", tc0220ioc_r, 0x00ff) AM_WRITE(spacedxo_tc0220ioc_w)
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x302000, 0x303fff) AM_READONLY
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM	/* Main RAM */
 	TC0180VCU_MEMRW( 0x500000 )
@@ -647,16 +640,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzshowby_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_READ_LEGACY(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x200000, 0x20000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
 	AM_RANGE(0x200024, 0x200025) AM_READ_PORT("P3_P4_A")	/* player 3,4 start */
-	AM_RANGE(0x200026, 0x200027) AM_WRITE_LEGACY(eeprom_w)
-	AM_RANGE(0x200028, 0x200029) AM_READWRITE_LEGACY(player_34_coin_ctrl_r, player_34_coin_ctrl_w)
+	AM_RANGE(0x200026, 0x200027) AM_WRITE(eeprom_w)
+	AM_RANGE(0x200028, 0x200029) AM_READWRITE(player_34_coin_ctrl_r, player_34_coin_ctrl_w)
 	AM_RANGE(0x20002e, 0x20002f) AM_READ_PORT("P3_P4_B")	/* player 3,4 buttons */
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x700000, 0x700003) AM_WRITE_LEGACY(gain_control_w)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x700000, 0x700003) AM_WRITE(gain_control_w)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM	/* Main RAM */
 ADDRESS_MAP_END
 
@@ -666,7 +659,7 @@ static ADDRESS_MAP_START( viofight_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM	/* Main RAM */
 ADDRESS_MAP_END
@@ -676,7 +669,7 @@ static ADDRESS_MAP_START( masterw_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM	/* Main RAM */
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0xff00)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
@@ -696,7 +689,7 @@ static ADDRESS_MAP_START( silentd_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
 	AM_RANGE(0x240000, 0x240001) AM_WRITENOP // ???
 //  AM_RANGE(0x240000, 0x240001) AM_READNOP /* read 4 times at init */
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x400000, 0x403fff) AM_RAM	/* Main RAM */
 	TC0180VCU_MEMRW( 0x500000 )
 ADDRESS_MAP_END
@@ -706,7 +699,7 @@ static ADDRESS_MAP_START( selfeena_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* Main RAM */
 	TC0180VCU_MEMRW( 0x200000 )
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x410000, 0x41000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00) /* mirror address - seems to be only used for coin control */
 	AM_RANGE(0x500000, 0x500001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
@@ -717,7 +710,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sbm_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* Main RAM */
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
 	AM_RANGE(0x320000, 0x320001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
@@ -733,9 +726,9 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x184000, 0x184001) AM_WRITE_LEGACY(realpunc_video_ctrl_w)
 	AM_RANGE(0x188000, 0x188001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x188002, 0x188003) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x18c000, 0x18c001) AM_WRITE_LEGACY(realpunc_output_w)
+	AM_RANGE(0x18c000, 0x18c001) AM_WRITE(realpunc_output_w)
 	TC0180VCU_MEMRW( 0x200000 )
-	AM_RANGE(0x280000, 0x281fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x280000, 0x281fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
 //  AM_RANGE(0x320000, 0x320001) AM_READ_LEGACY(SMH_NOP) // ?
@@ -763,7 +756,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitob_state )
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( viofight_sound_map, AS_PROGRAM, 8, taitob_state )
@@ -1929,7 +1922,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, bankswitch_w),
+		DEVCB_DRIVER_MEMBER(taitob_state, bankswitch_w),
 		DEVCB_NULL,
 	},
 	irqhandler

@@ -17,14 +17,13 @@
 #include "includes/tail2nos.h"
 
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(tail2nos_state::sound_command_w)
 {
-	tail2nos_state *state = space->machine().driver_data<tail2nos_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -44,10 +43,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(tail2nos_bgvideoram_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(tail2nos_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tail2nos_state )

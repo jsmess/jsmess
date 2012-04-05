@@ -276,19 +276,19 @@ static MACHINE_RESET( shogwarr )
 
 ***************************************************************************/
 
-static READ16_HANDLER( kaneko16_rnd_r )
+READ16_MEMBER(kaneko16_state::kaneko16_rnd_r)
 {
-	return space->machine().rand() & 0xffff;
+	return machine().rand() & 0xffff;
 }
 
-static WRITE16_HANDLER( kaneko16_coin_lockout_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0,   data  & 0x0100);
-		coin_counter_w(space->machine(), 1,   data  & 0x0200);
-		coin_lockout_w(space->machine(), 0, (~data) & 0x0400 );
-		coin_lockout_w(space->machine(), 1, (~data) & 0x0800 );
+		coin_counter_w(machine(), 0,   data  & 0x0100);
+		coin_counter_w(machine(), 1,   data  & 0x0200);
+		coin_lockout_w(machine(), 0, (~data) & 0x0400 );
+		coin_lockout_w(machine(), 1, (~data) & 0x0800 );
 	}
 }
 
@@ -303,12 +303,12 @@ static WRITE16_HANDLER( kaneko16_coin_lockout_w )
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( kaneko16_soundlatch_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data & 0xff00) >> 8 );
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -339,19 +339,19 @@ static WRITE16_DEVICE_HANDLER( kaneko16_YM2149_w )
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( kaneko16_eeprom_w )
+WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0100);
-		coin_counter_w(space->machine(), 1, data & 0x0200);
-		coin_lockout_w(space->machine(), 0, data & 0x8000);
-		coin_lockout_w(space->machine(), 1, data & 0x8000);
+		coin_counter_w(machine(), 0, data & 0x0100);
+		coin_counter_w(machine(), 1, data & 0x0200);
+		coin_lockout_w(machine(), 0, data & 0x8000);
+		coin_lockout_w(machine(), 1, data & 0x8000);
 	}
 }
 
@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x30e000, 0x30ffff) AM_RAM AM_SHARE("spriteram")		// Sprites
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 //  AM_RANGE(0x480000, 0x480001) AM_RAM     // ?
 	AM_RANGE(0x500000, 0x500001) AM_READWRITE_LEGACY(kaneko16_bg15_reg_r, kaneko16_bg15_reg_w) AM_BASE(m_bg15_reg)	// High Color Background
 	AM_RANGE(0x580000, 0x580001) AM_READWRITE_LEGACY(kaneko16_bg15_select_r, kaneko16_bg15_select_w) AM_BASE(m_bg15_select)
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x680002, 0x680003) AM_READ_PORT("P2")
 	AM_RANGE(0x680004, 0x680005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
-	AM_RANGE(0x700000, 0x700001) AM_WRITE_LEGACY(kaneko16_coin_lockout_w)	// Coin Lockout
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(kaneko16_coin_lockout_w)	// Coin Lockout
 	AM_RANGE(0x780000, 0x780001) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE_LEGACY("ay1", kaneko16_YM2149_r, kaneko16_YM2149_w)	// Sound
 	AM_RANGE(0x800200, 0x80021f) AM_DEVREADWRITE_LEGACY("ay2", kaneko16_YM2149_r, kaneko16_YM2149_w)
@@ -429,12 +429,12 @@ static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[3])									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[2])									//
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_SHARE("spriteram")					// Sprites
-	AM_RANGE(0x700000, 0x700fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x700000, 0x700fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x800000, 0x80001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
 	AM_RANGE(0x900000, 0x90001f) AM_RAM_WRITE_LEGACY(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs	)	// Sprites Regs
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_LEGACY(watchdog_reset16_r)	// Watchdog
 	AM_RANGE(0xb00000, 0xb0001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_1_regs_w) AM_BASE(m_layers_1_regs)	// Layers 1 Regs
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE_LEGACY(kaneko16_eeprom_w)	// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(kaneko16_eeprom_w)	// EEPROM
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("P1")
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("P2")
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("SYSTEM")
@@ -449,7 +449,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blazeon, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM		// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
 	AM_RANGE(0x601000, 0x601fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x602000, 0x602fff) AM_RAM AM_BASE(m_vscroll[1])									//
@@ -462,8 +462,8 @@ static ADDRESS_MAP_START( blazeon, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("DSW1_P2")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("UNK")
 	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE_LEGACY(kaneko16_coin_lockout_w)	// Coin Lockout
-	AM_RANGE(0xe00000, 0xe00001) AM_READNOP AM_WRITE_LEGACY(kaneko16_soundlatch_w)	// Read = IRQ Ack ?
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(kaneko16_coin_lockout_w)	// Coin Lockout
+	AM_RANGE(0xe00000, 0xe00001) AM_READNOP AM_WRITE(kaneko16_soundlatch_w)	// Read = IRQ Ack ?
 	AM_RANGE(0xe40000, 0xe40001) AM_READNOP	// IRQ Ack ?
 //  AM_RANGE(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
 	AM_RANGE(0xec0000, 0xec0001) AM_READNOP	// Lev 4 IRQ Ack ?
@@ -494,14 +494,14 @@ static WRITE16_DEVICE_HANDLER( bloodwar_oki_1_bank_w )
 	}
 }
 
-static WRITE16_HANDLER( bloodwar_coin_lockout_w )
+WRITE16_MEMBER(kaneko16_state::bloodwar_coin_lockout_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0100);
-		coin_counter_w(space->machine(), 1, data & 0x0200);
-		coin_lockout_w(space->machine(), 0, data & 0x8000);
-		coin_lockout_w(space->machine(), 1, data & 0x8000);
+		coin_counter_w(machine(), 0, data & 0x0100);
+		coin_counter_w(machine(), 1, data & 0x0200);
+		coin_lockout_w(machine(), 0, data & 0x8000);
+		coin_lockout_w(machine(), 1, data & 0x8000);
 	}
 }
 
@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE_LEGACY(toybox_mcu_com1_w)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE_LEGACY(toybox_mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE_LEGACY(toybox_mcu_com3_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")					// Sprites
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
 	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
@@ -534,7 +534,7 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("EXTRA")
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE_LEGACY(bloodwar_coin_lockout_w)	// Coin Lockout
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)	// Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE_LEGACY(kaneko16_display_enable)
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_LEGACY(toybox_mcu_status_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("oki1", bloodwar_oki_0_bank_w)
@@ -575,7 +575,7 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE_LEGACY(toybox_mcu_com1_w)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE_LEGACY(toybox_mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE_LEGACY(toybox_mcu_com3_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")					// Sprites
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
 	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
@@ -596,7 +596,7 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE_LEGACY(bloodwar_coin_lockout_w)	// Coin Lockout
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)	// Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE_LEGACY(kaneko16_display_enable)
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_LEGACY(toybox_mcu_status_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("oki1", bonkadv_oki_0_bank_w)
@@ -609,15 +609,15 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static READ16_HANDLER( gtmr_wheel_r )
+READ16_MEMBER(kaneko16_state::gtmr_wheel_r)
 {
 	// check 'Controls' dip switch
-	switch (input_port_read(space->machine(), "DSW1") & 0x1000)
+	switch (input_port_read(machine(), "DSW1") & 0x1000)
 	{
 		case 0x0000:	// 'Both Sides' = 270deg Wheel
-			return	(input_port_read(space->machine(), "WHEEL0"));
+			return	(input_port_read(machine(), "WHEEL0"));
 		case 0x1000:	// '1P Side' = 360' Wheel
-			return	(input_port_read(space->machine(), "WHEEL1"));
+			return	(input_port_read(machine(), "WHEEL1"));
 		default:
 			return	(0);
 	}
@@ -645,7 +645,7 @@ static WRITE16_DEVICE_HANDLER( gtmr_oki_1_bank_w )
 
 static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x0ffffd) AM_ROM																		// ROM
-	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ_LEGACY(gtmr_wheel_r)														// Wheel Value
+	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr_wheel_r)														// Wheel Value
 
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// Work RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_mcu_ram)											// Shared With MCU
@@ -655,7 +655,7 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE_LEGACY(toybox_mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE_LEGACY(toybox_mcu_com3_w)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x310000, 0x327fff) AM_RAM																		//
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")						// Sprites
 
@@ -677,14 +677,14 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)					// Samples
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x900014, 0x900015) AM_READ_LEGACY(kaneko16_rnd_r)													// Random Number ?
+	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)													// Random Number ?
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)						// Watchdog
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE_LEGACY(kaneko16_coin_lockout_w)											// Coin Lockout
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w)											// Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE_LEGACY(kaneko16_display_enable)											// might do more than that
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_LEGACY(toybox_mcu_status_r)
@@ -698,30 +698,30 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static READ16_HANDLER( gtmr2_wheel_r )
+READ16_MEMBER(kaneko16_state::gtmr2_wheel_r)
 {
-	switch (input_port_read(space->machine(), "DSW1") & 0x1800)
+	switch (input_port_read(machine(), "DSW1") & 0x1800)
 	{
 		case 0x0000:	// 270' A. Wheel
-			return	(input_port_read(space->machine(), "WHEEL0"));
+			return	(input_port_read(machine(), "WHEEL0"));
 		case 0x1000:	// 270' D. Wheel
-			return	(input_port_read(space->machine(), "WHEEL1") << 8);
+			return	(input_port_read(machine(), "WHEEL1") << 8);
 		case 0x0800:	// 360' Wheel
-			return	(input_port_read(space->machine(), "WHEEL2") << 8);
+			return	(input_port_read(machine(), "WHEEL2") << 8);
 		default:
-			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(&space->device()));
+			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(&space.device()));
 			return	(~0);
 	}
 }
 
-static READ16_HANDLER( gtmr2_IN1_r )
+READ16_MEMBER(kaneko16_state::gtmr2_IN1_r)
 {
-	return	(input_port_read(space->machine(), "P2") & (input_port_read(space->machine(), "FAKE") | ~0x7100));
+	return	(input_port_read(machine(), "P2") & (input_port_read(machine(), "FAKE") | ~0x7100));
 }
 
 static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x0ffffd) AM_ROM // ROM
-	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ_LEGACY(gtmr2_wheel_r)	// Wheel Value
+	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr2_wheel_r)	// Wheel Value
 
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_mcu_ram) // Shared With MCU
@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE_LEGACY(toybox_mcu_com2_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE_LEGACY(toybox_mcu_com3_w)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x310000, 0x327fff) AM_RAM //
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram") // Sprites
 
@@ -751,15 +751,15 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// Samples
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x900014, 0x900015) AM_READ_LEGACY(kaneko16_rnd_r)	// Random Number ?
+	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)	// Random Number ?
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 //  AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
-	AM_RANGE(0xb00002, 0xb00003) AM_READ_LEGACY(gtmr2_IN1_r)
+	AM_RANGE(0xb00002, 0xb00003) AM_READ(gtmr2_IN1_r)
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("EXTRA")
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE_LEGACY(kaneko16_coin_lockout_w)	// Coin Lockout
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(kaneko16_coin_lockout_w)	// Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE_LEGACY(kaneko16_display_enable)	// might do more than that
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_LEGACY(toybox_mcu_status_r)
@@ -778,7 +778,7 @@ static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE_LEGACY("ay1", kaneko16_YM2149_r, kaneko16_YM2149_w)	// Sound
 	AM_RANGE(0x400200, 0x40021f) AM_DEVREADWRITE_LEGACY("ay2", kaneko16_YM2149_r, kaneko16_YM2149_w)
 	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
 	AM_RANGE(0x601000, 0x601fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x602000, 0x602fff) AM_RAM AM_BASE(m_vscroll[1])									//
@@ -795,7 +795,7 @@ static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW_P1")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P2")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE_LEGACY(kaneko16_eeprom_w)	// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(kaneko16_eeprom_w)	// EEPROM
 ADDRESS_MAP_END
 
 
@@ -818,21 +818,21 @@ static void kaneko16_common_oki_bank_w( running_machine& machine, const char *ba
 	}
 }
 
-static WRITE16_HANDLER( shogwarr_oki_bank_w )
+WRITE16_MEMBER(kaneko16_state::shogwarr_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w(space->machine(), "bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w(space->machine(), "bank11", "oki2", (data & 0xf)     , 0x00000, 0x40000);
+		kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w(machine(), "bank11", "oki2", (data & 0xf)     , 0x00000, 0x40000);
 	}
 }
 
-static WRITE16_HANDLER( brapboys_oki_bank_w )
+WRITE16_MEMBER(kaneko16_state::brapboys_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w(space->machine(), "bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w(space->machine(), "bank11", "oki2", (data & 0xf)     , 0x20000, 0x20000);
+		kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w(machine(), "bank11", "oki2", (data & 0xf)     , 0x20000, 0x20000);
 	}
 }
 
@@ -846,7 +846,7 @@ static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x2b0000, 0x2b0001) AM_WRITE_LEGACY(calc3_mcu_com2_w)
 	//AM_RANGE(0x2c0000, 0x2c0001) AM_WRITE_LEGACY(calc3_run) // guess, might be irqack
 	AM_RANGE(0x2d0000, 0x2d0001) AM_WRITE_LEGACY(calc3_mcu_com3_w)
-	AM_RANGE(0x380000, 0x380fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x380000, 0x380fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// Samples
 	AM_RANGE(0x480000, 0x480001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x580000, 0x581fff) AM_RAM AM_SHARE("spriteram")					// Sprites
@@ -863,7 +863,7 @@ static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0xb80004, 0xb80005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb80006, 0xb80007) AM_READ_PORT("UNK")
 	AM_RANGE(0xd00000, 0xd00001) AM_NOP							// ? (bit 0)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE_LEGACY(shogwarr_oki_bank_w)	// Samples Bankswitching
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(shogwarr_oki_bank_w)	// Samples Bankswitching
 ADDRESS_MAP_END
 
 
@@ -3931,8 +3931,9 @@ static DRIVER_INIT( shogwarr )
 
 static DRIVER_INIT( brapboys )
 {
+	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	// sample banking is different on brap boys for the music, why? GALs / PALs ?
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe00000, 0xe00001, FUNC(brapboys_oki_bank_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_state::brapboys_oki_bank_w),state));
 
 	// default sample banks
 	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);

@@ -32,12 +32,12 @@ Notes:
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( tecmo16_sound_command_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0x00, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -53,9 +53,9 @@ static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE_LEGACY(tecmo16_colorram2_w) AM_BASE(m_colorram2)
 	AM_RANGE(0x122000, 0x127fff) AM_RAM	/* work area */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE_LEGACY(tecmo16_flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_WRITE_LEGACY(tecmo16_sound_command_w)
+	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP	/* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
 	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
@@ -76,9 +76,9 @@ static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE_LEGACY(tecmo16_colorram2_w) AM_BASE(m_colorram2)
 	AM_RANGE(0x124000, 0x124fff) AM_RAM	/* extra RAM for Riot */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE_LEGACY(tecmo16_flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_WRITE_LEGACY(tecmo16_sound_command_w)
+	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
 	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP	/* ??? */
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP	/* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
