@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_BASE(m_pf2_rowscroll)
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_device, read, 0x00ff)
@@ -96,14 +96,14 @@ ADDRESS_MAP_END
 
 /* Pocket Gal Deluxe (bootleg!) */
 
-static READ16_HANDLER( pckgaldx_unknown_r )
+READ16_MEMBER(pktgaldx_state::pckgaldx_unknown_r)
 {
 	return 0xffff;
 }
 
-static READ16_HANDLER( pckgaldx_protection_r )
+READ16_MEMBER(pktgaldx_state::pckgaldx_protection_r)
 {
-	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(&space->device()));
+	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(&space.device()));
 	return -1;
 }
 
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
 	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE_LEGACY("oki2", pktgaldx_oki_bank_w)
 	AM_RANGE(0x160000, 0x167fff) AM_WRITENOP
-	AM_RANGE(0x16500a, 0x16500b) AM_READ_LEGACY(pckgaldx_unknown_r)
+	AM_RANGE(0x16500a, 0x16500b) AM_READ(pckgaldx_unknown_r)
 
 	/* should we really be using these to read the i/o in the BOOTLEG?
       these look like i/o through protection ... */
@@ -144,14 +144,14 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x167c4c, 0x167c4d) AM_READ_PORT("DSW")
 	AM_RANGE(0x167db2, 0x167db3) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x167d10, 0x167d11) AM_READ_LEGACY(pckgaldx_protection_r) // check code at 6ea
-	AM_RANGE(0x167d1a, 0x167d1b) AM_READ_LEGACY(pckgaldx_protection_r) // check code at 7C4
+	AM_RANGE(0x167d10, 0x167d11) AM_READ(pckgaldx_protection_r) // check code at 6ea
+	AM_RANGE(0x167d1a, 0x167d1b) AM_READ(pckgaldx_protection_r) // check code at 7C4
 
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 
 	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram) // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_SHARE("paletteram") // extra colours?
 ADDRESS_MAP_END
 
 

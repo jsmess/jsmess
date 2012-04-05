@@ -17,33 +17,32 @@
 #include "sound/okim6295.h"
 #include "includes/ultraman.h"
 
-static WRITE16_HANDLER( sound_cmd_w )
+WRITE16_MEMBER(ultraman_state::sound_cmd_w)
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, data & 0xff);
 }
 
-static WRITE16_HANDLER( sound_irq_trigger_w )
+WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
 {
-	ultraman_state *state = space->machine().driver_data<ultraman_state>();
 
 	if (ACCESSING_BITS_0_7)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")/* Palette */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P2")
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c0008, 0x1c0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c0018, 0x1c0019) AM_WRITE_LEGACY(ultraman_gfxctrl_w)	/* counters + gfx ctrl */
-	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE_LEGACY(sound_cmd_w)
-	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE_LEGACY(sound_irq_trigger_w)
+	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
+	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
 	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0x00ff)	/* K051316 #0 RAM */
 	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0x00ff)	/* K051316 #1 RAM */

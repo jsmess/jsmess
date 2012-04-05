@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE_LEGACY(wrally_vram_w) AM_BASE(m_videoram)	/* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE(m_vregs)									/* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP												/* CLR INT Video */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM_WRITE(paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_SHARE("paletteram")	/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram)								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
@@ -122,18 +122,16 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_BASE(m_shareram)										/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
 
-static READ8_HANDLER( dallas_share_r )
+READ8_MEMBER(wrally_state::dallas_share_r)
 {
-	wrally_state *state = space->machine().driver_data<wrally_state>();
-	UINT8 *shareram = (UINT8 *)state->m_shareram;
+	UINT8 *shareram = (UINT8 *)m_shareram;
 
 	return shareram[BYTE_XOR_LE(offset) ^ 1];
 }
 
-static WRITE8_HANDLER( dallas_share_w )
+WRITE8_MEMBER(wrally_state::dallas_share_w)
 {
-	wrally_state *state = space->machine().driver_data<wrally_state>();
-	UINT8 *shareram = (UINT8 *)state->m_shareram;
+	UINT8 *shareram = (UINT8 *)m_shareram;
 
 	shareram[BYTE_XOR_LE(offset) ^ 1] = data;
 }
@@ -143,7 +141,7 @@ static ADDRESS_MAP_START( dallas_rom, AS_PROGRAM, 8, wrally_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dallas_ram, AS_IO, 8, wrally_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(dallas_share_r, dallas_share_w)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
 ADDRESS_MAP_END
 
 /* DS5002FP configuration */

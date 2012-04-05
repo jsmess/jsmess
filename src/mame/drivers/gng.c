@@ -27,17 +27,17 @@ Notes:
 #include "includes/gng.h"
 
 
-static WRITE8_HANDLER( gng_bankswitch_w )
+WRITE8_MEMBER(gng_state::gng_bankswitch_w)
 {
 	if (data == 4)
-		memory_set_bank(space->machine(), "bank1", 4);
+		memory_set_bank(machine(), "bank1", 4);
 	else
-		memory_set_bank(space->machine(), "bank1", (data & 0x03));
+		memory_set_bank(machine(), "bank1", (data & 0x03));
 }
 
-static WRITE8_HANDLER( gng_coin_counter_w )
+WRITE8_MEMBER(gng_state::gng_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data);
+	coin_counter_w(machine(), offset, data);
 }
 
 static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
@@ -50,16 +50,16 @@ static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3800, 0x38ff) AM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3900, 0x39ff) AM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3800, 0x38ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0x3900, 0x39ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE_LEGACY(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE_LEGACY(gng_bgscrolly_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_NOP /* watchdog? */
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE_LEGACY(gng_flipscreen_w)
 //  { 0x3d01, 0x3d01, reset sound cpu?
-	AM_RANGE(0x3d02, 0x3d03) AM_WRITE_LEGACY(gng_coin_counter_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE_LEGACY(gng_bankswitch_w)
+	AM_RANGE(0x3d02, 0x3d03) AM_WRITE(gng_coin_counter_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(gng_bankswitch_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -328,10 +328,10 @@ static MACHINE_RESET( gng )
                  For now let's fill everything with white colors until we have better info about it */
 		for(i=0;i<0x100;i+=4)
 		{
-			machine.generic.paletteram.u8[i] = machine.generic.paletteram2.u8[i] = 0x00;
-			machine.generic.paletteram.u8[i+1] = machine.generic.paletteram2.u8[i+1] = 0x55;
-			machine.generic.paletteram.u8[i+2] = machine.generic.paletteram2.u8[i+2] = 0xaa;
-			machine.generic.paletteram.u8[i+3] = machine.generic.paletteram2.u8[i+3] = 0xff;
+			state->m_generic_paletteram_8[i] = state->m_generic_paletteram2_8[i] = 0x00;
+			state->m_generic_paletteram_8[i+1] = state->m_generic_paletteram2_8[i+1] = 0x55;
+			state->m_generic_paletteram_8[i+2] = state->m_generic_paletteram2_8[i+2] = 0xaa;
+			state->m_generic_paletteram_8[i+3] = state->m_generic_paletteram2_8[i+3] = 0xff;
 			palette_set_color_rgb(machine,i+0,0x00,0x00,0x00);
 			palette_set_color_rgb(machine,i+1,0x55,0x55,0x55);
 			palette_set_color_rgb(machine,i+2,0xaa,0xaa,0xaa);
@@ -730,14 +730,15 @@ ROM_END
 
 
 
-static READ8_HANDLER( diamond_hack_r )
+READ8_MEMBER(gng_state::diamond_hack_r)
 {
 	return 0;
 }
 
 static DRIVER_INIT( diamond )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000, 0x6000, FUNC(diamond_hack_r));
+	gng_state *state = machine.driver_data<gng_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x6000, 0x6000, read8_delegate(FUNC(gng_state::diamond_hack_r),state));
 }
 
 
