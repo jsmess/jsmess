@@ -2042,9 +2042,9 @@ COMP( 1987, t1000tx,    ibm5150,    0,          t1000_286,  tandy1t,    t1000hx,
 COMP( 1989, t1000rl,    ibm5150,    0,          t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 RL", 0)
 COMP( 1989, t1000tl2,   ibm5150,    0,          t1000_286,  tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0)
 
-COMP( 1989, iskr1031,   ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "Iskra-1031", GAME_NOT_WORKING)
-COMP( 1989, iskr1030m,  ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "Iskra-1030M", GAME_NOT_WORKING)
-COMP( 19??, iskr3104,   ibm5150,    0,          iskr3104,   pcega,      pccga,      "<unknown>", "Iskra-3104", GAME_NOT_WORKING)
+COMP( 1989, iskr1031,   ibm5150,    0,          iskr1031,   pccga,      pccga,      "Schetmash", "Iskra 1031", GAME_NOT_WORKING)
+COMP( 1989, iskr1030m,  ibm5150,    0,          iskr1031,   pccga,      pccga,      "Schetmash", "Iskra 1030M", GAME_NOT_WORKING)
+COMP( 1992, iskr3104,   ibm5150,    0,          iskr3104,   pcega,      pccga,      "Schetmash", "Iskra 3104", GAME_NOT_WORKING)
 COMP( 1987, ec1840,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "EC-1840", GAME_NOT_WORKING)
 COMP( 1987, ec1841,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "EC-1841", GAME_NOT_WORKING)
 COMP( 1989, ec1845,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "EC-1845", GAME_NOT_WORKING)
