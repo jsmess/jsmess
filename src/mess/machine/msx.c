@@ -641,7 +641,7 @@ WRITE8_DEVICE_HANDLER( msx_printer_data_w )
 		/* SIMPL emulation */
 		dac_signed_data_w(device->machine().device("dac"), data);
 	else
-		device->machine().device<centronics_device>("centronics")->write(*memory_nonspecific_space(device->machine()), 0, data);
+		device->machine().device<centronics_device>("centronics")->write(*device->machine().memory().first_space(), 0, data);
 }
 
 READ8_DEVICE_HANDLER( msx_printer_status_r )

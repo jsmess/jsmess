@@ -164,7 +164,7 @@ READ8_DEVICE_HANDLER( pc_lpt_data_r )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
 	// pull up mechanism for input lines, zeros are provided by pheripherial
-	return lpt->data & ~lpt->centronics->read(*memory_nonspecific_space(device->machine()), 0);
+	return lpt->data & ~lpt->centronics->read(*device->machine().memory().first_space(), 0);
 }
 
 
@@ -172,7 +172,7 @@ WRITE8_DEVICE_HANDLER( pc_lpt_data_w )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
 	lpt->data = data;
-	lpt->centronics->write(*memory_nonspecific_space(device->machine()), 0, data);
+	lpt->centronics->write(*device->machine().memory().first_space(), 0, data);
 }
 
 
