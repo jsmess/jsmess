@@ -109,21 +109,23 @@ class jrpacman_state : public pacman_state
 public:
 	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
+	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 
 
-static WRITE8_HANDLER( jrpacman_interrupt_vector_w )
+WRITE8_MEMBER(jrpacman_state::jrpacman_interrupt_vector_w)
 {
-	device_set_input_line_vector(space->machine().device("maincpu"), 0, data);
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	device_set_input_line_vector(machine().device("maincpu"), 0, data);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(jrpacman_state::irq_mask_w)
 {
-	jrpacman_state *state = space->machine().driver_data<jrpacman_state>();
 
-	state->m_irq_mask = data & 1;
+
+	m_irq_mask = data & 1;
 }
 
 /*************************************
@@ -134,23 +136,23 @@ static WRITE8_HANDLER( irq_mask_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jrpacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE_LEGACY(jrpacman_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4800, 0x4fef) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
-	AM_RANGE(0x5003, 0x5003) AM_WRITE_LEGACY(pacman_flipscreen_w)
+	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("P2")
 	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x5070, 0x5070) AM_WRITE_LEGACY(pengo_palettebank_w)
-	AM_RANGE(0x5071, 0x5071) AM_WRITE_LEGACY(pengo_colortablebank_w)
-	AM_RANGE(0x5073, 0x5073) AM_WRITE_LEGACY(jrpacman_bgpriority_w)
-	AM_RANGE(0x5074, 0x5074) AM_WRITE_LEGACY(jrpacman_charbank_w)
-	AM_RANGE(0x5075, 0x5075) AM_WRITE_LEGACY(jrpacman_spritebank_w)
+	AM_RANGE(0x5070, 0x5070) AM_WRITE(pengo_palettebank_w)
+	AM_RANGE(0x5071, 0x5071) AM_WRITE(pengo_colortablebank_w)
+	AM_RANGE(0x5073, 0x5073) AM_WRITE(jrpacman_bgpriority_w)
+	AM_RANGE(0x5074, 0x5074) AM_WRITE(jrpacman_charbank_w)
+	AM_RANGE(0x5075, 0x5075) AM_WRITE(jrpacman_spritebank_w)
 	AM_RANGE(0x5080, 0x50bf) AM_READ_PORT("DSW")
-	AM_RANGE(0x5080, 0x5080) AM_WRITE_LEGACY(jrpacman_scroll_w)
+	AM_RANGE(0x5080, 0x5080) AM_WRITE(jrpacman_scroll_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITENOP
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
@@ -158,7 +160,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, jrpacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0, 0) AM_WRITE_LEGACY(jrpacman_interrupt_vector_w)
+	AM_RANGE(0, 0) AM_WRITE(jrpacman_interrupt_vector_w)
 ADDRESS_MAP_END
 
 
