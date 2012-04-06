@@ -699,7 +699,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 static WRITE8_DEVICE_HANDLER( misc_ppi_pb_w )
 {
 	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
-	centronics->write( *memory_nonspecific_space(device->machine()) , 0, ~data & 0xff);
+	centronics->write( *device->machine().memory().first_space() , 0, ~data & 0xff);
 }
 
 static READ8_DEVICE_HANDLER( misc_ppi_pc_r )

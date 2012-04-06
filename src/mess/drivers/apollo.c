@@ -1175,7 +1175,7 @@ static GENERIC_TERMINAL_INTERFACE( apollo_terminal_config ) {
 void apollo_terminal_write(UINT8 data) {
 	if (dsp_terminal != NULL) {
 		// output data to the terminal emulator
-		dynamic_cast<generic_terminal_device *>(dsp_terminal)->write(*memory_nonspecific_space(dsp_terminal->machine()), 0, data);
+		dynamic_cast<generic_terminal_device *>(dsp_terminal)->write(*dsp_terminal->machine().memory().first_space(), 0, data);
 	}
 }
 

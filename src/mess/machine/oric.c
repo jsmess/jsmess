@@ -242,7 +242,7 @@ static WRITE8_DEVICE_HANDLER ( oric_via_out_a_func )
 	{
 		/* if psg not selected, write to printer */
 		centronics_device *centronics = device->machine().device<centronics_device>("centronics");
-		centronics->write(*memory_nonspecific_space(device->machine()), 0, data);
+		centronics->write(*device->machine().memory().first_space(), 0, data);
 	}
 }
 

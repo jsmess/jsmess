@@ -765,7 +765,7 @@ static WRITE8_DEVICE_HANDLER( to7_io_portb_out )
 	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), data ));
 
 	/* set 8-bit data */
-	printer->write( *memory_nonspecific_space(device->machine()), 0, data);
+	printer->write( *device->machine().memory().first_space(), 0, data);
 }
 
 
@@ -2961,7 +2961,7 @@ static READ8_DEVICE_HANDLER ( to9_sys_porta_in )
 static WRITE8_DEVICE_HANDLER ( to9_sys_porta_out )
 {
 	centronics_device *printer = device->machine().device<centronics_device>("centronics");
-	printer->write(*memory_nonspecific_space(device->machine()), 0, data & 0xfe);
+	printer->write(*device->machine().memory().first_space(), 0, data & 0xfe);
 }
 
 
@@ -4472,7 +4472,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_game_porta_out )
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", cpu_get_previouspc(device->machine().device("maincpu")), device->machine().time().as_double(), data ));
 
 	/* centronics data */
-	printer->write( *memory_nonspecific_space(device->machine()), 0, data);
+	printer->write( *device->machine().memory().first_space(), 0, data);
 }
 
 
