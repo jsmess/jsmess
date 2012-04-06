@@ -173,8 +173,6 @@ Compiled by K1W1
 
    - Chalkboard Inc.                 ER       Leo's Links
 
-   - Convologic                               WAM
-
    - Elcomp                          ER       Atext-1 (Word Processor)
    - Elcomp                          ER       Atmas (Macro Assembler)
    - Elcomp                          ER       Atmona-1 (Machine Language Monitor)
@@ -760,7 +758,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="astro chase (first star software)(1982).rom" size="16384" crc="18752991" sha1="f508b89d2251c53d017cff6cb23b8e9880a0cc0b" offset="0" />
+				<rom name="astro chase (first star software)(1982).rom" size="16384" crc="18752991" sha1="f508b89d2251c53d017cff6cb23b8e9880a0cc0b" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -1538,7 +1536,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="chiffres et des lettres, des (alt).rom" size="16384" crc="3d8f5c25" sha1="51c490b284e44923943b2327550e3e40e7bcc6c5" offset="0" />
+				<rom name="chiffres et des lettres, des (alt).rom" size="16384" crc="3d8f5c25" sha1="51c490b284e44923943b2327550e3e40e7bcc6c5" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2443,7 +2441,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="gold mine.rom" size="8192" crc="8459b11e" sha1="5a1e44ac64205c08ce6037facb0b1b428c1e3115" offset="0" />
+				<rom name="gold mine.rom" size="8192" crc="8459b11e" sha1="5a1e44ac64205c08ce6037facb0b1b428c1e3115" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -3098,6 +3096,186 @@ Compiled by K1W1
 			<feature name="cart_type" value="right slot 8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="magic dump 2.rom" size="8192" crc="8184c0d4" sha1="705c5f41c6ed6c638f424728dd6a9afd074665ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega1" supported="partial">
+		<description>Mega Cartridge 01 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 1.rom" size="65536" crc="da0a5ae4" sha1="44951a131e906395e14727915e791f4a011a63a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega2" supported="partial">
+		<description>Mega Cartridge 02 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 2.rom" size="65536" crc="2d200f74" sha1="da57c3c29b4139d7f8e84af2e0674db359b8d248" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega3" supported="partial">
+		<description>Mega Cartridge 03 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 3 [b].rom" size="65536" crc="914372c0" sha1="220e769dd0a4b7237af27e6d73391e5016fbed63" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega4" supported="partial">
+		<description>Mega Cartridge 04 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 4.rom" size="65536" crc="8e12b596" sha1="d444c50463ef208667997343663596b94f482c56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega5" supported="partial">
+		<description>Mega Cartridge 05 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 5.rom" size="65536" crc="e4ee1623" sha1="93722a32130b481f3f99d2b47c01db5461e1525b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega6" supported="partial">
+		<description>Mega Cartridge 06 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 6.rom" size="65536" crc="85ecbc95" sha1="02e6eef1ce699fe330b9bfa40660789dcec50cd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega7" supported="partial">
+		<description>Mega Cartridge 07 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 7.rom" size="65536" crc="def97719" sha1="98eb12dc988ae08ca8112dcc189a188027ef520d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega8" supported="partial">
+		<description>Mega Cartridge 08 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 8.rom" size="65536" crc="a2b4ee4d" sha1="d1f3624f8513204c74726880a231b06dd9499cf4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega9" supported="partial">
+		<description>Mega Cartridge 09 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 9.rom" size="65536" crc="00241602" sha1="3e43e0783db4d0feb4229b5f91917c5778dd5ea7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega10" supported="partial">
+		<description>Mega Cartridge 10 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 10.rom" size="65536" crc="629bc83b" sha1="94d928c9deb9a51554b4f7805d480d19ba9ebc0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega11" supported="partial">
+		<description>Mega Cartridge 11 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 11.rom" size="65536" crc="aafe6b95" sha1="da890904d96322c49992e1867a858bf4d9170d47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega12" supported="partial">
+		<description>Mega Cartridge 12 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 12.rom" size="65536" crc="1014548a" sha1="7bd519d68cee4ba74b3ec405561347ea09691fc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega13" supported="partial">
+		<description>Mega Cartridge 13 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 13.rom" size="65536" crc="acbe80d9" sha1="001037c9f18d3e1433a5713bb30361b7f82f0811" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega14" supported="partial">
+		<description>Mega Cartridge 14 (Spa, Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 14.rom" size="65536" crc="722e760e" sha1="5f3d45f8cfd765bebb2197e842dec8a3e5895193" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega15" supported="partial">
+		<description>Mega Cartridge 15 (Pirate)</description>
+		<year>2004</year>
+		<publisher>Willysoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="mega cartridge 15.rom" size="65536" crc="04d3a9fb" sha1="607b2706fb7d7b783900936329f0286e5e4767df" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3959,6 +4137,90 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="princess and the frog.rom" size="8192" crc="7ce79281" sha1="eaa63bb404248aae516872b069e78840932d18c5" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma1" supported="partial">
+		<description>Prisma 1 (Spa, Pirate)</description>
+		<year>199?</year>
+		<publisher>Prismasoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="prisma 1.rom" size="65536" crc="fc2f3210" sha1="89b25b330b1d9789a70f2680926d283cbdb90ce5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma2" supported="partial">
+		<description>Prisma 2 (Spa, Pirate)</description>
+		<year>199?</year>
+		<publisher>Prismasoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="prisma 2.rom" size="65536" crc="6c79351e" sha1="09f1eba81aced69cf55536deda5fcfd33b6a1cfa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma3" supported="partial">
+		<description>Prisma 3 (Spa, Pirate)</description>
+		<year>1992</year>
+		<publisher>Prismasoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="prisma 3 [b].rom" size="65536" crc="a136fef3" sha1="9c621da086eaf221be4d9149ee49f67c342349cc" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma4" supported="partial">
+		<description>Prisma 4 (Spa, Pirate)</description>
+		<year>1992</year>
+		<publisher>Prismasoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="prisma 4.rom" size="65536" crc="670c49c6" sha1="b0dfe38188b2917b244a845aad85533f2987da1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma5" supported="partial">
+		<description>Prisma 5 (Spa, Pirate)</description>
+		<year>1992</year>
+		<publisher>Prismasoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="prisma 5.rom" size="65536" crc="ab71896a" sha1="66339b44c0e2775aa20a6ecad8e6281af2f8ea77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prisma6" supported="partial">
+		<description>Prisma 6 (Spa, Pirate)</description>
+		<year>1992</year>
+		<publisher>Prismasoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="prisma 6.rom" size="65536" crc="8f7e24df" sha1="80c12cf4095afc1d42f76be407a5af7f9eeb34d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prismas" supported="partial">
+		<description>Prisma Super 15-2 (Spa, Pirate)</description>
+		<year>1992</year>
+		<publisher>Prismasoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="prisma super 15-2.rom" size="65536" crc="62a7b77e" sha1="4962cf4ecf14a837210a588058d8f65708f7a353" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5046,6 +5308,222 @@ Compiled by K1W1
 			<feature name="peripheral" value="trackfld" /> <!-- Works with Track &amp; Field controller -->
 			<dataarea name="rom" size="16384">
 				<rom name="track and field.rom" size="16384" crc="9e2484c8" sha1="899305b96e204e8091183733bec43fbd84c18d4a" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboc1" supported="no">
+		<description>Turbo Cartridge C1 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge c1.rom" size="65536" crc="360a47b3" sha1="0f58e467e46c70f96c4c757f4e2031c0d44855c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboc2" supported="no">
+		<description>Turbo Cartridge C2 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge c2.rom" size="65536" crc="ade93e66" sha1="02e24a1444e6d4ee3ab8dae5cba58724f5cbb34f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboc3" supported="no">
+		<description>Turbo Cartridge C3 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge c3.rom" size="65536" crc="bedf99fe" sha1="7a51c4e1e473431c8795fe6d8407fee6fce034d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboc4" supported="no">
+		<description>Turbo Cartridge C4 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge c4.rom" size="65536" crc="97a8c904" sha1="dc13ec8759ae7482d66fd8c9208a53cf43de5f18" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboc5" supported="no">
+		<description>Turbo Cartridge C5 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge c5.rom" size="65536" crc="78dbb563" sha1="a9a324ef33887bac5ab144349630bf353cc182c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboc6" supported="no">
+		<description>Turbo Cartridge C6 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge c6.rom" size="65536" crc="49e18f6e" sha1="fe780141e181cef71c5833a7f027272dafc3225e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbod1" supported="no">
+		<description>Turbo Cartridge D1 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge d1.rom" size="131072" crc="4d1dd418" sha1="91a2e78abe4f3bfa0a95d2248e988c556fe8a5c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbod2" supported="no">
+		<description>Turbo Cartridge D2 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge d2.rom" size="131072" crc="025ab67a" sha1="d456adb1c53f24e15a88c00a54b33ad22c9e7fcf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbod3" supported="no">
+		<description>Turbo Cartridge D3 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge d3.rom" size="131072" crc="bca7d11b" sha1="fb75c42cc1c896aaabda7e9591a45fe9a2f3a8e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbod4" supported="no">
+		<description>Turbo Cartridge D4 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge d4 [b].rom" size="131072" crc="72df4a5e" sha1="519abe32c6c3ee09ec8f027790da4d51157ba468" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbod5" supported="no">
+		<description>Turbo Cartridge D5 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge d5.rom" size="131072" crc="a5aee6fd" sha1="136bfa432b5ab340c332019e8ceb847f4afd1b03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbod6" supported="no">
+		<description>Turbo Cartridge D6 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge d6.rom" size="131072" crc="5498c7dc" sha1="e2ee9d60d4ce806ff822ca14d45758a26d4502cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbod7" supported="no">
+		<description>Turbo Cartridge D7 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge d7.rom" size="131072" crc="3fb92d9e" sha1="f4c492b2c47c14bb5c8e2e3351b2b79d07395260" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbod8" supported="no">
+		<description>Turbo Cartridge D8 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge d8.rom" size="65536" crc="3d68152e" sha1="84c215aa71d2cb94b11f6b6859af8d3c2e65b3cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboe1" supported="no">
+		<description>Turbo Cartridge E1 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge e1.rom" size="131072" crc="fa100cbf" sha1="c016952dc27960e33de3f0e652b8f4147d97d212" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboe2" supported="no">
+		<description>Turbo Cartridge E2 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="turbosoft 128k" />
+			<dataarea name="rom" size="131072">
+				<rom name="turbocartridge e2.rom" size="131072" crc="bede95cd" sha1="0d1ab2d43fc71ee5c0f55f9dc6e893a651ae7a62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbox1" supported="no">
+		<description>Turbo Cartridge X1 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge x1.rom" size="65536" crc="1dccc2c7" sha1="5e9ca706bbd9af33f260962e648b27f48a4b97fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbox2" supported="no">
+		<description>Turbo Cartridge X2 (Spa, Pirate)</description>
+		<year>19??</year>
+		<publisher>Turbosoft</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="turbocartridge x2.rom" size="65536" crc="11f334dc" sha1="1af66bdb23a4df4b4c324ac2994dd239888ab588" offset="0" />
 			</dataarea>
 		</part>
 	</software>
