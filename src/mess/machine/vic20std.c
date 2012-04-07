@@ -44,65 +44,26 @@ void vic20_standard_cartridge_device::device_start()
 
 
 //-------------------------------------------------
-//  vic20_blk1_r - block 1 read
+//  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic20_standard_cartridge_device::vic20_blk1_r(address_space &space, offs_t offset)
+UINT8 vic20_standard_cartridge_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	UINT8 data = 0;
 
-	if (m_blk1 != NULL)
+	if (!blk1 && (m_blk1 != NULL))
 	{
 		data = m_blk1[offset & 0x1fff];
 	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk2_r - block 2 read
-//-------------------------------------------------
-
-UINT8 vic20_standard_cartridge_device::vic20_blk2_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (m_blk2 != NULL)
+	else if (!blk2 && (m_blk2 != NULL))
 	{
 		data = m_blk2[offset & 0x1fff];
 	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk3_r - block 3 read
-//-------------------------------------------------
-
-UINT8 vic20_standard_cartridge_device::vic20_blk3_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (m_blk3 != NULL)
+	else if (!blk3 && (m_blk3 != NULL))
 	{
 		data = m_blk3[offset & 0x1fff];
 	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk5_r - block 5 read
-//-------------------------------------------------
-
-UINT8 vic20_standard_cartridge_device::vic20_blk5_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (m_blk5 != NULL)
+	else if (!blk5 && (m_blk5 != NULL))
 	{
 		data = m_blk5[offset & 0x1fff];
 	}
