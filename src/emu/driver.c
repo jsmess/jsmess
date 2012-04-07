@@ -2,7 +2,7 @@
 
     driver.c
 
-    Driver enumeration helpers.
+    Core driver device base class.
 
 ****************************************************************************
 
@@ -38,393 +38,247 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <ctype.h>
-
-
-
-//**************************************************************************
-//  DRIVER LIST
-//**************************************************************************
-
-//-------------------------------------------------
-//  driver_list - constructor
-//-------------------------------------------------
-
-driver_list::driver_list()
-{
-}
-
-
-//-------------------------------------------------
-//  find - find a driver by name
-//-------------------------------------------------
-
-int driver_list::find(const char *name)
-{
-	// if no name, bail
-	if (name == NULL)
-		return -1;
-
-	// create a dummy item for comparison purposes
-	game_driver driver;
-	driver.name = name;
-	game_driver *driverptr = &driver;
-
-	// binary search to find it
-	const game_driver **result = reinterpret_cast<const game_driver **>(bsearch(&driverptr, s_drivers_sorted, s_driver_count, sizeof(*s_drivers_sorted), driver_sort_callback));
-	return (result == NULL) ? -1 : result - s_drivers_sorted;
-}
-
-
-//-------------------------------------------------
-//  matches - true if we match, taking into
-//  account wildcards in the wildstring
-//-------------------------------------------------
-
-bool driver_list::matches(const char *wildstring, const char *string)
-{
-	// can only match internal drivers if the wildstring starts with an underscore
-	if (string[0] == '_' && (wildstring == NULL || wildstring[0] != '_'))
-		return false;
-
-	// match everything else normally
-	return (wildstring == NULL || mame_strwildcmp(wildstring, string) == 0);
-}
-
-
-//-------------------------------------------------
-//  driver_sort_callback - compare two items in
-//  an array of game_driver pointers
-//-------------------------------------------------
-
-int driver_list::driver_sort_callback(const void *elem1, const void *elem2)
-{
-	const game_driver * const *item1 = reinterpret_cast<const game_driver * const *>(elem1);
-	const game_driver * const *item2 = reinterpret_cast<const game_driver * const *>(elem2);
-	return mame_stricmp((*item1)->name, (*item2)->name);
-}
-
-
-//-------------------------------------------------
-//  penalty_compare - compare two strings for
-//  closeness and assign a score.
-//-------------------------------------------------
-
-int driver_list::penalty_compare(const char *source, const char *target)
-{
-	int gaps = 1;
-	bool last = true;
-
-	// scan the strings
-	for ( ; *source && *target; target++)
-	{
-		// do a case insensitive match
-		bool match = (tolower((UINT8)*source) == tolower((UINT8)*target));
-
-		// if we matched, advance the source
-		if (match)
-			source++;
-
-		// if the match state changed, count gaps
-		if (match != last)
-		{
-			last = match;
-			if (!match)
-				gaps++;
-		}
-	}
-
-	// penalty if short string does not completely fit in
-	for ( ; *source; source++)
-		gaps++;
-
-	// if we matched perfectly, gaps == 0
-	if (gaps == 1 && *source == 0 && *target == 0)
-		gaps = 0;
-
-	return gaps;
-}
-
+#include "drivenum.h"
 
 
 //**************************************************************************
-//  DRIVER ENUMERATOR
+//  DRIVER DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  driver_enumerator - constructor
+//  driver_device - constructor
 //-------------------------------------------------
 
-driver_enumerator::driver_enumerator(emu_options &options)
-	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
+	: device_t(mconfig, type, "Driver Device", tag, NULL, 0),
+	  m_system(NULL),
+	  m_palette_init(NULL),
+	  m_generic_paletteram_8(*this, "paletteram"),
+	  m_generic_paletteram2_8(*this, "paletteram2"),
+	  m_generic_paletteram_16(*this, "paletteram"),
+	  m_generic_paletteram2_16(*this, "paletteram2"),
+	  m_generic_paletteram_32(*this, "paletteram"),
+	  m_generic_paletteram2_32(*this, "paletteram2")
 {
-	include_all();
-}
-
-
-driver_enumerator::driver_enumerator(emu_options &options, const char *string)
-	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
-{
-	filter(string);
-}
-
-
-driver_enumerator::driver_enumerator(emu_options &options, const game_driver &driver)
-	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
-{
-	filter(driver);
+	memset(m_callbacks, 0, sizeof(m_callbacks));
 }
 
 
 //-------------------------------------------------
-//  ~driver_enumerator - destructor
+//  driver_device - destructor
 //-------------------------------------------------
 
-driver_enumerator::~driver_enumerator()
-{
-	// free any configs
-	for (int index = 0; index < s_driver_count; index++)
-		global_free(m_config[index]);
-
-	// free the arrays
-	global_free(m_included);
-	global_free(m_config);
-}
-
-
-//-------------------------------------------------
-//  config - return a machine_config for the given
-//  driver, allocating on demand if needed
-//-------------------------------------------------
-
-machine_config &driver_enumerator::config(int index, emu_options &options) const
-{
-	assert(index >= 0 && index < s_driver_count);
-
-	// if we don't have it cached, add it
-	if (m_config[index] == NULL)
-	{
-		// if our cache is full, release the head entry
-		if (m_config_cache.count() == CONFIG_CACHE_COUNT)
-		{
-			config_entry *first = m_config_cache.first();
-			m_config[first->index()] = NULL;
-			m_config_cache.remove(*first);
-		}
-
-		// allocate the config and add it to the end of the list
-		machine_config *config = m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], options));
-		m_config_cache.append(*global_alloc(config_entry(*config, index)));
-	}
-	return *m_config[index];
-}
-
-
-//-------------------------------------------------
-//  filter - filter the driver list against the
-//  given string
-//-------------------------------------------------
-
-int driver_enumerator::filter(const char *filterstring)
-{
-	// reset the count
-	exclude_all();
-
-	// match name against each driver in the list
-	for (int index = 0; index < s_driver_count; index++)
-		if (matches(filterstring, s_drivers_sorted[index]->name))
-			include(index);
-
-	return m_filtered_count;
-}
-
-
-//-------------------------------------------------
-//  filter - filter the driver list against the
-//  given driver
-//-------------------------------------------------
-
-int driver_enumerator::filter(const game_driver &driver)
-{
-	// reset the count
-	exclude_all();
-
-	// match name against each driver in the list
-	for (int index = 0; index < s_driver_count; index++)
-		if (s_drivers_sorted[index] == &driver)
-			include(index);
-
-	return m_filtered_count;
-}
-
-
-//-------------------------------------------------
-//  include_all - include all non-internal drivers
-//-------------------------------------------------
-
-void driver_enumerator::include_all()
-{
-	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count;
-	int empty = find("___empty");
-	assert(empty != -1);
-	m_included[empty] = 0;
-}
-
-
-//-------------------------------------------------
-//  next - get the next driver matching the given
-//  filter
-//-------------------------------------------------
-
-bool driver_enumerator::next()
-{
-	// always advance one
-	m_current++;
-
-	// if we have a filter, scan forward to the next match
-	while (m_current < s_driver_count)
-	{
-		if (m_included[m_current])
-			break;
-		m_current++;
-	}
-
-	// return true if we end up in range
-	return (m_current >= 0 && m_current < s_driver_count);
-}
-
-
-//-------------------------------------------------
-//  next_excluded - get the next driver that is
-//  not currently included in the list
-//-------------------------------------------------
-
-bool driver_enumerator::next_excluded()
-{
-	// always advance one
-	m_current++;
-
-	// if we have a filter, scan forward to the next match
-	while (m_current < s_driver_count)
-	{
-		if (!m_included[m_current])
-			break;
-		m_current++;
-	}
-
-	// return true if we end up in range
-	return (m_current >= 0 && m_current < s_driver_count);
-}
-
-
-//-------------------------------------------------
-//  driver_sort_callback - compare two items in
-//  an array of game_driver pointers
-//-------------------------------------------------
-
-void driver_enumerator::find_approximate_matches(const char *string, int count, int *results)
-{
-#undef rand
-
-	// if no name, pick random entries
-	if (string == NULL || string[0] == 0)
-	{
-		// seed the RNG first
-		srand(osd_ticks());
-
-		// allocate a temporary list
-		int *templist = global_alloc_array(int, m_filtered_count);
-		int arrayindex = 0;
-		for (int index = 0; index < s_driver_count; index++)
-			if (m_included[index])
-				templist[arrayindex++] = index;
-		assert(arrayindex == m_filtered_count);
-
-		// shuffle
-		for (int shufnum = 0; shufnum < 4 * s_driver_count; shufnum++)
-		{
-			int item1 = rand() % m_filtered_count;
-			int item2 = rand() % m_filtered_count;
-			int temp = templist[item1];
-			templist[item1] = templist[item2];
-			templist[item2] = temp;
-		}
-
-		// copy out the first few entries
-		for (int matchnum = 0; matchnum < count; matchnum++)
-			results[matchnum] = templist[matchnum % m_filtered_count];
-
-		global_free(templist);
-		return;
-	}
-
-	// allocate memory to track the penalty value
-	int *penalty = global_alloc_array(int, count);
-
-	// initialize everyone's states
-	for (int matchnum = 0; matchnum < count; matchnum++)
-	{
-		penalty[matchnum] = 9999;
-		results[matchnum] = -1;
-	}
-
-	// scan the entire drivers array
-	for (int index = 0; index < s_driver_count; index++)
-		if (m_included[index])
-		{
-			// skip things that can't run
-			if ((s_drivers_sorted[index]->flags & GAME_NO_STANDALONE) != 0)
-				continue;
-
-			// pick the best match between driver name and description
-			int curpenalty = penalty_compare(string, s_drivers_sorted[index]->description);
-			int tmp = penalty_compare(string, s_drivers_sorted[index]->name);
-			curpenalty = MIN(curpenalty, tmp);
-
-			// insert into the sorted table of matches
-			for (int matchnum = count - 1; matchnum >= 0; matchnum--)
-			{
-				// stop if we're worse than the current entry
-				if (curpenalty >= penalty[matchnum])
-					break;
-
-				// as long as this isn't the last entry, bump this one down
-				if (matchnum < count - 1)
-				{
-					penalty[matchnum + 1] = penalty[matchnum];
-					results[matchnum + 1] = results[matchnum];
-				}
-				results[matchnum] = index;
-				penalty[matchnum] = curpenalty;
-			}
-		}
-
-	// free our temp memory
-	global_free(penalty);
-}
-
-
-driver_enumerator::config_entry::config_entry(machine_config &config, int index)
-	: m_next(NULL),
-	  m_config(&config),
-	  m_index(index)
+driver_device::~driver_device()
 {
 }
 
 
-driver_enumerator::config_entry::~config_entry()
+//-------------------------------------------------
+//  static_set_game - set the game in the device
+//  configuration
+//-------------------------------------------------
+
+void driver_device::static_set_game(device_t &device, const game_driver &game)
 {
-	global_free(m_config);
+	driver_device &driver = downcast<driver_device &>(device);
+
+	// set the system
+	driver.m_system = &game;
+
+	// set the short name to the game's name
+	driver.m_shortname = game.name;
+
+	// set the full name to the game's description
+	driver.m_name = game.description;
+
+	// and set the search path to include all parents
+	driver.m_searchpath = game.name;
+	for (int parent = driver_list::clone(game); parent != -1; parent = driver_list::clone(parent))
+		driver.m_searchpath.cat(";").cat(driver_list::driver(parent).name);
+}
+
+
+//-------------------------------------------------
+//  static_set_machine_start - set the legacy
+//  machine start callback in the device
+//  configuration
+//-------------------------------------------------
+
+void driver_device::static_set_callback(device_t &device, callback_type type, legacy_callback_func callback)
+{
+	downcast<driver_device &>(device).m_callbacks[type] = callback;
+}
+
+
+//-------------------------------------------------
+//  static_set_palette_init - set the legacy
+//  palette init callback in the device
+//  configuration
+//-------------------------------------------------
+
+void driver_device::static_set_palette_init(device_t &device, palette_init_func callback)
+{
+	downcast<driver_device &>(device).m_palette_init = callback;
+}
+
+
+//-------------------------------------------------
+//  driver_start - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::driver_start()
+{
+}
+
+
+//-------------------------------------------------
+//  machine_start - default implementation which
+//  calls to the legacy machine_start function
+//-------------------------------------------------
+
+void driver_device::machine_start()
+{
+	if (m_callbacks[CB_MACHINE_START] != NULL)
+		(*m_callbacks[CB_MACHINE_START])(machine());
+}
+
+
+//-------------------------------------------------
+//  sound_start - default implementation which
+//  calls to the legacy sound_start function
+//-------------------------------------------------
+
+void driver_device::sound_start()
+{
+	if (m_callbacks[CB_SOUND_START] != NULL)
+		(*m_callbacks[CB_SOUND_START])(machine());
+}
+
+
+//-------------------------------------------------
+//  video_start - default implementation which
+//  calls to the legacy video_start function
+//-------------------------------------------------
+
+void driver_device::video_start()
+{
+	if (m_callbacks[CB_VIDEO_START] != NULL)
+		(*m_callbacks[CB_VIDEO_START])(machine());
+}
+
+
+//-------------------------------------------------
+//  driver_reset - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::driver_reset()
+{
+}
+
+
+//-------------------------------------------------
+//  machine_reset - default implementation which
+//  calls to the legacy machine_reset function
+//-------------------------------------------------
+
+void driver_device::machine_reset()
+{
+	if (m_callbacks[CB_MACHINE_RESET] != NULL)
+		(*m_callbacks[CB_MACHINE_RESET])(machine());
+}
+
+
+//-------------------------------------------------
+//  sound_reset - default implementation which
+//  calls to the legacy sound_reset function
+//-------------------------------------------------
+
+void driver_device::sound_reset()
+{
+	if (m_callbacks[CB_SOUND_RESET] != NULL)
+		(*m_callbacks[CB_SOUND_RESET])(machine());
+}
+
+
+//-------------------------------------------------
+//  video_reset - default implementation which
+//  calls to the legacy video_reset function
+//-------------------------------------------------
+
+void driver_device::video_reset()
+{
+	if (m_callbacks[CB_VIDEO_RESET] != NULL)
+		(*m_callbacks[CB_VIDEO_RESET])(machine());
+}
+
+
+//-------------------------------------------------
+//  device_rom_region - return a pointer to the
+//  game's ROMs
+//-------------------------------------------------
+
+const rom_entry *driver_device::device_rom_region() const
+{
+	return m_system->rom;
+}
+
+
+//-------------------------------------------------
+//  device_input_ports - return a pointer to the
+//  game's input ports
+//-------------------------------------------------
+
+ioport_constructor driver_device::device_input_ports() const
+{
+	return m_system->ipt;
+}
+
+
+//-------------------------------------------------
+//  device_start - device override which calls
+//  the various helpers
+//-------------------------------------------------
+
+void driver_device::device_start()
+{
+	// reschedule ourselves to be last
+	device_iterator iter(*this);
+	for (device_t *test = iter.first(); test != NULL; test = iter.next())
+		if (test != this && !test->started())
+			throw device_missing_dependencies();
+
+	// call the game-specific init
+	if (m_system->driver_init != NULL)
+		(*m_system->driver_init)(machine());
+
+	// finish image devices init process
+	image_postdevice_init(machine());
+
+	// call palette_init if present
+	if (m_palette_init != NULL)
+		(*m_palette_init)(machine(), machine().region("proms")->base());
+
+	// start the various pieces
+	driver_start();
+	machine_start();
+	sound_start();
+	video_start();
+}
+
+
+//-------------------------------------------------
+//  device_reset_after_children - device override
+//  which calls the various helpers; must happen
+//  after all child devices are reset
+//-------------------------------------------------
+
+void driver_device::device_reset_after_children()
+{
+	// reset each piece
+	driver_reset();
+	machine_reset();
+	sound_reset();
+	video_reset();
 }

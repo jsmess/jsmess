@@ -71,6 +71,7 @@ EMUOBJS = \
 	$(EMUOBJ)/distate.o \
 	$(EMUOBJ)/drawgfx.o \
 	$(EMUOBJ)/driver.o \
+	$(EMUOBJ)/drivenum.o \
 	$(EMUOBJ)/emualloc.o \
 	$(EMUOBJ)/emucore.o \
 	$(EMUOBJ)/emuopts.o \
