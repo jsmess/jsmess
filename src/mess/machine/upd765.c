@@ -1535,15 +1535,6 @@ static TIMER_CALLBACK(upd765_continue_command)
 				/* sector id == EOT */
 				UINT8 ddam;
 
-				/* nothing to write */
-				if ((fdc->upd765_transfer_bytes_remaining==0) && (fdc->upd765_flags & UPD765_DMA_MODE))
-				{
-					if (fdc->upd765_flags & UPD765_TC)
-						upd765_write_complete(device);
-					// if TC not set, what?
-					break;
-				}
-
 				ddam = 0;
 				if (fdc->command == 0x09)
 				{
@@ -1551,7 +1542,18 @@ static TIMER_CALLBACK(upd765_continue_command)
 				}
 
 				/* write data to disc */
+				// logerror("floppy_drive_write_sector_data side=%d sector=%d tc=%x\n", fdc->side, fdc->sector_id, fdc->upd765_flags & UPD765_TC);
 				floppy_drive_write_sector_data(current_image(device), fdc->side, fdc->sector_id,fdc->data_buffer,upd765_n_to_bytes(fdc->upd765_command_bytes[5]),ddam);
+
+				/* nothing to write */
+				if ((fdc->upd765_transfer_bytes_remaining==0) && (fdc->upd765_flags & UPD765_DMA_MODE))
+				{
+					if (fdc->upd765_flags & UPD765_TC)
+					{
+						upd765_write_complete(device);
+						break;
+					}
+				}
 
 				if (upd765_sector_count_complete(device))
 				{
