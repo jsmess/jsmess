@@ -82,6 +82,8 @@ a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig
 {
 	m_shortname = "a2memexp";
     m_isramfactor = false;
+    m_bankhior = 0xf0;
+    m_addrmask = 0xfffff;
 }
 
 a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -89,6 +91,8 @@ a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, co
 {
 	m_shortname = "a2ramfac";
     m_isramfactor = true;
+    m_bankhior = 0x00;
+    m_addrmask = 0x7fffff;
 }
 
 //-------------------------------------------------
@@ -123,15 +127,15 @@ UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
 
     if (offset == 3)
     {
-        retval = m_ram[m_liveptr&0xfffff];
+        retval = m_ram[m_liveptr&m_addrmask];
 //        printf("Read RAM[%x] = %02x\n", m_liveptr, retval);
         m_liveptr++;
         m_regs[0] = m_liveptr & 0xff;
         m_regs[1] = (m_liveptr>>8) & 0xff;
-        m_regs[2] = ((m_liveptr>>16) & 0xff) | 0xf0;
+        m_regs[2] = ((m_liveptr>>16) & 0xff) | m_bankhior;
     }
 
-//    if (offset > 3) printf("Read c0n%x (PC=%x) = %02x\n", offset, cpu_get_pc(&space.device()), retval);
+//    printf("Read c0n%x (PC=%x) = %02x\n", offset, cpu_get_pc(&space.device()), retval);
 
 	return retval;
 }
@@ -143,7 +147,7 @@ UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-//    if (offset > 3) printf("Write %02x to c0n%x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
+//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
 
     switch (offset)
     {
@@ -152,7 +156,7 @@ void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
             m_wptr |= data;
             m_regs[0] = m_wptr & 0xff;
             m_regs[1] = (m_wptr>>8) & 0xff;
-            m_regs[2] = ((m_wptr>>16) & 0xff) | 0xf0;
+            m_regs[2] = ((m_wptr>>16) & 0xff) | m_bankhior;
             m_liveptr = m_wptr;
             break;
 
@@ -161,7 +165,7 @@ void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
             m_wptr |= (data<<8);
             m_regs[0] = m_wptr & 0xff;
             m_regs[1] = (m_wptr>>8) & 0xff;
-            m_regs[2] = ((m_wptr>>16) & 0xff) | 0xf0;
+            m_regs[2] = ((m_wptr>>16) & 0xff) | m_bankhior;
             m_liveptr = m_wptr;
             break;
 
@@ -170,17 +174,17 @@ void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
             m_wptr |= (data<<16);
             m_regs[0] = m_wptr & 0xff;
             m_regs[1] = (m_wptr>>8) & 0xff;
-            m_regs[2] = ((m_wptr>>16) & 0xff) | 0xf0;
+            m_regs[2] = ((m_wptr>>16) & 0xff) | m_bankhior;
             m_liveptr = m_wptr;
             break;
 
         case 3:
 //            printf("Write %02x to RAM[%x]\n", data, m_liveptr);
-            m_ram[(m_liveptr&0xfffff)] = data;
+            m_ram[(m_liveptr&m_addrmask)] = data;
             m_liveptr++;
             m_regs[0] = m_liveptr & 0xff;
             m_regs[1] = (m_liveptr>>8) & 0xff;
-            m_regs[2] = ((m_liveptr>>16) & 0xff) | 0xf0;
+            m_regs[2] = ((m_liveptr>>16) & 0xff) | m_bankhior;
             break;
 
         default:

@@ -29,6 +29,8 @@ public:
     virtual const rom_entry *device_rom_region() const;
 
     bool m_isramfactor;
+    UINT8 m_bankhior;
+    int m_addrmask;
 
 protected:
     virtual void device_start();
@@ -43,7 +45,7 @@ protected:
 private:
     UINT8 *m_rom;
     UINT8 m_regs[0x10];
-    UINT8 m_ram[1*1024*1024];   // 1 MB
+    UINT8 m_ram[8*1024*1024];
     int m_wptr, m_liveptr;
 };
 
