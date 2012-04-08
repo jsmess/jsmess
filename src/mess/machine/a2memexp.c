@@ -19,15 +19,24 @@
 //**************************************************************************
 
 const device_type A2BUS_MEMEXP = &device_creator<a2bus_memexpapple_device>;
+const device_type A2BUS_RAMFACTOR = &device_creator<a2bus_ramfactor_device>;
 
 #define MEMEXP_ROM_REGION  "memexp_rom"
 
-MACHINE_CONFIG_FRAGMENT( memexp2 )
+MACHINE_CONFIG_FRAGMENT( memexp )
 MACHINE_CONFIG_END
 
-ROM_START( memexp2 )
+ROM_START( memexp )
 	ROM_REGION(0x1000, MEMEXP_ROM_REGION, 0)
     ROM_LOAD( "341-0344a.bin", 0x0000, 0x1000, CRC(1e994e17) SHA1(6e823a1fa40ed37eeddcef23f5df24da2ea1463e) ) 
+ROM_END
+
+ROM_START( ramfactor )
+	ROM_REGION(0x8000, MEMEXP_ROM_REGION, 0)
+    ROM_LOAD( "ae ramfactor rom v1.4.bin", 0x0000, 0x2000, CRC(1c56d646) SHA1(32cb02a6a915dd3962bfa1f0184a94253e03ba6b) ) 
+    ROM_LOAD( "ae ramfactor rom v1.3.bin", 0x2000, 0x2000, CRC(434f5c45) SHA1(cf31a370951bd9a10d5b77f179134b358683b8fa) ) 
+    ROM_LOAD( "ae ramfactor rom v1.1.bin", 0x4000, 0x2000, CRC(328907a3) SHA1(dc25b4133a52609799098d8918a289fd973d28d9) ) 
+    ROM_LOAD( "ae ramfactor rom v1.0.bin", 0x6000, 0x2000, CRC(39c2162a) SHA1(9286d35907939aadb1fffd3e1d75603fe3e846ad) ) 
 ROM_END
 
 /***************************************************************************
@@ -41,7 +50,7 @@ ROM_END
 
 machine_config_constructor a2bus_memexp_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( memexp2 );
+	return MACHINE_CONFIG_NAME( memexp );
 }
 
 //-------------------------------------------------
@@ -50,7 +59,12 @@ machine_config_constructor a2bus_memexp_device::device_mconfig_additions() const
 
 const rom_entry *a2bus_memexp_device::device_rom_region() const
 {
-	return ROM_NAME( memexp2 );
+	return ROM_NAME( memexp );
+}
+
+const rom_entry *a2bus_ramfactor_device::device_rom_region() const
+{
+	return ROM_NAME( ramfactor );
 }
 
 //**************************************************************************
@@ -67,6 +81,14 @@ a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig
     a2bus_memexp_device(mconfig, A2BUS_MEMEXP, "Apple II Memory Expansion Card", tag, owner, clock)
 {
 	m_shortname = "a2memexp";
+    m_isramfactor = false;
+}
+
+a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+    a2bus_memexp_device(mconfig, A2BUS_RAMFACTOR, "Applied Engineering RamFactor", tag, owner, clock)
+{
+	m_shortname = "a2ramfac";
+    m_isramfactor = true;
 }
 
 //-------------------------------------------------
