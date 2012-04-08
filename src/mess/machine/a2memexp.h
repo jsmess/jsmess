@@ -28,6 +28,8 @@ public:
     virtual machine_config_constructor device_mconfig_additions() const;
     virtual const rom_entry *device_rom_region() const;
 
+    bool m_isramfactor;
+
 protected:
     virtual void device_start();
     virtual void device_reset();
@@ -51,8 +53,17 @@ public:
     a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class a2bus_ramfactor_device : public a2bus_memexp_device
+{
+public:
+    a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    virtual const rom_entry *device_rom_region() const;
+};
+
 // device type definition
 extern const device_type A2BUS_MEMEXP;
+extern const device_type A2BUS_RAMFACTOR;
 
 #endif /* __A2BUS_MEMEXP__ */
 
