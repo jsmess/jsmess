@@ -458,7 +458,7 @@ static READ8_HANDLER( apple2_c1xx_r )
 	slotnum = ((offset>>8) & 0xf) + 1;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
                                  
-	if (state->m_a2_cnxx_slot == -1)
+	if (1) //state->m_a2_cnxx_slot == -1)
 	{
 //        printf("c1xx_r: cnxx_slot now %d\n", slotnum);
 		state->m_a2_cnxx_slot = slotnum;
@@ -516,7 +516,7 @@ static READ8_HANDLER( apple2_c4xx_r )
 	slotnum = ((offset>>8) & 0xf) + 4;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
-	if (state->m_a2_cnxx_slot == -1)
+	if (1) //state->m_a2_cnxx_slot == -1)
 	{
 		state->m_a2_cnxx_slot = slotnum;
 //        printf("c4xx_r: cnxx_slot now %d\n", slotnum);
@@ -554,7 +554,7 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 	slotnum = ((offset>>8) & 0xf) + 4;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
 
-	if (state->m_a2_cnxx_slot == -1)
+	if (1) //state->m_a2_cnxx_slot == -1)
 	{
 //        printf("c4xx_w: cnxx_slot now %d\n", slotnum);
 		state->m_a2_cnxx_slot = slotnum;

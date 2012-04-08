@@ -477,6 +477,9 @@ static void adb_do_command(apple2gs_state *state)
 			}
 			break;
 
+        case 0xf2:
+            break;
+
 		default:
 			fatalerror("ADB command 0x%02x unimplemented", state->m_adb_command);
 			break;
@@ -599,13 +602,16 @@ static void adb_write_datareg(running_machine &machine, UINT8 data)
 					state->m_adb_command_length = 2;
 					break;
 
+                case 0xf2:
+                    break;
+
 				default:
 					fatalerror("ADB command 0x%02x unimplemented", data);
 					break;
 
 			}
 
-			if (state->m_adb_command_length > 0)
+            if (state->m_adb_command_length > 0)
 			{
 				state->m_adb_state = ADBSTATE_INCOMMAND;
 				if (LOG_ADB)
@@ -1550,7 +1556,6 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 	}
 	else if ((address & 0x000F00) == 0x000000)	// accessing C0xx?
 	{
-		state->m_a2_cnxx_slot = -1;
 		result = apple2gs_c0xx_r(machine.device("maincpu")->memory().space(AS_PROGRAM), address);
 	}
 	else
@@ -1567,14 +1572,16 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 			{
 				// accessing a slot mapped to internal, let's put back the internal ROM
 				state->m_a2_cnxx_slot = -1;
+                apple2_update_memory(space.machine());
 				result = *apple2gs_getslotmem(machine, address);
 			}
 			else
 			{
 				// accessing a slot mapped to "Your Card", C800 should belong to that card
-				if (state->m_a2_cnxx_slot == -1)
+				if (1) //state->m_a2_cnxx_slot == -1)
 				{
 					state->m_a2_cnxx_slot = slot;
+                    apple2_update_memory(space.machine());
 				}
 
 				if (slotdevice != NULL)
@@ -1595,6 +1602,7 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 			if ((address & 0xfff) == 0xfff)
 			{
 				state->m_a2_cnxx_slot = -1;
+                apple2_update_memory(space.machine());
 			}
 
 			if ( state->m_a2_cnxx_slot >= 0 && state->m_a2_cnxx_slot <= 7 )
@@ -1626,6 +1634,7 @@ static void apple2gs_xxCxxx_w(address_space &space, running_machine &machine, of
 	if ((address & 0xfff) == 0xfff)
 	{
 		state->m_a2_cnxx_slot = -1;
+        apple2_update_memory(space.machine());
 	}
 
 	if ((state->m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
