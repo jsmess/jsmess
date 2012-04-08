@@ -208,7 +208,8 @@ SOFTFLOAT_MACROS = $(LIBSRC)/softfloat/softfloat/bits64/softfloat-macros
 
 SOFTFLOATOBJS = \
 	$(LIBOBJ)/softfloat/softfloat.o \
-    $(LIBOBJ)/softfloat/fsincos.o
+    $(LIBOBJ)/softfloat/fsincos.o \
+    $(LIBOBJ)/softfloat/fyl2x.o
 
 $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 
