@@ -131,7 +131,7 @@ UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
         m_regs[2] = ((m_liveptr>>16) & 0xff) | 0xf0;
     }
 
-//    printf("Read c0n%x (PC=%x) = %02x\n", offset, cpu_get_pc(&space.device()), retval);
+//    if (offset > 3) printf("Read c0n%x (PC=%x) = %02x\n", offset, cpu_get_pc(&space.device()), retval);
 
 	return retval;
 }
@@ -143,7 +143,7 @@ UINT8 a2bus_memexp_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_memexp_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
+//    if (offset > 3) printf("Write %02x to c0n%x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
 
     switch (offset)
     {
@@ -198,6 +198,11 @@ UINT8 a2bus_memexp_device::read_cnxx(address_space &space, UINT8 offset)
     int slotimg = m_slot * 0x100;
 
     // first 0x400 of ROM contains a CnXX image for each of slots 1-7, last 0x400 is c800 image
+    if ((m_isramfactor) && (m_regs[0xf] & 0x01))
+    {
+        return m_rom[offset+slotimg+0x1000];
+    }                               
+
     return m_rom[offset+slotimg];
 }
 
@@ -207,5 +212,11 @@ UINT8 a2bus_memexp_device::read_cnxx(address_space &space, UINT8 offset)
 
 UINT8 a2bus_memexp_device::read_c800(address_space &space, UINT16 offset)
 {
+    // c70a diags confirm: bit 1 of cn0F banks in the second half of the ROM
+    if ((m_isramfactor) && (m_regs[0xf] & 0x01))
+    {
+        return m_rom[offset+0x1800];
+    }     
+
     return m_rom[offset+0x800];
 }

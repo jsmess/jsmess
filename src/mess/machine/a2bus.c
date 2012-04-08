@@ -197,6 +197,11 @@ void a2bus_device::device_reset()
 
 device_a2bus_card_interface *a2bus_device::get_a2bus_card(int slot)
 {
+    if (slot < 0)
+    {
+        return NULL;
+    }
+
     return m_device_list[slot];
 }
 

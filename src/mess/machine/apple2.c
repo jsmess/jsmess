@@ -760,7 +760,7 @@ static void apple2_mem_C300(running_machine &machine, offs_t begin, offs_t end, 
 static void apple2_mem_C800(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
-	if (state->m_a2_cnxx_slot == -1)
+	if (state->m_flags & VAR_INTCXROM)
 	{
 		meminfo->read_mem			= (begin & 0x0FFF) | (state->m_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
 		meminfo->write_mem			= APPLE2_MEM_FLOATING;
@@ -782,7 +782,7 @@ static void apple2_mem_CE00(running_machine &machine, offs_t begin, offs_t end, 
 	}
 	else
 	{
-		if (state->m_a2_cnxx_slot == -1)
+		if (state->m_flags & VAR_INTCXROM)
 		{
 			meminfo->read_mem		= (begin & 0x0FFF) | (state->m_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
 			meminfo->write_mem		= APPLE2_MEM_FLOATING;
@@ -886,11 +886,6 @@ void apple2_setvar(running_machine &machine, UINT32 val, UINT32 mask)
 	/* change the softswitch */
 	state->m_flags &= ~mask;
 	state->m_flags |= val;
-
-	if (state->m_flags & VAR_INTCXROM)
-    {
-        state->m_a2_cnxx_slot = -1;
-    }
 
 	apple2_update_memory(machine);
 }
