@@ -188,16 +188,14 @@ static const struct a2bus_interface a2bus_intf =
     DEVCB_NULL
 };
 
-#if 0
 static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("diskii", A2BUS_DISKII)  /* Disk II Controller Card */
     SLOT_INTERFACE("mockingboard", A2BUS_MOCKINGBOARD)  /* Sweet Micro Systems Mockingboard */
     SLOT_INTERFACE("cffa2", A2BUS_CFFA2)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
     SLOT_INTERFACE("cffa202", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
     SLOT_INTERFACE("memexp", A2BUS_MEMEXP)  /* Apple II Memory Expansion Card */
-    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
+//    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
-#endif
 
 static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	/* basic machine hardware */
@@ -235,7 +233,13 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	/* slot devices */
     MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
     MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
-//    MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, NULL, NULL)
+    MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL, NULL)
 
     MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
