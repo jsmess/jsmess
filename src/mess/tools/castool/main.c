@@ -43,6 +43,7 @@
 #include "formats/uef_cas.h"
 #include "formats/vg5k_cas.h"
 #include "formats/vt_cas.h"
+#include "formats/x07_cas.h"
 #include "formats/zx81_p.h"
 
 struct SupportedCassetteFormats
@@ -89,6 +90,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"vg5k", vg5k_cassette_formats             ,"VG 5000 k7"},
 	{"vtech1", vtech1_cassette_formats         ,"Video Technology Laser 110-310"},
 	{"vtech2", vtech2_cassette_formats         ,"Video Technology Laser 350-700"},
+	{"x07", x07_cassette_formats               ,"Canon X-07"},
 	{"zx81_p", zx81_p_format                   ,"Sinclair ZX81"},
 	{"zx80_o", zx80_o_format                   ,"Sinclair ZX80"},
 	{NULL,NULL,NULL}
