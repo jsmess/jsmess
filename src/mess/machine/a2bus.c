@@ -3,7 +3,69 @@
   a2bus.c - Apple II slot bus and card emulation
 
   by R. Belmont
-
+ 
+  Pinout (/ indicates an inverted signal, ie, one that would have a bar over it
+          on a schematic diagram)
+ 
+      (rear of computer)
+ 
+     GND  26  25  +5V
+  DMA IN  27  24  DMA OUT
+  INT IN  28  23  INT OUT
+    /NMI  29  22  /DMA
+    /IRQ  30  21  RDY
+    /RES  31  20  /IOSTB
+    /INH  32  19  N.C.
+    -12V  33  18  R/W
+     -5V  34  17  A15
+    N.C.  35  16  A14
+      7M  36  15  A13
+      Q3  37  14  A12
+     PH1  38  13  A11
+  USER 1  39  12  A10
+     PH0  40  11  A9
+ /DEVSEL  41  10  A8
+      D7  42   9  A7
+      D6  43   8  A6
+      D5  44   7  A5
+      D4  45   6  A4
+      D3  46   5  A3
+      D2  47   4  A2
+      D1  48   3  A1
+      D0  49   2  A0
+    -12V  50   1  /IOSEL
+ 
+     (front of computer)
+ 
+    Signal descriptions:
+    GND - power supply ground
+    DMA IN - daisy chain of DMA signal from higher priority devices.  usually connected to DMA OUT.
+    INT IN - similar to DMA IN but for INT instead of DMA.
+    /NMI - non-maskable interrupt input to the 6502
+    /IRQ - maskable interrupt input to the 6502
+    /RES - system reset signal
+    /INH - On the II and II+, inhibits the motherboard ROMs, allowing a card to replace them.
+           On the IIe, inhibits all motherboard RAM/ROM for both CPU and DMA accesses.
+           On the IIgs, works like the IIe except for the address range 0x6000 to 0x9FFF where
+           it will cause bus contention.
+    -12V - negative 12 volts DC power
+     -5V - negative 5 volts DC power
+      7M - 7 MHz clock (1/4th of the master clock on the IIgs, 1/2 on 8-bit IIs)
+      Q3 - 2 MHz asymmetrical clock
+     PH1 - 6502 phase 1 clock
+ /DEVSEL - asserted on an access to C0nX, where n = the slot number plus 8.
+   D0-D7 - 8-bit data bus
+     +5V - 5 volts DC power
+ DMA OUT - see DMA IN
+ INT OUT - see INT IN
+    /DMA - pulling this low disconnects the 6502 from the bus and halts it
+     RDY - 6502 RDY input.  Pulling this low when PH1 is active will halt the
+           6502 and latch the current address bus value.
+  /IOSTB - asserted on an access between C800 and CFFF.
+  A0-A15 - 16-bit address bus
+  /IOSEL - asserted on accesses to CnXX where n is the slot number.
+           Not present on slot 0.
+ 
 ***************************************************************************/
 
 #include "emu.h"

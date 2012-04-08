@@ -4,8 +4,6 @@
 
   Machine file to handle emulation of the Apple II series.
 
-  TODO:  Make a standard set of peripherals work.
-  TODO:  Allow swappable peripherals in each slot.
   TODO:  Verify correctness of C08X switches.
             - need to do double-read before write-enable RAM
 
@@ -23,6 +21,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/speaker.h"
+#include "debugger.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -358,12 +357,6 @@ READ8_HANDLER(apple2_c0xx_r)
 
 		if (offset < 0x80)
 		{
-			if (state->m_a2_cnxx_slot != -1)
-			{
-				state->m_a2_cnxx_slot = -1;
-				apple2_update_memory(space->machine());
-			}
-
 			/* normal handler */
 			if (handlers[offset / 0x10])
 				result = handlers[offset / 0x10](space, offset % 0x10);
@@ -409,12 +402,6 @@ WRITE8_HANDLER(apple2_c0xx_w)
 
 	if (offset < 0x80)
 	{
-		if (state->m_a2_cnxx_slot != -1)
-		{
-			state->m_a2_cnxx_slot = -1;
-			apple2_update_memory(space->machine());
-		}
-
 		/* normal handler */
 		if (handlers[offset / 0x10])
 			handlers[offset / 0x10](space, offset % 0x10, data);
@@ -448,8 +435,9 @@ INT8 apple2_slotram_r(running_machine &machine, int slotnum, int offset)
 
 	if (slot_ram)
 	{
-		if (state->m_a2_cnxx_slot == -1)
+		if (1) //state->m_a2_cnxx_slot == -1)
 		{
+//            printf("slotram_r: cnxx_slot now %d\n", slotnum);
 			state->m_a2_cnxx_slot = slotnum;
 			apple2_update_memory(machine);
 		}
@@ -472,6 +460,7 @@ static READ8_HANDLER( apple2_c1xx_r )
                                  
 	if (state->m_a2_cnxx_slot == -1)
 	{
+//        printf("c1xx_r: cnxx_slot now %d\n", slotnum);
 		state->m_a2_cnxx_slot = slotnum;
 		apple2_update_memory(space->machine());
 	}
@@ -530,6 +519,7 @@ static READ8_HANDLER( apple2_c4xx_r )
 	if (state->m_a2_cnxx_slot == -1)
 	{
 		state->m_a2_cnxx_slot = slotnum;
+//        printf("c4xx_r: cnxx_slot now %d\n", slotnum);
 		apple2_update_memory(space->machine());
 	}
 
@@ -566,6 +556,7 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 
 	if (state->m_a2_cnxx_slot == -1)
 	{
+//        printf("c4xx_w: cnxx_slot now %d\n", slotnum);
 		state->m_a2_cnxx_slot = slotnum;
 		apple2_update_memory(space->machine());
 	}
@@ -583,10 +574,11 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 
 static READ8_HANDLER(apple2_cfff_r)
 {
-	apple2_state *state = space->machine().driver_data<apple2_state>();
 	// debugger guard
-	if(!space->debugger_access())
+	if (!space->debugger_access())
 	{
+        apple2_state *state = space->machine().driver_data<apple2_state>();
+//        printf("cfff_r: cnxx_slot now %d\n", -1);
 		state->m_a2_cnxx_slot = -1;
 		apple2_update_memory(space->machine());
 	}
@@ -596,9 +588,13 @@ static READ8_HANDLER(apple2_cfff_r)
 
 static WRITE8_HANDLER(apple2_cfff_w)
 {
-	apple2_state *state = space->machine().driver_data<apple2_state>();
-	state->m_a2_cnxx_slot = -1;
-	apple2_update_memory(space->machine());
+	if (!space->debugger_access())
+	{
+        apple2_state *state = space->machine().driver_data<apple2_state>();
+//        printf("cfff_w: cnxx_slot now %d\n", -1);
+        state->m_a2_cnxx_slot = -1;
+        apple2_update_memory(space->machine());
+    }
 }
 
 static READ8_HANDLER ( apple2_c800_r )
@@ -891,6 +887,11 @@ void apple2_setvar(running_machine &machine, UINT32 val, UINT32 mask)
 	state->m_flags &= ~mask;
 	state->m_flags |= val;
 
+	if (state->m_flags & VAR_INTCXROM)
+    {
+        state->m_a2_cnxx_slot = -1;
+    }
+
 	apple2_update_memory(machine);
 }
 
@@ -1072,6 +1073,8 @@ static void apple2_reset(running_machine &machine)
 
 	state->m_a2_speaker_state = 0;
 
+    state->m_a2_cnxx_slot = -1; // bank in ROM at C800 on reset
+
 	state->m_joystick_x1_time = state->m_joystick_y1_time = 0;
 	state->m_joystick_x2_time = state->m_joystick_y2_time = 0;
 }
@@ -1141,6 +1144,8 @@ READ8_HANDLER ( apple2_c00x_r )
 		g_profiler.stop();
 	}
 
+
+
 	return result;
 }
 
@@ -1170,6 +1175,7 @@ READ8_HANDLER ( apple2_c00x_r )
 WRITE8_HANDLER ( apple2_c00x_w )
 {
 	UINT32 mask;
+
 	mask = 1 << (offset / 2);
 	apple2_setvar(space->machine(), (offset & 1) ? mask : 0, mask);
 }
@@ -1585,24 +1591,13 @@ static int apple2_fdc_read_status(device_t *device)
 }
 
 
-
 void apple2_iwm_setdiskreg(running_machine &machine, UINT8 data)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
-	state->m_fdc_diskreg = data & 0xC0;
+    state->m_fdc_diskreg = data & 0xC0;
 	if (apple2_fdc_has_35(machine))
 		sony_set_sel_line( machine.device("fdc"),state->m_fdc_diskreg & 0x80);
 }
-
-
-
-UINT8 apple2_iwm_getdiskreg(running_machine &machine)
-{
-	apple2_state *state = machine.driver_data<apple2_state>();
-	return state->m_fdc_diskreg;
-}
-
-
 
 
 const applefdc_interface apple2_fdc_interface =

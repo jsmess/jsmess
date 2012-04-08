@@ -985,7 +985,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x31:	/* C031 - DISKREG */
-			result = apple2_iwm_getdiskreg(space->machine());
+			result = state->m_fdc_diskreg; 
 			break;
 
 		case 0x33:	/* C033 - CLOCKDATA */

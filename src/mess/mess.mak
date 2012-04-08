@@ -646,6 +646,8 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/a2diskii.o	\
 	$(MESS_MACHINE)/a2mockingboard.o	\
 	$(MESS_MACHINE)/a2cffa.o	\
+    $(MESS_MACHINE)/a2memexp.o  \
+    $(MESS_MACHINE)/a2scsi.o    \
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
 	$(MESS_MACHINE)/nubus.o     \
