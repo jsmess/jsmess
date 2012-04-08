@@ -162,6 +162,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/vt_dsk.o		\
 	$(LIBOBJ)/formats/vtech1_dsk.o	\
 	$(LIBOBJ)/formats/wavfile.o		\
+	$(LIBOBJ)/formats/x07_cas.o		\
 	$(LIBOBJ)/formats/x1_tap.o		\
 	$(LIBOBJ)/formats/z80ne_dsk.o	\
 	$(LIBOBJ)/formats/zx81_p.o		\

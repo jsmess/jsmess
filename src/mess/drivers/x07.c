@@ -9,7 +9,6 @@
     - better emulation of the i/o ports
     - external video (need X-720 dump)
     - serial port
-    - load/save cassette in wav format
 
     Memory Map
 
@@ -28,14 +27,7 @@
 ****************************************************************************/
 
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/beep.h"
 #include "includes/x07.h"
-#include "imagedev/printer.h"
-#include "imagedev/cartslot.h"
-#include "machine/ram.h"
-#include "rendlay.h"
 
 /***************************************************************************
     T6834 IMPLEMENTATION
@@ -663,24 +655,160 @@ void x07_state::t6834_w ()
 	}
 }
 
-
 void x07_state::cassette_r()
 {
-	if (m_k7size && m_k7on && (m_k7pos<m_k7size))
-	{
-		m_regs_r[6] |= 2;
-		m_regs_r[7] = m_k7data[m_k7pos++];
-
-		popmessage("%04x//%04x", m_k7pos, m_k7size);
-
-		m_k7irq->adjust(attotime::from_msec(2));
-	}
+	m_regs_r[6] &= ~2;
 }
-
 
 void x07_state::cassette_w()
 {
-	//TODO
+	m_regs_r[6] &= ~1;
+	m_cass_data = m_regs_w[7];
+}
+
+static TIMER_CALLBACK( cassette_tick )
+{
+	x07_state *state = machine.driver_data<x07_state>();
+	state->m_cass_clk++;
+}
+
+static TIMER_CALLBACK( cassette_poll )
+{
+	x07_state *state = machine.driver_data<x07_state>();
+
+	if ((state->m_cassette->get_state() & 0x03) == CASSETTE_PLAY)
+		state->cassette_load();
+	else if ((state->m_cassette->get_state() & 0x03) == CASSETTE_RECORD)
+		state->cassette_save();
+}
+
+void x07_state::cassette_load()
+{
+	int cass = (m_cassette->input() >= 0) ? +1 : -1;
+	if (cass > 0 && m_cass_state < 0)
+	{
+		if ((m_cass_clk & 0x7f) >= 4 && (m_cass_clk & 0x7f) <= 6)
+		{
+			if (m_cass_clk & 0x80)
+			{
+				m_cass_clk = 0;
+				receive_bit(1);
+			}
+			else
+			{
+				m_cass_clk = 0x80;
+			}
+		}
+		else if ((m_cass_clk & 0x7f) >= 9 && (m_cass_clk & 0x7f) <= 11)
+		{
+			m_cass_clk = 0;
+			receive_bit(0);
+		}
+		else
+		{
+			m_cass_clk = 0;
+			logerror("Invalid data: %d %f\n", (m_cass_clk & 0x7f), m_cassette->get_position());
+		}
+
+		m_cass_tick->adjust(attotime::from_hz(12000), 0, attotime::from_hz(12000));
+	}
+
+	m_cass_state = cass;
+}
+
+
+void x07_state::cassette_save()
+{
+	int cass = m_cass_state;
+
+	if (m_cass_clk % 10 == 0)
+	{
+
+		if (m_bit_count < 4)
+		{
+			switch (m_bit_count & 3)
+			{
+				case 0: 	case 1: 	cass = +1;	break;
+				case 2: 	case 3: 	cass = -1;	break;
+			}
+
+			m_bit_count++;
+		}
+		else if (m_bit_count < 36)
+		{
+			switch (m_bit_count & 3)
+			{
+				case 0: 	cass = +1;	break;
+				case 1: 	cass = (m_cass_data & 1) ? -1 : +1;	break;
+				case 2: 	cass = (m_cass_data & 1) ? +1 : -1;	break;
+				case 3: 	cass = -1;	m_cass_data >>= 1;		break;
+			}
+
+			m_bit_count++;
+		}
+		else if (m_bit_count < 48)
+		{
+			switch (m_bit_count & 3)
+			{
+				case 0: 	case 2: 	cass = +1;	break;
+				case 1: 	case 3: 	cass = -1;	break;
+			}
+
+			if (m_bit_count == 47)
+				m_regs_r[6] |= 1;
+
+			m_bit_count++;
+		}
+		else
+		{
+			cass = (m_cass_state > 0) ? -1 : +1;
+		}
+
+		m_cassette->output( cass );
+	}
+
+	// finish the current cycle before start the next
+	if ((m_cass_state <= 0) && !(m_regs_r[6] & 1) && m_bit_count >= 48)
+		m_bit_count = 0;
+
+	m_cass_state = cass;
+	m_cass_clk++;
+}
+
+void x07_state::receive_bit(int bit)
+{
+	if (m_bit_count == 0)
+	{
+		// wait for start bit
+		if (bit == 0)
+			m_bit_count++;
+	}
+	else if (m_bit_count < 9)
+	{
+		m_cass_data = (m_cass_data>>1) | (bit<<7);
+		m_bit_count++;
+	}
+	else if (m_bit_count < 12)
+	{
+		if (bit != 1)
+			logerror("Invalid stop bit: %f\n", m_cassette->get_position());
+
+		m_bit_count++;
+	}
+
+	// every byte take 12 bit
+	if (m_bit_count == 12)
+	{
+		//printf("data: %02x %f\n", m_cass_data, m_cassette->get_position());
+		m_regs_r[6] |= 2;
+		m_regs_r[7] = m_cass_data;
+		m_cass_data = 0;
+		m_bit_count = 0;
+
+		device_set_input_line(m_maincpu, NSC800_RSTB, ASSERT_LINE);
+		m_rstb_clear->adjust(attotime::from_usec(200));
+
+	}
 }
 
 
@@ -910,84 +1038,6 @@ inline void x07_state::draw_udk()
 		}
 }
 
-
-static DEVICE_IMAGE_LOAD( x07_cass )
-{
-	running_machine &machine = image.device().machine();
-	x07_state *state = machine.driver_data<x07_state>();
-	UINT8 *tmp_data;
-	UINT32 image_size;
-	char *basename = (char*)image.basename();
-
-	if (image.software_entry() == NULL)
-	{
-		image_size = image.length();
-		tmp_data = auto_alloc_array(machine, UINT8, image_size);
-		image.fread(tmp_data, image_size);
-	}
-	else
-	{
-		image_size = image.get_software_region_length("k7");
-		tmp_data = auto_alloc_array(machine, UINT8, image_size);
-		memcpy(tmp_data, image.get_software_region("k7"), image_size);
-	}
-
-	if (tmp_data[0] == 0xd3 && tmp_data[1] == 0xd3)
-	{
-		//image should be valid
-		state->m_k7data = auto_alloc_array(machine, UINT8, image_size);
-		memcpy(state->m_k7data, tmp_data, image_size);
-		state->m_k7size = image_size;
-	}
-	else
-	{
-		UINT8 *img_data = tmp_data;
-
-		//remove the NULL chars at start
-		while (!img_data[0])
-		{
-			image_size--;
-			img_data++;
-		}
-
-		//allocate the required space
-		state->m_k7data = auto_alloc_array(machine, UINT8, image_size + 0x10);
-
-		//insert the sync bytes
-		for(int i=0; i<10; i++)
-			state->m_k7data[i] = 0xd3;
-
-		//empty the name area
-		memset(state->m_k7data + 0x0a, 0x00, 6);
-
-		//copy basename in the name area
-		for(int i=0; i<6; i++)
-		{
-			if (basename[i] == 0 || basename[i] == '.')
-				break;
-			state->m_k7data[10 + i] = basename[i];
-		}
-
-		memcpy(state->m_k7data + 0x10, img_data, image_size);
-		state->m_k7size = image_size + 0x10;
-	}
-
-	state->m_k7pos = 0;
-	auto_free(machine, tmp_data);
-	return IMAGE_INIT_PASS;
-}
-
-
-static DEVICE_IMAGE_UNLOAD( x07_cass )
-{
-	running_machine &machine = image.device().machine();
-	x07_state *state = machine.driver_data<x07_state>();
-
-	auto_free(machine, state->m_k7data);
-	state->m_k7size = state->m_k7pos = 0;
-}
-
-
 static DEVICE_IMAGE_LOAD( x07_card )
 {
 	running_machine &machine = image.device().machine();
@@ -1081,7 +1131,7 @@ READ8_MEMBER( x07_state::x07_io_r )
 		data = 0x00;
 		break;
 	case 0xf6:
-		if (m_k7on)	m_regs_r[6] |= 5;
+		if (m_cass_motor)	m_regs_r[6] |= 4;
 		//fall through
 	case 0xf0:
 	case 0xf1:
@@ -1124,7 +1174,19 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 
 	case 0xf4:
 		m_regs_r[4] = m_regs_w[4] = data;
-		m_k7on = ((data & 0x0c) == 0x08) ? 1 : 0;
+		m_cass_motor = ((data & 0x0d) == 0x09) ? 1 : 0;
+
+		if (m_cass_motor)
+		{
+			m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+			m_cass_poll->adjust(attotime::from_hz(48000), 0, attotime::from_hz(48000));
+		}
+		else
+		{
+			m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+			m_cass_poll->reset();
+			m_cass_tick->reset();
+		}
 
 #if(1)
 		if((data & 0x0e) == 0x0e)
@@ -1327,15 +1389,6 @@ static TIMER_CALLBACK( beep_stop )
 	beep_set_state(state->m_beep, 0);
 }
 
-static TIMER_CALLBACK( k7_irq )
-{
-	x07_state *state = machine.driver_data<x07_state>();
-
-	device_set_input_line(state->m_maincpu, NSC800_RSTB, ASSERT_LINE);
-
-	state->m_rstb_clear->adjust(attotime::from_usec(200));
-}
-
 static const gfx_layout x07_charlayout =
 {
 	6, 8,					/* 6 x 8 characters */
@@ -1356,7 +1409,8 @@ void x07_state::machine_start()
 	m_rsta_clear = machine().scheduler().timer_alloc(FUNC(rsta_clear));
 	m_rstb_clear = machine().scheduler().timer_alloc(FUNC(rstb_clear));
 	m_beep_stop = machine().scheduler().timer_alloc(FUNC(beep_stop));
-	m_k7irq = machine().scheduler().timer_alloc(FUNC(k7_irq));
+	m_cass_poll = machine().scheduler().timer_alloc(FUNC(cassette_poll));
+	m_cass_tick = machine().scheduler().timer_alloc(FUNC(cassette_tick));
 
 	/* Save State */
 	save_item(NAME(m_sleep));
@@ -1375,16 +1429,17 @@ void x07_state::machine_start()
 	save_item(NAME(m_prn_sendbit));
 	save_item(NAME(m_prn_char_code));
 	save_item(NAME(m_prn_size));
-	save_item(NAME(m_k7on));
-	save_item(NAME(m_k7size));
-	save_item(NAME(m_k7pos));
+	save_item(NAME(m_cass_motor));
+	save_item(NAME(m_cass_data));
+	save_item(NAME(m_cass_clk));
+	save_item(NAME(m_cass_state));
+	save_item(NAME(m_bit_count));
 	save_item(NAME(m_t6834_ram));
 	save_item(NAME(m_regs_r));
 	save_item(NAME(m_regs_w));
 	save_item(NAME(m_alarm));
 	save_item(NAME(m_lcd_map));
 	save_item(NAME(m_prn_buffer));
-	save_pointer(NAME(m_k7data), m_k7size);
 	save_item(NAME(m_in.read));
 	save_item(NAME(m_in.write));
 	save_item(NAME(m_in.data));
@@ -1437,6 +1492,15 @@ void x07_state::machine_reset()
 	cpu_set_reg(m_maincpu, Z80_PC, 0xc3c3);
 }
 
+static const cassette_interface x07_cassette_interface =
+{
+	x07_cassette_formats,
+	NULL,
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	"x07_cass",
+	NULL
+};
+
 static MACHINE_CONFIG_START( x07, x07_state )
 
 	/* basic machine hardware */
@@ -1459,7 +1523,9 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -1486,12 +1552,7 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_CARTSLOT_INTERFACE("x07_card")
 
 	/* cassette */
-	MCFG_CARTSLOT_ADD("cassette")
-	MCFG_CARTSLOT_EXTENSION_LIST("k7,cas,lst")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(x07_cass)
-	MCFG_CARTSLOT_UNLOAD(x07_cass)
-	MCFG_CARTSLOT_INTERFACE("x07_cass")
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, x07_cassette_interface )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("card_list", "x07_card")
