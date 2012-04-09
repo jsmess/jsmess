@@ -1,4 +1,63 @@
-﻿0.145u5
+﻿0.145u6
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+-pmd85: added support for loading .ptp cassette images. [Sandro Ronco]
+-apple2: Apple II slots rewrite [R. Belmont]
+ All Apple IIs that had slots now have them in MESS except the IIgs.
+ Slot 0 has one available card: the language card (which it defaults to)
+ Slots 1-7 can have any of the Mockingboard, CFFA2000, and Disk II cards.  
+ By default a Mockingboard is in Slot 4 and the Disk II is in 6.  Due to 
+ current limitations only one Disk II controller per machine will work, but
+ multiple CFFAs and Mockingboards should work great.  
+ The plain 6502 firmware version of the CFFA2000 is now supported so you can 
+ use CHDs with the emulated II Plus and unenhanced IIe as well.
+ 5.25" disks are broken on the IIgs at the moment; I'm looking into it.
+-iskr1030: Year/manufacturer fixes. [AntoPISA]
+- Apple II updates [R. Belmont]: 
+	- Improved C800 arbitration
+	- Cleanup and more documentation
+	- New working card: Apple II "Slinky" 1 MB Memory Expansion Card
+	- New non-working card: Apple II SCSI Card, Rev. C
+- Apple IIgs: User-configured slots now available.  Boot 6.0.1 and use 
+  the Slots Control Panel to set the desired slots to Your Card to use. [R. Belmont]
+- Apple II: Support AE RamFactor card (clone of Apple Memory Expansion) [R. Belmont]
+- Apple II: Fixed C800 banking with INTCXROM and implemented RamFactor card
+  ROM banking.  RamFactor diagnostic (g Cn0a in the Monitor) now works.
+- Apple II: RamFactor cards now have 8 MB capacity each [R. Belmont]
+- Apple II: Even more slot ROM arbitration work.  80 column mode works on IIe again, 
+  and AppleWorks 3 no longer crashes on boot. [R. Belmont]
+- Apple II: Allow slot 3 to be used by cards on II/II+. [R. Belmont]
+
+
+Software Lists:
+----------------
+- x07.xml: Added memory cards softlist. [Anna Wu, Sandro Ronco]
+- apple1.xml: added a few more tapes [Anon01]
+- a800.xml: added some new dumps and confirmed more dumps [K1W1]
+
+Source Changes:
+----------------
+- Fix for feature name xml output in softlist [bobz]
+- m68k improvements: [Hans Ostermeyer]
+   - Fixed BFINS, BFEXTU, and BFEXTS to fetch 8-bit quantities as 8 bits 
+     (corrects Domain/OS 10.3.5 crash on page boundry)
+   - Added SoftFloat log functions and m68k FLOGNP1, FLOGN, FLOG2, and FLOG10 instructions
+- uPD765: fix Apollo floppy read/write problems [Hans Ostermeyer]
+
+0.145u5
 
 New System Drivers Supported:
 -----------------------------
