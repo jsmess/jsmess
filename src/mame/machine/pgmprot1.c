@@ -1,5 +1,5 @@
 /***********************************************************************
- PGM IGA027A (55857E* type) ARM protection simulations & emulation
+ PGM IGS027A (55857E* type) ARM protection simulations & emulation
    *guess, the part number might not be directly tied to behavior, see note below
 
  these are simulations of the 'kov' type ARM device
@@ -229,7 +229,7 @@ MACHINE_CONFIG_START( pgm_arm_type1_cave, pgm_arm_type1_state )
 	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
 
 	MCFG_MACHINE_START( pgm_arm_type1 )
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
 MACHINE_CONFIG_END
