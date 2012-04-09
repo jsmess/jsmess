@@ -244,8 +244,8 @@ bool c64_expansion_slot_device::call_load()
 		else
 		{
 			size = get_software_region_length("uprom");
-		
-			if (size) 
+
+			if (size)
 			{
 				// Ultimax (VIC-10) cartridge
 				memcpy(m_cart->c64_romh_pointer(machine(), size), get_software_region("uprom"), size);

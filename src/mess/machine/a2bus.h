@@ -3,7 +3,7 @@
   a2bus.h - Apple II slot bus and card emulation
 
   by R. Belmont
- 
+
 ***************************************************************************/
 
 #pragma once

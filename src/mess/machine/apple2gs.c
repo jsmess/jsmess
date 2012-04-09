@@ -991,7 +991,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x31:	/* C031 - DISKREG */
-			result = state->m_fdc_diskreg; 
+			result = state->m_fdc_diskreg;
 			break;
 
 		case 0x33:	/* C033 - CLOCKDATA */
@@ -1057,8 +1057,8 @@ static READ8_HANDLER( apple2gs_c0xx_r )
             break;
 
         // slot 6 registers should go to applefdc if slot 6 not "Your Card"
-        case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: 
-        case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: 
+        case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+        case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
 			if ((state->m_sltromsel & (1 << 6)) == 0)
 			{
                 result = applefdc_r(state->m_fdc, offset);
@@ -1207,8 +1207,8 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 			break;
 
         // slot 6 registers should go to applefdc if slot 6 not "Your Card"
-        case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: 
-        case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: 
+        case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+        case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
             if ((state->m_sltromsel & (1 << 6)) == 0)
             {
                 applefdc_w(state->m_fdc, offset, data);
@@ -1565,7 +1565,7 @@ static UINT8 apple2gs_xxCxxx_r(address_space &space, running_machine &machine, o
 		slot = (address & 0x000F00) / 0x100;
 		if (slot <= 7)	// slots 1-7, it's the slot
 		{
-			slotdevice = state->m_a2bus->get_a2bus_card(slot); 
+			slotdevice = state->m_a2bus->get_a2bus_card(slot);
 
 			// is this slot internal or "Your Card"?
 			if ((state->m_sltromsel & (1 << slot)) == 0)

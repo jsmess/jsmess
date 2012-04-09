@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM						/* RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank10")					/* Cartridge/card peek area */
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE_LEGACY(sms_store_control_r, sms_store_control_w)	/* Control */
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(sms_store_cart_select_r, sms_store_cart_select_w) 	/* cartridge/card slot selector */
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(sms_store_cart_select_r, sms_store_cart_select_w)	/* cartridge/card slot selector */
 	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(sms_store_select1)			/* Game selector port #1 */
 	AM_RANGE(0xdc00, 0xdc00) AM_READ_LEGACY(sms_store_select2)			/* Game selector port #2 */
 ADDRESS_MAP_END

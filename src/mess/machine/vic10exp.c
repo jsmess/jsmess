@@ -254,7 +254,7 @@ const char * vic10_expansion_slot_device::get_default_card_software(const machin
 
 		clear();
 	}
-	
+
 	return software_get_default_slot(config, options, this, "standard");
 }
 

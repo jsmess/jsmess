@@ -42,7 +42,7 @@ ROM_END
 
 ROM_START( cffa2_6502 )
 	ROM_REGION(0x1000, CFFA2_ROM_REGION, 0)
-    ROM_LOAD( "cffa20ee02.bin", 0x000000, 0x001000, CRC(3ecafce5) SHA1(d600692ed9626668233a22a48236af639410cb7b) ) 
+    ROM_LOAD( "cffa20ee02.bin", 0x000000, 0x001000, CRC(3ecafce5) SHA1(d600692ed9626668233a22a48236af639410cb7b) )
 ROM_END
 
 /***************************************************************************
@@ -140,7 +140,7 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 
 
 /*-------------------------------------------------
-    write_c0nx - called for writes to this card's c0nx space 
+    write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
 void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)

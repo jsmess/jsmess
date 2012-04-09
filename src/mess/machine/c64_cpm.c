@@ -2,7 +2,7 @@
 
     Commodore 64 CP/M cartridge emulation
 
-	http://www.baltissen.org/newhtm/c64_cpm.htm
+    http://www.baltissen.org/newhtm/c64_cpm.htm
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -74,16 +74,16 @@ machine_config_constructor c64_cpm_cartridge_device::device_mconfig_additions() 
 //**************************************************************************
 
 //-------------------------------------------------
-//  update_signals - 
+//  update_signals -
 //-------------------------------------------------
 
 inline void c64_cpm_cartridge_device::update_signals()
 {
 	// NOTE: none of this works until the Z80 core has been rewritten
-	
+
 	// C64 DMA
 	m_slot->dma_w(m_enabled ? ASSERT_LINE : CLEAR_LINE);
-	
+
 	// Z80 BUSRQ
 	int busrq = !(m_enabled & !m_ba) ? CLEAR_LINE : ASSERT_LINE;
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, busrq);
@@ -169,7 +169,7 @@ int c64_cpm_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hira
 
 
 //-------------------------------------------------
-//	dma_r -
+//  dma_r -
 //-------------------------------------------------
 
 READ8_MEMBER( c64_cpm_cartridge_device::dma_r )

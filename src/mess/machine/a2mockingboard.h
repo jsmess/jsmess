@@ -53,7 +53,7 @@ protected:
 	required_device<via6522_device> m_via2;
     required_device<device_t> m_ay1;
     required_device<device_t> m_ay2;
-     
+
 private:
     UINT8 m_porta1, m_porta2;
 };

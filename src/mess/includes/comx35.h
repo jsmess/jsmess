@@ -87,7 +87,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( int_w );
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	
+
 	// processor state
 	int m_clear;				// CPU mode
 	int m_q;					// Q flag

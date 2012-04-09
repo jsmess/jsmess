@@ -245,7 +245,7 @@ UINT8 vic1112_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, 
 		if (offset & 0x1000)
 		{
 			data = m_blk5[offset & 0x17ff];
-		}		
+		}
 	}
 
 	return data;
@@ -267,6 +267,6 @@ void vic1112_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data,
 		else
 		{
 			m_via0->write(space, offset & 0x0f, data);
-		}		
+		}
 	}
 }

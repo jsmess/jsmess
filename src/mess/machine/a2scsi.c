@@ -3,25 +3,25 @@
     a2scsi.c
 
     Implementation of the Apple II SCSI Card
- 
+
     Schematic at:
     http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/SCSI%20Controllers/Apple%20II%20SCSI%20Card/Schematics/Rev.%20C%20SCSI%20Schematic%20-%20Updated%202-23-6.jpg
- 
- 
+
+
     Notes:
- 
-    PAL U3C: 
-    I1 = A0 
-    I2 = A1 
-    I3 = A2 
-    I4 = A3 
-    I5 = O2 of PAL U3D 
-    I6 = (logic maze) 
+
+    PAL U3C:
+    I1 = A0
+    I2 = A1
+    I3 = A2
+    I4 = A3
+    I5 = O2 of PAL U3D
+    I6 = (logic maze)
     I7 = R/W (also I7 of PAL U3D)
     I8 = PHI0 (via flip flops)
     I9 = RESET
-    I10 = GND 
- 
+    I10 = GND
+
     O1 = P on flip-flops U6DA/U6DB, I8 on PAL U3D
     O2 = N/C
     O3 = I6 on PAL U3D
@@ -30,19 +30,19 @@
     O6 = /WR on NCR 5380
     O7 = /RD on NCR 5380
     O8 = /DACK on NCR 5380
- 
-    PAL U3D: 
+
+    PAL U3D:
     I1 = A0-A10 NANDed together (goes low on CFFF access, i.e.)
-    I2 = /IOSTB 
-    I3 = /IOSEL 
-    I4 = RESET 
-    I5 = A10 (splits C800 space at C800/CC00) 
-    I6 = O3 of PAL U3C 
-    I7 = R/W 
-    I8 = O1 of PAL U3C 
-    I9 = DRQ from 5380 
-    I10 = Y6 from 74LS138 at U3D (C0n6 access) 
- 
+    I2 = /IOSTB
+    I3 = /IOSEL
+    I4 = RESET
+    I5 = A10 (splits C800 space at C800/CC00)
+    I6 = O3 of PAL U3C
+    I7 = R/W
+    I8 = O1 of PAL U3C
+    I9 = DRQ from 5380
+    I10 = Y6 from 74LS138 at U3D (C0n6 access)
+
     O1 = G on 74LS245 main data bus buffer
     O2 = I5 of PAL U3C
     O3 = D to flip-flop at U6DB
@@ -51,7 +51,7 @@
     O6 = CS1 on RAM
     O7 = EPROM CE
     O8 = EPROM OE
- 
+
 *********************************************************************/
 
 #include "a2scsi.h"
@@ -75,8 +75,8 @@ static const SCSIConfigTable dev_table =
 {
 	0,                                      /* 2 SCSI devices */
 	{
-//	 { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
-//	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
+//   { SCSI_ID_6, "harddisk1", SCSI_DEVICE_HARDDISK },  /* SCSI ID 6, using disk1, and it's a harddisk */
+//   { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
 	}
 };
 
@@ -92,7 +92,7 @@ MACHINE_CONFIG_END
 
 ROM_START( scsi )
 	ROM_REGION(0x4000, SCSI_ROM_REGION, 0)  // this is the Rev. C ROM
-    ROM_LOAD( "341-0437-a.bin", 0x0000, 0x4000, CRC(5aff85d3) SHA1(451c85c46b92e6ad2ad930f055ccf0fe3049936d) ) 
+    ROM_LOAD( "341-0437-a.bin", 0x0000, 0x4000, CRC(5aff85d3) SHA1(451c85c46b92e6ad2ad930f055ccf0fe3049936d) )
 ROM_END
 
 /***************************************************************************
@@ -162,14 +162,14 @@ void a2bus_scsi_device::device_reset()
 -------------------------------------------------*/
 
 /*
- 
-From schematic (decoded by 74LS138 at U2D) 
- 
-C0n1/9 = DIP switches 
+
+From schematic (decoded by 74LS138 at U2D)
+
+C0n1/9 = DIP switches
 C0n2/a = clock to 74LS273 bank switcher (so data here should be the bank)
-C0n3/b = reset 5380 
-C0n6/e = into the PAL stuff 
- 
+C0n3/b = reset 5380
+C0n6/e = into the PAL stuff
+
 */
 
 UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
@@ -181,7 +181,7 @@ UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
 
 
 /*-------------------------------------------------
-    write_c0nx - called for writes to this card's c0nx space 
+    write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
 void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
@@ -198,11 +198,11 @@ void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
                 EA11 = bit 1
                 EA12 = bit 2
                 EA13 = bit 3 (N/C)
-                 
-                RAM banking: 
-                RA10 = bit 4 
-                RA11 = bit 5 
-                RA12 = bit 6 
+
+                RAM banking:
+                RA10 = bit 4
+                RA11 = bit 5
+                RA12 = bit 6
             */
 
             m_rambank = ((data>>4) & 0x7) * 0x400;
