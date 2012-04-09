@@ -798,7 +798,7 @@ static void apple2_mem_Cx00(running_machine &machine, offs_t begin, offs_t end, 
 static void apple2_mem_C300(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
-	if ((state->m_flags & (VAR_INTCXROM|VAR_SLOTC3ROM)) != VAR_SLOTC3ROM)
+	if (((state->m_flags & (VAR_INTCXROM|VAR_SLOTC3ROM)) != VAR_SLOTC3ROM) && !(state->m_flags_mask & VAR_SLOTC3ROM))
 	{
 		meminfo->read_mem		= (begin & 0x0FFF) | (state->m_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
 		meminfo->write_mem		= APPLE2_MEM_FLOATING;
@@ -939,6 +939,9 @@ void apple2_setvar(running_machine &machine, UINT32 val, UINT32 mask)
 	/* change the softswitch */
 	state->m_flags &= ~mask;
 	state->m_flags |= val;
+
+    // disable flags that don't apply (INTCXROM/SLOTC3ROM on II/II+ for instance)
+    state->m_flags &= ~state->m_flags_mask;
 
 	apple2_update_memory(machine);
 }
@@ -1697,6 +1700,9 @@ MACHINE_START( apple2 )
 {
 	apple2_memmap_config mem_cfg;
 	void *apple2cp_ce00_ram = NULL;
+	apple2_state *state = machine.driver_data<apple2_state>();
+
+    state->m_flags_mask = 0;
 
 	/* there appears to be some hidden RAM that is swapped in on the Apple
      * IIc plus; I have not found any official documentation but the BIOS
@@ -1717,6 +1723,27 @@ MACHINE_START( apple2 )
 	apple2_reset(machine);
 }
 
+MACHINE_START( apple2orig )
+{
+	apple2_memmap_config mem_cfg;
+	void *apple2cp_ce00_ram = NULL;
+	apple2_state *state = machine.driver_data<apple2_state>();
+
+    // II and II+ have no internal ROM or internal slot 3 h/w, so don't allow these states
+    state->m_flags_mask = VAR_INTCXROM|VAR_SLOTC3ROM;
+
+	apple2_init_common(machine);
+
+	/* setup memory */
+	memset(&mem_cfg, 0, sizeof(mem_cfg));
+	mem_cfg.first_bank = 1;
+	mem_cfg.memmap = apple2_memmap_entries;
+	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	apple2_setup_memory(machine, &mem_cfg);
+
+	/* perform initial reset */
+	apple2_reset(machine);
+}
 
 
 int apple2_pressed_specialkey(running_machine &machine, UINT8 key)
