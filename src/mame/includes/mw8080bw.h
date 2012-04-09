@@ -89,6 +89,24 @@ public:
 	DECLARE_READ8_MEMBER(bowler_shift_result_r);
 	DECLARE_WRITE8_MEMBER(bowler_lights_1_w);
 	DECLARE_WRITE8_MEMBER(bowler_lights_2_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(seawolf_erase_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_left_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_right_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_left_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_right_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_score_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(desertgu_gun_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(desertgu_dip_sw_0_1_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_left_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_right_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(clowns_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_coin_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw5_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
 };
 
 
@@ -135,9 +153,6 @@ MACHINE_CONFIG_EXTERN( invaders );
 extern const char layout_invaders[];
 
 UINT8 tornbase_get_cabinet_type(running_machine &machine);
-
-CUSTOM_INPUT( invaders_in1_control_r );
-CUSTOM_INPUT( invaders_in2_control_r );
 
 int invaders_is_cabinet_cocktail(running_machine &machine);
 

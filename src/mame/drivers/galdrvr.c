@@ -350,7 +350,7 @@ static INPUT_PORTS_START( azurian )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(azurian_port_r, (void *)0) /* "linked" with bit 2 of IN2 */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, azurian_port_r, (void *)0) /* "linked" with bit 2 of IN2 */
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -362,7 +362,7 @@ static INPUT_PORTS_START( azurian )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x02, "7000" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(azurian_port_r, (void *)1) /* "linked" with bit 6 of IN1 */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, azurian_port_r, (void *)1) /* "linked" with bit 6 of IN1 */
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
@@ -889,13 +889,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gmgalax )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(gmgalax_port_r, "GMIN0\0GLIN0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_port_r, "GMIN0\0GLIN0")
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(gmgalax_port_r, "GMIN1\0GLIN1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_port_r, "GMIN1\0GLIN1")
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(gmgalax_port_r, "GMIN2\0GLIN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, gmgalax_port_r, "GMIN2\0GLIN2")
 
 	PORT_START("GMIN0")      /* Ghost Muncher - IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )	                                 PORT_CONDITION("GAMESEL",0x01,PORTCOND_NOTEQUALS,0x01)
@@ -1619,14 +1619,14 @@ static INPUT_PORTS_START( kingball )
 	PORT_INCLUDE(galaxian)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(kingball_muxbit_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, kingball_muxbit_r, NULL)
 	/* Relating to above port:Hack? - possibly multiplexed via writes to $b003 */
 	//PORT_DIPNAME( 0x40, 0x40, "Speech" )
 	//PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	//PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(kingball_noise_r, NULL)	/* NOISE line */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, kingball_noise_r, NULL)	/* NOISE line */
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
@@ -2055,9 +2055,9 @@ static INPUT_PORTS_START( scramble )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(scramble_protection_alt_r, (void *)0)	/* protection bit */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, scramble_protection_alt_r, (void *)0)	/* protection bit */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(scramble_protection_alt_r, (void *)1)	/* protection bit */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, scramble_protection_alt_r, (void *)1)	/* protection bit */
 
 	PORT_START("IN3")	/* need for some PPI accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -2481,27 +2481,26 @@ static INPUT_PORTS_START( scobras )
 INPUT_PORTS_END
 
 
-static CUSTOM_INPUT( moonwar_dial_r )
+CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
 {
-	galaxian_state *state = field.machine().driver_data<galaxian_state>();
 	static const char *const dialname[2] = { "P1_DIAL", "P2_DIAL" };
-	int p = (~state->m_moonwar_port_select >> 4) & 1;
+	int p = (~m_moonwar_port_select >> 4) & 1;
 
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	signed char dialread = input_port_read(field.machine(), dialname[p]);
+	signed char dialread = input_port_read(machine(), dialname[p]);
 
 	UINT8 ret;
 
-	if (dialread < 0) state->m_direction[p] = 0x00;
-	else if (dialread > 0) state->m_direction[p] = 0x10;
+	if (dialread < 0) m_direction[p] = 0x00;
+	else if (dialread > 0) m_direction[p] = 0x10;
 
-	state->m_counter_74ls161[p] += abs(dialread);
-	state->m_counter_74ls161[p] &= 0xf;
+	m_counter_74ls161[p] += abs(dialread);
+	m_counter_74ls161[p] &= 0xf;
 
-	ret = state->m_counter_74ls161[p] | state->m_direction[p];
-	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, state->m_counter_74ls161[p], ret);
+	ret = m_counter_74ls161[p] | m_direction[p];
+	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, m_counter_74ls161[p], ret);
 
 	return ret;
 }
@@ -2509,7 +2508,7 @@ static CUSTOM_INPUT( moonwar_dial_r )
 /* verified from Z80 code */
 static INPUT_PORTS_START( moonwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(moonwar_dial_r, (void *)0)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, moonwar_dial_r, (void *)0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // cocktail: p2 shield
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
