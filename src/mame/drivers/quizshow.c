@@ -8,7 +8,6 @@
 
 TODO:
 - preserve tape and hook it up, the game is not playable without it
-- discrete sound (should be simple to those that know how)
 - is timing accurate?
 - correct dump for gfx roms
 
@@ -16,6 +15,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "sound/dac.h"
 
 #include "quizshow.lh"
 
@@ -37,7 +37,7 @@ class quizshow_state : public driver_device
 public:
 	quizshow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-	
+
 	tilemap_t *m_tilemap;
 	UINT8* m_fo_state;
 	UINT8* m_main_ram;
@@ -77,7 +77,7 @@ PALETTE_INIT( quizshow )
 		1, 0, 0, 0,
 		1, 0, 1, 0
 	};
-	
+
 	for (int i = 0; i < 16 ; i++)
 		colortable_entry_set_value(machine.colortable, i, lut_pal[i]);
 }
@@ -157,8 +157,8 @@ WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 
 WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 {
-	// d1: audio beep on/off
-	// TODO
+	// d1: audio out
+	dac_signed_w(machine().device("dac"), 0, (data & 2) ? 0x7f : 0);
 
 	// d0, d2-d7: N/C
 }
@@ -221,8 +221,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
-//	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused
+//  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
+//  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(quizshow_tape_signal_r)
 	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(m_fo_state)
 ADDRESS_MAP_END
@@ -388,7 +388,10 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_MACHINE_RESET(quizshow)
 
 	/* sound hardware (discrete) */
-	// ..
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -437,10 +440,10 @@ static DRIVER_INIT( quizshow )
 				dest[tile << 4 | line] = gfxdata[tile << 3 | (line - 4)];
 		}
 	}
-	
+
 	// HACK out a gfxrom glitch, remove it when a good dump is out
 	dest[0x208] = dest[0x209] = 0;
 }
 
 
-GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", GAME_NO_SOUND | GAME_NOT_WORKING, layout_quizshow )
+GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", GAME_NOT_WORKING, layout_quizshow )

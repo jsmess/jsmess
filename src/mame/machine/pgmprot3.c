@@ -1,5 +1,5 @@
 /***********************************************************************
- PGM IGA027A (55857G* type) ARM protection emulation
+ PGM IGS027A (55857G* type) ARM protection emulation
   *guess, the part number might not be directly tied to behavior, see note below
 
  these are emulation of the 'dmnfrnt' type ARM device
@@ -29,7 +29,7 @@
 
  IGS027A type 55857G has also been seen on various IGS gambling boards
  as the main CPU (eg. Haunted House, see igs_m027a)
- 
+
  55857G is also used on the Cave single board PGM systems, but in those
  cases it behaves like the 55857E (pgmprot1.c)
 
