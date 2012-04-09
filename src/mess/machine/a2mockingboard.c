@@ -3,7 +3,7 @@
     a2mockingboard.c
 
     Implementation of the Sweet Micro Systems Mockingboard card
- 
+
 *********************************************************************/
 
 #include "emu.h"
@@ -37,7 +37,7 @@ static const ay8910_interface mockingboard_ay8910_interface =
    DEVCB_NULL
 };
 
-const via6522_interface mockingboard_via1_intf = 
+const via6522_interface mockingboard_via1_intf =
 {
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, a2bus_mockingboard_device, via1_in_a), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, a2bus_mockingboard_device, via1_in_b),
 	DEVCB_NULL, DEVCB_NULL,
@@ -48,7 +48,7 @@ const via6522_interface mockingboard_via1_intf =
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_mockingboard_device, via1_irq_w)
 };
 
-const via6522_interface mockingboard_via2_intf = 
+const via6522_interface mockingboard_via2_intf =
 {
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, a2bus_mockingboard_device, via2_in_a), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, a2bus_mockingboard_device, via2_in_b),
 	DEVCB_NULL, DEVCB_NULL,

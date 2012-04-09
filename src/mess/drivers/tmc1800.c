@@ -725,7 +725,7 @@ void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	switch (id)
 	{
 	case TIMER_ID_EF4:
-		m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);	
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
 		break;
 	}
 }

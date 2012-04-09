@@ -182,8 +182,8 @@ ADDRESS_MAP_END
 static const struct a2bus_interface a2bus_intf =
 {
 	// interrupt lines
-//	DEVCB_HANDLER(a2bus_irq_w),
-//	DEVCB_HANDLER(a2bus_nmi_w)
+//  DEVCB_HANDLER(a2bus_irq_w),
+//  DEVCB_HANDLER(a2bus_nmi_w)
     DEVCB_NULL,
     DEVCB_NULL
 };

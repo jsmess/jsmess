@@ -3,7 +3,7 @@
 Apple II
 
 This family of computers bank-switches everything up the wazoo.
- 
+
 Remarkable features
 -------------------
 

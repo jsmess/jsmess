@@ -36,9 +36,9 @@ protected:
     virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
     virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
     virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
- 
+
 	required_device<device_t> m_fdc;
-     
+
 private:
     UINT8 *m_rom;
 };

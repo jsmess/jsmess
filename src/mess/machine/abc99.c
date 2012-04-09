@@ -238,7 +238,7 @@ machine_config_constructor abc99_device::device_mconfig_additions() const
 
 INPUT_CHANGED_MEMBER( abc99_device::keyboard_reset )
 {
- 	device_set_input_line(m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

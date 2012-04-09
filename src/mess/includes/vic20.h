@@ -54,7 +54,7 @@ public:
 	required_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_cb2_w );
-	
+
 	// memory state
 	UINT8 *m_basic;
 	UINT8 *m_kernal;

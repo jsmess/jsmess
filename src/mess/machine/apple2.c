@@ -8,7 +8,7 @@
             - need to do double-read before write-enable RAM
 
 ***************************************************************************/
-              
+
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
@@ -467,7 +467,7 @@ static READ8_HANDLER( apple2_c1xx_r )
 
 	slotnum = ((offset>>8) & 0xf) + 1;
     slotdevice = state->m_a2bus->get_a2bus_card(slotnum);
-                                 
+
     state->m_a2_cnxx_slot = slotnum;
     apple2_update_memory(space->machine());
 

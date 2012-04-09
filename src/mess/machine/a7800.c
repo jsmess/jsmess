@@ -51,7 +51,7 @@ static READ8_DEVICE_HANDLER( riot_console_button_r )
 static WRITE8_DEVICE_HANDLER( riot_button_pullup_w )
 {
 	a7800_state *state = device->machine().driver_data<a7800_state>();
-	state->m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic) 
+	state->m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
 	state->m_p2_one_button = data & 0x10;
 }
 

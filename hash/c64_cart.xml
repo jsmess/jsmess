@@ -1190,7 +1190,7 @@
 		<description>SuperCPU</description>
 		<year>1997</year>
 		<publisher>Creative Micro Designs</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="supercpu" />
 			<feature name="game" value="1" />

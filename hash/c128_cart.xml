@@ -11,7 +11,7 @@
 			<feature name="slot" value="c128diag" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="1" />
-			
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="c128diag.bin" size="0x2000" crc="584f6750" sha1="b3cfd8508b887e9c7e72ed2b0c44fe63e6b44ac4" offset="0x0000" />
 			</dataarea>
@@ -23,7 +23,7 @@
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="c128diag" />
 			<feature name="game" value="1" />

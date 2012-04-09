@@ -3,12 +3,12 @@
   a2bus.c - Apple II slot bus and card emulation
 
   by R. Belmont
- 
+
   Pinout (/ indicates an inverted signal, ie, one that would have a bar over it
           on a schematic diagram)
- 
+
       (rear of computer)
- 
+
      GND  26  25  +5V
   DMA IN  27  24  DMA OUT
   INT IN  28  23  INT OUT
@@ -34,9 +34,9 @@
       D1  48   3  A1
       D0  49   2  A0
     -12V  50   1  /IOSEL
- 
+
      (front of computer)
- 
+
     Signal descriptions:
     GND - power supply ground
     DMA IN - daisy chain of DMA signal from higher priority devices.  usually connected to DMA OUT.
@@ -65,7 +65,7 @@
   A0-A15 - 16-bit address bus
   /IOSEL - asserted on accesses to CnXX where n is the slot number.
            Not present on slot 0.
- 
+
 ***************************************************************************/
 
 #include "emu.h"

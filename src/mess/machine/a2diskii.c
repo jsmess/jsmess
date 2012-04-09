@@ -3,7 +3,7 @@
     a2diskii.c
 
     Implementation of the Apple II Disk II controller card
- 
+
 *********************************************************************/
 
 #include "emu.h"
@@ -59,7 +59,7 @@ MACHINE_CONFIG_END
 
 ROM_START( diskii )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
-    ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) ) 
+    ROM_LOAD( "341-0027-a.p5", 0x000000, 0x000100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16) )
 ROM_END
 
 //-------------------------------------------------
@@ -133,7 +133,7 @@ UINT8 a2bus_floppy_device::read_c0nx(address_space &space, UINT8 offset)
 
 
 /*-------------------------------------------------
-    write_c0nx - called for writes to this card's c0nx space 
+    write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
 void a2bus_floppy_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)

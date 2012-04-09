@@ -3,11 +3,11 @@
     a2lang.c
 
     Implementation of the Apple II Language Card
- 
+
     TODO: refactor machine/apple2.c so it's possible to have an Apple II
           and II Plus without a language card (and to emulate other
           slot 0 stuff like hack/freezer cards).
- 
+
 *********************************************************************/
 
 #include "emu.h"
@@ -108,7 +108,7 @@ UINT8 a2bus_lang_device::read_c0nx(address_space &space, UINT8 offset)
 
 
 /*-------------------------------------------------
-    write_c0nx - called for writes to this card's c0nx space 
+    write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
 void a2bus_lang_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)

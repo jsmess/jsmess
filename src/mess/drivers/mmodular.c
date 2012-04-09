@@ -144,8 +144,8 @@ public:
 	DECLARE_WRITE8_MEMBER(write_latch_sfortea);
 	DECLARE_WRITE8_MEMBER(write_lcd_IO_sfortea);
 	DECLARE_WRITE8_MEMBER(write_LCD_academy);
-//	DECLARE_WRITE16_MEMBER(diablo68_aciawrite);
-//	DECLARE_READ16_MEMBER(diablo68_aciaread);
+//  DECLARE_WRITE16_MEMBER(diablo68_aciawrite);
+//  DECLARE_READ16_MEMBER(diablo68_aciaread);
 	DECLARE_WRITE16_MEMBER(diablo68_reg_select);
 	DECLARE_WRITE16_MEMBER(diablo68_write_LCD);
 	DECLARE_WRITE8_MEMBER(milano_write_LED);

@@ -82,19 +82,19 @@ void c128_comal80_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 	if (!io1)
 	{
 		/*
-		
-		    bit     description
-		
-		    0       
-		    1       
-		    2       
-		    3       
-		    4       A14
-		    5       ROM select bit 0
-		    6       ROM select bit 1
-		    7       
-		
-		*/
+
+            bit     description
+
+            0
+            1
+            2
+            3
+            4       A14
+            5       ROM select bit 0
+            6       ROM select bit 1
+            7
+
+        */
 
 		m_bank = (data >> 4) & 0x07;
 	}

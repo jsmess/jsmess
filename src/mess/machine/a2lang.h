@@ -31,7 +31,7 @@ protected:
 
     virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
     virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
- 
+
 private:
     void langcard_touch(offs_t offset);
 };
