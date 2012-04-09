@@ -7,10 +7,7 @@
 ****************************************************************************/
 
 
-#include "emu.h"
 #include "includes/special.h"
-#include "machine/ram.h"
-
 
 
 VIDEO_START( special )
@@ -20,18 +17,16 @@ VIDEO_START( special )
 SCREEN_UPDATE_IND16( special )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
-  UINT8 code;
+	UINT8 code;
 	int y, x, b;
 
 	for (x = 0; x < 48; x++)
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = state->m_specialist_video_ram[y + x*256];
+			code = state->m_p_videoram[y + x*256];
 			for (b = 7; b >= 0; b--)
-			{
 				bitmap.pix16(y, x*8+(7-b)) =  (code >> b) & 0x01;
-			}
 		}
 	}
 	return 0;
@@ -43,18 +38,16 @@ VIDEO_START( specialp )
 SCREEN_UPDATE_IND16( specialp )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
-  UINT8 code;
+	UINT8 code;
 	int y, x, b;
 
 	for (x = 0; x < 64; x++)
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = state->m_specialist_video_ram[y + x*256];
+			code = state->m_p_videoram[y + x*256];
 			for (b = 7; b >= 0; b--)
-			{
 				bitmap.pix16(y, x*8+(7-b)) =  (code >> b) & 0x01;
-			}
 		}
 	}
 	return 0;
@@ -77,7 +70,7 @@ const rgb_t specimx_palette[16] = {
 	MAKE_RGB(0xff, 0x55, 0x55), // C
 	MAKE_RGB(0xff, 0x55, 0xff), // D
 	MAKE_RGB(0xff, 0xff, 0x55), // E
-	MAKE_RGB(0xff, 0xff, 0xff)	// F
+	MAKE_RGB(0xff, 0xff, 0xff)  // F
 };
 
 PALETTE_INIT( specimx )
@@ -106,10 +99,7 @@ SCREEN_UPDATE_IND16( specimx )
 			code = screen.machine().device<ram_device>(RAM_TAG)->pointer()[0x9000 + y + x*256];
 			color = state->m_specimx_colorram[y + x*256];
 			for (b = 7; b >= 0; b--)
-			{
-
 				bitmap.pix16(y, x*8+(7-b)) =  ((code >> b) & 0x01)==0 ? color & 0x0f : (color >> 4)& 0x0f ;
-			}
 		}
 	}
 	return 0;
@@ -139,9 +129,9 @@ VIDEO_START( erik )
 SCREEN_UPDATE_IND16( erik )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
-  UINT8 code1;
-  UINT8 code2;
-  UINT8 color1,color2;
+	UINT8 code1;
+	UINT8 code2;
+	UINT8 color1,color2;
 	int y, x, b;
 	UINT8 *erik_video_ram_p1;
 	UINT8 *erik_video_ram_p2;
@@ -166,5 +156,3 @@ SCREEN_UPDATE_IND16( erik )
 	}
 	return 0;
 }
-
-
