@@ -636,6 +636,8 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
+	MCFG_MACHINE_START(apple2orig)
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -648,6 +650,7 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
+	MCFG_MACHINE_START(apple2orig)
 	MCFG_VIDEO_START(apple2p)
 
 	/* internal ram */
