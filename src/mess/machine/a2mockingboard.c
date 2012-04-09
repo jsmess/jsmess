@@ -7,11 +7,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
-#include "imagedev/flopdrv.h"
-#include "formats/ap2_dsk.h"
-#include "devices/appldriv.h"
-#include "machine/applefdc.h"
 #include "machine/a2mockingboard.h"
 
 
