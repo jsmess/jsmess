@@ -8,55 +8,42 @@
 ****************************************************************************/
 
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/dac.h"
-#include "sound/wave.h"
 #include "includes/special.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "formats/rk_cas.h"
-#include "formats/smx_dsk.h"
-#include "machine/wd17xx.h"
-#include "machine/ram.h"
+
 
 /* Address maps */
 static ADDRESS_MAP_START(specialist_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
-    AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
-    AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE(m_specialist_video_ram) // Video RAM
-    AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
-    AM_RANGE( 0xf000, 0xf700 ) AM_NOP
-    AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE( 0x3000, 0x8fff ) AM_RAM  // RAM
+	AM_RANGE( 0x9000, 0xbfff ) AM_RAM  AM_BASE(m_p_videoram) // Video RAM
+	AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
+	AM_RANGE( 0xf000, 0xf700 ) AM_NOP
+	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specialp_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0x0000, 0x2fff ) AM_RAMBANK("bank1") // First bank
-    AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
-    AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE(m_specialist_video_ram) // Video RAM
-    AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
-    AM_RANGE( 0xf000, 0xf700 ) AM_NOP
-    AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE( 0x3000, 0x7fff ) AM_RAM  // RAM
+	AM_RANGE( 0x8000, 0xbfff ) AM_RAM  AM_BASE(m_p_videoram) // Video RAM
+	AM_RANGE( 0xc000, 0xf000 ) AM_ROM  // System ROM
+	AM_RANGE( 0xf000, 0xf700 ) AM_NOP
+	AM_RANGE( 0xf800, 0xf803 ) AM_MIRROR(0x7fc) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(erik_mem, AS_PROGRAM, 8, special_state )
-    AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
-    AM_RANGE( 0x4000, 0x8fff ) AM_RAMBANK("bank2")
-    AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank3")
-    AM_RANGE( 0xc000, 0xefff ) AM_RAMBANK("bank4")
-    AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK("bank5")
-    AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank6")
+	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0x4000, 0x8fff ) AM_RAMBANK("bank2")
+	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank3")
+	AM_RANGE( 0xc000, 0xefff ) AM_RAMBANK("bank4")
+	AM_RANGE( 0xf000, 0xf7ff ) AM_RAMBANK("bank5")
+	AM_RANGE( 0xf800, 0xffff ) AM_RAMBANK("bank6")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( erik_io_map, AS_IO, 8, special_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE_LEGACY(erik_rr_reg_r, erik_rr_reg_w)
-	AM_RANGE(0xf2, 0xf2) AM_READWRITE_LEGACY(erik_rc_reg_r, erik_rc_reg_w)
-	AM_RANGE(0xf3, 0xf3) AM_READWRITE_LEGACY(erik_disk_reg_r, erik_disk_reg_w)
+	AM_RANGE(0xf1, 0xf1) AM_READWRITE(erik_rr_reg_r, erik_rr_reg_w)
+	AM_RANGE(0xf2, 0xf2) AM_READWRITE(erik_rc_reg_r, erik_rc_reg_w)
+	AM_RANGE(0xf3, 0xf3) AM_READWRITE(erik_disk_reg_r, erik_disk_reg_w)
 	AM_RANGE(0xf4, 0xf4) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r, wd17xx_command_w)
 	AM_RANGE(0xf5, 0xf5) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r, wd17xx_track_w)
 	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r, wd17xx_sector_w)
@@ -65,20 +52,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
 	ADDRESS_MAP_UNMAP_HIGH
-    AM_RANGE( 0x0000, 0x8fff ) AM_RAMBANK("bank1")
+	AM_RANGE( 0x0000, 0x8fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0xc000, 0xffbf ) AM_RAMBANK("bank3")
-    AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
-    AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-    AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
-    AM_RANGE( 0xffe8, 0xffe8 ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r,wd17xx_command_w)
-    AM_RANGE( 0xffe9, 0xffe9 ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r,wd17xx_track_w)
-    AM_RANGE( 0xffea, 0xffea ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r,wd17xx_sector_w)
-    AM_RANGE( 0xffea, 0xffeb ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r,wd17xx_data_w)
-    AM_RANGE( 0xffec, 0xffef ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
-    AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE_LEGACY(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
-    AM_RANGE( 0xfff8, 0xfff8 ) AM_READWRITE_LEGACY(specimx_video_color_r,specimx_video_color_w)
-    AM_RANGE( 0xfffc, 0xfffe ) AM_WRITE_LEGACY(specimx_select_bank)
+	AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
+	AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+	AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
+	AM_RANGE( 0xffe8, 0xffe8 ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r,wd17xx_command_w)
+	AM_RANGE( 0xffe9, 0xffe9 ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r,wd17xx_track_w)
+	AM_RANGE( 0xffea, 0xffea ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r,wd17xx_sector_w)
+	AM_RANGE( 0xffea, 0xffeb ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r,wd17xx_data_w)
+	AM_RANGE( 0xffec, 0xffef ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
+	AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
+	AM_RANGE( 0xfff8, 0xfff8 ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w)
+	AM_RANGE( 0xfffc, 0xfffe ) AM_WRITE(specimx_select_bank)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -413,75 +400,67 @@ static const floppy_interface specimx_floppy_interface =
 
 /* Machine driver */
 static MACHINE_CONFIG_START( special, special_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", I8080, 2000000)
-    MCFG_CPU_PROGRAM_MAP(specialist_mem)
-    MCFG_MACHINE_RESET( special )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8080, 2000000)
+	MCFG_CPU_PROGRAM_MAP(specialist_mem)
+	MCFG_MACHINE_RESET( special )
 
-	MCFG_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
-
-	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
-
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-    MCFG_SCREEN_UPDATE_STATIC(special)
-
+	MCFG_VIDEO_START(special)
+	MCFG_SCREEN_UPDATE_STATIC(special)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-    MCFG_VIDEO_START(special)
-
-    /* audio hardware */
+	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	/* Devices */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
-
+	MCFG_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
+	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specialp, special )
-
 	/* basic machine hardware */
-    MCFG_CPU_MODIFY("maincpu")
-    MCFG_CPU_PROGRAM_MAP(specialp_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(specialp_mem)
 
-    MCFG_SCREEN_MODIFY("screen")
-    MCFG_SCREEN_UPDATE_STATIC(specialp)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_STATIC(specialp)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-
-    MCFG_VIDEO_START(specialp)
+	MCFG_VIDEO_START(specialp)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specimx, special )
-    MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(specimx_mem)
 
 	MCFG_MACHINE_START ( specimx )
 	MCFG_MACHINE_RESET ( specimx )
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_STATIC(specimx)
-
 	MCFG_VIDEO_START(specimx)
-
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT( specimx )
 
-    /* audio hardware */
+	/* audio hardware */
 	MCFG_SOUND_ADD("custom", SPECIMX, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	/* Devices */
 	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
-
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
 
 	/* internal ram */
@@ -491,39 +470,35 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( erik, special_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", Z80, 4000000)
-    MCFG_CPU_PROGRAM_MAP(erik_mem)
-    MCFG_CPU_IO_MAP(erik_io_map)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(erik_mem)
+	MCFG_CPU_IO_MAP(erik_io_map)
+	MCFG_MACHINE_RESET( erik )
 
-    MCFG_MACHINE_RESET( erik )
-
-	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
-
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-    MCFG_SCREEN_UPDATE_STATIC(erik)
-
+	MCFG_VIDEO_START(erik)
+	MCFG_SCREEN_UPDATE_STATIC(erik)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT(erik)
 
-    MCFG_VIDEO_START(erik)
-    /* audio hardware */
+	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	/* Devices */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
-
 	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
-
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
+	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -533,7 +508,7 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( special )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "2nd", "2nd rev.")
 	ROMX_LOAD( "monitor2_1.rom", 0xc000, 0x0800, CRC(52abde77) SHA1(66ba2ef9eac14a5c0df510224ea25fd5745399cd), ROM_BIOS(1))
 	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(1))
@@ -549,7 +524,7 @@ ROM_START( special )
 	ROMX_LOAD( "pzu4.rom", 0xd800, 0x0800, CRC(6793ba23) SHA1(3a27b5dbc6561ea7af5fb30513dc83ec64f1d94c), ROM_BIOS(3))
 	ROMX_LOAD( "pzu5.rom", 0xe000, 0x0800, CRC(13a1a0dc) SHA1(3a0818cb8f36c2c5a9b9916669538ad1702a7710), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "1st", "1st rev.")
-    ROMX_LOAD( "special1.rom", 0xc000, 0x1000, CRC(217414BD) SHA1(345cd1410fbca8f75421d12d1419f27f81cd35d6), ROM_BIOS(4))
+	ROMX_LOAD( "special1.rom", 0xc000, 0x1000, CRC(217414BD) SHA1(345cd1410fbca8f75421d12d1419f27f81cd35d6), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "2col", "2nd rev. color")
 	ROMX_LOAD( "col_mon2.rom",   0xc000, 0x0800, CRC(8cebb1b5) SHA1(0c912a25220de8c5135e16c443e4796e6bb6f805), ROM_BIOS(5))
 	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(5))
@@ -557,7 +532,7 @@ ROM_START( special )
 ROM_END
 
 ROM_START( specialm )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pzu1-m.rom", 0xc000, 0x0800, CRC(61e94485) SHA1(dbe212dcd377cb8cd16000516cd4b3b760ce779e))
 	ROM_LOAD( "pzu2-m.rom", 0xc800, 0x0800, CRC(83d76815) SHA1(9d139eaa6ca6b241fa9fac94ede72abb56d83674))
 	ROM_LOAD( "pzu3-m.rom", 0xd000, 0x0800, CRC(2121ad65) SHA1(b43811d058d818f8c1cee59b405b515f96958656))
@@ -565,46 +540,46 @@ ROM_START( specialm )
 ROM_END
 
 ROM_START( specialp )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "special6.rom", 0xc000, 0x1000, CRC(f0c5a0ac) SHA1(50b53bd7c05117930aa84653a9ea0fc0c6f0f496) )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "special6.rom", 0xc000, 0x1000, CRC(f0c5a0ac) SHA1(50b53bd7c05117930aa84653a9ea0fc0c6f0f496) )
 ROM_END
 
 ROM_START( lik )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-    ROM_SYSTEM_BIOS(0, "1st", "1st rev.")
-    ROMX_LOAD( "lik.rom",	0xc000, 0x3000, CRC(705BB3A0) SHA1(f90b009ec9d3303bbda228714dd24de057e744b6), ROM_BIOS(1))
-    ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
-    ROMX_LOAD( "lik2.rom",	0xc000, 0x3000, CRC(71820E43) SHA1(a85b4fc33b1ea96a1b8fe0c791f1aab8e967bb44), ROM_BIOS(2))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "1st", "1st rev.")
+	ROMX_LOAD( "lik.rom",	0xc000, 0x3000, CRC(705BB3A0) SHA1(f90b009ec9d3303bbda228714dd24de057e744b6), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
+	ROMX_LOAD( "lik2.rom",	0xc000, 0x3000, CRC(71820E43) SHA1(a85b4fc33b1ea96a1b8fe0c791f1aab8e967bb44), ROM_BIOS(2))
 ROM_END
 
 ROM_START( specimx )
-    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-    ROM_SYSTEM_BIOS(0, "FOS", "ROM FOS")
-    ROMX_LOAD( "specimx.rom", 0x10000, 0xb800,  CRC(DB68F9B1) SHA1(c79888449f8a605267ec3e10dcc8e6e6f43b3a95), ROM_BIOS(1))
-    ROM_SYSTEM_BIOS(1, "NC", "NC")
-    ROMX_LOAD( "ncrdy.rom",   0x10000, 0x10000, CRC(5D04C522) SHA1(d7daa7fe14cd8e0c6f87fd6453ec3e94ea2c259f) ,ROM_BIOS(2))
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "FOS", "ROM FOS")
+	ROMX_LOAD( "specimx.rom", 0x10000, 0xb800,  CRC(DB68F9B1) SHA1(c79888449f8a605267ec3e10dcc8e6e6f43b3a95), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "NC", "NC")
+	ROMX_LOAD( "ncrdy.rom",   0x10000, 0x10000, CRC(5D04C522) SHA1(d7daa7fe14cd8e0c6f87fd6453ec3e94ea2c259f) ,ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "RAMFOS", "RAMFOS")
 	ROMX_LOAD( "ramfos.rom",  0x10000, 0x3000, CRC(83e19df4) SHA1(20e5e53eb45729a24c1c7c63e114dbd14e3c4184) ,ROM_BIOS(3))
 ROM_END
 
 ROM_START( erik )
-    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD( "erik.bin", 0x10000, 0x10000, CRC(6F3208F4) SHA1(41f6e2763ef60d3c7214c98893e580d25346fa2d))
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "erik.bin", 0x10000, 0x10000, CRC(6F3208F4) SHA1(41f6e2763ef60d3c7214c98893e580d25346fa2d))
 ROM_END
 
 ROM_START( pioner )
 	// Ukranian clone with 16KB RAM
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pioner.rf2", 0xc000, 0x0800, CRC(d6250ab2) SHA1(b953517d883c64857e63139fed52436f77d371cb))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT       INIT        COMPANY              FULLNAME       FLAGS */
-COMP( 1985, special,    0,  	0,		special,	special,	special,    "<unknown>",				 "Specialist",		0)
-COMP( 1985, specialm,   special,0,		special,	special,	special,    "<unknown>",				 "Specialist M",		0)
-COMP( 1985, pioner,     special,0,		special,	special,	special,    "<unknown>",				 "Pioner",		0)
-COMP( 1985, specialp,   special,0,		specialp,	specialp,	special,    "<unknown>",				 "Specialist + hires graph",		0)
-COMP( 1985, lik,    	special,0,		special,	lik,		special,    "<unknown>",				 "Lik",				0)
-COMP( 1985, specimx,	special,0,		specimx,	specimx,	0,	      "<unknown>",				 "Specialist MX",	0)
-COMP( 1994, erik,   	special,0,		erik,		special,	erik,		"<unknown>",				 "Erik",	0)
+/*    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT       INIT        COMPANY      FULLNAME       FLAGS */
+COMP( 1985, special,    0,        0,       special,   special,    special,   "<unknown>", "Specialist", GAME_NOT_WORKING )
+COMP( 1985, specialm,   special,  0,       special,   special,    special,   "<unknown>", "Specialist M", GAME_NOT_WORKING )
+COMP( 1985, pioner,     special,  0,       special,   special,    special,   "<unknown>", "Pioner", GAME_NOT_WORKING )
+COMP( 1985, specialp,   special,  0,       specialp,  specialp,   special,   "<unknown>", "Specialist + hires graph", GAME_NOT_WORKING )
+COMP( 1985, lik,        special,  0,       special,   lik,        special,   "<unknown>", "Lik", GAME_NOT_WORKING )
+COMP( 1985, specimx,    special,  0,       specimx,   specimx,    0,         "<unknown>", "Specialist MX", 0)
+COMP( 1994, erik,       special,  0,       erik,      special,    erik,      "<unknown>", "Erik", GAME_NOT_WORKING )

@@ -7,20 +7,62 @@
 #ifndef SPECIAL_H_
 #define SPECIAL_H_
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
+#include "sound/dac.h"
+#include "sound/wave.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
+#include "formats/rk_cas.h"
+#include "formats/smx_dsk.h"
+#include "machine/wd17xx.h"
+#include "machine/ram.h"
+
 
 class special_state : public driver_device
 {
 public:
 	special_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_ppi(*this, "ppi8255"),
+	m_fdc(*this, "wd1793"),
+	m_dac(*this, "dac"),
+	m_cass(*this, CASSETTE_TAG)
+	{ }
 
+	DECLARE_WRITE8_MEMBER(specimx_select_bank);
+	DECLARE_WRITE8_MEMBER(video_memory_w);
+	DECLARE_WRITE8_MEMBER(specimx_video_color_w);
+	DECLARE_READ8_MEMBER(specimx_video_color_r);
+	DECLARE_READ8_MEMBER(specimx_disk_ctrl_r);
+	DECLARE_WRITE8_MEMBER(specimx_disk_ctrl_w);
+	DECLARE_READ8_MEMBER(erik_rr_reg_r);
+	DECLARE_WRITE8_MEMBER(erik_rr_reg_w);
+	DECLARE_READ8_MEMBER(erik_rc_reg_r);
+	DECLARE_WRITE8_MEMBER(erik_rc_reg_w);
+	DECLARE_READ8_MEMBER(erik_disk_reg_r);
+	DECLARE_WRITE8_MEMBER(erik_disk_reg_w);
+	DECLARE_READ8_MEMBER(specialist_8255_porta_r);
+	DECLARE_READ8_MEMBER(specialist_8255_portb_r);
+	DECLARE_READ8_MEMBER(specialist_8255_portc_r);
+	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
+	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
+	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
+	DECLARE_WRITE_LINE_MEMBER(specimx_pit8253_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(specimx_pit8253_out1_changed);
+	DECLARE_WRITE_LINE_MEMBER(specimx_pit8253_out2_changed);
+	void specimx_set_bank(offs_t i, UINT8 data);
+	void erik_set_bank();
 	UINT8 *m_specimx_colorram;
 	UINT8 m_erik_color_1;
 	UINT8 m_erik_color_2;
 	UINT8 m_erik_background;
-	UINT8 *m_specialist_video_ram;
+	UINT8 *m_p_videoram;
 	UINT8 m_specimx_color;
 	device_t *m_specimx_audio;
 	int m_specialist_8255_porta;
@@ -28,6 +70,11 @@ public:
 	int m_specialist_8255_portc;
 	UINT8 m_RR_register;
 	UINT8 m_RC_register;
+	required_device<cpu_device> m_maincpu;
+	optional_device<i8255_device> m_ppi;
+	optional_device<device_t> m_fdc;
+	optional_device<device_t> m_dac;
+	optional_device<cassette_image_device> m_cass;
 };
 
 
@@ -42,23 +89,8 @@ MACHINE_RESET( special );
 MACHINE_RESET( specimx );
 MACHINE_START ( specimx );
 
-WRITE8_HANDLER( specimx_select_bank );
-
-READ8_HANDLER ( specimx_video_color_r );
-WRITE8_HANDLER( specimx_video_color_w );
-
-READ8_HANDLER ( specimx_disk_ctrl_r );
-WRITE8_HANDLER( specimx_disk_ctrl_w );
-
 DRIVER_INIT( erik );
 MACHINE_RESET( erik );
-
-READ8_HANDLER ( erik_rr_reg_r );
-WRITE8_HANDLER( erik_rr_reg_w );
-READ8_HANDLER ( erik_rc_reg_r );
-WRITE8_HANDLER( erik_rc_reg_w );
-READ8_HANDLER ( erik_disk_reg_r );
-WRITE8_HANDLER( erik_disk_reg_w );
 
 /*----------- defined in video/special.c -----------*/
 
