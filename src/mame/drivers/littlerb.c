@@ -106,6 +106,7 @@ public:
 	DECLARE_WRITE16_MEMBER(littlerb_vdp_w);
 	DECLARE_WRITE16_MEMBER(littlerb_l_sound_w);
 	DECLARE_WRITE16_MEMBER(littlerb_r_sound_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
 };
 
 
@@ -130,9 +131,9 @@ static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16, littlerb_state )
 	AM_RANGE(0x00800002 ,0x00800003) AM_DEVWRITE8("^ramdac", ramdac_device, pal_w,   0x00ff)
 	AM_RANGE(0x00800004 ,0x00800005) AM_DEVWRITE8("^ramdac", ramdac_device, mask_w,  0x00ff)
 
-	AM_RANGE(0x1ff80804, 0x1ff80805) AM_READ(buffer_status_r)
+	AM_RANGE(0x1ff80804, 0x1ff80805) AM_DEVREAD("^", littlerb_state, buffer_status_r)
 	// most gfx end up here including the sprite list
-	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE(region4_w)  AM_BASE(m_region4)
+	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM AM_DEVWRITE("^", littlerb_state, region4_w)  AM_BASE(m_region4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, littlerb_state )
@@ -349,9 +350,9 @@ static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16, littlerb_state )
 ADDRESS_MAP_END
 
 /* guess according to DASM code and checking the gameplay speed, could be different */
-static CUSTOM_INPUT( littlerb_frame_step_r )
+CUSTOM_INPUT_MEMBER(littlerb_state::littlerb_frame_step_r)
 {
-	UINT32 ret = field.machine().primary_screen->frame_number();
+	UINT32 ret = machine().primary_screen->frame_number();
 
 	return (ret) & 7;
 }
@@ -422,7 +423,7 @@ static INPUT_PORTS_START( littlerb )
 	PORT_DIPNAME( 0x1000, 0x1000, "???"  )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(littlerb_frame_step_r, NULL)
+	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, littlerb_state,littlerb_frame_step_r, NULL)
 
 	PORT_START("P2")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
