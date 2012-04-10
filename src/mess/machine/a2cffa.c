@@ -86,13 +86,15 @@ a2bus_cffa2000_device::a2bus_cffa2000_device(const machine_config &mconfig, devi
 }
 
 a2bus_cffa2_device::a2bus_cffa2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)", tag, owner, clock)
+    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (65C02 firmware, www.dreher.net)", tag, owner, clock),
+	device_nvram_interface(mconfig, *this)
 {
 	m_shortname = "a2cffa2";
 }
 
 a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)", tag, owner, clock)
+    a2bus_cffa2000_device(mconfig, A2BUS_CFFA2, "CFFA2000 Compact Flash (6502 firmware, www.dreher.net)", tag, owner, clock),
+	device_nvram_interface(mconfig, *this)
 {
 	m_shortname = "a2cffa02";
 }
@@ -108,10 +110,14 @@ void a2bus_cffa2000_device::device_start()
 
 	astring tempstring;
 	m_rom = device().machine().region(this->subtag(tempstring, CFFA2_ROM_REGION))->base();
+
+	// patch default setting so slave device is enabled
+	m_rom[0x801] = 4;
 }
 
 void a2bus_cffa2000_device::device_reset()
 {
+	m_writeprotect = true;
 }
 
 
@@ -121,18 +127,31 @@ void a2bus_cffa2000_device::device_reset()
 
 UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 {
-	if (offset == 0)
+	switch (offset)
 	{
-		return m_lastdata>>8;
-	}
-	else if (offset == 8)
-	{
-		m_lastdata = ide_controller_r(m_ide, 0x1f0+offset-8, 2);
-		return m_lastdata & 0xff;
-	}
-	else if (offset > 8)
-	{
-		return ide_controller_r(m_ide, 0x1f0+offset-8, 1);
+		case 0:
+			return m_lastdata>>8;
+
+		case 3:
+			m_writeprotect = false;
+			break;
+
+		case 4:
+			m_writeprotect = true;
+			break;
+
+		case 8:
+			m_lastdata = ide_controller_r(m_ide, 0x1f0+offset-8, 2);
+			return m_lastdata & 0xff;
+
+		case 9:
+		case 0xa:
+		case 0xb:
+		case 0xc:
+		case 0xd:
+		case 0xe:
+		case 0xf:
+			return ide_controller_r(m_ide, 0x1f0+offset-8, 1);
 	}
 
 	return 0xff;
@@ -145,20 +164,36 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-	if (offset == 0)
+	switch (offset)
 	{
-		m_lastdata &= 0x00ff;
-		m_lastdata |= data<<8;
-	}
-	else if (offset == 8)
-	{
-		m_lastdata &= 0xff00;
-		m_lastdata |= data;
-		ide_controller_w(m_ide, 0x1f0+offset-8, 2, m_lastdata);
-	}
-	else if (offset > 8)
-	{
-		ide_controller_w(m_ide, 0x1f0+offset-8, 1, data);
+		case 0:
+			m_lastdata &= 0x00ff;
+			m_lastdata |= data<<8;
+			break;
+
+		case 3:
+			m_writeprotect = false;
+			break;
+
+		case 4:
+			m_writeprotect = true;
+			break;
+
+		case 8:
+			m_lastdata &= 0xff00;
+			m_lastdata |= data;
+			ide_controller_w(m_ide, 0x1f0+offset-8, 2, m_lastdata);
+			break;
+
+		case 9:
+		case 0xa:
+		case 0xb:
+		case 0xc:
+		case 0xd:
+		case 0xe:
+		case 0xf:
+			ide_controller_w(m_ide, 0x1f0+offset-8, 1, data);
+			break;
 	}
 }
 
@@ -171,7 +206,7 @@ UINT8 a2bus_cffa2000_device::read_cnxx(address_space &space, UINT8 offset)
     int slotimg = m_slot * 0x100;
 
     // ROM contains a CnXX image for each of slots 1-7
-    return m_rom[offset+slotimg];
+    return m_eeprom[offset+slotimg];
 }
 
 /*-------------------------------------------------
@@ -180,6 +215,46 @@ UINT8 a2bus_cffa2000_device::read_cnxx(address_space &space, UINT8 offset)
 
 UINT8 a2bus_cffa2000_device::read_c800(address_space &space, UINT16 offset)
 {
-    return m_rom[offset+0x800];
+    return m_eeprom[offset+0x800];
+}
+
+void a2bus_cffa2000_device::write_c800(address_space &space, UINT16 offset, UINT8 data)
+{
+	if (!m_writeprotect)
+	{
+		printf("Write %02x to EEPROM at %x\n", data, offset);
+		m_eeprom[offset + 0x800] = data;
+	}
+}
+
+// NVRAM device virtual overrides to provide saving/loading of settings changes
+void a2bus_cffa2_device::nvram_default()
+{
+	memcpy(m_eeprom, m_rom, 0x1000);
+}
+
+void a2bus_cffa2_device::nvram_read(emu_file &file)
+{
+	file.read(m_eeprom, 0x1000);
+}
+
+void a2bus_cffa2_device::nvram_write(emu_file &file)
+{
+	file.write(m_eeprom, 0x1000);
+}
+
+void a2bus_cffa2_6502_device::nvram_default()
+{
+	memcpy(m_eeprom, m_rom, 0x1000);
+}
+
+void a2bus_cffa2_6502_device::nvram_read(emu_file &file)
+{
+	file.read(m_eeprom, 0x1000);
+}
+
+void a2bus_cffa2_6502_device::nvram_write(emu_file &file)
+{
+	file.write(m_eeprom, 0x1000);
 }
 
