@@ -577,7 +577,7 @@ ROM_END
 
 /*    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT       INIT        COMPANY      FULLNAME       FLAGS */
 COMP( 1985, special,    0,        0,       special,   special,    special,   "<unknown>", "Specialist", GAME_NOT_WORKING )
-COMP( 1985, specialm,   special,  0,       special,   special,    special,   "<unknown>", "Specialist M", GAME_NOT_WORKING )
+COMP( 1985, specialm,   special,  0,       special,   special,    special,   "<unknown>", "Specialist M", 0 )
 COMP( 1985, pioner,     special,  0,       special,   special,    special,   "<unknown>", "Pioner", GAME_NOT_WORKING )
 COMP( 1985, specialp,   special,  0,       specialp,  specialp,   special,   "<unknown>", "Specialist + hires graph", GAME_NOT_WORKING )
 COMP( 1985, lik,        special,  0,       special,   lik,        special,   "<unknown>", "Lik", GAME_NOT_WORKING )

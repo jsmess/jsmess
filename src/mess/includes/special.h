@@ -32,7 +32,8 @@ public:
 	m_ppi(*this, "ppi8255"),
 	m_fdc(*this, "wd1793"),
 	m_dac(*this, "dac"),
-	m_cass(*this, CASSETTE_TAG)
+	m_cass(*this, CASSETTE_TAG),
+	m_ram(*this, RAM_TAG)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(specimx_select_bank);
@@ -75,6 +76,7 @@ public:
 	optional_device<device_t> m_fdc;
 	optional_device<device_t> m_dac;
 	optional_device<cassette_image_device> m_cass;
+	optional_device<ram_device> m_ram;
 };
 
 

@@ -89,14 +89,14 @@ VIDEO_START( specimx )
 SCREEN_UPDATE_IND16( specimx )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
-	UINT8 code,color;
+	UINT8 code, color;
 	int y, x, b;
 
 	for (x = 0; x < 48; x++)
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = screen.machine().device<ram_device>(RAM_TAG)->pointer()[0x9000 + y + x*256];
+			code = state->m_ram->pointer()[0x9000 + y + x*256];
 			color = state->m_specimx_colorram[y + x*256];
 			for (b = 7; b >= 0; b--)
 				bitmap.pix16(y, x*8+(7-b)) =  ((code >> b) & 0x01)==0 ? color & 0x0f : (color >> 4)& 0x0f ;
@@ -129,15 +129,12 @@ VIDEO_START( erik )
 SCREEN_UPDATE_IND16( erik )
 {
 	special_state *state = screen.machine().driver_data<special_state>();
-	UINT8 code1;
-	UINT8 code2;
-	UINT8 color1,color2;
+	UINT8 code1, code2, color1, color2;
 	int y, x, b;
-	UINT8 *erik_video_ram_p1;
-	UINT8 *erik_video_ram_p2;
+	UINT8 *erik_video_ram_p1, *erik_video_ram_p2;
 
-	erik_video_ram_p1 =  screen.machine().device<ram_device>(RAM_TAG)->pointer() + 0x9000;
-	erik_video_ram_p2 =  screen.machine().device<ram_device>(RAM_TAG)->pointer() + 0xd000;
+	erik_video_ram_p1 = state->m_ram->pointer() + 0x9000;
+	erik_video_ram_p2 = state->m_ram->pointer() + 0xd000;
 
 	for (x = 0; x < 48; x++)
 	{

@@ -119,7 +119,7 @@ MACHINE_RESET( special )
 */
 WRITE8_MEMBER( special_state::video_memory_w )
 {
-	machine().device<ram_device>(RAM_TAG)->pointer()[0x9000 + offset] = data;
+	m_ram->pointer()[0x9000 + offset] = data;
 	m_specimx_colorram[offset] = m_specimx_color;
 }
 
@@ -136,7 +136,7 @@ READ8_MEMBER( special_state::specimx_video_color_r )
 void special_state::specimx_set_bank(offs_t i, UINT8 data)
 {
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	space->install_write_bank(0xc000, 0xffbf, "bank3");
 	space->install_write_bank(0xffc0, 0xffdf, "bank4");
@@ -145,7 +145,6 @@ void special_state::specimx_set_bank(offs_t i, UINT8 data)
 	{
 		case 0 :
 			space->install_write_bank(0x0000, 0x8fff, "bank1");
-			//space->install_legacy_write_handler(0x9000, 0xbfff, FUNC(video_memory_w));
 			space->install_write_handler(0x9000, 0xbfff, write8_delegate(FUNC(special_state::video_memory_w), this));
 
 			memory_set_bankptr(machine(), "bank1", ram);
@@ -274,7 +273,7 @@ void special_state::erik_set_bank()
 	UINT8 bank3 = (m_RR_register >> 4) & 3;
 	UINT8 bank4 = (m_RR_register >> 6) & 3;
 	UINT8 *mem = machine().region("maincpu")->base();
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 	address_space *space = m_maincpu->memory().space(AS_PROGRAM);
 
 	space->install_write_bank(0x0000, 0x3fff, "bank1");
