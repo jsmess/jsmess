@@ -421,10 +421,12 @@ class magicfly_state : public driver_device
 {
 public:
 	magicfly_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_input_selector;
 	DECLARE_WRITE8_MEMBER(magicfly_videoram_w);
@@ -441,13 +443,13 @@ public:
 
 WRITE8_MEMBER(magicfly_state::magicfly_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(magicfly_state::magicfly_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -463,16 +465,16 @@ static TILE_GET_INFO( get_magicfly_tile_info )
     x--- ----   Mirrored from bit 3. The code check this one to boot the game.
 
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 	int bank = (attr & 0x10) >> 4;   /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;         /* bits 0-2 for color */
 
     /* Seems that bit 7 is mirrored from bit 3 to have a normal boot */
     /* Boot only check the first color RAM offset */
 
-	state->m_colorram[0] = state->m_colorram[0] | ((state->m_colorram[0] & 0x08) << 4);	/* only for 1st offset */
-	//state->m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
+	state->m_colorram.target()[0] = state->m_colorram.target()[0] | ((state->m_colorram.target()[0] & 0x08) << 4);	/* only for 1st offset */
+	//state->m_colorram.target()[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
 
 	SET_TILE_INFO(bank, code, color, 0);
 }
@@ -495,16 +497,16 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
     x--- ----   Mirrored from bit 2. The code check this one to boot the game.
 
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 	int bank = (attr & 0x10) >> 4;    /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;          /* bits 0-2 for color */
 
     /* Seems that bit 7 is mirrored from bit 2 to have a normal boot */
     /* Boot only check the first color RAM offset */
 
-	state->m_colorram[0] = state->m_colorram[0] | ((state->m_colorram[0] & 0x04) << 5);	/* only for 1st offset */
-	//state->m_colorram[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
+	state->m_colorram.target()[0] = state->m_colorram.target()[0] | ((state->m_colorram.target()[0] & 0x04) << 5);	/* only for 1st offset */
+	//state->m_colorram.target()[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
 
 	SET_TILE_INFO(bank, code, color, 0);
 }
@@ -597,8 +599,8 @@ static ADDRESS_MAP_START( magicfly_map, AS_PROGRAM, 8, magicfly_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")    /* MK48Z02B NVRAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_BASE(m_videoram)	/* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_BASE(m_colorram)	/* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_SHARE("videoram")	/* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_SHARE("colorram")	/* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)	/* multiplexed input port */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_port_w)	/* output port */
 	AM_RANGE(0xc000, 0xffff) AM_ROM					/* ROM space */

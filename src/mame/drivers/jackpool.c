@@ -25,11 +25,13 @@ class jackpool_state : public driver_device
 {
 public:
 	jackpool_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_io(*this, "io"){ }
 
-	UINT16 *m_vram;
+	required_shared_ptr<UINT16> m_vram;
 	UINT8 m_map_vreg;
-	UINT16 *m_io;
+	required_shared_ptr<UINT16> m_io;
 	DECLARE_READ16_MEMBER(jackpool_ff_r);
 	DECLARE_READ16_MEMBER(jackpool_io_r);
 	DECLARE_WRITE16_MEMBER(jackpool_io_w);
@@ -54,8 +56,8 @@ static SCREEN_UPDATE_IND16(jackpool)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (state->m_vram[count+(0x2000/2)] & 0x7fff);
-				int attr = (state->m_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
+				int tile = (state->m_vram.target()[count+(0x2000/2)] & 0x7fff);
+				int attr = (state->m_vram.target()[count+(0x2000/2)+0x800] & 0x1f00)>>8;
 
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8);
 				count++;
@@ -67,12 +69,12 @@ static SCREEN_UPDATE_IND16(jackpool)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (state->m_vram[count] & 0x7fff);
+				int tile = (state->m_vram.target()[count] & 0x7fff);
 
 				if(tile != 0)
 				{
-					int attr = (state->m_vram[count+0x800] & 0x1f00)>>8;
-					int t_pen = (state->m_vram[count+0x800] & 0x1000);
+					int attr = (state->m_vram.target()[count+0x800] & 0x1f00)>>8;
+					int t_pen = (state->m_vram.target()[count+0x800] & 0x1000);
 
 					drawgfx_transpen(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
 				}
@@ -117,12 +119,12 @@ READ16_MEMBER(jackpool_state::jackpool_io_r)
 	}
 
 //  printf("R %02x\n",offset*2);
-	return m_io[offset];
+	return m_io.target()[offset];
 }
 
 WRITE16_MEMBER(jackpool_state::jackpool_io_w)
 {
-	COMBINE_DATA(&m_io[offset]);
+	COMBINE_DATA(&m_io.target()[offset]);
 
 	switch(offset*2)
 	{
@@ -171,11 +173,11 @@ static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1200ff) AM_RAM
-	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
 
-	AM_RANGE(0x360000, 0x3603ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_BASE(m_io)//AM_READ(jackpool_io_r)
+	AM_RANGE(0x360000, 0x3603ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_SHARE("io")//AM_READ(jackpool_io_r)
 
 	AM_RANGE(0x800000, 0x80000f) AM_READ(jackpool_ff_r) AM_WRITENOP //UART
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)

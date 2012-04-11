@@ -17,9 +17,10 @@ class sstrangr_state : public driver_device
 {
 public:
 	sstrangr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_flip_screen;
 	UINT8 *m_proms;
 	DECLARE_WRITE8_MEMBER(port_w);
@@ -44,7 +45,7 @@ static SCREEN_UPDATE_RGB32( sstrangr )
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = state->m_ram[offs];
+		UINT8 data = state->m_ram.target()[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -102,7 +103,7 @@ static SCREEN_UPDATE_RGB32( sstrngr2 )
 
 		offs_t color_address = (offs >> 9 << 5) | (offs & 0x1f);
 
-		UINT8 data = state->m_ram[offs];
+		UINT8 data = state->m_ram.target()[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
 		for (i = 0; i < 8; i++)
@@ -141,7 +142,7 @@ WRITE8_MEMBER(sstrangr_state::port_w)
 static ADDRESS_MAP_START( sstrangr_map, AS_PROGRAM, 8, sstrangr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x6000, 0x63ff) AM_ROM
 ADDRESS_MAP_END
 

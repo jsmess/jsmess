@@ -279,7 +279,14 @@ class sfbonus_state : public driver_device
 {
 public:
 	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_nvram(*this, "nvram"),
+		m_1800_regs(*this, "1800_regs"),
+		m_vregs(*this, "vregs"),
+		m_2801_regs(*this, "2801_regs"),
+		m_2c01_regs(*this, "2c01_regs"),
+		m_3000_regs(*this, "3000_regs"),
+		m_3800_regs(*this, "3800_regs"){ }
 
 	bitmap_ind16 *m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
@@ -293,14 +300,13 @@ public:
 	UINT8 *m_reel3_ram;
 	UINT8 *m_reel4_ram;
 	UINT8* m_videoram;
-	UINT8 *m_vregs;
-	UINT8 *m_nvram;
-	size_t m_nvram_size;
-	UINT8* m_1800_regs;
-	UINT8* m_3800_regs;
-	UINT8* m_3000_regs;
-	UINT8* m_2801_regs;
-	UINT8* m_2c01_regs;
+	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<UINT8> m_1800_regs;
+	required_shared_ptr<UINT8> m_vregs;
+	required_shared_ptr<UINT8> m_2801_regs;
+	required_shared_ptr<UINT8> m_2c01_regs;
+	required_shared_ptr<UINT8> m_3000_regs;
+	required_shared_ptr<UINT8> m_3800_regs;
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
 	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
 	DECLARE_READ8_MEMBER(sfbonus_2800_r);
@@ -802,8 +808,8 @@ static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT8* selectbase = &state->m_videoram[0x600];
 	UINT8* bg_scroll = &state->m_videoram[0x000];
 	UINT8* reels_rowscroll = &state->m_videoram[0x400];
-	int globalyscrollreels = (state->m_vregs[6] | state->m_vregs[7]<<8);
-	int globalxscrollreels = (state->m_vregs[4] | state->m_vregs[5]<<8);
+	int globalyscrollreels = (state->m_vregs.target()[6] | state->m_vregs.target()[7]<<8);
+	int globalxscrollreels = (state->m_vregs.target()[4] | state->m_vregs.target()[5]<<8);
 	globalyscrollreels += 8;
 	globalxscrollreels += 8;
 
@@ -932,8 +938,8 @@ static SCREEN_UPDATE_IND16(sfbonus)
 {
 	sfbonus_state *state = screen.machine().driver_data<sfbonus_state>();
 
-	int globalyscroll = (state->m_vregs[2] | state->m_vregs[3]<<8);
-	int globalxscroll = (state->m_vregs[0] | state->m_vregs[1]<<8);
+	int globalyscroll = (state->m_vregs.target()[2] | state->m_vregs.target()[3]<<8);
+	int globalxscroll = (state->m_vregs.target()[0] | state->m_vregs.target()[1]<<8);
 	UINT8* front_rowscroll = &state->m_videoram[0x200];
 	ioport_constructor ipt;
 	int i;
@@ -991,52 +997,52 @@ static SCREEN_UPDATE_IND16(sfbonus)
 	}
 #if 0
     popmessage("%02x %02x %02x %02x %02x %02x %02x %02x -- %02x -- %02x %02x -- %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
-    state->m_3800_regs[0],
-    state->m_3800_regs[1],
-    state->m_3800_regs[2],
-    state->m_3800_regs[3],
-    state->m_3800_regs[4],
-    state->m_3800_regs[5],
-    state->m_3800_regs[6],
-    state->m_3800_regs[7],
-    state->m_3000_regs[0],
-    state->m_2801_regs[0],
-    state->m_2c01_regs[0],
-    state->m_vregs[8],
-    state->m_vregs[0],
-    state->m_vregs[10],
-    state->m_vregs[11],
-    state->m_vregs[12],
-    state->m_vregs[13],
-    state->m_vregs[14],
-    state->m_vregs[15],
-    state->m_vregs[16],
-    state->m_vregs[17],
-    state->m_vregs[18],
-    state->m_vregs[19],
-    state->m_vregs[20],
-    state->m_vregs[21],
-    state->m_vregs[22],
-    state->m_vregs[23],
-    state->m_vregs[24],
-    state->m_vregs[25],
-    state->m_vregs[26],
-    state->m_vregs[27],
-    state->m_vregs[28],
-    state->m_vregs[29],
-    state->m_vregs[30],
-    state->m_vregs[31]
+    state->m_3800_regs.target()[0],
+    state->m_3800_regs.target()[1],
+    state->m_3800_regs.target()[2],
+    state->m_3800_regs.target()[3],
+    state->m_3800_regs.target()[4],
+    state->m_3800_regs.target()[5],
+    state->m_3800_regs.target()[6],
+    state->m_3800_regs.target()[7],
+    state->m_3000_regs.target()[0],
+    state->m_2801_regs.target()[0],
+    state->m_2c01_regs.target()[0],
+    state->m_vregs.target()[8],
+    state->m_vregs.target()[0],
+    state->m_vregs.target()[10],
+    state->m_vregs.target()[11],
+    state->m_vregs.target()[12],
+    state->m_vregs.target()[13],
+    state->m_vregs.target()[14],
+    state->m_vregs.target()[15],
+    state->m_vregs.target()[16],
+    state->m_vregs.target()[17],
+    state->m_vregs.target()[18],
+    state->m_vregs.target()[19],
+    state->m_vregs.target()[20],
+    state->m_vregs.target()[21],
+    state->m_vregs.target()[22],
+    state->m_vregs.target()[23],
+    state->m_vregs.target()[24],
+    state->m_vregs.target()[25],
+    state->m_vregs.target()[26],
+    state->m_vregs.target()[27],
+    state->m_vregs.target()[28],
+    state->m_vregs.target()[29],
+    state->m_vregs.target()[30],
+    state->m_vregs.target()[31]
     );
 
     popmessage("-- %02x %02x %02x %02x %02x %02x %02x %02x",
-    state->m_1800_regs[0],
-    state->m_1800_regs[1],
-    state->m_1800_regs[2],
-    state->m_1800_regs[3],
-    state->m_1800_regs[4],
-    state->m_1800_regs[5],
-    state->m_1800_regs[6],
-    state->m_1800_regs[7]);
+    state->m_1800_regs.target()[0],
+    state->m_1800_regs.target()[1],
+    state->m_1800_regs.target()[2],
+    state->m_1800_regs.target()[3],
+    state->m_1800_regs.target()[4],
+    state->m_1800_regs.target()[5],
+    state->m_1800_regs.target()[6],
+    state->m_1800_regs.target()[7]);
 #endif
 
 	ipt = screen.machine().system().ipt;
@@ -1044,22 +1050,22 @@ static SCREEN_UPDATE_IND16(sfbonus)
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
 		// based on pirpok2
-		output_set_lamp_value(0, (state->m_1800_regs[6] & 0x1) >> 0);
-		output_set_lamp_value(1, (state->m_1800_regs[6] & 0x4) >> 2);
-		output_set_lamp_value(2, (state->m_1800_regs[5] & 0x4) >> 2);
-		output_set_lamp_value(3, (state->m_1800_regs[5] & 0x1) >> 0);
-		output_set_lamp_value(4, (state->m_1800_regs[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (state->m_1800_regs[4] & 0x1) >> 0);
+		output_set_lamp_value(0, (state->m_1800_regs.target()[6] & 0x1) >> 0);
+		output_set_lamp_value(1, (state->m_1800_regs.target()[6] & 0x4) >> 2);
+		output_set_lamp_value(2, (state->m_1800_regs.target()[5] & 0x4) >> 2);
+		output_set_lamp_value(3, (state->m_1800_regs.target()[5] & 0x1) >> 0);
+		output_set_lamp_value(4, (state->m_1800_regs.target()[4] & 0x4) >> 2);
+		output_set_lamp_value(5, (state->m_1800_regs.target()[4] & 0x1) >> 0);
 	}
 	else if ((ipt == INPUT_PORTS_NAME(amcoe1_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe1_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe1_poker)))
 	{
-		output_set_lamp_value(0, (state->m_1800_regs[0] & 0x2) >> 1);
-		output_set_lamp_value(1, (state->m_1800_regs[4] & 0x2) >> 1);
-		output_set_lamp_value(2, (state->m_1800_regs[3] & 0x2) >> 1);
-		output_set_lamp_value(3, (state->m_1800_regs[6] & 0x4) >> 2);
-		output_set_lamp_value(4, (state->m_1800_regs[4] & 0x4) >> 2);
-		output_set_lamp_value(5, (state->m_1800_regs[3] & 0x4) >> 2);
+		output_set_lamp_value(0, (state->m_1800_regs.target()[0] & 0x2) >> 1);
+		output_set_lamp_value(1, (state->m_1800_regs.target()[4] & 0x2) >> 1);
+		output_set_lamp_value(2, (state->m_1800_regs.target()[3] & 0x2) >> 1);
+		output_set_lamp_value(3, (state->m_1800_regs.target()[6] & 0x4) >> 2);
+		output_set_lamp_value(4, (state->m_1800_regs.target()[4] & 0x4) >> 2);
+		output_set_lamp_value(5, (state->m_1800_regs.target()[3] & 0x4) >> 2);
 	}
 
 	return 0;
@@ -1069,7 +1075,7 @@ static SCREEN_UPDATE_IND16(sfbonus)
 
 static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_nvram) AM_SIZE(m_nvram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
@@ -1113,27 +1119,27 @@ READ8_MEMBER(sfbonus_state::sfbonus_3800_r)
 // lamps and coin counters
 WRITE8_MEMBER(sfbonus_state::sfbonus_1800_w)
 {
-	m_1800_regs[offset] = data;
+	m_1800_regs.target()[offset] = data;
 }
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_3800_w)
 {
-	m_3800_regs[offset] = data;
+	m_3800_regs.target()[offset] = data;
 }
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_3000_w)
 {
-	m_3000_regs[offset] = data;
+	m_3000_regs.target()[offset] = data;
 }
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_2801_w)
 {
-	m_2801_regs[offset] = data;
+	m_2801_regs.target()[offset] = data;
 }
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
 {
-	m_2c01_regs[offset] = data;
+	m_2c01_regs.target()[offset] = data;
 }
 
 
@@ -1154,21 +1160,21 @@ static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8, sfbonus_state )
 	AM_RANGE(0x0c01, 0x0c01) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_BASE(m_1800_regs) // lamps and coin counters
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_SHARE("1800_regs") // lamps and coin counters
 
-	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE(m_vregs)
+	AM_RANGE(0x2400, 0x241f) AM_RAM AM_SHARE("vregs")
 
 	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_2800_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_BASE(m_2801_regs)
+	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_SHARE("2801_regs")
 
 	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_2c00_r)
-	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_BASE(m_2c01_regs)
+	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_SHARE("2c01_regs")
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_BASE(m_3000_regs)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_SHARE("3000_regs")
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
 	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r)
 
-	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_BASE(m_3800_regs)
+	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_SHARE("3800_regs")
 ADDRESS_MAP_END
 
 
@@ -1217,18 +1223,18 @@ static NVRAM_HANDLER( sfbonus )
 {
 	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	if (read_or_write)
-		file->write(state->m_nvram,state->m_nvram_size);
+		file->write(state->m_nvram,state->m_nvram.bytes());
 	else
 	{
 		if (file)
 		{
-			memset(state->m_nvram,0x00,state->m_nvram_size);
-			file->read(state->m_nvram,state->m_nvram_size);
+			memset(state->m_nvram,0x00,state->m_nvram.bytes());
+			file->read(state->m_nvram,state->m_nvram.bytes());
 		}
 		else
 		{
 			UINT8* defaultram = machine.region("defaults")->base();
-			memset(state->m_nvram,0x00,state->m_nvram_size);
+			memset(state->m_nvram,0x00,state->m_nvram.bytes());
 
 			if (defaultram)
 				if ((defaultram[0x02]==0x00) && (defaultram[0x03]==0x00)) // hack! rom region optional regions get cleared with garbage if no rom is present, this is not good!

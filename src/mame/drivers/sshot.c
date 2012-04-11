@@ -163,9 +163,10 @@ class supershot_state : public driver_device
 {
 public:
 	supershot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8		*m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t	*m_tilemap;
 	DECLARE_WRITE8_MEMBER(supershot_vidram_w);
 	DECLARE_WRITE8_MEMBER(supershot_output0_w);
@@ -182,7 +183,7 @@ static TILE_GET_INFO( get_supershot_text_tile_info )
 {
 	supershot_state *state = machine.driver_data<supershot_state>();
 
-	UINT8 code = state->m_videoram[tile_index];
+	UINT8 code = state->m_videoram.target()[tile_index];
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
@@ -202,7 +203,7 @@ static SCREEN_UPDATE_IND16( supershot )
 WRITE8_MEMBER(supershot_state::supershot_vidram_w)
 {
 
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 

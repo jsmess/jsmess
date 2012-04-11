@@ -45,11 +45,14 @@ class vroulet_state : public driver_device
 {
 public:
 	vroulet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_ball(*this, "ball"){ }
 
-	UINT8 *m_ball;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_ball;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(vroulet_paletteram_w);
 	DECLARE_WRITE8_MEMBER(vroulet_videoram_w);
@@ -63,7 +66,7 @@ public:
 WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
 {
 	/*
-     paletteram_xxxxBBBBGGGGRRRR_be_w
+     paletteram_xxxxBBBBGGGGRRRR_byte_be_w
      but... each palette has 8 colors only, not 16 as expected...
     */
 
@@ -82,21 +85,21 @@ WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
 
 WRITE8_MEMBER(vroulet_state::vroulet_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(vroulet_state::vroulet_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	vroulet_state *state = machine.driver_data<vroulet_state>();
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] + ((attr & 0xc0) << 2);
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -114,7 +117,7 @@ static SCREEN_UPDATE_IND16(vroulet)
 	vroulet_state *state = screen.machine().driver_data<vroulet_state>();
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0], 0x320, 1, 0, 0,
-		state->m_ball[1], state->m_ball[0] - 12, 0);
+		state->m_ball.target()[1], state->m_ball.target()[0] - 12, 0);
 	return 0;
 }
 
@@ -124,9 +127,9 @@ static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x8000) AM_NOP
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE(m_ball)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xa000, 0xa001) AM_RAM AM_SHARE("ball")
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc000, 0xc000) AM_NOP
 ADDRESS_MAP_END

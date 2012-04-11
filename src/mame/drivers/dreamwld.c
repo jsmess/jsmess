@@ -125,15 +125,21 @@ class dreamwld_state : public driver_device
 {
 public:
 	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg2_videoram(*this, "bg2_videoram"),
+		m_vregs(*this, "vregs"),
+		m_workram(*this, "workram"){ }
 
 	/* memory pointers */
-	UINT32 *  m_bg_videoram;
-	UINT32 *  m_bg2_videoram;
-	UINT32 *  m_vregs;
-	UINT32 *  m_paletteram;
-	UINT32 *  m_spriteram;
-	UINT32 *  m_workram;
+	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<UINT32> m_paletteram;
+	required_shared_ptr<UINT32> m_bg_videoram;
+	required_shared_ptr<UINT32> m_bg2_videoram;
+	required_shared_ptr<UINT32> m_vregs;
+	required_shared_ptr<UINT32> m_workram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -223,7 +229,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 WRITE32_MEMBER(dreamwld_state::dreamwld_bg_videoram_w)
 {
-	COMBINE_DATA(&m_bg_videoram[offset]);
+	COMBINE_DATA(&m_bg_videoram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset * 2);
 	m_bg_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
@@ -232,7 +238,7 @@ static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	int tileno, colour;
-	tileno = (tile_index & 1) ? (state->m_bg_videoram[tile_index >> 1] & 0xffff) : ((state->m_bg_videoram[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (state->m_bg_videoram.target()[tile_index >> 1] & 0xffff) : ((state->m_bg_videoram.target()[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
 	SET_TILE_INFO(1, tileno + state->m_tilebank[0] * 0x2000, 0x80 + colour, 0);
@@ -241,7 +247,7 @@ static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 
 WRITE32_MEMBER(dreamwld_state::dreamwld_bg2_videoram_w)
 {
-	COMBINE_DATA(&m_bg2_videoram[offset]);
+	COMBINE_DATA(&m_bg2_videoram.target()[offset]);
 	m_bg2_tilemap->mark_tile_dirty(offset * 2);
 	m_bg2_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
@@ -250,7 +256,7 @@ static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	UINT16 tileno, colour;
-	tileno = (tile_index & 1) ? (state->m_bg2_videoram[tile_index >> 1] & 0xffff) : ((state->m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (state->m_bg2_videoram.target()[tile_index >> 1] & 0xffff) : ((state->m_bg2_videoram.target()[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
 	SET_TILE_INFO(1, tileno + state->m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
@@ -298,13 +304,13 @@ static SCREEN_UPDATE_IND16( dreamwld )
 	tmptilemap0 = state->m_bg_tilemap;
 	tmptilemap1 = state->m_bg2_tilemap;
 
-	int layer0_scrolly = state->m_vregs[(0x400 / 4)] + 32;
-	int layer1_scrolly = state->m_vregs[(0x400 / 4) + 2] + 32;
+	int layer0_scrolly = state->m_vregs.target()[(0x400 / 4)] + 32;
+	int layer1_scrolly = state->m_vregs.target()[(0x400 / 4) + 2] + 32;
 
-	int layer0_scrollx = state->m_vregs[(0x400 / 4) + 1] + 3;
-	int layer1_scrollx = state->m_vregs[(0x400 / 4) + 3] + 5;
-	UINT32 layer0_ctrl = state->m_vregs[0x412 / 4];
-	UINT32 layer1_ctrl = state->m_vregs[0x416 / 4];
+	int layer0_scrollx = state->m_vregs.target()[(0x400 / 4) + 1] + 3;
+	int layer1_scrollx = state->m_vregs.target()[(0x400 / 4) + 3] + 5;
+	UINT32 layer0_ctrl = state->m_vregs.target()[0x412 / 4];
+	UINT32 layer1_ctrl = state->m_vregs.target()[0x416 / 4];
 
 	tmptilemap0->set_scrolly(0, layer0_scrolly);
 	tmptilemap1->set_scrolly(0, layer1_scrolly);
@@ -338,10 +344,10 @@ static SCREEN_UPDATE_IND16( dreamwld )
 		{
 			if (layer0_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i/16)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + ((i + layer0_scrolly)&0xff))]; // different handling to psikyo.c? ( + scrolly )
 		}
 
 
@@ -355,10 +361,10 @@ static SCREEN_UPDATE_IND16( dreamwld )
 		{
 			if (layer1_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i/16)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + ((i + layer1_scrolly)&0xff))];  // different handling to psikyo.c? ( + scrolly )
 		}
 
 
@@ -368,8 +374,8 @@ static SCREEN_UPDATE_IND16( dreamwld )
 	}
 
 
-	state->m_tilebank[0] = (state->m_vregs[(0x400 / 4) + 4] >> 6) & 1;
-	state->m_tilebank[1] = (state->m_vregs[(0x400 / 4) + 5] >> 6) & 1;
+	state->m_tilebank[0] = (state->m_vregs.target()[(0x400 / 4) + 4] >> 6) & 1;
+	state->m_tilebank[1] = (state->m_vregs.target()[(0x400 / 4) + 5] >> 6) & 1;
 
 	if (state->m_tilebank[0] != state->m_tilebankold[0])
 	{
@@ -432,20 +438,20 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
 		logerror("OKI1: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
 
-// why doesn't using paletteram16_xRRRRRGGGGGBBBBB_word_w with a 16-bit handler work? colours are
+// why doesn't using paletteram_xRRRRRGGGGGBBBBB_word_w with a 16-bit handler work? colours are
 // severely corrupt on dream world's semicom screen + many sprites, seems palette values get duplicated.
 WRITE32_MEMBER(dreamwld_state::dreamwld_palette_w)
 {
 	UINT16 dat;
 	int color;
 
-	COMBINE_DATA(&m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram.target()[offset]);
 	color = offset * 2;
 
-	dat = m_paletteram[offset] & 0x7fff;
+	dat = m_paletteram.target()[offset] & 0x7fff;
 	palette_set_color_rgb(machine(), color+1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
-	dat = (m_paletteram[offset] >> 16) & 0x7fff;
+	dat = (m_paletteram.target()[offset] >> 16) & 0x7fff;
 	palette_set_color_rgb(machine(), color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
@@ -454,11 +460,11 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_palette_w)
 static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE(m_bg2_videoram)
-	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE(m_vregs)  // scroll regs etc.
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_SHARE("bg_videoram")
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_SHARE("bg2_videoram")
+	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_SHARE("vregs")  // scroll regs etc.
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
@@ -468,7 +474,7 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 
 	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_BASE(m_workram) // work ram
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_SHARE("workram") // work ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32, dreamwld_state )

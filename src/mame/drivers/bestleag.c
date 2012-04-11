@@ -27,17 +27,21 @@ class bestleag_state : public driver_device
 {
 public:
 	bestleag_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bgram(*this, "bgram"),
+		m_fgram(*this, "fgram"),
+		m_txram(*this, "txram"),
+		m_vregs(*this, "vregs"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_txram;
-	UINT16 *m_bgram;
-	UINT16 *m_fgram;
-	UINT16 *m_vregs;
+	required_shared_ptr<UINT16> m_bgram;
+	required_shared_ptr<UINT16> m_fgram;
+	required_shared_ptr<UINT16> m_txram;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_spriteram;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
 	DECLARE_WRITE16_MEMBER(bestleag_txram_w);
 	DECLARE_WRITE16_MEMBER(bestleag_bgram_w);
 	DECLARE_WRITE16_MEMBER(bestleag_fgram_w);
@@ -50,7 +54,7 @@ public:
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_txram[tile_index];
+	int code = state->m_txram.target()[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -62,7 +66,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_bgram[tile_index];
+	int code = state->m_bgram.target()[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -74,7 +78,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->m_fgram[tile_index];
+	int code = state->m_fgram.target()[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -113,7 +117,7 @@ Note: sprite chip is different than the other Big Striker sets and they
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = state->m_spriteram.target();
 
 	/*
 
@@ -123,7 +127,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	int offs;
 
-	for (offs = 0x16/2;offs < state->m_spriteram_size/2;offs += 4)
+	for (offs = 0x16/2;offs < state->m_spriteram.bytes()/2;offs += 4)
 	{
 		int code = spriteram16[offs+3] & 0xfff;
 		int color = (spriteram16[offs+2] & 0xf000) >> 12;
@@ -136,7 +140,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			return;
 
 		/* it can change sprites color mask like the original set */
-		if(state->m_vregs[0x00/2] & 0x1000)
+		if(state->m_vregs.target()[0x00/2] & 0x1000)
 			color &= 7;
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
@@ -169,12 +173,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static SCREEN_UPDATE_IND16(bestleag)
 {
 	bestleag_state *state = screen.machine().driver_data<bestleag_state>();
-	state->m_bg_tilemap->set_scrollx(0,(state->m_vregs[0x00/2] & 0xfff) + (state->m_vregs[0x08/2] & 0x7) - 3);
-	state->m_bg_tilemap->set_scrolly(0,state->m_vregs[0x02/2]);
-	state->m_tx_tilemap->set_scrollx(0,state->m_vregs[0x04/2]);
-	state->m_tx_tilemap->set_scrolly(0,state->m_vregs[0x06/2]);
-	state->m_fg_tilemap->set_scrollx(0,state->m_vregs[0x08/2] & 0xfff8);
-	state->m_fg_tilemap->set_scrolly(0,state->m_vregs[0x0a/2]);
+	state->m_bg_tilemap->set_scrollx(0,(state->m_vregs.target()[0x00/2] & 0xfff) + (state->m_vregs.target()[0x08/2] & 0x7) - 3);
+	state->m_bg_tilemap->set_scrolly(0,state->m_vregs.target()[0x02/2]);
+	state->m_tx_tilemap->set_scrollx(0,state->m_vregs.target()[0x04/2]);
+	state->m_tx_tilemap->set_scrolly(0,state->m_vregs.target()[0x06/2]);
+	state->m_fg_tilemap->set_scrollx(0,state->m_vregs.target()[0x08/2] & 0xfff8);
+	state->m_fg_tilemap->set_scrolly(0,state->m_vregs.target()[0x0a/2]);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
@@ -186,12 +190,12 @@ static SCREEN_UPDATE_IND16(bestleag)
 static SCREEN_UPDATE_IND16(bestleaw)
 {
 	bestleag_state *state = screen.machine().driver_data<bestleag_state>();
-	state->m_bg_tilemap->set_scrollx(0,state->m_vregs[0x08/2]);
-	state->m_bg_tilemap->set_scrolly(0,state->m_vregs[0x0a/2]);
-	state->m_tx_tilemap->set_scrollx(0,state->m_vregs[0x00/2]);
-	state->m_tx_tilemap->set_scrolly(0,state->m_vregs[0x02/2]);
-	state->m_fg_tilemap->set_scrollx(0,state->m_vregs[0x04/2]);
-	state->m_fg_tilemap->set_scrolly(0,state->m_vregs[0x06/2]);
+	state->m_bg_tilemap->set_scrollx(0,state->m_vregs.target()[0x08/2]);
+	state->m_bg_tilemap->set_scrolly(0,state->m_vregs.target()[0x0a/2]);
+	state->m_tx_tilemap->set_scrollx(0,state->m_vregs.target()[0x00/2]);
+	state->m_tx_tilemap->set_scrolly(0,state->m_vregs.target()[0x02/2]);
+	state->m_fg_tilemap->set_scrollx(0,state->m_vregs.target()[0x04/2]);
+	state->m_fg_tilemap->set_scrolly(0,state->m_vregs.target()[0x06/2]);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	state->m_fg_tilemap->draw(bitmap, cliprect, 0,0);
@@ -202,19 +206,19 @@ static SCREEN_UPDATE_IND16(bestleaw)
 
 WRITE16_MEMBER(bestleag_state::bestleag_txram_w)
 {
-	m_txram[offset] = data;
+	m_txram.target()[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(bestleag_state::bestleag_bgram_w)
 {
-	m_bgram[offset] = data;
+	m_bgram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(bestleag_state::bestleag_fgram_w)
 {
-	m_fgram[offset] = data;
+	m_fgram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -230,12 +234,12 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16, bestleag_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d2000, 0x0d3fff) AM_NOP // left over from the original game (only read / written in memory test)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bestleag_bgram_w) AM_BASE(m_bgram)
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bestleag_fgram_w) AM_BASE(m_fgram)
-	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(bestleag_txram_w) AM_BASE(m_txram)
-	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_BASE(m_vregs)
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bestleag_bgram_w) AM_SHARE("bgram")
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bestleag_fgram_w) AM_SHARE("fgram")
+	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(bestleag_txram_w) AM_SHARE("txram")
+	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_SHARE("vregs")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")

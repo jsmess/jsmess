@@ -134,7 +134,7 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 WRITE16_MEMBER(gradius3_state::sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(space, 0, (data >> 8) & 0xff);
+		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
 }
 
 WRITE16_MEMBER(gradius3_state::sound_irq_w)
@@ -157,7 +157,7 @@ static WRITE8_DEVICE_HANDLER( sound_bank_w )
 static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, irq enable, priority, coin counters, other? */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c8002, 0x0c8003) AM_READ_PORT("P1")
@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gradius3_s_map, AS_PROGRAM, 8, gradius3_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", sound_bank_w)				/* 007232 bankswitch */
-	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_r)
+	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM

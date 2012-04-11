@@ -36,14 +36,15 @@ class jongkyo_state : public driver_device
 {
 public:
 	jongkyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* misc */
 	UINT8    m_rom_bank;
 	UINT8    m_mux_data;
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8    m_videoram2[0x4000];
 	DECLARE_WRITE8_MEMBER(bank_select_w);
 	DECLARE_WRITE8_MEMBER(mux_w);
@@ -89,8 +90,8 @@ static SCREEN_UPDATE_IND16( jongkyo )
 
 
 
-			data1 = state->m_videoram[0x4000 + x / 4 + y * 64];
-			data2 = state->m_videoram[x / 4 + y * 64];
+			data1 = state->m_videoram.target()[0x4000 + x / 4 + y * 64];
+			data2 = state->m_videoram.target()[x / 4 + y * 64];
 
 			for (b = 0; b < 4; ++b)
 			{
@@ -224,7 +225,7 @@ static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
 	AM_RANGE(0x4000, 0x6bff) AM_ROM // fixed rom
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")	// banked (8 banks)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

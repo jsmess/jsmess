@@ -22,11 +22,13 @@ class flyball_state : public driver_device
 {
 public:
 	flyball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_playfield_ram(*this, "playfield_ram"),
+		m_rombase(*this, "rombase"){ }
 
 	/* memory pointers */
-	UINT8 *  m_rombase;
-	UINT8 *  m_playfield_ram;
+	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<UINT8> m_rombase;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
@@ -73,7 +75,7 @@ static TILEMAP_MAPPER( flyball_get_memory_offset )
 static TILE_GET_INFO( flyball_get_tile_info )
 {
 	flyball_state *state = machine.driver_data<flyball_state>();
-	UINT8 data = state->m_playfield_ram[tile_index];
+	UINT8 data = state->m_playfield_ram.target()[tile_index];
 	int flags = ((data & 0x40) ? TILE_FLIPX : 0) | ((data & 0x80) ? TILE_FLIPY : 0);
 	int code = data & 63;
 
@@ -262,8 +264,8 @@ static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8, flyball_state )
 	AM_RANGE(0x0900, 0x0900) AM_WRITE(flyball_potmask_w)
 	AM_RANGE(0x0a00, 0x0a07) AM_WRITE(flyball_misc_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(flyball_input_r)
-	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_BASE(m_playfield_ram)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE(m_rombase) /* program */
+	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_SHARE("playfield_ram")
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_SHARE("rombase") /* program */
 ADDRESS_MAP_END
 
 
@@ -390,7 +392,7 @@ static MACHINE_RESET( flyball )
 	UINT8* ROM = machine.region("maincpu")->base() + 0x2000;
 
 	for (i = 0; i < 0x1000; i++)
-		state->m_rombase[i] = ROM[i ^ 0x1ff];
+		state->m_rombase.target()[i] = ROM[i ^ 0x1ff];
 
 	machine.device("maincpu")->reset();
 

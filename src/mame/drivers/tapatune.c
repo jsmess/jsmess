@@ -39,13 +39,14 @@ class tapatune_state : public driver_device
 {
 public:
 	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) {}
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this, "videoram") {}
 
 	UINT8	m_paletteram[0x300];
 	UINT16	m_palette_write_address;
 	rgb_t	m_pens[0x100];
 
-	UINT16	*m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
 
 	UINT8	m_controls_mux;
 	UINT8	m_z80_to_68k_index;
@@ -128,7 +129,7 @@ READ16_MEMBER(tapatune_state::irq_ack_r)
 
 static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16, tapatune_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM // program rom and graphics roms
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_BASE(m_videoram) // hardware video buffer
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_SHARE("videoram") // hardware video buffer
 	AM_RANGE(0x320000, 0x327fff) AM_RAM // workram
 	AM_RANGE(0x328000, 0x32ffff) AM_RAM
 	AM_RANGE(0x330000, 0x337fff) AM_RAM // ram used as system video buffer
@@ -285,7 +286,7 @@ static INPUT_PORTS_START( tapatune )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -343,7 +344,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 	for (x = 0; x < x_count*4; x++)
 	{
-		UINT8 pix = ((UINT8*)state->m_videoram)[BYTE_XOR_BE(offs + x)];
+		UINT8 pix = ((UINT8*)state->m_videoram.target())[BYTE_XOR_BE(offs + x)];
 		dest[2*x] = pens[((pix >> 4) & 0x0f)];
 		dest[2*x + 1] = pens[(pix & 0x0f)];
 	}
@@ -397,7 +398,7 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, 24000000/16, h46505_intf)	/* H46505 */
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

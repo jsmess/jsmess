@@ -30,13 +30,17 @@ class cabaret_state : public driver_device
 {
 public:
 	cabaret_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_tile_ram(*this, "fg_tile_ram"),
+		m_fg_color_ram(*this, "fg_color_ram"),
+		m_bg_scroll(*this, "bg_scroll"),
+		m_bg_tile_ram(*this, "bg_tile_ram"){ }
 
-	UINT8 *m_bg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_color_ram;
+	required_shared_ptr<UINT8> m_bg_scroll;
+	required_shared_ptr<UINT8> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_bg_scroll;
-	UINT8 *m_fg_tile_ram;
-	UINT8 *m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
 	int m_nmi_enable;
 	UINT8 m_out[3];
@@ -59,40 +63,40 @@ public:
 
 WRITE8_MEMBER(cabaret_state::bg_scroll_w)
 {
-	m_bg_scroll[offset] = data;
+	m_bg_scroll.target()[offset] = data;
 	m_bg_tilemap->set_scrolly(offset,data);
 }
 
 WRITE8_MEMBER(cabaret_state::bg_tile_w)
 {
-	m_bg_tile_ram[offset] = data;
+	m_bg_tile_ram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	cabaret_state *state = machine.driver_data<cabaret_state>();
-	int code = state->m_bg_tile_ram[tile_index];
+	int code = state->m_bg_tile_ram.target()[tile_index];
 	SET_TILE_INFO(1, code & 0xff, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	cabaret_state *state = machine.driver_data<cabaret_state>();
-	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
+	int code = state->m_fg_tile_ram.target()[tile_index] | (state->m_fg_color_ram.target()[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 WRITE8_MEMBER(cabaret_state::fg_tile_w)
 {
-	m_fg_tile_ram[offset] = data;
+	m_fg_tile_ram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(cabaret_state::fg_color_w)
 {
-	m_fg_color_ram[offset] = data;
+	m_fg_color_ram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -177,8 +181,8 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
 	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
 
-	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_SHARE("paletteram")
-	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_SHARE("paletteram2")
+	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
+	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
 
 	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE(bg_scroll_w ) AM_BASE(m_bg_scroll )
 

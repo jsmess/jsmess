@@ -31,12 +31,18 @@ class mlanding_state : public driver_device
 {
 public:
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_g_ram(*this, "g_ram"),
+		m_ml_tileram(*this, "ml_tileram"),
+		m_dma_ram(*this, "dma_ram"),
+		m_ml_dotram(*this, "ml_dotram"),
+		m_mecha_ram(*this, "mecha_ram"){ }
 
-	UINT16 * m_ml_tileram;
-	UINT16 *m_g_ram;
-	UINT16 * m_ml_dotram;
-	UINT16 *m_dma_ram;
+	required_shared_ptr<UINT16> m_g_ram;
+	required_shared_ptr<UINT16> m_ml_tileram;
+	required_shared_ptr<UINT16> m_dma_ram;
+	required_shared_ptr<UINT16> m_ml_dotram;
+	required_shared_ptr<UINT8> m_mecha_ram;
 	UINT32 m_adpcm_pos;
 	UINT32 m_adpcm_end;
 	int m_adpcm_data;
@@ -44,7 +50,6 @@ public:
 	UINT8 m_pal_fg_bank;
 	int m_dma_active;
 	UINT16 m_dsp_HOLD_signal;
-	UINT8 *m_mecha_ram;
 	UINT8 m_trigger;
 	DECLARE_WRITE16_MEMBER(ml_tileram_w);
 	DECLARE_READ16_MEMBER(ml_tileram_r);
@@ -86,7 +91,7 @@ static SCREEN_UPDATE_IND16(mlanding)
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 *src = &state->m_g_ram[y * 512/2 + cliprect.min_x];
+		UINT16 *src = &state->m_g_ram.target()[y * 512/2 + cliprect.min_x];
 		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
@@ -119,14 +124,14 @@ static int start_dma(running_machine &machine)
 
 		int j, k;
 
-		UINT16 attr = state->m_dma_ram[offs];
+		UINT16 attr = state->m_dma_ram.target()[offs];
 
 		if (attr == 0)
 			continue;
 
-		x = state->m_dma_ram[offs + 1];
-		y = state->m_dma_ram[offs + 2];
-		colour = state->m_dma_ram[offs + 3];
+		x = state->m_dma_ram.target()[offs + 1];
+		y = state->m_dma_ram.target()[offs + 2];
+		colour = state->m_dma_ram.target()[offs + 3];
 
 		dx = x >> 11;
 		dy = y >> 11;
@@ -161,8 +166,8 @@ static int start_dma(running_machine &machine)
 					// Draw the 8x8 chunk
 					for (y1 = 0; y1 < 8; ++y1)
 					{
-						UINT16 *src = &state->m_ml_tileram[(code * 2 * 8) + y1*2];
-						UINT16 *dst = &state->m_g_ram[(y + k*8+y1)*512/2 + (j*8+x)/2];
+						UINT16 *src = &state->m_ml_tileram.target()[(code * 2 * 8) + y1*2];
+						UINT16 *dst = &state->m_g_ram.target()[(y + k*8+y1)*512/2 + (j*8+x)/2];
 
 						UINT8 p2 = *src & 0xff;
 						UINT8 p1 = *src++ >> 8;
@@ -209,7 +214,7 @@ static int start_dma(running_machine &machine)
 			for(y1 = 0; y1 < dy*8; y1++)
 			{
 				int x1;
-				UINT16 *dst = &state->m_g_ram[((y + y1) * 512/2) + x/2];
+				UINT16 *dst = &state->m_g_ram.target()[((y + y1) * 512/2) + x/2];
 
 				for(x1 = 0; x1 < dx*8; x1+=2)
 				{
@@ -223,12 +228,12 @@ static int start_dma(running_machine &machine)
 
 WRITE16_MEMBER(mlanding_state::ml_tileram_w)
 {
-	COMBINE_DATA(&m_ml_tileram[offset]);
+	COMBINE_DATA(&m_ml_tileram.target()[offset]);
 }
 
 READ16_MEMBER(mlanding_state::ml_tileram_r)
 {
-	return m_ml_tileram[offset];
+	return m_ml_tileram.target()[offset];
 }
 
 
@@ -454,7 +459,7 @@ WRITE16_MEMBER(mlanding_state::ml_nmi_to_sound_w)
 
 READ16_MEMBER(mlanding_state::ml_mecha_ram_r)
 {
-	return (m_mecha_ram[offset*2]<<8)|m_mecha_ram[offset*2+1];
+	return (m_mecha_ram.target()[offset*2]<<8)|m_mecha_ram.target()[offset*2+1];
 }
 
 WRITE16_MEMBER(mlanding_state::ml_mecha_ram_w)
@@ -469,9 +474,9 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 
-	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_BASE(m_g_ram)// 512kB G RAM - enough here for double buffered 512x400x8 frame
-	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_BASE(m_ml_tileram)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_BASE(m_dma_ram)
+	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_SHARE("g_ram")// 512kB G RAM - enough here for double buffered 512x400x8 frame
+	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_SHARE("ml_tileram")
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_SHARE("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
@@ -481,7 +486,7 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
 	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8_LEGACY("tc0140syt", tc0140syt_comm_r, 0x00ff)
 
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
 
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
@@ -509,7 +514,7 @@ static ADDRESS_MAP_START( mlanding_sub_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(m_ml_dotram)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("ml_dotram")
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( ml_msm_start_lsb_w )
@@ -544,12 +549,12 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(mlanding_state::ml_dotram_r)
 {
-	return m_ml_dotram[offset];
+	return m_ml_dotram.target()[offset];
 }
 
 WRITE16_MEMBER(mlanding_state::ml_dotram_w)
 {
-	m_ml_dotram[offset] = data;
+	m_ml_dotram.target()[offset] = data;
 }
 
 READ16_MEMBER(mlanding_state::dsp_HOLD_signal_r)
@@ -566,7 +571,7 @@ READ8_MEMBER(mlanding_state::test_r)
 //mecha driver ?
 static ADDRESS_MAP_START( mlanding_z80_sub_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_mecha_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("mecha_ram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 
 	AM_RANGE(0x9000, 0x9001) AM_READ(test_r)

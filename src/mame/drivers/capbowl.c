@@ -183,7 +183,7 @@ WRITE8_MEMBER(capbowl_state::track_reset_w)
 WRITE8_MEMBER(capbowl_state::capbowl_sndcmd_w)
 {
 	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 }
 
 
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP				/* Not hooked up according to the schematics */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_r)
+	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -318,10 +318,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_DEVICE_HANDLER("ticket", ticket_dispenser_r),
+		DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, read),
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER("ticket", ticket_dispenser_w),  /* Also a status LED. See memory map above */
+		DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, write),  /* Also a status LED. See memory map above */
 	},
 	firqhandler
 };
@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_MACHINE_RESET(capbowl)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", capbowl_state, init_nvram)
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
 	MCFG_VIDEO_START(capbowl)

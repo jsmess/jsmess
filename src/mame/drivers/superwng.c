@@ -32,12 +32,16 @@ class superwng_state : public driver_device
 {
 public:
 	superwng_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram_bg(*this, "videorabg"),
+		m_videoram_fg(*this, "videorafg"),
+		m_colorram_bg(*this, "colorrabg"),
+		m_colorram_fg(*this, "colorrafg"){ }
 
-	UINT8 *    m_videoram_bg;
-	UINT8 *    m_colorram_bg;
-	UINT8 *    m_videoram_fg;
-	UINT8 *    m_colorram_fg;
+	required_shared_ptr<UINT8> m_videoram_bg;
+	required_shared_ptr<UINT8> m_videoram_fg;
+	required_shared_ptr<UINT8> m_colorram_bg;
+	required_shared_ptr<UINT8> m_colorram_fg;
 
 	int			m_tile_bank;
 
@@ -68,8 +72,8 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	superwng_state *state = machine.driver_data<superwng_state>();
-	int code = state->m_videoram_bg[tile_index];
-	int attr = state->m_colorram_bg[tile_index];
+	int code = state->m_videoram_bg.target()[tile_index];
+	int attr = state->m_colorram_bg.target()[tile_index];
 
 	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
 	code|=state->m_tile_bank?0x200:0;
@@ -83,8 +87,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	superwng_state *state = machine.driver_data<superwng_state>();
-	int code = state->m_videoram_fg[tile_index];
-	int attr = state->m_colorram_fg[tile_index];
+	int code = state->m_videoram_fg.target()[tile_index];
+	int attr = state->m_colorram_fg.target()[tile_index];
 
 	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
 
@@ -98,12 +102,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE8_MEMBER(superwng_state::superwng_flip_screen_x_w)
 {
-	flip_screen_x_set(machine(), ~data & 1);
+	flip_screen_x_set(~data & 1);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_flip_screen_y_w)
 {
-	flip_screen_y_set(machine(), ~data & 1);
+	flip_screen_y_set(~data & 1);
 }
 
 static VIDEO_START( superwng )
@@ -118,7 +122,7 @@ static VIDEO_START( superwng )
 static SCREEN_UPDATE_IND16( superwng )
 {
 	superwng_state *state = screen.machine().driver_data<superwng_state>();
-	int flip=flip_screen_get(screen.machine());
+	int flip=state->flip_screen();
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	rectangle tmp=cliprect;
@@ -139,10 +143,10 @@ static SCREEN_UPDATE_IND16( superwng )
 
 		for(int i=0x3e; i>=0; i-=2)
 		{
-			int code=(state->m_videoram_bg[i]>>2)+0x40;
-			int sx=256-state->m_videoram_bg[i+1]-8;
-			int sy = state->m_colorram_bg[i]+8;
-			int attr = state->m_colorram_bg[i+1];
+			int code=(state->m_videoram_bg.target()[i]>>2)+0x40;
+			int sx=256-state->m_videoram_bg.target()[i+1]-8;
+			int sy = state->m_colorram_bg.target()[i]+8;
+			int attr = state->m_colorram_bg.target()[i+1];
 
 			if (flip)
 			{
@@ -150,7 +154,7 @@ static SCREEN_UPDATE_IND16( superwng )
 				sx-=8;
 			}
 
-			if(state->m_videoram_bg[i+1] | state->m_colorram_bg[i])
+			if(state->m_videoram_bg.target()[i+1] | state->m_colorram_bg.target()[i])
 			{
 
 				drawgfx_transpen(bitmap, cliprect,screen.machine().gfx[1],
@@ -242,25 +246,25 @@ static INTERRUPT_GEN( superwng_sound_nmi_assert )
 
 WRITE8_MEMBER(superwng_state::superwng_bg_vram_w)
 {
-	m_videoram_bg[offset] = data;
+	m_videoram_bg.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_bg_cram_w)
 {
-	m_colorram_bg[offset] = data;
+	m_colorram_bg.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_fg_vram_w)
 {
-	m_videoram_fg[offset] = data;
+	m_videoram_fg.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(superwng_state::superwng_fg_cram_w)
 {
-	m_colorram_fg[offset] = data;
+	m_colorram_fg.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -273,7 +277,7 @@ WRITE8_MEMBER(superwng_state::superwng_tilebank_w)
 
 WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
 {
-	flip_screen_set(machine(), ~data & 0x01);
+	flip_screen_set(~data & 0x01);
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 }
@@ -291,10 +295,10 @@ WRITE8_MEMBER(superwng_state::superwng_cointcnt2_w)
 static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_BASE(m_videoram_bg)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(superwng_fg_vram_w) AM_BASE(m_videoram_fg)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(superwng_bg_cram_w) AM_BASE(m_colorram_bg)
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(superwng_fg_cram_w) AM_BASE(m_colorram_fg)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_SHARE("videorabg")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(superwng_fg_vram_w) AM_SHARE("videorafg")
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(superwng_bg_cram_w) AM_SHARE("colorrabg")
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(superwng_fg_cram_w) AM_SHARE("colorrafg")
 	AM_RANGE(0x9800, 0x99ff) AM_RAM  //collision map
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP //unknown

@@ -90,12 +90,14 @@ class warpspeed_state : public driver_device
 {
 public:
 	warpspeed_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_workram(*this, "workram"){ }
 
-	UINT8		*m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t	*m_text_tilemap;
 	tilemap_t	*m_starfield_tilemap;
-	UINT8		*m_workram;
+	required_shared_ptr<UINT8> m_workram;
 	UINT8		m_regs[0x28];
 	DECLARE_WRITE8_MEMBER(warpspeed_hardware_w);
 	DECLARE_WRITE8_MEMBER(warpspeed_vidram_w);
@@ -110,7 +112,7 @@ static TILE_GET_INFO( get_warpspeed_text_tile_info )
 {
 	warpspeed_state *state = machine.driver_data<warpspeed_state>();
 
-	UINT8 code = state->m_videoram[tile_index] & 0x3f;
+	UINT8 code = state->m_videoram.target()[tile_index] & 0x3f;
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
@@ -127,7 +129,7 @@ static TILE_GET_INFO( get_warpspeed_starfield_tile_info )
 WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
 {
 
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 
@@ -215,8 +217,8 @@ static SCREEN_UPDATE_IND16( warpspeed )
 
 static ADDRESS_MAP_START( warpspeed_map, AS_PROGRAM, 8, warpspeed_state )
 	AM_RANGE(0x0000, 0x0dff) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(warpspeed_vidram_w ) AM_BASE(m_videoram)
-	AM_RANGE(0x1c00, 0x1cff) AM_RAM AM_BASE(m_workram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(warpspeed_vidram_w ) AM_SHARE("videoram")
+	AM_RANGE(0x1c00, 0x1cff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8, warpspeed_state )

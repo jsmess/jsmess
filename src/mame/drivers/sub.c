@@ -116,13 +116,18 @@ class sub_state : public driver_device
 {
 public:
 	sub_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_attr(*this, "attr"),
+		m_vid(*this, "vid"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_scrolly(*this, "scrolly"){ }
 
-	UINT8* m_vid;
-	UINT8* m_attr;
-	UINT8* m_scrolly;
-	UINT8* m_spriteram;
-	UINT8* m_spriteram2;
+	required_shared_ptr<UINT8> m_attr;
+	required_shared_ptr<UINT8> m_vid;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_scrolly;
 	UINT8 m_nmi_en;
 	DECLARE_WRITE8_MEMBER(subm_to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
@@ -144,12 +149,12 @@ static SCREEN_UPDATE_IND16(sub)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = state->m_vid[count];
+			UINT16 tile = state->m_vid.target()[count];
 			UINT8 col;
-			UINT8 y_offs = state->m_scrolly[x];
+			UINT8 y_offs = state->m_scrolly.target()[x];
 
-			tile += (state->m_attr[count]&0xe0)<<3;
-			col = (state->m_attr[count]&0x1f);
+			tile += (state->m_attr.target()[count]&0xe0)<<3;
+			col = (state->m_attr.target()[count]&0x1f);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
@@ -170,8 +175,8 @@ static SCREEN_UPDATE_IND16(sub)
     1 --cc cccc color
     */
 	{
-		UINT8 *spriteram = state->m_spriteram;
-		UINT8 *spriteram_2 = state->m_spriteram2;
+		UINT8 *spriteram = state->m_spriteram.target();
+		UINT8 *spriteram_2 = state->m_spriteram2.target();
 		UINT8 x,y,spr_offs,i,col,fx,fy;
 
 		for(i=0;i<0x40;i+=2)
@@ -195,12 +200,12 @@ static SCREEN_UPDATE_IND16(sub)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = state->m_vid[count];
+			UINT16 tile = state->m_vid.target()[count];
 			UINT8 col;
-			UINT8 y_offs = state->m_scrolly[x];
+			UINT8 y_offs = state->m_scrolly.target()[x];
 
-			tile += (state->m_attr[count]&0xe0)<<3;
-			col = (state->m_attr[count]&0x1f);
+			tile += (state->m_attr.target()[count]&0xe0)<<3;
+			col = (state->m_attr.target()[count]&0x1f);
 
 			if(x >= 28)
 			{
@@ -218,11 +223,11 @@ static SCREEN_UPDATE_IND16(sub)
 static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0x0000, 0xafff) AM_ROM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE(m_attr)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(m_vid)
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_BASE(m_spriteram2)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(m_scrolly)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("attr")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("vid")
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_SHARE("scrolly")
 
 	AM_RANGE(0xe000, 0xe000) AM_NOP
 	AM_RANGE(0xe800, 0xe800) AM_NOP
@@ -239,7 +244,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sub_state::subm_to_sound_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "soundcpu", 0, HOLD_LINE);
 }
 
@@ -251,7 +256,7 @@ WRITE8_MEMBER(sub_state::nmi_mask_w)
 
 static ADDRESS_MAP_START( subm_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r) AM_WRITE(subm_to_sound_w) // to/from sound CPU
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r) AM_WRITE(subm_to_sound_w) // to/from sound CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8, sub_state )
@@ -262,7 +267,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch2_w) // to/from main CPU
+	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w) // to/from main CPU
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_data_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_data_w)
 ADDRESS_MAP_END

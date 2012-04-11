@@ -230,16 +230,20 @@ class nmg5_state : public driver_device
 {
 public:
 	nmg5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_scroll_ram(*this, "scroll_ram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bitmap(*this, "bitmap"){ }
 
 	/* memory pointers */
-	UINT16 *    m_fg_videoram;
-	UINT16 *    m_bg_videoram;
-	UINT16 *    m_scroll_ram;
-	UINT16 *    m_bitmap;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_scroll_ram;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_bitmap;
 //  UINT16 *  m_paletteram;    // currently this uses generic palette handling
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -267,13 +271,13 @@ public:
 
 WRITE16_MEMBER(nmg5_state::fg_videoram_w)
 {
-	COMBINE_DATA(&m_fg_videoram[offset]);
+	COMBINE_DATA(&m_fg_videoram.target()[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(nmg5_state::bg_videoram_w)
 {
-	COMBINE_DATA(&m_bg_videoram[offset]);
+	COMBINE_DATA(&m_bg_videoram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -282,7 +286,7 @@ WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -330,8 +334,8 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP
 	AM_RANGE(0x180004, 0x180005) AM_READWRITE(prot_r, prot_w)
@@ -340,18 +344,18 @@ static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x18000e, 0x18000f) AM_WRITE(priority_reg_w)
-	AM_RANGE(0x300002, 0x300009) AM_WRITEONLY AM_BASE(m_scroll_ram)
+	AM_RANGE(0x300002, 0x300009) AM_WRITEONLY AM_SHARE("scroll_ram")
 	AM_RANGE(0x30000a, 0x30000f) AM_WRITENOP
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(m_fg_videoram)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_bitmap)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x480002, 0x480003) AM_WRITENOP
 	AM_RANGE(0x480004, 0x480005) AM_READWRITE(prot_r, prot_w)
@@ -360,10 +364,10 @@ static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x48000a, 0x48000b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x48000c, 0x48000d) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x48000e, 0x48000f) AM_WRITE(priority_reg_w)
-	AM_RANGE(0x500002, 0x500009) AM_WRITEONLY AM_BASE(m_scroll_ram)
-	AM_RANGE(0x520000, 0x521fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x522000, 0x523fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(m_fg_videoram)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_bitmap)
+	AM_RANGE(0x500002, 0x500009) AM_WRITEONLY AM_SHARE("scroll_ram")
+	AM_RANGE(0x520000, 0x521fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x522000, 0x523fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
 /*******************************************************************
@@ -386,7 +390,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("oki", oki_banking_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r)
+	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
@@ -862,13 +866,13 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 	{
 		for (x = 0; x < xxx; x++)
 		{
-			pix = (state->m_bitmap[count] & 0xf000) >> 12;
+			pix = (state->m_bitmap.target()[count] & 0xf000) >> 12;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 0 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x0f00) >> 8;
+			pix = (state->m_bitmap.target()[count] & 0x0f00) >> 8;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 1 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x00f0) >> 4;
+			pix = (state->m_bitmap.target()[count] & 0x00f0) >> 4;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 2 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x000f) >> 0;
+			pix = (state->m_bitmap.target()[count] & 0x000f) >> 0;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 3 + xoff) = pix + 0x300;
 
 			count++;
@@ -881,10 +885,10 @@ static SCREEN_UPDATE_IND16( nmg5 )
 {
 	nmg5_state *state = screen.machine().driver_data<nmg5_state>();
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_scroll_ram[3] + 9);
-	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_ram[2] + 3);
-	state->m_fg_tilemap->set_scrolly(0, state->m_scroll_ram[1] + 9);
-	state->m_fg_tilemap->set_scrollx(0, state->m_scroll_ram[0] - 1);
+	state->m_bg_tilemap->set_scrolly(0, state->m_scroll_ram.target()[3] + 9);
+	state->m_bg_tilemap->set_scrollx(0, state->m_scroll_ram.target()[2] + 3);
+	state->m_fg_tilemap->set_scrolly(0, state->m_scroll_ram.target()[1] + 9);
+	state->m_fg_tilemap->set_scrollx(0, state->m_scroll_ram.target()[0] - 1);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 

@@ -45,7 +45,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_nmi_w)
 
 WRITE8_MEMBER(thedeep_state::thedeep_sound_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -70,11 +70,11 @@ WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
 	switch (m_protection_command)
 	{
 		case 0x11:
-			flip_screen_set(machine(), 1);
+			flip_screen_set(1);
 		break;
 
 		case 0x20:
-			flip_screen_set(machine(), 0);
+			flip_screen_set(0);
 		break;
 
 		case 0x30:
@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	//
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)	// From Main CPU
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)	// From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -207,7 +207,7 @@ static void thedeep_maincpu_bankswitch(running_machine &machine,UINT8 bank_trig)
 
 WRITE8_MEMBER(thedeep_state::thedeep_p1_w)
 {
-	flip_screen_set(machine(), (data & 1) ^ 1);
+	flip_screen_set((data & 1) ^ 1);
 	thedeep_maincpu_bankswitch(machine(),(data & 6) >> 1);
 	logerror("P1 %02x\n",data);
 }

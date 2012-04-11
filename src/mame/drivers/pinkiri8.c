@@ -39,15 +39,22 @@ class pinkiri8_state : public driver_device
 {
 public:
 	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_janshi_back_vram(*this, "janshi_back_vram"),
+		m_janshi_vram1(*this, "janshi_vram1"),
+		m_janshi_unk1(*this, "janshi_unk1"),
+		m_janshi_widthflags(*this, "janshi_widthflags"),
+		m_janshi_unk2(*this, "janshi_unk2"),
+		m_janshi_vram2(*this, "janshi_vram2"),
+		m_janshi_crtc_regs(*this, "janshi_crtc_regs"){ }
 
-	UINT8* m_janshi_vram1;
-	UINT8* m_janshi_vram2;
-	UINT8* m_janshi_back_vram;
-	UINT8* m_janshi_crtc_regs;
-	UINT8* m_janshi_unk1;
-	UINT8* m_janshi_widthflags;
-	UINT8* m_janshi_unk2;
+	required_shared_ptr<UINT8> m_janshi_back_vram;
+	required_shared_ptr<UINT8> m_janshi_vram1;
+	required_shared_ptr<UINT8> m_janshi_unk1;
+	required_shared_ptr<UINT8> m_janshi_widthflags;
+	required_shared_ptr<UINT8> m_janshi_unk2;
+	required_shared_ptr<UINT8> m_janshi_vram2;
+	required_shared_ptr<UINT8> m_janshi_crtc_regs;
 	UINT32 m_vram_addr;
 	int m_prev_writes;
 	UINT8 m_mux_data;
@@ -68,19 +75,19 @@ public:
 
 static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8, pinkiri8_state )
 
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE(m_janshi_back_vram) // bg tilemap?
-	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE(m_janshi_vram1) // xpos, colour, tile number etc.
+	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_SHARE("janshi_back_vram") // bg tilemap?
+	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_SHARE("janshi_vram1") // xpos, colour, tile number etc.
 
-	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_BASE(m_janshi_unk1) // ?? height related?
-	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_BASE(m_janshi_widthflags)
-	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_BASE(m_janshi_unk2) // 2x increasing tables 00 10 20 30 etc.
+	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_SHARE("janshi_unk1") // ?? height related?
+	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_SHARE("janshi_widthflags")
+	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_SHARE("janshi_unk2") // 2x increasing tables 00 10 20 30 etc.
 
-	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_BASE(m_janshi_vram2) // y pos + unknown
+	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_SHARE("janshi_vram2") // y pos + unknown
 
-	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
 
-	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_BASE(m_janshi_crtc_regs)
+	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_SHARE("janshi_crtc_regs")
 ADDRESS_MAP_END
 
 
@@ -198,7 +205,7 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 		for (i=0x00;i<0x40;i+=2)
 		{
 
-			printf("%02x, ", state->m_janshi_widthflags[i+1]);
+			printf("%02x, ", state->m_janshi_widthflags.target()[i+1]);
 
 			count2++;
 
@@ -216,8 +223,8 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
 
 
-	//popmessage("%02x",state->m_janshi_crtc_regs[0x0a]);
-	col_bank = (state->m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
+	//popmessage("%02x",state->m_janshi_crtc_regs.target()[0x0a]);
+	col_bank = (state->m_janshi_crtc_regs.target()[0x0a] & 0x40) >> 6;
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -231,8 +238,8 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 		{
 			for(x=0;x<32;x++)
 			{
-				tile = state->m_janshi_back_vram[count+1]<<8 | state->m_janshi_back_vram[count+0];
-				attr = state->m_janshi_back_vram[count+2] ^ 0xf0;
+				tile = state->m_janshi_back_vram.target()[count+1]<<8 | state->m_janshi_back_vram.target()[count+0];
+				attr = state->m_janshi_back_vram.target()[count+2] ^ 0xf0;
 				col = (attr >> 4) | 0x10;
 
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*16,y*8,0);
@@ -268,15 +275,15 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
           */
 
-			spr_offs = ((state->m_janshi_vram1[(i*4)+0] & 0xff) | (state->m_janshi_vram1[(i*4)+1]<<8)) & 0xffff;
-			col = (state->m_janshi_vram1[(i*4)+2] & 0xf8) >> 3;
-			x =   state->m_janshi_vram1[(i*4)+3];
+			spr_offs = ((state->m_janshi_vram1.target()[(i*4)+0] & 0xff) | (state->m_janshi_vram1.target()[(i*4)+1]<<8)) & 0xffff;
+			col = (state->m_janshi_vram1.target()[(i*4)+2] & 0xf8) >> 3;
+			x =   state->m_janshi_vram1.target()[(i*4)+3];
 
 			x &= 0xff;
 			x *= 2;
 
-//          unk2 = state->m_janshi_vram2[(i*2)+1];
-			y = (state->m_janshi_vram2[(i*2)+0]);
+//          unk2 = state->m_janshi_vram2.target()[(i*2)+1];
+			y = (state->m_janshi_vram2.target()[(i*2)+0]);
 
 			y = 0x100-y;
 
@@ -289,7 +296,7 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 
 
 			// these bits seem to somehow determine the sprite height / widths for the sprite ram region?
-			int bit = state->m_janshi_widthflags[(i/0x20)*2 + 1];
+			int bit = state->m_janshi_widthflags.target()[(i/0x20)*2 + 1];
 
 			if (bit)
 			{

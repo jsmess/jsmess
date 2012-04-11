@@ -43,14 +43,18 @@ public:
 	dacholer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_audiocpu(*this,"audiocpu")
-		{ }
+		m_audiocpu(*this,"audiocpu"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spriteram(*this, "spriteram"){ }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	/* memory pointers */
-	UINT8 *  m_bgvideoram;
-	UINT8 *  m_fgvideoram;
-	UINT8 *  m_spriteram;
-	size_t   m_spriteram_size;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -66,9 +70,6 @@ public:
 	UINT8 m_music_interrupt_enable;
 	UINT8 m_snd_ack;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(background_w);
@@ -87,13 +88,13 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	dacholer_state *state = machine.driver_data<dacholer_state>();
-	SET_TILE_INFO(1, state->m_bgvideoram[tile_index] + state->m_bg_bank * 0x100, 0, 0);
+	SET_TILE_INFO(1, state->m_bgvideoram.target()[tile_index] + state->m_bg_bank * 0x100, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	dacholer_state *state = machine.driver_data<dacholer_state>();
-	SET_TILE_INFO(0, state->m_fgvideoram[tile_index], 0, 0);
+	SET_TILE_INFO(0, state->m_fgvideoram.target()[tile_index], 0, 0);
 }
 
 static VIDEO_START( dacholer )
@@ -120,18 +121,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	dacholer_state *state = machine.driver_data<dacholer_state>();
 	int offs, code, attr, sx, sy, flipx, flipy;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
-		code = state->m_spriteram[offs + 1];
-		attr = state->m_spriteram[offs + 2];
+		code = state->m_spriteram.target()[offs + 1];
+		attr = state->m_spriteram.target()[offs + 2];
 
 		flipx = attr & 0x10;
 		flipy = attr & 0x20;
 
-		sx = (state->m_spriteram[offs + 3] - 128) + 256 * (attr & 0x01);
-		sy = 255 - state->m_spriteram[offs];
+		sx = (state->m_spriteram.target()[offs + 3] - 128) + 256 * (attr & 0x01);
+		sy = 255 - state->m_spriteram.target()[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -151,7 +152,7 @@ static SCREEN_UPDATE_IND16(dacholer)
 {
 	dacholer_state *state = screen.machine().driver_data<dacholer_state>();
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		state->m_bg_tilemap->set_scrollx(0, 256 - state->m_scroll_x);
 		state->m_bg_tilemap->set_scrolly(0, 256 - state->m_scroll_y);
@@ -170,13 +171,13 @@ static SCREEN_UPDATE_IND16(dacholer)
 
 WRITE8_MEMBER(dacholer_state::background_w)
 {
-	m_bgvideoram[offset] = data;
+	m_bgvideoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(dacholer_state::foreground_w)
 {
-	m_fgvideoram[offset] = data;
+	m_fgvideoram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -188,7 +189,7 @@ WRITE8_MEMBER(dacholer_state::bg_bank_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	flip_screen_set(machine(), data & 0xc); // probably one bit for flipx and one for flipy
+	flip_screen_set(data & 0xc); // probably one bit for flipx and one for flipy
 
 }
 
@@ -203,7 +204,7 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 
 WRITE8_MEMBER(dacholer_state::snd_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -216,9 +217,9 @@ WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_main_map, AS_PROGRAM, 8, dacholer_state )
@@ -284,7 +285,7 @@ WRITE8_MEMBER(dacholer_state::music_irq_w)
 
 static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w )
 	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
@@ -296,7 +297,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w )
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)

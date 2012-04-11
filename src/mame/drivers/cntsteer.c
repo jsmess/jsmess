@@ -33,13 +33,17 @@ class cntsteer_state : public driver_device
 {
 public:
 	cntsteer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_videoram2(*this, "videoram2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_videoram2;
-	UINT8 *  m_colorram;
-	UINT8 *  m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram2;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -108,7 +112,7 @@ static PALETTE_INIT( zerotrgt )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	int code = state->m_videoram2[tile_index];
+	int code = state->m_videoram2.target()[tile_index];
 
 	SET_TILE_INFO(2, code + state->m_bg_bank, state->m_bg_color_bank, 0);
 }
@@ -116,8 +120,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	int code = state->m_videoram[tile_index];
-	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram.target()[tile_index];
+	int attr = state->m_colorram.target()[tile_index];
 
 	code |= (attr & 0x01) << 8;
 
@@ -168,18 +172,18 @@ static void zerotrgt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	{
 		int multi, fx, fy, sx, sy, code, color;
 
-		if ((state->m_spriteram[offs + 1] & 1) == 1)
+		if ((state->m_spriteram.target()[offs + 1] & 1) == 1)
 			continue;
 
-		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 1] & 0xc0) << 2);
-		sx = (state->m_spriteram[offs + 2]);
-		sy = 0xf0 - state->m_spriteram[offs];
-		color = 0x10 + ((state->m_spriteram[offs + 1] & 0x20) >> 4) + ((state->m_spriteram[offs + 1] & 0x8)>>3);
+		code = state->m_spriteram.target()[offs + 3] + ((state->m_spriteram.target()[offs + 1] & 0xc0) << 2);
+		sx = (state->m_spriteram.target()[offs + 2]);
+		sy = 0xf0 - state->m_spriteram.target()[offs];
+		color = 0x10 + ((state->m_spriteram.target()[offs + 1] & 0x20) >> 4) + ((state->m_spriteram.target()[offs + 1] & 0x8)>>3);
 
-		fx = !(state->m_spriteram[offs + 1] & 0x04);
-		fy = (state->m_spriteram[offs + 1] & 0x02);
+		fx = !(state->m_spriteram.target()[offs + 1] & 0x04);
+		fy = (state->m_spriteram.target()[offs + 1] & 0x02);
 
-		multi = state->m_spriteram[offs + 1] & 0x10;
+		multi = state->m_spriteram.target()[offs + 1] & 0x10;
 
 		if (state->m_flipscreen)
 		{
@@ -226,18 +230,18 @@ static void cntsteer_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	{
 		int multi, fx, fy, sx, sy, code, color;
 
-		if ((state->m_spriteram[offs + 0] & 1) == 0)
+		if ((state->m_spriteram.target()[offs + 0] & 1) == 0)
 			continue;
 
-		code = state->m_spriteram[offs + 1] + ((state->m_spriteram[offs + 0x80] & 0x03) << 8);
-		sx = 0x100 - state->m_spriteram[offs + 3];
-		sy = 0x100 - state->m_spriteram[offs + 2];
-		color = 0x10 + ((state->m_spriteram[offs + 0x80] & 0x70) >> 4);
+		code = state->m_spriteram.target()[offs + 1] + ((state->m_spriteram.target()[offs + 0x80] & 0x03) << 8);
+		sx = 0x100 - state->m_spriteram.target()[offs + 3];
+		sy = 0x100 - state->m_spriteram.target()[offs + 2];
+		color = 0x10 + ((state->m_spriteram.target()[offs + 0x80] & 0x70) >> 4);
 
-		fx = (state->m_spriteram[offs + 0] & 0x04);
-		fy = (state->m_spriteram[offs + 0] & 0x02);
+		fx = (state->m_spriteram.target()[offs + 0] & 0x04);
+		fy = (state->m_spriteram.target()[offs + 0] & 0x02);
 
-		multi = state->m_spriteram[offs + 0] & 0x10;
+		multi = state->m_spriteram.target()[offs + 0] & 0x10;
 
 		if (state->m_flipscreen)
 		{
@@ -395,7 +399,7 @@ WRITE8_MEMBER(cntsteer_state::zerotrgt_vregs_w)
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3:	m_rotation_sign = (data & 1);
-				flip_screen_set(machine(), !(data & 4));
+				flip_screen_set(!(data & 4));
 				m_scrolly_hi = (data & 0x30) << 4;
 				m_scrollx_hi = (data & 0xc0) << 2;
 				break;
@@ -429,19 +433,19 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_foreground_vram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_foreground_attr_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 {
-	m_videoram2[offset] = data;
+	m_videoram2.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -458,7 +462,7 @@ WRITE8_MEMBER(cntsteer_state::gekitsui_sub_irq_ack)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
@@ -529,17 +533,17 @@ READ8_MEMBER(cntsteer_state::cntsteer_adx_r)
 
 static ADDRESS_MAP_START( gekitsui_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1200, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(m_colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_SHARE("colorram")
 	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekitsui_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("videoram2")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
@@ -552,9 +556,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(m_colorram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_SHARE("colorram")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_sub_nmi_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(cntsteer_sub_irq_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -562,7 +566,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(m_videoram2) AM_SHARE("share3")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("videoram2") AM_SHARE("share3")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("share3")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
@@ -597,7 +601,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(nmimask_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

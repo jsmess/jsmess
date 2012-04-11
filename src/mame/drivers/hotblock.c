@@ -49,10 +49,11 @@ class hotblock_state : public driver_device
 {
 public:
 	hotblock_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_vram;
+	required_shared_ptr<UINT8> m_vram;
 
 	/* misc */
 	int      m_port0;
@@ -78,7 +79,7 @@ READ8_MEMBER(hotblock_state::hotblock_video_read)
 	}
 	else // port 0 = 88 c8
 	{
-		return m_vram[offset];
+		return m_vram.target()[offset];
 	}
 }
 
@@ -116,13 +117,13 @@ WRITE8_MEMBER(hotblock_state::hotblock_video_write)
 	}
 	else // port 0 = 88 c8
 	{
-		m_vram[offset] = data;
+		m_vram.target()[offset] = data;
 	}
 }
 
 static ADDRESS_MAP_START( hotblock_map, AS_PROGRAM, 8, hotblock_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(hotblock_video_read, hotblock_video_write) AM_BASE(m_vram)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(hotblock_video_read, hotblock_video_write) AM_SHARE("vram")
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -162,7 +163,7 @@ static SCREEN_UPDATE_IND16(hotblock)
 		for(x = 0; x < xxx; x++)
 		{
 			if (state->m_port0 & 0x40)
-				bitmap.pix16(y, x) = state->m_vram[count];
+				bitmap.pix16(y, x) = state->m_vram.target()[count];
 			count++;
 		}
 	}

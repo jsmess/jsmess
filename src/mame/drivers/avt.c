@@ -422,8 +422,14 @@ public:
 	avt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_crtc(*this, "crtc")
-		{ }
+		m_crtc(*this, "crtc"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 
 	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
 	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
@@ -431,13 +437,9 @@ public:
 	DECLARE_WRITE8_MEMBER(avt_videoram_w);
 	DECLARE_WRITE8_MEMBER(avt_colorram_w);
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
 	DECLARE_WRITE8_MEMBER(debug_w);
 };
 
@@ -466,14 +468,14 @@ public:
 
 WRITE8_MEMBER( avt_state::avt_videoram_w )
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
 WRITE8_MEMBER( avt_state::avt_colorram_w )
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -486,8 +488,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xxxx ----   color code.
     ---- xxxx   seems unused.
 */
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index] | ((attr & 1) << 8);
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index] | ((attr & 1) << 8);
 	int color = (attr & 0xf0)>>4;
 
 	SET_TILE_INFO( 0, code, color, 0);
@@ -514,8 +516,8 @@ static SCREEN_UPDATE_IND16( avt )
 	{
 		for(x=0;x<mc6845_h_display;x++)
 		{
-			UINT16 tile = state->m_videoram[count] | ((state->m_colorram[count] & 1) << 8);
-			UINT8 color = (state->m_colorram[count] & 0xf0) >> 4;
+			UINT16 tile = state->m_videoram.target()[count] | ((state->m_colorram.target()[count] & 1) << 8);
+			UINT8 color = (state->m_colorram.target()[count] & 0xf0) >> 4;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,(y*8));
 
@@ -614,8 +616,8 @@ static ADDRESS_MAP_START( avt_map, AS_PROGRAM, 8, avt_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )

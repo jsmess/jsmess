@@ -39,11 +39,13 @@ class good_state : public driver_device
 {
 public:
 	good_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_tilemapram(*this, "fg_tilemapram"),
+		m_bg_tilemapram(*this, "bg_tilemapram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg_tilemapram;
-	UINT16 *  m_fg_tilemapram;
+	required_shared_ptr<UINT16> m_fg_tilemapram;
+	required_shared_ptr<UINT16> m_bg_tilemapram;
 	UINT16 *  m_sprites;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
@@ -57,29 +59,29 @@ public:
 
 WRITE16_MEMBER(good_state::fg_tilemapram_w)
 {
-	COMBINE_DATA(&m_fg_tilemapram[offset]);
+	COMBINE_DATA(&m_fg_tilemapram.target()[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	good_state *state = machine.driver_data<good_state>();
-	int tileno = state->m_fg_tilemapram[tile_index * 2];
-	int attr = state->m_fg_tilemapram[tile_index * 2 + 1] & 0xf;
+	int tileno = state->m_fg_tilemapram.target()[tile_index * 2];
+	int attr = state->m_fg_tilemapram.target()[tile_index * 2 + 1] & 0xf;
 	SET_TILE_INFO(0, tileno, attr, 0);
 }
 
 WRITE16_MEMBER(good_state::bg_tilemapram_w)
 {
-	COMBINE_DATA(&m_bg_tilemapram[offset]);
+	COMBINE_DATA(&m_bg_tilemapram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	good_state *state = machine.driver_data<good_state>();
-	int tileno = state->m_bg_tilemapram[tile_index * 2];
-	int attr = state->m_bg_tilemapram[tile_index * 2 + 1] & 0xf;
+	int tileno = state->m_bg_tilemapram.target()[tile_index * 2];
+	int attr = state->m_bg_tilemapram.target()[tile_index * 2 + 1] & 0xf;
 	SET_TILE_INFO(1, tileno, attr, 0);
 }
 
@@ -111,10 +113,10 @@ static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("IN2")
 
-	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 
-	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE(m_fg_tilemapram)
-	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE(m_bg_tilemapram)
+	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_SHARE("fg_tilemapram")
+	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_SHARE("bg_tilemapram")
 
 	AM_RANGE(0xff0000, 0xffefff) AM_RAM
 ADDRESS_MAP_END

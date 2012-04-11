@@ -140,13 +140,17 @@ class kinst_state : public driver_device
 {
 public:
 	kinst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rambase(*this, "rambase"),
+		m_rambase2(*this, "rambase2"),
+		m_control(*this, "control"),
+		m_rombase(*this, "rombase"){ }
 
-	UINT32 *m_rambase;
-	UINT32 *m_rambase2;
-	UINT32 *m_rombase;
+	required_shared_ptr<UINT32> m_rambase;
+	required_shared_ptr<UINT32> m_rambase2;
+	required_shared_ptr<UINT32> m_control;
+	required_shared_ptr<UINT32> m_rombase;
 	UINT32 *m_video_base;
-	UINT32 *m_control;
 	const UINT8 *m_control_map;
 	DECLARE_READ32_MEMBER(kinst_control_r);
 	DECLARE_WRITE32_MEMBER(kinst_control_w);
@@ -172,9 +176,9 @@ static MACHINE_START( kinst )
 	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->m_rambase2);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->m_rambase);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->m_rambase2.target());
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->m_rambase.target());
+	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase.target());
 }
 
 
@@ -221,7 +225,7 @@ static MACHINE_RESET( kinst )
 	}
 
 	/* set a safe base location for video */
-	state->m_video_base = &state->m_rambase[0x30000/4];
+	state->m_video_base = &state->m_rambase.target()[0x30000/4];
 }
 
 
@@ -329,7 +333,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 
 	/* apply shuffling */
 	offset = m_control_map[offset / 2];
-	result = m_control[offset];
+	result = m_control.target()[offset];
 
 	switch (offset)
 	{
@@ -363,16 +367,16 @@ WRITE32_MEMBER(kinst_state::kinst_control_w)
 
 	/* apply shuffling */
 	offset = m_control_map[offset / 2];
-	olddata = m_control[offset];
-	COMBINE_DATA(&m_control[offset]);
+	olddata = m_control.target()[offset];
+	COMBINE_DATA(&m_control.target()[offset]);
 
 	switch (offset)
 	{
 		case 0:		/* $80 - VRAM buffer control */
 			if (data & 4)
-				m_video_base = &m_rambase[0x58000/4];
+				m_video_base = &m_rambase.target()[0x58000/4];
 			else
-				m_video_base = &m_rambase[0x30000/4];
+				m_video_base = &m_rambase.target()[0x30000/4];
 			break;
 
 		case 1:		/* $88 - sound reset */
@@ -380,8 +384,8 @@ WRITE32_MEMBER(kinst_state::kinst_control_w)
 			break;
 
 		case 2:		/* $90 - sound control */
-			if (!(olddata & 0x02) && (m_control[offset] & 0x02))
-				dcs_data_w(machine(), m_control[3]);
+			if (!(olddata & 0x02) && (m_control.target()[offset] & 0x02))
+				dcs_data_w(machine(), m_control.target()[3]);
 			break;
 
 		case 3:		/* $98 - sound data */
@@ -399,12 +403,12 @@ WRITE32_MEMBER(kinst_state::kinst_control_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, kinst_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_rambase)
-	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE(m_rambase2)
-	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_BASE(m_control)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("rambase")
+	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_SHARE("rambase2")
+	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_SHARE("control")
 	AM_RANGE(0x10000100, 0x1000013f) AM_DEVREADWRITE_LEGACY("ide", kinst_ide_r, kinst_ide_w)
 	AM_RANGE(0x10000170, 0x10000173) AM_DEVREADWRITE_LEGACY("ide", kinst_ide_extra_r, kinst_ide_extra_w)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rombase)
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 
 

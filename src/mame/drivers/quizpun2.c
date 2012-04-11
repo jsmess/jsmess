@@ -92,11 +92,13 @@ class quizpun2_state : public driver_device
 {
 public:
 	quizpun2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_ram(*this, "fg_ram"),
+		m_bg_ram(*this, "bg_ram"){ }
 
 	struct prot_t m_prot;
-	UINT8 *m_bg_ram;
-	UINT8 *m_fg_ram;
+	required_shared_ptr<UINT8> m_fg_ram;
+	required_shared_ptr<UINT8> m_bg_ram;
 	tilemap_t *m_bg_tmap;
 	tilemap_t *m_fg_tmap;
 	DECLARE_WRITE8_MEMBER(bg_ram_w);
@@ -118,27 +120,27 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	quizpun2_state *state = machine.driver_data<quizpun2_state>();
-	UINT16 code = state->m_bg_ram[ tile_index * 2 ] + state->m_bg_ram[ tile_index * 2 + 1 ] * 256;
+	UINT16 code = state->m_bg_ram.target()[ tile_index * 2 ] + state->m_bg_ram.target()[ tile_index * 2 + 1 ] * 256;
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	quizpun2_state *state = machine.driver_data<quizpun2_state>();
-	UINT16 code  = state->m_fg_ram[ tile_index * 4 ] + state->m_fg_ram[ tile_index * 4 + 1 ] * 256;
-	UINT8  color = state->m_fg_ram[ tile_index * 4 + 2 ];
+	UINT16 code  = state->m_fg_ram.target()[ tile_index * 4 ] + state->m_fg_ram.target()[ tile_index * 4 + 1 ] * 256;
+	UINT8  color = state->m_fg_ram.target()[ tile_index * 4 + 2 ];
 	SET_TILE_INFO(1, code, color & 0x0f, 0);
 }
 
 WRITE8_MEMBER(quizpun2_state::bg_ram_w)
 {
-	m_bg_ram[offset] = data;
+	m_bg_ram.target()[offset] = data;
 	m_bg_tmap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_MEMBER(quizpun2_state::fg_ram_w)
 {
-	m_fg_ram[offset] = data;
+	m_fg_ram.target()[offset] = data;
 	m_fg_tmap->mark_tile_dirty(offset/4);
 }
 
@@ -352,7 +354,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_irq_ack)
 
 WRITE8_MEMBER(quizpun2_state::quizpun2_soundlatch_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -364,7 +366,7 @@ static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE(bg_ram_w ) AM_BASE(m_bg_ram )	// 4 * 400
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAM										//
 
-	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w )  AM_SHARE("paletteram")
+	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w )  AM_SHARE("paletteram")
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
@@ -393,7 +395,7 @@ static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8, quizpun2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP	// IRQ end
 	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP	// NMI end
-	AM_RANGE( 0x40, 0x40 ) AM_READ(soundlatch_r )
+	AM_RANGE( 0x40, 0x40 ) AM_READ(soundlatch_byte_r )
 	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w )
 ADDRESS_MAP_END
 

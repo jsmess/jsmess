@@ -78,7 +78,10 @@ class subsino2_state : public driver_device
 {
 public:
 	subsino2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_outputs16(*this, "outputs16"),
+		m_outputs(*this, "outputs"),
+		m_am188em_regs(*this, "am188eregs"){ }
 
 	UINT8 *m_hm86171_colorram;
 	layer_t m_layers[2];
@@ -91,9 +94,9 @@ public:
 	UINT8 m_ss9601_disable;
 	int m_hm86171_offs;
 	UINT8 m_dsw_mask;
-	UINT8 *m_outputs;
-	UINT16 *m_outputs16;
-	UINT8 *m_am188em_regs;
+	required_shared_ptr<UINT16> m_outputs16;
+	required_shared_ptr<UINT8> m_outputs;
+	required_shared_ptr<UINT8> m_am188em_regs;
 	UINT16 m_bishjan_sel;
 	UINT16 m_bishjan_input;
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
@@ -829,36 +832,36 @@ enum
 
 READ8_MEMBER(subsino2_state::am188em_regs_r)
 {
-	return m_am188em_regs[offset];
+	return m_am188em_regs.target()[offset];
 }
 
 WRITE8_MEMBER(subsino2_state::am188em_regs_w)
 {
-	m_am188em_regs[offset] = data;
+	m_am188em_regs.target()[offset] = data;
 }
 
 static MACHINE_RESET( am188em )
 {
 	subsino2_state *state = machine.driver_data<subsino2_state>();
 	// start with masked interrupts
-	state->m_am188em_regs[AM188EM_IMASK+0] = 0xfd;
-	state->m_am188em_regs[AM188EM_IMASK+1] = 0x07;
-	state->m_am188em_regs[AM188EM_I0CON+0] = 0x0f;
-	state->m_am188em_regs[AM188EM_I0CON+1] = 0x00;
+	state->m_am188em_regs.target()[AM188EM_IMASK+0] = 0xfd;
+	state->m_am188em_regs.target()[AM188EM_IMASK+1] = 0x07;
+	state->m_am188em_regs.target()[AM188EM_I0CON+0] = 0x0f;
+	state->m_am188em_regs.target()[AM188EM_I0CON+1] = 0x00;
 }
 
 static INTERRUPT_GEN( am188em_int0_irq )
 {
 	subsino2_state *state = device->machine().driver_data<subsino2_state>();
-	if ( ((state->m_am188em_regs[AM188EM_IMASK+0] & 0x10) == 0) ||	// IMASK.I0 mask
-		 ((state->m_am188em_regs[AM188EM_I0CON+0] & 0x08) == 0) )	// I0CON.MSK mask
+	if ( ((state->m_am188em_regs.target()[AM188EM_IMASK+0] & 0x10) == 0) ||	// IMASK.I0 mask
+		 ((state->m_am188em_regs.target()[AM188EM_I0CON+0] & 0x08) == 0) )	// I0CON.MSK mask
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x0c);	// INT0 (background scrolling in xplan)
 }
 
 static TIMER_DEVICE_CALLBACK( am188em_timer2_irq )
 {
 	subsino2_state *state = timer.machine().driver_data<subsino2_state>();
-	if ((state->m_am188em_regs[AM188EM_IMASK+0] & 0x01) == 0)	// TMR mask
+	if ((state->m_am188em_regs.target()[AM188EM_IMASK+0] & 0x01) == 0)	// TMR mask
 		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0x4c/4);
 }
 
@@ -916,13 +919,13 @@ READ16_MEMBER(subsino2_state::bishjan_input_r)
 
 	return	(res << 8) |									// high byte
 			input_port_read(machine(), "SYSTEM") |		// low byte
-			(ticket_dispenser_r(machine().device("hopper"), 0) ? 0x00 : 0x04)	// bit 2: hopper sensor
+			(machine().device<ticket_dispenser_device>("hopper")->read(space, 0) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }
 
 WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 {
-	m_outputs16[offset] = data;
+	m_outputs16.target()[offset] = data;
 
 	switch (offset)
 	{
@@ -930,13 +933,13 @@ WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				// coin out         data & 0x01;
-				ticket_dispenser_w(machine().device("hopper"), 0, (data & 0x0002) ? 0x80 : 0);	// hopper
+				machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0002) ? 0x80 : 0);	// hopper
 				coin_counter_w(machine(), 0,	data & 0x0010 );
 			}
 			break;
 	}
 
-//  popmessage("0: %04x", m_outputs16[0]);
+//  popmessage("0: %04x", m_outputs16.target()[0]);
 }
 
 
@@ -994,7 +997,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 {
-	m_outputs[offset] = data;
+	m_outputs.target()[offset] = data;
 
 	switch (offset)
 	{
@@ -1021,7 +1024,7 @@ WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs.target()[0], m_outputs.target()[1], m_outputs.target()[2], m_outputs.target()[3]);
 }
 
 /***************************************************************************
@@ -1030,7 +1033,7 @@ WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 
 WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 {
-	m_outputs[offset] = data;
+	m_outputs.target()[offset] = data;
 
 	switch (offset)
 	{
@@ -1056,7 +1059,7 @@ WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs.target()[0], m_outputs.target()[1], m_outputs.target()[2], m_outputs.target()[3]);
 }
 
 WRITE8_MEMBER(subsino2_state::mtrain_videoram_w)
@@ -1160,7 +1163,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(subsino2_state::saklove_outputs_w)
 {
-	m_outputs[offset] = data;
+	m_outputs.target()[offset] = data;
 
 	switch (offset)
 	{
@@ -1180,7 +1183,7 @@ WRITE8_MEMBER(subsino2_state::saklove_outputs_w)
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs.target()[0], m_outputs.target()[1], m_outputs.target()[2], m_outputs.target()[3]);
 }
 
 static ADDRESS_MAP_START( saklove_map, AS_PROGRAM, 8, subsino2_state )
@@ -1242,7 +1245,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 {
-	m_outputs[offset] = data;
+	m_outputs.target()[offset] = data;
 
 	switch (offset)
 	{
@@ -1270,7 +1273,7 @@ WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs.target()[0], m_outputs.target()[1], m_outputs.target()[2], m_outputs.target()[3]);
 }
 
 static ADDRESS_MAP_START( xplan_map, AS_PROGRAM, 8, subsino2_state )
@@ -1344,7 +1347,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 {
-	m_outputs[offset] = data;
+	m_outputs.target()[offset] = data;
 
 	switch (offset)
 	{
@@ -1373,7 +1376,7 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs.target()[0], m_outputs.target()[1], m_outputs.target()[2], m_outputs.target()[3]);
 }
 
 static ADDRESS_MAP_START( expcard_io, AS_IO, 8, subsino2_state )
@@ -2161,7 +2164,7 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_TIMER_ADD_PERIODIC("timer", h8_timer_irq, attotime::from_hz(60)) // timer, ?? Hz
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

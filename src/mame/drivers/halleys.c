@@ -210,7 +210,9 @@ class halleys_state : public driver_device
 {
 public:
 	halleys_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_blitter_ram(*this, "blitter_ram"),
+		m_io_ram(*this, "io_ram"){ }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];
@@ -225,10 +227,8 @@ public:
 	UINT32 *m_alpha_table;
 	UINT8 *m_cpu1_base;
 	UINT8 *m_gfx1_base;
-	UINT8 *m_blitter_ram;
-	UINT8 *m_io_ram;
-	size_t m_blitter_ramsize;
-	size_t m_io_ramsize;
+	required_shared_ptr<UINT8> m_blitter_ram;
+	required_shared_ptr<UINT8> m_io_ram;
 	int m_game_id;
 	int m_blitter_busy;
 	int m_collision_count;
@@ -1027,7 +1027,7 @@ READ8_MEMBER(halleys_state::blitter_r)
 
 	if (i==0 || i==4) return(1);
 
-	return(m_blitter_ram[offset]);
+	return(m_blitter_ram.target()[offset]);
 }
 
 
@@ -1042,7 +1042,7 @@ WRITE8_MEMBER(halleys_state::blitter_w)
 {
 	int i = offset & 0xf;
 
-	m_blitter_ram[offset] = data;
+	m_blitter_ram.target()[offset] = data;
 
 	if (i==0) blit(offset);
 
@@ -1093,7 +1093,7 @@ READ8_MEMBER(halleys_state::collision_id_r)
 		return(0);
 	}
 
-	return(m_io_ram[0x66]);
+	return(m_io_ram.target()[0x66]);
 }
 
 
@@ -1496,9 +1496,9 @@ static SCREEN_UPDATE_IND16( halleys )
 	copy_fixed_xp (bitmap, state->m_render_layer[0]);
 
 	// HALF-HACK: apply RGB filter when the following conditions are met
-	i = state->m_io_ram[0xa0];
-	j = state->m_io_ram[0xa1];
-	if (state->m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen.machine(), bitmap, i);
+	i = state->m_io_ram.target()[0xa0];
+	j = state->m_io_ram.target()[0xa1];
+	if (state->m_io_ram.target()[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen.machine(), bitmap, i);
 	return 0;
 }
 
@@ -1506,7 +1506,7 @@ static SCREEN_UPDATE_IND16( halleys )
 static SCREEN_UPDATE_IND16( benberob )
 {
 	halleys_state *state = screen.machine().driver_data<halleys_state>();
-	if (state->m_io_ram[0xa0] & 0x80)
+	if (state->m_io_ram.target()[0xa0] & 0x80)
 		copy_scroll_op(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
 	else
 		bitmap.fill(state->m_bgcolor, cliprect);
@@ -1526,7 +1526,7 @@ READ8_MEMBER(halleys_state::zero_r){ return(0); }
 
 READ8_MEMBER(halleys_state::debug_r)
 {
-	return(m_io_ram[offset]);
+	return(m_io_ram.target()[offset]);
 }
 
 #endif
@@ -1598,7 +1598,7 @@ READ8_MEMBER(halleys_state::vector_r)
 
 WRITE8_MEMBER(halleys_state::firq_ack_w)
 {
-	m_io_ram[0x9c] = data;
+	m_io_ram.target()[0x9c] = data;
 
 	if (m_firq_level) m_firq_level--;
 	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
@@ -1615,8 +1615,8 @@ static WRITE8_DEVICE_HANDLER( sndnmi_msk_w )
 WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 
-	m_io_ram[0x8a] = data;
-	soundlatch_w(space,offset,data);
+	m_io_ram.target()[0x8a] = data;
+	soundlatch_byte_w(space,offset,data);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1650,7 +1650,7 @@ READ8_MEMBER(halleys_state::io_mirror_r)
 // Memory Maps
 
 static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(blitter_r, blitter_w) AM_BASE(m_blitter_ram) AM_SIZE(m_blitter_ramsize)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(blitter_r, blitter_w) AM_SHARE("blitter_ram")
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(bgtile_w)		// background tiles?(Ben Bero Beh only)
 	AM_RANGE(0x1000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfeff) AM_RAM					// work ram
@@ -1668,7 +1668,7 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0xff96, 0xff96) AM_READ_PORT("DSW2")	// dipswitch 3
 	AM_RANGE(0xff97, 0xff97) AM_READ_PORT("DSW3")	// dipswitch 2
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_BASE(m_io_ram) AM_SIZE(m_io_ramsize)	// I/O write fall-through
+	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_SHARE("io_ram")	// I/O write fall-through
 
 	AM_RANGE(0xffc0, 0xffdf) AM_RAM_WRITE(halleys_paletteram_IIRRGGBB_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)
@@ -1684,7 +1684,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD_LEGACY("ay3", ay8910_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE_LEGACY("ay4", ay8910_address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD_LEGACY("ay4", ay8910_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
+	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostic ROM
 ADDRESS_MAP_END
 
@@ -1937,7 +1937,7 @@ static MACHINE_RESET( halleys )
 	state->m_bgcolor         = get_black_pen(machine);
 	state->m_fftail = state->m_ffhead = state->m_ffcount = 0;
 
-	memset(state->m_io_ram, 0xff, state->m_io_ramsize);
+	memset(state->m_io_ram.target(), 0xff, state->m_io_ram.bytes());
 	memset(state->m_render_layer[0], 0, SCREEN_BYTESIZE * MAX_LAYERS);
 }
 

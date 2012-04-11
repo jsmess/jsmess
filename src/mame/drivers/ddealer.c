@@ -117,17 +117,25 @@ class ddealer_state : public driver_device
 {
 public:
 	ddealer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vregs(*this, "vregs"),
+		m_left_fg_vram_top(*this, "left_fg_vratop"),
+		m_right_fg_vram_top(*this, "right_fg_vratop"),
+		m_left_fg_vram_bottom(*this, "left_fg_vrabottom"),
+		m_right_fg_vram_bottom(*this, "right_fg_vrabottom"),
+		m_back_vram(*this, "back_vram"),
+		m_work_ram(*this, "work_ram"),
+		m_mcu_shared_ram(*this, "mcu_shared_ram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_mcu_shared_ram;
-	UINT16 *  m_work_ram;
-	UINT16 *  m_back_vram;
-	UINT16 *  m_left_fg_vram_top;
-	UINT16 *  m_right_fg_vram_top;
-	UINT16 *  m_left_fg_vram_bottom;
-	UINT16 *  m_right_fg_vram_bottom;
-	UINT16 *  m_vregs;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_left_fg_vram_top;
+	required_shared_ptr<UINT16> m_right_fg_vram_top;
+	required_shared_ptr<UINT16> m_left_fg_vram_bottom;
+	required_shared_ptr<UINT16> m_right_fg_vram_bottom;
+	required_shared_ptr<UINT16> m_back_vram;
+	required_shared_ptr<UINT16> m_work_ram;
+	required_shared_ptr<UINT16> m_mcu_shared_ram;
 //  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
@@ -155,7 +163,7 @@ WRITE16_MEMBER(ddealer_state::ddealer_flipscreen_w)
 static TILE_GET_INFO( get_back_tile_info )
 {
 	ddealer_state *state = machine.driver_data<ddealer_state>();
-	int code = state->m_back_vram[tile_index];
+	int code = state->m_back_vram.target()[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0xfff,
@@ -268,26 +276,26 @@ static SCREEN_UPDATE_IND16( ddealer )
 
 	if (!state->m_flipscreen)
 	{
-		if (state->m_vregs[0xcc / 2] & 0x80)
+		if (state->m_vregs.target()[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0xcc / 2], state->m_right_fg_vram_top, state->m_right_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &state->m_vregs.target()[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &state->m_vregs.target()[0xcc / 2], state->m_right_fg_vram_top, state->m_right_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &state->m_vregs.target()[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
 		}
 	}
 	else
 	{
-		if (state->m_vregs[0xcc / 2] & 0x80)
+		if (state->m_vregs.target()[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0xcc / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0x1e0 / 2], state->m_right_fg_vram_top, state->m_right_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &state->m_vregs.target()[0xcc / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &state->m_vregs.target()[0x1e0 / 2], state->m_right_fg_vram_top, state->m_right_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(screen.machine(), &state->m_vregs[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
+			ddealer_draw_video_layer(screen.machine(), &state->m_vregs.target()[0x1e0 / 2], state->m_left_fg_vram_top, state->m_left_fg_vram_bottom, bitmap, cliprect, state->m_flipscreen);
 		}
 
 	}
@@ -306,7 +314,7 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 	if (state->m_coin_input & 0x01)//coin 1
 	{
 		if((state->m_input_pressed & 0x01) == 0)
-			state->m_mcu_shared_ram[0x000 / 2]++;
+			state->m_mcu_shared_ram.target()[0x000 / 2]++;
 		state->m_input_pressed = (state->m_input_pressed & 0xfe) | 1;
 	}
 	else
@@ -315,7 +323,7 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 	if (state->m_coin_input & 0x02)//coin 2
 	{
 		if ((state->m_input_pressed & 0x02) == 0)
-			state->m_mcu_shared_ram[0x000 / 2]++;
+			state->m_mcu_shared_ram.target()[0x000 / 2]++;
 		state->m_input_pressed = (state->m_input_pressed & 0xfd) | 2;
 	}
 	else
@@ -324,7 +332,7 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 	if (state->m_coin_input & 0x04)//service 1
 	{
 		if ((state->m_input_pressed & 0x04) == 0)
-			state->m_mcu_shared_ram[0x000 / 2]++;
+			state->m_mcu_shared_ram.target()[0x000 / 2]++;
 		state->m_input_pressed = (state->m_input_pressed & 0xfb) | 4;
 	}
 	else
@@ -332,12 +340,12 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 
 	/*0x104/2 is some sort of "start-lock",i.e. used on the girl selection.
       Without it,the game "steals" one credit if you press the start button on that.*/
-	if (state->m_mcu_shared_ram[0x000 / 2] > 0 && state->m_work_ram[0x104 / 2] & 1)
+	if (state->m_mcu_shared_ram.target()[0x000 / 2] > 0 && state->m_work_ram.target()[0x104 / 2] & 1)
 	{
 		if (state->m_coin_input & 0x08)//start 1
 		{
-			if ((state->m_input_pressed & 0x08) == 0 && (~(state->m_work_ram[0x100 / 2] & 1)))
-				state->m_mcu_shared_ram[0x000 / 2]--;
+			if ((state->m_input_pressed & 0x08) == 0 && (~(state->m_work_ram.target()[0x100 / 2] & 1)))
+				state->m_mcu_shared_ram.target()[0x000 / 2]--;
 			state->m_input_pressed = (state->m_input_pressed & 0xf7) | 8;
 		}
 		else
@@ -345,8 +353,8 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 
 		if (state->m_coin_input & 0x10)//start 2
 		{
-			if((state->m_input_pressed & 0x10) == 0 && (~(state->m_work_ram[0x100 / 2] & 2)))
-				state->m_mcu_shared_ram[0x000 / 2]--;
+			if((state->m_input_pressed & 0x10) == 0 && (~(state->m_work_ram.target()[0x100 / 2] & 2)))
+				state->m_mcu_shared_ram.target()[0x000 / 2]--;
 			state->m_input_pressed = (state->m_input_pressed & 0xef) | 0x10;
 		}
 		else
@@ -354,24 +362,24 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 	}
 
 	/*random number generators,controls order of cards*/
-	state->m_mcu_shared_ram[0x10 / 2] = timer.machine().rand() & 0xffff;
-	state->m_mcu_shared_ram[0x12 / 2] = timer.machine().rand() & 0xffff;
-	state->m_mcu_shared_ram[0x14 / 2] = timer.machine().rand() & 0xffff;
-	state->m_mcu_shared_ram[0x16 / 2] = timer.machine().rand() & 0xffff;
+	state->m_mcu_shared_ram.target()[0x10 / 2] = timer.machine().rand() & 0xffff;
+	state->m_mcu_shared_ram.target()[0x12 / 2] = timer.machine().rand() & 0xffff;
+	state->m_mcu_shared_ram.target()[0x14 / 2] = timer.machine().rand() & 0xffff;
+	state->m_mcu_shared_ram.target()[0x16 / 2] = timer.machine().rand() & 0xffff;
 }
 
 
 
 WRITE16_MEMBER(ddealer_state::back_vram_w)
 {
-	COMBINE_DATA(&m_back_vram[offset]);
+	COMBINE_DATA(&m_back_vram.target()[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
 }
 
 
 WRITE16_MEMBER(ddealer_state::ddealer_vregs_w)
 {
-	COMBINE_DATA(&m_vregs[offset]);
+	COMBINE_DATA(&m_vregs.target()[offset]);
 }
 
 /******************************************************************************************************
@@ -381,24 +389,24 @@ Protection handling,identical to Hacha Mecha Fighter / Thunder Dragon with diffe
 ******************************************************************************************************/
 
 #define PROT_JSR(_offs_,_protvalue_,_pc_) \
-	if(m_mcu_shared_ram[(_offs_)/2] == _protvalue_) \
+	if(m_mcu_shared_ram.target()[(_offs_)/2] == _protvalue_) \
 	{ \
-		m_mcu_shared_ram[(_offs_)/2] = 0xffff;  /*(MCU job done)*/ \
-		m_mcu_shared_ram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
-		m_mcu_shared_ram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
-		m_mcu_shared_ram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
+		m_mcu_shared_ram.target()[(_offs_)/2] = 0xffff;  /*(MCU job done)*/ \
+		m_mcu_shared_ram.target()[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
+		m_mcu_shared_ram.target()[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
+		m_mcu_shared_ram.target()[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
 	} \
 
 #define PROT_INPUT(_offs_,_protvalue_,_protinput_,_input_) \
-	if(m_mcu_shared_ram[_offs_] == _protvalue_) \
+	if(m_mcu_shared_ram.target()[_offs_] == _protvalue_) \
 	{\
-		m_mcu_shared_ram[_protinput_] = ((_input_ & 0xffff0000)>>16);\
-		m_mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
+		m_mcu_shared_ram.target()[_protinput_] = ((_input_ & 0xffff0000)>>16);\
+		m_mcu_shared_ram.target()[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
 WRITE16_MEMBER(ddealer_state::ddealer_mcu_shared_w)
 {
-	COMBINE_DATA(&m_mcu_shared_ram[offset]);
+	COMBINE_DATA(&m_mcu_shared_ram.target()[offset]);
 
 	switch(offset)
 	{
@@ -430,25 +438,25 @@ WRITE16_MEMBER(ddealer_state::ddealer_mcu_shared_w)
 		case 0x4fe/2: PROT_JSR(0x4fe,0x8018,0x9818); break;
 		/*Start-up vector,I think that only the first ram address can be written by the main CPU,or it is a whole sequence.*/
 		case 0x000/2:
-			if (m_mcu_shared_ram[0x000 / 2] == 0x60fe)
+			if (m_mcu_shared_ram.target()[0x000 / 2] == 0x60fe)
 			{
-				m_mcu_shared_ram[0x000 / 2] = 0x0000;//coin counter
-				m_mcu_shared_ram[0x002 / 2] = 0x0000;//coin counter "decimal point"
-				m_mcu_shared_ram[0x004 / 2] = 0x4ef9;
+				m_mcu_shared_ram.target()[0x000 / 2] = 0x0000;//coin counter
+				m_mcu_shared_ram.target()[0x002 / 2] = 0x0000;//coin counter "decimal point"
+				m_mcu_shared_ram.target()[0x004 / 2] = 0x4ef9;
 			}
 			break;
 		case 0x002/2:
 		case 0x004/2:
-			if (m_mcu_shared_ram[0x002 / 2] == 0x0000 && m_mcu_shared_ram[0x004 / 2] == 0x0214)
-				m_mcu_shared_ram[0x004 / 2] = 0x4ef9;
+			if (m_mcu_shared_ram.target()[0x002 / 2] == 0x0000 && m_mcu_shared_ram.target()[0x004 / 2] == 0x0214)
+				m_mcu_shared_ram.target()[0x004 / 2] = 0x4ef9;
 			break;
 		case 0x008/2:
-			if (m_mcu_shared_ram[0x008 / 2] == 0x000f)
-				m_mcu_shared_ram[0x008 / 2] = 0x0604;
+			if (m_mcu_shared_ram.target()[0x008 / 2] == 0x000f)
+				m_mcu_shared_ram.target()[0x008 / 2] = 0x0604;
 			break;
 		case 0x00c/2:
-			if (m_mcu_shared_ram[0x00c / 2] == 0x000f)
-				m_mcu_shared_ram[0x00c / 2] = 0x0000;
+			if (m_mcu_shared_ram.target()[0x00c / 2] == 0x000f)
+				m_mcu_shared_ram.target()[0x00c / 2] = 0x0000;
 			break;
 	}
 }
@@ -460,19 +468,19 @@ static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("UNK")
 	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8_LEGACY("ymsnd", ym2203_w, 0x00ff) // ym ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") // palette ram
-	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE(ddealer_vregs_w) AM_BASE(m_vregs) // palette ram
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") // palette ram
+	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE(ddealer_vregs_w) AM_SHARE("vregs") // palette ram
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
-	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_BASE(m_left_fg_vram_top)
-	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_BASE(m_right_fg_vram_top)
-	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_BASE(m_left_fg_vram_bottom)
-	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_BASE(m_right_fg_vram_bottom)
+	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_SHARE("left_fg_vratop")
+	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_SHARE("right_fg_vratop")
+	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_SHARE("left_fg_vrabottom")
+	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_SHARE("right_fg_vrabottom")
 	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
 	AM_RANGE(0x098000, 0x098001) AM_WRITE(ddealer_flipscreen_w)
-	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(back_vram_w) AM_BASE(m_back_vram) // bg tilemap
-	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM AM_BASE(m_work_ram)
-	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM_WRITE(ddealer_mcu_shared_w) AM_BASE(m_mcu_shared_ram)
+	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(back_vram_w) AM_SHARE("back_vram") // bg tilemap
+	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM AM_SHARE("work_ram")
+	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM_WRITE(ddealer_mcu_shared_w) AM_SHARE("mcu_shared_ram")
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 

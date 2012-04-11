@@ -83,9 +83,11 @@ class pturn_state : public driver_device
 {
 public:
 	pturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_fgmap;
 	tilemap_t *m_bgmap;
 	int m_bgbank;
@@ -95,8 +97,7 @@ public:
 	int m_bgcolor;
 	int m_nmi_main;
 	int m_nmi_sub;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 	DECLARE_WRITE8_MEMBER(pturn_videoram_w);
 	DECLARE_WRITE8_MEMBER(nmi_main_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_sub_enable_w);
@@ -127,7 +128,7 @@ static const UINT8 tile_lookup[0x10]=
 static TILE_GET_INFO( get_pturn_tile_info )
 {
 	pturn_state *state = machine.driver_data<pturn_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int tileno;
 	tileno = videoram[tile_index];
 
@@ -163,7 +164,7 @@ static VIDEO_START(pturn)
 static SCREEN_UPDATE_IND16(pturn)
 {
 	pturn_state *state = screen.machine().driver_data<pturn_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = state->m_spriteram.target();
 	int offs;
 	int sx, sy;
 	int flipx, flipy;
@@ -179,13 +180,13 @@ static SCREEN_UPDATE_IND16(pturn)
 		flipy=spriteram[offs+1]&0x80;
 
 
-		if (flip_screen_x_get(screen.machine()))
+		if (state->flip_screen_x())
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (flip_screen_y_get(screen.machine()))
+		if (state->flip_screen_y())
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -218,7 +219,7 @@ READ8_MEMBER(pturn_state::pturn_protection2_r)
 
 WRITE8_MEMBER(pturn_state::pturn_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.target();
 	videoram[offset]=data;
 	m_fgmap->mark_tile_dirty(offset);
 }
@@ -236,7 +237,7 @@ WRITE8_MEMBER(pturn_state::nmi_sub_enable_w)
 
 WRITE8_MEMBER(pturn_state::sound_w)
 {
-	soundlatch_w(space,0,data);
+	soundlatch_byte_w(space,0,data);
 }
 
 
@@ -277,7 +278,7 @@ WRITE8_MEMBER(pturn_state::bgbank_w)
 
 WRITE8_MEMBER(pturn_state::flip_w)
 {
-	flip_screen_set(machine(), data);
+	flip_screen_set(data);
 }
 
 
@@ -314,11 +315,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pturn_state )
 
 	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(pturn_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(pturn_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_w)
 
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(bg_scrollx_w)
 
@@ -344,7 +345,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, pturn_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r) AM_WRITE(nmi_sub_enable_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(nmi_sub_enable_w)
 	AM_RANGE(0x4000, 0x4000) AM_RAM
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
@@ -478,7 +479,7 @@ static MACHINE_RESET( pturn )
 {
 	pturn_state *state = machine.driver_data<pturn_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->soundlatch_clear_w(*space,0,0);
+	state->soundlatch_clear_byte_w(*space,0,0);
 }
 
 static MACHINE_CONFIG_START( pturn, pturn_state )

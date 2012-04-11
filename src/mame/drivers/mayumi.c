@@ -18,10 +18,11 @@ class mayumi_state : public driver_device
 {
 public:
 	mayumi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 //  UINT8 *    m_nvram;       // this currently uses generic nvram handlers
 
 	/* video-related */
@@ -46,8 +47,8 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	mayumi_state *state = machine.driver_data<mayumi_state>();
-	int code = state->m_videoram[tile_index] + (state->m_videoram[tile_index + 0x800] & 0x1f) * 0x100;
-	int col = (state->m_videoram[tile_index + 0x1000] >> 3) & 0x1f;
+	int code = state->m_videoram.target()[tile_index] + (state->m_videoram.target()[tile_index + 0x800] & 0x1f) * 0x100;
+	int col = (state->m_videoram.target()[tile_index + 0x1000] >> 3) & 0x1f;
 
 	SET_TILE_INFO(0, code, col, 0);
 }
@@ -60,7 +61,7 @@ static VIDEO_START( mayumi )
 
 WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
@@ -99,7 +100,7 @@ WRITE8_MEMBER(mayumi_state::bank_sel_w)
 
 	m_int_enable = data & 1;
 
-	flip_screen_set(machine(), data & 2);
+	flip_screen_set(data & 2);
 }
 
 WRITE8_MEMBER(mayumi_state::input_sel_w)
@@ -139,7 +140,7 @@ static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8, mayumi_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 

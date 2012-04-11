@@ -60,13 +60,17 @@ class ddayjlc_state : public driver_device
 {
 public:
 	ddayjlc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_bgram(*this, "bgram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_bgram;
-	UINT8 *  m_mainram;
-	UINT8 *  m_videoram;
-	UINT8 *  m_spriteram;
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_bgram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -162,13 +166,13 @@ WRITE8_MEMBER(ddayjlc_state::ddayjlc_bgram_w)
 	if (!offset)
 		m_bg_tilemap->set_scrollx(0, data + 8);
 
-	m_bgram[offset] = data;
+	m_bgram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(ddayjlc_state::ddayjlc_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 }
 
 
@@ -205,7 +209,7 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 WRITE8_MEMBER(ddayjlc_state::sound_w)
 {
 
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
@@ -242,10 +246,10 @@ WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, ddayjlc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(m_mainram)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(ddayjlc_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(ddayjlc_bgram_w) AM_BASE(m_bgram) /* 9800-981f - videoregs */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(ddayjlc_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(ddayjlc_bgram_w) AM_SHARE("bgram") /* 9800-981f - videoregs */
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xe000, 0xe003) AM_WRITE(i8257_CH0_w)
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP
@@ -367,9 +371,9 @@ GFXDECODE_END
 static TILE_GET_INFO( get_tile_info_bg )
 {
 	ddayjlc_state *state = machine.driver_data<ddayjlc_state>();
-	int code = state->m_bgram[tile_index] + ((state->m_bgram[tile_index + 0x400] & 0x08) << 5);
-	int color = (state->m_bgram[tile_index + 0x400] & 0x7);
-	color |= (state->m_bgram[tile_index + 0x400] & 0x40) >> 3;
+	int code = state->m_bgram.target()[tile_index] + ((state->m_bgram.target()[tile_index + 0x400] & 0x08) << 5);
+	int color = (state->m_bgram.target()[tile_index + 0x400] & 0x7);
+	color |= (state->m_bgram.target()[tile_index + 0x400] & 0x40) >> 3;
 
 	SET_TILE_INFO(2, code, color, 0);
 }
@@ -388,10 +392,10 @@ static SCREEN_UPDATE_IND16( ddayjlc )
 
 	for (i = 0; i < 0x400; i += 4)
 	{
-		UINT8  flags = state->m_spriteram[i + 2];
-		UINT8  y = 256 - state->m_spriteram[i + 0] - 8;
-		UINT16 code = state->m_spriteram[i + 1];
-		UINT8  x = state->m_spriteram[i + 3] - 16;
+		UINT8  flags = state->m_spriteram.target()[i + 2];
+		UINT8  y = 256 - state->m_spriteram.target()[i + 0] - 8;
+		UINT16 code = state->m_spriteram.target()[i + 1];
+		UINT8  x = state->m_spriteram.target()[i + 3] - 16;
 		UINT8  xflip = flags & 0x80;
 		UINT8  yflip = (code & 0x80);
 		UINT8  color = flags & 0xf;
@@ -407,7 +411,7 @@ static SCREEN_UPDATE_IND16( ddayjlc )
 		for (y = 0; y < 32; y++)
 			for (x = 0; x < 32; x++)
 			{
-				c = state->m_videoram[y * 32 + x];
+				c = state->m_videoram.target()[y * 32 + x];
 				if (x > 1 && x < 30)
 					drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1], c + state->m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
@@ -421,7 +425,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

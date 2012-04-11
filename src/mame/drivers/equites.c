@@ -435,7 +435,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			generic_pulse_irq_line(m_audio_cpu, I8085_RST75_LINE, 1);
+			generic_pulse_irq_line(m_audio_cpu->execute(), I8085_RST75_LINE, 1);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
@@ -466,7 +466,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 7:	// c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			soundlatch_clear_w(space, 0, 0);
+			soundlatch_clear_byte_w(space, 0, 0);
 			break;
 	}
 }
@@ -750,7 +750,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
@@ -1224,7 +1224,7 @@ static MACHINE_RESET( equites )
 {
 	equites_state *state = machine.driver_data<equites_state>();
 
-	flip_screen_set(machine, 0);
+	state->flip_screen_set(0);
 
 	state->m_fg_char_bank = 0;
 	state->m_bgcolor = 0;

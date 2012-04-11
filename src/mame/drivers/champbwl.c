@@ -165,37 +165,39 @@ public:
 		: tnzs_state(mconfig, type, tag) { }
 
 	UINT8    m_last_trackball_val[2];
+	DECLARE_READ8_MEMBER(trackball_r);
+	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
+	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
 };
 
 
 
-static READ8_HANDLER( trackball_r )
+READ8_MEMBER(champbwl_state::trackball_r)
 {
-	champbwl_state *state = space->machine().driver_data<champbwl_state>();
 	UINT8 ret;
-	UINT8 port4 = input_port_read(space->machine(), "FAKEX");
-	UINT8 port5 = input_port_read(space->machine(), "FAKEY");
+	UINT8 port4 = input_port_read(machine(), "FAKEX");
+	UINT8 port5 = input_port_read(machine(), "FAKEY");
 
-	ret = (((port4 - state->m_last_trackball_val[0]) & 0x0f)<<4) | ((port5 - state->m_last_trackball_val[1]) & 0x0f);
+	ret = (((port4 - m_last_trackball_val[0]) & 0x0f)<<4) | ((port5 - m_last_trackball_val[1]) & 0x0f);
 
-	state->m_last_trackball_val[0] = port4;
-	state->m_last_trackball_val[1] = port5;
+	m_last_trackball_val[0] = port4;
+	m_last_trackball_val[1] = port5;
 
 	return ret;
 }
 
-static WRITE8_HANDLER( champbwl_misc_w )
+WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 
-	coin_lockout_w(space->machine(), 0, ~data & 8);
-	coin_lockout_w(space->machine(), 1, ~data & 4);
+	coin_lockout_w(machine(), 0, ~data & 8);
+	coin_lockout_w(machine(), 1, ~data & 4);
 
-	memory_set_bank(space->machine(), "bank1", (data & 0x30) >> 4);
+	memory_set_bank(machine(), "bank1", (data & 0x30) >> 4);
 }
 
-static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, tnzs_state )
+static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -206,13 +208,13 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 
-	AM_RANGE(0xf000, 0xf000) AM_READ_LEGACY(trackball_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1")
 	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2")
 	AM_RANGE(0xf007, 0xf007) AM_READ_PORT("IN3")
 
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(champbwl_misc_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(champbwl_misc_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITENOP //buttons light?
 	AM_RANGE(0xf004, 0xf004) AM_WRITENOP //buttons light?
 	AM_RANGE(0xf006, 0xf006) AM_WRITENOP //buttons light?
@@ -221,20 +223,20 @@ ADDRESS_MAP_END
 
 
 
-static WRITE8_HANDLER( doraemon_outputs_w )
+WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);	// coin in counter
-	coin_counter_w(space->machine(), 1, data & 2);	// gift out counter
+	coin_counter_w(machine(), 0, data & 1);	// coin in counter
+	coin_counter_w(machine(), 1, data & 2);	// gift out counter
 
-	coin_lockout_w(space->machine(), 0, ~data & 8);	// coin lockout
-	ticket_dispenser_w(space->machine().device("hopper"), 0, (data & 0x04) ? 0x00 : 0x80);	// gift out motor
+	coin_lockout_w(machine(), 0, ~data & 8);	// coin lockout
+	machine().device<ticket_dispenser_device>("hopper")->write(*&space, 0, (data & 0x04) ? 0x00 : 0x80);	// gift out motor
 
-	memory_set_bank(space->machine(), "bank1", (data & 0x30) >> 4);
+	memory_set_bank(machine(), "bank1", (data & 0x30) >> 4);
 
 //  popmessage("%02x", data);
 }
 
-static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, tnzs_state )
+static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -244,7 +246,7 @@ static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xe300, 0xe303) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0") AM_WRITE_LEGACY(doraemon_outputs_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0") AM_WRITE(doraemon_outputs_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN1") AM_WRITENOP	// Ack?
 	AM_RANGE(0xf004, 0xf004) AM_WRITENOP						// Ack?
 	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("DSW") AM_WRITENOP	// Ack?
@@ -396,7 +398,7 @@ static INPUT_PORTS_START( doraemon )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3  )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)	// sensor
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// sensor
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
@@ -541,7 +543,7 @@ static MACHINE_CONFIG_START( doraemon, tnzs_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_TICKET_DISPENSER_ADD("hopper", 2000, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	MCFG_MACHINE_START(doraemon)
 

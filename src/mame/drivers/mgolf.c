@@ -11,10 +11,11 @@ class mgolf_state : public driver_device
 {
 public:
 	mgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"){ }
 
 	/* memory pointers */
-	UINT8*   m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 
 	/* video-related */
 	tilemap_t* m_bg_tilemap;
@@ -38,7 +39,7 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	mgolf_state *state = machine.driver_data<mgolf_state>();
-	UINT8 code = state->m_video_ram[tile_index];
+	UINT8 code = state->m_video_ram.target()[tile_index];
 
 	SET_TILE_INFO(0, code, code >> 7, 0);
 }
@@ -46,7 +47,7 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_MEMBER(mgolf_state::mgolf_vram_w)
 {
-	m_video_ram[offset] = data;
+	m_video_ram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -70,18 +71,18 @@ static SCREEN_UPDATE_IND16( mgolf )
 	for (i = 0; i < 2; i++)
 	{
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-			state->m_video_ram[0x399 + 4 * i],
+			state->m_video_ram.target()[0x399 + 4 * i],
 			i,
 			0, 0,
-			state->m_video_ram[0x390 + 2 * i] - 7,
-			state->m_video_ram[0x398 + 4 * i] - 16, 0);
+			state->m_video_ram.target()[0x390 + 2 * i] - 7,
+			state->m_video_ram.target()[0x398 + 4 * i] - 16, 0);
 
 		drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
-			state->m_video_ram[0x39b + 4 * i],
+			state->m_video_ram.target()[0x39b + 4 * i],
 			i,
 			0, 0,
-			state->m_video_ram[0x390 + 2 * i] - 15,
-			state->m_video_ram[0x39a + 4 * i] - 16, 0);
+			state->m_video_ram.target()[0x390 + 2 * i] - 15,
+			state->m_video_ram.target()[0x39a + 4 * i] - 16, 0);
 	}
 	return 0;
 }
@@ -136,7 +137,7 @@ static double calc_plunger_pos(running_machine &machine)
 
 READ8_MEMBER(mgolf_state::mgolf_wram_r)
 {
-	return m_video_ram[0x380 + offset];
+	return m_video_ram.target()[0x380 + offset];
 }
 
 
@@ -178,7 +179,7 @@ READ8_MEMBER(mgolf_state::mgolf_misc_r)
 
 WRITE8_MEMBER(mgolf_state::mgolf_wram_w)
 {
-	m_video_ram[0x380 + offset] = data;
+	m_video_ram.target()[0x380 + offset] = data;
 }
 
 
@@ -207,7 +208,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
 	AM_RANGE(0x006d, 0x006d) AM_WRITENOP
 	AM_RANGE(0x0080, 0x00ff) AM_WRITE(mgolf_wram_w)
 	AM_RANGE(0x0180, 0x01ff) AM_WRITE(mgolf_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(mgolf_vram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x0800, 0x0bff) AM_WRITE(mgolf_vram_w) AM_SHARE("video_ram")
 
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END

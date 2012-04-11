@@ -196,7 +196,7 @@ READ16_MEMBER(tecmosys_state::sound_r)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().scheduler().synchronize();
-		return soundlatch2_r(space,  0 );
+		return soundlatch2_byte_r(space,  0 );
 	}
 
 	return 0;
@@ -207,7 +207,7 @@ WRITE16_MEMBER(tecmosys_state::sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		machine().scheduler().synchronize();
-		soundlatch_w(space, 0x00, data & 0xff);
+		soundlatch_byte_w(space, 0x00, data & 0xff);
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -300,10 +300,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_BASE(m_fgtilemap_ram) // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_spriteram) // obj ram
 	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // AM_WRITEONLY // obj pal
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // AM_WRITEONLY // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
-	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
+	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
 	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(m_tilemap_paletteram16)
 
@@ -351,8 +351,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_z80_bank_w)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE_LEGACY("ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 

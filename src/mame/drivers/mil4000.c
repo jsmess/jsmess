@@ -95,12 +95,16 @@ class mil4000_state : public driver_device
 {
 public:
 	mil4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sc0_vram(*this, "sc0_vram"),
+		m_sc1_vram(*this, "sc1_vram"),
+		m_sc2_vram(*this, "sc2_vram"),
+		m_sc3_vram(*this, "sc3_vram"){ }
 
-	UINT16 *m_sc0_vram;
-	UINT16 *m_sc1_vram;
-	UINT16 *m_sc2_vram;
-	UINT16 *m_sc3_vram;
+	required_shared_ptr<UINT16> m_sc0_vram;
+	required_shared_ptr<UINT16> m_sc1_vram;
+	required_shared_ptr<UINT16> m_sc2_vram;
+	required_shared_ptr<UINT16> m_sc3_vram;
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
@@ -119,9 +123,9 @@ public:
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc0_vram[tile_index*2]<<16) | state->m_sc0_vram[tile_index*2+1];
+	UINT32 data = (state->m_sc0_vram.target()[tile_index*2]<<16) | state->m_sc0_vram.target()[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc0_vram[tile_index*2+1] & 0x1f)+0;
+	int color = (state->m_sc0_vram.target()[tile_index*2+1] & 0x1f)+0;
 
 	SET_TILE_INFO(
 			0,
@@ -133,9 +137,9 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static TILE_GET_INFO( get_sc1_tile_info )
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc1_vram[tile_index*2]<<16) | state->m_sc1_vram[tile_index*2+1];
+	UINT32 data = (state->m_sc1_vram.target()[tile_index*2]<<16) | state->m_sc1_vram.target()[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc1_vram[tile_index*2+1] & 0x1f)+0x10;
+	int color = (state->m_sc1_vram.target()[tile_index*2+1] & 0x1f)+0x10;
 
 	SET_TILE_INFO(
 			0,
@@ -147,9 +151,9 @@ static TILE_GET_INFO( get_sc1_tile_info )
 static TILE_GET_INFO( get_sc2_tile_info )
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc2_vram[tile_index*2]<<16) | state->m_sc2_vram[tile_index*2+1];
+	UINT32 data = (state->m_sc2_vram.target()[tile_index*2]<<16) | state->m_sc2_vram.target()[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc2_vram[tile_index*2+1] & 0x1f)+0x20;
+	int color = (state->m_sc2_vram.target()[tile_index*2+1] & 0x1f)+0x20;
 
 	SET_TILE_INFO(
 			0,
@@ -161,9 +165,9 @@ static TILE_GET_INFO( get_sc2_tile_info )
 static TILE_GET_INFO( get_sc3_tile_info )
 {
 	mil4000_state *state = machine.driver_data<mil4000_state>();
-	UINT32 data = (state->m_sc3_vram[tile_index*2]<<16) | state->m_sc3_vram[tile_index*2+1];
+	UINT32 data = (state->m_sc3_vram.target()[tile_index*2]<<16) | state->m_sc3_vram.target()[tile_index*2+1];
 	int tile = data >> 14;
-	int color = (state->m_sc3_vram[tile_index*2+1] & 0x1f)+0x30;
+	int color = (state->m_sc3_vram.target()[tile_index*2+1] & 0x1f)+0x30;
 
 	SET_TILE_INFO(
 			0,
@@ -219,25 +223,25 @@ READ16_MEMBER(mil4000_state::hvretrace_r)
 
 WRITE16_MEMBER(mil4000_state::sc0_vram_w)
 {
-	m_sc0_vram[offset] = data;
+	m_sc0_vram.target()[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_MEMBER(mil4000_state::sc1_vram_w)
 {
-	m_sc1_vram[offset] = data;
+	m_sc1_vram.target()[offset] = data;
 	m_sc1_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_MEMBER(mil4000_state::sc2_vram_w)
 {
-	m_sc2_vram[offset] = data;
+	m_sc2_vram.target()[offset] = data;
 	m_sc2_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE16_MEMBER(mil4000_state::sc3_vram_w)
 {
-	m_sc3_vram[offset] = data;
+	m_sc3_vram.target()[offset] = data;
 	m_sc3_tilemap->mark_tile_dirty(offset/2);
 }
 
@@ -273,10 +277,10 @@ WRITE16_MEMBER(mil4000_state::output_w)
 
 static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(m_sc0_vram)	// CY62256L-70, U77
-	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(m_sc1_vram)	// CY62256L-70, U77
-	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(m_sc2_vram)	// CY62256L-70, U78
-	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE(m_sc3_vram)	// CY62256L-70, U78
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")	// CY62256L-70, U77
+	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")	// CY62256L-70, U77
+	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_SHARE("sc2_vram")	// CY62256L-70, U78
+	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_SHARE("sc3_vram")	// CY62256L-70, U78
 
 	AM_RANGE(0x708000, 0x708001) AM_READ_PORT("IN0")
 	AM_RANGE(0x708002, 0x708003) AM_READ_PORT("IN1")
@@ -286,7 +290,7 @@ static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x708010, 0x708011) AM_NOP //touch screen
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x780000, 0x780fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x780000, 0x780fff) AM_RAM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // 2x CY62256L-70 (U7 & U8).
 
 ADDRESS_MAP_END

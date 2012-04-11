@@ -26,17 +26,22 @@ class umipoker_state : public driver_device
 {
 public:
 	umipoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_0(*this, "vra0"),
+		m_vram_1(*this, "vra1"),
+		m_vram_2(*this, "vra2"),
+		m_vram_3(*this, "vra3"),
+		m_z80_wram(*this, "z80_wram"){ }
 
-	UINT16 *m_vram_0;
-	UINT16 *m_vram_1;
-	UINT16 *m_vram_2;
-	UINT16 *m_vram_3;
+	required_shared_ptr<UINT16> m_vram_0;
+	required_shared_ptr<UINT16> m_vram_1;
+	required_shared_ptr<UINT16> m_vram_2;
+	required_shared_ptr<UINT16> m_vram_3;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
 	tilemap_t *m_tilemap_3;
-	UINT8 *m_z80_wram;
+	required_shared_ptr<UINT8> m_z80_wram;
 	int m_umipoker_scrolly[4];
 	DECLARE_READ8_MEMBER(z80_rom_readback_r);
 	DECLARE_READ8_MEMBER(z80_shared_ram_r);
@@ -58,8 +63,8 @@ public:
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_0[tile_index*2+0];
-	int color = state->m_vram_0[tile_index*2+1] & 0x3f;
+	int tile = state->m_vram_0.target()[tile_index*2+0];
+	int color = state->m_vram_0.target()[tile_index*2+1] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -71,8 +76,8 @@ static TILE_GET_INFO( get_tile_info_0 )
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_1[tile_index*2+0];
-	int color = state->m_vram_1[tile_index*2+1] & 0x3f;
+	int tile = state->m_vram_1.target()[tile_index*2+0];
+	int color = state->m_vram_1.target()[tile_index*2+1] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -84,8 +89,8 @@ static TILE_GET_INFO( get_tile_info_1 )
 static TILE_GET_INFO( get_tile_info_2 )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_2[tile_index*2+0];
-	int color = state->m_vram_2[tile_index*2+1] & 0x3f;
+	int tile = state->m_vram_2.target()[tile_index*2+0];
+	int color = state->m_vram_2.target()[tile_index*2+1] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -97,8 +102,8 @@ static TILE_GET_INFO( get_tile_info_2 )
 static TILE_GET_INFO( get_tile_info_3 )
 {
 	umipoker_state *state = machine.driver_data<umipoker_state>();
-	int tile = state->m_vram_3[tile_index*2+0];
-	int color = state->m_vram_3[tile_index*2+1] & 0x3f;
+	int tile = state->m_vram_3.target()[tile_index*2+0];
+	int color = state->m_vram_3.target()[tile_index*2+1] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -154,7 +159,7 @@ READ8_MEMBER(umipoker_state::z80_shared_ram_r)
 
 	machine().scheduler().synchronize(); // force resync
 
-	return m_z80_wram[offset];
+	return m_z80_wram.target()[offset];
 }
 
 WRITE8_MEMBER(umipoker_state::z80_shared_ram_w)
@@ -162,7 +167,7 @@ WRITE8_MEMBER(umipoker_state::z80_shared_ram_w)
 
 	machine().scheduler().synchronize(); // force resync
 
-	m_z80_wram[offset] = data;
+	m_z80_wram.target()[offset] = data;
 }
 
 WRITE16_MEMBER(umipoker_state::umipoker_irq_ack_w)
@@ -182,14 +187,14 @@ WRITE16_MEMBER(umipoker_state::umipoker_scrolly_3_w){ COMBINE_DATA(&m_umipoker_s
 WRITE16_MEMBER(umipoker_state::umipoker_vram_0_w)
 {
 
-	COMBINE_DATA(&m_vram_0[offset]);
+	COMBINE_DATA(&m_vram_0.target()[offset]);
 	m_tilemap_0->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(umipoker_state::umipoker_vram_1_w)
 {
 
-	COMBINE_DATA(&m_vram_1[offset]);
+	COMBINE_DATA(&m_vram_1.target()[offset]);
 	m_tilemap_1->mark_tile_dirty(offset >> 1);
 }
 
@@ -197,14 +202,14 @@ WRITE16_MEMBER(umipoker_state::umipoker_vram_1_w)
 WRITE16_MEMBER(umipoker_state::umipoker_vram_2_w)
 {
 
-	COMBINE_DATA(&m_vram_2[offset]);
+	COMBINE_DATA(&m_vram_2.target()[offset]);
 	m_tilemap_2->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(umipoker_state::umipoker_vram_3_w)
 {
 
-	COMBINE_DATA(&m_vram_3[offset]);
+	COMBINE_DATA(&m_vram_3.target()[offset]);
 	m_tilemap_3->mark_tile_dirty(offset >> 1);
 }
 
@@ -305,11 +310,11 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_BASE(m_vram_0)
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_BASE(m_vram_1)
-	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_BASE(m_vram_2)
-	AM_RANGE(0x806000, 0x807fff) AM_RAM_WRITE(umipoker_vram_3_w) AM_BASE(m_vram_3)
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_SHARE("vra0")
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_SHARE("vra1")
+	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_SHARE("vra2")
+	AM_RANGE(0x806000, 0x807fff) AM_RAM_WRITE(umipoker_vram_3_w) AM_SHARE("vra3")
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ8(z80_rom_readback_r,0x00ff)
 	AM_RANGE(0xc1f000, 0xc1ffff) AM_READWRITE8(z80_shared_ram_r,z80_shared_ram_w,0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
@@ -329,7 +334,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( umipoker_audio_map, AS_PROGRAM, 8, umipoker_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(z80_shared_ram_r,z80_shared_ram_w) AM_BASE(m_z80_wram)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(z80_shared_ram_r,z80_shared_ram_w) AM_SHARE("z80_wram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8, umipoker_state )

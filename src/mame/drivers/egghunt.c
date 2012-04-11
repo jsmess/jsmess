@@ -49,7 +49,8 @@ class egghunt_state : public driver_device
 {
 public:
 	egghunt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_atram(*this, "atram"){ }
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
@@ -63,7 +64,7 @@ public:
 	device_t *m_audiocpu;
 
 	/* memory */
-	UINT8 *   m_atram;
+	required_shared_ptr<UINT8> m_atram;
 	UINT8     m_bgram[0x1000];
 	UINT8     m_spram[0x1000];
 	DECLARE_READ8_MEMBER(egghunt_bgram_r);
@@ -118,7 +119,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	egghunt_state *state = machine.driver_data<egghunt_state>();
 	int code = ((state->m_bgram[tile_index * 2 + 1] << 8) | state->m_bgram[tile_index * 2]) & 0x3fff;
-	int colour = state->m_atram[tile_index] & 0x3f;
+	int colour = state->m_atram.target()[tile_index] & 0x3f;
 
 	if(code & 0x2000)
 	{
@@ -160,7 +161,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_bgram_w)
 
 WRITE8_MEMBER(egghunt_state::egghunt_atram_w)
 {
-	m_atram[offset] = data;
+	m_atram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -199,7 +200,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_vidram_bank_w)
 
 WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
@@ -219,8 +220,8 @@ static WRITE8_DEVICE_HANDLER( egghunt_okibanking_w )
 
 static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_BASE(m_atram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_SHARE("atram")
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(egghunt_bgram_r, egghunt_bgram_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -239,7 +240,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE_LEGACY("oki", egghunt_okibanking_r, egghunt_okibanking_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_RAM

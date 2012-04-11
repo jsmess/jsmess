@@ -87,11 +87,13 @@ class calorie_state : public driver_device
 {
 public:
 	calorie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_ram(*this, "fg_ram"),
+		m_sprites(*this, "sprites"){ }
 
 	/* memory pointers */
-	UINT8 *  m_fg_ram;
-	UINT8 *  m_sprites;
+	required_shared_ptr<UINT8> m_fg_ram;
+	required_shared_ptr<UINT8> m_sprites;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -127,10 +129,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	calorie_state *state = machine.driver_data<calorie_state>();
-	int code  = ((state->m_fg_ram[tile_index + 0x400] & 0x30) << 4) | state->m_fg_ram[tile_index];
-	int color = state->m_fg_ram[tile_index + 0x400] & 0x0f;
+	int code  = ((state->m_fg_ram.target()[tile_index + 0x400] & 0x30) << 4) | state->m_fg_ram.target()[tile_index];
+	int color = state->m_fg_ram.target()[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, TILE_FLIPYX((state->m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
+	SET_TILE_INFO(0, code, color, TILE_FLIPYX((state->m_fg_ram.target()[tile_index + 0x400] & 0xc0) >> 6));
 }
 
 
@@ -164,16 +166,16 @@ static SCREEN_UPDATE_IND16( calorie )
 	{
 		int xpos, ypos, tileno, color, flipx, flipy;
 
-		tileno = state->m_sprites[x + 0];
-		color = state->m_sprites[x + 1] & 0x0f;
-		flipx = state->m_sprites[x + 1] & 0x40;
+		tileno = state->m_sprites.target()[x + 0];
+		color = state->m_sprites.target()[x + 1] & 0x0f;
+		flipx = state->m_sprites.target()[x + 1] & 0x40;
 		flipy = 0;
-		ypos = 0xff - state->m_sprites[x + 2];
-		xpos = state->m_sprites[x + 3];
+		ypos = 0xff - state->m_sprites.target()[x + 2];
+		xpos = state->m_sprites.target()[x + 3];
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
-			if (state->m_sprites[x + 1] & 0x10)
+			if (state->m_sprites.target()[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
 			else
 				ypos = 0xff - ypos + 16;
@@ -183,7 +185,7 @@ static SCREEN_UPDATE_IND16( calorie )
 			flipy = !flipy;
 		}
 
-		if (state->m_sprites[x + 1] & 0x10)
+		if (state->m_sprites.target()[x + 1] & 0x10)
 		{
 			 /* 32x32 sprites */
 			drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[3], tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
@@ -205,7 +207,7 @@ static SCREEN_UPDATE_IND16( calorie )
 
 WRITE8_MEMBER(calorie_state::fg_ram_w)
 {
-	m_fg_ram[offset] = data;
+	m_fg_ram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
@@ -219,13 +221,13 @@ WRITE8_MEMBER(calorie_state::bg_bank_w)
 
 WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 READ8_MEMBER(calorie_state::calorie_soundlatch_r)
 {
-	UINT8 latch = soundlatch_r(space, 0);
-	soundlatch_clear_w(space, 0, 0);
+	UINT8 latch = soundlatch_byte_r(space, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 	return latch;
 }
 
@@ -244,16 +246,16 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_BASE(m_fg_ram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE(m_sprites)
-	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xde00, 0xde00) AM_WRITE(bg_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P2")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW1") AM_WRITE(calorie_flipscreen_w)
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
 

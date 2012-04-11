@@ -222,7 +222,7 @@ READ16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_r)
 {
 
 	m_latch2_full = 0;
-	return soundlatch2_r(space,0);
+	return soundlatch2_byte_r(space,0);
 }
 
 WRITE16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_w)
@@ -231,7 +231,7 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_latch1_full = 1;
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(&space.device(), attotime::from_usec(100));	// Allow the other cpu to reply
 	}
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE(m_vscroll[0])									//
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
@@ -291,14 +291,14 @@ READ8_MEMBER(sandscrp_state::sandscrp_soundlatch_r)
 {
 
 	m_latch1_full = 0;
-	return soundlatch_r(space,0);
+	return soundlatch_byte_r(space,0);
 }
 
 WRITE8_MEMBER(sandscrp_state::sandscrp_soundlatch_w)
 {
 
 	m_latch2_full = 1;
-	soundlatch2_w(space,0,data);
+	soundlatch2_byte_w(space,0,data);
 }
 
 static ADDRESS_MAP_START( sandscrp_soundmem, AS_PROGRAM, 8, sandscrp_state )

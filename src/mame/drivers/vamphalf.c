@@ -65,15 +65,19 @@ class vamphalf_state : public driver_device
 {
 public:
 	vamphalf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		  m_tiles(*this,"tiles"),
+		  m_wram(*this,"wram"),
+		  m_tiles32(*this,"tiles32"),
+		  m_wram32(*this,"wram32")
 		{
 			m_has_extra_gfx = 0;
 		}
 
-	UINT16 *m_tiles;
-	UINT16 *m_wram;
-	UINT32 *m_tiles32;
-	UINT32 *m_wram32;
+	required_shared_ptr<UINT16> m_tiles;
+	required_shared_ptr<UINT16> m_wram;
+	required_shared_ptr<UINT32> m_tiles32;
+	required_shared_ptr<UINT32> m_wram32;
 	int m_flip_bit;
 	int m_flipscreen;
 	int m_palshift;
@@ -319,15 +323,15 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 }
 
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, vamphalf_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_wram)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles)
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_32bit_map, AS_PROGRAM, 32, vamphalf_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_wram32)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles32)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -441,8 +445,8 @@ static ADDRESS_MAP_START( mrdig_io, AS_IO, 16, vamphalf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_map, AS_PROGRAM, 32, vamphalf_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_wram32)
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles32)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("wram32")
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")
@@ -525,38 +529,38 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 			// 16bit version
 			if(state->m_tiles != NULL)
 			{
-				if(state->m_tiles[offs] & 0x0100) continue;
+				if(state->m_tiles.target()[offs] & 0x0100) continue;
 
-				code  = state->m_tiles[offs+1];
-				color = (state->m_tiles[offs+2] >> state->m_palshift) & 0x7f;
+				code  = state->m_tiles.target()[offs+1];
+				color = (state->m_tiles.target()[offs+2] >> state->m_palshift) & 0x7f;
 
 				// boonggab
 				if(state->m_has_extra_gfx)
 				{
-					code  |= ((state->m_tiles[offs+2] & 0x100) << 8);
+					code  |= ((state->m_tiles.target()[offs+2] & 0x100) << 8);
 				}
 
-				x = state->m_tiles[offs+3] & 0x01ff;
-				y = 256 - (state->m_tiles[offs] & 0x00ff);
+				x = state->m_tiles.target()[offs+3] & 0x01ff;
+				y = 256 - (state->m_tiles.target()[offs] & 0x00ff);
 
-				fx = state->m_tiles[offs] & 0x8000;
-				fy = state->m_tiles[offs] & 0x4000;
+				fx = state->m_tiles.target()[offs] & 0x8000;
+				fy = state->m_tiles.target()[offs] & 0x4000;
 			}
 			// 32bit version
 			else
 			{
 				offs /= 2;
 
-				if(state->m_tiles32[offs] & 0x01000000) continue;
+				if(state->m_tiles32.target()[offs] & 0x01000000) continue;
 
-				code  = state->m_tiles32[offs] & 0xffff;
-				color = ((state->m_tiles32[offs+1] >> state->m_palshift) & 0x7f0000) >> 16;
+				code  = state->m_tiles32.target()[offs] & 0xffff;
+				color = ((state->m_tiles32.target()[offs+1] >> state->m_palshift) & 0x7f0000) >> 16;
 
-				x = state->m_tiles32[offs+1] & 0x01ff;
-				y = 256 - ((state->m_tiles32[offs] & 0x00ff0000) >> 16);
+				x = state->m_tiles32.target()[offs+1] & 0x01ff;
+				y = 256 - ((state->m_tiles32.target()[offs] & 0x00ff0000) >> 16);
 
-				fx = state->m_tiles32[offs] & 0x80000000;
-				fy = state->m_tiles32[offs] & 0x40000000;
+				fx = state->m_tiles32.target()[offs] & 0x80000000;
+				fy = state->m_tiles32.target()[offs] & 0x40000000;
 			}
 
 			if(state->m_flipscreen)
@@ -603,14 +607,14 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 			offs = (block + cnt) / 2;
 			{
 				offs /= 2;
-				code  = (state->m_tiles32[offs] & 0xffff) | ((state->m_tiles32[offs] & 0x3000000) >> 8);
-				color = ((state->m_tiles32[offs+1] >> state->m_palshift) & 0x7f0000) >> 16;
+				code  = (state->m_tiles32.target()[offs] & 0xffff) | ((state->m_tiles32.target()[offs] & 0x3000000) >> 8);
+				color = ((state->m_tiles32.target()[offs+1] >> state->m_palshift) & 0x7f0000) >> 16;
 
-				x = state->m_tiles32[offs+1] & 0x01ff;
-				y = 256 - ((state->m_tiles32[offs] & 0x00ff0000) >> 16);
+				x = state->m_tiles32.target()[offs+1] & 0x01ff;
+				y = 256 - ((state->m_tiles32.target()[offs] & 0x00ff0000) >> 16);
 
-				fx = state->m_tiles32[offs] & 0x4000000;
-				fy = 0; // not used ? or it's state->m_tiles32[offs] & 0x8000000?
+				fx = state->m_tiles32.target()[offs] & 0x4000000;
+				fy = 0; // not used ? or it's state->m_tiles32.target()[offs] & 0x8000000?
 			}
 
 			if(state->m_flipscreen)
@@ -2084,7 +2088,7 @@ READ16_MEMBER(vamphalf_state::vamphalf_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x4a840/2)+offset];
+	return m_wram.target()[(0x4a840/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::vamphafk_speedup_r)
@@ -2097,7 +2101,7 @@ READ16_MEMBER(vamphalf_state::vamphafk_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x4a6d0/2)+offset];
+	return m_wram.target()[(0x4a6d0/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::misncrft_speedup_r)
@@ -2110,7 +2114,7 @@ READ16_MEMBER(vamphalf_state::misncrft_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x72eb4/2)+offset];
+	return m_wram.target()[(0x72eb4/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
@@ -2123,7 +2127,7 @@ READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0xd2e80/2)+offset];
+	return m_wram.target()[(0xd2e80/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::suplup_speedup_r)
@@ -2136,7 +2140,7 @@ READ16_MEMBER(vamphalf_state::suplup_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x11605c/2)+offset];
+	return m_wram.target()[(0x11605c/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::luplup_speedup_r)
@@ -2149,7 +2153,7 @@ READ16_MEMBER(vamphalf_state::luplup_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x115e84/2)+offset];
+	return m_wram.target()[(0x115e84/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::luplup29_speedup_r)
@@ -2162,7 +2166,7 @@ READ16_MEMBER(vamphalf_state::luplup29_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x113f08/2)+offset];
+	return m_wram.target()[(0x113f08/2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::puzlbang_speedup_r)
@@ -2175,7 +2179,7 @@ READ16_MEMBER(vamphalf_state::puzlbang_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x113ecc/2)+offset];
+	return m_wram.target()[(0x113ecc/2)+offset];
 }
 
 READ32_MEMBER(vamphalf_state::wyvernwg_speedup_r)
@@ -2190,7 +2194,7 @@ READ32_MEMBER(vamphalf_state::wyvernwg_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram32[0x00b56fc/4];
+	return m_wram32.target()[0x00b56fc/4];
 }
 
 READ32_MEMBER(vamphalf_state::wyvernwga_speedup_r)
@@ -2205,7 +2209,7 @@ READ32_MEMBER(vamphalf_state::wyvernwga_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram32[0x00b74f8/4];
+	return m_wram32.target()[0x00b74f8/4];
 }
 
 
@@ -2220,7 +2224,7 @@ READ32_MEMBER(vamphalf_state::finalgdr_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram32[0x005e874/4];
+	return m_wram32.target()[0x005e874/4];
 }
 
 READ32_MEMBER(vamphalf_state::mrkicker_speedup_r)
@@ -2234,7 +2238,7 @@ READ32_MEMBER(vamphalf_state::mrkicker_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram32[0x00701a4/4];
+	return m_wram32.target()[0x00701a4/4];
 }
 
 
@@ -2248,7 +2252,7 @@ READ16_MEMBER(vamphalf_state::dquizgo2_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0xcde70/2)+offset];
+	return m_wram.target()[(0xcde70/2)+offset];
 }
 
 READ32_MEMBER(vamphalf_state::aoh_speedup_r)
@@ -2263,7 +2267,7 @@ READ32_MEMBER(vamphalf_state::aoh_speedup_r)
 	}
 
 
-	return m_wram32[0x28a09c/4];
+	return m_wram32.target()[0x28a09c/4];
 }
 
 READ16_MEMBER(vamphalf_state::jmpbreak_speedup_r)
@@ -2276,7 +2280,7 @@ READ16_MEMBER(vamphalf_state::jmpbreak_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x00906fc / 2)+offset];
+	return m_wram.target()[(0x00906fc / 2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
@@ -2289,7 +2293,7 @@ READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
 			device_eat_cycles(&space.device(), 50);
 	}
 
-	return m_wram[(0x00a99c / 2)+offset];
+	return m_wram.target()[(0x00a99c / 2)+offset];
 }
 
 READ16_MEMBER(vamphalf_state::dtfamily_speedup_r)
@@ -2300,7 +2304,7 @@ READ16_MEMBER(vamphalf_state::dtfamily_speedup_r)
 	if (pc == 0x12fa6)
 		device_spin_until_interrupt(&space.device());
 
-	return m_wram[0xcc2a8 / 2];
+	return m_wram.target()[0xcc2a8 / 2];
 
 }
 
@@ -2310,7 +2314,7 @@ READ16_MEMBER(vamphalf_state::toyland_speedup_r)
 	if (cpu_get_pc(&space.device()) == 0x130c2)
 		device_spin_until_interrupt(&space.device());
 
-	return m_wram[0x780d8 / 2];
+	return m_wram.target()[0x780d8 / 2];
 
 }
 
@@ -2322,7 +2326,7 @@ READ16_MEMBER(vamphalf_state::boonggab_speedup_r)
 			device_spin_until_interrupt(&space.device());
 	}
 
-	return m_wram[(0xf1b7c / 2)+offset];
+	return m_wram.target()[(0xf1b7c / 2)+offset];
 }
 
 static DRIVER_INIT( vamphalf )

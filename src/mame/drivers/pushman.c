@@ -35,7 +35,7 @@ WRITE16_MEMBER(pushman_state::pushman_flipscreen_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		flip_screen_set(machine(), data & 0x0200);
+		flip_screen_set(data & 0x0200);
 		coin_counter_w(machine(), 0, data & 0x4000);
 		coin_counter_w(machine(), 1, data & 0x8000);
 	}
@@ -44,7 +44,7 @@ WRITE16_MEMBER(pushman_state::pushman_flipscreen_w)
 WRITE16_MEMBER(pushman_state::pushman_control_w)
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(space, 0, (data >> 8) & 0xff);
+		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
 }
 
 READ16_MEMBER(pushman_state::pushman_68705_r)
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16, pushman_state )
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, pushman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, pushman_state )
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, pushman_state )
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfc000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 

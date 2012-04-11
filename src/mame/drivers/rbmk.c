@@ -61,10 +61,12 @@ class rbmk_state : public driver_device
 {
 public:
 	rbmk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gms_vidram2(*this, "gms_vidram2"),
+		m_gms_vidram(*this, "gms_vidram"){ }
 
-	UINT16 *m_gms_vidram;
-	UINT16 *m_gms_vidram2;
+	required_shared_ptr<UINT16> m_gms_vidram2;
+	required_shared_ptr<UINT16> m_gms_vidram;
 	UINT16 m_tilebank;
 	UINT8 m_mux_data;
 	DECLARE_READ16_MEMBER(gms_read);
@@ -114,10 +116,10 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_BASE(m_gms_vidram2)
+	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("gms_vidram2")
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_BASE(m_gms_vidram)
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("gms_vidram")
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
 	AM_RANGE(0xC00000, 0xC00001) AM_READ_PORT("IN0") AM_WRITE(gms_write1)
 	AM_RANGE(0xC08000, 0xC08001) AM_READ_PORT("IN1") AM_WRITE(gms_write2)
@@ -502,7 +504,7 @@ static SCREEN_UPDATE_IND16(rbmk)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = state->m_gms_vidram2[count+0x600];
+			int tile = state->m_gms_vidram2.target()[count+0x600];
 			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],(tile&0xfff)+((state->m_tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
 			count++;
 		}
@@ -514,7 +516,7 @@ static SCREEN_UPDATE_IND16(rbmk)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = state->m_gms_vidram[count];
+			int tile = state->m_gms_vidram.target()[count];
 			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],(tile&0xfff)+((state->m_tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
 			count++;
 		}

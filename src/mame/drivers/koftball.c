@@ -38,19 +38,21 @@ class koftball_state : public driver_device
 public:
 	koftball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_main_ram(*this, "main_ram"),
+		m_bmc_1_videoram(*this, "bmc_1_videoram"),
+		m_bmc_2_videoram(*this, "bmc_2_videoram"){ }
 
-	UINT16 *m_bmc_1_videoram;
-	UINT16 *m_bmc_2_videoram;
-	UINT16 *m_main_ram;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT16> m_main_ram;
+	required_shared_ptr<UINT16> m_bmc_1_videoram;
+	required_shared_ptr<UINT16> m_bmc_2_videoram;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
 	UINT8 *m_bmc_colorram;
 	int m_clr_offset;
 	UINT16 m_prot_data;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_offset_w);
 	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_color_w);
 	DECLARE_READ16_MEMBER(bmc_RAMDAC_color_r);
@@ -65,7 +67,7 @@ public:
 static TILE_GET_INFO( get_t1_tile_info )
 {
 	koftball_state *state = machine.driver_data<koftball_state>();
-	int data = state->m_bmc_1_videoram[tile_index];
+	int data = state->m_bmc_1_videoram.target()[tile_index];
 	SET_TILE_INFO(
 			0,
 			data,
@@ -76,7 +78,7 @@ static TILE_GET_INFO( get_t1_tile_info )
 static TILE_GET_INFO( get_t2_tile_info )
 {
 	koftball_state *state = machine.driver_data<koftball_state>();
-	int data = state->m_bmc_2_videoram[tile_index];
+	int data = state->m_bmc_2_videoram.target()[tile_index];
 	SET_TILE_INFO(
 			0,
 			data,
@@ -145,22 +147,22 @@ WRITE16_MEMBER(koftball_state::prot_w)
 
 WRITE16_MEMBER(koftball_state::bmc_1_videoram_w)
 {
-	COMBINE_DATA(&m_bmc_1_videoram[offset]);
+	COMBINE_DATA(&m_bmc_1_videoram.target()[offset]);
 	m_tilemap_1->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(koftball_state::bmc_2_videoram_w)
 {
-	COMBINE_DATA(&m_bmc_2_videoram[offset]);
+	COMBINE_DATA(&m_bmc_2_videoram.target()[offset]);
 	m_tilemap_2->mark_tile_dirty(offset);
 }
 
 static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_BASE(m_main_ram)
+	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_SHARE("main_ram")
 
-	AM_RANGE(0x260000, 0x260fff) AM_WRITE(bmc_1_videoram_w) AM_BASE(m_bmc_1_videoram)
-	AM_RANGE(0x261000, 0x261fff) AM_WRITE(bmc_2_videoram_w) AM_BASE(m_bmc_2_videoram)
+	AM_RANGE(0x260000, 0x260fff) AM_WRITE(bmc_1_videoram_w) AM_SHARE("bmc_1_videoram")
+	AM_RANGE(0x261000, 0x261fff) AM_WRITE(bmc_2_videoram_w) AM_SHARE("bmc_2_videoram")
 	AM_RANGE(0x262000, 0x26ffff) AM_RAM
 
 	AM_RANGE(0x280000, 0x28ffff) AM_RAM /* unused ? */
@@ -313,7 +315,7 @@ static DRIVER_INIT(koftball)
 		int offset=0;
 		while(nvram[offset]!=0xffff)
 		{
-			state->m_main_ram[offset]=nvram[offset];
+			state->m_main_ram.target()[offset]=nvram[offset];
 			++offset;
 		}
 	}

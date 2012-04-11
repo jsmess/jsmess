@@ -33,12 +33,16 @@ class coinmstr_state : public driver_device
 {
 public:
 	coinmstr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_attr_ram1(*this, "attr_ram1"),
+		m_attr_ram2(*this, "attr_ram2"),
+		m_attr_ram3(*this, "attr_ram3"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_attr_ram1;
-	UINT8 *m_attr_ram2;
-	UINT8 *m_attr_ram3;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_attr_ram1;
+	required_shared_ptr<UINT8> m_attr_ram2;
+	required_shared_ptr<UINT8> m_attr_ram3;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_question_adr[4];
 	DECLARE_WRITE8_MEMBER(quizmstr_bg_w);
@@ -53,7 +57,7 @@ public:
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_bg_w)
 {
-	UINT8 *videoram = m_videoram;
+	UINT8 *videoram = m_videoram.target();
 	videoram[offset] = data;
 
 	if(offset >= 0x0240)
@@ -96,12 +100,12 @@ static void coinmstr_set_pal(running_machine &machine, UINT32 paldat, int col)
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 {
-	m_attr_ram1[offset] = data;
+	m_attr_ram1.target()[offset] = data;
 
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32	paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
+		UINT32	paldata = (m_attr_ram1.target()[offset] & 0x7f) | ((m_attr_ram2.target()[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
 		coinmstr_set_pal(machine(), paldata, offset - 0x240);
@@ -111,12 +115,12 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 {
-	m_attr_ram2[offset] = data;
+	m_attr_ram2.target()[offset] = data;
 
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32	paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
+		UINT32	paldata = (m_attr_ram1.target()[offset] & 0x7f) | ((m_attr_ram2.target()[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
 		coinmstr_set_pal(machine(), paldata, offset - 0x240);
@@ -126,7 +130,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 
 WRITE8_MEMBER(coinmstr_state::quizmstr_attr3_w)
 {
-	m_attr_ram3[offset] = data;
+	m_attr_ram3.target()[offset] = data;
 
 	if(offset >= 0x0240)
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
@@ -202,10 +206,10 @@ READ8_MEMBER(coinmstr_state::ff_r)
 static ADDRESS_MAP_START( coinmstr_map, AS_PROGRAM, 8, coinmstr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE(m_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_BASE(m_attr_ram1)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_BASE(m_attr_ram2)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_BASE(m_attr_ram3)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_SHARE("attr_ram1")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_SHARE("attr_ram2")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_SHARE("attr_ram3")
 ADDRESS_MAP_END
 
 // Different I/O mappping for every game
@@ -897,14 +901,14 @@ GFXDECODE_END
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	coinmstr_state *state = machine.driver_data<coinmstr_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int tile = videoram[tile_index + 0x0240];
 	int color = tile_index;
 
-	tile |= (state->m_attr_ram1[tile_index + 0x0240] & 0x80) << 1;
-	tile |= (state->m_attr_ram2[tile_index + 0x0240] & 0x80) << 2;
+	tile |= (state->m_attr_ram1.target()[tile_index + 0x0240] & 0x80) << 1;
+	tile |= (state->m_attr_ram2.target()[tile_index + 0x0240] & 0x80) << 2;
 
-	tile |= (state->m_attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
+	tile |= (state->m_attr_ram3.target()[tile_index + 0x0240] & 0x03) << (6+4);
 
 	SET_TILE_INFO(0, tile, color, 0);
 }

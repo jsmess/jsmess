@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfwfest_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -109,7 +109,7 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
 {
-	flip_screen_set(machine(), data&1);
+	flip_screen_set(data&1);
 }
 
 /*- Palette Reads/Writes -*/
@@ -123,7 +123,7 @@ READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r)
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	paletteram16_xxxxBBBBGGGGRRRR_word_w (space, offset, data, mem_mask);
+	paletteram_xxxxBBBBGGGGRRRR_word_w (space, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/
@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
 {
-	soundlatch_w(space,1,data & 0xff);
+	soundlatch_byte_w(space,1,data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 

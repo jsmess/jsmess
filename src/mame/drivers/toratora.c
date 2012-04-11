@@ -27,11 +27,11 @@ class toratora_state : public driver_device
 {
 public:
 	toratora_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	size_t     m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	int        m_timer;
@@ -73,13 +73,13 @@ static SCREEN_UPDATE_RGB32( toratora )
 	toratora_state *state = screen.machine().driver_data<toratora_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = state->m_videoram.target()[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -92,7 +92,7 @@ static SCREEN_UPDATE_RGB32( toratora )
 
 		/* the video system clears as it writes out the pixels */
 		if (state->m_clear_tv)
-			state->m_videoram[offs] = 0;
+			state->m_videoram.target()[offs] = 0;
 	}
 
 	state->m_clear_tv = 0;
@@ -311,7 +311,7 @@ static const pia6821_interface pia_u3_intf =
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xf047) AM_NOP
 	AM_RANGE(0xf048, 0xf049) AM_NOP
 	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)	/* the read is mark *LEDEN, but not used */

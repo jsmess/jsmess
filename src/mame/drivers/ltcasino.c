@@ -22,10 +22,12 @@ class ltcasino_state : public driver_device
 {
 public:
 	ltcasino_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tile_num_ram(*this, "tile_nuram"),
+		m_tile_atr_ram(*this, "tile_atr_ram"){ }
 
-	UINT8 *m_tile_num_ram;
-	UINT8 *m_tile_atr_ram;
+	required_shared_ptr<UINT8> m_tile_num_ram;
+	required_shared_ptr<UINT8> m_tile_atr_ram;
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
@@ -39,8 +41,8 @@ static TILE_GET_INFO( get_ltcasino_tile_info )
 	ltcasino_state *state = machine.driver_data<ltcasino_state>();
 	int tileno, colour;
 
-	tileno = state->m_tile_num_ram[tile_index];
-	colour = state->m_tile_atr_ram[tile_index];
+	tileno = state->m_tile_num_ram.target()[tile_index];
+	colour = state->m_tile_atr_ram.target()[tile_index];
 
 	tileno += (colour & 0x80) << 1;
 
@@ -56,13 +58,13 @@ static VIDEO_START(ltcasino)
 
 WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
 {
-	m_tile_num_ram[offset] = data;
+	m_tile_num_ram.target()[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 {
-	m_tile_atr_ram[offset] = data;
+	m_tile_atr_ram.target()[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
@@ -70,9 +72,9 @@ WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 static ADDRESS_MAP_START( ltcasino_map, AS_PROGRAM, 8, ltcasino_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ltcasino_tile_num_w) AM_BASE(m_tile_num_ram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ltcasino_tile_num_w) AM_SHARE("tile_nuram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ltcasino_tile_atr_w) AM_BASE(m_tile_atr_ram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ltcasino_tile_atr_w) AM_SHARE("tile_atr_ram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM
 
 	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("IN0")

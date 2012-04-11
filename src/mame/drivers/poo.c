@@ -50,11 +50,14 @@ class poo_state : public driver_device
 {
 public:
 	poo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sprites(*this, "sprites"),
+		m_scrolly(*this, "scrolly"),
+		m_vram(*this, "vram"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_scrolly;
-	UINT8 *m_sprites;
+	required_shared_ptr<UINT8> m_sprites;
+	required_shared_ptr<UINT8> m_scrolly;
+	required_shared_ptr<UINT8> m_vram;
 	UINT8 m_vram_colbank;
 	DECLARE_READ8_MEMBER(unk_inp_r);
 	DECLARE_READ8_MEMBER(unk_inp2_r);
@@ -83,9 +86,9 @@ static SCREEN_UPDATE_IND16(unclepoo)
 	{
 		for (y=0;y<32;y++)
 		{
-			int tile = state->m_vram[count+0x000] | ((state->m_vram[count+0x400] & 3) <<8);
-			int color = (state->m_vram[count+0x400] & 0x38) >> 3;
-			int scrolly = (state->m_scrolly[x*4]);
+			int tile = state->m_vram.target()[count+0x000] | ((state->m_vram.target()[count+0x400] & 3) <<8);
+			int color = (state->m_vram.target()[count+0x400] & 0x38) >> 3;
+			int scrolly = (state->m_scrolly.target()[x*4]);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->m_vram_colbank,0,0,x*8,256-(y*8)+scrolly);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->m_vram_colbank,0,0,x*8,0-(y*8)+scrolly);
@@ -99,10 +102,10 @@ static SCREEN_UPDATE_IND16(unclepoo)
 
 		for(i=0;i<0x80;i+=4)
 		{
-			spr_offs = state->m_sprites[i+2] | (state->m_sprites[i+3] & 3) << 8;
-			y = state->m_sprites[i+0]+8;
-			x = state->m_sprites[i+1];
-			col = (state->m_sprites[i+3] & 0xf8) >> 3;
+			spr_offs = state->m_sprites.target()[i+2] | (state->m_sprites.target()[i+3] & 3) << 8;
+			y = state->m_sprites.target()[i+0]+8;
+			x = state->m_sprites.target()[i+1];
+			col = (state->m_sprites.target()[i+3] & 0xf8) >> 3;
 			fx = 0;
 			fy = 0;
 
@@ -142,7 +145,7 @@ WRITE8_MEMBER(poo_state::unk_w)
 /* soundlatch write */
 WRITE8_MEMBER(poo_state::sound_cmd_w)
 {
-	soundlatch_w(space, 0, (data & 0xff));
+	soundlatch_byte_w(space, 0, (data & 0xff));
 	cputag_set_input_line(machine(), "subcpu", 0, HOLD_LINE);
 }
 
@@ -158,8 +161,8 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
 	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE(unk_w )
 
-	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE(m_sprites)
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE(m_scrolly)
+	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_SHARE("scrolly")
 
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(sound_cmd_w)
 
@@ -171,7 +174,7 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(poo_vregs_w)
 
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("vram")
 
 ADDRESS_MAP_END
 
@@ -322,7 +325,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_DRIVER_MEMBER(poo_state, timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL

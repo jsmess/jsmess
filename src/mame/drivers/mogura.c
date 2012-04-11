@@ -9,11 +9,13 @@ class mogura_state : public driver_device
 {
 public:
 	mogura_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gfxram(*this, "gfxram"),
+		m_tileram(*this, "tileram"){ }
 
 	/* memory pointers */
-	UINT8 *   m_tileram;
-	UINT8 *   m_gfxram;
+	required_shared_ptr<UINT8> m_gfxram;
+	required_shared_ptr<UINT8> m_tileram;
 
 	/* video-related */
 	tilemap_t *m_tilemap;
@@ -63,8 +65,8 @@ static PALETTE_INIT( mogura )
 static TILE_GET_INFO( get_mogura_tile_info )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
-	int code = state->m_tileram[tile_index];
-	int attr = state->m_tileram[tile_index + 0x800];
+	int code = state->m_tileram.target()[tile_index];
+	int attr = state->m_tileram.target()[tile_index + 0x800];
 
 	SET_TILE_INFO(
 			0,
@@ -77,7 +79,7 @@ static TILE_GET_INFO( get_mogura_tile_info )
 static VIDEO_START( mogura )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
-	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
+	gfx_element_set_source(machine.gfx[0], state->m_gfxram.target());
 	state->m_tilemap = tilemap_create(machine, get_mogura_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
@@ -102,7 +104,7 @@ static SCREEN_UPDATE_IND16( mogura )
 
 WRITE8_MEMBER(mogura_state::mogura_tileram_w)
 {
-	m_tileram[offset] = data;
+	m_tileram.target()[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
@@ -115,7 +117,7 @@ WRITE8_MEMBER(mogura_state::mogura_dac_w)
 
 WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 {
-	m_gfxram[offset] = data ;
+	m_gfxram.target()[offset] = data ;
 
 	gfx_element_mark_dirty(machine().gfx[0], offset / 16);
 }
@@ -124,8 +126,8 @@ WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 static ADDRESS_MAP_START( mogura_map, AS_PROGRAM, 8, mogura_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_BASE(m_gfxram) // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_BASE(m_tileram) // tilemap
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_SHARE("gfxram") // ram based characters
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_SHARE("tileram") // tilemap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8, mogura_state )

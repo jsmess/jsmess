@@ -123,28 +123,30 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_microtouch(*this,"microtouch")
-		{ }
+		,
+		m_regs(*this, "regs"),
+		m_galgames_ram(*this, "galgames_ram"){ }
 
-	DECLARE_WRITE8_MEMBER(microtouch_tx);
+	required_device<cpu_device> m_maincpu;
+	optional_device<microtouch_device> m_microtouch;
+	required_shared_ptr<UINT16> m_regs;
+	required_shared_ptr<UINT16> m_galgames_ram;
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];
 	bitmap_ind16 m_bitmap[2][2];
-	UINT16 *m_regs;
 	UINT16 m_color;
 	UINT16 m_addr;
 	UINT32 m_gfx_offs;
 	UINT32 m_gfx_size;
 	int (*m_compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
-	UINT16 *m_galgames_ram;
 	UINT16 m_galgames_cart;
 	UINT32 m_palette_offset;
 	UINT8 m_palette_index;
 	UINT8 m_palette_data[3];
 	device_t *m_duart68681;
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<microtouch_device> m_microtouch;
+	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	DECLARE_READ16_MEMBER(rtc_r);
 	DECLARE_WRITE16_MEMBER(rtc_w);
 	DECLARE_WRITE16_MEMBER(tmaster_color_w);
@@ -358,8 +360,8 @@ static SCREEN_UPDATE_IND16( tmaster )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
-	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->m_bitmap[0][(state->m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->m_bitmap[1][(state->m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->m_bitmap[0][(state->m_regs.target()[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->m_bitmap[1][(state->m_regs.target()[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
 
 	return 0;
 }
@@ -383,15 +385,15 @@ static void tmaster_draw(running_machine &machine)
 
 	UINT16 pen;
 
-	buffer	=	(state->m_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
-	sw		=	 state->m_regs[0x04/2];
-	sx		=	 state->m_regs[0x06/2];
-	sh		=	 state->m_regs[0x08/2] + 1;
-	sy		=	 state->m_regs[0x0a/2];
+	buffer	=	(state->m_regs.target()[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
+	sw		=	 state->m_regs.target()[0x04/2];
+	sx		=	 state->m_regs.target()[0x06/2];
+	sh		=	 state->m_regs.target()[0x08/2] + 1;
+	sy		=	 state->m_regs.target()[0x0a/2];
 	addr	=	(*state->m_compute_addr)(
-				 state->m_regs[0x0c/2],
-				 state->m_regs[0x0e/2], state->m_addr);
-	mode	=	 state->m_regs[0x10/2];
+				 state->m_regs.target()[0x0c/2],
+				 state->m_regs.target()[0x0e/2], state->m_addr);
+	mode	=	 state->m_regs.target()[0x10/2];
 
 	layer	=	(mode >> 7) & 1;	// layer to draw to
 	buffer	=	((mode >> 6) & 1) ^ ((buffer >> layer) & 1);	// bit 6 selects whether to use the opposite buffer to that displayed
@@ -538,7 +540,7 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
 
-	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_SHARE("paletteram")
+	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w ) AM_SHARE("paletteram")
 
 	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 
