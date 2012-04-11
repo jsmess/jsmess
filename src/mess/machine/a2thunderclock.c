@@ -104,12 +104,7 @@ void a2bus_thunderclock_device::device_reset()
 
 UINT8 a2bus_thunderclock_device::read_c0nx(address_space &space, UINT8 offset)
 {
-    if (m_dataout == 0)
-    {
-        return 0;
-    }
-
-    return 0xff;
+    return (m_dataout << 7);
 }
 
 
