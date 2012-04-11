@@ -58,62 +58,6 @@ Notes:
     DIPSW2  -
 
 
-Keyboard PCB Layout
--------------------
-
-KTC 65-01870-001 (dated 1978)
-PCB-002B
-
-    |---------------|
-|---|      CN1      |---------------------------------------------------|
-|                                                                       |
-|   LS06    LS04    LS04                        LS06    LS00    LS123   |
-|   LS74                    PROM        MCU             4051    900C    |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|-----------------------------------------------------------------------|
-
-Notes:
-    All IC's shown.
-
-    MCU         - General Instruments 30293B-013 20-04592-013 (?)
-    PROM        - Synertek N82S141N 512x8 bipolar PROM "053"
-    900C        - Interdesign 900C (?)
-    CN1         - keyboard data connector
-
-
-KTC A65-01870-001 (dated 1983)
-PCB-201C
-
-    |---------------|
-|---|      CN1      |---------------------------------------------------|
-|                                                                       |
-|   LS06    LS04    LS04                                LS00    LS123   |
-|                                       MCU             4051    900C    |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|-----------------------------------------------------------------------|
-
-Notes:
-    All IC's shown.
-
-    MCU         - General Instruments 30293B-047 20-04592-047 (?)
-    900C        - Interdesign 900C (?)
-    CN1         - keyboard data connector
-
-
 DOS PCB Layout
 --------------
 
@@ -172,6 +116,7 @@ Notes:
     - floppy
     - printer
     - IEC
+    - Metric ABC CAD 1000
 
 */
 
@@ -387,14 +332,14 @@ static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
 
 
 //**************************************************************************
-//  MEMORY MANAGEMENT UNIT
+//  MEMORY MANAGEMENT
 //**************************************************************************
 
 //-------------------------------------------------
-//  mmu_r -
+//  read -
 //-------------------------------------------------
 
-READ8_MEMBER( abc80_state::mmu_r )
+READ8_MEMBER( abc80_state::read )
 {
 	UINT8 data = 0xff;
 	UINT8 mmu = m_mmu_rom[0x40 | (offset >> 10)];
@@ -421,10 +366,10 @@ READ8_MEMBER( abc80_state::mmu_r )
 
 
 //-------------------------------------------------
-//  mmu_w -
+//  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc80_state::mmu_w )
+WRITE8_MEMBER( abc80_state::write )
 {
 	UINT8 mmu = m_mmu_rom[0x40 | (offset >> 10)];
 
@@ -452,9 +397,9 @@ WRITE8_MEMBER( abc80_state::mmu_w )
 //  vco_voltage_w - CSG VCO voltage select
 //-------------------------------------------------
 
-WRITE_LINE_DEVICE_HANDLER( vco_voltage_w )
+WRITE_LINE_MEMBER( abc80_state::vco_voltage_w )
 {
-	sn76477_vco_voltage_w(device, state ? 2.5 : 0);
+	sn76477_vco_voltage_w(m_psg, state ? 2.5 : 0);
 }
 
 
@@ -469,7 +414,7 @@ WRITE_LINE_DEVICE_HANDLER( vco_voltage_w )
 
 static ADDRESS_MAP_START( abc80_mem, AS_PROGRAM, 8, abc80_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
@@ -506,7 +451,7 @@ static INPUT_PORTS_START( abc80 )
 
 	PORT_START("SN76477")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_enable_w)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, vco_voltage_w)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, abc80_state, vco_voltage_w)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_vco_w)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_b_w)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_WRITE_LINE_DEVICE(SN76477_TAG, sn76477_mixer_a_w)
@@ -688,12 +633,21 @@ static SLOT_INTERFACE_START( abc80_abcbus_cards )
 	SLOT_INTERFACE("sio", ABC_SIO)
 SLOT_INTERFACE_END
 
-
 static ABCBUS_INTERFACE( abcbus_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  ABC80_KEYBOARD_INTERFACE( kb_intf )
+//-------------------------------------------------
+
+static ABC80_KEYBOARD_INTERFACE( kb_intf )
+{
 	DEVCB_NULL
 };
 
@@ -753,6 +707,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_interface)
 	MCFG_ABC830_ADD()
+	MCFG_ABC80_KEYBOARD_ADD(kb_intf)
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc80_abcbus_cards, "slow", NULL)
@@ -790,9 +745,6 @@ ROM_START( abc80 )
 	ROMX_LOAD( "ufddos20", 0x6000, 0x1000, CRC(69b09c0b) SHA1(403997a06cf6495b8fa13dc74eff6a64ef7aa53e), ROM_BIOS(4) )
 	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
 	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
-
-	ROM_REGION( 0x200, "keyboard", 0 )
-	ROM_LOAD( "053.z5", 0x0000, 0x0200, NO_DUMP ) // 82S141 512x8
 
 	ROM_REGION( 0xa00, "chargen", 0 )
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand

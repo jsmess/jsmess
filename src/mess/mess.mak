@@ -784,6 +784,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_bn1541.o	\
 	$(MESS_MACHINE)/c64_comal80.o	\
 	$(MESS_MACHINE)/c64_cpm.o	\
+	$(MESS_MACHINE)/c64_currah_speech.o	\
 	$(MESS_MACHINE)/c64_dela_ep256.o	\
 	$(MESS_MACHINE)/c64_dela_ep64.o	\
 	$(MESS_MACHINE)/c64_dela_ep7x8.o	\
@@ -1185,6 +1186,7 @@ $(MESSOBJ)/kyocera.a:			\
 $(MESSOBJ)/luxor.a:				\
 	$(MESS_DRIVERS)/abc80.o		\
 	$(MESS_VIDEO)/abc80.o		\
+	$(MESS_MACHINE)/abc80kb.o	\
 	$(MESS_DRIVERS)/abc80x.o	\
 	$(MESS_VIDEO)/abc800.o		\
 	$(MESS_MACHINE)/abc800kb.o	\

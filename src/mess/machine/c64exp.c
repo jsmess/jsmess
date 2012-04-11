@@ -415,3 +415,23 @@ WRITE_LINE_MEMBER( c64_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
 WRITE_LINE_MEMBER( c64_expansion_slot_device::nmi_w ) { m_out_nmi_func(state); }
 WRITE_LINE_MEMBER( c64_expansion_slot_device::dma_w ) { m_out_dma_func(state); }
 WRITE_LINE_MEMBER( c64_expansion_slot_device::reset_w ) { m_out_reset_func(state); }
+
+
+//-------------------------------------------------
+//  phi2 - system clock frequency
+//-------------------------------------------------
+
+int c64_expansion_slot_device::phi2()
+{
+	return clock();
+}
+
+
+//-------------------------------------------------
+//  dotclock - dot clock frequency
+//-------------------------------------------------
+
+int c64_expansion_slot_device::dotclock()
+{
+	return phi2() * 8;
+}

@@ -15,6 +15,7 @@
 #include "imagedev/printer.h"
 #include "imagedev/cassette.h"
 #include "machine/abcbus.h"
+#include "machine/abc80kb.h"
 #include "machine/abc830.h"
 #include "machine/abc_fd2.h"
 #include "machine/abc_sio.h"
@@ -67,6 +68,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_pio(*this, Z80PIO_TAG),
+		  m_psg(*this, SN76477_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_bus(*this, ABCBUS_TAG),
 		  m_ram(*this, RAM_TAG)
@@ -74,6 +76,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pio;
+	required_device<device_t> m_psg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_device> m_bus;
 	required_device<ram_device> m_ram;
@@ -85,8 +88,10 @@ public:
 
 	void update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mmu_r );
-	DECLARE_WRITE8_MEMBER( mmu_w );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( vco_voltage_w );
 
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_READ8_MEMBER( pio_pb_r );

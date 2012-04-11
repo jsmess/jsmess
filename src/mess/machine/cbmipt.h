@@ -10,6 +10,7 @@
 #include "machine/c64_bn1541.h"
 #include "machine/c64_comal80.h"
 #include "machine/c64_cpm.h"
+#include "machine/c64_currah_speech.h"
 #include "machine/c64_dela_ep256.h"
 #include "machine/c64_dela_ep64.h"
 #include "machine/c64_dela_ep7x8.h"
