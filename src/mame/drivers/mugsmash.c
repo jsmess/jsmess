@@ -55,7 +55,7 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 	switch (offset)
 	{
 	case 1:
-		soundlatch_w(space, 1, data & 0xff);
+		soundlatch_byte_w(space, 1, data & 0xff);
 		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16, mugsmash_state )
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_BASE(m_videoram1)
 	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_BASE(m_videoram2)
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_BASE(m_regs1)	/* video registers*/
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_BASE(m_regs2) /* sound + ? */
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* main ram? */
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( mugsmash_sound_map, AS_PROGRAM, 8, mugsmash_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

@@ -76,12 +76,14 @@ class pipeline_state : public driver_device
 {
 public:
 	pipeline_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram1(*this, "vram1"),
+		m_vram2(*this, "vram2"){ }
 
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
-	UINT8 *m_vram1;
-	UINT8 *m_vram2;
+	required_shared_ptr<UINT8> m_vram1;
+	required_shared_ptr<UINT8> m_vram2;
 	UINT8 m_vidctrl;
 	UINT8 *m_palram;
 	UINT8 m_toMCU;
@@ -98,7 +100,7 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
-	int code = state->m_vram2[tile_index]+state->m_vram2[tile_index+0x800]*256;
+	int code = state->m_vram2.target()[tile_index]+state->m_vram2.target()[tile_index+0x800]*256;
 	SET_TILE_INFO(
 		0,
 		code,
@@ -109,8 +111,8 @@ static TILE_GET_INFO( get_tile_info )
 static TILE_GET_INFO( get_tile_info2 )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
-	int code =state->m_vram1[tile_index]+((state->m_vram1[tile_index+0x800]>>4))*256;
-	int color=((state->m_vram1[tile_index+0x800])&0xf);
+	int code =state->m_vram1.target()[tile_index]+((state->m_vram1.target()[tile_index+0x800]>>4))*256;
+	int color=((state->m_vram1.target()[tile_index+0x800])&0xf);
 	SET_TILE_INFO
 	(
 		1,
@@ -149,7 +151,7 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 	if(!(m_vidctrl&1))
 	{
 		m_tilemap1->mark_tile_dirty(offset&0x7ff);
-		m_vram2[offset]=data;
+		m_vram2.target()[offset]=data;
 	}
 	else
 	{
@@ -165,7 +167,7 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 WRITE8_MEMBER(pipeline_state::vram1_w)
 {
 	m_tilemap2->mark_tile_dirty(offset&0x7ff);
-	m_vram1[offset]=data;
+	m_vram1.target()[offset]=data;
 }
 
 static READ8_DEVICE_HANDLER(protection_r)
@@ -189,8 +191,8 @@ static WRITE8_DEVICE_HANDLER(protection_w)
 static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8, pipeline_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_BASE(m_vram1)
-	AM_RANGE(0x9800, 0xa7ff) AM_RAM_WRITE(vram2_w) AM_BASE(m_vram2)
+	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_SHARE("vram1")
+	AM_RANGE(0x9800, 0xa7ff) AM_RAM_WRITE(vram2_w) AM_SHARE("vram2")
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xb830, 0xb830) AM_NOP

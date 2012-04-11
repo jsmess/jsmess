@@ -168,15 +168,14 @@ static int gsword_coins_in(void)
 /* CPU 2 memory hack */
 /* (402E) timeout upcount must be under 0AH                         */
 /* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
-static READ8_HANDLER( gsword_hack_r )
+READ8_MEMBER(gsword_state::gsword_hack_r)
 {
-	gsword_state *state = space->machine().driver_data<gsword_state>();
-	UINT8 data = state->m_cpu2_ram[offset + 4];
+	UINT8 data = m_cpu2_ram[offset + 4];
 
-	/*if(offset==1)mame_printf_debug("CNT %02X%02X\n",state->m_cpu2_ram[5],state->m_cpu2_ram[4]); */
+	/*if(offset==1)mame_printf_debug("CNT %02X%02X\n",m_cpu2_ram[5],m_cpu2_ram[4]); */
 
 	/* speedup timeout cound down */
-	if(state->m_protect_hack)
+	if(m_protect_hack)
 	{
 		switch(offset)
 		{
@@ -324,11 +323,10 @@ static WRITE8_DEVICE_HANDLER( gsword_adpcm_data_w )
 	msm5205_vclk_w(device,(data>>4)&1);  /* bit 4    */
 }
 
-static WRITE8_HANDLER( adpcm_soundcommand_w )
+WRITE8_MEMBER(gsword_state::adpcm_soundcommand_w)
 {
-	gsword_state *state = space->machine().driver_data<gsword_state>();
-	state->soundlatch_w(*space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_byte_w(*&space, 0, data);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state )
@@ -337,7 +335,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state )
 	AM_RANGE(0xa000, 0xa37f) AM_RAM
 	AM_RANGE(0xa380, 0xa3ff) AM_RAM AM_BASE(m_spritetile_ram)
 	AM_RANGE(0xa400, 0xa77f) AM_RAM
-	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_BASE(m_spritexy_ram) AM_SIZE(m_spritexy_size)
+	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_BASE_SIZE(m_spritexy_ram,m_spritexy_size)
 	AM_RANGE(0xa980, 0xa980) AM_WRITE(gsword_charbank_w)
 	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(gsword_videoctrl_w)	/* flip screen, char palette bank */
 	AM_RANGE(0xab00, 0xab00) AM_WRITE(gsword_scroll_w)
@@ -359,7 +357,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(m_cpu2_ram)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(adpcm_soundcommand_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
@@ -382,7 +380,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("msm", gsword_adpcm_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 
@@ -395,7 +393,7 @@ static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN2")	// 2PL / ACK
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN0")	// START
 
-//  AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(adpcm_soundcommand_w)
+//  AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
 	AM_RANGE(0xA000, 0xA001) AM_WRITE_LEGACY(josvolly_8741_1_w) AM_READ_LEGACY(josvolly_8741_1_r)
 ADDRESS_MAP_END
 
@@ -913,7 +911,8 @@ static DRIVER_INIT( gsword )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4004, 0x4005, FUNC(gsword_hack_r));
+	gsword_state *state = machine.driver_data<gsword_state>();
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),state));
 #endif
 }
 
@@ -928,7 +927,8 @@ static DRIVER_INIT( gsword2 )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4004, 0x4005, FUNC(gsword_hack_r));
+	gsword_state *state = machine.driver_data<gsword_state>();
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),state));
 #endif
 }
 

@@ -177,12 +177,16 @@ class spaceg_state : public driver_device
 {
 public:
 	spaceg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_io9400(*this, "io9400"),
+		m_io9401(*this, "io9401"){ }
 
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_io9400;
-	UINT8 *  m_io9401;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_io9400;
+	required_shared_ptr<UINT8> m_io9401;
 	DECLARE_WRITE8_MEMBER(zvideoram_w);
 	DECLARE_READ8_MEMBER(spaceg_colorram_r);
 };
@@ -222,16 +226,16 @@ static PALETTE_INIT( spaceg )
 
 WRITE8_MEMBER(spaceg_state::zvideoram_w)
 {
-	int col = m_colorram[0x400];
+	int col = m_colorram.target()[0x400];
 	int xoff = *m_io9400 >> 5 & 7;
 	UINT16 offset2 = (offset + 0x100) & 0x1fff;
 	UINT16 sdata = data << (8 - xoff);
-	UINT16 vram_data = m_videoram[offset] << 8 | (m_videoram[offset2]);
+	UINT16 vram_data = m_videoram.target()[offset] << 8 | (m_videoram.target()[offset2]);
 
 	if (col > 0x0f) popmessage("color > 0x0f = %2d", col);
 	col &= 0x0f;
 
-	switch (*m_io9401)
+	switch (*m_io9401.target())
 	{
 		// draw
 		case 0:
@@ -241,8 +245,8 @@ WRITE8_MEMBER(spaceg_state::zvideoram_w)
 			vram_data |= sdata;
 
 			// update colorram
-			if (sdata&0xff00) m_colorram[offset] = col;
-			if (sdata&0x00ff) m_colorram[offset2] = col;
+			if (sdata&0xff00) m_colorram.target()[offset] = col;
+			if (sdata&0x00ff) m_colorram.target()[offset2] = col;
 			break;
 
 		// erase
@@ -256,8 +260,8 @@ WRITE8_MEMBER(spaceg_state::zvideoram_w)
 			return;
 	}
 
-	m_videoram[offset]=vram_data>>8;
-	m_videoram[offset2]=vram_data&0xff;
+	m_videoram.target()[offset]=vram_data>>8;
+	m_videoram.target()[offset2]=vram_data&0xff;
 }
 
 
@@ -267,7 +271,7 @@ READ8_MEMBER(spaceg_state::spaceg_colorram_r)
 
 	if (offset < 0x400)
 	{
-		rgbcolor = (m_colorram[offset] << 1) | ((offset &0x100) >> 8);
+		rgbcolor = (m_colorram.target()[offset] << 1) | ((offset &0x100) >> 8);
 
 		if ((offset >= 0x200) && (offset < 0x220)) /* 0xa200- 0xa21f */
 		{
@@ -288,7 +292,7 @@ READ8_MEMBER(spaceg_state::spaceg_colorram_r)
 	if (*m_io9401 != 0x40)
 		logerror("colorram read in mode: 9401 = %02x (offset = %04x)\n", *m_io9401, offset);
 
-	return m_colorram[offset];
+	return m_colorram.target()[offset];
 }
 
 
@@ -300,13 +304,13 @@ static SCREEN_UPDATE_IND16( spaceg )
 	for (offs = 0; offs < 0x2000; offs++)
 	{
 		int i;
-		UINT8 data = state->m_videoram[offs];
+		UINT8 data = state->m_videoram.target()[offs];
 		int y = offs & 0xff;
 		int x = (offs >> 8) << 3;
 
 		for (i = 0; i < 8; i++)
 		{
-			bitmap.pix16(y, x) = (data & 0x80) ? state->m_colorram[offs] : 0;
+			bitmap.pix16(y, x) = (data & 0x80) ? state->m_colorram.target()[offs] : 0;
 
 			x++;
 			data <<= 1;
@@ -328,11 +332,11 @@ static ADDRESS_MAP_START( spaceg_map, AS_PROGRAM, 8, spaceg_state )
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(spaceg_colorram_r) AM_BASE(m_colorram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(spaceg_colorram_r) AM_SHARE("colorram")
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_BASE(m_io9400) /* gfx ctrl */
-	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_BASE(m_io9401) /* gfx ctrl */
+	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_SHARE("io9400") /* gfx ctrl */
+	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_SHARE("io9401") /* gfx ctrl */
 	/* 9402 -
         bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
         bit 2 - unknown -

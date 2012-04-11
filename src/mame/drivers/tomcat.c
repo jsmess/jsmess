@@ -40,10 +40,11 @@ class tomcat_state : public driver_device
 {
 public:
 	tomcat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_shared_ram(*this, "shared_ram"){ }
 
 	int m_control_num;
-	UINT16 *m_shared_ram;
+	required_shared_ptr<UINT16> m_shared_ram;
 	UINT8 m_nvram[0x800];
 	int m_dsp_BIO;
 	int m_dsp_idle;
@@ -254,12 +255,12 @@ READ16_MEMBER(tomcat_state::dsp_BIO_r)
 
 READ16_MEMBER(tomcat_state::tomcat_shared_ram_r)
 {
-	return m_shared_ram[offset];
+	return m_shared_ram.target()[offset];
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_shared_ram_w)
 {
-	COMBINE_DATA(&m_shared_ram[offset]);
+	COMBINE_DATA(&m_shared_ram.target()[offset]);
 }
 
 READ8_MEMBER(tomcat_state::tomcat_nvram_r)
@@ -303,7 +304,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_shared_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_io_map, AS_IO, 16, tomcat_state )
@@ -357,10 +358,10 @@ INPUT_PORTS_END
 static MACHINE_START(tomcat)
 {
 	tomcat_state *state = machine.driver_data<tomcat_state>();
-	((UINT16*)state->m_shared_ram)[0x0000] = 0xf600;
-	((UINT16*)state->m_shared_ram)[0x0001] = 0x0000;
-	((UINT16*)state->m_shared_ram)[0x0002] = 0xf600;
-	((UINT16*)state->m_shared_ram)[0x0003] = 0x0000;
+	((UINT16*)state->m_shared_ram.target())[0x0000] = 0xf600;
+	((UINT16*)state->m_shared_ram.target())[0x0001] = 0x0000;
+	((UINT16*)state->m_shared_ram.target())[0x0002] = 0xf600;
+	((UINT16*)state->m_shared_ram.target())[0x0003] = 0x0000;
 
 	machine.device<nvram_device>("nvram")->set_base(state->m_nvram, 0x800);
 

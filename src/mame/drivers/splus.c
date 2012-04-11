@@ -33,7 +33,11 @@ class splus_state : public driver_device
 public:
 	splus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cmosl_ram(*this, "cmosl"), m_cmosh_ram(*this, "cmosh")
+		m_cmosl_ram(*this, "cmosl"), 
+		m_cmosh_ram(*this, "cmosh"), 
+		m_program_ram(*this, "program_ram"), 
+		m_reel_ram(*this, "reel_ram"), 
+		m_io_port(*this, "io_port")
 	{
 		m_sda_dir = 0;
 		m_coin_state = 0;
@@ -58,11 +62,11 @@ public:
 	required_shared_ptr<UINT8> m_cmosh_ram;
 
 	// Program and Reel Data
-	UINT8 *m_program_ram;
-	UINT8 *m_reel_ram;
+	required_shared_ptr<UINT8> m_program_ram;
+	required_shared_ptr<UINT8> m_reel_ram;
 
 	// IO Ports
-	UINT8 *m_io_port;
+	required_shared_ptr<UINT8> m_io_port;
 
 	// EEPROM States
 	int m_sda_dir;
@@ -179,21 +183,21 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 #endif
 	}
 
-	m_io_port[offset] = data;
+	m_io_port.target()[offset] = data;
 }
 
 WRITE8_MEMBER(splus_state::splus_load_pulse_w)
 {
 
 //  UINT8 out = 0;
-//    out = ((~m_io_port[1] & 0xf0)>>4); // Output Bank
+//    out = ((~m_io_port.target()[1] & 0xf0)>>4); // Output Bank
 }
 
 WRITE8_MEMBER(splus_state::splus_serial_w)
 {
 
     UINT8 out = 0;
-    out = ((~m_io_port[1] & 0xe0)>>5); // Output Bank
+    out = ((~m_io_port.target()[1] & 0xe0)>>5); // Output Bank
 
 	switch (out)
 	{
@@ -342,8 +346,8 @@ WRITE8_MEMBER(splus_state::splus_7seg_w)
     seg = ((~data & 0xf0)>>4); // Segment Number
     val = (~data & 0x0f); // Digit Value
 
-    // Need to add ~m_io_port[1]-1 to seg value
-    if (seg < 0x0a && (m_io_port[1] & 0xe0) == 0xe0)
+    // Need to add ~m_io_port.target()[1]-1 to seg value
+    if (seg < 0x0a && (m_io_port.target()[1] & 0xe0) == 0xe0)
         output_set_digit_value(seg, ls48_map[val]);
 }
 
@@ -374,7 +378,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 
     UINT8 in = 0x00;
     UINT8 val = 0x00;
-    in = ((~m_io_port[1] & 0xe0)>>5); // Input Bank
+    in = ((~m_io_port.target()[1] & 0xe0)>>5); // Input Bank
 
 	switch (in)
 	{
@@ -508,16 +512,16 @@ READ8_MEMBER(splus_state::splus_serial_r)
 
 READ8_MEMBER(splus_state::splus_m_reel_ram_r)
 {
-	return m_reel_ram[offset];
+	return m_reel_ram.target()[offset];
 }
 
 READ8_MEMBER(splus_state::splus_io_r)
 {
 
     if (offset == 3)
-        return m_io_port[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
+        return m_io_port.target()[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
     else
-    	return m_io_port[offset];
+    	return m_io_port.target()[offset];
 }
 
 READ8_MEMBER(splus_state::splus_duart_r)
@@ -586,7 +590,7 @@ static DRIVER_INIT( splus )
 *************************/
 
 static ADDRESS_MAP_START( splus_map, AS_PROGRAM, 8, splus_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE(m_program_ram)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
@@ -616,10 +620,10 @@ static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
 
     // SSxxxx Reel Chip
-    AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_BASE(m_reel_ram)
+    AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_SHARE("reel_ram")
 
 	// Ports start here
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_BASE(m_io_port)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_SHARE("io_port")
 ADDRESS_MAP_END
 
 /*************************

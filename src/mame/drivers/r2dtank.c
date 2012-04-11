@@ -53,10 +53,12 @@ class r2dtank_state : public driver_device
 {
 public:
 	r2dtank_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	UINT8 m_flipscreen;
 	UINT32 m_ttl74123_output;
 	UINT8 m_AY8910_selected;
@@ -106,7 +108,7 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 
 READ8_MEMBER(r2dtank_state::audio_command_r)
 {
-	UINT8 ret = soundlatch_r(space, 0);
+	UINT8 ret = soundlatch_byte_r(space, 0);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc(&space.device()), ret);
 
@@ -116,7 +118,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc
 
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
-	soundlatch_w(space, 0, ~data);
+	soundlatch_byte_w(space, 0, ~data);
 	cputag_set_input_line(machine(), "audiocpu", M6800_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_pc(&space.device()), data^0xff);
@@ -125,7 +127,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
-	UINT8 ret = soundlatch2_r(space, 0);
+	UINT8 ret = soundlatch2_byte_r(space, 0);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", cpu_get_pc(&space.device()), ret);
 
 	return ret;
@@ -138,7 +140,7 @@ WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 	if (cpu_get_pc(&space.device()) == 0xfb12)
 		data = 0x00;
 
-	soundlatch2_w(space, 0, data);
+	soundlatch2_byte_w(space, 0, data);
 	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", cpu_get_pc(&space.device()), data);
@@ -351,8 +353,8 @@ static MC6845_UPDATE_ROW( update_row )
 		if (state->m_flipscreen)
 			offs = offs ^ 0x1fff;
 
-		data = state->m_videoram[offs];
-		fore_color = (state->m_colorram[offs] >> 5) & 0x07;
+		data = state->m_videoram.target()[offs];
+		fore_color = (state->m_colorram.target()[offs] >> 5) & 0x07;
 
 		for (i = 0; i < 8; i++)
 		{
@@ -415,9 +417,9 @@ static WRITE8_DEVICE_HANDLER( pia_comp_w )
 
 
 static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8003) AM_DEVREAD("pia_main", pia6821_device, read) AM_DEVWRITE_LEGACY("pia_main", pia_comp_w)
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)

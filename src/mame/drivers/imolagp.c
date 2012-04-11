@@ -87,10 +87,11 @@ class imolagp_state : public driver_device
 public:
 	imolagp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_slave_workram(*this, "slave_workram"){ }
 
-	UINT8 *m_slave_workram; // used only ifdef HLE_COM
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_slave_workram; // used only ifdef HLE_COM
 
 #ifdef HLE_COM
 	UINT8 m_mComData[0x100];
@@ -112,7 +113,6 @@ public:
 	/* memory */
 	UINT8  m_videoram[3][0x4000];
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(transmit_data_w);
 	DECLARE_READ8_MEMBER(trigger_slave_nmi_r);
 	DECLARE_READ8_MEMBER(receive_data_r);
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( imolagp_slave, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x0800, 0x0bff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_ROM
 	AM_RANGE(0x1c00, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(m_slave_workram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("slave_workram")
 	AM_RANGE(0x9fff, 0xa000) AM_READ(receive_data_r)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(screenram_w)
 ADDRESS_MAP_END
@@ -496,7 +496,7 @@ static INTERRUPT_GEN( vblank_irq )
 	imolagp_state *state = device->machine().driver_data<imolagp_state>();
 
 #ifdef HLE_COM
-	memcpy(&state->m_slave_workram[0x80], state->m_mComData, state->m_mComCount);
+	memcpy(&state->m_slave_workram.target()[0x80], state->m_mComData, state->m_mComCount);
 	state->m_mComCount = 0;
 #endif
 	device_set_input_line(device, 0, HOLD_LINE);

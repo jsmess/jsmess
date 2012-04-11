@@ -87,28 +87,44 @@ class luckgrln_state : public driver_device
 {
 public:
 	luckgrln_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_reel1_ram(*this, "reel1_ram"),
+		m_reel1_attr(*this, "reel1_attr"),
+		m_reel1_scroll(*this, "reel1_scroll"),
+		m_reel2_ram(*this, "reel2_ram"),
+		m_reel2_attr(*this, "reel2_attr"),
+		m_reel2_scroll(*this, "reel2_scroll"),
+		m_reel3_ram(*this, "reel3_ram"),
+		m_reel3_attr(*this, "reel3_attr"),
+		m_reel3_scroll(*this, "reel3_scroll"),
+		m_reel4_ram(*this, "reel4_ram"),
+		m_reel4_attr(*this, "reel4_attr"),
+		m_reel4_scroll(*this, "reel4_scroll"),
+		m_luck_vram1(*this, "luck_vram1"),
+		m_luck_vram2(*this, "luck_vram2"),
+		m_luck_vram3(*this, "luck_vram3"){ }
 
-	UINT8 *m_luck_vram1;
-	UINT8 *m_luck_vram2;
-	UINT8 *m_luck_vram3;
 	UINT8 m_nmi_enable;
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
 	tilemap_t *m_reel4_tilemap;
-	UINT8* m_reel1_ram;
-	UINT8* m_reel2_ram;
-	UINT8* m_reel3_ram;
-	UINT8* m_reel4_ram;
-	UINT8* m_reel1_scroll;
-	UINT8* m_reel2_scroll;
-	UINT8* m_reel3_scroll;
-	UINT8* m_reel4_scroll;
-	UINT8* m_reel1_attr;
-	UINT8* m_reel2_attr;
-	UINT8* m_reel3_attr;
-	UINT8* m_reel4_attr;
+	required_shared_ptr<UINT8> m_reel1_ram;
+	required_shared_ptr<UINT8> m_reel1_attr;
+	required_shared_ptr<UINT8> m_reel1_scroll;
+	required_shared_ptr<UINT8> m_reel2_ram;
+	required_shared_ptr<UINT8> m_reel2_attr;
+	required_shared_ptr<UINT8> m_reel2_scroll;
+	required_shared_ptr<UINT8> m_reel3_ram;
+	required_shared_ptr<UINT8> m_reel3_attr;
+	required_shared_ptr<UINT8> m_reel3_scroll;
+	required_shared_ptr<UINT8> m_reel4_ram;
+	required_shared_ptr<UINT8> m_reel4_attr;
+	required_shared_ptr<UINT8> m_reel4_scroll;
+	required_shared_ptr<UINT8> m_luck_vram1;
+	required_shared_ptr<UINT8> m_luck_vram2;
+	required_shared_ptr<UINT8> m_luck_vram3;
+
 	int m_palette_count;
 	UINT8 m_palette_ram[0x10000];
 	DECLARE_WRITE8_MEMBER(luckgrln_reel1_ram_w);
@@ -133,13 +149,13 @@ public:
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_ram_w)
 {
-	m_reel1_ram[offset] = data;
+	m_reel1_ram.target()[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
 {
-	m_reel1_attr[offset] = data;
+	m_reel1_attr.target()[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
@@ -148,8 +164,8 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
 static TILE_GET_INFO( get_luckgrln_reel1_tile_info )
 {
 	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	int code = state->m_reel1_ram[tile_index];
-	int attr = state->m_reel1_attr[tile_index];
+	int code = state->m_reel1_ram.target()[tile_index];
+	int attr = state->m_reel1_attr.target()[tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -165,13 +181,13 @@ static TILE_GET_INFO( get_luckgrln_reel1_tile_info )
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_ram_w)
 {
-	m_reel2_ram[offset] = data;
+	m_reel2_ram.target()[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_attr_w)
 {
-	m_reel2_attr[offset] = data;
+	m_reel2_attr.target()[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
@@ -179,8 +195,8 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_attr_w)
 static TILE_GET_INFO( get_luckgrln_reel2_tile_info )
 {
 	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	int code = state->m_reel2_ram[tile_index];
-	int attr = state->m_reel2_attr[tile_index];
+	int code = state->m_reel2_ram.target()[tile_index];
+	int attr = state->m_reel2_attr.target()[tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -195,13 +211,13 @@ static TILE_GET_INFO( get_luckgrln_reel2_tile_info )
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_ram_w)
 {
-	m_reel3_ram[offset] = data;
+	m_reel3_ram.target()[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_attr_w)
 {
-	m_reel3_attr[offset] = data;
+	m_reel3_attr.target()[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
@@ -209,8 +225,8 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_attr_w)
 static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 {
 	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	int code = state->m_reel3_ram[tile_index];
-	int attr = state->m_reel3_attr[tile_index];
+	int code = state->m_reel3_ram.target()[tile_index];
+	int attr = state->m_reel3_attr.target()[tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -224,13 +240,13 @@ static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_ram_w)
 {
-	m_reel4_ram[offset] = data;
+	m_reel4_ram.target()[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_attr_w)
 {
-	m_reel4_attr[offset] = data;
+	m_reel4_attr.target()[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
@@ -238,8 +254,8 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_attr_w)
 static TILE_GET_INFO( get_luckgrln_reel4_tile_info )
 {
 	luckgrln_state *state = machine.driver_data<luckgrln_state>();
-	int code = state->m_reel4_ram[tile_index];
-	int attr = state->m_reel4_attr[tile_index];
+	int code = state->m_reel4_ram.target()[tile_index];
+	int attr = state->m_reel4_attr.target()[tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -284,10 +300,10 @@ static SCREEN_UPDATE_IND16(luckgrln)
 
 	for (i= 0;i < 64;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll[i]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll[i]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll[i]);
-		state->m_reel4_tilemap->set_scrolly(i, state->m_reel4_scroll[i]);
+		state->m_reel1_tilemap->set_scrolly(i, state->m_reel1_scroll.target()[i]);
+		state->m_reel2_tilemap->set_scrolly(i, state->m_reel2_scroll.target()[i]);
+		state->m_reel3_tilemap->set_scrolly(i, state->m_reel3_scroll.target()[i]);
+		state->m_reel4_tilemap->set_scrolly(i, state->m_reel4_scroll.target()[i]);
 	}
 
 
@@ -301,9 +317,9 @@ static SCREEN_UPDATE_IND16(luckgrln)
 
 		for (x=0;x<64;x++)
 		{
-			UINT16 tile = (state->m_luck_vram1[count] & 0xff);
-			UINT16 tile_high = (state->m_luck_vram2[count]);
-			UINT16 tileattr = (state->m_luck_vram3[count]);
+			UINT16 tile = (state->m_luck_vram1.target()[count] & 0xff);
+			UINT16 tile_high = (state->m_luck_vram2.target()[count]);
+			UINT16 tileattr = (state->m_luck_vram3.target()[count]);
 			UINT8 col = 0;
 			UINT8 region = 0;
 			UINT8 bgenable;
@@ -372,30 +388,30 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, luckgrln_state )
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("rom_data",0x10000)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("rom_data",0x00000)
 
-	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM_WRITE(luckgrln_reel1_ram_w)  AM_BASE(m_reel1_ram) // only written to half way
-	AM_RANGE(0x0c800, 0x0c9ff) AM_RAM_WRITE(luckgrln_reel1_attr_w) AM_BASE(m_reel1_attr)
-	AM_RANGE(0x0d000, 0x0d03f) AM_RAM AM_BASE(m_reel1_scroll) AM_MIRROR(0x000c0)
+	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM_WRITE(luckgrln_reel1_ram_w)  AM_SHARE("reel1_ram") // only written to half way
+	AM_RANGE(0x0c800, 0x0c9ff) AM_RAM_WRITE(luckgrln_reel1_attr_w) AM_SHARE("reel1_attr")
+	AM_RANGE(0x0d000, 0x0d03f) AM_RAM AM_SHARE("reel1_scroll") AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c200, 0x0c3ff) AM_RAM_WRITE(luckgrln_reel2_ram_w)  AM_BASE(m_reel2_ram)
-	AM_RANGE(0x0ca00, 0x0cbff) AM_RAM_WRITE(luckgrln_reel2_attr_w) AM_BASE(m_reel2_attr)
-	AM_RANGE(0x0d200, 0x0d23f) AM_RAM AM_BASE(m_reel2_scroll) AM_MIRROR(0x000c0)
+	AM_RANGE(0x0c200, 0x0c3ff) AM_RAM_WRITE(luckgrln_reel2_ram_w)  AM_SHARE("reel2_ram")
+	AM_RANGE(0x0ca00, 0x0cbff) AM_RAM_WRITE(luckgrln_reel2_attr_w) AM_SHARE("reel2_attr")
+	AM_RANGE(0x0d200, 0x0d23f) AM_RAM AM_SHARE("reel2_scroll") AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c400, 0x0c5ff) AM_RAM_WRITE(luckgrln_reel3_ram_w ) AM_BASE(m_reel3_ram)
-	AM_RANGE(0x0cc00, 0x0cdff) AM_RAM_WRITE(luckgrln_reel3_attr_w) AM_BASE(m_reel3_attr)
-	AM_RANGE(0x0d400, 0x0d43f) AM_RAM AM_BASE(m_reel3_scroll) AM_MIRROR(0x000c0)
+	AM_RANGE(0x0c400, 0x0c5ff) AM_RAM_WRITE(luckgrln_reel3_ram_w ) AM_SHARE("reel3_ram")
+	AM_RANGE(0x0cc00, 0x0cdff) AM_RAM_WRITE(luckgrln_reel3_attr_w) AM_SHARE("reel3_attr")
+	AM_RANGE(0x0d400, 0x0d43f) AM_RAM AM_SHARE("reel3_scroll") AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c600, 0x0c7ff) AM_RAM_WRITE(luckgrln_reel4_ram_w ) AM_BASE(m_reel4_ram)
-	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE(luckgrln_reel4_attr_w) AM_BASE(m_reel4_attr)
-	AM_RANGE(0x0d600, 0x0d63f) AM_RAM AM_BASE(m_reel4_scroll)
+	AM_RANGE(0x0c600, 0x0c7ff) AM_RAM_WRITE(luckgrln_reel4_ram_w ) AM_SHARE("reel4_ram")
+	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE(luckgrln_reel4_attr_w) AM_SHARE("reel4_attr")
+	AM_RANGE(0x0d600, 0x0d63f) AM_RAM AM_SHARE("reel4_scroll")
 
 //  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
 
 
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM // nvram
 
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM AM_BASE(m_luck_vram1)
-	AM_RANGE(0x0e800, 0x0efff) AM_RAM AM_BASE(m_luck_vram2)
-	AM_RANGE(0x0f000, 0x0f7ff) AM_RAM AM_BASE(m_luck_vram3)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM AM_SHARE("luck_vram1")
+	AM_RANGE(0x0e800, 0x0efff) AM_RAM AM_SHARE("luck_vram2")
+	AM_RANGE(0x0f000, 0x0f7ff) AM_RAM AM_SHARE("luck_vram3")
 
 
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM

@@ -49,14 +49,19 @@ class galaxi_state : public driver_device
 {
 public:
 	galaxi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg1_ram(*this, "bg1_ram"),
+		m_bg2_ram(*this, "bg2_ram"),
+		m_bg3_ram(*this, "bg3_ram"),
+		m_bg4_ram(*this, "bg4_ram"),
+		m_fg_ram(*this, "fg_ram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg1_ram;
-	UINT16 *  m_bg2_ram;
-	UINT16 *  m_bg3_ram;
-	UINT16 *  m_bg4_ram;
-	UINT16 *  m_fg_ram;
+	required_shared_ptr<UINT16> m_bg1_ram;
+	required_shared_ptr<UINT16> m_bg2_ram;
+	required_shared_ptr<UINT16> m_bg3_ram;
+	required_shared_ptr<UINT16> m_bg4_ram;
+	required_shared_ptr<UINT16> m_fg_ram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 //  UINT16 *  m_nvram;        // currently this uses generic nvram handling
 
@@ -91,65 +96,65 @@ public:
 static TILE_GET_INFO( get_bg1_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg1_ram[tile_index];
+	UINT16 code = state->m_bg1_ram.target()[tile_index];
 	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg2_ram[tile_index];
+	UINT16 code = state->m_bg2_ram.target()[tile_index];
 	SET_TILE_INFO(0, code, 0x10 + (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg3_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg3_ram[tile_index];
+	UINT16 code = state->m_bg3_ram.target()[tile_index];
 	SET_TILE_INFO(0, code, (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_bg4_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_bg4_ram[tile_index];
+	UINT16 code = state->m_bg4_ram.target()[tile_index];
 	SET_TILE_INFO(0, code, (code >> 12), 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	galaxi_state *state = machine.driver_data<galaxi_state>();
-	UINT16 code = state->m_fg_ram[tile_index];
+	UINT16 code = state->m_fg_ram.target()[tile_index];
 	SET_TILE_INFO(1, code, 0x20 + (code >> 12), 0);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg1_w)
 {
-	COMBINE_DATA(&m_bg1_ram[offset]);
+	COMBINE_DATA(&m_bg1_ram.target()[offset]);
 	m_bg1_tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg2_w)
 {
-	COMBINE_DATA(&m_bg2_ram[offset]);
+	COMBINE_DATA(&m_bg2_ram.target()[offset]);
 	m_bg2_tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg3_w)
 {
-	COMBINE_DATA(&m_bg3_ram[offset]);
+	COMBINE_DATA(&m_bg3_ram.target()[offset]);
 	m_bg3_tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg4_w)
 {
-	COMBINE_DATA(&m_bg4_ram[offset]);
+	COMBINE_DATA(&m_bg4_ram.target()[offset]);
 	m_bg4_tmap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_fg_w)
 {
-	COMBINE_DATA(&m_fg_ram[offset]);
+	COMBINE_DATA(&m_fg_ram.target()[offset]);
 	m_fg_tmap->mark_tile_dirty(offset);
 }
 
@@ -275,15 +280,15 @@ CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
 static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg1_w) AM_BASE(m_bg1_ram)
-	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE(galaxi_bg2_w) AM_BASE(m_bg2_ram)
-	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE(galaxi_bg3_w) AM_BASE(m_bg3_ram)
-	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg4_w) AM_BASE(m_bg4_ram)
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg1_w) AM_SHARE("bg1_ram")
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE(galaxi_bg2_w) AM_SHARE("bg2_ram")
+	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE(galaxi_bg3_w) AM_SHARE("bg3_ram")
+	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg4_w) AM_SHARE("bg4_ram")
 
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_BASE(m_fg_ram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
 	AM_RANGE(0x102000, 0x1047ff) AM_READNOP	// unknown
 
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(galaxi_500000_w)

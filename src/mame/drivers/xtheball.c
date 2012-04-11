@@ -18,10 +18,12 @@ class xtheball_state : public driver_device
 {
 public:
 	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_bg(*this, "vrabg"),
+		m_vram_fg(*this, "vrafg"){ }
 
-	UINT16 *m_vram_bg;
-	UINT16 *m_vram_fg;
+	required_shared_ptr<UINT16> m_vram_bg;
+	required_shared_ptr<UINT16> m_vram_fg;
 	UINT8 m_bitvals[32];
 	DECLARE_WRITE16_MEMBER(bit_controls_w);
 	DECLARE_READ16_MEMBER(analogx_r);
@@ -40,7 +42,7 @@ public:
 static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	xtheball_state *state = screen.machine().driver_data<xtheball_state>();
-	UINT16 *srcbg = &state->m_vram_bg[(params->rowaddr << 8) & 0xff00];
+	UINT16 *srcbg = &state->m_vram_bg.target()[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr;
@@ -50,7 +52,7 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap
 	if (!state->m_bitvals[0x13])
 	{
 		/* mode 0: foreground is the same as background */
-		UINT16 *srcfg = &state->m_vram_fg[(params->rowaddr << 8) & 0xff00];
+		UINT16 *srcfg = &state->m_vram_fg.target()[(params->rowaddr << 8) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
@@ -65,7 +67,7 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap
 	{
 		/* mode 1: foreground is half background resolution in */
 		/* X and supports two pages */
-		UINT16 *srcfg = &state->m_vram_fg[(params->rowaddr << 7) & 0xff00];
+		UINT16 *srcfg = &state->m_vram_fg.target()[(params->rowaddr << 7) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
@@ -91,9 +93,9 @@ static void xtheball_to_shiftreg(address_space *space, UINT32 address, UINT16 *s
 {
 	xtheball_state *state = space->machine().driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
-		memcpy(shiftreg, &state->m_vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
+		memcpy(shiftreg, &state->m_vram_bg.target()[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
-		memcpy(shiftreg, &state->m_vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
+		memcpy(shiftreg, &state->m_vram_fg.target()[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
 		logerror("%s:xtheball_to_shiftreg(%08X)\n", space->machine().describe_context(), address);
 }
@@ -103,9 +105,9 @@ static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 
 {
 	xtheball_state *state = space->machine().driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
-		memcpy(&state->m_vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&state->m_vram_bg.target()[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
-		memcpy(&state->m_vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&state->m_vram_fg.target()[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
 		logerror("%s:xtheball_from_shiftreg(%08X)\n", space->machine().describe_context(), address);
 }
@@ -130,7 +132,7 @@ WRITE16_MEMBER(xtheball_state::bit_controls_w)
 			switch (offset)
 			{
 				case 7:
-					ticket_dispenser_w(machine().device("ticket"), 0, data << 7);
+					machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data << 7);
 					break;
 
 				case 8:
@@ -210,8 +212,8 @@ READ16_MEMBER(xtheball_state::analogy_watchdog_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xtheball_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE(m_vram_bg)
-	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE(m_vram_fg)
+	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("vrabg")
+	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_SHARE("vrafg")
 	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x03040000, 0x030401ff) AM_WRITE(bit_controls_w)
 	AM_RANGE(0x03040080, 0x0304008f) AM_READ_PORT("DSW")
@@ -240,7 +242,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( xtheball )
 	PORT_START("DSW")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0700, 0x0000, "Target Tickets")
 	PORT_DIPSETTING(      0x0000, "3" )
@@ -340,7 +342,7 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

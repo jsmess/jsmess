@@ -52,9 +52,10 @@ class hitpoker_state : public driver_device
 {
 public:
 	hitpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sys_regs(*this, "sys_regs"){ }
 
-	UINT8 *m_sys_regs;
+	required_shared_ptr<UINT8> m_sys_regs;
 	UINT8 m_pic_data;
 	UINT8 *m_videoram;
 	UINT8 *m_paletteram;
@@ -128,7 +129,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
 {
 //  UINT8 *ROM = machine().region("maincpu")->base();
 
-//  if(m_sys_regs[0x00] & 0x10)
+//  if(m_sys_regs.target()[0x00] & 0x10)
 	m_videoram[offset] = data;
 }
 
@@ -220,7 +221,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 		return (m_pic_data & 0x7f) | (m_pic_data & 0x40 ? 0x80 : 0x00);
 	}
 
-	return m_sys_regs[offset];
+	return m_sys_regs.target()[offset];
 }
 
 WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
@@ -228,7 +229,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
 	if(offset == 0)
 		m_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
 //  logerror("%02x W\n",data);
-	m_sys_regs[offset] = data;
+	m_sys_regs.target()[offset] = data;
 }
 
 #if 0
@@ -262,7 +263,7 @@ static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hitpoker_io, AS_IO, 8, hitpoker_state )
-	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_BASE(m_sys_regs)
+	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_SHARE("sys_regs")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hitpoker )

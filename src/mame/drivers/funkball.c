@@ -94,8 +94,8 @@ public:
 		  m_dma8237_2(*this, "dma8237_2"),
 		  m_pic8259_1(*this, "pic8259_1"),
 		  m_pic8259_2(*this, "pic8259_2"),
-		  m_voodoo(*this, "voodoo_0")
-		  { }
+		  m_voodoo(*this, "voodoo_0"),
+		  m_unk_ram(*this, "unk_ram"){ }
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
@@ -105,7 +105,6 @@ public:
 	UINT8 m_funkball_config_regs[256];
 	UINT32 m_cx5510_regs[256/4];
 	UINT16 m_flash_addr;
-	UINT32 *m_unk_ram;
 	UINT8 *m_bios_ram;
 	UINT8 m_flash_cmd;
 	UINT8 m_flash_data_cmd;
@@ -120,6 +119,8 @@ public:
 	required_device<pic8259_device> m_pic8259_1;
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<voodoo_device> m_voodoo;
+
+	required_shared_ptr<UINT32> m_unk_ram;
 
 	DECLARE_READ8_MEMBER( get_slave_ack );
 	DECLARE_WRITE8_MEMBER( flash_w );
@@ -142,6 +143,13 @@ public:
 
 		UINT32 init_enable;
 	} m_voodoo_pci_regs;
+	DECLARE_READ8_MEMBER(at_page8_r);
+	DECLARE_WRITE8_MEMBER(at_page8_w);
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_READ32_MEMBER(biu_ctrl_r);
+	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
+	DECLARE_WRITE8_MEMBER(bios_ram_w);
 };
 
 void funkball_state::video_start()
@@ -265,60 +273,48 @@ WRITE8_MEMBER( funkball_state::fdc_w )
 }
 
 
-static READ8_HANDLER(at_page8_r)
+READ8_MEMBER(funkball_state::at_page8_r)
 {
-	funkball_state *state = space->machine().driver_data<funkball_state>();
-	UINT8 data = state->m_at_pages[offset % 0x10];
+	UINT8 data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8) {
 	case 1:
-		data = state->m_dma_offset[(offset / 8) & 1][2];
+		data = m_dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = state->m_dma_offset[(offset / 8) & 1][3];
+		data = m_dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = state->m_dma_offset[(offset / 8) & 1][1];
+		data = m_dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = state->m_dma_offset[(offset / 8) & 1][0];
+		data = m_dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
 }
 
 
-static WRITE8_HANDLER(at_page8_w)
+WRITE8_MEMBER(funkball_state::at_page8_w)
 {
-	funkball_state *state = space->machine().driver_data<funkball_state>();
-	state->m_at_pages[offset % 0x10] = data;
+	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8) {
 	case 1:
-		state->m_dma_offset[(offset / 8) & 1][2] = data;
+		m_dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		state->m_dma_offset[(offset / 8) & 1][3] = data;
+		m_dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		state->m_dma_offset[(offset / 8) & 1][1] = data;
+		m_dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		state->m_dma_offset[(offset / 8) & 1][0] = data;
+		m_dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
 
-static READ32_HANDLER(at_page32_r)
-{
-	return read32le_with_read8_handler(at_page8_r, space, offset, mem_mask);
-}
-
-
-static WRITE32_HANDLER(at_page32_w)
-{
-	write32le_with_write8_handler(at_page8_w, space, offset, data, mem_mask);
-}
 
 static READ8_DEVICE_HANDLER(at_dma8237_2_r)
 {
@@ -352,23 +348,21 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 }
 
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(funkball_state::pc_dma_read_byte)
 {
-	funkball_state *state = space->machine().driver_data<funkball_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	return space->read_byte(page_offset + offset);
+	return space.read_byte(page_offset + offset);
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(funkball_state::pc_dma_write_byte)
 {
-	funkball_state *state = space->machine().driver_data<funkball_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	space->write_byte(page_offset + offset, data);
+	space.write_byte(page_offset + offset, data);
 }
 
 static void set_dma_channel(device_t *device, int channel, int state)
@@ -386,8 +380,8 @@ static I8237_INTERFACE( dma8237_1_config )
 {
 	DEVCB_LINE(pc_dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(funkball_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(funkball_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
@@ -516,23 +510,21 @@ WRITE8_MEMBER( funkball_state::flash_data_w )
 		printf("%08x %02x FLASH DATA W %08x\n",offset,data,m_flash_addr << 16);
 }
 
-static READ32_HANDLER( biu_ctrl_r )
+READ32_MEMBER(funkball_state::biu_ctrl_r)
 {
-	funkball_state *state = space->machine().driver_data<funkball_state>();
 
 	if (offset == 0)
 	{
 		return 0xffffff;
 	}
-	return state->m_biu_ctrl_reg[offset];
+	return m_biu_ctrl_reg[offset];
 }
 
-static WRITE32_HANDLER( biu_ctrl_w )
+WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 {
-	funkball_state *state = space->machine().driver_data<funkball_state>();
 
 	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
-	COMBINE_DATA(state->m_biu_ctrl_reg + offset);
+	COMBINE_DATA(m_biu_ctrl_reg + offset);
 
 	if (offset == 0x0c/4)		// BC_XMAP_3 register
 	{
@@ -542,20 +534,19 @@ static WRITE32_HANDLER( biu_ctrl_w )
 		for(i=0;i<8;i++)
 		{
 			if (data & 0x1 << i*4)		// enable RAM access to region 0xe0000 - 0xfffff
-				memory_set_bankptr(space->machine(), banknames[i], state->m_bios_ram + (0x4000 * i));
+				memory_set_bankptr(machine(), banknames[i], m_bios_ram + (0x4000 * i));
 			else					// disable RAM access (reads go to BIOS ROM)
-				memory_set_bankptr(space->machine(), banknames[i], space->machine().region("bios")->base() + (0x4000 * i));
+				memory_set_bankptr(machine(), banknames[i], machine().region("bios")->base() + (0x4000 * i));
 		}
 	}
 }
 
-static WRITE8_HANDLER( bios_ram_w )
+WRITE8_MEMBER(funkball_state::bios_ram_w)
 {
-	funkball_state *state = space->machine().driver_data<funkball_state>();
 
-	if(state->m_biu_ctrl_reg[0x0c/4] & (2 << ((offset & 0x4000)>>14)*4)) // memory is write-able
+	if(m_biu_ctrl_reg[0x0c/4] & (2 << ((offset & 0x4000)>>14)*4)) // memory is write-able
 	{
-		state->m_bios_ram[offset] = data;
+		m_bios_ram[offset] = data;
 	}
 }
 
@@ -581,11 +572,11 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 	AM_RANGE(0x000f4000, 0x000f7fff) AM_ROMBANK("bios_bank2")
 	AM_RANGE(0x000f8000, 0x000fbfff) AM_ROMBANK("bios_bank3")
 	AM_RANGE(0x000fc000, 0x000fffff) AM_ROMBANK("bios_bank4")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE8_LEGACY(bios_ram_w,0xffffffff)
+	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE8(bios_ram_w,0xffffffff)
 	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM
 //  AM_RANGE(0x08000000, 0x0fffffff) AM_NOP
-	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE_LEGACY(biu_ctrl_r, biu_ctrl_w)
-	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_BASE(m_unk_ram)
+	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE(biu_ctrl_r, biu_ctrl_w)
+	AM_RANGE(0x40010e00, 0x40010eff) AM_RAM AM_SHARE("unk_ram")
 	AM_RANGE(0xff000000, 0xffffdfff) AM_DEVREADWRITE_LEGACY("voodoo_0", voodoo_r, voodoo_w)
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
@@ -596,7 +587,7 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE_LEGACY(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE_LEGACY(at_page32_r,				at_page32_w)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
@@ -1120,8 +1111,8 @@ static MACHINE_START( funkball )
 	kbdc8042_init(machine, &at8042);
 
 	/* defaults, otherwise it won't boot */
-	state->m_unk_ram[0x010/4] = 0x2f8d85ff;
-	state->m_unk_ram[0x018/4] = 0x000018c5;
+	state->m_unk_ram.target()[0x010/4] = 0x2f8d85ff;
+	state->m_unk_ram.target()[0x018/4] = 0x000018c5;
 }
 
 static MACHINE_RESET( funkball )

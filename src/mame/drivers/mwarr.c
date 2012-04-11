@@ -50,20 +50,30 @@ class mwarr_state : public driver_device
 {
 public:
 	mwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_videoram(*this, "bg_videoram"),
+		m_mlow_videoram(*this, "mlow_videoram"),
+		m_mhigh_videoram(*this, "mhigh_videoram"),
+		m_tx_videoram(*this, "tx_videoram"),
+		m_bg_scrollram(*this, "bg_scrollram"),
+		m_mlow_scrollram(*this, "mlow_scrollram"),
+		m_mhigh_scrollram(*this, "mhigh_scrollram"),
+		m_vidattrram(*this, "vidattrram"),
+		m_spriteram(*this, "spriteram"),
+		m_mwarr_ram(*this, "mwarr_ram"){ }
 
 	/* memory pointers */
-	UINT16 *m_bg_videoram;
-	UINT16 *m_mlow_videoram;
-	UINT16 *m_mhigh_videoram;
-	UINT16 *m_tx_videoram;
-	UINT16 *m_bg_scrollram;
-	UINT16 *m_mlow_scrollram;
-	UINT16 *m_mhigh_scrollram;
-	UINT16 *m_vidattrram;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_mlow_videoram;
+	required_shared_ptr<UINT16> m_mhigh_videoram;
+	required_shared_ptr<UINT16> m_tx_videoram;
+	required_shared_ptr<UINT16> m_bg_scrollram;
+	required_shared_ptr<UINT16> m_mlow_scrollram;
+	required_shared_ptr<UINT16> m_mhigh_scrollram;
+	required_shared_ptr<UINT16> m_vidattrram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *m_paletteram;    // currently this uses generic palette handling
-	UINT16 *m_mwarr_ram;
+	required_shared_ptr<UINT16> m_mwarr_ram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -93,28 +103,28 @@ public:
 WRITE16_MEMBER(mwarr_state::bg_videoram_w)
 {
 
-	COMBINE_DATA(&m_bg_videoram[offset]);
+	COMBINE_DATA(&m_bg_videoram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::mlow_videoram_w)
 {
 
-	COMBINE_DATA(&m_mlow_videoram[offset]);
+	COMBINE_DATA(&m_mlow_videoram.target()[offset]);
 	m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::mhigh_videoram_w)
 {
 
-	COMBINE_DATA(&m_mhigh_videoram[offset]);
+	COMBINE_DATA(&m_mhigh_videoram.target()[offset]);
 	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 {
 
-	COMBINE_DATA(&m_tx_videoram[offset]);
+	COMBINE_DATA(&m_tx_videoram.target()[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
@@ -147,7 +157,7 @@ WRITE16_MEMBER(mwarr_state::sprites_commands_w)
 			/* refresh sprites on screen */
 			for (i = 0; i < 0x800; i++)
 			{
-				m_sprites_buffer[i] = m_spriteram[i];
+				m_sprites_buffer[i] = m_spriteram.target()[i];
 			}
 			break;
 
@@ -165,7 +175,7 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 	int i;
 	double brightness;
 
-	COMBINE_DATA(&m_mwarr_ram[0x14 / 2]);
+	COMBINE_DATA(&m_mwarr_ram.target()[0x14 / 2]);
 
 	brightness = (double)(data & 0xff);
 	for (i = 0; i < 0x800; i++)
@@ -183,23 +193,23 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 
 static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_BASE(m_mlow_videoram)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_BASE(m_mhigh_videoram)
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_BASE(m_tx_videoram)
-	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_BASE(m_bg_scrollram)
-	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_BASE(m_mlow_scrollram)
-	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_BASE(m_mhigh_scrollram)
-	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_BASE(m_vidattrram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_SHARE("mlow_videoram")
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_SHARE("mhigh_videoram")
+	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("tx_videoram")
+	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_SHARE("bg_scrollram")
+	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
+	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
+	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x110004, 0x110005) AM_READ_PORT("DSW")
 	AM_RANGE(0x110010, 0x110011) AM_DEVWRITE_LEGACY("oki2", oki1_bank_w)
 	AM_RANGE(0x110014, 0x110015) AM_WRITE(mwarr_brightness_w)
 	AM_RANGE(0x110016, 0x110017) AM_WRITE(sprites_commands_w)
-	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_BASE(m_mwarr_ram)
+	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("mwarr_ram")
 	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
@@ -342,8 +352,8 @@ GFXDECODE_END
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_bg_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_bg_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = state->m_bg_videoram.target()[tile_index] & 0x1fff;
+	int colour = (state->m_bg_videoram.target()[tile_index] & 0xe000) >> 13;
 
 	SET_TILE_INFO(4, tileno, colour, 0);
 }
@@ -351,8 +361,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_mlow_tile_info )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_mlow_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_mlow_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = state->m_mlow_videoram.target()[tile_index] & 0x1fff;
+	int colour = (state->m_mlow_videoram.target()[tile_index] & 0xe000) >> 13;
 
 	SET_TILE_INFO(3, tileno, colour, 0);
 }
@@ -360,8 +370,8 @@ static TILE_GET_INFO( get_mlow_tile_info )
 static TILE_GET_INFO( get_mhigh_tile_info )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_mhigh_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_mhigh_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = state->m_mhigh_videoram.target()[tile_index] & 0x1fff;
+	int colour = (state->m_mhigh_videoram.target()[tile_index] & 0xe000) >> 13;
 
 	SET_TILE_INFO(2, tileno, colour, 0);
 }
@@ -369,8 +379,8 @@ static TILE_GET_INFO( get_mhigh_tile_info )
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	mwarr_state *state = machine.driver_data<mwarr_state>();
-	int tileno = state->m_tx_videoram[tile_index] & 0x1fff;
-	int colour = (state->m_tx_videoram[tile_index] & 0xe000) >> 13;
+	int tileno = state->m_tx_videoram.target()[tile_index] & 0x1fff;
+	int colour = (state->m_tx_videoram.target()[tile_index] & 0xe000) >> 13;
 
 	SET_TILE_INFO(1, tileno, colour, 0);
 }
@@ -473,45 +483,45 @@ static SCREEN_UPDATE_IND16( mwarr )
 
 	screen.machine().priority_bitmap.fill(0, cliprect);
 
-	if (BIT(state->m_vidattrram[6], 0))
+	if (BIT(state->m_vidattrram.target()[6], 0))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[i] + 20);
+			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram.target()[i] + 20);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram[0] + 19);
+			state->m_bg_tilemap->set_scrollx(i, state->m_bg_scrollram.target()[0] + 19);
 	}
 
-	if (BIT(state->m_vidattrram[6], 2))
+	if (BIT(state->m_vidattrram.target()[6], 2))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[i] + 19);
+			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram.target()[i] + 19);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram[0] + 19);
+			state->m_mlow_tilemap->set_scrollx(i, state->m_mlow_scrollram.target()[0] + 19);
 	}
 
-	if (BIT(state->m_vidattrram[6], 4))
+	if (BIT(state->m_vidattrram.target()[6], 4))
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[i] + 19);
+			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram.target()[i] + 19);
 	}
 	else
 	{
 		for (i = 0; i < 256; i++)
-			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram[0] + 19);
+			state->m_mhigh_tilemap->set_scrollx(i, state->m_mhigh_scrollram.target()[0] + 19);
 	}
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_vidattrram[1] + 1);
-	state->m_mlow_tilemap->set_scrolly(0, state->m_vidattrram[2] + 1);
-	state->m_mhigh_tilemap->set_scrolly(0, state->m_vidattrram[3] + 1);
+	state->m_bg_tilemap->set_scrolly(0, state->m_vidattrram.target()[1] + 1);
+	state->m_mlow_tilemap->set_scrolly(0, state->m_vidattrram.target()[2] + 1);
+	state->m_mhigh_tilemap->set_scrolly(0, state->m_vidattrram.target()[3] + 1);
 
-	state->m_tx_tilemap->set_scrollx(0, state->m_vidattrram[0] + 16);
-	state->m_tx_tilemap->set_scrolly(0, state->m_vidattrram[4] + 1);
+	state->m_tx_tilemap->set_scrollx(0, state->m_vidattrram.target()[0] + 16);
+	state->m_tx_tilemap->set_scrolly(0, state->m_vidattrram.target()[4] + 1);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0x01);
 	state->m_mlow_tilemap->draw(bitmap, cliprect, 0, 0x02);

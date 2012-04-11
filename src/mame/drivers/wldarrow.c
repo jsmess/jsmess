@@ -36,12 +36,14 @@ class wldarrow_state : public driver_device
 {
 public:
 	wldarrow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram_0(*this, "videoram_0"),
+		m_videoram_1(*this, "videora1"),
+		m_videoram_2(*this, "videora2"){ }
 
-	UINT8 *m_videoram_0;
-	UINT8 *m_videoram_1;
-	UINT8 *m_videoram_2;
-	size_t m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram_0;
+	required_shared_ptr<UINT8> m_videoram_1;
+	required_shared_ptr<UINT8> m_videoram_2;
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
 	DECLARE_WRITE8_MEMBER(counter_w);
@@ -76,16 +78,16 @@ static SCREEN_UPDATE_RGB32( wldarrow )
 
 	get_pens(pens);
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_0.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data0 = state->m_videoram_0[offs];
-		UINT8 data1 = state->m_videoram_1[offs];
-		UINT8 data2 = state->m_videoram_2[offs];
+		UINT8 data0 = state->m_videoram_0.target()[offs];
+		UINT8 data1 = state->m_videoram_1.target()[offs];
+		UINT8 data2 = state->m_videoram_2.target()[offs];
 
 		/* weird equations, but it matches every flyer screenshot -
            perhaphs they used a look-up PROM? */
@@ -184,9 +186,9 @@ static WRITE8_DEVICE_HANDLER( wldarrow_dac_4_w )
 static ADDRESS_MAP_START( wldarrow_map, AS_PROGRAM, 8, wldarrow_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_videoram_0) AM_SIZE(m_videoram_size)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_videoram_1)
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_videoram_2)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videora0")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("videora1")
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videora2")
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BITSW") AM_DEVWRITE_LEGACY("dac", wldarrow_dac_1_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)

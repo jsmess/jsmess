@@ -487,7 +487,7 @@ static WRITE16_HANDLER( audio_command_w )
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
 	{
-		state->soundlatch_w(*space, 0, data >> 8);
+		state->soundlatch_byte_w(*space, 0, data >> 8);
 
 		audio_cpu_assert_nmi(space->machine());
 
@@ -502,7 +502,7 @@ static WRITE16_HANDLER( audio_command_w )
 static READ8_HANDLER( audio_command_r )
 {
 	ng_aes_state *state = space->machine().driver_data<ng_aes_state>();
-	UINT8 ret = state->soundlatch_r(*space, 0);
+	UINT8 ret = state->soundlatch_byte_r(*space, 0);
 
 	if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(&space->device()), ret);
 

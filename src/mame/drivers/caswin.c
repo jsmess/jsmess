@@ -51,10 +51,12 @@ class caswin_state : public driver_device
 {
 public:
 	caswin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sc0_vram(*this, "sc0_vram"),
+		m_sc0_attr(*this, "sc0_attr"){ }
 
-	UINT8 *m_sc0_vram;
-	UINT8 *m_sc0_attr;
+	required_shared_ptr<UINT8> m_sc0_vram;
+	required_shared_ptr<UINT8> m_sc0_attr;
 	tilemap_t *m_sc0_tilemap;
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
 	DECLARE_WRITE8_MEMBER(sc0_attr_w);
@@ -70,8 +72,8 @@ public:
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	caswin_state *state = machine.driver_data<caswin_state>();
-	int tile = (state->m_sc0_vram[tile_index] | ((state->m_sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
-	int colour = state->m_sc0_attr[tile_index] & 0xf;
+	int tile = (state->m_sc0_vram.target()[tile_index] | ((state->m_sc0_attr.target()[tile_index] & 0x70)<<4)) & 0x7ff;
+	int colour = state->m_sc0_attr.target()[tile_index] & 0xf;
 
 	SET_TILE_INFO(
 			0,
@@ -95,13 +97,13 @@ static SCREEN_UPDATE_IND16(vvillage)
 
 WRITE8_MEMBER(caswin_state::sc0_vram_w)
 {
-	m_sc0_vram[offset] = data;
+	m_sc0_vram.target()[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(caswin_state::sc0_attr_w)
 {
-	m_sc0_attr[offset] = data;
+	m_sc0_attr.target()[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
@@ -115,7 +117,7 @@ WRITE8_MEMBER(caswin_state::vvillage_scroll_w)
 /*---- ---x flip screen */
 WRITE8_MEMBER(caswin_state::vvillage_vregs_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 /**********************
@@ -158,8 +160,8 @@ static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8, caswin_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r) //accessed by caswin only
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(m_sc0_vram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_BASE(m_sc0_attr)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("sc0_attr")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vvillage_io, AS_IO, 8, caswin_state )

@@ -53,21 +53,28 @@ class jackie_state : public driver_device
 public:
 	jackie_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_bg_scroll2(*this, "bg_scroll2"),
+		m_bg_scroll(*this, "bg_scroll"),
+		m_reel1_ram(*this, "reel1_ram"),
+		m_reel2_ram(*this, "reel2_ram"),
+		m_reel3_ram(*this, "reel3_ram"),
+		m_fg_tile_ram(*this, "fg_tile_ram"),
+		m_fg_color_ram(*this, "fg_color_ram"){ }
 
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_bg_scroll2;
+	required_shared_ptr<UINT8> m_bg_scroll;
+	required_shared_ptr<UINT8> m_reel1_ram;
+	required_shared_ptr<UINT8> m_reel2_ram;
+	required_shared_ptr<UINT8> m_reel3_ram;
+	required_shared_ptr<UINT8> m_fg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_color_ram;
 	int m_exp_bank;
-	UINT8 *m_fg_tile_ram;
-	UINT8 *m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
-	UINT8 *m_bg_scroll;
-	UINT8 *m_bg_scroll2;
 	tilemap_t *m_reel1_tilemap;
-	UINT8 *m_reel1_ram;
 	tilemap_t *m_reel2_tilemap;
-	UINT8 *m_reel2_ram;
 	tilemap_t *m_reel3_tilemap;
-	UINT8 *m_reel3_ram;
 	int m_irq_enable;
 	int m_nmi_enable;
 	int m_bg_enable;
@@ -75,7 +82,6 @@ public:
 	UINT8 m_out[3];
 	UINT16 m_unk_reg[3][5];
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
 	DECLARE_WRITE8_MEMBER(bg_scroll_w);
@@ -105,20 +111,20 @@ public:
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
+	int code = state->m_fg_tile_ram.target()[tile_index] | (state->m_fg_color_ram.target()[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 WRITE8_MEMBER(jackie_state::fg_tile_w)
 {
-	m_fg_tile_ram[offset] = data;
+	m_fg_tile_ram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(jackie_state::fg_color_w)
 {
-	m_fg_color_ram[offset] = data;
+	m_fg_color_ram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -127,20 +133,20 @@ WRITE8_MEMBER(jackie_state::fg_color_w)
 
 WRITE8_MEMBER(jackie_state::bg_scroll_w)
 {
-	m_bg_scroll[offset] = data;
+	m_bg_scroll.target()[offset] = data;
 }
 
 
 WRITE8_MEMBER(jackie_state::jackie_reel1_ram_w)
 {
-	m_reel1_ram[offset] = data;
+	m_reel1_ram.target()[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel1_tile_info )
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel1_ram[tile_index];
+	int code = state->m_reel1_ram.target()[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
@@ -148,28 +154,28 @@ static TILE_GET_INFO( get_jackie_reel1_tile_info )
 
 WRITE8_MEMBER(jackie_state::jackie_reel2_ram_w)
 {
-	m_reel2_ram[offset] = data;
+	m_reel2_ram.target()[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel2_tile_info )
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel2_ram[tile_index];
+	int code = state->m_reel2_ram.target()[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
 
 WRITE8_MEMBER(jackie_state::jackie_reel3_ram_w)
 {
-	m_reel3_ram[offset] = data;
+	m_reel3_ram.target()[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_jackie_reel3_tile_info )
 {
 	jackie_state *state = machine.driver_data<jackie_state>();
-	int code = state->m_reel3_ram[tile_index];
+	int code = state->m_reel3_ram.target()[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
@@ -200,15 +206,15 @@ static SCREEN_UPDATE_IND16(jackie)
 
 	for (i=0;i < 0x40;i++)
 	{
-		state->m_reel1_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x000]);
-		state->m_reel2_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x040]);
-		state->m_reel3_tilemap->set_scrolly(i, state->m_bg_scroll[i+0x080]);
+		state->m_reel1_tilemap->set_scrolly(i, state->m_bg_scroll.target()[i+0x000]);
+		state->m_reel2_tilemap->set_scrolly(i, state->m_bg_scroll.target()[i+0x040]);
+		state->m_reel3_tilemap->set_scrolly(i, state->m_bg_scroll.target()[i+0x080]);
 	}
 
 	for (j=0; j < 0x100-1; j++)
 	{
 		rectangle clip;
-		int rowenable = state->m_bg_scroll2[j];
+		int rowenable = state->m_bg_scroll2.target()[j];
 
 		/* draw top of screen */
 		clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+1);
@@ -361,8 +367,8 @@ static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
 	AM_RANGE(0x05a0, 0x05a4) AM_WRITE(jackie_unk_reg3_lo_w)
 	AM_RANGE(0x0da0, 0x0da4) AM_WRITE(jackie_unk_reg3_hi_w)
 	AM_RANGE(0x1000, 0x1107) AM_RAM AM_BASE(m_bg_scroll2 )
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_SHARE("paletteram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_SHARE("paletteram2")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */

@@ -24,16 +24,18 @@ class atarisy4_state : public driver_device
 {
 public:
 	atarisy4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_m68k_ram(*this, "m68k_ram"),
+		m_screen_ram(*this, "screen_ram"){ }
 
 	UINT8 m_r_color_table[256];
 	UINT8 m_g_color_table[256];
 	UINT8 m_b_color_table[256];
 	UINT16 m_dsp_bank[2];
 	UINT8 m_csr[2];
-	UINT16 *m_m68k_ram;
+	required_shared_ptr<UINT16> m_m68k_ram;
 	UINT16 *m_shared_ram[2];
-	UINT16 *m_screen_ram;
+	required_shared_ptr<UINT16> m_screen_ram;
 	poly_manager *m_poly;
 	DECLARE_WRITE16_MEMBER(gpu_w);
 	DECLARE_READ16_MEMBER(gpu_r);
@@ -168,7 +170,7 @@ static SCREEN_UPDATE_RGB32( atarisy4 )
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 *src = &state->m_screen_ram[(offset + (4096 * y)) / 2];
+		UINT16 *src = &state->m_screen_ram.target()[(offset + (4096 * y)) / 2];
 		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
 		int x;
 
@@ -223,14 +225,14 @@ static void image_mem_to_screen(atarisy4_state *state, bool clip)
 			{
 				if (x >= 0 && x <= 511)
 				{
-					UINT16 pix = state->m_screen_ram[xy_to_screen_addr(x,y) >> 1];
+					UINT16 pix = state->m_screen_ram.target()[xy_to_screen_addr(x,y) >> 1];
 
 					if (x & 1)
 						pix = (pix & (0x00ff)) | gpu.idr << 8;
 					else
 						pix = (pix & (0xff00)) | gpu.idr;
 
-					state->m_screen_ram[xy_to_screen_addr(x,y) >> 1] = pix;
+					state->m_screen_ram.target()[xy_to_screen_addr(x,y) >> 1] = pix;
 				}
 				++x;
 			}
@@ -269,7 +271,7 @@ static void draw_polygon(atarisy4_state *state, UINT16 color)
 	clip.set(0, 511, 0, 511);
 
 	extra->color = color;
-	extra->screen_ram = state->m_screen_ram;
+	extra->screen_ram = state->m_screen_ram.target();
 
 	v1.x = gpu.points[0].x;
 	v1.y = gpu.points[0].y;
@@ -371,7 +373,7 @@ void execute_gpu_command(running_machine &machine)
 
 			for (i = 0; i < gpu.gr[3]; ++i)
 			{
-				UINT16 val = state->m_screen_ram[offset >> 1];
+				UINT16 val = state->m_screen_ram.target()[offset >> 1];
 				val >>= (~offset & 1) << 3;
 
 				if (gpu.gr[4] & 0x10)
@@ -627,7 +629,7 @@ WRITE16_MEMBER(atarisy4_state::dsp1_bank_w)
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy4_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(m_m68k_ram)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("m68k_ram")
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("JOYSTICK")
 	AM_RANGE(0x588000, 0x588001) AM_READ(analog_r)
@@ -636,7 +638,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy4_state )
 	AM_RANGE(0x7c6000, 0x7c6001) AM_READWRITE(dsp1_status_r, dsp1_control_w)
 	AM_RANGE(0x7f0000, 0x7f4fff) AM_READWRITE(m68k_shared_0_r, m68k_shared_0_w)
 	AM_RANGE(0x7f6000, 0x7f6001) AM_READWRITE(dsp0_status_r, dsp0_control_w)
-	AM_RANGE(0xa00400, 0xbfffff) AM_RAM AM_BASE(m_screen_ram)
+	AM_RANGE(0xa00400, 0xbfffff) AM_RAM AM_SHARE("screen_ram")
 	AM_RANGE(0xff8000, 0xff8fff) AM_READWRITE(gpu_r, gpu_w)
 ADDRESS_MAP_END
 

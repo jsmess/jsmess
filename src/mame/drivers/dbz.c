@@ -97,7 +97,7 @@ WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 
 WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
 {
-	soundlatch_w(space, 0, data >> 8);
+	soundlatch_byte_w(space, 0, data >> 8);
 }
 
 WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_8000_r)	// code near a60 in dbz2, subroutine at 730 in dbz
 	AM_RANGE(0x4a0000, 0x4a0fff) AM_DEVREADWRITE_LEGACY("k053246", k053247_word_r, k053247_word_w)
 	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
-	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") // palette
+	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") // palette
 	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
 	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
 	AM_RANGE(0x4c4000, 0x4c4007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( dbz_sound_map, AS_PROGRAM, 8, dbz_state )
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_io_map, AS_IO, 8, dbz_state )

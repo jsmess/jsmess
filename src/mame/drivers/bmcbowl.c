@@ -111,13 +111,15 @@ class bmcbowl_state : public driver_device
 {
 public:
 	bmcbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_stats_ram(*this, "stats_ram"),
+		m_vid1(*this, "vid1"),
+		m_vid2(*this, "vid2"){ }
 
-	UINT16 *m_vid1;
-	UINT16 *m_vid2;
+	required_shared_ptr<UINT8> m_stats_ram;
+	required_shared_ptr<UINT16> m_vid1;
+	required_shared_ptr<UINT16> m_vid2;
 	UINT8 *m_bmc_colorram;
-	UINT8 *m_stats_ram;
-	size_t m_stats_ram_size;
 	int m_clr_offset;
 	int m_bmc_input;
 	DECLARE_READ16_MEMBER(bmc_random_read);
@@ -152,28 +154,28 @@ static SCREEN_UPDATE_IND16( bmcbowl )
 	{
 		for (x=0;x<280;x+=2)
 		{
-			pixdat = state->m_vid2[0x8000+z];
+			pixdat = state->m_vid2.target()[0x8000+z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid2[z];
+			pixdat = state->m_vid2.target()[z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid1[0x8000+z];
+			pixdat = state->m_vid1.target()[0x8000+z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
 				bitmap.pix16(y, x) = (pixdat>>8);
 
-			pixdat = state->m_vid1[z];
+			pixdat = state->m_vid1.target()[z];
 
 			if(pixdat&0xff)
 				bitmap.pix16(y, x+1) = (pixdat&0xff);
@@ -295,7 +297,7 @@ static void init_stats(bmcbowl_state *state, const UINT8 *table, int table_len, 
 {
 	int i;
 	for (i=0; i<table_len; i++)
-		state->m_stats_ram[address+2*i]=table[i];
+		state->m_stats_ram.target()[address+2*i]=table[i];
 }
 #endif
 
@@ -305,23 +307,23 @@ static NVRAM_HANDLER( bmcbowl )
 	int i;
 
 	if (read_or_write)
-		file->write(state->m_stats_ram, state->m_stats_ram_size);
+		file->write(state->m_stats_ram, state->m_stats_ram.bytes());
 	else
 
 #ifdef NVRAM_HACK
-	for (i = 0; i < state->m_stats_ram_size; i++)
-		state->m_stats_ram[i] = 0xff;
+	for (i = 0; i < state->m_stats_ram.bytes(); i++)
+		state->m_stats_ram.target()[i] = 0xff;
 
 	init_stats(state,bmc_nv1,ARRAY_LENGTH(bmc_nv1),0);
 	init_stats(state,bmc_nv2,ARRAY_LENGTH(bmc_nv2),0x3b0);
 	init_stats(state,bmc_nv3,ARRAY_LENGTH(bmc_nv3),0xfe2);
 #else
 	if (file)
-		file->read(state->m_stats_ram, state->m_stats_ram_size);
+		file->read(state->m_stats_ram, state->m_stats_ram.bytes());
 	else
 
-		for (i = 0; i < state->m_stats_ram_size; i++)
-			state->m_stats_ram[i] = 0xff;
+		for (i = 0; i < state->m_stats_ram.bytes(); i++)
+			state->m_stats_ram.target()[i] = 0xff;
 #endif
 
 }
@@ -343,12 +345,12 @@ static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_address_w, 0xff00)
 	AM_RANGE(0x092802, 0x092803) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0xff00)
 	AM_RANGE(0x093802, 0x093803) AM_READ_PORT("IN0")
-	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_BASE(m_stats_ram) AM_SIZE(m_stats_ram_size) /* 8 bit */
+	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_SHARE("stats_ram") /* 8 bit */
 	AM_RANGE(0x097000, 0x097001) AM_READNOP
 	AM_RANGE(0x140000, 0x1bffff) AM_ROM
-	AM_RANGE(0x1c0000, 0x1effff) AM_RAM AM_BASE(m_vid1)
+	AM_RANGE(0x1c0000, 0x1effff) AM_RAM AM_SHARE("vid1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(m_vid2)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("vid2")
 
 	AM_RANGE(0x28c000, 0x28c001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 

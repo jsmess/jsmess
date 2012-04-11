@@ -42,10 +42,11 @@ class dynadice_state : public driver_device
 {
 public:
 	dynadice_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 //  UINT8 *  m_nvram;     // currently this uses generic nvram handling
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
@@ -62,7 +63,7 @@ public:
 
 WRITE8_MEMBER(dynadice_state::dynadice_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_top_tilemap->mark_all_dirty();
 }
@@ -94,7 +95,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 static ADDRESS_MAP_START( dynadice_map, AS_PROGRAM, 8, dynadice_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -103,7 +104,7 @@ static ADDRESS_MAP_START( dynadice_io_map, AS_IO, 8, dynadice_state )
 	AM_RANGE(0x51, 0x51) AM_READ_PORT("IN1")
 	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSW")
 	AM_RANGE(0x62, 0x62) AM_WRITENOP
-	AM_RANGE(0x63, 0x63) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x63, 0x63) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x70, 0x77) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -114,8 +115,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynadice_sound_io_map, AS_IO, 8, dynadice_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(soundlatch_clear_w)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x01, 0x01) AM_WRITE(soundlatch_clear_byte_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_data_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("aysnd", sound_control_w)
 ADDRESS_MAP_END
@@ -192,7 +193,7 @@ GFXDECODE_END
 static TILE_GET_INFO( get_tile_info )
 {
 	dynadice_state *state = machine.driver_data<dynadice_state>();
-	int code = state->m_videoram[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 

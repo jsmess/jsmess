@@ -79,13 +79,18 @@ class cyclemb_state : public driver_device
 {
 public:
 	cyclemb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram"),
+		m_obj1_ram(*this, "obj1_ram"),
+		m_obj2_ram(*this, "obj2_ram"),
+		m_obj3_ram(*this, "obj3_ram"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_cram;
-	UINT8 *m_obj1_ram;
-	UINT8 *m_obj2_ram;
-	UINT8 *m_obj3_ram;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_cram;
+	required_shared_ptr<UINT8> m_obj1_ram;
+	required_shared_ptr<UINT8> m_obj2_ram;
+	required_shared_ptr<UINT8> m_obj3_ram;
 	DECLARE_WRITE8_MEMBER(cyclemb_bankswitch_w);
 	DECLARE_READ8_MEMBER(mcu_status_r);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
@@ -130,7 +135,7 @@ static SCREEN_UPDATE_IND16( cyclemb )
 	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
 	int x,y,count;
 	const gfx_element *gfx = screen.machine().gfx[0];
-	UINT8 flip_screen = flip_screen_get(screen.machine());
+	UINT8 flip_screen = state->flip_screen();
 
 	count = 0;
 
@@ -138,12 +143,12 @@ static SCREEN_UPDATE_IND16( cyclemb )
 	{
 		for (x=0;x<64;x++)
 		{
-			int attr = state->m_cram[count];
-			int tile = (state->m_vram[count]) | ((attr & 3)<<8);
+			int attr = state->m_cram.target()[count];
+			int tile = (state->m_vram.target()[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
 //          int sx_offs = flip_screen ? 512 : 0
-			int scrollx = ((state->m_vram[(y/2)+odd_line]) + (state->m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
+			int scrollx = ((state->m_vram.target()[(y/2)+odd_line]) + (state->m_cram.target()[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
 			if(flip_screen)
 			{
@@ -188,24 +193,24 @@ static SCREEN_UPDATE_IND16( cyclemb )
 
 		for(i=0;i<0x40;i+=2)
 		{
-			y = 0xf1 - state->m_obj2_ram[i];
-			x = state->m_obj2_ram[i+1] - 56;
-			spr_offs = (state->m_obj1_ram[i+0]);
-			col = (state->m_obj1_ram[i+1] & 0x3f);
-			region = ((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
+			y = 0xf1 - state->m_obj2_ram.target()[i];
+			x = state->m_obj2_ram.target()[i+1] - 56;
+			spr_offs = (state->m_obj1_ram.target()[i+0]);
+			col = (state->m_obj1_ram.target()[i+1] & 0x3f);
+			region = ((state->m_obj3_ram.target()[i] & 0x10) >> 4) + 1;
 			if(region == 2)
 			{
 				spr_offs >>= 2;
-				spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
+				spr_offs += ((state->m_obj3_ram.target()[i+0] & 3) << 5);
 				y-=16;
 			}
 
-			if(state->m_obj3_ram[i+1] & 1)
+			if(state->m_obj3_ram.target()[i+1] & 1)
 				x+=256;
-			//if(state->m_obj3_ram[i+1] & 2)
+			//if(state->m_obj3_ram.target()[i+1] & 2)
 //              x-=256;
-			fx = (state->m_obj3_ram[i+0] & 4) >> 2;
-			fy = (state->m_obj3_ram[i+0] & 8) >> 3;
+			fx = (state->m_obj3_ram.target()[i+0] & 4) >> 2;
+			fy = (state->m_obj3_ram.target()[i+0] & 8) >> 3;
 
 			if(flip_screen)
 			{
@@ -227,7 +232,7 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
 #if 0
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 #endif
@@ -241,14 +246,14 @@ READ8_MEMBER(cyclemb_state::mcu_status_r)
 
 WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 #endif
 
 WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 {
-	flip_screen_set(machine(), data & 1);
+	flip_screen_set(data & 1);
 
 	// a bunch of other things are setted here
 }
@@ -256,11 +261,11 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8, cyclemb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_cram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(m_obj1_ram) //ORAM1 (only a000-a3ff tested)
-	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE(m_obj2_ram) //ORAM2 (only a800-abff tested)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE(m_obj3_ram) //ORAM3 (only b000-b3ff tested)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("cram")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("obj1_ram") //ORAM1 (only a000-a3ff tested)
+	AM_RANGE(0xa800, 0xafff) AM_RAM AM_SHARE("obj2_ram") //ORAM2 (only a800-abff tested)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("obj3_ram") //ORAM3 (only b000-b3ff tested)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
 ADDRESS_MAP_END
 
@@ -280,7 +285,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r) AM_WRITE(soundlatch2_byte_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( cyclemb )

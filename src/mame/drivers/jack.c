@@ -65,7 +65,7 @@ static READ8_DEVICE_HANDLER( timer_r )
 
 WRITE8_MEMBER(jack_state::jack_sh_command_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
@@ -74,7 +74,7 @@ WRITE8_MEMBER(jack_state::jack_sh_command_w)
 
 WRITE8_MEMBER(jack_state::joinem_misc_w)
 {
-	flip_screen_set(machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 	m_joinem_snd_bit = data & 1;
 }
 
@@ -776,7 +776,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_DEVICE_HANDLER("audiocpu", timer_r)
 };
 

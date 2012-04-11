@@ -81,8 +81,8 @@ class sliver_state : public driver_device
 public:
 	sliver_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-		{ }
+		m_maincpu(*this, "maincpu"),
+		m_colorram(*this, "colorram"){ }
 
 	UINT16 m_io_offset;
 	UINT16 m_io_reg[IO_SIZE];
@@ -96,13 +96,13 @@ public:
 	int m_tmp_counter;
 	int m_clr_offset;
 
-	UINT8 *m_colorram;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_colorram;
 	bitmap_rgb32 m_bitmap_fg;
 	bitmap_rgb32 m_bitmap_bg;
 
 	UINT16 m_tempbuf[8];
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE16_MEMBER(fifo_data_w);
 	DECLARE_WRITE16_MEMBER(fifo_clear_w);
 	DECLARE_WRITE16_MEMBER(fifo_flush_w);
@@ -132,9 +132,9 @@ static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	b=(state->m_colorram[addr] << 2) | (state->m_colorram[addr] & 0x3);
-	g=(state->m_colorram[addr+0x100] << 2) | (state->m_colorram[addr+0x100] & 3);
-	r=(state->m_colorram[addr+0x200] << 2) | (state->m_colorram[addr+0x200] & 3);
+	b=(state->m_colorram.target()[addr] << 2) | (state->m_colorram.target()[addr] & 0x3);
+	g=(state->m_colorram.target()[addr+0x100] << 2) | (state->m_colorram.target()[addr+0x100] & 3);
+	r=(state->m_colorram.target()[addr+0x200] << 2) | (state->m_colorram.target()[addr+0x200] & 3);
 
 	state->m_bitmap_fg.pix32(y, x) = r | (g<<8) | (b<<16);
 }
@@ -313,7 +313,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 
 WRITE16_MEMBER(sliver_state::sound_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
+	soundlatch_byte_w(space, 0, data & 0xff);
 	cputag_set_input_line(machine(), "audiocpu", MCS51_INT0_LINE, HOLD_LINE);
 }
 
@@ -360,7 +360,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
 	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_r)
+	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_byte_r)
 	/* ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(oki_setbank )
 ADDRESS_MAP_END
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( sliver )
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sliver_state )
-	AM_RANGE(0x000, 0x3ff) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )

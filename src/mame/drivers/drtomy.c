@@ -15,12 +15,15 @@ class drtomy_state : public driver_device
 {
 public:
 	drtomy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram_fg(*this, "videorafg"),
+		m_videoram_bg(*this, "videorabg"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_spriteram;
-	UINT16 *  m_videoram_bg;
-	UINT16 *  m_videoram_fg;
+	required_shared_ptr<UINT16> m_videoram_fg;
+	required_shared_ptr<UINT16> m_videoram_bg;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
@@ -38,8 +41,8 @@ public:
 static TILE_GET_INFO( get_tile_info_fg )
 {
 	drtomy_state *state = machine.driver_data<drtomy_state>();
-	int code  = state->m_videoram_fg[tile_index] & 0xfff;
-	int color = (state->m_videoram_fg[tile_index] & 0xf000) >> 12;
+	int code  = state->m_videoram_fg.target()[tile_index] & 0xfff;
+	int color = (state->m_videoram_fg.target()[tile_index] & 0xf000) >> 12;
 	SET_TILE_INFO(2, code, color, 0);
 }
 
@@ -47,8 +50,8 @@ static TILE_GET_INFO( get_tile_info_fg )
 static TILE_GET_INFO( get_tile_info_bg )
 {
 	drtomy_state *state = machine.driver_data<drtomy_state>();
-	int code  = state->m_videoram_bg[tile_index] & 0xfff;
-	int color = (state->m_videoram_bg[tile_index] & 0xf000) >> 12;
+	int code  = state->m_videoram_bg.target()[tile_index] & 0xfff;
+	int color = (state->m_videoram_bg.target()[tile_index] & 0xf000) >> 12;
 	SET_TILE_INFO(1, code, color, 0);
 }
 
@@ -81,11 +84,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (i = 3; i < 0x1000 / 2; i += 4)
 	{
-		int sx = state->m_spriteram[i + 2] & 0x01ff;
-		int sy = (240 - (state->m_spriteram[i] & 0x00ff)) & 0x00ff;
-		int number = state->m_spriteram[i + 3];
-		int color = (state->m_spriteram[i + 2] & 0x1e00) >> 9;
-		int attr = (state->m_spriteram[i] & 0xfe00) >> 9;
+		int sx = state->m_spriteram.target()[i + 2] & 0x01ff;
+		int sy = (240 - (state->m_spriteram.target()[i] & 0x00ff)) & 0x00ff;
+		int number = state->m_spriteram.target()[i + 3];
+		int color = (state->m_spriteram.target()[i + 2] & 0x1e00) >> 9;
+		int attr = (state->m_spriteram.target()[i] & 0xfe00) >> 9;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
@@ -137,13 +140,13 @@ static SCREEN_UPDATE_IND16( drtomy )
 
 WRITE16_MEMBER(drtomy_state::drtomy_vram_fg_w)
 {
-	COMBINE_DATA(&m_videoram_fg[offset]);
+	COMBINE_DATA(&m_videoram_fg.target()[offset]);
 	m_tilemap_fg->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(drtomy_state::drtomy_vram_bg_w)
 {
-	COMBINE_DATA(&m_videoram_bg[offset]);
+	COMBINE_DATA(&m_videoram_bg.target()[offset]);
 	m_tilemap_bg->mark_tile_dirty(offset);
 }
 
@@ -162,10 +165,10 @@ static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 
 static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	/* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_BASE(m_videoram_fg)	/* Video RAM FG */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_BASE(m_videoram_bg) /* Video RAM BG */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram) /* Sprite RAM */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_SHARE("videorafg")	/* Video RAM FG */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_SHARE("videorabg") /* Video RAM BG */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") /* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram") /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")

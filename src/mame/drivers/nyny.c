@@ -88,13 +88,17 @@ class nyny_state : public driver_device
 {
 public:
 	nyny_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram1(*this, "videoram1"),
+		m_colorram1(*this, "colorram1"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram2(*this, "colorram2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram1;
-	UINT8 *  m_videoram2;
-	UINT8 *  m_colorram1;
-	UINT8 *  m_colorram2;
+	required_shared_ptr<UINT8> m_videoram1;
+	required_shared_ptr<UINT8> m_colorram1;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_colorram2;
 
 	/* video-related */
 	int      m_flipscreen;
@@ -323,10 +327,10 @@ static MC6845_UPDATE_ROW( update_row )
 		if (state->m_flipscreen)
 			offs = offs ^ 0x9fff;
 
-		data1 = state->m_videoram1[offs];
-		data2 = state->m_videoram2[offs];
-		color1 = state->m_colorram1[offs] & 0x07;
-		color2 = state->m_colorram2[offs] & 0x07;
+		data1 = state->m_videoram1.target()[offs];
+		data2 = state->m_videoram2.target()[offs];
+		color1 = state->m_colorram1.target()[offs] & 0x07;
+		color2 = state->m_colorram2.target()[offs] & 0x07;
 
 		for (i = 0; i < 8; i++)
 		{
@@ -442,7 +446,7 @@ static const mc6845_interface mc6845_intf =
 WRITE8_MEMBER(nyny_state::audio_1_command_w)
 {
 
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, M6800_IRQ_LINE, HOLD_LINE);
 }
 
@@ -450,7 +454,7 @@ WRITE8_MEMBER(nyny_state::audio_1_command_w)
 WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 {
 
-	soundlatch3_w(space, 0, data);
+	soundlatch3_byte_w(space, 0, data);
 	device_set_input_line(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -495,7 +499,7 @@ static const ay8910_interface ay8910_64_interface =
 WRITE8_MEMBER(nyny_state::audio_2_command_w)
 {
 
-	soundlatch2_w(space, 0, (data & 0x60) >> 5);
+	soundlatch2_byte_w(space, 0, (data & 0x60) >> 5);
 	device_set_input_line(m_audiocpu2, M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -529,16 +533,16 @@ WRITE8_MEMBER(nyny_state::nyny_pia_1_2_w)
 
 
 static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8, nyny_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_videoram1)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(m_colorram1)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_videoram2)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_colorram2)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram1")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("colorram1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("colorram2")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("nvram") /* SRAM (coin counter, shown when holding F2) */
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xa200, 0xa20f) AM_MIRROR(0x00f0) AM_READWRITE(nyny_pia_1_2_r, nyny_pia_1_2_w)
-	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_READ(soundlatch3_r) AM_WRITE(audio_1_command_w)
+	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_READ(soundlatch3_byte_r) AM_WRITE(audio_1_command_w)
 	AM_RANGE(0xa400, 0xa7ff) AM_NOP
 	AM_RANGE(0xa800, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -550,7 +554,7 @@ static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch_r) AM_WRITE(audio_1_answer_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r) AM_WRITE(audio_1_answer_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
@@ -567,7 +571,7 @@ static ADDRESS_MAP_START( nyny_audio_2_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_r)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD_LEGACY("ay3", ay8910_r)
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
 	AM_RANGE(0x3000, 0x6fff) AM_NOP

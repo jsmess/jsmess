@@ -49,17 +49,20 @@ class gpworld_state : public driver_device
 public:
 	gpworld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_sprite_RAM(*this, "sprite_RAM"),
+		m_palette_RAM(*this, "palette_RAM"),
+		m_tile_RAM(*this, "tile_RAM"){ }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_start_lamp;
 	UINT8 m_ldp_read_latch;
 	UINT8 m_ldp_write_latch;
 	UINT8 m_brake_gas;
-	UINT8* m_tile_RAM;
-	UINT8* m_sprite_RAM;
-	UINT8* m_palette_RAM;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_shared_ptr<UINT8> m_sprite_RAM;
+	required_shared_ptr<UINT8> m_palette_RAM;
+	required_shared_ptr<UINT8> m_tile_RAM;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_READ8_MEMBER(pedal_in);
 	DECLARE_WRITE8_MEMBER(ldp_write);
@@ -89,7 +92,7 @@ static void gpworld_draw_tiles(running_machine &machine, bitmap_ind16 &bitmap,co
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_tile_RAM[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_tile_RAM.target()[current_screen_character],
 					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -118,7 +121,7 @@ static void gpworld_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 	const int SPR_SKIP_HI   = 5;
 	const int SPR_GFXOFS_LO = 6;
 	const int SPR_GFXOFS_HI = 7;
-	int flip = flip_screen_get(machine);
+	int flip = state->flip_screen();
 
 	int i;
 
@@ -275,15 +278,15 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b, a;
 
-	m_palette_RAM[offset] = data;
+	m_palette_RAM.target()[offset] = data;
 
 	/* "Round down" to the nearest palette entry */
 	pal_index = offset & 0xffe;
 
-	g = (m_palette_RAM[pal_index]   & 0xf0) << 0;
-	b = (m_palette_RAM[pal_index]   & 0x0f) << 4;
-	r = (m_palette_RAM[pal_index+1] & 0x0f) << 4;
-	a = (m_palette_RAM[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
+	g = (m_palette_RAM.target()[pal_index]   & 0xf0) << 0;
+	b = (m_palette_RAM.target()[pal_index]   & 0x0f) << 4;
+	r = (m_palette_RAM.target()[pal_index+1] & 0x0f) << 4;
+	a = (m_palette_RAM.target()[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
@@ -293,9 +296,9 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 /* PROGRAM MAP */
 static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
-	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE(m_sprite_RAM)
-	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_BASE(m_palette_RAM)	/* The memory test reads at 0xc800 */
-	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE(m_tile_RAM)
+	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_SHARE("sprite_RAM")
+	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_SHARE("palette_RAM")	/* The memory test reads at 0xc800 */
+	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_SHARE("tile_RAM")
 	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
 /*  AM_RANGE(0xd801,0xd801) AM_READ_LEGACY(???) */
 	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")	//8255 here....

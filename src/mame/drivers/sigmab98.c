@@ -101,11 +101,14 @@ class sigmab98_state : public driver_device
 public:
 	sigmab98_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_spriteram(*this, "spriteram"),
+		m_nvram(*this, "nvram"){ }
 
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_nvram;
+
 	UINT8 m_reg;
 	UINT8 m_rombank;
 	UINT8 m_reg2;
@@ -116,9 +119,7 @@ public:
 	UINT8 m_c8;
 	UINT8 m_vblank;
 	UINT8 m_out[3];
-	UINT8 *m_nvram;
 
-	required_device<cpu_device> m_maincpu;
 	UINT8 m_vblank_vector;
 	UINT8 m_timer0_vector;
 	UINT8 m_timer1_vector;
@@ -212,8 +213,8 @@ public:
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask)
 {
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
-	UINT8 *end		=	state->m_spriteram - 0x10;
-	UINT8 *s		=	end + state->m_spriteram_size;
+	UINT8 *end		=	state->m_spriteram.target() - 0x10;
+	UINT8 *s		=	end + state->m_spriteram.bytes();
 
 	for ( ; s != end; s -= 0x10 )
 	{
@@ -479,7 +480,7 @@ WRITE8_MEMBER(sigmab98_state::c6_w)
 // 02 hopper motor on (active low)?
 WRITE8_MEMBER(sigmab98_state::c8_w)
 {
-	ticket_dispenser_w(machine().device("hopper"), 0, (!(data & 0x02) && (data & 0x01)) ? 0x00 : 0x80);
+	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (!(data & 0x02) && (data & 0x01)) ? 0x00 : 0x80);
 
 	m_c8 = data;
 	show_outputs();
@@ -489,9 +490,9 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("rombank")
 
-	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_be_w) AM_SHARE("paletteram")
+	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_be_w) AM_SHARE("paletteram")
 
 	AM_RANGE( 0xc800, 0xc87f ) AM_RAM
 
@@ -712,7 +713,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 // 01 hopper motor on (active low)?
 WRITE8_MEMBER(sigmab98_state::sammymdl_hopper_w)
 {
-	ticket_dispenser_w(machine().device("hopper"), 0, (!(data & 0x01) && (data & 0x02)) ? 0x00 : 0x80);
+	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (!(data & 0x01) && (data & 0x02)) ? 0x00 : 0x80);
 
 	m_out[2] = data;
 	show_3_outputs();
@@ -722,7 +723,7 @@ READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
 {
 	UINT8 ret = input_port_read(machine(), "COIN");
 
-//  if ( !ticket_dispenser_r(machine().device("hopper"), 0) )
+//  if ( !machine().device<ticket_dispenser_device>("hopper")->read(0) )
 //      ret &= ~0x01;
 
 	return ret;
@@ -737,7 +738,7 @@ static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0xa000, 0xafff ) AM_RAM
 	AM_RANGE( 0xb000, 0xbfff ) AM_RAMBANK("sprbank")
 
-	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_be_w ) AM_SHARE("paletteram")
+	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_be_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0xd800, 0xd87f ) AM_RAM	// table?
 
 	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP	// IRQ Enable? Screen disable?
@@ -901,7 +902,7 @@ READ8_MEMBER(sigmab98_state::haekaka_b000_r)
 
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
-				return m_spriteram[offset];
+				return m_spriteram.target()[offset];
 
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
@@ -922,7 +923,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
 			{
-				m_spriteram[offset] = data;
+				m_spriteram.target()[offset] = data;
 				return;
 			}
 			break;
@@ -930,7 +931,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
 			{
-				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
+				paletteram_xRRRRRGGGGGBBBBB_byte_be_w(space, offset, data);
 //              m_generic_paletteram_8[offset] = data;
 				return;
 			}
@@ -1073,8 +1074,8 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 					break;
 
 				case 0x6c:	// 3800 IS RAM! (1000 bytes) - SPRITERAM
-					memory_set_bankptr(machine(), "rombank0", m_spriteram);
-					memory_set_bankptr(machine(), "sprbank0", m_spriteram);
+					memory_set_bankptr(machine(), "rombank0", m_spriteram.target());
+					memory_set_bankptr(machine(), "sprbank0", m_spriteram.target());
 //                  memory_set_bankptr(machine(), "sprbank1", m_spriteram + 0x1000*4);    // scratch
 					break;
 
@@ -1138,7 +1139,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
 			m_rambank = data;
 			switch (data)
 			{
-				case 0x52:	memory_set_bankptr(machine(), "palbank", m_nvram);									break;
+				case 0x52:	memory_set_bankptr(machine(), "palbank", m_nvram.target());									break;
 				case 0x64:	memory_set_bankptr(machine(), "palbank", m_generic_paletteram_8);	break;
 				default:
 					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
@@ -1171,12 +1172,12 @@ WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
 {
 	if (m_rambank == 0x64)
 	{
-		paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
+		paletteram_xRRRRRGGGGGBBBBB_byte_be_w(space, offset, data);
 //      m_generic_paletteram_8[offset] = data;
 	}
 	else if (m_rambank == 0x52)
 	{
-		m_nvram[offset] = data;
+		m_nvram.target()[offset] = data;
 	}
 	else
 	{
@@ -1189,7 +1190,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 	if (m_rombank == 0x6c)
 	{
 		if (offset < 0x200)
-			paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
+			paletteram_xRRRRRGGGGGBBBBB_byte_be_w(space, offset, data);
 //          m_generic_paletteram_8[offset] = data;
 	}
 	else
@@ -1377,7 +1378,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
 
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
-				return m_spriteram[offset];
+				return m_spriteram.target()[offset];
 			break;
 
 		case 0x66:	// PALETTERAM + TABLE?
@@ -1402,7 +1403,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
 			{
-				m_spriteram[offset] = data;
+				m_spriteram.target()[offset] = data;
 				return;
 			}
 			break;
@@ -1410,7 +1411,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 		case 0x66:	// PALETTERAM + TABLE?
 			if (offset < 0x200)
 			{
-				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
+				paletteram_xRRRRRGGGGGBBBBB_byte_be_w(space, offset, data);
 //              m_generic_paletteram_8[offset] = data;
 				return;
 			}
@@ -1509,7 +1510,7 @@ static INPUT_PORTS_START( gegege )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)	// ? (coin error, pulses mask 4 of port c6)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(5) PORT_NAME("Medal")	// coin/medal in (coin error)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Bet")	// bet / select in test menu
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Play")	// play game / select in test menu
@@ -1547,7 +1548,7 @@ static INPUT_PORTS_START( pepsiman )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)	// ? (coin error, pulses mask 4 of port c6)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(5) PORT_NAME("Medal")	// coin/medal in (coin error)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_1)	// bet / select in test menu
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Rock (Gu)")
@@ -1585,7 +1586,7 @@ static INPUT_PORTS_START( ucytokyu )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(10)	// ? (coin error, pulses mask 4 of port c6)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_IMPULSE(10) PORT_NAME("Medal")	// coin/medal in (coin error)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_BET ) PORT_CODE(KEYCODE_1)	// bet / enter in test menu
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN  )
@@ -1625,7 +1626,7 @@ static INPUT_PORTS_START( sammymdl )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3   ) PORT_IMPULSE(5) PORT_NAME("Medal")	// medal in
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )	// test sw
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1647,7 +1648,7 @@ static INPUT_PORTS_START( haekaka )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE  )	// test sw
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1  )	// button
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// service coin / set in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
@@ -1690,7 +1691,7 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)					// ?
@@ -1744,7 +1745,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")	// battery
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2113,9 +2114,9 @@ static DRIVER_INIT( animalc )
 	memory_configure_bank(machine, "rambank", 1, 4, bankedram, 0x1000);
 	memory_set_bank(machine, "rambank", 0);
 
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	memset(state->m_spriteram, 0, 0x1000 * 5);
-	state->m_spriteram_size = 0x1000;
+	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
+	//memset(state->m_spriteram, 0, 0x1000 * 5);
+	//state->m_spriteram_size = 0x1000;
 	memory_configure_bank(machine, "sprbank", 0, 5, state->m_spriteram, 0x1000);
 	memory_set_bank(machine, "sprbank", 0);
 
@@ -2161,9 +2162,9 @@ static DRIVER_INIT( itazuram )
 	memory_set_bankptr(machine, "palbank", state->m_generic_paletteram_8);
 	state->m_rambank = 0x64;
 
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	memset(state->m_spriteram, 0, 0x1000 * 5);
-	state->m_spriteram_size = 0x1000;
+	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
+	//memset(state->m_spriteram, 0, 0x1000 * 5);
+	//state->m_spriteram_size = 0x1000;
 	memory_set_bankptr(machine, "sprbank0",  state->m_spriteram + 0x1000*4);	// scratch
 	memory_set_bankptr(machine, "sprbank1",  state->m_spriteram + 0x1000*4);	// scratch
 
@@ -2273,9 +2274,9 @@ static DRIVER_INIT( haekaka )
 	state->m_generic_paletteram_8.allocate(0x200);
 	memset(state->m_generic_paletteram_8, 0, 0x200);
 
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
-	memset(state->m_spriteram, 0, 0x1000);
-	state->m_spriteram_size = 0x1000;
+	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
+	//memset(state->m_spriteram, 0, 0x1000);
+	//state->m_spriteram_size = 0x1000;
 
 	state->m_rombank = 0x65;
 	state->m_rambank = 0x53;

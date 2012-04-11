@@ -132,12 +132,20 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_oki_1(*this, "oki1"),
-		  m_oki_2(*this, "oki2") { }
+		  m_oki_2(*this, "oki2") ,
+		m_workram(*this, "workram"),
+		m_vram(*this, "vram"),
+		m_paletteram(*this, "paletteram"){ }
+
+	/* devices */
+	required_device<e132xt_device> m_maincpu;
+	required_device<okim6295_device> m_oki_1;
+	required_device<okim6295_device> m_oki_2;
 
 	/* memory pointers */
-	UINT32 *  m_vram;
-	UINT32 *  m_workram;
-	UINT32 *  m_paletteram;
+	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<UINT32> m_paletteram;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
@@ -155,10 +163,6 @@ public:
 	int       m_oki_bank_0;
 	int       m_oki_bank_1;
 
-	/* devices */
-	required_device<e132xt_device> m_maincpu;
-	required_device<okim6295_device> m_oki_1;
-	required_device<okim6295_device> m_oki_2;
 	DECLARE_WRITE32_MEMBER(gstream_palette_w);
 	DECLARE_WRITE32_MEMBER(gstream_vram_w);
 	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrollx_w);
@@ -207,21 +211,21 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
 
 WRITE32_MEMBER(gstream_state::gstream_palette_w)
 {
-	COMBINE_DATA(&m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram.target()[offset]);
 
-	palette_set_color_rgb(machine(), offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
-									pal5bit(m_paletteram[offset] >> (6 + 16)),
-									pal5bit(m_paletteram[offset] >> (11 + 16)));
+	palette_set_color_rgb(machine(), offset * 2, pal5bit(m_paletteram.target()[offset] >> (0 + 16)),
+									pal5bit(m_paletteram.target()[offset] >> (6 + 16)),
+									pal5bit(m_paletteram.target()[offset] >> (11 + 16)));
 
 
-	palette_set_color_rgb(machine(),offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
-									pal5bit(m_paletteram[offset] >> (6)),
-									pal5bit(m_paletteram[offset] >> (11)));
+	palette_set_color_rgb(machine(),offset * 2 + 1,pal5bit(m_paletteram.target()[offset] >> (0)),
+									pal5bit(m_paletteram.target()[offset] >> (6)),
+									pal5bit(m_paletteram.target()[offset] >> (11)));
 }
 
 WRITE32_MEMBER(gstream_state::gstream_vram_w)
 {
-	COMBINE_DATA(&m_vram[offset]);
+	COMBINE_DATA(&m_vram.target()[offset]);
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -271,13 +275,13 @@ WRITE32_MEMBER(gstream_state::gstream_tilemap3_scrolly_w)
 }
 
 static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
-	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE(m_workram) // work ram
+	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_SHARE("workram") // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE(m_vram) // video ram
+	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_SHARE("vram") // video ram
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
@@ -443,16 +447,16 @@ GFXDECODE_END
 static TILE_GET_INFO( get_gs1_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram.target()[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram.target()[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno, palette + 0x10, 0);
 }
 
 static TILE_GET_INFO( get_gs2_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram.target()[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram.target()[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno + 0x1000, palette + 0x14, 0);
 }
 
@@ -460,8 +464,8 @@ static TILE_GET_INFO( get_gs2_tile_info )
 static TILE_GET_INFO( get_gs3_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->m_vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->m_vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram.target()[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram.target()[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno + 0x2000, palette + 0x18, 0);
 }
 
@@ -514,10 +518,10 @@ static SCREEN_UPDATE_IND16(gstream)
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4)
 	{
 		/* Upper bits are used by the tilemaps */
-		int code = state->m_vram[i + 0] & 0xffff;
-		int x = state->m_vram[i + 1] & 0xffff;
-		int y = state->m_vram[i + 2] & 0xffff;
-		int col = state->m_vram[i + 3] & 0x1f;
+		int code = state->m_vram.target()[i + 0] & 0xffff;
+		int x = state->m_vram.target()[i + 1] & 0xffff;
+		int y = state->m_vram.target()[i + 2] & 0xffff;
+		int col = state->m_vram.target()[i + 3] & 0x1f;
 
 		/* co-ordinates are signed */
 		if (x & 0x8000) x -= 0x10000;
@@ -638,7 +642,7 @@ READ32_MEMBER(gstream_state::gstream_speedup_r)
 		m_maincpu->eat_cycles(50);
 	}
 
-	return m_workram[0xd1ee0 / 4];
+	return m_workram.target()[0xd1ee0 / 4];
 }
 
 static DRIVER_INIT( gstream )

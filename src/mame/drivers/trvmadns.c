@@ -69,11 +69,13 @@ class trvmadns_state : public driver_device
 {
 public:
 	trvmadns_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gfxram(*this, "gfxram"),
+		m_tileram(*this, "tileram"){ }
 
 	tilemap_t *m_bg_tilemap;
-	UINT8 *m_gfxram;
-	UINT8 *m_tileram;
+	required_shared_ptr<UINT8> m_gfxram;
+	required_shared_ptr<UINT8> m_tileram;
 	int m_old_data;
 	DECLARE_WRITE8_MEMBER(trvmadns_banking_w);
 	DECLARE_WRITE8_MEMBER(trvmadns_gfxram_w);
@@ -158,7 +160,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 
 WRITE8_MEMBER(trvmadns_state::trvmadns_gfxram_w)
 {
-	m_gfxram[offset] = data;
+	m_gfxram.target()[offset] = data;
 	gfx_element_mark_dirty(machine().gfx[0], offset/16);
 }
 
@@ -206,7 +208,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 
 	}
 
-	m_tileram[offset] = data;
+	m_tileram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
@@ -215,9 +217,9 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE(m_gfxram)
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_SHARE("gfxram")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(trvmadns_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
@@ -262,8 +264,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 	trvmadns_state *state = machine.driver_data<trvmadns_state>();
 	int tile,attr,color,flag;
 
-	attr = state->m_tileram[tile_index*2 + 0];
-	tile = state->m_tileram[tile_index*2 + 1] + ((attr & 0x01) << 8);
+	attr = state->m_tileram.target()[tile_index*2 + 0];
+	tile = state->m_tileram.target()[tile_index*2 + 1] + ((attr & 0x01) << 8);
 	color = (attr & 0x18) >> 3;
 	flag = TILE_FLIPXY((attr & 0x06) >> 1);
 
@@ -285,7 +287,7 @@ static VIDEO_START( trvmadns )
 
 //  fg_tilemap->set_transparent_pen(1);
 
-	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
+	gfx_element_set_source(machine.gfx[0], state->m_gfxram.target());
 }
 
 static SCREEN_UPDATE_IND16( trvmadns )
@@ -302,8 +304,8 @@ static SCREEN_UPDATE_IND16( trvmadns )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = state->m_tileram[count*2+0];
-			int tile = state->m_tileram[count*2+1] | ((attr & 0x01) << 8);
+			int attr = state->m_tileram.target()[count*2+0];
+			int tile = state->m_tileram.target()[count*2+1] | ((attr & 0x01) << 8);
 			int color = (attr & 0x18) >> 3;
 			int flipx = attr & 4;
 			int flipy = attr & 2;
@@ -320,8 +322,8 @@ static SCREEN_UPDATE_IND16( trvmadns )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = state->m_tileram[count*2+0];
-			int tile = state->m_tileram[count*2+1] | ((attr & 0x01) << 8);
+			int attr = state->m_tileram.target()[count*2+0];
+			int tile = state->m_tileram.target()[count*2+1] | ((attr & 0x01) << 8);
 			int color = (attr & 0x18) >> 3;
 			int flipx = attr & 4;
 			int flipy = attr & 2;

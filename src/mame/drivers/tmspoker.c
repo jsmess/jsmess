@@ -218,9 +218,10 @@ class tmspoker_state : public driver_device
 {
 public:
 	tmspoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
 	//DECLARE_WRITE8_MEMBER(debug_w);
@@ -234,7 +235,7 @@ public:
 
 WRITE8_MEMBER(tmspoker_state::tmspoker_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -248,7 +249,7 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- ----   seems unused.
 */
 	tmspoker_state *state = machine.driver_data<tmspoker_state>();
-	int code = state->m_videoram[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 
 	SET_TILE_INFO( 0 /* bank */, code, 0 /* color */, 0);
 }
@@ -316,7 +317,7 @@ static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(tmspoker_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE(tmspoker_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3800, 0x3fff) AM_RAM //NVRAM?
 	AM_RANGE(0x2000, 0x20ff) AM_RAM //color RAM?
 ADDRESS_MAP_END

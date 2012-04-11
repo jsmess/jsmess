@@ -72,7 +72,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0x00);
 }
 
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
@@ -104,7 +104,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	/* watchdog? */
 ADDRESS_MAP_END
 

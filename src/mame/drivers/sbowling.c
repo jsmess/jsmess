@@ -49,11 +49,12 @@ class sbowling_state : public driver_device
 public:
 	sbowling_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-		{ }
+		m_maincpu(*this, "maincpu"),
+		m_videoram(*this, "videoram"){ }
 
 	int m_bgmap;
-	UINT8 *m_videoram;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_videoram;
 
 	int m_sbw_system;
 	tilemap_t *m_sb_tilemap;
@@ -62,7 +63,6 @@ public:
 	UINT8 m_pix_sh;
 	UINT8 m_pix[2];
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(sbw_videoram_w);
 	DECLARE_WRITE8_MEMBER(pix_shift_w);
 	DECLARE_WRITE8_MEMBER(pix_data_w);
@@ -93,18 +93,18 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 
 WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 {
-	int flip = flip_screen_get(machine());
+	int flip = flip_screen();
 	int x,y,i,v1,v2;
 
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 
 	offset &= 0x1fff;
 
 	y = offset / 32;
 	x = (offset % 32) * 8;
 
-	v1 = m_videoram[offset];
-	v2 = m_videoram[offset+0x2000];
+	v1 = m_videoram.target()[offset];
+	v2 = m_videoram.target()[offset+0x2000];
 
 	for (i = 0; i < 8; i++)
 	{
@@ -183,13 +183,13 @@ WRITE8_MEMBER(sbowling_state::system_w)
     */
 
 
-	flip_screen_set(machine(), data&1);
+	flip_screen_set(data&1);
 
 	if ((m_sbw_system^data)&1)
 	{
 		int offs;
 		for (offs = 0;offs < 0x4000; offs++)
-			sbw_videoram_w(space, offs, m_videoram[offs]);
+			sbw_videoram_w(space, offs, m_videoram.target()[offs]);
 	}
 	m_sbw_system = data;
 }
@@ -223,7 +223,7 @@ READ8_MEMBER(sbowling_state::controls_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbowling_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xf801, 0xf801) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM

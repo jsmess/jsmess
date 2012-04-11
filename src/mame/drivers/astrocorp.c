@@ -40,12 +40,13 @@ class astrocorp_state : public driver_device
 {
 public:
 	astrocorp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"){ }
 
 	/* memory pointers */
-	UINT16 *   m_spriteram;
-	UINT16 *   m_paletteram;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	bitmap_ind16 m_bitmap;
@@ -100,8 +101,8 @@ static VIDEO_START( astrocorp )
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	astrocorp_state *state = machine.driver_data<astrocorp_state>();
-	UINT16 *source = state->m_spriteram;
-	UINT16 *finish = state->m_spriteram + state->m_spriteram_size / 2;
+	UINT16 *source = state->m_spriteram.target();
+	UINT16 *finish = state->m_spriteram.target() + state->m_spriteram.bytes() / 2;
 
 	for ( ; source < finish; source += 8 / 2 )
 	{
@@ -243,10 +244,10 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 		coin_counter_w(machine(), 0,	(data & 0x0001));	// key in  |
 		coin_counter_w(machine(), 0,	(data & 0x0002));	// coin in |- manual shows 1 in- and 1 out- counter
 		coin_counter_w(machine(), 1,	(data & 0x0004));	// key out |
-		ticket_dispenser_w(machine().device("hopper"), 0, (data & 0x0008)<<4);	// hopper motor?
+		machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x0008)<<4);	// hopper motor?
 		//                                  (data & 0x0010)     // hopper?
 		set_led_status(machine(), 0,	(data & 0x0020));	// error lamp (coin/hopper jam: "call attendant")
-		ticket_dispenser_w(machine().device("ticket"), 0, data & 0x0080);	// ticket motor?
+		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data & 0x0080);	// ticket motor?
 	}
 	if (ACCESSING_BITS_8_15)
 	{
@@ -278,23 +279,23 @@ READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
 // 5-6-5 Palette: BBBBB-GGGGGG-RRRRR
 WRITE16_MEMBER(astrocorp_state::astrocorp_palette_w)
 {
-	COMBINE_DATA(&m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram.target()[offset]);
 	palette_set_color_rgb(machine(), offset,
-		pal5bit((m_paletteram[offset] >>  0) & 0x1f),
-		pal6bit((m_paletteram[offset] >>  5) & 0x3f),
-		pal5bit((m_paletteram[offset] >> 11) & 0x1f)
+		pal5bit((m_paletteram.target()[offset] >>  0) & 0x1f),
+		pal6bit((m_paletteram.target()[offset] >>  5) & 0x3f),
+		pal5bit((m_paletteram.target()[offset] >> 11) & 0x1f)
 	);
 }
 
 static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x052000, 0x052001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x054000, 0x054001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(showhand_outputs_w)
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE_LEGACY("oki", astrocorp_sound_bank_w)
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
@@ -303,9 +304,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE_LEGACY("oki", astrocorp_sound_bank_w)
-	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x082000, 0x082001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE(astrocorp_eeprom_w)
@@ -318,13 +319,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x202000, 0x202001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x204000, 0x204001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x208000, 0x208001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x20a000, 0x20a001 ) AM_WRITE(skilldrp_outputs_w)
 	AM_RANGE( 0x20e000, 0x20e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x400000, 0x400001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x580000, 0x580001 ) AM_DEVWRITE_LEGACY("oki", skilldrp_sound_bank_w)
@@ -334,13 +335,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( speeddrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_SHARE("nvram")	// battery
-	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x382000, 0x382001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x384000, 0x384001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x388000, 0x388001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x38a000, 0x38a001 ) AM_WRITE(skilldrp_outputs_w)
 	AM_RANGE( 0x38e000, 0x38e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x480000, 0x4801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE( 0x480000, 0x4801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
 	AM_RANGE( 0x500000, 0x500001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x580000, 0x580001 ) AM_DEVWRITE_LEGACY("oki", skilldrp_sound_bank_w)
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -422,9 +423,9 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_START2        )	PORT_NAME("Bet")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)	// ticket sw
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)	// ticket sw
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("hopper", ticket_dispenser_line_r)	// hopper sw
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// hopper sw
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 
 	PORT_START( "EEPROMIN" )
@@ -522,8 +523,8 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

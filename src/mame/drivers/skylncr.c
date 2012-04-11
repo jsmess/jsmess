@@ -43,27 +43,41 @@ class skylncr_state : public driver_device
 {
 public:
 	skylncr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_reeltiles_1_ram(*this, "reeltiles_1_ram"),
+		m_reeltiles_2_ram(*this, "reeltiles_2_ram"),
+		m_reeltiles_3_ram(*this, "reeltiles_3_ram"),
+		m_reeltiles_4_ram(*this, "reeltiles_4_ram"),
+		m_reeltileshigh_1_ram(*this, "reeltileshigh_1_ram"),
+		m_reeltileshigh_2_ram(*this, "reeltileshigh_2_ram"),
+		m_reeltileshigh_3_ram(*this, "reeltileshigh_3_ram"),
+		m_reeltileshigh_4_ram(*this, "reeltileshigh_4_ram"),
+		m_reelscroll1(*this, "reelscroll1"),
+		m_reelscroll2(*this, "reelscroll2"),
+		m_reelscroll3(*this, "reelscroll3"),
+		m_reelscroll4(*this, "reelscroll4"){ }
 
 	tilemap_t *m_tmap;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8* m_reeltiles_1_ram;
-	UINT8* m_reeltiles_2_ram;
-	UINT8* m_reeltiles_3_ram;
-	UINT8* m_reeltiles_4_ram;
-	UINT8* m_reeltileshigh_1_ram;
-	UINT8* m_reeltileshigh_2_ram;
-	UINT8* m_reeltileshigh_3_ram;
-	UINT8* m_reeltileshigh_4_ram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_reeltiles_1_ram;
+	required_shared_ptr<UINT8> m_reeltiles_2_ram;
+	required_shared_ptr<UINT8> m_reeltiles_3_ram;
+	required_shared_ptr<UINT8> m_reeltiles_4_ram;
+	required_shared_ptr<UINT8> m_reeltileshigh_1_ram;
+	required_shared_ptr<UINT8> m_reeltileshigh_2_ram;
+	required_shared_ptr<UINT8> m_reeltileshigh_3_ram;
+	required_shared_ptr<UINT8> m_reeltileshigh_4_ram;
 	tilemap_t *m_reel_1_tilemap;
 	tilemap_t *m_reel_2_tilemap;
 	tilemap_t *m_reel_3_tilemap;
 	tilemap_t *m_reel_4_tilemap;
-	UINT8* m_reelscroll1;
-	UINT8* m_reelscroll2;
-	UINT8* m_reelscroll3;
-	UINT8* m_reelscroll4;
+	required_shared_ptr<UINT8> m_reelscroll1;
+	required_shared_ptr<UINT8> m_reelscroll2;
+	required_shared_ptr<UINT8> m_reelscroll3;
+	required_shared_ptr<UINT8> m_reelscroll4;
 	UINT8 m_nmi_enable;
 	int m_color;
 	int m_color2;
@@ -96,13 +110,13 @@ public:
 
 WRITE8_MEMBER(skylncr_state::skylncr_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
@@ -110,35 +124,35 @@ WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
 static TILE_GET_INFO( get_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_videoram[ tile_index ] + (state->m_colorram[ tile_index ] << 8);
+	UINT16 code = state->m_videoram.target()[ tile_index ] + (state->m_colorram.target()[ tile_index ] << 8);
 	SET_TILE_INFO(0, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_1_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_1_ram[ tile_index ] + (state->m_reeltileshigh_1_ram[ tile_index ] << 8);
+	UINT16 code = state->m_reeltiles_1_ram.target()[ tile_index ] + (state->m_reeltileshigh_1_ram.target()[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_2_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_2_ram[ tile_index ] + (state->m_reeltileshigh_2_ram[ tile_index ] << 8);
+	UINT16 code = state->m_reeltiles_2_ram.target()[ tile_index ] + (state->m_reeltileshigh_2_ram.target()[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_3_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_3_ram[ tile_index ] + (state->m_reeltileshigh_3_ram[ tile_index ] << 8);
+	UINT16 code = state->m_reeltiles_3_ram.target()[ tile_index ] + (state->m_reeltileshigh_3_ram.target()[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 static TILE_GET_INFO( get_reel_4_tile_info )
 {
 	skylncr_state *state = machine.driver_data<skylncr_state>();
-	UINT16 code = state->m_reeltiles_4_ram[ tile_index ] + (state->m_reeltileshigh_4_ram[ tile_index ] << 8);
+	UINT16 code = state->m_reeltiles_4_ram.target()[ tile_index ] + (state->m_reeltileshigh_4_ram.target()[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));
 }
 
@@ -182,9 +196,9 @@ static SCREEN_UPDATE_IND16( skylncr )
 
 	for (i= 0;i < 64;i++)
 	{
-		state->m_reel_2_tilemap->set_scrolly(i, state->m_reelscroll2[i]);
-		state->m_reel_3_tilemap->set_scrolly(i, state->m_reelscroll3[i]);
-		state->m_reel_4_tilemap->set_scrolly(i, state->m_reelscroll4[i]);
+		state->m_reel_2_tilemap->set_scrolly(i, state->m_reelscroll2.target()[i]);
+		state->m_reel_3_tilemap->set_scrolly(i, state->m_reelscroll3.target()[i]);
+		state->m_reel_4_tilemap->set_scrolly(i, state->m_reelscroll4.target()[i]);
 	}
 
 	state->m_reel_2_tilemap->draw(bitmap, visible1, 0, 0);
@@ -198,49 +212,49 @@ static SCREEN_UPDATE_IND16( skylncr )
 
 WRITE8_MEMBER(skylncr_state::reeltiles_1_w)
 {
-	m_reeltiles_1_ram[offset] = data;
+	m_reeltiles_1_ram.target()[offset] = data;
 	m_reel_1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltiles_2_w)
 {
-	m_reeltiles_2_ram[offset] = data;
+	m_reeltiles_2_ram.target()[offset] = data;
 	m_reel_2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltiles_3_w)
 {
-	m_reeltiles_3_ram[offset] = data;
+	m_reeltiles_3_ram.target()[offset] = data;
 	m_reel_3_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltiles_4_w)
 {
-	m_reeltiles_4_ram[offset] = data;
+	m_reeltiles_4_ram.target()[offset] = data;
 	m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltileshigh_1_w)
 {
-	m_reeltileshigh_1_ram[offset] = data;
+	m_reeltileshigh_1_ram.target()[offset] = data;
 	m_reel_1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltileshigh_2_w)
 {
-	m_reeltileshigh_2_ram[offset] = data;
+	m_reeltileshigh_2_ram.target()[offset] = data;
 	m_reel_2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltileshigh_3_w)
 {
-	m_reeltileshigh_3_ram[offset] = data;
+	m_reeltileshigh_3_ram.target()[offset] = data;
 	m_reel_3_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skylncr_state::reeltileshigh_4_w)
 {
-	m_reeltileshigh_4_ram[offset] = data;
+	m_reeltileshigh_4_ram.target()[offset] = data;
 	m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
@@ -295,22 +309,22 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram2_w)
 
 WRITE8_MEMBER(skylncr_state::reelscroll1_w)
 {
-	m_reelscroll1[offset] = data;
+	m_reelscroll1.target()[offset] = data;
 }
 
 WRITE8_MEMBER(skylncr_state::reelscroll2_w)
 {
-	m_reelscroll2[offset] = data;
+	m_reelscroll2.target()[offset] = data;
 }
 
 WRITE8_MEMBER(skylncr_state::reelscroll3_w)
 {
-	m_reelscroll3[offset] = data;
+	m_reelscroll3.target()[offset] = data;
 }
 
 WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 {
-	m_reelscroll4[offset] = data;
+	m_reelscroll4.target()[offset] = data;
 }
 
 
@@ -363,7 +377,7 @@ static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8, skylncr_state )
 
 	AM_RANGE(0xaa55, 0xaa55) AM_READ(ret_ff )
 
-	AM_RANGE(0xb000, 0xb03f) AM_RAM_WRITE(reelscroll1_w) AM_BASE(m_reelscroll1)
+	AM_RANGE(0xb000, 0xb03f) AM_RAM_WRITE(reelscroll1_w) AM_SHARE("reelscroll1")
 	AM_RANGE(0xb040, 0xb07f) AM_RAM_WRITE(reelscroll1_w)
 	AM_RANGE(0xb080, 0xb0bf) AM_RAM_WRITE(reelscroll1_w)
 	AM_RANGE(0xb0c0, 0xb0ff) AM_RAM_WRITE(reelscroll1_w)
@@ -372,7 +386,7 @@ static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8, skylncr_state )
 	AM_RANGE(0xb180, 0xb1bf) AM_RAM_WRITE(reelscroll1_w)
 	AM_RANGE(0xb1c0, 0xb1ff) AM_RAM_WRITE(reelscroll1_w)
 
-	AM_RANGE(0xb200, 0xb23f) AM_RAM_WRITE(reelscroll2_w) AM_BASE(m_reelscroll2)
+	AM_RANGE(0xb200, 0xb23f) AM_RAM_WRITE(reelscroll2_w) AM_SHARE("reelscroll2")
 	AM_RANGE(0xb240, 0xb27f) AM_RAM_WRITE(reelscroll2_w)
 	AM_RANGE(0xb280, 0xb2bf) AM_RAM_WRITE(reelscroll2_w)
 	AM_RANGE(0xb2c0, 0xb2ff) AM_RAM_WRITE(reelscroll2_w)
@@ -381,7 +395,7 @@ static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8, skylncr_state )
 	AM_RANGE(0xb380, 0xb3bf) AM_RAM_WRITE(reelscroll2_w)
 	AM_RANGE(0xb3c0, 0xb3ff) AM_RAM_WRITE(reelscroll2_w)
 
-	AM_RANGE(0xb400, 0xb43f) AM_RAM_WRITE(reelscroll3_w) AM_BASE(m_reelscroll3)
+	AM_RANGE(0xb400, 0xb43f) AM_RAM_WRITE(reelscroll3_w) AM_SHARE("reelscroll3")
 	AM_RANGE(0xb440, 0xb47f) AM_RAM_WRITE(reelscroll3_w)
 	AM_RANGE(0xb480, 0xb4bf) AM_RAM_WRITE(reelscroll3_w)
 	AM_RANGE(0xb4c0, 0xb4ff) AM_RAM_WRITE(reelscroll3_w)
@@ -390,7 +404,7 @@ static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8, skylncr_state )
 	AM_RANGE(0xb580, 0xb5bf) AM_RAM_WRITE(reelscroll3_w)
 	AM_RANGE(0xb5c0, 0xb5ff) AM_RAM_WRITE(reelscroll3_w)
 
-	AM_RANGE(0xb600, 0xb63f) AM_RAM_WRITE(reelscroll4_w) AM_BASE(m_reelscroll4)
+	AM_RANGE(0xb600, 0xb63f) AM_RAM_WRITE(reelscroll4_w) AM_SHARE("reelscroll4")
 	AM_RANGE(0xb640, 0xb67f) AM_RAM_WRITE(reelscroll4_w)
 	AM_RANGE(0xb680, 0xb6bf) AM_RAM_WRITE(reelscroll4_w)
 	AM_RANGE(0xb6c0, 0xb6ff) AM_RAM_WRITE(reelscroll4_w)

@@ -28,10 +28,11 @@ class dotrikun_state : public driver_device
 {
 public:
 	dotrikun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_dotrikun_bitmap(*this, "dotrikun_bitmap"){ }
 
 	/* memory pointers */
-	UINT8 *        m_dotrikun_bitmap;
+	required_shared_ptr<UINT8> m_dotrikun_bitmap;
 
 	/* video-related */
 	UINT8          m_color;
@@ -71,7 +72,7 @@ static SCREEN_UPDATE_RGB32( dotrikun )
 	{
 		for (x = 0; x < 256; x+=16)
 		{
-			UINT8 data = state->m_dotrikun_bitmap[((x/16)+((y/2)*16))];
+			UINT8 data = state->m_dotrikun_bitmap.target()[((x/16)+((y/2)*16))];
 
 			for (i = 0; i < 8; i++)
 			{
@@ -98,7 +99,7 @@ static SCREEN_UPDATE_RGB32( dotrikun )
 
 static ADDRESS_MAP_START( dotrikun_map, AS_PROGRAM, 8, dotrikun_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_BASE(m_dotrikun_bitmap)
+	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_SHARE("dotrikun_bitmap")
 	AM_RANGE(0x8600, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 

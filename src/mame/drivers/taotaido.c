@@ -83,7 +83,7 @@ WRITE16_MEMBER(taotaido_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_w(space, offset, data & 0xff);
+		soundlatch_byte_w(space, offset, data & 0xff);
 		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE(m_spriteram)		// sprite ram
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE(m_spriteram2)		// sprite tile lookup ram
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM										// main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// palette ram
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// palette ram
 	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE(m_scrollram)		// rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff81) AM_READ_PORT("P1")
 	AM_RANGE(0xffff82, 0xffff83) AM_READ_PORT("P2")
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, taotaido_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(taotaido_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
+	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

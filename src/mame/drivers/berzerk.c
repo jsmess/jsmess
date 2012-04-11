@@ -21,11 +21,12 @@ class berzerk_state : public driver_device
 {
 public:
 	berzerk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	size_t m_videoram_size;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	UINT8 m_magicram_control;
 	UINT8 m_last_shift_data;
 	UINT8 m_intercept;
@@ -362,7 +363,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 {
 	UINT8 alu_output;
 
-	UINT8 current_video_data = m_videoram[offset];
+	UINT8 current_video_data = m_videoram.target()[offset];
 
 	/* shift data towards LSB.  MSB bits are filled by data from last_shift_data.
        The shifter consists of 5 74153 devices @ 7A, 8A, 9A, 10A and 11A,
@@ -389,7 +390,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 	alu_output = (TTL74181_read(LS181_10C, TTL74181_OUTPUT_F0, 4) << 4) |
 				 (TTL74181_read(LS181_12C, TTL74181_OUTPUT_F0, 4) << 0);
 
-	m_videoram[offset] = alu_output ^ 0xff;
+	m_videoram.target()[offset] = alu_output ^ 0xff;
 
 	/* save data for next time */
 	m_last_shift_data = data & 0x7f;
@@ -460,12 +461,12 @@ static SCREEN_UPDATE_RGB32( berzerk )
 
 	get_pens(screen.machine(), pens);
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
-		UINT8 data = state->m_videoram[offs];
-		UINT8 color = state->m_colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
+		UINT8 data = state->m_videoram.target()[offs];
+		UINT8 color = state->m_colorram.target()[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -597,18 +598,18 @@ static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8, berzerk_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_videoram) AM_SIZE(m_videoram_size) AM_SHARE("share1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram") AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8, berzerk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_videoram) AM_SIZE(m_videoram_size) AM_SHARE("share1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram") AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xf800, 0xfbff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END

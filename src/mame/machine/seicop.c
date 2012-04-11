@@ -1534,7 +1534,7 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 
 	switch(offset)
 	{
-		case (0x01a/2): { flip_screen_set(space->machine(), seibu_vregs[offset] & 0x01); break; }
+		case (0x01a/2): { state->flip_screen_set(seibu_vregs[offset] & 0x01); break; }
 		case (0x01c/2): { state->m_layer_disable =  seibu_vregs[offset]; break; }
 		case (0x020/2): { state->m_scrollram16[0] = seibu_vregs[offset]; break; }
 		case (0x022/2): { state->m_scrollram16[1] = seibu_vregs[offset]; break; }
@@ -1713,7 +1713,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 		case (0x740/2):
 		{
-			state->soundlatch_w(*space, 0, data & 0xff);
+			state->soundlatch_byte_w(*space, 0, data & 0xff);
 			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}

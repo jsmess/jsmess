@@ -445,13 +445,16 @@ class mastboy_state : public driver_device
 public:
 	mastboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_workram(*this, "workram"),
+		m_tileram(*this, "tileram"),
+		m_colram(*this, "colram"){ }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	UINT8* m_tileram;
+	required_shared_ptr<UINT8> m_workram;
+	required_shared_ptr<UINT8> m_tileram;
+	required_shared_ptr<UINT8> m_colram;
 	UINT8* m_vram;
-	UINT8* m_colram;
-	UINT8* m_workram;
 	UINT8 m_bank;
 	int m_irq0_ack;
 	int m_backupram_enabled;
@@ -490,7 +493,7 @@ static SCREEN_UPDATE_IND16(mastboy)
 
 	for (i=0;i<0x200;i+=2)
 	{
-		int coldat = state->m_colram[i+1] |  (state->m_colram[i+0]<<8);
+		int coldat = state->m_colram.target()[i+1] |  (state->m_colram.target()[i+0]<<8);
 
 		palette_set_color_rgb(screen.machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
@@ -500,8 +503,8 @@ static SCREEN_UPDATE_IND16(mastboy)
 		for (x=0;x<32;x++)
 		{
 			/* bytes 0 and 3 seem to be unused for rendering , they appear to contain data the game uses internally */
-			int tileno = (state->m_tileram[count+1]|(state->m_tileram[count+2]<<8))&0xfff;
-			int attr = (state->m_tileram[count+2]&0xf0)>>4;
+			int tileno = (state->m_tileram.target()[count+1]|(state->m_tileram.target()[count+2]<<8))&0xfff;
+			int attr = (state->m_tileram.target()[count+2]&0xf0)>>4;
 			gfx_element *gfx;
 
 			if (tileno&0x800)
@@ -603,14 +606,14 @@ WRITE8_MEMBER(mastboy_state::mastboy_bank_w)
 
 READ8_MEMBER(mastboy_state::mastboy_backupram_r)
 {
-	return m_nvram[offset];
+	return m_nvram.target()[offset];
 }
 
 WRITE8_MEMBER(mastboy_state::mastboy_backupram_w)
 {
 //  if (m_backupram_enabled)
 //  {
-		m_nvram[offset] = data;
+		m_nvram.target()[offset] = data;
 //  }
 //  else
 //  {
@@ -702,9 +705,9 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
 
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(m_workram)// work ram
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE(m_tileram)// tilemap ram
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE(m_colram) AM_MIRROR(0x0e00)  // colour ram
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("workram")// work ram
+	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_SHARE("tileram")// tilemap ram
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_SHARE("colram") AM_MIRROR(0x0e00)  // colour ram
 
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 

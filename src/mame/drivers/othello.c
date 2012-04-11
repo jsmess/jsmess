@@ -51,10 +51,11 @@ class othello_state : public driver_device
 {
 public:
 	othello_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	int    m_tile_bank;
@@ -103,7 +104,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 	for(cx = 0; cx < x_count; ++cx)
 	{
-		data_address = ((state->m_videoram[ma + cx] + state->m_tile_bank) << 4) | ra;
+		data_address = ((state->m_videoram.target()[ma + cx] + state->m_tile_bank) << 4) | ra;
 		tmp = gfx[data_address] | (gfx[data_address + 0x2000] << 8) | (gfx[data_address + 0x4000] << 16);
 
 		for(x = 0; x < TILE_WIDTH; ++x)
@@ -135,7 +136,7 @@ static PALETTE_INIT( othello )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -196,14 +197,14 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(0x87, 0x87) AM_READ(unk_87_r)
 	AM_RANGE(0x8a, 0x8a) AM_WRITE(unk_8a_w)
 	AM_RANGE(0x8c, 0x8c) AM_READWRITE(unk_8c_r, unk_8c_w)
-	AM_RANGE(0x8d, 0x8d) AM_READWRITE(sound_ack_r, soundlatch_w)
+	AM_RANGE(0x8d, 0x8d) AM_READWRITE(sound_ack_r, soundlatch_byte_w)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(unk_8f_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(othello_state::latch_r)
 {
-	int retval = soundlatch_r(space, 0);
-	soundlatch_clear_w(space, 0, 0);
+	int retval = soundlatch_byte_r(space, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 	return retval;
 }
 

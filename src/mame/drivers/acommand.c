@@ -64,20 +64,23 @@ class acommand_state : public driver_device
 {
 public:
 	acommand_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ac_bgvram(*this, "ac_bgvram"),
+		m_ac_txvram(*this, "ac_txvram"),
+		m_spriteram(*this, "spriteram"),
+		m_ac_devram(*this, "ac_devram"){ }
 
+	required_shared_ptr<UINT16> m_ac_bgvram;
+	required_shared_ptr<UINT16> m_ac_txvram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_ac_devram;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
-	UINT16 *m_ac_txvram;
-	UINT16 *m_ac_bgvram;
 	UINT16 *m_ac_vregs;
 	UINT16 m_led0;
 	UINT16 m_led1;
-	UINT16 *m_ac_devram;
 	UINT16 m_ufo_sw1;
 	UINT16 m_ufo_sw2;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
 	DECLARE_WRITE16_MEMBER(ac_bgvram_w);
 	DECLARE_WRITE16_MEMBER(ac_txvram_w);
 	DECLARE_WRITE16_MEMBER(ac_bgscroll_w);
@@ -98,7 +101,7 @@ static TILEMAP_MAPPER( bg_scan )
 static TILE_GET_INFO( ac_get_bg_tile_info )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	int code = state->m_ac_bgvram[tile_index];
+	int code = state->m_ac_bgvram.target()[tile_index];
 	SET_TILE_INFO(
 			1,
 			code & 0xfff,
@@ -109,7 +112,7 @@ static TILE_GET_INFO( ac_get_bg_tile_info )
 static TILE_GET_INFO( ac_get_tx_tile_info )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	int code = state->m_ac_txvram[tile_index];
+	int code = state->m_ac_txvram.target()[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0xfff,
@@ -120,10 +123,10 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask)
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = state->m_spriteram.target();
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram_size/2;offs += 8)
+	for (offs = 0;offs < state->m_spriteram.bytes()/2;offs += 8)
 	{
 		if (!(spriteram16[offs+0] & 0x1000))
 		{
@@ -140,12 +143,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			int xx,yy,x;
 			int delta = 16;
 
-			flipx ^= flip_screen_get(machine);
-			flipy ^= flip_screen_get(machine);
+			flipx ^= state->flip_screen();
+			flipy ^= state->flip_screen();
 
 			if ((pri&pri_mask)!=priority) continue;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;
@@ -266,13 +269,13 @@ static SCREEN_UPDATE_IND16( acommand )
 
 WRITE16_MEMBER(acommand_state::ac_bgvram_w)
 {
-	COMBINE_DATA(&m_ac_bgvram[offset]);
+	COMBINE_DATA(&m_ac_bgvram.target()[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(acommand_state::ac_txvram_w)
 {
-	COMBINE_DATA(&m_ac_txvram[offset]);
+	COMBINE_DATA(&m_ac_txvram.target()[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
@@ -342,24 +345,24 @@ READ16_MEMBER(acommand_state::ac_devices_r)
             */
         //22dc8
 		{
-			m_ufo_sw1 = m_ac_devram[offset] & 3;
-			if(m_ac_devram[offset] & 0x10)
+			m_ufo_sw1 = m_ac_devram.target()[offset] & 3;
+			if(m_ac_devram.target()[offset] & 0x10)
 				m_ufo_sw1|= 0x10;
-			if(m_ac_devram[offset] & 0x40)
+			if(m_ac_devram.target()[offset] & 0x40)
 				m_ufo_sw1|= 0x20;
-			if(m_ac_devram[offset] & 0x100)
+			if(m_ac_devram.target()[offset] & 0x100)
 				m_ufo_sw1|=0x100;
-			if(m_ac_devram[offset] & 0x400)
+			if(m_ac_devram.target()[offset] & 0x400)
 				m_ufo_sw1|=0x200;
-			if(m_ac_devram[offset] & 0x1000)
+			if(m_ac_devram.target()[offset] & 0x1000)
 				m_ufo_sw1|=0x1000;
-			if(m_ac_devram[offset] & 0x4000)
+			if(m_ac_devram.target()[offset] & 0x4000)
 				m_ufo_sw1|=0x2000;
-//          if(m_ac_devram[0x0048/2] & 0x0001)
+//          if(m_ac_devram.target()[0x0048/2] & 0x0001)
 //              m_ufo_sw1|=0x0040;
-//          if(m_ac_devram[0x0048/2] & 0x0004)
+//          if(m_ac_devram.target()[0x0048/2] & 0x0004)
 //              m_ufo_sw1|=0x0400;
-//          if(m_ac_devram[0x0048/2] & 0x0100)
+//          if(m_ac_devram.target()[0x0048/2] & 0x0100)
 //              m_ufo_sw1|=0x4000;
 			return m_ufo_sw1;
 		}
@@ -372,18 +375,18 @@ READ16_MEMBER(acommand_state::ac_devices_r)
             */
 		{
 			m_ufo_sw2 = 0;
-			if(m_ac_devram[offset] & 0x01)
+			if(m_ac_devram.target()[offset] & 0x01)
 				m_ufo_sw2|= 1;
-			if(m_ac_devram[offset] & 0x04)
+			if(m_ac_devram.target()[offset] & 0x04)
 				m_ufo_sw2|= 2;
-			if(m_ac_devram[offset] & 0x10)
+			if(m_ac_devram.target()[offset] & 0x10)
 				m_ufo_sw2|=0x10;
-			if(m_ac_devram[offset] & 0x40)
+			if(m_ac_devram.target()[offset] & 0x40)
 				m_ufo_sw2|=0x20;
 			return m_ufo_sw2;
 		}
 		case 0x0048/2:
-			return m_ac_devram[offset];
+			return m_ac_devram.target()[offset];
 		case 0x005c/2:
 			/*
                 xxxx xxxx ---- ---- DIPSW4
@@ -391,12 +394,12 @@ READ16_MEMBER(acommand_state::ac_devices_r)
             */
 			return input_port_read(machine(), "IN1");
 	}
-	return m_ac_devram[offset];
+	return m_ac_devram.target()[offset];
 }
 
 WRITE16_MEMBER(acommand_state::ac_devices_w)
 {
-	COMBINE_DATA(&m_ac_devram[offset]);
+	COMBINE_DATA(&m_ac_devram.target()[offset]);
 	switch(offset)
 	{
 		case 0x00/2:
@@ -434,11 +437,11 @@ WRITE16_MEMBER(acommand_state::ac_devices_w)
 		case 0x48/2:
 			break;
 		case 0x50/2:
-			m_led0 = m_ac_devram[offset];
+			m_led0 = m_ac_devram.target()[offset];
 			//popmessage("%04x",m_led0);
 			break;
 		case 0x54/2:
-			m_led1 = m_ac_devram[offset];
+			m_led1 = m_ac_devram.target()[offset];
 			//popmessage("%04x",m_led0);
 			break;
 	}
@@ -456,13 +459,13 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x082000, 0x082005) AM_WRITE(ac_bgscroll_w)
 	AM_RANGE(0x082100, 0x082105) AM_WRITE(ac_txscroll_w)
 	AM_RANGE(0x082208, 0x082209) AM_WRITE(ac_unk2_w)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(ac_bgvram_w) AM_BASE(m_ac_bgvram)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(ac_txvram_w) AM_BASE(m_ac_txvram)
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(ac_bgvram_w) AM_SHARE("ac_bgvram")
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(ac_txvram_w) AM_SHARE("ac_txvram")
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x1000ff) AM_READ(ac_devices_r) AM_WRITE(ac_devices_w) AM_BASE(m_ac_devram)
+	AM_RANGE(0x100000, 0x1000ff) AM_READ(ac_devices_r) AM_WRITE(ac_devices_w) AM_SHARE("ac_devram")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )

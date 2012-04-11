@@ -30,10 +30,12 @@ class neoprint_state : public driver_device
 {
 public:
 	neoprint_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_npvidram(*this, "npvidram"),
+		m_npvidregs(*this, "npvidregs"){ }
 
-	UINT16* m_npvidram;
-	UINT16* m_npvidregs;
+	required_shared_ptr<UINT16> m_npvidram;
+	required_shared_ptr<UINT16> m_npvidregs;
 	UINT8 m_audio_result;
 	UINT8 m_bank_val;
 	UINT8 m_vblank;
@@ -71,9 +73,9 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	const gfx_element *gfx = machine.gfx[0];
 	INT16 scrollx, scrolly;
 
-	i = (state->m_npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
-	scrollx = ((state->m_npvidregs[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
-	scrolly = ((state->m_npvidregs[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
+	i = (state->m_npvidregs.target()[((layer*8)+0x06)/2] & 7) * 0x1000/4;
+	scrollx = ((state->m_npvidregs.target()[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
+	scrolly = ((state->m_npvidregs.target()[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
 
 	scrollx/=2;
 	scrolly/=2;
@@ -82,14 +84,14 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = state->m_npvidram[i*2] >> data_shift; // a video register?
+			UINT16 dat = state->m_npvidram.target()[i*2] >> data_shift; // a video register?
 			UINT16 color;
-			if(state->m_npvidram[i*2+1] & 0x0020) // TODO: 8bpp switch?
-				color = ((state->m_npvidram[i*2+1] & 0x8000) << 1) | 0x200 | ((state->m_npvidram[i*2+1] & 0xff00) >> 7);
+			if(state->m_npvidram.target()[i*2+1] & 0x0020) // TODO: 8bpp switch?
+				color = ((state->m_npvidram.target()[i*2+1] & 0x8000) << 1) | 0x200 | ((state->m_npvidram.target()[i*2+1] & 0xff00) >> 7);
 			else
-				color = ((state->m_npvidram[i*2+1] & 0xff00) >> 8) | ((state->m_npvidram[i*2+1] & 0x0010) << 4);
-			UINT8 fx = (state->m_npvidram[i*2+1] & 0x0040);
-			UINT8 fy = (state->m_npvidram[i*2+1] & 0x0080);
+				color = ((state->m_npvidram.target()[i*2+1] & 0xff00) >> 8) | ((state->m_npvidram.target()[i*2+1] & 0x0010) << 4);
+			UINT8 fx = (state->m_npvidram.target()[i*2+1] & 0x0040);
+			UINT8 fy = (state->m_npvidram.target()[i*2+1] & 0x0080);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
 			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
@@ -173,7 +175,7 @@ WRITE16_MEMBER(neoprint_state::audio_command_w)
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
 	{
-		soundlatch_w(space, 0, data >> 8);
+		soundlatch_byte_w(space, 0, data >> 8);
 
 		audio_cpu_assert_nmi(machine());
 
@@ -187,7 +189,7 @@ WRITE16_MEMBER(neoprint_state::audio_command_w)
 
 READ8_MEMBER(neoprint_state::audio_command_r)
 {
-	UINT8 ret = soundlatch_r(space, 0);
+	UINT8 ret = soundlatch_byte_r(space, 0);
 
 	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(&space.device()), ret);
 
@@ -213,8 +215,8 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 /*  AM_RANGE(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_npvidram)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
@@ -224,7 +226,7 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x60000c, 0x60000d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x60000e, 0x60000f) AM_WRITENOP
 
-	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_BASE(m_npvidregs)
+	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_SHARE("npvidregs")
 
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
 ADDRESS_MAP_END
@@ -288,12 +290,12 @@ static ADDRESS_MAP_START( nprsp_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITENOP
 
-	AM_RANGE(0x240000, 0x24001b) AM_RAM AM_BASE(m_npvidregs)
+	AM_RANGE(0x240000, 0x24001b) AM_RAM AM_SHARE("npvidregs")
 	AM_RANGE(0x24001e, 0x24001f) AM_WRITENOP //watchdog
 
 	AM_RANGE(0x300000, 0x33ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_npvidram)
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
 	AM_RANGE(0x500000, 0x57ffff) AM_RAM_WRITE(nprsp_palette_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 

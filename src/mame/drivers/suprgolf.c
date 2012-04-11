@@ -30,10 +30,11 @@ class suprgolf_state : public driver_device
 {
 public:
 	suprgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	tilemap_t *m_tilemap;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 *m_paletteram;
 	UINT8 *m_bg_vram;
 	UINT16 *m_bg_fb;
@@ -59,8 +60,8 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	suprgolf_state *state = machine.driver_data<suprgolf_state>();
-	int code = state->m_videoram[tile_index*2]+256*(state->m_videoram[tile_index*2+1]);
-	int color = state->m_videoram[tile_index*2+0x800] & 0x7f;
+	int code = state->m_videoram.target()[tile_index*2]+256*(state->m_videoram.target()[tile_index*2+1]);
+	int color = state->m_videoram.target()[tile_index*2+0x800] & 0x7f;
 
 	SET_TILE_INFO(
 		0,
@@ -133,7 +134,7 @@ READ8_MEMBER(suprgolf_state::suprgolf_videoram_r)
 	if (m_palette_switch)
 		return m_paletteram[offset];
 	else
-		return m_videoram[offset];
+		return m_videoram.target()[offset];
 }
 
 WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
@@ -154,7 +155,7 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
 	}
 	else
 	{
-		m_videoram[offset] = data;
+		m_videoram.target()[offset] = data;
 		m_tilemap->mark_tile_dirty((offset & 0x7fe) >> 1);
 	}
 }
@@ -266,7 +267,7 @@ static WRITE8_DEVICE_HANDLER( rom_bank_select_w )
 	memory_set_bankptr(device->machine(), "bank2", region_base + (data&0x3f ) * 0x4000);
 
 	state->m_msm_nmi_mask = data & 0x40;
-	flip_screen_set(device->machine(), data & 0x80);
+	state->flip_screen_set(data & 0x80);
 }
 
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
@@ -306,7 +307,7 @@ static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(rom2_bank_select_w )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(m_videoram) //foreground vram + paletteram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(suprgolf_videoram_r, suprgolf_videoram_w ) AM_SHARE("videoram") //foreground vram + paletteram
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END

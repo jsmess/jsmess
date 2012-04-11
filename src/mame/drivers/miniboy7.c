@@ -156,10 +156,12 @@ class miniboy7_state : public driver_device
 {
 public:
 	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(miniboy7_videoram_w);
 	DECLARE_WRITE8_MEMBER(miniboy7_colorram_w);
@@ -172,13 +174,13 @@ public:
 
 WRITE8_MEMBER(miniboy7_state::miniboy7_videoram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(miniboy7_state::miniboy7_colorram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -191,8 +193,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- --x-   tiles bank.
     xx-- ---x   seems unused. */
 
-	int attr = state->m_colorram[tile_index];
-	int code = state->m_videoram[tile_index];
+	int attr = state->m_colorram.target()[tile_index];
+	int code = state->m_videoram.target()[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c);	/* bits 2-3-4-5 for color? */
 
@@ -268,8 +270,8 @@ static PALETTE_INIT( miniboy7 )
 
 static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8, miniboy7_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	AM_SHARE("nvram") /* battery backed RAM? */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x25ff) AM_RAM	/* looks like videoram */
 	AM_RANGE(0x2600, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)

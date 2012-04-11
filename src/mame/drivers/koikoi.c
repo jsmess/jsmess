@@ -49,10 +49,11 @@ class koikoi_state : public driver_device
 {
 public:
 	koikoi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
@@ -77,9 +78,9 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	koikoi_state *state = machine.driver_data<koikoi_state>();
-	int code  = state->m_videoram[tile_index] | ((state->m_videoram[tile_index + 0x400] & 0x40) << 2);
-	int color = (state->m_videoram[tile_index + 0x400] & 0x1f);
-	int flip  = (state->m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	int code  = state->m_videoram.target()[tile_index] | ((state->m_videoram.target()[tile_index + 0x400] & 0x40) << 2);
+	int color = (state->m_videoram.target()[tile_index + 0x400] & 0x1f);
+	int flip  = (state->m_videoram.target()[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 
 	SET_TILE_INFO( 0, code, color, flip);
 }
@@ -150,7 +151,7 @@ static SCREEN_UPDATE_IND16(koikoi)
 
 WRITE8_MEMBER(koikoi_state::vram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
@@ -222,7 +223,7 @@ WRITE8_MEMBER(koikoi_state::io_w)
 static ADDRESS_MAP_START( koikoi_map, AS_PROGRAM, 8, koikoi_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW")
 	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END

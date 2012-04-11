@@ -25,14 +25,17 @@ class backfire_state : public driver_device
 {
 public:
 	backfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_left_priority(*this, "left_priority"),
+		m_right_priority(*this, "right_priority"){ }
 
 	/* memory pointers */
 	UINT16 *  m_spriteram_1;
 	UINT16 *  m_spriteram_2;
-	UINT32 *  m_mainram;
-	UINT32 *  m_left_priority;
-	UINT32 *  m_right_priority;
+	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<UINT32> m_left_priority;
+	required_shared_ptr<UINT32> m_right_priority;
 
 	/* video related */
 	bitmap_ind16  *m_left;
@@ -106,7 +109,7 @@ static SCREEN_UPDATE_IND16( backfire_left )
 	backfire_state *state = screen.machine().driver_data<backfire_state>();
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen.machine(), 1);
+	state->flip_screen_set_no_update(1);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -116,20 +119,20 @@ static SCREEN_UPDATE_IND16( backfire_left )
 	screen.machine().priority_bitmap.fill(0);
 	bitmap.fill(0x100, cliprect);
 
-	if (state->m_left_priority[0] == 0)
+	if (state->m_left_priority.target()[0] == 0)
 	{
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 1);
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram_1, 0x800);
 	}
-	else if (state->m_left_priority[0] == 2)
+	else if (state->m_left_priority.target()[0] == 2)
 	{
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 4);
 		screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram_1, 0x800);
 	}
 	else
-		popmessage( "unknown left priority %08x", state->m_left_priority[0]);
+		popmessage( "unknown left priority %08x", state->m_left_priority.target()[0]);
 
 	return 0;
 }
@@ -139,7 +142,7 @@ static SCREEN_UPDATE_IND16( backfire_right )
 	backfire_state *state = screen.machine().driver_data<backfire_state>();
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen.machine(), 1);
+	state->flip_screen_set_no_update(1);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -149,20 +152,20 @@ static SCREEN_UPDATE_IND16( backfire_right )
 	screen.machine().priority_bitmap.fill(0);
 	bitmap.fill(0x500, cliprect);
 
-	if (state->m_right_priority[0] == 0)
+	if (state->m_right_priority.target()[0] == 0)
 	{
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 1);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram_2, 0x800);
 	}
-	else if (state->m_right_priority[0] == 2)
+	else if (state->m_right_priority.target()[0] == 2)
 	{
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 4);
 		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram_2, 0x800);
 	}
 	else
-		popmessage( "unknown right priority %08x", state->m_right_priority[0]);
+		popmessage( "unknown right priority %08x", state->m_right_priority.target()[0]);
 
 	return 0;
 }
@@ -286,7 +289,7 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x150000, 0x150fff) AM_READWRITE(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
 	AM_RANGE(0x154000, 0x154fff) AM_READWRITE(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
 	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE(m_mainram)// main ram
+	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_SHARE("mainram")// main ram
 
 //  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE_LEGACY(&backfire_180010) // always 180010 ?
 //  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE_LEGACY(&backfire_188010) // always 188010 ?
@@ -297,8 +300,8 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x194000, 0x194003) AM_READ(backfire_control2_r)
 	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE_LEGACY("eeprom", backfire_eeprom_w)
 
-	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_BASE(m_left_priority)
-	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_BASE(m_right_priority)
+	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_SHARE("left_priority")
+	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_SHARE("right_priority")
 //  AM_RANGE(0x1b0000, 0x1b0003) AM_WRITENOP // always 1b0000
 
 	/* when set to pentometer in test mode */
@@ -696,7 +699,7 @@ READ32_MEMBER(backfire_state::backfire_speedup_r)
 	if (cpu_get_pc(&space.device() )== 0xce44)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfire
 	if (cpu_get_pc(&space.device()) == 0xcee4)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfirea
 
-	return m_mainram[0x18/4];
+	return m_mainram.target()[0x18/4];
 }
 
 

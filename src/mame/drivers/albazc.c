@@ -18,12 +18,15 @@ class albazc_state : public driver_device
 {
 public:
 	albazc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram1(*this, "spriteram1"),
+		m_spriteram2(*this, "spriteram2"),
+		m_spriteram3(*this, "spriteram3"){ }
 
 	/* video-related */
-	UINT8 *  m_spriteram1;
-	UINT8 *  m_spriteram2;
-	UINT8 *  m_spriteram3;
+	required_shared_ptr<UINT8> m_spriteram1;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_spriteram3;
 	UINT8 m_flip_bit;
 	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
@@ -62,12 +65,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (i = 511; i >= 0; i--)
 	{
-		int code = state->m_spriteram1[i] | (state->m_spriteram2[i] << 8);
-		int color = (state->m_spriteram2[i + 0x200] & 0xf8) >> 3;
+		int code = state->m_spriteram1.target()[i] | (state->m_spriteram2.target()[i] << 8);
+		int color = (state->m_spriteram2.target()[i + 0x200] & 0xf8) >> 3;
 		int flipx = 0;
 		int flipy = 0;
-		int sx = state->m_spriteram1[i + 0x200] | ((state->m_spriteram2[i + 0x200] & 0x07) << 8);
-		int sy = 242 - state->m_spriteram3[i];
+		int sx = state->m_spriteram1.target()[i + 0x200] | ((state->m_spriteram2.target()[i + 0x200] & 0x07) << 8);
+		int sy = 242 - state->m_spriteram3.target()[i];
 
 		if (state->m_flip_bit)
 		{
@@ -145,7 +148,7 @@ WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 	if(offset == 0)
 	{
 		/* core bug with this? */
-		//flip_screen_set(machine(), (data & 0x40) >> 6);
+		//flip_screen_set((data & 0x40) >> 6);
 		m_flip_bit = (data & 0x40) >> 6;
 	}
 }
@@ -154,9 +157,9 @@ WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 
 static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_spriteram1)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(m_spriteram2)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE(m_spriteram3)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram1")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_SHARE("spriteram3")
 	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
 	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)	// ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40

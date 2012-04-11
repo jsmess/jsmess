@@ -50,12 +50,15 @@ class onetwo_state : public driver_device
 {
 public:
 	onetwo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_paletteram(*this, "paletteram"),
+		m_paletteram2(*this, "paletteram2"),
+		m_fgram(*this, "fgram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_fgram;
-	UINT8 *  m_paletteram;
-	UINT8 *  m_paletteram2;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_paletteram2;
+	required_shared_ptr<UINT8> m_fgram;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
@@ -82,8 +85,8 @@ public:
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	onetwo_state *state = machine.driver_data<onetwo_state>();
-	int code = (state->m_fgram[tile_index * 2 + 1] << 8) | state->m_fgram[tile_index * 2];
-	int color = (state->m_fgram[tile_index * 2 + 1] & 0x80) >> 7;
+	int code = (state->m_fgram.target()[tile_index * 2 + 1] << 8) | state->m_fgram.target()[tile_index * 2];
+	int color = (state->m_fgram.target()[tile_index * 2 + 1] & 0x80) >> 7;
 
 	code &= 0x7fff;
 
@@ -111,7 +114,7 @@ static SCREEN_UPDATE_IND16( onetwo )
 
 WRITE8_MEMBER(onetwo_state::onetwo_fgram_w)
 {
-	m_fgram[offset] = data;
+	m_fgram.target()[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
@@ -129,7 +132,7 @@ WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
 
 WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -138,21 +141,21 @@ static void set_color(running_machine &machine, int offset)
 	onetwo_state *state = machine.driver_data<onetwo_state>();
 	int r, g, b;
 
-	r = state->m_paletteram[offset] & 0x1f;
-	g = state->m_paletteram2[offset] & 0x1f;
-	b = ((state->m_paletteram[offset] & 0x60) >> 2) | ((state->m_paletteram2[offset] & 0xe0) >> 5);
+	r = state->m_paletteram.target()[offset] & 0x1f;
+	g = state->m_paletteram2.target()[offset] & 0x1f;
+	b = ((state->m_paletteram.target()[offset] & 0x60) >> 2) | ((state->m_paletteram2.target()[offset] & 0xe0) >> 5);
 	palette_set_color_rgb(machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_MEMBER(onetwo_state::palette1_w)
 {
-	m_paletteram[offset] = data;
+	m_paletteram.target()[offset] = data;
 	set_color(machine(), offset);
 }
 
 WRITE8_MEMBER(onetwo_state::palette2_w)
 {
-	m_paletteram2[offset] = data;
+	m_paletteram2.target()[offset] = data;
 	set_color(machine(), offset);
 }
 
@@ -165,9 +168,9 @@ WRITE8_MEMBER(onetwo_state::palette2_w)
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, onetwo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_BASE(m_paletteram)
-	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_BASE(m_paletteram2)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(onetwo_fgram_w) AM_BASE(m_fgram)
+	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(onetwo_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -183,7 +186,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, onetwo_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_io, AS_IO, 8, onetwo_state )
@@ -191,7 +194,7 @@ static ADDRESS_MAP_START( sound_cpu_io, AS_IO, 8, onetwo_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ymsnd", ym3812_write_port_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_byte_w)
 ADDRESS_MAP_END
 
 /*************************************

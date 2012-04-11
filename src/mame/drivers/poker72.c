@@ -19,10 +19,12 @@ class poker72_state : public driver_device
 {
 public:
 	poker72_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_pal(*this, "pal"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_pal;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_pal;
 	UINT8 m_tile_bank;
 	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
 	DECLARE_WRITE8_MEMBER(output_w);
@@ -45,10 +47,10 @@ static SCREEN_UPDATE_IND16(poker72)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = ((state->m_vram[count+1] & 0x0f) << 8 ) | (state->m_vram[count+0] & 0xff); //TODO: tile bank
-			int fx = (state->m_vram[count+1] & 0x10);
-			int fy = (state->m_vram[count+1] & 0x20);
-			int color = (state->m_vram[count+1] & 0xc0) >> 6;
+			int tile = ((state->m_vram.target()[count+1] & 0x0f) << 8 ) | (state->m_vram.target()[count+0] & 0xff); //TODO: tile bank
+			int fx = (state->m_vram.target()[count+1] & 0x10);
+			int fy = (state->m_vram.target()[count+1] & 0x20);
+			int color = (state->m_vram.target()[count+1] & 0xc0) >> 6;
 
 			tile|= state->m_tile_bank << 12;
 
@@ -64,11 +66,11 @@ static SCREEN_UPDATE_IND16(poker72)
 WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 {
 	int r,g,b;
-	m_pal[offset] = data;
+	m_pal.target()[offset] = data;
 
-	r = m_pal[(offset & 0x3ff)+0x000] & 0x3f;
-	g = m_pal[(offset & 0x3ff)+0x400] & 0x3f;
-	b = m_pal[(offset & 0x3ff)+0x800] & 0x3f;
+	r = m_pal.target()[(offset & 0x3ff)+0x000] & 0x3f;
+	g = m_pal.target()[(offset & 0x3ff)+0x400] & 0x3f;
+	b = m_pal.target()[(offset & 0x3ff)+0x800] & 0x3f;
 
 	palette_set_color_rgb( machine(), offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
@@ -96,8 +98,8 @@ WRITE8_MEMBER(poker72_state::tile_bank_w)
 static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_BASE(m_pal)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_SHARE("pal")
 	AM_RANGE(0xfc00, 0xfdff) AM_RAM //???
 	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("IN0")
 	AM_RANGE(0xfe09, 0xfe09) AM_READ_PORT("IN1")

@@ -62,16 +62,15 @@ static WRITE8_DEVICE_HANDLER( redalert_analog_w )
  *
  *************************************/
 
-WRITE8_HANDLER( redalert_audio_command_w )
+WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 {
-	redalert_state *state = space->machine().driver_data<redalert_state>();
 	/* the byte is connected to port A of the AY8910 */
-	state->soundlatch_w(*space, 0, data);
+	soundlatch_byte_w(*&space, 0, data);
 
 	/* D7 is also connected to the NMI input of the CPU -
        the NMI is actually toggled by a 74121 */
 	if ((data & 0x80) == 0x00)
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -101,17 +100,15 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 }
 
 
-static READ8_HANDLER( redalert_ay8910_latch_1_r )
+READ8_MEMBER(redalert_state::redalert_ay8910_latch_1_r)
 {
-	redalert_state *state = space->machine().driver_data<redalert_state>();
-	return state->m_ay8910_latch_1;
+	return m_ay8910_latch_1;
 }
 
 
-static WRITE8_HANDLER( redalert_ay8910_latch_2_w )
+WRITE8_MEMBER(redalert_state::redalert_ay8910_latch_2_w)
 {
-	redalert_state *state = space->machine().driver_data<redalert_state>();
-	state->m_ay8910_latch_2 = data;
+	m_ay8910_latch_2 = data;
 }
 
 
@@ -119,18 +116,18 @@ static const ay8910_interface redalert_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,		/* port A/B read */
 	DEVCB_NULL,
 	DEVCB_HANDLER(redalert_analog_w)	/* port A/B write */
 };
 
 
-static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8, redalert_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_DEVWRITE_LEGACY("aysnd", redalert_AY8910_w)
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE_LEGACY(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
 	AM_RANGE(0x2000, 0x6fff) AM_NOP
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
 ADDRESS_MAP_END
@@ -155,11 +152,10 @@ static SOUND_START( redalert_audio )
  *
  *************************************/
 
-WRITE8_HANDLER( redalert_voice_command_w )
+WRITE8_MEMBER(redalert_state::redalert_voice_command_w)
 {
-	redalert_state *state = space->machine().driver_data<redalert_state>();
-	state->soundlatch2_w(*space, 0, (data & 0x78) >> 3);
-	cputag_set_input_line(space->machine(), "voice", I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	soundlatch2_byte_w(*&space, 0, (data & 0x78) >> 3);
+	cputag_set_input_line(machine(), "voice", I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -184,11 +180,11 @@ static I8085_CONFIG( redalert_voice_i8085_config )
 };
 
 
-static ADDRESS_MAP_START( redalert_voice_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( redalert_voice_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x3fff) AM_READ(soundlatch2_r) AM_WRITENOP
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x3fff) AM_READ(soundlatch2_byte_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -282,12 +278,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-WRITE8_HANDLER( demoneye_audio_command_w )
+WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 {
-	redalert_state *state = space->machine().driver_data<redalert_state>();
 	/* the byte is connected to port A of the AY8910 */
-	state->soundlatch_w(*space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_byte_w(*&space, 0, data);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -347,7 +342,7 @@ static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 }
 
 
-static ADDRESS_MAP_START( demoneye_audio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( demoneye_audio_map, AS_PROGRAM, 8, redalert_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("sndpia", pia6821_device, read, write)
@@ -359,7 +354,7 @@ static const ay8910_interface demoneye_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,	/* port A/B read */
 	DEVCB_NULL,
 	DEVCB_NULL				/* port A/B write */

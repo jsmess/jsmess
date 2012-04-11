@@ -147,7 +147,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 WRITE16_MEMBER(mcatadv_state::mcat_soundlatch_w)
 {
 
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 	device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_BASE(m_videoram1) // Tilemap 0
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_BASE(m_videoram2) // Tilemap 1
 
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
 
 	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) // Sprites, two halves for double buffering
@@ -220,7 +220,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcatadv_sound_io_map, AS_IO, 8, mcatadv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)
 ADDRESS_MAP_END
 
 
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( nost_sound_io_map, AS_IO, 8, mcatadv_state )
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2610_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREAD_LEGACY("ymsnd", ym2610_r)
 	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)
 ADDRESS_MAP_END
 
 /*** Inputs ***/

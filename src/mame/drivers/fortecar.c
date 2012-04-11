@@ -330,13 +330,11 @@ class fortecar_state : public driver_device
 public:
 	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
-
-	UINT8 *m_vram;
-	size_t m_vram_size;
+		m_maincpu(*this,"maincpu"),
+		m_vram(*this, "vram"){ }
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_vram;
 };
 
 
@@ -356,9 +354,9 @@ static SCREEN_UPDATE_IND16(fortecar)
 		{
 			int tile,color,bpp;
 
-			tile = (state->m_vram[(count*4)+1] | (state->m_vram[(count*4)+2]<<8)) & 0xfff;
-			color = state->m_vram[(count*4)+3] & 0x1f;
-			bpp = (state->m_vram[(count*4)+3] & 0x20) >> 5;
+			tile = (state->m_vram.target()[(count*4)+1] | (state->m_vram.target()[(count*4)+2]<<8)) & 0xfff;
+			color = state->m_vram.target()[(count*4)+3] & 0x1f;
+			bpp = (state->m_vram.target()[(count*4)+3] & 0x20) >> 5;
 
 			if(bpp)
 				color&=0x3;
@@ -562,7 +560,7 @@ static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8, fortecar_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_SIZE(m_vram,m_vram_size)
+	AM_RANGE(0xd800, 0xffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )
@@ -674,8 +672,8 @@ static MACHINE_RESET(fortecar)
 	int i;
 
 	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorythm) */
-	for(i=0;i<state->m_vram_size;i++)
-		state->m_vram[i] = machine.rand();
+	for(i=0;i<state->m_vram.bytes();i++)
+		state->m_vram.target()[i] = machine.rand();
 }
 
 

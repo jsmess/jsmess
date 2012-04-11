@@ -74,18 +74,22 @@ class srmp6_state : public driver_device
 {
 public:
 	srmp6_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sprram(*this, "sprram"),
+		m_chrram(*this, "chrram"),
+		m_dmaram(*this, "dmaram"),
+		m_video_regs(*this, "video_regs"){ }
 
 	UINT16* m_tileram;
-	UINT16* m_dmaram;
-	UINT16* m_chrram;
+	required_shared_ptr<UINT16> m_sprram;
+	required_shared_ptr<UINT16> m_chrram;
+	required_shared_ptr<UINT16> m_dmaram;
+	required_shared_ptr<UINT16> m_video_regs;
 
-	UINT16 *m_sprram;
 	UINT16 *m_sprram_old;
 
 	int m_brightness;
 	UINT16 m_input_select;
-	UINT16 *m_video_regs;
 
 	unsigned short m_lastb;
 	unsigned short m_lastb2;
@@ -153,7 +157,7 @@ static VIDEO_START(srmp6)
 	srmp6_state *state = machine.driver_data<srmp6_state>();
 
 	state->m_tileram = auto_alloc_array_clear(machine, UINT16, 0x100000*16/2);
-	state->m_dmaram = auto_alloc_array(machine, UINT16, 0x100/2);
+	//state->m_dmaram = auto_alloc_array(machine, UINT16, 0x100/2);
 	state->m_sprram_old = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
@@ -359,14 +363,14 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", cpu_get_previouspc(&space.device()), offset*2, data, mem_mask);
 			break;
 	}
-	COMBINE_DATA(&m_video_regs[offset]);
+	COMBINE_DATA(&m_video_regs.target()[offset]);
 }
 
 READ16_MEMBER(srmp6_state::video_regs_r)
 {
 
 	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(&space.device()), offset*2);
-	return m_video_regs[offset];
+	return m_video_regs.target()[offset];
 }
 
 
@@ -409,7 +413,7 @@ static UINT32 process(running_machine &machine,UINT8 b,UINT32 dst_offset)
 
 WRITE16_MEMBER(srmp6_state::srmp6_dma_w)
 {
-	UINT16* dmaram = m_dmaram;
+	UINT16* dmaram = m_dmaram.target();
 
 	COMBINE_DATA(&dmaram[offset]);
 	if (offset==13 && dmaram[offset]==0x40)
@@ -483,14 +487,14 @@ WRITE16_MEMBER(srmp6_state::srmp6_dma_w)
 READ16_MEMBER(srmp6_state::tileram_r)
 {
 
-	return m_chrram[offset];
+	return m_chrram.target()[offset];
 }
 
 WRITE16_MEMBER(srmp6_state::tileram_w)
 {
 
 	//UINT16 tmp;
-	COMBINE_DATA(&m_chrram[offset]);
+	COMBINE_DATA(&m_chrram.target()[offset]);
 
 	/* are the DMA registers enabled some other way, or always mapped here, over RAM? */
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )
@@ -505,7 +509,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 	INT8 r, g, b;
 	int brg = m_brightness - 0x60;
 
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 
 	if(brg)
 	{
@@ -551,13 +555,13 @@ static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16, srmp6_state )
 	AM_RANGE(0x4d0000, 0x4d0001) AM_READ(srmp6_irq_ack_r)
 
 	// OBJ RAM: checked [$400000-$47dfff]
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_BASE(m_sprram)
+	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_SHARE("sprram")
 
 	// CHR RAM: checked [$500000-$5fffff]
-	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w) AM_BASE(m_chrram)
-	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE_LEGACY(dma_w) AM_BASE(m_dmaram)
+	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w) AM_SHARE("chrram")
+	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE_LEGACY(dma_w) AM_SHARE("dmaram")
 
-	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_BASE(m_video_regs)	// ? gfx regs ST-0026 NiLe
+	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_SHARE("video_regs")	// ? gfx regs ST-0026 NiLe
 	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE_LEGACY("nile", nile_snd_r, nile_snd_w)
 	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE_LEGACY("nile", nile_sndctrl_r, nile_sndctrl_w)
 	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)

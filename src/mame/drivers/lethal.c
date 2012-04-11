@@ -213,7 +213,7 @@ static INTERRUPT_GEN(lethalen_interrupt)
 
 WRITE8_MEMBER(lethal_state::sound_cmd_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 }
 
 WRITE8_MEMBER(lethal_state::sound_irq_w)
@@ -326,7 +326,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 
 	if (m_cur_control2 & 0x10)	// RAM enable
 	{
-		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
+		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 	}
 	else
 	{
@@ -417,7 +417,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 // use one more palette entry for the BG color
 WRITE8_MEMBER(lethal_state::le_bgcolor_w)
 {
-	paletteram_xBBBBBGGGGGRRRRR_be_w(space, 0x3800 + offset, data);
+	paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, 0x3800 + offset, data);
 }
 
 READ8_MEMBER(lethal_state::guns_r)
@@ -479,8 +479,8 @@ static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xfc03, 0xfc03) AM_READNOP
 ADDRESS_MAP_END
 

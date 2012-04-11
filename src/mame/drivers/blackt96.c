@@ -57,10 +57,12 @@ class blackt96_state : public driver_device
 {
 public:
 	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tilemapram(*this, "tilemapram"),
+		m_tilemapram2(*this, "tilemapram2"){ }
 
-	UINT16* m_tilemapram;
-	UINT16* m_tilemapram2;
+	required_shared_ptr<UINT16> m_tilemapram;
+	required_shared_ptr<UINT16> m_tilemapram2;
 	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
 	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
 	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
@@ -88,9 +90,9 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 
 	for (y=0;y<32;y++)
 	{
-		UINT16 tile = (state->m_tilemapram2[count*2 + (base/2)+1]&0x3fff);
-		UINT16 flipx = (state->m_tilemapram2[count*2 + (base/2)+1]&0x4000);
-		UINT16 colour = (state->m_tilemapram2[count*2 + (base/2)]&0x00ff);
+		UINT16 tile = (state->m_tilemapram2.target()[count*2 + (base/2)+1]&0x3fff);
+		UINT16 flipx = (state->m_tilemapram2.target()[count*2 + (base/2)+1]&0x4000);
+		UINT16 colour = (state->m_tilemapram2.target()[count*2 + (base/2)]&0x00ff);
 
 		if (tile&0x2000)
 		{
@@ -119,8 +121,8 @@ static void draw_main(running_machine &machine, bitmap_ind16 &bitmap, const rect
 		int yy;
 		int s = 0;
 
-		xx=  ((state->m_tilemapram2[x+0]&0x001f)<<4) | (state->m_tilemapram2[x+1]&0xf000)>>12;
-		yy = ((state->m_tilemapram2[x+1]&0x1ff));
+		xx=  ((state->m_tilemapram2.target()[x+0]&0x001f)<<4) | (state->m_tilemapram2.target()[x+1]&0xf000)>>12;
+		yy = ((state->m_tilemapram2.target()[x+1]&0x1ff));
 
 		if (xx&0x100) xx-=0x200;
 		yy = 0x1ff-yy;
@@ -154,7 +156,7 @@ static SCREEN_UPDATE_IND16( blackt96 )
 	{
 		for (y=0;y<32;y++)
 		{
-			UINT16 tile = (state->m_tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
+			UINT16 tile = (state->m_tilemapram.target()[count*2]&0x7ff)+0x800; // +0xc00 for korean text
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,-16+y*8,0);
 			count++;
 		}
@@ -185,9 +187,9 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(m_tilemapram) // text tilemap
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(m_tilemapram2)// sprite list + sprite tilemaps
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("tilemapram") // text tilemap
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("tilemapram2")// sprite list + sprite tilemaps
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 
 ADDRESS_MAP_END

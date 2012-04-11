@@ -91,7 +91,7 @@ WRITE16_MEMBER(ashnojoe_state::ashnojoe_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_soundlatch_status = 1;
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }
 
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
 	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(ashnojoe_tileram6_w) AM_BASE(m_tileram_6)
 	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_BASE(m_tileram_7)
 	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0x049000, 0x049fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x049000, 0x049fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")
 	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
@@ -126,7 +126,7 @@ WRITE8_MEMBER(ashnojoe_state::adpcm_w)
 READ8_MEMBER(ashnojoe_state::sound_latch_r)
 {
 	m_soundlatch_status = 0;
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
 READ8_MEMBER(ashnojoe_state::sound_latch_status_r)

@@ -69,14 +69,18 @@ class panicr_state : public driver_device
 {
 public:
 	panicr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_scrollram(*this, "scrollram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_scrollram;
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_txttilemap;
-	UINT8 *m_scrollram;
-	UINT8 *m_mainram;
-	UINT8 *m_spriteram;
 	DECLARE_READ8_MEMBER(t5182shared_r);
 	DECLARE_WRITE8_MEMBER(t5182shared_w);
 };
@@ -159,7 +163,7 @@ static TILE_GET_INFO( get_bgtile_info )
 static TILE_GET_INFO( get_txttile_info )
 {
 	panicr_state *state = machine.driver_data<panicr_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = state->m_videoram.target();
 	int code=videoram[tile_index*4];
 	int attr=videoram[tile_index*4+2];
 	int color = attr & 0x07;
@@ -189,11 +193,11 @@ WRITE8_MEMBER(panicr_state::t5182shared_w)
 
 
 static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
-	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE(m_mainram)
-	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION("user3", 0) //attribue map ?
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0d000, 0x0d000) AM_WRITE_LEGACY(t5182_sound_irq_w)
 	AM_RANGE(0x0d002, 0x0d002) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0x0d004, 0x0d004) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
@@ -204,7 +208,7 @@ static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x0d404, 0x0d404) AM_READ_PORT("START")
 	AM_RANGE(0x0d406, 0x0d406) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d407, 0x0d407) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_BASE(m_scrollram)
+	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -220,7 +224,7 @@ static VIDEO_START( panicr )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
 	panicr_state *state = machine.driver_data<panicr_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = state->m_spriteram.target();
 	int offs,flipx,flipy,x,y,color,sprite;
 
 	for (offs = 0; offs<0x1000; offs+=16)
@@ -232,7 +236,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		if (spriteram[offs+1] & 0x40) x -= 0x100;
 
 		color = spriteram[offs+1] & 0x0f;
-		sprite = spriteram[offs+0]+(state->m_scrollram[0x0c]<<8);
+		sprite = spriteram[offs+0]+(state->m_scrollram.target()[0x0c]<<8);
 
 		drawgfx_transmask(bitmap,cliprect,machine.gfx[2],
 				sprite,
@@ -246,7 +250,7 @@ static SCREEN_UPDATE_IND16( panicr)
 	panicr_state *state = screen.machine().driver_data<panicr_state>();
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	state->m_txttilemap ->mark_all_dirty();
-	state->m_bgtilemap->set_scrollx(0, ((state->m_scrollram[0x02]&0x0f)<<12)+((state->m_scrollram[0x02]&0xf0)<<4)+((state->m_scrollram[0x04]&0x7f)<<1)+((state->m_scrollram[0x04]&0x80)>>7) );
+	state->m_bgtilemap->set_scrollx(0, ((state->m_scrollram.target()[0x02]&0x0f)<<12)+((state->m_scrollram.target()[0x02]&0xf0)<<4)+((state->m_scrollram.target()[0x04]&0x7f)<<1)+((state->m_scrollram.target()[0x04]&0x80)>>7) );
 	state->m_bgtilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(screen.machine(),bitmap,cliprect);
 	state->m_txttilemap->draw(bitmap, cliprect, 0,0);

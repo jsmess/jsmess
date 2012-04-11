@@ -45,12 +45,15 @@ class albazg_state : public driver_device
 {
 public:
 	albazg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_cus_ram(*this, "cus_ram"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_cus_ram;
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
+	required_shared_ptr<UINT8> m_cus_ram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 //  UINT8 *  m_paletteram_2;  // currently this uses generic palette handling
 
@@ -71,8 +74,8 @@ public:
 static TILE_GET_INFO( y_get_bg_tile_info )
 {
 	albazg_state *state = machine.driver_data<albazg_state>();
-	int code = state->m_videoram[tile_index];
-	int color = state->m_colorram[tile_index];
+	int code = state->m_videoram.target()[tile_index];
+	int color = state->m_colorram.target()[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -115,13 +118,13 @@ GFXDECODE_END
 
 WRITE8_MEMBER(albazg_state::yumefuda_vram_w)
 {
-	m_videoram[offset] = data;
+	m_videoram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
 {
-	m_colorram[offset] = data;
+	m_colorram.target()[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -129,14 +132,14 @@ WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
 READ8_MEMBER(albazg_state::custom_ram_r)
 {
 //  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(&space.device()));
-	return m_cus_ram[offset];// ^ 0x55;
+	return m_cus_ram.target()[offset];// ^ 0x55;
 }
 
 WRITE8_MEMBER(albazg_state::custom_ram_w)
 {
 //  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(&space.device()));
 	if(m_prot_lock)
-		m_cus_ram[offset] = data;
+		m_cus_ram.target()[offset] = data;
 }
 
 /*this might be used as NVRAM commands btw*/
@@ -183,12 +186,13 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 
 static WRITE8_DEVICE_HANDLER( yumefuda_output_w )
 {
+	albazg_state *state = device->machine().driver_data<albazg_state>();
 	coin_counter_w(device->machine(), 0, ~data & 4);
 	coin_counter_w(device->machine(), 1, ~data & 2);
 	coin_lockout_global_w(device->machine(), data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
-	flip_screen_set(device->machine(), ~data & 0x20);
+	state->flip_screen_set(~data & 0x20);
 }
 
 static const ay8910_interface ay8910_config =
@@ -232,11 +236,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE(m_cus_ram)
-	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_SHARE("cus_ram")
+	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
