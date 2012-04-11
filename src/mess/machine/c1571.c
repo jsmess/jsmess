@@ -812,7 +812,7 @@ void base_c1571_device::cbm_iec_srq(int state)
 {
 	if (!m_ser_dir)
 	{
-		//m_cia->cnt_w(state);
+		m_cia->cnt_w(state);
 	}
 }
 
@@ -838,7 +838,7 @@ void base_c1571_device::cbm_iec_data(int state)
 {
 	if (!m_ser_dir)
 	{
-		//m_cia->sp_w(state);
+		m_cia->sp_w(state);
 	}
 }
 
