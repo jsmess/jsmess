@@ -185,7 +185,7 @@ class towns_state : public driver_device
 	UINT8 m_prev_x;
 	UINT8 m_prev_y;
 
-	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<UINT32> m_nvram;
 
 	virtual void driver_start();
 	virtual void machine_reset();

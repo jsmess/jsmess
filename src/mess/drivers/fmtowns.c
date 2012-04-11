@@ -1102,16 +1102,6 @@ WRITE32_MEMBER(towns_state::towns_pad_mask_w)
 	}
 }
 
-READ8_MEMBER( towns_state::towns_cmos8_r )
-{
-	return m_nvram[offset];
-}
-
-WRITE8_MEMBER( towns_state::towns_cmos8_w )
-{
-	m_nvram[offset] = data;
-}
-
 READ8_MEMBER( towns_state::towns_cmos_low_r )
 {
 	if(m_towns_mainmem_enable != 0)
@@ -2181,7 +2171,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
   // SCSI controller
   AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("scsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
   // CMOS
-  AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
+  AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos_r, towns_cmos_w,0x00ff00ff)
   // Something (MS-DOS wants this 0x41ff to be 1)
 //  AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
   // CRTC / Video (again)
