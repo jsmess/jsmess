@@ -19,7 +19,7 @@ static ADDRESS_MAP_START( lynx_mem , AS_PROGRAM, 8, lynx_state )
 	AM_RANGE(0x0000, 0xfbff) AM_RAM AM_BASE(m_mem_0000)
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM AM_BASE(m_mem_fc00)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM AM_BASE(m_mem_fd00)
-	AM_RANGE(0xfe00, 0xfff7) AM_READ_BANK("bank3") AM_WRITEONLY AM_BASE(m_mem_fe00) AM_SIZE( m_mem_fe00_size)
+	AM_RANGE(0xfe00, 0xfff7) AM_READ_BANK("bank3") AM_WRITEONLY AM_BASE_SIZE(m_mem_fe00, m_mem_fe00_size)
 	AM_RANGE(0xfff8, 0xfff8) AM_RAM
 	AM_RANGE(0xfff9, 0xfff9) AM_READWRITE_LEGACY(lynx_memory_config_r, lynx_memory_config_w)
 	AM_RANGE(0xfffa, 0xffff) AM_READ_BANK("bank4") AM_WRITEONLY AM_BASE(m_mem_fffa)

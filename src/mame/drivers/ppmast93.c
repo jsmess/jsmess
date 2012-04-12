@@ -159,13 +159,13 @@ public:
 
 WRITE8_MEMBER(ppmast93_state::ppmast93_fgram_w)
 {
-	m_fgram.target()[offset] = data;
+	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_MEMBER(ppmast93_state::ppmast93_bgram_w)
 {
-	m_bgram.target()[offset] = data;
+	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
@@ -184,9 +184,9 @@ WRITE8_MEMBER(ppmast93_state::ppmast93_port4_w)
 static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8, ppmast93_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_SHARE("bgram") AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(ppmast93_fgram_w) AM_SHARE("fgram") AM_SHARE("share2")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(ppmast93_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -325,7 +325,7 @@ GFXDECODE_END
 static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 {
 	ppmast93_state *state = machine.driver_data<ppmast93_state>();
-	int code = (state->m_bgram.target()[tile_index*2+1] << 8) | state->m_bgram.target()[tile_index*2];
+	int code = (state->m_bgram[tile_index*2+1] << 8) | state->m_bgram[tile_index*2];
 	SET_TILE_INFO(
 			0,
 			code & 0x0fff,
@@ -336,7 +336,7 @@ static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 {
 	ppmast93_state *state = machine.driver_data<ppmast93_state>();
-	int code = (state->m_fgram.target()[tile_index*2+1] << 8) | state->m_fgram.target()[tile_index*2];
+	int code = (state->m_fgram[tile_index*2+1] << 8) | state->m_fgram[tile_index*2];
 	SET_TILE_INFO(
 			0,
 			(code & 0x0fff)+0x1000,

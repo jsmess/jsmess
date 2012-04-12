@@ -91,7 +91,7 @@ static SCREEN_UPDATE_IND16(mlanding)
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT16 *src = &state->m_g_ram.target()[y * 512/2 + cliprect.min_x];
+		UINT16 *src = &state->m_g_ram[y * 512/2 + cliprect.min_x];
 		UINT16 *dst = &bitmap.pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
@@ -124,14 +124,14 @@ static int start_dma(running_machine &machine)
 
 		int j, k;
 
-		UINT16 attr = state->m_dma_ram.target()[offs];
+		UINT16 attr = state->m_dma_ram[offs];
 
 		if (attr == 0)
 			continue;
 
-		x = state->m_dma_ram.target()[offs + 1];
-		y = state->m_dma_ram.target()[offs + 2];
-		colour = state->m_dma_ram.target()[offs + 3];
+		x = state->m_dma_ram[offs + 1];
+		y = state->m_dma_ram[offs + 2];
+		colour = state->m_dma_ram[offs + 3];
 
 		dx = x >> 11;
 		dy = y >> 11;
@@ -166,8 +166,8 @@ static int start_dma(running_machine &machine)
 					// Draw the 8x8 chunk
 					for (y1 = 0; y1 < 8; ++y1)
 					{
-						UINT16 *src = &state->m_ml_tileram.target()[(code * 2 * 8) + y1*2];
-						UINT16 *dst = &state->m_g_ram.target()[(y + k*8+y1)*512/2 + (j*8+x)/2];
+						UINT16 *src = &state->m_ml_tileram[(code * 2 * 8) + y1*2];
+						UINT16 *dst = &state->m_g_ram[(y + k*8+y1)*512/2 + (j*8+x)/2];
 
 						UINT8 p2 = *src & 0xff;
 						UINT8 p1 = *src++ >> 8;
@@ -214,7 +214,7 @@ static int start_dma(running_machine &machine)
 			for(y1 = 0; y1 < dy*8; y1++)
 			{
 				int x1;
-				UINT16 *dst = &state->m_g_ram.target()[((y + y1) * 512/2) + x/2];
+				UINT16 *dst = &state->m_g_ram[((y + y1) * 512/2) + x/2];
 
 				for(x1 = 0; x1 < dx*8; x1+=2)
 				{
@@ -228,12 +228,12 @@ static int start_dma(running_machine &machine)
 
 WRITE16_MEMBER(mlanding_state::ml_tileram_w)
 {
-	COMBINE_DATA(&m_ml_tileram.target()[offset]);
+	COMBINE_DATA(&m_ml_tileram[offset]);
 }
 
 READ16_MEMBER(mlanding_state::ml_tileram_r)
 {
-	return m_ml_tileram.target()[offset];
+	return m_ml_tileram[offset];
 }
 
 
@@ -459,7 +459,7 @@ WRITE16_MEMBER(mlanding_state::ml_nmi_to_sound_w)
 
 READ16_MEMBER(mlanding_state::ml_mecha_ram_r)
 {
-	return (m_mecha_ram.target()[offset*2]<<8)|m_mecha_ram.target()[offset*2+1];
+	return (m_mecha_ram[offset*2]<<8)|m_mecha_ram[offset*2+1];
 }
 
 WRITE16_MEMBER(mlanding_state::ml_mecha_ram_w)
@@ -476,7 +476,7 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 
 	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_SHARE("g_ram")// 512kB G RAM - enough here for double buffered 512x400x8 frame
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_SHARE("ml_tileram")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_SHARE("dma_ram")
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
@@ -512,7 +512,7 @@ static ADDRESS_MAP_START( mlanding_sub_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("ml_dotram")
 ADDRESS_MAP_END
@@ -549,12 +549,12 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(mlanding_state::ml_dotram_r)
 {
-	return m_ml_dotram.target()[offset];
+	return m_ml_dotram[offset];
 }
 
 WRITE16_MEMBER(mlanding_state::ml_dotram_w)
 {
-	m_ml_dotram.target()[offset] = data;
+	m_ml_dotram[offset] = data;
 }
 
 READ16_MEMBER(mlanding_state::dsp_HOLD_signal_r)

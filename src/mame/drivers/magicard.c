@@ -174,14 +174,14 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_magicram(*this, "magicram"),
 		m_pcab_vregs(*this, "pcab_vregs"),
-		m_scc68070_ext_irqc_regs(*this, "scc68070_ext_irqc_regs"),
-		m_scc68070_iic_regs(*this, "scc68070_iic_regs"),
-		m_scc68070_uart_regs(*this, "scc68070_uart_regs"),
-		m_scc68070_timer_regs(*this, "scc68070_timer_regs"),
-		m_scc68070_int_irqc_regs(*this, "scc68070_int_irqc_regs"),
-		m_scc68070_dma_ch1_regs(*this, "scc68070_dma_ch1_regs"),
-		m_scc68070_dma_ch2_regs(*this, "scc68070_dma_ch2_regs"),
-		m_scc68070_mmu_regs(*this, "scc68070_mmu_regs"){ }
+		m_scc68070_ext_irqc_regs(*this, "scc_xirqc_regs"),
+		m_scc68070_iic_regs(*this, "scc_iic_regs"),
+		m_scc68070_uart_regs(*this, "scc_uart_regs"),
+		m_scc68070_timer_regs(*this, "scc_timer_regs"),
+		m_scc68070_int_irqc_regs(*this, "scc_iirqc_regs"),
+		m_scc68070_dma_ch1_regs(*this, "scc_dma1_regs"),
+		m_scc68070_dma_ch2_regs(*this, "scc_dma2_regs"),
+		m_scc68070_mmu_regs(*this, "scc_mmu_regs"){ }
 
 	required_shared_ptr<UINT16> m_magicram;
 	required_shared_ptr<UINT16> m_pcab_vregs;
@@ -248,7 +248,7 @@ TODO: check this register,doesn't seem to be 100% correct.
 */
 
 /*63 at post test,6d all the time.*/
-#define SCC_CSR_VREG    (state->m_pcab_vregs.target()[0x00/2] & 0xffff)
+#define SCC_CSR_VREG    (state->m_pcab_vregs[0x00/2] & 0xffff)
 #define SCC_CG_VREG		((SCC_CSR_VREG & 0x10)>>4)
 
 /*
@@ -274,7 +274,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ ....aaaa  VSR:H = video start address (MSB's)
 */
 
-#define SCC_DCR_VREG    (state->m_pcab_vregs.target()[0x02/2] & 0xffff)
+#define SCC_DCR_VREG    (state->m_pcab_vregs[0x02/2] & 0xffff)
 #define SCC_DE_VREG		((SCC_DCR_VREG & 0x8000)>>15)
 #define SCC_FG_VREG		((SCC_DCR_VREG & 0x0080)>>7)
 #define SCC_VSR_VREG_H  ((SCC_DCR_VREG & 0xf)>>0)
@@ -284,7 +284,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w aaaaaaaa aaaaaaaa  VSR:L = video start address (LSB's)
 */
 
-#define SCC_VSR_VREG_L  (state->m_pcab_vregs.target()[0x04/2] & 0xffff)
+#define SCC_VSR_VREG_L  (state->m_pcab_vregs[0x04/2] & 0xffff)
 #define SCC_VSR_VREG    ((SCC_VSR_VREG_H)<<16) | (SCC_VSR_VREG_L)
 
 /*
@@ -303,7 +303,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ xxxx....  not used
     w ........ ....aaaa  "data" (dunno the purpose...)
 */
-#define SCC_DCR2_VREG  (state->m_pcab_vregs.target()[0x08/2] & 0xffff)
+#define SCC_DCR2_VREG  (state->m_pcab_vregs[0x08/2] & 0xffff)
 
 /*
 (Note: not present on the original vreg listing)
@@ -324,14 +324,14 @@ TODO: check this register,doesn't seem to be 100% correct.
 1ffff0  a = source register a
     w nnnnnnnn nnnnnnnn  source
 */
-#define SCC_SRCA_VREG  (state->m_pcab_vregs.target()[0x10/2] & 0xffff)
+#define SCC_SRCA_VREG  (state->m_pcab_vregs[0x10/2] & 0xffff)
 
 /*
 1ffff2  b = destination register b
    rw nnnnnnnn nnnnnnnn  destination
 */
 
-#define SCC_DSTB_VREG  (state->m_pcab_vregs.target()[0x12/2] & 0xffff)
+#define SCC_DSTB_VREG  (state->m_pcab_vregs[0x12/2] & 0xffff)
 
 /*
 1ffff4  pcr = pixac command register
@@ -378,7 +378,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ .......0
 */
 
-#define SCC_PCR_VREG  (state->m_pcab_vregs.target()[0x14/2] & 0xffff)
+#define SCC_PCR_VREG  (state->m_pcab_vregs[0x14/2] & 0xffff)
 
 /*
 1ffff6  mask = mask register
@@ -430,22 +430,22 @@ static SCREEN_UPDATE_RGB32(magicard)
 			{
 				UINT32 color;
 
-				color = ((state->m_magicram.target()[count]) & 0x000f)>>0;
+				color = ((state->m_magicram[count]) & 0x000f)>>0;
 
 				if(cliprect.contains((x*4)+3, y))
 					bitmap.pix32(y, (x*4)+3) = screen.machine().pens[color];
 
-				color = ((state->m_magicram.target()[count]) & 0x00f0)>>4;
+				color = ((state->m_magicram[count]) & 0x00f0)>>4;
 
 				if(cliprect.contains((x*4)+2, y))
 					bitmap.pix32(y, (x*4)+2) = screen.machine().pens[color];
 
-				color = ((state->m_magicram.target()[count]) & 0x0f00)>>8;
+				color = ((state->m_magicram[count]) & 0x0f00)>>8;
 
 				if(cliprect.contains((x*4)+1, y))
 					bitmap.pix32(y, (x*4)+1) = screen.machine().pens[color];
 
-				color = ((state->m_magicram.target()[count]) & 0xf000)>>12;
+				color = ((state->m_magicram[count]) & 0xf000)>>12;
 
 				if(cliprect.contains((x*4)+0, y))
 					bitmap.pix32(y, (x*4)+0) = screen.machine().pens[color];
@@ -462,12 +462,12 @@ static SCREEN_UPDATE_RGB32(magicard)
 			{
 				UINT32 color;
 
-				color = ((state->m_magicram.target()[count]) & 0x00ff)>>0;
+				color = ((state->m_magicram[count]) & 0x00ff)>>0;
 
 				if(cliprect.contains((x*2)+1, y))
 					bitmap.pix32(y, (x*2)+1) = screen.machine().pens[color];
 
-				color = ((state->m_magicram.target()[count]) & 0xff00)>>8;
+				color = ((state->m_magicram[count]) & 0xff00)>>8;
 
 				if(cliprect.contains((x*2)+0, y))
 					bitmap.pix32(y, (x*2)+0) = screen.machine().pens[color];
@@ -534,17 +534,17 @@ READ16_MEMBER(magicard_state::philips_66470_r)
 	//printf("[%04x]\n",offset*2);
 
 
-	return m_pcab_vregs.target()[offset];
+	return m_pcab_vregs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::philips_66470_w)
 {
-	COMBINE_DATA(&m_pcab_vregs.target()[offset]);
+	COMBINE_DATA(&m_pcab_vregs[offset]);
 
 //  if(offset == 0x10/2)
 //  {
-		//printf("%04x %04x %04x\n",data,m_pcab_vregs.target()[0x12/2],m_pcab_vregs.target()[0x14/2]);
-		//m_pcab_vregs.target()[0x12/2] = m_pcab_vregs.target()[0x10/2];
+		//printf("%04x %04x %04x\n",data,m_pcab_vregs[0x12/2],m_pcab_vregs[0x14/2]);
+		//m_pcab_vregs[0x12/2] = m_pcab_vregs[0x10/2];
 //  }
 }
 
@@ -552,12 +552,12 @@ WRITE16_MEMBER(magicard_state::philips_66470_w)
 
 READ16_MEMBER(magicard_state::scc68070_ext_irqc_r)
 {
-	return m_scc68070_ext_irqc_regs.target()[offset];
+	return m_scc68070_ext_irqc_regs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::scc68070_ext_irqc_w)
 {
-	m_scc68070_ext_irqc_regs.target()[offset] = data;
+	m_scc68070_ext_irqc_regs[offset] = data;
 }
 
 READ16_MEMBER(magicard_state::scc68070_iic_r)
@@ -566,15 +566,15 @@ READ16_MEMBER(magicard_state::scc68070_iic_r)
 
 	switch(offset)
 	{
-		case 0x04/2: return m_scc68070_iic_regs.target()[offset] & 0xef; //iic status register, bit 4 = pending irq
+		case 0x04/2: return m_scc68070_iic_regs[offset] & 0xef; //iic status register, bit 4 = pending irq
 	}
 
-	return m_scc68070_iic_regs.target()[offset];
+	return m_scc68070_iic_regs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::scc68070_iic_w)
 {
-	m_scc68070_iic_regs.target()[offset] = data;
+	m_scc68070_iic_regs[offset] = data;
 }
 
 READ16_MEMBER(magicard_state::scc68070_uart_r)
@@ -586,62 +586,62 @@ READ16_MEMBER(magicard_state::scc68070_uart_r)
 		case 0x02/2: return machine().rand(); //uart mode register
 	}
 
-	return m_scc68070_uart_regs.target()[offset];
+	return m_scc68070_uart_regs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::scc68070_uart_w)
 {
-	m_scc68070_uart_regs.target()[offset] = data;
+	m_scc68070_uart_regs[offset] = data;
 }
 
 READ16_MEMBER(magicard_state::scc68070_timer_r)
 {
-	return m_scc68070_timer_regs.target()[offset];
+	return m_scc68070_timer_regs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::scc68070_timer_w)
 {
-	m_scc68070_timer_regs.target()[offset] = data;
+	m_scc68070_timer_regs[offset] = data;
 }
 
 READ16_MEMBER(magicard_state::scc68070_int_irqc_r)
 {
-	return m_scc68070_int_irqc_regs.target()[offset];
+	return m_scc68070_int_irqc_regs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::scc68070_int_irqc_w)
 {
-	m_scc68070_int_irqc_regs.target()[offset] = data;
+	m_scc68070_int_irqc_regs[offset] = data;
 }
 
 READ16_MEMBER(magicard_state::scc68070_dma_ch1_r)
 {
-	return m_scc68070_dma_ch1_regs.target()[offset];
+	return m_scc68070_dma_ch1_regs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::scc68070_dma_ch1_w)
 {
-	m_scc68070_dma_ch1_regs.target()[offset] = data;
+	m_scc68070_dma_ch1_regs[offset] = data;
 }
 
 READ16_MEMBER(magicard_state::scc68070_dma_ch2_r)
 {
-	return m_scc68070_dma_ch2_regs.target()[offset];
+	return m_scc68070_dma_ch2_regs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::scc68070_dma_ch2_w)
 {
-	m_scc68070_dma_ch2_regs.target()[offset] = data;
+	m_scc68070_dma_ch2_regs[offset] = data;
 }
 
 READ16_MEMBER(magicard_state::scc68070_mmu_r)
 {
-	return m_scc68070_mmu_regs.target()[offset];
+	return m_scc68070_mmu_regs[offset];
 }
 
 WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
 {
-	m_scc68070_mmu_regs.target()[offset] = data;
+	m_scc68070_mmu_regs[offset] = data;
 
 	switch(offset)
 	{
@@ -671,14 +671,14 @@ static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
 	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
 	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_SHARE("pcab_vregs") //video registers
-	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_SHARE("scc68070_ext_irqc_regs") //lir
-	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_SHARE("scc68070_iic_regs") //i2c
-	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_SHARE("scc68070_uart_regs")
-	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_SHARE("scc68070_timer_regs")
-	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_SHARE("scc68070_int_irqc_regs")
-	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_SHARE("scc68070_dma_ch1_regs")
-	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_SHARE("scc68070_dma_ch2_regs")
-	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_SHARE("scc68070_mmu_regs")
+	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_SHARE("scc_xirqc_regs") //lir
+	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_SHARE("scc_iic_regs") //i2c
+	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_SHARE("scc_uart_regs")
+	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_SHARE("scc_timer_regs")
+	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_SHARE("scc_iirqc_regs")
+	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_SHARE("scc_dma1_regs")
+	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_SHARE("scc_dma2_regs")
+	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_SHARE("scc_mmu_regs")
 ADDRESS_MAP_END
 
 
@@ -694,7 +694,7 @@ static MACHINE_RESET( magicard )
 {
 	magicard_state *state = machine.driver_data<magicard_state>();
 	UINT16 *src    = (UINT16*)machine.region("maincpu" )->base();
-	UINT16 *dst    = state->m_magicram.target();
+	UINT16 *dst    = state->m_magicram;
 	memcpy (dst, src, 0x80000);
 	machine.device("maincpu")->reset();
 }
