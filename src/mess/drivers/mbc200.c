@@ -42,7 +42,8 @@ public:
 		m_ppi(*this, "ppi8255_2"),
 		m_floppy0(*this, FLOPPY_0),
 		m_floppy1(*this, FLOPPY_1)
-	{ }
+	,
+		m_vram(*this, "vram"){ }
 
 	virtual void machine_start();
 
@@ -58,7 +59,7 @@ public:
 
 	UINT8 m_hs_bit;
 	UINT8 m_comm_latch;
-	UINT8 *m_vram;
+	required_shared_ptr<UINT8> m_vram;
 
 };
 
@@ -92,7 +93,7 @@ static ADDRESS_MAP_START(mbc200_sub_mem, AS_PROGRAM, 8, mbc200_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x2fff ) AM_ROM
 	AM_RANGE( 0x3000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_RAM AM_BASE(m_vram)
+	AM_RANGE( 0x8000, 0xffff ) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 READ8_MEMBER(mbc200_state::from_master_r)

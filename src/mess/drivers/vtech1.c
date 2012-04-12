@@ -161,7 +161,8 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_printer(*this, "printer")
-	{ }
+	,
+		m_videoram(*this, "videoram"){ }
 
 	/* devices */
 	required_device<mc6847_base_device> m_mc6847;
@@ -171,8 +172,7 @@ public:
 
 	UINT8 *m_ram;
 	UINT32 m_ram_size;
-	UINT8 *m_videoram;
-	size_t m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* floppy */
 	int m_drive;
@@ -566,7 +566,7 @@ WRITE8_MEMBER(vtech1_state::vtech1_latch_w)
 		logerror("vtech1_latch_w $%02X\n", data);
 
 	/* bit 1, SHRG mod (if installed) */
-	if (m_videoram_size == 0x2000)
+	if (m_videoram.bytes() == 0x2000)
 	{
 		m_mc6847->gm0_w(BIT(data, 1));
 		m_mc6847->gm2_w(BIT(data, 1));
@@ -686,8 +686,8 @@ static DRIVER_INIT( vtech1h )
 	DRIVER_INIT_CALL(vtech1);
 
 	/* the SHRG mod replaces the standard videoram chip with an 8k chip */
-	vtech1->m_videoram_size = 0x2000;
-	vtech1->m_videoram = auto_alloc_array(machine, UINT8, vtech1->m_videoram_size);
+	//vtech1->m_videoram_size = 0x2000;
+	//vtech1->m_videoram = auto_alloc_array(machine, UINT8, vtech1->m_videoram_size);
 
 	prg->install_readwrite_bank(0x7000, 0x77ff, "bank4");
 	memory_configure_bank(machine, "bank4", 0, 4, vtech1->m_videoram, 0x800);
@@ -703,7 +703,7 @@ static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(m_videoram) /* (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* (6847) */
 	AM_RANGE(0x7800, 0x7fff) AM_RAMBANK("bank1") /* 2k user ram */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xc000, 0xffff) AM_NOP
@@ -714,7 +714,7 @@ static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(m_videoram) /* U7 (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* U7 (6847) */
 	AM_RANGE(0x7800, 0x8fff) AM_RAMBANK("bank1") /* 6k user ram */
 	AM_RANGE(0x9000, 0xcfff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xd000, 0xffff) AM_NOP
@@ -725,7 +725,7 @@ static ADDRESS_MAP_START( laser310_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(m_videoram) /* (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* (6847) */
 	AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK("bank1") /* 16k user ram */
 	AM_RANGE(0xb800, 0xf7ff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xf8ff, 0xffff) AM_NOP

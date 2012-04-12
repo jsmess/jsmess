@@ -18,7 +18,8 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_pic(*this, "pic8259"),
 	m_crtc(*this, "crtc")
-	{ }
+	,
+		m_p_vram(*this, "p_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pic;
@@ -26,7 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
 	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);
 	DECLARE_WRITE_LINE_MEMBER(multi16_set_int_line);
-	UINT16 *m_p_vram;
+	required_shared_ptr<UINT16> m_p_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 };
 
@@ -84,7 +85,7 @@ static SCREEN_UPDATE_IND16( multi16 )
 static ADDRESS_MAP_START(multi16_map, AS_PROGRAM, 16, multi16_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
-	AM_RANGE(0xd8000,0xdffff) AM_RAM AM_BASE(m_p_vram)
+	AM_RANGE(0xd8000,0xdffff) AM_RAM AM_SHARE("p_vram")
 	AM_RANGE(0xe0000,0xeffff) AM_RAM
 	AM_RANGE(0xf0000,0xf3fff) AM_MIRROR(0xc000) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END

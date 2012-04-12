@@ -260,7 +260,9 @@ public:
 		  m_sio(*this, UPD8251_TAG),
 		  m_hgdc1(*this, "upd7220_chr"),
 		  m_hgdc2(*this, "upd7220_btm")
-	{ }
+	,
+		m_video_ram_1(*this, "video_ram_1"),
+		m_video_ram_2(*this, "video_ram_2"){ }
 
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_sio;
@@ -270,8 +272,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *m_video_ram_1;
-	UINT8 *m_video_ram_2;
+	required_shared_ptr<UINT8> m_video_ram_1;
+	required_shared_ptr<UINT8> m_video_ram_2;
 	UINT8 *m_char_rom;
 
 	UINT8 m_portb_tmp;
@@ -1706,11 +1708,11 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, pc9801_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram_1)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, pc9801_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram_2)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
 /* keyboard code */

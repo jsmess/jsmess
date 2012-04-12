@@ -25,7 +25,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_speaker(*this, SPEAKER_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
@@ -35,7 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	const UINT8	*m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	const UINT8	*m_p_chargen;
 	UINT8		m_data_out;
 	UINT8		m_keyboard_input;

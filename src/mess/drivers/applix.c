@@ -32,14 +32,15 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "crtc")
-	{ }
+	,
+		m_base(*this, "base"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(applix_index_w);
 	DECLARE_WRITE16_MEMBER(applix_register_w);
-	UINT8* m_base;
+	required_shared_ptr<UINT8> m_base;
 };
 
 WRITE16_MEMBER( applix_state::applix_index_w )
@@ -70,7 +71,7 @@ READ16_MEMBER( applix_state::applix_inputs_r )
 static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(m_base)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("base")
 	AM_RANGE(0x080000, 0x47ffff) AM_NOP //AM_RAM // expansion
 	AM_RANGE(0x500000, 0x5fffff) AM_ROM
 	//AM_RANGE(0x600000, 0x600001) centronics latch (odd), video palette entry 0 (even)

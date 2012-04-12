@@ -16,10 +16,11 @@ public:
 	rainbow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_crtc(*this, "vt100_video")
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<device_t> m_crtc;
-	UINT8 *m_p_ram;
+	required_shared_ptr<UINT8> m_p_ram;
 	UINT8 m_diagnostic;
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
@@ -34,7 +35,7 @@ static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xec000, 0xedfff) AM_RAM
-	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_BASE(m_p_ram)
+	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

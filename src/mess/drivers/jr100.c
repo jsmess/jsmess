@@ -25,11 +25,14 @@ class jr100_state : public driver_device
 {
 public:
 	jr100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"),
+		m_pcg(*this, "pcg"),
+		m_vram(*this, "vram"){ }
 
-	UINT8 *m_ram;
-	UINT8 *m_vram;
-	UINT8 *m_pcg;
+	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<UINT8> m_pcg;
+	required_shared_ptr<UINT8> m_vram;
 	UINT8 m_keyboard_line;
 	bool m_use_pcg;
 	UINT8 m_speaker;
@@ -79,9 +82,9 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 
 static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8, jr100_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_ram)
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(m_pcg)
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("pcg")
+	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xc800, 0xc80f) AM_DEVREAD("via", via6522_device, read) AM_WRITE(jr100_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -33,7 +33,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, CASSETTE_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -41,7 +42,7 @@ public:
 	DECLARE_READ8_MEMBER(z1013_port_b_r);
 	DECLARE_WRITE8_MEMBER(z1013_port_b_w);
 	DECLARE_READ8_MEMBER(z1013k7659_port_b_r);
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT8 m_keyboard_line;
 	bool m_keyboard_part;
@@ -51,7 +52,7 @@ public:
 /* Address maps */
 static ADDRESS_MAP_START(z1013_mem, AS_PROGRAM, 8, z1013_state)
 	AM_RANGE( 0x0000, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
 ADDRESS_MAP_END
 

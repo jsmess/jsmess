@@ -25,14 +25,15 @@ public:
 	ax20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_vram(*this, "p_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *m_p_vram;
+	required_shared_ptr<UINT8> m_p_vram;
 };
 
 
@@ -56,7 +57,7 @@ static ADDRESS_MAP_START(ax20_map, AS_PROGRAM, 8, ax20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x1ffff) AM_RAM
 	AM_RANGE(0x20000,0x3ffff) AM_RAM //optional RAM
-	AM_RANGE(0xf0400,0xf0fff) AM_RAM AM_BASE(m_p_vram)
+	AM_RANGE(0xf0400,0xf0fff) AM_RAM AM_SHARE("p_vram")
 	AM_RANGE(0xff800,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 

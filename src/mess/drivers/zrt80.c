@@ -33,7 +33,8 @@ public:
 	m_crtc(*this, "crtc"),
 	m_8250(*this, "ins8250"),
 	m_beep(*this, BEEPER_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -44,7 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER( zrt80_38_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	const UINT8 *m_p_chargen;
 	virtual void machine_reset();
 	virtual void video_start();
@@ -81,7 +82,7 @@ static ADDRESS_MAP_START(zrt80_mem, AS_PROGRAM, 8, zrt80_state)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
 	AM_RANGE(0x4000, 0x43ff) AM_RAM	// Board RAM
 	// Normally video RAM is 0x800 but could be expanded up to 8K
-	AM_RANGE(0xc000, 0xdfff) AM_RAM	AM_BASE(m_p_videoram) // Video RAM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM	AM_SHARE("p_videoram") // Video RAM
 
 ADDRESS_MAP_END
 

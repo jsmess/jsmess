@@ -59,7 +59,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ppi8255_2(*this, "ppi8255_2")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device> m_ppi8255_2;
@@ -75,7 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
 	UINT8 m_term_data;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
 	UINT8 m_shift_press_flag;
@@ -310,7 +311,7 @@ static ADDRESS_MAP_START(tk80bs_mem, AS_PROGRAM, 8, tk80bs_state)
 //  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
 	AM_RANGE(0x7df8, 0x7df9) AM_NOP // i8251 sio
 	AM_RANGE(0x7dfc, 0x7dff) AM_READWRITE(ppi_custom_r,ppi_custom_w)
-	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_BASE(m_p_videoram) // video ram
+	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_SHARE("p_videoram") // video ram
 	AM_RANGE(0x8000, 0xcfff) AM_RAM // RAM
 	AM_RANGE(0xd000, 0xefff) AM_ROM // BASIC
 	AM_RANGE(0xf000, 0xffff) AM_ROM // BSMON

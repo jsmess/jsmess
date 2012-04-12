@@ -24,11 +24,14 @@ class jr200_state : public driver_device
 {
 public:
 	jr200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram"),
+		m_mn1271_ram(*this, "mn1271_ram"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_cram;
-	UINT8 *m_mn1271_ram;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_cram;
+	required_shared_ptr<UINT8> m_mn1271_ram;
 	UINT8 m_border_col;
 	UINT8 m_old_keydata;
 	UINT8 m_freq_reg[2];
@@ -335,12 +338,12 @@ static ADDRESS_MAP_START(jr200_mem, AS_PROGRAM, 8, jr200_state )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(jr200_pcg_1_r,jr200_pcg_1_w) //PCG area (1)
-	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0xc100, 0xc3ff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xc400, 0xc4ff) AM_READWRITE(jr200_pcg_2_r,jr200_pcg_2_w) //PCG area (2)
-	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_BASE(m_cram)
+	AM_RANGE(0xc500, 0xc7ff) AM_RAM AM_SHARE("cram")
 
 //  0xc800 - 0xcfff I / O area
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(mn1271_io_r,mn1271_io_w) AM_BASE(m_mn1271_ram)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(mn1271_io_r,mn1271_io_w) AM_SHARE("mn1271_ram")
 
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(jr200_bios_char_r,jr200_bios_char_w) //BIOS PCG RAM area
 	AM_RANGE(0xd800, 0xdfff) AM_ROM // cart space (header 0x7e)

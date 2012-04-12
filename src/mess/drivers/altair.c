@@ -29,7 +29,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
-	{ }
+	,
+		m_ram(*this, "ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -39,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sio_command_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	UINT8* m_ram;
+	required_shared_ptr<UINT8> m_ram;
 };
 
 
@@ -68,7 +69,7 @@ READ8_MEMBER(altair_state::sio_key_status_r)
 
 static ADDRESS_MAP_START(altair_mem, AS_PROGRAM, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_BASE(m_ram)
+	AM_RANGE( 0x0000, 0xfcff ) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0xfd00, 0xfdff ) AM_ROM
 	AM_RANGE( 0xff00, 0xffff ) AM_ROM
 ADDRESS_MAP_END

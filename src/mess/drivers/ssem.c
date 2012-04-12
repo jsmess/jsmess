@@ -15,9 +15,10 @@ class ssem_state : public driver_device
 {
 public:
 	ssem_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_store(*this, "store"){ }
 
-	UINT8 *m_store;
+	required_shared_ptr<UINT8> m_store;
 	UINT8 m_store_line;
 };
 
@@ -53,7 +54,7 @@ INLINE UINT32 reverse(UINT32 v)
 \****************************************************/
 
 static ADDRESS_MAP_START( ssem_map, AS_PROGRAM, 8, ssem_state )
-	AM_RANGE(0x00, 0x7f) AM_RAM AM_BASE(m_store)// Primary store
+	AM_RANGE(0x00, 0x7f) AM_RAM AM_SHARE("store")// Primary store
 ADDRESS_MAP_END
 
 /****************************************************\

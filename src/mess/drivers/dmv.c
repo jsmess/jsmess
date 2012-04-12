@@ -25,7 +25,8 @@ public:
 		  m_dmac(*this, "dma8237"),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)
-		{ }
+		,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
@@ -41,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fdd_motor_w);
 	DECLARE_READ8_MEMBER(sys_status_r);
 
-	UINT8 *		m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	int 		m_fdc_int_line;
 };
 
@@ -144,7 +145,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, dmv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_BASE(m_video_ram)
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 /* Input ports */

@@ -62,8 +62,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_term_data(0),
 	m_j(0),
-	m_scroll(0)
-	{ }
+	m_scroll(0),
+	m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
@@ -74,10 +74,10 @@ public:
 	DECLARE_READ8_MEMBER(okean240a_keyboard_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	UINT8 *m_p_videoram;
 	UINT8 m_term_data;
 	UINT8 m_j;
 	UINT8 m_scroll;
+	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_reset();
 	virtual void video_start();
 };
@@ -190,7 +190,7 @@ static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8, okean240_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -80,17 +80,18 @@ public:
 	sun2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset();
 
-	UINT16* m_p_ram;
+	required_shared_ptr<UINT16> m_p_ram;
 };
 
 static ADDRESS_MAP_START(sun2_mem, AS_PROGRAM, 16, sun2_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(m_p_ram) // 8MB
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("p_ram") // 8MB
 	AM_RANGE(0x00ef0000, 0x00ef7fff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -103,7 +104,7 @@ MACHINE_RESET_MEMBER(sun2_state)
 {
 	UINT8* user1 = machine().region("user1")->base();
 
-	memcpy((UINT8*)m_p_ram,user1,0x8000);
+	memcpy((UINT8*)m_p_ram.target(),user1,0x8000);
 
 	machine().device("maincpu")->reset();
 }

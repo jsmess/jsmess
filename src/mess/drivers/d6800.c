@@ -58,7 +58,8 @@ public:
 		  m_cass(*this, CASSETTE_TAG),
 		  m_pia(*this, "pia"),
 		  m_speaker(*this, SPEAKER_TAG)
-	{ }
+	,
+		m_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -75,7 +76,7 @@ public:
 	UINT8 m_keylatch;
 	UINT8 m_screen_on;
 	UINT8 m_rtc;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 };
 
 

@@ -27,7 +27,8 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, CASSETTE_TAG),
 	m_beep(*this, BEEPER_TAG)
-	{ }
+	,
+		m_p_wram(*this, "p_wram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -42,7 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(tape_start_r);
 	DECLARE_WRITE8_MEMBER(xor_display_w);
 	bool m_tape_switch;
-	UINT8 *m_p_wram;
+	required_shared_ptr<UINT8> m_p_wram;
 	UINT8 *m_p_chargen;
 	UINT8 m_xor_display;
 	UINT8 m_key_mux;
@@ -162,7 +163,7 @@ static ADDRESS_MAP_START(bmjr_mem, AS_PROGRAM, 8, bmjr_state)
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
 	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
-	AM_RANGE(0x0000, 0xafff) AM_RAM AM_BASE(m_p_wram)
+	AM_RANGE(0x0000, 0xafff) AM_RAM AM_SHARE("p_wram")
 	AM_RANGE(0xb000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_ROM
 //  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color

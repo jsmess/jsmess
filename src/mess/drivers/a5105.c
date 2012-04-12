@@ -41,8 +41,8 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_hgdc(*this, "upd7220"),
 	m_cass(*this, CASSETTE_TAG),
-	m_beep(*this, BEEPER_TAG)
-	{ }
+	m_beep(*this, BEEPER_TAG),
+	m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
@@ -57,7 +57,7 @@ public:
 	WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_ram_base;
 	UINT8 *m_rom_base;
 	UINT8 *m_char_rom;
@@ -518,7 +518,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, a5105_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static LEGACY_FLOPPY_OPTIONS_START(a5105)

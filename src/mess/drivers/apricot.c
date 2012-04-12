@@ -39,7 +39,8 @@ public:
 	m_pit(*this, "ic16"),
 	m_z80sio(*this, "ic15"),
 	m_fdc(*this, "ic68")
-	{ }
+	,
+		m_screen_buffer(*this, "screen_buffer"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -60,7 +61,7 @@ public:
 	bool m_video_mode;
 	bool m_display_on;
 	bool m_display_enabled;
-	UINT16 *m_screen_buffer;
+	required_shared_ptr<UINT16> m_screen_buffer;
 };
 
 
@@ -277,7 +278,7 @@ static DRIVER_INIT( apricot )
 static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAMBANK("standard_ram")
 	AM_RANGE(0x40000, 0xeffff) AM_RAMBANK("expansion_ram")
-	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_BASE(m_screen_buffer)
+	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x7000) AM_RAM AM_SHARE("screen_buffer")
 	AM_RANGE(0xfc000, 0xfffff) AM_MIRROR(0x4000) AM_ROM AM_REGION("bootstrap", 0)
 ADDRESS_MAP_END
 

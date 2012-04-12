@@ -26,12 +26,13 @@ class pv9234_state : public driver_device
 {
 public:
 	pv9234_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_ram(*this, "p_ram"){ }
 
 	DECLARE_WRITE32_MEMBER(debug_w);
 	DECLARE_WRITE32_MEMBER(debug1_w);
 	DECLARE_WRITE32_MEMBER(debug2_w);
-	UINT32 *m_p_ram;
+	required_shared_ptr<UINT32> m_p_ram;
 };
 
 
@@ -99,7 +100,7 @@ static ADDRESS_MAP_START(pv9234_map, AS_PROGRAM, 32, pv9234_state)
 	AM_RANGE(0x000080c0, 0x000080c3) AM_WRITE(debug2_w)
 	AM_RANGE(0x000080cc, 0x000080cf) AM_WRITE(debug_w)
 	// AM_RANGE(0x000080d0, 0x000080d3) AM_WRITE something
-	AM_RANGE(0x0003e000, 0x0003efff) AM_RAM AM_BASE(m_p_ram)
+	AM_RANGE(0x0003e000, 0x0003efff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu",0) //FLASH ROM!
 	AM_RANGE(0x00080000, 0x00087fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("share1")//mirror is a guess, writes a prg at 0xc0200 then it jumps at b0200 (!)
 	AM_RANGE(0xe0000000, 0xe0007fff) AM_MIRROR(0x0fff8000) AM_RAM AM_SHARE("share1")

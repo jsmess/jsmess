@@ -28,7 +28,8 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "vt100_video"),
 	m_speaker(*this, SPEAKER_TAG)
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_crtc;
@@ -40,7 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
 	DECLARE_WRITE8_MEMBER(vt100_clear_video_interrupt);
-	UINT8 *m_p_ram;
+	required_shared_ptr<UINT8> m_p_ram;
 	bool m_keyboard_int;
 	bool m_receiver_int;
 	bool m_vertical_int;
@@ -56,7 +57,7 @@ public:
 static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8, vt100_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM ( 4 * 2K)
-	AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_BASE(m_p_ram) // Screen and scratch RAM
+	AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_SHARE("p_ram") // Screen and scratch RAM
 	AM_RANGE( 0x2c00, 0x2fff ) AM_RAM  // AVO Screen RAM
 	AM_RANGE( 0x3000, 0x3fff ) AM_RAM  // AVO Attribute RAM (4 bits wide)
 	// 0x4000, 0x7fff is unassigned

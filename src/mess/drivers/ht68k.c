@@ -40,7 +40,8 @@ public:
 	m_terminal(*this, TERMINAL_TAG),
 	m_duart(*this, "duart68681"),
 	m_fdc(*this, "wd1770")
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -48,14 +49,14 @@ public:
 	required_device<device_t> m_fdc;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE_LINE_MEMBER(ht68k_fdc_intrq_w);
-	UINT16* m_p_ram;
+	required_shared_ptr<UINT16> m_p_ram;
 };
 
 
 
 static ADDRESS_MAP_START(ht68k_mem, AS_PROGRAM, 16, ht68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_p_ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
 	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
 	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8_LEGACY("wd1770", wd17xx_r, wd17xx_w, 0x00ff) // FDC WD1770
@@ -73,7 +74,7 @@ static MACHINE_RESET(ht68k)
 	ht68k_state *state = machine.driver_data<ht68k_state>();
 	UINT8* user1 = machine.region("user1")->base();
 
-	memcpy((UINT8*)state->m_p_ram,user1,0x8000);
+	memcpy((UINT8*)state->m_p_ram.target(),user1,0x8000);
 
 	machine.device("maincpu")->reset();
 }

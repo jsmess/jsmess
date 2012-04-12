@@ -42,8 +42,9 @@ public:
 	m_crtc(*this, "crtc"),
 	m_usart(*this, "usart"),
 	m_cass(*this, CASSETTE_TAG),
-	m_beep(*this, BEEPER_TAG)
-	{ }
+	m_beep(*this, BEEPER_TAG),
+	m_p_ram(*this, "p_ram"),
+	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -57,11 +58,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(rxdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 
+	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	emu_timer* m_sys_timer;
 	emu_timer* m_serial_timer;  // for the usart
-	UINT8 *m_p_videoram;
 	UINT8 *m_p_chargen;
-	UINT8 *m_p_ram;
 	virtual void video_start();
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -181,8 +182,8 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0xefff) AM_RAM AM_BASE(m_p_ram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )

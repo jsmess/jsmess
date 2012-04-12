@@ -24,7 +24,9 @@ public:
 	m_pic(*this, "pic8259"),
 	m_dma(*this, "8237dma"),
 	m_crtc(*this, "crtc")
-	{ }
+	,
+		m_p_vram(*this, "p_vram"),
+		m_p_gvram(*this, "p_gvram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pic;
@@ -42,8 +44,8 @@ public:
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 *m_p_chargen;
 	UINT8 *m_p_pcg;
-	UINT16 *m_p_vram;
-	UINT16 *m_p_gvram;
+	required_shared_ptr<UINT16> m_p_vram;
+	required_shared_ptr<UINT16> m_p_gvram;
 
 	struct{
 		UINT8 portb;
@@ -216,9 +218,9 @@ READ16_MEMBER( paso1600_state::test_hi_r )
 static ADDRESS_MAP_START(paso1600_map, AS_PROGRAM, 16, paso1600_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
-	AM_RANGE(0xb0000,0xb0fff) AM_RAM AM_BASE(m_p_vram) // tvram
+	AM_RANGE(0xb0000,0xb0fff) AM_RAM AM_SHARE("p_vram") // tvram
 	AM_RANGE(0xbfff0,0xbffff) AM_READWRITE8(paso1600_pcg_r,paso1600_pcg_w,0xffff)
-	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_BASE(m_p_gvram)// gvram
+	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_SHARE("p_gvram")// gvram
 	AM_RANGE(0xe0000,0xeffff) AM_ROM AM_REGION("kanji",0)// kanji rom, banked via port 0x93
 	AM_RANGE(0xfe000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
