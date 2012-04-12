@@ -104,61 +104,15 @@
 		</screen>
 	</view>
 
-	<view name="Apollo 15&quot; Monochrome old">
-		<bezel element="background"> <bounds left="0" right="1023" top="801" bottom="821" /> </bezel>
-
-		<bezel name="internal_led_1" element="internal_led"> <bounds left="5" right="17" top="805" bottom="817" /> </bezel>
-		<bezel name="internal_led_2" element="internal_led"> <bounds left="25" right="37" top="805" bottom="817" /> </bezel>
-		<bezel name="internal_led_3" element="internal_led"> <bounds left="45" right="57" top="805" bottom="817" /> </bezel>
-		<bezel name="internal_led_4" element="internal_led"> <bounds left="65" right="77" top="805" bottom="817" /> </bezel>
-
-		<bezel element="label_a"> <bounds left="812" right="826" top="803" bottom="819" /> </bezel>
-		<bezel name="external_led_a" element="external_led"> <bounds left="830" right="842" top="805" bottom="817" /> </bezel>
-
-		<bezel element="label_b"> <bounds left="850" right="862" top="803" bottom="819" /> </bezel>
-		<bezel name="external_led_b" element="external_led"> <bounds left="868" right="880" top="805" bottom="817" /> </bezel>
-
-		<bezel element="label_c"> <bounds left="888" right="900" top="803" bottom="819" /> </bezel>
-		<bezel name="external_led_c" element="external_led"> <bounds left="906" right="918" top="805" bottom="817" /> </bezel>
-
-		<bezel element="label_d"> <bounds left="926" right="938" top="803" bottom="819" /> </bezel>
-		<bezel name="external_led_d" element="external_led"> <bounds left="944" right="956" top="805" bottom="817" /> </bezel>
-
-		<bezel element="power_label"> <bounds left="964" right="996" top="803" bottom="819" /> </bezel>
-		<bezel name="power_led" element="power_led"> <bounds left="1002" right="1014" top="805" bottom="817" /> </bezel>
-
-		<bezel element="background"> <bounds left="0" right="340" top="823" bottom="865" /> </bezel>
-		<bezel element="f1s"> <bounds left="0" right="80" top="827" bottom="843" /> </bezel>
-		<bezel element="f1"> <bounds left="0" right="80" top="845" bottom="861" /> </bezel>
-		<bezel element="f2s"> <bounds left="82" right="162" top="827" bottom="843" /> </bezel>
-		<bezel element="f2"> <bounds left="82" right="162" top="845" bottom="861" /> </bezel>
-		<bezel element="f3s"> <bounds left="164" right="246" top="827" bottom="843" /> </bezel>
-		<bezel element="f3"> <bounds left="164" right="246" top="845" bottom="861" /> </bezel>
-		<bezel element="f4s"> <bounds left="248" right="328" top="827" bottom="843" /> </bezel>
-		<bezel element="f4"> <bounds left="248" right="328" top="845" bottom="861" /> </bezel>
-
-		<bezel element="background"> <bounds left="342" right="682" top="823" bottom="865" /> </bezel>
-		<bezel element="f5s"> <bounds left="350" right="430" top="827" bottom="843" /> </bezel>
-		<bezel element="f5"> <bounds left="350" right="430" top="845" bottom="861" /> </bezel>
-		<bezel element="f6s"> <bounds left="432" right="512" top="827" bottom="843" /> </bezel>
-		<bezel element="f6"> <bounds left="432" right="512" top="845" bottom="861" /> </bezel>
-		<bezel element="f7s"> <bounds left="514" right="594" top="827" bottom="843" /> </bezel>
-		<bezel element="f7"> <bounds left="514" right="594" top="845" bottom="861" /> </bezel>
-		<bezel element="f8s"> <bounds left="597" right="677" top="827" bottom="843" /> </bezel>
-		<bezel element="f8"> <bounds left="597" right="677" top="845" bottom="861" /> </bezel>
-
-		<bezel element="background"> <bounds left="684" right="1023" top="823" bottom="865" /> </bezel>
-		<bezel element="f9s"> <bounds left="697" right="777" top="827" bottom="843" /> </bezel>
-		<bezel element="f9"> <bounds left="697" right="777" top="845" bottom="861" /> </bezel>
-		<bezel element="f10s"> <bounds left="779" right="859" top="827" bottom="843" /> </bezel>
-		<bezel element="f10"> <bounds left="779" right="859" top="845" bottom="861" /> </bezel>
-		<bezel element="f11s"> <bounds left="861" right="941" top="827" bottom="843" /> </bezel>
-		<bezel element="f11"> <bounds left="861" right="941" top="845" bottom="861" /> </bezel>
-		<bezel element="f12s"> <bounds left="943" right="1023" top="827" bottom="843" /> </bezel>
-		<bezel element="f12"> <bounds left="943" right="1023" top="845" bottom="861" /> </bezel>
-
+	<view name="WXGA Screen (1280x800)">
 		<screen index="0">
 			<bounds x="0" y="0" width="1024" height="800" />
+		</screen>
+	</view>
+
+	<view name="XGA Screen (1024x768)">
+		<screen index="0">
+			<bounds x="0" y="0" width="1024" height="768" />
 		</screen>
 	</view>
 
