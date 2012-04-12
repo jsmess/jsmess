@@ -3,7 +3,24 @@
     a2thunderclock.c
  
     Implemention of the Thunderware Thunderclock Plus.
-
+ 
+ 
+    PCB Layout: (B1/B2 are batteries)
+     _______________________________________________________________
+    |                                                               |
+    |    | | | |           uPD1990 CD4050 74LS174   74LS132         |
+    |    | | | |              _      _     _     _     _            |
+    |    | | | |             | |    | |   | |   | |   | |           |
+    |    | | | |             |_|    |_|   |_|   |_|   |_|           |
+    |    B1  B2                               74LS08                |
+    |           74LS74  74LS109 74LS126        ____________  74LS27 |
+    |               _      _     _            |            |    _   |
+    |              | |    | |   | |           |   2716     |   | |  |
+    |              |_|    |_|   |_|           |____________|   |_|  |
+    |______________________________________                        _|
+                                           |                      |
+                                           |______________________|
+ 
 *********************************************************************/
 
 #include "a2thunderclock.h"
@@ -19,7 +36,7 @@
 const device_type A2BUS_THUNDERCLOCK = &device_creator<a2bus_thunderclock_device>;
 
 #define THUNDERCLOCK_ROM_REGION  "thunclk_rom"
-#define THUNDERCLOCK_UPD1990_TAG    "thunclk_upd"
+#define THUNDERCLOCK_UPD1990_TAG "thunclk_upd"
 
 static UPD1990A_INTERFACE( thunderclock_upd1990a_intf )
 {
