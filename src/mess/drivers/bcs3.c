@@ -25,11 +25,12 @@ public:
 	bcs3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	const UINT8 *m_p_chargen;
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	DECLARE_READ8_MEMBER(bcs3_keyboard_r);
 	virtual void machine_reset();
 	virtual void video_start();
@@ -67,7 +68,7 @@ static ADDRESS_MAP_START(bcs3_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c50, 0x3d9f ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x3c50, 0x3d9f ) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8, bcs3_state)
@@ -76,7 +77,7 @@ static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5a7f ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x3c00, 0x5a7f ) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -86,7 +87,7 @@ static ADDRESS_MAP_START(bcs3b_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x657f ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x3c00, 0x657f ) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -96,7 +97,7 @@ static ADDRESS_MAP_START(bcs3c_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5ab3 ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x3c00, 0x5ab3 ) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bcs3_io, AS_IO, 8, bcs3_state)

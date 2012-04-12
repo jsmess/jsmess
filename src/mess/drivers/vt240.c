@@ -32,7 +32,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hgdc(*this, "upd7220")
-		{ }
+		,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
@@ -44,7 +45,7 @@ public:
 	//UINT8 m_pcg_internal_addr;
 	//UINT8 *m_char_rom;
 
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 };
 
 /* TODO */
@@ -116,7 +117,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, vt240_state)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 /* Input ports */

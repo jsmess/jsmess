@@ -47,7 +47,8 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_crtc(*this, "crtc"),
 		  m_speaker(*this, SPEAKER_TAG)
-	{ }
+	,
+		m_ram(*this, "ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -65,7 +66,7 @@ public:
 	DECLARE_WRITE16_MEMBER( dim68k_video_control_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
-	UINT16* m_ram;
+	required_shared_ptr<UINT16> m_ram;
 	const UINT8 *m_p_chargen;
 	bool m_speaker_bit;
 	UINT8 m_video_control;
@@ -169,7 +170,7 @@ WRITE16_MEMBER( dim68k_state::dim68k_banksw_w )
 
 static ADDRESS_MAP_START(dim68k_mem, AS_PROGRAM, 16, dim68k_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_BASE(m_ram) // 16MB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x00feffff) AM_RAM AM_SHARE("ram") // 16MB RAM / ROM at boot
 	AM_RANGE(0x00ff0000, 0x00ff1fff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x00ff2000, 0x00ff7fff) AM_RAM // Graphics Video RAM
 	AM_RANGE(0x00ff8000, 0x00ff8001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0xff)
@@ -203,7 +204,7 @@ MACHINE_RESET_MEMBER(dim68k_state)
 {
 	UINT8* ROM = machine().region("bootrom")->base();
 
-	memcpy((UINT8*)m_ram, ROM, 0x2000);
+	memcpy((UINT8*)m_ram.target(), ROM, 0x2000);
 
 	machine().device("maincpu")->reset();
 }

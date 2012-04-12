@@ -61,7 +61,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -69,7 +70,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sun1_upd7201_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	virtual void machine_reset();
-	UINT16* m_p_ram;
+	required_shared_ptr<UINT16> m_p_ram;
 	UINT8 m_term_data;
 };
 
@@ -99,7 +100,7 @@ WRITE16_MEMBER( sun1_state::sun1_upd7201_w )
 
 static ADDRESS_MAP_START(sun1_mem, AS_PROGRAM, 16, sun1_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_p_ram) // 512 KB RAM / ROM at boot
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram") // 512 KB RAM / ROM at boot
 	AM_RANGE(0x00200000, 0x00203fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x00600000, 0x00600007) AM_READWRITE( sun1_upd7201_r, sun1_upd7201_w )
 ADDRESS_MAP_END
@@ -113,7 +114,7 @@ MACHINE_RESET_MEMBER(sun1_state)
 {
 	UINT8* user1 = machine().region("user1")->base();
 
-	memcpy((UINT8*)m_p_ram,user1,0x4000);
+	memcpy((UINT8*)m_p_ram.target(),user1,0x4000);
 
 	machine().device("maincpu")->reset();
 	m_term_data = 0;

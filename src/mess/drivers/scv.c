@@ -15,7 +15,8 @@ class scv_state : public driver_device
 {
 public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_WRITE8_MEMBER(scv_porta_w);
 	DECLARE_READ8_MEMBER(scv_portb_r);
@@ -24,7 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scv_cart_ram_w);
 	DECLARE_WRITE8_MEMBER(scv_cart_ram2_w);
 	DECLARE_WRITE_LINE_MEMBER(scv_upd1771_ack_w);
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_porta;
 	UINT8 m_portc;
 	emu_timer *m_vb_timer;

@@ -40,7 +40,9 @@ class cat_state : public driver_device
 {
 public:
 	cat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_sram(*this, "p_sram"),
+		m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_WRITE16_MEMBER(cat_video_status_w);
 	DECLARE_WRITE16_MEMBER(cat_test_mode_w);
@@ -54,9 +56,9 @@ public:
 	DECLARE_WRITE16_MEMBER(cat_keyboard_w);
 	DECLARE_WRITE16_MEMBER(cat_video_w);
 	DECLARE_READ16_MEMBER(cat_something_r);
-	UINT16 *m_p_videoram;
+	required_shared_ptr<UINT16> m_p_sram;
+	required_shared_ptr<UINT16> m_p_videoram;
 	UINT8 m_duart_inp;// = 0x0e;
-	UINT16 *m_p_sram;
 	UINT8 m_video_enable;
 	UINT16 m_pr_cont;
 	UINT8 m_keyboard_line;
@@ -154,9 +156,9 @@ READ16_MEMBER( cat_state::cat_something_r )
 static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // 256 KB ROM
-	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_BASE(m_p_sram) // SRAM powered by battery
+	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_SHARE("p_sram") // SRAM powered by battery
 	AM_RANGE(0x00200000, 0x0027ffff) AM_ROM AM_REGION("svrom",0x0000) // SV ROM
-	AM_RANGE(0x00400000, 0x0047ffff) AM_RAM AM_BASE(m_p_videoram) // 512 KB RAM
+	AM_RANGE(0x00400000, 0x0047ffff) AM_RAM AM_SHARE("p_videoram") // 512 KB RAM
 	AM_RANGE(0x00600000, 0x0065ffff) AM_WRITE(cat_video_w) // Video chip
 	AM_RANGE(0x00800000, 0x00800001) AM_READWRITE(cat_floppy_r, cat_floppy_w)
 	AM_RANGE(0x00800002, 0x00800003) AM_WRITE(cat_keyboard_w)
@@ -172,7 +174,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM // 64 KB ROM
-	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 /* Input ports */

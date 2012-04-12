@@ -50,9 +50,10 @@ class pc88va_state : public driver_device
 {
 public:
 	pc88va_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_palram(*this, "palram"){ }
 
-	UINT16 *m_palram;
+	required_shared_ptr<UINT16> m_palram;
 	UINT16 m_bank_reg;
 	UINT16 m_screen_ctrl_reg;
 	UINT8 m_timer3_io_reg;
@@ -1140,7 +1141,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 	AM_RANGE(0x0220, 0x023f) AM_RAM // Frame buffer 1 control parameter
 	AM_RANGE(0x0240, 0x025f) AM_RAM // Frame buffer 2 control parameter
 	AM_RANGE(0x0260, 0x027f) AM_RAM // Frame buffer 3 control parameter
-	AM_RANGE(0x0300, 0x033f) AM_RAM_WRITE(palette_ram_w) AM_BASE(m_palram) // Palette RAM (xBBBBxRRRRxGGGG format)
+	AM_RANGE(0x0300, 0x033f) AM_RAM_WRITE(palette_ram_w) AM_SHARE("palram") // Palette RAM (xBBBBxRRRRxGGGG format)
 
 //  AM_RANGE(0x0500, 0x05ff) GVRAM
 //  AM_RANGE(0x1000, 0xfeff) user area (???)

@@ -54,7 +54,11 @@ class vboy_state : public driver_device
 {
 public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_l_frame_0(*this,"l_frame_0"),
+		  m_l_frame_1(*this,"l_frame_1"),
+		  m_r_frame_0(*this,"r_frame_0"),
+		  m_r_frame_1(*this,"r_frame_1") { }
 
 	DECLARE_READ32_MEMBER(port_02_read);
 	DECLARE_WRITE32_MEMBER(port_02_write);
@@ -72,10 +76,10 @@ public:
 	DECLARE_READ16_MEMBER(vboy_bgmap_r);
 	UINT16 *m_font;
 	UINT16 *m_bgmap;
-	UINT16 *m_l_frame_0;
-	UINT16 *m_l_frame_1;
-	UINT16 *m_r_frame_0;
-	UINT16 *m_r_frame_1;
+	required_shared_ptr<UINT16> m_l_frame_0;
+	required_shared_ptr<UINT16> m_l_frame_1;
+	required_shared_ptr<UINT16> m_r_frame_0;
+	required_shared_ptr<UINT16> m_r_frame_1;
 	UINT16 *m_world;
 	UINT16 *m_columntab1;
 	UINT16 *m_columntab2;
@@ -371,13 +375,13 @@ READ16_MEMBER( vboy_state::vboy_bgmap_r )
 
 static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
-	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE(m_l_frame_0) // L frame buffer 0
+	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_SHARE("l_frame_0") // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
-	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_BASE(m_l_frame_1) // L frame buffer 1
+	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_SHARE("l_frame_1") // L frame buffer 1
 	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
-	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_BASE(m_r_frame_0) // R frame buffer 0
+	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_SHARE("r_frame_0") // R frame buffer 0
 	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
-	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE(m_r_frame_1) // R frame buffer 1
+	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_SHARE("r_frame_1") // R frame buffer 1
 	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
 
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory
@@ -400,13 +404,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07ffffff)
-	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_BASE(m_l_frame_0) // L frame buffer 0
+	AM_RANGE( 0x00000000, 0x00005fff ) AM_RAM AM_SHARE("l_frame_0") // L frame buffer 0
 	AM_RANGE( 0x00006000, 0x00007fff ) AM_READWRITE16(vboy_font0_r, vboy_font0_w, 0xffffffff) // Font 0-511
-	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_BASE(m_l_frame_1) // L frame buffer 1
+	AM_RANGE( 0x00008000, 0x0000dfff ) AM_RAM AM_SHARE("l_frame_1") // L frame buffer 1
 	AM_RANGE( 0x0000e000, 0x0000ffff ) AM_READWRITE16(vboy_font1_r, vboy_font1_w, 0xffffffff) // Font 512-1023
-	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_BASE(m_r_frame_0) // R frame buffer 0
+	AM_RANGE( 0x00010000, 0x00015fff ) AM_RAM AM_SHARE("r_frame_0") // R frame buffer 0
 	AM_RANGE( 0x00016000, 0x00017fff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535
-	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_BASE(m_r_frame_1) // R frame buffer 1
+	AM_RANGE( 0x00018000, 0x0001dfff ) AM_RAM AM_SHARE("r_frame_1") // R frame buffer 1
 	AM_RANGE( 0x0001e000, 0x0001ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047
 
 	AM_RANGE( 0x00020000, 0x0003ffff ) AM_READWRITE16(vboy_bgmap_r,vboy_bgmap_w, 0xffffffff) // VIPC memory

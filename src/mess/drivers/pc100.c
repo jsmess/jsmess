@@ -25,7 +25,8 @@ class pc100_state : public driver_device
 {
 public:
 	pc100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_palram(*this, "palram"){ }
 
 	DECLARE_READ16_MEMBER(pc100_vram_r);
 	DECLARE_WRITE16_MEMBER(pc100_vram_w);
@@ -46,7 +47,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc100_set_int_line);
 	UINT16 *m_kanji_rom;
 	UINT16 *m_vram;
-	UINT16 *m_palram;
+	required_shared_ptr<UINT16> m_palram;
 	UINT16 m_kanji_addr;
 	UINT8 m_timer_mode;
 
@@ -230,7 +231,7 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
 	AM_RANGE(0x38, 0x39) AM_WRITE8(pc100_crtc_addr_w,0x00ff) //crtc address reg
 	AM_RANGE(0x3a, 0x3b) AM_WRITE8(pc100_crtc_data_w,0x00ff) //crtc data reg
 	AM_RANGE(0x3c, 0x3f) AM_READWRITE8(pc100_vs_vreg_r,pc100_vs_vreg_w,0x00ff) //crtc vertical start position
-	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_BASE(m_palram)
+	AM_RANGE(0x40, 0x5f) AM_RAM_WRITE(pc100_paletteram_w) AM_SHARE("palram")
 //  AM_RANGE(0x60, 0x61) crtc command (16-bit wide)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(pc100_kanji_r,pc100_kanji_w)
 	AM_RANGE(0x82, 0x83) AM_WRITENOP //kanji-related?

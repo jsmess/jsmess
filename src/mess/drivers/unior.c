@@ -41,7 +41,8 @@ class unior_state : public driver_device
 {
 public:
 	unior_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(unior_4c_w);
@@ -50,7 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(unior_50_w);
 	DECLARE_WRITE8_MEMBER(unior_60_w);
 	UINT8 *m_p_vram;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_4c;
 	UINT8 m_cursor_col;
@@ -103,7 +104,7 @@ WRITE8_MEMBER( unior_state::unior_60_w )
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_BASE(m_p_videoram) // status line
+	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("p_videoram") // status line
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(vram_w) // main video
 ADDRESS_MAP_END
 

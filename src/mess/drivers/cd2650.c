@@ -40,13 +40,14 @@ public:
 	cd2650_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( cd2650_keyin_r );
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	const UINT8 *m_p_chargen;
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	UINT8 m_term_data;
 	virtual void machine_reset();
 	virtual void video_start();
@@ -67,7 +68,7 @@ static ADDRESS_MAP_START(cd2650_mem, AS_PROGRAM, 8, cd2650_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff) AM_ROM
 	AM_RANGE( 0x0400, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0x1800, 0x7fff) AM_RAM // expansion ram? the system doesn't use it
 ADDRESS_MAP_END
 

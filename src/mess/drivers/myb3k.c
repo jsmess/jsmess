@@ -25,7 +25,8 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc")
-	{ }
+	,
+		m_p_vram(*this, "p_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_fdc;
@@ -34,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
-	UINT8 *m_p_vram;
+	required_shared_ptr<UINT8> m_p_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 m_vmode;
 };
@@ -129,7 +130,7 @@ static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
 	AM_RANGE(0x80000,0x8ffff) AM_NOP
-	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_BASE(m_p_vram)
+	AM_RANGE(0xd0000,0xdffff) AM_RAM AM_SHARE("p_vram")
 //  AM_RANGE(0xe0000,0xexxxx) option ROM board
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END

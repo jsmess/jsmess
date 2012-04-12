@@ -28,14 +28,15 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")//,
 	//m_speaker(*this, SPEAKER_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	//required_device<device_t> m_speaker;
 	DECLARE_READ8_MEMBER( e802_r );
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_WRITE8_MEMBER( key_w );
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	const UINT8 *m_p_chargen;
 	//virtual void machine_reset();
 	//virtual void machine_start();
@@ -84,7 +85,7 @@ static ADDRESS_MAP_START(homelab2_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0x3000, 0x37ff ) AM_ROM  // Empty
 	AM_RANGE( 0x3800, 0x3fff ) AM_READWRITE(key_r,key_w)
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_BASE(m_p_videoram) AM_MIRROR(0x3c00) // Video RAM 1K
+	AM_RANGE( 0xc000, 0xc3ff ) AM_RAM AM_SHARE("p_videoram") AM_MIRROR(0x3c00) // Video RAM 1K
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8, homelab_state)
@@ -93,7 +94,7 @@ static ADDRESS_MAP_START(homelab3_mem, AS_PROGRAM, 8, homelab_state)
 	AM_RANGE( 0xe802, 0xe802 ) AM_READ(e802_r)
 	AM_RANGE( 0xe880, 0xe880 ) AM_READNOP // reads this then throws result away
 	//AM_RANGE( 0xe000, 0xefff ) AM_RAM // Keyboard
-	AM_RANGE( 0xf000, 0xf7ff ) AM_RAM AM_BASE(m_p_videoram) AM_MIRROR(0x0800) // Video RAM 2K
+	AM_RANGE( 0xf000, 0xf7ff ) AM_RAM AM_SHARE("p_videoram") AM_MIRROR(0x0800) // Video RAM 2K
 ADDRESS_MAP_END
 
 /* Input ports */

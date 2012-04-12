@@ -117,7 +117,8 @@ class supracan_state : public driver_device
 public:
 	supracan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		  m_maincpu(*this, "maincpu"),
+		  m_soundram(*this, "soundram")
 	{
 		m_m6502_reset = 0;
 	}
@@ -139,7 +140,7 @@ public:
 	acan_sprdma_regs_t m_acan_sprdma_regs;
 
 	UINT16 m_m6502_reset;
-	UINT8 *m_soundram;
+	required_shared_ptr<UINT8> m_soundram;
 	UINT8 m_soundlatch;
 	UINT8 m_soundcpu_irq_src;
 	UINT8 m_sound_irq_enable_reg;
@@ -1214,7 +1215,7 @@ WRITE8_MEMBER( supracan_state::supracan_6502_soundmem_w )
 }
 
 static ADDRESS_MAP_START( supracan_sound_mem, AS_PROGRAM, 8, supracan_state )
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(supracan_6502_soundmem_r, supracan_6502_soundmem_w) AM_BASE(m_soundram)
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(supracan_6502_soundmem_r, supracan_6502_soundmem_w) AM_SHARE("soundram")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( supracan )

@@ -26,7 +26,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -34,7 +35,7 @@ public:
 	DECLARE_READ8_MEMBER( czk80_81_r );
 	DECLARE_READ8_MEMBER( czk80_c0_r );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 *m_p_ram;
+	required_shared_ptr<UINT8> m_p_ram;
 	UINT8 m_term_data;
 	virtual void machine_reset();
 };
@@ -59,7 +60,7 @@ READ8_MEMBER( czk80_state::czk80_81_r )
 
 static ADDRESS_MAP_START(czk80_mem, AS_PROGRAM, 8, czk80_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(m_p_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("p_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(czk80_io, AS_IO, 8, czk80_state)

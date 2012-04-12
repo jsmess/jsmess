@@ -80,7 +80,8 @@ public:
 	m_ctc_u(*this, "z80ctc_u"),
 	m_speaker(*this, SPEAKER_TAG),
 	m_cass(*this, CASSETTE_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pio_s;
@@ -96,7 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 *m_p_chargen;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_term_data;
 	UINT8 m_step;
 	UINT8 m_85;
@@ -169,7 +170,7 @@ static ADDRESS_MAP_START(pcm_mem, AS_PROGRAM, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
 	AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_BASE(m_p_videoram) // Video RAM
+	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("p_videoram") // Video RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pcm_io, AS_IO, 8, pcm_state)

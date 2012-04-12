@@ -74,7 +74,8 @@ public:
 	m_pia1(*this, "pia_1"),
 	m_cass(*this, CASSETTE_TAG),
 	m_fdc(*this, "wd179x")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_crtc;
@@ -123,7 +124,7 @@ public:
 	unsigned char m_keyboard_data;
 	unsigned char m_pad_data;
 	UINT8 m_mc6847_css;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_apf_ints;
 	void apf_update_ints(UINT8 intnum);
 };
@@ -426,7 +427,7 @@ READ8_MEMBER( apf_state::apf_wd179x_data_r)
 }
 
 static ADDRESS_MAP_START( apf_imagination_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(m_p_videoram) AM_MIRROR(0x1c00)
+	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_SHARE("p_videoram") AM_MIRROR(0x1c00)
 	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
@@ -444,7 +445,7 @@ static ADDRESS_MAP_START( apf_imagination_map, AS_PROGRAM, 8, apf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apf_m1000_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(m_p_videoram)  AM_MIRROR(0x1c00)
+	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_SHARE("p_videoram")  AM_MIRROR(0x1c00)
 	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM

@@ -140,11 +140,12 @@ public:
 	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_ppi(*this, "ppi8255")
-	{ }
+	,
+		m_ram(*this, "ram"){ }
 
 	required_device<i8255_device> m_ppi;
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 *m_video_ram;
 	UINT8 m_irq_vector;
 	UINT8 m_cas_switch;
@@ -819,7 +820,7 @@ static ADDRESS_MAP_START(pc6001_map, AS_PROGRAM, 8, pc6001_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("cart_img",0)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc6001_io , AS_IO, 8, pc6001_state )

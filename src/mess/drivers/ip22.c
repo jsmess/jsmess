@@ -93,9 +93,11 @@ class ip22_state : public driver_device
 {
 public:
 	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_unkpbus0(*this, "unkpbus0"){ }
 
-	UINT32 *m_mainram;
+	required_shared_ptr<UINT32> m_mainram;
 	RTC_t m_RTC;
 	UINT32 m_int3_regs[64];
 	UINT32 m_nIOC_ParReadCnt;
@@ -103,7 +105,7 @@ public:
 	HPC3_t m_HPC3;
 	HAL2_t m_HAL2;
 	PBUS_DMA_t m_PBUS_DMA;
-	UINT32 *m_unkpbus0;
+	required_shared_ptr<UINT32> m_unkpbus0;
 	UINT32 m_nIntCounter;
 	UINT8 m_dma_buffer[4096];
 };
@@ -1193,7 +1195,7 @@ static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
 	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE_LEGACY(hpc3_hd_enet_r, hpc3_hd_enet_w )
 	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM	/* unknown, but read a lot and discarded */
 	AM_RANGE( 0x1fbc0000, 0x1fbc7fff ) AM_READWRITE_LEGACY(hpc3_hd0_r, hpc3_hd0_w )
-	AM_RANGE( 0x1fbc8000, 0x1fbcffff ) AM_READWRITE_LEGACY(hpc3_unkpbus0_r, hpc3_unkpbus0_w ) AM_BASE(m_unkpbus0)
+	AM_RANGE( 0x1fbc8000, 0x1fbcffff ) AM_READWRITE_LEGACY(hpc3_unkpbus0_r, hpc3_unkpbus0_w ) AM_SHARE("unkpbus0")
 	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE_LEGACY(hpc3_pbusdma_r, hpc3_pbusdma_w )
 	AM_RANGE( 0x1fbd8000, 0x1fbd83ff ) AM_READWRITE_LEGACY(hal2_r, hal2_w )
 	AM_RANGE( 0x1fbd8400, 0x1fbd87ff ) AM_RAM /* hack */

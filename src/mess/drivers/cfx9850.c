@@ -25,14 +25,16 @@ class cfx9850_state : public driver_device
 {
 public:
 	cfx9850_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_video_ram(*this, "p_video_ram"),
+		m_p_display_ram(*this, "p_display_ram"){ }
 
 	DECLARE_WRITE8_MEMBER(cfx9850_kol_w);
 	DECLARE_WRITE8_MEMBER(cfx9850_koh_w);
 	DECLARE_READ8_MEMBER(cfx9850_ki_r);
 	DECLARE_READ8_MEMBER(cfx9850_battery_level_r);
-	UINT8 *m_p_video_ram;
-	UINT8 *m_p_display_ram;
+	required_shared_ptr<UINT8> m_p_video_ram;
+	required_shared_ptr<UINT8> m_p_display_ram;
 	UINT16 m_ko;				/* KO lines KO1 - KO14 */
 };
 

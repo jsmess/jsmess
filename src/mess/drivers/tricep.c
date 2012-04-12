@@ -18,14 +18,15 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER(tricep_terminal_r);
 	DECLARE_WRITE16_MEMBER(tricep_terminal_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT16* m_p_ram;
+	required_shared_ptr<UINT16> m_p_ram;
 };
 
 
@@ -42,7 +43,7 @@ WRITE16_MEMBER( tricep_state::tricep_terminal_w )
 
 static ADDRESS_MAP_START(tricep_mem, AS_PROGRAM, 16, tricep_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_p_ram)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0x00fd0000, 0x00fd1fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x00ff0028, 0x00ff0029) AM_READWRITE(tricep_terminal_r,tricep_terminal_w)
 ADDRESS_MAP_END
@@ -57,7 +58,7 @@ static MACHINE_RESET(tricep)
 	tricep_state *state = machine.driver_data<tricep_state>();
 	UINT8* user1 = machine.region("user1")->base();
 
-	memcpy((UINT8*)state->m_p_ram,user1,0x2000);
+	memcpy((UINT8*)state->m_p_ram.target(),user1,0x2000);
 
 	machine.device("maincpu")->reset();
 }

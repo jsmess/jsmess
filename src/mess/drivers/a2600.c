@@ -41,13 +41,14 @@ class a2600_state : public driver_device
 {
 public:
 	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_riot_ram(*this, "riot_ram"){ }
 
 	dpc_t m_dpc;
 	memory_region* m_extra_RAM;
 	UINT8* m_bank_base[5];
 	UINT8* m_ram_base;
-	UINT8* m_riot_ram;
+	required_shared_ptr<UINT8> m_riot_ram;
 	UINT8 m_banking_mode;
 	UINT8 m_keypad_left_column;
 	UINT8 m_keypad_right_column;
@@ -1139,7 +1140,7 @@ static  READ8_HANDLER(current_bank_r)
 static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE_LEGACY(tia_r, tia_w)
-	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_BASE(m_riot_ram)
+	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_SHARE("riot_ram")
 	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK("bank1")
 ADDRESS_MAP_END

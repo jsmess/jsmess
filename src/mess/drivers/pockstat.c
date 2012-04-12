@@ -91,9 +91,10 @@ class pockstat_state : public driver_device
 {
 public:
 	pockstat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_lcd_buffer(*this, "lcd_buffer"){ }
 
-	UINT32 *m_lcd_buffer;
+	required_shared_ptr<UINT32> m_lcd_buffer;
 	ps_ftlb_regs_t m_ftlb_regs;
 	ps_intc_regs_t m_intc_regs;
 	ps_timer_regs_t m_timer_regs;
@@ -849,7 +850,7 @@ static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32, pockstat_state )
 	AM_RANGE(0x0b000000, 0x0b000007) AM_READWRITE(ps_clock_r, ps_clock_w)
 	AM_RANGE(0x0b800000, 0x0b80000f) AM_READWRITE(ps_rtc_r, ps_rtc_w)
 	AM_RANGE(0x0d000000, 0x0d000003) AM_READWRITE(ps_lcd_r, ps_lcd_w)
-	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_BASE(m_lcd_buffer)
+	AM_RANGE(0x0d000100, 0x0d00017f) AM_RAM AM_SHARE("lcd_buffer")
 	AM_RANGE(0x0d80000c, 0x0d80000f) AM_READWRITE(ps_audio_r, ps_audio_w)
 	AM_RANGE(0x0d800014, 0x0d800017) AM_WRITE(ps_dac_w)
 ADDRESS_MAP_END

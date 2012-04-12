@@ -148,9 +148,10 @@ class casloopy_state : public driver_device
 {
 public:
 	casloopy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bios_rom(*this, "bios_rom"){ }
 
-	UINT32 *m_bios_rom;
+	required_shared_ptr<UINT32> m_bios_rom;
 };
 
 
@@ -166,7 +167,7 @@ static SCREEN_UPDATE_IND16( casloopy )
 }
 
 static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
-	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_BASE(m_bios_rom)
+	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_SHARE("bios_rom")
 //  AM_RANGE(0x01000000, 0x017fffff) - i/o?
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("cart",0) // wrong?
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM

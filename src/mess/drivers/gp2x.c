@@ -27,7 +27,8 @@ public:
 	gp2x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_ram(*this, "ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ32_MEMBER(gp2x_lcdc_r);
@@ -40,7 +41,7 @@ public:
 	DECLARE_READ32_MEMBER(nand_ctrl_r);
 	DECLARE_WRITE32_MEMBER(nand_ctrl_w);
 	DECLARE_READ32_MEMBER(sdcard_r);
-	UINT32 *m_ram;
+	required_shared_ptr<UINT32> m_ram;
 	UINT16 m_vidregs[0x200/2];
 	UINT32 m_nand_ptr;
 	UINT32 m_nand_cmd;
@@ -337,7 +338,7 @@ READ32_MEMBER( gp2x_state::sdcard_r )
 
 static ADDRESS_MAP_START( gp2x_map, AS_PROGRAM, 32, gp2x_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_ROM
-	AM_RANGE(0x01000000, 0x04ffffff) AM_RAM	AM_BASE(m_ram) // 64 MB of RAM
+	AM_RANGE(0x01000000, 0x04ffffff) AM_RAM	AM_SHARE("ram") // 64 MB of RAM
 	AM_RANGE(0x9c000000, 0x9c00001f) AM_READWRITE(nand_r, nand_w)
 	AM_RANGE(0xc0000a00, 0xc0000a03) AM_READ(timer_r)
 	AM_RANGE(0xc0001208, 0xc000120b) AM_READ(tx_status_r)

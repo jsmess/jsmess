@@ -22,14 +22,15 @@ public:
 	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( k8915_52_r );
 	DECLARE_READ8_MEMBER( k8915_53_r );
 	DECLARE_WRITE8_MEMBER( k8915_a8_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	UINT8 m_term_data;
@@ -64,7 +65,7 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8, k8915_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

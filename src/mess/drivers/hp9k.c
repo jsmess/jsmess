@@ -20,10 +20,11 @@ public:
 	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 };
 
 
@@ -31,7 +32,7 @@ static ADDRESS_MAP_START(hp9k_mem, AS_PROGRAM, 16, hp9k_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x010000, 0x3fffff) AM_RAM // guessing
-	AM_RANGE(0x512000, 0x512fff) AM_RAM AM_BASE(m_p_videoram) // videoram
+	AM_RANGE(0x512000, 0x512fff) AM_RAM AM_SHARE("p_videoram") // videoram
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // system ram
 ADDRESS_MAP_END
 

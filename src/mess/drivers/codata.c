@@ -14,16 +14,17 @@ class codata_state : public driver_device
 {
 public:
 	codata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_base(*this, "p_base"){ }
 
-	UINT8 *m_p_base;
+	required_shared_ptr<UINT8> m_p_base;
 };
 
 
 
 static ADDRESS_MAP_START(codata_mem, AS_PROGRAM, 16, codata_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE(m_p_base)
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("p_base")
 	AM_RANGE(0x200000, 0x203fff) AM_ROM AM_REGION("user1", 0);
 	AM_RANGE(0x400000, 0x403fff) AM_ROM AM_REGION("user1", 0x4000);
 	//AM_RANGE(0x600000, 0x600003) some device

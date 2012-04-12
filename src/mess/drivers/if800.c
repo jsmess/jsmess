@@ -17,11 +17,12 @@ public:
 	if800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
     	  m_hgdc(*this, "upd7220")
-		{ }
+		,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<upd7220_device> m_hgdc;
 
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
@@ -77,7 +78,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 };
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, if800_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( if800, if800_state )

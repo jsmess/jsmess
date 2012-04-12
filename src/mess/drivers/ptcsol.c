@@ -136,7 +136,8 @@ public:
 	m_cass2(*this, CASSETTE2_TAG),
 	m_uart(*this, "uart"),
 	m_uart_s(*this, "uart_s")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass1;
@@ -160,7 +161,7 @@ public:
 	UINT8 m_sol20_fc;
 	UINT8 m_sol20_fe;
 	const UINT8 *m_p_chargen;
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	UINT8 m_framecnt;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
@@ -396,7 +397,7 @@ static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
 	AM_RANGE(0X0800, 0Xbfff) AM_RAM	// optional s100 ram
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0Xc800, 0Xcbff) AM_RAM	// system ram
-	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_BASE(m_p_videoram)
+	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_SHARE("p_videoram")
 	AM_RANGE(0Xd000, 0Xffff) AM_RAM	// optional s100 ram
 ADDRESS_MAP_END
 

@@ -24,10 +24,11 @@ class b16_state : public driver_device
 {
 public:
 	b16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"){ }
 
 	UINT8 *m_char_rom;
-	UINT16 *m_vram;
+	required_shared_ptr<UINT16> m_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 
 	DECLARE_READ16_MEMBER(vblank_r);
@@ -111,7 +112,7 @@ static ADDRESS_MAP_START( b16_map, AS_PROGRAM, 16, b16_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x9ffff ) AM_RAM // probably not all of it.
 	AM_RANGE( 0xa0000, 0xaffff ) AM_RAM // bitmap?
-	AM_RANGE( 0xb0000, 0xb7fff ) AM_RAM AM_BASE(m_vram) // tvram
+	AM_RANGE( 0xb0000, 0xb7fff ) AM_RAM AM_SHARE("vram") // tvram
 	AM_RANGE( 0xb8000, 0xbbfff ) AM_WRITE8(b16_pcg_w,0x00ff) // pcg
 	AM_RANGE( 0xfc000, 0xfffff ) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END

@@ -44,9 +44,10 @@ class m20_state : public driver_device
 {
 public:
 	m20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_videoram(*this, "p_videoram"){ }
 
-	UINT16 *m_p_videoram;
+	required_shared_ptr<UINT16> m_p_videoram;
 };
 
 
@@ -90,7 +91,7 @@ static SCREEN_UPDATE_RGB32( m20 )
 static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x01fff ) AM_ROM AM_MIRROR(0x40000) AM_REGION("maincpu", 0x10000)
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_BASE(m_p_videoram)//base vram
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")//base vram
 //  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
 //  AM_RANGE( 0x20000, 0x2???? ) //work RAM?
 ADDRESS_MAP_END

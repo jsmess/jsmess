@@ -60,8 +60,8 @@ public:
 	m_fdc(*this, WD1771_TAG),
 	// m_ram(*this, RAM_TAG),
 	m_floppy0(*this, FLOPPY_0),
-	m_floppy1(*this, FLOPPY_1)
-	{ }
+	m_floppy1(*this, FLOPPY_1),
+	m_videoram(*this, "videoram"){ }
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -98,7 +98,7 @@ public:
 	UINT8 m_term_status;
 
 	/* video state */
-	UINT8 *m_videoram;					/* video RAM */
+	required_shared_ptr<UINT8> m_videoram; /* video RAM */
 	UINT8 *m_char_rom;					/* character ROM */
 	UINT8 m_scroll;						/* vertical scroll */
 	int m_ncset2;						/* national character set */
@@ -252,7 +252,7 @@ WRITE8_MEMBER( bigbii_state::sync_w )
 
 static ADDRESS_MAP_START( bigbord2_mem, AS_PROGRAM, 8, bigbord2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x5fff) AM_RAM
 	AM_RANGE(0x6800, 0xffff) AM_RAM
