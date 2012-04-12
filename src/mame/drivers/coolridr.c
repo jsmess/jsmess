@@ -271,7 +271,7 @@ public:
 		m_soundcpu(*this,"soundcpu"),
 		m_h1_vram(*this, "h1_vram"),
 		m_h1_charram(*this, "h1_charram"),
-		m_framebuffer_vram(*this, "framebuffer_vram"),
+		m_framebuffer_vram(*this, "fb_vram"),
 		m_txt_vram(*this, "txt_vram"),
 		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
 		m_sysh1_workram_h(*this, "sysh1_workrah"),
@@ -375,10 +375,10 @@ static SCREEN_UPDATE_RGB32(coolridr)
 		{
 			int tile;
 
-			tile = (state->m_h1_vram.target()[count] & 0x0fff0000) >> 16;
+			tile = (state->m_h1_vram[count] & 0x0fff0000) >> 16;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,state->m_color,0,0,(x+0)*16,y*16);
 
-			tile = (state->m_h1_vram.target()[count] & 0x00000fff) >> 0;
+			tile = (state->m_h1_vram[count] & 0x00000fff) >> 0;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,state->m_color,0,0,(x+1)*16,y*16);
 
 			count++;
@@ -404,19 +404,19 @@ READ32_MEMBER(coolridr_state::sysh1_unk_r)
 
 			m_vblank^=1;
 
-			return (m_h1_unk.target()[offset] & 0xfdffffff) | (m_vblank<<25);
+			return (m_h1_unk[offset] & 0xfdffffff) | (m_vblank<<25);
 		}
 		case 0x14/4:
-			return m_h1_unk.target()[offset];
+			return m_h1_unk[offset];
 		//case 0x20/4:
 	}
 
-	return 0xffffffff;//m_h1_unk.target()[offset];
+	return 0xffffffff;//m_h1_unk[offset];
 }
 
 WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
 {
-	COMBINE_DATA(&m_h1_unk.target()[offset]);
+	COMBINE_DATA(&m_h1_unk[offset]);
 }
 
 /* According to Guru, this is actually the same I/O chip of Sega Model 2 HW */
@@ -438,7 +438,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 {
 
-	COMBINE_DATA(&m_sysh1_txt_blit.target()[offset]);
+	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
 
 	switch(offset)
 	{
@@ -600,10 +600,10 @@ static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 	end_dma_mark = 0;
 
 	do{
-		src = (state->m_framebuffer_vram.target()[(0+dma_index)/4] & 0x0fffffff);
-		dst = (state->m_framebuffer_vram.target()[(4+dma_index)/4]);
-		size = state->m_framebuffer_vram.target()[(8+dma_index)/4];
-		type = (state->m_framebuffer_vram.target()[(0+dma_index)/4] & 0xf0000000) >> 28;
+		src = (state->m_framebuffer_vram[(0+dma_index)/4] & 0x0fffffff);
+		dst = (state->m_framebuffer_vram[(4+dma_index)/4]);
+		size = state->m_framebuffer_vram[(8+dma_index)/4];
+		type = (state->m_framebuffer_vram[(0+dma_index)/4] & 0xf0000000) >> 28;
 
 		#if 0
 		if(type == 0xc || type == 0xd || type == 0xe)
@@ -669,26 +669,26 @@ static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 
 WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 {
-	COMBINE_DATA(&m_framebuffer_vram.target()[offset]);
+	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
 	if(offset*4 == 0x000)
 	{
-		if((m_framebuffer_vram.target()[offset] & 0xff00000) == 0xfe00000)
-			sysh1_dma_transfer(&space, m_framebuffer_vram.target()[offset] & 0xffff);
+		if((m_framebuffer_vram[offset] & 0xff00000) == 0xfe00000)
+			sysh1_dma_transfer(&space, m_framebuffer_vram[offset] & 0xffff);
 	}
 }
 
 WRITE32_MEMBER(coolridr_state::sysh1_char_w)
 {
-	COMBINE_DATA(&m_h1_charram.target()[offset]);
+	COMBINE_DATA(&m_h1_charram[offset]);
 
 	{
 		UINT8 *gfx = machine().region("ram_gfx")->base();
 
-		gfx[offset*4+0] = (m_h1_charram.target()[offset] & 0xff000000) >> 24;
-		gfx[offset*4+1] = (m_h1_charram.target()[offset] & 0x00ff0000) >> 16;
-		gfx[offset*4+2] = (m_h1_charram.target()[offset] & 0x0000ff00) >> 8;
-		gfx[offset*4+3] = (m_h1_charram.target()[offset] & 0x000000ff) >> 0;
+		gfx[offset*4+0] = (m_h1_charram[offset] & 0xff000000) >> 24;
+		gfx[offset*4+1] = (m_h1_charram[offset] & 0x00ff0000) >> 16;
+		gfx[offset*4+2] = (m_h1_charram[offset] & 0x0000ff00) >> 8;
+		gfx[offset*4+3] = (m_h1_charram[offset] & 0x000000ff) >> 0;
 
 		gfx_element_mark_dirty(machine().gfx[2], offset/64); //*4/256
 	}
@@ -701,7 +701,7 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_SHARE("h1_vram")//bg vram
 	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_SHARE("h1_charram") //FIXME: half size
-	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("framebuffer_vram") //FIXME: not all of it
+	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") //FIXME: not all of it
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_SHARE("txt_vram")//text tilemap + "lineram"
@@ -1235,7 +1235,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack1_r)
 	if(pc == 0x6012374 || pc == 0x6012392)
 		return 0;
 
-	return m_sysh1_workram_h.target()[0xd88a4/4];
+	return m_sysh1_workram_h[0xd88a4/4];
 }
 #endif
 
@@ -1246,7 +1246,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
 
-	return m_sysh1_workram_h.target()[0xd8894/4];
+	return m_sysh1_workram_h[0xd8894/4];
 }
 
 static DRIVER_INIT( coolridr )

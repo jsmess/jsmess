@@ -63,8 +63,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_scroll_ram(*this, "scroll_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_dderby_vidchars(*this, "dderby_vidchars"),
-		m_dderby_vidattribs(*this, "dderby_vidattribs"){ }
+		m_dderby_vidchars(*this, "vidchars"),
+		m_dderby_vidattribs(*this, "vidattribs"){ }
 
 	required_shared_ptr<UINT8> m_scroll_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
@@ -134,8 +134,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0xca03, 0xca03) AM_WRITENOP//(timer_irq_w) //???
 	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_SHARE("scroll_ram")
 	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_SHARE("sprite_ram") // horse sprites
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("dderby_vidchars") // char ram
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("dderby_vidattribs") // colours/ attrib ram
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("vidchars") // char ram
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("vidattribs") // colours/ attrib ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8, dmndrby_state )
@@ -362,11 +362,11 @@ racetrack seems to be stored in 4th and 5th prom.
 can we draw it with the tilemap? maybe not, the layout is a litle strange
 
 */
-//  base = state->m_scroll_ram.target()[0];
+//  base = state->m_scroll_ram[0];
 
-	off=0x1900-(state->m_bg*0x100)+(state->m_scroll_ram.target()[1])*0x100;
-	scrolly = 0xff-(state->m_scroll_ram.target()[0]);
-	if(state->m_scroll_ram.target()[1]==0xff) off=0x1800;
+	off=0x1900-(state->m_bg*0x100)+(state->m_scroll_ram[1])*0x100;
+	scrolly = 0xff-(state->m_scroll_ram[0]);
+	if(state->m_scroll_ram[1]==0xff) off=0x1800;
 	for(x=0;x<16;x++) {
 		for(y=0;y<16;y++) {
 			int chr = state->m_racetrack_tilemap_rom[off];
@@ -398,12 +398,12 @@ wouldnt like to say its the most effective way though...
 		int a=0;
 		int b=0;
 		int base = count*4;
-		int sprx=state->m_sprite_ram.target()[base+3];
-		int spry=state->m_sprite_ram.target()[base+2];
-		//state->m_sprite_ram.target()[base+1];
-		int col = (state->m_sprite_ram.target()[base+1]&0x1f);
-		int anim = (state->m_sprite_ram.target()[base]&0x3)*0x40; // animation frame - probably wrong but seems right
-		int horse = (state->m_sprite_ram.target()[base+1]&0x7)*8+7;  // horse label from 1 - 6
+		int sprx=state->m_sprite_ram[base+3];
+		int spry=state->m_sprite_ram[base+2];
+		//state->m_sprite_ram[base+1];
+		int col = (state->m_sprite_ram[base+1]&0x1f);
+		int anim = (state->m_sprite_ram[base]&0x3)*0x40; // animation frame - probably wrong but seems right
+		int horse = (state->m_sprite_ram[base+1]&0x7)*8+7;  // horse label from 1 - 6
 
 		for (a=0;a<8 ;a++)
 		{
@@ -426,10 +426,10 @@ wouldnt like to say its the most effective way though...
 		for(x=0;x<32;x++)
 		{
 			int tileno,bank,color;
-			tileno=state->m_dderby_vidchars.target()[count];
-			bank=(state->m_dderby_vidattribs.target()[count]&0x20)>>5;
+			tileno=state->m_dderby_vidchars[count];
+			bank=(state->m_dderby_vidattribs[count]&0x20)>>5;
 			tileno|=(bank<<8);
-			color=((state->m_dderby_vidattribs.target()[count])&0x1f);
+			color=((state->m_dderby_vidattribs[count])&0x1f);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
 

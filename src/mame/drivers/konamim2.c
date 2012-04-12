@@ -262,12 +262,12 @@ static SCREEN_UPDATE_IND16( m2 )
 	UINT32 fb_start = 0xffffffff;
 	if (state->m_vdl0_address != 0)
 	{
-		fb_start = *(UINT32*)&state->m_main_ram.target()[(state->m_vdl0_address - 0x40000000) / 8] - 0x40000000;
+		fb_start = *(UINT32*)&state->m_main_ram[(state->m_vdl0_address - 0x40000000) / 8] - 0x40000000;
 	}
 
 	if (fb_start <= 0x800000)
 	{
-		UINT16 *frame = (UINT16*)&state->m_main_ram.target()[fb_start/8];
+		UINT16 *frame = (UINT16*)&state->m_main_ram[fb_start/8];
 		for (j=0; j < 384; j++)
 		{
 			UINT16 *fb = &frame[(j*512)];
@@ -1135,7 +1135,7 @@ static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
 	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r)
 	AM_RANGE(0x10000008, 0x10001007) AM_NOP		// ???
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share2")
-	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("share3") AM_SHARE("main_ram")
+	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("boot", 0) AM_SHARE("share2")
 ADDRESS_MAP_END
 
