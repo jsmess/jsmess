@@ -10,6 +10,13 @@
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 
+// our parent's device is the Disk II card (Apple II) or main driver (Mac, IIgs)
+// either way, get the drive from there.                          
+#define PARENT_FLOPPY_0 "^floppy0"
+#define PARENT_FLOPPY_1 "^floppy1"
+#define PARENT_FLOPPY_2 "^floppy2"
+#define PARENT_FLOPPY_3 "^floppy3"
+
 struct apple525_disk
 {
 	unsigned int state : 4;		/* bits 0-3 are the phase */
@@ -30,6 +37,33 @@ INLINE apple525_floppy_image_device *get_device(device_t *device)
 }
 
 static int apple525_enable_mask = 1;
+
+device_t *apple525_get_subdevice(device_t *device, int drive)
+{
+	switch(drive) {
+		case 0 : return device->subdevice(PARENT_FLOPPY_0);
+		case 1 : return device->subdevice(PARENT_FLOPPY_1);
+		case 2 : return device->subdevice(PARENT_FLOPPY_2);
+		case 3 : return device->subdevice(PARENT_FLOPPY_3);
+	}
+	return NULL;
+}
+
+device_t *apple525_get_device_by_type(device_t *device, int ftype, int drive)
+{
+	int i;
+	int cnt = 0;
+	for (i=0;i<4;i++) {
+		device_t *disk = apple525_get_subdevice(device, i);
+		if (floppy_get_drive_type(disk)==ftype) {
+			if (cnt==drive) {
+				return disk;
+			}
+			cnt++;
+		}
+	}
+	return NULL;
+}
 
 void apple525_set_enable_lines(device_t *device,int enable_mask)
 {
@@ -135,26 +169,29 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 	}
 }
 
-int apple525_get_count(running_machine &machine) {
+int apple525_get_count(device_t *device)
+{
 	int cnt = 0;
-	if (machine.device(FLOPPY_0)!=NULL && flopimg_get_custom_data(machine.device(FLOPPY_0))!=NULL) cnt++;
-    if (machine.device(FLOPPY_1)!=NULL && flopimg_get_custom_data(machine.device(FLOPPY_1))!=NULL) cnt++;
-    if (machine.device(FLOPPY_2)!=NULL && flopimg_get_custom_data(machine.device(FLOPPY_2))!=NULL) cnt++;
-    if (machine.device(FLOPPY_3)!=NULL && flopimg_get_custom_data(machine.device(FLOPPY_3))!=NULL) cnt++;
-	return cnt;
+	if (device->subdevice("^"FLOPPY_0)!=NULL && flopimg_get_custom_data(device->subdevice(PARENT_FLOPPY_0))!=NULL) cnt++;
+    if (device->subdevice("^"FLOPPY_1)!=NULL && flopimg_get_custom_data(device->subdevice(PARENT_FLOPPY_1))!=NULL) cnt++;
+    if (device->subdevice("^"FLOPPY_2)!=NULL && flopimg_get_custom_data(device->subdevice(PARENT_FLOPPY_2))!=NULL) cnt++;
+    if (device->subdevice("^"FLOPPY_3)!=NULL && flopimg_get_custom_data(device->subdevice(PARENT_FLOPPY_3))!=NULL) cnt++;
+
+//    printf("%d apple525 drives\n", cnt);
+    return cnt;
 }
 
-void apple525_set_lines(device_t *device,UINT8 lines)
+void apple525_set_lines(device_t *device, UINT8 lines)
 {
 	int i, count;
 	device_t *image;
 
-	count = apple525_get_count(device->machine());
+	count = apple525_get_count(device);
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_APPLE, i);
+			image = apple525_get_device_by_type(device, FLOPPY_TYPE_APPLE, i);
 			if (image)
 				apple525_disk_set_lines(device,image, lines);
 		}
@@ -212,16 +249,16 @@ static UINT8 apple525_process_byte(device_t *img, int write_value)
 	return read_value;
 }
 
-static device_t *apple525_selected_image(running_machine &machine)
+static device_t *apple525_selected_image(device_t *device)
 {
 	int i,count;
 
-	count = apple525_get_count(machine);
+	count = apple525_get_count(device);
 
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
-			return floppy_get_device_by_type(machine, FLOPPY_TYPE_APPLE, i);
+			return apple525_get_device_by_type(device, FLOPPY_TYPE_APPLE, i);
 	}
 	return NULL;
 }
@@ -229,14 +266,14 @@ static device_t *apple525_selected_image(running_machine &machine)
 UINT8 apple525_read_data(device_t *device)
 {
 	device_t *image;
-	image = apple525_selected_image(device->machine());
+	image = apple525_selected_image(device);
 	return image ? apple525_process_byte(image, -1) : 0xFF;
 }
 
 void apple525_write_data(device_t *device,UINT8 data)
 {
 	device_t *image;
-	image = apple525_selected_image(device->machine());
+	image = apple525_selected_image(device);
 	if (image)
 		apple525_process_byte(image, data);
 }
@@ -246,13 +283,13 @@ int apple525_read_status(device_t *device)
 	int i, count, result = 0;
 	device_image_interface *image;
 
-	count = apple525_get_count(device->machine());
+	count = apple525_get_count(device);
 
 	for (i = 0; i < count; i++)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_APPLE, i));
+			image = dynamic_cast<device_image_interface *>(apple525_get_device_by_type(device, FLOPPY_TYPE_APPLE, i));
 			if (image && image->is_readonly())
 				result = 1;
 		}
@@ -268,7 +305,7 @@ const device_type FLOPPY_APPLE = &device_creator<apple525_floppy_image_device>;
 //-------------------------------------------------
 
 apple525_floppy_image_device::apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : legacy_floppy_image_device(mconfig, FLOPPY_APPLE, "Floppy Disk [Apple]", tag, owner, clock)
+    : legacy_floppy_image_device(mconfig, FLOPPY_APPLE, "Apple Disk II", tag, owner, clock)
 {
 }
 
