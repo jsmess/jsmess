@@ -222,7 +222,7 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 //  c64_exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_easyflash_cartridge_device::c64_exrom_r()
+int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int ba, int rw, int hiram)
 {
 	return !BIT(m_mode, 1);
 }

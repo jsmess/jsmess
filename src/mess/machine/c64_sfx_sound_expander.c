@@ -294,7 +294,7 @@ int c64_sfx_sound_expander_cartridge_device::c64_game_r(offs_t offset, int ba, i
 //  c64_exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_sfx_sound_expander_cartridge_device::c64_exrom_r()
+int c64_sfx_sound_expander_cartridge_device::c64_exrom_r(offs_t offset, int ba, int rw, int hiram)
 {
-	return m_exp->exrom_r();
+	return m_exp->exrom_r(offset, ba, rw, hiram);
 }

@@ -100,7 +100,7 @@ public:
 	UINT8 cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
 	void cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
 	int game_r(offs_t offset, int ba, int rw, int hiram);
-	DECLARE_READ_LINE_MEMBER( exrom_r );
+	int exrom_r(offs_t offset, int ba, int rw, int hiram);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// cartridge interface
@@ -169,7 +169,7 @@ protected:
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2) { return 0; };
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2) { };
 	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram) { return m_game; }
-	virtual int c64_exrom_r() { return m_exrom; }
+	virtual int c64_exrom_r(offs_t offset, int ba, int rw, int hiram) { return m_exrom; }
 	virtual void c64_reset_w() { };
 	virtual UINT32 c64_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
 

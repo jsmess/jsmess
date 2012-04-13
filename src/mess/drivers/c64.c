@@ -61,7 +61,7 @@ void c64_state::check_interrupts()
 void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh)
 {
 	int game = m_exp->game_r(offset, rw, ba, m_hiram);
-	int exrom = m_exp->exrom_r();
+	int exrom = m_exp->exrom_r(offset, rw, ba, m_hiram);
 
 	UINT16 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 | A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
 	UINT8 data = m_pla->read(input);

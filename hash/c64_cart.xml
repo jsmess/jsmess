@@ -164,7 +164,7 @@
 		</part>
 	</software>
 
-	<software name="cs64" supported="no">
+	<software name="cs64">
 		<description>Currah Speech 64</description>
 		<year>1984</year>
 		<publisher>Currah</publisher>
@@ -172,9 +172,9 @@
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="cs64" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 
-			<dataarea name="roml" size="0x2000">
+			<dataarea name="romh" size="0x2000">
 				<rom name="778r01" size="0x2000" crc="e3f8abd0" sha1="dc9fc1ffb033531abec03b1a06a8d5064dd0ce61" offset="0x0000" />
 			</dataarea>
 		</part>

@@ -384,16 +384,16 @@ int c64_expansion_slot_device::game_r(offs_t offset, int ba, int rw, int hiram)
 
 
 //-------------------------------------------------
-//  game_r - EXROM read
+//  exrom_r - EXROM read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( c64_expansion_slot_device::exrom_r )
+int c64_expansion_slot_device::exrom_r(offs_t offset, int ba, int rw, int hiram)
 {
 	int state = 1;
 
 	if (m_cart != NULL)
 	{
-		state = m_cart->c64_exrom_r();
+		state = m_cart->c64_exrom_r(offset, ba, rw, hiram);
 	}
 
 	return state;
