@@ -276,12 +276,35 @@ UINT32 vic10_expansion_slot_device::screen_update(screen_device &screen, bitmap_
 }
 
 
-READ8_MEMBER( vic10_expansion_slot_device::lorom_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic10_lorom_r(space, offset); return data; }
-WRITE8_MEMBER( vic10_expansion_slot_device::lorom_w ) { if (m_cart != NULL) m_cart->vic10_lorom_w(space, offset, data); }
-READ8_MEMBER( vic10_expansion_slot_device::uprom_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic10_uprom_r(space, offset); return data; }
-WRITE8_MEMBER( vic10_expansion_slot_device::uprom_w ) { if (m_cart != NULL) m_cart->vic10_uprom_w(space, offset, data); }
-READ8_MEMBER( vic10_expansion_slot_device::exram_r ) { UINT8 data = 0; if (m_cart != NULL) data = m_cart->vic10_exram_r(space, offset); return data; }
-WRITE8_MEMBER( vic10_expansion_slot_device::exram_w ) { if (m_cart != NULL) m_cart->vic10_exram_w(space, offset, data); }
+//-------------------------------------------------
+//  cd_r - cartridge data read
+//-------------------------------------------------
+
+UINT8 vic10_expansion_slot_device::cd_r(address_space &space, offs_t offset, int lorom, int uprom, int exram)
+{
+	UINT8 data = 0;
+
+	if (m_cart != NULL)
+	{
+		data = m_cart->vic10_cd_r(space, offset, lorom, uprom, exram);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  cd_w - cartridge data write
+//-------------------------------------------------
+
+void vic10_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram)
+{
+	if (m_cart != NULL)
+	{
+		m_cart->vic10_cd_w(space, offset, data, lorom, uprom, exram);
+	}
+}
+
 
 READ_LINE_MEMBER( vic10_expansion_slot_device::p0_r ) { int state = 0; if (m_cart != NULL) state = m_cart->vic10_p0_r(); return state; }
 WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_cart != NULL) m_cart->vic10_p0_w(state); }

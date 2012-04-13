@@ -52,6 +52,9 @@ public:
 
 	void check_interrupts();
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_button_cb );

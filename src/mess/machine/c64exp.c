@@ -40,6 +40,8 @@ device_c64_expansion_card_interface::device_c64_expansion_card_interface(const m
 	  m_roml(NULL),
 	  m_romh(NULL),
 	  m_ram(NULL),
+	  m_nvram(NULL),
+	  m_nvram_size(0),
 	  m_roml_mask(0),
 	  m_romh_mask(0),
 	  m_ram_mask(0),
@@ -68,6 +70,7 @@ UINT8* device_c64_expansion_card_interface::c64_roml_pointer(running_machine &ma
 	if (m_roml == NULL)
 	{
 		m_roml = auto_alloc_array(machine, UINT8, size);
+		
 		m_roml_mask = size - 1;
 	}
 
@@ -84,6 +87,7 @@ UINT8* device_c64_expansion_card_interface::c64_romh_pointer(running_machine &ma
 	if (m_romh == NULL)
 	{
 		m_romh = auto_alloc_array(machine, UINT8, size);
+
 		m_romh_mask = size - 1;
 	}
 
@@ -100,10 +104,29 @@ UINT8* device_c64_expansion_card_interface::c64_ram_pointer(running_machine &mac
 	if (m_ram == NULL)
 	{
 		m_ram = auto_alloc_array(machine, UINT8, size);
+
 		m_ram_mask = size - 1;
 	}
 
 	return m_ram;
+}
+
+
+//-------------------------------------------------
+//  c64_ram_pointer - get NVRAM pointer
+//-------------------------------------------------
+
+UINT8* device_c64_expansion_card_interface::c64_nvram_pointer(running_machine &machine, size_t size)
+{
+	if (m_nvram == NULL)
+	{
+		m_nvram = auto_alloc_array(machine, UINT8, size);
+
+		m_nvram_mask = size - 1;
+		m_nvram_size = size;
+	}
+
+	return m_nvram;
 }
 
 
@@ -199,25 +222,25 @@ bool c64_expansion_slot_device::call_load()
 			if (!mame_stricmp(filetype(), "80"))
 			{
 				fread(m_cart->c64_roml_pointer(machine(), size), size);
-				m_cart->c64_exrom_w(0);
+				m_cart->m_exrom = (0);
 
 				if (size == 0x4000)
 				{
-					m_cart->c64_game_w(0);
+					m_cart->m_game = 0;
 				}
 			}
 			else if (!mame_stricmp(filetype(), "a0"))
 			{
 				fread(m_cart->c64_romh_pointer(machine(), 0x2000), 0x2000);
 
-				m_cart->c64_exrom_w(0);
-				m_cart->c64_game_w(0);
+				m_cart->m_exrom = 0;
+				m_cart->m_game = 0;
 			}
 			else if (!mame_stricmp(filetype(), "e0"))
 			{
 				fread(m_cart->c64_romh_pointer(machine(), 0x2000), 0x2000);
 
-				m_cart->c64_game_w(0);
+				m_cart->m_game = 0;
 			}
 			else if (!mame_stricmp(filetype(), "crt"))
 			{
@@ -237,8 +260,8 @@ bool c64_expansion_slot_device::call_load()
 					cbm_crt_read_data(m_file, roml, romh);
 				}
 
-				m_cart->c64_exrom_w(exrom);
-				m_cart->c64_game_w(game);
+				m_cart->m_exrom = exrom;
+				m_cart->m_game = game;
 			}
 		}
 		else
@@ -253,8 +276,8 @@ bool c64_expansion_slot_device::call_load()
 				size = get_software_region_length("lorom");
 				if (size) memcpy(m_cart->c64_roml_pointer(machine(), size), get_software_region("lorom"), size);
 
-				m_cart->c64_exrom_w(1);
-				m_cart->c64_game_w(0);
+				m_cart->m_exrom = 1;
+				m_cart->m_game = 0;
 			}
 			else
 			{
@@ -268,8 +291,11 @@ bool c64_expansion_slot_device::call_load()
 				size = get_software_region_length("ram");
 				if (size) memset(m_cart->c64_ram_pointer(machine(), size), 0, size);
 
-				m_cart->c64_exrom_w(atol(get_feature("exrom")));
-				m_cart->c64_game_w(atol(get_feature("game")));
+				size = get_software_region_length("nvram");
+				if (size) memset(m_cart->c64_nvram_pointer(machine(), size), 0, size);
+
+				m_cart->m_exrom = (atol(get_feature("exrom")));
+				m_cart->m_game = atol(get_feature("game"));
 			}
 		}
 	}

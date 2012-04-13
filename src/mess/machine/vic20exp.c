@@ -45,7 +45,8 @@ device_vic20_expansion_card_interface::device_vic20_expansion_card_interface(con
 	  m_blk3(NULL),
 	  m_blk5(NULL),
 	  m_ram(NULL),
-	  m_nvram(NULL)
+	  m_nvram(NULL),
+	  m_nvram_size(0)
 {
 	m_slot = dynamic_cast<vic20_expansion_slot_device *>(device.owner());
 }
@@ -135,6 +136,9 @@ UINT8* device_vic20_expansion_card_interface::vic20_nvram_pointer(running_machin
 	if (m_nvram == NULL)
 	{
 		m_nvram = auto_alloc_array(machine, UINT8, size);
+
+		m_nvram_mask = size - 1;
+		m_nvram_size = size;
 	}
 
 	return m_nvram;
@@ -279,6 +283,7 @@ bool vic20_expansion_slot_device::call_load()
 
 			size = get_software_region_length("nvram");
 			if (size) memcpy(m_cart->vic20_nvram_pointer(machine(), size), get_software_region("nvram"), size);
+
 		}
 	}
 

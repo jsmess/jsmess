@@ -94,12 +94,8 @@ public:
 	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~vic10_expansion_slot_device();
 
-	DECLARE_READ8_MEMBER( lorom_r );
-	DECLARE_WRITE8_MEMBER( lorom_w );
-	DECLARE_READ8_MEMBER( uprom_r );
-	DECLARE_WRITE8_MEMBER( uprom_w );
-	DECLARE_READ8_MEMBER( exram_r );
-	DECLARE_WRITE8_MEMBER( exram_w );
+	UINT8 cd_r(address_space &space, offs_t offset, int lorom, int uprom, int exram);
+	void cd_w(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram);
 
 	DECLARE_READ_LINE_MEMBER( p0_r );
 	DECLARE_WRITE_LINE_MEMBER( p0_w );
@@ -148,35 +144,28 @@ protected:
 // class representing interface-specific live vic10_expansion card
 class device_vic10_expansion_card_interface : public device_slot_card_interface
 {
+	friend class vic10_expansion_slot_device;
+
 public:
 	// construction/destruction
 	device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic10_expansion_card_interface();
 
-	// RAM
+protected:
+	// initialization
 	virtual UINT8* vic10_exram_pointer(running_machine &machine, size_t size);
-	virtual UINT8 vic10_exram_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic10_exram_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	// ROM
 	virtual UINT8* vic10_lorom_pointer(running_machine &machine, size_t size);
-	virtual UINT8 vic10_lorom_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic10_lorom_w(address_space &space, offs_t offset, UINT8 data) { };
-
 	virtual UINT8* vic10_uprom_pointer(running_machine &machine, size_t size);
-	virtual UINT8 vic10_uprom_r(address_space &space, offs_t offset) { return 0; };
-	virtual void vic10_uprom_w(address_space &space, offs_t offset, UINT8 data) { };
 
-	// I/O
+	// runtime
+	virtual UINT8 vic10_cd_r(address_space &space, offs_t offset, int lorom, int uprom, int exram) { return 0; };
+	virtual void vic10_cd_w(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram) { };
 	virtual int vic10_p0_r() { return 0; };
 	virtual void vic10_p0_w(int state) { };
 	virtual void vic10_sp_w(int state) { };
 	virtual void vic10_cnt_w(int state) { };
-
-	// video
 	virtual UINT32 vic10_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
 
-protected:
 	vic10_expansion_slot_device *m_slot;
 
 	UINT8 *m_exram;
