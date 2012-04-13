@@ -156,17 +156,15 @@ protected:
 // class representing interface-specific live vic20_expansion card
 class device_vic20_expansion_card_interface : public device_slot_card_interface
 {
+	friend class vic20_expansion_slot_device;
+
 public:
 	// construction/destruction
 	device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic20_expansion_card_interface();
 
-	// memory access
-	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return 0; };
-	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { };
-
-	virtual UINT32 vic20_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
-
+protected:
+	// initialization
 	virtual UINT8* vic20_blk1_pointer(running_machine &machine, size_t size);
 	virtual UINT8* vic20_blk2_pointer(running_machine &machine, size_t size);
 	virtual UINT8* vic20_blk3_pointer(running_machine &machine, size_t size);
@@ -174,7 +172,11 @@ public:
 	virtual UINT8* vic20_ram_pointer(running_machine &machine, size_t size);
 	virtual UINT8* vic20_nvram_pointer(running_machine &machine, size_t size);
 
-protected:
+	// runtime
+	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return 0; };
+	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { };
+	virtual UINT32 vic20_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
+
 	vic20_expansion_slot_device *m_slot;
 
 	UINT8 *m_blk1;
@@ -183,6 +185,10 @@ protected:
 	UINT8 *m_blk5;
 	UINT8 *m_ram;
 	UINT8 *m_nvram;
+
+	size_t m_nvram_size;
+
+	size_t m_nvram_mask;
 };
 
 

@@ -44,64 +44,38 @@ void vic10_standard_cartridge_device::device_start()
 
 
 //-------------------------------------------------
-//  vic10_exram_r - expanded RAM read
+//  vic10_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic10_standard_cartridge_device::vic10_exram_r(address_space &space, offs_t offset)
+UINT8 vic10_standard_cartridge_device::vic10_cd_r(address_space &space, offs_t offset, int lorom, int uprom, int exram)
 {
 	UINT8 data = 0;
 
-	if (m_exram != NULL)
-	{
-		data = m_exram[offset & 0x7ff];
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic10_exram_w - expanded RAM write
-//-------------------------------------------------
-
-void vic10_standard_cartridge_device::vic10_exram_w(address_space &space, offs_t offset, UINT8 data)
-{
-	if (m_exram != NULL)
-	{
-		m_exram[offset & 0x7ff] = data;
-	}
-}
-
-
-//-------------------------------------------------
-//  vic10_lorom_r - lower ROM read
-//-------------------------------------------------
-
-UINT8 vic10_standard_cartridge_device::vic10_lorom_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (m_lorom != NULL)
+	if (!lorom && (m_lorom != NULL))
 	{
 		data = m_lorom[offset & 0x1fff];
 	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic10_uprom_r - upper ROM read
-//-------------------------------------------------
-
-UINT8 vic10_standard_cartridge_device::vic10_uprom_r(address_space &space, offs_t offset)
-{
-	UINT8 data = 0;
-
-	if (m_uprom != NULL)
+	else if (!exram && (m_exram != NULL))
+	{
+		data = m_exram[offset & 0x7ff];
+	}
+	else if (!uprom && (m_uprom != NULL))
 	{
 		data = m_uprom[offset & 0x1fff];
 	}
 
 	return data;
+}
+
+
+//-------------------------------------------------
+//  vic10_cd_w - cartridge data write
+//-------------------------------------------------
+
+void vic10_standard_cartridge_device::vic10_cd_w(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram)
+{
+	if (!exram && (m_exram != NULL))
+	{
+		m_exram[offset & 0x7ff] = data;
+	}
 }

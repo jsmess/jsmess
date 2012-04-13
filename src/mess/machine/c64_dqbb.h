@@ -26,7 +26,8 @@
 // ======================> c64_dqbb_cartridge_device
 
 class c64_dqbb_cartridge_device : public device_t,
-								  public device_c64_expansion_card_interface
+								  public device_c64_expansion_card_interface,
+							   	  public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -37,6 +38,11 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "c64_dqbb"; }
+
+	// device_nvram_interface overrides
+	virtual void nvram_default() { }
+	virtual void nvram_read(emu_file &file) { if (m_nvram != NULL) { file.read(m_nvram, m_nvram_size); } }
+	virtual void nvram_write(emu_file &file) { if (m_nvram != NULL) { file.write(m_nvram, m_nvram_size); } }
 
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);

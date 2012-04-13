@@ -27,6 +27,99 @@ void vic10_state::check_interrupts()
 }
 
 
+//**************************************************************************
+//  MEMORY MANAGEMENT
+//**************************************************************************
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+READ8_MEMBER( vic10_state::read )
+{
+	// TODO this is really handled by the PLA
+
+	UINT8 data = 0;
+	int lorom = 1, uprom = 1, exram = 1;
+
+	if (offset < 0x800)
+	{
+		data = m_ram->pointer()[offset];
+	}
+	else if (offset < 0x1000)
+	{
+		exram = 0;
+	}
+	else if (offset >= 0x8000 && offset < 0xa000)
+	{
+		lorom = 0;
+	}
+	else if (offset >= 0xd000 && offset < 0xd400)
+	{
+		data = vic2_port_r(m_vic, offset & 0x3f);
+	}
+	else if (offset >= 0xd400 && offset < 0xd800)
+	{
+		data = sid6581_r(m_sid, offset & 0x1f);
+	}
+	else if (offset >= 0xd800 && offset < 0xdc00)
+	{
+		data = m_color_ram[offset & 0x3ff];
+	}
+	else if (offset >= 0xdc00 && offset < 0xe000)
+	{
+		data = mos6526_r(m_cia, offset & 0x0f);
+	}
+	else if (offset >= 0xe000)
+	{
+		uprom = 0;
+	}
+
+	data |= m_exp->cd_r(space, offset, lorom, uprom, exram);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( vic10_state::write )
+{
+	// TODO this is really handled by the PLA
+
+	int lorom = 1, uprom = 1, exram = 1;
+
+	if (offset < 0x800)
+	{
+		m_ram->pointer()[offset] = data;
+	}
+	else if (offset < 0x1000)
+	{
+		exram = 0;
+	}
+	else if (offset >= 0xd000 && offset < 0xd400)
+	{
+		vic2_port_w(m_vic, offset & 0x3f, data);
+	}
+	else if (offset >= 0xd400 && offset < 0xd800)
+	{
+		sid6581_w(m_sid, offset & 0x1f, data);
+	}
+	else if (offset >= 0xd800 && offset < 0xdc00)
+	{
+		m_color_ram[offset & 0x3ff] = data & 0x0f;
+	}
+	else if (offset >= 0xdc00 && offset < 0xe000)
+	{
+		mos6526_w(m_cia, offset & 0x0f, data);
+	}
+
+	m_exp->cd_w(space, offset, data, lorom, uprom, exram);
+}
+
+
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -37,14 +130,7 @@ void vic10_state::check_interrupts()
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vic10_mem, AS_PROGRAM, 8, vic10_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, exram_r, exram_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, lorom_r, lorom_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE_LEGACY(MOS6566_TAG, vic2_port_r, vic2_port_w)
-	AM_RANGE(0xd400, 0xd7ff) AM_DEVREADWRITE_LEGACY(MOS6581_TAG, sid6581_r, sid6581_w)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE(m_color_ram)
-	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE_LEGACY(MOS6526_TAG, mos6526_r, mos6526_w)
-	AM_RANGE(0xe000, 0xffff) AM_DEVREADWRITE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, uprom_r, uprom_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
@@ -498,6 +584,9 @@ static VIC10_EXPANSION_INTERFACE( expansion_intf )
 
 void vic10_state::machine_start()
 {
+	// allocate memory
+	m_color_ram = auto_alloc_array(machine(), UINT8, 0x400);
+
 	// state saving
 	save_item(NAME(m_cia_irq));
 	save_item(NAME(m_vic_irq));

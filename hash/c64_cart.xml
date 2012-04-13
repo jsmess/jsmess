@@ -4,11 +4,13 @@
 
 	Hardware to be emulated
 
-	CPU accelerators:
+	CPU replacements:
 	- Turbo Master CPU (R65C02P4 @ 4.09 MHz)
 	- Turbo Process Accelerator (65C816P-4  @ 50kHz-4MHz)
 	- Flash 8 (65816 @ 8 MHz, 4/8 MB RAM)
 	- CMD SuperCPU 64 (65C816S, 64 KB RAM)
+	- Data 20 Z-80 Video Pak (Z80, 80 column video)
+	- Commodore CP/M (Z80)
 
 	Serial I/O:
 	- CMD SwiftLink (6551 @ 3.6864 MHz)
