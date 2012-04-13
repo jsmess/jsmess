@@ -8,7 +8,6 @@ There appear to exist some undumped N64 protos
   - Air Boardin' USA,
   - Echo Delta,
   - Looney Tunes Space Race,
-  - Mini Racers,
   - Ohcouchi Gengorou Ikka,
   - Star Soldier Vanishing Earth (Europe),
 
@@ -5343,6 +5342,17 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
+	<software name="miniracr">
+		<description>Mini Racers (Prototype)</description>
+		<year>1999</year>
+		<publisher>Looking Glass Studios</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="mini racers (unreleased).bin" size="16777216" crc="cf4c80b0" sha1="ac093f0bbec0893e942da322318f54268834c10b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mischief">
 		<description>Mischief Makers (Euro)</description>
 		<year>1997</year>
@@ -8835,6 +8845,17 @@ There appear to exist some undumped N64 protos
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="syd2k (usa).bin" size="33554432" crc="9b7b6f51" sha1="b9def914d6395b794418f0ccd846cbee123b27ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tamiyarc" cloneof="miniracr">
+		<description>Tamiya Racing 64 (Prototype)</description>
+		<year>1999</year>
+		<publisher>Looking Glass Studios</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="tamiya racing 64 (unreleased).bin" size="16777216" crc="7ea56078" sha1="6d8551c846dec2a732732d988078731e047a82a5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
