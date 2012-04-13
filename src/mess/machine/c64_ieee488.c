@@ -106,7 +106,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
 	data |= m_bus->ifc_r();
 	data |= m_bus->srq_r() << 1;
 
-	data |= m_exp->exrom_r() << 7;
+	data |= m_exp->exrom_r(offset, 1, 1, 0) << 7;
 
 	return data;
 }
