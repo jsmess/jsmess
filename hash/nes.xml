@@ -55250,6 +55250,21 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
+	<software name="lionkin6" cloneof="lionkin3" supported="no">
+		<description>The Lion King 6</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="lion king 6, the (unl) [!].chr" size="262144" crc="efca7f1e" sha1="f9ec26e30b26a49b9d6e1698f96a7d9366b475ec" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="lion king 6, the (unl) [!].prg" size="262144" crc="b828190e" sha1="05a0594106b3309a101c2402ad0cfcb5fcd1a409" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- nointro -->
 	<software name="magicjwl">
 		<description>Magic Jewelry (Asia)</description>
@@ -55947,6 +55962,22 @@ We don't include these hacks because they were not burned into real carts nor so
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="super mary (19xx)(-)(as)[p][!].prg" size="32768" crc="5cf548d3" sha1="fefa1097449a3a11ebf8c6199e905996c5dc8fbd" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrisa">
+		<description>Tetris (Asia)</description>
+		<year>1992</year>
+		<publisher>Pyramid Game Card?</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="tetris (pyramid game card)(unl)[!].chr" size="8192" crc="6daff832" sha1="4b60b229d2cd6addf6c41fb0c93d232abbccb09e" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="tetris (pyramid game card)(unl)[!].prg" size="32768" crc="ba2fb2f6" sha1="4d6b6ae5e80194d93e34c2cf2f0e8f312a424507" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
