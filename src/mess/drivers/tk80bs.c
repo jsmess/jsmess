@@ -76,7 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
 	UINT8 m_term_data;
-	required_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
 	UINT8 m_shift_press_flag;
