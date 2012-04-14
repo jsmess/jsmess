@@ -94,10 +94,9 @@ class ip22_state : public driver_device
 public:
 	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_mainram(*this, "mainram"),
 		m_unkpbus0(*this, "unkpbus0"){ }
 
-	required_shared_ptr<UINT32> m_mainram;
+	UINT32 *m_mainram;
 	RTC_t m_RTC;
 	UINT32 m_int3_regs[64];
 	UINT32 m_nIOC_ParReadCnt;
