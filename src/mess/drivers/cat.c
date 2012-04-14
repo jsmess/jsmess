@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cat_keyboard_w);
 	DECLARE_WRITE16_MEMBER(cat_video_w);
 	DECLARE_READ16_MEMBER(cat_something_r);
-	required_shared_ptr<UINT16> m_p_sram;
+	optional_shared_ptr<UINT16> m_p_sram;
 	required_shared_ptr<UINT16> m_p_videoram;
 	UINT8 m_duart_inp;// = 0x0e;
 	UINT8 m_video_enable;
