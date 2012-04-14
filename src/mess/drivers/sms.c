@@ -531,6 +531,8 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
+	MCFG_VIDEO_START(sms1)
+
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
 MACHINE_CONFIG_END
 
