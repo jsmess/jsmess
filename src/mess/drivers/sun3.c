@@ -226,7 +226,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset();
 
-	required_shared_ptr<UINT16> m_p_ram;
+	required_shared_ptr<UINT32> m_p_ram;
 };
 
 static ADDRESS_MAP_START(sun3_mem, AS_PROGRAM, 32, sun3_state)
