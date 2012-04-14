@@ -641,7 +641,6 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_DRIVERS)/apple2gs.o	\
 	$(MESS_MACHINE)/ay3600.o	\
     $(MESS_MACHINE)/a2bus.o     \
-	$(MESS_MACHINE)/ap2_slot.o	\
 	$(MESS_MACHINE)/a2lang.o	\
 	$(MESS_MACHINE)/a2diskii.o	\
 	$(MESS_MACHINE)/a2mockingboard.o	\
@@ -649,6 +648,7 @@ $(MESSOBJ)/apple.a:				\
     $(MESS_MACHINE)/a2memexp.o  \
     $(MESS_MACHINE)/a2scsi.o    \
     $(MESS_MACHINE)/a2thunderclock.o    \
+    $(MESS_MACHINE)/a2softcard.o \
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
 	$(MESS_MACHINE)/nubus.o     \
