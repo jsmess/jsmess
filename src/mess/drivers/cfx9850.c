@@ -25,28 +25,26 @@ class cfx9850_state : public driver_device
 {
 public:
 	cfx9850_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_p_video_ram(*this, "p_video_ram"),
-		m_p_display_ram(*this, "p_display_ram"){ }
+		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(cfx9850_kol_w);
 	DECLARE_WRITE8_MEMBER(cfx9850_koh_w);
 	DECLARE_READ8_MEMBER(cfx9850_ki_r);
 	DECLARE_READ8_MEMBER(cfx9850_battery_level_r);
-	required_shared_ptr<UINT8> m_p_video_ram;
-	required_shared_ptr<UINT8> m_p_display_ram;
+	UINT8 *m_video_ram;
+	UINT8 *m_display_ram;
 	UINT16 m_ko;				/* KO lines KO1 - KO14 */
 };
 
 
 static ADDRESS_MAP_START( cfx9850, AS_PROGRAM, 8, cfx9850_state )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
-	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_BASE(m_p_video_ram )
+	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_BASE(m_video_ram )
 //  AM_RANGE( 0x100000, 0x10ffff ) /* some memory mapped i/o? */
 //  AM_RANGE( 0x110000, 0x11ffff ) /* some memory mapped i/o? */
 	AM_RANGE( 0x200000, 0x27ffff ) AM_ROM AM_REGION( "bios", 0 )
 	AM_RANGE( 0x400000, 0x40ffff ) AM_RAM
-	AM_RANGE( 0x600000, 0x601fff ) AM_MIRROR(0xf800) AM_RAM AM_BASE(m_p_display_ram )
+	AM_RANGE( 0x600000, 0x601fff ) AM_MIRROR(0xf800) AM_RAM AM_BASE(m_display_ram )
 //  AM_RANGE( 0xe10000, 0xe1ffff ) /* some memory mapped i/o? */
 ADDRESS_MAP_END
 
@@ -205,8 +203,8 @@ static SCREEN_UPDATE_IND16( cfx9850 )
 
 		for ( int j = 0; j < 64; j++ )
 		{
-			UINT8 data1 = state->m_p_display_ram[ offset ];
-			UINT8 data2 = state->m_p_display_ram[ offset + 0x400 ];
+			UINT8 data1 = state->m_display_ram[ offset ];
+			UINT8 data2 = state->m_display_ram[ offset + 0x400 ];
 
 			for ( int b = 0; b < 8; b++ )
 			{
