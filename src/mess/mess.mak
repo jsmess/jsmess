@@ -1985,6 +1985,14 @@ $(MESS_DRIVERS)/mac.o:		$(MESSSRC)/drivers/mac.c \
 $(MESS_MACHINE)/egret.o:	$(MESSSRC)/machine/egret.c\
                         	$(MESSSRC)/machine/egret.h
 
+$(MESS_DRIVERS)/apple2.o:   $(MESSSRC)/includes/apple2.h
+$(MESS_MACHINE)/apple2.o:   $(MESSSRC)/includes/apple2.h
+$(MESS_VIDEO)/apple2.o:     $(MESSSRC)/includes/apple2.h
+$(MESS_DRIVERS)/apple2gs.o: $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
+$(MESS_MACHINE)/apple2gs.o: $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
+$(MESS_VIDEO)/apple2gs.o:   $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
+
+
 # $(MESSSRC)/drivers/apollo.c includes m68kcpu.h and m68kcpu.h now includes m68kops.h
 $(MESS_DRIVERS)/apollo.o:	$(EMUSRC)/cpu/m68000/m68kcpu.h
 $(MESS_MACHINE)/apollo_dbg.o:	$(EMUSRC)/cpu/m68000/m68kcpu.h
