@@ -24,7 +24,7 @@ public:
 		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<UINT16> m_p_videoram;
 };
 
 
