@@ -145,7 +145,7 @@ public:
 
 	required_device<i8255_device> m_ppi;
 
-	required_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<UINT8> m_ram;
 	UINT8 *m_video_ram;
 	UINT8 m_irq_vector;
 	UINT8 m_cas_switch;
