@@ -10,47 +10,11 @@
 
     Notes:
 
-    PAL U3C:
-    I1 = A0
-    I2 = A1
-    I3 = A2
-    I4 = A3
-    I5 = O2 of PAL U3D
-    I6 = (logic maze)
-    I7 = R/W (also I7 of PAL U3D)
-    I8 = PHI0 (via flip flops)
-    I9 = RESET
-    I10 = GND
-
-    O1 = P on flip-flops U6DA/U6DB, I8 on PAL U3D
-    O2 = N/C
-    O3 = I6 on PAL U3D
-    O4 = N/C
-    O5 = /CS on NCR 5380
-    O6 = /WR on NCR 5380
-    O7 = /RD on NCR 5380
-    O8 = /DACK on NCR 5380
-
-    PAL U3D:
-    I1 = A0-A10 NANDed together (goes low on CFFF access, i.e.)
-    I2 = /IOSTB
-    I3 = /IOSEL
-    I4 = RESET
-    I5 = A10 (splits C800 space at C800/CC00)
-    I6 = O3 of PAL U3C
-    I7 = R/W
-    I8 = O1 of PAL U3C
-    I9 = DRQ from 5380
-    I10 = Y6 from 74LS138 at U3D (C0n6 access)
-
-    O1 = G on 74LS245 main data bus buffer
-    O2 = I5 of PAL U3C
-    O3 = D to flip-flop at U6DB
-    O4 = CLK to flip-flop at U6DA
-    O5 = D7 (?)
-    O6 = CS1 on RAM
-    O7 = EPROM CE
-    O8 = EPROM OE
+    C0n0-C0n7 = NCR5380 registers in normal order 
+    C0n9 = DIP switches
+    C0na = RAM and ROM bank switching
+    C0nb = reset 5380
+    C0ne = into the PAL stuff
 
 *********************************************************************/
 
@@ -124,14 +88,16 @@ const rom_entry *a2bus_scsi_device::device_rom_region() const
 
 a2bus_scsi_device::a2bus_scsi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
     device_t(mconfig, type, name, tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this)
+    device_a2bus_card_interface(mconfig, *this),
+    m_ncr5380(*this, SCSI_5380_TAG)
 {
 	m_shortname = "a2scsi";
 }
 
 a2bus_scsi_device::a2bus_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
     device_t(mconfig, A2BUS_SCSI, "Apple II SCSI Card", tag, owner, clock),
-    device_a2bus_card_interface(mconfig, *this)
+    device_a2bus_card_interface(mconfig, *this),
+    m_ncr5380(*this, SCSI_5380_TAG)
 {
 	m_shortname = "a2scsi";
 }
@@ -161,20 +127,25 @@ void a2bus_scsi_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-/*
-
-From schematic (decoded by 74LS138 at U2D)
-
-C0n1/9 = DIP switches
-C0n2/a = clock to 74LS273 bank switcher (so data here should be the bank)
-C0n3/b = reset 5380
-C0n6/e = into the PAL stuff
-
-*/
-
 UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
 {
     printf("Read c0n%x (PC=%x)\n", offset, cpu_get_pc(&space.device()));
+
+    switch (offset)
+    {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            return ncr5380_read_reg(m_ncr5380, offset);
+
+    case 9:         // card's ID?
+        return 7;
+    }
 
 	return 0xff;
 }
@@ -188,9 +159,20 @@ void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
 {
     printf("Write %02x to c0n%x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
 
-    switch (offset & 7)
+    switch (offset)
     {
-        case 0x2:   // ROM and RAM banking (74LS273 at U3E)
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            ncr5380_write_reg(m_ncr5380, offset, data);
+            break;
+
+        case 0xa:  // ROM and RAM banking (74LS273 at U3E)
             /*
                 ROM banking:
                 (bits EA8-EA13 are all zeroed when /IOSEL is asserted, so CnXX always gets the first page of the ROM)
@@ -208,6 +190,10 @@ void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
             m_rambank = ((data>>4) & 0x7) * 0x400;
             m_rombank = (data & 0xf) * 0x400;
             printf("RAM bank to %x, ROM bank to %x\n", m_rambank, m_rombank);
+            break;
+
+        case 0xb:
+            printf("Reset NCR5380\n");
             break;
     }
 }
