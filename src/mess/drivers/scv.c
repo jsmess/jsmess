@@ -15,8 +15,7 @@ class scv_state : public driver_device
 {
 public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(scv_porta_w);
 	DECLARE_READ8_MEMBER(scv_portb_r);
@@ -25,7 +24,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scv_cart_ram_w);
 	DECLARE_WRITE8_MEMBER(scv_cart_ram2_w);
 	DECLARE_WRITE_LINE_MEMBER(scv_upd1771_ack_w);
-	required_shared_ptr<UINT8> m_p_videoram;
+	UINT8 *m_videoram;
 	UINT8 m_porta;
 	UINT8 m_portc;
 	emu_timer *m_vb_timer;
@@ -42,7 +41,7 @@ public:
 static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM		/* BIOS */
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE(m_p_videoram )	/* VRAM + 4 registers */
+	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE(m_videoram )	/* VRAM + 4 registers */
 
 	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE_LEGACY("upd1771c", upd1771_w )
 
@@ -442,10 +441,10 @@ INLINE void draw_sprite( scv_state *state, bitmap_ind16 &bitmap, UINT8 x, UINT8 
 	y += clip_y * 2;
 	for ( j = clip_y * 4; j < 32; j += 4 )
 	{
-		UINT8 pat0 = state->m_p_videoram[ tile_idx * 32 + j + 0 ];
-		UINT8 pat1 = state->m_p_videoram[ tile_idx * 32 + j + 1 ];
-		UINT8 pat2 = state->m_p_videoram[ tile_idx * 32 + j + 2 ];
-		UINT8 pat3 = state->m_p_videoram[ tile_idx * 32 + j + 3 ];
+		UINT8 pat0 = state->m_videoram[ tile_idx * 32 + j + 0 ];
+		UINT8 pat1 = state->m_videoram[ tile_idx * 32 + j + 1 ];
+		UINT8 pat2 = state->m_videoram[ tile_idx * 32 + j + 2 ];
+		UINT8 pat3 = state->m_videoram[ tile_idx * 32 + j + 3 ];
 
 		if ( ( top && j < 16 ) || ( bottom && j >= 16 ) )
 		{
@@ -549,12 +548,12 @@ static SCREEN_UPDATE_IND16( scv )
 {
 	scv_state *state = screen.machine().driver_data<scv_state>();
 	int x, y;
-	UINT8 fg = state->m_p_videoram[0x1403] >> 4;
-	UINT8 bg = state->m_p_videoram[0x1403] & 0x0f;
-	UINT8 gr_fg = state->m_p_videoram[0x1401] >> 4;
-	UINT8 gr_bg = state->m_p_videoram[0x1401] & 0x0f;
-	int clip_x = ( state->m_p_videoram[0x1402] & 0x0f ) * 2;
-	int clip_y = state->m_p_videoram[0x1402] >> 4;
+	UINT8 fg = state->m_videoram[0x1403] >> 4;
+	UINT8 bg = state->m_videoram[0x1403] & 0x0f;
+	UINT8 gr_fg = state->m_videoram[0x1401] >> 4;
+	UINT8 gr_bg = state->m_videoram[0x1401] & 0x0f;
+	int clip_x = ( state->m_videoram[0x1402] & 0x0f ) * 2;
+	int clip_y = state->m_videoram[0x1402] >> 4;
 
 	/* Clear the screen */
 	bitmap.fill(gr_bg , cliprect);
@@ -565,19 +564,19 @@ static SCREEN_UPDATE_IND16( scv )
 		int text_y = 0;
 
 		if ( y < clip_y )
-			text_y = ( state->m_p_videoram[0x1400] & 0x80 ) ? 0 : 1;
+			text_y = ( state->m_videoram[0x1400] & 0x80 ) ? 0 : 1;
 		else
-			text_y = ( state->m_p_videoram[0x1400] & 0x80 ) ? 1 : 0;
+			text_y = ( state->m_videoram[0x1400] & 0x80 ) ? 1 : 0;
 
 		for ( x = 0; x < 32; x++ )
 		{
 			int text_x = 0;
-			UINT8 d = state->m_p_videoram[ 0x1000 + y * 32 + x ];
+			UINT8 d = state->m_videoram[ 0x1000 + y * 32 + x ];
 
 			if ( x < clip_x )
-				text_x = ( state->m_p_videoram[0x1400] & 0x40 ) ? 0 : 1;
+				text_x = ( state->m_videoram[0x1400] & 0x40 ) ? 0 : 1;
 			else
-				text_x = ( state->m_p_videoram[0x1400] & 0x40 ) ? 1 : 0;
+				text_x = ( state->m_videoram[0x1400] & 0x40 ) ? 1 : 0;
 
 			if ( text_x && text_y )
 			{
@@ -587,7 +586,7 @@ static SCREEN_UPDATE_IND16( scv )
 			}
 			else
 			{
-				switch ( state->m_p_videoram[0x1400] & 0x03 )
+				switch ( state->m_videoram[0x1400] & 0x03 )
 				{
 				case 0x01:		/* Semi graphics mode */
 					draw_semi_graph( bitmap, x * 8    , y * 16     , d & 0x80, gr_fg );
@@ -611,20 +610,20 @@ static SCREEN_UPDATE_IND16( scv )
 	}
 
 	/* Draw sprites if enabled */
-	if ( state->m_p_videoram[0x1400] & 0x10 )
+	if ( state->m_videoram[0x1400] & 0x10 )
 	{
 		int i;
 
 		for ( i = 0; i < 128; i++ )
 		{
-			UINT8 spr_y = state->m_p_videoram[ 0x1200 + i * 4 ] & 0xfe;
-			UINT8 y_32 = state->m_p_videoram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
-			UINT8 clip = state->m_p_videoram[ 0x1201 + i * 4 ] >> 4;
-			UINT8 col = state->m_p_videoram[ 0x1201 + i * 4 ] & 0x0f;
-			UINT8 spr_x = state->m_p_videoram[ 0x1202 + i * 4 ] & 0xfe;
-			UINT8 x_32 = state->m_p_videoram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
-			UINT8 tile_idx = state->m_p_videoram[ 0x1203 + i * 4 ] & 0x7f;
-			UINT8 half = state->m_p_videoram[ 0x1203 + i * 4] & 0x80;
+			UINT8 spr_y = state->m_videoram[ 0x1200 + i * 4 ] & 0xfe;
+			UINT8 y_32 = state->m_videoram[ 0x1200 + i * 4 ] & 0x01;		/* Xx32 sprite */
+			UINT8 clip = state->m_videoram[ 0x1201 + i * 4 ] >> 4;
+			UINT8 col = state->m_videoram[ 0x1201 + i * 4 ] & 0x0f;
+			UINT8 spr_x = state->m_videoram[ 0x1202 + i * 4 ] & 0xfe;
+			UINT8 x_32 = state->m_videoram[ 0x1202 + i * 4 ] & 0x01;		/* 32xX sprite */
+			UINT8 tile_idx = state->m_videoram[ 0x1203 + i * 4 ] & 0x7f;
+			UINT8 half = state->m_videoram[ 0x1203 + i * 4] & 0x80;
 			UINT8 left = 1;
 			UINT8 right = 1;
 			UINT8 top = 1;
@@ -668,7 +667,7 @@ static SCREEN_UPDATE_IND16( scv )
 			}
 
 			/* Check if 2 color sprites are enabled */
-			if ( ( state->m_p_videoram[0x1400] & 0x20 ) && ( i & 0x20 ) )
+			if ( ( state->m_videoram[0x1400] & 0x20 ) && ( i & 0x20 ) )
 			{
 				/* 2 color sprite handling */
 				draw_sprite( state, bitmap, spr_x, spr_y, tile_idx, col, left, right, top, bottom, clip );
