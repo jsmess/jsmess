@@ -23,14 +23,12 @@ public:
 	pc1500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_rtc(*this, "upd1990a")
-		,
-		m_lcd_data(*this, "lcd_data"){ }
+		  m_rtc(*this, "upd1990a") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 
-	required_shared_ptr<UINT8> m_lcd_data;
+	UINT8 *m_lcd_data;
 	UINT8 m_kb_matrix;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
