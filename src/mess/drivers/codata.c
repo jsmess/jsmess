@@ -17,7 +17,7 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_p_base(*this, "p_base"){ }
 
-	required_shared_ptr<UINT8> m_p_base;
+	required_shared_ptr<UINT16> m_p_base;
 };
 
 
