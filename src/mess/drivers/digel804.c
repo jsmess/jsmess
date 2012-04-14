@@ -72,8 +72,8 @@ public:
 		  m_terminal(*this, TERMINAL_TAG),
 		  m_speaker(*this, "speaker"),
 		  m_acia(*this, "acia")
-	,
-		m_main_ram(*this, "main_ram"){ }
+		//, m_main_ram(*this, "main_ram")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
@@ -107,7 +107,7 @@ public:
 	UINT8 m_speaker_state;
 	// ram stuff for banking
 	UINT8 m_ram_bank;
-	required_shared_ptr<UINT8> m_main_ram;
+	//required_shared_ptr<UINT8> m_main_ram;
 	// states
 	UINT8 m_kbd;
 	UINT8 m_kbd_row;
