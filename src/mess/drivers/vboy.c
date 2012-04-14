@@ -76,10 +76,10 @@ public:
 	DECLARE_READ16_MEMBER(vboy_bgmap_r);
 	UINT16 *m_font;
 	UINT16 *m_bgmap;
-	required_shared_ptr<UINT16> m_l_frame_0;
-	required_shared_ptr<UINT16> m_l_frame_1;
-	required_shared_ptr<UINT16> m_r_frame_0;
-	required_shared_ptr<UINT16> m_r_frame_1;
+	required_shared_ptr<UINT32> m_l_frame_0;
+	required_shared_ptr<UINT32> m_l_frame_1;
+	required_shared_ptr<UINT32> m_r_frame_0;
+	required_shared_ptr<UINT32> m_r_frame_1;
 	UINT16 *m_world;
 	UINT16 *m_columntab1;
 	UINT16 *m_columntab2;
