@@ -734,13 +734,14 @@ READ8_HANDLER( sms_fm_detect_r )
 WRITE8_HANDLER( sms_io_control_w )
 {
 	sms_state *state = space->machine().driver_data<sms_state>();
+	bool hcount_latch = false;
 
 	if (data & 0x08)
 	{
 		/* check if TH pin level is high (1) and was low last time */
 		if (data & 0x80 && !(state->m_ctrl_reg & 0x80))
 		{
-			sms_vdp_hcount_latch(space);
+			hcount_latch = true;
 		}
 		sms_input_write(space, 0, (data & 0x20) >> 5);
 	}
@@ -749,9 +750,14 @@ WRITE8_HANDLER( sms_io_control_w )
 	{
 		if (data & 0x20 && !(state->m_ctrl_reg & 0x20))
 		{
-			sms_vdp_hcount_latch(space);
+			hcount_latch = true;
 		}
 		sms_input_write(space, 1, (data & 0x80) >> 7);
+	}
+
+	if (hcount_latch)
+	{
+		sms_vdp_hcount_latch(space);
 	}
 
 	state->m_ctrl_reg = data;
@@ -2213,17 +2219,6 @@ DRIVER_INIT( gamegeaj )
 }
 
 
-static void sms_black_bitmap( const screen_device &screen, bitmap_rgb32 &bitmap )
-{
-	const int width = screen.width();
-	const int height = screen.height();
-	int x, y;
-
-	for (y = 0; y < height; y++)
-		for (x = 0; x < width; x++)
-			bitmap.pix32(y, x) = MAKE_RGB(0,0,0);
-}
-
 VIDEO_START( sms1 )
 {
 	sms_state *state = machine.driver_data<sms_state>();
@@ -2238,21 +2233,30 @@ VIDEO_START( sms1 )
 SCREEN_UPDATE_RGB32( sms1 )
 {
 	sms_state *state = screen.machine().driver_data<sms_state>();
-	UINT8 sscope = input_port_read_safe(screen.machine(), "SEGASCOPE", 0x00);
-	UINT8 sscope_binocular_hack = input_port_read_safe(screen.machine(), "SSCOPE_BINOCULAR", 0x00);
+	UINT8 sscope = 0;
+	UINT8 sscope_binocular_hack;
 	UINT8 occluded_view = 0;
 
-	// without SegaScope, both LCDs for glasses go black
-	if ((&screen != state->m_main_scr) && !sscope)
-		occluded_view = 1;
-
-	// with SegaScope, sscope_state 0 = left screen OFF, right screen ON
-	if (!(state->m_sscope_state & 0x01) && (&screen == state->m_left_lcd))
-		occluded_view = 1;
-
-	// with SegaScope, sscope_state 1 = left screen ON, right screen OFF
-	if ((state->m_sscope_state & 0x01) && (&screen == state->m_right_lcd))
-		occluded_view = 1;
+	if (&screen != state->m_main_scr)
+	{
+		sscope = input_port_read_safe(screen.machine(), "SEGASCOPE", 0x00);
+		if (!sscope)
+		{
+			occluded_view = 1;
+		}
+		else if (&screen == state->m_left_lcd)
+		{
+			// with SegaScope, sscope_state 0 = left screen OFF, right screen ON
+			if (!(state->m_sscope_state & 0x01))
+				occluded_view = 1;
+		}
+		else // it's right LCD
+		{
+			// with SegaScope, sscope_state 1 = left screen ON, right screen OFF
+			if (state->m_sscope_state & 0x01)
+				occluded_view = 1;
+		}
+	}
 
 	if (!occluded_view)
 	{
@@ -2260,21 +2264,48 @@ SCREEN_UPDATE_RGB32( sms1 )
 
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// save a copy of current bitmap for the binocular hack
-		if (sscope && (&screen == state->m_left_lcd) && (sscope_binocular_hack & 0x01))
-			copybitmap(state->m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-		if (sscope && (&screen == state->m_right_lcd) && (sscope_binocular_hack & 0x02))
-			copybitmap(state->m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+		if (sscope)
+		{
+			sscope_binocular_hack = input_port_read_safe(screen.machine(), "SSCOPE_BINOCULAR", 0x00);
+
+			if (&screen == state->m_left_lcd)
+			{
+				if (sscope_binocular_hack & 0x01)
+					copybitmap(state->m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+			}
+			else // it's right LCD
+			{
+				if (sscope_binocular_hack & 0x02)
+					copybitmap(state->m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+			}
+		}
 	}
 	else
 	{
-		sms_black_bitmap(screen, bitmap);
-
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// use the copied bitmap for the binocular hack
-		if (sscope && (&screen == state->m_left_lcd) && (sscope_binocular_hack & 0x01))
-			copybitmap(bitmap, state->m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
-		if (sscope && (&screen == state->m_right_lcd) && (sscope_binocular_hack & 0x02))
-			copybitmap(bitmap, state->m_prevright_bitmap, 0, 0, 0, 0, cliprect);
+		if (sscope)
+		{
+			sscope_binocular_hack = input_port_read_safe(screen.machine(), "SSCOPE_BINOCULAR", 0x00);
+
+			if (&screen == state->m_left_lcd)
+			{
+				if (sscope_binocular_hack & 0x01)
+				{
+					copybitmap(bitmap, state->m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
+					return 0;
+				}
+			}
+			else // it's right LCD
+			{
+				if (sscope_binocular_hack & 0x02)
+				{
+					copybitmap(bitmap, state->m_prevright_bitmap, 0, 0, 0, 0, cliprect);
+					return 0;
+				}
+			}
+		}
+		bitmap.fill(RGB_BLACK);
 	}
 
 	return 0;
@@ -2293,7 +2324,6 @@ VIDEO_START( gamegear )
 	screen_device *screen = machine.first_screen();
 
 	screen->register_screen_bitmap(state->m_prev_bitmap);
-	screen->register_screen_bitmap(state->m_tmp_bitmap);
 	state->save_item(NAME(state->m_prev_bitmap));
 }
 
@@ -2304,13 +2334,14 @@ SCREEN_UPDATE_RGB32( gamegear )
 	int height = screen.height();
 	int x, y;
 
-	state->m_vdp->screen_update(screen, state->m_tmp_bitmap, cliprect);
+	bitmap_rgb32 &vdp_bitmap = state->m_vdp->get_bitmap();
 
 	// HACK: fake LCD persistence effect
 	// (it would be better to generalize this in the core, to be used for all LCD systems)
 	for (y = 0; y < height; y++)
 	{
-		UINT32 *line0 = &state->m_tmp_bitmap.pix32(y);
+		UINT32 *linedst = &bitmap.pix32(y);
+		UINT32 *line0 = &vdp_bitmap.pix32(y);
 		UINT32 *line1 = &state->m_prev_bitmap.pix32(y);
 		for (x = 0; x < width; x++)
 		{
@@ -2325,10 +2356,10 @@ SCREEN_UPDATE_RGB32( gamegear )
 			UINT8 r = (UINT8)((r0 + r1) >> 1);
 			UINT8 g = (UINT8)((g0 + g1) >> 1);
 			UINT8 b = (UINT8)((b0 + b1) >> 1);
-			bitmap.pix32(y, x) = (r << 16) | (g << 8) | b;
+			linedst[x] = (r << 16) | (g << 8) | b;
 		}
 	}
-	copybitmap(state->m_prev_bitmap, state->m_tmp_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(state->m_prev_bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

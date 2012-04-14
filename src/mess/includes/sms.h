@@ -59,7 +59,6 @@ public:
 	UINT8 m_input_port1;
 
 	// for gamegear LCD persistence hack
-	bitmap_rgb32 m_tmp_bitmap;
 	bitmap_rgb32 m_prev_bitmap;
 
 	// for 3D glass binocular hack
