@@ -60,10 +60,11 @@ Notes:
 	--------------
 
 	INIT		Initialize the cartridge
+	BYE			Disable the cartridge
 	KON 0		Enable keyvoices, low voice
 	KON 1		Enable keyvoices, high voice
 	KOFF		Disable keyvoices
-	SAY ""		Say words
+	SAY 0/1 ""	Say words
 
 */
 
@@ -92,7 +93,7 @@ const device_type C64_CURRAH_SPEECH = &device_creator<c64_currah_speech_cartridg
 
 ROM_START( c64_currah_speech )
 	ROM_REGION( 0x10000, SP0256_TAG, 0 )
-	ROM_LOAD( "sp0256a-al2", 0x000, 0x800, CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
+	ROM_LOAD( "sp0256a-al2", 0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
 
@@ -123,7 +124,7 @@ static sp0256_interface sp0256_intf =
 
 static MACHINE_CONFIG_FRAGMENT( c64_currah_speech )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SP0256_TAG, SP0256, 1000000) // ???
+	MCFG_SOUND_ADD(SP0256_TAG, SP0256, 4000000) // ???
 	MCFG_SOUND_CONFIG(sp0256_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -142,6 +143,25 @@ machine_config_constructor c64_currah_speech_cartridge_device::device_mconfig_ad
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  set_osc1 - 
+//-------------------------------------------------
+
+void c64_currah_speech_cartridge_device::set_osc1(int voice, int intonation)
+{
+	int dotclock = m_slot->dotclock();
+
+	// TODO SP0256 does not handle clock change
+	// TODO intonation
+	m_nsp->set_unscaled_clock(dotclock / (2 << voice));
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -152,8 +172,7 @@ machine_config_constructor c64_currah_speech_cartridge_device::device_mconfig_ad
 c64_currah_speech_cartridge_device::c64_currah_speech_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_CURRAH_SPEECH, "C64 Currah Speech", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_nsp(*this, SP0256_TAG),
-	m_rom_en(0)
+	m_nsp(*this, SP0256_TAG)
 {
 }
 
@@ -164,8 +183,6 @@ c64_currah_speech_cartridge_device::c64_currah_speech_cartridge_device(const mac
 
 void c64_currah_speech_cartridge_device::device_start()
 {
-	// state saving
-	save_item(NAME(m_rom_en));
 }
 
 
@@ -175,7 +192,8 @@ void c64_currah_speech_cartridge_device::device_start()
 
 void c64_currah_speech_cartridge_device::device_reset()
 {
-	m_rom_en = 0;
+	m_game = 1;
+	m_exrom = 1;
 }
 
 
@@ -210,9 +228,11 @@ UINT8 c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t 
 
 		data = sp0256_sby_r(m_nsp) << 7;
 	}
-	else if (offset == 0xa7f0)
+	
+	if (!space.debugger_access() && (offset == 0xa7f0))
 	{
-		m_rom_en = !m_rom_en;
+		m_game = !m_game;
+		m_exrom = !m_exrom;
 	}
 
 	return data;
@@ -242,27 +262,11 @@ void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t o
 		
 		*/
 
-		// TODO offset bit 0 = low/high voice
+		int voice = BIT(offset, 0);
+		int intonation = BIT(data, 7);
+
+		set_osc1(voice, intonation);
+
 		sp0256_ALD_w(m_nsp, 0, data & 0x3f);
 	}
-}
-
-
-//-------------------------------------------------
-//  c64_game_r - GAME read
-//-------------------------------------------------
-
-int c64_currah_speech_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hiram)
-{
-	return !(m_rom_en && ba && rw && ((offset & 0xe000) == 0xa000));
-}
-
-
-//-------------------------------------------------
-//  c64_exrom_r - EXROM read
-//-------------------------------------------------
-
-int c64_currah_speech_cartridge_device::c64_exrom_r(offs_t offset, int ba, int rw, int hiram)
-{
-	return !(m_rom_en && ba && rw && ((offset & 0xe000) == 0xa000));
 }
