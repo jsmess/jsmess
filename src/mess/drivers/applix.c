@@ -40,7 +40,7 @@ public:
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(applix_index_w);
 	DECLARE_WRITE16_MEMBER(applix_register_w);
-	required_shared_ptr<UINT8> m_base;
+	required_shared_ptr<UINT16> m_base;
 };
 
 WRITE16_MEMBER( applix_state::applix_index_w )
