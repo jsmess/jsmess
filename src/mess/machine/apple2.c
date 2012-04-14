@@ -19,7 +19,6 @@
 #include "devices/appldriv.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "sound/speaker.h"
 #include "debugger.h"
 
@@ -204,11 +203,11 @@ void apple2_update_memory(running_machine &machine)
 			else
 			{
 				/* RAM */
-				if (end_r >= machine.device<ram_device>(RAM_TAG)->size())
-					end_r = machine.device<ram_device>(RAM_TAG)->size() - 1;
+				if (end_r >= state->m_ram->size())
+					end_r = state->m_ram->size() - 1;
 				offset = meminfo.read_mem & APPLE2_MEM_MASK;
 				if (end_r >= begin)
-					rbase = &machine.device<ram_device>(RAM_TAG)->pointer()[offset];
+					rbase = &state->m_ram->pointer()[offset];
 			}
 
 			/* install the actual handlers */
@@ -295,11 +294,11 @@ void apple2_update_memory(running_machine &machine)
 			else
 			{
 				/* RAM */
-				if (end_w >= machine.device<ram_device>(RAM_TAG)->size())
-					end_w = machine.device<ram_device>(RAM_TAG)->size() - 1;
+				if (end_w >= state->m_ram->size())
+					end_w = state->m_ram->size() - 1;
 				offset = meminfo.write_mem & APPLE2_MEM_MASK;
 				if (end_w >= begin)
-					wbase = &machine.device<ram_device>(RAM_TAG)->pointer()[offset];
+					wbase = &state->m_ram->pointer()[offset];
 			}
 
 
@@ -1093,7 +1092,7 @@ UINT8 apple2_getfloatingbusvalue(running_machine &machine)
 		//CMemory::mState |= CMemory::kVBLBar; // N: VBL' is true // FIX: MESS?
 	}
 
-	return machine.device<ram_device>(RAM_TAG)->pointer()[address % machine.device<ram_device>(RAM_TAG)->size()]; // FIX: this seems to work, but is it right!?
+	return state->m_ram->pointer()[address % machine.device<ram_device>(RAM_TAG)->size()]; // FIX: this seems to work, but is it right!?
 }
 
 

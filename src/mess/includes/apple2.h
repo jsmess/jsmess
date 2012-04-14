@@ -11,6 +11,7 @@
 
 #include "machine/a2bus.h"
 #include "machine/applefdc.h"
+#include "machine/ram.h"
 
 
 /***************************************************************************
@@ -111,10 +112,12 @@ public:
 	apple2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
         m_maincpu(*this, "maincpu"),
+        m_ram(*this, RAM_TAG),
         m_a2bus(*this, "a2bus")
     { }
 
 	required_device<cpu_device> m_maincpu;
+    required_device<ram_device> m_ram;
     required_device<a2bus_device> m_a2bus;
 
 	UINT32 m_flags, m_flags_mask;
