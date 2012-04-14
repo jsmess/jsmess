@@ -200,6 +200,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2memexp.h"
 #include "machine/a2scsi.h"
 #include "machine/a2thunderclock.h"
+#include "machine/a2softcard.h"
 
 /***************************************************************************
     PARAMETERS
@@ -594,6 +595,7 @@ static SLOT_INTERFACE_START(apple2_cards)
     SLOT_INTERFACE("memexp", A2BUS_MEMEXP)  /* Apple II Memory Expansion Card */
     SLOT_INTERFACE("ramfactor", A2BUS_RAMFACTOR)    /* Applied Engineering RamFactor */
     SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus */
+    SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
