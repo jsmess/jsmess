@@ -40,8 +40,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "c64_geocable"; }
+	virtual void device_start();
 
 	// device_c64_user_port_interface overrides
 	virtual void c64_pb_w(address_space &space, offs_t offset, UINT8 data);

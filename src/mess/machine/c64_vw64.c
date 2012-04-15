@@ -93,7 +93,6 @@ void c64_vizawrite_cartridge_device::device_reset()
 {
 	m_game = 0;
 
-
 	m_game_timer->adjust(attotime::from_msec(TIMER_PERIOD), 0);
 }
 

@@ -11,7 +11,6 @@
 
     TODO:
 
-    - NVRAM
     - 64/128 mode switch
     - dump of the initial NVRAM contents
 
