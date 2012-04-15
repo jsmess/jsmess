@@ -53,8 +53,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "c64_bn1541"; }
+	virtual void device_start();
 
 	// device_c64_user_port_interface overrides
 	virtual UINT8 c64_pb_r(address_space &space, offs_t offset);
