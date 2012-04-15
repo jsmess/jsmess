@@ -61,9 +61,6 @@ const device_type C64_XL80 = &device_creator<c64_xl80_device>;
 //-------------------------------------------------
 
 ROM_START( c64_xl80 )
-	ROM_REGION( 0x1000, "roml", 0 )
-	ROM_LOAD( "9433cs-0090.u3",	0x0000, 0x1000, CRC(aec58630) SHA1(49fb99afcb419413be4b82babf022793362dd15b) )
-
 	ROM_REGION( 0x800, HD46505SP_TAG, 0 )
 	ROM_LOAD( "dtc.u14", 0x000, 0x800, CRC(9edf5e58) SHA1(4b244e6d94a7653a2e52c351589f0b469119fb04) )
 ROM_END
@@ -191,9 +188,8 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 void c64_xl80_device::device_start()
 {
 	// find memory regions
-	m_rom = subregion("roml")->base();
 	m_char_rom = subregion(HD46505SP_TAG)->base();
-	m_ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);
+	c64_ram_pointer(machine(), RAM_SIZE);
 
 	// state saving
 	save_pointer(NAME(m_ram), RAM_SIZE);
@@ -226,7 +222,7 @@ UINT8 c64_xl80_device::c64_cd_r(address_space &space, offs_t offset, int roml, i
 	}
 	else if (offset >= 0x8000 && offset < 0x9000)
 	{
-		data = m_rom[offset & 0xfff];
+		data = m_roml[offset & 0xfff];
 	}
 	else if (offset >= 0x9800 && offset < 0xa000)
 	{

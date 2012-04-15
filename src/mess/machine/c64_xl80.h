@@ -54,7 +54,6 @@ protected:
 private:
 	required_device<h46505_device> m_crtc;
 
-	UINT8 *m_rom;
 	UINT8 *m_char_rom;
 };
 

@@ -108,7 +108,8 @@ c64_easyflash_cartridge_device::c64_easyflash_cartridge_device(const machine_con
 
 void c64_easyflash_cartridge_device::device_start()
 {
-	m_ram = auto_alloc_array(machine(), UINT8, 0x100);
+	// allocate memory
+	c64_ram_pointer(machine(), 0x100);
 
 	// state saving
 	save_item(NAME(m_bank));
