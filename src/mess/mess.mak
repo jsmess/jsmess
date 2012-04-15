@@ -480,6 +480,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/cps1.o	\
 	$(MAME_DRIVERS)/konamim2.o \
 
+
 #-------------------------------------------------
 # the following files are general components and
 # shared across a number of drivers
@@ -499,7 +500,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/i82371sb.o	\
 	$(MESS_MACHINE)/i82439tx.o	\
 	$(MESS_MACHINE)/i8271.o		\
-	$(MESS_MACHINE)/i8279.o		\
 	$(MESS_MACHINE)/ieee488.o	\
 	$(MESS_MACHINE)/isa.o		\
 	$(MESS_MACHINE)/kb3600.o	\
@@ -640,15 +640,15 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/apple2gs.o	\
 	$(MESS_DRIVERS)/apple2gs.o	\
 	$(MESS_MACHINE)/ay3600.o	\
-    $(MESS_MACHINE)/a2bus.o     \
+	$(MESS_MACHINE)/a2bus.o     \
 	$(MESS_MACHINE)/a2lang.o	\
 	$(MESS_MACHINE)/a2diskii.o	\
 	$(MESS_MACHINE)/a2mockingboard.o	\
 	$(MESS_MACHINE)/a2cffa.o	\
-    $(MESS_MACHINE)/a2memexp.o  \
-    $(MESS_MACHINE)/a2scsi.o    \
-    $(MESS_MACHINE)/a2thunderclock.o    \
-    $(MESS_MACHINE)/a2softcard.o \
+	$(MESS_MACHINE)/a2memexp.o  \
+	$(MESS_MACHINE)/a2scsi.o    \
+	$(MESS_MACHINE)/a2thunderclock.o    \
+	$(MESS_MACHINE)/a2softcard.o \
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
 	$(MESS_MACHINE)/nubus.o     \
