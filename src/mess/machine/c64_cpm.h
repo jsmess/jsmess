@@ -57,6 +57,8 @@ private:
 
 	int m_enabled;
 	int m_ba;
+
+	int m_reset;
 };
 
 
