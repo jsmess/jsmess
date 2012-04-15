@@ -32,6 +32,7 @@
 #include "machine/c64_magic_formel.h"
 #include "machine/c64_mikro_assembler.h"
 #include "machine/c64_multiscreen.h"
+#include "machine/c64_neoram.h"
 #include "machine/c64_ocean.h"
 #include "machine/c64_pagefox.h"
 #include "machine/c64_prophet64.h"
