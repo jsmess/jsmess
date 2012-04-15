@@ -154,9 +154,8 @@ void c64_currah_speech_cartridge_device::set_osc1(int voice, int intonation)
 {
 	int dotclock = m_slot->dotclock();
 
-	// TODO SP0256 does not handle clock change
-	// TODO intonation
-	m_nsp->set_unscaled_clock(dotclock / (2 << voice));
+	// TODO intonation and correct dividers
+	sp0256_set_clock(m_nsp, dotclock / (2 << voice));
 }
 
 
