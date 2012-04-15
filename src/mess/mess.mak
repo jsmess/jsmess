@@ -806,6 +806,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_magic_formel.o	\
 	$(MESS_MACHINE)/c64_mikro_assembler.o	\
 	$(MESS_MACHINE)/c64_multiscreen.o	\
+	$(MESS_MACHINE)/c64_neoram.o	\
 	$(MESS_MACHINE)/c64_ocean.o	\
 	$(MESS_MACHINE)/c64_pagefox.o	\
 	$(MESS_MACHINE)/c64_prophet64.o	\
