@@ -246,32 +246,30 @@
 	</software>
 
 	<software name="ps64" supported="no">
-		<description>PS-64 puhemoduli v2.0 (Fin)</description>
+		<description>PS-64 puhemoduli v1.0 (Fin)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|                      SW1|
-		|=|       SC02              |
-		|=|                         |
-		|=|                      CN1|
-		|=|       ROM        LF347  |
-		|=|                         |
-		|=|                         |
-		|===========================|
 
-		SC02  - Votrax SSI-263AP Speech Synthesizer (mapped at 0xde00-0xde04)
-		ROM   - Hynix Semiconductor HY27C64D-20 8Kx8 EPROM
-		LF347 - National Instruments LF347N JFET Operational Amplifier
-		SW1   - Module on/off switch
-		CN1   - connector to C64 video/audio port
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ps64" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-			<feature name="speech" value="SSI-263AP" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="ps-64.bin" size="0x2000" crc="0613bd98" sha1="a255e3a42d65ffffe835d9ac06034caf371d6994" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ps64v2" cloneof="ps64" supported="no">
+		<description>PS-64 puhemoduli v2.0 (Fin)</description>
+		<year>1988</year>
+		<publisher>Koulun erityispalvelu</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ps64" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="unlabeled" size="0x2000" crc="793ced42" sha1="8f66fde8ec8ed6fd8fb597df39d2867ecc58d7e1" offset="0x0000" />
@@ -321,22 +319,7 @@
 		<description>Pagefox (Fin)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|     RAM         LS11    |
-		|=|                         |
-		|=|                 LS139   |
-		|=|     ROM0                |
-		|=|                 LS273   |
-		|=|                         |
-		|=|     ROM1        LS00    |
-		|===========================|
 
-		RAM   - NEC D43256-12L 32Kx8 RAM
-		ROM0  - SGS M27256-2FI 32Kx8 EPROM
-		ROM1  - National Instruments NMC27C256Q 32Kx8 EPROM
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="pagefox" />
 			<feature name="game" value="0" />
@@ -355,21 +338,7 @@
 		<description>Easy Calc Result</description>
 		<year>1985</year>
 		<publisher>Handic Software</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|     ROM0        LS73    |
-		|=|                         |
-		|=|                         |
-		|=|                         |
-		|=|                         |
-		|=|     ROM1        LS00    |
-		|=|                         |
-		|===========================|
 
-		ROM0  - Hitachi HN61364P 8Kx8 EPROM "CR2001"
-		ROM1  - Hitachi HN613128P 16Kx8 EPROM "CR3001"
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="easycalcres" />
 			<feature name="game" value="0" />
@@ -460,38 +429,7 @@
 		<description>Multiscreen (Aus)</description>
 		<year>1987</year>
 		<publisher>Multiscreen Pty</publisher>
-		<!--
-		                |===================|
-		                |           ROM6    |
-		                |  MC14066          |
-		                |                   |
-		|===============|           ROM5    |
-		|=|                                 |
-		|=|                                 |
-		|=|    RAM         BAT      ROM4    |
-		|=|                                 |
-		|=|                                 |
-		|=|    ROM0                 ROM3    |
-		|=|                                 |
-		|=|                                 |
-		|===============|  LS138    ROM2    |
-		                |  LS138            |
-		                |  LS174            |
-		                |  LS133    ROM1    |
-		                |===================|
 
-		BAT   - BR2325 lithium battery
-		RAM   - ? 8Kx8 RAM
-		ROM0  - ? 16Kx8 EPROM
-		ROM1  - ? 32Kx8 EPROM
-		ROM2  - ? 32Kx8 EPROM
-		ROM3  - ? 32Kx8 EPROM
-		ROM4  - not populated
-		ROM5  - not populated
-		ROM6  - not populated
-
-		bankswitching latch at I/O2 ($DF00..$DFFF) (write $0D -> RAM @8000)
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="multiscreen" />
 			<feature name="game" value="0" />
@@ -505,25 +443,7 @@
 				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x14000" />
 			</dataarea>
 
-			<dataarea name="ram" size="0x2000" />
-		</part>
-		<!--
-		-->
-		<part name="driver_board" interface="device">
-			<feature name="pcb" value="RDL77" />
-			<feature name="xtal" value="4000000" />
-			<feature name="cpu" value="MC6802P" />
-			<feature name="pia1" value="MC6821P" />
-			<feature name="pia2" value="MC6821P" />
-			<feature name="ram1" value="MC6810P" />
-			<feature name="ram2" value="MC6810P" />
-
-			<dataarea name="rom" size="0x2000">
-				<rom name="1" size="0x1000" crc="35be02a8" sha1="5912bc3d8e0c0949c1e66c19116d6b71c7574e46" offset="0x0000" />
-				<rom name="1 2cr" size="0x1000" crc="76a9ac6d" sha1="87e7335e626bdb73498b46c28c7baab72df38d1f" offset="0x1000" />
-			</dataarea>
-
-			<dataarea name="ram" size="0x100" />
+			<dataarea name="nvram" size="0x2000" />
 		</part>
 	</software>
 
@@ -564,28 +484,7 @@
 		<description>Skærmtrolden Hugo (Den)</description>
 		<year>1990</year>
 		<publisher>SilverRock Productions</publisher>
-		<!--
-		e9048
-		|=============|
-		|=| LS00      |
-		|=|      LS273|
-		|=|           |
-		|=|           |
-		|=| ROM       |
-		|=|           |
-		|=|           |
-		|=|           |
-		|=============|
 
-		ROM     - Atmel AT27C010-25PC 128Kx8 OTP EPROM "HUGO 2012"
-
-		data and address lines are scrambled:
-		data = BITSWAP8(7,6,5,4,0,1,2,3)
-		address = BITSWAP17(D6,D5,D4,D7,12,7,6,5,4,3,2,1,0,8,9,11,10)
-
-		bankswitching latch at I/O1 ($DE00..$DEFF): D6=A16, D5=A15, D4=A14, D7=A13
-		latch is cleared to 0 on computer reset
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="silverrock" />
 			<feature name="game" value="0" />
@@ -602,21 +501,7 @@
 		<description>Chase H.Q. 2: Special Criminal Investigation</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
-		<!--
-		|===========================|
-		|=|                   LS02  |
-		|=|                         |
-		|=|                         |
-		|=|    ROM0   ROM1          |
-		|=|                   LS273 |
-		|=|                         |
-		|=|                         |
-		|=|                         |
-		|===========================|
 
-		ROM0,1 - 28-pin ROM (Toshiba TC531000 pinout, markings scratched off)
-		bankswitch latch @ I/O1: D3-D0 = A16-A13
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="game" value="0" />
@@ -638,30 +523,7 @@
 		<description>XL 80</description>
 		<year>1984</year>
 		<publisher>Data 20</publisher>
-		<!--
-		        |==================================|
-		        |   LS175    LS20    LS139         |
-		        |   LS157                          |
-		|=======|                                  |
-		|=|                          RAM           |
-		|=|    LS157      LS157             LS165  |
-		|=|                                        |
-		|=|                                     CN1|
-		|=|          CRTC            ROM1          |
-		|=|                                        |
-		|=|    ROM0          LS245   LS151         |
-		|=|                             14.31818MHz|
-		|=======|            LS174   LS00          |
-		        |                           HCU04  |
-		        |    LS74    LS161   LS74          |
-		        |==================================|
 
-		CRTC - Hitachi HD46505SP
-		RAM  - Toshiba TMM2016AP-12 2Kx8 Static RAM
-		ROM0 - GI 9433CS-0090 4Kx8 ROM
-		ROM1 - GI 9316CS-F67 2Kx8 ROM "DTC"
-		CN1  - RCA video output
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="xl80" />
 			<feature name="game" value="1" />
@@ -675,6 +537,7 @@
 				<rom name="dtc.u14" size="0x800" crc="9edf5e58" sha1="4b244e6d94a7653a2e52c351589f0b469119fb04" offset="0x0000" />
 			</dataarea>
 		</part>
+
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="xl 80 system software.d64" size="174848" crc="7fc45fca" sha1="c8c890ecd826dd9c3b1a1254793f73dc0ef9ef95" offset="0" />

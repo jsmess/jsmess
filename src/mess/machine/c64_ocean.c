@@ -7,6 +7,28 @@
 
 **********************************************************************/
 
+/*
+
+	Chase H.Q. 2: Special Criminal Investigation
+
+	PCB Layout
+	----------
+
+	|===========================|
+	|=|                   LS02  |
+	|=|                         |
+	|=|                         |
+	|=|    ROM0   ROM1          |
+	|=|                   LS273 |
+	|=|                         |
+	|=|                         |
+	|=|                         |
+	|===========================|
+
+	ROM0,1 - 28-pin ROM (Toshiba TC531000 pinout, markings scratched off)
+
+*/
+
 #include "c64_ocean.h"
 
 

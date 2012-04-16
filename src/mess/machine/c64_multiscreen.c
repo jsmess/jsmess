@@ -59,7 +59,12 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define BANK_RAM	0x0d
+#define MC6802P_TAG		"m6802"
+#define MC6821P_0_TAG	"m6821_0"
+#define MC6821P_1_TAG	"m6821_1"
+
+
+#define BANK_RAM		0x0d
 
 
 
@@ -68,6 +73,98 @@
 //**************************************************************************
 
 const device_type C64_MULTISCREEN = &device_creator<c64_multiscreen_cartridge_device>;
+
+
+//-------------------------------------------------
+//  ROM( c64_multiscreen )
+//-------------------------------------------------
+
+ROM_START( c64_multiscreen )
+	ROM_REGION( 0x2000, MC6802P_TAG, 0 )
+	ROM_LOAD( "1",	  0x0000, 0x1000, CRC(35be02a8) SHA1(5912bc3d8e0c0949c1e66c19116d6b71c7574e46) )
+	ROM_LOAD( "2 cr", 0x1000, 0x1000, CRC(76a9ac6d) SHA1(87e7335e626bdb73498b46c28c7baab72df38d1f) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c64_multiscreen_cartridge_device::device_rom_region() const
+{
+	return ROM_NAME( c64_multiscreen );
+}
+
+
+static ADDRESS_MAP_START( multiscreen_mem, AS_PROGRAM, 8, c64_multiscreen_cartridge_device )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(MC6802P_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  pia6821_interface pia0_intf -
+//-------------------------------------------------
+
+static const pia6821_interface pia0_intf =
+{
+	DEVCB_NULL,		// input A
+	DEVCB_NULL,		// input B
+	DEVCB_NULL,		// input CA1
+	DEVCB_NULL,		// input CB1
+	DEVCB_NULL,		// input CA2
+	DEVCB_NULL,		// input CB2
+	DEVCB_NULL,		// output A
+	DEVCB_NULL,		// output B
+	DEVCB_NULL,		// output CA2
+	DEVCB_NULL,		// output CB2
+	DEVCB_NULL,		// irq A
+	DEVCB_NULL		// irq B
+};
+
+
+//-------------------------------------------------
+//  pia6821_interface pia1_intf -
+//-------------------------------------------------
+
+static const pia6821_interface pia1_intf =
+{
+	DEVCB_NULL,		// input A
+	DEVCB_NULL,		// input B
+	DEVCB_NULL,		// input CA1
+	DEVCB_NULL,		// input CB1
+	DEVCB_NULL,		// input CA2
+	DEVCB_NULL,		// input CB2
+	DEVCB_NULL,		// output A
+	DEVCB_NULL,		// output B
+	DEVCB_NULL,		// output CA2
+	DEVCB_NULL,		// output CB2
+	DEVCB_NULL,		// irq A
+	DEVCB_NULL		// irq B
+};
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
+	MCFG_CPU_ADD(MC6802P_TAG, M6802, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(multiscreen_mem)
+
+	MCFG_PIA6821_ADD(MC6821P_0_TAG, pia0_intf)
+	MCFG_PIA6821_ADD(MC6821P_1_TAG, pia1_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor c64_multiscreen_cartridge_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c64_multiscreen );
+}
 
 
 
@@ -121,7 +218,7 @@ UINT8 c64_multiscreen_cartridge_device::c64_cd_r(address_space &space, offs_t of
 
 		if (bank == BANK_RAM)
 		{
-			data = m_ram[offset & 0x1fff];
+			data = m_nvram[offset & 0x1fff];
 		}
 		else
 		{
@@ -158,7 +255,7 @@ void c64_multiscreen_cartridge_device::c64_cd_w(address_space &space, offs_t off
 
 		if (bank == BANK_RAM)
 		{
-			m_ram[offset & 0x1fff] = data;
+			m_nvram[offset & 0x1fff] = data;
 		}
 	}
 	else if (!io2)
