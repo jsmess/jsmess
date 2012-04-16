@@ -36,6 +36,7 @@
 #include "machine/c64_ocean.h"
 #include "machine/c64_pagefox.h"
 #include "machine/c64_prophet64.h"
+#include "machine/c64_ps64.h"
 #include "machine/c64_rex.h"
 #include "machine/c64_rex_ep256.h"
 #include "machine/c64_ross.h"

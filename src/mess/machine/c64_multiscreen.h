@@ -14,6 +14,8 @@
 
 
 #include "emu.h"
+#include "cpu/m6800/m6800.h"
+#include "machine/6821pia.h"
 #include "machine/c64exp.h"
 
 
@@ -31,9 +33,13 @@ public:
 	// construction/destruction
 	c64_multiscreen_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "c64_multiscreen"; }
+	virtual void device_config_complete() { m_shortname = "c64_mscr"; }
 	virtual void device_start();
 	virtual void device_reset();
 

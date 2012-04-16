@@ -310,6 +310,7 @@
 		<description>BASIC-kääntäjä (Fin)</description>
 		<year>1984</year>
 		<publisher>Amersoft</publisher>
+
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="basic-kaantaja[amersoft_1984].nbz" size="333744" crc="68ffade3" sha1="951e63d05c0911abcc247ff8327b7239fc0c9e86" offset="0" />
@@ -321,9 +322,181 @@
 		<description>SuperBase 64 (Fin)</description>
 		<year>1983</year>
 		<publisher>Precision</publisher>
+
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="superbase_64[precision_1983](finnish).nbz" size="333744" crc="83eb8f50" sha1="2cff03d08f15f8d66fad9d20233fc4d87f71395c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Educational -->
+
+	<software name="kats1">
+		<description>KÄTS-opetuslevy 1 (Fin)</description>
+		<year>1989</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="kats-1.d64" size="174848" crc="076e961a" sha1="011922880a227d388a77b5c179d7540d6118469d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kats2">
+		<description>KÄTS-opetuslevy 2 (Fin)</description>
+		<year>1989</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="kats-2.d64" size="174848" crc="44a5f655" sha1="eecb240de09b8adfaac68190e490984ea7e62304" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kertolas">
+		<description>Kertolasku (Fin)</description>
+		<year>1986</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="kertolasku.d64" size="174848" crc="78f4ad0d" sha1="4ef1552535c26bf6c884f463d69f6e11fe152a9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lrsharj">
+		<description>LRS-harjoitus (Fin)</description>
+		<year>1988</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="lrs-harjoitus.d64" size="174848" crc="ed5ce5ae" sha1="ca4eabc7d41db9f56e434ba8f38d7f24ad2fe5b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opinkirj">
+		<description>Opin kirjoittamaan (Fin)</description>
+		<year>1985</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="opin_kirjoittamaan.d64" size="174848" crc="6125f441" sha1="e1d908644529eb3c0e4fef4be7b394a697d6bb9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="opinluk1">
+		<description>Opin lukemaan 1 (Fin)</description>
+		<year>1985</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="opin_lukemaan_1.d64" size="174848" crc="70b4d79e" sha1="0f7ba68acfdca1b3fb8fc137b5b2c2292b6fc397" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opinluk2">
+		<description>Opin lukemaan 2 (Fin)</description>
+		<year>1985</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="opin_lukemaan_2.d64" size="174848" crc="58cb5f41" sha1="5cc321cb82f144b3faa88dbcb9b591657cdc66cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psenglsh">
+		<description>PS-English (Fin)</description>
+		<year>1986</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ps-english.d64" size="174848" crc="18d66daa" sha1="35d9871fb337ada74f0788d4910dfba08d1d4c15" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psmemory">
+		<description>PS-Memory (Fin)</description>
+		<year>1989</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ps-memory.d64" size="174848" crc="08a635cd" sha1="cd797378c35272ca65f35784fda7f4e42029d8ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puventti">
+		<description>Puhuva venttipeli (Fin)</description>
+		<year>1986</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="puhuva_venttipeli.d64" size="174848" crc="16661038" sha1="69c67d4e3c2f15285549df4cb19caae44ed2dc2a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vahennys">
+		<description>Vähennyslasku (Fin)</description>
+		<year>1986</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="vahennyslasku.d64" size="174848" crc="e03d35ae" sha1="2fa26e548c577b647f3e23a93851c7cf4dc257ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valmhrj1">
+		<description>Valmiusharjoituksia 1 (Fin)</description>
+		<year>198?</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="valm-harj1.d64" size="174848" crc="190cf6d4" sha1="7ca9176a83c48f5b9aebbc3e38e9a847da9ffc3c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yhteenla">
+		<description>Yhteenlasku (Fin)</description>
+		<year>198?</year>
+		<publisher>Koulun erityispalvelu</publisher>
+		<sharedfeat name="requirement" value="c64_cart:ps64"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="yhteenlasku.d64" size="174848" crc="c02a0821" sha1="17e03cd9d81ee2bf328e802354c149945a319450" offset="0" />
 			</dataarea>
 		</part>
 	</software>
