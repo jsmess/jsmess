@@ -27,6 +27,7 @@
 #include "formats/gtp_cas.h"
 #include "formats/hect_tap.h"
 #include "formats/ace_tap.h"
+#include "formats/adam_cas.h"
 #include "formats/kc_cas.h"
 #include "formats/kim1_cas.h"
 #include "formats/lviv_lvt.h"
@@ -55,6 +56,7 @@ struct SupportedCassetteFormats
 
 const struct SupportedCassetteFormats formats[] = {
 	{"a26", a26_cassette_formats               ,"Atari 2600"},
+	{"ddp", coleco_adam_cassette_formats       ,"Coleco Adam"},
 	{"apf", apf_cassette_formats               ,"APF Imagination Machine"},
 	{"cbm", cbm_cassette_formats               ,"Commodore"},
 	{"cgenie", cgenie_cassette_formats         ,"Colour Genie"},
