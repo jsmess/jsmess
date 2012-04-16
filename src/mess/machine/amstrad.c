@@ -284,6 +284,7 @@ with different data and be able to select the other entries - not tested on a re
 and not supported by this driver */
 PALETTE_INIT( kccomp )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	color_prom = color_prom+0x018000;

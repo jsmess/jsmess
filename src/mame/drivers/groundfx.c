@@ -141,7 +141,7 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 		case 0x00:
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(machine());
+				machine().watchdog_reset();
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -213,8 +213,8 @@ WRITE32_MEMBER(groundfx_state::motor_control_w)
 
 static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32, groundfx_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_BASE(m_ram) /* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* sprite ram */
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_SHARE("ram") /* main CPUA ram */
+	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_SHARE("spriteram") /* sprite ram */
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)	/* gun vibration */
 	AM_RANGE(0x500000, 0x500003) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x500004, 0x500007) AM_READ_PORT("SYSTEM")

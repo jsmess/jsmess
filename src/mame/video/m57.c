@@ -32,6 +32,7 @@
 
 PALETTE_INIT( m57 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 32 * 8 + 16);
@@ -224,7 +225,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	m57_state *state = machine.driver_data<m57_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		UINT8 attributes = state->m_spriteram[offs + 1];
 		int sx = state->m_spriteram[offs + 3];

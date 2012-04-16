@@ -10,7 +10,12 @@ class segag80r_state : public driver_device
 {
 public:
 	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_videoram(*this, "videoram"){ }
+
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	UINT8 m_sound_state[2];
 	UINT8 m_sound_rate;
@@ -22,9 +27,7 @@ public:
 	sound_stream *m_sega005_stream;
 	UINT8 m_n7751_command;
 	UINT8 m_n7751_busy;
-	UINT8 *m_videoram;
 	segag80_decrypt_func m_decrypt;
-	UINT8 *m_mainram;
 	UINT8 m_background_pcb;
 	double m_rweights[3];
 	double m_gweights[3];
@@ -71,6 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_READ8_MEMBER(n7751_t1_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 };
 
 

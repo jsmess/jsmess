@@ -20,31 +20,30 @@ static void set_service_mode(running_machine &machine, int enable)
 	state->m_in_service_mode = enable;
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(machine, !enable);
+	machine.watchdog_enable(!enable);
 
 	/* change CPU clock speed according to service switch change */
 	machine.device("maincpu")->set_unscaled_clock(enable ? (MASTER_CLOCK/12) : (MASTER_CLOCK/16));
 }
 
 
-static INPUT_CHANGED( service_mode_switch_changed )
+INPUT_CHANGED_MEMBER(firetrk_state::service_mode_switch_changed)
 {
-	set_service_mode(field.machine(), newval);
+	set_service_mode(machine(), newval);
 }
 
 
-static INPUT_CHANGED( firetrk_horn_changed )
+INPUT_CHANGED_MEMBER(firetrk_state::firetrk_horn_changed)
 {
-	device_t *discrete = field.machine().device("discrete");
+	device_t *discrete = machine().device("discrete");
 	discrete_sound_w(discrete, FIRETRUCK_HORN_EN, newval);
 }
 
 
-static INPUT_CHANGED( gear_changed )
+INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 {
-	firetrk_state *state = field.machine().driver_data<firetrk_state>();
 	if (newval)
-		state->m_gear = (FPTR)param;
+		m_gear = (FPTR)param;
 }
 
 
@@ -317,22 +316,22 @@ WRITE8_MEMBER(firetrk_state::crash_reset_w)
 
 static ADDRESS_MAP_START( firetrk_map, AS_PROGRAM, 8, firetrk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(m_alpha_num_ram)
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(m_playfield_ram)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_scroll_y)
-	AM_RANGE(0x1020, 0x1020) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_scroll_x)
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("alpha_num_ram")
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("playfield_ram")
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("scroll_y")
+	AM_RANGE(0x1020, 0x1020) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("scroll_x")
 	AM_RANGE(0x1040, 0x1040) AM_MIRROR(0x001f) AM_WRITE(crash_reset_w)
 	AM_RANGE(0x1060, 0x1060) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_skid_reset_w)
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_car_rot)
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("car_rot")
 	AM_RANGE(0x10a0, 0x10a0) AM_MIRROR(0x001f) AM_WRITE(steer_reset_w)
 	AM_RANGE(0x10c0, 0x10c0) AM_MIRROR(0x001f) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x10e0, 0x10e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_BASE(m_blink)
+	AM_RANGE(0x10e0, 0x10e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_SHARE("blink")
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_motor_snd_w)
 	AM_RANGE(0x1420, 0x1420) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_crash_snd_w)
 	AM_RANGE(0x1440, 0x1440) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_skid_snd_w)
-	AM_RANGE(0x1460, 0x1460) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_drone_x)
-	AM_RANGE(0x1480, 0x1480) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_drone_y)
-	AM_RANGE(0x14a0, 0x14a0) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_drone_rot)
+	AM_RANGE(0x1460, 0x1460) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("drone_x")
+	AM_RANGE(0x1480, 0x1480) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("drone_y")
+	AM_RANGE(0x14a0, 0x14a0) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("drone_rot")
 	AM_RANGE(0x14c0, 0x14c0) AM_MIRROR(0x001f) AM_WRITE(firetrk_output_w)
 	AM_RANGE(0x14e0, 0x14e0) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_xtndply_w)
 	AM_RANGE(0x1800, 0x1807) AM_MIRROR(0x03f8) AM_READ(firetrk_input_r) AM_WRITENOP
@@ -344,14 +343,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( superbug_map, AS_PROGRAM, 8, firetrk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_scroll_y)
-	AM_RANGE(0x0120, 0x0120) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_scroll_x)
+	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("scroll_y")
+	AM_RANGE(0x0120, 0x0120) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("scroll_x")
 	AM_RANGE(0x0140, 0x0140) AM_MIRROR(0x001f) AM_WRITE(crash_reset_w)
 	AM_RANGE(0x0160, 0x0160) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_skid_reset_w)
-	AM_RANGE(0x0180, 0x0180) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_car_rot)
+	AM_RANGE(0x0180, 0x0180) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("car_rot")
 	AM_RANGE(0x01a0, 0x01a0) AM_MIRROR(0x001f) AM_WRITE(steer_reset_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_MIRROR(0x001f) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x01e0, 0x01e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_BASE(m_blink)
+	AM_RANGE(0x01e0, 0x01e0) AM_MIRROR(0x001f) AM_WRITE(blink_on_w) AM_SHARE("blink")
 	AM_RANGE(0x0200, 0x0207) AM_MIRROR(0x0018) AM_READ(firetrk_input_r)
 	AM_RANGE(0x0220, 0x0220) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_xtndply_w)
 	AM_RANGE(0x0240, 0x0243) AM_MIRROR(0x001c) AM_READ(firetrk_dip_r)
@@ -359,30 +358,30 @@ static ADDRESS_MAP_START( superbug_map, AS_PROGRAM, 8, firetrk_state )
 	AM_RANGE(0x0280, 0x0280) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", superbug_motor_snd_w)
 	AM_RANGE(0x02a0, 0x02a0) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_crash_snd_w)
 	AM_RANGE(0x02c0, 0x02c0) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_skid_snd_w)
-	AM_RANGE(0x0400, 0x041f) AM_RAM AM_BASE(m_alpha_num_ram)
-	AM_RANGE(0x0500, 0x05ff) AM_RAM AM_BASE(m_playfield_ram)
+	AM_RANGE(0x0400, 0x041f) AM_RAM AM_SHARE("alpha_num_ram")
+	AM_RANGE(0x0500, 0x05ff) AM_RAM AM_SHARE("playfield_ram")
 	AM_RANGE(0x0800, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( montecar_map, AS_PROGRAM, 8, firetrk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(m_alpha_num_ram)
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(m_playfield_ram)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_scroll_y)
-	AM_RANGE(0x1020, 0x1020) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_scroll_x)
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("alpha_num_ram")
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("playfield_ram")
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("scroll_y")
+	AM_RANGE(0x1020, 0x1020) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("scroll_x")
 	AM_RANGE(0x1040, 0x1040) AM_MIRROR(0x001f) AM_WRITE(montecar_drone_reset_w)
 	AM_RANGE(0x1060, 0x1060) AM_MIRROR(0x001f) AM_WRITE(montecar_car_reset_w)
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_car_rot)
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("car_rot")
 	AM_RANGE(0x10a0, 0x10a0) AM_MIRROR(0x001f) AM_WRITE(steer_reset_w)
 	AM_RANGE(0x10c0, 0x10c0) AM_MIRROR(0x001f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x10e0, 0x10e0) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", montecar_skid_reset_w)
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_motor_snd_w)
 	AM_RANGE(0x1420, 0x1420) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_crash_snd_w)
 	AM_RANGE(0x1440, 0x1440) AM_MIRROR(0x001f) AM_DEVWRITE_LEGACY("discrete", firetrk_skid_snd_w)
-	AM_RANGE(0x1460, 0x1460) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_drone_x)
-	AM_RANGE(0x1480, 0x1480) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_drone_y)
-	AM_RANGE(0x14a0, 0x14a0) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE(m_drone_rot)
+	AM_RANGE(0x1460, 0x1460) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("drone_x")
+	AM_RANGE(0x1480, 0x1480) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("drone_y")
+	AM_RANGE(0x14a0, 0x14a0) AM_MIRROR(0x001f) AM_WRITEONLY AM_SHARE("drone_rot")
 	AM_RANGE(0x14c0, 0x14c0) AM_MIRROR(0x001f) AM_WRITE(montecar_output_1_w)
 	AM_RANGE(0x14e0, 0x14e0) AM_MIRROR(0x001f) AM_WRITE(montecar_output_2_w)
 	AM_RANGE(0x1800, 0x1807) AM_MIRROR(0x03f8) AM_READ(montecar_input_r) AM_WRITENOP
@@ -438,7 +437,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Bell") PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,skid_r, (void *)2)
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Service_Mode ) ) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_CHANGED(service_mode_switch_changed, 0)
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Service_Mode ) ) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,service_mode_switch_changed, 0)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -465,7 +464,7 @@ static INPUT_PORTS_START( firetrk )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diag Step") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("HORN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Horn") PORT_PLAYER(1) PORT_CHANGED(firetrk_horn_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Horn") PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,firetrk_horn_changed, 0)
 
 	PORT_START("R27")
 	PORT_ADJUSTER( 20, "R27 - Motor Frequency" )
@@ -523,10 +522,10 @@ static INPUT_PORTS_START( superbug )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE)
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_CHANGED(gear_changed, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CODE(KEYCODE_X) PORT_CHANGED(gear_changed, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CODE(KEYCODE_C) PORT_CHANGED(gear_changed, (void *)2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CODE(KEYCODE_V) PORT_CHANGED(gear_changed, (void *)3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)3)
 
 	PORT_START("R62")
 	PORT_ADJUSTER( 20, "R62 - Motor Frequency" )
@@ -587,7 +586,7 @@ static INPUT_PORTS_START( montecar )
 	PORT_START("BIT_7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH ) PORT_CHANGED(service_mode_switch_changed, 0)
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,service_mode_switch_changed, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )
@@ -595,10 +594,10 @@ static INPUT_PORTS_START( montecar )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, firetrk_state,skid_r, (void *)0)
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_CHANGED(gear_changed, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CODE(KEYCODE_X) PORT_CHANGED(gear_changed, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CODE(KEYCODE_C) PORT_CHANGED(gear_changed, (void *)2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CODE(KEYCODE_V) PORT_CHANGED(gear_changed, (void *)3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CODE(KEYCODE_C) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, firetrk_state,gear_changed, (void *)3)
 
 	PORT_START("R89")
 	PORT_ADJUSTER( 20, "R89 - Motor Frequency" )

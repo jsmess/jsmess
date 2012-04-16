@@ -556,6 +556,7 @@ MC6845_UPDATE_ROW( mbeeppc_update_row )
 
 PALETTE_INIT( mbeeic )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	UINT16 i;
 	UINT8 r, b, g, k;
 	UINT8 level[] = { 0, 0x80, 0xff, 0xff };	/* off, half, full intensity */
@@ -583,6 +584,7 @@ PALETTE_INIT( mbeeic )
 
 PALETTE_INIT( mbeepc85b )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	UINT16 i;
 	UINT8 r, b, g, k;
 	UINT8 level[] = { 0, 0x80, 0x80, 0xff };	/* off, half, full intensity */

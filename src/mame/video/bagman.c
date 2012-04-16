@@ -44,6 +44,7 @@ WRITE8_MEMBER(bagman_state::bagman_colorram_w)
 ***************************************************************************/
 PALETTE_INIT( bagman )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
@@ -114,7 +115,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 

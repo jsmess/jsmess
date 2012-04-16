@@ -42,6 +42,7 @@ WRITE8_MEMBER(clshroad_state::clshroad_flipscreen_w)
 
 PALETTE_INIT( clshroad )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	for (i = 0;i < 256;i++)
 		palette_set_color_rgb(machine,i,	pal4bit(color_prom[i + 256 * 0]),
@@ -51,6 +52,7 @@ PALETTE_INIT( clshroad )
 
 PALETTE_INIT( firebatl )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -290,7 +292,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int i;
 
-	for (i = 0; i < state->m_spriteram_size ; i += 8)
+	for (i = 0; i < state->m_spriteram.bytes() ; i += 8)
 	{
 		int y		=	 240 - spriteram[i+1];
 		int code	=	(spriteram[i+3] & 0x3f) + (spriteram[i+2] << 6);

@@ -34,8 +34,8 @@ static WRITE8_HANDLER( irqack_w )
 static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x5806, 0x5806) AM_WRITE_LEGACY(redclash_star2_w)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE_LEGACY(redclash_flipscreen_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(redclash_star_reset_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE_LEGACY(irqack_w)
 ADDRESS_MAP_END
@@ -76,20 +76,16 @@ ADDRESS_MAP_END
   Interrupts are still used, but they are related to coin
   slots. Left slot generates an IRQ, Right slot a NMI.
 */
-static INPUT_CHANGED( left_coin_inserted )
+INPUT_CHANGED_MEMBER( ladybug_state::left_coin_inserted )
 {
-	ladybug_state *state = field.machine().driver_data<ladybug_state>();
-
 	if(newval)
-		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
 }
 
-static INPUT_CHANGED( right_coin_inserted )
+INPUT_CHANGED_MEMBER( ladybug_state::right_coin_inserted )
 {
-	ladybug_state *state = field.machine().driver_data<ladybug_state>();
-
 	if(newval)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( redclash )
@@ -181,8 +177,8 @@ static INPUT_PORTS_START( redclash )
 	/* handler to be notified of coin insertions. We use IMPULSE to */
 	/* trigger exactly one interrupt, without having to check when the */
 	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state, left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state, right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zerohour )
@@ -256,8 +252,8 @@ static INPUT_PORTS_START( zerohour )
 	/* handler to be notified of coin insertions. We use IMPULSE to */
 	/* trigger exactly one interrupt, without having to check when the */
 	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state, left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state, right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

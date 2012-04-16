@@ -19,6 +19,7 @@
 
 PALETTE_INIT( ojankoy )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	int bit0, bit1, bit2, bit3, bit4, r, g, b;
 
@@ -266,10 +267,6 @@ VIDEO_START( ojankohs )
 //  state->m_videoram = auto_alloc_array(machine, UINT8, 0x1000);
 //  state->m_colorram = auto_alloc_array(machine, UINT8, 0x1000);
 //  state->m_paletteram = auto_alloc_array(machine, UINT8, 0x800);
-
-	state->save_pointer(NAME(state->m_videoram), 0x1000);
-	state->save_pointer(NAME(state->m_colorram), 0x1000);
-	state->save_pointer(NAME(state->m_paletteram), 0x800);
 }
 
 VIDEO_START( ojankoy )
@@ -279,9 +276,6 @@ VIDEO_START( ojankoy )
 	state->m_tilemap = tilemap_create(machine, ojankoy_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
 //  state->m_videoram = auto_alloc_array(machine, UINT8, 0x2000);
 //  state->m_colorram = auto_alloc_array(machine, UINT8, 0x1000);
-
-	state->save_pointer(NAME(state->m_videoram), 0x2000);
-	state->save_pointer(NAME(state->m_colorram), 0x1000);
 }
 
 VIDEO_START( ojankoc )
@@ -289,11 +283,9 @@ VIDEO_START( ojankoc )
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
 	machine.primary_screen->register_screen_bitmap(state->m_tmpbitmap);
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x8000);
-	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x20);
+	state->m_videoram.allocate(0x8000);
+	state->m_paletteram.allocate(0x20);
 
-	state->save_pointer(NAME(state->m_videoram), 0x8000);
-	state->save_pointer(NAME(state->m_paletteram), 0x20);
 	state->save_item(NAME(state->m_tmpbitmap));
 }
 

@@ -26,6 +26,7 @@ Additional tweaking by Jarek Burczynski
 ***************************************************************************/
 PALETTE_INIT( magmax )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -173,7 +174,7 @@ SCREEN_UPDATE_IND16( magmax )
 	}
 
 	/* draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size/2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes()/2; offs += 4)
 	{
 		int sx, sy;
 

@@ -14,13 +14,13 @@ class cosmic_state : public driver_device
 {
 public:
 	cosmic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *        m_videoram;
-	UINT8 *        m_spriteram;
-	size_t         m_videoram_size;
-	size_t         m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	pen_t          (*m_map_color)(running_machine &machine, UINT8 x, UINT8 y);
@@ -51,6 +51,11 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(cosmic_color_register_w);
 	DECLARE_WRITE8_MEMBER(cosmic_background_enable_w);
+	DECLARE_INPUT_CHANGED_MEMBER(panic_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
 };
 
 

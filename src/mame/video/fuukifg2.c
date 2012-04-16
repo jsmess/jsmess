@@ -82,6 +82,7 @@ WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(&space, offset, 
 #if 0
 PALETTE_INIT( fuuki16 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int pen;
 
 	/* The game does not initialise the palette at startup. It should
@@ -147,7 +148,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 	int max_y =	visarea.max_y + 1;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram_size - 8) / 2; offs >=0; offs -= 8 / 2 )
+	for ( offs = (state->m_spriteram.bytes() - 8) / 2; offs >=0; offs -= 8 / 2 )
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
 		int xnum, ynum, xzoom, yzoom, flipx, flipy;

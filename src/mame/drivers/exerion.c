@@ -137,11 +137,10 @@ CUSTOM_INPUT_MEMBER(exerion_state::exerion_controls_r)
 }
 
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
 {
-	exerion_state *state = field.machine().driver_data<exerion_state>();
 	/* coin insertion causes an NMI */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -192,9 +191,9 @@ READ8_MEMBER(exerion_state::exerion_protection_r)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(m_main_ram)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x8800, 0x887f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
@@ -275,7 +274,7 @@ static INPUT_PORTS_START( exerion )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exerion_state,coin_inserted, 0)
 
 	PORT_START("P1")          /* fake input port */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY

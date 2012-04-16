@@ -32,6 +32,7 @@
 
 PALETTE_INIT( circusc )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -170,7 +171,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	else
 		sr = state->m_spriteram_2;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int code = sr[offs + 0] + 8 * (sr[offs + 1] & 0x20);
 		int color = sr[offs + 1] & 0x0f;

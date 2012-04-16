@@ -27,7 +27,8 @@ class esripsys_state : public driver_device
 {
 public:
 	esripsys_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_pal_ram(*this, "pal_ram") { }
 
 	UINT8 m_g_iodata;
 	UINT8 m_g_ioaddr;
@@ -54,7 +55,7 @@ public:
 	int m_fasel;
 	int m_fbsel;
 	int m_hblank;
-	UINT8 *m_pal_ram;
+	required_shared_ptr<UINT8> m_pal_ram;
 	int m_frame_vbl;
 	int m_12sel;
 	int m_video_firq_en;
@@ -85,6 +86,8 @@ public:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(volume_dac_w);
 	DECLARE_WRITE8_MEMBER(esripsys_bg_intensity_w);
+	DECLARE_INPUT_CHANGED_MEMBER(keypad_interrupt);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
 };
 
 

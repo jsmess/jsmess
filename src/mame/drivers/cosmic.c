@@ -353,8 +353,8 @@ WRITE8_MEMBER(cosmic_state::flip_screen_w)
 
 static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
@@ -368,8 +368,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
@@ -382,7 +382,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
@@ -396,7 +396,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
-	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
@@ -404,15 +404,14 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
 	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
 	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
 
-static INPUT_CHANGED( panic_coin_inserted )
+INPUT_CHANGED_MEMBER(cosmic_state::panic_coin_inserted)
 {
-	cosmic_state *state = field.machine().driver_data<cosmic_state>();
-	state->panic_sound_output_w(*field.machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
+	panic_sound_output_w(*machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
 }
 
 static INPUT_PORTS_START( panic )
@@ -467,13 +466,13 @@ static INPUT_PORTS_START( panic )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(panic_coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(panic_coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,panic_coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,panic_coin_inserted, 0)
 INPUT_PORTS_END
 
-static INPUT_CHANGED( cosmica_coin_inserted )
+INPUT_CHANGED_MEMBER(cosmic_state::cosmica_coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( cosmica )
@@ -518,7 +517,7 @@ static INPUT_PORTS_START( cosmica )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(cosmica_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,cosmica_coin_inserted, 0)
 INPUT_PORTS_END
 
 /* These are used for the CR handling - This can be used to */
@@ -526,9 +525,9 @@ INPUT_PORTS_END
 
 /* Offsets are in BYTES, so bits 0-7 are at offset 0 etc.   */
 
-static INPUT_CHANGED( cosmicg_coin_inserted )
+INPUT_CHANGED_MEMBER(cosmic_state::cosmicg_coin_inserted)
 {
-	cputag_set_input_line_and_vector(field.machine(), "maincpu", 0, newval ? ASSERT_LINE : CLEAR_LINE, 6);
+	cputag_set_input_line_and_vector(machine(), "maincpu", 0, newval ? ASSERT_LINE : CLEAR_LINE, 6);
 }
 
 static INPUT_PORTS_START( cosmicg )
@@ -557,7 +556,7 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPSETTING(    0x80, "5" )
 
 	PORT_START("IN2")	/* Hard wired settings */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(cosmicg_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,cosmicg_coin_inserted, 0)
 
 	/* This dip switch is not read by the program at any time   */
 	/* but is wired to enable or disable the flip screen output */
@@ -573,14 +572,14 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW:6" )
 INPUT_PORTS_END
 
-static INPUT_CHANGED( coin_inserted_irq0 )
+INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_irq0)
 {
-	cputag_set_input_line(field.machine(), "maincpu", 0, newval ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, newval ? HOLD_LINE : CLEAR_LINE);
 }
 
-static INPUT_CHANGED( coin_inserted_nmi )
+INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_nmi)
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( magspot )
@@ -639,8 +638,8 @@ static INPUT_PORTS_START( magspot )
 
 	/* Fake port to handle coins */
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted_irq0, 0) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,coin_inserted_irq0, 0) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,coin_inserted_nmi, 0)
 
 	/* Fake port to handle coinage dip switches. Each bit goes to 3800-3807 */
 	PORT_START("DSW")
@@ -723,8 +722,8 @@ static INPUT_PORTS_START( devzone )
 
 	/* Fake port to handle coins */
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted_irq0, 0) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,coin_inserted_irq0, 0) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,coin_inserted_nmi, 0)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
@@ -820,7 +819,7 @@ static INPUT_PORTS_START( nomnlnd )
 
 	/* Fake port to handle coin */
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cosmic_state,coin_inserted_nmi, 0)
 INPUT_PORTS_END
 
 

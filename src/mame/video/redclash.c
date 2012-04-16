@@ -20,6 +20,7 @@
 
 PALETTE_INIT( redclash )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -190,7 +191,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int i, offs;
 
-	for (offs = state->m_spriteram_size - 0x20; offs >= 0; offs -= 0x20)
+	for (offs = state->m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
 	{
 		i = 0;
 		while (i < 0x20 && spriteram[offs + i] != 0)

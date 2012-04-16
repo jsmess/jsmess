@@ -11,6 +11,7 @@
 
 static PALETTE_INIT( common )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* characters */
@@ -28,6 +29,7 @@ static PALETTE_INIT( common )
 
 PALETTE_INIT( josvolly )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -52,6 +54,7 @@ PALETTE_INIT( josvolly )
 
 PALETTE_INIT( gsword )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -162,7 +165,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	gsword_state *state = machine.driver_data<gsword_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spritexy_size - 1; offs+=2)
+	for (offs = 0; offs < state->m_spritexy_ram.bytes() - 1; offs+=2)
 	{
 		int sx,sy,flipx,flipy,spritebank,tile,color;
 

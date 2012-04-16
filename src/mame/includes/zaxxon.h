@@ -8,12 +8,15 @@ class zaxxon_state : public driver_device
 {
 public:
 	zaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_colorram;
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
-
+	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
+	
 	UINT8 m_int_enabled;
 	UINT8 m_coin_status[3];
 	UINT8 m_coin_enable[3];
@@ -50,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(congo_sprite_custom_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
 };
 
 

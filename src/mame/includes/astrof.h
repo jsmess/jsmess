@@ -10,16 +10,18 @@ class astrof_state : public driver_device
 {
 public:
 	astrof_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_astrof_color(*this, "astrof_color"),
+		m_tomahawk_protection(*this, "tomahawk_prot"){ }
 
 	/* video-related */
-	UINT8 *    m_videoram;
-	size_t     m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	UINT8 *    m_colorram;
-	UINT8 *    m_tomahawk_protection;
+	required_shared_ptr<UINT8> m_astrof_color;
+	optional_shared_ptr<UINT8> m_tomahawk_protection;
 
-	UINT8 *    m_astrof_color;
 	UINT8      m_astrof_palette_bank;
 	UINT8      m_red_on;
 	UINT8      m_flipscreen;
@@ -55,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(astrof_audio_2_w);
 	DECLARE_WRITE8_MEMBER(spfghmk2_audio_w);
 	DECLARE_WRITE8_MEMBER(tomahawk_audio_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
 };
 
 /*----------- defined in audio/astrof.c -----------*/

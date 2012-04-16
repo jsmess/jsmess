@@ -34,6 +34,7 @@
 
 PALETTE_INIT( brkthru )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -182,7 +183,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
         ---- ---- ---- ---- ---- ---- xxxx xxxx = X position
     */
 
-	for (offs = 0;offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		if ((state->m_spriteram[offs] & 0x09) == prio)	/* Enable && Low Priority */
 		{

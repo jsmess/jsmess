@@ -111,7 +111,7 @@ static INTERRUPT_GEN( sprint2 )
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	watchdog_enable(device->machine(), !service_mode(device->machine()));
+	device->machine().watchdog_enable(!service_mode(device->machine()));
 
 	if (!service_mode(device->machine()))
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -249,7 +249,7 @@ WRITE8_MEMBER(sprint2_state::sprint2_lamp2_w)
 
 static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x0818, 0x081f) AM_READ(sprint2_input_A_r)
 	AM_RANGE(0x0828, 0x082f) AM_READ(sprint2_input_B_r)
 	AM_RANGE(0x0830, 0x0837) AM_READ(sprint2_dip_r)

@@ -96,13 +96,12 @@ WRITE8_MEMBER(brkthru_state::brkthru_soundlatch_w)
 	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
 {
-	brkthru_state *state = field.machine().driver_data<brkthru_state>();
 
 	/* coin insertion causes an IRQ */
 	if(oldval)
-		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
 }
 
 
@@ -113,10 +112,10 @@ static INPUT_CHANGED( coin_inserted )
  *************************************/
 
 static ADDRESS_MAP_START( brkthru_map, AS_PROGRAM, 8, brkthru_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_SIZE(m_fg_videoram, m_fg_videoram_size)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1100, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("P2")
@@ -131,10 +130,10 @@ ADDRESS_MAP_END
 
 /* same as brktrhu, but xor 0x1000 below 8k */
 static ADDRESS_MAP_START( darwin_map, AS_PROGRAM, 8, brkthru_state )
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_SIZE(m_fg_videoram, m_fg_videoram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x1400, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0100, 0x01ff) AM_WRITENOP /*tidyup, nothing really here?*/
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("P1")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
@@ -227,9 +226,9 @@ static INPUT_PORTS_START( brkthru )
 //  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* SW2:7,8 ALWAYS OFF according to the manual  */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( brkthruj )
@@ -269,9 +268,9 @@ static INPUT_PORTS_START( darwin )
 //  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* SW2:5,7,8 ALWAYS OFF according to the manual  */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, brkthru_state,coin_inserted, 0)
 INPUT_PORTS_END
 
 

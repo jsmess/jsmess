@@ -155,10 +155,10 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_coin_lockout_w)
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
-	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE_SIZE(m_bulletsram,m_bulletsram_size)
+	AM_RANGE(0x0000, 0x000f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(tankbatt_coin_counter_w)
@@ -185,9 +185,9 @@ static INTERRUPT_GEN( tankbatt_interrupt )
 	if (state->m_nmi_enable) device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", 0, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tankbatt )
@@ -197,8 +197,8 @@ static INPUT_PORTS_START( tankbatt )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tankbatt_state,coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tankbatt_state,coin_inserted, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("P2")	/* IN1 */

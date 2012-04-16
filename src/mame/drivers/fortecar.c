@@ -372,6 +372,7 @@ static SCREEN_UPDATE_IND16(fortecar)
 
 static PALETTE_INIT( fortecar )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 /* Video resistors...
 
 O1 (LS374) R1K  RED
@@ -508,7 +509,7 @@ Seems to work properly, but must be checked closely...
 */
 	if (((data >> 7) & 0x01) == 0)		/* check for bit7 */
 	{
-		watchdog_reset(device->machine());
+		device->machine().watchdog_reset();
 	}
 
 //  logerror("AY port B write %02x\n",data);

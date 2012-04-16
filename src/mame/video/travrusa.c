@@ -39,6 +39,7 @@ J Clegg
 
 PALETTE_INIT( travrusa )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -114,6 +115,7 @@ PALETTE_INIT( travrusa )
 
 PALETTE_INIT( shtrider )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -303,7 +305,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		clip &= spritevisiblearea;
 
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int sx = ((state->m_spriteram[offs + 3] + 8) & 0xff) - 8;
 		int sy = 240 - state->m_spriteram[offs];

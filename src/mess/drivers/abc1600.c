@@ -907,7 +907,7 @@ READ8_MEMBER( abc1600_state::cause_r )
 	// DMA status
 	data |= m_cause;
 
-	watchdog_reset(machine());
+	machine().watchdog_reset();
 
 	return data;
 }

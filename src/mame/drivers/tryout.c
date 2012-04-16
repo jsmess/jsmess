@@ -54,11 +54,11 @@ WRITE8_MEMBER(tryout_state::tryout_bankswitch_w)
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE(m_spriteram2)
+	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tryout_vram_r, tryout_vram_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("P1")
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0xe301, 0xe301) AM_WRITE(tryout_flipscreen_w)
 	AM_RANGE(0xe302, 0xe302) AM_WRITE(tryout_bankswitch_w)
 	AM_RANGE(0xe401, 0xe401) AM_WRITE(tryout_vram_bankswitch_w)
-	AM_RANGE(0xe402, 0xe404) AM_WRITEONLY AM_BASE(m_gfx_control)
+	AM_RANGE(0xe402, 0xe404) AM_WRITEONLY AM_SHARE("gfx_control")
 	AM_RANGE(0xe414, 0xe414) AM_WRITE(tryout_sound_w)
 	AM_RANGE(0xe417, 0xe417) AM_WRITE(tryout_nmi_ack_w)
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xbff0) /* reset vectors */
@@ -81,10 +81,10 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(tryout_state::coin_inserted)
 {
 	if(newval != oldval)
-		cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tryout )
@@ -136,8 +136,8 @@ static INPUT_PORTS_START( tryout )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tryout_state,coin_inserted, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tryout_state,coin_inserted, 0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )

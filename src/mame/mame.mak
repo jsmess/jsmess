@@ -209,6 +209,7 @@ SOUNDS += SP0250
 SOUNDS += SPU
 SOUNDS += CDDA
 SOUNDS += ICS2115
+SOUNDS += I5000_SND
 SOUNDS += ST0016
 SOUNDS += NILE
 SOUNDS += X1_010
@@ -693,6 +694,7 @@ $(MAMEOBJ)/exidy.a: \
 
 $(MAMEOBJ)/f32.a: \
 	$(DRIVERS)/crospang.o $(VIDEO)/crospang.o \
+	$(DRIVERS)/silvmil.o \
 	$(DRIVERS)/f-32.o \
 
 $(MAMEOBJ)/funworld.a: \
@@ -812,7 +814,6 @@ $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/psychic5.o $(VIDEO)/psychic5.o \
 	$(DRIVERS)/pturn.o \
 	$(DRIVERS)/skyfox.o $(VIDEO)/skyfox.o \
-	$(DRIVERS)/stepstag.o \
 	$(DRIVERS)/tetrisp2.o $(VIDEO)/tetrisp2.o \
 	$(MACHINE)/jalcrpt.o \
 	$(VIDEO)/jalblend.o \
@@ -1777,6 +1778,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/majorpkr.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
+	$(DRIVERS)/meyc8080.o \
 	$(DRIVERS)/micro3d.o $(MACHINE)/micro3d.o $(VIDEO)/micro3d.o $(AUDIO)/micro3d.o \
 	$(DRIVERS)/midas.o \
 	$(DRIVERS)/miniboy7.o \
@@ -1872,7 +1874,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vp101.o \
 	$(DRIVERS)/vpoker.o \
 	$(DRIVERS)/vroulet.o \
-	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/gamtor.o \
@@ -1998,6 +1999,8 @@ $(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
 $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 			$(LAYOUT)/pulltabs.lh
 
+$(DRIVERS)/globalfr.o:	$(LAYOUT)/globalfr.lh
+
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/pmpoker.lh \
 			$(LAYOUT)/upndown.lh
@@ -2008,6 +2011,8 @@ $(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh \
 $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
+
+$(DRIVERS)/icecold.o:	$(LAYOUT)/icecold.lh
 
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
@@ -2055,6 +2060,10 @@ $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 
 $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 			$(LAYOUT)/gypsyjug.lh
+
+$(DRIVERS)/meyc8080.o:	$(LAYOUT)/wldarrow.lh \
+			$(LAYOUT)/mdrawpkr.lh \
+			$(LAYOUT)/meybjack.lh
 
 $(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
 
@@ -2113,8 +2122,6 @@ $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 
 $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
-$(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
-
 $(DRIVERS)/sstrangr.o:	$(LAYOUT)/sstrangr.lh
 
 $(DRIVERS)/subsino.o:	$(LAYOUT)/victor5.lh \
@@ -2139,7 +2146,8 @@ $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 
 $(DRIVERS)/tehkanwc.o:	$(LAYOUT)/gridiron.lh
 
-$(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
+$(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh \
+			$(LAYOUT)/stepstag.lh
 
 $(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
 
