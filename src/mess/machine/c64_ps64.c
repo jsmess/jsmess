@@ -75,9 +75,9 @@ static struct votrax_sc02_interface votrax_intf =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_ps64 )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	//MCFG_SPEAKER_STANDARD_MONO("mono")
 	//MCFG_VOTRAX_SC02_ADD(SSI263_TAG, 2000000, votrax_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -134,7 +134,11 @@ UINT8 c64_ps64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, i
 {
 	UINT8 data = 0;
 
-	if (!io1)
+	if (!roml)
+	{
+		data = m_roml[offset & 0x1fff];
+	}
+	else if (!io1)
 	{
 		//sc02->read(offset & 0x07);
 	}
