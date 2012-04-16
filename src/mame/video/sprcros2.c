@@ -9,6 +9,7 @@ Super Cross II (JPN Ver.)
 
 PALETTE_INIT( sprcros2 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -147,7 +148,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 	int offs,sx,sy,color,flipx,flipy;
 
-	for (offs = state->m_spriteram_size-4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes()-4; offs >= 0; offs -= 4)
 	{
 		if (state->m_spriteram[offs])
 		{

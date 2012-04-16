@@ -4,6 +4,7 @@
 
 PALETTE_INIT( mermaid )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -34,6 +35,7 @@ PALETTE_INIT( mermaid )
 
 PALETTE_INIT( rougien )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -189,7 +191,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -273,7 +275,7 @@ SCREEN_VBLANK( mermaid )
 
 		// check for bit 0 (sprite-sprite), 1 (sprite-foreground), 2 (sprite-background)
 
-		for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+		for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 		{
 			int attr = spriteram[offs + 2];
 			int bank = (attr & 0x30) >> 4;
@@ -337,7 +339,7 @@ SCREEN_VBLANK( mermaid )
 			state->m_helper.fill(0, rect);
 			state->m_helper2.fill(0, rect);
 
-			for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+			for (offs2 = state->m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
 				if (offs != offs2)
 				{
 					int attr2 = spriteram[offs2 + 2];
@@ -376,7 +378,7 @@ SCREEN_VBLANK( mermaid )
 
 		// check for bit 3 (sprite-sprite)
 
-		for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+		for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 		{
 			int attr = spriteram[offs + 2];
 			int bank = (attr & 0x30) >> 4;
@@ -418,7 +420,7 @@ SCREEN_VBLANK( mermaid )
 			state->m_helper.fill(0, rect);
 			state->m_helper2.fill(0, rect);
 
-			for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+			for (offs2 = state->m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
 				if (offs != offs2)
 				{
 					int attr2 = spriteram[offs2 + 2];
@@ -457,7 +459,7 @@ SCREEN_VBLANK( mermaid )
 
 		// check for bit 6
 
-		for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+		for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 		{
 			int attr = spriteram[offs + 2];
 			int bank = (attr & 0x30) >> 4;
@@ -499,7 +501,7 @@ SCREEN_VBLANK( mermaid )
 			state->m_helper.fill(0, rect);
 			state->m_helper2.fill(0, rect);
 
-			for (offs2 = state->m_spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+			for (offs2 = state->m_spriteram.bytes() - 4; offs2 >= 0; offs2 -= 4)
 				if (offs != offs2)
 				{
 					int attr2 = spriteram[offs2 + 2];

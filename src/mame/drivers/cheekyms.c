@@ -12,29 +12,28 @@
 #include "includes/cheekyms.h"
 
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
 {
-	cheekyms_state *state = field.machine().driver_data<cheekyms_state>();
 
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cheekyms_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cheekyms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x20, 0x3f) AM_WRITEONLY AM_BASE(m_spriteram)
+	AM_RANGE(0x20, 0x3f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x40, 0x40) AM_WRITE(cheekyms_port_40_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w) AM_BASE(m_port_80)
+	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w) AM_SHARE("port_80")
 ADDRESS_MAP_END
 
 
@@ -73,7 +72,7 @@ static INPUT_PORTS_START( cheekyms )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cheekyms_state,coin_inserted, 0)
 INPUT_PORTS_END
 
 

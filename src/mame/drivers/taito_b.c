@@ -392,10 +392,9 @@ WRITE16_MEMBER(taitob_state::gain_control_w)
 	}
 }
 
-static INPUT_CHANGED( realpunc_sensor )
+INPUT_CHANGED_MEMBER(taitob_state::realpunc_sensor)
 {
-	taitob_state *state = field.machine().driver_data<taitob_state>();
-	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+	device_set_input_line(m_maincpu, 4, HOLD_LINE);
 }
 
 /***************************************************************************
@@ -506,7 +505,7 @@ WRITE16_MEMBER(taitob_state::realpunc_output_w)
 
 #define TC0180VCU_MEMRW( ADDR )											\
 	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_word_r, tc0180vcu_word_w)	\
-	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE(m_spriteram)	\
+	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_SHARE("spriteram")	\
 	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM					\
 	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_scroll_r, tc0180vcu_scroll_w)	\
 	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_ctrl_r, tc0180vcu_ctrl_w)		\
@@ -566,7 +565,7 @@ static ADDRESS_MAP_START( hitice_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	/* Main RAM */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_BASE(m_pixelram)
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_SHARE("pixelram")
 //  { 0xbffff0, 0xbffff1, ???
 	AM_RANGE(0xbffff2, 0xbffff5) AM_WRITE(hitice_pixel_scroll_w)
 //  { 0xbffffa, 0xbffffb, ???
@@ -1838,9 +1837,9 @@ static INPUT_PORTS_START( realpunc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_BUTTON2 ) PORT_NAME("Pad Photosensor 1 (N)") PORT_CHANGED(realpunc_sensor, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,IPT_BUTTON3 ) PORT_NAME("Pad Photosensor 2 (U)") PORT_CHANGED(realpunc_sensor, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,IPT_BUTTON4 ) PORT_NAME("Pad Photosensor 3 (D)") PORT_CHANGED(realpunc_sensor, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_BUTTON2 ) PORT_NAME("Pad Photosensor 1 (N)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_state,realpunc_sensor, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,IPT_BUTTON3 ) PORT_NAME("Pad Photosensor 2 (U)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_state,realpunc_sensor, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,IPT_BUTTON4 ) PORT_NAME("Pad Photosensor 3 (D)") PORT_CHANGED_MEMBER(DEVICE_SELF, taitob_state,realpunc_sensor, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,IPT_UNKNOWN )
 INPUT_PORTS_END
 

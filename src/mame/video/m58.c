@@ -21,6 +21,7 @@
 
 PALETTE_INIT( yard )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	const UINT8 *char_lopal = color_prom + 0x000;
 	const UINT8 *char_hipal = color_prom + 0x100;
 	const UINT8 *sprite_pal = color_prom + 0x200;
@@ -222,7 +223,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int offs;
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int attr = state->m_spriteram[offs + 1];
 		int bank = (attr & 0x20) >> 5;

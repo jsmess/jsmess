@@ -28,6 +28,7 @@
 
 PALETTE_INIT( thepit )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 32; i++)
@@ -68,6 +69,7 @@ PALETTE_INIT( thepit )
 
 PALETTE_INIT( suprmous )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 32; i++)
@@ -235,7 +237,7 @@ static void draw_sprites(running_machine &machine,
 	thepit_state *state = machine.driver_data<thepit_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		if (((state->m_spriteram[offs + 2] & 0x08) >> 3) == priority_to_draw)
 		{

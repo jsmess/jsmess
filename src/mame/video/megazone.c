@@ -38,6 +38,7 @@ Changes by Martin M. (pfloyd@gmx.net) 14.10.2001:
 
 PALETTE_INIT( megazone )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -117,7 +118,7 @@ SCREEN_UPDATE_IND16( megazone )
 	int x, y;
 
 	/* for every character in the Video RAM */
-	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)
+	for (offs = state->m_videoram.bytes() - 1; offs >= 0; offs--)
 	{
 		int sx, sy, flipx, flipy;
 
@@ -165,7 +166,7 @@ SCREEN_UPDATE_IND16( megazone )
 	/* Draw the sprites. */
 	{
 		UINT8 *spriteram = state->m_spriteram;
-		for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+		for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 		{
 			int sx = spriteram[offs + 3];
 			int sy = 255 - ((spriteram[offs + 1] + 16) & 0xff);

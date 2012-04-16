@@ -21,6 +21,7 @@ WRITE8_MEMBER(higemaru_state::higemaru_colorram_w)
 
 PALETTE_INIT( higemaru )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -109,7 +110,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 16; offs >= 0; offs -= 16)
+	for (offs = state->m_spriteram.bytes() - 16; offs >= 0; offs -= 16)
 	{
 		int code,col,sx,sy,flipx,flipy;
 

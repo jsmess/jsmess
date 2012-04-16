@@ -246,10 +246,10 @@ WRITE8_MEMBER(naughtyb_state::popflame_protection_w)
 static ADDRESS_MAP_START( naughtyb_map, AS_PROGRAM, 8, naughtyb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("videoram2")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(naughtyb_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("scrollreg")
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
@@ -259,10 +259,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( popflame_map, AS_PROGRAM, 8, naughtyb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("videoram2")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(popflame_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_SHARE("scrollreg")
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
@@ -279,9 +279,9 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(naughtyb_state::coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( naughtyb )
@@ -329,7 +329,7 @@ static INPUT_PORTS_START( naughtyb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START( "FAKE" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, naughtyb_state,coin_inserted, 0)
 	// when reading DSW0, bit 7 doesn't read cabinet, but vblank
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
@@ -377,7 +377,7 @@ static INPUT_PORTS_START( trvmstr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START( "FAKE" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, naughtyb_state,coin_inserted, 0)
 	// when reading DSW0, bit 7 doesn't read cabinet, but vblank
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END

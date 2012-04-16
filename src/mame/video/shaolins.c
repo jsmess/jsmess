@@ -28,6 +28,7 @@
 ***************************************************************************/
 PALETTE_INIT( shaolins )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -159,7 +160,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 32; offs >= 0; offs -= 32 ) /* max 24 sprites */
+	for (offs = state->m_spriteram.bytes() - 32; offs >= 0; offs -= 32 ) /* max 24 sprites */
 	{
 		if (spriteram[offs] && spriteram[offs + 6]) /* stop rogue sprites on high score screen */
 		{

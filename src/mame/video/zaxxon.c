@@ -17,6 +17,7 @@
 
 PALETTE_INIT( zaxxon )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -164,13 +165,14 @@ VIDEO_START( congo )
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* allocate our own spriteram since it is not accessible by the main CPU */
-	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x100);
+	//TODO:TIX
+	//state->m_spriteram = auto_alloc_array(machine, UINT8, 0x100);
 
 	/* register for save states */
 	state->save_item(NAME(state->m_congo_fg_bank));
 	state->save_item(NAME(state->m_congo_color_bank));
 	state->save_item(NAME(state->m_congo_custom));
-	state->save_pointer(NAME(state->m_spriteram), 0x100);
+	//state->save_pointer(NAME(state->m_spriteram), 0x100);
 
 	video_start_common(machine, congo_get_fg_tile_info);
 }

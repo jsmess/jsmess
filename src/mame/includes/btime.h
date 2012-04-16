@@ -3,23 +3,29 @@ class btime_state : public driver_device
 {
 public:
 	btime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rambase(*this, "rambase"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_bnj_backgroundram(*this, "bnj_bgram"),
+		m_zoar_scrollram(*this, "zoar_scrollram"),
+		m_lnc_charbank(*this, "lnc_charbank"),
+		m_deco_charram(*this, "deco_charram"),
+		m_spriteram(*this, "spriteram"),
+		m_audio_rambase(*this, "audio_rambase"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
+	required_shared_ptr<UINT8> m_rambase;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-	UINT8 *  m_lnc_charbank;
-	UINT8 *  m_bnj_backgroundram;
-	UINT8 *  m_zoar_scrollram;
-	UINT8 *  m_deco_charram;
-	UINT8 *  m_spriteram;	// used by disco
+	optional_shared_ptr<UINT8> m_bnj_backgroundram;
+	optional_shared_ptr<UINT8> m_zoar_scrollram;
+	optional_shared_ptr<UINT8> m_lnc_charbank;
+	optional_shared_ptr<UINT8> m_deco_charram;
+	optional_shared_ptr<UINT8> m_spriteram;   	// used by disco
 //  UINT8 *  m_decrypted;
-	UINT8 *  m_rambase;
-	UINT8 *  m_audio_rambase;
-	size_t   m_videoram_size;
-	size_t   m_spriteram_size;
-	size_t   m_bnj_backgroundram_size;
+	required_shared_ptr<UINT8> m_audio_rambase;
 
 	/* video-related */
 	bitmap_ind16 *m_background_bitmap;
@@ -70,6 +76,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bnj_video_control_w);
 	DECLARE_WRITE8_MEMBER(zoar_video_control_w);
 	DECLARE_WRITE8_MEMBER(disco_video_control_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_hi);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
 };
 
 

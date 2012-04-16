@@ -4,6 +4,7 @@
 
 PALETTE_INIT( bogeyman )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* first 16 colors are RAM */
@@ -105,7 +106,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	bogeyman_state *state = machine.driver_data<bogeyman_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int attr = state->m_spriteram[offs];
 

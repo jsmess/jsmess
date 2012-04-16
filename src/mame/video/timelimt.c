@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 PALETTE_INIT( timelimt ) {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0;i < machine.total_colors();i++)
@@ -117,7 +118,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for( offs = state->m_spriteram_size; offs >= 0; offs -= 4 )
+	for( offs = state->m_spriteram.bytes(); offs >= 0; offs -= 4 )
 	{
 		int sy = 240 - spriteram[offs];
 		int sx = spriteram[offs+3];

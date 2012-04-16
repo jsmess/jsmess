@@ -47,6 +47,7 @@ static int intensity(int bits)
 
 static PALETTE_INIT( fgoal )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* for B/W screens PCB can be jumpered to use lower half of PROM */
@@ -220,7 +221,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, fgoal_state )
 	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
 
 	AM_RANGE(0x0100, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(fgoal_ypos_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(fgoal_xpos_w)

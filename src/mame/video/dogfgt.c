@@ -13,6 +13,7 @@
 
 PALETTE_INIT( dogfgt )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* first 16 colors are RAM */
@@ -182,7 +183,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		if (state->m_spriteram[offs] & 0x01)
 		{

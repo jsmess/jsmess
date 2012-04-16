@@ -24,6 +24,7 @@
 
 PALETTE_INIT( chaknpop )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; i++)
@@ -185,7 +186,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spr_ram_size; offs += 4)
+	for (offs = 0; offs < state->m_spr_ram.bytes(); offs += 4)
 	{
 		int sx = state->m_spr_ram[offs + 3];
 		int sy = 256 - 15 - state->m_spr_ram[offs];

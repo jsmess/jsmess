@@ -201,6 +201,7 @@ static const res_net_info radarscp_grid_net_info =
 
 PALETTE_INIT( dkong2b)
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	rgb_t	*rgb;
 	int i;
@@ -231,6 +232,7 @@ PALETTE_INIT( dkong2b)
 #ifdef UNUSED_FUNCTION
 PALETTE_INIT( dkong4b )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -270,6 +272,7 @@ PALETTE_INIT( dkong4b )
 
 PALETTE_INIT( radarscp )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -334,6 +337,7 @@ PALETTE_INIT( radarscp )
 
 PALETTE_INIT( radarscp1 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -434,6 +438,7 @@ PALETTE_INIT( radarscp1 )
 
 PALETTE_INIT( dkong3 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	rgb_t	*rgb;
 
@@ -884,16 +889,13 @@ static void check_palette(running_machine &machine)
 		newset = input_port_read_direct(port);
 		if (newset != state->m_vidhw)
 		{
-			const UINT8 *color_prom;
 			state->m_vidhw = newset;
 			switch (newset)
 			{
 				case 0x00:
-					color_prom = machine.region("proms")->base();
 					PALETTE_INIT_CALL(radarscp);
 					break;
 				case 0x01:
-					color_prom = machine.region("proms")->base();
 					PALETTE_INIT_CALL(dkong2b);
 					break;
 			}
@@ -994,7 +996,7 @@ SCREEN_UPDATE_IND16( pestplce )
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
-	for (offs = 0;offs < state->m_sprite_ram_size;offs += 4)
+	for (offs = 0;offs < state->m_sprite_ram.bytes();offs += 4)
 	{
 		if (state->m_sprite_ram[offs])
 		{

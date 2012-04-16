@@ -17,6 +17,7 @@
 ***************************************************************************/
 PALETTE_INIT( tankbatt )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	#define RES_1	0xc0 /* this is a guess */
@@ -86,7 +87,7 @@ static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const r
 	tankbatt_state *state = machine.driver_data<tankbatt_state>();
 	int offs;
 
-	for (offs = 0;offs < state->m_bulletsram_size;offs += 2)
+	for (offs = 0;offs < state->m_bulletsram.bytes();offs += 2)
 	{
 		int color = 0xff;	/* cyan, same color as the tanks */
 		int x = state->m_bulletsram[offs + 1];

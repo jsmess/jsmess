@@ -113,14 +113,14 @@ static READ64_HANDLER( dc_arm_r )
 {
 	dc_state *state = space->machine().driver_data<dc_state>();
 
-	return *((UINT64 *)state->dc_sound_ram+offset);
+	return *((UINT64 *)state->dc_sound_ram.target()+offset);
 }
 
 static WRITE64_HANDLER( dc_arm_w )
 {
 	dc_state *state = space->machine().driver_data<dc_state>();
 
-	COMBINE_DATA((UINT64 *)state->dc_sound_ram + offset);
+	COMBINE_DATA((UINT64 *)state->dc_sound_ram.target() + offset);
 }
 
 

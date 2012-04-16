@@ -89,6 +89,7 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 
 PALETTE_INIT( skyfox )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -168,7 +169,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift =(state->m_bg_ctrl & 0x80) ? (4 - 1) : 4;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int xstart, ystart, xend, yend;
 		int xinc, yinc, dx, dy;

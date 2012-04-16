@@ -4881,7 +4881,7 @@ deathcox		// 2000.10 Death Crimson OX
 cspike			// 2000.10 Gun Spike / Cannon Spike
 sstrkfgt		// 2000.10 Sega Strike Fighter (Rev A)
 confmiss		// 2000.11 Confidential Mission												// First GD-ROM game?
-                // 2000.11 Ninja Assault
+ninjaslt        // 2000.11 Ninja Assault
 				// 2000.11 Shakatto Tambourine
 wwfroyal		// 2000.11 WWF Royal Rumble
 pjustic			// 2000.12 Moero Justice Gakuen / Project Justice
@@ -10221,6 +10221,7 @@ supertnk		// (c) 1981 VIDEO GAMES GmbH, W.-GERMANY
 crospang		// (c) 1998 F2 System
 heuksun			// (c) 1998 Oksan / F2 System
 bestri			// (c) F2 System
+silvmil			// (c) 1995 Para
 funybubl		// (c) 1999 In Chang Electronic Co
 funybublc		// (c) 1999 Comad Industries
 dcheese			// (c) 1993 HAR
@@ -19657,12 +19658,23 @@ hg_frd		// Fruit Deuce
 /* Global Games 'Stealth' */
 
 gl_dow		// Deals On Wheels (Global)
+gl_dowp
 gl_dowcl	// Deals On Wheels Club (Global)
+gl_dowclp
 gl_wywh		// Wish You Were Here Club (Global)
+gl_wywhp
+gl_wywh24
+gl_wywh24p
 gl_coc		// Carry On Clubbin' (Global)
+gl_cocp
+gl_coc29
+gl_coc29p
 gl_uyr		// Up Yer Riggin Club (Global)
+gl_uyrp
 gl_hbh		// Heartbreak Hotel (Global)
 gl_hbhcl	// Heartbreak Hotel Club (Global)
+gl_hbhclp
+gl_hbhcla
 
 /* Unknown, Pluto? */
 
@@ -20303,6 +20315,7 @@ empsback
 
 // icecold.c
 icecold
+zekepeak
 
 // inder.c
 ind250cc

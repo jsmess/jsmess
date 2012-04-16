@@ -317,7 +317,6 @@ INPUT_PORTS_END
 static INPUT_CHANGED( cpc_monitor_changed )
 {
 	running_machine &machine = field.machine();
-	const UINT8	*color_prom = NULL;
 
 	if ( (input_port_read(machine, "green_display")) & 0x01 )
 	{

@@ -54,6 +54,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 PALETTE_INIT( galivan )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -309,7 +310,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int offs;
 
 	/* draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int code;
 		int attr = spriteram[offs + 2];

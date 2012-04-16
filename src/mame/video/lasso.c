@@ -66,6 +66,7 @@ static rgb_t get_color( int data )
 
 PALETTE_INIT( lasso )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
@@ -75,6 +76,7 @@ PALETTE_INIT( lasso )
 
 PALETTE_INIT( wwjgtin )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -276,12 +278,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	if (reverse)
 	{
 		source = state->m_spriteram;
-		finish = state->m_spriteram + state->m_spriteram_size;
+		finish = state->m_spriteram + state->m_spriteram.bytes();
 		inc = 4;
 	}
 	else
 	{
-		source = state->m_spriteram + state->m_spriteram_size - 4;
+		source = state->m_spriteram + state->m_spriteram.bytes() - 4;
 		finish = state->m_spriteram - 4;
 		inc = -4;
 	}

@@ -26,6 +26,7 @@
 
 PALETTE_INIT( 1942 )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	rgb_t palette[256];
 	int i, colorbase;
 
@@ -198,7 +199,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	_1942_state *state = machine.driver_data<_1942_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int i, code, col, sx, sy, dir;
 

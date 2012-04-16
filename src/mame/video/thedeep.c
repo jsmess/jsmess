@@ -88,6 +88,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_vram_1_w)
 
 PALETTE_INIT( thedeep )
 {
+	const UINT8 *color_prom = machine.region("proms")->base();
 	int i;
 	for (i = 0;i < 512;i++)
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));
@@ -148,7 +149,7 @@ Offset:     Bits:       Value:
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	thedeep_state *state = machine.driver_data<thedeep_state>();
-	UINT8 *s = state->m_spriteram, *end = s + state->m_spriteram_size;
+	UINT8 *s = state->m_spriteram, *end = s + state->m_spriteram.bytes();
 
 	while (s < end)
 	{

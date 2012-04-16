@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 16, cchasm_state )
 	AM_RANGE(0x060000, 0x060001) AM_READ_PORT("DSW") AM_WRITE(cchasm_led_w)
 	AM_RANGE(0x070000, 0x070001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE(cchasm_io_r,cchasm_io_w)
-	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 /*************************************
@@ -124,9 +124,9 @@ static INPUT_PORTS_START( cchasm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(cchasm_set_coin_flag, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(cchasm_set_coin_flag, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CHANGED(cchasm_set_coin_flag, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cchasm_state, cchasm_set_coin_flag, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cchasm_state, cchasm_set_coin_flag, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cchasm_state, cchasm_set_coin_flag, 0)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test 1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) /* Test 2, not used in cchasm */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* Test 3, not used in cchasm */
