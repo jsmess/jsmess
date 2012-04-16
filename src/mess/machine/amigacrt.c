@@ -230,7 +230,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 
 		if ( offset == 0x03 ) /* disable cart oberlay on chip mem */
 		{
-			UINT32 mirror_mask = state->m_chip_ram_size;
+			UINT32 mirror_mask = state->m_chip_ram.bytes();
 
 			memory_set_bank(space->machine(), "bank1", 0);
 
@@ -240,7 +240,7 @@ static READ16_HANDLER( amiga_ar23_mode_r )
 			}
 
 			/* overlay disabled, map RAM on 0x000000 */
-			space->install_write_bank(0x000000, state->m_chip_ram_size - 1, 0, mirror_mask, "bank1");
+			space->install_write_bank(0x000000, state->m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
 		}
 	}
 
@@ -282,7 +282,7 @@ static void amiga_ar23_freeze( running_machine &machine )
 		memory_set_bank(machine, "bank1", 2);
 
 		/* writes go to chipram */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, state->m_chip_ram_size - 1, FUNC(amiga_ar23_chipmem_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x000000, state->m_chip_ram.bytes() - 1, FUNC(amiga_ar23_chipmem_w));
 
 		/* trigger NMI irq */
 		cputag_set_input_line(machine, "maincpu", 7, PULSE_LINE);
