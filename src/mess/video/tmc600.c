@@ -70,7 +70,7 @@ WRITE8_MEMBER( tmc600_state::page_ram_w )
 }
 
 static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, tmc600_state )
-	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM AM_BASE(m_page_ram) AM_WRITE(page_ram_w)
+	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM AM_SHARE("page_ram") AM_WRITE(page_ram_w)
 ADDRESS_MAP_END
 
 static CDP1869_CHAR_RAM_READ( tmc600_char_ram_r )

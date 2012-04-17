@@ -883,7 +883,7 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_0b_nofdc_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram)
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_mem)
 ADDRESS_MAP_END
@@ -896,19 +896,19 @@ static ADDRESS_MAP_START( next_fdc_mem, AS_PROGRAM, 32, next_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_0b_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram)
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_0c_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_BASE(vram)
+	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_2c_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x2c000000, 0x2c1fffff) AM_RAM AM_BASE(vram)
+	AM_RANGE(0x2c000000, 0x2c1fffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END

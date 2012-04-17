@@ -44,7 +44,8 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_video_ram(*this, "video_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -59,6 +60,8 @@ public:
 	required_device<device_t> m_floppy0;
 	required_device<device_t> m_floppy1;
 	required_device<ram_device> m_ram;
+	required_shared_ptr<UINT8> m_video_ram;
+
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -95,7 +98,6 @@ public:
 
 	// video state
 	bitmap_ind16 m_bitmap;
-	const UINT8 *m_video_ram;
 	const UINT8 *m_char_rom;
 	int m_llen;
 

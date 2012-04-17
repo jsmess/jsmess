@@ -15,7 +15,8 @@ class scv_state : public driver_device
 {
 public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_videoram(*this,"videoram")		{ }
 
 	DECLARE_WRITE8_MEMBER(scv_porta_w);
 	DECLARE_READ8_MEMBER(scv_portb_r);
@@ -24,7 +25,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scv_cart_ram_w);
 	DECLARE_WRITE8_MEMBER(scv_cart_ram2_w);
 	DECLARE_WRITE_LINE_MEMBER(scv_upd1771_ack_w);
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_porta;
 	UINT8 m_portc;
 	emu_timer *m_vb_timer;
@@ -41,7 +42,7 @@ public:
 static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM		/* BIOS */
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_BASE(m_videoram )	/* VRAM + 4 registers */
+	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")	/* VRAM + 4 registers */
 
 	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE_LEGACY("upd1771c", upd1771_w )
 

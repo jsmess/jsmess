@@ -57,7 +57,8 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_cass(*this, CASSETTE_TAG),
 		  m_pia(*this, "pia"),
-		  m_speaker(*this, SPEAKER_TAG) { }
+		  m_speaker(*this, SPEAKER_TAG),
+		  m_videoram(*this, "videoram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -74,7 +75,7 @@ public:
 	UINT8 m_keylatch;
 	UINT8 m_screen_on;
 	UINT8 m_rtc;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 };
 
 
@@ -82,7 +83,7 @@ public:
 
 static ADDRESS_MAP_START( d6800_map, AS_PROGRAM, 8, d6800_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_BASE(m_videoram )
+	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
 	AM_RANGE(0x8010, 0x8013) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_ROM

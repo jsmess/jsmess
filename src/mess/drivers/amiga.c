@@ -98,7 +98,7 @@ static ADDRESS_MAP_START(amiga_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM /* slow-mem */
 	AM_RANGE(0xc80000, 0xcfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w)	/* see Note 1 above */
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_BASE(m_custom_regs)	/* Custom Chips */
+	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* System ROM - mirror */
 ADDRESS_MAP_END
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START(cdtv_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE_LEGACY(amiga_clock_r, amiga_clock_w)
 	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_BASE(m_custom_regs)	/* Custom Chips */
+	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* CDTV & System ROM */
 ADDRESS_MAP_END
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START(a1000_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0xc0000) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) /* See Note 1 above */
-	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_BASE(m_custom_regs)	/* Custom Chips */
+	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xfbffff) AM_ROM AM_REGION("user1", 0)	/* Bootstrap ROM */
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK("bank2")	/* Writable Control Store RAM */

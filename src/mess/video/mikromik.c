@@ -61,7 +61,7 @@ static const i8275_interface crtc_intf =
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 8, mm1_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 

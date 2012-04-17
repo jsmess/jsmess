@@ -66,9 +66,10 @@ class interact_state : public hec2hrp_state
 {
 public:
 	interact_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hec2hrp_state(mconfig, type, tag) { }
+		: hec2hrp_state(mconfig, type, tag),
+		  m_videoram(*this, "videoram") { }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 };
 
 
@@ -88,7 +89,7 @@ static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xffff) AM_RAM
 

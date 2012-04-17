@@ -94,9 +94,11 @@ class ip22_state : public driver_device
 public:
 	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_unkpbus0(*this, "unkpbus0"){ }
+		m_unkpbus0(*this, "unkpbus0"),
+		m_mainram(*this, "mainram") { }
 
-	UINT32 *m_mainram;
+	required_shared_ptr<UINT32> m_unkpbus0;
+	required_shared_ptr<UINT32> m_mainram;
 	RTC_t m_RTC;
 	UINT32 m_int3_regs[64];
 	UINT32 m_nIOC_ParReadCnt;
@@ -104,7 +106,6 @@ public:
 	HPC3_t m_HPC3;
 	HAL2_t m_HAL2;
 	PBUS_DMA_t m_PBUS_DMA;
-	required_shared_ptr<UINT32> m_unkpbus0;
 	UINT32 m_nIntCounter;
 	UINT8 m_dma_buffer[4096];
 };
@@ -1188,7 +1189,7 @@ static WRITE32_HANDLER( hpc3_unkpbus0_w )
 
 static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )	/* mirror of first 512k of main RAM */
-	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("share1") AM_BASE(m_mainram ) AM_RAM_WRITE_LEGACY(ip22_write_ram)		/* 128 MB of main RAM */
+	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("share1") AM_SHARE("mainram") AM_RAM_WRITE_LEGACY(ip22_write_ram)		/* 128 MB of main RAM */
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE_LEGACY(newport_rex3_r, newport_rex3_w )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE_LEGACY(sgi_mc_r, sgi_mc_w )
 	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE_LEGACY(hpc3_hd_enet_r, hpc3_hd_enet_w )

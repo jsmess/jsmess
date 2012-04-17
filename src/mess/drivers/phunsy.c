@@ -24,7 +24,8 @@ public:
 	phunsy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, SPEAKER_TAG) { }
+		m_speaker(*this, SPEAKER_TAG),
+		m_videoram(*this, "videoram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
@@ -34,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	const UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	const UINT8	*m_p_chargen;
 	UINT8		m_data_out;
 	UINT8		m_keyboard_input;
@@ -58,7 +59,7 @@ static ADDRESS_MAP_START(phunsy_mem, AS_PROGRAM, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE(m_videoram ) // Video RAM
+	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_SHARE("videoram") // Video RAM
 	AM_RANGE( 0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1")	// Banked RAM/ROM
 	AM_RANGE( 0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
 ADDRESS_MAP_END
