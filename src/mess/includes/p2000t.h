@@ -19,9 +19,8 @@ public:
 	p2000t_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, SPEAKER_TAG)
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_speaker(*this, SPEAKER_TAG),
+	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
@@ -34,7 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p2000t_port_888b_w);
 	DECLARE_WRITE8_MEMBER(p2000t_port_8c90_w);
 	DECLARE_WRITE8_MEMBER(p2000t_port_9494_w);
-	required_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_port_101f;
 	UINT8 m_port_202f;
 	UINT8 m_port_303f;

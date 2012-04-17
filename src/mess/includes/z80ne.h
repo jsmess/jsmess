@@ -68,7 +68,7 @@ public:
 		  m_videoram(*this,"videoram") {}
 
 	optional_device<mc6847_base_device> m_vdg;
-	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
 	UINT8 m_lx383_scan_counter;
 	UINT8 m_lx383_key[LX383_KEYS];
 	int m_lx383_downsampler;

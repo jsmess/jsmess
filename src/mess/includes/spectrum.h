@@ -82,7 +82,7 @@ public:
 	int m_frame_number;    /* Used for handling FLASH 1 */
 	int m_flash_invert;
 	UINT8 m_retrace_cycles;
-	required_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_screen_location;
 
 	int m_ROMSelection;

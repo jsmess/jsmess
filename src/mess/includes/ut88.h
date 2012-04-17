@@ -22,9 +22,9 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_cass(*this, CASSETTE_TAG),
 	m_ppi(*this, "ppi8255"),
-	m_dac(*this, "dac")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_dac(*this, "dac"),
+	m_p_videoram(*this, "p_videoram")
+	{ }
 
 	required_device<cassette_image_device> m_cass;
 	optional_device<i8255_device> m_ppi;
@@ -38,7 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(ut88_8255_portb_r);
 	DECLARE_READ8_MEMBER(ut88_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(ut88_8255_porta_w);
-	required_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<UINT8> m_p_videoram;
 	int m_keyboard_mask;
 	int m_lcd_digit[6];
 };

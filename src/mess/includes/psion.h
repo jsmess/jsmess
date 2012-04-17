@@ -18,8 +18,7 @@ public:
 		  m_lcdc(*this, "hd44780"),
 		  m_beep(*this, BEEPER_TAG),
 		  m_pack1(*this, "pack1"),
-		  m_pack2(*this, "pack2")
-		,
+		  m_pack2(*this, "pack2"),
 		m_sys_register(*this, "sys_register"),
 		m_ram(*this, "m_ram"){ }
 
@@ -31,7 +30,7 @@ public:
 
 	UINT16 m_kb_counter;
 	UINT8 m_enable_nmi;
-	required_shared_ptr<UINT8> m_sys_register;
+	optional_shared_ptr<UINT8> m_sys_register;
 	UINT8 m_tcsr_value;
 	UINT8 m_stby_pwr;
 	UINT8 m_pulse;
@@ -42,7 +41,7 @@ public:
 	UINT8 m_port6;		// datapack control lines
 
 	// RAM/ROM banks
-	required_shared_ptr<UINT8> m_ram;
+	optional_shared_ptr<UINT8> m_ram;
 	UINT8 *m_paged_ram;
 	UINT8 m_rom_bank;
 	UINT8 m_ram_bank;
