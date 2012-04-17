@@ -20,7 +20,7 @@ public:
 		  m_pack1(*this, "pack1"),
 		  m_pack2(*this, "pack2"),
 		m_sys_register(*this, "sys_register"),
-		m_ram(*this, "m_ram"){ }
+		m_ram(*this, "ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -41,7 +41,7 @@ public:
 	UINT8 m_port6;		// datapack control lines
 
 	// RAM/ROM banks
-	optional_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 *m_paged_ram;
 	UINT8 m_rom_bank;
 	UINT8 m_ram_bank;

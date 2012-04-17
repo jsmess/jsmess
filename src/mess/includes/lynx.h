@@ -100,7 +100,7 @@ public:
 		m_mem_0000(*this, "mem_0000"),
 		m_mem_fc00(*this, "mem_fc00"),
 		m_mem_fd00(*this, "mem_fd00"),
-		m_mem_fe00(*this, "m_mem_fe00"),
+		m_mem_fe00(*this, "mem_fe00"),
 		m_mem_fffa(*this, "mem_fffa"){ }
 
 	virtual void video_start();
