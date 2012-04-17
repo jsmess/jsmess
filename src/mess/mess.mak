@@ -822,7 +822,9 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_structured_basic.o	\
 	$(MESS_MACHINE)/c64_super_explode.o	\
 	$(MESS_MACHINE)/c64_super_games.o	\
+	$(MESS_MACHINE)/c64_sw8k.o	\
 	$(MESS_MACHINE)/c64_system3.o	\
+	$(MESS_MACHINE)/c64_tdos.o	\
 	$(MESS_MACHINE)/c64_vw64.o	\
 	$(MESS_MACHINE)/c64_warp_speed.o	\
 	$(MESS_MACHINE)/c64_westermann.o	\

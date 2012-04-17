@@ -62,6 +62,7 @@
 	List of mostly undumped cartridges:
 	http://www.retroport.de/C64_C128_Hardware.html
 	http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
+	http://members.optusnet.com.au/spacetaxi64/SPEED-UP-CARTS/SPEED-C64-CPU.htm
 
 -->
 <softwarelist name="c64_cart" description="Commodore 64 cartridges">
@@ -70,30 +71,7 @@
 		<description>VizaWrite 64</description>
 		<year>1984</year>
 		<publisher>Viza Software</publisher>
-		<!--
-		|===========================|
-		|=|      LS10    LS122  C   |
-		|=|                  R      |
-		|=|                         |
-		|=|                         |
-		|=|      ROM0  ROM2  ROM1   |
-		|=|                         |
-		|=|                         |
-		|=|                         |
-		|===========================|
 
-		ROM0    - Mitsubishi M5L2764K 8Kx8 EPROM "U"
-		ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM "3"
-		ROM2    - Mitsubishi M5L2764K 8Kx8 EPROM "2" (located on solder side)
-		R       - 56K
-		C       - 47uF
-
-		data and address lines are scrambled:
-		data = BITSWAP8(7,6,0,5,1,4,2,3)
-		address = BITSWAP16(15,14,13,12,7,8,6,9,5,11,4,3,2,10,1,0)
-		GAME:after reset GND for 1.1844s (74LS122 tW=0.45*R*C) then goes to Vcc
-		EXROM:GND
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="vizawrite" />
 			<feature name="game" value="0" />
@@ -114,44 +92,7 @@
 		<description>Triton QD TDOS 1.2</description>
 		<year>198?</year>
 		<publisher>Radofin</publisher>
-		<!--
-		XM-2206-A (top)
-		XM-2205-A (bottom)
-		            |===========================|
-		            |            CN4            |
-		            |                           |
-		            |      ULA                  |
-		            |                           |
-		            |      6.5MHz               |
-		            |                           |
-		            |      SSDA                 |
-		            |                 LS175     |
-		            |                 LS367     |
-		            |            CN3            |
-		            |=========|||||||||=========|
-		                      |||||||||
-		        |=============|||||||||============|
-		        |                CN2               |
-		        |       LS00     LS02     LS138    |
-		|=======|                                  |
-		|=|             LS245        ROM           |
-		|=|                                        |
-		|=|                                        |
-		|=|                                     CN1|
-		|=|                                        |
-		|=|                                        |
-		|=|                                        |
-		|=|                             SW1        |
-		|==========================================|
 
-		ROM    - Hitachi HN482764G 8Kx8 EPROM "TDOS 1.2"
-		ULA    - Ferranti ULA5RB073E1 XZ-2085-1
-		SSDA   - Motorola MC68A52P SSDA
-		CN1    - C64 expansion connector (pass-thru)
-		CN2,3  - 19x1 flat ribbon cable to other PCB
-		CN4    - 9 wires to 3" drive
-		SW1    - cartridge on/off switch
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="tdos" />
 			<feature name="game" value="1" />
@@ -215,8 +156,7 @@
 		<description>Fast Load Cartridge v2</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
 			<feature name="game" value="1" />
@@ -232,8 +172,7 @@
 		<description>Fast Load Cartridge v1</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
 			<feature name="game" value="1" />
@@ -412,8 +351,7 @@
 		<description>Print Technik-Help</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
@@ -447,29 +385,13 @@
 		</part>
 	</software>
 
-	<software name="4040fast" supported="no">
+	<software name="4040fast">
 		<description>4040 + Fast Hack'Em</description>
 		<year>1990</year>
 		<publisher>Basement Boys Software</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|                     SW1 |
-		|=|         ROM0            |
-		|=|                         |
-		|=|                         |
-		|=|         ROM1            |
-		|=|                         |
-		|=|                         |
-		|===========================|
 
-		ROM0,1  - National Semiconductor NMC27C64Q 8Kx8 EPROM
-		SW1     - ROM selection switch
-		EXROM:GND
-		GAME:Vcc
-		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="4040_fast_hack_em" />
+			<feature name="slot" value="sw8k" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -519,7 +441,7 @@
 		</part>
 	</software>
 
-	<software name="xl80" supported="no">
+	<software name="xl80">
 		<description>XL 80</description>
 		<year>1984</year>
 		<publisher>Data 20</publisher>
@@ -750,13 +672,7 @@
 		<description>Super Explode! v5.0</description>
 		<year>1989</year>
 		<publisher>The Soft Group</publisher>
-		<!--
-		Bankswitch register at $DF00, then executes code from the I/O2 area:
 
-		0193: lda  #$80
-		0195: sta  $DF00
-		0198: jsr  $DF15
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="super_explode" />
 			<feature name="game" value="1" />
@@ -903,20 +819,7 @@
 		<description>Stardos</description>
 		<year>1986</year>
 		<publisher>Starpoint Software</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|   LS30                  |
-		|=|               LS157     |
-		|=|          LS00           |
-		|=|   ROM                   |
-		|=|          7407           |
-		|=|                         |
-		|=|                      SW1|
-		|===========================|
 
-		ROM     - Toshiba TMM271128D-25 16Kx8 EPROM
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="stardos" />
 			<feature name="game" value="1" />
@@ -1056,8 +959,7 @@
 		<description>Grappler CD</description>
 		<year>1984</year>
 		<publisher>Orange Micro</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="grappler" />
 			<feature name="game" value="1" />
@@ -1207,8 +1109,8 @@
 
 	<software name="flash8" supported="no">
 		<description>Flash 8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Elektronik-Technik-Peters</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="flash8" />
 			<feature name="exrom" value="0" />
