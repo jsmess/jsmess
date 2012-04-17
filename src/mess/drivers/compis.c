@@ -358,7 +358,7 @@ static const floppy_interface compis_floppy_interface =
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( compis, compis_state )

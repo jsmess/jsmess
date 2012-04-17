@@ -266,7 +266,7 @@ READ8_MEMBER( vixen_state::port3_r )
 static ADDRESS_MAP_START( vixen_mem, AS_PROGRAM, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_BASE(m_video_ram)
+	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 
@@ -419,7 +419,7 @@ void vixen_state::video_start()
 	save_item(NAME(m_alt));
 	save_item(NAME(m_256));
 	save_item(NAME(m_vsync));
-	save_pointer(NAME(m_video_ram), 0x1000);
+	save_pointer(NAME(m_video_ram.target()), 0x1000);
 }
 
 

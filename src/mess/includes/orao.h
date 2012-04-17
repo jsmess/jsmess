@@ -12,10 +12,12 @@ class orao_state : public driver_device
 {
 public:
 	orao_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_memory(*this, "memory"),
+		m_video_ram(*this, "video_ram"){ }
 
-	UINT8 *m_memory;
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_memory;
+	required_shared_ptr<UINT8> m_video_ram;
 };
 
 

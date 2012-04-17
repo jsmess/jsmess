@@ -32,7 +32,9 @@ public:
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG)
-	{ }
+	,
+		m_mc6845_video_ram(*this, "mc6845_video_ram"),
+		m_mc6847_video_ram(*this, "mc6847_video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
@@ -72,8 +74,8 @@ public:
 	/* video state */
 	int m_hsync;
 	int m_vsync;
-	UINT8 *m_mc6845_video_ram;
-	UINT8 *m_mc6847_video_ram;
+	required_shared_ptr<UINT8> m_mc6845_video_ram;
+	required_shared_ptr<UINT8> m_mc6847_video_ram;
 	UINT8 m_mc6847_attr;
 };
 

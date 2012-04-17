@@ -139,8 +139,8 @@ public:
 	m_uart(*this, "uart"),
 	m_rtc(*this, "mm58274c"),
 	m_fdc(*this, "upd765"),
-	m_crtc(*this, "upd7220")
-	{ }
+	m_crtc(*this, "upd7220"),
+	m_video_ram(*this, "video_ram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_8253;
@@ -180,7 +180,7 @@ public:
 	void handle_eoi(int data);
 	void compis_fdc_tc(int state);
 
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 };
 
 

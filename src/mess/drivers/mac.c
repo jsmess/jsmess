@@ -570,7 +570,7 @@ static ADDRESS_MAP_START(macprtb_map, AS_PROGRAM, 16, mac_state )
 	AM_RANGE(0xf60000, 0xf6ffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
 	AM_RANGE(0xf70000, 0xf7ffff) AM_READWRITE(mac_via_r, mac_via_w)
 	AM_RANGE(0xf90000, 0xf9ffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	AM_BASE(m_vram)	// VRAM
+	AM_RANGE(0xfa8000, 0xfaffff) AM_RAM	AM_SHARE("vram")	// VRAM
 	AM_RANGE(0xfb0000, 0xfbffff) AM_DEVREADWRITE8("asc", asc_device, read, write, 0xffff)
 	AM_RANGE(0xfc0000, 0xfcffff) AM_READ(mac_config_r)
 	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_2_w)
@@ -591,7 +591,7 @@ static ADDRESS_MAP_START(maclc_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xf16000, 0xf17fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff)
 	AM_RANGE(0xf24000, 0xf24003) AM_READWRITE(rbv_ramdac_r, ariel_ramdac_w)
 	AM_RANGE(0xf26000, 0xf27fff) AM_READWRITE8(mac_rbv_r, mac_rbv_w, 0xffffffff)	// VIA2 (V8)
-	AM_RANGE(0xf40000, 0xfbffff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0xf40000, 0xfbffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maclc3_map, AS_PROGRAM, 32, mac_state )
@@ -610,7 +610,7 @@ static ADDRESS_MAP_START(maclc3_map, AS_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_read_id)
 
-	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_MIRROR(0x0ff00000) AM_BASE(m_vram)
+	AM_RANGE(0x60000000, 0x600fffff) AM_RAM AM_MIRROR(0x0ff00000) AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macii_map, AS_PROGRAM, 32, mac_state )
@@ -657,7 +657,7 @@ static ADDRESS_MAP_START(macse30_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x00f00000)
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00f00000)	// mirror
 
-	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM	AM_BASE(m_vram)
+	AM_RANGE(0xfe000000, 0xfe00ffff) AM_RAM	AM_SHARE("vram")
 	AM_RANGE(0xfeffe000, 0xfeffffff) AM_ROM AM_REGION("se30vrom", 0x0)
 ADDRESS_MAP_END
 
@@ -692,7 +692,7 @@ static ADDRESS_MAP_START(macpb140_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffff) AM_MIRROR(0x01f00000)
 	AM_RANGE(0x50024000, 0x50027fff) AM_READ(buserror_r) AM_MIRROR(0x01f00000)   // bus error here to make sure we aren't mistaken for another decoder
 
-	AM_RANGE(0xfee08000, 0xfeffffff) AM_RAM	AM_BASE(m_vram)
+	AM_RANGE(0xfee08000, 0xfeffffff) AM_RAM	AM_SHARE("vram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
@@ -709,7 +709,7 @@ static ADDRESS_MAP_START(macpb160_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0x50f20000, 0x50f21fff) AM_READWRITE8(mac_gsc_r, mac_gsc_w, 0xffffffff)
 	AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
 
-	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM	AM_BASE(m_vram) AM_MIRROR(0x0ffe0000)
+	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM	AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
@@ -727,7 +727,7 @@ static ADDRESS_MAP_START(macpb165c_map, AS_PROGRAM, 32, mac_state )
     AM_RANGE(0x50f24000, 0x50f27fff) AM_READ(buserror_r)   // bus error here to make sure we aren't mistaken for another decoder
 
     // on-board color video on 165c/180c
-    AM_RANGE(0xfc000000, 0xfc07ffff) AM_RAM AM_BASE(m_vram) AM_MIRROR(0x00380000) // 512k of VRAM
+    AM_RANGE(0xfc000000, 0xfc07ffff) AM_RAM AM_SHARE("vram") AM_MIRROR(0x00380000) // 512k of VRAM
     AM_RANGE(0xfc400000, 0xfcefffff) AM_READWRITE(macwd_r, macwd_w)
 // fc4003c8 = DAC control, fc4003c9 = DAC data
 // fc4003da bit 3 is VBL
@@ -750,7 +750,7 @@ static ADDRESS_MAP_START(macpd210_map, AS_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0x5ffffffc, 0x5fffffff) AM_READ(mac_read_id)
 
-	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM	AM_BASE(m_vram) AM_MIRROR(0x0ffe0000)
+	AM_RANGE(0x60000000, 0x6001ffff) AM_RAM	AM_SHARE("vram") AM_MIRROR(0x0ffe0000)
 ADDRESS_MAP_END
 #endif
 static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
@@ -768,7 +768,7 @@ static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 
 	AM_RANGE(0x50040000, 0x50041fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffff) AM_MIRROR(0x00fc0000)
 	// f9800000 = VDAC / DAFB
-	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM	AM_BASE(m_vram)
+	AM_RANGE(0xf9000000, 0xf91fffff) AM_RAM	AM_SHARE("vram")
 	AM_RANGE(0xf9800000, 0xf98001ff) AM_READWRITE(dafb_r, dafb_w)
 	AM_RANGE(0xf9800200, 0xf980023f) AM_READWRITE(dafb_dac_r, dafb_dac_w)
 ADDRESS_MAP_END

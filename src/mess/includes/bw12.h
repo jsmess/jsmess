@@ -33,7 +33,8 @@ public:
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
 		  m_floppy_timer(*this, FLOPPY_TIMER_TAG)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
@@ -71,7 +72,7 @@ public:
 	int m_bank;
 
 	/* video state */
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_char_rom;
 
 	/* PIT state */

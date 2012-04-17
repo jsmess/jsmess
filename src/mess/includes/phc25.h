@@ -29,7 +29,8 @@ public:
 		  m_vdg(*this, MC6847_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_cassette(*this, CASSETTE_TAG)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
@@ -46,7 +47,7 @@ public:
 	static UINT8 pal_char_rom_r(running_machine &machine, UINT8 ch, int line);
 
 	/* video state */
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_char_rom;
 };
 

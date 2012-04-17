@@ -226,26 +226,26 @@ WRITE16_MEMBER( cgc7900_state::disk_command_w )
 static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
-	AM_RANGE(0x000008, 0x1fffff) AM_RAM AM_BASE(m_chrom_ram)
+	AM_RANGE(0x000008, 0x1fffff) AM_RAM AM_SHARE("chrom_ram")
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(z_mode_r, z_mode_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_BASE(m_plane_ram)
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_SHARE("plane_ram")
 	AM_RANGE(0xe00000, 0xe1ffff) AM_WRITE(color_status_w)
 //  AM_RANGE(0xe20000, 0xe23fff) Raster Processor
-	AM_RANGE(0xe30000, 0xe303ff) AM_RAM AM_BASE(m_clut_ram)
-	AM_RANGE(0xe38000, 0xe3bfff) AM_RAM AM_BASE(m_overlay_ram)
-	AM_RANGE(0xe40000, 0xe40001) AM_RAM AM_BASE(m_roll_bitmap)
-	AM_RANGE(0xe40002, 0xe40003) AM_RAM AM_BASE(m_pan_x)
-	AM_RANGE(0xe40004, 0xe40005) AM_RAM AM_BASE(m_pan_y)
-	AM_RANGE(0xe40006, 0xe40007) AM_RAM AM_BASE(m_zoom)
+	AM_RANGE(0xe30000, 0xe303ff) AM_RAM AM_SHARE("clut_ram")
+	AM_RANGE(0xe38000, 0xe3bfff) AM_RAM AM_SHARE("overlay_ram")
+	AM_RANGE(0xe40000, 0xe40001) AM_RAM AM_SHARE("roll_bitmap")
+	AM_RANGE(0xe40002, 0xe40003) AM_RAM AM_SHARE("pan_x")
+	AM_RANGE(0xe40004, 0xe40005) AM_RAM AM_SHARE("pan_y")
+	AM_RANGE(0xe40006, 0xe40007) AM_RAM AM_SHARE("zoom")
 	AM_RANGE(0xe40008, 0xe40009) AM_RAM
 	AM_RANGE(0xe4000a, 0xe4000f) AM_RAM // Raster Processor
-	AM_RANGE(0xe40010, 0xe40011) AM_RAM AM_BASE(m_blink_select)
-	AM_RANGE(0xe40012, 0xe40013) AM_RAM AM_BASE(m_plane_select)
-	AM_RANGE(0xe40014, 0xe40015) AM_RAM AM_BASE(m_plane_switch)
-	AM_RANGE(0xe40016, 0xe40017) AM_RAM AM_BASE(m_color_status_fg)
-	AM_RANGE(0xe40018, 0xe40019) AM_RAM AM_BASE(m_color_status_bg)
-	AM_RANGE(0xe4001a, 0xe4001b) AM_RAM AM_BASE(m_roll_overlay)
+	AM_RANGE(0xe40010, 0xe40011) AM_RAM AM_SHARE("blink_select")
+	AM_RANGE(0xe40012, 0xe40013) AM_RAM AM_SHARE("plane_select")
+	AM_RANGE(0xe40014, 0xe40015) AM_RAM AM_SHARE("plane_switch")
+	AM_RANGE(0xe40016, 0xe40017) AM_RAM AM_SHARE("color_status_fg")
+	AM_RANGE(0xe40018, 0xe40019) AM_RAM AM_SHARE("color_status_bg")
+	AM_RANGE(0xe4001a, 0xe4001b) AM_RAM AM_SHARE("roll_overlay")
 	AM_RANGE(0xe4001c, 0xe40fff) AM_RAM
 //  AM_RANGE(0xefc440, 0xefc441) HVG Load X
 //  AM_RANGE(0xefc442, 0xefc443) HVG Load Y
@@ -398,7 +398,7 @@ static const ay8910_interface ay8910_intf =
 void cgc7900_state::machine_start()
 {
 	/* register for state saving */
-	save_pointer(NAME(m_overlay_ram), 0x4000);
+	save_pointer(NAME(m_overlay_ram.target()), 0x4000);
 }
 
 /*-------------------------------------------------

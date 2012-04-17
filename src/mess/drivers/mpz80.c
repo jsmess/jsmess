@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
     AM_RANGE(0x0401, 0x0401) AM_READWRITE(keyboard_r, disp_col_w)
     AM_RANGE(0x0402, 0x0402) AM_READWRITE(switch_r, task_w)
     AM_RANGE(0x0403, 0x0403) AM_READWRITE(status_r, mask_w)
-    AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(m_map_ram)
+    AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("map_ram")
     AM_RANGE(0x0800, 0x0bff) AM_ROM AM_REGION(Z80_TAG, 0)
     AM_RANGE(0x0c00, 0x0c00) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
 */
@@ -723,7 +723,8 @@ SLOT_INTERFACE_END
 
 void mpz80_state::machine_start()
 {
-	m_map_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
+	//FIXME
+	//m_map_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
 }
 
 

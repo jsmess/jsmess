@@ -76,7 +76,8 @@ public:
 		  m_timer_ack(*this, TIMER_ACK_TAG),
 		  m_timer_rst(*this, TIMER_RST_TAG),
 		  m_sasibus(*this, SASIBUS_TAG)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -154,7 +155,7 @@ public:
 	UINT8 m_bank;				// bank register
 
 	// video state
-	UINT8 *m_video_ram;			// video RAM
+	required_shared_ptr<UINT8> m_video_ram; 			// video RAM
 	UINT8 *m_attr_ram;			// attribute RAM
 	UINT8 m_attr;				// attribute latch
 };

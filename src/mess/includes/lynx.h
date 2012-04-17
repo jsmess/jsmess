@@ -96,18 +96,23 @@ class lynx_state : public driver_device
 {
 public:
 	lynx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mem_0000(*this, "mem_0000"),
+		m_mem_fc00(*this, "mem_fc00"),
+		m_mem_fd00(*this, "mem_fd00"),
+		m_mem_fe00(*this, "m_mem_fe00"),
+		m_mem_fffa(*this, "mem_fffa"){ }
 
 	virtual void video_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *m_mem_0000;
-	UINT8 *m_mem_fc00;
-	UINT8 *m_mem_fd00;
-	UINT8 *m_mem_fe00;
-	UINT8 *m_mem_fffa;
-	size_t m_mem_fe00_size;
+	required_shared_ptr<UINT8> m_mem_0000;
+	required_shared_ptr<UINT8> m_mem_fc00;
+	required_shared_ptr<UINT8> m_mem_fd00;
+	required_shared_ptr<UINT8> m_mem_fe00;
+	required_shared_ptr<UINT8> m_mem_fffa;
+//OBRISI.ME
 	UINT16 m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;

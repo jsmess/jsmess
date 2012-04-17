@@ -28,7 +28,9 @@ public:
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ram(*this, RAM_TAG)
-	 { }
+	 ,
+		m_video_ram(*this, "video_ram"),
+		m_char_ram(*this, "char_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -54,8 +56,8 @@ public:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 
-	UINT8 *m_video_ram;
-	UINT8 *m_char_ram;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_char_ram;
 };
 
 #endif /* ACE_H_ */

@@ -51,10 +51,11 @@ public:
 	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	UINT8 *m_p_ram;
+	required_shared_ptr<UINT8> m_p_ram;
 	UINT8 m_pm_reg[0x100];
 	PRC m_prc;
 	TIMERS m_timers;

@@ -28,9 +28,10 @@ class nascom1_state : public driver_device
 {
 public:
 	nascom1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	device_t *m_hd6402;
 	int m_tape_size;
 	UINT8 *m_tape_image;

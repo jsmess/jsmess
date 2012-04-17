@@ -40,7 +40,8 @@ public:
 		  m_trap_int(1),
 		  m_trap_stop(1),
 		  m_trap_aux(1)
-	{ }
+	,
+		m_map_ram(*this, "map_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -74,7 +75,6 @@ public:
 
 	// memory state
 	UINT32 m_addr;
-	UINT8 *m_map_ram;
 	UINT8 m_task;
 	UINT8 m_mask;
 
@@ -96,6 +96,7 @@ public:
 	int m_trap_int;
 	int m_trap_stop;
 	int m_trap_aux;
+	required_shared_ptr<UINT8> m_map_ram;
 };
 
 #endif

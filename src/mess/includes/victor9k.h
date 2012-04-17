@@ -55,7 +55,8 @@ public:
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1),
 		  m_kb(*this, VICTOR9K_KEYBOARD_TAG)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdc_cpu;
@@ -105,7 +106,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
 
 	/* video state */
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	int m_brt;
 	int m_cont;
 

@@ -92,10 +92,12 @@ class lisa_state : public driver_device
 {
 public:
 	lisa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_fdc_rom(*this,"fdc_rom"),
+		m_fdc_ram(*this,"fdc_ram") { }
 
-	UINT8 *m_fdc_rom;
-	UINT8 *m_fdc_ram;
+	required_shared_ptr<UINT8> m_fdc_rom;
+	required_shared_ptr<UINT8> m_fdc_ram;
 	UINT8 *m_ram_ptr;
 	UINT8 *m_rom_ptr;
 	UINT8 *m_videoROM_ptr;

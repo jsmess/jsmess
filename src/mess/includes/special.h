@@ -34,7 +34,8 @@ public:
 	m_dac(*this, "dac"),
 	m_cass(*this, CASSETTE_TAG),
 	m_ram(*this, RAM_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_WRITE8_MEMBER(specimx_select_bank);
 	DECLARE_WRITE8_MEMBER(video_memory_w);
@@ -63,7 +64,6 @@ public:
 	UINT8 m_erik_color_1;
 	UINT8 m_erik_color_2;
 	UINT8 m_erik_background;
-	UINT8 *m_p_videoram;
 	UINT8 m_specimx_color;
 	device_t *m_specimx_audio;
 	int m_specialist_8255_porta;
@@ -77,6 +77,7 @@ public:
 	optional_device<device_t> m_dac;
 	optional_device<cassette_image_device> m_cass;
 	optional_device<ram_device> m_ram;
+	required_shared_ptr<UINT8> m_p_videoram;
 };
 
 

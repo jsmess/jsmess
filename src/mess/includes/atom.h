@@ -48,7 +48,8 @@ public:
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
@@ -76,7 +77,7 @@ public:
 	int m_eprom;
 
 	/* video state */
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 
 	/* keyboard state */
 	int m_keylatch;

@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
 	AM_RANGE(0x8040, 0x8041) AM_READWRITE(counter_r, counter_w)
 	AM_RANGE(0x8050, 0x8050) AM_READWRITE(irq_status_r, irq_mask_w)
 	AM_RANGE(0x8051, 0x8051) AM_READWRITE(battery_r, unknown_w)
-	AM_RANGE(0x8060, 0x8060) AM_RAM AM_BASE(m_contrast)
+	AM_RANGE(0x8060, 0x8060) AM_RAM AM_SHARE("contrast")
 //  AM_RANGE(0x8070, 0x8077) AM_DEVREADWRITE_LEGACY(M82C50A_TAG, ins8250_r, ins8250_w) // Serial Interface
 //  AM_RANGE(0x8078, 0x807b) AM_DEVREADWRITE(M82C55A_TAG, i8255_device, read, write) // Parallel Interface
 	AM_RANGE(0x807c, 0x807c) AM_WRITE(ncc1_w)

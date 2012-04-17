@@ -132,11 +132,11 @@ static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xbfff) AM_RAM
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAM AM_BASE(m_hector_videoram)
+	AM_RANGE(0xc000,0xffff) AM_RAM AM_SHARE("hector_videoram")
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -156,11 +156,11 @@ static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
 	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xbfff) AM_RAM
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_BASE(m_hector_videoram)
+	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_SHARE("hector_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2hrp_io , AS_IO, 8, hec2hrp_state )
@@ -333,7 +333,7 @@ static MACHINE_START( hec2hrx )
 /*************************************************SPECIFIQUE DISK II ***************************/
 
 	// As video HR ram is in bank, use extern memory
-	state->m_hector_videoram  = state->m_hector_videoram_hrx;
+	state->m_hector_videoram.set_target(state->m_hector_videoram_hrx,state->m_hector_videoram.bytes());
 
 	hector_init(machine);
 	hector_disc2_init(machine); // Init of the Disc II !
@@ -360,7 +360,7 @@ static MACHINE_START( hec2mdhrx )
 	/******************************************************SPECIFIQUE Mini disque ***************************/
 
 	// As video HR ram is in bank, use extern memory
-	state->m_hector_videoram  = state->m_hector_videoram_hrx;
+	state->m_hector_videoram.set_target(state->m_hector_videoram_hrx,state->m_hector_videoram.bytes());
 
 	hector_init(machine);
 	hector_minidisc_init(machine);

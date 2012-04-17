@@ -28,7 +28,8 @@ public:
 		  m_beep(*this, BEEPER_TAG),
 		  m_rtc(*this, MC146818_TAG),
 		  m_ram(*this, RAM_TAG)
-		{ }
+		,
+		m_ram_base(*this, "ram_base"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
@@ -53,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER( rtc_data_w );
 	DECLARE_WRITE_LINE_MEMBER( mc146818_irq );
 
-	UINT8 *m_ram_base;
+	required_shared_ptr<UINT8> m_ram_base;
 	UINT8 m_banks_num;
 	UINT8 m_kp_matrix;
 	UINT8 m_lcd_contrast;

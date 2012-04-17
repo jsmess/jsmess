@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( jtc_mem, AS_PROGRAM, 8, jtc_state )
 	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
 	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jtc_es1988_mem, AS_PROGRAM, 8, jtces88_state )
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( jtc_es1988_mem, AS_PROGRAM, 8, jtces88_state )
 	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
 	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8, jtces23_state )
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8, jtces23_state )
 	AM_RANGE(0x700e, 0x700e) AM_MIRROR(0x0ff0) AM_READ_PORT("Y14")
 	AM_RANGE(0x700f, 0x700f) AM_MIRROR(0x0ff0) AM_READ_PORT("Y15")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jtc_es40_mem, AS_PROGRAM, 8, jtces40_state )
@@ -542,14 +542,14 @@ static PALETTE_INIT( jtc_es40 )
 void jtces40_state::video_start()
 {
 	/* allocate memory */
-	m_video_ram = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
+	//m_video_ram = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
 	m_color_ram_r = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
 	m_color_ram_g = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
 	m_color_ram_b = auto_alloc_array(machine(), UINT8, JTC_ES40_VIDEORAM_SIZE);
 
 	/* register for state saving */
 	save_item(NAME(m_video_bank));
-	save_pointer(NAME(m_video_ram), JTC_ES40_VIDEORAM_SIZE);
+	save_pointer(NAME(m_video_ram.target()), JTC_ES40_VIDEORAM_SIZE);
 	save_pointer(NAME(m_color_ram_r), JTC_ES40_VIDEORAM_SIZE);
 	save_pointer(NAME(m_color_ram_g), JTC_ES40_VIDEORAM_SIZE);
 	save_pointer(NAME(m_color_ram_b), JTC_ES40_VIDEORAM_SIZE);

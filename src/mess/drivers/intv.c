@@ -766,7 +766,7 @@ static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )		/* GRAM Alias,     8-bits wide */
 	AM_RANGE(0x4800, 0x6fff) AM_ROM		/* Cartridges? */
 	AM_RANGE(0x7000, 0x7fff) AM_ROM	AM_REGION("maincpu", 0x7000<<1)	/* Keyboard ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE( intvkbd_dualport16_w ) AM_BASE(m_intvkbd_dualport_ram)	/* Dual-port RAM */
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE( intvkbd_dualport16_w ) AM_SHARE("intvkbd_dualport_ram")	/* Dual-port RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intvkbd2_mem , AS_PROGRAM, 8, intv_state)
@@ -774,7 +774,7 @@ static ADDRESS_MAP_START( intvkbd2_mem , AS_PROGRAM, 8, intv_state)
 	AM_RANGE( 0x0000, 0x3fff) AM_READWRITE( intvkbd_dualport8_lsb_r, intvkbd_dualport8_lsb_w )	/* Dual-port RAM */
 	AM_RANGE( 0x4000, 0x7fff) AM_READWRITE( intvkbd_dualport8_msb_r, intvkbd_dualport8_msb_w )	/* Dual-port RAM */
 	AM_RANGE( 0xb7f8, 0xb7ff) AM_RAM	/* ??? */
-	AM_RANGE( 0xb800, 0xbfff) AM_RAM AM_BASE(m_videoram) /* Text Display */
+	AM_RANGE( 0xb800, 0xbfff) AM_RAM AM_SHARE("videoram") /* Text Display */
 	AM_RANGE( 0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

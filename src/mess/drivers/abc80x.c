@@ -425,7 +425,7 @@ WRITE8_MEMBER( abc806_state::mao_w )
 
 static ADDRESS_MAP_START( abc800c_mem, AS_PROGRAM, 8, abc800_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x4000, 0x7bff) AM_ROM
 	AM_RANGE(0x7c00, 0x7fff) AM_DEVREADWRITE_LEGACY(SAA5052_TAG, saa5050_videoram_r, saa5050_videoram_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
@@ -460,9 +460,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800m_mem, AS_PROGRAM, 8, abc800_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x4000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(m_char_ram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("char_ram")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -486,7 +486,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_mem, AS_PROGRAM, 8, abc802_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(m_char_ram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("char_ram")
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -995,12 +995,13 @@ void abc802_state::machine_reset()
 void abc806_state::machine_start()
 {
 	UINT8 *mem = machine().region(Z80_TAG)->base();
-	UINT32 videoram_size = m_ram->size() - (32 * 1024);
+	//UINT32 videoram_size = m_ram->size() - (32 * 1024);
 	int bank;
 	char bank_name[10];
 
 	// setup memory banking
-	m_video_ram = auto_alloc_array(machine(), UINT8, videoram_size);
+	//FIXME
+	//m_video_ram = auto_alloc_array(machine(), UINT8, videoram_size);
 
 	for (bank = 1; bank <= 16; bank++)
 	{

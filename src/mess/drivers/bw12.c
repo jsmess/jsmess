@@ -193,7 +193,7 @@ READ8_MEMBER( bw12_state::ls259_r )
 static ADDRESS_MAP_START( bw12_mem, AS_PROGRAM, 8, bw12_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bw12_io, AS_IO, 8, bw12_state )

@@ -437,7 +437,7 @@ static const pia6821_interface pia_dummy_intf =
 static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8, sb2m600_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
 	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
@@ -447,7 +447,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8, uk101_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xdf00, 0xdf00) AM_MIRROR(0x03ff) AM_READ(keyboard_r) AM_WRITE(keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
@@ -460,8 +460,8 @@ static ADDRESS_MAP_START( c1p_mem, AS_PROGRAM, 8, c1p_state )
 	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE("pia_3", pia6821_device, read, write)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(m_video_ram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE(m_color_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
@@ -480,8 +480,8 @@ static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8, c1pmf_state )
 	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE("pia_3", pia6821_device, read, write)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(m_video_ram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE(m_color_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
@@ -657,7 +657,7 @@ void sb2m600_state::machine_start()
 
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
-	save_pointer(NAME(m_video_ram), OSI600_VIDEORAM_SIZE);
+	save_pointer(NAME(m_video_ram.target()), OSI600_VIDEORAM_SIZE);
 }
 
 void c1p_state::machine_start()
@@ -684,8 +684,8 @@ void c1p_state::machine_start()
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_32));
 	save_item(NAME(m_coloren));
-	save_pointer(NAME(m_video_ram), OSI600_VIDEORAM_SIZE);
-	save_pointer(NAME(m_color_ram), OSI630_COLORRAM_SIZE);
+	save_pointer(NAME(m_video_ram.target()), OSI600_VIDEORAM_SIZE);
+	save_pointer(NAME(m_color_ram.target()), OSI630_COLORRAM_SIZE);
 }
 
 void c1pmf_state::machine_start()

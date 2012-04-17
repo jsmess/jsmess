@@ -107,10 +107,12 @@ class pce_state : public driver_device
 {
 public:
 	pce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_cd_ram(*this, "cd_ram"),
+		m_user_ram(*this, "user_ram"){ }
 
-	unsigned char *m_user_ram;
-	UINT8 *m_cd_ram;
+	required_shared_ptr<UINT8> m_cd_ram;
+	required_shared_ptr<unsigned char> m_user_ram;
 	UINT8 m_io_port_options;
 	UINT8 m_sys3_card;
 	UINT8 m_acard;

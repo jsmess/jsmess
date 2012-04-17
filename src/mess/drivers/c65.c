@@ -79,15 +79,15 @@ static ADDRESS_MAP_START( c65_mem , AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x0dc00, 0x0dfff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x0e000, 0x0ffff) AM_READ_BANK("bank10") AM_WRITE_BANK("bank15")
 	AM_RANGE(0x10000, 0x1f7ff) AM_RAM
-	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_SHARE("colorram")
 
 	AM_RANGE(0x20000, 0x23fff) AM_ROM /* &c65_dos,     maps to 0x8000    */
 	AM_RANGE(0x24000, 0x28fff) AM_ROM /* reserved */
-	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_BASE(m_chargen)
-	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_BASE(m_basic)
-	AM_RANGE(0x2c000, 0x2cfff) AM_ROM AM_BASE(m_interface)
-	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_BASE(m_chargen)
-	AM_RANGE(0x2e000, 0x2ffff) AM_ROM AM_BASE(m_kernal)
+	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_SHARE("chargen")
+	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_SHARE("basic")
+	AM_RANGE(0x2c000, 0x2cfff) AM_ROM AM_SHARE("interface")
+	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_SHARE("chargen")
+	AM_RANGE(0x2e000, 0x2ffff) AM_ROM AM_SHARE("kernal")
 
 	AM_RANGE(0x30000, 0x31fff) AM_ROM /*&c65_monitor,     monitor maps to 0x6000    */
 	AM_RANGE(0x32000, 0x37fff) AM_ROM /*&c65_basic, */

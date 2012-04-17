@@ -11,7 +11,7 @@
 static void draw_mode0_scanline(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 
 	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
 	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
@@ -114,7 +114,7 @@ static void draw_mode0_scanline(running_machine &machine, gba_state *state, int 
 static void draw_mode0_scanline_nowindow(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 	int effect = state->m_BLDCNT & BLDCNT_SFX;
 
 	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
@@ -294,7 +294,7 @@ static void draw_mode0_scanline_nowindow(running_machine &machine, gba_state *st
 static void draw_mode0_scanline_all(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 	int inWindow0 = 0;
 	int inWindow1 = 0;
 	UINT8 inWin0Mask = state->m_WININ & 0x00ff;

@@ -107,7 +107,7 @@ MACHINE_START(llc1)
 DRIVER_INIT(llc2)
 {
 	llc_state *state = machine.driver_data<llc_state>();
-	state->m_video_ram = machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000;
+	state->m_video_ram.set_target( machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000,state->m_video_ram.bytes());
 }
 
 MACHINE_RESET( llc2 )

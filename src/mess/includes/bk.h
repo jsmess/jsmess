@@ -12,10 +12,11 @@ class bk_state : public driver_device
 {
 public:
 	bk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bk0010_video_ram(*this, "bk0010_video_ram"){ }
 
 	UINT16 m_scrool;
-	UINT16 *m_bk0010_video_ram;
+	required_shared_ptr<UINT16> m_bk0010_video_ram;
 	UINT16 m_kbd_state;
 	UINT16 m_key_code;
 	UINT16 m_key_pressed;

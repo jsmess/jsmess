@@ -142,7 +142,7 @@ SCREEN_UPDATE_IND16( macprtb )
 	int y, x, b;
 	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_ram = (const UINT16 *) state->m_vram;
+	video_ram = (const UINT16 *) state->m_vram.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -168,7 +168,7 @@ SCREEN_UPDATE_IND16( macpb140 )
 	int y, x, b;
 	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_ram = (const UINT16 *) state->m_vram;
+	video_ram = (const UINT16 *) state->m_vram.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -192,7 +192,7 @@ SCREEN_UPDATE_IND16( macpb160 )
 	int y, x;
 	UINT8 pixels;
 	mac_state *state = screen.machine().driver_data<mac_state>();
-	UINT8 *vram8 = (UINT8 *)state->m_vram;
+	UINT8 *vram8 = (UINT8 *)state->m_vram.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -526,7 +526,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 	{
 		case 0:	// 1bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 
 			if (mac->m_rbv_type == RBV_TYPE_SONORA)
@@ -574,7 +574,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 1:	// 2bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
@@ -595,7 +595,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 2: // 4bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
@@ -615,7 +615,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 3: // 8bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 
 			if (mac->m_rbv_type == RBV_TYPE_SONORA)
@@ -879,7 +879,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 	{
 		case 0:	// 1bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 			vram8 += mac->m_dafb_base;
 
@@ -905,7 +905,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 1:	// 2bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 			vram8 += mac->m_dafb_base;
 
@@ -927,7 +927,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 2: // 4bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 			vram8 += mac->m_dafb_base;
 
@@ -948,7 +948,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 3: // 8bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 			vram8 += mac->m_dafb_base;
 
@@ -988,7 +988,7 @@ SCREEN_UPDATE_RGB32( macpbwd )    /* Color PowerBooks using an off-the-shelf WD 
 	UINT32 *scanline;
 	int x, y;
 	mac_state *mac = screen.machine().driver_data<mac_state>();
-    UINT8 *vram8 = (UINT8 *)mac->m_vram;
+    UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
     UINT8 pixels;
 
 //    vram8 += 0x40000;

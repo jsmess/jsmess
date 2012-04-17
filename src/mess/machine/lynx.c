@@ -1976,7 +1976,7 @@ MACHINE_START( lynx )
 
 	int i;
 	state->save_item(NAME(state->m_memory_config));
-	state->save_pointer(NAME(state->m_mem_fe00), state->m_mem_fe00_size);
+	state->save_pointer(NAME(state->m_mem_fe00.target()), state->m_mem_fe00.bytes());
 	machine.save().register_postload(save_prepost_delegate(FUNC(lynx_postload), state));
 
 	memory_configure_bank(machine, "bank3", 0, 1, machine.region("maincpu")->base() + 0x0000, 0);

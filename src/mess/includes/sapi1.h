@@ -11,9 +11,10 @@ class sapi1_state : public driver_device
 {
 public:
 	sapi1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sapi_video_ram(*this, "sapi_video_ram"){ }
 
-	UINT8* m_sapi_video_ram;
+	required_shared_ptr<UINT8> m_sapi_video_ram;
 	UINT8 m_keyboard_mask;
 	UINT8 m_refresh_counter;
 	UINT8 m_zps3_25;
