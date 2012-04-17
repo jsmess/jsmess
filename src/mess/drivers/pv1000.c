@@ -44,7 +44,7 @@ public:
 
 static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8, pv1000_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_MIRROR( 0x4000 ) AM_ROM AM_REGION( "cart", 0 )
-	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE(m_p_videoram )
+	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM_WRITE( pv1000_gfxram_w ) AM_REGION( "gfxram", 0 )
 ADDRESS_MAP_END
 

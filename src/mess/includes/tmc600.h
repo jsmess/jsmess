@@ -30,7 +30,8 @@ public:
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_vis(*this, CDP1869_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_page_ram(*this, "page_ram")
 	 { }
 
 	required_device<cosmac_device> m_maincpu;
@@ -59,7 +60,7 @@ public:
 	int m_vismac_bkg_latch;		// background color latch
 	int m_blink;				// cursor blink
 
-	UINT8 *m_page_ram;			// page memory
+	required_shared_ptr<UINT8> m_page_ram;			// page memory
 	UINT8 *m_color_ram;			// color memory
 	UINT8 *m_char_rom;			// character generator ROM
 
