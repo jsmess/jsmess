@@ -112,7 +112,6 @@ public:
 	required_shared_ptr<UINT8> m_mem_fd00;
 	required_shared_ptr<UINT8> m_mem_fe00;
 	required_shared_ptr<UINT8> m_mem_fffa;
-//OBRISI.ME
 	UINT16 m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;
