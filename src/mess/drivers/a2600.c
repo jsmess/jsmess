@@ -66,6 +66,13 @@ public:
 	unsigned m_FVlocked;
 	UINT16 m_current_screen_height;
 	int m_FETimer;
+
+	direct_update_delegate m_FE_old_opbase_handler;
+	
+	DECLARE_DIRECT_UPDATE_MEMBER(modeF6_opbase);
+	DECLARE_DIRECT_UPDATE_MEMBER(modeSS_opbase);
+	DECLARE_DIRECT_UPDATE_MEMBER(modeDPC_opbase_handler);
+	DECLARE_DIRECT_UPDATE_MEMBER(modeFE_opbase_handler);	
 };
 
 
@@ -741,27 +748,26 @@ static WRITE8_HANDLER(modeJVP_switch_w)
 }
 
 
-DIRECT_UPDATE_HANDLER( modeF6_opbase )
+DIRECT_UPDATE_MEMBER(a2600_state::modeF6_opbase)
 {
 	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 )
 	{
-		modeF6_switch_w( machine.device("maincpu")->memory().space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
+		modeF6_switch_w( machine().device("maincpu")->memory().space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
 	}
 	return address;
 }
 
-DIRECT_UPDATE_HANDLER( modeSS_opbase )
+DIRECT_UPDATE_MEMBER(a2600_state::modeSS_opbase)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	if ( address & 0x1000 )
 	{
 		if ( address & 0x800 )
 		{
-			direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, state->m_bank_base[2]);
+			direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, m_bank_base[2]);
 		}
 		else
 		{
-			direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, state->m_bank_base[1]);
+			direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, m_bank_base[1]);
 		}
 		return ~0;
 	}
@@ -936,14 +942,13 @@ static TIMER_CALLBACK(modeDPC_timer_callback)
 	}
 }
 
-DIRECT_UPDATE_HANDLER(modeDPC_opbase_handler)
+DIRECT_UPDATE_MEMBER(a2600_state::modeDPC_opbase_handler)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	UINT8	new_bit;
-	new_bit = ( state->m_dpc.shift_reg & 0x80 ) ^ ( ( state->m_dpc.shift_reg & 0x20 ) << 2 );
-	new_bit = new_bit ^ ( ( ( state->m_dpc.shift_reg & 0x10 ) << 3 ) ^ ( ( state->m_dpc.shift_reg & 0x08 ) << 4 ) );
+	new_bit = ( m_dpc.shift_reg & 0x80 ) ^ ( ( m_dpc.shift_reg & 0x20 ) << 2 );
+	new_bit = new_bit ^ ( ( ( m_dpc.shift_reg & 0x10 ) << 3 ) ^ ( ( m_dpc.shift_reg & 0x08 ) << 4 ) );
 	new_bit = new_bit ^ 0x80;
-	state->m_dpc.shift_reg = new_bit | ( state->m_dpc.shift_reg >> 1 );
+	m_dpc.shift_reg = new_bit | ( m_dpc.shift_reg >> 1 );
 	return address;
 }
 
@@ -1085,25 +1090,23 @@ depending on last byte & 0x20 -> 0x00 -> switch to bank #1
 
  */
 
-direct_update_delegate FE_old_opbase_handler;
 
-DIRECT_UPDATE_HANDLER(modeFE_opbase_handler)
+DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
-	if ( ! state->m_FETimer )
+	if ( ! m_FETimer )
 	{
 		/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
            cpu should be the last byte that was on the data bus and so should determine the bank
            we should switch in. */
-		state->m_bank_base[1] = machine.region("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
-		memory_set_bankptr(machine, "bank1", state->m_bank_base[1] );
+		m_bank_base[1] = machine().region("user1")->base() + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
+		memory_set_bankptr(machine(), "bank1", m_bank_base[1] );
 		/* and restore old opbase handler */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(FE_old_opbase_handler);
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(m_FE_old_opbase_handler);
 	}
 	else
 	{
 		/* Wait for one memory access to have passed (reading of new PCH either from code or from stack) */
-		state->m_FETimer--;
+		m_FETimer--;
 	}
 	return address;
 }
@@ -1116,7 +1119,7 @@ static void modeFE_switch(running_machine &machine,UINT16 offset, UINT8 data)
        should be the last byte that was on the data bus
     */
 	state->m_FETimer = 1;
-	FE_old_opbase_handler = space->set_direct_update_handler(direct_update_delegate(FUNC(modeFE_opbase_handler), &machine));
+	state->m_FE_old_opbase_handler = space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeFE_opbase_handler), state));
 }
 
 static READ8_HANDLER(modeFE_switch_r)
@@ -1907,7 +1910,7 @@ static MACHINE_RESET( a2600 )
 	case modeF6:
 		space->install_legacy_write_handler(0x1ff6, 0x1ff9, FUNC(modeF6_switch_w));
 		space->install_legacy_read_handler(0x1ff6, 0x1ff9, FUNC(modeF6_switch_r));
-		space->set_direct_update_handler(direct_update_delegate(FUNC(modeF6_opbase), &machine));
+		space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeF6_opbase), state));
 		break;
 
 	case modeF4:
@@ -1962,7 +1965,7 @@ static MACHINE_RESET( a2600 )
 		memory_set_bankptr(machine, "bank2", state->m_bank_base[2] );
 		state->m_modeSS_write_enabled = 0;
 		state->m_modeSS_byte_started = 0;
-		space->set_direct_update_handler(direct_update_delegate(FUNC(modeSS_opbase), &machine));
+		space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeSS_opbase), state));
 		/* The Supercharger has no motor control so just enable it */
 		machine.device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
@@ -1977,7 +1980,7 @@ static MACHINE_RESET( a2600 )
 		space->install_legacy_write_handler(0x1040, 0x107f, FUNC(modeDPC_w));
 		space->install_legacy_write_handler(0x1ff8, 0x1ff9, FUNC(modeF8_switch_w));
 		space->install_legacy_read_handler(0x1ff8, 0x1ff9, FUNC(modeF8_switch_r));
-		space->set_direct_update_handler(direct_update_delegate(FUNC(modeDPC_opbase_handler), &machine));
+		space->set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeDPC_opbase_handler), state));
 		{
 			int	data_fetcher;
 			for( data_fetcher = 0; data_fetcher < 8; data_fetcher++ )
