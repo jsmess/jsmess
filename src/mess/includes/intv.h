@@ -37,7 +37,7 @@ public:
 	m_sound(*this, "ay8914.1"),
 	m_ecs_sound(*this, "ay8914.2")
 		 ,
-		m_intvkbd_dualport_ram(*this, "intvkbd_dualport_ram"),
+		m_intvkbd_dualport_ram(*this, "dualport_ram"),
 		m_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
