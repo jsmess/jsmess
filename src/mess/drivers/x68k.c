@@ -1965,8 +1965,8 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE_LEGACY(x68k_rom0_r, x68k_rom0_w)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
 //  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE_LEGACY(x68k_crtc_r, x68k_crtc_w)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE_LEGACY(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE_LEGACY(x68k_dmac_r, x68k_dmac_w)
@@ -2002,8 +2002,8 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE_LEGACY(x68k_rom0_r, x68k_rom0_w)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
 //  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE_LEGACY(x68k_crtc_r, x68k_crtc_w)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE_LEGACY(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE_LEGACY(x68k_dmac_r, x68k_dmac_w)
@@ -2041,8 +2041,8 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16_LEGACY(x68k_rom0_r, x68k_rom0_w,0xffffffff)
 //  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
 //  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16_LEGACY(x68k_crtc_r, x68k_crtc_w,0xffffffff)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE16_LEGACY(x68k_vid_r, x68k_vid_w,0xffffffff)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE16_LEGACY(x68k_dmac_r, x68k_dmac_w,0xffffffff)
@@ -2703,8 +2703,8 @@ static DRIVER_INIT( x68000 )
 	unsigned char* rom = machine.region("maincpu")->base();
 	unsigned char* user2 = machine.region("user2")->base();
 	//FIXME
-	//state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
-	//state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
+//	state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
+//	state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
 	state->m_sram = auto_alloc_array(machine, UINT16, 0x4000/sizeof(UINT16));
 
 	state->m_spritereg = auto_alloc_array_clear(machine, UINT16, 0x8000/sizeof(UINT16));
