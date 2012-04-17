@@ -1544,7 +1544,7 @@ static WRITE16_HANDLER( x68k_sram_w )
 
 	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(state->m_nvram + offset);
+		state->m_nvram[offset] = data;
 	}
 }
 
@@ -1569,7 +1569,7 @@ static READ16_HANDLER( x68k_sram_r )
 
 static READ32_HANDLER( x68k_sram32_r )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68030_state *state = space->machine().driver_data<x68030_state>();
 	if(offset == 0x08/4)
 		return (space->machine().device<ram_device>(RAM_TAG)->size() & 0xffff0000);  // RAM size
 #if 0
@@ -1585,7 +1585,7 @@ static READ32_HANDLER( x68k_sram32_r )
 
 static WRITE32_HANDLER( x68k_sram32_w )
 {
-	x68k_state *state = space->machine().driver_data<x68k_state>();
+	x68030_state *state = space->machine().driver_data<x68030_state>();
 	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
 		COMBINE_DATA(state->m_nvram + offset);
@@ -2669,16 +2669,13 @@ static MACHINE_START( x68000 )
 static MACHINE_START( x68030 )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	x68k_state *state = machine.driver_data<x68k_state>();
+	x68030_state *state = machine.driver_data<x68030_state>();
 	/*  Install RAM handlers  */
 	state->m_spriteram = (UINT16*)(*machine.region("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_w),0xffffffff);
 	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
-	space->install_readwrite_bank(0x3000000,0x3000000+machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank5");
 	memory_set_bankptr(machine, "bank1",machine.device<ram_device>(RAM_TAG)->pointer());
-	memory_set_bankptr(machine, "bank5",machine.device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
 	memory_set_bankptr(machine, "bank2",state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
@@ -2756,7 +2753,7 @@ static DRIVER_INIT( x68030 )
 	state->m_sysport.cputype = 0xdc; // 68030, 25MHz
 }
 
-static MACHINE_CONFIG_START( x68000_base, x68k_state )
+static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
@@ -2804,8 +2801,6 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
 	MCFG_UPD72065_ADD("upd72065", fdc_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x68k_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
@@ -2818,13 +2813,16 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68000, x68000_base )
+static MACHINE_CONFIG_START( x68000, x68k_state )
+	MCFG_FRAGMENT_ADD(x68000_base)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_X68KHDC_ADD( "x68k_hdc" )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68kxvi, x68000_base )
+static MACHINE_CONFIG_DERIVED( x68kxvi, x68000 )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
@@ -2840,13 +2838,16 @@ static MACHINE_CONFIG_DERIVED( x68kxvi, x68000_base )
 	MCFG_HARDDISK_ADD("harddisk6")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68030, x68000_base )
+static MACHINE_CONFIG_START( x68030, x68030_state )
+	MCFG_FRAGMENT_ADD(x68000_base)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MCFG_CPU_PROGRAM_MAP(x68030_map)
 
 	MCFG_MACHINE_START( x68030 )
 	MCFG_MACHINE_RESET( x68000 )
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
 	MCFG_HARDDISK_ADD("harddisk0")
