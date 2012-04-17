@@ -37,7 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(asp_port_b_r);
 	DECLARE_WRITE8_MEMBER(asp_port_a_w);
 	DECLARE_WRITE8_MEMBER(asp_port_b_w);
-	required_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<UINT8> m_p_videoram;
 };
 
 

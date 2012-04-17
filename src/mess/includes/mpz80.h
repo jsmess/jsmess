@@ -39,8 +39,7 @@ public:
 		  m_trap_halt(1),
 		  m_trap_int(1),
 		  m_trap_stop(1),
-		  m_trap_aux(1)
-	,
+		  m_trap_aux(1),
 		m_map_ram(*this, "map_ram"){ }
 
 	required_device<cpu_device> m_maincpu;

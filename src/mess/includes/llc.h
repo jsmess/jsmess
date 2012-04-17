@@ -17,7 +17,7 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_video_ram(*this, "video_ram"){ }
 
-	required_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<UINT8> m_video_ram;
 	UINT8 m_s_code;
 	UINT8 m_llc1_key_state;
 };

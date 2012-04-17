@@ -74,8 +74,8 @@ public:
 		  m_videoram(*this,"videoram"),
 		  m_hector_videoram(*this,"hector_videoram") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_hector_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_hector_videoram;
 	UINT8 m_hector_flag_hr;
 	UINT8 m_hector_flag_80c;
 	UINT8 m_hector_color[4];
