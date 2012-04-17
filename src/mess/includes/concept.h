@@ -34,9 +34,10 @@ class concept_state : public driver_device
 {
 public:
 	concept_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_videoram(*this,"videoram") { }
 
-	UINT16 *m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
 	UINT8 m_pending_interrupts;
 	char m_clock_enable;
 	char m_clock_address;

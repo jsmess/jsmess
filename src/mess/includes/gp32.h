@@ -86,11 +86,12 @@ class gp32_state : public driver_device
 {
 public:
 	gp32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_s3c240x_ram(*this, "s3c240x_ram"){ }
 
 	virtual void video_start();
 
-	UINT32 *m_s3c240x_ram;
+	required_shared_ptr<UINT32> m_s3c240x_ram;
 	UINT8 *m_eeprom_data;
 	UINT32 m_s3c240x_lcd_regs[0x400/4];
 	emu_timer *m_s3c240x_lcd_timer;

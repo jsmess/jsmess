@@ -20,7 +20,7 @@ static ADDRESS_MAP_START(llc1_mem, AS_PROGRAM, 8, llc_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0800, 0x13ff) AM_ROM // BASIC ROM
 	AM_RANGE(0x1400, 0x1bff) AM_RAM // RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE(m_video_ram) // Video RAM
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_SHARE("video_ram") // Video RAM
 	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 

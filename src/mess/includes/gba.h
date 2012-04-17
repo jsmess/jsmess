@@ -137,8 +137,15 @@ class gba_state : public driver_device
 {
 public:
 	gba_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
+		: driver_device(mconfig, type, tag),
+		m_gba_pram(*this, "gba_pram"),
+		m_gba_vram(*this, "gba_vram"),
+		m_gba_oam(*this, "gba_oam") { }
+	
+	required_shared_ptr<UINT32> m_gba_pram;
+	required_shared_ptr<UINT32> m_gba_vram;
+	required_shared_ptr<UINT32> m_gba_oam;
+	
 	virtual void video_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -180,9 +187,7 @@ public:
 	INT32  m_gfxBG3X;
 	INT32  m_gfxBG3Y;
 
-	UINT32 *m_gba_pram;
-	UINT32 *m_gba_vram;
-	UINT32 *m_gba_oam;
+
 
 	UINT32 m_dma_regs[16];
 	UINT32 m_dma_src[4], m_dma_dst[4], m_dma_cnt[4], m_dma_srcadd[4], m_dma_dstadd[4];

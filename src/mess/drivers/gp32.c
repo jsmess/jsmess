@@ -102,7 +102,7 @@ static UINT32 s3c240x_lcd_dma_read( running_machine &machine)
 	int i;
 	for (i = 0; i < 2; i++)
 	{
-		vram = (UINT8 *)state->m_s3c240x_ram + state->m_s3c240x_lcd.vramaddr_cur - 0x0C000000;
+		vram = (UINT8 *)state->m_s3c240x_ram.target() + state->m_s3c240x_lcd.vramaddr_cur - 0x0C000000;
 		data[i*2+0] = vram[0];
 		data[i*2+1] = vram[1];
 		state->m_s3c240x_lcd.vramaddr_cur += 2;
@@ -1763,7 +1763,7 @@ static void s3c240x_machine_reset( running_machine &machine)
 
 static ADDRESS_MAP_START( gp32_map, AS_PROGRAM, 32, gp32_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_BASE(m_s3c240x_ram)
+	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_SHARE("s3c240x_ram")
 	AM_RANGE(0x14000000, 0x1400003b) AM_READWRITE_LEGACY(s3c240x_memcon_r, s3c240x_memcon_w)
 	AM_RANGE(0x14200000, 0x1420005b) AM_READWRITE_LEGACY(s3c240x_usb_host_r, s3c240x_usb_host_w)
 	AM_RANGE(0x14400000, 0x14400017) AM_READWRITE_LEGACY(s3c240x_irq_r, s3c240x_irq_w)

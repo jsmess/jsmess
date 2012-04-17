@@ -20,7 +20,7 @@ static ADDRESS_MAP_START(poly88_mem, AS_PROGRAM, 8, poly88_state )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM // System Expansion area
 	AM_RANGE(0x2000, 0x3fff) AM_RAM // Minimal user RAM area
 	AM_RANGE(0x4000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_BASE(m_video_ram) // Video RAM
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("video_ram") // Video RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poly88_io, AS_IO, 8, poly88_state )
@@ -38,7 +38,7 @@ static ADDRESS_MAP_START(poly8813_mem, AS_PROGRAM, 8, poly88_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM // Monitor ROM
 	AM_RANGE(0x0400, 0x0bff) AM_ROM // Disk System ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM // System RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_BASE(m_video_ram) // Video RAM
+	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_SHARE("video_ram") // Video RAM
 	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 

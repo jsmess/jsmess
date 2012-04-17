@@ -11,7 +11,7 @@
 static void draw_mode2_scanline(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 
 	draw_roz_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
 	draw_roz_scanline(state, line3, y, DISPCNT_BG3_EN, state->m_BG3CNT, state->m_BG3X, state->m_BG3Y, state->m_BG3PA, state->m_BG3PB, state->m_BG3PC, state->m_BG3PD, &state->m_gfxBG3X, &state->m_gfxBG3Y, state->m_gfxBG3Changed);
@@ -90,7 +90,7 @@ static void draw_mode2_scanline(running_machine &machine, gba_state *state, int 
 static void draw_mode2_scanline_nowindow(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 	int effect = state->m_BLDCNT & BLDCNT_SFX;
 
 	draw_roz_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
@@ -228,7 +228,7 @@ static void draw_mode2_scanline_nowindow(running_machine &machine, gba_state *st
 static void draw_mode2_scanline_all(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 	int inWindow0 = 0;
 	int inWindow1 = 0;
 	UINT8 inWin0Mask = state->m_WININ & 0x00ff;

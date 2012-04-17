@@ -33,7 +33,8 @@ public:
 		  m_atn(1),
 		  m_rxrdy(0),
 		  m_txrdy(0)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_fdc;
@@ -98,7 +99,7 @@ public:
 	// video state
 	int m_alt;
 	int m_256;
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	const UINT8 *m_sync_rom;
 	const UINT8 *m_char_rom;
 };

@@ -47,7 +47,7 @@ READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }	/* to bypass unemul
 
 static ADDRESS_MAP_START( kaypro_map, AS_PROGRAM, 8, kaypro_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0x0000)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_BASE(m_p_videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_REGION("maincpu", 0x3000) AM_SHARE("p_videoram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
 ADDRESS_MAP_END
 

@@ -94,7 +94,7 @@ READ8_MEMBER( amu880_state::keyboard_r )
 static ADDRESS_MAP_START( amu880_mem, AS_PROGRAM, 8, amu880_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xf000, 0xfbff) AM_ROM
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END

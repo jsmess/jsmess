@@ -29,8 +29,8 @@ static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
 	AM_RANGE( 0x4000, 0x5FFF )  AM_ROMBANK("bank2")                                   /* External ROM/Flash. Controlled by MMU2 */
 	AM_RANGE( 0x6000, 0x7FFF )  AM_ROMBANK("bank3")                                   /* External ROM/Flash. Controlled by MMU3 */
 	AM_RANGE( 0x8000, 0x9FFF )  AM_ROMBANK("bank4")                                   /* External ROM/Flash. Controlled by MMU4 */
-	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_BASE(m_p_videoram)			  /* VRAM */
-	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_BASE(m_p_nvram) AM_SHARE("nvram")           /* Extended I/O, Extended RAM */
+	AM_RANGE( 0xA000, 0xDFFF )  AM_RAM AM_SHARE("p_videoram")			  /* VRAM */
+	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_SHARE("p_nvram") AM_SHARE("nvram")           /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 
 static const SM8500_CONFIG gamecom_cpu_config = {

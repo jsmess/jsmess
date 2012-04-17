@@ -233,8 +233,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, visicom_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_BASE(m_color_ram)
-	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_BASE(m_color_ram1)
+	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_SHARE("color_ram")
+	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_SHARE("color_ram1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_io_map, AS_IO, 8, visicom_state )
@@ -245,7 +245,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mpt02_map, AS_PROGRAM, 8, mpt02_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
-	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_BASE(m_color_ram)
+	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 

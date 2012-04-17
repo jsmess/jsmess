@@ -435,7 +435,7 @@ static READ8_HANDLER ( spectrum_port_ula_r )
 
 static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_SHARE("video_ram")
 //  AM_RANGE(0x5b00, 0x7fff) AM_RAM
 //  AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END

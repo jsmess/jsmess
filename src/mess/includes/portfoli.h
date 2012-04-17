@@ -35,7 +35,8 @@ public:
 		  m_uart(*this, M82C50A_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_timer_tick(*this, TIMER_TICK_TAG)
-	{ }
+	,
+		m_contrast(*this, "contrast"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
@@ -79,7 +80,7 @@ public:
 	UINT8 m_keylatch;
 
 	/* video state */
-	UINT8 m_contrast;
+	required_shared_ptr<UINT8> m_contrast;
 
 	/* peripheral state */
 	UINT8 m_pid;						/* peripheral identification */

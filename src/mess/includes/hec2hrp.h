@@ -70,10 +70,12 @@ class hec2hrp_state : public driver_device
 {
 public:
 	hec2hrp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this,"videoram"),
+		  m_hector_videoram(*this,"hector_videoram") { }
 
-	UINT8 *m_videoram;
-	UINT8 *m_hector_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_hector_videoram;
 	UINT8 m_hector_flag_hr;
 	UINT8 m_hector_flag_80c;
 	UINT8 m_hector_color[4];

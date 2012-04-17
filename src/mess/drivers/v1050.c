@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_crt_mem, AS_PROGRAM, 8, v1050_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(videoram_r, videoram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(videoram_r, videoram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(H46505_TAG, mc6845_device, address_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE(H46505_TAG, mc6845_device, register_r, register_w)
 	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE(I8255A_M6502_TAG, i8255_device, read, write)

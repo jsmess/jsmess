@@ -260,8 +260,8 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 static ADDRESS_MAP_START( tandy2k_mem, AS_PROGRAM, 16, tandy2k_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xe0000, 0xf7fff) AM_RAM AM_BASE(m_hires_ram)
-	AM_RANGE(0xf8000, 0xfbfff) AM_RAM AM_BASE(m_char_ram)
+	AM_RANGE(0xe0000, 0xf7fff) AM_RAM AM_SHARE("hires_ram")
+	AM_RANGE(0xf8000, 0xfbfff) AM_RAM AM_SHARE("char_ram")
 	AM_RANGE(0xfc000, 0xfdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 

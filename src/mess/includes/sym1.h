@@ -24,13 +24,18 @@ class sym1_state : public driver_device
 {
 public:
 	sym1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram_1k(*this, "ram_1k"),
+		m_ram_2k(*this, "ram_2k"),
+		m_ram_3k(*this, "ram_3k"),
+		m_monitor(*this, "monitor"),
+		m_riot_ram(*this, "riot_ram"){ }
 
-	UINT8 *m_ram_1k;
-	UINT8 *m_ram_2k;
-	UINT8 *m_ram_3k;
-	UINT8 *m_riot_ram;
-	UINT8 *m_monitor;
+	required_shared_ptr<UINT8> m_ram_1k;
+	required_shared_ptr<UINT8> m_ram_2k;
+	required_shared_ptr<UINT8> m_ram_3k;
+	required_shared_ptr<UINT8> m_monitor;
+	required_shared_ptr<UINT8> m_riot_ram;
 	UINT8 m_riot_port_a;
 	UINT8 m_riot_port_b;
 	emu_timer *m_led_update;

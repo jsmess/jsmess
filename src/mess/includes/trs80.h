@@ -33,7 +33,8 @@ public:
 	m_fdc(*this, "wd179x"),
 	m_speaker(*this, SPEAKER_TAG),
 	m_cass(*this, CASSETTE_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<centronics_device> m_printer;
@@ -80,7 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER( trs80_gfxram_w );
 	DECLARE_READ8_MEMBER (trs80_wd179x_r);
 	const UINT8 *m_p_chargen;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_gfxram;
 	UINT8 m_model4;
 	UINT8 m_mode;

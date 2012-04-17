@@ -36,13 +36,16 @@ public:
 	m_intellivoice(*this, "sp0256_speech"),
 	m_sound(*this, "ay8914.1"),
 	m_ecs_sound(*this, "ay8914.2")
-		 { }
+		 ,
+		m_intvkbd_dualport_ram(*this, "intvkbd_dualport_ram"),
+		m_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_intellivoice;
 	required_device<device_t> m_sound;
 	optional_device<device_t> m_ecs_sound;
-
+	required_shared_ptr<UINT16> m_intvkbd_dualport_ram;
+	required_shared_ptr<UINT8> m_videoram;
 
 
 	DECLARE_READ16_MEMBER(intv_stic_r);
@@ -61,7 +64,7 @@ public:
 	DECLARE_READ8_MEMBER( intv_left_control_r );
 
 	bitmap_ind16 m_bitmap;
-	UINT8 *m_videoram;
+
 	intv_sprite_type m_sprite[STIC_MOBS];
 	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH*2][STIC_CARD_HEIGHT*4*2*2];
 	UINT16 m_backtab_buffer[STIC_BACKTAB_HEIGHT][STIC_BACKTAB_WIDTH];
@@ -116,7 +119,6 @@ public:
 	UINT8 m_tms9927_last_row;
 
 	int m_intvkbd_text_blanked;
-	UINT16 *m_intvkbd_dualport_ram;
 	int m_intvkbd_keyboard_col;
 	int m_tape_int_pending;
 	int m_tape_interrupts_enabled;

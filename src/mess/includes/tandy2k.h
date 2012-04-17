@@ -58,7 +58,9 @@ public:
 		  m_floppy1(*this, FLOPPY_1),
 		  m_kb(*this, TANDY2K_KEYBOARD_TAG),
 		  m_kbdclk(0)
-	{ }
+	,
+		m_hires_ram(*this, "hires_ram"),
+		m_char_ram(*this, "char_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
@@ -123,8 +125,8 @@ public:
 	int m_pb_sel;
 
 	/* video state */
-	UINT16 *m_char_ram;
-	UINT16 *m_hires_ram;
+	required_shared_ptr<UINT16> m_hires_ram;
+	required_shared_ptr<UINT16> m_char_ram;
 	UINT16 m_palette[16];
 	UINT8 m_vram_base;
 	int m_vidouts;

@@ -79,7 +79,7 @@ WRITE8_MEMBER( tmc2000e_state::keyboard_latch_w )
 static ADDRESS_MAP_START( tmc2000e_map, AS_PROGRAM, 8, tmc2000e_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_BASE(m_colorram)
+	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000e_io_map, AS_IO, 8, tmc2000e_state )
@@ -211,10 +211,11 @@ static COSMAC_INTERFACE( tmc2000e_config )
 void tmc2000e_state::machine_start()
 {
 	/* allocate color RAM */
-	m_colorram = auto_alloc_array(machine(), UINT8, TMC2000E_COLORRAM_SIZE);
+	//FIXME
+	//m_colorram = auto_alloc_array(machine(), UINT8, TMC2000E_COLORRAM_SIZE);
 
 	/* register for state saving */
-	save_pointer(NAME(m_colorram), TMC2000E_COLORRAM_SIZE);
+	save_pointer(NAME(m_colorram.target()), TMC2000E_COLORRAM_SIZE);
 	save_item(NAME(m_cdp1864_efx));
 	save_item(NAME(m_keylatch));
 }

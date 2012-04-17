@@ -79,8 +79,9 @@ public:
 		  m_dart(*this, Z80DART_TAG),
 		  m_sio(*this, Z80SIO_TAG),
 		  m_discrete(*this, "discrete"),
-		  m_ram(*this, RAM_TAG)
-	{ }
+		  m_ram(*this, RAM_TAG),
+		m_video_ram(*this, "video_ram"),
+		m_char_ram(*this, "char_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -112,8 +113,8 @@ public:
 	int m_fetch_charram;			// opcode fetched from character RAM region (0x7800-0x7fff)
 
 	// video state
-	UINT8 *m_char_ram;				// character RAM
-	UINT8 *m_video_ram;				// HR video RAM
+	required_shared_ptr<UINT8> m_video_ram; 				// HR video RAM
+	required_shared_ptr<UINT8> m_char_ram; 				// character RAM
 	const UINT8 *m_char_rom;		// character generator ROM
 	const UINT8 *m_fgctl_prom;		// foreground control PROM
 	UINT8 m_hrs;					// HR picture start scanline

@@ -49,8 +49,9 @@ public:
 		  m_floppy0(*this, FLOPPY_0),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ctc_int(CLEAR_LINE),
-		  m_sio_int(CLEAR_LINE)
-	{ }
+		  m_sio_int(CLEAR_LINE),
+		  m_p_scrollram(*this, "p_scrollram"),
+		  m_p_paletteram(*this, "p_paletteram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -58,6 +59,10 @@ public:
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_floppy0;
 	required_device<centronics_device> m_centronics;
+	int m_ctc_int;
+	int m_sio_int;
+	required_shared_ptr<UINT16> m_p_scrollram;
+	required_shared_ptr<UINT16> m_p_paletteram;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -69,11 +74,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 
-	int m_ctc_int;
-	int m_sio_int;
-
-	UINT16 *m_p_paletteram;
-	UINT16 *m_p_scrollram;
 	int m_40_80;
 	int m_200_256;
 };

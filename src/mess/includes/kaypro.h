@@ -26,7 +26,8 @@ public:
 	m_fdc(*this, "wd1793"),
 	m_crtc(*this, "crtc"),
 	m_beep(*this, BEEPER_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<device_t> m_pio_g;
@@ -57,7 +58,7 @@ public:
 	DECLARE_READ8_MEMBER(kaypro_videoram_r);
 	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
 	const UINT8 *m_p_chargen;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_system_port;
 	UINT8 m_mc6845_cursor[16];
 	UINT8 m_mc6845_reg[32];

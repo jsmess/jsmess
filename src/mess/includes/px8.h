@@ -32,11 +32,14 @@ public:
 		  m_maincpu(*this, UPD70008_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	/* video state */
+	required_shared_ptr<UINT8> m_video_ram; 		/* LCD video RAM */
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -74,9 +77,6 @@ public:
 
 	/* keyboard state */
 	int m_ksc;				/* keyboard scan column */
-
-	/* video state */
-	UINT8 *m_video_ram;		/* LCD video RAM */
 };
 
 #endif

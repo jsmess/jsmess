@@ -1098,7 +1098,7 @@ static void dgnbeta_reset(running_machine &machine)
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	state->m_videoram = machine.device<ram_device>(RAM_TAG)->pointer();		/* Point video ram at the start of physical ram */
+	state->m_videoram.set_target(machine.device<ram_device>(RAM_TAG)->pointer(),state->m_videoram.bytes());		/* Point video ram at the start of physical ram */
 
     wd17xx_reset(fdc);
     state->m_wd2797_written=0;

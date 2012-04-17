@@ -102,9 +102,13 @@ class fm7_state : public driver_device
 {
 public:
 	fm7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_shared_ram(*this, "shared_ram"),
+		m_boot_ram(*this, "boot_ram"){ }
 
-	UINT8* m_boot_ram;
+	required_shared_ptr<UINT8> m_shared_ram;
+	required_shared_ptr<UINT8> m_boot_ram;
+	
 	UINT8 m_irq_flags;
 	UINT8 m_irq_mask;
 	emu_timer* m_timer;
@@ -132,7 +136,6 @@ public:
 	fm7_mmr_t m_mmr;
 	UINT8 m_cp_prev;
 	UINT8* m_video_ram;
-	UINT8* m_shared_ram;
 	emu_timer* m_fm77av_vsync_timer;
 	UINT8 m_type;
 	fm7_video_t m_video;

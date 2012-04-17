@@ -86,10 +86,12 @@ class dgn_beta_state : public driver_device
 public:
 	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_mc6845(*this, "crtc")
-		{ }
+		  m_mc6845(*this, "crtc"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_device<mc6845_device> m_mc6845;
+	required_shared_ptr<UINT8> m_videoram;
+	
 	UINT8 *m_system_rom;
 	int m_LogDatWrites;
 	int m_Keyboard[NoKeyrows];
@@ -140,8 +142,6 @@ public:
 	int m_ColourRAM[4];
 	int m_Field;
 	int m_DrawInterlace;
-
-	required_device<mc6845_device> m_mc6845;
 };
 
 

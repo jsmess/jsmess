@@ -165,9 +165,9 @@ WRITE8_MEMBER( f1_state::system_w )
 static ADDRESS_MAP_START( act_f1_mem, AS_PROGRAM, 16, f1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x01dff) AM_RAM
-	AM_RANGE(0x01e00, 0x01fff) AM_RAM AM_BASE(m_p_scrollram)
+	AM_RANGE(0x01e00, 0x01fff) AM_RAM AM_SHARE("p_scrollram")
 	AM_RANGE(0x02000, 0x3ffff) AM_RAM
-	AM_RANGE(0xe0000, 0xe001f) AM_READWRITE(palette_r, palette_w) AM_BASE(m_p_paletteram)
+	AM_RANGE(0xe0000, 0xe001f) AM_READWRITE(palette_r, palette_w) AM_SHARE("p_paletteram")
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 

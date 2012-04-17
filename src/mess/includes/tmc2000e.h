@@ -28,7 +28,8 @@ public:
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_cti(*this, CDP1864_TAG),
 		  m_cassette(*this, CASSETTE_TAG)
-	{ }
+	,
+		m_colorram(*this, "colorram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
@@ -59,7 +60,7 @@ public:
 
 	/* video state */
 	int m_cdp1864_efx;		/* EFx */
-	UINT8 *m_colorram;		/* color memory */
+	required_shared_ptr<UINT8> m_colorram; 		/* color memory */
 	UINT8 m_color;
 
 	/* keyboard state */

@@ -64,11 +64,11 @@ class z80ne_state : public driver_device
 public:
 	z80ne_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_vdg(*this, "mc6847")
-	{}
+		  m_vdg(*this, "mc6847"),
+		  m_videoram(*this,"videoram") {}
 
 	optional_device<mc6847_base_device> m_vdg;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_lx383_scan_counter;
 	UINT8 m_lx383_key[LX383_KEYS];
 	int m_lx383_downsampler;

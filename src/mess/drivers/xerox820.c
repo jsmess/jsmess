@@ -238,7 +238,7 @@ WRITE8_MEMBER( xerox820ii_state::sync_w )
 
 static ADDRESS_MAP_START( xerox820_mem, AS_PROGRAM, 8, xerox820_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -256,7 +256,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xerox820ii_mem, AS_PROGRAM, 8, xerox820ii_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

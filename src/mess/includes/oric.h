@@ -58,9 +58,10 @@ class oric_state : public driver_device
 {
 public:
 	oric_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_ram(*this, "ram") { }
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	int m_is_telestrat;
 	unsigned char m_irqs;
 	char *m_ram_0x0c000;
