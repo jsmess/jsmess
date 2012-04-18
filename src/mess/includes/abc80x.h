@@ -142,6 +142,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+	DECLARE_DIRECT_UPDATE_MEMBER(abc800m_direct_update_handler);
 };
 
 class abc800c_state : public abc800_state
@@ -157,6 +159,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	DECLARE_DIRECT_UPDATE_MEMBER(abc800c_direct_update_handler);
 };
 
 // ======================> abc802_state
@@ -184,7 +188,8 @@ public:
 	DECLARE_READ8_MEMBER( pling_r );
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
-	DECLARE_WRITE_LINE_MEMBER( vs_w );
+	DECLARE_WRITE_LINE_MEMBER( vs_w );	
+	DECLARE_DIRECT_UPDATE_MEMBER(abc802_direct_update_handler);
 
 	// cpu state
 	int m_lrs;					// low RAM select
@@ -241,6 +246,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
+	DECLARE_DIRECT_UPDATE_MEMBER(abc806_direct_update_handler);
 
 	// memory state
 	int m_keydtr;				// keyboard DTR

@@ -28,39 +28,39 @@ public:
 		: spectrum_state(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
+	DIRECT_UPDATE_MEMBER(atm_direct);
 };
 
 
-DIRECT_UPDATE_HANDLER( atm_direct )
+DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	device_t *beta = machine.device(BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(machine.device("maincpu"), STATE_GENPCBASE);
+	device_t *beta = machine().device(BETA_DISK_TAG);
+	UINT16 pc = cpu_get_reg(machine().device("maincpu"), STATE_GENPCBASE);
 
 	if (beta->started() && betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
 		{
-			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
+			m_ROMSelection = ((m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
 		}
 	}
-	else if (((pc & 0xff00) == 0x3d00) && (state->m_ROMSelection==1))
+	else if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
 	{
-		state->m_ROMSelection = 3;
+		m_ROMSelection = 3;
 		if (beta->started())
 			betadisk_enable(beta);
 
 	}
 	if(address<=0x3fff)
 	{
-		if (state->m_ROMSelection == 3) {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.region("maincpu")->base() + 0x018000);
-			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x018000);
+		if (m_ROMSelection == 3) {
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().region("maincpu")->base() + 0x018000);
+			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x018000);
 		} else {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
-			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().region("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
 		}
 		return ~0;
 	}
@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( atm )
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
+	atm_state *state = machine.driver_data<atm_state>();
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *beta = machine.device(BETA_DISK_TAG);
@@ -130,7 +130,7 @@ static MACHINE_RESET( atm )
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}
-	space->set_direct_update_handler(direct_update_delegate(FUNC(atm_direct), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), state));
 
 	memset(messram,0,128*1024);
 

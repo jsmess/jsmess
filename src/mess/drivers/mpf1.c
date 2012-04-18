@@ -462,17 +462,15 @@ ROM_END
 
 /* System Drivers */
 
-DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
+DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
 {
-	mpf1_state *state = machine.driver_data<mpf1_state>();
-
-	if (!state->m_break)
+	if (!m_break)
 	{
-		state->m_m1++;
+		m_m1++;
 
-		if (state->m_m1 == 5)
+		if (m_m1 == 5)
 		{
-			state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		}
 	}
 
@@ -483,7 +481,7 @@ static DRIVER_INIT( mpf1 )
 {
 	mpf1_state *state = machine.driver_data<mpf1_state>();
 
-	state->m_maincpu->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mpf1_direct_update_handler), &machine));
+	state->m_maincpu->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mpf1_state::mpf1_direct_update_handler), state));
 }
 
 COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, "Multitech", "Micro Professor 1", 0)

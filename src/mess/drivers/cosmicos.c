@@ -610,14 +610,12 @@ ROM_END
 
 /* System Drivers */
 
-DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
+DIRECT_UPDATE_MEMBER(cosmicos_state::cosmicos_direct_update_handler)
 {
-	cosmicos_state *state = machine.driver_data<cosmicos_state>();
-
-	if (state->m_boot)
+	if (m_boot)
 	{
 		/* force A6 and A7 high */
-		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, machine.region(CDP1802_TAG)->base() + 0xc0);
+		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, machine().region(CDP1802_TAG)->base() + 0xc0);
 		return ~0;
 	}
 
@@ -626,9 +624,10 @@ DIRECT_UPDATE_HANDLER( cosmicos_direct_update_handler )
 
 static DRIVER_INIT( cosmicos )
 {
+	cosmicos_state *state = machine.driver_data<cosmicos_state>();
 	address_space *program = machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
-	program->set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_direct_update_handler), &machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_state::cosmicos_direct_update_handler), state));
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */

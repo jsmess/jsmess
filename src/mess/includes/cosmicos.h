@@ -91,6 +91,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( clear_data );
 	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
 	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
+	DECLARE_DIRECT_UPDATE_MEMBER(cosmicos_direct_update_handler);
+	
 	void set_cdp1802_mode(int mode);
 	void clear_input_data();
 	void set_ram_mode();

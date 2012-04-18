@@ -71,6 +71,7 @@ public:
 	DECLARE_WRITE8_MEMBER( terminal_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
+	DECLARE_DIRECT_UPDATE_MEMBER(mpz80_direct_update_handler);
 
 	// memory state
 	UINT32 m_addr;
