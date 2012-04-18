@@ -102,11 +102,12 @@ class fm7_state : public driver_device
 {
 public:
 	fm7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_shared_ram(*this, "shared_ram"),
-		m_boot_ram(*this, "boot_ram"){ }
+		: driver_device(mconfig, type, tag),
+	m_shared_ram(*this, "shared_ram"),
+	m_boot_ram(*this, "boot_ram")
+	{ }
 
-	required_shared_ptr<UINT8> m_shared_ram;
+	optional_shared_ptr<UINT8> m_shared_ram;
 	optional_shared_ptr<UINT8> m_boot_ram;
 	
 	UINT8 m_irq_flags;
