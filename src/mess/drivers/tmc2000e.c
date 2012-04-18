@@ -210,10 +210,6 @@ static COSMAC_INTERFACE( tmc2000e_config )
 
 void tmc2000e_state::machine_start()
 {
-	/* allocate color RAM */
-	//FIXME
-	//m_colorram = auto_alloc_array(machine(), UINT8, TMC2000E_COLORRAM_SIZE);
-
 	/* register for state saving */
 	save_pointer(NAME(m_colorram.target()), TMC2000E_COLORRAM_SIZE);
 	save_item(NAME(m_cdp1864_efx));

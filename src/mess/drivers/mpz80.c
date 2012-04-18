@@ -723,8 +723,7 @@ SLOT_INTERFACE_END
 
 void mpz80_state::machine_start()
 {
-	//FIXME
-	//m_map_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
+	m_map_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
 }
 
 
