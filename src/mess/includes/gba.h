@@ -221,6 +221,8 @@ public:
 	int m_bios_protected;
 
 	int m_flash_battery_load;
+	
+	DIRECT_UPDATE_MEMBER(gba_direct);
 };
 
 /*----------- defined in video/gba.c -----------*/

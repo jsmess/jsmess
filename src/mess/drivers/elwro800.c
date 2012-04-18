@@ -44,6 +44,8 @@ public:
 	/* NR signal */
 	UINT8 m_NR;
 	UINT8 m_df_on_databus;
+	
+	DECLARE_DIRECT_UPDATE_MEMBER(elwro800_direct_handler);
 };
 
 
@@ -54,12 +56,11 @@ public:
  * (note that in CP/J mode address 66 is used for FCB)
  *
  *************************************/
-DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
+DIRECT_UPDATE_MEMBER(elwro800_state::elwro800_direct_handler)
 {
-	elwro800_state *state = machine.driver_data<elwro800_state>();
-	if (state->m_ram_at_0000 && address == 0x66)
+	if (m_ram_at_0000 && address == 0x66)
 	{
-		direct.explicit_configure(0x66, 0x66, 0, &state->m_df_on_databus);
+		direct.explicit_configure(0x66, 0x66, 0, &m_df_on_databus);
 		return ~0;
 	}
 	return address;
@@ -520,7 +521,7 @@ static MACHINE_RESET(elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_direct_handler), &machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), state));
 }
 
 static const cassette_interface elwro800jr_cassette_interface =

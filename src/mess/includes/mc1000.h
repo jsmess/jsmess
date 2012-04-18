@@ -57,6 +57,7 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_READ8_MEMBER( keydata_r );
+	DIRECT_UPDATE_MEMBER(mc1000_direct_update_handler);
 
 	void bankswitch();
 

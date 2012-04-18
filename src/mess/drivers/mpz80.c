@@ -828,13 +828,11 @@ ROM_END
 //  DRIVER_INIT( mpz80 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_HANDLER( mpz80_direct_update_handler )
+DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
 {
-	mpz80_state *state = machine.driver_data<mpz80_state>();
-
-	if (state->m_trap && address >= state->m_trap_start && address <= state->m_trap_start + 0xf)
+	if (m_trap && address >= m_trap_start && address <= m_trap_start + 0xf)
 	{
-		direct.explicit_configure(state->m_trap_start, state->m_trap_start + 0xf, 0xf, machine.region(Z80_TAG)->base() + ((state->m_trap_reset << 10) | 0x3f0));
+		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, machine().region(Z80_TAG)->base() + ((m_trap_reset << 10) | 0x3f0));
 		return ~0;
 	}
 
@@ -843,8 +841,9 @@ DIRECT_UPDATE_HANDLER( mpz80_direct_update_handler )
 
 static DRIVER_INIT( mpz80 )
 {
+	mpz80_state *state = machine.driver_data<mpz80_state>();
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(mpz80_direct_update_handler), &machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(mpz80_state::mpz80_direct_update_handler), state));
 }
 
 

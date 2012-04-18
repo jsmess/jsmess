@@ -3215,24 +3215,24 @@ MACHINE_CONFIG_END
 
 /* this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,
    and some games verify that as a protection check (notably Metroid Fusion) */
-DIRECT_UPDATE_HANDLER( gba_direct )
+DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
 {
-	gba_state *state = machine.driver_data<gba_state>();
 	if (address > 0x4000)
 	{
-		state->m_bios_protected = 1;
+		m_bios_protected = 1;
 	}
 	else
 	{
-		state->m_bios_protected = 0;
-		state->m_bios_last_address = address;
+		m_bios_protected = 0;
+		m_bios_last_address = address;
 	}
 	return address;
 }
 
 static DRIVER_INIT(gbadv)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(gba_direct), &machine));
+	gba_state *state = machine.driver_data<gba_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), state));
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */
