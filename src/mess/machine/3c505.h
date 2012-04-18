@@ -151,7 +151,9 @@ typedef struct
 
 // ======================> threecom3c505_device
 
-class threecom3c505_device:  public device_t, public threecom3c505_interface
+class threecom3c505_device:  public device_t,
+					  public device_network_interface,
+					  public threecom3c505_interface
 {
 public:
 	// construction/destruction
@@ -160,7 +162,9 @@ public:
 	// static configuration helpers
 	static void static_set_interface(device_t &device, const threecom3c505_interface &interface);
 
-	int threecom3c505_receive(const UINT8 data[], int length);
+	void recv_cb(UINT8 *buf, int len);
+	bool mcast_chk(const UINT8 *buf, int len);
+
 	// device register I/O
 	UINT8 read_port(offs_t offset);
 	void write_port(offs_t offset, UINT8 data);

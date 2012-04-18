@@ -180,7 +180,8 @@ const device_type THREECOM3C505 = &device_creator<threecom3c505_device>;
 //-------------------------------------------------
 
 threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, THREECOM3C505, "Threecom 3C505", tag, owner, clock)
+    : device_t(mconfig, THREECOM3C505, "Threecom 3C505", tag, owner, clock),
+	  device_network_interface(mconfig, *this, 10.0f)
 {
 	memset(static_cast<threecom3c505_interface *>(this), 0, sizeof(threecom3c505_interface));
 }
@@ -246,6 +247,7 @@ void threecom3c505_device::device_reset()
 	memset(m_station_address, 0 , sizeof(m_station_address));
 	memset(m_multicast_list, 0 , sizeof(m_multicast_list));
 	set_filter_list();
+	set_promisc(true);
 }
 
 /***************************************************************************
@@ -775,6 +777,7 @@ void threecom3c505_device::do_command()
 			memcpy(m_station_address, m_command_buffer+2 , m_command_buffer[1]);
 		}
 		set_filter_list();
+		set_mac((char *)m_station_address);
 		break;
 
 	case CMD_CONFIGURE_82586: // 0x02
@@ -829,30 +832,27 @@ int threecom3c505_device::ethernet_packet_is_for_me(const UINT8 mac_address[])
 }
 
 /***************************************************************************
- threecom3c505_receive - receive and process an ethernet packet
+ recv_cb - receive callback - receive and process an ethernet packet
  ***************************************************************************/
 
-int threecom3c505_device::threecom3c505_receive(const UINT8 data[], int length)
+void threecom3c505_device::recv_cb(UINT8 *data, int length)
 {
 	if (length < ETHERNET_ADDR_SIZE || !ethernet_packet_is_for_me(data))
 	{
 		// skip packet
-		return 0;
 	}
 //  else if (m_command_pending && m_command_buffer[0] == CMD_MC_F9)
 //  {
-//      LOG(("threecom3c505_receive: data_length=%x !!!! skipped data while CMD_MC_F9 is pending!", length));
-//      return 0;
+//      LOG(("recv_cb: data_length=%x !!!! skipped data while CMD_MC_F9 is pending!", length));
 //  }
 	else if (!m_rx_fifo.put(data, length))
 	{
 		// fifo overrun
-		LOG1(("threecom3c505_receive: data_length=%x !!! RX FIFO OVERRUN !!!", length));
-		return 0;
+		LOG1(("recv_cb: data_length=%x !!! RX FIFO OVERRUN !!!", length));
 	}
 	else
 	{
-		LOG1(("threecom3c505_receive: data_length=%x m_rx_pending=%d", length, m_rx_pending));
+		LOG1(("recv_cb: data_length=%x m_rx_pending=%d", length, m_rx_pending));
 
 		if (m_rx_data_buffer.get_length() == 0)
 		{
@@ -877,12 +877,23 @@ int threecom3c505_device::threecom3c505_receive(const UINT8 data[], int length)
 //      {
 //          m_status |= ACRF; /* adapter command register full */
 //
-//          LOG(("threecom3c505_receive - set_interrupt(%d)",ASSERT_LINE));
+//          LOG(("recv_cb - set_interrupt(%d)",ASSERT_LINE));
 //          set_interrupt(ASSERT_LINE);
 //      }
-
-		return 1;
 	}
+}
+
+bool threecom3c505_device::mcast_chk(const UINT8 *buf, int len) {
+	int i;
+	for (i = 0; i + ETHERNET_ADDR_SIZE < sizeof(m_multicast_list); i += ETHERNET_ADDR_SIZE)
+	{
+		if (memcmp(buf, m_multicast_list + i, ETHERNET_ADDR_SIZE) == 0)
+		{
+			LOG2(("threecom3c505_device::mcast_chk: true (len=%d)", len));
+			return true;
+		}
+	}
+	return  false;
 }
 
 void threecom3c505_device::write_command_port( UINT8 data)
@@ -1025,6 +1036,12 @@ UINT8 threecom3c505_device::read_command_port()
 
 			case CMD_TRANSMIT_PACKET_COMPLETE:
 			case CMD_TRANSMIT_PACKET_18_COMPLETE:
+				if(!send(m_tx_data_buffer.get_data(), m_tx_data_buffer.get_length()))
+				{
+					// FIXME: failed to send the ethernet packet
+					LOG(("read_command_port(): failed to send ethernet packet"));
+				}
+
 				if (tx_data != NULL && //
 					(*tx_data)(this, m_tx_data_buffer.get_data(), m_tx_data_buffer.get_length()) == 0)
 				{
@@ -1378,7 +1395,8 @@ WRITE8_DEVICE_HANDLER( threecom3c505_w )
 
 int threecom3c505_receive(device_t *device, const UINT8 data[], int length)
 {
-	return downcast<threecom3c505_device *> (device)->threecom3c505_receive(data,length);
+	 downcast<threecom3c505_device *> (device)->recv_cb((UINT8 *)data,length);
+	 return 1;
 }
 
 void threecom3c505_set_verbose(int on_off)
