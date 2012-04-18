@@ -35,17 +35,17 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_intellivoice(*this, "sp0256_speech"),
 	m_sound(*this, "ay8914.1"),
-	m_ecs_sound(*this, "ay8914.2")
-		 ,
-		m_intvkbd_dualport_ram(*this, "dualport_ram"),
-		m_videoram(*this, "videoram"){ }
+	m_ecs_sound(*this, "ay8914.2"),
+	m_intvkbd_dualport_ram(*this, "dualport_ram"),
+	m_videoram(*this, "videoram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_intellivoice;
 	required_device<device_t> m_sound;
 	optional_device<device_t> m_ecs_sound;
-	required_shared_ptr<UINT16> m_intvkbd_dualport_ram;
-	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT16> m_intvkbd_dualport_ram;
+	optional_shared_ptr<UINT8> m_videoram;
 
 
 	DECLARE_READ16_MEMBER(intv_stic_r);
