@@ -2269,7 +2269,6 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_MACHINE_RESET(a2600)
 
 	/* video hardware */
-	MCFG_DEVICE_REMOVE("tia_video")
 	MCFG_TIA_VIDEO_ADD("tia_video", a2600_tia_interface_pal)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
