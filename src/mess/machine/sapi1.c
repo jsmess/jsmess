@@ -6,9 +6,6 @@
 
 ****************************************************************************/
 
-
-#include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/sapi1.h"
 
 
@@ -27,17 +24,18 @@ MACHINE_START(sapi1)
 {
 }
 
-READ8_MEMBER(sapi1_state::sapi1_keyboard_r)
+READ8_MEMBER( sapi1_state::sapi1_keyboard_r )
 {
 	UINT8 key = 0xff;
-	if ((m_keyboard_mask & 0x01)!=0) { key &= input_port_read(machine(),"LINE0"); }
-	if ((m_keyboard_mask & 0x02)!=0) { key &= input_port_read(machine(),"LINE1"); }
-	if ((m_keyboard_mask & 0x04)!=0) { key &= input_port_read(machine(),"LINE2"); }
-	if ((m_keyboard_mask & 0x08)!=0) { key &= input_port_read(machine(),"LINE3"); }
-	if ((m_keyboard_mask & 0x10)!=0) { key &= input_port_read(machine(),"LINE4"); }
+	if (BIT(m_keyboard_mask, 0)) { key &= input_port_read(machine(),"LINE0"); }
+	if (BIT(m_keyboard_mask, 1)) { key &= input_port_read(machine(),"LINE1"); }
+	if (BIT(m_keyboard_mask, 2)) { key &= input_port_read(machine(),"LINE2"); }
+	if (BIT(m_keyboard_mask, 3)) { key &= input_port_read(machine(),"LINE3"); }
+	if (BIT(m_keyboard_mask, 4)) { key &= input_port_read(machine(),"LINE4"); }
 	return key;
 }
-WRITE8_MEMBER(sapi1_state::sapi1_keyboard_w)
+
+WRITE8_MEMBER( sapi1_state::sapi1_keyboard_w )
 {
 	m_keyboard_mask = (data ^ 0xff ) & 0x1f;
 }
