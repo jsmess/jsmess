@@ -341,7 +341,7 @@ public:
     UINT32 m_dafb_base, m_dafb_stride;
 
     // this is shared among all video setups with vram
-	required_shared_ptr<UINT32> m_vram;
+	optional_shared_ptr<UINT32> m_vram;
 
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_via2_interrupt, m_scsi_interrupt, m_asc_interrupt, m_last_taken_interrupt;
